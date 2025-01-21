@@ -29,8 +29,8 @@ import mega.privacy.android.shared.original.core.ui.theme.OriginalTempTheme
 internal class CameraActivity : AppCompatActivity() {
 
     override fun attachBaseContext(newBase: Context?) {
-        super.attachBaseContext(newBase)
         delegate.localNightMode = AppCompatDelegate.MODE_NIGHT_YES
+        super.attachBaseContext(newBase)
     }
 
     @OptIn(ExperimentalMaterialNavigationApi::class)
