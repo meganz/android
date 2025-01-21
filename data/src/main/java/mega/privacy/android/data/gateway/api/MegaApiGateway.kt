@@ -3699,4 +3699,29 @@ interface MegaApiGateway {
         lastAccessTimestamp: Long,
         listener: MegaRequestListenerInterface
     )
+
+    /**
+     * Creates the special folder for backups ("My backups")
+     *
+     * It creates a new folder inside the Vault rootnode and later stores the node's
+     * handle in a user's attribute, MegaApi::USER_ATTR_MY_BACKUPS_FOLDER.
+     *
+     * Apps should first check if this folder exists already, by calling
+     * MegaApi::getUserAttribute for the corresponding attribute.
+     *
+     * The associated request type with this request is MegaRequest::TYPE_SET_MY_BACKUPS
+     * Valid data in the MegaRequest object received on callbacks:
+     * - MegaRequest::getText - Returns the name provided as parameter
+     *
+     * Valid data in the MegaRequest object received in onRequestFinish when the error code
+     * is MegaError::API_OK:
+     * - MegaRequest::getNodehandle - Returns the node handle of the folder created
+     *
+     * If no user was logged in, the request will fail with the error API_EACCESS.
+     * If the folder for backups already existed, the request will fail with the error API_EEXIST.
+     *
+     * @param localizedName Localized name for "My backups" folder
+     * @param listener MegaRequestListener to track this request
+     */
+    fun setMyBackupsFolder(localizedName: String, listener: MegaRequestListenerInterface?)
 }

@@ -17,11 +17,14 @@ import kotlinx.coroutines.flow.collectLatest
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import mega.privacy.android.domain.entity.sync.SyncType
+import mega.privacy.android.domain.repository.BackupRepository.Companion.BACKUPS_FOLDER_DEFAULT_NAME
 import mega.privacy.android.domain.usecase.account.IsStorageOverQuotaUseCase
 import mega.privacy.android.domain.usecase.backup.GetDeviceIdUseCase
 import mega.privacy.android.domain.usecase.backup.GetDeviceNameUseCase
 import mega.privacy.android.feature.sync.domain.entity.RemoteFolder
 import mega.privacy.android.feature.sync.domain.usecase.GetLocalDCIMFolderPathUseCase
+import mega.privacy.android.feature.sync.domain.usecase.backup.MyBackupsFolderExistsUseCase
+import mega.privacy.android.feature.sync.domain.usecase.backup.SetMyBackupsFolderUseCase
 import mega.privacy.android.feature.sync.domain.usecase.sync.SyncFolderPairUseCase
 import mega.privacy.android.feature.sync.domain.usecase.sync.option.ClearSelectedMegaFolderUseCase
 import mega.privacy.android.feature.sync.domain.usecase.sync.option.MonitorSelectedMegaFolderUseCase
@@ -37,6 +40,8 @@ internal class SyncNewFolderViewModel @AssistedInject constructor(
     private val clearSelectedMegaFolderUseCase: ClearSelectedMegaFolderUseCase,
     private val getDeviceIdUseCase: GetDeviceIdUseCase,
     private val getDeviceNameUseCase: GetDeviceNameUseCase,
+    private val myBackupsFolderExistsUseCase: MyBackupsFolderExistsUseCase,
+    private val setMyBackupsFolderUseCase: SetMyBackupsFolderUseCase,
 ) : ViewModel() {
 
     @AssistedFactory
@@ -49,7 +54,9 @@ internal class SyncNewFolderViewModel @AssistedInject constructor(
     val state: StateFlow<SyncNewFolderState> = _state.asStateFlow()
 
     init {
-        getDeviceName()
+        if (syncType == SyncType.TYPE_BACKUP) {
+            getDeviceName()
+        }
         viewModelScope.launch {
             clearSelectedMegaFolderUseCase()
             monitorSelectedMegaFolderUseCase().collectLatest { folder ->
@@ -104,12 +111,17 @@ internal class SyncNewFolderViewModel @AssistedInject constructor(
                         else -> {
                             when (state.value.syncType) {
                                 SyncType.TYPE_BACKUP -> {
-                                    syncFolderPairUseCase(
-                                        syncType = state.value.syncType,
-                                        name = null,
-                                        localPath = state.value.selectedLocalFolder,
-                                        remotePath = RemoteFolder(-1L, ""),
-                                    )
+                                    if (myBackupsFolderExistsUseCase().not()) {
+                                        runCatching {
+                                            setMyBackupsFolderUseCase(BACKUPS_FOLDER_DEFAULT_NAME)
+                                        }.onSuccess {
+                                            createBackup()
+                                        }.onFailure {
+                                            Timber.e(it)
+                                        }
+                                    } else {
+                                        createBackup()
+                                    }
                                 }
 
                                 else -> {
@@ -143,6 +155,15 @@ internal class SyncNewFolderViewModel @AssistedInject constructor(
                 }
             }
         }
+    }
+
+    private suspend fun createBackup() {
+        syncFolderPairUseCase(
+            syncType = state.value.syncType,
+            name = null,
+            localPath = state.value.selectedLocalFolder,
+            remotePath = RemoteFolder(-1L, ""),
+        )
     }
 
     /**

@@ -20,7 +20,9 @@ class SetupDeviceNameUseCase @Inject constructor(
         getDeviceIdUseCase()?.let { deviceId ->
             runCatching { getDeviceNameUseCase(deviceId) }.getOrNull().let {
                 if (it.isNullOrEmpty()) {
-                    setDeviceNameUseCase(deviceId, environmentRepository.getDeviceInfo().device)
+                    setDeviceNameUseCase(
+                        deviceId,
+                        environmentRepository.getDeviceInfo().device.ifBlank { "My device" })
                 }
             }
         }
