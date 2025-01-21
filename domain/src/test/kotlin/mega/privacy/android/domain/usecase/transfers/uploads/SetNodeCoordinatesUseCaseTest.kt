@@ -3,11 +3,10 @@ package mega.privacy.android.domain.usecase.transfers.uploads
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.test.runTest
 import mega.privacy.android.domain.entity.node.NodeId
+import mega.privacy.android.domain.entity.transfer.TransferAppData
 import mega.privacy.android.domain.entity.uri.UriPath
 import mega.privacy.android.domain.repository.NodeRepository
 import mega.privacy.android.domain.usecase.file.GetGPSCoordinatesUseCase
-import mega.privacy.android.domain.usecase.file.IsImageFileUseCase
-import mega.privacy.android.domain.usecase.file.IsVideoFileUseCase
 import org.junit.jupiter.api.BeforeAll
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.TestInstance
@@ -28,53 +27,48 @@ class SetNodeCoordinatesUseCaseTest {
     private lateinit var underTest: SetNodeCoordinatesUseCase
 
     private lateinit var nodeRepository: NodeRepository
-    private lateinit var isVideoFileUseCase: IsVideoFileUseCase
-    private lateinit var isImageFileUseCase: IsImageFileUseCase
     private lateinit var getGPSCoordinatesUseCase: GetGPSCoordinatesUseCase
 
     @BeforeAll
     fun setUp() {
         nodeRepository = mock()
-        isVideoFileUseCase = mock()
-        isImageFileUseCase = mock()
         getGPSCoordinatesUseCase = mock()
         underTest = SetNodeCoordinatesUseCase(
             nodeRepository = nodeRepository,
-            isVideoFileUseCase = isVideoFileUseCase,
-            isImageFileUseCase = isImageFileUseCase,
             getGPSCoordinatesUseCase = getGPSCoordinatesUseCase
         )
     }
 
     @BeforeEach
     fun resetMocks() {
-        reset(nodeRepository, isVideoFileUseCase, isImageFileUseCase, getGPSCoordinatesUseCase)
+        reset(nodeRepository, getGPSCoordinatesUseCase)
     }
 
-    @ParameterizedTest(name = " is invoked = {0} when isVideoFile is {1} and isImageFile {2}")
+    @ParameterizedTest(name = " is invoked = {0} when file has coordinates is {1} and has geolocation app data is {2}")
     @MethodSource("provideParameters")
-    fun `test that GetGPSCoordinatesUseCase`(
+    fun `test that setNodeCoordinates`(
         isInvoked: Boolean,
-        isVideoFile: Boolean,
-        isImageFile: Boolean,
+        hasCoordinates: Boolean,
+        hasAppData: Boolean,
     ) = runTest {
         val uriPath = UriPath("path")
         val nodeHandle = 1L
         val coordinates = Pair(123.0, 6345.0)
-        whenever(isVideoFileUseCase(uriPath)).thenReturn(isVideoFile)
-        whenever(isImageFileUseCase(uriPath)).thenReturn(isImageFile)
-        whenever(getGPSCoordinatesUseCase.invoke(uriPath, isVideoFile)).thenReturn(coordinates)
-        underTest.invoke(uriPath, nodeHandle)
+        val appData = if (hasAppData) {
+            TransferAppData.Geolocation(coordinates.first, coordinates.second)
+        } else null
+        whenever(getGPSCoordinatesUseCase.invoke(uriPath, null))
+            .thenReturn(if (hasCoordinates) coordinates else null)
+        underTest.invoke(uriPath, nodeHandle, appData)
 
         if (isInvoked) {
-            verify(getGPSCoordinatesUseCase).invoke(uriPath, isVideoFile)
-            nodeRepository.setNodeCoordinates(
-                NodeId(nodeHandle),
-                coordinates.first,
-                coordinates.second,
-            )
+            verify(nodeRepository).setNodeCoordinates(
+                    NodeId(nodeHandle),
+                    coordinates.first,
+                    coordinates.second,
+                )
         } else {
-            verifyNoInteractions(getGPSCoordinatesUseCase)
+            verifyNoInteractions(nodeRepository)
         }
     }
 

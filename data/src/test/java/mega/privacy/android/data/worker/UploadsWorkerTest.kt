@@ -29,6 +29,7 @@ import mega.privacy.android.domain.entity.Progress
 import mega.privacy.android.domain.entity.transfer.ActiveTransferTotals
 import mega.privacy.android.domain.entity.transfer.MonitorOngoingActiveTransfersResult
 import mega.privacy.android.domain.entity.transfer.Transfer
+import mega.privacy.android.domain.entity.transfer.TransferAppData
 import mega.privacy.android.domain.entity.transfer.TransferEvent
 import mega.privacy.android.domain.entity.transfer.TransferState
 import mega.privacy.android.domain.entity.transfer.TransferType
@@ -57,7 +58,6 @@ import org.mockito.kotlin.times
 import org.mockito.kotlin.verify
 import org.mockito.kotlin.verifyNoInteractions
 import org.mockito.kotlin.whenever
-import java.io.File
 import java.util.UUID
 import java.util.concurrent.Executor
 import java.util.concurrent.Executors
@@ -341,11 +341,12 @@ class UploadsWorkerTest {
 
     @Test
     fun `test that node attributes are set once upload is finished`() = runTest {
-        val finishEvent = commonStub()
+        val appData = listOf(TransferAppData.Geolocation(345.4,45.34))
+        val finishEvent = commonStub(appData = appData)
 
         underTest.onTransferEventReceived(finishEvent)
 
-        verify(setNodeAttributesAfterUploadUseCase).invoke(nodeId, UriPath(localPath))
+        verify(setNodeAttributesAfterUploadUseCase).invoke(nodeId, UriPath(localPath), appData)
     }
 
     @Test
@@ -355,22 +356,24 @@ class UploadsWorkerTest {
             on { this.localPath }.thenReturn(localPath)
             on { this.state }.thenReturn(TransferState.STATE_FAILED)
         }
-        val transferEvent = TransferEvent.TransferFinishEvent(transfer, null)
+        val transferEvent = TransferEvent.TransferFinishEvent(transfer, mock())
         commonStub()
 
         underTest.onTransferEventReceived(transferEvent)
 
-        verify(setNodeAttributesAfterUploadUseCase).invoke(nodeId, UriPath(localPath))
+        verifyNoInteractions(setNodeAttributesAfterUploadUseCase)
     }
 
     private suspend fun commonStub(
         initialTransferTotals: ActiveTransferTotals = mockActiveTransferTotals(false),
         transferTotals: List<ActiveTransferTotals> = listOf(mockActiveTransferTotals(true)),
         storageOverQuota: Boolean = false,
+        appData: List<TransferAppData>? = null,
     ): TransferEvent.TransferFinishEvent {
         val transfer: Transfer = mock {
             on { this.nodeHandle }.thenReturn(nodeId)
             on { this.localPath }.thenReturn(localPath)
+            on { this.appData}.thenReturn(appData)
         }
         val transferEvent = TransferEvent.TransferFinishEvent(transfer, null)
         whenever(areTransfersPausedUseCase())

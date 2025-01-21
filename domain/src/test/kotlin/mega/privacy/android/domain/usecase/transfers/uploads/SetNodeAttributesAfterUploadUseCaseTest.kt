@@ -2,6 +2,7 @@ package mega.privacy.android.domain.usecase.transfers.uploads
 
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.test.runTest
+import mega.privacy.android.domain.entity.transfer.TransferAppData
 import mega.privacy.android.domain.entity.uri.UriPath
 import mega.privacy.android.domain.usecase.file.IsImageFileUseCase
 import mega.privacy.android.domain.usecase.file.IsPdfFileUseCase
@@ -13,10 +14,12 @@ import mega.privacy.android.domain.usecase.thumbnailpreview.CreatePdfThumbnailUs
 import org.junit.jupiter.api.Assertions.*
 import org.junit.jupiter.api.BeforeAll
 import org.junit.jupiter.api.BeforeEach
+import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.TestInstance
 import org.junit.jupiter.params.ParameterizedTest
 import org.junit.jupiter.params.provider.Arguments
 import org.junit.jupiter.params.provider.MethodSource
+import org.junit.jupiter.params.provider.ValueSource
 import org.mockito.kotlin.mock
 import org.mockito.kotlin.never
 import org.mockito.kotlin.reset
@@ -123,6 +126,21 @@ class SetNodeAttributesAfterUploadUseCaseTest {
                 verify(setNodeCoordinatesUseCase, never()).invoke(uriPath, nodeHandle)
             }
         }
+    }
+
+    @ParameterizedTest
+    @ValueSource(booleans = [true, false])
+    fun `test that geolocation appdata parameter is set when is an image or video file and app data contains it`(
+        isVideoFile: Boolean
+    ) = runTest{
+        whenever(isVideoFileUseCase(uriPath)).thenReturn(isVideoFile)
+        whenever(isImageFileUseCase(uriPath)).thenReturn(!isVideoFile)
+        whenever(isPdfFileUseCase(uriPath)).thenReturn(false)
+        val geolocation = TransferAppData.Geolocation(34.354, 45.435)
+        val appData = listOf(geolocation)
+        underTest.invoke(nodeHandle, uriPath, appData = appData)
+
+        verify(setNodeCoordinatesUseCase).invoke(uriPath, nodeHandle, geolocation)
     }
 
     private fun provideParameters() = Stream.of(

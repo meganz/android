@@ -1,5 +1,6 @@
 package mega.privacy.android.domain.usecase.transfers.uploads
 
+import mega.privacy.android.domain.entity.transfer.TransferAppData
 import mega.privacy.android.domain.entity.uri.UriPath
 import mega.privacy.android.domain.usecase.file.IsImageFileUseCase
 import mega.privacy.android.domain.usecase.file.IsPdfFileUseCase
@@ -43,7 +44,11 @@ class SetNodeAttributesAfterUploadUseCase @Inject constructor(
      * @param nodeHandle Node handle of the file already in the Cloud.
      * @param uriPath Uri path.
      */
-    suspend operator fun invoke(nodeHandle: Long, uriPath: UriPath) {
+    suspend operator fun invoke(
+        nodeHandle: Long,
+        uriPath: UriPath,
+        appData: List<TransferAppData>? = null,
+        ) {
         val localPath = uriPath.value
         val localFile = File(localPath)
         val isVideoOrImage = isVideoFileUseCase(uriPath) || isImageFileUseCase(uriPath)
@@ -52,7 +57,11 @@ class SetNodeAttributesAfterUploadUseCase @Inject constructor(
         if (isVideoOrImage) {
             createImageOrVideoThumbnailUseCase(nodeHandle = nodeHandle, localFile = localFile)
             createImageOrVideoPreviewUseCase(nodeHandle = nodeHandle, localFile = localFile)
-            setNodeCoordinatesUseCase(uriPath = uriPath, nodeHandle = nodeHandle)
+            setNodeCoordinatesUseCase(
+                nodeHandle = nodeHandle,
+                uriPath = uriPath,
+                geolocation = appData?.filterIsInstance<TransferAppData.Geolocation>()?.firstOrNull(),
+            )
         } else if (isPdf) {
             createPdfThumbnailUseCase(nodeHandle = nodeHandle, uriPath = uriPath)
             createPdfPreviewUseCase(nodeHandle = nodeHandle, uriPath = uriPath)

@@ -97,6 +97,7 @@ class UploadsWorker @AssistedInject constructor(
                     setNodeAttributesAfterUploadUseCase(
                         nodeHandle = it.transfer.nodeHandle,
                         uriPath = UriPath(it.transfer.localPath),
+                        appData = it.transfer.appData
                     )
                 }.onFailure { exception ->
                     Timber.e(exception, "Node attributes not correctly set")
