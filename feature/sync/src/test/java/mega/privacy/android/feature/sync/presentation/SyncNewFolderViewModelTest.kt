@@ -13,6 +13,7 @@ import kotlinx.coroutines.flow.flow
 import kotlinx.coroutines.flow.flowOf
 import kotlinx.coroutines.test.runTest
 import mega.privacy.android.core.test.extension.CoroutineMainDispatcherExtension
+import mega.privacy.android.domain.entity.node.NodeId
 import mega.privacy.android.domain.entity.sync.SyncType
 import mega.privacy.android.domain.usecase.account.IsStorageOverQuotaUseCase
 import mega.privacy.android.domain.usecase.backup.GetDeviceIdUseCase
@@ -21,6 +22,8 @@ import mega.privacy.android.feature.sync.domain.entity.FolderPair
 import mega.privacy.android.feature.sync.domain.entity.RemoteFolder
 import mega.privacy.android.feature.sync.domain.entity.SyncStatus
 import mega.privacy.android.feature.sync.domain.usecase.GetLocalDCIMFolderPathUseCase
+import mega.privacy.android.feature.sync.domain.usecase.backup.MyBackupsFolderExistsUseCase
+import mega.privacy.android.feature.sync.domain.usecase.backup.SetMyBackupsFolderUseCase
 import mega.privacy.android.feature.sync.domain.usecase.sync.GetFolderPairsUseCase
 import mega.privacy.android.feature.sync.domain.usecase.sync.SyncFolderPairUseCase
 import mega.privacy.android.feature.sync.domain.usecase.sync.option.ClearSelectedMegaFolderUseCase
@@ -54,6 +57,8 @@ internal class SyncNewFolderViewModelTest {
     private val getDeviceIdUseCase: GetDeviceIdUseCase = mock()
     private val getDeviceNameUseCase: GetDeviceNameUseCase = mock()
     private val getFolderPairsUseCase: GetFolderPairsUseCase = mock()
+    private val myBackupsFolderExistsUseCase: MyBackupsFolderExistsUseCase = mock()
+    private val setMyBackupsFolderUseCase: SetMyBackupsFolderUseCase = mock()
     private lateinit var underTest: SyncNewFolderViewModel
 
     @AfterEach
@@ -67,6 +72,8 @@ internal class SyncNewFolderViewModelTest {
             getDeviceIdUseCase,
             getDeviceNameUseCase,
             getFolderPairsUseCase,
+            myBackupsFolderExistsUseCase,
+            setMyBackupsFolderUseCase,
         )
     }
 
@@ -233,6 +240,7 @@ internal class SyncNewFolderViewModelTest {
                 emit(remoteFolder)
                 awaitCancellation()
             })
+            whenever(myBackupsFolderExistsUseCase()).thenReturn(true)
             whenever(
                 syncFolderPairUseCase.invoke(
                     syncType = syncType,
@@ -253,6 +261,43 @@ internal class SyncNewFolderViewModelTest {
             verify(syncFolderPairUseCase).invoke(
                 syncType = syncType,
                 name = if (syncType == SyncType.TYPE_TWOWAY) remoteFolder.name else null,
+                localPath = state.selectedLocalFolder,
+                remotePath = remoteFolder,
+            )
+            assertThat(underTest.state.value.openSyncListScreen).isEqualTo(triggered)
+        }
+
+    @Test
+    fun `test that next click creates backups node, new folder pair and navigates to next screen`() =
+        runTest {
+            val remoteFolder = RemoteFolder(-1L, "")
+            whenever(isStorageOverQuotaUseCase()).thenReturn(false)
+            whenever(monitorSelectedMegaFolderUseCase()).thenReturn(flow {
+                emit(remoteFolder)
+                awaitCancellation()
+            })
+            whenever(myBackupsFolderExistsUseCase()).thenReturn(false)
+            whenever(setMyBackupsFolderUseCase("Backups")).thenReturn(NodeId(9999L))
+            whenever(
+                syncFolderPairUseCase.invoke(
+                    syncType = SyncType.TYPE_BACKUP,
+                    name = null,
+                    localPath = "",
+                    remotePath = remoteFolder,
+                )
+            ).thenReturn(true)
+            val state = SyncNewFolderState(
+                syncType = SyncType.TYPE_BACKUP,
+                deviceName = "Device Name",
+                selectedMegaFolder = remoteFolder,
+            )
+            initViewModel(syncType = SyncType.TYPE_BACKUP)
+
+            underTest.handleAction(SyncNewFolderAction.NextClicked)
+
+            verify(syncFolderPairUseCase).invoke(
+                syncType = SyncType.TYPE_BACKUP,
+                name = null,
                 localPath = state.selectedLocalFolder,
                 remotePath = remoteFolder,
             )
@@ -373,6 +418,8 @@ internal class SyncNewFolderViewModelTest {
             getDeviceIdUseCase = getDeviceIdUseCase,
             getDeviceNameUseCase = getDeviceNameUseCase,
             getFolderPairsUseCase = getFolderPairsUseCase,
+            myBackupsFolderExistsUseCase = myBackupsFolderExistsUseCase,
+            setMyBackupsFolderUseCase = setMyBackupsFolderUseCase,
         )
     }
 

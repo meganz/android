@@ -1600,4 +1600,11 @@ internal class MegaApiFacade @Inject constructor(
             listener
         )
     }
+
+    override fun setMyBackupsFolder(
+        localizedName: String,
+        listener: MegaRequestListenerInterface?,
+    ) {
+        megaApi.setMyBackupsFolder(localizedName, listener)
+    }
 }

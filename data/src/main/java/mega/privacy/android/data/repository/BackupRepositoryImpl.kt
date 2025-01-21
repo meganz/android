@@ -3,10 +3,12 @@ package mega.privacy.android.data.repository
 import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.suspendCancellableCoroutine
 import kotlinx.coroutines.withContext
+import mega.privacy.android.data.extensions.failWithError
 import mega.privacy.android.data.extensions.getRequestListener
 import mega.privacy.android.data.gateway.AppEventGateway
 import mega.privacy.android.data.gateway.MegaLocalRoomGateway
 import mega.privacy.android.data.gateway.api.MegaApiGateway
+import mega.privacy.android.data.listener.OptionalMegaRequestListenerInterface
 import mega.privacy.android.data.mapper.backup.BackupDeviceNamesMapper
 import mega.privacy.android.data.mapper.backup.BackupInfoListMapper
 import mega.privacy.android.data.mapper.backup.BackupInfoTypeIntMapper
@@ -15,10 +17,13 @@ import mega.privacy.android.data.mapper.camerauploads.BackupStateIntMapper
 import mega.privacy.android.domain.entity.BackupState
 import mega.privacy.android.domain.entity.backup.Backup
 import mega.privacy.android.domain.entity.backup.BackupInfoType
+import mega.privacy.android.domain.entity.node.NodeId
 import mega.privacy.android.domain.qualifier.IoDispatcher
 import mega.privacy.android.domain.repository.BackupRepository
+import mega.privacy.android.domain.repository.BackupRepository.Companion.BACKUPS_FOLDER_DEFAULT_NAME
 import nz.mega.sdk.MegaApiJava
 import nz.mega.sdk.MegaError
+import nz.mega.sdk.MegaRequest
 import timber.log.Timber
 import javax.inject.Inject
 
@@ -159,4 +164,40 @@ internal class BackupRepositoryImpl @Inject constructor(
             Timber.d("Local Backup saved $backup")
         }
     }
+
+    override suspend fun myBackupsFolderExists(): Boolean =
+        suspendCancellableCoroutine { continuation ->
+            val listener =
+                OptionalMegaRequestListenerInterface(onRequestFinish = { request: MegaRequest, error: MegaError ->
+                    if (error.errorCode == MegaError.API_OK) {
+                        continuation.resumeWith(Result.success(request.megaStringMap != null))
+                    } else {
+                        continuation.resumeWith(Result.success(false))
+                    }
+                })
+            megaApiGateway.getUserAttribute(
+                attributeIdentifier = MegaApiJava.USER_ATTR_MY_BACKUPS_FOLDER,
+                listener = listener,
+            )
+        }
+
+    override suspend fun setMyBackupsFolder(localizedName: String?): NodeId =
+        suspendCancellableCoroutine { continuation ->
+            val listener =
+                OptionalMegaRequestListenerInterface(onRequestFinish = { request: MegaRequest, error: MegaError ->
+                    when (error.errorCode) {
+                        MegaError.API_OK, MegaError.API_EEXIST -> {
+                            continuation.resumeWith(Result.success(NodeId(request.nodeHandle)))
+                        }
+
+                        else -> {
+                            continuation.failWithError(error, "setMyBackupsFolder")
+                        }
+                    }
+                })
+            megaApiGateway.setMyBackupsFolder(
+                localizedName = localizedName ?: BACKUPS_FOLDER_DEFAULT_NAME,
+                listener = listener,
+            )
+        }
 }
