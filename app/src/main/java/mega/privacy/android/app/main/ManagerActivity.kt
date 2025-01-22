@@ -4823,17 +4823,19 @@ class ManagerActivity : PasscodeActivity(), NavigationView.OnNavigationItemSelec
         with(fileBrowserViewModel) {
             when {
                 // User is exploring a Sync Folder
-                isSyncFolderOpen() -> {
+                isSyncFolderOpen() || isFromSyncTab() -> {
                     lifecycleScope.launch {
                         if (isAtAccessedFolder()) {
-                            resetSyncFolderVisibility()
-                            // Remove Cloud Drive and go back to Syncs
-                            if (getFeatureFlagValueUseCase(AppFeatures.CloudDriveAndSyncs)) {
-                                removeFragment(cloudDriveSyncsFragment)
-                            } else {
-                                removeFragment(fileBrowserComposeFragment)
+                            if (isFromSyncTab().not()) {
+                                // Remove Cloud Drive and go back to Syncs
+                                if (getFeatureFlagValueUseCase(AppFeatures.CloudDriveAndSyncs)) {
+                                    removeFragment(cloudDriveSyncsFragment)
+                                } else {
+                                    removeFragment(fileBrowserComposeFragment)
+                                }
+                                megaNavigator.openSyncs(this@ManagerActivity)
                             }
-                            megaNavigator.openSyncs(this@ManagerActivity)
+                            resetSyncFolderVisibility()
                             goBackToRootLevel()
                         } else {
                             if (isMediaDiscoveryOpen()) {
@@ -4884,20 +4886,15 @@ class ManagerActivity : PasscodeActivity(), NavigationView.OnNavigationItemSelec
                             lifecycle.withStarted {
                                 if (isAccessedFolderExited()) {
                                     resetIsAccessedFolderExited()
+                                    //user is navigating to cloud drive from device fragment
+                                    // Remove Cloud Drive and go back to Device Center
                                     if (isCloudDriveSyncsFeatureActive) {
-                                        if (fileBrowserViewModel.isSyncFolderOpen()) {
-                                            //user is navigating to cloud drive from device fragment
-                                            // Remove Cloud Drive and go back to Device Center
-                                            removeFragment(cloudDriveSyncsFragment)
-                                            selectDrawerItem(DrawerItem.DEVICE_CENTER)
-                                        }
+                                        removeFragment(cloudDriveSyncsFragment)
                                         // user navigates from sync tab so need to remove cloud drive fragment
                                     } else {
-                                        //user is navigating to cloud drive from device fragment
-                                        // Remove Cloud Drive and go back to Device Center
                                         removeFragment(fileBrowserComposeFragment)
-                                        selectDrawerItem(DrawerItem.DEVICE_CENTER)
                                     }
+                                    selectDrawerItem(DrawerItem.DEVICE_CENTER)
                                 }
                             }
                         }

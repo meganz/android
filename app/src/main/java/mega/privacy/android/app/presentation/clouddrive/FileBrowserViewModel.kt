@@ -460,6 +460,13 @@ class FileBrowserViewModel @Inject constructor(
      */
     fun isSyncFolderOpen() = _state.value.isSyncFolderOpen
 
+
+    /**
+     * Checks if file browser is opened from Sync Tab
+     */
+    fun isFromSyncTab() = _state.value.isFromSyncTab
+
+
     /**
      * Sets the Sync Folder Visibility
      *
@@ -469,10 +476,18 @@ class FileBrowserViewModel @Inject constructor(
         _state.update { it.copy(isSyncFolderOpen = isSyncFolderOpen) }
 
     /**
+     * Sets is file browser is opened from Sync Tab
+     *
+     * @param isFromSyncTab True if file browser is opened from sync tab
+     */
+    fun setIsFromSyncTab(isFromSyncTab: Boolean) =
+        _state.update { it.copy(isFromSyncTab = isFromSyncTab) }
+
+    /**
      * Resets the Sync Folder Visibility
      */
     fun resetSyncFolderVisibility() =
-        _state.update { it.copy(isSyncFolderOpen = false) }
+        _state.update { it.copy(isSyncFolderOpen = false, isFromSyncTab = false) }
 
     /**
      * Navigate back to the Cloud Drive Root Level hierarchy

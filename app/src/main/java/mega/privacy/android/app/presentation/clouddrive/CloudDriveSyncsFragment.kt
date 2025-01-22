@@ -353,6 +353,7 @@ class CloudDriveSyncsFragment : Fragment() {
                                         },
                                         onOpenMegaFolderClicked = {
                                             coroutineScope.launch {
+                                                fileBrowserViewModel.setIsFromSyncTab(true)
                                                 appNavigator.openNodeInCloudDrive(
                                                     activity,
                                                     nodeHandle = it,
