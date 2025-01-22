@@ -47,7 +47,7 @@ class SetNodeAttributesAfterUploadUseCase @Inject constructor(
     suspend operator fun invoke(
         nodeHandle: Long,
         uriPath: UriPath,
-        appData: List<TransferAppData>? = null,
+        appData: List<TransferAppData>?,
         ) {
         val localPath = uriPath.value
         val localFile = File(localPath)

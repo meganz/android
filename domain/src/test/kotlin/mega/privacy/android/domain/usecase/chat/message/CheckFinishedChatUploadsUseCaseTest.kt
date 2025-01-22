@@ -6,6 +6,7 @@ import mega.privacy.android.domain.entity.chat.PendingMessageState
 import mega.privacy.android.domain.entity.chat.messages.pending.UpdatePendingMessageStateRequest
 import mega.privacy.android.domain.entity.node.NodeId
 import mega.privacy.android.domain.entity.transfer.Transfer
+import mega.privacy.android.domain.entity.transfer.TransferAppData
 import mega.privacy.android.domain.repository.TransferRepository
 import mega.privacy.android.domain.repository.chat.ChatMessageRepository
 import org.junit.jupiter.api.BeforeAll
@@ -77,6 +78,7 @@ class CheckFinishedChatUploadsUseCaseTest {
         runTest {
             val pendingMessageIds = (1..10).map { it * 100L }
             val nodeHandles = pendingMessageIds.map { it * 2 }
+            val appData = listOf(TransferAppData.Geolocation(345.4, 45.34))
             val uploadingPendingMessage = pendingMessageIds.mapIndexed { index, id ->
                 mock<PendingMessage> {
                     on { it.transferTag } doReturn index
@@ -88,6 +90,7 @@ class CheckFinishedChatUploadsUseCaseTest {
                 val transfer = mock<Transfer> {
                     on { it.nodeHandle } doReturn nodeHandles[index]
                     on { it.isFinished } doReturn true
+                    on { it.appData } doReturn appData
                 }
                 whenever(transferRepository.getTransferByTag(index)) doReturn transfer
             }
@@ -97,7 +100,8 @@ class CheckFinishedChatUploadsUseCaseTest {
             pendingMessageIds.forEachIndexed { index, pendingMessageId ->
                 verify(attachNodeWithPendingMessageUseCase).invoke(
                     pendingMessageId,
-                    NodeId(nodeHandles[index])
+                    NodeId(nodeHandles[index]),
+                    appData,
                 )
             }
         }

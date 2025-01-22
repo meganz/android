@@ -47,7 +47,8 @@ class HandleChatUploadTransferEventUseCase @Inject constructor(
                 pendingMessageIds.forEach { pendingMessageId ->
                     attachNodeWithPendingMessageUseCase(
                         pendingMessageId,
-                        alreadyTransferredNodeId
+                        alreadyTransferredNodeId,
+                        singleTransferEvent.transferEvent.transfer.appData,
                     )
                 }
             }

@@ -7,6 +7,7 @@ import mega.privacy.android.domain.entity.chat.messages.pending.UpdatePendingMes
 import mega.privacy.android.domain.entity.node.NodeId
 import mega.privacy.android.domain.entity.transfer.MultiTransferEvent
 import mega.privacy.android.domain.entity.transfer.Transfer
+import mega.privacy.android.domain.entity.transfer.TransferAppData
 import mega.privacy.android.domain.entity.transfer.TransferEvent
 import mega.privacy.android.domain.usecase.chat.message.AttachNodeWithPendingMessageUseCase
 import mega.privacy.android.domain.usecase.chat.message.UpdatePendingMessageUseCase
@@ -61,8 +62,16 @@ class HandleChatUploadTransferEventUseCaseTest {
         runTest {
             val pendingMessageId = 15L
             val nodeHandle = 12L
+            val appData = listOf(TransferAppData.Geolocation(345.4, 45.34))
+            val transfer = mock<Transfer> {
+                on { it.isFinished } doReturn true
+                on { it.appData } doReturn appData
+            }
+            val transferEvent = mock<TransferEvent.TransferFinishEvent> {
+                on { it.transfer } doReturn transfer
+            }
             val event = MultiTransferEvent.SingleTransferEvent(
-                mock<TransferEvent.TransferFinishEvent>(),
+                transferEvent,
                 1L, 1L,
                 alreadyTransferredIds = setOf(NodeId(nodeHandle))
             )
@@ -70,7 +79,8 @@ class HandleChatUploadTransferEventUseCaseTest {
             underTest(event, pendingMessageId)
             verify(attachNodeWithPendingMessageUseCase).invoke(
                 pendingMessageId,
-                NodeId(nodeHandle)
+                NodeId(nodeHandle),
+                appData,
             )
         }
 

@@ -172,7 +172,8 @@ class ChatUploadsWorker @AssistedInject constructor(
                             //once uploaded, it can be attached to the chat
                             attachNodeWithPendingMessageUseCase(
                                 pendingMessageId,
-                                NodeId(event.transfer.nodeHandle)
+                                NodeId(event.transfer.nodeHandle),
+                                finishEvent.transfer.appData,
                             )
                         }.onFailure {
                             updateState(pendingMessageId, PendingMessageState.ERROR_ATTACHING)

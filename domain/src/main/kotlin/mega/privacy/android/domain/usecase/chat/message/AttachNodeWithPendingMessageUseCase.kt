@@ -4,6 +4,7 @@ import mega.privacy.android.domain.entity.chat.PendingMessageState
 import mega.privacy.android.domain.entity.chat.messages.pending.UpdatePendingMessageStateAndNodeHandleRequest
 import mega.privacy.android.domain.entity.chat.messages.pending.UpdatePendingMessageStateRequest
 import mega.privacy.android.domain.entity.node.NodeId
+import mega.privacy.android.domain.entity.transfer.TransferAppData
 import mega.privacy.android.domain.entity.uri.UriPath
 import mega.privacy.android.domain.repository.ChatRepository
 import mega.privacy.android.domain.repository.chat.ChatMessageRepository
@@ -30,8 +31,13 @@ class AttachNodeWithPendingMessageUseCase @Inject constructor(
      *
      * @param pendingMessageId
      * @param nodeId of the already uploaded file that will be attached to the chat
+     * @param appData [TransferAppData] list related to this transfer if known, to get some data like geolocation
      */
-    suspend operator fun invoke(pendingMessageId: Long, nodeId: NodeId) {
+    suspend operator fun invoke(
+        pendingMessageId: Long,
+        nodeId: NodeId,
+        appData: List<TransferAppData>? = null,
+        ) {
 
         getPendingMessageUseCase(pendingMessageId)
             ?.let { pendingMessage ->
@@ -51,7 +57,8 @@ class AttachNodeWithPendingMessageUseCase @Inject constructor(
                 runCatching {
                     setNodeAttributesAfterUploadUseCase(
                         nodeId.longValue,
-                        UriPath(pendingMessage.filePath)
+                        UriPath(pendingMessage.filePath),
+                        appData,
                     )
                 }
                 val chatId = pendingMessage.chatId

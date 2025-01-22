@@ -39,6 +39,7 @@ import mega.privacy.android.domain.entity.transfer.ChatCompressionState
 import mega.privacy.android.domain.entity.transfer.MonitorOngoingActiveTransfersResult
 import mega.privacy.android.domain.entity.transfer.Transfer
 import mega.privacy.android.domain.entity.transfer.TransferAppData
+import mega.privacy.android.domain.entity.transfer.TransferAppData.ChatUpload
 import mega.privacy.android.domain.entity.transfer.TransferEvent
 import mega.privacy.android.domain.entity.transfer.TransferType
 import mega.privacy.android.domain.exception.MegaException
@@ -73,6 +74,7 @@ import org.mockito.kotlin.times
 import org.mockito.kotlin.verify
 import org.mockito.kotlin.verifyNoMoreInteractions
 import org.mockito.kotlin.whenever
+import org.mockito.kotlin.anyValueClass
 import java.util.UUID
 import java.util.concurrent.Executor
 import java.util.concurrent.Executors
@@ -213,7 +215,11 @@ class ChatUploadsWorkerTest {
 
         underTest.onTransferEventReceived(finishEvent)
 
-        verify(attachNodeWithPendingMessageUseCase).invoke(PENDING_MSG_ID, NodeId(NODE_ID))
+        verify(attachNodeWithPendingMessageUseCase).invoke(
+            PENDING_MSG_ID,
+            NodeId(NODE_ID),
+            listOf(ChatUpload(pendingMessageId = PENDING_MSG_ID))
+        )
     }
 
     @Test
@@ -235,8 +241,9 @@ class ChatUploadsWorkerTest {
         val finishEvent = commonStub()
         whenever(
             attachNodeWithPendingMessageUseCase(
-                PENDING_MSG_ID,
-                NodeId(NODE_ID),
+                any(),
+                anyValueClass(),
+                any()
             )
         ).thenThrow(RuntimeException::class.java)
 

@@ -99,7 +99,7 @@ class SetNodeAttributesAfterUploadUseCaseTest {
         whenever(createPdfPreviewUseCase(nodeHandle, uriPath)).thenReturn(Unit)
         whenever(setNodeCoordinatesUseCase(uriPath, nodeHandle)).thenReturn(Unit)
 
-        underTest.invoke(nodeHandle, uriPath)
+        underTest.invoke(nodeHandle, uriPath, null)
 
         when {
             isVideoFile || isImageFile -> {
