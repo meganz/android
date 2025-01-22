@@ -104,12 +104,21 @@ internal fun ChatBottomBar(
         uiState = uiState,
         textFieldValue = textFieldValue,
         showEmojiPicker = showEmojiPicker,
-        onSendClick = onSendClick,
+        onSendClick = {
+            onSendClick(it)
+            viewModel.onExitTypingContext()
+        },
         onAttachmentClick = onAttachmentClick,
         onEmojiClick = onEmojiClick,
         interactionSourceTextInput = interactionSourceTextInput,
-        onTextChange = { textFieldValue = it },
-        onCloseEditing = onCloseEditing,
+        onTextChange = {
+            textFieldValue = it
+            if (it.text.isNotEmpty()) viewModel.onUserTyping()
+        },
+        onCloseEditing = {
+            onCloseEditing()
+            viewModel.onExitTypingContext()
+        },
         onVoiceClipEvent = onVoiceClipEvent,
         focusRequester = focusRequester,
     )
