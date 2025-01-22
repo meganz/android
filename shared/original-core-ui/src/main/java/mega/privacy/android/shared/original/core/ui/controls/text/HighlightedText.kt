@@ -38,7 +38,7 @@ fun HighlightedText(
     highlightText: String,
     modifier: Modifier = Modifier,
     textColor: TextColor = TextColor.Primary,
-    highlightColor: Color = teal_300_alpha_020,
+    highlightColor: Color = MegaOriginalTheme.colors.notifications.notificationSuccess,
     highlightFontWeight: FontWeight = FontWeight.Normal,
     applyMarqueEffect: Boolean = true,
     maxLines: Int = 1,
