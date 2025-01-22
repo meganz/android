@@ -6,6 +6,7 @@ import androidx.work.Constraints
 import androidx.work.ExistingPeriodicWorkPolicy
 import androidx.work.ExistingWorkPolicy
 import androidx.work.OneTimeWorkRequest
+import androidx.work.OutOfQuotaPolicy
 import androidx.work.PeriodicWorkRequest
 import androidx.work.PeriodicWorkRequest.Companion.MIN_PERIODIC_FLEX_MILLIS
 import androidx.work.WorkInfo
@@ -88,6 +89,7 @@ class WorkManagerGatewayImpl @Inject constructor(
         val request =
             OneTimeWorkRequest.Builder(workerClassGateway.downloadsWorkerClass)
                 .addTag(DownloadsWorker.SINGLE_DOWNLOAD_TAG)
+                .setExpedited(OutOfQuotaPolicy.RUN_AS_NON_EXPEDITED_WORK_REQUEST)
                 .build()
         workManager
             .enqueueUniqueWork(
@@ -103,6 +105,7 @@ class WorkManagerGatewayImpl @Inject constructor(
         val request =
             OneTimeWorkRequest.Builder(workerClassGateway.chatUploadsWorkerClass)
                 .addTag(ChatUploadsWorker.SINGLE_CHAT_UPLOAD_TAG)
+                .setExpedited(OutOfQuotaPolicy.RUN_AS_NON_EXPEDITED_WORK_REQUEST)
                 .build()
         workManager
             .enqueueUniqueWork(
@@ -311,6 +314,7 @@ class WorkManagerGatewayImpl @Inject constructor(
         val request =
             OneTimeWorkRequest.Builder(workerClassGateway.uploadsWorkerClass)
                 .addTag(UploadsWorker.SINGLE_UPLOAD_TAG)
+                .setExpedited(OutOfQuotaPolicy.RUN_AS_NON_EXPEDITED_WORK_REQUEST)
                 .build()
         workManager
             .enqueueUniqueWork(
