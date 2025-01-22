@@ -212,7 +212,7 @@ enum class AppFeatures(override val description: String, private val defaultValu
      */
     CloudDriveAndSyncs(
         "Implement Cloud Drive and Sync in a single screen with the Two Tabs (Cloud Drive and Syncs)",
-        false,
+        true,
     ),
     ;
 
