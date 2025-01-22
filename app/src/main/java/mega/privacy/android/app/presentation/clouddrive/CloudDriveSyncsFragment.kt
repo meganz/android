@@ -344,10 +344,12 @@ class CloudDriveSyncsFragment : Fragment() {
                                             )
                                         },
                                         onSelectStopBackupDestinationClicked = {
-
+                                            megaNavigator.openSelectStopBackupDestinationFromSyncsTab(
+                                                activity
+                                            )
                                         },
                                         onOpenUpgradeAccountClicked = {
-
+                                            megaNavigator.openUpgradeAccount(activity)
                                         },
                                         onOpenMegaFolderClicked = {
                                             coroutineScope.launch {

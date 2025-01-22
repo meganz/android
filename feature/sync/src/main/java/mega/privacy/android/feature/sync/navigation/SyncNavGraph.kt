@@ -301,3 +301,34 @@ internal fun NavGraphBuilder.syncNavGraph(
         }
     }
 }
+
+internal fun NavGraphBuilder.syncStopBackupNavGraph(
+    navController: NavController,
+    fileTypeIconMapper: FileTypeIconMapper,
+    syncPermissionsManager: SyncPermissionsManager,
+) {
+    navigation(
+        startDestination = stopBackupMegaPicker,
+        route = syncRoute,
+    ) {
+        composable(route = stopBackupMegaPicker) {
+            val context = LocalContext.current
+            MegaPickerRoute(
+                hiltViewModel(),
+                syncPermissionsManager,
+                folderSelected = {
+                    if (!navController.popBackStack()) {
+                        context.findFragmentActivity()?.finish()
+                    }
+                },
+                backClicked = {
+                    if (!navController.popBackStack()) {
+                        context.findFragmentActivity()?.finish()
+                    }
+                },
+                fileTypeIconMapper = fileTypeIconMapper,
+                isStopBackupMegaPicker = true,
+            )
+        }
+    }
+}

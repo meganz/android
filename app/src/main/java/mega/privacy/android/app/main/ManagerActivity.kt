@@ -6430,7 +6430,9 @@ class ManagerActivity : PasscodeActivity(), NavigationView.OnNavigationItemSelec
      */
     private fun updateFabAndShow() {
         fabButton.setImageDrawable(ContextCompat.getDrawable(this, R.drawable.ic_add_white))
-        fabButton.show()
+        if (fileBrowserViewModel.state().selectedTab != CloudDriveTab.SYNC) {
+            fabButton.show()
+        }
     }
 
     /**

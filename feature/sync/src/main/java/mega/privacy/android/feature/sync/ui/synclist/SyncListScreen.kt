@@ -417,7 +417,7 @@ private fun SelectedChipScreen(
                 snackBarHostState = snackBarHostState,
                 deviceName = deviceName,
                 isBackupForAndroidEnabled = isBackupForAndroidEnabled,
-                onOpenMegaFolderClicked = onOpenMegaFolderClicked
+                onOpenMegaFolderClicked = onOpenMegaFolderClicked,
             )
         }
 

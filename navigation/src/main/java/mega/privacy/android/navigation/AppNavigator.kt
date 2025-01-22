@@ -287,4 +287,11 @@ interface AppNavigator {
      * @param handle the handle of the remote folder
      */
     fun openSyncMegaFolder(context: Context, handle: Long)
+
+
+    /**
+     * Open Stop Backup Destination in SyncHost Activity
+     * //stop-backup-mega-picker
+     */
+    fun openSelectStopBackupDestinationFromSyncsTab(context: Context)
 }

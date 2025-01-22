@@ -30,6 +30,7 @@ import mega.privacy.android.domain.usecase.GetThemeMode
 import mega.privacy.android.feature.sync.R
 import mega.privacy.android.feature.sync.navigation.getSyncRoute
 import mega.privacy.android.feature.sync.navigation.syncNavGraph
+import mega.privacy.android.feature.sync.navigation.syncStopBackupNavGraph
 import mega.privacy.android.feature.sync.ui.newfolderpair.TAG_SYNC_NEW_FOLDER_SCREEN_TOOLBAR
 import mega.privacy.android.feature.sync.ui.permissions.SyncPermissionsManager
 import mega.privacy.android.navigation.MegaNavigator
@@ -38,6 +39,7 @@ import mega.privacy.android.shared.original.core.ui.controls.appbar.MegaAppBar
 import mega.privacy.android.shared.original.core.ui.controls.layouts.MegaScaffold
 import mega.privacy.android.shared.original.core.ui.theme.OriginalTempTheme
 import mega.privacy.android.shared.sync.ui.SyncEmptyState
+import timber.log.Timber
 import javax.inject.Inject
 
 /**
@@ -89,7 +91,10 @@ class SyncFragment : Fragment() {
                             animatedNavController,
                             shouldNavigateToSyncList = activity?.intent?.getBooleanExtra(
                                 SyncHostActivity.EXTRA_IS_FROM_CLOUD_DRIVE, false
-                            ) == false
+                            ) == false,
+                            shouldOpenStopBackup = activity?.intent?.getBooleanExtra(
+                                SyncHostActivity.EXTRA_OPEN_SELECT_STOP_BACKUP_DESTINATION, false
+                            ) == true,
                         )
                     } else {
                         SyncNoNetworkState()
@@ -103,6 +108,7 @@ class SyncFragment : Fragment() {
     private fun AndroidSyncFeatureNavigation(
         animatedNavController: NavHostController,
         shouldNavigateToSyncList: Boolean,
+        shouldOpenStopBackup: Boolean = false,
     ) {
         val context = LocalContext.current
         NavHost(
@@ -113,16 +119,25 @@ class SyncFragment : Fragment() {
             popEnterTransition = { EnterTransition.None },
             popExitTransition = { ExitTransition.None },
         ) {
-            syncNavGraph(
-                navController = animatedNavController,
-                megaNavigator = megaNavigator,
-                fileTypeIconMapper = fileTypeIconMapper,
-                syncPermissionsManager = syncPermissionsManager,
-                openUpgradeAccountPage = {
-                    megaNavigator.openUpgradeAccount(context)
-                },
-                shouldNavigateToSyncList = shouldNavigateToSyncList
-            )
+            Timber.d("shouldOpenStopBackup: $shouldOpenStopBackup")
+            if (shouldOpenStopBackup) {
+                syncStopBackupNavGraph(
+                    navController = animatedNavController,
+                    fileTypeIconMapper = fileTypeIconMapper,
+                    syncPermissionsManager = syncPermissionsManager,
+                )
+            } else {
+                syncNavGraph(
+                    navController = animatedNavController,
+                    megaNavigator = megaNavigator,
+                    fileTypeIconMapper = fileTypeIconMapper,
+                    syncPermissionsManager = syncPermissionsManager,
+                    openUpgradeAccountPage = {
+                        megaNavigator.openUpgradeAccount(context)
+                    },
+                    shouldNavigateToSyncList = shouldNavigateToSyncList,
+                )
+            }
         }
     }
 

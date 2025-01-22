@@ -72,7 +72,7 @@ fun SyncListRoute(
         viewModel = hiltViewModel(),
         selectedChip = selectedChip,
         onOpenMegaFolderClicked = onOpenMegaFolderClicked,
-        onFabExpanded = onFabExpanded
+        onFabExpanded = onFabExpanded,
     )
 }
 
@@ -90,7 +90,7 @@ internal fun SyncListRoute(
     isInCloudDrive: Boolean = false,
     viewModel: SyncListViewModel = hiltViewModel(),
     selectedChip: SyncChip = SyncChip.SYNC_FOLDERS,
-    onFabExpanded: (Boolean) -> Unit = {}
+    onFabExpanded: (Boolean) -> Unit = {},
 ) {
     val state by viewModel.state.collectAsStateWithLifecycle()
 
@@ -162,7 +162,7 @@ internal fun SyncListRoute(
         syncStalledIssuesViewModel = syncStalledIssuesViewModel,
         syncSolvedIssuesViewModel = syncSolvedIssuesViewModel,
         selectedChip = selectedChip,
-        onFabExpanded = onFabExpanded
+        onFabExpanded = onFabExpanded,
     )
 
     LaunchedEffect(key1 = state.snackbarMessage) {
