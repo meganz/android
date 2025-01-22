@@ -926,4 +926,12 @@ internal class MegaChatApiFacade @Inject constructor(
     ) {
         chatApi.createMeeting(title, speakRequest, waitingRoom, openInvite, listener)
     }
+
+    override suspend fun setUserTyping(chatId: Long) {
+        chatApi.sendTypingNotification(chatId)
+    }
+
+    override suspend fun setUserStoppedTyping(chatId: Long) {
+        chatApi.sendStopTypingNotification(chatId)
+    }
 }

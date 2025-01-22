@@ -2027,4 +2027,18 @@ interface MegaChatApiGateway {
         openInvite: Boolean,
         listener: MegaChatRequestListenerInterface,
     )
+
+    /**
+     * Set user typing
+     *
+     * @param chatId
+     */
+    suspend fun setUserTyping(chatId: Long)
+
+    /**
+     * Set user stopped typing
+     *
+     * @param chatId
+     */
+    suspend fun setUserStoppedTyping(chatId: Long)
 }

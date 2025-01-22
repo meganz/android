@@ -338,4 +338,16 @@ internal class DefaultChatParticipantsRepository @Inject constructor(
             megaChatApiGateway.setOnlineStatus(userStatusToIntMapper(status), listener)
         }
     }
+
+    override suspend fun setUserStartTyping(chatId: Long) {
+        withContext(ioDispatcher) {
+            megaChatApiGateway.setUserTyping(chatId)
+        }
+    }
+
+    override suspend fun setUserStopTyping(chatId: Long) {
+        withContext(ioDispatcher) {
+            megaChatApiGateway.setUserStoppedTyping(chatId)
+        }
+    }
 }
