@@ -11,7 +11,7 @@ enum class DomainFeatures(
      */
     UseFileDescriptorForUploads(
         "Use file descriptor for uploads to avoid the copy to the cache folder",
-        false,
+        true,
     ),
 
     /**
