@@ -1,8 +1,5 @@
 package mega.privacy.android.app.presentation.psa
 
-import androidx.compose.material.Text
-import androidx.compose.ui.Modifier
-import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.test.assertIsDisplayed
 import androidx.compose.ui.test.junit4.createComposeRule
 import androidx.compose.ui.test.onNodeWithTag
@@ -21,18 +18,15 @@ class PsaContainerKtTest {
     val composeTestRule = createComposeRule()
 
     @Test
-    fun `test that no PSA displays the content only`() {
-        val contentTag = "Content tag"
+    fun `test that no PSA displays nothing`() {
         composeTestRule.setContent {
             PsaContainerContent(
                 state = PsaState.NoPsa,
-                content = { Text("This is the content", Modifier.testTag(contentTag)) },
                 markAsSeen = {},
                 navigateToPsaPage = {}
             )
         }
 
-        composeTestRule.onNodeWithTag(contentTag).assertIsDisplayed()
         composeTestRule.onNodeWithTag(WebPsaTag).assertDoesNotExist()
         composeTestRule.onNodeWithTag(PsaViewTag).assertDoesNotExist()
         composeTestRule.onNodeWithTag(PsaInfoViewTag).assertDoesNotExist()
@@ -40,7 +34,6 @@ class PsaContainerKtTest {
 
     @Test
     fun `test that info psa displays the correct view`() {
-        val contentTag = "Content tag"
         composeTestRule.setContent {
             PsaContainerContent(
                 state = PsaState.InfoPsa(
@@ -49,13 +42,11 @@ class PsaContainerKtTest {
                     text = "test",
                     imageUrl = null,
                 ),
-                content = { Text("This is the content", Modifier.testTag(contentTag)) },
                 markAsSeen = {},
                 navigateToPsaPage = {}
             )
         }
 
-        composeTestRule.onNodeWithTag(contentTag).assertIsDisplayed()
         composeTestRule.onNodeWithTag(WebPsaTag).assertDoesNotExist()
         composeTestRule.onNodeWithTag(PsaViewTag).assertDoesNotExist()
         composeTestRule.onNodeWithTag(PsaInfoViewTag).assertIsDisplayed()
@@ -63,7 +54,6 @@ class PsaContainerKtTest {
 
     @Test
     fun `test that standard psa displays the correct view`() {
-        val contentTag = "Content tag"
         composeTestRule.setContent {
             PsaContainerContent(
                 state = PsaState.StandardPsa(
@@ -74,13 +64,11 @@ class PsaContainerKtTest {
                     positiveText = "positiveText",
                     positiveLink = "positiveLink"
                 ),
-                content = { Text("This is the content", Modifier.testTag(contentTag)) },
                 markAsSeen = {},
                 navigateToPsaPage = {}
             )
         }
 
-        composeTestRule.onNodeWithTag(contentTag).assertIsDisplayed()
         composeTestRule.onNodeWithTag(WebPsaTag).assertDoesNotExist()
         composeTestRule.onNodeWithTag(PsaViewTag).assertIsDisplayed()
         composeTestRule.onNodeWithTag(PsaInfoViewTag).assertDoesNotExist()
@@ -88,20 +76,17 @@ class PsaContainerKtTest {
 
     @Test
     fun `test that web psa displays the correct view`() {
-        val contentTag = "Content tag"
         composeTestRule.setContent {
             PsaContainerContent(
                 state = PsaState.WebPsa(
                     id = 0,
                     url = "https://www.mega.nz"
                 ),
-                content = { Text("This is the content", Modifier.testTag(contentTag)) },
                 markAsSeen = {},
                 navigateToPsaPage = {}
             )
         }
 
-        composeTestRule.onNodeWithTag(WebPsaTag).assertIsDisplayed()
         composeTestRule.onNodeWithTag(PsaViewTag).assertDoesNotExist()
         composeTestRule.onNodeWithTag(PsaInfoViewTag).assertDoesNotExist()
     }

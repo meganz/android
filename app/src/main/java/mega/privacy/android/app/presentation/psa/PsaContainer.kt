@@ -4,9 +4,7 @@ import android.content.Context
 import android.content.Intent
 import android.net.Uri
 import androidx.compose.foundation.isSystemInDarkTheme
-import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
-import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.navigationBarsPadding
@@ -30,10 +28,8 @@ import mega.privacy.android.app.presentation.psa.view.InfoPsaView
 import mega.privacy.android.app.presentation.psa.view.PsaView
 import mega.privacy.android.app.presentation.psa.view.WebPsaView
 import mega.privacy.android.shared.original.core.ui.controls.sheets.MegaBottomSheetContainer
-import mega.privacy.android.shared.original.core.ui.controls.text.MegaText
 import mega.privacy.android.shared.original.core.ui.preview.CombinedThemePreviews
 import mega.privacy.android.shared.original.core.ui.theme.OriginalTempTheme
-import mega.privacy.android.shared.original.core.ui.theme.values.TextColor
 
 /**
  * Psa container
@@ -51,38 +47,41 @@ fun PsaContainer(
     val context = LocalContext.current
     val coroutineScope = rememberCoroutineScope()
 
-    PsaContainerContent(
-        state = state,
-        content = content,
-        markAsSeen = viewModel::markAsSeen,
-        navigateToPsaPage = { url -> coroutineScope.launch { navigateToPsaPage(context, url) } },
-    )
+    Box {
+        content()
+        PsaContainerContent(
+            state = state,
+            markAsSeen = viewModel::markAsSeen,
+            navigateToPsaPage = { url ->
+                coroutineScope.launch {
+                    navigateToPsaPage(
+                        context,
+                        url
+                    )
+                }
+            },
+        )
+    }
 }
 
 @Composable
 internal fun PsaContainerContent(
     state: PsaState,
-    content: @Composable () -> Unit,
     markAsSeen: (Int) -> Unit,
     navigateToPsaPage: (String) -> Unit,
 ) {
     when (state) {
-        is PsaState.NoPsa -> {
-            content()
-        }
+        is PsaState.NoPsa -> {}
 
         is PsaState.WebPsa -> {
             WebPsaView(
                 psa = state,
-                content = content,
                 markAsSeen = { markAsSeen(state.id) }
             )
         }
 
         is PsaState.StandardPsa -> {
-            NestedPsaView(
-                content = content,
-            ) { modifier: Modifier ->
+            NestedPsaView { modifier: Modifier ->
                 PsaView(
                     title = state.title,
                     text = state.text,
@@ -99,9 +98,7 @@ internal fun PsaContainerContent(
         }
 
         is PsaState.InfoPsa -> {
-            NestedPsaView(
-                content = content,
-            ) { modifier: Modifier ->
+            NestedPsaView { modifier: Modifier ->
                 InfoPsaView(
                     title = state.title,
                     text = state.text,
@@ -116,11 +113,9 @@ internal fun PsaContainerContent(
 
 @Composable
 private fun NestedPsaView(
-    content: @Composable () -> Unit,
     psaView: @Composable (Modifier) -> Unit,
 ) {
     Box(Modifier.fillMaxSize()) {
-        content()
         MegaBottomSheetContainer(
             modifier = Modifier
                 .shadow(6.dp)
@@ -148,15 +143,6 @@ private fun PsaContainerPreview(@PreviewParameter(PsaStatePreviewParameterProvid
     OriginalTempTheme(isDark = isSystemInDarkTheme()) {
         PsaContainerContent(
             state = psaState,
-            content = {
-                Column(
-                    Modifier.fillMaxSize(),
-                    verticalArrangement = Arrangement.Center,
-                    horizontalAlignment = Alignment.CenterHorizontally
-                ) {
-                    MegaText("Content goes here", textColor = TextColor.Primary)
-                }
-            },
             markAsSeen = {},
             navigateToPsaPage = {},
         )

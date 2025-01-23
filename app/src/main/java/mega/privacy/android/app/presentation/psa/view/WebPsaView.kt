@@ -33,7 +33,6 @@ import mega.privacy.android.app.presentation.psa.model.PsaState
 @Composable
 fun WebPsaView(
     psa: PsaState.WebPsa,
-    content: @Composable () -> Unit,
     markAsSeen: () -> Unit,
     loadPage: (WebView, String) -> Unit = { view, url -> view.loadUrl(url) },
     javascriptInterfaceFactory: (
@@ -55,7 +54,6 @@ fun WebPsaView(
     }
 
     Box(modifier = Modifier.testTag(WebPsaTag)) {
-        if (webViewVisible.not()) content()
         WebView(
             webViewVisible = webViewVisible,
             jsInterface = javascriptInterfaceFactory(onShowPsa, onHidePsa),

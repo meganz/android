@@ -1,6 +1,7 @@
 package mega.privacy.android.app.presentation.psa.view
 
 import androidx.activity.ComponentActivity
+import androidx.compose.foundation.layout.Box
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.test.assertIsDisplayed
@@ -28,30 +29,28 @@ class WebPsaViewKtTest {
     fun `test that web view is not displayed if show psa has not been called`() {
         val contentTag = "content"
         composeTestRule.setContent {
-            WebPsaView(
-                psa = PsaState.WebPsa(
-                    id = 0,
-                    url = "https://megaad.nz/psa/test1.html"
-                ),
-                content = {
-                    MegaText(
-                        "Content goes here",
-                        textColor = TextColor.Primary,
-                        modifier = Modifier.testTag(contentTag)
-                    )
-                },
-                markAsSeen = {},
-            )
+            Box {
+                MegaText(
+                    "Content goes here",
+                    textColor = TextColor.Primary,
+                    modifier = Modifier.testTag(contentTag)
+                )
+                WebPsaView(
+                    psa = PsaState.WebPsa(
+                        id = 0,
+                        url = "https://megaad.nz/psa/test1.html"
+                    ),
+                    markAsSeen = {},
+                )
+            }
         }
 
         composeTestRule.onNodeWithTag(contentTag).assertIsDisplayed()
-        composeTestRule.onNodeWithTag(WebPsaTag).assertIsDisplayed()
         composeTestRule.onNodeWithTag(WebPsaWebViewTag).assertIsNotDisplayed()
     }
 
     @Test
     fun `test that web view is displayed after show psa is called`() {
-        val contentTag = "content"
         var jsInterface: PsaJavascriptInterface? = null
         composeTestRule.setContent {
             WebPsaView(
@@ -59,13 +58,6 @@ class WebPsaViewKtTest {
                     id = 0,
                     url = "https://megaad.nz/psa/test1.html"
                 ),
-                content = {
-                    MegaText(
-                        "Content goes here",
-                        textColor = TextColor.Primary,
-                        modifier = Modifier.testTag(contentTag)
-                    )
-                },
                 markAsSeen = {},
                 javascriptInterfaceFactory = { show, hide ->
                     jsInterface = PsaJavascriptInterface(
@@ -83,7 +75,6 @@ class WebPsaViewKtTest {
 
     @Test
     fun `test that back handler calls mark as seen if web view is visible`() {
-        val contentTag = "content"
         var jsInterface: PsaJavascriptInterface? = null
         val markAsSeen = mock<() -> Unit>()
         composeTestRule.setContent {
@@ -92,13 +83,6 @@ class WebPsaViewKtTest {
                     id = 0,
                     url = "https://megaad.nz/psa/test1.html"
                 ),
-                content = {
-                    MegaText(
-                        "Content goes here",
-                        textColor = TextColor.Primary,
-                        modifier = Modifier.testTag(contentTag)
-                    )
-                },
                 markAsSeen = markAsSeen,
                 javascriptInterfaceFactory = { show, hide ->
                     jsInterface = PsaJavascriptInterface(
@@ -122,7 +106,6 @@ class WebPsaViewKtTest {
 
     @Test
     fun `tet that back handler does not call mark as seen if web view is not visible`() {
-        val contentTag = "content"
         val markAsSeen = mock<() -> Unit>()
         composeTestRule.setContent {
             WebPsaView(
@@ -130,13 +113,6 @@ class WebPsaViewKtTest {
                     id = 0,
                     url = "https://megaad.nz/psa/test1.html"
                 ),
-                content = {
-                    MegaText(
-                        "Content goes here",
-                        textColor = TextColor.Primary,
-                        modifier = Modifier.testTag(contentTag)
-                    )
-                },
                 markAsSeen = markAsSeen,
             )
         }
