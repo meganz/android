@@ -913,5 +913,5 @@
     <!-- Tab bar title of Syncs tab -->
     <string name="general_syncs">同步</string>
     <!-- Text under the syncs list -->
-    <string name="syncs_tab_view_other_devices">View other devices in Device centre</string>
+    <string name="syncs_tab_view_other_devices">在裝置中心查看其它裝置</string>
 </resources>

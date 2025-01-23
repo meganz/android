@@ -474,7 +474,7 @@
     <!-- Title shown when cancelling the subscription -->
     <string name="account_cancellation_instructions_cancel_subscription_title">Batalkan Langganan</string>
     <!-- Title shown when reactivating the subscription -->
-    <string name="account_cancellation_instructions_reactivate_subscription_title">Reactivate subscription</string>
+    <string name="account_cancellation_instructions_reactivate_subscription_title">Aktifkan kembali langganan</string>
     <!-- Title shown when cancelling the current plan in the instructions screen, informing the user about the account is not managed by google -->
     <string name="account_cancellation_instructions_not_managed_by_google">Your subscription is not managed by Google</string>
     <!-- Message shown when cancelling the current plan in the instructions screen, informing the user about how to cancel subscription -->
@@ -550,7 +550,7 @@
     <!-- Transfers scanning folders dialog title when the app is creating the needed folders -->
     <string name="transfers_scanning_folders_dialog_creating_folders_title">Membuat folder&#8230;</string>
     <!-- Transfers scanning folders dialog title when the app is starting transfers but some files still needs to be added to the queue  -->
-    <string name="transfers_scanning_folders_dialog_starting_transfers_title">Starting transfers&#8230;</string>
+    <string name="transfers_scanning_folders_dialog_starting_transfers_title">Memulai transfer...</string>
     <!-- Transfers scanning folders dialog info to explain why the app shouldn't be closed -->
     <string name="transfers_scanning_folders_dialog_cancel_info_subtitle">Jangan tutup aplikasi. Jika anda menutup, transfer yang belum masuk antrian akan hilang.</string>
     <!-- Transfers scanning folders dialog sub-title when the app is scanning a single folder-->
@@ -801,7 +801,7 @@
     <!-- Photos search welcome description -->
     <string name="photos_search_welcome_description">Search for photos, videos, and albums</string>
     <!-- Photos search empty state title -->
-    <string name="photos_search_empty_state_title">No matching results</string>
+    <string name="photos_search_empty_state_title">Tidak ada hasil yang cocok</string>
     <!-- Photos search empty state description -->
     <string name="photos_search_empty_state_description">Try a different search term</string>
     <!-- Photos search recent search -->
@@ -877,11 +877,11 @@
     <!-- The Generous storage label in the ads free introduction screen -->
     <string name="payment_ads_free_intro_generous_storage_label">Penyimpanan murah hati</string>
     <!-- The Generous storage description in the ads free introduction screen -->
-    <string name="payment_ads_free_intro_generous_storage_description">Store unlimited data, starting from %1$s.</string>
+    <string name="payment_ads_free_intro_generous_storage_description">Simpan data tak terbatas, mulai dari %1$s.</string>
     <!-- The Transfer sharing label in the ads free introduction screen -->
     <string name="payment_ads_free_intro_transfer_sharing_label">Berbagi transfer</string>
     <!-- The Transfer sharing description in the ads free introduction screen -->
-    <string name="payment_ads_free_intro_transfer_sharing_description">The people you share data with can use your transfer quota to download the items you shared.</string>
+    <string name="payment_ads_free_intro_transfer_sharing_description">Orang yang berbagi data dengan anda dapat menggunakan kuota transfer anda untuk mengunduh item yang anda bagikan.</string>
     <!-- The additional security label in the ads free introduction screen -->
     <string name="payment_ads_free_intro_additional_security_label">MEGA&#160;Pass and MEGA&#160;VPN</string>
     <!-- The additional security description in the ads free introduction screen -->
