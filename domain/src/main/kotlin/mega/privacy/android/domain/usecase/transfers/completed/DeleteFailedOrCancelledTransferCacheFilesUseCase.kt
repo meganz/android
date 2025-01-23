@@ -1,8 +1,8 @@
 package mega.privacy.android.domain.usecase.transfers.completed
 
-import mega.privacy.android.domain.repository.CacheRepository
+import mega.privacy.android.domain.entity.uri.UriPath
+import mega.privacy.android.domain.usecase.transfers.DeleteCacheFilesUseCase
 import mega.privacy.android.domain.usecase.transfers.GetFailedOrCanceledTransfersUseCase
-import java.io.File
 import javax.inject.Inject
 
 /**
@@ -10,18 +10,18 @@ import javax.inject.Inject
  */
 class DeleteFailedOrCancelledTransferCacheFilesUseCase @Inject constructor(
     private val getFailedOrCanceledTransfersUseCase: GetFailedOrCanceledTransfersUseCase,
-    private val cacheRepository: CacheRepository,
+    private val deleteCacheFilesUseCase: DeleteCacheFilesUseCase,
 ) {
 
     /**
      * Invoke.
      */
     suspend operator fun invoke() {
-        getFailedOrCanceledTransfersUseCase().forEach { transfer ->
-            File(transfer.originalPath).let { file ->
-                if (cacheRepository.isFileInCacheDirectory(file)) {
-                    file.delete()
-                }
+        getFailedOrCanceledTransfersUseCase().map { transfer ->
+            UriPath(transfer.originalPath)
+        }.let { pathsToDelete ->
+            if (pathsToDelete.isNotEmpty()) {
+                deleteCacheFilesUseCase(pathsToDelete)
             }
         }
     }
