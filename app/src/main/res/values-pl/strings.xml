@@ -5823,5 +5823,5 @@
     <!-- Logout warning dialog message if user has transfers in progress. -->
     <string name="logout_warning_dialog_transfers_message">Jeśli wylogujesz się teraz, Twoje transfery nie zostaną zakończone, a dane zostaną usunięte</string>
     <!-- Warning warning dialog message if user has offline files or transfers in progress. -->
-    <string name="logout_warning_dialog_offline_and_transfers_message">If you log out now, any pending transfers and offline files will be deleted</string>
+    <string name="logout_warning_dialog_offline_and_transfers_message">Jeśli wylogujesz się teraz, wszelkie oczekujące transfery i plik offline zostaną usunięte</string>
 </resources>

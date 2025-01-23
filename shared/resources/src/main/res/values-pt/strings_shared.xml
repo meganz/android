@@ -941,5 +941,5 @@
     <!-- Tab bar title of Syncs tab -->
     <string name="general_syncs">Sincronizações</string>
     <!-- Text under the syncs list -->
-    <string name="syncs_tab_view_other_devices">View other devices in Device centre</string>
+    <string name="syncs_tab_view_other_devices">Ver outros dispositivos na Central de dispositivos</string>
 </resources>

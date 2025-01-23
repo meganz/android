@@ -5101,13 +5101,13 @@
     <!-- Image or Video no map location info-->
     <string name="file_properties_info_map_location_no_location_info">沒有位置資訊</string>
     <!-- Logout warning dialog title if user has offline files or transfers in progress -->
-    <string name="logout_warning_dialog_title">Logging out now will result in lost data</string>
+    <string name="logout_warning_dialog_title">現在登出將導致資料遺失</string>
     <!-- Logout warning dialog positive button text -->
-    <string name="logout_warning_dialog_positive_button">Log out anyway</string>
+    <string name="logout_warning_dialog_positive_button">無論如何仍然登出</string>
     <!-- Logout warning dialog message if offline files exists -->
-    <string name="logout_warning_dialog_offline_message">If you log out now, your offline files will be deleted</string>
+    <string name="logout_warning_dialog_offline_message">如果您現在登出，您的離線檔案將被刪除</string>
     <!-- Logout warning dialog message if user has transfers in progress. -->
-    <string name="logout_warning_dialog_transfers_message">If you log out now, your transfers won’t be completed and the data will be deleted</string>
+    <string name="logout_warning_dialog_transfers_message">如果您現在登出，您的傳輸將無法完成，而且資料將被刪除</string>
     <!-- Warning warning dialog message if user has offline files or transfers in progress. -->
-    <string name="logout_warning_dialog_offline_and_transfers_message">If you log out now, any pending transfers and offline files will be deleted</string>
+    <string name="logout_warning_dialog_offline_and_transfers_message">如果您現在退出，所有待處理的傳輸和離線檔案都將被刪除</string>
 </resources>

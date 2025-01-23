@@ -2214,7 +2214,7 @@
     <!-- Title of compression queue size option in settings -->
     <string name="settings_video_compression_queue_size_title">إذا كانت مقاطع الفيديو المراد ضغطها أكبر من</string>
     <!-- Text of the alert when a FREE user tries to disable the RB scheduler -->
-    <string name="settings_rb_scheduler_alert_disabling">To disable automatic Rubbish bin emptying or set a longer retention period, you need to subscribe to one of our plans.</string>
+    <string name="settings_rb_scheduler_alert_disabling">لتعطيل التفريغ التلقائي لسلة المحذوفات أو تعيين فترة احتفاظ أطول تحتاج إلى الاشتراك في إحدى باقاتنا.</string>
     <!-- Picker text to choose custom retention time. This option indicates several days -->
     <string name="hint_days">أيام</string>
     <!-- Title of the option to generate a public chat link -->
@@ -6291,13 +6291,13 @@
     <!-- Image or Video no map location info-->
     <string name="file_properties_info_map_location_no_location_info">لا توجد معلومات عن الموقع</string>
     <!-- Logout warning dialog title if user has offline files or transfers in progress -->
-    <string name="logout_warning_dialog_title">Logging out now will result in lost data</string>
+    <string name="logout_warning_dialog_title">تسجيل الخروج الآن سيؤدي إلى فقدان البيانات</string>
     <!-- Logout warning dialog positive button text -->
-    <string name="logout_warning_dialog_positive_button">Log out anyway</string>
+    <string name="logout_warning_dialog_positive_button">تسجيل الخروج على أي حال</string>
     <!-- Logout warning dialog message if offline files exists -->
-    <string name="logout_warning_dialog_offline_message">If you log out now, your offline files will be deleted</string>
+    <string name="logout_warning_dialog_offline_message">إذا قمت بتسجيل الخروج الآن فسيتم حذف الملفات غير المتصلة بالإنترنت</string>
     <!-- Logout warning dialog message if user has transfers in progress. -->
-    <string name="logout_warning_dialog_transfers_message">If you log out now, your transfers won’t be completed and the data will be deleted</string>
+    <string name="logout_warning_dialog_transfers_message">إذا قمت بتسجيل الخروج الآن فلن تكتمل عمليات تراسل المعطيات الخاصة بك وسيتم حذف البيانات</string>
     <!-- Warning warning dialog message if user has offline files or transfers in progress. -->
-    <string name="logout_warning_dialog_offline_and_transfers_message">If you log out now, any pending transfers and offline files will be deleted</string>
+    <string name="logout_warning_dialog_offline_and_transfers_message">إذا قمت بتسجيل الخروج الآن فسيتم حذف أي عمليات تراسل المعطيات معلقة وملفات غير متصلة بالإنترنت</string>
 </resources>

@@ -941,5 +941,5 @@
     <!-- Tab bar title of Syncs tab -->
     <string name="general_syncs">Sincronizări</string>
     <!-- Text under the syncs list -->
-    <string name="syncs_tab_view_other_devices">View other devices in Device centre</string>
+    <string name="syncs_tab_view_other_devices">Vizualizarea altor dispozitive în Centrul de aparate</string>
 </resources>

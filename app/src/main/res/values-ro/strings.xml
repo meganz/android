@@ -5577,13 +5577,13 @@
     <!-- Image or Video no map location info-->
     <string name="file_properties_info_map_location_no_location_info">Nicio informație despre locație</string>
     <!-- Logout warning dialog title if user has offline files or transfers in progress -->
-    <string name="logout_warning_dialog_title">Logging out now will result in lost data</string>
+    <string name="logout_warning_dialog_title">Deconectarea acum va duce la pierderea datelor</string>
     <!-- Logout warning dialog positive button text -->
-    <string name="logout_warning_dialog_positive_button">Log out anyway</string>
+    <string name="logout_warning_dialog_positive_button">Deconectați-vă oricum</string>
     <!-- Logout warning dialog message if offline files exists -->
-    <string name="logout_warning_dialog_offline_message">If you log out now, your offline files will be deleted</string>
+    <string name="logout_warning_dialog_offline_message">Dacă vă deconectați acum, fișierele dvs. offline vor fi șterse</string>
     <!-- Logout warning dialog message if user has transfers in progress. -->
-    <string name="logout_warning_dialog_transfers_message">If you log out now, your transfers won’t be completed and the data will be deleted</string>
+    <string name="logout_warning_dialog_transfers_message">Dacă vă deconectați acum, transferurile dvs. nu vor fi finalizate și datele vor fi șterse</string>
     <!-- Warning warning dialog message if user has offline files or transfers in progress. -->
-    <string name="logout_warning_dialog_offline_and_transfers_message">If you log out now, any pending transfers and offline files will be deleted</string>
+    <string name="logout_warning_dialog_offline_and_transfers_message">Dacă vă deconectați acum, toate transferurile în așteptare și fișierele offline vor fi șterse</string>
 </resources>
