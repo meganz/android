@@ -368,7 +368,7 @@ internal class TransferPageFragment : Fragment() {
         val builder = MaterialAlertDialogBuilder(requireContext())
         builder.setMessage(R.string.confirmation_to_clear_completed_transfers)
             .setPositiveButton(R.string.general_clear) { _: DialogInterface?, _: Int ->
-                transfersViewModel.deleteFailedOrCancelledTransferFiles()
+                transfersViewModel.deleteFailedOrCancelledTransferCacheFiles()
                 viewModel.deleteAllCompletedTransfers()
             }
             .setNegativeButton(R.string.general_dismiss, null)
