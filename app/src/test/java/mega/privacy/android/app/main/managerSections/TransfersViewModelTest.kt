@@ -35,6 +35,7 @@ import mega.privacy.android.domain.usecase.transfers.MoveTransferBeforeByTagUseC
 import mega.privacy.android.domain.usecase.transfers.MoveTransferToFirstByTagUseCase
 import mega.privacy.android.domain.usecase.transfers.MoveTransferToLastByTagUseCase
 import mega.privacy.android.domain.usecase.transfers.completed.DeleteCompletedTransferUseCase
+import mega.privacy.android.domain.usecase.transfers.completed.DeleteFailedOrCancelledTransferCacheFilesUseCase
 import mega.privacy.android.domain.usecase.transfers.completed.MonitorCompletedTransferEventUseCase
 import mega.privacy.android.domain.usecase.transfers.completed.MonitorCompletedTransfersUseCase
 import mega.privacy.android.domain.usecase.transfers.overquota.MonitorTransferOverQuotaUseCase
@@ -76,6 +77,8 @@ internal class TransfersViewModelTest {
     private val monitorTransferOverQuotaUseCase = mock<MonitorTransferOverQuotaUseCase> {
         onBlocking { invoke() } doReturn emptyFlow()
     }
+    private val deleteFailedOrCancelledTransferCacheFilesUseCase =
+        mock<DeleteFailedOrCancelledTransferCacheFilesUseCase>()
 
     @BeforeEach
     fun setUp() {
@@ -102,6 +105,7 @@ internal class TransfersViewModelTest {
             transferAppDataMapper = transferAppDataMapper,
             retryChatUploadUseCase = retryChatUploadUseCase,
             monitorTransferOverQuotaUseCase = monitorTransferOverQuotaUseCase,
+            deleteFailedOrCancelledTransferCacheFilesUseCase = deleteFailedOrCancelledTransferCacheFilesUseCase,
         )
     }
 
@@ -492,6 +496,12 @@ internal class TransfersViewModelTest {
         assertThat(underTest.isOnTransferOverQuota()).isTrue()
     }
 
+    @Test
+    fun `test that deleteFailedOrCancelledTransferCacheFiles invokes use case`() = runTest {
+        underTest.deleteFailedOrCancelledTransferCacheFiles()
+
+        verify(deleteFailedOrCancelledTransferCacheFilesUseCase).invoke()
+    }
 
     companion object {
         @JvmField

@@ -41,6 +41,7 @@ import mega.privacy.android.domain.usecase.transfers.MoveTransferBeforeByTagUseC
 import mega.privacy.android.domain.usecase.transfers.MoveTransferToFirstByTagUseCase
 import mega.privacy.android.domain.usecase.transfers.MoveTransferToLastByTagUseCase
 import mega.privacy.android.domain.usecase.transfers.completed.DeleteCompletedTransferUseCase
+import mega.privacy.android.domain.usecase.transfers.completed.DeleteFailedOrCancelledTransferCacheFilesUseCase
 import mega.privacy.android.domain.usecase.transfers.completed.MonitorCompletedTransferEventUseCase
 import mega.privacy.android.domain.usecase.transfers.completed.MonitorCompletedTransfersUseCase
 import mega.privacy.android.domain.usecase.transfers.overquota.MonitorTransferOverQuotaUseCase
@@ -48,7 +49,6 @@ import mega.privacy.android.domain.usecase.transfers.paused.MonitorPausedTransfe
 import mega.privacy.android.domain.usecase.transfers.paused.PauseTransferByTagUseCase
 import nz.mega.sdk.MegaTransfer
 import timber.log.Timber
-import java.io.File
 import java.util.Collections
 import javax.inject.Inject
 
@@ -75,6 +75,7 @@ class TransfersViewModel @Inject constructor(
     private val transferAppDataMapper: TransferAppDataMapper,
     private val retryChatUploadUseCase: RetryChatUploadUseCase,
     private val monitorTransferOverQuotaUseCase: MonitorTransferOverQuotaUseCase,
+    private val deleteFailedOrCancelledTransferCacheFilesUseCase: DeleteFailedOrCancelledTransferCacheFilesUseCase,
 ) : ViewModel() {
     private val _uiState = MutableStateFlow(TransfersUiState())
 
@@ -358,15 +359,10 @@ class TransfersViewModel @Inject constructor(
         }
 
     /**
-     * Removes all completed transfers.
+     * Removes all the cache files which were cancelled or failed while uploading.
      */
-    fun deleteFailedOrCancelledTransferFiles() = viewModelScope.launch(ioDispatcher) {
-        runCatching { getFailedOrCanceledTransfersUseCase() }
-            .onSuccess { transfers ->
-                transfers.forEach { transfer ->
-                    File(transfer.originalPath).takeIf { it.exists() }?.delete()
-                }
-            }
+    fun deleteFailedOrCancelledTransferCacheFiles() = viewModelScope.launch(ioDispatcher) {
+        runCatching { deleteFailedOrCancelledTransferCacheFilesUseCase() }
     }
 
     /**
