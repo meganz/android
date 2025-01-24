@@ -473,4 +473,7 @@ internal class FileSystemRepositoryImpl @Inject constructor(
         Uri.parse(fileContentUri)?.let { uri ->
             documentFileWrapper.fromSingleUri(uri)?.delete() ?: false
         } ?: false
+
+    override suspend fun canReadUri(stringUri: String) =
+        fileGateway.canReadUri(stringUri)
 }

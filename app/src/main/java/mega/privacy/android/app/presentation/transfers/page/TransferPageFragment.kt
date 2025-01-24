@@ -1,5 +1,6 @@
 package mega.privacy.android.app.presentation.transfers.page
 
+import mega.privacy.android.shared.resources.R as sharedR
 import android.content.DialogInterface
 import android.os.Bundle
 import android.view.LayoutInflater
@@ -223,6 +224,22 @@ internal class TransferPageFragment : Fragment() {
                 clearCompletedTransfers?.isVisible = completedTransfers.isNotEmpty()
             }
         }
+        viewLifecycleOwner.collectFlow(transfersViewModel.uiState) { uiState ->
+            with(uiState) {
+                readRetryError?.let {
+                    (activity as? BaseActivity)?.showSnackbar(
+                        Constants.SNACKBAR_TYPE,
+                        resources.getQuantityString(
+                            sharedR.plurals.transfers_completed_read_error_retrying,
+                            readRetryError,
+                            readRetryError
+                        ),
+                        -1
+                    )
+                    transfersViewModel.onConsumeRetryReadError()
+                }
+            }
+        }
     }
 
     private fun handleDeleteFailedOrCancelledTransfersResult(transfers: List<CompletedTransfer>) {
@@ -409,8 +426,6 @@ internal class TransferPageFragment : Fragment() {
                 Timber.d("Unable to retrieve transfer type value")
             }
         }
-
-        transfersViewModel.completedTransferRemoved(transfer, false)
     }
 
     /**

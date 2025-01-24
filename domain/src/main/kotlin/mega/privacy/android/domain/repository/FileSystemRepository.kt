@@ -479,4 +479,12 @@ interface FileSystemRepository {
      * Deletes the file given the content URI.
      */
     suspend fun deleteFileFromSdCardContentUri(fileContentUri: String): Boolean
+
+    /**
+     * Checks if an uri can be read
+     *
+     * @param stringUri the uri to check
+     * @return true if the uri can be read, false otherwise
+     */
+    suspend fun canReadUri(stringUri: String): Boolean
 }

@@ -850,6 +850,9 @@ internal class FileFacade @Inject constructor(
     override suspend fun getInputStream(uriPath: UriPath): InputStream? =
         context.contentResolver.openInputStream(uriPath.toUri())
 
+    override suspend fun canReadUri(stringUri: String) =
+        getDocumentFileFromUri(Uri.parse(stringUri))?.canRead() == true
+
     private fun isMediaDocumentUri() = "com.android.providers.media.documents"
 
     private fun isDownloadDocumentUri() = "com.android.providers.downloads.documents"

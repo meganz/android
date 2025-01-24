@@ -38,10 +38,8 @@ import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.TestInstance
 import org.junit.jupiter.params.ParameterizedTest
 import org.junit.jupiter.params.provider.ValueSource
-import org.mockito.Mockito
 import org.mockito.Mockito.mockStatic
 import org.mockito.kotlin.any
-import org.mockito.kotlin.anyValueClass
 import org.mockito.kotlin.argumentCaptor
 import org.mockito.kotlin.doReturn
 import org.mockito.kotlin.mock
@@ -575,5 +573,15 @@ internal class FileSystemRepositoryImplTest {
         )
 
         assertThat(result).isEqualTo(newFile)
+    }
+
+    @ParameterizedTest(name = "pauseTransfers: {0}")
+    @ValueSource(booleans = [true, false])
+    fun `test that canReadUri returns correctly`(canRead: Boolean) = runTest {
+        val uri = "content://com.android.externalstorage.documents/tree/"
+
+        whenever(fileGateway.canReadUri(uri)).thenReturn(canRead)
+
+        assertThat(underTest.canReadUri(uri)).isEqualTo(canRead)
     }
 }

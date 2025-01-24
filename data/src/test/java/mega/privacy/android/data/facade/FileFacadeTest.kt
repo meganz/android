@@ -408,4 +408,26 @@ internal class FileFacadeTest {
                 }
             }
         }
+
+    @ParameterizedTest(name = "pauseTransfers: {0}")
+    @ValueSource(booleans = [true, false])
+    fun `test that canReadUri returns correctly`(canRead: Boolean) = runTest {
+        mockStatic(Uri::class.java).use {
+            mockStatic(DocumentFile::class.java).use {
+                mockStatic(DocumentsContract::class.java).use {
+                    val uriString = "content://com.android.externalstorage.documents/tree/"
+                    val uri = mock<Uri>()
+                    val documentFile = mock<DocumentFile> {
+                        on { canRead() } doReturn canRead
+                    }
+
+                    whenever(Uri.parse(uriString)).thenReturn(uri)
+                    whenever(DocumentsContract.isTreeUri(uri)) doReturn false
+                    whenever(DocumentFile.fromSingleUri(context, uri)) doReturn documentFile
+
+                    assertThat(underTest.canReadUri(uriString)).isEqualTo(canRead)
+                }
+            }
+        }
+    }
 }

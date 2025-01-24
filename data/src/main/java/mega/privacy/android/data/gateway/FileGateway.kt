@@ -456,4 +456,12 @@ interface FileGateway {
      * @param uriPath the file represented by an Uri or a path
      */
     suspend fun getInputStream(uriPath: UriPath): InputStream?
+
+    /**
+     * Checks if an uri can be read
+     *
+     * @param stringUri the uri to check
+     * @return true if the uri can be read, false otherwise
+     */
+    suspend fun canReadUri(stringUri: String): Boolean
 }

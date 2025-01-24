@@ -32,6 +32,7 @@ import mega.privacy.android.domain.entity.transfer.isBackgroundTransfer
 import mega.privacy.android.domain.qualifier.IoDispatcher
 import mega.privacy.android.domain.usecase.GetNodeByIdUseCase
 import mega.privacy.android.domain.usecase.chat.message.pendingmessages.RetryChatUploadUseCase
+import mega.privacy.android.domain.usecase.file.CanReadUriUseCase
 import mega.privacy.android.domain.usecase.transfers.CancelTransferByTagUseCase
 import mega.privacy.android.domain.usecase.transfers.GetFailedOrCanceledTransfersUseCase
 import mega.privacy.android.domain.usecase.transfers.GetInProgressTransfersUseCase
@@ -76,6 +77,7 @@ class TransfersViewModel @Inject constructor(
     private val retryChatUploadUseCase: RetryChatUploadUseCase,
     private val monitorTransferOverQuotaUseCase: MonitorTransferOverQuotaUseCase,
     private val deleteFailedOrCancelledTransferCacheFilesUseCase: DeleteFailedOrCancelledTransferCacheFilesUseCase,
+    private val canReadUriUseCase: CanReadUriUseCase,
 ) : ViewModel() {
     private val _uiState = MutableStateFlow(TransfersUiState())
 
@@ -462,17 +464,54 @@ class TransfersViewModel @Inject constructor(
     fun retryAllTransfers() = viewModelScope.launch(ioDispatcher) {
         runCatching { getFailedOrCanceledTransfersUseCase() }
             .onSuccess { transfers ->
+                var cannotReadCount = 0
+
                 transfers.forEach { transfer ->
-                    retryTransfer(transfer)
-                    deleteCompletedTransferUseCase(transfer, false)
+                    if (canReadTransferUri(transfer)) {
+                        retryCompletedTransfer(transfer)
+                    } else {
+                        cannotReadCount++
+                    }
+                }
+
+                if (cannotReadCount > 0) {
+                    _uiState.update { state -> state.copy(readRetryError = cannotReadCount) }
                 }
             }
     }
+
+    private suspend fun canReadTransferUri(transfer: CompletedTransfer) =
+        if (transfer.type == MegaTransfer.TYPE_UPLOAD) {
+            val appData = transfer.appData?.let { transferAppDataMapper(it) }
+            val path = appData?.getOriginalContentUri() ?: transfer.originalPath
+
+            canReadUriUseCase(path)
+        } else {
+            true
+        }
 
     /**
      * trigger retry transfer event
      */
     suspend fun retryTransfer(transfer: CompletedTransfer) {
+        if (canReadTransferUri(transfer)) {
+            retryCompletedTransfer(transfer)
+        } else {
+            _uiState.update { state -> state.copy(readRetryError = 1) }
+        }
+    }
+
+    /**
+     * Consume retry read error
+     */
+    fun onConsumeRetryReadError() {
+        _uiState.update { state -> state.copy(readRetryError = null) }
+    }
+
+    /**
+     * trigger retry transfer event
+     */
+    private suspend fun retryCompletedTransfer(transfer: CompletedTransfer) {
         with(transfer) {
             when (type) {
                 MegaTransfer.TYPE_DOWNLOAD -> {
@@ -494,19 +533,17 @@ class TransfersViewModel @Inject constructor(
                     val path = appData?.getOriginalContentUri() ?: originalPath
 
                     if (isChatUpload) {
-                        viewModelScope.launch {
-                            runCatching {
-                                retryChatUploadUseCase(appData?.mapNotNull { it as? TransferAppData.ChatUpload }
-                                    ?: emptyList())
-                            }.onFailure {
-                                //No uploads were retried, try general upload only.
-                                _uiState.update { state ->
-                                    state.copy(
-                                        startEvent = triggered(
-                                            getUploadTriggerEvent(path, parentHandle)
-                                        )
+                        runCatching {
+                            retryChatUploadUseCase(appData?.mapNotNull { it as? TransferAppData.ChatUpload }
+                                ?: emptyList())
+                        }.onFailure {
+                            //No uploads were retried, try general upload only.
+                            _uiState.update { state ->
+                                state.copy(
+                                    startEvent = triggered(
+                                        getUploadTriggerEvent(path, parentHandle)
                                     )
-                                }
+                                )
                             }
                         }
                     } else {
@@ -517,6 +554,7 @@ class TransfersViewModel @Inject constructor(
                 else -> throw IllegalArgumentException("This transfer type cannot be retried here for now")
             }.let { event ->
                 if (event is TransferTriggerEvent) {
+                    deleteCompletedTransferUseCase(transfer, false)
                     _uiState.update { state -> state.copy(startEvent = triggered(event)) }
                 }
             }
