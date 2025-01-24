@@ -27,7 +27,6 @@ import mega.privacy.android.app.MegaApplication
 import mega.privacy.android.app.R
 import mega.privacy.android.app.arch.extensions.collectFlow
 import mega.privacy.android.app.databinding.ActivityLoginBinding
-import mega.privacy.android.app.extensions.isTablet
 import mega.privacy.android.app.globalmanagement.MegaChatRequestHandler
 import mega.privacy.android.app.interfaces.OnKeyboardVisibilityListener
 import mega.privacy.android.app.main.CreateAccountFragment
@@ -347,16 +346,14 @@ class LoginActivity : BaseActivity(), MegaRequestListenerInterface {
      */
     @SuppressLint("SourceLockedOrientationActivity")
     private fun restrictOrientation() {
-        if (isTablet()) {
-            requestedOrientation =
-                if (visibleFragment == Constants.TOUR_FRAGMENT) {
-                    Timber.d("Tablet landscape mode allowed")
-                    ActivityInfo.SCREEN_ORIENTATION_FULL_USER
-                } else {
-                    Timber.d("Tablet landscape mode restricted")
-                    ActivityInfo.SCREEN_ORIENTATION_PORTRAIT
-                }
-        }
+        requestedOrientation =
+            if (visibleFragment == Constants.TOUR_FRAGMENT) {
+                Timber.d("Tour screen landscape mode allowed")
+                ActivityInfo.SCREEN_ORIENTATION_FULL_USER
+            } else {
+                Timber.d("Other screens landscape mode restricted")
+                ActivityInfo.SCREEN_ORIENTATION_PORTRAIT
+            }
     }
 
     override fun shouldSetStatusBarTextColor() = false
