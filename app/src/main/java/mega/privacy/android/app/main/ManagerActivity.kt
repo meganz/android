@@ -2056,7 +2056,7 @@ class ManagerActivity : PasscodeActivity(), NavigationView.OnNavigationItemSelec
         }
 
         collectFlow(fileBrowserViewModel.state.map { it.selectedTab }.distinctUntilChanged()) {
-            if (it != CloudDriveTab.NONE) {
+            if (it != CloudDriveTab.NONE && drawerItem == DrawerItem.CLOUD_DRIVE) {
                 val shouldVisible = it == CloudDriveTab.CLOUD
                 searchMenuItem?.isVisible = shouldVisible
                 openLinkMenuItem?.isVisible = shouldVisible
