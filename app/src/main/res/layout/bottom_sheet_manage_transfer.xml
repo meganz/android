@@ -47,23 +47,23 @@
                 android:layout_marginStart="12dp"
                 android:ellipsize="middle"
                 android:singleLine="true"
-                app:layout_constraintVertical_chainStyle="packed"
-                app:layout_constraintEnd_toEndOf="parent"
                 app:layout_constraintBottom_toTopOf="@+id/manage_transfer_completed_layout"
+                app:layout_constraintEnd_toEndOf="parent"
                 app:layout_constraintStart_toEndOf="@+id/manage_transfer_thumbnail_layout"
                 app:layout_constraintTop_toTopOf="parent"
+                app:layout_constraintVertical_chainStyle="packed"
                 tools:text="File Name" />
 
             <LinearLayout
                 android:id="@+id/manage_transfer_completed_layout"
-                app:layout_constraintTop_toBottomOf="@+id/manage_transfer_filename"
-                app:layout_constraintStart_toStartOf="@+id/manage_transfer_filename"
-                app:layout_constraintBottom_toBottomOf="parent"
-                app:layout_constraintEnd_toEndOf="parent"
                 android:layout_width="0dp"
                 android:layout_height="wrap_content"
+                android:gravity="center_vertical"
                 android:orientation="horizontal"
-                android:gravity="center_vertical">
+                app:layout_constraintBottom_toBottomOf="parent"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintStart_toStartOf="@+id/manage_transfer_filename"
+                app:layout_constraintTop_toBottomOf="@+id/manage_transfer_filename">
 
                 <ImageView
                     android:id="@+id/manage_transfer_completed_image"
@@ -71,12 +71,13 @@
                     android:layout_height="25dp"
                     android:layout_marginEnd="4dp"
                     android:src="@drawable/ic_transfers_completed" />
+
                 <TextView
                     android:id="@+id/manage_transfer_location"
                     android:layout_width="0dp"
-                    android:layout_weight="1"
                     android:layout_height="wrap_content"
                     android:layout_marginEnd="13dp"
+                    android:layout_weight="1"
                     android:ellipsize="middle"
                     android:singleLine="true"
                     android:textAppearance="@style/TextAppearance.Mega.Body2.Secondary"
@@ -106,7 +107,20 @@
                     android:id="@+id/option_view"
                     style="@style/BottomSheetOption"
                     android:text="@string/view_in_folder_label"
-                    app:drawableStartCompat="@drawable/ic_search_large_medium_regular_outline"/>
+                    app:drawableStartCompat="@drawable/ic_search_large_medium_regular_outline" />
+
+                <View
+                    android:id="@+id/separator_open_with"
+                    android:layout_width="match_parent"
+                    android:layout_height="1dp"
+                    android:layout_marginStart="72dp"
+                    android:background="@color/grey_012_white_012" />
+
+                <TextView
+                    android:id="@+id/option_open_with"
+                    style="@style/BottomSheetOption"
+                    android:text="@string/external_play"
+                    app:drawableStartCompat="@drawable/ic_external_link_medium_regular_outline" />
 
                 <View
                     android:id="@+id/separator_get_link"
@@ -119,7 +133,7 @@
                     android:id="@+id/option_get_link"
                     style="@style/BottomSheetOption"
                     android:text="@{@plurals/label_share_links(1)}"
-                    app:drawableStartCompat="@drawable/ic_link01_medium_regular_outline"/>
+                    app:drawableStartCompat="@drawable/ic_link01_medium_regular_outline" />
 
                 <View
                     android:id="@+id/separator_retry"
@@ -132,7 +146,7 @@
                     android:id="@+id/option_retry"
                     style="@style/BottomSheetOption"
                     android:text="@string/general_retry"
-                    app:drawableStartCompat="@drawable/ic_rotate_ccw_medium_regular_outline"/>
+                    app:drawableStartCompat="@drawable/ic_rotate_ccw_medium_regular_outline" />
 
                 <View
                     android:id="@+id/separator_clear"
@@ -145,7 +159,7 @@
                     android:id="@+id/option_clear"
                     style="@style/BottomSheetOption.Red"
                     android:text="@string/general_clear"
-                    app:drawableStartCompat="@drawable/ic_x_medium_regular_outline"/>
+                    app:drawableStartCompat="@drawable/ic_x_medium_regular_outline" />
             </LinearLayout>
 
         </androidx.core.widget.NestedScrollView>
