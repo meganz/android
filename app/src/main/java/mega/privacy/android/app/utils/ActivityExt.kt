@@ -1,7 +1,10 @@
 package mega.privacy.android.app.utils
 
 import android.app.Activity
+import android.content.Intent
+import android.net.Uri
 import android.os.Build
+import android.provider.DocumentsContract
 import android.util.DisplayMetrics
 import android.view.WindowInsets
 import androidx.annotation.IdRes
@@ -11,7 +14,7 @@ import androidx.fragment.app.Fragment
 @Suppress("UNCHECKED_CAST")
 fun <F : Fragment> AppCompatActivity.getFragmentFromNavHost(
     @IdRes navHostId: Int,
-    fragmentClass: Class<F>
+    fragmentClass: Class<F>,
 ): F? {
     val navHostFragment = supportFragmentManager.findFragmentById(navHostId) ?: return null
     for (fragment in navHostFragment.childFragmentManager.fragments) {
@@ -56,4 +59,29 @@ fun Activity.getScreenWidth(): Int {
         windowManager.defaultDisplay.getMetrics(displayMetrics)
         displayMetrics.widthPixels
     }
+}
+
+
+/**
+ * Checks if intent can be handled by 3rd-party apps installed on the device
+ */
+fun Activity.canHandleIntent(intent: Intent) =
+    packageManager.queryIntentActivities(intent, 0).isNotEmpty()
+
+
+/**
+ * Create intent to view a folder in 3rd-party file manager
+ */
+fun Activity.createViewFolderIntent(folderUri: Uri): Intent? {
+    val intent = Intent(Intent.ACTION_VIEW).apply {
+        putExtra("android.provider.extra.INITIAL_URI", folderUri)
+        putExtra("org.openintents.extra.ABSOLUTE_PATH", folderUri)
+        addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION or Intent.FLAG_ACTIVITY_NEW_TASK)
+    }
+    intent.setDataAndType(folderUri, "resource/folder")
+    if (canHandleIntent(intent)) return intent
+
+    intent.setDataAndType(folderUri, DocumentsContract.Document.MIME_TYPE_DIR)
+    if (canHandleIntent(intent)) return intent
+    return null
 }

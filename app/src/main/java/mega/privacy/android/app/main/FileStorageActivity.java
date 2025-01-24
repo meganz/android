@@ -26,6 +26,7 @@ import android.os.Build;
 import android.os.Bundle;
 import android.os.Handler;
 import android.provider.DocumentsContract;
+import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.Window;
@@ -64,6 +65,7 @@ import mega.privacy.android.app.extensions.EdgeToEdgeExtensionsKt;
 import mega.privacy.android.app.interfaces.Scrollable;
 import mega.privacy.android.app.main.adapters.FileStorageAdapter;
 import mega.privacy.android.app.psa.PsaWebBrowser;
+import mega.privacy.android.app.utils.ActivityExtKt;
 import mega.privacy.android.app.utils.ColorUtils;
 import timber.log.Timber;
 
@@ -104,6 +106,7 @@ public class FileStorageActivity extends PasscodeActivity implements Scrollable 
     public static final String EXTRA_PROMPT = "prompt";
 
     private Boolean isFolderInSDCard = false;
+    private MenuItem openInFileManagerMenuItem;
 
     // Pick modes
     public enum Mode {
@@ -162,8 +165,19 @@ public class FileStorageActivity extends PasscodeActivity implements Scrollable 
         if (item.getItemId() == android.R.id.home) {
             onBackPressed();
             return true;
+        } else if (item.getItemId() == R.id.action_open_in_file_manager) {
+            try {
+                Intent intent = ActivityExtKt.createViewFolderIntent(this, Uri.fromFile(path));
+                if (intent != null) {
+                    startActivity(intent);
+                    return true;
+                }
+            } catch (Exception e) {
+                Timber.e(e);
+            }
+            showSnackbar(viewContainer, getResources().getString(R.string.filestorage_snackbar_file_manager_is_not_available));
+            return true;
         }
-
         return super.onOptionsItemSelected(item);
     }
 
@@ -290,6 +304,16 @@ public class FileStorageActivity extends PasscodeActivity implements Scrollable 
             }
             checkPath();
         }
+    }
+
+    @Override
+    public boolean onCreateOptionsMenu(Menu menu) {
+        getMenuInflater().inflate(R.menu.activity_filestorage_menu, menu);
+        openInFileManagerMenuItem = menu.findItem(R.id.action_open_in_file_manager);
+        if (mode == Mode.BROWSE_FILES) {
+            checkMenuVisibility();
+        }
+        return super.onCreateOptionsMenu(menu);
     }
 
     /**
@@ -430,8 +454,32 @@ public class FileStorageActivity extends PasscodeActivity implements Scrollable 
         if (contentText != null) {
             contentText.setText(path.getAbsolutePath());
         }
+        checkMenuVisibility();
+    }
 
-        invalidateOptionsMenu();
+    private void checkMenuVisibility() {
+        if (openInFileManagerMenuItem != null) {
+            openInFileManagerMenuItem.setVisible(
+                    mode == Mode.BROWSE_FILES && !isInCacheDirectory(path)
+            );
+        }
+    }
+
+    /*
+     * Check if the folder is in the cache directory by matching last two directories
+     * e.g. mega.privacy.android.app/cache
+     */
+    private boolean isInCacheDirectory(File folderPath) {
+        if (folderPath == null) return false;
+        File cacheDir = getExternalCacheDir();
+        if (cacheDir == null)
+            cacheDir = getCacheDir();
+        if (cacheDir == null) return false;
+        File cacheDirParent = cacheDir.getParentFile();
+        if (cacheDirParent == null) return false;
+        return folderPath
+                .getAbsolutePath()
+                .contains(cacheDirParent.getName() + "/" + cacheDir.getName());
     }
 
     /*
