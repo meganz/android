@@ -251,6 +251,9 @@ class CloudDriveSyncsFragment : Fragment() {
                 LaunchedEffect(pagerState.currentPage) {
                     fileBrowserViewModel.onTabChanged(CloudDriveTab.entries.first { it.position == pagerState.currentPage })
                 }
+                LaunchedEffect(uiState.selectedTab) {
+                    pagerState.scrollToPage(uiState.selectedTab.position)
+                }
                 val isTabShown = when (uiState.selectedTab) {
                     CloudDriveTab.CLOUD -> uiState.isRootNode && !uiState.isInSelection
                     else -> true
@@ -293,9 +296,6 @@ class CloudDriveSyncsFragment : Fragment() {
                                                 unselectedContentColor = MaterialTheme.colors.secondary,
                                                 onClick = {
                                                     fileBrowserViewModel.onTabChanged(tab)
-                                                    coroutineScope.launch {
-                                                        pagerState.animateScrollToPage(index)
-                                                    }
                                                 }
                                             )
                                         }
@@ -360,7 +360,6 @@ class CloudDriveSyncsFragment : Fragment() {
                                                     errorMessage = null,
                                                     isFromSyncFolders = false
                                                 )
-                                                pagerState.scrollToPage(CloudDriveTab.CLOUD.position)
                                             }
                                         },
                                         onFabExpanded = { isExpanded ->

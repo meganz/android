@@ -703,6 +703,32 @@ class FileBrowserViewModelTest {
         }
     }
 
+    @Test
+    fun `test openFileBrowserWithSpecificNode updates state and refreshes nodes`() = runTest {
+        val folderHandle = 123456789L
+
+        // Mock the necessary dependencies
+        whenever(shouldEnterMediaDiscoveryModeUseCase(folderHandle)).thenReturn(false)
+
+        // Call the function
+        underTest.openFileBrowserWithSpecificNode(folderHandle, null)
+
+        // Verify the state updates
+        underTest.state.test {
+            val state = awaitItem()
+            assertThat(state.isLoading).isFalse()
+            assertThat(state.fileBrowserHandle).isEqualTo(folderHandle)
+            assertThat(state.accessedFolderHandle).isEqualTo(folderHandle)
+            assertThat(state.openedFolderNodeHandles).isEmpty()
+            assertThat(state.errorMessage).isEqualTo(null)
+            assertThat(state.selectedTab).isEqualTo(CloudDriveTab.CLOUD)
+            cancelAndIgnoreRemainingEvents()
+        }
+
+        // Verify that refreshNodesState is called
+        verify(getFileBrowserNodeChildrenUseCase).invoke(folderHandle)
+    }
+
     private suspend fun stubCommon() {
         whenever(monitorNodeUpdatesUseCase()).thenReturn(monitorNodeUpdatesFakeFlow)
         whenever(monitorViewType()).thenReturn(emptyFlow())

@@ -318,6 +318,7 @@ class FileBrowserViewModel @Inject constructor(
                 accessedFolderHandle = folderHandle,
                 openedFolderNodeHandles = emptySet(),
                 errorMessage = errorMessage,
+                selectedTab = CloudDriveTab.CLOUD
             )
         }
         if (shouldEnterMediaDiscoveryMode(
@@ -481,7 +482,7 @@ class FileBrowserViewModel @Inject constructor(
      * @param isFromSyncTab True if file browser is opened from sync tab
      */
     fun setIsFromSyncTab(isFromSyncTab: Boolean) =
-        _state.update { it.copy(isFromSyncTab = isFromSyncTab) }
+        _state.update { it.copy(isFromSyncTab = isFromSyncTab, selectedTab = CloudDriveTab.CLOUD) }
 
     /**
      * Resets the Sync Folder Visibility
