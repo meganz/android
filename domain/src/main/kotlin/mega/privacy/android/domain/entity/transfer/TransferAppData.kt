@@ -61,5 +61,19 @@ sealed interface TransferAppData {
     data class ChatDownload(val chatId: Long, val msgId: Long, val msgIndex: Int) :
         TransferAppData
 
-    data class Geolocation(val latitude: Double, val longitude: Double): TransferAppData
+    /**
+     * Identify the coordinates of a file upload transfer.
+     * This is required in case it is necessary to add them as an attribute of the node after uploading.
+     *
+     * @param latitude the latitude of the geolocation.
+     * @param longitude the longitude of the geolocation.
+     */
+    data class Geolocation(val latitude: Double, val longitude: Double) : TransferAppData
+
+    /**
+     * Identify a transfer that belongs to a group
+     *
+     * @param groupId the group Id related to this transfer
+     */
+    data class TransferGroup(val groupId: Long) : TransferAppData
 }

@@ -84,7 +84,17 @@ fun AppDataOwner.getChatDownloadAppData(): TransferAppData.ChatDownload? =
         .filterIsInstance<TransferAppData.ChatDownload>()
         .firstOrNull()
 
+/**
+ * Returns [TransferAppData.Geolocation] associated to this transfer.
+ */
 fun AppDataOwner.getGeolocation(): TransferAppData.Geolocation? = appData
     .filterIsInstance<TransferAppData.Geolocation>()
+    .firstOrNull()
+
+/**
+ * Returns [TransferAppData.TransferGroup] associated to this transfer.
+ */
+fun AppDataOwner.getTransferGroup(): TransferAppData.TransferGroup? = appData
+    .filterIsInstance<TransferAppData.TransferGroup>()
     .firstOrNull()
 

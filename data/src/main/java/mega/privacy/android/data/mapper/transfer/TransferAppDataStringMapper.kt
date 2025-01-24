@@ -46,6 +46,8 @@ class TransferAppDataStringMapper @Inject constructor() {
                     longitude.toString()
                 )
 
+                is TransferAppData.TransferGroup -> listOf(groupId.toString())
+
                 else -> emptyList()
             }
         ).filterNotNull()

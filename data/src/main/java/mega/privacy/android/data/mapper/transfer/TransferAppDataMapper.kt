@@ -71,9 +71,12 @@ class TransferAppDataMapper @Inject constructor() {
                         val latitude = values.getOrNull(0)?.toDoubleOrNull()
                         val longitude = values.getOrNull(1)?.toDoubleOrNull()
                         if (latitude != null && longitude != null) {
-                            TransferAppData.Geolocation(latitude = latitude, longitude= longitude)
+                            TransferAppData.Geolocation(latitude = latitude, longitude = longitude)
                         } else null
                     }
+
+                    AppDataTypeConstants.TransferGroup -> values.firstIfNotBlank()?.toLongOrNull()
+                        ?.let { TransferAppData.TransferGroup(it) }
 
                     else -> null
                 }

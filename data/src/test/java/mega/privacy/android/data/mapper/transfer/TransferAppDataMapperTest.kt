@@ -5,10 +5,10 @@ import mega.privacy.android.data.mapper.transfer.AppDataTypeConstants.Background
 import mega.privacy.android.data.mapper.transfer.AppDataTypeConstants.CameraUpload
 import mega.privacy.android.data.mapper.transfer.AppDataTypeConstants.ChatDownload
 import mega.privacy.android.data.mapper.transfer.AppDataTypeConstants.ChatUpload
+import mega.privacy.android.data.mapper.transfer.AppDataTypeConstants.GeoLocation
 import mega.privacy.android.data.mapper.transfer.AppDataTypeConstants.OriginalContentUri
 import mega.privacy.android.data.mapper.transfer.AppDataTypeConstants.SDCardDownload
 import mega.privacy.android.data.mapper.transfer.AppDataTypeConstants.VoiceClip
-import mega.privacy.android.data.mapper.transfer.AppDataTypeConstants.GeoLocation
 import mega.privacy.android.data.mapper.transfer.TransferAppDataMapper.Companion.APP_DATA_INDICATOR
 import mega.privacy.android.data.mapper.transfer.TransferAppDataMapper.Companion.APP_DATA_REPEATED_TRANSFER_SEPARATOR
 import mega.privacy.android.data.mapper.transfer.TransferAppDataMapper.Companion.APP_DATA_SEPARATOR
@@ -137,6 +137,14 @@ class TransferAppDataMapperTest {
             val expected = TransferAppData.Geolocation(LAT, LON)
             Truth.assertThat(underTest(raw)).containsExactly(expected)
         }
+
+
+        @Test
+        fun `test that a TransferGroup is mapped correctly`() {
+            val raw = "TRANSFER_GROUP>$GROUP_ID"
+            val expected = TransferAppData.TransferGroup(GROUP_ID)
+            Truth.assertThat(underTest(raw)).containsExactly(expected)
+        }
     }
 
     private fun provideWrongParameters() = wrongParameters
@@ -165,6 +173,7 @@ class TransferAppDataMapperTest {
         private const val TARGET_URI = "targetUri"
         private const val LAT = 41.60
         private const val LON = 2.28
+        private const val GROUP_ID = 4567L
         private val wrongParameters = listOf(
             "",
             "something wrong",
@@ -207,7 +216,11 @@ class TransferAppDataMapperTest {
             generateAppDataString(
                 GeoLocation,
                 LAT.toString(), LON.toString()
-            ) to listOf(TransferAppData.Geolocation(LAT, LON))
+            ) to listOf(TransferAppData.Geolocation(LAT, LON)),
+            generateAppDataString(
+                AppDataTypeConstants.TransferGroup,
+                GROUP_ID.toString()
+            ) to listOf(TransferAppData.TransferGroup(GROUP_ID)),
         )
 
         private fun generateAppDataString(
