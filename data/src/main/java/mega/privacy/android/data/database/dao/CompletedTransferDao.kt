@@ -50,6 +50,9 @@ internal interface CompletedTransferDao {
     @Query("DELETE FROM $TABLE_COMPLETED_TRANSFERS WHERE id IN(:ids)")
     suspend fun deleteCompletedTransferByIds(ids: List<Int>)
 
+    @Query("DELETE FROM $TABLE_COMPLETED_TRANSFERS WHERE transferpath = :path")
+    suspend fun deleteCompletedTransfersByPath(path: String)
+
     /**
      * Transaction to delete a list of entities with their IDs but splitting the delete to avoid SQLiteException too many SQL variables
      */

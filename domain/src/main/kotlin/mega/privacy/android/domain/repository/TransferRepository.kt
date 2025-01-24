@@ -223,6 +223,12 @@ interface TransferRepository {
     suspend fun deleteOldestCompletedTransfers()
 
     /**
+     * Delete completed transfers which path contains the given path
+     * @param path to search for
+     */
+    suspend fun deleteCompletedTransfersByPath(path: String)
+
+    /**
      * Starts the download worker to monitor the download transfers as a foreground service
      */
     suspend fun startDownloadWorker()

@@ -509,6 +509,10 @@ internal class DefaultTransfersRepository @Inject constructor(
         workerManagerGateway.enqueueDeleteOldestCompletedTransfersWorkRequest()
     }
 
+    override suspend fun deleteCompletedTransfersByPath(path: String) = withContext(ioDispatcher) {
+        megaLocalRoomGateway.deleteCompletedTransfersByPath(path)
+    }
+
     override suspend fun startDownloadWorker() = withContext(ioDispatcher) {
         workerManagerGateway.enqueueDownloadsWorkerRequest()
     }

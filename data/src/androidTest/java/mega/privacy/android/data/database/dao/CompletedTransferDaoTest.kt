@@ -181,6 +181,15 @@ class CompletedTransferDaoTest {
         assertThat(completedTransferDao.getCompletedTransfersCount()).isEqualTo(expected)
     }
 
+    @Test
+    fun test_that_deleteCompletedTransfersByPath_deletes_the_corresponding_items() = runTest {
+        val entity = createCompletedTransferEntity()
+        completedTransferDao.deleteAllCompletedTransfers()
+        completedTransferDao.insertOrUpdateCompletedTransfer(entity)
+        completedTransferDao.deleteCompletedTransfersByPath(entity.path)
+        assertThat(completedTransferDao.getCompletedTransfersCount()).isEqualTo(0)
+    }
+
     private fun createCompletedTransferEntity(fileName: String = "2023-03-24 00.13.20_1.jpg") =
         CompletedTransferEntity(
             fileName = fileName,

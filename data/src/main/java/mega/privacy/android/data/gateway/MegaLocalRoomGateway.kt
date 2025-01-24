@@ -534,4 +534,10 @@ interface MegaLocalRoomGateway {
      * Delete all pending transfers
      */
     suspend fun deleteAllPendingTransfers()
+
+    /**
+     * Delete completed transfers which path contains the given path
+     * @param path to search for
+     */
+    suspend fun deleteCompletedTransfersByPath(path: String)
 }

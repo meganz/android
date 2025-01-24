@@ -540,6 +540,9 @@ internal class MegaLocalRoomFacade @Inject constructor(
         pendingTransferDao.get().deleteAllPendingTransfers()
     }
 
+    override suspend fun deleteCompletedTransfersByPath(path: String) = completedTransferDao.get()
+        .deleteCompletedTransfersByPath(path)
+
     companion object {
         private const val MAX_COMPLETED_TRANSFER_ROWS = 100
         internal const val MAX_INSERT_LIST_SIZE = 200
