@@ -72,7 +72,7 @@ class StartAllPendingDownloadsUseCase @Inject constructor(
                             }
                             downloadNodeUseCase(
                                 node = node,
-                                destinationPath = pendingTransfer.path,
+                                destinationPath = pendingTransfer.uriPath.value,
                                 appData = pendingTransfer.appData,
                                 isHighPriority = pendingTransfer.isHighPriority,
                             ).takeWhile { transferEvent ->

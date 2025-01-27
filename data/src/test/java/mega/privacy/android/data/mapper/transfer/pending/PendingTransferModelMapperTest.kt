@@ -42,6 +42,7 @@ internal class PendingTransferModelMapperTest {
         startedFiles = 0,
         alreadyTransferred = 0,
         state = PendingTransferState.NotSentToSdk,
+        fileName = "renamed.txt",
     )
 
     @BeforeAll
@@ -65,7 +66,7 @@ internal class PendingTransferModelMapperTest {
             { assertThat(pendingTransfer.transferTag).isEqualTo(pendingTransferEntity.transferTag) },
             { assertThat(pendingTransfer.transferType).isEqualTo(pendingTransferEntity.transferType) },
             { assertThat(pendingTransfer.nodeIdentifier).isEqualTo(pendingTransferEntity.nodeIdentifier) },
-            { assertThat(pendingTransfer.path).isEqualTo(pendingTransferEntity.path) },
+            { assertThat(pendingTransfer.uriPath.value).isEqualTo(pendingTransferEntity.path) },
             { assertThat(pendingTransfer.appData).isEqualTo(appData) },
             { assertThat(pendingTransfer.isHighPriority).isEqualTo(pendingTransferEntity.isHighPriority) },
             { assertThat(pendingTransfer.scanningFoldersData.stage).isEqualTo(pendingTransferEntity.scanningFoldersData.stage) },
@@ -84,6 +85,7 @@ internal class PendingTransferModelMapperTest {
             { assertThat(pendingTransfer.startedFiles).isEqualTo(pendingTransferEntity.startedFiles) },
             { assertThat(pendingTransfer.alreadyTransferred).isEqualTo(pendingTransferEntity.alreadyTransferred) },
             { assertThat(pendingTransfer.state).isEqualTo(pendingTransferEntity.state) },
+            { assertThat(pendingTransfer.fileName).isEqualTo(pendingTransferEntity.fileName) }
         )
     }
 }

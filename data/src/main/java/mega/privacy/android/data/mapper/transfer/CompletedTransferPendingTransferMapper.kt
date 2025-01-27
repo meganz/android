@@ -7,7 +7,6 @@ import mega.privacy.android.domain.entity.transfer.CompletedTransfer
 import mega.privacy.android.domain.entity.transfer.TransferType
 import mega.privacy.android.domain.entity.transfer.pending.PendingTransfer
 import nz.mega.sdk.MegaTransfer
-import java.io.File
 import javax.inject.Inject
 
 /**
@@ -39,13 +38,12 @@ class CompletedTransferPendingTransferMapper @Inject constructor(
     ) = CompletedTransfer(
         appData = transferAppDataStringMapper(pendingTransfer.appData),
         error = error.localizedMessage ?: error::class.simpleName,
-        fileName = pendingTransfer.path
-            .split(File.separator).lastOrNull { it.isNotBlank() } ?: "",
+        fileName = pendingTransfer.fileName ?: "",
         handle = pendingTransfer.nodeIdentifier.nodeId.longValue,
         isOffline = isOffline(pendingTransfer),
-        originalPath = pendingTransfer.path,
+        originalPath = pendingTransfer.uriPath.value,
         parentHandle = -1L,
-        path = pendingTransfer.path,
+        path = pendingTransfer.uriPath.value,
         size = stringWrapper.getSizeString(sizeInBytes),
         timestamp = deviceGateway.now,
         state = MegaTransfer.STATE_FAILED,
@@ -55,7 +53,7 @@ class CompletedTransferPendingTransferMapper @Inject constructor(
     private suspend fun isOffline(pendingTransfer: PendingTransfer) =
         when (pendingTransfer.transferType) {
             TransferType.DOWNLOAD ->
-                pendingTransfer.path.let {
+                pendingTransfer.uriPath.value.let {
                     it.isNotBlank() && it.startsWith(fileGateway.getOfflineFilesRootPath())
                 }
 

@@ -15,6 +15,7 @@ import mega.privacy.android.domain.entity.transfer.pending.PendingTransferState.
 import mega.privacy.android.domain.entity.transfer.pending.PendingTransferState.ErrorStarting
 import mega.privacy.android.domain.entity.transfer.pending.PendingTransferState.NotSentToSdk
 import mega.privacy.android.domain.entity.transfer.pending.PendingTransferState.SdkScanned
+import mega.privacy.android.domain.entity.uri.UriPath
 import org.junit.jupiter.api.BeforeAll
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.TestInstance
@@ -117,8 +118,9 @@ class MonitorPendingTransfersUntilResolvedUseCaseTest {
         appData = null,
         isHighPriority = false,
         nodeIdentifier = mock<PendingTransferNodeIdentifier.CloudDriveNode>(),
-        path = "",
+        uriPath = UriPath(""),
         transferType = type,
         state = pendingTransferState,
+        fileName = null
     )
 }

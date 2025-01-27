@@ -4,6 +4,7 @@ import mega.privacy.android.domain.entity.transfer.TransferAppData
 import mega.privacy.android.domain.entity.transfer.TransferStage
 import mega.privacy.android.domain.entity.transfer.TransferType
 import mega.privacy.android.domain.entity.transfer.pending.PendingTransfer.ScanningFoldersData
+import mega.privacy.android.domain.entity.uri.UriPath
 
 /**
  * Pending transfer. The user has selected this transfer but it's still not sent to the SDK or it's waiting for SDK folder scanning process
@@ -11,26 +12,28 @@ import mega.privacy.android.domain.entity.transfer.pending.PendingTransfer.Scann
  * @property transferTag Sdk transfer tag
  * @property transferType
  * @property nodeIdentifier the identifier to fetch the related node. The node to download or the folder node to upload to.
- * @property path the path where this node will be downloaded or uploaded
+ * @property uriPath the [UriPath] where this node will be downloaded to or uploaded from
  * @property appData the [TransferAppData] associated to this transfer
  * @property isHighPriority
  * @property scanningFoldersData [ScanningFoldersData] of this transfer if the SDK is in the scanning folders process
  * @property startedFiles
  * @property alreadyTransferred
  * @property state the state of this pending transfer
+ * @property fileName The name of the file to be shown in completed Transfers. It can be used to rename uploaded nodes. Current file name will be used if not specified.
  */
 data class PendingTransfer(
     val pendingTransferId: Long,
     val transferTag: Int? = null,
     val transferType: TransferType,
     val nodeIdentifier: PendingTransferNodeIdentifier,
-    val path: String,
+    val uriPath: UriPath,
     val appData: List<TransferAppData>?,
     val isHighPriority: Boolean,
     val scanningFoldersData: ScanningFoldersData = ScanningFoldersData(),
     val startedFiles: Int = 0,
     val alreadyTransferred: Int = 0,
     val state: PendingTransferState = PendingTransferState.NotSentToSdk,
+    val fileName: String?,
 ) {
 
     /**

@@ -17,6 +17,7 @@ import mega.privacy.android.domain.entity.transfer.TransferType
 import mega.privacy.android.domain.entity.transfer.isTransferUpdated
 import mega.privacy.android.domain.entity.transfer.pending.PendingTransfer
 import mega.privacy.android.domain.entity.transfer.pending.PendingTransferState
+import mega.privacy.android.domain.entity.uri.UriPath
 import mega.privacy.android.domain.exception.node.NodeDoesNotExistsException
 import mega.privacy.android.domain.repository.TransferRepository
 import mega.privacy.android.domain.usecase.transfers.downloads.DownloadNodeUseCase
@@ -139,7 +140,7 @@ class StartAllPendingDownloadsUseCaseTest {
         runTest {
             val pendingTransfers = (0..5).map { index ->
                 mock<PendingTransfer> {
-                    on { path } doReturn "path/file$index.txt"
+                    on { uriPath } doReturn UriPath("path/file$index.txt")
                     on { appData } doReturn listOf(mock<TransferAppData.ChatUpload>())
                     on { isHighPriority } doReturn (index == 2)
 
@@ -161,7 +162,7 @@ class StartAllPendingDownloadsUseCaseTest {
             nodes.forEachIndexed { index, node ->
                 verify(downloadNodesUseCase).invoke(
                     node = node,
-                    destinationPath = pendingTransfers[index].path,
+                    destinationPath = pendingTransfers[index].uriPath.value,
                     appData = pendingTransfers[index].appData,
                     isHighPriority = pendingTransfers[index].isHighPriority,
                 )

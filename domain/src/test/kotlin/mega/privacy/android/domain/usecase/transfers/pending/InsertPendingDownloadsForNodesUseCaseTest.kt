@@ -87,9 +87,10 @@ class InsertPendingDownloadsForNodesUseCaseTest {
             InsertPendingTransferRequest(
                 transferType = TransferType.DOWNLOAD,
                 nodeIdentifier = nodeIdentifier,
-                path = uriPath.value,
+                uriPath = uriPath,
                 appData = null,
                 isHighPriority = isHighPriority,
+                fileName = FOLDER_NAME,
             )
         }
 
@@ -140,6 +141,7 @@ class InsertPendingDownloadsForNodesUseCaseTest {
     }
 
     companion object {
-        private const val PATH_STRING = "uriPath/"
+        private const val FOLDER_NAME = "uriPath"
+        private const val PATH_STRING = "$FOLDER_NAME/"
     }
 }

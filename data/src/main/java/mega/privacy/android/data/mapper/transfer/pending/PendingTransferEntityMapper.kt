@@ -17,7 +17,7 @@ internal class PendingTransferEntityMapper @Inject constructor(
             transferTag = transferTag,
             transferType = transferType,
             nodeIdentifier = nodeIdentifier,
-            path = path,
+            path = uriPath.value,
             appData = transferAppDataStringMapper(appData),
             isHighPriority = isHighPriority,
             scanningFoldersData = with(scanningFoldersData) {
@@ -31,6 +31,7 @@ internal class PendingTransferEntityMapper @Inject constructor(
             startedFiles = startedFiles,
             alreadyTransferred = alreadyTransferred,
             state = state,
+            fileName = fileName,
         )
     }
 }

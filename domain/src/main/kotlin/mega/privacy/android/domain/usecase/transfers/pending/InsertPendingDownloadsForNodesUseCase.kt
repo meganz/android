@@ -12,6 +12,7 @@ import mega.privacy.android.domain.usecase.file.DoesUriPathHaveSufficientSpaceFo
 import mega.privacy.android.domain.usecase.transfers.downloads.GetFileDestinationAndAppDataForDownloadUseCase
 import java.io.File
 import javax.inject.Inject
+import kotlin.text.split
 
 /**
  * Use case to insert pending transfers for download a list of nodes to a specific destination.
@@ -48,9 +49,10 @@ class InsertPendingDownloadsForNodesUseCase @Inject constructor(
                 InsertPendingTransferRequest(
                     transferType = TransferType.DOWNLOAD,
                     nodeIdentifier = getPendingTransferNodeIdentifierUseCase(node),
-                    path = folderDestination.value.ensureEndsWithFileSeparator(),
+                    uriPath = UriPath(folderDestination.value.ensureEndsWithFileSeparator()),
                     appData = appData?.let { listOf(it) },
                     isHighPriority = isHighPriority,
+                    fileName = folderDestination.value.split(File.separator).lastOrNull { it.isNotBlank() }
                 )
             }
         )

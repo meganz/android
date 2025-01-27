@@ -45,6 +45,7 @@ data class PendingTransferEntity(
     @ColumnInfo("startedFiles") val startedFiles: Int = 0,
     @ColumnInfo("alreadyTransferred") val alreadyTransferred: Int,
     @ColumnInfo("state") val state: PendingTransferState,
+    @ColumnInfo("fileName") val fileName: String?,
 ) {
 
     /**
