@@ -8,6 +8,7 @@ import kotlinx.coroutines.test.runTest
 import mega.privacy.android.data.cryptography.DecryptData
 import mega.privacy.android.data.cryptography.EncryptData
 import mega.privacy.android.data.database.dao.ActiveTransferDao
+import mega.privacy.android.data.database.dao.ActiveTransferGroupDao
 import mega.privacy.android.data.database.dao.BackupDao
 import mega.privacy.android.data.database.dao.CameraUploadsRecordDao
 import mega.privacy.android.data.database.dao.ChatPendingChangesDao
@@ -17,6 +18,7 @@ import mega.privacy.android.data.database.dao.OfflineDao
 import mega.privacy.android.data.database.dao.PendingTransferDao
 import mega.privacy.android.data.database.dao.VideoRecentlyWatchedDao
 import mega.privacy.android.data.database.entity.ActiveTransferEntity
+import mega.privacy.android.data.database.entity.ActiveTransferGroupEntity
 import mega.privacy.android.data.database.entity.BackupEntity
 import mega.privacy.android.data.database.entity.CameraUploadsRecordEntity
 import mega.privacy.android.data.database.entity.ChatPendingChangesEntity
@@ -37,11 +39,11 @@ import mega.privacy.android.data.mapper.contact.ContactModelMapper
 import mega.privacy.android.data.mapper.offline.OfflineEntityMapper
 import mega.privacy.android.data.mapper.offline.OfflineModelMapper
 import mega.privacy.android.data.mapper.transfer.active.ActiveTransferEntityMapper
+import mega.privacy.android.data.mapper.transfer.active.ActiveTransferGroupEntityMapper
 import mega.privacy.android.data.mapper.transfer.completed.CompletedTransferEntityMapper
 import mega.privacy.android.data.mapper.transfer.completed.CompletedTransferLegacyModelMapper
 import mega.privacy.android.data.mapper.transfer.completed.CompletedTransferModelMapper
 import mega.privacy.android.data.mapper.transfer.pending.InsertPendingTransferRequestMapper
-import mega.privacy.android.data.mapper.transfer.pending.PendingTransferEntityMapper
 import mega.privacy.android.data.mapper.transfer.pending.PendingTransferModelMapper
 import mega.privacy.android.data.mapper.videosection.VideoRecentlyWatchedEntityMapper
 import mega.privacy.android.data.mapper.videosection.VideoRecentlyWatchedItemMapper
@@ -53,6 +55,7 @@ import mega.privacy.android.domain.entity.camerauploads.CameraUploadFolderType
 import mega.privacy.android.domain.entity.camerauploads.CameraUploadsRecord
 import mega.privacy.android.domain.entity.camerauploads.CameraUploadsRecordUploadStatus
 import mega.privacy.android.domain.entity.chat.ChatPendingChanges
+import mega.privacy.android.domain.entity.transfer.ActiveTransferGroupImpl
 import mega.privacy.android.domain.entity.transfer.CompletedTransfer
 import mega.privacy.android.domain.entity.transfer.Transfer
 import mega.privacy.android.domain.entity.transfer.TransferType
@@ -108,9 +111,10 @@ internal class MegaLocalRoomFacadeTest {
     private val videoRecentlyWatchedEntityMapper: VideoRecentlyWatchedEntityMapper = mock()
     private val videoRecentlyWatchedItemMapper: VideoRecentlyWatchedItemMapper = mock()
     private val pendingTransferDao = mock<PendingTransferDao>()
-    private val pendingTransferEntityMapper = mock<PendingTransferEntityMapper>()
     private val pendingTransferModelMapper = mock<PendingTransferModelMapper>()
     private val insertPendingTransferRequestMapper = mock<InsertPendingTransferRequestMapper>()
+    private val activeTransferGroupDao = mock<ActiveTransferGroupDao>()
+    private val activeTransferGroupEntityMapper = mock<ActiveTransferGroupEntityMapper>()
 
     @BeforeAll
     fun setUp() {
@@ -144,9 +148,10 @@ internal class MegaLocalRoomFacadeTest {
             videoRecentlyWatchedItemMapper = videoRecentlyWatchedItemMapper,
             videoRecentlyWatchedEntityMapper = videoRecentlyWatchedEntityMapper,
             pendingTransferDao = { pendingTransferDao },
-            pendingTransferEntityMapper = pendingTransferEntityMapper,
             pendingTransferModelMapper = pendingTransferModelMapper,
             insertPendingTransferRequestMapper = insertPendingTransferRequestMapper,
+            activeTransferGroupDao = { activeTransferGroupDao },
+            activeTransferGroupEntityMapper = activeTransferGroupEntityMapper,
         )
     }
 
@@ -177,8 +182,9 @@ internal class MegaLocalRoomFacadeTest {
             videoRecentlyWatchedEntityMapper,
             pendingTransferDao,
             pendingTransferModelMapper,
-            pendingTransferEntityMapper,
             insertPendingTransferRequestMapper,
+            activeTransferGroupDao,
+            activeTransferGroupEntityMapper,
         )
     }
 
@@ -932,4 +938,21 @@ internal class MegaLocalRoomFacadeTest {
 
             verify(pendingTransferDao).deleteAllPendingTransfers()
         }
+
+    @Test
+    fun `test that insertActiveTransferGroup insert the mapped entities`() = runTest {
+        val groupId = 3543
+        val transferType = TransferType.DOWNLOAD
+        val destination = "destination"
+        val activeTransferGroup =
+            ActiveTransferGroupImpl(groupId, transferType, destination)
+        val roomEntity = ActiveTransferGroupEntity(groupId, transferType, destination)
+        whenever(activeTransferGroupEntityMapper(activeTransferGroup)) doReturn roomEntity
+
+        val expected = roomEntity
+
+        underTest.insertActiveTransferGroup(activeTransferGroup)
+
+        verify(activeTransferGroupDao).insertActiveTransferGroup(expected)
+    }
 }

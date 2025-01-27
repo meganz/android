@@ -7,6 +7,7 @@ import kotlinx.coroutines.flow.map
 import mega.privacy.android.data.cryptography.DecryptData
 import mega.privacy.android.data.cryptography.EncryptData
 import mega.privacy.android.data.database.dao.ActiveTransferDao
+import mega.privacy.android.data.database.dao.ActiveTransferGroupDao
 import mega.privacy.android.data.database.dao.BackupDao
 import mega.privacy.android.data.database.dao.CameraUploadsRecordDao
 import mega.privacy.android.data.database.dao.ChatPendingChangesDao
@@ -28,11 +29,11 @@ import mega.privacy.android.data.mapper.contact.ContactModelMapper
 import mega.privacy.android.data.mapper.offline.OfflineEntityMapper
 import mega.privacy.android.data.mapper.offline.OfflineModelMapper
 import mega.privacy.android.data.mapper.transfer.active.ActiveTransferEntityMapper
+import mega.privacy.android.data.mapper.transfer.active.ActiveTransferGroupEntityMapper
 import mega.privacy.android.data.mapper.transfer.completed.CompletedTransferEntityMapper
 import mega.privacy.android.data.mapper.transfer.completed.CompletedTransferLegacyModelMapper
 import mega.privacy.android.data.mapper.transfer.completed.CompletedTransferModelMapper
 import mega.privacy.android.data.mapper.transfer.pending.InsertPendingTransferRequestMapper
-import mega.privacy.android.data.mapper.transfer.pending.PendingTransferEntityMapper
 import mega.privacy.android.data.mapper.transfer.pending.PendingTransferModelMapper
 import mega.privacy.android.data.mapper.videosection.VideoRecentlyWatchedEntityMapper
 import mega.privacy.android.data.mapper.videosection.VideoRecentlyWatchedItemMapper
@@ -47,6 +48,7 @@ import mega.privacy.android.domain.entity.camerauploads.CameraUploadsRecord
 import mega.privacy.android.domain.entity.camerauploads.CameraUploadsRecordUploadStatus
 import mega.privacy.android.domain.entity.chat.ChatPendingChanges
 import mega.privacy.android.domain.entity.transfer.ActiveTransfer
+import mega.privacy.android.domain.entity.transfer.ActiveTransferGroup
 import mega.privacy.android.domain.entity.transfer.CompletedTransfer
 import mega.privacy.android.domain.entity.transfer.TransferType
 import mega.privacy.android.domain.entity.transfer.pending.InsertPendingTransferRequest
@@ -87,9 +89,10 @@ internal class MegaLocalRoomFacade @Inject constructor(
     private val videoRecentlyWatchedEntityMapper: VideoRecentlyWatchedEntityMapper,
     private val videoRecentlyWatchedItemMapper: VideoRecentlyWatchedItemMapper,
     private val pendingTransferDao: Lazy<PendingTransferDao>,
-    private val pendingTransferEntityMapper: PendingTransferEntityMapper,
     private val pendingTransferModelMapper: PendingTransferModelMapper,
     private val insertPendingTransferRequestMapper: InsertPendingTransferRequestMapper,
+    private val activeTransferGroupDao: Lazy<ActiveTransferGroupDao>,
+    private val activeTransferGroupEntityMapper: ActiveTransferGroupEntityMapper,
 ) : MegaLocalRoomGateway {
     override suspend fun insertContact(contact: Contact) {
         contactDao.get().insertOrUpdateContact(contactEntityMapper(contact))
@@ -256,6 +259,18 @@ internal class MegaLocalRoomFacade @Inject constructor(
 
     override suspend fun setActiveTransferAsCancelledByTag(tags: List<Int>) =
         activeTransferDao.get().setActiveTransferAsCancelledByTag(tags)
+
+    override suspend fun insertActiveTransferGroup(activeTransferGroup: ActiveTransferGroup) {
+        activeTransferGroupDao.get()
+            .insertActiveTransferGroup(activeTransferGroupEntityMapper(activeTransferGroup))
+    }
+
+    override suspend fun getActiveTransferGroup(groupId: Int): ActiveTransferGroup? =
+        activeTransferGroupDao.get().getActiveTransferGroupById(groupId)
+
+    override suspend fun deleteActiveTransferGroup(groupId: Int) {
+        activeTransferGroupDao.get().deleteActiveTransfersGroupById(groupId)
+    }
 
     override suspend fun getCompletedTransferById(id: Int) = completedTransferDao.get()
         .getCompletedTransferById(id)?.let { completedTransferModelMapper(it) }

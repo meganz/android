@@ -11,6 +11,7 @@ import mega.privacy.android.domain.entity.camerauploads.CameraUploadsRecord
 import mega.privacy.android.domain.entity.camerauploads.CameraUploadsRecordUploadStatus
 import mega.privacy.android.domain.entity.chat.ChatPendingChanges
 import mega.privacy.android.domain.entity.transfer.ActiveTransfer
+import mega.privacy.android.domain.entity.transfer.ActiveTransferGroup
 import mega.privacy.android.domain.entity.transfer.CompletedTransfer
 import mega.privacy.android.domain.entity.transfer.TransferType
 import mega.privacy.android.domain.entity.transfer.pending.InsertPendingTransferRequest
@@ -202,12 +203,12 @@ interface MegaLocalRoomGateway {
     suspend fun getCurrentActiveTransfers(): List<ActiveTransfer>
 
     /**
-     * Insert a new active transfer or replace it if there's already an active transfer with the same tag
+     * Insert a new active transfer or update it if there's already an active transfer with the same tag
      */
     suspend fun insertOrUpdateActiveTransfer(activeTransfer: ActiveTransfer)
 
     /**
-     * Insert (or replace  if there's already an active transfer with the same tag) a list of active transfers
+     * Insert (or update if there's already an active transfer with the same tag) a list of active transfers
      */
     suspend fun insertOrUpdateActiveTransfers(activeTransfers: List<ActiveTransfer>)
 
@@ -225,6 +226,21 @@ interface MegaLocalRoomGateway {
      * Set an active transfer as finished cancelled by its tag
      */
     suspend fun setActiveTransferAsCancelledByTag(tags: List<Int>)
+
+    /**
+     * Insert a new active transfer group
+     */
+    suspend fun insertActiveTransferGroup(activeTransferGroup: ActiveTransferGroup)
+
+    /**
+     * Get the [ActiveTransferGroup] by [groupId]
+     */
+    suspend fun getActiveTransferGroup(groupId: Int): ActiveTransferGroup?
+
+    /**
+     * Delete the [ActiveTransferGroup] by [groupId]
+     */
+    suspend fun deleteActiveTransferGroup(groupId: Int)
 
     /**
      * Get completed transfer by id

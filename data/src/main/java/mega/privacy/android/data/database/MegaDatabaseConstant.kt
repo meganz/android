@@ -8,7 +8,7 @@ object MegaDatabaseConstant {
     /**
      * Database Version
      */
-    const val DATABASE_VERSION = 96
+    const val DATABASE_VERSION = 97
 
     /**
      * Database Name
