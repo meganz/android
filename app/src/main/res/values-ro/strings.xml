@@ -5586,4 +5586,8 @@
     <string name="logout_warning_dialog_transfers_message">Dacă vă deconectați acum, transferurile dvs. nu vor fi finalizate și datele vor fi șterse</string>
     <!-- Warning warning dialog message if user has offline files or transfers in progress. -->
     <string name="logout_warning_dialog_offline_and_transfers_message">Dacă vă deconectați acum, toate transferurile în așteptare și fișierele offline vor fi șterse</string>
+    <!-- Toolbar action menu button in file storage screen to open 3rd-party File Manager -->
+    <string name="filestorage_menu_option_open_in_file_manager">Open in File Manager</string>
+    <!-- Snackbar message when file storage screen is unable to open 3rd-party File Manager -->
+    <string name="filestorage_snackbar_file_manager_is_not_available">A suitable file manager app is not available on this device.</string>
 </resources>

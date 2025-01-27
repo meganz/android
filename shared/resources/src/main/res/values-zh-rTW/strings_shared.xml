@@ -914,4 +914,8 @@
     <string name="general_syncs">同步</string>
     <!-- Text under the syncs list -->
     <string name="syncs_tab_view_other_devices">在裝置中心查看其它裝置</string>
+    <!-- The snackbar message of you and others raised your hands -->
+    <plurals name="transfers_completed_read_error_retrying">
+        <item quantity="other"></item>
+    </plurals>
 </resources>

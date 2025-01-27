@@ -914,4 +914,8 @@
     <string name="general_syncs">ซิงค์</string>
     <!-- Text under the syncs list -->
     <string name="syncs_tab_view_other_devices">View other devices in Device centre</string>
+    <!-- The snackbar message of you and others raised your hands -->
+    <plurals name="transfers_completed_read_error_retrying">
+        <item quantity="other"></item>
+    </plurals>
 </resources>

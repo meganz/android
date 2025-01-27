@@ -965,17 +965,17 @@
     <!-- The Screen Toolbar Title for configuring the scan settings -->
     <string name="document_scanning_settings_toolbar_title">إعدادات المسح الضوئي</string>
     <!-- Title of the camera setting screen -->
-    <string name="camera_settings_title">Camera settings</string>
+    <string name="camera_settings_title">إعدادات الكاميرا</string>
     <!-- Title of the save location in the camera setting screen -->
-    <string name="camera_settings_save_location_title">Save location</string>
+    <string name="camera_settings_save_location_title">احفظ الموقع</string>
     <!-- Description of the save location in the camera setting screen -->
-    <string name="camera_settings_save_location_description">Enable geotagging for photos and videos</string>
+    <string name="camera_settings_save_location_description">تمكين وضع العلامات الجغرافية للصور ومقاطع الفيديو</string>
     <!-- Message when user denies location permission in the camera setting screen -->
-    <string name="camera_settings_save_location_permission_denied">Allow MEGA to access this device’s location to continue</string>
+    <string name="camera_settings_save_location_permission_denied">اسمح لميغا MEGA بالوصول إلى موقع هذا الجهاز للمتابعة</string>
     <!-- Warning message to indicate that cannot select a currently synced folder -->
-    <string name="sync_local_device_folder_currently_synced_message">This folder is already synced</string>
+    <string name="sync_local_device_folder_currently_synced_message">تمت مزامنة هذا المجلد بالفعل</string>
     <!-- Warning message to indicate that cannot select a currently backed up folder -->
-    <string name="sync_local_device_folder_currently_backed_up_message">This folder is already backed up</string>
+    <string name="sync_local_device_folder_currently_backed_up_message">تم نسخ هذا المجلد احتياطيًا بالفعل</string>
     <!-- The name of every users root drive in the cloud of MEGA. -->
     <string name="general_section_cloud_drive">سحابة التخزين</string>
     <!-- App Bar Title in of Cloud Drive Bottom Menu -->
@@ -983,5 +983,14 @@
     <!-- Tab bar title of Syncs tab -->
     <string name="general_syncs">يقوم بالمزامنة</string>
     <!-- Text under the syncs list -->
-    <string name="syncs_tab_view_other_devices">View other devices in Device centre</string>
+    <string name="syncs_tab_view_other_devices">عرض الأجهزة الأخرى في مركز الأجهزة</string>
+    <!-- The snackbar message of you and others raised your hands -->
+    <plurals name="transfers_completed_read_error_retrying">
+        <item quantity="zero"></item>
+        <item quantity="one"></item>
+        <item quantity="two"></item>
+        <item quantity="few"></item>
+        <item quantity="many"></item>
+        <item quantity="other"></item>
+    </plurals>
 </resources>

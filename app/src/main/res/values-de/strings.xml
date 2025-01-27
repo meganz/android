@@ -5348,4 +5348,8 @@
     <string name="logout_warning_dialog_transfers_message">Wenn Sie sich jetzt ausloggen, werden Ihre Transfers nicht abgeschlossen und die Daten werden gelöscht</string>
     <!-- Warning warning dialog message if user has offline files or transfers in progress. -->
     <string name="logout_warning_dialog_offline_and_transfers_message">Wenn Sie sich jetzt ausloggen, werden alle ausstehenden Transfers und Offline-Dateien gelöscht</string>
+    <!-- Toolbar action menu button in file storage screen to open 3rd-party File Manager -->
+    <string name="filestorage_menu_option_open_in_file_manager">Open in File Manager</string>
+    <!-- Snackbar message when file storage screen is unable to open 3rd-party File Manager -->
+    <string name="filestorage_snackbar_file_manager_is_not_available">A suitable file manager app is not available on this device.</string>
 </resources>
