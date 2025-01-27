@@ -146,7 +146,7 @@ class FileContactsListBottomSheetDialogFragment : BaseBottomSheetDialogFragment 
                         contactPermission?.let { contactPermission ->
                             ShareContactOptionsContent(
                                 contactPermission = contactPermission,
-                                allowChangePermission = node == null || !megaApi.isInInbox(node),
+                                allowChangePermission = node == null || !megaApi.isInVault(node),
                                 onInfoClicked = {
                                     email()?.let {
                                         ContactUtil.openContactInfoActivity(requireActivity(), it)

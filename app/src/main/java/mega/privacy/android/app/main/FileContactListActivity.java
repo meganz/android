@@ -283,7 +283,7 @@ public class FileContactListActivity extends PasscodeActivity implements OnClick
             }
 
             MenuItem changePermissionsMenuItem = menu.findItem(R.id.action_file_contact_list_permissions);
-            if (node != null && megaApi.isInInbox(node)) {
+            if (node != null && megaApi.isInVault(node)) {
                 // If the node came from Backups, hide the Change Permissions option from the Action Bar
                 changePermissionsMenuItem.setVisible(false);
                 changePermissionsMenuItem.setShowAsAction(MenuItem.SHOW_AS_ACTION_NEVER);

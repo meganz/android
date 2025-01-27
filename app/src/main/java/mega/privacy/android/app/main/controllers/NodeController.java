@@ -136,7 +136,7 @@ public class NodeController {
         return node != null
                 && !megaApi.isInCloud(node)
                 && !megaApi.isInRubbish(node)
-                && !megaApi.isInInbox(node);
+                && !megaApi.isInVault(node);
     }
 
     public MegaNode getParent(MegaNode node) {
@@ -217,7 +217,7 @@ public class NodeController {
                             Timber.d("Navigate to TAB RUBBISH first level%s", parentIntentN.getName());
                             firstNavigationLevel = true;
                             ((ManagerActivity) context).setParentHandleRubbish(parentIntentN.getHandle());
-                        } else if (parentIntentN.getHandle() == megaApi.getInboxNode().getHandle()) {
+                        } else if (parentIntentN.getHandle() == megaApi.getVaultNode().getHandle()) {
                             Timber.d("Navigate to BACKUPS first level%s", parentIntentN.getName());
                             firstNavigationLevel = true;
                             ((ManagerActivity) context).setParentHandleBackups(parentIntentN.getHandle());
@@ -313,7 +313,7 @@ public class NodeController {
             } else if (parentNode.getHandle() == megaApi.getRubbishNode().getHandle()) {
                 Timber.d("The parent is the RUBBISH");
                 return 1;
-            } else if (parentNode.getHandle() == megaApi.getInboxNode().getHandle()) {
+            } else if (parentNode.getHandle() == megaApi.getVaultNode().getHandle()) {
                 Timber.d("The parent is the BACKUPS");
                 return 2;
             } else if (parentNode.getHandle() == -1) {

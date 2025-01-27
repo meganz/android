@@ -1249,7 +1249,7 @@ object MegaNodeUtil {
 
             val inCloudDrive = topAncestor.handle == megaApi.rootNode?.handle
                     || topAncestor.handle == megaApi.rubbishNode?.handle
-            val inBackups = topAncestor.handle == megaApi.inboxNode?.handle
+            val inBackups = topAncestor.handle == megaApi.vaultNode?.handle
 
             val location = when {
                 fromIncomingShare -> {
@@ -1355,7 +1355,7 @@ object MegaNodeUtil {
         return when {
             parent.handle == megaApi.rootNode?.handle -> context.getString(R.string.section_cloud_drive)
             parent.handle == megaApi.rubbishNode?.handle -> context.getString(R.string.section_rubbish_bin)
-            parent.handle == megaApi.inboxNode?.handle -> context.getString(R.string.home_side_menu_backups_title)
+            parent.handle == megaApi.vaultNode?.handle -> context.getString(R.string.home_side_menu_backups_title)
             else -> parent.name
         }
     }
@@ -1812,7 +1812,7 @@ object MegaNodeUtil {
 
             // First, check if the node exists in Backups.
             // If the node doesn't exist in Backups, or is in Rubbish Bin, return BACKUP_NONE
-            if (!megaApi.isInInbox(selectedNode) || isNodeInRubbishOrDeleted(selectedNode.handle)) {
+            if (!megaApi.isInVault(selectedNode) || isNodeInRubbishOrDeleted(selectedNode.handle)) {
                 Timber.d("MyBackup + checkBackupNodeTypeByHandle return nodeType = $BACKUP_NONE")
                 return BACKUP_NONE
             }

@@ -1112,7 +1112,7 @@ class PdfViewerActivity : BaseActivity(), MegaGlobalListenerInterface, OnPageCha
      */
     private fun checkIfShouldApplyReadOnlyState(menu: Menu) {
         val node = megaApi.getNodeByHandle(handle)
-        if (node != null && megaApi.isInInbox(node)) {
+        if (node != null && megaApi.isInVault(node)) {
             menu.findItem(R.id.pdf_viewer_rename).isVisible = false
             menu.findItem(R.id.pdf_viewer_move).isVisible = false
             menu.findItem(R.id.pdf_viewer_move_to_trash).isVisible = false

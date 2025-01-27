@@ -673,7 +673,7 @@ class TextEditorActivity : PasscodeActivity(), SnackbarShower, Scrollable {
      */
     private fun checkIfShouldApplyReadOnlyState(menu: Menu) {
         viewModel.getNode()?.let {
-            if (megaApi.isInInbox(it)) {
+            if (megaApi.isInVault(it)) {
                 with(menu) {
                     findItem(R.id.action_rename).isVisible = false
                     findItem(R.id.action_move).isVisible = false

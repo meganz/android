@@ -1252,7 +1252,7 @@ class LegacyVideoPlayerActivity : MediaPlayerActivity() {
         val isPaidAccount = accountType?.isPaid == true
         val isBusinessAccountExpired =
             viewModel.state.value.isBusinessAccountExpired
-        val isNodeInBackup = megaApi.isInInbox(node)
+        val isNodeInBackup = megaApi.isInVault(node)
 
         val shouldShowHideNode = when {
             !isHiddenNodesEnabled || isInSharedItems || isRootParentInShare || isNodeInBackup -> false
@@ -1288,7 +1288,7 @@ class LegacyVideoPlayerActivity : MediaPlayerActivity() {
      * @param node The [MegaNode] to check
      */
     private fun checkIfShouldApplyReadOnlyState(menu: Menu, node: MegaNode?) {
-        if (node != null && megaApi.isInInbox(node)) {
+        if (node != null && megaApi.isInVault(node)) {
             with(menu) {
                 findItem(R.id.move_to_trash).isVisible = false
                 findItem(R.id.move).isVisible = false

@@ -1504,7 +1504,7 @@ class ManagerActivity : PasscodeActivity(), NavigationView.OnNavigationItemSelec
                                         selectDrawerItemPending = false
                                     }
 
-                                    megaApi.inboxNode?.handle -> {
+                                    megaApi.vaultNode?.handle -> {
                                         drawerItem = DrawerItem.BACKUPS
                                         backupsFragment?.updateBackupsHandle(handleIntent)
                                         selectDrawerItem(drawerItem)
@@ -2548,7 +2548,7 @@ class ManagerActivity : PasscodeActivity(), NavigationView.OnNavigationItemSelec
             else -> if (megaApi.isInRubbish(parentIntentN)) {
                 rubbishBinViewModel.setRubbishBinHandle(handleIntent)
                 DrawerItem.RUBBISH_BIN
-            } else if (megaApi.isInInbox(parentIntentN)) {
+            } else if (megaApi.isInVault(parentIntentN)) {
                 backupsFragment?.updateBackupsHandle(handleIntent)
                 DrawerItem.BACKUPS
             } else {
@@ -6309,7 +6309,7 @@ class ManagerActivity : PasscodeActivity(), NavigationView.OnNavigationItemSelec
                 selectDrawerItem(drawerItem)
             }
 
-            megaApi.inboxNode?.handle -> {
+            megaApi.vaultNode?.handle -> {
                 // Backups
                 drawerItem = DrawerItem.BACKUPS
                 openFolderRefresh = true
@@ -6471,7 +6471,7 @@ class ManagerActivity : PasscodeActivity(), NavigationView.OnNavigationItemSelec
                         val outgoingParentNode = withContext(ioDispatcher) {
                             megaApi.getNodeByHandle(getHandleFromOutgoingSharesViewModel())
                         }
-                        if (outgoingParentNode != null && megaApi.isInInbox(outgoingParentNode)) {
+                        if (outgoingParentNode != null && megaApi.isInVault(outgoingParentNode)) {
                             hideFabButton()
                         } else {
                             updateFabAndShow()
@@ -6489,7 +6489,7 @@ class ManagerActivity : PasscodeActivity(), NavigationView.OnNavigationItemSelec
                         val linksParentNode = withContext(ioDispatcher) {
                             megaApi.getNodeByHandle(getHandleFromLinksViewModel())
                         }
-                        if (linksParentNode != null && megaApi.isInInbox(linksParentNode)) {
+                        if (linksParentNode != null && megaApi.isInVault(linksParentNode)) {
                             hideFabButton()
                         } else {
                             updateFabAndShow()
@@ -6848,7 +6848,7 @@ class ManagerActivity : PasscodeActivity(), NavigationView.OnNavigationItemSelec
             sharesViewModel.onTabSelected(SharesTab.INCOMING_TAB)
             refreshSharesPageAdapter()
             selectDrawerItem(DrawerItem.SHARED_ITEMS)
-        } else if (parentNode.handle == megaApi.inboxNode?.handle) {
+        } else if (parentNode.handle == megaApi.vaultNode?.handle) {
             refreshFragment(FragmentTag.BACKUPS.tag)
             selectDrawerItem(DrawerItem.BACKUPS)
         }

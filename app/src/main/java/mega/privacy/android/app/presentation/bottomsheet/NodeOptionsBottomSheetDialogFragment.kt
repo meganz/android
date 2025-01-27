@@ -1267,7 +1267,7 @@ class NodeOptionsBottomSheetDialogFragment : BaseBottomSheetDialogFragment() {
         val optionOpenFolder = contentView.findViewById<TextView>(R.id.open_folder_option)
         val optionRubbishBin = contentView.findViewById<TextView>(R.id.rubbish_bin_option)
         val optionRemove = contentView.findViewById<TextView>(R.id.remove_option)
-        if (node != null && megaApi.isInInbox(node)) {
+        if (node != null && megaApi.isInVault(node)) {
             optionEdit.visibility = View.GONE
             optionFavourite.visibility = View.GONE
             optionHideLayout.visibility = View.GONE

@@ -40,7 +40,6 @@ import mega.privacy.android.app.components.dragger.DragToExitSupport
 import mega.privacy.android.app.databinding.ActivityAudioPlayerBinding
 import mega.privacy.android.app.extensions.enableEdgeToEdgeAndConsumeInsets
 import mega.privacy.android.app.featuretoggle.ApiFeatures
-import mega.privacy.android.app.featuretoggle.AppFeatures
 import mega.privacy.android.app.interfaces.ActionNodeCallback
 import mega.privacy.android.app.interfaces.showSnackbar
 import mega.privacy.android.app.listeners.OptionalMegaRequestListenerInterface
@@ -970,7 +969,7 @@ class AudioPlayerActivity : MediaPlayerActivity() {
                                     val isPaidAccount = accountType?.isPaid == true
                                     val isBusinessAccountExpired =
                                         viewModel.state.value.isBusinessAccountExpired
-                                    val isNodeInBackup = megaApi.isInInbox(node)
+                                    val isNodeInBackup = megaApi.isInVault(node)
 
 
                                     val shouldShowHideNode = when {
@@ -1040,7 +1039,7 @@ class AudioPlayerActivity : MediaPlayerActivity() {
     private fun checkIfShouldApplyReadOnlyState(menu: Menu) {
         playerServiceGateway?.getCurrentPlayingHandle()?.let { playingHandle ->
             megaApi.getNodeByHandle(playingHandle)?.let { node ->
-                if (megaApi.isInInbox(node)) {
+                if (megaApi.isInVault(node)) {
                     with(menu) {
                         findItem(R.id.move_to_trash).isVisible = false
                         findItem(R.id.move).isVisible = false

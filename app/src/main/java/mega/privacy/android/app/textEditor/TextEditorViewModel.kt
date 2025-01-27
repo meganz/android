@@ -223,7 +223,7 @@ class TextEditorViewModel @Inject constructor(
      * @return true if the [MegaNode] exists in Backups, and false if otherwise
      */
     private fun isNodeInBackups(): Boolean = getNode()?.let {
-        megaApi.isInInbox(it)
+        megaApi.isInVault(it)
     } ?: false
 
     fun getNodeAccess(): Int = megaApi.getAccess(getNode())

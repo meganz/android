@@ -119,7 +119,7 @@ public class MegaApiUtils {
 
             if (parentNode != null) {
 
-                if ((parentNode.getType() != MegaNode.TYPE_ROOT) & (parentNode.getHandle() != megaApi.getInboxNode().getHandle())) {
+                if ((parentNode.getType() != MegaNode.TYPE_ROOT) & (parentNode.getHandle() != megaApi.getVaultNode().getHandle())) {
                     do {
 
                         dTreeList.add(parentNode);
@@ -130,7 +130,7 @@ public class MegaApiUtils {
                         if (parentNode == null) {
                             break;
                         }
-                    } while ((parentNode.getType() != MegaNode.TYPE_ROOT) & (parentNode.getHandle() != megaApi.getInboxNode().getHandle()));
+                    } while ((parentNode.getType() != MegaNode.TYPE_ROOT) & (parentNode.getHandle() != megaApi.getVaultNode().getHandle()));
                 }
             }
         }
