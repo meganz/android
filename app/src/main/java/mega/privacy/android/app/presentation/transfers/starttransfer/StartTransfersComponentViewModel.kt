@@ -40,8 +40,8 @@ import mega.privacy.android.domain.exception.NotEnoughStorageException
 import mega.privacy.android.domain.usecase.SetStorageDownloadAskAlwaysUseCase
 import mega.privacy.android.domain.usecase.SetStorageDownloadLocationUseCase
 import mega.privacy.android.domain.usecase.canceltoken.CancelCancelTokenUseCase
+import mega.privacy.android.domain.usecase.canceltoken.InvalidateCancelTokenUseCase
 import mega.privacy.android.domain.usecase.chat.message.SendChatAttachmentsUseCase
-import mega.privacy.android.domain.usecase.featureflag.GetFeatureFlagValueUseCase
 import mega.privacy.android.domain.usecase.file.TotalFileSizeOfNodesUseCase
 import mega.privacy.android.domain.usecase.network.IsConnectedToInternetUseCase
 import mega.privacy.android.domain.usecase.node.GetFilePreviewDownloadPathUseCase
@@ -109,9 +109,9 @@ internal class StartTransfersComponentViewModel @Inject constructor(
     private val startDownloadsWorkerAndWaitUntilIsStartedUseCase: StartDownloadsWorkerAndWaitUntilIsStartedUseCase,
     private val deleteAllPendingTransfersUseCase: DeleteAllPendingTransfersUseCase,
     private val monitorPendingTransfersUntilResolvedUseCase: MonitorPendingTransfersUntilResolvedUseCase,
-    private val getFeatureFlagValueUseCase: GetFeatureFlagValueUseCase,
     private val insertPendingDownloadsForNodesUseCase: InsertPendingDownloadsForNodesUseCase,
     private val monitorStorageOverQuotaUseCase: MonitorStorageOverQuotaUseCase,
+    private val invalidateCancelTokenUseCase: InvalidateCancelTokenUseCase,
 ) : ViewModel(), DefaultLifecycleObserver {
 
     private val _uiState = MutableStateFlow(StartTransferViewState())
@@ -418,6 +418,7 @@ internal class StartTransfersComponentViewModel @Inject constructor(
                     .lastOrNull()
 
             Timber.d("Scanning finished")
+            invalidateCancelTokenUseCase()
             deleteAllPendingTransfersUseCase()
             _uiState.updateEventAndClearProgress(
                 StartTransferEvent.FinishDownloadProcessing(

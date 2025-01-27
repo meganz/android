@@ -35,6 +35,7 @@ import mega.privacy.android.domain.exception.NotEnoughStorageException
 import mega.privacy.android.domain.usecase.SetStorageDownloadAskAlwaysUseCase
 import mega.privacy.android.domain.usecase.SetStorageDownloadLocationUseCase
 import mega.privacy.android.domain.usecase.canceltoken.CancelCancelTokenUseCase
+import mega.privacy.android.domain.usecase.canceltoken.InvalidateCancelTokenUseCase
 import mega.privacy.android.domain.usecase.chat.message.SendChatAttachmentsUseCase
 import mega.privacy.android.domain.usecase.featureflag.GetFeatureFlagValueUseCase
 import mega.privacy.android.domain.usecase.file.TotalFileSizeOfNodesUseCase
@@ -134,6 +135,7 @@ class StartTransfersComponentViewModelTest {
     private val monitorStorageOverQuotaUseCase = mock<MonitorStorageOverQuotaUseCase> {
         on { invoke() } doReturn emptyFlow()
     }
+    val invalidateCancelTokenUseCase = mock<InvalidateCancelTokenUseCase>()
 
     private val node: TypedFileNode = mock()
     private val nodes = listOf(node)
@@ -155,7 +157,6 @@ class StartTransfersComponentViewModelTest {
         on { allTransfersUpdated } doReturn true
         on { startedFiles } doReturn 1
     }
-    val getFeatureFlagValueUseCase = mock<GetFeatureFlagValueUseCase>()
 
     @BeforeAll
     fun setup() {
@@ -194,9 +195,9 @@ class StartTransfersComponentViewModelTest {
             startDownloadsWorkerAndWaitUntilIsStartedUseCase = startDownloadsWorkerAndWaitUntilIsStartedUseCase,
             deleteAllPendingTransfersUseCase = deleteAllPendingTransfersUseCase,
             monitorPendingTransfersUntilResolvedUseCase = monitorPendingTransfersUntilResolvedUseCase,
-            getFeatureFlagValueUseCase = getFeatureFlagValueUseCase,
             insertPendingDownloadsForNodesUseCase = insertPendingDownloadsForNodesUseCase,
             monitorStorageOverQuotaUseCase = monitorStorageOverQuotaUseCase,
+            invalidateCancelTokenUseCase = invalidateCancelTokenUseCase
         )
     }
 
@@ -235,7 +236,7 @@ class StartTransfersComponentViewModelTest {
             deleteAllPendingTransfersUseCase,
             monitorPendingTransfersUntilResolvedUseCase,
             insertPendingDownloadsForNodesUseCase,
-            getFeatureFlagValueUseCase,
+            invalidateCancelTokenUseCase
         )
         initialStub()
     }
@@ -825,6 +826,25 @@ class StartTransfersComponentViewModelTest {
             underTest.startTransfer(triggerEvent)
 
             verify(deleteAllPendingTransfersUseCase)()
+        }
+
+    @Test
+    fun `test that invalidateCancelTokenUseCase is invoked when monitorNotResolvedPendingTransfersUseCase finishes`() =
+        runTest {
+            commonStub()
+            val pendingTransfer = mock<PendingTransfer> {
+                val scanningFoldersData = PendingTransfer.ScanningFoldersData(
+                    TransferStage.STAGE_TRANSFERRING_FILES,
+                )
+                on { this.scanningFoldersData } doReturn scanningFoldersData
+            }
+            val triggerEvent = TransferTriggerEvent.StartDownloadNode(nodes)
+            whenever(monitorPendingTransfersUntilResolvedUseCase(TransferType.DOWNLOAD)) doReturn
+                    flowOf(listOf(pendingTransfer))
+
+            underTest.startTransfer(triggerEvent)
+
+            verify(invalidateCancelTokenUseCase)()
         }
 
     @Test
