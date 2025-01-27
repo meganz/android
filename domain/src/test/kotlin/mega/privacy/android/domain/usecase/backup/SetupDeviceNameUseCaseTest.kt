@@ -3,6 +3,7 @@ package mega.privacy.android.domain.usecase.backup
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.test.runTest
 import mega.privacy.android.domain.entity.DeviceInfo
+import mega.privacy.android.domain.exception.ResourceAlreadyExistsMegaException
 import mega.privacy.android.domain.repository.EnvironmentRepository
 import org.junit.jupiter.api.BeforeAll
 import org.junit.jupiter.api.BeforeEach
@@ -10,6 +11,7 @@ import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.TestInstance
 import org.junit.jupiter.params.ParameterizedTest
 import org.junit.jupiter.params.provider.NullAndEmptySource
+import org.mockito.kotlin.given
 import org.mockito.kotlin.mock
 import org.mockito.kotlin.reset
 import org.mockito.kotlin.verify
@@ -79,5 +81,33 @@ internal class SetupDeviceNameUseCaseTest {
         whenever(environmentRepository.getDeviceInfo()).thenReturn(deviceInfo)
         underTest()
         verify(setDeviceNameUseCase).invoke(deviceId, localDeviceName)
+    }
+
+    @Test
+    fun `test that device name is set even if exists an old device with the same name`() = runTest {
+        val deviceId = "1234"
+        val localDeviceName = "Google Pixel 4"
+        val deviceInfo = mock<DeviceInfo> {
+            on { device }.thenReturn(localDeviceName)
+        }
+        whenever(getDeviceIdUseCase()).thenReturn(deviceId)
+        whenever(getDeviceNameUseCase(deviceId)).thenReturn(null)
+        whenever(environmentRepository.getDeviceInfo()).thenReturn(deviceInfo)
+        given(setDeviceNameUseCase(deviceId, localDeviceName)).willAnswer {
+            throw ResourceAlreadyExistsMegaException(
+                errorCode = -12,
+                errorString = "Already exists"
+            )
+        }
+        given(setDeviceNameUseCase(deviceId, "$localDeviceName (1)")).willAnswer {
+            throw ResourceAlreadyExistsMegaException(
+                errorCode = -12,
+                errorString = "Already exists"
+            )
+        }
+        underTest()
+        verify(setDeviceNameUseCase).invoke(deviceId, localDeviceName)
+        verify(setDeviceNameUseCase).invoke(deviceId, "$localDeviceName (1)")
+        verify(setDeviceNameUseCase).invoke(deviceId, "$localDeviceName (2)")
     }
 }
