@@ -1224,6 +1224,11 @@ class ManagerActivity : PasscodeActivity(), NavigationView.OnNavigationItemSelec
                 )
 
                 OriginalTempTheme(isDark = isDark) {
+                    LaunchedEffect(syncPromotionBottomSheetState.targetValue) {
+                        if (syncPromotionBottomSheetState.targetValue == ModalBottomSheetValue.Hidden) {
+                            coroutineScope.launch { syncPromotionViewModel.onConsumeShouldShowSyncPromotion() }
+                        }
+                    }
                     LaunchedEffect(state.shouldShowSyncPromotion) {
                         Timber.d("shouldShowSyncPromotion ${state.shouldShowSyncPromotion}")
                         if (state.shouldShowSyncPromotion) {
