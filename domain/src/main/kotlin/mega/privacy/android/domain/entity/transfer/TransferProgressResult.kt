@@ -1,6 +1,4 @@
-package mega.privacy.android.data.worker
-
-import mega.privacy.android.domain.entity.transfer.MonitorOngoingActiveTransfersResult
+package mega.privacy.android.domain.entity.transfer
 
 /**
  * Data class for representing the progress of transfers, along with an indicator to determine if there is any pending work.
@@ -8,7 +6,7 @@ import mega.privacy.android.domain.entity.transfer.MonitorOngoingActiveTransfers
  * @param monitorOngoingActiveTransfersResult the current progress of transfers
  * @param pendingWork flag to indicate whether there are more work to do or not
  */
-internal data class MonitorProgressResult(
+data class TransferProgressResult(
     val monitorOngoingActiveTransfersResult: MonitorOngoingActiveTransfersResult,
     val pendingWork: Boolean,
 )

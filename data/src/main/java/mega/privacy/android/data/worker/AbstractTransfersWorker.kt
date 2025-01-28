@@ -28,6 +28,7 @@ import mega.privacy.android.data.extensions.onFirst
 import mega.privacy.android.data.extensions.skipUnstable
 import mega.privacy.android.data.mapper.transfer.OverQuotaNotificationBuilder
 import mega.privacy.android.domain.entity.transfer.ActiveTransferTotals
+import mega.privacy.android.domain.entity.transfer.TransferProgressResult
 import mega.privacy.android.domain.entity.transfer.TransferEvent
 import mega.privacy.android.domain.entity.transfer.TransferType
 import mega.privacy.android.domain.monitoring.CrashReporter
@@ -62,7 +63,7 @@ abstract class AbstractTransfersWorker(
     private val areNotificationsEnabledUseCase: AreNotificationsEnabledUseCase,
     private val correctActiveTransfersUseCase: CorrectActiveTransfersUseCase,
     private val clearActiveTransfersIfFinishedUseCase: ClearActiveTransfersIfFinishedUseCase,
-    private val crashReporter: CrashReporter,
+    protected val crashReporter: CrashReporter,
     private val foregroundSetter: ForegroundSetter?,
     private val notificationSamplePeriod: Long?,
 ) : CoroutineWorker(context, workerParams) {
@@ -106,7 +107,7 @@ abstract class AbstractTransfersWorker(
     /**
      * @return a flow with updates of MonitorOngoingActiveTransfersResult to track the progress of the ongoing work. It will be sampled to avoid too much updates.
      */
-    internal abstract fun monitorProgress(): Flow<MonitorProgressResult>
+    internal abstract fun monitorProgress(): Flow<TransferProgressResult>
 
     internal fun consumeProgress() = monitorProgress()
         .skipUnstable(eventsChunkDuration) {

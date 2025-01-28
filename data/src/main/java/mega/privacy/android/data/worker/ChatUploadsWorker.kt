@@ -23,6 +23,7 @@ import mega.privacy.android.domain.entity.transfer.ActiveTransferTotals
 import mega.privacy.android.domain.entity.transfer.ChatCompressionFinished
 import mega.privacy.android.domain.entity.transfer.ChatCompressionProgress
 import mega.privacy.android.domain.entity.transfer.ChatCompressionState
+import mega.privacy.android.domain.entity.transfer.TransferProgressResult
 import mega.privacy.android.domain.entity.transfer.TransferEvent
 import mega.privacy.android.domain.entity.transfer.TransferType
 import mega.privacy.android.domain.entity.transfer.pendingMessageIds
@@ -109,7 +110,7 @@ class ChatUploadsWorker @AssistedInject constructor(
         paused
     )
 
-    override fun monitorProgress(): Flow<MonitorProgressResult> =
+    override fun monitorProgress(): Flow<TransferProgressResult> =
         combine(
             monitorOngoingActiveTransfersUseCase(type),
             monitorPendingMessagesByStateUseCase(
@@ -123,7 +124,7 @@ class ChatUploadsWorker @AssistedInject constructor(
         ) { monitorOngoingActiveTransfersResult, pendingMessages, _ ->
             val pendingWork = pendingMessages.isNotEmpty()
                     || monitorOngoingActiveTransfersResult.hasPendingWork(type)
-            MonitorProgressResult(monitorOngoingActiveTransfersResult, pendingWork)
+            TransferProgressResult(monitorOngoingActiveTransfersResult, pendingWork)
         }
 
     override suspend fun onComplete() {

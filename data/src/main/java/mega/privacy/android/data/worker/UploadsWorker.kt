@@ -7,27 +7,30 @@ import androidx.work.WorkerParameters
 import dagger.assisted.Assisted
 import dagger.assisted.AssistedInject
 import kotlinx.coroutines.CoroutineDispatcher
+import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.flow.Flow
-import kotlinx.coroutines.flow.map
+import kotlinx.coroutines.flow.catch
+import kotlinx.coroutines.launch
 import mega.privacy.android.data.mapper.transfer.OverQuotaNotificationBuilder
 import mega.privacy.android.data.mapper.transfer.TransfersFinishedNotificationMapper
 import mega.privacy.android.data.mapper.transfer.TransfersNotificationMapper
 import mega.privacy.android.domain.entity.transfer.ActiveTransferTotals
+import mega.privacy.android.domain.entity.transfer.TransferProgressResult
 import mega.privacy.android.domain.entity.transfer.TransferEvent
 import mega.privacy.android.domain.entity.transfer.TransferType
 import mega.privacy.android.domain.entity.uri.UriPath
 import mega.privacy.android.domain.monitoring.CrashReporter
 import mega.privacy.android.domain.qualifier.IoDispatcher
+import mega.privacy.android.domain.usecase.transfers.MonitorActiveAndPendingTransfersUseCase
 import mega.privacy.android.domain.usecase.transfers.MonitorTransferEventsUseCase
 import mega.privacy.android.domain.usecase.transfers.active.ClearActiveTransfersIfFinishedUseCase
 import mega.privacy.android.domain.usecase.transfers.active.CorrectActiveTransfersUseCase
 import mega.privacy.android.domain.usecase.transfers.active.GetActiveTransferTotalsUseCase
 import mega.privacy.android.domain.usecase.transfers.active.HandleTransferEventUseCase
-import mega.privacy.android.domain.usecase.transfers.active.MonitorOngoingActiveTransfersUseCase
 import mega.privacy.android.domain.usecase.transfers.paused.AreTransfersPausedUseCase
+import mega.privacy.android.domain.usecase.transfers.pending.StartAllPendingUploadsUseCase
 import mega.privacy.android.domain.usecase.transfers.uploads.SetNodeAttributesAfterUploadUseCase
 import timber.log.Timber
-import java.io.File
 
 /**
  * Worker that will monitor current active upload transfers while there are some.
@@ -40,7 +43,7 @@ class UploadsWorker @AssistedInject constructor(
     @IoDispatcher private val ioDispatcher: CoroutineDispatcher,
     monitorTransferEventsUseCase: MonitorTransferEventsUseCase,
     handleTransferEventUseCase: HandleTransferEventUseCase,
-    private val monitorOngoingActiveTransfersUseCase: MonitorOngoingActiveTransfersUseCase,
+    private val monitorActiveAndPendingTransfersUseCase: MonitorActiveAndPendingTransfersUseCase,
     areTransfersPausedUseCase: AreTransfersPausedUseCase,
     getActiveTransferTotalsUseCase: GetActiveTransferTotalsUseCase,
     overQuotaNotificationBuilder: OverQuotaNotificationBuilder,
@@ -54,6 +57,7 @@ class UploadsWorker @AssistedInject constructor(
     crashReporter: CrashReporter,
     foregroundSetter: ForegroundSetter? = null,
     notificationSamplePeriod: Long? = null,
+    private val startAllPendingUploadsUseCase: StartAllPendingUploadsUseCase,
 ) : AbstractTransfersWorker(
     context = context,
     workerParams = workerParams,
@@ -75,13 +79,22 @@ class UploadsWorker @AssistedInject constructor(
     override val finalNotificationId = NOTIFICATION_UPLOAD_FINAL
     override val updateNotificationId = UPLOAD_NOTIFICATION_ID
 
-    override fun monitorProgress(): Flow<MonitorProgressResult> =
-        monitorOngoingActiveTransfersUseCase(type).map { ongoingActiveTransfersResult ->
-            MonitorProgressResult(
-                ongoingActiveTransfersResult,
-                ongoingActiveTransfersResult.hasPendingWork(type)
-            )
+    override fun monitorProgress(): Flow<TransferProgressResult> =
+        monitorActiveAndPendingTransfersUseCase(type)
+
+    override suspend fun doWorkInternal(scope: CoroutineScope) {
+        scope.launch {
+            super.doWorkInternal(this)
         }
+        scope.launch {
+            startAllPendingUploadsUseCase()
+                .catch {
+                    Timber.e(it, "Error on start uploading files")
+                    crashReporter.report(it)
+                }
+                .collect { Timber.d("Start uploading $it files") }
+        }
+    }
 
     override suspend fun createUpdateNotification(
         activeTransferTotals: ActiveTransferTotals,

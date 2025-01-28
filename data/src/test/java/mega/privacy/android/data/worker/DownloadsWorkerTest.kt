@@ -18,7 +18,6 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.awaitCancellation
 import kotlinx.coroutines.delay
-import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.flow
 import kotlinx.coroutines.flow.flowOf
 import kotlinx.coroutines.test.UnconfinedTestDispatcher
@@ -32,19 +31,19 @@ import mega.privacy.android.data.worker.AbstractTransfersWorker.Companion.ON_TRA
 import mega.privacy.android.domain.entity.Progress
 import mega.privacy.android.domain.entity.transfer.ActiveTransferTotals
 import mega.privacy.android.domain.entity.transfer.MonitorOngoingActiveTransfersResult
+import mega.privacy.android.domain.entity.transfer.TransferProgressResult
 import mega.privacy.android.domain.entity.transfer.Transfer
 import mega.privacy.android.domain.entity.transfer.TransferEvent
 import mega.privacy.android.domain.entity.transfer.TransferType
 import mega.privacy.android.domain.monitoring.CrashReporter
 import mega.privacy.android.domain.usecase.qrcode.ScanMediaFileUseCase
+import mega.privacy.android.domain.usecase.transfers.MonitorActiveAndPendingTransfersUseCase
 import mega.privacy.android.domain.usecase.transfers.MonitorTransferEventsUseCase
 import mega.privacy.android.domain.usecase.transfers.active.ClearActiveTransfersIfFinishedUseCase
 import mega.privacy.android.domain.usecase.transfers.active.CorrectActiveTransfersUseCase
 import mega.privacy.android.domain.usecase.transfers.active.GetActiveTransferTotalsUseCase
 import mega.privacy.android.domain.usecase.transfers.active.HandleTransferEventUseCase
-import mega.privacy.android.domain.usecase.transfers.active.MonitorOngoingActiveTransfersUseCase
 import mega.privacy.android.domain.usecase.transfers.paused.AreTransfersPausedUseCase
-import mega.privacy.android.domain.usecase.transfers.pending.GetPendingTransfersByTypeUseCase
 import mega.privacy.android.domain.usecase.transfers.pending.StartAllPendingDownloadsUseCase
 import org.junit.jupiter.api.AfterAll
 import org.junit.jupiter.api.BeforeAll
@@ -92,9 +91,9 @@ class DownloadsWorkerTest {
     private val setForeground = mock<ForegroundSetter>()
     private val crashReporter = mock<CrashReporter>()
     private val notificationManager = mock<NotificationManagerCompat>()
-    private val getPendingTransfersByTypeUseCase = mock<GetPendingTransfersByTypeUseCase>()
-    private val monitorOngoingActiveTransfersUseCase = mock<MonitorOngoingActiveTransfersUseCase>()
     private val startAllPendingDownloadsUseCase = mock<StartAllPendingDownloadsUseCase>()
+    private val monitorActiveAndPendingTransfersUseCase =
+        mock<MonitorActiveAndPendingTransfersUseCase>()
 
     @BeforeAll
     fun setup() {
@@ -139,8 +138,7 @@ class DownloadsWorkerTest {
             crashReporter = crashReporter,
             foregroundSetter = setForeground,
             notificationSamplePeriod = 0L,
-            getPendingTransfersByTypeUseCase = getPendingTransfersByTypeUseCase,
-            monitorOngoingActiveTransfersUseCase = monitorOngoingActiveTransfersUseCase,
+            monitorActiveAndPendingTransfersUseCase = monitorActiveAndPendingTransfersUseCase,
             startAllPendingDownloadsUseCase = startAllPendingDownloadsUseCase,
         )
     }
@@ -164,8 +162,7 @@ class DownloadsWorkerTest {
             crashReporter,
             setForeground,
             monitorTransferEventsUseCase,
-            getPendingTransfersByTypeUseCase,
-            monitorOngoingActiveTransfersUseCase,
+            monitorActiveAndPendingTransfersUseCase,
             startAllPendingDownloadsUseCase,
         )
     }
@@ -204,7 +201,7 @@ class DownloadsWorkerTest {
         runTest {
             commonStub()
             underTest.doWork()
-            verify(monitorOngoingActiveTransfersUseCase).invoke(TransferType.DOWNLOAD)
+            verify(monitorActiveAndPendingTransfersUseCase).invoke(TransferType.DOWNLOAD)
         }
 
     @Test
@@ -215,11 +212,11 @@ class DownloadsWorkerTest {
                 inOrder(
                     monitorTransferEventsUseCase,
                     correctActiveTransfersUseCase,
-                    monitorOngoingActiveTransfersUseCase
+                    monitorActiveAndPendingTransfersUseCase,
                 )
             underTest.doWork()
             inOrder.verify(correctActiveTransfersUseCase).invoke(TransferType.DOWNLOAD)
-            inOrder.verify(monitorOngoingActiveTransfersUseCase)
+            inOrder.verify(monitorActiveAndPendingTransfersUseCase)
                 .invoke(TransferType.DOWNLOAD)
         }
 
@@ -368,14 +365,12 @@ class DownloadsWorkerTest {
     }
 
     @Test
-    fun `test that consumeProgress does complete if there are no ongoing transfers or pending transfers`() =
+    fun `test that consumeProgress does complete if there are no pending work`() =
         runTest {
             commonStub()
-            val monitorOngoingActiveTransfersUseFlow = monitorOngoingActiveTransfersFlow(false)
-            whenever(getPendingTransfersByTypeUseCase(TransferType.DOWNLOAD)) doReturn
-                    flowOf(emptyList())
-            whenever(monitorOngoingActiveTransfersUseCase(TransferType.DOWNLOAD)) doReturn
-                    monitorOngoingActiveTransfersUseFlow
+            val monitorProgressResult = mockMonitorProgressResult(false)
+            whenever(monitorActiveAndPendingTransfersUseCase(TransferType.DOWNLOAD)) doReturn
+                    flowOf(monitorProgressResult)
 
             underTest.consumeProgress().test {
                 awaitItem() //first value
@@ -383,22 +378,20 @@ class DownloadsWorkerTest {
             }
         }
 
+
     @Test
-    fun `test that consumeProgress only completes when there are no pending transfers for more than sample duration`() =
+    fun `test that consumeProgress only completes when there are no pending work for more than sample duration`() =
         runTest {
             commonStub()
-            val monitorOngoingActiveTransfersUseFlow = monitorOngoingActiveTransfersFlow(false)
-            whenever(getPendingTransfersByTypeUseCase(TransferType.DOWNLOAD)) doReturn
+            whenever(monitorActiveAndPendingTransfersUseCase(TransferType.DOWNLOAD)) doReturn
                     flow {
-                        emit(emptyList())
+                        emit(mockMonitorProgressResult(false))
                         delay(ON_TRANSFER_UPDATE_REFRESH_MILLIS / 2)
-                        emit(listOf(mock())) //second value
-                        emit(emptyList())
+                        emit(mockMonitorProgressResult(true)) //second value
+                        emit(mockMonitorProgressResult(false))
                         delay(ON_TRANSFER_UPDATE_REFRESH_MILLIS + 100)
-                        emit(listOf(mock())) //third value
+                        emit(mockMonitorProgressResult(true)) //third value
                     }
-            whenever(monitorOngoingActiveTransfersUseCase(TransferType.DOWNLOAD)) doReturn
-                    monitorOngoingActiveTransfersUseFlow
 
             underTest.consumeProgress().test {
                 awaitItem() //first value
@@ -408,14 +401,14 @@ class DownloadsWorkerTest {
         }
 
     @Test
-    fun `test that monitorProgress does not complete if there are ongoing transfers`() =
+    fun `test that monitorProgress does not complete if there are pending work`() =
         runTest {
             commonStub()
-            val monitorOngoingActiveTransfersUseFlow = monitorOngoingActiveTransfersFlow(true)
-            whenever(getPendingTransfersByTypeUseCase(TransferType.DOWNLOAD)) doReturn
-                    flowOf(emptyList())
-            whenever(monitorOngoingActiveTransfersUseCase(TransferType.DOWNLOAD)) doReturn
-                    monitorOngoingActiveTransfersUseFlow
+            whenever(monitorActiveAndPendingTransfersUseCase(TransferType.DOWNLOAD)) doReturn
+                    flow {
+                        emit(mockMonitorProgressResult(true))
+                        awaitCancellation()
+                    }
 
             underTest.monitorProgress().test {
                 awaitItem()
@@ -423,24 +416,7 @@ class DownloadsWorkerTest {
             }
         }
 
-    @Test
-    fun `test that monitorProgress does not complete if there are pending transfers`() =
-        runTest {
-            commonStub()
-            val monitorOngoingActiveTransfersUseFlow = monitorOngoingActiveTransfersFlow(false)
-            whenever(getPendingTransfersByTypeUseCase(TransferType.DOWNLOAD)) doReturn
-                    flowOf(listOf(mock()))
-            whenever(monitorOngoingActiveTransfersUseCase(TransferType.DOWNLOAD)) doReturn
-                    monitorOngoingActiveTransfersUseFlow
-
-            underTest.monitorProgress().test {
-                awaitItem()
-                expectNoEvents()
-            }
-        }
-
-
-    private suspend fun commonStub(
+    private fun commonStub(
         initialTransferTotals: ActiveTransferTotals = mockActiveTransferTotals(false),
         transferTotals: List<ActiveTransferTotals> = listOf(mockActiveTransferTotals(true)),
         transferOverQuota: Boolean = false,
@@ -451,24 +427,30 @@ class DownloadsWorkerTest {
             .thenReturn(false)
         whenever(monitorTransferEventsUseCase())
             .thenReturn(flowOf(transferEvent))
-        whenever(monitorOngoingActiveTransfersUseCase(TransferType.DOWNLOAD))
+        whenever(monitorActiveAndPendingTransfersUseCase(TransferType.DOWNLOAD))
             .thenReturn(flow {
                 emit(
-                    MonitorOngoingActiveTransfersResult(
-                        activeTransferTotals = initialTransferTotals,
-                        paused = false,
-                        transfersOverQuota = false,
-                        storageOverQuota = false
+                    TransferProgressResult(
+                        MonitorOngoingActiveTransfersResult(
+                            activeTransferTotals = initialTransferTotals,
+                            paused = false,
+                            transfersOverQuota = false,
+                            storageOverQuota = false
+                        ),
+                        !initialTransferTotals.hasCompleted(),
                     )
                 )
                 transferTotals.forEach {
                     delay(ON_TRANSFER_UPDATE_REFRESH_MILLIS) // events are sampled in the worker
                     emit(
-                        MonitorOngoingActiveTransfersResult(
-                            activeTransferTotals = it,
-                            paused = false,
-                            transfersOverQuota = transferOverQuota,
-                            storageOverQuota = false
+                        TransferProgressResult(
+                            MonitorOngoingActiveTransfersResult(
+                                activeTransferTotals = it,
+                                paused = false,
+                                transfersOverQuota = transferOverQuota,
+                                storageOverQuota = false
+                            ),
+                            !it.hasCompleted(),
                         )
                     )
                 }
@@ -478,8 +460,6 @@ class DownloadsWorkerTest {
         whenever(workProgressUpdater.updateProgress(any(), any(), any()))
             .thenReturn(SettableFuture.create<Void?>().also { it.set(null) })
         whenever(transfersNotificationMapper(any(), any())).thenReturn(mock())
-        whenever(getPendingTransfersByTypeUseCase(TransferType.DOWNLOAD))
-            .thenReturn(flowOf(emptyList()))
     }
 
     private fun mockActiveTransferTotals(
@@ -490,20 +470,15 @@ class DownloadsWorkerTest {
         on { hasOngoingTransfers() }.thenReturn(hasOngoing)
     }
 
-    private fun monitorOngoingActiveTransfersFlow(hasOngoingTransfers: Boolean): Flow<MonitorOngoingActiveTransfersResult> {
-        val activeTransferTotals = mock<ActiveTransferTotals> {
-            on { this.hasOngoingTransfers() } doReturn hasOngoingTransfers
-        }
-        return flow {
-            emit(
-                MonitorOngoingActiveTransfersResult(
-                    activeTransferTotals,
-                    paused = false,
-                    transfersOverQuota = false,
-                    storageOverQuota = false
-                )
-            )
-            awaitCancellation()
-        }
+    private fun mockMonitorProgressResult(pendingWork: Boolean): TransferProgressResult {
+        return TransferProgressResult(
+            MonitorOngoingActiveTransfersResult(
+                mock<ActiveTransferTotals>(),
+                paused = false,
+                transfersOverQuota = false,
+                storageOverQuota = false
+            ),
+           pendingWork =  pendingWork,
+        )
     }
 }
