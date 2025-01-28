@@ -6,13 +6,6 @@ enum class DomainFeatures(
     override val description: String,
     private val defaultValue: Boolean,
 ) : Feature {
-    /**
-     * Use file descriptor for uploads to avoid the copy to the cache folder
-     */
-    UseFileDescriptorForUploads(
-        "Use file descriptor for uploads to avoid the copy to the cache folder",
-        true,
-    ),
 
     /**
      * Use file descriptor for uploads to avoid the copy to the cache folder

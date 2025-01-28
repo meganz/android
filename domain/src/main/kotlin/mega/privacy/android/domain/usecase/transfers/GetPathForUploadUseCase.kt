@@ -2,10 +2,8 @@ package mega.privacy.android.domain.usecase.transfers
 
 import mega.privacy.android.domain.entity.uri.UriPath
 import mega.privacy.android.domain.exception.NotEnoughStorageException
-import mega.privacy.android.domain.featuretoggle.DomainFeatures
 import mega.privacy.android.domain.repository.FileSystemRepository
 import mega.privacy.android.domain.repository.PermissionRepository
-import mega.privacy.android.domain.usecase.featureflag.GetFeatureFlagValueUseCase
 import mega.privacy.android.domain.usecase.file.DoesPathHaveSufficientSpaceUseCase
 import java.io.File
 import javax.inject.Inject
@@ -21,7 +19,6 @@ class GetPathForUploadUseCase @Inject constructor(
     private val doesPathHaveSufficientSpaceUseCase: DoesPathHaveSufficientSpaceUseCase,
     private val fileSystemRepository: FileSystemRepository,
     private val permissionRepository: PermissionRepository,
-    private val getFeatureFlagValueUseCase: GetFeatureFlagValueUseCase,
 ) {
     /**
      * Invoke
@@ -31,8 +28,7 @@ class GetPathForUploadUseCase @Inject constructor(
      */
     suspend operator fun invoke(originalUriPath: UriPath, isChatUpload: Boolean): String? {
         return when {
-            !isChatUpload && getFeatureFlagValueUseCase(DomainFeatures.UseFileDescriptorForUploads)
-                    && fileSystemRepository.isContentUri(originalUriPath.value) -> {
+            !isChatUpload && fileSystemRepository.isContentUri(originalUriPath.value) -> {
                 originalUriPath.value
             }
 
