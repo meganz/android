@@ -2,8 +2,10 @@ package mega.privacy.android.data.repository
 
 import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
+import kotlinx.coroutines.flow.asSharedFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.filterIsInstance
 import kotlinx.coroutines.flow.flowOn
@@ -37,6 +39,7 @@ import mega.privacy.android.domain.entity.chat.ChatScheduledMeeting
 import mega.privacy.android.domain.entity.chat.ChatScheduledMeetingOccurr
 import mega.privacy.android.domain.entity.chat.ChatScheduledRules
 import mega.privacy.android.domain.entity.chat.ChatVideoUpdate
+import mega.privacy.android.domain.entity.meeting.FakeIncomingCallState
 import mega.privacy.android.domain.entity.meeting.ResultOccurrenceUpdate
 import mega.privacy.android.domain.qualifier.IoDispatcher
 import mega.privacy.android.domain.repository.CallRepository
@@ -78,6 +81,10 @@ internal class CallRepositoryImpl @Inject constructor(
     private val appEventGateway: AppEventGateway,
     @IoDispatcher private val dispatcher: CoroutineDispatcher,
 ) : CallRepository {
+
+    private val fakeIncomingCalls = mutableMapOf<Long, FakeIncomingCallState>()
+    private val fakeIncomingCallsFlow = MutableSharedFlow<MutableMap<Long, FakeIncomingCallState>>()
+    private val hangingCallIds = mutableSetOf<Long>()
 
     private val monitorCallRecordingConsentEvent: MutableStateFlow<Boolean?> =
         MutableStateFlow(null)
@@ -825,4 +832,28 @@ internal class CallRepositoryImpl @Inject constructor(
             )
         }
     }
+
+    override fun monitorFakeIncomingCall() = fakeIncomingCallsFlow.asSharedFlow()
+
+    override suspend fun addFakeIncomingCall(chatId: Long, type: FakeIncomingCallState) {
+        fakeIncomingCalls[chatId] = type
+        fakeIncomingCallsFlow.emit(fakeIncomingCalls)
+    }
+
+    override suspend fun removeFakeIncomingCall(chatId: Long) {
+        fakeIncomingCalls.remove(chatId)
+    }
+
+    override suspend fun getFakeIncomingCall(chatId: Long): FakeIncomingCallState? =
+        fakeIncomingCalls[chatId]
+
+    override suspend fun addCallPendingToHangUp(chatId: Long) {
+        hangingCallIds.add(chatId)
+    }
+
+    override suspend fun removeCallPendingToHangUp(chatId: Long) {
+        hangingCallIds.remove(chatId)
+    }
+
+    override suspend fun isPendingToHangUp(chatId: Long): Boolean = hangingCallIds.contains(chatId)
 }
