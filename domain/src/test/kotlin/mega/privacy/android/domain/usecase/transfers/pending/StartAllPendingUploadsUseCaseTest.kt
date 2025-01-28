@@ -7,6 +7,7 @@ import kotlinx.coroutines.flow.flowOf
 import kotlinx.coroutines.test.runTest
 import kotlinx.coroutines.yield
 import mega.privacy.android.domain.entity.node.DefaultTypedFileNode
+import mega.privacy.android.domain.entity.node.NodeId
 import mega.privacy.android.domain.entity.transfer.Transfer
 import mega.privacy.android.domain.entity.transfer.TransferAppData
 import mega.privacy.android.domain.entity.transfer.TransferEvent
@@ -16,11 +17,11 @@ import mega.privacy.android.domain.entity.transfer.TransferType
 import mega.privacy.android.domain.entity.transfer.isAlreadyTransferredEvent
 import mega.privacy.android.domain.entity.transfer.isTransferUpdated
 import mega.privacy.android.domain.entity.transfer.pending.PendingTransfer
+import mega.privacy.android.domain.entity.transfer.pending.PendingTransferNodeIdentifier
 import mega.privacy.android.domain.entity.transfer.pending.PendingTransferState
 import mega.privacy.android.domain.entity.uri.UriPath
-import mega.privacy.android.domain.exception.node.NodeDoesNotExistsException
 import mega.privacy.android.domain.repository.TransferRepository
-import mega.privacy.android.domain.usecase.transfers.downloads.DownloadNodeUseCase
+import mega.privacy.android.domain.usecase.transfers.uploads.UploadFileUseCase
 import org.junit.jupiter.api.BeforeAll
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
@@ -29,39 +30,38 @@ import org.junit.jupiter.params.ParameterizedTest
 import org.junit.jupiter.params.provider.MethodSource
 import org.mockito.kotlin.any
 import org.mockito.kotlin.anyOrNull
+import org.mockito.kotlin.anyValueClass
 import org.mockito.kotlin.doReturn
 import org.mockito.kotlin.doSuspendableAnswer
 import org.mockito.kotlin.doThrow
 import org.mockito.kotlin.eq
-import org.mockito.kotlin.isA
 import org.mockito.kotlin.mock
 import org.mockito.kotlin.reset
 import org.mockito.kotlin.verify
 import org.mockito.kotlin.whenever
+import kotlin.RuntimeException
 
 @TestInstance(TestInstance.Lifecycle.PER_CLASS)
-class StartAllPendingDownloadsUseCaseTest {
-    private lateinit var underTest: StartAllPendingDownloadsUseCase
+class StartAllPendingUploadsUseCaseTest {
+    private lateinit var underTest: StartAllPendingUploadsUseCase
 
     private val transferRepository = mock<TransferRepository>()
     private val getPendingTransfersByTypeAndStateUseCase =
         mock<GetPendingTransfersByTypeAndStateUseCase>()
     private val updatePendingTransferStateUseCase = mock<UpdatePendingTransferStateUseCase>()
-    private val getTypedNodeFromPendingTransferUseCase =
-        mock<GetTypedNodeFromPendingTransferUseCase>()
-    private val downloadNodesUseCase = mock<DownloadNodeUseCase>()
+
     private val updatePendingTransferStartedCountUseCase =
         mock<UpdatePendingTransferStartedCountUseCase>()
+    private val uploadFileUseCase = mock<UploadFileUseCase>()
 
     @BeforeAll
     fun setUp() {
-        underTest = StartAllPendingDownloadsUseCase(
+        underTest = StartAllPendingUploadsUseCase(
             transferRepository,
             getPendingTransfersByTypeAndStateUseCase,
             updatePendingTransferStateUseCase,
             updatePendingTransferStartedCountUseCase,
-            getTypedNodeFromPendingTransferUseCase,
-            downloadNodesUseCase,
+            uploadFileUseCase,
         )
     }
 
@@ -71,9 +71,8 @@ class StartAllPendingDownloadsUseCaseTest {
             transferRepository,
             getPendingTransfersByTypeAndStateUseCase,
             updatePendingTransferStateUseCase,
-            getTypedNodeFromPendingTransferUseCase,
-            downloadNodesUseCase,
             updatePendingTransferStartedCountUseCase,
+            uploadFileUseCase,
         )
     }
 
@@ -136,21 +135,19 @@ class StartAllPendingDownloadsUseCaseTest {
         }
 
     @Test
-    fun `test that downloadNodesUseCase is invoked for each node corresponding to the pending transfer`() =
+    fun `test that uploadNodesUseCase is invoked for each file corresponding to the pending transfer`() =
         runTest {
             val pendingTransfers = (0..5).map { index ->
+                val pendingTransferNodeIdentifier =
+                    PendingTransferNodeIdentifier.CloudDriveNode(NodeId(4875L * index))
                 mock<PendingTransfer> {
                     on { uriPath } doReturn UriPath("path/file$index.txt")
                     on { appData } doReturn listOf(mock<TransferAppData.ChatUpload>())
                     on { isHighPriority } doReturn (index == 2)
+                    on { nodeIdentifier } doReturn pendingTransferNodeIdentifier
+                }
+            }
 
-                }
-            }
-            val nodes = pendingTransfers.map { pendingTransfer ->
-                mock<DefaultTypedFileNode>().also {
-                    whenever(getTypedNodeFromPendingTransferUseCase(pendingTransfer)) doReturn it
-                }
-            }
             stubNotSentPendingTransfers(pendingTransfers)
 
             underTest().test {
@@ -158,12 +155,13 @@ class StartAllPendingDownloadsUseCaseTest {
                 cancelAndIgnoreRemainingEvents()
             }
 
-            nodes.forEachIndexed { index, node ->
-                verify(downloadNodesUseCase).invoke(
-                    node = node,
-                    destinationPath = pendingTransfers[index].uriPath.value,
-                    appData = pendingTransfers[index].appData,
-                    isHighPriority = pendingTransfers[index].isHighPriority,
+            pendingTransfers.forEach { pendingTransfer ->
+                verify(uploadFileUseCase).invoke(
+                    uriPath = pendingTransfer.uriPath,
+                    fileName = pendingTransfer.fileName,
+                    appData = pendingTransfer.appData,
+                    parentFolderId = pendingTransfer.nodeIdentifier.nodeId,
+                    isHighPriority = pendingTransfer.isHighPriority,
                 )
             }
         }
@@ -171,19 +169,19 @@ class StartAllPendingDownloadsUseCaseTest {
 
     @ParameterizedTest
     @MethodSource("provideTransferUpdatedAndScanningFinishEvents")
-    fun `test that pending transfers state is updated to SdkScanned or AlreadyStarted when scanningFinished  or updated event is received`(
-        transferEvent: TransferEvent
+    fun `test that pending transfers state is updated to SdkScanned or AlreadyStarted when scanningFinished or updated event is received`(
+        transferEvent: TransferEvent,
     ) = runTest {
-        val pendingTransfer = mock<PendingTransfer>()
+        val pendingTransfer = mockPendingTransfer()
         stubNotSentPendingTransfers(listOf(pendingTransfer))
-        val typedNode = mock<DefaultTypedFileNode>()
-        whenever(getTypedNodeFromPendingTransferUseCase(pendingTransfer)) doReturn typedNode
+
         whenever(
-            downloadNodesUseCase(
-                eq(typedNode),
-                anyOrNull(),
-                anyOrNull(),
-                anyOrNull(),
+            uploadFileUseCase(
+                uriPath = anyValueClass(),
+                fileName = anyOrNull(),
+                appData = anyOrNull(),
+                parentFolderId = anyValueClass(),
+                isHighPriority = anyOrNull(),
             )
         ) doReturn flowOf(transferEvent)
 
@@ -206,153 +204,116 @@ class StartAllPendingDownloadsUseCaseTest {
         }
     }
 
-    @Test
-    fun `test that pending transfers state is updated to ErrorStarting and failed completed transfer is added when there is an exception getting the node`() =
-        runTest {
-            val pendingTransfer = mock<PendingTransfer>()
-            stubNotSentPendingTransfers(listOf(pendingTransfer))
-            val exception = RuntimeException()
-            whenever(getTypedNodeFromPendingTransferUseCase(pendingTransfer)) doThrow exception
+        @Test
+        fun `test that pending transfers state is updated to ErrorStarting and failed completed transfer is added when there is an exception uploading the node`() =
+            runTest {
+                val pendingTransfer = mockPendingTransfer()
+                stubNotSentPendingTransfers(listOf(pendingTransfer))
 
-            underTest().test {
-                awaitItem()
-                cancelAndIgnoreRemainingEvents()
-            }
+                val exception = RuntimeException()
+                whenever(
+                    uploadFileUseCase(
+                        uriPath = anyValueClass(),
+                        fileName = anyOrNull(),
+                        appData = anyOrNull(),
+                        parentFolderId = anyValueClass(),
+                        isHighPriority = anyOrNull(),
+                    )
+                ) doReturn flow {
+                    throw exception
+                }
 
-            verify(updatePendingTransferStateUseCase)(
-                listOf(pendingTransfer),
-                PendingTransferState.ErrorStarting
-            )
-            verify(transferRepository).addCompletedTransferFromFailedPendingTransfer(
-                pendingTransfer,
-                0,
-                exception,
-            )
-        }
+                underTest().test {
+                    awaitItem()
+                    cancelAndIgnoreRemainingEvents()
+                }
 
-    @Test
-    fun `test that pending transfers state is updated to ErrorStarting and failed completed transfer is added when node does not exist`() =
-        runTest {
-            val pendingTransfer = mock<PendingTransfer>()
-            stubNotSentPendingTransfers(listOf(pendingTransfer))
-            whenever(getTypedNodeFromPendingTransferUseCase(pendingTransfer)) doReturn null
-
-            underTest().test {
-                awaitItem()
-                cancelAndIgnoreRemainingEvents()
-            }
-
-            verify(updatePendingTransferStateUseCase)(
-                listOf(pendingTransfer),
-                PendingTransferState.ErrorStarting
-            )
-            verify(transferRepository).addCompletedTransferFromFailedPendingTransfer(
-                eq(pendingTransfer),
-                eq(0),
-                isA<NodeDoesNotExistsException>(),
-            )
-        }
-
-    @Test
-    fun `test that pending transfers state is updated to ErrorStarting and failed completed transfer is added when there is an exception downloading the node`() =
-        runTest {
-            val pendingTransfer = mock<PendingTransfer>()
-            stubNotSentPendingTransfers(listOf(pendingTransfer))
-            val typedNode = mock<DefaultTypedFileNode>()
-            val exception = RuntimeException()
-            whenever(getTypedNodeFromPendingTransferUseCase(pendingTransfer)) doReturn typedNode
-            whenever(
-                downloadNodesUseCase(
-                    eq(typedNode),
-                    anyOrNull(),
-                    anyOrNull(),
-                    anyOrNull(),
+                verify(updatePendingTransferStateUseCase)(
+                    listOf(pendingTransfer),
+                    PendingTransferState.ErrorStarting
                 )
-            ) doReturn flow {
-                throw exception
+                verify(transferRepository).addCompletedTransferFromFailedPendingTransfer(
+                    pendingTransfer,
+                    0L,
+                    exception,
+                )
             }
 
-            underTest().test {
-                awaitItem()
-                cancelAndIgnoreRemainingEvents()
-            }
-
-            verify(updatePendingTransferStateUseCase)(
-                listOf(pendingTransfer),
-                PendingTransferState.ErrorStarting
-            )
-            verify(transferRepository).addCompletedTransferFromFailedPendingTransfer(
-                pendingTransfer,
-                0L,
-                exception,
-            )
-        }
-
-    @Test
-    fun `test that pending transfers state is updated to ErrorStarting and failed completed transfer is added when there is an exception collecting the pending transfers`() =
-        runTest {
-            val pendingTransfer = mock<PendingTransfer>()
-            val pendingTransfers = listOf(pendingTransfer)
-            val exception = RuntimeException()
-            stubNotSentPendingTransfers(
-                pendingTransfers,
-                pendingTransfers,
-                emptyList()
-            )
-            whenever(
-                updatePendingTransferStateUseCase(
+        @Test
+        fun `test that pending transfers state is updated to ErrorStarting and failed completed transfer is added when there is an exception collecting the pending transfers`() =
+            runTest {
+                val pendingTransfer = mock<PendingTransfer>()
+                val pendingTransfers = listOf(pendingTransfer)
+                val exception = RuntimeException()
+                stubNotSentPendingTransfers(
                     pendingTransfers,
-                    PendingTransferState.SdkScanning
+                    pendingTransfers,
+                    emptyList()
                 )
-            ).doThrow(exception)
+                whenever(
+                    updatePendingTransferStateUseCase(
+                        pendingTransfers,
+                        PendingTransferState.SdkScanning
+                    )
+                ).doThrow(exception)
 
-            underTest().test {
-                awaitComplete()
+                underTest().test {
+                    awaitComplete()
+                }
+
+                verify(updatePendingTransferStateUseCase)(
+                    pendingTransfers,
+                    PendingTransferState.ErrorStarting
+                )
+                verify(transferRepository).addCompletedTransferFromFailedPendingTransfer(
+                    eq(pendingTransfer),
+                    eq(0),
+                    any(),
+                )
             }
 
-            verify(updatePendingTransferStateUseCase)(
-                pendingTransfers,
-                PendingTransferState.ErrorStarting
-            )
-            verify(transferRepository).addCompletedTransferFromFailedPendingTransfer(
-                eq(pendingTransfer),
-                eq(0),
-                any(),
-            )
+        @Test
+        fun `test that active transfer is inserted when a Start event is received`() = runTest {
+            val pendingTransfer = mockPendingTransfer()
+            stubNotSentPendingTransfers(listOf(pendingTransfer))
+            val transfer = mock<Transfer>()
+            val transferEvent = mock<TransferEvent.TransferStartEvent> {
+                on { this.transfer } doReturn transfer
+            }
+            whenever(
+                uploadFileUseCase(
+                    uriPath = anyValueClass(),
+                    fileName = anyOrNull(),
+                    appData = anyOrNull(),
+                    parentFolderId = anyValueClass(),
+                    isHighPriority = anyOrNull(),
+                )
+            ) doReturn flowOf(transferEvent)
+
+            underTest().test {
+                awaitItem()
+                cancelAndIgnoreRemainingEvents()
+            }
+
+            verify(transferRepository)
+                .insertOrUpdateActiveTransfer(transfer)
         }
 
-    @Test
-    fun `test that active transfer is inserted when a Start event is received`() = runTest {
-        val pendingTransfer = mock<PendingTransfer>()
-        stubNotSentPendingTransfers(listOf(pendingTransfer))
-        val typedNode = mock<DefaultTypedFileNode>()
-        val transfer = mock<Transfer>()
-        val transferEvent = mock<TransferEvent.TransferStartEvent> {
-            on { this.transfer } doReturn transfer
-        }
-        whenever(getTypedNodeFromPendingTransferUseCase(pendingTransfer)) doReturn typedNode
-        whenever(
-            downloadNodesUseCase(
-                eq(typedNode),
-                anyOrNull(),
-                anyOrNull(),
-                anyOrNull(),
-            )
-        ) doReturn flowOf(transferEvent)
 
-        underTest().test {
-            awaitItem()
-            cancelAndIgnoreRemainingEvents()
+    private fun mockPendingTransfer(): PendingTransfer {
+        val pendingTransferNodeIdentifier = PendingTransferNodeIdentifier.CloudDriveNode(NodeId(8456L))
+        return mock<PendingTransfer> {
+            on { uriPath } doReturn UriPath("path/file.txt")
+            on { appData } doReturn listOf(mock<TransferAppData.ChatUpload>())
+            on { isHighPriority } doReturn false
+            on { nodeIdentifier } doReturn pendingTransferNodeIdentifier
         }
-
-        verify(transferRepository)
-            .insertOrUpdateActiveTransfer(transfer)
     }
 
     private fun stubNotSentPendingTransfers(vararg pendingTransfers: List<PendingTransfer>) {
         whenever(
             getPendingTransfersByTypeAndStateUseCase(
-                TransferType.DOWNLOAD,
+                TransferType.GENERAL_UPLOAD,
                 PendingTransferState.NotSentToSdk
             )
         ) doReturn flowOf(*pendingTransfers)
@@ -363,7 +324,7 @@ class StartAllPendingDownloadsUseCaseTest {
             on { this.isFolderTransfer } doReturn false
             on { this.isFinished } doReturn false
         }
-        val fileTransferAlreadyDownloaded = mock<Transfer> {
+        val fileTransferAlreadyUploaded = mock<Transfer> {
             on { this.isFolderTransfer } doReturn false
             on { isFinished } doReturn true
             on { transferredBytes } doReturn 0L
@@ -377,7 +338,7 @@ class StartAllPendingDownloadsUseCaseTest {
                 on { transfer } doReturn fileTransfer
             },
             mock<TransferEvent.TransferUpdateEvent> {
-                on { transfer } doReturn fileTransferAlreadyDownloaded
+                on { transfer } doReturn fileTransferAlreadyUploaded
             },
             mock<TransferEvent.TransferFinishEvent> {
                 on { transfer } doReturn folderTransfer
@@ -386,7 +347,7 @@ class StartAllPendingDownloadsUseCaseTest {
                 on { stage } doReturn TransferStage.STAGE_TRANSFERRING_FILES
                 on { transfer } doReturn folderTransfer
             },
-            mock<TransferEvent.TransferFinishEvent>{
+            mock<TransferEvent.TransferFinishEvent> {
                 on { transfer } doReturn fileTransfer
             },
             mock<TransferEvent.FolderTransferUpdateEvent> {
