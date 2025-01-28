@@ -21,11 +21,13 @@ import mega.privacy.android.app.presentation.transfers.view.IN_PROGRESS_TAB_INDE
 import mega.privacy.android.app.utils.Constants
 import mega.privacy.android.app.utils.Constants.LOGIN_FRAGMENT
 import mega.privacy.android.app.utils.Constants.VISIBLE_FRAGMENT
+import mega.privacy.android.app.utils.TimeUtils
 import mega.privacy.android.data.mapper.transfer.OverQuotaNotificationBuilder
 import mega.privacy.android.domain.usecase.HasCredentialsUseCase
 import mega.privacy.android.domain.usecase.featureflag.GetFeatureFlagValueUseCase
 import mega.privacy.android.domain.usecase.login.ClearEphemeralCredentialsUseCase
 import mega.privacy.android.domain.usecase.login.IsUserLoggedInUseCase
+import mega.privacy.android.domain.usecase.transfers.overquota.GetBandwidthOverQuotaDelayUseCase
 import nz.mega.sdk.MegaAccountDetails
 import javax.inject.Inject
 
@@ -39,6 +41,7 @@ class DefaultOverQuotaNotificationBuilder @Inject constructor(
     private val hasCredentialsUseCase: HasCredentialsUseCase,
     private val accountInfoFacade: AccountInfoFacade,
     private val getFeatureFlagValueUseCase: GetFeatureFlagValueUseCase,
+    private val getBandwidthOverQuotaDelayUseCase: GetBandwidthOverQuotaDelayUseCase,
 ) : OverQuotaNotificationBuilder {
 
     override suspend operator fun invoke(storageOverQuota: Boolean) = if (storageOverQuota) {
@@ -97,7 +100,10 @@ class DefaultOverQuotaNotificationBuilder @Inject constructor(
             setStyle(NotificationCompat.BigTextStyle())
             addAction(iconPackR.drawable.ic_stat_notify, upgradeButtonText, pendingIntent)
             setContentTitle(context.getString(R.string.label_transfer_over_quota))
-            setContentText(context.getString(R.string.current_text_depleted_transfer_overquota))
+            setContentText(context.getString(
+                R.string.current_text_depleted_transfer_overquota,
+                TimeUtils.getHumanizedTime(getBandwidthOverQuotaDelayUseCase().inWholeSeconds))
+            )
             setContentIntent(clickPendingIntent)
             setOngoing(false)
             setAutoCancel(true)
