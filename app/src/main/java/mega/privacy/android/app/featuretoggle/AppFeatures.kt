@@ -214,6 +214,14 @@ enum class AppFeatures(override val description: String, private val defaultValu
         "Implement Cloud Drive and Sync in a single screen with the Two Tabs (Cloud Drive and Syncs)",
         true,
     ),
+
+    /**
+     *  Use new approach to download files for preview.
+     */
+    PreviewDownload(
+        "Use new approach to download files for preview",
+        false,
+    ),
     ;
 
     companion object : FeatureFlagValueProvider {
