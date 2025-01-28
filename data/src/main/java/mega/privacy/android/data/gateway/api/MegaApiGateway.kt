@@ -1982,17 +1982,6 @@ interface MegaApiGateway {
     fun getFileVersionsOption(listener: MegaRequestListenerInterface)
 
     /**
-     * Number of pending uploads
-     */
-    val numberOfPendingUploads: Int
-
-    /**
-     *
-     * Number of pending downloads.
-     */
-    val numberOfPendingDownloads: Int
-
-    /**
      * Enable or disable file versioning
      * <p>
      * The associated request type with this request is MegaRequest::TYPE_SET_ATTR_USER
@@ -2062,16 +2051,6 @@ interface MegaApiGateway {
      * @param listener MegaRequestListener to track this request
      */
     fun changeEmail(email: String, listener: MegaRequestListenerInterface)
-
-    /**
-     * Reset the number of total uploads
-     * This function resets the number returned by MegaApi::getTotalUploads
-     */
-    @Deprecated(
-        "Function related to statistics will be reviewed in future updates to\n" +
-                "provide more data and avoid race conditions. They could change or be removed in the current form."
-    )
-    fun resetTotalUploads()
 
     /**
      * @brief Check if the logged in account is considered new

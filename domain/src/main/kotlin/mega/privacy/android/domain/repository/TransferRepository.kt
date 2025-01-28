@@ -239,11 +239,6 @@ interface TransferRepository {
     suspend fun startChatUploadsWorker()
 
     /**
-     * Reset total uploads
-     */
-    suspend fun resetTotalUploads()
-
-    /**
      * Start downloading a node to desired destination and returns a flow to expose download progress
      *
      * @param node              The node we want to download, it can be a folder

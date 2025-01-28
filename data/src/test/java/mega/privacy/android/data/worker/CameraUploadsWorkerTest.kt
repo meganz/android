@@ -121,7 +121,6 @@ import mega.privacy.android.domain.usecase.transfers.active.HandleTransferEventU
 import mega.privacy.android.domain.usecase.transfers.overquota.BroadcastStorageOverQuotaUseCase
 import mega.privacy.android.domain.usecase.transfers.overquota.MonitorStorageOverQuotaUseCase
 import mega.privacy.android.domain.usecase.transfers.paused.MonitorPausedTransfersUseCase
-import mega.privacy.android.domain.usecase.transfers.uploads.ResetTotalUploadsUseCase
 import mega.privacy.android.domain.usecase.workers.ScheduleCameraUploadUseCase
 import org.junit.After
 import org.junit.Before
@@ -186,7 +185,6 @@ internal class CameraUploadsWorkerTest {
         mock()
     private val establishCameraUploadsSyncHandlesUseCase: EstablishCameraUploadsSyncHandlesUseCase =
         mock()
-    private val resetTotalUploadsUseCase: ResetTotalUploadsUseCase = mock()
     private val disableMediaUploadSettingsUseCase: DisableMediaUploadsSettingsUseCase = mock()
     private val createCameraUploadsTemporaryRootDirectoryUseCase: CreateCameraUploadsTemporaryRootDirectoryUseCase =
         mock()
@@ -292,7 +290,6 @@ internal class CameraUploadsWorkerTest {
                 getTransferByTagUseCase = getTransferByTagUseCase,
                 checkOrCreateCameraUploadsNodeUseCase = checkOrCreateCameraUploadsNodeUseCase,
                 establishCameraUploadsSyncHandlesUseCase = establishCameraUploadsSyncHandlesUseCase,
-                resetTotalUploadsUseCase = resetTotalUploadsUseCase,
                 disableMediaUploadSettingsUseCase = disableMediaUploadSettingsUseCase,
                 createCameraUploadsTemporaryRootDirectoryUseCase = createCameraUploadsTemporaryRootDirectoryUseCase,
                 deleteCameraUploadsTemporaryRootDirectoryUseCase = deleteCameraUploadsTemporaryRootDirectoryUseCase,
@@ -1580,17 +1577,6 @@ internal class CameraUploadsWorkerTest {
         }
 
     @Test
-    fun `test that total upload count is reset on the back end when the worker complete with success`() =
-        runTest {
-            setupDefaultCheckConditionMocks()
-
-            val result = underTest.doWork()
-
-            verify(resetTotalUploadsUseCase).invoke()
-            assertThat(result).isEqualTo(ListenableWorker.Result.success())
-        }
-
-    @Test
     fun `test that all transfers are cancelled when the worker complete with failure`() =
         runTest {
             setupDefaultCheckConditionMocks()
@@ -1719,7 +1705,7 @@ internal class CameraUploadsWorkerTest {
 
             val result = underTest.doWork()
 
-            verify(resetTotalUploadsUseCase).invoke()
+            verify(clearActiveTransfersIfFinishedUseCase).invoke()
             assertThat(result).isEqualTo(ListenableWorker.Result.success())
         }
 

@@ -128,7 +128,6 @@ import mega.privacy.android.domain.usecase.transfers.active.HandleTransferEventU
 import mega.privacy.android.domain.usecase.transfers.overquota.BroadcastStorageOverQuotaUseCase
 import mega.privacy.android.domain.usecase.transfers.overquota.MonitorStorageOverQuotaUseCase
 import mega.privacy.android.domain.usecase.transfers.paused.MonitorPausedTransfersUseCase
-import mega.privacy.android.domain.usecase.transfers.uploads.ResetTotalUploadsUseCase
 import mega.privacy.android.domain.usecase.workers.ScheduleCameraUploadUseCase
 import timber.log.Timber
 import java.time.Instant
@@ -166,7 +165,6 @@ class CameraUploadsWorker @AssistedInject constructor(
     private val getTransferByTagUseCase: GetTransferByTagUseCase,
     private val checkOrCreateCameraUploadsNodeUseCase: CheckOrCreateCameraUploadsNodeUseCase,
     private val establishCameraUploadsSyncHandlesUseCase: EstablishCameraUploadsSyncHandlesUseCase,
-    private val resetTotalUploadsUseCase: ResetTotalUploadsUseCase,
     private val disableMediaUploadSettingsUseCase: DisableMediaUploadsSettingsUseCase,
     private val createCameraUploadsTemporaryRootDirectoryUseCase: CreateCameraUploadsTemporaryRootDirectoryUseCase,
     private val deleteCameraUploadsTemporaryRootDirectoryUseCase: DeleteCameraUploadsTemporaryRootDirectoryUseCase,
@@ -409,7 +407,7 @@ class CameraUploadsWorker @AssistedInject constructor(
     ): Result =
         when (finishedReason) {
             CameraUploadsFinishedReason.COMPLETED -> {
-                resetTotalUploads()
+                clearActiveTransfersIfFinished()
                 sendTransfersUpToDateInfoToBackupCenter()
                 scheduleCameraUploads()
                 Result.success()
@@ -417,7 +415,7 @@ class CameraUploadsWorker @AssistedInject constructor(
 
             else -> {
                 cancelAllTransfers()
-                resetTotalUploads()
+                clearActiveTransfersIfFinished()
                 sendTransfersInterruptedInfoToBackupCenter()
                 when (restartMode) {
                     CameraUploadsRestartMode.RestartImmediately -> {
@@ -585,9 +583,7 @@ class CameraUploadsWorker @AssistedInject constructor(
     /**
      * Reset totals uploads
      */
-    private suspend fun resetTotalUploads() {
-        runCatching { resetTotalUploadsUseCase() }
-            .onFailure { Timber.e(it) }
+    private suspend fun clearActiveTransfersIfFinished() {
         runCatching { clearActiveTransfersIfFinishedUseCase() }
             .onFailure { Timber.e(it) }
     }

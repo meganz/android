@@ -852,13 +852,6 @@ class DefaultTransfersRepositoryTest {
         }
 
     @Test
-    @Suppress("DEPRECATION")
-    fun `test that reset total uploads is invoked`() = runTest {
-        underTest.resetTotalUploads()
-        verify(megaApiGateway).resetTotalUploads()
-    }
-
-    @Test
     fun `test that isCompletedTransfersEmpty returns false if completed transfers db contains items`() =
         runTest {
             whenever(megaLocalRoomGateway.getCompletedTransfersCount()).thenReturn(1)

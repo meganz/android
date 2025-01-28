@@ -1070,20 +1070,6 @@ internal class MegaApiFacade @Inject constructor(
         megaApi.getFileVersionsOption(listener)
     }
 
-    @Deprecated(
-        "Function related to statistics will be reviewed in future updates to provide more " +
-                "data and avoid race conditions. They could change or be removed in the current form."
-    )
-    override val numberOfPendingUploads: Int
-        get() = megaApi.numPendingUploads
-
-    @Deprecated(
-        "Function related to statistics will be reviewed in future updates to provide more" +
-                "data and avoid race conditions. They could change or be removed in the current form."
-    )
-    override val numberOfPendingDownloads: Int
-        get() = megaApi.numPendingDownloads
-
     override fun setFileVersionsOption(disable: Boolean, listener: MegaRequestListenerInterface) {
         megaApi.setFileVersionsOption(disable, listener)
     }
@@ -1103,15 +1089,6 @@ internal class MegaApiFacade @Inject constructor(
 
     override fun changeEmail(email: String, listener: MegaRequestListenerInterface) =
         megaApi.changeEmail(email, listener)
-
-    @Suppress("DEPRECATION")
-    @Deprecated(
-        "Function related to statistics will be reviewed in future updates to\n" +
-                " * provide more data and avoid race conditions. They could change or be removed in the current form."
-    )
-    override fun resetTotalUploads() {
-        megaApi.resetTotalUploads()
-    }
 
     override suspend fun isAccountNew(): Boolean = megaApi.accountIsNew()
 

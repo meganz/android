@@ -402,8 +402,7 @@ internal class DefaultTransfersRepository @Inject constructor(
             megaApiGateway.cancelTransfers(direction, listener)
         }
 
-    override suspend fun ongoingTransfersExist(): Boolean =
-        megaApiGateway.numberOfPendingUploads > 0 || megaApiGateway.numberOfPendingDownloads > 0
+    override suspend fun ongoingTransfersExist(): Boolean = getNumPendingTransfers() > 0
 
     override suspend fun moveTransferToFirstByTag(transferTag: Int) = withContext(ioDispatcher) {
         suspendCancellableCoroutine { continuation ->
@@ -534,10 +533,6 @@ internal class DefaultTransfersRepository @Inject constructor(
         workerManagerGateway.monitorChatUploadsStatusInfo().map { workInfos ->
             workInfos.any { it.state == WorkInfo.State.ENQUEUED }
         }
-
-    override suspend fun resetTotalUploads() = withContext(ioDispatcher) {
-        megaApiGateway.resetTotalUploads()
-    }
 
     override suspend fun getActiveTransferByTag(tag: Int) = withContext(ioDispatcher) {
         megaLocalRoomGateway.getActiveTransferByTag(tag)
