@@ -7,6 +7,7 @@ import static mega.privacy.android.app.utils.Util.getNumberItemChildren;
 import static mega.privacy.android.app.utils.Util.getSizeString;
 
 import android.content.Context;
+import android.util.DisplayMetrics;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.View.OnClickListener;
@@ -15,6 +16,7 @@ import android.widget.ImageView;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
 
+import androidx.recyclerview.widget.LinearSmoothScroller;
 import androidx.recyclerview.widget.RecyclerView;
 
 import java.util.List;
@@ -98,6 +100,8 @@ public class FileStorageAdapter extends RecyclerView.Adapter<FileStorageAdapter.
             long documentSize = document.getSize();
             holder.textViewFileSize.setText(getSizeString(documentSize, context));
         }
+
+        holder.itemLayout.setBackgroundResource(document.isHighlighted() ? R.color.color_background_surface_2 : android.R.color.transparent);
 
         resetImageView(holder.imageView);
 
@@ -208,4 +212,24 @@ public class FileStorageAdapter extends RecyclerView.Adapter<FileStorageAdapter.
             ((FileStorageActivity) context).itemClick(currentPosition);
         }
     }
+
+
+    public static class CenterSmoothScroller extends LinearSmoothScroller {
+
+        public CenterSmoothScroller(Context context) {
+            super(context);
+        }
+
+        @Override
+        public int calculateDtToFit(int viewStart, int viewEnd, int boxStart, int boxEnd, int snapPreference) {
+            // Calculate the distance needed to center the view
+            return (boxStart + (boxEnd - boxStart) / 2) - (viewStart + (viewEnd - viewStart) / 2);
+        }
+
+        @Override
+        protected float calculateSpeedPerPixel(DisplayMetrics displayMetrics) {
+            return 50f / displayMetrics.densityDpi;
+        }
+    }
 }
+

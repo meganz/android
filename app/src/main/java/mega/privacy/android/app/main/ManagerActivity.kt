@@ -6778,6 +6778,7 @@ class ManagerActivity : PasscodeActivity(), NavigationView.OnNavigationItemSelec
                         val intent = Intent(this, FileStorageActivity::class.java)
                         intent.action = FileStorageActivity.Mode.BROWSE_FILES.action
                         intent.putExtra(FileStorageActivity.EXTRA_PATH, file.path)
+                        intent.putExtra(FileStorageActivity.EXTRA_FILE_NAME, transfer.fileName)
                         startActivity(intent)
                     }
 
