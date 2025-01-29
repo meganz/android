@@ -1,7 +1,5 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources xmlns:tools="http://schemas.android.com/tools" tools:ignore="ImpliedQuantity, ExtraTranslation, MissingTranslation">
-    <!-- The name of the Device or Folder Sub State when its code is NO_SYNC_ERROR -->
-    <string name="general_sync_no_error">No sync error</string>
     <!-- The name of the Device or Folder Sub State when its code is UNSUPPORTED_FILE_SYSTEM -->
     <string name="general_sync_unsupported_file_system">MEGA không thể đồng&#160;bộ hoặc sao lưu thư&#160;mục này bởi vì hệ&#160;thống tệp trên thiết&#160;bị của bạn không được hỗ&#160;trợ</string>
     <!-- The name of the Device or Folder Sub State when its code is INVALID_REMOTE_TYPE -->
@@ -18,8 +16,6 @@
     <string name="general_sync_account_expired">Không thể đồng&#160;bộ hóa hoặc sao&#160;lưu thư&#160;mục này vì gói đăng&#160;ký của bạn đã hết hạn</string>
     <!-- The name of the Device or Folder Sub State when its code is FOREIGN_TARGET_OVERSTORAGE -->
     <string name="general_sync_foreign_target_overshare">Thư&#160;mục không thể đồng&#160;bộ được do tài&#160;khoản của người chia&#160;sẻ thư&#160;mục này đã vượt mức không&#160;gian lưu&#160;trữ</string>
-    <!-- The name of the Device or Folder Sub State when its code is REMOTE_PATH_HAS_CHANGED -->
-    <string name="general_sync_remote_path_has_changed">Không tìm thấy vị&#160;trí của thư&#160;mục trên MEGA, có thể do đã bị di&#160;chuyển hoặc bị xóa, cũng có thể là bạn không có quyền truy&#160;cập</string>
     <!-- The name of the Device or Folder Sub State when its code is SHARE_NON_FULL_ACCESS -->
     <string name="general_sync_share_non_full_access">Thư&#160;mục không thể đồng&#160;bộ được vì thư&#160;mục này đã chia&#160;sẻ mà không có cấp quyền truy&#160;cập toàn quyền cho bạn</string>
     <!-- The name of the Device or Folder Sub State when its code is PUT_NODES_ERROR -->
@@ -36,8 +32,6 @@
     <string name="general_sync_too_many_action_packets">Đã tải lại tài&#160;khoản. Mọi cập&#160;nhật bị bỏ lỡ đối với các bản sao&#160;lưu hoặc đồng&#160;bộ hóa của bạn chưa có được áp&#160;dụng.</string>
     <!-- The name of the Device or Folder Sub State when its code is LOGGED_OUT -->
     <string name="general_sync_logged_out">Đồng&#160;bộ hóa hoặc sao&#160;lưu đã bị dừng do có vẻ như bạn đã đăng&#160;xuất khỏi app cho máy&#160;tính. Đăng&#160;nhập vào lại app cho máy&#160;tính để tiếp&#160;tục đồng&#160;bộ hóa hoặc sao&#160;lưu.</string>
-    <!-- The name of the Device or Folder Sub State when its code is MISSING_PARENT_NODE -->
-    <string name="general_sync_missing_parent_node">N/A</string>
     <!-- The name of the Device or Folder Sub State when its code is BACKUP_SOURCE_NOT_BELOW_DRIVE -->
     <string name="general_sync_backup_source_not_below_drive">Không tìm thấy vị&#160;trí của thư&#160;mục trong ổ&#160;đĩa ngoài.</string>
     <!-- The name of the Device or Folder Sub State when its code is ACTIVE_SYNC_SAME_PATH -->
@@ -58,16 +52,10 @@
     <string name="general_sync_unable_to_add_watch">Không thể thêm đồng&#160;hồ hệ&#160;thống tệp. Hãy đảm&#160;bảo có đủ không&#160;gian và bộ nhớ trống, và bạn đã có cấp quyền truy&#160;cập vào vị&#160;trí thư&#160;mục.</string>
     <!-- The name of the Device or Folder Sub State when its code is UNABLE_TO_RETRIEVE_ROOT_FSID -->
     <string name="general_sync_unable_to_retrieve_root_fsid">Không thể đọc được vị&#160;trí thư&#160;mục. Kiểm&#160;tra xem vị&#160;trí có thể truy&#160;cập được hay không và quyền đi tới vị&#160;trí thư&#160;mục đã được cấp phép.</string>
-    <!-- The name of the Device or Folder Sub State when its code is UNABLE_TO_OPEN_DATABASE -->
-    <string name="general_sync_unable_to_open_database">Unable to open state cache database</string>
     <!-- The name of the Device or Folder Sub State when its code is INSUFFICIENT_DISK_SPACE -->
     <string name="general_sync_insufficient_disk_space">Không đủ không&#160;gian lưu&#160;trữ trong thiết&#160;bị của bạn</string>
-    <!-- The name of the Device or Folder Sub State when its code is FAILURE_ACCESSING_PERSISTENT_STORAGE -->
-    <string name="general_sync_failure_accessing_persistent_storage">Không thể đọc được vị&#160;trí thư&#160;mục. Kiểm&#160;tra xem vị&#160;trí có thể truy&#160;cập được hay không và quyền đi tới vị&#160;trí thư&#160;mục đã được cấp phép.</string>
     <!-- The name for specific Sub States to indicate that an unknown error occurred -->
     <string name="general_sync_message_unknown_error">Một lỗi không xác&#160;định được đã xảy ra. Liên&#160;hệ support@mega.nz.</string>
-    <!-- The name for specific Sub States to indicate that something went wrong -->
-    <string name="general_sync_message_something_went_wrong">Something went wrong.</string>
     <!-- The name for specific Sub States to indicate that the Node is in the Rubbish Bin -->
     <string name="general_sync_message_node_in_rubbish_bin">Thư&#160;mục không thể đồng&#160;bộ hoặc sao&#160;lưu được bởi vì thư&#160;mục tương&#160;ứng trên MEGA đang nằm trong Thùng&#160;Rác</string>
     <!-- The name for specific Sub States to indicate that the local drive cannot be located at this time -->
@@ -92,14 +80,6 @@
     <string name="dialog_onboarding_feature_title_backup_rewind">Không bao&#160;giờ mất dữ&#160;liệu nữa</string>
     <!-- Description about Backup and Rewind features on Onboarding dialog (for user to choose account - Free or Pro).  -->
     <string name="dialog_onboarding_feature_description_backup_rewind">Tua lại để khôi&#160;phục lại các tệp&#160;tin và thư&#160;mục về bất kỳ ngày nào trong phạm&#160;vi lên đến 180 ngày, vì vậy dữ&#160;liệu của bạn không bị tai&#160;nạn và chống giả&#160;mạo.</string>
-    <!-- Title for MEGA VPN feature on Onboarding dialog (for user to choose account - Free or Pro).  -->
-    <string name="dialog_onboarding_feature_title_vpn">MEGA&#160;VPN</string>
-    <!-- Description about MEGA VPN feature on Onboarding dialog (for user to choose account - Free or Pro).  -->
-    <string name="dialog_onboarding_feature_description_vpn">Giữ an&#160;ninh trực&#160;tuyến với VPN tốc&#160;độ cao của chúng&#160;tôi.</string>
-    <!-- Title for chats and meetings feature on Onboarding dialog (for user to choose account - Free or Pro).  -->
-    <string name="dialog_onboarding_feature_title_chat">Cuộc gọi và cuộc họp không hạn&#160;chế</string>
-    <!-- Description about chats and meetings feature on Onboarding dialog (for user to choose account - Free or Pro).  -->
-    <string name="dialog_onboarding_feature_description_chat">Nhắn&#160;tin, gọi video và họp hoàn&#160;toàn riêng&#160;tư với số&#160;lượng người tham&#160;gia không giới&#160;hạn.</string>
     <!-- Search drop down chips filter type file type -->
     <string name="search_dropdown_chip_filter_type_file_type">Dạng</string>
     <!-- Search drop down chips filter type file type images -->
@@ -272,8 +252,6 @@
     <string name="account_confirm_email_misspelled_email_description">Nếu địa chỉ email bị viết sai, sửa lại cho đúng và chạm vào [A]Gửi lại[/A].</string>
     <!-- Title of the insufficient storage error banner -->
     <string name="sync_error_storage_over_quota_banner_title">Đồng&#160;bộ hóa tạm dừng, gói MEGA của bạn đã hết dung&#160;lượng lưu&#160;trữ</string>
-    <!-- Title of the insufficient storage error action -->
-    <string name="sync_error_storage_over_quota_banner_action">Nâng cấp</string>
     <!-- The warning message shown when the User enables the Device Charging requirement in Settings Camera Uploads, enables Camera Uploads, begins uploading content and the Device is not charged -->
     <string name="camera_uploads_phone_not_charging_message">Tải lên tạm dừng, thiết&#160;bị không có sạc</string>
     <!-- Label of the Device Status informing the user that Nothing is set up for the Current Device -->
@@ -336,36 +314,8 @@
     <string name="cloud_drive_tour_fourth_subtitle">Đăng&#160;tải camêra là tính&#160;năng thiết&#160;yếu cho mọi thiết&#160;bị di&#160;động, và MEGA có cung&#160;cấp cho mọi người dùng. Tạo tài&#160;khoản ngay.</string>
     <!-- Fifth subtitle of the tour screen -->
     <string name="cloud_drive_tour_fifth_subtitle">Gọi họp video an&#160;toàn với mã&#160;hóa vô&#160;kiến&#160;thức.</string>
-    <!-- Titles of the tour screen to onboard users with the MEGA application -->
-    <string-array name="cloud_drive_tour_titles">
-        <item>@string/cloud_drive_tour_first_title</item>
-        <item>@string/cloud_drive_tour_second_title</item>
-        <item>@string/cloud_drive_tour_third_title</item>
-        <item>@string/cloud_drive_tour_fourth_title</item>
-        <item>@string/cloud_drive_tour_fifth_title</item>
-    </string-array>
-    <!-- Subtitles of the tour screen to onboard users with the MEGA application -->
-    <string-array name="cloud_drive_tour_subtitles">
-        <item>@string/cloud_drive_tour_first_subtitle</item>
-        <item>@string/cloud_drive_tour_second_subtitle</item>
-        <item>@string/cloud_drive_tour_third_subtitle</item>
-        <item>@string/cloud_drive_tour_fourth_subtitle</item>
-        <item>@string/cloud_drive_tour_fifth_subtitle</item>
-    </string-array>
     <!-- Title of the Raise to Hand Feature Introduction Tooltip -->
     <string name="meetings_raised_hand_tooltip_title">[A]Tính&#160;năng mới: Giơ tay[/A]</string>
-    <!-- Message of the synced folder list empty state for free accounts -->
-    <string name="device_center_sync_list_empty_state_message_free_account">Giữ cho thông&#160;tin của bạn được đồng&#160;bộ hóa và cập&#160;nhật bằng cách nâng&#160;cấp lên một trong các gói Pro của chúng&#160;tôi.</string>
-    <!-- "Upgrade now" label for a button, menu entry, etc -->
-    <string name="general_upgrade_now_label">Nâng&#160;cấp ngay</string>
-    <!-- Title of the upgrade dialog displayed for free accounts when try to add a new sync -->
-    <string name="device_center_sync_upgrade_dialog_title">Nâng cấp lên Pro</string>
-    <!-- Message of the upgrade dialog displayed for free accounts when try to add a new sync -->
-    <string name="device_center_sync_upgrade_dialog_message">Mở khóa sức&#160;mạnh để đồng&#160;bộ thiết&#160;bị di&#160;động của bạn lên đám mây với các gói Pro của chúng&#160;tôi.</string>
-    <!-- Confirm button text of the upgrade dialog displayed for free accounts when try to add a new sync -->
-    <string name="device_center_sync_upgrade_dialog_confirm_button">Nâng cấp</string>
-    <!-- Cancel button text of the upgrade dialog displayed for free accounts when try to add a new sync -->
-    <string name="device_center_sync_upgrade_dialog_cancel_button">Không phải lúc này</string>
     <!-- Title of the Warning Dialog shown when the new Local Primary or Secondary Folder is same as, a parent folder or sub-folder of the opposite Local Folder -->
     <string name="settings_camera_uploads_related_new_local_folder_warning_dialog_title">Xung&#160;đột thư&#160;mục tải lên</string>
     <!-- Body of the Warning Dialog shown when the new Local Primary or Secondary Folder is same as, a parent folder or sub-folder of the opposite Local Folder -->
@@ -376,12 +326,6 @@
     <string name="general_no_picker_warning">Thiết&#160;bị này không có ứng&#160;dụng nào để chọn thư&#160;mục</string>
     <!-- Description of feature, which will be available for user, if they buy plan. This feature means user will be able to sync folders. Keep the bullet point, as this string is part of the bullet point list. -->
     <string name="account_upgrade_account_description_feature_sync">&#8226;&#160;Tự động đồng&#160;bộ các thư&#160;mục trên thiết&#160;bị di&#160;động của bạn</string>
-    <!-- The error dialog text displayed when user opens Android Sync while having previously established syncs -->
-    <string name="sync_error_dialog_free_user">Các phiên đồng&#160;bộ hóa của bạn đã bị tạm dừng. Đồng&#160;bộ hóa là một tính&#160;năng của gói Pro.</string>
-    <!-- The error dialog confirm action text -->
-    <string name="sync_error_dialog_free_user_confirm_action">Ok</string>
-    <!-- The error banner text displayed when user opens Android Sync while having previously established syncs -->
-    <string name="sync_error_banner_free_user">Việc đồng&#160;bộ bị tạm dừng vì gói MEGA Pro của bạn đã bị hủy. Nâng&#160;cấp để tiếp&#160;tục đồng bộ hóa.</string>
     <!-- Hidden items -->
     <string name="hidden_items">Các mục ẩn</string>
     <!-- Label to indicate that is a Pro only feature -->
@@ -400,8 +344,6 @@
     <string name="add_tags_error_special_characters">Thẻ không thể chứa khoảng trắng hoặc ký&#160;hiệu khác chữ và số. Thẻ viết bằng chữ in hoa sẽ được hiển thị bằng chữ thường.</string>
     <!-- error label for add tags page when tag count is maximum -->
     <string name="add_tags_error_max_tags">Số lượng thẻ tối&#160;đa là %1$d</string>
-    <!-- error label for add tags page when tag character limit reached -->
-    <string name="add_tags_error_max_characters">Thẻ phải có %1$d ký&#160;tự hoặc ít hơn</string>
     <!-- title label for tags page -->
     <string name="add_tags_page_title_label">Gắn thẻ</string>
     <!-- The placeholder for read only files/folders with no description in info screen-->
@@ -410,8 +352,6 @@
     <string name="video_to_playlist_top_bar_title">Thêm vào danh&#160;sách phát</string>
     <!-- Text of the create new playlist in the page that adds the video to the video playlist -->
     <string name="video_to_playlist_new_playlist_text">Tạo danh sách phát mới</string>
-    <!-- Text of the done button in the page that adds the video to the video playlist -->
-    <string name="video_to_playlist_done_button">Xong</string>
     <!-- Title shown when cancelling the current plan, informing the user of features they'll miss out on -->
     <string name="account_cancel_account_screen_plan_miss_out_on_features">Bạn sẽ bỏ lỡ những tính&#160;năng này</string>
     <!-- Message shown when cancelling the plan, indicating that access to features will continue until the plan expires -->
@@ -424,8 +364,6 @@
     <string name="account_cancel_account_screen_plan_free_plan">Miễn phí</string>
     <!-- Row label for storage feature in the comparison table -->
     <string name="account_cancel_account_screen_plan_storage">Lưu trữ</string>
-    <!-- Storage amount available in the free plan. %1s represents the amount of storage and the unit -->
-    <string name="account_cancel_account_screen_plan_free_storage">%1s</string>
     <!-- Row label for transfer feature in the comparison table -->
     <string name="account_cancel_account_screen_plan_transfer">Truyền tải</string>
     <!-- Transfer limit in the free plan -->
@@ -445,13 +383,13 @@
     <!-- Feature indicating MEGA VPN availability, available in the pro plan -->
     <string name="account_cancel_account_screen_plan_mega_vpn">MEGA&#160;VPN</string>
     <!-- Row label for call and meeting duration in the comparison table -->
-    <string name="account_cancel_account_screen_plan_call_meeting_duration">Thời&#160;lượng cuộc&#160;gọi &amp;amp; cuộc&#160;họp</string>
+    <string name="account_cancel_account_screen_plan_call_meeting_duration">Call &amp;amp;amp; meeting duration</string>
     <!-- Call and meeting duration limit in the free plan -->
     <string name="account_cancel_account_screen_plan_call_meeting_duration_free">Lên đến 1 tiếng</string>
     <!-- Unlimited call and meeting duration available in the pro plan -->
     <string name="cancel_account_plan_call_meeting_duration_pro">Không giới&#160;hạn</string>
     <!-- Row label for call and meeting participants in the comparison table -->
-    <string name="account_cancel_account_plan_call_meeting_participants">Số người tham&#160;gia cuộc&#160;gọi $ cuộc&#160;họp</string>
+    <string name="account_cancel_account_plan_call_meeting_participants">Call &amp;amp;amp; meeting participants</string>
     <!-- Limit on call and meeting participants in the free plan -->
     <string name="account_cancel_account_free_plan_call_meeting_participants">Lên đến 100 người</string>
     <!-- Unlimited call and meeting participants available in the pro plan -->
@@ -516,10 +454,6 @@
     <string name="account_cancellation_instructions_click_reactivate_subscription">6. Click vào [A]Kích&#160;hoạt lại gói đăng&#160;ký[/A].</string>
     <!-- Label for cancellation instructions on a mobile device -->
     <string name="account_cancellation_instructions_on_mobile_device">Trên thiết&#160;bị di&#160;động</string>
-    <!-- Step 1: instruction step no.1 to visit the MEGA website on the mobile device-->
-    <string name="account_cancellation_instructions_mobile_visit_website">1. Ghé trang [A]www.mega.nz[/A] trong trình&#160;duyệt web của bạn.</string>
-    <!-- Step 2: instruction step no.2 to Log in to MEGA account on the mobile device from the browser-->
-    <string name="account_cancellation_instructions_mobile_login_account">2. Đăng&#160;nhập vào tài&#160;khoản MEGA của bạn.</string>
     <!-- Step 3: instruction step no.3 Tap on the user avatar on the MEGA website from the mobile device-->
     <string name="account_cancellation_instructions_tap_avatar">3. Chạm vào ảnh đại&#160;diện của bạn.</string>
     <!-- Step 4: instruction step no.4 Tap Cancel subscription on the account from the MEGA website from the mobile device-->
@@ -550,10 +484,6 @@
     <string name="transfers_scanning_folders_dialog_starting_transfers_title">Đang bắt&#160;đầu truyền tải&#8230;</string>
     <!-- Transfers scanning folders dialog info to explain why the app shouldn't be closed -->
     <string name="transfers_scanning_folders_dialog_cancel_info_subtitle">Xin đừng đóng ứng dụng. Nếu bạn đóng, các phiên truyền tải chưa được xếp hàng sẽ bị mất.</string>
-    <!-- Transfers scanning folders dialog sub-title when the app is scanning a single folder-->
-    <plurals name="transfers_scanning_folders_dialog_scanning_folder_subtitle">
-        <item quantity="other">Tìm thấy 1 thư&#160;mục và %1$d tệp&#160;tin.</item>
-    </plurals>
     <!-- Transfers scanning folders dialog sub-title when the app is scanning multiple folders. This is the folders pluralization part to implement double pluralization in transfers_scanning_folders_dialog_scanning_files_and_folders_subtitle. Example: "134 folders". Example with double pluralization in transfers_scanning_folders_dialog_scanning_files_and_folders_subtitle: "Found 134 folders and 5689 files."-->
     <plurals name="transfers_scanning_folders_dialog_scanning_folders_subtitle">
         <item quantity="other">%1$d thư&#160;mục</item>
@@ -568,8 +498,6 @@
     <string name="settings_sync_clear_debris_dialog_title">Xóa rác vụn?</string>
     <!-- Body of the dialog shown when user clicks to clear debris from settings menu -->
     <string name="settings_sync_clear_debris_dialog_body">Bản sao&#160;lưu của các phiên&#160;bản trước đây của các tệp&#160;tin đã đồng&#160;bộ hóa sẽ bị xóa vĩnh&#160;viễn khỏi thiết&#160;bị của bạn. \n\nKiểm&#160;tra thư&#160;mục .debris trong thiết&#160;bị cục&#160;bộ của bạn để xem bạn có cần khôi&#160;phục bất cứ thứ gì hay không.</string>
-    <!-- Cancel button of the dialog shown when user clicks to clear debris from settings menu -->
-    <string name="settings_sync_clear_debris_dialog_cancel">Hủy</string>
     <!-- Continue button of the dialog shown when user clicks to clear debris from settings menu -->
     <string name="settings_sync_clear_debris_dialog_continue">Tiếp tục</string>
     <!-- Snackbar message shown when user clears debris from settings menu -->
@@ -578,8 +506,6 @@
     <plurals name="transfers_scanning_folders_dialog_scanning_files_and_folders_subtitle">
         <item quantity="other">Tìm thấy %1$s và %2$d tệp&#160;tin.</item>
     </plurals>
-    <!-- Label for the file info information screen no tags label -->
-    <string name="file_info_information_no_tags_label">Không có gắn thẻ</string>
     <!-- Transfers scanning folders dialog title to inform that the transfers are being cancelled -->
     <string name="transfers_scanning_folders_dialog_cancel_cancelling_title">Đang hủy các phiên truyền tải&#8230;</string>
     <!-- error warning message for report issue when not enough characters are typed and user tries to send report-->
@@ -670,12 +596,8 @@
     <string name="sync_promotion_bottom_sheet_body_message">Đồng&#160;bộ hóa thư&#160;mục trên thiết&#160;bị của bạn với MEGA để truy&#160;cập phiên&#160;bản mới nhất của tệp&#160;tin ở bất cứ nơi đâu</string>
     <!-- Text of the primary button of the bottom sheet to promote Sync feature for Pro users ("Sync folders") -->
     <string name="sync_promotion_bottom_sheet_primary_button_text_pro">Đồng bộ thư mục</string>
-    <!-- Text of the primary button of the bottom sheet to promote Sync feature for Free users ("Upgrade") -->
-    <string name="sync_promotion_bottom_sheet_primary_button_text_free">Nâng&#160;cấp để dùng đồng&#160;bộ hóa</string>
     <!-- Text of the secondary button of the bottom sheet to promote Sync feature ("Learn more") -->
     <string name="sync_promotion_bottom_sheet_secondary_button_text">Tìm&#160;hiểu thêm</string>
-    <!-- Sync option dialog cancel button -->
-    <string name="settings_sync_option_cancel">Hủy</string>
     <!-- Snackbar message displayed when sync option is selected -->
     <string name="settings_sync_option_updated_message">Tùy chọn đồng&#160;bộ hóa đã được cập nhật</string>
     <!-- Title of the Contact Permission Explanation -->
@@ -694,10 +616,6 @@
     <string name="device_center_add_sync_button_option">Thêm đồng bộ</string>
     <!-- Label for the button or menu option to add a backup -->
     <string name="device_center_add_backup_button_option">Thêm sao lưu</string>
-    <!-- Title of the upgrade dialog displayed for free accounts when try to add a new sync or backup -->
-    <string name="device_center_sync_backup_upgrade_dialog_title">Nâng&#160;cấp tài&#160;khoản của bạn</string>
-    <!-- Message of the upgrade dialog displayed for free accounts when try to add a new sync or backup -->
-    <string name="device_center_sync_backup_upgrade_dialog_message">Mở khóa sức&#160;mạnh để đồng&#160;bộ và sao lưu thiết&#160;bị di&#160;động của bạn lên không&#160;gian lưu&#160;trữ đám&#160;mây với một trong các gói Pro của chúng&#160;tôi</string>
     <!-- Title of the share meeting link bottom panel -->
     <string name="meetings_share_link_bottom_sheet_title">Cuộc họp được xác&#160;nhận: Mời thêm người khác tham&#160;gia</string>
     <!-- Button text of the send meeting link to chat -->
@@ -734,8 +652,6 @@
     <string name="sync_backup_access_storage_permission_dialog_message">Để sao lưu các tệp&#160;tin của bạn, MEGA cần truy&#160;cập vào các tệp&#160;tin và thư&#160;mục trong thiết&#160;bị này. Dữ&#160;liệu của bạn luôn an&#160;toàn với chúng&#160;tôi.</string>
     <!-- Text for the warning banner displayed if try to create a new backup but storage permission has not been granted. The placeholders are to underline text -->
     <string name="sync_add_new_backup_storage_permission_banner">MEGA cần quyền truy&#160;cập vào bộ nhớ thiết&#160;bị của bạn để sao lưu thư&#160;mục cục&#160;bộ của bạn. [U]Chạm để cấp quyền truy&#160;cập[/U]</string>
-    <!--Success message displayed in the Login screen after the account has been activated-->
-    <string name="login_screen_account_confirmed_success_message">Tài&#160;khoản đã được kích&#160;hoạt rồi. Xin đăng&#160;nhập</string>
     <!-- Title in the files permission screen -->
     <string name="files_permission_screen_title">Cho phép MEGA truy&#160;cập các tệp&#160;tin trong thiết&#160;bị của bạn</string>
     <!-- Context message in the files permission screen -->
@@ -752,8 +668,6 @@
     <string name="sync_snackbar_message_confirm_sync_stopped">Đồng&#160;bộ đã dừng</string>
     <!-- Title of the dialog to confirm stop a backup -->
     <string name="sync_stop_backup_confirm_dialog_title">Chấm dứt sao lưu</string>
-    <!-- Message of the dialog to confirm stop a backup -->
-    <string name="sync_stop_backup_confirm_dialog_message">Thao&#160;tác này sẽ dừng quá&#160;trình đồng&#160;bộ hóa giữa hai thư&#160;mục. Một bản&#160;sao sẽ được tạo và lưu vào Ổ&#160;Mây của bạn.</string>
     <!-- Label for the button to stop a backup -->
     <string name="sync_stop_backup_button">Chấm dứt sao lưu</string>
     <!-- Snackbar message to indicate that backup has been stopped -->
@@ -768,10 +682,6 @@
     <string name="device_center_sync_backup_list_empty_state_title">Không có kết&#160;nối nào được thiết&#160;lập</string>
     <!-- Message of the synced folder list empty state -->
     <string name="device_center_sync_backup_list_empty_state_message">Đồng&#160;bộ hoặc sao lưu một thư&#160;mục trong thiết&#160;bị của bạn với một thư&#160;mục trên MEGA</string>
-    <!-- Message of the synced folder list empty state for free accounts -->
-    <string name="device_center_sync_backup_list_empty_state_message_free_account">Nâng&#160;cấp lên tài&#160;khoản cao&#160;cấp để giữ thông&#160;tin quan&#160;trọng của bạn được an&#160;toàn và cập&#160;nhật liên&#160;tục với đồng&#160;bộ và sao&#160;lưu</string>
-    <!-- Synced folder list empty state "See upgrade options" button label -->
-    <string name="device_center_sync_backup_see_upgrade_options_button_label">Xem các tùy chọn nâng cấp</string>
     <!-- subtitle of meeting title in schedule meeting for title disclaimer -->
     <string name="meetings_schedule_meeting_meeting_title_disclaimer">MEGA có thể xem tên và mô&#160;tả của cuộc họp của bạn, nhưng chúng tôi giữ mọi thứ ở chế&#160;độ riêng&#160;tư</string>
     <!-- Capital letters. Text of the label of a new historic notifications-->

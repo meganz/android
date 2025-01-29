@@ -1,7 +1,5 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources xmlns:tools="http://schemas.android.com/tools" tools:ignore="ImpliedQuantity, ExtraTranslation, MissingTranslation">
-    <!-- The name of the Device or Folder Sub State when its code is NO_SYNC_ERROR -->
-    <string name="general_sync_no_error">同期エラーはありません</string>
     <!-- The name of the Device or Folder Sub State when its code is UNSUPPORTED_FILE_SYSTEM -->
     <string name="general_sync_unsupported_file_system">デバイスのファイルシステムがサポートされていないため、MEGAはこのフォルダを同期またはバックアップできません</string>
     <!-- The name of the Device or Folder Sub State when its code is INVALID_REMOTE_TYPE -->
@@ -18,8 +16,6 @@
     <string name="general_sync_account_expired">お客様のプランの有効期限が切れているため、このフォルダを同期またはバックアップできません</string>
     <!-- The name of the Device or Folder Sub State when its code is FOREIGN_TARGET_OVERSTORAGE -->
     <string name="general_sync_foreign_target_overshare">このフォルダを共有したユーザーはストレージ限度に達したため、フォルダを同期できません</string>
-    <!-- The name of the Device or Folder Sub State when its code is REMOTE_PATH_HAS_CHANGED -->
-    <string name="general_sync_remote_path_has_changed">MEGA内のフォルダは、移動または削除されたため見つからないか、アクセス権がない可能性があります</string>
     <!-- The name of the Device or Folder Sub State when its code is SHARE_NON_FULL_ACCESS -->
     <string name="general_sync_share_non_full_access">完全なアクセス権がない共有フォルダであるため、フォルダを同期できません</string>
     <!-- The name of the Device or Folder Sub State when its code is PUT_NODES_ERROR -->
@@ -36,8 +32,6 @@
     <string name="general_sync_too_many_action_packets">アカウントが再読み込みされました。バックアップまたは同期に対して欠落した更新は適用されていません。</string>
     <!-- The name of the Device or Folder Sub State when its code is LOGGED_OUT -->
     <string name="general_sync_logged_out">デスクトップアプリからログアウトしたようであるため、同期またはバックアップが停止されました。デスクトップアプリから再度ログインし、同期またはバックアップを再開してください。</string>
-    <!-- The name of the Device or Folder Sub State when its code is MISSING_PARENT_NODE -->
-    <string name="general_sync_missing_parent_node">N/A（該当なし）</string>
     <!-- The name of the Device or Folder Sub State when its code is BACKUP_SOURCE_NOT_BELOW_DRIVE -->
     <string name="general_sync_backup_source_not_below_drive">外付けドライブのフォルダが見つかりません。</string>
     <!-- The name of the Device or Folder Sub State when its code is ACTIVE_SYNC_SAME_PATH -->
@@ -58,16 +52,10 @@
     <string name="general_sync_unable_to_add_watch">ファイルシステム監視を追加できません。十分な空き容量とメモリがあること、およびフォルダの場所に対するアクセス許可が付与されていることを確認してください。</string>
     <!-- The name of the Device or Folder Sub State when its code is UNABLE_TO_RETRIEVE_ROOT_FSID -->
     <string name="general_sync_unable_to_retrieve_root_fsid">同期の場所を読み取れませんでした。場所がアクセス可能であること、およびフォルダの場所に対するアクセス許可が付与されていることを確認してください。</string>
-    <!-- The name of the Device or Folder Sub State when its code is UNABLE_TO_OPEN_DATABASE -->
-    <string name="general_sync_unable_to_open_database">状態キャッシュデータベースを開けません</string>
     <!-- The name of the Device or Folder Sub State when its code is INSUFFICIENT_DISK_SPACE -->
     <string name="general_sync_insufficient_disk_space">デバイスのストレージ容量が不十分です</string>
-    <!-- The name of the Device or Folder Sub State when its code is FAILURE_ACCESSING_PERSISTENT_STORAGE -->
-    <string name="general_sync_failure_accessing_persistent_storage">同期の場所を読み取れませんでした。場所がアクセス可能であること、およびフォルダの場所に対するアクセス許可が付与されていることを確認してください。</string>
     <!-- The name for specific Sub States to indicate that an unknown error occurred -->
     <string name="general_sync_message_unknown_error">不明なエラーが発生しました。support@mega.nzにご連絡ください。</string>
-    <!-- The name for specific Sub States to indicate that something went wrong -->
-    <string name="general_sync_message_something_went_wrong">何か問題が発生しました。</string>
     <!-- The name for specific Sub States to indicate that the Node is in the Rubbish Bin -->
     <string name="general_sync_message_node_in_rubbish_bin">MEGAフォルダはごみ箱にあるため、フォルダを同期またはバックアップできません</string>
     <!-- The name for specific Sub States to indicate that the local drive cannot be located at this time -->
@@ -92,14 +80,6 @@
     <string name="dialog_onboarding_feature_title_backup_rewind">二度とデータを失わない</string>
     <!-- Description about Backup and Rewind features on Onboarding dialog (for user to choose account - Free or Pro).  -->
     <string name="dialog_onboarding_feature_description_backup_rewind">巻き戻してファイルとフォルダを最大180日までの任意の日付に復元できるため、データの事故や改ざんが防止されます。</string>
-    <!-- Title for MEGA VPN feature on Onboarding dialog (for user to choose account - Free or Pro).  -->
-    <string name="dialog_onboarding_feature_title_vpn">MEGA&#160;VPN</string>
-    <!-- Description about MEGA VPN feature on Onboarding dialog (for user to choose account - Free or Pro).  -->
-    <string name="dialog_onboarding_feature_description_vpn">当社の高速VPNでオンラインでのプライバシーを確​​保</string>
-    <!-- Title for chats and meetings feature on Onboarding dialog (for user to choose account - Free or Pro).  -->
-    <string name="dialog_onboarding_feature_title_chat">無制限の通話とミーティング</string>
-    <!-- Description about chats and meetings feature on Onboarding dialog (for user to choose account - Free or Pro).  -->
-    <string name="dialog_onboarding_feature_description_chat">メッセージ、ビデオ通話、完全プライバシーで無制限の参加者とミーティングができます。</string>
     <!-- Search drop down chips filter type file type -->
     <string name="search_dropdown_chip_filter_type_file_type">種類</string>
     <!-- Search drop down chips filter type file type images -->
@@ -272,8 +252,6 @@
     <string name="account_confirm_email_misspelled_email_description">メールアドレスのスペルを間違った場合、それを修正して[A]再送信[/A]をタップしてください。</string>
     <!-- Title of the insufficient storage error banner -->
     <string name="sync_error_storage_over_quota_banner_title">同期が一時停止されました。MEGAプランのストレージが不足しています</string>
-    <!-- Title of the insufficient storage error action -->
-    <string name="sync_error_storage_over_quota_banner_action">アップグレード</string>
     <!-- The warning message shown when the User enables the Device Charging requirement in Settings Camera Uploads, enables Camera Uploads, begins uploading content and the Device is not charged -->
     <string name="camera_uploads_phone_not_charging_message">アップロードが一時停止されました、デバイスは充電されていません</string>
     <!-- Label of the Device Status informing the user that Nothing is set up for the Current Device -->
@@ -336,36 +314,8 @@
     <string name="cloud_drive_tour_fourth_subtitle">カメラアップロードは、あらゆるモバイル端末にとって不可欠な機能で、あなたにもご利用いただけます。今すぐアカウントをサインアップ（登録）してください。</string>
     <!-- Fifth subtitle of the tour screen -->
     <string name="cloud_drive_tour_fifth_subtitle">ゼロ知識暗号化によるビデオミーティングが可能です。</string>
-    <!-- Titles of the tour screen to onboard users with the MEGA application -->
-    <string-array name="cloud_drive_tour_titles">
-        <item>@string/cloud_drive_tour_first_title</item>
-        <item>@string/cloud_drive_tour_second_title</item>
-        <item>@string/cloud_drive_tour_third_title</item>
-        <item>@string/cloud_drive_tour_fourth_title</item>
-        <item>@string/cloud_drive_tour_fifth_title</item>
-    </string-array>
-    <!-- Subtitles of the tour screen to onboard users with the MEGA application -->
-    <string-array name="cloud_drive_tour_subtitles">
-        <item>@string/cloud_drive_tour_first_subtitle</item>
-        <item>@string/cloud_drive_tour_second_subtitle</item>
-        <item>@string/cloud_drive_tour_third_subtitle</item>
-        <item>@string/cloud_drive_tour_fourth_subtitle</item>
-        <item>@string/cloud_drive_tour_fifth_subtitle</item>
-    </string-array>
     <!-- Title of the Raise to Hand Feature Introduction Tooltip -->
     <string name="meetings_raised_hand_tooltip_title">[A]新機能：挙手[/A]</string>
-    <!-- Message of the synced folder list empty state for free accounts -->
-    <string name="device_center_sync_list_empty_state_message_free_account">Proプランのいずれかにアップグレードしていただくと、情報を常に同期して最新の状態に保つことができます。</string>
-    <!-- "Upgrade now" label for a button, menu entry, etc -->
-    <string name="general_upgrade_now_label">今すぐアップグレード</string>
-    <!-- Title of the upgrade dialog displayed for free accounts when try to add a new sync -->
-    <string name="device_center_sync_upgrade_dialog_title">Proにアップグレード</string>
-    <!-- Message of the upgrade dialog displayed for free accounts when try to add a new sync -->
-    <string name="device_center_sync_upgrade_dialog_message">当社のProプランをご利用いただくと、モバイルデバイスをクラウドに同期する機能をご利用いただけるようになります。</string>
-    <!-- Confirm button text of the upgrade dialog displayed for free accounts when try to add a new sync -->
-    <string name="device_center_sync_upgrade_dialog_confirm_button">アップグレード</string>
-    <!-- Cancel button text of the upgrade dialog displayed for free accounts when try to add a new sync -->
-    <string name="device_center_sync_upgrade_dialog_cancel_button">今はやめます</string>
     <!-- Title of the Warning Dialog shown when the new Local Primary or Secondary Folder is same as, a parent folder or sub-folder of the opposite Local Folder -->
     <string name="settings_camera_uploads_related_new_local_folder_warning_dialog_title">アップロードフォルダの競合</string>
     <!-- Body of the Warning Dialog shown when the new Local Primary or Secondary Folder is same as, a parent folder or sub-folder of the opposite Local Folder -->
@@ -376,12 +326,6 @@
     <string name="general_no_picker_warning">この端末には、フォルダを選択するアプリがありません</string>
     <!-- Description of feature, which will be available for user, if they buy plan. This feature means user will be able to sync folders. Keep the bullet point, as this string is part of the bullet point list. -->
     <string name="account_upgrade_account_description_feature_sync">&#8226;&#160;モバイルデバイス上のフォルダを自動的に同期します</string>
-    <!-- The error dialog text displayed when user opens Android Sync while having previously established syncs -->
-    <string name="sync_error_dialog_free_user">同期が一時停止されました。同期はProプランの機能です。</string>
-    <!-- The error dialog confirm action text -->
-    <string name="sync_error_dialog_free_user_confirm_action">OK</string>
-    <!-- The error banner text displayed when user opens Android Sync while having previously established syncs -->
-    <string name="sync_error_banner_free_user">MEGA Proプランをキャンセルされたため、同期が一時停止されています。アップグレードしていただくと、同期を継続できます。</string>
     <!-- Hidden items -->
     <string name="hidden_items">非表示項目</string>
     <!-- Label to indicate that is a Pro only feature -->
@@ -400,8 +344,6 @@
     <string name="add_tags_error_special_characters">タグにはスペースや英数字以外の記号を含めることはできません。大文字で書かれたタグは小文字で表示されます。</string>
     <!-- error label for add tags page when tag count is maximum -->
     <string name="add_tags_error_max_tags">タグの最大数は%1$d個です</string>
-    <!-- error label for add tags page when tag character limit reached -->
-    <string name="add_tags_error_max_characters">タグは%1$d文字以下にする必要があります</string>
     <!-- title label for tags page -->
     <string name="add_tags_page_title_label">タグ</string>
     <!-- The placeholder for read only files/folders with no description in info screen-->
@@ -410,8 +352,6 @@
     <string name="video_to_playlist_top_bar_title">プレイリストに追加</string>
     <!-- Text of the create new playlist in the page that adds the video to the video playlist -->
     <string name="video_to_playlist_new_playlist_text">新しいプレイリスト</string>
-    <!-- Text of the done button in the page that adds the video to the video playlist -->
-    <string name="video_to_playlist_done_button">完了</string>
     <!-- Title shown when cancelling the current plan, informing the user of features they'll miss out on -->
     <string name="account_cancel_account_screen_plan_miss_out_on_features">これらの機能をご利用いただけなくなります</string>
     <!-- Message shown when cancelling the plan, indicating that access to features will continue until the plan expires -->
@@ -424,8 +364,6 @@
     <string name="account_cancel_account_screen_plan_free_plan">無料</string>
     <!-- Row label for storage feature in the comparison table -->
     <string name="account_cancel_account_screen_plan_storage">ストレージ</string>
-    <!-- Storage amount available in the free plan. %1s represents the amount of storage and the unit -->
-    <string name="account_cancel_account_screen_plan_free_storage">%1s</string>
     <!-- Row label for transfer feature in the comparison table -->
     <string name="account_cancel_account_screen_plan_transfer">転送</string>
     <!-- Transfer limit in the free plan -->
@@ -445,13 +383,13 @@
     <!-- Feature indicating MEGA VPN availability, available in the pro plan -->
     <string name="account_cancel_account_screen_plan_mega_vpn">MEGA&#160;VPN</string>
     <!-- Row label for call and meeting duration in the comparison table -->
-    <string name="account_cancel_account_screen_plan_call_meeting_duration">通話とミーティング時間</string>
+    <string name="account_cancel_account_screen_plan_call_meeting_duration">通話＆ミーティング時間</string>
     <!-- Call and meeting duration limit in the free plan -->
     <string name="account_cancel_account_screen_plan_call_meeting_duration_free">最大1時間</string>
     <!-- Unlimited call and meeting duration available in the pro plan -->
     <string name="cancel_account_plan_call_meeting_duration_pro">無制限</string>
     <!-- Row label for call and meeting participants in the comparison table -->
-    <string name="account_cancel_account_plan_call_meeting_participants">通話とミーティングの参加者</string>
+    <string name="account_cancel_account_plan_call_meeting_participants">通話＆ミーティングの参加者</string>
     <!-- Limit on call and meeting participants in the free plan -->
     <string name="account_cancel_account_free_plan_call_meeting_participants">最大100人</string>
     <!-- Unlimited call and meeting participants available in the pro plan -->
@@ -516,10 +454,6 @@
     <string name="account_cancellation_instructions_click_reactivate_subscription">6. [A]サブスクリプションを再有効化[/A]をクリックする。</string>
     <!-- Label for cancellation instructions on a mobile device -->
     <string name="account_cancellation_instructions_on_mobile_device">モバイルデバイスの場合</string>
-    <!-- Step 1: instruction step no.1 to visit the MEGA website on the mobile device-->
-    <string name="account_cancellation_instructions_mobile_visit_website">1. ウェブブラウザで[A]www.mega.nz[/A]にアクセスする。</string>
-    <!-- Step 2: instruction step no.2 to Log in to MEGA account on the mobile device from the browser-->
-    <string name="account_cancellation_instructions_mobile_login_account">2. MEGAアカウントにログインする。</string>
     <!-- Step 3: instruction step no.3 Tap on the user avatar on the MEGA website from the mobile device-->
     <string name="account_cancellation_instructions_tap_avatar">3. アバターをタップする。</string>
     <!-- Step 4: instruction step no.4 Tap Cancel subscription on the account from the MEGA website from the mobile device-->
@@ -550,10 +484,6 @@
     <string name="transfers_scanning_folders_dialog_starting_transfers_title">転送を開始しています...</string>
     <!-- Transfers scanning folders dialog info to explain why the app shouldn't be closed -->
     <string name="transfers_scanning_folders_dialog_cancel_info_subtitle">アプリを閉じないでください。閉じると、まだキューに入れられていない転送は失われます。</string>
-    <!-- Transfers scanning folders dialog sub-title when the app is scanning a single folder-->
-    <plurals name="transfers_scanning_folders_dialog_scanning_folder_subtitle">
-        <item quantity="other">1個のフォルダと%1$d個のファイルが見つかりました。</item>
-    </plurals>
     <!-- Transfers scanning folders dialog sub-title when the app is scanning multiple folders. This is the folders pluralization part to implement double pluralization in transfers_scanning_folders_dialog_scanning_files_and_folders_subtitle. Example: "134 folders". Example with double pluralization in transfers_scanning_folders_dialog_scanning_files_and_folders_subtitle: "Found 134 folders and 5689 files."-->
     <plurals name="transfers_scanning_folders_dialog_scanning_folders_subtitle">
         <item quantity="other">%1$d個のフォルダ</item>
@@ -568,8 +498,6 @@
     <string name="settings_sync_clear_debris_dialog_title">debrisをクリアしますか？</string>
     <!-- Body of the dialog shown when user clicks to clear debris from settings menu -->
     <string name="settings_sync_clear_debris_dialog_body">同期されたファイルの以前のバージョンのバックアップはデバイスから完全に削除されます。\n\nローカルデバイスの.debrisフォルダをチェックして、復元する必要があるものがないか確認してください。</string>
-    <!-- Cancel button of the dialog shown when user clicks to clear debris from settings menu -->
-    <string name="settings_sync_clear_debris_dialog_cancel">キャンセル</string>
     <!-- Continue button of the dialog shown when user clicks to clear debris from settings menu -->
     <string name="settings_sync_clear_debris_dialog_continue">続ける</string>
     <!-- Snackbar message shown when user clears debris from settings menu -->
@@ -578,8 +506,6 @@
     <plurals name="transfers_scanning_folders_dialog_scanning_files_and_folders_subtitle">
         <item quantity="other">%1$s個のフォルダと%2$d個のファイルが見つかりました。</item>
     </plurals>
-    <!-- Label for the file info information screen no tags label -->
-    <string name="file_info_information_no_tags_label">タグなし</string>
     <!-- Transfers scanning folders dialog title to inform that the transfers are being cancelled -->
     <string name="transfers_scanning_folders_dialog_cancel_cancelling_title">転送をキャンセル中&#8230;</string>
     <!-- error warning message for report issue when not enough characters are typed and user tries to send report-->
@@ -670,12 +596,8 @@
     <string name="sync_promotion_bottom_sheet_body_message">デバイス上のフォルダをMEGAと同期すると、どこからでもお持ちのファイルの最新バージョンにアクセスできます</string>
     <!-- Text of the primary button of the bottom sheet to promote Sync feature for Pro users ("Sync folders") -->
     <string name="sync_promotion_bottom_sheet_primary_button_text_pro">フォルダを同期</string>
-    <!-- Text of the primary button of the bottom sheet to promote Sync feature for Free users ("Upgrade") -->
-    <string name="sync_promotion_bottom_sheet_primary_button_text_free">アップグレードして同期を使用する</string>
     <!-- Text of the secondary button of the bottom sheet to promote Sync feature ("Learn more") -->
     <string name="sync_promotion_bottom_sheet_secondary_button_text">もっと詳しく知る</string>
-    <!-- Sync option dialog cancel button -->
-    <string name="settings_sync_option_cancel">キャンセル</string>
     <!-- Snackbar message displayed when sync option is selected -->
     <string name="settings_sync_option_updated_message">同期オプションが更新されました</string>
     <!-- Title of the Contact Permission Explanation -->
@@ -694,10 +616,6 @@
     <string name="device_center_add_sync_button_option">同期を追加</string>
     <!-- Label for the button or menu option to add a backup -->
     <string name="device_center_add_backup_button_option">バックアップを追加</string>
-    <!-- Title of the upgrade dialog displayed for free accounts when try to add a new sync or backup -->
-    <string name="device_center_sync_backup_upgrade_dialog_title">アカウントをアップグレード</string>
-    <!-- Message of the upgrade dialog displayed for free accounts when try to add a new sync or backup -->
-    <string name="device_center_sync_backup_upgrade_dialog_message">当社のプレミアムプランのいずれかをご使用いただくと、モバイルデバイスをクラウドストレージに同期およびバックアップする機能をご利用いただけます</string>
     <!-- Title of the share meeting link bottom panel -->
     <string name="meetings_share_link_bottom_sheet_title">ミーティングが確認されました：他の人を招待しましょう</string>
     <!-- Button text of the send meeting link to chat -->
@@ -734,8 +652,6 @@
     <string name="sync_backup_access_storage_permission_dialog_message">ファイルをバックアップするには、MEGAはあなたのデバイスのファイルとフォルダにアクセスする必要があります。あなたのデータは常に安全に保管されます。</string>
     <!-- Text for the warning banner displayed if try to create a new backup but storage permission has not been granted. The placeholders are to underline text -->
     <string name="sync_add_new_backup_storage_permission_banner">MEGAは、あなたのローカルフォルダをバックアップするためにお使いのデバイスのストレージにアクセスする必要があります。[U]タップしてアクセスを許可する[/U]</string>
-    <!--Success message displayed in the Login screen after the account has been activated-->
-    <string name="login_screen_account_confirmed_success_message">あなたのアカウントは有効になっています。ログインしてください。</string>
     <!-- Title in the files permission screen -->
     <string name="files_permission_screen_title">MEGAにデバイスのファイルへのアクセスを許可</string>
     <!-- Context message in the files permission screen -->
@@ -752,8 +668,6 @@
     <string name="sync_snackbar_message_confirm_sync_stopped">同期が停止しました</string>
     <!-- Title of the dialog to confirm stop a backup -->
     <string name="sync_stop_backup_confirm_dialog_title">バックアップの停止</string>
-    <!-- Message of the dialog to confirm stop a backup -->
-    <string name="sync_stop_backup_confirm_dialog_message">これにより、2つのフォルダ間の同期プロセスが停止します。コピーが作成され、クラウドドライブに保存されます。</string>
     <!-- Label for the button to stop a backup -->
     <string name="sync_stop_backup_button">バックアップの停止</string>
     <!-- Snackbar message to indicate that backup has been stopped -->
@@ -768,10 +682,6 @@
     <string name="device_center_sync_backup_list_empty_state_title">接続が設定されていません</string>
     <!-- Message of the synced folder list empty state -->
     <string name="device_center_sync_backup_list_empty_state_message">デバイス上のフォルダをMEGA上のフォルダと同期またはバックアップできます</string>
-    <!-- Message of the synced folder list empty state for free accounts -->
-    <string name="device_center_sync_backup_list_empty_state_message_free_account">プレミアムアカウントにアップグレードすると、同期とバックアップを使用して、重要な情報を安全かつ最新の状態に保つことができます</string>
-    <!-- Synced folder list empty state "See upgrade options" button label -->
-    <string name="device_center_sync_backup_see_upgrade_options_button_label">アップグレードオプションを見る</string>
     <!-- subtitle of meeting title in schedule meeting for title disclaimer -->
     <string name="meetings_schedule_meeting_meeting_title_disclaimer">MEGAはミーティングの名前と説明を見ることができますが、それらは非公開に保たれます</string>
     <!-- Capital letters. Text of the label of a new historic notifications-->

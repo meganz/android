@@ -26,8 +26,6 @@
     <plurals name="num_folders_num_files_2">
         <item quantity="other">파일 %1$d개</item>
     </plurals>
-    <!-- Sync options -->
-    <string name="sync_menu_sync_options">동기화 옵션</string>
     <!-- Sync text when need to solved stalled issues-->
     <string name="sync_menu_clear_issues">해결된 문제 지우기</string>
     <!-- Sync message for two way sync-->
@@ -44,14 +42,10 @@
     <string name="sync_stalled_issue_choose_latest_modified_time">마지막으로 수정된 파일 선택</string>
     <!-- Sync message when conflict resolved -->
     <string name="sync_stalled_issue_conflict_resolved">충돌 해결됨</string>
-    <!-- Sync message to access storage permission on device -->
-    <string name="sync_access_storage_permission_message">파일을 백업하려면, MEGA가 이 장치의 파일과 폴더에 대한 접근이 필요합니다. 당신의 데이터는 언제나 우리와 함께 안전합니다.</string>
     <!-- Sync dialog continue button -->
     <string name="sync_dialog_file_permission_positive_button">계속</string>
     <!-- Sync dialog not now button -->
     <string name="sync_dialog_file_permission_negative_button">나중에</string>
-    <!-- Sync dialog title for storage access -->
-    <string name="sync_dialog_storage_access_title">모든 파일에 접근 허용</string>
     <!-- Sync dialog title for battery optimization -->
     <string name="sync_dialog_battery_optimization_title">배터리 최적화</string>
     <!-- Sync dialog cancel button text -->
@@ -70,8 +64,6 @@
     <string name="sync_list_sync_state_syncing">동기화 중&#8230;</string>
     <!-- Sync state failed -->
     <string name="sync_folders_sync_state_failed">정지됨</string>
-    <!-- Sync state synced -->
-    <string name="sync_list_sync_state_synced">동기화됨</string>
     <!-- Sync permission title for device storage -->
     <string name="sync_folders_device_storage">장치 폴더</string>
     <!-- Sync permission title for mega storage -->
@@ -82,20 +74,12 @@
     <string name="sync_card_pause_sync">일시정지</string>
     <!-- Sync Run -->
     <string name="sync_card_run_sync">재개</string>
-    <!-- Sync Remove -->
-    <string name="sync_card_remove_sync">제거</string>
     <!-- Sync dialog for sync over Wi-Fi or mobile data -->
     <string name="sync_dialog_message_wifi_or_mobile_data">와이파이 또는 모바일 데이터</string>
     <!-- Sync dialog for sync only over Wi-Fi -->
     <string name="sync_dialog_message_wifi_only">와이파이 전용</string>
     <!-- Sync empty state message -->
     <string name="sync_empty_state_message">당신의 클라우드 드라이브에서 선택한 폴더와 동기화할 장치의 로컬 폴더를 설정해야 합니다</string>
-    <!-- Sync notification title description sync monitoring-->
-    <string name="sync_notification_monitoring_description">동기화 감시 중</string>
-    <!-- Snackbar message shown when Wi-Fi only sync option is selected -->
-    <string name="sync_options_changed_to_wifi_only">동기화 옵션이 변경되었습니다: Wi-Fi만</string>
-    <!-- Snackbar message shown when Wi-Fi or mobile data sync option is selected -->
-    <string name="sync_options_changed_to_wifi_and_mobile_data">동기화 옵션이 변경되었습니다: Wi-Fi와 모바일 데이터</string>
     <!-- Sync stalled issue reason is no reason-->
     <string name="sync_stalled_issue_no_reason">No reason</string>
     <!-- Sync stalled issue reason is no file issue-->
@@ -136,8 +120,6 @@
     <string name="sync_start_sync">동기화 설정</string>
     <!-- Text that indicates that a folder is currently empty -->
     <string name="sync_file_browser_empty_folder">빈 폴더</string>
-    <!-- Selecting a specific location in MEGA. This is the text of the button -->
-    <string name="sync_general_select_to_download">폴더 선택</string>
     <!-- Selecting a specific location in MEGA. This is the text of the button -->
     <string name="sync_general_select">선택</string>
     <!-- Sync stalled issue reason is no file issue detailed description-->
