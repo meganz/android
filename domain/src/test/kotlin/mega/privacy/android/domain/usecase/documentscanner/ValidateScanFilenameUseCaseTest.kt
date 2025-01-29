@@ -27,20 +27,50 @@ internal class ValidateScanFilenameUseCaseTest {
     fun `test that an empty filename validation status is returned if the filename does not contain anything`(
         filename: String,
     ) = runTest {
-        assertThat(underTest(filename)).isEqualTo(ScanFilenameValidationStatus.EmptyFilename)
+        assertThat(
+            underTest(
+                filename = filename,
+                fileExtension = ".pdf",
+            )
+        ).isEqualTo(ScanFilenameValidationStatus.EmptyFilename)
     }
+
+    @Test
+    fun `test that an empty filename validation status is returned if removing the file extension from the filename results in a blank filename`() =
+        runTest {
+            assertThat(
+                underTest(
+                    filename = ".pdf",
+                    fileExtension = ".pdf",
+                )
+            ).isEqualTo(ScanFilenameValidationStatus.EmptyFilename)
+        }
 
     @ParameterizedTest(name = "invalid character: {0}")
     @ValueSource(strings = ["/", "\\", ":", "?", "\"", "*", "<", ">", "|"])
     fun `test that an invalid filename validation status is returned if the non-empty filename contains any of the invalid characters`(
         character: String,
     ) = runTest {
-        assertThat(underTest("Test$character")).isEqualTo(ScanFilenameValidationStatus.InvalidFilename)
+        assertThat(
+            underTest(
+                filename = "Test$character",
+                fileExtension = ".pdf",
+            )
+        ).isEqualTo(
+            ScanFilenameValidationStatus.InvalidFilename
+        )
     }
 
     @Test
     fun `test that a valid filename validation status is returned if all checks pass`() =
         runTest {
-            assertThat(underTest("Test Filename")).isEqualTo(ScanFilenameValidationStatus.ValidFilename)
+            assertThat(
+                underTest(
+                    filename = "Test Filename",
+                    fileExtension = ".pdf",
+                )
+            ).isEqualTo(
+                ScanFilenameValidationStatus.ValidFilename
+            )
         }
 }

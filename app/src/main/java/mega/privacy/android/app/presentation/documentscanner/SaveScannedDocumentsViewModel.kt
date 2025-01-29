@@ -105,7 +105,10 @@ internal class SaveScannedDocumentsViewModel @Inject constructor(
      * @param newFilename the new Filename
      */
     fun onFilenameChanged(newFilename: String) {
-        val filenameValidationStatus = validateScanFilenameUseCase(newFilename)
+        val filenameValidationStatus = validateScanFilenameUseCase(
+            filename = newFilename,
+            fileExtension = _uiState.value.scanFileType.fileSuffix,
+        )
         _uiState.update {
             it.copy(
                 filename = newFilename,
@@ -187,7 +190,10 @@ internal class SaveScannedDocumentsViewModel @Inject constructor(
      * it is not provided
      */
     private fun isConfirmedFilenameValid(filename: String = _uiState.value.filename): Boolean {
-        return when (val filenameValidationStatus = validateScanFilenameUseCase(filename)) {
+        return when (val filenameValidationStatus = validateScanFilenameUseCase(
+            filename = filename,
+            fileExtension = _uiState.value.scanFileType.fileSuffix,
+        )) {
             ScanFilenameValidationStatus.ValidFilename -> true
             ScanFilenameValidationStatus.InvalidFilename -> false
             else -> {
