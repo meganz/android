@@ -8,8 +8,10 @@ import android.os.Bundle
 import androidx.activity.compose.setContent
 import androidx.appcompat.app.AppCompatActivity
 import androidx.appcompat.app.AppCompatDelegate
+import androidx.compose.foundation.layout.navigationBarsPadding
 import androidx.compose.material.rememberScaffoldState
 import androidx.compose.runtime.rememberCoroutineScope
+import androidx.compose.ui.Modifier
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.rememberNavController
 import com.google.accompanist.navigation.material.ExperimentalMaterialNavigationApi
@@ -45,7 +47,11 @@ internal class CameraActivity : AppCompatActivity() {
 
             // force dark theme for camera
             OriginalTempTheme(isDark = true) {
-                NavHost(navController = navController, startDestination = CAMERA_CAPTURE_ROUTE) {
+                NavHost(
+                    navController = navController,
+                    startDestination = CAMERA_CAPTURE_ROUTE,
+                    modifier = Modifier.navigationBarsPadding(),
+                ) {
                     cameraCaptureScreen(
                         scaffoldState = scaffoldState,
                         bottomSheetNavigator = bottomSheetNavigator,
