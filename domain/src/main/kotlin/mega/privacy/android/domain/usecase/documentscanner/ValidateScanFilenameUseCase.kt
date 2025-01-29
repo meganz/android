@@ -8,8 +8,9 @@ import javax.inject.Inject
  *
  * The filename is considered valid if:
  *
- * 1. The filename is not empty or only contains whitespaces, and
- * 2. The filename does not contain any of the following invalid characters:
+ * 1. The filename is not empty or only contains whitespaces,
+ * 2. The base filename (without the expected file extension) is not empty or only contains whitespaces, and
+ * 3. The filename does not contain any of the following invalid characters:
  *     1. A forward slash /
  *     2. A back slash \
  *     3. A colon :
@@ -26,12 +27,22 @@ class ValidateScanFilenameUseCase @Inject constructor() {
      * Invocation function
      *
      * @param filename The filename to be validated
+     * @param fileExtension The expected filename extension
      *
      * @return The appropriate validation status
      */
-    operator fun invoke(filename: String): ScanFilenameValidationStatus {
+    operator fun invoke(filename: String, fileExtension: String): ScanFilenameValidationStatus {
         // Check if the filename is empty or only contains whitespaces
         if (filename.isBlank()) {
+            return ScanFilenameValidationStatus.EmptyFilename
+        }
+
+        // Check if the filename ends with the expected file extension, and whether or not
+        // removing the file extension results in a blank filename
+        if (filename.endsWith(fileExtension) && filename.substring(
+                0, filename.length - fileExtension.length
+            ).isBlank()
+        ) {
             return ScanFilenameValidationStatus.EmptyFilename
         }
 
