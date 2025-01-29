@@ -12,6 +12,7 @@ import java.io.File
  * Event to trigger the start of a transfer
  */
 sealed interface TransferTriggerEvent {
+    sealed interface CloudTransfer: TransferTriggerEvent
 
     /**
      * Type of the transfer
@@ -67,7 +68,7 @@ sealed interface TransferTriggerEvent {
     /**
      * Event to start downloading a list of nodes
      */
-    sealed interface DownloadTriggerEvent : TransferTriggerEvent {
+    sealed interface DownloadTriggerEvent : CloudTransfer {
         override val type: TransferType
             get() = TransferType.DOWNLOAD
 
@@ -157,7 +158,7 @@ sealed interface TransferTriggerEvent {
      *                          The name will be null in case the original name.
      * @property destinationId the id of the folder where the files will be uploaded.
      */
-    sealed interface StartUpload : TransferTriggerEvent {
+    sealed interface StartUpload : CloudTransfer {
         override val type: TransferType
             get() = TransferType.GENERAL_UPLOAD
 
