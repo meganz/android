@@ -4,8 +4,6 @@
     <string name="device_center_rename_device_dialog_title">Zmiana nazwy urządzenia</string>
     <!-- The name of the Positive Button for the Rename Device Dialog -->
     <string name="device_center_rename_device_dialog_positive_button">Zmień nazwę</string>
-    <!-- The name of the Negative Button for the Rename Device Dialog -->
-    <string name="device_center_rename_device_dialog_negative_button">Anuluj</string>
     <!-- The name of the Header in Device Center which signifies the User's Device that is currently in use -->
     <string name="device_center_list_view_item_header_this_device">To urządzenie</string>
     <!-- The name of the Header in Device Center which signifies the User's Devices that are not currently in use  -->
@@ -24,12 +22,10 @@
     <string name="device_center_list_view_item_status_updating">Aktualizowanie&#8230;</string>
     <!-- The name of the Device or Folder Status which signifies that it is currently updating its backup contents with a percentage completion -->
     <string name="device_center_list_view_item_status_updating_with_progress">%1$d%% aktualizowanie&#8230;</string>
-    <!-- The name of the Device Status which signifies that Camera Uploads is disabled for the User's Current Device -->
-    <string name="device_center_list_view_item_status_no_camera_uploads">Brak przesłanych plików z kamery</string>
     <!-- The name of the Device or Folder Status which signifies that it is disabled -->
     <string name="device_center_list_view_item_status_disabled">Zablokowane</string>
     <!-- The name of the Device or Folder Status which signifies that it is offline -->
-    <string name="device_center_list_view_item_status_offline">Lokalne</string>
+    <string name="device_center_list_view_item_status_offline">Nieaktywny</string>
     <!-- The name of the Device or Folder Status which signifies that the backup procedure has been paused -->
     <string name="device_center_list_view_item_status_paused">Zatrzymane</string>
     <!-- The name of the Device or Folder Status which signifies that the backup procedure has been stopped -->
@@ -52,74 +48,14 @@
     <string name="device_center_bottom_sheet_item_rename">Zmień nazwę</string>
     <!-- The name of one of the Device Center Bottom Sheet items that when clicked, takes the User to the Node Information screen to view more information about the Device or Device Folder -->
     <string name="device_center_bottom_sheet_item_info">Info</string>
-    <!-- The name of one of the Device Center Bottom Sheet items that when clicked, takes the User to the Backups feature to display the Device or Device Folder -->
-    <string name="device_center_bottom_sheet_item_show_in_backups">Show in BackupsPokaż w kopiach zapasowych</string>
-    <!-- The name of one of the Device Center Bottom Sheet items that when clicked, takes the User to the Cloud Drive feature to display the Device or Device Folder -->
-    <string name="device_center_bottom_sheet_item_show_in_cloud_drive">Pokaż na Dysku w chmurze</string>
-    <!-- The name of the Device or Folder Sub State when its code is NO_SYNC_ERROR -->
-    <string name="device_center_list_view_item_sub_state_no_sync_error">Brak błędu synchronizacji</string>
-    <!-- The name of the Device or Folder Sub State when its code is UNSUPPORTED_FILE_SYSTEM -->
-    <string name="device_center_list_view_item_sub_state_unsupported_file_system">MEGA nie może zsynchronizować ani wykonać kopii zapasowej tego katalogu, ponieważ system plików na urządzeniu nie jest obsługiwany</string>
-    <!-- The name of the Device or Folder Sub State when its code is INVALID_REMOTE_TYPE -->
-    <string name="device_center_list_view_item_sub_state_invalid_remote_type">Nie można zsynchronizować wybranego katalogu</string>
-    <!-- The name of the Device or Folder Sub State when its code is INVALID_LOCAL_TYPE -->
-    <string name="device_center_list_view_item_sub_state_invalid_local_type">Nie można zsynchronizować pliku pojedynczo. Należy skonfigurować synchronizację z katalogu.</string>
-    <!-- The name of the Device or Folder Sub State when its code is REMOTE_NODE_NOT_FOUND -->
-    <string name="device_center_list_view_item_sub_state_remote_node_not_found">Katalog w MEGA nie może zostać zlokalizowany, ponieważ został przeniesiony lub usunięty, lub możesz nie mieć do niego dostępu.</string>
     <!-- The name of the Device or Folder Sub State when its code is STORAGE_OVERQUOTA -->
     <string name="device_center_list_view_item_sub_state_storage_overquota">Osiągnięto limit przydziału pamięci.</string>
-    <!-- The name of the Device or Folder Sub State when its code is ACCOUNT_EXPIRED -->
-    <string name="device_center_list_view_item_sub_state_account_expired">Nie można zsynchronizować ani utworzyć kopii zapasowej tego katalogu, ponieważ plan wygasł</string>
-    <!-- The name of the Device or Folder Sub State when its code is FOREIGN_TARGET_OVERSTORAGE -->
-    <string name="device_center_list_view_item_sub_state_foreign_target_overshare">Nie można zsynchronizować folderu, ponieważ użytkownik, który udostępnił ten katalog, osiągnął swoją pojemność</string>
-    <!-- The name of the Device or Folder Sub State when its code is SHARE_NON_FULL_ACCESS -->
-    <string name="device_center_list_view_item_sub_state_share_non_full_access">Nie można zsynchronizować katalogu, ponieważ jest to katalog udostępniony bez pełnego dostępu</string>
-    <!-- The name of the Device or Folder Sub State when its code is PUT_NODES_ERROR -->
-    <string name="device_center_list_view_item_sub_state_put_nodes_error">Pliki w tym katalogu nie można synchronizować ani tworzyć kopii zapasowych. Będziesz musiał ponownie włączyć synchronizację lub kopię zapasową z aplikacji desktopowej.</string>
-    <!-- The name of the Device or Folder Sub State when its code is ACTIVE_SYNC_BELOW_PATH -->
-    <string name="device_center_list_view_item_sub_state_active_sync_below_path">Nie można zsynchronizować katalogu, ponieważ zawiera już zsynchronizowane katalogi</string>
-    <!-- The name of the Device or Folder Sub State when its code is VBOXSHAREDFOLDER_UNSUPPORTED -->
-    <string name="device_center_list_view_item_sub_state_vboxsharedfolder_unsupported">MEGA nie może synchronizować ani tworzyć kopii zapasowych katalogu VirtualBox</string>
     <!-- The name of the Device or Folder Sub State when its code is ACCOUNT_BLOCKED -->
     <string name="device_center_list_view_item_sub_state_account_blocked">Nie można zsynchronizować ani utworzyć kopii zapasowej tego katalogu, ponieważ konto zostało zablokowane</string>
-    <!-- The name of the Device or Folder Sub State when its code is UNKNOWN_TEMPORARY_ERROR -->
-    <string name="device_center_list_view_item_sub_state_unknown_temporary_error">Problem z synchronizacją lub tworzeniem kopii zapasowej tego katalogu. Spróbuj ponownie później. Jeśli problem będzie się powtarzał, kontakt wsparcie.</string>
-    <!-- The name of the Device or Folder Sub State when its code is TOO_MANY_ACTION_PACKETS -->
-    <string name="device_center_list_view_item_sub_state_too_many_action_packets">Konto zostało przeładowane. Wszelkie pominięte aktualizacje kopii zapasowych lub synchronizacji nie zostały zastosowane.</string>
     <!-- The name of the Device or Folder Sub State when its code is LOGGED_OUT -->
     <string name="device_center_list_view_item_sub_state_logged_out">Synchronizacja lub tworzenie kopii zapasowych zostało zatrzymane, ponieważ wydaje się, że wylogowałeś się z aplikacji desktopowej. Zaloguj się ponownie za pomocą aplikacji desktopowerj aby wznowić synchronizację lub tworzenie kopii zapasowych.</string>
-    <!-- The name of the Device or Folder Sub State when its code is MISSING_PARENT_NODE -->
-    <string name="device_center_list_view_item_sub_state_missing_parent_node">N/A</string>
-    <!-- The name of the Device or Folder Sub State when its code is BACKUP_SOURCE_NOT_BELOW_DRIVE -->
-    <string name="device_center_list_view_item_sub_state_backup_source_not_below_drive">Nie można zlokalizować katalogu na dysku zewnętrznym.</string>
-    <!-- The name of the Device or Folder Sub State when its code is ACTIVE_SYNC_SAME_PATH -->
-    <string name="device_center_list_view_item_sub_state_active_sync_same_path">Istnieje już zsynchronizowany katalog na tej samej ścieżce</string>
-    <!-- The name of the Device or Folder Sub State when its code is COULD_NOT_MOVE_CLOUD_NODES -->
-    <string name="device_center_list_view_item_sub_state_could_not_move_cloud_nodes">Zmiana nazwy nie powiodła się.</string>
-    <!-- The name of the Device or Folder Sub State when its code is UNKNOWN_DRIVE_PATH -->
-    <string name="device_center_list_view_item_sub_state_unknown_drive_path">Lokalizacja katalogu synchronizacji jest nieznana</string>
-    <!-- The name of the Device or Folder Sub State when its code is UNABLE_TO_ADD_WATCH -->
-    <string name="device_center_list_view_item_sub_state_unable_to_add_watch">Nie można dodać obserwacji systemu plików. Upewnij się, że jest wystarczająco dużo wolnego miejsca i pamięci oraz że masz uprawnienia do lokalizacji katalogu.</string>
-    <!-- The name of the Device or Folder Sub State when its code is UNABLE_TO_OPEN_DATABASE -->
-    <string name="device_center_list_view_item_sub_state_unable_to_open_database">Nie można otworzyć bazy danych pamięci podręcznej</string>
     <!-- The name of the Device or Folder Sub State when its code is INSUFFICIENT_DISK_SPACE -->
     <string name="device_center_list_view_item_sub_state_insufficient_disk_space">Niewystarczająca ilość miejsca do pobrania.</string>
-    <!-- The name for specific Sub States to indicate that an unknown error occurred -->
-    <string name="device_center_list_view_item_sub_state_message_unknown_error">Nieznany błąd.</string>
-    <!-- The name for specific Sub States to indicate that something went wrong -->
-    <string name="device_center_list_view_item_sub_state_message_something_went_wrong">Coś poszło nie tak.</string>
-    <!-- The name for specific Sub States to indicate that the Node is in the Rubbish Bin -->
-    <string name="device_center_list_view_item_sub_state_message_node_in_rubbish_bin">Nie można synchronizować ani utworzyć kopii zapasowej katalogu, ponieważ katalog MEGA znajduje się w koszu</string>
-    <!-- The name for specific Sub States to indicate that the local drive cannot be located at this time -->
-    <string name="device_center_list_view_item_sub_state_message_cannot_locate_local_drive_now">Nie można teraz zlokalizować katalogu w urządzeniu, spróbuj ponownie później.</string>
-    <!-- The name for specific Sub States to indicate that the local drive cannot be located -->
-    <string name="device_center_list_view_item_sub_state_message_cannot_locate_local_drive">Nie można zlokalizować katalogu w urządzeniu</string>
-    <!-- The name for specific Sub States to indicate that a problem occurred when syncing or backing up the MEGA Folder due to some changes -->
-    <string name="device_center_list_view_item_sub_state_message_folder_backup_issue_due_to_recent_changes">Problem z synchronizacją lub tworzeniem kopii zapasowej tego katalogu z powodu zmian w katalogu MEGA. Zatrzymaj synchronizację lub kopię zapasową i spróbuj ponownie skonfigurować ją w aplikacji desktopowej lub skontaktuj się z nami.</string>
-    <!-- The name for specific Sub States to indicate that a problem occurred when syncing or backing up the MEGA Folder -->
-    <string name="device_center_list_view_item_sub_state_message_folder_backup_issue">Problem z synchronizacją lub kopią zapasową tego katalogu. Zatrzymaj synchronizację lub tworzenie kopii zapasowej i spróbuj skonfigurować je ponownie w aplikacji Desktop lub skontaktuj się z pomocą techniczną.</string>
-    <!-- The name for specific Sub States to indicate that the MEGA Folder cannot be synced or backed up as it is inside another synced MEGA Folder -->
-    <string name="device_center_list_view_item_sub_state_message_folder_backup_issue_due_to_being_inside_another_backed_up_folder">Nie można zsynchronizować katalogu, ponieważ znajduje się on już w zsynchronizowanym katalogu</string>
     <!-- The name of the Device Status informing the User that Camera Uploads is disabled for the Current Device -->
     <string name="device_center_list_view_item_status_camera_uploads_disabled">Przesyłanie z kamery wyłączone</string>
     <!-- The Error Message shown in the Rename Device Dialog when the User submits an empty Device Name -->
@@ -140,8 +76,6 @@
     <string name="device_center_device_top_menu_option_info">Info</string>
     <!-- Text to show in the Device Center for a No Network State when there is no network connectivity -->
     <string name="device_center_no_network_state">Brak połączenia z internetem</string>
-    <!-- The name of the Device or Folder Sub State when its code is LOCAL_FILESYSTEM_MISMATCH -->
-    <string name="device_center_list_view_item_sub_state_local_filesystem_mismatch">Pliki w tym katalogu nie można synchronizować ani tworzyć kopii zapasowych. Będziesz musiał ponownie włączyć synchronizację lub kopię zapasową z aplikacji desktopowej.</string>
     <!-- Text to display in Device Center for an empty state when inspecting a device where no sync or backup has been configured -->
     <string name="device_center_nothing_setup_state">Nic nie zostało jeszcze skonfigurowane</string>
     <!-- The hint text for the search bar in the Device Center feature when the User is searching for Devices -->
@@ -150,11 +84,4 @@
     <string name="device_center_top_app_bar_search_syncs_hint">Synchronizacja wyszukiwania</string>
     <!-- Text to show in the Device Center when no search results are found -->
     <string name="device_center_empty_screen_no_results">Brak wyników</string>
-    <!-- First part of string, which indicates the content of a device/folder is some folders and some files. The full string is '%1$d folders · %2$d files'. The string was split in 2 for pluralization. Middle height point is to separate two fragments of text and it was not to be considered a punctuation mark. Please keep the spaces around middle height point. -->
-    <plurals name="device_center_info_num_folders_and_files">
-        <item quantity="one">%1$d katalog&#160;·&#160;</item>
-        <item quantity="few">%1$d katalogów&#160;·&#160;</item>
-        <item quantity="many">%1$d katalogów&#160;·&#160;</item>
-        <item quantity="other">%1$d katalogów&#160;·&#160;</item>
-    </plurals>
 </resources>

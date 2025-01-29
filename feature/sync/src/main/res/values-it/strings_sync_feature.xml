@@ -34,8 +34,6 @@
         <item quantity="many">%1$d di file</item>
         <item quantity="other">%1$d file</item>
     </plurals>
-    <!-- Sync options -->
-    <string name="sync_menu_sync_options">Opzioni di sincronizzazione</string>
     <!-- Sync text when need to solved stalled issues-->
     <string name="sync_menu_clear_issues">Svuota i problemi risolti</string>
     <!-- Sync message for two way sync-->
@@ -52,14 +50,10 @@
     <string name="sync_stalled_issue_choose_latest_modified_time">Scegli l\’ultimo file modificato</string>
     <!-- Sync message when conflict resolved -->
     <string name="sync_stalled_issue_conflict_resolved">Conflitti risolti</string>
-    <!-- Sync message to access storage permission on device -->
-    <string name="sync_access_storage_permission_message">Per effettuare il backup dei tuoi file, MEGA ha bisogno di accedere ai file e alle cartelle in questo dispositivo. I tuoi dati sono sempre al sicuro con noi.</string>
     <!-- Sync dialog continue button -->
     <string name="sync_dialog_file_permission_positive_button">Continua</string>
     <!-- Sync dialog not now button -->
     <string name="sync_dialog_file_permission_negative_button">Non adesso</string>
-    <!-- Sync dialog title for storage access -->
-    <string name="sync_dialog_storage_access_title">Accedi a tutti i file</string>
     <!-- Sync dialog title for battery optimization -->
     <string name="sync_dialog_battery_optimization_title">Ottimizzazione della batteria</string>
     <!-- Sync dialog cancel button text -->
@@ -78,8 +72,6 @@
     <string name="sync_list_sync_state_syncing">Sincronizzazione&#8230;</string>
     <!-- Sync state failed -->
     <string name="sync_folders_sync_state_failed">Fermato</string>
-    <!-- Sync state synced -->
-    <string name="sync_list_sync_state_synced">Sincronizzato</string>
     <!-- Sync permission title for device storage -->
     <string name="sync_folders_device_storage">Cartella sul dispositivo</string>
     <!-- Sync permission title for mega storage -->
@@ -90,20 +82,12 @@
     <string name="sync_card_pause_sync">Pausa</string>
     <!-- Sync Run -->
     <string name="sync_card_run_sync">Riprendi</string>
-    <!-- Sync Remove -->
-    <string name="sync_card_remove_sync">Rimuovi</string>
     <!-- Sync dialog for sync over Wi-Fi or mobile data -->
     <string name="sync_dialog_message_wifi_or_mobile_data">Wi-Fi o connessione dati</string>
     <!-- Sync dialog for sync only over Wi-Fi -->
     <string name="sync_dialog_message_wifi_only">Solo Wi-Fi</string>
     <!-- Sync empty state message -->
     <string name="sync_empty_state_message">Dovrai impostare una cartella locale su tuo dispositivo che sarà sincronizzata con una cartella scelta sul tuo Cloud Drive</string>
-    <!-- Sync notification title description sync monitoring-->
-    <string name="sync_notification_monitoring_description">Monitorizzazione delle sincronizzazioni</string>
-    <!-- Snackbar message shown when Wi-Fi only sync option is selected -->
-    <string name="sync_options_changed_to_wifi_only">Opzioni della sincronizzazione cambiate in: solo Wi-Fi</string>
-    <!-- Snackbar message shown when Wi-Fi or mobile data sync option is selected -->
-    <string name="sync_options_changed_to_wifi_and_mobile_data">Opzioni della sincronizzazione cambiate in: Wi-Fi o connessione dati</string>
     <!-- Sync stalled issue reason is no reason-->
     <string name="sync_stalled_issue_no_reason">No reason</string>
     <!-- Sync stalled issue reason is no file issue-->
@@ -144,8 +128,6 @@
     <string name="sync_start_sync">Imposta una sincronizzazione</string>
     <!-- Text that indicates that a folder is currently empty -->
     <string name="sync_file_browser_empty_folder">Cartella vuota</string>
-    <!-- Selecting a specific location in MEGA. This is the text of the button -->
-    <string name="sync_general_select_to_download">Seleziona cartelle</string>
     <!-- Selecting a specific location in MEGA. This is the text of the button -->
     <string name="sync_general_select">Seleziona</string>
     <!-- Sync stalled issue reason is no file issue detailed description-->

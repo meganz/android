@@ -8,8 +8,6 @@
     <string name="general_yes">はい</string>
     <!-- Answer for confirmation dialog. -->
     <string name="general_no">いいえ</string>
-    <!-- dialog option cancel in alert dialog -->
-    <string name="general_cancel">キャンセル</string>
     <!-- When moving a file to a location in MEGA. This is the text of the button after selection the destination -->
     <string name="general_move_to">移動先</string>
     <!-- Selecting a specific location in MEGA. This is the text of the button -->
@@ -54,14 +52,10 @@
     <string name="general_already_downloaded">ダウンロード済み</string>
     <!-- Label of the option menu. When clicking this button, the app shows the info of the file -->
     <string name="general_file_info">ファイル情報</string>
-    <!-- Hint how to cancel the download -->
-    <string name="general_show_info">情報を表示</string>
     <!-- Error getting the root node -->
     <string name="error_general_nodes">エラー。もう一度やり直してください。</string>
     <!-- File name (without extension) of file exported with the recovery key -->
     <string name="general_rk">MEGA-回復キー</string>
-    <!-- when no external card exists -->
-    <string name="no_external_SD_card_detected">外部ストレージが検出されませんでした</string>
     <!-- Button where the user can sign off or logout -->
     <string name="action_logout">ログ&#160;アウト</string>
     <!-- Item menu option upon right click on one or multiple files. -->
@@ -116,8 +110,6 @@
     </plurals>
     <!-- Alert text before download. Please do not modify the %s placeholder as it will be replaced by the size to be donwloaded -->
     <string name="alert_larger_file">%sがダウンロードされます。</string>
-    <!-- Alert text before download -->
-    <string name="alert_no_app">ファイル%sを開くアプリがありません。ダウンロードを続行しますか？</string>
     <!-- Dialog option that permits user do not show it again -->
     <string name="checkbox_not_show_again">次回から表示しない</string>
     <!-- Press back while login to cancel current login process. -->
@@ -276,10 +268,6 @@
     <plurals name="upload_began">
         <item quantity="other">%1$d個のアップロードが開始されました</item>
     </plurals>
-    <!-- Message when many downloads finish. Plural more than 1 file. Placeholder is for include the number of uploads in runtime. -->
-    <plurals name="upload_finish">
-        <item quantity="other">%1$d個のアップロードが完了しました</item>
-    </plurals>
     <!-- Hint how to cancel the download -->
     <string name="download_touch_to_show">転送を表示</string>
     <!-- message when trying to open a downloaded file but there isn’t any app that open that file. Example: a user downloads a pdf but doesn’t have any app to read a pdf -->
@@ -358,10 +346,6 @@
     <string name="context_contact_invitation_resent">要求を再送信しました</string>
     <!-- success message when sending a contact request -->
     <string name="context_contact_request_sent">要求が%sさんに送信されました。「送信済み要求」タブで表示します。</string>
-    <!-- success message when removing a contact -->
-    <string name="context_contact_removed">連絡先を削除しました</string>
-    <!-- error message -->
-    <string name="context_contact_not_removed">エラー。連絡先が削除されていません</string>
     <!-- success message when chaning the permissionss -->
     <string name="context_permissions_changed">権限を変更しました</string>
     <!-- message when trying to create a folder that already exists -->
@@ -668,10 +652,6 @@
     <string name="six_pin_lock">6桁</string>
     <!-- Passcode alphanumeric -->
     <string name="AN_pin_lock">英数字</string>
-    <!-- Confirmation message when enabling logs in the app -->
-    <string name="settings_enable_logs">ログが有効になりました</string>
-    <!-- Confirmation message when disabling logs in the app -->
-    <string name="settings_disable_logs">ログが無効になりました</string>
     <!-- Option in the sliding panel to open the folder which contains the file selected after performing a search -->
     <string name="search_open_location">場所を開く</string>
     <!-- message when a temporary error on logging in is due to SDK is waiting for the server to complete a request due to an API lock -->
@@ -738,24 +718,12 @@
     <string name="text_dialog_insert_MK">以下にあなたの回復キーを入力してください</string>
     <!-- Text of the alert when the pass has been correctly changed -->
     <string name="pass_changed_alert">パスワードを変更しました。</string>
-    <!-- Title of the dialog to park an account -->
-    <string name="park_account_dialog_title">アカウントを放っておく</string>
-    <!-- Button to park an account -->
-    <string name="park_account_button">放置</string>
-    <!-- Text shown in the last alert dialog to park an account -->
-    <string name="park_account_text_last_step">これは、あなたのアカウントをそのままにしておくための最後のステップです。新しいパスワードを入力してください。あなたのデータは少なくとも60日間は保持されます。そのままにしておいたアカウントのパスワードを思い出された場合は、support&#64;mega.nzまでご連絡ください。</string>
     <!-- Title of the screen to write the new password after opening the recovery link -->
     <string name="title_enter_new_password">新しいパスワードを入力</string>
     <!-- Message when the user tries to open a recovery pass link and it has expired -->
     <string name="recovery_link_expired">この回復リンクの有効期限が切れています。もう一度やり直してください。</string>
     <!-- Text of the alert after opening the recovery link to reset pass being logged. -->
     <string name="text_reset_pass_logged_in">回復キーは、パスワードのリセットに使用されます。新しいパスワードを入力してください。</string>
-    <!-- Button to upgrade the account to PRO account in My Account Section -->
-    <string name="my_account_upgrade_pro">アップグレード</string>
-    <!-- Button to upgrade the account to PRO account in the panel that appears randomly -->
-    <string name="my_account_upgrade_pro_panel">今すぐアップグレード</string>
-    <!-- Message to promote PRO accounts -->
-    <string name="get_pro_account">あなたのクラウドを育てましょう。[A]ぜひProアカウントで、ストレージと転送容量を増やしてください。</string>
     <!-- Error shown when the user tries to change his mail to one that is already used -->
     <string name="mail_already_used">そのメールアドレスはすでに使用されています。別のメールアドレスをご入力ください。</string>
     <!-- Error shown when the user tries to change his mail while the user has already requested a confirmation link for that email address -->
@@ -834,12 +802,6 @@
     <string name="section_chat">チャット</string>
     <!-- Confirmation button of the dialog to archive a chat -->
     <string name="tab_archive_chat">アーカイブ</string>
-    <!-- Initial of the word hour to show the duration of a video or audio call -->
-    <string name="initial_hour">時間</string>
-    <!-- Initial of the word minute to show the duration of a video or audio call -->
-    <string name="initial_minute">分</string>
-    <!-- Initial of the word second to show the duration of a video or audio call -->
-    <string name="initial_second">秒</string>
     <!-- Title shown when multiselection is enable in chat tabs -->
     <string name="selected_items">%d件が選択されました</string>
     <!-- Message to confirm if the user wants to delete a contact from a shared folder -->
@@ -916,10 +878,6 @@
     <string name="add_participants_menu_item">参加者を追加</string>
     <!-- Menu item to remove a participants from a chat -->
     <string name="remove_participant_menu_item">参加者を削除</string>
-    <!-- Message about MEGA when there are no message in the chat screen -->
-    <string name="mega_info_empty_screen">ゼロ知識暗号化でチャットを保護し、必須の安全保証をご提供いたします。</string>
-    <!-- Message about MEGA when there are no message in the chat screen -->
-    <string name="mega_authenticity_empty_screen">このシステムは、受信したデータが真に指定された送信者からのものであり、そのコンテンツが転送中に操作されていないことを保証します。</string>
     <!-- Message about MEGA when there are no message in the chat screen -->
     <string name="mega_confidentiality_empty_screen">作者と意図された受信者のみがコンテンツを復号して読むことができます。</string>
     <!-- Message about MEGA when there are no message in the chat screen -->
@@ -1087,10 +1045,6 @@
     <string name="general_enable">有効にする</string>
     <!-- Positive confirmation to allow MEGA to read contacts book. -->
     <string name="general_allow">許可</string>
-    <!-- Dialog to confirm the action of enabling logs -->
-    <string name="enable_log_text_dialog">ログには、アカウントに関連する情報が含めることができます</string>
-    <!-- Dialog to confirm the reconnect action -->
-    <string name="confirmation_to_reconnect">ネットワーク接続が回復しました。MEGAに接続しますか？</string>
     <!-- Error when a message cannot be edited -->
     <string name="error_editing_message">このメッセージは編集できません</string>
     <!-- Label of the modal bottom sheet to clear completed transfers -->
@@ -1163,14 +1117,6 @@
     <string name="text_depleted_transfer_overquota">このIPアドレスの転送容量を超えました。アカウントをアップグレードするか、%s待ってからダウンロードを続行してください。</string>
     <!-- Button to show plans in the alert when the transfer quota is depleted -->
     <string name="plans_depleted_transfer_overquota">計画を参照</string>
-    <!-- Button option of the alert when the transfer quota is depleted -->
-    <string name="continue_without_account_transfer_overquota">アカウントを作成せず続ける</string>
-    <!-- this is used for example when downloading 1 file or 2 files, Plural of file. 2 files -->
-    <plurals name="new_general_num_files">
-        <item quantity="other">%1$dファイル</item>
-    </plurals>
-    <!-- Menu option -->
-    <string name="general_view">ファイルを表示</string>
     <!-- Menu option to choose to add file or folders to Cloud Drive -->
     <string name="add_to_cloud">クラウドドライブに追加する</string>
     <!-- Menu option to choose to add file to Cloud Drive in the chat -->
@@ -1183,8 +1129,6 @@
     <string name="chat_connecting">接続中&#8230;</string>
     <!-- message when trying to invite a contact with a pending request -->
     <string name="context_contact_already_invited">%sさんはすでに招待されました。保留中の要求を確認してください。</string>
-    <!-- Hint text explaining that you can change the email and resend the create account link to the new email address -->
-    <string name="confirm_email_misspelled">メールアドレスのスペルを間違った場合、それを修正して[A]再送信[A]をタップしてください。</string>
     <!-- Button to resend the create account email to a new email address in case the previous email address was misspelled -->
     <string name="confirm_email_misspelled_resend">再送</string>
     <!-- Text shown after the confirmation email has been sent to the new email address -->
@@ -1275,8 +1219,6 @@
     <string name="contact_is_me">使用可能なオプションはありません。自分自身を選択しました</string>
     <!-- Confirmation before deleting one attachment -->
     <string name="confirmation_delete_one_attachment">添付ファイルを削除しますか？</string>
-    <!-- Menu option -->
-    <string name="general_view_with_revoke">ファイルを表示（%1$d件が削除済み）</string>
     <!-- Message sound option when no sound has been selected for chat notifications -->
     <string name="settings_chat_silent_sound_not">サイレント</string>
     <!-- part of the string in incoming shared folder notification -->
@@ -1423,10 +1365,6 @@
     <string name="rate_the_app_panel">はい、アプリを評価します</string>
     <!-- Label to show send feedback -->
     <string name="send_feedback_panel">いいえ、意見を送信します</string>
-    <!-- Message to show when users deny to permit the permissions to read and write on external storage on setting default download location -->
-    <string name="download_requires_permission">MEGAは、外部ストレージにファイルをダウンロードするために、外部ストレージの読み取り権限と書き込み権限が必要です。</string>
-    <!-- Default download location is on old sd card, but currently the user installed a new SD card, need user to reset download location. -->
-    <string name="old_sdcard_unavailable">古いSDカードは使用できません。新しいダウンロード場所を設定してください。</string>
     <!-- Title of the section to invite contacts if the user has denied the contacts permmissions -->
     <string name="no_contacts_permissions">連絡先権限が付与されていません</string>
     <!-- Option of the sliding panel to go to QR code section -->
@@ -1483,8 +1421,6 @@
     <string name="button_copy_link">リンクをコピー</string>
     <!-- Create QR code -->
     <string name="button_create_qr">QRコードを作成</string>
-    <!-- Text shown in QR code scan fragment to help and guide the user in the action -->
-    <string name="qrcode_scan_help">QRコードを整列させて、端末のカメラでスキャンします</string>
     <!-- positive button on dialog to view a contact -->
     <string name="contact_view">表示</string>
     <!-- Item menu option to reproduce audio or video in external reproductors -->
@@ -1545,8 +1481,6 @@
     <string name="button_notification_call_in_progress">通話に戻る</string>
     <!-- When it lists contacts of phone, the title of list’s header -->
     <string name="contacts_phone">電話連絡先</string>
-    <!-- In a chat conversation when you try to send device’s images but images are still loading -->
-    <string name="file_storage_loading">ファイルを読み込んでいます</string>
     <!-- Size in bytes. The placeholder is for the size value, please adjust the position based on linguistics -->
     <string name="label_file_size_byte">%s&#160;B</string>
     <!-- Size in kilobytes. The placeholder is for the size value, please adjust the position based on linguistics -->
@@ -1668,8 +1602,6 @@
     <string name="recovery_key_bottom_sheet">回復キー</string>
     <!-- Option that permits user save on File System -->
     <string name="option_save_on_filesystem">ファイルシステムに保存</string>
-    <!-- Title of the notification shown on the action bar when there is a incoming call -->
-    <string name="notification_subtitle_incoming">着信</string>
     <!-- Subtitle to show the number of unread messages on a chat, unread messages -->
     <plurals name="number_unread_messages">
         <item quantity="other">%1$s件の未読メッセージ</item>
@@ -1838,8 +1770,6 @@
     <string name="archived_chats_title_section">アーカイブ済み</string>
     <!-- Text of the option to show the arhived chat, it shows the number of archived chats -->
     <string name="archived_chats_show_option">アーカイブ済み（%d）</string>
-    <!-- Title of the option on the chat list to archive a chat -->
-    <string name="archive_chat_option">アーカイブ</string>
     <!-- Confirmation button of the dialog to archive a chat -->
     <string name="general_archive">アーカイブ</string>
     <!-- Confirmation button of the dialog to unarchive a chat -->
@@ -1938,8 +1868,6 @@
     <string name="title_mail_upgrade_plan">カスタムプランにアップグレード</string>
     <!-- Mail subject to upgrade to a custom plan -->
     <string name="subject_mail_upgrade_plan">カスタムプランにアップグレードする方法をお問い合わせください：</string>
-    <!-- Used in chat list screen to indicate in a chat list item that the message was sent by me, followed by the message -->
-    <string name="word_me">私：</string>
     <!-- Title of the button in the contact info screen to start an audio call -->
     <string name="call_button">通話</string>
     <!-- Title of the button in the contact info screen to send a message -->
@@ -2036,8 +1964,6 @@
     <string name="subtitle_chat_message_enabled_ERK">暗号化キーローテーションでは安全性が少し高まりますが、チャットリンクを作成できず、新規参加者は過去のメッセージを見れません。</string>
     <!-- Message shown when a contact request has not been sent because the invitation has been sent before -->
     <string name="invite_not_sent_already_sent">%sさんに連絡するための招待状は以前に送信され、「送信済み要求」タブで照会できます。</string>
-    <!-- Label shown to indicate the QR is saving in Cloud Drive -->
-    <string name="save_qr_cloud_drive">クラウドドライブに%sを保存中&#8230;</string>
     <!-- General label for files -->
     <string name="general_files">ファイル</string>
     <!-- Item menu option upon right click on one or multiple files -->
@@ -2072,8 +1998,6 @@
     <string name="subtitle_contact_notification_blocked">[A]%s [/A][B]さんはあなたを連絡先としてブロックしました。[/B]</string>
     <!-- Item of the navigation title for the notification section when there is any unread -->
     <string name="section_notification_with_unread">通知[A](%1$d)[/A]</string>
-    <!-- Text shown in the notifications section. When a contact has nickname, nickname (email) will be shown -->
-    <string name="section_notification_user_with_nickname">[A]%1$s (%2$s)[/A]</string>
     <!-- Title of the historic notification for an account deleted -->
     <string name="title_account_notification_deleted">削除されたアカウント</string>
     <!-- Subtitle of the historic notification for an account deleted -->
@@ -2114,16 +2038,12 @@
     <string name="subtitle_incoming_contact_request_accepted">[B][A]%s [/A]さんからの連絡先要求[/B]は[B]受け入れられました[/B]</string>
     <!-- Subtitle of the historic notification for incoming contact request declined -->
     <string name="subtitle_incoming_contact_request_denied">[B][A]%s [/A]さんからの連絡先要求[/B]は[B]拒否されました[/B]</string>
-    <!-- Footnote to clarify the storage space is subject to the achievement program -->
-    <string name="footnote_achievements">当社の達成プログラムにご参加いただくことを条件とします。</string>
     <!-- dialog option cancel in alert dialog -->
     <string name="button_cancel">キャンセル</string>
     <!-- dialog option continue in alert dialog -->
     <string name="button_continue">続行</string>
     <!-- one of the payment methods -->
     <string name="payment_method_google_wallet">[A]Google Pay[/A]（サブスクリプション）</string>
-    <!-- Capital letters. Text of the label of a new historic notifications -->
-    <string name="new_label_notification_item">新</string>
     <!-- Input field description in the create file dialog. -->
     <string name="context_new_file_name_hint">ファイル名</string>
     <!-- Option in Settings section to enable the last active connection in chat -->
@@ -2208,12 +2128,6 @@
     <string name="allow_acces_camera_subtitle">あなたのカメラへのアクセスを許可して、ドキュメントのスキャン、写真の撮影、ビデオ通話を行います。</string>
     <!-- Title of the screen asking permissions for microphone and write in log calls -->
     <string name="allow_acces_calls_title">通話を有効にする</string>
-    <!-- Title of the screen asking permissions for contacts -->
-    <string name="allow_acces_contact_title">アドレス帳へのアクセスを許可する</string>
-    <!-- Subtitle of the screen asking permissions for contacts -->
-    <string name="allow_acces_contact_subtitle">MEGAのあなたのアドレス帳から連絡先を簡単に見つけます。</string>
-    <!-- Explanation under the subtitle of asking permissions for contacts to explain that MEGA will never use the address book data for any other purpose -->
-    <string name="allow_access_contact_explanation">MEGAはこのデータを他の目的に使用せず、あなたの同意なしにあなたの連絡先とやり取りすることは絶対にございません。</string>
     <!-- Subtitle of the screen asking permissions for microphone -->
     <string name="allow_acces_calls_subtitle_microphone">あなたのマイクへのアクセスを許可して、暗号化通話を行います。</string>
     <!-- Title of the option on chat info screen to list all the files sent to the chat -->
@@ -2252,8 +2166,6 @@
     <string name="context_empty_shared_files">[A]共有ファイル[/A]は[B]ありません[/B]</string>
     <!-- Message show when a call cannot be established because there are too many participants in the group call -->
     <string name="call_error_too_many_participants">最大参加者数を超えてしまったため、通話に参加できません。</string>
-    <!-- Message show when a user cannot put the call on hold -->
-    <string name="call_error_call_on_hold">通話を保留できません。</string>
     <!-- Error message shown when a file cannot be opened by other app using the open with option menu -->
     <string name="error_open_file_with">エラーが発生したため、このアプリではファイルを開くことができません。</string>
     <!-- Subtitle of the call screen when a outgoing call is just starting -->
@@ -2284,14 +2196,6 @@
     </plurals>
     <!-- Title of a chat message that contains geolocation info -->
     <string name="title_geolocation_message">ピン留めされた場所</string>
-    <!-- Alert shown when a num of files have not been sent because of any error occurs, Plural of file. 2 files -->
-    <plurals name="num_files_not_send">
-        <item quantity="other">%d個のファイルが%dチャットに送信されませんでした</item>
-    </plurals>
-    <!-- Alert shown when a num of contacts have not been sent because of any error occurs, Plural of file. 2 files -->
-    <plurals name="num_contacts_not_send">
-        <item quantity="other">%d個の連絡先が%dチャットに送信されませんでした</item>
-    </plurals>
     <!-- Alert shown when a num of messages have not been sent because of any error occurs, Plural of file. 2 files -->
     <plurals name="num_messages_not_send">
         <item quantity="other">%d個のメッセージが%d個のチャットに送信されませんでした</item>
@@ -2392,8 +2296,6 @@
     <string name="text_join_call">この通話に参加するには、現在の通話を終了する必要があります。</string>
     <!-- Text of the dialog shown when you want to join a group call but you are in another active call -->
     <string name="text_join_another_call">この通話に参加するには、現在の通話を終了または保留する必要があります。</string>
-    <!-- Explanation of the dialog shown to share a chat link -->
-    <string name="copy_link_explanation">このリンクを使用すると、人々はあなたのグループに参加できます。</string>
     <!-- Title of the dialog shown when the user it is creating a chat link and the chat has not title -->
     <string name="enter_group_name">グループ名を入力</string>
     <!-- Alert shown when the user it is creating a chat link and the chat has not title -->
@@ -2482,8 +2384,6 @@
     <string name="usage_storage_details_label">ストレージ使用量の内訳</string>
     <!-- Title of transfer section in Storage -->
     <string name="transfer_label">転送</string>
-    <!-- Error shown when a Business account user (sub-user or admin) tries to remove a contact which is part of the same Business account. Please, keep the placeholder, it will be replaced with the name or email of the account, for example: Jane Appleseed or ja@mega.nz -->
-    <string name="error_remove_business_contact">%1$sさんはあなたのビジネスアカウントの一部であるため、連絡先から削除できません。</string>
     <!-- When logging in during the grace period, the administrator of the Business account will be notified that their payment is overdue, indicating that they need to access MEGA using a desktop browser for more information -->
     <string name="grace_period_admin_alert">最後のお支払いで問題がありました。詳細については、デスクトップブラウザを使用してMEGAにアクセスしてください。</string>
     <!-- Message shown when users with a business account (no administrators of a business account) try to enable the Camera Uploads, to advise them that the administrator do have the ability to view their data. -->
@@ -2542,8 +2442,6 @@
     <string name="phonenumber_title">電話番号</string>
     <!-- Text shown in a call when it is trying to reconnect after lose the internet connection -->
     <string name="reconnecting_message">再接続中</string>
-    <!-- Text is displayed while a voice clip is being recorded -->
-    <string name="recording_layout">録音中&#8230;</string>
     <!-- Text shown for the action create new file -->
     <string name="create_new_file_action">新規ファイルを作成</string>
     <!-- Error title shown when you are trying to do an action with a file or folder and you don’t have the necessary permissions -->
@@ -2644,8 +2542,6 @@
     <string name="section_documents">ドキュメント</string>
     <!-- Label of the floating action button of opening the new chat conversation -->
     <string name="fab_label_new_chat">新しいチャット</string>
-    <!-- Text that indicates that there’s no image to show in image section -->
-    <string name="homepage_empty_hint_photos">[B][/B][A]画像[/A][B]が見つかりません[/B]</string>
     <!-- Text that indicates that there’s no document to show. The format placeholders are to showing it in different colors. -->
     <string name="homepage_empty_hint_documents">[B][/B][A]ドキュメント[/A][B]が見つかりません[/B]</string>
     <!-- Text that indicates that there’s no audio to show. The format placeholders are to showing it in different colors. -->
@@ -2852,12 +2748,8 @@
     <string name="discard_changes_warning">変更内容を破棄してエディタを閉じてもよろしいですか？</string>
     <!-- Action discard -->
     <string name="discard_close_action">廃棄して閉じる</string>
-    <!-- Label indicating a file was created successfully -->
-    <string name="file_created">ファイルが作成されました</string>
     <!-- Warning indicating a file was not created successfully -->
     <string name="file_creation_failed">ファイルの作成に失敗しました。もう一度やり直してください。</string>
-    <!-- Label indicating a file was updated successfully -->
-    <string name="file_updated">ファイルが更新されました</string>
     <!-- Warning indicating a file was not updated successfully -->
     <string name="file_update_failed">ファイルの更新に失敗しました。もう一度やり直してください。</string>
     <!-- Warning which alerts the user a file cannot be opened -->
@@ -3094,8 +2986,6 @@
     <string name="left_meeting_join_title">お客様のプライバシーは重要です</string>
     <!-- the content of join without account on left meeting page-->
     <string name="left_meeting_join_content">世界最大の安全なクラウドストレージとコラボレーションプラットフォームにご参加ください。</string>
-    <!-- the bonus title of join without account on left meeting page-->
-    <string name="left_meeting_bonus_title">20 &#160;GBを無料で入手</string>
     <!-- the bonus content of join without account on left meeting page-->
     <string name="left_meeting_bonus_content">今すぐ登録して、高度なコラボレーション機能を無料でお楽しみください。</string>
     <!-- Content of ongoing call for MaterialAlertDialog-->
@@ -3156,8 +3046,6 @@
     <string name="contact_already_invited">すでに%1$sさんを招待しています</string>
     <!-- Warning shown informing the contact request has been sent and can be managed in sent requests section. -->
     <string name="contact_invited">招待状を送信しました。送信済み要求をご確認ください。</string>
-    <!-- Message when file available offline. -->
-    <string name="file_available_offline">オフラインで利用できるファイル</string>
     <!-- Message when file removed from offline. -->
     <string name="file_removed_offline">オフラインから削除されたファイル</string>
     <!-- Menu option to open a link. Also title of the dialog to open a link. -->
@@ -3262,8 +3150,6 @@
     <string name="media_player_audio_playlist_next">次</string>
     <!-- Previous audios have been already played in the audio playlist -->
     <string name="media_player_audio_playlist_previous">前</string>
-    <!-- Next videos to be played in the video playlist -->
-    <string name="media_player_video_playlist_next">次</string>
     <!-- Previous videos have been already played in the video playlist -->
     <string name="media_player_video_playlist_previous">前</string>
     <!-- Setting option available to choose for the preferred start screen. -->
@@ -3318,16 +3204,10 @@
     <string name="settings_passcode_enter_password_title">パスワードを入力</string>
     <!-- Resume to paused transfers snack bar description text -->
     <string name="resume_paused_transfers_text">転送は一時停止しています。再開するとダウンロードが続行します。</string>
-    <!-- Warning of the scanning transfers dialog. It warns about not closing the app because the transfers will be lost. -->
-    <string name="warning_scanning_transfers">アプリケーションを閉じないでください。</string>
     <!-- Stage of the scanning transfers dialog indicating transfers are scanning. -->
     <string name="scanning_transfers">スキャン中&#8230;</string>
     <!-- Label cancel transfers. -->
     <string name="cancel_transfers">転送をキャンセル</string>
-    <!-- Warning informing what will happen if proceed on cancelling transfers. -->
-    <string name="warning_cancel_transfers">まだ処理されていない転送はキャンセルされます。</string>
-    <!-- Button which dismisses the warning and proceeds with the cancel transfers action. -->
-    <string name="button_proceed">進む</string>
     <!-- Warning informing transfers were cancelled. -->
     <string name="transfers_cancelled">転送はキャンセルされました。</string>
     <!-- Title of the screen where a name collision has been detected and some options to choose are shown to the user. -->
@@ -3420,8 +3300,6 @@
     <string name="settings_help_report_issue">問題を報告</string>
     <!-- Report issue fragment instructions-->
     <string name="settings_help_report_issue_instructions">お客様のご意見は、MEGAをより良くするための参考となります。ご経験された問題を明確に記述してください。より詳細な情報をご提供いただくことで、より簡単に解決できます。</string>
-    <!-- Hint text for the description field on the report issue screen-->
-    <string name="settings_help_report_issue_description_label">問題を記述</string>
     <!-- Label for the switch to enable attaching logs when reporting an issue-->
     <string name="settings_help_report_issue_attach_logs_label">ログファイル送信</string>
     <!-- Error message when there is no connectivity when reporting an issue-->
@@ -3440,12 +3318,8 @@
     <string name="settings_help_report_issue_discard_button">破棄する</string>
     <!-- Text shown when editing a chatroom message -->
     <string name="edit_chat_message">メッセージの編集</string>
-    <!-- Title of the voice call option displayed in the chat room toolbar -->
-    <string name="chat_room_toolbar_voice_call_option">ボイス</string>
     <!-- Title of the scan option displayed in the chat room toolbar -->
     <string name="chat_room_toolbar_scan_option">スキャン</string>
-    <!-- Title of the voice clip option displayed in the chat room toolbar -->
-    <string name="chat_room_toolbar_voice_clip_option">ボイスクリップ</string>
     <!-- Title of the gif option displayed in the chat room toolbar -->
     <string name="chat_room_toolbar_gif_option">GIF</string>
     <!-- Filter option on Photos/Timeline -->
@@ -3472,10 +3346,6 @@
     <string name="calls_call_screen_bottom_panel_leave_call_option">通話から離れる</string>
     <!-- Option in bottom panel to end call for all, displayed on the group call and meeting screen -->
     <string name="calls_call_screen_bottom_panel_end_call_for_all_option">全員に対して終了</string>
-    <!-- Title of the dialog that indicates you are the only moderator of the meeting, displayed on meeting screen -->
-    <string name="meeting_call_screen_title_of_bottom_panel_to_assign_another_host">主催者を設定</string>
-    <!-- Description of the dialog that indicates you are the only host of the meeting, displayed on meeting screen -->
-    <string name="meeting_call_screen_description_of_bottom_panel_to_assign_another_host">通話の主催者はあなただけです。通話から離れる前に別の主催者を任命しますか？</string>
     <!-- Yes button for the confirmation dialog before removing the outgoing shares of several folders. -->
     <string name="shared_items_outgoing_unshare_confirm_dialog_button_yes">はい</string>
     <!-- No button for the confirmation dialog before removing the outgoing shares of several folders. -->
@@ -3520,20 +3390,8 @@
     <string name="calls_call_screen_waiting_for_participants">他の人が参加するのを待機中</string>
     <!-- Text that indicates that there’s no favourite to show. The format placeholders are to showing it in different colors. -->
     <string name="homepage_empty_hint_favourites">[B][/B][A]お気に入り[/A][B]が見つかりません[/B]</string>
-    <!--Action text to start a conversation from Recent Chat screen empty view-->
-    <string name="chat_recent_list_empty_action">今すぐチャットを開始</string>
-    <!--Description text from Recent Chat screen empty view-->
-    <string name="chat_recent_list_empty_description">誰とでも、どんな端末でも、安全かつ非公開にチャットができます。誰も、MEGAでさえも、あなたのチャットを読むことはできませんので、ご安心ください。</string>
     <!-- Action to indicate immediate meeting creation -->
     <string name="action_start_meeting_now">今すぐミーティングを開始</string>
-    <!-- Label for call option on settings -->
-    <string name="settings_calls_preferences">通話</string>
-    <!-- Label for the sound notifications option on calls settings -->
-    <string name="settings_calls_preferences_sound_notifications">サウンド通知</string>
-    <!-- Text for the sound notifications option on calls settings -->
-    <string name="settings_calls_preferences_sound_notifications_text">誰かが通話に参加または退出したときに音を聞きます。</string>
-    <!-- Text indicating a text file was saved to Cloud drive -->
-    <string name="text_editor_creation_success">ファイルがクラウドドライブに保存されました。</string>
     <!-- Warning indicating a text file was not saved to Cloud Drive. -->
     <string name="text_editor_creation_error">ファイルがクラウドドライブに保存されませんでした。もう一度試してみてください。</string>
     <!-- Action label to start images slideshow -->
@@ -3714,26 +3572,12 @@
     <string name="video_playback_position_dialog_restart_button">再起動</string>
     <!-- User Alert notification for new scheduled meeting. %s placeholder is for the email of whom has invited you to the scheduled meeting. [A][A/] and [B][/B] format placeholders are to bold text if required - e.g: zadiesmith@hotmail.com invited you to a meeting scheduled for: -->
     <string name="notification_subtitle_scheduled_meeting_new">[A]%s [/A][B]さんが以下に予定されたミーティングにあなたを招待しました：[/B]</string>
-    <!-- User Alert notification for canceled scheduled meeting -->
-    <string name="notification_subtitle_scheduled_meeting_canceled">[B]以下に予定されたミーティングを[/B][A]%sさんがキャンセルしました[/A]：</string>
     <!-- User Alert notification for scheduled meeting title change -->
     <string name="notification_subtitle_scheduled_meeting_updated_title">[A]%sさんがミーティング名を「%s」から[/B]「[A]%s[/A]」に更新しました[/A][B]</string>
-    <!-- User Alert notification for scheduled meeting date change -->
-    <string name="notification_subtitle_scheduled_meeting_updated_date">[B]ミーティングの日付を[/B][A]%sさんが更新しました[/A]</string>
-    <!-- User Alert notification for scheduled meeting time change -->
-    <string name="notification_subtitle_scheduled_meeting_updated_time">[B]ミーティングの時間を[/B][A]%sさんが更新しました[/A]</string>
     <!-- User Alert notification for scheduled meeting description change -->
     <string name="notification_subtitle_scheduled_meeting_updated_description">[B]ミーティングの説明を[/B][A]%sさんが更新しました[/A]</string>
-    <!-- User Alert notification for scheduled meeting fields change -->
-    <string name="notification_subtitle_scheduled_meeting_updated_multiple">[B]以下に予定されたミーティングの詳細を[/B][A]%sさんが更新しました[/A]：</string>
-    <!-- Title of the dialog when permission is denied and it's required to upload content -->
-    <string name="dialog_title_media_permissions_denied">アクセスが拒否されました</string>
-    <!-- Content of the dialog when permission is denied and it's required to upload content -->
-    <string name="dialog_content_media_permissions_denied">デバイスのストレージとメディアファイルへのMEGAアクセスを拒否しました。共有を続けたい場合は、MEGA権限を許可してください。</string>
     <!-- Positive action button of the dialog when permission is denied and it's required to upload content. Clicking it will redirect to settings screen of device -->
     <string name="dialog_positive_button_allow_permission">権限を許可</string>
-    <!-- Negative action button of the dialog when permission is denied and it's required to upload content. Clicking it will close the dialog -->
-    <string name="dialog_negative_button_do_not_allow">許可しない</string>
     <!-- Option of a recurring meeting in meeting list to view occurrences -->
     <string name="meetings_list_recurring_meeting_occurrences_option">開催</string>
     <!-- Subtitle of recurring meeting info screen when the recurrence occurs daily -->
@@ -3752,16 +3596,8 @@
     <string name="notification_subtitle_scheduled_recurring_meeting_new">[A]%s [/A][B]さんが以下に予定された定期的なミーティングにあなたを招待しました：[/B]</string>
     <!-- User Alert notification for scheduled recurring meeting description change -->
     <string name="notification_subtitle_scheduled_recurring_meeting_updated_description">[B]定期的なミーティングの説明を[/B][A]%sさんが更新しました[/A]</string>
-    <!-- User Alert notification for scheduled recurring meeting fields change -->
-    <string name="notification_subtitle_scheduled_recurring_meeting_updated_multiple">[B]以下に予定された定期的なミーティングの詳細を[/B][A]%sさんが更新しました[/A]：</string>
-    <!-- User Alert notification for scheduled recurring meeting occurrence change -->
-    <string name="notification_subtitle_scheduled_recurring_meeting_updated_occurrence">[B]開催日時を[/B][A]%sさんが更新しました[/A]：</string>
-    <!-- User Alert notification for scheduled recurring meeting time change -->
-    <string name="notification_subtitle_scheduled_recurring_meeting_updated_time">[B]定期的なミーティングの時間を[/B][A]%sさんが更新しました[/A]</string>
     <!-- User Alert notification for canceled scheduled recurring meeting -->
     <string name="notification_subtitle_scheduled_recurring_meeting_canceled">[B]以下のミーティングとそのすべての開催を[/B][A]%sさんがキャンセルしました[/A]：</string>
-    <!-- User Alert notification for canceled occurrences of a scheduled recurring meeting -->
-    <string name="notification_subtitle_scheduled_recurring_meeting_occurrence_canceled">[B]以下に予定された開催日時を[/B][A]%sさんがキャンセルしました[/A]：</string>
     <!-- Error message for the alert shown when opening a change email verification link with an account that not corresponds to the link -->
     <string name="account_change_email_error_not_logged_with_correct_account_message">このリンクは、現在ログインしているアカウントでは生成されていません。このリンクに関連するアカウントにログインして、メールアドレスを認証してください。</string>
     <!-- Title of the error message for the alert shown when opening a change email verification link with an account that not corresponds to the link -->
@@ -4294,14 +4130,6 @@
     </plurals>
     <!-- The select time dialog in schedule meeting -->
     <string name="meetings_schedule_meeting_enter_time_title_dialog">時間を入力してください</string>
-    <!-- Label for the meeting invitations option on calls settings -->
-    <string name="settings_calls_preferences_meeting_invitations">ミーティング招待</string>
-    <!-- Text for the meeting invitations option on calls settings -->
-    <string name="settings_calls_preferences_meeting_invitations_text">Notify me when someone invites me to a meeting</string>
-    <!-- Label for the meeting reminders option on calls settings -->
-    <string name="settings_calls_preferences_meeting_reminders">Meeting reminders</string>
-    <!-- Text for the meeting reminders option on calls settings -->
-    <string name="settings_calls_preferences_meeting_reminders_text">Notify me 15 minutes before the meetings starts and on the time the meeting is schedule to start</string>
     <!-- Notification description for scheduled meetings that starts in 15 minutes -->
     <string name="notification_sched_meeting_starts_15_minutes">ミーティングが15分後に開始します</string>
     <!-- Notification description for scheduled meetings that starts now -->
@@ -4590,10 +4418,6 @@
     <string name="meetings_schedule_meeting_end_recurrence_label">定期開催を終了する</string>
     <!-- Title of Ends section in Custom Recurrence screen -->
     <string name="meetings_custom_recurrence_ends_section">終了</string>
-    <!--Action text to start a conversation from Meeting List screen empty view-->
-    <string name="meeting_list_empty_action">ミーティングを開始</string>
-    <!--Description text from Meeting List screen empty view-->
-    <string name="meeting_list_empty_description">世界中の友人や同僚と、安全かつプライベートな音声通話やビデオ通話ができます。</string>
     <!-- Title of the confirmation dialog to cancel a scheduled meeting -->
     <string name="meetings_cancel_scheduled_meeting_dialog_title">「%1$s」をキャンセルしますか？</string>
     <!-- Message of the confirmation dialog to cancel a scheduled meeting when the chat history is empty -->
@@ -4794,12 +4618,8 @@
     <string name="dialog_onboarding_get_pro_title">Proプランでさらに充実</string>
     <!-- Short description about Pro plans on Onboarding dialog (for user to choose account - Free or Pro). %1$s placeholder will be replaced with correct localised price (e.g. $4.99). -->
     <string name="dialog_onboarding_get_pro_description">Proプランにアップグレードしていただくと、ストレージが増え、各種Pro機能をご利用いただけるようになります。プランは月額%1$sからご利用いただけます。</string>
-    <!-- Title about features available on Pro plan on Onboarding dialog (for user to choose account - Free or Pro).  -->
-    <string name="dialog_onboarding_some_features_title">MEGA&#160;Proプランには次のものが含まれます：</string>
     <!-- Title for Storage feature on Onboarding dialog (for user to choose account - Free or Pro).  -->
     <string name="dialog_onboarding_feature_title_storage">究極のストレージの柔軟性</string>
-    <!-- Description about Storage feature on Onboarding dialog (for user to choose account - Free or Pro). %1$s placeholder will be replaced with correct localised storage size (e.g. 400GB or 2TB)  -->
-    <string name="dialog_onboarding_feature_description_storage">%1$sから始めて、お客様のストレージのニーズに最適なものを見つけてください。</string>
     <!-- Title for Button to view Pro plans on Onboarding dialog (for user to choose account - Free or Pro). After clicking on the button user will redirecting to Upgrade Account screen.  -->
     <string name="dialog_onboarding_button_view_pro_plan">今すぐProにアップグレード</string>
     <!-- Label indicating that a participant is presenting in the main view of the call -->
@@ -4854,8 +4674,6 @@
     <string name="meetings_bottom_panel_not_in_call_participants_no_response_status">応答なし</string>
     <!-- Label of the button to call all absent participants from the not in call participants list -->
     <string name="meetings_bottom_panel_not_in_call_participants_call_all_button">全員と通話</string>
-    <!-- Banner description when a user navigates from other app with a different account than the one currently logged in -->
-    <string name="account_upgrade_vpn_wrong_account_upgrade_banner_description">このアプリは別のMEGAアカウントにログインしています。\nこのアカウントからログアウトし、MEGA&#160;VPNアカウントでログインしてください</string>
     <!-- Warning shown if user denies the camera permission when trying to capture photos or videos from camera -->
     <string name="chat_attach_pick_from_camera_deny_permission">MEGAは写真や動画を取得するためにカメラにアクセスする必要があります。</string>
     <!-- Warning shown if user denies the location permission when trying to pick a location -->
@@ -4964,8 +4782,6 @@
     <string name="account_upgrade_account_description_feature_vpn">&#8226;&#160;当社の高速VPNでオンラインでのプライバシーを確​​保</string>
     <!-- The body of the Dialog shown to upgrade meeting from the free version -->
     <string name="meetings_in_call_warning_dialog_body">もっと時間がご必要です？Proプランをご利用いただくと無制限の通話をお楽しみいただけます。</string>
-    <!-- The action button text of the Dialog shown to upgrade meeting from the free version -->
-    <string name="meetings_in_call_warning_dialog_action_button">アップグレード</string>
     <!-- The negative button text of the Dialog shown to upgrade meeting from the free version -->
     <string name="meetings_in_call_warning_dialog_negative_button">今はやめます</string>
     <!-- The snackbar message of the time left for the current free call -->
@@ -5048,8 +4864,6 @@
     <string name="search_dropdown_chip_filter_type_date_older">それ以前</string>
     <!-- String below login button next to button for reporting a login issue -->
     <string name="general_login_label_trouble_logging_in">ログインできませんか？</string>
-    <!-- Button text for reporting an issue on the login screen -->
-    <string name="general_login_button_report_your_issue">問題を報告</string>
     <!-- Hidden nodes show items -->
     <string name="hidden_nodes_show_items">非表示項目を表示する</string>
     <!-- Hidden nodes show items description -->
@@ -5076,8 +4890,6 @@
     <string name="meetings_swap_calls_option_button">通話を切り替える</string>
     <!-- Title of resume call button in call screen -->
     <string name="meetings_resume_call_option_button">通話を再開</string>
-    <!-- Text of pop up informing about the Raise hand feature -->
-    <string name="meetings_new_feature_raise_hand_layout">新機能：挙手</string>
     <!-- The snackbar message of your hand is raised -->
     <string name="meeting_your_hand_is_raised_message">挙手しました</string>
     <!-- The snackbar message of you and others raised your hands -->
@@ -5092,10 +4904,6 @@
     </plurals>
     <!-- Hidden nodes sharing album -->
     <string name="hidden_nodes_sharing_album">このアルバムには隠し項目があります。アルバムを共有すると、共有相手には非表示の項目が表示されます。それらの項目は引き続きクラウドドライブに隠されたままです。</string>
-    <!-- Hidden nodes items -->
-    <plurals name="hidden_nodes_items">
-        <item quantity="other">非表示項目</item>
-    </plurals>
     <!-- Image or Video map location title-->
     <string name="file_properties_info_map_location">場所</string>
     <!-- Image or Video no map location info-->
@@ -5111,7 +4919,7 @@
     <!-- Warning warning dialog message if user has offline files or transfers in progress. -->
     <string name="logout_warning_dialog_offline_and_transfers_message">今ログアウトすると、保留中の転送とオフラインファイルはすべて削除されます</string>
     <!-- Toolbar action menu button in file storage screen to open 3rd-party File Manager -->
-    <string name="filestorage_menu_option_open_in_file_manager">Open in File Manager</string>
+    <string name="filestorage_menu_option_open_in_file_manager">ファイルマネージャーで開く</string>
     <!-- Snackbar message when file storage screen is unable to open 3rd-party File Manager -->
-    <string name="filestorage_snackbar_file_manager_is_not_available">A suitable file manager app is not available on this device.</string>
+    <string name="filestorage_snackbar_file_manager_is_not_available">このデバイスでは、適切なファイルマネージャーアプリが利用できません</string>
 </resources>

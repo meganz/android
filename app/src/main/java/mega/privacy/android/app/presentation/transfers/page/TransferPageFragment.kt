@@ -229,10 +229,12 @@ internal class TransferPageFragment : Fragment() {
                 readRetryError?.let {
                     (activity as? BaseActivity)?.showSnackbar(
                         Constants.SNACKBAR_TYPE,
-                        resources.getQuantityString(
-                            sharedR.plurals.transfers_completed_read_error_retrying,
-                            readRetryError,
-                            readRetryError
+                        resources.getString(
+                            if (it == 1) {
+                                sharedR.string.transfers_completed_one_read_error_retrying
+                            } else {
+                                sharedR.string.transfers_completed_some_read_error_retrying
+                            }
                         ),
                         -1
                     )

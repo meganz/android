@@ -4,8 +4,6 @@
     <string name="device_center_rename_device_dialog_title">Rename device</string>
     <!-- The name of the Positive Button for the Rename Device Dialog -->
     <string name="device_center_rename_device_dialog_positive_button">Rename</string>
-    <!-- The name of the Negative Button for the Rename Device Dialog -->
-    <string name="device_center_rename_device_dialog_negative_button">Cancel</string>
     <!-- The name of the Header in Device Center which signifies the User's Device that is currently in use -->
     <string name="device_center_list_view_item_header_this_device">This device</string>
     <!-- The name of the Header in Device Center which signifies the User's Devices that are not currently in use  -->
@@ -24,12 +22,10 @@
     <string name="device_center_list_view_item_status_updating">Updating&#8230;</string>
     <!-- The name of the Device or Folder Status which signifies that it is currently updating its backup contents with a percentage completion -->
     <string name="device_center_list_view_item_status_updating_with_progress">%1$d%% Updating&#8230;</string>
-    <!-- The name of the Device Status which signifies that Camera Uploads is disabled for the User's Current Device -->
-    <string name="device_center_list_view_item_status_no_camera_uploads">No camera uploads</string>
     <!-- The name of the Device or Folder Status which signifies that it is disabled -->
     <string name="device_center_list_view_item_status_disabled">Disabled</string>
     <!-- The name of the Device or Folder Status which signifies that it is offline -->
-    <string name="device_center_list_view_item_status_offline">Offline</string>
+    <string name="device_center_list_view_item_status_offline">Inactive</string>
     <!-- The name of the Device or Folder Status which signifies that the backup procedure has been paused -->
     <string name="device_center_list_view_item_status_paused">Paused</string>
     <!-- The name of the Device or Folder Status which signifies that the backup procedure has been stopped -->
@@ -52,74 +48,14 @@
     <string name="device_center_bottom_sheet_item_rename">Rename</string>
     <!-- The name of one of the Device Center Bottom Sheet items that when clicked, takes the User to the Node Information screen to view more information about the Device or Device Folder -->
     <string name="device_center_bottom_sheet_item_info">Info</string>
-    <!-- The name of one of the Device Center Bottom Sheet items that when clicked, takes the User to the Backups feature to display the Device or Device Folder -->
-    <string name="device_center_bottom_sheet_item_show_in_backups">Show in Backups</string>
-    <!-- The name of one of the Device Center Bottom Sheet items that when clicked, takes the User to the Cloud Drive feature to display the Device or Device Folder -->
-    <string name="device_center_bottom_sheet_item_show_in_cloud_drive">Show in Cloud drive</string>
-    <!-- The name of the Device or Folder Sub State when its code is NO_SYNC_ERROR -->
-    <string name="device_center_list_view_item_sub_state_no_sync_error">No sync error</string>
-    <!-- The name of the Device or Folder Sub State when its code is UNSUPPORTED_FILE_SYSTEM -->
-    <string name="device_center_list_view_item_sub_state_unsupported_file_system">MEGA can’t sync or backup this folder because the file system on your device is not supported</string>
-    <!-- The name of the Device or Folder Sub State when its code is INVALID_REMOTE_TYPE -->
-    <string name="device_center_list_view_item_sub_state_invalid_remote_type">The folder you chose can’t be synced</string>
-    <!-- The name of the Device or Folder Sub State when its code is INVALID_LOCAL_TYPE -->
-    <string name="device_center_list_view_item_sub_state_invalid_local_type">A file cannot be synced individually. You need to set up the sync from a folder.</string>
-    <!-- The name of the Device or Folder Sub State when its code is REMOTE_NODE_NOT_FOUND -->
-    <string name="device_center_list_view_item_sub_state_remote_node_not_found">Folder in MEGA can’t be located as it’s been moved or deleted, or you might not have access.</string>
     <!-- The name of the Device or Folder Sub State when its code is STORAGE_OVERQUOTA -->
     <string name="device_center_list_view_item_sub_state_storage_overquota">Storage quota limit reached.</string>
-    <!-- The name of the Device or Folder Sub State when its code is ACCOUNT_EXPIRED -->
-    <string name="device_center_list_view_item_sub_state_account_expired">Unable to sync or back up this folder as your plan has expired</string>
-    <!-- The name of the Device or Folder Sub State when its code is FOREIGN_TARGET_OVERSTORAGE -->
-    <string name="device_center_list_view_item_sub_state_foreign_target_overshare">Folder can’t be synced as the user who shared this folder has reached their storage quota</string>
-    <!-- The name of the Device or Folder Sub State when its code is SHARE_NON_FULL_ACCESS -->
-    <string name="device_center_list_view_item_sub_state_share_non_full_access">Folder can’t be synced as it’s a shared folder without full access</string>
-    <!-- The name of the Device or Folder Sub State when its code is PUT_NODES_ERROR -->
-    <string name="device_center_list_view_item_sub_state_put_nodes_error">Files in this folder can’t be synced or backed up. You will need to re-enable the sync or backup from the desktop app.</string>
-    <!-- The name of the Device or Folder Sub State when its code is ACTIVE_SYNC_BELOW_PATH -->
-    <string name="device_center_list_view_item_sub_state_active_sync_below_path">Folder can’t be synced as it already contains synced folders</string>
-    <!-- The name of the Device or Folder Sub State when its code is VBOXSHAREDFOLDER_UNSUPPORTED -->
-    <string name="device_center_list_view_item_sub_state_vboxsharedfolder_unsupported">MEGA can’t sync or back up VirtualBox folders</string>
     <!-- The name of the Device or Folder Sub State when its code is ACCOUNT_BLOCKED -->
     <string name="device_center_list_view_item_sub_state_account_blocked">Unable to sync or back up this folder as the account has been blocked</string>
-    <!-- The name of the Device or Folder Sub State when its code is UNKNOWN_TEMPORARY_ERROR -->
-    <string name="device_center_list_view_item_sub_state_unknown_temporary_error">Problem syncing or backing up this folder. Try again later. If the issue continues, contact support.</string>
-    <!-- The name of the Device or Folder Sub State when its code is TOO_MANY_ACTION_PACKETS -->
-    <string name="device_center_list_view_item_sub_state_too_many_action_packets">Account reloaded. Any missed updates to your backups or syncs haven’t been applied.</string>
     <!-- The name of the Device or Folder Sub State when its code is LOGGED_OUT -->
     <string name="device_center_list_view_item_sub_state_logged_out">Sync or backup has been stopped as you appear to have logged out of the desktop app. Log back in via the desktop app, and resume the sync or backup.</string>
-    <!-- The name of the Device or Folder Sub State when its code is MISSING_PARENT_NODE -->
-    <string name="device_center_list_view_item_sub_state_missing_parent_node">N/A</string>
-    <!-- The name of the Device or Folder Sub State when its code is BACKUP_SOURCE_NOT_BELOW_DRIVE -->
-    <string name="device_center_list_view_item_sub_state_backup_source_not_below_drive">Folder in external drive can’t be located.</string>
-    <!-- The name of the Device or Folder Sub State when its code is ACTIVE_SYNC_SAME_PATH -->
-    <string name="device_center_list_view_item_sub_state_active_sync_same_path">There’s already a synced folder at the same path</string>
-    <!-- The name of the Device or Folder Sub State when its code is COULD_NOT_MOVE_CLOUD_NODES -->
-    <string name="device_center_list_view_item_sub_state_could_not_move_cloud_nodes">Renaming failed.</string>
-    <!-- The name of the Device or Folder Sub State when its code is UNKNOWN_DRIVE_PATH -->
-    <string name="device_center_list_view_item_sub_state_unknown_drive_path">Sync folder location is unknown</string>
-    <!-- The name of the Device or Folder Sub State when its code is UNABLE_TO_ADD_WATCH -->
-    <string name="device_center_list_view_item_sub_state_unable_to_add_watch">Unable to add a file system watch. Ensure there is sufficient free space and memory, and that you have granted permissions for the folder location.</string>
-    <!-- The name of the Device or Folder Sub State when its code is UNABLE_TO_OPEN_DATABASE -->
-    <string name="device_center_list_view_item_sub_state_unable_to_open_database">Unable to open state cache database</string>
     <!-- The name of the Device or Folder Sub State when its code is INSUFFICIENT_DISK_SPACE -->
     <string name="device_center_list_view_item_sub_state_insufficient_disk_space">Insufficient space for download.</string>
-    <!-- The name for specific Sub States to indicate that an unknown error occurred -->
-    <string name="device_center_list_view_item_sub_state_message_unknown_error">Unknown error.</string>
-    <!-- The name for specific Sub States to indicate that something went wrong -->
-    <string name="device_center_list_view_item_sub_state_message_something_went_wrong">Something went wrong.</string>
-    <!-- The name for specific Sub States to indicate that the Node is in the Rubbish Bin -->
-    <string name="device_center_list_view_item_sub_state_message_node_in_rubbish_bin">Folder can’t be synced or backed up as the MEGA folder is in the Rubbish bin</string>
-    <!-- The name for specific Sub States to indicate that the local drive cannot be located at this time -->
-    <string name="device_center_list_view_item_sub_state_message_cannot_locate_local_drive_now">Folder in your device can’t be located now, try again later.</string>
-    <!-- The name for specific Sub States to indicate that the local drive cannot be located -->
-    <string name="device_center_list_view_item_sub_state_message_cannot_locate_local_drive">Folder in your device can’t be located</string>
-    <!-- The name for specific Sub States to indicate that a problem occurred when syncing or backing up the MEGA Folder due to some changes -->
-    <string name="device_center_list_view_item_sub_state_message_folder_backup_issue_due_to_recent_changes">Problem syncing or backing up this folder because of changes to the MEGA folder. Stop the sync or backup and try setting it up again in the desktop app, or contact support.</string>
-    <!-- The name for specific Sub States to indicate that a problem occurred when syncing or backing up the MEGA Folder -->
-    <string name="device_center_list_view_item_sub_state_message_folder_backup_issue">Problem syncing or backing up this folder. Stop the sync or backup and try setting it up again in the desktop app, or contact Support.</string>
-    <!-- The name for specific Sub States to indicate that the MEGA Folder cannot be synced or backed up as it is inside another synced MEGA Folder -->
-    <string name="device_center_list_view_item_sub_state_message_folder_backup_issue_due_to_being_inside_another_backed_up_folder">Folder can’t be synced as it’s already inside a synced folder</string>
     <!-- The name of the Device Status informing the User that Camera Uploads is disabled for the Current Device -->
     <string name="device_center_list_view_item_status_camera_uploads_disabled">Camera uploads disabled</string>
     <!-- The Error Message shown in the Rename Device Dialog when the User submits an empty Device Name -->
@@ -140,8 +76,6 @@
     <string name="device_center_device_top_menu_option_info">Info</string>
     <!-- Text to show in the Device Center for a No Network State when there is no network connectivity -->
     <string name="device_center_no_network_state">No internet connection</string>
-    <!-- The name of the Device or Folder Sub State when its code is LOCAL_FILESYSTEM_MISMATCH -->
-    <string name="device_center_list_view_item_sub_state_local_filesystem_mismatch">Files in this folder can’t be synced or backed up. You will need to re-enable the sync or backup from the desktop app.</string>
     <!-- Text to display in Device Center for an empty state when inspecting a device where no sync or backup has been configured -->
     <string name="device_center_nothing_setup_state">Nothing set up yet</string>
     <!-- The hint text for the search bar in the Device Center feature when the User is searching for Devices -->
@@ -150,9 +84,4 @@
     <string name="device_center_top_app_bar_search_syncs_hint">Search syncs</string>
     <!-- Text to show in the Device Center when no search results are found -->
     <string name="device_center_empty_screen_no_results">No results</string>
-    <!-- First part of string, which indicates the content of a device/folder is some folders and some files. The full string is '%1$d folders · %2$d files'. The string was split in 2 for pluralization. Middle height point is to separate two fragments of text and it was not to be considered a punctuation mark. Please keep the spaces around middle height point. -->
-    <plurals name="device_center_info_num_folders_and_files">
-        <item quantity="one">%1$d folder&#160;·&#160;</item>
-        <item quantity="other">%1$d folders&#160;·&#160;</item>
-    </plurals>
 </resources>

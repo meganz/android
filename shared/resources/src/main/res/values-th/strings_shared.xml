@@ -1,7 +1,5 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources xmlns:tools="http://schemas.android.com/tools" tools:ignore="ImpliedQuantity, ExtraTranslation, MissingTranslation">
-    <!-- The name of the Device or Folder Sub State when its code is NO_SYNC_ERROR -->
-    <string name="general_sync_no_error">No sync error</string>
     <!-- The name of the Device or Folder Sub State when its code is UNSUPPORTED_FILE_SYSTEM -->
     <string name="general_sync_unsupported_file_system">MEGA ไม่สามารถซิงค์หรือสำรองข้อมูลโฟลเดอร์นี้ได้ เนื่องจากไม่สนับสนุนระบบไฟล์ในอุปกรณ์ของคุณ</string>
     <!-- The name of the Device or Folder Sub State when its code is INVALID_REMOTE_TYPE -->
@@ -18,8 +16,6 @@
     <string name="general_sync_account_expired">ไม่สามารถซิงค์หรือสำรองข้อมูลในโฟลเดอร์นี้ได้เนื่องจากแผนของคุณหมดอายุแล้ว</string>
     <!-- The name of the Device or Folder Sub State when its code is FOREIGN_TARGET_OVERSTORAGE -->
     <string name="general_sync_foreign_target_overshare">ไม่สามารถซิงค์โฟลเดอร์ได้ เนื่องจากผู้ใช้ที่แชร์โฟลเดอร์นี้ได้ใช้พื้นที่จัดเก็บข้อมูลจนเต็มขีดจำกัดแล้ว</string>
-    <!-- The name of the Device or Folder Sub State when its code is REMOTE_PATH_HAS_CHANGED -->
-    <string name="general_sync_remote_path_has_changed">ไม่สามารถหาโฟลเดอร์ใน MEGA ได้ อาจถูกย้ายหรือลบออก หรือคุณอาจไม่สามารถเข้าถึงได้</string>
     <!-- The name of the Device or Folder Sub State when its code is SHARE_NON_FULL_ACCESS -->
     <string name="general_sync_share_non_full_access">ไม่สามารถซิงค์โฟลเดอร์นี้ได้ เนื่องจากเป็นโฟลเดอร์ที่แชร์และคุณไม่มีสิทธิ์เข้าถึงแบบเต็มที่</string>
     <!-- The name of the Device or Folder Sub State when its code is PUT_NODES_ERROR -->
@@ -36,8 +32,6 @@
     <string name="general_sync_too_many_action_packets">โหลดข้อมูลในบัญชีใหม่แล้ว แต่การอัปเดตสำรองข้อมูลหรือการซิงค์ที่พลาดไปยังไม่ได้ถูกนำไปใช้</string>
     <!-- The name of the Device or Folder Sub State when its code is LOGGED_OUT -->
     <string name="general_sync_logged_out">การซิงค์หรือสำรองข้อมูลหยุดลง เนื่องจากคุณออกจากระบบแอปเดสก์ท็อปแล้ว เข้าสู่ระบบแอปเดสก์ท็อปอีกครั้งเพื่อดำเนินการซิงค์หรือสำรองข้อมูลต่อ</string>
-    <!-- The name of the Device or Folder Sub State when its code is MISSING_PARENT_NODE -->
-    <string name="general_sync_missing_parent_node">N/A</string>
     <!-- The name of the Device or Folder Sub State when its code is BACKUP_SOURCE_NOT_BELOW_DRIVE -->
     <string name="general_sync_backup_source_not_below_drive">ไม่พบโฟลเดอร์ในไดรฟ์ภายนอก</string>
     <!-- The name of the Device or Folder Sub State when its code is ACTIVE_SYNC_SAME_PATH -->
@@ -58,16 +52,10 @@
     <string name="general_sync_unable_to_add_watch">ไม่สามารถเพิ่มการตรวจดูระบบไฟล์ได้ ตรวจสอบให้แน่ใจว่ามีพื้นที่ว่างและหน่วยความจำเพียงพอแล้ว และคุณได้ให้สิทธิ์ในการเข้าถึงตำแหน่งที่ตั้งโฟลเดอร์แล้ว</string>
     <!-- The name of the Device or Folder Sub State when its code is UNABLE_TO_RETRIEVE_ROOT_FSID -->
     <string name="general_sync_unable_to_retrieve_root_fsid">ไม่สามารถอ่านตำแหน่งที่ตั้งการซิงค์ได้ ตรวจสอบว่าสามารถเข้าถึงได้และได้รับอนุญาตให้ใช้งานโฟลเดอร์ตามตำแหน่งที่ตั้งนี้หรือไม่</string>
-    <!-- The name of the Device or Folder Sub State when its code is UNABLE_TO_OPEN_DATABASE -->
-    <string name="general_sync_unable_to_open_database">Unable to open state cache database</string>
     <!-- The name of the Device or Folder Sub State when its code is INSUFFICIENT_DISK_SPACE -->
     <string name="general_sync_insufficient_disk_space">พื้นที่เก็บข้อมูลในอุปกรณ์ของคุณไม่เพียงพอ</string>
-    <!-- The name of the Device or Folder Sub State when its code is FAILURE_ACCESSING_PERSISTENT_STORAGE -->
-    <string name="general_sync_failure_accessing_persistent_storage">ไม่สามารถอ่านตำแหน่งที่ตั้งการซิงค์ได้ กรุณาตรวจสอบว่าสามารถเข้าถึงได้และได้รับอนุญาตให้ใช้งานโฟลเดอร์ตามตำแหน่งที่ตั้งนี้หรือไม่</string>
     <!-- The name for specific Sub States to indicate that an unknown error occurred -->
     <string name="general_sync_message_unknown_error">เกิดข้อผิดพลาดที่ไม่ทราบสาเหตุ ติดต่อ support@mega.nz</string>
-    <!-- The name for specific Sub States to indicate that something went wrong -->
-    <string name="general_sync_message_something_went_wrong">Something went wrong.</string>
     <!-- The name for specific Sub States to indicate that the Node is in the Rubbish Bin -->
     <string name="general_sync_message_node_in_rubbish_bin">ไม่สามารถซิงค์หรือสำรองข้อมูลโฟลเดอร์ได้ เนื่องจากโฟลเดอร์ MEGA อยู่ในถังขยะ</string>
     <!-- The name for specific Sub States to indicate that the local drive cannot be located at this time -->
@@ -92,14 +80,6 @@
     <string name="dialog_onboarding_feature_title_backup_rewind">ไม่มีพลาดทุกข้อมูลสำคัญของคุณ</string>
     <!-- Description about Backup and Rewind features on Onboarding dialog (for user to choose account - Free or Pro).  -->
     <string name="dialog_onboarding_feature_description_backup_rewind">ย้อนกลับไฟล์และโฟลเดอร์ไปยังวันที่ใดก็ได้ในช่วง 180 วันที่ผ่านมา ช่วยให้ข้อมูลของคุณปลอดภัยจากเหตุไม่คาดคิดและการแก้ไขโดยไม่ได้รับอนุญาต</string>
-    <!-- Title for MEGA VPN feature on Onboarding dialog (for user to choose account - Free or Pro).  -->
-    <string name="dialog_onboarding_feature_title_vpn">MEGA&#160;VPN</string>
-    <!-- Description about MEGA VPN feature on Onboarding dialog (for user to choose account - Free or Pro).  -->
-    <string name="dialog_onboarding_feature_description_vpn">ปกป้องความเป็นส่วนตัวของคุณบนโลกออนไลน์ด้วย VPN ความเร็วสูงของเรา</string>
-    <!-- Title for chats and meetings feature on Onboarding dialog (for user to choose account - Free or Pro).  -->
-    <string name="dialog_onboarding_feature_title_chat">โทรและประชุมได้ไม่จำกัด</string>
-    <!-- Description about chats and meetings feature on Onboarding dialog (for user to choose account - Free or Pro).  -->
-    <string name="dialog_onboarding_feature_description_chat">สื่อสารแบบส่วนตัว ปลอดภัยไร้กังวล กับข้อความ วิดีโอคอล และการประชุม รองรับผู้เข้าร่วมได้ไม่จำกัด</string>
     <!-- Search drop down chips filter type file type -->
     <string name="search_dropdown_chip_filter_type_file_type">ประเภท</string>
     <!-- Search drop down chips filter type file type images -->
@@ -272,8 +252,6 @@
     <string name="account_confirm_email_misspelled_email_description">หากคุณสะกดที่อยู่อีเมลผิด ให้แก้ไขแล้วแตะ[A]ส่งใหม่[/A]</string>
     <!-- Title of the insufficient storage error banner -->
     <string name="sync_error_storage_over_quota_banner_title">การซิงค์ถูกหยุดไว้ชั่วคราว เนื่องจากพื้นที่เก็บข้อมูลใน MEGA ของคุณเต็มแล้ว</string>
-    <!-- Title of the insufficient storage error action -->
-    <string name="sync_error_storage_over_quota_banner_action">อัปเกรด</string>
     <!-- The warning message shown when the User enables the Device Charging requirement in Settings Camera Uploads, enables Camera Uploads, begins uploading content and the Device is not charged -->
     <string name="camera_uploads_phone_not_charging_message">การอัปโหลดถูกหยุดชั่วคราว เนื่องจากอุปกรณ์ไม่ได้เสียบชาร์จ</string>
     <!-- Label of the Device Status informing the user that Nothing is set up for the Current Device -->
@@ -336,36 +314,8 @@
     <string name="cloud_drive_tour_fourth_subtitle">การอัปโหลดจากกล้องเป็นฟีเจอร์สำคัญสำหรับมือถือทุกเครื่อง และเราก็มีบริการนี้ให้คุณแล้ว สมัครสมาชิกเลยตอนนี้</string>
     <!-- Fifth subtitle of the tour screen -->
     <string name="cloud_drive_tour_fifth_subtitle">การประชุมทางวิดีโอด้วยการเข้ารหัสแบบซีโร่-นอว์เลจ</string>
-    <!-- Titles of the tour screen to onboard users with the MEGA application -->
-    <string-array name="cloud_drive_tour_titles">
-        <item>@string/cloud_drive_tour_first_title</item>
-        <item>@string/cloud_drive_tour_second_title</item>
-        <item>@string/cloud_drive_tour_third_title</item>
-        <item>@string/cloud_drive_tour_fourth_title</item>
-        <item>@string/cloud_drive_tour_fifth_title</item>
-    </string-array>
-    <!-- Subtitles of the tour screen to onboard users with the MEGA application -->
-    <string-array name="cloud_drive_tour_subtitles">
-        <item>@string/cloud_drive_tour_first_subtitle</item>
-        <item>@string/cloud_drive_tour_second_subtitle</item>
-        <item>@string/cloud_drive_tour_third_subtitle</item>
-        <item>@string/cloud_drive_tour_fourth_subtitle</item>
-        <item>@string/cloud_drive_tour_fifth_subtitle</item>
-    </string-array>
     <!-- Title of the Raise to Hand Feature Introduction Tooltip -->
     <string name="meetings_raised_hand_tooltip_title">[A]ฟีเจอร์ใหม่: ยกมือขึ้น[/A]</string>
-    <!-- Message of the synced folder list empty state for free accounts -->
-    <string name="device_center_sync_list_empty_state_message_free_account">อัปเกรดเป็นแผน Pro ช่วยให้คุณซิงค์ข้อมูลกับอุปกรณ์ต่าง ๆ ของคุณได้อย่างราบรื่นและมั่นใจได้ว่าข้อมูลจะอัปเดตอยู่เสมอ</string>
-    <!-- "Upgrade now" label for a button, menu entry, etc -->
-    <string name="general_upgrade_now_label">อัปเกรดตอนนี้เลย</string>
-    <!-- Title of the upgrade dialog displayed for free accounts when try to add a new sync -->
-    <string name="device_center_sync_upgrade_dialog_title">อัปเกรดเป็น Pro</string>
-    <!-- Message of the upgrade dialog displayed for free accounts when try to add a new sync -->
-    <string name="device_center_sync_upgrade_dialog_message">ปลดล็อกพลังแห่งการซิงค์อุปกรณ์มือถือของคุณกับคลาวด์ด้วยแผน Pro ของเรา</string>
-    <!-- Confirm button text of the upgrade dialog displayed for free accounts when try to add a new sync -->
-    <string name="device_center_sync_upgrade_dialog_confirm_button">อัปเกรด</string>
-    <!-- Cancel button text of the upgrade dialog displayed for free accounts when try to add a new sync -->
-    <string name="device_center_sync_upgrade_dialog_cancel_button">ไม่ใช่ตอนนี้</string>
     <!-- Title of the Warning Dialog shown when the new Local Primary or Secondary Folder is same as, a parent folder or sub-folder of the opposite Local Folder -->
     <string name="settings_camera_uploads_related_new_local_folder_warning_dialog_title">โฟลเดอร์อัปโหลดขัดแย้งกัน</string>
     <!-- Body of the Warning Dialog shown when the new Local Primary or Secondary Folder is same as, a parent folder or sub-folder of the opposite Local Folder -->
@@ -376,12 +326,6 @@
     <string name="general_no_picker_warning">อุปกรณ์นี้ไม่มีแอปจัดการไฟล์สำหรับให้เลือกโฟลเดอร์</string>
     <!-- Description of feature, which will be available for user, if they buy plan. This feature means user will be able to sync folders. Keep the bullet point, as this string is part of the bullet point list. -->
     <string name="account_upgrade_account_description_feature_sync">&#8226;&#160;ซิงค์โฟลเดอร์บนอุปกรณ์มือถือของคุณโดยอัตโนมัติ</string>
-    <!-- The error dialog text displayed when user opens Android Sync while having previously established syncs -->
-    <string name="sync_error_dialog_free_user">การซิงค์ของคุณถูกหยุดไว้ชั่วคราว และเป็นฟีเจอร์ของแผน Pro เท่านั้น</string>
-    <!-- The error dialog confirm action text -->
-    <string name="sync_error_dialog_free_user_confirm_action">ตกลง</string>
-    <!-- The error banner text displayed when user opens Android Sync while having previously established syncs -->
-    <string name="sync_error_banner_free_user">การซิงค์ถูกหยุดหยุดไว้ชั่วคราว เนื่องจากแผน MEGA Pro ของคุณถูกยกเลิกแล้ว อัปเกรดเพื่อดำเนินการซิงค์ต่อ</string>
     <!-- Hidden items -->
     <string name="hidden_items">รายการที่ถูกซ่อน</string>
     <!-- Label to indicate that is a Pro only feature -->
@@ -400,8 +344,6 @@
     <string name="add_tags_error_special_characters">แท็กไม่สามารถมีช่องว่างหรือสัญลักษณ์ที่ไม่ใช่ตัวอักษรและตัวเลขได้ แท็กที่เขียนด้วยตัวพิมพ์ใหญ่จะแสดงเป็นตัวพิมพ์เล็ก</string>
     <!-- error label for add tags page when tag count is maximum -->
     <string name="add_tags_error_max_tags">กำหนดแท็กได้สูงสุดแค่ %1$d รายการเท่านั้น</string>
-    <!-- error label for add tags page when tag character limit reached -->
-    <string name="add_tags_error_max_characters">Tags must be %1$d characters or less</string>
     <!-- title label for tags page -->
     <string name="add_tags_page_title_label">แท็ก</string>
     <!-- The placeholder for read only files/folders with no description in info screen-->
@@ -410,8 +352,6 @@
     <string name="video_to_playlist_top_bar_title">เพิ่มลงในเพลย์ลิสต์</string>
     <!-- Text of the create new playlist in the page that adds the video to the video playlist -->
     <string name="video_to_playlist_new_playlist_text">เพลย์ลิสต์ใหม่</string>
-    <!-- Text of the done button in the page that adds the video to the video playlist -->
-    <string name="video_to_playlist_done_button">เสร็จแล้ว</string>
     <!-- Title shown when cancelling the current plan, informing the user of features they'll miss out on -->
     <string name="account_cancel_account_screen_plan_miss_out_on_features">คุณอาจพลาดโอกาสที่จะได้ใช้ฟีเจอร์เหล่านี้</string>
     <!-- Message shown when cancelling the plan, indicating that access to features will continue until the plan expires -->
@@ -424,8 +364,6 @@
     <string name="account_cancel_account_screen_plan_free_plan">Free</string>
     <!-- Row label for storage feature in the comparison table -->
     <string name="account_cancel_account_screen_plan_storage">พื้นที่เก็บข้อมูล</string>
-    <!-- Storage amount available in the free plan. %1s represents the amount of storage and the unit -->
-    <string name="account_cancel_account_screen_plan_free_storage">%1s</string>
     <!-- Row label for transfer feature in the comparison table -->
     <string name="account_cancel_account_screen_plan_transfer">ถ่ายโอน</string>
     <!-- Transfer limit in the free plan -->
@@ -445,13 +383,13 @@
     <!-- Feature indicating MEGA VPN availability, available in the pro plan -->
     <string name="account_cancel_account_screen_plan_mega_vpn">MEGA&#160;VPN</string>
     <!-- Row label for call and meeting duration in the comparison table -->
-    <string name="account_cancel_account_screen_plan_call_meeting_duration">ระยะเวลาในการโทรและการประชุม</string>
+    <string name="account_cancel_account_screen_plan_call_meeting_duration">Call &amp;amp;amp; meeting duration</string>
     <!-- Call and meeting duration limit in the free plan -->
     <string name="account_cancel_account_screen_plan_call_meeting_duration_free">นานถึง 1 ชั่วโมง</string>
     <!-- Unlimited call and meeting duration available in the pro plan -->
     <string name="cancel_account_plan_call_meeting_duration_pro">ไม่จำกัด</string>
     <!-- Row label for call and meeting participants in the comparison table -->
-    <string name="account_cancel_account_plan_call_meeting_participants">จำนวนผู้เข้าร่วมการโทรและการประชุม</string>
+    <string name="account_cancel_account_plan_call_meeting_participants">Call &amp;amp;amp; meeting participants</string>
     <!-- Limit on call and meeting participants in the free plan -->
     <string name="account_cancel_account_free_plan_call_meeting_participants">มากสุด 100 คน</string>
     <!-- Unlimited call and meeting participants available in the pro plan -->
@@ -516,10 +454,6 @@
     <string name="account_cancellation_instructions_click_reactivate_subscription">6. คลิก[A]เปิดใช้งานการสมัครใช้งานอีกครั้ง[/A]</string>
     <!-- Label for cancellation instructions on a mobile device -->
     <string name="account_cancellation_instructions_on_mobile_device">บนอุปกรณ์มือถือ</string>
-    <!-- Step 1: instruction step no.1 to visit the MEGA website on the mobile device-->
-    <string name="account_cancellation_instructions_mobile_visit_website">1. ไปที่ [A]www.mega.nz[/A] ในเว็บเบราว์เซอร์ของคุณ</string>
-    <!-- Step 2: instruction step no.2 to Log in to MEGA account on the mobile device from the browser-->
-    <string name="account_cancellation_instructions_mobile_login_account">2. เข้าสู่ระบบบัญชี MEGA ของคุณ</string>
     <!-- Step 3: instruction step no.3 Tap on the user avatar on the MEGA website from the mobile device-->
     <string name="account_cancellation_instructions_tap_avatar">3. แตะที่รูปประจำตัวของคุณ</string>
     <!-- Step 4: instruction step no.4 Tap Cancel subscription on the account from the MEGA website from the mobile device-->
@@ -550,10 +484,6 @@
     <string name="transfers_scanning_folders_dialog_starting_transfers_title">กำลังเริ่มถ่ายโอน&#8230;</string>
     <!-- Transfers scanning folders dialog info to explain why the app shouldn't be closed -->
     <string name="transfers_scanning_folders_dialog_cancel_info_subtitle">อย่าปิดแอป หากคุณปิด คิวการถ่ายโอนที่กำลังดำเนินการอยู่อาจสูญหายได้</string>
-    <!-- Transfers scanning folders dialog sub-title when the app is scanning a single folder-->
-    <plurals name="transfers_scanning_folders_dialog_scanning_folder_subtitle">
-        <item quantity="other">พบโฟลเดอร์ 1 รายการและไฟล์อีก %1$d รายการ</item>
-    </plurals>
     <!-- Transfers scanning folders dialog sub-title when the app is scanning multiple folders. This is the folders pluralization part to implement double pluralization in transfers_scanning_folders_dialog_scanning_files_and_folders_subtitle. Example: "134 folders". Example with double pluralization in transfers_scanning_folders_dialog_scanning_files_and_folders_subtitle: "Found 134 folders and 5689 files."-->
     <plurals name="transfers_scanning_folders_dialog_scanning_folders_subtitle">
         <item quantity="other">%1$d โฟลเดอร์</item>
@@ -568,8 +498,6 @@
     <string name="settings_sync_clear_debris_dialog_title">ล้างไฟล์ขยะหรือไม่</string>
     <!-- Body of the dialog shown when user clicks to clear debris from settings menu -->
     <string name="settings_sync_clear_debris_dialog_body">ไฟล์สำรองข้อมูลที่คุณซิงค์ไว้ก่อนหน้านี้จะถูกลบออกจากอุปกรณ์ของคุณอย่างถาวร\n\nตรวจสอบโฟลเดอร์ .debris ในอุปกรณ์ของคุณ เพื่อดูว่ามีไฟล์ใดที่คุณต้องการกู้คืนหรือไม่</string>
-    <!-- Cancel button of the dialog shown when user clicks to clear debris from settings menu -->
-    <string name="settings_sync_clear_debris_dialog_cancel">ยกเลิก</string>
     <!-- Continue button of the dialog shown when user clicks to clear debris from settings menu -->
     <string name="settings_sync_clear_debris_dialog_continue">ดำเนินการต่อ</string>
     <!-- Snackbar message shown when user clears debris from settings menu -->
@@ -578,8 +506,6 @@
     <plurals name="transfers_scanning_folders_dialog_scanning_files_and_folders_subtitle">
         <item quantity="other">พบ %1$s รายการและไฟล์อีก %2$d รายการ</item>
     </plurals>
-    <!-- Label for the file info information screen no tags label -->
-    <string name="file_info_information_no_tags_label">ไม่มีแท็ก</string>
     <!-- Transfers scanning folders dialog title to inform that the transfers are being cancelled -->
     <string name="transfers_scanning_folders_dialog_cancel_cancelling_title">กำลังยกเลิกการถ่ายโอน&#8230;</string>
     <!-- error warning message for report issue when not enough characters are typed and user tries to send report-->
@@ -670,12 +596,8 @@
     <string name="sync_promotion_bottom_sheet_body_message">ซิงค์โฟลเดอร์ในอุปกรณ์ของคุณกับ MEGA เพื่อเข้าถึงไฟล์ล่าสุดได้จากทุกที่</string>
     <!-- Text of the primary button of the bottom sheet to promote Sync feature for Pro users ("Sync folders") -->
     <string name="sync_promotion_bottom_sheet_primary_button_text_pro">ซิงค์โฟลเดอร์</string>
-    <!-- Text of the primary button of the bottom sheet to promote Sync feature for Free users ("Upgrade") -->
-    <string name="sync_promotion_bottom_sheet_primary_button_text_free">อัปเกรดเพื่อใช้การซิงค์</string>
     <!-- Text of the secondary button of the bottom sheet to promote Sync feature ("Learn more") -->
     <string name="sync_promotion_bottom_sheet_secondary_button_text">เรียนรู้เพิ่มเติม</string>
-    <!-- Sync option dialog cancel button -->
-    <string name="settings_sync_option_cancel">ยกเลิก</string>
     <!-- Snackbar message displayed when sync option is selected -->
     <string name="settings_sync_option_updated_message">อัปเดตตัวเลือกการซิงค์แล้ว</string>
     <!-- Title of the Contact Permission Explanation -->
@@ -694,10 +616,6 @@
     <string name="device_center_add_sync_button_option">เพิ่มการซิงค์</string>
     <!-- Label for the button or menu option to add a backup -->
     <string name="device_center_add_backup_button_option">เพิ่มการสำรองข้อมูล</string>
-    <!-- Title of the upgrade dialog displayed for free accounts when try to add a new sync or backup -->
-    <string name="device_center_sync_backup_upgrade_dialog_title">อัปเกรดบัญชีของคุณ</string>
-    <!-- Message of the upgrade dialog displayed for free accounts when try to add a new sync or backup -->
-    <string name="device_center_sync_backup_upgrade_dialog_message">ปลดล็อกฟังก์ชันการซิงค์และสำรองข้อมูลอุปกรณ์มือถือของคุณกับที่เก็บข้อมูลบนคลาวด์ ด้วยแผนพรีเมียมของเรา</string>
     <!-- Title of the share meeting link bottom panel -->
     <string name="meetings_share_link_bottom_sheet_title">ยืนยันการประชุมแล้ว: เชิญคนอื่นเข้าร่วม</string>
     <!-- Button text of the send meeting link to chat -->
@@ -734,8 +652,6 @@
     <string name="sync_backup_access_storage_permission_dialog_message">เพื่อสำรองไฟล์ของคุณ MEGA จำเป็นต้องเข้าถึงไฟล์และโฟลเดอร์บนอุปกรณ์ของคุณ ข้อมูลของคุณปลอดภัยเสมอเมื่ออยู่กับเรา</string>
     <!-- Text for the warning banner displayed if try to create a new backup but storage permission has not been granted. The placeholders are to underline text -->
     <string name="sync_add_new_backup_storage_permission_banner">MEGA ขออนุญาตเข้าถึงพื้นที่เก็บข้อมูลในอุปกรณ์ของคุณ เพื่อทำการสำรองข้อมูลโฟลเดอร์ในเครื่องของคุณ [U]แตะเพื่ออนุญาต[/U]</string>
-    <!--Success message displayed in the Login screen after the account has been activated-->
-    <string name="login_screen_account_confirmed_success_message">บัญชีของคุณถูกเปิดใช้งานแล้ว กรุณาเข้าสู่ระบบ</string>
     <!-- Title in the files permission screen -->
     <string name="files_permission_screen_title">อนุญาตให้ MEGA เข้าถึงไฟล์ในอุปกรณ์ของคุณ</string>
     <!-- Context message in the files permission screen -->
@@ -752,8 +668,6 @@
     <string name="sync_snackbar_message_confirm_sync_stopped">หยุดการซิงค์แล้ว</string>
     <!-- Title of the dialog to confirm stop a backup -->
     <string name="sync_stop_backup_confirm_dialog_title">หยุดสำรองข้อมูล</string>
-    <!-- Message of the dialog to confirm stop a backup -->
-    <string name="sync_stop_backup_confirm_dialog_message">การดำเนินการนี้จะหยุดกระบวนการซิงค์ข้อมูลระหว่างสองโฟลเดอร์นี้ ระบบจะทำการคัดลอกข้อมูลและบันทึกไว้ในคลาวด์ไดรฟ์ของคุณ</string>
     <!-- Label for the button to stop a backup -->
     <string name="sync_stop_backup_button">หยุดสำรองข้อมูล</string>
     <!-- Snackbar message to indicate that backup has been stopped -->
@@ -768,10 +682,6 @@
     <string name="device_center_sync_backup_list_empty_state_title">ยังไม่ได้ตั้งค่าการเชื่อมต่อ</string>
     <!-- Message of the synced folder list empty state -->
     <string name="device_center_sync_backup_list_empty_state_message">ซิงค์หรือสำรองข้อมูลในโฟลเดอร์ของอุปกรณ์คุณเข้ากับโฟลเดอร์ใน MEGA</string>
-    <!-- Message of the synced folder list empty state for free accounts -->
-    <string name="device_center_sync_backup_list_empty_state_message_free_account">เพื่อความปลอดภัยและการอัปเดตข้อมูลที่สำคัญของคุณอย่างสม่ำเสมอผ่านฟีเจอร์ซิงค์และสำรองข้อมูล ขอแนะนำให้คุณอัปเกรดเป็นบัญชีพรีเมียม</string>
-    <!-- Synced folder list empty state "See upgrade options" button label -->
-    <string name="device_center_sync_backup_see_upgrade_options_button_label">ดูตัวเลือกการอัปเกรด</string>
     <!-- subtitle of meeting title in schedule meeting for title disclaimer -->
     <string name="meetings_schedule_meeting_meeting_title_disclaimer">MEGA มองเห็นชื่อและรายละเอียดการประชุมของคุณ แต่เราเก็บข้อมูลเหล่านี้ไว้เป็นส่วนตัว</string>
     <!-- Capital letters. Text of the label of a new historic notifications-->

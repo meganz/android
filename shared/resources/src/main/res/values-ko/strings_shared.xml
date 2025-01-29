@@ -1,7 +1,5 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources xmlns:tools="http://schemas.android.com/tools" tools:ignore="ImpliedQuantity, ExtraTranslation, MissingTranslation">
-    <!-- The name of the Device or Folder Sub State when its code is NO_SYNC_ERROR -->
-    <string name="general_sync_no_error">No sync error</string>
     <!-- The name of the Device or Folder Sub State when its code is UNSUPPORTED_FILE_SYSTEM -->
     <string name="general_sync_unsupported_file_system">이 폴더는 당신의 기기의 파일 시스템이 지원하지 않기 때문에 MEGA에서 동기화 하거나 백업할 수 없습니다</string>
     <!-- The name of the Device or Folder Sub State when its code is INVALID_REMOTE_TYPE -->
@@ -18,8 +16,6 @@
     <string name="general_sync_account_expired">요금제가 만료되었기 때문에 이 폴더를 동기화 또는 백업할 수 없습니다</string>
     <!-- The name of the Device or Folder Sub State when its code is FOREIGN_TARGET_OVERSTORAGE -->
     <string name="general_sync_foreign_target_overshare">이 폴더를 공유한 사람의 저장소 한도에 도달하여 폴더를 동기화할 수 없습니다.</string>
-    <!-- The name of the Device or Folder Sub State when its code is REMOTE_PATH_HAS_CHANGED -->
-    <string name="general_sync_remote_path_has_changed">MEGA의 폴더가 이동 되었거나, 삭제 되었거나, 접근 권한이 없어서 찾을 수 없습니다</string>
     <!-- The name of the Device or Folder Sub State when its code is SHARE_NON_FULL_ACCESS -->
     <string name="general_sync_share_non_full_access">당신에게 전체 권한 없이 공유된 폴더이기 때문에 폴더를 동기화할 수 없습니다.</string>
     <!-- The name of the Device or Folder Sub State when its code is PUT_NODES_ERROR -->
@@ -36,8 +32,6 @@
     <string name="general_sync_too_many_action_packets">계정을 다시 불러왔습니다. 백업 또는 동기화에 누락된 변경사항이 적용되지 않습니다.</string>
     <!-- The name of the Device or Folder Sub State when its code is LOGGED_OUT -->
     <string name="general_sync_logged_out">데스크톱 앱에서 로그아웃한 것으로 나타나서 동기화 또는 백업이 멈추었습니다. 데스크톱 앱에서 다시 로그인하고, 동기화 또는 백업을 재개하세요.</string>
-    <!-- The name of the Device or Folder Sub State when its code is MISSING_PARENT_NODE -->
-    <string name="general_sync_missing_parent_node">N/A</string>
     <!-- The name of the Device or Folder Sub State when its code is BACKUP_SOURCE_NOT_BELOW_DRIVE -->
     <string name="general_sync_backup_source_not_below_drive">외부 드라이브에 있는 폴더를 찾을 수 없습니다.</string>
     <!-- The name of the Device or Folder Sub State when its code is ACTIVE_SYNC_SAME_PATH -->
@@ -58,16 +52,10 @@
     <string name="general_sync_unable_to_add_watch">파일 시스템 감시를 추가할 수 없습니다. 충분한 여유 공간과 메모리가 있고, 폴더 위치에 대하여 권한을 승인 받았는지 확인하세요.</string>
     <!-- The name of the Device or Folder Sub State when its code is UNABLE_TO_RETRIEVE_ROOT_FSID -->
     <string name="general_sync_unable_to_retrieve_root_fsid">동기화 위치를 읽을 수 없습니다. 위치에 접근 가능한지 여부와 폴더 위치에 대한 권한이 승인 되었는지 확인하세요.</string>
-    <!-- The name of the Device or Folder Sub State when its code is UNABLE_TO_OPEN_DATABASE -->
-    <string name="general_sync_unable_to_open_database">Unable to open state cache database</string>
     <!-- The name of the Device or Folder Sub State when its code is INSUFFICIENT_DISK_SPACE -->
     <string name="general_sync_insufficient_disk_space">장치에 충분한 저장 공간이 없습니다</string>
-    <!-- The name of the Device or Folder Sub State when its code is FAILURE_ACCESSING_PERSISTENT_STORAGE -->
-    <string name="general_sync_failure_accessing_persistent_storage">동기화 위치를 읽을 수 없습니다. 위치에 접근 가능한지 여부와 폴더 위치에 대한 권한이 승인 되었는지 확인하세요.</string>
     <!-- The name for specific Sub States to indicate that an unknown error occurred -->
     <string name="general_sync_message_unknown_error">알 수 없는 오류가 발생하였습니다. support@mega.nz에 연락하세요.</string>
-    <!-- The name for specific Sub States to indicate that something went wrong -->
-    <string name="general_sync_message_something_went_wrong">Something went wrong.</string>
     <!-- The name for specific Sub States to indicate that the Node is in the Rubbish Bin -->
     <string name="general_sync_message_node_in_rubbish_bin">MEGA 폴더가 휴지통에 있어서 폴더를 동기화 또는 백업할 수 없습니다</string>
     <!-- The name for specific Sub States to indicate that the local drive cannot be located at this time -->
@@ -92,14 +80,6 @@
     <string name="dialog_onboarding_feature_title_backup_rewind">다시는 데이터를 잃지 마세요</string>
     <!-- Description about Backup and Rewind features on Onboarding dialog (for user to choose account - Free or Pro).  -->
     <string name="dialog_onboarding_feature_description_backup_rewind">당신의 데이터가 사고로 인해 변경되는 것을 막을 수 있도록, 파일과 폴더를 최대 180일까지 되돌려서 복원하세요.</string>
-    <!-- Title for MEGA VPN feature on Onboarding dialog (for user to choose account - Free or Pro).  -->
-    <string name="dialog_onboarding_feature_title_vpn">MEGA&#160;VPN</string>
-    <!-- Description about MEGA VPN feature on Onboarding dialog (for user to choose account - Free or Pro).  -->
-    <string name="dialog_onboarding_feature_description_vpn">우리의 고속 VPN으로 온라인에서 개인 정보를 지키세요.</string>
-    <!-- Title for chats and meetings feature on Onboarding dialog (for user to choose account - Free or Pro).  -->
-    <string name="dialog_onboarding_feature_title_chat">제한 없는 통화와 회의</string>
-    <!-- Description about chats and meetings feature on Onboarding dialog (for user to choose account - Free or Pro).  -->
-    <string name="dialog_onboarding_feature_description_chat">제한 없는 참가자와 함께 완벽한 개인 정보 보호 안에서 메시지, 영상 통화, 회의하세요.</string>
     <!-- Search drop down chips filter type file type -->
     <string name="search_dropdown_chip_filter_type_file_type">형식</string>
     <!-- Search drop down chips filter type file type images -->
@@ -272,8 +252,6 @@
     <string name="account_confirm_email_misspelled_email_description">만약 이메일 주소를 잘못 입력하였다면, 수정하고 [A]재발송[/A]을 탭하세요.</string>
     <!-- Title of the insufficient storage error banner -->
     <string name="sync_error_storage_over_quota_banner_title">당신의 MEGA 요금제의 저장소를 다 써서, 동기화가 일시정지 되었습니다</string>
-    <!-- Title of the insufficient storage error action -->
-    <string name="sync_error_storage_over_quota_banner_action">업그레이드</string>
     <!-- The warning message shown when the User enables the Device Charging requirement in Settings Camera Uploads, enables Camera Uploads, begins uploading content and the Device is not charged -->
     <string name="camera_uploads_phone_not_charging_message">장치가 충전 중이 아니어서, 업로드가 일시정지 되었습니다</string>
     <!-- Label of the Device Status informing the user that Nothing is set up for the Current Device -->
@@ -336,36 +314,8 @@
     <string name="cloud_drive_tour_fourth_subtitle">카메라 업로드는 어떠한 모바일 기기에서든 필요한 기능이며 우리는 이 기능이 준비되어 있습니다. 지금 가입하세요.</string>
     <!-- Fifth subtitle of the tour screen -->
     <string name="cloud_drive_tour_fifth_subtitle">영지식 암호화 화상 회의.</string>
-    <!-- Titles of the tour screen to onboard users with the MEGA application -->
-    <string-array name="cloud_drive_tour_titles">
-        <item>@string/cloud_drive_tour_first_title</item>
-        <item>@string/cloud_drive_tour_second_title</item>
-        <item>@string/cloud_drive_tour_third_title</item>
-        <item>@string/cloud_drive_tour_fourth_title</item>
-        <item>@string/cloud_drive_tour_fifth_title</item>
-    </string-array>
-    <!-- Subtitles of the tour screen to onboard users with the MEGA application -->
-    <string-array name="cloud_drive_tour_subtitles">
-        <item>@string/cloud_drive_tour_first_subtitle</item>
-        <item>@string/cloud_drive_tour_second_subtitle</item>
-        <item>@string/cloud_drive_tour_third_subtitle</item>
-        <item>@string/cloud_drive_tour_fourth_subtitle</item>
-        <item>@string/cloud_drive_tour_fifth_subtitle</item>
-    </string-array>
     <!-- Title of the Raise to Hand Feature Introduction Tooltip -->
     <string name="meetings_raised_hand_tooltip_title">[A]새로운 기능: 손 들기[/A]</string>
-    <!-- Message of the synced folder list empty state for free accounts -->
-    <string name="device_center_sync_list_empty_state_message_free_account">Pro 요금제 중 하나로 업그레이드하여 정보를 동기화하고 최신 상태로 유지하세요.</string>
-    <!-- "Upgrade now" label for a button, menu entry, etc -->
-    <string name="general_upgrade_now_label">지금 업그레이드</string>
-    <!-- Title of the upgrade dialog displayed for free accounts when try to add a new sync -->
-    <string name="device_center_sync_upgrade_dialog_title">Pro로 업그레이드</string>
-    <!-- Message of the upgrade dialog displayed for free accounts when try to add a new sync -->
-    <string name="device_center_sync_upgrade_dialog_message">Pro 요금제로 휴대 장치에서 클라우드로 동기화하는 기능을 잠금 해제하세요.</string>
-    <!-- Confirm button text of the upgrade dialog displayed for free accounts when try to add a new sync -->
-    <string name="device_center_sync_upgrade_dialog_confirm_button">업그레이드</string>
-    <!-- Cancel button text of the upgrade dialog displayed for free accounts when try to add a new sync -->
-    <string name="device_center_sync_upgrade_dialog_cancel_button">나중에</string>
     <!-- Title of the Warning Dialog shown when the new Local Primary or Secondary Folder is same as, a parent folder or sub-folder of the opposite Local Folder -->
     <string name="settings_camera_uploads_related_new_local_folder_warning_dialog_title">업로드 폴더 충돌</string>
     <!-- Body of the Warning Dialog shown when the new Local Primary or Secondary Folder is same as, a parent folder or sub-folder of the opposite Local Folder -->
@@ -376,12 +326,6 @@
     <string name="general_no_picker_warning">이 장치에 폴더를 선택할 앱이 없습니다</string>
     <!-- Description of feature, which will be available for user, if they buy plan. This feature means user will be able to sync folders. Keep the bullet point, as this string is part of the bullet point list. -->
     <string name="account_upgrade_account_description_feature_sync">&#8226;&#160;휴대 장치의 폴더를 자동으로 동기화</string>
-    <!-- The error dialog text displayed when user opens Android Sync while having previously established syncs -->
-    <string name="sync_error_dialog_free_user">동기화가 일시정지 되었습니다. 동기화는 Pro 요금제 기능입니다.</string>
-    <!-- The error dialog confirm action text -->
-    <string name="sync_error_dialog_free_user_confirm_action">Ok</string>
-    <!-- The error banner text displayed when user opens Android Sync while having previously established syncs -->
-    <string name="sync_error_banner_free_user">당신의 MEGA Pro 요금제가 취소되어 동기화가 일시정지 되었습니다. 동기화를 계속하려면 업그레이드 하세요.</string>
     <!-- Hidden items -->
     <string name="hidden_items">숨겨진 항목</string>
     <!-- Label to indicate that is a Pro only feature -->
@@ -400,8 +344,6 @@
     <string name="add_tags_error_special_characters">태그는 공백 또는 영숫자가 아닌 기호를 포함할 수 없습니다. 대문자로 쓴 태그는 소문자로 표기됩니다.</string>
     <!-- error label for add tags page when tag count is maximum -->
     <string name="add_tags_error_max_tags">최대 태그 수는 %1$d입니다.</string>
-    <!-- error label for add tags page when tag character limit reached -->
-    <string name="add_tags_error_max_characters">Tags must be %1$d characters or less</string>
     <!-- title label for tags page -->
     <string name="add_tags_page_title_label">태그</string>
     <!-- The placeholder for read only files/folders with no description in info screen-->
@@ -410,8 +352,6 @@
     <string name="video_to_playlist_top_bar_title">재생목록에 추가</string>
     <!-- Text of the create new playlist in the page that adds the video to the video playlist -->
     <string name="video_to_playlist_new_playlist_text">새 재생 목록</string>
-    <!-- Text of the done button in the page that adds the video to the video playlist -->
-    <string name="video_to_playlist_done_button">완료</string>
     <!-- Title shown when cancelling the current plan, informing the user of features they'll miss out on -->
     <string name="account_cancel_account_screen_plan_miss_out_on_features">이러한 기능들을 잃게 됩니다</string>
     <!-- Message shown when cancelling the plan, indicating that access to features will continue until the plan expires -->
@@ -424,8 +364,6 @@
     <string name="account_cancel_account_screen_plan_free_plan">Free</string>
     <!-- Row label for storage feature in the comparison table -->
     <string name="account_cancel_account_screen_plan_storage">저장소</string>
-    <!-- Storage amount available in the free plan. %1s represents the amount of storage and the unit -->
-    <string name="account_cancel_account_screen_plan_free_storage">%1초</string>
     <!-- Row label for transfer feature in the comparison table -->
     <string name="account_cancel_account_screen_plan_transfer">전송</string>
     <!-- Transfer limit in the free plan -->
@@ -445,13 +383,13 @@
     <!-- Feature indicating MEGA VPN availability, available in the pro plan -->
     <string name="account_cancel_account_screen_plan_mega_vpn">MEGA&#160;VPN</string>
     <!-- Row label for call and meeting duration in the comparison table -->
-    <string name="account_cancel_account_screen_plan_call_meeting_duration">통화 &amp;amp; 회의 길이</string>
+    <string name="account_cancel_account_screen_plan_call_meeting_duration">Call &amp;amp;amp; meeting duration</string>
     <!-- Call and meeting duration limit in the free plan -->
     <string name="account_cancel_account_screen_plan_call_meeting_duration_free">최대 1시간</string>
     <!-- Unlimited call and meeting duration available in the pro plan -->
     <string name="cancel_account_plan_call_meeting_duration_pro">무제한</string>
     <!-- Row label for call and meeting participants in the comparison table -->
-    <string name="account_cancel_account_plan_call_meeting_participants">통화 &amp;amp; 회의 참여자</string>
+    <string name="account_cancel_account_plan_call_meeting_participants">Call &amp;amp;amp; meeting participants</string>
     <!-- Limit on call and meeting participants in the free plan -->
     <string name="account_cancel_account_free_plan_call_meeting_participants">최대 100명</string>
     <!-- Unlimited call and meeting participants available in the pro plan -->
@@ -516,10 +454,6 @@
     <string name="account_cancellation_instructions_click_reactivate_subscription">6. [A]구독 재활성화[/A]를 클릭합니다.</string>
     <!-- Label for cancellation instructions on a mobile device -->
     <string name="account_cancellation_instructions_on_mobile_device">휴대 장치에서</string>
-    <!-- Step 1: instruction step no.1 to visit the MEGA website on the mobile device-->
-    <string name="account_cancellation_instructions_mobile_visit_website">1. 웹 브라우저에서 [A]www.mega.nz[/A]에 방문합니다.</string>
-    <!-- Step 2: instruction step no.2 to Log in to MEGA account on the mobile device from the browser-->
-    <string name="account_cancellation_instructions_mobile_login_account">2. MEGA 계정에 로그인합니다.</string>
     <!-- Step 3: instruction step no.3 Tap on the user avatar on the MEGA website from the mobile device-->
     <string name="account_cancellation_instructions_tap_avatar">3. 아바타를 탭합니다.</string>
     <!-- Step 4: instruction step no.4 Tap Cancel subscription on the account from the MEGA website from the mobile device-->
@@ -550,10 +484,6 @@
     <string name="transfers_scanning_folders_dialog_starting_transfers_title">전송 시작 중...</string>
     <!-- Transfers scanning folders dialog info to explain why the app shouldn't be closed -->
     <string name="transfers_scanning_folders_dialog_cancel_info_subtitle">앱을 닫지 마세요. 만약 닫으면, 아직 대기열에 들어가지 않은 전송이 손실됩니다.</string>
-    <!-- Transfers scanning folders dialog sub-title when the app is scanning a single folder-->
-    <plurals name="transfers_scanning_folders_dialog_scanning_folder_subtitle">
-        <item quantity="other">폴더 1개와 파일 %1$d개 발견</item>
-    </plurals>
     <!-- Transfers scanning folders dialog sub-title when the app is scanning multiple folders. This is the folders pluralization part to implement double pluralization in transfers_scanning_folders_dialog_scanning_files_and_folders_subtitle. Example: "134 folders". Example with double pluralization in transfers_scanning_folders_dialog_scanning_files_and_folders_subtitle: "Found 134 folders and 5689 files."-->
     <plurals name="transfers_scanning_folders_dialog_scanning_folders_subtitle">
         <item quantity="other">폴더 %1$d개</item>
@@ -568,8 +498,6 @@
     <string name="settings_sync_clear_debris_dialog_title">debris를 지울까요?</string>
     <!-- Body of the dialog shown when user clicks to clear debris from settings menu -->
     <string name="settings_sync_clear_debris_dialog_body">동기화된 파일의 이전 버전의 백업이 장치에서 영구적으로 삭제됩니다.\n\n복구해야 할 것이 있다면 로컬 장치의 .debris 폴더를 확인하세요.</string>
-    <!-- Cancel button of the dialog shown when user clicks to clear debris from settings menu -->
-    <string name="settings_sync_clear_debris_dialog_cancel">취소</string>
     <!-- Continue button of the dialog shown when user clicks to clear debris from settings menu -->
     <string name="settings_sync_clear_debris_dialog_continue">계속</string>
     <!-- Snackbar message shown when user clears debris from settings menu -->
@@ -578,8 +506,6 @@
     <plurals name="transfers_scanning_folders_dialog_scanning_files_and_folders_subtitle">
         <item quantity="other">%1$s와/과 파일 %2$d개 발견</item>
     </plurals>
-    <!-- Label for the file info information screen no tags label -->
-    <string name="file_info_information_no_tags_label">태그 없음</string>
     <!-- Transfers scanning folders dialog title to inform that the transfers are being cancelled -->
     <string name="transfers_scanning_folders_dialog_cancel_cancelling_title">전송 취소 중...</string>
     <!-- error warning message for report issue when not enough characters are typed and user tries to send report-->
@@ -670,12 +596,8 @@
     <string name="sync_promotion_bottom_sheet_body_message">당신의 장치의 폴더를 MEGA와 동기화하고 당신의 파일의 최신 버전에 어디서든 접근하세요</string>
     <!-- Text of the primary button of the bottom sheet to promote Sync feature for Pro users ("Sync folders") -->
     <string name="sync_promotion_bottom_sheet_primary_button_text_pro">폴더 동기화</string>
-    <!-- Text of the primary button of the bottom sheet to promote Sync feature for Free users ("Upgrade") -->
-    <string name="sync_promotion_bottom_sheet_primary_button_text_free">동기화를 이용하려면 업그레이드</string>
     <!-- Text of the secondary button of the bottom sheet to promote Sync feature ("Learn more") -->
     <string name="sync_promotion_bottom_sheet_secondary_button_text">더 알아보기</string>
-    <!-- Sync option dialog cancel button -->
-    <string name="settings_sync_option_cancel">취소</string>
     <!-- Snackbar message displayed when sync option is selected -->
     <string name="settings_sync_option_updated_message">동기화 옵션 업데이트됨</string>
     <!-- Title of the Contact Permission Explanation -->
@@ -694,10 +616,6 @@
     <string name="device_center_add_sync_button_option">동기화 추가</string>
     <!-- Label for the button or menu option to add a backup -->
     <string name="device_center_add_backup_button_option">백업 추가</string>
-    <!-- Title of the upgrade dialog displayed for free accounts when try to add a new sync or backup -->
-    <string name="device_center_sync_backup_upgrade_dialog_title">계정 업그레이드</string>
-    <!-- Message of the upgrade dialog displayed for free accounts when try to add a new sync or backup -->
-    <string name="device_center_sync_backup_upgrade_dialog_message">프리미엄 요금제로 휴대 장치에서 클라우드로 동기화와 백업의 힘을 잠금 해제하세요.</string>
     <!-- Title of the share meeting link bottom panel -->
     <string name="meetings_share_link_bottom_sheet_title">회의 확정됨: 다른 사람들을 초대하세요</string>
     <!-- Button text of the send meeting link to chat -->
@@ -734,8 +652,6 @@
     <string name="sync_backup_access_storage_permission_dialog_message">파일을 백업하려면, MEGA가 당신의 장치의 파일과 폴더에 대한 접근이 필요합니다. 당신의 데이터는 언제나 우리와 함께 안전합니다.</string>
     <!-- Text for the warning banner displayed if try to create a new backup but storage permission has not been granted. The placeholders are to underline text -->
     <string name="sync_add_new_backup_storage_permission_banner">MEGA가 당신의 로컬 폴더를 백업하기 위해 장치 저장소에 접근이 필요합니다. [U]접근을 승인하려면 탭하세요[/U]</string>
-    <!--Success message displayed in the Login screen after the account has been activated-->
-    <string name="login_screen_account_confirmed_success_message">계정이 활성화되었습니다. 로그인 하세요.</string>
     <!-- Title in the files permission screen -->
     <string name="files_permission_screen_title">MEGA가 장치의 파일에 접근하는 것을 허용</string>
     <!-- Context message in the files permission screen -->
@@ -752,8 +668,6 @@
     <string name="sync_snackbar_message_confirm_sync_stopped">동기화 멈춤</string>
     <!-- Title of the dialog to confirm stop a backup -->
     <string name="sync_stop_backup_confirm_dialog_title">백업 중단</string>
-    <!-- Message of the dialog to confirm stop a backup -->
-    <string name="sync_stop_backup_confirm_dialog_message">이것은 하면 두 폴더 간의 동기화 프로세스를 멈춥니다. 사본이 생성되어 클라우드 드라이브에 저장됩니다.</string>
     <!-- Label for the button to stop a backup -->
     <string name="sync_stop_backup_button">백업 중단</string>
     <!-- Snackbar message to indicate that backup has been stopped -->
@@ -768,10 +682,6 @@
     <string name="device_center_sync_backup_list_empty_state_title">설정된 연결 없음</string>
     <!-- Message of the synced folder list empty state -->
     <string name="device_center_sync_backup_list_empty_state_message">장치의 폴더를 MEGA의 폴더와 동기화 또는 백업하세요.</string>
-    <!-- Message of the synced folder list empty state for free accounts -->
-    <string name="device_center_sync_backup_list_empty_state_message_free_account">동기화와 백업으로 중요한 정보를 안전하고 최신으로 유지하려면 프리미엄 계정으로 업그레이드하세요</string>
-    <!-- Synced folder list empty state "See upgrade options" button label -->
-    <string name="device_center_sync_backup_see_upgrade_options_button_label">업그레이드 옵션 보기</string>
     <!-- subtitle of meeting title in schedule meeting for title disclaimer -->
     <string name="meetings_schedule_meeting_meeting_title_disclaimer">MEGA는 회의 이름과 설명을 볼 수 있지만, 비밀로 유지합니다</string>
     <!-- Capital letters. Text of the label of a new historic notifications-->

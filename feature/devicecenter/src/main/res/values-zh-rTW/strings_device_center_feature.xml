@@ -4,8 +4,6 @@
     <string name="device_center_rename_device_dialog_title">重新命名裝置</string>
     <!-- The name of the Positive Button for the Rename Device Dialog -->
     <string name="device_center_rename_device_dialog_positive_button">重新命名</string>
-    <!-- The name of the Negative Button for the Rename Device Dialog -->
-    <string name="device_center_rename_device_dialog_negative_button">取消</string>
     <!-- The name of the Header in Device Center which signifies the User's Device that is currently in use -->
     <string name="device_center_list_view_item_header_this_device">此裝置</string>
     <!-- The name of the Header in Device Center which signifies the User's Devices that are not currently in use  -->
@@ -24,12 +22,10 @@
     <string name="device_center_list_view_item_status_updating">正在更新⋯</string>
     <!-- The name of the Device or Folder Status which signifies that it is currently updating its backup contents with a percentage completion -->
     <string name="device_center_list_view_item_status_updating_with_progress">%1$d%%更新中⋯</string>
-    <!-- The name of the Device Status which signifies that Camera Uploads is disabled for the User's Current Device -->
-    <string name="device_center_list_view_item_status_no_camera_uploads">沒有相機上傳</string>
     <!-- The name of the Device or Folder Status which signifies that it is disabled -->
     <string name="device_center_list_view_item_status_disabled">停用</string>
     <!-- The name of the Device or Folder Status which signifies that it is offline -->
-    <string name="device_center_list_view_item_status_offline">離線</string>
+    <string name="device_center_list_view_item_status_offline">非活躍</string>
     <!-- The name of the Device or Folder Status which signifies that the backup procedure has been paused -->
     <string name="device_center_list_view_item_status_paused">暫停</string>
     <!-- The name of the Device or Folder Status which signifies that the backup procedure has been stopped -->
@@ -52,74 +48,14 @@
     <string name="device_center_bottom_sheet_item_rename">重新命名</string>
     <!-- The name of one of the Device Center Bottom Sheet items that when clicked, takes the User to the Node Information screen to view more information about the Device or Device Folder -->
     <string name="device_center_bottom_sheet_item_info">資訊</string>
-    <!-- The name of one of the Device Center Bottom Sheet items that when clicked, takes the User to the Backups feature to display the Device or Device Folder -->
-    <string name="device_center_bottom_sheet_item_show_in_backups">在備份中顯示</string>
-    <!-- The name of one of the Device Center Bottom Sheet items that when clicked, takes the User to the Cloud Drive feature to display the Device or Device Folder -->
-    <string name="device_center_bottom_sheet_item_show_in_cloud_drive">在雲端硬碟中顯示</string>
-    <!-- The name of the Device or Folder Sub State when its code is NO_SYNC_ERROR -->
-    <string name="device_center_list_view_item_sub_state_no_sync_error">無同步錯誤</string>
-    <!-- The name of the Device or Folder Sub State when its code is UNSUPPORTED_FILE_SYSTEM -->
-    <string name="device_center_list_view_item_sub_state_unsupported_file_system">MEGA無法同步或備份此資料夾，因為尚不支援您裝置上的檔案系統。</string>
-    <!-- The name of the Device or Folder Sub State when its code is INVALID_REMOTE_TYPE -->
-    <string name="device_center_list_view_item_sub_state_invalid_remote_type">您選擇的資料夾無法同步</string>
-    <!-- The name of the Device or Folder Sub State when its code is INVALID_LOCAL_TYPE -->
-    <string name="device_center_list_view_item_sub_state_invalid_local_type">無法單獨同步檔案。您需要從資料夾設定同步。</string>
-    <!-- The name of the Device or Folder Sub State when its code is REMOTE_NODE_NOT_FOUND -->
-    <string name="device_center_list_view_item_sub_state_remote_node_not_found">無法找到MEGA中的資料夾，因為它已被移動或刪除，或者您沒有存取權限。</string>
     <!-- The name of the Device or Folder Sub State when its code is STORAGE_OVERQUOTA -->
     <string name="device_center_list_view_item_sub_state_storage_overquota">已達到儲存配額限制。</string>
-    <!-- The name of the Device or Folder Sub State when its code is ACCOUNT_EXPIRED -->
-    <string name="device_center_list_view_item_sub_state_account_expired">由於您的方案已過期，因此無法同步或備份此資料夾。</string>
-    <!-- The name of the Device or Folder Sub State when its code is FOREIGN_TARGET_OVERSTORAGE -->
-    <string name="device_center_list_view_item_sub_state_foreign_target_overshare">無法同步資料夾，因為共享此資料夾的使用者已達到其儲存配額上限</string>
-    <!-- The name of the Device or Folder Sub State when its code is SHARE_NON_FULL_ACCESS -->
-    <string name="device_center_list_view_item_sub_state_share_non_full_access">資料夾無法同步，因為它是沒有完全存取權限的共享資料夾。</string>
-    <!-- The name of the Device or Folder Sub State when its code is PUT_NODES_ERROR -->
-    <string name="device_center_list_view_item_sub_state_put_nodes_error">此資料夾中的檔案無法同步或備份。您需要從桌面應用程式重新啟用同步或備份。</string>
-    <!-- The name of the Device or Folder Sub State when its code is ACTIVE_SYNC_BELOW_PATH -->
-    <string name="device_center_list_view_item_sub_state_active_sync_below_path">資料夾無法同步，因為它已經包含同步的資料夾</string>
-    <!-- The name of the Device or Folder Sub State when its code is VBOXSHAREDFOLDER_UNSUPPORTED -->
-    <string name="device_center_list_view_item_sub_state_vboxsharedfolder_unsupported">MEGA無法同步或備份VirtualBox資料夾</string>
     <!-- The name of the Device or Folder Sub State when its code is ACCOUNT_BLOCKED -->
     <string name="device_center_list_view_item_sub_state_account_blocked">由於帳戶已被封鎖，因此無法同步或備份此資料夾</string>
-    <!-- The name of the Device or Folder Sub State when its code is UNKNOWN_TEMPORARY_ERROR -->
-    <string name="device_center_list_view_item_sub_state_unknown_temporary_error">同步或備份此資料夾時出現問題。稍後再試。如果問題仍然存在，請聯繫客服。</string>
-    <!-- The name of the Device or Folder Sub State when its code is TOO_MANY_ACTION_PACKETS -->
-    <string name="device_center_list_view_item_sub_state_too_many_action_packets">帳戶已重新載入。您的備份或同步的任何遺失的更新尚未套用。</string>
     <!-- The name of the Device or Folder Sub State when its code is LOGGED_OUT -->
     <string name="device_center_list_view_item_sub_state_logged_out">由於您似乎已登出桌面應用程式，因此同步或備份已停止。使用桌面應用程式重新登入，然後恢復同步或備份。</string>
-    <!-- The name of the Device or Folder Sub State when its code is MISSING_PARENT_NODE -->
-    <string name="device_center_list_view_item_sub_state_missing_parent_node">不適用</string>
-    <!-- The name of the Device or Folder Sub State when its code is BACKUP_SOURCE_NOT_BELOW_DRIVE -->
-    <string name="device_center_list_view_item_sub_state_backup_source_not_below_drive">無法找到外部磁碟的資料夾。</string>
-    <!-- The name of the Device or Folder Sub State when its code is ACTIVE_SYNC_SAME_PATH -->
-    <string name="device_center_list_view_item_sub_state_active_sync_same_path">同一路徑下已有一個同步資料夾</string>
-    <!-- The name of the Device or Folder Sub State when its code is COULD_NOT_MOVE_CLOUD_NODES -->
-    <string name="device_center_list_view_item_sub_state_could_not_move_cloud_nodes">重新命名失敗。</string>
-    <!-- The name of the Device or Folder Sub State when its code is UNKNOWN_DRIVE_PATH -->
-    <string name="device_center_list_view_item_sub_state_unknown_drive_path">同步資料夾位置未知</string>
-    <!-- The name of the Device or Folder Sub State when its code is UNABLE_TO_ADD_WATCH -->
-    <string name="device_center_list_view_item_sub_state_unable_to_add_watch">無法新增檔案系統偵聽。確保有足夠的可用空間和記憶體，並且您已授予資料夾位置的權限。</string>
-    <!-- The name of the Device or Folder Sub State when its code is UNABLE_TO_OPEN_DATABASE -->
-    <string name="device_center_list_view_item_sub_state_unable_to_open_database">無法開啟狀態快取資料庫</string>
     <!-- The name of the Device or Folder Sub State when its code is INSUFFICIENT_DISK_SPACE -->
     <string name="device_center_list_view_item_sub_state_insufficient_disk_space">空間不足，無法下載。</string>
-    <!-- The name for specific Sub States to indicate that an unknown error occurred -->
-    <string name="device_center_list_view_item_sub_state_message_unknown_error">未知錯誤。</string>
-    <!-- The name for specific Sub States to indicate that something went wrong -->
-    <string name="device_center_list_view_item_sub_state_message_something_went_wrong">出了點問題。</string>
-    <!-- The name for specific Sub States to indicate that the Node is in the Rubbish Bin -->
-    <string name="device_center_list_view_item_sub_state_message_node_in_rubbish_bin">由於MEGA資料夾位於垃圾筒中，因此資料夾無法同步或備份</string>
-    <!-- The name for specific Sub States to indicate that the local drive cannot be located at this time -->
-    <string name="device_center_list_view_item_sub_state_message_cannot_locate_local_drive_now">現在無法找到您裝置中的資料夾，請稍後重試。</string>
-    <!-- The name for specific Sub States to indicate that the local drive cannot be located -->
-    <string name="device_center_list_view_item_sub_state_message_cannot_locate_local_drive">無法找到您裝置中的資料夾</string>
-    <!-- The name for specific Sub States to indicate that a problem occurred when syncing or backing up the MEGA Folder due to some changes -->
-    <string name="device_center_list_view_item_sub_state_message_folder_backup_issue_due_to_recent_changes">由於MEGA資料夾發生變動，因此同步或備份此資料夾時出現問題。請停止同步或備份，然後嘗試在桌面應用程式中再次設定，或者聯繫客服。</string>
-    <!-- The name for specific Sub States to indicate that a problem occurred when syncing or backing up the MEGA Folder -->
-    <string name="device_center_list_view_item_sub_state_message_folder_backup_issue">同步或備份此資料夾時出現問題。停止同步或備份，然後嘗試在桌面應用程式中重新設定，或聯繫客服。</string>
-    <!-- The name for specific Sub States to indicate that the MEGA Folder cannot be synced or backed up as it is inside another synced MEGA Folder -->
-    <string name="device_center_list_view_item_sub_state_message_folder_backup_issue_due_to_being_inside_another_backed_up_folder">資料夾無法同步，因為它已經在同步資料夾中</string>
     <!-- The name of the Device Status informing the User that Camera Uploads is disabled for the Current Device -->
     <string name="device_center_list_view_item_status_camera_uploads_disabled">相機上傳已停用</string>
     <!-- The Error Message shown in the Rename Device Dialog when the User submits an empty Device Name -->
@@ -140,8 +76,6 @@
     <string name="device_center_device_top_menu_option_info">資訊</string>
     <!-- Text to show in the Device Center for a No Network State when there is no network connectivity -->
     <string name="device_center_no_network_state">無網路連線</string>
-    <!-- The name of the Device or Folder Sub State when its code is LOCAL_FILESYSTEM_MISMATCH -->
-    <string name="device_center_list_view_item_sub_state_local_filesystem_mismatch">此資料夾中的檔案無法同步或備份。您需要從桌面應用程式重新啟用同步或備份。</string>
     <!-- Text to display in Device Center for an empty state when inspecting a device where no sync or backup has been configured -->
     <string name="device_center_nothing_setup_state">尚未設定任何內容</string>
     <!-- The hint text for the search bar in the Device Center feature when the User is searching for Devices -->
@@ -150,8 +84,4 @@
     <string name="device_center_top_app_bar_search_syncs_hint">搜尋同步</string>
     <!-- Text to show in the Device Center when no search results are found -->
     <string name="device_center_empty_screen_no_results">無搜尋結果</string>
-    <!-- First part of string, which indicates the content of a device/folder is some folders and some files. The full string is '%1$d folders · %2$d files'. The string was split in 2 for pluralization. Middle height point is to separate two fragments of text and it was not to be considered a punctuation mark. Please keep the spaces around middle height point. -->
-    <plurals name="device_center_info_num_folders_and_files">
-        <item quantity="other">%1$d個資料夾&#160;·&#160;</item>
-    </plurals>
 </resources>

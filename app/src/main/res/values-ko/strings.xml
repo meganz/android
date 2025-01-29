@@ -8,8 +8,6 @@
     <string name="general_yes">예</string>
     <!-- Answer for confirmation dialog. -->
     <string name="general_no">아니오</string>
-    <!-- dialog option cancel in alert dialog -->
-    <string name="general_cancel">취소</string>
     <!-- When moving a file to a location in MEGA. This is the text of the button after selection the destination -->
     <string name="general_move_to">이동</string>
     <!-- Selecting a specific location in MEGA. This is the text of the button -->
@@ -54,14 +52,10 @@
     <string name="general_already_downloaded">이미 다운로드됨</string>
     <!-- Label of the option menu. When clicking this button, the app shows the info of the file -->
     <string name="general_file_info">파일 정보</string>
-    <!-- Hint how to cancel the download -->
-    <string name="general_show_info">정보 보기</string>
     <!-- Error getting the root node -->
     <string name="error_general_nodes">오류. 다시 시도하세요.</string>
     <!-- File name (without extension) of file exported with the recovery key -->
     <string name="general_rk">MEGA-복구키</string>
-    <!-- when no external card exists -->
-    <string name="no_external_SD_card_detected">외부 저장 공간이 감지되지 않았습니다</string>
     <!-- Button where the user can sign off or logout -->
     <string name="action_logout">로그아웃</string>
     <!-- Item menu option upon right click on one or multiple files. -->
@@ -116,8 +110,6 @@
     </plurals>
     <!-- Alert text before download. Please do not modify the %s placeholder as it will be replaced by the size to be donwloaded -->
     <string name="alert_larger_file">%s가 다운로드 됩니다.</string>
-    <!-- Alert text before download -->
-    <string name="alert_no_app">%s 파일을 열 앱이 없습니다. 다운로드를 진행 하시겠습니까?</string>
     <!-- Dialog option that permits user do not show it again -->
     <string name="checkbox_not_show_again">다시 보여주지 마세요</string>
     <!-- Press back while login to cancel current login process. -->
@@ -276,10 +268,6 @@
     <plurals name="upload_began">
         <item quantity="other">업로드 %1$d개 시작</item>
     </plurals>
-    <!-- Message when many downloads finish. Plural more than 1 file. Placeholder is for include the number of uploads in runtime. -->
-    <plurals name="upload_finish">
-        <item quantity="other">업로드 %1$d개 완료</item>
-    </plurals>
     <!-- Hint how to cancel the download -->
     <string name="download_touch_to_show">전송 보기</string>
     <!-- message when trying to open a downloaded file but there isn’t any app that open that file. Example: a user downloads a pdf but doesn’t have any app to read a pdf -->
@@ -358,10 +346,6 @@
     <string name="context_contact_invitation_resent">요청이 재발송되었습니다</string>
     <!-- success message when sending a contact request -->
     <string name="context_contact_request_sent">%s님께 요청이 전송되었습니다. 보낸 요청 탭에서 보세요.</string>
-    <!-- success message when removing a contact -->
-    <string name="context_contact_removed">연락처가 제거되었습니다</string>
-    <!-- error message -->
-    <string name="context_contact_not_removed">오류. 연락처가 제거되지 않았습니다</string>
     <!-- success message when chaning the permissionss -->
     <string name="context_permissions_changed">권한이 변경되었습니다</string>
     <!-- message when trying to create a folder that already exists -->
@@ -668,10 +652,6 @@
     <string name="six_pin_lock">여섯 자리</string>
     <!-- Passcode alphanumeric -->
     <string name="AN_pin_lock">영숫자</string>
-    <!-- Confirmation message when enabling logs in the app -->
-    <string name="settings_enable_logs">로그가 활성화 되었습니다</string>
-    <!-- Confirmation message when disabling logs in the app -->
-    <string name="settings_disable_logs">로그가 비활성화 되었습니다</string>
     <!-- Option in the sliding panel to open the folder which contains the file selected after performing a search -->
     <string name="search_open_location">위치 열기</string>
     <!-- message when a temporary error on logging in is due to SDK is waiting for the server to complete a request due to an API lock -->
@@ -738,24 +718,12 @@
     <string name="text_dialog_insert_MK">복구 키를 아래에 입력하세요</string>
     <!-- Text of the alert when the pass has been correctly changed -->
     <string name="pass_changed_alert">암호가 변경되었습니다.</string>
-    <!-- Title of the dialog to park an account -->
-    <string name="park_account_dialog_title">계정 보류</string>
-    <!-- Button to park an account -->
-    <string name="park_account_button">보류</string>
-    <!-- Text shown in the last alert dialog to park an account -->
-    <string name="park_account_text_last_step">이것은 당신의 계정을 보류하는 마지막 단계입니다, 당신의 새 암호를 입력하세요. 당신의 데이터는 최소 60일간 저장됩니다. 만약 보류된 계정의 암호가 생각났다면, support&#64;mega.nz로 연락주세요.</string>
     <!-- Title of the screen to write the new password after opening the recovery link -->
     <string name="title_enter_new_password">새 암호를 입력하세요</string>
     <!-- Message when the user tries to open a recovery pass link and it has expired -->
     <string name="recovery_link_expired">이 복구 링크는 만료된 것으로 보입니다. 다시 시도하세요.</string>
     <!-- Text of the alert after opening the recovery link to reset pass being logged. -->
     <string name="text_reset_pass_logged_in">복구 키는 암호를 재설정하는데에 사용됩니다. 새 암호를 입력하세요.</string>
-    <!-- Button to upgrade the account to PRO account in My Account Section -->
-    <string name="my_account_upgrade_pro">업그레이드</string>
-    <!-- Button to upgrade the account to PRO account in the panel that appears randomly -->
-    <string name="my_account_upgrade_pro_panel">지금 업그레이드</string>
-    <!-- Message to promote PRO accounts -->
-    <string name="get_pro_account">클라우드를 키우세요.[A]Pro 계정으로 증가된 저장소와 전송 할당량을 받으세요.</string>
     <!-- Error shown when the user tries to change his mail to one that is already used -->
     <string name="mail_already_used">이메일 주소가 이미 사용 중입니다. 다른 이메일을 입력하세요.</string>
     <!-- Error shown when the user tries to change his mail while the user has already requested a confirmation link for that email address -->
@@ -834,12 +802,6 @@
     <string name="section_chat">대화</string>
     <!-- Confirmation button of the dialog to archive a chat -->
     <string name="tab_archive_chat">보관함</string>
-    <!-- Initial of the word hour to show the duration of a video or audio call -->
-    <string name="initial_hour">시간</string>
-    <!-- Initial of the word minute to show the duration of a video or audio call -->
-    <string name="initial_minute">분</string>
-    <!-- Initial of the word second to show the duration of a video or audio call -->
-    <string name="initial_second">초</string>
     <!-- Title shown when multiselection is enable in chat tabs -->
     <string name="selected_items">%d개 선택됨</string>
     <!-- Message to confirm if the user wants to delete a contact from a shared folder -->
@@ -916,10 +878,6 @@
     <string name="add_participants_menu_item">참여자 추가</string>
     <!-- Menu item to remove a participants from a chat -->
     <string name="remove_participant_menu_item">참여자 제거</string>
-    <!-- Message about MEGA when there are no message in the chat screen -->
-    <string name="mega_info_empty_screen">당신의 대화를 필수적인 안전 보증을 제공하는, 영지식 암호화로 보호하세요:</string>
-    <!-- Message about MEGA when there are no message in the chat screen -->
-    <string name="mega_authenticity_empty_screen">시스템이 명시된 발송자로부터 데이터를 수신하였으며, 그 내용이 전송중 조작되지 않았음을 보증합니다.</string>
     <!-- Message about MEGA when there are no message in the chat screen -->
     <string name="mega_confidentiality_empty_screen">작성자와 의도된 수신자만 내용을 복호화하고 읽을 수 있습니다.</string>
     <!-- Message about MEGA when there are no message in the chat screen -->
@@ -1087,10 +1045,6 @@
     <string name="general_enable">활성화</string>
     <!-- Positive confirmation to allow MEGA to read contacts book. -->
     <string name="general_allow">허가</string>
-    <!-- Dialog to confirm the action of enabling logs -->
-    <string name="enable_log_text_dialog">기록은 당신의 계정과 관련된 정보를 포함할 수 있습니다</string>
-    <!-- Dialog to confirm the reconnect action -->
-    <string name="confirmation_to_reconnect">네트워크 연결이 복구되었습니다. MEGA에 연결할까요?</string>
     <!-- Error when a message cannot be edited -->
     <string name="error_editing_message">이 메시지는 수정할 수 없습니다</string>
     <!-- Label of the modal bottom sheet to clear completed transfers -->
@@ -1163,14 +1117,6 @@
     <string name="text_depleted_transfer_overquota">이 IP 주소의 전송 할당량이 초과되었습니다. 다운로드를 계속하려면 계정을 업그레이드하거나 %s 동안 기다리세요.</string>
     <!-- Button to show plans in the alert when the transfer quota is depleted -->
     <string name="plans_depleted_transfer_overquota">요금제 보기</string>
-    <!-- Button option of the alert when the transfer quota is depleted -->
-    <string name="continue_without_account_transfer_overquota">계정 없이 계속하기</string>
-    <!-- this is used for example when downloading 1 file or 2 files, Plural of file. 2 files -->
-    <plurals name="new_general_num_files">
-        <item quantity="other">파일 %1$d개</item>
-    </plurals>
-    <!-- Menu option -->
-    <string name="general_view">파일 보기</string>
     <!-- Menu option to choose to add file or folders to Cloud Drive -->
     <string name="add_to_cloud">클라우드 드라이브에 추가</string>
     <!-- Menu option to choose to add file to Cloud Drive in the chat -->
@@ -1183,8 +1129,6 @@
     <string name="chat_connecting">연결중&#8230;</string>
     <!-- message when trying to invite a contact with a pending request -->
     <string name="context_contact_already_invited">%s님이 이미 초대되었습니다. 보류중인 요청을 확인하세요.</string>
-    <!-- Hint text explaining that you can change the email and resend the create account link to the new email address -->
-    <string name="confirm_email_misspelled">만약 이메일 주소를 잘못 입력하였다면, 수정하고 [A]재발송[A]을 탭하세요.</string>
     <!-- Button to resend the create account email to a new email address in case the previous email address was misspelled -->
     <string name="confirm_email_misspelled_resend">재발송</string>
     <!-- Text shown after the confirmation email has been sent to the new email address -->
@@ -1275,8 +1219,6 @@
     <string name="contact_is_me">옵션이 존재하지 않습니다, 자신을 선택하였습니다</string>
     <!-- Confirmation before deleting one attachment -->
     <string name="confirmation_delete_one_attachment">첨부물을 제거할까요?</string>
-    <!-- Menu option -->
-    <string name="general_view_with_revoke">파일 보기(%1$d개 삭제됨)</string>
     <!-- Message sound option when no sound has been selected for chat notifications -->
     <string name="settings_chat_silent_sound_not">조용히</string>
     <!-- part of the string in incoming shared folder notification -->
@@ -1423,10 +1365,6 @@
     <string name="rate_the_app_panel">예, 앱을 평가하기</string>
     <!-- Label to show send feedback -->
     <string name="send_feedback_panel">아니오, 피드백 보내기</string>
-    <!-- Message to show when users deny to permit the permissions to read and write on external storage on setting default download location -->
-    <string name="download_requires_permission">MEGA가 외부 저장소에 파일을 다운로드 하기 위해 외부 저장소에 읽고 쓸 수 있는 권한이 필요합니다.</string>
-    <!-- Default download location is on old sd card, but currently the user installed a new SD card, need user to reset download location. -->
-    <string name="old_sdcard_unavailable">이전 SD 카드를 이용할 수 없습니다. 새 다운로드 위치를 설정하세요.</string>
     <!-- Title of the section to invite contacts if the user has denied the contacts permmissions -->
     <string name="no_contacts_permissions">연락처 권한이 승인되지 않았습니다</string>
     <!-- Option of the sliding panel to go to QR code section -->
@@ -1483,8 +1421,6 @@
     <string name="button_copy_link">링크 복사</string>
     <!-- Create QR code -->
     <string name="button_create_qr">QR 코드 생성</string>
-    <!-- Text shown in QR code scan fragment to help and guide the user in the action -->
-    <string name="qrcode_scan_help">스캔할 QR 코드를 기기의 카메라와 정렬하세요</string>
     <!-- positive button on dialog to view a contact -->
     <string name="contact_view">보기</string>
     <!-- Item menu option to reproduce audio or video in external reproductors -->
@@ -1545,8 +1481,6 @@
     <string name="button_notification_call_in_progress">통화로 돌아옴</string>
     <!-- When it lists contacts of phone, the title of list’s header -->
     <string name="contacts_phone">휴대 전화 연락처</string>
-    <!-- In a chat conversation when you try to send device’s images but images are still loading -->
-    <string name="file_storage_loading">파일 불러오는 중</string>
     <!-- Size in bytes. The placeholder is for the size value, please adjust the position based on linguistics -->
     <string name="label_file_size_byte">%sB</string>
     <!-- Size in kilobytes. The placeholder is for the size value, please adjust the position based on linguistics -->
@@ -1668,8 +1602,6 @@
     <string name="recovery_key_bottom_sheet">복구 키</string>
     <!-- Option that permits user save on File System -->
     <string name="option_save_on_filesystem">파일 시스템에 저장</string>
-    <!-- Title of the notification shown on the action bar when there is a incoming call -->
-    <string name="notification_subtitle_incoming">전화 수신중</string>
     <!-- Subtitle to show the number of unread messages on a chat, unread messages -->
     <plurals name="number_unread_messages">
         <item quantity="other">%1$s개의 읽지 않은 메시지</item>
@@ -1838,8 +1770,6 @@
     <string name="archived_chats_title_section">보관됨</string>
     <!-- Text of the option to show the arhived chat, it shows the number of archived chats -->
     <string name="archived_chats_show_option">보관됨 (%d)</string>
-    <!-- Title of the option on the chat list to archive a chat -->
-    <string name="archive_chat_option">보관함</string>
     <!-- Confirmation button of the dialog to archive a chat -->
     <string name="general_archive">보관함</string>
     <!-- Confirmation button of the dialog to unarchive a chat -->
@@ -1938,8 +1868,6 @@
     <string name="title_mail_upgrade_plan">커스텀 요금제로 업그레이드</string>
     <!-- Mail subject to upgrade to a custom plan -->
     <string name="subject_mail_upgrade_plan">어떻게 커스텀 요금제로 업그레이드할 수 있는지 물어보세요:</string>
-    <!-- Used in chat list screen to indicate in a chat list item that the message was sent by me, followed by the message -->
-    <string name="word_me">나:</string>
     <!-- Title of the button in the contact info screen to start an audio call -->
     <string name="call_button">전화</string>
     <!-- Title of the button in the contact info screen to send a message -->
@@ -2036,8 +1964,6 @@
     <string name="subtitle_chat_message_enabled_ERK">암호화 키 순환은 약간 더 안전하지만, 대화 링크를 만들 수 없고 새 참여자들이 지난 메시지를 볼 수 없게 됩니다.</string>
     <!-- Message shown when a contact request has not been sent because the invitation has been sent before -->
     <string name="invite_not_sent_already_sent">연락처 %s에 대한 초대장이 이전에 발송되었으며, 발송된 요청 탭에서 찾아볼 수 있습니다.</string>
-    <!-- Label shown to indicate the QR is saving in Cloud Drive -->
-    <string name="save_qr_cloud_drive">%s을/를 클라우드 드라이브에 저장하는 중&#8230;</string>
     <!-- General label for files -->
     <string name="general_files">파일</string>
     <!-- Item menu option upon right click on one or multiple files -->
@@ -2072,8 +1998,6 @@
     <string name="subtitle_contact_notification_blocked">[A]%s님이 [/A][B]당신을 연락처에서 차단하였습니다.[/B]</string>
     <!-- Item of the navigation title for the notification section when there is any unread -->
     <string name="section_notification_with_unread">알림 [A](%1$d)[/A]</string>
-    <!-- Text shown in the notifications section. When a contact has nickname, nickname (email) will be shown -->
-    <string name="section_notification_user_with_nickname">[A]%1$s(%2$s)[/A]</string>
     <!-- Title of the historic notification for an account deleted -->
     <string name="title_account_notification_deleted">계정 삭제됨</string>
     <!-- Subtitle of the historic notification for an account deleted -->
@@ -2114,16 +2038,12 @@
     <string name="subtitle_incoming_contact_request_accepted">[A]%s님이 보낸 [/A][B]연락처 요청을 [/B][B]수락하였습니다[/B]</string>
     <!-- Subtitle of the historic notification for incoming contact request declined -->
     <string name="subtitle_incoming_contact_request_denied">[A]%s님이 보낸 [/A][B]연락처 요청을 [/B][B]거절하였습니다[/B]</string>
-    <!-- Footnote to clarify the storage space is subject to the achievement program -->
-    <string name="footnote_achievements">도전 과제 프로그램에 참여할 수 있습니다.</string>
     <!-- dialog option cancel in alert dialog -->
     <string name="button_cancel">취소</string>
     <!-- dialog option continue in alert dialog -->
     <string name="button_continue">계속</string>
     <!-- one of the payment methods -->
     <string name="payment_method_google_wallet">[A]Google Pay[/A](구독)</string>
-    <!-- Capital letters. Text of the label of a new historic notifications -->
-    <string name="new_label_notification_item">신규</string>
     <!-- Input field description in the create file dialog. -->
     <string name="context_new_file_name_hint">파일명</string>
     <!-- Option in Settings section to enable the last active connection in chat -->
@@ -2208,12 +2128,6 @@
     <string name="allow_acces_camera_subtitle">문서 스캔, 사진 촬영 그리고 영상 통화를 하려면 당신의 카메라에 대한 접근을 허용하세요.</string>
     <!-- Title of the screen asking permissions for microphone and write in log calls -->
     <string name="allow_acces_calls_title">통화 활성화</string>
-    <!-- Title of the screen asking permissions for contacts -->
-    <string name="allow_acces_contact_title">주소록에 대한 접근 허용</string>
-    <!-- Subtitle of the screen asking permissions for contacts -->
-    <string name="allow_acces_contact_subtitle">MEGA에서 당신의 주소록에 있는 지인들을 쉽게 찾으세요.</string>
-    <!-- Explanation under the subtitle of asking permissions for contacts to explain that MEGA will never use the address book data for any other purpose -->
-    <string name="allow_access_contact_explanation">MEGA는 당신의 동의 없이 이 데이터를 다른 목적으로 사용하고 당신의 지인들과 상호작용하지 않을 것입니다.</string>
     <!-- Subtitle of the screen asking permissions for microphone -->
     <string name="allow_acces_calls_subtitle_microphone">암호화된 통화를 하려면 당신의 마이크에 접근을 허용하세요.</string>
     <!-- Title of the option on chat info screen to list all the files sent to the chat -->
@@ -2252,8 +2166,6 @@
     <string name="context_empty_shared_files">[A]공유된 파일[/A][B] 없음[/B]</string>
     <!-- Message show when a call cannot be established because there are too many participants in the group call -->
     <string name="call_error_too_many_participants">최대 참여자 수가 초과하여 통화에 참가할 수 없습니다.</string>
-    <!-- Message show when a user cannot put the call on hold -->
-    <string name="call_error_call_on_hold">통화를 보류할 수 없습니다.</string>
     <!-- Error message shown when a file cannot be opened by other app using the open with option menu -->
     <string name="error_open_file_with">오류가 발생하여 이 앱으로 파일을 열 수 없습니다.</string>
     <!-- Subtitle of the call screen when a outgoing call is just starting -->
@@ -2284,14 +2196,6 @@
     </plurals>
     <!-- Title of a chat message that contains geolocation info -->
     <string name="title_geolocation_message">고정된 위치</string>
-    <!-- Alert shown when a num of files have not been sent because of any error occurs, Plural of file. 2 files -->
-    <plurals name="num_files_not_send">
-        <item quantity="other">%d개의 파일이 %d개의 대화에 전송되지 않았습니다</item>
-    </plurals>
-    <!-- Alert shown when a num of contacts have not been sent because of any error occurs, Plural of file. 2 files -->
-    <plurals name="num_contacts_not_send">
-        <item quantity="other">%d개의 연락처가 %d개의 대화에 전송되지 않았습니다</item>
-    </plurals>
     <!-- Alert shown when a num of messages have not been sent because of any error occurs, Plural of file. 2 files -->
     <plurals name="num_messages_not_send">
         <item quantity="other">%d개의 메시지가 %d개의 대화에 전송되지 않았습니다</item>
@@ -2392,8 +2296,6 @@
     <string name="text_join_call">이 통화에 참여하려면 현재 통화를 마쳐야합니다.</string>
     <!-- Text of the dialog shown when you want to join a group call but you are in another active call -->
     <string name="text_join_another_call">이 통화에 참여하려면 현재 통화를 종료하거나 보류해야합니다.</string>
-    <!-- Explanation of the dialog shown to share a chat link -->
-    <string name="copy_link_explanation">사람들이 이 링크를 이용하여 당신의 그룹에 참여할 수 있습니다.</string>
     <!-- Title of the dialog shown when the user it is creating a chat link and the chat has not title -->
     <string name="enter_group_name">그룹 이름을 입력하세요</string>
     <!-- Alert shown when the user it is creating a chat link and the chat has not title -->
@@ -2482,8 +2384,6 @@
     <string name="usage_storage_details_label">저장소 사용량 명세서</string>
     <!-- Title of transfer section in Storage -->
     <string name="transfer_label">전송</string>
-    <!-- Error shown when a Business account user (sub-user or admin) tries to remove a contact which is part of the same Business account. Please, keep the placeholder, it will be replaced with the name or email of the account, for example: Jane Appleseed or ja@mega.nz -->
-    <string name="error_remove_business_contact">%1$s님의 연락처는 당신의 비즈니스 계정의 일부이기 때문에 삭제할 수 없습니다.</string>
     <!-- When logging in during the grace period, the administrator of the Business account will be notified that their payment is overdue, indicating that they need to access MEGA using a desktop browser for more information -->
     <string name="grace_period_admin_alert">지난 결제에 문제가 있었습니다. 자세한 정보를 보려면 데스크톱 브라우저를 이용하여 MEGA에 접속하세요.</string>
     <!-- Message shown when users with a business account (no administrators of a business account) try to enable the Camera Uploads, to advise them that the administrator do have the ability to view their data. -->
@@ -2542,8 +2442,6 @@
     <string name="phonenumber_title">전화번호</string>
     <!-- Text shown in a call when it is trying to reconnect after lose the internet connection -->
     <string name="reconnecting_message">다시 연결중</string>
-    <!-- Text is displayed while a voice clip is being recorded -->
-    <string name="recording_layout">녹음중&#8230;</string>
     <!-- Text shown for the action create new file -->
     <string name="create_new_file_action">새 파일 만들기</string>
     <!-- Error title shown when you are trying to do an action with a file or folder and you don’t have the necessary permissions -->
@@ -2644,8 +2542,6 @@
     <string name="section_documents">문서</string>
     <!-- Label of the floating action button of opening the new chat conversation -->
     <string name="fab_label_new_chat">새 대화</string>
-    <!-- Text that indicates that there’s no image to show in image section -->
-    <string name="homepage_empty_hint_photos">[B]발견된[/B] [A]이미지[/A] [B]없음[/B]</string>
     <!-- Text that indicates that there’s no document to show. The format placeholders are to showing it in different colors. -->
     <string name="homepage_empty_hint_documents">[A]문서[/A][B]가[/B] [B]없습니다[/B]</string>
     <!-- Text that indicates that there’s no audio to show. The format placeholders are to showing it in different colors. -->
@@ -2852,12 +2748,8 @@
     <string name="discard_changes_warning">변경사항을 취소하고 편집기를 닫을까요?</string>
     <!-- Action discard -->
     <string name="discard_close_action">취소하고 닫기</string>
-    <!-- Label indicating a file was created successfully -->
-    <string name="file_created">파일 생성됨</string>
     <!-- Warning indicating a file was not created successfully -->
     <string name="file_creation_failed">파일 생성 실패. 다시 시도하세요.</string>
-    <!-- Label indicating a file was updated successfully -->
-    <string name="file_updated">파일 업데이트됨</string>
     <!-- Warning indicating a file was not updated successfully -->
     <string name="file_update_failed">파일 업데이트 실패. 다시 시도하세요.</string>
     <!-- Warning which alerts the user a file cannot be opened -->
@@ -3094,8 +2986,6 @@
     <string name="left_meeting_join_title">당신의 프라이버시가 중요합니다</string>
     <!-- the content of join without account on left meeting page-->
     <string name="left_meeting_join_content">세계에서 가장 큰 안전한 클라우드 저장소와 협업 플랫폼에 가입하세요.</string>
-    <!-- the bonus title of join without account on left meeting page-->
-    <string name="left_meeting_bonus_title">20GB를 무료로 받으세요</string>
     <!-- the bonus content of join without account on left meeting page-->
     <string name="left_meeting_bonus_content">지금 가입하고 고급 협업 기능을 무료로 즐기세요.</string>
     <!-- Content of ongoing call for MaterialAlertDialog-->
@@ -3156,8 +3046,6 @@
     <string name="contact_already_invited">당신은 이미 %1$s님을 초대하였습니다</string>
     <!-- Warning shown informing the contact request has been sent and can be managed in sent requests section. -->
     <string name="contact_invited">초대장 발송됨. 보낸 요청을 보세요.</string>
-    <!-- Message when file available offline. -->
-    <string name="file_available_offline">파일을 오프라인에서 이용할 수 있음</string>
     <!-- Message when file removed from offline. -->
     <string name="file_removed_offline">파일이 오프라인에서 제거됨</string>
     <!-- Menu option to open a link. Also title of the dialog to open a link. -->
@@ -3262,8 +3150,6 @@
     <string name="media_player_audio_playlist_next">다음</string>
     <!-- Previous audios have been already played in the audio playlist -->
     <string name="media_player_audio_playlist_previous">이전</string>
-    <!-- Next videos to be played in the video playlist -->
-    <string name="media_player_video_playlist_next">다음</string>
     <!-- Previous videos have been already played in the video playlist -->
     <string name="media_player_video_playlist_previous">이전</string>
     <!-- Setting option available to choose for the preferred start screen. -->
@@ -3318,16 +3204,10 @@
     <string name="settings_passcode_enter_password_title">암호를 입력하세요</string>
     <!-- Resume to paused transfers snack bar description text -->
     <string name="resume_paused_transfers_text">전송이 일시정지 되었습니다. 다운로드를 계속 하려면 다시 시작하세요.</string>
-    <!-- Warning of the scanning transfers dialog. It warns about not closing the app because the transfers will be lost. -->
-    <string name="warning_scanning_transfers">애플리케이션을 닫지 마세요.</string>
     <!-- Stage of the scanning transfers dialog indicating transfers are scanning. -->
     <string name="scanning_transfers">스캔 중&#8230;</string>
     <!-- Label cancel transfers. -->
     <string name="cancel_transfers">전송 취소</string>
-    <!-- Warning informing what will happen if proceed on cancelling transfers. -->
-    <string name="warning_cancel_transfers">처리되지 않은 전송은 취소됩니다.</string>
-    <!-- Button which dismisses the warning and proceeds with the cancel transfers action. -->
-    <string name="button_proceed">진행</string>
     <!-- Warning informing transfers were cancelled. -->
     <string name="transfers_cancelled">전송이 취소되었습니다.</string>
     <!-- Title of the screen where a name collision has been detected and some options to choose are shown to the user. -->
@@ -3420,8 +3300,6 @@
     <string name="settings_help_report_issue">문제 신고</string>
     <!-- Report issue fragment instructions-->
     <string name="settings_help_report_issue_instructions">당신의 피드백이 MEGA의 개선을 돕습니다. 겪으신 문제를 명확히 설명해주세요. 자세히 설명할 수록, 우리가 문제를 해결하는 것이 쉬워집니다.</string>
-    <!-- Hint text for the description field on the report issue screen-->
-    <string name="settings_help_report_issue_description_label">문제를 설명해주세요</string>
     <!-- Label for the switch to enable attaching logs when reporting an issue-->
     <string name="settings_help_report_issue_attach_logs_label">로그 파일 전송</string>
     <!-- Error message when there is no connectivity when reporting an issue-->
@@ -3440,12 +3318,8 @@
     <string name="settings_help_report_issue_discard_button">폐기</string>
     <!-- Text shown when editing a chatroom message -->
     <string name="edit_chat_message">메시지 편집</string>
-    <!-- Title of the voice call option displayed in the chat room toolbar -->
-    <string name="chat_room_toolbar_voice_call_option">음성</string>
     <!-- Title of the scan option displayed in the chat room toolbar -->
     <string name="chat_room_toolbar_scan_option">스캔</string>
-    <!-- Title of the voice clip option displayed in the chat room toolbar -->
-    <string name="chat_room_toolbar_voice_clip_option">음성 클립</string>
     <!-- Title of the gif option displayed in the chat room toolbar -->
     <string name="chat_room_toolbar_gif_option">GIF</string>
     <!-- Filter option on Photos/Timeline -->
@@ -3472,10 +3346,6 @@
     <string name="calls_call_screen_bottom_panel_leave_call_option">떠나기</string>
     <!-- Option in bottom panel to end call for all, displayed on the group call and meeting screen -->
     <string name="calls_call_screen_bottom_panel_end_call_for_all_option">모두 통화 종료</string>
-    <!-- Title of the dialog that indicates you are the only moderator of the meeting, displayed on meeting screen -->
-    <string name="meeting_call_screen_title_of_bottom_panel_to_assign_another_host">주최자로 임명</string>
-    <!-- Description of the dialog that indicates you are the only host of the meeting, displayed on meeting screen -->
-    <string name="meeting_call_screen_description_of_bottom_panel_to_assign_another_host">당신은 이 통화의 유일한 주최자입니다. 떠나기 전에 다른 주최자를 할당하시겠습니까?</string>
     <!-- Yes button for the confirmation dialog before removing the outgoing shares of several folders. -->
     <string name="shared_items_outgoing_unshare_confirm_dialog_button_yes">예</string>
     <!-- No button for the confirmation dialog before removing the outgoing shares of several folders. -->
@@ -3520,20 +3390,8 @@
     <string name="calls_call_screen_waiting_for_participants">다른 사람들이 참여하기를 기다리는 중</string>
     <!-- Text that indicates that there’s no favourite to show. The format placeholders are to showing it in different colors. -->
     <string name="homepage_empty_hint_favourites">[B]발견된[/B] [A]즐겨찾기[/A] [B]없음[/B]</string>
-    <!--Action text to start a conversation from Recent Chat screen empty view-->
-    <string name="chat_recent_list_empty_action">지금 대화 시작</string>
-    <!--Description text from Recent Chat screen empty view-->
-    <string name="chat_recent_list_empty_description">그 누구도, 심지어는 MEGA도 당신의 대화를 읽을 수 없다는 것을 알고 어느 누구와 어느 기기에서든 안전하고 비밀스럽게 대화하세요.</string>
     <!-- Action to indicate immediate meeting creation -->
     <string name="action_start_meeting_now">지금 회의 시작</string>
-    <!-- Label for call option on settings -->
-    <string name="settings_calls_preferences">통화</string>
-    <!-- Label for the sound notifications option on calls settings -->
-    <string name="settings_calls_preferences_sound_notifications">소리 알림</string>
-    <!-- Text for the sound notifications option on calls settings -->
-    <string name="settings_calls_preferences_sound_notifications_text">누군가 통화에 참여하거나 떠날 때 소리를 듣습니다.</string>
-    <!-- Text indicating a text file was saved to Cloud drive -->
-    <string name="text_editor_creation_success">파일이 클라우드 드라이브에 저장되었습니다.</string>
     <!-- Warning indicating a text file was not saved to Cloud Drive. -->
     <string name="text_editor_creation_error">파일이 클라우드 드라이브에 저장되지 않았습니다. 다시 시도하세요.</string>
     <!-- Action label to start images slideshow -->
@@ -3714,26 +3572,12 @@
     <string name="video_playback_position_dialog_restart_button">재시작</string>
     <!-- User Alert notification for new scheduled meeting. %s placeholder is for the email of whom has invited you to the scheduled meeting. [A][A/] and [B][/B] format placeholders are to bold text if required - e.g: zadiesmith@hotmail.com invited you to a meeting scheduled for: -->
     <string name="notification_subtitle_scheduled_meeting_new">[A]%s[/A] 님이 [B]당신을 다음의 회의에 초대하였습니다:[/B]</string>
-    <!-- User Alert notification for canceled scheduled meeting -->
-    <string name="notification_subtitle_scheduled_meeting_canceled">[A]%s[/A] 님이 [B]다음의 회의에 취소하였습니다:[/B]</string>
     <!-- User Alert notification for scheduled meeting title change -->
     <string name="notification_subtitle_scheduled_meeting_updated_title">[A]%s 님이 회의 이름을[/A] [B]“%s”에서 “[A]%s[/A]”로 변경하였습니다.[/B]</string>
-    <!-- User Alert notification for scheduled meeting date change -->
-    <string name="notification_subtitle_scheduled_meeting_updated_date">[A]%s 님이 회의 날짜를 수정[/A][B]하였습니다[/B]</string>
-    <!-- User Alert notification for scheduled meeting time change -->
-    <string name="notification_subtitle_scheduled_meeting_updated_time">[A]%s 님이 회의 시간을 수정[/A][B]하였습니다[/B]</string>
     <!-- User Alert notification for scheduled meeting description change -->
     <string name="notification_subtitle_scheduled_meeting_updated_description">[A]%s 님이 회의 설명을 수정[/A][B]하였습니다[/B]</string>
-    <!-- User Alert notification for scheduled meeting fields change -->
-    <string name="notification_subtitle_scheduled_meeting_updated_multiple">[A]%s 님이[/A] [B]다음의 회의 정보를 수정[/B]하였습니다:</string>
-    <!-- Title of the dialog when permission is denied and it's required to upload content -->
-    <string name="dialog_title_media_permissions_denied">접근 거부됨</string>
-    <!-- Content of the dialog when permission is denied and it's required to upload content -->
-    <string name="dialog_content_media_permissions_denied">당신은 MEGA가 당신의 장치의 저장소와 미디어 파일에 접근하는 것을 거부하였습니다. 공유를 계속 하려면, MEGA에게 권한을 허용하세요.</string>
     <!-- Positive action button of the dialog when permission is denied and it's required to upload content. Clicking it will redirect to settings screen of device -->
     <string name="dialog_positive_button_allow_permission">권한 허용</string>
-    <!-- Negative action button of the dialog when permission is denied and it's required to upload content. Clicking it will close the dialog -->
-    <string name="dialog_negative_button_do_not_allow">허용하지 않음</string>
     <!-- Option of a recurring meeting in meeting list to view occurrences -->
     <string name="meetings_list_recurring_meeting_occurrences_option">주기</string>
     <!-- Subtitle of recurring meeting info screen when the recurrence occurs daily -->
@@ -3752,16 +3596,8 @@
     <string name="notification_subtitle_scheduled_recurring_meeting_new">[A]%s[/A] 님이 [B]당신을 다음의 반복 회의에 초대하였습니다:[/B]</string>
     <!-- User Alert notification for scheduled recurring meeting description change -->
     <string name="notification_subtitle_scheduled_recurring_meeting_updated_description">[A]%s 님이 반복 회의 설명을 수정[/A][B]하였습니다[/B]</string>
-    <!-- User Alert notification for scheduled recurring meeting fields change -->
-    <string name="notification_subtitle_scheduled_recurring_meeting_updated_multiple">[A]%s 님이[/A] [B]다음의 반복 회의 정보를 수정[/B]하였습니다:</string>
-    <!-- User Alert notification for scheduled recurring meeting occurrence change -->
-    <string name="notification_subtitle_scheduled_recurring_meeting_updated_occurrence">[A]%s 님이 되풀이 항목을 수정[/A][B]하였습니다[/B]</string>
-    <!-- User Alert notification for scheduled recurring meeting time change -->
-    <string name="notification_subtitle_scheduled_recurring_meeting_updated_time">[A]%s 님이 반복 회의 시간을 수정[/A][B]하였습니다[/B]</string>
     <!-- User Alert notification for canceled scheduled recurring meeting -->
     <string name="notification_subtitle_scheduled_recurring_meeting_canceled">[A]%s[/A] 님이 [B]반복 회의를 취소하였습니다[/B]</string>
-    <!-- User Alert notification for canceled occurrences of a scheduled recurring meeting -->
-    <string name="notification_subtitle_scheduled_recurring_meeting_occurrence_canceled">[A]%s[/A] 님이 [B]다음의 예약된 되풀이 항목을 취소하였습니다:[/B]</string>
     <!-- Error message for the alert shown when opening a change email verification link with an account that not corresponds to the link -->
     <string name="account_change_email_error_not_logged_with_correct_account_message">링크가 현재 로그인한 계정에서 생성된 것이 아닙니다. 이메일 주소를 인증하려면 이 링크와 관련된 계정으로 로그인 하세요.</string>
     <!-- Title of the error message for the alert shown when opening a change email verification link with an account that not corresponds to the link -->
@@ -4294,14 +4130,6 @@
     </plurals>
     <!-- The select time dialog in schedule meeting -->
     <string name="meetings_schedule_meeting_enter_time_title_dialog">시간 입력</string>
-    <!-- Label for the meeting invitations option on calls settings -->
-    <string name="settings_calls_preferences_meeting_invitations">Meeting invitations</string>
-    <!-- Text for the meeting invitations option on calls settings -->
-    <string name="settings_calls_preferences_meeting_invitations_text">Notify me when someone invites me to a meeting</string>
-    <!-- Label for the meeting reminders option on calls settings -->
-    <string name="settings_calls_preferences_meeting_reminders">Meeting reminders</string>
-    <!-- Text for the meeting reminders option on calls settings -->
-    <string name="settings_calls_preferences_meeting_reminders_text">Notify me 15 minutes before the meetings starts and on the time the meeting is schedule to start</string>
     <!-- Notification description for scheduled meetings that starts in 15 minutes -->
     <string name="notification_sched_meeting_starts_15_minutes">15분 내에 회의가 시작됩니다</string>
     <!-- Notification description for scheduled meetings that starts now -->
@@ -4590,10 +4418,6 @@
     <string name="meetings_schedule_meeting_end_recurrence_label">되풀이 종료</string>
     <!-- Title of Ends section in Custom Recurrence screen -->
     <string name="meetings_custom_recurrence_ends_section">종료</string>
-    <!--Action text to start a conversation from Meeting List screen empty view-->
-    <string name="meeting_list_empty_action">회의 시작</string>
-    <!--Description text from Meeting List screen empty view-->
-    <string name="meeting_list_empty_description">전세계의 친구 및 동료들과 안전하고 비밀스럽게 음성 또는 영상 통화를 하세요.</string>
     <!-- Title of the confirmation dialog to cancel a scheduled meeting -->
     <string name="meetings_cancel_scheduled_meeting_dialog_title">“%1$s”을/를 취소할까요?</string>
     <!-- Message of the confirmation dialog to cancel a scheduled meeting when the chat history is empty -->
@@ -4794,12 +4618,8 @@
     <string name="dialog_onboarding_get_pro_title">Pro 요금제로 더 받기</string>
     <!-- Short description about Pro plans on Onboarding dialog (for user to choose account - Free or Pro). %1$s placeholder will be replaced with correct localised price (e.g. $4.99). -->
     <string name="dialog_onboarding_get_pro_description">더 많은 저장소와 Pro 기능에 접근하기 위해 Pro 요금제로 업그레이드 하세요. 요금제는 월 %1$s의 저렴한 가격으로 시작합니다.</string>
-    <!-- Title about features available on Pro plan on Onboarding dialog (for user to choose account - Free or Pro).  -->
-    <string name="dialog_onboarding_some_features_title">MEGA&#160;Pro 요금제는 다음이 포함됩니다:</string>
     <!-- Title for Storage feature on Onboarding dialog (for user to choose account - Free or Pro).  -->
     <string name="dialog_onboarding_feature_title_storage">엄청난 저장소 유연성</string>
-    <!-- Description about Storage feature on Onboarding dialog (for user to choose account - Free or Pro). %1$s placeholder will be replaced with correct localised storage size (e.g. 400GB or 2TB)  -->
-    <string name="dialog_onboarding_feature_description_storage">%1$s부터 시작하여, 당신의 저장소 수요에 완벽하게 맞는 크기를 찾으세요.</string>
     <!-- Title for Button to view Pro plans on Onboarding dialog (for user to choose account - Free or Pro). After clicking on the button user will redirecting to Upgrade Account screen.  -->
     <string name="dialog_onboarding_button_view_pro_plan">오늘 Pro로 업그레이드</string>
     <!-- Label indicating that a participant is presenting in the main view of the call -->
@@ -4854,8 +4674,6 @@
     <string name="meetings_bottom_panel_not_in_call_participants_no_response_status">응답 없음</string>
     <!-- Label of the button to call all absent participants from the not in call participants list -->
     <string name="meetings_bottom_panel_not_in_call_participants_call_all_button">모두 통화</string>
-    <!-- Banner description when a user navigates from other app with a different account than the one currently logged in -->
-    <string name="account_upgrade_vpn_wrong_account_upgrade_banner_description">이 앱은 다른 MEGA 계정으로 로그인 되어 있습니다. \n이 계정에서 로그아웃 하고 당신의 MEGA&#160;VPN 계정으로 로그인 하세요.</string>
     <!-- Warning shown if user denies the camera permission when trying to capture photos or videos from camera -->
     <string name="chat_attach_pick_from_camera_deny_permission">MEGA는 사진과 동영상을 촬영하기 위해 당신의 카메라에 접근해야 합니다</string>
     <!-- Warning shown if user denies the location permission when trying to pick a location -->
@@ -4964,8 +4782,6 @@
     <string name="account_upgrade_account_description_feature_vpn">&#8226;&#160;우리의 고속 VPN으로 온라인에서 개인 정보를 지키세요</string>
     <!-- The body of the Dialog shown to upgrade meeting from the free version -->
     <string name="meetings_in_call_warning_dialog_body">시간이 더 필요한가요? Pro 요금제는 무제한 통화를 할 수 있습니다.</string>
-    <!-- The action button text of the Dialog shown to upgrade meeting from the free version -->
-    <string name="meetings_in_call_warning_dialog_action_button">업그레이드</string>
     <!-- The negative button text of the Dialog shown to upgrade meeting from the free version -->
     <string name="meetings_in_call_warning_dialog_negative_button">나중에</string>
     <!-- The snackbar message of the time left for the current free call -->
@@ -5048,8 +4864,6 @@
     <string name="search_dropdown_chip_filter_type_date_older">더 오래됨</string>
     <!-- String below login button next to button for reporting a login issue -->
     <string name="general_login_label_trouble_logging_in">로그인에 문제가 있나요?</string>
-    <!-- Button text for reporting an issue on the login screen -->
-    <string name="general_login_button_report_your_issue">문제 신고</string>
     <!-- Hidden nodes show items -->
     <string name="hidden_nodes_show_items">숨겨진 항목 보기</string>
     <!-- Hidden nodes show items description -->
@@ -5076,8 +4890,6 @@
     <string name="meetings_swap_calls_option_button">통화 전환</string>
     <!-- Title of resume call button in call screen -->
     <string name="meetings_resume_call_option_button">통화 재개</string>
-    <!-- Text of pop up informing about the Raise hand feature -->
-    <string name="meetings_new_feature_raise_hand_layout">새로운 기능: 손 들기</string>
     <!-- The snackbar message of your hand is raised -->
     <string name="meeting_your_hand_is_raised_message">당신이 손을 들었습니다</string>
     <!-- The snackbar message of you and others raised your hands -->
@@ -5092,10 +4904,6 @@
     </plurals>
     <!-- Hidden nodes sharing album -->
     <string name="hidden_nodes_sharing_album">이 사진첩에 숨겨진 항목이 있습니다. 사진첩을 공유하는 것은 숨겨진 항목이 공유하고자 하는 사람들에게 보인다는 것입니다. 항목은 클라우드 드라이브에서 숨긴 상태로 유지됩니다.</string>
-    <!-- Hidden nodes items -->
-    <plurals name="hidden_nodes_items">
-        <item quantity="other">숨겨진 항목</item>
-    </plurals>
     <!-- Image or Video map location title-->
     <string name="file_properties_info_map_location">위치</string>
     <!-- Image or Video no map location info-->
@@ -5111,7 +4919,7 @@
     <!-- Warning warning dialog message if user has offline files or transfers in progress. -->
     <string name="logout_warning_dialog_offline_and_transfers_message">If you log out now, any pending transfers and offline files will be deleted</string>
     <!-- Toolbar action menu button in file storage screen to open 3rd-party File Manager -->
-    <string name="filestorage_menu_option_open_in_file_manager">Open in File Manager</string>
+    <string name="filestorage_menu_option_open_in_file_manager">Open in file manager</string>
     <!-- Snackbar message when file storage screen is unable to open 3rd-party File Manager -->
-    <string name="filestorage_snackbar_file_manager_is_not_available">A suitable file manager app is not available on this device.</string>
+    <string name="filestorage_snackbar_file_manager_is_not_available">A suitable file manager app is not available on this device</string>
 </resources>

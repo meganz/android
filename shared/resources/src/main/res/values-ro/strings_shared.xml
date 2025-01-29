@@ -1,7 +1,5 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources xmlns:tools="http://schemas.android.com/tools" tools:ignore="ImpliedQuantity, ExtraTranslation, MissingTranslation">
-    <!-- The name of the Device or Folder Sub State when its code is NO_SYNC_ERROR -->
-    <string name="general_sync_no_error">No sync error</string>
     <!-- The name of the Device or Folder Sub State when its code is UNSUPPORTED_FILE_SYSTEM -->
     <string name="general_sync_unsupported_file_system">MEGA nu poate sincroniza sau backup pentru acest folder deoarece sistemul de fișiere de pe dispozitiv nu este acceptat</string>
     <!-- The name of the Device or Folder Sub State when its code is INVALID_REMOTE_TYPE -->
@@ -18,8 +16,6 @@
     <string name="general_sync_account_expired">Nu se poate sincroniza sau backup pentru acest folder, deoarece abonamentul dvs. a expirat</string>
     <!-- The name of the Device or Folder Sub State when its code is FOREIGN_TARGET_OVERSTORAGE -->
     <string name="general_sync_foreign_target_overshare">Folderul nu poate fi sincronizat deoarece utilizatorul care a partajat acest folder a atins cotă de spațiu de stocare</string>
-    <!-- The name of the Device or Folder Sub State when its code is REMOTE_PATH_HAS_CHANGED -->
-    <string name="general_sync_remote_path_has_changed">Folderul din MEGA nu poate fi localizat deoarece a fost mutat sau șters sau este posibil să nu aveți acces</string>
     <!-- The name of the Device or Folder Sub State when its code is SHARE_NON_FULL_ACCESS -->
     <string name="general_sync_share_non_full_access">Folderul nu poate fi sincronizat deoarece este un folder partajat la care nu aveți acces complet</string>
     <!-- The name of the Device or Folder Sub State when its code is PUT_NODES_ERROR -->
@@ -36,8 +32,6 @@
     <string name="general_sync_too_many_action_packets">Contul a fost reîncărcat. Toate actualizările ratate ale backupurilor sau ale sincronizărilor nu au fost aplicate.</string>
     <!-- The name of the Device or Folder Sub State when its code is LOGGED_OUT -->
     <string name="general_sync_logged_out">Sincronizarea sau backupul au fost oprite pe măsură ce parcă v-ați deconectat de la aplicația desktop. Conectați-vă din nou prin aplicația desktop și reluați sincronizarea sau backup-ul.</string>
-    <!-- The name of the Device or Folder Sub State when its code is MISSING_PARENT_NODE -->
-    <string name="general_sync_missing_parent_node">N/A</string>
     <!-- The name of the Device or Folder Sub State when its code is BACKUP_SOURCE_NOT_BELOW_DRIVE -->
     <string name="general_sync_backup_source_not_below_drive">Folderul din unitatea externă nu poate fi localizat.</string>
     <!-- The name of the Device or Folder Sub State when its code is ACTIVE_SYNC_SAME_PATH -->
@@ -58,16 +52,10 @@
     <string name="general_sync_unable_to_add_watch">Imposibil de adăugat un ceas de sistem de fișiere. Asigurați-vă că există suficient spațiu liber și memorie și că ați acordat permisiuni pentru locația folderului.</string>
     <!-- The name of the Device or Folder Sub State when its code is UNABLE_TO_RETRIEVE_ROOT_FSID -->
     <string name="general_sync_unable_to_retrieve_root_fsid">Nu am putut citi locația de sincronizare. Verificați dacă locația este accesibilă și permisiunile pentru locația folderului sunt acordate.</string>
-    <!-- The name of the Device or Folder Sub State when its code is UNABLE_TO_OPEN_DATABASE -->
-    <string name="general_sync_unable_to_open_database">Unable to open state cache database</string>
     <!-- The name of the Device or Folder Sub State when its code is INSUFFICIENT_DISK_SPACE -->
     <string name="general_sync_insufficient_disk_space">Spațiu de stocare insuficient pe dispozitiv</string>
-    <!-- The name of the Device or Folder Sub State when its code is FAILURE_ACCESSING_PERSISTENT_STORAGE -->
-    <string name="general_sync_failure_accessing_persistent_storage">Nu am putut citi locația de sincronizare. Verificați dacă locația este accesibilă și permisiunile pentru locația folderului sunt acordate.</string>
     <!-- The name for specific Sub States to indicate that an unknown error occurred -->
     <string name="general_sync_message_unknown_error">A apărut o eroare necunoscută. Contactați support@mega.nz.</string>
-    <!-- The name for specific Sub States to indicate that something went wrong -->
-    <string name="general_sync_message_something_went_wrong">Something went wrong.</string>
     <!-- The name for specific Sub States to indicate that the Node is in the Rubbish Bin -->
     <string name="general_sync_message_node_in_rubbish_bin">Folderul nu poate fi sincronizat sau backup-uite, deoarece folderul MEGA se află în Coșul de gunoi</string>
     <!-- The name for specific Sub States to indicate that the local drive cannot be located at this time -->
@@ -92,14 +80,6 @@
     <string name="dialog_onboarding_feature_title_backup_rewind">Nu pierdeți niciodată datele</string>
     <!-- Description about Backup and Rewind features on Onboarding dialog (for user to choose account - Free or Pro).  -->
     <string name="dialog_onboarding_feature_description_backup_rewind">Derulați înapoi pentru a restabili fișierele și folderele la orice dată de până la 180 de zile, astfel încât datele dvs. să fie protejate împotriva accidentelor și a manipulării.</string>
-    <!-- Title for MEGA VPN feature on Onboarding dialog (for user to choose account - Free or Pro).  -->
-    <string name="dialog_onboarding_feature_title_vpn">MEGA&#160;VPN</string>
-    <!-- Description about MEGA VPN feature on Onboarding dialog (for user to choose account - Free or Pro).  -->
-    <string name="dialog_onboarding_feature_description_vpn">Rămâneți privat online cu VPN-ul nostru de mare viteză.</string>
-    <!-- Title for chats and meetings feature on Onboarding dialog (for user to choose account - Free or Pro).  -->
-    <string name="dialog_onboarding_feature_title_chat">Apeluri și întâlniri nerestricționate</string>
-    <!-- Description about chats and meetings feature on Onboarding dialog (for user to choose account - Free or Pro).  -->
-    <string name="dialog_onboarding_feature_description_chat">Întâlnirile, mesajele și apelurile video sunt complet private și protejate, cu un număr nelimitat de participanți.</string>
     <!-- Search drop down chips filter type file type -->
     <string name="search_dropdown_chip_filter_type_file_type">Tip</string>
     <!-- Search drop down chips filter type file type images -->
@@ -288,8 +268,6 @@
     <string name="account_confirm_email_misspelled_email_description">Dacă ați scris greșit adresa dvs. de e-mail, corectați-o și atingeți [A]Retrimite[/A].</string>
     <!-- Title of the insufficient storage error banner -->
     <string name="sync_error_storage_over_quota_banner_title">Sincronizarea a fost întreruptă. Planul dvs. MEGA a rămas fără spațiu de stocare.</string>
-    <!-- Title of the insufficient storage error action -->
-    <string name="sync_error_storage_over_quota_banner_action">Upgradează</string>
     <!-- The warning message shown when the User enables the Device Charging requirement in Settings Camera Uploads, enables Camera Uploads, begins uploading content and the Device is not charged -->
     <string name="camera_uploads_phone_not_charging_message">Încărcarea este întreruptă, deoarece dispozitivul nu se încarcă</string>
     <!-- Label of the Device Status informing the user that Nothing is set up for the Current Device -->
@@ -352,36 +330,8 @@
     <string name="cloud_drive_tour_fourth_subtitle">Încărcări cameră sunt o funcție esențială pentru orice dispozitiv mobil și vă asigurăm. Înscrieți-vă acum pentru un cont.</string>
     <!-- Fifth subtitle of the tour screen -->
     <string name="cloud_drive_tour_fifth_subtitle">Întâlnire video criptată cu zero cunoștințe.</string>
-    <!-- Titles of the tour screen to onboard users with the MEGA application -->
-    <string-array name="cloud_drive_tour_titles">
-        <item>@string/cloud_drive_tour_first_title</item>
-        <item>@string/cloud_drive_tour_second_title</item>
-        <item>@string/cloud_drive_tour_third_title</item>
-        <item>@string/cloud_drive_tour_fourth_title</item>
-        <item>@string/cloud_drive_tour_fifth_title</item>
-    </string-array>
-    <!-- Subtitles of the tour screen to onboard users with the MEGA application -->
-    <string-array name="cloud_drive_tour_subtitles">
-        <item>@string/cloud_drive_tour_first_subtitle</item>
-        <item>@string/cloud_drive_tour_second_subtitle</item>
-        <item>@string/cloud_drive_tour_third_subtitle</item>
-        <item>@string/cloud_drive_tour_fourth_subtitle</item>
-        <item>@string/cloud_drive_tour_fifth_subtitle</item>
-    </string-array>
     <!-- Title of the Raise to Hand Feature Introduction Tooltip -->
     <string name="meetings_raised_hand_tooltip_title">[A]Funcție nouă: ridicați mâna[/A]</string>
-    <!-- Message of the synced folder list empty state for free accounts -->
-    <string name="device_center_sync_list_empty_state_message_free_account">Păstrați-vă informațiile sincronizate și upgradate trecând la unul dintre abonamentele noastre Pro.</string>
-    <!-- "Upgrade now" label for a button, menu entry, etc -->
-    <string name="general_upgrade_now_label">Upgradați acum</string>
-    <!-- Title of the upgrade dialog displayed for free accounts when try to add a new sync -->
-    <string name="device_center_sync_upgrade_dialog_title">Upgradează la Pro</string>
-    <!-- Message of the upgrade dialog displayed for free accounts when try to add a new sync -->
-    <string name="device_center_sync_upgrade_dialog_message">Abonamentele noastre Pro dezlănțuie puterea de sincronizare a dispozitivului dvs. mobil cu MEGA.</string>
-    <!-- Confirm button text of the upgrade dialog displayed for free accounts when try to add a new sync -->
-    <string name="device_center_sync_upgrade_dialog_confirm_button">Upgradează</string>
-    <!-- Cancel button text of the upgrade dialog displayed for free accounts when try to add a new sync -->
-    <string name="device_center_sync_upgrade_dialog_cancel_button">Nu acum</string>
     <!-- Title of the Warning Dialog shown when the new Local Primary or Secondary Folder is same as, a parent folder or sub-folder of the opposite Local Folder -->
     <string name="settings_camera_uploads_related_new_local_folder_warning_dialog_title">Conflictul folderului încarcă</string>
     <!-- Body of the Warning Dialog shown when the new Local Primary or Secondary Folder is same as, a parent folder or sub-folder of the opposite Local Folder -->
@@ -392,12 +342,6 @@
     <string name="general_no_picker_warning">Acest dispozitiv nu are o aplicație care să selecteze foldere</string>
     <!-- Description of feature, which will be available for user, if they buy plan. This feature means user will be able to sync folders. Keep the bullet point, as this string is part of the bullet point list. -->
     <string name="account_upgrade_account_description_feature_sync">&#8226;&#160;Sincronizați automat folderele de pe dispozitivul mobil</string>
-    <!-- The error dialog text displayed when user opens Android Sync while having previously established syncs -->
-    <string name="sync_error_dialog_free_user">Sincronizările dvs. au fost întrerupte. Sincronizarea este o funcție a abonamentelor Pro.</string>
-    <!-- The error dialog confirm action text -->
-    <string name="sync_error_dialog_free_user_confirm_action">Bine</string>
-    <!-- The error banner text displayed when user opens Android Sync while having previously established syncs -->
-    <string name="sync_error_banner_free_user">Sincronizarea este întreruptă deoarece abonamentul MEGA Pro a fost anulat. Upgradați pentru a continua sincronizarea.</string>
     <!-- Hidden items -->
     <string name="hidden_items">Elemente ascunse</string>
     <!-- Label to indicate that is a Pro only feature -->
@@ -416,8 +360,6 @@
     <string name="add_tags_error_special_characters">Etichetele nu pot conține spații sau simboluri non-alfanumerice. Etichetele scrise cu majuscule vor fi afișate cu litere mici.</string>
     <!-- error label for add tags page when tag count is maximum -->
     <string name="add_tags_error_max_tags">Numărul maximal de etichete este %1$d</string>
-    <!-- error label for add tags page when tag character limit reached -->
-    <string name="add_tags_error_max_characters">Etichetele trebuie să fie %1$d&#160;caractere sau mai puțin</string>
     <!-- title label for tags page -->
     <string name="add_tags_page_title_label">Etichete</string>
     <!-- The placeholder for read only files/folders with no description in info screen-->
@@ -426,8 +368,6 @@
     <string name="video_to_playlist_top_bar_title">Adăugați la lista de redare</string>
     <!-- Text of the create new playlist in the page that adds the video to the video playlist -->
     <string name="video_to_playlist_new_playlist_text">Listă de redare nouă</string>
-    <!-- Text of the done button in the page that adds the video to the video playlist -->
-    <string name="video_to_playlist_done_button">Terminat</string>
     <!-- Title shown when cancelling the current plan, informing the user of features they'll miss out on -->
     <string name="account_cancel_account_screen_plan_miss_out_on_features">Nu veți beneficia de următoarele funcții</string>
     <!-- Message shown when cancelling the plan, indicating that access to features will continue until the plan expires -->
@@ -440,8 +380,6 @@
     <string name="account_cancel_account_screen_plan_free_plan">Gratuit</string>
     <!-- Row label for storage feature in the comparison table -->
     <string name="account_cancel_account_screen_plan_storage">Spațiu de stocare</string>
-    <!-- Storage amount available in the free plan. %1s represents the amount of storage and the unit -->
-    <string name="account_cancel_account_screen_plan_free_storage">%1&#160;s</string>
     <!-- Row label for transfer feature in the comparison table -->
     <string name="account_cancel_account_screen_plan_transfer">Transferuri</string>
     <!-- Transfer limit in the free plan -->
@@ -461,13 +399,13 @@
     <!-- Feature indicating MEGA VPN availability, available in the pro plan -->
     <string name="account_cancel_account_screen_plan_mega_vpn">MEGA&#160;VPN</string>
     <!-- Row label for call and meeting duration in the comparison table -->
-    <string name="account_cancel_account_screen_plan_call_meeting_duration">Durata apelului și întâlnirii</string>
+    <string name="account_cancel_account_screen_plan_call_meeting_duration">Call &amp;amp;amp; meeting duration</string>
     <!-- Call and meeting duration limit in the free plan -->
     <string name="account_cancel_account_screen_plan_call_meeting_duration_free">Până la 1&#160;oră</string>
     <!-- Unlimited call and meeting duration available in the pro plan -->
     <string name="cancel_account_plan_call_meeting_duration_pro">Nelimitată</string>
     <!-- Row label for call and meeting participants in the comparison table -->
-    <string name="account_cancel_account_plan_call_meeting_participants">Participanții la apel și la întâlnire</string>
+    <string name="account_cancel_account_plan_call_meeting_participants">Call &amp;amp;amp; meeting participants</string>
     <!-- Limit on call and meeting participants in the free plan -->
     <string name="account_cancel_account_free_plan_call_meeting_participants">Până la 100</string>
     <!-- Unlimited call and meeting participants available in the pro plan -->
@@ -532,10 +470,6 @@
     <string name="account_cancellation_instructions_click_reactivate_subscription">6. Dați clic pe [A]Reactivați abonamentul[/A].</string>
     <!-- Label for cancellation instructions on a mobile device -->
     <string name="account_cancellation_instructions_on_mobile_device">Pe un dispozitiv mobil</string>
-    <!-- Step 1: instruction step no.1 to visit the MEGA website on the mobile device-->
-    <string name="account_cancellation_instructions_mobile_visit_website">1. Accesați [A]www.mega.nz[/A] în browserul web.</string>
-    <!-- Step 2: instruction step no.2 to Log in to MEGA account on the mobile device from the browser-->
-    <string name="account_cancellation_instructions_mobile_login_account">2. Conectați-vă la contul MEGA.</string>
     <!-- Step 3: instruction step no.3 Tap on the user avatar on the MEGA website from the mobile device-->
     <string name="account_cancellation_instructions_tap_avatar">3. Atingeți avatarul dvs.</string>
     <!-- Step 4: instruction step no.4 Tap Cancel subscription on the account from the MEGA website from the mobile device-->
@@ -566,12 +500,6 @@
     <string name="transfers_scanning_folders_dialog_starting_transfers_title">Începerea transferurilor&#8230;</string>
     <!-- Transfers scanning folders dialog info to explain why the app shouldn't be closed -->
     <string name="transfers_scanning_folders_dialog_cancel_info_subtitle">Nu închide aplicația. Dacă o închizi, transferurile care nu sunt încă în coadă vor fi pierdute.</string>
-    <!-- Transfers scanning folders dialog sub-title when the app is scanning a single folder-->
-    <plurals name="transfers_scanning_folders_dialog_scanning_folder_subtitle">
-        <item quantity="one">Au fost găsite 1 folder și %1$d&#160;fișier.</item>
-        <item quantity="few">Au fost găsite 1 folder și %1$d&#160;fișiere.</item>
-        <item quantity="other">Au fost găsite 1 folder și %1$d de fișiere.</item>
-    </plurals>
     <!-- Transfers scanning folders dialog sub-title when the app is scanning multiple folders. This is the folders pluralization part to implement double pluralization in transfers_scanning_folders_dialog_scanning_files_and_folders_subtitle. Example: "134 folders". Example with double pluralization in transfers_scanning_folders_dialog_scanning_files_and_folders_subtitle: "Found 134 folders and 5689 files."-->
     <plurals name="transfers_scanning_folders_dialog_scanning_folders_subtitle">
         <item quantity="one">%1$d&#160;folder</item>
@@ -590,8 +518,6 @@
     <string name="settings_sync_clear_debris_dialog_title">Ștergeți resturile?</string>
     <!-- Body of the dialog shown when user clicks to clear debris from settings menu -->
     <string name="settings_sync_clear_debris_dialog_body">Backup-uri ale versiunilor anterioare ale fișierelor sincronizate vor fi șterse definitiv de pe dispozitiv.\n\nVerificați folderul .debris în dispozitivul local pentru a vedea dacă trebuie să restaurați ceva.</string>
-    <!-- Cancel button of the dialog shown when user clicks to clear debris from settings menu -->
-    <string name="settings_sync_clear_debris_dialog_cancel">Anulați</string>
     <!-- Continue button of the dialog shown when user clicks to clear debris from settings menu -->
     <string name="settings_sync_clear_debris_dialog_continue">Continuați</string>
     <!-- Snackbar message shown when user clears debris from settings menu -->
@@ -602,8 +528,6 @@
         <item quantity="few">Au fost găsite %1$s și %2$d&#160;fișiere.</item>
         <item quantity="other">Au fost găsite %1$s și %2$d de fișiere.</item>
     </plurals>
-    <!-- Label for the file info information screen no tags label -->
-    <string name="file_info_information_no_tags_label">Nicio etichetă</string>
     <!-- Transfers scanning folders dialog title to inform that the transfers are being cancelled -->
     <string name="transfers_scanning_folders_dialog_cancel_cancelling_title">Se anulează transferurile&#8230;</string>
     <!-- error warning message for report issue when not enough characters are typed and user tries to send report-->
@@ -694,12 +618,8 @@
     <string name="sync_promotion_bottom_sheet_body_message">Sincronizați un folder de pe dispozitiv cu MEGA pentru a accesa cea mai recentă versiune a fișierelor dvs. oriunde</string>
     <!-- Text of the primary button of the bottom sheet to promote Sync feature for Pro users ("Sync folders") -->
     <string name="sync_promotion_bottom_sheet_primary_button_text_pro">Sincronizați folderele</string>
-    <!-- Text of the primary button of the bottom sheet to promote Sync feature for Free users ("Upgrade") -->
-    <string name="sync_promotion_bottom_sheet_primary_button_text_free">Faceți upgrade pentru a folosi sincronizarea</string>
     <!-- Text of the secondary button of the bottom sheet to promote Sync feature ("Learn more") -->
     <string name="sync_promotion_bottom_sheet_secondary_button_text">Aflați mai multe</string>
-    <!-- Sync option dialog cancel button -->
-    <string name="settings_sync_option_cancel">Anulați</string>
     <!-- Snackbar message displayed when sync option is selected -->
     <string name="settings_sync_option_updated_message">Opțiuni de sincronizare actualizate</string>
     <!-- Title of the Contact Permission Explanation -->
@@ -718,10 +638,6 @@
     <string name="device_center_add_sync_button_option">Adăugați o sincronizare</string>
     <!-- Label for the button or menu option to add a backup -->
     <string name="device_center_add_backup_button_option">Adăugați un backup</string>
-    <!-- Title of the upgrade dialog displayed for free accounts when try to add a new sync or backup -->
-    <string name="device_center_sync_backup_upgrade_dialog_title">Upgradează-ți contul</string>
-    <!-- Message of the upgrade dialog displayed for free accounts when try to add a new sync or backup -->
-    <string name="device_center_sync_backup_upgrade_dialog_message">Deblocați puterea de a sincroniza și de a face backup pentru dispozitivul mobil în spațiu de stocare în cloud cu unul dintre abonamentele noastre premium</string>
     <!-- Title of the share meeting link bottom panel -->
     <string name="meetings_share_link_bottom_sheet_title">Întâlnire confirmată: Invitați alții să se alăture</string>
     <!-- Button text of the send meeting link to chat -->
@@ -758,8 +674,6 @@
     <string name="sync_backup_access_storage_permission_dialog_message">Pentru a face copii de rezervă ale fișierelor, MEGA are nevoie de acces la fișierele și folderele de pe dispozitiv. Datele dvs. sunt întotdeauna în siguranță la noi.</string>
     <!-- Text for the warning banner displayed if try to create a new backup but storage permission has not been granted. The placeholders are to underline text -->
     <string name="sync_add_new_backup_storage_permission_banner">MEGA are nevoie de acces la spațiul de stocare al dispozitivului dvs. pentru a face o copie de rezervă a folderului local. [U]Atingeți pentru a acorda acces[/U]</string>
-    <!--Success message displayed in the Login screen after the account has been activated-->
-    <string name="login_screen_account_confirmed_success_message">Contul tău a fost activat. Te rugăm să te autentifici.</string>
     <!-- Title in the files permission screen -->
     <string name="files_permission_screen_title">Permiteți MEGA să acceseze fișierele dispozitivului</string>
     <!-- Context message in the files permission screen -->
@@ -776,8 +690,6 @@
     <string name="sync_snackbar_message_confirm_sync_stopped">Sincronizarea sa oprit</string>
     <!-- Title of the dialog to confirm stop a backup -->
     <string name="sync_stop_backup_confirm_dialog_title">Oprește backupul</string>
-    <!-- Message of the dialog to confirm stop a backup -->
-    <string name="sync_stop_backup_confirm_dialog_message">Aceasta va opri procesul de sincronizare între cele două foldere. O copie va fi creată și salvată pe Unitatea cloud.</string>
     <!-- Label for the button to stop a backup -->
     <string name="sync_stop_backup_button">Oprește backupul</string>
     <!-- Snackbar message to indicate that backup has been stopped -->
@@ -792,10 +704,6 @@
     <string name="device_center_sync_backup_list_empty_state_title">Nu sunt configurate conexiuni</string>
     <!-- Message of the synced folder list empty state -->
     <string name="device_center_sync_backup_list_empty_state_message">Sincronizați sau faceți o copie de rezervă a unui folder de pe dispozitiv cu un folder de pe MEGA</string>
-    <!-- Message of the synced folder list empty state for free accounts -->
-    <string name="device_center_sync_backup_list_empty_state_message_free_account">Treceți la un cont premium pentru a vă menține informațiile importante în siguranță și actualizate cu sincronizare și backup</string>
-    <!-- Synced folder list empty state "See upgrade options" button label -->
-    <string name="device_center_sync_backup_see_upgrade_options_button_label">Consultați opțiunile de upgrade</string>
     <!-- subtitle of meeting title in schedule meeting for title disclaimer -->
     <string name="meetings_schedule_meeting_meeting_title_disclaimer">MEGA poate vedea numele și descrierea întâlnirii dvs., dar le păstrăm private</string>
     <!-- Capital letters. Text of the label of a new historic notifications-->
