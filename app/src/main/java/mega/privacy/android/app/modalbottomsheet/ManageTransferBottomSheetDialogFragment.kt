@@ -33,6 +33,7 @@ import mega.privacy.android.domain.entity.node.thumbnail.ThumbnailRequest
 import mega.privacy.android.domain.entity.transfer.CompletedTransfer
 import nz.mega.sdk.MegaChatApiJava
 import nz.mega.sdk.MegaTransfer
+import timber.log.Timber
 import java.io.File
 
 /**
@@ -223,19 +224,25 @@ internal class ManageTransferBottomSheetDialogFragment : BaseBottomSheetDialogFr
         if (FileUtil.isFileAvailable(localFile)) {
             val intent = Intent(Intent.ACTION_VIEW)
             intent.addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION)
-            FileProvider.getUriForFile(
-                requireActivity(),
-                Constants.AUTHORITY_STRING_FILE_PROVIDER,
-                localFile
-            )?.let { uri ->
-                intent.setDataAndType(uri, typeForName(localFile.name).type)
-                if (MegaApiUtils.isIntentAvailable(requireActivity(), intent)) {
-                    startActivity(intent)
-                    return
+            try {
+                FileProvider.getUriForFile(
+                    requireActivity(),
+                    Constants.AUTHORITY_STRING_FILE_PROVIDER,
+                    localFile
+                )?.let { uri ->
+                    intent.setDataAndType(uri, typeForName(localFile.name).type)
+                    if (MegaApiUtils.isIntentAvailable(requireActivity(), intent)) {
+                        startActivity(intent)
+                        return
+                    }
                 }
+            } catch (e: Exception) {
+                Timber.e(e)
             }
+            showSnackbar(requireContext(), getString(R.string.intent_not_available))
+        } else {
+            showSnackbar(requireContext(), getString(R.string.corrupt_video_dialog_text))
         }
-        showSnackbar(requireContext(), getString(R.string.corrupt_video_dialog_text))
     }
 
     companion object {
