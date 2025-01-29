@@ -8,13 +8,19 @@ import java.io.File;
 public class FileDocument {
     private File file;
     private MimeTypeList mimeType;
+    private boolean isHighlighted;
 
-    public FileDocument(File file) {
+    public FileDocument(File file, boolean isHighlighted) {
         this.file = file;
+        this.isHighlighted = isHighlighted;
     }
 
     public File getFile() {
         return file;
+    }
+
+    public boolean isHighlighted() {
+        return isHighlighted;
     }
 
     public boolean isHidden() {

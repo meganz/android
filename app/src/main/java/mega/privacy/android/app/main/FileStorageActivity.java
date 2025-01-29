@@ -102,6 +102,7 @@ public class FileStorageActivity extends PasscodeActivity implements Scrollable 
     public static final String EXTRA_DOCUMENT_HASHES = "document_hash";
     public static final String EXTRA_SAVE_RECOVERY_KEY = "save_recovery_key";
     public static final String EXTRA_PATH = "filepath";
+    public static final String EXTRA_FILE_NAME = "filename";
     public static final String EXTRA_IS_FOLDER_IN_SD_CARD = "is_folder_in_sd_card";
     public static final String EXTRA_PROMPT = "prompt";
 
@@ -137,6 +138,7 @@ public class FileStorageActivity extends PasscodeActivity implements Scrollable 
     private Mode mode;
     private File path;
     private File root;
+    private String highlightFilePath;
     private RelativeLayout viewContainer;
     private TextView contentText;
     private RecyclerView listView;
@@ -300,6 +302,7 @@ public class FileStorageActivity extends PasscodeActivity implements Scrollable 
                 String extraPath = intent.getExtras().getString(EXTRA_PATH);
                 if (!isTextEmpty(extraPath)) {
                     root = path = new File(extraPath);
+                    highlightFilePath = extraPath + File.separator + intent.getExtras().getString(EXTRA_FILE_NAME);
                 }
             }
             checkPath();
@@ -496,23 +499,42 @@ public class FileStorageActivity extends PasscodeActivity implements Scrollable 
         }
 
         File[] files = path.listFiles();
+        int hightlightFilePosition = -1;
+        boolean isHighlightFileFound = false;
 
         if (files != null) {
-            Timber.d("Number of files: %s", files.length);
-
             for (File file : files) {
-                FileDocument document = new FileDocument(file);
+                boolean isHighlighted = highlightFilePath != null && highlightFilePath.equals(file.getAbsolutePath());
+                FileDocument document = new FileDocument(file, isHighlighted);
                 if (document.isHidden()) {
                     continue;
                 }
-
                 documents.add(document);
+                if (isHighlighted) {
+                    isHighlightFileFound = true;
+                }
             }
 
             Collections.sort(documents, new CustomComparator());
+
+            if (isHighlightFileFound) {
+                for (int i = 0; i < documents.size(); i++) {
+                    if (documents.get(i).isHighlighted()) {
+                        hightlightFilePosition = i;
+                        break;
+                    }
+                }
+            }
         }
 
         adapter.setFiles(documents);
+
+        if (hightlightFilePosition != -1) {
+            RecyclerView.SmoothScroller smoothScroller = new FileStorageAdapter.CenterSmoothScroller(listView.getContext());
+            smoothScroller.setTargetPosition(hightlightFilePosition);
+            mLayoutManager.startSmoothScroll(smoothScroller);
+        }
+
         showEmptyState();
     }
 
