@@ -231,7 +231,7 @@ fun RingingActionButtons(
     Box(
         modifier = modifier
             .padding(bottom = 80.dp)
-            .padding(horizontal = 24.dp)
+            .padding(horizontal = 48.dp)
 
     ) {
         Column(
