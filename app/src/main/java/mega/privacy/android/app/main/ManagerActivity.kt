@@ -3081,48 +3081,46 @@ class ManagerActivity : PasscodeActivity(), NavigationView.OnNavigationItemSelec
             DrawerItem.CLOUD_DRIVE -> {
                 val isCloudDriveSyncsFeatureOn =
                     getFeatureFlagValueUseCase(AppFeatures.CloudDriveAndSyncs)
-                if (fileBrowserViewModel.state().selectedTab != CloudDriveTab.SYNC) {
-                    supportActionBar?.subtitle = null
-                    Timber.d("Cloud Drive SECTION")
-                    val parentNode = withContext(ioDispatcher) {
-                        megaApi.getNodeByHandle(fileBrowserViewModel.state().fileBrowserHandle)
-                    }
-                    if (parentNode != null) {
-                        if (megaApi.rootNode != null) {
-                            if ((parentNode.handle == megaApi.rootNode?.handle
-                                        || fileBrowserViewModel.state().fileBrowserHandle == -1L)
-                                && !fileBrowserViewModel.isMediaDiscoveryOpen()
-                            ) {
-                                if (isCloudDriveSyncsFeatureOn) {
-                                    supportActionBar?.title =
-                                        getString(sharedR.string.general_drive)
-                                } else {
-                                    supportActionBar?.title =
-                                        getString(R.string.section_cloud_drive)
-                                }
-
-                                viewModel.setIsFirstNavigationLevel(true)
+                supportActionBar?.subtitle = null
+                Timber.d("Cloud Drive SECTION")
+                val parentNode = withContext(ioDispatcher) {
+                    megaApi.getNodeByHandle(fileBrowserViewModel.state().fileBrowserHandle)
+                }
+                if (parentNode != null) {
+                    if (megaApi.rootNode != null) {
+                        if ((parentNode.handle == megaApi.rootNode?.handle
+                                    || fileBrowserViewModel.state().fileBrowserHandle == -1L)
+                            && !fileBrowserViewModel.isMediaDiscoveryOpen()
+                        ) {
+                            if (isCloudDriveSyncsFeatureOn) {
+                                supportActionBar?.title =
+                                    getString(sharedR.string.general_drive)
                             } else {
-                                supportActionBar?.title = parentNode.name
-                                viewModel.setIsFirstNavigationLevel(false)
+                                supportActionBar?.title =
+                                    getString(R.string.section_cloud_drive)
                             }
+
+                            viewModel.setIsFirstNavigationLevel(true)
                         } else {
-                            fileBrowserViewModel.setFileBrowserHandle(-1)
+                            supportActionBar?.title = parentNode.name
+                            viewModel.setIsFirstNavigationLevel(false)
                         }
                     } else {
-                        if (megaApi.rootNode != null) {
-                            if (fileBrowserViewModel.state().fileBrowserHandle == INVALID_HANDLE) {
-                                fileBrowserViewModel.setFileBrowserHandle(
-                                    megaApi.rootNode?.handle ?: INVALID_HANDLE
-                                )
-                                supportActionBar?.title =
-                                    getString(R.string.title_mega_info_empty_screen)
-                                viewModel.setIsFirstNavigationLevel(true)
-                            }
-                        } else {
-                            fileBrowserViewModel.setFileBrowserHandle(-1)
+                        fileBrowserViewModel.setFileBrowserHandle(-1)
+                    }
+                } else {
+                    if (megaApi.rootNode != null) {
+                        if (fileBrowserViewModel.state().fileBrowserHandle == INVALID_HANDLE) {
+                            fileBrowserViewModel.setFileBrowserHandle(
+                                megaApi.rootNode?.handle ?: INVALID_HANDLE
+                            )
+                            supportActionBar?.title =
+                                getString(R.string.title_mega_info_empty_screen)
                             viewModel.setIsFirstNavigationLevel(true)
                         }
+                    } else {
+                        fileBrowserViewModel.setFileBrowserHandle(-1)
+                        viewModel.setIsFirstNavigationLevel(true)
                     }
                 }
             }
@@ -4835,8 +4833,8 @@ class ManagerActivity : PasscodeActivity(), NavigationView.OnNavigationItemSelec
                                 }
                                 megaNavigator.openSyncs(this@ManagerActivity)
                             }
-                            resetSyncFolderVisibility()
                             goBackToRootLevel()
+                            resetSyncFolderVisibility()
                         } else {
                             if (isMediaDiscoveryOpen()) {
                                 exitMediaDiscovery(performBackNavigation = performBackNavigation)

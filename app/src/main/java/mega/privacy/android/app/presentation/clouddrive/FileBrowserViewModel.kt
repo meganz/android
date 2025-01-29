@@ -500,6 +500,9 @@ class FileBrowserViewModel @Inject constructor(
                 isMediaDiscoveryOpen = false,
                 isMediaDiscoveryOpenedByIconClick = false,
                 isSyncFolderOpen = false,
+                selectedTab = if (it.isFromSyncTab) CloudDriveTab.SYNC else CloudDriveTab.CLOUD,
+                isFromSyncTab = false,
+                updateToolbarTitleEvent = triggered
             )
         }
         getRootNodeUseCase()?.id?.longValue?.let { rootHandle ->
@@ -564,7 +567,7 @@ class FileBrowserViewModel @Inject constructor(
             _state.update {
                 it.copy(
                     openedFolderNodeHandles = emptySet(),
-                    exitFileBrowserEvent = triggered
+                    exitFileBrowserEvent = triggered,
                 )
             }
         }
