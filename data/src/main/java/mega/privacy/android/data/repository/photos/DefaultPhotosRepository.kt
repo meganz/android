@@ -764,7 +764,7 @@ internal class DefaultPhotosRepository @Inject constructor(
                 onRequestFinish = { request, error ->
                     if (error.errorCode == MegaError.API_OK) {
                         if (!request.flag) {
-                            continuation.resumeWith(Result.success(request.publicNode))
+                            continuation.resumeWith(Result.success(request.publicMegaNode))
                         } else {
                             continuation.resumeWithException(IllegalArgumentException("Invalid key for public node"))
                         }
