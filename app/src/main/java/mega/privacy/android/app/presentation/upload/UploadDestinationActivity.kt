@@ -19,6 +19,7 @@ import mega.privacy.android.app.presentation.extensions.isDarkMode
 import mega.privacy.android.app.presentation.extensions.parcelable
 import mega.privacy.android.app.presentation.extensions.parcelableArrayList
 import mega.privacy.android.app.presentation.passcode.model.PasscodeCryptObjectFactory
+import mega.privacy.android.app.presentation.psa.PsaContainer
 import mega.privacy.android.app.presentation.security.check.PasscodeContainer
 import mega.privacy.android.app.utils.Constants
 import mega.privacy.android.domain.entity.ThemeMode
@@ -75,16 +76,18 @@ class UploadDestinationActivity : AppCompatActivity() {
                             PasscodeContainer(
                                 passcodeCryptObjectFactory = passcodeCryptObjectFactory,
                                 content = {
-                                    UploadDestinationView(
-                                        uiState = uploadActivityUiState,
-                                        isValidNameForUpload = uploadDestinationViewModel::isValidNameForUpload,
-                                        consumeNameValidationError = uploadDestinationViewModel::consumeNameValidationError,
-                                        editFileName = uploadDestinationViewModel::editFileName,
-                                        updateFileName = uploadDestinationViewModel::updateFileName,
-                                        navigateToCloudDrive = this::navigateToCloudDrive,
-                                        navigateToChats = this::navigateToChats,
-                                        handleBackPress = this::onBackPressed
-                                    )
+                                    PsaContainer {
+                                        UploadDestinationView(
+                                            uiState = uploadActivityUiState,
+                                            isValidNameForUpload = uploadDestinationViewModel::isValidNameForUpload,
+                                            consumeNameValidationError = uploadDestinationViewModel::consumeNameValidationError,
+                                            editFileName = uploadDestinationViewModel::editFileName,
+                                            updateFileName = uploadDestinationViewModel::updateFileName,
+                                            navigateToCloudDrive = this::navigateToCloudDrive,
+                                            navigateToChats = this::navigateToChats,
+                                            handleBackPress = this::onBackPressed
+                                        )
+                                    }
                                 }
                             )
                         }

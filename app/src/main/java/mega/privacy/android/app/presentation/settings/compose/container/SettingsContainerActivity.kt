@@ -15,6 +15,7 @@ import mega.android.core.ui.theme.AndroidTheme
 import mega.privacy.android.app.components.session.SessionContainer
 import mega.privacy.android.app.presentation.extensions.isDarkMode
 import mega.privacy.android.app.presentation.passcode.model.PasscodeCryptObjectFactory
+import mega.privacy.android.app.presentation.psa.PsaContainer
 import mega.privacy.android.app.presentation.security.check.PasscodeContainer
 import mega.privacy.android.app.presentation.settings.compose.navigation.SettingsGraph
 import mega.privacy.android.app.presentation.settings.compose.navigation.settingsGraph
@@ -42,20 +43,22 @@ class SettingsContainerActivity : FragmentActivity() {
                     PasscodeContainer(
                         passcodeCryptObjectFactory = passcodeCryptObjectFactory,
                         content = {
-                            val navHostController = rememberNavController()
-                            NavHost(
-                                navController = navHostController,
-                                startDestination = SettingsGraph,
-                                modifier = Modifier.fillMaxSize()
-                            ) {
-                                settingsGraph(
+                            PsaContainer {
+                                val navHostController = rememberNavController()
+                                NavHost(
                                     navController = navHostController,
-                                    {
-                                        if (navHostController.popBackStack()
-                                                .not()
-                                        ) finishAfterTransition()
-                                    }
-                                )
+                                    startDestination = SettingsGraph,
+                                    modifier = Modifier.fillMaxSize()
+                                ) {
+                                    settingsGraph(
+                                        navController = navHostController,
+                                        {
+                                            if (navHostController.popBackStack()
+                                                    .not()
+                                            ) finishAfterTransition()
+                                        }
+                                    )
+                                }
                             }
                         }
                     )

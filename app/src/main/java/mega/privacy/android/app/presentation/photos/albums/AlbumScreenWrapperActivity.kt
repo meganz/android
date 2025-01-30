@@ -30,6 +30,7 @@ import mega.privacy.android.app.presentation.photos.albums.importlink.AlbumImpor
 import mega.privacy.android.app.presentation.photos.albums.importlink.ImagePreviewProvider
 import mega.privacy.android.app.presentation.photos.albums.photosselection.AlbumFlow
 import mega.privacy.android.app.presentation.photos.albums.photosselection.AlbumPhotosSelectionScreen
+import mega.privacy.android.app.presentation.psa.PsaContainer
 import mega.privacy.android.app.presentation.security.check.PasscodeContainer
 import mega.privacy.android.app.presentation.settings.model.StorageTargetPreference
 import mega.privacy.android.app.upgradeAccount.UpgradeAccountActivity
@@ -83,7 +84,7 @@ class AlbumScreenWrapperActivity : BaseActivity() {
             OriginalTempTheme(isDark = themeMode.isDarkMode()) {
                 PasscodeContainer(
                     passcodeCryptObjectFactory = passcodeCryptObjectFactory,
-                    content = { AlbumScreenContent() }
+                    content = { PsaContainer { AlbumScreenContent() } }
                 )
             }
         }

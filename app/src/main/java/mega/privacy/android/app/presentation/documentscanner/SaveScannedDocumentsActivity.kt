@@ -15,12 +15,12 @@ import com.google.accompanist.systemuicontroller.rememberSystemUiController
 import dagger.hilt.android.AndroidEntryPoint
 import mega.privacy.android.analytics.Analytics
 import mega.privacy.android.app.components.session.SessionContainer
-import mega.privacy.android.app.extensions.enableEdgeToEdgeAndConsumeInsets
 import mega.privacy.android.app.main.FileExplorerActivity
 import mega.privacy.android.app.presentation.documentscanner.model.ScanDestination
 import mega.privacy.android.app.presentation.documentscanner.model.ScanFileType
 import mega.privacy.android.app.presentation.extensions.isDarkMode
 import mega.privacy.android.app.presentation.passcode.model.PasscodeCryptObjectFactory
+import mega.privacy.android.app.presentation.psa.PsaContainer
 import mega.privacy.android.app.presentation.security.check.PasscodeContainer
 import mega.privacy.android.domain.entity.ThemeMode
 import mega.privacy.android.domain.usecase.GetThemeMode
@@ -70,24 +70,26 @@ internal class SaveScannedDocumentsActivity : AppCompatActivity() {
                     PasscodeContainer(
                         passcodeCryptObjectFactory = passcodeCryptObjectFactory,
                         content = {
-                            SaveScannedDocumentsScreen(
-                                viewModel = viewModel,
-                                onUploadScansStarted = { uriToUpload ->
-                                    val uiState = viewModel.uiState.value
-                                    if (uiState.originatedFromChat) {
-                                        Analytics.tracker.trackEvent(
-                                            if (uiState.scanFileType == ScanFileType.Pdf) {
-                                                DocumentScannerUploadingPDFToChatEvent
-                                            } else {
-                                                DocumentScannerUploadingImageToChatEvent
-                                            }
-                                        )
-                                        redirectBackToChat(uriToUpload)
-                                    } else {
-                                        proceedToFileExplorer(uriToUpload)
+                            PsaContainer {
+                                SaveScannedDocumentsScreen(
+                                    viewModel = viewModel,
+                                    onUploadScansStarted = { uriToUpload ->
+                                        val uiState = viewModel.uiState.value
+                                        if (uiState.originatedFromChat) {
+                                            Analytics.tracker.trackEvent(
+                                                if (uiState.scanFileType == ScanFileType.Pdf) {
+                                                    DocumentScannerUploadingPDFToChatEvent
+                                                } else {
+                                                    DocumentScannerUploadingImageToChatEvent
+                                                }
+                                            )
+                                            redirectBackToChat(uriToUpload)
+                                        } else {
+                                            proceedToFileExplorer(uriToUpload)
+                                        }
                                     }
-                                }
-                            )
+                                )
+                            }
                         },
                     )
                 }

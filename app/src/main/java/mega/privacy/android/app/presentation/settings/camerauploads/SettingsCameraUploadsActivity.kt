@@ -10,6 +10,7 @@ import mega.privacy.android.app.components.session.SessionContainer
 import mega.privacy.android.app.extensions.enableEdgeToEdgeAndConsumeInsets
 import mega.privacy.android.app.presentation.extensions.isDarkMode
 import mega.privacy.android.app.presentation.passcode.model.PasscodeCryptObjectFactory
+import mega.privacy.android.app.presentation.psa.PsaContainer
 import mega.privacy.android.app.presentation.security.check.PasscodeContainer
 import mega.privacy.android.domain.entity.ThemeMode
 import mega.privacy.android.domain.usecase.GetThemeMode
@@ -48,7 +49,7 @@ class SettingsCameraUploadsActivity : ComponentActivity() {
                 OriginalTempTheme(isDark = themeMode.isDarkMode()) {
                     PasscodeContainer(
                         passcodeCryptObjectFactory = passcodeCryptObjectFactory,
-                        content = { SettingsCameraUploadsScreen() },
+                        content = { PsaContainer { SettingsCameraUploadsScreen() } },
                     )
                 }
             }

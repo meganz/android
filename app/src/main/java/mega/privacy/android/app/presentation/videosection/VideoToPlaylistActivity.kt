@@ -12,6 +12,7 @@ import dagger.hilt.android.AndroidEntryPoint
 import mega.privacy.android.app.components.session.SessionContainer
 import mega.privacy.android.app.presentation.extensions.isDarkMode
 import mega.privacy.android.app.presentation.passcode.model.PasscodeCryptObjectFactory
+import mega.privacy.android.app.presentation.psa.PsaContainer
 import mega.privacy.android.app.presentation.security.check.PasscodeContainer
 import mega.privacy.android.app.presentation.videosection.view.videotoplaylist.VideoToPlaylistScreen
 import mega.privacy.android.domain.entity.ThemeMode
@@ -52,18 +53,21 @@ class VideoToPlaylistActivity : ComponentActivity() {
                 OriginalTempTheme(isDark = themeMode.isDarkMode()) {
                     PasscodeContainer(passcodeCryptObjectFactory = passcodeCryptObjectFactory,
                         content = {
-                            VideoToPlaylistScreen(
-                                viewModel = viewModel,
-                                addedVideoFinished = { titles ->
-                                    setResult(
-                                        RESULT_OK,
-                                        Intent().putStringArrayListExtra(
-                                            INTENT_SUCCEED_ADDED_PLAYLIST_TITLES, ArrayList(titles)
+                            PsaContainer {
+                                VideoToPlaylistScreen(
+                                    viewModel = viewModel,
+                                    addedVideoFinished = { titles ->
+                                        setResult(
+                                            RESULT_OK,
+                                            Intent().putStringArrayListExtra(
+                                                INTENT_SUCCEED_ADDED_PLAYLIST_TITLES,
+                                                ArrayList(titles)
+                                            )
                                         )
-                                    )
-                                    finish()
-                                }
-                            )
+                                        finish()
+                                    }
+                                )
+                            }
                         }
                     )
                 }

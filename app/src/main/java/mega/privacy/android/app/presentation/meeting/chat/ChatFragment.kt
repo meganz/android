@@ -36,6 +36,7 @@ import mega.privacy.android.app.presentation.meeting.chat.view.navigation.startM
 import mega.privacy.android.app.presentation.meeting.chat.view.navigation.startWaitingRoom
 import mega.privacy.android.app.presentation.meeting.chat.view.showPermissionNotAllowedSnackbar
 import mega.privacy.android.app.presentation.passcode.model.PasscodeCryptObjectFactory
+import mega.privacy.android.app.presentation.psa.PsaContainer
 import mega.privacy.android.app.presentation.security.check.PasscodeContainer
 import mega.privacy.android.app.presentation.settings.model.StorageTargetPreference
 import mega.privacy.android.app.utils.Constants
@@ -77,86 +78,93 @@ internal class ChatFragment : Fragment() {
                     PasscodeContainer(
                         passcodeCryptObjectFactory = passcodeCryptObjectFactory,
                         content = {
-                            val bottomSheetNavigator = rememberBottomSheetNavigator()
-                            val navHostController = rememberNavController(bottomSheetNavigator)
-                            val chatId =
-                                requireActivity().intent.getLongExtra(Constants.CHAT_ID, -1)
-                            val action = requireActivity().intent.getStringExtra(EXTRA_ACTION)
-                                ?: Constants.ACTION_CHAT_SHOW_MESSAGES
-                            val chatLink = requireActivity().intent.getStringExtra(EXTRA_LINK)
-                            val coroutineScope = rememberCoroutineScope()
+                            PsaContainer {
+                                val bottomSheetNavigator = rememberBottomSheetNavigator()
+                                val navHostController = rememberNavController(bottomSheetNavigator)
+                                val chatId =
+                                    requireActivity().intent.getLongExtra(Constants.CHAT_ID, -1)
+                                val action = requireActivity().intent.getStringExtra(EXTRA_ACTION)
+                                    ?: Constants.ACTION_CHAT_SHOW_MESSAGES
+                                val chatLink = requireActivity().intent.getStringExtra(EXTRA_LINK)
+                                val coroutineScope = rememberCoroutineScope()
 
-                            val scaffoldState = rememberScaffoldState()
+                                val scaffoldState = rememberScaffoldState()
 
-                            //Real chat navigation graph implementation should include the chat list screen and use that as the default route,
-                            NavHost(
-                                navController = navHostController,
-                                startDestination = "start",
-                                modifier = Modifier.navigationBarsPadding()
-                            ) {
+                                //Real chat navigation graph implementation should include the chat list screen and use that as the default route,
+                                NavHost(
+                                    navController = navHostController,
+                                    startDestination = "start",
+                                    modifier = Modifier.navigationBarsPadding()
+                                ) {
 
-                                composable("start") {
-                                    navHostController.navigateToChatViewGraph(
-                                        chatId = chatId,
-                                        chatLink = chatLink,
-                                        action = action,
-                                        navOptions = navOptions {
-                                            popUpTo("start") {
-                                                inclusive = true
+                                    composable("start") {
+                                        navHostController.navigateToChatViewGraph(
+                                            chatId = chatId,
+                                            chatLink = chatLink,
+                                            action = action,
+                                            navOptions = navOptions {
+                                                popUpTo("start") {
+                                                    inclusive = true
+                                                }
                                             }
+                                        )
+                                    }
+
+                                    chatViewNavigationGraph(
+                                        navController = navHostController,
+                                        bottomSheetNavigator = bottomSheetNavigator,
+                                        scaffoldState = scaffoldState,
+                                        startMeeting = {
+                                            startMeetingActivity(
+                                                requireContext(),
+                                                it
+                                            )
+                                        },
+                                        navigateToInviteContact = {
+                                            megaNavigator.openInviteContactActivity(
+                                                requireContext(),
+                                                false
+                                            )
+                                        },
+                                        showGroupOrContactInfoActivity = {
+                                            showGroupOrContactInfoActivity(
+                                                context,
+                                                it
+                                            )
+                                        },
+                                        navigateToChat = { openChatFragment(context, it) },
+                                        navigateToContactInfo = {
+                                            openContactInfoActivity(
+                                                context,
+                                                it
+                                            )
+                                        },
+                                        navigateToMeeting = { chatId, enableAudio, enableVideo ->
+                                            startMeetingActivity(
+                                                context,
+                                                chatId,
+                                                enableAudio,
+                                                enableVideo
+                                            )
+                                        },
+                                        navigateToWaitingRoom = { startWaitingRoom(context, it) },
+                                        onBackPress = { requireActivity().supportFinishAfterTransition() },
+                                        onCameraPermissionDenied = {
+                                            showPermissionNotAllowedSnackbar(
+                                                context,
+                                                coroutineScope,
+                                                scaffoldState.snackbarHostState,
+                                                R.string.chat_attach_pick_from_camera_deny_permission
+                                            )
+                                        },
+                                        navigateToStorageSettings = {
+                                            megaNavigator.openSettings(
+                                                requireActivity(),
+                                                StorageTargetPreference
+                                            )
                                         }
                                     )
                                 }
-
-                                chatViewNavigationGraph(
-                                    navController = navHostController,
-                                    bottomSheetNavigator = bottomSheetNavigator,
-                                    scaffoldState = scaffoldState,
-                                    startMeeting = { startMeetingActivity(requireContext(), it) },
-                                    navigateToInviteContact = {
-                                        megaNavigator.openInviteContactActivity(
-                                            requireContext(),
-                                            false
-                                        )
-                                    },
-                                    showGroupOrContactInfoActivity = {
-                                        showGroupOrContactInfoActivity(
-                                            context,
-                                            it
-                                        )
-                                    },
-                                    navigateToChat = { openChatFragment(context, it) },
-                                    navigateToContactInfo = {
-                                        openContactInfoActivity(
-                                            context,
-                                            it
-                                        )
-                                    },
-                                    navigateToMeeting = { chatId, enableAudio, enableVideo ->
-                                        startMeetingActivity(
-                                            context,
-                                            chatId,
-                                            enableAudio,
-                                            enableVideo
-                                        )
-                                    },
-                                    navigateToWaitingRoom = { startWaitingRoom(context, it) },
-                                    onBackPress = { requireActivity().supportFinishAfterTransition() },
-                                    onCameraPermissionDenied = {
-                                        showPermissionNotAllowedSnackbar(
-                                            context,
-                                            coroutineScope,
-                                            scaffoldState.snackbarHostState,
-                                            R.string.chat_attach_pick_from_camera_deny_permission
-                                        )
-                                    },
-                                    navigateToStorageSettings = {
-                                        megaNavigator.openSettings(
-                                            requireActivity(),
-                                            StorageTargetPreference
-                                        )
-                                    }
-                                )
                             }
                         }
                     )

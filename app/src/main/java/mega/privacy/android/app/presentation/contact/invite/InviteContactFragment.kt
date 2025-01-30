@@ -21,6 +21,7 @@ import mega.privacy.android.app.components.session.SessionContainer
 import mega.privacy.android.app.presentation.contact.invite.navigation.InviteContactScreenResult
 import mega.privacy.android.app.presentation.extensions.isDarkMode
 import mega.privacy.android.app.presentation.passcode.model.PasscodeCryptObjectFactory
+import mega.privacy.android.app.presentation.psa.PsaContainer
 import mega.privacy.android.app.presentation.qrcode.QRCodeComposeActivity
 import mega.privacy.android.app.presentation.security.check.PasscodeContainer
 import mega.privacy.android.app.utils.Constants
@@ -65,18 +66,20 @@ class InviteContactFragment : Fragment() {
                         passcodeCryptObjectFactory = passcodeCryptObjectFactory,
                         loading = {},
                         content = {
-                            // This is necessary to prevent the viewmodel class from being recreated when the configuration changes.
-                            // This can be removed after we fully migrate to a single activity and Compose navigation.
-                            CompositionLocalProvider(LocalViewModelStoreOwner provides activity as InviteContactActivity) {
-                                InviteContactRoute(
-                                    modifier = Modifier.fillMaxSize(),
-                                    isDarkMode = themeMode.isDarkMode(),
-                                    onNavigateUp = ::setActivityResultAndFinish,
-                                    onBackPressed = ::onBackPressed,
-                                    onShareContactLink = ::shareContactLink,
-                                    onOpenPersonalQRCode = ::initMyQr,
-                                    onOpenQRScanner = ::initScanQR,
-                                )
+                            PsaContainer {
+                                // This is necessary to prevent the viewmodel class from being recreated when the configuration changes.
+                                // This can be removed after we fully migrate to a single activity and Compose navigation.
+                                CompositionLocalProvider(LocalViewModelStoreOwner provides activity as InviteContactActivity) {
+                                    InviteContactRoute(
+                                        modifier = Modifier.fillMaxSize(),
+                                        isDarkMode = themeMode.isDarkMode(),
+                                        onNavigateUp = ::setActivityResultAndFinish,
+                                        onBackPressed = ::onBackPressed,
+                                        onShareContactLink = ::shareContactLink,
+                                        onOpenPersonalQRCode = ::initMyQr,
+                                        onOpenQRScanner = ::initScanQR,
+                                    )
+                                }
                             }
                         }
                     )

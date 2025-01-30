@@ -58,6 +58,7 @@ import mega.privacy.android.app.presentation.offline.action.HandleOfflineNodeAct
 import mega.privacy.android.app.presentation.offline.action.OfflineNodeActionsViewModel
 import mega.privacy.android.app.presentation.passcode.model.PasscodeCryptObjectFactory
 import mega.privacy.android.app.presentation.photos.albums.add.AddToAlbumActivity
+import mega.privacy.android.app.presentation.psa.PsaContainer
 import mega.privacy.android.app.presentation.security.check.PasscodeContainer
 import mega.privacy.android.app.presentation.settings.model.StorageTargetPreference
 import mega.privacy.android.app.presentation.transfers.attach.NodeAttachmentView
@@ -168,50 +169,52 @@ class ImagePreviewActivity : BaseActivity() {
                 PasscodeContainer(
                     passcodeCryptObjectFactory = passcodeCryptObjectFactory,
                     content = {
-                        ImagePreviewScreen(
-                            snackbarHostState = snackbarHostState,
-                            onClickBack = ::finish,
-                            onClickVideoPlay = ::playVideo,
-                            onClickSlideshow = ::playSlideshow,
-                            onClickInfo = ::checkInfo,
-                            onClickFavourite = ::favouriteNode,
-                            onClickLabel = ::handleLabel,
-                            onClickOpenWith = ::handleOpenWith,
-                            onClickSaveToDevice = ::saveNodeToDevice,
-                            onClickImport = ::importNode,
-                            onSwitchAvailableOffline = ::setAvailableOffline,
-                            onClickGetLink = ::getNodeLink,
-                            onClickSendTo = {
-                                nodeAttachmentViewModel.startAttachNodes(listOf(it.id))
-                            },
-                            onClickShare = ::shareNode,
-                            onClickRename = ::renameNode,
-                            onClickHide = ::hideNode,
-                            onClickHideHelp = ::showHiddenNodesOnboarding,
-                            onClickUnhide = ::unhideNode,
-                            onClickMove = ::moveNode,
-                            onClickCopy = ::copyNode,
-                            onClickRestore = ::restoreNode,
-                            onClickRemove = ::removeNode,
-                            onClickMoveToRubbishBin = ::moveNodeToRubbishBin,
-                            onClickAddToAlbum = ::addToAlbum,
-                            navigateToStorageSettings = {
-                                megaNavigator.openSettings(
-                                    this,
-                                    StorageTargetPreference
-                                )
-                            }
-                        )
+                        PsaContainer {
+                            ImagePreviewScreen(
+                                snackbarHostState = snackbarHostState,
+                                onClickBack = ::finish,
+                                onClickVideoPlay = ::playVideo,
+                                onClickSlideshow = ::playSlideshow,
+                                onClickInfo = ::checkInfo,
+                                onClickFavourite = ::favouriteNode,
+                                onClickLabel = ::handleLabel,
+                                onClickOpenWith = ::handleOpenWith,
+                                onClickSaveToDevice = ::saveNodeToDevice,
+                                onClickImport = ::importNode,
+                                onSwitchAvailableOffline = ::setAvailableOffline,
+                                onClickGetLink = ::getNodeLink,
+                                onClickSendTo = {
+                                    nodeAttachmentViewModel.startAttachNodes(listOf(it.id))
+                                },
+                                onClickShare = ::shareNode,
+                                onClickRename = ::renameNode,
+                                onClickHide = ::hideNode,
+                                onClickHideHelp = ::showHiddenNodesOnboarding,
+                                onClickUnhide = ::unhideNode,
+                                onClickMove = ::moveNode,
+                                onClickCopy = ::copyNode,
+                                onClickRestore = ::restoreNode,
+                                onClickRemove = ::removeNode,
+                                onClickMoveToRubbishBin = ::moveNodeToRubbishBin,
+                                onClickAddToAlbum = ::addToAlbum,
+                                navigateToStorageSettings = {
+                                    megaNavigator.openSettings(
+                                        this,
+                                        StorageTargetPreference
+                                    )
+                                }
+                            )
 
-                        NodeAttachmentView(
-                            viewModel = nodeAttachmentViewModel,
-                            snackbarHostState = snackbarHostState,
-                        )
-                        HandleOfflineNodeActions(
-                            viewModel = offlineNodeActionsViewModel,
-                            snackBarHostState = snackbarHostState,
-                            coroutineScope = rememberCoroutineScope(),
-                        )
+                            NodeAttachmentView(
+                                viewModel = nodeAttachmentViewModel,
+                                snackbarHostState = snackbarHostState,
+                            )
+                            HandleOfflineNodeActions(
+                                viewModel = offlineNodeActionsViewModel,
+                                snackBarHostState = snackbarHostState,
+                                coroutineScope = rememberCoroutineScope(),
+                            )
+                        }
                     }
                 )
             }
