@@ -222,7 +222,7 @@ internal class GetChatsUseCaseTest {
     }
 
     @Test
-    fun `test that isChatEnabled is called accordingly`() = runTest {
+    fun `test that isChatDndEnabled is called accordingly`() = runTest {
         val chatRoomType = GetChatsUseCase.ChatRoomType.NON_MEETINGS
 
         whenever(chatRoomItemMapper(any())).thenAnswer {
@@ -238,7 +238,7 @@ internal class GetChatsUseCaseTest {
             headerTimeMapper = headerTimeMapper,
         ).take(2).last()
 
-        verify(notificationsRepository, times(chatRooms.size)).isChatEnabled(anyLong())
+        verify(notificationsRepository, times(chatRooms.size)).isChatDndEnabled(anyLong())
     }
 
     @Test

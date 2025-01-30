@@ -83,11 +83,10 @@ class SettingsChatNotificationsFragment : SettingsBaseFragment(),
      */
     fun updateSwitch() {
         with(getPushNotificationSettingManagement().pushNotificationSetting) {
-            val areChatsEnabled = this.isChatsEnabled
             val isDndEnabled = this.isGlobalChatsDndEnabled
             val dndTime = this.globalChatsDnd
 
-            chatNotificationsSwitch?.isChecked = (areChatsEnabled && !isDndEnabled)
+            chatNotificationsSwitch?.isChecked = !isDndEnabled
 
             chatDndSwitch?.let {
                 when (dndTime) {

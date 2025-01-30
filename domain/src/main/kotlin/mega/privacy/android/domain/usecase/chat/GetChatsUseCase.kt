@@ -452,7 +452,7 @@ class GetChatsUseCase @Inject constructor(
         }.getOrNull()
 
     private suspend fun isChatMuted(chatId: Long): Boolean =
-        runCatching { !notificationsRepository.isChatEnabled(chatId) }.getOrNull() ?: false
+        runCatching { notificationsRepository.isChatDndEnabled(chatId) }.getOrNull() ?: false
 
     private suspend fun getCall(chatId: Long): ChatCall? =
         runCatching { getChatCallUseCase(chatId) }.getOrNull()

@@ -473,11 +473,11 @@ class DefaultNotificationsRepositoryTest {
         }
 
         @Test
-        fun `test that isChatEnabled returns correct value`() = runTest {
+        fun `test that isChatDndEnabled returns correct value`() = runTest {
             val chatId = 123L
-            val enabled = true
+            val enabled = false
             val settings = mock<MegaPushNotificationSettings> {
-                on { isChatEnabled(chatId) }.thenReturn(enabled)
+                on { isChatDndEnabled(chatId) }.thenReturn(enabled)
             }
 
             whenever(megaApiGateway.getPushNotificationSettings(any())).thenAnswer {
@@ -491,7 +491,7 @@ class DefaultNotificationsRepositoryTest {
 
             underTest.updatePushNotificationSettings()
 
-            val result = underTest.isChatEnabled(chatId)
+            val result = underTest.isChatDndEnabled(chatId)
 
             assertThat(result).isEqualTo(enabled)
         }
