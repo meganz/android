@@ -21,7 +21,7 @@
             app:surface_type="texture_view" />
 
         <ProgressBar
-            android:id="@+id/loading"
+            android:id="@+id/loading_audio_player_controller_view"
             android:layout_width="82dp"
             android:layout_height="82dp"
             app:layout_constraintStart_toStartOf="parent"

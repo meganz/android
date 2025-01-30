@@ -12,12 +12,4 @@
         app:default_artwork="@drawable/ic_default_audio_cover"
         app:player_layout_id="@layout/audio_player_view"
         app:surface_type="none" />
-
-    <com.google.android.material.progressindicator.LinearProgressIndicator
-        android:id="@+id/loading"
-        android:layout_width="200dp"
-        android:layout_height="wrap_content"
-        android:layout_gravity="center"
-        android:layout_marginTop="54dp"
-        android:indeterminate="true" />
 </FrameLayout>

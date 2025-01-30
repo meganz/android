@@ -2,11 +2,11 @@ package mega.privacy.android.app.mediaplayer
 
 import android.animation.Animator
 import android.content.Context
+import android.view.View
 import android.widget.FrameLayout
 import android.widget.ImageButton
 import android.widget.ImageView
 import android.widget.TextView
-import androidx.cardview.widget.CardView
 import androidx.constraintlayout.widget.ConstraintLayout
 import androidx.core.view.isVisible
 import androidx.media3.common.Player
@@ -28,7 +28,7 @@ import mega.privacy.mobile.analytics.event.AudioPlayerQueueButtonPressedEvent
  */
 class AudioPlayerViewHolder(val binding: FragmentAudioPlayerBinding) {
 
-    private val artworkContainer = binding.root.findViewById<CardView>(R.id.artwork_container)
+    private val artworkContainer = binding.root.findViewById<FrameLayout>(R.id.artwork_container)
     private val trackName = binding.root.findViewById<TextView>(R.id.track_name)
     private val artistName = binding.root.findViewById<TextView>(R.id.artist_name)
     private val playlist = binding.root.findViewById<ImageButton>(R.id.playlist)
@@ -185,7 +185,7 @@ class AudioPlayerViewHolder(val binding: FragmentAudioPlayerBinding) {
                         R.color.grey_050_grey_800
 
                     shuffleEnabled ->
-                        R.color.teal_300_teal_600
+                        R.color.color_button_brand
 
                     else ->
                         R.color.dark_grey_white
@@ -200,6 +200,11 @@ class AudioPlayerViewHolder(val binding: FragmentAudioPlayerBinding) {
      * @param playbackState the state of player
      */
     fun updateLoadingAnimation(@Player.State playbackState: Int?) {
-        binding.loading.isVisible = playbackState == Player.STATE_BUFFERING
+        binding.root.findViewById<View>(R.id.loading_audio_player_controller_view).isVisible =
+            playbackState == Player.STATE_BUFFERING
+        if (playbackState != null) {
+            binding.root.findViewById<View>(R.id.play_pause_placeholder).visibility =
+                if (playbackState > Player.STATE_BUFFERING) View.VISIBLE else View.INVISIBLE
+        }
     }
 }

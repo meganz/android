@@ -5,6 +5,7 @@ import android.content.Context
 import android.content.Intent
 import android.content.ServiceConnection
 import android.os.IBinder
+import android.view.View
 import android.widget.ImageButton
 import android.widget.TextView
 import androidx.core.view.isVisible
@@ -14,6 +15,7 @@ import androidx.lifecycle.LifecycleOwner
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.Observer
 import androidx.lifecycle.lifecycleScope
+import androidx.media3.common.Player
 import androidx.media3.ui.PlayerView
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Job
@@ -51,6 +53,12 @@ class MiniAudioPlayerController(
     private var _audioBinding = MutableStateFlow(false)
     val audioBinding: Flow<Boolean> = _audioBinding
 
+    private val playerListener = object : Player.Listener {
+        override fun onPlaybackStateChanged(state: Int) {
+            updateUIRegardingPlayback(state)
+        }
+    }
+
     /**
      * The parameter that determine the player view whether should be visible
      */
@@ -84,6 +92,7 @@ class MiniAudioPlayerController(
                         }
                     }
                 }
+                serviceGateway?.addPlayerListener(playerListener)
                 setupPlayerView()
                 if (visible()) {
                     onPlayerVisibilityChanged?.invoke()
@@ -157,6 +166,7 @@ class MiniAudioPlayerController(
      */
     fun onDestroy() {
         audioPlayerPlaying.removeObserver(audioPlayerPlayingObserver)
+        serviceGateway?.removeListener(playerListener)
         metadataChangedJob?.cancel()
         onAudioPlayerServiceStopped()
     }
@@ -197,7 +207,17 @@ class MiniAudioPlayerController(
 
     private fun setupPlayerView() {
         updatePlayerViewVisibility()
+        serviceGateway?.getPlaybackState()?.let { state ->
+            updateUIRegardingPlayback(state)
+        }
         serviceGateway?.setupPlayerView(playerView = playerView)
+    }
+
+    private fun updateUIRegardingPlayback(state: Int) {
+        playerView.findViewById<View>(R.id.loading_mini_audio_player).isVisible =
+            state == Player.STATE_BUFFERING
+        playerView.findViewById<View>(R.id.play_pause_placeholder).visibility =
+            if (state > Player.STATE_BUFFERING) View.VISIBLE else View.INVISIBLE
     }
 
     companion object {

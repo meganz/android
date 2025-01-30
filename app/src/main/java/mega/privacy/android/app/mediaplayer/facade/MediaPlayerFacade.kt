@@ -33,7 +33,6 @@ import androidx.media3.ui.PlayerView
 import com.google.common.collect.ImmutableList
 import dagger.hilt.android.qualifiers.ApplicationContext
 import kotlinx.coroutines.flow.flowOf
-import mega.privacy.android.app.R
 import mega.privacy.android.app.mediaplayer.MediaMegaPlayer
 import mega.privacy.android.app.mediaplayer.gateway.MediaPlayerGateway
 import mega.privacy.android.app.mediaplayer.mapper.ExoPlayerRepeatModeMapper
@@ -45,6 +44,7 @@ import mega.privacy.android.app.mediaplayer.service.MetadataExtractor
 import mega.privacy.android.app.utils.Constants.INVALID_VALUE
 import mega.privacy.android.domain.entity.mediaplayer.RepeatToggleMode
 import mega.privacy.android.domain.monitoring.CrashReporter
+import mega.privacy.android.icon.pack.R
 import timber.log.Timber
 import javax.inject.Inject
 

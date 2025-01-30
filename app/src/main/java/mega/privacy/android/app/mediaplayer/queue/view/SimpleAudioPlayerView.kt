@@ -3,10 +3,9 @@ package mega.privacy.android.app.mediaplayer.queue.view
 import android.view.LayoutInflater
 import android.view.ViewGroup
 import androidx.compose.foundation.isSystemInDarkTheme
-import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.wrapContentHeight
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.unit.dp
 import androidx.compose.ui.viewinterop.AndroidViewBinding
 import androidx.media3.ui.PlayerView
 import mega.privacy.android.app.databinding.SimpleAudioPlayerBinding
@@ -25,7 +24,7 @@ fun SimpleAudioPlayerView(
     modifier: Modifier = Modifier,
 ) {
     AndroidViewBinding(
-        modifier = modifier.height(130.dp),
+        modifier = modifier.wrapContentHeight(),
         factory = { inflater: LayoutInflater, parent: ViewGroup, attachToParent: Boolean ->
             SimpleAudioPlayerBinding.inflate(inflater, parent, attachToParent).apply {
                 setupAudioPlayer(playerView)

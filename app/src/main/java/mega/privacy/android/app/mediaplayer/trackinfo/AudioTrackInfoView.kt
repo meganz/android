@@ -1,5 +1,6 @@
 package mega.privacy.android.app.mediaplayer.trackinfo
 
+import mega.privacy.android.icon.pack.R as iconPackR
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
@@ -118,7 +119,7 @@ fun AudioInfoView(
                 if (thumbnail != null && thumbnail.exists()) {
                     thumbnail
                 } else {
-                    R.drawable.ic_default_audio_cover
+                    iconPackR.drawable.ic_default_audio_cover
                 }
             ),
             contentDescription = null,

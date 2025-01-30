@@ -231,7 +231,7 @@ class VideoPlayerViewHolder(val container: ViewGroup) {
      * @param playbackState the state of player
      */
     fun updateLoadingAnimation(@Player.State playbackState: Int?) {
-        container.findViewById<ProgressBar>(R.id.loading).isVisible =
+        container.findViewById<ProgressBar>(R.id.loading_audio_player_controller_view).isVisible =
             playbackState == Player.STATE_BUFFERING
     }
 
