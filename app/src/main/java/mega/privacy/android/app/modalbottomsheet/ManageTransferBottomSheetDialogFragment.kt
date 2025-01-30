@@ -98,8 +98,6 @@ internal class ManageTransferBottomSheetDialogFragment : BaseBottomSheetDialogFr
         name.text = transfer.fileName
         if (transfer.type == MegaTransfer.TYPE_DOWNLOAD) {
             type.setImageResource(R.drawable.ic_download_transfers)
-            getLinkOption.visibility = View.GONE
-            getLinkOptionSeparator.visibility = View.GONE
         } else if (transfer.type == MegaTransfer.TYPE_UPLOAD) {
             type.setImageResource(R.drawable.ic_upload_transfers)
         }
