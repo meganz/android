@@ -243,10 +243,6 @@ internal class MegaApiFacade @Inject constructor(
                 trySend(GlobalUpdate.OnNodesUpdate(nodeList))
             }
 
-            override fun onReloadNeeded(api: MegaApiJava) {
-                trySend(GlobalUpdate.OnReloadNeeded)
-            }
-
             override fun onAccountUpdate(api: MegaApiJava) {
                 trySend(GlobalUpdate.OnAccountUpdate)
             }
@@ -259,6 +255,9 @@ internal class MegaApiFacade @Inject constructor(
             }
 
             override fun onEvent(api: MegaApiJava, event: MegaEvent?) {
+                if (event?.type == MegaEvent.EVENT_RELOADING) {
+                    trySend(GlobalUpdate.OnReloadNeeded)
+                }
                 trySend(GlobalUpdate.OnEvent(event))
             }
 

@@ -885,9 +885,6 @@ internal class FileContactListActivity : PasscodeActivity(), View.OnClickListene
         nodeController.removeShares(shares, node)
     }
 
-    override fun onReloadNeeded(api: MegaApiJava) {
-    }
-
     override fun onAccountUpdate(api: MegaApiJava) {
     }
 

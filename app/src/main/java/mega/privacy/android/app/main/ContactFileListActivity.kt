@@ -910,7 +910,6 @@ internal class ContactFileListActivity : PasscodeActivity(), MegaGlobalListenerI
         contactFileListFragment?.takeIf { it.isVisible }?.setNodes(parentHandle)
     }
 
-    override fun onReloadNeeded(api: MegaApiJava) {}
     override fun onRequestStart(api: MegaApiJava, request: MegaRequest) {
         if (request.type == MegaRequest.TYPE_MOVE) {
             Timber.d("Move request start")

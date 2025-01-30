@@ -181,11 +181,6 @@ class GlobalListener @Inject constructor(
     }
 
     /**
-     * onReloadNeeded
-     */
-    override fun onReloadNeeded(api: MegaApiJava) {}
-
-    /**
      * onAccountUpdate
      */
     override fun onAccountUpdate(api: MegaApiJava) {
@@ -290,6 +285,7 @@ class GlobalListener @Inject constructor(
                 }
                 getInstance().checkEnabledCookies()
             }
+
             MegaEvent.EVENT_RELOADING -> showLoginFetchingNodes()
             MegaEvent.EVENT_UPGRADE_SECURITY -> applicationScope.launch {
                 setSecurityUpgradeInAppUseCase(true)

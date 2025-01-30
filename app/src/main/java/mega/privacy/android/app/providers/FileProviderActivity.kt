@@ -1569,7 +1569,6 @@ class FileProviderActivity : PasscodeFileProviderActivity(), MegaRequestListener
         }
     }
 
-    override fun onReloadNeeded(api: MegaApiJava) {}
     public override fun onDestroy() {
         megaApi.removeRequestListener(this@FileProviderActivity)
         megaApi.removeTransferListener(this@FileProviderActivity)

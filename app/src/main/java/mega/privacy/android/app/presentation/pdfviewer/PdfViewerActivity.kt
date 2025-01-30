@@ -696,8 +696,6 @@ class PdfViewerActivity : BaseActivity(), MegaGlobalListenerInterface, OnPageCha
         invalidateOptionsMenu()
     }
 
-    override fun onReloadNeeded(api: MegaApiJava) {}
-
     override fun onAccountUpdate(api: MegaApiJava) {}
 
     override fun onContactRequestsUpdate(

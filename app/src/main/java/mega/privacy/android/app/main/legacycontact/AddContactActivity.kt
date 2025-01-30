@@ -2924,9 +2924,6 @@ class AddContactActivity : PasscodeActivity(), View.OnClickListener,
     override fun onNodesUpdate(api: MegaApiJava, nodeList: ArrayList<MegaNode>?) {
     }
 
-    override fun onReloadNeeded(api: MegaApiJava) {
-    }
-
     override fun onAccountUpdate(api: MegaApiJava) {
     }
 

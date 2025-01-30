@@ -889,8 +889,6 @@ class VersionsFileActivity : PasscodeActivity(), MegaRequestListenerInterface,
         }
     }
 
-    override fun onReloadNeeded(api: MegaApiJava) {}
-
     override fun onRequestUpdate(api: MegaApiJava, request: MegaRequest) {}
 
     override fun onAccountUpdate(api: MegaApiJava) {}

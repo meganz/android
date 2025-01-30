@@ -2154,10 +2154,6 @@ class FileExplorerActivity : PasscodeActivity(), MegaRequestListenerInterface,
         }
     }
 
-    override fun onReloadNeeded(api: MegaApiJava) {
-
-    }
-
     public override fun onDestroy() {
         megaApi.removeGlobalListener(this)
         megaApi.removeRequestListener(this)
