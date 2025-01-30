@@ -2,7 +2,9 @@ package mega.privacy.android.domain.usecase.meeting
 
 import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.distinctUntilChanged
 import kotlinx.coroutines.flow.emitAll
+import kotlinx.coroutines.flow.filter
 import kotlinx.coroutines.flow.flow
 import kotlinx.coroutines.flow.flowOn
 import kotlinx.coroutines.flow.map
@@ -72,76 +74,89 @@ class MonitorCallPushNotificationUseCase @Inject constructor(
                     }
                 }
                 result
-            }
+            }.filter { it.isNotEmpty() }
 
     private fun monitorChatConnectionStateUpdates(): Flow<MutableMap<Long, CallPushMessageNotificationActionType>> =
         contactsRepository.monitorChatConnectionStateUpdates()
+            .distinctUntilChanged()
             .map { chatConnectionState ->
                 val chatId = chatConnectionState.chatId
                 val result = emptyMap<Long, CallPushMessageNotificationActionType>().toMutableMap()
                 val isConnected = isChatStatusConnectedForCallUseCase(chatId = chatId)
-                val isNotification =
-                    callRepository.getFakeIncomingCall(chatId = chatId) == FakeIncomingCallState.Notification
-                if (isConnected && isNotification) {
+
+                if (isConnected) {
                     val call = callRepository.getChatCall(chatId)
+                    val isNotification =
+                        callRepository.getFakeIncomingCall(chatId = chatId) == FakeIncomingCallState.Notification
+
+                    if (isNotification) {
+                        result[chatId] =
+                            if (call == null) CallPushMessageNotificationActionType.Missed else CallPushMessageNotificationActionType.Update
+                    }
+
                     if (call == null) {
-                        result[chatId] = CallPushMessageNotificationActionType.Missed
                         setFakeIncomingCallUseCase(chatId = chatId, type = null)
-                    } else {
-                        result[chatId] = CallPushMessageNotificationActionType.Update
+                        setPendingToHangUpCallUseCase(chatId = chatId, add = false)
                     }
                 }
+
                 result
-            }
+            }.filter { it.isNotEmpty() }
 
     private fun monitorChatCallUpdates(): Flow<MutableMap<Long, CallPushMessageNotificationActionType>> =
         callRepository.monitorChatCallUpdates()
             .map { call ->
                 val result = emptyMap<Long, CallPushMessageNotificationActionType>().toMutableMap()
-                when {
-                    call.changes.orEmpty().contains(ChatCallChanges.Status) -> {
+                call.changes?.apply {
+                    if (contains(ChatCallChanges.Status) &&
+                        (call.status == ChatCallStatus.Joining ||
+                                call.status == ChatCallStatus.InProgress ||
+                                call.status == ChatCallStatus.TerminatingUserParticipation ||
+                                call.status == ChatCallStatus.Destroyed)
+                    ) {
+                        runCatching {
+                            callRepository.isPendingToHangUp(call.callId)
+                        }.onSuccess { isPendingToHangUp ->
+                            if (isPendingToHangUp) {
+                                setPendingToHangUpCallUseCase(chatId = call.chatId, add = false)
+                            }
+                            setFakeIncomingCallUseCase(
+                                chatId = call.chatId,
+                                type = FakeIncomingCallState.Remove
+                            )
+                        }
+                    }
+                    if ((contains(ChatCallChanges.Status) || contains(ChatCallChanges.RingingStatus)) && call.status == ChatCallStatus.UserNoPresent) {
                         val chatId = call.chatId
                         val callId = call.callId
 
-                        val isPendingToHangUp = callRepository.isPendingToHangUp(chatId)
-
-                        when (call.status) {
-                            ChatCallStatus.UserNoPresent -> {
-                                if (isPendingToHangUp) {
-                                    setPendingToHangUpCallUseCase(chatId = chatId, add = false)
+                        runCatching {
+                            callRepository.isPendingToHangUp(callId)
+                        }.onSuccess { isPendingToHangUp ->
+                            if (isPendingToHangUp) {
+                                runCatching {
                                     callRepository.hangChatCall(callId)
-                                } else {
-                                    val isNotification =
-                                        callRepository.getFakeIncomingCall(chatId = chatId) == FakeIncomingCallState.Notification
-                                    val isConnected =
-                                        isChatStatusConnectedForCallUseCase(chatId = chatId)
-                                    if (isConnected && isNotification) {
-                                        result[chatId] =
-                                            CallPushMessageNotificationActionType.Update
-                                    }
+                                }.onSuccess {
+                                    setPendingToHangUpCallUseCase(
+                                        chatId = chatId,
+                                        add = false
+                                    )
+                                }
+                            } else {
+                                val isNotification =
+                                    callRepository.getFakeIncomingCall(chatId = chatId) == FakeIncomingCallState.Notification
+                                val isConnected =
+                                    isChatStatusConnectedForCallUseCase(chatId = chatId)
+                                if (isConnected && isNotification) {
+                                    result[chatId] =
+                                        CallPushMessageNotificationActionType.Update
                                 }
                             }
-
-                            ChatCallStatus.Joining,
-                            ChatCallStatus.InProgress,
-                            ChatCallStatus.TerminatingUserParticipation,
-                            ChatCallStatus.Destroyed,
-                                -> {
-                                if (isPendingToHangUp) {
-                                    setPendingToHangUpCallUseCase(chatId = chatId, add = false)
-                                }
-                                setFakeIncomingCallUseCase(
-                                    chatId = chatId,
-                                    type = FakeIncomingCallState.Remove
-                                )
-                            }
-
-                            else -> {}
                         }
-
                     }
                 }
 
+
                 result
-            }
+            }.filter { it.isNotEmpty() }
 }

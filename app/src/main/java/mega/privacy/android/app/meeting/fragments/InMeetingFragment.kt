@@ -195,7 +195,6 @@ class InMeetingFragment : MeetingBaseFragment(), BottomFloatingPanelListener, Sn
     private lateinit var dragTouchListener: OnDragTouchListener
     private var bannerShouldBeShown = false
 
-    private var callStatus: ChatCallStatus? = null
     private var isParticipantSharingScreen: Boolean = false
 
     private lateinit var binding: InMeetingFragmentBinding
@@ -323,9 +322,7 @@ class InMeetingFragment : MeetingBaseFragment(), BottomFloatingPanelListener, Sn
             val speaker: Participant? =
                 if (participant.isSpeaker && !participant.hasHiRes) inMeetingViewModel.getSpeaker(
                     participant.peerId, participant.clientId
-                )?.let {
-                    it
-                } ?: run { null } else null
+                ) ?: run { null } else null
 
             val existSpeaker: Boolean = speaker != null
 
@@ -858,13 +855,6 @@ class InMeetingFragment : MeetingBaseFragment(), BottomFloatingPanelListener, Sn
                 }
             }
 
-            state.call?.let {
-                if (callStatus != it.status) {
-                    callStatus = it.status
-                    checkChildFragments()
-                }
-            }
-
             meetingChrono?.apply {
                 if (state.showCallDuration) {
                     if (!isVisible) {
@@ -1060,6 +1050,7 @@ class InMeetingFragment : MeetingBaseFragment(), BottomFloatingPanelListener, Sn
                     ChatCallStatus.Initial -> {}
 
                     ChatCallStatus.Connecting -> {
+                        checkChildFragments()
                         checkMenuItemsVisibility()
                     }
 
@@ -1200,7 +1191,6 @@ class InMeetingFragment : MeetingBaseFragment(), BottomFloatingPanelListener, Sn
 
         viewLifecycleOwner.collectFlow(sharedModel.state.map { it.chatId }
             .distinctUntilChanged()) {
-            inMeetingViewModel.setChatId(it)
             callRecordingViewModel.setChatId(it)
         }
 
@@ -1297,8 +1287,10 @@ class InMeetingFragment : MeetingBaseFragment(), BottomFloatingPanelListener, Sn
         }
 
         viewLifecycleOwner.collectFlow(inMeetingViewModel.state.map { it.isInPipMode }) {
-            checkChildFragments()
-            Timber.d("Currently Picture in Picture Mode is $it")
+            if (it) {
+                checkChildFragments()
+                Timber.d("Currently Picture in Picture Mode is $it")
+            }
         }
 
         viewLifecycleOwner.collectFlow(

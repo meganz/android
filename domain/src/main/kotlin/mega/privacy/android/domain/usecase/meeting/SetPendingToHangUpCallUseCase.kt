@@ -17,7 +17,11 @@ class SetPendingToHangUpCallUseCase @Inject constructor(
      */
     suspend operator fun invoke(chatId: Long, add: Boolean) {
         when {
-            add -> callRepository.addCallPendingToHangUp(chatId)
+            add -> {
+                callRepository.addCallPendingToHangUp(chatId)
+                callRepository.removeFakeIncomingCall(chatId)
+            }
+
             callRepository.isPendingToHangUp(chatId) -> callRepository.removeCallPendingToHangUp(
                 chatId
             )

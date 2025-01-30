@@ -2,6 +2,7 @@ package mega.privacy.android.domain.usecase.meeting
 
 import mega.privacy.android.domain.entity.meeting.FakeIncomingCallState
 import mega.privacy.android.domain.repository.CallRepository
+import mega.privacy.android.domain.usecase.call.IsChatStatusConnectedForCallUseCase
 import javax.inject.Inject
 
 /**
@@ -9,6 +10,7 @@ import javax.inject.Inject
  */
 class SetFakeIncomingCallStateUseCase @Inject constructor(
     private val callRepository: CallRepository,
+    private val isChatStatusConnectedForCallUseCase: IsChatStatusConnectedForCallUseCase,
 ) {
     /**
      * Invoke
@@ -18,16 +20,24 @@ class SetFakeIncomingCallStateUseCase @Inject constructor(
      */
     suspend operator fun invoke(chatId: Long, type: FakeIncomingCallState?) {
         when (type) {
-            FakeIncomingCallState.Notification -> callRepository.addFakeIncomingCall(chatId, type)
+            FakeIncomingCallState.Notification -> if (!isChatStatusConnectedForCallUseCase(chatId)) {
+                callRepository.addFakeIncomingCall(chatId, type)
+            }
 
             FakeIncomingCallState.Screen,
             FakeIncomingCallState.Dismiss,
             FakeIncomingCallState.Remove,
-                -> if (callRepository.getFakeIncomingCall(chatId) != null) {
-                callRepository.addFakeIncomingCall(chatId, type)
+                -> {
+                callRepository.getFakeIncomingCall(chatId)?.let {
+                    if (it != type) {
+                        callRepository.addFakeIncomingCall(chatId, type)
+                    }
+                }
             }
 
-            null -> callRepository.removeFakeIncomingCall(chatId)
+            null -> if (callRepository.isFakeIncomingCall(chatId)) {
+                callRepository.removeFakeIncomingCall(chatId)
+            }
         }
     }
 }

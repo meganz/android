@@ -673,6 +673,13 @@ interface CallRepository {
     suspend fun getFakeIncomingCall(chatId: Long): FakeIncomingCallState?
 
     /**
+     * Check if call is fake incoming call
+     *
+     * @param chatId    Chat id
+     */
+    suspend fun isFakeIncomingCall(chatId: Long): Boolean
+
+    /**
      * Check if call is pending to hang up
      *
      * @param chatId    Chat id

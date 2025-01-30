@@ -166,6 +166,10 @@ class RTCAudioManagerFacade @Inject constructor(
         rtcAudioManagerRingInCall?.stopAudioSignals()
     }
 
+    override fun stopIncomingCallSounds() {
+        rtcAudioManagerRingInCall?.stopAudioSignals()
+    }
+
     override fun updateRTCAudioMangerTypeStatus(callStatus: Int) {
         removeRTCAudioManagerRingIn()
         stopSounds()

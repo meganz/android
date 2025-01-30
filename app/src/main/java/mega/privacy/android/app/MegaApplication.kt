@@ -4,6 +4,8 @@ import android.app.Activity
 import android.content.Intent
 import android.os.Build
 import android.os.Build.VERSION.SDK_INT
+import android.os.Handler
+import android.os.Looper
 import android.os.StrictMode
 import androidx.lifecycle.DefaultLifecycleObserver
 import androidx.lifecycle.LifecycleOwner
@@ -459,7 +461,9 @@ class MegaApplication : MultiDexApplication(), DefaultLifecycleObserver,
     fun createOrUpdateAudioManager(isSpeakerOn: Boolean, type: Int) {
         Timber.d("Create or update audio manager, type is %s", type)
         chatManagement.registerScreenReceiver()
-        rtcAudioManagerGateway.createOrUpdateAudioManager(isSpeakerOn, type)
+        Handler(Looper.getMainLooper()).post {
+            rtcAudioManagerGateway.createOrUpdateAudioManager(isSpeakerOn, type)
+        }
     }
 
     /**

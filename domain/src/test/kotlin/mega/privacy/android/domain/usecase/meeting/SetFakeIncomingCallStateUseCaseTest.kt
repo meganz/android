@@ -3,6 +3,7 @@ package mega.privacy.android.domain.usecase.meeting
 import kotlinx.coroutines.test.runTest
 import mega.privacy.android.domain.entity.meeting.FakeIncomingCallState
 import mega.privacy.android.domain.repository.CallRepository
+import mega.privacy.android.domain.usecase.call.IsChatStatusConnectedForCallUseCase
 import org.junit.jupiter.api.BeforeAll
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
@@ -15,22 +16,25 @@ import org.mockito.kotlin.whenever
 @TestInstance(TestInstance.Lifecycle.PER_CLASS)
 internal class SetFakeIncomingCallStateUseCaseTest {
     private val callRepository: CallRepository = mock()
+    private val isChatStatusConnectedForCallUseCase: IsChatStatusConnectedForCallUseCase = mock()
 
     private lateinit var underTest: SetFakeIncomingCallStateUseCase
     val chatId = 123L
 
     @BeforeAll
     fun setup() {
-        underTest = SetFakeIncomingCallStateUseCase(callRepository)
+        underTest =
+            SetFakeIncomingCallStateUseCase(callRepository, isChatStatusConnectedForCallUseCase)
     }
 
     @BeforeEach
     fun resetMocks() {
-        reset(callRepository)
+        reset(callRepository, isChatStatusConnectedForCallUseCase)
     }
 
     @Test
     fun `test that set fake incoming call as Notification`() = runTest {
+        whenever(isChatStatusConnectedForCallUseCase(chatId)).thenReturn(false)
         underTest.invoke(chatId = chatId, type = FakeIncomingCallState.Notification)
         verify(callRepository).addFakeIncomingCall(
             chatId = chatId,

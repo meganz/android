@@ -11,6 +11,7 @@ import android.widget.RelativeLayout
 import androidx.core.view.isVisible
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
+import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import androidx.preference.PreferenceManager
@@ -39,6 +40,7 @@ import mega.privacy.android.app.components.twemoji.EmojiTextView
 import mega.privacy.android.app.featuretoggle.AppFeatures
 import mega.privacy.android.app.fragments.homepage.Event
 import mega.privacy.android.app.listeners.GetUserEmailListener
+import mega.privacy.android.app.meeting.activity.MeetingActivity.Companion.MEETING_CHAT_ID
 import mega.privacy.android.app.meeting.adapter.Participant
 import mega.privacy.android.app.meeting.gateway.RTCAudioManagerGateway
 import mega.privacy.android.app.meeting.listeners.GroupVideoListener
@@ -228,15 +230,16 @@ class InMeetingViewModel @Inject constructor(
     private val monitorChatConnectionStateUseCase: MonitorChatConnectionStateUseCase,
     monitorContactCacheUpdates: MonitorContactCacheUpdates,
     monitorUserUpdates: MonitorUserUpdates,
+    savedStateHandle: SavedStateHandle,
 ) : ViewModel(), GetUserEmailListener.OnUserEmailUpdateCallback {
-    /**
-     * private UI state
-     */
-    private val _state = MutableStateFlow(InMeetingUiState())
 
-    /**
-     * public UI State
-     */
+    private val _state = MutableStateFlow(
+        InMeetingUiState(
+            currentChatId = savedStateHandle[MEETING_CHAT_ID]
+                ?: -1L
+        )
+    )
+
     val state = _state.asStateFlow()
 
     private var reconnectingJob: Job? = null
@@ -347,6 +350,10 @@ class InMeetingViewModel @Inject constructor(
     val getParticipantsChanges: StateFlow<Pair<Int, ((Context) -> String)?>> get() = _getParticipantsChanges
 
     init {
+        if (state.value.currentChatId != -1L) {
+            getChatRoom()
+            getChatCall()
+        }
         startMonitorChatCallUpdates()
         startMonitorChatSessionUpdates()
         startMonitorChatListItemUpdates()
@@ -772,17 +779,6 @@ class InMeetingViewModel @Inject constructor(
 
                             contains(ChatCallChanges.CallComposition) -> {
                                 if (call.callCompositionChange == CallCompositionChanges.Added || call.callCompositionChange == CallCompositionChanges.Removed) {
-                                    val numParticipants = call.numParticipants ?: 0
-                                    if (call.callCompositionChange == CallCompositionChanges.Added && numParticipants > 1 &&
-                                        state.value.myUserHandle == call.peerIdCallCompositionChange && call.status == ChatCallStatus.UserNoPresent
-                                    ) {
-                                        _state.update { state ->
-                                            state.copy(
-                                                callAnsweredInAnotherClient = true,
-                                            )
-                                        }
-                                    }
-
                                     if (showReconnectingBanner.value || !isOnline()) {
                                         Timber.d("Back from reconnecting")
                                     } else {

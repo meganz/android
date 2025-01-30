@@ -12,8 +12,6 @@ import kotlinx.coroutines.cancel
 import kotlinx.coroutines.launch
 import mega.privacy.android.app.MegaApplication
 import mega.privacy.android.app.meeting.gateway.RTCAudioManagerGateway
-import mega.privacy.android.app.meeting.listeners.HangChatCallListener
-import mega.privacy.android.app.meeting.listeners.HangChatCallListener.OnCallHungUpCallback
 import mega.privacy.android.app.objects.PasscodeManagement
 import mega.privacy.android.app.presentation.meeting.WaitingRoomActivity
 import mega.privacy.android.app.presentation.meeting.chat.ChatHostActivity
@@ -25,11 +23,15 @@ import mega.privacy.android.app.utils.permission.PermissionUtils.hasPermissions
 import mega.privacy.android.data.gateway.api.MegaChatApiGateway
 import mega.privacy.android.data.qualifier.MegaApi
 import mega.privacy.android.domain.entity.ChatRoomPermission
+import mega.privacy.android.domain.entity.meeting.FakeIncomingCallState
 import mega.privacy.android.domain.qualifier.IoDispatcher
 import mega.privacy.android.domain.usecase.GetChatRoomUseCase
 import mega.privacy.android.domain.usecase.call.AnswerChatCallUseCase
 import mega.privacy.android.domain.usecase.call.GetChatCallUseCase
+import mega.privacy.android.domain.usecase.call.HangChatCallUseCase
+import mega.privacy.android.domain.usecase.call.SetIgnoredCallUseCase
 import mega.privacy.android.domain.usecase.chat.HoldChatCallUseCase
+import mega.privacy.android.domain.usecase.meeting.SetFakeIncomingCallStateUseCase
 import mega.privacy.android.domain.usecase.meeting.StartMeetingInWaitingRoomChatUseCase
 import mega.privacy.android.domain.usecase.meeting.StartScheduledMeetingUseCase
 import nz.mega.sdk.MegaApiAndroid
@@ -57,10 +59,12 @@ import javax.inject.Inject
  * @property app                                    [MegaApplication]
  * @property megaChatApiGateway                     [MegaChatApiGateway]
  * @property holdChatCallUseCase                    [HoldChatCallUseCase]
+ * @property hangChatCallUseCase                    [HangChatCallUseCase]
+ * @property setIgnoredCallUseCase                  [SetIgnoredCallUseCase]
+ * @property setFakeIncomingCallStateUseCase        [SetFakeIncomingCallStateUseCase]
  */
 @AndroidEntryPoint
-class CallNotificationIntentService : Service(),
-    OnCallHungUpCallback {
+class CallNotificationIntentService : Service() {
 
     @Inject
     lateinit var passcodeManagement: PasscodeManagement
@@ -88,6 +92,15 @@ class CallNotificationIntentService : Service(),
 
     @Inject
     lateinit var notificationManager: NotificationManagerCompat
+
+    @Inject
+    lateinit var hangChatCallUseCase: HangChatCallUseCase
+
+    @Inject
+    lateinit var setIgnoredCallUseCase: SetIgnoredCallUseCase
+
+    @Inject
+    lateinit var setFakeIncomingCallStateUseCase: SetFakeIncomingCallStateUseCase
 
     /**
      * Coroutine dispatcher for camera upload work
@@ -118,7 +131,6 @@ class CallNotificationIntentService : Service(),
     private var callIdCurrentCall = MegaChatApiJava.MEGACHAT_INVALID_HANDLE
     private var isTraditionalCall = true
     private var schedIdIncomingCall: Long = MegaChatApiJava.MEGACHAT_INVALID_HANDLE
-
 
     /**
      * Service starts
@@ -157,6 +169,11 @@ class CallNotificationIntentService : Service(),
     private fun onHandleIntent(intent: Intent?) {
         Timber.d("onHandleIntent")
         if (intent == null) return
+        val action = intent.action ?: return
+
+        if (action == DISMISS) {
+            rtcAudioManagerGateway.removeRTCAudioManagerRingIn()
+        }
 
         intent.extras?.let { extras ->
             chatIdCurrentCall = extras.getLong(
@@ -189,7 +206,7 @@ class CallNotificationIntentService : Service(),
                 }
             }
 
-            val action = intent.action ?: return
+
             Timber.d("The button clicked is : $action, currentChatId = $chatIdCurrentCall, incomingCall = $chatIdIncomingCall")
 
             when (action) {
@@ -200,10 +217,7 @@ class CallNotificationIntentService : Service(),
                         answerCall(chatIdIncomingCall)
                     } else {
                         Timber.d("Hanging up current call ... ")
-                        megaChatApi.hangChatCall(
-                            call.callId,
-                            HangChatCallListener(this, this)
-                        )
+                        hangChatCall(call.callId)
                     }
                 } else {
                     if (currentCall == null) {
@@ -211,10 +225,7 @@ class CallNotificationIntentService : Service(),
                         answerCall(chatIdIncomingCall)
                     } else {
                         Timber.d("Hanging up current call ... ")
-                        megaChatApi.hangChatCall(
-                            callIdCurrentCall,
-                            HangChatCallListener(this, this)
-                        )
+                        hangChatCall(callIdCurrentCall)
                     }
                 }
 
@@ -225,14 +236,18 @@ class CallNotificationIntentService : Service(),
 
                 DECLINE -> {
                     Timber.d("Hanging up incoming call ... ")
-                    megaChatApi.hangChatCall(callIdIncomingCall, HangChatCallListener(this, this))
+                    hangChatCall(callIdIncomingCall)
                 }
 
                 IGNORE -> {
                     Timber.d("Ignore incoming call... ")
-                    megaChatApi.setIgnoredCall(chatIdIncomingCall)
-                    rtcAudioManagerGateway.stopSounds()
-                    clearIncomingCallNotification(callIdIncomingCall)
+                    ignoreCall(chatIdIncomingCall)
+                }
+
+                DISMISS -> {
+                    setFakeIncomingCall(
+                        chatId = chatIdIncomingCall, FakeIncomingCallState.Dismiss
+                    )
                     stopSelf()
                 }
 
@@ -245,6 +260,22 @@ class CallNotificationIntentService : Service(),
                 }
 
                 else -> throw IllegalArgumentException("Unsupported action: $action")
+            }
+        }
+    }
+
+    /**
+     * Set fake incoming call
+     *
+     * @param chatId Chat id
+     * @param type  [FakeIncomingCallState]
+     */
+    private fun setFakeIncomingCall(chatId: Long, type: FakeIncomingCallState) {
+        coroutineScope.launch {
+            runCatching {
+                setFakeIncomingCallStateUseCase(chatId = chatId, type = type)
+            }.onFailure { exception ->
+                Timber.e(exception)
             }
         }
     }
@@ -265,6 +296,61 @@ class CallNotificationIntentService : Service(),
                         answerCall(chatIdIncomingCall)
                     }
                 }
+            }.onFailure { error ->
+                Timber.e(error)
+            }
+        }
+    }
+
+    /**
+     * Hang chat call
+     *
+     * @param callId Call id
+     */
+    private fun hangChatCall(callId: Long) {
+        coroutineScope.launch {
+            runCatching {
+                hangChatCallUseCase(callId = callId)
+            }.onSuccess {
+                it?.let { call ->
+                    when (call.callId) {
+                        callIdIncomingCall -> {
+                            Timber.d("Incoming call hung up. ")
+                            clearIncomingCallNotification(callIdIncomingCall)
+                            setFakeIncomingCall(
+                                chatId = call.chatId,
+                                type = FakeIncomingCallState.Remove
+                            )
+
+                            stopSelf()
+                        }
+
+                        callIdCurrentCall -> {
+                            Timber.d("Current call hung up. Answering incoming call ...")
+                            answerCall(chatIdIncomingCall)
+                        }
+                    }
+                }
+            }.onFailure { error ->
+                Timber.e(error)
+            }
+        }
+    }
+
+    /**
+     * Ignore chat call
+     *
+     * @param chatId Call id
+     */
+    private fun ignoreCall(chatId: Long) {
+        coroutineScope.launch {
+            runCatching {
+                setIgnoredCallUseCase(chatId = chatId)
+            }.onSuccess {
+                rtcAudioManagerGateway.stopSounds()
+                clearIncomingCallNotification(callIdIncomingCall)
+                setFakeIncomingCall(chatId = chatId, type = FakeIncomingCallState.Remove)
+                stopSelf()
             }.onFailure { error ->
                 Timber.e(error)
             }
@@ -373,22 +459,6 @@ class CallNotificationIntentService : Service(),
     }
 
     /**
-     * Hang call
-     *
-     * @param callId The call id.
-     */
-    override fun onCallHungUp(callId: Long) {
-        if (callId == callIdIncomingCall) {
-            Timber.d("Incoming call hung up. ")
-            clearIncomingCallNotification(callIdIncomingCall)
-            stopSelf()
-        } else if (callId == callIdCurrentCall) {
-            Timber.d("Current call hung up. Answering incoming call ...")
-            answerCall(chatIdIncomingCall)
-        }
-    }
-
-    /**
      * Method for answering a call
      *
      * @param chatId Chat ID
@@ -423,7 +493,9 @@ class CallNotificationIntentService : Service(),
                         }
                 }
                 coroutineScope.cancel()
-            }.onFailure { Timber.w("Exception answering call: $it") }
+            }.onFailure {
+                Timber.w("Exception answering call: $it")
+            }
         }
     }
 
@@ -436,5 +508,6 @@ class CallNotificationIntentService : Service(),
         const val HOLD_JOIN = "HOLD_JOIN"
         const val END_JOIN = "END_JOIN"
         const val START_SCHED_MEET = "START_SCHED_MEET"
+        const val DISMISS = "DISMISS"
     }
 }

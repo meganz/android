@@ -847,6 +847,9 @@ internal class CallRepositoryImpl @Inject constructor(
     override suspend fun getFakeIncomingCall(chatId: Long): FakeIncomingCallState? =
         fakeIncomingCalls[chatId]
 
+    override suspend fun isFakeIncomingCall(chatId: Long): Boolean =
+        fakeIncomingCalls.contains(chatId)
+
     override suspend fun addCallPendingToHangUp(chatId: Long) {
         hangingCallIds.add(chatId)
     }

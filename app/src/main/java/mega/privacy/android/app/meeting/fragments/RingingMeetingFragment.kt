@@ -21,6 +21,7 @@ import mega.privacy.android.app.presentation.meeting.view.RingingScreen
 import mega.privacy.android.app.utils.RunOnUIThreadUtils
 import mega.privacy.android.app.utils.permission.PermissionUtils
 import mega.privacy.android.app.utils.permission.permissionsBuilder
+import mega.privacy.android.domain.entity.chat.ChatConnectionStatus
 import mega.privacy.android.shared.original.core.ui.theme.OriginalTempTheme
 import nz.mega.sdk.MegaChatApiJava.MEGACHAT_INVALID_HANDLE
 import timber.log.Timber
@@ -53,7 +54,6 @@ class RingingMeetingFragment : MeetingBaseFragment() {
      */
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
-
         meetingActivity.binding.toolbar.apply {
             isVisible = false
         }
@@ -67,17 +67,21 @@ class RingingMeetingFragment : MeetingBaseFragment() {
             RingingScreen(
                 viewModel = ringingViewModel,
                 onAudioClicked = {
-                    ringingViewModel.state.value.call?.let {
+                    if (ringingViewModel.state.value.call != null &&
+                        ringingViewModel.state.value.chatConnectionStatus == ChatConnectionStatus.Online
+                    ) {
                         checkAndAnswerCall(enableVideo = false)
-                    } ?: run {
-                        ringingViewModel.onVideoClicked(isClicked = true)
+                    } else {
+                        ringingViewModel.onAudioClicked(isClicked = true)
                     }
                 },
                 onVideoClicked = {
-                    ringingViewModel.state.value.call?.let {
+                    if (ringingViewModel.state.value.call != null &&
+                        ringingViewModel.state.value.chatConnectionStatus == ChatConnectionStatus.Online
+                    ) {
                         checkAndAnswerCall(enableVideo = true)
-                    } ?: run {
-                        ringingViewModel.onAudioClicked(isClicked = true)
+                    } else {
+                        ringingViewModel.onVideoClicked(isClicked = true)
                     }
                 },
                 onBackPressed = {
@@ -107,7 +111,7 @@ class RingingMeetingFragment : MeetingBaseFragment() {
             video = PermissionUtils.hasPermissions(requireContext(), Manifest.permission.CAMERA)
         }
 
-        sharedModel.checkAndAnswerCall(
+        sharedModel.answerCall(
             chatId = ringingViewModel.state.value.chatId,
             enableVideo = enableVideo,
             enableAudio = true,
@@ -166,26 +170,39 @@ class RingingMeetingFragment : MeetingBaseFragment() {
             .distinctUntilChanged()) {
             if (it != MEGACHAT_INVALID_HANDLE) {
                 sharedModel.updateChatRoomId(it)
-                inMeetingViewModel.setChatId(it)
             }
         }
 
         viewLifecycleOwner.collectFlow(ringingViewModel.state.map { it.call }
             .distinctUntilChanged()) {
-            it?.let {
-                if (ringingViewModel.state.value.isHangUpClicked) {
-                    ringingViewModel.onHangUpClicked(isClicked = false)
-                    ringingViewModel.processHangUp(it.callId)
-                }
+            it?.run {
+                if (ringingViewModel.state.value.chatConnectionStatus == ChatConnectionStatus.Online) {
+                    if (ringingViewModel.state.value.isAnswerWithAudioClicked) {
+                        ringingViewModel.onAudioClicked(isClicked = false)
+                        checkAndAnswerCall(enableVideo = false)
+                    }
 
-                if (ringingViewModel.state.value.isAnswerWithAudioClicked) {
-                    ringingViewModel.onAudioClicked(isClicked = false)
-                    checkAndAnswerCall(enableVideo = false)
+                    if (ringingViewModel.state.value.isAnswerWithVideoClicked) {
+                        ringingViewModel.onVideoClicked(isClicked = false)
+                        checkAndAnswerCall(enableVideo = true)
+                    }
                 }
+            }
+        }
 
-                if (ringingViewModel.state.value.isAnswerWithVideoClicked) {
-                    ringingViewModel.onVideoClicked(isClicked = false)
-                    checkAndAnswerCall(enableVideo = true)
+        viewLifecycleOwner.collectFlow(ringingViewModel.state.map { it.chatConnectionStatus }
+            .distinctUntilChanged()) {
+            if (it == ChatConnectionStatus.Online) {
+                ringingViewModel.state.value.call?.let {
+                    if (ringingViewModel.state.value.isAnswerWithAudioClicked) {
+                        ringingViewModel.onAudioClicked(isClicked = false)
+                        checkAndAnswerCall(enableVideo = false)
+                    }
+
+                    if (ringingViewModel.state.value.isAnswerWithVideoClicked) {
+                        ringingViewModel.onVideoClicked(isClicked = false)
+                        checkAndAnswerCall(enableVideo = true)
+                    }
                 }
             }
         }

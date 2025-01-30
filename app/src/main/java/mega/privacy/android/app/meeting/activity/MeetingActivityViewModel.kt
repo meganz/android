@@ -67,6 +67,7 @@ import mega.privacy.android.domain.entity.call.ChatCallChanges
 import mega.privacy.android.domain.entity.call.ChatCallStatus
 import mega.privacy.android.domain.entity.call.ChatCallTermCodeType
 import mega.privacy.android.domain.entity.call.ChatSessionChanges
+import mega.privacy.android.domain.entity.chat.ChatConnectionStatus
 import mega.privacy.android.domain.entity.chat.ChatParticipant
 import mega.privacy.android.domain.entity.chat.ChatRoomChange
 import mega.privacy.android.domain.entity.chat.ScheduledMeetingChanges
@@ -168,7 +169,7 @@ import javax.inject.Inject
  * @property muteAllPeersUseCase                            [MuteAllPeersUseCase]
  * @property getStringFromStringResMapper                   [GetStringFromStringResMapper]
  * @property getCurrentSubscriptionPlanUseCase              [GetCurrentSubscriptionPlanUseCase]
- * @property monitorAudioOutputUseCase                      [MonitoraAudioOutputUseCase]
+ * @property monitorAudioOutputUseCase                      [MonitorAudioOutputUseCase]
  * @property state                                          Current view state as [MeetingState]
  */
 @HiltViewModel
@@ -701,7 +702,7 @@ class MeetingActivityViewModel @Inject constructor(
                             }
 
                             ScheduledMeetingChanges.EndDate,
-                            -> _state.update { state ->
+                                -> _state.update { state ->
                                 state.copy(
                                     chatScheduledMeeting = state.chatScheduledMeeting?.copy(
                                         startDateTime = scheduledMeetReceived.endDateTime,
@@ -948,7 +949,7 @@ class MeetingActivityViewModel @Inject constructor(
 
                                             ChatCallTermCodeType.TooManyParticipants,
                                             ChatCallTermCodeType.TooManyClients,
-                                            -> _state.update { state ->
+                                                -> _state.update { state ->
                                                 state.copy(
                                                     callEndedDueToTooManyParticipants = true
                                                 )
@@ -1108,6 +1109,13 @@ class MeetingActivityViewModel @Inject constructor(
             monitorChatSessionUpdatesUseCase()
                 .filter { it.call?.chatId == _state.value.chatId }
                 .collectLatest { result ->
+                    result.call?.let { call ->
+                        _state.update { state ->
+                            state.copy(
+                                currentCall = call
+                            )
+                        }
+                    }
                     result.session?.let { session ->
                         session.changes?.apply {
                             if (contains(ChatSessionChanges.RemoteAvFlags)) {
@@ -1763,40 +1771,6 @@ class MeetingActivityViewModel @Inject constructor(
     }
 
     /**
-     * Check if should answer the call
-     *
-     * @param chatId Chat id
-     * @param enableAudio If audio is on
-     * @param enableVideo if video is on
-     * @param speakerAudio if speaker is on
-     */
-    fun checkAndAnswerCall(
-        chatId: Long,
-        enableVideo: Boolean,
-        enableAudio: Boolean,
-        speakerAudio: Boolean,
-    ) {
-
-        viewModelScope.launch {
-            runCatching {
-                getChatCallUseCase(chatId)
-            }.onSuccess { call ->
-                call?.apply {
-                    Timber.d("Answer call")
-                    answerCall(
-                        chatId = this.chatId,
-                        enableAudio = enableAudio,
-                        enableVideo = enableVideo,
-                        speakerAudio = speakerAudio
-                    )
-                }
-            }.onFailure { exception ->
-                Timber.e(exception)
-            }
-        }
-    }
-
-    /**
      * Answer call
      *
      * @param chatId Chat id
@@ -1810,50 +1784,64 @@ class MeetingActivityViewModel @Inject constructor(
         enableAudio: Boolean,
         speakerAudio: Boolean,
     ) {
-        if (CallUtil.amIParticipatingInThisMeeting(chatId)) {
-            Timber.d("Already participating in this call")
-            return
-        }
-
-        if (MegaApplication.getChatManagement().isAlreadyJoiningCall(chatId)) {
-            Timber.d("The call has been answered")
-            return
-        }
-
-        chatManagement.addJoiningCallChatId(chatId)
         viewModelScope.launch {
-            runCatching {
-                setChatVideoInDeviceUseCase()
-                answerChatCallUseCase(chatId = chatId, video = enableVideo, audio = enableAudio)
-            }.onSuccess { call ->
-                chatManagement.removeJoiningCallChatId(chatId)
-                rtcAudioManagerGateway.removeRTCAudioManagerRingIn()
-                if (call == null) {
-                    finishMeetingActivity()
-                } else {
-                    chatManagement.setSpeakerStatus(call.chatId, speakerAudio)
-                    chatManagement.setRequestSentCall(call.callId, false)
-                    CallUtil.clearIncomingCallNotification(call.callId)
+            val call = getChatCallUseCase(chatId)
 
-                    val actionString = if (enableVideo) {
-                        Timber.d("Call answered with video ON and audio ON")
-                        MEETING_ACTION_RINGING_VIDEO_ON
-                    } else {
-                        Timber.d("Call answered with video OFF and audio ON")
-                        MEETING_ACTION_RINGING_VIDEO_OFF
-                    }
+            when {
+                call == null -> {
+                    return@launch
+                }
 
-                    _state.update { state ->
-                        state.copy(
-                            answerResult = AnswerCallResult(
-                                chatHandle = chatId,
-                                actionString = actionString
-                            )
+                CallUtil.amIParticipatingInThisMeeting(chatId) -> {
+                    Timber.d("Already participating in this call")
+                    return@launch
+                }
+
+                MegaApplication.getChatManagement().isAlreadyJoiningCall(chatId) -> {
+                    Timber.d("The call has been answered")
+                    return@launch
+                }
+
+                else -> {
+                    chatManagement.addJoiningCallChatId(chatId)
+                    setChatVideoInDeviceUseCase()
+                    runCatching {
+                        answerChatCallUseCase(
+                            chatId = call.chatId,
+                            video = enableVideo,
+                            audio = enableAudio
                         )
+                    }.onSuccess { chatCall ->
+                        chatManagement.removeJoiningCallChatId(chatId)
+                        rtcAudioManagerGateway.removeRTCAudioManagerRingIn()
+                        if (chatCall == null) {
+                            finishMeetingActivity()
+                        } else {
+                            chatManagement.setSpeakerStatus(chatCall.chatId, speakerAudio)
+                            chatManagement.setRequestSentCall(chatCall.callId, false)
+                            CallUtil.clearIncomingCallNotification(chatCall.callId)
+
+                            val actionString = if (enableVideo) {
+                                Timber.d("Call answered with video ON and audio ON")
+                                MEETING_ACTION_RINGING_VIDEO_ON
+                            } else {
+                                Timber.d("Call answered with video OFF and audio ON")
+                                MEETING_ACTION_RINGING_VIDEO_OFF
+                            }
+
+                            _state.update { state ->
+                                state.copy(
+                                    answerResult = AnswerCallResult(
+                                        chatHandle = chatCall.chatId,
+                                        actionString = actionString
+                                    )
+                                )
+                            }
+                        }
+                    }.onFailure {
+                        Timber.w("Exception answering call: $it")
                     }
                 }
-            }.onFailure {
-                Timber.w("Exception answering call: $it")
             }
         }
     }

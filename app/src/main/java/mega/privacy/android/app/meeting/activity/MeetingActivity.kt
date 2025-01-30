@@ -11,17 +11,13 @@ import android.util.Rational
 import android.view.KeyEvent
 import android.view.MenuItem
 import android.view.View
-import android.view.ViewGroup
 import androidx.activity.OnBackPressedCallback
 import androidx.activity.enableEdgeToEdge
 import androidx.activity.viewModels
 import androidx.appcompat.app.AppCompatDelegate
 import androidx.compose.ui.platform.ViewCompositionStrategy
 import androidx.core.app.NotificationManagerCompat
-import androidx.core.view.ViewCompat
-import androidx.core.view.WindowInsetsCompat
 import androidx.core.view.isVisible
-import androidx.core.view.updateLayoutParams
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.lifecycleScope
 import androidx.navigation.NavController
@@ -148,40 +144,40 @@ class MeetingActivity : PasscodeActivity() {
      */
     private val onBackPressedCallback = object : OnBackPressedCallback(true) {
         override fun handleOnBackPressed() {
-            val currentFragment = getCurrentFragment()
+            getCurrentFragment()?.let { currentFragment ->
+                when (currentFragment) {
+                    is CreateMeetingFragment -> {
+                        currentFragment.releaseVideoAndHideKeyboard()
+                        removeRTCAudioManager()
+                    }
 
-            when (currentFragment) {
-                is CreateMeetingFragment -> {
-                    currentFragment.releaseVideoAndHideKeyboard()
-                    removeRTCAudioManager()
-                }
+                    is JoinMeetingFragment -> {
+                        currentFragment.releaseVideoDeviceAndRemoveChatVideoListener()
+                        removeRTCAudioManager()
+                    }
 
-                is JoinMeetingFragment -> {
-                    currentFragment.releaseVideoDeviceAndRemoveChatVideoListener()
-                    removeRTCAudioManager()
-                }
+                    is JoinMeetingAsGuestFragment -> {
+                        currentFragment.releaseVideoAndHideKeyboard()
+                        removeRTCAudioManager()
+                    }
 
-                is JoinMeetingAsGuestFragment -> {
-                    currentFragment.releaseVideoAndHideKeyboard()
-                    removeRTCAudioManager()
-                }
+                    is InMeetingFragment -> {
+                        // Prevent guest from quitting the call by pressing back
+                        if (!isGuest) {
+                            if (enterPipModeIfPossible()) return
+                            currentFragment.removeUI()
+                        }
+                    }
 
-                is InMeetingFragment -> {
-                    // Prevent guest from quitting the call by pressing back
-                    if (!isGuest) {
-                        if (enterPipModeIfPossible()) return
-                        currentFragment.removeUI()
+                    is MakeModeratorFragment -> {
+                        currentFragment.cancel()
                     }
                 }
 
-                is MakeModeratorFragment -> {
-                    currentFragment.cancel()
+                if (currentFragment !is MakeModeratorFragment && (currentFragment !is InMeetingFragment || !isGuest)) {
+                    isEnabled = false
+                    onBackPressedDispatcher.onBackPressed()
                 }
-            }
-
-            if (currentFragment !is MakeModeratorFragment && (currentFragment !is InMeetingFragment || !isGuest)) {
-                isEnabled = false
-                onBackPressedDispatcher.onBackPressed()
             }
         }
     }
@@ -222,9 +218,10 @@ class MeetingActivity : PasscodeActivity() {
      * Handle the case when the user leaves the app
      */
     override fun onUserLeaveHint() {
-        val currentFragment = getCurrentFragment()
-        if (currentFragment is InMeetingFragment) {
-            enterPipModeIfPossible()
+        getCurrentFragment()?.let {
+            if (it is InMeetingFragment) {
+                enterPipModeIfPossible()
+            }
         }
         super.onUserLeaveHint()
     }
@@ -469,7 +466,8 @@ class MeetingActivity : PasscodeActivity() {
                 false
             )
 
-            if ((!isGuest && shouldRefreshSessionDueToSDK()) || shouldRefreshSessionDueToKarere()) {
+            meetingAction = it.action
+            if (meetingAction != MEETING_ACTION_RINGING && ((!isGuest && shouldRefreshSessionDueToSDK()) || shouldRefreshSessionDueToKarere())) {
                 meetingViewModel.state.value.chatId.let { currentChatId ->
                     if (currentChatId != MEGACHAT_INVALID_HANDLE) {
                         //Notification of this call should be displayed again
@@ -480,7 +478,6 @@ class MeetingActivity : PasscodeActivity() {
                 return
             }
 
-            meetingAction = it.action
             meetingViewModel.setAction(meetingAction)
         }
     }
@@ -590,6 +587,7 @@ class MeetingActivity : PasscodeActivity() {
                 MEETING_ACTION_MAKE_MODERATOR -> R.id.makeModeratorFragment
                 else -> R.id.createMeetingFragment
             }
+
             setStartDestination(startDestination)
             navController?.setGraph(this, bundle)
         }
@@ -610,9 +608,17 @@ class MeetingActivity : PasscodeActivity() {
      * Get current fragment from navHostFragment
      */
     fun getCurrentFragment(): MeetingBaseFragment? {
-        val navHostFragment: Fragment? =
-            supportFragmentManager.findFragmentById(R.id.nav_host_fragment)
-        return navHostFragment?.childFragmentManager?.fragments?.get(0) as MeetingBaseFragment?
+        supportFragmentManager.findFragmentById(R.id.nav_host_fragment)?.apply {
+            childFragmentManager.fragments.apply {
+                get(0)?.let { fragment ->
+                    if (fragment is MeetingBaseFragment) {
+                        return fragment
+                    }
+                }
+            }
+        }
+
+        return null
     }
 
     override fun onActivityResult(requestCode: Int, resultCode: Int, intent: Intent?) {
@@ -626,9 +632,10 @@ class MeetingActivity : PasscodeActivity() {
 
     override fun onStop() {
         super.onStop()
-        val currentFragment = getCurrentFragment()
-        if (currentFragment is InMeetingFragment) {
-            meetingViewModel.sendEnterCallEvent(false)
+        getCurrentFragment()?.let { currentFragment ->
+            if (currentFragment is InMeetingFragment) {
+                meetingViewModel.sendEnterCallEvent(false)
+            }
         }
     }
 
@@ -655,9 +662,10 @@ class MeetingActivity : PasscodeActivity() {
         @Suppress("DEPRECATION")
         window.decorView.systemUiVisibility = View.SYSTEM_UI_FLAG_LAYOUT_STABLE or 0x00000010
 
-        val currentFragment = getCurrentFragment()
-        if (currentFragment is InMeetingFragment) {
-            meetingViewModel.sendEnterCallEvent(true)
+        getCurrentFragment()?.let { currentFragment ->
+            if (currentFragment is InMeetingFragment) {
+                meetingViewModel.sendEnterCallEvent(true)
+            }
         }
     }
 

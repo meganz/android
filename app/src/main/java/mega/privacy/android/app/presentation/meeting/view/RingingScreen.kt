@@ -2,7 +2,6 @@ package mega.privacy.android.app.presentation.meeting.view
 
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
-import androidx.compose.foundation.isSystemInDarkTheme
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -38,6 +37,7 @@ import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import kotlinx.coroutines.launch
 import mega.privacy.android.app.R
 import mega.privacy.android.app.extensions.navigateToAppSettings
+import mega.privacy.android.icon.pack.R as IconR
 import mega.privacy.android.app.presentation.chat.list.view.ChatAvatarView
 import mega.privacy.android.app.presentation.meeting.RingingViewModel
 import mega.privacy.android.app.presentation.meeting.model.RingingUIState
@@ -95,11 +95,7 @@ internal fun RingingScreen(
         onAudioClicked = onAudioClicked,
         onVideoClicked = onVideoClicked,
         onHangUpClicked = {
-            uiState.call?.let {
-                viewModel.processHangUp(it.callId)
-            } ?: run {
-                viewModel.onHangUpClicked(isClicked = true)
-            }
+            viewModel.onHangUpClicked()
         }
     )
 }
@@ -128,7 +124,9 @@ fun RingingView(
                 elevation = 1.dp,
                 onNavigationPressed = onBackPressed,
                 title = uiState.getTitle ?: stringResource(R.string.title_mega_info_empty_screen),
-                subtitle = stringResource(R.string.outgoing_call_starting)
+                subtitle = if (uiState.isCallAnsweredAndWaitingForCallInfo) stringResource(
+                    R.string.chat_connecting
+                ) else stringResource(R.string.outgoing_call_starting)
             )
         },
         content = { paddingValues ->
@@ -189,9 +187,11 @@ fun RingingViewContent(
 
                     ) {
                         ChatAvatarView(
-                            modifier = Modifier.padding(4.dp).testTag(
-                                if (uiState.isOneToOneCall) ONE_TO_ONE_AVATAR else GROUP_AVATAR
-                            ),
+                            modifier = Modifier
+                                .padding(4.dp)
+                                .testTag(
+                                    if (uiState.isOneToOneCall) ONE_TO_ONE_AVATAR else GROUP_AVATAR
+                                ),
                             avatarUri = avatar.uri,
                             avatarPlaceholder = avatar.placeholderText,
                             avatarColor = avatar.color,
@@ -208,11 +208,13 @@ fun RingingViewContent(
             horizontalArrangement = Arrangement.Center,
             verticalAlignment = Alignment.CenterVertically
         ) {
-            RingingActionButtons(
-                onAudioClicked = onAudioClicked,
-                onVideoClicked = onVideoClicked,
-                onHangUpClicked = onHangUpClicked
-            )
+            if (!uiState.isCallAnsweredAndWaitingForCallInfo) {
+                ActionButtons(
+                    onAudioClicked = onAudioClicked,
+                    onVideoClicked = onVideoClicked,
+                    onHangUpClicked = onHangUpClicked,
+                )
+            }
         }
     }
 }
@@ -222,7 +224,7 @@ fun RingingViewContent(
  * MeetingActionButtons contains the buttons for the ringing fragment.
  */
 @Composable
-fun RingingActionButtons(
+fun ActionButtons(
     onAudioClicked: (() -> Unit)?,
     onVideoClicked: (() -> Unit)?,
     onHangUpClicked: (() -> Unit)?,
@@ -242,60 +244,75 @@ fun RingingActionButtons(
                 modifier = Modifier.fillMaxWidth(),
                 horizontalArrangement = Arrangement.SpaceBetween
             ) {
-
-                // Audio button
-                Column(
-                    verticalArrangement = Arrangement.spacedBy(4.dp),
-                    horizontalAlignment = Alignment.CenterHorizontally
-                ) {
-                    CellButton(
-                        itemName = stringResource(id = R.string.calls_answer_audio_button),
-                        modifier = Modifier.testTag(AUDIO_BUTTON),
-                        type = CellButtonType.On,
-                        enabled = true,
-                        iconId = mega.privacy.android.icon.pack.R.drawable.ic_phone_01,
-                        onItemClick = { onAudioClicked?.invoke() }
-                    )
-                }
-
-                // Video button
-                Column(
-                    verticalArrangement = Arrangement.spacedBy(4.dp),
-                    horizontalAlignment = Alignment.CenterHorizontally
-                ) {
-                    CellButton(
-                        itemName = stringResource(id = R.string.upload_to_video),
-                        modifier = Modifier.testTag(VIDEO_BUTTON),
-                        type = CellButtonType.On,
-                        enabled = true,
-                        iconId = mega.privacy.android.icon.pack.R.drawable.ic_video_on,
-                        onItemClick = { onVideoClicked?.invoke() }
-                    )
-                }
-
-                // Hang up Call button
-                Column(
-                    verticalArrangement = Arrangement.spacedBy(4.dp),
-                    horizontalAlignment = Alignment.CenterHorizontally
-                ) {
-                    CellButton(
-                        itemName = stringResource(id = R.string.general_reject),
-                        modifier = Modifier.testTag(HANG_UP_BUTTON),
-                        type = CellButtonType.Interactive,
-                        enabled = true,
-                        iconId = mega.privacy.android.icon.pack.R.drawable.hang_call_icon,
-                        onItemClick = { onHangUpClicked?.invoke() }
-                    )
-                }
+                RingingActionButtons(
+                    onAudioClicked = onAudioClicked,
+                    onVideoClicked = onVideoClicked,
+                    onHangUpClicked = onHangUpClicked
+                )
             }
         }
+    }
+}
+
+/**
+ * RingingActionButtons contains the buttons for the ringing fragment.
+ */
+@Composable
+fun RingingActionButtons(
+    onAudioClicked: (() -> Unit)?,
+    onVideoClicked: (() -> Unit)?,
+    onHangUpClicked: (() -> Unit)?,
+) {
+    // Audio button
+    Column(
+        verticalArrangement = Arrangement.spacedBy(4.dp),
+        horizontalAlignment = Alignment.CenterHorizontally
+    ) {
+        CellButton(
+            itemName = stringResource(id = R.string.calls_answer_audio_button),
+            modifier = Modifier.testTag(AUDIO_BUTTON),
+            type = CellButtonType.On,
+            enabled = true,
+            iconId = IconR.drawable.ic_phone_01,
+            onItemClick = { onAudioClicked?.invoke() }
+        )
+    }
+
+    // Video button
+    Column(
+        verticalArrangement = Arrangement.spacedBy(4.dp),
+        horizontalAlignment = Alignment.CenterHorizontally
+    ) {
+        CellButton(
+            itemName = stringResource(id = R.string.upload_to_video),
+            modifier = Modifier.testTag(VIDEO_BUTTON),
+            type = CellButtonType.On,
+            enabled = true,
+            iconId = IconR.drawable.ic_video_on,
+            onItemClick = { onVideoClicked?.invoke() }
+        )
+    }
+
+    // Hang up Call button
+    Column(
+        verticalArrangement = Arrangement.spacedBy(4.dp),
+        horizontalAlignment = Alignment.CenterHorizontally
+    ) {
+        CellButton(
+            itemName = stringResource(id = R.string.general_reject),
+            modifier = Modifier.testTag(HANG_UP_BUTTON),
+            type = CellButtonType.Interactive,
+            enabled = true,
+            iconId = IconR.drawable.hang_call_icon,
+            onItemClick = { onHangUpClicked?.invoke() }
+        )
     }
 }
 
 @CombinedThemePreviews
 @Composable
 internal fun PreviewRingingView() {
-    OriginalTempTheme(isDark = isSystemInDarkTheme()) {
+    OriginalTempTheme(isDark = true) {
         RingingView(
             uiState = RingingUIState(
                 chatId = -1,

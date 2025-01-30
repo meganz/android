@@ -20,15 +20,20 @@ import mega.privacy.android.domain.entity.call.CallCompositionChanges
 import mega.privacy.android.domain.entity.call.ChatCall
 import mega.privacy.android.domain.entity.call.ChatCallChanges
 import mega.privacy.android.domain.entity.call.ChatCallStatus
+import mega.privacy.android.domain.entity.chat.ChatConnectionStatus
+import mega.privacy.android.domain.entity.meeting.FakeIncomingCallState
 import mega.privacy.android.domain.usecase.GetChatRoomUseCase
 import mega.privacy.android.domain.usecase.call.BroadcastCallEndedUseCase
 import mega.privacy.android.domain.usecase.call.GetChatCallUseCase
 import mega.privacy.android.domain.usecase.call.HangChatCallUseCase
-import mega.privacy.android.domain.usecase.call.SetIgnoredCallUseCase
+import mega.privacy.android.domain.usecase.call.IsChatStatusConnectedForCallUseCase
+import mega.privacy.android.domain.usecase.chat.MonitorChatConnectionStateUseCase
 import mega.privacy.android.domain.usecase.meeting.GetCallAvatarUseCase
 import mega.privacy.android.domain.usecase.chat.MonitorChatRoomUpdatesUseCase
 import mega.privacy.android.domain.usecase.contact.GetMyUserHandleUseCase
 import mega.privacy.android.domain.usecase.meeting.MonitorChatCallUpdatesUseCase
+import mega.privacy.android.domain.usecase.meeting.SetFakeIncomingCallStateUseCase
+import mega.privacy.android.domain.usecase.meeting.SetPendingToHangUpCallUseCase
 import timber.log.Timber
 import javax.inject.Inject
 
@@ -42,37 +47,49 @@ class RingingViewModel @Inject constructor(
     private val getChatCallUseCase: GetChatCallUseCase,
     private val getChatRoomUseCase: GetChatRoomUseCase,
     private val rtcAudioManagerGateway: RTCAudioManagerGateway,
-    private val setIgnoredCallUseCase: SetIgnoredCallUseCase,
+    private val broadcastCallEndedUseCase: BroadcastCallEndedUseCase,
+    private val hangChatCallUseCase: HangChatCallUseCase,
     private val getCallAvatarUseCase: GetCallAvatarUseCase,
     private val getMyUserHandleUseCase: GetMyUserHandleUseCase,
-    private val hangChatCallUseCase: HangChatCallUseCase,
-    private val broadcastCallEndedUseCase: BroadcastCallEndedUseCase,
+    private val setFakeIncomingCallStateUseCase: SetFakeIncomingCallStateUseCase,
+    private val isChatStatusConnectedForCallUseCase: IsChatStatusConnectedForCallUseCase,
     private val monitorChatCallUpdatesUseCase: MonitorChatCallUpdatesUseCase,
     private val monitorChatRoomUpdatesUseCase: MonitorChatRoomUpdatesUseCase,
+    private val monitorChatConnectionStateUseCase: MonitorChatConnectionStateUseCase,
+    private val setPendingToHangUpCallUseCase: SetPendingToHangUpCallUseCase,
     savedStateHandle: SavedStateHandle,
 ) : ViewModel() {
 
-    private val _state = MutableStateFlow(RingingUIState())
+    private val _state = MutableStateFlow(
+        RingingUIState(
+            chatId = savedStateHandle[MEETING_CHAT_ID]
+                ?: -1L
+        )
+    )
+
     val state = _state.asStateFlow()
 
-    private var chatId: Long? = savedStateHandle[MEETING_CHAT_ID]
     private var monitorChatCallUpdatesJob: Job? = null
     private var monitorChatRoomUpdatesJob: Job? = null
+    private var monitorChatConnectionStateJob: Job? = null
 
     init {
-        getMyUserHandle()
-        chatId?.let {
-            _state.update { state ->
-                state.copy(
-                    chatId = it
+        viewModelScope.launch {
+            runCatching {
+                setFakeIncomingCallStateUseCase(
+                    chatId = state.value.chatId,
+                    type = FakeIncomingCallState.Screen
                 )
             }
-            getChatRoom()
-            getChatCall()
-            startMonitorChatRoomUpdates()
         }
 
+        getMyUserHandle()
+        getChatConnectionState()
+        getChatRoom()
+        getChatCall()
+        startMonitorChatRoomUpdates()
         startMonitoringChatCallUpdates()
+        startMonitorChatConnectionStatus()
     }
 
     /**
@@ -131,6 +148,29 @@ class RingingViewModel @Inject constructor(
     }
 
     /**
+     * Get chat connection state updates
+     */
+    private fun startMonitorChatConnectionStatus() {
+        monitorChatConnectionStateJob?.cancel()
+        monitorChatConnectionStateJob = viewModelScope.launch {
+            monitorChatConnectionStateUseCase()
+                .filter { it.chatId == _state.value.chatId }
+                .collectLatest {
+                    val isConnected = isChatStatusConnectedForCallUseCase(it.chatId)
+                    if (isConnected && state.value.call == null) {
+                        rtcAudioManagerGateway.stopSounds()
+                        rtcAudioManagerGateway.removeRTCAudioManagerRingIn()
+                        _state.update { state -> state.copy(finish = true) }
+                    } else {
+                        _state.update { state ->
+                            state.copy(chatConnectionStatus = it.chatConnectionStatus)
+                        }
+                    }
+                }
+        }
+    }
+
+    /**
      * Get chat call updates
      */
     private fun startMonitoringChatCallUpdates() {
@@ -170,9 +210,12 @@ class RingingViewModel @Inject constructor(
     private fun updateCall(call: ChatCall) {
         if (state.value.call == null) {
             call.caller?.let {
-                getAvatar(it)
+                if (!state.value.isCallAnsweredAndWaitingForCallInfo) {
+                    getAvatar(it)
+                }
             }
         }
+
         _state.update { state ->
             state.copy(
                 call = call
@@ -214,6 +257,23 @@ class RingingViewModel @Inject constructor(
     }
 
     /**
+     * Get chat connection state
+     */
+    private fun getChatConnectionState() {
+        viewModelScope.launch {
+            runCatching {
+                isChatStatusConnectedForCallUseCase(chatId = state.value.chatId)
+            }.onSuccess { connected ->
+                if (connected) {
+                    _state.update { state -> state.copy(chatConnectionStatus = ChatConnectionStatus.Online) }
+                }
+            }.onFailure {
+                Timber.e(it)
+            }
+        }
+    }
+
+    /**
      * Show snackbar
      */
     fun showSnackbar() {
@@ -233,7 +293,16 @@ class RingingViewModel @Inject constructor(
      * @param isClicked True, if it's clicked
      */
     fun onAudioClicked(isClicked: Boolean) {
-        _state.update { state -> state.copy(isAnswerWithAudioClicked = isClicked) }
+        if (isClicked) {
+            rtcAudioManagerGateway.stopSounds()
+        }
+
+        _state.update { state ->
+            state.copy(
+                isAnswerWithAudioClicked = isClicked,
+                isCallAnsweredAndWaitingForCallInfo = true
+            )
+        }
     }
 
     /**
@@ -242,76 +311,59 @@ class RingingViewModel @Inject constructor(
      * @param isClicked True, if it's clicked
      */
     fun onVideoClicked(isClicked: Boolean) {
-        _state.update { state -> state.copy(isAnswerWithVideoClicked = isClicked) }
-
-    }
-
-    /**
-     * Process when hang up button is clicked
-     *
-     * @param isClicked True, if it's clicked
-     */
-    fun onHangUpClicked(isClicked: Boolean) {
-        _state.update { state -> state.copy(isHangUpClicked = isClicked) }
-
-    }
-
-    /**
-     * Process hang up incoming call
-     *
-     * @param callId    Call id
-     */
-    fun processHangUp(callId: Long) {
-        _state.update { state -> state.copy(isHangUpClicked = false) }
-
-        rtcAudioManagerGateway.stopSounds()
-        CallUtil.clearIncomingCallNotification(callId)
-        when {
-            state.value.isOneToOneCall == true -> hangCurrentCall()
-            else -> ignoreCall()
+        if (isClicked) {
+            rtcAudioManagerGateway.stopSounds()
         }
+
+        _state.update { state ->
+            state.copy(
+                isAnswerWithVideoClicked = isClicked,
+                isCallAnsweredAndWaitingForCallInfo = true
+            )
+        }
+    }
+
+    /**
+     * Process when hang up button is clicked but the call is not recovered
+     **/
+    fun onHangUpClicked() {
+        rtcAudioManagerGateway.stopSounds()
+        rtcAudioManagerGateway.removeRTCAudioManagerRingIn()
+
+        state.value.call?.let { call ->
+            Timber.d("Call exists")
+            CallUtil.clearIncomingCallNotification(call.callId)
+            hangUpCall(chatId = call.chatId, callId = call.callId)
+        } ?: run {
+            Timber.d("Call is null")
+            viewModelScope.launch {
+                runCatching {
+                    setPendingToHangUpCallUseCase(
+                        chatId = state.value.chatId,
+                        add = true
+                    )
+                }
+            }
+        }
+
         _state.update { state -> state.copy(finish = true) }
     }
 
     /**
-     * Ignore call
+     * Hang up call
+     *
+     * @param chatId    Chat id
+     * @param callId    Call id
      */
-    private fun ignoreCall() {
+    private fun hangUpCall(chatId: Long, callId: Long) {
         viewModelScope.launch {
             runCatching {
-                setIgnoredCallUseCase(_state.value.chatId)
+                hangChatCallUseCase(callId)
             }.onSuccess {
-                if (it) {
-                    Timber.d("Call was ignored")
-                }
+                broadcastCallEndedUseCase(chatId)
             }.onFailure { exception ->
                 Timber.e(exception)
             }
-        }
-    }
-
-    /**
-     * Hang up the current call
-     */
-    private fun hangCurrentCall() {
-        state.value.call?.apply {
-            hangCall(callId)
-        }
-    }
-
-    /**
-     * Hang up a specified call
-     *
-     * @param callId Call ID
-     */
-    private fun hangCall(callId: Long) = viewModelScope.launch {
-        Timber.d("Hang up call. Call id $callId")
-        runCatching {
-            hangChatCallUseCase(callId)
-        }.onSuccess {
-            broadcastCallEndedUseCase(state.value.chatId)
-        }.onFailure {
-            Timber.e(it.stackTraceToString())
         }
     }
 }

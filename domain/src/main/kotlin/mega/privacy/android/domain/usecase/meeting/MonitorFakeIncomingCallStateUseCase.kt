@@ -1,6 +1,7 @@
 package mega.privacy.android.domain.usecase.meeting
 
 import mega.privacy.android.domain.repository.CallRepository
+import mega.privacy.android.domain.entity.meeting.FakeIncomingCallState
 import javax.inject.Inject
 
 /**
@@ -12,7 +13,7 @@ class MonitorFakeIncomingCallStateUseCase @Inject constructor(
     /**
      * Invoke
      *
-     * @return Flow of chatId and [FakeIncomingCallType]
+     * @return Flow of chatId and [FakeIncomingCallState]
      */
     operator fun invoke() = callRepository.monitorFakeIncomingCall()
 }

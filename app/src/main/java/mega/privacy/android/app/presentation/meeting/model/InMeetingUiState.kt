@@ -64,7 +64,6 @@ import timber.log.Timber
  * @property changesInLowResInSession               [ChatSession] with changes in low resolution video
  * @property changesInStatusInSession               [ChatSession] with changes in status
  * @property shouldCheckChildFragments              True, if should update fragments. False, if not.
- * @property callAnsweredInAnotherClient            True, if the call was answered in another client.
  * @property isVideoEnabledDueToProximitySensor     True, video on, false, video off.
  */
 data class InMeetingUiState(
@@ -116,7 +115,6 @@ data class InMeetingUiState(
     val changesInLowResInSession: ChatSession? = null,
     val changesInStatusInSession: ChatSession? = null,
     val shouldCheckChildFragments: Boolean = false,
-    val callAnsweredInAnotherClient: Boolean = false,
     val snackbarMsg: String? = null,
     val isVideoEnabledDueToProximitySensor: Boolean? = null,
     val userAvatarUpdateId: Long? = null,

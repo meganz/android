@@ -8,7 +8,6 @@ import androidx.compose.ui.test.junit4.createComposeRule
 import androidx.compose.ui.test.onNodeWithTag
 import androidx.compose.ui.test.performClick
 import androidx.test.ext.junit.runners.AndroidJUnit4
-
 import mega.privacy.android.app.presentation.meeting.model.RingingUIState
 import mega.privacy.android.app.presentation.meeting.view.RingingViewTestTags.AUDIO_BUTTON
 import mega.privacy.android.app.presentation.meeting.view.RingingViewTestTags.GROUP_AVATAR
@@ -16,6 +15,7 @@ import mega.privacy.android.app.presentation.meeting.view.RingingViewTestTags.HA
 import mega.privacy.android.app.presentation.meeting.view.RingingViewTestTags.ONE_TO_ONE_AVATAR
 import mega.privacy.android.app.presentation.meeting.view.RingingViewTestTags.VIDEO_BUTTON
 import mega.privacy.android.domain.entity.ChatRoomPermission
+import mega.privacy.android.domain.entity.call.ChatCall
 import mega.privacy.android.domain.entity.chat.ChatAvatarItem
 import mega.privacy.android.domain.entity.chat.ChatRoom
 import mega.privacy.android.shared.original.core.ui.controls.appbar.APP_BAR_BACK_BUTTON_TAG
@@ -51,6 +51,7 @@ class RingingScreenTest {
             setScreen(
                 uiState = RingingUIState(
                     chat = createChat(isGroup = true),
+                    call = createCall(),
                     avatar = ChatAvatarItem(
                         placeholderText = "R",
                         color = 0xFFC70000.toInt(),
@@ -69,6 +70,7 @@ class RingingScreenTest {
             setScreen(
                 uiState = RingingUIState(
                     chat = createChat(isGroup = false),
+                    call = createCall(),
                     avatar = ChatAvatarItem(
                         placeholderText = "R",
                         color = 0xFFC70000.toInt(),
@@ -88,6 +90,7 @@ class RingingScreenTest {
             setScreen(
                 uiState = RingingUIState(
                     chat = createChat(isGroup = false),
+                    isCallAnsweredAndWaitingForCallInfo = false,
                     avatar = ChatAvatarItem(
                         placeholderText = "R",
                         color = 0xFFC70000.toInt(),
@@ -113,6 +116,7 @@ class RingingScreenTest {
             setScreen(
                 uiState = RingingUIState(
                     chat = createChat(isGroup = false),
+                    isCallAnsweredAndWaitingForCallInfo = false,
                     avatar = ChatAvatarItem(
                         placeholderText = "R",
                         color = 0xFFC70000.toInt(),
@@ -138,6 +142,7 @@ class RingingScreenTest {
             setScreen(
                 uiState = RingingUIState(
                     chat = createChat(isGroup = false),
+                    isCallAnsweredAndWaitingForCallInfo = false,
                     avatar = ChatAvatarItem(
                         placeholderText = "R",
                         color = 0xFFC70000.toInt(),
@@ -208,6 +213,13 @@ class RingingScreenTest {
             isOpenInvite = false,
             isSpeakRequest = false,
             changes = null
+        )
+    }
+
+    private fun createCall(): ChatCall {
+        return ChatCall(
+            chatId = 123L,
+            callId = 456L,
         )
     }
 
