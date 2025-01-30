@@ -611,8 +611,21 @@
             <meta-data
                 android:name="mega.privacy.android.app.initializer.NotificationChannelsInitializer"
                 android:value="androidx.startup" />
+            <meta-data
+                android:name="mega.privacy.android.app.initializer.OfflineDocumentProviderInitializer"
+                android:value="androidx.startup" />
         </provider>
-
+        <provider
+            android:name=".providers.OfflineDocumentProvider"
+            android:authorities="${offlineDocumentProviderAuthority}"
+            android:exported="true"
+            android:grantUriPermissions="true"
+            android:permission="android.permission.MANAGE_DOCUMENTS">
+            <intent-filter>
+                <action android:name="android.content.action.DOCUMENTS_PROVIDER" />
+            </intent-filter>
+        </provider>
+        
         <activity
             android:name=".main.megachat.MapsActivity"
             android:configChanges="orientation|screenSize"

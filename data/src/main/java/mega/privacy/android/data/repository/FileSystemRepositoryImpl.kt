@@ -476,4 +476,7 @@ internal class FileSystemRepositoryImpl @Inject constructor(
 
     override suspend fun canReadUri(stringUri: String) =
         fileGateway.canReadUri(stringUri)
+
+    override suspend fun getOfflineFilesRootFolder(): File =
+        File(fileGateway.getOfflineFilesRootPath())
 }

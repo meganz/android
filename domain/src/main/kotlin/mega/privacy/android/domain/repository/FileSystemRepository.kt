@@ -487,4 +487,9 @@ interface FileSystemRepository {
      * @return true if the uri can be read, false otherwise
      */
     suspend fun canReadUri(stringUri: String): Boolean
+
+    /**
+     * Returns Offline Files Root Folder
+     */
+    suspend fun getOfflineFilesRootFolder(): File
 }

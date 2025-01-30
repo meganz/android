@@ -66,6 +66,13 @@ android {
         buildConfigField("long", "NOCTURN_TIMEOUT", "${getNocturnTimeout(project)}")
         buildConfigField("int", "KARMA_PLUGIN_PORT", "${getKarmaPluginPort(project)}")
         resValue("string", "app_version", "\"${versionName}${versionNameSuffix}\"")
+        val offlineDocumentProviderAuthority = "$applicationId.offline.documents"
+        manifestPlaceholders["offlineDocumentProviderAuthority"] = offlineDocumentProviderAuthority
+        buildConfigField(
+            "String",
+            "OFFLINE_DOCUMENT_PROVIDER_AUTHORITY",
+            "\"${offlineDocumentProviderAuthority}\""
+        )
 
         val megaSdkVersion: String by rootProject.extra
         resValue("string", "sdk_version", "\"${getSdkGitHash(megaSdkVersion, project)}\"")
@@ -122,6 +129,15 @@ android {
             applicationIdSuffix = ".qa"
             buildConfigField("String", "ENVIRONMENT", "\"MEGAEnv/QA\"")
             buildConfigField("String", "AD_UNIT_ID", "\"ca-app-pub-3940256099942544/9214589741\"")
+            val offlineDocumentProviderAuthority =
+                "${defaultConfig.applicationId}$applicationIdSuffix.offline.documents"
+            manifestPlaceholders["offlineDocumentProviderAuthority"] =
+                offlineDocumentProviderAuthority
+            buildConfigField(
+                "String",
+                "OFFLINE_DOCUMENT_PROVIDER_AUTHORITY",
+                "\"${offlineDocumentProviderAuthority}\""
+            )
             firebaseAppDistribution {
                 releaseNotes = readReleaseNotes()
                 groups = readTesterGroupList()
