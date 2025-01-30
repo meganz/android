@@ -834,9 +834,15 @@ internal class DefaultTransfersRepository @Inject constructor(
         megaApiGateway.getBandwidthOverQuotaDelay().seconds
     }
 
-    override suspend fun insertActiveTransferGroup(activeTransferGroup: ActiveTransferGroup) = withContext(ioDispatcher) {
-        megaLocalRoomGateway.insertActiveTransferGroup(activeTransferGroup)
-    }
+    override suspend fun insertActiveTransferGroup(activeTransferGroup: ActiveTransferGroup) =
+        withContext(ioDispatcher) {
+            megaLocalRoomGateway.insertActiveTransferGroup(activeTransferGroup)
+        }
+
+    override suspend fun getActiveTransferGroupById(id: Int): ActiveTransferGroup? =
+        withContext(ioDispatcher) {
+            megaLocalRoomGateway.getActiveTransferGroup(id)
+        }
 
     @Deprecated(
         "ViewerNode should be replaced by [TypedNode], there's a similar use-case to download any type of [TypedNode] and receive a flow of the progress: StartDownloadUseCase. Please add [TransferAppData.BackgroundTransfer] to avoid this transfers to be added in the counters of the DownloadService notification",

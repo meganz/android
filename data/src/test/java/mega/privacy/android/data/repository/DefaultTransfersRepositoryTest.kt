@@ -1698,6 +1698,15 @@ class DefaultTransfersRepositoryTest {
         assertThat(underTest.insertActiveTransferGroup(activeTransferGroup)).isEqualTo(expected)
     }
 
+    @Test
+    fun `test that get Active Transfer Group returns room gateway entity`() = runTest{
+        val groupId = 435834379
+        val expected = mock<ActiveTransferGroup>()
+        whenever(megaLocalRoomGateway.getActiveTransferGroup(groupId)).thenReturn(expected)
+
+        assertThat(underTest.getActiveTransferGroupById(groupId)).isEqualTo(expected)
+    }
+
     private fun getCompletedTransfer(fileName: String) = CompletedTransfer(
         fileName = fileName,
         type = 0,

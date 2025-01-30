@@ -592,7 +592,18 @@ interface TransferRepository {
      */
     suspend fun getBandwidthOverQuotaDelay(): Duration
 
-    suspend fun insertActiveTransferGroup(activeTransferGroup: ActiveTransferGroup) :Long
+    /**
+     * Insert a new [ActiveTransferGroup].
+     * If there's an existing [ActiveTransferGroup] with the same id, it will be ignored
+     */
+    suspend fun insertActiveTransferGroup(activeTransferGroup: ActiveTransferGroup): Long
+
+    /**
+     * Get the [ActiveTransferGroup] by id
+     *
+     * @return [ActiveTransferGroup] with this [id] or null if it's not found
+     */
+    suspend fun getActiveTransferGroupById(id: Int): ActiveTransferGroup?
 
     /**
      * Downloads a file node in background.

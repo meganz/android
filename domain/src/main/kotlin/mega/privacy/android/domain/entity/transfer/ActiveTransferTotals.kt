@@ -29,7 +29,14 @@ data class ActiveTransferTotals(
     val transferredBytes: Long,
     val totalAlreadyTransferredFiles: Int,
     val totalCancelled: Int,
+    val groups: List<Group> = emptyList()
 ) {
+    data class Group(
+        val groupId: Int,
+        val totalFiles:Int,
+        val finishedFiles:Int,
+        val destination: String,
+    )
     /**
      * @return true if there are ongoing transfers, false if all transfers are finished or there are no active transfers to transfer
      */
