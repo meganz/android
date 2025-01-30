@@ -1,11 +1,16 @@
 package mega.privacy.android.app.presentation.imagepreview.slideshow.view
 
+import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Box
-import androidx.compose.foundation.layout.PaddingValues
+import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.WindowInsets
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.ime
+import androidx.compose.foundation.layout.navigationBars
 import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.layout.systemBarsPadding
+import androidx.compose.foundation.layout.windowInsetsPadding
+import androidx.compose.foundation.layout.wrapContentSize
 import androidx.compose.foundation.pager.HorizontalPager
 import androidx.compose.foundation.pager.PagerState
 import androidx.compose.foundation.pager.rememberPagerState
@@ -25,6 +30,7 @@ import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalLifecycleOwner
 import androidx.compose.ui.res.painterResource
@@ -111,36 +117,38 @@ fun SlideshowScreen(
         }
 
         MegaScaffold(
-            modifier = Modifier.systemBarsPadding(),
             scaffoldState = scaffoldState,
-            topBar = {
-                if (!isPlaying) {
-                    SlideshowTopBar(
-                        onClickBack = onClickBack,
-                        onClickSettingMenu = onClickSettingMenu
-                    )
-                }
-            },
-            bottomBar = {
-                if (!isPlaying) {
-                    SlideshowBottomBar(
-                        onPlayOrPauseSlideshow = {
-                            coroutineScope.launch {
-                                val page = pagerState.currentPage
-                                for (candidatePage in page - 1..page + 1) {
-                                    viewState.imageNodes.getOrNull(candidatePage)?.let { node ->
-                                        zoomableStateMap[node.id]?.resetZoom()
-                                    }
-                                }
-                                viewModel.updateIsPlaying(isPlaying = true)
-                            }
-                        },
-                    )
-                }
-            },
+            contentWindowInsets = WindowInsets.ime,
         ) { paddingValues ->
             SlideShowContent(
-                paddingValues = paddingValues,
+                modifier = Modifier
+                    .background(Color.Black)
+                    .padding(paddingValues),
+                topBar = {
+                    if (!isPlaying) {
+                        SlideshowTopBar(
+                            onClickBack = onClickBack,
+                            onClickSettingMenu = onClickSettingMenu,
+                        )
+                    }
+                },
+                bottomBar = {
+                    if (!isPlaying) {
+                        SlideshowBottomBar(
+                            onPlayOrPauseSlideshow = {
+                                coroutineScope.launch {
+                                    val page = pagerState.currentPage
+                                    for (candidatePage in page - 1..page + 1) {
+                                        viewState.imageNodes.getOrNull(candidatePage)?.let { node ->
+                                            zoomableStateMap[node.id]?.resetZoom()
+                                        }
+                                    }
+                                    viewModel.updateIsPlaying(isPlaying = true)
+                                }
+                            },
+                        )
+                    }
+                },
                 pagerState = pagerState,
                 imageNodes = imageNodes,
                 downloadImage = viewModel::monitorImageResult,
@@ -192,20 +200,25 @@ fun SlideshowScreen(
 private fun SlideshowBottomBar(
     onPlayOrPauseSlideshow: () -> Unit,
 ) {
-    BottomAppBar(
-        backgroundColor = MaterialTheme.colors.white_alpha_070_grey_alpha_070,
-        elevation = 0.dp,
+    Box(
+        modifier = Modifier.background(MaterialTheme.colors.white_alpha_070_grey_alpha_070)
     ) {
-        Box(
-            modifier = Modifier.fillMaxWidth(),
-            contentAlignment = Alignment.Center,
+        BottomAppBar(
+            backgroundColor = Color.Transparent,
+            elevation = 0.dp,
+            modifier =Modifier.windowInsetsPadding(WindowInsets.navigationBars),
         ) {
-            IconButton(onClick = onPlayOrPauseSlideshow) {
-                Icon(
-                    painter = painterResource(id = drawable.ic_play),
-                    contentDescription = null,
-                    tint = MaterialTheme.colors.black_white,
-                )
+            Column(
+                modifier = Modifier.fillMaxWidth(),
+                horizontalAlignment = Alignment.CenterHorizontally
+            ) {
+                IconButton(onClick = onPlayOrPauseSlideshow) {
+                    Icon(
+                        painter = painterResource(id = drawable.ic_play_video_recorded),
+                        contentDescription = null,
+                        tint = MaterialTheme.colors.black_white,
+                    )
+                }
             }
         }
     }
@@ -234,7 +247,9 @@ private fun SlideshowTopBar(
 
 @Composable
 private fun SlideShowContent(
-    paddingValues: PaddingValues,
+    modifier: Modifier = Modifier,
+    topBar: @Composable () -> Unit,
+    bottomBar: @Composable () -> Unit,
     pagerState: PagerState,
     imageNodes: List<ImageNode>,
     downloadImage: suspend (ImageNode) -> Flow<ImageResult>,
@@ -244,12 +259,7 @@ private fun SlideShowContent(
     onImageZooming: (ZoomableState) -> Unit,
     onCacheImageState: (ImageNode, ZoomableState) -> Unit,
 ) {
-
-    Box(
-        modifier = Modifier
-            .padding(paddingValues)
-            .fillMaxSize()
-    ) {
+    Box(modifier.fillMaxSize()) {
         HorizontalPager(
             modifier = Modifier
                 .fillMaxSize(),
@@ -292,6 +302,20 @@ private fun SlideShowContent(
                 errorImagePath = if (imageNode.serializedData == "localFile") imageNode.fullSizePath else errorImagePath,
             )
         }
+
+        Box(
+            modifier = Modifier
+                .wrapContentSize()
+                .align(Alignment.TopCenter),
+            content = { topBar() },
+        )
+
+        Box(
+            modifier = Modifier
+                .wrapContentSize()
+                .align(Alignment.BottomCenter),
+            content = { bottomBar() },
+        )
     }
 }
 
@@ -319,7 +343,7 @@ private fun ImageContent(
                     imagePath = errorImagePath
                 }
             )
-            .crossfade(2000)
+            .crossfade(1000)
             .build()
 
         ZoomableAsyncImage(
