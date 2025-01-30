@@ -228,9 +228,9 @@ interface MegaLocalRoomGateway {
     suspend fun setActiveTransferAsCancelledByTag(tags: List<Int>)
 
     /**
-     * Insert a new active transfer group
+     * Insert a new active transfer group and returns it's id
      */
-    suspend fun insertActiveTransferGroup(activeTransferGroup: ActiveTransferGroup)
+    suspend fun insertActiveTransferGroup(activeTransferGroup: ActiveTransferGroup): Long
 
     /**
      * Get the [ActiveTransferGroup] by [groupId]

@@ -60,6 +60,7 @@ import mega.privacy.android.domain.entity.node.NodeId
 import mega.privacy.android.domain.entity.node.TypedNode
 import mega.privacy.android.domain.entity.node.ViewerNode
 import mega.privacy.android.domain.entity.transfer.ActiveTransfer
+import mega.privacy.android.domain.entity.transfer.ActiveTransferGroup
 import mega.privacy.android.domain.entity.transfer.ActiveTransferTotals
 import mega.privacy.android.domain.entity.transfer.CompletedTransfer
 import mega.privacy.android.domain.entity.transfer.CompletedTransferState
@@ -831,6 +832,10 @@ internal class DefaultTransfersRepository @Inject constructor(
 
     override suspend fun getBandwidthOverQuotaDelay() = withContext(ioDispatcher) {
         megaApiGateway.getBandwidthOverQuotaDelay().seconds
+    }
+
+    override suspend fun insertActiveTransferGroup(activeTransferGroup: ActiveTransferGroup) = withContext(ioDispatcher) {
+        megaLocalRoomGateway.insertActiveTransferGroup(activeTransferGroup)
     }
 
     @Deprecated(

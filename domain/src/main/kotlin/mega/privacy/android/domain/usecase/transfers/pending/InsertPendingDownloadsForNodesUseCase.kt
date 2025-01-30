@@ -1,6 +1,8 @@
 package mega.privacy.android.domain.usecase.transfers.pending
 
 import mega.privacy.android.domain.entity.node.TypedNode
+import mega.privacy.android.domain.entity.transfer.ActiveTransferGroupImpl
+import mega.privacy.android.domain.entity.transfer.TransferAppData
 import mega.privacy.android.domain.entity.transfer.TransferType
 import mega.privacy.android.domain.entity.transfer.pending.InsertPendingTransferRequest
 import mega.privacy.android.domain.entity.uri.UriPath
@@ -40,6 +42,14 @@ class InsertPendingDownloadsForNodesUseCase @Inject constructor(
         val (folderDestination, appData) = getFileDestinationAndAppDataForDownloadUseCase(
             destination
         )
+        val transferGroupId = transferRepository.insertActiveTransferGroup(ActiveTransferGroupImpl(
+            transferType = TransferType.DOWNLOAD,
+            destination = destination.value
+        ))
+        val appDataList = listOfNotNull(
+            appData,
+            TransferAppData.TransferGroup(transferGroupId),
+            ).takeIf { it.isNotEmpty() }
         fileSystemRepository.createDirectory(folderDestination.value)
         if (!doesUriPathHaveSufficientSpaceForNodesUseCase(folderDestination, nodes)) {
             throw NotEnoughStorageException()
@@ -50,7 +60,7 @@ class InsertPendingDownloadsForNodesUseCase @Inject constructor(
                     transferType = TransferType.DOWNLOAD,
                     nodeIdentifier = getPendingTransferNodeIdentifierUseCase(node),
                     uriPath = UriPath(folderDestination.value.ensureEndsWithFileSeparator()),
-                    appData = appData?.let { listOf(it) },
+                    appData = appDataList,
                     isHighPriority = isHighPriority,
                     fileName = folderDestination.value.split(File.separator).lastOrNull { it.isNotBlank() }
                 )

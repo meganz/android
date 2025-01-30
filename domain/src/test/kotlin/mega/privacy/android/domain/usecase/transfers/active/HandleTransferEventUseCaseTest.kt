@@ -149,6 +149,25 @@ class HandleTransferEventUseCaseTest {
     }
 
     @Test
+    fun `test that parent group app data is added when child transfer start event is received`() =
+        runTest {
+            val parentTag = 2
+            val transferEvent = mockTransferEvent<TransferEvent.TransferStartEvent>(
+                TransferType.DOWNLOAD,
+                1,
+                folderTransferTag = parentTag
+            )
+            val groupData = TransferAppData.TransferGroup(34L)
+            val parentTransfer = mock<Transfer> {
+                on { appData } doReturn listOf(groupData)
+            }
+            whenever(transferRepository.getTransferByTag(parentTag)) doReturn parentTransfer
+            val expected = transferEvent.transfer.copy(appData = listOf(groupData))
+            underTest.invoke(transferEvent)
+            verify(transferRepository).insertOrUpdateActiveTransfers(eq(listOf(expected)))
+        }
+
+    @Test
     fun `test that invoke call insertOrUpdateActiveTransfers with the last event of each transfer when multiple events are send`() =
         runTest {
             val events1 = listOf(
@@ -415,6 +434,8 @@ class HandleTransferEventUseCaseTest {
         provideFinishEventsWithError() +
                 provideTransferEvents()
 
+    private fun provideStartEvents() = provideTransferEvents<TransferEvent.TransferStartEvent>()
+
     private fun provideFinishEventsWithError() =
         provideTransferEvents<TransferEvent.TransferFinishEvent> {
             on { this.error }.thenReturn(BusinessAccountExpiredMegaException(1))
@@ -435,17 +456,20 @@ class HandleTransferEventUseCaseTest {
         stubbing: KStubbing<T>.(T) -> Unit = {},
     ) =
         TransferType.entries.map { transferType ->
-            mockTransferEvent(transferType, transferTag, stubbing)
+            mockTransferEvent(transferType, transferTag, stubbing = stubbing)
         }
 
     private inline fun <reified T : TransferEvent> mockTransferEvent(
         transferType: TransferType,
         transferTag: Int = 0,
+        folderTransferTag: Int? = null,
         stubbing: KStubbing<T>.(T) -> Unit = {},
     ): T {
         val transfer = mock<Transfer> {
             on { this.transferType }.thenReturn(transferType)
             on { this.tag }.thenReturn(transferTag)
+            on { this.folderTransferTag }.thenReturn(folderTransferTag)
+            on { this.appData }.thenReturn(emptyList())
         }
         return mock<T> {
             on { this.transfer }.thenReturn(transfer)

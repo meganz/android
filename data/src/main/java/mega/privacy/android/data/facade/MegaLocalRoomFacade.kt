@@ -260,10 +260,9 @@ internal class MegaLocalRoomFacade @Inject constructor(
     override suspend fun setActiveTransferAsCancelledByTag(tags: List<Int>) =
         activeTransferDao.get().setActiveTransferAsCancelledByTag(tags)
 
-    override suspend fun insertActiveTransferGroup(activeTransferGroup: ActiveTransferGroup) {
+    override suspend fun insertActiveTransferGroup(activeTransferGroup: ActiveTransferGroup) =
         activeTransferGroupDao.get()
             .insertActiveTransferGroup(activeTransferGroupEntityMapper(activeTransferGroup))
-    }
 
     override suspend fun getActiveTransferGroup(groupId: Int): ActiveTransferGroup? =
         activeTransferGroupDao.get().getActiveTransferGroupById(groupId)

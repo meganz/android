@@ -6,6 +6,7 @@ import mega.privacy.android.domain.entity.node.NodeId
 import mega.privacy.android.domain.entity.node.TypedNode
 import mega.privacy.android.domain.entity.node.ViewerNode
 import mega.privacy.android.domain.entity.transfer.ActiveTransfer
+import mega.privacy.android.domain.entity.transfer.ActiveTransferGroup
 import mega.privacy.android.domain.entity.transfer.ActiveTransferTotals
 import mega.privacy.android.domain.entity.transfer.CompletedTransfer
 import mega.privacy.android.domain.entity.transfer.CompletedTransferState
@@ -590,6 +591,8 @@ interface TransferRepository {
      * @return Time during which transfers will be stopped, otherwise 0
      */
     suspend fun getBandwidthOverQuotaDelay(): Duration
+
+    suspend fun insertActiveTransferGroup(activeTransferGroup: ActiveTransferGroup) :Long
 
     /**
      * Downloads a file node in background.

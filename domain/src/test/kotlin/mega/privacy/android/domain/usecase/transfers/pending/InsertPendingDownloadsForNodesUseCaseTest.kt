@@ -4,6 +4,7 @@ import com.google.common.truth.Truth.assertThat
 import kotlinx.coroutines.test.runTest
 import mega.privacy.android.domain.entity.node.DefaultTypedFileNode
 import mega.privacy.android.domain.entity.node.NodeId
+import mega.privacy.android.domain.entity.transfer.TransferAppData
 import mega.privacy.android.domain.entity.transfer.TransferType
 import mega.privacy.android.domain.entity.transfer.pending.InsertPendingTransferRequest
 import mega.privacy.android.domain.entity.transfer.pending.PendingTransferNodeIdentifier
@@ -21,6 +22,7 @@ import org.junit.jupiter.api.TestInstance
 import org.junit.jupiter.api.assertThrows
 import org.junit.jupiter.params.ParameterizedTest
 import org.junit.jupiter.params.provider.ValueSource
+import org.mockito.kotlin.any
 import org.mockito.kotlin.anyOrNull
 import org.mockito.kotlin.doReturn
 import org.mockito.kotlin.doThrow
@@ -66,6 +68,7 @@ class InsertPendingDownloadsForNodesUseCaseTest {
         whenever(getPendingTransferNodeIdentifierUseCase(anyOrNull())) doReturn nodeIdentifier
         whenever(getFileDestinationAndAppDataForDownloadUseCase(UriPath(PATH_STRING))) doReturn
                 DestinationAndAppDataForDownloadResult(UriPath(PATH_STRING), null)
+        whenever(transferRepository.insertActiveTransferGroup(any())) doReturn GROUP_ID
     }
 
     @ParameterizedTest
@@ -76,6 +79,10 @@ class InsertPendingDownloadsForNodesUseCaseTest {
         val nodes = (0..5).map {
             mock<DefaultTypedFileNode>()
         }
+        val appData = mock<TransferAppData.SdCardDownload>()
+        val expectedAppData = listOf(appData, TransferAppData.TransferGroup(GROUP_ID))
+        whenever(getFileDestinationAndAppDataForDownloadUseCase(UriPath(PATH_STRING))) doReturn
+                DestinationAndAppDataForDownloadResult(UriPath(PATH_STRING), appData)
         val uriPath = UriPath(PATH_STRING)
         val expected = nodes.mapIndexed { index, node ->
             val nodeIdentifier =
@@ -88,7 +95,7 @@ class InsertPendingDownloadsForNodesUseCaseTest {
                 transferType = TransferType.DOWNLOAD,
                 nodeIdentifier = nodeIdentifier,
                 uriPath = uriPath,
-                appData = null,
+                appData = expectedAppData,
                 isHighPriority = isHighPriority,
                 fileName = FOLDER_NAME,
             )
@@ -104,8 +111,9 @@ class InsertPendingDownloadsForNodesUseCaseTest {
         runTest {
             val node = mock<DefaultTypedFileNode>()
             val destination = UriPath(PATH_STRING)
-            whenever(doesUriPathHaveSufficientSpaceForNodesUseCase(destination, listOf(node))) doReturn
-                    false
+            whenever(
+                doesUriPathHaveSufficientSpaceForNodesUseCase(destination, listOf(node))
+            ) doReturn false
 
             assertThrows<NotEnoughStorageException> {
                 underTest(listOf(node), destination, false)
@@ -143,5 +151,6 @@ class InsertPendingDownloadsForNodesUseCaseTest {
     companion object {
         private const val FOLDER_NAME = "uriPath"
         private const val PATH_STRING = "$FOLDER_NAME/"
+        private const val GROUP_ID = 874L
     }
 }

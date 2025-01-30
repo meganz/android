@@ -1,6 +1,7 @@
 package mega.privacy.android.domain.usecase.transfers.active
 
 import mega.privacy.android.domain.entity.transfer.TransferEvent
+import mega.privacy.android.domain.entity.transfer.getTransferGroup
 import mega.privacy.android.domain.entity.transfer.isBackgroundTransfer
 import mega.privacy.android.domain.entity.transfer.isVoiceClip
 import mega.privacy.android.domain.exception.BusinessAccountExpiredMegaException
@@ -127,7 +128,20 @@ class HandleTransferEventUseCase @Inject internal constructor(
             start = true,
             pause = true,
             finish = true
-        )?.map { it.transfer }?.let {
+        )?.map { transferEvent ->
+            val appDataToAdd =
+                if (transferEvent is TransferEvent.TransferStartEvent && transferEvent.transfer.folderTransferTag != null) {
+                    transferRepository.getTransferByTag(transferEvent.transfer.folderTransferTag)
+                        ?.getTransferGroup()
+                } else null
+            if (appDataToAdd == null) {
+                transferEvent.transfer
+            } else {
+                transferEvent.transfer.copy(
+                    appData = transferEvent.transfer.appData.plus(appDataToAdd)
+                )
+            }
+        }?.let {
             transferRepository.insertOrUpdateActiveTransfers(it)
         }
     }

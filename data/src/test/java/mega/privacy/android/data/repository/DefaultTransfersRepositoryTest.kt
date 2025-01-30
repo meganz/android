@@ -40,6 +40,7 @@ import mega.privacy.android.data.repository.DefaultTransfersRepository.Companion
 import mega.privacy.android.domain.entity.node.NodeId
 import mega.privacy.android.domain.entity.node.TypedFileNode
 import mega.privacy.android.domain.entity.transfer.ActiveTransfer
+import mega.privacy.android.domain.entity.transfer.ActiveTransferGroup
 import mega.privacy.android.domain.entity.transfer.ActiveTransferTotals
 import mega.privacy.android.domain.entity.transfer.CompletedTransfer
 import mega.privacy.android.domain.entity.transfer.CompletedTransferState
@@ -1686,6 +1687,15 @@ class DefaultTransfersRepositoryTest {
         whenever(megaApiGateway.getBandwidthOverQuotaDelay()).thenReturn(expected)
 
         assertThat(underTest.getBandwidthOverQuotaDelay()).isEqualTo(expected.seconds)
+    }
+
+    @Test
+    fun `test that insert Active Transfer Group returns room gateway result`() = runTest {
+        val expected = 123L
+        val activeTransferGroup = mock<ActiveTransferGroup>()
+        whenever(megaLocalRoomGateway.insertActiveTransferGroup(activeTransferGroup)).thenReturn(expected)
+
+        assertThat(underTest.insertActiveTransferGroup(activeTransferGroup)).isEqualTo(expected)
     }
 
     private fun getCompletedTransfer(fileName: String) = CompletedTransfer(
