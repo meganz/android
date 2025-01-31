@@ -28,8 +28,8 @@ import mega.privacy.android.data.extensions.onFirst
 import mega.privacy.android.data.extensions.skipUnstable
 import mega.privacy.android.data.mapper.transfer.OverQuotaNotificationBuilder
 import mega.privacy.android.domain.entity.transfer.ActiveTransferTotals
-import mega.privacy.android.domain.entity.transfer.TransferProgressResult
 import mega.privacy.android.domain.entity.transfer.TransferEvent
+import mega.privacy.android.domain.entity.transfer.TransferProgressResult
 import mega.privacy.android.domain.entity.transfer.TransferType
 import mega.privacy.android.domain.monitoring.CrashReporter
 import mega.privacy.android.domain.usecase.transfers.MonitorTransferEventsUseCase
@@ -232,8 +232,10 @@ abstract class AbstractTransfersWorker(
                 chunkDuration = eventsChunkDuration,
                 flushOnIdleDuration = 200.milliseconds
             ) { transferEvents ->
-                transferEvents.forEach {
-                    onTransferEventReceived(it)
+                scope.launch {
+                    transferEvents.forEach {
+                        onTransferEventReceived(it)
+                    }
                 }
                 handleTransferEvents(transferEvents)
             }
