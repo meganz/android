@@ -87,10 +87,7 @@ internal class StalledIssueDetailInfoMapper @Inject constructor(
                 ""
             )
 
-            else -> Pair(
-                context.getString(R.string.sync_stalled_issue_no_reason),
-                ""
-            )
+            else -> Pair("", "")
         }
         return StalledIssueDetailedInfo(
             title = issue.first,

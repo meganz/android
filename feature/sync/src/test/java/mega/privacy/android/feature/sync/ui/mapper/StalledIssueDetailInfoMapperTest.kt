@@ -24,7 +24,6 @@ class StalledIssueDetailInfoMapperTest {
 
     @BeforeEach
     fun getStrings() {
-        whenever(context.getString(R.string.sync_stalled_issue_no_reason)).thenReturn("No Reason")
         whenever(context.getString(R.string.sync_stalled_issue_file_issue)).thenReturn("File Issue")
         whenever(context.getString(R.string.sync_stalled_issue_move_or_rename)).thenReturn("Move Or Rename Cannot Occur")
         whenever(context.getString(R.string.sync_stalled_issue_delete_or_move_scanning)).thenReturn(
@@ -124,7 +123,7 @@ class StalledIssueDetailInfoMapperTest {
                 conflictName = "",
                 nodeNames = emptyList()
             ),
-            R.string.sync_stalled_issue_no_reason, 0,
+            0, 0,
         ),
         Arguments.of(
             StalledIssue(
