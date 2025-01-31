@@ -6835,24 +6835,24 @@ class ManagerActivity : PasscodeActivity(), NavigationView.OnNavigationItemSelec
      * @param node the node to open its location
      */
     fun viewNodeInFolder(node: MegaNode) {
-        val parentNode = megaApi.getRootParentNode(node)
+        val rootParentNode = megaApi.getRootParentNode(node)
         viewInFolderNode = node
-        if (parentNode.handle == megaApi.rootNode?.handle) {
+        if (rootParentNode.handle == megaApi.rootNode?.handle) {
             fileBrowserViewModel.setFileBrowserHandle(node.parentHandle)
             refreshFragment(FragmentTag.CLOUD_DRIVE.tag)
             selectDrawerItem(DrawerItem.CLOUD_DRIVE)
-        } else if (parentNode.handle == megaApi.rubbishNode?.handle) {
+        } else if (rootParentNode.handle == megaApi.rubbishNode?.handle) {
             rubbishBinViewModel.setRubbishBinHandle(node.parentHandle)
             refreshFragment(FragmentTag.RUBBISH_BIN_COMPOSE.tag)
             selectDrawerItem(DrawerItem.RUBBISH_BIN)
-        } else if (parentNode.isInShare) {
-            incomingSharesViewModel.setCurrentHandle(parentNode.handle)
+        } else if (rootParentNode.isInShare) {
+            incomingSharesViewModel.setCurrentHandle(node.parentHandle)
             incomingSharesViewModel.refreshNodes()
             viewModel.setSharesTab(SharesTab.INCOMING_TAB)
             sharesViewModel.onTabSelected(SharesTab.INCOMING_TAB)
             refreshSharesPageAdapter()
             selectDrawerItem(DrawerItem.SHARED_ITEMS)
-        } else if (parentNode.handle == megaApi.vaultNode?.handle) {
+        } else if (rootParentNode.handle == megaApi.vaultNode?.handle) {
             refreshFragment(FragmentTag.BACKUPS.tag)
             selectDrawerItem(DrawerItem.BACKUPS)
         }

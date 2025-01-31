@@ -142,7 +142,7 @@ class CompletedTransferMapper @Inject constructor(
                 stringWrapper.getRubbishBinSection() +
                         path.replace("bin${File.separator}", "")
 
-            node.isInShare ->
+            node.isInShare || rootParent.isInShare ->
                 stringWrapper.getTitleIncomingSharesExplorer() + File.separator +
                         path.substring(path.indexOf(":") + 1)
 
