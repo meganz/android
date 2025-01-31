@@ -82,10 +82,8 @@ internal class StalledIssueDetailInfoMapper @Inject constructor(
                 context.getString(R.string.sync_stalled_issue_name_clash_detail)
             )
 
-            StallIssueType.SyncStallReasonLastPlusOne -> Pair(
-                context.getString(R.string.sync_stalled_issue_last_plus_one),
-                ""
-            )
+            //Is a sentinel value: It is not a valid "stall reason" in and of itself.
+            StallIssueType.SyncStallReasonLastPlusOne -> Pair("", "")
 
             else -> Pair("", "")
         }

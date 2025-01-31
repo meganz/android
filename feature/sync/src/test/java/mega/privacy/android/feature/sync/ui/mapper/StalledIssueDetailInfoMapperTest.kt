@@ -51,9 +51,6 @@ class StalledIssueDetailInfoMapperTest {
         whenever(context.getString(R.string.sync_stalled_issue_name_clash)).thenReturn(
             "Names Would Clash When Synced"
         )
-        whenever(context.getString(R.string.sync_stalled_issue_last_plus_one)).thenReturn(
-            "Last Plus One"
-        )
         whenever(context.getString(R.string.sync_stalled_issue_file_issue_detail)).thenReturn(
             "File Issue Detail"
         )
@@ -302,8 +299,7 @@ class StalledIssueDetailInfoMapperTest {
                 conflictName = "",
                 nodeNames = emptyList()
             ),
-            R.string.sync_stalled_issue_last_plus_one,
-            0,
+            0, 0,
         ),
     )
 }
