@@ -15,18 +15,28 @@ import javax.inject.Inject
 internal class ActiveTransferTotalsMapper @Inject constructor(
     private val transferRepository: Lazy<TransferRepository>,
 ) {
+    /**
+     * @param type
+     * @param list the list of active transfers of which the total will be calculated
+     * @param transferredBytes Map of transfer tag to transferred bytes
+     * @param previousGroups The previously returned groups, this will be used to optimize performance, as groups can be changed.
+     */
     suspend operator fun invoke(
         type: TransferType,
         list: List<ActiveTransfer>,
         transferredBytes: Map<Int, Long>,
+        previousGroups: List<ActiveTransferTotals.Group>? = null,
     ): ActiveTransferTotals {
         val onlyFiles = list.filter { !it.isFolderTransfer }
         val groups = onlyFiles
             .groupBy { it.getTransferGroup()?.groupId }
             .mapNotNull { (key, activeTransfers) ->
                 key?.toInt()?.let { groupId ->
-                    transferRepository.get()
-                        .getActiveTransferGroupById(groupId)?.destination?.let { destination ->
+                    val destination =
+                        previousGroups?.firstOrNull { it.groupId == groupId }?.destination
+                            ?: transferRepository.get()
+                                .getActiveTransferGroupById(groupId)?.destination
+                    destination?.let { destination ->
                         ActiveTransferTotals.Group(
                             groupId = groupId,
                             totalFiles = activeTransfers.size,

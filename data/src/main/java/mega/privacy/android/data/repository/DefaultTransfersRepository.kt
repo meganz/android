@@ -16,12 +16,14 @@ import kotlinx.coroutines.flow.callbackFlow
 import kotlinx.coroutines.flow.cancellable
 import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.flow.emitAll
+import kotlinx.coroutines.flow.filterNotNull
 import kotlinx.coroutines.flow.firstOrNull
 import kotlinx.coroutines.flow.flow
 import kotlinx.coroutines.flow.flowOn
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.mapNotNull
 import kotlinx.coroutines.flow.merge
+import kotlinx.coroutines.flow.scan
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.suspendCancellableCoroutine
@@ -602,8 +604,16 @@ internal class DefaultTransfersRepository @Inject constructor(
             emitAll(
                 megaLocalRoomGateway.getActiveTransfersByType(transferType).flowOn(ioDispatcher)
                     .combine(transferredBytesFlow) { activeTransfers, transferredBytes ->
-                        activeTransferTotalsMapper(transferType, activeTransfers, transferredBytes)
+                        activeTransfers to transferredBytes
                     }
+                    .scan(null as ActiveTransferTotals?) { previousTotals, (activeTransfers, transferredBytes) ->
+                        activeTransferTotalsMapper(
+                            type = transferType,
+                            list = activeTransfers,
+                            transferredBytes = transferredBytes,
+                            previousGroups = previousTotals?.groups
+                        )
+                    }.filterNotNull() //skip first null value
             )
         }.cancellable()
 
@@ -612,7 +622,7 @@ internal class DefaultTransfersRepository @Inject constructor(
             activeTransferTotalsMapper(
                 type = transferType,
                 list = megaLocalRoomGateway.getCurrentActiveTransfersByType(transferType),
-                transferredBytes = transferredBytesFlow(transferType).value
+                transferredBytes = transferredBytesFlow(transferType).value,
             )
         }
 

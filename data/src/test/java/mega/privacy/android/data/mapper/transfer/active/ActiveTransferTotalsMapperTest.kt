@@ -17,6 +17,7 @@ import org.junit.jupiter.params.provider.EnumSource
 import org.mockito.kotlin.doReturn
 import org.mockito.kotlin.mock
 import org.mockito.kotlin.reset
+import org.mockito.kotlin.verifyNoInteractions
 import org.mockito.kotlin.whenever
 import kotlin.collections.component1
 import kotlin.collections.component2
@@ -184,6 +185,37 @@ class ActiveTransferTotalsMapperTest {
                 }
             val actual = underTest(transferType, entities, emptyMap()).groups
             assertThat(actual).containsExactlyElementsIn(expected)
+        }
+
+    @ParameterizedTest(name = "Transfer Type {0}")
+    @EnumSource(TransferType::class)
+    fun `test that groups are not fetched from repository if was in previous groups`(transferType: TransferType) =
+        runTest {
+            val groups = mutableListOf<ActiveTransferTotals.Group>()
+            val entities = createEntities(transferType).mapIndexed { index, entity ->
+                val groupId = index.mod(5)
+                groups.add(
+                    ActiveTransferTotals.Group(groupId, 0, 0, "destination$groupId")
+                )
+                entity.copy(appData = listOf(TransferAppData.TransferGroup(groupId.toLong())))
+            }
+            val expected = entities
+                .groupBy { it.getTransferGroup()?.groupId }
+                .mapNotNull { (key, activeTransfers) ->
+                    key?.toInt()?.let { groupId ->
+                        val fileTransfers = activeTransfers.filter { !it.isFolderTransfer }
+                        ActiveTransferTotals.Group(
+                            groupId = groupId,
+                            totalFiles = fileTransfers.size,
+                            finishedFiles = fileTransfers.count { it.isFinished },
+                            destination = "destination$groupId",
+                        )
+                    }
+                }
+            val actual =
+                underTest(transferType, entities, emptyMap(), previousGroups = groups).groups
+            assertThat(actual).containsExactlyElementsIn(expected)
+            verifyNoInteractions(transferRepository)
         }
 
     private fun createEntities(transferType: TransferType) = (0..20).map { tag ->

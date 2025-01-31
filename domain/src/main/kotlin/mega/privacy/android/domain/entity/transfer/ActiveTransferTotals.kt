@@ -29,14 +29,23 @@ data class ActiveTransferTotals(
     val transferredBytes: Long,
     val totalAlreadyTransferredFiles: Int,
     val totalCancelled: Int,
-    val groups: List<Group> = emptyList()
+    val groups: List<Group> = emptyList(),
 ) {
+    /**
+     * Information about transfer groups. A transfer group represents all the transfers initiated by a single user action.
+     * @param groupId
+     * @param totalFiles the total files that will be transferred, notice that this is not the total files selected by the user, as it includes child files in case of folder transfers
+     * @param finishedFiles the amount of files that have finished
+     * @param destination the destination of the transfer
+     * @param singleFileName in case of a single file transfer, the name of the file, null otherwise
+     */
     data class Group(
         val groupId: Int,
-        val totalFiles:Int,
-        val finishedFiles:Int,
+        val totalFiles: Int,
+        val finishedFiles: Int,
         val destination: String,
     )
+
     /**
      * @return true if there are ongoing transfers, false if all transfers are finished or there are no active transfers to transfer
      */

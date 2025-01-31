@@ -6,6 +6,7 @@ import com.google.common.truth.Truth.assertThat
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.emptyFlow
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.flow.flowOf
@@ -178,6 +179,10 @@ class DefaultTransfersRepositoryTest {
             deviceGateway,
             inProgressTransferMapper,
             cacheGateway,
+            transferAppDataStringMapper,
+            activeTransferTotalsMapper,
+            monitorFetchNodesFinishUseCase,
+            transfersPreferencesGateway,
         )
     }
 
@@ -1221,10 +1226,48 @@ class DefaultTransfersRepositoryTest {
             val flow = flowOf(list)
             whenever(megaLocalRoomGateway.getActiveTransfersByType(transferType))
                 .thenReturn(flow)
-            whenever(activeTransferTotalsMapper(eq(transferType), eq(list), any()))
+            whenever(activeTransferTotalsMapper(eq(transferType), eq(list), any(), anyOrNull()))
                 .thenReturn(expected)
             val actual = underTest.getActiveTransferTotalsByType(transferType).first()
             assertThat(actual).isEqualTo(expected)
+        }
+
+        @ParameterizedTest
+        @EnumSource(TransferType::class)
+        fun `test that previous groups are send to activeTransferTotalsMapper after first emission`(
+            transferType: TransferType,
+        ) = runTest {
+            val groups = mock<List<ActiveTransferTotals.Group>>()
+            val firstActiveTransferTotals = mock<ActiveTransferTotals>{
+                on { this.groups } doReturn groups
+            }
+            val secondActiveTransferTotals = mock<ActiveTransferTotals>()
+            val firstList = listOf(mock<ActiveTransfer>())
+            val secondList = listOf(mock<ActiveTransfer>(), mock<ActiveTransfer>())
+            val flow = MutableStateFlow(firstList)
+            whenever(megaLocalRoomGateway.getActiveTransfersByType(transferType))
+                .thenReturn(flow)
+            whenever(
+                activeTransferTotalsMapper(
+                    type = transferType,
+                    list = firstList,
+                    transferredBytes = emptyMap(),
+                    previousGroups = null
+                )
+            ) doReturn firstActiveTransferTotals
+            whenever(
+                activeTransferTotalsMapper(
+                    type = transferType,
+                    list = secondList,
+                    transferredBytes = emptyMap(),
+                    previousGroups = groups //this comes from first emission
+                )
+            ) doReturn secondActiveTransferTotals
+            underTest.getActiveTransferTotalsByType(transferType).test {
+                assertThat(awaitItem()).isEqualTo(firstActiveTransferTotals)
+                flow.emit(secondList)
+                assertThat(awaitItem()).isEqualTo(secondActiveTransferTotals)
+            }
         }
 
         @ParameterizedTest
@@ -1236,7 +1279,7 @@ class DefaultTransfersRepositoryTest {
             val expected = mock<ActiveTransferTotals>()
             whenever(megaLocalRoomGateway.getCurrentActiveTransfersByType(transferType))
                 .thenReturn(list)
-            whenever(activeTransferTotalsMapper(eq(transferType), eq(list), any()))
+            whenever(activeTransferTotalsMapper(eq(transferType), eq(list), any(), anyOrNull()))
                 .thenReturn(expected)
             val actual = underTest.getCurrentActiveTransferTotalsByType(transferType)
             assertThat(actual).isEqualTo(expected)
@@ -1292,7 +1335,7 @@ class DefaultTransfersRepositoryTest {
             val flow = flowOf(list)
             whenever(megaLocalRoomGateway.getActiveTransfersByType(transferType))
                 .thenReturn(flow)
-            whenever(activeTransferTotalsMapper(eq(transferType), eq(list), any()))
+            whenever(activeTransferTotalsMapper(eq(transferType), eq(list), any(), anyOrNull()))
                 .thenReturn(expected)
 
             underTest.getActiveTransferTotalsByType(transferType).test {
@@ -1324,13 +1367,23 @@ class DefaultTransfersRepositoryTest {
             underTest.getCurrentActiveTransferTotalsByType(transferType)
             //here we check that the mapper is called with the proper expectedMap
             val map = expectedMap(transfer)
-            verify(activeTransferTotalsMapper).invoke(eq(transferType), eq(list), eq(map))
+            verify(activeTransferTotalsMapper).invoke(
+                eq(transferType),
+                eq(list),
+                eq(map),
+                anyOrNull()
+            )
 
             // test deleteAllActiveTransfersByType so we also clear the cached values
             underTest.deleteAllActiveTransfersByType(transferType)
             underTest.getCurrentActiveTransferTotalsByType(transferType)
             //here we check that the mapper is called with the proper expectedMap
-            verify(activeTransferTotalsMapper).invoke(eq(transferType), eq(list), eq(emptyMap()))
+            verify(activeTransferTotalsMapper).invoke(
+                eq(transferType),
+                eq(list),
+                eq(emptyMap()),
+                anyOrNull()
+            )
         }
 
         private fun stubActiveTransfer(
@@ -1693,13 +1746,14 @@ class DefaultTransfersRepositoryTest {
     fun `test that insert Active Transfer Group returns room gateway result`() = runTest {
         val expected = 123L
         val activeTransferGroup = mock<ActiveTransferGroup>()
-        whenever(megaLocalRoomGateway.insertActiveTransferGroup(activeTransferGroup)).thenReturn(expected)
+        whenever(megaLocalRoomGateway.insertActiveTransferGroup(activeTransferGroup))
+            .thenReturn(expected)
 
         assertThat(underTest.insertActiveTransferGroup(activeTransferGroup)).isEqualTo(expected)
     }
 
     @Test
-    fun `test that get Active Transfer Group returns room gateway entity`() = runTest{
+    fun `test that get Active Transfer Group returns room gateway entity`() = runTest {
         val groupId = 435834379
         val expected = mock<ActiveTransferGroup>()
         whenever(megaLocalRoomGateway.getActiveTransferGroup(groupId)).thenReturn(expected)
