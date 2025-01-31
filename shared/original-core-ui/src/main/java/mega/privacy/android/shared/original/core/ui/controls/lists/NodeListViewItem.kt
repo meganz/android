@@ -234,8 +234,9 @@ fun NodeListViewItem(
         },
         description = {
             description?.let {
-                if (highlightText.isNotBlank()) {
+                if (highlightText.isNotBlank() && it.contains(highlightText, ignoreCase = true)) {
                     HighlightedText(
+                        modifier = Modifier.testTag(DESCRIPTION_TAG),
                         text = description,
                         highlightText = highlightText,
                         highlightFontWeight = FontWeight.Bold,
@@ -248,15 +249,17 @@ fun NodeListViewItem(
             tags?.let {
                 if (highlightText.isNotBlank()) {
                     val tagHighlightText = highlightText.removePrefix("#")
-                    Row(
-                        modifier = Modifier.horizontalScroll(rememberScrollState()),
-                        horizontalArrangement = Arrangement.spacedBy(8.dp)
-                    ) {
-                        tags.forEach { tag ->
-                            HighlightChip(
-                                text = "#$tag",
-                                highlightText = tagHighlightText,
-                            )
+                    if (it.any { tag -> tag.contains(tagHighlightText, ignoreCase = true) }) {
+                        Row(
+                            modifier = Modifier.horizontalScroll(rememberScrollState()).testTag(TAGS_TAG),
+                            horizontalArrangement = Arrangement.spacedBy(8.dp)
+                        ) {
+                            tags.forEach { tag ->
+                                HighlightChip(
+                                    text = "#$tag",
+                                    highlightText = tagHighlightText,
+                                )
+                            }
                         }
                     }
                 }
@@ -406,4 +409,7 @@ internal const val PERMISSION_ICON_TAG = "node_list_view_item:permission_icon"
 internal const val LABEL_TAG = "node_list_view_item:label"
 internal const val MORE_ICON_TAG = "node_list_view_item:more_icon"
 internal const val SELECTED_TEST_TAG = "node_list_view_item:image_selected"
+internal const val TAGS_TAG = "node_list_view_item:tags"
+internal const val DESCRIPTION_TAG = "node_list_view_item:description"
+
 
