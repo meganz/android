@@ -25,6 +25,7 @@ internal class PsaRepositoryImpl @Inject constructor(
     @IoDispatcher private val ioDispatcher: CoroutineDispatcher,
 ) : PsaRepository {
     override suspend fun fetchPsa(refreshCache: Boolean) = withContext(ioDispatcher) {
+        Timber.d("Calling fetch psa. Refresh cache: $refreshCache")
         if (refreshCache) psaCache.set(getLatestPsa())
         return@withContext psaCache.get()
     }
@@ -36,7 +37,9 @@ internal class PsaRepositoryImpl @Inject constructor(
                     if (isActive) {
                         when (error.errorCode) {
                             MegaError.API_OK -> {
-                                continuation.resumeWith(Result.success(psaMapper(request)))
+                                val psa = psaMapper(request)
+                                Timber.i("Psa fetched. Id: ${psa.id}")
+                                continuation.resumeWith(Result.success(psa))
                             }
 
                             MegaError.API_ENOENT -> continuation.resumeWith(Result.success(null))
@@ -59,9 +62,12 @@ internal class PsaRepositoryImpl @Inject constructor(
         withContext(ioDispatcher) { psaPreferenceGateway.setLastRequestedTime(time) }
 
     override suspend fun clearCache() {
+        Timber.d("Psa cache cleared")
         withContext(ioDispatcher) { psaCache.clear() }
     }
 
-    override suspend fun dismissPsa(psaId: Int) =
+    override suspend fun dismissPsa(psaId: Int) {
+        Timber.d("Dismiss Psa called with id: $psaId")
         withContext(ioDispatcher) { megaApiGateway.setPsaHandled(psaId) }
+    }
 }
