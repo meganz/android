@@ -106,7 +106,7 @@ class ContactFileListFragment : ContactFileBaseFragment() {
 
     private inner class ActionBarCallBack : ActionMode.Callback {
         override fun onActionItemClicked(mode: ActionMode, item: MenuItem): Boolean {
-            val documents = adapter.selectedNodes
+            val documents = adapter.selectedNodes.filterNotNull()
 
             val itemId = item.itemId
             if (itemId == R.id.cab_menu_download) {
@@ -168,13 +168,10 @@ class ContactFileListFragment : ContactFileBaseFragment() {
         override fun onPrepareActionMode(mode: ActionMode, menu: Menu): Boolean {
             val selected = adapter.selectedNodes
 
-            menu.findItem(R.id.cab_menu_share_link)
-                .setTitle(
-                    resources.getQuantityString(
-                        mega.privacy.android.shared.resources.R.plurals.label_share_links,
-                        selected.size
-                    )
-                )
+            menu.findItem(R.id.cab_menu_share_link).title = resources.getQuantityString(
+                mega.privacy.android.shared.resources.R.plurals.label_share_links,
+                selected.size
+            )
 
             val areAllNotTakenDown = selected.areAllNotTakenDown()
             var showRename = false
@@ -405,8 +402,13 @@ class ContactFileListFragment : ContactFileBaseFragment() {
 
             if (adapter == null) {
                 adapter = MegaNodeAdapter(
-                    context, this, contactNodes, _parentHandle,
-                    listView, Constants.CONTACT_FILE_ADAPTER, MegaNodeAdapter.ITEM_VIEW_TYPE_LIST
+                    context,
+                    this,
+                    contactNodes,
+                    _parentHandle,
+                    listView as RecyclerView,
+                    Constants.CONTACT_FILE_ADAPTER,
+                    MegaNodeAdapter.ITEM_VIEW_TYPE_LIST
                 )
             } else {
                 adapter.setNodes(contactNodes)
@@ -837,7 +839,7 @@ class ContactFileListFragment : ContactFileBaseFragment() {
         if (actionMode == null) {
             return
         }
-        val documents = adapter.selectedNodes
+        val documents = adapter.selectedNodes.filterNotNull()
         var files = 0
         var folders = 0
         for (document in documents) {

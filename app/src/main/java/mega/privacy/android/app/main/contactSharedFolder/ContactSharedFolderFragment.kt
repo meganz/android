@@ -272,8 +272,8 @@ class ContactSharedFolderFragment : ContactFileBaseFragment() {
      */
     override fun updateActionModeTitle() {
         actionMode?.let {
-            val files = adapter?.selectedNodes?.count { it.isFile } ?: 0
-            val folders = adapter?.selectedNodes?.count { it.isFolder } ?: 0
+            val files = adapter?.selectedNodes?.count { it?.isFile == true } ?: 0
+            val folders = adapter?.selectedNodes?.count { it?.isFolder == true } ?: 0
 
             actionMode?.title = when {
                 (files == 0 && folders == 0) -> 0.toString()
@@ -395,7 +395,7 @@ class ContactSharedFolderFragment : ContactFileBaseFragment() {
         }
 
         override fun onActionItemClicked(mode: ActionMode?, item: MenuItem?): Boolean {
-            val documents = adapter?.selectedNodes ?: listOf()
+            val documents = adapter?.selectedNodes?.filterNotNull().orEmpty()
             when (item?.itemId) {
                 R.id.cab_menu_download -> {
                     contactInfoActivity.downloadFile(documents)

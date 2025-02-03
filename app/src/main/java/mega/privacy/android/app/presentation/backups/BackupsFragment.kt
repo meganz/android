@@ -1,5 +1,7 @@
 package mega.privacy.android.app.presentation.backups
 
+import mega.privacy.android.icon.pack.R as iconPackR
+import android.annotation.SuppressLint
 import android.content.Intent
 import android.net.Uri
 import android.os.Bundle
@@ -73,7 +75,6 @@ import timber.log.Timber
 import java.io.File
 import java.util.Stack
 import javax.inject.Inject
-import mega.privacy.android.icon.pack.R as iconPackR
 
 /**
  * An instance of [RotatableFragment] that displays all content that were backed up by the user
@@ -217,7 +218,7 @@ class BackupsFragment : RotatableFragment() {
             return
         }
 
-        val documents = megaNodeAdapter?.selectedNodes ?: emptyList()
+        val documents = megaNodeAdapter?.selectedNodes?.filterNotNull().orEmpty()
         val files = documents.filter { it.isFile }.size
         val folders = documents.filter { it.isFolder }.size
         val sum = files + folders
@@ -247,7 +248,7 @@ class BackupsFragment : RotatableFragment() {
      */
     private inner class ActionBarCallBack : ActionMode.Callback {
         override fun onActionItemClicked(mode: ActionMode, item: MenuItem): Boolean {
-            val selectedNodes = megaNodeAdapter?.selectedNodes ?: emptyList()
+            val selectedNodes = megaNodeAdapter?.selectedNodes?.filterNotNull().orEmpty()
             when (item.itemId) {
                 R.id.cab_menu_download -> {
                     (requireActivity() as ManagerActivity).saveNodesToDevice(
@@ -300,6 +301,7 @@ class BackupsFragment : RotatableFragment() {
             return true
         }
 
+        @SuppressLint("NotifyDataSetChanged")
         override fun onDestroyActionMode(arg0: ActionMode) {
             Timber.d("onDestroyActionMode()")
             clearSelections()
@@ -309,7 +311,7 @@ class BackupsFragment : RotatableFragment() {
         }
 
         override fun onPrepareActionMode(mode: ActionMode, menu: Menu): Boolean {
-            val selectedNodes = megaNodeAdapter?.selectedNodes ?: emptyList()
+            val selectedNodes = megaNodeAdapter?.selectedNodes.orEmpty()
             val areAllNotTakenDown = selectedNodes.areAllNotTakenDown()
             var showDownload = false
             var showCopy = false
@@ -376,17 +378,19 @@ class BackupsFragment : RotatableFragment() {
      * Establishes the [MegaNodeAdapter]
      */
     private fun setupAdapter() {
-        megaNodeAdapter = MegaNodeAdapter(
-            requireActivity(),
-            this,
-            emptyList(),
-            state().currentBackupsFolderNodeId.longValue,
-            binding?.backupsRecyclerView,
-            BACKUPS_ADAPTER,
-            if (state().currentViewType == ViewType.LIST) MegaNodeAdapter.ITEM_VIEW_TYPE_LIST else MegaNodeAdapter.ITEM_VIEW_TYPE_GRID,
-            sortByHeaderViewModel,
-        )
-        megaNodeAdapter?.isMultipleSelect = false
+        binding?.backupsRecyclerView?.let {
+            megaNodeAdapter = MegaNodeAdapter(
+                requireActivity(),
+                this,
+                mutableListOf<MegaNode?>(),
+                state().currentBackupsFolderNodeId.longValue,
+                it as RecyclerView,
+                BACKUPS_ADAPTER,
+                if (state().currentViewType == ViewType.LIST) MegaNodeAdapter.ITEM_VIEW_TYPE_LIST else MegaNodeAdapter.ITEM_VIEW_TYPE_GRID,
+                sortByHeaderViewModel,
+            )
+            megaNodeAdapter?.isMultipleSelect = false
+        }
     }
 
     /**
@@ -690,7 +694,7 @@ class BackupsFragment : RotatableFragment() {
         if (megaNodeAdapter?.isMultipleSelect == true) {
             Timber.d("Multi Select is Enabled")
             megaNodeAdapter?.toggleSelection(nodePosition)
-            val selectedNodes = megaNodeAdapter?.selectedNodes ?: emptyList()
+            val selectedNodes = megaNodeAdapter?.selectedNodes.orEmpty()
             if (selectedNodes.isNotEmpty()) updateActionModeTitle()
         } else {
             megaNodeAdapter?.getItem(nodePosition)?.let { selectedNode ->
@@ -812,7 +816,7 @@ class BackupsFragment : RotatableFragment() {
      * @param nodes The list of Nodes to display. A [MutableList] is needed as
      * [MegaNodeAdapter.setNodes] is written in Java
      */
-    private fun setNodes(nodes: MutableList<MegaNode>) {
+    private fun setNodes(nodes: MutableList<MegaNode?>) {
         Timber.d("Call setNodes() with Node Size ${nodes.size}")
         megaNodeAdapter?.setNodes(nodes)
     }
