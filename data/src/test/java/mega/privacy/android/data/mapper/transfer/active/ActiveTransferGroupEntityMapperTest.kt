@@ -25,8 +25,9 @@ class ActiveTransferGroupEntityMapperTest {
     internal fun `test that entity is mapped correctly`(
         transferType: TransferType,
     ) = runTest {
-        val activeTransferGroup = ActiveTransferGroupImpl(GROUP_ID, transferType, DESTINATION)
-        val expected = ActiveTransferGroupEntity(GROUP_ID, transferType, DESTINATION)
+        val activeTransferGroup =
+            ActiveTransferGroupImpl(GROUP_ID, transferType, DESTINATION, FILE_NAME)
+        val expected = ActiveTransferGroupEntity(GROUP_ID, transferType, DESTINATION, FILE_NAME)
         val actual = underTest(activeTransferGroup)
         assertThat(expected).isEqualTo(actual)
     }
@@ -34,5 +35,6 @@ class ActiveTransferGroupEntityMapperTest {
     private companion object {
         const val GROUP_ID = 34
         const val DESTINATION = "destination"
+        const val FILE_NAME = "file.jpg"
     }
 }

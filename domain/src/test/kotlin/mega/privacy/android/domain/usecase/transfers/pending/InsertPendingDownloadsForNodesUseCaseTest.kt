@@ -4,6 +4,7 @@ import com.google.common.truth.Truth.assertThat
 import kotlinx.coroutines.test.runTest
 import mega.privacy.android.domain.entity.node.DefaultTypedFileNode
 import mega.privacy.android.domain.entity.node.NodeId
+import mega.privacy.android.domain.entity.transfer.ActiveTransferGroupImpl
 import mega.privacy.android.domain.entity.transfer.TransferAppData
 import mega.privacy.android.domain.entity.transfer.TransferType
 import mega.privacy.android.domain.entity.transfer.pending.InsertPendingTransferRequest
@@ -76,8 +77,10 @@ class InsertPendingDownloadsForNodesUseCaseTest {
     fun `test that an InsertPendingTransferRequest is sent to transferRepository's insertPendingTransfers with the correct parameters for each node`(
         isHighPriority: Boolean,
     ) = runTest {
-        val nodes = (0..5).map {
-            mock<DefaultTypedFileNode>()
+        val nodes = (0..5).map { index ->
+            mock<DefaultTypedFileNode> {
+                on { it.name } doReturn "fileName$index"
+            }
         }
         val appData = mock<TransferAppData.SdCardDownload>()
         val expectedAppData = listOf(appData, TransferAppData.TransferGroup(GROUP_ID))
@@ -97,13 +100,44 @@ class InsertPendingDownloadsForNodesUseCaseTest {
                 uriPath = uriPath,
                 appData = expectedAppData,
                 isHighPriority = isHighPriority,
-                fileName = FOLDER_NAME,
+                fileName = "fileName$index",
             )
         }
 
         underTest(nodes, uriPath, isHighPriority)
 
         verify(transferRepository).insertPendingTransfers(expected)
+    }
+
+    @ParameterizedTest
+    @ValueSource(booleans = [true, false])
+    fun `test that active transfer group is created with correct parameters`(
+        multipleNodes: Boolean,
+    ) = runTest {
+        val singleFileName = "file.txt"
+        val nodes = if (multipleNodes) (0..5).map { index ->
+            mock<DefaultTypedFileNode>()
+        } else {
+            listOf(mock<DefaultTypedFileNode>{
+                on { name } doReturn singleFileName
+            })
+        }
+        val uriPath = UriPath(PATH_STRING)
+        whenever(
+            doesUriPathHaveSufficientSpaceForNodesUseCase(uriPath, nodes)
+        ) doReturn true
+        underTest(
+            nodes = nodes,
+            destination = uriPath,
+            isHighPriority = false
+        )
+        verify(transferRepository).insertActiveTransferGroup(
+            ActiveTransferGroupImpl(
+                transferType = TransferType.DOWNLOAD,
+                destination = uriPath.value,
+                singleFileName = if (multipleNodes) null else singleFileName,
+            )
+        )
     }
 
     @Test

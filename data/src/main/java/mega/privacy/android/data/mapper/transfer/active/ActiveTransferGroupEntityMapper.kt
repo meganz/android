@@ -9,7 +9,8 @@ internal class ActiveTransferGroupEntityMapper @Inject constructor() {
         ActiveTransferGroupEntity(
             groupId = groupId,
             transferType = transferType,
-            destination = destination
+            destination = destination,
+            singleFileName = singleFileName,
         )
     }
 }

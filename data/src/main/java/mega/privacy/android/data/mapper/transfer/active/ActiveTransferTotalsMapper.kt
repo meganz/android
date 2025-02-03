@@ -30,18 +30,21 @@ internal class ActiveTransferTotalsMapper @Inject constructor(
         val onlyFiles = list.filter { !it.isFolderTransfer }
         val groups = onlyFiles
             .groupBy { it.getTransferGroup()?.groupId }
-            .mapNotNull { (key, activeTransfers) ->
+            .mapNotNull { (key, activeTransfersFiles) ->
                 key?.toInt()?.let { groupId ->
-                    val destination =
-                        previousGroups?.firstOrNull { it.groupId == groupId }?.destination
-                            ?: transferRepository.get()
-                                .getActiveTransferGroupById(groupId)?.destination
+                    val previousGroup = previousGroups?.firstOrNull { it.groupId == groupId }
+                    val transferGroup = if (previousGroup == null) {
+                        transferRepository.get().getActiveTransferGroupById(groupId)
+                    } else null
+                    val destination = previousGroup?.destination ?: transferGroup?.destination
+                    val fileName = previousGroup?.singleFileName ?: transferGroup?.singleFileName
                     destination?.let { destination ->
                         ActiveTransferTotals.Group(
                             groupId = groupId,
-                            totalFiles = activeTransfers.size,
-                            finishedFiles = activeTransfers.count { it.isFinished },
+                            totalFiles = activeTransfersFiles.size,
+                            finishedFiles = activeTransfersFiles.count { it.isFinished },
                             destination = destination,
+                            singleFileName = fileName
                         )
                     }
                 }

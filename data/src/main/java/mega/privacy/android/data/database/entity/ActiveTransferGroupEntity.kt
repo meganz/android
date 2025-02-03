@@ -21,4 +21,6 @@ data class ActiveTransferGroupEntity(
     override val transferType: TransferType,
     @ColumnInfo(name = "destination")
     override val destination: String,
+    @ColumnInfo(name = "fileName")
+    override val singleFileName: String? = null,
 ) : ActiveTransferGroup

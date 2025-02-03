@@ -166,7 +166,8 @@ class ActiveTransferTotalsMapperTest {
                 whenever(transferRepository.getActiveTransferGroupById(groupId)) doReturn ActiveTransferGroupImpl(
                     groupId,
                     transferType,
-                    "destination$groupId"
+                    "destination$groupId",
+                    "file$groupId",
                 )
                 entity.copy(appData = listOf(TransferAppData.TransferGroup(groupId.toLong())))
             }
@@ -180,6 +181,7 @@ class ActiveTransferTotalsMapperTest {
                             totalFiles = fileTransfers.size,
                             finishedFiles = fileTransfers.count { it.isFinished },
                             destination = "destination$groupId",
+                            singleFileName = "file$groupId",
                         )
                     }
                 }
@@ -195,7 +197,7 @@ class ActiveTransferTotalsMapperTest {
             val entities = createEntities(transferType).mapIndexed { index, entity ->
                 val groupId = index.mod(5)
                 groups.add(
-                    ActiveTransferTotals.Group(groupId, 0, 0, "destination$groupId")
+                    ActiveTransferTotals.Group(groupId, 0, 0, "destination$groupId", "file$groupId")
                 )
                 entity.copy(appData = listOf(TransferAppData.TransferGroup(groupId.toLong())))
             }
@@ -209,6 +211,7 @@ class ActiveTransferTotalsMapperTest {
                             totalFiles = fileTransfers.size,
                             finishedFiles = fileTransfers.count { it.isFinished },
                             destination = "destination$groupId",
+                            singleFileName = "file$groupId",
                         )
                     }
                 }

@@ -252,7 +252,8 @@ class PendingTransferDaoTest {
         ),
         alreadyTransferred = 0,
         state = state,
-        nodeIdentifier = PendingTransferNodeIdentifier.CloudDriveNode(NodeId(45L))
+        nodeIdentifier = PendingTransferNodeIdentifier.CloudDriveNode(NodeId(45L)),
+        fileName = "file.txt"
     )
 
 }

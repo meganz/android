@@ -44,6 +44,7 @@ data class ActiveTransferTotals(
         val totalFiles: Int,
         val finishedFiles: Int,
         val destination: String,
+        val singleFileName: String?,
     )
 
     /**

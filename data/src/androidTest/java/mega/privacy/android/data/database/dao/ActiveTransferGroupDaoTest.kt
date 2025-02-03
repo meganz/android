@@ -39,7 +39,8 @@ class ActiveTransferGroupDaoTest {
         val newEntity = ActiveTransferGroupEntity(
             groupId = 6434,
             transferType = TransferType.DOWNLOAD,
-            destination = "destination"
+            destination = "destination",
+            singleFileName = "file.txt",
         )
         underTest.insertActiveTransferGroup(newEntity)
         val actual = underTest.getActiveTransferGroupById(newEntity.groupId ?: -1)
@@ -51,7 +52,8 @@ class ActiveTransferGroupDaoTest {
         val newEntity = ActiveTransferGroupEntity(
             groupId = 6434,
             transferType = TransferType.DOWNLOAD,
-            destination = "destination"
+            destination = "destination",
+            singleFileName = "file.txt",
         )
         underTest.insertActiveTransferGroup(newEntity)
         underTest.deleteActiveTransfersGroupById(newEntity.groupId ?: -1)
