@@ -180,6 +180,8 @@ class ActiveTransferTotalsMapperTest {
                             groupId = groupId,
                             totalFiles = fileTransfers.size,
                             finishedFiles = fileTransfers.count { it.isFinished },
+                            completedFiles = 0,
+                            alreadyTransferred = fileTransfers.count { it.isAlreadyTransferred },
                             destination = "destination$groupId",
                             singleFileName = "file$groupId",
                         )
@@ -191,13 +193,59 @@ class ActiveTransferTotalsMapperTest {
 
     @ParameterizedTest(name = "Transfer Type {0}")
     @EnumSource(TransferType::class)
+    fun `test that mapper correctly maps completed transfers in groups `(transferType: TransferType) =
+        runTest {
+            val entities = createEntities(transferType).mapIndexed { index, entity ->
+                val groupId = index.mod(5)
+                whenever(transferRepository.getActiveTransferGroupById(groupId)) doReturn ActiveTransferGroupImpl(
+                    groupId,
+                    transferType,
+                    "destination$groupId",
+                    "file$groupId",
+                )
+                entity.copy(appData = listOf(TransferAppData.TransferGroup(groupId.toLong())))
+            }
+            val subSetWithErrors =
+                entities.filter { it.tag.rem(2) == 0 } //set 50% of the transfers as completed 50% as not completed
+            val transferredBytes =
+                entities.associate { it.tag to if (it in subSetWithErrors) it.totalBytes / 2 else it.totalBytes }
+            val entitiesFinished = entities.map { it.copy(isFinished = true) }
+            val expected = entities
+                .groupBy { it.getTransferGroup()?.groupId }
+                .mapNotNull { (key, activeTransfers) ->
+                    key?.toInt()?.let { groupId ->
+                        val fileTransfers = activeTransfers.filter { !it.isFolderTransfer }
+                        val expectedCompleted = activeTransfers.filter { !it.isFolderTransfer }
+                            .count { it !in subSetWithErrors }
+                        ActiveTransferTotals.Group(
+                            groupId = groupId,
+                            totalFiles = fileTransfers.size,
+                            finishedFiles = fileTransfers.size,
+                            completedFiles = expectedCompleted,
+                            alreadyTransferred = fileTransfers.count { it.isAlreadyTransferred },
+                            destination = "destination$groupId",
+                            singleFileName = "file$groupId",
+                        )
+                    }
+                }
+            val actual = underTest(transferType, entitiesFinished, transferredBytes).groups
+            assertThat(actual).containsExactlyElementsIn(expected)
+        }
+
+    @ParameterizedTest(name = "Transfer Type {0}")
+    @EnumSource(TransferType::class)
     fun `test that groups are not fetched from repository if was in previous groups`(transferType: TransferType) =
         runTest {
             val groups = mutableListOf<ActiveTransferTotals.Group>()
             val entities = createEntities(transferType).mapIndexed { index, entity ->
                 val groupId = index.mod(5)
                 groups.add(
-                    ActiveTransferTotals.Group(groupId, 0, 0, "destination$groupId", "file$groupId")
+                    ActiveTransferTotals.Group(
+                        groupId,
+                        0, 0, 0, 0,
+                        "destination$groupId",
+                        "file$groupId"
+                    )
                 )
                 entity.copy(appData = listOf(TransferAppData.TransferGroup(groupId.toLong())))
             }
@@ -210,6 +258,8 @@ class ActiveTransferTotalsMapperTest {
                             groupId = groupId,
                             totalFiles = fileTransfers.size,
                             finishedFiles = fileTransfers.count { it.isFinished },
+                            completedFiles = 0,
+                            alreadyTransferred = fileTransfers.count { it.isAlreadyTransferred },
                             destination = "destination$groupId",
                             singleFileName = "file$groupId",
                         )

@@ -43,8 +43,10 @@ internal class ActiveTransferTotalsMapper @Inject constructor(
                             groupId = groupId,
                             totalFiles = activeTransfersFiles.size,
                             finishedFiles = activeTransfersFiles.count { it.isFinished },
+                            completedFiles = activeTransfersFiles.count { it.isFinished && transferredBytes[it.tag] == it.totalBytes },
+                            alreadyTransferred = activeTransfersFiles.count { it.isAlreadyTransferred },
                             destination = destination,
-                            singleFileName = fileName
+                            singleFileName = fileName,
                         )
                     }
                 }

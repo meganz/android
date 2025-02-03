@@ -36,6 +36,8 @@ data class ActiveTransferTotals(
      * @param groupId
      * @param totalFiles the total files that will be transferred, notice that this is not the total files selected by the user, as it includes child files in case of folder transfers
      * @param finishedFiles the amount of files that have finished
+     * @param completedFiles the amount of files completed (finished without errors)
+     * @param alreadyTransferred the amount of files not transferred because already transferred
      * @param destination the destination of the transfer
      * @param singleFileName in case of a single file transfer, the name of the file, null otherwise
      */
@@ -43,9 +45,14 @@ data class ActiveTransferTotals(
         val groupId: Int,
         val totalFiles: Int,
         val finishedFiles: Int,
+        val completedFiles: Int,
+        val alreadyTransferred: Int,
         val destination: String,
         val singleFileName: String?,
-    )
+    ) {
+        fun finished() = totalFiles == finishedFiles
+        val finishedFilesWithErrors = finishedFiles - completedFiles - alreadyTransferred
+    }
 
     /**
      * @return true if there are ongoing transfers, false if all transfers are finished or there are no active transfers to transfer
