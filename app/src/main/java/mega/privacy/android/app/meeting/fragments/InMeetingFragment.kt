@@ -1191,6 +1191,7 @@ class InMeetingFragment : MeetingBaseFragment(), BottomFloatingPanelListener, Sn
 
         viewLifecycleOwner.collectFlow(sharedModel.state.map { it.chatId }
             .distinctUntilChanged()) {
+            inMeetingViewModel.setChatId(it)
             callRecordingViewModel.setChatId(it)
         }
 
