@@ -17,6 +17,7 @@ import kotlinx.coroutines.NonCancellable
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.catch
 import kotlinx.coroutines.flow.filter
+import kotlinx.coroutines.flow.filterNot
 import kotlinx.coroutines.flow.lastOrNull
 import kotlinx.coroutines.flow.onCompletion
 import kotlinx.coroutines.flow.transform
@@ -31,6 +32,8 @@ import mega.privacy.android.domain.entity.transfer.ActiveTransferTotals
 import mega.privacy.android.domain.entity.transfer.TransferEvent
 import mega.privacy.android.domain.entity.transfer.TransferProgressResult
 import mega.privacy.android.domain.entity.transfer.TransferType
+import mega.privacy.android.domain.entity.transfer.isBackgroundTransfer
+import mega.privacy.android.domain.entity.transfer.isVoiceClip
 import mega.privacy.android.domain.monitoring.CrashReporter
 import mega.privacy.android.domain.usecase.transfers.MonitorTransferEventsUseCase
 import mega.privacy.android.domain.usecase.transfers.active.ClearActiveTransfersIfFinishedUseCase
@@ -227,6 +230,13 @@ abstract class AbstractTransfersWorker(
      */
     internal open suspend fun doWorkInternal(scope: CoroutineScope) {
         monitorTransferEventsUseCase()
+            .filterNot { event ->
+                event.transfer.isVoiceClip()
+                        || event.transfer.isBackgroundTransfer()
+                        || event.transfer.isStreamingTransfer
+                        || event.transfer.isBackupTransfer
+                        || event.transfer.isSyncTransfer
+            }
             .filter { it.transfer.transferType == type }
             .collectChunked(
                 chunkDuration = eventsChunkDuration,

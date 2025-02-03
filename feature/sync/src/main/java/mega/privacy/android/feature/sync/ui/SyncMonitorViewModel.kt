@@ -23,13 +23,13 @@ import mega.privacy.android.domain.usecase.environment.MonitorBatteryInfoUseCase
 import mega.privacy.android.domain.usecase.network.MonitorConnectivityUseCase
 import mega.privacy.android.domain.usecase.transfers.MonitorTransferEventsUseCase
 import mega.privacy.android.domain.usecase.transfers.active.HandleTransferEventUseCase
-import mega.privacy.android.feature.sync.domain.usecase.sync.MonitorSyncsUseCase
 import mega.privacy.android.feature.sync.domain.entity.FolderPair
 import mega.privacy.android.feature.sync.domain.entity.StalledIssue
 import mega.privacy.android.feature.sync.domain.entity.SyncNotificationMessage
 import mega.privacy.android.feature.sync.domain.usecase.notifcation.GetSyncNotificationUseCase
 import mega.privacy.android.feature.sync.domain.usecase.notifcation.SetSyncNotificationShownUseCase
 import mega.privacy.android.feature.sync.domain.usecase.sync.MonitorSyncStalledIssuesUseCase
+import mega.privacy.android.feature.sync.domain.usecase.sync.MonitorSyncsUseCase
 import mega.privacy.android.feature.sync.domain.usecase.sync.PauseResumeSyncsBasedOnBatteryAndWiFiUseCase
 import mega.privacy.android.feature.sync.domain.usecase.sync.PauseResumeSyncsBasedOnBatteryAndWiFiUseCase.Companion.LOW_BATTERY_LEVEL
 import mega.privacy.android.feature.sync.domain.usecase.sync.option.MonitorSyncByWiFiUseCase

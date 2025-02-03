@@ -28,10 +28,10 @@ import mega.privacy.android.data.mapper.transfer.TransfersNotificationMapper
 import mega.privacy.android.domain.entity.Progress
 import mega.privacy.android.domain.entity.transfer.ActiveTransferTotals
 import mega.privacy.android.domain.entity.transfer.MonitorOngoingActiveTransfersResult
-import mega.privacy.android.domain.entity.transfer.TransferProgressResult
 import mega.privacy.android.domain.entity.transfer.Transfer
 import mega.privacy.android.domain.entity.transfer.TransferAppData
 import mega.privacy.android.domain.entity.transfer.TransferEvent
+import mega.privacy.android.domain.entity.transfer.TransferProgressResult
 import mega.privacy.android.domain.entity.transfer.TransferState
 import mega.privacy.android.domain.entity.transfer.TransferType
 import mega.privacy.android.domain.entity.uri.UriPath
@@ -380,7 +380,7 @@ class UploadsWorkerTest {
         initialTransferTotals: ActiveTransferTotals = mockActiveTransferTotals(false),
         transferTotals: List<ActiveTransferTotals> = listOf(mockActiveTransferTotals(true)),
         storageOverQuota: Boolean = false,
-        appData: List<TransferAppData>? = null,
+        appData: List<TransferAppData>? = emptyList(),
     ): TransferEvent.TransferFinishEvent {
         val transfer: Transfer = mock {
             on { this.nodeHandle }.thenReturn(nodeId)

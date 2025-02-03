@@ -2,7 +2,9 @@ package mega.privacy.android.domain.usecase.transfers.active
 
 import mega.privacy.android.domain.entity.transfer.ActiveTransferTotals
 import mega.privacy.android.domain.entity.transfer.TransferType
+import mega.privacy.android.domain.entity.transfer.isBackgroundTransfer
 import mega.privacy.android.domain.entity.transfer.isSDCardDownload
+import mega.privacy.android.domain.entity.transfer.isVoiceClip
 import mega.privacy.android.domain.entity.transfer.pending.PendingTransferState
 import mega.privacy.android.domain.repository.TransferRepository
 import mega.privacy.android.domain.usecase.transfers.GetInProgressTransfersUseCase
@@ -32,6 +34,11 @@ class CorrectActiveTransfersUseCase @Inject constructor(
             transferRepository.getCurrentActiveTransfersByType(transferType)
         }
         val inProgressTransfers = getInProgressTransfersUseCase()
+            .filterNot { transfer ->
+                transfer.isVoiceClip()
+                        || transfer.isBackgroundTransfer()
+                        || transfer.isStreamingTransfer
+            }
 
         //update transferred bytes for each transfer
         transferRepository.updateTransferredBytes(inProgressTransfers)

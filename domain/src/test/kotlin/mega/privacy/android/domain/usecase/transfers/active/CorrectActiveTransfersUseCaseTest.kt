@@ -267,4 +267,64 @@ internal class CorrectActiveTransfersUseCaseTest {
             any()
         )
     }
+
+    @Test
+    fun `test that voice clip transfers are filtered`() =
+        runTest {
+            val transfer = mock<Transfer> {
+                on { this.transferType } doReturn TransferType.CHAT_UPLOAD
+                on { this.appData } doReturn listOf(TransferAppData.VoiceClip)
+            }
+            val transfers = subSetTransfers()
+            val inProgress = buildList {
+                addAll(transfers)
+                add(transfer)
+            }
+
+            whenever(getInProgressTransfersUseCase()).thenReturn(inProgress)
+
+            underTest.invoke(TransferType.CHAT_UPLOAD)
+
+            verify(transferRepository).updateTransferredBytes(eq(transfers))
+        }
+
+    @Test
+    fun `test that background transfers are filtered`() =
+        runTest {
+            val transfer = mock<Transfer> {
+                on { this.transferType } doReturn TransferType.DOWNLOAD
+                on { this.appData } doReturn listOf(TransferAppData.BackgroundTransfer)
+            }
+            val transfers = subSetTransfers()
+            val inProgress = buildList {
+                addAll(transfers)
+                add(transfer)
+            }
+
+            whenever(getInProgressTransfersUseCase()).thenReturn(inProgress)
+
+            underTest.invoke(TransferType.DOWNLOAD)
+
+            verify(transferRepository).updateTransferredBytes(eq(transfers))
+        }
+
+    @Test
+    fun `test that streaming transfers are filtered`() =
+        runTest {
+            val transfer = mock<Transfer> {
+                on { this.transferType } doReturn TransferType.DOWNLOAD
+                on { this.isStreamingTransfer } doReturn true
+            }
+            val transfers = subSetTransfers()
+            val inProgress = buildList {
+                addAll(transfers)
+                add(transfer)
+            }
+
+            whenever(getInProgressTransfersUseCase()).thenReturn(inProgress)
+
+            underTest.invoke(TransferType.DOWNLOAD)
+
+            verify(transferRepository).updateTransferredBytes(eq(transfers))
+        }
 }

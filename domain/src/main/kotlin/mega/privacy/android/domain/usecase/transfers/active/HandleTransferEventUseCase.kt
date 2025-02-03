@@ -2,8 +2,6 @@ package mega.privacy.android.domain.usecase.transfers.active
 
 import mega.privacy.android.domain.entity.transfer.TransferEvent
 import mega.privacy.android.domain.entity.transfer.getTransferGroup
-import mega.privacy.android.domain.entity.transfer.isBackgroundTransfer
-import mega.privacy.android.domain.entity.transfer.isVoiceClip
 import mega.privacy.android.domain.exception.BusinessAccountExpiredMegaException
 import mega.privacy.android.domain.exception.QuotaExceededMegaException
 import mega.privacy.android.domain.repository.TransferRepository
@@ -35,12 +33,8 @@ class HandleTransferEventUseCase @Inject internal constructor(
      * @param events the [TransferEvent] that has been received.
      */
     suspend operator fun invoke(vararg events: TransferEvent) {
-        val transferEvents = events.filterNot { event ->
-            event.transfer.isVoiceClip() || event.transfer.isBackgroundTransfer()
-                    || event.transfer.isStreamingTransfer
-                    || event.transfer.isBackupTransfer
-        }
-        if (transferEvents.isEmpty()) return
+        val transferEvents = events.asList().takeIf { it.isNotEmpty() } ?: return
+
         val eventsWithDestinationMap = transferEvents.associateWith { event ->
             if (event is TransferEvent.TransferStartEvent || event is TransferEvent.TransferFinishEvent) {
                 getTransferDestinationUriUseCase(event.transfer)
@@ -129,11 +123,12 @@ class HandleTransferEventUseCase @Inject internal constructor(
             pause = true,
             finish = true
         )?.map { transferEvent ->
-            val appDataToAdd =
-                if (transferEvent is TransferEvent.TransferStartEvent && transferEvent.transfer.folderTransferTag != null) {
-                    transferRepository.getTransferByTag(transferEvent.transfer.folderTransferTag)
-                        ?.getTransferGroup()
-                } else null
+            val appDataToAdd = if (transferEvent is TransferEvent.TransferStartEvent) {
+                transferEvent.transfer.folderTransferTag?.let { folderTransferTag ->
+                    transferRepository.getTransferByTag(folderTransferTag)?.getTransferGroup()
+                }
+            } else null
+
             if (appDataToAdd == null) {
                 transferEvent.transfer
             } else {
