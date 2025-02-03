@@ -786,25 +786,17 @@ class FileExplorerActivity : PasscodeActivity(), MegaRequestListenerInterface,
                 }
 
                 else -> {
-                    Timber.d("action = UPLOAD")
-                    mode = UPLOAD
+                    configureView()
                     title = getString(R.string.title_upload_explorer)
                     importFileF = true
-                    action = intent.action
                     viewModel.ownFilePrepareTask(this, intent)
-                    chooseFragment(IMPORT_FRAGMENT)
-                    createAndShowProgressDialog(
-                        false,
-                        resources.getQuantityString(R.plurals.upload_prepare, 1)
+                    chooseFragment(
+                        if (intent.action == ACTION_UPLOAD_TO_CHAT) {
+                            CHAT_FRAGMENT
+                        } else {
+                            IMPORT_FRAGMENT
+                        }
                     )
-
-                    with(binding) {
-                        cloudDriveFrameLayout.isVisible = true
-                        slidingTabsFileExplorer.isVisible = false
-                        explorerTabsPager.isVisible = false
-                    }
-
-                    tabShown = NO_TABS
                 }
             }
 
@@ -812,6 +804,24 @@ class FileExplorerActivity : PasscodeActivity(), MegaRequestListenerInterface,
         } else {
             Timber.e("intent error")
         }
+    }
+
+    private fun configureView() {
+        Timber.d("action = UPLOAD")
+        mode = UPLOAD
+        action = intent.action
+        createAndShowProgressDialog(
+            false,
+            resources.getQuantityString(R.plurals.upload_prepare, 1)
+        )
+
+        with(binding) {
+            cloudDriveFrameLayout.isVisible = true
+            slidingTabsFileExplorer.isVisible = false
+            explorerTabsPager.isVisible = false
+        }
+
+        tabShown = NO_TABS
     }
 
     /**
