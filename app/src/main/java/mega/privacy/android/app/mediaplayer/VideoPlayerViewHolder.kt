@@ -4,7 +4,6 @@ import android.content.Context
 import android.view.View
 import android.view.ViewGroup
 import android.widget.ImageButton
-import android.widget.ProgressBar
 import android.widget.TextView
 import androidx.annotation.DrawableRes
 import androidx.annotation.OptIn
@@ -100,7 +99,7 @@ class VideoPlayerViewHolder(val container: ViewGroup) {
             if (repeatToggleMode == RepeatToggleMode.REPEAT_NONE) {
                 context.getColor(R.color.white)
             } else {
-                context.getColor(R.color.accent_900)
+                context.getColor(R.color.color_button_brand)
             }
         )
     }
@@ -231,7 +230,7 @@ class VideoPlayerViewHolder(val container: ViewGroup) {
      * @param playbackState the state of player
      */
     fun updateLoadingAnimation(@Player.State playbackState: Int?) {
-        container.findViewById<ProgressBar>(R.id.loading_audio_player_controller_view).isVisible =
+        container.findViewById<View>(R.id.loading_video_player_controller_view).isVisible =
             playbackState == Player.STATE_BUFFERING
     }
 

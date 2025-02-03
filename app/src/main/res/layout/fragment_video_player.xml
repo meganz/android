@@ -19,17 +19,6 @@
             app:shutter_background_color="@color/black"
             android:animateLayoutChanges="true"
             app:surface_type="texture_view" />
-
-        <ProgressBar
-            android:id="@+id/loading_audio_player_controller_view"
-            android:layout_width="82dp"
-            android:layout_height="82dp"
-            app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintTop_toTopOf="parent"
-            app:layout_constraintBottom_toBottomOf="parent"
-            android:indeterminateDrawable="@drawable/video_player_progress_indeterminate_anim_large_material" />
-
     </androidx.constraintlayout.widget.ConstraintLayout>
 
 
