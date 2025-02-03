@@ -870,4 +870,10 @@
         <item quantity="many"></item>
         <item quantity="other"></item>
     </plurals>
+    <!-- Warning shown to the user when tries to retry a cancelled or failed transfer but it cannot be retried because app does not have read permission over the file anymore -->
+    <string name="transfers_completed_one_read_error_retrying">Невозможно завершить загрузку или повторить попытку, поскольку у MEGA больше нет доступа к файлу</string>
+    <!-- Warning shown to the user when tries to retry some or all of cancelled or failed transfer but they cannot be retried because app does not have read permission over the files anymore -->
+    <string name="transfers_completed_some_read_error_retrying">Невозможно завершить некоторые загрузки или повторить попытку, поскольку у MEGA больше нет доступа к файлам</string>
+    <!-- Title for Offline Folder exposed via SAF -->
+    <string name="general_mega_offline">MEGA Offline</string>
 </resources>
