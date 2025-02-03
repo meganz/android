@@ -271,7 +271,7 @@
     <!-- Hint how to cancel the download -->
     <string name="download_touch_to_show">查看傳輸</string>
     <!-- message when trying to open a downloaded file but there isn’t any app that open that file. Example: a user downloads a pdf but doesn’t have any app to read a pdf -->
-    <string name="intent_not_available">你的裝置上沒有任何應用程式可以執行這個檔案</string>
+    <string name="intent_not_available">There’s no suitable app to open this file on your device</string>
     <!-- Message when trying to open a location message but there isn’t any app that open that location. -->
     <string name="intent_not_available_location">在您的裝罝上沒有可以開啟此位置資訊的應用程式</string>
     <!-- Message displayed when user tries to open a file with a 3rd party app using the option "Open with" but there isn't any app installed in the device which can open that file type, e.g. user tries to open a ".txt" but doesn’t have any installed 3rd party app which supports ".txt" files. -->

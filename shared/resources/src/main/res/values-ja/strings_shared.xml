@@ -828,4 +828,10 @@
     <plurals name="transfers_completed_read_error_retrying">
         <item quantity="other"></item>
     </plurals>
+    <!-- Warning shown to the user when tries to retry a cancelled or failed transfer but it cannot be retried because app does not have read permission over the file anymore -->
+    <string name="transfers_completed_one_read_error_retrying">MEGAが当該ファイルにアクセスできなくなったため、アップロードを完了または再試行できません。</string>
+    <!-- Warning shown to the user when tries to retry some or all of cancelled or failed transfer but they cannot be retried because app does not have read permission over the files anymore -->
+    <string name="transfers_completed_some_read_error_retrying">MEGAが当該ファイルにアクセスできなくなったため、アップロードの一部または全部が完了または再試行できません。</string>
+    <!-- Title for Offline Folder exposed via SAF -->
+    <string name="general_mega_offline">MEGA Offline</string>
 </resources>
