@@ -16,13 +16,47 @@ class FileWrapper(
     val isFolder: Boolean,
     private val getChildrenUrisFunction: () -> List<String>,
     private val getDetachedFileDescriptorFunction: (write: Boolean) -> Int?,
+    private val childFileExistsFunction: (name: String) -> Boolean,
+    private val createChildFileFunction: (name: String, asFolder: Boolean) -> FileWrapper?,
+    private val getParentUriFunction: () -> FileWrapper?,
+    private val getPathFunction: () -> String?,
+    private val deleteFileFunction: () -> Boolean,
+    private val deleteFolderIfEmptyFunction: () -> Boolean,
+    private val setModificationTimeFunction: (newTime: Long) -> Boolean,
+    private val renameFunction: (newName: String) -> FileWrapper?,
 ) {
+
     @Keep
     fun getFileDescriptor(write: Boolean) =
         getDetachedFileDescriptorFunction(write)
 
     @Keep
     fun getChildrenUris(): List<String> = getChildrenUrisFunction()
+
+    @Keep
+    fun childFileExists(name: String) = childFileExistsFunction(name)
+
+    @Keep
+    fun createChildFile(name: String, asFolder: Boolean) = createChildFileFunction(name, asFolder)
+
+    @Keep
+    fun getParentFile(): FileWrapper? = getParentUriFunction()
+
+    @Keep
+    fun getPath(): String? = getPathFunction()
+
+    @Keep
+    fun deleteFile(): Boolean = deleteFileFunction()
+
+    @Keep
+    fun deleteFolderIfEmpty(): Boolean = deleteFolderIfEmptyFunction()
+
+    @Keep
+    fun setModificationTime(newTime: Long): Boolean = setModificationTimeFunction(newTime)
+
+    @Keep
+    fun rename(newName: String): FileWrapper? = renameFunction(newName)
+
 
     companion object {
 

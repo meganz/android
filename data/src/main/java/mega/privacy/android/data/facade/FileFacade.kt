@@ -287,7 +287,10 @@ internal class FileFacade @Inject constructor(
         )
     }
 
-    override suspend fun getExternalPathByContentUri(contentUri: String): String? = run {
+    override suspend fun getExternalPathByContentUri(contentUri: String) =
+        getExternalPathByContentUriSync(contentUri)
+
+    override fun getExternalPathByContentUriSync(contentUri: String): String? = run {
         contentUri
             .toUri()
             .lastPathSegment
@@ -661,8 +664,7 @@ internal class FileFacade @Inject constructor(
         } else {
             val fileName = getFileNameIfHasNameCollision(destination, source.name)
             val fileNameWithoutExtension = fileName.substringBeforeLast(".")
-            val mimeType = MimeTypeMap.getSingleton().getMimeTypeFromExtension(source.extension)
-                ?: "application/octet-stream"
+            val mimeType = getMimeTypeFromExtension(source.extension)
             val newFile = destination.createFile(mimeType, fileNameWithoutExtension)
             newFile?.uri?.let { newUri ->
                 context.contentResolver.openOutputStream(newUri)?.use { output ->
@@ -683,10 +685,8 @@ internal class FileFacade @Inject constructor(
     ) {
         val fileName = getFileNameIfHasNameCollision(destination, name)
         val fileNameWithoutExtension = fileName.substringBeforeLast(".")
-        val extension = fileName.substringAfterLast(".", "")
         val mimeType = context.contentResolver.getType(source)
-            ?: MimeTypeMap.getSingleton().getMimeTypeFromExtension(extension)
-            ?: "application/octet-stream"
+            ?: getMimeTypeFromFileName(fileName)
         val newFile = destination.createFile(mimeType, fileNameWithoutExtension)
         newFile?.uri?.let { newUri ->
             context.contentResolver.openInputStream(source)?.use { input ->
@@ -853,11 +853,89 @@ internal class FileFacade @Inject constructor(
     override suspend fun canReadUri(stringUri: String) =
         getDocumentFileFromUri(Uri.parse(stringUri))?.canRead() == true
 
+    override fun childFileExistsSync(parentFolder: UriPath, childName: String): Boolean {
+        val parentDocumentFile = getDocumentFileFromUri(parentFolder.toUri())
+        return parentDocumentFile
+            ?.takeIf { it.isDirectory }
+            ?.listFiles()
+            ?.any { it.name == childName } == true
+    }
+
+    override fun createChildFileSync(
+        parentFolder: UriPath,
+        childName: String,
+        asFolder: Boolean,
+    ): UriPath? {
+        val parentDocumentFile = getDocumentFileFromUri(parentFolder.toUri())
+        return when {
+            parentDocumentFile?.isDirectory != true -> null
+            asFolder -> parentDocumentFile.createDirectory(childName)
+            else -> parentDocumentFile.createFile(getMimeTypeFromFileName(childName), childName)
+        }?.let {
+            UriPath(it.uri.toString())
+        }
+    }
+
+    override fun getParentSync(childUriPath: UriPath): UriPath? {
+        val childDocumentFile = getDocumentFileFromUri(childUriPath.toUri())
+        return childDocumentFile?.parentFile?.uri?.toString()?.let { UriPath(it) }
+    }
+
+    override fun deleteIfItIsAFileSync(uriPath: UriPath): Boolean {
+        val documentFile = getDocumentFileFromUri(uriPath.toUri())
+        return if (documentFile?.isFile == true) {
+            documentFile.delete()
+        } else {
+            false
+        }
+    }
+
+    override fun deleteIfItIsAnEmptyFolder(uriPath: UriPath): Boolean {
+        val documentFile = getDocumentFileFromUri(uriPath.toUri())
+        return if (documentFile?.isDirectory == true && documentFile.listFiles().isNullOrEmpty()) {
+            documentFile.delete()
+        } else {
+            false
+        }
+    }
+
+    override fun setLastModifiedSync(uriPath: UriPath, newTime: Long): Boolean =
+        updateFileMTime(uriPath, newTime) || updateDocumentFileMTime(uriPath, newTime)
+
+    private fun updateFileMTime(uriPath: UriPath, newTime: Long): Boolean =
+        getExternalPathByContentUriSync(uriPath.value)?.let {
+            File(it).takeIf { it.exists() }?.setLastModified(newTime)
+        } == true
+
+    private fun updateDocumentFileMTime(uriPath: UriPath, newTime: Long): Boolean {
+        val contentValues = ContentValues().apply {
+            put(DocumentsContract.Document.COLUMN_LAST_MODIFIED, newTime)
+        }
+
+        return context.contentResolver.update(uriPath.toUri(), contentValues, null, null) > 0
+    }
+
+    override fun renameFileSync(uriPath: UriPath, newName: String): UriPath? {
+        val documentFile = getDocumentFileFromUri(uriPath.toUri())
+        return if (documentFile?.renameTo(newName) == true) {
+            UriPath(documentFile.uri.toString())
+        } else {
+            null
+        }
+    }
+
     private fun isMediaDocumentUri() = "com.android.providers.media.documents"
 
     private fun isDownloadDocumentUri() = "com.android.providers.downloads.documents"
 
     private fun isExternalStorageUri() = "com.android.externalstorage.documents"
+
+    private fun getMimeTypeFromFileName(fileName: String) =
+        getMimeTypeFromExtension(fileName.substringAfterLast(".", ""))
+
+    private fun getMimeTypeFromExtension(extension: String) =
+        MimeTypeMap.getSingleton().getMimeTypeFromExtension(extension)
+            ?: "application/octet-stream"
 
     private fun getDataColumn(
         context: Context,

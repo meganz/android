@@ -198,6 +198,18 @@ interface FileGateway {
     suspend fun getExternalPathByContentUri(contentUri: String): String?
 
     /**
+     * Takes a content Uri and creates an external storage path from it
+     *
+     * e.g. the following Uri:
+     * "content://com.android.externalstorage.documents/tree/primary%3ASync%2FsomeFolder"
+     * will be converted to
+     * "/storage/emulated/0/Sync/someFolder"
+     *
+     * @param contentUri The content Uri to be converted
+     */
+    fun getExternalPathByContentUriSync(contentUri: String): String?
+
+    /**
      * delete files in a directory
      *
      * @param directory the directory from which files are deleted
@@ -464,4 +476,48 @@ interface FileGateway {
      * @return true if the uri can be read, false otherwise
      */
     suspend fun canReadUri(stringUri: String): Boolean
+
+    /**
+     * Checks if a specific folder has a child with a specific name
+     */
+    fun childFileExistsSync(parentFolder: UriPath, childName: String): Boolean
+
+    /**
+     * Creates a file as a child of a specific folder
+     * @param parentFolder the folder where the child will be created
+     * @param childName the name of the created child
+     * @param asFolder if true, the child will be a folder, otherwise it will be a file
+     * @return true if the child was created, false otherwise
+     */
+    fun createChildFileSync(parentFolder: UriPath, childName: String, asFolder: Boolean): UriPath?
+
+    /**
+     * Get the parent of a file or folder
+     * @return the [UriPath] of the parent if it's accessible and permissions are granted, null otherwise
+     */
+    fun getParentSync(childUriPath: UriPath): UriPath?
+
+    /**
+     * Deletes a file if it's a regular file
+     * @return true if the file was deleted, false otherwise
+     */
+    fun deleteIfItIsAFileSync(uriPath: UriPath): Boolean
+
+    /**
+     * Deletes a folder if it's a folder and it's empty
+     * @return true if the folder was deleted, false otherwise
+     */
+    fun deleteIfItIsAnEmptyFolder(uriPath: UriPath): Boolean
+
+    /**
+     * Set the last modified time of a file or folder
+     * @return true if the time was updated, false otherwise
+     */
+    fun setLastModifiedSync(uriPath: UriPath, newTime: Long): Boolean
+
+    /**
+     * Renames a file or folder
+     * @return the new [UriPath] of the renamed file, null if the file wasn't renamed
+     */
+    fun renameFileSync(uriPath: UriPath, newName: String): UriPath?
 }

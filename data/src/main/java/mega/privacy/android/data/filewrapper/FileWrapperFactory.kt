@@ -24,6 +24,36 @@ internal class FileWrapperFactory(private val fileGateway: FileGateway) {
                             emptyList()
                         }
                     },
+                    childFileExistsFunction = { name ->
+                        fileGateway.childFileExistsSync(uriPath, name)
+                    },
+                    createChildFileFunction = { name, asFolder ->
+                        fileGateway.createChildFileSync(uriPath, name, asFolder)?.let {
+                            invoke(it)
+                        }
+                    },
+                    getPathFunction = {
+                        fileGateway.getExternalPathByContentUriSync(uriPath.value)
+                    },
+                    getParentUriFunction = {
+                        fileGateway.getParentSync(uriPath)?.let {
+                            invoke(it)
+                        }
+                    },
+                    deleteFileFunction = {
+                        fileGateway.deleteIfItIsAFileSync(uriPath)
+                    },
+                    deleteFolderIfEmptyFunction = {
+                        fileGateway.deleteIfItIsAnEmptyFolder(uriPath)
+                    },
+                    setModificationTimeFunction = {
+                        fileGateway.setLastModifiedSync(uriPath, it)
+                    },
+                    renameFunction = {
+                        fileGateway.renameFileSync(uriPath, it)?.let {
+                            invoke(it)
+                        }
+                    }
                 )
             }
 }
