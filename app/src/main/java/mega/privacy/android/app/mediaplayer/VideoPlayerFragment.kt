@@ -360,7 +360,7 @@ class VideoPlayerFragment : Fragment() {
                     uiState.map { it.currentSpeedPlayback }.distinctUntilChanged()
                 ) { item ->
                     playerViewHolder?.updateSpeedPlaybackIcon(item.iconId)
-                    mediaPlayerGateway.updatePlaybackSpeed(item.speed)
+                    mediaPlayerGateway.updatePlaybackSpeed(item)
                 }
 
                 viewLifecycleOwner.collectFlow(
@@ -681,7 +681,7 @@ class VideoPlayerFragment : Fragment() {
             setContent {
                 val state by viewModel.uiState.collectAsStateWithLifecycle()
                 SpeedSelectedPopup(
-                    items = speedPlaybackList,
+                    items = SpeedPlaybackItem.entries,
                     isShown = state.isSpeedPopupShown,
                     currentPlaybackSpeed = state.currentSpeedPlayback,
                     onDismissRequest = { viewModel.updateIsSpeedPopupShown(false) }
@@ -865,17 +865,5 @@ class VideoPlayerFragment : Fragment() {
          * The intent key for passing subtitle file id
          */
         const val INTENT_KEY_SUBTITLE_FILE_ID = "INTENT_KEY_SUBTITLE_FILE_ID"
-
-        internal const val SPEED_PLAYBACK_0_5_X = 0.5F
-        internal const val SPEED_PLAYBACK_1_X = 1F
-        internal const val SPEED_PLAYBACK_1_5_X = 1.5F
-        internal const val SPEED_PLAYBACK_2_X = 2F
-
-        internal val speedPlaybackList = listOf(
-            SpeedPlaybackItem.PLAYBACK_SPEED_0_5_X,
-            SpeedPlaybackItem.PLAYBACK_SPEED_1_X,
-            SpeedPlaybackItem.PLAYBACK_SPEED_1_5_X,
-            SpeedPlaybackItem.PLAYBACK_SPEED_2_X,
-        )
     }
 }

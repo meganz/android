@@ -112,7 +112,7 @@ fun SpeedSelectedPopup(
 private fun PreviewSpeedSelectedPopup() {
     OriginalTempTheme(isDark = isSystemInDarkTheme()) {
         SpeedSelectedPopup(
-            items = VideoPlayerFragment.speedPlaybackList,
+            items = SpeedPlaybackItem.entries,
             isShown = true,
             currentPlaybackSpeed = SpeedPlaybackItem.PLAYBACK_SPEED_1_X,
             onDismissRequest = {},

@@ -13,6 +13,7 @@ import androidx.media3.common.Player
 import mega.privacy.android.analytics.Analytics
 import mega.privacy.android.app.R
 import mega.privacy.android.app.databinding.FragmentAudioPlayerBinding
+import mega.privacy.android.app.mediaplayer.model.SpeedPlaybackItem
 import mega.privacy.android.app.mediaplayer.playlist.PlaylistItem
 import mega.privacy.android.app.mediaplayer.queue.audio.AudioQueueFragment.Companion.SINGLE_PLAYLIST_SIZE
 import mega.privacy.android.app.mediaplayer.service.Metadata
@@ -34,6 +35,7 @@ class AudioPlayerViewHolder(val binding: FragmentAudioPlayerBinding) {
     private val playlist = binding.root.findViewById<ImageButton>(R.id.playlist)
     private val shuffle =
         binding.root.findViewById<ImageView>(androidx.media3.ui.R.id.exo_shuffle)
+    private val speedPlaybackButton = binding.root.findViewById<ImageButton>(R.id.speed_playback)
 
     /**
      * Update the layout param of artwork of player view.
@@ -207,4 +209,34 @@ class AudioPlayerViewHolder(val binding: FragmentAudioPlayerBinding) {
                 if (playbackState > Player.STATE_BUFFERING) View.VISIBLE else View.INVISIBLE
         }
     }
+
+    /**
+     * Setup speed playback button.
+     *
+     * @param default default SpeedPlaybackItem
+     * @param callback the callback when speed playback button is clicked
+     */
+    fun setupSpeedPlaybackButton(default: SpeedPlaybackItem?, callback: (View) -> Unit) {
+        speedPlaybackButton.setOnClickListener(callback)
+        updateSpeedPlaybackIcon(default ?: SpeedPlaybackItem.PLAYBACK_SPEED_1_X)
+    }
+
+    /**
+     * Update the speed playback icon according to the playback speed
+     *
+     * @param speedPlaybackItem SpeedPlaybackItem
+     */
+    fun updateSpeedPlaybackIcon(speedPlaybackItem: SpeedPlaybackItem) =
+        with(speedPlaybackButton) {
+            setImageResource(speedPlaybackItem.iconId)
+            setColorFilter(
+                context.getColor(
+                    if (speedPlaybackItem != SpeedPlaybackItem.PLAYBACK_SPEED_1_X) {
+                        R.color.color_button_brand
+                    } else {
+                        R.color.dark_grey_white
+                    }
+                )
+            )
+        }
 }

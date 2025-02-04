@@ -9,6 +9,7 @@ import androidx.media3.ui.PlayerView
 import kotlinx.coroutines.flow.Flow
 import mega.privacy.android.app.mediaplayer.model.MediaPlaySources
 import mega.privacy.android.app.mediaplayer.model.PlayerNotificationCreatedParams
+import mega.privacy.android.app.mediaplayer.model.SpeedPlaybackItem
 import mega.privacy.android.app.mediaplayer.service.MediaPlayerCallback
 import mega.privacy.android.domain.entity.mediaplayer.RepeatToggleMode
 
@@ -224,11 +225,11 @@ interface MediaPlayerGateway {
     fun hideSubtitle()
 
     /**
-     * Update the playback speed
+     * Update SpeedPlaybackItem
      *
-     * @param speed playback speed
+     * @param item [SpeedPlaybackItem]
      */
-    fun updatePlaybackSpeed(speed: Float)
+    fun updatePlaybackSpeed(item: SpeedPlaybackItem)
 
     /**
      * Update the mediaNotAllowPlayState
@@ -250,4 +251,11 @@ interface MediaPlayerGateway {
      * @param surface Surface
      */
     fun setSurface(surface: Surface)
+
+    /**
+     * Get current SpeedPlaybackItem
+     *
+     * @return current [SpeedPlaybackItem]
+     */
+    fun getCurrentSpeedPlaybackItem(): SpeedPlaybackItem
 }

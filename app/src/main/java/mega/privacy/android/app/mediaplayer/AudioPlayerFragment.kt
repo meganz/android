@@ -22,8 +22,11 @@ import kotlinx.coroutines.launch
 import mega.privacy.android.app.R
 import mega.privacy.android.app.arch.extensions.collectFlow
 import mega.privacy.android.app.databinding.FragmentAudioPlayerBinding
+import mega.privacy.android.app.di.mediaplayer.AudioPlayer
 import mega.privacy.android.app.mediaplayer.gateway.AudioPlayerServiceViewModelGateway
+import mega.privacy.android.app.mediaplayer.gateway.MediaPlayerGateway
 import mega.privacy.android.app.mediaplayer.gateway.MediaPlayerServiceGateway
+import mega.privacy.android.app.mediaplayer.model.SpeedPlaybackItem
 import mega.privacy.android.app.mediaplayer.service.AudioPlayerService
 import mega.privacy.android.app.mediaplayer.service.MediaPlayerServiceBinder
 import mega.privacy.android.app.utils.Constants.AUDIO_PLAYER_TOOLBAR_INIT_HIDE_DELAY_MS
@@ -44,6 +47,13 @@ class AudioPlayerFragment : Fragment() {
      */
     @Inject
     lateinit var getFeatureFlagValueUseCase: GetFeatureFlagValueUseCase
+
+    /**
+     * MediaPlayerGateway for video player
+     */
+    @AudioPlayer
+    @Inject
+    lateinit var mediaPlayerGateway: MediaPlayerGateway
 
     private var playerViewHolder: AudioPlayerViewHolder? = null
 
@@ -212,6 +222,19 @@ class AudioPlayerFragment : Fragment() {
                         }
                     }
                 }
+
+                val defaultSpeedItem = SpeedPlaybackItem.entries.find {
+                    it == mediaPlayerGateway.getCurrentSpeedPlaybackItem()
+                }
+                viewHolder.setupSpeedPlaybackButton(
+                    default = defaultSpeedItem,
+                    callback = {
+                        val currentPlaybackItem = mediaPlayerGateway.getCurrentSpeedPlaybackItem()
+                        val nextItem = getNextSpeedPlaybackItem(currentPlaybackItem.speed)
+                        mediaPlayerGateway.updatePlaybackSpeed(nextItem)
+                        viewHolder.updateSpeedPlaybackIcon(nextItem)
+                    }
+                )
             }
         }
     }
@@ -269,5 +292,12 @@ class AudioPlayerFragment : Fragment() {
             delayHideToolbarCanceled = true
             hideToolbar(animate = false)
         }
+    }
+
+    private fun getNextSpeedPlaybackItem(speed: Float): SpeedPlaybackItem {
+        val speedPlaybackList = SpeedPlaybackItem.entries
+        val currentIndex = speedPlaybackList.indexOfFirst { it.speed == speed }
+        return speedPlaybackList.getOrNull((currentIndex + 1) % speedPlaybackList.size)
+            ?: SpeedPlaybackItem.PLAYBACK_SPEED_1_X
     }
 }

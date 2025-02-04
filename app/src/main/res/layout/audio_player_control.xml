@@ -152,8 +152,8 @@
         android:id="@id/exo_shuffle"
         style="@style/AudioPlayerButton"
         app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintEnd_toEndOf="@id/exo_prev"
-        app:layout_constraintStart_toStartOf="@id/exo_prev"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintEnd_toStartOf="@id/exo_repeat_toggle"
         tools:src="@drawable/exo_styled_controls_shuffle_on" />
 
     <ImageButton
@@ -161,8 +161,17 @@
         style="@style/AudioPlayerButton"
         android:src="@drawable/exo_styled_controls_repeat_all"
         app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toStartOf="parent" />
+        app:layout_constraintEnd_toStartOf="@id/speed_playback"
+        app:layout_constraintStart_toEndOf="@id/exo_shuffle" />
+
+    <ImageButton
+        android:id="@id/speed_playback"
+        style="@style/AudioPlayerButton"
+        android:src="@drawable/ic_playback_1x"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toStartOf="@id/playlist"
+        app:layout_constraintStart_toEndOf="@+id/exo_repeat_toggle"
+        app:tint="@color/dark_grey_white"/>
 
     <ImageButton
         android:id="@+id/playlist"
@@ -170,8 +179,8 @@
         android:enabled="false"
         android:src="@drawable/ic_player_queue"
         app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintEnd_toEndOf="@id/exo_next"
-        app:layout_constraintStart_toStartOf="@id/exo_next"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toEndOf="@id/speed_playback"
         app:tint="@color/dark_grey_white" />
 
 </androidx.constraintlayout.widget.ConstraintLayout>

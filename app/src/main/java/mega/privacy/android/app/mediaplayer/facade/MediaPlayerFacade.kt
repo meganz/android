@@ -39,6 +39,7 @@ import mega.privacy.android.app.mediaplayer.mapper.ExoPlayerRepeatModeMapper
 import mega.privacy.android.app.mediaplayer.mapper.RepeatToggleModeByExoPlayerMapper
 import mega.privacy.android.app.mediaplayer.model.MediaPlaySources
 import mega.privacy.android.app.mediaplayer.model.PlayerNotificationCreatedParams
+import mega.privacy.android.app.mediaplayer.model.SpeedPlaybackItem
 import mega.privacy.android.app.mediaplayer.service.MediaPlayerCallback
 import mega.privacy.android.app.mediaplayer.service.MetadataExtractor
 import mega.privacy.android.app.utils.Constants.INVALID_VALUE
@@ -452,8 +453,8 @@ class MediaPlayerFacade @Inject constructor(
             .setTrackTypeDisabled(C.TRACK_TYPE_TEXT, true).build()
     }
 
-    override fun updatePlaybackSpeed(speed: Float) {
-        player?.playbackParameters = PlaybackParameters(speed)
+    override fun updatePlaybackSpeed(item: SpeedPlaybackItem) {
+        player?.playbackParameters = PlaybackParameters(item.speed)
     }
 
     override fun updateMediaNotAllowPlayState(value: Boolean) {
@@ -466,6 +467,10 @@ class MediaPlayerFacade @Inject constructor(
     override fun setSurface(surface: Surface) {
         exoPlayer.setVideoSurface(surface)
     }
+
+    override fun getCurrentSpeedPlaybackItem(): SpeedPlaybackItem =
+        SpeedPlaybackItem.entries.find { it.speed == player?.playbackParameters?.speed }
+            ?: SpeedPlaybackItem.PLAYBACK_SPEED_1_X
 
     companion object {
         private const val INCREMENT_TIME_IN_MS = 15000L

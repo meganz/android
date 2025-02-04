@@ -2,10 +2,6 @@ package mega.privacy.android.app.mediaplayer.model
 
 import androidx.annotation.DrawableRes
 import mega.privacy.android.app.R
-import mega.privacy.android.app.mediaplayer.VideoPlayerFragment.Companion.SPEED_PLAYBACK_0_5_X
-import mega.privacy.android.app.mediaplayer.VideoPlayerFragment.Companion.SPEED_PLAYBACK_1_5_X
-import mega.privacy.android.app.mediaplayer.VideoPlayerFragment.Companion.SPEED_PLAYBACK_1_X
-import mega.privacy.android.app.mediaplayer.VideoPlayerFragment.Companion.SPEED_PLAYBACK_2_X
 
 /**
  * The enum class for playback speed
@@ -15,8 +11,7 @@ import mega.privacy.android.app.mediaplayer.VideoPlayerFragment.Companion.SPEED_
  */
 enum class SpeedPlaybackItem(
     val speed: Float,
-    @DrawableRes
-    val iconId: Int,
+    @DrawableRes val iconId: Int,
 ) {
     /**
      * 0.5x playback speed
@@ -39,3 +34,8 @@ enum class SpeedPlaybackItem(
      */
     PLAYBACK_SPEED_2_X(speed = SPEED_PLAYBACK_2_X, iconId = R.drawable.ic_playback_2x),
 }
+
+private const val SPEED_PLAYBACK_0_5_X = 0.5F
+private const val SPEED_PLAYBACK_1_X = 1F
+private const val SPEED_PLAYBACK_1_5_X = 1.5F
+private const val SPEED_PLAYBACK_2_X = 2F
