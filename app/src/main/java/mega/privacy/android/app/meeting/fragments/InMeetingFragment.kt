@@ -2339,6 +2339,22 @@ class InMeetingFragment : MeetingBaseFragment(), BottomFloatingPanelListener, Sn
         )
     }
 
+    override fun showSnackbar(type: Int, content: String, action: () -> Unit) {
+        val anchor =
+            if (BottomSheetBehavior.STATE_COLLAPSED == bottomFloatingPanelViewHolder?.getState() && floatingBottomSheet.isVisible) {
+                binding.snackbarPosition
+            } else null
+
+        meetingActivity.showSnackbar(
+            type = type,
+            view = binding.root,
+            anchor = anchor,
+            s = content,
+            forceDarkMode = true,
+            action = action,
+        )
+    }
+
     private fun showRequestPermissionSnackBar() {
         val warningText =
             getString(R.string.meeting_required_permissions_warning)

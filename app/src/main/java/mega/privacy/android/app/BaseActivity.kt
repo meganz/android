@@ -1258,6 +1258,11 @@ abstract class BaseActivity : AppCompatActivity(), ActivityLauncher, PermissionR
         showSnackbar(type = type, view = rootView, s = content, idChat = chatId)
     }
 
+    override fun showSnackbar(type: Int, content: String, action: () -> Unit) {
+        val rootView = Util.getRootViewFromContext(this)
+        showSnackbar(type = type, view = rootView, s = content, action = action)
+    }
+
     /**
      * Shows a dialog when the user is selecting the download location.
      * It asks if they want to set the current chosen location as default.

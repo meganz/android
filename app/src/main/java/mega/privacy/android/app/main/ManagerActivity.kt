@@ -5121,6 +5121,19 @@ class ManagerActivity : PasscodeActivity(), NavigationView.OnNavigationItemSelec
         }
     }
 
+    override fun showSnackbar(type: Int, content: String, action: () -> Unit) {
+        showSnackbar(type = type, view = fragmentContainer, s = content, action = action)
+        snackbar?.apply {
+            val snackbarLayout = this.view as? Snackbar.SnackbarLayout
+            // Add system navigation bar bottom insets padding
+            systemBarInsets?.let { insets ->
+                snackbarLayout?.updateLayoutParams<CoordinatorLayout.LayoutParams> {
+                    bottomMargin = insets.bottom
+                }
+            }
+        }
+    }
+
     /**
      * Restores a list of nodes from Rubbish Bin to their original parent.
      *
