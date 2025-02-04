@@ -11,9 +11,6 @@ import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.FlowPreview
 import kotlinx.coroutines.Job
-import kotlinx.coroutines.async
-import kotlinx.coroutines.awaitAll
-import kotlinx.coroutines.coroutineScope
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.catch
@@ -28,7 +25,6 @@ import mega.privacy.android.app.R
 import mega.privacy.android.app.constants.StringsConstants.INVALID_CHARACTERS
 import mega.privacy.android.app.presentation.mapper.GetStringFromStringResMapper
 import mega.privacy.android.app.presentation.photos.albums.AlbumScreenWrapperActivity.Companion.ALBUM_LINK
-import mega.privacy.android.app.presentation.photos.util.LegacyPublicAlbumPhotoNodeProvider
 import mega.privacy.android.app.presentation.transfers.starttransfer.model.TransferTriggerEvent
 import mega.privacy.android.domain.entity.account.AccountDetail
 import mega.privacy.android.domain.entity.node.NodeId
@@ -45,6 +41,7 @@ import mega.privacy.android.domain.usecase.network.MonitorConnectivityUseCase
 import mega.privacy.android.domain.usecase.photos.DownloadPublicAlbumPhotoPreviewUseCase
 import mega.privacy.android.domain.usecase.photos.DownloadPublicAlbumPhotoThumbnailUseCase
 import mega.privacy.android.domain.usecase.photos.GetProscribedAlbumNamesUseCase
+import mega.privacy.android.domain.usecase.photos.GetPublicAlbumNodesDataUseCase
 import mega.privacy.android.domain.usecase.photos.GetPublicAlbumPhotoUseCase
 import mega.privacy.android.domain.usecase.photos.GetPublicAlbumUseCase
 import mega.privacy.android.domain.usecase.photos.ImportPublicAlbumUseCase
@@ -61,7 +58,6 @@ internal class AlbumImportViewModel @Inject constructor(
     private val getUserAlbums: GetUserAlbums,
     private val getPublicAlbumUseCase: GetPublicAlbumUseCase,
     private val getPublicAlbumPhotoUseCase: GetPublicAlbumPhotoUseCase,
-    private val legacyPublicAlbumPhotoNodeProvider: LegacyPublicAlbumPhotoNodeProvider,
     private val downloadPublicAlbumPhotoPreviewUseCase: DownloadPublicAlbumPhotoPreviewUseCase,
     private val downloadPublicAlbumPhotoThumbnailUseCase: DownloadPublicAlbumPhotoThumbnailUseCase,
     private val getProscribedAlbumNamesUseCase: GetProscribedAlbumNamesUseCase,
@@ -71,6 +67,7 @@ internal class AlbumImportViewModel @Inject constructor(
     private val isAlbumLinkValidUseCase: IsAlbumLinkValidUseCase,
     private val monitorConnectivityUseCase: MonitorConnectivityUseCase,
     private val getPublicNodeFromSerializedDataUseCase: GetPublicNodeFromSerializedDataUseCase,
+    private val getPublicAlbumNodesDataUseCase: GetPublicAlbumNodesDataUseCase,
     @DefaultDispatcher private val defaultDispatcher: CoroutineDispatcher,
 ) : ViewModel() {
     private val state = MutableStateFlow(value = AlbumImportState())
@@ -97,6 +94,10 @@ internal class AlbumImportViewModel @Inject constructor(
     @VisibleForTesting
     var availableStorage: Long = 0
 
+    init {
+        initialize()
+    }
+
     fun initialize() = viewModelScope.launch {
         monitorNetworkConnection()
         validateLink(link = albumLink)
@@ -109,7 +110,6 @@ internal class AlbumImportViewModel @Inject constructor(
 
         state.update {
             it.copy(
-                isInitialized = true,
                 isLogin = isLogin,
                 isLocalAlbumsLoaded = !isLogin,
                 isAvailableStorageCollected = it.isAvailableStorageCollected || !isLogin,
@@ -168,23 +168,17 @@ internal class AlbumImportViewModel @Inject constructor(
         }
     }
 
-    @Suppress("UNCHECKED_CAST")
     private suspend fun handlePublicAlbum(link: String, albumPhotos: AlbumPhotoIds) {
         val (album, albumPhotoIds) = albumPhotos
 
         runCatching {
-            coroutineScope {
-                awaitAll(
-                    async { getPublicAlbumPhotoUseCase(albumPhotoIds) },
-                    async { legacyPublicAlbumPhotoNodeProvider.loadNodeCache(albumPhotoIds) },
-                )
-            }
+            getPublicAlbumPhotoUseCase(albumPhotoIds)
         }.onFailure {
             state.update {
                 it.copy(showErrorAccessDialog = true)
             }
         }.onSuccess { result ->
-            updateAlbumPhotos(link, album, result[0] as List<Photo>)
+            updateAlbumPhotos(link, album, result)
         }
     }
 
@@ -510,23 +504,13 @@ internal class AlbumImportViewModel @Inject constructor(
         }
     }
 
-    fun mapPhotosToNodes(photos: Collection<Photo>) = photos.mapNotNull { photo ->
-        legacyPublicAlbumPhotoNodeProvider.getPublicNode(photo.id)
-    }
-
-    fun stopPreview() {
-        legacyPublicAlbumPhotoNodeProvider.stopPreview()
-    }
-
     fun startDownload() {
         viewModelScope.launch {
             val photos = with(state.value) { selectedPhotos.ifEmpty { photos } }
-            val megaNodes = mapPhotosToNodes(photos)
-
-            // Please note that using [MegaNode] should be avoided, [Photo] should implement [TypedNode] so that it can be sent directly to [TransferTriggerEvent]
-            val nodes = megaNodes.mapNotNull {
-                getPublicNodeFromSerializedDataUseCase(it.serialize())
-            }
+            val data = getPublicAlbumNodesDataUseCase()
+            val nodes = photos
+                .mapNotNull { data[NodeId(it.id)] }
+                .mapNotNull { getPublicNodeFromSerializedDataUseCase(it) }
             updateDownloadEvent(TransferTriggerEvent.StartDownloadNode(nodes))
             clearSelection()
         }

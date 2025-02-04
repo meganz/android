@@ -151,7 +151,7 @@ abstract class MediaPlayerActivity : PasscodeActivity() {
 
     internal fun saveFromAlbumSharing(nodeId: NodeId) {
         viewModel.getNodeForAlbumSharing(nodeId.longValue)?.let { node ->
-            startDownloadViewModel.onDownloadClicked(node.serialize())
+            startDownloadViewModel.onDownloadClicked(node)
         }
     }
 

@@ -17,7 +17,6 @@ import mega.privacy.android.app.R
 import mega.privacy.android.app.mediaplayer.model.MediaPlayerMenuClickedEvent
 import mega.privacy.android.app.mediaplayer.model.MediaPlayerState
 import mega.privacy.android.app.mediaplayer.service.Metadata
-import mega.privacy.android.app.presentation.photos.util.LegacyPublicAlbumPhotoNodeProvider
 import mega.privacy.android.app.utils.livedata.SingleLiveEvent
 import mega.privacy.android.domain.entity.account.business.BusinessAccountStatus
 import mega.privacy.android.domain.entity.node.NameCollision
@@ -32,6 +31,7 @@ import mega.privacy.android.domain.usecase.favourites.IsAvailableOfflineUseCase
 import mega.privacy.android.domain.usecase.node.CheckChatNodesNameCollisionAndCopyUseCase
 import mega.privacy.android.domain.usecase.node.CheckNodesNameCollisionWithActionUseCase
 import mega.privacy.android.domain.usecase.node.chat.GetChatFileUseCase
+import mega.privacy.android.domain.usecase.photos.GetPublicAlbumNodeDataUseCase
 import nz.mega.sdk.MegaNode
 import timber.log.Timber
 import javax.inject.Inject
@@ -43,12 +43,12 @@ import javax.inject.Inject
 class MediaPlayerViewModel @Inject constructor(
     private val checkNodesNameCollisionWithActionUseCase: CheckNodesNameCollisionWithActionUseCase,
     private val checkChatNodesNameCollisionAndCopyUseCase: CheckChatNodesNameCollisionAndCopyUseCase,
-    private val legacyPublicAlbumPhotoNodeProvider: LegacyPublicAlbumPhotoNodeProvider,
     private val monitorAccountDetailUseCase: MonitorAccountDetailUseCase,
     private val isHiddenNodesOnboardedUseCase: IsHiddenNodesOnboardedUseCase,
     private val isAvailableOfflineUseCase: IsAvailableOfflineUseCase,
     private val getChatFileUseCase: GetChatFileUseCase,
     private val getBusinessStatusUseCase: GetBusinessStatusUseCase,
+    private val getPublicAlbumNodeDataUseCase: GetPublicAlbumNodeDataUseCase,
 ) : ViewModel() {
 
     private val collision = SingleLiveEvent<NameCollision>()
@@ -247,7 +247,7 @@ class MediaPlayerViewModel @Inject constructor(
      * @param handle node handle
      */
     fun getNodeForAlbumSharing(handle: Long) =
-        legacyPublicAlbumPhotoNodeProvider.getPublicNode(handle)
+        getPublicAlbumNodeDataUseCase(NodeId(handle))
 
     private fun monitorAccountDetail() {
         monitorAccountDetailUseCase()

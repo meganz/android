@@ -7,14 +7,15 @@ import com.google.common.truth.Truth.assertThat
 import de.palm.composestateevents.StateEventWithContentConsumed
 import de.palm.composestateevents.StateEventWithContentTriggered
 import kotlinx.coroutines.ExperimentalCoroutinesApi
+import kotlinx.coroutines.flow.drop
 import kotlinx.coroutines.flow.flowOf
+import kotlinx.coroutines.runBlocking
 import kotlinx.coroutines.test.StandardTestDispatcher
 import kotlinx.coroutines.test.runTest
 import mega.privacy.android.app.constants.StringsConstants.INVALID_CHARACTERS
 import mega.privacy.android.app.presentation.mapper.GetStringFromStringResMapper
 import mega.privacy.android.app.presentation.photos.albums.AlbumScreenWrapperActivity.Companion.ALBUM_LINK
 import mega.privacy.android.app.presentation.photos.albums.importlink.AlbumImportViewModel
-import mega.privacy.android.app.presentation.photos.util.LegacyPublicAlbumPhotoNodeProvider
 import mega.privacy.android.app.presentation.transfers.starttransfer.model.TransferTriggerEvent
 import mega.privacy.android.core.test.extension.CoroutineMainDispatcherExtension
 import mega.privacy.android.domain.entity.node.NodeId
@@ -31,6 +32,7 @@ import mega.privacy.android.domain.usecase.network.MonitorConnectivityUseCase
 import mega.privacy.android.domain.usecase.photos.DownloadPublicAlbumPhotoPreviewUseCase
 import mega.privacy.android.domain.usecase.photos.DownloadPublicAlbumPhotoThumbnailUseCase
 import mega.privacy.android.domain.usecase.photos.GetProscribedAlbumNamesUseCase
+import mega.privacy.android.domain.usecase.photos.GetPublicAlbumNodesDataUseCase
 import mega.privacy.android.domain.usecase.photos.GetPublicAlbumPhotoUseCase
 import mega.privacy.android.domain.usecase.photos.GetPublicAlbumUseCase
 import mega.privacy.android.domain.usecase.photos.ImportPublicAlbumUseCase
@@ -58,8 +60,6 @@ class AlbumImportViewModelTest {
 
     private val mockGetPublicAlbumPhotoUseCase: GetPublicAlbumPhotoUseCase = mock()
 
-    private val mockLegacyPublicAlbumPhotoNodeProvider: LegacyPublicAlbumPhotoNodeProvider = mock()
-
     private val mockDownloadPublicAlbumPhotoPreviewUseCase: DownloadPublicAlbumPhotoPreviewUseCase =
         mock()
 
@@ -81,9 +81,12 @@ class AlbumImportViewModelTest {
     private val mockGetPublicNodeFromSerializedDataUseCase: GetPublicNodeFromSerializedDataUseCase =
         mock()
 
+    private val getPublicAlbumNodesDataUseCase: GetPublicAlbumNodesDataUseCase = mock()
+
     @BeforeEach
     fun setup() {
         whenever(mockMonitorConnectivityUseCase()).thenReturn(flowOf(false))
+        runBlocking { whenever(mockHasCredentialsUseCaseUseCase()).thenReturn(false) }
 
         underTest = AlbumImportViewModel(
             savedStateHandle = mockSavedStateHandle,
@@ -91,7 +94,6 @@ class AlbumImportViewModelTest {
             getUserAlbums = mockGetUserAlbums,
             getPublicAlbumUseCase = mockGetPublicAlbumUseCase,
             getPublicAlbumPhotoUseCase = mockGetPublicAlbumPhotoUseCase,
-            legacyPublicAlbumPhotoNodeProvider = mockLegacyPublicAlbumPhotoNodeProvider,
             downloadPublicAlbumPhotoPreviewUseCase = mockDownloadPublicAlbumPhotoPreviewUseCase,
             downloadPublicAlbumPhotoThumbnailUseCase = mockDownloadPublicAlbumPhotoThumbnailUseCase,
             monitorAccountDetailUseCase = mockMonitorAccountDetailUseCase,
@@ -102,6 +104,7 @@ class AlbumImportViewModelTest {
             monitorConnectivityUseCase = mockMonitorConnectivityUseCase,
             defaultDispatcher = StandardTestDispatcher(),
             getPublicNodeFromSerializedDataUseCase = mockGetPublicNodeFromSerializedDataUseCase,
+            getPublicAlbumNodesDataUseCase = getPublicAlbumNodesDataUseCase,
         )
     }
 
@@ -116,8 +119,6 @@ class AlbumImportViewModelTest {
 
         // then
         underTest.stateFlow.test {
-            repeat(2) { awaitItem() }
-
             val state = awaitItem()
             assertThat(state.showErrorAccessDialog).isTrue()
         }
@@ -138,9 +139,7 @@ class AlbumImportViewModelTest {
         underTest.initialize()
 
         // then
-        underTest.stateFlow.test {
-            repeat(2) { awaitItem() }
-
+        underTest.stateFlow.drop(1).test {
             val state = awaitItem()
             assertThat(state.showInputDecryptionKeyDialog).isTrue()
         }
@@ -164,16 +163,11 @@ class AlbumImportViewModelTest {
         whenever(mockGetPublicAlbumPhotoUseCase(albumPhotoIds = listOf()))
             .thenReturn(listOf())
 
-        whenever(mockLegacyPublicAlbumPhotoNodeProvider.loadNodeCache(albumPhotoIds = listOf()))
-            .thenReturn(Unit)
-
         // when
         underTest.initialize()
 
         // then
-        underTest.stateFlow.test {
-            repeat(2) { awaitItem() }
-
+        underTest.stateFlow.drop(1).test {
             val state = awaitItem()
             assertThat(state.album).isEqualTo(album)
         }
@@ -403,10 +397,21 @@ class AlbumImportViewModelTest {
     @Test
     fun `test that start download triggers the correct download event when start download is triggered`() =
         runTest {
-            val megaNode = stubSelectedMegaNode()
+            val handle = 1L
+            val photo = mock<Photo.Image> {
+                on { id } doReturn handle
+            }
+            val serializedData = "serializedNode"
+            val megaNode = mock<MegaNode> {
+                on { serialize() } doReturn serializedData
+            }
+            underTest.selectPhoto(photo)
+
             val node = mock<PublicLinkFile>()
             whenever(mockGetPublicNodeFromSerializedDataUseCase(megaNode.serialize()))
                 .thenReturn(node)
+            whenever(getPublicAlbumNodesDataUseCase())
+                .thenReturn(mapOf(NodeId(handle) to serializedData))
             underTest.stateFlow.test {
                 awaitItem() //initial
                 underTest.startDownload()
@@ -465,8 +470,6 @@ class AlbumImportViewModelTest {
         val megaNode = mock<MegaNode> {
             on { serialize() } doReturn serializedData
         }
-        whenever(mockLegacyPublicAlbumPhotoNodeProvider.getPublicNode(handle))
-            .thenReturn(megaNode)
         underTest.selectPhoto(photo)
         return megaNode
     }

@@ -27,6 +27,7 @@ import mega.privacy.android.domain.usecase.favourites.IsAvailableOfflineUseCase
 import mega.privacy.android.domain.usecase.node.CheckChatNodesNameCollisionAndCopyUseCase
 import mega.privacy.android.domain.usecase.node.CheckNodesNameCollisionWithActionUseCase
 import mega.privacy.android.domain.usecase.node.chat.GetChatFileUseCase
+import mega.privacy.android.domain.usecase.photos.GetPublicAlbumNodeDataUseCase
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.TestInstance
@@ -60,18 +61,19 @@ internal class MediaPlayerViewModelTest {
         }.thenReturn(false)
     }
     private val getBusinessStatusUseCase = mock<GetBusinessStatusUseCase>()
+    private val getPublicAlbumNodeDataUseCase = mock<GetPublicAlbumNodeDataUseCase>()
 
     @BeforeEach
     fun setUp() {
         underTest = MediaPlayerViewModel(
             checkNodesNameCollisionWithActionUseCase = checkNodesNameCollisionWithActionUseCase,
             checkChatNodesNameCollisionAndCopyUseCase = checkChatNodesNameCollisionAndCopyUseCase,
-            legacyPublicAlbumPhotoNodeProvider = mock(),
             monitorAccountDetailUseCase = monitorAccountDetailUseCase,
             isHiddenNodesOnboardedUseCase = isHiddenNodesOnboardedUseCase,
             isAvailableOfflineUseCase = isAvailableOfflineUseCase,
             getChatFileUseCase = getChatFileUseCase,
             getBusinessStatusUseCase = getBusinessStatusUseCase,
+            getPublicAlbumNodeDataUseCase = getPublicAlbumNodeDataUseCase,
         )
     }
 

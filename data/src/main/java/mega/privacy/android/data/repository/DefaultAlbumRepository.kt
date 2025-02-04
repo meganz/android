@@ -551,7 +551,8 @@ internal class DefaultAlbumRepository @Inject constructor(
         }
     }
 
-    override fun getPublicAlbumNodesData(): Map<NodeId, String> = publicNodesDataMap
+    override fun getPublicAlbumNodesData(): Map<NodeId, String> =
+        publicNodesMap.mapValues { it.value.serialize() }
 
     override suspend fun addBulkPhotosToAlbum(
         albumId: AlbumId,
