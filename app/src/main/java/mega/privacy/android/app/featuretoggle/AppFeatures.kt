@@ -222,6 +222,14 @@ enum class AppFeatures(override val description: String, private val defaultValu
         "Use new approach to download files for preview",
         false,
     ),
+
+    /**
+     * Show a single download finish notifications for each user action
+     */
+    ShowGroupedDownloadNotifications(
+        "Show a single download finish notifications for each user action",
+        false,
+    )
     ;
 
     companion object : FeatureFlagValueProvider {
