@@ -26,9 +26,7 @@ import androidx.activity.OnBackPressedCallback
 import androidx.activity.viewModels
 import androidx.appcompat.app.AlertDialog
 import androidx.appcompat.app.AppCompatActivity
-import androidx.coordinatorlayout.widget.CoordinatorLayout
 import androidx.core.content.ContextCompat
-import androidx.core.view.updateLayoutParams
 import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.lifecycleScope
 import com.google.android.material.dialog.MaterialAlertDialogBuilder
@@ -43,7 +41,6 @@ import kotlinx.coroutines.runBlocking
 import mega.privacy.android.analytics.Analytics
 import mega.privacy.android.app.activities.settingsActivities.FileManagementPreferencesActivity
 import mega.privacy.android.app.arch.extensions.collectFlow
-import mega.privacy.android.app.components.saver.AutoPlayInfo
 import mega.privacy.android.app.constants.BroadcastConstants
 import mega.privacy.android.app.databinding.TransferOverquotaLayoutBinding
 import mega.privacy.android.app.globalmanagement.MyAccountInfo
@@ -88,7 +85,6 @@ import mega.privacy.android.app.utils.Constants.PERMISSIONS_TYPE
 import mega.privacy.android.app.utils.Constants.SENT_REQUESTS_TYPE
 import mega.privacy.android.app.utils.Constants.SNACKBAR_TYPE
 import mega.privacy.android.app.utils.Constants.VISIBLE_FRAGMENT
-import mega.privacy.android.app.utils.MegaNodeUtil.autoPlayNode
 import mega.privacy.android.app.utils.TextUtil
 import mega.privacy.android.app.utils.TimeUtils
 import mega.privacy.android.app.utils.Util
@@ -237,11 +233,6 @@ abstract class BaseActivity : AppCompatActivity(), ActivityLauncher, PermissionR
      */
     var snackbar: Snackbar? = null
         private set
-
-    /**
-     * Contains the info of a node that to be opened in-app.
-     */
-    private var autoPlayInfo: AutoPlayInfo? = null
 
     /**
      * Load the psa in the web browser fragment if the psa is a web one and this activity
@@ -540,21 +531,6 @@ abstract class BaseActivity : AppCompatActivity(), ActivityLauncher, PermissionR
     }
 
     /**
-     * Open the downloaded file.
-     */
-    private fun openDownloadedFile() {
-        autoPlayNode(
-            context = this@BaseActivity,
-            autoPlayInfo = autoPlayInfo ?: return,
-            activityLauncher = this@BaseActivity,
-            snackbarShower = this@BaseActivity,
-            coroutineScope = lifecycleScope
-        )
-
-        autoPlayInfo = null
-    }
-
-    /**
      * Method to display an alert dialog indicating that the MEGA SSL key
      * can't be verified (API_ESSL Error) and giving the user several options.
      */
@@ -755,6 +731,7 @@ abstract class BaseActivity : AppCompatActivity(), ActivityLauncher, PermissionR
      *                      If the value is -1 (MEGACHAT_INVALID_HANDLE) the function ends in chats list view.
      * @param userEmail     Email of the user to be invited.
      * @param forceDarkMode True if want to force to display the snackbar like in dark mode or False otherwise
+     * @param action        To perform when the snackbar action is clicked.
      */
     fun showSnackbar(
         type: Int,
@@ -764,6 +741,7 @@ abstract class BaseActivity : AppCompatActivity(), ActivityLauncher, PermissionR
         idChat: Long = MEGACHAT_INVALID_HANDLE,
         userEmail: String? = null,
         forceDarkMode: Boolean = false,
+        action: () -> Unit = {},
     ) {
         Timber.d("Show snackbar: %s", s)
         snackbar = try {
@@ -874,7 +852,7 @@ abstract class BaseActivity : AppCompatActivity(), ActivityLauncher, PermissionR
                 }
 
                 OPEN_FILE_SNACKBAR_TYPE -> {
-                    setAction(getString(R.string.general_confirmation_open)) { openDownloadedFile() }
+                    setAction(getString(R.string.general_confirmation_open)) { action() }
                     show()
                 }
 

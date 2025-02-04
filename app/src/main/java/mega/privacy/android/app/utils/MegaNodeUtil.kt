@@ -22,13 +22,10 @@ import dagger.hilt.EntryPoint
 import dagger.hilt.InstallIn
 import dagger.hilt.android.EntryPointAccessors
 import dagger.hilt.components.SingletonComponent
-import kotlinx.coroutines.CoroutineScope
-import kotlinx.coroutines.launch
 import mega.privacy.android.app.MegaApplication
 import mega.privacy.android.app.MimeTypeList
 import mega.privacy.android.app.R
 import mega.privacy.android.app.activities.WebViewActivity
-import mega.privacy.android.app.components.saver.AutoPlayInfo
 import mega.privacy.android.app.constants.BroadcastConstants
 import mega.privacy.android.app.di.getDbHandler
 import mega.privacy.android.app.interfaces.ActivityLauncher
@@ -41,7 +38,6 @@ import mega.privacy.android.app.main.FileExplorerActivity
 import mega.privacy.android.app.main.ManagerActivity
 import mega.privacy.android.app.main.listeners.MultipleRequestListener
 import mega.privacy.android.app.presentation.extensions.getStorageState
-import mega.privacy.android.app.presentation.pdfviewer.PdfViewerActivity
 import mega.privacy.android.app.textEditor.TextEditorActivity
 import mega.privacy.android.app.textEditor.TextEditorViewModel.Companion.EDIT_MODE
 import mega.privacy.android.app.textEditor.TextEditorViewModel.Companion.MODE
@@ -53,8 +49,6 @@ import mega.privacy.android.app.utils.Constants.INTENT_EXTRA_KEY_ADAPTER_TYPE
 import mega.privacy.android.app.utils.Constants.INTENT_EXTRA_KEY_COPY_FROM
 import mega.privacy.android.app.utils.Constants.INTENT_EXTRA_KEY_FRAGMENT_HANDLE
 import mega.privacy.android.app.utils.Constants.INTENT_EXTRA_KEY_HANDLE
-import mega.privacy.android.app.utils.Constants.INTENT_EXTRA_KEY_INSIDE
-import mega.privacy.android.app.utils.Constants.INTENT_EXTRA_KEY_IS_URL
 import mega.privacy.android.app.utils.Constants.INTENT_EXTRA_KEY_LOCATION_FILE_INFO
 import mega.privacy.android.app.utils.Constants.INTENT_EXTRA_KEY_MOVE_FROM
 import mega.privacy.android.app.utils.Constants.INTENT_EXTRA_KEY_OFFLINE_ADAPTER
@@ -85,7 +79,6 @@ import mega.privacy.android.app.utils.TimeUtils.formatLongDateTime
 import mega.privacy.android.app.utils.Util.getSizeString
 import mega.privacy.android.app.utils.Util.isOnline
 import mega.privacy.android.app.utils.Util.showSnackbar
-import mega.privacy.android.domain.entity.SortOrder
 import mega.privacy.android.domain.entity.StorageState
 import mega.privacy.android.navigation.MegaNavigator
 import nz.mega.sdk.MegaApiAndroid
@@ -1357,93 +1350,6 @@ object MegaNodeUtil {
             parent.handle == megaApi.rubbishNode?.handle -> context.getString(R.string.section_rubbish_bin)
             parent.handle == megaApi.vaultNode?.handle -> context.getString(R.string.home_side_menu_backups_title)
             else -> parent.name
-        }
-    }
-
-    /**
-     * Auto play a node when it's downloaded.
-     *
-     * @param context Android context
-     * @param autoPlayInfo auto play info
-     * @param activityLauncher interface to launch activity
-     * @param snackbarShower interface to show snackbar
-     */
-    @JvmStatic
-    fun autoPlayNode(
-        context: Context,
-        autoPlayInfo: AutoPlayInfo,
-        activityLauncher: ActivityLauncher,
-        snackbarShower: SnackbarShower,
-        coroutineScope: CoroutineScope,
-    ) {
-        val mime = MimeTypeList.typeForName(autoPlayInfo.nodeName)
-        when {
-            // // ZIP file on SD card can't not be created by `new java.util.zip.ZipFile(path)`.
-            mime.isZip && !SDCardUtils.isLocalFolderOnSDCard(context, autoPlayInfo.localPath) -> {
-                openZip(
-                    context = context,
-                    activityLauncher = activityLauncher,
-                    zipFilePath = autoPlayInfo.localPath,
-                    snackbarShower = snackbarShower,
-                    nodeHandle = autoPlayInfo.nodeHandle
-                )
-            }
-
-            mime.isPdf -> {
-                val pdfIntent = Intent(context, PdfViewerActivity::class.java)
-                pdfIntent.putExtra(INTENT_EXTRA_KEY_HANDLE, autoPlayInfo.nodeHandle)
-
-                if (!setLocalIntentParams(
-                        context, autoPlayInfo.nodeName, pdfIntent, autoPlayInfo.localPath,
-                        false, snackbarShower
-                    )
-                ) {
-                    return
-                }
-
-                pdfIntent.addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION)
-                pdfIntent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP)
-                pdfIntent.putExtra(INTENT_EXTRA_KEY_INSIDE, true)
-                pdfIntent.putExtra(INTENT_EXTRA_KEY_IS_URL, false)
-
-                activityLauncher.launchActivity(pdfIntent)
-            }
-
-            mime.isVideoMimeType || mime.isAudio -> {
-                val file = File(autoPlayInfo.localPath)
-                if (file.exists().not()) return
-                coroutineScope.launch {
-                    runCatching {
-                        EntryPointAccessors.fromApplication(
-                            context, MegaNavigatorEntryPoint::class.java
-                        ).megaNavigator().openMediaPlayerActivityByLocalFile(
-                            context = context,
-                            localFile = file,
-                            handle = autoPlayInfo.nodeHandle,
-                            sortOrder = SortOrder.ORDER_NONE
-                        )
-                    }.onFailure {
-                        Timber.e(it)
-                        sendFile(
-                            context,
-                            autoPlayInfo.nodeName,
-                            autoPlayInfo.localPath,
-                            activityLauncher,
-                            snackbarShower
-                        )
-                    }
-                }
-            }
-
-            else -> {
-                launchActionView(
-                    context,
-                    autoPlayInfo.nodeName,
-                    autoPlayInfo.localPath,
-                    activityLauncher,
-                    snackbarShower
-                )
-            }
         }
     }
 
