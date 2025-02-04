@@ -162,6 +162,12 @@ interface PlayerServiceViewModelGateway {
     fun itemSelected(handle: Long)
 
     /**
+     * Saved or remove the selected items
+     * @param handles node handle of selected item
+     */
+    fun itemsSelected(handles: List<Long>)
+
+    /**
      * Get the index from playlistItems to keep the play order is correct after reordered
      * @param item clicked item
      * @return the index of clicked item in playlistItems or null

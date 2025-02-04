@@ -71,8 +71,8 @@
 
     <item
         android:id="@+id/chat_save_for_offline"
-        android:orderInCategory="120"
         android:icon="@drawable/ic_arrow_down_circle_medium_regular_outline"
+        android:orderInCategory="120"
         android:title="@string/file_properties_available_offline"
         android:visible="true"
         app:iconTint="?attr/colorControlNormal"
@@ -80,10 +80,19 @@
 
     <item
         android:id="@+id/remove"
+        android:icon="@drawable/ic_remove_toolbar_audio_queue"
         android:orderInCategory="145"
-        android:icon="@drawable/ic_x_medium_regular_outline"
         android:title="@string/general_remove"
-        android:visible="true"
+        android:visible="false"
+        app:iconTint="?attr/colorControlNormal"
+        app:showAsAction="always" />
+
+    <item
+        android:id="@+id/select_all"
+        android:icon="@drawable/ic_select_toolbar_audio_queue"
+        android:orderInCategory="145"
+        android:title="@string/action_select_all"
+        android:visible="false"
         app:iconTint="?attr/colorControlNormal"
         app:showAsAction="always" />
 
@@ -95,21 +104,19 @@
 
     <item
         android:id="@+id/hide"
+        android:icon="@drawable/ic_eye_off_medium_regular_outline"
         android:orderInCategory="121"
         android:title="@string/general_hide_node"
-        android:icon="@drawable/ic_eye_off_medium_regular_outline"
         app:iconTint="?attr/colorControlNormal"
-        app:showAsAction="never"
-        />
+        app:showAsAction="never" />
 
     <item
         android:id="@+id/unhide"
+        android:icon="@drawable/ic_eye_medium_regular_outline"
         android:orderInCategory="122"
         android:title="@string/general_unhide_node"
-        android:icon="@drawable/ic_eye_medium_regular_outline"
         app:iconTint="?attr/colorControlNormal"
-        app:showAsAction="never"
-        />
+        app:showAsAction="never" />
 
     <item
         android:id="@+id/move"
@@ -131,8 +138,10 @@
 
     <item
         android:id="@+id/select"
+        android:icon="@drawable/ic_select_toolbar_audio_queue"
         android:orderInCategory="140"
         android:title="@string/general_select"
-        app:showAsAction="never"
-        android:visible="false"/>
+        android:visible="false"
+        app:iconTint="?attr/colorControlNormal"
+        app:showAsAction="always" />
 </menu>

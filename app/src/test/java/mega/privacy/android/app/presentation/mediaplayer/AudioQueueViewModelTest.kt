@@ -315,6 +315,40 @@ class AudioQueueViewModelTest {
     @Test
     fun `test that state is updated correctly after removing selected items`() =
         runTest {
+            val testItems = (1..3).map {
+                getMockedMediaQueueItem(
+                    NodeId(it.toLong()),
+                    itemType = if (it == 1) MediaQueueItemType.Playing else MediaQueueItemType.Next
+                )
+            }
+            val selectedItems = testItems.filter { it.type == MediaQueueItemType.Next }.map {
+                getMockedMediaQueueItem(it.id, testIsSelected = true)
+            }
+            val list = testItems.map { item ->
+                initMediaQueueItemMapperResult(item.id.longValue, item)
+                getPlaylistItem(item.id.longValue)
+            }
+            whenever(testItems[1].copy(isSelected = true)).thenReturn(selectedItems[0])
+            whenever(testItems[2].copy(isSelected = true)).thenReturn(selectedItems[1])
+            initUnderTest()
+
+            underTest.initMediaQueueItemList(list)
+            underTest.uiState.test {
+                awaitItem().let {
+                    assertThat(it.items.size).isEqualTo(3)
+                    assertThat(it.selectedItemHandles).isEmpty()
+                }
+                underTest.selectAllNextTypeItems()
+                awaitItem().let {
+                    assertThat(it.items.size).isEqualTo(3)
+                    assertThat(it.selectedItemHandles.size).isEqualTo(2)
+                }
+            }
+        }
+
+    @Test
+    fun `test that state is updated correctly after selected all items which type is next`() =
+        runTest {
             val item = getMockedMediaQueueItem(NodeId(1L))
             val testItem = getMockedMediaQueueItem(NodeId(1L), testIsSelected = true)
             val list = (1..3).map {
@@ -382,6 +416,19 @@ class AudioQueueViewModelTest {
                 }
                 underTest.updateSearchMode(false)
                 assertThat(awaitItem().items.size).isEqualTo(3)
+            }
+        }
+
+    @Test
+    fun `test that isSelectMode is updated correctly after updateSelectMode is invoked`() =
+        runTest {
+            initUnderTest()
+            underTest.uiState.test {
+                assertThat(awaitItem().isSelectMode).isFalse()
+                underTest.enableSelectMode(true)
+                assertThat(awaitItem().isSelectMode).isTrue()
+                underTest.enableSelectMode(false)
+                assertThat(awaitItem().isSelectMode).isFalse()
             }
         }
 }

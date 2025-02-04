@@ -85,7 +85,6 @@ import mega.privacy.android.domain.exception.MegaException
 import mega.privacy.android.domain.exception.QuotaExceededMegaException
 import mega.privacy.android.domain.qualifier.ApplicationScope
 import mega.privacy.android.domain.qualifier.IoDispatcher
-import mega.privacy.android.domain.usecase.node.backup.GetBackupsNodeUseCase
 import mega.privacy.android.domain.usecase.GetLocalFilePathUseCase
 import mega.privacy.android.domain.usecase.GetLocalFolderLinkFromMegaApiFolderUseCase
 import mega.privacy.android.domain.usecase.GetLocalFolderLinkFromMegaApiUseCase
@@ -122,6 +121,7 @@ import mega.privacy.android.domain.usecase.mediaplayer.audioplayer.MonitorAudioS
 import mega.privacy.android.domain.usecase.mediaplayer.audioplayer.SetAudioRepeatModeUseCase
 import mega.privacy.android.domain.usecase.mediaplayer.audioplayer.SetAudioShuffleEnabledUseCase
 import mega.privacy.android.domain.usecase.network.IsConnectedToInternetUseCase
+import mega.privacy.android.domain.usecase.node.backup.GetBackupsNodeUseCase
 import mega.privacy.android.domain.usecase.offline.GetOfflineNodeInformationByIdUseCase
 import mega.privacy.android.domain.usecase.thumbnailpreview.GetThumbnailUseCase
 import mega.privacy.android.domain.usecase.transfers.MonitorTransferEventsUseCase
@@ -395,7 +395,7 @@ class AudioPlayerServiceViewModel @Inject constructor(
                     OUTGOING_SHARES_ADAPTER,
                     CONTACT_FILE_ADAPTER,
                     FAVOURITES_ADAPTER,
-                    -> {
+                        -> {
                         val parentHandle = intent.getLongExtra(
                             INTENT_EXTRA_KEY_PARENT_NODE_HANDLE,
                             INVALID_HANDLE
@@ -912,7 +912,7 @@ class AudioPlayerServiceViewModel @Inject constructor(
             FROM_CHAT,
             FILE_LINK_ADAPTER,
             PHOTO_SYNC_ADAPTER,
-            -> {
+                -> {
                 return oldType == type
             }
 
@@ -924,7 +924,7 @@ class AudioPlayerServiceViewModel @Inject constructor(
             OUTGOING_SHARES_ADAPTER,
             CONTACT_FILE_ADAPTER,
             FOLDER_LINK_ADAPTER,
-            -> {
+                -> {
                 val oldParentHandle = oldIntent.getLongExtra(
                     INTENT_EXTRA_KEY_PARENT_NODE_HANDLE,
                     INVALID_HANDLE
@@ -1228,28 +1228,38 @@ class AudioPlayerServiceViewModel @Inject constructor(
     }
 
     override fun itemSelected(handle: Long) {
+        val playlistItems = playlistItemsFlow.value.first.toMutableList()
+        val selectedIndex = playlistItems.indexOfFirst { (nodeHandle) -> nodeHandle == handle }
+
+        if (selectedIndex in playlistItems.indices) {
+            val item = playlistItems[selectedIndex]
+            val isSelected = !item.isSelected
+            playlistItems[selectedIndex] = item.copy(isSelected = isSelected)
+            if (isSelected) {
+                itemsSelectedMap[handle] = item
+            } else {
+                itemsSelectedMap.remove(handle)
+            }
+            itemsSelectedCount.value = itemsSelectedMap.size
+            playlistItemsFlow.update {
+                it.copy(first = playlistItems)
+            }
+        }
+    }
+
+    override fun itemsSelected(handles: List<Long>) {
+        val playlistItems = playlistItemsFlow.value.first.toMutableList()
+        itemsSelectedMap.clear()
+        handles.forEach { handle ->
+            val selectedIndex = playlistItems.indexOfFirst { (nodeHandle) -> nodeHandle == handle }
+            if (selectedIndex in playlistItems.indices) {
+                playlistItems[selectedIndex] = playlistItems[selectedIndex].copy(isSelected = true)
+                itemsSelectedMap[handle] = playlistItems[selectedIndex]
+            }
+        }
+        itemsSelectedCount.value = itemsSelectedMap.size
         playlistItemsFlow.update {
-            it.copy(
-                it.first.toMutableList().let { playlistItems ->
-                    playlistItems.indexOfFirst { (nodeHandle) ->
-                        nodeHandle == handle
-                    }.takeIf { index ->
-                        index in playlistItems.indices
-                    }?.let { selectedIndex ->
-                        playlistItems[selectedIndex].let { item ->
-                            val isSelected = !item.isSelected
-                            playlistItems[selectedIndex] = item.copy(isSelected = isSelected)
-                            if (playlistItems[selectedIndex].isSelected) {
-                                itemsSelectedMap[handle] = item
-                            } else {
-                                itemsSelectedMap.remove(handle)
-                            }
-                            itemsSelectedCount.value = itemsSelectedMap.size
-                        }
-                    }
-                    playlistItems
-                }
-            )
+            it.copy(first = playlistItems)
         }
     }
 

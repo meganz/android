@@ -1,5 +1,6 @@
 package mega.privacy.android.app.mediaplayer.queue.audio
 
+import mega.privacy.android.icon.pack.R as iconPackR
 import android.content.ComponentName
 import android.content.Context
 import android.content.Intent
@@ -14,6 +15,7 @@ import android.view.MenuInflater
 import android.view.MenuItem
 import android.view.View
 import android.view.ViewGroup
+import androidx.annotation.DrawableRes
 import androidx.appcompat.app.AppCompatActivity
 import androidx.appcompat.view.ActionMode
 import androidx.appcompat.widget.SearchView
@@ -33,10 +35,12 @@ import kotlinx.coroutines.launch
 import mega.privacy.android.analytics.Analytics
 import mega.privacy.android.app.R
 import mega.privacy.android.app.arch.extensions.collectFlow
+import mega.privacy.android.app.mediaplayer.AudioPlayerActivity
 import mega.privacy.android.app.mediaplayer.MediaPlayerActivity
 import mega.privacy.android.app.mediaplayer.gateway.MediaPlayerServiceGateway
 import mega.privacy.android.app.mediaplayer.gateway.PlayerServiceViewModelGateway
 import mega.privacy.android.app.mediaplayer.playlist.PlaylistActionModeCallback
+import mega.privacy.android.app.mediaplayer.queue.model.MediaQueueItemType
 import mega.privacy.android.app.mediaplayer.queue.model.MediaQueueItemUiEntity
 import mega.privacy.android.app.mediaplayer.queue.view.AudioQueueView
 import mega.privacy.android.app.mediaplayer.service.AudioPlayerService
@@ -122,6 +126,7 @@ class AudioQueueFragment : Fragment() {
         override fun onMenuItemSelected(menuItem: MenuItem): Boolean {
             when (menuItem.itemId) {
                 R.id.select -> {
+                    audioQueueViewModel.enableSelectMode(true)
                     activateActionMode()
                 }
             }
@@ -249,6 +254,7 @@ class AudioQueueFragment : Fragment() {
     private fun itemClicked(index: Int, item: MediaQueueItemUiEntity) =
         viewLifecycleOwner.lifecycleScope.launch {
             if (actionMode != null) {
+                if (item.type != MediaQueueItemType.Next) return@launch
                 audioQueueViewModel.onItemClicked(index, item)
                 playerServiceViewModelGateway?.itemSelected(item.id.longValue)
                 return@launch
@@ -293,20 +299,30 @@ class AudioQueueFragment : Fragment() {
                     playerServiceViewModelGateway?.removeAllSelectedItems()
                     audioQueueViewModel.removeSelectedItems()
                     actionMode?.finish()
+                    audioQueueViewModel.enableSelectMode(false)
+                    updateToolbarIcon(iconPackR.drawable.ic_back_audio_queue)
                 },
                 clearSelections = {
                     audioQueueViewModel.clearAllSelectedItems()
                     playerServiceViewModelGateway?.clearSelections()
                     actionMode = null
+                    audioQueueViewModel.enableSelectMode(false)
+                    updateToolbarIcon(iconPackR.drawable.ic_back_audio_queue)
+                },
+                selectAll = {
+                    audioQueueViewModel.selectAllNextTypeItems()
+                    playerServiceViewModelGateway?.itemsSelected(
+                        audioQueueViewModel.uiState.value.selectedItemHandles
+                    )
                 }
             )
         }
         playlistActionModeCallback?.let {
             actionMode = (activity as? AppCompatActivity)?.startSupportActionMode(it)
             actionMode?.title = resources.getString(R.string.title_select_tracks)
+            actionMode?.menu?.findItem(R.id.select_all)?.isVisible = true
         }
     }
-
 
     /**
      * onDestroyView
@@ -323,6 +339,10 @@ class AudioQueueFragment : Fragment() {
         serviceGateway = null
         playerServiceViewModelGateway = null
         context?.unbindService(connection)
+    }
+
+    private fun updateToolbarIcon(@DrawableRes icon: Int) {
+        (activity as? AudioPlayerActivity)?.updateToolbarHomeAsUp(icon)
     }
 
     companion object {

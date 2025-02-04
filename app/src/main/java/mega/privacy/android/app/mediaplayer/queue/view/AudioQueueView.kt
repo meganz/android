@@ -41,6 +41,7 @@ internal fun AudioQueueView(
             isAudio = true,
             isPaused = uiState.isPaused,
             isSearchMode = uiState.isSearchMode,
+            isSelectMode = uiState.isSelectMode,
             lazyListState = lazyListState,
             onClick = onClick,
             onDragFinished = onDragFinished,

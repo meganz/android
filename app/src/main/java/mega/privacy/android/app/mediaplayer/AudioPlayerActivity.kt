@@ -17,6 +17,7 @@ import androidx.activity.result.ActivityResult
 import androidx.activity.result.ActivityResultLauncher
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.annotation.ColorRes
+import androidx.annotation.DrawableRes
 import androidx.appcompat.app.AlertDialog
 import androidx.appcompat.widget.SearchView
 import androidx.core.content.ContextCompat
@@ -552,18 +553,21 @@ class AudioPlayerActivity : MediaPlayerActivity() {
         navController.addOnDestinationChangedListener { _, dest, args ->
             setupToolbarColors()
             when (dest.id) {
-                R.id.audio_main_player,
-                    -> {
-                    if (dest.id == R.id.audio_main_player) {
-                        supportActionBar?.title = ""
+                R.id.audio_main_player -> {
+                    supportActionBar?.apply {
+                        setHomeAsUpIndicator(null)
+                        title = ""
                     }
                     viewingTrackInfo = null
                 }
 
                 R.id.track_info -> {
-                    supportActionBar?.title = getString(R.string.audio_track_info)
-                    if (args != null) {
-                        viewingTrackInfo = TrackInfoFragmentArgs.fromBundle(args)
+                    supportActionBar?.apply {
+                        setHomeAsUpIndicator(null)
+                        title = getString(R.string.audio_track_info)
+                    }
+                    args?.let {
+                        viewingTrackInfo = TrackInfoFragmentArgs.fromBundle(it)
                     }
                 }
             }
@@ -936,6 +940,7 @@ class AudioPlayerActivity : MediaPlayerActivity() {
                                     // Hide the select, select all, and clear options
                                     menu.findItem(R.id.select).isVisible = false
                                     menu.findItem(R.id.remove).isVisible = false
+                                    menu.findItem(R.id.select_all).isVisible = false
 
                                     menu.findItem(R.id.properties).isVisible =
                                         currentFragmentId == R.id.audio_main_player
@@ -1128,4 +1133,8 @@ class AudioPlayerActivity : MediaPlayerActivity() {
                 })
             )
         }
+
+    internal fun updateToolbarHomeAsUp(@DrawableRes icon: Int) {
+        supportActionBar?.setHomeAsUpIndicator(icon)
+    }
 }

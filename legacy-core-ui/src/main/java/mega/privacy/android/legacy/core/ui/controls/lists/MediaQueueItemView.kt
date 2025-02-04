@@ -56,6 +56,7 @@ fun MediaQueueItemView(
     isItemPlaying: Boolean = false,
     isReorderEnabled: Boolean = true,
     isSelected: Boolean = false,
+    isAudio: Boolean = false,
 ) {
     GenericTwoLineListItem(
         title = name,
@@ -79,7 +80,7 @@ fun MediaQueueItemView(
             )
         },
         trailingIcons = {
-            if (!isItemPlaying && isReorderEnabled) {
+            if (!isItemPlaying && isReorderEnabled && !isAudio) {
                 Image(
                     modifier = Modifier
                         .padding(end = 12.dp)
@@ -188,16 +189,34 @@ private fun MediaQueueItemInfoViewWithSelectedPreview() {
 
 @CombinedThemePreviews
 @Composable
-private fun MediaQueueItemInfoViewPreview() {
+private fun VideoQueueItemInfoViewPreview() {
     OriginalTempTheme(isDark = isSystemInDarkTheme()) {
         MediaQueueItemView(
-            icon = iconPackR.drawable.ic_audio_medium_solid,
+            icon = iconPackR.drawable.ic_video_medium_solid,
             onClick = {},
             thumbnailData = null,
             modifier = Modifier,
             name = "Video name",
             currentPlayingPosition = "",
             duration = "14:00",
+            isReorderEnabled = true
+        )
+    }
+}
+
+@CombinedThemePreviews
+@Composable
+private fun AudioQueueItemInfoViewPreview() {
+    OriginalTempTheme(isDark = isSystemInDarkTheme()) {
+        MediaQueueItemView(
+            icon = iconPackR.drawable.ic_audio_medium_solid,
+            onClick = {},
+            thumbnailData = null,
+            modifier = Modifier,
+            name = "Audio name",
+            currentPlayingPosition = "",
+            duration = "14:00",
+            isAudio = true,
         )
     }
 }

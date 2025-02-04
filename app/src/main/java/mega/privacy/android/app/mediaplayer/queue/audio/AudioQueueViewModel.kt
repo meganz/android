@@ -179,6 +179,22 @@ class AudioQueueViewModel @Inject constructor(
         it.copy(isSelected = false)
     }
 
+    internal fun selectAllNextTypeItems() {
+        val updatedItems = allItemsSelected().updateOriginalData().filterItemBySearchQuery()
+        val selectedHandles = updatedItems.filter { it.isSelected }.map { it.id.longValue }
+        _uiState.update {
+            it.copy(
+                items = updatedItems,
+                selectedItemHandles = selectedHandles
+            )
+        }
+    }
+
+    private fun allItemsSelected() =
+        _uiState.value.items.map { item ->
+            item.takeIf { it.type == MediaQueueItemType.Next }?.copy(isSelected = true) ?: item
+        }
+
     internal fun removeSelectedItems() {
         val updatedItems = _uiState.value.items.filterNot { item ->
             _uiState.value.selectedItemHandles.any { it == item.id.longValue }
@@ -218,4 +234,9 @@ class AudioQueueViewModel @Inject constructor(
             )
         }
     }
+
+    internal fun enableSelectMode(isSelectMode: Boolean) =
+        _uiState.update {
+            it.copy(isSelectMode = isSelectMode)
+        }
 }
