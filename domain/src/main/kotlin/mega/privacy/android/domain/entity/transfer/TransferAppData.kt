@@ -76,4 +76,9 @@ sealed interface TransferAppData {
      * @param groupId the group Id related to this transfer
      */
     data class TransferGroup(val groupId: Long) : TransferAppData
+
+    /**
+     * Identify a transfer that is a download only for preview purposes.
+     */
+    data object PreviewDownload : TransferAppData
 }

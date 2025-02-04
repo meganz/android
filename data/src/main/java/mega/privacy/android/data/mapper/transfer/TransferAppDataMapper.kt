@@ -2,9 +2,13 @@ package mega.privacy.android.data.mapper.transfer
 
 import mega.privacy.android.data.mapper.transfer.AppDataTypeConstants.BackgroundTransfer
 import mega.privacy.android.data.mapper.transfer.AppDataTypeConstants.CameraUpload
+import mega.privacy.android.data.mapper.transfer.AppDataTypeConstants.ChatDownload
 import mega.privacy.android.data.mapper.transfer.AppDataTypeConstants.ChatUpload
+import mega.privacy.android.data.mapper.transfer.AppDataTypeConstants.GeoLocation
 import mega.privacy.android.data.mapper.transfer.AppDataTypeConstants.OriginalContentUri
+import mega.privacy.android.data.mapper.transfer.AppDataTypeConstants.PreviewDownload
 import mega.privacy.android.data.mapper.transfer.AppDataTypeConstants.SDCardDownload
+import mega.privacy.android.data.mapper.transfer.AppDataTypeConstants.TransferGroup
 import mega.privacy.android.data.mapper.transfer.AppDataTypeConstants.VoiceClip
 import mega.privacy.android.domain.entity.transfer.TransferAppData
 import timber.log.Timber
@@ -58,7 +62,7 @@ class TransferAppDataMapper @Inject constructor() {
                         TransferAppData.OriginalContentUri(it)
                     }
 
-                    AppDataTypeConstants.ChatDownload -> {
+                    ChatDownload -> {
                         val chatId = values.getOrNull(0)?.toLongOrNull()
                         val msgId = values.getOrNull(1)?.toLongOrNull()
                         val msgIndex = values.getOrNull(2)?.toIntOrNull()
@@ -67,7 +71,7 @@ class TransferAppDataMapper @Inject constructor() {
                         } else null
                     }
 
-                    AppDataTypeConstants.GeoLocation -> {
+                    GeoLocation -> {
                         val latitude = values.getOrNull(0)?.toDoubleOrNull()
                         val longitude = values.getOrNull(1)?.toDoubleOrNull()
                         if (latitude != null && longitude != null) {
@@ -75,8 +79,10 @@ class TransferAppDataMapper @Inject constructor() {
                         } else null
                     }
 
-                    AppDataTypeConstants.TransferGroup -> values.firstIfNotBlank()?.toLongOrNull()
+                    TransferGroup -> values.firstIfNotBlank()?.toLongOrNull()
                         ?.let { TransferAppData.TransferGroup(it) }
+
+                    PreviewDownload -> TransferAppData.PreviewDownload
 
                     else -> null
                 }

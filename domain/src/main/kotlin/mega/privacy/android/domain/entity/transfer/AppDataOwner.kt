@@ -98,3 +98,11 @@ fun AppDataOwner.getTransferGroup(): TransferAppData.TransferGroup? = appData
     .filterIsInstance<TransferAppData.TransferGroup>()
     .firstOrNull()
 
+/**
+ * Is preview download
+ *
+ * @return True if the transfer is a preview download, false otherwise.
+ */
+fun AppDataOwner.isPreviewDownload(): Boolean =
+    appData.contains(TransferAppData.PreviewDownload)
+

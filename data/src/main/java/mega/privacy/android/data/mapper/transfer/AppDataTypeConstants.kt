@@ -16,6 +16,7 @@ internal enum class AppDataTypeConstants(
     ChatDownload("CHAT_DOWNLOAD", TransferAppData.ChatDownload::class),
     GeoLocation("GEO_LOCATION", TransferAppData.Geolocation::class),
     TransferGroup("TRANSFER_GROUP", TransferAppData.TransferGroup::class),
+    PreviewDownload("PREVIEW_DOWNLOAD", TransferAppData.PreviewDownload::class),
     ;
 
     override fun toString() = sdkTypeValue
