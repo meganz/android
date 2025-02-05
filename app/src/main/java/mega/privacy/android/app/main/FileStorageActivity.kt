@@ -197,7 +197,10 @@ class FileStorageActivity : PasscodeActivity(), Scrollable {
                 if (!extraPath.isNullOrEmpty()) {
                     path = File(extraPath)
                     root = path
-                    highlightFilePath = extraPath + File.separator + it.getString(EXTRA_FILE_NAME)
+                    if (it.containsKey(EXTRA_FILE_NAME)) {
+                        highlightFilePath =
+                            extraPath.trimEnd('/') + File.separator + it.getString(EXTRA_FILE_NAME)
+                    }
                 }
             }
             checkPath()

@@ -4,14 +4,13 @@ import android.app.Activity
 import android.content.Intent
 import android.net.Uri
 import dagger.hilt.android.scopes.ActivityScoped
+import mega.privacy.android.app.main.FileStorageActivity
 import mega.privacy.android.app.main.ManagerActivity
 import mega.privacy.android.app.presentation.extensions.serializable
 import mega.privacy.android.app.presentation.filelink.FileLinkComposeActivity
 import mega.privacy.android.app.presentation.login.LoginActivity
 import mega.privacy.android.app.presentation.manager.model.TransfersTab
-import mega.privacy.android.app.upgradeAccount.UpgradeAccountActivity
 import mega.privacy.android.app.utils.Constants
-import mega.privacy.android.domain.entity.Feature
 import timber.log.Timber
 import javax.inject.Inject
 
@@ -80,6 +79,25 @@ class ManagerRedirectIntentMapper @Inject constructor(private val activity: Acti
                         intent.serializable<TransfersTab>(ManagerActivity.TRANSFERS_TAB)
                             ?: TransfersTab.NONE
                     )
+                }
+
+            Constants.ACTION_LOCATE_DOWNLOADED_FILE -> Intent(activity, LoginActivity::class.java)
+                .apply {
+                    putExtra(Constants.VISIBLE_FRAGMENT, Constants.LOGIN_FRAGMENT)
+                    flags = Intent.FLAG_ACTIVITY_CLEAR_TOP
+                    action = Constants.ACTION_LOCATE_DOWNLOADED_FILE
+                    if (intent.hasExtra(FileStorageActivity.EXTRA_PATH)) {
+                        putExtra(
+                            FileStorageActivity.EXTRA_PATH,
+                            intent.getStringExtra(FileStorageActivity.EXTRA_PATH)
+                        )
+                    }
+                    if (intent.hasExtra(FileStorageActivity.EXTRA_FILE_NAME)) {
+                        putExtra(
+                            FileStorageActivity.EXTRA_FILE_NAME,
+                            intent.getStringExtra(FileStorageActivity.EXTRA_FILE_NAME)
+                        )
+                    }
                 }
 
             Constants.ACTION_IPC -> Intent(activity, LoginActivity::class.java)

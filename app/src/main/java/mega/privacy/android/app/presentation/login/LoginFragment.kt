@@ -253,6 +253,10 @@ class LoginFragment : Fragment() {
                         else -> {
                             Timber.d("intent received $action")
                             when (action) {
+                                Constants.ACTION_LOCATE_DOWNLOADED_FILE -> {
+                                    intentExtras = extras
+                                }
+
                                 Constants.ACTION_OPEN_MEGA_FOLDER_LINK,
                                 Constants.ACTION_IMPORT_LINK_FETCH_NODES,
                                 Constants.ACTION_CHANGE_MAIL,
@@ -650,6 +654,10 @@ class LoginFragment : Fragment() {
                     intent = Intent(requireContext(), FileProviderActivity::class.java)
                     intentExtras?.let { intent.putExtras(it) }
                     intent.data = intentData
+                }
+
+                Constants.ACTION_LOCATE_DOWNLOADED_FILE -> {
+                    intentExtras?.let { intent.putExtras(it) }
                 }
 
                 Constants.ACTION_OPEN_FILE_LINK_ROOTNODES_NULL -> {

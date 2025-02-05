@@ -11,6 +11,7 @@ import androidx.core.content.ContextCompat
 import dagger.hilt.android.qualifiers.ApplicationContext
 import mega.privacy.android.app.R
 import mega.privacy.android.app.featuretoggle.AppFeatures
+import mega.privacy.android.app.main.FileStorageActivity
 import mega.privacy.android.app.main.ManagerActivity
 import mega.privacy.android.app.presentation.manager.model.TransfersTab
 import mega.privacy.android.app.presentation.transfers.EXTRA_TAB
@@ -91,10 +92,19 @@ class DefaultTransfersGroupFinishNotificationBuilder @Inject constructor(
             intent,
             PendingIntent.FLAG_UPDATE_CURRENT or PendingIntent.FLAG_IMMUTABLE
         )
+
+        val locateIntent = Intent(context, ManagerActivity::class.java).apply {
+            action = Constants.ACTION_LOCATE_DOWNLOADED_FILE
+            putExtra(FileStorageActivity.EXTRA_PATH, group.destination)
+            group.singleFileName?.let {
+                putExtra(FileStorageActivity.EXTRA_FILE_NAME, it)
+            }
+        }
+
         val actionPendingIntent = PendingIntent.getActivity(
             context,
             0,
-            intent, //to be changed in TRAN-745
+            locateIntent,
             PendingIntent.FLAG_UPDATE_CURRENT or PendingIntent.FLAG_IMMUTABLE
         )
 
@@ -102,14 +112,20 @@ class DefaultTransfersGroupFinishNotificationBuilder @Inject constructor(
             .setSmallIcon(iconPackR.drawable.ic_stat_notify)
             .setColor(ContextCompat.getColor(context, R.color.red_600_red_300))
             .setContentIntent(pendingIntent)
-            .setAutoCancel(true).setTicker(notificationTitle)
-            .setContentTitle(notificationTitle).setContentText(contentText)
+            .setAutoCancel(true)
+            .setTicker(notificationTitle)
+            .setContentTitle(notificationTitle)
+            .setContentText(contentText)
             .setOngoing(false)
-            .addAction(
-                iconPackR.drawable.ic_stat_notify,
-                resources.getString(sharedR.string.transfers_notification_location_action),
-                actionPendingIntent
-            )
+            .apply {
+                if (group.finishedFiles > 0) {
+                    addAction(
+                        iconPackR.drawable.ic_stat_notify,
+                        resources.getString(sharedR.string.transfers_notification_location_action),
+                        actionPendingIntent
+                    )
+                }
+            }
             .setGroup(transferType.name)
             .build()
     }

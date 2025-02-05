@@ -2692,6 +2692,10 @@ class ManagerActivity : PasscodeActivity(), NavigationView.OnNavigationItemSelec
                     openTransfers()
                 }
 
+                Constants.ACTION_LOCATE_DOWNLOADED_FILE -> {
+                    navigateToFileStorageFromIntent()
+                }
+
                 Constants.ACTION_TAKE_SELFIE -> {
                     Timber.d("Intent take selfie")
                     Util.checkTakePicture(this, Constants.TAKE_PHOTO_CODE)
@@ -5766,6 +5770,25 @@ class ManagerActivity : PasscodeActivity(), NavigationView.OnNavigationItemSelec
             }
         }
         setIntent(intent)
+    }
+
+    private fun navigateToFileStorageFromIntent() {
+        Intent(this, FileStorageActivity::class.java).apply {
+            action = FileStorageActivity.Mode.BROWSE_FILES.action
+            if (intent.hasExtra(FileStorageActivity.EXTRA_PATH)) {
+                putExtra(
+                    FileStorageActivity.EXTRA_PATH,
+                    intent.getStringExtra(FileStorageActivity.EXTRA_PATH)
+                )
+            }
+            if (intent.hasExtra(FileStorageActivity.EXTRA_FILE_NAME)) {
+                putExtra(
+                    FileStorageActivity.EXTRA_FILE_NAME,
+                    intent.getStringExtra(FileStorageActivity.EXTRA_FILE_NAME)
+                )
+            }
+            startActivity(this)
+        }
     }
 
     override fun navigateToUpgradeAccount() {
