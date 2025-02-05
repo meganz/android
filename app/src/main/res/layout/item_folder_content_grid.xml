@@ -48,21 +48,16 @@
         app:layout_constraintTop_toTopOf="@+id/file_thumbnail"
         tools:ignore="ContentDescription" />
 
-    <com.facebook.drawee.view.SimpleDraweeView
+    <androidx.appcompat.widget.AppCompatImageView
         android:id="@+id/file_thumbnail"
         android:layout_width="match_parent"
         android:layout_height="172dp"
         android:paddingStart="1dp"
         android:paddingTop="1dp"
         android:paddingEnd="1dp"
-        android:scaleType="fitCenter"
+        android:scaleType="centerCrop"
+        android:adjustViewBounds="true"
         app:layout_constraintTop_toTopOf="parent"
-        app:placeholderImageScaleType="center"
-        app:roundBottomEnd="false"
-        app:roundBottomStart="false"
-        app:roundTopEnd="true"
-        app:roundTopStart="true"
-        app:roundedCornerRadius="4dp"
         tools:placeholderImage="@android:drawable/ic_menu_camera" />
 
     <ImageView
