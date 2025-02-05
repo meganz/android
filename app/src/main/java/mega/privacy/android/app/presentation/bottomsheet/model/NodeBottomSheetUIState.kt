@@ -17,6 +17,7 @@ import nz.mega.sdk.MegaNode
  * @property isBusinessAccountExpired
  * @property isHiddenNodesOnboarded
  * @property isHidingActionAllowed
+ * @property isUserAttributeFolder          True if the node is a user attribute folder (CU, MU or "My chat files") or false otherwise
  */
 data class NodeBottomSheetUIState(
     val canMoveNode: Boolean = false,
@@ -31,4 +32,5 @@ data class NodeBottomSheetUIState(
     val isBusinessAccountExpired: Boolean = false,
     val isHiddenNodesOnboarded: Boolean? = null,
     val isHidingActionAllowed: Boolean = false,
+    val isUserAttributeFolder: Boolean = false,
 )

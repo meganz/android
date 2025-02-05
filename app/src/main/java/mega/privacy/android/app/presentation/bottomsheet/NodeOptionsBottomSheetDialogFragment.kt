@@ -581,7 +581,7 @@ class NodeOptionsBottomSheetDialogFragment : BaseBottomSheetDialogFragment() {
                 viewLifecycleOwner.lifecycleScope.launch {
                     if (getFeatureFlagValueUseCase(
                             AppFeatures.CloudDriveAndSyncs
-                        ) && mode == CLOUD_DRIVE_MODE && node.isFolder && !isTakenDown && state.isOnline
+                        ) && mode == CLOUD_DRIVE_MODE && node.isFolder && !isTakenDown && state.isOnline && !state.isUserAttributeFolder
                     ) {
                         optionSync.visibility = View.VISIBLE
                         separatorSync.visibility = View.VISIBLE
