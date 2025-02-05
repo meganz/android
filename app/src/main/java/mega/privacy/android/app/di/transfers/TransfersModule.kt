@@ -10,12 +10,16 @@ import dagger.hilt.components.SingletonComponent
 import dagger.multibindings.IntoSet
 import mega.privacy.android.app.presentation.transfers.notification.DefaultChatUploadNotificationMapper
 import mega.privacy.android.app.presentation.transfers.notification.DefaultOverQuotaNotificationBuilder
+import mega.privacy.android.app.presentation.transfers.notification.DefaultTransfersFinishNotificationSummaryBuilder
 import mega.privacy.android.app.presentation.transfers.notification.DefaultTransfersFinishedNotificationMapper
+import mega.privacy.android.app.presentation.transfers.notification.DefaultTransfersGroupFinishNotificationBuilder
 import mega.privacy.android.app.presentation.transfers.notification.DefaultTransfersNotificationMapper
 import mega.privacy.android.app.utils.Constants
 import mega.privacy.android.data.mapper.transfer.ChatUploadNotificationMapper
 import mega.privacy.android.data.mapper.transfer.OverQuotaNotificationBuilder
+import mega.privacy.android.data.mapper.transfer.TransfersFinishNotificationSummaryBuilder
 import mega.privacy.android.data.mapper.transfer.TransfersFinishedNotificationMapper
+import mega.privacy.android.data.mapper.transfer.TransfersGroupFinishNotificationBuilder
 import mega.privacy.android.data.mapper.transfer.TransfersNotificationMapper
 
 /**
@@ -53,6 +57,19 @@ abstract class TransfersModule {
      */
     @Binds
     abstract fun bindTransfersFinishedNotificationMapper(builder: DefaultTransfersFinishedNotificationMapper): TransfersFinishedNotificationMapper
+
+    /**
+     * Binds [TransfersFinishNotificationSummaryBuilder] to its default implementation [DefaultTransfersFinishedNotificationMapper]
+     */
+    @Binds
+    abstract fun bindTransfersFinishNotificationSummaryBuilder(builder: DefaultTransfersFinishNotificationSummaryBuilder): TransfersFinishNotificationSummaryBuilder
+
+    /**
+     * Binds [TransfersGroupFinishNotificationBuilder] to its default implementation [DefaultTransfersFinishedNotificationMapper]
+     */
+    @Binds
+    abstract fun bindTransfersGroupFinishNotificationBuilder(builder: DefaultTransfersGroupFinishNotificationBuilder): TransfersGroupFinishNotificationBuilder
+
 
     companion object {
 
