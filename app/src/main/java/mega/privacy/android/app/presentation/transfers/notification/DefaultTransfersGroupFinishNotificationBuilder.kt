@@ -51,19 +51,30 @@ class DefaultTransfersGroupFinishNotificationBuilder @Inject constructor(
             alreadyTransferredCount > 0 -> alreadyMsg(alreadyTransferredCount)
             else -> null
         }
-        val notificationTitle = if (totalCompleted != totalFinished) {
-            resources.getQuantityString(
-                R.plurals.download_service_final_notification_with_details,
-                totalFinished,
-                totalCompleted,
-                totalFinished,
-            )
-        } else {
-            resources.getQuantityString(
-                R.plurals.download_service_final_notification,
-                totalCompleted,
-                totalCompleted
-            )
+        val notificationTitle = when {
+            totalCompleted != totalFinished -> {
+                resources.getQuantityString(
+                    R.plurals.download_service_final_notification_with_details,
+                    totalFinished,
+                    totalCompleted,
+                    totalFinished,
+                )
+            }
+
+            totalCompleted > 1 || group.singleFileName == null -> {
+                resources.getQuantityString(
+                    R.plurals.download_service_final_notification,
+                    totalCompleted,
+                    totalCompleted
+                )
+            }
+
+            else -> {
+                resources.getString(
+                    sharedR.string.transfers_notification_title_single_download,
+                    group.singleFileName
+                )
+            }
         } + (titleSuffix?.let { ". $it." } ?: "")
 
         val destination = if (isOfflinePathUseCase(group.destination)) {

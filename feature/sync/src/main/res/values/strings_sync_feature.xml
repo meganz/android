@@ -84,8 +84,6 @@
     <string name="sync_dialog_message_wifi_only">Wi-Fi only</string>
     <!-- Sync empty state message -->
     <string name="sync_empty_state_message">You’ll need to set up a local folder on your device that will sync with a chosen folder on your Cloud drive</string>
-    <!-- Sync stalled issue reason is no reason-->
-    <string name="sync_stalled_issue_no_reason">No reason</string>
     <!-- Sync stalled issue reason is no file issue-->
     <string name="sync_stalled_issue_file_issue">File or folder issue</string>
     <!-- Sync stalled issue reason is move or rename-->
@@ -112,8 +110,6 @@
     <string name="sync_stalled_issue_local_and_remote_not_synced">File or folder conflict</string>
     <!-- Sync stalled issue reason is Name clash-->
     <string name="sync_stalled_issue_name_clash">File or folder name conflict</string>
-    <!-- Sync stalled issue reason is Last PlusOne-->
-    <string name="sync_stalled_issue_last_plus_one">Last plus one</string>
     <!-- Sync chip folder chip title-->
     <string name="sync_folders">Folders</string>
     <!-- Sync stalled issue count chip title for 1 or more stalled issues-->
