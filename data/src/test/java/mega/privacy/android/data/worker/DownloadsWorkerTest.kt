@@ -25,17 +25,20 @@ import kotlinx.coroutines.test.resetMain
 import kotlinx.coroutines.test.runTest
 import kotlinx.coroutines.test.setMain
 import mega.privacy.android.data.mapper.transfer.OverQuotaNotificationBuilder
+import mega.privacy.android.data.mapper.transfer.TransfersFinishNotificationSummaryBuilder
 import mega.privacy.android.data.mapper.transfer.TransfersFinishedNotificationMapper
+import mega.privacy.android.data.mapper.transfer.TransfersGroupFinishNotificationBuilder
 import mega.privacy.android.data.mapper.transfer.TransfersNotificationMapper
 import mega.privacy.android.data.worker.AbstractTransfersWorker.Companion.ON_TRANSFER_UPDATE_REFRESH_MILLIS
 import mega.privacy.android.domain.entity.Progress
 import mega.privacy.android.domain.entity.transfer.ActiveTransferTotals
 import mega.privacy.android.domain.entity.transfer.MonitorOngoingActiveTransfersResult
-import mega.privacy.android.domain.entity.transfer.TransferProgressResult
 import mega.privacy.android.domain.entity.transfer.Transfer
 import mega.privacy.android.domain.entity.transfer.TransferEvent
+import mega.privacy.android.domain.entity.transfer.TransferProgressResult
 import mega.privacy.android.domain.entity.transfer.TransferType
 import mega.privacy.android.domain.monitoring.CrashReporter
+import mega.privacy.android.domain.usecase.featureflag.GetFeatureFlagValueUseCase
 import mega.privacy.android.domain.usecase.qrcode.ScanMediaFileUseCase
 import mega.privacy.android.domain.usecase.transfers.MonitorActiveAndPendingTransfersUseCase
 import mega.privacy.android.domain.usecase.transfers.MonitorTransferEventsUseCase
@@ -94,6 +97,11 @@ class DownloadsWorkerTest {
     private val startAllPendingDownloadsUseCase = mock<StartAllPendingDownloadsUseCase>()
     private val monitorActiveAndPendingTransfersUseCase =
         mock<MonitorActiveAndPendingTransfersUseCase>()
+    private val transfersGroupFinishNotificationBuilder =
+        mock<TransfersGroupFinishNotificationBuilder>()
+    private val transfersFinishNotificationSummaryBuilder =
+        mock<TransfersFinishNotificationSummaryBuilder>()
+    private val getFeatureFlagValueUseCase = mock<GetFeatureFlagValueUseCase>()
 
     @BeforeAll
     fun setup() {
@@ -140,6 +148,9 @@ class DownloadsWorkerTest {
             notificationSamplePeriod = 0L,
             monitorActiveAndPendingTransfersUseCase = monitorActiveAndPendingTransfersUseCase,
             startAllPendingDownloadsUseCase = startAllPendingDownloadsUseCase,
+            transfersGroupFinishNotificationBuilder = transfersGroupFinishNotificationBuilder,
+            transfersFinishNotificationSummaryBuilder = transfersFinishNotificationSummaryBuilder,
+            getFeatureFlagValueUseCase = getFeatureFlagValueUseCase,
         )
     }
 
@@ -164,6 +175,9 @@ class DownloadsWorkerTest {
             monitorTransferEventsUseCase,
             monitorActiveAndPendingTransfersUseCase,
             startAllPendingDownloadsUseCase,
+            transfersGroupFinishNotificationBuilder,
+            transfersFinishNotificationSummaryBuilder,
+            getFeatureFlagValueUseCase,
         )
     }
 
@@ -460,6 +474,7 @@ class DownloadsWorkerTest {
         whenever(workProgressUpdater.updateProgress(any(), any(), any()))
             .thenReturn(SettableFuture.create<Void?>().also { it.set(null) })
         whenever(transfersNotificationMapper(any(), any())).thenReturn(mock())
+        whenever(getFeatureFlagValueUseCase(any())).thenReturn(false)
     }
 
     private fun mockActiveTransferTotals(
@@ -478,7 +493,7 @@ class DownloadsWorkerTest {
                 transfersOverQuota = false,
                 storageOverQuota = false
             ),
-           pendingWork =  pendingWork,
+            pendingWork = pendingWork,
         )
     }
 }

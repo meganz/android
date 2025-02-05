@@ -23,7 +23,16 @@ enum class DataFeatures(
     UseCameraUploadsRecords(
         "Use Camera Uploads Records",
         true
-    );
+    ),
+
+    /**
+     * Show a single download finish notifications for each user action
+     */
+    ShowGroupedDownloadNotifications(
+        "Show a single download finish notifications for each user action",
+        false,
+    ),
+    ;
 
     companion object : FeatureFlagValueProvider {
         override suspend fun isEnabled(feature: Feature) =

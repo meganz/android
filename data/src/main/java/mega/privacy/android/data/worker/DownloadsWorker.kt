@@ -1,5 +1,6 @@
 package mega.privacy.android.data.worker
 
+import android.app.Notification
 import android.content.Context
 import androidx.core.app.NotificationManagerCompat
 import androidx.hilt.work.HiltWorker
@@ -11,15 +12,19 @@ import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.catch
 import kotlinx.coroutines.launch
+import mega.privacy.android.data.featuretoggle.DataFeatures
 import mega.privacy.android.data.mapper.transfer.OverQuotaNotificationBuilder
+import mega.privacy.android.data.mapper.transfer.TransfersFinishNotificationSummaryBuilder
 import mega.privacy.android.data.mapper.transfer.TransfersFinishedNotificationMapper
+import mega.privacy.android.data.mapper.transfer.TransfersGroupFinishNotificationBuilder
 import mega.privacy.android.data.mapper.transfer.TransfersNotificationMapper
 import mega.privacy.android.domain.entity.transfer.ActiveTransferTotals
-import mega.privacy.android.domain.entity.transfer.TransferProgressResult
 import mega.privacy.android.domain.entity.transfer.TransferEvent
+import mega.privacy.android.domain.entity.transfer.TransferProgressResult
 import mega.privacy.android.domain.entity.transfer.TransferType
 import mega.privacy.android.domain.monitoring.CrashReporter
 import mega.privacy.android.domain.qualifier.IoDispatcher
+import mega.privacy.android.domain.usecase.featureflag.GetFeatureFlagValueUseCase
 import mega.privacy.android.domain.usecase.qrcode.ScanMediaFileUseCase
 import mega.privacy.android.domain.usecase.transfers.MonitorActiveAndPendingTransfersUseCase
 import mega.privacy.android.domain.usecase.transfers.MonitorTransferEventsUseCase
@@ -51,12 +56,15 @@ class DownloadsWorker @AssistedInject constructor(
     clearActiveTransfersIfFinishedUseCase: ClearActiveTransfersIfFinishedUseCase,
     private val transfersNotificationMapper: TransfersNotificationMapper,
     private val transfersFinishedNotificationMapper: TransfersFinishedNotificationMapper,
+    private val transfersFinishNotificationSummaryBuilder: TransfersFinishNotificationSummaryBuilder,
+    private val transfersGroupFinishNotificationBuilder: TransfersGroupFinishNotificationBuilder,
     private val scanMediaFileUseCase: ScanMediaFileUseCase,
     crashReporter: CrashReporter,
     foregroundSetter: ForegroundSetter? = null,
     notificationSamplePeriod: Long? = null,
     private val monitorActiveAndPendingTransfersUseCase: MonitorActiveAndPendingTransfersUseCase,
     private val startAllPendingDownloadsUseCase: StartAllPendingDownloadsUseCase,
+    private val getFeatureFlagValueUseCase: GetFeatureFlagValueUseCase,
 ) : AbstractTransfersWorker(
     context = context,
     workerParams = workerParams,
@@ -114,6 +122,15 @@ class DownloadsWorker @AssistedInject constructor(
             }
         }
     }
+
+    override suspend fun showGroupedNotifications() =
+        getFeatureFlagValueUseCase(DataFeatures.ShowGroupedDownloadNotifications)
+
+    override suspend fun createSummaryNotification(): Notification? =
+        transfersFinishNotificationSummaryBuilder(type)
+
+    override suspend fun createGroupNotification(group: ActiveTransferTotals.Group): Notification? =
+        transfersGroupFinishNotificationBuilder(group, type)
 
     companion object {
         /**

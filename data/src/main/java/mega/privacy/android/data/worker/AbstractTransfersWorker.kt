@@ -140,6 +140,9 @@ abstract class AbstractTransfersWorker(
             if (storageOverQuota || transferOverQuota) {
                 showOverQuotaNotification(storageOverQuota = storageOverQuota)
             }
+            if (showGroupedNotifications()) {
+                checkFinishedGroups(transferTotals)
+            }
             //set progress percent as worker progress
             setProgress(workDataOf(PROGRESS to transferTotals.transferProgress.floatValue))
             //update the notification
@@ -154,6 +157,17 @@ abstract class AbstractTransfersWorker(
             Timber.e("${this@AbstractTransfersWorker::class.java.simpleName}error: $it")
             crashReporter.report(it)
         }
+
+    private val alreadyFinishedGroups = mutableListOf<Int>()
+    private suspend fun checkFinishedGroups(transferTotals: ActiveTransferTotals) {
+        transferTotals.groups.filter { it.finished() && !alreadyFinishedGroups.contains(it.groupId) }
+            .also { finishedGroups ->
+                alreadyFinishedGroups.addAll(finishedGroups.map { it.groupId })
+                finishedGroups.forEach {
+                    showGroupFinishedNotification(it)
+                }
+            }
+    }
 
     /**
      * @return true if the work is completed, false otherwise
@@ -177,7 +191,9 @@ abstract class AbstractTransfersWorker(
             if (hasCompleted(lastActiveTransferTotals)) {
                 Timber.d("${this@AbstractTransfersWorker::class.java.simpleName} Finished Successful: $lastActiveTransferTotals")
                 if (lastActiveTransferTotals.totalTransfers > 0) {
-                    showFinishNotification(lastActiveTransferTotals)
+                    if (showFinalNotification()) {
+                        showFinishNotification(lastActiveTransferTotals)
+                    }
                 }
                 return@withContext Result.success()
             } else {
@@ -306,6 +322,39 @@ abstract class AbstractTransfersWorker(
     }
 
     /**
+     * If true, the notifications for finished transfers will be shown by each group instead of a single final notification for all transfers.
+     */
+    open suspend fun showGroupedNotifications() = false
+    private suspend fun showFinalNotification() = !showGroupedNotifications()
+    open suspend fun createSummaryNotification(): Notification? = null
+    open suspend fun createGroupNotification(group: ActiveTransferTotals.Group): Notification? =
+        null
+
+    @SuppressLint("MissingPermission")
+    private suspend fun showGroupFinishedNotification(
+        group: ActiveTransferTotals.Group,
+    ) {
+        if (areNotificationsEnabledUseCase()) {
+            finalNotificationId?.let { finalNotificationId ->
+                createSummaryNotification()?.let { summaryNotification ->
+                    createGroupNotification(group)?.let { groupNotification ->
+                        val groupNotificationId =
+                            NOTIFICATION_GROUP_MULTIPLAYER * finalNotificationId + group.groupId
+                        notificationManager.notify(
+                            finalNotificationId,
+                            summaryNotification,
+                        )
+                        notificationManager.notify(
+                            groupNotificationId,
+                            groupNotification,
+                        )
+                    }
+                }
+            }
+        }
+    }
+
+    /**
      * Create a [ForegroundInfo] based on [Notification]
      */
     @SuppressLint("SpecifyForegroundServiceType")
@@ -330,6 +379,8 @@ abstract class AbstractTransfersWorker(
          */
         const val PROGRESS = "Progress"
         private const val NOTIFICATION_STORAGE_OVERQUOTA = 14
+
+        private const val NOTIFICATION_GROUP_MULTIPLAYER = 1_000_000
 
         /**
          * Milliseconds to sample the transfer progress updates
