@@ -2,17 +2,24 @@ package mega.privacy.android.shared.original.core.ui.controls.tab
 
 import android.content.res.Configuration
 import androidx.compose.foundation.ExperimentalFoundationApi
+import androidx.compose.foundation.background
 import androidx.compose.foundation.isSystemInDarkTheme
+import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.pager.HorizontalPager
+import androidx.compose.foundation.pager.PagerState
 import androidx.compose.foundation.pager.rememberPagerState
 import androidx.compose.material.MaterialTheme
 import androidx.compose.material.Tab
 import androidx.compose.material.TabRow
+import androidx.compose.material.TabRowDefaults.tabIndicatorOffset
 import androidx.compose.material.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.platform.LocalView
 import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.tooling.preview.PreviewParameter
@@ -24,42 +31,80 @@ import mega.privacy.android.shared.original.core.ui.theme.MegaOriginalTheme
 import mega.privacy.android.shared.original.core.ui.theme.OriginalTempTheme
 import mega.privacy.android.shared.original.core.ui.theme.extensions.subtitle2medium
 
+
 /**
- *
+ * Tabs with Mega style.
  */
 @OptIn(ExperimentalFoundationApi::class)
 @Composable
 fun Tabs(
-    cells: ImmutableList<TextCell>,
     modifier: Modifier = Modifier,
+    pagerModifier: Modifier = Modifier,
+    pagerState: PagerState? = null,
     selectedIndex: Int = 0,
     onTabSelected: (Int) -> Unit = {},
+    shouldTabsShown: Boolean = true,
+    pagerEnabled: Boolean = true,
+    cells: @Composable TabsScope.() -> Unit,
 ) {
+    val activeColor = MegaOriginalTheme.colors.components.interactive
+    val color = MegaOriginalTheme.colors.text.secondary
+    val tabsScope = TabsScope(activeColor = activeColor, color = color)
     val coroutineScope = rememberCoroutineScope()
-    val pagerState =
-        rememberPagerState(initialPage = selectedIndex, initialPageOffsetFraction = 0f) {
-            cells.size
-        }
-
-    TabRow(
-        selectedTabIndex = pagerState.currentPage,
-        modifier = modifier,
-        contentColor = MegaOriginalTheme.colors.border.interactive,
-        divider = { },
+    val tabs = with(tabsScope) {
+        cells()
+        build()
+    }
+    val pagerState = pagerState ?: rememberPagerState(
+        initialPage = selectedIndex,
+        initialPageOffsetFraction = 0f
     ) {
-        cells.forEachIndexed { index, cell ->
-            TabCell(
-                text = cell.text,
-                selected = pagerState.currentPage == index,
-                onClick = { coroutineScope.launch { pagerState.animateScrollToPage(index) } },
-                modifier = Modifier.testTag(cell.tag)
-            )
+        tabs.size
+    }
+    if (shouldTabsShown) {
+        TabRow(
+            selectedTabIndex = pagerState.currentPage,
+            modifier = modifier,
+            contentColor = activeColor,
+            indicator = { tabPositions ->
+                TabRowDefaults.Indicator(
+                    modifier = Modifier
+                        .tabIndicatorOffset(tabPositions[pagerState.currentPage])
+                        .background(color = MegaOriginalTheme.colors.border.brand)
+                )
+            }
+        ) {
+            tabs.forEachIndexed { index, tabItem ->
+                tabItem.Tab(
+                    selected = pagerState.currentPage == index,
+                    onClick = {
+                        coroutineScope.launch {
+                            pagerState.animateScrollToPage(index)
+                            onTabSelected(index)
+                        }
+                    },
+                    modifier = Modifier.testTag(tabItem.tag)
+                )
+            }
+        }
+    }
+    if (pagerEnabled) {
+        val view = LocalView.current
+        if (!view.isInEditMode) {
+            HorizontalPager(
+                state = pagerState,
+                modifier = pagerModifier,
+                userScrollEnabled = shouldTabsShown
+            ) { page ->
+                Column(modifier = Modifier.fillMaxSize()) {
+                    tabs[page].content?.let {
+                        tabsScope.it(page == pagerState.currentPage)
+                    }
+                }
+            }
         }
     }
 
-    HorizontalPager(state = pagerState, modifier = modifier) { page ->
-        cells[page].view()
-    }
 
     LaunchedEffect(pagerState.currentPage) {
         onTabSelected(pagerState.currentPage)
@@ -75,6 +120,7 @@ private fun TabCell(
     selected: Boolean,
     onClick: () -> Unit,
     modifier: Modifier = Modifier,
+    icon: @Composable (() -> Unit)? = null,
 ) = Tab(
     text = {
         Text(
@@ -84,23 +130,110 @@ private fun TabCell(
             style = MaterialTheme.typography.subtitle2medium,
         )
     },
+    icon = icon,
     selected = selected,
     onClick = onClick,
     modifier = modifier,
 )
 
 /**
- * Data class for a cell with text.
+ * Data class for a Tab with text.
  *
  * @param text The text to display.
  * @param tag The tag for testing.
- * @param view The view to display.
+ * @param content The view to display for the Tab is selected.
  */
-data class TextCell(
+private data class TextTabContent(
     val text: String,
-    val tag: String,
-    val view: @Composable () -> Unit,
-)
+    override val tag: String,
+    override val content: @Composable (TabsScope.(isActive: Boolean) -> Unit)? = null,
+) : TabContent {
+    @Composable
+    override fun Tab(
+        selected: Boolean,
+        onClick: () -> Unit,
+        modifier: Modifier,
+    ) {
+        TabCell(
+            text = text,
+            selected = selected,
+            onClick = onClick,
+            modifier = modifier,
+        )
+    }
+}
+
+/**
+ * Data class for a Tab with text and Icon.
+ *
+ * @param text The text to display.
+ * @param icon The icon to display.
+ * @param tag The tag for testing.
+ * @param content The view to display.
+ */
+private data class IconTabContent(
+    val text: String,
+    val icon: @Composable () -> Unit,
+    override val tag: String,
+    override val content: @Composable (TabsScope.(isActive: Boolean) -> Unit)? = null,
+) : TabContent {
+    @Composable
+    override fun Tab(
+        selected: Boolean,
+        onClick: () -> Unit,
+        modifier: Modifier,
+    ) {
+        TabCell(
+            text = text,
+            icon = icon,
+            selected = selected,
+            onClick = onClick,
+            modifier = modifier,
+        )
+    }
+}
+
+interface TabContent {
+    val content: @Composable (TabsScope.(isActive: Boolean) -> Unit)?
+    val tag: String
+
+    @Composable
+    fun Tab(
+        selected: Boolean,
+        onClick: () -> Unit,
+        modifier: Modifier,
+    )
+}
+
+
+/**
+ * Scope for building tabs.
+ */
+
+class TabsScope(
+    private val cells: MutableList<TabContent> = mutableListOf(),
+    val activeColor: Color,
+    val color: Color,
+) {
+    fun addTextTab(
+        text: String,
+        tag: String,
+        content: @Composable (TabsScope.(isActive: Boolean) -> Unit)? = null,
+    ) {
+        cells.add(TextTabContent(text = text, tag = tag, content = content))
+    }
+
+    fun addIconTab(
+        text: String,
+        icon: @Composable () -> Unit,
+        tag: String,
+        content: @Composable (TabsScope.(isActive: Boolean) -> Unit)? = null,
+    ) {
+        cells.add(IconTabContent(text = text, icon = icon, tag = tag, content = content))
+    }
+
+    internal fun build(): ImmutableList<TabContent> = persistentListOf(*cells.toTypedArray())
+}
 
 @Preview
 @Preview(uiMode = Configuration.UI_MODE_NIGHT_YES, name = "DarkTabsPreview")
@@ -110,10 +243,10 @@ private fun TabsPreview(
 ) {
     OriginalTempTheme(isDark = isSystemInDarkTheme()) {
         Tabs(
-            cells = persistentListOf(
-                TextCell("Tab 1", "tab1") {},
-                TextCell("Tab 2", "tab2") {},
-            ),
+            cells = {
+                addTextTab("Tab 1", "tab1") { Text("Tab 1 content") }
+                addTextTab("Tab 2", "tab2") { Text("Tab 2 content") }
+            },
             selectedIndex = selectedTab,
         )
     }

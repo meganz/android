@@ -571,4 +571,6 @@
     <color name="color_link_primary">#2C5BEB</color>
     <color name="color_text_on_color">#FFFAFAFF</color>
     <color name="color_support_success">#009B48</color>
+    <color name="color_components_interactive">#DD1405</color>
+    <color name="color_border_brand">#DD1405</color>
 </resources>

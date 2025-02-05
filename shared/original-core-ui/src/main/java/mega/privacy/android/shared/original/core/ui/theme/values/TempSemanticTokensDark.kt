@@ -49,7 +49,7 @@ internal object TempSemanticTokensDark : SemanticTokens {
             )
 
     override val border: Border = Border(
-            interactive = Colors.Primary.n400,
+            brand = Colors.Primary.n400,
             strong = Colors.Neutral.n600,
             strongSelected = Colors.Accent.n050,
             subtle = Colors.Neutral.n800,

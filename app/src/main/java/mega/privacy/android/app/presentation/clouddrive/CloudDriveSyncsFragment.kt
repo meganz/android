@@ -18,18 +18,10 @@ import androidx.activity.result.contract.ActivityResultContracts
 import androidx.annotation.StringRes
 import androidx.appcompat.app.AppCompatActivity
 import androidx.appcompat.view.ActionMode
-import androidx.compose.foundation.background
-import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.fillMaxWidth
-import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.pager.HorizontalPager
 import androidx.compose.foundation.pager.rememberPagerState
-import androidx.compose.material.MaterialTheme
 import androidx.compose.material.SnackbarHostState
-import androidx.compose.material.Tab
-import androidx.compose.material.TabRow
-import androidx.compose.material.TabRowDefaults.tabIndicatorOffset
-import androidx.compose.material.Text
 import androidx.compose.material.rememberScaffoldState
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
@@ -44,10 +36,7 @@ import androidx.compose.ui.platform.ComposeView
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.ViewCompositionStrategy
 import androidx.compose.ui.platform.testTag
-import androidx.compose.ui.res.colorResource
 import androidx.compose.ui.res.stringResource
-import androidx.compose.ui.text.font.FontWeight
-import androidx.compose.ui.unit.dp
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.activityViewModels
 import androidx.fragment.app.viewModels
@@ -115,6 +104,7 @@ import mega.privacy.android.feature.sync.ui.permissions.SyncPermissionsManager
 import mega.privacy.android.feature.sync.ui.synclist.SyncListRoute
 import mega.privacy.android.navigation.MegaNavigator
 import mega.privacy.android.shared.original.core.ui.controls.layouts.MegaScaffold
+import mega.privacy.android.shared.original.core.ui.controls.tab.Tabs
 import mega.privacy.android.shared.original.core.ui.theme.OriginalTempTheme
 import mega.privacy.android.shared.original.core.ui.utils.showAutoDurationSnackbar
 import mega.privacy.mobile.analytics.event.AndroidSyncFABButtonEvent
@@ -263,43 +253,19 @@ class CloudDriveSyncsFragment : Fragment() {
                     MegaScaffold(
                         scaffoldState = scaffoldState,
                         topBar = {
-                            if (isTabShown) {
-                                TabRow(
-                                    modifier = Modifier
-                                        .fillMaxWidth()
-                                        .testTag(TAB_ROW_TEST_TAG),
-                                    selectedTabIndex = pagerState.currentPage,
-                                    backgroundColor = MaterialTheme.colors.surface,
-                                    contentColor = colorResource(R.color.color_border_interactive),
-                                    indicator = { tabPositions ->
-                                        Box(
-                                            modifier = Modifier
-                                                .tabIndicatorOffset(tabPositions[pagerState.currentPage])
-                                                .height(2.dp)
-                                                .background(color = colorResource(R.color.color_border_interactive))
+                            Tabs(
+                                modifier = Modifier.testTag(TAB_ROW_TEST_TAG),
+                                shouldTabsShown = isTabShown,
+                                pagerEnabled = false,
+                                pagerState = pagerState,
+                            ) {
+                                CloudDriveTab.entries.filter { it != CloudDriveTab.NONE }
+                                    .forEachIndexed { page, item ->
+                                        addTextTab(
+                                            text = stringResource(tabResIds[page]),
+                                            tag = item.name,
                                         )
                                     }
-                                ) {
-                                    CloudDriveTab.entries.filter { it != CloudDriveTab.NONE }
-                                        .forEachIndexed { index, tab ->
-                                            Tab(
-                                                text = {
-                                                    Text(
-                                                        text = stringResource(tabResIds[index]),
-                                                        style = MaterialTheme.typography.subtitle2.copy(
-                                                            fontWeight = FontWeight.Medium
-                                                        ),
-                                                    )
-                                                },
-                                                selected = pagerState.currentPage == index,
-                                                selectedContentColor = colorResource(R.color.color_border_interactive),
-                                                unselectedContentColor = MaterialTheme.colors.secondary,
-                                                onClick = {
-                                                    fileBrowserViewModel.onTabChanged(tab)
-                                                }
-                                            )
-                                        }
-                                }
                             }
                         }
                     ) {

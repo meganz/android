@@ -377,4 +377,6 @@
     <color name="color_background_pageBackground">#FF18191A</color>
     <color name="color_link_primary">#69A3FB</color>
     <color name="color_support_success">#09BF5B</color>
+    <color name="color_components_interactive">#FB6361</color>
+    <color name="color_border_brand">#FB6361</color>
 </resources>

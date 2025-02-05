@@ -20,7 +20,6 @@ import androidx.compose.ui.unit.dp
 import com.google.accompanist.navigation.material.BottomSheetNavigator
 import com.google.accompanist.navigation.material.ExperimentalMaterialNavigationApi
 import com.google.accompanist.navigation.material.rememberBottomSheetNavigator
-import kotlinx.collections.immutable.persistentListOf
 import mega.privacy.android.app.R
 import mega.privacy.android.app.presentation.transfers.model.TransferMenuAction
 import mega.privacy.android.app.presentation.transfers.model.TransfersUiState
@@ -30,7 +29,6 @@ import mega.privacy.android.shared.original.core.ui.controls.appbar.MegaAppBar
 import mega.privacy.android.shared.original.core.ui.controls.layouts.MegaScaffold
 import mega.privacy.android.shared.original.core.ui.controls.sheets.MegaBottomSheetLayout
 import mega.privacy.android.shared.original.core.ui.controls.tab.Tabs
-import mega.privacy.android.shared.original.core.ui.controls.tab.TextCell
 import mega.privacy.android.shared.original.core.ui.theme.OriginalTempTheme
 
 @OptIn(ExperimentalComposeUiApi::class, ExperimentalMaterialNavigationApi::class)
@@ -82,8 +80,8 @@ internal fun TransfersView(
                     .fillMaxSize(),
             ) {
                 Tabs(
-                    cells = persistentListOf(
-                        TextCell(
+                    cells = {
+                        addTextTab(
                             text = stringResource(id = R.string.title_tab_in_progress_transfers),
                             tag = TEST_TAG_IN_PROGRESS_TAB,
                         ) {
@@ -93,12 +91,12 @@ internal fun TransfersView(
                                 areTransfersPaused = areTransfersPaused,
                                 onPlayPauseClicked = onPlayPauseTransfer,
                             )
-                        },
-                        TextCell(
+                        }
+                        addTextTab(
                             text = stringResource(id = R.string.title_tab_completed_transfers),
                             tag = TEST_TAG_COMPLETED_TAB,
                         ) { CompletedTransfersView() }
-                    ),
+                    },
                     selectedIndex = selectedTab,
                     onTabSelected = onTabSelected,
                 )

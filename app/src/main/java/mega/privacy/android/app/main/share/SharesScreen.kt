@@ -4,12 +4,10 @@ import mega.privacy.android.icon.pack.R as IconR
 import androidx.activity.compose.LocalOnBackPressedDispatcherOwner
 import androidx.compose.foundation.background
 import androidx.compose.foundation.isSystemInDarkTheme
-import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.WindowInsets
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
-import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.pager.HorizontalPager
 import androidx.compose.foundation.pager.rememberPagerState
@@ -20,9 +18,6 @@ import androidx.compose.material.Icon
 import androidx.compose.material.IconButton
 import androidx.compose.material.MaterialTheme
 import androidx.compose.material.Surface
-import androidx.compose.material.Tab
-import androidx.compose.material.TabRow
-import androidx.compose.material.TabRowDefaults.tabIndicatorOffset
 import androidx.compose.material.Text
 import androidx.compose.material.TopAppBar
 import androidx.compose.runtime.Composable
@@ -37,7 +32,6 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalView
 import androidx.compose.ui.platform.testTag
-import androidx.compose.ui.res.colorResource
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.semantics.semantics
@@ -57,8 +51,9 @@ import mega.privacy.android.app.presentation.shares.outgoing.OutgoingSharesCompo
 import mega.privacy.android.app.presentation.shares.outgoing.model.OutgoingSharesState
 import mega.privacy.android.shared.original.core.ui.controls.appbar.TEST_TAG_APP_BAR
 import mega.privacy.android.shared.original.core.ui.controls.layouts.MegaScaffold
+import mega.privacy.android.shared.original.core.ui.controls.tab.Tabs
 import mega.privacy.android.shared.original.core.ui.theme.OriginalTempTheme
-import mega.privacy.android.shared.original.core.ui.theme.extensions.grey_alpha_054_white_alpha_054
+import timber.log.Timber
 
 @OptIn(ExperimentalComposeUiApi::class)
 @Composable
@@ -179,66 +174,46 @@ internal fun SharesScreen(
                             }
                         }
                     )
-                    if (isTabShown) {
-                        TabRow(
-                            modifier = Modifier
-                                .fillMaxWidth()
-                                .testTag(TAB_ROW_TEST_TAG),
-                            selectedTabIndex = pagerState.currentPage,
-                            backgroundColor = MaterialTheme.colors.surface,
-                            contentColor = colorResource(R.color.color_border_interactive),
-                            indicator = { tabPositions ->
-                                Box(
-                                    modifier = Modifier
-                                        .tabIndicatorOffset(tabPositions[pagerState.currentPage])
-                                        .height(2.dp)
-                                        .background(color = colorResource(R.color.color_border_interactive))
-                                )
-                            }
-                        ) {
-                            SharesTab.entries.filter { it != SharesTab.NONE }
-                                .forEachIndexed { index, item ->
-                                    Tab(
-                                        text = {
-                                            Text(
-                                                text = stringResource(item.stringRes),
-                                                style = MaterialTheme.typography.subtitle2.copy(
-                                                    fontWeight = FontWeight.Medium
-                                                ),
-                                            )
-                                        },
-                                        icon = {
-                                            BadgedBox(
-                                                badge = {
-                                                    if (item == SharesTab.INCOMING_TAB && unverifiedIncoming > 0) {
-                                                        Badge {
-                                                            Text("$unverifiedIncoming")
-                                                        }
-                                                    } else if (item == SharesTab.OUTGOING_TAB && unVerifiedOutgoing > 0) {
-                                                        Badge {
-                                                            Text("$unVerifiedOutgoing")
-                                                        }
+                    Tabs(
+                        modifier = Modifier.testTag(TAB_ROW_TEST_TAG),
+                        shouldTabsShown = isTabShown,
+                        pagerEnabled = false,
+                        pagerState = pagerState,
+                        onTabSelected = {
+                            Timber.d("Selected tab: $it")
+                        },
+                    ) {
+                        SharesTab.entries.filter { it != SharesTab.NONE }
+                            .forEachIndexed { page, item ->
+                                addIconTab(
+                                    text = stringResource(item.stringRes),
+                                    icon = {
+                                        BadgedBox(
+                                            badge = {
+                                                if (item == SharesTab.INCOMING_TAB && unverifiedIncoming > 0) {
+                                                    Badge {
+                                                        Text("$unverifiedIncoming")
+                                                    }
+                                                } else if (item == SharesTab.OUTGOING_TAB && unVerifiedOutgoing > 0) {
+                                                    Badge {
+                                                        Text("$unVerifiedOutgoing")
                                                     }
                                                 }
-                                            ) {
-                                                Icon(
-                                                    painter = painterResource(
-                                                        id = item.getIcon(
-                                                            pagerState.currentPage == index
-                                                        )
-                                                    ),
-                                                    contentDescription = stringResource(item.stringRes)
-                                                )
                                             }
-                                        },
-                                        selected = pagerState.currentPage == index,
-                                        unselectedContentColor = MaterialTheme.colors.grey_alpha_054_white_alpha_054,
-                                        onClick = {
-                                            onPageSelected(item)
+                                        ) {
+                                            Icon(
+                                                painter = painterResource(
+                                                    id = item.getIcon(
+                                                        pagerState.currentPage == page
+                                                    )
+                                                ),
+                                                contentDescription = stringResource(item.stringRes),
+                                            )
                                         }
-                                    )
-                                }
-                        }
+                                    },
+                                    tag = item.name,
+                                )
+                            }
                     }
                 }
             }
@@ -298,15 +273,15 @@ internal fun SharesScreen(
 }
 
 private fun SharesTab.getIcon(isSelected: Boolean): Int {
-    if (isSelected) {
-        return when (this) {
+    return if (isSelected) {
+        when (this) {
             SharesTab.INCOMING_TAB -> IconR.drawable.ic_folder_incoming_medium_regular_solid
             SharesTab.OUTGOING_TAB -> IconR.drawable.ic_folder_outgoing_medium_regular_solid
             SharesTab.LINKS_TAB -> IconR.drawable.ic_link01_medium_regular_solid
             else -> throw IllegalArgumentException("Invalid SharesTab")
         }
     } else {
-        return when (this) {
+        when (this) {
             SharesTab.INCOMING_TAB -> IconR.drawable.ic_folder_incoming_medium_regular_outline
             SharesTab.OUTGOING_TAB -> IconR.drawable.ic_folder_outgoing_medium_regular_outline
             SharesTab.LINKS_TAB -> IconR.drawable.ic_link01_medium_regular_outline
