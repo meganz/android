@@ -10,7 +10,6 @@ import android.provider.Settings.canDrawOverlays
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import androidx.activity.result.contract.ActivityResultContracts
 import androidx.core.content.ContextCompat
 import androidx.core.view.isVisible
 import androidx.fragment.app.Fragment
@@ -19,6 +18,7 @@ import androidx.lifecycle.lifecycleScope
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
+import mega.privacy.android.analytics.Analytics
 import mega.privacy.android.app.databinding.FragmentPermissionsBinding
 import mega.privacy.android.app.databinding.PermissionsImageLayoutBinding
 import mega.privacy.android.app.main.ManagerActivity
@@ -35,6 +35,8 @@ import mega.privacy.android.app.utils.permission.PermissionUtils.getReadExternal
 import mega.privacy.android.app.utils.permission.PermissionUtils.getVideoPermissionByVersion
 import mega.privacy.android.app.utils.permission.PermissionUtils.hasPermissions
 import mega.privacy.android.app.utils.permission.PermissionUtils.requestPermission
+import mega.privacy.mobile.analytics.event.OnboardingInitialPageNotNowButtonPressedEvent
+import mega.privacy.mobile.analytics.event.OnboardingInitialPageSetUpMegaButtonPressedEvent
 import timber.log.Timber
 
 /**
@@ -61,12 +63,9 @@ class PermissionsFragment : Fragment() {
             )
         }
 
-    private val startDisplayOverOtherAppsPermissionForResult = registerForActivityResult(
-        ActivityResultContracts.StartActivityForResult()
-    ) {
-        setNextPermission()
-    }
-
+    /**
+     * onCreateView
+     */
     override fun onCreateView(
         inflater: LayoutInflater,
         container: ViewGroup?,
@@ -77,6 +76,9 @@ class PermissionsFragment : Fragment() {
         return binding.root
     }
 
+    /**
+     * onViewCreated
+     */
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
 
@@ -90,9 +92,13 @@ class PermissionsFragment : Fragment() {
 
     private fun setupView() {
         binding.notNowButton.setOnClickListener {
+            Analytics.tracker.trackEvent(OnboardingInitialPageNotNowButtonPressedEvent)
             (requireActivity() as ManagerActivity).destroyPermissionsFragment()
         }
-        binding.setupButton.setOnClickListener { viewModel.grantAskForPermissions() }
+        binding.setupButton.setOnClickListener {
+            Analytics.tracker.trackEvent(OnboardingInitialPageSetUpMegaButtonPressedEvent)
+            viewModel.grantAskForPermissions()
+        }
         binding.notNowButton2.setOnClickListener { setNextPermission() }
     }
 
