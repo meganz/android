@@ -223,13 +223,15 @@ class TransfersViewModel @Inject constructor(
      * @param transfer updated item
      */
     private fun updateTransfer(transfer: Transfer) {
-        val current = activeTransfer.value.toMutableList()
-        current.indexOfFirst { it.tag == transfer.tag }
-            .takeIf { pos -> pos in current.indices }
-            ?.let { pos ->
-                current[pos] = transfer
-                _activeTransfers.update { current }
-            }
+        viewModelScope.launch(ioDispatcher) {
+            val current = activeTransfer.value.toMutableList()
+            current.indexOfFirst { it.tag == transfer.tag }
+                .takeIf { pos -> pos in current.indices }
+                ?.let { pos ->
+                    current[pos] = transfer
+                    _activeTransfers.update { current }
+                }
+        }
     }
 
     /**
@@ -313,10 +315,12 @@ class TransfersViewModel @Inject constructor(
      * @param transfer transfer to add
      */
     private fun startTransfer(transfer: Transfer) {
-        val current = activeTransfer.value.toMutableList()
-        current.add(transfer)
-        current.sortBy { it.priority }
-        _activeTransfers.update { current }
+        viewModelScope.launch(ioDispatcher) {
+            val current = activeTransfer.value.toMutableList()
+            current.add(transfer)
+            current.sortBy { it.priority }
+            _activeTransfers.update { current }
+        }
     }
 
     /**
@@ -325,17 +329,19 @@ class TransfersViewModel @Inject constructor(
      * @param transfer
      */
     private fun transferFinished(transfer: Transfer) {
-        val current = activeTransfer.value.toMutableList()
-        current.indexOfFirst {
-            it.tag == transfer.tag
-        }.takeIf { pos -> pos in current.indices }
-            ?.let { pos ->
-                current.removeAt(pos)
-                _activeTransfers.update { current }
-                _activeState.update {
-                    ActiveTransfersState.TransferFinishedUpdated(pos, current)
+        viewModelScope.launch(ioDispatcher) {
+            val current = activeTransfer.value.toMutableList()
+            current.indexOfFirst {
+                it.tag == transfer.tag
+            }.takeIf { pos -> pos in current.indices }
+                ?.let { pos ->
+                    current.removeAt(pos)
+                    _activeTransfers.update { current }
+                    _activeState.update {
+                        ActiveTransfersState.TransferFinishedUpdated(pos, current)
+                    }
                 }
-            }
+        }
     }
 
     /**
