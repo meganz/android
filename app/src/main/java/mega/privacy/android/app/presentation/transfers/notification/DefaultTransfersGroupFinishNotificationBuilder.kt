@@ -21,11 +21,13 @@ import mega.privacy.android.data.mapper.transfer.TransfersGroupFinishNotificatio
 import mega.privacy.android.domain.entity.transfer.ActiveTransferTotals
 import mega.privacy.android.domain.entity.transfer.TransferType
 import mega.privacy.android.domain.usecase.featureflag.GetFeatureFlagValueUseCase
+import mega.privacy.android.domain.usecase.offline.IsOfflinePathUseCase
 import javax.inject.Inject
 
 class DefaultTransfersGroupFinishNotificationBuilder @Inject constructor(
     @ApplicationContext private val context: Context,
     private val getFeatureFlagValueUseCase: GetFeatureFlagValueUseCase,
+    private val isOfflinePathUseCase: IsOfflinePathUseCase,
 ) : TransfersGroupFinishNotificationBuilder {
     private val resources get() = context.resources
     override suspend fun invoke(
@@ -63,9 +65,14 @@ class DefaultTransfersGroupFinishNotificationBuilder @Inject constructor(
             )
         } + (titleSuffix?.let { ". $it." } ?: "")
 
+        val destination = if (isOfflinePathUseCase(group.destination)) {
+            context.getString(R.string.section_saved_for_offline_new)
+        } else {
+            group.destination
+        }
         val contentText = resources.getString(
             sharedR.string.transfers_notification_location_content,
-            group.destination,
+            destination,
         )
 
         val intent = if (getFeatureFlagValueUseCase(AppFeatures.TransfersSection)) {

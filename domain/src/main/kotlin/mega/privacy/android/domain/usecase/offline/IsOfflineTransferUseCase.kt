@@ -8,7 +8,7 @@ import javax.inject.Inject
  * Check if a Transfer is to downloading a node for offline use
  */
 class IsOfflineTransferUseCase @Inject constructor(
-    private val fileSystemRepository: FileSystemRepository,
+    private val isOfflinePathUseCase: IsOfflinePathUseCase
 ) {
 
     /**
@@ -17,6 +17,5 @@ class IsOfflineTransferUseCase @Inject constructor(
      * @return true if it's a download for offline use
      */
     suspend operator fun invoke(transfer: Transfer) =
-        transfer.localPath.startsWith(fileSystemRepository.getOfflinePath())
-                || transfer.localPath.startsWith(fileSystemRepository.getOfflineBackupsPath())
+        isOfflinePathUseCase(transfer.localPath)
 }
