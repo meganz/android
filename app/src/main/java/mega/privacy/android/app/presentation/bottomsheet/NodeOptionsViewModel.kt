@@ -25,6 +25,9 @@ import mega.privacy.android.domain.usecase.GetNodeByIdUseCase
 import mega.privacy.android.domain.usecase.IsHiddenNodesOnboardedUseCase
 import mega.privacy.android.domain.usecase.UpdateNodeSensitiveUseCase
 import mega.privacy.android.domain.usecase.account.MonitorAccountDetailUseCase
+import mega.privacy.android.domain.usecase.camerauploads.GetPrimarySyncHandleUseCase
+import mega.privacy.android.domain.usecase.camerauploads.GetSecondaryFolderNodeUseCase
+import mega.privacy.android.domain.usecase.chat.GetMyChatsFilesFolderIdUseCase
 import mega.privacy.android.domain.usecase.contact.GetContactUserNameFromDatabaseUseCase
 import mega.privacy.android.domain.usecase.favourites.IsAvailableOfflineUseCase
 import mega.privacy.android.domain.usecase.network.MonitorConnectivityUseCase
@@ -61,6 +64,9 @@ class NodeOptionsViewModel @Inject constructor(
     private val isHidingActionAllowedUseCase: IsHidingActionAllowedUseCase,
     private val isAvailableOfflineUseCase: IsAvailableOfflineUseCase,
     private val getBusinessStatusUseCase: GetBusinessStatusUseCase,
+    private val getCameraUploadsFolderHandleUseCase: GetPrimarySyncHandleUseCase,
+    private val getMediaUploadsFolderHandleUseCase: GetSecondaryFolderNodeUseCase,
+    private val getMyChatsFilesFolderIdUseCase: GetMyChatsFilesFolderIdUseCase,
     savedStateHandle: SavedStateHandle,
 ) : ViewModel() {
 
@@ -137,10 +143,15 @@ class NodeOptionsViewModel @Inject constructor(
                 val isHiddenNodesOnboarded = isHiddenNodesOnboardedUseCase()
                 val isHidingActionAllowed =
                     isHidingActionAllowedUseCase(NodeId(nodeId))
+                val isCameraUploadsFolder = nodeId == getCameraUploadsFolderHandleUseCase()
+                val isMediaUploadsFolder =
+                    nodeId == (getMediaUploadsFolderHandleUseCase()?.id?.longValue ?: false)
+                val isMyChatFilesFolder = nodeId == getMyChatsFilesFolderIdUseCase()?.longValue
                 _state.update {
                     it.copy(
                         isHiddenNodesOnboarded = isHiddenNodesOnboarded,
                         isHidingActionAllowed = isHidingActionAllowed,
+                        isUserAttributeFolder = isCameraUploadsFolder || isMediaUploadsFolder || isMyChatFilesFolder,
                     )
                 }
             }.onFailure {

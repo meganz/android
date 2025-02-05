@@ -25,6 +25,9 @@ import mega.privacy.android.domain.usecase.GetNodeByIdUseCase
 import mega.privacy.android.domain.usecase.IsHiddenNodesOnboardedUseCase
 import mega.privacy.android.domain.usecase.UpdateNodeSensitiveUseCase
 import mega.privacy.android.domain.usecase.account.MonitorAccountDetailUseCase
+import mega.privacy.android.domain.usecase.camerauploads.GetPrimarySyncHandleUseCase
+import mega.privacy.android.domain.usecase.camerauploads.GetSecondaryFolderNodeUseCase
+import mega.privacy.android.domain.usecase.chat.GetMyChatsFilesFolderIdUseCase
 import mega.privacy.android.domain.usecase.contact.GetContactUserNameFromDatabaseUseCase
 import mega.privacy.android.domain.usecase.favourites.IsAvailableOfflineUseCase
 import mega.privacy.android.domain.usecase.network.MonitorConnectivityUseCase
@@ -113,6 +116,9 @@ class NodeOptionsViewModelTest {
         }.thenReturn(nodeDeviceCenterInformationFlow)
     }
     private val getBusinessStatusUseCase = mock<GetBusinessStatusUseCase>()
+    private val getCameraUploadsFolderHandleUseCase = mock<GetPrimarySyncHandleUseCase>()
+    private val getMediaUploadsFolderHandleUseCase = mock<GetSecondaryFolderNodeUseCase>()
+    private val getMyChatsFilesFolderIdUseCase = mock<GetMyChatsFilesFolderIdUseCase>()
 
     @BeforeEach
     fun setUp() {
@@ -130,6 +136,9 @@ class NodeOptionsViewModelTest {
             isHidingActionAllowedUseCase = isHidingActionAllowedUseCase,
             isAvailableOfflineUseCase = isAvailableOfflineUseCase,
             getBusinessStatusUseCase = getBusinessStatusUseCase,
+            getCameraUploadsFolderHandleUseCase = getCameraUploadsFolderHandleUseCase,
+            getMediaUploadsFolderHandleUseCase = getMediaUploadsFolderHandleUseCase,
+            getMyChatsFilesFolderIdUseCase = getMyChatsFilesFolderIdUseCase,
             savedStateHandle = savedStateHandle,
         )
     }
