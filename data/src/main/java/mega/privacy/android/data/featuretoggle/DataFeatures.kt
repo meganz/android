@@ -30,7 +30,7 @@ enum class DataFeatures(
      */
     ShowGroupedDownloadNotifications(
         "Show a single download finish notifications for each user action",
-        false,
+        true,
     ),
     ;
 
