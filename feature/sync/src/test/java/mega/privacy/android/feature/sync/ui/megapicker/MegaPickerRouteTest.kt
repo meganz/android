@@ -38,4 +38,40 @@ class MegaPickerRouteTest {
         composeTestRule.onNodeWithTag(TAG_SYNC_MEGA_FOLDER_PICKER_LIST_SCREEN_NO_ITEMS)
             .assertIsDisplayed()
     }
+
+    @Test
+    fun `test that loading state is displayed at init when the nodes list is null`() {
+        whenever(state.value).thenReturn(MegaPickerState())
+        whenever(viewModel.state).thenReturn(state)
+        composeTestRule.setContent {
+            MegaPickerRoute(
+                viewModel = viewModel,
+                syncPermissionsManager = mock(),
+                folderSelected = {},
+                backClicked = {},
+                fileTypeIconMapper = mock(),
+            )
+        }
+
+        composeTestRule.onNodeWithTag(TAG_SYNC_MEGA_FOLDER_PICKER_LOADING_SATE)
+            .assertIsDisplayed()
+    }
+
+    @Test
+    fun `test that loading state is displayed when isLoading state property is set`() {
+        whenever(state.value).thenReturn(MegaPickerState(isLoading = true))
+        whenever(viewModel.state).thenReturn(state)
+        composeTestRule.setContent {
+            MegaPickerRoute(
+                viewModel = viewModel,
+                syncPermissionsManager = mock(),
+                folderSelected = {},
+                backClicked = {},
+                fileTypeIconMapper = mock(),
+            )
+        }
+
+        composeTestRule.onNodeWithTag(TAG_SYNC_MEGA_FOLDER_PICKER_LOADING_SATE)
+            .assertIsDisplayed()
+    }
 }

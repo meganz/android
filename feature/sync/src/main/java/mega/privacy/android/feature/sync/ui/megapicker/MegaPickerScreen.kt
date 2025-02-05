@@ -44,12 +44,13 @@ import nz.mega.sdk.MegaApiJava
 @Composable
 internal fun MegaPickerScreen(
     currentFolder: Node?,
-    nodes: List<TypedNodeUiModel>,
+    nodes: List<TypedNodeUiModel>?,
     folderClicked: (TypedNode) -> Unit,
     currentFolderSelected: () -> Unit,
     fileTypeIconMapper: FileTypeIconMapper,
     errorMessageId: Int?,
     errorMessageShown: () -> Unit,
+    isLoading: Boolean,
     isSelectEnabled: Boolean,
     onCreateNewFolderDialogSuccess: (String) -> Unit = {},
     isStopBackupMegaPicker: Boolean = false,
@@ -102,6 +103,7 @@ internal fun MegaPickerScreen(
                 currentFolderSelected = currentFolderSelected,
                 fileTypeIconMapper = fileTypeIconMapper,
                 modifier = Modifier.padding(paddingValues),
+                isLoading = isLoading,
                 isSelectEnabled = isSelectEnabled,
                 isStopBackupMegaPicker = isStopBackupMegaPicker,
             )
@@ -138,10 +140,11 @@ internal fun MegaPickerScreen(
 
 @Composable
 private fun MegaPickerScreenContent(
-    nodes: List<TypedNodeUiModel>,
+    nodes: List<TypedNodeUiModel>?,
     folderClicked: (TypedNode) -> Unit,
     currentFolderSelected: () -> Unit,
     fileTypeIconMapper: FileTypeIconMapper,
+    isLoading: Boolean,
     isSelectEnabled: Boolean,
     isStopBackupMegaPicker: Boolean,
     modifier: Modifier = Modifier,
@@ -161,7 +164,8 @@ private fun MegaPickerScreenContent(
             onFolderClick = {
                 folderClicked(it)
             },
-            fileTypeIconMapper = fileTypeIconMapper
+            fileTypeIconMapper = fileTypeIconMapper,
+            isLoading = isLoading,
         )
 
         Box(
@@ -200,6 +204,7 @@ private fun SyncNewFolderScreenPreview(
             FileTypeIconMapper(),
             errorMessageId = null,
             errorMessageShown = {},
+            isLoading = false,
             isSelectEnabled = isSelectEnabled,
         )
     }

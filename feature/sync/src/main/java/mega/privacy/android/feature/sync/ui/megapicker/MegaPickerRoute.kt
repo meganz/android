@@ -40,29 +40,27 @@ internal fun MegaPickerRoute(
         selectCurrentFolder(viewModel, syncPermissionsManager)
     }
 
-    state.value.nodes?.let { nodes ->
-        MegaPickerScreen(
-            currentFolder = state.value.currentFolder,
-            nodes = nodes,
-            folderClicked = { viewModel.handleAction(FolderClicked(it)) },
-            currentFolderSelected = {
-                selectCurrentFolder(viewModel, syncPermissionsManager)
-            },
-            fileTypeIconMapper = fileTypeIconMapper,
-            errorMessageId = state.value.errorMessageId,
-            errorMessageShown = {
-                viewModel.handleAction(MegaPickerAction.ErrorMessageShown)
-            },
-            onCreateNewFolderDialogSuccess = { newFolderName ->
-                viewModel.createFolder(
-                    newFolderName = newFolderName,
-                    parentNode = state.value.currentFolder
-                )
-            },
-            isSelectEnabled = isStopBackupMegaPicker || state.value.isSelectEnabled,
-            isStopBackupMegaPicker = isStopBackupMegaPicker,
-        )
-    }
+    MegaPickerScreen(
+        currentFolder = state.value.currentFolder,
+        nodes = state.value.nodes,
+        folderClicked = { viewModel.handleAction(FolderClicked(it)) },
+        currentFolderSelected = {
+            selectCurrentFolder(viewModel, syncPermissionsManager)
+        },
+        fileTypeIconMapper = fileTypeIconMapper,
+        errorMessageId = state.value.errorMessageId,
+        errorMessageShown = {
+            viewModel.handleAction(MegaPickerAction.ErrorMessageShown)
+        },
+        onCreateNewFolderDialogSuccess = { newFolderName ->
+            viewModel.createFolder(
+                newFolderName = newFolderName, parentNode = state.value.currentFolder
+            )
+        },
+        isLoading = state.value.isLoading,
+        isSelectEnabled = isStopBackupMegaPicker || state.value.isSelectEnabled,
+        isStopBackupMegaPicker = isStopBackupMegaPicker,
+    )
 
     val onBack = {
         if (state.value.currentFolder?.parentId?.longValue != MegaApiJava.INVALID_HANDLE) {
