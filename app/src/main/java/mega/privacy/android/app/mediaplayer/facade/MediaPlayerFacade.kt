@@ -66,6 +66,12 @@ class MediaPlayerFacade @Inject constructor(
     private var playerNotificationManager: PlayerNotificationManager? = null
     private var notificationDismissed = false
 
+    @Volatile
+    private var isSubtitleHidden = false
+
+    @Volatile
+    private var hasSwitchTrackOnInit = false
+
     override fun createPlayer(
         shuffleEnabled: Boolean?,
         shuffleOrder: ShuffleOrder?,
@@ -91,6 +97,7 @@ class MediaPlayerFacade @Inject constructor(
                             handle = mediaItem?.mediaId,
                             isUpdateName = reason != Player.MEDIA_ITEM_TRANSITION_REASON_PLAYLIST_CHANGED
                         )
+                        hasSwitchTrackOnInit = false
                     }
 
                     override fun onShuffleModeEnabledChanged(shuffleModeEnabled: Boolean) {
@@ -162,6 +169,7 @@ class MediaPlayerFacade @Inject constructor(
     }
 
     private fun switchRendererToTextTrackType() {
+        if (hasSwitchTrackOnInit && isSubtitleHidden) return
         val mappedTrackInfo = trackSelector.currentMappedTrackInfo
         val mediaUri = exoPlayer.currentMediaItem?.localConfiguration?.uri
         if (mappedTrackInfo != null) {
@@ -180,6 +188,9 @@ class MediaPlayerFacade @Inject constructor(
                 ?: Timber.d("SwitchTrackInfo: There is no text track type found, the media uri: $mediaUri")
         } else {
             Timber.d("SwitchTrackInfo: There is no mapped track info found, the media uri: $mediaUri")
+        }
+        if (!hasSwitchTrackOnInit) {
+            hasSwitchTrackOnInit = true
         }
     }
 
@@ -317,6 +328,7 @@ class MediaPlayerFacade @Inject constructor(
         if (::exoPlayer.isInitialized) {
             exoPlayer.release()
         }
+        hasSwitchTrackOnInit = false
     }
 
     override fun playerSeekTo(index: Int) {
@@ -444,11 +456,13 @@ class MediaPlayerFacade @Inject constructor(
 
 
     override fun showSubtitle() {
+        isSubtitleHidden = false
         trackSelector.parameters = DefaultTrackSelector.Parameters.Builder(context)
             .setTrackTypeDisabled(C.TRACK_TYPE_TEXT, false).build()
     }
 
     override fun hideSubtitle() {
+        isSubtitleHidden = true
         trackSelector.parameters = DefaultTrackSelector.Parameters.Builder(context)
             .setTrackTypeDisabled(C.TRACK_TYPE_TEXT, true).build()
     }
