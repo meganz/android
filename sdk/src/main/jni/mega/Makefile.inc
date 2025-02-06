@@ -75,7 +75,11 @@ CPP_SOURCES= sdk/src/attrmap.cpp \
     sdk/src/user_attribute_manager.cpp \
     sdk/src/transferstats.cpp \
     sdk/src/tlv.cpp \
-    sdk/src/syncinternals.cpp
+    sdk/src/syncinternals/syncinternals.cpp \
+    sdk/src/syncinternals/syncuploadthrottlingfile.cpp \
+    sdk/src/syncinternals/syncuploadthrottlingmanager.cpp \
+
+
 
 C_SOURCES = sdk/src/mega_glob.c
 
@@ -148,7 +152,11 @@ HEADERS= sdk/include/mega.h \
         sdk/include/mega/user_attribute_types.h \
         sdk/include/mega/transferstats.h \
         sdk/include/mega/tlv.h \
-        sdk/include/mega/syncinternals.h
+        sdk/include/mega/syncinternals/syncinternals.h \
+        sdk/include/mega/syncinternals/syncinternals_logging.h \
+        sdk/include/mega/syncinternals/synciuploadthrottlingmanager.h \
+        sdk/include/mega/syncinternals/syncuploadthrottlingfile.h \
+        sdk/include/mega/syncinternals/syncuploadthrottlingmanager.h
 
 # impl layer headers
 HEADERS += \
