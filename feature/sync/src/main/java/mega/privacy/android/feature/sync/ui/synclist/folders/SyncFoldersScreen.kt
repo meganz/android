@@ -54,7 +54,8 @@ internal fun SyncFoldersScreen(
     cardExpanded: (CardExpanded) -> Unit,
     pauseRunClicked: (SyncUiItem) -> Unit,
     removeFolderClicked: (SyncUiItem) -> Unit,
-    addFolderClicked: () -> Unit,
+    onAddNewSyncClicked: () -> Unit,
+    onAddNewBackupClicked: () -> Unit,
     issuesInfoClicked: () -> Unit,
     onOpenDeviceFolderClicked: (String) -> Unit,
     onOpenMegaFolderClicked: (SyncUiItem) -> Unit,
@@ -78,7 +79,8 @@ internal fun SyncFoldersScreen(
             } else if (syncUiItems.isEmpty()) {
                 item {
                     SyncFoldersScreenEmptyState(
-                        addFolderClicked = addFolderClicked,
+                        onAddNewSyncClicked = onAddNewSyncClicked,
+                        onAddNewBackupClicked = onAddNewBackupClicked,
                         isBackupForAndroidEnabled = isBackupForAndroidEnabled,
                         modifier = Modifier
                             .fillParentMaxHeight()
@@ -123,26 +125,26 @@ internal fun SyncFoldersScreen(
 
 @Composable
 private fun SyncFoldersScreenEmptyState(
-    addFolderClicked: () -> Unit,
+    onAddNewSyncClicked: () -> Unit,
+    onAddNewBackupClicked: () -> Unit,
     isBackupForAndroidEnabled: Boolean,
     modifier: Modifier = Modifier,
 ) {
+    val isLandscape =
+        LocalConfiguration.current.orientation == Configuration.ORIENTATION_LANDSCAPE
+
     Column(
         modifier = if (isBackupForAndroidEnabled) {
             modifier
                 .verticalScroll(rememberScrollState())
-                .padding(all = 48.dp)
+                .padding(all = if (isLandscape) 0.dp else 48.dp)
         } else {
             modifier
                 .verticalScroll(rememberScrollState())
                 .padding(horizontal = 32.dp)
         },
         horizontalAlignment = Alignment.CenterHorizontally,
-        verticalArrangement = if (isBackupForAndroidEnabled) {
-            Arrangement.Top
-        } else {
-            Arrangement.Center
-        }
+        verticalArrangement = Arrangement.Center,
     ) {
         Image(
             painterResource(R.drawable.no_syncs_placeholder),
@@ -176,17 +178,31 @@ private fun SyncFoldersScreenEmptyState(
             )
         }
 
-        val isLandscape =
-            LocalConfiguration.current.orientation == Configuration.ORIENTATION_LANDSCAPE
-
-        if (isBackupForAndroidEnabled.not()) {
+        if (isBackupForAndroidEnabled) {
             RaisedDefaultMegaButton(
                 textId = sharedResR.string.device_center_sync_add_new_syn_button_option,
-                onClick = addFolderClicked,
+                onClick = onAddNewSyncClicked,
+                modifier = Modifier
+                    .padding(top = if (isLandscape) 32.dp else 48.dp)
+                    .defaultMinSize(minWidth = 232.dp)
+                    .testTag(TEST_TAG_SYNC_LIST_SCREEN_EMPTY_STATUS_SYNC_BUTTON),
+            )
+            RaisedDefaultMegaButton(
+                textId = sharedResR.string.device_center_sync_add_new_backup_button_option,
+                onClick = onAddNewBackupClicked,
+                modifier = Modifier
+                    .padding(top = 24.dp)
+                    .defaultMinSize(minWidth = 232.dp)
+                    .testTag(TEST_TAG_SYNC_LIST_SCREEN_EMPTY_STATUS_BACKUP_BUTTON),
+            )
+        } else {
+            RaisedDefaultMegaButton(
+                textId = sharedResR.string.device_center_sync_add_new_syn_button_option,
+                onClick = onAddNewSyncClicked,
                 modifier = Modifier
                     .padding(top = if (isLandscape) 32.dp else 162.dp)
                     .defaultMinSize(minWidth = 232.dp)
-                    .testTag(TEST_TAG_SYNC_LIST_SCREEN_EMPTY_STATUS_BUTTON),
+                    .testTag(TEST_TAG_SYNC_LIST_SCREEN_EMPTY_STATUS_SYNC_BUTTON),
             )
         }
     }
@@ -225,7 +241,8 @@ private fun SyncFoldersScreenEmptyStatePreview(
             cardExpanded = {},
             pauseRunClicked = {},
             removeFolderClicked = {},
-            addFolderClicked = {},
+            onAddNewSyncClicked = {},
+            onAddNewBackupClicked = {},
             issuesInfoClicked = {},
             onOpenDeviceFolderClicked = {},
             onOpenMegaFolderClicked = {},
@@ -249,7 +266,8 @@ private fun SyncFoldersScreenLoadingStatePreview() {
             cardExpanded = {},
             pauseRunClicked = {},
             removeFolderClicked = {},
-            addFolderClicked = {},
+            onAddNewSyncClicked = {},
+            onAddNewBackupClicked = {},
             issuesInfoClicked = {},
             onOpenDeviceFolderClicked = {},
             onOpenMegaFolderClicked = {},
@@ -284,7 +302,8 @@ private fun SyncFoldersScreenSyncingPreview(
             cardExpanded = {},
             pauseRunClicked = {},
             removeFolderClicked = {},
-            addFolderClicked = {},
+            onAddNewSyncClicked = {},
+            onAddNewBackupClicked = {},
             issuesInfoClicked = {},
             onOpenDeviceFolderClicked = {},
             onOpenMegaFolderClicked = {},
@@ -319,7 +338,8 @@ private fun SyncFoldersScreenSyncingWithStalledIssuesPreview(
             cardExpanded = {},
             pauseRunClicked = {},
             removeFolderClicked = {},
-            addFolderClicked = {},
+            onAddNewSyncClicked = {},
+            onAddNewBackupClicked = {},
             issuesInfoClicked = {},
             onOpenDeviceFolderClicked = {},
             onOpenMegaFolderClicked = {},
@@ -333,9 +353,9 @@ private fun SyncFoldersScreenSyncingWithStalledIssuesPreview(
 
 internal const val TEST_TAG_SYNC_LIST_SCREEN_EMPTY_STATUS_TEXT =
     "sync_list_screen_empty_status_text"
-internal const val TEST_TAG_SYNC_LIST_SCREEN_EMPTY_STATUS_TEXT_FOR_FREE_ACCOUNTS =
-    "sync_list_screen_empty_status_text_for_free_accounts"
-internal const val TEST_TAG_SYNC_LIST_SCREEN_EMPTY_STATUS_BUTTON =
-    "sync_list_screen_empty_status_button"
+internal const val TEST_TAG_SYNC_LIST_SCREEN_EMPTY_STATUS_SYNC_BUTTON =
+    "sync_list_screen:empty_status:sync_button"
+internal const val TEST_TAG_SYNC_LIST_SCREEN_EMPTY_STATUS_BACKUP_BUTTON =
+    "sync_list_screen:empty_status:backup_button"
 internal const val TEST_TAG_SYNC_LIST_SCREEN_FAB = "sync_list_screen:fab"
 internal const val TEST_TAG_SYNC_LIST_SCREEN_LOADING_STATE = "sync_list_screen:loading_state"

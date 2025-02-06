@@ -26,7 +26,8 @@ import mega.privacy.android.shared.original.core.ui.utils.showAutoDurationSnackb
 
 @Composable
 internal fun SyncFoldersRoute(
-    addFolderClicked: () -> Unit,
+    onAddNewSyncClicked: () -> Unit,
+    onAddNewBackupClicked: () -> Unit,
     onSelectStopBackupDestinationClicked: () -> Unit,
     issuesInfoClicked: () -> Unit,
     onOpenMegaFolderClicked: (handle: Long) -> Unit,
@@ -47,7 +48,8 @@ internal fun SyncFoldersRoute(
         removeFolderClicked = {
             viewModel.handleAction(RemoveFolderClicked(it))
         },
-        addFolderClicked = addFolderClicked,
+        onAddNewSyncClicked = onAddNewSyncClicked,
+        onAddNewBackupClicked = onAddNewBackupClicked,
         issuesInfoClicked = issuesInfoClicked,
         onOpenDeviceFolderClicked = { deviceStoragePath ->
             context.startActivity(

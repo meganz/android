@@ -73,9 +73,14 @@ class SyncListRouteTest {
 
     @Before
     fun setupMock(): Unit = runBlocking {
-        whenever(state.value).thenReturn(SyncListState())
+        whenever(state.value).thenReturn(SyncListState(enabledFlags = setOf(SyncFeatures.BackupForAndroid)))
         whenever(viewModel.state).thenReturn(state)
-        whenever(syncFoldersUiState.value).thenReturn(SyncFoldersUiState(syncUiItems = synUiItems))
+        whenever(syncFoldersUiState.value).thenReturn(
+            SyncFoldersUiState(
+                syncUiItems = synUiItems,
+                enabledFlags = setOf(SyncFeatures.BackupForAndroid)
+            )
+        )
         whenever(syncFoldersViewModel.uiState).thenReturn(syncFoldersUiState)
         whenever(syncStalledIssuesState.value).thenReturn(SyncStalledIssuesState(emptyList()))
         whenever(syncStalledIssuesViewModel.state).thenReturn(syncStalledIssuesState)
@@ -102,16 +107,6 @@ class SyncListRouteTest {
 
     @Test
     fun `test that tap on and expand the multi FAB sends the right analytics tracker event`() {
-        whenever(state.value).thenReturn(
-            SyncListState(enabledFlags = setOf(SyncFeatures.BackupForAndroid))
-        )
-        whenever(viewModel.state).thenReturn(state)
-        whenever(syncFoldersUiState.value).thenReturn(
-            SyncFoldersUiState(
-                syncUiItems = emptyList(),
-                enabledFlags = setOf(SyncFeatures.BackupForAndroid),
-            )
-        )
         setComposeContent()
         composeTestRule.onNodeWithTag(MULTI_FAB_MAIN_FAB_TEST_TAG).performClick()
         assertThat(analyticsRule.events).contains(AndroidSyncMultiFABButtonPressedEvent)
@@ -119,16 +114,6 @@ class SyncListRouteTest {
 
     @Test
     fun `test that tap on Backup FAB sends the right analytics tracker event`() {
-        whenever(state.value).thenReturn(
-            SyncListState(enabledFlags = setOf(SyncFeatures.BackupForAndroid))
-        )
-        whenever(viewModel.state).thenReturn(state)
-        whenever(syncFoldersUiState.value).thenReturn(
-            SyncFoldersUiState(
-                syncUiItems = emptyList(),
-                enabledFlags = setOf(SyncFeatures.BackupForAndroid),
-            )
-        )
         setComposeContent()
         composeTestRule.onNodeWithTag(MULTI_FAB_MAIN_FAB_TEST_TAG).performClick()
         composeTestRule.onNodeWithTag(

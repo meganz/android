@@ -181,9 +181,9 @@ internal fun SyncListScreen(
                 }
             },
             floatingActionButton = {
-                if (isBackupForAndroidEnabled) {
-                    MegaMultiFloatingActionButton(
-                        items = listOf(
+                if (syncFoldersState.syncUiItems.isNotEmpty() || syncFoldersState.isLoading) {
+                    if (isBackupForAndroidEnabled) {
+                        MegaMultiFloatingActionButton(items = listOf(
                             MultiFloatingActionButtonItem(
                                 icon = painterResource(id = iconPackR.drawable.ic_sync_01),
                                 label = stringResource(id = R.string.sync_toolbar_title),
@@ -204,21 +204,18 @@ internal fun SyncListScreen(
                                 },
                             ),
                         ),
-                        modifier = Modifier.testTag(TEST_TAG_SYNC_LIST_SCREEN_FAB),
-                        multiFabState = multiFabState,
-                        onStateChanged = { state ->
-                            if (state == MultiFloatingActionButtonState.EXPANDED) {
-                                Analytics.tracker.trackEvent(
-                                    AndroidSyncMultiFABButtonPressedEvent
-                                )
-                            }
-                            onFabExpanded(state == MultiFloatingActionButtonState.EXPANDED)
-                            multiFabState.value = state
-                        }
-                    )
-
-                } else {
-                    if (syncFoldersState.syncUiItems.isNotEmpty() || syncFoldersState.isLoading) {
+                            modifier = Modifier.testTag(TEST_TAG_SYNC_LIST_SCREEN_FAB),
+                            multiFabState = multiFabState,
+                            onStateChanged = { state ->
+                                if (state == MultiFloatingActionButtonState.EXPANDED) {
+                                    Analytics.tracker.trackEvent(
+                                        AndroidSyncMultiFABButtonPressedEvent
+                                    )
+                                }
+                                onFabExpanded(state == MultiFloatingActionButtonState.EXPANDED)
+                                multiFabState.value = state
+                            })
+                    } else {
                         MegaFloatingActionButton(
                             onClick = onSyncFolderClicked,
                             modifier = Modifier.testTag(TEST_TAG_SYNC_LIST_SCREEN_FAB)
@@ -253,7 +250,8 @@ internal fun SyncListScreen(
                             modalSheetState.show()
                         }
                     },
-                    addFolderClicked = onSyncFolderClicked,
+                    onAddNewSyncClicked = onSyncFolderClicked,
+                    onAddNewBackupClicked = onBackupFolderClicked,
                     onOpenMegaFolderClicked = onOpenMegaFolderClicked,
                     syncPermissionsManager = syncPermissionsManager,
                     onSelectStopBackupDestinationClicked = onSelectStopBackupDestinationClicked,
@@ -278,7 +276,8 @@ private fun SyncListScreenContent(
     stalledIssuesCount: Int,
     stalledIssuesDetailsClicked: (StalledIssueUiItem) -> Unit,
     moreClicked: (StalledIssueUiItem) -> Unit,
-    addFolderClicked: () -> Unit,
+    onAddNewSyncClicked: () -> Unit,
+    onAddNewBackupClicked: () -> Unit,
     onOpenMegaFolderClicked: (handle: Long) -> Unit,
     syncPermissionsManager: SyncPermissionsManager,
     onSelectStopBackupDestinationClicked: () -> Unit,
@@ -336,7 +335,8 @@ private fun SyncListScreenContent(
                 .pullRefresh(pullToRefreshState)
         ) {
             SelectedChipScreen(
-                addFolderClicked = addFolderClicked,
+                onAddNewSyncClicked = onAddNewSyncClicked,
+                onAddNewBackupClicked = onAddNewBackupClicked,
                 onSelectStopBackupDestinationClicked = onSelectStopBackupDestinationClicked,
                 stalledIssueDetailsClicked = stalledIssuesDetailsClicked,
                 onOpenMegaFolderClicked = onOpenMegaFolderClicked,
@@ -391,7 +391,8 @@ private fun HeaderChips(
 
 @Composable
 private fun SelectedChipScreen(
-    addFolderClicked: () -> Unit,
+    onAddNewSyncClicked: () -> Unit,
+    onAddNewBackupClicked: () -> Unit,
     onSelectStopBackupDestinationClicked: () -> Unit,
     onOpenMegaFolderClicked: (handle: Long) -> Unit,
     stalledIssueDetailsClicked: (StalledIssueUiItem) -> Unit,
@@ -409,7 +410,8 @@ private fun SelectedChipScreen(
     when (checkedChip) {
         SYNC_FOLDERS -> {
             SyncFoldersRoute(
-                addFolderClicked = addFolderClicked,
+                onAddNewSyncClicked = onAddNewSyncClicked,
+                onAddNewBackupClicked = onAddNewBackupClicked,
                 onSelectStopBackupDestinationClicked = onSelectStopBackupDestinationClicked,
                 issuesInfoClicked = issuesInfoClicked,
                 viewModel = syncFoldersViewModel,
