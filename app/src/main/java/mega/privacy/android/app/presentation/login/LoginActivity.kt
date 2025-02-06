@@ -347,8 +347,8 @@ class LoginActivity : BaseActivity(), MegaRequestListenerInterface {
     @SuppressLint("SourceLockedOrientationActivity")
     private fun restrictOrientation() {
         requestedOrientation =
-            if (visibleFragment == Constants.TOUR_FRAGMENT) {
-                Timber.d("Tour screen landscape mode allowed")
+            if (visibleFragment == Constants.TOUR_FRAGMENT || visibleFragment == Constants.CREATE_ACCOUNT_FRAGMENT) {
+                Timber.d("Tour/create account screen landscape mode allowed")
                 ActivityInfo.SCREEN_ORIENTATION_FULL_USER
             } else {
                 Timber.d("Other screens landscape mode restricted")

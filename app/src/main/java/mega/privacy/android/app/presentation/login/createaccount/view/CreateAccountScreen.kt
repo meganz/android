@@ -520,7 +520,7 @@ private fun CreateAccountView(
                 }
 
                 Row(
-                    modifier = Modifier.padding(start = 16.dp, top = 32.dp),
+                    modifier = Modifier.padding(start = 16.dp, top = 32.dp, bottom = 16.dp),
                     verticalAlignment = Alignment.CenterVertically
                 ) {
                     RaisedDefaultMegaButton(
@@ -611,7 +611,7 @@ private fun CreateAccountInProgressView(
         modifier = modifier
             .fillMaxWidth()
             .fillMaxHeight()
-            .padding(horizontal = 20.dp)
+            .padding(start = 20.dp, end = 20.dp, bottom = 16.dp)
     ) {
         Image(
             painter = painterResource(id = R.drawable.ic_splash_logo),
