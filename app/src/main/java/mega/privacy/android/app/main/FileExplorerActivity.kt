@@ -222,7 +222,6 @@ class FileExplorerActivity : PasscodeActivity(), MegaRequestListenerInterface,
     private var importFileFragment: ImportFilesFragment? = null
     private var statusDialog: AlertDialog? = null
     private var newFolderDialog: AlertDialog? = null
-    private var filePreparedDocuments: List<DocumentEntity>? = null
     private var mTabsAdapterExplorer: FileExplorerPagerAdapter? = null
     private var nodes: ArrayList<MegaNode>? = null
     private var importFileF = false
@@ -359,8 +358,6 @@ class FileExplorerActivity : PasscodeActivity(), MegaRequestListenerInterface,
             return
         }
 
-        filePreparedDocuments = documents
-
         if (needLogin) {
             val loginIntent = intent.setClass(this@FileExplorerActivity, LoginActivity::class.java)
                 .apply {
@@ -382,7 +379,7 @@ class FileExplorerActivity : PasscodeActivity(), MegaRequestListenerInterface,
         }
 
         if (chatListItems.isNotEmpty()) {
-            onIntentProcessed(filePreparedDocuments)
+            onIntentProcessed(documents)
         } else if (importFileF) {
             when {
                 importFragmentSelected != -1 -> chooseFragment(importFragmentSelected)
@@ -657,7 +654,7 @@ class FileExplorerActivity : PasscodeActivity(), MegaRequestListenerInterface,
     private fun setupObservers() {
         this.lifecycleScope.launch {
             val documents = viewModel.uiState
-                .mapNotNull { filePreparedDocuments -> filePreparedDocuments.documents.takeIf { it.isNotEmpty() } }
+                .mapNotNull { it.documents.takeIf { it.isNotEmpty() } }
                 .flowWithLifecycle(this@FileExplorerActivity.lifecycle, Lifecycle.State.STARTED)
                 .catch {
                     Timber.e(it)
@@ -679,7 +676,6 @@ class FileExplorerActivity : PasscodeActivity(), MegaRequestListenerInterface,
                 viewModel.resetMoveTargetPathState()
             }
         }
-
     }
 
     private fun afterLoginAndFetch() {
@@ -1465,12 +1461,13 @@ class FileExplorerActivity : PasscodeActivity(), MegaRequestListenerInterface,
     private fun startChatUploadService() {
         if (chatListItems.isEmpty()) {
             Timber.w("ERROR null chats to upload")
-            filePreparedDocuments = null
             openManagerAndFinish()
             return
         }
 
-        Timber.d("Launch chat upload with files %s", filePreparedDocuments?.size)
+        val filePreparedDocuments = viewModel.getDocuments()
+
+        Timber.d("Launch chat upload with files %s", filePreparedDocuments.size)
         val notEmptyAttachedNodes = attachNodes.isNotEmpty()
         val notEmptyUploadInfo = uploadDocuments.isNotEmpty()
         filesChecked = 0
@@ -1515,7 +1512,6 @@ class FileExplorerActivity : PasscodeActivity(), MegaRequestListenerInterface,
 
     private fun finishFileExplorer() {
         dismissAlertDialogIfExists(statusDialog)
-        filePreparedDocuments = null
         Timber.d("finish!!!")
         finishAndRemoveTask()
     }
@@ -1524,7 +1520,8 @@ class FileExplorerActivity : PasscodeActivity(), MegaRequestListenerInterface,
      * Checks if files exists in MEGA.
      */
     fun checkIfFilesExistsInMEGA() {
-        for (info in filePreparedDocuments ?: return) {
+        val filePreparedDocuments = viewModel.getDocuments()
+        for (info in filePreparedDocuments) {
             val fingerprint = megaApi.getFingerprint(info.uri.value)
             val node = megaApi.getNodeByFingerprint(fingerprint)
             if (node != null) {
@@ -1548,13 +1545,13 @@ class FileExplorerActivity : PasscodeActivity(), MegaRequestListenerInterface,
                         }.onSuccess {
                             filesChecked++
                             attachNodes.add(node)
-                            if (filesChecked == (filePreparedDocuments ?: return@onSuccess).size) {
+                            if (filesChecked == filePreparedDocuments.size) {
                                 startChatUploadService()
                             }
                         }.onFailure { throwable ->
                             filesChecked++
                             Timber.w("Error copying node into My Chat Files")
-                            if (filesChecked == (filePreparedDocuments ?: return@onFailure).size) {
+                            if (filesChecked == filePreparedDocuments.size) {
                                 startChatUploadService()
                             }
                             manageCopyMoveException(throwable)
@@ -1567,7 +1564,7 @@ class FileExplorerActivity : PasscodeActivity(), MegaRequestListenerInterface,
             }
         }
 
-        if (filesChecked == (filePreparedDocuments ?: return).size) {
+        if (filesChecked == filePreparedDocuments.size) {
             startChatUploadService()
         }
     }
@@ -1601,7 +1598,7 @@ class FileExplorerActivity : PasscodeActivity(), MegaRequestListenerInterface,
     }
 
     private fun onIntentProcessed() {
-        val documents = filePreparedDocuments
+        val documents = viewModel.getDocuments()
 
         if (intent != null && intent.action !== ACTION_PROCESSED) {
             intent.action = ACTION_PROCESSED
@@ -1610,7 +1607,7 @@ class FileExplorerActivity : PasscodeActivity(), MegaRequestListenerInterface,
         Timber.d("intent processed!")
 
         if (folderSelected) {
-            if (documents == null) {
+            if (documents.isEmpty()) {
                 dismissAlertDialogIfExists(statusDialog)
                 showSnackbar(getString(R.string.upload_can_not_open))
                 return
@@ -1759,7 +1756,7 @@ class FileExplorerActivity : PasscodeActivity(), MegaRequestListenerInterface,
                     return
                 }
 
-                if (filePreparedDocuments == null) {
+                if (viewModel.getDocuments().isEmpty()) {
                     viewModel.ownFilePrepareTask(this, intent)
                     createAndShowProgressDialog(
                         false,
@@ -1886,6 +1883,7 @@ class FileExplorerActivity : PasscodeActivity(), MegaRequestListenerInterface,
         }
 
         startActivity(startIntent)
+        finishAndRemoveTask()
     }
 
     /**
@@ -2365,7 +2363,10 @@ class FileExplorerActivity : PasscodeActivity(), MegaRequestListenerInterface,
 
             return
         }
-        if (filePreparedDocuments == null) {
+
+        val filePreparedDocuments = viewModel.getDocuments()
+
+        if (filePreparedDocuments.isEmpty()) {
             createAndShowProgressDialog(
                 false,
                 resources.getQuantityString(R.plurals.upload_prepare, 1)
@@ -2637,7 +2638,6 @@ class FileExplorerActivity : PasscodeActivity(), MegaRequestListenerInterface,
                         it.pathsAndNames.size,
                         null
                     )
-                    finishAndRemoveTask()
                 }
             }
         )

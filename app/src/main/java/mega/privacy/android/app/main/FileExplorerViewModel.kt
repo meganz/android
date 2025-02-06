@@ -521,4 +521,9 @@ class FileExplorerViewModel @Inject constructor(
             it.copy(uploadEvent = consumed())
         }
     }
+
+    /**
+     * Get the documents
+     */
+    fun getDocuments() = uiState.value.documents
 }
