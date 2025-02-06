@@ -8,10 +8,14 @@ import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.emptyFlow
 import kotlinx.coroutines.flow.flowOf
 import kotlinx.coroutines.test.runTest
+import mega.privacy.android.app.interfaces.OnProximitySensorListener
+import mega.privacy.android.app.meeting.gateway.RTCAudioManagerGateway
 import mega.privacy.android.app.presentation.time.mapper.DurationInSecondsTextMapper
+import mega.privacy.android.app.utils.Constants.AUDIO_MANAGER_PLAY_VOICE_CLIP
 import mega.privacy.android.core.test.extension.CoroutineMainDispatcherExtension
 import mega.privacy.android.domain.entity.Progress
 import mega.privacy.android.domain.entity.chat.ChatMessageStatus
+import mega.privacy.android.domain.entity.chat.ProximitySensorState
 import mega.privacy.android.domain.entity.chat.messages.VoiceClipMessage
 import mega.privacy.android.domain.entity.node.NodeId
 import mega.privacy.android.domain.entity.node.chat.ChatDefaultFile
@@ -70,6 +74,7 @@ class VoiceClipMessageViewModelTest {
     private val getCacheFileUseCase: GetCacheFileUseCase = mock()
     private val downloadNodeResultFlow: MutableSharedFlow<MultiTransferEvent> = MutableSharedFlow()
     private val downloadNodesUseCase: DownloadNodesUseCase = mock()
+    private val rtcAudioManagerGateway: RTCAudioManagerGateway = mock()
     private val voiceClipPlayResultFlow: MutableSharedFlow<VoiceClipPlayState> = MutableSharedFlow()
     private val durationInSecondsTextMapper: DurationInSecondsTextMapper = mock()
     private val updateDoesNotExistInMessageUseCase =
@@ -89,8 +94,8 @@ class VoiceClipMessageViewModelTest {
             voiceClipPlayer,
             durationInSecondsTextMapper,
             updateDoesNotExistInMessageUseCase,
+            rtcAudioManagerGateway
         )
-
         whenever(getCacheFileUseCase(any(), any())).thenReturn(cacheFile)
         whenever(
             downloadNodesUseCase(
@@ -105,6 +110,12 @@ class VoiceClipMessageViewModelTest {
             on { length() }.thenReturn(voiceClipMessage.size)
         }
         whenever(durationInSecondsTextMapper(anyOrNull())).thenReturn(mockTimestamp)
+        whenever(
+            rtcAudioManagerGateway.createOrUpdateAudioManager(
+                true,
+                AUDIO_MANAGER_PLAY_VOICE_CLIP
+            )
+        ).thenAnswer { }
     }
 
     @BeforeEach
@@ -115,6 +126,7 @@ class VoiceClipMessageViewModelTest {
             voiceClipPlayer = voiceClipPlayer,
             durationInSecondsTextMapper = durationInSecondsTextMapper,
             updateDoesNotExistInMessageUseCase = updateDoesNotExistInMessageUseCase,
+            rtcAudioManagerGateway = rtcAudioManagerGateway
         )
     }
 
@@ -407,6 +419,69 @@ class VoiceClipMessageViewModelTest {
 
             verifyNoInteractions(voiceClipPlayer)
         }
+
+    @Test
+    fun `test that start proximity sensor`() = runTest {
+        val msgId = 100L
+        initUiStateFlow()
+        testScheduler.advanceUntilIdle()
+        underTest.startProximitySensor(msgId)
+        verify(rtcAudioManagerGateway).createOrUpdateAudioManager(
+            true,
+            AUDIO_MANAGER_PLAY_VOICE_CLIP
+        )
+    }
+
+    @Test
+    fun `test that start proximity sensor when is near`() {
+        val msgId = 100L
+        whenever(rtcAudioManagerGateway.startProximitySensor(any())).thenAnswer {
+            (it.arguments[0] as OnProximitySensorListener).needToUpdate(true)
+            runTest {
+                initUiStateFlow()
+                testScheduler.advanceUntilIdle()
+                underTest.startProximitySensor(msgId)
+
+                underTest.getUiStateFlow(msgId).test {
+                    assertThat(awaitItem().proximitySensorState).isEqualTo(ProximitySensorState.Near)
+                }
+            }
+        }
+    }
+
+    @Test
+    fun `test that start proximity sensor when is far`() {
+        val msgId = 100L
+        whenever(rtcAudioManagerGateway.startProximitySensor(any())).thenAnswer {
+            (it.arguments[0] as OnProximitySensorListener).needToUpdate(false)
+            runTest {
+                whenever(voiceClipPlayer.isPlaying(msgId)).thenReturn(true)
+                whenever(underTest.getUiStateFlow(msgId).value.proximitySensorState).thenReturn(
+                    ProximitySensorState.Near
+                )
+
+                initUiStateFlow()
+                testScheduler.advanceUntilIdle()
+                underTest.startProximitySensor(msgId)
+
+                underTest.getUiStateFlow(msgId).test {
+                    assertThat(awaitItem().proximitySensorState).isEqualTo(ProximitySensorState.Far)
+                    assertThat(awaitItem().isPaused).isTrue()
+                }
+            }
+        }
+    }
+
+    @Test
+    fun `test that stop proximity sensor updates the sensor state`() = runTest {
+        val msgId = 100L
+        initUiStateFlow()
+        testScheduler.advanceUntilIdle()
+        underTest.stopProximitySensor(msgId)
+        underTest.getUiStateFlow(msgId).test {
+            assertThat(awaitItem().proximitySensorState).isEqualTo(ProximitySensorState.Unknown)
+        }
+    }
 
     private fun setCacheFileNotExists() {
         cacheFile.stub {

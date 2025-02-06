@@ -8,10 +8,13 @@ import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.onCompletion
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
+import mega.privacy.android.app.meeting.gateway.RTCAudioManagerGateway
 import mega.privacy.android.app.presentation.time.mapper.DurationInSecondsTextMapper
 import mega.privacy.android.app.utils.CacheFolderManager
+import mega.privacy.android.app.utils.Constants.AUDIO_MANAGER_PLAY_VOICE_CLIP
 import mega.privacy.android.domain.entity.Progress
 import mega.privacy.android.domain.entity.chat.ChatMessageStatus
+import mega.privacy.android.domain.entity.chat.ProximitySensorState
 import mega.privacy.android.domain.entity.chat.messages.VoiceClipMessage
 import mega.privacy.android.domain.entity.node.TypedNode
 import mega.privacy.android.domain.entity.transfer.MultiTransferEvent
@@ -39,6 +42,7 @@ class VoiceClipMessageViewModel @Inject constructor(
     private val voiceClipPlayer: VoiceClipPlayer,
     private val durationInSecondsTextMapper: DurationInSecondsTextMapper,
     private val updateDoesNotExistInMessageUseCase: UpdateDoesNotExistInMessageUseCase,
+    private val rtcAudioManagerGateway: RTCAudioManagerGateway
 ) : ViewModel() {
 
     // key: msgId, value: ui state flow
@@ -210,6 +214,11 @@ class VoiceClipMessageViewModel @Inject constructor(
             if (voiceClipPlayer.isPlaying(msgId)) {
                 pauseVoiceClip(msgId)
             } else {
+                getMutableStateFlow(msgId)?.update {
+                    it.copy(
+                        isPaused = false,
+                    )
+                }
                 val voiceClipFile = getVoiceClipFile(msgId) ?: run {
                     Timber.e("voice clip cache path is invalid for msgId(${msgId})")
                     updateDoesNotExists(msgId)
@@ -224,6 +233,7 @@ class VoiceClipMessageViewModel @Inject constructor(
                 val currentProgress =
                     getMutableStateFlow(msgId)?.value?.playProgress?.floatValue ?: 0f
                 val currentPos = (duration * currentProgress).toInt()
+                startProximitySensor(msgId = msgId)
 
                 voiceClipPlayer.play(
                     key = msgId,
@@ -268,11 +278,18 @@ class VoiceClipMessageViewModel @Inject constructor(
         state: VoiceClipPlayState.Playing,
         msgId: Long,
     ) {
+        getMutableStateFlow(msgId)?.apply {
+            if (value.isPaused) {
+                return
+            }
+        }
+
         val timestamp = durationInSecondsTextMapper(state.pos.milliseconds)
         val playProgress =
             getUiStateFlow(msgId).value.voiceClipMessage?.duration?.let { dur ->
                 Progress(state.pos, dur.inWholeMilliseconds)
             }
+
         getMutableStateFlow(msgId)?.update {
             it.copy(
                 isPlaying = true,
@@ -283,6 +300,7 @@ class VoiceClipMessageViewModel @Inject constructor(
     }
 
     private fun updateUiToNormalState(msgId: Long) {
+        stopProximitySensor(msgId)
         getMutableStateFlow(msgId)?.update {
             it.copy(
                 isPlaying = false,
@@ -296,6 +314,7 @@ class VoiceClipMessageViewModel @Inject constructor(
             .filter { it.value.isPlaying }
             .map { it.value.voiceClipMessage }
             .firstOrNull()?.let {
+                Timber.d("Pause ongoing voice clip, msgId(${it.msgId})")
                 voiceClipPlayer.pause(it.msgId)
                 getMutableStateFlow(it.msgId)?.update { state ->
                     state.copy(
@@ -306,10 +325,51 @@ class VoiceClipMessageViewModel @Inject constructor(
     }
 
     private fun pauseVoiceClip(msgId: Long) {
+        Timber.d("Pause voice clip, msgId($msgId)")
+        stopProximitySensor(msgId)
         voiceClipPlayer.pause(msgId)
         getMutableStateFlow(msgId)?.update {
-            it.copy(isPlaying = false)
+            it.copy(isPlaying = false, isPaused = true)
         }
+    }
+
+    /**
+     *  Create RTC Audio Manager and start proximity sensor
+     */
+    fun startProximitySensor(msgId: Long) {
+        Timber.d("Start proximity sensor")
+        rtcAudioManagerGateway.createOrUpdateAudioManager(
+            isSpeakerOn = true,
+            type = AUDIO_MANAGER_PLAY_VOICE_CLIP
+        )
+
+        rtcAudioManagerGateway.startProximitySensor { isNear ->
+            if (!isNear) {
+                if (getMutableStateFlow(msgId)?.value?.proximitySensorState == ProximitySensorState.Near &&
+                    voiceClipPlayer.isPlaying(msgId)
+                ) {
+                    pauseVoiceClip(msgId)
+                }
+            }
+
+            getMutableStateFlow(msgId)?.update {
+                it.copy(proximitySensorState = if (isNear) ProximitySensorState.Near else ProximitySensorState.Far)
+            }
+        }
+    }
+
+    /**
+     * Unregister proximity sensor and remove RTC Audio manager
+     *
+     * @param msgId
+     */
+    fun stopProximitySensor(msgId: Long) {
+        Timber.d("Stop proximity sensor")
+        getMutableStateFlow(msgId)?.update {
+            it.copy(proximitySensorState = ProximitySensorState.Unknown)
+        }
+        rtcAudioManagerGateway.unregisterProximitySensor()
+        rtcAudioManagerGateway.removeRTCAudioManager()
     }
 
     private fun getMutableStateFlow(msgId: Long) = _uiStateFlowMap[msgId]
