@@ -80,8 +80,6 @@
     <string name="sync_dialog_message_wifi_only">只在WiFi連線</string>
     <!-- Sync empty state message -->
     <string name="sync_empty_state_message">您需要在您的裝置上設定一個本地資料夾，該資料夾將與您雲端硬碟上選定的資料夾同步</string>
-    <!-- Sync stalled issue reason is no reason-->
-    <string name="sync_stalled_issue_no_reason">No reason</string>
     <!-- Sync stalled issue reason is no file issue-->
     <string name="sync_stalled_issue_file_issue">檔案或資料夾問題</string>
     <!-- Sync stalled issue reason is move or rename-->
@@ -108,8 +106,6 @@
     <string name="sync_stalled_issue_local_and_remote_not_synced">檔案或資料夾衝突</string>
     <!-- Sync stalled issue reason is Name clash-->
     <string name="sync_stalled_issue_name_clash">檔案或資料夾名稱衝突</string>
-    <!-- Sync stalled issue reason is Last PlusOne-->
-    <string name="sync_stalled_issue_last_plus_one">Last plus one</string>
     <!-- Sync chip folder chip title-->
     <string name="sync_folders">資料夾</string>
     <!-- Sync stalled issue count chip title for 1 or more stalled issues-->

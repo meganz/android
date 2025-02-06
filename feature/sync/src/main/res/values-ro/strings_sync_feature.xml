@@ -88,8 +88,6 @@
     <string name="sync_dialog_message_wifi_only">Numai Wi-Fi</string>
     <!-- Sync empty state message -->
     <string name="sync_empty_state_message">Va trebui să configurați un folder local pe dispozitivul dvs. care se va sincroniza cu un folder ales de pe Unitatea dvs. cloud</string>
-    <!-- Sync stalled issue reason is no reason-->
-    <string name="sync_stalled_issue_no_reason">No reason</string>
     <!-- Sync stalled issue reason is no file issue-->
     <string name="sync_stalled_issue_file_issue">Problemă de fișier sau folder</string>
     <!-- Sync stalled issue reason is move or rename-->
@@ -116,8 +114,6 @@
     <string name="sync_stalled_issue_local_and_remote_not_synced">Conflict de fișier sau folder</string>
     <!-- Sync stalled issue reason is Name clash-->
     <string name="sync_stalled_issue_name_clash">Conflict de nume de fișier sau folder</string>
-    <!-- Sync stalled issue reason is Last PlusOne-->
-    <string name="sync_stalled_issue_last_plus_one">Last plus one</string>
     <!-- Sync chip folder chip title-->
     <string name="sync_folders">Foldere</string>
     <!-- Sync stalled issue count chip title for 1 or more stalled issues-->

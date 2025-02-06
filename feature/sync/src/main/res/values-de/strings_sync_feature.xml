@@ -84,8 +84,6 @@
     <string name="sync_dialog_message_wifi_only">Nur via WLAN</string>
     <!-- Sync empty state message -->
     <string name="sync_empty_state_message">Sie müssen einen lokalen Ordner auf Ihrem Gerät einrichten, der mit einem ausgewählten Ordner in Ihrem Cloud Drive synchronisiert wird</string>
-    <!-- Sync stalled issue reason is no reason-->
-    <string name="sync_stalled_issue_no_reason">No reason</string>
     <!-- Sync stalled issue reason is no file issue-->
     <string name="sync_stalled_issue_file_issue">Datei- oder Ordnerproblem</string>
     <!-- Sync stalled issue reason is move or rename-->
@@ -112,8 +110,6 @@
     <string name="sync_stalled_issue_local_and_remote_not_synced">Datei- oder Ordnerkonflikt</string>
     <!-- Sync stalled issue reason is Name clash-->
     <string name="sync_stalled_issue_name_clash">Konflikt bei Datei- oder Ordnernamen</string>
-    <!-- Sync stalled issue reason is Last PlusOne-->
-    <string name="sync_stalled_issue_last_plus_one">Last plus one</string>
     <!-- Sync chip folder chip title-->
     <string name="sync_folders">Ordner</string>
     <!-- Sync stalled issue count chip title for 1 or more stalled issues-->
