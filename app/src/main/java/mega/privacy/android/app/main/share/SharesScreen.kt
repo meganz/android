@@ -1,6 +1,5 @@
 package mega.privacy.android.app.main.share
 
-import mega.privacy.android.icon.pack.R as IconR
 import androidx.activity.compose.LocalOnBackPressedDispatcherOwner
 import androidx.compose.foundation.background
 import androidx.compose.foundation.isSystemInDarkTheme
@@ -12,8 +11,6 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.pager.HorizontalPager
 import androidx.compose.foundation.pager.rememberPagerState
 import androidx.compose.material.AppBarDefaults
-import androidx.compose.material.Badge
-import androidx.compose.material.BadgedBox
 import androidx.compose.material.Icon
 import androidx.compose.material.IconButton
 import androidx.compose.material.MaterialTheme
@@ -185,31 +182,18 @@ internal fun SharesScreen(
                     ) {
                         SharesTab.entries.filter { it != SharesTab.NONE }
                             .forEachIndexed { page, item ->
-                                addIconTab(
+                                addTextTab(
                                     text = stringResource(item.stringRes),
-                                    icon = {
-                                        BadgedBox(
-                                            badge = {
-                                                if (item == SharesTab.INCOMING_TAB && unverifiedIncoming > 0) {
-                                                    Badge {
-                                                        Text("$unverifiedIncoming")
-                                                    }
-                                                } else if (item == SharesTab.OUTGOING_TAB && unVerifiedOutgoing > 0) {
-                                                    Badge {
-                                                        Text("$unVerifiedOutgoing")
-                                                    }
-                                                }
-                                            }
-                                        ) {
-                                            Icon(
-                                                painter = painterResource(
-                                                    id = item.getIcon(
-                                                        pagerState.currentPage == page
-                                                    )
-                                                ),
-                                                contentDescription = stringResource(item.stringRes),
-                                            )
+                                    badge = when {
+                                        item == SharesTab.INCOMING_TAB && unverifiedIncoming > 0 -> {
+                                            "$unverifiedIncoming"
                                         }
+
+                                        item == SharesTab.OUTGOING_TAB && unVerifiedOutgoing > 0 -> {
+                                            "$unVerifiedOutgoing"
+                                        }
+
+                                        else -> null
                                     },
                                     tag = item.name,
                                 )
@@ -268,24 +252,6 @@ internal fun SharesScreen(
                     }
                 }
             }
-        }
-    }
-}
-
-private fun SharesTab.getIcon(isSelected: Boolean): Int {
-    return if (isSelected) {
-        when (this) {
-            SharesTab.INCOMING_TAB -> IconR.drawable.ic_folder_incoming_medium_regular_solid
-            SharesTab.OUTGOING_TAB -> IconR.drawable.ic_folder_outgoing_medium_regular_solid
-            SharesTab.LINKS_TAB -> IconR.drawable.ic_link01_medium_regular_solid
-            else -> throw IllegalArgumentException("Invalid SharesTab")
-        }
-    } else {
-        when (this) {
-            SharesTab.INCOMING_TAB -> IconR.drawable.ic_folder_incoming_medium_regular_outline
-            SharesTab.OUTGOING_TAB -> IconR.drawable.ic_folder_outgoing_medium_regular_outline
-            SharesTab.LINKS_TAB -> IconR.drawable.ic_link01_medium_regular_outline
-            else -> throw IllegalArgumentException("Invalid SharesTab")
         }
     }
 }

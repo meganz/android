@@ -6,9 +6,12 @@ import androidx.compose.foundation.background
 import androidx.compose.foundation.isSystemInDarkTheme
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.pager.HorizontalPager
 import androidx.compose.foundation.pager.PagerState
 import androidx.compose.foundation.pager.rememberPagerState
+import androidx.compose.material.Badge
+import androidx.compose.material.BadgedBox
 import androidx.compose.material.MaterialTheme
 import androidx.compose.material.Tab
 import androidx.compose.material.TabRow
@@ -24,6 +27,8 @@ import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.tooling.preview.PreviewParameter
 import androidx.compose.ui.tooling.preview.PreviewParameterProvider
+import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.sp
 import kotlinx.collections.immutable.ImmutableList
 import kotlinx.collections.immutable.persistentListOf
 import kotlinx.coroutines.launch
@@ -76,6 +81,7 @@ fun Tabs(
         ) {
             tabs.forEachIndexed { index, tabItem ->
                 tabItem.Tab(
+                    tabsScope = tabsScope,
                     selected = pagerState.currentPage == index,
                     onClick = {
                         coroutineScope.launch {
@@ -117,18 +123,37 @@ fun Tabs(
 @Composable
 private fun TabCell(
     text: String,
+    badge: String? = null,
     selected: Boolean,
     onClick: () -> Unit,
     modifier: Modifier = Modifier,
     icon: @Composable (() -> Unit)? = null,
 ) = Tab(
     text = {
-        Text(
-            text = text,
-            color = if (selected) MegaOriginalTheme.colors.components.interactive
-            else MegaOriginalTheme.colors.text.secondary,
-            style = MaterialTheme.typography.subtitle2medium,
-        )
+        badge?.let {
+            BadgedBox(
+                badge = {
+                    Badge(modifier = Modifier.padding(6.dp)) {
+                        Text(it, fontSize = 8.sp)
+                    }
+                },
+            ) {
+                Text(
+                    text = text,
+                    color = if (selected) MegaOriginalTheme.colors.components.interactive
+                    else MegaOriginalTheme.colors.text.secondary,
+                    style = MaterialTheme.typography.subtitle2medium,
+                )
+            }
+        } ?: run {
+            Text(
+                text = text,
+                color = if (selected) MegaOriginalTheme.colors.components.interactive
+                else MegaOriginalTheme.colors.text.secondary,
+                style = MaterialTheme.typography.subtitle2medium,
+            )
+
+        }
     },
     icon = icon,
     selected = selected,
@@ -144,12 +169,14 @@ private fun TabCell(
  * @param content The view to display for the Tab is selected.
  */
 private data class TextTabContent(
-    val text: String,
+    override val text: String,
+    override val badge: String? = null,
     override val tag: String,
     override val content: @Composable (TabsScope.(isActive: Boolean) -> Unit)? = null,
 ) : TabContent {
     @Composable
     override fun Tab(
+        tabsScope: TabsScope,
         selected: Boolean,
         onClick: () -> Unit,
         modifier: Modifier,
@@ -159,6 +186,7 @@ private data class TextTabContent(
             selected = selected,
             onClick = onClick,
             modifier = modifier,
+            badge = badge
         )
     }
 }
@@ -172,33 +200,39 @@ private data class TextTabContent(
  * @param content The view to display.
  */
 private data class IconTabContent(
-    val text: String,
-    val icon: @Composable () -> Unit,
+    override val text: String,
+    override val badge: String? = null,
+    val icon: @Composable (activeColor: Color, color: Color) -> Unit,
     override val tag: String,
     override val content: @Composable (TabsScope.(isActive: Boolean) -> Unit)? = null,
 ) : TabContent {
     @Composable
     override fun Tab(
+        tabsScope: TabsScope,
         selected: Boolean,
         onClick: () -> Unit,
         modifier: Modifier,
     ) {
         TabCell(
             text = text,
-            icon = icon,
+            icon = { icon(tabsScope.activeColor, tabsScope.color) },
             selected = selected,
             onClick = onClick,
             modifier = modifier,
+            badge = badge
         )
     }
 }
 
 interface TabContent {
+    val text: String
+    val badge: String?
     val content: @Composable (TabsScope.(isActive: Boolean) -> Unit)?
     val tag: String
 
     @Composable
     fun Tab(
+        tabsScope: TabsScope,
         selected: Boolean,
         onClick: () -> Unit,
         modifier: Modifier,
@@ -218,18 +252,28 @@ class TabsScope(
     fun addTextTab(
         text: String,
         tag: String,
+        badge: String? = null,
         content: @Composable (TabsScope.(isActive: Boolean) -> Unit)? = null,
     ) {
-        cells.add(TextTabContent(text = text, tag = tag, content = content))
+        cells.add(TextTabContent(text = text, badge = badge, tag = tag, content = content))
     }
 
     fun addIconTab(
         text: String,
-        icon: @Composable () -> Unit,
+        badge: String? = null,
+        icon: @Composable (activeColor: Color, color: Color) -> Unit,
         tag: String,
         content: @Composable (TabsScope.(isActive: Boolean) -> Unit)? = null,
     ) {
-        cells.add(IconTabContent(text = text, icon = icon, tag = tag, content = content))
+        cells.add(
+            IconTabContent(
+                text = text,
+                badge = badge,
+                icon = icon,
+                tag = tag,
+                content = content
+            )
+        )
     }
 
     internal fun build(): ImmutableList<TabContent> = persistentListOf(*cells.toTypedArray())
