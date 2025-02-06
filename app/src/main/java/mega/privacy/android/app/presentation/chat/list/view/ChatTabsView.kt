@@ -6,6 +6,7 @@ import androidx.compose.animation.scaleIn
 import androidx.compose.animation.scaleOut
 import androidx.compose.foundation.Canvas
 import androidx.compose.foundation.ExperimentalFoundationApi
+import androidx.compose.foundation.isSystemInDarkTheme
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxSize
@@ -19,8 +20,6 @@ import androidx.compose.material.MaterialTheme
 import androidx.compose.material.Scaffold
 import androidx.compose.material.Snackbar
 import androidx.compose.material.SnackbarHost
-import androidx.compose.material.Tab
-import androidx.compose.material.TabRow
 import androidx.compose.material.Text
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Add
@@ -30,7 +29,6 @@ import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
-import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.geometry.Offset
@@ -39,7 +37,6 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import de.palm.composestateevents.EventEffect
-import kotlinx.coroutines.launch
 import mega.privacy.android.app.R
 import mega.privacy.android.app.extensions.normalize
 import mega.privacy.android.app.presentation.chat.list.model.ChatTab
@@ -50,8 +47,8 @@ import mega.privacy.android.app.presentation.meeting.view.dialog.ForceAppUpdateD
 import mega.privacy.android.domain.entity.chat.ChatRoomItem
 import mega.privacy.android.domain.entity.chat.MeetingTooltipItem
 import mega.privacy.android.legacy.core.ui.controls.tooltips.LegacyMegaTooltip
-import mega.privacy.android.shared.original.core.ui.theme.extensions.grey_alpha_054_white_alpha_054
-import mega.privacy.android.shared.original.core.ui.theme.extensions.red_600_red_300
+import mega.privacy.android.shared.original.core.ui.controls.tab.Tabs
+import mega.privacy.android.shared.original.core.ui.theme.OriginalTempTheme
 import mega.privacy.android.shared.original.core.ui.theme.extensions.white_black
 import mega.privacy.android.shared.original.core.ui.theme.red_600
 import mega.privacy.android.shared.original.core.ui.utils.showAutoDurationSnackbar
@@ -89,7 +86,6 @@ fun ChatTabsView(
     val initialPage = if (showMeetingTab) ChatTab.MEETINGS.ordinal else ChatTab.CHATS.ordinal
     val context = LocalContext.current
     val scaffoldState = rememberScaffoldState()
-    val coroutineScope = rememberCoroutineScope()
     val pagerState = rememberPagerState(
         initialPage = initialPage,
         initialPageOffsetFraction = 0f
@@ -138,33 +134,32 @@ fun ChatTabsView(
                 .padding(paddingValues)
                 .fillMaxSize()
         ) {
-            TabRow(
+            Tabs(
+                pagerEnabled = false,
+                pagerState = pagerState,
                 selectedTabIndex = pagerState.currentPage,
-                backgroundColor = MaterialTheme.colors.surface,
-                contentColor = MaterialTheme.colors.red_600_red_300
+                onTabSelected = {
+                    if (pagerState.currentPage == it) {
+                        scrollToTop = !scrollToTop
+                        false
+                    }
+                    true
+                }
             ) {
                 ChatTab.entries.forEachIndexed { index, item ->
-                    Tab(
-                        text = {
-                            TabText(
-                                titleStringRes = item.titleStringRes,
-                                hasUnreadMessages = state.currentUnreadStatus
-                                    ?.toList()?.getOrNull(index) ?: false
-                            )
-                        },
-                        selected = pagerState.currentPage == index,
-                        unselectedContentColor = MaterialTheme.colors.grey_alpha_054_white_alpha_054,
-                        onClick = {
-                            if (pagerState.currentPage != index) {
-                                coroutineScope.launch { pagerState.animateScrollToPage(index) }
-                            } else {
-                                scrollToTop = !scrollToTop
+                    addTextTab(
+                        text = stringResource(item.titleStringRes),
+                        tag = item.name,
+                        suffix = { activeColor, color ->
+                            if (state.currentUnreadStatus?.toList()?.getOrNull(index) == true) {
+                                Canvas(modifier = Modifier.size(4.dp)) {
+                                    drawCircle(color = activeColor, center = Offset(20f, 20f))
+                                }
                             }
-                        }
+                        },
                     )
                 }
             }
-
             HorizontalPager(
                 state = pagerState,
                 modifier = Modifier.fillMaxSize(),
@@ -295,8 +290,10 @@ private fun FabButton(showFabButton: Boolean, onStartChatClick: (isFabClicked: B
 @Preview(uiMode = Configuration.UI_MODE_NIGHT_NO, name = "PreviewChatTabsView")
 @Composable
 private fun PreviewEmptyView() {
-    ChatTabsView(
-        state = ChatsTabState(currentUnreadStatus = true to false),
-        managementState = ScheduledMeetingManagementUiState(),
-    )
+    OriginalTempTheme(isSystemInDarkTheme()) {
+        ChatTabsView(
+            state = ChatsTabState(currentUnreadStatus = true to false),
+            managementState = ScheduledMeetingManagementUiState(),
+        )
+    }
 }

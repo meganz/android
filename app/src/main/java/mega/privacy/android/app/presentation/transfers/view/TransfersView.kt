@@ -97,8 +97,12 @@ internal fun TransfersView(
                             tag = TEST_TAG_COMPLETED_TAB,
                         ) { CompletedTransfersView() }
                     },
-                    selectedIndex = selectedTab,
-                    onTabSelected = onTabSelected,
+                    selectedTabIndex = selectedTab,
+                    onTabSelected = {
+                        onTabSelected(it)
+                        true
+                    },
+                    pagerEnabled = true,
                 )
             }
         }

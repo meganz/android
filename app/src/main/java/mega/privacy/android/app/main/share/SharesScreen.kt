@@ -50,7 +50,6 @@ import mega.privacy.android.shared.original.core.ui.controls.appbar.TEST_TAG_APP
 import mega.privacy.android.shared.original.core.ui.controls.layouts.MegaScaffold
 import mega.privacy.android.shared.original.core.ui.controls.tab.Tabs
 import mega.privacy.android.shared.original.core.ui.theme.OriginalTempTheme
-import timber.log.Timber
 
 @OptIn(ExperimentalComposeUiApi::class)
 @Composable
@@ -174,11 +173,7 @@ internal fun SharesScreen(
                     Tabs(
                         modifier = Modifier.testTag(TAB_ROW_TEST_TAG),
                         shouldTabsShown = isTabShown,
-                        pagerEnabled = false,
                         pagerState = pagerState,
-                        onTabSelected = {
-                            Timber.d("Selected tab: $it")
-                        },
                     ) {
                         SharesTab.entries.filter { it != SharesTab.NONE }
                             .forEachIndexed { page, item ->

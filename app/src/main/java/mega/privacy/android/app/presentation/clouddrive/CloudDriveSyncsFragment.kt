@@ -237,7 +237,9 @@ class CloudDriveSyncsFragment : Fragment() {
                 var clickedFile: TypedFileNode? by remember {
                     mutableStateOf(null)
                 }
-                val pagerState = rememberPagerState(initialPage = 0) { 2 }
+                val pagerState =
+                    rememberPagerState(initialPage = uiState.selectedTab.position.takeIf { it != CloudDriveTab.NONE.position }
+                        ?: 0) { 2 }
                 LaunchedEffect(pagerState.currentPage) {
                     fileBrowserViewModel.onTabChanged(CloudDriveTab.entries.first { it.position == pagerState.currentPage })
                 }
@@ -256,7 +258,6 @@ class CloudDriveSyncsFragment : Fragment() {
                             Tabs(
                                 modifier = Modifier.testTag(TAB_ROW_TEST_TAG),
                                 shouldTabsShown = isTabShown,
-                                pagerEnabled = false,
                                 pagerState = pagerState,
                             ) {
                                 CloudDriveTab.entries.filter { it != CloudDriveTab.NONE }
