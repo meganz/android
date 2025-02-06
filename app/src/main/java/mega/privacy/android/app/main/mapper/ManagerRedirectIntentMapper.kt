@@ -98,6 +98,16 @@ class ManagerRedirectIntentMapper @Inject constructor(private val activity: Acti
                     }
                 }
 
+            Constants.ACTION_SHOW_WARNING -> Intent(activity, LoginActivity::class.java)
+                .apply {
+                    putExtra(Constants.VISIBLE_FRAGMENT, Constants.LOGIN_FRAGMENT)
+                    flags = Intent.FLAG_ACTIVITY_CLEAR_TOP
+                    action = Constants.ACTION_SHOW_WARNING
+                    intent.getStringExtra(Constants.INTENT_EXTRA_WARNING_MESSAGE)?.let {
+                        putExtra(Constants.INTENT_EXTRA_WARNING_MESSAGE, it)
+                    }
+                }
+
             Constants.ACTION_IPC -> Intent(activity, LoginActivity::class.java)
                 .apply {
                     putExtra(Constants.VISIBLE_FRAGMENT, Constants.LOGIN_FRAGMENT)

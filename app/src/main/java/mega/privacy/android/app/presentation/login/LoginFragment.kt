@@ -257,6 +257,10 @@ class LoginFragment : Fragment() {
                                     intentExtras = extras
                                 }
 
+                                Constants.ACTION_SHOW_WARNING -> {
+                                    intentExtras = extras
+                                }
+
                                 Constants.ACTION_OPEN_MEGA_FOLDER_LINK,
                                 Constants.ACTION_IMPORT_LINK_FETCH_NODES,
                                 Constants.ACTION_CHANGE_MAIL,
@@ -657,6 +661,10 @@ class LoginFragment : Fragment() {
                 }
 
                 Constants.ACTION_LOCATE_DOWNLOADED_FILE -> {
+                    intentExtras?.let { intent.putExtras(it) }
+                }
+
+                Constants.ACTION_SHOW_WARNING -> {
                     intentExtras?.let { intent.putExtras(it) }
                 }
 

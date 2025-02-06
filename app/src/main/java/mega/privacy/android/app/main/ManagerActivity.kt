@@ -2696,6 +2696,11 @@ class ManagerActivity : PasscodeActivity(), NavigationView.OnNavigationItemSelec
                     handleLocateFileNavigationFromIntent()
                 }
 
+                Constants.ACTION_SHOW_WARNING -> {
+                    val message = intent.getStringExtra(Constants.INTENT_EXTRA_WARNING_MESSAGE)
+                    showSnackbar(SNACKBAR_TYPE, message, -1)
+                }
+
                 Constants.ACTION_TAKE_SELFIE -> {
                     Timber.d("Intent take selfie")
                     Util.checkTakePicture(this, Constants.TAKE_PHOTO_CODE)

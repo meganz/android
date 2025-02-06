@@ -15,19 +15,16 @@ public class Constants {
 
     public static final int REQUEST_CODE_SELECT_FOLDER_TO_MOVE = 1001;
     public static final int REQUEST_CODE_SELECT_FOLDER_TO_COPY = 1002;
-    public static final int REQUEST_CODE_SELECT_LOCAL_FOLDER = 1004;
     public static final int REQUEST_CODE_REFRESH = 1005;
     public static final int REQUEST_CODE_SELECT_IMPORT_FOLDER = 1007;
     public static final int REQUEST_CODE_SELECT_CONTACT = 1009;
     public static final int TAKE_PHOTO_CODE = 1010;
-    public static final int REQUEST_CODE_TREE = 1014;
     public static final int TAKE_PICTURE_PROFILE_CODE = 1015;
     public static final int REQUEST_CREATE_CHAT = 1018;
     public static final int REQUEST_ADD_PARTICIPANTS = 1019;
     public static final int REQUEST_CODE_SELECT_CHAT = 1025;
     public static final int REQUEST_CODE_FILE_INFO = 1027;
     public static final int REQUEST_CODE_REFRESH_API_SERVER = 1028;
-    public static final int REQUEST_CODE_DELETE_VERSIONS_HISTORY = 1029;
     public static final int REQUEST_CODE_GET_FOLDER = 1038;
     public static final int REQUEST_CODE_GET_FOLDER_CONTENT = 1039;
 
@@ -58,14 +55,11 @@ public class Constants {
     public static final String ACTION_SHOW_WARNING_ACCOUNT_BLOCKED = "ACTION_SHOW_WARNING_ACCOUNT_BLOCKED";
 
     public static final String EXTRA_STORAGE_STATE = "STORAGE_STATE";
-    public static final String EXTRA_KEY = "EXTRA_KEY";
-    public static final String EXTRA_PASSWORD = "EXTRA_PASSWORD";
 
     public static final String EXTRA_MOVE_TO_CHAT_SECTION = "EXTRA_MOVE_TO_CHAT_SECTION";
 
     //MultipleRequestListener options
     public static final int MULTIPLE_SEND_RUBBISH = 1;
-    public static final int MULTIPLE_COPY = 4;
     public static final int MULTIPLE_LEAVE_SHARE = 8;
 
     public static final int CANCEL_ACCOUNT_2FA = 4000;
@@ -86,13 +80,8 @@ public class Constants {
     public static final int REQUEST_CAMERA = 2;
     public static final int REQUEST_READ_CONTACTS = 3;
     public static final int REQUEST_RECORD_AUDIO = 4;
-    public static final int REQUEST_UPLOAD_CONTACT = 5;
 
     public static final int REQUEST_READ_WRITE_STORAGE = 9;
-
-    public static final int TYPE_START_RECORD = 1;
-    public static final int TYPE_END_RECORD = 2;
-    public static final int TYPE_ERROR_RECORD = 3;
 
     public static final int IMPORT_ONLY_OPTION = 0;
     public static final int FORWARD_ONLY_OPTION = 1;
@@ -159,6 +148,7 @@ public class Constants {
     public static final String ACTION_LOG_IN = "ACTION_LOG_IN";
     public static final String ACTION_OPEN_DEVICE_CENTER = "ACTION_OPEN_DEVICE_CENTER";
     public static final String ACTION_OPEN_SYNC_MEGA_FOLDER = "ACTION_OPEN_SYNC_MEGA_FOLDER";
+    public static final String ACTION_SHOW_WARNING = "ACTION_SHOW_WARNING";
 
     public static final String OPENED_FROM_CHAT = "OPENED_FROM_CHAT";
     public static final String ACTION_OPEN_CHAT_LINK = "OPEN_CHAT_LINK";
@@ -168,14 +158,9 @@ public class Constants {
     public static final String ACTION_SHOW_UPGRADE_ACCOUNT = "ACTION_SHOW_UPGRADE_ACCOUNT";
     public static final String ACTION_OPEN_CONTACTS_SECTION = "ACTION_OPEN_CONTACTS_SECTION";
 
-    public static final String TYPE_EMOJI = "TYPE_EMOJI";
-    public static final String TYPE_REACTION = "TYPE_REACTION";
-
     public static final String ACTION_STORAGE_STATE_CHANGED = "ACTION_STORAGE_STATE_CHANGED";
 
     public static final String ACTION_SHOW_SNACKBAR_SENT_AS_MESSAGE = "ACTION_SHOW_SNACKBAR_SENT_AS_MESSAGE";
-
-    public static final String ACTION_RESTART_SERVICE = "ACTION_RESTART_SERVICE";
 
     public static final String ACTION_SHARE_MSG = "ACTION_SHARE_MSG";
     public static final String ACTION_SHARE_NODE = "ACTION_SHARE_NODE";
@@ -200,16 +185,12 @@ public class Constants {
     public static final String INTENT_EXTRA_KEY_FROM_DOWNLOAD_SERVICE = "fromDownloadService";
     public static final String INTENT_EXTRA_KEY_INSIDE = "inside";
     public static final String INTENT_EXTRA_KEY_MAIL = "mail";
-
     public static final String INTENT_EXTRA_KEY_APP = "APP";
-    public static final String INTENT_EXTRA_KEY_IS_URL = "isUrl";
-    public static final String INTENT_EXTRA_KEY_POSITION = "position";
     public static final String INTENT_EXTRA_KEY_IS_FOLDER_LINK = "isFolderLink";
     public static final String INTENT_EXTRA_KEY_ORDER_GET_CHILDREN = "orderGetChildren";
     public static final String INTENT_EXTRA_KEY_PARENT_NODE_HANDLE = "parentNodeHandle";
     public static final String INTENT_EXTRA_KEY_PARENT_ID = "parentId";
     public static final String INTENT_EXTRA_KEY_HANDLES_NODES_SEARCH = "handlesNodesSearch";
-    public static final String INTENT_EXTRA_KEY_ARRAY_OFFLINE = "ARRAY_OFFLINE";
     public static final String INTENT_EXTRA_KEY_OFFLINE_PATH_DIRECTORY = "offlinePathDirectory";
     public static final String INTENT_EXTRA_KEY_PATH = "path";
     public static final String INTENT_EXTRA_KEY_PATH_NAVIGATION = "pathNavigation";
@@ -234,7 +215,7 @@ public class Constants {
     public static final String INTENT_EXTRA_KEY_CHAT_ID = "chatId";
     public static final String INTENT_EXTRA_KEY_MAX_USER = "max_user";
     public static final String INTENT_EXTRA_IS_OFFLINE_PATH = "IS_OFFLINE_PATH";
-
+    public static final String INTENT_EXTRA_WARNING_MESSAGE = "WARNING_MESSAGE";
     public static final String INTENT_EXTRA_KEY_MSG_ID = "msgId";
     public static final String INTENT_EXTRA_KEY_CONTACT_TYPE = "contactType";
     public static final String INTENT_EXTRA_KEY_CHAT = "chat";
@@ -242,7 +223,6 @@ public class Constants {
     public static final String INTENT_EXTRA_IS_FROM_MEETING = "extra_is_from_meeting";
     public static final String INTENT_EXTRA_COLLISION_RESULTS = "INTENT_EXTRA_COLLISION_RESULTS";
     public static final String INTENT_EXTRA_SINGLE_COLLISION_RESULT = "INTENT_EXTRA_SINGLE_COLLISION_RESULT";
-
     public static final String INTENT_EXTRA_KEY_CONTACTS_SELECTED = "INTENT_EXTRA_KEY_CONTACTS_SELECTED";
     public static final int FILE_BROWSER_ADAPTER = 2000;
     public static final int CONTACT_FILE_ADAPTER = 2001;
@@ -267,15 +247,12 @@ public class Constants {
     public static final int DOCUMENTS_BROWSE_ADAPTER = 2030;
     public static final int DOCUMENTS_SEARCH_ADAPTER = 2031;
     public static final int VIDEO_BROWSE_ADAPTER = 2032;
-    public static final int VIDEO_SEARCH_ADAPTER = 2033;
     public static final int RECENTS_BUCKET_ADAPTER = 2034;
     public static final int VERSIONS_ADAPTER = 2035;
     public static final int FROM_IMAGE_VIEWER = 2036;
     public static final int FAVOURITES_ADAPTER = 2039;
     public static final int FROM_MEDIA_DISCOVERY = 2040;
     public static final int FROM_ALBUM_SHARING = 2041;
-    public static final int VIEWER_FROM_VIDEOS = 6;
-    public static final int VIEWER_FROM_OFFLINE = 7;
     public static final int VIEWER_FROM_RECETS_BUCKET = 8;
     public static final int VIEWER_FROM_CONTACT_FILE_LIST = 11;
     public static final int VIEWER_FROM_ZIP_BROWSER = 13;
@@ -300,10 +277,7 @@ public class Constants {
     public static final int DEVICE_ANDROID = 1;
 
     public static final int NOTIFICATION_SUMMARY_CHAT = 0;
-    public static final int NOTIFICATION_UPLOAD = 1;
     public static final int NOTIFICATION_CAMERA_UPLOADS = 3;
-    public static final int NOTIFICATION_DOWNLOAD_FINAL = 4;
-    public static final int NOTIFICATION_UPLOAD_FINAL = 5;
     public static final int NOTIFICATION_PUSH_CLOUD_DRIVE = 7;
     public static final int NOTIFICATION_GENERAL_PUSH_CHAT = 8;
     public static final int NOTIFICATION_SUMMARY_INCOMING_CONTACT = 9;
@@ -311,7 +285,6 @@ public class Constants {
     public static final int NOTIFICATION_MISSED_CALL = 12;
     public static final int NOTIFICATION_SUMMARY_ACCEPTANCE_CONTACT = 13;
     public static final int NOTIFICATION_STORAGE_OVERQUOTA = 14;
-    public static final int NOTIFICATION_UPLOAD_FOLDER = 16;
     public static final int NOTIFICATION_NOT_ENOUGH_STORAGE = 17;
     public static final int NOTIFICATION_VIDEO_COMPRESSION = 18;
     public static final int NOTIFICATION_CAMERA_UPLOADS_PRIMARY_FOLDER_UNAVAILABLE = 19;
@@ -366,12 +339,6 @@ public class Constants {
 
     public static final int MAX_AUTOAWAY_TIMEOUT = 1457; //in minute, the max value supported by SDK
 
-    //Transfers app data parameters
-    public static final String APP_DATA_TXT_FILE = "TXT_FILE_UPLOAD";
-    //Indicates the data after it, is the value of a transfer parameter
-    public static final String APP_DATA_INDICATOR = ">";
-
-
     public static final String AVATAR_PRIMARY_COLOR = "AVATAR_PRIMARY_COLOR";
     public static final String AVATAR_GROUP_CHAT_COLOR = "AVATAR_GROUP_CHAT_COLOR";
     public static final String AVATAR_PHONE_COLOR = "AVATAR_PHONE_COLOR";
@@ -399,7 +366,6 @@ public class Constants {
 
     public static final int FROM_INCOMING_SHARES = 140;
     public static final int FROM_BACKUPS = 150;
-    public static final int FROM_OTHERS = 0;
 
     public static final int SNACKBAR_TYPE = 0;
     public static final int MESSAGE_SNACKBAR_TYPE = 1;
@@ -417,9 +383,6 @@ public class Constants {
     public static final int ITEM_VIEW_TYPE = 1;
     public static final int ITEM_PROGRESS = 2;
     public static final int ITEM_PLACEHOLDER_TYPE = 3;
-
-    public static final int BACK_PRESS_NOT_HANDLED = 0;
-    public static final int BACK_PRESS_HANDLED = 1;
 
     public static final int SCROLLING_UP_DIRECTION = -1;
     public static final int REQUIRE_PASSCODE_INVALID = -1;
@@ -459,7 +422,6 @@ public class Constants {
     public static final String SCHEDULED_MEETING_ID = "SCHEDULED_MEETING_ID";
     public static final String SCHEDULED_MEETING_CREATED = "SCHEDULED_MEETING_CREATED";
     public static final int INVALID_POSITION = -1;
-    public static final int INVALID_ID = -1;
     public static final String INVALID_OPTION = "-1";
     public static final int INVALID_TYPE_PERMISSIONS = -1;
     public static final int INVALID_VOLUME = -1;
@@ -494,10 +456,6 @@ public class Constants {
 
     public static final float ALPHA_VIEW_DISABLED = 0.3f;
     public static final float ALPHA_VIEW_ENABLED = 1.0f;
-
-    // Thumbnail dimens for Browse file page
-    public static final int THUMBNAIL_SIZE_DP = 36;
-    public static final int THUMBNAIL_MARGIN_DP = 18;
 
     public static final int AUDIO_MANAGER_PLAY_VOICE_CLIP = 0;
     public static final int AUDIO_MANAGER_CALL_RINGING = 1;
@@ -667,7 +625,6 @@ public class Constants {
     public static final int INVALID_VALUE = -1;
 
     public static final long INVALID_SIZE = -1;
-    public static final int COPY_FILE_BUFFER_SIZE = 32 * 1024; // 32 KB
 
     public static final int LOCATION_INDEX_LEFT = 0;
     public static final int LOCATION_INDEX_TOP = 1;
@@ -682,10 +639,6 @@ public class Constants {
     public static final String KEY_IS_SHOWED_WARNING_MESSAGE = "is_showed_meeting_warning_message_";
 
     public static final String STRING_SEPARATOR = " · ";
-
-    public static final int NOT_OVERQUOTA_STATE = 0;
-    public static final int OVERQUOTA_STORAGE_STATE = 1;
-    public static final int PRE_OVERQUOTA_STORAGE_STATE = 2;
 
     public static final int ORDER_CLOUD = 0;
     public static final int ORDER_OTHERS = 1;
