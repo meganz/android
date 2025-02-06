@@ -2693,7 +2693,7 @@ class ManagerActivity : PasscodeActivity(), NavigationView.OnNavigationItemSelec
                 }
 
                 Constants.ACTION_LOCATE_DOWNLOADED_FILE -> {
-                    navigateToFileStorageFromIntent()
+                    handleLocateFileNavigationFromIntent()
                 }
 
                 Constants.ACTION_TAKE_SELFIE -> {
@@ -5772,22 +5772,24 @@ class ManagerActivity : PasscodeActivity(), NavigationView.OnNavigationItemSelec
         setIntent(intent)
     }
 
-    private fun navigateToFileStorageFromIntent() {
-        Intent(this, FileStorageActivity::class.java).apply {
-            action = FileStorageActivity.Mode.BROWSE_FILES.action
-            if (intent.hasExtra(FileStorageActivity.EXTRA_PATH)) {
-                putExtra(
-                    FileStorageActivity.EXTRA_PATH,
-                    intent.getStringExtra(FileStorageActivity.EXTRA_PATH)
-                )
+    private fun handleLocateFileNavigationFromIntent() {
+        val path = intent.getStringExtra(FileStorageActivity.EXTRA_PATH) ?: return
+        if (intent.getBooleanExtra(Constants.INTENT_EXTRA_IS_OFFLINE_PATH, false)) {
+            selectDrawerItem(DrawerItem.HOMEPAGE)
+            val offlinePath = path.replace(
+                getString(R.string.section_saved_for_offline_new),
+                ""
+            ) + Constants.SEPARATOR
+            openFullscreenOfflineFragment(offlinePath)
+        } else {
+            Intent(this, FileStorageActivity::class.java).apply {
+                action = FileStorageActivity.Mode.BROWSE_FILES.action
+                putExtra(FileStorageActivity.EXTRA_PATH, path)
+                intent.getStringExtra(FileStorageActivity.EXTRA_FILE_NAME)?.let {
+                    putExtra(FileStorageActivity.EXTRA_FILE_NAME, it)
+                }
+                startActivity(this)
             }
-            if (intent.hasExtra(FileStorageActivity.EXTRA_FILE_NAME)) {
-                putExtra(
-                    FileStorageActivity.EXTRA_FILE_NAME,
-                    intent.getStringExtra(FileStorageActivity.EXTRA_FILE_NAME)
-                )
-            }
-            startActivity(this)
         }
     }
 

@@ -233,6 +233,7 @@ public class Constants {
     public static final String INTENT_EXTRA_KEY_FIRST_LEVEL = "firstLevel";
     public static final String INTENT_EXTRA_KEY_CHAT_ID = "chatId";
     public static final String INTENT_EXTRA_KEY_MAX_USER = "max_user";
+    public static final String INTENT_EXTRA_IS_OFFLINE_PATH = "IS_OFFLINE_PATH";
 
     public static final String INTENT_EXTRA_KEY_MSG_ID = "msgId";
     public static final String INTENT_EXTRA_KEY_CONTACT_TYPE = "contactType";

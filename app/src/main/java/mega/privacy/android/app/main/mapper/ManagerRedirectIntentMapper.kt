@@ -86,17 +86,15 @@ class ManagerRedirectIntentMapper @Inject constructor(private val activity: Acti
                     putExtra(Constants.VISIBLE_FRAGMENT, Constants.LOGIN_FRAGMENT)
                     flags = Intent.FLAG_ACTIVITY_CLEAR_TOP
                     action = Constants.ACTION_LOCATE_DOWNLOADED_FILE
-                    if (intent.hasExtra(FileStorageActivity.EXTRA_PATH)) {
-                        putExtra(
-                            FileStorageActivity.EXTRA_PATH,
-                            intent.getStringExtra(FileStorageActivity.EXTRA_PATH)
-                        )
+                    putExtra(
+                        Constants.INTENT_EXTRA_IS_OFFLINE_PATH,
+                        intent.getBooleanExtra(Constants.INTENT_EXTRA_IS_OFFLINE_PATH, false)
+                    )
+                    intent.getStringExtra(FileStorageActivity.EXTRA_PATH)?.let {
+                        putExtra(FileStorageActivity.EXTRA_PATH, it)
                     }
-                    if (intent.hasExtra(FileStorageActivity.EXTRA_FILE_NAME)) {
-                        putExtra(
-                            FileStorageActivity.EXTRA_FILE_NAME,
-                            intent.getStringExtra(FileStorageActivity.EXTRA_FILE_NAME)
-                        )
+                    intent.getStringExtra(FileStorageActivity.EXTRA_FILE_NAME)?.let {
+                        putExtra(FileStorageActivity.EXTRA_FILE_NAME, it)
                     }
                 }
 

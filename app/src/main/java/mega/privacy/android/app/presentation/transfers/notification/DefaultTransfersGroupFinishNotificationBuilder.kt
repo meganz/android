@@ -77,7 +77,8 @@ class DefaultTransfersGroupFinishNotificationBuilder @Inject constructor(
             }
         } + (titleSuffix?.let { ". $it." } ?: "")
 
-        val destination = if (isOfflinePathUseCase(group.destination)) {
+        val isOfflineDownload = isOfflinePathUseCase(group.destination)
+        val destination = if (isOfflineDownload) {
             context.getString(R.string.section_saved_for_offline_new)
         } else {
             group.destination
@@ -106,6 +107,7 @@ class DefaultTransfersGroupFinishNotificationBuilder @Inject constructor(
 
         val locateIntent = Intent(context, ManagerActivity::class.java).apply {
             action = Constants.ACTION_LOCATE_DOWNLOADED_FILE
+            putExtra(Constants.INTENT_EXTRA_IS_OFFLINE_PATH, isOfflineDownload)
             putExtra(FileStorageActivity.EXTRA_PATH, group.destination)
             group.singleFileName?.let {
                 putExtra(FileStorageActivity.EXTRA_FILE_NAME, it)
@@ -114,7 +116,8 @@ class DefaultTransfersGroupFinishNotificationBuilder @Inject constructor(
 
         val actionPendingIntent = PendingIntent.getActivity(
             context,
-            0,
+            System.currentTimeMillis()
+                .toInt(), // Unique request code to make sure old intents are not reused
             locateIntent,
             PendingIntent.FLAG_UPDATE_CURRENT or PendingIntent.FLAG_IMMUTABLE
         )
