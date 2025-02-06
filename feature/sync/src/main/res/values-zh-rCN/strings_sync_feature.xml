@@ -80,8 +80,6 @@
     <string name="sync_dialog_message_wifi_only">仅限Wi-Fi</string>
     <!-- Sync empty state message -->
     <string name="sync_empty_state_message">您需要在您的设备上设置一个本地文件夹，该文件夹将与您云盘上的选定文件夹同步</string>
-    <!-- Sync stalled issue reason is no reason-->
-    <string name="sync_stalled_issue_no_reason">No reason</string>
     <!-- Sync stalled issue reason is no file issue-->
     <string name="sync_stalled_issue_file_issue">文件或文件夹问题</string>
     <!-- Sync stalled issue reason is move or rename-->
@@ -108,8 +106,6 @@
     <string name="sync_stalled_issue_local_and_remote_not_synced">文件或文件夹冲突</string>
     <!-- Sync stalled issue reason is Name clash-->
     <string name="sync_stalled_issue_name_clash">文件或文件夹名称冲突</string>
-    <!-- Sync stalled issue reason is Last PlusOne-->
-    <string name="sync_stalled_issue_last_plus_one">Last plus one</string>
     <!-- Sync chip folder chip title-->
     <string name="sync_folders">文件夹</string>
     <!-- Sync stalled issue count chip title for 1 or more stalled issues-->

@@ -88,8 +88,6 @@
     <string name="sync_dialog_message_wifi_only">Solo Wi-Fi</string>
     <!-- Sync empty state message -->
     <string name="sync_empty_state_message">Necesitarás configurar una carpeta en tu dispositivo que se sincronizará con la carpeta elegida en tu Nube</string>
-    <!-- Sync stalled issue reason is no reason-->
-    <string name="sync_stalled_issue_no_reason">No reason</string>
     <!-- Sync stalled issue reason is no file issue-->
     <string name="sync_stalled_issue_file_issue">Problema con un archivo o una carpeta</string>
     <!-- Sync stalled issue reason is move or rename-->
@@ -116,8 +114,6 @@
     <string name="sync_stalled_issue_local_and_remote_not_synced">Conflicto de archivo o carpeta</string>
     <!-- Sync stalled issue reason is Name clash-->
     <string name="sync_stalled_issue_name_clash">Conflicto de nombre de archivo o carpeta</string>
-    <!-- Sync stalled issue reason is Last PlusOne-->
-    <string name="sync_stalled_issue_last_plus_one">Last plus one</string>
     <!-- Sync chip folder chip title-->
     <string name="sync_folders">Carpetas</string>
     <!-- Sync stalled issue count chip title for 1 or more stalled issues-->
