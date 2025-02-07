@@ -92,6 +92,8 @@ import nz.mega.sdk.MegaChatMessage
 import nz.mega.sdk.MegaChatRoom
 import nz.mega.sdk.MegaNode
 import nz.mega.sdk.MegaShare
+import org.commonmark.parser.Parser
+import org.commonmark.renderer.html.HtmlRenderer
 import timber.log.Timber
 import java.io.BufferedReader
 import java.io.BufferedWriter
@@ -146,6 +148,17 @@ class TextEditorViewModel @Inject constructor(
         const val VIEW_MODE = "VIEW_MODE"
         const val EDIT_MODE = "EDIT_MODE"
         const val SHOW_LINE_NUMBERS = "SHOW_LINE_NUMBERS"
+
+        private val BLOCKQUOTE_STYLE = """
+            blockquote {
+                margin: 16px 0;
+                padding: 10px 20px;
+                background-color: #f9f9f9;
+                border-left: 5px solid #ccc;
+                font-style: italic;
+                color: #555;
+            }
+        """.trimIndent()
     }
 
     private val handle: Long
@@ -1043,5 +1056,34 @@ class TextEditorViewModel @Inject constructor(
                 throwable.value = it
             }
         }
+    }
+
+    internal fun convertMarkDownToHtml() {
+        viewModelScope.launch(ioDispatcher) {
+            getPagination()?.getEditedText()?.let { content ->
+                val document = Parser.builder().build().parse(content)
+                val htmlContent = HtmlRenderer.builder().build().render(document)
+                val convertedHtmlContent = generateHtmlContent(htmlContent)
+                _uiState.update { it.copy(convertedHtmlContent = convertedHtmlContent) }
+            }
+        }
+    }
+
+    private fun generateHtmlContent(content: String) =
+        """
+            <html>
+                <head>
+                    <style>
+                        $BLOCKQUOTE_STYLE
+                    </style>
+                </head>
+                <body>
+                    $content
+                </body>
+            </html>
+        """.trimIndent()
+
+    internal fun updateHtmlContent(value: String?) {
+        _uiState.update { it.copy(convertedHtmlContent = value) }
     }
 }

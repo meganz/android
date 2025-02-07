@@ -125,8 +125,6 @@ import nz.mega.sdk.MegaApiJava.INVALID_HANDLE
 import nz.mega.sdk.MegaChatApi
 import nz.mega.sdk.MegaChatApiJava.MEGACHAT_INVALID_HANDLE
 import nz.mega.sdk.MegaShare
-import org.commonmark.parser.Parser
-import org.commonmark.renderer.html.HtmlRenderer
 import timber.log.Timber
 import javax.inject.Inject
 import kotlin.math.roundToInt
@@ -146,17 +144,6 @@ class TextEditorActivity : PasscodeActivity(), SnackbarShower, Scrollable {
         private const val STATE = "STATE"
         private const val STATE_SHOWN = 0
         private const val STATE_HIDDEN = 1
-
-        private val BLOCKQUOTE_STYLE = """
-            blockquote {
-                margin: 16px 0;
-                padding: 10px 20px;
-                background-color: #f9f9f9;
-                border-left: 5px solid #ccc;
-                font-style: italic;
-                color: #555;
-            }
-        """.trimIndent()
     }
 
     /**
@@ -853,6 +840,12 @@ class TextEditorActivity : PasscodeActivity(), SnackbarShower, Scrollable {
             binding.contentText.isVisible = !isMarkDownFile
             binding.contentWebView.isVisible = isMarkDownFile
         }
+        collectFlow(viewModel.uiState.map { it.convertedHtmlContent }) { htmlContent ->
+            htmlContent?.let {
+                binding.contentWebView.loadDataWithBaseURL(null, it, "text/html", "UTF-8", null)
+                viewModel.updateHtmlContent(null)
+            }
+        }
     }
 
     /**
@@ -888,10 +881,7 @@ class TextEditorActivity : PasscodeActivity(), SnackbarShower, Scrollable {
 
             binding.contentWebView.apply {
                 isVisible = viewModel.uiState.value.isMarkDownFile
-                viewModel.getPagination()?.getEditedText()?.let {
-                    val styledMarkdownHtml = convertMarkDownToHtml(it)
-                    loadDataWithBaseURL(null, styledMarkdownHtml, "text/html", "UTF-8", null)
-                }
+                viewModel.convertMarkDownToHtml()
             }
 
             if (viewModel.canShowEditFab() && currentUIState == STATE_SHOWN) {
@@ -911,26 +901,6 @@ class TextEditorActivity : PasscodeActivity(), SnackbarShower, Scrollable {
             binding.editFab.hide()
         }
     }
-
-    private fun convertMarkDownToHtml(content: String?): String {
-        val document = Parser.builder().build().parse(content)
-        val htmlContent = HtmlRenderer.builder().build().render(document)
-        return generateHtmlContent(htmlContent)
-    }
-
-    private fun generateHtmlContent(content: String) =
-        """
-            <html>
-                <head>
-                    <style>
-                        $BLOCKQUOTE_STYLE
-                    </style>
-                </head>
-                <body>
-                    $content
-                </body>
-            </html>
-        """.trimIndent()
 
     /**
      * Shows the loading view.
@@ -974,8 +944,7 @@ class TextEditorActivity : PasscodeActivity(), SnackbarShower, Scrollable {
         binding.contentText.setText(currentContent, firstLineNumber)
         binding.contentEditText.setText(currentContent, firstLineNumber)
         binding.contentWebView.apply {
-            val markdownHtml = convertMarkDownToHtml(content.getEditedText())
-            loadDataWithBaseURL(null, markdownHtml, "text/html", "UTF-8", null)
+            viewModel.convertMarkDownToHtml()
         }
         binding.fileEditorScrollView.isVisible = true
         binding.fileEditorScrollView.smoothScrollTo(0, 0)

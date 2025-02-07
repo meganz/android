@@ -92,7 +92,7 @@ internal class TextEditorViewModelTest {
             checkNodesNameCollisionWithActionUseCase = checkNodesNameCollisionWithActionUseCase,
             checkChatNodesNameCollisionAndCopyUseCase = checkChatNodesNameCollisionAndCopyUseCase,
             downloadBackgroundFile = mock(),
-            ioDispatcher = mock(),
+            ioDispatcher = StandardTestDispatcher(),
             getNodeByIdUseCase = mock(),
             getChatFileUseCase = getChatFileUseCase,
             getPublicChildNodeFromIdUseCase = mock(),
@@ -423,6 +423,19 @@ internal class TextEditorViewModelTest {
         arrayOf("file.txt", false),
         arrayOf(null, false),
     )
+
+    @Test
+    fun `convertMarkDownToHtml should update UI state with converted HTML`() = runTest {
+        val expectedContent = "markdown content"
+        advanceUntilIdle()
+        underTest.uiState.test {
+            assertThat(awaitItem().convertedHtmlContent).isEqualTo(null)
+            underTest.updateHtmlContent(expectedContent)
+            assertThat(awaitItem().convertedHtmlContent).isEqualTo(expectedContent)
+            underTest.updateHtmlContent(null)
+            assertThat(awaitItem().convertedHtmlContent).isEqualTo(null)
+        }
+    }
 
     companion object {
         @JvmField
