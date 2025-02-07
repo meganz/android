@@ -1,7 +1,6 @@
 package mega.privacy.android.app.fragments.settingsFragments
 
 import mega.privacy.android.shared.resources.R as sharedR
-import android.content.Intent
 import android.os.Bundle
 import android.text.format.Formatter
 import android.view.LayoutInflater
@@ -17,7 +16,6 @@ import dagger.hilt.android.AndroidEntryPoint
 import mega.privacy.android.app.R
 import mega.privacy.android.app.activities.settingsActivities.FileManagementPreferencesActivity
 import mega.privacy.android.app.arch.extensions.collectFlow
-import mega.privacy.android.app.constants.BroadcastConstants
 import mega.privacy.android.app.constants.SettingsConstants.KEY_AUTO_PLAY_SWITCH
 import mega.privacy.android.app.constants.SettingsConstants.KEY_CACHE
 import mega.privacy.android.app.constants.SettingsConstants.KEY_CLEAR_VERSIONS
@@ -172,11 +170,7 @@ class SettingsFileManagementFragment : SettingsBaseFragment(),
 
         filePreferencesState.updateOfflineSize?.let { size ->
             val offlineSize = Util.getSizeString(size, requireContext())
-            Intent(BroadcastConstants.ACTION_UPDATE_OFFLINE_SIZE_SETTING).apply {
-                putExtra(BroadcastConstants.OFFLINE_SIZE, offlineSize)
-                setPackage(requireContext().packageName)
-                requireContext().sendBroadcast(this)
-            }
+            setOfflineSize(offlineSize)
             viewModel.resetUpdateOfflineSize()
         }
     }
@@ -366,7 +360,7 @@ class SettingsFileManagementFragment : SettingsBaseFragment(),
      *
      * @param size offline size
      */
-    fun setOfflineSize(size: String?) {
+    private fun setOfflineSize(size: String?) {
         if (isAdded) {
             offlineFileManagement?.summary =
                 getString(R.string.settings_advanced_features_size, size)

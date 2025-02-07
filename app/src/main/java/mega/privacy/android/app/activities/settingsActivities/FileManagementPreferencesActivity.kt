@@ -26,10 +26,8 @@ import mega.privacy.android.app.R
 import mega.privacy.android.app.constants.BroadcastConstants.ACTION_REFRESH_CLEAR_OFFLINE_SETTING
 import mega.privacy.android.app.constants.BroadcastConstants.ACTION_RESET_VERSION_INFO_SETTING
 import mega.privacy.android.app.constants.BroadcastConstants.ACTION_TYPE
-import mega.privacy.android.app.constants.BroadcastConstants.ACTION_UPDATE_OFFLINE_SIZE_SETTING
 import mega.privacy.android.app.constants.BroadcastConstants.ACTION_UPDATE_RB_SCHEDULER
 import mega.privacy.android.app.constants.BroadcastConstants.DAYS_COUNT
-import mega.privacy.android.app.constants.BroadcastConstants.OFFLINE_SIZE
 import mega.privacy.android.app.databinding.DialogTwoVerticalButtonsBinding
 import mega.privacy.android.app.fragments.settingsFragments.SettingsFileManagementFragment
 import mega.privacy.android.app.globalmanagement.MyAccountInfo
@@ -59,13 +57,6 @@ class FileManagementPreferencesActivity : PreferencesBaseActivity() {
         override fun onReceive(context: Context, intent: Intent) {
             if (sttFileManagement != null && intent.action == ACTION_RESET_VERSION_INFO_SETTING) {
                 sttFileManagement?.resetVersionsInfo()
-            }
-        }
-    }
-    private val offlineSizeUpdateReceiver: BroadcastReceiver = object : BroadcastReceiver() {
-        override fun onReceive(context: Context, intent: Intent) {
-            if (sttFileManagement != null && intent.action == ACTION_UPDATE_OFFLINE_SIZE_SETTING) {
-                sttFileManagement?.setOfflineSize(intent.getStringExtra(OFFLINE_SIZE))
             }
         }
     }
@@ -110,10 +101,6 @@ class FileManagementPreferencesActivity : PreferencesBaseActivity() {
                 supportFragmentManager.findFragmentById(R.id.fragment_container) as? SettingsFileManagementFragment
         }
         registerReceiver(
-            offlineSizeUpdateReceiver,
-            IntentFilter(ACTION_UPDATE_OFFLINE_SIZE_SETTING)
-        )
-        registerReceiver(
             updateMyAccountReceiver,
             IntentFilter(Constants.BROADCAST_ACTION_INTENT_UPDATE_ACCOUNT_DETAILS)
         )
@@ -145,7 +132,6 @@ class FileManagementPreferencesActivity : PreferencesBaseActivity() {
 
     override fun onDestroy() {
         super.onDestroy()
-        unregisterReceiver(offlineSizeUpdateReceiver)
         unregisterReceiver(updateMyAccountReceiver)
         unregisterReceiver(updateCUSettingsReceiver)
         unregisterReceiver(resetVersionInfoReceiver)
