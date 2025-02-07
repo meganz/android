@@ -176,7 +176,6 @@ import mega.privacy.android.app.presentation.clouddrive.FileBrowserComposeFragme
 import mega.privacy.android.app.presentation.clouddrive.FileBrowserViewModel
 import mega.privacy.android.app.presentation.copynode.mapper.CopyRequestMessageMapper
 import mega.privacy.android.app.presentation.documentscanner.dialogs.DocumentScanningErrorDialog
-import mega.privacy.android.app.presentation.documentscanner.model.HandleScanDocumentResult
 import mega.privacy.android.app.presentation.extensions.isDarkMode
 import mega.privacy.android.app.presentation.extensions.serializable
 import mega.privacy.android.app.presentation.favourites.FavouriteFolderViewModel
@@ -1958,19 +1957,9 @@ class ManagerActivity : PasscodeActivity(), NavigationView.OnNavigationItemSelec
                 viewModel.markHandledMessage()
             }
 
-            managerState.handleScanDocumentResult?.let { handleScanDocumentResult ->
-                when (handleScanDocumentResult) {
-                    HandleScanDocumentResult.UseLegacyImplementation -> {
-                        uploadBottomSheetDialogActionHandler.scanDocumentUsingLegacyScanner()
-                    }
-
-                    is HandleScanDocumentResult.UseNewImplementation -> {
-                        uploadBottomSheetDialogActionHandler.scanDocumentUsingNewScanner(
-                            documentScanner = handleScanDocumentResult.documentScanner,
-                        )
-                    }
-                }
-                viewModel.onHandleScanDocumentResultConsumed()
+            managerState.gmsDocumentScanner?.let { gmsDocumentScanner ->
+                uploadBottomSheetDialogActionHandler.scanDocument(gmsDocumentScanner)
+                viewModel.onGmsDocumentScannerConsumed()
             }
 
             managerState.chatLinkContent?.let {
@@ -2072,10 +2061,10 @@ class ManagerActivity : PasscodeActivity(), NavigationView.OnNavigationItemSelec
     }
 
     /**
-     * When the system fails to open the ML Document Kit Scanner, display a generic error message
+     * When the system fails to open the ML Kit Document Scanner, display a generic error message
      */
-    fun onNewDocumentScannerFailedToOpen() {
-        viewModel.onNewDocumentScannerFailedToOpen()
+    fun onDocumentScannerFailedToOpen() {
+        viewModel.onDocumentScannerFailedToOpen()
     }
 
     /**
@@ -5335,7 +5324,7 @@ class ManagerActivity : PasscodeActivity(), NavigationView.OnNavigationItemSelec
     }
 
     override fun scanDocument() {
-        viewModel.handleScanDocument()
+        viewModel.prepareDocumentScanner()
     }
 
     override fun showNewFolderDialog(typedText: String?) {

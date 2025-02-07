@@ -38,7 +38,6 @@ import de.palm.composestateevents.StateEventWithContentTriggered
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.launch
 import mega.privacy.android.analytics.Analytics
-import mega.privacy.android.app.DocumentScannerEdgeToEdgeActivity
 import mega.privacy.android.app.R
 import mega.privacy.android.app.activities.PasscodeActivity
 import mega.privacy.android.app.activities.contract.NameCollisionActivityContract
@@ -57,7 +56,6 @@ import mega.privacy.android.app.presentation.contact.ContactFileListViewModel
 import mega.privacy.android.app.presentation.copynode.mapper.CopyRequestMessageMapper
 import mega.privacy.android.app.presentation.documentscanner.SaveScannedDocumentsActivity
 import mega.privacy.android.app.presentation.documentscanner.dialogs.DocumentScanningErrorDialog
-import mega.privacy.android.app.presentation.documentscanner.model.HandleScanDocumentResult
 import mega.privacy.android.app.presentation.extensions.isDarkMode
 import mega.privacy.android.app.presentation.extensions.uploadFolderManually
 import mega.privacy.android.app.presentation.movenode.mapper.MoveRequestMessageMapper
@@ -100,7 +98,6 @@ import mega.privacy.android.domain.usecase.file.CheckFileNameCollisionsUseCase
 import mega.privacy.android.domain.usecase.node.GetNodeByHandleUseCase
 import mega.privacy.android.shared.original.core.ui.theme.OriginalTempTheme
 import mega.privacy.mobile.analytics.event.DocumentScanInitiatedEvent
-import nz.mega.documentscanner.DocumentScannerActivity
 import nz.mega.sdk.MegaApiJava
 import nz.mega.sdk.MegaApiJava.INVALID_HANDLE
 import nz.mega.sdk.MegaChatApiJava
@@ -199,38 +196,10 @@ internal class ContactFileListActivity : PasscodeActivity(), MegaGlobalListenerI
     }
 
     /**
-     * The launcher to scan documents using the old Document Scanner
+     * Launcher to scan documents using the ML Kit Document Scanner. After scanning, a different
+     * screen is opened to configure where to save the scanned documents.
      */
-    private val legacyScanDocumentLauncher =
-        registerForActivityResult(ActivityResultContracts.StartActivityForResult()) {
-            if (it.resultCode == RESULT_OK) {
-                it.data?.let { intent ->
-                    val savedDestination: String? =
-                        intent.getStringExtra(DocumentScannerActivity.EXTRA_PICKED_SAVE_DESTINATION)
-                    val fileIntent =
-                        Intent(this, FileExplorerActivity::class.java).apply {
-                            if (getString(R.string.section_chat) == savedDestination) {
-                                action = FileExplorerActivity.ACTION_UPLOAD_TO_CHAT
-                            } else {
-                                action = FileExplorerActivity.ACTION_SAVE_TO_CLOUD
-                                putExtra(
-                                    FileExplorerActivity.EXTRA_PARENT_HANDLE,
-                                    getParentHandle(),
-                                )
-                            }
-                            putExtra(Intent.EXTRA_STREAM, intent.data)
-                            type = intent.type
-                        }
-                    startActivity(fileIntent)
-                }
-            }
-        }
-
-    /**
-     * The launcher to scan documents using the new ML Document Kit Scanner. After scanning, a
-     * different screen is opened to configure where to save the scanned documents.
-     */
-    private val newScanDocumentLauncher =
+    private val scanDocumentLauncher =
         registerForActivityResult(ActivityResultContracts.StartIntentSenderForResult()) { result ->
             if (result.resultCode == RESULT_OK) {
                 GmsDocumentScanningResult.fromActivityResultIntent(result.data)?.let { data ->
@@ -266,7 +235,7 @@ internal class ContactFileListActivity : PasscodeActivity(), MegaGlobalListenerI
                     }
                 }
             } else {
-                Timber.e("The ML Document Kit Scan result could not be retrieved from Contact File List")
+                Timber.e("The ML Kit Document Scan result could not be retrieved from Contact File List")
             }
         }
 
@@ -347,7 +316,7 @@ internal class ContactFileListActivity : PasscodeActivity(), MegaGlobalListenerI
     }
 
     override fun scanDocument() {
-        viewModel.handleScanDocument()
+        viewModel.prepareDocumentScanner()
     }
 
     override fun showNewFolderDialog(typedText: String?) {
@@ -533,57 +502,31 @@ internal class ContactFileListActivity : PasscodeActivity(), MegaGlobalListenerI
                 startDownloadViewModel.onUploadClicked(uiState.uploadEvent.content)
             }
 
-            uiState.handleScanDocumentResult?.let { handleScanDocumentResult ->
-                when (handleScanDocumentResult) {
-                    HandleScanDocumentResult.UseLegacyImplementation -> {
-                        scanDocumentUsingLegacyScanner()
-                    }
-
-                    is HandleScanDocumentResult.UseNewImplementation -> {
-                        scanDocumentsUsingNewScanner(
-                            documentScanner = handleScanDocumentResult.documentScanner,
-                        )
-                    }
-                }
-                viewModel.onHandleScanDocumentResultConsumed()
+            uiState.gmsDocumentScanner?.let { gmsDocumentScanner ->
+                scanDocument(gmsDocumentScanner)
+                viewModel.onGmsDocumentScannerConsumed()
             }
         }
     }
 
     /**
-     * Begin scanning Documents using the old Document Scanner
-     */
-    private fun scanDocumentUsingLegacyScanner() {
-        val saveDestinations = arrayOf(
-            getString(R.string.section_cloud_drive),
-            getString(R.string.section_chat)
-        )
-        val intent = DocumentScannerActivity.getIntent(
-            context = this,
-            targetClass = DocumentScannerEdgeToEdgeActivity::class.java,
-            saveDestinations = saveDestinations
-        )
-        legacyScanDocumentLauncher.launch(intent)
-    }
-
-    /**
-     * Begin scanning Documents using the new ML Kit Document Scanner
+     * Begin scanning Documents using the ML Kit Document Scanner
      *
-     * @param documentScanner the new ML Kit Document Scanner
+     * @param documentScanner the ML Kit Document Scanner
      */
-    private fun scanDocumentsUsingNewScanner(documentScanner: GmsDocumentScanner) {
+    private fun scanDocument(documentScanner: GmsDocumentScanner) {
         documentScanner.apply {
             getStartScanIntent(this@ContactFileListActivity)
                 .addOnSuccessListener {
                     Analytics.tracker.trackEvent(DocumentScanInitiatedEvent)
-                    newScanDocumentLauncher.launch(IntentSenderRequest.Builder(it).build())
+                    scanDocumentLauncher.launch(IntentSenderRequest.Builder(it).build())
                 }
                 .addOnFailureListener { exception ->
                     Timber.e(
                         exception,
                         "An error occurred when attempting to run the ML Kit Document Scanner from Contact File List",
                     )
-                    viewModel.onNewDocumentScannerFailedToOpen()
+                    viewModel.onDocumentScannerFailedToOpen()
                 }
         }
     }

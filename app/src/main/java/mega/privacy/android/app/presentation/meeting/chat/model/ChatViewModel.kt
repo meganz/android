@@ -105,7 +105,6 @@ import mega.privacy.android.domain.usecase.chat.MonitorUserChatStatusByHandleUse
 import mega.privacy.android.domain.usecase.chat.MuteChatNotificationForChatRoomsUseCase
 import mega.privacy.android.domain.usecase.chat.OpenChatLinkUseCase
 import mega.privacy.android.domain.usecase.chat.RecordAudioUseCase
-import mega.privacy.android.domain.usecase.chat.RemoveChatOpeningWithLinkUseCase
 import mega.privacy.android.domain.usecase.chat.UnmuteChatNotificationUseCase
 import mega.privacy.android.domain.usecase.chat.link.JoinPublicChatUseCase
 import mega.privacy.android.domain.usecase.chat.link.MonitorJoiningChatUseCase
@@ -1777,15 +1776,15 @@ class ChatViewModel @Inject constructor(
     }
 
     /**
-     * Checks whether the legacy or modern Document Scanner should be used
+     * Prepares the ML Kit Document Scanner from Google Play Services
      */
     fun onAttachScan() {
         viewModelScope.launch {
             runCatching {
-                scannerHandler.handleScanDocument()
-            }.onSuccess { handleScanDocumentResult ->
+                scannerHandler.prepareDocumentScanner()
+            }.onSuccess { gmsDocumentScanner ->
                 _state.update {
-                    it.copy(handleScanDocumentResult = triggered(handleScanDocumentResult))
+                    it.copy(gmsDocumentScanner = triggered(gmsDocumentScanner))
                 }
             }.onFailure { exception ->
                 _state.update {
@@ -1802,17 +1801,17 @@ class ChatViewModel @Inject constructor(
     }
 
     /**
-     * When the system fails to open the ML Document Kit Scanner, display a generic error message
+     * When the system fails to open the ML Kit Document Scanner, display a generic error message
      */
-    fun onNewDocumentScannerFailedToOpen() {
+    fun onDocumentScannerFailedToOpen() {
         _state.update { it.copy(documentScanningError = DocumentScanningError.GenericError) }
     }
 
     /**
-     * Resets the value of [ChatUiState.handleScanDocumentResult]
+     * Resets the value of [ChatUiState.gmsDocumentScanner]
      */
-    fun onHandleScanDocumentResultConsumed() {
-        _state.update { it.copy(handleScanDocumentResult = consumed()) }
+    fun onGmsDocumentScannerConsumed() {
+        _state.update { it.copy(gmsDocumentScanner = consumed()) }
     }
 
     /**

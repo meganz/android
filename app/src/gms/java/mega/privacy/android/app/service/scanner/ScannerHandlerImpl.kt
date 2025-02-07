@@ -17,12 +17,9 @@ import dagger.hilt.android.qualifiers.ApplicationContext
 import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.suspendCancellableCoroutine
 import kotlinx.coroutines.withContext
-import mega.privacy.android.app.featuretoggle.AppFeatures
 import mega.privacy.android.app.middlelayer.scanner.ScannerHandler
-import mega.privacy.android.app.presentation.documentscanner.model.HandleScanDocumentResult
 import mega.privacy.android.app.presentation.qrcode.model.BarcodeScanResult
 import mega.privacy.android.domain.qualifier.IoDispatcher
-import mega.privacy.android.domain.usecase.featureflag.GetFeatureFlagValueUseCase
 import timber.log.Timber
 import javax.inject.Inject
 
@@ -32,7 +29,6 @@ import javax.inject.Inject
 class ScannerHandlerImpl @Inject constructor(
     @ApplicationContext private val context: Context,
     @IoDispatcher private val ioDispatcher: CoroutineDispatcher,
-    private val getFeatureFlagValueUseCase: GetFeatureFlagValueUseCase,
 ) : ScannerHandler {
 
     /**
@@ -75,22 +71,7 @@ class ScannerHandlerImpl @Inject constructor(
         }
     }
 
-    override suspend fun handleScanDocument() = withContext(ioDispatcher) {
-        if (getFeatureFlagValueUseCase(AppFeatures.DocumentScanner)) {
-            buildDocumentScanner()
-        } else {
-            HandleScanDocumentResult.UseLegacyImplementation
-        }
-    }
-
-    /**
-     * When [AppFeatures.DocumentScanner] is enabled, this attempts to install the ML Kit Document
-     * Scanner from Google Play services
-     *
-     * @return the ML Kit Document Scanner installation result. If successful, the Document Scanner
-     * is returned for the caller's use
-     */
-    private suspend fun buildDocumentScanner(): HandleScanDocumentResult =
+    override suspend fun prepareDocumentScanner() = withContext(ioDispatcher) {
         suspendCancellableCoroutine { continuation ->
             val options = GmsDocumentScannerOptions.Builder()
                 .setGalleryImportAllowed(false)
@@ -109,14 +90,10 @@ class ScannerHandlerImpl @Inject constructor(
                 .installModules(moduleInstallRequest)
                 .addOnSuccessListener { moduleResponse ->
                     if (moduleResponse.areModulesAlreadyInstalled()) {
-                        Timber.d("The ML Document Kit Scanner is present on the device")
-                        continuation.resumeWith(
-                            Result.success(
-                                HandleScanDocumentResult.UseNewImplementation(documentScanner)
-                            )
-                        )
+                        Timber.d("The ML Kit Document Scanner is present on the device")
+                        continuation.resumeWith(Result.success(documentScanner))
                     } else {
-                        Timber.e("The ML Document Kit Scanner is not present on the device")
+                        Timber.e("The ML Kit Document Scanner is not present on the device")
                         continuation.resumeWith(Result.failure(DocumentScannerModuleIsNotInstalled()))
                     }
                 }.addOnFailureListener {
@@ -128,11 +105,12 @@ class ScannerHandlerImpl @Inject constructor(
                         }
                     Timber.e(
                         exception,
-                        "An Exception occurred when installing the ML Document Kit Scanner",
+                        "An Exception occurred when installing the ML Kit Document Scanner",
                     )
                     continuation.resumeWith(Result.failure(exception))
                 }
         }
+    }
 }
 
 /**

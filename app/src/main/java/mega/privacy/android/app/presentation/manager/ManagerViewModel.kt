@@ -1408,14 +1408,14 @@ class ManagerViewModel @Inject constructor(
         filePrepareUseCase(uris.map { UriPath(it.toString()) })
 
     /**
-     * Checks whether the legacy or modern Document Scanner should be used
+     * Prepares the ML Kit Document Scanner from Google Play Services
      */
-    fun handleScanDocument() {
+    fun prepareDocumentScanner() {
         viewModelScope.launch {
             runCatching {
-                scannerHandler.handleScanDocument()
-            }.onSuccess { handleScanDocumentResult ->
-                _state.update { it.copy(handleScanDocumentResult = handleScanDocumentResult) }
+                scannerHandler.prepareDocumentScanner()
+            }.onSuccess { gmsDocumentScanner ->
+                _state.update { it.copy(gmsDocumentScanner = gmsDocumentScanner) }
             }.onFailure { exception ->
                 _state.update {
                     it.copy(
@@ -1431,17 +1431,17 @@ class ManagerViewModel @Inject constructor(
     }
 
     /**
-     * When the system fails to open the ML Document Kit Scanner, display a generic error message
+     * When the system fails to open the ML Kit Document Scanner, display a generic error message
      */
-    fun onNewDocumentScannerFailedToOpen() {
+    fun onDocumentScannerFailedToOpen() {
         _state.update { it.copy(documentScanningError = DocumentScanningError.GenericError) }
     }
 
     /**
-     * Resets the value of [ManagerState.handleScanDocumentResult]
+     * Resets the value of [ManagerState.gmsDocumentScanner]
      */
-    fun onHandleScanDocumentResultConsumed() {
-        _state.update { it.copy(handleScanDocumentResult = null) }
+    fun onGmsDocumentScannerConsumed() {
+        _state.update { it.copy(gmsDocumentScanner = null) }
     }
 
     /**

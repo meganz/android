@@ -81,14 +81,6 @@ enum class AppFeatures(override val description: String, private val defaultValu
     ),
 
     /**
-     * Enables document scanner
-     */
-    DocumentScanner(
-        "Enable new document scanner implementation",
-        true,
-    ),
-
-    /**
      * Enables Map location
      */
     MapLocation(

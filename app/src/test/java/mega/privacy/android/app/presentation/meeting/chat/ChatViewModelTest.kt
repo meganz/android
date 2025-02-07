@@ -4,6 +4,7 @@ import android.net.Uri
 import androidx.lifecycle.SavedStateHandle
 import app.cash.turbine.test
 import com.google.common.truth.Truth.assertThat
+import com.google.mlkit.vision.documentscanner.GmsDocumentScanner
 import de.palm.composestateevents.StateEventWithContentConsumed
 import de.palm.composestateevents.StateEventWithContentTriggered
 import de.palm.composestateevents.consumed
@@ -31,7 +32,6 @@ import mega.privacy.android.app.middlelayer.scanner.ScannerHandler
 import mega.privacy.android.app.objects.GifData
 import mega.privacy.android.app.objects.PasscodeManagement
 import mega.privacy.android.app.presentation.documentscanner.model.DocumentScanningError
-import mega.privacy.android.app.presentation.documentscanner.model.HandleScanDocumentResult
 import mega.privacy.android.app.presentation.meeting.chat.mapper.ForwardMessagesResultMapper
 import mega.privacy.android.app.presentation.meeting.chat.mapper.InviteParticipantResultMapper
 import mega.privacy.android.app.presentation.meeting.chat.mapper.ParticipantNameMapper
@@ -3115,30 +3115,24 @@ internal class ChatViewModelTest {
         }
 
         @Test
-        fun `test that the old document scanner is used for scanning documents`() =
-            verifyHandleScanDocumentResult(HandleScanDocumentResult.UseLegacyImplementation)
-
-        @Test
-        fun `test that the new ML document kit scanner is initialized and used for scanning documents`() =
-            verifyHandleScanDocumentResult(HandleScanDocumentResult.UseNewImplementation(mock()))
-
-        private fun verifyHandleScanDocumentResult(handleScanDocumentResult: HandleScanDocumentResult) =
+        fun `test that the ML Kit Document Scanner is initialized and ready to scan documents`() =
             runTest {
-                whenever(scannerHandler.handleScanDocument()).thenReturn(handleScanDocumentResult)
+                val gmsDocumentScanner = mock<GmsDocumentScanner>()
+                whenever(scannerHandler.prepareDocumentScanner()).thenReturn(gmsDocumentScanner)
 
                 underTest.onAttachScan()
 
                 underTest.state.test {
-                    assertThat(awaitItem().handleScanDocumentResult).isEqualTo(
-                        triggered(handleScanDocumentResult)
+                    assertThat(awaitItem().gmsDocumentScanner).isEqualTo(
+                        triggered(gmsDocumentScanner)
                     )
                 }
             }
 
         @Test
-        fun `test that an insufficient RAM to launch error is returned when initializing the ML document kit scanner with low device RAM`() =
+        fun `test that an insufficient RAM to launch error is returned when initializing the ML Kit Document Scanner with low device RAM`() =
             runTest {
-                whenever(scannerHandler.handleScanDocument()).thenAnswer {
+                whenever(scannerHandler.prepareDocumentScanner()).thenAnswer {
                     throw InsufficientRAMToLaunchDocumentScanner()
                 }
 
@@ -3150,9 +3144,9 @@ internal class ChatViewModelTest {
             }
 
         @Test
-        fun `test that a generic error is returned when initializing the ML document kit scanner results in an error`() =
+        fun `test that a generic error is returned when initializing the ML Kit Document Scanner results in an error`() =
             runTest {
-                whenever(scannerHandler.handleScanDocument()).thenThrow(RuntimeException())
+                whenever(scannerHandler.prepareDocumentScanner()).thenThrow(RuntimeException())
 
                 assertDoesNotThrow { underTest.onAttachScan() }
 
@@ -3162,9 +3156,9 @@ internal class ChatViewModelTest {
             }
 
         @Test
-        fun `test that a generic error is returned when opening the ML document kit scanner results in an error`() =
+        fun `test that a generic error is returned when opening the ML Kit Document Scanner results in an error`() =
             runTest {
-                underTest.onNewDocumentScannerFailedToOpen()
+                underTest.onDocumentScannerFailedToOpen()
 
                 underTest.state.test {
                     assertThat(awaitItem().documentScanningError).isEqualTo(DocumentScanningError.GenericError)
@@ -3172,11 +3166,11 @@ internal class ChatViewModelTest {
             }
 
         @Test
-        fun `test that the handle scan document result is reset`() = runTest {
-            underTest.onHandleScanDocumentResultConsumed()
+        fun `test that the gms document scanner is reset`() = runTest {
+            underTest.onGmsDocumentScannerConsumed()
 
             underTest.state.test {
-                assertThat(awaitItem().handleScanDocumentResult).isEqualTo(consumed())
+                assertThat(awaitItem().gmsDocumentScanner).isEqualTo(consumed())
             }
         }
 

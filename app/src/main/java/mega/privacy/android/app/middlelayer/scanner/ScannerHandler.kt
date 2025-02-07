@@ -1,6 +1,6 @@
 package mega.privacy.android.app.middlelayer.scanner
 
-import mega.privacy.android.app.presentation.documentscanner.model.HandleScanDocumentResult
+import com.google.mlkit.vision.documentscanner.GmsDocumentScanner
 import mega.privacy.android.app.presentation.qrcode.model.BarcodeScanResult
 
 /**
@@ -21,5 +21,11 @@ interface ScannerHandler {
      *
      * @return the result dictating what type of Document Scanner to use
      */
-    suspend fun handleScanDocument(): HandleScanDocumentResult
+
+    /**
+     * Install the ML Kit Document Scanner from Google Play services
+     *
+     * @return the ML Kit Document Scanner if installation is successful
+     */
+    suspend fun prepareDocumentScanner(): GmsDocumentScanner
 }

@@ -323,7 +323,6 @@ dependencies {
     implementation(lib.shimmerlayout)
     implementation(lib.namedregexp)
     implementation(lib.blurry)
-    implementation(lib.documentscanner)
     implementation(lib.simplestorage)
     implementation(lib.compose.state.events)
     implementation(testlib.hamcrest)

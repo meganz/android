@@ -5,6 +5,7 @@ import androidx.lifecycle.SavedStateHandle
 import app.cash.turbine.Event
 import app.cash.turbine.test
 import com.google.common.truth.Truth.assertThat
+import com.google.mlkit.vision.documentscanner.GmsDocumentScanner
 import com.jraska.livedata.test
 import de.palm.composestateevents.triggered
 import kotlinx.coroutines.ExperimentalCoroutinesApi
@@ -31,7 +32,6 @@ import mega.privacy.android.app.meeting.gateway.RTCAudioManagerGateway
 import mega.privacy.android.app.middlelayer.scanner.ScannerHandler
 import mega.privacy.android.app.objects.PasscodeManagement
 import mega.privacy.android.app.presentation.documentscanner.model.DocumentScanningError
-import mega.privacy.android.app.presentation.documentscanner.model.HandleScanDocumentResult
 import mega.privacy.android.app.presentation.manager.model.SharesTab
 import mega.privacy.android.app.presentation.meeting.chat.model.InfoToShow
 import mega.privacy.android.app.presentation.transfers.starttransfer.model.TransferTriggerEvent
@@ -1548,40 +1548,27 @@ class ManagerViewModelTest {
     }
 
     @Test
-    fun `test that the old document scanner is used for scanning documents`() = runTest {
-        val handleScanDocumentResult = HandleScanDocumentResult.UseLegacyImplementation
-        whenever(scannerHandler.handleScanDocument()).thenReturn(handleScanDocumentResult)
-
-        underTest.handleScanDocument()
-        testScheduler.advanceUntilIdle()
-
-        underTest.state.test {
-            assertThat(awaitItem().handleScanDocumentResult).isEqualTo(handleScanDocumentResult)
-        }
-    }
-
-    @Test
-    fun `test that the new ML document kit scanner is initialized and used for scanning documents`() =
+    fun `test that the ML Kit Document Scanner is initialized and ready to scan documents`() =
         runTest {
-            val handleScanDocumentResult = HandleScanDocumentResult.UseNewImplementation(mock())
-            whenever(scannerHandler.handleScanDocument()).thenReturn(handleScanDocumentResult)
+            val gmsDocumentScanner = mock<GmsDocumentScanner>()
+            whenever(scannerHandler.prepareDocumentScanner()).thenReturn(gmsDocumentScanner)
 
-            underTest.handleScanDocument()
+            underTest.prepareDocumentScanner()
             testScheduler.advanceUntilIdle()
 
             underTest.state.test {
-                assertThat(awaitItem().handleScanDocumentResult).isEqualTo(handleScanDocumentResult)
+                assertThat(awaitItem().gmsDocumentScanner).isEqualTo(gmsDocumentScanner)
             }
         }
 
     @Test
-    fun `test that an insufficient RAM to launch error is returned when initializing the ML document kit scanner with low device RAM`() =
+    fun `test that an insufficient RAM to launch error is returned when initializing the ML Kit Document Scanner with low device RAM`() =
         runTest {
-            whenever(scannerHandler.handleScanDocument()).thenAnswer {
+            whenever(scannerHandler.prepareDocumentScanner()).thenAnswer {
                 throw InsufficientRAMToLaunchDocumentScanner()
             }
 
-            assertDoesNotThrow { underTest.handleScanDocument() }
+            assertDoesNotThrow { underTest.prepareDocumentScanner() }
             testScheduler.advanceUntilIdle()
 
             underTest.state.test {
@@ -1590,11 +1577,11 @@ class ManagerViewModelTest {
         }
 
     @Test
-    fun `test that a generic error is returned when initializing the ML document kit scanner results in an error`() =
+    fun `test that a generic error is returned when initializing the ML Kit Document Scanner results in an error`() =
         runTest {
-            whenever(scannerHandler.handleScanDocument()).thenThrow(RuntimeException())
+            whenever(scannerHandler.prepareDocumentScanner()).thenThrow(RuntimeException())
 
-            assertDoesNotThrow { underTest.handleScanDocument() }
+            assertDoesNotThrow { underTest.prepareDocumentScanner() }
             testScheduler.advanceUntilIdle()
 
             underTest.state.test {
@@ -1603,9 +1590,9 @@ class ManagerViewModelTest {
         }
 
     @Test
-    fun `test that a generic error is returned when opening the ML document kit scanner results in an error`() =
+    fun `test that a generic error is returned when opening the ML Kit Document Scanner results in an error`() =
         runTest {
-            underTest.onNewDocumentScannerFailedToOpen()
+            underTest.onDocumentScannerFailedToOpen()
             testScheduler.advanceUntilIdle()
 
             underTest.state.test {
@@ -1614,12 +1601,12 @@ class ManagerViewModelTest {
         }
 
     @Test
-    fun `test that the handle scan document result is reset`() = runTest {
-        underTest.onHandleScanDocumentResultConsumed()
+    fun `test that the gms document scanner is reset`() = runTest {
+        underTest.onGmsDocumentScannerConsumed()
         testScheduler.advanceUntilIdle()
 
         underTest.state.test {
-            assertThat(awaitItem().handleScanDocumentResult).isNull()
+            assertThat(awaitItem().gmsDocumentScanner).isNull()
         }
     }
 
