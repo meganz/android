@@ -26,10 +26,8 @@ import mega.privacy.android.app.R
 import mega.privacy.android.app.constants.BroadcastConstants.ACTION_REFRESH_CLEAR_OFFLINE_SETTING
 import mega.privacy.android.app.constants.BroadcastConstants.ACTION_RESET_VERSION_INFO_SETTING
 import mega.privacy.android.app.constants.BroadcastConstants.ACTION_TYPE
-import mega.privacy.android.app.constants.BroadcastConstants.ACTION_UPDATE_CACHE_SIZE_SETTING
 import mega.privacy.android.app.constants.BroadcastConstants.ACTION_UPDATE_OFFLINE_SIZE_SETTING
 import mega.privacy.android.app.constants.BroadcastConstants.ACTION_UPDATE_RB_SCHEDULER
-import mega.privacy.android.app.constants.BroadcastConstants.CACHE_SIZE
 import mega.privacy.android.app.constants.BroadcastConstants.DAYS_COUNT
 import mega.privacy.android.app.constants.BroadcastConstants.OFFLINE_SIZE
 import mega.privacy.android.app.databinding.DialogTwoVerticalButtonsBinding
@@ -57,19 +55,6 @@ class FileManagementPreferencesActivity : PreferencesBaseActivity() {
     private var clearRubbishBinDialog: AlertDialog? = null
     private var newFolderDialog: AlertDialog? = null
     private var generalDialog: AlertDialog? = null
-    private val cacheSizeUpdateReceiver: BroadcastReceiver = object : BroadcastReceiver() {
-        override fun onReceive(context: Context, intent: Intent) {
-            if (sttFileManagement != null && intent.action == ACTION_UPDATE_CACHE_SIZE_SETTING) {
-                val size = intent.getLongExtra(CACHE_SIZE, 0)
-                sttFileManagement?.setCacheSize(
-                    Util.getSizeString(
-                        size,
-                        this@FileManagementPreferencesActivity
-                    )
-                )
-            }
-        }
-    }
     private val resetVersionInfoReceiver: BroadcastReceiver = object : BroadcastReceiver() {
         override fun onReceive(context: Context, intent: Intent) {
             if (sttFileManagement != null && intent.action == ACTION_RESET_VERSION_INFO_SETTING) {
@@ -125,10 +110,6 @@ class FileManagementPreferencesActivity : PreferencesBaseActivity() {
                 supportFragmentManager.findFragmentById(R.id.fragment_container) as? SettingsFileManagementFragment
         }
         registerReceiver(
-            cacheSizeUpdateReceiver,
-            IntentFilter(ACTION_UPDATE_CACHE_SIZE_SETTING)
-        )
-        registerReceiver(
             offlineSizeUpdateReceiver,
             IntentFilter(ACTION_UPDATE_OFFLINE_SIZE_SETTING)
         )
@@ -164,7 +145,6 @@ class FileManagementPreferencesActivity : PreferencesBaseActivity() {
 
     override fun onDestroy() {
         super.onDestroy()
-        unregisterReceiver(cacheSizeUpdateReceiver)
         unregisterReceiver(offlineSizeUpdateReceiver)
         unregisterReceiver(updateMyAccountReceiver)
         unregisterReceiver(updateCUSettingsReceiver)
@@ -200,7 +180,10 @@ class FileManagementPreferencesActivity : PreferencesBaseActivity() {
             val nC = NodeController(this)
             nC.cleanRubbishBin()
         }
-        builder.setNegativeButton(getFormattedStringOrDefault(sharedR.string.general_dialog_cancel_button), null)
+        builder.setNegativeButton(
+            getFormattedStringOrDefault(sharedR.string.general_dialog_cancel_button),
+            null
+        )
         clearRubbishBinDialog = builder.create()
         clearRubbishBinDialog?.show()
     }
@@ -218,7 +201,10 @@ class FileManagementPreferencesActivity : PreferencesBaseActivity() {
             val nC = NodeController(this)
             nC.clearAllVersions()
         }
-        builder.setNegativeButton(getFormattedStringOrDefault(sharedR.string.general_dialog_cancel_button), null)
+        builder.setNegativeButton(
+            getFormattedStringOrDefault(sharedR.string.general_dialog_cancel_button),
+            null
+        )
         clearRubbishBinDialog = builder.create()
         clearRubbishBinDialog?.show()
     }
@@ -330,7 +316,7 @@ class FileManagementPreferencesActivity : PreferencesBaseActivity() {
             setTextColor(
                 getThemeColor(
                     this@FileManagementPreferencesActivity,
-                   com.google.android.material.R.attr.colorSecondary
+                    com.google.android.material.R.attr.colorSecondary
                 )
             )
             hint = getFormattedStringOrDefault(R.string.hint_days)

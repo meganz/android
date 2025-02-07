@@ -18,8 +18,6 @@ import mega.privacy.android.app.R
 import mega.privacy.android.app.activities.settingsActivities.FileManagementPreferencesActivity
 import mega.privacy.android.app.arch.extensions.collectFlow
 import mega.privacy.android.app.constants.BroadcastConstants
-import mega.privacy.android.app.constants.BroadcastConstants.ACTION_UPDATE_CACHE_SIZE_SETTING
-import mega.privacy.android.app.constants.BroadcastConstants.CACHE_SIZE
 import mega.privacy.android.app.constants.SettingsConstants.KEY_AUTO_PLAY_SWITCH
 import mega.privacy.android.app.constants.SettingsConstants.KEY_CACHE
 import mega.privacy.android.app.constants.SettingsConstants.KEY_CLEAR_VERSIONS
@@ -163,11 +161,12 @@ class SettingsFileManagementFragment : SettingsBaseFragment(),
         }
 
         if (filePreferencesState.updateCacheSizeSetting != null) {
-            Intent(ACTION_UPDATE_CACHE_SIZE_SETTING).apply {
-                putExtra(CACHE_SIZE, filePreferencesState.updateCacheSizeSetting)
-                setPackage(requireContext().packageName)
-                requireContext().sendBroadcast(this)
-            }
+            setCacheSize(
+                Util.getSizeString(
+                    filePreferencesState.updateCacheSizeSetting,
+                    requireContext()
+                )
+            )
             viewModel.resetUpdateCacheSizeSetting()
         }
 
@@ -357,11 +356,9 @@ class SettingsFileManagementFragment : SettingsBaseFragment(),
      *
      * @param size cache size
      */
-    fun setCacheSize(size: String?) {
-        if (isAdded) {
-            cacheAdvancedOptions?.summary =
-                getString(R.string.settings_advanced_features_size, size)
-        }
+    private fun setCacheSize(size: String?) {
+        cacheAdvancedOptions?.summary =
+            getString(R.string.settings_advanced_features_size, size)
     }
 
     /**
