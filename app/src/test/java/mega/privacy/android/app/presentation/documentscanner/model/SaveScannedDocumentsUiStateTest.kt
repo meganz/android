@@ -35,30 +35,4 @@ internal class SaveScannedDocumentsUiStateTest {
 
             assertThat(underTest.canSelectScanFileType).isFalse()
         }
-
-    @Test
-    fun `test that the actual filename of the pdf to be uploaded has the correct suffix`() =
-        runTest {
-            val filename = "test_filename"
-
-            underTest = SaveScannedDocumentsUiState(
-                filename = filename,
-                scanFileType = ScanFileType.Pdf,
-            )
-
-            assertThat(underTest.actualFilename).isEqualTo("$filename.pdf")
-        }
-
-    @Test
-    fun `test that the actual filename of the image to be uploaded has the correct suffix`() =
-        runTest {
-            val filename = "test_filename"
-
-            underTest = SaveScannedDocumentsUiState(
-                filename = filename,
-                scanFileType = ScanFileType.Jpg,
-            )
-
-            assertThat(underTest.actualFilename).isEqualTo("$filename.jpg")
-        }
 }

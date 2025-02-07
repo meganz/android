@@ -40,9 +40,4 @@ internal data class SaveScannedDocumentsUiState(
      * True if the User can select the [scanFileType] to upload the scanned document/s
      */
     val canSelectScanFileType = soloImageUri != null
-
-    /**
-     * The actual filename that will be used when uploading the scanned document/s
-     */
-    val actualFilename = "$filename${scanFileType.fileSuffix}"
 }

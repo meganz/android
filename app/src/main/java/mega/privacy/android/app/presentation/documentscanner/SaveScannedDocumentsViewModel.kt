@@ -75,14 +75,16 @@ internal class SaveScannedDocumentsViewModel @Inject constructor(
                 ),
             ) { originatedFromChat: Boolean, cloudDriveParentHandle: Long, pdfUri: Uri?, soloImageUri: Uri? ->
                 { state: SaveScannedDocumentsUiState ->
+                    val initialFilename = String.format(
+                        Locale.getDefault(),
+                        INITIAL_FILENAME_FORMAT,
+                        Calendar.getInstance(),
+                    ) + _uiState.value.scanFileType.fileSuffix
+
                     state.copy(
-                        originatedFromChat = originatedFromChat,
                         cloudDriveParentHandle = cloudDriveParentHandle,
-                        filename = String.format(
-                            Locale.getDefault(),
-                            INITIAL_FILENAME_FORMAT,
-                            Calendar.getInstance(),
-                        ),
+                        filename = initialFilename,
+                        originatedFromChat = originatedFromChat,
                         pdfUri = pdfUri,
                         scanDestination = if (originatedFromChat) {
                             ScanDestination.Chat
@@ -144,7 +146,7 @@ internal class SaveScannedDocumentsViewModel @Inject constructor(
                         runCatching {
                             renameFileAndDeleteOriginalUseCase(
                                 originalUriPath = UriPath(nonNullUriPath),
-                                newFilename = uiState.actualFilename,
+                                newFilename = uiState.filename,
                             )
                         }.onSuccess { renamedFile ->
                             logDocumentScanEvent(uiState.scanFileType, uiState.scanDestination)
@@ -213,12 +215,55 @@ internal class SaveScannedDocumentsViewModel @Inject constructor(
     }
 
     /**
-     * Updates the File Type of the scanned Document/s to be uploaded
+     * When changing the [ScanFileType], update the Filename, Filename Validation Status and
+     * Scan File Type to the UI State
+     *
+     * Filename Logic:
+     *
+     * * If the current Filename ends with the new [ScanFileType] file suffix, there are no changes
+     *
+     *     * Example: If the previous Filename is "Scanned.pdf" and PDF is the new [ScanFileType]
+     *
+     * * Else if the current Filename ends with the old [ScanFileType] file suffix, then replace it
+     * with the new [ScanFileType] suffix
+     *
+     *     * Example: If the previous Filename is "Scanned.pdf" and JPG is the new [ScanFileType],
+     *     then the new Filename is "Scanned.jpg".
+     *
+     *  * Else, simply append the new [ScanFileType] suffix to the current Filename
+     *
+     *     * Example: If the previous Filename is "Scanned" and PDF is the new [ScanFileType], then
+     *     the new Filename is "Scanned.pdf"
      *
      * @param newScanFileType The new Scan File Type
      */
     fun onScanFileTypeSelected(newScanFileType: ScanFileType) {
-        _uiState.update { it.copy(scanFileType = newScanFileType) }
+        val previousSuffix = _uiState.value.scanFileType.fileSuffix
+        val previousFilename = _uiState.value.filename
+        val newSuffix = newScanFileType.fileSuffix
+
+        val updatedFilename = when {
+            previousFilename.endsWith(newSuffix) -> previousFilename
+            previousFilename.endsWith(previousSuffix) -> {
+                previousFilename.substringBeforeLast(
+                    previousSuffix,
+                    ""
+                ) + newSuffix
+            }
+
+            else -> "$previousFilename$newSuffix"
+        }
+        val updatedFileValidationStatus = validateScanFilenameUseCase(
+            filename = updatedFilename,
+            fileExtension = newSuffix,
+        )
+        _uiState.update {
+            it.copy(
+                filename = updatedFilename,
+                filenameValidationStatus = updatedFileValidationStatus,
+                scanFileType = newScanFileType,
+            )
+        }
     }
 
     /**

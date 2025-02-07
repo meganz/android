@@ -86,8 +86,21 @@ internal fun SaveScannedDocumentsView(
         event = uiState.snackbarMessage,
         onConsumed = { onSnackbarMessageConsumed() },
         action = { filenameValidationStatus ->
-            val message = context.resources.getString(R.string.scan_snackbar_incorrect_name)
-                .takeIf { filenameValidationStatus == ScanFilenameValidationStatus.EmptyFilename }
+            val message = when (filenameValidationStatus) {
+                ScanFilenameValidationStatus.EmptyFilename -> {
+                    context.resources.getString(R.string.scan_snackbar_incorrect_name)
+                }
+
+                ScanFilenameValidationStatus.IncorrectFilenameExtension -> context.resources.getString(
+                    SharedR.string.document_scanning_settings_non_matching_file_extension_error_message
+                )
+
+                ScanFilenameValidationStatus.MissingFilenameExtension -> context.resources.getString(
+                    SharedR.string.document_scanning_settings_file_extension_required_error_message
+                )
+
+                else -> null
+            }
 
             message?.let {
                 scaffoldState.snackbarHostState.showAutoDurationSnackbar(it)

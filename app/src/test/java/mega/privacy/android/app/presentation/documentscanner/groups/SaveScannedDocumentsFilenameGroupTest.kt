@@ -23,7 +23,7 @@ internal class SaveScannedDocumentsFilenameGroupTest {
     fun `test that the ui components are displayed`() {
         composeTestRule.setContent {
             SaveScannedDocumentsFilenameGroup(
-                filename = "Filename",
+                filename = "Filename.pdf",
                 filenameValidationStatus = ScanFilenameValidationStatus.ValidFilename,
                 scanFileType = ScanFileType.Pdf,
                 onFilenameChanged = {},

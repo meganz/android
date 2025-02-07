@@ -134,25 +134,24 @@ internal class SaveScannedDocumentsViewModelTest {
         }
 
     @Test
-    fun `test that the default actual filename ends with PDF upon initialization`() = runTest {
+    fun `test that the default filename ends with PDF upon initialization`() = runTest {
         val expectedFilename = String.format(
             Locale.getDefault(),
             "Scanned_%1tY%<tm%<td%<tH%<tM%<tS",
             Calendar.getInstance(),
-        )
-        val actualFilename = "$expectedFilename.pdf"
+        ) + ".pdf"
 
         initViewModel()
 
         underTest.uiState.test {
-            assertThat(awaitItem().actualFilename).isEqualTo(actualFilename)
+            assertThat(awaitItem().filename).isEqualTo(expectedFilename)
         }
     }
 
     @Test
     fun `test that both filename and filename validation status are updated when the filename changes`() =
         runTest {
-            val filename = "New Scan"
+            val filename = "New Scan.pdf"
 
             initViewModel()
             // Just to ensure that the selected scan file type is a PDF
@@ -169,22 +168,43 @@ internal class SaveScannedDocumentsViewModelTest {
         }
 
     @Test
-    fun `test that the snackbar is shown when confirming an empty filename`() = runTest {
-        initViewModel()
+    fun `test that the snackbar is shown when confirming a valid filename with an incorrect extension`() =
+        runTest {
+            initViewModel()
 
-        underTest.onFilenameConfirmed("")
+            underTest.onFilenameConfirmed("New Filename.jpg")
 
-        underTest.uiState.test {
-            assertThat(awaitItem().snackbarMessage).isEqualTo(triggered(ScanFilenameValidationStatus.EmptyFilename))
+            underTest.uiState.test {
+                assertThat(awaitItem().snackbarMessage).isEqualTo(
+                    triggered(
+                        ScanFilenameValidationStatus.IncorrectFilenameExtension
+                    )
+                )
+            }
         }
-    }
+
+    @Test
+    fun `test that the snackbar is shown when confirming a valid filename without an extension`() =
+        runTest {
+            initViewModel()
+
+            underTest.onFilenameConfirmed("New Filename")
+
+            underTest.uiState.test {
+                assertThat(awaitItem().snackbarMessage).isEqualTo(
+                    triggered(
+                        ScanFilenameValidationStatus.MissingFilenameExtension
+                    )
+                )
+            }
+        }
 
     @Test
     fun `test that the snackbar is not shown when confirming a filename with invalid characters`() =
         runTest {
             initViewModel()
 
-            underTest.onFilenameConfirmed("New Filename?")
+            underTest.onFilenameConfirmed("New Filename?.pdf")
 
             underTest.uiState.test {
                 assertThat(awaitItem().snackbarMessage).isEqualTo(consumed())
@@ -195,7 +215,7 @@ internal class SaveScannedDocumentsViewModelTest {
     fun `test that the snackbar is not shown when confirming a valid filename`() = runTest {
         initViewModel()
 
-        underTest.onFilenameConfirmed("New Filename")
+        underTest.onFilenameConfirmed("New Filename.pdf")
 
         underTest.uiState.test {
             assertThat(awaitItem().snackbarMessage).isEqualTo(consumed())
@@ -206,9 +226,8 @@ internal class SaveScannedDocumentsViewModelTest {
     fun `test that the snackbar is shown when proceeding to upload the scanned documents using a blank filename`() =
         runTest {
             initViewModel()
-            // First, set the blank filename to the UI State
-            underTest.onFilenameChanged("")
 
+            underTest.onFilenameChanged("")
             underTest.onSaveButtonClicked()
 
             underTest.uiState.test {
@@ -219,12 +238,29 @@ internal class SaveScannedDocumentsViewModelTest {
         }
 
     @Test
+    fun `test that the snackbar is shown when proceeding to upload the scanned documents using a valid filename with an incorrect extension`() =
+        runTest {
+            initViewModel()
+
+            underTest.onScanFileTypeSelected(ScanFileType.Pdf)
+            underTest.onFilenameChanged("New Filename.jpg")
+            underTest.onSaveButtonClicked()
+
+            underTest.uiState.test {
+                assertThat(awaitItem().snackbarMessage).isEqualTo(
+                    triggered(
+                        ScanFilenameValidationStatus.IncorrectFilenameExtension
+                    )
+                )
+            }
+        }
+
+    @Test
     fun `test that the snackbar is not shown when proceeding to upload the scanned documents using a filename with invalid characters`() =
         runTest {
             initViewModel()
-            // First, set a filename with invalid characters to the UI State
-            underTest.onFilenameChanged("New Filename?")
 
+            underTest.onFilenameChanged("New Filename?.pdf")
             underTest.onSaveButtonClicked()
 
             underTest.uiState.test {
@@ -236,13 +272,97 @@ internal class SaveScannedDocumentsViewModelTest {
     fun `test that the snackbar is not shown when proceeding to upload the scanned documents using a valid filename`() =
         runTest {
             initViewModel()
-            // First, set a valid filename to the UI State
-            underTest.onFilenameChanged("New Filename")
 
+            underTest.onFilenameChanged("New Filename.pdf")
             underTest.onSaveButtonClicked()
 
             underTest.uiState.test {
                 assertThat(awaitItem().snackbarMessage).isEqualTo(consumed())
+            }
+        }
+
+    @Test
+    fun `test that the filename is unchanged when the new scan file type suffix exists in the filename`() =
+        runTest {
+            val previousFilename = "New Scan.pdf"
+            val newScanFileType = ScanFileType.Pdf
+
+            initViewModel()
+            // First, set the new filename
+            underTest.onFilenameChanged(previousFilename)
+            // Then, change the scan file type
+            underTest.onScanFileTypeSelected(newScanFileType)
+
+            underTest.uiState.test {
+                val state = awaitItem()
+                assertThat(state.filename).isEqualTo(previousFilename)
+                assertThat(state.scanFileType).isEqualTo(newScanFileType)
+            }
+        }
+
+    @Test
+    fun `test that the filename suffix ends in pdf when the old scan file type is JPG and the new scan file type is PDF`() =
+        runTest {
+            val previousFilename = "New Scan.pdf"
+            val previousScanFileType = ScanFileType.Pdf
+            val newScanFileType = ScanFileType.Jpg
+
+            initViewModel()
+            // First, set the old filename and scan file type
+            underTest.onFilenameChanged(previousFilename)
+            underTest.onScanFileTypeSelected(previousScanFileType)
+
+            // Then, change to a different scan file type
+            underTest.onScanFileTypeSelected(newScanFileType)
+
+            underTest.uiState.test {
+                val state = awaitItem()
+                assertThat(state.filename).isEqualTo("New Scan${newScanFileType.fileSuffix}")
+                assertThat(state.scanFileType).isEqualTo(newScanFileType)
+            }
+        }
+
+    @Test
+    fun `test that the filename suffix ends in jpg when the old scan file type is PDF and the new scan file type is JPG`() =
+        runTest {
+            val previousFilename = "New Scan.jpg"
+            val previousScanFileType = ScanFileType.Jpg
+            val newScanFileType = ScanFileType.Pdf
+
+            initViewModel()
+            // First, set the old filename and scan file type
+            underTest.onFilenameChanged(previousFilename)
+            underTest.onScanFileTypeSelected(previousScanFileType)
+
+            // Then, change to a different scan file type
+            underTest.onScanFileTypeSelected(newScanFileType)
+
+            underTest.uiState.test {
+                val state = awaitItem()
+                assertThat(state.filename).isEqualTo("New Scan${newScanFileType.fileSuffix}")
+                assertThat(state.scanFileType).isEqualTo(newScanFileType)
+            }
+        }
+
+    @Test
+    fun `test that the new filename suffix is simply appended when the old filename does not contain the suffix of the old or new scan file type`() =
+        runTest {
+            val newScanFileType = ScanFileType.Jpg
+
+            initViewModel()
+            // First, set the old filename and scan file type
+            underTest.onFilenameChanged("New Scan.pdf")
+            underTest.onScanFileTypeSelected(ScanFileType.Pdf)
+
+            // Next, update the filename without the suffix
+            underTest.onFilenameChanged("New Scan")
+            // Then, change to a different scan file type
+            underTest.onScanFileTypeSelected(newScanFileType)
+
+            underTest.uiState.test {
+                val state = awaitItem()
+                assertThat(state.filename).isEqualTo("New Scan${newScanFileType.fileSuffix}")
+                assertThat(state.scanFileType).isEqualTo(newScanFileType)
             }
         }
 
@@ -252,7 +372,7 @@ internal class SaveScannedDocumentsViewModelTest {
             // This assumes that no URIs for both PDF and Solo Image were not initialized
             initViewModel()
 
-            underTest.onFilenameChanged("new_filename")
+            underTest.onFilenameChanged("new_filename.pdf")
             underTest.onScanFileTypeSelected(ScanFileType.Pdf)
             underTest.onScanDestinationSelected(ScanDestination.CloudDrive)
             // Trigger the scan uploading process
@@ -285,7 +405,7 @@ internal class SaveScannedDocumentsViewModelTest {
 
             initViewModel()
 
-            underTest.onFilenameChanged("new_filename")
+            underTest.onFilenameChanged("new_filename.pdf")
             underTest.onScanFileTypeSelected(ScanFileType.Pdf)
             underTest.onScanDestinationSelected(ScanDestination.CloudDrive)
             // Trigger the scan uploading process
@@ -299,7 +419,7 @@ internal class SaveScannedDocumentsViewModelTest {
     @Test
     fun `test that the scans are not uploaded when the filename and Uri and its path are valid but an error occurred in the renaming process`() =
         runTest {
-            val newFilename = "new_filename"
+            val newFilename = "new_filename.pdf"
             // Initialize the PDF and Solo Image URIs
             savedStateHandle[SaveScannedDocumentsActivity.EXTRA_ORIGINATED_FROM_CHAT] = false
             savedStateHandle[SaveScannedDocumentsActivity.EXTRA_CLOUD_DRIVE_PARENT_HANDLE] =
@@ -309,7 +429,7 @@ internal class SaveScannedDocumentsViewModelTest {
             whenever(
                 renameFileAndDeleteOriginalUseCase(
                     originalUriPath = UriPath(pdfUriPath),
-                    newFilename = "${newFilename}.pdf",
+                    newFilename = newFilename,
                 )
             ).thenThrow(RuntimeException())
 
@@ -329,7 +449,7 @@ internal class SaveScannedDocumentsViewModelTest {
     @Test
     fun `test that the scans with the correct filename are uploaded`() = runTest {
         val uriMock = Mockito.mockStatic(Uri::class.java)
-        val newFilename = "new_filename"
+        val newFilename = "new_filename.pdf"
         val fileToUploadUri = mock<Uri> {
             on { toString() } doReturn "/data/user/0/app_location/cache/renamed_test_scan.pdf"
         }
@@ -345,7 +465,7 @@ internal class SaveScannedDocumentsViewModelTest {
         whenever(
             renameFileAndDeleteOriginalUseCase(
                 originalUriPath = UriPath(pdfUriPath),
-                newFilename = "${newFilename}.pdf",
+                newFilename = newFilename,
             )
         ).thenReturn(fileToUpload)
 

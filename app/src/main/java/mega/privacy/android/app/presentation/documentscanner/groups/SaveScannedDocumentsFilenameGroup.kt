@@ -1,6 +1,7 @@
 package mega.privacy.android.app.presentation.documentscanner.groups
 
 import mega.privacy.android.icon.pack.R as IconPackR
+import mega.privacy.android.shared.resources.R as SharedR
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.isSystemInDarkTheme
@@ -11,6 +12,7 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.text.KeyboardActions
 import androidx.compose.material.MaterialTheme
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.SideEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
@@ -81,6 +83,12 @@ internal fun SaveScannedDocumentsFilenameGroup(
         mutableStateOf(TextFieldValue(filename))
     }
 
+    LaunchedEffect(filename) {
+        if (filename != filenameValueState.text) {
+            filenameValueState = TextFieldValue(filename)
+        }
+    }
+
     Column(modifier = modifier) {
         MegaText(
             modifier = Modifier
@@ -109,9 +117,18 @@ internal fun SaveScannedDocumentsFilenameGroup(
                     .onFocusChanged { focusState ->
                         isFocused = focusState.isFocused
                         if (focusState.isFocused) {
-                            // When the Text Field gains focus, select the entire filename
+
+                            val fileSuffix = scanFileType.fileSuffix
+                            val lastFileSuffixIndex = filename.lastIndexOf(fileSuffix)
+
                             filenameValueState = filenameValueState.copy(
-                                selection = TextRange(0, filenameValueState.text.length)
+                                selection = if (lastFileSuffixIndex != -1 && lastFileSuffixIndex == filename.length - fileSuffix.length) {
+                                    // If the filename contains the expected suffix, highlight the filename without the suffix
+                                    TextRange(0, lastFileSuffixIndex)
+                                } else {
+                                    // Else, highlight the entire filename
+                                    TextRange(0, filename.length)
+                                }
                             )
                             keepWholeSelection = true
                         } else {
@@ -122,11 +139,7 @@ internal fun SaveScannedDocumentsFilenameGroup(
                         }
                     }
                     .testTag(SAVE_SCANNED_DOCUMENTS_FILENAME_GROUP_FILENAME_TEXT_FIELD),
-                textFieldValue = if (isFocused) {
-                    filenameValueState
-                } else {
-                    TextFieldValue("${filenameValueState.text}${scanFileType.fileSuffix}")
-                },
+                textFieldValue = filenameValueState,
                 placeholder = "",
                 showIndicatorLine = isFocused || (filenameValidationStatus != null && filenameValidationStatus != ScanFilenameValidationStatus.ValidFilename),
                 onTextChange = { newTextFieldValue ->
@@ -149,7 +162,10 @@ internal fun SaveScannedDocumentsFilenameGroup(
                         filenameValueState = newTextFieldValue
                     }
                 },
-                errorText = getFilenameErrorMessage(filenameValidationStatus),
+                errorText = getFilenameErrorMessage(
+                    filenameValidationStatus = filenameValidationStatus,
+                    scanFileType = scanFileType,
+                ),
                 imeAction = ImeAction.Done,
                 keyboardActions = KeyboardActions(
                     onDone = {
@@ -178,20 +194,30 @@ internal fun SaveScannedDocumentsFilenameGroup(
  * Retrieves the correct error message when an incorrect filename is supplied
  *
  * @param filenameValidationStatus The filename validation status
+ * @param scanFileType The scan file type
  *
  * @return The error message to be displayed in the filename input
  */
 @Composable
-private fun getFilenameErrorMessage(filenameValidationStatus: ScanFilenameValidationStatus?) =
-    when (filenameValidationStatus) {
-        ScanFilenameValidationStatus.EmptyFilename -> stringResource(R.string.scan_incorrect_name)
-        ScanFilenameValidationStatus.InvalidFilename -> stringResource(
-            R.string.scan_snackbar_invalid_characters,
-            "\" * / : < > ? \\ |"
-        )
+private fun getFilenameErrorMessage(
+    filenameValidationStatus: ScanFilenameValidationStatus?,
+    scanFileType: ScanFileType,
+) = when (filenameValidationStatus) {
+    ScanFilenameValidationStatus.EmptyFilename -> stringResource(R.string.scan_incorrect_name)
+    ScanFilenameValidationStatus.InvalidFilename -> stringResource(
+        R.string.scan_snackbar_invalid_characters,
+        "\" * / : < > ? \\ |"
+    )
 
-        else -> null
-    }
+    ScanFilenameValidationStatus.MissingFilenameExtension,
+    ScanFilenameValidationStatus.IncorrectFilenameExtension,
+        -> stringResource(
+        SharedR.string.document_scanning_settings_missing_file_extension_error_message,
+        scanFileType.fileSuffix,
+    )
+
+    else -> null
+}
 
 /**
  * A Preview Composable for [SaveScannedDocumentsFilenameGroup] that shows the different File Image
@@ -206,7 +232,7 @@ private fun SaveScannedDocumentsFilenameGroupFileImagePreview(
 ) {
     OriginalTempTheme(isDark = isSystemInDarkTheme()) {
         SaveScannedDocumentsFilenameGroup(
-            filename = "Scanned_file",
+            filename = "Scanned_file.pdf",
             filenameValidationStatus = ScanFilenameValidationStatus.ValidFilename,
             scanFileType = scanFileType,
             onFilenameChanged = {},
@@ -251,11 +277,15 @@ private class FilenameInputErrorProvider : PreviewParameterProvider<FilenameInpu
     override val values: Sequence<FilenameInputError>
         get() = sequenceOf(
             FilenameInputError(
+                filename = "Scanned_file",
+                filenameValidationStatus = ScanFilenameValidationStatus.MissingFilenameExtension,
+            ),
+            FilenameInputError(
                 filename = "",
                 filenameValidationStatus = ScanFilenameValidationStatus.EmptyFilename,
             ),
             FilenameInputError(
-                filename = "Scanned_f\\le",
+                filename = "Scanned_f\\le.pdf",
                 filenameValidationStatus = ScanFilenameValidationStatus.InvalidFilename,
             ),
         )

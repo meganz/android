@@ -862,4 +862,10 @@
     <string name="transfers_notification_preview_action">Preview</string>
     <!-- Title for the OS dialog shown with available apps to open a file -->
     <string name="open_with_os_dialog_title">Open %1$s with</string>
+    <!-- The Scan Confirmation screen error message shown when the new filename does not contain the file extension that was selected -->
+    <string name="document_scanning_settings_missing_file_extension_error_message">Missing file extension (%s)</string>
+    <!-- The Scan Confirmation screen error message shown when the filename does not end with the expected file extension -->
+    <string name="document_scanning_settings_non_matching_file_extension_error_message">File extension doesn’t match file type</string>
+    <!-- The Scan Confirmation screen error message shown when the filename has no file extension -->
+    <string name="document_scanning_settings_file_extension_required_error_message">File extension is needed</string>
 </resources>

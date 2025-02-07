@@ -8,9 +8,10 @@ import javax.inject.Inject
  *
  * The filename is considered valid if:
  *
- * 1. The filename is not empty or only contains whitespaces,
- * 2. The base filename (without the expected file extension) is not empty or only contains whitespaces, and
- * 3. The filename does not contain any of the following invalid characters:
+ * 1. The filename is not empty or only contains whitespaces
+ * 2. The filename without the file extension is not empty or only contains whitespaces
+ * 3. The filename ends with the expected file suffix, and
+ * 4. The filename does not contain any of the following invalid characters:
  *     1. A forward slash /
  *     2. A back slash \
  *     3. A colon :
@@ -27,7 +28,7 @@ class ValidateScanFilenameUseCase @Inject constructor() {
      * Invocation function
      *
      * @param filename The filename to be validated
-     * @param fileExtension The expected filename extension
+     * @param fileExtension The file extension which the [filename] is expected to end in
      *
      * @return The appropriate validation status
      */
@@ -37,14 +38,21 @@ class ValidateScanFilenameUseCase @Inject constructor() {
             return ScanFilenameValidationStatus.EmptyFilename
         }
 
-        // Check if the filename ends with the expected file extension, and whether or not
-        // removing the file extension results in a blank filename
-        if (filename.endsWith(fileExtension) && filename.substring(
-                0, filename.length - fileExtension.length
-            ).isBlank()
-        ) {
+        // Check if the filename without the file suffix is empty or only contains whitespaces
+        if (filename.substringBeforeLast(fileExtension).isBlank()) {
             return ScanFilenameValidationStatus.EmptyFilename
         }
+
+        // Check if the filename just ends with "."
+        if (filename.endsWith(".")) {
+            return ScanFilenameValidationStatus.MissingFilenameExtension
+        }
+
+        // Check if the filename does not have at least one instance of "." anywhere.
+        if (filename.lastIndexOf(".") == -1) return ScanFilenameValidationStatus.MissingFilenameExtension
+
+        // Check if the filename has at least one instance of "." anywhere, but does not end with the expected suffix
+        if (!filename.endsWith(fileExtension)) return ScanFilenameValidationStatus.IncorrectFilenameExtension
 
         // Check if the filename contains any of the invalid characters
         val invalidCharactersPattern = Regex("""["*/:<>?|\\]""")
