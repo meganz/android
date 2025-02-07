@@ -7,6 +7,8 @@ import com.google.common.truth.Truth.assertThat
 import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.emptyFlow
 import kotlinx.coroutines.flow.flowOf
+import kotlinx.coroutines.flow.map
+import kotlinx.coroutines.flow.transform
 import kotlinx.coroutines.test.runTest
 import mega.privacy.android.app.interfaces.OnProximitySensorListener
 import mega.privacy.android.app.meeting.gateway.RTCAudioManagerGateway
@@ -23,7 +25,7 @@ import mega.privacy.android.domain.entity.transfer.MultiTransferEvent
 import mega.privacy.android.domain.entity.transfer.TransferEvent
 import mega.privacy.android.domain.usecase.cache.GetCacheFileUseCase
 import mega.privacy.android.domain.usecase.chat.message.UpdateDoesNotExistInMessageUseCase
-import mega.privacy.android.domain.usecase.transfers.downloads.DownloadNodesUseCase
+import mega.privacy.android.domain.usecase.transfers.downloads.DownloadNodeUseCase
 import org.junit.Rule
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
@@ -72,8 +74,7 @@ class VoiceClipMessageViewModelTest {
     private val voiceClipPlayer: VoiceClipPlayer = mock()
     private val cacheFile: File = mock()
     private val getCacheFileUseCase: GetCacheFileUseCase = mock()
-    private val downloadNodeResultFlow: MutableSharedFlow<MultiTransferEvent> = MutableSharedFlow()
-    private val downloadNodesUseCase: DownloadNodesUseCase = mock()
+    private val downloadNodeUseCase: DownloadNodeUseCase = mock()
     private val rtcAudioManagerGateway: RTCAudioManagerGateway = mock()
     private val voiceClipPlayResultFlow: MutableSharedFlow<VoiceClipPlayState> = MutableSharedFlow()
     private val durationInSecondsTextMapper: DurationInSecondsTextMapper = mock()
@@ -89,7 +90,7 @@ class VoiceClipMessageViewModelTest {
     @BeforeEach
     fun resetMocks() {
         reset(
-            downloadNodesUseCase,
+            downloadNodeUseCase,
             getCacheFileUseCase,
             voiceClipPlayer,
             durationInSecondsTextMapper,
@@ -98,7 +99,7 @@ class VoiceClipMessageViewModelTest {
         )
         whenever(getCacheFileUseCase(any(), any())).thenReturn(cacheFile)
         whenever(
-            downloadNodesUseCase(
+            downloadNodeUseCase(
                 any(),
                 any(),
                 any(),
@@ -121,7 +122,7 @@ class VoiceClipMessageViewModelTest {
     @BeforeEach
     fun setupUnderTest() {
         underTest = VoiceClipMessageViewModel(
-            downloadNodesUseCase = downloadNodesUseCase,
+            downloadNodeUseCase = downloadNodeUseCase,
             getCacheFileUseCase = getCacheFileUseCase,
             voiceClipPlayer = voiceClipPlayer,
             durationInSecondsTextMapper = durationInSecondsTextMapper,
@@ -183,75 +184,28 @@ class VoiceClipMessageViewModelTest {
         }
 
     @Test
-    fun `test that ui is updated with not available when download returns TransferNotStarted`() =
+    fun `test that ui is updated with not available when download throws an exception`() =
         runTest {
             setCacheFileNotExists()
+            val downloadNodeResultFlow: MutableSharedFlow<TransferEvent?> = MutableSharedFlow()
             whenever(
-                downloadNodesUseCase(
+                downloadNodeUseCase(
                     any(),
                     any(),
                     any(),
                     any()
                 )
-            ).thenReturn(downloadNodeResultFlow)
+            ).thenReturn(downloadNodeResultFlow.transform {
+                if (it == null) {
+                    throw RuntimeException("test error")
+                } else {
+                    emit(it)
+                }
+            })
             initUiStateFlow()
             underTest.addVoiceClip(voiceClipMessage)
             testScheduler.advanceUntilIdle()
-            downloadNodeResultFlow.emit(
-                MultiTransferEvent.TransferNotStarted(
-                    NodeId(1L), Exception()
-                )
-            )
-            underTest.getUiStateFlow(voiceClipMessage.msgId).test {
-                val actual = awaitItem()
-                assertThat(actual.timestamp).isNull()
-                assertThat(actual.loadProgress).isNull()
-            }
-        }
-
-    @Test
-    fun `test that ui is updated with not available when download returns NotSufficientSpace`() =
-        runTest {
-            setCacheFileNotExists()
-            whenever(
-                downloadNodesUseCase(
-                    any(),
-                    any(),
-                    any(),
-                    any()
-                )
-            ).thenReturn(downloadNodeResultFlow)
-            initUiStateFlow()
-            underTest.addVoiceClip(voiceClipMessage)
-            testScheduler.advanceUntilIdle()
-            downloadNodeResultFlow.emit(MultiTransferEvent.InsufficientSpace)
-            underTest.getUiStateFlow(voiceClipMessage.msgId).test {
-                val actual = awaitItem()
-                assertThat(actual.timestamp).isNull()
-                assertThat(actual.loadProgress).isNull()
-            }
-        }
-
-    @Test
-    fun `test that ui is updated with not available when download finishes with error`() =
-        runTest {
-            setCacheFileNotExists()
-            val endEvent = TransferEvent.TransferFinishEvent(mock(), mock())
-            whenever(
-                downloadNodesUseCase(
-                    any(),
-                    any(),
-                    any(),
-                    any()
-                )
-            ).thenReturn(
-                flowOf(
-                    MultiTransferEvent.SingleTransferEvent(endEvent, 1L, 1L)
-                )
-            )
-            initUiStateFlow()
-            underTest.addVoiceClip(voiceClipMessage)
-            testScheduler.advanceUntilIdle()
+            downloadNodeResultFlow.emit(null) //this will throw an exception on the transformed flow
             underTest.getUiStateFlow(voiceClipMessage.msgId).test {
                 val actual = awaitItem()
                 assertThat(actual.timestamp).isNull()
@@ -265,7 +219,7 @@ class VoiceClipMessageViewModelTest {
             setCacheFileNotExists()
             val endEvent = TransferEvent.TransferFinishEvent(mock(), null)
             whenever(
-                downloadNodesUseCase(
+                downloadNodeUseCase(
                     any(),
                     any(),
                     any(),
@@ -273,7 +227,7 @@ class VoiceClipMessageViewModelTest {
                 )
             ).thenReturn(
                 flowOf(
-                    MultiTransferEvent.SingleTransferEvent(endEvent, 1L, 1L)
+                    endEvent
                 )
             )
             initUiStateFlow()

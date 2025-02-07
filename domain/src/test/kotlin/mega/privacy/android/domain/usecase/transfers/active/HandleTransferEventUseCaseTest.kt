@@ -370,8 +370,6 @@ class HandleTransferEventUseCaseTest {
         provideFinishEventsWithError() +
                 provideTransferEvents()
 
-    private fun provideStartEvents() = provideTransferEvents<TransferEvent.TransferStartEvent>()
-
     private fun provideFinishEventsWithError() =
         provideTransferEvents<TransferEvent.TransferFinishEvent> {
             on { this.error }.thenReturn(BusinessAccountExpiredMegaException(1))

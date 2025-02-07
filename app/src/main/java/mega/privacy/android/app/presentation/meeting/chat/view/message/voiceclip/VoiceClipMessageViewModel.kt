@@ -5,6 +5,7 @@ import androidx.lifecycle.viewModelScope
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
+import kotlinx.coroutines.flow.catch
 import kotlinx.coroutines.flow.onCompletion
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
@@ -17,11 +18,10 @@ import mega.privacy.android.domain.entity.chat.ChatMessageStatus
 import mega.privacy.android.domain.entity.chat.ProximitySensorState
 import mega.privacy.android.domain.entity.chat.messages.VoiceClipMessage
 import mega.privacy.android.domain.entity.node.TypedNode
-import mega.privacy.android.domain.entity.transfer.MultiTransferEvent
 import mega.privacy.android.domain.entity.transfer.TransferAppData
 import mega.privacy.android.domain.usecase.cache.GetCacheFileUseCase
 import mega.privacy.android.domain.usecase.chat.message.UpdateDoesNotExistInMessageUseCase
-import mega.privacy.android.domain.usecase.transfers.downloads.DownloadNodesUseCase
+import mega.privacy.android.domain.usecase.transfers.downloads.DownloadNodeUseCase
 import timber.log.Timber
 import java.io.File
 import java.util.concurrent.ConcurrentHashMap
@@ -32,12 +32,12 @@ import kotlin.time.Duration.Companion.milliseconds
  * View model for voice clip message. This view model manages all visible voice clip messages
  * in a chat room.
  *
- * @property downloadNodesUseCase [DownloadNodesUseCase]
+ * @property downloadNodeUseCase [DownloadNodeUseCase]
  * @property getCacheFileUseCase [GetCacheFileUseCase]
  */
 @HiltViewModel
 class VoiceClipMessageViewModel @Inject constructor(
-    private val downloadNodesUseCase: DownloadNodesUseCase,
+    private val downloadNodeUseCase: DownloadNodeUseCase,
     private val getCacheFileUseCase: GetCacheFileUseCase,
     private val voiceClipPlayer: VoiceClipPlayer,
     private val durationInSecondsTextMapper: DurationInSecondsTextMapper,
@@ -121,8 +121,8 @@ class VoiceClipMessageViewModel @Inject constructor(
 
 
     private suspend fun download(node: TypedNode, destinationPath: String, msgId: Long) {
-        downloadNodesUseCase(
-            nodes = listOf(node),
+        downloadNodeUseCase(
+            node = node,
             destinationPath = destinationPath,
             appData = listOf(TransferAppData.VoiceClip),
             isHighPriority = true,
@@ -140,25 +140,16 @@ class VoiceClipMessageViewModel @Inject constructor(
                     }
                 }
             }
+            .catch {
+                Timber.d(it, "Transfer TransferNotStarted msgId($msgId)")
+                updateDoesNotExists(msgId)
+            }
             .collect { downloadEvent ->
-                when (downloadEvent) {
-                    is MultiTransferEvent.TransferNotStarted<*> -> {
-                        Timber.d("Transfer TransferNotStarted msgId($msgId) (${downloadEvent.exception})")
-                        updateDoesNotExists(msgId)
-                    }
-
-                    is MultiTransferEvent.SingleTransferEvent -> {
-                        if (downloadEvent.finishedWithError) {
-                            updateDoesNotExists(msgId)
-                        } else {
-                            getMutableStateFlow(msgId)?.update {
-                                it.copy(loadProgress = downloadEvent.overallProgress)
-                            }
-                        }
-                    }
-
-                    is MultiTransferEvent.InsufficientSpace -> {
-                        updateDoesNotExists(msgId)
+                if (downloadEvent.isFinishedWithErrorEvent()) {
+                    updateDoesNotExists(msgId)
+                } else {
+                    getMutableStateFlow(msgId)?.update {
+                        it.copy(loadProgress = downloadEvent.transfer.progress)
                     }
                 }
             }

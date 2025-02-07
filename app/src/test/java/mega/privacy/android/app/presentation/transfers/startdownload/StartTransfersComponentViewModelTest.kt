@@ -986,19 +986,6 @@ class StartTransfersComponentViewModelTest {
             }
     }
 
-    private fun provideDownloadNodeParameters() = listOf(
-        Arguments.of(
-            mock<MultiTransferEvent.SingleTransferEvent> {
-                on { scanningFinished } doReturn true
-            },
-            StartTransferEvent.FinishDownloadProcessing(null, 1, 0, 0, startDownloadEvent),
-        ),
-        Arguments.of(
-            MultiTransferEvent.InsufficientSpace,
-            StartTransferEvent.Message.NotSufficientSpace,
-        ),
-    )
-
     private fun provideStartDownloadEvents() = listOf(
         TransferTriggerEvent.StartDownloadNode(nodes),
         TransferTriggerEvent.StartDownloadForOffline(node),

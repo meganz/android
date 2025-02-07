@@ -1,5 +1,6 @@
 package mega.privacy.android.domain.entity.transfer
 
+import mega.privacy.android.domain.entity.Progress
 import mega.privacy.android.domain.exception.MegaException
 
 
@@ -11,6 +12,10 @@ import mega.privacy.android.domain.exception.MegaException
 sealed interface TransferEvent {
     val transfer: Transfer
 
+    /**
+     * @return true if this event represents a finished with error event
+     */
+    fun isFinishedWithErrorEvent() = this is TransferFinishEvent && error != null
 
     /**
      * Transfer start event
