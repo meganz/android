@@ -526,14 +526,12 @@ class OpenLinkActivity : PasscodeActivity(), MegaRequestListenerInterface,
             }
             //Enable camera uploads link
             getUrlRegexPatternTypeUseCase(url?.lowercase()) == RegexPatternType.ENABLE_CAMERA_UPLOADS_LINK -> {
-                lifecycleScope.launch {
-                    if (isLoggedIn) {
-                        navigator.openSettingsCameraUploads(this@OpenLinkActivity)
-                        finish()
-                    } else {
-                        Timber.w("Not logged in")
-                        setError(getString(R.string.alert_not_logged_in))
-                    }
+                if (isLoggedIn) {
+                    navigator.openSettingsCameraUploads(this)
+                    finish()
+                } else {
+                    Timber.w("Not logged in")
+                    setError(getString(R.string.alert_not_logged_in))
                 }
             }
 

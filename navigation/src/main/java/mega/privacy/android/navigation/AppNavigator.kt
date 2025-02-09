@@ -23,9 +23,9 @@ interface AppNavigator {
     /**
      * Navigates to the Settings Camera Uploads page
      *
-     * @param activity The Activity
+     * @param context The Context
      */
-    fun openSettingsCameraUploads(activity: Activity)
+    fun openSettingsCameraUploads(context: Context)
 
     /**
      * Navigates to the Backups page to load the contents of the Backup Folder

@@ -1,6 +1,5 @@
 package mega.privacy.android.app.nav
 
-import android.app.Activity
 import android.content.Context
 import android.content.Intent
 import android.net.Uri
@@ -86,15 +85,9 @@ internal class MegaNavigatorImpl @Inject constructor(
     private val settingsNavigator: SettingsNavigatorImpl,
 ) : MegaNavigator,
     AppNavigatorImpl, SettingsNavigator by settingsNavigator {
-    override fun openSettingsCameraUploads(activity: Activity) {
-        applicationScope.launch {
-            activity.startActivity(
-                Intent(
-                    activity,
-                    SettingsCameraUploadsActivity::class.java,
-                )
-            )
-        }
+
+    override fun openSettingsCameraUploads(context: Context) {
+        context.startActivity(Intent(context, SettingsCameraUploadsActivity::class.java))
     }
 
     override fun openChat(

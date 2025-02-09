@@ -197,7 +197,7 @@ class DeviceCenterFragment : Fragment() {
                                 }
 
                                 is DeviceMenuAction.CameraUploads -> {
-                                    megaNavigator.openSettingsCameraUploads(requireActivity())
+                                    megaNavigator.openSettingsCameraUploads(requireContext())
                                 }
                             }
                         },
