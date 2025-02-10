@@ -181,7 +181,7 @@ internal class VideoSectionRepositoryImpl @Inject constructor(
                     elementID = element.id()
                 )
             }
-        }
+        }.sortedBy { it.name }
         return userVideoPlaylistMapper(
             userSet = this,
             videoNodeList = videoNodeList
