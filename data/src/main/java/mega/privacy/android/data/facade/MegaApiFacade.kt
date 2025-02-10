@@ -47,6 +47,7 @@ import nz.mega.sdk.MegaSetList
 import nz.mega.sdk.MegaShare
 import nz.mega.sdk.MegaStringList
 import nz.mega.sdk.MegaStringMap
+import nz.mega.sdk.MegaSyncList
 import nz.mega.sdk.MegaTransfer
 import nz.mega.sdk.MegaTransferData
 import nz.mega.sdk.MegaTransferListenerInterface
@@ -1583,4 +1584,6 @@ internal class MegaApiFacade @Inject constructor(
     ) {
         megaApi.setMyBackupsFolder(localizedName, listener)
     }
+
+    override fun getSyncs(): MegaSyncList = megaApi.syncs
 }

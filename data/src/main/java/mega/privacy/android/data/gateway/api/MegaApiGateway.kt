@@ -26,6 +26,7 @@ import nz.mega.sdk.MegaSetList
 import nz.mega.sdk.MegaShare
 import nz.mega.sdk.MegaStringList
 import nz.mega.sdk.MegaStringMap
+import nz.mega.sdk.MegaSyncList
 import nz.mega.sdk.MegaTransfer
 import nz.mega.sdk.MegaTransferData
 import nz.mega.sdk.MegaTransferListenerInterface
@@ -3703,4 +3704,11 @@ interface MegaApiGateway {
      * @param listener MegaRequestListener to track this request
      */
     fun setMyBackupsFolder(localizedName: String, listener: MegaRequestListenerInterface?)
+
+    /**
+     * Get all configured syncs
+     *
+     * @return List of MegaSync objects with all syncs
+     */
+    fun getSyncs(): MegaSyncList
 }

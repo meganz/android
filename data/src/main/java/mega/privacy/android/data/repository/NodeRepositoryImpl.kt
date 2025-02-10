@@ -1200,4 +1200,16 @@ internal class NodeRepositoryImpl @Inject constructor(
             else -> throw result.second.toException("moveOrRemoveDeconfiguredBackupNodes")
         }
     }
+
+    override suspend fun isNodeSynced(nodeId: NodeId): Boolean = withContext(ioDispatcher) {
+        val syncs = megaApiGateway.getSyncs()
+        for (i in 0..syncs.size()) {
+            syncs.get(i)?.let { syncNode ->
+                if (syncNode.megaHandle == nodeId.longValue) {
+                    return@withContext true
+                }
+            }
+        }
+        return@withContext false
+    }
 }

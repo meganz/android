@@ -70,6 +70,8 @@ import nz.mega.sdk.MegaSearchFilter
 import nz.mega.sdk.MegaShare
 import nz.mega.sdk.MegaShare.ACCESS_READ
 import nz.mega.sdk.MegaStringList
+import nz.mega.sdk.MegaSync
+import nz.mega.sdk.MegaSyncList
 import nz.mega.sdk.MegaUser
 import org.junit.jupiter.api.AfterAll
 import org.junit.jupiter.api.BeforeAll
@@ -1498,6 +1500,20 @@ internal class NodeRepositoryImplTest {
 
         val fileTypes = underTest.getNodeChildrenFileTypes(nodeId)
         assertThat(fileTypes.first()).isEqualTo(targetFileType)
+    }
+
+    @Test
+    fun `test that isNodeSynced returns the correct value`() = runTest {
+        val sync = mock<MegaSync> {
+            on { megaHandle }.thenReturn(1234L)
+        }
+        val syncList = mock<MegaSyncList> {
+            on { size() }.thenReturn(1)
+            on { get(0) }.thenReturn(sync)
+        }
+        whenever(megaApiGateway.getSyncs()).thenReturn(syncList)
+        assertThat(underTest.isNodeSynced(NodeId(1234L))).isTrue()
+        assertThat(underTest.isNodeSynced(NodeId(4321L))).isFalse()
     }
 
     private fun provideNodeId() = Stream.of(

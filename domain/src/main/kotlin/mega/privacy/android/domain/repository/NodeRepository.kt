@@ -826,4 +826,11 @@ interface NodeRepository {
         deconfiguredBackupRoot: NodeId,
         backupDestination: NodeId,
     ): NodeId
+
+    /**
+     * Check whether the node is synced or not
+     *
+     * @return True if node is synced or False otherwise
+     */
+    suspend fun isNodeSynced(nodeId: NodeId): Boolean
 }
