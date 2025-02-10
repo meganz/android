@@ -24,7 +24,7 @@ import mega.privacy.android.shared.original.core.ui.controls.chip.TransparentChi
 import mega.privacy.android.shared.original.core.ui.controls.text.MegaText
 import mega.privacy.android.shared.original.core.ui.preview.CombinedThemePreviews
 import mega.privacy.android.shared.original.core.ui.theme.OriginalTempTheme
-import mega.privacy.android.shared.original.core.ui.theme.values.TextColor
+import mega.android.core.ui.theme.values.TextColor
 
 /**
  * A Composable Group allowing Users to select the resulting File Type of the Scanned Document. This

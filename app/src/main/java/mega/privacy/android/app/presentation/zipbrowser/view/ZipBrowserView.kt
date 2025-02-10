@@ -40,7 +40,7 @@ import mega.privacy.android.shared.original.core.ui.controls.progressindicator.M
 import mega.privacy.android.shared.original.core.ui.controls.text.MegaText
 import mega.privacy.android.shared.original.core.ui.preview.CombinedThemePreviews
 import mega.privacy.android.shared.original.core.ui.theme.OriginalTempTheme
-import mega.privacy.android.shared.original.core.ui.theme.values.TextColor
+import mega.android.core.ui.theme.values.TextColor
 import mega.privacy.android.shared.original.core.ui.utils.showAutoDurationSnackbar
 
 @OptIn(ExperimentalComposeUiApi::class)

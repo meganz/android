@@ -38,7 +38,7 @@ import mega.privacy.android.domain.entity.node.thumbnail.ThumbnailRequest
 import mega.privacy.android.shared.original.core.ui.controls.buttons.TextMegaButton
 import mega.privacy.android.shared.original.core.ui.controls.text.MegaText
 import mega.privacy.android.shared.original.core.ui.theme.extensions.grey_050_grey_800
-import mega.privacy.android.shared.original.core.ui.theme.values.TextColor
+import mega.android.core.ui.theme.values.TextColor
 
 @Composable
 internal fun AddToPlaylistPage(

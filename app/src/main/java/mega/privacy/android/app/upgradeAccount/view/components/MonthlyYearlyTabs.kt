@@ -29,7 +29,7 @@ import mega.privacy.android.shared.original.core.ui.theme.extensions.accent_900_
 import mega.privacy.android.shared.original.core.ui.theme.extensions.body2medium
 import mega.privacy.android.shared.original.core.ui.theme.extensions.textColorSecondary
 import mega.privacy.android.shared.original.core.ui.theme.transparent
-import mega.privacy.android.shared.original.core.ui.theme.values.TextColor
+import mega.android.core.ui.theme.values.TextColor
 
 
 /**

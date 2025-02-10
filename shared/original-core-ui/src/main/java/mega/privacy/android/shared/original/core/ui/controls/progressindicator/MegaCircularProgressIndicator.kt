@@ -14,8 +14,8 @@ import mega.privacy.android.shared.original.core.ui.preview.BooleanProvider
 import mega.privacy.android.shared.original.core.ui.preview.CombinedThemePreviews
 import mega.privacy.android.shared.original.core.ui.theme.MegaOriginalTheme
 import mega.privacy.android.shared.original.core.ui.theme.OriginalTempTheme
-import mega.privacy.android.shared.original.core.ui.theme.values.BackgroundColor
-import mega.privacy.android.shared.original.core.ui.theme.values.SupportColor
+import mega.android.core.ui.theme.values.BackgroundColor
+import mega.android.core.ui.theme.values.SupportColor
 
 /**
  * Wrapper for [CircularProgressIndicator] to set default parameters to better represent the project theme

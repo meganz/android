@@ -87,7 +87,7 @@ import mega.privacy.android.shared.original.core.ui.theme.grey_alpha_038
 import mega.privacy.android.shared.original.core.ui.theme.grey_alpha_054
 import mega.privacy.android.shared.original.core.ui.theme.red_300
 import mega.privacy.android.shared.original.core.ui.theme.red_600
-import mega.privacy.android.shared.original.core.ui.theme.values.TextColor
+import mega.android.core.ui.theme.values.TextColor
 import mega.privacy.android.shared.original.core.ui.theme.white
 import mega.privacy.android.shared.original.core.ui.theme.white_alpha_012
 import mega.privacy.android.shared.original.core.ui.theme.white_alpha_038

@@ -12,7 +12,7 @@ import mega.privacy.android.shared.original.core.ui.controls.dividers.MegaDivide
 import mega.privacy.android.shared.original.core.ui.preview.CombinedThemePreviews
 import mega.privacy.android.shared.original.core.ui.theme.OriginalTempTheme
 import mega.privacy.android.shared.original.core.ui.theme.extensions.backgroundToken
-import mega.privacy.android.shared.original.core.ui.theme.values.BackgroundColor
+import mega.android.core.ui.theme.values.BackgroundColor
 
 @Composable
 internal fun MegaTable(

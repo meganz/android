@@ -46,7 +46,7 @@ import mega.privacy.android.shared.original.core.ui.controls.textfields.GenericT
 import mega.privacy.android.shared.original.core.ui.preview.CombinedThemePreviews
 import mega.privacy.android.shared.original.core.ui.theme.OriginalTempTheme
 import mega.privacy.android.shared.original.core.ui.theme.extensions.accent_900_accent_050
-import mega.privacy.android.shared.original.core.ui.theme.values.TextColor
+import mega.android.core.ui.theme.values.TextColor
 
 /**
  * A Composable Group allowing Users to change the filename of the scanned Document/s

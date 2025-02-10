@@ -20,7 +20,7 @@ import mega.privacy.android.shared.original.core.ui.controls.pager.indicator.Hor
 import mega.privacy.android.shared.original.core.ui.controls.text.MegaText
 import mega.privacy.android.shared.original.core.ui.preview.CombinedTextAndThemePreviews
 import mega.privacy.android.shared.original.core.ui.theme.OriginalTempTheme
-import mega.privacy.android.shared.original.core.ui.theme.values.TextColor
+import mega.android.core.ui.theme.values.TextColor
 
 /**
  * A [HorizontalPager] that supports infinite scrolling with indicator.

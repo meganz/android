@@ -29,12 +29,10 @@ import mega.android.core.ui.tokens.theme.tokens.SemanticTokens
 import mega.android.core.ui.tokens.theme.tokens.Support
 import mega.android.core.ui.tokens.theme.tokens.Text
 import mega.privacy.android.shared.original.core.ui.controls.text.MegaText
-import mega.privacy.android.shared.original.core.ui.theme.values.BackgroundColor
-import mega.privacy.android.shared.original.core.ui.theme.values.IconColor
-import mega.privacy.android.shared.original.core.ui.theme.values.SupportColor
-import mega.privacy.android.shared.original.core.ui.theme.values.TempSemanticTokensDark
-import mega.privacy.android.shared.original.core.ui.theme.values.TempSemanticTokensLight
-import mega.privacy.android.shared.original.core.ui.theme.values.TextColor
+import mega.android.core.ui.theme.values.BackgroundColor
+import mega.android.core.ui.theme.values.IconColor
+import mega.android.core.ui.theme.values.SupportColor
+import mega.android.core.ui.theme.values.TextColor
 
 /**
  * Android theme to be used by Original components with TEMP (temporary) color tokens.
@@ -66,48 +64,6 @@ internal fun OriginalTempThemeForPreviews(
     isSystemInDarkTheme(),
     content,
 )
-
-/**
- * Helper function to create preview with both, Android TEMP and Android NEW tokens.
- * This should only be used for previews with the objective of compare the differences between the 2 core-tokens and how they work with the components.
- */
-@SuppressLint("IsSystemInDarkTheme")
-@Composable
-internal fun PreviewWithTempAndNewCoreColorTokens(
-    isDark: Boolean = isSystemInDarkTheme(),
-    content: @Composable () -> Unit,
-) = Column {
-    OriginalTheme(
-        isDark = isDark,
-        darkColorTokens = TempSemanticTokensDark,
-        lightColorTokens = TempSemanticTokensLight,
-        content = {
-            PreviewWithTitle(title = "TEMP", content)
-        }
-    )
-    OriginalTheme(
-        isDark = isDark,
-        darkColorTokens = AndroidNewSemanticTokensDark,
-        lightColorTokens = AndroidNewSemanticTokensLight,
-        content = {
-            PreviewWithTitle(title = "NEW", content)
-        }
-    )
-}
-
-@Composable
-private fun PreviewWithTitle(title: String, content: @Composable () -> Unit) =
-    Column(
-        modifier = Modifier.padding(24.dp),
-        verticalArrangement = Arrangement.spacedBy(24.dp)
-    ) {
-        MegaText(
-            text = title,
-            textColor = TextColor.Accent,
-            style = MaterialTheme.typography.body2,
-        )
-        content()
-    }
 
 /**
  * Android theme to be used by Original components with with the specified color tokens.

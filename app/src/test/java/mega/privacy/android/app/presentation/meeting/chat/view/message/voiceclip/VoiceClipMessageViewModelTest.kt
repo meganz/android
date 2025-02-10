@@ -7,7 +7,6 @@ import com.google.common.truth.Truth.assertThat
 import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.emptyFlow
 import kotlinx.coroutines.flow.flowOf
-import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.transform
 import kotlinx.coroutines.test.runTest
 import mega.privacy.android.app.interfaces.OnProximitySensorListener
@@ -19,9 +18,7 @@ import mega.privacy.android.domain.entity.Progress
 import mega.privacy.android.domain.entity.chat.ChatMessageStatus
 import mega.privacy.android.domain.entity.chat.ProximitySensorState
 import mega.privacy.android.domain.entity.chat.messages.VoiceClipMessage
-import mega.privacy.android.domain.entity.node.NodeId
 import mega.privacy.android.domain.entity.node.chat.ChatDefaultFile
-import mega.privacy.android.domain.entity.transfer.MultiTransferEvent
 import mega.privacy.android.domain.entity.transfer.TransferEvent
 import mega.privacy.android.domain.usecase.cache.GetCacheFileUseCase
 import mega.privacy.android.domain.usecase.chat.message.UpdateDoesNotExistInMessageUseCase

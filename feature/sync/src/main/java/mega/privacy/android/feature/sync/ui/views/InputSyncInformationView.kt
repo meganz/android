@@ -24,7 +24,7 @@ import androidx.compose.ui.tooling.preview.PreviewParameterProvider
 import androidx.compose.ui.unit.dp
 import mega.privacy.android.domain.entity.sync.SyncType
 import mega.privacy.android.icon.pack.R as iconPackR
-import mega.privacy.android.shared.original.core.ui.theme.values.TextColor
+import mega.android.core.ui.theme.values.TextColor
 import mega.privacy.android.feature.sync.R
 import mega.privacy.android.feature.sync.ui.newfolderpair.SyncNewFolderScreen
 import mega.privacy.android.shared.original.core.ui.controls.cards.MegaCardWithHeader

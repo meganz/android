@@ -49,7 +49,7 @@ import mega.privacy.android.shared.original.core.ui.theme.OriginalTempTheme
 import mega.privacy.android.shared.original.core.ui.theme.MegaOriginalTheme
 import mega.privacy.android.shared.original.core.ui.theme.extensions.body4
 import mega.privacy.android.shared.original.core.ui.theme.extensions.conditional
-import mega.privacy.android.shared.original.core.ui.theme.values.TextColor
+import mega.android.core.ui.theme.values.TextColor
 
 internal const val TEST_TAG_FORWARD_ICON = "chat_message_container:forward_icon"
 

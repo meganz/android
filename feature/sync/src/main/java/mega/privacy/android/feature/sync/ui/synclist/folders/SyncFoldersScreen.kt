@@ -44,7 +44,7 @@ import mega.privacy.android.shared.original.core.ui.preview.BooleanProvider
 import mega.privacy.android.shared.original.core.ui.preview.CombinedThemePreviews
 import mega.privacy.android.shared.original.core.ui.theme.OriginalTempTheme
 import mega.privacy.android.shared.original.core.ui.theme.extensions.h6Medium
-import mega.privacy.android.shared.original.core.ui.theme.values.TextColor
+import mega.android.core.ui.theme.values.TextColor
 import mega.privacy.mobile.analytics.event.SyncCardExpandedEvent
 import mega.privacy.mobile.analytics.event.SyncFoldersListDisplayedEvent
 

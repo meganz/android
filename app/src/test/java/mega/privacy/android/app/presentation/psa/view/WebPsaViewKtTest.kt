@@ -12,7 +12,7 @@ import androidx.test.ext.junit.runners.AndroidJUnit4
 import mega.privacy.android.app.presentation.psa.model.PsaJavascriptInterface
 import mega.privacy.android.app.presentation.psa.model.PsaState
 import mega.privacy.android.shared.original.core.ui.controls.text.MegaText
-import mega.privacy.android.shared.original.core.ui.theme.values.TextColor
+import mega.android.core.ui.theme.values.TextColor
 import org.junit.Rule
 import org.junit.Test
 import org.junit.runner.RunWith

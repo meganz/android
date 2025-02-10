@@ -48,7 +48,7 @@ import mega.privacy.android.shared.original.core.ui.controls.text.MegaText
 import mega.privacy.android.shared.original.core.ui.preview.CombinedThemePreviews
 import mega.privacy.android.shared.original.core.ui.theme.OriginalTempTheme
 import mega.privacy.android.shared.original.core.ui.theme.extensions.subtitle1medium
-import mega.privacy.android.shared.original.core.ui.theme.values.TextColor
+import mega.android.core.ui.theme.values.TextColor
 import mega.privacy.mobile.analytics.event.SyncCardIssuesInfoButtonPressedEvent
 import mega.privacy.mobile.analytics.event.SyncCardOpenDeviceFolderButtonPressedEvent
 import mega.privacy.mobile.analytics.event.SyncCardOpenMegaFolderButtonPressedEvent

@@ -53,7 +53,7 @@ import mega.privacy.android.shared.original.core.ui.controls.text.MiddleEllipsis
 import mega.privacy.android.shared.original.core.ui.theme.grey_alpha_070
 import mega.privacy.android.shared.original.core.ui.theme.accent_050
 import mega.privacy.android.shared.original.core.ui.theme.accent_900
-import mega.privacy.android.shared.original.core.ui.theme.values.TextColor
+import mega.android.core.ui.theme.values.TextColor
 import mega.privacy.android.shared.original.core.ui.theme.white_alpha_070
 import nz.mega.sdk.MegaNode
 

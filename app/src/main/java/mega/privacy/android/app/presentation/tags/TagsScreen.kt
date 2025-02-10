@@ -48,7 +48,7 @@ import mega.privacy.android.shared.original.core.ui.controls.textfields.GenericD
 import mega.privacy.android.shared.original.core.ui.controls.textfields.transformations.PrefixTransformation
 import mega.privacy.android.shared.original.core.ui.preview.CombinedThemePreviews
 import mega.privacy.android.shared.original.core.ui.theme.OriginalTempTheme
-import mega.privacy.android.shared.original.core.ui.theme.values.TextColor
+import mega.android.core.ui.theme.values.TextColor
 import mega.privacy.android.shared.original.core.ui.utils.showAutoDurationSnackbar
 import mega.privacy.mobile.analytics.event.NodeInfoTagsAddedEvent
 import mega.privacy.mobile.analytics.event.NodeInfoTagsRemovedEvent

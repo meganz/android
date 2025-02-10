@@ -30,7 +30,7 @@ import mega.privacy.android.shared.original.core.ui.controls.text.MegaText
 import mega.privacy.android.shared.original.core.ui.model.MenuAction
 import mega.privacy.android.shared.original.core.ui.model.MenuActionWithIcon
 import mega.privacy.android.shared.original.core.ui.theme.grey_alpha_070
-import mega.privacy.android.shared.original.core.ui.theme.values.TextColor
+import mega.android.core.ui.theme.values.TextColor
 import mega.privacy.android.shared.original.core.ui.theme.white_alpha_070
 import javax.inject.Inject
 

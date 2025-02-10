@@ -38,7 +38,7 @@ import mega.privacy.android.shared.original.core.ui.controls.lists.MenuActionLis
 import mega.privacy.android.shared.original.core.ui.controls.sheets.BottomSheet
 import mega.privacy.android.shared.original.core.ui.controls.text.LongTextBehaviour
 import mega.privacy.android.shared.original.core.ui.controls.text.MegaText
-import mega.privacy.android.shared.original.core.ui.theme.values.TextColor
+import mega.android.core.ui.theme.values.TextColor
 
 @Composable
 internal fun FolderLinkBottomSheetView(

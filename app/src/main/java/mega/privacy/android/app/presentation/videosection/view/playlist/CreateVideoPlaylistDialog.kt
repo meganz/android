@@ -53,7 +53,7 @@ import mega.privacy.android.shared.original.core.ui.theme.red_400
 import mega.privacy.android.shared.original.core.ui.theme.red_900
 import mega.privacy.android.shared.original.core.ui.theme.accent_050
 import mega.privacy.android.shared.original.core.ui.theme.accent_900
-import mega.privacy.android.shared.original.core.ui.theme.values.TextColor
+import mega.android.core.ui.theme.values.TextColor
 import mega.privacy.android.shared.original.core.ui.theme.white
 
 @OptIn(ExperimentalMaterialApi::class)

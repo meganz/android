@@ -22,7 +22,7 @@ import mega.privacy.android.shared.original.core.ui.controls.preview.PreviewStri
 import mega.privacy.android.shared.original.core.ui.controls.text.MegaText
 import mega.privacy.android.shared.original.core.ui.preview.CombinedThemeRtlPreviews
 import mega.privacy.android.shared.original.core.ui.theme.OriginalTempThemeForPreviews
-import mega.privacy.android.shared.original.core.ui.theme.values.TextColor
+import mega.android.core.ui.theme.values.TextColor
 
 
 /**

@@ -3,7 +3,7 @@ package mega.privacy.android.shared.original.core.ui.model
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.text.SpanStyle
 import mega.privacy.android.shared.original.core.ui.controls.text.megaSpanStyle
-import mega.privacy.android.shared.original.core.ui.theme.values.TextColor
+import mega.android.core.ui.theme.values.TextColor
 
 /**
  * MegaSpanStyle : SpanStyle with TextColor

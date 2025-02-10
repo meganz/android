@@ -42,7 +42,7 @@ import mega.privacy.android.shared.original.core.ui.preview.CombinedThemeTabletP
 import mega.privacy.android.shared.original.core.ui.theme.OriginalTempTheme
 import mega.privacy.android.shared.original.core.ui.theme.extensions.h6Medium
 import mega.privacy.android.shared.original.core.ui.theme.extensions.subtitle1medium
-import mega.privacy.android.shared.original.core.ui.theme.values.TextColor
+import mega.android.core.ui.theme.values.TextColor
 import mega.privacy.android.shared.original.core.ui.utils.isScreenOrientationLandscape
 import mega.privacy.android.shared.original.core.ui.utils.isTablet
 

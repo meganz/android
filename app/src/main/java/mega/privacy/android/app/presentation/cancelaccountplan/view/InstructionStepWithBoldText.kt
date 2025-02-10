@@ -14,7 +14,7 @@ import androidx.compose.ui.unit.sp
 import mega.privacy.android.shared.original.core.ui.controls.text.MegaSpannedText
 import mega.privacy.android.shared.original.core.ui.model.MegaSpanStyle
 import mega.privacy.android.shared.original.core.ui.model.SpanIndicator
-import mega.privacy.android.shared.original.core.ui.theme.values.TextColor
+import mega.android.core.ui.theme.values.TextColor
 
 /**
  * Composable function to display a generic instruction step with highlighted bold text

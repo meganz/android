@@ -68,7 +68,7 @@ import mega.privacy.android.shared.original.core.ui.controls.text.LongTextBehavi
 import mega.privacy.android.shared.original.core.ui.controls.text.MegaText
 import mega.privacy.android.shared.original.core.ui.controls.widgets.TransfersWidgetViewAnimated
 import mega.privacy.android.shared.original.core.ui.theme.teal_200_alpha_038
-import mega.privacy.android.shared.original.core.ui.theme.values.TextColor
+import mega.android.core.ui.theme.values.TextColor
 import kotlin.time.Duration.Companion.milliseconds
 
 @Composable

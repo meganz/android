@@ -138,9 +138,9 @@ import mega.privacy.android.shared.original.core.ui.theme.extensions.subtitle2me
 import mega.privacy.android.shared.original.core.ui.theme.extensions.textColorPrimary
 import mega.privacy.android.shared.original.core.ui.theme.extensions.textColorSecondary
 import mega.privacy.android.shared.original.core.ui.theme.extensions.white_grey_800
-import mega.privacy.android.shared.original.core.ui.theme.values.BackgroundColor
-import mega.privacy.android.shared.original.core.ui.theme.values.SupportColor
-import mega.privacy.android.shared.original.core.ui.theme.values.TextColor
+import mega.android.core.ui.theme.values.BackgroundColor
+import mega.android.core.ui.theme.values.SupportColor
+import mega.android.core.ui.theme.values.TextColor
 import mega.privacy.android.shared.original.core.ui.theme.white
 import mega.privacy.android.shared.original.core.ui.utils.showAutoDurationSnackbar
 import java.io.File

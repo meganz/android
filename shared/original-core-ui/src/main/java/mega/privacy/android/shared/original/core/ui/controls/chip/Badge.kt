@@ -23,7 +23,7 @@ import mega.privacy.android.shared.original.core.ui.theme.MegaOriginalTheme
 import mega.privacy.android.shared.original.core.ui.theme.Typography
 import mega.privacy.android.shared.original.core.ui.theme.extensions.buttonNormal
 import mega.privacy.android.shared.original.core.ui.theme.extensions.buttonThin
-import mega.privacy.android.shared.original.core.ui.theme.values.TextColor
+import mega.android.core.ui.theme.values.TextColor
 import kotlin.math.pow
 
 @Immutable

@@ -24,7 +24,7 @@ import mega.privacy.android.legacy.core.ui.controls.appbar.LegacyTopAppBar
 import mega.privacy.android.shared.original.core.ui.controls.buttons.RaisedDefaultMegaButton
 import mega.privacy.android.shared.original.core.ui.controls.text.MegaText
 import mega.privacy.android.shared.original.core.ui.theme.OriginalTempTheme
-import mega.privacy.android.shared.original.core.ui.theme.values.TextColor
+import mega.android.core.ui.theme.values.TextColor
 
 @Composable
 internal fun SyncEmptyScreen(getStartedClicked: () -> Unit) {

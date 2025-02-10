@@ -100,7 +100,7 @@ import mega.privacy.android.shared.original.core.ui.controls.textfields.LabelTex
 import mega.privacy.android.shared.original.core.ui.controls.textfields.PasswordTextField
 import mega.privacy.android.shared.original.core.ui.preview.CombinedThemePreviews
 import mega.privacy.android.shared.original.core.ui.theme.OriginalTempTheme
-import mega.privacy.android.shared.original.core.ui.theme.values.TextColor
+import mega.android.core.ui.theme.values.TextColor
 import mega.privacy.android.shared.resources.R as SharedRes
 import mega.privacy.android.shared.original.core.ui.preview.CombinedThemePhoneLandscapePreviews
 

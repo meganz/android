@@ -27,7 +27,7 @@ import mega.privacy.android.shared.original.core.ui.theme.OriginalTempTheme
 import mega.privacy.android.shared.original.core.ui.theme.MegaOriginalTheme
 import mega.privacy.android.shared.original.core.ui.theme.extensions.body4
 import mega.privacy.android.shared.original.core.ui.theme.extensions.conditional
-import mega.privacy.android.shared.original.core.ui.theme.values.TextColor
+import mega.android.core.ui.theme.values.TextColor
 
 
 internal const val SCROLL_TO_BOTTOM_FAB_TEST_TAG = "scroll_to_bottom_fab:fab"

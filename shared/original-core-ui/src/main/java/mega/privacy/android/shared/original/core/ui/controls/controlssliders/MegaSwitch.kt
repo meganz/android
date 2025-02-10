@@ -50,7 +50,7 @@ import mega.privacy.android.shared.original.core.ui.preview.BooleanProvider
 import mega.privacy.android.shared.original.core.ui.preview.CombinedThemePreviews
 import mega.privacy.android.shared.original.core.ui.theme.MegaOriginalTheme
 import mega.privacy.android.shared.original.core.ui.theme.OriginalTempTheme
-import mega.privacy.android.shared.original.core.ui.theme.PreviewWithTempAndNewCoreColorTokens
+import mega.privacy.android.shared.original.core.ui.theme.OriginalTempThemeForPreviews
 
 
 /**
@@ -332,7 +332,7 @@ private fun MegaSwitchDisabledPreview(
 private fun MegaSwitchTempAndNewPreview(
     @PreviewParameter(BooleanProvider::class) initialChecked: Boolean,
 ) {
-    PreviewWithTempAndNewCoreColorTokens(isDark = isSystemInDarkTheme()) {
+    OriginalTempThemeForPreviews {
         var checked by remember {
             mutableStateOf(initialChecked)
         }
@@ -347,7 +347,7 @@ private fun MegaSwitchTempAndNewPreview(
 private fun MegaSwitchDisabledTempAndNewPreview(
     @PreviewParameter(BooleanProvider::class) initialChecked: Boolean,
 ) {
-    PreviewWithTempAndNewCoreColorTokens(isDark = isSystemInDarkTheme()) {
+    OriginalTempThemeForPreviews {
         var checked by remember {
             mutableStateOf(initialChecked)
         }

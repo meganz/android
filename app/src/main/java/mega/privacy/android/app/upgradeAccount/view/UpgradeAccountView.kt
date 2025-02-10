@@ -95,7 +95,7 @@ import mega.privacy.android.shared.original.core.ui.theme.extensions.subtitle1me
 import mega.privacy.android.shared.original.core.ui.theme.extensions.accent_900_accent_050
 import mega.privacy.android.shared.original.core.ui.theme.extensions.yellow_100_yellow_700_alpha_015
 import mega.privacy.android.shared.original.core.ui.theme.subtitle1
-import mega.privacy.android.shared.original.core.ui.theme.values.TextColor
+import mega.android.core.ui.theme.values.TextColor
 import mega.privacy.android.shared.original.core.ui.utils.showAutoDurationSnackbar
 
 /**

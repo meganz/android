@@ -50,7 +50,7 @@ import mega.privacy.android.shared.original.core.ui.controls.text.LongTextBehavi
 import mega.privacy.android.shared.original.core.ui.controls.text.MegaText
 import mega.privacy.android.shared.original.core.ui.theme.extensions.body3
 import mega.privacy.android.shared.original.core.ui.theme.extensions.body4
-import mega.privacy.android.shared.original.core.ui.theme.values.TextColor
+import mega.android.core.ui.theme.values.TextColor
 
 @Composable
 internal fun AddToAlbumPage(

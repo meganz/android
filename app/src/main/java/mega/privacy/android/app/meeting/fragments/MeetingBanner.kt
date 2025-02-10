@@ -25,7 +25,7 @@ import mega.privacy.android.app.R
 import mega.privacy.android.app.utils.TimeUtils
 import mega.privacy.android.shared.original.core.ui.controls.text.MiddleEllipsisText
 import mega.privacy.android.shared.original.core.ui.preview.CombinedThemePreviews
-import mega.privacy.android.shared.original.core.ui.theme.values.TextColor
+import mega.android.core.ui.theme.values.TextColor
 import mega.privacy.android.shared.original.core.ui.theme.OriginalTempTheme
 import java.util.concurrent.TimeUnit
 

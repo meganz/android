@@ -46,7 +46,7 @@ import mega.privacy.android.shared.original.core.ui.controls.text.MarqueeText
 import mega.privacy.android.shared.original.core.ui.preview.CombinedTextAndThemePreviews
 import mega.privacy.android.shared.original.core.ui.theme.OriginalTempTheme
 import mega.privacy.android.shared.original.core.ui.theme.extensions.textColorPrimary
-import mega.privacy.android.shared.original.core.ui.theme.values.TextColor
+import mega.android.core.ui.theme.values.TextColor
 import timber.log.Timber
 import java.text.SimpleDateFormat
 import java.util.Calendar

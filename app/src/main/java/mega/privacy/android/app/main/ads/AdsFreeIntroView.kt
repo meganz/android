@@ -39,7 +39,7 @@ import mega.privacy.android.shared.original.core.ui.controls.dialogs.FullScreenD
 import mega.privacy.android.shared.original.core.ui.controls.text.MegaText
 import mega.privacy.android.shared.original.core.ui.preview.CombinedThemePreviews
 import mega.privacy.android.shared.original.core.ui.theme.OriginalTempTheme
-import mega.privacy.android.shared.original.core.ui.theme.values.TextColor
+import mega.android.core.ui.theme.values.TextColor
 import mega.privacy.mobile.analytics.event.AdFreeDialogScreenEvent
 import mega.privacy.mobile.analytics.event.AdFreeDialogScreenSkipButtonPressedEvent
 import mega.privacy.mobile.analytics.event.AdFreeDialogScreenViewProPlansButtonPressedEvent
