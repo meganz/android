@@ -2054,9 +2054,9 @@ class ManagerActivity : PasscodeActivity(), NavigationView.OnNavigationItemSelec
                 val shouldVisible = it == CloudDriveTab.CLOUD
                 searchMenuItem?.isVisible = shouldVisible
                 openLinkMenuItem?.isVisible = shouldVisible
-                fabButton.isInvisible = !shouldVisible
+                fabButton.isInvisible =
+                    (!shouldVisible || fileBrowserViewModel.isMediaDiscoveryOpen())
             }
-            Timber.d("Current Tab $it")
         }
     }
 
@@ -2891,12 +2891,18 @@ class ManagerActivity : PasscodeActivity(), NavigationView.OnNavigationItemSelec
         @StringRes errorMessage: Int?,
     ) {
         lifecycle.withStarted {
-            showMediaDiscovery(
-                mediaHandle = mediaHandle,
-                isAccessedByIconClick = isAccessedByIconClick,
-                replaceFragment = replaceFragment,
-                errorMessage = errorMessage,
-            )
+            with(fileBrowserViewModel) {
+                if (isFromSyncTab().not() || (isFromSyncTab() && state().openedFolderNodeHandles.size == 1)) {
+                    // this call back shouldn't be called when media discovery is already opened from the Manager Activity directly from sync tab
+                    // this should be called only when file browser is already opened (state().openedFolderNodeHandles.size == 1)
+                    showMediaDiscovery(
+                        mediaHandle = mediaHandle,
+                        isAccessedByIconClick = isAccessedByIconClick,
+                        replaceFragment = replaceFragment,
+                        errorMessage = errorMessage,
+                    )
+                }
+            }
         }
     }
 
@@ -3941,7 +3947,8 @@ class ManagerActivity : PasscodeActivity(), NavigationView.OnNavigationItemSelec
                 showMediaDiscovery(
                     mediaHandle = fileBrowserViewModel.getSafeBrowserParentHandle(),
                     isAccessedByIconClick = false,
-                    replaceFragment = fileBrowserViewModel.state().hasNoOpenedFolders,
+                    replaceFragment = fileBrowserViewModel.state().hasNoOpenedFolders && fileBrowserViewModel.isFromSyncTab()
+                        .not(),
                     errorMessage = fileBrowserViewModel.state.value.errorMessage,
                 )
             }
@@ -4824,7 +4831,7 @@ class ManagerActivity : PasscodeActivity(), NavigationView.OnNavigationItemSelec
         with(fileBrowserViewModel) {
             when {
                 // User is exploring a Sync Folder
-                isSyncFolderOpen() || isFromSyncTab() -> {
+                isSyncFolderOpen() || (isFromSyncTab() && isMediaDiscoveryOpen().not()) -> {
                     lifecycleScope.launch {
                         if (isAtAccessedFolder()) {
                             if (isFromSyncTab().not()) {
@@ -4863,7 +4870,18 @@ class ManagerActivity : PasscodeActivity(), NavigationView.OnNavigationItemSelec
                                     if (isAccessedFolderExited()) {
                                         resetIsAccessedFolderExited()
                                         // Go back to Device Center
-                                        selectDrawerItem(DrawerItem.DEVICE_CENTER)
+                                        if (isFromSyncTab().not()) {
+                                            selectDrawerItem(DrawerItem.DEVICE_CENTER)
+                                        } else {
+                                            lifecycleScope.launch {
+                                                if (isFromSyncTab()) {
+                                                    goBackToRootLevel()
+                                                }
+                                                fileBrowserViewModel.onTabChanged(CloudDriveTab.SYNC)
+                                                resetSyncFolderVisibility()
+                                            }
+
+                                        }
                                     } else {
                                         goBackToBottomNavigationItem(bottomNavigationCurrentItem)
                                     }
@@ -6461,8 +6479,9 @@ class ManagerActivity : PasscodeActivity(), NavigationView.OnNavigationItemSelec
      * Updates the fabButton icon and shows it.
      */
     private fun updateFabAndShow() {
-        fabButton.setImageDrawable(ContextCompat.getDrawable(this, R.drawable.ic_add_white))
         if (fileBrowserViewModel.state().selectedTab != CloudDriveTab.SYNC) {
+            fabButton.setImageDrawable(ContextCompat.getDrawable(this, R.drawable.ic_add_white))
+            Timber.d("Showing Fab Button")
             fabButton.show()
         }
     }
