@@ -9,6 +9,7 @@ import kotlinx.coroutines.test.runTest
 import mega.privacy.android.domain.entity.chat.PendingMessage
 import mega.privacy.android.domain.entity.chat.PendingMessageState
 import mega.privacy.android.domain.entity.chat.messages.pending.UpdatePendingMessageStateRequest
+import mega.privacy.android.domain.entity.uri.UriPath
 import mega.privacy.android.domain.repository.FileSystemRepository
 import mega.privacy.android.domain.usecase.chat.message.MonitorPendingMessagesByStateUseCase
 import mega.privacy.android.domain.usecase.chat.message.UpdatePendingMessageUseCase
@@ -115,16 +116,16 @@ class StartUploadingAllPendingMessagesUseCaseTest {
         runTest {
             val pendingMessage = stubPendingMessage()
             val file = File("video.mp4")
-            val expectedFilesAndNames =
-                mapOf(file to pendingMessage.name)
+            val fileName = pendingMessage.name
             whenever(monitorPendingMessagesByStateUseCase(PendingMessageState.READY_TO_UPLOAD)) doReturn
                     flowOf(listOf(pendingMessage))
             whenever(fileSystemRepository.getFileByPath(pendingMessage.filePath)) doReturn file
 
             underTest().test { cancelAndConsumeRemainingEvents() }
 
-            verify(startChatUploadAndWaitScanningFinishedUseCase)(
-                expectedFilesAndNames,
+            verify(startChatUploadAndWaitScanningFinishedUseCase).invoke(
+                UriPath(file.absolutePath),
+                fileName,
                 listOf(pendingMessage.id)
             )
         }
@@ -134,8 +135,6 @@ class StartUploadingAllPendingMessagesUseCaseTest {
         runTest {
             val pendingMessage = stubPendingMessage()
             val file = File("video.mp4")
-            val expectedFilesAndNames =
-                mapOf(file to pendingMessage.name)
             whenever(monitorPendingMessagesByStateUseCase(PendingMessageState.READY_TO_UPLOAD)) doReturn
                     flowOf(listOf(pendingMessage))
             whenever(fileSystemRepository.getFileByPath(pendingMessage.filePath)) doReturn file
@@ -166,10 +165,9 @@ class StartUploadingAllPendingMessagesUseCaseTest {
             underTest().test { cancelAndConsumeRemainingEvents() }
 
             pendingMessages.forEachIndexed { i, it ->
-                val expectedFilesAndNames =
-                    mapOf(files[i] to it.name)
                 verify(startChatUploadAndWaitScanningFinishedUseCase)(
-                    expectedFilesAndNames,
+                    UriPath(files[i].absolutePath),
+                    it.name,
                     listOf(it.id)
                 )
             }

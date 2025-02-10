@@ -3,8 +3,9 @@ package mega.privacy.android.domain.usecase.transfers.chatuploads
 import mega.privacy.android.domain.entity.chat.PendingMessageState
 import mega.privacy.android.domain.entity.chat.messages.pending.UpdatePendingMessageStateRequest
 import mega.privacy.android.domain.entity.chat.messages.pending.UpdatePendingMessageTransferTagRequest
-import mega.privacy.android.domain.entity.transfer.MultiTransferEvent
+import mega.privacy.android.domain.entity.node.NodeId
 import mega.privacy.android.domain.entity.transfer.TransferEvent
+import mega.privacy.android.domain.entity.transfer.isAlreadyTransferredEvent
 import mega.privacy.android.domain.usecase.chat.message.AttachNodeWithPendingMessageUseCase
 import mega.privacy.android.domain.usecase.chat.message.UpdatePendingMessageUseCase
 import javax.inject.Inject
@@ -22,12 +23,11 @@ class HandleChatUploadTransferEventUseCase @Inject constructor(
      * Invoke
      */
     suspend operator fun invoke(
-        event: MultiTransferEvent,
+        event: TransferEvent,
         vararg pendingMessageIds: Long,
     ) {
-        val singleTransferEvent = (event as? MultiTransferEvent.SingleTransferEvent)
         //update transfer tag on Start event
-        (singleTransferEvent?.transferEvent as? TransferEvent.TransferStartEvent)?.transfer?.tag?.let { transferTag ->
+        (event as? TransferEvent.TransferStartEvent)?.transfer?.tag?.let { transferTag ->
             pendingMessageIds.forEach { pendingMessageId ->
                 updatePendingMessageUseCase(
                     UpdatePendingMessageTransferTagRequest(
@@ -39,21 +39,21 @@ class HandleChatUploadTransferEventUseCase @Inject constructor(
             }
         }
         //attach it if it's already uploaded
-        singleTransferEvent
-            ?.alreadyTransferredIds
-            ?.singleOrNull()
-            ?.takeIf { it.longValue != -1L }
-            ?.let { alreadyTransferredNodeId ->
+        event
+            .takeIf { it.isAlreadyTransferredEvent }
+            ?.transfer?.nodeHandle
+            .takeIf { it != -1L }
+            ?.let { nodeHandle ->
                 pendingMessageIds.forEach { pendingMessageId ->
                     attachNodeWithPendingMessageUseCase(
                         pendingMessageId,
-                        alreadyTransferredNodeId,
-                        singleTransferEvent.transferEvent.transfer.appData,
+                        NodeId(nodeHandle),
+                        event.transfer.appData,
                     )
                 }
             }
         //mark as error if it's a temporary error (typically an over quota error)
-        if (singleTransferEvent?.transferEvent is TransferEvent.TransferTemporaryErrorEvent) {
+        if (event is TransferEvent.TransferTemporaryErrorEvent) {
             updatePendingMessageUseCase(
                 updatePendingMessageRequests = pendingMessageIds.map { pendingMessageId ->
                     UpdatePendingMessageStateRequest(
