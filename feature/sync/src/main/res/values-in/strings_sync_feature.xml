@@ -93,7 +93,7 @@
     <!-- Sync stalled issue reason is download issue-->
     <string name="sync_stalled_issue_download_issue">Download problem</string>
     <!-- Sync stalled issue reason is can not create folder-->
-    <string name="sync_stalled_issue_cannot_create_folder">Can’t create folder</string>
+    <string name="sync_stalled_issue_cannot_create_folder">Tidak dapat membuat folder</string>
     <!-- Sync stalled issue reason is can not perform deletion-->
     <string name="sync_stalled_issue_cannot_perform_deletion">Can’t delete item</string>
     <!-- Sync stalled issue reason is can not support tree depth-->
@@ -113,7 +113,7 @@
     <!-- Sync stalled issue count chip title for 0 stalled issues-->
     <string name="sync_stalled_issue_zero">Masalah</string>
     <!-- Sync start sync button -->
-    <string name="sync_start_sync">Set up a sync</string>
+    <string name="sync_start_sync">Siapkan sinkronisasi</string>
     <!-- Text that indicates that a folder is currently empty -->
     <string name="sync_file_browser_empty_folder">Folder kosong</string>
     <!-- Selecting a specific location in MEGA. This is the text of the button -->

@@ -667,7 +667,7 @@
     <!-- Text for the label to indicate the destiny of a new backup folder -->
     <string name="sync_add_new_backup_choose_mega_folder_title">Salvar backup em:</string>
     <!-- Backup text for the the button to begin backup -->
-    <string name="sync_add_new_backup_proceed_button_label">Backup</string>
+    <string name="sync_add_new_backup_proceed_button_label">Fazer backup</string>
     <!-- Title of the dialog to notify the requirement of access storage permission for Sync/Backup feature -->
     <string name="sync_backup_access_storage_permission_dialog_title">Permitir que o MEGA acesse todos os arquivos?</string>
     <!-- Message of the dialog to notify the requirement of access storage permission for Sync/Backup feature -->
@@ -861,19 +861,25 @@
     <!-- Warning shown to the user when tries to retry some or all of cancelled or failed transfer but they cannot be retried because app does not have read permission over the files anymore -->
     <string name="transfers_completed_some_read_error_retrying">Não é possível finalizar alguns ou todos os seus upload, nem tentar novamente, porque o MEGA já não pode acessar os arquivos</string>
     <!-- Title for Offline Folder exposed via SAF -->
-    <string name="general_mega_offline">MEGA Offline files</string>
+    <string name="general_mega_offline">Arquivos offline do MEGA</string>
     <!-- Notification content for download final notification. It will inform the user about the location where file/s were downloaded -->
     <string name="transfers_notification_location_content">Localização: %1$s</string>
     <!-- Notification action for download final notification. It will open the file explorer activity to show the destination folder -->
     <string name="transfers_notification_location_action">Locate</string>
     <!-- Notification content for download final notification in case of a single file downloaded. -->
-    <string name="transfers_notification_title_single_download">Downloaded “%1$s”</string>
+    <string name="transfers_notification_title_single_download">Foi feito o download de “%1$s”</string>
     <!-- Label for the button or menu option to add a new backup -->
-    <string name="device_center_sync_add_new_backup_button_option">Add new backup</string>
+    <string name="device_center_sync_add_new_backup_button_option">Adicionar novo backup</string>
     <!-- Notification content for download final notification in case of a single file downloaded to preview. -->
-    <string name="transfers_notification_title_preview_download">%1$s is ready to preview</string>
+    <string name="transfers_notification_title_preview_download">“%1$s” já pode ser visualizado</string>
     <!-- Notification action for download final notification. It will open a dialog with installed apps which can open the file -->
     <string name="transfers_notification_preview_action">Visualizar</string>
     <!-- Title for the OS dialog shown with available apps to open a file -->
-    <string name="open_with_os_dialog_title">Open %1$s with</string>
+    <string name="open_with_os_dialog_title">Abrir “%1$s” com</string>
+    <!-- The Scan Confirmation screen error message shown when the new filename does not contain the file extension that was selected -->
+    <string name="document_scanning_settings_missing_file_extension_error_message">Extensão de arquivo ausente (%s)</string>
+    <!-- The Scan Confirmation screen error message shown when the filename does not end with the expected file extension -->
+    <string name="document_scanning_settings_non_matching_file_extension_error_message">A extensão não corresponde ao tipo de arquivo</string>
+    <!-- The Scan Confirmation screen error message shown when the filename has no file extension -->
+    <string name="document_scanning_settings_file_extension_required_error_message">É necessário incluir a extensão do arquivo</string>
 </resources>
