@@ -271,7 +271,7 @@
     <!-- Hint how to cancel the download -->
     <string name="download_touch_to_show">Xem các truyền tải</string>
     <!-- message when trying to open a downloaded file but there isn’t any app that open that file. Example: a user downloads a pdf but doesn’t have any app to read a pdf -->
-    <string name="intent_not_available">There’s no suitable app to open this file on your device</string>
+    <string name="intent_not_available">Không có ứng&#160;dụng nào phù&#160;hợp có thể mở được tệp&#160;tin này trên thiết&#160;bị của bạn.</string>
     <!-- Message when trying to open a location message but there isn’t any app that open that location. -->
     <string name="intent_not_available_location">Không có ứng dụng nào trong điện thoại của bạn để mở định vị này</string>
     <!-- Message displayed when user tries to open a file with a 3rd party app using the option "Open with" but there isn't any app installed in the device which can open that file type, e.g. user tries to open a ".txt" but doesn’t have any installed 3rd party app which supports ".txt" files. -->
@@ -1917,7 +1917,7 @@
     <!-- Title of compression queue size option in settings -->
     <string name="settings_video_compression_queue_size_title">Nếu videos cần nén có kích thước lớn hơn</string>
     <!-- Text of the alert when a FREE user tries to disable the RB scheduler -->
-    <string name="settings_rb_scheduler_alert_disabling">To disable automatic Rubbish bin emptying or set a longer retention period, you need to subscribe to one of our plans.</string>
+    <string name="settings_rb_scheduler_alert_disabling">Để tắt tính&#160;năng tự&#160;động dọn Thùng&#160;Rác hoặc đặt thời&#160;gian trữ rác lâu hơn, bạn cần phải đăng&#160;ký một trong các gói của chúng&#160;tôi.</string>
     <!-- Picker text to choose custom retention time. This option indicates several days -->
     <string name="hint_days">ngày</string>
     <!-- Title of the option to generate a public chat link -->
@@ -4909,17 +4909,17 @@
     <!-- Image or Video no map location info-->
     <string name="file_properties_info_map_location_no_location_info">Không có thông&#160;tin vị&#160;trí</string>
     <!-- Logout warning dialog title if user has offline files or transfers in progress -->
-    <string name="logout_warning_dialog_title">Logging out now will result in lost data</string>
+    <string name="logout_warning_dialog_title">Việc đăng&#160; xuất ngsy bây giờ sẽ làm mất đi&#160;dữ liệu</string>
     <!-- Logout warning dialog positive button text -->
-    <string name="logout_warning_dialog_positive_button">Log out anyway</string>
+    <string name="logout_warning_dialog_positive_button">Vẫn cứ đăng xuất</string>
     <!-- Logout warning dialog message if offline files exists -->
-    <string name="logout_warning_dialog_offline_message">If you log out now, your offline files will be deleted</string>
+    <string name="logout_warning_dialog_offline_message">Nếu bạn đăng&#160;xuất ngay bây giờ, các tệp&#160;tin ngoại&#160;tuyến của bạn sẽ bị xoá</string>
     <!-- Logout warning dialog message if user has transfers in progress. -->
-    <string name="logout_warning_dialog_transfers_message">If you log out now, your transfers won’t be completed and the data will be deleted</string>
+    <string name="logout_warning_dialog_transfers_message">Nếu bạn đăng&#160;xuất ngay bây giờ, các phiên truyền tải của bạn sẽ không được hoàn tất và dữ&#160;liệu sẽ bị xóa</string>
     <!-- Warning warning dialog message if user has offline files or transfers in progress. -->
-    <string name="logout_warning_dialog_offline_and_transfers_message">If you log out now, any pending transfers and offline files will be deleted</string>
+    <string name="logout_warning_dialog_offline_and_transfers_message">Nếu bạn đăng&#160;xuất ngay bây giờ, các phiên truyền tải đang chờ và các tệp&#160;tin ngoại&#160;tuyến sẽ bị xóa</string>
     <!-- Toolbar action menu button in file storage screen to open 3rd-party File Manager -->
-    <string name="filestorage_menu_option_open_in_file_manager">Open in file manager</string>
+    <string name="filestorage_menu_option_open_in_file_manager">Mở trong trình quản&#160;lý tệp&#160;tin</string>
     <!-- Snackbar message when file storage screen is unable to open 3rd-party File Manager -->
-    <string name="filestorage_snackbar_file_manager_is_not_available">A suitable file manager app is not available on this device</string>
+    <string name="filestorage_snackbar_file_manager_is_not_available">Không có ứng&#160;dụng quản&#160;lý tệp&#160;tin nào phù&#160;hợp khả&#160;dụng trong thiết&#160;bị này</string>
 </resources>

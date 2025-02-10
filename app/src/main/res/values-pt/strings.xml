@@ -1139,9 +1139,9 @@
     </plurals>
     <!-- Text of the notification shown when the download service has finished, Plural -->
     <plurals name="download_service_final_notification">
-        <item quantity="one">Download de %1$d arquivo concluído</item>
-        <item quantity="many">Download de %1$d arquivos concluído</item>
-        <item quantity="other">Download de %1$d arquivos concluído</item>
+        <item quantity="one">Foi feito o download de %1$d arquivo</item>
+        <item quantity="many">Foi feito o download de %1$d de arquivos</item>
+        <item quantity="other">Foi feito o download de %1$d arquivos</item>
     </plurals>
     <!-- Text of the notification shown when the download service has finished with any error, Plural -->
     <plurals name="download_service_final_notification_with_details">
