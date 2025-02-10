@@ -536,7 +536,8 @@ class CloudDriveSyncsFragment : Fragment() {
                 fileBrowserActionListener?.showMediaDiscoveryFromCloudDrive(
                     mediaHandle = mediaHandle,
                     isAccessedByIconClick = isMediaDiscoveryOpenedByIconClick,
-                    replaceFragment = fileBrowserViewModel.state().hasNoOpenedFolders,
+                    replaceFragment = fileBrowserViewModel.state().hasNoOpenedFolders && fileBrowserViewModel.isFromSyncTab()
+                        .not(),
                     errorMessage = errorMessage,
                 )
             }
