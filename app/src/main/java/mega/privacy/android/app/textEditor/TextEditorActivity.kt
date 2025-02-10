@@ -340,7 +340,7 @@ class TextEditorActivity : PasscodeActivity(), SnackbarShower, Scrollable {
         if (isErrorReadingContentDialogShown()) {
             errorReadingContentDialog?.dismiss()
         }
-
+        binding.contentWebView.destroy()
         super.onDestroy()
     }
 
