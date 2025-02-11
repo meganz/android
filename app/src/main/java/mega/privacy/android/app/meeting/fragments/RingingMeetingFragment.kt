@@ -16,6 +16,7 @@ import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.flow.distinctUntilChanged
 import kotlinx.coroutines.flow.map
 import mega.privacy.android.app.arch.extensions.collectFlow
+import mega.privacy.android.app.fcm.ChatAdvancedNotificationBuilder
 import mega.privacy.android.app.presentation.meeting.RingingViewModel
 import mega.privacy.android.app.presentation.meeting.view.RingingScreen
 import mega.privacy.android.app.utils.RunOnUIThreadUtils
@@ -204,6 +205,16 @@ class RingingMeetingFragment : MeetingBaseFragment() {
                         checkAndAnswerCall(enableVideo = true)
                     }
                 }
+            }
+        }
+
+        viewLifecycleOwner.collectFlow(ringingViewModel.state.map { it.showMissedCallNotification }
+            .distinctUntilChanged()) {
+            if (it) {
+                Timber.d("Show missed call notification")
+                ChatAdvancedNotificationBuilder.newInstance(requireContext())
+                    .showMissedCallNotification(ringingViewModel.state.value.chatId, -1L)
+                requireActivity().finish()
             }
         }
 

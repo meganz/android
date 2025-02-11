@@ -160,7 +160,8 @@ class RingingViewModel @Inject constructor(
                     if (isConnected && state.value.call == null) {
                         rtcAudioManagerGateway.stopSounds()
                         rtcAudioManagerGateway.removeRTCAudioManagerRingIn()
-                        _state.update { state -> state.copy(finish = true) }
+                        Timber.d("Show missed call notification")
+                        _state.update { state -> state.copy(showMissedCallNotification = true) }
                     } else {
                         _state.update { state ->
                             state.copy(chatConnectionStatus = it.chatConnectionStatus)
