@@ -2286,22 +2286,6 @@
     </plurals>
     <!-- Alert shown when the user tries to realize some action in chat and has not contacts -->
     <string name="no_contacts_invite">You have no MEGA contacts. Please invite friends from the Contacts section.</string>
-    <!-- Title of first tour screen -->
-    <string name="title_tour_one">You hold the keys</string>
-    <!-- Content of first tour screen -->
-    <string name="content_tour_one">Security is why we exist, your files are safe with us behind a well oiled encryption machine where only you can access your files.</string>
-    <!-- Title of second tour screen -->
-    <string name="title_tour_two">Encrypted chat</string>
-    <!-- Content of second tour screen -->
-    <string name="content_tour_two">Fully encrypted chat with voice and video calls, group messaging and file sharing integration with your Cloud drive.</string>
-    <!-- Title of third tour screen -->
-    <string name="title_tour_three">Create your network</string>
-    <!-- Content of third tour screen -->
-    <string name="content_tour_three">Add contacts, create a network, collaborate, and make voice and video calls without ever leaving MEGA</string>
-    <!-- Title of fourth tour screen -->
-    <string name="title_tour_four">Your photos in the cloud</string>
-    <!-- Content of fourth tour screen -->
-    <string name="content_tour_four">Camera uploads is an essential feature for any mobile device and we have got you covered. Sign up for an account now.</string>
     <!-- Title of the dialog shown when a pdf required password -->
     <string name="title_pdf_password">Enter your password</string>
     <!-- Text of the dialog shown when a pdf required password -->
@@ -3060,10 +3044,6 @@
     <string name="copied_meeting_link">Copied link to clipboard</string>
     <!-- Title of the layout to join a meeting from the chat screen. -->
     <string name="join_meeting_layout_in_group_call">Tap to join current meeting.</string>
-    <!-- Title of fifth tour screen -->
-    <string name="title_tour_five">MEGA meeting</string>
-    <!-- Content of fourth tour screen -->
-    <string name="content_tour_five">Zero-knowledge encrypted video meeting</string>
     <!-- Error shown when it tries to open an invalid meeting link and the text view is empty -->
     <string name="invalid_meeting_link_empty">Please enter a valid meeting link</string>
     <!-- Guest leave call-->

@@ -336,9 +336,15 @@ private fun StartTransferComponent(
         )
     }
     uiState.confirmLargeDownload?.let {
+        val textId = if (it.transferTriggerEvent is TransferTriggerEvent.StartDownloadForPreview) {
+            sharedR.string.alert_larger_file_preview
+        } else {
+            R.string.alert_larger_file
+        }
+
         ConfirmationDialog(
             title = stringResource(id = R.string.transfers_confirm_large_download_title),
-            text = stringResource(id = R.string.alert_larger_file, it.sizeString),
+            text = stringResource(id = textId, it.sizeString),
             buttonOption1Text = stringResource(id = R.string.transfers_confirm_large_download_button_start),
             buttonOption2Text = stringResource(id = R.string.transfers_confirm_large_download_button_start_always),
             cancelButtonText = stringResource(id = sharedR.string.general_dialog_cancel_button),
