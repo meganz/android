@@ -411,4 +411,9 @@ class UploadFolderViewModel @Inject constructor(
             it.copy(transferTriggerEvent = consumed())
         }
     }
+
+    /**
+     * Cancels the name collision job.
+     */
+    fun isInList() = isList
 }
