@@ -24,6 +24,7 @@ import java.util.List;
 import coil.Coil;
 import coil.request.ImageRequest;
 import coil.transform.RoundedCornersTransformation;
+import coil.util.CoilUtils;
 import mega.privacy.android.app.FileDocument;
 import mega.privacy.android.app.MegaApplication;
 import mega.privacy.android.app.MimeTypeList;
@@ -152,6 +153,7 @@ public class FileStorageAdapter extends RecyclerView.Adapter<FileStorageAdapter.
         int margin = dp2px(ICON_MARGIN_DP);
         params.setMargins(margin, margin, margin, margin);
         imageView.setLayoutParams(params);
+        CoilUtils.dispose(imageView);
     }
 
     /**

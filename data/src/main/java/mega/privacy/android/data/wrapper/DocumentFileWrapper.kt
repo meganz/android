@@ -10,6 +10,51 @@ import java.io.File
 interface DocumentFileWrapper {
 
     /**
+     * If the given DocumentFile represents a Document tree.
+     */
+    val DocumentFile.isTreeDocumentFile: Boolean
+
+    /**
+     * If the given DocumentFile represents a file in local storage.
+     */
+    val DocumentFile.isExternalStorageDocument: Boolean
+
+    /**
+     * If the given DocumentFile represents a file in local storage, Downloads folder.
+     */
+    val DocumentFile.isDownloadsDocument: Boolean
+
+    /**
+     * If the given DocumentFile represents a media file.
+     */
+    val DocumentFile.isMediaDocument: Boolean
+
+    /**
+     * If the given DocumentFile represents a file in local storage.
+     */
+    val DocumentFile.isInPrimaryStorage: Boolean
+
+    /**
+     * If the given DocumentFile represents a file in SD card storage.
+     */
+    val DocumentFile.isInSdCardStorage: Boolean
+
+    /**
+     * If the given DocumentFile represents a file created with [File]
+     */
+    val DocumentFile.isRawFile: Boolean
+
+    /**
+     * DocumentFile id
+     */
+    val DocumentFile.id: String
+
+    /**
+     * DocumentFile storage id
+     */
+    val DocumentFile.storageId: String
+
+    /**
      * Creates a [DocumentFile] representing the document tree rooted at the given [uri]
      *
      * @see androidx.documentfile.provider.DocumentFile.fromTreeUri
@@ -42,6 +87,11 @@ interface DocumentFileWrapper {
      * @return A potentially nullable [DocumentFile]
      */
     fun fromUri(uri: Uri): DocumentFile?
+
+    /**
+     * Gets the absolute path of the given [uri]
+     */
+    fun getAbsolutePathFromContentUri(uri: Uri): String?
 
     /**
      * Creates a [DocumentFile] representing the given [file]

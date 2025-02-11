@@ -153,6 +153,11 @@ internal class FileSystemRepositoryImpl @Inject constructor(
             fileGateway.getExternalPathByContentUri(uri)
         }
 
+    override suspend fun getAbsolutePathByContentUri(uri: String): String? =
+        withContext(ioDispatcher) {
+            documentFileWrapper.getAbsolutePathFromContentUri(uri.toUri())
+        }
+
     override suspend fun getGuessContentTypeFromName(localPath: String): String? =
         withContext(ioDispatcher) {
             URLConnection.guessContentTypeFromName(localPath)
@@ -177,7 +182,7 @@ internal class FileSystemRepositoryImpl @Inject constructor(
             if (uriPath.isPath()) {
                 fileAttributeGateway.getPhotoGPSCoordinates(uriPath.value)
             } else {
-                fileGateway.getInputStream(uriPath)?.let {inputStream ->
+                fileGateway.getInputStream(uriPath)?.let { inputStream ->
                     fileAttributeGateway.getPhotoGPSCoordinates(inputStream)
                 }
             }

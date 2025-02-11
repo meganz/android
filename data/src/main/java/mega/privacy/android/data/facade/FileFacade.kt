@@ -291,14 +291,14 @@ internal class FileFacade @Inject constructor(
         getExternalPathByContentUriSync(contentUri)
 
     override fun getExternalPathByContentUriSync(contentUri: String): String? = run {
+        val externalStorageDir = Environment.getExternalStorageDirectory().path
         contentUri
             .toUri()
             .lastPathSegment
             ?.split(":")
             ?.lastOrNull()
             ?.let {
-                Environment.getExternalStorageDirectory().path +
-                        "/" + it
+                if (it.contains(externalStorageDir)) it else "$externalStorageDir/$it"
             }
     }
 
