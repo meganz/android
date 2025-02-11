@@ -368,7 +368,9 @@ internal class ChatExplorerActivity : PasscodeActivity(), View.OnClickListener,
             intent.putExtra(Constants.ID_MESSAGES, messagesIds)
         }
         val selectedChats = listItems.mapNotNull { it.chat?.chatId }.toLongArray()
-        val selectedUsers = listItems.mapNotNull { it.contactItem?.user?.handle }.toLongArray()
+        val selectedUsers =
+            listItems.filter { it.chat?.chatId == null }.mapNotNull { it.contactItem?.user?.handle }
+                .toLongArray()
 
         if (selectedChats.isNotEmpty()) {
             intent.putExtra(Constants.SELECTED_CHATS, selectedChats)
