@@ -22,6 +22,7 @@ import mega.privacy.android.domain.entity.chat.ChatConnectionStatus
  * @property isAnswerWithVideoClicked               True, if video button was clicked. False, if not.
  * @property isCallAnsweredAndWaitingForCallInfo    True, If the call has been answered and I am waiting to receive the information from the call.. False, is in the ringing call screen.
  * @property chatConnectionStatus                   [ChatConnectionStatus]
+ * @property showMissedCallNotification             True, show missed call notification. False, if not.
  **/
 data class RingingUIState(
     val chatId: Long = -1L,
@@ -36,6 +37,7 @@ data class RingingUIState(
     val isCallAnsweredAndWaitingForCallInfo: Boolean = false,
     val finish: Boolean = false,
     val chatConnectionStatus: ChatConnectionStatus? = null,
+    val showMissedCallNotification: Boolean = false
 ) {
     /**
      * Get title

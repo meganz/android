@@ -97,6 +97,16 @@ class MonitorCallPushNotificationUseCase @Inject constructor(
                     if (call == null) {
                         setFakeIncomingCallUseCase(chatId = chatId, type = null)
                         setPendingToHangUpCallUseCase(chatId = chatId, add = false)
+                    } else {
+                        runCatching {
+                            if (callRepository.isPendingToHangUp(chatId)) {
+                                callRepository.hangChatCall(call.callId)
+                                setPendingToHangUpCallUseCase(
+                                    chatId = chatId,
+                                    add = false
+                                )
+                            }
+                        }
                     }
                 }
 
@@ -131,17 +141,12 @@ class MonitorCallPushNotificationUseCase @Inject constructor(
                         val callId = call.callId
 
                         runCatching {
-                            callRepository.isPendingToHangUp(callId)
-                        }.onSuccess { isPendingToHangUp ->
-                            if (isPendingToHangUp) {
-                                runCatching {
-                                    callRepository.hangChatCall(callId)
-                                }.onSuccess {
-                                    setPendingToHangUpCallUseCase(
-                                        chatId = chatId,
-                                        add = false
-                                    )
-                                }
+                            if (callRepository.isPendingToHangUp(chatId)) {
+                                callRepository.hangChatCall(callId)
+                                setPendingToHangUpCallUseCase(
+                                    chatId = chatId,
+                                    add = false
+                                )
                             } else {
                                 val isNotification =
                                     callRepository.getFakeIncomingCall(chatId = chatId) == FakeIncomingCallState.Notification
