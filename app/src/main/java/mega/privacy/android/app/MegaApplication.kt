@@ -59,7 +59,6 @@ import mega.privacy.android.domain.usecase.featureflag.GetFeatureFlagValueUseCas
 import mega.privacy.android.domain.usecase.login.IsUserLoggedInUseCase
 import mega.privacy.android.domain.usecase.setting.GetMiscFlagsUseCase
 import mega.privacy.android.domain.usecase.setting.UpdateCrashAndPerformanceReportersUseCase
-import mega.privacy.android.domain.usecase.transfers.DeleteCompletedTransfersInCacheUseCase
 import nz.mega.sdk.MegaApiAndroid
 import nz.mega.sdk.MegaChatApiAndroid
 import nz.mega.sdk.MegaChatApiJava
@@ -199,9 +198,6 @@ class MegaApplication : MultiDexApplication(), DefaultLifecycleObserver,
     @Inject
     lateinit var getFeatureFlagValueUseCase: GetFeatureFlagValueUseCase
 
-    @Inject
-    lateinit var deleteCompletedTransfersInCacheUseCase: DeleteCompletedTransfersInCacheUseCase
-
     var localIpAddress: String? = ""
 
     var isEsid = false
@@ -243,10 +239,6 @@ class MegaApplication : MultiDexApplication(), DefaultLifecycleObserver,
         initialiseAdsIfNeeded()
         applicationScope.launch {
             runCatching { updateApiServerUseCase() }
-            // clear the cache files stored in the external cache folder.
-            runCatching {
-                deleteCompletedTransfersInCacheUseCase()
-            }
         }
 
         myAccountInfo.resetDefaults()
