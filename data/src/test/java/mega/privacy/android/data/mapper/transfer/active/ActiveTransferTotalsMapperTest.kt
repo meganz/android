@@ -234,6 +234,33 @@ class ActiveTransferTotalsMapperTest {
 
     @ParameterizedTest(name = "Transfer Type {0}")
     @EnumSource(TransferType::class)
+    fun `test that app data from individual transfers is added to transfer group without duplicates`(
+        transferType: TransferType,
+    ) = runTest {
+        val groupAppData = TransferAppData.TransferGroup(0L)
+        val appData = listOf(
+            TransferAppData.PreviewDownload,
+            TransferAppData.ChatUpload(4534L),
+            TransferAppData.VoiceClip,
+            TransferAppData.Geolocation(43.0, 2.4)
+        )
+        val entities = createEntities(transferType).mapIndexed { index, entity ->
+            entity.copy(
+                appData = appData.subList(index.mod(appData.size), appData.size) //random sub-set
+                        + groupAppData
+            )
+        }
+        val actual = underTest(
+            transferType,
+            entities,
+            emptyMap(),
+            listOf(ActiveTransferTotals.Group(0, 0, 0, 0, 0, "", null))
+        ).groups.single().appData
+        assertThat(actual).containsExactlyElementsIn(appData)
+    }
+
+    @ParameterizedTest(name = "Transfer Type {0}")
+    @EnumSource(TransferType::class)
     fun `test that groups are not fetched from repository if was in previous groups`(transferType: TransferType) =
         runTest {
             val groups = mutableListOf<ActiveTransferTotals.Group>()
@@ -270,6 +297,7 @@ class ActiveTransferTotalsMapperTest {
             assertThat(actual).containsExactlyElementsIn(expected)
             verifyNoInteractions(transferRepository)
         }
+
 
     private fun createEntities(transferType: TransferType) = (0..20).map { tag ->
         ActiveTransferEntity(

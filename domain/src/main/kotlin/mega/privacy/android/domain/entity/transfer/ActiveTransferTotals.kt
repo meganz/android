@@ -40,6 +40,7 @@ data class ActiveTransferTotals(
      * @param alreadyTransferred the amount of files not transferred because already transferred
      * @param destination the destination of the transfer
      * @param singleFileName in case of a single file transfer, the name of the file, null otherwise
+     * @param appData the list of app data of the transfers in this group. Group app data itself is filtered out. Only one instance of each app data type is added to represent this group.
      */
     data class Group(
         val groupId: Int,
@@ -49,7 +50,8 @@ data class ActiveTransferTotals(
         val alreadyTransferred: Int,
         val destination: String,
         val singleFileName: String?,
-    ) {
+        override val appData: List<TransferAppData> = emptyList(),
+    ) : AppDataOwner {
         fun finished() = totalFiles == finishedFiles
         val finishedFilesWithErrors = finishedFiles - completedFiles - alreadyTransferred
     }

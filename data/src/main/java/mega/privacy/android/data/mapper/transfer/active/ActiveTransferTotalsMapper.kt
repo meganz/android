@@ -4,6 +4,7 @@ import dagger.Lazy
 import mega.privacy.android.data.database.entity.ActiveTransferEntity
 import mega.privacy.android.domain.entity.transfer.ActiveTransfer
 import mega.privacy.android.domain.entity.transfer.ActiveTransferTotals
+import mega.privacy.android.domain.entity.transfer.TransferAppData
 import mega.privacy.android.domain.entity.transfer.TransferType
 import mega.privacy.android.domain.entity.transfer.getTransferGroup
 import mega.privacy.android.domain.repository.TransferRepository
@@ -19,7 +20,7 @@ internal class ActiveTransferTotalsMapper @Inject constructor(
      * @param type
      * @param list the list of active transfers of which the total will be calculated
      * @param transferredBytes Map of transfer tag to transferred bytes
-     * @param previousGroups The previously returned groups, this will be used to optimize performance, as groups can be changed.
+     * @param previousGroups The previously returned groups, this will be used to optimize performance, as groups can't be changed.
      */
     suspend operator fun invoke(
         type: TransferType,
@@ -47,6 +48,10 @@ internal class ActiveTransferTotalsMapper @Inject constructor(
                             alreadyTransferred = activeTransfersFiles.count { it.isAlreadyTransferred },
                             destination = destination,
                             singleFileName = fileName,
+                            appData = activeTransfersFiles
+                                .flatMap { it.appData }
+                                .filterNot { it is TransferAppData.TransferGroup } //group would be redundant
+                                .distinctBy { it::class } //only one of each type representing the group
                         )
                     }
                 }
