@@ -150,6 +150,11 @@ interface FileSystemRepository {
     suspend fun getExternalPathByContentUri(uri: String): String?
 
     /**
+     * Returns an absolute path based on document content Uri
+     */
+    suspend fun getAbsolutePathByContentUri(uri: String): String?
+
+    /**
      * Tries to determine the content type of an object,
      * based on the specified "file" component of a URL.
      *

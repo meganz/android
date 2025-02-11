@@ -25,6 +25,8 @@ import mega.privacy.android.data.mapper.transfer.TransfersGroupFinishNotificatio
 import mega.privacy.android.domain.entity.transfer.ActiveTransferTotals
 import mega.privacy.android.domain.entity.transfer.TransferType
 import mega.privacy.android.domain.usecase.featureflag.GetFeatureFlagValueUseCase
+import mega.privacy.android.domain.usecase.file.GetPathByDocumentContentUriUseCase
+import mega.privacy.android.domain.usecase.file.IsContentUriUseCase
 import mega.privacy.android.domain.usecase.node.GetFilePreviewDownloadPathUseCase
 import mega.privacy.android.domain.usecase.offline.IsOfflinePathUseCase
 import java.io.File
@@ -35,6 +37,8 @@ class DefaultTransfersGroupFinishNotificationBuilder @Inject constructor(
     private val getFeatureFlagValueUseCase: GetFeatureFlagValueUseCase,
     private val isOfflinePathUseCase: IsOfflinePathUseCase,
     private val getFilePreviewDownloadPathUseCase: GetFilePreviewDownloadPathUseCase,
+    private val isContentUriUseCase: IsContentUriUseCase,
+    private val getPathByDocumentContentUriUseCase: GetPathByDocumentContentUriUseCase,
 ) : TransfersGroupFinishNotificationBuilder {
     private val resources get() = context.resources
     override suspend fun invoke(
@@ -91,8 +95,15 @@ class DefaultTransfersGroupFinishNotificationBuilder @Inject constructor(
             }
         } + (titleSuffix?.let { ". $it." } ?: "")
 
-        val isOfflineDownload = isOfflinePathUseCase(group.destination)
-        val destination = when {
+        val destination = runCatching {
+            if (isContentUriUseCase(group.destination)) {
+                getPathByDocumentContentUriUseCase(group.destination)
+            } else {
+                group.destination
+            }
+        }.getOrNull() ?: group.destination
+        val isOfflineDownload = isOfflinePathUseCase(destination)
+        val destinationText = when {
             isOfflineDownload -> {
                 context.getString(R.string.section_saved_for_offline_new)
             }
@@ -102,13 +113,13 @@ class DefaultTransfersGroupFinishNotificationBuilder @Inject constructor(
             }
 
             else -> {
-                group.destination
+                destination
             }
         }
-        val contentText = destination?.let {
+        val contentText = destinationText?.let {
             resources.getString(
                 sharedR.string.transfers_notification_location_content,
-                destination,
+                it,
             )
         }
 
@@ -173,7 +184,7 @@ class DefaultTransfersGroupFinishNotificationBuilder @Inject constructor(
             Intent(context, ManagerActivity::class.java).apply {
                 action = Constants.ACTION_LOCATE_DOWNLOADED_FILE
                 putExtra(Constants.INTENT_EXTRA_IS_OFFLINE_PATH, isOfflineDownload)
-                putExtra(FileStorageActivity.EXTRA_PATH, group.destination)
+                putExtra(FileStorageActivity.EXTRA_PATH, destination)
                 group.singleFileName?.let {
                     putExtra(FileStorageActivity.EXTRA_FILE_NAME, it)
                 }
@@ -206,7 +217,7 @@ class DefaultTransfersGroupFinishNotificationBuilder @Inject constructor(
                 contentText?.let {
                     setContentText(it)
                 }
-                if (group.finishedFiles > 0) {
+                if (group.completedFiles > 0 || group.alreadyTransferred > 0) {
                     addAction(
                         iconPackR.drawable.ic_stat_notify,
                         actionText,
