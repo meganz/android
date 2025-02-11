@@ -1586,4 +1586,8 @@ internal class MegaApiFacade @Inject constructor(
     }
 
     override fun getSyncs(): MegaSyncList = megaApi.syncs
+
+    override fun removeVersions(listener: MegaRequestListenerInterface) {
+        megaApi.removeVersions(listener)
+    }
 }

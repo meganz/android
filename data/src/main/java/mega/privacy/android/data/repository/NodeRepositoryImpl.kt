@@ -1212,4 +1212,11 @@ internal class NodeRepositoryImpl @Inject constructor(
         }
         return@withContext false
     }
+
+    override suspend fun removeAllVersions() = withContext(ioDispatcher) {
+        suspendCancellableCoroutine { continuation ->
+            val listener = continuation.getRequestListener("removeAllVersions") {}
+            megaApiGateway.removeVersions(listener)
+        }
+    }
 }

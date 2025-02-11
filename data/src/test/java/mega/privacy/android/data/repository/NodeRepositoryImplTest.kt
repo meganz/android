@@ -1516,6 +1516,23 @@ internal class NodeRepositoryImplTest {
         assertThat(underTest.isNodeSynced(NodeId(4321L))).isFalse()
     }
 
+    @Test
+    fun `test that removeAllVersions triggers correctly`() = runTest {
+        whenever(megaApiGateway.removeVersions(any())).thenAnswer {
+            ((it.arguments[0]) as OptionalMegaRequestListenerInterface).onRequestFinish(
+                api = mock(),
+                request = mock(),
+                error = mock {
+                    on { errorCode }.thenReturn(
+                        MegaError.API_OK
+                    )
+                },
+            )
+        }
+        underTest.removeAllVersions()
+        verify(megaApiGateway).removeVersions(any())
+    }
+
     private fun provideNodeId() = Stream.of(
         Arguments.of(null),
         Arguments.of(NodeId(2L)),

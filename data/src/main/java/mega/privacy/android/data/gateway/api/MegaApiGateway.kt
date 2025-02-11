@@ -3628,7 +3628,7 @@ interface MegaApiGateway {
         password: String,
         firstName: String,
         lastName: String,
-        listener: MegaRequestListenerInterface
+        listener: MegaRequestListenerInterface,
     )
 
     /**
@@ -3677,7 +3677,7 @@ interface MegaApiGateway {
         lastPublicHandle: Long,
         lastPublicHandleType: Int,
         lastAccessTimestamp: Long,
-        listener: MegaRequestListenerInterface
+        listener: MegaRequestListenerInterface,
     )
 
     /**
@@ -3711,4 +3711,16 @@ interface MegaApiGateway {
      * @return List of MegaSync objects with all syncs
      */
     fun getSyncs(): MegaSyncList
+
+    /**
+     * Remove all versions from the MEGA account
+     * <p>
+     * The associated request type with this request is MegaRequest::TYPE_REMOVE_VERSIONS
+     * <p>
+     * When the request finishes, file versions might not be deleted yet.
+     * Deletions are notified using onNodesUpdate callbacks.
+     *
+     * @param listener MegaRequestListener to track this request
+     */
+    fun removeVersions(listener: MegaRequestListenerInterface)
 }

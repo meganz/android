@@ -833,4 +833,9 @@ interface NodeRepository {
      * @return True if node is synced or False otherwise
      */
     suspend fun isNodeSynced(nodeId: NodeId): Boolean
+
+    /**
+     * Remove all versions of a nodes in app
+     */
+    suspend fun removeAllVersions()
 }
