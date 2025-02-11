@@ -71,7 +71,7 @@ import mega.privacy.android.shared.original.core.ui.controls.buttons.TextMegaBut
 import mega.privacy.android.shared.original.core.ui.controls.pager.InfiniteHorizontalPagerWithIndicator
 import mega.privacy.android.shared.original.core.ui.controls.text.MegaText
 import mega.privacy.android.shared.original.core.ui.preview.CombinedTextAndThemePreviews
-import mega.privacy.android.shared.original.core.ui.theme.OriginalTempTheme
+import mega.privacy.android.shared.original.core.ui.theme.OriginalTheme
 import mega.privacy.android.shared.original.core.ui.theme.extensions.conditional
 import mega.android.core.ui.theme.values.TextColor
 import mega.privacy.android.shared.original.core.ui.utils.showAutoDurationSnackbar
@@ -398,7 +398,7 @@ private fun HorizontalTourPager(
 @CombinedTextAndThemePreviews
 @Composable
 private fun TourScreenPreview() {
-    OriginalTempTheme(isDark = isSystemInDarkTheme()) {
+    OriginalTheme(isDark = isSystemInDarkTheme()) {
         TourScreen(
             modifier = Modifier.fillMaxSize(),
             uiState = TourUiState(),

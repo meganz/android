@@ -57,7 +57,7 @@ import mega.privacy.android.shared.original.core.ui.controls.dividers.DividerTyp
 import mega.privacy.android.shared.original.core.ui.controls.dividers.MegaDivider
 import mega.privacy.android.shared.original.core.ui.controls.lists.MenuActionListTile
 import mega.privacy.android.shared.original.core.ui.controls.sheets.BottomSheet
-import mega.privacy.android.shared.original.core.ui.theme.OriginalTempTheme
+import mega.privacy.android.shared.original.core.ui.theme.OriginalTheme
 import javax.inject.Inject
 
 /**
@@ -191,7 +191,7 @@ class ContactRequestsPageFragment : Fragment() {
                 }
                 val coroutineScope = rememberCoroutineScope()
 
-                OriginalTempTheme(isDark = themeMode.isDarkMode()) {
+                OriginalTheme(isDark = themeMode.isDarkMode()) {
                     (state as? ContactRequestsState.Data)?.selectedItem?.takeIf { it.isOutgoing == isOutgoing }
                         ?.let { item ->
                             coroutineScope.launch { sheetState.show() }

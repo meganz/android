@@ -28,7 +28,7 @@ import mega.privacy.android.shared.original.core.ui.controls.chip.HighlightChip
 import mega.privacy.android.shared.original.core.ui.controls.text.HighlightedText
 import mega.privacy.android.shared.original.core.ui.preview.CombinedThemePreviews
 import mega.privacy.android.shared.original.core.ui.theme.MegaOriginalTheme
-import mega.privacy.android.shared.original.core.ui.theme.OriginalTempTheme
+import mega.privacy.android.shared.original.core.ui.theme.OriginalTheme
 import mega.privacy.android.shared.original.core.ui.theme.extensions.conditional
 import mega.android.core.ui.theme.values.TextColor
 
@@ -120,7 +120,7 @@ private fun DescriptionTitleRow(
 @CombinedThemePreviews
 @Composable
 private fun GenericMultiLineListItemPreview() {
-    OriginalTempTheme(isDark = isSystemInDarkTheme()) {
+    OriginalTheme(isDark = isSystemInDarkTheme()) {
         GenericMultilineListItem(
             title = {
                 Text(

@@ -23,11 +23,10 @@ import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import mega.privacy.android.app.R
-import mega.privacy.android.shared.original.core.ui.controls.buttons.MegaButtonWithIcon
 import mega.privacy.android.shared.original.core.ui.preview.CombinedTextAndThemePreviews
 import mega.privacy.android.shared.original.core.ui.theme.extensions.subtitle2medium
 import mega.privacy.android.shared.original.core.ui.theme.extensions.textColorPrimary
-import mega.privacy.android.shared.original.core.ui.theme.OriginalTempTheme
+import mega.privacy.android.shared.original.core.ui.theme.OriginalTheme
 
 
 /**
@@ -77,7 +76,7 @@ internal fun LocationInfoView(
 @Composable
 private fun LocationInfoViewPreview() {
     var counter by remember { mutableStateOf(0) }
-    OriginalTempTheme(isDark = isSystemInDarkTheme()) {
+    OriginalTheme(isDark = isSystemInDarkTheme()) {
         LocationInfoView(
             modifier = Modifier.systemBarsPadding(),
             location = "CloudDrive $counter", onClick = {

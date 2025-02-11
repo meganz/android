@@ -65,7 +65,7 @@ import mega.privacy.android.domain.entity.ThemeMode
 import mega.privacy.android.domain.entity.support.SupportEmailTicket
 import mega.privacy.android.domain.qualifier.LoginMutex
 import mega.privacy.android.domain.usecase.GetThemeMode
-import mega.privacy.android.shared.original.core.ui.theme.OriginalTempTheme
+import mega.privacy.android.shared.original.core.ui.theme.OriginalTheme
 import nz.mega.sdk.MegaError
 import timber.log.Timber
 import javax.inject.Inject
@@ -133,7 +133,7 @@ class LoginFragment : Fragment() {
             if (ongoingTransfersExist == true) showCancelTransfersDialog()
         }
 
-        OriginalTempTheme(isDark = themeMode.isDarkMode()) {
+        OriginalTheme(isDark = themeMode.isDarkMode()) {
             LoginView(
                 state = uiState,
                 onEmailChanged = viewModel::onEmailChanged,

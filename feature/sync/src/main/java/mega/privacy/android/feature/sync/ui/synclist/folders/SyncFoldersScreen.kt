@@ -42,7 +42,7 @@ import mega.privacy.android.shared.original.core.ui.controls.skeleton.CardItemLo
 import mega.privacy.android.shared.original.core.ui.controls.text.MegaText
 import mega.privacy.android.shared.original.core.ui.preview.BooleanProvider
 import mega.privacy.android.shared.original.core.ui.preview.CombinedThemePreviews
-import mega.privacy.android.shared.original.core.ui.theme.OriginalTempTheme
+import mega.privacy.android.shared.original.core.ui.theme.OriginalTheme
 import mega.privacy.android.shared.original.core.ui.theme.extensions.h6Medium
 import mega.android.core.ui.theme.values.TextColor
 import mega.privacy.mobile.analytics.event.SyncCardExpandedEvent
@@ -235,7 +235,7 @@ private fun SyncFoldersScreenLoadingState() {
 private fun SyncFoldersScreenEmptyStatePreview(
     @PreviewParameter(BooleanProvider::class) isFreeAccount: Boolean,
 ) {
-    OriginalTempTheme(isDark = isSystemInDarkTheme()) {
+    OriginalTheme(isDark = isSystemInDarkTheme()) {
         SyncFoldersScreen(
             syncUiItems = emptyList(),
             cardExpanded = {},
@@ -260,7 +260,7 @@ private fun SyncFoldersScreenEmptyStatePreview(
 @CombinedThemePreviews
 @Composable
 private fun SyncFoldersScreenLoadingStatePreview() {
-    OriginalTempTheme(isDark = isSystemInDarkTheme()) {
+    OriginalTheme(isDark = isSystemInDarkTheme()) {
         SyncFoldersScreen(
             syncUiItems = emptyList(),
             cardExpanded = {},
@@ -284,7 +284,7 @@ private fun SyncFoldersScreenLoadingStatePreview() {
 private fun SyncFoldersScreenSyncingPreview(
     @PreviewParameter(SyncTypePreviewProvider::class) syncType: SyncType,
 ) {
-    OriginalTempTheme(isDark = isSystemInDarkTheme()) {
+    OriginalTheme(isDark = isSystemInDarkTheme()) {
         SyncFoldersScreen(
             listOf(
                 SyncUiItem(
@@ -320,7 +320,7 @@ private fun SyncFoldersScreenSyncingPreview(
 private fun SyncFoldersScreenSyncingWithStalledIssuesPreview(
     @PreviewParameter(SyncTypePreviewProvider::class) syncType: SyncType,
 ) {
-    OriginalTempTheme(isDark = isSystemInDarkTheme()) {
+    OriginalTheme(isDark = isSystemInDarkTheme()) {
         SyncFoldersScreen(
             listOf(
                 SyncUiItem(

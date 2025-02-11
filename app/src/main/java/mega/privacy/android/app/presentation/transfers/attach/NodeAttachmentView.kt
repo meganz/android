@@ -25,7 +25,7 @@ import mega.privacy.android.app.main.ManagerActivity
 import mega.privacy.android.app.presentation.qrcode.findActivity
 import mega.privacy.android.app.utils.Constants
 import mega.privacy.android.domain.entity.node.NodeId
-import mega.privacy.android.shared.original.core.ui.theme.OriginalTempTheme
+import mega.privacy.android.shared.original.core.ui.theme.OriginalTheme
 
 /**
  * Node attachment view
@@ -126,7 +126,7 @@ fun createNodeAttachmentView(
 ): View = ComposeView(activity).apply {
     setViewCompositionStrategy(ViewCompositionStrategy.DisposeOnViewTreeLifecycleDestroyed)
     setContent {
-        OriginalTempTheme(isDark = isSystemInDarkTheme()) {
+        OriginalTheme(isDark = isSystemInDarkTheme()) {
             NodeAttachmentView(
                 viewModel = viewModel,
                 showMessage = showMessage

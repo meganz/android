@@ -64,7 +64,7 @@ import mega.privacy.android.shared.original.core.ui.controls.layouts.MegaScaffol
 import mega.privacy.android.shared.original.core.ui.controls.text.LongTextBehaviour
 import mega.privacy.android.shared.original.core.ui.controls.text.MegaText
 import mega.privacy.android.shared.original.core.ui.preview.CombinedThemePreviews
-import mega.privacy.android.shared.original.core.ui.theme.OriginalTempTheme
+import mega.privacy.android.shared.original.core.ui.theme.OriginalTheme
 import mega.privacy.android.shared.original.core.ui.theme.extensions.grey_050_grey_800
 import mega.android.core.ui.theme.values.TextColor
 import mega.privacy.android.shared.original.core.ui.utils.showAutoDurationSnackbar
@@ -595,7 +595,7 @@ internal fun PlayAllButtonView(
 @CombinedThemePreviews
 @Composable
 private fun VideoPlaylistDetailViewPreview() {
-    OriginalTempTheme(isDark = isSystemInDarkTheme()) {
+    OriginalTheme(isDark = isSystemInDarkTheme()) {
         VideoPlaylistDetailView(
             playlist = VideoPlaylistUIEntity(
                 id = NodeId(0),
@@ -639,7 +639,7 @@ private fun VideoPlaylistDetailViewPreview() {
 @CombinedThemePreviews
 @Composable
 private fun VideoPlaylistDetailViewUnderActionModePreview() {
-    OriginalTempTheme(isDark = isSystemInDarkTheme()) {
+    OriginalTheme(isDark = isSystemInDarkTheme()) {
         VideoPlaylistDetailView(
             playlist = null,
             selectedSize = 2,
@@ -672,7 +672,7 @@ private fun VideoPlaylistDetailViewUnderActionModePreview() {
 @CombinedThemePreviews
 @Composable
 private fun VideoPlaylistHeaderViewPreview() {
-    OriginalTempTheme(isDark = isSystemInDarkTheme()) {
+    OriginalTheme(isDark = isSystemInDarkTheme()) {
         VideoPlaylistHeaderView(
             modifier = Modifier,
             thumbnailList = listOf(null),
@@ -687,7 +687,7 @@ private fun VideoPlaylistHeaderViewPreview() {
 @CombinedThemePreviews
 @Composable
 private fun PlayAllButtonViewPreview() {
-    OriginalTempTheme(isDark = isSystemInDarkTheme()) {
+    OriginalTheme(isDark = isSystemInDarkTheme()) {
         PlayAllButtonView()
     }
 }

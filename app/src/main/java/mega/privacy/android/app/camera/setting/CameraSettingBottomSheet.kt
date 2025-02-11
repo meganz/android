@@ -16,7 +16,7 @@ import mega.privacy.android.shared.original.core.ui.controls.controlssliders.Meg
 import mega.privacy.android.shared.original.core.ui.controls.lists.GenericTwoLineListItem
 import mega.privacy.android.shared.original.core.ui.controls.text.MegaText
 import mega.privacy.android.shared.original.core.ui.preview.CombinedThemePreviews
-import mega.privacy.android.shared.original.core.ui.theme.OriginalTempTheme
+import mega.privacy.android.shared.original.core.ui.theme.OriginalTheme
 import mega.android.core.ui.theme.values.TextColor
 
 @Composable
@@ -68,7 +68,7 @@ internal fun CameraSettingBottomSheet(
 @CombinedThemePreviews
 @Composable
 private fun CameraSettingBottomSheetPreview() {
-    OriginalTempTheme(isDark = isSystemInDarkTheme()) {
+    OriginalTheme(isDark = isSystemInDarkTheme()) {
         CameraSettingBottomSheet()
     }
 }

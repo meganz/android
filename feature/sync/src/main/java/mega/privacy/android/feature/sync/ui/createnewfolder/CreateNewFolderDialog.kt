@@ -13,7 +13,7 @@ import mega.privacy.android.domain.entity.node.Node
 import mega.privacy.android.feature.sync.ui.createnewfolder.model.CreateNewFolderState
 import mega.privacy.android.legacy.core.ui.controls.dialogs.InputDialog
 import mega.privacy.android.shared.original.core.ui.preview.CombinedThemePreviews
-import mega.privacy.android.shared.original.core.ui.theme.OriginalTempTheme
+import mega.privacy.android.shared.original.core.ui.theme.OriginalTheme
 import mega.privacy.android.shared.resources.R as sharedR
 import androidx.compose.ui.res.stringResource
 import de.palm.composestateevents.EventEffect
@@ -82,7 +82,7 @@ private fun CreateNewFolderDialogBody(
 private fun CreateNewFolderDialogPreview(
     @PreviewParameter(CreateNewFolderDialogPreviewProvider::class) createNewFolderState: CreateNewFolderState,
 ) {
-    OriginalTempTheme(isDark = isSystemInDarkTheme()) {
+    OriginalTheme(isDark = isSystemInDarkTheme()) {
         CreateNewFolderDialogBody(
             uiState = createNewFolderState,
             onConfirm = {},

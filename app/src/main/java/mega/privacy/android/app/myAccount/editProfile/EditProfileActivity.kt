@@ -79,7 +79,7 @@ import mega.privacy.android.domain.entity.ThemeMode
 import mega.privacy.android.domain.exception.ChangeEmailException
 import mega.privacy.android.domain.usecase.GetThemeMode
 import mega.privacy.android.domain.usecase.featureflag.GetFeatureFlagValueUseCase
-import mega.privacy.android.shared.original.core.ui.theme.OriginalTempTheme
+import mega.privacy.android.shared.original.core.ui.theme.OriginalTheme
 import nz.mega.sdk.MegaChatApi
 import timber.log.Timber
 import java.io.File
@@ -312,7 +312,7 @@ class EditProfileActivity : PasscodeActivity(), PhotoBottomSheetDialogFragment.P
                 val uiState by viewModel.state.collectAsStateWithLifecycle()
                 val themeMode by getThemeMode().collectAsStateWithLifecycle(initialValue = ThemeMode.System)
                 if (uiState.showLogoutConfirmationDialog) {
-                    OriginalTempTheme(isDark = themeMode.isDarkMode()) {
+                    OriginalTheme(isDark = themeMode.isDarkMode()) {
                         LogoutConfirmationDialog(
                             onDismissed = { viewModel.dismissLogoutConfirmationDialog() },
                             logoutViewModel = logoutViewModel

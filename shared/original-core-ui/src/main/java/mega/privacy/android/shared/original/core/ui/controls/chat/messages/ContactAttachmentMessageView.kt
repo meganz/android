@@ -28,7 +28,7 @@ import mega.privacy.android.shared.original.core.ui.controls.chat.ChatStatusIcon
 import mega.privacy.android.shared.original.core.ui.controls.chat.UiChatStatus
 import mega.privacy.android.shared.original.core.ui.preview.BooleanProvider
 import mega.privacy.android.shared.original.core.ui.preview.CombinedThemePreviews
-import mega.privacy.android.shared.original.core.ui.theme.OriginalTempTheme
+import mega.privacy.android.shared.original.core.ui.theme.OriginalTheme
 import mega.privacy.android.shared.original.core.ui.theme.MegaOriginalTheme
 import mega.privacy.android.shared.original.core.ui.theme.extensions.conditional
 
@@ -164,7 +164,7 @@ fun ContactMessageContentView(
 private fun ContactAttachmentMessageViewPreview(
     @PreviewParameter(BooleanProvider::class) isMe: Boolean,
 ) {
-    OriginalTempTheme(isDark = isSystemInDarkTheme()) {
+    OriginalTheme(isDark = isSystemInDarkTheme()) {
         ContactAttachmentMessageView(
             isMe = isMe,
             userName = "User Name",
@@ -189,7 +189,7 @@ private fun ContactAttachmentMessageViewPreview(
 private fun VerifiedContactAttachmentMessageViewPreview(
     @PreviewParameter(BooleanProvider::class) isMe: Boolean,
 ) {
-    OriginalTempTheme(isDark = isSystemInDarkTheme()) {
+    OriginalTheme(isDark = isSystemInDarkTheme()) {
         ContactAttachmentMessageView(
             isMe = isMe,
             userName = "User Name",

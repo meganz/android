@@ -29,7 +29,7 @@ import mega.privacy.android.shared.original.core.ui.controls.appbar.MegaAppBar
 import mega.privacy.android.shared.original.core.ui.controls.layouts.MegaScaffold
 import mega.privacy.android.shared.original.core.ui.controls.sheets.MegaBottomSheetLayout
 import mega.privacy.android.shared.original.core.ui.controls.tab.Tabs
-import mega.privacy.android.shared.original.core.ui.theme.OriginalTempTheme
+import mega.privacy.android.shared.original.core.ui.theme.OriginalTheme
 
 @OptIn(ExperimentalComposeUiApi::class, ExperimentalMaterialNavigationApi::class)
 @Composable
@@ -134,7 +134,7 @@ internal fun CompletedTransfersView() {
 @Preview(uiMode = Configuration.UI_MODE_NIGHT_YES, name = "DarkTransfersViewPreview")
 @Composable
 private fun TransfersViewPreview() {
-    OriginalTempTheme(isDark = isSystemInDarkTheme()) {
+    OriginalTheme(isDark = isSystemInDarkTheme()) {
         TransfersView(
             bottomSheetNavigator = rememberBottomSheetNavigator(),
             scaffoldState = rememberScaffoldState(),

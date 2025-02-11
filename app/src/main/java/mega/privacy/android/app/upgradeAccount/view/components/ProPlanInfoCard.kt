@@ -36,7 +36,7 @@ import mega.privacy.android.shared.original.core.ui.controls.text.MegaText
 import mega.privacy.android.shared.original.core.ui.model.MegaSpanStyle
 import mega.privacy.android.shared.original.core.ui.model.SpanIndicator
 import mega.privacy.android.shared.original.core.ui.preview.CombinedThemePreviews
-import mega.privacy.android.shared.original.core.ui.theme.OriginalTempTheme
+import mega.privacy.android.shared.original.core.ui.theme.OriginalTheme
 import mega.privacy.android.shared.original.core.ui.theme.body2
 import mega.privacy.android.shared.original.core.ui.theme.caption
 import mega.privacy.android.shared.original.core.ui.theme.extensions.accent_900_accent_050
@@ -278,7 +278,7 @@ fun ProPlanInfoCardPreview() {
         localisedPriceCurrencyCode = localisedPriceCurrencyCodeStringMapper,
         formattedSize = formattedSizeMapper,
     )
-    OriginalTempTheme(isDark = isSystemInDarkTheme()) {
+    OriginalTheme(isDark = isSystemInDarkTheme()) {
         ProPlanInfoCard(
             proPlan = AccountType.PRO_I,
             subscription = subscriptionProI,
@@ -313,7 +313,7 @@ fun FreePlanInfoCardPreview() {
         localisedPriceCurrencyCode = localisedPriceCurrencyCodeStringMapper,
         formattedSize = formattedSizeMapper,
     )
-    OriginalTempTheme(isDark = isSystemInDarkTheme()) {
+    OriginalTheme(isDark = isSystemInDarkTheme()) {
         ProPlanInfoCard(
             proPlan = AccountType.FREE,
             subscription = subscriptionProI,

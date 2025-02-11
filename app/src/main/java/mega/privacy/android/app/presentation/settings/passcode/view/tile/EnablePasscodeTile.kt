@@ -14,7 +14,7 @@ import mega.privacy.android.shared.original.core.ui.controls.dividers.MegaDivide
 import mega.privacy.android.shared.original.core.ui.controls.lists.GenericTwoLineListItem
 import mega.privacy.android.shared.original.core.ui.preview.BooleanProvider
 import mega.privacy.android.shared.original.core.ui.preview.CombinedThemePreviews
-import mega.privacy.android.shared.original.core.ui.theme.OriginalTempTheme
+import mega.privacy.android.shared.original.core.ui.theme.OriginalTheme
 
 /**
  * Enable passcode tile
@@ -61,7 +61,7 @@ internal fun EnablePasscodeTile(
 private fun EnablePasscodeTilePreview(
     @PreviewParameter(BooleanProvider::class) isChecked: Boolean,
 ) {
-    OriginalTempTheme(isDark = isSystemInDarkTheme()) {
+    OriginalTheme(isDark = isSystemInDarkTheme()) {
         EnablePasscodeTile(
             isChecked = isChecked,
             onItemClicked = {},

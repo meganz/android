@@ -50,7 +50,7 @@ import mega.privacy.android.domain.entity.photos.Photo
 import mega.privacy.android.domain.usecase.GetThemeMode
 import mega.privacy.android.domain.usecase.featureflag.GetFeatureFlagValueUseCase
 import mega.privacy.android.navigation.MegaNavigator
-import mega.privacy.android.shared.original.core.ui.theme.OriginalTempTheme
+import mega.privacy.android.shared.original.core.ui.theme.OriginalTheme
 import javax.inject.Inject
 
 /**
@@ -108,7 +108,7 @@ class MediaDiscoveryFragment : Fragment() {
                     .collectAsStateWithLifecycle(initialValue = ThemeMode.System)
                 val uiState by mediaDiscoveryViewModel.state.collectAsStateWithLifecycle()
 
-                OriginalTempTheme(isDark = mode.isDarkMode()) {
+                OriginalTheme(isDark = mode.isDarkMode()) {
                     Box(
                         modifier = Modifier
                             .background(MaterialTheme.colors.background)

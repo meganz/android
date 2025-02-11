@@ -49,8 +49,8 @@ import mega.privacy.android.core.R
 import mega.privacy.android.shared.original.core.ui.preview.BooleanProvider
 import mega.privacy.android.shared.original.core.ui.preview.CombinedThemePreviews
 import mega.privacy.android.shared.original.core.ui.theme.MegaOriginalTheme
-import mega.privacy.android.shared.original.core.ui.theme.OriginalTempTheme
-import mega.privacy.android.shared.original.core.ui.theme.OriginalTempThemeForPreviews
+import mega.privacy.android.shared.original.core.ui.theme.OriginalTheme
+import mega.privacy.android.shared.original.core.ui.theme.OriginalThemeForPreviews
 
 
 /**
@@ -103,7 +103,7 @@ class MegaSwitch : AbstractComposeView, Checkable {
 
     @Composable
     override fun Content() {
-        OriginalTempTheme(isDark = isSystemInDarkTheme()) {
+        OriginalTheme(isDark = isSystemInDarkTheme()) {
             MegaSwitch(
                 checked = checked,
                 onCheckedChange = if (clickable) {
@@ -302,7 +302,7 @@ private fun getColorForBorder(pressed: Boolean, enabled: Boolean) =
 private fun MegaSwitchPreview(
     @PreviewParameter(BooleanProvider::class) initialChecked: Boolean,
 ) {
-    OriginalTempTheme(isDark = isSystemInDarkTheme()) {
+    OriginalTheme(isDark = isSystemInDarkTheme()) {
         var checked by remember {
             mutableStateOf(initialChecked)
         }
@@ -317,7 +317,7 @@ private fun MegaSwitchPreview(
 private fun MegaSwitchDisabledPreview(
     @PreviewParameter(BooleanProvider::class) initialChecked: Boolean,
 ) {
-    OriginalTempTheme(isDark = isSystemInDarkTheme()) {
+    OriginalTheme(isDark = isSystemInDarkTheme()) {
         var checked by remember {
             mutableStateOf(initialChecked)
         }
@@ -332,7 +332,7 @@ private fun MegaSwitchDisabledPreview(
 private fun MegaSwitchTempAndNewPreview(
     @PreviewParameter(BooleanProvider::class) initialChecked: Boolean,
 ) {
-    OriginalTempThemeForPreviews {
+    OriginalThemeForPreviews {
         var checked by remember {
             mutableStateOf(initialChecked)
         }
@@ -347,7 +347,7 @@ private fun MegaSwitchTempAndNewPreview(
 private fun MegaSwitchDisabledTempAndNewPreview(
     @PreviewParameter(BooleanProvider::class) initialChecked: Boolean,
 ) {
-    OriginalTempThemeForPreviews {
+    OriginalThemeForPreviews {
         var checked by remember {
             mutableStateOf(initialChecked)
         }

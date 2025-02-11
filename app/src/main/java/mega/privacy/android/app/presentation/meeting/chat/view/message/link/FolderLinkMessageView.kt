@@ -19,7 +19,7 @@ import mega.privacy.android.shared.original.core.ui.controls.chat.messages.RichL
 import mega.privacy.android.shared.original.core.ui.preview.BooleanProvider
 import mega.privacy.android.shared.original.core.ui.preview.CombinedThemePreviews
 import mega.privacy.android.domain.entity.FolderInfo
-import mega.privacy.android.shared.original.core.ui.theme.OriginalTempTheme
+import mega.privacy.android.shared.original.core.ui.theme.OriginalTheme
 
 /**
  * Folder link message view
@@ -55,7 +55,7 @@ fun FolderLinkMessageView(
 private fun FolderLinkMessageViewPreview(
     @PreviewParameter(BooleanProvider::class) isMe: Boolean,
 ) {
-    OriginalTempTheme(isDark = isSystemInDarkTheme()) {
+    OriginalTheme(isDark = isSystemInDarkTheme()) {
         ChatBubble(isMe = isMe, subContent = {
             FolderLinkMessageView(
                 linkContent = FolderLinkContent(

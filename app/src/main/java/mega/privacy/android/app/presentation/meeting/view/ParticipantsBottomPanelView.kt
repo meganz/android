@@ -62,7 +62,7 @@ import mega.privacy.android.shared.original.core.ui.controls.buttons.RaisedDefau
 import mega.privacy.android.shared.original.core.ui.controls.buttons.TextMegaButton
 import mega.privacy.android.shared.original.core.ui.controls.controlssliders.MegaSwitch
 import mega.privacy.android.shared.original.core.ui.controls.snackbars.MegaSnackbar
-import mega.privacy.android.shared.original.core.ui.theme.OriginalTempTheme
+import mega.privacy.android.shared.original.core.ui.theme.OriginalTheme
 import mega.privacy.android.shared.original.core.ui.theme.extensions.black_white
 import mega.privacy.android.shared.original.core.ui.theme.extensions.grey_200_grey_700
 import mega.privacy.android.shared.original.core.ui.theme.extensions.accent_900_accent_050
@@ -662,7 +662,7 @@ private fun InviteParticipantsButton(
 @Preview
 @Composable
 fun ParticipantsBottomPanelGuestInCallSectionPreview() {
-    OriginalTempTheme(isDark = true) {
+    OriginalTheme(isDark = true) {
         BottomPanelView(uiState = MeetingState(
             participantsSection = ParticipantsSection.InCallSection,
             chatParticipantsInCall = getListWith4Participants(),
@@ -692,7 +692,7 @@ fun ParticipantsBottomPanelGuestInCallSectionPreview() {
 @Preview
 @Composable
 fun ParticipantsBottomPanelGuestNotInCallSectionPreview() {
-    OriginalTempTheme(isDark = true) {
+    OriginalTheme(isDark = true) {
         BottomPanelView(uiState = MeetingState(
             participantsSection = ParticipantsSection.NotInCallSection,
             chatParticipantsNotInCall = getListWith4Participants(),
@@ -722,7 +722,7 @@ fun ParticipantsBottomPanelGuestNotInCallSectionPreview() {
 @Preview
 @Composable
 fun ParticipantsBottomPanelGuestNotInCallSectionEmptyStatePreview() {
-    OriginalTempTheme(isDark = true) {
+    OriginalTheme(isDark = true) {
         BottomPanelView(uiState = MeetingState(
             participantsSection = ParticipantsSection.NotInCallSection,
             chatParticipantsNotInCall = emptyList(),
@@ -752,7 +752,7 @@ fun ParticipantsBottomPanelGuestNotInCallSectionEmptyStatePreview() {
 @Preview
 @Composable
 fun ParticipantsBottomPanelNonHostInCallSectionPreview() {
-    OriginalTempTheme(isDark = true) {
+    OriginalTheme(isDark = true) {
         BottomPanelView(uiState = MeetingState(
             participantsSection = ParticipantsSection.InCallSection,
             chatParticipantsInCall = getListWith4Participants(),
@@ -782,7 +782,7 @@ fun ParticipantsBottomPanelNonHostInCallSectionPreview() {
 @Preview
 @Composable
 fun ParticipantsBottomPanelNonHostAndOpenInviteInCallSectionPreview() {
-    OriginalTempTheme(isDark = true) {
+    OriginalTheme(isDark = true) {
         BottomPanelView(uiState = MeetingState(
             participantsSection = ParticipantsSection.InCallSection,
             chatParticipantsInCall = getListWith4Participants(),
@@ -814,7 +814,7 @@ fun ParticipantsBottomPanelNonHostAndOpenInviteInCallSectionPreview() {
 @Preview
 @Composable
 fun ParticipantsBottomPanelNonHostNotInCallSectionPreview() {
-    OriginalTempTheme(isDark = true) {
+    OriginalTheme(isDark = true) {
         BottomPanelView(uiState = MeetingState(
             participantsSection = ParticipantsSection.NotInCallSection,
             chatParticipantsNotInCall = getListWith4Participants(),
@@ -844,7 +844,7 @@ fun ParticipantsBottomPanelNonHostNotInCallSectionPreview() {
 @Preview
 @Composable
 fun ParticipantsBottomPanelNonHostNotInCallSectionEmptyStatePreview() {
-    OriginalTempTheme(isDark = true) {
+    OriginalTheme(isDark = true) {
         BottomPanelView(uiState = MeetingState(
             participantsSection = ParticipantsSection.NotInCallSection,
             chatParticipantsNotInCall = emptyList(),
@@ -874,7 +874,7 @@ fun ParticipantsBottomPanelNonHostNotInCallSectionEmptyStatePreview() {
 @Preview
 @Composable
 fun ParticipantsBottomPanelInCallView4ParticipantsPreview() {
-    OriginalTempTheme(isDark = true) {
+    OriginalTheme(isDark = true) {
         BottomPanelView(uiState = MeetingState(
             participantsSection = ParticipantsSection.InCallSection,
             chatParticipantsInCall = getListWith4Participants(),
@@ -903,7 +903,7 @@ fun ParticipantsBottomPanelInCallView4ParticipantsPreview() {
 @Preview
 @Composable
 fun ParticipantsBottomPanelInCallView6ParticipantsPreview() {
-    OriginalTempTheme(isDark = true) {
+    OriginalTheme(isDark = true) {
         BottomPanelView(uiState = MeetingState(
             participantsSection = ParticipantsSection.InCallSection,
             chatParticipantsInCall = getListWith6Participants(),
@@ -932,7 +932,7 @@ fun ParticipantsBottomPanelInCallView6ParticipantsPreview() {
 @Preview
 @Composable
 fun ParticipantsBottomPanelNotInCallViewEmptyStatePreview() {
-    OriginalTempTheme(isDark = true) {
+    OriginalTheme(isDark = true) {
         BottomPanelView(uiState = MeetingState(
             participantsSection = ParticipantsSection.NotInCallSection,
             chatParticipantsNotInCall = emptyList(),
@@ -961,7 +961,7 @@ fun ParticipantsBottomPanelNotInCallViewEmptyStatePreview() {
 @Preview
 @Composable
 fun ParticipantsBottomPanelNotInCallView4ParticipantsPreview() {
-    OriginalTempTheme(isDark = true) {
+    OriginalTheme(isDark = true) {
         BottomPanelView(uiState = MeetingState(
             participantsSection = ParticipantsSection.NotInCallSection,
             chatParticipantsNotInCall = getListWith4Participants(),
@@ -991,7 +991,7 @@ fun ParticipantsBottomPanelNotInCallView4ParticipantsPreview() {
 @Preview
 @Composable
 fun ParticipantsBottomPanelNotInCallView6ParticipantsPreview() {
-    OriginalTempTheme(isDark = true) {
+    OriginalTheme(isDark = true) {
         BottomPanelView(uiState = MeetingState(
             isRingingAll = true,
             participantsSection = ParticipantsSection.NotInCallSection,
@@ -1021,7 +1021,7 @@ fun ParticipantsBottomPanelNotInCallView6ParticipantsPreview() {
 @Preview(name = "5-inch Device Landscape", widthDp = 640, heightDp = 360)
 @Composable
 fun ParticipantsBottomPanelNotInCallViewLandEmptyStatePreview() {
-    OriginalTempTheme(isDark = true) {
+    OriginalTheme(isDark = true) {
         BottomPanelView(uiState = MeetingState(
             participantsSection = ParticipantsSection.NotInCallSection,
             chatParticipantsNotInCall = emptyList(),
@@ -1050,7 +1050,7 @@ fun ParticipantsBottomPanelNotInCallViewLandEmptyStatePreview() {
 @Preview
 @Composable
 fun ParticipantsBottomPanelWaitingRoomViewEmptyStatePreview() {
-    OriginalTempTheme(isDark = true) {
+    OriginalTheme(isDark = true) {
         BottomPanelView(uiState = MeetingState(
             participantsSection = ParticipantsSection.WaitingRoomSection,
             chatParticipantsInWaitingRoom = emptyList(),
@@ -1080,7 +1080,7 @@ fun ParticipantsBottomPanelWaitingRoomViewEmptyStatePreview() {
 @Preview
 @Composable
 fun ParticipantsBottomPanelWaitingRoomView4ParticipantsPreview() {
-    OriginalTempTheme(isDark = true) {
+    OriginalTheme(isDark = true) {
         BottomPanelView(uiState = MeetingState(
             participantsSection = ParticipantsSection.WaitingRoomSection,
             chatParticipantsInWaitingRoom = getListWith4Participants(),
@@ -1110,7 +1110,7 @@ fun ParticipantsBottomPanelWaitingRoomView4ParticipantsPreview() {
 @Preview(name = "5-inch Device Landscape", widthDp = 640, heightDp = 360)
 @Composable
 fun ParticipantsBottomPanelWaitingRoomView4ParticipantsLandPreview() {
-    OriginalTempTheme(isDark = true) {
+    OriginalTheme(isDark = true) {
         BottomPanelView(uiState = MeetingState(
             participantsSection = ParticipantsSection.WaitingRoomSection,
             chatParticipantsInWaitingRoom = getListWith4Participants(),
@@ -1140,7 +1140,7 @@ fun ParticipantsBottomPanelWaitingRoomView4ParticipantsLandPreview() {
 @Preview
 @Composable
 fun ParticipantsBottomPanelWaitingRoomView6ParticipantsPreview() {
-    OriginalTempTheme(isDark = true) {
+    OriginalTheme(isDark = true) {
         BottomPanelView(uiState = MeetingState(
             participantsSection = ParticipantsSection.WaitingRoomSection,
             chatParticipantsInWaitingRoom = getListWith6Participants(),
@@ -1170,7 +1170,7 @@ fun ParticipantsBottomPanelWaitingRoomView6ParticipantsPreview() {
 @Preview(name = "5-inch Device Landscape", widthDp = 640, heightDp = 360)
 @Composable
 fun ParticipantsBottomPanelWaitingRoomView6ParticipantsLandPreview() {
-    OriginalTempTheme(isDark = true) {
+    OriginalTheme(isDark = true) {
         BottomPanelView(uiState = MeetingState(
             participantsSection = ParticipantsSection.WaitingRoomSection,
             chatParticipantsInWaitingRoom = getListWith6Participants(),
@@ -1200,7 +1200,7 @@ fun ParticipantsBottomPanelWaitingRoomView6ParticipantsLandPreview() {
 @Preview(name = "5-inch Device Landscape", widthDp = 640, heightDp = 360)
 @Composable
 fun ParticipantsBottomPanelWaitingRoomViewLandEmptyStatePreview() {
-    OriginalTempTheme(isDark = true) {
+    OriginalTheme(isDark = true) {
         BottomPanelView(uiState = MeetingState(
             participantsSection = ParticipantsSection.WaitingRoomSection,
             chatParticipantsInWaitingRoom = emptyList(),

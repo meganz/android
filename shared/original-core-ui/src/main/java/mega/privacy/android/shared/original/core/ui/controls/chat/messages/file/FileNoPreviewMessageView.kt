@@ -24,7 +24,7 @@ import mega.privacy.android.core.R
 import mega.privacy.android.shared.original.core.ui.controls.text.LongTextBehaviour
 import mega.privacy.android.shared.original.core.ui.controls.text.MegaText
 import mega.privacy.android.shared.original.core.ui.preview.CombinedThemePreviews
-import mega.privacy.android.shared.original.core.ui.theme.OriginalTempTheme
+import mega.privacy.android.shared.original.core.ui.theme.OriginalTheme
 import mega.privacy.android.shared.original.core.ui.theme.MegaOriginalTheme
 import mega.android.core.ui.theme.values.TextColor
 
@@ -110,7 +110,7 @@ private fun FileIcon(
 private fun FileNoPreviewMessageViewPreview(
     @PreviewParameter(NoPreviewPreviewProvider::class) params: NoPreviewPreviewParams,
 ) {
-    OriginalTempTheme(isDark = isSystemInDarkTheme()) {
+    OriginalTheme(isDark = isSystemInDarkTheme()) {
         FileContainerMessageView(
             modifier = Modifier.padding(12.dp),
             content = {

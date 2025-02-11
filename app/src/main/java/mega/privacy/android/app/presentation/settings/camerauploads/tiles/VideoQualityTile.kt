@@ -14,7 +14,7 @@ import mega.privacy.android.shared.original.core.ui.controls.dividers.DividerTyp
 import mega.privacy.android.shared.original.core.ui.controls.dividers.MegaDivider
 import mega.privacy.android.shared.original.core.ui.controls.lists.GenericTwoLineListItem
 import mega.privacy.android.shared.original.core.ui.preview.CombinedThemePreviews
-import mega.privacy.android.shared.original.core.ui.theme.OriginalTempTheme
+import mega.privacy.android.shared.original.core.ui.theme.OriginalTheme
 
 /**
  * A [Composable] that shows the Video Quality of Videos being uploaded by Camera Uploads
@@ -53,7 +53,7 @@ internal fun VideoQualityTile(
 private fun VideoQualityTileProvider(
     @PreviewParameter(VideoQualityUiItemParameterProvider::class) videoQualityUiItem: VideoQualityUiItem,
 ) {
-    OriginalTempTheme(isDark = isSystemInDarkTheme()) {
+    OriginalTheme(isDark = isSystemInDarkTheme()) {
         VideoQualityTile(
             videoQualityUiItem = videoQualityUiItem,
             onItemClicked = {},

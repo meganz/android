@@ -28,7 +28,7 @@ import mega.privacy.android.shared.original.core.ui.controls.dialogs.internal.Ba
 import mega.privacy.android.shared.original.core.ui.controls.preview.PreviewStringParameters
 import mega.privacy.android.shared.original.core.ui.preview.CombinedThemeRtlPreviews
 import mega.privacy.android.shared.original.core.ui.theme.MegaOriginalTheme
-import mega.privacy.android.shared.original.core.ui.theme.OriginalTempThemeForPreviews
+import mega.privacy.android.shared.original.core.ui.theme.OriginalThemeForPreviews
 
 /**
  * Test Tags for the Confirmation Dialog with Illustration
@@ -122,7 +122,7 @@ fun ConfirmationDialogWithIllustration(
 private fun ConfirmationDialogWithIllustrationPreview(
     @PreviewParameter(PreviewStringsParametersProviderWithTitle::class) texts: PreviewStringParameters,
 ) {
-    OriginalTempThemeForPreviews {
+    OriginalThemeForPreviews {
         DialogBox {
             ConfirmationDialogWithIllustration(
                 title = texts.title?.getText() ?: "",

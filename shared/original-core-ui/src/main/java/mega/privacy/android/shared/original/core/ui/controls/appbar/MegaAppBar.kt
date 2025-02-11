@@ -52,7 +52,7 @@ import mega.privacy.android.shared.original.core.ui.model.MenuAction
 import mega.privacy.android.shared.original.core.ui.model.MenuActionWithClick
 import mega.privacy.android.shared.original.core.ui.preview.CombinedThemePreviews
 import mega.privacy.android.shared.original.core.ui.theme.MegaOriginalTheme
-import mega.privacy.android.shared.original.core.ui.theme.OriginalTempTheme
+import mega.privacy.android.shared.original.core.ui.theme.OriginalTheme
 import mega.privacy.android.shared.original.core.ui.theme.extensions.badge
 import mega.privacy.android.shared.original.core.ui.theme.extensions.body4
 import mega.privacy.android.shared.original.core.ui.utils.composeLet
@@ -471,7 +471,7 @@ private fun NavigationIcon(
 @CombinedThemePreviews
 @Composable
 private fun MegaAppBarPreview() {
-    OriginalTempTheme(isDark = isSystemInDarkTheme()) {
+    OriginalTheme(isDark = isSystemInDarkTheme()) {
         MegaAppBar(
             appBarType = AppBarType.MENU,
             title = "App bar title",
@@ -496,7 +496,7 @@ private fun MegaAppBarPreview() {
 @CombinedThemePreviews
 @Composable
 private fun MegaAppBarPreviewWithoutSubtitle() {
-    OriginalTempTheme(isDark = isSystemInDarkTheme()) {
+    OriginalTheme(isDark = isSystemInDarkTheme()) {
         MegaAppBar(
             appBarType = AppBarType.MENU,
             title = "App bar title",
@@ -508,7 +508,7 @@ private fun MegaAppBarPreviewWithoutSubtitle() {
 @CombinedThemePreviews
 @Composable
 private fun MegaAppBarPreviewWithMarqueeSubtitle() {
-    OriginalTempTheme(isDark = isSystemInDarkTheme()) {
+    OriginalTheme(isDark = isSystemInDarkTheme()) {
         MegaAppBar(
             appBarType = AppBarType.MENU,
             title = "App bar title",

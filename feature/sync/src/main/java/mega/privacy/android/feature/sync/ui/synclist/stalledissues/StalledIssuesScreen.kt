@@ -21,7 +21,7 @@ import mega.privacy.android.feature.sync.ui.model.StalledIssueUiItem
 import mega.privacy.android.feature.sync.ui.views.StalledIssueCard
 import mega.privacy.android.feature.sync.ui.views.SyncListNoItemsPlaceHolder
 import mega.privacy.android.shared.original.core.ui.preview.CombinedThemePreviews
-import mega.privacy.android.shared.original.core.ui.theme.OriginalTempTheme
+import mega.privacy.android.shared.original.core.ui.theme.OriginalTheme
 
 @Composable
 internal fun StalledIssuesScreen(
@@ -72,7 +72,7 @@ private fun StalledIssuesScreenContent(
 @CombinedThemePreviews
 @Composable
 internal fun StalledIssuesScreenEmptyStatePreview() {
-    OriginalTempTheme(isDark = isSystemInDarkTheme()) {
+    OriginalTheme(isDark = isSystemInDarkTheme()) {
         StalledIssuesScreen(
             stalledIssues = emptyList(),
             issueDetailsClicked = {},
@@ -84,7 +84,7 @@ internal fun StalledIssuesScreenEmptyStatePreview() {
 @CombinedThemePreviews
 @Composable
 internal fun StalledIssuesScreenPreview() {
-    OriginalTempTheme(isDark = isSystemInDarkTheme()) {
+    OriginalTheme(isDark = isSystemInDarkTheme()) {
         val detailedInfo = StalledIssueDetailedInfo(
             title = "Conflict title",
             explanation = "Conflict explanation",

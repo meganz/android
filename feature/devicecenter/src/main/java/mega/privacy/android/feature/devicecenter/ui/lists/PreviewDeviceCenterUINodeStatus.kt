@@ -9,7 +9,7 @@ import mega.privacy.android.feature.devicecenter.ui.model.OwnDeviceUINode
 import mega.privacy.android.feature.devicecenter.ui.model.icon.DeviceIconType
 import mega.privacy.android.feature.devicecenter.ui.model.status.DeviceCenterUINodeStatus
 import mega.privacy.android.shared.resources.R
-import mega.privacy.android.shared.original.core.ui.theme.OriginalTempTheme
+import mega.privacy.android.shared.original.core.ui.theme.OriginalTheme
 
 /**
  * A Preview Composable that displays all possible Statuses
@@ -21,7 +21,7 @@ import mega.privacy.android.shared.original.core.ui.theme.OriginalTempTheme
 private fun PreviewDeviceCenterUINodeStatus(
     @PreviewParameter(DeviceCenterUINodeStatusProvider::class) status: DeviceCenterUINodeStatus,
 ) {
-    OriginalTempTheme(isDark = isSystemInDarkTheme()) {
+    OriginalTheme(isDark = isSystemInDarkTheme()) {
         DeviceCenterListViewItem(
             uiNode = OwnDeviceUINode(
                 id = "1234-5678",

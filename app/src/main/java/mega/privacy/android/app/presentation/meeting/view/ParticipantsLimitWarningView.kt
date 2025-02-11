@@ -29,7 +29,7 @@ import mega.privacy.android.shared.original.core.ui.model.SpanIndicator
 import mega.privacy.android.shared.original.core.ui.preview.BooleanProvider
 import mega.privacy.android.shared.original.core.ui.preview.CombinedThemePreviews
 import mega.android.core.ui.theme.values.TextColor
-import mega.privacy.android.shared.original.core.ui.theme.OriginalTempTheme
+import mega.privacy.android.shared.original.core.ui.theme.OriginalTheme
 
 /**
  * Participants limit warning view
@@ -54,7 +54,7 @@ class ParticipantsLimitWarningView : AbstractComposeView {
 
     @Composable
     override fun Content() {
-        OriginalTempTheme(isDark = isSystemInDarkTheme()) {
+        OriginalTheme(isDark = isSystemInDarkTheme()) {
             ParticipantsLimitWarningComposeView(
                 isModerator = isModerator,
             )
@@ -131,7 +131,7 @@ internal const val TEST_TAG_PARTICIPANTS_LIMIT_WARNING_VIEW = "participants_limi
 private fun ParticipantsLimitWarningComposeViewPreview(
     @PreviewParameter(BooleanProvider::class) isModerator: Boolean,
 ) {
-    OriginalTempTheme(isDark = isSystemInDarkTheme()) {
+    OriginalTheme(isDark = isSystemInDarkTheme()) {
         ParticipantsLimitWarningComposeView(
             isModerator = isModerator,
         )

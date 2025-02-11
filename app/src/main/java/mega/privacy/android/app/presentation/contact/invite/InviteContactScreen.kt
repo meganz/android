@@ -13,7 +13,6 @@ import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.horizontalScroll
-import androidx.compose.foundation.interaction.MutableInteractionSource
 import androidx.compose.foundation.isSystemInDarkTheme
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
@@ -119,7 +118,7 @@ import mega.privacy.android.shared.original.core.ui.controls.textfields.GenericT
 import mega.privacy.android.shared.original.core.ui.model.MegaSpanStyle
 import mega.privacy.android.shared.original.core.ui.model.SpanIndicator
 import mega.privacy.android.shared.original.core.ui.preview.CombinedTextAndThemePreviews
-import mega.privacy.android.shared.original.core.ui.theme.OriginalTempTheme
+import mega.privacy.android.shared.original.core.ui.theme.OriginalTheme
 import mega.android.core.ui.theme.values.TextColor
 import mega.privacy.android.shared.original.core.ui.utils.rememberPermissionState
 import mega.privacy.android.shared.original.core.ui.utils.showAutoDurationSnackbar
@@ -881,7 +880,7 @@ private fun invitePhoneContacts(
 @CombinedTextAndThemePreviews
 @Composable
 private fun InviteContactScreenWithoutSelectedContactsPreview() {
-    OriginalTempTheme(isDark = isSystemInDarkTheme()) {
+    OriginalTheme(isDark = isSystemInDarkTheme()) {
         InviteContactScreen(
             uiState = InviteContactUiState(),
             isDarkMode = isSystemInDarkTheme(),
@@ -903,7 +902,7 @@ private fun InviteContactScreenWithoutSelectedContactsPreview() {
 @CombinedTextAndThemePreviews
 @Composable
 private fun InviteContactScreenWithSelectedContactsPreview() {
-    OriginalTempTheme(isDark = isSystemInDarkTheme()) {
+    OriginalTheme(isDark = isSystemInDarkTheme()) {
         InviteContactScreen(
             uiState = InviteContactUiState(
                 areContactsInitialized = true,

@@ -13,7 +13,7 @@ import androidx.compose.ui.unit.dp
 import mega.privacy.android.shared.original.core.ui.controls.text.MegaText
 import mega.privacy.android.shared.original.core.ui.preview.CombinedThemePreviews
 import mega.privacy.android.shared.original.core.ui.theme.MegaOriginalTheme
-import mega.privacy.android.shared.original.core.ui.theme.OriginalTempThemeForPreviews
+import mega.privacy.android.shared.original.core.ui.theme.OriginalThemeForPreviews
 import mega.android.core.ui.theme.values.TextColor
 
 /**
@@ -46,7 +46,7 @@ internal const val COUNTER_TEXT_TAG = "counter:text_text"
 @CombinedThemePreviews
 @Composable
 private fun CounterPreview() {
-    OriginalTempThemeForPreviews {
+    OriginalThemeForPreviews {
         Counter("1/10")
     }
 }

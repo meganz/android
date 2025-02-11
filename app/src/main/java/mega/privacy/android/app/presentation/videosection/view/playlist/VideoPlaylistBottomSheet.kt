@@ -15,7 +15,7 @@ import kotlinx.coroutines.launch
 import mega.privacy.android.shared.original.core.ui.controls.lists.MenuActionListTile
 import mega.privacy.android.shared.original.core.ui.controls.sheets.BottomSheet
 import mega.privacy.android.shared.original.core.ui.preview.CombinedThemePreviews
-import mega.privacy.android.shared.original.core.ui.theme.OriginalTempTheme
+import mega.privacy.android.shared.original.core.ui.theme.OriginalTheme
 import mega.privacy.android.shared.resources.R
 
 @OptIn(ExperimentalMaterialApi::class)
@@ -82,7 +82,7 @@ internal fun DeleteVideoPlaylistBottomSheetTile(
 @CombinedThemePreviews
 @Composable
 private fun VideoPlaylistBottomSheetBodyPreview() {
-    OriginalTempTheme(isDark = isSystemInDarkTheme()) {
+    OriginalTheme(isDark = isSystemInDarkTheme()) {
         VideoPlaylistBottomSheetBody(
             onRenameVideoPlaylistClicked = {},
             onDeleteVideoPlaylistClicked = {}
@@ -93,7 +93,7 @@ private fun VideoPlaylistBottomSheetBodyPreview() {
 @CombinedThemePreviews
 @Composable
 private fun RenameVideoPlaylistBottomSheetTilePreview() {
-    OriginalTempTheme(isDark = isSystemInDarkTheme()) {
+    OriginalTheme(isDark = isSystemInDarkTheme()) {
         RenameVideoPlaylistBottomSheetTile(onActionClicked = {})
     }
 }
@@ -101,7 +101,7 @@ private fun RenameVideoPlaylistBottomSheetTilePreview() {
 @CombinedThemePreviews
 @Composable
 private fun DeleteVideoPlaylistBottomSheetTilePreview() {
-    OriginalTempTheme(isDark = isSystemInDarkTheme()) {
+    OriginalTheme(isDark = isSystemInDarkTheme()) {
         DeleteVideoPlaylistBottomSheetTile(onActionClicked = {})
     }
 }

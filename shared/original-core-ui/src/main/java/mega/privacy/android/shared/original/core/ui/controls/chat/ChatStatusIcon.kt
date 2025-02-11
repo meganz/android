@@ -14,7 +14,7 @@ import androidx.compose.ui.tooling.preview.PreviewParameter
 import androidx.compose.ui.tooling.preview.datasource.CollectionPreviewParameterProvider
 import androidx.compose.ui.unit.dp
 import mega.privacy.android.shared.original.core.ui.preview.CombinedThemePreviews
-import mega.privacy.android.shared.original.core.ui.theme.OriginalTempTheme
+import mega.privacy.android.shared.original.core.ui.theme.OriginalTheme
 import mega.privacy.android.shared.original.core.ui.theme.MegaOriginalTheme
 
 @Composable
@@ -69,7 +69,7 @@ private fun ChatStatusIcon(
 private fun ChatStatusIconPreview(
     @PreviewParameter(ChatStatusProvider::class) status: UiChatStatus,
 ) {
-    OriginalTempTheme(isDark = isSystemInDarkTheme()) {
+    OriginalTheme(isDark = isSystemInDarkTheme()) {
         ChatStatusIcon(status)
     }
 }

@@ -14,7 +14,7 @@ import mega.privacy.android.shared.original.core.ui.controls.layouts.ScaffoldWit
 import mega.privacy.android.shared.original.core.ui.model.MenuAction
 import mega.privacy.android.shared.original.core.ui.preview.CombinedThemePreviews
 import mega.privacy.android.shared.original.core.ui.theme.MegaOriginalTheme
-import mega.privacy.android.shared.original.core.ui.theme.OriginalTempTheme
+import mega.privacy.android.shared.original.core.ui.theme.OriginalTheme
 import mega.privacy.android.shared.original.core.ui.utils.composeLet
 
 /**
@@ -74,7 +74,7 @@ fun AppBarForCollapsibleHeader(
 @CombinedThemePreviews
 @Composable
 private fun MegaAppBarForCollapsibleHeaderPreview() {
-    OriginalTempTheme(isDark = isSystemInDarkTheme()) {
+    OriginalTheme(isDark = isSystemInDarkTheme()) {
         //this component gets the colors from ScaffoldWithCollapsibleHeader, to preview it here we need to provide these colors
         CompositionLocalProvider(
             LocalMegaAppBarColors provides MegaAppBarColors(

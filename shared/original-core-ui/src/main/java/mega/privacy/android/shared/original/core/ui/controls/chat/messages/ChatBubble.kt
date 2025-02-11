@@ -22,7 +22,7 @@ import androidx.compose.ui.tooling.preview.PreviewParameter
 import androidx.compose.ui.unit.dp
 import mega.privacy.android.shared.original.core.ui.preview.BooleanProvider
 import mega.privacy.android.shared.original.core.ui.preview.CombinedThemePreviews
-import mega.privacy.android.shared.original.core.ui.theme.OriginalTempTheme
+import mega.privacy.android.shared.original.core.ui.theme.OriginalTheme
 import mega.privacy.android.shared.original.core.ui.theme.MegaOriginalTheme
 
 /**
@@ -79,7 +79,7 @@ fun ChatBubble(
 private fun ChatBubblePreview(
     @PreviewParameter(BooleanProvider::class) isMe: Boolean,
 ) {
-    OriginalTempTheme(isDark = isSystemInDarkTheme()) {
+    OriginalTheme(isDark = isSystemInDarkTheme()) {
         ChatBubble(isMe = isMe) {
             Text(
                 modifier = Modifier.padding(horizontal = 12.dp, vertical = 8.dp),
@@ -94,7 +94,7 @@ private fun ChatBubblePreview(
 private fun ChatBubbleWithSubContentPreview(
     @PreviewParameter(BooleanProvider::class) isMe: Boolean,
 ) {
-    OriginalTempTheme(isDark = isSystemInDarkTheme()) {
+    OriginalTheme(isDark = isSystemInDarkTheme()) {
         ChatBubble(isMe = isMe, subContent = {
             Text(
                 modifier = Modifier.padding(horizontal = 12.dp, vertical = 8.dp),

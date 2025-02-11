@@ -24,7 +24,7 @@ import mega.privacy.android.app.R
 import mega.privacy.android.shared.original.core.ui.controls.text.MegaText
 import mega.privacy.android.shared.original.core.ui.preview.BooleanProvider
 import mega.privacy.android.shared.original.core.ui.preview.CombinedThemePreviews
-import mega.privacy.android.shared.original.core.ui.theme.OriginalTempTheme
+import mega.privacy.android.shared.original.core.ui.theme.OriginalTheme
 import mega.privacy.android.shared.original.core.ui.theme.extensions.accent_900_accent_050
 import mega.privacy.android.shared.original.core.ui.theme.extensions.body2medium
 import mega.privacy.android.shared.original.core.ui.theme.extensions.textColorSecondary
@@ -153,7 +153,7 @@ private fun MonthlyYearlyTabsPreview(
     @PreviewParameter(BooleanProvider::class) initialValue: Boolean,
 ) {
     val isMonthly = remember { mutableStateOf(initialValue) }
-    OriginalTempTheme(isDark = isSystemInDarkTheme()) {
+    OriginalTheme(isDark = isSystemInDarkTheme()) {
         MonthlyYearlyTabs(
             isMonthly = isMonthly.value,
             onTabClicked = { isMonthly.value = it },

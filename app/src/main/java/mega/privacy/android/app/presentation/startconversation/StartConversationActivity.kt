@@ -29,7 +29,7 @@ import mega.privacy.android.app.presentation.startconversation.view.StartConvers
 import mega.privacy.android.app.utils.Constants
 import mega.privacy.android.domain.entity.ThemeMode
 import mega.privacy.android.domain.usecase.GetThemeMode
-import mega.privacy.android.shared.original.core.ui.theme.OriginalTempTheme
+import mega.privacy.android.shared.original.core.ui.theme.OriginalTheme
 import mega.privacy.mobile.analytics.event.GroupChatPressedEvent
 import mega.privacy.mobile.analytics.event.InviteContactsPressedEvent
 import javax.inject.Inject
@@ -118,7 +118,7 @@ class StartConversationActivity : ComponentActivity() {
         val themeMode by getThemeMode().collectAsState(initial = ThemeMode.System)
         val uiState by viewModel.state.collectAsState()
 
-        OriginalTempTheme(isDark = themeMode.isDarkMode()) {
+        OriginalTheme(isDark = themeMode.isDarkMode()) {
             StartConversationView(
                 state = uiState,
                 onButtonClicked = ::onActionTap,

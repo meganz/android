@@ -38,7 +38,7 @@ import mega.privacy.android.feature.devicecenter.navigation.deviceCenterRoute
 import mega.privacy.android.feature.devicecenter.ui.model.DeviceCenterUINode
 import mega.privacy.android.feature.devicecenter.ui.model.DeviceMenuAction
 import mega.privacy.android.navigation.MegaNavigator
-import mega.privacy.android.shared.original.core.ui.theme.OriginalTempTheme
+import mega.privacy.android.shared.original.core.ui.theme.OriginalTheme
 import mega.privacy.mobile.analytics.event.AndroidSyncNavigationItemEvent
 import mega.privacy.mobile.analytics.event.DeviceCenterDeviceOptionsButtonEvent
 import mega.privacy.mobile.analytics.event.DeviceCenterItemClicked
@@ -101,7 +101,7 @@ class DeviceCenterFragment : Fragment() {
                     }
                 }
 
-                OriginalTempTheme(isDark = themeMode.isDarkMode()) {
+                OriginalTheme(isDark = themeMode.isDarkMode()) {
                     DeviceCenterScreen(
                         uiState = uiState,
                         snackbarHostState = snackbarHostState,

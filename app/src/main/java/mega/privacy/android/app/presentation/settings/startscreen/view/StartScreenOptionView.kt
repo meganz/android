@@ -33,7 +33,7 @@ import mega.privacy.android.shared.original.core.ui.controls.images.MegaIcon
 import mega.privacy.android.shared.original.core.ui.controls.text.MegaText
 import mega.privacy.android.shared.original.core.ui.preview.BooleanProvider
 import mega.privacy.android.shared.original.core.ui.preview.CombinedThemeComponentPreviews
-import mega.privacy.android.shared.original.core.ui.theme.OriginalTempTheme
+import mega.privacy.android.shared.original.core.ui.theme.OriginalTheme
 import mega.android.core.ui.theme.values.IconColor
 import mega.android.core.ui.theme.values.TextColor
 
@@ -114,7 +114,7 @@ fun StartScreenOptionViewPreview(
     @PreviewParameter(BooleanProvider::class) isSelected: Boolean,
 ) {
     var selected by remember { (mutableStateOf(isSelected)) }
-    OriginalTempTheme(isDark = isSystemInDarkTheme()) {
+    OriginalTheme(isDark = isSystemInDarkTheme()) {
         Box(modifier = Modifier.background(MaterialTheme.colors.surface)) {
             StartScreenOptionView(
                 iconPackR.drawable.ic_mega_medium_regular_outline,

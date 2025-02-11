@@ -12,7 +12,7 @@ import androidx.compose.ui.unit.dp
 import mega.privacy.android.core.R
 import mega.privacy.android.shared.original.core.ui.preview.CombinedThemePreviews
 import mega.privacy.android.shared.original.core.ui.theme.MegaOriginalTheme
-import mega.privacy.android.shared.original.core.ui.theme.OriginalTempTheme
+import mega.privacy.android.shared.original.core.ui.theme.OriginalTheme
 
 /**
  * Close icon for ads.
@@ -39,7 +39,7 @@ fun AdsCloseIcon(
 @CombinedThemePreviews
 @Composable
 private fun AdsCloseIconPreview() {
-    OriginalTempTheme(isSystemInDarkTheme()) {
+    OriginalTheme(isSystemInDarkTheme()) {
         AdsCloseIcon {}
     }
 }

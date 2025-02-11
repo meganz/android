@@ -29,7 +29,7 @@ import mega.privacy.android.app.presentation.changepassword.view.Constants.SNACK
 import mega.privacy.android.app.presentation.changepassword.view.Constants.TNC_CHECKBOX_TEST_TAG
 import mega.privacy.android.app.presentation.changepassword.view.PasswordStrengthBar
 import mega.privacy.android.domain.entity.changepassword.PasswordStrength
-import mega.privacy.android.shared.original.core.ui.theme.OriginalTempTheme
+import mega.privacy.android.shared.original.core.ui.theme.OriginalTheme
 import mega.privacy.android.shared.original.core.ui.theme.dark_blue_200
 import mega.privacy.android.shared.original.core.ui.theme.dark_blue_500
 import mega.privacy.android.shared.original.core.ui.theme.green_400
@@ -281,7 +281,7 @@ class ChangePasswordComposeViewTest {
 
     private fun verifyBarStrength(strength: PasswordStrength, color: Color, isDark: Boolean) {
         composeTestRule.setContent {
-            OriginalTempTheme(isDark = isDark) {
+            OriginalTheme(isDark = isDark) {
                 PasswordStrengthBar(strengthAttribute = strength.toStrengthAttribute())
             }
         }

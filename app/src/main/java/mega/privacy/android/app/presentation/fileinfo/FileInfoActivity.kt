@@ -70,7 +70,7 @@ import mega.privacy.android.domain.entity.node.MoveRequestResult
 import mega.privacy.android.domain.entity.node.NodeId
 import mega.privacy.android.domain.usecase.GetThemeMode
 import mega.privacy.android.navigation.MegaNavigator
-import mega.privacy.android.shared.original.core.ui.theme.OriginalTempTheme
+import mega.privacy.android.shared.original.core.ui.theme.OriginalTheme
 import mega.privacy.android.shared.original.core.ui.utils.showAutoDurationSnackbar
 import mega.privacy.mobile.analytics.event.NodeInfoDescriptionAddedMessageDisplayedEvent
 import mega.privacy.mobile.analytics.event.NodeInfoDescriptionUpdatedMessageDisplayedEvent
@@ -152,7 +152,7 @@ class FileInfoActivity : BaseActivity() {
             val uiState by viewModel.uiState.collectAsStateWithLifecycle()
             val snackBarHostState = remember { SnackbarHostState() }
             val coroutineScope = rememberCoroutineScope()
-            OriginalTempTheme(isDark = themeMode.isDarkMode()) {
+            OriginalTheme(isDark = themeMode.isDarkMode()) {
                 EventEffect(
                     event = uiState.oneOffViewEvent,
                     onConsumed = viewModel::consumeOneOffEvent,

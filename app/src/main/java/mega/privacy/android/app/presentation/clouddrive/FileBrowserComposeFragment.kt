@@ -87,7 +87,7 @@ import mega.privacy.android.domain.usecase.GetThemeMode
 import mega.privacy.android.domain.usecase.featureflag.GetFeatureFlagValueUseCase
 import mega.privacy.android.navigation.MegaNavigator
 import mega.privacy.android.shared.original.core.ui.controls.layouts.MegaScaffold
-import mega.privacy.android.shared.original.core.ui.theme.OriginalTempTheme
+import mega.privacy.android.shared.original.core.ui.theme.OriginalTheme
 import mega.privacy.android.shared.original.core.ui.utils.showAutoDurationSnackbar
 import mega.privacy.mobile.analytics.event.CloudDriveHideNodeMenuItemEvent
 import mega.privacy.mobile.analytics.event.CloudDriveScreenEvent
@@ -195,7 +195,7 @@ class FileBrowserComposeFragment : Fragment() {
                     mutableStateOf(null)
                 }
 
-                OriginalTempTheme(isDark = themeMode.isDarkMode()) {
+                OriginalTheme(isDark = themeMode.isDarkMode()) {
                     MegaScaffold(
                         scaffoldState = scaffoldState,
                     ) {

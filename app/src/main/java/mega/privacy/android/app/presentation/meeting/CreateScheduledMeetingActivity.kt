@@ -43,7 +43,7 @@ import mega.privacy.android.domain.entity.meeting.EndsRecurrenceOption
 import mega.privacy.android.domain.entity.meeting.RecurrenceDialogOption
 import mega.privacy.android.domain.entity.meeting.ScheduledMeetingType
 import mega.privacy.android.domain.usecase.GetThemeMode
-import mega.privacy.android.shared.original.core.ui.theme.OriginalTempTheme
+import mega.privacy.android.shared.original.core.ui.theme.OriginalTheme
 import mega.privacy.mobile.analytics.event.CreateMeetingMaxDurationReachedEvent
 import mega.privacy.mobile.analytics.event.EditMeetingMaxDurationReachedEvent
 import mega.privacy.mobile.analytics.event.ScheduledMeetingCreateConfirmButtonEvent
@@ -206,7 +206,7 @@ class CreateScheduledMeetingActivity : PasscodeActivity(), SnackbarShower {
         val managementState by scheduledMeetingManagementViewModel.state.collectAsStateWithLifecycle()
         navController = rememberNavController()
 
-        OriginalTempTheme(isDark = isDark) {
+        OriginalTheme(isDark = isDark) {
             NavHost(
                 navController = navController,
                 startDestination = CREATE_SCHEDULED_MEETING_TAG

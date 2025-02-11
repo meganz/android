@@ -93,7 +93,7 @@ import mega.privacy.android.shared.original.core.ui.controls.textfields.GenericT
 import mega.privacy.android.shared.original.core.ui.model.MegaSpanStyle
 import mega.privacy.android.shared.original.core.ui.model.SpanIndicator
 import mega.privacy.android.shared.original.core.ui.preview.BooleanProvider
-import mega.privacy.android.shared.original.core.ui.theme.OriginalTempTheme
+import mega.privacy.android.shared.original.core.ui.theme.OriginalTheme
 import mega.privacy.android.shared.original.core.ui.theme.extensions.black_white
 import mega.privacy.android.shared.original.core.ui.theme.extensions.grey_alpha_038_white_alpha_038
 import mega.privacy.android.shared.original.core.ui.theme.extensions.textColorSecondary
@@ -829,7 +829,7 @@ internal const val UPGRADE_ACCOUNT_BUTTON_TAG =
 @Preview(uiMode = Configuration.UI_MODE_NIGHT_YES, name = "DarkPreviewDiscardMeetingAlertDialog")
 @Composable
 fun PreviewDiscardMeetingAlertDialog() {
-    OriginalTempTheme(isDark = isSystemInDarkTheme()) {
+    OriginalTheme(isDark = isSystemInDarkTheme()) {
         DiscardMeetingAlertDialog(state = CreateScheduledMeetingState(
             meetingTitle = "Title meeting",
             rulesSelected = ChatScheduledRules(),
@@ -850,7 +850,7 @@ fun PreviewDiscardMeetingAlertDialog() {
 @Preview(uiMode = Configuration.UI_MODE_NIGHT_YES, name = "DarkPreviewRecurringMeetingDialog")
 @Composable
 fun PreviewRecurringMeetingDialog() {
-    OriginalTempTheme(isDark = isSystemInDarkTheme()) {
+    OriginalTheme(isDark = isSystemInDarkTheme()) {
         RecurringMeetingDialog(state = CreateScheduledMeetingState(
             meetingTitle = "Title meeting",
             rulesSelected = ChatScheduledRules(),
@@ -871,7 +871,7 @@ fun PreviewRecurringMeetingDialog() {
 @Preview(uiMode = Configuration.UI_MODE_NIGHT_YES, name = "DarkPreviewCreateScheduledMeetingView")
 @Composable
 private fun PreviewCreateScheduledMeetingView() {
-    OriginalTempTheme(isDark = isSystemInDarkTheme()) {
+    OriginalTheme(isDark = isSystemInDarkTheme()) {
         CreateScheduledMeetingView(
             state = CreateScheduledMeetingState(
                 meetingTitle = "Title meeting",
@@ -913,7 +913,7 @@ private fun PreviewCreateScheduledMeetingView() {
 private fun CreateScheduledMeetingViewWithFreePlanLimitWarningPreview(
     @PreviewParameter(BooleanProvider::class) isEmptyTitleError: Boolean,
 ) {
-    OriginalTempTheme(isDark = isSystemInDarkTheme()) {
+    OriginalTheme(isDark = isSystemInDarkTheme()) {
         CreateScheduledMeetingView(
             state = CreateScheduledMeetingState(
                 meetingTitle = if (isEmptyTitleError) "" else "Title meeting",

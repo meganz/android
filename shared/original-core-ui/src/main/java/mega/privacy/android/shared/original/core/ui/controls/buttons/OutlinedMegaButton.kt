@@ -29,7 +29,7 @@ import androidx.compose.ui.unit.dp
 import mega.privacy.android.core.R
 import mega.privacy.android.shared.original.core.ui.preview.CombinedTextAndThemePreviews
 import mega.privacy.android.shared.original.core.ui.theme.MegaOriginalTheme
-import mega.privacy.android.shared.original.core.ui.theme.OriginalTempTheme
+import mega.privacy.android.shared.original.core.ui.theme.OriginalTheme
 
 /**
  * Plain button with an outlined border
@@ -116,7 +116,7 @@ fun OutlinedMegaButton(
 private fun PreviewOutlinedRoundedMegaButton(
     @PreviewParameter(OutlinedMegaButtonPreviewProvider::class) state: OutlinedMegaButtonState,
 ) {
-    OriginalTempTheme(isDark = isSystemInDarkTheme()) {
+    OriginalTheme(isDark = isSystemInDarkTheme()) {
         with(state) {
             var count by remember { mutableIntStateOf(0) }
             OutlinedMegaButton(

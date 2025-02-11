@@ -49,7 +49,7 @@ import mega.privacy.android.app.presentation.shares.outgoing.model.OutgoingShare
 import mega.privacy.android.shared.original.core.ui.controls.appbar.TEST_TAG_APP_BAR
 import mega.privacy.android.shared.original.core.ui.controls.layouts.MegaScaffold
 import mega.privacy.android.shared.original.core.ui.controls.tab.Tabs
-import mega.privacy.android.shared.original.core.ui.theme.OriginalTempTheme
+import mega.privacy.android.shared.original.core.ui.theme.OriginalTheme
 
 @OptIn(ExperimentalComposeUiApi::class)
 @Composable
@@ -262,7 +262,7 @@ private val SharesTab.stringRes: Int
 @Preview(showBackground = true)
 @Composable
 private fun SharesScreenPreview() {
-    OriginalTempTheme(isSystemInDarkTheme()) {
+    OriginalTheme(isSystemInDarkTheme()) {
         SharesScreen()
     }
 }

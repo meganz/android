@@ -26,7 +26,7 @@ import mega.privacy.android.shared.original.core.ui.controls.lists.MenuActionLis
 import mega.privacy.android.shared.original.core.ui.preview.CombinedThemePreviews
 import mega.privacy.android.domain.entity.node.NodeId
 import mega.privacy.android.legacy.core.ui.controls.lists.MenuActionHeader
-import mega.privacy.android.shared.original.core.ui.theme.OriginalTempTheme
+import mega.privacy.android.shared.original.core.ui.theme.OriginalTheme
 
 /**
  * Bottom sheet to select where to get the file to attach (cloud drive or upload from device) and return the selection.
@@ -122,7 +122,7 @@ private fun openFilePicker(
 @CombinedThemePreviews
 @Composable
 private fun ChatAttachFileBottomSheetPreview() {
-    OriginalTempTheme(isDark = isSystemInDarkTheme()) {
+    OriginalTheme(isDark = isSystemInDarkTheme()) {
         ChatAttachFileBottomSheet(
             hideSheet = {},
         )

@@ -51,7 +51,7 @@ import mega.privacy.android.legacy.core.ui.controls.LegacyMegaEmptyViewWithImage
 import mega.privacy.android.legacy.core.ui.controls.lists.HeaderViewItem
 import mega.privacy.android.shared.original.core.ui.controls.dialogs.MegaAlertDialog
 import mega.privacy.android.shared.original.core.ui.preview.CombinedThemePreviews
-import mega.privacy.android.shared.original.core.ui.theme.OriginalTempTheme
+import mega.privacy.android.shared.original.core.ui.theme.OriginalTheme
 import mega.privacy.android.shared.original.core.ui.theme.black
 import mega.privacy.android.shared.original.core.ui.theme.extensions.white_black
 import mega.privacy.android.shared.original.core.ui.theme.white
@@ -360,7 +360,7 @@ internal fun DeleteItemsDialog(
 @CombinedThemePreviews
 @Composable
 private fun DeleteVideoPlaylistDialogPreview() {
-    OriginalTempTheme(isDark = isSystemInDarkTheme()) {
+    OriginalTheme(isDark = isSystemInDarkTheme()) {
         DeleteItemsDialog(
             title = "Delete playlist?",
             text = "Do we need additional explanation to delete playlists?",
@@ -374,7 +374,7 @@ private fun DeleteVideoPlaylistDialogPreview() {
 @CombinedThemePreviews
 @Composable
 private fun DeleteVideosDialogPreview() {
-    OriginalTempTheme(isDark = isSystemInDarkTheme()) {
+    OriginalTheme(isDark = isSystemInDarkTheme()) {
         DeleteItemsDialog(
             title = "Remove from playlist?",
             text = null,
@@ -388,7 +388,7 @@ private fun DeleteVideosDialogPreview() {
 @CombinedThemePreviews
 @Composable
 private fun VideoPlaylistsViewPreview() {
-    OriginalTempTheme(isDark = isSystemInDarkTheme()) {
+    OriginalTheme(isDark = isSystemInDarkTheme()) {
         VideoPlaylistsView(
             items = emptyList(),
             progressBarShowing = false,
@@ -418,7 +418,7 @@ private fun VideoPlaylistsViewPreview() {
 @CombinedThemePreviews
 @Composable
 private fun VideoPlaylistsViewCreateDialogShownPreview() {
-    OriginalTempTheme(isDark = isSystemInDarkTheme()) {
+    OriginalTheme(isDark = isSystemInDarkTheme()) {
         VideoPlaylistsView(
             items = emptyList(),
             progressBarShowing = false,
@@ -448,7 +448,7 @@ private fun VideoPlaylistsViewCreateDialogShownPreview() {
 @CombinedThemePreviews
 @Composable
 private fun FabButtonPreview() {
-    OriginalTempTheme(isDark = isSystemInDarkTheme()) {
+    OriginalTheme(isDark = isSystemInDarkTheme()) {
         CreateVideoPlaylistFabButton(onCreateVideoPlaylistClick = {})
     }
 }

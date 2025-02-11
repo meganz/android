@@ -20,7 +20,7 @@ import mega.privacy.android.shared.original.core.ui.controls.progressindicator.M
 import mega.privacy.android.shared.original.core.ui.preview.CombinedTextAndThemePreviews
 import mega.privacy.android.shared.original.core.ui.preview.CombinedThemePreviews
 import mega.privacy.android.shared.original.core.ui.theme.MegaOriginalTheme
-import mega.privacy.android.shared.original.core.ui.theme.OriginalTempTheme
+import mega.privacy.android.shared.original.core.ui.theme.OriginalTheme
 
 /**
  * Raised default text button
@@ -142,7 +142,7 @@ private fun RaisedErrorMegaButton(
 @CombinedTextAndThemePreviews
 @Composable
 private fun PreviewRaisedDefaultMegaButton() {
-    OriginalTempTheme(isDark = isSystemInDarkTheme()) {
+    OriginalTheme(isDark = isSystemInDarkTheme()) {
         Column(
             modifier = Modifier.padding(24.dp),
             verticalArrangement = Arrangement.spacedBy(12.dp)
@@ -166,7 +166,7 @@ private fun PreviewRaisedDefaultMegaButton() {
 @CombinedTextAndThemePreviews
 @Composable
 private fun RaisedErrorMegaButtonPreview() {
-    OriginalTempTheme(isDark = isSystemInDarkTheme()) {
+    OriginalTheme(isDark = isSystemInDarkTheme()) {
         Column(
             modifier = Modifier.padding(24.dp),
             verticalArrangement = Arrangement.spacedBy(12.dp)
@@ -190,7 +190,7 @@ private fun RaisedErrorMegaButtonPreview() {
 @CombinedThemePreviews
 @Composable
 private fun RaisedProgressMegaButtonPreview() {
-    OriginalTempTheme(isDark = isSystemInDarkTheme()) {
+    OriginalTheme(isDark = isSystemInDarkTheme()) {
         RaisedProgressMegaButton()
     }
 }

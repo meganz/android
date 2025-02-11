@@ -20,7 +20,7 @@ import mega.privacy.android.shared.original.core.ui.controls.appbar.AppBarType
 import mega.privacy.android.shared.original.core.ui.controls.layouts.CollapsibleHeaderWithTitle
 import mega.privacy.android.shared.original.core.ui.preview.CombinedTextAndThemePreviews
 import mega.privacy.android.shared.original.core.ui.theme.extensions.textColorSecondary
-import mega.privacy.android.shared.original.core.ui.theme.OriginalTempTheme
+import mega.privacy.android.shared.original.core.ui.theme.OriginalTheme
 
 @Composable
 internal fun FileInfoHeader(
@@ -74,7 +74,7 @@ internal fun FileInfoHeader(
 private fun FileInfoHeaderPreview(
     @PreviewParameter(FileInfoViewStatePreviewsProvider::class) viewState: FileInfoViewState,
 ) {
-    OriginalTempTheme(isDark = isSystemInDarkTheme()) {
+    OriginalTheme(isDark = isSystemInDarkTheme()) {
         FileInfoHeader(
             title = viewState.title,
             iconResource = viewState.iconResource,

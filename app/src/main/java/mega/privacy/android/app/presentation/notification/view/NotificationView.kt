@@ -26,7 +26,7 @@ import mega.privacy.android.legacy.core.ui.controls.LegacyMegaEmptyView
 import mega.privacy.android.shared.original.core.ui.controls.notifications.NotificationItemType
 import mega.privacy.android.shared.original.core.ui.controls.notifications.NotificationItemView
 import mega.privacy.android.shared.original.core.ui.preview.CombinedThemePreviews
-import mega.privacy.android.shared.original.core.ui.theme.OriginalTempTheme
+import mega.privacy.android.shared.original.core.ui.theme.OriginalTheme
 import mega.privacy.android.shared.original.core.ui.utils.ComposableLifecycle
 import mega.privacy.android.icon.pack.R as iconPackR
 import android.text.format.DateFormat
@@ -146,7 +146,7 @@ private fun NotificationEmptyView(modifier: Modifier) {
 @CombinedThemePreviews
 @Composable
 private fun EmptyNotificationViewPreview() {
-    OriginalTempTheme(isDark = isSystemInDarkTheme()) {
+    OriginalTheme(isDark = isSystemInDarkTheme()) {
         NotificationView(
             state = NotificationState(emptyList()),
             onNotificationClick = {},
@@ -179,7 +179,7 @@ private fun NotificationViewPreview() {
         dateText = { "11 October 2022 6:46 pm" },
         isNew = true,
     ) {}
-    OriginalTempTheme(isDark = isSystemInDarkTheme()) {
+    OriginalTheme(isDark = isSystemInDarkTheme()) {
         NotificationView(
             state = NotificationState(
                 promoNotifications = (listOf(promoNotification)),

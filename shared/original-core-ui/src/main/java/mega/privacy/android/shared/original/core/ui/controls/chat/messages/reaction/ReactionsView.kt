@@ -17,7 +17,7 @@ import androidx.compose.ui.unit.dp
 import mega.privacy.android.shared.original.core.ui.controls.chat.messages.reaction.model.UIReaction
 import mega.privacy.android.shared.original.core.ui.preview.BooleanProvider
 import mega.privacy.android.shared.original.core.ui.preview.CombinedThemeRtlPreviews
-import mega.privacy.android.shared.original.core.ui.theme.OriginalTempTheme
+import mega.privacy.android.shared.original.core.ui.theme.OriginalTheme
 
 /**
  * A container view for the actions
@@ -82,7 +82,7 @@ internal val reactionsList = listOf(
 private fun ReactionsViewRtlPreview(
     @PreviewParameter(BooleanProvider::class) isMine: Boolean,
 ) {
-    OriginalTempTheme(isDark = isSystemInDarkTheme()) {
+    OriginalTheme(isDark = isSystemInDarkTheme()) {
         ReactionsView(
             modifier = Modifier.width(300.dp),
             reactions = reactionsList,

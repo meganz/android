@@ -15,9 +15,8 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextOverflow
 import mega.privacy.android.shared.original.core.ui.preview.CombinedThemePreviews
 import mega.privacy.android.shared.original.core.ui.theme.MegaOriginalTheme
-import mega.privacy.android.shared.original.core.ui.theme.OriginalTempTheme
+import mega.privacy.android.shared.original.core.ui.theme.OriginalTheme
 import mega.privacy.android.shared.original.core.ui.theme.red_200
-import mega.privacy.android.shared.original.core.ui.theme.teal_300_alpha_020
 import mega.android.core.ui.theme.values.TextColor
 import mega.privacy.android.shared.original.core.ui.utils.normalize
 
@@ -99,7 +98,7 @@ fun HighlightedText(
 @CombinedThemePreviews
 @Composable
 private fun HighlightedTextPreview() {
-    OriginalTempTheme(isDark = isSystemInDarkTheme()) {
+    OriginalTheme(isDark = isSystemInDarkTheme()) {
         HighlightedText(
             text = "This is a title with Title highlight",
             highlightText = "TITLE",
@@ -111,7 +110,7 @@ private fun HighlightedTextPreview() {
 @CombinedThemePreviews
 @Composable
 private fun HighlightedTextBoldPreview() {
-    OriginalTempTheme(isDark = isSystemInDarkTheme()) {
+    OriginalTheme(isDark = isSystemInDarkTheme()) {
         HighlightedText(
             text = "This is ä tìtle with TITLE highlight",
             highlightText = "TITLE",

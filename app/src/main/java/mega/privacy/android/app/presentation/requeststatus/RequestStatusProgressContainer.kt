@@ -17,7 +17,7 @@ import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import mega.privacy.android.domain.entity.Progress
 import mega.privacy.android.shared.original.core.ui.controls.progressindicator.MegaAnimatedLinearProgressIndicator
 import mega.privacy.android.shared.original.core.ui.preview.CombinedThemePreviews
-import mega.privacy.android.shared.original.core.ui.theme.OriginalTempTheme
+import mega.privacy.android.shared.original.core.ui.theme.OriginalTheme
 
 /**
  * Composable for request status progress bar container
@@ -72,7 +72,7 @@ internal const val PROGRESS_BAR_TEST_TAG = "request_status_progress_bar_content:
 @CombinedThemePreviews
 @Composable
 private fun RequestStatusProgressBarContentPreview() {
-    OriginalTempTheme(isDark = isSystemInDarkTheme()) {
+    OriginalTheme(isDark = isSystemInDarkTheme()) {
         RequestStatusProgressBarContent(progress = Progress(0.5f))
     }
 }

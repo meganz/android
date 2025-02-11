@@ -35,7 +35,7 @@ import mega.privacy.android.shared.original.core.ui.controls.layouts.MegaScaffol
 import mega.privacy.android.shared.original.core.ui.controls.lists.GenericTwoLineListItem
 import mega.privacy.android.shared.original.core.ui.controls.text.MegaText
 import mega.privacy.android.shared.original.core.ui.preview.CombinedThemePreviews
-import mega.privacy.android.shared.original.core.ui.theme.OriginalTempTheme
+import mega.privacy.android.shared.original.core.ui.theme.OriginalTheme
 import mega.android.core.ui.theme.values.TextColor
 
 @OptIn(ExperimentalComposeUiApi::class)
@@ -176,7 +176,7 @@ internal fun VideoToPlaylistView(
 @CombinedThemePreviews
 @Composable
 private fun VideoToPlaylistViewPreview() {
-    OriginalTempTheme(isDark = isSystemInDarkTheme()) {
+    OriginalTheme(isDark = isSystemInDarkTheme()) {
         VideoToPlaylistView(
             items = provideTestItems(),
             searchState = SearchWidgetState.COLLAPSED,
@@ -205,7 +205,7 @@ private fun provideTestItems() = (0..20).map {
 @CombinedThemePreviews
 @Composable
 private fun VideoToPlaylistViewPreviewWithEmptyItems() {
-    OriginalTempTheme(isDark = isSystemInDarkTheme()) {
+    OriginalTheme(isDark = isSystemInDarkTheme()) {
         VideoToPlaylistView(
             items = emptyList(),
             searchState = SearchWidgetState.COLLAPSED,

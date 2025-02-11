@@ -35,7 +35,7 @@ import mega.privacy.android.shared.original.core.ui.controls.appbar.AppBarType
 import mega.privacy.android.shared.original.core.ui.controls.appbar.MegaAppBar
 import mega.privacy.android.shared.original.core.ui.controls.text.MegaText
 import mega.privacy.android.shared.original.core.ui.preview.CombinedThemePreviews
-import mega.privacy.android.shared.original.core.ui.theme.OriginalTempTheme
+import mega.privacy.android.shared.original.core.ui.theme.OriginalTheme
 import mega.privacy.android.shared.original.core.ui.theme.extensions.textColorSecondary
 import mega.android.core.ui.theme.values.TextColor
 
@@ -206,7 +206,7 @@ private fun InfoRow(
 @CombinedThemePreviews
 @Composable
 private fun DeviceCenterInfoScreenDevicePreview() {
-    OriginalTempTheme(isDark = isSystemInDarkTheme()) {
+    OriginalTheme(isDark = isSystemInDarkTheme()) {
         DeviceCenterInfoScreen(
             uiState = DeviceCenterInfoUiState(
                 icon = IconPackR.drawable.ic_pc_medium_solid,
@@ -224,7 +224,7 @@ private fun DeviceCenterInfoScreenDevicePreview() {
 @CombinedThemePreviews
 @Composable
 private fun DeviceCenterInfoScreenFolderPreview() {
-    OriginalTempTheme(isDark = isSystemInDarkTheme()) {
+    OriginalTheme(isDark = isSystemInDarkTheme()) {
         DeviceCenterInfoScreen(
             uiState = DeviceCenterInfoUiState(
                 icon = IconPackR.drawable.ic_folder_medium_solid,

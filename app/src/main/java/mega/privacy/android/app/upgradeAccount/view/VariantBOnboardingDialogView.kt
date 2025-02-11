@@ -50,7 +50,7 @@ import mega.privacy.android.shared.original.core.ui.controls.appbar.MegaAppBar
 import mega.privacy.android.shared.original.core.ui.controls.buttons.RaisedDefaultMegaButton
 import mega.privacy.android.shared.original.core.ui.controls.layouts.MegaScaffold
 import mega.privacy.android.shared.original.core.ui.preview.CombinedThemePreviews
-import mega.privacy.android.shared.original.core.ui.theme.OriginalTempTheme
+import mega.privacy.android.shared.original.core.ui.theme.OriginalTheme
 
 
 /**
@@ -312,7 +312,7 @@ internal fun VariantBOnboardingDialogColumn(
 private fun PreviewVariantBOnboardingDialogView(
     @PreviewParameter(VariantBOnboardingDialogPreviewProvider::class) state: ChooseAccountState,
 ) {
-    OriginalTempTheme(isDark = isSystemInDarkTheme()) {
+    OriginalTheme(isDark = isSystemInDarkTheme()) {
         VariantBOnboardingDialogView(
             state = state,
             accountUiState = AccountStorageUIState(),

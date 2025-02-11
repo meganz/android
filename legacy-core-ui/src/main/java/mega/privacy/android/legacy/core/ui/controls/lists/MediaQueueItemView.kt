@@ -26,7 +26,7 @@ import coil.request.ImageRequest
 import mega.privacy.android.core.R
 import mega.privacy.android.shared.original.core.ui.controls.lists.GenericTwoLineListItem
 import mega.privacy.android.shared.original.core.ui.preview.CombinedThemePreviews
-import mega.privacy.android.shared.original.core.ui.theme.OriginalTempTheme
+import mega.privacy.android.shared.original.core.ui.theme.OriginalTheme
 
 /**
  * The media queue item view
@@ -155,7 +155,7 @@ private fun QueueThumbnailView(
 @CombinedThemePreviews
 @Composable
 private fun MediaQueueItemInfoViewWithPausedPreview() {
-    OriginalTempTheme(isDark = isSystemInDarkTheme()) {
+    OriginalTheme(isDark = isSystemInDarkTheme()) {
         MediaQueueItemView(
             icon = iconPackR.drawable.ic_audio_medium_solid,
             onClick = {},
@@ -173,7 +173,7 @@ private fun MediaQueueItemInfoViewWithPausedPreview() {
 @CombinedThemePreviews
 @Composable
 private fun MediaQueueItemInfoViewWithSelectedPreview() {
-    OriginalTempTheme(isDark = isSystemInDarkTheme()) {
+    OriginalTheme(isDark = isSystemInDarkTheme()) {
         MediaQueueItemView(
             icon = iconPackR.drawable.ic_video_medium_solid,
             onClick = {},
@@ -190,7 +190,7 @@ private fun MediaQueueItemInfoViewWithSelectedPreview() {
 @CombinedThemePreviews
 @Composable
 private fun VideoQueueItemInfoViewPreview() {
-    OriginalTempTheme(isDark = isSystemInDarkTheme()) {
+    OriginalTheme(isDark = isSystemInDarkTheme()) {
         MediaQueueItemView(
             icon = iconPackR.drawable.ic_video_medium_solid,
             onClick = {},
@@ -207,7 +207,7 @@ private fun VideoQueueItemInfoViewPreview() {
 @CombinedThemePreviews
 @Composable
 private fun AudioQueueItemInfoViewPreview() {
-    OriginalTempTheme(isDark = isSystemInDarkTheme()) {
+    OriginalTheme(isDark = isSystemInDarkTheme()) {
         MediaQueueItemView(
             icon = iconPackR.drawable.ic_audio_medium_solid,
             onClick = {},

@@ -29,7 +29,7 @@ import mega.privacy.android.domain.entity.ChatRoomPermission
 import mega.privacy.android.domain.entity.ThemeMode
 import mega.privacy.android.domain.usecase.GetThemeMode
 import mega.privacy.android.domain.usecase.featureflag.GetFeatureFlagValueUseCase
-import mega.privacy.android.shared.original.core.ui.theme.OriginalTempTheme
+import mega.privacy.android.shared.original.core.ui.theme.OriginalTheme
 import mega.privacy.mobile.analytics.event.EditSingleOccurrenceMeetingMaxDurationReachedEvent
 import nz.mega.sdk.MegaChatApiJava
 import timber.log.Timber
@@ -104,7 +104,7 @@ class RecurringMeetingInfoActivity : PasscodeActivity() {
         val isDark = themeMode.isDarkMode()
         val uiState by viewModel.state.collectAsStateWithLifecycle()
         val managementState by scheduledMeetingManagementViewModel.state.collectAsStateWithLifecycle()
-        OriginalTempTheme(isDark = isDark) {
+        OriginalTheme(isDark = isDark) {
             RecurringMeetingInfoView(
                 state = uiState,
                 managementState = managementState,

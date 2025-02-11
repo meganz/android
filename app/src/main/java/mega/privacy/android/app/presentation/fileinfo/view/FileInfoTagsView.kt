@@ -28,7 +28,7 @@ import mega.privacy.android.shared.original.core.ui.controls.chip.TransparentChi
 import mega.privacy.android.shared.original.core.ui.controls.lists.MenuActionListTile
 import mega.privacy.android.shared.original.core.ui.preview.BooleanProvider
 import mega.privacy.android.shared.original.core.ui.preview.CombinedThemePreviews
-import mega.privacy.android.shared.original.core.ui.theme.OriginalTempTheme
+import mega.privacy.android.shared.original.core.ui.theme.OriginalTheme
 import mega.privacy.android.shared.original.core.ui.theme.extensions.grey_alpha_038_white_alpha_038
 import mega.privacy.mobile.analytics.event.NodeInfoTagsEnteredEvent
 
@@ -92,7 +92,7 @@ fun FileInfoTagsView(
 private fun FileInfoTagsViewPreview(
     @PreviewParameter(BooleanProvider::class) isProAccount: Boolean,
 ) {
-    OriginalTempTheme(isDark = isSystemInDarkTheme()) {
+    OriginalTheme(isDark = isSystemInDarkTheme()) {
         FileInfoTagsView(
             tags = listOf("Tag", "SampleTag", "Tag1", "Tag2", "Tag3", "Tag4", "Tag5"),
             onAddTagClick = {},
@@ -106,7 +106,7 @@ private fun FileInfoTagsViewPreview(
 private fun FileInfoTagsViewDeactivatedBusinessAccountPreview(
     @PreviewParameter(BooleanProvider::class) isBusinessAccountActive: Boolean,
 ) {
-    OriginalTempTheme(isDark = isSystemInDarkTheme()) {
+    OriginalTheme(isDark = isSystemInDarkTheme()) {
         FileInfoTagsView(
             tags = listOf("Tag", "SampleTag", "Tag1", "Tag2", "Tag3", "Tag4", "Tag5"),
             onAddTagClick = {},

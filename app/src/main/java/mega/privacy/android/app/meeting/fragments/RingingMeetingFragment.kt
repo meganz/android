@@ -23,7 +23,7 @@ import mega.privacy.android.app.utils.RunOnUIThreadUtils
 import mega.privacy.android.app.utils.permission.PermissionUtils
 import mega.privacy.android.app.utils.permission.permissionsBuilder
 import mega.privacy.android.domain.entity.chat.ChatConnectionStatus
-import mega.privacy.android.shared.original.core.ui.theme.OriginalTempTheme
+import mega.privacy.android.shared.original.core.ui.theme.OriginalTheme
 import nz.mega.sdk.MegaChatApiJava.MEGACHAT_INVALID_HANDLE
 import timber.log.Timber
 
@@ -64,7 +64,7 @@ class RingingMeetingFragment : MeetingBaseFragment() {
 
     @Composable
     private fun MainComposeView() {
-        OriginalTempTheme(isDark = true) {
+        OriginalTheme(isDark = true) {
             RingingScreen(
                 viewModel = ringingViewModel,
                 onAudioClicked = {

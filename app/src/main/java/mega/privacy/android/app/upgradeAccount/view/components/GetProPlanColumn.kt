@@ -33,7 +33,7 @@ import mega.android.core.ui.theme.values.TextColor
 import mega.privacy.android.domain.entity.AccountType
 import mega.privacy.android.domain.entity.Currency
 import mega.privacy.android.domain.entity.account.CurrencyAmount
-import mega.privacy.android.shared.original.core.ui.theme.OriginalTempTheme
+import mega.privacy.android.shared.original.core.ui.theme.OriginalTheme
 import java.util.Locale
 
 /**
@@ -106,7 +106,7 @@ private fun GetProPlanColumnPreview() {
         localisedPriceCurrencyCode = localisedPriceCurrencyCodeStringMapper,
         formattedSize = formattedSizeMapper,
     )
-    OriginalTempTheme(isDark = isSystemInDarkTheme()) {
+    OriginalTheme(isDark = isSystemInDarkTheme()) {
         GetProPlanColumn(
             state = ChooseAccountState(
                 cheapestSubscriptionAvailable = subscriptionProLite

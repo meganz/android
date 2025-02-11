@@ -12,7 +12,7 @@ import androidx.compose.ui.unit.dp
 import mega.privacy.android.shared.original.core.ui.controls.buttons.TextMegaButton
 import mega.privacy.android.shared.original.core.ui.controls.text.MegaText
 import mega.privacy.android.shared.original.core.ui.preview.CombinedThemePreviews
-import mega.privacy.android.shared.original.core.ui.theme.OriginalTempTheme
+import mega.privacy.android.shared.original.core.ui.theme.OriginalTheme
 import mega.android.core.ui.theme.values.TextColor
 
 /**
@@ -57,7 +57,7 @@ fun ActionBanner(
 @CombinedThemePreviews
 @Composable
 internal fun PreviewTwoActionsBanner() {
-    OriginalTempTheme(isDark = isSystemInDarkTheme()) {
+    OriginalTheme(isDark = isSystemInDarkTheme()) {
         ActionBanner(
             modifier = Modifier.padding(start = 16.dp, end = 16.dp, top = 20.dp, bottom = 8.dp),
             mainText = "Battery optimisation permission allow MEGA to run " +

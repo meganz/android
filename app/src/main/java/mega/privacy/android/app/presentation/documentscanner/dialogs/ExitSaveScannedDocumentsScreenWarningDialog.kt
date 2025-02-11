@@ -11,7 +11,7 @@ import mega.privacy.android.app.R
 import mega.privacy.android.shared.original.core.ui.controls.dialogs.MegaAlertDialog
 import mega.privacy.android.shared.original.core.ui.preview.BooleanProvider
 import mega.privacy.android.shared.original.core.ui.preview.CombinedThemePreviews
-import mega.privacy.android.shared.original.core.ui.theme.OriginalTempTheme
+import mega.privacy.android.shared.original.core.ui.theme.OriginalTheme
 
 /**
  * A Composable Dialog shown when the User attempts to back away from the Save Scanned Document Screen
@@ -61,7 +61,7 @@ internal fun ExitSaveScannedDocumentsScreenWarningDialog(
 private fun ExitSaveScannedDocumentsScreenWarningDialogPreview(
     @PreviewParameter(BooleanProvider::class) canSelectScanFileType: Boolean,
 ) {
-    OriginalTempTheme(isDark = isSystemInDarkTheme()) {
+    OriginalTheme(isDark = isSystemInDarkTheme()) {
         ExitSaveScannedDocumentsScreenWarningDialog(
             canSelectScanFileType = canSelectScanFileType,
             onWarningAcknowledged = {},

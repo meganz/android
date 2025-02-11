@@ -105,7 +105,7 @@ import mega.privacy.android.feature.sync.ui.synclist.SyncListRoute
 import mega.privacy.android.navigation.MegaNavigator
 import mega.privacy.android.shared.original.core.ui.controls.layouts.MegaScaffold
 import mega.privacy.android.shared.original.core.ui.controls.tab.Tabs
-import mega.privacy.android.shared.original.core.ui.theme.OriginalTempTheme
+import mega.privacy.android.shared.original.core.ui.theme.OriginalTheme
 import mega.privacy.android.shared.original.core.ui.utils.showAutoDurationSnackbar
 import mega.privacy.mobile.analytics.event.AndroidSyncFABButtonEvent
 import mega.privacy.mobile.analytics.event.CloudDriveHideNodeMenuItemEvent
@@ -251,7 +251,7 @@ class CloudDriveSyncsFragment : Fragment() {
                     else -> true
                 }
 
-                OriginalTempTheme(isDark = themeMode.isDarkMode()) {
+                OriginalTheme(isDark = themeMode.isDarkMode()) {
                     MegaScaffold(
                         scaffoldState = scaffoldState,
                         topBar = {

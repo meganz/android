@@ -20,7 +20,7 @@ import mega.privacy.android.app.presentation.meeting.LeftMeetingViewModel
 import mega.privacy.android.app.presentation.meeting.view.dialog.FreePlanLimitParticipantsDialog
 import mega.privacy.android.app.utils.Constants
 import mega.privacy.android.app.utils.Util
-import mega.privacy.android.shared.original.core.ui.theme.OriginalTempTheme
+import mega.privacy.android.shared.original.core.ui.theme.OriginalTheme
 import mega.privacy.android.shared.resources.R as sharedR
 
 class LeftMeetingActivity : BaseActivity() {
@@ -54,7 +54,7 @@ class LeftMeetingActivity : BaseActivity() {
             setContent {
                 val state by viewModel.state.collectAsStateWithLifecycle()
                 if (state.callEndedDueToFreePlanLimits) {
-                    OriginalTempTheme(isDark = isSystemInDarkTheme()) {
+                    OriginalTheme(isDark = isSystemInDarkTheme()) {
                         FreePlanLimitParticipantsDialog(
                             onConfirm = {
                                 viewModel.onConsumeShowFreePlanParticipantsLimitDialogEvent()

@@ -41,7 +41,7 @@ import mega.privacy.android.shared.original.core.ui.preview.CombinedThemePreview
 import mega.privacy.android.shared.original.core.ui.preview.TextFieldProvider
 import mega.privacy.android.shared.original.core.ui.preview.TextFieldState
 import mega.privacy.android.shared.original.core.ui.theme.MegaOriginalTheme
-import mega.privacy.android.shared.original.core.ui.theme.OriginalTempTheme
+import mega.privacy.android.shared.original.core.ui.theme.OriginalTheme
 import mega.privacy.android.shared.original.core.ui.theme.extensions.autofill
 
 /**
@@ -250,7 +250,7 @@ fun LabelTextField(
 private fun PreviewLabelTextField(
     @PreviewParameter(TextFieldProvider::class) state: TextFieldState,
 ) {
-    OriginalTempTheme(isDark = isSystemInDarkTheme()) {
+    OriginalTheme(isDark = isSystemInDarkTheme()) {
         var text by remember { mutableStateOf(state.text) }
 
         LabelTextField(

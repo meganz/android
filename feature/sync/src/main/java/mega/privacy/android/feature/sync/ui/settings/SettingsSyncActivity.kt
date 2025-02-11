@@ -9,7 +9,7 @@ import dagger.hilt.android.AndroidEntryPoint
 import mega.privacy.android.domain.entity.ThemeMode
 import mega.privacy.android.domain.usecase.GetThemeMode
 import mega.privacy.android.feature.sync.ui.isDarkMode
-import mega.privacy.android.shared.original.core.ui.theme.OriginalTempTheme
+import mega.privacy.android.shared.original.core.ui.theme.OriginalTheme
 import javax.inject.Inject
 
 /**
@@ -30,7 +30,7 @@ class SettingsSyncActivity : ComponentActivity() {
         setContent {
             val themeMode by getThemeMode().collectAsStateWithLifecycle(initialValue = ThemeMode.System)
 
-            OriginalTempTheme(isDark = themeMode.isDarkMode()) {
+            OriginalTheme(isDark = themeMode.isDarkMode()) {
                 SettingsSyncRoute()
             }
         }

@@ -41,7 +41,7 @@ import mega.privacy.android.shared.original.core.ui.controls.text.MegaText
 import mega.privacy.android.shared.original.core.ui.preview.BooleanProvider
 import mega.privacy.android.shared.original.core.ui.preview.CombinedThemePreviews
 import mega.privacy.android.shared.original.core.ui.theme.MegaOriginalTheme
-import mega.privacy.android.shared.original.core.ui.theme.OriginalTempTheme
+import mega.privacy.android.shared.original.core.ui.theme.OriginalTheme
 import mega.android.core.ui.theme.values.TextColor
 
 /**
@@ -196,7 +196,7 @@ fun ReactionsInfoView(
 private fun ReactionsInfoViewPreview(
     @PreviewParameter(BooleanProvider::class) hasMe: Boolean,
 ) {
-    OriginalTempTheme(isDark = isSystemInDarkTheme()) {
+    OriginalTheme(isDark = isSystemInDarkTheme()) {
 
         val reactionList = listOf(
             SLIGHT_SMILE_REACTION,

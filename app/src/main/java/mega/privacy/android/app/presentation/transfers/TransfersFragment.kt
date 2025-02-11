@@ -29,7 +29,7 @@ import mega.privacy.android.app.presentation.transfers.view.navigation.compose.n
 import mega.privacy.android.app.presentation.transfers.view.navigation.compose.transfersViewNavigationGraph
 import mega.privacy.android.domain.entity.ThemeMode
 import mega.privacy.android.domain.usecase.GetThemeMode
-import mega.privacy.android.shared.original.core.ui.theme.OriginalTempTheme
+import mega.privacy.android.shared.original.core.ui.theme.OriginalTheme
 import javax.inject.Inject
 
 /**
@@ -56,7 +56,7 @@ internal class TransfersFragment : Fragment() {
         setContent {
             val mode by getThemeMode().collectAsStateWithLifecycle(initialValue = ThemeMode.System)
             SessionContainer(shouldCheckChatSession = true) {
-                OriginalTempTheme(isDark = mode.isDarkMode()) {
+                OriginalTheme(isDark = mode.isDarkMode()) {
                     PasscodeContainer(
                         passcodeCryptObjectFactory = passcodeCryptObjectFactory,
                         content = {

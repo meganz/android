@@ -33,7 +33,7 @@ import mega.privacy.android.app.presentation.twofactorauthentication.extensions.
 import mega.privacy.android.app.upgradeAccount.UpgradeAccountActivity
 import mega.privacy.android.shared.original.core.ui.controls.buttons.RaisedDefaultMegaButton
 import mega.privacy.android.shared.original.core.ui.preview.CombinedThemePreviews
-import mega.privacy.android.shared.original.core.ui.theme.OriginalTempTheme
+import mega.privacy.android.shared.original.core.ui.theme.OriginalTheme
 import mega.privacy.android.shared.original.core.ui.theme.extensions.subtitle1medium
 import mega.privacy.android.shared.original.core.ui.theme.extensions.textColorPrimary
 import mega.privacy.android.shared.original.core.ui.theme.extensions.textColorSecondary
@@ -122,7 +122,7 @@ fun UpgradeProPlanBottomSheet(
 @CombinedThemePreviews
 @Composable
 private fun UpgradeProPlanBottomSheetPreview() {
-    OriginalTempTheme(isDark = isSystemInDarkTheme()) {
+    OriginalTheme(isDark = isSystemInDarkTheme()) {
         UpgradeProPlanBottomSheet()
     }
 }

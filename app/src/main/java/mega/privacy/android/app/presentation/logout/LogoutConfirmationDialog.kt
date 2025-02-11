@@ -11,7 +11,7 @@ import mega.privacy.android.app.R
 import mega.privacy.android.app.presentation.logout.model.LogoutState
 import mega.privacy.android.shared.original.core.ui.controls.dialogs.MegaAlertDialog
 import mega.privacy.android.shared.original.core.ui.preview.CombinedThemePreviews
-import mega.privacy.android.shared.original.core.ui.theme.OriginalTempTheme
+import mega.privacy.android.shared.original.core.ui.theme.OriginalTheme
 
 @Composable
 internal fun LogoutConfirmationDialog(
@@ -79,7 +79,7 @@ private fun ShowDialog(
 @CombinedThemePreviews
 @Composable
 private fun LogoutConfirmationDialogPreview() {
-    OriginalTempTheme(isDark = isSystemInDarkTheme()) {
+    OriginalTheme(isDark = isSystemInDarkTheme()) {
         ConfirmationDialog(
             logoutState = LogoutState.Data(hasOfflineFiles = true, hasPendingTransfers = true),
             logout = {},

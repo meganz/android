@@ -54,7 +54,7 @@ import mega.privacy.android.domain.entity.photos.Photo
 import mega.privacy.android.domain.qualifier.DefaultDispatcher
 import mega.privacy.android.domain.usecase.GetThemeMode
 import mega.privacy.android.domain.usecase.featureflag.GetFeatureFlagValueUseCase
-import mega.privacy.android.shared.original.core.ui.theme.OriginalTempTheme
+import mega.privacy.android.shared.original.core.ui.theme.OriginalTheme
 import mega.privacy.mobile.analytics.event.AlbumContentDeleteAlbumEvent
 import mega.privacy.mobile.analytics.event.AlbumContentScreenEvent
 import mega.privacy.mobile.analytics.event.AlbumContentShareLinkMenuToolbarEvent
@@ -123,7 +123,7 @@ class AlbumContentFragment : Fragment() {
             setContent {
                 val mode by getThemeMode()
                     .collectAsStateWithLifecycle(initialValue = ThemeMode.System)
-                OriginalTempTheme(isDark = mode.isDarkMode()) {
+                OriginalTheme(isDark = mode.isDarkMode()) {
                     AlbumContentScreen(
                         photoDownloaderViewModel = photoDownloaderViewModel,
                         timelineViewModel = timelineViewModel,

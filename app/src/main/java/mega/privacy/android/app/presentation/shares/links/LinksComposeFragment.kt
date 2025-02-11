@@ -72,7 +72,7 @@ import mega.privacy.android.domain.entity.node.publiclink.PublicLinkFile
 import mega.privacy.android.domain.entity.node.publiclink.PublicLinkNode
 import mega.privacy.android.domain.usecase.GetThemeMode
 import mega.privacy.android.navigation.MegaNavigator
-import mega.privacy.android.shared.original.core.ui.theme.OriginalTempTheme
+import mega.privacy.android.shared.original.core.ui.theme.OriginalTheme
 import mega.privacy.android.shared.original.core.ui.utils.showAutoDurationSnackbar
 import timber.log.Timber
 import javax.inject.Inject
@@ -142,7 +142,7 @@ class LinksComposeFragment : Fragment() {
                     mutableStateOf(null)
                 }
 
-                OriginalTempTheme(isDark = isDarkMode) {
+                OriginalTheme(isDark = isDarkMode) {
                     LinksView(
                         uiState = uiState,
                         emptyState = getEmptyFolderDrawable(uiState.isLinksEmpty),

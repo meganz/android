@@ -20,7 +20,7 @@ import mega.privacy.android.shared.original.core.ui.controls.lists.NodeListViewI
 import mega.privacy.android.shared.original.core.ui.controls.sheets.MegaBottomSheetContainer
 import mega.privacy.android.shared.original.core.ui.controls.text.LongTextBehaviour
 import mega.privacy.android.shared.original.core.ui.preview.CombinedThemePreviews
-import mega.privacy.android.shared.original.core.ui.theme.OriginalTempTheme
+import mega.privacy.android.shared.original.core.ui.theme.OriginalTheme
 
 
 @Composable
@@ -116,7 +116,7 @@ internal const val REMOVE_FROM_OFFLINE_ACTION_TEST_TAG =
 @CombinedThemePreviews
 @Composable
 private fun OfflineOptionsContentPreview() {
-    OriginalTempTheme(isDark = isSystemInDarkTheme()) {
+    OriginalTheme(isDark = isSystemInDarkTheme()) {
         OfflineOptionsContent(
             uiState = OfflineOptionsUiState(
                 nodeId = NodeId(1),
@@ -144,7 +144,7 @@ private fun OfflineOptionsContentPreview() {
 @CombinedThemePreviews
 @Composable
 private fun OfflineOptionsContentFolderPreview() {
-    OriginalTempTheme(isDark = isSystemInDarkTheme()) {
+    OriginalTheme(isDark = isSystemInDarkTheme()) {
         OfflineOptionsContent(
             uiState = OfflineOptionsUiState(
                 nodeId = NodeId(1),

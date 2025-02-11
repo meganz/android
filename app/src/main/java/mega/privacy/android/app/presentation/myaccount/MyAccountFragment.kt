@@ -31,7 +31,7 @@ import mega.privacy.android.app.utils.Constants
 import mega.privacy.android.domain.entity.StorageState
 import mega.privacy.android.domain.entity.ThemeMode
 import mega.privacy.android.domain.usecase.GetThemeMode
-import mega.privacy.android.shared.original.core.ui.theme.OriginalTempTheme
+import mega.privacy.android.shared.original.core.ui.theme.OriginalTheme
 import mega.privacy.mobile.analytics.event.AccountScreenEvent
 import mega.privacy.mobile.analytics.event.UpgradeMyAccountEvent
 import javax.inject.Inject
@@ -79,7 +79,7 @@ class MyAccountFragment : Fragment(), MyAccountHomeViewActions {
                 val storageState by activityViewModel.state.map { it.storageState }
                     .collectAsStateWithLifecycle(StorageState.Unknown)
 
-                OriginalTempTheme(isDark = themeMode.isDarkMode()) {
+                OriginalTheme(isDark = themeMode.isDarkMode()) {
                     MyAccountHomeView(
                         storageState = storageState,
                         uiState = uiState,

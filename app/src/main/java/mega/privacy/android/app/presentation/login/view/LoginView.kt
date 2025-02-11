@@ -70,7 +70,6 @@ import androidx.compose.ui.semantics.testTagsAsResourceId
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.text.style.TextAlign
-import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.tooling.preview.PreviewParameter
 import androidx.compose.ui.tooling.preview.PreviewParameterProvider
 import androidx.compose.ui.unit.dp
@@ -99,7 +98,7 @@ import mega.privacy.android.shared.original.core.ui.controls.text.MegaText
 import mega.privacy.android.shared.original.core.ui.controls.textfields.LabelTextField
 import mega.privacy.android.shared.original.core.ui.controls.textfields.PasswordTextField
 import mega.privacy.android.shared.original.core.ui.preview.CombinedThemePreviews
-import mega.privacy.android.shared.original.core.ui.theme.OriginalTempTheme
+import mega.privacy.android.shared.original.core.ui.theme.OriginalTheme
 import mega.android.core.ui.theme.values.TextColor
 import mega.privacy.android.shared.resources.R as SharedRes
 import mega.privacy.android.shared.original.core.ui.preview.CombinedThemePhoneLandscapePreviews
@@ -594,7 +593,7 @@ private fun TwoFactorAuthentication(
 @CombinedThemePreviews
 @Composable
 private fun EmptyLoginViewPreview() {
-    OriginalTempTheme(isDark = isSystemInDarkTheme()) {
+    OriginalTheme(isDark = isSystemInDarkTheme()) {
         var state by remember { mutableStateOf(LoginState(isLoginRequired = true)) }
 
         RequireLogin(
@@ -617,7 +616,7 @@ private fun EmptyLoginViewPreview() {
 private fun LoginViewPreview(
     @PreviewParameter(LoginStateProvider::class) state: LoginState,
 ) {
-    OriginalTempTheme(isDark = isSystemInDarkTheme()) {
+    OriginalTheme(isDark = isSystemInDarkTheme()) {
         LoginView(
             state = state,
             onEmailChanged = {},
@@ -641,7 +640,7 @@ private fun LoginViewPreview(
 private fun LandscapeLoginViewPreview(
     @PreviewParameter(LoginStateProvider::class) state: LoginState,
 ) {
-    OriginalTempTheme(isDark = isSystemInDarkTheme()) {
+    OriginalTheme(isDark = isSystemInDarkTheme()) {
         LoginView(
             state = state,
             onEmailChanged = {},

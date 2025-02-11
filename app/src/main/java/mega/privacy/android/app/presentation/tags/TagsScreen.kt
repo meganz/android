@@ -47,7 +47,7 @@ import mega.privacy.android.shared.original.core.ui.controls.text.MegaText
 import mega.privacy.android.shared.original.core.ui.controls.textfields.GenericDescriptionTextField
 import mega.privacy.android.shared.original.core.ui.controls.textfields.transformations.PrefixTransformation
 import mega.privacy.android.shared.original.core.ui.preview.CombinedThemePreviews
-import mega.privacy.android.shared.original.core.ui.theme.OriginalTempTheme
+import mega.privacy.android.shared.original.core.ui.theme.OriginalTheme
 import mega.android.core.ui.theme.values.TextColor
 import mega.privacy.android.shared.original.core.ui.utils.showAutoDurationSnackbar
 import mega.privacy.mobile.analytics.event.NodeInfoTagsAddedEvent
@@ -241,7 +241,7 @@ private fun TagsContent(
 @CombinedThemePreviews
 @Composable
 private fun TagsScreenPreview() {
-    OriginalTempTheme(isDark = isSystemInDarkTheme()) {
+    OriginalTheme(isDark = isSystemInDarkTheme()) {
         TagsScreen(
             consumeInfoMessage = {},
             validateTagName = { it.isNotEmpty() },

@@ -44,7 +44,7 @@ import mega.privacy.android.core.ui.mapper.FileTypeIconMapper
 import mega.privacy.android.domain.entity.ThemeMode
 import mega.privacy.android.domain.entity.node.NodeId
 import mega.privacy.android.domain.usecase.GetThemeMode
-import mega.privacy.android.shared.original.core.ui.theme.OriginalTempTheme
+import mega.privacy.android.shared.original.core.ui.theme.OriginalTheme
 import timber.log.Timber
 import javax.inject.Inject
 
@@ -101,7 +101,7 @@ class OfflineComposeFragment : Fragment(), ActionMode.Callback {
                 val snackbarHostState = remember { SnackbarHostState() }
                 val coroutineScope = rememberCoroutineScope()
 
-                OriginalTempTheme(isDark = isDarkMode) {
+                OriginalTheme(isDark = isDarkMode) {
                     OfflineFeatureScreen(
                         uiState = uiState,
                         backgroundColor = if (args.rootFolderOnly) backgroundColor else MaterialTheme.colors.background,

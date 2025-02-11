@@ -38,7 +38,7 @@ import mega.privacy.android.legacy.core.ui.controls.LegacyMegaEmptyViewWithImage
 import mega.privacy.android.legacy.core.ui.controls.lists.HeaderViewItem
 import mega.privacy.android.shared.original.core.ui.controls.layouts.MegaScaffold
 import mega.privacy.android.shared.original.core.ui.preview.CombinedThemePreviews
-import mega.privacy.android.shared.original.core.ui.theme.OriginalTempTheme
+import mega.privacy.android.shared.original.core.ui.theme.OriginalTheme
 import mega.privacy.android.shared.original.core.ui.utils.showAutoDurationSnackbar
 import mega.privacy.mobile.analytics.event.DurationFilterAllDurationsClickedEvent
 import mega.privacy.mobile.analytics.event.DurationFilterBetween10and60SecondsClickedEvent
@@ -326,7 +326,7 @@ internal fun AllVideosView(
 @CombinedThemePreviews
 @Composable
 private fun AllVideosViewPreview() {
-    OriginalTempTheme(isDark = isSystemInDarkTheme()) {
+    OriginalTheme(isDark = isSystemInDarkTheme()) {
         AllVideosView(
             items = emptyList(),
             shouldApplySensitiveMode = false,

@@ -34,7 +34,7 @@ import kotlinx.collections.immutable.ImmutableList
 import kotlinx.collections.immutable.persistentListOf
 import kotlinx.coroutines.launch
 import mega.privacy.android.shared.original.core.ui.theme.MegaOriginalTheme
-import mega.privacy.android.shared.original.core.ui.theme.OriginalTempTheme
+import mega.privacy.android.shared.original.core.ui.theme.OriginalTheme
 import mega.privacy.android.shared.original.core.ui.theme.extensions.subtitle2medium
 
 
@@ -263,7 +263,7 @@ class TabsScope(
 private fun TabsPreview(
     @PreviewParameter(SelectedTabProvider::class) selectedTab: Int,
 ) {
-    OriginalTempTheme(isDark = isSystemInDarkTheme()) {
+    OriginalTheme(isDark = isSystemInDarkTheme()) {
         Tabs(
             cells = {
                 addTextTab("Tab 1", "tab1") { Text("Tab 1 content") }
@@ -282,7 +282,7 @@ private class SelectedTabProvider : PreviewParameterProvider<Int> {
 @Preview(uiMode = Configuration.UI_MODE_NIGHT_YES, name = "DarkTabCellPreview")
 @Composable
 private fun TabCellPreview() {
-    OriginalTempTheme(isDark = isSystemInDarkTheme()) {
+    OriginalTheme(isDark = isSystemInDarkTheme()) {
         TabCell(
             text = "Tab name",
             selected = false,

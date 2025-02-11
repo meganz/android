@@ -59,7 +59,7 @@ import mega.privacy.android.shared.original.core.ui.controls.text.MegaText
 import mega.privacy.android.shared.original.core.ui.controls.tooltips.Tooltip
 import mega.privacy.android.shared.original.core.ui.preview.CombinedThemePreviews
 import mega.privacy.android.shared.original.core.ui.theme.MegaOriginalTheme
-import mega.privacy.android.shared.original.core.ui.theme.OriginalTempTheme
+import mega.privacy.android.shared.original.core.ui.theme.OriginalTheme
 import mega.android.core.ui.theme.values.TextColor
 import mega.privacy.android.shared.original.core.ui.utils.showAutoDurationSnackbar
 import kotlin.math.abs
@@ -396,7 +396,7 @@ private fun TimerWithIndicator(seconds: Int, modifier: Modifier = Modifier) {
 @CombinedThemePreviews
 @Composable
 private fun TimerWithIndicatorPreview() {
-    OriginalTempTheme(isDark = isSystemInDarkTheme()) {
+    OriginalTheme(isDark = isSystemInDarkTheme()) {
         TimerWithIndicator(seconds = 100)
     }
 }
@@ -495,7 +495,7 @@ private const val SLIDE_TO_CANCEL_THRESHOLD_IN_PX = 400
 @CombinedThemePreviews
 @Composable
 private fun SlideToCancelPreview() {
-    OriginalTempTheme(isDark = isSystemInDarkTheme()) {
+    OriginalTheme(isDark = isSystemInDarkTheme()) {
         SlideToCancel()
     }
 }
@@ -503,7 +503,7 @@ private fun SlideToCancelPreview() {
 @CombinedThemePreviews
 @Composable
 private fun RecordIndicatorPreview() {
-    OriginalTempTheme(isDark = isSystemInDarkTheme()) {
+    OriginalTheme(isDark = isSystemInDarkTheme()) {
         RecordIndicator()
     }
 }
@@ -511,7 +511,7 @@ private fun RecordIndicatorPreview() {
 @CombinedThemePreviews
 @Composable
 private fun VoiceClipRecorderViewPreview() {
-    OriginalTempTheme(isDark = isSystemInDarkTheme()) {
+    OriginalTheme(isDark = isSystemInDarkTheme()) {
         VoiceClipRecorderView()
     }
 }
@@ -519,7 +519,7 @@ private fun VoiceClipRecorderViewPreview() {
 @CombinedThemePreviews
 @Composable
 private fun RecordScrollerPreview() {
-    OriginalTempTheme(isDark = isSystemInDarkTheme()) {
+    OriginalTheme(isDark = isSystemInDarkTheme()) {
         RecordScroller()
     }
 }

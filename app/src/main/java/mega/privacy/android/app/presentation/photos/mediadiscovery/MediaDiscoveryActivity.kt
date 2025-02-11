@@ -41,7 +41,7 @@ import mega.privacy.android.domain.entity.node.NodeId
 import mega.privacy.android.domain.entity.photos.Photo
 import mega.privacy.android.domain.usecase.GetThemeMode
 import mega.privacy.android.navigation.MegaNavigator
-import mega.privacy.android.shared.original.core.ui.theme.OriginalTempTheme
+import mega.privacy.android.shared.original.core.ui.theme.OriginalTheme
 import timber.log.Timber
 import java.io.File
 import javax.inject.Inject
@@ -88,7 +88,7 @@ class MediaDiscoveryActivity : BaseActivity(), PermissionRequester, SnackbarShow
         checkLoginStatus()
         setContent {
             val themeMode by getThemeMode().collectAsStateWithLifecycle(initialValue = ThemeMode.System)
-            OriginalTempTheme(isDark = themeMode.isDarkMode()) {
+            OriginalTheme(isDark = themeMode.isDarkMode()) {
                 MediaDiscoveryScreen(
                     mediaDiscoveryGlobalStateViewModel = mediaDiscoveryGlobalStateViewModel,
                     viewModel = mediaDiscoveryViewModel,

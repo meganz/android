@@ -29,7 +29,7 @@ import mega.privacy.android.shared.original.core.ui.controls.buttons.OutlinedWit
 import mega.privacy.android.shared.original.core.ui.controls.buttons.RaisedDefaultErrorMegaButton
 import mega.privacy.android.shared.original.core.ui.controls.buttons.RaisedDefaultMegaButton
 import mega.privacy.android.shared.original.core.ui.preview.CombinedThemePreviews
-import mega.privacy.android.shared.original.core.ui.theme.OriginalTempTheme
+import mega.privacy.android.shared.original.core.ui.theme.OriginalTheme
 import mega.privacy.android.shared.original.core.ui.theme.black
 import mega.privacy.android.shared.original.core.ui.theme.extensions.textColorPrimary
 
@@ -189,7 +189,7 @@ internal const val BOTTOM_SHEET_END_FOR_ALL_BUTTON =
 @CombinedThemePreviews
 @Composable
 private fun PreviewLeaveMeetingBottomSheetView() {
-    OriginalTempTheme(isDark = true) {
+    OriginalTheme(isDark = true) {
         LeaveMeetingBottomSheetView(
             state = InMeetingUiState(),
             onAssignAndLeaveClick = {},

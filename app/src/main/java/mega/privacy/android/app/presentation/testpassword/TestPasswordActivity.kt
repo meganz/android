@@ -32,7 +32,7 @@ import mega.privacy.android.app.utils.TextUtil
 import mega.privacy.android.app.utils.permission.PermissionUtils
 import mega.privacy.android.domain.entity.ThemeMode
 import mega.privacy.android.domain.usecase.GetThemeMode
-import mega.privacy.android.shared.original.core.ui.theme.OriginalTempTheme
+import mega.privacy.android.shared.original.core.ui.theme.OriginalTheme
 import timber.log.Timber
 import javax.inject.Inject
 
@@ -119,7 +119,7 @@ class TestPasswordActivity : PasscodeActivity() {
         val uiState by viewModel.uiState.collectAsStateWithLifecycle()
         var logoutDialog by rememberSaveable { mutableStateOf(false) }
 
-        OriginalTempTheme(isDark = themeMode.isDarkMode()) {
+        OriginalTheme(isDark = themeMode.isDarkMode()) {
             TestPasswordComposeView(
                 uiState = uiState,
                 onResetUserMessage = viewModel::resetUserMessage,

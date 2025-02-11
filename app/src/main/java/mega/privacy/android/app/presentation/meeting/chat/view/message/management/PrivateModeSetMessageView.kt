@@ -19,7 +19,7 @@ import mega.privacy.android.shared.original.core.ui.model.SpanIndicator
 import mega.privacy.android.shared.original.core.ui.preview.CombinedThemePreviews
 import mega.android.core.ui.theme.values.TextColor
 import mega.privacy.android.domain.entity.chat.messages.management.PrivateModeSetMessage
-import mega.privacy.android.shared.original.core.ui.theme.OriginalTempTheme
+import mega.privacy.android.shared.original.core.ui.theme.OriginalTheme
 
 /**
  * Private mode set message view
@@ -96,7 +96,7 @@ internal fun PrivateModeSetMessageView(
 @CombinedThemePreviews
 @Composable
 private fun PrivateModeSetMessagePreview() {
-    OriginalTempTheme(isDark = isSystemInDarkTheme()) {
+    OriginalTheme(isDark = isSystemInDarkTheme()) {
         PrivateModeSetMessageView(
             ownerActionFullName = "Name"
         )

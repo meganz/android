@@ -17,7 +17,7 @@ import androidx.compose.runtime.remember
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 import mega.privacy.android.shared.original.core.ui.preview.CombinedThemePreviews
-import mega.privacy.android.shared.original.core.ui.theme.OriginalTempTheme
+import mega.privacy.android.shared.original.core.ui.theme.OriginalTheme
 
 /**
  * ChipBar is a scrollable toolbar for chips
@@ -51,7 +51,7 @@ private fun ChipBarPreview() {
     val chips = listOf("Documents", "Photos", "Videos", "Important Files", "Backup")
     val selectedChips = remember { mutableStateListOf(chips[0]) }
 
-    OriginalTempTheme(isDark = isSystemInDarkTheme()) {
+    OriginalTheme(isDark = isSystemInDarkTheme()) {
         ChipBar {
             chips.forEach { item ->
                 val isSelected = selectedChips.contains(item)

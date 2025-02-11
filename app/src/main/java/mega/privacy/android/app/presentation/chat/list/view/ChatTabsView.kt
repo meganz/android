@@ -48,7 +48,7 @@ import mega.privacy.android.domain.entity.chat.ChatRoomItem
 import mega.privacy.android.domain.entity.chat.MeetingTooltipItem
 import mega.privacy.android.legacy.core.ui.controls.tooltips.LegacyMegaTooltip
 import mega.privacy.android.shared.original.core.ui.controls.tab.Tabs
-import mega.privacy.android.shared.original.core.ui.theme.OriginalTempTheme
+import mega.privacy.android.shared.original.core.ui.theme.OriginalTheme
 import mega.privacy.android.shared.original.core.ui.theme.extensions.white_black
 import mega.privacy.android.shared.original.core.ui.theme.red_600
 import mega.privacy.android.shared.original.core.ui.utils.showAutoDurationSnackbar
@@ -290,7 +290,7 @@ private fun FabButton(showFabButton: Boolean, onStartChatClick: (isFabClicked: B
 @Preview(uiMode = Configuration.UI_MODE_NIGHT_NO, name = "PreviewChatTabsView")
 @Composable
 private fun PreviewEmptyView() {
-    OriginalTempTheme(isSystemInDarkTheme()) {
+    OriginalTheme(isSystemInDarkTheme()) {
         ChatTabsView(
             state = ChatsTabState(currentUnreadStatus = true to false),
             managementState = ScheduledMeetingManagementUiState(),

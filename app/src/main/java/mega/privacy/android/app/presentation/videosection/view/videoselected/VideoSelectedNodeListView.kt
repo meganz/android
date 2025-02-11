@@ -23,7 +23,7 @@ import mega.privacy.android.domain.entity.node.thumbnail.ThumbnailRequest
 import mega.privacy.android.legacy.core.ui.controls.lists.HeaderViewItem
 import mega.privacy.android.shared.original.core.ui.controls.lists.NodeListViewItem
 import mega.privacy.android.shared.original.core.ui.preview.CombinedThemePreviews
-import mega.privacy.android.shared.original.core.ui.theme.OriginalTempTheme
+import mega.privacy.android.shared.original.core.ui.theme.OriginalTheme
 import mega.privacy.android.shared.original.core.ui.theme.extensions.grey_alpha_012_white_alpha_012
 
 @Composable
@@ -87,7 +87,7 @@ internal fun <T : TypedNode> VideoSelectedNodeListView(
 private fun VideoSelectedNodeListViewFoldersPreview(
     @PreviewParameter(SampleFolderNodeDataProvider::class) items: List<NodeUIItem<TypedFolderNode>>,
 ) {
-    OriginalTempTheme(isDark = isSystemInDarkTheme()) {
+    OriginalTheme(isDark = isSystemInDarkTheme()) {
         VideoSelectedNodeListView(
             modifier = Modifier,
             nodeUIItemList = items,

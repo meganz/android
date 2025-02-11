@@ -26,7 +26,7 @@ import androidx.compose.ui.tooling.preview.PreviewParameter
 import androidx.compose.ui.unit.dp
 import mega.privacy.android.shared.original.core.ui.preview.BooleanProvider
 import mega.privacy.android.shared.original.core.ui.preview.CombinedThemePreviews
-import mega.privacy.android.shared.original.core.ui.theme.OriginalTempTheme
+import mega.privacy.android.shared.original.core.ui.theme.OriginalTheme
 import mega.privacy.android.shared.original.core.ui.theme.MegaOriginalTheme
 
 /**
@@ -96,7 +96,7 @@ fun LocationMessageView(
 private fun LocationMessagePreview(
     @PreviewParameter(BooleanProvider::class) isMe: Boolean,
 ) {
-    OriginalTempTheme(isDark = isSystemInDarkTheme()) {
+    OriginalTheme(isDark = isSystemInDarkTheme()) {
         LocationMessageView(
             isMe = isMe,
             title = buildAnnotatedString { append("Pinned location") },

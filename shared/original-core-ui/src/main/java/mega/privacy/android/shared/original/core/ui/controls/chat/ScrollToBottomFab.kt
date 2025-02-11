@@ -23,7 +23,7 @@ import mega.privacy.android.shared.original.core.ui.controls.buttons.FloatingAct
 import mega.privacy.android.shared.original.core.ui.controls.buttons.MegaFloatingActionButton
 import mega.privacy.android.shared.original.core.ui.controls.text.MegaText
 import mega.privacy.android.shared.original.core.ui.preview.CombinedThemePreviews
-import mega.privacy.android.shared.original.core.ui.theme.OriginalTempTheme
+import mega.privacy.android.shared.original.core.ui.theme.OriginalTheme
 import mega.privacy.android.shared.original.core.ui.theme.MegaOriginalTheme
 import mega.privacy.android.shared.original.core.ui.theme.extensions.body4
 import mega.privacy.android.shared.original.core.ui.theme.extensions.conditional
@@ -89,7 +89,7 @@ private fun Int.formatUnreadCount(): String = if (this > 99) "+99" else "$this"
 private fun ScrollToBottomFabPreview(
     @PreviewParameter(UnreadCountProvider::class) unreadCount: Int,
 ) {
-    OriginalTempTheme(isDark = isSystemInDarkTheme()) {
+    OriginalTheme(isDark = isSystemInDarkTheme()) {
         ScrollToBottomFab(onClick = {}, unreadCount = unreadCount)
     }
 }

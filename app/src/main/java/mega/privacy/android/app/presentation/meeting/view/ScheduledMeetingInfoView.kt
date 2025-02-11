@@ -80,7 +80,7 @@ import mega.privacy.android.shared.original.core.ui.controls.dialogs.Confirmatio
 import mega.privacy.android.shared.original.core.ui.controls.layouts.MegaScaffold
 import mega.privacy.android.shared.original.core.ui.controls.text.LongTextBehaviour
 import mega.privacy.android.shared.original.core.ui.controls.text.MegaText
-import mega.privacy.android.shared.original.core.ui.theme.OriginalTempTheme
+import mega.privacy.android.shared.original.core.ui.theme.OriginalTheme
 import mega.privacy.android.shared.original.core.ui.theme.black
 import mega.privacy.android.shared.original.core.ui.theme.grey_alpha_012
 import mega.privacy.android.shared.original.core.ui.theme.grey_alpha_038
@@ -1170,7 +1170,7 @@ internal const val SCHEDULE_MEETING_INFO_PARTICIPANTS_WARNING_TAG =
 @Preview(uiMode = Configuration.UI_MODE_NIGHT_YES, name = "DarkPreviewActionButton")
 @Composable
 fun PreviewActionButton() {
-    OriginalTempTheme(isDark = isSystemInDarkTheme()) {
+    OriginalTheme(isDark = isSystemInDarkTheme()) {
         ActionButton(state = ScheduledMeetingInfoUiState(
             scheduledMeeting = ChatScheduledMeeting(
                 chatId = -1,
@@ -1203,7 +1203,7 @@ fun PreviewActionButton() {
 @Preview(uiMode = Configuration.UI_MODE_NIGHT_YES, name = "DarkAddParticipantsButton")
 @Composable
 fun PreviewAddParticipantsButton() {
-    OriginalTempTheme(isDark = isSystemInDarkTheme()) {
+    OriginalTheme(isDark = isSystemInDarkTheme()) {
         AddParticipantsButton(state = ScheduledMeetingInfoUiState(
             scheduledMeeting = ChatScheduledMeeting(
                 chatId = -1,
@@ -1232,7 +1232,7 @@ fun PreviewAddParticipantsButton() {
 @Preview(uiMode = Configuration.UI_MODE_NIGHT_YES, name = "DarkPreviewScheduledMeetingInfoView")
 @Composable
 fun PreviewScheduledMeetingInfoView() {
-    OriginalTempTheme(isDark = isSystemInDarkTheme()) {
+    OriginalTheme(isDark = isSystemInDarkTheme()) {
         ScheduledMeetingInfoView(
             state = ScheduledMeetingInfoUiState(
                 scheduledMeeting = ChatScheduledMeeting(

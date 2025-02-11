@@ -55,7 +55,7 @@ import mega.privacy.android.app.presentation.verification.model.SMSVerificationU
 import mega.privacy.android.legacy.core.ui.controls.text.MegaSpannedText
 import mega.privacy.android.legacy.core.ui.controls.textfields.MegaTextField
 import mega.privacy.android.shared.original.core.ui.model.SpanIndicator
-import mega.privacy.android.shared.original.core.ui.theme.OriginalTempTheme
+import mega.privacy.android.shared.original.core.ui.theme.OriginalTheme
 import mega.privacy.android.shared.original.core.ui.theme.extensions.blue_400_blue_200
 import mega.privacy.android.shared.original.core.ui.theme.extensions.grey_alpha_012_white_alpha_012
 import mega.privacy.android.shared.original.core.ui.theme.extensions.textColorSecondary
@@ -432,7 +432,7 @@ private fun SMSVerificationViewPreview() {
         countryCodeText = "(NZ+64)New Zealand",
         isUserLocked = true,
     )
-    OriginalTempTheme(isDark = isSystemInDarkTheme()) {
+    OriginalTheme(isDark = isSystemInDarkTheme()) {
         SMSVerificationView(
             state = uiState,
             {}, {}, {}, {}, {}, {}, {}

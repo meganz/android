@@ -31,7 +31,7 @@ import mega.privacy.android.app.presentation.meeting.WaitingRoomManagementViewMo
 import mega.privacy.android.app.presentation.meeting.view.ParticipantsBottomPanelView
 import mega.privacy.android.app.utils.Util
 import mega.privacy.android.domain.entity.call.AudioDevice
-import mega.privacy.android.shared.original.core.ui.theme.OriginalTempTheme
+import mega.privacy.android.shared.original.core.ui.theme.OriginalTheme
 import mega.privacy.mobile.analytics.event.CallUIMoreButtonPressedEvent
 import mega.privacy.mobile.analytics.event.ParticipantListInviteParticipantRowPressedEvent
 import timber.log.Timber
@@ -445,7 +445,7 @@ class BottomFloatingPanelViewHolder(
 
             setViewCompositionStrategy(ViewCompositionStrategy.DisposeOnViewTreeLifecycleDestroyed)
             setContent {
-                OriginalTempTheme(isDark = true) {
+                OriginalTheme(isDark = true) {
                     ParticipantsBottomPanelView(
                         viewModel = meetingViewModel,
                         waitingRoomManagementViewModel = waitingRoomManagementViewModel,

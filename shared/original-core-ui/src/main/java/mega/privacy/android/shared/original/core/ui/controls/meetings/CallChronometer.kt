@@ -19,7 +19,7 @@ import androidx.compose.ui.tooling.preview.PreviewParameter
 import androidx.compose.ui.viewinterop.AndroidView
 import mega.privacy.android.shared.original.core.ui.preview.BooleanProvider
 import mega.privacy.android.shared.original.core.ui.preview.CombinedThemePreviews
-import mega.privacy.android.shared.original.core.ui.theme.OriginalTempTheme
+import mega.privacy.android.shared.original.core.ui.theme.OriginalTheme
 import java.time.Instant
 import kotlin.time.Duration
 import kotlin.time.DurationUnit
@@ -67,7 +67,7 @@ fun CallChronometer(
 private fun CallChronometerPreview(
     @PreviewParameter(BooleanProvider::class) selected: Boolean,
 ) {
-    OriginalTempTheme(isDark = isSystemInDarkTheme()) {
+    OriginalTheme(isDark = isSystemInDarkTheme()) {
         CallChronometer(
             duration = Instant.now().epochSecond.toDuration(DurationUnit.SECONDS),
             textStyle = MaterialTheme.typography.body2.copy(color = MaterialTheme.colors.secondary)

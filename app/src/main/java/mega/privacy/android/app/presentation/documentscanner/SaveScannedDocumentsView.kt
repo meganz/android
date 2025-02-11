@@ -44,7 +44,7 @@ import mega.privacy.android.shared.original.core.ui.controls.dividers.DividerTyp
 import mega.privacy.android.shared.original.core.ui.controls.dividers.MegaDivider
 import mega.privacy.android.shared.original.core.ui.controls.layouts.MegaScaffold
 import mega.privacy.android.shared.original.core.ui.preview.CombinedThemePreviews
-import mega.privacy.android.shared.original.core.ui.theme.OriginalTempTheme
+import mega.privacy.android.shared.original.core.ui.theme.OriginalTheme
 import mega.privacy.android.shared.original.core.ui.utils.showAutoDurationSnackbar
 
 /**
@@ -205,7 +205,7 @@ internal fun SaveScannedDocumentsView(
 private fun SaveScannedDocumentsViewPreview(
     @PreviewParameter(SaveScannedDocumentsViewPreviewParameterProvider::class) saveScannedDocumentsViewPreviewParameter: SaveScannedDocumentsViewPreviewParameter,
 ) {
-    OriginalTempTheme(isDark = isSystemInDarkTheme()) {
+    OriginalTheme(isDark = isSystemInDarkTheme()) {
         SaveScannedDocumentsView(
             uiState = SaveScannedDocumentsUiState(
                 originatedFromChat = saveScannedDocumentsViewPreviewParameter.originatedFromChat,

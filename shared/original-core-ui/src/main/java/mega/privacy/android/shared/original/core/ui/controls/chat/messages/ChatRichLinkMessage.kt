@@ -14,7 +14,7 @@ import androidx.compose.ui.unit.dp
 import mega.privacy.android.core.R
 import mega.privacy.android.shared.original.core.ui.preview.BooleanProvider
 import mega.privacy.android.shared.original.core.ui.preview.CombinedThemePreviews
-import mega.privacy.android.shared.original.core.ui.theme.OriginalTempTheme
+import mega.privacy.android.shared.original.core.ui.theme.OriginalTheme
 
 /**
  * Chat rick link message
@@ -83,7 +83,7 @@ fun ChatRichLinkMessage(
 private fun ChatRickLinkMessagePreview(
     @PreviewParameter(BooleanProvider::class) isMe: Boolean,
 ) {
-    OriginalTempTheme(isDark = isSystemInDarkTheme()) {
+    OriginalTheme(isDark = isSystemInDarkTheme()) {
         ChatRichLinkMessage(
             modifier = Modifier,
             isMine = isMe,

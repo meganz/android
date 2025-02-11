@@ -81,7 +81,7 @@ import mega.privacy.android.domain.entity.node.TypedFolderNode
 import mega.privacy.android.domain.entity.node.shares.ShareNode
 import mega.privacy.android.domain.usecase.GetThemeMode
 import mega.privacy.android.navigation.MegaNavigator
-import mega.privacy.android.shared.original.core.ui.theme.OriginalTempTheme
+import mega.privacy.android.shared.original.core.ui.theme.OriginalTheme
 import mega.privacy.android.shared.original.core.ui.utils.showAutoDurationSnackbar
 import timber.log.Timber
 import javax.inject.Inject
@@ -191,7 +191,7 @@ class OutgoingSharesComposeFragment : Fragment() {
                 var clickedFile: TypedFileNode? by remember {
                     mutableStateOf(null)
                 }
-                OriginalTempTheme(isDark = themeMode.isDarkMode()) {
+                OriginalTheme(isDark = themeMode.isDarkMode()) {
                     OutgoingSharesView(
                         uiState = uiState,
                         emptyState = getEmptyFolderDrawable(uiState.isOutgoingSharesEmpty),

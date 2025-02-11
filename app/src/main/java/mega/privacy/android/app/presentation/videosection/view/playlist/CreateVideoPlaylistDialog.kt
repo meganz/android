@@ -45,7 +45,7 @@ import mega.privacy.android.app.constants.StringsConstants
 import mega.privacy.android.legacy.core.ui.controls.dialogs.MegaDialog
 import mega.privacy.android.shared.original.core.ui.controls.text.MegaText
 import mega.privacy.android.shared.original.core.ui.preview.CombinedThemePreviews
-import mega.privacy.android.shared.original.core.ui.theme.OriginalTempTheme
+import mega.privacy.android.shared.original.core.ui.theme.OriginalTheme
 import mega.privacy.android.shared.original.core.ui.theme.black
 import mega.privacy.android.shared.original.core.ui.theme.caption
 import mega.privacy.android.shared.original.core.ui.theme.grey_300
@@ -263,7 +263,7 @@ internal fun CreateVideoPlaylistDialog(
 @CombinedThemePreviews
 @Composable
 private fun CreateVideoPlaylistDialogPreview() {
-    OriginalTempTheme(isDark = isSystemInDarkTheme()) {
+    OriginalTheme(isDark = isSystemInDarkTheme()) {
         CreateVideoPlaylistDialog(
             title = "Enter playlist name",
             positiveButtonText = stringResource(id = R.string.general_create),
@@ -281,7 +281,7 @@ private fun CreateVideoPlaylistDialogPreview() {
 @CombinedThemePreviews
 @Composable
 private fun CreateVideoPlaylistDialogWithErrorPreview() {
-    OriginalTempTheme(isDark = isSystemInDarkTheme()) {
+    OriginalTheme(isDark = isSystemInDarkTheme()) {
         CreateVideoPlaylistDialog(
             title = "Enter playlist name",
             positiveButtonText = stringResource(id = R.string.general_create),
@@ -299,7 +299,7 @@ private fun CreateVideoPlaylistDialogWithErrorPreview() {
 @CombinedThemePreviews
 @Composable
 private fun CreateVideoPlaylistDialogWithSameNamePreview() {
-    OriginalTempTheme(isDark = isSystemInDarkTheme()) {
+    OriginalTheme(isDark = isSystemInDarkTheme()) {
         CreateVideoPlaylistDialog(
             title = "Enter playlist name",
             positiveButtonText = stringResource(id = R.string.general_create),

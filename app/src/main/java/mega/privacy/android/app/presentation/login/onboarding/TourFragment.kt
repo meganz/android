@@ -15,7 +15,7 @@ import mega.privacy.android.app.presentation.extensions.isDarkMode
 import mega.privacy.android.app.presentation.login.onboarding.view.TourRoute
 import mega.privacy.android.domain.entity.ThemeMode
 import mega.privacy.android.domain.usecase.GetThemeMode
-import mega.privacy.android.shared.original.core.ui.theme.OriginalTempTheme
+import mega.privacy.android.shared.original.core.ui.theme.OriginalTheme
 import timber.log.Timber
 import javax.inject.Inject
 
@@ -46,7 +46,7 @@ class TourFragment : Fragment() {
         setViewCompositionStrategy(ViewCompositionStrategy.DisposeOnViewTreeLifecycleDestroyed)
         setContent {
             val themeMode by getThemeMode().collectAsStateWithLifecycle(initialValue = ThemeMode.System)
-            OriginalTempTheme(isDark = themeMode.isDarkMode()) {
+            OriginalTheme(isDark = themeMode.isDarkMode()) {
                 TourRoute(
                     modifier = Modifier.fillMaxSize(),
                     onLoginClick = {

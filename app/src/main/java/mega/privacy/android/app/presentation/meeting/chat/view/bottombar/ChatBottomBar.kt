@@ -31,7 +31,7 @@ import mega.privacy.android.app.presentation.meeting.chat.view.UserTypingView
 import mega.privacy.android.shared.original.core.ui.controls.chat.ChatInputTextToolbar
 import mega.privacy.android.shared.original.core.ui.controls.chat.VoiceClipRecordEvent
 import mega.privacy.android.shared.original.core.ui.preview.CombinedThemePreviews
-import mega.privacy.android.shared.original.core.ui.theme.OriginalTempTheme
+import mega.privacy.android.shared.original.core.ui.theme.OriginalTheme
 import mega.privacy.android.shared.original.core.ui.utils.ComposableLifecycle
 
 
@@ -185,7 +185,7 @@ fun ChatBottomBarContent(
 @CombinedThemePreviews
 @Composable
 private fun ChatBottomBarPreview() {
-    OriginalTempTheme(isDark = isSystemInDarkTheme()) {
+    OriginalTheme(isDark = isSystemInDarkTheme()) {
         ChatBottomBarContent(
             uiState = ChatUiState(
                 sendingText = "Sending text",

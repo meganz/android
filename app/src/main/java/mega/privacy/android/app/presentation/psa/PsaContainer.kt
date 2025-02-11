@@ -29,7 +29,7 @@ import mega.privacy.android.app.presentation.psa.view.PsaView
 import mega.privacy.android.app.presentation.psa.view.WebPsaView
 import mega.privacy.android.shared.original.core.ui.controls.sheets.MegaBottomSheetContainer
 import mega.privacy.android.shared.original.core.ui.preview.CombinedThemePreviews
-import mega.privacy.android.shared.original.core.ui.theme.OriginalTempTheme
+import mega.privacy.android.shared.original.core.ui.theme.OriginalTheme
 
 /**
  * Psa container
@@ -140,7 +140,7 @@ private fun navigateToWebView(context: Context, psaUrl: String) {
 @CombinedThemePreviews
 @Composable
 private fun PsaContainerPreview(@PreviewParameter(PsaStatePreviewParameterProvider::class) psaState: PsaState) {
-    OriginalTempTheme(isDark = isSystemInDarkTheme()) {
+    OriginalTheme(isDark = isSystemInDarkTheme()) {
         PsaContainerContent(
             state = psaState,
             markAsSeen = {},

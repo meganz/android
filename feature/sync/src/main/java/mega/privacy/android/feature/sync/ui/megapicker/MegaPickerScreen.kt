@@ -36,7 +36,7 @@ import mega.privacy.android.shared.original.core.ui.controls.snackbars.MegaSnack
 import mega.privacy.android.shared.original.core.ui.model.MenuAction
 import mega.privacy.android.shared.original.core.ui.preview.BooleanProvider
 import mega.privacy.android.shared.original.core.ui.preview.CombinedThemePreviews
-import mega.privacy.android.shared.original.core.ui.theme.OriginalTempTheme
+import mega.privacy.android.shared.original.core.ui.theme.OriginalTheme
 import mega.privacy.android.shared.original.core.ui.utils.showAutoDurationSnackbar
 import mega.privacy.android.shared.resources.R as sharedR
 import nz.mega.sdk.MegaApiJava
@@ -195,7 +195,7 @@ private fun MegaPickerScreenContent(
 private fun SyncNewFolderScreenPreview(
     @PreviewParameter(BooleanProvider::class) isSelectEnabled: Boolean,
 ) {
-    OriginalTempTheme(isDark = isSystemInDarkTheme()) {
+    OriginalTheme(isDark = isSystemInDarkTheme()) {
         MegaPickerScreen(
             null,
             SampleNodeDataProvider.values,

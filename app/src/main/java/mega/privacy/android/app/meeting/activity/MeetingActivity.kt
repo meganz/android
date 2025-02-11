@@ -18,7 +18,6 @@ import androidx.appcompat.app.AppCompatDelegate
 import androidx.compose.ui.platform.ViewCompositionStrategy
 import androidx.core.app.NotificationManagerCompat
 import androidx.core.view.isVisible
-import androidx.fragment.app.Fragment
 import androidx.lifecycle.lifecycleScope
 import androidx.navigation.NavController
 import androidx.navigation.NavGraph
@@ -56,7 +55,7 @@ import mega.privacy.android.app.utils.ScheduledMeetingDateUtil.getAppropriateStr
 import mega.privacy.android.domain.entity.chat.ChatScheduledMeeting
 import mega.privacy.android.domain.entity.meeting.ParticipantsSection
 import mega.privacy.android.navigation.MegaNavigator
-import mega.privacy.android.shared.original.core.ui.theme.OriginalTempTheme
+import mega.privacy.android.shared.original.core.ui.theme.OriginalTheme
 import nz.mega.sdk.MegaChatApiJava.MEGACHAT_INVALID_HANDLE
 import timber.log.Timber
 import javax.inject.Inject
@@ -279,7 +278,7 @@ class MeetingActivity : PasscodeActivity() {
             isVisible = true
             setViewCompositionStrategy(ViewCompositionStrategy.DisposeOnViewTreeLifecycleDestroyed)
             setContent {
-                OriginalTempTheme(isDark = true) {
+                OriginalTheme(isDark = true) {
                     UsersInWaitingRoomDialog()
                     DenyEntryToCallDialog()
                 }
@@ -290,7 +289,7 @@ class MeetingActivity : PasscodeActivity() {
             isVisible = true
             setViewCompositionStrategy(ViewCompositionStrategy.DisposeOnViewTreeLifecycleDestroyed)
             setContent {
-                OriginalTempTheme(isDark = true) {
+                OriginalTheme(isDark = true) {
                     ParticipantsFullListView(
                         onScrollChange = { scrolled ->
                             binding.toolbar.elevation = if (scrolled) 4f else 0f
@@ -306,7 +305,7 @@ class MeetingActivity : PasscodeActivity() {
             isVisible = true
             setViewCompositionStrategy(ViewCompositionStrategy.DisposeOnViewTreeLifecycleDestroyed)
             setContent {
-                OriginalTempTheme(isDark = true) {
+                OriginalTheme(isDark = true) {
                     CallRecordingConsentDialog()
                 }
             }

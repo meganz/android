@@ -46,7 +46,7 @@ import mega.privacy.android.core.R
 import mega.privacy.android.shared.original.core.ui.preview.BooleanProvider
 import mega.privacy.android.shared.original.core.ui.preview.CombinedThemePreviews
 import mega.privacy.android.shared.original.core.ui.theme.MegaOriginalTheme
-import mega.privacy.android.shared.original.core.ui.theme.OriginalTempTheme
+import mega.privacy.android.shared.original.core.ui.theme.OriginalTheme
 import mega.privacy.android.shared.original.core.ui.theme.extensions.conditional
 
 /**
@@ -307,7 +307,7 @@ private fun addPickedEmojiToInput(
 private fun ChatInputTextToolbarPlaceholderPreview(
     @PreviewParameter(BooleanProvider::class) showEmojiPicker: Boolean,
 ) {
-    OriginalTempTheme(isDark = isSystemInDarkTheme()) {
+    OriginalTheme(isDark = isSystemInDarkTheme()) {
         ChatInputTextToolbar(
             text = "",
             placeholder = "Very long long long long long long long long long long long long long long long long long long long long long long long long long long long ",
@@ -325,7 +325,7 @@ private fun ChatInputTextToolbarPlaceholderPreview(
 private fun ChatInputTextToolbarLongTextPreview(
     @PreviewParameter(BooleanProvider::class) showEmojiPicker: Boolean,
 ) {
-    OriginalTempTheme(isDark = isSystemInDarkTheme()) {
+    OriginalTheme(isDark = isSystemInDarkTheme()) {
         ChatInputTextToolbar(
             text = "abc ".repeat(30),
             placeholder = "",
@@ -343,7 +343,7 @@ private fun ChatInputTextToolbarLongTextPreview(
 private fun ChatInputTextToolbarEditingMessageTextPreview(
     @PreviewParameter(BooleanProvider::class) showEmojiPicker: Boolean,
 ) {
-    OriginalTempTheme(isDark = isSystemInDarkTheme()) {
+    OriginalTheme(isDark = isSystemInDarkTheme()) {
         ChatInputTextToolbar(
             text = "Hello world",
             placeholder = "",

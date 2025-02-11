@@ -59,7 +59,7 @@ import mega.privacy.android.shared.original.core.ui.controls.dividers.MegaDivide
 import mega.privacy.android.shared.original.core.ui.controls.lists.GenericTwoLineListItem
 import mega.privacy.android.shared.original.core.ui.controls.text.MegaText
 import mega.privacy.android.shared.original.core.ui.preview.CombinedThemePreviews
-import mega.privacy.android.shared.original.core.ui.theme.OriginalTempTheme
+import mega.privacy.android.shared.original.core.ui.theme.OriginalTheme
 import mega.android.core.ui.theme.values.TextColor
 import mega.privacy.android.shared.original.core.ui.utils.showAutoDurationSnackbar
 import java.util.Locale
@@ -405,7 +405,7 @@ private fun ClearHistoryOption(title: String, modifier: Modifier = Modifier) {
 @CombinedThemePreviews
 @Composable
 private fun ManageChatHistoryScreenWithRetentionTimePreview() {
-    OriginalTempTheme(isDark = isSystemInDarkTheme()) {
+    OriginalTheme(isDark = isSystemInDarkTheme()) {
         ManageChatHistoryScreen(
             uiState = ManageChatHistoryUIState(retentionTime = 3600L),
             onNavigateUp = {},
@@ -418,7 +418,7 @@ private fun ManageChatHistoryScreenWithRetentionTimePreview() {
 @CombinedThemePreviews
 @Composable
 private fun ManageChatHistoryScreenWithoutRetentionTimePreview() {
-    OriginalTempTheme(isDark = isSystemInDarkTheme()) {
+    OriginalTheme(isDark = isSystemInDarkTheme()) {
         ManageChatHistoryScreen(
             uiState = ManageChatHistoryUIState(),
             onNavigateUp = {},

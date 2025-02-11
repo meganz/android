@@ -10,7 +10,7 @@ import mega.privacy.android.app.R
 import mega.privacy.android.app.presentation.settings.camerauploads.model.VideoQualityUiItem
 import mega.privacy.android.shared.original.core.ui.controls.dialogs.ConfirmationDialogWithRadioButtons
 import mega.privacy.android.shared.original.core.ui.preview.CombinedThemePreviews
-import mega.privacy.android.shared.original.core.ui.theme.OriginalTempTheme
+import mega.privacy.android.shared.original.core.ui.theme.OriginalTheme
 
 /**
  * A [Composable] Dialog that displays a list of Video Quality Options for Videos being uploaded by
@@ -44,7 +44,7 @@ internal fun VideoQualityDialog(
 @CombinedThemePreviews
 @Composable
 private fun VideoQualityDialogPreview() {
-    OriginalTempTheme(isDark = isSystemInDarkTheme()) {
+    OriginalTheme(isDark = isSystemInDarkTheme()) {
         VideoQualityDialog(
             currentVideoQualityUiItem = VideoQualityUiItem.Low,
             onOptionSelected = {},

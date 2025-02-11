@@ -21,7 +21,7 @@ import mega.privacy.android.domain.entity.CallsMeetingReminders
 import mega.privacy.android.domain.entity.CallsSoundEnabledState
 import mega.privacy.android.shared.original.core.ui.controls.controlssliders.MegaSwitch
 import mega.privacy.android.shared.original.core.ui.preview.CombinedThemePreviews
-import mega.privacy.android.shared.original.core.ui.theme.OriginalTempTheme
+import mega.privacy.android.shared.original.core.ui.theme.OriginalTheme
 import mega.privacy.android.shared.original.core.ui.theme.Typography
 import mega.privacy.android.shared.resources.R as sharedR
 
@@ -86,7 +86,7 @@ fun CallSettingItem(
 @CombinedThemePreviews
 @Composable
 private fun PreviewSettingsCallsView() {
-    OriginalTempTheme(isDark = isSystemInDarkTheme()) {
+    OriginalTheme(isDark = isSystemInDarkTheme()) {
         SettingsCallsView(
             settingsCallsState = SettingsCallsState(
                 soundNotifications = CallsSoundEnabledState.Enabled,

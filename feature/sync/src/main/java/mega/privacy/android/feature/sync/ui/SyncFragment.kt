@@ -37,7 +37,7 @@ import mega.privacy.android.navigation.MegaNavigator
 import mega.privacy.android.shared.original.core.ui.controls.appbar.AppBarType
 import mega.privacy.android.shared.original.core.ui.controls.appbar.MegaAppBar
 import mega.privacy.android.shared.original.core.ui.controls.layouts.MegaScaffold
-import mega.privacy.android.shared.original.core.ui.theme.OriginalTempTheme
+import mega.privacy.android.shared.original.core.ui.theme.OriginalTheme
 import mega.privacy.android.shared.sync.ui.SyncEmptyState
 import timber.log.Timber
 import javax.inject.Inject
@@ -85,7 +85,7 @@ class SyncFragment : Fragment() {
                 val themeMode by getThemeMode().collectAsStateWithLifecycle(initialValue = ThemeMode.System)
                 val state by viewModel.state.collectAsStateWithLifecycle()
 
-                OriginalTempTheme(isDark = themeMode.isDarkMode()) {
+                OriginalTheme(isDark = themeMode.isDarkMode()) {
                     if (state.isNetworkConnected) {
                         AndroidSyncFeatureNavigation(
                             animatedNavController,

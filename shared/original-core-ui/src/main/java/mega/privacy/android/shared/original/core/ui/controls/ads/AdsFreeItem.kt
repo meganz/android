@@ -19,7 +19,7 @@ import mega.privacy.android.core.R
 import mega.privacy.android.shared.original.core.ui.controls.text.MegaText
 import mega.privacy.android.shared.original.core.ui.preview.CombinedThemePreviews
 import mega.privacy.android.shared.original.core.ui.theme.MegaOriginalTheme
-import mega.privacy.android.shared.original.core.ui.theme.OriginalTempTheme
+import mega.privacy.android.shared.original.core.ui.theme.OriginalTheme
 import mega.privacy.android.shared.original.core.ui.theme.extensions.subtitle2medium
 
 /**
@@ -66,7 +66,7 @@ fun AdsFreeItem(
 @CombinedThemePreviews
 @Composable
 private fun AdsFreeItemPreview() {
-    OriginalTempTheme(isSystemInDarkTheme()) {
+    OriginalTheme(isSystemInDarkTheme()) {
         AdsFreeItem(
             title = "Enjoy an ad-free experience",
             desc = "Upgrade to a Pro plan for lots of storage and more. Our Pro plans start at just €4.99 a month.",

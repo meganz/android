@@ -23,7 +23,7 @@ import androidx.compose.ui.unit.dp
 import mega.privacy.android.app.R
 import mega.privacy.android.shared.original.core.ui.preview.BooleanProvider
 import mega.privacy.android.shared.original.core.ui.preview.CombinedThemePreviews
-import mega.privacy.android.shared.original.core.ui.theme.OriginalTempTheme
+import mega.privacy.android.shared.original.core.ui.theme.OriginalTheme
 import mega.privacy.android.shared.original.core.ui.theme.extensions.black_white
 
 /**
@@ -131,7 +131,7 @@ private fun onGotoSettings(context: Context, navigateToQrSettings: () -> Unit) {
 private fun PreviewQRCodeTopBar(
     @PreviewParameter(BooleanProvider::class) qrCodeAvailable: Boolean
 ) {
-    OriginalTempTheme(isDark = isSystemInDarkTheme()) {
+    OriginalTheme(isDark = isSystemInDarkTheme()) {
         QRCodeTopBar(
             context = LocalContext.current,
             isQRCodeAvailable = qrCodeAvailable,

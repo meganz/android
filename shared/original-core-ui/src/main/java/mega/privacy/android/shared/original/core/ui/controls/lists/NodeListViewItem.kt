@@ -35,7 +35,7 @@ import mega.privacy.android.shared.original.core.ui.controls.text.LongTextBehavi
 import mega.privacy.android.shared.original.core.ui.controls.text.MegaText
 import mega.privacy.android.shared.original.core.ui.preview.CombinedThemePreviews
 import mega.privacy.android.shared.original.core.ui.theme.MegaOriginalTheme
-import mega.privacy.android.shared.original.core.ui.theme.OriginalTempTheme
+import mega.privacy.android.shared.original.core.ui.theme.OriginalTheme
 import mega.android.core.ui.theme.values.TextColor
 
 /**
@@ -314,7 +314,7 @@ private fun Circle(color: Color, modifier: Modifier = Modifier) {
 @CombinedThemePreviews
 @Composable
 private fun GenericNodeListViewItemSimplePreview() {
-    OriginalTempTheme(isDark = isSystemInDarkTheme()) {
+    OriginalTheme(isDark = isSystemInDarkTheme()) {
         NodeListViewItem(
             title = "Simple title",
             subtitle = "Simple sub title",
@@ -326,7 +326,7 @@ private fun GenericNodeListViewItemSimplePreview() {
 @CombinedThemePreviews
 @Composable
 private fun GenericNodeListViewItemHighlightPreview() {
-    OriginalTempTheme(isDark = isSystemInDarkTheme()) {
+    OriginalTheme(isDark = isSystemInDarkTheme()) {
         NodeListViewItem(
             title = "Simple title highlight",
             highlightText = "TITLE",
@@ -339,7 +339,7 @@ private fun GenericNodeListViewItemHighlightPreview() {
 @CombinedThemePreviews
 @Composable
 private fun GenericNodeListItemWithLongTitlePreview() {
-    OriginalTempTheme(isDark = isSystemInDarkTheme()) {
+    OriginalTheme(isDark = isSystemInDarkTheme()) {
         NodeListViewItem(
             title = "Title very big for testing the middle ellipsis",
             subtitle = "Subtitle very big for testing the middle ellipsis",
@@ -358,7 +358,7 @@ private fun GenericNodeListItemWithLongTitlePreview() {
 @CombinedThemePreviews
 @Composable
 private fun GenericNodeListItemPreview() {
-    OriginalTempTheme(isDark = isSystemInDarkTheme()) {
+    OriginalTheme(isDark = isSystemInDarkTheme()) {
         NodeListViewItem(
             title = "Title",
             subtitle = "Subtitle",
@@ -378,7 +378,7 @@ private fun GenericNodeListItemPreview() {
 @CombinedThemePreviews
 @Composable
 private fun GenericNodeListItemWithoutMoreOptionPreview() {
-    OriginalTempTheme(isDark = isSystemInDarkTheme()) {
+    OriginalTheme(isDark = isSystemInDarkTheme()) {
         NodeListViewItem(
             title = "Title",
             subtitle = "Subtitle",

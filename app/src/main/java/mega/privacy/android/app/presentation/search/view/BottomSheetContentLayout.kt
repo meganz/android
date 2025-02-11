@@ -27,7 +27,7 @@ import mega.privacy.android.app.presentation.search.model.FilterOptionEntity
 import mega.privacy.android.domain.entity.search.TypeFilterOption
 import mega.privacy.android.shared.original.core.ui.controls.text.MegaText
 import mega.privacy.android.shared.original.core.ui.preview.CombinedThemePreviews
-import mega.privacy.android.shared.original.core.ui.theme.OriginalTempTheme
+import mega.privacy.android.shared.original.core.ui.theme.OriginalTheme
 
 @Composable
 internal fun BottomSheetContentLayout(
@@ -78,7 +78,7 @@ internal fun BottomSheetContentLayout(
 @CombinedThemePreviews
 @Composable
 private fun SearchFilterBottomSheetPreview() {
-    OriginalTempTheme(isDark = isSystemInDarkTheme()) {
+    OriginalTheme(isDark = isSystemInDarkTheme()) {
         BottomSheetContentLayout(
             title = "Type",
             options = TypeFilterOption.entries.map { option ->

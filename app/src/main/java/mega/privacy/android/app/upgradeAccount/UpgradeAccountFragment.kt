@@ -40,7 +40,7 @@ import mega.privacy.android.domain.entity.billing.BillingEvent
 import mega.privacy.android.domain.entity.billing.MegaPurchase
 import mega.privacy.android.domain.usecase.GetThemeMode
 import mega.privacy.android.domain.usecase.featureflag.GetFeatureFlagValueUseCase
-import mega.privacy.android.shared.original.core.ui.theme.OriginalTempTheme
+import mega.privacy.android.shared.original.core.ui.theme.OriginalTheme
 import mega.privacy.mobile.analytics.event.AdFreeDialogUpgradeAccountPlanPageBuyButtonPressedEvent
 import mega.privacy.mobile.analytics.event.AdsUpgradeAccountPlanPageBuyButtonPressedEvent
 import mega.privacy.mobile.analytics.event.BuyProIEvent
@@ -112,7 +112,7 @@ class UpgradeAccountFragment : Fragment() {
         val mode by getThemeMode()
             .collectAsStateWithLifecycle(initialValue = ThemeMode.System)
         BackHandler { trackAndFinish() }
-        OriginalTempTheme(isDark = mode.isDarkMode()) {
+        OriginalTheme(isDark = mode.isDarkMode()) {
             UpgradeAccountView(
                 modifier = Modifier.semantics {
                     testTagsAsResourceId = true

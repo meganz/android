@@ -19,7 +19,7 @@ import mega.privacy.android.shared.original.core.ui.model.MegaSpanStyle
 import mega.privacy.android.shared.original.core.ui.model.SpanIndicator
 import mega.privacy.android.shared.original.core.ui.preview.CombinedThemePreviews
 import mega.android.core.ui.theme.values.TextColor
-import mega.privacy.android.shared.original.core.ui.theme.OriginalTempTheme
+import mega.privacy.android.shared.original.core.ui.theme.OriginalTheme
 
 /**
  * User typing view
@@ -65,7 +65,7 @@ private fun List<String?>.getTypingText(): String = when {
 private fun UserTypingViewPreview(
     @PreviewParameter(UserTypingParameter::class) usersTyping: List<String>,
 ) {
-    OriginalTempTheme(isDark = isSystemInDarkTheme()) {
+    OriginalTheme(isDark = isSystemInDarkTheme()) {
         UserTypingView(
             modifier = Modifier
                 .fillMaxWidth()

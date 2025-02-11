@@ -78,7 +78,7 @@ import mega.privacy.android.app.utils.Util.showKeyboardDelayed
 import mega.privacy.android.app.utils.ViewUtils.hideKeyboard
 import mega.privacy.android.domain.entity.ThemeMode
 import mega.privacy.android.domain.usecase.GetThemeMode
-import mega.privacy.android.shared.original.core.ui.theme.OriginalTempTheme
+import mega.privacy.android.shared.original.core.ui.theme.OriginalTheme
 import mega.privacy.mobile.analytics.event.CancelSubscriptionMenuToolbarEvent
 import mega.privacy.mobile.analytics.event.ToolbarOverflowMenuItemEvent
 import nz.mega.sdk.MegaApiJava
@@ -200,7 +200,7 @@ class MyAccountActivity : PasscodeActivity(),
                 val uiState by viewModel.state.collectAsStateWithLifecycle()
                 val themeMode by getThemeMode().collectAsStateWithLifecycle(initialValue = ThemeMode.System)
                 if (uiState.showLogoutConfirmationDialog) {
-                    OriginalTempTheme(isDark = themeMode.isDarkMode()) {
+                    OriginalTheme(isDark = themeMode.isDarkMode()) {
                         LogoutConfirmationDialog(
                             onDismissed = { viewModel.dismissLogoutConfirmationDialog() },
                             logoutViewModel = logoutViewModel

@@ -32,7 +32,7 @@ import mega.privacy.android.shared.original.core.ui.controls.dividers.DividerTyp
 import mega.privacy.android.shared.original.core.ui.controls.dividers.MegaDivider
 import mega.privacy.android.shared.original.core.ui.controls.text.MegaText
 import mega.privacy.android.shared.original.core.ui.preview.CombinedThemePreviews
-import mega.privacy.android.shared.original.core.ui.theme.OriginalTempTheme
+import mega.privacy.android.shared.original.core.ui.theme.OriginalTheme
 import mega.privacy.android.shared.original.core.ui.theme.extensions.textColorSecondary
 import mega.privacy.android.shared.resources.R as sharedResR
 import androidx.compose.ui.platform.testTag
@@ -181,7 +181,7 @@ private fun TwoLinesItem(
 private fun EmptyInputSyncInformationViewPreview(
     @PreviewParameter(SyncTypePreviewProvider::class) syncType: SyncType
 ) {
-    OriginalTempTheme(isDark = isSystemInDarkTheme()) {
+    OriginalTheme(isDark = isSystemInDarkTheme()) {
         InputSyncInformationView(
             syncType = syncType,
             deviceName = "Device Name",
@@ -196,7 +196,7 @@ private fun EmptyInputSyncInformationViewPreview(
 private fun InputSyncInformationViewPreview(
     @PreviewParameter(SyncTypePreviewProvider::class) syncType: SyncType
 ) {
-    OriginalTempTheme(isDark = isSystemInDarkTheme()) {
+    OriginalTheme(isDark = isSystemInDarkTheme()) {
         InputSyncInformationView(
             syncType = syncType,
             deviceName = "Device Name",

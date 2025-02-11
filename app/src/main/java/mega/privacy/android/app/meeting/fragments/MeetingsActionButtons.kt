@@ -49,7 +49,7 @@ import mega.privacy.android.shared.original.core.ui.controls.chat.attachpanel.Ce
 import mega.privacy.android.shared.original.core.ui.controls.chat.attachpanel.CellButtonType
 import mega.privacy.android.shared.original.core.ui.preview.BooleanProvider
 import mega.privacy.android.shared.original.core.ui.preview.CombinedThemePreviews
-import mega.privacy.android.shared.original.core.ui.theme.OriginalTempTheme
+import mega.privacy.android.shared.original.core.ui.theme.OriginalTheme
 import kotlin.random.Random
 
 
@@ -113,7 +113,7 @@ internal class MeetingsActionButtonsView : AbstractComposeView {
 
     @Composable
     override fun Content() {
-        OriginalTempTheme(
+        OriginalTheme(
             isDark = (isSystemInDarkTheme().not() && backgroundTintAlpha < 0.2F) || isSystemInDarkTheme()
         ) {
             MeetingsActionButtons(
@@ -358,7 +358,7 @@ fun MeetingsActionButtons(
 private fun MeetingBottomFloatingPanelPreview(
     @PreviewParameter(BooleanProvider::class) showMicWarning: Boolean,
 ) {
-    OriginalTempTheme(isDark = isSystemInDarkTheme()) {
+    OriginalTheme(isDark = isSystemInDarkTheme()) {
         MeetingsActionButtons(
             modifier = Modifier.padding(vertical = 8.dp),
             onMicClicked = {},

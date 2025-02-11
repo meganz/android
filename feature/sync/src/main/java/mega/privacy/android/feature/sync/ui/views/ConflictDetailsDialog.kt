@@ -8,7 +8,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 import mega.privacy.android.shared.original.core.ui.controls.text.MegaText
-import mega.privacy.android.shared.original.core.ui.theme.OriginalTempTheme
+import mega.privacy.android.shared.original.core.ui.theme.OriginalTheme
 import mega.privacy.android.shared.original.core.ui.preview.CombinedThemePreviews
 import mega.android.core.ui.theme.values.TextColor
 
@@ -36,7 +36,7 @@ internal fun ConflictDetailsDialog(
 @Composable
 @CombinedThemePreviews
 internal fun PreviewConflictDetailsDialog() {
-    OriginalTempTheme(isDark = isSystemInDarkTheme()) {
+    OriginalTheme(isDark = isSystemInDarkTheme()) {
         ConflictDetailsDialog(
             conflictName = "Conflict A",
             explanation = "This folders contain multiple names on one side, that would all become the" +

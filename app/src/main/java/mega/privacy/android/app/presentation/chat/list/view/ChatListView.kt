@@ -59,7 +59,7 @@ import mega.privacy.android.shared.original.core.ui.model.SpanIndicator
 import mega.privacy.android.shared.original.core.ui.preview.BooleanProvider
 import mega.privacy.android.shared.original.core.ui.preview.CombinedThemePreviews
 import mega.privacy.android.shared.original.core.ui.preview.CombinedThemeTabletLandscapePreviews
-import mega.privacy.android.shared.original.core.ui.theme.OriginalTempTheme
+import mega.privacy.android.shared.original.core.ui.theme.OriginalTheme
 import mega.android.core.ui.theme.values.TextColor
 import mega.privacy.mobile.analytics.event.InviteFriendsLearnMorePressedEvent
 
@@ -394,7 +394,7 @@ private fun EmptyView(
 private fun PreviewMeetingEmptyView(
     @PreviewParameter(BooleanProvider::class) isMeeting: Boolean,
 ) {
-    OriginalTempTheme(isDark = isSystemInDarkTheme()) {
+    OriginalTheme(isDark = isSystemInDarkTheme()) {
         ChatListView(
             items = emptyList(),
             selectedIds = emptyList(),

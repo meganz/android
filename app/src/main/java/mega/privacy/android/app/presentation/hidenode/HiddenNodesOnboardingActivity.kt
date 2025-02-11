@@ -15,7 +15,7 @@ import mega.privacy.android.app.presentation.extensions.isDarkMode
 import mega.privacy.android.app.upgradeAccount.UpgradeAccountActivity
 import mega.privacy.android.domain.entity.ThemeMode
 import mega.privacy.android.domain.usecase.GetThemeMode
-import mega.privacy.android.shared.original.core.ui.theme.OriginalTempTheme
+import mega.privacy.android.shared.original.core.ui.theme.OriginalTheme
 import mega.privacy.mobile.analytics.event.HiddenNodeOnboardingCloseButtonPressedEvent
 import mega.privacy.mobile.analytics.event.HiddenNodeOnboardingContinueButtonPressedEvent
 import mega.privacy.mobile.analytics.event.HiddenNodeUpgradeCloseButtonPressedEvent
@@ -40,7 +40,7 @@ class HiddenNodesOnboardingActivity : AppCompatActivity() {
 
         setContent {
             val themeMode by getThemeMode().collectAsState(initial = ThemeMode.System)
-            OriginalTempTheme(isDark = themeMode.isDarkMode()) {
+            OriginalTheme(isDark = themeMode.isDarkMode()) {
                 HiddenNodesOnboardingScreen(
                     isOnboarding = isOnboarding,
                     onClickBack = ::finish,

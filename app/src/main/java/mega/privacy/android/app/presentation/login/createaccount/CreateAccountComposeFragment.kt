@@ -22,7 +22,7 @@ import mega.privacy.android.app.utils.Constants.TERMS_OF_SERVICE_URL
 import mega.privacy.android.domain.entity.ThemeMode
 import mega.privacy.android.domain.entity.login.EphemeralCredentials
 import mega.privacy.android.domain.usecase.GetThemeMode
-import mega.privacy.android.shared.original.core.ui.theme.OriginalTempTheme
+import mega.privacy.android.shared.original.core.ui.theme.OriginalTheme
 import timber.log.Timber
 import javax.inject.Inject
 
@@ -47,7 +47,7 @@ class CreateAccountComposeFragment : Fragment() {
         savedInstanceState: Bundle?,
     ) = content {
         val themeMode by getThemeMode().collectAsStateWithLifecycle(initialValue = ThemeMode.System)
-        OriginalTempTheme(isDark = themeMode.isDarkMode()) {
+        OriginalTheme(isDark = themeMode.isDarkMode()) {
             CreateAccountRoute(
                 onNavigateToLogin = ::navigateToLogin,
                 openTermsAndServiceLink = { openLink(TERMS_OF_SERVICE_URL) },

@@ -30,7 +30,7 @@ import androidx.compose.ui.platform.LocalConfiguration
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import mega.privacy.android.shared.original.core.ui.preview.CombinedThemePreviews
-import mega.privacy.android.shared.original.core.ui.theme.OriginalTempTheme
+import mega.privacy.android.shared.original.core.ui.theme.OriginalTheme
 import mega.privacy.android.shared.original.core.ui.utils.shimmerEffect
 
 @Composable
@@ -282,7 +282,7 @@ private fun Modifier.shimmerEffectSquare(): Modifier {
 @CombinedThemePreviews
 @Composable
 private fun PhotosSkeletonViewPreview() {
-    OriginalTempTheme(isDark = isSystemInDarkTheme()) {
+    OriginalTheme(isDark = isSystemInDarkTheme()) {
         PhotosSkeletonView()
     }
 }
@@ -290,7 +290,7 @@ private fun PhotosSkeletonViewPreview() {
 @CombinedThemePreviews
 @Composable
 private fun AlbumListSkeletonViewPreview() {
-    OriginalTempTheme(isDark = isSystemInDarkTheme()) {
+    OriginalTheme(isDark = isSystemInDarkTheme()) {
         AlbumListSkeletonView()
     }
 }
@@ -298,7 +298,7 @@ private fun AlbumListSkeletonViewPreview() {
 @CombinedThemePreviews
 @Composable
 private fun AlbumContentSkeletonViewPreview() {
-    OriginalTempTheme(isDark = isSystemInDarkTheme()) {
+    OriginalTheme(isDark = isSystemInDarkTheme()) {
         val configuration = LocalConfiguration.current
         val smallWidth = remember(configuration) {
             (configuration.screenWidthDp.dp - 1.dp) / 3
@@ -310,7 +310,7 @@ private fun AlbumContentSkeletonViewPreview() {
 @CombinedThemePreviews
 @Composable
 private fun AlbumBig2SmallSkeletonViewPreview() {
-    OriginalTempTheme(isDark = isSystemInDarkTheme()) {
+    OriginalTheme(isDark = isSystemInDarkTheme()) {
         val configuration = LocalConfiguration.current
         val smallWidth = remember(configuration) {
             (configuration.screenWidthDp.dp - 1.dp) / 3
@@ -322,7 +322,7 @@ private fun AlbumBig2SmallSkeletonViewPreview() {
 @CombinedThemePreviews
 @Composable
 private fun AlbumSmall3ItemSkeletonViewPreview() {
-    OriginalTempTheme(isDark = isSystemInDarkTheme()) {
+    OriginalTheme(isDark = isSystemInDarkTheme()) {
         val configuration = LocalConfiguration.current
         val smallWidth = remember(configuration) {
             (configuration.screenWidthDp.dp - 1.dp) / 3
@@ -335,7 +335,7 @@ private fun AlbumSmall3ItemSkeletonViewPreview() {
 @CombinedThemePreviews
 @Composable
 private fun AlbumSmall2BigSkeletonViewPreview() {
-    OriginalTempTheme(isDark = isSystemInDarkTheme()) {
+    OriginalTheme(isDark = isSystemInDarkTheme()) {
         val configuration = LocalConfiguration.current
         val smallWidth = remember(configuration) {
             (configuration.screenWidthDp.dp - 1.dp) / 3

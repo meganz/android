@@ -5,7 +5,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.tooling.preview.Preview
 import mega.privacy.android.app.R
-import mega.privacy.android.shared.original.core.ui.theme.OriginalTempTheme
+import mega.privacy.android.shared.original.core.ui.theme.OriginalTheme
 import mega.privacy.android.shared.original.core.ui.controls.dialogs.ConfirmationDialog
 
 /**
@@ -56,7 +56,7 @@ fun CancelScheduledMeetingDialog(
 @Preview
 @Composable
 fun PreviewEmptyHistoryCancelScheduledMeetingDialog() {
-    OriginalTempTheme(isDark = isSystemInDarkTheme()) {
+    OriginalTheme(isDark = isSystemInDarkTheme()) {
         CancelScheduledMeetingDialog(
             isChatHistoryEmpty = true,
             isRecurringMeeting = false,
@@ -73,7 +73,7 @@ fun PreviewEmptyHistoryCancelScheduledMeetingDialog() {
 @Preview
 @Composable
 fun PreviewNoEmptyHistoryCancelScheduledMeetingDialog() {
-    OriginalTempTheme(isDark = isSystemInDarkTheme()) {
+    OriginalTheme(isDark = isSystemInDarkTheme()) {
         CancelScheduledMeetingDialog(
             isChatHistoryEmpty = false,
             isRecurringMeeting = false,
@@ -90,7 +90,7 @@ fun PreviewNoEmptyHistoryCancelScheduledMeetingDialog() {
 @Preview
 @Composable
 fun PreviewEmptyHistoryCancelRecurringScheduledMeetingDialog() {
-    OriginalTempTheme(isDark = isSystemInDarkTheme()) {
+    OriginalTheme(isDark = isSystemInDarkTheme()) {
         CancelScheduledMeetingDialog(
             isChatHistoryEmpty = true,
             isRecurringMeeting = true,
@@ -107,7 +107,7 @@ fun PreviewEmptyHistoryCancelRecurringScheduledMeetingDialog() {
 @Preview
 @Composable
 fun PreviewNoEmptyHistoryCancelRecurringScheduledMeetingDialog() {
-    OriginalTempTheme(isDark = isSystemInDarkTheme()) {
+    OriginalTheme(isDark = isSystemInDarkTheme()) {
         CancelScheduledMeetingDialog(
             isChatHistoryEmpty = false,
             isRecurringMeeting = true,

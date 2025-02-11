@@ -18,7 +18,7 @@ import mega.privacy.android.shared.original.core.ui.controls.chat.messages.First
 import mega.privacy.android.shared.original.core.ui.controls.chat.messages.FirstMessageHeaderTitle
 import mega.privacy.android.shared.original.core.ui.preview.CombinedThemePreviews
 import mega.privacy.android.domain.entity.chat.ChatScheduledMeeting
-import mega.privacy.android.shared.original.core.ui.theme.OriginalTempTheme
+import mega.privacy.android.shared.original.core.ui.theme.OriginalTheme
 
 @Composable
 internal fun FirstMessageHeader(
@@ -71,7 +71,7 @@ internal fun FirstMessageHeader(
 @CombinedThemePreviews
 @Composable
 private fun FirstMessageHeaderPreview() {
-    OriginalTempTheme(isDark = isSystemInDarkTheme()) {
+    OriginalTheme(isDark = isSystemInDarkTheme()) {
         FirstMessageHeader(
             scheduledMeeting = null,
             title = "My name"

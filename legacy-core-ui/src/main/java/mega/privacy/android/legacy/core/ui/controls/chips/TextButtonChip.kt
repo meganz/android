@@ -22,7 +22,7 @@ import mega.privacy.android.legacy.core.ui.customTextSelectionColors
 import mega.privacy.android.shared.original.core.ui.preview.CombinedThemePreviews
 import mega.privacy.android.shared.original.core.ui.preview.TextFieldProvider
 import mega.privacy.android.shared.original.core.ui.preview.TextFieldState
-import mega.privacy.android.shared.original.core.ui.theme.OriginalTempTheme
+import mega.privacy.android.shared.original.core.ui.theme.OriginalTheme
 import mega.privacy.android.shared.original.core.ui.theme.extensions.textColorSecondary
 
 /**
@@ -95,7 +95,7 @@ private fun colorsUnChecked() = ButtonDefaults.buttonColors(
 private fun PreviewTextButtonChip(
     @PreviewParameter(TextFieldProvider::class) state: TextFieldState,
 ) {
-    OriginalTempTheme(isDark = isSystemInDarkTheme()) {
+    OriginalTheme(isDark = isSystemInDarkTheme()) {
         TextButtonChip(
             onClick = { },
             text = "M",

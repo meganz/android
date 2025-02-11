@@ -71,7 +71,7 @@ import mega.privacy.android.domain.entity.ThemeMode
 import mega.privacy.android.domain.entity.chat.ChatParticipant
 import mega.privacy.android.domain.usecase.GetThemeMode
 import mega.privacy.android.navigation.MegaNavigator
-import mega.privacy.android.shared.original.core.ui.theme.OriginalTempTheme
+import mega.privacy.android.shared.original.core.ui.theme.OriginalTheme
 import mega.privacy.mobile.analytics.event.MeetingInfoAddParticipantButtonTappedEvent
 import mega.privacy.mobile.analytics.event.MeetingInfoLeaveMeetingButtonTappedEvent
 import mega.privacy.mobile.analytics.event.ScheduledMeetingEditMenuToolbarEvent
@@ -548,7 +548,7 @@ class ScheduledMeetingInfoActivity : PasscodeActivity(), SnackbarShower {
             }
         }
 
-        OriginalTempTheme(isDark = isDark) {
+        OriginalTheme(isDark = isDark) {
             MeetingLinkBottomSheet(
                 modalSheetState = modalSheetState,
                 coroutineScope = coroutineScope,

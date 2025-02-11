@@ -36,7 +36,7 @@ import androidx.core.content.withStyledAttributes
 import mega.privacy.android.core.R
 import mega.privacy.android.shared.original.core.ui.preview.BooleanProvider
 import mega.privacy.android.shared.original.core.ui.preview.CombinedThemePreviews
-import mega.privacy.android.shared.original.core.ui.theme.OriginalTempTheme
+import mega.privacy.android.shared.original.core.ui.theme.OriginalTheme
 
 /**
  * A custom wrapper view for the `MegaChip` composable, extending `AbstractComposeView`.
@@ -138,7 +138,7 @@ class MegaChip : AbstractComposeView {
 
     @Composable
     override fun Content() {
-        OriginalTempTheme(isDark = isSystemInDarkTheme()) {
+        OriginalTheme(isDark = isSystemInDarkTheme()) {
             MegaChip(
                 selected = selected,
                 text = text,
@@ -253,7 +253,7 @@ fun MegaChip(
 private fun ChipPreview(
     @PreviewParameter(BooleanProvider::class) selected: Boolean,
 ) {
-    OriginalTempTheme(isDark = isSystemInDarkTheme()) {
+    OriginalTheme(isDark = isSystemInDarkTheme()) {
         MegaChip(
             selected = selected,
             text = "Type",
@@ -266,7 +266,7 @@ private fun ChipPreview(
 private fun ChipPreviewWithLeadAndTrail(
     @PreviewParameter(BooleanProvider::class) selected: Boolean,
 ) {
-    OriginalTempTheme(isDark = isSystemInDarkTheme()) {
+    OriginalTheme(isDark = isSystemInDarkTheme()) {
         MegaChip(
             selected = selected,
             text = "Type",
@@ -290,7 +290,7 @@ private class ChipStyleProvider : PreviewParameterProvider<Pair<ChipStyle, Strin
 private fun ChipPreviewWithStyles(
     @PreviewParameter(ChipStyleProvider::class) chipStyleAndName: Pair<ChipStyle, String>,
 ) {
-    OriginalTempTheme(isDark = isSystemInDarkTheme()) {
+    OriginalTheme(isDark = isSystemInDarkTheme()) {
         var selected = remember { mutableStateOf(true) }
         MegaChip(
             selected = selected.value,

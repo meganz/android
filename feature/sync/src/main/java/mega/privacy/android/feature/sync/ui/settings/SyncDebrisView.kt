@@ -9,7 +9,7 @@ import androidx.compose.ui.res.stringResource
 import mega.privacy.android.core.formatter.formatFileSize
 import mega.privacy.android.shared.original.core.ui.controls.lists.GenericTwoLineListItem
 import mega.privacy.android.shared.original.core.ui.preview.CombinedThemePreviews
-import mega.privacy.android.shared.original.core.ui.theme.OriginalTempTheme
+import mega.privacy.android.shared.original.core.ui.theme.OriginalTheme
 import mega.privacy.android.shared.resources.R
 
 @Composable
@@ -30,7 +30,7 @@ internal fun SyncDebrisView(
 @Composable
 @CombinedThemePreviews
 private fun SyncOptionsViewPreview() {
-    OriginalTempTheme(isDark = isSystemInDarkTheme()) {
+    OriginalTheme(isDark = isSystemInDarkTheme()) {
         SyncDebrisView(
             size = 1024 * 1024 * 1024,
             clearDebrisClicked = {},

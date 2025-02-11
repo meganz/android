@@ -10,7 +10,7 @@ import androidx.compose.ui.viewinterop.AndroidViewBinding
 import androidx.media3.ui.PlayerView
 import mega.privacy.android.app.databinding.SimpleAudioPlayerBinding
 import mega.privacy.android.shared.original.core.ui.preview.CombinedThemePreviews
-import mega.privacy.android.shared.original.core.ui.theme.OriginalTempTheme
+import mega.privacy.android.shared.original.core.ui.theme.OriginalTheme
 
 /**
  * Simple audio player view for showing the audio player in the audio queue
@@ -37,7 +37,7 @@ fun SimpleAudioPlayerView(
 @CombinedThemePreviews
 @Composable
 private fun SimpleAudioPlayerViewPreview() {
-    OriginalTempTheme(isDark = isSystemInDarkTheme()) {
+    OriginalTheme(isDark = isSystemInDarkTheme()) {
         SimpleAudioPlayerView(
             setupAudioPlayer = {}
         )

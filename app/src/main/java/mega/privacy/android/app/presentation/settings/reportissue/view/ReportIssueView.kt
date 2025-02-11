@@ -16,7 +16,7 @@ import androidx.compose.ui.tooling.preview.Preview
 import mega.privacy.android.app.R
 import mega.privacy.android.app.presentation.settings.reportissue.model.ReportIssueUiState
 import mega.privacy.android.shared.original.core.ui.controls.dialogs.ProgressDialog
-import mega.privacy.android.shared.original.core.ui.theme.OriginalTempTheme
+import mega.privacy.android.shared.original.core.ui.theme.OriginalTheme
 
 /**
  * Report issue view from settings screen
@@ -69,7 +69,7 @@ private fun ProgressHandler(
 @Composable
 fun PreviewReportIssueView() {
     var checkedState by remember { mutableStateOf(false) }
-    OriginalTempTheme(isDark = isSystemInDarkTheme()) {
+    OriginalTheme(isDark = isSystemInDarkTheme()) {
         Scaffold {
             ReportIssueView(
                 uiState = ReportIssueUiState(

@@ -22,7 +22,7 @@ import mega.privacy.android.app.presentation.meeting.ScheduledMeetingManagementV
 import mega.privacy.android.app.presentation.meeting.model.ShareLinkOption
 import mega.privacy.android.domain.entity.ThemeMode
 import mega.privacy.android.domain.usecase.GetThemeMode
-import mega.privacy.android.shared.original.core.ui.theme.OriginalTempTheme
+import mega.privacy.android.shared.original.core.ui.theme.OriginalTheme
 import javax.inject.Inject
 
 /**
@@ -60,7 +60,7 @@ class MeetingShareLinkBottomSheetFragment : BottomSheetDialogFragment() {
     ): View = ComposeView(requireContext()).apply {
         setContent {
             val mode by getThemeMode().collectAsStateWithLifecycle(initialValue = ThemeMode.System)
-            OriginalTempTheme(isDark = mode.isDarkMode()) {
+            OriginalTheme(isDark = mode.isDarkMode()) {
                 MeetingLinkView(
                     modifier = Modifier.verticalScroll(rememberScrollState()),
                     onSendLinkToChat = {

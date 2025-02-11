@@ -10,7 +10,7 @@ import mega.privacy.android.shared.original.core.ui.controls.chat.attachpanel.Ce
 import mega.privacy.android.shared.original.core.ui.controls.chat.attachpanel.CellButtonType
 import mega.privacy.android.shared.original.core.ui.preview.BooleanProvider
 import mega.privacy.android.shared.original.core.ui.preview.CombinedThemePreviews
-import mega.privacy.android.shared.original.core.ui.theme.OriginalTempTheme
+import mega.privacy.android.shared.original.core.ui.theme.OriginalTheme
 
 /**
  * OnOffFab is a FloatingActionButton that can be toggled on and off.
@@ -50,7 +50,7 @@ fun OnOffFab(
 private fun OnOffFabPreviewOff(
     @PreviewParameter(BooleanProvider::class) value: Boolean,
 ) {
-    OriginalTempTheme(isDark = isSystemInDarkTheme()) {
+    OriginalTheme(isDark = isSystemInDarkTheme()) {
         OnOffFab(
             itemName = "Mic",
             isOn = true,

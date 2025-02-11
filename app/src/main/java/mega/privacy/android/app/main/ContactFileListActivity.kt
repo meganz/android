@@ -96,7 +96,7 @@ import mega.privacy.android.domain.qualifier.ApplicationScope
 import mega.privacy.android.domain.usecase.GetThemeMode
 import mega.privacy.android.domain.usecase.file.CheckFileNameCollisionsUseCase
 import mega.privacy.android.domain.usecase.node.GetNodeByHandleUseCase
-import mega.privacy.android.shared.original.core.ui.theme.OriginalTempTheme
+import mega.privacy.android.shared.original.core.ui.theme.OriginalTheme
 import mega.privacy.mobile.analytics.event.DocumentScanInitiatedEvent
 import nz.mega.sdk.MegaApiJava
 import nz.mega.sdk.MegaApiJava.INVALID_HANDLE
@@ -458,7 +458,7 @@ internal class ContactFileListActivity : PasscodeActivity(), MegaGlobalListenerI
                 val isDark = themeMode.isDarkMode()
                 val state by viewModel.state.collectAsStateWithLifecycle()
 
-                OriginalTempTheme(isDark = isDark) {
+                OriginalTheme(isDark = isDark) {
                     DocumentScanningErrorDialog(
                         documentScanningError = state.documentScanningError,
                         onErrorAcknowledged = { viewModel.onDocumentScanningErrorConsumed() },

@@ -25,7 +25,7 @@ import mega.android.core.ui.theme.values.TextColor
 import mega.privacy.android.domain.entity.ChatRoomPermission
 import mega.privacy.android.domain.entity.chat.ChatMessageStatus
 import mega.privacy.android.domain.entity.chat.messages.management.PermissionChangeMessage
-import mega.privacy.android.shared.original.core.ui.theme.OriginalTempTheme
+import mega.privacy.android.shared.original.core.ui.theme.OriginalTheme
 
 /**
  * Permission change message view
@@ -128,7 +128,7 @@ fun PermissionChangeMessageView(
 private fun PermissionChangeMessageViewPreview(
     @PreviewParameter(ChatRoomPermissionProvider::class) permission: ChatRoomPermission,
 ) {
-    OriginalTempTheme(isDark = isSystemInDarkTheme()) {
+    OriginalTheme(isDark = isSystemInDarkTheme()) {
         PermissionChangeMessageView(
             message = PermissionChangeMessage(
                 chatId = 1L,

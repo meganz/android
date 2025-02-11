@@ -25,7 +25,7 @@ import mega.privacy.android.app.camera.setting.cameraSettingModal
 import mega.privacy.android.app.camera.setting.navigateCameraSettingModal
 import mega.privacy.android.app.presentation.extensions.parcelable
 import mega.privacy.android.app.presentation.meeting.chat.view.showPermissionNotAllowedSnackbar
-import mega.privacy.android.shared.original.core.ui.theme.OriginalTempTheme
+import mega.privacy.android.shared.original.core.ui.theme.OriginalTheme
 
 @AndroidEntryPoint
 internal class CameraActivity : AppCompatActivity() {
@@ -46,7 +46,7 @@ internal class CameraActivity : AppCompatActivity() {
             val coroutineScope = rememberCoroutineScope()
 
             // force dark theme for camera
-            OriginalTempTheme(isDark = true) {
+            OriginalTheme(isDark = true) {
                 NavHost(
                     navController = navController,
                     startDestination = CAMERA_CAPTURE_ROUTE,

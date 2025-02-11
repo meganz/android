@@ -40,7 +40,7 @@ import mega.privacy.android.shared.original.core.ui.controls.textfields.customTe
 import mega.privacy.android.shared.original.core.ui.preview.BooleanProvider
 import mega.privacy.android.shared.original.core.ui.preview.CombinedThemePreviews
 import mega.privacy.android.shared.original.core.ui.theme.MegaOriginalTheme
-import mega.privacy.android.shared.original.core.ui.theme.OriginalTempTheme
+import mega.privacy.android.shared.original.core.ui.theme.OriginalTheme
 
 internal const val CHAT_TEXT_FIELD_TEXT_TAG = "chat_text_field"
 internal const val CHAT_TEXT_FIELD_EMOJI_ICON = "chat_text_field:emoji_icon"
@@ -159,7 +159,7 @@ fun ChatTextField(
 private fun ChatTextFieldPreview(
     @PreviewParameter(BooleanProvider::class) isEmojiPickerShown: Boolean,
 ) {
-    OriginalTempTheme(isDark = isSystemInDarkTheme()) {
+    OriginalTheme(isDark = isSystemInDarkTheme()) {
         ChatTextField(
             textFieldValue = TextFieldValue("how it looks like when the text is too long"),
             placeholder = "Message",

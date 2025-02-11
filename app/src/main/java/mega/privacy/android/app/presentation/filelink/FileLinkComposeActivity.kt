@@ -55,7 +55,7 @@ import mega.privacy.android.domain.entity.node.TypedFileNode
 import mega.privacy.android.domain.usecase.GetThemeMode
 import mega.privacy.android.domain.usecase.featureflag.GetFeatureFlagValueUseCase
 import mega.privacy.android.navigation.MegaNavigator
-import mega.privacy.android.shared.original.core.ui.theme.OriginalTempTheme
+import mega.privacy.android.shared.original.core.ui.theme.OriginalTheme
 import nz.mega.sdk.MegaApiJava.INVALID_HANDLE
 import timber.log.Timber
 import javax.inject.Inject
@@ -147,7 +147,7 @@ class FileLinkComposeActivity : PasscodeActivity(),
             )
 
             val snackBarHostState = remember { SnackbarHostState() }
-            OriginalTempTheme(isDark = themeMode.isDarkMode()) {
+            OriginalTheme(isDark = themeMode.isDarkMode()) {
                 FileLinkView(
                     viewState = uiState,
                     snackBarHostState = snackBarHostState,

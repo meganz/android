@@ -75,7 +75,7 @@ import mega.privacy.android.shared.original.core.ui.controls.buttons.TextMegaBut
 import mega.privacy.android.shared.original.core.ui.controls.layouts.MegaScaffold
 import mega.privacy.android.shared.original.core.ui.controls.widgets.TransfersWidgetViewAnimated
 import mega.privacy.android.shared.original.core.ui.preview.CombinedThemePreviews
-import mega.privacy.android.shared.original.core.ui.theme.OriginalTempTheme
+import mega.privacy.android.shared.original.core.ui.theme.OriginalTheme
 import mega.privacy.android.shared.original.core.ui.theme.extensions.accent_900_accent_050
 import mega.privacy.android.shared.original.core.ui.theme.extensions.grey_020_grey_700
 import mega.privacy.android.shared.original.core.ui.utils.showAutoDurationSnackbar
@@ -486,7 +486,7 @@ internal fun EmptyFolderLinkView(
 @CombinedThemePreviews
 @Composable
 private fun FolderLinkTopAppBarPreview() {
-    OriginalTempTheme(isDark = isSystemInDarkTheme()) {
+    OriginalTheme(isDark = isSystemInDarkTheme()) {
         FolderLinkTopAppBar(
             title = "Folder Name",
             elevation = false,
@@ -500,7 +500,7 @@ private fun FolderLinkTopAppBarPreview() {
 @CombinedThemePreviews
 @Composable
 private fun EmptyFolderLinkViewPreview() {
-    OriginalTempTheme(isDark = isSystemInDarkTheme()) {
+    OriginalTheme(isDark = isSystemInDarkTheme()) {
         MegaScaffold(
             bottomBar = {
                 ImportDownloadView(
@@ -529,7 +529,7 @@ private fun EmptyFolderLinkViewPreview() {
 @CombinedThemePreviews
 @Composable
 private fun FolderLinkSelectedTopAppBarPreview() {
-    OriginalTempTheme(isDark = isSystemInDarkTheme()) {
+    OriginalTheme(isDark = isSystemInDarkTheme()) {
         FolderLinkSelectedTopAppBar(
             title = "Folder Name",
             elevation = false,
@@ -544,7 +544,7 @@ private fun FolderLinkSelectedTopAppBarPreview() {
 @CombinedThemePreviews
 @Composable
 private fun ImportDownloadViewPreview() {
-    OriginalTempTheme(isDark = isSystemInDarkTheme()) {
+    OriginalTheme(isDark = isSystemInDarkTheme()) {
         ImportDownloadView(
             modifier = Modifier
                 .fillMaxWidth()

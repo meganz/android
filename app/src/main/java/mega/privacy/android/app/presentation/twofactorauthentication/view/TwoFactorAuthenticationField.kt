@@ -52,7 +52,7 @@ import de.palm.composestateevents.consumed
 import de.palm.composestateevents.triggered
 import mega.privacy.android.app.presentation.twofactorauthentication.extensions.getTwoFactorAuthentication
 import mega.privacy.android.app.presentation.twofactorauthentication.extensions.getUpdatedTwoFactorAuthentication
-import mega.privacy.android.shared.original.core.ui.theme.OriginalTempTheme
+import mega.privacy.android.shared.original.core.ui.theme.OriginalTheme
 import mega.privacy.android.shared.original.core.ui.preview.CombinedThemePreviews
 import mega.privacy.android.shared.original.core.ui.theme.extensions.body2medium
 import mega.privacy.android.shared.original.core.ui.theme.extensions.grey_alpha_012_white_alpha_038
@@ -289,7 +289,7 @@ private fun PinTwoFactorAuthentication(
 private fun PreviewTwoFactorAuthenticationField() {
     var twoFAPin by remember { mutableStateOf(listOf("", "", "", "", "", "")) }
     var isError by remember { mutableStateOf(false) }
-    OriginalTempTheme(isDark = isSystemInDarkTheme()) {
+    OriginalTheme(isDark = isSystemInDarkTheme()) {
         TwoFactorAuthenticationField(
             twoFAPin = twoFAPin,
             on2FAPinChanged = { pin, index ->

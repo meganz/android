@@ -26,7 +26,7 @@ import mega.privacy.android.feature.devicecenter.ui.model.icon.DeviceCenterUINod
 import mega.privacy.android.feature.devicecenter.ui.model.icon.DeviceIconType
 import mega.privacy.android.feature.devicecenter.ui.model.status.DeviceCenterUINodeStatus
 import mega.privacy.android.legacy.core.ui.controls.lists.MenuActionNodeHeaderWithBody
-import mega.privacy.android.shared.original.core.ui.theme.OriginalTempTheme
+import mega.privacy.android.shared.original.core.ui.theme.OriginalTheme
 
 /**
  * Test Tags for the Device Bottom Sheet
@@ -161,7 +161,7 @@ private fun getNodeIconColor(uiNodeIcon: DeviceCenterUINodeIcon) =
 private fun DeviceBottomSheetBodyPreview(
     @PreviewParameter(DeviceBottomSheetBodyPreviewProvider::class) device: DeviceUINode,
 ) {
-    OriginalTempTheme(isDark = isSystemInDarkTheme()) {
+    OriginalTheme(isDark = isSystemInDarkTheme()) {
         DeviceBottomSheetBody(
             device = device,
             isCameraUploadsEnabled = true,

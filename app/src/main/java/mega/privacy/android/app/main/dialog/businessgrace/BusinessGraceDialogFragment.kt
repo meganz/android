@@ -33,7 +33,7 @@ import dagger.hilt.android.AndroidEntryPoint
 import mega.privacy.android.app.R
 import mega.privacy.android.app.globalmanagement.MyAccountInfo
 import mega.privacy.android.app.presentation.extensions.isDarkMode
-import mega.privacy.android.shared.original.core.ui.theme.OriginalTempTheme
+import mega.privacy.android.shared.original.core.ui.theme.OriginalTheme
 import mega.privacy.android.shared.original.core.ui.controls.buttons.TextMegaButton
 import mega.privacy.android.domain.entity.ThemeMode
 import mega.privacy.android.domain.usecase.GetThemeMode
@@ -59,7 +59,7 @@ internal class BusinessGraceDialogFragment : DialogFragment() {
             setContent {
                 val themeMode by getThemeMode()
                     .collectAsStateWithLifecycle(initialValue = ThemeMode.System)
-                OriginalTempTheme(isDark = themeMode.isDarkMode()) {
+                OriginalTheme(isDark = themeMode.isDarkMode()) {
                     BusinessGraceView(onDismissRequest = {
                         myAccountInfo.isBusinessAlertShown = false
                         dismissAllowingStateLoss()
@@ -125,7 +125,7 @@ private fun BusinessGraceView(modifier: Modifier = Modifier, onDismissRequest: (
 @Preview(uiMode = Configuration.UI_MODE_NIGHT_YES, name = "HorizontalButtonDialog")
 @Composable
 private fun BusinessGraceViewViewPreview() {
-    OriginalTempTheme(isDark = isSystemInDarkTheme()) {
+    OriginalTheme(isDark = isSystemInDarkTheme()) {
         BusinessGraceView(
             onDismissRequest = { },
         )

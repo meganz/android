@@ -44,7 +44,7 @@ import mega.privacy.android.shared.original.core.ui.controls.layouts.MegaScaffol
 import mega.privacy.android.shared.original.core.ui.preview.BooleanProvider
 import mega.privacy.android.shared.original.core.ui.preview.CombinedThemePreviews
 import mega.privacy.android.shared.original.core.ui.theme.MegaOriginalTheme
-import mega.privacy.android.shared.original.core.ui.theme.OriginalTempTheme
+import mega.privacy.android.shared.original.core.ui.theme.OriginalTheme
 
 /**
  * MegaMultiFloatingActionButton
@@ -226,7 +226,7 @@ class MultiFloatingActionButtonItem(
 private fun MegaMultiFloatingActionButtonCollapsedPreview(
     @PreviewParameter(BooleanProvider::class) enabled: Boolean,
 ) {
-    OriginalTempTheme(isDark = isSystemInDarkTheme()) {
+    OriginalTheme(isDark = isSystemInDarkTheme()) {
         val multiFabState = rememberMultiFloatingActionButtonState()
         MegaScaffold(
             topBar = { MegaAppBar(appBarType = AppBarType.NONE, title = "Top bar title") },
@@ -263,7 +263,7 @@ private fun MegaMultiFloatingActionButtonCollapsedPreview(
 private fun MegaMultiFloatingActionButtonExpandedPreview(
     @PreviewParameter(BooleanProvider::class) enabled: Boolean,
 ) {
-    OriginalTempTheme(isDark = isSystemInDarkTheme()) {
+    OriginalTheme(isDark = isSystemInDarkTheme()) {
         val multiFabState =
             rememberMultiFloatingActionButtonState(MultiFloatingActionButtonState.EXPANDED)
         MegaScaffold(

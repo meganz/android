@@ -7,7 +7,7 @@ import androidx.compose.ui.res.stringResource
 import mega.privacy.android.app.R
 import mega.privacy.android.shared.original.core.ui.controls.dialogs.MegaAlertDialog
 import mega.privacy.android.shared.original.core.ui.preview.CombinedThemePreviews
-import mega.privacy.android.shared.original.core.ui.theme.OriginalTempTheme
+import mega.privacy.android.shared.original.core.ui.theme.OriginalTheme
 
 @Composable
 internal fun CanNotOpenFileDialog(
@@ -27,7 +27,7 @@ internal fun CanNotOpenFileDialog(
 @CombinedThemePreviews
 @Composable
 private fun CanNotOpenFileDialogPreview() {
-    OriginalTempTheme(isDark = isSystemInDarkTheme()) {
+    OriginalTheme(isDark = isSystemInDarkTheme()) {
         CanNotOpenFileDialog({}, {})
     }
 }

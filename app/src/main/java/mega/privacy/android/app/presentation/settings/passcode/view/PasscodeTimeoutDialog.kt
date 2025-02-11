@@ -20,7 +20,7 @@ import mega.privacy.android.app.presentation.settings.passcode.model.PasscodeTim
 import mega.privacy.android.app.presentation.settings.passcode.model.TimeoutOption
 import mega.privacy.android.shared.original.core.ui.controls.dialogs.ConfirmationDialogWithRadioButtons
 import mega.privacy.android.shared.original.core.ui.preview.CombinedThemePreviews
-import mega.privacy.android.shared.original.core.ui.theme.OriginalTempTheme
+import mega.privacy.android.shared.original.core.ui.theme.OriginalTheme
 
 @OptIn(ExperimentalComposeUiApi::class)
 @Composable
@@ -47,7 +47,7 @@ internal fun PasscodeTimeoutDialog(
 @CombinedThemePreviews
 @Composable
 private fun PasscodeTimeoutDialogPreview() {
-    OriginalTempTheme(isDark = isSystemInDarkTheme()) {
+    OriginalTheme(isDark = isSystemInDarkTheme()) {
         var state by remember {
             mutableStateOf(
                 PasscodeTimeoutUIState(

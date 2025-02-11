@@ -25,7 +25,7 @@ import mega.privacy.android.app.utils.Constants.IMPORT_ONLY_OPTION
 import mega.privacy.android.core.ui.mapper.FileTypeIconMapper
 import mega.privacy.android.domain.entity.ThemeMode
 import mega.privacy.android.domain.usecase.GetThemeMode
-import mega.privacy.android.shared.original.core.ui.theme.OriginalTempTheme
+import mega.privacy.android.shared.original.core.ui.theme.OriginalTheme
 import javax.inject.Inject
 
 @AndroidEntryPoint
@@ -54,7 +54,7 @@ internal class NodeAttachmentBottomSheetDialogFragment : BottomSheetDialogFragme
                     .collectAsStateWithLifecycle(initialValue = ThemeMode.System)
                 val uiState by viewModel.uiState.collectAsStateWithLifecycle()
 
-                OriginalTempTheme(isDark = themeMode.isDarkMode()) {
+                OriginalTheme(isDark = themeMode.isDarkMode()) {
                     NodeAttachmentBottomSheetContent(
                         uiState = uiState,
                         fileTypeIconMapper = fileTypeIconMapper,

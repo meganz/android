@@ -24,7 +24,7 @@ eclipse-jgit = "6.6.0.202305301015-r"
 json = "20240303"
 mega-telephoto = "1.0.0"
 telephoto = "0.14.0"
-mega-core-ui = "2.84.20250210185300-SNAPSHOT"
+mega-core-ui = "2.91.20250210195930"
 kotlinx-collections-immutable = "0.3.7"
 commonmark-java = "0.24.0"
 

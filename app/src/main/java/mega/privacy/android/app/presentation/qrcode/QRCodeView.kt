@@ -91,7 +91,7 @@ import mega.privacy.android.shared.original.core.ui.controls.buttons.RaisedDefau
 import mega.privacy.android.shared.original.core.ui.controls.dialogs.ConfirmationDialog
 import mega.privacy.android.shared.original.core.ui.controls.snackbars.MegaSnackbar
 import mega.privacy.android.shared.original.core.ui.preview.CombinedThemePreviews
-import mega.privacy.android.shared.original.core.ui.theme.OriginalTempTheme
+import mega.privacy.android.shared.original.core.ui.theme.OriginalTheme
 import mega.privacy.android.shared.original.core.ui.theme.extensions.grey_alpha_038_white_alpha_038
 import mega.privacy.android.shared.original.core.ui.theme.extensions.grey_alpha_087_white_alpha_087
 import mega.privacy.android.shared.original.core.ui.theme.extensions.accent_900_accent_050
@@ -672,7 +672,7 @@ private fun finishActivity(activity: Activity?) {
 @CombinedThemePreviews
 @Composable
 private fun PreviewQRCodeView() {
-    OriginalTempTheme(isDark = isSystemInDarkTheme()) {
+    OriginalTheme(isDark = isSystemInDarkTheme()) {
         val avatarContent = TextAvatarContent(
             avatarText = "A",
             backgroundColor = colorResource(id = R.color.red_300_red_200).toArgb(),
@@ -720,7 +720,7 @@ private fun PreviewQRCodeView() {
 @CombinedThemePreviews
 @Composable
 private fun PreviewInviteContactDialog() {
-    OriginalTempTheme(isDark = isSystemInDarkTheme()) {
+    OriginalTheme(isDark = isSystemInDarkTheme()) {
         val result = ScannedContactLinkResult(
             contactName = "Abc",
             email = "abc@gmail.com",
@@ -747,7 +747,7 @@ private fun PreviewInviteContactDialog() {
 @CombinedThemePreviews
 @Composable
 private fun PreviewInviteResultDialog() {
-    OriginalTempTheme(isDark = isSystemInDarkTheme()) {
+    OriginalTheme(isDark = isSystemInDarkTheme()) {
         InviteResultDialog(
             title = "Title",
             text = "Message content text",

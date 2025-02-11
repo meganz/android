@@ -59,7 +59,7 @@ import mega.privacy.android.legacy.core.ui.controls.appbar.SimpleTopAppBar
 import mega.privacy.android.shared.original.core.ui.controls.buttons.RaisedDefaultMegaButton
 import mega.privacy.android.shared.original.core.ui.controls.text.MegaText
 import mega.privacy.android.shared.original.core.ui.preview.CombinedThemePreviews
-import mega.privacy.android.shared.original.core.ui.theme.OriginalTempTheme
+import mega.privacy.android.shared.original.core.ui.theme.OriginalTheme
 import mega.privacy.android.shared.original.core.ui.theme.grey_alpha_012
 import mega.android.core.ui.theme.values.TextColor
 import mega.privacy.android.shared.original.core.ui.theme.white_alpha_012
@@ -340,7 +340,7 @@ private fun EmptyContactsView(onInviteContactsClicked: () -> Unit) {
 @CombinedThemePreviews
 @Composable
 private fun PreviewActionButton() {
-    OriginalTempTheme(isDark = isSystemInDarkTheme()) {
+    OriginalTheme(isDark = isSystemInDarkTheme()) {
         ActionButton(action = StartConversationAction.NewGroup, onButtonClicked = {})
     }
 }
@@ -348,7 +348,7 @@ private fun PreviewActionButton() {
 @CombinedThemePreviews
 @Composable
 private fun PreviewInviteContactsButton() {
-    OriginalTempTheme(isDark = isSystemInDarkTheme()) {
+    OriginalTheme(isDark = isSystemInDarkTheme()) {
         InviteContactsButton(onInviteContactsClicked = {})
     }
 }
@@ -356,7 +356,7 @@ private fun PreviewInviteContactsButton() {
 @CombinedThemePreviews
 @Composable
 private fun PreviewHeaderItem() {
-    OriginalTempTheme(isDark = isSystemInDarkTheme()) {
+    OriginalTheme(isDark = isSystemInDarkTheme()) {
         HeaderItem(text = "A")
     }
 }
@@ -364,7 +364,7 @@ private fun PreviewHeaderItem() {
 @CombinedThemePreviews
 @Composable
 private fun PreviewStartConversationView() {
-    OriginalTempTheme(isDark = isSystemInDarkTheme()) {
+    OriginalTheme(isDark = isSystemInDarkTheme()) {
         StartConversationView(
             state = StartConversationState(),
             onButtonClicked = {},
@@ -382,7 +382,7 @@ private fun PreviewStartConversationView() {
 @CombinedThemePreviews
 @Composable
 private fun PreviewEmptyContactsView() {
-    OriginalTempTheme(isDark = isSystemInDarkTheme()) {
+    OriginalTheme(isDark = isSystemInDarkTheme()) {
         EmptyContactsView(onInviteContactsClicked = {})
     }
 }

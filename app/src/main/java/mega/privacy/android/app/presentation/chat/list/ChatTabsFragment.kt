@@ -64,7 +64,7 @@ import mega.privacy.android.domain.entity.chat.ChatRoomItem
 import mega.privacy.android.domain.entity.chat.ChatStatus
 import mega.privacy.android.domain.usecase.GetThemeMode
 import mega.privacy.android.navigation.MegaNavigator
-import mega.privacy.android.shared.original.core.ui.theme.OriginalTempTheme
+import mega.privacy.android.shared.original.core.ui.theme.OriginalTheme
 import mega.privacy.mobile.analytics.event.ChatScreenEvent
 import mega.privacy.mobile.analytics.event.ChatTabFABPressedEvent
 import mega.privacy.mobile.analytics.event.ChatsTabEvent
@@ -235,7 +235,7 @@ class ChatTabsFragment : Fragment() {
                         }
                     }
                 }
-                OriginalTempTheme(isDark = mode.isDarkMode()) {
+                OriginalTheme(isDark = mode.isDarkMode()) {
                     ChatTabsView(
                         state = chatsTabState,
                         managementState = managementState,

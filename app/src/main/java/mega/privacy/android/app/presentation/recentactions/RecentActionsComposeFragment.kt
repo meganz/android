@@ -48,7 +48,7 @@ import mega.privacy.android.domain.entity.ThemeMode
 import mega.privacy.android.domain.entity.node.TypedFileNode
 import mega.privacy.android.domain.usecase.GetThemeMode
 import mega.privacy.android.navigation.MegaNavigator
-import mega.privacy.android.shared.original.core.ui.theme.OriginalTempTheme
+import mega.privacy.android.shared.original.core.ui.theme.OriginalTheme
 import mega.privacy.android.shared.original.core.ui.utils.showAutoDurationSnackbar
 import javax.inject.Inject
 
@@ -106,7 +106,7 @@ class RecentActionsComposeFragment : Fragment() {
                     mutableStateOf(null)
                 }
 
-                OriginalTempTheme(isDark = themeMode.isDarkMode()) {
+                OriginalTheme(isDark = themeMode.isDarkMode()) {
                     Surface(
                         modifier = Modifier.nestedScroll(rememberNestedScrollInteropConnection()),
                         color = backgroundColor

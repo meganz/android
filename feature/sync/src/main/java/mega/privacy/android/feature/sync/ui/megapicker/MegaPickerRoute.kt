@@ -17,7 +17,7 @@ import mega.privacy.android.shared.resources.R as sharedResR
 import androidx.compose.foundation.isSystemInDarkTheme
 import mega.privacy.android.analytics.Analytics
 import mega.privacy.android.shared.original.core.ui.preview.CombinedThemePreviews
-import mega.privacy.android.shared.original.core.ui.theme.OriginalTempTheme
+import mega.privacy.android.shared.original.core.ui.theme.OriginalTheme
 import mega.privacy.mobile.analytics.event.AndroidSyncAllFilesAccessDialogConfirmButtonPressedEvent
 import mega.privacy.mobile.analytics.event.AndroidSyncAllFilesAccessDialogDismissButtonPressedEvent
 import mega.privacy.mobile.analytics.event.AndroidSyncAllFilesAccessDialogDisplayedEvent
@@ -163,7 +163,7 @@ private fun DisableBatteryOptimizationDialog(
 @CombinedThemePreviews
 @Composable
 private fun AllFilesAccessDialogPreview() {
-    OriginalTempTheme(isDark = isSystemInDarkTheme()) {
+    OriginalTheme(isDark = isSystemInDarkTheme()) {
         AllFilesAccessDialog(
             onConfirm = {},
             onDismiss = {},
@@ -174,7 +174,7 @@ private fun AllFilesAccessDialogPreview() {
 @CombinedThemePreviews
 @Composable
 private fun DisableBatteryOptimizationDialogPreview() {
-    OriginalTempTheme(isDark = isSystemInDarkTheme()) {
+    OriginalTheme(isDark = isSystemInDarkTheme()) {
         DisableBatteryOptimizationDialog(
             onConfirm = {},
             onDismiss = {},

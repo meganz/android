@@ -28,7 +28,7 @@ import mega.privacy.android.domain.entity.StorageState
 import mega.privacy.android.domain.entity.ThemeMode
 import mega.privacy.android.domain.usecase.GetThemeMode
 import mega.privacy.android.navigation.MegaNavigator
-import mega.privacy.android.shared.original.core.ui.theme.OriginalTempTheme
+import mega.privacy.android.shared.original.core.ui.theme.OriginalTheme
 import mega.privacy.android.shared.original.core.ui.utils.showAutoDurationSnackbar
 import javax.inject.Inject
 
@@ -69,7 +69,7 @@ class TrackInfoFragment : Fragment() {
                 val mode by getThemeMode()
                     .collectAsStateWithLifecycle(initialValue = ThemeMode.System)
                 val snackbarHostState = remember { SnackbarHostState() }
-                OriginalTempTheme(isDark = mode.isDarkMode()) {
+                OriginalTheme(isDark = mode.isDarkMode()) {
                     AudioTrackInfoView(
                         uiState = uiState,
                         metadata = metadata,

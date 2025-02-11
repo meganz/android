@@ -24,7 +24,7 @@ import mega.privacy.android.app.presentation.node.dialogs.renamenode.RenameNodeD
 import mega.privacy.android.app.presentation.node.dialogs.renamenode.RenameNodeDialogAction.OnRenameValidationPassed
 import mega.privacy.android.legacy.core.ui.controls.dialogs.InputDialog
 import mega.privacy.android.shared.original.core.ui.preview.CombinedThemePreviews
-import mega.privacy.android.shared.original.core.ui.theme.OriginalTempTheme
+import mega.privacy.android.shared.original.core.ui.theme.OriginalTheme
 
 internal const val RENAME_NODE_DIALOG_TAG = "rename_node_dialog:input_dialog"
 internal const val NODE_NAME_INVALID_CHARACTERS = "\" * / : < > ? \\ |"
@@ -89,7 +89,7 @@ private fun RenameNodeDialogBody(
 ) {
     var initialInput by rememberSaveable { mutableStateOf(nodeName) }
 
-    OriginalTempTheme(isDark = isSystemInDarkTheme()) {
+    OriginalTheme(isDark = isSystemInDarkTheme()) {
         InputDialog(
             modifier = Modifier.testTag(RENAME_NODE_DIALOG_TAG),
             title = stringResource(id = R.string.context_rename),
@@ -115,7 +115,7 @@ private fun RenameNodeDialogBody(
 private fun PreviewRenameDeviceDialogBody(
     @PreviewParameter(RenameNodeDialogBodyPreviewProvider::class) renameDialogState: RenameNodeDialogState,
 ) {
-    OriginalTempTheme(isDark = isSystemInDarkTheme()) {
+    OriginalTheme(isDark = isSystemInDarkTheme()) {
         RenameNodeDialogBody(
             nodeName = renameDialogState.nodeName ?: "",
             errorMessage = renameDialogState.errorMessage,

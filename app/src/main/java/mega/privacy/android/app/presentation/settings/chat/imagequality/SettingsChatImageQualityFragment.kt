@@ -12,7 +12,7 @@ import androidx.fragment.app.viewModels
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import dagger.hilt.android.AndroidEntryPoint
 import mega.privacy.android.app.presentation.extensions.isDarkMode
-import mega.privacy.android.shared.original.core.ui.theme.OriginalTempTheme
+import mega.privacy.android.shared.original.core.ui.theme.OriginalTheme
 import mega.privacy.android.domain.entity.ThemeMode
 import mega.privacy.android.domain.usecase.GetThemeMode
 import javax.inject.Inject
@@ -36,7 +36,7 @@ class SettingsChatImageQualityFragment : Fragment() {
         setContent {
             val themeMode by getThemeMode()
                 .collectAsStateWithLifecycle(initialValue = ThemeMode.System)
-            OriginalTempTheme(isDark = themeMode.isDarkMode()) {
+            OriginalTheme(isDark = themeMode.isDarkMode()) {
                 ChatImageQualitySettingBody()
             }
         }

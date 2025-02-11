@@ -31,7 +31,7 @@ import mega.privacy.android.shared.original.core.ui.controls.text.MegaText
 import mega.privacy.android.shared.original.core.ui.preview.CombinedThemePreviews
 import mega.privacy.android.shared.original.core.ui.preview.CombinedThemeTabletLandscapePreviews
 import mega.privacy.android.shared.original.core.ui.preview.CombinedThemeTabletPortraitPreviews
-import mega.privacy.android.shared.original.core.ui.theme.OriginalTempTheme
+import mega.privacy.android.shared.original.core.ui.theme.OriginalTheme
 import mega.privacy.android.shared.original.core.ui.theme.extensions.h6Medium
 import mega.privacy.android.shared.original.core.ui.theme.extensions.subtitle1medium
 import mega.android.core.ui.theme.values.TextColor
@@ -297,7 +297,7 @@ internal fun CancelAccountPlanView(
 @CombinedThemeTabletLandscapePreviews
 @CombinedThemeTabletPortraitPreviews
 private fun CancelAccountPlanViewPreview() {
-    OriginalTempTheme(isDark = isSystemInDarkTheme()) {
+    OriginalTheme(isDark = isSystemInDarkTheme()) {
         CancelAccountPlanView(
             uiState = CancelAccountPlanUiState(
                 accountNameRes = SharedR.string.general_pro_only_label,

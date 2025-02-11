@@ -25,7 +25,7 @@ import mega.privacy.android.domain.entity.RecentActionsSharesType
 import mega.privacy.android.domain.entity.node.TypedFileNode
 import mega.privacy.android.shared.original.core.ui.controls.lists.RecentActionListViewItem
 import mega.privacy.android.shared.original.core.ui.preview.CombinedThemePreviews
-import mega.privacy.android.shared.original.core.ui.theme.OriginalTempTheme
+import mega.privacy.android.shared.original.core.ui.theme.OriginalTheme
 
 
 /**
@@ -103,7 +103,7 @@ fun RecentActionsListView(
 private fun RecentActionListViewPreview(
     @PreviewParameter(SampleRecentActionDataProvider::class) items: List<RecentActionBucketUiEntity>,
 ) {
-    OriginalTempTheme(isDark = isSystemInDarkTheme()) {
+    OriginalTheme(isDark = isSystemInDarkTheme()) {
         RecentActionsListView(
             groupedRecentActions = items.groupBy { it.date },
             shouldApplySensitiveMode = false,

@@ -29,7 +29,7 @@ import mega.privacy.android.core.R
 import mega.privacy.android.shared.original.core.ui.controls.text.MegaText
 import mega.privacy.android.shared.original.core.ui.preview.BooleanProvider
 import mega.privacy.android.shared.original.core.ui.preview.CombinedThemePreviews
-import mega.privacy.android.shared.original.core.ui.theme.OriginalTempTheme
+import mega.privacy.android.shared.original.core.ui.theme.OriginalTheme
 import mega.privacy.android.shared.original.core.ui.theme.extensions.body4
 import mega.android.core.ui.theme.values.TextColor
 
@@ -131,7 +131,7 @@ fun FileMessageView(
 @CombinedThemePreviews
 @Composable
 private fun FileNoPreviewMessageNotMineViewPreview() {
-    OriginalTempTheme(isDark = isSystemInDarkTheme()) {
+    OriginalTheme(isDark = isSystemInDarkTheme()) {
         val context = LocalContext.current
         val resourceId = R.drawable.ic_check_circle
         //this uri will be loaded if the preview is running on the device
@@ -161,7 +161,7 @@ private fun FileNoPreviewMessageNotMineViewPreview() {
 private fun FileNoPreviewMessageViewPreview(
     @PreviewParameter(BooleanProvider::class) isUploadPaused: Boolean,
 ) {
-    OriginalTempTheme(isDark = isSystemInDarkTheme()) {
+    OriginalTheme(isDark = isSystemInDarkTheme()) {
         val context = LocalContext.current
         val resourceId = R.drawable.ic_check_circle
         //this uri will be loaded if the preview is running on the device

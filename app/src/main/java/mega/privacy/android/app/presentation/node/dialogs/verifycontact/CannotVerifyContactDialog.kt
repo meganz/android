@@ -5,7 +5,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.res.stringResource
 import mega.privacy.android.app.R
 import mega.privacy.android.shared.original.core.ui.controls.dialogs.ConfirmationDialog
-import mega.privacy.android.shared.original.core.ui.theme.OriginalTempTheme
+import mega.privacy.android.shared.original.core.ui.theme.OriginalTheme
 
 /**
  * Dialog to show when the user tries to verify a contact that is not in the contact list
@@ -15,7 +15,7 @@ import mega.privacy.android.shared.original.core.ui.theme.OriginalTempTheme
  */
 @Composable
 fun CannotVerifyContactDialog(email: String?, onDismiss: () -> Unit) {
-    OriginalTempTheme(isDark = isSystemInDarkTheme()) {
+    OriginalTheme(isDark = isSystemInDarkTheme()) {
         ConfirmationDialog(
             title = stringResource(id = R.string.shared_items_contact_not_in_contact_list_dialog_title),
             text = stringResource(id = R.string.shared_items_contact_not_in_contact_list_dialog_content)

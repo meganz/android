@@ -17,7 +17,7 @@ import mega.privacy.android.shared.original.core.ui.model.MegaSpanStyle
 import mega.privacy.android.shared.original.core.ui.model.MegaSpanStyleWithAnnotation
 import mega.privacy.android.shared.original.core.ui.model.SpanIndicator
 import mega.privacy.android.shared.original.core.ui.preview.CombinedThemePreviews
-import mega.privacy.android.shared.original.core.ui.theme.OriginalTempTheme
+import mega.privacy.android.shared.original.core.ui.theme.OriginalTheme
 import mega.android.core.ui.theme.values.TextColor
 import mega.privacy.android.shared.resources.R
 
@@ -91,7 +91,7 @@ internal fun NotEnoughSpaceForUploadDialog(
 @CombinedThemePreviews
 @Composable
 private fun NotEnoughSpaceForUploadDialogPreview() {
-    OriginalTempTheme(isDark = isSystemInDarkTheme()) {
+    OriginalTheme(isDark = isSystemInDarkTheme()) {
         NotEnoughSpaceForUploadDialog(onCancel = {})
     }
 }

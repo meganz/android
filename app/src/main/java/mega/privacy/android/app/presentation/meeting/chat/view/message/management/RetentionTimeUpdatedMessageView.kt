@@ -22,7 +22,7 @@ import mega.privacy.android.shared.original.core.ui.model.SpanIndicator
 import mega.privacy.android.shared.original.core.ui.preview.CombinedThemePreviews
 import mega.android.core.ui.theme.values.TextColor
 import mega.privacy.android.domain.entity.chat.messages.management.RetentionTimeUpdatedMessage
-import mega.privacy.android.shared.original.core.ui.theme.OriginalTempTheme
+import mega.privacy.android.shared.original.core.ui.theme.OriginalTheme
 
 /**
  * Retention time updated message view
@@ -134,7 +134,7 @@ internal fun getRetentionTimeString(context: Context, timeInSeconds: Long) = whe
 private fun RetentionTimeUpdatedMessagePreview(
     @PreviewParameter(RetentionTimeProvider::class) retentionTime: Long,
 ) {
-    OriginalTempTheme(isDark = isSystemInDarkTheme()) {
+    OriginalTheme(isDark = isSystemInDarkTheme()) {
         RetentionTimeUpdatedMessageView(
             ownerActionFullName = "Owner",
             newRetentionTime = retentionTime,

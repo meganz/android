@@ -38,7 +38,7 @@ import mega.privacy.android.shared.original.core.ui.controls.buttons.RaisedDefau
 import mega.privacy.android.shared.original.core.ui.controls.dialogs.FullScreenDialog
 import mega.privacy.android.shared.original.core.ui.controls.text.MegaText
 import mega.privacy.android.shared.original.core.ui.preview.CombinedThemePreviews
-import mega.privacy.android.shared.original.core.ui.theme.OriginalTempTheme
+import mega.privacy.android.shared.original.core.ui.theme.OriginalTheme
 import mega.android.core.ui.theme.values.TextColor
 import mega.privacy.mobile.analytics.event.AdFreeDialogScreenEvent
 import mega.privacy.mobile.analytics.event.AdFreeDialogScreenSkipButtonPressedEvent
@@ -197,7 +197,7 @@ internal fun AdsFreeIntroContent(
 @CombinedThemePreviews
 @Composable
 private fun AddFreeIntroViewPreview() {
-    OriginalTempTheme(isSystemInDarkTheme()) {
+    OriginalTheme(isSystemInDarkTheme()) {
         AdsFreeIntroContent(uiState = AdsFreeIntroUiState()) {}
     }
 }

@@ -14,7 +14,7 @@ import mega.privacy.android.shared.original.core.ui.controls.dividers.MegaDivide
 import mega.privacy.android.shared.original.core.ui.controls.lists.GenericTwoLineListItem
 import mega.privacy.android.shared.original.core.ui.preview.BooleanProvider
 import mega.privacy.android.shared.original.core.ui.preview.CombinedThemePreviews
-import mega.privacy.android.shared.original.core.ui.theme.OriginalTempTheme
+import mega.privacy.android.shared.original.core.ui.theme.OriginalTheme
 
 /**
  * A [Composable] that displays a [MegaSwitch] to enable or disable Camera Uploads
@@ -59,7 +59,7 @@ internal fun CameraUploadsTile(
 private fun CameraUploadsTilePreview(
     @PreviewParameter(BooleanProvider::class) isChecked: Boolean,
 ) {
-    OriginalTempTheme(isDark = isSystemInDarkTheme()) {
+    OriginalTheme(isDark = isSystemInDarkTheme()) {
         CameraUploadsTile(
             isChecked = isChecked,
             onCheckedChange = {},

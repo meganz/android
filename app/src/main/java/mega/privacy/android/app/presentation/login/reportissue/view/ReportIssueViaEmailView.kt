@@ -18,7 +18,7 @@ import mega.privacy.android.app.presentation.settings.reportissue.view.ReportIss
 import mega.privacy.android.shared.original.core.ui.controls.appbar.AppBarType
 import mega.privacy.android.shared.original.core.ui.controls.appbar.MegaAppBar
 import mega.privacy.android.shared.original.core.ui.preview.CombinedThemePreviews
-import mega.privacy.android.shared.original.core.ui.theme.OriginalTempTheme
+import mega.privacy.android.shared.original.core.ui.theme.OriginalTheme
 
 /**
  * Report issue via email view
@@ -80,7 +80,7 @@ fun ReportIssueViaEmailView(
 @CombinedThemePreviews
 @Composable
 private fun ConfirmEmailScreenPreview() {
-    OriginalTempTheme(isDark = isSystemInDarkTheme()) {
+    OriginalTheme(isDark = isSystemInDarkTheme()) {
         ReportIssueViaEmailView(
             uiState = ReportIssueViaEmailUiState(),
             onDescriptionChanged = {},
@@ -95,7 +95,7 @@ private fun ConfirmEmailScreenPreview() {
 @CombinedThemePreviews
 @Composable
 private fun ConfirmEmailScreenWithErrorPreview() {
-    OriginalTempTheme(isDark = isSystemInDarkTheme()) {
+    OriginalTheme(isDark = isSystemInDarkTheme()) {
         ReportIssueViaEmailView(
             uiState = ReportIssueViaEmailUiState(
                 error = sharedR.string.report_issue_error_minimum_characters

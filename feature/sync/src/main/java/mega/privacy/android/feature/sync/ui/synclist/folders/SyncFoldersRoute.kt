@@ -21,7 +21,7 @@ import mega.privacy.android.feature.sync.ui.synclist.folders.SyncFoldersAction.R
 import mega.privacy.android.feature.sync.ui.synclist.folders.SyncFoldersAction.SnackBarShown
 import mega.privacy.android.shared.original.core.ui.controls.dialogs.ConfirmationDialog
 import mega.privacy.android.shared.original.core.ui.preview.CombinedThemePreviews
-import mega.privacy.android.shared.original.core.ui.theme.OriginalTempTheme
+import mega.privacy.android.shared.original.core.ui.theme.OriginalTheme
 import mega.privacy.android.shared.original.core.ui.utils.showAutoDurationSnackbar
 
 @Composable
@@ -132,7 +132,7 @@ internal fun StopSyncConfirmDialog(
 @CombinedThemePreviews
 @Composable
 private fun RemoveSyncFolderConfirmDialogPreview() {
-    OriginalTempTheme(isDark = isSystemInDarkTheme()) {
+    OriginalTheme(isDark = isSystemInDarkTheme()) {
         StopSyncConfirmDialog(
             onConfirm = {},
             onDismiss = {},

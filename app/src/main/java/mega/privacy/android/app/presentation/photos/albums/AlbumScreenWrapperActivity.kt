@@ -40,7 +40,7 @@ import mega.privacy.android.domain.entity.photos.AlbumId
 import mega.privacy.android.domain.entity.photos.AlbumLink
 import mega.privacy.android.domain.usecase.GetThemeMode
 import mega.privacy.android.navigation.MegaNavigator
-import mega.privacy.android.shared.original.core.ui.theme.OriginalTempTheme
+import mega.privacy.android.shared.original.core.ui.theme.OriginalTheme
 import javax.inject.Inject
 
 @AndroidEntryPoint
@@ -81,7 +81,7 @@ class AlbumScreenWrapperActivity : BaseActivity() {
 
         setContent {
             val themeMode by getThemeMode().collectAsState(initial = ThemeMode.System)
-            OriginalTempTheme(isDark = themeMode.isDarkMode()) {
+            OriginalTheme(isDark = themeMode.isDarkMode()) {
                 PasscodeContainer(
                     passcodeCryptObjectFactory = passcodeCryptObjectFactory,
                     content = { PsaContainer { AlbumScreenContent() } }

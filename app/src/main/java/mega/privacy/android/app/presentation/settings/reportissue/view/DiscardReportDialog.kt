@@ -14,7 +14,7 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.window.DialogProperties
 import mega.privacy.android.app.R
 import mega.privacy.android.legacy.core.ui.controls.dialogs.MegaDialog
-import mega.privacy.android.shared.original.core.ui.theme.OriginalTempTheme
+import mega.privacy.android.shared.original.core.ui.theme.OriginalTheme
 
 @Composable
 fun DiscardReportDialog(
@@ -65,7 +65,7 @@ fun DiscardReportDialog(
 )
 @Composable
 fun PreviewDiscardReportDialog() {
-    OriginalTempTheme(isDark = isSystemInDarkTheme()) {
+    OriginalTheme(isDark = isSystemInDarkTheme()) {
         DiscardReportDialog(onDiscardCancelled = {},
             onDiscard = {})
     }

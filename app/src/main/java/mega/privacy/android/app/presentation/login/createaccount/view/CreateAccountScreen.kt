@@ -79,7 +79,7 @@ import mega.privacy.android.shared.original.core.ui.controls.textfields.Password
 import mega.privacy.android.shared.original.core.ui.model.MegaSpanStyle
 import mega.privacy.android.shared.original.core.ui.model.SpanIndicator
 import mega.privacy.android.shared.original.core.ui.preview.CombinedThemePreviews
-import mega.privacy.android.shared.original.core.ui.theme.OriginalTempTheme
+import mega.privacy.android.shared.original.core.ui.theme.OriginalTheme
 import mega.android.core.ui.theme.values.TextColor
 import mega.privacy.android.shared.original.core.ui.utils.showAutoDurationSnackbar
 
@@ -653,7 +653,7 @@ private fun CreateAccountInProgressView(
 @CombinedThemePreviews
 @Composable
 private fun CreateAccountScreenLandingPreview() {
-    OriginalTempTheme(isDark = isSystemInDarkTheme()) {
+    OriginalTheme(isDark = isSystemInDarkTheme()) {
         CreateAccountScreen(
             uiState = CreateAccountUIState(passwordStrength = PasswordStrength.INVALID),
             onFirstNameInputChanged = {},
@@ -678,7 +678,7 @@ private fun CreateAccountScreenLandingPreview() {
 @CombinedThemePreviews
 @Composable
 private fun CreateAccountScreenErrorPreview() {
-    OriginalTempTheme(isDark = isSystemInDarkTheme()) {
+    OriginalTheme(isDark = isSystemInDarkTheme()) {
         CreateAccountScreen(
             uiState = CreateAccountUIState(
                 isFirstNameValid = false,
@@ -709,7 +709,7 @@ private fun CreateAccountScreenErrorPreview() {
 @CombinedThemePreviews
 @Composable
 private fun CreateAccountScreenVeryWeakPasswordPreview() {
-    OriginalTempTheme(isDark = isSystemInDarkTheme()) {
+    OriginalTheme(isDark = isSystemInDarkTheme()) {
         CreateAccountScreen(
             uiState = CreateAccountUIState(passwordStrength = PasswordStrength.VERY_WEAK),
             onFirstNameInputChanged = {},
@@ -734,7 +734,7 @@ private fun CreateAccountScreenVeryWeakPasswordPreview() {
 @CombinedThemePreviews
 @Composable
 private fun CreateAccountScreenWeakPasswordPreview() {
-    OriginalTempTheme(isDark = isSystemInDarkTheme()) {
+    OriginalTheme(isDark = isSystemInDarkTheme()) {
         CreateAccountScreen(
             uiState = CreateAccountUIState(passwordStrength = PasswordStrength.WEAK),
             onFirstNameInputChanged = {},
@@ -759,7 +759,7 @@ private fun CreateAccountScreenWeakPasswordPreview() {
 @CombinedThemePreviews
 @Composable
 private fun CreateAccountScreenMediumPasswordPreview() {
-    OriginalTempTheme(isDark = isSystemInDarkTheme()) {
+    OriginalTheme(isDark = isSystemInDarkTheme()) {
         CreateAccountScreen(
             uiState = CreateAccountUIState(passwordStrength = PasswordStrength.MEDIUM),
             onFirstNameInputChanged = {},
@@ -784,7 +784,7 @@ private fun CreateAccountScreenMediumPasswordPreview() {
 @CombinedThemePreviews
 @Composable
 private fun CreateAccountScreenGoodPasswordPreview() {
-    OriginalTempTheme(isDark = isSystemInDarkTheme()) {
+    OriginalTheme(isDark = isSystemInDarkTheme()) {
         CreateAccountScreen(
             uiState = CreateAccountUIState(passwordStrength = PasswordStrength.GOOD),
             onFirstNameInputChanged = {},
@@ -810,7 +810,7 @@ private fun CreateAccountScreenGoodPasswordPreview() {
 @CombinedThemePreviews
 @Composable
 private fun CreateAccountScreenStrongPasswordPreview() {
-    OriginalTempTheme(isDark = isSystemInDarkTheme()) {
+    OriginalTheme(isDark = isSystemInDarkTheme()) {
         CreateAccountScreen(
             uiState = CreateAccountUIState(passwordStrength = PasswordStrength.STRONG),
             onFirstNameInputChanged = {},
@@ -835,7 +835,7 @@ private fun CreateAccountScreenStrongPasswordPreview() {
 @CombinedThemePreviews
 @Composable
 private fun CreateAccountScreenNoNetworkPreview() {
-    OriginalTempTheme(isDark = isSystemInDarkTheme()) {
+    OriginalTheme(isDark = isSystemInDarkTheme()) {
         CreateAccountScreen(
             uiState = CreateAccountUIState(
                 isConnected = false,
@@ -863,7 +863,7 @@ private fun CreateAccountScreenNoNetworkPreview() {
 @CombinedThemePreviews
 @Composable
 private fun CreateAccountScreenInProgressPreview() {
-    OriginalTempTheme(isDark = isSystemInDarkTheme()) {
+    OriginalTheme(isDark = isSystemInDarkTheme()) {
         CreateAccountScreen(
             uiState = CreateAccountUIState(
                 isAccountCreationInProgress = true

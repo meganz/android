@@ -13,7 +13,7 @@ import mega.privacy.android.shared.original.core.ui.model.MenuActionWithClick
 import mega.privacy.android.shared.original.core.ui.model.MenuActionWithoutIcon
 import mega.privacy.android.shared.original.core.ui.preview.CombinedThemePreviews
 import mega.privacy.android.shared.original.core.ui.theme.MegaOriginalTheme
-import mega.privacy.android.shared.original.core.ui.theme.OriginalTempTheme
+import mega.privacy.android.shared.original.core.ui.theme.OriginalTheme
 
 @Composable
 fun SelectModeAppBar(
@@ -68,7 +68,7 @@ fun SelectModeAppBar(
 @CombinedThemePreviews
 @Composable
 private fun SelectModeAppBarPreview() {
-    OriginalTempTheme(isDark = isSystemInDarkTheme()) {
+    OriginalTheme(isDark = isSystemInDarkTheme()) {
         SelectModeAppBar(
             title = "App bar title",
             actions = getSampleToolbarActions()

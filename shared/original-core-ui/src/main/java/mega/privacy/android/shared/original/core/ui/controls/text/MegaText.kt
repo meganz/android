@@ -20,7 +20,7 @@ import androidx.compose.ui.unit.dp
 import mega.android.core.ui.theme.values.TextColor
 import mega.privacy.android.shared.original.core.ui.preview.CombinedThemeComponentPreviews
 import mega.privacy.android.shared.original.core.ui.theme.MegaOriginalTheme
-import mega.privacy.android.shared.original.core.ui.theme.OriginalTempTheme
+import mega.privacy.android.shared.original.core.ui.theme.OriginalTheme
 
 /**
  * Mega text.
@@ -126,7 +126,7 @@ private fun LongTextBehaviour.getTextOverflow() = when (this) {
 private fun PreviewMiddleEllipsisText(
     @PreviewParameter(MiddleEllipsisTextPreviewProvider::class) text: String,
 ) {
-    OriginalTempTheme(isDark = isSystemInDarkTheme()) {
+    OriginalTheme(isDark = isSystemInDarkTheme()) {
         MegaText(
             text = text,
             textColor = TextColor.Primary,
@@ -138,7 +138,7 @@ private fun PreviewMiddleEllipsisText(
 @CombinedThemeComponentPreviews
 @Composable
 private fun MarqueeTextPreview() {
-    OriginalTempTheme(isDark = isSystemInDarkTheme()) {
+    OriginalTheme(isDark = isSystemInDarkTheme()) {
         MegaText(
             text = "Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua",
             textColor = TextColor.Secondary,
@@ -152,7 +152,7 @@ private fun MarqueeTextPreview() {
 private fun MegaTextPreview(
     @PreviewParameter(TextColorProvider::class) textColor: TextColor,
 ) {
-    OriginalTempTheme(isDark = isSystemInDarkTheme()) {
+    OriginalTheme(isDark = isSystemInDarkTheme()) {
         MegaText(
             text = textColor.name,
             textColor = textColor,

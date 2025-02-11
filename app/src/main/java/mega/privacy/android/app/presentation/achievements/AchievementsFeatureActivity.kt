@@ -14,7 +14,7 @@ import mega.privacy.android.app.listeners.GetAchievementsListener
 import mega.privacy.android.app.presentation.extensions.isDarkMode
 import mega.privacy.android.domain.entity.ThemeMode
 import mega.privacy.android.domain.usecase.GetThemeMode
-import mega.privacy.android.shared.original.core.ui.theme.OriginalTempTheme
+import mega.privacy.android.shared.original.core.ui.theme.OriginalTheme
 import timber.log.Timber
 import javax.inject.Inject
 
@@ -57,7 +57,7 @@ class AchievementsFeatureActivity : PasscodeActivity() {
             /**
              * AndroidTheme will be removed once the AchievementsActivity is removed in the future
              */
-            OriginalTempTheme(isDark = themeMode.isDarkMode()) {
+            OriginalTheme(isDark = themeMode.isDarkMode()) {
                 AchievementsFeatureScreen(viewModel)
             }
         }

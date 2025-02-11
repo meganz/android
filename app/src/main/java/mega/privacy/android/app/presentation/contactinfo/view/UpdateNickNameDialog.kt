@@ -10,7 +10,7 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.tooling.preview.Preview
 import mega.privacy.android.app.R
 import mega.privacy.android.legacy.core.ui.controls.dialogs.InputDialog
-import mega.privacy.android.shared.original.core.ui.theme.OriginalTempTheme
+import mega.privacy.android.shared.original.core.ui.theme.OriginalTheme
 
 @Composable
 internal fun UpdateNickNameDialog(
@@ -43,7 +43,7 @@ internal const val UPDATE_NICKNAME_DIALOG_TAG = "update_nickname:input_dialog"
 @Composable
 private fun PreviewVerticalButtonDialogView() {
 
-    OriginalTempTheme(isDark = isSystemInDarkTheme()) {
+    OriginalTheme(isDark = isSystemInDarkTheme()) {
         UpdateNickNameDialog(
             hasAlias = true,
             nickName = "Jack",

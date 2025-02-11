@@ -56,7 +56,7 @@ import mega.privacy.android.shared.original.core.ui.model.MenuActionWithoutIcon
 import mega.privacy.android.shared.original.core.ui.preview.BooleanProvider
 import mega.privacy.android.shared.original.core.ui.preview.CombinedThemePreviews
 import mega.privacy.android.shared.original.core.ui.theme.MegaOriginalTheme
-import mega.privacy.android.shared.original.core.ui.theme.OriginalTempTheme
+import mega.privacy.android.shared.original.core.ui.theme.OriginalTheme
 
 /**
  * ScaffoldWithCollapsibleHeader
@@ -350,7 +350,7 @@ private fun Color.surfaceColorAtElevation(
 private fun ScaffoldWithCollapsibleHeaderPreview(
     @PreviewParameter(BooleanProvider::class) hasHeaderBelowAppbar: Boolean,
 ) {
-    OriginalTempTheme(isDark = isSystemInDarkTheme()) {
+    OriginalTheme(isDark = isSystemInDarkTheme()) {
         val title = "Title very long that can take up to 3 lines when the header is expanded"
         val appBarType = if (hasHeaderBelowAppbar) AppBarType.NONE else AppBarType.BACK_NAVIGATION
         ScaffoldWithCollapsibleHeader(
@@ -388,7 +388,7 @@ private fun ScaffoldWithCollapsibleHeaderPreview(
 @CombinedThemePreviews
 @Composable
 private fun ScaffoldWithCollapsibleHeaderWithSubtitlePreview() {
-    OriginalTempTheme(isDark = isSystemInDarkTheme()) {
+    OriginalTheme(isDark = isSystemInDarkTheme()) {
         val title = "Collapsable With Subtitle"
         val subtitle = "Subtitle"
         val appBarType = AppBarType.BACK_NAVIGATION

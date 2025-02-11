@@ -25,7 +25,7 @@ import androidx.compose.ui.unit.dp
 import mega.privacy.android.shared.original.core.ui.controls.text.MegaText
 import mega.privacy.android.shared.original.core.ui.preview.CombinedThemePreviews
 import mega.privacy.android.shared.original.core.ui.theme.MegaOriginalTheme
-import mega.privacy.android.shared.original.core.ui.theme.OriginalTempThemeForPreviews
+import mega.privacy.android.shared.original.core.ui.theme.OriginalThemeForPreviews
 import mega.android.core.ui.theme.values.TextColor
 
 /**
@@ -90,7 +90,7 @@ internal const val LAZY_GRID_TAG = "fast_scroll_lazy_grid:lazy_grid_content"
 @CombinedThemePreviews
 @Composable
 private fun FastScrollLazyGridPreview() {
-    OriginalTempThemeForPreviews {
+    OriginalThemeForPreviews {
         val items = (0..1000).map { it }
         FastScrollLazyVerticalGrid(
             tooltipText = {
@@ -120,7 +120,7 @@ private fun FastScrollLazyGridPreview() {
 @CombinedThemePreviews
 @Composable
 private fun FastScrollLazyGridReversePreview() {
-    OriginalTempThemeForPreviews {
+    OriginalThemeForPreviews {
         val items = (0..1000).map { it }
         FastScrollLazyVerticalGrid(
             tooltipText = {

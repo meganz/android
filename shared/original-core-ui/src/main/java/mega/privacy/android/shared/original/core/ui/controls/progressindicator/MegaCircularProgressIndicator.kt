@@ -13,7 +13,7 @@ import androidx.compose.ui.unit.Dp
 import mega.privacy.android.shared.original.core.ui.preview.BooleanProvider
 import mega.privacy.android.shared.original.core.ui.preview.CombinedThemePreviews
 import mega.privacy.android.shared.original.core.ui.theme.MegaOriginalTheme
-import mega.privacy.android.shared.original.core.ui.theme.OriginalTempTheme
+import mega.privacy.android.shared.original.core.ui.theme.OriginalTheme
 import mega.android.core.ui.theme.values.BackgroundColor
 import mega.android.core.ui.theme.values.SupportColor
 
@@ -89,7 +89,7 @@ fun MegaCircularProgressIndicator(
 private fun MegaCircularProgressIndicatorPreview(
     @PreviewParameter(BooleanProvider::class) initialValue: Boolean,
 ) {
-    OriginalTempTheme(isDark = isSystemInDarkTheme()) {
+    OriginalTheme(isDark = isSystemInDarkTheme()) {
         MegaCircularProgressIndicator(
             useInverseColor = initialValue
         )

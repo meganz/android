@@ -36,7 +36,7 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import mega.privacy.android.legacy.core.ui.customTextSelectionColors
-import mega.privacy.android.shared.original.core.ui.theme.OriginalTempTheme
+import mega.privacy.android.shared.original.core.ui.theme.OriginalTheme
 import mega.privacy.android.shared.original.core.ui.theme.grey_alpha_012
 import mega.privacy.android.shared.original.core.ui.theme.white_alpha_012
 
@@ -155,7 +155,7 @@ private fun PreviewTextField() {
     var content by remember {
         mutableStateOf("")
     }
-    OriginalTempTheme(isDark = isSystemInDarkTheme()) {
+    OriginalTheme(isDark = isSystemInDarkTheme()) {
         MegaTextField(
             placeholder = { Text(text = "This is the label") },
             value = content,

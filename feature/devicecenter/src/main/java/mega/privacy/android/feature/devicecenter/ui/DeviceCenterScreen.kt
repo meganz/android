@@ -51,7 +51,7 @@ import mega.privacy.android.shared.original.core.ui.controls.sheets.BottomSheet
 import mega.privacy.android.shared.original.core.ui.controls.snackbars.MegaSnackbar
 import mega.privacy.android.shared.original.core.ui.model.MenuAction
 import mega.privacy.android.shared.original.core.ui.preview.CombinedThemePreviews
-import mega.privacy.android.shared.original.core.ui.theme.OriginalTempTheme
+import mega.privacy.android.shared.original.core.ui.theme.OriginalTheme
 import mega.privacy.android.shared.original.core.ui.utils.showAutoDurationSnackbar
 import mega.privacy.android.shared.sync.featuretoggles.SyncFeatures
 import mega.privacy.android.shared.sync.ui.SyncEmptyState
@@ -441,7 +441,7 @@ private fun DeviceCenterContent(
 @CombinedThemePreviews
 @Composable
 private fun DeviceCenterNoNetworkStatePreview() {
-    OriginalTempTheme(isDark = isSystemInDarkTheme()) {
+    OriginalTheme(isDark = isSystemInDarkTheme()) {
         DeviceCenterScreen(
             uiState = DeviceCenterUiState(isInitialLoadingFinished = true),
             snackbarHostState = SnackbarHostState(),
@@ -468,7 +468,7 @@ private fun DeviceCenterNoNetworkStatePreview() {
 @CombinedThemePreviews
 @Composable
 private fun DeviceCenterNoItemsFoundPreview() {
-    OriginalTempTheme(isDark = isSystemInDarkTheme()) {
+    OriginalTheme(isDark = isSystemInDarkTheme()) {
         DeviceCenterScreen(
             uiState = DeviceCenterUiState(
                 isInitialLoadingFinished = true,
@@ -504,7 +504,7 @@ private fun DeviceCenterNoItemsFoundPreview() {
 @CombinedThemePreviews
 @Composable
 private fun DeviceCenterInInitialLoadingPreview() {
-    OriginalTempTheme(isDark = isSystemInDarkTheme()) {
+    OriginalTheme(isDark = isSystemInDarkTheme()) {
         DeviceCenterScreen(
             uiState = DeviceCenterUiState(isNetworkConnected = true),
             snackbarHostState = SnackbarHostState(),
@@ -544,7 +544,7 @@ private fun DeviceCenterInDeviceViewPreview() {
         isInitialLoadingFinished = true,
         isNetworkConnected = true,
     )
-    OriginalTempTheme(isDark = isSystemInDarkTheme()) {
+    OriginalTheme(isDark = isSystemInDarkTheme()) {
         DeviceCenterScreen(
             uiState = uiState,
             snackbarHostState = SnackbarHostState(),
@@ -581,7 +581,7 @@ private fun DeviceCenterInFolderViewEmptyStatePreview() {
         selectedDevice = ownDeviceUINode,
         isNetworkConnected = true,
     )
-    OriginalTempTheme(isDark = isSystemInDarkTheme()) {
+    OriginalTheme(isDark = isSystemInDarkTheme()) {
         DeviceCenterScreen(
             uiState = uiState,
             snackbarHostState = SnackbarHostState(),
@@ -617,7 +617,7 @@ private fun DeviceCenterInFolderViewPreview() {
         selectedDevice = ownDeviceUINodeTwo,
         isNetworkConnected = true,
     )
-    OriginalTempTheme(isDark = isSystemInDarkTheme()) {
+    OriginalTheme(isDark = isSystemInDarkTheme()) {
         DeviceCenterScreen(
             uiState = uiState,
             snackbarHostState = SnackbarHostState(),
@@ -647,7 +647,7 @@ private fun DeviceCenterInFolderViewPreview() {
 @CombinedThemePreviews
 @Composable
 private fun DeviceCenterContentWithOwnDeviceSectionOnlyPreview() {
-    OriginalTempTheme(isDark = isSystemInDarkTheme()) {
+    OriginalTheme(isDark = isSystemInDarkTheme()) {
         DeviceCenterContent(
             itemsToDisplay = listOf(ownDeviceUINode),
             onDeviceClicked = {},
@@ -665,7 +665,7 @@ private fun DeviceCenterContentWithOwnDeviceSectionOnlyPreview() {
 @CombinedThemePreviews
 @Composable
 private fun DeviceCenterContentWithOtherDevicesSectionOnlyPreview() {
-    OriginalTempTheme(isDark = isSystemInDarkTheme()) {
+    OriginalTheme(isDark = isSystemInDarkTheme()) {
         DeviceCenterContent(
             itemsToDisplay = listOf(otherDeviceUINodeOne),
             onDeviceClicked = {},
@@ -683,7 +683,7 @@ private fun DeviceCenterContentWithOtherDevicesSectionOnlyPreview() {
 @CombinedThemePreviews
 @Composable
 private fun DeviceCenterContentWithBothDeviceSectionsPreview() {
-    OriginalTempTheme(isDark = isSystemInDarkTheme()) {
+    OriginalTheme(isDark = isSystemInDarkTheme()) {
         DeviceCenterContent(
             itemsToDisplay = listOf(
                 ownDeviceUINode,

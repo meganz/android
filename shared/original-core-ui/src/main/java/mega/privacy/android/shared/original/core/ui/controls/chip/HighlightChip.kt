@@ -17,7 +17,7 @@ import androidx.compose.ui.unit.dp
 import mega.privacy.android.shared.original.core.ui.controls.text.HighlightedText
 import mega.privacy.android.shared.original.core.ui.preview.BooleanProvider
 import mega.privacy.android.shared.original.core.ui.preview.CombinedThemePreviews
-import mega.privacy.android.shared.original.core.ui.theme.OriginalTempTheme
+import mega.privacy.android.shared.original.core.ui.theme.OriginalTheme
 
 /**
  * Chip with highlighted text inside
@@ -76,7 +76,7 @@ fun HighlightChip(
 private fun HighlightChipPreview(
     @PreviewParameter(BooleanProvider::class) selected: Boolean,
 ) {
-    OriginalTempTheme(isDark = isSystemInDarkTheme()) {
+    OriginalTheme(isDark = isSystemInDarkTheme()) {
         HighlightChip(
             selected = selected,
             text = "#ThisIsATag",

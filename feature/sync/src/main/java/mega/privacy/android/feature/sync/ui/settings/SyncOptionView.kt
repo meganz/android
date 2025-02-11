@@ -11,7 +11,7 @@ import mega.privacy.android.feature.sync.ui.model.SyncOption
 import mega.privacy.android.shared.original.core.ui.controls.lists.GenericTwoLineListItem
 import mega.privacy.android.shared.original.core.ui.preview.BooleanProvider
 import mega.privacy.android.shared.original.core.ui.preview.CombinedThemePreviews
-import mega.privacy.android.shared.original.core.ui.theme.OriginalTempTheme
+import mega.privacy.android.shared.original.core.ui.theme.OriginalTheme
 
 @Composable
 internal fun SyncOptionView(
@@ -37,7 +37,7 @@ internal fun SyncOptionView(
 private fun SyncOptionsViewPreview(
     @PreviewParameter(BooleanProvider::class) syncOnlyByWifi: Boolean,
 ) {
-    OriginalTempTheme(isDark = isSystemInDarkTheme()) {
+    OriginalTheme(isDark = isSystemInDarkTheme()) {
         SyncOptionView(
             syncOption = if (syncOnlyByWifi) SyncOption.WI_FI_ONLY else SyncOption.WI_FI_OR_MOBILE_DATA,
             syncOptionsClicked = {},

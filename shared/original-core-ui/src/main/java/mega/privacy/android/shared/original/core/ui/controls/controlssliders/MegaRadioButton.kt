@@ -11,7 +11,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.tooling.preview.PreviewParameter
 import mega.privacy.android.shared.original.core.ui.preview.BooleanProvider
 import mega.privacy.android.shared.original.core.ui.preview.CombinedThemePreviews
-import mega.privacy.android.shared.original.core.ui.theme.OriginalTempTheme
+import mega.privacy.android.shared.original.core.ui.theme.OriginalTheme
 import mega.privacy.android.shared.original.core.ui.theme.MegaOriginalTheme
 
 /**
@@ -35,7 +35,7 @@ private fun RadioPreview(
     @PreviewParameter(BooleanProvider::class) initialValue: Boolean,
 ) {
     var selected by remember { mutableStateOf(initialValue) } //this is to make an interactive preview
-    OriginalTempTheme(isDark = isSystemInDarkTheme()) {
+    OriginalTheme(isDark = isSystemInDarkTheme()) {
         MegaRadioButton(
             selected = selected,
             onClick = { selected = !selected },

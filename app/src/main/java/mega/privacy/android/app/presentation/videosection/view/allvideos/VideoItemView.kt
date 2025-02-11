@@ -54,7 +54,7 @@ import mega.privacy.android.app.R
 import mega.privacy.android.app.presentation.time.mapper.DurationInSecondsTextMapper
 import mega.privacy.android.shared.original.core.ui.controls.text.MegaText
 import mega.privacy.android.shared.original.core.ui.preview.CombinedThemePreviews
-import mega.privacy.android.shared.original.core.ui.theme.OriginalTempTheme
+import mega.privacy.android.shared.original.core.ui.theme.OriginalTheme
 import mega.privacy.android.shared.original.core.ui.theme.extensions.textColorSecondary
 import mega.android.core.ui.theme.values.TextColor
 import kotlin.time.Duration
@@ -396,7 +396,7 @@ internal fun VideoSizeAndIconsView(
 @CombinedThemePreviews
 @Composable
 private fun VideoItemViewWithFavouritePreview() {
-    OriginalTempTheme(isDark = isSystemInDarkTheme()) {
+    OriginalTheme(isDark = isSystemInDarkTheme()) {
         VideoItemView(
             icon = iconPackR.drawable.ic_video_section_video_default_thumbnail,
             name = "testing_video_file_name_long_name_testing.mp4",
@@ -417,7 +417,7 @@ private fun VideoItemViewWithFavouritePreview() {
 @CombinedThemePreviews
 @Composable
 private fun VideoItemViewWithoutFavouritePreview() {
-    OriginalTempTheme(isDark = isSystemInDarkTheme()) {
+    OriginalTheme(isDark = isSystemInDarkTheme()) {
         VideoItemView(
             icon = iconPackR.drawable.ic_video_section_video_default_thumbnail,
             name = "name.mp4",
@@ -437,7 +437,7 @@ private fun VideoItemViewWithoutFavouritePreview() {
 @CombinedThemePreviews
 @Composable
 private fun VideoInfoViewPreview() {
-    OriginalTempTheme(isDark = isSystemInDarkTheme()) {
+    OriginalTheme(isDark = isSystemInDarkTheme()) {
         VideoInfoView(
             name = "testing_video_file_name_long_name_testing_testing_video_file_name_long_name_testing_testing_video_file_name_long_name_testing.mp4",
             fileSize = "1.3MB",
@@ -455,7 +455,7 @@ private fun VideoInfoViewPreview() {
 @CombinedThemePreviews
 @Composable
 private fun CollectionTitleViewPreview() {
-    OriginalTempTheme(isDark = isSystemInDarkTheme()) {
+    OriginalTheme(isDark = isSystemInDarkTheme()) {
         CollectionTitleView(
             collectionTitle = "Collection Title"
         )

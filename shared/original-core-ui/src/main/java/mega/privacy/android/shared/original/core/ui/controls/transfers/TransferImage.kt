@@ -29,7 +29,7 @@ import mega.privacy.android.icon.pack.R
 import mega.privacy.android.shared.original.core.ui.preview.BooleanProvider
 import mega.privacy.android.shared.original.core.ui.preview.CombinedThemePreviews
 import mega.privacy.android.shared.original.core.ui.theme.MegaOriginalTheme
-import mega.privacy.android.shared.original.core.ui.theme.OriginalTempTheme
+import mega.privacy.android.shared.original.core.ui.theme.OriginalTheme
 
 @Composable
 internal fun TransferImage(
@@ -135,7 +135,7 @@ private fun TransferFileTypePreview(
     @PreviewParameter(BooleanProvider::class) isDownload: Boolean,
 ) {
     val isDark = isSystemInDarkTheme()
-    OriginalTempTheme(isDark = isDark) {
+    OriginalTheme(isDark = isDark) {
         TransferFileType(
             isDownload = isDownload,
             fileTypeResId = R.drawable.ic_pdf_medium_solid,
@@ -149,7 +149,7 @@ private fun LeadingIndicatorPreview(
     @PreviewParameter(BooleanProvider::class) isDownload: Boolean,
 ) {
     val isDark = isSystemInDarkTheme()
-    OriginalTempTheme(isDark = isDark) {
+    OriginalTheme(isDark = isDark) {
         LeadingIndicator(
             isDownload = isDownload,
             modifier = Modifier.background(if (isDark) Color.White else Color.Black)

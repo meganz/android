@@ -25,7 +25,7 @@ import mega.privacy.android.shared.original.core.ui.controls.buttons.OutlinedWit
 import mega.privacy.android.shared.original.core.ui.controls.buttons.RaisedDefaultMegaButton
 import mega.privacy.android.shared.original.core.ui.controls.text.MegaText
 import mega.privacy.android.shared.original.core.ui.preview.CombinedThemePreviews
-import mega.privacy.android.shared.original.core.ui.theme.OriginalTempTheme
+import mega.privacy.android.shared.original.core.ui.theme.OriginalTheme
 import mega.privacy.android.shared.original.core.ui.theme.extensions.h6Medium
 import mega.android.core.ui.theme.values.TextColor
 import mega.privacy.android.shared.resources.R as sharedR
@@ -115,7 +115,7 @@ fun SyncPromotionBottomSheet(
 @CombinedThemePreviews
 @Composable
 private fun UpgradeProPlanBottomSheetPreview() {
-    OriginalTempTheme(isDark = isSystemInDarkTheme()) {
+    OriginalTheme(isDark = isSystemInDarkTheme()) {
         SyncPromotionBottomSheet(
             onSyncNewFolderClicked = {},
         )

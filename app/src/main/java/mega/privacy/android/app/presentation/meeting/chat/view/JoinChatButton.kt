@@ -13,7 +13,7 @@ import mega.privacy.android.shared.original.core.ui.controls.buttons.RaisedDefau
 import mega.privacy.android.shared.original.core.ui.controls.buttons.RaisedProgressMegaButton
 import mega.privacy.android.shared.original.core.ui.preview.BooleanProvider
 import mega.privacy.android.shared.original.core.ui.preview.CombinedTextAndThemePreviews
-import mega.privacy.android.shared.original.core.ui.theme.OriginalTempTheme
+import mega.privacy.android.shared.original.core.ui.theme.OriginalTheme
 
 /**
  * Button to join a chat, only available in preview mode.
@@ -46,7 +46,7 @@ fun JoinChatButton(
 private fun JoinChatButtonPreview(
     @PreviewParameter(BooleanProvider::class) isJoining: Boolean,
 ) {
-    OriginalTempTheme(isDark = isSystemInDarkTheme()) {
+    OriginalTheme(isDark = isSystemInDarkTheme()) {
         JoinChatButton(
             isPreviewMode = true,
             isJoining = isJoining,

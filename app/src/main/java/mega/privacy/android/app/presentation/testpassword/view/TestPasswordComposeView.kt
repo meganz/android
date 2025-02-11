@@ -112,7 +112,7 @@ import mega.privacy.android.legacy.core.ui.controls.appbar.SimpleTopAppBar
 import mega.privacy.android.legacy.core.ui.controls.textfields.MegaTextField
 import mega.privacy.android.shared.original.core.ui.controls.dialogs.MegaAlertDialog
 import mega.privacy.android.shared.original.core.ui.controls.progressindicator.MegaCircularProgressIndicator
-import mega.privacy.android.shared.original.core.ui.theme.OriginalTempTheme
+import mega.privacy.android.shared.original.core.ui.theme.OriginalTheme
 import mega.privacy.android.shared.original.core.ui.theme.black
 import mega.privacy.android.shared.original.core.ui.theme.extensions.autofill
 import mega.privacy.android.shared.original.core.ui.theme.extensions.green_500_green_400
@@ -872,7 +872,7 @@ private fun printRecoveryKey(
 @Preview(uiMode = Configuration.UI_MODE_NIGHT_YES, name = "DarkMode")
 @Composable
 private fun TestPasswordComposeViewPreview() {
-    OriginalTempTheme(isDark = isSystemInDarkTheme()) {
+    OriginalTheme(isDark = isSystemInDarkTheme()) {
         TestPasswordComposeView(
             uiState = TestPasswordUIState(
                 isUITestPasswordMode = false,

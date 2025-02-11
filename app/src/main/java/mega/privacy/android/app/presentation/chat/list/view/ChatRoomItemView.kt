@@ -51,7 +51,7 @@ import mega.privacy.android.shared.original.core.ui.controls.meetings.CallChrono
 import mega.privacy.android.shared.original.core.ui.controls.text.LongTextBehaviour
 import mega.privacy.android.shared.original.core.ui.controls.text.MegaText
 import mega.privacy.android.shared.original.core.ui.preview.CombinedThemeComponentPreviews
-import mega.privacy.android.shared.original.core.ui.theme.OriginalTempTheme
+import mega.privacy.android.shared.original.core.ui.theme.OriginalTheme
 import mega.privacy.android.shared.original.core.ui.theme.extensions.grey_alpha_054_white_alpha_054
 import mega.privacy.android.shared.original.core.ui.theme.extensions.textColorPrimary
 import mega.privacy.android.shared.original.core.ui.theme.extensions.textColorSecondary
@@ -518,7 +518,7 @@ private fun BottomTextView(
 private fun PreviewIndividualChatRoomItem(
     @PreviewParameter(ChatRoomItemProvider::class) itemToSelected: Pair<ChatRoomItem, Boolean>,
 ) {
-    OriginalTempTheme(isDark = isSystemInDarkTheme()) {
+    OriginalTheme(isDark = isSystemInDarkTheme()) {
         ChatRoomItemView(
             item = itemToSelected.first,
             isSelected = itemToSelected.second,

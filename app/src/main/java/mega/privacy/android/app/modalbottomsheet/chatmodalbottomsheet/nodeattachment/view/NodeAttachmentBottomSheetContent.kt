@@ -23,7 +23,7 @@ import mega.privacy.android.shared.original.core.ui.controls.lists.NodeListViewI
 import mega.privacy.android.shared.original.core.ui.controls.sheets.MegaBottomSheetContainer
 import mega.privacy.android.shared.original.core.ui.controls.text.LongTextBehaviour
 import mega.privacy.android.shared.original.core.ui.preview.CombinedThemePreviews
-import mega.privacy.android.shared.original.core.ui.theme.OriginalTempTheme
+import mega.privacy.android.shared.original.core.ui.theme.OriginalTheme
 
 @Composable
 internal fun NodeAttachmentBottomSheetContent(
@@ -94,7 +94,7 @@ internal const val AVAILABLE_OFFLINE_ACTION_TEST_TAG = "node_attachment:availabl
 @CombinedThemePreviews
 @Composable
 private fun NodeAttachmentBottomSheetContentPreview() {
-    OriginalTempTheme(isDark = isSystemInDarkTheme()) {
+    OriginalTheme(isDark = isSystemInDarkTheme()) {
         NodeAttachmentBottomSheetContent(
             uiState = NodeAttachmentBottomSheetUiState(
                 isOnline = false,

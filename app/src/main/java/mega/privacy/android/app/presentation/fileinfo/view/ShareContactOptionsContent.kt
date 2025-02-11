@@ -26,7 +26,7 @@ import mega.privacy.android.shared.original.core.ui.controls.dividers.DividerTyp
 import mega.privacy.android.shared.original.core.ui.controls.lists.MenuActionListTile
 import mega.privacy.android.shared.original.core.ui.preview.BooleanProvider
 import mega.privacy.android.shared.original.core.ui.preview.CombinedThemePreviews
-import mega.privacy.android.shared.original.core.ui.theme.OriginalTempTheme
+import mega.privacy.android.shared.original.core.ui.theme.OriginalTheme
 
 /**
  * Content for file contacts list bottom sheet
@@ -86,7 +86,7 @@ internal const val SHARE_CONTACT_OPTIONS_REMOVE = "share_contact_options:remove_
 private fun FileContactsListBottomSheetContentPreview(
     @PreviewParameter(BooleanProvider::class) allowChangePermission: Boolean,
 ) = Column(modifier = Modifier.sizeIn(minHeight = 200.dp)) {
-    OriginalTempTheme(isDark = isSystemInDarkTheme()) {
+    OriginalTheme(isDark = isSystemInDarkTheme()) {
         val contactPermission = contactPermissionForPreview
         ShareContactOptionsContent(
             contactPermission = contactPermission,

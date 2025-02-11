@@ -50,7 +50,7 @@ import mega.privacy.android.shared.original.core.ui.theme.extensions.textColorPr
 import mega.privacy.android.shared.original.core.ui.theme.extensions.textColorSecondary
 import mega.privacy.android.shared.original.core.ui.utils.isScreenOrientationLandscape
 import mega.privacy.android.legacy.core.ui.controls.text.MiddleEllipsisText
-import mega.privacy.android.shared.original.core.ui.theme.OriginalTempTheme
+import mega.privacy.android.shared.original.core.ui.theme.OriginalTheme
 import java.io.File
 
 /**
@@ -488,7 +488,7 @@ private fun FilePreview() {
     val imageState = remember {
         mutableStateOf(null as File?)
     }
-    OriginalTempTheme(isDark = isSystemInDarkTheme()) {
+    OriginalTheme(isDark = isSystemInDarkTheme()) {
         NodeListViewItem(
             modifier = Modifier,
             isSelected = false,
@@ -514,7 +514,7 @@ private fun FolderPreview() {
     val imageState = remember {
         mutableStateOf(null as File?)
     }
-    OriginalTempTheme(isDark = isSystemInDarkTheme()) {
+    OriginalTheme(isDark = isSystemInDarkTheme()) {
         NodeListViewItem(
             modifier = Modifier,
             isSelected = false,

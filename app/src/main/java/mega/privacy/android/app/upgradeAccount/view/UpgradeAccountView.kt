@@ -1,8 +1,6 @@
 package mega.privacy.android.app.upgradeAccount.view
 
 import mega.privacy.android.shared.resources.R as sharedR
-import androidx.annotation.StringRes
-import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.animation.core.FastOutLinearInEasing
 import androidx.compose.animation.core.animateFloat
 import androidx.compose.animation.core.infiniteRepeatable
@@ -85,7 +83,7 @@ import mega.privacy.android.shared.original.core.ui.model.MegaSpanStyle
 import mega.privacy.android.shared.original.core.ui.model.MegaSpanStyleWithAnnotation
 import mega.privacy.android.shared.original.core.ui.model.SpanIndicator
 import mega.privacy.android.shared.original.core.ui.preview.CombinedThemePreviews
-import mega.privacy.android.shared.original.core.ui.theme.OriginalTempTheme
+import mega.privacy.android.shared.original.core.ui.theme.OriginalTheme
 import mega.privacy.android.shared.original.core.ui.theme.Typography
 import mega.privacy.android.shared.original.core.ui.theme.extensions.black_yellow_700
 import mega.privacy.android.shared.original.core.ui.theme.extensions.grey_020_grey_800
@@ -633,7 +631,7 @@ private fun PricingPageLinkText(
 fun PreviewUpgradeAccountView(
     @PreviewParameter(UpgradeAccountPreviewProvider::class) state: UpgradeAccountState,
 ) {
-    OriginalTempTheme(isDark = isSystemInDarkTheme()) {
+    OriginalTheme(isDark = isSystemInDarkTheme()) {
         UpgradeAccountView(
             state = state,
             accountStorageState = AccountStorageUIState(),

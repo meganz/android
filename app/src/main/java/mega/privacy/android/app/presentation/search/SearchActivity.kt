@@ -95,7 +95,7 @@ import mega.privacy.android.feature.sync.data.mapper.ListToStringWithDelimitersM
 import mega.privacy.android.navigation.MegaNavigator
 import mega.privacy.android.shared.original.core.ui.controls.layouts.MegaScaffold
 import mega.privacy.android.shared.original.core.ui.controls.widgets.TransfersWidgetViewAnimated
-import mega.privacy.android.shared.original.core.ui.theme.OriginalTempTheme
+import mega.privacy.android.shared.original.core.ui.theme.OriginalTheme
 import mega.privacy.android.shared.original.core.ui.utils.showAutoDurationSnackbar
 import timber.log.Timber
 import java.io.File
@@ -232,7 +232,7 @@ class SearchActivity : AppCompatActivity(), MegaSnackbarShower {
             val navHostController = rememberNavController(bottomSheetNavigator)
             val coroutineScope = rememberCoroutineScope()
             SessionContainer {
-                OriginalTempTheme(isDark = themeMode.isDarkMode()) {
+                OriginalTheme(isDark = themeMode.isDarkMode()) {
                     MegaScaffold(
                         modifier = Modifier
                             .fillMaxSize()

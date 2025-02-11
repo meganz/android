@@ -31,7 +31,7 @@ import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import mega.privacy.android.shared.original.core.ui.controls.progressindicator.MegaLinearProgressIndicator
 import mega.privacy.android.shared.original.core.ui.preview.CombinedThemePreviews
-import mega.privacy.android.shared.original.core.ui.theme.OriginalTempTheme
+import mega.privacy.android.shared.original.core.ui.theme.OriginalTheme
 import mega.privacy.android.shared.original.core.ui.theme.MegaOriginalTheme
 
 /**
@@ -103,7 +103,7 @@ private fun LoadOverlay(
 private fun FileMessageViewLoadingPreview(
     @PreviewParameter(PreviewContainerProvider::class) params: PreviewContainerParams,
 ) {
-    OriginalTempTheme(isDark = isSystemInDarkTheme()) {
+    OriginalTheme(isDark = isSystemInDarkTheme()) {
         val painter = rememberVectorPainter(image = image(params.width, params.height))
         FileContainerMessageView(
             modifier = Modifier.padding(12.dp),

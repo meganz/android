@@ -22,7 +22,7 @@ import mega.privacy.android.app.presentation.shares.links.LinksViewModel
 import mega.privacy.android.app.presentation.shares.outgoing.OutgoingSharesComposeViewModel
 import mega.privacy.android.app.utils.Constants
 import mega.privacy.android.domain.entity.ThemeMode
-import mega.privacy.android.shared.original.core.ui.theme.OriginalTempTheme
+import mega.privacy.android.shared.original.core.ui.theme.OriginalTheme
 import mega.privacy.mobile.analytics.event.IncomingSharesTabEvent
 import mega.privacy.mobile.analytics.event.OutgoingSharesTabEvent
 
@@ -78,7 +78,7 @@ class SharesFragment : Fragment() {
             }
         }
 
-        OriginalTempTheme(isDark = isDark) {
+        OriginalTheme(isDark = isDark) {
             SharesScreen(
                 statusBarPadding = managerActivity.appBarLayout.paddingTop,
                 uiState = uiState,

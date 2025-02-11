@@ -39,7 +39,7 @@ import mega.privacy.android.shared.original.core.ui.controls.textfields.GenericD
 import mega.privacy.android.shared.original.core.ui.preview.CombinedThemePreviews
 import mega.privacy.android.shared.original.core.ui.preview.CombinedThemeTabletLandscapePreviews
 import mega.privacy.android.shared.original.core.ui.preview.CombinedThemeTabletPortraitPreviews
-import mega.privacy.android.shared.original.core.ui.theme.OriginalTempTheme
+import mega.privacy.android.shared.original.core.ui.theme.OriginalTheme
 import mega.privacy.android.shared.original.core.ui.theme.extensions.h6Medium
 import mega.privacy.android.shared.original.core.ui.theme.extensions.subtitle1medium
 import mega.android.core.ui.theme.values.TextColor
@@ -306,7 +306,7 @@ private fun CancelSubscriptionSurveyViewPreview() {
         UICancellationSurveyAnswer.Answer9,
         UICancellationSurveyAnswer.Answer10,
     ).shuffled() + UICancellationSurveyAnswer.Answer8
-    OriginalTempTheme(isDark = isSystemInDarkTheme()) {
+    OriginalTheme(isDark = isSystemInDarkTheme()) {
         CancelSubscriptionSurveyView(
             possibleCancellationReasons = possibleCancellationReasons,
             onCancelSubscriptionButtonClicked = { _, _ -> },

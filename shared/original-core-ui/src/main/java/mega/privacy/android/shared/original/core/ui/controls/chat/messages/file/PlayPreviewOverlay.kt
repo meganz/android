@@ -16,7 +16,7 @@ import androidx.compose.ui.unit.dp
 import mega.privacy.android.icon.pack.R as IconPackR
 import mega.privacy.android.shared.original.core.ui.controls.chat.VideoDuration
 import mega.privacy.android.shared.original.core.ui.preview.CombinedThemePreviews
-import mega.privacy.android.shared.original.core.ui.theme.OriginalTempTheme
+import mega.privacy.android.shared.original.core.ui.theme.OriginalTheme
 import mega.privacy.android.shared.original.core.ui.theme.MegaOriginalTheme
 
 /**
@@ -51,7 +51,7 @@ fun PlayPreviewOverlay(
 @Composable
 @CombinedThemePreviews
 private fun PlayPreviewOverlayPreview() {
-    OriginalTempTheme(isDark = isSystemInDarkTheme()) {
+    OriginalTheme(isDark = isSystemInDarkTheme()) {
         PlayPreviewOverlay(
             modifier = Modifier
                 .background(Color.Gray)

@@ -123,7 +123,7 @@ import mega.privacy.android.shared.original.core.ui.controls.text.MegaText
 import mega.privacy.android.shared.original.core.ui.model.SpanIndicator
 import mega.privacy.android.shared.original.core.ui.preview.BooleanProvider
 import mega.privacy.android.shared.original.core.ui.preview.CombinedThemePreviews
-import mega.privacy.android.shared.original.core.ui.theme.OriginalTempTheme
+import mega.privacy.android.shared.original.core.ui.theme.OriginalTheme
 import mega.privacy.android.shared.original.core.ui.theme.black
 import mega.privacy.android.shared.original.core.ui.theme.extensions.accent_900_accent_050
 import mega.privacy.android.shared.original.core.ui.theme.extensions.amber_700_amber_300
@@ -985,7 +985,7 @@ private fun shouldShowPaymentInfo(uiState: MyAccountHomeUIState): Boolean {
 internal fun MyAccountHomePreview(
     @PreviewParameter(BooleanProvider::class) isBusinessAccount: Boolean,
 ) {
-    OriginalTempTheme(isDark = isSystemInDarkTheme()) {
+    OriginalTheme(isDark = isSystemInDarkTheme()) {
         MyAccountHomeView(
             storageState = StorageState.Red,
             uiState = MyAccountHomeUIState(

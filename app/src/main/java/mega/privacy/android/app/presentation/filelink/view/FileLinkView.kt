@@ -44,7 +44,7 @@ import mega.privacy.android.shared.original.core.ui.controls.layouts.ScaffoldWit
 import mega.privacy.android.shared.original.core.ui.controls.snackbars.MegaSnackbar
 import mega.privacy.android.shared.original.core.ui.controls.widgets.TransfersWidgetViewAnimated
 import mega.privacy.android.shared.original.core.ui.preview.CombinedThemePreviews
-import mega.privacy.android.shared.original.core.ui.theme.OriginalTempTheme
+import mega.privacy.android.shared.original.core.ui.theme.OriginalTheme
 import mega.privacy.android.shared.original.core.ui.theme.extensions.grey_020_grey_700
 import mega.privacy.android.shared.original.core.ui.utils.showAutoDurationSnackbar
 
@@ -239,7 +239,7 @@ internal fun ImportDownloadView(
 @CombinedThemePreviews
 @Composable
 private fun PreviewImportDownloadView() {
-    OriginalTempTheme(isDark = isSystemInDarkTheme()) {
+    OriginalTheme(isDark = isSystemInDarkTheme()) {
         ImportDownloadView(
             modifier = Modifier
                 .fillMaxWidth()
@@ -255,7 +255,7 @@ private fun PreviewImportDownloadView() {
 @CombinedThemePreviews
 @Composable
 private fun PreviewFileLinkView() {
-    OriginalTempTheme(isDark = isSystemInDarkTheme()) {
+    OriginalTheme(isDark = isSystemInDarkTheme()) {
         val viewState =
             FileLinkState(hasDbCredentials = true, title = "Title", sizeInBytes = 10000L)
         FileLinkView(

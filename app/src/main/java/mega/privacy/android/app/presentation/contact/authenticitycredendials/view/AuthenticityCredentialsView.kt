@@ -49,7 +49,7 @@ import mega.privacy.android.shared.original.core.ui.controls.appbar.MegaAppBar
 import mega.privacy.android.shared.original.core.ui.controls.layouts.MegaScaffold
 import mega.privacy.android.shared.original.core.ui.preview.BooleanProvider
 import mega.privacy.android.shared.original.core.ui.preview.CombinedThemePreviews
-import mega.privacy.android.shared.original.core.ui.theme.OriginalTempTheme
+import mega.privacy.android.shared.original.core.ui.theme.OriginalTheme
 import mega.privacy.android.shared.original.core.ui.theme.black
 import mega.privacy.android.shared.original.core.ui.theme.extensions.textColorPrimary
 import mega.privacy.android.shared.original.core.ui.theme.extensions.textColorSecondary
@@ -318,7 +318,7 @@ fun CredentialsItem(modifier: Modifier, text: String, myCredentials: Boolean) {
 fun PreviewAuthenticityCredentialsView(
     @PreviewParameter(BooleanProvider::class) showContactVerificationBanner: Boolean,
 ) {
-    OriginalTempTheme(isDark = isSystemInDarkTheme()) {
+    OriginalTheme(isDark = isSystemInDarkTheme()) {
         AuthenticityCredentialsView(state = AuthenticityCredentialsState(
             contactCredentials = AccountCredentials.ContactCredentials(
                 credentials = listOf(

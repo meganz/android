@@ -19,7 +19,7 @@ import androidx.compose.ui.tooling.preview.PreviewParameterProvider
 import androidx.compose.ui.unit.dp
 import mega.privacy.android.shared.original.core.ui.preview.CombinedThemePreviews
 import mega.privacy.android.shared.original.core.ui.theme.MegaOriginalTheme
-import mega.privacy.android.shared.original.core.ui.theme.OriginalTempThemeForPreviews
+import mega.privacy.android.shared.original.core.ui.theme.OriginalThemeForPreviews
 
 /**
  * Mega Password Strength
@@ -111,7 +111,7 @@ private fun StrengthSegment(
 @CombinedThemePreviews
 @Composable
 private fun MegaPasswordStrengthPreview(@PreviewParameter(PasswordStrengthProvider::class) params: Pair<Int, String>) {
-    OriginalTempThemeForPreviews {
+    OriginalThemeForPreviews {
         MegaPasswordStrength(params.first, params.second)
     }
 }

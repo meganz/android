@@ -52,7 +52,7 @@ import mega.privacy.android.shared.original.core.ui.controls.appbar.MegaAppBar
 import mega.privacy.android.shared.original.core.ui.controls.chat.attachpanel.CellButton
 import mega.privacy.android.shared.original.core.ui.controls.chat.attachpanel.CellButtonType
 import mega.privacy.android.shared.original.core.ui.preview.CombinedThemePreviews
-import mega.privacy.android.shared.original.core.ui.theme.OriginalTempTheme
+import mega.privacy.android.shared.original.core.ui.theme.OriginalTheme
 import mega.privacy.android.shared.original.core.ui.controls.layouts.MegaScaffold
 import mega.privacy.android.shared.original.core.ui.utils.showAutoDurationSnackbar
 
@@ -312,7 +312,7 @@ fun RingingActionButtons(
 @CombinedThemePreviews
 @Composable
 internal fun PreviewRingingView() {
-    OriginalTempTheme(isDark = true) {
+    OriginalTheme(isDark = true) {
         RingingView(
             uiState = RingingUIState(
                 chatId = -1,

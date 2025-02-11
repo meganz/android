@@ -58,7 +58,7 @@ import mega.privacy.android.shared.original.core.ui.model.MegaSpanStyle
 import mega.privacy.android.shared.original.core.ui.model.MegaSpanStyleWithAnnotation
 import mega.privacy.android.shared.original.core.ui.model.SpanIndicator
 import mega.privacy.android.shared.original.core.ui.preview.CombinedThemePreviews
-import mega.privacy.android.shared.original.core.ui.theme.OriginalTempTheme
+import mega.privacy.android.shared.original.core.ui.theme.OriginalTheme
 import mega.android.core.ui.theme.values.TextColor
 import mega.privacy.android.shared.original.core.ui.utils.showAutoDurationSnackbar
 import mega.privacy.mobile.analytics.event.AndroidSyncAllFilesAccessDialogDisplayedEvent
@@ -385,7 +385,7 @@ internal const val TAG_SYNC_NEW_FOLDER_SCREEN_SYNC_BUTTON =
 private fun SyncNewFolderScreenPreview(
     @PreviewParameter(SyncTypePreviewProvider::class) syncType: SyncType
 ) {
-    OriginalTempTheme(isDark = isSystemInDarkTheme()) {
+    OriginalTheme(isDark = isSystemInDarkTheme()) {
         SyncNewFolderScreenScaffold(
             state = SyncNewFolderState(
                 syncType = syncType,
@@ -411,7 +411,7 @@ private fun SyncNewFolderScreenPreview(
 private fun SyncNewFolderScreenContentPreview(
     @PreviewParameter(SyncTypePreviewProvider::class) syncType: SyncType
 ) {
-    OriginalTempTheme(isDark = isSystemInDarkTheme()) {
+    OriginalTheme(isDark = isSystemInDarkTheme()) {
         SyncNewFolderScreenContent(
             syncType = syncType,
             deviceName = "Device Name",

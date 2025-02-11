@@ -63,7 +63,7 @@ import mega.privacy.android.domain.entity.StorageState
 import mega.privacy.android.shared.original.core.ui.controls.dialogs.ConfirmationDialog
 import mega.privacy.android.shared.original.core.ui.controls.dialogs.MegaAlertDialog
 import mega.privacy.android.shared.original.core.ui.navigation.launchFolderPicker
-import mega.privacy.android.shared.original.core.ui.theme.OriginalTempTheme
+import mega.privacy.android.shared.original.core.ui.theme.OriginalTheme
 import mega.privacy.android.shared.original.core.ui.utils.showAutoDurationSnackbar
 import timber.log.Timber
 
@@ -191,7 +191,7 @@ fun createStartTransferView(
         val downloadEvent by transferEventState.collectAsStateWithLifecycle(
             (transferEventState as? StateFlow)?.value ?: consumed()
         )
-        OriginalTempTheme(isDark = isSystemInDarkTheme()) {
+        OriginalTheme(isDark = isSystemInDarkTheme()) {
             val snackbarHostState = remember { SnackbarHostState() }
             //if we need this view is because we are not using compose views, so we don't have a scaffold to show snack bars and need to launch a View snackbar
             LegacySnackBarWrapper(snackbarHostState = snackbarHostState, activity)

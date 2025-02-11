@@ -11,7 +11,7 @@ import mega.privacy.android.shared.original.core.ui.model.MegaSpanStyle
 import mega.privacy.android.shared.original.core.ui.model.SpanIndicator
 import mega.privacy.android.shared.original.core.ui.preview.CombinedThemePreviews
 import mega.android.core.ui.theme.values.TextColor
-import mega.privacy.android.shared.original.core.ui.theme.OriginalTempTheme
+import mega.privacy.android.shared.original.core.ui.theme.OriginalTheme
 
 /**
  * Chat management message view
@@ -38,7 +38,7 @@ fun ChatManagementMessageView(
 @CombinedThemePreviews
 @Composable
 private fun ChatManagementMessageViewPreview() {
-    OriginalTempTheme(isDark = isSystemInDarkTheme()) {
+    OriginalTheme(isDark = isSystemInDarkTheme()) {
         ChatManagementMessageView(
             text = "[A]Hello[/A] World",
             styles = mapOf(

@@ -121,7 +121,7 @@ import mega.privacy.android.domain.entity.meeting.ParticipantsSection
 import mega.privacy.android.domain.entity.meeting.SubtitleCallType
 import mega.privacy.android.domain.entity.meeting.TypeRemoteAVFlagChange
 import mega.privacy.android.shared.original.core.ui.controls.dialogs.MegaAlertDialog
-import mega.privacy.android.shared.original.core.ui.theme.OriginalTempTheme
+import mega.privacy.android.shared.original.core.ui.theme.OriginalTheme
 import nz.mega.sdk.MegaApiAndroid
 import nz.mega.sdk.MegaChatApiJava.MEGACHAT_INVALID_HANDLE
 import nz.mega.sdk.MegaUser.VISIBILITY_VISIBLE
@@ -458,7 +458,7 @@ class InMeetingFragment : MeetingBaseFragment(), BottomFloatingPanelListener, Sn
             setViewCompositionStrategy(ViewCompositionStrategy.DisposeOnViewTreeLifecycleDestroyed)
             setViewTreeViewModelStoreOwner(requireActivity())
             setContent {
-                OriginalTempTheme(isDark = true) {
+                OriginalTheme(isDark = true) {
                     SnackbarInMeetingView(
                         meetingActivityViewModel = sharedModel,
                         inMeetingViewModel = inMeetingViewModel
@@ -475,7 +475,7 @@ class InMeetingFragment : MeetingBaseFragment(), BottomFloatingPanelListener, Sn
                 val sharedState by sharedModel.state.collectAsStateWithLifecycle()
                 val state by inMeetingViewModel.state.collectAsStateWithLifecycle()
 
-                OriginalTempTheme(isDark = true) {
+                OriginalTheme(isDark = true) {
                     LeaveMeetingBottomSheetView(
                         state = state,
                         onAssignAndLeaveClick = {
@@ -518,7 +518,7 @@ class InMeetingFragment : MeetingBaseFragment(), BottomFloatingPanelListener, Sn
             setViewCompositionStrategy(ViewCompositionStrategy.DisposeOnViewTreeLifecycleDestroyed)
             setViewTreeViewModelStoreOwner(requireActivity())
             setContent {
-                OriginalTempTheme(isDark = true) {
+                OriginalTheme(isDark = true) {
                     MoreCallOptionsBottomSheetView()
                 }
             }
@@ -721,7 +721,7 @@ class InMeetingFragment : MeetingBaseFragment(), BottomFloatingPanelListener, Sn
             isVisible = true
             setViewCompositionStrategy(ViewCompositionStrategy.DisposeOnViewTreeLifecycleDestroyed)
             setContent {
-                OriginalTempTheme(isDark = false) {
+                OriginalTheme(isDark = false) {
                     MeetingBanner(inMeetingViewModel)
                 }
             }

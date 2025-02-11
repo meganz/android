@@ -41,7 +41,7 @@ import mega.privacy.android.shared.original.core.ui.controls.buttons.MegaCheckbo
 import mega.privacy.android.shared.original.core.ui.controls.buttons.TextMegaButton
 import mega.privacy.android.shared.original.core.ui.controls.text.MegaText
 import mega.privacy.android.shared.original.core.ui.preview.CombinedTextAndThemePreviews
-import mega.privacy.android.shared.original.core.ui.theme.OriginalTempTheme
+import mega.privacy.android.shared.original.core.ui.theme.OriginalTheme
 import mega.android.core.ui.theme.values.TextColor
 
 @Composable
@@ -201,7 +201,7 @@ private fun isEmail(contact: String) =
 @CombinedTextAndThemePreviews
 @Composable
 private fun ContactInfoListDialogPreview() {
-    OriginalTempTheme(isDark = isSystemInDarkTheme()) {
+    OriginalTheme(isDark = isSystemInDarkTheme()) {
         ContactInfoListDialog(
             contactInfo = InvitationContactInfo(
                 name = "W3 Multiple Phones",

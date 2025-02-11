@@ -2,9 +2,6 @@ package mega.privacy.android.shared.original.core.ui.theme
 
 import android.annotation.SuppressLint
 import androidx.compose.foundation.isSystemInDarkTheme
-import androidx.compose.foundation.layout.Arrangement
-import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.padding
 import androidx.compose.material.MaterialTheme
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.CompositionLocalProvider
@@ -12,8 +9,10 @@ import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.staticCompositionLocalOf
-import androidx.compose.ui.Modifier
-import androidx.compose.ui.unit.dp
+import mega.android.core.ui.theme.values.BackgroundColor
+import mega.android.core.ui.theme.values.IconColor
+import mega.android.core.ui.theme.values.SupportColor
+import mega.android.core.ui.theme.values.TextColor
 import mega.android.core.ui.tokens.theme.tokens.AndroidNewSemanticTokensDark
 import mega.android.core.ui.tokens.theme.tokens.AndroidNewSemanticTokensLight
 import mega.android.core.ui.tokens.theme.tokens.Background
@@ -28,57 +27,30 @@ import mega.android.core.ui.tokens.theme.tokens.Notifications
 import mega.android.core.ui.tokens.theme.tokens.SemanticTokens
 import mega.android.core.ui.tokens.theme.tokens.Support
 import mega.android.core.ui.tokens.theme.tokens.Text
-import mega.privacy.android.shared.original.core.ui.controls.text.MegaText
-import mega.android.core.ui.theme.values.BackgroundColor
-import mega.android.core.ui.theme.values.IconColor
-import mega.android.core.ui.theme.values.SupportColor
-import mega.android.core.ui.theme.values.TextColor
 
 /**
- * Android theme to be used by Original components with TEMP (temporary) color tokens.
- *
- * @param isDark
- * @param content
- */
-@Composable
-fun OriginalTempTheme(
-    isDark: Boolean,
-    content: @Composable () -> Unit,
-) = OriginalTheme(
-    isDark = isDark,
-    darkColorTokens = AndroidNewSemanticTokensDark,
-    lightColorTokens = AndroidNewSemanticTokensLight,
-    content = content,
-)
-
-/**
- * Android theme with TEMP (temporary) tokens to be used only in Previews.
+ * Android original theme to be used only in Previews.
  *
  * @param content
  */
 @SuppressLint("IsSystemInDarkTheme")
 @Composable
-internal fun OriginalTempThemeForPreviews(
+internal fun OriginalThemeForPreviews(
     content: @Composable () -> Unit,
-) = OriginalTempTheme(
+) = OriginalTheme(
     isSystemInDarkTheme(),
     content,
 )
 
 /**
- * Android theme to be used by Original components with with the specified color tokens.
- * This method is added to add flexibility, however the version with default tokens is preferred: [OriginalTempTheme].
+ * Android theme to be used by components in the original design system
  *
  * @param isDark
- * @param darkColorTokens [SemanticTokens] for dark mode
- * @param lightColorTokens [SemanticTokens] for light mode
  * @param content
  */
 @Composable
 fun OriginalTheme(
     isDark: Boolean,
-    darkColorTokens: SemanticTokens,
-    lightColorTokens: SemanticTokens,
     content: @Composable () -> Unit,
 ) {
     val legacyColors = if (isDark) {
@@ -88,9 +60,9 @@ fun OriginalTheme(
     }
 
     val semanticTokens = if (isDark) {
-        darkColorTokens
+        AndroidNewSemanticTokensDark
     } else {
-        lightColorTokens
+        AndroidNewSemanticTokensLight
     }
     val colors = MegaColors(semanticTokens, !isDark)
 

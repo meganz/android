@@ -11,15 +11,13 @@ import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.SpanStyle
-import androidx.compose.ui.text.font.FontWeight
-import androidx.compose.ui.unit.dp
 import androidx.constraintlayout.compose.ConstraintLayout
 import mega.privacy.android.app.R
 import mega.privacy.android.shared.original.core.ui.controls.text.MegaSpannedText
 import mega.privacy.android.shared.original.core.ui.model.MegaSpanStyle
 import mega.privacy.android.shared.original.core.ui.model.SpanIndicator
 import mega.privacy.android.shared.original.core.ui.preview.CombinedThemePreviews
-import mega.privacy.android.shared.original.core.ui.theme.OriginalTempTheme
+import mega.privacy.android.shared.original.core.ui.theme.OriginalTheme
 import mega.android.core.ui.theme.values.TextColor
 import mega.privacy.android.icon.pack.R as iconPackR
 
@@ -78,7 +76,7 @@ internal const val RECENT_EMPTY_TEXT_TEST_TAG = "recent_actions_empty_view:text"
 @CombinedThemePreviews
 @Composable
 private fun RecentActionsEmptyViewPreview() {
-    OriginalTempTheme(isDark = isSystemInDarkTheme()) {
+    OriginalTheme(isDark = isSystemInDarkTheme()) {
         RecentActionsEmptyView()
     }
 }

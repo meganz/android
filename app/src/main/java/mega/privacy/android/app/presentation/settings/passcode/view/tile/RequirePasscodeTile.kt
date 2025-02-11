@@ -9,7 +9,7 @@ import androidx.compose.ui.res.stringResource
 import mega.privacy.android.app.R
 import mega.privacy.android.shared.original.core.ui.controls.lists.GenericTwoLineListItem
 import mega.privacy.android.shared.original.core.ui.preview.CombinedThemePreviews
-import mega.privacy.android.shared.original.core.ui.theme.OriginalTempTheme
+import mega.privacy.android.shared.original.core.ui.theme.OriginalTheme
 
 /**
  * Require passcode tile
@@ -39,7 +39,7 @@ internal fun RequirePasscodeTile(
 @CombinedThemePreviews
 @Composable
 private fun RequirePasscodeTilePreview() {
-    OriginalTempTheme(isDark = isSystemInDarkTheme()) {
+    OriginalTheme(isDark = isSystemInDarkTheme()) {
         RequirePasscodeTile(
             onItemClicked = {},
             subTitle = "30 Seconds"

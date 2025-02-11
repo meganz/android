@@ -34,7 +34,7 @@ import mega.privacy.android.domain.entity.contacts.ContactPermission
 import mega.privacy.android.domain.entity.shares.AccessPermission
 import mega.privacy.android.shared.original.core.ui.controls.buttons.TextMegaButton
 import mega.privacy.android.shared.original.core.ui.preview.CombinedThemePreviews
-import mega.privacy.android.shared.original.core.ui.theme.OriginalTempTheme
+import mega.privacy.android.shared.original.core.ui.theme.OriginalTheme
 import mega.privacy.android.shared.original.core.ui.theme.extensions.grey_alpha_012_white_alpha_012
 import mega.privacy.android.shared.original.core.ui.theme.extensions.subtitle2medium
 import mega.privacy.android.shared.original.core.ui.theme.extensions.textColorPrimary
@@ -160,7 +160,7 @@ internal const val MAX_CONTACTS_TO_SHOW = MAX_NUMBER_OF_CONTACTS_IN_LIST
 @CombinedThemePreviews
 @Composable
 private fun SharedInfoPreview() {
-    OriginalTempTheme(isDark = isSystemInDarkTheme()) {
+    OriginalTheme(isDark = isSystemInDarkTheme()) {
         var expanded by remember { mutableStateOf(true) }
         SharedInfoView(
             contacts = List(7) {

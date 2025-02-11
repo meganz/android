@@ -26,7 +26,7 @@ import mega.privacy.android.app.utils.MANAGE_PLAY_STORE_SUBSCRIPTION_URL
 import mega.privacy.android.domain.entity.AccountType
 import mega.privacy.android.domain.entity.ThemeMode
 import mega.privacy.android.domain.usecase.GetThemeMode
-import mega.privacy.android.shared.original.core.ui.theme.OriginalTempTheme
+import mega.privacy.android.shared.original.core.ui.theme.OriginalTheme
 import mega.privacy.mobile.analytics.event.CancelSubscriptionContinueCancellationButtonPressedEvent
 import mega.privacy.mobile.analytics.event.CancelSubscriptionKeepPlanButtonPressedEvent
 import mega.privacy.mobile.analytics.event.SubscriptionCancellationSurveyCancelSubscriptionButtonEvent
@@ -67,7 +67,7 @@ class CancelAccountPlanActivity : AppCompatActivity() {
             val accountUiState by accountStorageViewModel.state.collectAsStateWithLifecycle()
 
             val accountType = uiState.accountType
-            OriginalTempTheme(isDark = themeMode.isDarkMode()) {
+            OriginalTheme(isDark = themeMode.isDarkMode()) {
                 NavHost(
                     navController = navController,
                     startDestination = if (accountType == AccountType.PRO_FLEXI) {

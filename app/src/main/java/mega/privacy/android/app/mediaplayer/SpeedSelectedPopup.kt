@@ -26,7 +26,7 @@ import androidx.compose.ui.window.PopupProperties
 import mega.privacy.android.analytics.Analytics
 import mega.privacy.android.app.R
 import mega.privacy.android.app.mediaplayer.model.SpeedPlaybackItem
-import mega.privacy.android.shared.original.core.ui.theme.OriginalTempTheme
+import mega.privacy.android.shared.original.core.ui.theme.OriginalTheme
 import mega.privacy.mobile.analytics.event.SpeedOption0_5XPressedEvent
 import mega.privacy.mobile.analytics.event.SpeedOption1_5XPressedEvent
 import mega.privacy.mobile.analytics.event.SpeedOption2XPressedEvent
@@ -110,7 +110,7 @@ fun SpeedSelectedPopup(
 @Preview
 @Composable
 private fun PreviewSpeedSelectedPopup() {
-    OriginalTempTheme(isDark = isSystemInDarkTheme()) {
+    OriginalTheme(isDark = isSystemInDarkTheme()) {
         SpeedSelectedPopup(
             items = SpeedPlaybackItem.entries,
             isShown = true,

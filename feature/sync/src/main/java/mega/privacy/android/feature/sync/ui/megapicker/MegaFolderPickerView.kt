@@ -38,7 +38,7 @@ import mega.privacy.android.shared.original.core.ui.controls.dividers.MegaDivide
 import mega.privacy.android.shared.original.core.ui.controls.skeleton.ListItemLoadingSkeleton
 import mega.privacy.android.shared.original.core.ui.controls.text.MegaText
 import mega.privacy.android.shared.original.core.ui.preview.CombinedThemePreviews
-import mega.privacy.android.shared.original.core.ui.theme.OriginalTempTheme
+import mega.privacy.android.shared.original.core.ui.theme.OriginalTheme
 import mega.android.core.ui.theme.values.TextColor
 
 @Composable
@@ -176,7 +176,7 @@ private fun EmptyFolderPlaceHolder(
 @Composable
 @CombinedThemePreviews
 private fun MegaFolderPickerViewLoadingStatePreview() {
-    OriginalTempTheme(isDark = isSystemInDarkTheme()) {
+    OriginalTheme(isDark = isSystemInDarkTheme()) {
         MegaFolderPickerView(
             nodesList = emptyList(),
             sortOrder = "Name",
@@ -196,7 +196,7 @@ private fun MegaFolderPickerViewLoadingStatePreview() {
 @Composable
 @CombinedThemePreviews
 private fun MegaFolderPickerViewEmptyPreview() {
-    OriginalTempTheme(isDark = isSystemInDarkTheme()) {
+    OriginalTheme(isDark = isSystemInDarkTheme()) {
         MegaFolderPickerView(
             nodesList = emptyList(),
             sortOrder = "Name",
@@ -216,7 +216,7 @@ private fun MegaFolderPickerViewEmptyPreview() {
 @Composable
 @CombinedThemePreviews
 private fun PreviewMegaFolderPickerView() {
-    OriginalTempTheme(isDark = isSystemInDarkTheme()) {
+    OriginalTheme(isDark = isSystemInDarkTheme()) {
         MegaFolderPickerView(
             nodesList = SampleNodeDataProvider.values,
             sortOrder = "Name",

@@ -49,7 +49,7 @@ import mega.privacy.android.app.utils.permission.PermissionUtils
 import mega.privacy.android.shared.original.core.ui.controls.chat.attachpanel.CellButton
 import mega.privacy.android.shared.original.core.ui.controls.chat.attachpanel.CellButtonPlaceHolder
 import mega.privacy.android.shared.original.core.ui.preview.CombinedThemePreviews
-import mega.privacy.android.shared.original.core.ui.theme.OriginalTempTheme
+import mega.privacy.android.shared.original.core.ui.theme.OriginalTheme
 import mega.privacy.android.shared.original.core.ui.utils.showAutoDurationSnackbar
 import mega.privacy.mobile.analytics.event.ChatConversationContactMenuItemEvent
 import mega.privacy.mobile.analytics.event.ChatConversationFileMenuItemEvent
@@ -362,7 +362,7 @@ private fun openDocumentScanner(
 @CombinedThemePreviews
 @Composable
 private fun ChatToolbarBottomSheetPreview() {
-    OriginalTempTheme(isDark = isSystemInDarkTheme()) {
+    OriginalTheme(isDark = isSystemInDarkTheme()) {
         ChatToolbarBottomSheet(
             onAttachContacts = {},
             uiState = ChatUiState(),

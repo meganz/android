@@ -14,7 +14,7 @@ import mega.privacy.android.shared.original.core.ui.controls.lists.GenericTwoLin
 import mega.privacy.android.shared.original.core.ui.preview.BooleanProvider
 import mega.privacy.android.shared.original.core.ui.preview.CombinedThemePreviews
 import mega.privacy.android.shared.original.core.ui.controls.controlssliders.MegaSwitch
-import mega.privacy.android.shared.original.core.ui.theme.OriginalTempTheme
+import mega.privacy.android.shared.original.core.ui.theme.OriginalTheme
 
 /**
  * A [Composable] that displays a [MegaSwitch] to enable or disable Location Tags when uploading
@@ -61,7 +61,7 @@ internal fun IncludeLocationTagsTile(
 private fun IncludeLocationTagsTilePreview(
     @PreviewParameter(BooleanProvider::class) isChecked: Boolean,
 ) {
-    OriginalTempTheme(isDark = isSystemInDarkTheme()) {
+    OriginalTheme(isDark = isSystemInDarkTheme()) {
         IncludeLocationTagsTile(
             isChecked = isChecked,
             onCheckedChange = {},

@@ -33,7 +33,7 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import mega.privacy.android.app.R
-import mega.privacy.android.shared.original.core.ui.theme.OriginalTempTheme
+import mega.privacy.android.shared.original.core.ui.theme.OriginalTheme
 
 @Composable
 fun NotificationsPermissionView(
@@ -118,7 +118,7 @@ fun NotificationsPermissionView(
 @Composable
 @Preview
 fun PreviewNotificationsPermissionView() {
-    OriginalTempTheme(isDark = isSystemInDarkTheme()) {
+    OriginalTheme(isDark = isSystemInDarkTheme()) {
         NotificationsPermissionView(
             onNotNowClicked = {},
             onGrantAccessClicked = {}

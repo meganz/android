@@ -34,7 +34,7 @@ import mega.privacy.android.shared.original.core.ui.controls.dividers.MegaDivide
 import mega.privacy.android.shared.original.core.ui.controls.layouts.MegaScaffold
 import mega.privacy.android.shared.original.core.ui.controls.text.MegaText
 import mega.privacy.android.shared.original.core.ui.preview.CombinedThemePreviews
-import mega.privacy.android.shared.original.core.ui.theme.OriginalTempTheme
+import mega.privacy.android.shared.original.core.ui.theme.OriginalTheme
 import mega.android.core.ui.theme.values.TextColor
 import mega.privacy.android.shared.original.core.ui.utils.showAutoDurationSnackbar
 
@@ -211,7 +211,7 @@ private fun UploadDestinationFooterView(
 @CombinedThemePreviews
 @Composable
 private fun UploadViewPreview() {
-    OriginalTempTheme(isDark = isSystemInDarkTheme()) {
+    OriginalTheme(isDark = isSystemInDarkTheme()) {
         UploadDestinationView(
             uiState = UploadDestinationUiState(
                 importUiItems = listOf(
@@ -251,7 +251,7 @@ private fun UploadViewPreview() {
 @CombinedThemePreviews
 @Composable
 private fun UploadViewInEditModePreview() {
-    OriginalTempTheme(isDark = isSystemInDarkTheme()) {
+    OriginalTheme(isDark = isSystemInDarkTheme()) {
         UploadDestinationView(
             uiState = UploadDestinationUiState(
                 importUiItems = listOf(

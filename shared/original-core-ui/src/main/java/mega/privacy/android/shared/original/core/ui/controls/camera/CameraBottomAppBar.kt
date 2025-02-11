@@ -37,7 +37,7 @@ import mega.privacy.android.shared.original.core.ui.controls.chip.RoundedChipSty
 import mega.privacy.android.shared.original.core.ui.preview.BooleanProvider
 import mega.privacy.android.shared.original.core.ui.preview.CombinedThemePreviews
 import mega.privacy.android.shared.original.core.ui.theme.MegaOriginalTheme
-import mega.privacy.android.shared.original.core.ui.theme.OriginalTempTheme
+import mega.privacy.android.shared.original.core.ui.theme.OriginalTheme
 
 /**
  * Camera bottom app bar
@@ -260,7 +260,7 @@ private fun CameraButton(
 private fun CameraBottomAppBarPreview(
     @PreviewParameter(BooleanProvider::class) isVideoSelected: Boolean,
 ) {
-    OriginalTempTheme(isDark = isSystemInDarkTheme()) {
+    OriginalTheme(isDark = isSystemInDarkTheme()) {
         CameraBottomAppBar(
             isCaptureVideo = isVideoSelected,
             isRecording = false,
@@ -274,7 +274,7 @@ private fun CameraBottomAppBarPreview(
 private fun RecordingCameraBottomAppBarPreview(
     @PreviewParameter(BooleanProvider::class) isVideoSelected: Boolean,
 ) {
-    OriginalTempTheme(isDark = isSystemInDarkTheme()) {
+    OriginalTheme(isDark = isSystemInDarkTheme()) {
         CameraBottomAppBar(
             isCaptureVideo = isVideoSelected,
             isRecording = true,

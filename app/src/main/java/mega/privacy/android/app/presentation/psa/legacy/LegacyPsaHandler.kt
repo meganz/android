@@ -19,7 +19,7 @@ import mega.privacy.android.app.presentation.extensions.isDarkMode
 import mega.privacy.android.app.presentation.psa.PsaContainer
 import mega.privacy.android.domain.entity.ThemeMode
 import mega.privacy.android.domain.usecase.GetThemeMode
-import mega.privacy.android.shared.original.core.ui.theme.OriginalTempTheme
+import mega.privacy.android.shared.original.core.ui.theme.OriginalTheme
 import java.security.InvalidParameterException
 import javax.inject.Inject
 
@@ -62,7 +62,7 @@ class LegacyPsaHandler @Inject constructor(
                         val themeMode by getThemeMode()
                             .collectAsStateWithLifecycle(initialValue = ThemeMode.System)
                         val isDarkMode = themeMode.isDarkMode()
-                        OriginalTempTheme(isDark = isDarkMode) {
+                        OriginalTheme(isDark = isDarkMode) {
                             PsaContainer { Box(Modifier.fillMaxSize()) }
                         }
                     }

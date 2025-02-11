@@ -31,7 +31,7 @@ import androidx.core.content.withStyledAttributes
 import mega.privacy.android.core.R
 import mega.privacy.android.shared.original.core.ui.preview.BooleanProvider
 import mega.privacy.android.shared.original.core.ui.preview.CombinedTextAndThemePreviews
-import mega.privacy.android.shared.original.core.ui.theme.OriginalTempTheme
+import mega.privacy.android.shared.original.core.ui.theme.OriginalTheme
 import mega.privacy.android.shared.original.core.ui.theme.MegaOriginalTheme
 
 class WarningBanner : AbstractComposeView {
@@ -52,7 +52,7 @@ class WarningBanner : AbstractComposeView {
 
     @Composable
     override fun Content() {
-        OriginalTempTheme(isDark = isSystemInDarkTheme()) {
+        OriginalTheme(isDark = isSystemInDarkTheme()) {
             WarningBanner(textString = text, onCloseClick = onCloseClick)
         }
     }
@@ -181,7 +181,7 @@ private fun BannerContent(
 private fun WarningBannerPreview(
     @PreviewParameter(BooleanProvider::class) showCloseButton: Boolean,
 ) {
-    OriginalTempTheme(isDark = isSystemInDarkTheme()) {
+    OriginalTheme(isDark = isSystemInDarkTheme()) {
         WarningBanner(
             textString = "This is a warning banner",
             onCloseClick = if (showCloseButton) {
@@ -196,7 +196,7 @@ private fun WarningBannerPreview(
 private fun WarningBannerLongTextPreview(
     @PreviewParameter(BooleanProvider::class) showCloseButton: Boolean,
 ) {
-    OriginalTempTheme(isDark = isSystemInDarkTheme()) {
+    OriginalTheme(isDark = isSystemInDarkTheme()) {
         WarningBanner(
             textString = "This is a warning banner with a very long text to preview multiline behaviour, still more text needed",
             onCloseClick = if (showCloseButton) {

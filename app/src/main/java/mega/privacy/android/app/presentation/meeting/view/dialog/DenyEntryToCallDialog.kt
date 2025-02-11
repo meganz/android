@@ -11,7 +11,7 @@ import mega.privacy.android.app.R
 import mega.privacy.android.app.presentation.meeting.WaitingRoomManagementViewModel
 import mega.privacy.android.app.presentation.meeting.model.WaitingRoomManagementState
 import mega.privacy.android.shared.original.core.ui.controls.dialogs.MegaAlertDialog
-import mega.privacy.android.shared.original.core.ui.theme.OriginalTempTheme
+import mega.privacy.android.shared.original.core.ui.theme.OriginalTheme
 
 /**
  * Show the dialog to deny a user entry to the call.
@@ -104,7 +104,7 @@ private fun DenyEntryToCallDialog(
 @Preview
 @Composable
 fun PreviewDenyEntryToCallDialog() {
-    OriginalTempTheme(isDark = isSystemInDarkTheme()) {
+    OriginalTheme(isDark = isSystemInDarkTheme()) {
         DenyEntryToCallDialog(
             WaitingRoomManagementState(
                 scheduledMeetingTitle = "Title",

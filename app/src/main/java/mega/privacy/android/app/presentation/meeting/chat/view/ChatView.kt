@@ -92,7 +92,7 @@ import mega.privacy.android.shared.original.core.ui.controls.chat.VoiceClipRecor
 import mega.privacy.android.shared.original.core.ui.controls.chat.messages.reaction.model.UIReaction
 import mega.privacy.android.shared.original.core.ui.controls.layouts.MegaScaffold
 import mega.privacy.android.shared.original.core.ui.controls.sheets.MegaBottomSheetLayout
-import mega.privacy.android.shared.original.core.ui.theme.OriginalTempTheme
+import mega.privacy.android.shared.original.core.ui.theme.OriginalTheme
 import mega.privacy.android.shared.original.core.ui.utils.showAutoDurationSnackbar
 import mega.privacy.mobile.analytics.event.ChatConversationAddAttachmentButtonPressedEvent
 import mega.privacy.mobile.analytics.event.ChatMessageLongPressedEvent
@@ -646,7 +646,7 @@ fun showPermissionNotAllowedSnackbar(
 @Preview(uiMode = Configuration.UI_MODE_NIGHT_YES, name = "ChatView")
 @Composable
 private fun ChatViewPreview() {
-    OriginalTempTheme(isDark = isSystemInDarkTheme()) {
+    OriginalTheme(isDark = isSystemInDarkTheme()) {
         val uiState = ChatUiState(
             userChatStatus = UserChatStatus.Away,
             isChatNotificationMute = true,

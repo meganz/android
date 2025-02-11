@@ -11,7 +11,7 @@ import androidx.compose.ui.tooling.preview.PreviewParameterProvider
 import mega.privacy.android.app.R
 import mega.privacy.android.shared.original.core.ui.controls.dialogs.ConfirmationDialog
 import mega.privacy.android.shared.original.core.ui.preview.CombinedThemePreviews
-import mega.privacy.android.shared.original.core.ui.theme.OriginalTempTheme
+import mega.privacy.android.shared.original.core.ui.theme.OriginalTheme
 
 @Composable
 internal fun JoinAnswerCallDialog(
@@ -49,7 +49,7 @@ internal fun JoinAnswerCallDialog(
 private fun JoinAnswerCallDialogPreview(
     @PreviewParameter(JoinAnswerCallDialogPreviewProvider::class) status: JoinAnswerCallDialogStatus,
 ) {
-    OriginalTempTheme(isDark = isSystemInDarkTheme()) {
+    OriginalTheme(isDark = isSystemInDarkTheme()) {
         with(status) {
             JoinAnswerCallDialog(
                 isGroup = isGroup,

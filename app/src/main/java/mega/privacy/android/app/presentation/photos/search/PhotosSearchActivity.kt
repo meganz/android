@@ -74,7 +74,7 @@ import mega.privacy.android.domain.usecase.featureflag.GetFeatureFlagValueUseCas
 import mega.privacy.android.feature.sync.data.mapper.ListToStringWithDelimitersMapper
 import mega.privacy.android.navigation.MegaNavigator
 import mega.privacy.android.shared.original.core.ui.controls.sheets.MegaBottomSheetLayout
-import mega.privacy.android.shared.original.core.ui.theme.OriginalTempTheme
+import mega.privacy.android.shared.original.core.ui.theme.OriginalTheme
 import mega.privacy.android.shared.original.core.ui.utils.showAutoDurationSnackbar
 import javax.inject.Inject
 
@@ -123,7 +123,7 @@ internal class PhotosSearchActivity : AppCompatActivity(), MegaSnackbarShower {
 
         setContent {
             val theme by getThemeMode().collectAsStateWithLifecycle(initialValue = ThemeMode.System)
-            OriginalTempTheme(isDark = theme.isDarkMode()) {
+            OriginalTheme(isDark = theme.isDarkMode()) {
                 val bottomSheetNavigator = rememberBottomSheetNavigator()
                 val navController = rememberNavController(bottomSheetNavigator)
                 val scaffoldState = rememberScaffoldState(snackbarHostState = snackbarHostState)

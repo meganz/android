@@ -25,7 +25,7 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextDecoration
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.window.DialogProperties
-import mega.privacy.android.shared.original.core.ui.theme.OriginalTempTheme
+import mega.privacy.android.shared.original.core.ui.theme.OriginalTheme
 import mega.privacy.android.shared.original.core.ui.controls.buttons.TextMegaButton
 import mega.privacy.android.shared.original.core.ui.controls.text.MegaSpannedText
 import mega.privacy.android.shared.original.core.ui.model.MegaSpanStyle
@@ -203,7 +203,7 @@ internal const val EDIT_OCCURRENCE_DIALOG_WARNING_TAG =
 @CombinedThemePreviews
 @Composable
 private fun EditOccurrenceDialogPreview() {
-    OriginalTempTheme(isDark = isSystemInDarkTheme()) {
+    OriginalTheme(isDark = isSystemInDarkTheme()) {
         Box(
             modifier = Modifier.padding(horizontal = 240.dp, vertical = 120.dp),
             content = {

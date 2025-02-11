@@ -50,7 +50,7 @@ import mega.privacy.android.app.utils.Constants
 import mega.privacy.android.app.utils.MenuUtils.toggleAllMenuItemsVisibility
 import mega.privacy.android.domain.entity.ThemeMode
 import mega.privacy.android.domain.usecase.GetThemeMode
-import mega.privacy.android.shared.original.core.ui.theme.OriginalTempTheme
+import mega.privacy.android.shared.original.core.ui.theme.OriginalTheme
 import mega.privacy.mobile.analytics.event.AudioPlayerQueueReorderedEvent
 import javax.inject.Inject
 
@@ -230,7 +230,7 @@ class AudioQueueFragment : Fragment() {
             setContent {
                 val themeMode by getThemeMode()
                     .collectAsStateWithLifecycle(initialValue = ThemeMode.System)
-                OriginalTempTheme(isDark = themeMode.isDarkMode()) {
+                OriginalTheme(isDark = themeMode.isDarkMode()) {
                     AudioQueueView(
                         viewModel = audioQueueViewModel,
                         setupAudioPlayer = { playerView ->

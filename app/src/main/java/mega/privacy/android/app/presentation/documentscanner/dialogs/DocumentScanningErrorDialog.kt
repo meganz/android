@@ -11,7 +11,7 @@ import androidx.compose.ui.tooling.preview.PreviewParameterProvider
 import mega.privacy.android.app.presentation.documentscanner.model.DocumentScanningError
 import mega.privacy.android.shared.original.core.ui.controls.dialogs.MegaAlertDialog
 import mega.privacy.android.shared.original.core.ui.preview.CombinedThemePreviews
-import mega.privacy.android.shared.original.core.ui.theme.OriginalTempTheme
+import mega.privacy.android.shared.original.core.ui.theme.OriginalTheme
 
 /**
  * A Composable Dialog shown when an error occurs during Document Scanning
@@ -50,7 +50,7 @@ internal fun DocumentScanningErrorDialog(
 private fun DocumentScanningErrorDialogPreview(
     @PreviewParameter(DocumentScanningErrorParameterProvider::class) documentScanningError: DocumentScanningError,
 ) {
-    OriginalTempTheme(isDark = isSystemInDarkTheme()) {
+    OriginalTheme(isDark = isSystemInDarkTheme()) {
         DocumentScanningErrorDialog(
             documentScanningError = documentScanningError,
             onErrorAcknowledged = {},

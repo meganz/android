@@ -29,7 +29,7 @@ import mega.privacy.android.app.R
 import mega.privacy.android.shared.original.core.ui.controls.buttons.TextMegaButton
 import mega.privacy.android.shared.original.core.ui.controls.text.MegaText
 import mega.privacy.android.shared.original.core.ui.preview.CombinedThemePreviews
-import mega.privacy.android.shared.original.core.ui.theme.OriginalTempTheme
+import mega.privacy.android.shared.original.core.ui.theme.OriginalTheme
 import mega.privacy.android.shared.original.core.ui.theme.extensions.subtitle1medium
 import mega.android.core.ui.theme.values.TextColor
 
@@ -192,7 +192,7 @@ private fun ButtonRow(
 private fun PsaViewPreview(
     @PreviewParameter(ImagePainterProvider::class) imagePainter: () -> Painter?,
 ) {
-    OriginalTempTheme(isDark = isSystemInDarkTheme()) {
+    OriginalTheme(isDark = isSystemInDarkTheme()) {
         PsaViewContent(
             modifier = Modifier,
             title = "Title",
@@ -213,7 +213,7 @@ private fun PsaViewPreview(
 private fun InfoPsaViewPreview(
     @PreviewParameter(ImagePainterProvider::class) imagePainter: @Composable () -> Painter?,
 ) {
-    OriginalTempTheme(isDark = isSystemInDarkTheme()) {
+    OriginalTheme(isDark = isSystemInDarkTheme()) {
         Box(modifier = Modifier.fillMaxSize()) {
             PsaViewContent(
                 modifier = Modifier
@@ -232,7 +232,7 @@ private fun InfoPsaViewPreview(
 @CombinedThemePreviews
 @Composable
 private fun ButtonRowPreview() {
-    OriginalTempTheme(isDark = isSystemInDarkTheme()) {
+    OriginalTheme(isDark = isSystemInDarkTheme()) {
         Box(Modifier.fillMaxSize()) {
             ButtonRow(
                 positiveButton = { TextMegaButton(text = "Positive", onClick = {}) },

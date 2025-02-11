@@ -77,7 +77,7 @@ import mega.privacy.android.domain.entity.node.NameCollision
 import mega.privacy.android.domain.entity.node.NodeId
 import mega.privacy.android.domain.usecase.GetThemeMode
 import mega.privacy.android.navigation.MegaNavigator
-import mega.privacy.android.shared.original.core.ui.theme.OriginalTempTheme
+import mega.privacy.android.shared.original.core.ui.theme.OriginalTheme
 import mega.privacy.mobile.analytics.event.PhotoPreviewSaveToDeviceMenuToolbarEvent
 import mega.privacy.mobile.analytics.event.PhotoPreviewScreenEvent
 import mega.privacy.mobile.analytics.event.PlaySlideshowMenuToolbarEvent
@@ -165,7 +165,7 @@ class ImagePreviewActivity : BaseActivity() {
                     darkIcons = !isDarkMode
                 )
             }
-            OriginalTempTheme(isDark = isDarkMode) {
+            OriginalTheme(isDark = isDarkMode) {
                 PasscodeContainer(
                     passcodeCryptObjectFactory = passcodeCryptObjectFactory,
                     content = {

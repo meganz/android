@@ -44,7 +44,7 @@ import mega.privacy.android.domain.entity.documentscanner.ScanFilenameValidation
 import mega.privacy.android.shared.original.core.ui.controls.text.MegaText
 import mega.privacy.android.shared.original.core.ui.controls.textfields.GenericTextField
 import mega.privacy.android.shared.original.core.ui.preview.CombinedThemePreviews
-import mega.privacy.android.shared.original.core.ui.theme.OriginalTempTheme
+import mega.privacy.android.shared.original.core.ui.theme.OriginalTheme
 import mega.privacy.android.shared.original.core.ui.theme.extensions.accent_900_accent_050
 import mega.android.core.ui.theme.values.TextColor
 
@@ -230,7 +230,7 @@ private fun getFilenameErrorMessage(
 private fun SaveScannedDocumentsFilenameGroupFileImagePreview(
     @PreviewParameter(ScanFileTypeProvider::class) scanFileType: ScanFileType,
 ) {
-    OriginalTempTheme(isDark = isSystemInDarkTheme()) {
+    OriginalTheme(isDark = isSystemInDarkTheme()) {
         SaveScannedDocumentsFilenameGroup(
             filename = "Scanned_file.pdf",
             filenameValidationStatus = ScanFilenameValidationStatus.ValidFilename,
@@ -257,7 +257,7 @@ private class ScanFileTypeProvider : PreviewParameterProvider<ScanFileType> {
 private fun SaveScannedDocumentsFilenameGroupInputErrorPreview(
     @PreviewParameter(FilenameInputErrorProvider::class) filenameInputError: FilenameInputError,
 ) {
-    OriginalTempTheme(isDark = isSystemInDarkTheme()) {
+    OriginalTheme(isDark = isSystemInDarkTheme()) {
         SaveScannedDocumentsFilenameGroup(
             filename = filenameInputError.filename,
             filenameValidationStatus = filenameInputError.filenameValidationStatus,

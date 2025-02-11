@@ -21,7 +21,7 @@ import androidx.compose.ui.unit.dp
 import mega.privacy.android.shared.original.core.ui.preview.CombinedThemePreviews
 import mega.privacy.android.shared.original.core.ui.theme.MegaColors
 import mega.privacy.android.shared.original.core.ui.theme.MegaOriginalTheme
-import mega.privacy.android.shared.original.core.ui.theme.OriginalTempTheme
+import mega.privacy.android.shared.original.core.ui.theme.OriginalTheme
 import mega.privacy.android.shared.original.core.ui.utils.composeLet
 
 
@@ -89,7 +89,7 @@ private val MegaColors.snackBarButtonColors
 private fun MegaSnackbarPreview(
     @PreviewParameter(MegaSnackbarProvider::class) data: Pair<SnackbarData, Boolean>,
 ) {
-    OriginalTempTheme(isSystemInDarkTheme()) {
+    OriginalTheme(isSystemInDarkTheme()) {
         MegaSnackbar(snackbarData = data.first, actionOnNewLine = data.second)
     }
 }

@@ -10,7 +10,7 @@ import androidx.compose.ui.res.stringResource
 import mega.privacy.android.shared.original.core.ui.controls.dividers.DividerType
 import mega.privacy.android.shared.original.core.ui.controls.lists.MenuActionListTile
 import mega.privacy.android.shared.original.core.ui.preview.CombinedThemePreviews
-import mega.privacy.android.shared.original.core.ui.theme.OriginalTempTheme
+import mega.privacy.android.shared.original.core.ui.theme.OriginalTheme
 import mega.privacy.android.shared.resources.R as sharedResR
 import mega.privacy.android.shared.original.core.ui.controls.text.MegaText
 import mega.android.core.ui.theme.values.TextColor
@@ -50,7 +50,7 @@ internal fun AddNewSyncBottomSheetTile(
 @CombinedThemePreviews
 @Composable
 private fun AddNewSyncBottomSheetTilePreview() {
-    OriginalTempTheme(isDark = isSystemInDarkTheme()) {
+    OriginalTheme(isDark = isSystemInDarkTheme()) {
         AddNewSyncBottomSheetTile(onActionClicked = {})
     }
 }

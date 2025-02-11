@@ -18,7 +18,7 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import mega.privacy.android.app.R
-import mega.privacy.android.shared.original.core.ui.theme.OriginalTempTheme
+import mega.privacy.android.shared.original.core.ui.theme.OriginalTheme
 import mega.privacy.android.shared.original.core.ui.preview.CombinedThemePreviews
 import mega.privacy.android.shared.original.core.ui.theme.extensions.textColorPrimary
 
@@ -76,7 +76,7 @@ internal fun ChatOptions() = Row(
 @CombinedThemePreviews
 @Composable
 private fun PreviewChatOptionsLight() {
-    OriginalTempTheme(isDark = false) {
+    OriginalTheme(isDark = false) {
         Surface {
             ChatOptions()
         }
@@ -86,7 +86,7 @@ private fun PreviewChatOptionsLight() {
 @CombinedThemePreviews
 @Composable
 private fun PreviewChatOptionsDark() {
-    OriginalTempTheme(isDark = true) {
+    OriginalTheme(isDark = true) {
         Surface {
             ChatOptions()
         }

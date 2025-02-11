@@ -22,7 +22,7 @@ import mega.privacy.android.app.presentation.preview.contactItemForPreviews
 import mega.privacy.android.domain.entity.contacts.ContactPermission
 import mega.privacy.android.domain.entity.shares.AccessPermission
 import mega.privacy.android.shared.original.core.ui.preview.CombinedTextAndThemePreviews
-import mega.privacy.android.shared.original.core.ui.theme.OriginalTempTheme
+import mega.privacy.android.shared.original.core.ui.theme.OriginalTheme
 
 /**
  * Contact item for shared with lists
@@ -68,7 +68,7 @@ internal fun SharedInfoContactItemView(
 @CombinedTextAndThemePreviews
 @Composable
 private fun SharedInfoContactItemViewPreview() {
-    OriginalTempTheme(isDark = isSystemInDarkTheme()) {
+    OriginalTheme(isDark = isSystemInDarkTheme()) {
         SharedInfoContactItemView(
             contactItem = ContactPermission(contactItemForPreviews, AccessPermission.READWRITE),
             selected = false,

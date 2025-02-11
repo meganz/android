@@ -11,7 +11,7 @@ import mega.privacy.android.app.presentation.account.model.AccountDeactivatedSta
 import mega.privacy.android.shared.original.core.ui.controls.dialogs.MegaAlertDialog
 import mega.privacy.android.shared.original.core.ui.preview.BooleanProvider
 import mega.privacy.android.shared.original.core.ui.preview.CombinedThemePreviews
-import mega.privacy.android.shared.original.core.ui.theme.OriginalTempTheme
+import mega.privacy.android.shared.original.core.ui.theme.OriginalTheme
 
 /**
  * A Composable Dialog informing the Business User that his/her Account has been suspended. The
@@ -51,7 +51,7 @@ fun AccountSuspendedDialog(
 private fun BusinessAccountSuspendedDialogPreview(
     @PreviewParameter(BooleanProvider::class) isBusinessAdministratorAccount: Boolean,
 ) {
-    OriginalTempTheme(isDark = isSystemInDarkTheme()) {
+    OriginalTheme(isDark = isSystemInDarkTheme()) {
         AccountSuspendedDialog(
             accountDeactivatedStatus = if (isBusinessAdministratorAccount) {
                 AccountDeactivatedStatus.MASTER_BUSINESS_ACCOUNT_DEACTIVATED

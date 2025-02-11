@@ -19,7 +19,7 @@ import mega.privacy.android.app.presentation.manager.ManagerViewModel
 import mega.privacy.android.domain.entity.ThemeMode
 import mega.privacy.android.domain.usecase.GetThemeMode
 import mega.privacy.android.shared.original.core.ui.controls.dialogs.MegaAlertDialog
-import mega.privacy.android.shared.original.core.ui.theme.OriginalTempTheme
+import mega.privacy.android.shared.original.core.ui.theme.OriginalTheme
 import javax.inject.Inject
 
 @AndroidEntryPoint
@@ -40,7 +40,7 @@ internal class ConfirmRemoveFromOfflineDialogFragment : DialogFragment() {
             setContent {
                 val themeMode by getThemeMode()
                     .collectAsStateWithLifecycle(initialValue = ThemeMode.System)
-                OriginalTempTheme(isDark = themeMode.isDarkMode()) {
+                OriginalTheme(isDark = themeMode.isDarkMode()) {
                     MegaAlertDialog(
                         text = stringResource(id = R.string.confirmation_delete_from_save_for_offline),
                         confirmButtonText = stringResource(id = R.string.general_remove),

@@ -8,7 +8,7 @@ import androidx.hilt.navigation.compose.hiltViewModel
 import mega.privacy.android.app.R
 import mega.privacy.android.shared.original.core.ui.controls.dialogs.ConfirmationDialog
 import mega.privacy.android.shared.original.core.ui.preview.CombinedTextAndThemePreviews
-import mega.privacy.android.shared.original.core.ui.theme.OriginalTempTheme
+import mega.privacy.android.shared.original.core.ui.theme.OriginalTheme
 
 @Composable
 internal fun ChangeNodeExtensionDialog(
@@ -17,7 +17,7 @@ internal fun ChangeNodeExtensionDialog(
     onDismiss: () -> Unit,
     viewModel: ChangeNodeExtensionDialogViewModel = hiltViewModel(),
 ) {
-    OriginalTempTheme(isDark = isSystemInDarkTheme()) {
+    OriginalTheme(isDark = isSystemInDarkTheme()) {
         ChangeNodeExtensionDialogBody(
             onChangeNodeExtension = {
                 onDismiss()
@@ -57,7 +57,7 @@ private fun ChangeNodeExtensionDialogBody(
 @CombinedTextAndThemePreviews
 @Composable
 private fun MoveToRubbishOrDeleteNodeDialogPreview() {
-    OriginalTempTheme(isDark = isSystemInDarkTheme()) {
+    OriginalTheme(isDark = isSystemInDarkTheme()) {
         ChangeNodeExtensionDialogBody(
             onChangeNodeExtension = {},
             onDismiss = {}

@@ -24,7 +24,7 @@ import mega.privacy.android.domain.entity.chat.messages.management.AlterParticip
 import mega.privacy.android.shared.original.core.ui.model.MegaSpanStyle
 import mega.privacy.android.shared.original.core.ui.model.SpanIndicator
 import mega.privacy.android.shared.original.core.ui.preview.CombinedThemePreviews
-import mega.privacy.android.shared.original.core.ui.theme.OriginalTempTheme
+import mega.privacy.android.shared.original.core.ui.theme.OriginalTheme
 
 /**
  * Alter participants message view
@@ -140,7 +140,7 @@ internal fun AlterParticipantsMessageView(
 private fun AlterParticipantsMessageViewSameHandlePreview(
     @PreviewParameter(ChatRoomPermissionProvider::class) permission: ChatRoomPermission,
 ) {
-    OriginalTempTheme(isDark = isSystemInDarkTheme()) {
+    OriginalTheme(isDark = isSystemInDarkTheme()) {
         AlterParticipantsMessageView(
             message = AlterParticipantsMessage(
                 chatId = 1L,
@@ -167,7 +167,7 @@ private fun AlterParticipantsMessageViewSameHandlePreview(
 private fun AlterParticipantsMessageViewDifferentHandlePreview(
     @PreviewParameter(ChatRoomPermissionProvider::class) permission: ChatRoomPermission,
 ) {
-    OriginalTempTheme(isDark = isSystemInDarkTheme()) {
+    OriginalTheme(isDark = isSystemInDarkTheme()) {
         AlterParticipantsMessageView(
             message = AlterParticipantsMessage(
                 chatId = 1L,

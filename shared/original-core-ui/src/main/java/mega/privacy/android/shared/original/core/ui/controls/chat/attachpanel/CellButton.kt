@@ -23,7 +23,7 @@ import androidx.compose.ui.unit.dp
 import mega.privacy.android.core.R
 import mega.privacy.android.shared.original.core.ui.preview.CombinedThemePreviews
 import mega.privacy.android.shared.original.core.ui.theme.MegaOriginalTheme
-import mega.privacy.android.shared.original.core.ui.theme.OriginalTempThemeForPreviews
+import mega.privacy.android.shared.original.core.ui.theme.OriginalThemeForPreviews
 import mega.privacy.android.shared.original.core.ui.theme.extensions.body4
 
 /**
@@ -98,7 +98,7 @@ fun CellButtonPlaceHolder(modifier: Modifier = Modifier) =
 private fun CellButtonPreview(
     @PreviewParameter(CellButtonTypeProvider::class) typeAndEnabled: Pair<CellButtonType, Boolean>,
 ) {
-    OriginalTempThemeForPreviews {
+    OriginalThemeForPreviews {
         CellButton(
             iconId = R.drawable.ic_menu,
             itemName = "Item",

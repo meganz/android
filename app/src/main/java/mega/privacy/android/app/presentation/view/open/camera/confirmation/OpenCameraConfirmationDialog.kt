@@ -13,7 +13,7 @@ import androidx.hilt.navigation.compose.hiltViewModel
 import mega.privacy.android.app.R
 import mega.privacy.android.shared.original.core.ui.controls.dialogs.ConfirmationDialog
 import mega.privacy.android.shared.original.core.ui.preview.CombinedTextAndThemePreviews
-import mega.privacy.android.shared.original.core.ui.theme.OriginalTempTheme
+import mega.privacy.android.shared.original.core.ui.theme.OriginalTheme
 
 @OptIn(ExperimentalComposeUiApi::class)
 @Composable
@@ -55,7 +55,7 @@ internal fun OpenCameraConfirmationDialog(
 @CombinedTextAndThemePreviews
 @Composable
 private fun OpenCameraConfirmationDialogPreview() {
-    OriginalTempTheme(isDark = isSystemInDarkTheme()) {
+    OriginalTheme(isDark = isSystemInDarkTheme()) {
         OpenCameraConfirmationDialog(
             onConfirm = {},
             onDismiss = {}

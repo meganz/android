@@ -22,7 +22,7 @@ import mega.privacy.android.core.ui.mapper.FileTypeIconMapper
 import mega.privacy.android.domain.entity.ThemeMode
 import mega.privacy.android.domain.usecase.GetThemeMode
 import mega.privacy.android.legacy.core.ui.model.SearchWidgetState
-import mega.privacy.android.shared.original.core.ui.theme.OriginalTempTheme
+import mega.privacy.android.shared.original.core.ui.theme.OriginalTheme
 import javax.inject.Inject
 
 /**
@@ -79,7 +79,7 @@ class VideoSelectedActivity : PasscodeActivity() {
             val themeMode by getThemeMode().collectAsStateWithLifecycle(
                 initialValue = ThemeMode.System
             )
-            OriginalTempTheme(isDark = themeMode.isDarkMode()) {
+            OriginalTheme(isDark = themeMode.isDarkMode()) {
                 VideoSelectedScreen(
                     viewModel = viewModel,
                     onBackPressed = {

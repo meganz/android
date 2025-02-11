@@ -37,7 +37,7 @@ import mega.privacy.android.shared.original.core.ui.model.MegaSpanStyle
 import mega.privacy.android.shared.original.core.ui.model.MegaSpanStyleWithAnnotation
 import mega.privacy.android.shared.original.core.ui.model.SpanIndicator
 import mega.privacy.android.shared.original.core.ui.preview.CombinedThemePreviews
-import mega.privacy.android.shared.original.core.ui.theme.OriginalTempTheme
+import mega.privacy.android.shared.original.core.ui.theme.OriginalTheme
 import mega.android.core.ui.theme.values.TextColor
 
 @Composable
@@ -181,7 +181,7 @@ internal fun StopBackupConfirmationDialogBody(
 @CombinedThemePreviews
 @Composable
 private fun StopBackupConfirmationDialogBodyPreview() {
-    OriginalTempTheme(isDark = isSystemInDarkTheme()) {
+    OriginalTheme(isDark = isSystemInDarkTheme()) {
         MegaScaffold {
             StopBackupConfirmationDialogBody(
                 state = StopBackupState(),

@@ -18,7 +18,7 @@ import mega.privacy.android.shared.original.core.ui.controls.buttons.OutlinedMeg
 import mega.privacy.android.shared.original.core.ui.preview.BooleanProvider
 import mega.privacy.android.shared.original.core.ui.preview.CombinedThemePreviews
 import mega.privacy.android.domain.entity.call.ChatCallStatus
-import mega.privacy.android.shared.original.core.ui.theme.OriginalTempTheme
+import mega.privacy.android.shared.original.core.ui.theme.OriginalTheme
 
 @Composable
 internal fun BottomCallButton(
@@ -81,7 +81,7 @@ private fun BottomCallButton(
 @CombinedThemePreviews
 @Composable
 private fun CallOnHoldButtonPreview() {
-    OriginalTempTheme(isDark = isSystemInDarkTheme()) {
+    OriginalTheme(isDark = isSystemInDarkTheme()) {
         Box {
             BottomCallButton(
                 textId = R.string.call_on_hold,
@@ -97,7 +97,7 @@ private fun CallOnHoldButtonPreview() {
 private fun JoinAnswerCallButtonPreview(
     @PreviewParameter(BooleanProvider::class) isGroup: Boolean,
 ) {
-    OriginalTempTheme(isDark = isSystemInDarkTheme()) {
+    OriginalTheme(isDark = isSystemInDarkTheme()) {
         Box {
             BottomCallButton(
                 textId = if (isGroup) R.string.title_join_call else R.string.title_join_one_to_one_call,

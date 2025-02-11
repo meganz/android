@@ -322,7 +322,7 @@ import mega.privacy.android.navigation.MegaNavigator
 import mega.privacy.android.navigation.settings.arguments.TargetPreference
 import mega.privacy.android.shared.original.core.ui.controls.sheets.BottomSheet
 import mega.privacy.android.shared.original.core.ui.controls.widgets.setTransfersWidgetContent
-import mega.privacy.android.shared.original.core.ui.theme.OriginalTempTheme
+import mega.privacy.android.shared.original.core.ui.theme.OriginalTheme
 import mega.privacy.mobile.analytics.event.ArchivedChatsMenuItemEvent
 import mega.privacy.mobile.analytics.event.ChatRoomDNDMenuItemEvent
 import mega.privacy.mobile.analytics.event.ChatRoomsBottomNavigationItemEvent
@@ -1071,7 +1071,7 @@ class ManagerActivity : PasscodeActivity(), NavigationView.OnNavigationItemSelec
             setContent {
                 val themeMode by getThemeMode().collectAsStateWithLifecycle(initialValue = ThemeMode.System)
                 val isDark = themeMode.isDarkMode()
-                OriginalTempTheme(isDark = isDark) {
+                OriginalTheme(isDark = isDark) {
                     UsersInWaitingRoomDialog()
                     DenyEntryToCallDialog()
                 }
@@ -1084,7 +1084,7 @@ class ManagerActivity : PasscodeActivity(), NavigationView.OnNavigationItemSelec
             setContent {
                 val themeMode by getThemeMode().collectAsStateWithLifecycle(initialValue = ThemeMode.System)
                 val isDark = themeMode.isDarkMode()
-                OriginalTempTheme(isDark = isDark) {
+                OriginalTheme(isDark = isDark) {
                     CallRecordingConsentDialog()
                 }
             }
@@ -1098,7 +1098,7 @@ class ManagerActivity : PasscodeActivity(), NavigationView.OnNavigationItemSelec
                 val isDark = themeMode.isDarkMode()
                 val state by viewModel.state.collectAsStateWithLifecycle()
 
-                OriginalTempTheme(isDark = isDark) {
+                OriginalTheme(isDark = isDark) {
                     DocumentScanningErrorDialog(
                         documentScanningError = state.documentScanningError,
                         onErrorAcknowledged = { viewModel.onDocumentScanningErrorConsumed() },
@@ -1130,7 +1130,7 @@ class ManagerActivity : PasscodeActivity(), NavigationView.OnNavigationItemSelec
                     upgradeToProPlanBottomSheetState.currentValue != ModalBottomSheetValue.Hidden
                 }
 
-                OriginalTempTheme(isDark = isDark) {
+                OriginalTheme(isDark = isDark) {
 
                     var showUpgradeDialog by rememberSaveable {
                         mutableStateOf(false)
@@ -1197,7 +1197,7 @@ class ManagerActivity : PasscodeActivity(), NavigationView.OnNavigationItemSelec
             setContent {
                 val themeMode by getThemeMode().collectAsStateWithLifecycle(initialValue = ThemeMode.System)
                 val isDark = themeMode.isDarkMode()
-                OriginalTempTheme(isDark = isDark) {
+                OriginalTheme(isDark = isDark) {
                     RequestStatusProgressContainer()
                 }
             }
@@ -1222,7 +1222,7 @@ class ManagerActivity : PasscodeActivity(), NavigationView.OnNavigationItemSelec
                     skipHalfExpanded = true,
                 )
 
-                OriginalTempTheme(isDark = isDark) {
+                OriginalTheme(isDark = isDark) {
                     LaunchedEffect(syncPromotionBottomSheetState.targetValue) {
                         if (syncPromotionBottomSheetState.targetValue == ModalBottomSheetValue.Hidden) {
                             coroutineScope.launch { syncPromotionViewModel.onConsumeShouldShowSyncPromotion() }
@@ -2389,7 +2389,7 @@ class ManagerActivity : PasscodeActivity(), NavigationView.OnNavigationItemSelec
         adsContainerView.setContent {
             val themeMode by getThemeMode().collectAsStateWithLifecycle(initialValue = ThemeMode.System)
             val request by googleAdsManager.request.collectAsStateWithLifecycle()
-            OriginalTempTheme(isDark = themeMode.isDarkMode()) {
+            OriginalTheme(isDark = themeMode.isDarkMode()) {
                 AdsContainer(
                     modifier = Modifier.fillMaxSize(),
                     request = request,

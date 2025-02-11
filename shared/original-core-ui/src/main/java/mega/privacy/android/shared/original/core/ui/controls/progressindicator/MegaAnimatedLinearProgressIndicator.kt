@@ -24,7 +24,7 @@ import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import mega.privacy.android.shared.original.core.ui.preview.CombinedThemePreviews
 import mega.privacy.android.shared.original.core.ui.theme.MegaOriginalTheme
-import mega.privacy.android.shared.original.core.ui.theme.OriginalTempTheme
+import mega.privacy.android.shared.original.core.ui.theme.OriginalTheme
 
 /**
  * Wrapper for [MegaAnimatedLinearProgressIndicator] to set default parameters to better represent the project theme
@@ -82,7 +82,7 @@ fun MegaAnimatedLinearProgressIndicator(
 @CombinedThemePreviews
 @Composable
 private fun MegaAnimatedLinearProgressIndicatorPreview() {
-    OriginalTempTheme(isDark = isSystemInDarkTheme()) {
+    OriginalTheme(isDark = isSystemInDarkTheme()) {
         Box(modifier = Modifier.padding(16.dp)) {
             MegaAnimatedLinearProgressIndicator(
                 indicatorProgress = 0.5f

@@ -44,7 +44,7 @@ import mega.privacy.android.shared.original.core.ui.controls.dividers.DividerTyp
 import mega.privacy.android.shared.original.core.ui.controls.dividers.MegaDivider
 import mega.privacy.android.shared.original.core.ui.controls.text.MarqueeText
 import mega.privacy.android.shared.original.core.ui.preview.CombinedTextAndThemePreviews
-import mega.privacy.android.shared.original.core.ui.theme.OriginalTempTheme
+import mega.privacy.android.shared.original.core.ui.theme.OriginalTheme
 import mega.privacy.android.shared.original.core.ui.theme.extensions.textColorPrimary
 import mega.android.core.ui.theme.values.TextColor
 import timber.log.Timber
@@ -329,7 +329,7 @@ internal fun ContactAvatarVerified(
 @CombinedTextAndThemePreviews
 @Composable
 private fun PreviewContactItem() {
-    OriginalTempTheme(isDark = isSystemInDarkTheme()) {
+    OriginalTheme(isDark = isSystemInDarkTheme()) {
 
         val contactUiItem = ContactUiItem(
             nameOrEmail = "Alias",

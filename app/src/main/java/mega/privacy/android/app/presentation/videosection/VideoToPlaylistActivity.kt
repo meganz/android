@@ -17,7 +17,7 @@ import mega.privacy.android.app.presentation.security.check.PasscodeContainer
 import mega.privacy.android.app.presentation.videosection.view.videotoplaylist.VideoToPlaylistScreen
 import mega.privacy.android.domain.entity.ThemeMode
 import mega.privacy.android.domain.usecase.GetThemeMode
-import mega.privacy.android.shared.original.core.ui.theme.OriginalTempTheme
+import mega.privacy.android.shared.original.core.ui.theme.OriginalTheme
 import javax.inject.Inject
 
 /**
@@ -50,7 +50,7 @@ class VideoToPlaylistActivity : ComponentActivity() {
                 initialValue = ThemeMode.System
             )
             SessionContainer {
-                OriginalTempTheme(isDark = themeMode.isDarkMode()) {
+                OriginalTheme(isDark = themeMode.isDarkMode()) {
                     PasscodeContainer(passcodeCryptObjectFactory = passcodeCryptObjectFactory,
                         content = {
                             PsaContainer {
