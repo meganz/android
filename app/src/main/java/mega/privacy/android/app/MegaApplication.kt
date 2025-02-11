@@ -48,7 +48,6 @@ import mega.privacy.android.app.objects.PasscodeManagement
 import mega.privacy.android.app.presentation.theme.ThemeModeState
 import mega.privacy.android.app.receivers.GlobalNetworkStateHandler
 import mega.privacy.android.app.usecase.call.MonitorCallSoundsUseCase
-import mega.privacy.android.app.utils.CacheFolderManager.clearPublicCache
 import mega.privacy.android.app.utils.Constants
 import mega.privacy.android.app.utils.greeter.Greeter
 import mega.privacy.android.data.qualifier.MegaApi
@@ -245,7 +244,6 @@ class MegaApplication : MultiDexApplication(), DefaultLifecycleObserver,
         applicationScope.launch {
             runCatching { updateApiServerUseCase() }
             // clear the cache files stored in the external cache folder.
-            clearPublicCache()
             runCatching {
                 deleteCompletedTransfersInCacheUseCase()
             }
