@@ -730,7 +730,7 @@ class FolderLinkViewModel @Inject constructor(
         viewModelScope.launch {
             runCatching {
                 pdfIntent.apply {
-                    flags = Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_CLEAR_TASK
+                    flags = Intent.FLAG_ACTIVITY_NEW_TASK
 
                     putExtra(Constants.INTENT_EXTRA_KEY_IS_FOLDER_LINK, true)
                     putExtra(Constants.INTENT_EXTRA_KEY_HANDLE, fileNode.id.longValue)

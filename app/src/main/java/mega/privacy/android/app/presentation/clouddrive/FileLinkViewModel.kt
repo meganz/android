@@ -366,7 +366,7 @@ class FileLinkViewModel @Inject constructor(
             runCatching {
                 with(state.value) {
                     pdfIntent.apply {
-                        flags = Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_CLEAR_TASK
+                        flags = Intent.FLAG_ACTIVITY_NEW_TASK
 
                         putExtra(Constants.INTENT_EXTRA_KEY_HANDLE, handle)
                         putExtra(Constants.INTENT_EXTRA_KEY_FILE_NAME, title)
