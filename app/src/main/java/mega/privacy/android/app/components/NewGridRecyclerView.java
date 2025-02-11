@@ -3,12 +3,12 @@ package mega.privacy.android.app.components;
 
 import android.content.Context;
 import android.content.res.TypedArray;
+import android.util.AttributeSet;
+import android.view.ViewGroup;
 
 import androidx.annotation.StyleableRes;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
-import android.util.AttributeSet;
-import android.view.ViewGroup;
 
 public class NewGridRecyclerView extends RecyclerView {
     
@@ -114,5 +114,9 @@ public class NewGridRecyclerView extends RecyclerView {
         mLinearLayoutManager = null;
         setLayoutManager(manager);
         calculateSpanCount();
+    }
+
+    public boolean isInList() {
+        return mLinearLayoutManager != null;
     }
 }

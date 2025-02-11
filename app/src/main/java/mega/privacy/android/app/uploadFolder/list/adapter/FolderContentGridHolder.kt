@@ -31,6 +31,7 @@ class FolderContentGridHolder(
             root.setBackgroundResource(if (item.isSelected) R.drawable.background_item_grid_selected else R.drawable.background_item_grid)
             selectedIcon.isVisible = item.isSelected
 
+            CoilUtils.dispose(fileThumbnail)
             if (item.isFolder) {
                 folderThumbnail.visibility = if (item.isSelected) INVISIBLE else VISIBLE
 
@@ -50,7 +51,6 @@ class FolderContentGridHolder(
                     isVisible = true
                     setImageResource(MimeTypeThumbnail.typeForName(item.name).iconResourceId)
                 }
-                CoilUtils.dispose(fileThumbnail)
                 fileThumbnail.apply {
                     isVisible = true
 

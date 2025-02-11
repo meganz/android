@@ -369,7 +369,6 @@ class UploadFolderActivity : PasscodeActivity(), Scrollable {
     private fun setupObservers() {
         collectFlow(sortByHeaderViewModel.state) { state ->
             val viewType = state.viewType
-            switchViewType(viewType)
             viewModel.setIsList(viewType == ViewType.LIST)
         }
 
@@ -414,7 +413,12 @@ class UploadFolderActivity : PasscodeActivity(), Scrollable {
         folderContentAdapter.submitList(folderContent)
         binding.list.apply {
             isVisible = !isEmpty
-            postDelayed({ showProgress(false) }, WAIT_TIME_TO_UPDATE)
+            postDelayed({
+                showProgress(false)
+                if (isInList != viewModel.isInList()) {
+                    switchViewType(if (viewModel.isInList()) ViewType.LIST else ViewType.GRID)
+                }
+            }, WAIT_TIME_TO_UPDATE)
         }
 
         if (viewModel.query == null && this::searchMenuItem.isInitialized) {
