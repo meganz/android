@@ -769,13 +769,15 @@ class FileExplorerActivity : PasscodeActivity(), MegaRequestListenerInterface,
                     Timber.d("action = SAVE to Cloud Drive")
                     mode = SAVE
                     isSelectFile = false
-                    parentHandleCloud =
-                        intent.getLongExtra(EXTRA_PARENT_HANDLE, INVALID_HANDLE)
-                    title = getString(R.string.section_cloud_drive)
-                    supportActionBar?.subtitle =
-                        getString(R.string.cloud_drive_select_destination)
-                    setView(CLOUD_TAB, false)
-                    tabShown = NO_TABS
+                    parentHandleCloud = intent.getLongExtra(EXTRA_PARENT_HANDLE, INVALID_HANDLE)
+                    title = getString(R.string.title_upload_explorer)
+
+                    with(binding) {
+                        slidingTabsFileExplorer.isVisible = false
+                        explorerTabsPager.isVisible = false
+                        cloudDriveFrameLayout.isVisible = false
+                    }
+                    chooseFragment(CLOUD_FRAGMENT)
                 }
 
                 ACTION_IMPORT_ALBUM -> {
@@ -1261,9 +1263,7 @@ class FileExplorerActivity : PasscodeActivity(), MegaRequestListenerInterface,
                 getString(R.string.title_file_explorer_send_link)
             }
 
-            mode == SAVE -> {
-                getString(R.string.section_cloud_drive)
-            }
+            mode == SAVE -> getString(R.string.title_upload_explorer)
 
             mode == UPLOAD -> {
                 when (importFragmentSelected) {
@@ -1284,11 +1284,6 @@ class FileExplorerActivity : PasscodeActivity(), MegaRequestListenerInterface,
         Timber.d("changeTitle")
         cDriveExplorer = cloudExplorerFragment
         iSharesExplorer = incomingExplorerFragment
-        supportActionBar?.subtitle = if (mode == SAVE) {
-            getString(R.string.cloud_drive_select_destination)
-        } else {
-            null
-        }
 
         if (tabShown == NO_TABS || mTabsAdapterExplorer == null) {
             if (importFileF) {
