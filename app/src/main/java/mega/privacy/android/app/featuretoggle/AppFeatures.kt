@@ -208,6 +208,14 @@ enum class AppFeatures(override val description: String, private val defaultValu
     ),
 
     /**
+     *  Login Revamp with new components
+     */
+    LoginRevamp(
+        "Login Revamp with new components",
+        false,
+    ),
+
+    /**
      *  Use new approach to download files for preview.
      */
     PreviewDownload(
