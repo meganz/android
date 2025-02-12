@@ -26,6 +26,7 @@ import mega.privacy.android.app.utils.ColorUtils
 import mega.privacy.android.app.utils.Constants
 import mega.privacy.android.app.utils.FileUtil
 import mega.privacy.android.app.utils.MegaApiUtils
+import mega.privacy.android.app.utils.MegaNodeUtil
 import mega.privacy.android.app.utils.Util
 import mega.privacy.android.app.utils.Util.showSnackbar
 import mega.privacy.android.domain.entity.node.NodeId
@@ -90,6 +91,15 @@ internal class ManageTransferBottomSheetDialogFragment : BaseBottomSheetDialogFr
         val getLinkOption = contentView.findViewById<TextView>(R.id.option_get_link)
         val getLinkOptionSeparator = contentView.findViewById<View>(R.id.separator_get_link)
         getLinkOption.setOnClickListener(this)
+
+        if (MegaNodeUtil.showShareOption(-1, false, transfer.handle)) {
+            getLinkOption.visibility = View.VISIBLE
+            getLinkOptionSeparator.visibility = View.VISIBLE
+        } else {
+            getLinkOption.visibility = View.GONE
+            getLinkOptionSeparator.visibility = View.GONE
+        }
+
         val clearOption = contentView.findViewById<TextView>(R.id.option_clear)
         clearOption.setOnClickListener(this)
         val retryOption = contentView.findViewById<TextView>(R.id.option_retry)
