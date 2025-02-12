@@ -33,6 +33,7 @@ import mega.privacy.android.domain.usecase.favourites.IsAvailableOfflineUseCase
 import mega.privacy.android.domain.usecase.network.MonitorConnectivityUseCase
 import mega.privacy.android.domain.usecase.node.IsHidingActionAllowedUseCase
 import mega.privacy.android.domain.usecase.node.IsNodeDeletedFromBackupsUseCase
+import mega.privacy.android.domain.usecase.node.IsNodeSyncedUseCase
 import mega.privacy.android.domain.usecase.offline.RemoveOfflineNodeUseCase
 import mega.privacy.android.domain.usecase.shares.CreateShareKeyUseCase
 import nz.mega.sdk.MegaNode
@@ -119,6 +120,7 @@ class NodeOptionsViewModelTest {
     private val getCameraUploadsFolderHandleUseCase = mock<GetPrimarySyncHandleUseCase>()
     private val getMediaUploadsFolderHandleUseCase = mock<GetSecondaryFolderNodeUseCase>()
     private val getMyChatsFilesFolderIdUseCase = mock<GetMyChatsFilesFolderIdUseCase>()
+    private val isNodeSyncedUseCase = mock<IsNodeSyncedUseCase>()
 
     @BeforeEach
     fun setUp() {
@@ -139,6 +141,7 @@ class NodeOptionsViewModelTest {
             getCameraUploadsFolderHandleUseCase = getCameraUploadsFolderHandleUseCase,
             getMediaUploadsFolderHandleUseCase = getMediaUploadsFolderHandleUseCase,
             getMyChatsFilesFolderIdUseCase = getMyChatsFilesFolderIdUseCase,
+            isNodeSyncedUseCase = isNodeSyncedUseCase,
             savedStateHandle = savedStateHandle,
         )
     }
@@ -155,6 +158,9 @@ class NodeOptionsViewModelTest {
             assertThat(initial.nodeDeviceCenterInformation).isNull()
             assertThat(initial.shareKeyCreated).isNull()
             assertThat(initial.isAvailableOffline).isFalse()
+            assertThat(initial.isUserAttributeFolder).isFalse()
+            assertThat(initial.isSyncedFolder).isFalse()
+            assertThat(initial.isSyncActionAllowed).isFalse()
         }
     }
 

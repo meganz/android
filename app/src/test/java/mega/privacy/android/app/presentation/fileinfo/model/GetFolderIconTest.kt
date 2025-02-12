@@ -136,6 +136,12 @@ class GetFolderIconTest {
             ) {
                 on { type }.thenReturn(FolderType.ChildBackup)
             },
+            FolderMockNameResource(
+                "Sync",
+                IconPackR.drawable.ic_folder_sync_medium_solid
+            ) {
+                on { type }.thenReturn(FolderType.Sync)
+            },
             FolderMockNameResource("Simple", IconPackR.drawable.ic_folder_medium_solid) {},
         )
     }

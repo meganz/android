@@ -66,6 +66,7 @@ internal class FolderNodeMapper @Inject constructor(
         isIncomingShare = megaNode.isInShare,
         isShared = megaNode.isOutShare,
         isPendingShare = megaApiGateway.isPendingShare(megaNode),
+        isSynced = isSynced(megaNode),
         device = megaNode.deviceId,
         isNodeKeyDecrypted = megaNode.isNodeKeyDecrypted,
         creationTime = megaNode.creationTime,
@@ -76,4 +77,16 @@ internal class FolderNodeMapper @Inject constructor(
         description = megaNode.description,
         tags = megaNode.tags?.let { stringListMapper(it) }
     )
+
+    private fun isSynced(megaNode: MegaNode): Boolean {
+        val syncs = megaApiGateway.getSyncs()
+        for (i in 0..syncs.size()) {
+            syncs.get(i)?.let { syncNode ->
+                if (syncNode.megaHandle == megaNode.handle) {
+                    return true
+                }
+            }
+        }
+        return false
+    }
 }

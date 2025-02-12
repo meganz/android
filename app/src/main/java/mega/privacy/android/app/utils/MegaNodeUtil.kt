@@ -530,6 +530,8 @@ object MegaNodeUtil {
             } else {
                 IconPackR.drawable.ic_folder_chat_medium_solid
             }
+        } else if (isSynced(node)) {
+            IconPackR.drawable.ic_folder_sync_medium_solid
         } else if (isOutShare(node)) {
             IconPackR.drawable.ic_folder_outgoing_medium_solid
         } else if (isRootBackupFolder(node)) {
@@ -617,6 +619,19 @@ object MegaNodeUtil {
 
             else -> IconPackR.drawable.ic_pc_medium_solid
         }
+    }
+
+    private fun isSynced(megaNode: MegaNode): Boolean {
+        val megaApi = MegaApplication.getInstance().megaApi
+        val syncs = megaApi.syncs
+        for (i in 0..syncs.size()) {
+            syncs.get(i)?.let { syncNode ->
+                if (syncNode.megaHandle == megaNode.handle) {
+                    return true
+                }
+            }
+        }
+        return false
     }
 
     /**

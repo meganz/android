@@ -18,6 +18,7 @@ import nz.mega.sdk.MegaNode
  * @property isHiddenNodesOnboarded
  * @property isHidingActionAllowed
  * @property isUserAttributeFolder          True if the node is a user attribute folder (CU, MU or "My chat files") or false otherwise
+ * @property isSyncedFolder                 True if the node is synced (root of a Sync) or False otherwise
  */
 data class NodeBottomSheetUIState(
     val canMoveNode: Boolean = false,
@@ -33,4 +34,10 @@ data class NodeBottomSheetUIState(
     val isHiddenNodesOnboarded: Boolean? = null,
     val isHidingActionAllowed: Boolean = false,
     val isUserAttributeFolder: Boolean = false,
-)
+    val isSyncedFolder: Boolean = false,
+) {
+    /**
+     * True if Sync action is allowed for the node or False otherwise
+     */
+    val isSyncActionAllowed = node?.isFolder == true && !isUserAttributeFolder && !isSyncedFolder
+}

@@ -18,6 +18,7 @@ internal class SampleFolderNodeDataProvider :
             override val isInRubbishBin = false
             override val isShared = false
             override val isPendingShare = false
+            override val isSynced = false
             override val device = null
             override val childFolderCount = 1
             override val childFileCount = 1
@@ -51,6 +52,7 @@ internal class SampleFolderNodeDataProvider :
             override val isInRubbishBin = false
             override val isShared = false
             override val isPendingShare = false
+            override val isSynced = false
             override val device = null
             override val childFolderCount = 1
             override val childFileCount = 1
@@ -84,6 +86,7 @@ internal class SampleFolderNodeDataProvider :
             override val isInRubbishBin = false
             override val isShared = false
             override val isPendingShare = false
+            override val isSynced = false
             override val device = null
             override val childFolderCount = 1
             override val childFileCount = 1
