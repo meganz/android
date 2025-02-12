@@ -837,7 +837,7 @@
     <!-- Notification content for download final notification. It will inform the user about the location where file/s were downloaded -->
     <string name="transfers_notification_location_content">位置：%1$s</string>
     <!-- Notification action for download final notification. It will open the file explorer activity to show the destination folder -->
-    <string name="transfers_notification_location_action">Locate</string>
+    <string name="transfers_notification_location_action">位置</string>
     <!-- Notification content for download final notification in case of a single file downloaded. -->
     <string name="transfers_notification_title_single_download">已下载“%1$s”</string>
     <!-- Label for the button or menu option to add a new backup -->
@@ -854,4 +854,6 @@
     <string name="document_scanning_settings_non_matching_file_extension_error_message">文件扩展名与文件类型不匹配</string>
     <!-- The Scan Confirmation screen error message shown when the filename has no file extension -->
     <string name="document_scanning_settings_file_extension_required_error_message">需要文件扩展名</string>
+    <!-- Alert text before download a file for preview. Please do not modify the %s placeholder as it will be replaced by the size to be donwloaded -->
+    <string name="alert_larger_file_preview">为了预览此文件，MEGA需要下载它。%1$s将被下载。</string>
 </resources>

@@ -2228,22 +2228,6 @@
     </plurals>
     <!-- Alert shown when the user tries to realize some action in chat and has not contacts -->
     <string name="no_contacts_invite">您没有MEGA联系人。请从联系人中邀请好友。</string>
-    <!-- Title of first tour screen -->
-    <string name="title_tour_one">您持有这把密钥</string>
-    <!-- Content of first tour screen -->
-    <string name="content_tour_one">安全即是我们存在的意义。您的文件会在我们的加密机器下受到安全保护，并且只有您可以访问您的文件。</string>
-    <!-- Title of second tour screen -->
-    <string name="title_tour_two">已加密聊天</string>
-    <!-- Content of second tour screen -->
-    <string name="content_tour_two">使用您的云盘即可享有完全加密的语音与视频通话、群组消息以及文件共享整合。</string>
-    <!-- Title of third tour screen -->
-    <string name="title_tour_three">创建您的网络</string>
-    <!-- Content of third tour screen -->
-    <string name="content_tour_three">无需离开MEGA即可添加联系人、创建关系网、协同合作以及进行语音与视频通话</string>
-    <!-- Title of fourth tour screen -->
-    <string name="title_tour_four">您在云盘的照片</string>
-    <!-- Content of fourth tour screen -->
-    <string name="content_tour_four">相机上传是任何移动设备的必备功能，我们已经为您提供这项服务。立即注册一个帐户。</string>
     <!-- Title of the dialog shown when a pdf required password -->
     <string name="title_pdf_password">请输入您的密码</string>
     <!-- Text of the dialog shown when a pdf required password -->
@@ -2974,10 +2958,6 @@
     <string name="copied_meeting_link">链接已复制到剪贴板</string>
     <!-- Title of the layout to join a meeting from the chat screen. -->
     <string name="join_meeting_layout_in_group_call">点击加入当前会议。</string>
-    <!-- Title of fifth tour screen -->
-    <string name="title_tour_five">MEGA会议</string>
-    <!-- Content of fourth tour screen -->
-    <string name="content_tour_five">零知识加密视频会议</string>
     <!-- Error shown when it tries to open an invalid meeting link and the text view is empty -->
     <string name="invalid_meeting_link_empty">请输入一个有效的会议链接</string>
     <!-- Guest leave call-->

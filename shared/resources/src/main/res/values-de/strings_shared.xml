@@ -656,7 +656,7 @@
     <!-- Text for the label to indicate the destiny of a new backup folder -->
     <string name="sync_add_new_backup_choose_mega_folder_title">Backup-Ort</string>
     <!-- Backup text for the the button to begin backup -->
-    <string name="sync_add_new_backup_proceed_button_label">Backups</string>
+    <string name="sync_add_new_backup_proceed_button_label">Sichern</string>
     <!-- Title of the dialog to notify the requirement of access storage permission for Sync/Backup feature -->
     <string name="sync_backup_access_storage_permission_dialog_title">MEGA den Zugriff auf alle Dateien gewähren?</string>
     <!-- Message of the dialog to notify the requirement of access storage permission for Sync/Backup feature -->
@@ -868,4 +868,6 @@
     <string name="document_scanning_settings_non_matching_file_extension_error_message">File extension doesn’t match file type</string>
     <!-- The Scan Confirmation screen error message shown when the filename has no file extension -->
     <string name="document_scanning_settings_file_extension_required_error_message">File extension is needed</string>
+    <!-- Alert text before download a file for preview. Please do not modify the %s placeholder as it will be replaced by the size to be donwloaded -->
+    <string name="alert_larger_file_preview">In order to preview this file, MEGA needs to download it. %1$s will be downloaded.</string>
 </resources>

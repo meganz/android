@@ -2344,22 +2344,6 @@
     </plurals>
     <!-- Alert shown when the user tries to realize some action in chat and has not contacts -->
     <string name="no_contacts_invite">Vous n’avez aucun contact sur MEGA. Veuillez inviter des amis dans la section Contacts.</string>
-    <!-- Title of first tour screen -->
-    <string name="title_tour_one">Vous détenez les clés</string>
-    <!-- Content of first tour screen -->
-    <string name="content_tour_one">La sécurité est notre raison d’être. Avec nous, vos fichiers sont en sécurité, protégés par un système de chiffrement efficace dans lequel vous seul avez accès à vos fichiers.</string>
-    <!-- Title of second tour screen -->
-    <string name="title_tour_two">Dialogue en ligne chiffré</string>
-    <!-- Content of second tour screen -->
-    <string name="content_tour_two">Le dialogue en ligne est entièrement chiffré et offre des appels vocaux et vidéo, une messagerie de groupe et le partage de fichiers, tous intégrés à votre Disque nuagique.</string>
-    <!-- Title of third tour screen -->
-    <string name="title_tour_three">Créez votre réseau</string>
-    <!-- Content of third tour screen -->
-    <string name="content_tour_three">Ajoutez des contacts, créez un réseau, collaborez et faites des appels vocaux ou vidéo sans jamais quitter MEGA</string>
-    <!-- Title of fourth tour screen -->
-    <string name="title_tour_four">Vos photos dans le nuage</string>
-    <!-- Content of fourth tour screen -->
-    <string name="content_tour_four">Les téléversements de lappareil photo sont une fonction essentielle de tout appareil mobile et nous avons ce qu\’il vous faut. Ouvrez un compte dès maintenant.</string>
     <!-- Title of the dialog shown when a pdf required password -->
     <string name="title_pdf_password">Saisissez votre mot de passe</string>
     <!-- Text of the dialog shown when a pdf required password -->
@@ -3146,10 +3130,6 @@
     <string name="copied_meeting_link">Le lien a été copié dans le presse-papiers</string>
     <!-- Title of the layout to join a meeting from the chat screen. -->
     <string name="join_meeting_layout_in_group_call">Toucher pour vous joindre à la réunion en cours.</string>
-    <!-- Title of fifth tour screen -->
-    <string name="title_tour_five">Réunion&#160;MEGA</string>
-    <!-- Content of fourth tour screen -->
-    <string name="content_tour_five">Réunion vidéo chiffrée sans divulgation de connaissance</string>
     <!-- Error shown when it tries to open an invalid meeting link and the text view is empty -->
     <string name="invalid_meeting_link_empty">Veuillez saisir un lien de réunion valide</string>
     <!-- Guest leave call-->
