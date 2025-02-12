@@ -258,4 +258,14 @@ interface MediaPlayerGateway {
      * @return current [SpeedPlaybackItem]
      */
     fun getCurrentSpeedPlaybackItem(): SpeedPlaybackItem
+
+    /**
+     * Media player plays next item
+     */
+    fun playNext()
+
+    /**
+     * Media player plays previous item
+     */
+    fun playPrev()
 }

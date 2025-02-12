@@ -15,6 +15,8 @@ import android.content.res.Configuration.ORIENTATION_LANDSCAPE
 import android.content.res.Configuration.ORIENTATION_PORTRAIT
 import android.database.ContentObserver
 import android.graphics.Color
+import android.media.AudioFocusRequest
+import android.media.AudioManager
 import android.net.Uri
 import android.os.Bundle
 import android.os.Handler
@@ -84,6 +86,9 @@ import mega.privacy.android.app.usecase.exception.MegaException
 import mega.privacy.android.app.utils.AlertDialogUtil
 import mega.privacy.android.app.utils.AlertsAndWarnings
 import mega.privacy.android.app.utils.CallUtil
+import mega.privacy.android.app.utils.ChatUtil
+import mega.privacy.android.app.utils.ChatUtil.AUDIOFOCUS_DEFAULT
+import mega.privacy.android.app.utils.ChatUtil.getRequest
 import mega.privacy.android.app.utils.ChatUtil.removeAttachmentMessage
 import mega.privacy.android.app.utils.Constants.BACKUPS_ADAPTER
 import mega.privacy.android.app.utils.Constants.EXTRA_SERIALIZE_STRING
@@ -205,6 +210,22 @@ class LegacyVideoPlayerActivity : MediaPlayerActivity() {
         }
     }
 
+    private lateinit var mediaSessionHelper: MediaSessionHelper
+    private var audioManager: AudioManager? = null
+    private var audioFocusRequest: AudioFocusRequest? = null
+    private val audioFocusListener =
+        AudioManager.OnAudioFocusChangeListener { focusChange ->
+            when (focusChange) {
+                AudioManager.AUDIOFOCUS_LOSS, AudioManager.AUDIOFOCUS_LOSS_TRANSIENT -> {
+                    mediaPlayerGateway.setPlayWhenReady(false)
+                }
+
+                AudioManager.AUDIOFOCUS_GAIN -> {
+                    mediaPlayerGateway.setPlayWhenReady(true)
+                }
+            }
+        }
+
     /**
      * Handle events when a Back Press is detected
      */
@@ -291,6 +312,7 @@ class LegacyVideoPlayerActivity : MediaPlayerActivity() {
         setupNavDestListener()
         setupObserver()
         initMediaData()
+        initMediaSession()
 
         if (CallUtil.participatingInACall()) {
             showNotAllowPlayAlert()
@@ -899,6 +921,24 @@ class LegacyVideoPlayerActivity : MediaPlayerActivity() {
         }
     }
 
+    private fun initMediaSession() {
+        audioManager = (getSystemService(AUDIO_SERVICE) as AudioManager)
+        audioFocusRequest = getRequest(audioFocusListener, AUDIOFOCUS_DEFAULT)
+        mediaSessionHelper = MediaSessionHelper(
+            applicationContext,
+            onPlayPauseClicked = {
+                mediaPlayerGateway.setPlayWhenReady(!mediaPlayerGateway.getPlayWhenReady())
+            },
+            onNextClicked = { mediaPlayerGateway.playNext() },
+            onPreviousClicked = { mediaPlayerGateway.playPrev() }
+        )
+        audioFocusRequest?.let {
+            if (audioManager?.requestAudioFocus(it) == AudioManager.AUDIOFOCUS_REQUEST_GRANTED) {
+                mediaSessionHelper.setupMediaSession()
+            }
+        }
+    }
+
     private val rotationContentObserver by lazy(LazyThreadSafetyMode.NONE) {
         object : ContentObserver(Handler(mainLooper)) {
             override fun onChange(selfChange: Boolean) {
@@ -989,6 +1029,10 @@ class LegacyVideoPlayerActivity : MediaPlayerActivity() {
         }
         unregisterReceiver(headsetPlugReceiver)
         AlertDialogUtil.dismissAlertDialogIfExists(takenDownDialog)
+        if (audioManager != null) {
+            ChatUtil.abandonAudioFocus(audioFocusListener, audioManager, audioFocusRequest)
+        }
+        mediaSessionHelper.releaseMediaSession()
     }
 
     override fun onCreateOptionsMenu(menu: Menu): Boolean {

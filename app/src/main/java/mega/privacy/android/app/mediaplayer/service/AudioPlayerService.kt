@@ -42,6 +42,7 @@ import mega.privacy.android.analytics.Analytics
 import mega.privacy.android.app.R
 import mega.privacy.android.app.di.mediaplayer.AudioPlayer
 import mega.privacy.android.app.mediaplayer.AudioPlayerActivity
+import mega.privacy.android.app.mediaplayer.MediaSessionHelper
 import mega.privacy.android.app.mediaplayer.gateway.AudioPlayerServiceViewModelGateway
 import mega.privacy.android.app.mediaplayer.gateway.MediaPlayerGateway
 import mega.privacy.android.app.mediaplayer.gateway.MediaPlayerServiceGateway
@@ -131,6 +132,7 @@ class AudioPlayerService : LifecycleService(), LifecycleEventObserver, MediaPlay
         audioClosable = true
     }
 
+    private lateinit var mediaSessionHelper: MediaSessionHelper
     private var audioManager: AudioManager? = null
     private var audioFocusRequest: AudioFocusRequest? = null
     private var audioFocusRequested = false
@@ -176,8 +178,8 @@ class AudioPlayerService : LifecycleService(), LifecycleEventObserver, MediaPlay
         createPlayer()
         audioManager = (getSystemService(AUDIO_SERVICE) as AudioManager)
         audioFocusRequest = getRequest(audioFocusListener, AUDIOFOCUS_DEFAULT)
+        initMediaSession()
         observeData()
-
         ProcessLifecycleOwner.get().lifecycle.addObserver(this)
         registerReceiver(headsetPlugReceiver, IntentFilter(Intent.ACTION_HEADSET_PLUG))
     }
@@ -434,6 +436,20 @@ class AudioPlayerService : LifecycleService(), LifecycleEventObserver, MediaPlay
         }
     }
 
+    private fun initMediaSession() {
+        mediaSessionHelper = MediaSessionHelper(
+            applicationContext,
+            onPlayPauseClicked = { setPlayWhenReady(!mediaPlayerGateway.getPlayWhenReady()) },
+            onNextClicked = { mediaPlayerGateway.playNext() },
+            onPreviousClicked = { mediaPlayerGateway.playPrev() }
+        )
+        audioFocusRequest?.let {
+            if (audioManager?.requestAudioFocus(it) == AudioManager.AUDIOFOCUS_REQUEST_GRANTED) {
+                mediaSessionHelper.setupMediaSession()
+            }
+        }
+    }
+
     override fun monitorMediaNotAllowPlayState() =
         mediaPlayerGateway.monitorMediaNotAllowPlayState()
 
@@ -468,6 +484,7 @@ class AudioPlayerService : LifecycleService(), LifecycleEventObserver, MediaPlay
         // Remove observer when the service is destroyed to avoid the memory leak, causing Service cannot be stopped.
         ProcessLifecycleOwner.get().lifecycle.removeObserver(this)
         unregisterReceiver(headsetPlugReceiver)
+        mediaSessionHelper.releaseMediaSession()
     }
 
     override fun stopPlayer() {

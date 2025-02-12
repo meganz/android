@@ -486,6 +486,14 @@ class MediaPlayerFacade @Inject constructor(
         SpeedPlaybackItem.entries.find { it.speed == player?.playbackParameters?.speed }
             ?: SpeedPlaybackItem.PLAYBACK_SPEED_1_X
 
+    override fun playNext() {
+        player?.seekToNext()
+    }
+
+    override fun playPrev() {
+        player?.seekToPrevious()
+    }
+
     companion object {
         private const val INCREMENT_TIME_IN_MS = 15000L
     }
