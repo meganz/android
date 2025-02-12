@@ -2228,22 +2228,6 @@
     </plurals>
     <!-- Alert shown when the user tries to realize some action in chat and has not contacts -->
     <string name="no_contacts_invite">あなたはMEGAの連絡先がありません。連絡先セクションからご友人をご招待ください。</string>
-    <!-- Title of first tour screen -->
-    <string name="title_tour_one">あなたがキーを持っています</string>
-    <!-- Content of first tour screen -->
-    <string name="content_tour_one">セキュリティこそが私たちの存在理由です。あなたのファイルは、非常に効果的な暗号化マシンの裏側にあり、安全です。そこで、あなたのファイルにアクセスできるのは、あなただけです。</string>
-    <!-- Title of second tour screen -->
-    <string name="title_tour_two">暗号化されたチャット</string>
-    <!-- Content of second tour screen -->
-    <string name="content_tour_two">音声＆ビデオ通話、グループメッセージング、クラウドドライブとのファイル共有統合による完全に暗号化されたチャット。</string>
-    <!-- Title of third tour screen -->
-    <string name="title_tour_three">ネットワークの作成</string>
-    <!-- Content of third tour screen -->
-    <string name="content_tour_three">連絡先の追加、ネットワークの作成、コラボレーション、MEGAを一切離れずに音声通話とビデオ通話を行う</string>
-    <!-- Title of fourth tour screen -->
-    <string name="title_tour_four">クラウド内のあなたの写真</string>
-    <!-- Content of fourth tour screen -->
-    <string name="content_tour_four">カメラアップロードは、あらゆるモバイル端末にとって不可欠な機能で、あなたにもご利用いただけます。今すぐアカウントをサインアップ（登録）してください。</string>
     <!-- Title of the dialog shown when a pdf required password -->
     <string name="title_pdf_password">パスワードを入力</string>
     <!-- Text of the dialog shown when a pdf required password -->
@@ -2974,10 +2958,6 @@
     <string name="copied_meeting_link">リンクをクリップボードにコピーしました</string>
     <!-- Title of the layout to join a meeting from the chat screen. -->
     <string name="join_meeting_layout_in_group_call">タップして現在の会議に参加します。</string>
-    <!-- Title of fifth tour screen -->
-    <string name="title_tour_five">MEGAミーティング</string>
-    <!-- Content of fourth tour screen -->
-    <string name="content_tour_five">ゼロ知識暗号化によるビデオミーティング</string>
     <!-- Error shown when it tries to open an invalid meeting link and the text view is empty -->
     <string name="invalid_meeting_link_empty">有効なミーティングリンクをご入力ください</string>
     <!-- Guest leave call-->

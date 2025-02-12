@@ -389,7 +389,7 @@
     <!-- Unlimited call and meeting duration available in the pro plan -->
     <string name="cancel_account_plan_call_meeting_duration_pro">无限制</string>
     <!-- Row label for call and meeting participants in the comparison table -->
-    <string name="account_cancel_account_plan_call_meeting_participants">通话&amp;amp;amp;会议参与者</string>
+    <string name="account_cancel_account_plan_call_meeting_participants">通话和会议参与者人数</string>
     <!-- Limit on call and meeting participants in the free plan -->
     <string name="account_cancel_account_free_plan_call_meeting_participants">最多100人</string>
     <!-- Unlimited call and meeting participants available in the pro plan -->
@@ -837,15 +837,23 @@
     <!-- Notification content for download final notification. It will inform the user about the location where file/s were downloaded -->
     <string name="transfers_notification_location_content">位置：%1$s</string>
     <!-- Notification action for download final notification. It will open the file explorer activity to show the destination folder -->
-    <string name="transfers_notification_location_action">Locate</string>
+    <string name="transfers_notification_location_action">位置</string>
     <!-- Notification content for download final notification in case of a single file downloaded. -->
     <string name="transfers_notification_title_single_download">已下载“%1$s”</string>
     <!-- Label for the button or menu option to add a new backup -->
     <string name="device_center_sync_add_new_backup_button_option">添加新备份</string>
     <!-- Notification content for download final notification in case of a single file downloaded to preview. -->
-    <string name="transfers_notification_title_preview_download">%1$s已准备好预览</string>
+    <string name="transfers_notification_title_preview_download">“%1$s”预览已就绪</string>
     <!-- Notification action for download final notification. It will open a dialog with installed apps which can open the file -->
     <string name="transfers_notification_preview_action">预览</string>
     <!-- Title for the OS dialog shown with available apps to open a file -->
-    <string name="open_with_os_dialog_title">打开%1$s</string>
+    <string name="open_with_os_dialog_title">使用一下方式打开“%1$s”</string>
+    <!-- The Scan Confirmation screen error message shown when the new filename does not contain the file extension that was selected -->
+    <string name="document_scanning_settings_missing_file_extension_error_message">缺少文件扩展名（%s）</string>
+    <!-- The Scan Confirmation screen error message shown when the filename does not end with the expected file extension -->
+    <string name="document_scanning_settings_non_matching_file_extension_error_message">文件扩展名与文件类型不匹配</string>
+    <!-- The Scan Confirmation screen error message shown when the filename has no file extension -->
+    <string name="document_scanning_settings_file_extension_required_error_message">需要文件扩展名</string>
+    <!-- Alert text before download a file for preview. Please do not modify the %s placeholder as it will be replaced by the size to be donwloaded -->
+    <string name="alert_larger_file_preview">为了预览此文件，MEGA需要下载它。%1$s将被下载。</string>
 </resources>
