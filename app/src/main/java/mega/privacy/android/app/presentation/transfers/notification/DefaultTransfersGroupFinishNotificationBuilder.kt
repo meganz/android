@@ -24,19 +24,17 @@ import mega.privacy.android.app.utils.MegaApiUtils
 import mega.privacy.android.data.mapper.transfer.TransfersGroupFinishNotificationBuilder
 import mega.privacy.android.domain.entity.transfer.ActiveTransferTotals
 import mega.privacy.android.domain.entity.transfer.TransferType
+import mega.privacy.android.domain.entity.transfer.isOfflineDownload
+import mega.privacy.android.domain.entity.transfer.isPreviewDownload
 import mega.privacy.android.domain.usecase.featureflag.GetFeatureFlagValueUseCase
 import mega.privacy.android.domain.usecase.file.GetPathByDocumentContentUriUseCase
 import mega.privacy.android.domain.usecase.file.IsContentUriUseCase
-import mega.privacy.android.domain.usecase.node.GetFilePreviewDownloadPathUseCase
-import mega.privacy.android.domain.usecase.offline.IsOfflinePathUseCase
 import java.io.File
 import javax.inject.Inject
 
 class DefaultTransfersGroupFinishNotificationBuilder @Inject constructor(
     @ApplicationContext private val context: Context,
     private val getFeatureFlagValueUseCase: GetFeatureFlagValueUseCase,
-    private val isOfflinePathUseCase: IsOfflinePathUseCase,
-    private val getFilePreviewDownloadPathUseCase: GetFilePreviewDownloadPathUseCase,
     private val isContentUriUseCase: IsContentUriUseCase,
     private val getPathByDocumentContentUriUseCase: GetPathByDocumentContentUriUseCase,
 ) : TransfersGroupFinishNotificationBuilder {
@@ -53,7 +51,8 @@ class DefaultTransfersGroupFinishNotificationBuilder @Inject constructor(
         if (!isDownload) {
             throw NotImplementedError("Group notifications are not yet implemented for uploads")
         }
-        val isPreviewDownload = group.destination.startsWith(getFilePreviewDownloadPathUseCase())
+        val isPreviewDownload = group.isPreviewDownload()
+        val isOfflineDownload = group.isOfflineDownload()
         val titleSuffix = when {
             errorCount > 0 && alreadyTransferredCount > 0 ->
                 "${alreadyMsg(alreadyTransferredCount)}, ${errorMsg(errorCount)}"
@@ -102,7 +101,6 @@ class DefaultTransfersGroupFinishNotificationBuilder @Inject constructor(
                 group.destination
             }
         }.getOrNull() ?: group.destination
-        val isOfflineDownload = isOfflinePathUseCase(destination)
         val destinationText = when {
             isOfflineDownload -> {
                 context.getString(R.string.section_saved_for_offline_new)

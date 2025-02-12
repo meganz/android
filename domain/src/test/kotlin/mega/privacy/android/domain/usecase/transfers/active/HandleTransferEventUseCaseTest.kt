@@ -84,8 +84,11 @@ class HandleTransferEventUseCaseTest {
         verify(transferRepository).insertOrUpdateActiveTransfers(eq(listOf(transferEvent.transfer)))
     }
 
-    @Test
-    fun `test that parent group app data is added when child transfer start event is received`() =
+    @ParameterizedTest
+    @MethodSource("provideRecursiveTransferAppData")
+    fun `test that parent group app data is added when child transfer start event is received`(
+        appData: TransferAppData,
+    ) =
         runTest {
             val parentTag = 2
             val transferEvent = mockTransferEvent<TransferEvent.TransferStartEvent>(
@@ -93,12 +96,11 @@ class HandleTransferEventUseCaseTest {
                 1,
                 folderTransferTag = parentTag
             )
-            val groupData = TransferAppData.TransferGroup(34L)
             val parentTransfer = mock<Transfer> {
-                on { appData } doReturn listOf(groupData)
+                on { it.appData } doReturn listOf(appData)
             }
             whenever(transferRepository.getTransferByTag(parentTag)) doReturn parentTransfer
-            val expected = transferEvent.transfer.copy(appData = listOf(groupData))
+            val expected = transferEvent.transfer.copy(appData = listOf(appData))
             underTest.invoke(transferEvent)
             verify(transferRepository).insertOrUpdateActiveTransfers(eq(listOf(expected)))
         }
@@ -383,6 +385,11 @@ class HandleTransferEventUseCaseTest {
         provideTransferEvents<TransferEvent.TransferStartEvent>() +
                 provideTransferEvents<TransferEvent.TransferPaused>() +
                 provideTransferEvents<TransferEvent.TransferUpdateEvent>()
+
+    private fun provideRecursiveTransferAppData() = listOf(
+        TransferAppData.TransferGroup(245),
+        TransferAppData.OfflineDownload
+    )
 
 
     private inline fun <reified T : TransferEvent> provideTransferEvents(

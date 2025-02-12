@@ -1,7 +1,7 @@
 package mega.privacy.android.domain.usecase.transfers.active
 
+import mega.privacy.android.domain.entity.transfer.TransferAppData.RecursiveTransferAppData
 import mega.privacy.android.domain.entity.transfer.TransferEvent
-import mega.privacy.android.domain.entity.transfer.getTransferGroup
 import mega.privacy.android.domain.exception.BusinessAccountExpiredMegaException
 import mega.privacy.android.domain.exception.QuotaExceededMegaException
 import mega.privacy.android.domain.repository.TransferRepository
@@ -125,7 +125,7 @@ class HandleTransferEventUseCase @Inject internal constructor(
         )?.map { transferEvent ->
             val appDataToAdd = if (transferEvent is TransferEvent.TransferStartEvent) {
                 transferEvent.transfer.folderTransferTag?.let { folderTransferTag ->
-                    transferRepository.getTransferByTag(folderTransferTag)?.getTransferGroup()
+                    transferRepository.getTransferByTag(folderTransferTag)?.appData?.filterIsInstance<RecursiveTransferAppData>()
                 }
             } else null
 
