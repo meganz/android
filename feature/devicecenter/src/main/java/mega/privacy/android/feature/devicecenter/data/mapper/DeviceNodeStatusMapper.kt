@@ -65,8 +65,7 @@ internal class DeviceNodeStatusMapper @Inject constructor() {
      * @return The appropriate [DeviceCenterNodeStatus]
      */
     private fun List<DeviceFolderNode>.calculateDeviceStatus(): DeviceCenterNodeStatus =
-        when (this.filter { it.type != BackupInfoType.CAMERA_UPLOADS && it.type != BackupInfoType.MEDIA_UPLOADS }
-            .maxOfOrNull { folder -> folder.status.priority }) {
+        when (this.maxOfOrNull { folder -> folder.status.priority }) {
             // Syncing Devices do not need to display the syncing progress in the UI
             12 -> DeviceCenterNodeStatus.Syncing(progress = 0)
             11 -> DeviceCenterNodeStatus.Scanning

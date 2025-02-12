@@ -116,21 +116,16 @@ internal class DeviceFolderUINodeListMapperTest {
         whenever(deviceCenterUINodeStatusMapper(folderStatus)).thenReturn(expectedUINodeStatus)
         whenever(deviceFolderUINodeIconMapper(folderType)).thenReturn(expectedFolderUINodeIcon)
 
-        val expectedList =
-            if (folderType in BackupInfoType.CAMERA_UPLOADS..BackupInfoType.MEDIA_UPLOADS) {
-                emptyList()
-            } else {
-                listOf(
-                    NonBackupDeviceFolderUINode(
-                        id = folderId,
-                        name = folderName,
-                        icon = expectedFolderUINodeIcon,
-                        status = expectedUINodeStatus,
-                        rootHandle = folderRootHandle,
-                        localFolderPath = localPath
-                    )
-                )
-            }
+        val expectedList = listOf(
+            NonBackupDeviceFolderUINode(
+                id = folderId,
+                name = folderName,
+                icon = expectedFolderUINodeIcon,
+                status = expectedUINodeStatus,
+                rootHandle = folderRootHandle,
+                localFolderPath = localPath
+            )
+        )
 
         assertThat(
             underTest(
