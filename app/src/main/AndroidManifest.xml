@@ -720,6 +720,7 @@
             android:windowSoftInputMode="stateHidden|adjustResize" />
         <activity
             android:name=".presentation.imagepreview.slideshow.SlideshowActivity"
+            android:theme="@style/Theme.Mega.Slideshow"
             android:windowSoftInputMode="stateHidden|adjustResize" />
         <activity
             android:name=".presentation.hidenode.HiddenNodesOnboardingActivity"
