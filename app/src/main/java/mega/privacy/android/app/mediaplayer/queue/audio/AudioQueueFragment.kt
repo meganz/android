@@ -23,6 +23,7 @@ import androidx.compose.runtime.getValue
 import androidx.compose.ui.platform.ComposeView
 import androidx.compose.ui.platform.ViewCompositionStrategy
 import androidx.core.view.MenuProvider
+import androidx.core.view.isVisible
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.viewModels
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
@@ -214,6 +215,11 @@ class AudioQueueFragment : Fragment() {
                     menu.findItem(R.id.remove).isVisible = true
                 }
             }
+        }
+
+        viewLifecycleOwner.collectFlow(audioQueueViewModel.uiState.map { it.isSelectMode }
+            .distinctUntilChanged()) {
+            simpleAudioPlayerView?.isVisible = !it
         }
     }
 
