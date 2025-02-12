@@ -24,7 +24,6 @@ class GetFileDestinationAndAppDataForDownloadUseCase @Inject constructor(
     private val isExternalStorageContentUriUseCase: IsExternalStorageContentUriUseCase,
     private val getExternalPathByContentUriUseCase: GetExternalPathByContentUriUseCase,
     private val getFeatureFlagValueUseCase: GetFeatureFlagValueUseCase,
-    private val getFilePreviewDownloadPathUseCase: GetFilePreviewDownloadPathUseCase,
 ) {
 
     /**
@@ -69,11 +68,6 @@ class GetFileDestinationAndAppDataForDownloadUseCase @Inject constructor(
                         targetPathForSDK = downloadDestination ?: "",
                         finalTargetUri = uriPathFolderDestination.value
                     )
-            }
-
-            uriPathFolderDestination.value.startsWith(getFilePreviewDownloadPathUseCase()) -> {
-                appData = TransferAppData.PreviewDownload
-                folderDestination = uriPathFolderDestination
             }
 
             else -> {

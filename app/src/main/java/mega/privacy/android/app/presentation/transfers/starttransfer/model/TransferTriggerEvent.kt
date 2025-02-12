@@ -5,6 +5,7 @@ import androidx.core.net.toUri
 import mega.privacy.android.domain.entity.node.NodeId
 import mega.privacy.android.domain.entity.node.TypedNode
 import mega.privacy.android.domain.entity.node.namecollision.NameCollisionChoice
+import mega.privacy.android.domain.entity.transfer.TransferAppData
 import mega.privacy.android.domain.entity.transfer.TransferType
 import java.io.File
 
@@ -12,7 +13,7 @@ import java.io.File
  * Event to trigger the start of a transfer
  */
 sealed interface TransferTriggerEvent {
-    sealed interface CloudTransfer: TransferTriggerEvent
+    sealed interface CloudTransfer : TransferTriggerEvent
 
     /**
      * Type of the transfer
@@ -81,6 +82,11 @@ sealed interface TransferTriggerEvent {
          * true if this download is a high priority transfer, false otherwise
          */
         val isHighPriority: Boolean
+
+        /**
+         * App data related to this type of download
+         */
+        val appData: TransferAppData? get() = null
     }
 
     /**
@@ -107,6 +113,7 @@ sealed interface TransferTriggerEvent {
         override val isHighPriority: Boolean = false,
     ) : DownloadTriggerEvent {
         override val nodes = node?.let { listOf(node) } ?: emptyList()
+        override val appData = TransferAppData.OfflineDownload
     }
 
 
@@ -149,6 +156,7 @@ sealed interface TransferTriggerEvent {
     ) : DownloadTriggerEvent {
         override val nodes = node?.let { listOf(node) } ?: emptyList()
         override val isHighPriority: Boolean = true
+        override val appData = TransferAppData.PreviewDownload
     }
 
     /**
@@ -208,7 +216,7 @@ sealed interface TransferTriggerEvent {
             val collisionChoice: NameCollisionChoice?,
             override val pathsAndNames: Map<String, String?>,
             override val destinationId: NodeId,
-        ) : StartUpload{
+        ) : StartUpload {
             override val isHighPriority = false
         }
     }

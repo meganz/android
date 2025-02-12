@@ -36,7 +36,6 @@ class GetFileDestinationAndAppDataForDownloadUseCaseTest {
     private val getExternalPathByContentUriUseCase = mock<GetExternalPathByContentUriUseCase>()
     private val cacheRepository = mock<CacheRepository>()
     private val getFeatureFlagValueUseCase = mock<GetFeatureFlagValueUseCase>()
-    private val getFilePreviewDownloadPathUseCase = mock<GetFilePreviewDownloadPathUseCase>()
 
     @BeforeAll
     fun setUp() {
@@ -47,7 +46,6 @@ class GetFileDestinationAndAppDataForDownloadUseCaseTest {
             isExternalStorageContentUriUseCase,
             getExternalPathByContentUriUseCase,
             getFeatureFlagValueUseCase,
-            getFilePreviewDownloadPathUseCase,
         )
     }
 
@@ -60,7 +58,6 @@ class GetFileDestinationAndAppDataForDownloadUseCaseTest {
             isExternalStorageContentUriUseCase,
             getExternalPathByContentUriUseCase,
             getFeatureFlagValueUseCase,
-            getFilePreviewDownloadPathUseCase,
         )
         whenever(fileSystemRepository.isSDCardPathOrUri(any())) doReturn false
         whenever(fileSystemRepository.isContentUri(any())) doReturn false
@@ -72,8 +69,6 @@ class GetFileDestinationAndAppDataForDownloadUseCaseTest {
     fun `test that same destination and null app data is returned when the destination is not in external storage or content uri`() =
         runTest {
             val expectedUri = UriPath(PATH_STRING)
-
-            whenever(getFilePreviewDownloadPathUseCase()) doReturn PREVIEW_PATH
 
             val (actualUri, actualAppData) = underTest(expectedUri)
 
@@ -168,23 +163,7 @@ class GetFileDestinationAndAppDataForDownloadUseCaseTest {
             }
         }
 
-    @Test
-    fun `test that original uri and PreviewDownload app data is returned when the destination is a preview uri path`() =
-        runTest {
-            val expectedUri = UriPath(PREVIEW_PATH)
-
-            whenever(getFilePreviewDownloadPathUseCase()) doReturn PREVIEW_PATH
-
-            val (actualUri, actualAppData) = underTest(expectedUri)
-
-            assertAll(
-                { assertThat(actualUri).isEqualTo(expectedUri) },
-                { assertThat(actualAppData).isEqualTo(TransferAppData.PreviewDownload) },
-            )
-        }
-
     companion object {
         private const val PATH_STRING = "uriPath/"
-        private const val PREVIEW_PATH = "previewPath/"
     }
 }

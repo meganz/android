@@ -11,6 +11,7 @@ import mega.privacy.android.data.mapper.transfer.AppDataTypeConstants.SDCardDown
 import mega.privacy.android.data.mapper.transfer.AppDataTypeConstants.TransferGroup
 import mega.privacy.android.data.mapper.transfer.AppDataTypeConstants.VoiceClip
 import mega.privacy.android.domain.entity.transfer.TransferAppData
+import mega.privacy.android.domain.entity.transfer.TransferAppData.*
 import timber.log.Timber
 import javax.inject.Inject
 
@@ -44,11 +45,11 @@ class TransferAppDataMapper @Inject constructor() {
                     VoiceClip -> TransferAppData.VoiceClip
                     CameraUpload -> TransferAppData.CameraUpload
                     ChatUpload -> values.firstIfNotBlank()?.toLongOrNull()
-                        ?.let { TransferAppData.ChatUpload(it) }
+                        ?.let { ChatUpload(it) }
 
                     SDCardDownload -> {
                         values.firstIfNotBlank()?.let {
-                            TransferAppData.SdCardDownload(
+                            SdCardDownload(
                                 targetPathForSDK = it,
                                 finalTargetUri = values.getOrElse(1) { "" },
                                 parentPath = parentPath ?: values.getOrNull(2),
@@ -59,7 +60,7 @@ class TransferAppDataMapper @Inject constructor() {
                     BackgroundTransfer -> TransferAppData.BackgroundTransfer
 
                     OriginalContentUri -> values.firstIfNotBlank()?.let {
-                        TransferAppData.OriginalContentUri(it)
+                        OriginalContentUri(it)
                     }
 
                     ChatDownload -> {
@@ -67,7 +68,7 @@ class TransferAppDataMapper @Inject constructor() {
                         val msgId = values.getOrNull(1)?.toLongOrNull()
                         val msgIndex = values.getOrNull(2)?.toIntOrNull()
                         if (chatId != null && msgId != null && msgIndex != null) {
-                            TransferAppData.ChatDownload(chatId, msgId, msgIndex)
+                            ChatDownload(chatId, msgId, msgIndex)
                         } else null
                     }
 
@@ -75,16 +76,18 @@ class TransferAppDataMapper @Inject constructor() {
                         val latitude = values.getOrNull(0)?.toDoubleOrNull()
                         val longitude = values.getOrNull(1)?.toDoubleOrNull()
                         if (latitude != null && longitude != null) {
-                            TransferAppData.Geolocation(latitude = latitude, longitude = longitude)
+                            Geolocation(latitude = latitude, longitude = longitude)
                         } else null
                     }
 
                     TransferGroup -> values.firstIfNotBlank()?.toLongOrNull()
-                        ?.let { TransferAppData.TransferGroup(it) }
+                        ?.let { TransferGroup(it) }
 
                     PreviewDownload -> TransferAppData.PreviewDownload
 
-                    else -> null
+                    AppDataTypeConstants.OfflineDownload -> TransferAppData.OfflineDownload
+
+                    null -> null
                 }
                 if (result == null) {
                     Timber.d("appData not recognized: $type $values")
@@ -99,7 +102,7 @@ class TransferAppDataMapper @Inject constructor() {
      * Similar to [split(APP_DATA_SEPARATOR)] but checking if there is an [AppDataTypeConstants] after the separator
      */
     private fun String.splitTransfersParameters(): List<String> {
-        val separators = AppDataTypeConstants.values().map { APP_DATA_SEPARATOR + it.sdkTypeValue }
+        val separators = AppDataTypeConstants.entries.map { APP_DATA_SEPARATOR + it.sdkTypeValue }
         val result = mutableListOf<String>()
         var toCheck = this
         var index = toCheck.indexOfAny(separators)

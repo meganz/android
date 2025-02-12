@@ -912,19 +912,24 @@ class StartTransfersComponentViewModelTest {
             verify(invalidateCancelTokenUseCase)()
         }
 
-    @Test
-    fun `test that insertPendingDownloadsForNodesUseCase is invoked when a download starts`() =
-        runTest {
-            commonStub()
+    @ParameterizedTest
+    @MethodSource("provideStartDownloadEvents")
+    fun `test that insertPendingDownloadsForNodesUseCase is invoked with correct parameters when a download starts`(
+        startDownloadEvent: TransferTriggerEvent.DownloadTriggerEvent,
+    ) = runTest {
+        commonStub()
+        whenever(getOfflinePathForNodeUseCase(any())) doReturn DESTINATION
+        whenever(getFilePreviewDownloadPathUseCase()) doReturn DESTINATION
 
-            underTest.startTransfer(startDownloadEvent)
+        underTest.startTransfer(startDownloadEvent)
 
-            verify(insertPendingDownloadsForNodesUseCase)(
-                startDownloadEvent.nodes,
-                UriPath(DESTINATION),
-                false,
-            )
-        }
+        verify(insertPendingDownloadsForNodesUseCase)(
+            startDownloadEvent.nodes,
+            UriPath(DESTINATION),
+            startDownloadEvent.isHighPriority,
+            startDownloadEvent.appData,
+        )
+    }
 
     @Test
     fun `test that GetFeatureFlagValueUseCase updates state`() =

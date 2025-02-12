@@ -106,3 +106,11 @@ fun AppDataOwner.getTransferGroup(): TransferAppData.TransferGroup? = appData
 fun AppDataOwner.isPreviewDownload(): Boolean =
     appData.contains(TransferAppData.PreviewDownload)
 
+/**
+ * Is offline download
+ *
+ * @return True if the transfer is an offline download, false otherwise.
+ */
+fun AppDataOwner.isOfflineDownload(): Boolean =
+    appData.contains(TransferAppData.OfflineDownload)
+

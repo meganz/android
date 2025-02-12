@@ -17,6 +17,7 @@ internal enum class AppDataTypeConstants(
     GeoLocation("GEO_LOCATION", TransferAppData.Geolocation::class),
     TransferGroup("TRANSFER_GROUP", TransferAppData.TransferGroup::class),
     PreviewDownload("PREVIEW_DOWNLOAD", TransferAppData.PreviewDownload::class),
+    OfflineDownload("OFFLINE_DOWNLOAD", TransferAppData.OfflineDownload::class),
     ;
 
     override fun toString() = sdkTypeValue

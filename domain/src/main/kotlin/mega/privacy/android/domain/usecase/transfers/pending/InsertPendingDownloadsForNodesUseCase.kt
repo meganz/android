@@ -33,13 +33,15 @@ class InsertPendingDownloadsForNodesUseCase @Inject constructor(
      * @param nodes the nodes to insert as download pending transfer
      * @param destination the destination to download the nodes. This is the final destination, cache folder can be used as the destination in pending transfers if needed.
      * @param isHighPriority whether this downloads are high priority (take precedence over current transfers) or not
+     * @param appData app data to be added to this download (other app data will be added too, like group app data).
      */
     suspend operator fun invoke(
         nodes: List<TypedNode>,
         destination: UriPath,
         isHighPriority: Boolean,
+        appData: TransferAppData?,
     ) {
-        val (folderDestination, appData) = getFileDestinationAndAppDataForDownloadUseCase(
+        val (folderDestination, destinationAppData) = getFileDestinationAndAppDataForDownloadUseCase(
             destination
         )
         val transferGroupId = transferRepository.insertActiveTransferGroup(
@@ -51,6 +53,7 @@ class InsertPendingDownloadsForNodesUseCase @Inject constructor(
         )
         val appDataList = listOfNotNull(
             appData,
+            destinationAppData,
             TransferAppData.TransferGroup(transferGroupId),
         ).takeIf { it.isNotEmpty() }
         fileSystemRepository.createDirectory(folderDestination.value)

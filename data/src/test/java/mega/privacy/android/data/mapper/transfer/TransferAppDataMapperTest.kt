@@ -8,6 +8,7 @@ import mega.privacy.android.data.mapper.transfer.AppDataTypeConstants.ChatUpload
 import mega.privacy.android.data.mapper.transfer.AppDataTypeConstants.GeoLocation
 import mega.privacy.android.data.mapper.transfer.AppDataTypeConstants.OriginalContentUri
 import mega.privacy.android.data.mapper.transfer.AppDataTypeConstants.PreviewDownload
+import mega.privacy.android.data.mapper.transfer.AppDataTypeConstants.OfflineDownload
 import mega.privacy.android.data.mapper.transfer.AppDataTypeConstants.SDCardDownload
 import mega.privacy.android.data.mapper.transfer.AppDataTypeConstants.TransferGroup
 import mega.privacy.android.data.mapper.transfer.AppDataTypeConstants.VoiceClip
@@ -225,6 +226,8 @@ class TransferAppDataMapperTest {
             ) to listOf(TransferAppData.TransferGroup(GROUP_ID)),
             generateAppDataString(PreviewDownload)
                     to listOf(TransferAppData.PreviewDownload),
+            generateAppDataString(OfflineDownload)
+                    to listOf(TransferAppData.OfflineDownload),
         )
 
         private fun generateAppDataString(

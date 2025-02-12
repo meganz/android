@@ -81,4 +81,9 @@ sealed interface TransferAppData {
      * Identify a transfer that is a download only for preview purposes.
      */
     data object PreviewDownload : TransferAppData
+
+    /**
+     * Identify a transfer that is a download to make it available offline
+     */
+    data object OfflineDownload : TransferAppData
 }

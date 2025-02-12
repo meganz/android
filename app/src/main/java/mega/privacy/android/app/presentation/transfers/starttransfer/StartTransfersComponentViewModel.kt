@@ -383,7 +383,12 @@ internal class StartTransfersComponentViewModel @Inject constructor(
             if (uri.isNullOrBlank()) {
                 throw NullPointerException("path not found!")
             }
-            insertPendingDownloadsForNodesUseCase(nodes, UriPath(uri), isHighPriority)
+            insertPendingDownloadsForNodesUseCase(
+                nodes,
+                UriPath(uri),
+                isHighPriority,
+                transferTriggerEvent.appData
+            )
             monitorPendingTransfersUntilProcessed(transferTriggerEvent)
             startDownloadsWorkerAndWaitUntilIsStartedUseCase()
         }.onFailure {

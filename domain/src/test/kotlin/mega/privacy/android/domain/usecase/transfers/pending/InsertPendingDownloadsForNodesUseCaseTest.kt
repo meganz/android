@@ -82,10 +82,12 @@ class InsertPendingDownloadsForNodesUseCaseTest {
                 on { it.name } doReturn "fileName$index"
             }
         }
-        val appData = mock<TransferAppData.SdCardDownload>()
-        val expectedAppData = listOf(appData, TransferAppData.TransferGroup(GROUP_ID))
+        val appData = TransferAppData.OfflineDownload
+        val destinationAppData = mock<TransferAppData.SdCardDownload>()
+        val expectedAppData =
+            listOf(appData, destinationAppData, TransferAppData.TransferGroup(GROUP_ID))
         whenever(getFileDestinationAndAppDataForDownloadUseCase(UriPath(PATH_STRING))) doReturn
-                DestinationAndAppDataForDownloadResult(UriPath(PATH_STRING), appData)
+                DestinationAndAppDataForDownloadResult(UriPath(PATH_STRING), destinationAppData)
         val uriPath = UriPath(PATH_STRING)
         val expected = nodes.mapIndexed { index, node ->
             val nodeIdentifier =
@@ -104,7 +106,7 @@ class InsertPendingDownloadsForNodesUseCaseTest {
             )
         }
 
-        underTest(nodes, uriPath, isHighPriority)
+        underTest(nodes, uriPath, isHighPriority, appData)
 
         verify(transferRepository).insertPendingTransfers(expected)
     }
@@ -118,7 +120,7 @@ class InsertPendingDownloadsForNodesUseCaseTest {
         val nodes = if (multipleNodes) (0..5).map { index ->
             mock<DefaultTypedFileNode>()
         } else {
-            listOf(mock<DefaultTypedFileNode>{
+            listOf(mock<DefaultTypedFileNode> {
                 on { name } doReturn singleFileName
             })
         }
@@ -129,7 +131,8 @@ class InsertPendingDownloadsForNodesUseCaseTest {
         underTest(
             nodes = nodes,
             destination = uriPath,
-            isHighPriority = false
+            isHighPriority = false,
+            appData = null,
         )
         verify(transferRepository).insertActiveTransferGroup(
             ActiveTransferGroupImpl(
@@ -150,7 +153,7 @@ class InsertPendingDownloadsForNodesUseCaseTest {
             ) doReturn false
 
             assertThrows<NotEnoughStorageException> {
-                underTest(listOf(node), destination, false)
+                underTest(listOf(node), destination, false, null)
             }
         }
 
@@ -163,7 +166,7 @@ class InsertPendingDownloadsForNodesUseCaseTest {
             whenever(getFileDestinationAndAppDataForDownloadUseCase(UriPath(destination))) doThrow expected
 
             val actual = runCatching {
-                underTest(listOf(node), UriPath(destination), false)
+                underTest(listOf(node), UriPath(destination), false, null)
             }.exceptionOrNull()
 
             assertThat(actual).isEqualTo(expected)
@@ -177,7 +180,7 @@ class InsertPendingDownloadsForNodesUseCaseTest {
             doesUriPathHaveSufficientSpaceForNodesUseCase(uriPath, nodes)
         ) doReturn true
 
-        underTest(nodes, uriPath, false)
+        underTest(nodes, uriPath, false, null)
 
         verify(fileSystemRepository).createDirectory(PATH_STRING)
     }
