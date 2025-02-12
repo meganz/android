@@ -261,14 +261,18 @@ internal class DefaultLoginRepository @Inject constructor(
      * A temporary method to report log to Crashlytics when connectivity issue occurred during login
      * @param error MegaError
      */
-    private fun reportLogToCrashlytics(error: MegaError) {
+    private fun reportLogToCrashlytics(error: MegaError, waitingReason: Int) {
         applicationScope.launch(ioDispatcher) {
+            val publicIpDeferred = async {
+                getPublicIpAddress()
+            }
             val googlePingDeferred = async {
                 pingDomainAddress("google.com")
             }
             val megaPingDeferred = async {
                 pingDomainAddress("g.api.mega.co.nz")
             }
+            val publicIp = publicIpDeferred.await()
             val googlePing = googlePingDeferred.await()
             val megaPing = megaPingDeferred.await()
 
@@ -284,12 +288,19 @@ internal class DefaultLoginRepository @Inject constructor(
                     """Connection issue occurred during login. 
                     Error code: ${error.errorCode},
                     Error value: ${error.value.toInt()},
-                    Waiting reason: RETRY_CONNECTIVITY,
+                    Waiting reason: RETRY_CONNECTIVITY($waitingReason),
+                    Public IP: $publicIp,
                     ${googlePing.second},
                     ${megaPing.second}""".trimIndent()
                 )
             )
         }
+    }
+
+    private suspend fun getPublicIpAddress() = withContext(ioDispatcher) {
+        runCatching {
+            URL("https://api.ipify.org/").openStream().bufferedReader().use { it.readLine() }
+        }.getOrDefault("Failed to get public IP address")
     }
 
     private fun loginRequest(
@@ -304,12 +315,13 @@ internal class DefaultLoginRepository @Inject constructor(
                     timerJob = applicationScope.launch(ioDispatcher) {
                         runCatching {
                             delay(WAITING_ERROR_TIMER)
-                            val temporaryError = megaApiGateway.getWaitingReason().let {
+                            val waitingReason = megaApiGateway.getWaitingReason()
+                            val temporaryError = waitingReason.let {
                                 Timber.w("Waiting, retry reason for ${request.requestString}: $it")
                                 temporaryWaitingErrorMapper(it)
                             }
                             if (this.isActive && temporaryError == TemporaryWaitingError.ConnectivityIssues) {
-                                reportLogToCrashlytics(error)
+                                reportLogToCrashlytics(error, waitingReason)
                             }
                             trySend(LoginStatus.LoginWaiting(temporaryError))
                         }
