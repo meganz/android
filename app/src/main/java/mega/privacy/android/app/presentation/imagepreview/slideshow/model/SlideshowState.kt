@@ -26,3 +26,10 @@ data class SlideshowState(
     val repeat: Boolean = false,
     val isPlaying: Boolean = false,
 )
+
+internal data class ImageResultStatus(
+    val progress: Int,
+    val isFullyLoaded: Boolean,
+    val imagePath: String?,
+    val errorImagePath: String?,
+)

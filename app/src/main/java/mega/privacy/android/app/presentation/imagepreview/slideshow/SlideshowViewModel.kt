@@ -17,6 +17,7 @@ import kotlinx.coroutines.flow.flowOf
 import kotlinx.coroutines.flow.launchIn
 import kotlinx.coroutines.flow.onEach
 import kotlinx.coroutines.flow.update
+import kotlinx.coroutines.launch
 import mega.privacy.android.app.presentation.imagepreview.ImagePreviewViewModel
 import mega.privacy.android.app.presentation.imagepreview.ImagePreviewViewModel.Companion.PARAMS_CURRENT_IMAGE_NODE_ID_VALUE
 import mega.privacy.android.app.presentation.imagepreview.fetcher.ImageNodeFetcher
@@ -194,7 +195,7 @@ class SlideshowViewModel @Inject constructor(
 
     suspend fun getHighestResolutionImagePath(imageResult: ImageResult?): String? {
         return imageResult?.run {
-            checkUri(fullSizeUri) ?: checkUri(previewUri) ?: checkUri(thumbnailUri)
+            checkUri(fullSizeUri)
         }
     }
 
@@ -228,5 +229,14 @@ class SlideshowViewModel @Inject constructor(
                 currentImageNode = currentImageNode,
             )
         }
+    }
+
+    // We can simply use beyondViewportPageCount for the preload, but somehow it breaks
+    // the cross-fade effect which indicating a bug in Coil lib.
+    //
+    // This manual preloading is the alternative to simulate same behavior.
+    fun preloadImageNode(page: Int) = viewModelScope.launch {
+        val node = _state.value.imageNodes.getOrNull(page) ?: return@launch
+        monitorImageResult(node).collect {}
     }
 }

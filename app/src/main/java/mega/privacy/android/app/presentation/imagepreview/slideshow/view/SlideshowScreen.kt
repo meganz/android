@@ -9,12 +9,14 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.ime
 import androidx.compose.foundation.layout.navigationBars
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.layout.windowInsetsPadding
 import androidx.compose.foundation.layout.wrapContentSize
 import androidx.compose.foundation.pager.HorizontalPager
 import androidx.compose.foundation.pager.PagerState
 import androidx.compose.foundation.pager.rememberPagerState
 import androidx.compose.material.BottomAppBar
+import androidx.compose.material.CircularProgressIndicator
 import androidx.compose.material.Icon
 import androidx.compose.material.IconButton
 import androidx.compose.material.MaterialTheme
@@ -23,6 +25,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.DisposableEffect
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateMapOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.produceState
 import androidx.compose.runtime.remember
@@ -57,6 +60,7 @@ import mega.privacy.android.analytics.Analytics
 import mega.privacy.android.app.R.drawable
 import mega.privacy.android.app.R.string
 import mega.privacy.android.app.presentation.imagepreview.slideshow.SlideshowViewModel
+import mega.privacy.android.app.presentation.imagepreview.slideshow.model.ImageResultStatus
 import mega.privacy.android.app.presentation.imagepreview.slideshow.model.SlideshowMenuAction.SettingOptionsMenuAction
 import mega.privacy.android.domain.entity.imageviewer.ImageResult
 import mega.privacy.android.domain.entity.node.ImageNode
@@ -101,8 +105,9 @@ fun SlideshowScreen(
 
     val currentImageNodeIndex = viewState.currentImageNodeIndex
     val currentImageNode = viewState.currentImageNode
-    currentImageNode?.let {
+    currentImageNode?.let { node ->
         val zoomableStateMap = remember { mutableMapOf<NodeId, ZoomableState?>() }
+        val isNodeDownloaded = remember { mutableStateMapOf<NodeId, Boolean>() }
 
         val scaffoldState = rememberScaffoldState()
         val coroutineScope = rememberCoroutineScope()
@@ -111,10 +116,9 @@ fun SlideshowScreen(
         val isPlaying = viewState.isPlaying
         val pagerState = rememberPagerState(
             initialPage = currentImageNodeIndex,
-            initialPageOffsetFraction = 0f
-        ) {
-            imageNodes.size
-        }
+            initialPageOffsetFraction = 0f,
+            pageCount = { imageNodes.size },
+        )
 
         MegaScaffold(
             scaffoldState = scaffoldState,
@@ -151,6 +155,7 @@ fun SlideshowScreen(
                 },
                 pagerState = pagerState,
                 imageNodes = imageNodes,
+                isPlaying = viewState.isPlaying,
                 downloadImage = viewModel::monitorImageResult,
                 getImagePath = viewModel::getHighestResolutionImagePath,
                 getErrorImagePath = viewModel::getFallbackImagePath,
@@ -158,12 +163,21 @@ fun SlideshowScreen(
                 onImageZooming = { viewModel.updateIsPlaying(false) },
                 onCacheImageState = { node, zoomState ->
                     zoomableStateMap[node.id] = zoomState
-                }
+                },
+                onImageDownloadStatus = { node, isDownloaded ->
+                    isNodeDownloaded[node.id] = isDownloaded
+                },
             )
         }
 
         LaunchedEffect(pagerState.currentPage) {
             val page = pagerState.currentPage
+            viewState.imageNodes.getOrNull(page)?.let { node ->
+                viewModel.setCurrentImageNode(node)
+                viewModel.setCurrentImageNodeIndex(page)
+
+                repeat(2) { viewModel.preloadImageNode(page + 1 + it) }
+            }
 
             for (candidatePage in page - 1..page + 1) {
                 viewState.imageNodes.getOrNull(candidatePage)?.let { node ->
@@ -181,16 +195,16 @@ fun SlideshowScreen(
             }
         }
 
-        LaunchedEffect(isPlaying, currentImageNodeIndex, speed) {
-            if (isPlaying) {
-                delay(speed.duration.inWholeMilliseconds)
-                val nextIndex =
-                    if (pagerState.canScrollForward) currentImageNodeIndex + 1 else 0
-                pagerState.scrollToPage(nextIndex)
-                viewModel.setCurrentImageNodeIndex(nextIndex)
-                viewModel.setCurrentImageNode(imageNodes[nextIndex])
-            } else {
-                pagerState.scrollToPage(currentImageNodeIndex)
+        LaunchedEffect(isPlaying, currentImageNodeIndex, speed, isNodeDownloaded[node.id]) {
+            if (viewState.imageNodes.getOrNull(currentImageNodeIndex) == node) {
+                if (isPlaying && isNodeDownloaded[node.id] == true) {
+                    delay(speed.duration.inWholeMilliseconds)
+
+                    var nextIdx = if (pagerState.canScrollForward) currentImageNodeIndex + 1 else 0
+                    if (nextIdx >= pagerState.pageCount) nextIdx = 0
+
+                    pagerState.scrollToPage(nextIdx)
+                }
             }
         }
     }
@@ -252,35 +266,39 @@ private fun SlideShowContent(
     bottomBar: @Composable () -> Unit,
     pagerState: PagerState,
     imageNodes: List<ImageNode>,
+    isPlaying: Boolean,
     downloadImage: suspend (ImageNode) -> Flow<ImageResult>,
     getImagePath: suspend (ImageResult?) -> String?,
     getErrorImagePath: suspend (ImageResult?) -> String?,
     onTapImage: () -> Unit,
     onImageZooming: (ZoomableState) -> Unit,
     onCacheImageState: (ImageNode, ZoomableState) -> Unit,
+    onImageDownloadStatus: (ImageNode, Boolean) -> Unit,
 ) {
     Box(modifier.fillMaxSize()) {
         HorizontalPager(
             modifier = Modifier
                 .fillMaxSize(),
             state = pagerState,
-            key = { imageNodes.getOrNull(it)?.id?.longValue ?: -1L }
+            key = { imageNodes.getOrNull(it)?.id?.longValue ?: -1L },
         ) { index ->
-
             val imageNode = imageNodes[index]
-            val imageResultPair by produceState<Pair<String?, String?>>(
-                initialValue = Pair(null, null),
-                key1 = imageNode
+            val status by produceState(
+                initialValue = ImageResultStatus(0, false, null, null),
+                key1 = imageNode,
             ) {
                 downloadImage(imageNode).collectLatest { imageResult ->
-                    value = Pair(
-                        getImagePath(imageResult),
-                        getErrorImagePath(imageResult)
+                    value = ImageResultStatus(
+                        progress = imageResult.getProgressPercentage() ?: 0,
+                        isFullyLoaded = imageResult.isFullyLoaded,
+                        imagePath = getImagePath(imageResult),
+                        errorImagePath = getErrorImagePath(imageResult)
                     )
                 }
             }
 
-            val (fullSizePath, errorImagePath) = imageResultPair
+            val (progress, isDownloaded, fullSizePath, errorImagePath) = status
+            onImageDownloadStatus(imageNode, isDownloaded)
 
             val zoomableState = rememberZoomableState(
                 zoomSpec = ZoomSpec(maxZoomFactor = Int.MAX_VALUE.toFloat())
@@ -295,12 +313,36 @@ private fun SlideShowContent(
                 }
             }
 
-            ImageContent(
-                imageState = imageState,
-                onTapImage = onTapImage,
-                fullSizePath = if (imageNode.serializedData == "localFile") imageNode.fullSizePath else fullSizePath,
-                errorImagePath = if (imageNode.serializedData == "localFile") imageNode.fullSizePath else errorImagePath,
-            )
+            Box(modifier = Modifier.fillMaxSize()) {
+                ImageContent(
+                    imageState = imageState,
+                    onTapImage = onTapImage,
+                    fullSizePath = if (imageNode.serializedData == "localFile") imageNode.fullSizePath else fullSizePath,
+                    errorImagePath = if (imageNode.serializedData == "localFile") imageNode.fullSizePath else errorImagePath,
+                )
+
+                if (isPlaying && progress < 100 && !isDownloaded) {
+                    val loadingModifier = Modifier
+                        .align(Alignment.BottomEnd)
+                        .padding(end = 16.dp)
+                        .width(32.dp)
+
+                    if (progress <= 0) {
+                        CircularProgressIndicator(
+                            modifier = loadingModifier,
+                            color = Color.White,
+                            strokeWidth = 2.dp,
+                        )
+                    } else {
+                        CircularProgressIndicator(
+                            progress = progress.toFloat() / 100,
+                            modifier = loadingModifier,
+                            color = Color.White,
+                            strokeWidth = 2.dp,
+                        )
+                    }
+                }
+            }
         }
 
         Box(
@@ -326,10 +368,7 @@ private fun ImageContent(
     fullSizePath: String?,
     errorImagePath: String?,
 ) {
-    Box(
-        modifier = Modifier.fillMaxSize(),
-    ) {
-
+    Box(modifier = Modifier.fillMaxSize()) {
         var imagePath by remember(fullSizePath) {
             mutableStateOf(fullSizePath)
         }
@@ -350,11 +389,8 @@ private fun ImageContent(
             model = request,
             state = imageState,
             contentDescription = "Image Preview",
-            modifier = Modifier
-                .fillMaxSize(),
-            onClick = {
-                onTapImage()
-            },
+            modifier = Modifier.fillMaxSize(),
+            onClick = { onTapImage() },
             onDoubleClick = DoubleClickToZoomListener.cycle(maxZoomFactor = 3f),
         )
     }
