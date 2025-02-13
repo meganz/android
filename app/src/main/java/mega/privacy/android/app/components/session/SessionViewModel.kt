@@ -11,14 +11,12 @@ import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import mega.privacy.android.domain.usecase.RootNodeExistsUseCase
 import mega.privacy.android.domain.usecase.chat.RetryConnectionsAndSignalPresenceUseCase
-import mega.privacy.android.domain.usecase.login.CheckChatSessionUseCase
 import timber.log.Timber
 import javax.inject.Inject
 
 @HiltViewModel
 internal class SessionViewModel @Inject constructor(
     private val rootNodeExistsUseCase: RootNodeExistsUseCase,
-    private val checkChatSessionUseCase: CheckChatSessionUseCase,
     private val retryConnectionsAndSignalPresenceUseCase: RetryConnectionsAndSignalPresenceUseCase,
 ) : ViewModel() {
 
@@ -27,25 +25,8 @@ internal class SessionViewModel @Inject constructor(
 
     private var retryConnectionsAndSignalPresenceJob: Job? = null
 
-    // important don't call 2 use cases in parallel
-    // it can cause refresh session hang, I'm not sure why
-    fun checkSdkSession(shouldCheckChatSession: Boolean = false) {
+    fun checkSdkSession() {
         viewModelScope.launch {
-            if (shouldCheckChatSession) {
-                runCatching {
-                    checkChatSessionUseCase()
-                }.onSuccess {
-                    _state.update { state ->
-                        state.copy(isChatSessionValid = true)
-                    }
-                }.onFailure {
-                    Timber.e(it, "Failed to check chat session")
-                    _state.update { state ->
-                        state.copy(isChatSessionValid = false)
-                    }
-                }
-            }
-
             runCatching {
                 rootNodeExistsUseCase()
             }.onSuccess {

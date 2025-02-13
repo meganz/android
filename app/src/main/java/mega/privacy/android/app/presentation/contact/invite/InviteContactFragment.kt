@@ -17,6 +17,7 @@ import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.lifecycle.viewmodel.compose.LocalViewModelStoreOwner
 import dagger.hilt.android.AndroidEntryPoint
 import mega.privacy.android.app.R
+import mega.privacy.android.app.components.chatsession.ChatSessionContainer
 import mega.privacy.android.app.components.session.SessionContainer
 import mega.privacy.android.app.presentation.contact.invite.navigation.InviteContactScreenResult
 import mega.privacy.android.app.presentation.extensions.isDarkMode
@@ -60,29 +61,31 @@ class InviteContactFragment : Fragment() {
         setViewCompositionStrategy(ViewCompositionStrategy.DisposeOnViewTreeLifecycleDestroyed)
         setContent {
             val themeMode by getThemeMode().collectAsStateWithLifecycle(initialValue = ThemeMode.System)
-            SessionContainer(shouldCheckChatSession = true) {
-                OriginalTheme(isDark = themeMode.isDarkMode()) {
-                    PasscodeContainer(
-                        passcodeCryptObjectFactory = passcodeCryptObjectFactory,
-                        loading = {},
-                        content = {
-                            PsaContainer {
-                                // This is necessary to prevent the viewmodel class from being recreated when the configuration changes.
-                                // This can be removed after we fully migrate to a single activity and Compose navigation.
-                                CompositionLocalProvider(LocalViewModelStoreOwner provides activity as InviteContactActivity) {
-                                    InviteContactRoute(
-                                        modifier = Modifier.fillMaxSize(),
-                                        isDarkMode = themeMode.isDarkMode(),
-                                        onNavigateUp = ::setActivityResultAndFinish,
-                                        onBackPressed = ::onBackPressed,
-                                        onShareContactLink = ::shareContactLink,
-                                        onOpenPersonalQRCode = ::initMyQr,
-                                        onOpenQRScanner = ::initScanQR,
-                                    )
+            SessionContainer {
+                ChatSessionContainer {
+                    OriginalTheme(isDark = themeMode.isDarkMode()) {
+                        PasscodeContainer(
+                            passcodeCryptObjectFactory = passcodeCryptObjectFactory,
+                            loading = {},
+                            content = {
+                                PsaContainer {
+                                    // This is necessary to prevent the viewmodel class from being recreated when the configuration changes.
+                                    // This can be removed after we fully migrate to a single activity and Compose navigation.
+                                    CompositionLocalProvider(LocalViewModelStoreOwner provides activity as InviteContactActivity) {
+                                        InviteContactRoute(
+                                            modifier = Modifier.fillMaxSize(),
+                                            isDarkMode = themeMode.isDarkMode(),
+                                            onNavigateUp = ::setActivityResultAndFinish,
+                                            onBackPressed = ::onBackPressed,
+                                            onShareContactLink = ::shareContactLink,
+                                            onOpenPersonalQRCode = ::initMyQr,
+                                            onOpenQRScanner = ::initScanQR,
+                                        )
+                                    }
                                 }
                             }
-                        }
-                    )
+                        )
+                    }
                 }
             }
         }

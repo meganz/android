@@ -14,17 +14,14 @@ import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.google.accompanist.systemuicontroller.rememberSystemUiController
 import dagger.hilt.android.AndroidEntryPoint
 import mega.privacy.android.analytics.Analytics
-import mega.privacy.android.app.components.session.SessionContainer
 import mega.privacy.android.app.main.FileExplorerActivity
+import mega.privacy.android.app.presentation.container.MegaAppContainer
 import mega.privacy.android.app.presentation.documentscanner.model.ScanDestination
 import mega.privacy.android.app.presentation.documentscanner.model.ScanFileType
 import mega.privacy.android.app.presentation.extensions.isDarkMode
 import mega.privacy.android.app.presentation.passcode.model.PasscodeCryptObjectFactory
-import mega.privacy.android.app.presentation.psa.PsaContainer
-import mega.privacy.android.app.presentation.security.check.PasscodeContainer
 import mega.privacy.android.domain.entity.ThemeMode
 import mega.privacy.android.domain.usecase.GetThemeMode
-import mega.privacy.android.shared.original.core.ui.theme.OriginalTheme
 import mega.privacy.mobile.analytics.event.DocumentScannerUploadingImageToChatEvent
 import mega.privacy.mobile.analytics.event.DocumentScannerUploadingPDFToChatEvent
 import javax.inject.Inject
@@ -65,34 +62,28 @@ internal class SaveScannedDocumentsActivity : AppCompatActivity() {
                 darkIcons = useDarkIcons
             )
 
-            SessionContainer {
-                OriginalTheme(isDark = themeMode.isDarkMode()) {
-                    PasscodeContainer(
-                        passcodeCryptObjectFactory = passcodeCryptObjectFactory,
-                        content = {
-                            PsaContainer {
-                                SaveScannedDocumentsScreen(
-                                    viewModel = viewModel,
-                                    onUploadScansStarted = { uriToUpload ->
-                                        val uiState = viewModel.uiState.value
-                                        if (uiState.originatedFromChat) {
-                                            Analytics.tracker.trackEvent(
-                                                if (uiState.scanFileType == ScanFileType.Pdf) {
-                                                    DocumentScannerUploadingPDFToChatEvent
-                                                } else {
-                                                    DocumentScannerUploadingImageToChatEvent
-                                                }
-                                            )
-                                            redirectBackToChat(uriToUpload)
-                                        } else {
-                                            proceedToFileExplorer(uriToUpload)
-                                        }
-                                    }
-                                )
-                            }
-                        },
-                    )
-                }
+            MegaAppContainer(
+                themeMode = themeMode,
+                passcodeCryptObjectFactory = passcodeCryptObjectFactory
+            ) {
+                SaveScannedDocumentsScreen(
+                    viewModel = viewModel,
+                    onUploadScansStarted = { uriToUpload ->
+                        val uiState = viewModel.uiState.value
+                        if (uiState.originatedFromChat) {
+                            Analytics.tracker.trackEvent(
+                                if (uiState.scanFileType == ScanFileType.Pdf) {
+                                    DocumentScannerUploadingPDFToChatEvent
+                                } else {
+                                    DocumentScannerUploadingImageToChatEvent
+                                }
+                            )
+                            redirectBackToChat(uriToUpload)
+                        } else {
+                            proceedToFileExplorer(uriToUpload)
+                        }
+                    }
+                )
             }
         }
     }

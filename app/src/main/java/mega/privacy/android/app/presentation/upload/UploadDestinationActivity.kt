@@ -68,7 +68,7 @@ class UploadDestinationActivity : AppCompatActivity() {
             val isNewUploadActivityEnabled = uploadActivityUiState.isNewUploadScreenEnabled
             if (isNewUploadActivityEnabled != null) {
                 if (isNewUploadActivityEnabled) {
-                    SessionContainer(shouldCheckChatSession = false, shouldFinish = false) {
+                    SessionContainer(shouldFinish = false) {
                         LaunchedEffect(Unit) {
                             handleIntent()
                         }
