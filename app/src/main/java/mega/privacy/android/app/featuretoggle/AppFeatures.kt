@@ -17,6 +17,14 @@ enum class AppFeatures(override val description: String, private val defaultValu
     Feature {
 
     /**
+     * New psa state
+     */
+    NewPsaState(
+        "Use new psa state in stead of legacy psa state singleton. Legacy psa state exists to unify behaviour while legacy screens still exist",
+        false,
+    ),
+
+    /**
      * Enable the menu of Favourites playlist
      */
     FavouritesPlaylistMenuEnabled(
@@ -63,13 +71,6 @@ enum class AppFeatures(override val description: String, private val defaultValu
         true
     ),
 
-    /**
-     * Compose passcode settings
-     */
-    ComposePasscodeSettings(
-        "Use the new compose version of the passcode settings screens",
-        true
-    ),
 
     /**
      * Enables Map location

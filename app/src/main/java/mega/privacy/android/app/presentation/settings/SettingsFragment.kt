@@ -33,7 +33,6 @@ import mega.privacy.android.app.activities.settingsActivities.ChatPreferencesAct
 import mega.privacy.android.app.activities.settingsActivities.CookiePreferencesActivity
 import mega.privacy.android.app.activities.settingsActivities.DownloadPreferencesActivity
 import mega.privacy.android.app.activities.settingsActivities.FileManagementPreferencesActivity
-import mega.privacy.android.app.activities.settingsActivities.LegacyPasscodePreferencesActivity
 import mega.privacy.android.app.activities.settingsActivities.StartScreenPreferencesActivity
 import mega.privacy.android.app.constants.SettingsConstants.KEY_2FA
 import mega.privacy.android.app.constants.SettingsConstants.KEY_ABOUT_APP_VERSION
@@ -63,7 +62,6 @@ import mega.privacy.android.app.constants.SettingsConstants.KEY_STORAGE_FILE_MAN
 import mega.privacy.android.app.constants.SettingsConstants.KEY_SUB_FOLDER_MEDIA_DISCOVERY
 import mega.privacy.android.app.constants.SettingsConstants.REPORT_ISSUE
 import mega.privacy.android.app.di.settings.ViewModelPreferenceDataStoreFactory
-import mega.privacy.android.app.featuretoggle.AppFeatures
 import mega.privacy.android.app.presentation.changepassword.ChangePasswordActivity
 import mega.privacy.android.app.presentation.extensions.hideKeyboard
 import mega.privacy.android.app.presentation.settings.calls.SettingsCallsActivity
@@ -303,17 +301,10 @@ class SettingsFragment :
 
             KEY_PASSCODE_LOCK -> {
                 lifecycleScope.launch {
-                    val activity =
-                        if (getFeatureFlagValueUseCase(AppFeatures.ComposePasscodeSettings)) {
-                            PasscodeSettingsActivity::class.java
-                        } else {
-                            LegacyPasscodePreferencesActivity::class.java
-                        }
-
                     startActivity(
                         Intent(
                             context,
-                            activity
+                            PasscodeSettingsActivity::class.java
                         )
                     )
                 }
