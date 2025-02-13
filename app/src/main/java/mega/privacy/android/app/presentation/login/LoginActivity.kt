@@ -68,7 +68,6 @@ class LoginActivity : BaseActivity(), MegaRequestListenerInterface {
 
     //Fragments
     private var loginFragment: LoginFragment? = null
-    private var createAccountFragment: CreateAccountFragment? = null
 
     private var visibleFragment = 0
     private var sessionTemp: String? = null
@@ -265,15 +264,9 @@ class LoginActivity : BaseActivity(), MegaRequestListenerInterface {
             Constants.CREATE_ACCOUNT_FRAGMENT -> {
                 Timber.d("Show CREATE_ACCOUNT_FRAGMENT")
                 lifecycleScope.launch {
-                    val isNewCreateAccountFragmentEnabled =
-                        viewModel.isNewCreateAccountFragmentEnabled()
-                    val createActFragment = if (isNewCreateAccountFragmentEnabled) {
+                    val createActFragment =
                         CreateAccountComposeFragment()
-                    } else {
-                        createAccountFragment ?: CreateAccountFragment().also {
-                            createAccountFragment = it
-                        }
-                    }
+
                     if (cancelledConfirmationProcess) {
                         cancelledConfirmationProcess = false
                     }

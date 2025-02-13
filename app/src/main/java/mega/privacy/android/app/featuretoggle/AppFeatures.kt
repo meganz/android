@@ -55,15 +55,6 @@ enum class AppFeatures(override val description: String, private val defaultValu
         "Enable new contact request screen",
         false
     ),
-
-    /**
-     * New create account fragment(compose version)
-     */
-    NewCreateAccountFragment(
-        "Enable new create account fragment",
-        true
-    ),
-
     /**
      * Enable request status progress dialog
      */
