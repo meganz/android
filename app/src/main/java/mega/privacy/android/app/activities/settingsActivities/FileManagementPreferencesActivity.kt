@@ -24,7 +24,6 @@ import com.google.android.material.dialog.MaterialAlertDialogBuilder
 import dagger.hilt.android.AndroidEntryPoint
 import mega.privacy.android.app.R
 import mega.privacy.android.app.constants.BroadcastConstants.ACTION_REFRESH_CLEAR_OFFLINE_SETTING
-import mega.privacy.android.app.constants.BroadcastConstants.ACTION_RESET_VERSION_INFO_SETTING
 import mega.privacy.android.app.constants.BroadcastConstants.ACTION_TYPE
 import mega.privacy.android.app.constants.BroadcastConstants.ACTION_UPDATE_RB_SCHEDULER
 import mega.privacy.android.app.constants.BroadcastConstants.DAYS_COUNT
@@ -53,13 +52,6 @@ class FileManagementPreferencesActivity : PreferencesBaseActivity() {
     private var clearRubbishBinDialog: AlertDialog? = null
     private var newFolderDialog: AlertDialog? = null
     private var generalDialog: AlertDialog? = null
-    private val resetVersionInfoReceiver: BroadcastReceiver = object : BroadcastReceiver() {
-        override fun onReceive(context: Context, intent: Intent) {
-            if (sttFileManagement != null && intent.action == ACTION_RESET_VERSION_INFO_SETTING) {
-                sttFileManagement?.resetVersionsInfo()
-            }
-        }
-    }
     private val updateCUSettingsReceiver: BroadcastReceiver = object : BroadcastReceiver() {
         override fun onReceive(context: Context, intent: Intent) {
             if (sttFileManagement != null && intent.action == ACTION_REFRESH_CLEAR_OFFLINE_SETTING) {
@@ -109,10 +101,6 @@ class FileManagementPreferencesActivity : PreferencesBaseActivity() {
         filterUpdateCUSettings.addAction(ACTION_REFRESH_CLEAR_OFFLINE_SETTING)
         registerReceiver(updateCUSettingsReceiver, filterUpdateCUSettings)
         registerReceiver(
-            resetVersionInfoReceiver,
-            IntentFilter(ACTION_RESET_VERSION_INFO_SETTING)
-        )
-        registerReceiver(
             updateRBSchedulerReceiver,
             IntentFilter(ACTION_UPDATE_RB_SCHEDULER)
         )
@@ -134,7 +122,6 @@ class FileManagementPreferencesActivity : PreferencesBaseActivity() {
         super.onDestroy()
         unregisterReceiver(updateMyAccountReceiver)
         unregisterReceiver(updateCUSettingsReceiver)
-        unregisterReceiver(resetVersionInfoReceiver)
         unregisterReceiver(updateRBSchedulerReceiver)
         dismissAlertDialogIfExists(clearOfflineDialog)
     }
@@ -184,8 +171,7 @@ class FileManagementPreferencesActivity : PreferencesBaseActivity() {
         builder.setPositiveButton(
             getFormattedStringOrDefault(R.string.context_delete)
         ) { _: DialogInterface?, _: Int ->
-            val nC = NodeController(this)
-            nC.clearAllVersions()
+            viewModel.clearAllVersions()
         }
         builder.setNegativeButton(
             getFormattedStringOrDefault(sharedR.string.general_dialog_cancel_button),

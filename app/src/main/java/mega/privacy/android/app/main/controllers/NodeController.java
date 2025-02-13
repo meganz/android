@@ -24,7 +24,6 @@ import mega.privacy.android.app.MegaApplication;
 import mega.privacy.android.app.R;
 import mega.privacy.android.app.interfaces.SnackbarShower;
 import mega.privacy.android.app.listeners.CleanRubbishBinListener;
-import mega.privacy.android.app.listeners.RemoveVersionsListener;
 import mega.privacy.android.app.listeners.ShareListener;
 import mega.privacy.android.app.main.DrawerItem;
 import mega.privacy.android.app.main.FileExplorerActivity;
@@ -421,10 +420,5 @@ public class NodeController {
     public void cleanRubbishBin() {
         Timber.d("cleanRubbishBin");
         megaApi.cleanRubbishBin(new CleanRubbishBinListener(context));
-    }
-
-    public void clearAllVersions() {
-        Timber.d("clearAllVersions");
-        megaApi.removeVersions(new RemoveVersionsListener(context));
     }
 }

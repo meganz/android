@@ -13,6 +13,7 @@ import androidx.preference.Preference
 import androidx.preference.SwitchPreferenceCompat
 import com.google.android.material.dialog.MaterialAlertDialogBuilder
 import dagger.hilt.android.AndroidEntryPoint
+import de.palm.composestateevents.StateEventWithContentTriggered
 import mega.privacy.android.app.R
 import mega.privacy.android.app.activities.settingsActivities.FileManagementPreferencesActivity
 import mega.privacy.android.app.arch.extensions.collectFlow
@@ -173,6 +174,17 @@ class SettingsFileManagementFragment : SettingsBaseFragment(),
             setOfflineSize(offlineSize)
             viewModel.resetUpdateOfflineSize()
         }
+
+        if (filePreferencesState.deleteAllVersionsEvent is StateEventWithContentTriggered) {
+            val exception = filePreferencesState.deleteAllVersionsEvent.content
+            if (exception == null) {
+                Util.showSnackbar(requireActivity(), getString(R.string.success_delete_versions))
+                resetVersionsInfo()
+            } else {
+                Util.showSnackbar(requireActivity(), getString(R.string.error_delete_versions))
+            }
+            viewModel.resetDeleteAllVersionsEvent()
+        }
     }
 
     override fun onSaveInstanceState(outState: Bundle) {
@@ -251,7 +263,7 @@ class SettingsFileManagementFragment : SettingsBaseFragment(),
     /**
      * Method for reset the version information.
      */
-    fun resetVersionsInfo() {
+    private fun resetVersionsInfo() {
         viewModel.resetVersionsInfo()
         clearVersionsFileManagement?.let {
             preferenceScreen.removePreference(it)
