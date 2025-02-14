@@ -730,6 +730,16 @@
         <item quantity="one">Added to “%1$s”</item>
         <item quantity="other">Added %2$d items to “%1$s”</item>
     </plurals>
+    <!-- Add to album files existed message -->
+    <plurals name="album_add_to_files_existed">
+        <item quantity="one">This file already exists in “%1$s” and cannot be added again</item>
+        <item quantity="other">These files already exist in “%1$s” and cannot be added again</item>
+    </plurals>
+    <!-- Add to album partial added message -->
+    <plurals name="album_add_to_partial_added_message">
+        <item quantity="one">1 file added to “%1$s”. Some file already exist, and cannot be added again.</item>
+        <item quantity="other">%2$d files added to “%1$s”. Some files already exist, and cannot be added again.</item>
+    </plurals>
     <!-- Name for a general button which action is "Open" something -->
     <string name="general_open_button">Open</string>
     <!-- Bottom sheet option title for add the video to playlist from video section -->

@@ -82,12 +82,52 @@ internal fun AddToAlbumScreen(
 
     LaunchedEffect(state.completionType) {
         if (state.completionType > 0) {
-            val message = context.resources.getQuantityString(
-                sharedR.plurals.album_add_to_message,
-                state.completionType,
-                state.mediaHolderName,
-                state.numAddedItems,
-            )
+            val message = if (state.additionType == 0) {
+                if (state.completionType == 1) {
+                    if (state.numAddedItems > 0) {
+                        context.resources.getQuantityString(
+                            sharedR.plurals.album_add_to_message,
+                            state.completionType,
+                            state.mediaHolderName,
+                        )
+                    } else {
+                        context.resources.getQuantityString(
+                            sharedR.plurals.album_add_to_files_existed,
+                            state.completionType,
+                            state.mediaHolderName,
+                        )
+                    }
+                } else if (state.completionType == 2) {
+                    if (state.numAddedItems == addToAlbumViewModel.nodeIds.size) {
+                        context.resources.getQuantityString(
+                            sharedR.plurals.album_add_to_message,
+                            state.completionType,
+                            state.mediaHolderName,
+                            state.numAddedItems,
+                        )
+                    } else {
+                        context.resources.getQuantityString(
+                            sharedR.plurals.album_add_to_partial_added_message,
+                            state.numAddedItems,
+                            state.mediaHolderName,
+                            state.numAddedItems,
+                        )
+                    }
+                } else {
+                    context.resources.getQuantityString(
+                        sharedR.plurals.album_add_to_files_existed,
+                        state.completionType,
+                        state.mediaHolderName,
+                    )
+                }
+            } else {
+                context.resources.getQuantityString(
+                    sharedR.plurals.album_add_to_message,
+                    state.completionType,
+                    state.mediaHolderName,
+                    state.numAddedItems,
+                )
+            }
             onClose(message)
         }
     }

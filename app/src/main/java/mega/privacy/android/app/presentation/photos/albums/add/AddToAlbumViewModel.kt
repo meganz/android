@@ -78,7 +78,7 @@ internal class AddToAlbumViewModel @Inject constructor(
         savedStateHandle["type"] ?: 0
     }
 
-    private val nodeIds: List<NodeId> by lazy {
+    val nodeIds: List<NodeId> by lazy {
         savedStateHandle.get<Array<Long>?>("ids")?.map { NodeId(it) }.orEmpty()
     }
 
@@ -267,11 +267,17 @@ internal class AddToAlbumViewModel @Inject constructor(
         val nodeIds = nodeIds
 
         val (completionType, numAddedItems) = if (nodeIds.size == 1) {
-            1 to 1
+            if (photos.any { it.id == nodeIds.firstOrNull()?.longValue }) {
+                1 to 0
+            } else {
+                1 to nodeIds.size
+            }
         } else if (nodeIds.all { nodeId -> photos.any { it.id == nodeId.longValue } }) {
-            2 to 0
-        } else {
+            3 to 0
+        } else if (nodeIds.none { nodeId -> photos.any { it.id == nodeId.longValue } }) {
             2 to nodeIds.size
+        } else {
+            2 to (nodeIds.map { it.longValue } - photos.map { it.id }).size
         }
 
         runCatching {
@@ -286,6 +292,7 @@ internal class AddToAlbumViewModel @Inject constructor(
                     mediaHolderName = album.title,
                     completionType = completionType,
                     numAddedItems = numAddedItems,
+                    additionType = 0,
                 )
             }
         }
@@ -408,6 +415,7 @@ internal class AddToAlbumViewModel @Inject constructor(
                 mediaHolderName = playlist.title,
                 completionType = completionType,
                 numAddedItems = numAddedItems,
+                additionType = 1,
             )
         }
     }

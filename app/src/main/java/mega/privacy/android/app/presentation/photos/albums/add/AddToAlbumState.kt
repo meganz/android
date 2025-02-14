@@ -23,6 +23,7 @@ internal data class AddToAlbumState(
     val mediaHolderName: String = "",
     val numAddedItems: Int = 0,
     val completionType: Int = -1,
+    val additionType: Int = 0,
 ) {
     val existingAlbumNames: List<String>
         get() = albums.map { it.first.title }
