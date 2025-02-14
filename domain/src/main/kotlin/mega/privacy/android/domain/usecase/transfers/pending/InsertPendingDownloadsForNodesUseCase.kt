@@ -9,12 +9,12 @@ import mega.privacy.android.domain.entity.uri.UriPath
 import mega.privacy.android.domain.exception.NotEnoughStorageException
 import mega.privacy.android.domain.exception.NullFileException
 import mega.privacy.android.domain.repository.FileSystemRepository
+import mega.privacy.android.domain.repository.TimeSystemRepository
 import mega.privacy.android.domain.repository.TransferRepository
 import mega.privacy.android.domain.usecase.file.DoesUriPathHaveSufficientSpaceForNodesUseCase
 import mega.privacy.android.domain.usecase.transfers.downloads.GetFileDestinationAndAppDataForDownloadUseCase
 import java.io.File
 import javax.inject.Inject
-import kotlin.text.split
 
 /**
  * Use case to insert pending transfers for download a list of nodes to a specific destination.
@@ -25,6 +25,7 @@ class InsertPendingDownloadsForNodesUseCase @Inject constructor(
     private val doesUriPathHaveSufficientSpaceForNodesUseCase: DoesUriPathHaveSufficientSpaceForNodesUseCase,
     private val getFileDestinationAndAppDataForDownloadUseCase: GetFileDestinationAndAppDataForDownloadUseCase,
     private val fileSystemRepository: FileSystemRepository,
+    private val timeSystemRepository: TimeSystemRepository,
 ) {
     /**
      * Invoke: insert pending transfers for download a list of nodes to a specific destination.
@@ -48,7 +49,8 @@ class InsertPendingDownloadsForNodesUseCase @Inject constructor(
             ActiveTransferGroupImpl(
                 transferType = TransferType.DOWNLOAD,
                 destination = destination.value,
-                singleFileName = nodes.singleOrNull()?.name
+                singleFileName = nodes.singleOrNull()?.name,
+                startTime = timeSystemRepository.getCurrentTimeInMillis(),
             )
         )
         val appDataList = listOfNotNull(

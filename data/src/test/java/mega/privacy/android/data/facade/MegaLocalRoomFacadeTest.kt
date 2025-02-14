@@ -945,9 +945,12 @@ internal class MegaLocalRoomFacadeTest {
         val groupId: Int? = null
         val transferType = TransferType.DOWNLOAD
         val destination = "destination"
+        val singleFileName = "file.txt"
+        val startTime = 987465L
         val activeTransferGroup =
-            ActiveTransferGroupImpl(groupId, transferType, destination)
-        val roomEntity = ActiveTransferGroupEntity(groupId, transferType, destination)
+            ActiveTransferGroupImpl(groupId, transferType, destination, singleFileName, startTime)
+        val roomEntity =
+            ActiveTransferGroupEntity(groupId, transferType, destination, singleFileName, startTime)
         whenever(activeTransferGroupEntityMapper(activeTransferGroup)) doReturn roomEntity
 
         val expected = roomEntity

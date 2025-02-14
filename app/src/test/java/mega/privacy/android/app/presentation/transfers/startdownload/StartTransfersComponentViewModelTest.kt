@@ -36,6 +36,7 @@ import mega.privacy.android.domain.usecase.SetStorageDownloadLocationUseCase
 import mega.privacy.android.domain.usecase.canceltoken.CancelCancelTokenUseCase
 import mega.privacy.android.domain.usecase.canceltoken.InvalidateCancelTokenUseCase
 import mega.privacy.android.domain.usecase.chat.message.SendChatAttachmentsUseCase
+import mega.privacy.android.domain.usecase.environment.GetCurrentTimeInMillisUseCase
 import mega.privacy.android.domain.usecase.featureflag.GetFeatureFlagValueUseCase
 import mega.privacy.android.domain.usecase.file.TotalFileSizeOfNodesUseCase
 import mega.privacy.android.domain.usecase.network.IsConnectedToInternetUseCase
@@ -136,6 +137,7 @@ class StartTransfersComponentViewModelTest {
     private val startUploadsWorkerAndWaitUntilIsStartedUseCase =
         mock<StartUploadsWorkerAndWaitUntilIsStartedUseCase>()
     private val getFeatureFlagValueUseCase = mock<GetFeatureFlagValueUseCase>()
+    private val getCurrentTimeInMillisUseCase = mock<GetCurrentTimeInMillisUseCase>()
 
 
     private val node: TypedFileNode = mock()
@@ -199,6 +201,7 @@ class StartTransfersComponentViewModelTest {
             monitorStorageOverQuotaUseCase = monitorStorageOverQuotaUseCase,
             invalidateCancelTokenUseCase = invalidateCancelTokenUseCase,
             getFeatureFlagValueUseCase = getFeatureFlagValueUseCase,
+            getCurrentTimeInMillisUseCase = getCurrentTimeInMillisUseCase,
         )
     }
 
@@ -240,6 +243,7 @@ class StartTransfersComponentViewModelTest {
             insertPendingUploadsForFilesUseCase,
             startUploadsWorkerAndWaitUntilIsStartedUseCase,
             getFeatureFlagValueUseCase,
+            getCurrentTimeInMillisUseCase,
         )
         initialStub()
     }

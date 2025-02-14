@@ -2,6 +2,7 @@ package mega.privacy.android.app.presentation.transfers.starttransfer
 
 import android.net.Uri
 import androidx.lifecycle.DefaultLifecycleObserver
+import androidx.lifecycle.LifecycleOwner
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import dagger.hilt.android.lifecycle.HiltViewModel
@@ -23,14 +24,18 @@ import mega.privacy.android.app.presentation.mapper.file.FileSizeStringMapper
 import mega.privacy.android.app.presentation.transfers.TransfersConstants
 import mega.privacy.android.app.presentation.transfers.starttransfer.model.ConfirmLargeDownloadInfo
 import mega.privacy.android.app.presentation.transfers.starttransfer.model.StartTransferEvent
+import mega.privacy.android.app.presentation.transfers.starttransfer.model.StartTransferEvent.Message.SlowDownloadPreviewFinished
+import mega.privacy.android.app.presentation.transfers.starttransfer.model.StartTransferEvent.Message.SlowDownloadPreviewInProgress
 import mega.privacy.android.app.presentation.transfers.starttransfer.model.StartTransferJobInProgress
 import mega.privacy.android.app.presentation.transfers.starttransfer.model.StartTransferViewState
 import mega.privacy.android.app.presentation.transfers.starttransfer.model.TransferTriggerEvent
 import mega.privacy.android.app.service.iar.RatingHandlerImpl
 import mega.privacy.android.domain.entity.node.NodeId
 import mega.privacy.android.domain.entity.node.TypedNode
+import mega.privacy.android.domain.entity.transfer.ActiveTransferTotals
 import mega.privacy.android.domain.entity.transfer.TransferStage
 import mega.privacy.android.domain.entity.transfer.TransferType
+import mega.privacy.android.domain.entity.transfer.isPreviewDownload
 import mega.privacy.android.domain.entity.uri.UriPath
 import mega.privacy.android.domain.exception.NotEnoughStorageException
 import mega.privacy.android.domain.usecase.SetStorageDownloadAskAlwaysUseCase
@@ -38,6 +43,7 @@ import mega.privacy.android.domain.usecase.SetStorageDownloadLocationUseCase
 import mega.privacy.android.domain.usecase.canceltoken.CancelCancelTokenUseCase
 import mega.privacy.android.domain.usecase.canceltoken.InvalidateCancelTokenUseCase
 import mega.privacy.android.domain.usecase.chat.message.SendChatAttachmentsUseCase
+import mega.privacy.android.domain.usecase.environment.GetCurrentTimeInMillisUseCase
 import mega.privacy.android.domain.usecase.featureflag.GetFeatureFlagValueUseCase
 import mega.privacy.android.domain.usecase.file.TotalFileSizeOfNodesUseCase
 import mega.privacy.android.domain.usecase.network.IsConnectedToInternetUseCase
@@ -70,6 +76,8 @@ import mega.privacy.android.domain.usecase.transfers.uploads.StartUploadsWorkerA
 import timber.log.Timber
 import java.io.File
 import javax.inject.Inject
+import kotlin.collections.filter
+import kotlin.time.Duration.Companion.seconds
 
 /**
  * View model to handle start transfers component
@@ -111,6 +119,7 @@ internal class StartTransfersComponentViewModel @Inject constructor(
     private val monitorStorageOverQuotaUseCase: MonitorStorageOverQuotaUseCase,
     private val invalidateCancelTokenUseCase: InvalidateCancelTokenUseCase,
     private val getFeatureFlagValueUseCase: GetFeatureFlagValueUseCase,
+    private val getCurrentTimeInMillisUseCase: GetCurrentTimeInMillisUseCase,
 ) : ViewModel(), DefaultLifecycleObserver {
 
     private val _uiState = MutableStateFlow(StartTransferViewState())
@@ -133,6 +142,7 @@ internal class StartTransfersComponentViewModel @Inject constructor(
         checkUploadRating()
         monitorRequestFilesPermissionDenied()
         monitorStorageOverQuota()
+        monitorPreviews()
     }
 
     /**
@@ -569,6 +579,21 @@ internal class StartTransfersComponentViewModel @Inject constructor(
         }
     }
 
+    fun previewFile(file: File) {
+        _uiState.update {
+            it.copy(previewFileToOpen = file)
+        }
+    }
+
+    /**
+     * Consume preview file opened
+     */
+    fun consumePreviewFileOpened() {
+        _uiState.update {
+            it.copy(previewFileToOpen = null)
+        }
+    }
+
     private fun checkAndHandleDeviceIsNotConnected() =
         if (runCatching { isConnectedToInternetUseCase() }.getOrDefault(true)) {
             false
@@ -634,6 +659,56 @@ internal class StartTransfersComponentViewModel @Inject constructor(
         }
     }
 
+    private fun monitorPreviews() {
+        viewModelScope.launch {
+            monitorOngoingActiveTransfersUseCase(TransferType.DOWNLOAD).conflate()
+                .catch {
+                    Timber.e(it)
+                }.collect { (transferTotals, _) ->
+                    transferTotals.groups
+                        .filter { it.isPreviewDownload() }
+                        .takeIf { it.isNotEmpty() }?.let { previewGroups ->
+                            if (active) {
+                                checkFinishedPreviews(previewGroups)
+                                checkSlowPreviews(previewGroups)
+                            }
+                        }
+                }
+        }
+    }
+
+    private fun checkFinishedPreviews(groups: List<ActiveTransferTotals.Group>) {
+        groups.filter { it.finished() && !alreadyFinishedPreviewGroups.contains(it.groupId) }
+            .let { finishedGroups ->
+                alreadyFinishedPreviewGroups.addAll(finishedGroups.map { it.groupId })
+                finishedGroups.forEach { group ->
+                    val file = File(group.destination + group.singleFileName)
+                    val duration = group.durationFromStart(getCurrentTimeInMillisUseCase())
+                    if (duration < 6.seconds) {
+                        previewFile(file)
+                    } else {
+                        _uiState.updateEventAndClearProgress(
+                            SlowDownloadPreviewFinished(file)
+                        )
+                    }
+                }
+            }
+    }
+
+    private fun checkSlowPreviews(groups: List<ActiveTransferTotals.Group>) {
+        groups.filter {
+            !it.finished()
+                    && !alreadySlowNotifiedGroups.contains(it.groupId)
+                    && it.durationFromStart(getCurrentTimeInMillisUseCase()) > 2.seconds
+        }
+            .takeIf { it.isNotEmpty() }
+            ?.let { notFinishedSlowGroups ->
+                //as this is responding an user action, usually only one group at a time, but
+                alreadySlowNotifiedGroups.addAll(notFinishedSlowGroups.map { it.groupId })
+                _uiState.updateEventAndClearProgress(SlowDownloadPreviewInProgress)
+            }
+    }
+
     private fun MutableStateFlow<StartTransferViewState>.updateEventAndClearProgress(
         event: StartTransferEvent?,
     ) = this.update {
@@ -663,6 +738,19 @@ internal class StartTransfersComponentViewModel @Inject constructor(
 
     private fun String.ensureSuffix(suffix: String) =
         if (this.endsWith(suffix)) this else this.plus(suffix)
+
+
+    private var active = false
+
+    override fun onResume(owner: LifecycleOwner) {
+        super.onResume(owner)
+        active = true
+    }
+
+    override fun onPause(owner: LifecycleOwner) {
+        super.onPause(owner)
+        active = false
+    }
 
     /**
      * Set asked resume transfers.
@@ -799,5 +887,11 @@ internal class StartTransfersComponentViewModel @Inject constructor(
                 _uiState.update { state -> state.copy(isStorageOverQuota = isStorageOverQuota) }
             }
         }
+    }
+
+    companion object {
+        // preview snackbar notifications can be shown in a different screen than the one that started it, that's why we need to store it in the companion object
+        private val alreadyFinishedPreviewGroups = mutableListOf<Int>()
+        private val alreadySlowNotifiedGroups = mutableListOf<Int>()
     }
 }

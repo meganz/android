@@ -2,6 +2,7 @@ package mega.privacy.android.app.presentation.transfers.starttransfer.model
 
 import de.palm.composestateevents.StateEventWithContent
 import de.palm.composestateevents.consumed
+import java.io.File
 
 /**
  * Data class defining the state of the start transfer.
@@ -15,6 +16,7 @@ import de.palm.composestateevents.consumed
  * @property triggerEventWithoutPermission user needs to answer requested permission after triggering this event
  * @property isStorageOverQuota True if the user is in storage over quota state.
  * @property isPreviewDownloadFeatureEnabled True if the PreviewDownload feature is enabled.
+ * @property previewFileToOpen
  * @constructor Create empty Start transfer view state
  */
 data class StartTransferViewState(
@@ -27,4 +29,5 @@ data class StartTransferViewState(
     val triggerEventWithoutPermission: TransferTriggerEvent? = null,
     val isStorageOverQuota: Boolean = false,
     val isPreviewDownloadFeatureEnabled: Boolean = false,
+    val previewFileToOpen: File? = null,
 )

@@ -1,6 +1,7 @@
 package mega.privacy.android.domain.entity.transfer
 
 import mega.privacy.android.domain.entity.Progress
+import kotlin.time.Duration.Companion.milliseconds
 
 /**
  * Class to expose the totals for active transfers grouped by [TransferType]
@@ -40,6 +41,7 @@ data class ActiveTransferTotals(
      * @param alreadyTransferred the amount of files not transferred because already transferred
      * @param destination the destination of the transfer
      * @param singleFileName in case of a single file transfer, the name of the file, null otherwise
+     * @param startTime the local time in milliseconds when this action was started, it should be used for UX only as precision is not guaranteed
      * @param appData the list of app data of the transfers in this group. Group app data itself is filtered out. Only one instance of each app data type is added to represent this group.
      */
     data class Group(
@@ -50,10 +52,14 @@ data class ActiveTransferTotals(
         val alreadyTransferred: Int,
         val destination: String,
         val singleFileName: String?,
+        val startTime: Long,
         override val appData: List<TransferAppData> = emptyList(),
     ) : AppDataOwner {
         fun finished() = totalFiles == finishedFiles
         val finishedFilesWithErrors = finishedFiles - completedFiles - alreadyTransferred
+
+        fun durationFromStart(currentTimeInMillis: Long) =
+            (currentTimeInMillis - startTime).milliseconds
     }
 
     /**

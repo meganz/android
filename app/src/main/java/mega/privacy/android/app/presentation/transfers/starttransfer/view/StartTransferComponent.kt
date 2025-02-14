@@ -45,6 +45,7 @@ import mega.privacy.android.app.constants.IntentConstants
 import mega.privacy.android.app.interfaces.SnackbarShower
 import mega.privacy.android.app.main.dialog.storagestatus.StorageStatusDialogView
 import mega.privacy.android.app.myAccount.MyAccountActivity
+import mega.privacy.android.app.presentation.node.action.HandleFileAction
 import mega.privacy.android.app.presentation.permissions.NotificationsPermissionActivity
 import mega.privacy.android.app.presentation.snackbar.LegacySnackBarWrapper
 import mega.privacy.android.app.presentation.transfers.starttransfer.StartTransfersComponentViewModel
@@ -66,6 +67,7 @@ import mega.privacy.android.shared.original.core.ui.navigation.launchFolderPicke
 import mega.privacy.android.shared.original.core.ui.theme.OriginalTheme
 import mega.privacy.android.shared.original.core.ui.utils.showAutoDurationSnackbar
 import timber.log.Timber
+import java.io.File
 
 /**
  * Helper compose view to show UI related to starting a download transfer
@@ -169,6 +171,8 @@ internal fun StartTransferComponent(
         snackBarHostState = snackBarHostState,
         onScanningFinished = onScanningFinished,
         navigateToStorageSettings = navigateToStorageSettings,
+        onPreviewFile = viewModel::previewFile,
+        onPreviewOpened = viewModel::consumePreviewFileOpened,
     )
 }
 
@@ -179,7 +183,7 @@ internal fun StartTransferComponent(
  * @param onConsumeEvent lambda to consume the download event, typically it will launch the corresponding consume event in the view model,
  * @param onScanningFinished lambda to be called when the scanning process is finished.
  */
-fun createStartTransferView(
+internal fun createStartTransferView(
     activity: Activity,
     transferEventState: Flow<StateEventWithContent<TransferTriggerEvent>>,
     onConsumeEvent: () -> Unit,
@@ -222,6 +226,8 @@ private fun StartTransferComponent(
     snackBarHostState: SnackbarHostState,
     onScanningFinished: (StartTransferEvent) -> Unit = {},
     navigateToStorageSettings: () -> Unit,
+    onPreviewFile: (File) -> Unit,
+    onPreviewOpened: () -> Unit,
 ) {
     val context = LocalContext.current
     val coroutineScope = rememberCoroutineScope()
@@ -269,8 +275,15 @@ private fun StartTransferComponent(
                     onScanningFinished(it)
                 }
 
-                is StartTransferEvent.Message ->
-                    consumeMessage(it, snackBarHostState, context, navigateToStorageSettings)
+                is StartTransferEvent.Message -> {
+                    consumeMessage(
+                        it,
+                        snackBarHostState,
+                        context,
+                        navigateToStorageSettings,
+                        onPreviewFile,
+                    )
+                }
 
                 StartTransferEvent.NotConnected -> {
                     showOfflineAlertDialog = true
@@ -313,6 +326,13 @@ private fun StartTransferComponent(
             cancelButtonText = null,
             onConfirm = { showOfflineAlertDialog = false },
             onDismiss = { showOfflineAlertDialog = false },
+        )
+    }
+    if (uiState.previewFileToOpen != null) {
+        HandleFileAction(
+            file = uiState.previewFileToOpen,
+            snackBarHostState = snackBarHostState,
+            onActionHandled = onPreviewOpened,
         )
     }
     showQuotaExceededDialog.value?.let {
@@ -420,7 +440,7 @@ private suspend fun consumeFinishProcessing(
         null -> {
             val message = when {
                 transferTriggerEvent is TransferTriggerEvent.StartDownloadForPreview -> {
-                    context.resources.getString(R.string.cloud_drive_snackbar_preparing_file_for_preview_context)
+                    null //to be improved in TRAN-772
                 }
 
                 event.totalAlreadyDownloaded == 0 -> {
@@ -473,15 +493,17 @@ private suspend fun consumeFinishProcessing(
                     ).toString()
                 }
             }
-            if (delayed) {
-                coroutineScope {
-                    launch {
-                        delay(100)
-                        snackBarHostState.showAutoDurationSnackbar(message)
+            if (message != null) {
+                if (delayed) {
+                    coroutineScope {
+                        launch {
+                            delay(100)
+                            snackBarHostState.showAutoDurationSnackbar(message)
+                        }
                     }
+                } else {
+                    snackBarHostState.showAutoDurationSnackbar(message)
                 }
-            } else {
-                snackBarHostState.showAutoDurationSnackbar(message)
             }
         }
 
@@ -505,16 +527,18 @@ private suspend fun consumeMessage(
     snackBarHostState: SnackbarHostState,
     context: Context,
     navigateToStorageSettings: () -> Unit,
+    previewFile: (File) -> Unit,
 ) {
     //show snack bar with an optional action
     val result = snackBarHostState.showAutoDurationSnackbar(
-        context.getString(event.message),
+        context.getString(event.message, *event.messageArgs),
         event.action?.let { context.getString(it) }
     )
     if (result == SnackbarResult.ActionPerformed && event.actionEvent != null) {
         consumeMessageAction(
             event.actionEvent,
-            navigateToStorageSettings
+            navigateToStorageSettings,
+            previewFile,
         )
     }
 }
@@ -522,9 +546,13 @@ private suspend fun consumeMessage(
 private fun consumeMessageAction(
     actionEvent: StartTransferEvent.Message.ActionEvent,
     navigateToStorageSettings: () -> Unit,
+    previewFile: (File) -> Unit,
 ) = when (actionEvent) {
     StartTransferEvent.Message.ActionEvent.GoToFileManagement -> {
         navigateToStorageSettings()
     }
-}
 
+    is StartTransferEvent.Message.ActionEvent.OpenPreview -> {
+        previewFile(actionEvent.file)
+    }
+}

@@ -1,7 +1,9 @@
 package mega.privacy.android.app.presentation.transfers.starttransfer.model
 
+import mega.privacy.android.shared.resources.R as sharedR
 import androidx.annotation.StringRes
 import mega.privacy.android.app.R
+import java.io.File
 
 /**
  * One off events related to start transfers
@@ -66,15 +68,17 @@ sealed interface StartTransferEvent {
         @StringRes val message: Int,
         @StringRes val action: Int? = null,
         val actionEvent: ActionEvent? = null,
+        vararg val messageArgs: String,
     ) : StartTransferEvent {
         /**
          * The one off event to be triggered with the [action], if [action] is null this parameter will be ignored
          */
-        enum class ActionEvent {
+        sealed interface ActionEvent {
             /**
              * The user have chosen to go to settings to file management (from no sufficient disk space snack bar action)
              */
-            GoToFileManagement
+            data object GoToFileManagement : ActionEvent
+            data class OpenPreview(val file: File, val fileName: String) : ActionEvent
         }
 
         /**
@@ -112,5 +116,17 @@ sealed interface StartTransferEvent {
                 else -> R.string.file_creation_failed
             }, null, null
         )
+
+        data object SlowDownloadPreviewInProgress : Message(
+            sharedR.string.transfers_preview_slow_snackbar
+        )
+
+        data class SlowDownloadPreviewFinished(val file: File) :
+            Message(
+                sharedR.string.transfers_notification_title_preview_download,
+                R.string.general_confirmation_open,
+                ActionEvent.OpenPreview(file, file.name),
+                file.name,
+            )
     }
 }

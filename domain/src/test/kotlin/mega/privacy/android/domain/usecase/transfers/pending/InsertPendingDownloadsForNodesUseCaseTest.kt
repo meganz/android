@@ -12,6 +12,7 @@ import mega.privacy.android.domain.entity.transfer.pending.PendingTransferNodeId
 import mega.privacy.android.domain.entity.uri.UriPath
 import mega.privacy.android.domain.exception.NotEnoughStorageException
 import mega.privacy.android.domain.repository.FileSystemRepository
+import mega.privacy.android.domain.repository.TimeSystemRepository
 import mega.privacy.android.domain.repository.TransferRepository
 import mega.privacy.android.domain.usecase.file.DoesUriPathHaveSufficientSpaceForNodesUseCase
 import mega.privacy.android.domain.usecase.transfers.downloads.DestinationAndAppDataForDownloadResult
@@ -44,6 +45,7 @@ class InsertPendingDownloadsForNodesUseCaseTest {
     private val getFileDestinationAndAppDataForDownloadUseCase =
         mock<GetFileDestinationAndAppDataForDownloadUseCase>()
     private val fileSystemRepository = mock<FileSystemRepository>()
+    private val timeSystemRepository = mock<TimeSystemRepository>()
 
     @BeforeAll
     fun setUp() {
@@ -53,6 +55,7 @@ class InsertPendingDownloadsForNodesUseCaseTest {
             doesUriPathHaveSufficientSpaceForNodesUseCase,
             getFileDestinationAndAppDataForDownloadUseCase,
             fileSystemRepository,
+            timeSystemRepository
         )
     }
 
@@ -64,6 +67,7 @@ class InsertPendingDownloadsForNodesUseCaseTest {
             doesUriPathHaveSufficientSpaceForNodesUseCase,
             getFileDestinationAndAppDataForDownloadUseCase,
             fileSystemRepository,
+            timeSystemRepository,
         )
         val nodeIdentifier = PendingTransferNodeIdentifier.CloudDriveNode(NodeId(647L))
         whenever(getPendingTransferNodeIdentifierUseCase(anyOrNull())) doReturn nodeIdentifier
@@ -117,6 +121,7 @@ class InsertPendingDownloadsForNodesUseCaseTest {
         multipleNodes: Boolean,
     ) = runTest {
         val singleFileName = "file.txt"
+        val time = 349853489L
         val nodes = if (multipleNodes) (0..5).map { index ->
             mock<DefaultTypedFileNode>()
         } else {
@@ -128,6 +133,7 @@ class InsertPendingDownloadsForNodesUseCaseTest {
         whenever(
             doesUriPathHaveSufficientSpaceForNodesUseCase(uriPath, nodes)
         ) doReturn true
+        whenever(timeSystemRepository.getCurrentTimeInMillis()) doReturn time
         underTest(
             nodes = nodes,
             destination = uriPath,
@@ -139,6 +145,7 @@ class InsertPendingDownloadsForNodesUseCaseTest {
                 transferType = TransferType.DOWNLOAD,
                 destination = uriPath.value,
                 singleFileName = if (multipleNodes) null else singleFileName,
+                startTime = time
             )
         )
     }

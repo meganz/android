@@ -21,6 +21,7 @@ import mega.privacy.android.app.presentation.node.model.NodeActionState
 import mega.privacy.android.app.presentation.snackbar.SnackBarHandler
 import mega.privacy.android.app.presentation.transfers.starttransfer.model.TransferTriggerEvent
 import mega.privacy.android.app.presentation.versions.mapper.VersionHistoryRemoveMessageMapper
+import mega.privacy.android.data.mapper.FileTypeInfoMapper
 import mega.privacy.android.domain.entity.AudioFileTypeInfo
 import mega.privacy.android.domain.entity.ImageFileTypeInfo
 import mega.privacy.android.domain.entity.PdfFileTypeInfo
@@ -55,6 +56,7 @@ import mega.privacy.android.domain.usecase.node.MoveNodesUseCase
 import mega.privacy.android.domain.usecase.node.backup.CheckBackupNodeTypeByHandleUseCase
 import mega.privacy.android.feature.sync.data.mapper.ListToStringWithDelimitersMapper
 import timber.log.Timber
+import java.io.File
 import javax.inject.Inject
 
 /**
@@ -100,6 +102,7 @@ class NodeActionsViewModel @Inject constructor(
     private val monitorAccountDetailUseCase: MonitorAccountDetailUseCase,
     private val getBusinessStatusUseCase: GetBusinessStatusUseCase,
     private val get1On1ChatIdUseCase: Get1On1ChatIdUseCase,
+    private val fileTypeInfoMapper: FileTypeInfoMapper,
     @ApplicationScope private val applicationScope: CoroutineScope,
 ) : ViewModel() {
 
@@ -516,4 +519,9 @@ class NodeActionsViewModel @Inject constructor(
         val isBusinessAccountExpired = businessStatus == BusinessAccountStatus.Expired
         return isPaid && !isBusinessAccountExpired
     }
+
+    /**
+     * return the file type of the given file
+     */
+    fun getTypeInfo(file: File) = fileTypeInfoMapper(file.name)
 }

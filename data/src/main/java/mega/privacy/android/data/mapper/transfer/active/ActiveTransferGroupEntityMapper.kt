@@ -11,6 +11,7 @@ internal class ActiveTransferGroupEntityMapper @Inject constructor() {
             transferType = transferType,
             destination = destination,
             singleFileName = singleFileName,
+            startTime = startTime,
         )
     }
 }

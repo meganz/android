@@ -6,6 +6,7 @@ import android.net.Uri
 import androidx.compose.material.SnackbarHostState
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.platform.LocalContext
 import androidx.hilt.navigation.compose.hiltViewModel
 import dagger.hilt.android.EntryPointAccessors
@@ -25,6 +26,7 @@ import mega.privacy.android.app.textEditor.TextEditorActivity
 import mega.privacy.android.app.textEditor.TextEditorViewModel
 import mega.privacy.android.app.utils.Constants
 import mega.privacy.android.app.utils.MegaNodeUtil.MegaNavigatorEntryPoint
+import mega.privacy.android.domain.entity.FileTypeInfo
 import mega.privacy.android.domain.entity.SortOrder
 import mega.privacy.android.domain.entity.ZipFileTypeInfo
 import mega.privacy.android.domain.entity.node.NodeContentUri
@@ -106,23 +108,15 @@ fun HandleNodeAction(
 
                 is FileNodeContent.Other -> {
                     content.localFile?.let {
-                        if (typedFileNode.type is ZipFileTypeInfo) {
-                            openZipFile(
-                                context = context,
-                                localFile = it,
-                                fileNode = typedFileNode,
-                                snackBarHostState = snackBarHostState,
-                                coroutineScope = coroutineScope
-                            )
-                        } else {
-                            handleOtherFiles(
-                                context = context,
-                                localFile = it,
-                                currentFileNode = typedFileNode,
-                                snackBarHostState = snackBarHostState,
-                                nodeActionsViewModel = nodeActionsViewModel
-                            )
-                        }
+                        openOtherFile(
+                            file = it,
+                            typedFileNode = typedFileNode,
+                            fileTypeInfo = typedFileNode.type,
+                            nodeActionsViewModel = nodeActionsViewModel,
+                            snackBarHostState = snackBarHostState,
+                            coroutineScope = coroutineScope,
+                            context = context,
+                        )
                     } ?: run {
                         nodeActionsViewModel.downloadNodeForPreview(typedFileNode)
                     }
@@ -136,6 +130,32 @@ fun HandleNodeAction(
         }.onFailure {
             Timber.e(it)
         }
+    }
+}
+
+
+@Composable
+fun HandleFileAction(
+    file: File,
+    snackBarHostState: SnackbarHostState,
+    onActionHandled: () -> Unit,
+    coroutineScope: CoroutineScope = rememberCoroutineScope(),
+    nodeActionsViewModel: NodeActionsViewModel = hiltViewModel(),
+) {
+    val context = LocalContext.current
+
+    LaunchedEffect(file) {
+        openOtherFile(
+            file = file,
+            typedFileNode = null,
+            fileTypeInfo = nodeActionsViewModel.getTypeInfo(file),
+            nodeActionsViewModel = nodeActionsViewModel,
+            snackBarHostState = snackBarHostState,
+            coroutineScope = coroutineScope,
+            context = context,
+        )
+
+        onActionHandled()
     }
 }
 
@@ -198,7 +218,7 @@ private fun openImageViewerActivity(
 
         Constants.INCOMING_SHARES_ADAPTER,
         Constants.OUTGOING_SHARES_ADAPTER,
-        -> Triple(
+            -> Triple(
             ImagePreviewFetcherSource.SHARED_ITEMS,
             ImagePreviewMenuSource.SHARED_ITEMS,
             SharedItemsImageNodeFetcher.PARENT_ID
@@ -311,10 +331,38 @@ private suspend fun Intent.openShareIntent(
     )
 }
 
+private suspend fun openOtherFile(
+    file: File,
+    typedFileNode: TypedFileNode?,
+    fileTypeInfo: FileTypeInfo,
+    nodeActionsViewModel: NodeActionsViewModel,
+    snackBarHostState: SnackbarHostState,
+    coroutineScope: CoroutineScope,
+    context: Context,
+) {
+    if (fileTypeInfo is ZipFileTypeInfo) {
+        openZipFile(
+            context = context,
+            localFile = file,
+            fileNode = typedFileNode,
+            snackBarHostState = snackBarHostState,
+            coroutineScope = coroutineScope
+        )
+    } else {
+        handleOtherFiles(
+            context = context,
+            localFile = file,
+            mimeType = fileTypeInfo.mimeType,
+            snackBarHostState = snackBarHostState,
+            nodeActionsViewModel = nodeActionsViewModel
+        )
+    }
+}
+
 private fun openZipFile(
     context: Context,
     localFile: File,
-    fileNode: TypedFileNode,
+    fileNode: TypedFileNode?,
     snackBarHostState: SnackbarHostState?,
     coroutineScope: CoroutineScope,
 ) {
@@ -325,7 +373,7 @@ private fun openZipFile(
     ).megaNavigator().openZipBrowserActivity(
         context = context,
         zipFilePath = localFile.absolutePath,
-        nodeHandle = fileNode.id.longValue,
+        nodeHandle = fileNode?.id?.longValue,
     ) {
         coroutineScope.launch {
             snackBarHostState?.showAutoDurationSnackbar(context.getString(R.string.message_zip_format_error))
@@ -336,7 +384,7 @@ private fun openZipFile(
 private suspend fun handleOtherFiles(
     context: Context,
     localFile: File,
-    currentFileNode: TypedFileNode,
+    mimeType: String,
     snackBarHostState: SnackbarHostState?,
     nodeActionsViewModel: NodeActionsViewModel,
 ) {
@@ -344,7 +392,7 @@ private suspend fun handleOtherFiles(
         nodeActionsViewModel.applyNodeContentUri(
             intent = this,
             content = NodeContentUri.LocalContentUri(localFile),
-            mimeType = currentFileNode.type.mimeType,
+            mimeType = mimeType,
             isSupported = false
         )
         runCatching {

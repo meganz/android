@@ -7,5 +7,6 @@ data class ActiveTransferGroupImpl(
     override val groupId: Int? = null,
     override val transferType: TransferType,
     override val destination: String,
-    override val singleFileName: String? = null
+    override val singleFileName: String? = null,
+    override val startTime: Long,
 ) : ActiveTransferGroup

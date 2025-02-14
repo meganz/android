@@ -2,6 +2,7 @@ package mega.privacy.android.app.presentation.node
 
 import app.cash.turbine.test
 import com.google.common.truth.Truth
+import com.google.common.truth.Truth.assertThat
 import de.palm.composestateevents.StateEvent
 import de.palm.composestateevents.StateEventWithContentConsumed
 import de.palm.composestateevents.StateEventWithContentTriggered
@@ -16,10 +17,13 @@ import mega.privacy.android.app.presentation.movenode.mapper.MoveRequestMessageM
 import mega.privacy.android.app.presentation.snackbar.SnackBarHandler
 import mega.privacy.android.app.presentation.versions.mapper.VersionHistoryRemoveMessageMapper
 import mega.privacy.android.core.test.extension.CoroutineMainDispatcherExtension
+import mega.privacy.android.data.mapper.FileTypeInfoMapper
 import mega.privacy.android.domain.entity.AccountType
 import mega.privacy.android.domain.entity.AudioFileTypeInfo
+import mega.privacy.android.domain.entity.FileTypeInfo
 import mega.privacy.android.domain.entity.ImageFileTypeInfo
 import mega.privacy.android.domain.entity.PdfFileTypeInfo
+import mega.privacy.android.domain.entity.RawFileTypeInfo
 import mega.privacy.android.domain.entity.StaticImageFileTypeInfo
 import mega.privacy.android.domain.entity.TextFileTypeInfo
 import mega.privacy.android.domain.entity.UnknownFileTypeInfo
@@ -101,6 +105,7 @@ class NodeActionsViewModelTest {
     }
     private val applicationScope = CoroutineScope(UnconfinedTestDispatcher())
     private val getBusinessStatusUseCase: GetBusinessStatusUseCase = mock()
+    private val fileTypeInfoMapper = mock<FileTypeInfoMapper>()
 
     private fun initViewModel() {
         viewModel = NodeActionsViewModel(
@@ -126,6 +131,7 @@ class NodeActionsViewModelTest {
             get1On1ChatIdUseCase = get1On1ChatIdUseCase,
             monitorAccountDetailUseCase = monitorAccountDetailUseCase,
             getBusinessStatusUseCase = getBusinessStatusUseCase,
+            fileTypeInfoMapper = fileTypeInfoMapper
         )
     }
 
@@ -302,7 +308,7 @@ class NodeActionsViewModelTest {
                 is VideoFileTypeInfo,
                 is PdfFileTypeInfo,
                 is AudioFileTypeInfo,
-                -> {
+                    -> {
                     verify(getNodeContentUriUseCase).invoke(node)
                 }
 
@@ -447,5 +453,14 @@ class NodeActionsViewModelTest {
             mock<FileNodeContent.UrlContent>()
         )
     )
+
+    @Test
+    fun `test getTypeInfo returns the type from the mapper`() = runTest {
+        val file = File("/folder/foo.txt")
+        val expected = mock<RawFileTypeInfo>()
+        whenever(fileTypeInfoMapper(file.name)) doReturn expected
+        val actual = viewModel.getTypeInfo(file)
+        assertThat(actual).isEqualTo(expected)
+    }
 }
 

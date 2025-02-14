@@ -26,8 +26,9 @@ class ActiveTransferGroupEntityMapperTest {
         transferType: TransferType,
     ) = runTest {
         val activeTransferGroup =
-            ActiveTransferGroupImpl(GROUP_ID, transferType, DESTINATION, FILE_NAME)
-        val expected = ActiveTransferGroupEntity(GROUP_ID, transferType, DESTINATION, FILE_NAME)
+            ActiveTransferGroupImpl(GROUP_ID, transferType, DESTINATION, FILE_NAME, START_TIME)
+        val expected =
+            ActiveTransferGroupEntity(GROUP_ID, transferType, DESTINATION, FILE_NAME, START_TIME)
         val actual = underTest(activeTransferGroup)
         assertThat(expected).isEqualTo(actual)
     }
@@ -36,5 +37,6 @@ class ActiveTransferGroupEntityMapperTest {
         const val GROUP_ID = 34
         const val DESTINATION = "destination"
         const val FILE_NAME = "file.jpg"
+        const val START_TIME = 94837594L
     }
 }

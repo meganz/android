@@ -168,6 +168,7 @@ class ActiveTransferTotalsMapperTest {
                     transferType,
                     "destination$groupId",
                     "file$groupId",
+                    groupId.toLong(),
                 )
                 entity.copy(appData = listOf(TransferAppData.TransferGroup(groupId.toLong())))
             }
@@ -184,6 +185,7 @@ class ActiveTransferTotalsMapperTest {
                             alreadyTransferred = fileTransfers.count { it.isAlreadyTransferred },
                             destination = "destination$groupId",
                             singleFileName = "file$groupId",
+                            startTime = groupId.toLong(),
                         )
                     }
                 }
@@ -202,6 +204,7 @@ class ActiveTransferTotalsMapperTest {
                     transferType,
                     "destination$groupId",
                     "file$groupId",
+                    groupId.toLong()
                 )
                 entity.copy(appData = listOf(TransferAppData.TransferGroup(groupId.toLong())))
             }
@@ -225,6 +228,7 @@ class ActiveTransferTotalsMapperTest {
                             alreadyTransferred = fileTransfers.count { it.isAlreadyTransferred },
                             destination = "destination$groupId",
                             singleFileName = "file$groupId",
+                            groupId.toLong(),
                         )
                     }
                 }
@@ -254,7 +258,7 @@ class ActiveTransferTotalsMapperTest {
             transferType,
             entities,
             emptyMap(),
-            listOf(ActiveTransferTotals.Group(0, 0, 0, 0, 0, "", null))
+            listOf(ActiveTransferTotals.Group(0, 0, 0, 0, 0, "", null, 0))
         ).groups.single().appData
         assertThat(actual).containsExactlyElementsIn(appData)
     }
@@ -271,7 +275,8 @@ class ActiveTransferTotalsMapperTest {
                         groupId,
                         0, 0, 0, 0,
                         "destination$groupId",
-                        "file$groupId"
+                        "file$groupId",
+                        groupId.toLong(),
                     )
                 )
                 entity.copy(appData = listOf(TransferAppData.TransferGroup(groupId.toLong())))
@@ -289,6 +294,7 @@ class ActiveTransferTotalsMapperTest {
                             alreadyTransferred = fileTransfers.count { it.isAlreadyTransferred },
                             destination = "destination$groupId",
                             singleFileName = "file$groupId",
+                            startTime = groupId.toLong()
                         )
                     }
                 }
