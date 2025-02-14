@@ -43,6 +43,7 @@ import mega.privacy.mobile.analytics.event.NodeInfoTagsEnteredEvent
 @Composable
 fun FileInfoTagsView(
     tags: List<String>,
+    canEditTags: Boolean,
     onAddTagClick: () -> Unit,
     modifier: Modifier,
 ) {
@@ -50,22 +51,26 @@ fun FileInfoTagsView(
         modifier = modifier
             .fillMaxWidth()
             .clickable {
-                onAddTagClick()
-                Analytics.tracker.trackEvent(NodeInfoTagsEnteredEvent)
+                if (canEditTags) {
+                    onAddTagClick()
+                    Analytics.tracker.trackEvent(NodeInfoTagsEnteredEvent)
+                }
             }
     ) {
         MenuActionListTile(
             text = stringResource(id = sharedR.string.file_info_information_tags_label),
             dividerType = null,
             addIconPadding = false,
-            trailingItem = {
-                Icon(
-                    imageVector = ImageVector.vectorResource(id = iconPackR.drawable.ic_chevron_right_medium_regular_outline),
-                    contentDescription = "Add Tag",
-                    modifier = Modifier.size(24.dp),
-                    tint = MaterialTheme.colors.grey_alpha_038_white_alpha_038,
-                )
-            },
+            trailingItem = if (canEditTags) {
+                {
+                    Icon(
+                        imageVector = ImageVector.vectorResource(id = iconPackR.drawable.ic_chevron_right_medium_regular_outline),
+                        contentDescription = "Add Tag",
+                        modifier = Modifier.size(24.dp),
+                        tint = MaterialTheme.colors.grey_alpha_038_white_alpha_038,
+                    )
+                }
+            } else null,
         )
 
         FlowRow(
@@ -97,6 +102,7 @@ private fun FileInfoTagsViewPreview(
             tags = listOf("Tag", "SampleTag", "Tag1", "Tag2", "Tag3", "Tag4", "Tag5"),
             onAddTagClick = {},
             modifier = Modifier,
+            canEditTags = true,
         )
     }
 }
@@ -111,6 +117,7 @@ private fun FileInfoTagsViewDeactivatedBusinessAccountPreview(
             tags = listOf("Tag", "SampleTag", "Tag1", "Tag2", "Tag3", "Tag4", "Tag5"),
             onAddTagClick = {},
             modifier = Modifier,
+            canEditTags = true,
         )
     }
 }

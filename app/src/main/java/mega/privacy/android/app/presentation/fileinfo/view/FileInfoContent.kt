@@ -244,12 +244,13 @@ internal fun FileInfoContent(
             )
 
             //tags
-            if (canEnableTags()) {
+            if (canEditTags() || canViewTags()) {
                 FileInfoTagsView(
                     modifier = Modifier
                         .fillMaxWidth()
                         .padding(vertical = 8.dp),
                     tags = tags,
+                    canEditTags = canEditTags(),
                     onAddTagClick = {
                         if (viewState.accountDeactivatedStatus != null) {
                             showExpiredBusinessDialog = true
