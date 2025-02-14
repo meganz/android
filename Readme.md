@@ -175,7 +175,7 @@ fun shouldUsePrebuiltSdk(): Boolean = false
     git clone --recursive https://github.com/meganz/mobile-analytics.git
     cd mobile-analytics
     git checkout main
-    ./gradlew assembleRelease
+    ./gradlew --no-daemon assembleRelease
     ```
 
 2. Copy below generated libraries to root of MEGA code

@@ -167,7 +167,7 @@ void checkoutMegaChatSdkByTag(String megaChatTag) {
  * @return version of prebuilt SDK
  */
 String readPrebuiltSdkVersion() {
-    String version = sh(script: "./gradlew -q printPrebuildSdkVersion  | tail -n 1", returnStdout: true).trim()
+    String version = sh(script: "./gradlew --no-daemon -q printPrebuildSdkVersion  | tail -n 1", returnStdout: true).trim()
     println("readPrebuiltSdkVersion version = $version")
     return version
 }
@@ -394,9 +394,9 @@ SDK version: ${readPrebuiltSdkVersion()}
  */
 def readAppVersion() {
     String versionCode = APK_VERSION_CODE_FOR_CD
-    String versionName = sh(script: "./gradlew -q printAppVersionName  | tail -n 1", returnStdout: true).trim()
-    String versionNameChannel = sh(script: "./gradlew -q printAppVersionNameChannel | tail -n 1", returnStdout: true).trim()
-    String appGitHash = sh(script: "./gradlew -q printAppGitHash | tail -n 1", returnStdout: true).trim()
+    String versionName = sh(script: "./gradlew --no-daemon -q printAppVersionName  | tail -n 1", returnStdout: true).trim()
+    String versionNameChannel = sh(script: "./gradlew --no-daemon -q printAppVersionNameChannel | tail -n 1", returnStdout: true).trim()
+    String appGitHash = sh(script: "./gradlew --no-daemon -q printAppGitHash | tail -n 1", returnStdout: true).trim()
     return [versionName, versionNameChannel, versionCode, appGitHash]
 }
 
@@ -463,7 +463,7 @@ void cleanAndroid() {
     println("clean Android code")
     sh """
         cd $WORKSPACE
-        ./gradlew clean
+        ./gradlew --no-daemon clean
     """
 }
 

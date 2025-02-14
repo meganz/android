@@ -273,7 +273,7 @@ pipeline {
             steps {
                 script {
                     BUILD_STEP = 'Build GMS APK'
-                    sh './gradlew clean app:assembleGmsRelease'
+                    sh './gradlew --no-daemon clean app:assembleGmsRelease'
                 }
             }
         }
@@ -316,7 +316,7 @@ pipeline {
                     BUILD_STEP = 'Upload Firebase Crashlytics symbol files'
                     sh """
                     cd $WORKSPACE
-                    ./gradlew app:uploadCrashlyticsSymbolFileGmsRelease
+                    ./gradlew --no-daemon app:uploadCrashlyticsSymbolFileGmsRelease
                     """
                 }
             }
@@ -328,7 +328,7 @@ pipeline {
             steps {
                 script {
                     BUILD_STEP = 'Build GMS AAB'
-                    sh './gradlew clean app:bundleGmsRelease'
+                    sh './gradlew --no-daemon clean app:bundleGmsRelease'
                 }
             }
         }
@@ -426,7 +426,7 @@ pipeline {
                         ]) {
                             sh 'echo $TRANSIFEX_BOT_TOKEN'
                             sh 'echo $TRANSIFEX_BOT_URL'
-                            sh './gradlew deleteOldStrings'
+                            sh './gradlew --no-daemon deleteOldStrings'
                         }
                     }
                 }
@@ -447,7 +447,7 @@ pipeline {
                             gitUsernamePassword(credentialsId: 'Gitlab-Access-Token', gitToolName: 'Default')
                     ]) {
                         if (isMajorRelease(common)) {
-                            sh './gradlew readReleaseNotes'
+                            sh './gradlew --no-daemon readReleaseNotes'
                             RELEASE_NOTES_CONTENT = common.releaseNotes(MAJOR_RELEASE_NOTES)
                             println("Major release notes: ${RELEASE_NOTES_CONTENT}")
                         } else {
@@ -486,7 +486,7 @@ pipeline {
                             string(credentialsId: 'JIRA_API_URL', variable: 'JIRA_API_URL'),
                             string(credentialsId: 'JIRA_PROJECT_NAME_AND_ID_TABLE', variable: 'JIRA_PROJECTS'),
                     ]) {
-                        sh("./gradlew createJiraVersion --rv ${releaseVersion} --rd ${releaseDate}")
+                        sh("./gradlew --no-daemon createJiraVersion --rv ${releaseVersion} --rd ${releaseDate}")
                     }
                 }
             }
@@ -507,7 +507,7 @@ pipeline {
                             string(credentialsId: 'MOBILE_DEV_TEAM_SLACK_CHANNEL_ID', variable: 'MOBILE_DEV_TEAM_SLACK_CHANNEL_ID'),
                             string(credentialsId: 'RELEASE_ANNOUNCEMENT_SLACK_TOKEN', variable: 'RELEASE_ANNOUNCEMENT_SLACK_TOKEN'),
                     ]) {
-                        sh("./gradlew sendCodeFreezeReminder --current-version ${currentVersion} --next-version ${nextVersion} --app MEGA")
+                        sh("./gradlew --no-daemon sendCodeFreezeReminder --current-version ${currentVersion} --next-version ${nextVersion} --app MEGA")
                     }
                 }
             }
@@ -524,7 +524,7 @@ pipeline {
                             gitUsernamePassword(credentialsId: 'Gitlab-Access-Token', gitToolName: 'Default'),
                     ]) {
                         util.useGpg() {
-                            sh './gradlew fetchAnalyticDependency'
+                            sh './gradlew --no-daemon fetchAnalyticDependency'
                         }
                     }
                 }
@@ -563,10 +563,10 @@ pipeline {
                             usernamePassword(credentialsId: 'GitHub-Access-Token', usernameVariable: 'USERNAME', passwordVariable: 'TOKEN')
                     ]) {
                         util.useGpg() {
-                            sh("./gradlew postRelease --rv ${releaseVersion}")
-                            sh("./gradlew setReleaseStatus --rv ${releaseVersion}")
-                            sh("./gradlew createGitlabRelease --rv ${releaseVersion} --vc ${versionCode} --hash ${appGitHash}")
-                            sh("./gradlew createGithubRelease --rv ${releaseVersion} --vc ${versionCode} --hash ${appGitHash}")
+                            sh("./gradlew --no-daemon postRelease --rv ${releaseVersion}")
+                            sh("./gradlew --no-daemon setReleaseStatus --rv ${releaseVersion}")
+                            sh("./gradlew --no-daemon createGitlabRelease --rv ${releaseVersion} --vc ${versionCode} --hash ${appGitHash}")
+                            sh("./gradlew --no-daemon createGithubRelease --rv ${releaseVersion} --vc ${versionCode} --hash ${appGitHash}")
                         }
                     }
                 }

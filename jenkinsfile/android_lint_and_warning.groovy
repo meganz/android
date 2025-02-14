@@ -108,8 +108,8 @@ pipeline {
                 }
                 gitlabCommitStatus(name: 'Build APK (GMS+QA)') {
                     // Finish building and packaging the APK
-                    sh "./gradlew clean"
-                    sh "./gradlew app:assembleGmsRelease 2>&1  | tee ${GMS_APK_BUILD_LOG}"
+                    sh "./gradlew --no-daemon clean"
+                    sh "./gradlew --no-daemon app:assembleGmsRelease 2>&1  | tee ${GMS_APK_BUILD_LOG}"
 
                     sh """
                         if grep -q -m 1 \"^FAILURE: \" ${GMS_APK_BUILD_LOG}; then
@@ -138,7 +138,7 @@ pipeline {
 
                 gitlabCommitStatus(name: 'Lint Check') {
                     sh "mv custom_lint.xml lint.xml"
-                    sh "./gradlew lint"
+                    sh "./gradlew --no-daemon lint"
 
                     script {
                         MODULE_LIST.each { module ->
@@ -232,7 +232,7 @@ String buildLintSummaryTable(Map lintReportSummaryMap) {
  */
 def generateLintSummary(String module) {
     def targetFile = "${module}_processed-lint-results.json"
-    sh "./gradlew generateLintReport --lint-results $WORKSPACE/${module}/build/reports/lint-results.xml --target-file ${targetFile}"
+    sh "./gradlew --no-daemon generateLintReport --lint-results $WORKSPACE/${module}/build/reports/lint-results.xml --target-file ${targetFile}"
     def lintJsonFile = readFile(targetFile)
     def lintJsonContent = new HashMap(new groovy.json.JsonSlurper().parseText(lintJsonFile))
     print("lintSummary($module) = ${lintJsonContent}")
@@ -246,6 +246,6 @@ def generateLintSummary(String module) {
  * @return
  */
 String generateWarningReport(String targetFileLocation) {
-    sh "./gradlew -w clean compileGmsReleaseUnitTestSources 2>&1 | tee ${WARNING_SOURCE_FILE}"
-    sh "./gradlew generateBuildWarningReport --build-log $WARNING_SOURCE_FILE --target-file $targetFileLocation"
+    sh "./gradlew --no-daemon -w clean compileGmsReleaseUnitTestSources 2>&1 | tee ${WARNING_SOURCE_FILE}"
+    sh "./gradlew --no-daemon generateBuildWarningReport --build-log $WARNING_SOURCE_FILE --target-file $targetFileLocation"
 }

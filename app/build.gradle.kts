@@ -397,7 +397,7 @@ dependencies {
 
 /**
  * Gradle task for getting the app git hash
- * Run ./gradlew -q printAppGitHash
+ * Run ./gradlew --no-daemon -q printAppGitHash
  */
 tasks.register("printAppGitHash") {
     doLast {
@@ -407,7 +407,7 @@ tasks.register("printAppGitHash") {
 
 /**
  * Gradle task for getting the app version name
- * Run ./gradlew -q printAppVersionName
+ * Run ./gradlew --no-daemon -q printAppVersionName
  */
 tasks.register("printAppVersionName") {
     doLast {
@@ -417,7 +417,7 @@ tasks.register("printAppVersionName") {
 
 /**
  * Gradle task for getting the pre-build SDK version
- * Run ./gradlew -q printPrebuildSdkVersion
+ * Run ./gradlew --no-daemon -q printPrebuildSdkVersion
  */
 tasks.register("printPrebuildSdkVersion") {
     doLast {
@@ -428,7 +428,7 @@ tasks.register("printPrebuildSdkVersion") {
 
 /**
  * Gradle task for getting the app version name channel
- * Run ./gradlew -q printAppVersionNameChannel
+ * Run ./gradlew --no-daemon -q printAppVersionNameChannel
  */
 tasks.register("printAppVersionNameChannel") {
     doLast {

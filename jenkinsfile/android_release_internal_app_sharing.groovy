@@ -158,7 +158,7 @@ pipeline {
             steps {
                 script {
                     BUILD_STEP = 'Build GMS APK'
-                    sh './gradlew clean app:assembleGmsRelease'
+                    sh './gradlew --no-daemon clean app:assembleGmsRelease'
                 }
             }
         }
@@ -199,7 +199,7 @@ pipeline {
             steps {
                 script {
                     BUILD_STEP = 'Build GMS AAB'
-                    sh './gradlew clean app:bundleGmsRelease'
+                    sh './gradlew --no-daemon clean app:bundleGmsRelease'
                 }
             }
         }

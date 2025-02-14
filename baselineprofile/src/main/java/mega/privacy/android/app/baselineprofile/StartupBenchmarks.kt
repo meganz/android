@@ -21,7 +21,7 @@ import org.junit.runner.RunWith
  * the effectiveness of your Baseline Profiles. You can run it directly from Android
  * Studio as an instrumentation test, or run all benchmarks with this Gradle task:
  * ```
- * ./gradlew :baselineprofile:connectedAndroidTest -Pandroid.testInstrumentationRunnerArguments.androidx.benchmark.enabledRules=Macrobenchmark
+ * ./gradlew --no-daemon :baselineprofile:connectedAndroidTest -Pandroid.testInstrumentationRunnerArguments.androidx.benchmark.enabledRules=Macrobenchmark
  * ```
  *
  * You should run the benchmarks on a physical device, not an Android emulator, because the

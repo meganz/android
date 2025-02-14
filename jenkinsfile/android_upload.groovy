@@ -319,7 +319,7 @@ pipeline {
                         ]) {
                             sh """
                                 cd ${WORKSPACE}
-                                ./gradlew sdk:artifactoryPublish 2>&1  | tee ${ARTIFACTORY_PUBLISH_LOG}
+                                ./gradlew --no-daemon sdk:artifactoryPublish 2>&1  | tee ${ARTIFACTORY_PUBLISH_LOG}
                             """
                         }
 
@@ -350,7 +350,7 @@ pipeline {
             steps {
                 script {
                     BUILD_STEP = 'Build APK (GMS)'
-                    sh './gradlew app:assembleGmsRelease'
+                    sh './gradlew --no-daemon app:assembleGmsRelease'
                 }
             }
         }
@@ -401,7 +401,7 @@ pipeline {
                         ]) {
                             println("Upload GMS APK, TESTERS_FOR_CD = ${env.TESTERS_FOR_CD}")
                             println("Upload GMS APK, RELEASE_NOTES_FOR_CD = ${env.RELEASE_NOTES_FOR_CD}")
-                            sh './gradlew appDistributionUploadGmsRelease'
+                            sh './gradlew --no-daemon appDistributionUploadGmsRelease'
                         }
                     }
                 }
@@ -417,7 +417,7 @@ pipeline {
                     withEnv([
                             "APK_VERSION_NAME_TAG_FOR_CD=_QA"
                     ]) {
-                        sh './gradlew app:assembleGmsQa'
+                        sh './gradlew --no-daemon app:assembleGmsQa'
                     }
                 }
             }
@@ -441,7 +441,7 @@ pipeline {
                                 "TESTERS_FOR_CD=${parseCommandParameter()["tester"]}",
                                 "TESTER_GROUP_FOR_CD=${parseCommandParameter()["tester-group"]}"
                         ]) {
-                            sh './gradlew appDistributionUploadGmsQa'
+                            sh './gradlew --no-daemon appDistributionUploadGmsQa'
                         }
                     }
                 }
@@ -461,10 +461,10 @@ pipeline {
                             string(credentialsId: 'ARTIFACTORY_ACCESS_TOKEN', variable: 'ARTIFACTORY_ACCESS_TOKEN')
                     ]) {
 
-                        sh "./gradlew runUnitTest"
+                        sh "./gradlew --no-daemon runUnitTest"
                         String artifactoryTargetPath = "${env.ARTIFACTORY_BASE_URL}/artifactory/android-mega/cicd/coverage/"
                         String coverageSummaryFile = "coverage_summary.csv"
-                        sh "./gradlew collectCoverage --modules \"app,data,domain,shared/original-core-ui,feature/sync,feature/devicecenter,legacy-core-ui\" --csv-output ${coverageSummaryFile}"
+                        sh "./gradlew --no-daemon collectCoverage --modules \"app,data,domain,shared/original-core-ui,feature/sync,feature/devicecenter,legacy-core-ui\" --csv-output ${coverageSummaryFile}"
                         sh "curl -u${ARTIFACTORY_USER}:${ARTIFACTORY_ACCESS_TOKEN} -T \"$WORKSPACE/$coverageSummaryFile\" \"${artifactoryTargetPath}/$coverageSummaryFile\""
                     }
                 }

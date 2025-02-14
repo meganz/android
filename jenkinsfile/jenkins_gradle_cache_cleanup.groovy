@@ -173,14 +173,14 @@ void buildProject() {
                 "ARTIFACTORY_USER=${ARTIFACTORY_USER}",
                 "ARTIFACTORY_ACCESS_TOKEN=${ARTIFACTORY_ACCESS_TOKEN}"
         ]) {
-            sh "./gradlew clean"
-            sh "./gradlew app:assembleGmsDebug"
-            sh "./gradlew lint"
-            sh "./gradlew app:testGmsDebugUnitTest"
-            sh "./gradlew domain:test"
-            sh "./gradlew feature:devicecenter:testDebugUnitTest"
-            sh "./gradlew feature:sync:testDebugUnitTest"
-            sh "./gradlew core-ui:testDebugUnitTest"
+            sh "./gradlew --no-daemon clean"
+            sh "./gradlew --no-daemon app:assembleGmsDebug"
+            sh "./gradlew --no-daemon lint"
+            sh "./gradlew --no-daemon app:testGmsDebugUnitTest"
+            sh "./gradlew --no-daemon domain:test"
+            sh "./gradlew --no-daemon feature:devicecenter:testDebugUnitTest"
+            sh "./gradlew --no-daemon feature:sync:testDebugUnitTest"
+            sh "./gradlew --no-daemon core-ui:testDebugUnitTest"
         }
     }
 }
