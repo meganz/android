@@ -26,30 +26,10 @@ class CreateAccountUseCase @Inject constructor(
         password: String,
         firstName: String,
         lastName: String,
-    ): EphemeralCredentials {
-        val lastPublicHandle = accountRepository.getLastPublicHandle()
-        val lastPublicHandleType = accountRepository.getLastPublicHandleType()
-        val lastPublicHandleTimeStamp = accountRepository.getLastPublicHandleTimeStamp()
-
-        return if (lastPublicHandle == accountRepository.getInvalidHandle()
-            || lastPublicHandleType == accountRepository.getInvalidAffiliateType()
-        ) {
-            accountRepository.createAccount(
-                email = email,
-                password = password,
-                firstName = firstName,
-                lastName = lastName
-            )
-        } else {
-            accountRepository.createAccount(
-                email = email,
-                password = password,
-                firstName = firstName,
-                lastName = lastName,
-                lastPublicHandle = lastPublicHandle,
-                lastPublicHandleType = lastPublicHandleType,
-                lastPublicHandleTimeStamp = lastPublicHandleTimeStamp
-            )
-        }
-    }
+    ): EphemeralCredentials = accountRepository.createAccount(
+        email = email,
+        password = password,
+        firstName = firstName,
+        lastName = lastName
+    )
 }

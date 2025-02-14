@@ -186,21 +186,6 @@ interface MegaLocalStorageGateway {
     suspend fun setLastPublicHandleType(type: Int)
 
     /**
-     * Get last public handle
-     */
-    suspend fun getLastPublicHandle(): Long?
-
-    /**
-     * Get last public handle type
-     */
-    suspend fun getLastPublicHandleType(): Int?
-
-    /**
-     * Get last public handle time stamp
-     */
-    suspend fun getLastPublicHandleTimeStamp(): Long?
-
-    /**
      * Gets chat settings.
      */
     suspend fun getChatSettings(): ChatSettings?

@@ -3632,55 +3632,6 @@ interface MegaApiGateway {
     )
 
     /**
-     * Initialize the creation of a new MEGA account, with firstname and lastname
-     * <p>
-     * The associated request type with this request is MegaRequest::TYPE_CREATE_ACCOUNT.
-     * Valid data in the MegaRequest object received on callbacks:
-     * - MegaRequest::getEmail - Returns the email for the account
-     * - MegaRequest::getPassword - Returns the password for the account
-     * - MegaRequest::getName - Returns the firstname of the user
-     * - MegaRequest::getText - Returns the lastname of the user
-     * - MegaRequest::getNodeHandle - Returns the last public node handle accessed
-     * - MegaRequest::getAccess - Returns the type of lastPublicHandle
-     * - MegaRequest::getTransferredBytes - Returns the timestamp of the last access
-     * - MegaRequest::getParamType - Returns the value MegaApi::CREATE_ACCOUNT
-     * <p>
-     * Valid data in the MegaRequest object received in onRequestFinish when the error code
-     * is MegaError::API_OK:
-     * - MegaRequest::getSessionKey - Returns the session id to resume the process
-     * <p>
-     * If this request succeeds, a new ephemeral session will be created for the new user
-     * and a confirmation email will be sent to the specified email address. The app may
-     * resume the create-account process by using MegaApi::resumeCreateAccount.
-     * <p>
-     * If an account with the same email already exists, you will get the error code
-     * MegaError::API_EEXIST in onRequestFinish
-     *
-     * @param email                Email for the account
-     * @param password             Password for the account
-     * @param firstname            Firstname of the user
-     * @param lastname             Lastname of the user
-     * @param lastPublicHandle     Last public node handle accessed by the user in the last 24h
-     * @param lastPublicHandleType Indicates the type of lastPublicHandle, valid values are:
-     *                             - MegaApi::AFFILIATE_TYPE_ID = 1
-     *                             - MegaApi::AFFILIATE_TYPE_FILE_FOLDER = 2
-     *                             - MegaApi::AFFILIATE_TYPE_CHAT = 3
-     *                             - MegaApi::AFFILIATE_TYPE_CONTACT = 4
-     * @param lastAccessTimestamp  Timestamp of the last access
-     * @param listener             MegaRequestListener to track this request
-     */
-    fun createAccount(
-        email: String,
-        password: String,
-        firstName: String,
-        lastName: String,
-        lastPublicHandle: Long,
-        lastPublicHandleType: Int,
-        lastAccessTimestamp: Long,
-        listener: MegaRequestListenerInterface,
-    )
-
-    /**
      * Creates the special folder for backups ("My backups")
      *
      * It creates a new folder inside the Vault rootnode and later stores the node's

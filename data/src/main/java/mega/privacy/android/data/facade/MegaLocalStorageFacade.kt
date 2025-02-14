@@ -133,14 +133,6 @@ internal class MegaLocalStorageFacade @Inject constructor(
         dbHandler.get().lastPublicHandleType = type
     }
 
-    override suspend fun getLastPublicHandle(): Long? = dbHandler.get().attributes?.lastPublicHandle
-
-    override suspend fun getLastPublicHandleType(): Int? =
-        dbHandler.get().attributes?.lastPublicHandleType
-
-    override suspend fun getLastPublicHandleTimeStamp(): Long? =
-        dbHandler.get().attributes?.lastPublicHandleTimeStamp
-
     override suspend fun getChatSettings(): ChatSettings? = dbHandler.get().chatSettings
 
     override suspend fun setChatSettings(chatSettings: ChatSettings) {

@@ -1556,28 +1556,6 @@ internal class MegaApiFacade @Inject constructor(
         megaApi.createAccount(email, password, firstName, lastName, listener)
     }
 
-    override fun createAccount(
-        email: String,
-        password: String,
-        firstName: String,
-        lastName: String,
-        lastPublicHandle: Long,
-        lastPublicHandleType: Int,
-        lastAccessTimestamp: Long,
-        listener: MegaRequestListenerInterface,
-    ) {
-        megaApi.createAccount(
-            email,
-            password,
-            firstName,
-            lastName,
-            lastPublicHandle,
-            lastPublicHandleType,
-            lastAccessTimestamp,
-            listener
-        )
-    }
-
     override fun setMyBackupsFolder(
         localizedName: String,
         listener: MegaRequestListenerInterface?,
