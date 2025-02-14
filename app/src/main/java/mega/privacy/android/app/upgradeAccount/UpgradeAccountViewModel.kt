@@ -9,7 +9,7 @@ import kotlinx.coroutines.flow.catch
 import kotlinx.coroutines.flow.collectLatest
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
-import mega.privacy.android.app.featuretoggle.ABTestFeatures
+import mega.privacy.android.app.featuretoggle.ApiFeatures
 import mega.privacy.android.app.upgradeAccount.model.LocalisedSubscription
 import mega.privacy.android.app.upgradeAccount.model.UpgradeAccountState
 import mega.privacy.android.app.upgradeAccount.model.UpgradePayment
@@ -150,7 +150,7 @@ class UpgradeAccountViewModel @Inject constructor(
         }
         viewModelScope.launch {
             runCatching {
-                val showNoAds = getFeatureFlagValueUseCase(ABTestFeatures.ads)
+                val showNoAds = getFeatureFlagValueUseCase(ApiFeatures.GoogleAdsFeatureFlag)
                 _state.update { state ->
                     state.copy(
                         showNoAdsFeature = showNoAds

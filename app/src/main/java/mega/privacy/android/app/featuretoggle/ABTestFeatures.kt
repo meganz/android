@@ -33,28 +33,6 @@ enum class ABTestFeatures(
     ),
 
     /**
-     * To use remote feature flag 'ab_ads' from API
-     * this flag is part of real experiment related to Ads
-     * DO NOT USE this flag anywhere else, except the Ads related files
-     */
-    ads(
-        experimentName = "ads",
-        description = "Real experiment flag to show ads",
-        defaultValue = false
-    ),
-
-    /**
-     * To use remote feature flag 'ab_adse' from API
-     * this flag is part of real experiment related to Ads
-     * DO NOT USE this flag anywhere else, except the Ads related files
-     */
-    adse(
-        experimentName = "adse",
-        description = "Real experiment flag to show external ads",
-        defaultValue = false
-    ),
-
-    /**
      * Enable new design Variant A for ChooseAccount screen
      */
     ChooseAccountScreenVariantA(

@@ -8,6 +8,7 @@ import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import mega.privacy.android.app.featuretoggle.ABTestFeatures
+import mega.privacy.android.app.featuretoggle.ApiFeatures
 import mega.privacy.android.app.upgradeAccount.model.ChooseAccountState
 import mega.privacy.android.app.upgradeAccount.model.mapper.LocalisedSubscriptionMapper
 import mega.privacy.android.domain.entity.AccountType
@@ -120,10 +121,10 @@ internal class ChooseAccountViewModel @Inject constructor(
         }
         viewModelScope.launch {
             runCatching {
-                val showNoAds = getFeatureFlagValueUseCase(ABTestFeatures.ads)
+                val showAds = getFeatureFlagValueUseCase(ApiFeatures.GoogleAdsFeatureFlag)
                 _state.update { state ->
                     state.copy(
-                        showAdsFeature = showNoAds
+                        showAdsFeature = showAds
                     )
                 }
             }.onFailure {
