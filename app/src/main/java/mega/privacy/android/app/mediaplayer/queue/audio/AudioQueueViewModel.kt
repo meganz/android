@@ -195,19 +195,24 @@ class AudioQueueViewModel @Inject constructor(
             item.takeIf { it.type == MediaQueueItemType.Next }?.copy(isSelected = true) ?: item
         }
 
-    internal fun removeSelectedItems() {
-        val updatedItems = _uiState.value.items.filterNot { item ->
-            _uiState.value.selectedItemHandles.any { it == item.id.longValue }
-        }.updateOriginalData()
-        val playingIndex = updatedItems.indexOfFirst { it.type == MediaQueueItemType.Playing }
+    internal fun removeSelectedItems(
+        removedIds: List<Long> = _uiState.value.selectedItemHandles.toList(),
+    ) {
+        val updatedItems = _uiState.value.items
+            .filterNot { item -> removedIds.contains(item.id.longValue) }
+            .updateOriginalData()
+
         _uiState.update {
             it.copy(
                 items = updatedItems,
                 selectedItemHandles = emptyList(),
-                indexOfCurrentPlayingItem = playingIndex
+                removedItemHandles = removedIds
             )
         }
     }
+
+    internal fun clearRemovedItemHandles() =
+        _uiState.update { it.copy(removedItemHandles = emptyList()) }
 
     internal fun updateSearchMode(isSearchMode: Boolean) {
         if (isSearchMode.not()) {

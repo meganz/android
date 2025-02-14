@@ -10,6 +10,7 @@ package mega.privacy.android.app.mediaplayer.queue.model
  * @property selectedItemHandles the selected item handles
  * @property isSearchMode whether the search mode is activated
  * @property isSelectMode whether the select mode is activated
+ * @property removedItemHandles the removed item handles
  */
 data class AudioQueueUiState(
     val items: List<MediaQueueItemUiEntity>,
@@ -18,5 +19,6 @@ data class AudioQueueUiState(
     val indexOfCurrentPlayingItem: Int = -1,
     val selectedItemHandles: List<Long> = emptyList(),
     val isSearchMode: Boolean = false,
-    val isSelectMode: Boolean = false
+    val isSelectMode: Boolean = false,
+    val removedItemHandles: List<Long> = emptyList(),
 )

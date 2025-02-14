@@ -373,7 +373,36 @@ class AudioQueueViewModelTest {
                 awaitItem().let {
                     assertThat(it.items.size).isEqualTo(2)
                     assertThat(it.selectedItemHandles).isEmpty()
+                    assertThat(it.removedItemHandles).isNotEmpty()
+                    assertThat(it.removedItemHandles.size).isEqualTo(1)
+                    assertThat(it.removedItemHandles.first()).isEqualTo(1)
                 }
+            }
+        }
+
+    @Test
+    fun `test that removedItemHandles is cleared after clearRemovedItemHandles is invoked`() =
+        runTest {
+            val item = getMockedMediaQueueItem(NodeId(1L))
+            val testItem = getMockedMediaQueueItem(NodeId(1L), testIsSelected = true)
+            val list = (1..3).map {
+                if (it == 1) {
+                    initMediaQueueItemMapperResult(it.toLong(), item)
+                } else {
+                    initMediaQueueItemMapperResult(it.toLong())
+                }
+                getPlaylistItem(it.toLong())
+            }
+            whenever(item.copy(isSelected = true)).thenReturn(testItem)
+            initUnderTest()
+
+            underTest.initMediaQueueItemList(list)
+            underTest.onItemClicked(0, item)
+            underTest.removeSelectedItems()
+            underTest.uiState.test {
+                assertThat(awaitItem().removedItemHandles).isNotEmpty()
+                underTest.clearRemovedItemHandles()
+                assertThat(awaitItem().removedItemHandles).isEmpty()
             }
         }
 

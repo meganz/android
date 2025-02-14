@@ -154,7 +154,6 @@ class AudioQueueFragment : Fragment() {
                     audioQueueViewModel.updatePlaybackState(isPaused())
                     simpleAudioPlayerView?.let { setupPlayerView(it) }
                     tryObservePlaylist()
-                    scrollToPlayingPosition()
                 }
             }
         }
@@ -221,6 +220,15 @@ class AudioQueueFragment : Fragment() {
             .distinctUntilChanged()) {
             simpleAudioPlayerView?.isVisible = !it
         }
+
+        viewLifecycleOwner.collectFlow(audioQueueViewModel.uiState.map { it.removedItemHandles }
+            .distinctUntilChanged()) { removeItemIds ->
+            if (removeItemIds.isNotEmpty()) {
+                playerServiceViewModelGateway?.removeSelectedItems(removeItemIds)
+                audioQueueViewModel.clearRemovedItemHandles()
+                actionMode?.finish()
+            }
+        }
     }
 
     /**
@@ -259,10 +267,9 @@ class AudioQueueFragment : Fragment() {
 
     private fun itemClicked(index: Int, item: MediaQueueItemUiEntity) =
         viewLifecycleOwner.lifecycleScope.launch {
-            if (actionMode != null) {
+            if (audioQueueViewModel.uiState.value.isSelectMode) {
                 if (item.type != MediaQueueItemType.Next) return@launch
                 audioQueueViewModel.onItemClicked(index, item)
-                playerServiceViewModelGateway?.itemSelected(item.id.longValue)
                 return@launch
             }
 
@@ -302,16 +309,10 @@ class AudioQueueFragment : Fragment() {
         if (playlistActionModeCallback == null) {
             playlistActionModeCallback = PlaylistActionModeCallback(
                 removeSelections = {
-                    playerServiceViewModelGateway?.removeAllSelectedItems()
                     audioQueueViewModel.removeSelectedItems()
-                    actionMode?.finish()
-                    audioQueueViewModel.enableSelectMode(false)
-                    updateToolbarIcon(iconPackR.drawable.ic_back_audio_queue)
                 },
                 clearSelections = {
                     audioQueueViewModel.clearAllSelectedItems()
-                    playerServiceViewModelGateway?.clearSelections()
-                    actionMode = null
                     audioQueueViewModel.enableSelectMode(false)
                     updateToolbarIcon(iconPackR.drawable.ic_back_audio_queue)
                 },

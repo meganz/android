@@ -226,10 +226,6 @@ class AudioPlayerServiceViewModel @Inject constructor(
 
     private val itemsClearedState = MutableStateFlow<Boolean?>(null)
 
-    private var actionMode = MutableLiveData<Boolean>()
-
-    private val itemsSelectedCount = MutableLiveData<Int>()
-
     private var mediaPlayback = MutableLiveData<Boolean>()
 
     private val playlistItems = mutableListOf<PlaylistItem>()
@@ -261,7 +257,6 @@ class AudioPlayerServiceViewModel @Inject constructor(
     private var mediaItemTransitionState = MutableStateFlow<Long?>(null)
 
     init {
-        itemsSelectedCount.value = 0
         setupTransferListener()
         cancellableJobs[JOB_KEY_MONITOR_SHUFFLE]?.cancel()
         cancellableJobs[JOB_KEY_MONITOR_SHUFFLE] = sharingScope.launch {
@@ -1170,122 +1165,63 @@ class AudioPlayerServiceViewModel @Inject constructor(
 
     override fun playlistTitleUpdate() = playlistTitle.asFlow()
 
-    override fun itemsSelectedCountUpdate() = itemsSelectedCount.asFlow()
-
-    override fun actionModeUpdate() = actionMode.asFlow()
-
     override fun removeItem(handle: Long) {
         initPlayerSourceChanged()
-        val newItems = removeSingleItem(handle)
-        if (newItems.isNotEmpty()) {
-            resetRetryState()
-            recreateAndUpdatePlaylistItems(originalItems = newItems)
-        } else {
-            playlistItemsFlow.update {
-                it.copy(emptyList(), 0)
-            }
-            itemsClearedState.update { true }
-        }
-    }
-
-    private fun removeSingleItem(handle: Long): List<PlaylistItem> =
-        playlistItemsFlow.value.first.let { items ->
-            val newItems = items.toMutableList()
-            items.indexOfFirst { (nodeHandle) ->
-                nodeHandle == handle
-            }.takeIf { index ->
-                index in playlistItems.indices
-            }?.let { index ->
-                mediaItemToRemove.update { Pair(index, handle) }
-                newItems.removeIf { (nodeHandle) ->
-                    nodeHandle == handle
-                }
-                playlistItems.removeIf { (nodeHandle) ->
-                    nodeHandle == handle
-                }
-                playSourceChanged.removeIf { mediaItem ->
-                    mediaItem.mediaId.toLong() == handle
-                }
-            }
-            newItems
-        }
-
-    override fun removeAllSelectedItems() {
-        if (itemsSelectedMap.isNotEmpty()) {
-            initPlayerSourceChanged()
-            itemsSelectedMap.forEach {
-                removeSingleItem(it.value.nodeHandle).let { newItems ->
-                    playlistItemsFlow.update { flow ->
-                        flow.copy(newItems, playingPosition)
-                    }
-                }
-            }
-            updatePlaySource()
-            itemsSelectedMap.clear()
-            itemsSelectedCount.value = itemsSelectedMap.size
-            actionMode.value = false
-        }
-    }
-
-    override fun itemSelected(handle: Long) {
-        val playlistItems = playlistItemsFlow.value.first.toMutableList()
-        val selectedIndex = playlistItems.indexOfFirst { (nodeHandle) -> nodeHandle == handle }
-
-        if (selectedIndex in playlistItems.indices) {
-            val item = playlistItems[selectedIndex]
-            val isSelected = !item.isSelected
-            playlistItems[selectedIndex] = item.copy(isSelected = isSelected)
-            if (isSelected) {
-                itemsSelectedMap[handle] = item
+        removeSingleItem(handle).let { newItems ->
+            if (newItems.isNotEmpty()) {
+                resetRetryState()
+                recreateAndUpdatePlaylistItems(newItems)
             } else {
-                itemsSelectedMap.remove(handle)
-            }
-            itemsSelectedCount.value = itemsSelectedMap.size
-            playlistItemsFlow.update {
-                it.copy(first = playlistItems)
+                playlistItemsFlow.update { it.copy(emptyList(), 0) }
+                itemsClearedState.update { true }
             }
         }
+    }
+
+    private fun removeSingleItem(handle: Long): List<PlaylistItem> {
+        val currentItems = playlistItemsFlow.value.first
+        val newItems = currentItems.toMutableList()
+
+        val index = currentItems.indexOfFirst { it.nodeHandle == handle }
+        if (index != -1) {
+            mediaItemToRemove.update { Pair(index, handle) }
+            newItems.removeAt(index)
+            playlistItems.removeIf { it.nodeHandle == handle }
+            playSourceChanged.removeIf { it.mediaId.toLong() == handle }
+        }
+        return newItems
+    }
+
+    override fun removeSelectedItems(removedHandles: List<Long>) {
+        itemsSelected(removedHandles)
+
+        if (itemsSelectedMap.isEmpty()) return
+
+        initPlayerSourceChanged()
+        val newItems = playlistItemsFlow.value.first.toMutableList()
+        itemsSelectedMap.forEach { (_, selectedItem) ->
+            newItems.removeIf { it.nodeHandle == selectedItem.nodeHandle }
+            playlistItems.removeIf { it.nodeHandle == selectedItem.nodeHandle }
+            playSourceChanged.removeIf { it.mediaId.toLong() == selectedItem.nodeHandle }
+        }
+        playlistItemsFlow.update { it.copy(newItems, playingPosition) }
+        updatePlaySource()
+        itemsSelectedMap.clear()
     }
 
     override fun itemsSelected(handles: List<Long>) {
-        val playlistItems = playlistItemsFlow.value.first.toMutableList()
         itemsSelectedMap.clear()
-        handles.forEach { handle ->
-            val selectedIndex = playlistItems.indexOfFirst { (nodeHandle) -> nodeHandle == handle }
-            if (selectedIndex in playlistItems.indices) {
-                playlistItems[selectedIndex] = playlistItems[selectedIndex].copy(isSelected = true)
-                itemsSelectedMap[handle] = playlistItems[selectedIndex]
+        val updatedPlaylistItems = playlistItemsFlow.value.first.map { item ->
+            if (item.nodeHandle in handles) {
+                val updatedItem = item.copy(isSelected = true)
+                itemsSelectedMap[item.nodeHandle] = updatedItem
+                updatedItem
+            } else {
+                item
             }
         }
-        itemsSelectedCount.value = itemsSelectedMap.size
         playlistItemsFlow.update {
-            it.copy(first = playlistItems)
-        }
-    }
-
-    override fun clearSelections() {
-        playlistItemsFlow.update {
-            it.copy(
-                it.first.toMutableList().let { playlistItems ->
-                    playlistItems.map { item ->
-                        item.copy(isSelected = false)
-                    }
-                }
-            )
-        }
-        itemsSelectedMap.clear()
-        actionMode.value = false
-
-    }
-
-    override fun setActionMode(isActionMode: Boolean) {
-        actionMode.value = isActionMode
-        if (isActionMode) {
-            recreateAndUpdatePlaylistItems(
-                originalItems = playlistItemsFlow.value.first,
-                isScroll = false,
-                isBuildPlaySources = false
-            )
+            it.copy(first = updatedPlaylistItems)
         }
     }
 
@@ -1370,15 +1306,6 @@ class AudioPlayerServiceViewModel @Inject constructor(
         }
     }
 
-    override fun getIndexFromPlaylistItems(item: PlaylistItem): Int? =
-        /* The media items of ExoPlayer are still the original order even the shuffleEnable is true,
-         so the index of media item should be got from original playlist items */
-        playlistItems.indexOfFirst {
-            it.nodeHandle == item.nodeHandle
-        }.takeIf { index ->
-            index in playlistItems.indices
-        }
-
     override fun getIndexFromPlaylistItems(handle: Long): Int? =
         /* The media items of ExoPlayer are still the original order even the shuffleEnable is true,
          so the index of media item should be got from original playlist items */
@@ -1389,33 +1316,23 @@ class AudioPlayerServiceViewModel @Inject constructor(
         }
 
     override fun updatePlaySource() {
-        if (playlistItemsChanged.isNotEmpty() && playSourceChanged.isNotEmpty()) {
-            playlistItemsFlow.update {
-                it.copy(playlistItemsChanged.toList())
+        if (playSourceChanged.isNotEmpty()) {
+            playlistItemsChanged.takeIf { it.isNotEmpty() }?.let {
+                playlistItemsFlow.update { currentList ->
+                    currentList.copy(it.toList())
+                }
+                playlistItemsChanged.clear()
             }
-            playerSource.value?.run {
-                playerSource.value =
-                    copy(
-                        mediaItems = playSourceChanged.toList(),
-                        newIndexForCurrentItem = playingPosition
-                    )
-            }
+
+            playerSource.value = playerSource.value?.copy(
+                mediaItems = playSourceChanged.toList(),
+                newIndexForCurrentItem = playingPosition
+            )
             playSourceChanged.clear()
-            playlistItemsChanged.clear()
         }
     }
 
     override fun isPaused() = paused
-
-    override fun getPlayingPosition(): Int = playingPosition
-
-    override fun scrollToPlayingPosition() =
-        recreateAndUpdatePlaylistItems(
-            originalItems = playlistItemsFlow.value.first,
-            isBuildPlaySources = false
-        )
-
-    override fun isActionMode() = actionMode.value
 
     private fun initPlayerSourceChanged() {
         if (playSourceChanged.isEmpty()) {
