@@ -68,7 +68,8 @@ class ReportIssueFragment : Fragment() {
     override fun onPrepareOptionsMenu(menu: Menu) {
         super.onPrepareOptionsMenu(menu)
         val valid = viewModel.uiState.value.canSubmit
-        val color = context?.getColor(if (valid) R.color.accent_900 else R.color.color_icon_disabled)
+        val color =
+            context?.getColor(if (valid) R.color.color_icon_accent else R.color.color_icon_disabled)
         menu.findItem(R.id.menu_report_issue_submit)?.let { menuItem ->
             menuItem.isEnabled = valid
             color?.let { menuItem.icon?.setTint(it) }
