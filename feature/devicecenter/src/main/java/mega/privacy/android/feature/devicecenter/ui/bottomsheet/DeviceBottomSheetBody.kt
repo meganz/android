@@ -42,6 +42,7 @@ internal const val BOTTOM_SHEET_HEADER =
  *
  * @param device The selected [DeviceUINode]
  * @param isCameraUploadsEnabled true if Camera Uploads is Enabled, and false if otherwise
+ * @param onCameraUploadsClicked Lambda that is executed when the "Camera uploads" Tile is selected
  * @param onRenameDeviceClicked Lambda that is executed when the "Rename" Tile is selected
  * @param onInfoClicked Lambda that is executed when the "Info" Tile is selected
  * @param onAddNewSyncClicked Lambda that is executed when the "Add new sync" Tile is selected
@@ -52,6 +53,7 @@ internal const val BOTTOM_SHEET_HEADER =
 internal fun DeviceBottomSheetBody(
     device: DeviceUINode,
     isCameraUploadsEnabled: Boolean,
+    onCameraUploadsClicked: () -> Unit,
     onRenameDeviceClicked: (DeviceUINode) -> Unit,
     onInfoClicked: (DeviceUINode) -> Unit,
     onAddNewSyncClicked: (DeviceUINode) -> Unit,
@@ -77,6 +79,10 @@ internal fun DeviceBottomSheetBody(
                 OwnDeviceBottomSheetBody(
                     isCameraUploadsEnabled = isCameraUploadsEnabled,
                     hasSyncedFolders = device.folders.isNotEmpty(),
+                    onCameraUploadsClicked = {
+                        onBottomSheetDismissed()
+                        onCameraUploadsClicked()
+                    },
                     onRenameDeviceClicked = {
                         onBottomSheetDismissed()
                         onRenameDeviceClicked(device)
@@ -165,6 +171,7 @@ private fun DeviceBottomSheetBodyPreview(
         DeviceBottomSheetBody(
             device = device,
             isCameraUploadsEnabled = true,
+            onCameraUploadsClicked = {},
             onRenameDeviceClicked = {},
             onInfoClicked = {},
             onAddNewSyncClicked = {},

@@ -95,6 +95,7 @@ internal fun DeviceCenterScreen(
     onDeviceMenuClicked: (DeviceUINode) -> Unit,
     onBackupFolderClicked: (BackupDeviceFolderUINode) -> Unit,
     onNonBackupFolderClicked: (NonBackupDeviceFolderUINode) -> Unit,
+    onCameraUploadsClicked: () -> Unit,
     onInfoOptionClicked: (DeviceCenterUINode) -> Unit,
     onAddNewSyncOptionClicked: () -> Unit,
     onAddBackupOptionClicked: () -> Unit,
@@ -156,6 +157,7 @@ internal fun DeviceCenterScreen(
             DeviceBottomSheetBody(
                 device = uiState.menuClickedDevice ?: return@BottomSheet,
                 isCameraUploadsEnabled = uiState.isCameraUploadsEnabled,
+                onCameraUploadsClicked = onCameraUploadsClicked,
                 onRenameDeviceClicked = onRenameDeviceOptionClicked,
                 onInfoClicked = onInfoOptionClicked,
                 onAddNewSyncClicked = { onAddNewSyncOptionClicked() },
@@ -296,6 +298,7 @@ private fun DeviceCenterAppBar(
                         if (uiState.isCameraUploadsEnabled) {
                             list.add(DeviceMenuAction.Info)
                         }
+                        list.add(DeviceMenuAction.CameraUploads)
                     }
 
                     else -> list.add(DeviceMenuAction.Info)
@@ -450,6 +453,7 @@ private fun DeviceCenterNoNetworkStatePreview() {
             onDeviceMenuClicked = {},
             onBackupFolderClicked = {},
             onNonBackupFolderClicked = {},
+            onCameraUploadsClicked = {},
             onInfoOptionClicked = {},
             onAddNewSyncOptionClicked = {},
             onAddBackupOptionClicked = {},
@@ -483,6 +487,7 @@ private fun DeviceCenterNoItemsFoundPreview() {
             onDeviceMenuClicked = {},
             onBackupFolderClicked = {},
             onNonBackupFolderClicked = {},
+            onCameraUploadsClicked = {},
             onInfoOptionClicked = {},
             onAddNewSyncOptionClicked = {},
             onAddBackupOptionClicked = {},
@@ -513,6 +518,7 @@ private fun DeviceCenterInInitialLoadingPreview() {
             onDeviceMenuClicked = {},
             onBackupFolderClicked = {},
             onNonBackupFolderClicked = {},
+            onCameraUploadsClicked = {},
             onInfoOptionClicked = {},
             onAddNewSyncOptionClicked = {},
             onAddBackupOptionClicked = {},
@@ -553,6 +559,7 @@ private fun DeviceCenterInDeviceViewPreview() {
             onDeviceMenuClicked = {},
             onBackupFolderClicked = {},
             onNonBackupFolderClicked = {},
+            onCameraUploadsClicked = {},
             onInfoOptionClicked = {},
             onAddNewSyncOptionClicked = {},
             onAddBackupOptionClicked = {},
@@ -590,6 +597,7 @@ private fun DeviceCenterInFolderViewEmptyStatePreview() {
             onDeviceMenuClicked = {},
             onBackupFolderClicked = {},
             onNonBackupFolderClicked = {},
+            onCameraUploadsClicked = {},
             onInfoOptionClicked = {},
             onAddNewSyncOptionClicked = {},
             onAddBackupOptionClicked = {},
@@ -626,6 +634,7 @@ private fun DeviceCenterInFolderViewPreview() {
             onDeviceMenuClicked = {},
             onBackupFolderClicked = {},
             onNonBackupFolderClicked = {},
+            onCameraUploadsClicked = {},
             onInfoOptionClicked = {},
             onAddNewSyncOptionClicked = {},
             onAddBackupOptionClicked = {},
@@ -723,7 +732,7 @@ private val ownDeviceUINode = OwnDeviceUINode(
     id = "1234-5678",
     name = "User's Pixel 6",
     icon = DeviceIconType.Android,
-    status = DeviceCenterUINodeStatus.CameraUploadsDisabled,
+    status = DeviceCenterUINodeStatus.NothingSetUp,
     folders = emptyList(),
 )
 

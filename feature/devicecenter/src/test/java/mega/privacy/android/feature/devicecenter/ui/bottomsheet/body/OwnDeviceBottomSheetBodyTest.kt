@@ -1,7 +1,6 @@
 package mega.privacy.android.feature.devicecenter.ui.bottomsheet.body
 
 import androidx.compose.ui.test.assertIsDisplayed
-import androidx.compose.ui.test.assertIsNotDisplayed
 import androidx.compose.ui.test.junit4.createComposeRule
 import androidx.compose.ui.test.onNodeWithTag
 import androidx.test.ext.junit.runners.AndroidJUnit4
@@ -29,6 +28,7 @@ internal class OwnDeviceBottomSheetBodyTest {
             OwnDeviceBottomSheetBody(
                 isCameraUploadsEnabled = true,
                 hasSyncedFolders = true,
+                onCameraUploadsClicked = {},
                 onRenameDeviceClicked = {},
                 onInfoClicked = {},
                 onAddNewSyncClicked = {},
@@ -37,7 +37,7 @@ internal class OwnDeviceBottomSheetBodyTest {
             )
         }
         composeTestRule.onNodeWithTag(BOTTOM_SHEET_BODY_OWN_DEVICE).assertIsDisplayed()
-        composeTestRule.onNodeWithTag(BOTTOM_SHEET_TILE_CAMERA_UPLOADS).assertIsNotDisplayed()
+        composeTestRule.onNodeWithTag(BOTTOM_SHEET_TILE_CAMERA_UPLOADS).assertIsDisplayed()
         composeTestRule.onNodeWithTag(TEST_TAG_BOTTOM_SHEET_TILE_ADD_NEW_SYNC).assertIsDisplayed()
         composeTestRule.onNodeWithTag(TEST_TAG_BOTTOM_SHEET_TILE_ADD_BACKUP).assertIsDisplayed()
         composeTestRule.onNodeWithTag(BOTTOM_SHEET_TILE_RENAME_DEVICE).assertIsDisplayed()

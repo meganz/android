@@ -5,10 +5,12 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.res.stringResource
-import mega.privacy.android.shared.original.core.ui.theme.OriginalTheme
-import mega.privacy.android.shared.original.core.ui.preview.CombinedThemePreviews
 import mega.privacy.android.feature.devicecenter.R
+import mega.privacy.android.icon.pack.R as iconPackR
 import mega.privacy.android.legacy.core.ui.controls.lists.MenuActionListTileWithBody
+import mega.privacy.android.shared.original.core.ui.controls.dividers.DividerType
+import mega.privacy.android.shared.original.core.ui.preview.CombinedThemePreviews
+import mega.privacy.android.shared.original.core.ui.theme.OriginalTheme
 
 /**
  * Test Tag for the Camera Uploads Bottom Sheet Tile
@@ -21,11 +23,13 @@ internal const val BOTTOM_SHEET_TILE_CAMERA_UPLOADS =
  *
  * @param isCameraUploadsEnabled true if Camera Uploads is Enabled, and false if otherwise
  * @param onActionClicked Lambda that is executed when the Tile is selected
+ * @param dividerType type for the divider at the bottom. Hidden if NULL
  */
 @Composable
 internal fun CameraUploadsBottomSheetTile(
     isCameraUploadsEnabled: Boolean,
     onActionClicked: () -> Unit,
+    dividerType: DividerType? = DividerType.BigStartPadding,
 ) {
     MenuActionListTileWithBody(
         modifier = Modifier.testTag(BOTTOM_SHEET_TILE_CAMERA_UPLOADS),
@@ -37,7 +41,8 @@ internal fun CameraUploadsBottomSheetTile(
                 R.string.device_center_bottom_sheet_item_camera_uploads_disabled_status
             }
         ),
-        icon = R.drawable.ic_bottom_sheet_camera_uploads,
+        icon = iconPackR.drawable.ic_camera_medium_regular_outline,
+        dividerType = dividerType,
         onActionClicked = onActionClicked,
     )
 }

@@ -170,6 +170,9 @@ class DeviceCenterFragment : Fragment() {
                                 syncType = SyncType.TYPE_BACKUP,
                             )
                         },
+                        onCameraUploadsClicked = {
+                            megaNavigator.openSettingsCameraUploads(requireActivity())
+                        },
                         onRenameDeviceOptionClicked = viewModel::setDeviceToRename,
                         onRenameDeviceCancelled = viewModel::resetDeviceToRename,
                         onRenameDeviceSuccessful = {

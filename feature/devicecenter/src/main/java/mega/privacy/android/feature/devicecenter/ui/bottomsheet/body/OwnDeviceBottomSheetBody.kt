@@ -11,6 +11,7 @@ import mega.privacy.android.shared.original.core.ui.theme.OriginalTheme
 import mega.privacy.android.shared.original.core.ui.preview.BooleanProvider
 import mega.privacy.android.shared.original.core.ui.preview.CombinedThemePreviews
 import mega.privacy.android.feature.devicecenter.ui.bottomsheet.tiles.AddNewSyncBottomSheetTile
+import mega.privacy.android.feature.devicecenter.ui.bottomsheet.tiles.CameraUploadsBottomSheetTile
 import mega.privacy.android.feature.devicecenter.ui.bottomsheet.tiles.InfoBottomSheetTile
 import mega.privacy.android.feature.devicecenter.ui.bottomsheet.tiles.RenameDeviceBottomSheetTile
 
@@ -26,6 +27,7 @@ internal const val BOTTOM_SHEET_BODY_OWN_DEVICE =
  *
  * @param isCameraUploadsEnabled true if Camera Uploads is Enabled, and false if otherwise
  * @param hasSyncedFolders True if the device has synced folders. False otherwise
+ * @param onCameraUploadsClicked Lambda that is executed when the "Camera uploads" Tile is selected
  * @param onRenameDeviceClicked Lambda that is executed when the "Rename" Tile is selected
  * @param onInfoClicked Lambda that is executed when the "Info" Tile is selected
  * @param onAddNewSyncClicked Lambda that is executed when the "Add new sync" Tile is selected
@@ -36,6 +38,7 @@ internal const val BOTTOM_SHEET_BODY_OWN_DEVICE =
 internal fun OwnDeviceBottomSheetBody(
     isCameraUploadsEnabled: Boolean,
     hasSyncedFolders: Boolean,
+    onCameraUploadsClicked: () -> Unit,
     onRenameDeviceClicked: () -> Unit,
     onInfoClicked: () -> Unit,
     onAddNewSyncClicked: () -> Unit,
@@ -46,6 +49,10 @@ internal fun OwnDeviceBottomSheetBody(
         if (hasSyncedFolders || isCameraUploadsEnabled) {
             InfoBottomSheetTile(onActionClicked = onInfoClicked)
         }
+        CameraUploadsBottomSheetTile(
+            isCameraUploadsEnabled = isCameraUploadsEnabled,
+            onActionClicked = onCameraUploadsClicked,
+        )
         AddNewSyncBottomSheetTile(onActionClicked = onAddNewSyncClicked)
         if (isBackupForAndroidEnabled) {
             AddBackupBottomSheetTile(onActionClicked = onAddBackupClicked)
@@ -69,6 +76,7 @@ private fun PreviewOwnDeviceBottomSheet(
         OwnDeviceBottomSheetBody(
             isCameraUploadsEnabled = isCameraUploadsEnabled,
             hasSyncedFolders = true,
+            onCameraUploadsClicked = {},
             onRenameDeviceClicked = {},
             onInfoClicked = {},
             onAddNewSyncClicked = {},

@@ -47,7 +47,7 @@ private class DeviceCenterUINodeStatusProvider :
         DeviceCenterUINodeStatus.Scanning,
         DeviceCenterUINodeStatus.Syncing,
         DeviceCenterUINodeStatus.SyncingWithPercentage(50),
-        DeviceCenterUINodeStatus.CameraUploadsDisabled,
+        DeviceCenterUINodeStatus.NothingSetUp,
         DeviceCenterUINodeStatus.Disabled,
         DeviceCenterUINodeStatus.Offline,
         DeviceCenterUINodeStatus.Paused,

@@ -50,7 +50,7 @@ internal class DeviceNodeMapperTest {
         val currentDeviceFolderNodes = listOf<DeviceFolderNode>(
             mock { on { name }.thenReturn("Current Device Folder One") }
         )
-        val currentDeviceStatus = DeviceCenterNodeStatus.NoCameraUploads
+        val currentDeviceStatus = DeviceCenterNodeStatus.NothingSetUp
 
         whenever(deviceFolderNodeMapper(currentDeviceBackupInfo)).thenReturn(
             currentDeviceFolderNodes
@@ -92,14 +92,13 @@ internal class DeviceNodeMapperTest {
             mock { on { deviceId }.thenReturn(currentDeviceId) },
             mock { on { deviceId }.thenReturn(otherDeviceId) },
         )
-        val isCameraUploadsEnabled = false
 
         // Current Device
         val currentDeviceBackupInfo = backupInfoList.filterBackupInfoByDeviceId(currentDeviceId)
         val currentDeviceFolderNodes = listOf<DeviceFolderNode>(
             mock { on { name }.thenReturn("Current Device Folder One") }
         )
-        val currentDeviceStatus = DeviceCenterNodeStatus.NoCameraUploads
+        val currentDeviceStatus = DeviceCenterNodeStatus.NothingSetUp
         whenever(deviceFolderNodeMapper(currentDeviceBackupInfo)).thenReturn(
             currentDeviceFolderNodes
         )
@@ -158,14 +157,13 @@ internal class DeviceNodeMapperTest {
         val backupInfoList = listOf<BackupInfo>(
             mock { on { deviceId }.thenReturn(currentDeviceId) },
         )
-        val isCameraUploadsEnabled = false
 
         // Current Device
         val currentDeviceBackupInfo = backupInfoList.filterBackupInfoByDeviceId(currentDeviceId)
         val currentDeviceFolderNodes = listOf<DeviceFolderNode>(
             mock { on { name }.thenReturn("Current Device Folder One") }
         )
-        val currentDeviceStatus = DeviceCenterNodeStatus.NoCameraUploads
+        val currentDeviceStatus = DeviceCenterNodeStatus.NothingSetUp
         whenever(deviceFolderNodeMapper(currentDeviceBackupInfo)).thenReturn(
             currentDeviceFolderNodes
         )
