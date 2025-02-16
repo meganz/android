@@ -457,6 +457,7 @@ class MediaPlayerFacade @Inject constructor(
 
     override fun showSubtitle() {
         isSubtitleHidden = false
+        if (!hasSwitchTrackOnInit) hasSwitchTrackOnInit = true
         trackSelector.parameters = DefaultTrackSelector.Parameters.Builder(context)
             .setTrackTypeDisabled(C.TRACK_TYPE_TEXT, false).build()
     }
