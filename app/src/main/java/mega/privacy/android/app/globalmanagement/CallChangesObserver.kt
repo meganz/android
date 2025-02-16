@@ -18,7 +18,6 @@ import mega.privacy.android.app.components.ChatManagement
 import mega.privacy.android.app.fcm.ChatAdvancedNotificationBuilder
 import mega.privacy.android.app.meeting.gateway.RTCAudioManagerGateway
 import mega.privacy.android.app.notifications.CallPushMessageNotificationManager
-import mega.privacy.android.app.objects.PasscodeManagement
 import mega.privacy.android.app.utils.CallUtil
 import mega.privacy.android.app.utils.Constants
 import mega.privacy.android.app.utils.Util
@@ -66,7 +65,6 @@ class CallChangesObserver @Inject constructor(
     private val application: Application,
     private val chatManagement: ChatManagement,
     private val activityLifecycleHandler: ActivityLifecycleHandler,
-    private val passcodeManagement: PasscodeManagement,
     private val monitorChatCallUpdatesUseCase: MonitorChatCallUpdatesUseCase,
     private val monitorChatSessionUpdatesUseCase: MonitorChatSessionUpdatesUseCase,
     private val getCallHandleListUseCase: GetCallHandleListUseCase,
@@ -232,7 +230,11 @@ class CallChangesObserver @Inject constructor(
                 ) {
                     if (isRinging) {
                         Timber.d("Handle call status change: is incoming call")
-                        incomingCall(listAllCalls, chatId, callStatus)
+                        incomingCall(
+                            listAllCalls = listAllCalls,
+                            incomingCallChatId = chatId,
+                            callStatus = callStatus,
+                        )
                     } else {
                         val chatRoom = megaChatApi.getChatRoom(chatId)
                         if (chatRoom != null && chatRoom.isGroup && !chatRoom.isMeeting) {
@@ -391,7 +393,9 @@ class CallChangesObserver @Inject constructor(
                     if (CallUtil.isOneToOneCall(chatRoom) && openCallChatId != chatRoom.chatId) {
                         Timber.d("Show incoming one to one call screen")
                         val callToLaunch = megaChatApi.getChatCall(chatRoom.chatId)
-                        checkOneToOneIncomingCall(callToLaunch)
+                        checkOneToOneIncomingCall(
+                            callToLaunch = callToLaunch,
+                        )
                         return
                     }
                 }
@@ -409,7 +413,11 @@ class CallChangesObserver @Inject constructor(
                 Timber.d("The call is already opened")
             }
         }
-        callToLaunch?.let { checkOneToOneIncomingCall(it) }
+        callToLaunch?.let {
+            checkOneToOneIncomingCall(
+                callToLaunch = it,
+            )
+        }
     }
 
     /**
@@ -417,7 +425,9 @@ class CallChangesObserver @Inject constructor(
      *
      * @param incomingCallChatId
      */
-    private fun checkOneCall(incomingCallChatId: Long) {
+    private fun checkOneCall(incomingCallChatId: Long
+
+    ) {
         Timber.d("One call : Chat ID is $incomingCallChatId, openCall Chat ID is $openCallChatId")
         if (openCallChatId == incomingCallChatId) {
             Timber.d("The call is already opened")
@@ -453,7 +463,7 @@ class CallChangesObserver @Inject constructor(
         }
 
         Timber.d("Check the one-to-one call")
-        checkOneToOneIncomingCall(callToLaunch)
+        checkOneToOneIncomingCall(callToLaunch = callToLaunch)
     }
 
     private fun checkQueuedCalls(incomingCallChatId: Long) {
@@ -470,7 +480,9 @@ class CallChangesObserver @Inject constructor(
      *
      * @param callToLaunch The incoming call
      */
-    private fun checkOneToOneIncomingCall(callToLaunch: MegaChatCall) {
+    private fun checkOneToOneIncomingCall(
+        callToLaunch: MegaChatCall,
+    ) {
         if (shouldNotify(application) && !activityLifecycleHandler.isActivityVisible) {
             initWakeLock()
             Timber.d("The notification should be displayed. Chat ID of incoming call ${callToLaunch.chatid}")
@@ -485,7 +497,7 @@ class CallChangesObserver @Inject constructor(
 
     private fun launchCallActivity(call: MegaChatCall) {
         Timber.d("Show the call screen: ${CallUtil.callStatusToString(call.status)}, callId = ${call.callId}")
-        CallUtil.openMeetingRinging(application, call.chatid, passcodeManagement)
+        CallUtil.openMeetingRinging(application, call.chatid)
     }
 
     /**
@@ -570,7 +582,11 @@ class CallChangesObserver @Inject constructor(
         if (!chatRoom.isMeeting || !chatManagement.isOpeningMeetingLink(incomingCallChatId)) {
             Timber.d("It is necessary to check the number of current calls")
             withContext(mainImmediateDispatcher) {
-                controlNumberOfCalls(listAllCalls, callStatus, incomingCallChatId)
+                controlNumberOfCalls(
+                    listAllCalls = listAllCalls,
+                    callStatus = callStatus,
+                    incomingCallChatId = incomingCallChatId,
+                )
             }
         }
     }
@@ -581,9 +597,14 @@ class CallChangesObserver @Inject constructor(
         incomingCallChatId: Long,
     ) {
         if (listAllCalls.size() == 1L) {
-            checkOneCall(incomingCallChatId)
+            checkOneCall(incomingCallChatId = incomingCallChatId)
         } else {
-            checkSeveralCall(listAllCalls, callStatus, true, incomingCallChatId)
+            checkSeveralCall(
+                listAllCalls = listAllCalls,
+                callStatus = callStatus,
+                isRinging = true,
+                incomingCallChatId = incomingCallChatId,
+            )
         }
     }
 

@@ -31,6 +31,7 @@ class SettingsActivity : BaseActivity(),
     override fun onCreate(savedInstanceState: Bundle?) {
         enableEdgeToEdgeAndConsumeInsets()
         super.onCreate(savedInstanceState)
+        appContainerWrapper.setPasscodeCheck(passCodeFacade)
         if (shouldRefreshSessionDueToSDK(true)) return
         setContentView(R.layout.settings_activity)
         setSupportActionBar(findViewById(R.id.settings_toolbar))

@@ -75,7 +75,6 @@ import mega.privacy.android.app.meeting.activity.MeetingActivity
 import mega.privacy.android.app.modalbottomsheet.ContactFileListBottomSheetDialogFragment
 import mega.privacy.android.app.modalbottomsheet.ContactNicknameBottomSheetDialogFragment
 import mega.privacy.android.app.modalbottomsheet.ModalBottomSheetUtil.isBottomSheetDialogShown
-import mega.privacy.android.app.objects.PasscodeManagement
 import mega.privacy.android.app.presentation.contact.authenticitycredendials.AuthenticityCredentialsActivity
 import mega.privacy.android.app.presentation.contactinfo.model.ContactInfoUiState
 import mega.privacy.android.app.presentation.extensions.iconRes
@@ -87,6 +86,7 @@ import mega.privacy.android.app.presentation.meeting.WaitingRoomManagementViewMo
 import mega.privacy.android.app.presentation.meeting.view.dialog.DenyEntryToCallDialog
 import mega.privacy.android.app.presentation.meeting.view.dialog.UsersInWaitingRoomDialog
 import mega.privacy.android.app.presentation.movenode.mapper.MoveRequestMessageMapper
+import mega.privacy.android.app.presentation.security.PasscodeCheck
 import mega.privacy.android.app.presentation.transfers.attach.NodeAttachmentViewModel
 import mega.privacy.android.app.presentation.transfers.attach.createNodeAttachmentView
 import mega.privacy.android.app.presentation.transfers.starttransfer.StartDownloadViewModel
@@ -138,7 +138,7 @@ class ContactInfoActivity : BaseActivity(), ActionNodeCallback, MegaRequestListe
      * object handles passcode lock behaviours
      */
     @Inject
-    lateinit var passcodeManagement: PasscodeManagement
+    lateinit var passcodeCheck: PasscodeCheck
 
     /**
      * Get theme mode
@@ -546,7 +546,6 @@ class ContactInfoActivity : BaseActivity(), ActionNodeCallback, MegaRequestListe
             callInProgressLayout.setOnClickListener {
                 CallUtil.returnActiveCall(
                     this@ContactInfoActivity,
-                    passcodeManagement
                 )
             }
         }
@@ -869,7 +868,7 @@ class ContactInfoActivity : BaseActivity(), ActionNodeCallback, MegaRequestListe
             }
 
             R.id.action_return_call -> {
-                CallUtil.returnActiveCall(this, passcodeManagement)
+                CallUtil.returnActiveCall(this)
                 return true
             }
         }
@@ -1023,7 +1022,7 @@ class ContactInfoActivity : BaseActivity(), ActionNodeCallback, MegaRequestListe
     private fun launchCallScreen() {
         val chatId = waitingRoomManagementViewModel.state.value.chatId
         MegaApplication.getInstance().openCallService(chatId)
-        passcodeManagement.showPasscodeScreen = true
+        passcodeCheck.enablePassCode()
 
         val intent = Intent(this, MeetingActivity::class.java).apply {
             addFlags(Intent.FLAG_ACTIVITY_NEW_TASK)
@@ -1214,7 +1213,7 @@ class ContactInfoActivity : BaseActivity(), ActionNodeCallback, MegaRequestListe
 
     private fun startingACall(withVideo: Boolean) {
         startVideo = withVideo
-        if (CallUtil.canCallBeStartedFromContactOption(this, passcodeManagement)) {
+        if (CallUtil.canCallBeStartedFromContactOption(this)) {
             verifyPermissionAndJoinCall()
         }
     }

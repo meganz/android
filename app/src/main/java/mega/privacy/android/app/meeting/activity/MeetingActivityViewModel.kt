@@ -41,7 +41,6 @@ import mega.privacy.android.app.meeting.activity.MeetingActivity.Companion.MEETI
 import mega.privacy.android.app.meeting.adapter.Participant
 import mega.privacy.android.app.meeting.gateway.RTCAudioManagerGateway
 import mega.privacy.android.app.meeting.listeners.IndividualCallVideoListener
-import mega.privacy.android.app.objects.PasscodeManagement
 import mega.privacy.android.app.presentation.chat.model.AnswerCallResult
 import mega.privacy.android.app.presentation.contactinfo.model.ContactInfoUiState
 import mega.privacy.android.app.presentation.extensions.getState
@@ -67,7 +66,6 @@ import mega.privacy.android.domain.entity.call.ChatCallChanges
 import mega.privacy.android.domain.entity.call.ChatCallStatus
 import mega.privacy.android.domain.entity.call.ChatCallTermCodeType
 import mega.privacy.android.domain.entity.call.ChatSessionChanges
-import mega.privacy.android.domain.entity.chat.ChatConnectionStatus
 import mega.privacy.android.domain.entity.chat.ChatParticipant
 import mega.privacy.android.domain.entity.chat.ChatRoomChange
 import mega.privacy.android.domain.entity.chat.ScheduledMeetingChanges
@@ -222,7 +220,6 @@ class MeetingActivityViewModel @Inject constructor(
     private val monitorCallEndedUseCase: MonitorCallEndedUseCase,
     private val createMeetingUseCase: CreateMeetingUseCase,
     private val startCallUseCase: StartCallUseCase,
-    private val passcodeManagement: PasscodeManagement,
     private val monitorAudioOutputUseCase: MonitorAudioOutputUseCase,
     private val monitorChatConnectionStateUseCase: MonitorChatConnectionStateUseCase,
     savedStateHandle: SavedStateHandle,
@@ -1246,7 +1243,6 @@ class MeetingActivityViewModel @Inject constructor(
                                     MegaApplication.getInstance().applicationContext,
                                     call.chatId,
                                     true,
-                                    passcodeManagement
                                 )
                                 _state.update {
                                     it.copy(

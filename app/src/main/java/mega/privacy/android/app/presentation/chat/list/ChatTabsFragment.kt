@@ -42,7 +42,6 @@ import mega.privacy.android.app.main.NavigationDrawerManager
 import mega.privacy.android.app.main.dialog.chatstatus.ChatStatusDialogFragment
 import mega.privacy.android.app.meeting.activity.MeetingActivity
 import mega.privacy.android.app.modalbottomsheet.MeetingBottomSheetDialogFragment
-import mega.privacy.android.app.objects.PasscodeManagement
 import mega.privacy.android.app.presentation.chat.list.model.ChatTab
 import mega.privacy.android.app.presentation.chat.list.view.ChatTabsView
 import mega.privacy.android.app.presentation.contact.invite.InviteContactActivity
@@ -107,8 +106,6 @@ class ChatTabsFragment : Fragment() {
     @Inject
     lateinit var getThemeMode: GetThemeMode
 
-    @Inject
-    lateinit var passcodeManagement: PasscodeManagement
 
     private val showMeetingTab by lazy {
         arguments?.getBoolean(EXTRA_SHOW_MEETING_TAB, false) ?: false
@@ -328,7 +325,6 @@ class ChatTabsFragment : Fragment() {
             CallUtil.showConfirmationInACall(
                 requireContext(),
                 getString(R.string.ongoing_call_content),
-                passcodeManagement
             )
         } else {
             if (hasBluetoothPermission()) {

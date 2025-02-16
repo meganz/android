@@ -30,7 +30,6 @@ import mega.privacy.android.app.main.dialog.removelink.RemovePublicLinkResultMap
 import mega.privacy.android.app.main.dialog.shares.RemoveShareResultMapper
 import mega.privacy.android.app.meeting.gateway.RTCAudioManagerGateway
 import mega.privacy.android.app.middlelayer.scanner.ScannerHandler
-import mega.privacy.android.app.objects.PasscodeManagement
 import mega.privacy.android.app.presentation.documentscanner.model.DocumentScanningError
 import mega.privacy.android.app.presentation.manager.model.SharesTab
 import mega.privacy.android.app.presentation.meeting.chat.model.InfoToShow
@@ -328,7 +327,6 @@ class ManagerViewModelTest {
     private val getUsersCallLimitRemindersUseCase: GetUsersCallLimitRemindersUseCase = mock()
     private val rtcAudioManagerGateway: RTCAudioManagerGateway = mock()
     private val chatManagement: ChatManagement = mock()
-    private val passcodeManagement: PasscodeManagement = mock()
     private lateinit var monitorSyncsUseCaseFakeFlow: MutableSharedFlow<List<FolderPair>>
     private val monitorChatSessionUpdatesUseCase: MonitorChatSessionUpdatesUseCase = mock()
     private val hangChatCallUseCase: HangChatCallUseCase = mock()
@@ -424,7 +422,6 @@ class ManagerViewModelTest {
             setChatVideoInDeviceUseCase = setChatVideoInDeviceUseCase,
             rtcAudioManagerGateway = rtcAudioManagerGateway,
             chatManagement = chatManagement,
-            passcodeManagement = passcodeManagement,
             monitorSyncStalledIssuesUseCase = monitorSyncStalledIssuesUseCase,
             monitorSyncsUseCase = mock {
                 on { invoke() }.thenReturn(monitorSyncsUseCaseFakeFlow)
@@ -487,7 +484,6 @@ class ManagerViewModelTest {
             setChatVideoInDeviceUseCase,
             rtcAudioManagerGateway,
             chatManagement,
-            passcodeManagement,
             hangChatCallUseCase,
             monitorChatArchivedUseCase,
             monitorPushNotificationSettingsUpdate,

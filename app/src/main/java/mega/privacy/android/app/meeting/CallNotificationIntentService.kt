@@ -12,7 +12,6 @@ import kotlinx.coroutines.cancel
 import kotlinx.coroutines.launch
 import mega.privacy.android.app.MegaApplication
 import mega.privacy.android.app.meeting.gateway.RTCAudioManagerGateway
-import mega.privacy.android.app.objects.PasscodeManagement
 import mega.privacy.android.app.presentation.meeting.WaitingRoomActivity
 import mega.privacy.android.app.presentation.meeting.chat.ChatHostActivity
 import mega.privacy.android.app.utils.CallUtil.clearIncomingCallNotification
@@ -44,7 +43,6 @@ import javax.inject.Inject
 /**
  * Service which should be for call notifications.
  *
- * @property passcodeManagement                     [PasscodeManagement]
  * @property rtcAudioManagerGateway                 [RTCAudioManagerGateway]
  * @property answerChatCallUseCase                  [AnswerChatCallUseCase]
  * @property startScheduledMeetingUseCase           [StartScheduledMeetingUseCase]
@@ -65,9 +63,6 @@ import javax.inject.Inject
  */
 @AndroidEntryPoint
 class CallNotificationIntentService : Service() {
-
-    @Inject
-    lateinit var passcodeManagement: PasscodeManagement
 
     @Inject
     lateinit var answerChatCallUseCase: AnswerChatCallUseCase
@@ -381,7 +376,6 @@ class CallNotificationIntentService : Service() {
                         openMeetingRinging(
                             this@CallNotificationIntentService,
                             chatIdIncomingCall,
-                            passcodeManagement
                         )
                     }
 
@@ -413,7 +407,6 @@ class CallNotificationIntentService : Service() {
                                 this@CallNotificationIntentService,
                                 meeting.chatId,
                                 true,
-                                passcodeManagement
                             )
                         }
                         stopSelf()
@@ -468,7 +461,6 @@ class CallNotificationIntentService : Service() {
             openMeetingRinging(
                 this@CallNotificationIntentService,
                 chatIdIncomingCall,
-                passcodeManagement
             )
             clearIncomingCallNotification(callIdIncomingCall)
             stopSelf()
@@ -486,7 +478,6 @@ class CallNotificationIntentService : Service() {
                                 this@CallNotificationIntentService,
                                 chatIdIncomingCall,
                                 true,
-                                passcodeManagement
                             )
                             clearIncomingCallNotification(callChatId)
                             stopSelf()

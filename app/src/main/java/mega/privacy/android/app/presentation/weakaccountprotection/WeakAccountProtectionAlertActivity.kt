@@ -1,5 +1,6 @@
 package mega.privacy.android.app.presentation.weakaccountprotection
 
+import android.annotation.SuppressLint
 import android.content.Intent
 import android.os.Bundle
 import android.text.Html
@@ -95,8 +96,8 @@ class WeakAccountProtectionAlertActivity : PasscodeActivity(), View.OnClickListe
     /**
      * onBackPressed
      */
+    @SuppressLint("MissingSuperCall")
     override fun onBackPressed() {
-        if (psaWebBrowser?.consumeBack() == true) return
         //        Do nothing: do not permit to skip the warning, account blocked
     }
 

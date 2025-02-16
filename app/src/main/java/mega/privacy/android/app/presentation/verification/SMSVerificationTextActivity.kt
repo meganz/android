@@ -406,7 +406,6 @@ class SMSVerificationTextActivity : PasscodeActivity(),
 
     override fun onBackPressed() {
         Timber.d("onBackPressed")
-        if (psaWebBrowser != null && psaWebBrowser?.consumeBack() == true) return
         super.onBackPressed()
         if (allowResend) {
             finish()

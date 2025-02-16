@@ -25,15 +25,13 @@ import mega.privacy.android.app.meeting.activity.MeetingActivity
 import mega.privacy.android.app.meeting.adapter.AssignParticipantsAdapter
 import mega.privacy.android.app.meeting.adapter.Participant
 import mega.privacy.android.app.meeting.adapter.SelectedParticipantsAdapter
-import mega.privacy.android.app.objects.PasscodeManagement
 import mega.privacy.android.app.utils.ColorUtils
 import mega.privacy.android.app.utils.Util
-import mega.privacy.android.domain.entity.call.ChatSessionStatus
 import mega.privacy.android.domain.entity.call.ChatCallStatus
+import mega.privacy.android.domain.entity.call.ChatSessionStatus
 import nz.mega.sdk.MegaChatApiJava.MEGACHAT_INVALID_HANDLE
 import nz.mega.sdk.MegaChatRoom
 import timber.log.Timber
-import javax.inject.Inject
 
 @AndroidEntryPoint
 class MakeModeratorFragment : MeetingBaseFragment() {
@@ -52,9 +50,6 @@ class MakeModeratorFragment : MeetingBaseFragment() {
     lateinit var toolbarTitle: EmojiTextView
     lateinit var toolbarSubtitle: TextView
     val inMeetingViewModel: InMeetingViewModel by activityViewModels()
-
-    @Inject
-    lateinit var passcodeManagement: PasscodeManagement
 
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,

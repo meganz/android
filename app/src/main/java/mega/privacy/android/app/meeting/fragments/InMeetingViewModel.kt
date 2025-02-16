@@ -44,7 +44,6 @@ import mega.privacy.android.app.meeting.activity.MeetingActivity.Companion.MEETI
 import mega.privacy.android.app.meeting.adapter.Participant
 import mega.privacy.android.app.meeting.gateway.RTCAudioManagerGateway
 import mega.privacy.android.app.meeting.listeners.GroupVideoListener
-import mega.privacy.android.app.objects.PasscodeManagement
 import mega.privacy.android.app.presentation.mapper.GetStringFromStringResMapper
 import mega.privacy.android.app.presentation.meeting.model.InMeetingUiState
 import mega.privacy.android.app.presentation.meeting.model.ParticipantsChange
@@ -149,7 +148,6 @@ import kotlin.time.DurationUnit
  * @property rtcAudioManagerGateway             [RTCAudioManagerGateway]
  * @property setChatVideoInDeviceUseCase        [SetChatVideoInDeviceUseCase]
  * @property megaChatApiGateway                 [MegaChatApiGateway]
- * @property passcodeManagement                 [PasscodeManagement]
  * @property chatManagement                     [ChatManagement]
  * @property sendStatisticsMeetingsUseCase      [SendStatisticsMeetingsUseCase]
  * @property enableAudioLevelMonitorUseCase     [EnableAudioLevelMonitorUseCase]
@@ -187,7 +185,6 @@ class InMeetingViewModel @Inject constructor(
     private val rtcAudioManagerGateway: RTCAudioManagerGateway,
     private val setChatVideoInDeviceUseCase: SetChatVideoInDeviceUseCase,
     private val megaChatApiGateway: MegaChatApiGateway,
-    private val passcodeManagement: PasscodeManagement,
     private val chatManagement: ChatManagement,
     private val sendStatisticsMeetingsUseCase: SendStatisticsMeetingsUseCase,
     private val enableAudioLevelMonitorUseCase: EnableAudioLevelMonitorUseCase,

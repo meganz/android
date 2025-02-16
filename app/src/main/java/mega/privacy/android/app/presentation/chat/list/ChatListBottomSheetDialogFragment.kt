@@ -21,6 +21,7 @@ import dagger.hilt.android.AndroidEntryPoint
 import mega.privacy.android.analytics.Analytics
 import mega.privacy.android.app.MegaApplication
 import mega.privacy.android.app.R
+import mega.privacy.android.app.activities.PasscodeActivity
 import mega.privacy.android.app.main.megachat.GroupChatInfoActivity
 import mega.privacy.android.app.presentation.chat.dialog.view.ChatRoomItemBottomSheetView
 import mega.privacy.android.app.presentation.contactinfo.ContactInfoActivity
@@ -236,7 +237,10 @@ class ChatListBottomSheetDialogFragment : BottomSheetDialogFragment() {
     private fun getCallPermissionsRequest(): ActivityResultLauncher<Array<String>> =
         registerForActivityResult(ActivityResultContracts.RequestMultiplePermissions()) {
             if (checkMandatoryCallPermissions(requireActivity())) {
-                viewModel.startMeetingCall(chatId)
+                viewModel.startMeetingCall(
+                    chatId,
+                    (requireActivity() as PasscodeActivity).passcodeFacade::enablePassCode
+                )
             } else {
                 viewModel.updateSnackBar(
                     SnackBarItem(

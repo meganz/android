@@ -573,8 +573,6 @@ internal class FileContactListActivity : PasscodeActivity(), View.OnClickListene
     @SuppressLint("NotifyDataSetChanged")
     override fun onBackPressed() {
         Timber.d("onBackPressed")
-        val psaWebBrowser = psaWebBrowser
-        if (psaWebBrowser != null && psaWebBrowser.consumeBack()) return
         retryConnectionsAndSignalPresence()
 
         if (adapter?.positionClicked != -1) {

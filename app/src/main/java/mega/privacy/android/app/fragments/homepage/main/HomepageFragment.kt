@@ -232,7 +232,6 @@ class HomepageFragment : Fragment() {
 
         (activity as? ManagerActivity)?.apply {
             adjustTransferWidgetPositionInHomepage()
-            fetchPsa()
         }
 
         if (savedInstanceState?.getBoolean(START_SCREEN_DIALOG_SHOWN, false) == true) {

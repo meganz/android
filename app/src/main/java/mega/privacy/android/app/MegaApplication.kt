@@ -44,7 +44,6 @@ import mega.privacy.android.app.meeting.CallSoundType
 import mega.privacy.android.app.meeting.CallSoundsController
 import mega.privacy.android.app.meeting.gateway.RTCAudioManagerGateway
 import mega.privacy.android.app.meeting.listeners.MeetingListener
-import mega.privacy.android.app.objects.PasscodeManagement
 import mega.privacy.android.app.presentation.theme.ThemeModeState
 import mega.privacy.android.app.receivers.GlobalNetworkStateHandler
 import mega.privacy.android.app.usecase.call.MonitorCallSoundsUseCase
@@ -78,7 +77,6 @@ import javax.inject.Provider
  * @property getMiscFlagsUseCase
  * @property isUserLoggedInUseCase
  * @property myAccountInfo
- * @property passcodeManagement
  * @property crashReporter
  * @property updateCrashAndPerformanceReportersUseCase
  * @property monitorCallSoundsUseCase
@@ -130,9 +128,6 @@ class MegaApplication : MultiDexApplication(), DefaultLifecycleObserver,
 
     @Inject
     lateinit var myAccountInfo: MyAccountInfo
-
-    @Inject
-    lateinit var passcodeManagement: PasscodeManagement
 
     @Inject
     lateinit var crashReporter: CrashReporter

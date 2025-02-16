@@ -75,7 +75,6 @@ import mega.privacy.android.app.meeting.adapter.Participant
 import mega.privacy.android.app.meeting.gateway.RTCAudioManagerGateway
 import mega.privacy.android.app.meeting.listeners.BottomFloatingPanelListener
 import mega.privacy.android.app.meeting.pip.PictureInPictureCallFragment
-import mega.privacy.android.app.objects.PasscodeManagement
 import mega.privacy.android.app.presentation.chat.dialog.AddParticipantsNoContactsDialogFragment
 import mega.privacy.android.app.presentation.chat.dialog.AddParticipantsNoContactsLeftToAddDialogFragment
 import mega.privacy.android.app.presentation.meeting.CallRecordingViewModel
@@ -136,9 +135,6 @@ class InMeetingFragment : MeetingBaseFragment(), BottomFloatingPanelListener, Sn
     @Inject
     @MegaApi
     lateinit var megaApi: MegaApiAndroid
-
-    @Inject
-    lateinit var passcodeManagement: PasscodeManagement
 
     @Inject
     lateinit var rtcAudioManagerGateway: RTCAudioManagerGateway
@@ -3021,7 +3017,7 @@ class InMeetingFragment : MeetingBaseFragment(), BottomFloatingPanelListener, Sn
         sharedModel.startOrCreateMeeting(
             title = inMeetingViewModel.state.value.chatTitle,
             video = video,
-            audio = audio
+            audio = audio,
         )
     }
 

@@ -7,10 +7,13 @@ import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.flow
 import kotlinx.coroutines.test.runTest
 import mega.privacy.android.app.extensions.asHotFlow
+import mega.privacy.android.app.featuretoggle.AppFeatures
+import mega.privacy.android.app.presentation.psa.legacy.LegacyPsaGlobalState
 import mega.privacy.android.app.presentation.psa.mapper.PsaStateMapper
 import mega.privacy.android.app.presentation.psa.model.PsaState
 import mega.privacy.android.core.test.extension.CoroutineMainDispatcherExtension
 import mega.privacy.android.domain.entity.psa.Psa
+import mega.privacy.android.domain.usecase.featureflag.GetFeatureFlagValueUseCase
 import mega.privacy.android.domain.usecase.psa.DismissPsaUseCase
 import mega.privacy.android.domain.usecase.psa.FetchPsaUseCase
 import mega.privacy.android.domain.usecase.psa.MonitorPsaUseCase
@@ -63,13 +66,19 @@ class PsaViewModelTest {
     }
 
 
+    private val getFeatureFlagValueUseCase = mock<GetFeatureFlagValueUseCase> {
+        onBlocking { invoke(AppFeatures.NewPsaState) }.thenReturn(true)
+    }
+
     private fun initViewModel() {
         underTest = PsaViewModel(
             monitorPsaUseCase = monitorPsaUseCase,
             fetchPsaUseCase = fetchPsaUseCase,
             dismissPsaUseCase = dismissPsaUseCase,
             psaStateMapper = psaStateMapper,
-            currentTimeProvider = { 0 }
+            currentTimeProvider = { 0 },
+            legacyState = mock<LegacyPsaGlobalState>(),
+            getFeatureFlagValueUseCase = getFeatureFlagValueUseCase
         )
     }
 

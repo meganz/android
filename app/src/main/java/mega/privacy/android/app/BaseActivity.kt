@@ -53,12 +53,12 @@ import mega.privacy.android.app.meeting.activity.MeetingActivity
 import mega.privacy.android.app.myAccount.MyAccountActivity
 import mega.privacy.android.app.presentation.base.BaseViewModel
 import mega.privacy.android.app.presentation.billing.BillingViewModel
+import mega.privacy.android.app.presentation.container.AppContainerWrapper
 import mega.privacy.android.app.presentation.locale.SupportedLanguageContextWrapper
 import mega.privacy.android.app.presentation.login.LoginActivity
 import mega.privacy.android.app.presentation.transfers.TransfersManagementViewModel
 import mega.privacy.android.app.presentation.verification.SMSVerificationActivity
 import mega.privacy.android.app.presentation.weakaccountprotection.WeakAccountProtectionAlertActivity
-import mega.privacy.android.app.psa.PsaWebBrowser
 import mega.privacy.android.app.service.iar.RatingHandlerImpl
 import mega.privacy.android.app.snackbarListeners.SnackbarNavigateOption
 import mega.privacy.android.app.usecase.exception.NotEnoughQuotaMegaException
@@ -101,14 +101,12 @@ import mega.privacy.android.domain.entity.account.AccountBlockedType
 import mega.privacy.android.domain.entity.account.Skus
 import mega.privacy.android.domain.entity.billing.BillingEvent
 import mega.privacy.android.domain.entity.billing.MegaPurchase
-import mega.privacy.android.domain.entity.psa.Psa
 import mega.privacy.android.domain.exception.node.ForeignNodeException
 import mega.privacy.android.domain.usecase.GetAccountDetailsUseCase
 import mega.privacy.android.domain.usecase.MonitorChatSignalPresenceUseCase
 import mega.privacy.android.domain.usecase.ResetSdkLoggerUseCase
 import mega.privacy.android.domain.usecase.login.GetAccountCredentialsUseCase
 import mega.privacy.android.domain.usecase.login.SaveAccountCredentialsUseCase
-import mega.privacy.android.domain.usecase.psa.FetchPsaUseCase
 import mega.privacy.android.domain.usecase.setting.MonitorCookieSettingsSavedUseCase
 import mega.privacy.android.domain.usecase.transfers.overquota.MonitorTransferOverQuotaUseCase
 import mega.privacy.android.domain.usecase.transfers.paused.PauseTransfersQueueUseCase
@@ -137,7 +135,6 @@ import kotlin.time.Duration.Companion.seconds
  * @property getAccountDetailsUseCase
  * @property billingViewModel
  * @property monitorTransferOverQuotaUseCase
- * @property fetchPsaUseCase
  * @property pauseTransfersQueueUseCase
  */
 @AndroidEntryPoint
@@ -174,9 +171,6 @@ abstract class BaseActivity : AppCompatActivity(), ActivityLauncher, PermissionR
     lateinit var monitorCookieSettingsSavedUseCase: MonitorCookieSettingsSavedUseCase
 
     @Inject
-    lateinit var fetchPsaUseCase: FetchPsaUseCase
-
-    @Inject
     lateinit var getAccountCredentialsUseCase: GetAccountCredentialsUseCase
 
     @Inject
@@ -191,6 +185,12 @@ abstract class BaseActivity : AppCompatActivity(), ActivityLauncher, PermissionR
 
     @Inject
     lateinit var pauseTransfersQueueUseCase: PauseTransfersQueueUseCase
+
+    /**
+     * Psa handler
+     */
+    @Inject
+    lateinit var appContainerWrapper: AppContainerWrapper
 
     private val billingViewModel by viewModels<BillingViewModel>()
     private val viewModel by viewModels<BaseViewModel>()
@@ -210,7 +210,6 @@ abstract class BaseActivity : AppCompatActivity(), ActivityLauncher, PermissionR
     private var activeSubscriptionSku: String? = null
     private var expiredBusinessAlert: AlertDialog? = null
     private var isExpiredBusinessAlertShown = false
-    private var psaWebBrowserContainer: FrameLayout? = null
     private val uiHandler = Handler(Looper.getMainLooper())
 
     protected val outMetrics: DisplayMetrics by lazy { resources.displayMetrics }
@@ -235,16 +234,6 @@ abstract class BaseActivity : AppCompatActivity(), ActivityLauncher, PermissionR
         private set
 
     /**
-     * Load the psa in the web browser fragment if the psa is a web one and this activity
-     * is on the top of the task stack
-     */
-    open fun handlePsa(psa: Psa) {
-        if (psa.url != null && Util.isTopActivity(javaClass.name, this)) {
-            loadPsaInWebBrowser(psa)
-        }
-    }
-
-    /**
      * Checks if the current activity is in background.
      *
      * @return True if the current activity is in background, false otherwise.
@@ -259,13 +248,6 @@ abstract class BaseActivity : AppCompatActivity(), ActivityLauncher, PermissionR
      */
     protected val isActivityInForeground: Boolean
         get() = !isActivityInBackground
-
-    /**
-     * Every sub-class activity has an embedded PsaWebBrowser fragment, either visible or invisible.
-     * In order to show the newly retrieved PSA at any occasion
-     */
-    protected val psaWebBrowser: PsaWebBrowser?
-        get() = supportFragmentManager.findFragmentById(R.id.psa_web_browser_container) as? PsaWebBrowser
 
     /**
      * Broadcast receiver to manage a possible SSL verification error.
@@ -417,10 +399,6 @@ abstract class BaseActivity : AppCompatActivity(), ActivityLauncher, PermissionR
             }
         }
 
-        // Add an invisible full screen Psa web browser container to the activity.
-        addPsaWebBrowser()
-
-
         if (shouldSetStatusBarTextColor()) {
             setStatusBarTextColor(this)
         }
@@ -434,44 +412,6 @@ abstract class BaseActivity : AppCompatActivity(), ActivityLauncher, PermissionR
      */
     protected open fun shouldSetStatusBarTextColor(): Boolean = true
 
-    /**
-     * Create a fragment container and the web browser fragment, add them to the activity
-     */
-    private fun addPsaWebBrowser() {
-        // Execute after the sub-class activity finish its setContentView()
-        uiHandler.post {
-            psaWebBrowserContainer = FrameLayout(this@BaseActivity)
-            (psaWebBrowserContainer ?: return@post).id = R.id.psa_web_browser_container
-
-            findViewById<ViewGroup>(android.R.id.content)
-                .addView(
-                    psaWebBrowserContainer,
-                    ViewGroup.LayoutParams(
-                        ViewGroup.LayoutParams.MATCH_PARENT,
-                        ViewGroup.LayoutParams.MATCH_PARENT
-                    )
-                )
-        }
-    }
-
-    /**
-     * Add fragment and Display the new url PSA in the web browser
-     *
-     * @param psa the psa to display
-     */
-    private fun loadPsaInWebBrowser(psa: Psa) {
-        if (psaWebBrowserContainer == null || psa.url.isNullOrEmpty()) return
-        // Don't put the fragment to the back stack. Since pressing back key just hide it,
-        // never pop it up. onBackPressed() will let PSA browser to consume the back
-        // key event anyway
-        supportFragmentManager
-            .beginTransaction()
-            .replace(
-                R.id.psa_web_browser_container,
-                PsaWebBrowser.newInstance(psa.url.orEmpty(), psa.id)
-            )
-            .commitAllowingStateLoss()
-    }
 
     override fun onSaveInstanceState(outState: Bundle) {
         outState.apply {
@@ -497,21 +437,6 @@ abstract class BaseActivity : AppCompatActivity(), ActivityLauncher, PermissionR
         Util.setAppFontSize(this)
         isActivityInBackground = false
         retryConnectionsAndSignalPresence()
-        fetchPsa()
-    }
-
-    /**
-     * Fetch psa
-     *
-     */
-    fun fetchPsa() {
-        lifecycleScope.launch {
-            kotlin.runCatching { fetchPsaUseCase(System.currentTimeMillis()) }
-                .onFailure { Timber.e(it) }
-                .getOrNull()?.let {
-                    handlePsa(it)
-                }
-        }
     }
 
     override fun attachBaseContext(newBase: Context?) {

@@ -137,6 +137,7 @@ class FileInfoActivity : BaseActivity() {
     @OptIn(ExperimentalComposeUiApi::class)
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
+        appContainerWrapper.setPasscodeCheck(passCodeFacade)
         enableEdgeToEdge()
         viewModel.setNode(readExtrasAndGetHandle() ?: run {
             finish()

@@ -103,9 +103,6 @@ class ScheduledMeetingInfoActivity : PasscodeActivity(), SnackbarShower {
     lateinit var navigator: MegaNavigator
 
     @Inject
-    lateinit var passCodeFacade: PasscodeCheck
-
-    @Inject
     lateinit var getThemeMode: GetThemeMode
 
     private val viewModel by viewModels<ScheduledMeetingInfoViewModel>()
@@ -163,7 +160,7 @@ class ScheduledMeetingInfoActivity : PasscodeActivity(), SnackbarShower {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         enableEdgeToEdge()
-
+        appContainerWrapper.setPasscodeCheck(passcodeFacade)
         collectFlows()
 
         val chatId = intent.getLongExtra(CHAT_ID, -1L)
@@ -500,7 +497,7 @@ class ScheduledMeetingInfoActivity : PasscodeActivity(), SnackbarShower {
     private fun launchCallScreen() {
         val chatId = waitingRoomManagementViewModel.state.value.chatId
         MegaApplication.getInstance().openCallService(chatId)
-        passcodeManagement.showPasscodeScreen = true
+        passcodeFacade.enablePassCode()
 
         val intent = Intent(this@ScheduledMeetingInfoActivity, MeetingActivity::class.java).apply {
             addFlags(Intent.FLAG_ACTIVITY_NEW_TASK)

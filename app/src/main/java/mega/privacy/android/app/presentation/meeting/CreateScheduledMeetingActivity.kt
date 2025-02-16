@@ -101,6 +101,7 @@ class CreateScheduledMeetingActivity : PasscodeActivity(), SnackbarShower {
      */
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
+        appContainerWrapper.setPasscodeCheck(passCodeFacade)
         enableEdgeToEdge()
 
         collectFlows()

@@ -7,6 +7,7 @@ import androidx.appcompat.app.AppCompatActivity
 import dagger.hilt.android.AndroidEntryPoint
 import mega.privacy.android.app.R
 import mega.privacy.android.app.extensions.enableEdgeToEdgeAndConsumeInsets
+import mega.privacy.android.app.presentation.container.AppContainerWrapper
 import mega.privacy.android.app.presentation.security.PasscodeCheck
 import javax.inject.Inject
 
@@ -17,10 +18,14 @@ import javax.inject.Inject
 class SettingsChatImageQualityActivity : AppCompatActivity() {
 
     @Inject
+    lateinit var appContainerWrapper: AppContainerWrapper
+
+    @Inject
     lateinit var passCodeFacade: PasscodeCheck
 
     @SuppressLint("CommitTransaction")
     override fun onCreate(savedInstanceState: Bundle?) {
+        appContainerWrapper.setPasscodeCheck(passCodeFacade)
         enableEdgeToEdgeAndConsumeInsets()
         super.onCreate(savedInstanceState)
         setContentView(R.layout.settings_activity)

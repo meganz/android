@@ -4,8 +4,8 @@ import dagger.Binds
 import dagger.Module
 import dagger.hilt.InstallIn
 import dagger.hilt.android.components.ActivityComponent
-import mega.privacy.android.app.presentation.psa.legacy.LegacyPsaHandler
-import mega.privacy.android.app.presentation.psa.legacy.PsaHandler
+import mega.privacy.android.app.presentation.container.AppContainerWrapper
+import mega.privacy.android.app.presentation.psa.legacy.ActivityAppContainerWrapper
 import mega.privacy.android.app.presentation.security.PasscodeCheck
 import mega.privacy.android.app.presentation.security.PasscodeFacade
 
@@ -27,11 +27,12 @@ abstract class ActivityModule {
     abstract fun bindPasscodeCheck(implementation: PasscodeFacade): PasscodeCheck
 
     /**
-     * Bind psa handler
+     * Bind app container wrapper
      *
      * @param implementation
      */
     @Binds
-    abstract fun bindPsaHandler(implementation: LegacyPsaHandler): PsaHandler
+    abstract fun bindAppContainerWrapper(implementation: ActivityAppContainerWrapper): AppContainerWrapper
+
 
 }

@@ -13,14 +13,18 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Alignment
+import androidx.compose.ui.ExperimentalComposeUiApi
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.shadow
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.semantics.semantics
+import androidx.compose.ui.semantics.testTagsAsResourceId
 import androidx.compose.ui.tooling.preview.PreviewParameter
 import androidx.compose.ui.tooling.preview.PreviewParameterProvider
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
+import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.launch
 import mega.privacy.android.app.activities.WebViewActivity
 import mega.privacy.android.app.presentation.psa.model.PsaState
@@ -47,11 +51,48 @@ fun PsaContainer(
     val context = LocalContext.current
     val coroutineScope = rememberCoroutineScope()
 
-    Box {
+    PsaContentView(
+        content = content,
+        state = state,
+        coroutineScope = coroutineScope,
+        navigateToPsaPage = navigateToPsaPage,
+        context = context,
+        markAsSeen = viewModel::markAsSeen
+    )
+}
+
+/**
+ * Psa content view
+ *
+ * @param context
+ * @param state
+ * @param coroutineScope
+ * @param markAsSeen
+ * @param containerModifier - Workaround for legacy screens
+ * @param innerModifier - Workaround for legacy screens
+ * @param navigateToPsaPage
+ * @param content
+ */
+@OptIn(ExperimentalComposeUiApi::class)
+@Composable
+internal fun PsaContentView(
+    context: Context,
+    state: PsaState,
+    coroutineScope: CoroutineScope,
+    markAsSeen: (Int) -> Unit,
+    containerModifier: Modifier = Modifier,
+    innerModifier: (Modifier) -> Modifier = { it },
+    navigateToPsaPage: (Context, String) -> Unit = ::navigateToWebView,
+    content: @Composable () -> Unit,
+) {
+    Box(modifier = Modifier.semantics {
+        testTagsAsResourceId = true
+    }
+    ) {
         content()
-        PsaContainerContent(
+        PsaStateView(
             state = state,
-            markAsSeen = viewModel::markAsSeen,
+            markAsSeen = markAsSeen,
             navigateToPsaPage = { url ->
                 coroutineScope.launch {
                     navigateToPsaPage(
@@ -60,15 +101,20 @@ fun PsaContainer(
                     )
                 }
             },
+            containerModifier = containerModifier,
+            innerModifier = innerModifier,
         )
     }
 }
 
+
 @Composable
-internal fun PsaContainerContent(
+internal fun PsaStateView(
     state: PsaState,
     markAsSeen: (Int) -> Unit,
     navigateToPsaPage: (String) -> Unit,
+    containerModifier: Modifier,
+    innerModifier: (Modifier) -> Modifier,
 ) {
     when (state) {
         is PsaState.NoPsa -> {}
@@ -81,7 +127,8 @@ internal fun PsaContainerContent(
         }
 
         is PsaState.StandardPsa -> {
-            NestedPsaView { modifier: Modifier ->
+            NestedPsaView(containerModifier) { modifier: Modifier ->
+                val psaModifier = innerModifier(modifier)
                 PsaView(
                     title = state.title,
                     text = state.text,
@@ -92,19 +139,20 @@ internal fun PsaContainerContent(
                         markAsSeen(state.id)
                     },
                     onDismiss = { markAsSeen(state.id) },
-                    modifier = modifier
+                    modifier = psaModifier
                 )
             }
         }
 
         is PsaState.InfoPsa -> {
-            NestedPsaView { modifier: Modifier ->
+            NestedPsaView(containerModifier) { modifier: Modifier ->
+                val psaModifier = innerModifier(modifier)
                 InfoPsaView(
                     title = state.title,
                     text = state.text,
                     imageUrl = state.imageUrl,
                     onDismiss = { markAsSeen(state.id) },
-                    modifier = modifier,
+                    modifier = psaModifier,
                 )
             }
         }
@@ -113,11 +161,12 @@ internal fun PsaContainerContent(
 
 @Composable
 private fun NestedPsaView(
+    containerModifier: Modifier,
     psaView: @Composable (Modifier) -> Unit,
 ) {
     Box(Modifier.fillMaxSize()) {
         MegaBottomSheetContainer(
-            modifier = Modifier
+            modifier = containerModifier
                 .shadow(6.dp)
                 .align(Alignment.BottomCenter)
                 .fillMaxWidth(),
@@ -141,10 +190,12 @@ private fun navigateToWebView(context: Context, psaUrl: String) {
 @Composable
 private fun PsaContainerPreview(@PreviewParameter(PsaStatePreviewParameterProvider::class) psaState: PsaState) {
     OriginalTheme(isDark = isSystemInDarkTheme()) {
-        PsaContainerContent(
+        PsaStateView(
             state = psaState,
             markAsSeen = {},
             navigateToPsaPage = {},
+            containerModifier = Modifier,
+            innerModifier = { it },
         )
 
     }

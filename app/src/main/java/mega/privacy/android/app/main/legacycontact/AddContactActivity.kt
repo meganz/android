@@ -1,5 +1,7 @@
 package mega.privacy.android.app.main.legacycontact
 
+import mega.privacy.android.icon.pack.R as iconPackR
+import mega.privacy.android.shared.resources.R as sharedR
 import android.Manifest
 import android.annotation.SuppressLint
 import android.content.DialogInterface
@@ -98,8 +100,6 @@ import nz.mega.sdk.MegaUser
 import nz.mega.sdk.MegaUserAlert
 import timber.log.Timber
 import javax.inject.Inject
-import mega.privacy.android.shared.resources.R as sharedR
-import mega.privacy.android.icon.pack.R as iconPackR
 
 /**
  * Add contact activity
@@ -2572,8 +2572,6 @@ class AddContactActivity : PasscodeActivity(), View.OnClickListener,
     }
 
     override fun onBackPressed() {
-        val psaWebBrowser = psaWebBrowser
-        if (psaWebBrowser != null && psaWebBrowser.consumeBack()) return
         retryConnectionsAndSignalPresence()
 
         if (onNewGroup) {

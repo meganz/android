@@ -18,12 +18,10 @@ import androidx.appcompat.app.AppCompatDelegate
 import androidx.compose.ui.platform.ViewCompositionStrategy
 import androidx.core.app.NotificationManagerCompat
 import androidx.core.view.isVisible
-import androidx.lifecycle.lifecycleScope
 import androidx.navigation.NavController
 import androidx.navigation.NavGraph
 import androidx.navigation.fragment.NavHostFragment
 import dagger.hilt.android.AndroidEntryPoint
-import kotlinx.coroutines.launch
 import mega.privacy.android.app.MegaApplication
 import mega.privacy.android.app.R
 import mega.privacy.android.app.activities.PasscodeActivity
@@ -50,7 +48,6 @@ import mega.privacy.android.app.presentation.meeting.view.dialog.CallRecordingCo
 import mega.privacy.android.app.presentation.meeting.view.dialog.DenyEntryToCallDialog
 import mega.privacy.android.app.presentation.meeting.view.dialog.UsersInWaitingRoomDialog
 import mega.privacy.android.app.utils.Constants
-import mega.privacy.android.app.utils.Constants.REQUIRE_PASSCODE_INVALID
 import mega.privacy.android.app.utils.ScheduledMeetingDateUtil.getAppropriateStringForScheduledMeetingDate
 import mega.privacy.android.domain.entity.chat.ChatScheduledMeeting
 import mega.privacy.android.domain.entity.meeting.ParticipantsSection
@@ -123,7 +120,6 @@ class MeetingActivity : PasscodeActivity() {
     private var meetingAction: String? = null
 
     private var isGuest = false
-    private var isLockingEnabled = false
 
     private var navController: NavController? = null
     private var navGraph: NavGraph? = null
@@ -326,7 +322,7 @@ class MeetingActivity : PasscodeActivity() {
         collectFlow(meetingViewModel.switchCall) { chatId ->
             if (chatId != MEGACHAT_INVALID_HANDLE && meetingViewModel.state.value.chatId != chatId) {
                 Timber.d("Switch call")
-                passcodeManagement.showPasscodeScreen = true
+                passcodeFacade.enablePassCode()
                 MegaApplication.getInstance().openCallService(chatId)
                 startActivity(getIntentOngoingCall(this@MeetingActivity, chatId))
             }
@@ -638,25 +634,10 @@ class MeetingActivity : PasscodeActivity() {
         }
     }
 
-    override fun onPause() {
-        super.onPause()
-        lifecycleScope.launch {
-            val timeRequired = passcodeUtil.timeRequiredForPasscode()
-            if (timeRequired != REQUIRE_PASSCODE_INVALID) {
-                if (isLockingEnabled) {
-                    passcodeManagement.lastPause = System.currentTimeMillis() - timeRequired
-                } else {
-                    passcodeUtil.pauseUpdate()
-                }
-            }
-        }
-    }
 
     override fun onResume() {
         super.onResume()
-        lifecycleScope.launch {
-            isLockingEnabled = passcodeUtil.shouldLock(false)
-        }
+        passcodeFacade.disablePasscode()
 
         @Suppress("DEPRECATION")
         window.decorView.systemUiVisibility = View.SYSTEM_UI_FLAG_LAYOUT_STABLE or 0x00000010

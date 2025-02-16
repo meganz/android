@@ -41,6 +41,7 @@ internal fun NavGraphBuilder.chatScreen(
     navigateToConversation: (Long) -> Unit,
     onBackPress: () -> Unit,
     navigateToStorageSettings: () -> Unit,
+    enablePasscodeCheck: () -> Unit,
 ) {
     composable(
         route = ConversationRoute
@@ -55,7 +56,7 @@ internal fun NavGraphBuilder.chatScreen(
             onBackPressed = onBackPress,
             scaffoldState = scaffoldState,
             onMenuActionPressed = viewModel::handleActionPress,
-            enablePasscodeCheck = viewModel::enablePasscodeCheck,
+            enablePasscodeCheck = enablePasscodeCheck,
             inviteContactsToChat = viewModel::inviteContactsToChat,
             onInfoToShowConsumed = viewModel::onInfoToShowEventConsumed,
             archiveChat = viewModel::archiveChat,

@@ -28,7 +28,6 @@ import mega.privacy.android.app.main.dialog.removelink.RemovePublicLinkResultMap
 import mega.privacy.android.app.main.dialog.shares.RemoveShareResultMapper
 import mega.privacy.android.app.meeting.gateway.RTCAudioManagerGateway
 import mega.privacy.android.app.middlelayer.scanner.ScannerHandler
-import mega.privacy.android.app.objects.PasscodeManagement
 import mega.privacy.android.app.presentation.documentscanner.model.DocumentScanningError
 import mega.privacy.android.app.presentation.extensions.getState
 import mega.privacy.android.app.presentation.manager.model.ManagerState
@@ -187,7 +186,6 @@ import javax.inject.Inject
  * @property setChatVideoInDeviceUseCase Use case for setting chat video in device.
  * @property rtcAudioManagerGateway Gateway for RTC audio manager.
  * @property chatManagement Management for chat.
- * @property passcodeManagement Management for passcode.
  * @property monitorSyncStalledIssuesUseCase Use case for monitoring sync stalled issues.
  * @property monitorSyncsUseCase Use case for monitoring syncs.
  * @property monitorChatSessionUpdatesUseCase Use case for monitoring chat session updates.
@@ -258,7 +256,6 @@ class ManagerViewModel @Inject constructor(
     private val setChatVideoInDeviceUseCase: SetChatVideoInDeviceUseCase,
     private val rtcAudioManagerGateway: RTCAudioManagerGateway,
     private val chatManagement: ChatManagement,
-    private val passcodeManagement: PasscodeManagement,
     private val monitorSyncStalledIssuesUseCase: MonitorSyncStalledIssuesUseCase,
     private val monitorSyncsUseCase: MonitorSyncsUseCase,
     private val monitorChatSessionUpdatesUseCase: MonitorChatSessionUpdatesUseCase,
@@ -1320,7 +1317,6 @@ class ManagerViewModel @Inject constructor(
             MegaApplication.getInstance().applicationContext,
             call.chatId,
             true,
-            passcodeManagement,
         )
     }
 

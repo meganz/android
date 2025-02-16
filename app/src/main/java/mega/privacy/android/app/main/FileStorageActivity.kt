@@ -550,8 +550,6 @@ class FileStorageActivity : PasscodeActivity(), Scrollable {
      * onBackPressed
      */
     override fun onBackPressed() {
-        val psaWebBrowser = psaWebBrowser
-        if (psaWebBrowser != null && psaWebBrowser.consumeBack()) return
         retryConnectionsAndSignalPresence()
         // Finish activity if at the root
         if (path == root) {

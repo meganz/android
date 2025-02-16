@@ -236,6 +236,7 @@ class PdfViewerActivity : BaseActivity(), MegaGlobalListenerInterface, OnPageCha
     public override fun onCreate(savedInstanceState: Bundle?) {
         Timber.d("onCreate")
         enableEdgeToEdgeAndConsumeInsets()
+        appContainerWrapper.setPasscodeCheck(passCodeFacade)
         super.onCreate(savedInstanceState)
         if (intent == null) {
             Timber.w("Intent null")

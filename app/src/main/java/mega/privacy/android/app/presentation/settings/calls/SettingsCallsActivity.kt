@@ -10,6 +10,7 @@ import kotlinx.coroutines.launch
 import mega.privacy.android.app.R
 import mega.privacy.android.app.extensions.enableEdgeToEdgeAndConsumeInsets
 import mega.privacy.android.app.featuretoggle.AppFeatures
+import mega.privacy.android.app.presentation.container.AppContainerWrapper
 import mega.privacy.android.app.presentation.security.PasscodeCheck
 import mega.privacy.android.domain.usecase.featureflag.GetFeatureFlagValueUseCase
 import mega.privacy.android.feature.chat.settings.calls.CallSettingsFragment
@@ -22,6 +23,9 @@ import javax.inject.Inject
 class SettingsCallsActivity : AppCompatActivity() {
 
     @Inject
+    lateinit var appContainerWrapper: AppContainerWrapper
+
+    @Inject
     lateinit var passCodeFacade: PasscodeCheck
 
     @Inject
@@ -29,6 +33,7 @@ class SettingsCallsActivity : AppCompatActivity() {
 
     @SuppressLint("CommitTransaction")
     override fun onCreate(savedInstanceState: Bundle?) {
+        appContainerWrapper.setPasscodeCheck(passCodeFacade)
         enableEdgeToEdgeAndConsumeInsets()
         super.onCreate(savedInstanceState)
         setContentView(R.layout.settings_activity)

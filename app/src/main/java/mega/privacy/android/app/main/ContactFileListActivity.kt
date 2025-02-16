@@ -813,7 +813,6 @@ internal class ContactFileListActivity : PasscodeActivity(), MegaGlobalListenerI
     }
 
     override fun onBackPressed() {
-        if (psaWebBrowser?.consumeBack() == true) return
         retryConnectionsAndSignalPresence()
         if (contactFileListFragment?.onBackPressed() == 0) {
             super.onBackPressed()

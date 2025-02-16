@@ -647,7 +647,6 @@ class OpenLinkActivity : PasscodeActivity(), MegaRequestListenerInterface,
             meetingName,
             chatId,
             url,
-            passcodeManagement,
             chatRequestHandler,
             isWaitingRoom
         )
@@ -794,7 +793,6 @@ class OpenLinkActivity : PasscodeActivity(), MegaRequestListenerInterface,
                 showConfirmationInACall(
                     this,
                     getString(R.string.text_join_call),
-                    passcodeManagement
                 )
             } else {
                 when {

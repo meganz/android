@@ -19,7 +19,6 @@ import android.os.Bundle
 import android.os.Environment
 import android.os.Handler
 import android.os.Looper
-import android.text.TextUtils
 import android.view.Display
 import android.view.Gravity
 import android.view.LayoutInflater
@@ -295,7 +294,6 @@ import mega.privacy.android.domain.entity.node.NodeNameCollisionType
 import mega.privacy.android.domain.entity.node.NodeNameCollisionsResult
 import mega.privacy.android.domain.entity.node.NodeSourceType
 import mega.privacy.android.domain.entity.node.RestoreNodeResult
-import mega.privacy.android.domain.entity.psa.Psa
 import mega.privacy.android.domain.entity.sync.SyncType
 import mega.privacy.android.domain.entity.transfer.CompletedTransfer
 import mega.privacy.android.domain.exception.MegaException
@@ -606,7 +604,7 @@ class ManagerActivity : PasscodeActivity(), NavigationView.OnNavigationItemSelec
     private var initFabButtonShow = false
 
     private var bottomSheetDialogFragment: BottomSheetDialogFragment? = null
-    private var psaViewHolder: PsaViewHolder? = null
+    var psaViewHolder: PsaViewHolder? = null
 
     // end for Meeting
     private var backupHandleList: ArrayList<Long>? = null
@@ -2073,7 +2071,7 @@ class ManagerActivity : PasscodeActivity(), NavigationView.OnNavigationItemSelec
     private fun launchCallScreen() {
         val chatId = waitingRoomManagementViewModel.state.value.chatId
         MegaApplication.getInstance().openCallService(chatId)
-        passcodeManagement.showPasscodeScreen = true
+        passcodeFacade.enablePassCode()
 
         val intent = Intent(this, MeetingActivity::class.java).apply {
             addFlags(Intent.FLAG_ACTIVITY_NEW_TASK)
@@ -3048,33 +3046,6 @@ class ManagerActivity : PasscodeActivity(), NavigationView.OnNavigationItemSelec
         Timber.d("Should force refresh contact database after logging in for the first time - $firstTimeAfterInstallation")
         userInfoViewModel.refreshContactDatabase(firstTimeAfterInstallation)
         cookieDialogHandler.showDialogIfNeeded(this)
-    }
-
-
-    override fun handlePsa(psa: Psa) {
-        super.handlePsa(psa)
-        if (psa.url.isNullOrEmpty()) {
-            showPsa(psa)
-        }
-    }
-
-    /**
-     * Show PSA view for old PSA type.
-     *
-     * @param psa the PSA to show
-     */
-    private fun showPsa(psa: Psa?) {
-        if (psa == null || drawerItem !== DrawerItem.HOMEPAGE || homepageScreen !== HomepageScreen.HOMEPAGE) {
-            updateHomepageFabPosition()
-            return
-        }
-        if (lifecycle.currentState == Lifecycle.State.RESUMED && TextUtils.isEmpty(
-                psa.url
-            )
-        ) {
-            psaViewHolder?.bind(psa)
-            handler.post { updateHomepageFabPosition() }
-        }
     }
 
     fun setToolbarTitle(title: String?) {
@@ -4694,7 +4665,7 @@ class ManagerActivity : PasscodeActivity(), NavigationView.OnNavigationItemSelec
      * Method to return to an ongoing call
      */
     fun returnCall() {
-        CallUtil.returnActiveCall(this, passcodeManagement)
+        CallUtil.returnActiveCall(this)
     }
 
     private fun checkBeforeOpeningQR(openScanQR: Boolean) {
@@ -4983,10 +4954,9 @@ class ManagerActivity : PasscodeActivity(), NavigationView.OnNavigationItemSelec
     }
 
     /**
-     * Update the PSA view visibility. It should only visible in root homepage tab.
+     * Update the PSA view visibility.
      */
     private fun updatePsaViewVisibility() {
-        psaViewHolder?.toggleVisible(isInMainHomePage)
         if (psaViewHolder?.visible() == true) {
             handler.post { updateHomepageFabPosition() }
         } else {
@@ -5479,7 +5449,6 @@ class ManagerActivity : PasscodeActivity(), NavigationView.OnNavigationItemSelec
             CallUtil.showConfirmationInACall(
                 this,
                 getString(R.string.text_join_call),
-                passcodeManagement
             )
         } else {
             showOpenLinkDialog(isJoinMeeting = true)
@@ -6990,7 +6959,9 @@ class ManagerActivity : PasscodeActivity(), NavigationView.OnNavigationItemSelec
                     }.onSuccess { chatRoom ->
                         chatRoom?.let {
                             if (chatRoom.isMeeting && chatRoom.isWaitingRoom && chatRoom.ownPrivilege == ChatRoomPermission.Moderator) {
-                                viewModel.startOrAnswerMeetingWithWaitingRoomAsHost(chatId = chatLinkContent.chatHandle)
+                                viewModel.startOrAnswerMeetingWithWaitingRoomAsHost(
+                                    chatId = chatLinkContent.chatHandle,
+                                )
                             } else {
                                 CallUtil.joinMeetingOrReturnCall(
                                     applicationContext,
@@ -6999,7 +6970,6 @@ class ManagerActivity : PasscodeActivity(), NavigationView.OnNavigationItemSelec
                                     chatLinkContent.text,
                                     chatLinkContent.exist,
                                     chatLinkContent.userHandle,
-                                    passcodeManagement,
                                     chatLinkContent.isWaitingRoom,
                                 )
                             }
@@ -7019,7 +6989,6 @@ class ManagerActivity : PasscodeActivity(), NavigationView.OnNavigationItemSelec
                     CallUtil.showConfirmationInACall(
                         this,
                         getString(R.string.text_join_call),
-                        passcodeManagement
                     )
                 }
 

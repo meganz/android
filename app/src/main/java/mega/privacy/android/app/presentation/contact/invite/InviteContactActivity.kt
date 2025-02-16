@@ -26,8 +26,6 @@ class InviteContactActivity : BaseActivity() {
         onBackPressedDispatcher.addCallback(object : OnBackPressedCallback(true) {
             override fun handleOnBackPressed() {
                 Timber.d("onBackPressed")
-                val psaWebBrowser = psaWebBrowser
-                if (psaWebBrowser != null && psaWebBrowser.consumeBack()) return
                 finish()
             }
         })

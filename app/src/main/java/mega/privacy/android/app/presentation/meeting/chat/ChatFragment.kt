@@ -7,7 +7,10 @@ import android.view.ViewGroup
 import androidx.compose.foundation.layout.navigationBarsPadding
 import androidx.compose.material.rememberScaffoldState
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.ComposeView
 import androidx.compose.ui.platform.ViewCompositionStrategy
@@ -74,11 +77,14 @@ internal class ChatFragment : Fragment() {
 
         setContent {
             val mode by getThemeMode().collectAsStateWithLifecycle(initialValue = ThemeMode.System)
+            var passcodeEnabled by remember { mutableStateOf(true) }
+
             SessionContainer {
                 ChatSessionContainer {
                     OriginalTheme(isDark = mode.isDarkMode()) {
                         PasscodeContainer(
                             passcodeCryptObjectFactory = passcodeCryptObjectFactory,
+                            canLock = { passcodeEnabled },
                             content = {
                                 PsaContainer {
                                     val bottomSheetNavigator = rememberBottomSheetNavigator()
@@ -116,8 +122,8 @@ internal class ChatFragment : Fragment() {
                                         }
 
                                         chatViewNavigationGraph(
-                                            navController = navHostController,
                                             bottomSheetNavigator = bottomSheetNavigator,
+                                            navController = navHostController,
                                             scaffoldState = scaffoldState,
                                             startMeeting = {
                                                 startMeetingActivity(
@@ -172,7 +178,8 @@ internal class ChatFragment : Fragment() {
                                                     requireActivity(),
                                                     StorageTargetPreference
                                                 )
-                                            }
+                                            },
+                                            enablePasscodeCheck = { passcodeEnabled = true }
                                         )
                                     }
                                 }

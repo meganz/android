@@ -30,7 +30,6 @@ import mega.privacy.android.app.featuretoggle.ApiFeatures
 import mega.privacy.android.app.meeting.gateway.RTCAudioManagerGateway
 import mega.privacy.android.app.middlelayer.scanner.ScannerHandler
 import mega.privacy.android.app.objects.GifData
-import mega.privacy.android.app.objects.PasscodeManagement
 import mega.privacy.android.app.presentation.documentscanner.model.DocumentScanningError
 import mega.privacy.android.app.presentation.meeting.chat.mapper.ForwardMessagesResultMapper
 import mega.privacy.android.app.presentation.meeting.chat.mapper.InviteParticipantResultMapper
@@ -248,7 +247,6 @@ internal class ChatViewModelTest {
     private val monitorHasAnyContactUseCase = mock<MonitorHasAnyContactUseCase> {
         onBlocking { invoke() } doReturn emptyFlow()
     }
-    private val passcodeManagement: PasscodeManagement = mock()
     private val getCustomSubtitleListUseCase = mock<GetCustomSubtitleListUseCase>()
 
     private val monitorAllContactParticipantsInChatUseCase: MonitorAllContactParticipantsInChatUseCase =
@@ -335,7 +333,6 @@ internal class ChatViewModelTest {
             getMyUserHandleUseCase,
             getParticipantFirstNameUseCase,
             getScheduledMeetingByChatUseCase,
-            passcodeManagement,
             getCustomSubtitleListUseCase,
             inviteToChatUseCase,
             inviteParticipantResultMapper,
@@ -451,7 +448,6 @@ internal class ChatViewModelTest {
             getMyUserHandleUseCase = getMyUserHandleUseCase,
             getScheduledMeetingByChatUseCase = getScheduledMeetingByChatUseCase,
             monitorHasAnyContactUseCase = monitorHasAnyContactUseCase,
-            passcodeManagement = passcodeManagement,
             getCustomSubtitleListUseCase = getCustomSubtitleListUseCase,
             savedStateHandle = savedStateHandle,
             monitorAllContactParticipantsInChatUseCase = monitorAllContactParticipantsInChatUseCase,
@@ -1487,14 +1483,6 @@ internal class ChatViewModelTest {
     }
 
     @Test
-    fun `test that enable passcode check enables the passcode check`() =
-        runTest {
-            underTest.enablePasscodeCheck()
-            verify(passcodeManagement).showPasscodeScreen = true
-        }
-
-
-    @Test
     fun `test that monitor all contacts participant in the chat call when monitor chat room updates with participant change`() =
         runTest {
             val flow = MutableSharedFlow<ChatRoom>()
@@ -1823,8 +1811,6 @@ internal class ChatViewModelTest {
             verify(chatManagement).setSpeakerStatus(chatId, video)
             verify(chatManagement).setRequestSentCall(callId, true)
             verifyNoMoreInteractions(chatManagement)
-            verify(passcodeManagement).showPasscodeScreen = true
-            verifyNoMoreInteractions(passcodeManagement)
             underTest.state.test {
                 val actual = awaitItem()
                 assertThat(actual.callInThisChat).isEqualTo(call)
@@ -1832,7 +1818,6 @@ internal class ChatViewModelTest {
             }
         } else {
             verifyNoInteractions(chatManagement)
-            verifyNoInteractions(passcodeManagement)
         }
     }
 
@@ -1883,7 +1868,6 @@ internal class ChatViewModelTest {
             assertThat(awaitItem().isStartingCall).isFalse()
         }
         verifyNoInteractions(chatManagement)
-        verifyNoInteractions(passcodeManagement)
     }
 
     @Test
@@ -1928,8 +1912,6 @@ internal class ChatViewModelTest {
         verify(chatManagement).setSpeakerStatus(chatId, call.hasLocalVideo)
         verify(chatManagement).setRequestSentCall(callId, true)
         verifyNoMoreInteractions(chatManagement)
-        verify(passcodeManagement).showPasscodeScreen = true
-        verifyNoMoreInteractions(passcodeManagement)
     }
 
     @Test
@@ -1966,7 +1948,6 @@ internal class ChatViewModelTest {
             assertThat(awaitItem().isStartingCall).isFalse()
         }
         verifyNoInteractions(chatManagement)
-        verifyNoInteractions(passcodeManagement)
     }
 
     @Test
@@ -2011,8 +1992,6 @@ internal class ChatViewModelTest {
         verify(chatManagement).setSpeakerStatus(chatId, call.hasLocalVideo)
         verify(chatManagement).setRequestSentCall(callId, true)
         verifyNoMoreInteractions(chatManagement)
-        verify(passcodeManagement).showPasscodeScreen = true
-        verifyNoMoreInteractions(passcodeManagement)
     }
 
     @Test

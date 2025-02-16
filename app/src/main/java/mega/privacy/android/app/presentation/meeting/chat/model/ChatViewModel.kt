@@ -30,7 +30,6 @@ import mega.privacy.android.app.main.megachat.MapsActivity
 import mega.privacy.android.app.meeting.gateway.RTCAudioManagerGateway
 import mega.privacy.android.app.middlelayer.scanner.ScannerHandler
 import mega.privacy.android.app.objects.GifData
-import mega.privacy.android.app.objects.PasscodeManagement
 import mega.privacy.android.app.presentation.documentscanner.model.DocumentScanningError
 import mega.privacy.android.app.presentation.extensions.getErrorStringId
 import mega.privacy.android.app.presentation.extensions.isPast
@@ -200,7 +199,6 @@ class ChatViewModel @Inject constructor(
     private val getMyUserHandleUseCase: GetMyUserHandleUseCase,
     private val getScheduledMeetingByChatUseCase: GetScheduledMeetingByChatUseCase,
     private val monitorHasAnyContactUseCase: MonitorHasAnyContactUseCase,
-    private val passcodeManagement: PasscodeManagement,
     private val getCustomSubtitleListUseCase: GetCustomSubtitleListUseCase,
     private val monitorAllContactParticipantsInChatUseCase: MonitorAllContactParticipantsInChatUseCase,
     private val inviteToChatUseCase: InviteToChatUseCase,
@@ -796,15 +794,6 @@ class ChatViewModel @Inject constructor(
     }
 
     /**
-     * Get another call participating
-     *
-     */
-    fun enablePasscodeCheck() {
-        passcodeManagement.showPasscodeScreen = true
-    }
-
-
-    /**
      * Handle action press
      *
      * @param action [ChatRoomMenuAction].
@@ -1005,7 +994,6 @@ class ChatViewModel @Inject constructor(
         call?.let {
             chatManagement.setSpeakerStatus(call.chatId, call.hasLocalVideo)
             chatManagement.setRequestSentCall(call.callId, call.isOutgoing)
-            passcodeManagement.showPasscodeScreen = true
             _state.update { state ->
                 state.copy(callInThisChat = call, isStartingCall = true)
             }

@@ -1,5 +1,6 @@
 package mega.privacy.android.app.presentation.psa
 
+import androidx.compose.ui.Modifier
 import androidx.compose.ui.test.assertIsDisplayed
 import androidx.compose.ui.test.junit4.createComposeRule
 import androidx.compose.ui.test.onNodeWithTag
@@ -20,10 +21,12 @@ class PsaContainerKtTest {
     @Test
     fun `test that no PSA displays nothing`() {
         composeTestRule.setContent {
-            PsaContainerContent(
+            PsaStateView(
                 state = PsaState.NoPsa,
                 markAsSeen = {},
-                navigateToPsaPage = {}
+                navigateToPsaPage = {},
+                innerModifier = { it },
+                containerModifier = Modifier,
             )
         }
 
@@ -35,7 +38,7 @@ class PsaContainerKtTest {
     @Test
     fun `test that info psa displays the correct view`() {
         composeTestRule.setContent {
-            PsaContainerContent(
+            PsaStateView(
                 state = PsaState.InfoPsa(
                     id = 0,
                     title = "title",
@@ -43,7 +46,9 @@ class PsaContainerKtTest {
                     imageUrl = null,
                 ),
                 markAsSeen = {},
-                navigateToPsaPage = {}
+                navigateToPsaPage = {},
+                innerModifier = { it },
+                containerModifier = Modifier,
             )
         }
 
@@ -55,7 +60,7 @@ class PsaContainerKtTest {
     @Test
     fun `test that standard psa displays the correct view`() {
         composeTestRule.setContent {
-            PsaContainerContent(
+            PsaStateView(
                 state = PsaState.StandardPsa(
                     id = 0,
                     title = "title",
@@ -65,7 +70,9 @@ class PsaContainerKtTest {
                     positiveLink = "positiveLink"
                 ),
                 markAsSeen = {},
-                navigateToPsaPage = {}
+                navigateToPsaPage = {},
+                innerModifier = { it },
+                containerModifier = Modifier,
             )
         }
 
@@ -77,13 +84,15 @@ class PsaContainerKtTest {
     @Test
     fun `test that web psa displays the correct view`() {
         composeTestRule.setContent {
-            PsaContainerContent(
+            PsaStateView(
                 state = PsaState.WebPsa(
                     id = 0,
                     url = "https://www.mega.nz"
                 ),
                 markAsSeen = {},
-                navigateToPsaPage = {}
+                navigateToPsaPage = {},
+                innerModifier = { it },
+                containerModifier = Modifier,
             )
         }
 

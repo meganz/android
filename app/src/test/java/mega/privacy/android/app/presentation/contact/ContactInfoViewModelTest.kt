@@ -14,7 +14,6 @@ import kotlinx.coroutines.test.TestCoroutineScheduler
 import kotlinx.coroutines.test.UnconfinedTestDispatcher
 import kotlinx.coroutines.test.runTest
 import mega.privacy.android.app.components.ChatManagement
-import mega.privacy.android.app.objects.PasscodeManagement
 import mega.privacy.android.app.presentation.contactinfo.ContactInfoViewModel
 import mega.privacy.android.app.usecase.chat.SetChatVideoInDeviceUseCase
 import mega.privacy.android.core.test.extension.CoroutineMainDispatcherExtension
@@ -85,7 +84,6 @@ class ContactInfoViewModelTest {
     private var underTest: ContactInfoViewModel = mock()
     private var monitorStorageStateEventUseCase: MonitorStorageStateEventUseCase = mock()
     private var isConnectedToInternetUseCase: IsConnectedToInternetUseCase = mock()
-    private var passcodeManagement: PasscodeManagement = mock()
     private var setChatVideoInDeviceUseCase: SetChatVideoInDeviceUseCase = mock()
     private var chatManagement: ChatManagement = mock()
     private var monitorContactUpdates: MonitorContactUpdates = mock()
@@ -154,7 +152,6 @@ class ContactInfoViewModelTest {
         reset(
             monitorStorageStateEventUseCase,
             isConnectedToInternetUseCase,
-            passcodeManagement,
             setChatVideoInDeviceUseCase,
             chatManagement,
             monitorContactUpdates,
@@ -189,7 +186,6 @@ class ContactInfoViewModelTest {
         underTest = ContactInfoViewModel(
             monitorStorageStateEventUseCase = monitorStorageStateEventUseCase,
             isConnectedToInternetUseCase = isConnectedToInternetUseCase,
-            passcodeManagement = passcodeManagement,
             setChatVideoInDeviceUseCase = setChatVideoInDeviceUseCase,
             chatManagement = chatManagement,
             monitorContactUpdates = monitorContactUpdates,

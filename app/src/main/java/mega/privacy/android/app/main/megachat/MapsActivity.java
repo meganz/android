@@ -46,7 +46,6 @@ import mega.privacy.android.app.R;
 import mega.privacy.android.app.activities.PasscodeActivity;
 import mega.privacy.android.app.middlelayer.map.MapHandler;
 import mega.privacy.android.app.middlelayer.map.MegaLatLng;
-import mega.privacy.android.app.psa.PsaWebBrowser;
 import mega.privacy.android.app.service.map.MapHandlerImpl;
 import timber.log.Timber;
 
@@ -490,8 +489,6 @@ public class MapsActivity extends PasscodeActivity implements ActivityCompat.OnR
 
     @Override
     public void onBackPressed() {
-        PsaWebBrowser psaWebBrowser = getPsaWebBrowser();
-        if (psaWebBrowser != null && psaWebBrowser.consumeBack()) return;
         super.onBackPressed();
         this.finish();
     }

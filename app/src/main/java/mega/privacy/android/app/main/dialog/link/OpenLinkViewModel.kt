@@ -14,7 +14,6 @@ import mega.privacy.android.app.components.ChatManagement
 import mega.privacy.android.app.main.dialog.link.OpenLinkDialogFragment.Companion.IS_CHAT_SCREEN
 import mega.privacy.android.app.main.dialog.link.OpenLinkDialogFragment.Companion.IS_JOIN_MEETING
 import mega.privacy.android.app.meeting.gateway.RTCAudioManagerGateway
-import mega.privacy.android.app.objects.PasscodeManagement
 import mega.privacy.android.app.usecase.chat.SetChatVideoInDeviceUseCase
 import mega.privacy.android.app.utils.CallUtil
 import mega.privacy.android.domain.entity.RegexPatternType
@@ -23,10 +22,10 @@ import mega.privacy.android.domain.entity.call.ChatCallStatus
 import mega.privacy.android.domain.entity.meeting.ScheduledMeetingStatus
 import mega.privacy.android.domain.qualifier.ApplicationScope
 import mega.privacy.android.domain.usecase.GetUrlRegexPatternTypeUseCase
-import mega.privacy.android.domain.usecase.chat.GetHandleFromContactLinkUseCase
-import mega.privacy.android.domain.usecase.chat.link.GetChatLinkContentUseCase
 import mega.privacy.android.domain.usecase.call.AnswerChatCallUseCase
 import mega.privacy.android.domain.usecase.call.GetChatCallUseCase
+import mega.privacy.android.domain.usecase.chat.GetHandleFromContactLinkUseCase
+import mega.privacy.android.domain.usecase.chat.link.GetChatLinkContentUseCase
 import mega.privacy.android.domain.usecase.meeting.GetScheduledMeetingByChatUseCase
 import mega.privacy.android.domain.usecase.meeting.StartMeetingInWaitingRoomChatUseCase
 import timber.log.Timber
@@ -45,7 +44,6 @@ internal class OpenLinkViewModel @Inject constructor(
     private val setChatVideoInDeviceUseCase: SetChatVideoInDeviceUseCase,
     private val rtcAudioManagerGateway: RTCAudioManagerGateway,
     private val chatManagement: ChatManagement,
-    private val passcodeManagement: PasscodeManagement,
     @ApplicationScope private val applicationScope: CoroutineScope,
 ) : ViewModel() {
     private val isChatScreen = savedStateHandle.get<Boolean>(IS_CHAT_SCREEN) ?: false
@@ -124,7 +122,7 @@ internal class OpenLinkViewModel @Inject constructor(
                     ChatCallStatus.Connecting,
                     ChatCallStatus.Joining,
                     ChatCallStatus.InProgress,
-                    -> ScheduledMeetingStatus.Joined(call.duration)
+                        -> ScheduledMeetingStatus.Joined(call.duration)
 
                     else -> ScheduledMeetingStatus.NotStarted
                 }
@@ -155,7 +153,10 @@ internal class OpenLinkViewModel @Inject constructor(
      * @param chatId    Chat ID
      * @param schedIdWr Scheduled meeting ID
      */
-    private fun startSchedMeetingWithWaitingRoom(chatId: Long, schedIdWr: Long) =
+    private fun startSchedMeetingWithWaitingRoom(
+        chatId: Long,
+        schedIdWr: Long,
+    ) =
         applicationScope.launch {
             Timber.d("Start scheduled meeting with waiting room")
             runCatching {
@@ -169,7 +170,7 @@ internal class OpenLinkViewModel @Inject constructor(
                 call?.let {
                     call.chatId.takeIf { it != INVALID_HANDLE }?.let {
                         Timber.d("Meeting started")
-                        openCall(call)
+                        openCall(call = call)
                     }
                 }
             }.onFailure { exception ->
@@ -195,7 +196,7 @@ internal class OpenLinkViewModel @Inject constructor(
                     chatManagement.removeJoiningCallChatId(chatId)
                     rtcAudioManagerGateway.removeRTCAudioManagerRingIn()
                     CallUtil.clearIncomingCallNotification(callId)
-                    openCall(call)
+                    openCall(call = call)
                 }
             }.onFailure { exception ->
                 Timber.e(exception)
@@ -215,7 +216,6 @@ internal class OpenLinkViewModel @Inject constructor(
             MegaApplication.getInstance().applicationContext,
             call.chatId,
             true,
-            passcodeManagement
         )
     }
 

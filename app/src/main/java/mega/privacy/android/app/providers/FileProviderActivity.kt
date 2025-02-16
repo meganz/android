@@ -33,6 +33,7 @@ import androidx.activity.enableEdgeToEdge
 import androidx.activity.viewModels
 import androidx.appcompat.app.ActionBar
 import androidx.appcompat.app.AlertDialog
+import androidx.appcompat.app.AppCompatActivity
 import androidx.appcompat.widget.AppCompatEditText
 import androidx.appcompat.widget.SearchView
 import androidx.core.content.ContextCompat
@@ -59,7 +60,9 @@ import mega.privacy.android.app.extensions.consumeInsetsWithToolbar
 import mega.privacy.android.app.main.providers.CloudDriveProviderFragment
 import mega.privacy.android.app.main.providers.IncomingSharesProviderFragment
 import mega.privacy.android.app.main.providers.ProviderPageAdapter
+import mega.privacy.android.app.presentation.container.AppContainerWrapper
 import mega.privacy.android.app.presentation.provider.FileProviderViewModel
+import mega.privacy.android.app.presentation.security.PasscodeCheck
 import mega.privacy.android.app.presentation.settings.model.StorageTargetPreference
 import mega.privacy.android.app.presentation.transfers.starttransfer.view.createStartTransferView
 import mega.privacy.android.app.utils.AlertDialogUtil.dismissAlertDialogIfExists
@@ -123,7 +126,7 @@ import javax.inject.Inject
  */
 @SuppressLint("NewApi")
 @AndroidEntryPoint
-class FileProviderActivity : PasscodeFileProviderActivity(), MegaRequestListenerInterface,
+class FileProviderActivity : AppCompatActivity(), MegaRequestListenerInterface,
     MegaGlobalListenerInterface, MegaTransferListenerInterface {
 
     @Inject
@@ -155,6 +158,12 @@ class FileProviderActivity : PasscodeFileProviderActivity(), MegaRequestListener
      */
     @Inject
     lateinit var megaNavigator: MegaNavigator
+
+    @Inject
+    lateinit var appContainerWrapper: AppContainerWrapper
+
+    @Inject
+    lateinit var passcodeCheck: PasscodeCheck
 
     private val viewModel by viewModels<FileProviderViewModel>()
 
@@ -277,6 +286,7 @@ class FileProviderActivity : PasscodeFileProviderActivity(), MegaRequestListener
         requestWindowFeature(Window.FEATURE_NO_TITLE)
         enableEdgeToEdge()
         super.onCreate(savedInstanceState)
+        appContainerWrapper.setPasscodeCheck(passcodeCheck)
         onBackPressedDispatcher.addCallback(this, onBackPressedCallback)
         setStatusBarTextColor(this@FileProviderActivity)
         fileProviderActivity = this@FileProviderActivity

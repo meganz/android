@@ -14,8 +14,9 @@ internal fun PasscodeContainer(
     passcodeCryptObjectFactory: PasscodeCryptObjectFactory,
     passcodeUI: @Composable () -> Unit = { PasscodeView(cryptObjectFactory = passcodeCryptObjectFactory) },
     viewModel: PasscodeCheckViewModel = viewModel(),
-    content: @Composable () -> Unit = {},
+    canLock: () -> Boolean = { true },
     loading: @Composable (() -> Unit)? = null,
+    content: @Composable () -> Unit = {},
 ) {
     val state by viewModel.state.collectAsStateWithLifecycle()
 
@@ -26,7 +27,7 @@ internal fun PasscodeContainer(
             content()
         }
 
-        if (state is PasscodeCheckState.Locked) {
+        if (state is PasscodeCheckState.Locked && canLock()) {
             passcodeUI()
         }
     }

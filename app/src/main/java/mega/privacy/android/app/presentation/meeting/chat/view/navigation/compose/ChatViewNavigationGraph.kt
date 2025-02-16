@@ -44,6 +44,7 @@ internal fun NavGraphBuilder.chatViewNavigationGraph(
     onBackPress: () -> Unit,
     onCameraPermissionDenied: () -> Unit,
     navigateToStorageSettings: () -> Unit,
+    enablePasscodeCheck: () -> Unit,
 ) {
     navigation(
         startDestination = ConversationRoute,
@@ -89,6 +90,7 @@ internal fun NavGraphBuilder.chatViewNavigationGraph(
             navigateToConversation = navController::navigateToChatViewGraph,
             onBackPress = onBackPress,
             navigateToStorageSettings = navigateToStorageSettings,
+            enablePasscodeCheck = enablePasscodeCheck,
         )
 
         chatFileModal(navController = navController) {

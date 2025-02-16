@@ -1,5 +1,6 @@
 package mega.privacy.android.app.contacts.list
 
+import mega.privacy.android.icon.pack.R as IconPackR
 import android.content.Context
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.ViewModel
@@ -27,7 +28,6 @@ import mega.privacy.android.app.contacts.list.data.ContactActionItem.Type
 import mega.privacy.android.app.contacts.list.data.ContactItem
 import mega.privacy.android.app.contacts.list.data.ContactListState
 import mega.privacy.android.app.contacts.mapper.ContactItemDataMapper
-import mega.privacy.android.app.objects.PasscodeManagement
 import mega.privacy.android.app.usecase.chat.SetChatVideoInDeviceUseCase
 import mega.privacy.android.app.utils.CallUtil
 import mega.privacy.android.data.gateway.api.MegaChatApiGateway
@@ -44,7 +44,6 @@ import mega.privacy.android.domain.usecase.shares.CreateShareKeyUseCase
 import nz.mega.sdk.MegaNode
 import timber.log.Timber
 import javax.inject.Inject
-import mega.privacy.android.icon.pack.R as IconPackR
 
 /**
  * ViewModel that handles all related logic to Contact List for the current user.
@@ -53,7 +52,6 @@ import mega.privacy.android.icon.pack.R as IconPackR
  * @property get1On1ChatIdUseCase Use case to get 1 on 1 chat id.
  * @property removedContactByEmailUseCase Use case to remove contact by email.
  * @property startCallUseCase Use case to start a call.
- * @property passcodeManagement PasscodeManagement object.
  * @property chatApiGateway MegaChatApiGateway object.
  * @property setChatVideoInDeviceUseCase Use case to set chat video in device.
  * @property chatManagement ChatManagement object.
@@ -70,7 +68,6 @@ internal class ContactListViewModel @Inject constructor(
     private val get1On1ChatIdUseCase: Get1On1ChatIdUseCase,
     private val removedContactByEmailUseCase: RemoveContactByEmailUseCase,
     private val startCallUseCase: StartCallUseCase,
-    private val passcodeManagement: PasscodeManagement,
     private val chatApiGateway: MegaChatApiGateway,
     private val setChatVideoInDeviceUseCase: SetChatVideoInDeviceUseCase,
     private val chatManagement: ChatManagement,
@@ -258,7 +255,6 @@ internal class ContactListViewModel @Inject constructor(
                 MegaApplication.getInstance().applicationContext,
                 chatId,
                 true,
-                passcodeManagement
             )
             return
         }
@@ -281,7 +277,6 @@ internal class ContactListViewModel @Inject constructor(
                         chatId,
                         hasLocalAudio,
                         hasLocalVideo,
-                        passcodeManagement
                     )
                 }
             }
