@@ -78,8 +78,7 @@ CPP_SOURCES= sdk/src/attrmap.cpp \
     sdk/src/syncinternals/syncinternals.cpp \
     sdk/src/syncinternals/syncuploadthrottlingfile.cpp \
     sdk/src/syncinternals/syncuploadthrottlingmanager.cpp \
-
-
+    sdk/src/totp.cpp \
 
 C_SOURCES = sdk/src/mega_glob.c
 
@@ -156,7 +155,8 @@ HEADERS= sdk/include/mega.h \
         sdk/include/mega/syncinternals/syncinternals_logging.h \
         sdk/include/mega/syncinternals/synciuploadthrottlingmanager.h \
         sdk/include/mega/syncinternals/syncuploadthrottlingfile.h \
-        sdk/include/mega/syncinternals/syncuploadthrottlingmanager.h
+        sdk/include/mega/syncinternals/syncuploadthrottlingmanager.h \
+        sdk/include/mega/totp.h
 
 # impl layer headers
 HEADERS += \
