@@ -8,6 +8,7 @@ import androidx.recyclerview.widget.DiffUtil
  *
  * @property id         Action Id.
  * @property title      Action Title
+ * @property leadingIcon Item Icon
  * @property counter    Notification counter
  */
 data class ContactActionItem(
@@ -17,8 +18,24 @@ data class ContactActionItem(
     val counter: Int = 0,
 ) {
 
-    enum class Type { REQUESTS, GROUPS }
+    /**
+     * Type
+     */
+    enum class Type {
+        /**
+         * Requests
+         */
+        REQUESTS,
 
+        /**
+         * Groups
+         */
+        GROUPS
+    }
+
+    /**
+     * Diff callback
+     */
     class DiffCallback : DiffUtil.ItemCallback<ContactActionItem>() {
         override fun areItemsTheSame(
             oldItem: ContactActionItem,

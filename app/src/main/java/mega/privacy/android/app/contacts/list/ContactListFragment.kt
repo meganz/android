@@ -1,10 +1,7 @@
 package mega.privacy.android.app.contacts.list
 
-import android.Manifest
 import android.os.Bundle
 import android.view.LayoutInflater
-import android.view.Menu
-import android.view.MenuInflater
 import android.view.View
 import android.view.ViewGroup
 import androidx.appcompat.app.AlertDialog
@@ -31,10 +28,8 @@ import mega.privacy.android.app.utils.AlertDialogUtil.createForceAppUpdateDialog
 import mega.privacy.android.app.utils.Constants
 import mega.privacy.android.app.utils.Constants.MIN_ITEMS_SCROLLBAR
 import mega.privacy.android.app.utils.ContactUtil
-import mega.privacy.android.app.utils.MenuUtils.setupSearchView
 import mega.privacy.android.app.utils.StringUtils.formatColorTag
 import mega.privacy.android.app.utils.StringUtils.toSpannedHtmlText
-import mega.privacy.android.app.utils.permission.PermissionUtils
 import mega.privacy.android.navigation.MegaNavigator
 import javax.inject.Inject
 
@@ -70,7 +65,6 @@ class ContactListFragment : Fragment() {
         savedInstanceState: Bundle?,
     ): View {
         binding = FragmentContactListBinding.inflate(inflater, container, false)
-        setHasOptionsMenu(true)
         binding.root.addView(
             createNodeAttachmentView(
                 activity = requireActivity(),
@@ -86,79 +80,6 @@ class ContactListFragment : Fragment() {
         setupView()
         setupObservers()
         collectFlows()
-    }
-
-    /**
-     * on Start
-     */
-    override fun onStart() {
-        super.onStart()
-        viewModel.monitorSFUServerUpgrade()
-    }
-
-    /**
-     * on Stop
-     */
-    override fun onStop() {
-        viewModel.cancelMonitorSFUServerUpgrade()
-        super.onStop()
-    }
-
-
-    private fun collectFlows() {
-        viewLifecycleOwner.collectFlow(viewModel.state) { state ->
-            if (state.showForceUpdateDialog) {
-                showForceUpdateAppDialog()
-            }
-
-            state.shouldOpenChatWithId?.let { chatId ->
-                navigator.openChat(
-                    context = requireActivity(),
-                    chatId = chatId,
-                    action = Constants.ACTION_CHAT_SHOW_MESSAGES
-                )
-
-                contactSheet?.dismiss()
-
-                viewModel.onChatOpened()
-
-            }
-            actionsAdapter.submitList(state.contactActionItems)
-        }
-    }
-
-    /**
-     * Show Force App Update Dialog
-     */
-    private fun showForceUpdateAppDialog() {
-        if (forceAppUpdateDialog?.isShowing == true) return
-        forceAppUpdateDialog = context?.let {
-            createForceAppUpdateDialog(it) {
-                viewModel.onForceUpdateDialogDismissed()
-            }
-        }
-        forceAppUpdateDialog?.show()
-    }
-
-    override fun onCreateOptionsMenu(menu: Menu, inflater: MenuInflater) {
-        inflater.inflate(R.menu.fragment_contact_search, menu)
-        menu.findItem(R.id.action_search)?.setupSearchView { query ->
-            viewModel.setQuery(query)
-        }
-    }
-
-    override fun onDestroyView() {
-        binding.list.clearOnScrollListeners()
-        super.onDestroyView()
-    }
-
-    /**
-     * Start call
-     */
-    fun startCall() {
-        val audio =
-            PermissionUtils.hasPermissions(requireContext(), Manifest.permission.RECORD_AUDIO)
-        viewModel.onCallTap(video = false, audio = audio)
     }
 
     private fun setupView() {
@@ -197,8 +118,6 @@ class ContactListFragment : Fragment() {
     }
 
     private fun setupObservers() {
-
-
         viewModel.getRecentlyAddedContacts().observe(viewLifecycleOwner) { items ->
             recentlyAddedAdapter.submitList(items)
         }
@@ -208,6 +127,76 @@ class ContactListFragment : Fragment() {
             binding.viewEmpty.isVisible = items.isNullOrEmpty()
             contactsAdapter.submitList(items)
         }
+    }
+
+    private fun collectFlows() {
+        viewLifecycleOwner.collectFlow(viewModel.state) { state ->
+            if (state.showForceUpdateDialog) {
+                showForceUpdateAppDialog()
+            }
+
+            state.shouldOpenChatWithId?.let { chatId ->
+                navigator.openChat(
+                    context = requireActivity(),
+                    chatId = chatId,
+                    action = Constants.ACTION_CHAT_SHOW_MESSAGES
+                )
+
+                contactSheet?.dismiss()
+
+                viewModel.onChatOpened()
+
+            }
+            actionsAdapter.submitList(state.contactActionItems)
+        }
+
+        (requireActivity() as? ContactsActivity)?.queryState?.let {
+            viewLifecycleOwner.collectFlow(it) { query ->
+                viewModel.setQuery(query)
+            }
+        }
+    }
+
+    /**
+     * on Start
+     */
+    override fun onStart() {
+        super.onStart()
+        viewModel.monitorSFUServerUpgrade()
+    }
+
+
+    /**
+     * on Stop
+     */
+    override fun onStop() {
+        viewModel.cancelMonitorSFUServerUpgrade()
+        super.onStop()
+    }
+
+    /**
+     * Show Force App Update Dialog
+     */
+    private fun showForceUpdateAppDialog() {
+        if (forceAppUpdateDialog?.isShowing == true) return
+        forceAppUpdateDialog = context?.let {
+            createForceAppUpdateDialog(it) {
+                viewModel.onForceUpdateDialogDismissed()
+            }
+        }
+        forceAppUpdateDialog?.show()
+    }
+
+    override fun onDestroyView() {
+        binding.list.clearOnScrollListeners()
+        super.onDestroyView()
+    }
+
+    /**
+     * Start call
+     */
+    fun startCall() {
+        viewModel.onCallTap(video = false)
     }
 
     private fun onContactInfoClick(userEmail: String) {

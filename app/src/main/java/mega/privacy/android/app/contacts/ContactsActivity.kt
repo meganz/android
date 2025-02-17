@@ -3,6 +3,7 @@ package mega.privacy.android.app.contacts
 import android.content.Context
 import android.content.Intent
 import android.os.Bundle
+import android.view.Menu
 import androidx.activity.enableEdgeToEdge
 import androidx.fragment.app.Fragment
 import androidx.navigation.NavController
@@ -11,6 +12,7 @@ import androidx.navigation.ui.AppBarConfiguration
 import androidx.navigation.ui.NavigationUI
 import androidx.navigation.ui.navigateUp
 import dagger.hilt.android.AndroidEntryPoint
+import kotlinx.coroutines.flow.MutableStateFlow
 import mega.privacy.android.app.R
 import mega.privacy.android.app.activities.PasscodeActivity
 import mega.privacy.android.app.contacts.list.ContactListFragment
@@ -21,6 +23,7 @@ import mega.privacy.android.app.interfaces.SnackbarShower
 import mega.privacy.android.app.utils.CallUtil.checkCameraPermission
 import mega.privacy.android.app.utils.Constants
 import mega.privacy.android.app.utils.Constants.REQUEST_RECORD_AUDIO
+import mega.privacy.android.app.utils.MenuUtils.setupSearchView
 import mega.privacy.android.app.utils.permission.PermissionUtils
 
 /**
@@ -30,51 +33,7 @@ import mega.privacy.android.app.utils.permission.PermissionUtils
  */
 @AndroidEntryPoint
 class ContactsActivity : PasscodeActivity(), SnackbarShower {
-
-    companion object {
-        private const val EXTRA_SHOW_GROUPS = "EXTRA_SHOW_GROUPS"
-        private const val EXTRA_SHOW_SENT_REQUESTS = "EXTRA_SHOW_SENT_REQUESTS"
-        private const val EXTRA_SHOW_RECEIVED_REQUESTS = "EXTRA_SHOW_RECEIVED_REQUESTS"
-
-        /**
-         * Show Contact list screen
-         */
-        @JvmStatic
-        fun getListIntent(context: Context): Intent =
-            Intent(context, ContactsActivity::class.java)
-
-        /**
-         * Show Contact group list screen
-         */
-        @JvmStatic
-        fun getGroupsIntent(context: Context): Intent =
-            Intent(context, ContactsActivity::class.java).apply {
-                putExtra(EXTRA_SHOW_GROUPS, true)
-            }
-
-        /**
-         * Show Contact sent requests screen
-         */
-        @JvmStatic
-        fun getSentRequestsIntent(context: Context): Intent =
-            Intent(context, ContactsActivity::class.java).apply {
-                putExtra(EXTRA_SHOW_SENT_REQUESTS, true)
-                putExtra(ContactRequestsFragment.EXTRA_IS_OUTGOING, true)
-            }
-
-        /**
-         * Show Contact received requests screen
-         */
-        @JvmStatic
-        fun getReceivedRequestsIntent(context: Context): Intent =
-            Intent(context, ContactsActivity::class.java).apply {
-                putExtra(EXTRA_SHOW_RECEIVED_REQUESTS, true)
-                putExtra(ContactRequestsFragment.EXTRA_IS_OUTGOING, false)
-            }
-    }
-
     private lateinit var binding: ActivityContactsBinding
-    private val showGroups by lazy { intent.getBooleanExtra(EXTRA_SHOW_GROUPS, false) }
     private val showSentRequests by lazy { intent.getBooleanExtra(EXTRA_SHOW_SENT_REQUESTS, false) }
     private val showReceivedRequests by lazy {
         intent.getBooleanExtra(
@@ -93,6 +52,11 @@ class ContactsActivity : PasscodeActivity(), SnackbarShower {
             }
         )
     }
+
+    /**
+     * Query state
+     */
+    val queryState: MutableStateFlow<String?> = MutableStateFlow(null)
 
     override fun onCreate(savedInstanceState: Bundle?) {
         enableEdgeToEdge()
@@ -121,7 +85,6 @@ class ContactsActivity : PasscodeActivity(), SnackbarShower {
                 navController.navInflater.inflate(R.navigation.nav_contacts).apply {
                     setStartDestination(
                         when {
-                            showGroups -> R.id.contact_groups
                             showSentRequests || showReceivedRequests -> R.id.contact_requests
                             else -> R.id.contact_list
                         }
@@ -142,6 +105,14 @@ class ContactsActivity : PasscodeActivity(), SnackbarShower {
         }
     }
 
+    override fun onCreateOptionsMenu(menu: Menu?): Boolean {
+        menuInflater.inflate(R.menu.fragment_contact_search, menu)
+        menu?.findItem(R.id.action_search)?.setupSearchView { query ->
+            queryState.value = query
+        }
+        return true
+    }
+
     override fun showSnackbar(type: Int, content: String?, chatId: Long) {
         showSnackbar(type, binding.root, content, chatId)
     }
@@ -149,7 +120,7 @@ class ContactsActivity : PasscodeActivity(), SnackbarShower {
     /**
      * Get current fragment from navHostFragment
      */
-    fun getCurrentFragment(): Fragment? {
+    private fun getCurrentFragment(): Fragment? {
         return supportFragmentManager.findFragmentById(R.id.contacts_nav_host_fragment)?.childFragmentManager?.fragments?.get(
             0
         )
@@ -192,4 +163,36 @@ class ContactsActivity : PasscodeActivity(), SnackbarShower {
 
     private fun getNavController(): NavController =
         (supportFragmentManager.findFragmentById(R.id.contacts_nav_host_fragment) as NavHostFragment).navController
+
+    companion object {
+        private const val EXTRA_SHOW_SENT_REQUESTS = "EXTRA_SHOW_SENT_REQUESTS"
+        private const val EXTRA_SHOW_RECEIVED_REQUESTS = "EXTRA_SHOW_RECEIVED_REQUESTS"
+
+        /**
+         * Show Contact list screen
+         */
+        @JvmStatic
+        fun getListIntent(context: Context): Intent =
+            Intent(context, ContactsActivity::class.java)
+
+        /**
+         * Show Contact sent requests screen
+         */
+        @JvmStatic
+        fun getSentRequestsIntent(context: Context): Intent =
+            Intent(context, ContactsActivity::class.java).apply {
+                putExtra(EXTRA_SHOW_SENT_REQUESTS, true)
+                putExtra(ContactRequestsFragment.EXTRA_IS_OUTGOING, true)
+            }
+
+        /**
+         * Show Contact received requests screen
+         */
+        @JvmStatic
+        fun getReceivedRequestsIntent(context: Context): Intent =
+            Intent(context, ContactsActivity::class.java).apply {
+                putExtra(EXTRA_SHOW_RECEIVED_REQUESTS, true)
+                putExtra(ContactRequestsFragment.EXTRA_IS_OUTGOING, false)
+            }
+    }
 }

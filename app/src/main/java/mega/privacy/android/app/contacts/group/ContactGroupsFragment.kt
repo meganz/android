@@ -4,8 +4,6 @@ import android.app.Activity
 import android.content.Intent
 import android.os.Bundle
 import android.view.LayoutInflater
-import android.view.Menu
-import android.view.MenuInflater
 import android.view.View
 import android.view.ViewGroup
 import androidx.activity.result.ActivityResultLauncher
@@ -18,6 +16,7 @@ import androidx.recyclerview.widget.DividerItemDecoration
 import androidx.recyclerview.widget.RecyclerView
 import dagger.hilt.android.AndroidEntryPoint
 import mega.privacy.android.app.R
+import mega.privacy.android.app.arch.extensions.collectFlow
 import mega.privacy.android.app.contacts.ContactsActivity
 import mega.privacy.android.app.contacts.group.adapter.ContactGroupsAdapter
 import mega.privacy.android.app.contacts.group.data.ContactGroupItem
@@ -27,7 +26,6 @@ import mega.privacy.android.app.interfaces.showSnackbar
 import mega.privacy.android.app.main.legacycontact.AddContactActivity
 import mega.privacy.android.app.utils.Constants
 import mega.privacy.android.app.utils.Constants.MIN_ITEMS_SCROLLBAR
-import mega.privacy.android.app.utils.MenuUtils.setupSearchView
 import mega.privacy.android.app.utils.StringUtils.formatColorTag
 import mega.privacy.android.app.utils.StringUtils.toSpannedHtmlText
 import mega.privacy.android.navigation.MegaNavigator
@@ -96,20 +94,12 @@ class ContactGroupsFragment : Fragment() {
         savedInstanceState: Bundle?,
     ): View {
         binding = FragmentContactGroupsBinding.inflate(inflater, container, false)
-        setHasOptionsMenu(true)
         return binding.root
     }
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         setupView()
         setupObservers()
-    }
-
-    override fun onCreateOptionsMenu(menu: Menu, inflater: MenuInflater) {
-        inflater.inflate(R.menu.fragment_contact_search, menu)
-        menu.findItem(R.id.action_search)?.setupSearchView { query ->
-            viewModel.setQuery(query)
-        }
     }
 
     override fun onDestroyView() {
@@ -122,13 +112,15 @@ class ContactGroupsFragment : Fragment() {
         binding.list.setHasFixedSize(true)
         binding.list.addItemDecoration(
             DividerItemDecoration(requireContext(), DividerItemDecoration.VERTICAL).apply {
-                setDrawable(
-                    ResourcesCompat.getDrawable(
-                        resources,
-                        R.drawable.contact_list_divider,
-                        null
-                    )!!
-                )
+                ResourcesCompat.getDrawable(
+                    resources,
+                    R.drawable.contact_list_divider,
+                    null
+                )?.let {
+                    setDrawable(
+                        it
+                    )
+                }
             }
         )
         binding.list.addOnScrollListener(object : RecyclerView.OnScrollListener() {
@@ -167,6 +159,11 @@ class ContactGroupsFragment : Fragment() {
 
     private fun setupObservers() {
         viewModel.getGroups().observe(viewLifecycleOwner, ::showGroups)
+        (requireActivity() as? ContactsActivity)?.queryState?.let {
+            viewLifecycleOwner.collectFlow(it) { query ->
+                viewModel.setQuery(query)
+            }
+        }
     }
 
     /**
@@ -176,7 +173,7 @@ class ContactGroupsFragment : Fragment() {
      */
     private fun showGroups(items: List<ContactGroupItem>) {
         binding.listScroller.isVisible = items.size >= MIN_ITEMS_SCROLLBAR
-        binding.viewEmpty.isVisible = items.isNullOrEmpty()
+        binding.viewEmpty.isVisible = items.isEmpty()
         groupsAdapter.submitList(items)
     }
 
