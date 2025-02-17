@@ -3,13 +3,8 @@ package mega.privacy.android.app.presentation.login
 import android.annotation.SuppressLint
 import android.content.Intent
 import android.content.pm.ActivityInfo
-import android.graphics.Rect
 import android.net.Uri
 import android.os.Bundle
-import android.util.TypedValue
-import android.view.View
-import android.view.ViewGroup
-import android.view.ViewTreeObserver
 import android.view.WindowManager
 import androidx.activity.OnBackPressedCallback
 import androidx.activity.enableEdgeToEdge
@@ -28,8 +23,6 @@ import mega.privacy.android.app.R
 import mega.privacy.android.app.arch.extensions.collectFlow
 import mega.privacy.android.app.databinding.ActivityLoginBinding
 import mega.privacy.android.app.globalmanagement.MegaChatRequestHandler
-import mega.privacy.android.app.interfaces.OnKeyboardVisibilityListener
-import mega.privacy.android.app.main.CreateAccountFragment
 import mega.privacy.android.app.main.ManagerActivity
 import mega.privacy.android.app.presentation.extensions.toConstant
 import mega.privacy.android.app.presentation.login.confirmemail.ConfirmEmailFragment
@@ -457,45 +450,6 @@ class LoginActivity : BaseActivity(), MegaRequestListenerInterface {
         Timber.d("onSaveInstanceState")
         super.onSaveInstanceState(outState)
         outState.putInt(Constants.VISIBLE_FRAGMENT, visibleFragment)
-    }
-
-    /**
-     * Sets [OnKeyboardVisibilityListener].
-     *
-     * @param onKeyboardVisibilityListener The listener.
-     */
-    fun setKeyboardVisibilityListener(onKeyboardVisibilityListener: OnKeyboardVisibilityListener) {
-        val parentView = (findViewById<View>(android.R.id.content) as ViewGroup).getChildAt(0)
-        if (parentView == null) {
-            Timber.w("Cannot set the keyboard visibility listener. Parent view is NULL.")
-            return
-        }
-
-        parentView.viewTreeObserver.addOnGlobalLayoutListener(object :
-            ViewTreeObserver.OnGlobalLayoutListener {
-            private var alreadyOpen = false
-            private val defaultKeyboardHeightDP = 100
-            private val EstimatedKeyboardDP = defaultKeyboardHeightDP + 48
-            private val rect = Rect()
-
-            override fun onGlobalLayout() {
-                val estimatedKeyboardHeight = TypedValue.applyDimension(
-                    TypedValue.COMPLEX_UNIT_DIP,
-                    EstimatedKeyboardDP.toFloat(),
-                    parentView.resources.displayMetrics
-                ).toInt()
-                parentView.getWindowVisibleDisplayFrame(rect)
-
-                val heightDiff = parentView.rootView.height - (rect.bottom - rect.top)
-                val isShown = heightDiff >= estimatedKeyboardHeight
-
-                if (isShown == alreadyOpen) {
-                    return
-                }
-                alreadyOpen = isShown
-                onKeyboardVisibilityListener.onVisibilityChanged(isShown)
-            }
-        })
     }
 
     /**
