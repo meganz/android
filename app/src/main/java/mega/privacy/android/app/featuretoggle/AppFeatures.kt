@@ -17,6 +17,14 @@ enum class AppFeatures(override val description: String, private val defaultValu
     Feature {
 
     /**
+     * Contacts compose u i
+     */
+    ContactsComposeUI(
+        "Enable compose version of the contacts ui",
+        false,
+    ),
+
+    /**
      * New psa state
      */
     NewPsaState(
@@ -63,6 +71,7 @@ enum class AppFeatures(override val description: String, private val defaultValu
         "Enable new contact request screen",
         false
     ),
+
     /**
      * Enable request status progress dialog
      */
