@@ -16,12 +16,14 @@ import mega.privacy.android.app.featuretoggle.AppFeatures
 import mega.privacy.android.app.main.FileStorageActivity
 import mega.privacy.android.app.main.ManagerActivity
 import mega.privacy.android.app.presentation.manager.model.TransfersTab
+import mega.privacy.android.app.presentation.mapper.file.FileSizeStringMapper
 import mega.privacy.android.app.presentation.transfers.EXTRA_TAB
 import mega.privacy.android.app.presentation.transfers.TransfersActivity
 import mega.privacy.android.app.presentation.transfers.view.COMPLETED_TAB_INDEX
 import mega.privacy.android.app.utils.Constants
 import mega.privacy.android.app.utils.MegaApiUtils
-import mega.privacy.android.data.mapper.transfer.TransfersGroupFinishNotificationBuilder
+import mega.privacy.android.data.mapper.transfer.TransfersActionGroupFinishNotificationBuilder
+import mega.privacy.android.data.worker.AbstractTransfersWorker.Companion.FINAL_SUMMARY_GROUP
 import mega.privacy.android.domain.entity.transfer.ActiveTransferTotals
 import mega.privacy.android.domain.entity.transfer.TransferType
 import mega.privacy.android.domain.entity.transfer.isOfflineDownload
@@ -32,12 +34,16 @@ import mega.privacy.android.domain.usecase.file.IsContentUriUseCase
 import java.io.File
 import javax.inject.Inject
 
-class DefaultTransfersGroupFinishNotificationBuilder @Inject constructor(
+/**
+ * Default implementation of [TransfersActionGroupFinishNotificationBuilder]
+ */
+class DefaultTransfersActionGroupFinishNotificationBuilder @Inject constructor(
     @ApplicationContext private val context: Context,
     private val getFeatureFlagValueUseCase: GetFeatureFlagValueUseCase,
     private val isContentUriUseCase: IsContentUriUseCase,
     private val getPathByDocumentContentUriUseCase: GetPathByDocumentContentUriUseCase,
-) : TransfersGroupFinishNotificationBuilder {
+    private val fileSizeStringMapper: FileSizeStringMapper,
+) : TransfersActionGroupFinishNotificationBuilder {
     private val resources get() = context.resources
     override suspend fun invoke(
         group: ActiveTransferTotals.Group,
@@ -102,23 +108,24 @@ class DefaultTransfersGroupFinishNotificationBuilder @Inject constructor(
             }
         }.getOrNull() ?: group.destination
         val destinationText = when {
-            isOfflineDownload -> {
-                context.getString(R.string.section_saved_for_offline_new)
-            }
-
-            isPreviewDownload -> {
-                null
-            }
-
-            else -> {
-                destination
-            }
+            isOfflineDownload -> context.getString(R.string.section_saved_for_offline_new)
+            isPreviewDownload -> null
+            else -> destination
         }
         val contentText = destinationText?.let {
             resources.getString(
                 sharedR.string.transfers_notification_location_content,
                 it,
             )
+        }?.let {
+            if (titleSuffix == null) {
+                it + "\n" + resources.getString(
+                    R.string.general_total_size,
+                    fileSizeStringMapper(group.totalBytes)
+                )
+            } else {
+                it
+            }
         }
 
         val previewFile = File(group.destination + group.singleFileName)
@@ -207,6 +214,7 @@ class DefaultTransfersGroupFinishNotificationBuilder @Inject constructor(
             .setSmallIcon(iconPackR.drawable.ic_stat_notify)
             .setColor(ContextCompat.getColor(context, R.color.red_600_red_300))
             .setContentIntent(pendingIntent)
+            .setStyle(NotificationCompat.BigTextStyle().bigText(contentText))
             .setAutoCancel(true)
             .setTicker(notificationTitle)
             .setContentTitle(notificationTitle)
@@ -223,7 +231,7 @@ class DefaultTransfersGroupFinishNotificationBuilder @Inject constructor(
                     )
                 }
             }
-            .setGroup(transferType.name)
+            .setGroup(FINAL_SUMMARY_GROUP + transferType.name)
             .build()
     }
 

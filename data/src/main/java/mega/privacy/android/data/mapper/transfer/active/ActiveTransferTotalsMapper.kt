@@ -40,16 +40,22 @@ internal class ActiveTransferTotalsMapper @Inject constructor(
                     val destination = previousGroup?.destination ?: transferGroup?.destination
                     val fileName = previousGroup?.singleFileName ?: transferGroup?.singleFileName
                     val startTime = previousGroup?.startTime ?: transferGroup?.startTime ?: 0
-                    destination?.let { destination ->
+                    destination?.let { dest ->
                         ActiveTransferTotals.Group(
                             groupId = groupId,
                             totalFiles = activeTransfersFiles.size,
                             finishedFiles = activeTransfersFiles.count { it.isFinished },
                             completedFiles = activeTransfersFiles.count { it.isFinished && transferredBytes[it.tag] == it.totalBytes },
                             alreadyTransferred = activeTransfersFiles.count { it.isAlreadyTransferred },
-                            destination = destination,
+                            destination = dest,
                             singleFileName = fileName,
                             startTime = startTime,
+                            pausedFiles = activeTransfersFiles.count { it.isPaused },
+                            totalBytes = activeTransfersFiles.sumOf { it.totalBytes },
+                            transferredBytes = activeTransfersFiles.sumOf {
+                                //if it's finished always totalBytes as it can be cancelled or failed
+                                if (it.isFinished) it.totalBytes else transferredBytes[it.tag] ?: 0L
+                            },
                             appData = activeTransfersFiles
                                 .flatMap { it.appData }
                                 .filterNot { it is TransferAppData.TransferGroup } //group would be redundant

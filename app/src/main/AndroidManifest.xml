@@ -560,6 +560,12 @@
             </intent-filter>
         </receiver>
 
+        <receiver
+            android:name=".presentation.transfers.notification.DefaultTransfersActionGroupProgressNotificationBuilder$ResumeTransfersReceiver"
+            android:enabled="true"
+            android:exported="false">
+        </receiver>
+
         <provider
             android:name="androidx.core.content.FileProvider"
             android:authorities="${applicationId}.providers.fileprovider"

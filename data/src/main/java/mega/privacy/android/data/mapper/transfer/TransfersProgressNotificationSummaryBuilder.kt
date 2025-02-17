@@ -4,9 +4,9 @@ import android.app.Notification
 import mega.privacy.android.domain.entity.transfer.TransferType
 
 /**
- * Interface to build the finish summary notification for transfers.
+ * Interface to build the progress summary notification for transfers.
  */
-interface TransfersFinishNotificationSummaryBuilder {
+interface TransfersProgressNotificationSummaryBuilder {
 
     /**
      * Invoke

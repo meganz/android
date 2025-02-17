@@ -5,14 +5,16 @@ import mega.privacy.android.domain.entity.transfer.ActiveTransferTotals
 import mega.privacy.android.domain.entity.transfer.TransferType
 
 /**
- * Creates a final notification from ActiveTransferTotals
+ * Creates a progress notification from ActiveTransferTotals
  */
-interface TransfersGroupFinishNotificationBuilder {
+interface TransfersActionGroupProgressNotificationBuilder {
+
     /**
-     * Creates a final notification from ActiveTransferTotals
+     * Invoke.
      */
     suspend operator fun invoke(
         group: ActiveTransferTotals.Group,
         transferType: TransferType,
+        paused: Boolean,
     ): Notification
 }

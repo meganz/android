@@ -14,10 +14,12 @@ import kotlinx.coroutines.flow.catch
 import kotlinx.coroutines.launch
 import mega.privacy.android.data.featuretoggle.DataFeatures
 import mega.privacy.android.data.mapper.transfer.OverQuotaNotificationBuilder
+import mega.privacy.android.data.mapper.transfer.TransfersActionGroupFinishNotificationBuilder
+import mega.privacy.android.data.mapper.transfer.TransfersActionGroupProgressNotificationBuilder
 import mega.privacy.android.data.mapper.transfer.TransfersFinishNotificationSummaryBuilder
 import mega.privacy.android.data.mapper.transfer.TransfersFinishedNotificationMapper
-import mega.privacy.android.data.mapper.transfer.TransfersGroupFinishNotificationBuilder
 import mega.privacy.android.data.mapper.transfer.TransfersNotificationMapper
+import mega.privacy.android.data.mapper.transfer.TransfersProgressNotificationSummaryBuilder
 import mega.privacy.android.domain.entity.transfer.ActiveTransferTotals
 import mega.privacy.android.domain.entity.transfer.TransferEvent
 import mega.privacy.android.domain.entity.transfer.TransferProgressResult
@@ -57,7 +59,9 @@ class DownloadsWorker @AssistedInject constructor(
     private val transfersNotificationMapper: TransfersNotificationMapper,
     private val transfersFinishedNotificationMapper: TransfersFinishedNotificationMapper,
     private val transfersFinishNotificationSummaryBuilder: TransfersFinishNotificationSummaryBuilder,
-    private val transfersGroupFinishNotificationBuilder: TransfersGroupFinishNotificationBuilder,
+    private val transfersActionGroupFinishNotificationBuilder: TransfersActionGroupFinishNotificationBuilder,
+    private val transfersActionGroupProgressNotificationBuilder: TransfersActionGroupProgressNotificationBuilder,
+    private val transfersProgressNotificationSummaryBuilder: TransfersProgressNotificationSummaryBuilder,
     private val scanMediaFileUseCase: ScanMediaFileUseCase,
     crashReporter: CrashReporter,
     foregroundSetter: ForegroundSetter? = null,
@@ -126,11 +130,19 @@ class DownloadsWorker @AssistedInject constructor(
     override suspend fun showGroupedNotifications() =
         getFeatureFlagValueUseCase(DataFeatures.ShowGroupedDownloadNotifications)
 
-    override suspend fun createSummaryNotification(): Notification? =
+    override suspend fun createFinishSummaryNotification(): Notification =
         transfersFinishNotificationSummaryBuilder(type)
 
-    override suspend fun createGroupNotification(group: ActiveTransferTotals.Group): Notification? =
-        transfersGroupFinishNotificationBuilder(group, type)
+    override suspend fun createActionGroupFinishNotification(group: ActiveTransferTotals.Group): Notification =
+        transfersActionGroupFinishNotificationBuilder(group, type)
+
+    override suspend fun createProgressSummaryNotification(): Notification =
+        transfersProgressNotificationSummaryBuilder(type)
+
+    override suspend fun createActionGroupProgressNotification(
+        group: ActiveTransferTotals.Group,
+        paused: Boolean,
+    ): Notification = transfersActionGroupProgressNotificationBuilder(group, type, paused)
 
     companion object {
         /**

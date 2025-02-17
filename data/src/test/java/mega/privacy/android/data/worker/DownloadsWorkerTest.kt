@@ -25,10 +25,12 @@ import kotlinx.coroutines.test.resetMain
 import kotlinx.coroutines.test.runTest
 import kotlinx.coroutines.test.setMain
 import mega.privacy.android.data.mapper.transfer.OverQuotaNotificationBuilder
+import mega.privacy.android.data.mapper.transfer.TransfersActionGroupFinishNotificationBuilder
+import mega.privacy.android.data.mapper.transfer.TransfersActionGroupProgressNotificationBuilder
 import mega.privacy.android.data.mapper.transfer.TransfersFinishNotificationSummaryBuilder
 import mega.privacy.android.data.mapper.transfer.TransfersFinishedNotificationMapper
-import mega.privacy.android.data.mapper.transfer.TransfersGroupFinishNotificationBuilder
 import mega.privacy.android.data.mapper.transfer.TransfersNotificationMapper
+import mega.privacy.android.data.mapper.transfer.TransfersProgressNotificationSummaryBuilder
 import mega.privacy.android.data.worker.AbstractTransfersWorker.Companion.ON_TRANSFER_UPDATE_REFRESH_MILLIS
 import mega.privacy.android.domain.entity.Progress
 import mega.privacy.android.domain.entity.transfer.ActiveTransferTotals
@@ -97,10 +99,14 @@ class DownloadsWorkerTest {
     private val startAllPendingDownloadsUseCase = mock<StartAllPendingDownloadsUseCase>()
     private val monitorActiveAndPendingTransfersUseCase =
         mock<MonitorActiveAndPendingTransfersUseCase>()
-    private val transfersGroupFinishNotificationBuilder =
-        mock<TransfersGroupFinishNotificationBuilder>()
+    private val transfersActionGroupFinishNotificationBuilder =
+        mock<TransfersActionGroupFinishNotificationBuilder>()
     private val transfersFinishNotificationSummaryBuilder =
         mock<TransfersFinishNotificationSummaryBuilder>()
+    private val transfersActionGroupProgressNotificationBuilder =
+        mock<TransfersActionGroupProgressNotificationBuilder>()
+    private val transfersProgressNotificationSummaryBuilder =
+        mock<TransfersProgressNotificationSummaryBuilder>()
     private val getFeatureFlagValueUseCase = mock<GetFeatureFlagValueUseCase>()
 
     @BeforeAll
@@ -148,8 +154,10 @@ class DownloadsWorkerTest {
             notificationSamplePeriod = 0L,
             monitorActiveAndPendingTransfersUseCase = monitorActiveAndPendingTransfersUseCase,
             startAllPendingDownloadsUseCase = startAllPendingDownloadsUseCase,
-            transfersGroupFinishNotificationBuilder = transfersGroupFinishNotificationBuilder,
+            transfersActionGroupFinishNotificationBuilder = transfersActionGroupFinishNotificationBuilder,
             transfersFinishNotificationSummaryBuilder = transfersFinishNotificationSummaryBuilder,
+            transfersActionGroupProgressNotificationBuilder = transfersActionGroupProgressNotificationBuilder,
+            transfersProgressNotificationSummaryBuilder = transfersProgressNotificationSummaryBuilder,
             getFeatureFlagValueUseCase = getFeatureFlagValueUseCase,
         )
     }
@@ -175,8 +183,10 @@ class DownloadsWorkerTest {
             monitorTransferEventsUseCase,
             monitorActiveAndPendingTransfersUseCase,
             startAllPendingDownloadsUseCase,
-            transfersGroupFinishNotificationBuilder,
+            transfersActionGroupFinishNotificationBuilder,
             transfersFinishNotificationSummaryBuilder,
+            transfersActionGroupProgressNotificationBuilder,
+            transfersProgressNotificationSummaryBuilder,
             getFeatureFlagValueUseCase,
         )
     }

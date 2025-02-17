@@ -51,6 +51,7 @@ import kotlin.time.Duration.Companion.milliseconds
  * Abstract CoroutineWorker to share common implementation of transfers workers
  * @param foregroundSetter to inject the set foreground method, used for testing
  * @param type Transfer type that this worker will manage
+ * @param crashReporter CrashReporter to log information and errors
  */
 abstract class AbstractTransfersWorker(
     context: Context,
@@ -142,11 +143,14 @@ abstract class AbstractTransfersWorker(
             }
             if (showGroupedNotifications()) {
                 checkFinishedGroups(transferTotals)
+                checkProgressGroups(transferTotals, paused)
             }
             //set progress percent as worker progress
             setProgress(workDataOf(PROGRESS to transferTotals.transferProgress.floatValue))
             //update the notification
-            updateProgressNotification(createUpdateNotification(transferTotals, paused))
+            if (showSingleNotification()) {
+                updateProgressNotification(createUpdateNotification(transferTotals, paused))
+            }
             Timber.d("${this@AbstractTransfersWorker::class.java.simpleName}${if (paused) "(paused) " else ""} Notification update (${transferTotals.transferProgress.intValue}):${transferTotals.hasOngoingTransfers()}")
         }
         .onCompletion {
@@ -164,8 +168,18 @@ abstract class AbstractTransfersWorker(
             .also { finishedGroups ->
                 alreadyFinishedGroups.addAll(finishedGroups.map { it.groupId })
                 finishedGroups.forEach {
-                    showGroupFinishedNotification(it)
+                    showActionGroupFinishedNotification(it)
                 }
+            }
+    }
+
+    private suspend fun checkProgressGroups(
+        transferTotals: ActiveTransferTotals,
+        paused: Boolean,
+    ) {
+        transferTotals.groups.filter { alreadyFinishedGroups.contains(it.groupId).not() }
+            .onEach {
+                showActionGroupProgressNotification(it, paused)
             }
     }
 
@@ -191,13 +205,13 @@ abstract class AbstractTransfersWorker(
             if (hasCompleted(lastActiveTransferTotals)) {
                 Timber.d("${this@AbstractTransfersWorker::class.java.simpleName} Finished Successful: $lastActiveTransferTotals")
                 if (lastActiveTransferTotals.totalTransfers > 0) {
-                    if (showFinalNotification()) {
+                    if (showSingleNotification()) {
                         showFinishNotification(lastActiveTransferTotals)
                     }
                 }
                 return@withContext Result.success()
             } else {
-                if (!storageOverQuota && !transferOverQuota) {
+                if (!storageOverQuota && !transferOverQuota && showSingleNotification()) {
                     showFinishNotification(lastActiveTransferTotals)
                 }
                 Timber.d("${this@AbstractTransfersWorker::class.java.simpleName}finished Failure: $lastActiveTransferTotals")
@@ -239,7 +253,14 @@ abstract class AbstractTransfersWorker(
         activeTransferTotals: ActiveTransferTotals,
         paused: Boolean,
     ): ForegroundInfo =
-        createForegroundInfo(createUpdateNotification(activeTransferTotals, paused))
+        createForegroundInfo(
+            if (showSingleNotification()) {
+                createUpdateNotification(activeTransferTotals, paused)
+            } else {
+                createProgressSummaryNotification()
+                    ?: createUpdateNotification(activeTransferTotals, paused)
+            }
+        )
 
     /**
      * Monitors transfer events and update the related active transfers
@@ -297,19 +318,19 @@ abstract class AbstractTransfersWorker(
     }
 
     private suspend fun showFinishNotification(activeTransferTotals: ActiveTransferTotals) =
-        showFinalNotification(
+        showSingleNotification(
             createFinishNotification(activeTransferTotals),
             finalNotificationId,
         )
 
     private suspend fun showOverQuotaNotification(storageOverQuota: Boolean) =
-        showFinalNotification(
+        showSingleNotification(
             overQuotaNotificationBuilder(storageOverQuota = storageOverQuota),
             NOTIFICATION_STORAGE_OVERQUOTA
         )
 
     @SuppressLint("MissingPermission")
-    private suspend fun showFinalNotification(
+    private suspend fun showSingleNotification(
         notification: Notification?,
         notificationId: Int?,
     ) {
@@ -322,22 +343,40 @@ abstract class AbstractTransfersWorker(
     }
 
     /**
-     * If true, the notifications for finished transfers will be shown by each group instead of a single final notification for all transfers.
+     * If true, the notifications for transfers will be shown by each group instead of a single notification for all transfers.
      */
     open suspend fun showGroupedNotifications() = false
-    private suspend fun showFinalNotification() = !showGroupedNotifications()
-    open suspend fun createSummaryNotification(): Notification? = null
-    open suspend fun createGroupNotification(group: ActiveTransferTotals.Group): Notification? =
+
+    /**
+     * Shows a single notification if [showGroupedNotifications] returns false.
+     */
+    private suspend fun showSingleNotification() = !showGroupedNotifications()
+
+    /**
+     * Groups finish notifications by type.
+     */
+    open suspend fun createFinishSummaryNotification(): Notification? = null
+
+    /**
+     * Groups progress notifications by type.
+     */
+    open suspend fun createProgressSummaryNotification(): Notification? = null
+
+    /**
+     * Creates a group finish notification.
+     */
+    open suspend fun createActionGroupFinishNotification(group: ActiveTransferTotals.Group): Notification? =
         null
 
     @SuppressLint("MissingPermission")
-    private suspend fun showGroupFinishedNotification(
+    private suspend fun showActionGroupFinishedNotification(
         group: ActiveTransferTotals.Group,
     ) {
         if (areNotificationsEnabledUseCase()) {
+            notificationManager.cancel(NOTIFICATION_GROUP_MULTIPLAYER * updateNotificationId + group.groupId)
             finalNotificationId?.let { finalNotificationId ->
-                createSummaryNotification()?.let { summaryNotification ->
-                    createGroupNotification(group)?.let { groupNotification ->
+                createFinishSummaryNotification()?.let { summaryNotification ->
+                    createActionGroupFinishNotification(group)?.let { groupNotification ->
                         val groupNotificationId =
                             NOTIFICATION_GROUP_MULTIPLAYER * finalNotificationId + group.groupId
                         notificationManager.notify(
@@ -349,6 +388,40 @@ abstract class AbstractTransfersWorker(
                             groupNotification,
                         )
                     }
+                }
+            }
+        }
+    }
+
+    /**
+     * Creates a group progress notification.
+     */
+    open suspend fun createActionGroupProgressNotification(
+        group: ActiveTransferTotals.Group,
+        paused: Boolean,
+    ): Notification? = null
+
+    @SuppressLint("MissingPermission")
+    private suspend fun showActionGroupProgressNotification(
+        group: ActiveTransferTotals.Group,
+        paused: Boolean,
+    ) {
+        if (areNotificationsEnabledUseCase()) {
+            createProgressSummaryNotification()?.let { summaryNotification ->
+                createActionGroupProgressNotification(
+                    group,
+                    paused,
+                )?.let { groupNotification ->
+                    val groupNotificationId =
+                        NOTIFICATION_GROUP_MULTIPLAYER * updateNotificationId + group.groupId
+                    notificationManager.notify(
+                        updateNotificationId,
+                        summaryNotification,
+                    )
+                    notificationManager.notify(
+                        groupNotificationId,
+                        groupNotification,
+                    )
                 }
             }
         }
@@ -378,6 +451,17 @@ abstract class AbstractTransfersWorker(
          * Tag to get the progress as float in [0,1] range of this worker
          */
         const val PROGRESS = "Progress"
+
+        /**
+         * Final summary group
+         */
+        const val FINAL_SUMMARY_GROUP = "FinalSummary"
+
+        /**
+         * Progress summary group
+         */
+        const val PROGRESS_SUMMARY_GROUP = "ProgressSummary"
+
         private const val NOTIFICATION_STORAGE_OVERQUOTA = 14
 
         private const val NOTIFICATION_GROUP_MULTIPLAYER = 1_000_000

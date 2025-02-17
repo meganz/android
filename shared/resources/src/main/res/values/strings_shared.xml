@@ -886,4 +886,8 @@
     <string name="multi_factor_auth_login_verification_input_error_text">Incorrect verification code</string>
     <!-- Snackbar text to inform the user that preview may take some time because it needs to be downloaded -->
     <string name="transfers_preview_slow_snackbar">Preparing file for preview. See notification for details.</string>
+    <!-- Notification text for preview downloads.  Please do not modify the %s placeholder as it will be replaced by the name of the file to be donwloaded -->
+    <string name="transfers_notification_downloading_preview">Preparing %1$s for preview</string>
+    <!-- Notification text for preview downloads, paused state.  Please do not modify the %s placeholder as it will be replaced by the name of the file to be donwloaded -->
+    <string name="transfers_notification_downloading_preview_paused">Preparing %1$s for preview (paused)</string>
 </resources>

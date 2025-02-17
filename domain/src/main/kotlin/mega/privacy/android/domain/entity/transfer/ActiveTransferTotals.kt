@@ -42,6 +42,9 @@ data class ActiveTransferTotals(
      * @param destination the destination of the transfer
      * @param singleFileName in case of a single file transfer, the name of the file, null otherwise
      * @param startTime the local time in milliseconds when this action was started, it should be used for UX only as precision is not guaranteed
+     * @param pausedFiles the amount of files that are paused
+     * @param totalBytes the total bytes of all files in this group
+     * @param transferredBytes the total bytes already transferred of all files in this group
      * @param appData the list of app data of the transfers in this group. Group app data itself is filtered out. Only one instance of each app data type is added to represent this group.
      */
     data class Group(
@@ -53,13 +56,34 @@ data class ActiveTransferTotals(
         val destination: String,
         val singleFileName: String?,
         val startTime: Long,
+        val pausedFiles: Int,
+        val totalBytes: Long,
+        val transferredBytes: Long,
         override val appData: List<TransferAppData> = emptyList(),
     ) : AppDataOwner {
+
+        /**
+         * @return true if all files in this group have finished, false otherwise
+         */
         fun finished() = totalFiles == finishedFiles
+
+        /**
+         * The amount of files that have finished but are not completed (finished with errors)
+         */
         val finishedFilesWithErrors = finishedFiles - completedFiles - alreadyTransferred
 
         fun durationFromStart(currentTimeInMillis: Long) =
             (currentTimeInMillis - startTime).milliseconds
+
+        /**
+         * @return true if all pending files in this group are paused, false otherwise
+         */
+        fun allPaused() = totalFiles - finishedFiles == pausedFiles
+
+        /**
+         * The progress of the already transferred bytes
+         */
+        val progress = Progress(transferredBytes, totalBytes)
     }
 
     /**

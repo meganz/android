@@ -7,23 +7,23 @@ import androidx.core.content.ContextCompat
 import dagger.hilt.android.qualifiers.ApplicationContext
 import mega.privacy.android.app.R
 import mega.privacy.android.app.utils.Constants
-import mega.privacy.android.data.mapper.transfer.TransfersFinishNotificationSummaryBuilder
-import mega.privacy.android.data.worker.AbstractTransfersWorker.Companion.FINAL_SUMMARY_GROUP
+import mega.privacy.android.data.mapper.transfer.TransfersProgressNotificationSummaryBuilder
+import mega.privacy.android.data.worker.AbstractTransfersWorker.Companion.PROGRESS_SUMMARY_GROUP
 import mega.privacy.android.domain.entity.transfer.TransferType
 import javax.inject.Inject
 
 /**
- * Default implementation of [TransfersFinishNotificationSummaryBuilder]
+ * Default implementation of [TransfersProgressNotificationSummaryBuilder]
  */
-class DefaultTransfersFinishNotificationSummaryBuilder @Inject constructor(
+class DefaultTransfersProgressNotificationSummaryBuilder @Inject constructor(
     @ApplicationContext private val context: Context,
-) : TransfersFinishNotificationSummaryBuilder {
+) : TransfersProgressNotificationSummaryBuilder {
 
     override suspend fun invoke(type: TransferType) =
         NotificationCompat.Builder(context, Constants.NOTIFICATION_CHANNEL_DOWNLOAD_ID)
             .setSmallIcon(iconPackR.drawable.ic_stat_notify)
             .setColor(ContextCompat.getColor(context, R.color.red_600_red_300))
-            .setGroup(FINAL_SUMMARY_GROUP + type.name)
+            .setGroup(PROGRESS_SUMMARY_GROUP + type.name)
             .setGroupSummary(true)
             .build()
 }
