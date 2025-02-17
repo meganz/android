@@ -18,7 +18,6 @@ import kotlinx.coroutines.flow.onEach
 import kotlinx.coroutines.flow.takeWhile
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
-import mega.privacy.android.app.featuretoggle.AppFeatures
 import mega.privacy.android.app.middlelayer.iar.OnCompleteListener
 import mega.privacy.android.app.presentation.mapper.file.FileSizeStringMapper
 import mega.privacy.android.app.presentation.transfers.TransfersConstants
@@ -44,7 +43,6 @@ import mega.privacy.android.domain.usecase.canceltoken.CancelCancelTokenUseCase
 import mega.privacy.android.domain.usecase.canceltoken.InvalidateCancelTokenUseCase
 import mega.privacy.android.domain.usecase.chat.message.SendChatAttachmentsUseCase
 import mega.privacy.android.domain.usecase.environment.GetCurrentTimeInMillisUseCase
-import mega.privacy.android.domain.usecase.featureflag.GetFeatureFlagValueUseCase
 import mega.privacy.android.domain.usecase.file.TotalFileSizeOfNodesUseCase
 import mega.privacy.android.domain.usecase.network.IsConnectedToInternetUseCase
 import mega.privacy.android.domain.usecase.node.GetFilePreviewDownloadPathUseCase
@@ -76,7 +74,6 @@ import mega.privacy.android.domain.usecase.transfers.uploads.StartUploadsWorkerA
 import timber.log.Timber
 import java.io.File
 import javax.inject.Inject
-import kotlin.collections.filter
 import kotlin.time.Duration.Companion.seconds
 
 /**
@@ -118,7 +115,6 @@ internal class StartTransfersComponentViewModel @Inject constructor(
     private val insertPendingUploadsForFilesUseCase: InsertPendingUploadsForFilesUseCase,
     private val monitorStorageOverQuotaUseCase: MonitorStorageOverQuotaUseCase,
     private val invalidateCancelTokenUseCase: InvalidateCancelTokenUseCase,
-    private val getFeatureFlagValueUseCase: GetFeatureFlagValueUseCase,
     private val getCurrentTimeInMillisUseCase: GetCurrentTimeInMillisUseCase,
 ) : ViewModel(), DefaultLifecycleObserver {
 
@@ -130,14 +126,6 @@ internal class StartTransfersComponentViewModel @Inject constructor(
     internal val uiState = _uiState.asStateFlow()
 
     init {
-        viewModelScope.launch {
-            val isPreviewDownloadFeatureEnabled =
-                getFeatureFlagValueUseCase(AppFeatures.PreviewDownload)
-
-            _uiState.update { state ->
-                state.copy(isPreviewDownloadFeatureEnabled = isPreviewDownloadFeatureEnabled)
-            }
-        }
         checkDownloadRating()
         checkUploadRating()
         monitorRequestFilesPermissionDenied()

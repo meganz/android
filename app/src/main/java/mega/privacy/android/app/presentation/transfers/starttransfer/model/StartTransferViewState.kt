@@ -15,7 +15,6 @@ import java.io.File
  * @property requestFilesPermissionDenied True if the user denied the files permission request.
  * @property triggerEventWithoutPermission user needs to answer requested permission after triggering this event
  * @property isStorageOverQuota True if the user is in storage over quota state.
- * @property isPreviewDownloadFeatureEnabled True if the PreviewDownload feature is enabled.
  * @property previewFileToOpen
  * @constructor Create empty Start transfer view state
  */
@@ -28,6 +27,5 @@ data class StartTransferViewState(
     val requestFilesPermissionDenied: Boolean = false,
     val triggerEventWithoutPermission: TransferTriggerEvent? = null,
     val isStorageOverQuota: Boolean = false,
-    val isPreviewDownloadFeatureEnabled: Boolean = false,
     val previewFileToOpen: File? = null,
 )

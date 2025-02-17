@@ -15,7 +15,6 @@ import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.takeWhile
 import kotlinx.coroutines.test.runTest
 import kotlinx.coroutines.yield
-import mega.privacy.android.app.featuretoggle.AppFeatures
 import mega.privacy.android.app.presentation.mapper.file.FileSizeStringMapper
 import mega.privacy.android.app.presentation.transfers.TransfersConstants
 import mega.privacy.android.app.presentation.transfers.starttransfer.StartTransfersComponentViewModel
@@ -37,7 +36,6 @@ import mega.privacy.android.domain.usecase.canceltoken.CancelCancelTokenUseCase
 import mega.privacy.android.domain.usecase.canceltoken.InvalidateCancelTokenUseCase
 import mega.privacy.android.domain.usecase.chat.message.SendChatAttachmentsUseCase
 import mega.privacy.android.domain.usecase.environment.GetCurrentTimeInMillisUseCase
-import mega.privacy.android.domain.usecase.featureflag.GetFeatureFlagValueUseCase
 import mega.privacy.android.domain.usecase.file.TotalFileSizeOfNodesUseCase
 import mega.privacy.android.domain.usecase.network.IsConnectedToInternetUseCase
 import mega.privacy.android.domain.usecase.node.GetFilePreviewDownloadPathUseCase
@@ -136,7 +134,6 @@ class StartTransfersComponentViewModelTest {
     private val insertPendingUploadsForFilesUseCase = mock<InsertPendingUploadsForFilesUseCase>()
     private val startUploadsWorkerAndWaitUntilIsStartedUseCase =
         mock<StartUploadsWorkerAndWaitUntilIsStartedUseCase>()
-    private val getFeatureFlagValueUseCase = mock<GetFeatureFlagValueUseCase>()
     private val getCurrentTimeInMillisUseCase = mock<GetCurrentTimeInMillisUseCase>()
 
 
@@ -200,7 +197,6 @@ class StartTransfersComponentViewModelTest {
             insertPendingUploadsForFilesUseCase = insertPendingUploadsForFilesUseCase,
             monitorStorageOverQuotaUseCase = monitorStorageOverQuotaUseCase,
             invalidateCancelTokenUseCase = invalidateCancelTokenUseCase,
-            getFeatureFlagValueUseCase = getFeatureFlagValueUseCase,
             getCurrentTimeInMillisUseCase = getCurrentTimeInMillisUseCase,
         )
     }
@@ -242,7 +238,6 @@ class StartTransfersComponentViewModelTest {
             invalidateCancelTokenUseCase,
             insertPendingUploadsForFilesUseCase,
             startUploadsWorkerAndWaitUntilIsStartedUseCase,
-            getFeatureFlagValueUseCase,
             getCurrentTimeInMillisUseCase,
         )
         initialStub()
@@ -252,7 +247,6 @@ class StartTransfersComponentViewModelTest {
         whenever(monitorOngoingActiveTransfersUseCase(any())).thenReturn(emptyFlow())
         whenever(monitorRequestFilesPermissionDeniedUseCase()).thenReturn(emptyFlow())
         whenever(monitorStorageOverQuotaUseCase()).thenReturn(emptyFlow())
-        whenever(getFeatureFlagValueUseCase(AppFeatures.PreviewDownload)).thenReturn(false)
     }
 
     @ParameterizedTest
@@ -935,18 +929,6 @@ class StartTransfersComponentViewModelTest {
         )
     }
 
-    @Test
-    fun `test that GetFeatureFlagValueUseCase updates state`() =
-        runTest {
-            whenever(getFeatureFlagValueUseCase(AppFeatures.PreviewDownload)).thenReturn(true)
-
-            initTest()
-
-            underTest.uiState.test {
-                assertThat(awaitItem().isPreviewDownloadFeatureEnabled).isTrue()
-            }
-        }
-
     @Nested
     inner class TriggerEventWithoutPermission {
 
@@ -1051,7 +1033,6 @@ class StartTransfersComponentViewModelTest {
         whenever(shouldAskDownloadDestinationUseCase()).thenReturn(false)
         whenever(monitorRequestFilesPermissionDeniedUseCase()).thenReturn(emptyFlow())
         whenever(monitorStorageOverQuotaUseCase()).thenReturn(emptyFlow())
-        whenever(getFeatureFlagValueUseCase(AppFeatures.PreviewDownload)).thenReturn(false)
     }
 
     private fun stubMonitorPendingTransfers(

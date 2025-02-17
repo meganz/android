@@ -223,14 +223,6 @@ enum class AppFeatures(override val description: String, private val defaultValu
         "Registration Revamp with new components",
         false,
     ),
-
-    /**
-     *  Use new approach to download files for preview.
-     */
-    PreviewDownload(
-        "Use new approach to download files for preview",
-        false,
-    ),
     ;
 
     companion object : FeatureFlagValueProvider {
