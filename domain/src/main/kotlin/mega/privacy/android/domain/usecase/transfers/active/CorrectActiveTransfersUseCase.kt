@@ -3,6 +3,7 @@ package mega.privacy.android.domain.usecase.transfers.active
 import mega.privacy.android.domain.entity.transfer.ActiveTransferTotals
 import mega.privacy.android.domain.entity.transfer.TransferType
 import mega.privacy.android.domain.entity.transfer.isBackgroundTransfer
+import mega.privacy.android.domain.entity.transfer.isPreviewDownload
 import mega.privacy.android.domain.entity.transfer.isSDCardDownload
 import mega.privacy.android.domain.entity.transfer.isVoiceClip
 import mega.privacy.android.domain.entity.transfer.pending.PendingTransferState
@@ -100,13 +101,15 @@ class CorrectActiveTransfersUseCase @Inject constructor(
                 notInProgressPendingTransfersWaitingSdkScanning,
                 PendingTransferState.ErrorStarting
             )
-            notInProgressPendingTransfersWaitingSdkScanning.forEach {
-                transferRepository.addCompletedTransferFromFailedPendingTransfer(
-                    it,
-                    0L,
-                    UnknownError()
-                )
-            }
+            notInProgressPendingTransfersWaitingSdkScanning
+                .filterNot { it.isPreviewDownload() }
+                .forEach {
+                    transferRepository.addCompletedTransferFromFailedPendingTransfer(
+                        it,
+                        0L,
+                        UnknownError()
+                    )
+                }
         }
     }
 }

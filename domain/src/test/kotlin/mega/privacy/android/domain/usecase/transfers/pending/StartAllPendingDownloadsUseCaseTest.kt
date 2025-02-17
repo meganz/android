@@ -35,6 +35,7 @@ import org.mockito.kotlin.doThrow
 import org.mockito.kotlin.eq
 import org.mockito.kotlin.isA
 import org.mockito.kotlin.mock
+import org.mockito.kotlin.never
 import org.mockito.kotlin.reset
 import org.mockito.kotlin.verify
 import org.mockito.kotlin.whenever
@@ -318,6 +319,41 @@ class StartAllPendingDownloadsUseCaseTest {
                 eq(pendingTransfer),
                 eq(0),
                 any(),
+            )
+        }
+
+    @Test
+    fun `test that pending transfers state is updated to ErrorStarting and failed completed transfer is not added when there is an exception collecting the pending transfers and pending transfer is a preview`() =
+        runTest {
+            val pendingTransfer = mock<PendingTransfer> {
+                on { appData } doReturn listOf(TransferAppData.PreviewDownload)
+            }
+            val pendingTransfers = listOf(pendingTransfer)
+            val exception = RuntimeException()
+            stubNotSentPendingTransfers(
+                pendingTransfers,
+                pendingTransfers,
+                emptyList()
+            )
+            whenever(
+                updatePendingTransferStateUseCase(
+                    pendingTransfers,
+                    PendingTransferState.SdkScanning
+                )
+            ).doThrow(exception)
+
+            underTest().test {
+                awaitComplete()
+            }
+
+            verify(updatePendingTransferStateUseCase)(
+                pendingTransfers,
+                PendingTransferState.ErrorStarting
+            )
+            verify(transferRepository, never()).addCompletedTransferFromFailedPendingTransfer(
+                any(),
+                any(),
+                any()
             )
         }
 

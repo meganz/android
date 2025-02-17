@@ -19,7 +19,7 @@ internal class PendingTransferModelMapper @Inject constructor(
             transferType = transferType,
             nodeIdentifier = nodeIdentifier,
             uriPath = UriPath(path),
-            appData = appData?.let { appDataMapper(it) },
+            appData = appData?.let { appDataMapper(it) } ?: emptyList(),
             isHighPriority = isHighPriority,
             scanningFoldersData = with(scanningFoldersData) {
                 PendingTransfer.ScanningFoldersData(

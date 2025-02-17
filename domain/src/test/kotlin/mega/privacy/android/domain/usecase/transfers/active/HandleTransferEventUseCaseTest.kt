@@ -28,6 +28,7 @@ import org.mockito.kotlin.any
 import org.mockito.kotlin.doReturn
 import org.mockito.kotlin.eq
 import org.mockito.kotlin.mock
+import org.mockito.kotlin.never
 import org.mockito.kotlin.reset
 import org.mockito.kotlin.verify
 import org.mockito.kotlin.verifyNoInteractions
@@ -294,6 +295,55 @@ class HandleTransferEventUseCaseTest {
             val expected = events.associateWith { destinationUriAndSubFolders.toString() }
             underTest.invoke(events = events.toTypedArray())
             verify(transferRepository).addCompletedTransfers(eq(expected))
+        }
+
+    @Test
+    fun `test that does not invoke call addCompletedTransfers when the event is a finish event and transfer is a preview`() =
+        runTest {
+            val transfer = mock<Transfer> {
+                on { this.transferType } doReturn TransferType.DOWNLOAD
+                on { this.tag } doReturn 1
+                on { this.appData }.thenReturn(listOf(TransferAppData.PreviewDownload))
+            }
+            val transferEvent = mock<TransferEvent.TransferFinishEvent> {
+                on { this.transfer }.thenReturn(transfer)
+            }
+            val destinationUriAndSubFolders = DestinationUriAndSubFolders("folder/file")
+
+            whenever(getTransferDestinationUriUseCase(transferEvent.transfer)) doReturn destinationUriAndSubFolders
+
+            underTest.invoke(transferEvent)
+
+            verify(transferRepository, never()).addCompletedTransferFromFailedPendingTransfer(
+                any(),
+                any(),
+                any()
+            )
+        }
+
+    @Test
+    fun `test that does not invoke call addCompletedTransfers when the event is a finish event and transfer is a folder`() =
+        runTest {
+            val transfer = mock<Transfer> {
+                on { this.transferType } doReturn TransferType.DOWNLOAD
+                on { this.tag } doReturn 1
+                on { isFolderTransfer } doReturn true
+                on { this.appData }.thenReturn(emptyList())
+            }
+            val transferEvent = mock<TransferEvent.TransferFinishEvent> {
+                on { this.transfer }.thenReturn(transfer)
+            }
+            val destinationUriAndSubFolders = DestinationUriAndSubFolders("folder/file")
+
+            whenever(getTransferDestinationUriUseCase(transferEvent.transfer)) doReturn destinationUriAndSubFolders
+
+            underTest.invoke(transferEvent)
+
+            verify(transferRepository, never()).addCompletedTransferFromFailedPendingTransfer(
+                any(),
+                any(),
+                any()
+            )
         }
 
     @ParameterizedTest

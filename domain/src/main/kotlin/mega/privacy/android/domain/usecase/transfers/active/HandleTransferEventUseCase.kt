@@ -2,6 +2,7 @@ package mega.privacy.android.domain.usecase.transfers.active
 
 import mega.privacy.android.domain.entity.transfer.TransferAppData.RecursiveTransferAppData
 import mega.privacy.android.domain.entity.transfer.TransferEvent
+import mega.privacy.android.domain.entity.transfer.isPreviewDownload
 import mega.privacy.android.domain.exception.BusinessAccountExpiredMegaException
 import mega.privacy.android.domain.exception.QuotaExceededMegaException
 import mega.privacy.android.domain.repository.TransferRepository
@@ -54,7 +55,7 @@ class HandleTransferEventUseCase @Inject internal constructor(
         updateActiveTransfers(transferEvents)
 
         val completedEventsMap = transferEvents
-            .filterNot { it.transfer.isFolderTransfer }
+            .filterNot { it.transfer.isFolderTransfer || it.transfer.isPreviewDownload() }
             .filterIsInstance<TransferEvent.TransferFinishEvent>()
             .associateWith { eventsWithDestinationMap[it]?.toString() }
         if (completedEventsMap.isNotEmpty()) {

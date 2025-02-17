@@ -269,6 +269,37 @@ internal class CorrectActiveTransfersUseCaseTest {
     }
 
     @Test
+    fun `test that pending preview transfers waiting for sdk scanning not known by sdk are not set as completed`() =
+        runTest {
+            val pendingTransfer = mock<PendingTransfer> {
+                on { this.transferTag } doReturn 1
+                on { appData } doReturn listOf(TransferAppData.PreviewDownload)
+            }
+            val pendingTransfers = listOf(pendingTransfer)
+
+            whenever(
+                transferRepository
+                    .getPendingTransfersByTypeAndState(
+                        TransferType.DOWNLOAD,
+                        PendingTransferState.SdkScanning
+                    )
+            ) doReturn pendingTransfers
+            whenever(getInProgressTransfersUseCase()) doReturn emptyList()
+
+            underTest(TransferType.DOWNLOAD)
+
+            verify(updatePendingTransferStateUseCase).invoke(
+                pendingTransfers,
+                PendingTransferState.ErrorStarting
+            )
+            verify(transferRepository, never()).addCompletedTransferFromFailedPendingTransfer(
+                any(),
+                any(),
+                any()
+            )
+        }
+
+    @Test
     fun `test that voice clip transfers are filtered`() =
         runTest {
             val transfer = mock<Transfer> {

@@ -115,7 +115,7 @@ class MonitorPendingTransfersUntilResolvedUseCaseTest {
         pendingTransferState: PendingTransferState = NotSentToSdk,
     ) = PendingTransfer(
         354L,
-        appData = null,
+        appData = emptyList(),
         isHighPriority = false,
         nodeIdentifier = mock<PendingTransferNodeIdentifier.CloudDriveNode>(),
         uriPath = UriPath(""),

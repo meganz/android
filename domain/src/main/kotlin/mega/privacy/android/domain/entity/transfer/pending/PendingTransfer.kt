@@ -1,5 +1,6 @@
 package mega.privacy.android.domain.entity.transfer.pending
 
+import mega.privacy.android.domain.entity.transfer.AppDataOwner
 import mega.privacy.android.domain.entity.transfer.TransferAppData
 import mega.privacy.android.domain.entity.transfer.TransferStage
 import mega.privacy.android.domain.entity.transfer.TransferType
@@ -27,14 +28,14 @@ data class PendingTransfer(
     val transferType: TransferType,
     val nodeIdentifier: PendingTransferNodeIdentifier,
     val uriPath: UriPath,
-    val appData: List<TransferAppData>?,
+    override val appData: List<TransferAppData> = emptyList(),
     val isHighPriority: Boolean,
     val scanningFoldersData: ScanningFoldersData = ScanningFoldersData(),
     val startedFiles: Int = 0,
     val alreadyTransferred: Int = 0,
     val state: PendingTransferState = PendingTransferState.NotSentToSdk,
     val fileName: String?,
-) {
+) : AppDataOwner {
 
     /**
      * Pending transfer data related to scanning folders process

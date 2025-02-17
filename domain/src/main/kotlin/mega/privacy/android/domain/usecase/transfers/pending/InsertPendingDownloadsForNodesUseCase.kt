@@ -57,7 +57,7 @@ class InsertPendingDownloadsForNodesUseCase @Inject constructor(
             appData,
             destinationAppData,
             TransferAppData.TransferGroup(transferGroupId),
-        ).takeIf { it.isNotEmpty() }
+        )
         fileSystemRepository.createDirectory(folderDestination.value)
         if (!doesUriPathHaveSufficientSpaceForNodesUseCase(folderDestination, nodes)) {
             throw NotEnoughStorageException()

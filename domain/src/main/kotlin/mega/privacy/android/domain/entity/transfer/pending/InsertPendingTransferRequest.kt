@@ -16,7 +16,7 @@ data class InsertPendingTransferRequest(
     val transferType: TransferType,
     val nodeIdentifier: PendingTransferNodeIdentifier,
     val uriPath: UriPath,
-    val appData: List<TransferAppData>?,
+    val appData: List<TransferAppData> = emptyList(),
     val isHighPriority: Boolean,
     val fileName: String?,
 )

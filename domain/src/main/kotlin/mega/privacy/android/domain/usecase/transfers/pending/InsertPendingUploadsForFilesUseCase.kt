@@ -26,7 +26,7 @@ class InsertPendingUploadsForFilesUseCase @Inject constructor(
         pathsAndNames: Map<String, String?>,
         parentFolderId: NodeId,
         isHighPriority: Boolean = false,
-        appData: List<TransferAppData>? = null,
+        appData: List<TransferAppData> = emptyList(),
     ) {
         transferRepository.insertPendingTransfers(
             pathsAndNames.map { (path, name) ->

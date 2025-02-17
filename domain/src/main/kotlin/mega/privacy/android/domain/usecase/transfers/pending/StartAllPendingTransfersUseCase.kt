@@ -13,6 +13,7 @@ import mega.privacy.android.domain.entity.transfer.TransferEvent
 import mega.privacy.android.domain.entity.transfer.TransferType
 import mega.privacy.android.domain.entity.transfer.isAlreadyTransferredEvent
 import mega.privacy.android.domain.entity.transfer.isFinishScanningEvent
+import mega.privacy.android.domain.entity.transfer.isPreviewDownload
 import mega.privacy.android.domain.entity.transfer.isTransferUpdated
 import mega.privacy.android.domain.entity.transfer.pending.PendingTransfer
 import mega.privacy.android.domain.entity.transfer.pending.PendingTransferState
@@ -111,10 +112,13 @@ abstract class StartAllPendingTransfersUseCase(
             listOf(pendingTransfer),
             PendingTransferState.ErrorStarting
         )
-        transferRepository.addCompletedTransferFromFailedPendingTransfer(
-            pendingTransfer,
-            0,
-            exception,
-        )
+
+        if (pendingTransfer.isPreviewDownload().not()) {
+            transferRepository.addCompletedTransferFromFailedPendingTransfer(
+                pendingTransfer,
+                0,
+                exception,
+            )
+        }
     }
 }
