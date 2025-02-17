@@ -26,6 +26,7 @@ import mega.privacy.android.core.test.extension.CoroutineMainDispatcherExtension
 import mega.privacy.android.domain.entity.Progress
 import mega.privacy.android.domain.entity.login.EphemeralCredentials
 import mega.privacy.android.domain.exception.MegaException
+import mega.privacy.android.domain.usecase.GetThemeMode
 import mega.privacy.android.domain.usecase.RootNodeExistsUseCase
 import mega.privacy.android.domain.usecase.account.ClearUserCredentialsUseCase
 import mega.privacy.android.domain.usecase.account.MonitorAccountBlockedUseCase
@@ -129,6 +130,7 @@ internal class LoginViewModelTest {
     private val checkIfTransfersShouldBePausedUseCase =
         mock<CheckIfTransfersShouldBePausedUseCase>()
     private val isFirstLaunchUseCase = mock<IsFirstLaunchUseCase>()
+    private val getThemeMode = mock<GetThemeMode>()
 
     @BeforeEach
     fun setUp() {
@@ -175,7 +177,8 @@ internal class LoginViewModelTest {
             enableRequestStatusMonitorUseCase = enableRequestStatusMonitorUseCase,
             monitorRequestStatusProgressEventUseCase = monitorRequestStatusProgressEventUseCase,
             checkIfTransfersShouldBePausedUseCase = checkIfTransfersShouldBePausedUseCase,
-            isFirstLaunchUseCase = isFirstLaunchUseCase
+            isFirstLaunchUseCase = isFirstLaunchUseCase,
+            getThemeMode = getThemeMode
         )
     }
 

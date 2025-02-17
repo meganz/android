@@ -61,7 +61,6 @@ import mega.privacy.android.app.utils.ConstantsUrl.RECOVERY_URL_EMAIL
 import mega.privacy.android.app.utils.TextUtil
 import mega.privacy.android.app.utils.Util
 import mega.privacy.android.domain.entity.StorageState
-import mega.privacy.android.domain.entity.ThemeMode
 import mega.privacy.android.domain.entity.support.SupportEmailTicket
 import mega.privacy.android.domain.qualifier.LoginMutex
 import mega.privacy.android.domain.usecase.GetThemeMode
@@ -77,9 +76,6 @@ import javax.inject.Inject
  */
 @AndroidEntryPoint
 class LoginFragment : Fragment() {
-
-    @Inject
-    lateinit var getThemeMode: GetThemeMode
 
     @Inject
     @LoginMutex
@@ -115,7 +111,6 @@ class LoginFragment : Fragment() {
 
     @Composable
     private fun LoginScreen() {
-        val themeMode by getThemeMode().collectAsStateWithLifecycle(initialValue = ThemeMode.System)
         val uiState by viewModel.state.collectAsStateWithLifecycle()
 
         with(uiState) {
@@ -133,7 +128,7 @@ class LoginFragment : Fragment() {
             if (ongoingTransfersExist == true) showCancelTransfersDialog()
         }
 
-        OriginalTheme(isDark = themeMode.isDarkMode()) {
+        OriginalTheme(isDark = uiState.themeMode.isDarkMode()) {
             LoginView(
                 state = uiState,
                 onEmailChanged = viewModel::onEmailChanged,

@@ -882,4 +882,8 @@
         <item quantity="one">1 file added to “%1$s”. Some files already exist, and can’t be added again.</item>
         <item quantity="other">%2$d files added to “%1$s”. Some files already exist, and can’t be added again.</item>
     </plurals>
+    <!--Content on the Multi-Factor Authentication Login page -->
+    <string name="multi_factor_auth_login_verification_content">Enter the 6-digit code from your authenticator app.</string>
+    <!--Message to be shown to the user when they entered an incorrect verification code-->
+    <string name="multi_factor_auth_login_verification_input_error_text">Incorrect verification code</string>
 </resources>

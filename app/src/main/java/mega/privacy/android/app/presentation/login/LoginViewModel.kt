@@ -50,6 +50,7 @@ import mega.privacy.android.domain.exception.QuerySignupLinkException
 import mega.privacy.android.domain.exception.login.FetchNodesErrorAccess
 import mega.privacy.android.domain.exception.login.FetchNodesException
 import mega.privacy.android.domain.qualifier.LoginMutex
+import mega.privacy.android.domain.usecase.GetThemeMode
 import mega.privacy.android.domain.usecase.RootNodeExistsUseCase
 import mega.privacy.android.domain.usecase.account.ClearUserCredentialsUseCase
 import mega.privacy.android.domain.usecase.account.MonitorAccountBlockedUseCase
@@ -140,6 +141,7 @@ class LoginViewModel @Inject constructor(
     private val monitorRequestStatusProgressEventUseCase: MonitorRequestStatusProgressEventUseCase,
     private val checkIfTransfersShouldBePausedUseCase: CheckIfTransfersShouldBePausedUseCase,
     private val isFirstLaunchUseCase: IsFirstLaunchUseCase,
+    private val getThemeMode: GetThemeMode,
 ) : ViewModel() {
 
     private val _state = MutableStateFlow(LoginState())
@@ -253,6 +255,16 @@ class LoginViewModel @Inject constructor(
                 flowOf(isFirstLaunchUseCase()).map { isFirstLaunch ->
                     { state: LoginState ->
                         state.copy(isFirstTimeLaunch = isFirstLaunch)
+                    }
+                },
+                getThemeMode().map { themeMode ->
+                    { state: LoginState ->
+                        state.copy(themeMode = themeMode)
+                    }
+                },
+                flowOf(getFeatureFlagValueUseCase(AppFeatures.LoginRevamp)).map { enabled ->
+                    { state: LoginState ->
+                        state.copy(isLoginNewDesignEnabled = enabled)
                     }
                 },
             ).collect {
@@ -595,6 +607,7 @@ class LoginViewModel @Inject constructor(
                         pin2FA,
                         DisableChatApiUseCase { MegaApplication.getInstance()::disableMegaChatApi }
                     ).collectLatest { status ->
+                        _state.update { it.copy(multiFactorAuthState = MultiFactorAuthState.Passed) }
                         status.checkStatus(email = email)
                     }
                 }.onFailure { exception ->

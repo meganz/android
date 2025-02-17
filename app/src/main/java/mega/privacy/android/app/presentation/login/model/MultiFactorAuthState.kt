@@ -17,5 +17,10 @@ enum class MultiFactorAuthState {
     /**
      * Fixed state.
      */
-    Fixed
+    Fixed,
+
+    /**
+     * Passed state.
+     */
+    Passed
 }
