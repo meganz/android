@@ -119,7 +119,7 @@
     <!-- Selecting a specific location in MEGA. This is the text of the button -->
     <string name="sync_general_select">Pilih</string>
     <!-- Sync stalled issue reason is no file issue detailed description-->
-    <string name="sync_stalled_issue_file_issue_detail">An item has an issue that needs your decision to resolve it</string>
+    <string name="sync_stalled_issue_file_issue_detail">Item memiliki masalah yang membutuhkan keputusan Anda untuk menyelesaikannya</string>
     <!-- Sync stalled issue reason is delete or move detailed description-->
     <string name="sync_stalled_issue_delete_or_move_detail">Waiting for other processes to complete</string>
     <!-- Sync stalled issue reason is upload issue detailed description-->
@@ -135,7 +135,7 @@
     <!-- Sync stalled issue reason is Folder Matched Against File detailed description-->
     <string name="sync_stalled_issue_folder_matched_against_file_detail">File yang anda coba sinkronkan tidak memiliki ekstensi dan memiliki nama yang sama dengan folder yang ada</string>
     <!-- Sync stalled issue reason is Local and remote changed since last sync detailed description-->
-    <string name="sync_stalled_issue_local_and_remote_change_last_sync_detail">This file has been changed both in MEGA and locally since it was last synced.</string>
+    <string name="sync_stalled_issue_local_and_remote_change_last_sync_detail">File ini telah diubah baik di MEGA maupun lokal sejak terakhir disinkronkan.</string>
     <!-- Sync stalled issue reason is Local and remote not synced detailed description-->
     <string name="sync_stalled_issue_local_and_remote_not_synced_detail">This file has conflicting copies</string>
     <!-- Sync stalled issue reason is Name clash detailed description-->

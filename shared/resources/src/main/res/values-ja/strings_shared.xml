@@ -692,8 +692,6 @@
     <string name="display_over_other_apps_permission_screen_message">MEGAをアプリ上に表示するにはあなたの許可が必要です。それにより、別の着信通知を見逃すことはありません。</string>
     <!-- Positive action button when permission is not granted and it's required for some feature. Clicking it will redirect to settings screen of device -->
     <string name="general_allow_permission_positive_button">権限を許可</string>
-    <!-- Message displayed with progress percentage while the app is doing some background operation -->
-    <string name="login_completing_operation">操作を完了しています ：%1$d%%\n</string>
     <!-- Title for a warning dialog informing the account is in storage over quota and cannot upload anything unless it is upgraded -->
     <string name="dialog_not_enough_space_to_upload_title">新しいファイルをアップロードするのに十分なスペースがありません</string>
     <!-- Message for a warning dialog informing the account is in storage over quota and cannot upload anything unless it is upgraded. Please do not remove the placeholders, it is for highlighting the text as a link. -->
@@ -856,4 +854,14 @@
     <string name="document_scanning_settings_file_extension_required_error_message">ファイル拡張子が必要です</string>
     <!-- Alert text before download a file for preview. Please do not modify the %s placeholder as it will be replaced by the size to be donwloaded -->
     <string name="alert_larger_file_preview">このファイルをプレビューするには、MEGAがそれをダウンロードする必要があります。%1$sがダウンロードされます。</string>
+    <!-- Message displayed with progress percentage while the app is doing some background operation -->
+    <string name="login_completing_operation">操作を完了しています ：%1$d%%\n</string>
+    <!-- Add to album files existed message -->
+    <plurals name="album_add_to_files_existed">
+        <item quantity="other">これらのファイルは既に「%1$s」に存在しており、再度追加することはできません。</item>
+    </plurals>
+    <!-- Add to album partial added message -->
+    <plurals name="album_add_to_partial_added_message">
+        <item quantity="other">%2$d個のファイルが「%1$s」に追加されました。いくつかのファイルはすでに存在し、再度追加することはできません。</item>
+    </plurals>
 </resources>

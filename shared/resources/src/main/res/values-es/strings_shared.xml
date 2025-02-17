@@ -714,8 +714,6 @@
     <string name="display_over_other_apps_permission_screen_message">MEGA necesita tu permiso para mostrarse sobre las apps. Esto significa que nunca te perderás ninguna notificación de llamadas entrantes.</string>
     <!-- Positive action button when permission is not granted and it's required for some feature. Clicking it will redirect to settings screen of device -->
     <string name="general_allow_permission_positive_button">Permitir</string>
-    <!-- Message displayed with progress percentage while the app is doing some background operation -->
-    <string name="login_completing_operation">Completando operación: %1$d%%</string>
     <!-- Title for a warning dialog informing the account is in storage over quota and cannot upload anything unless it is upgraded -->
     <string name="dialog_not_enough_space_to_upload_title">No hay espacio suficiente para subir más archivos</string>
     <!-- Message for a warning dialog informing the account is in storage over quota and cannot upload anything unless it is upgraded. Please do not remove the placeholders, it is for highlighting the text as a link. -->
@@ -884,4 +882,17 @@
     <string name="document_scanning_settings_file_extension_required_error_message">Se necesita la extensión del archivo</string>
     <!-- Alert text before download a file for preview. Please do not modify the %s placeholder as it will be replaced by the size to be donwloaded -->
     <string name="alert_larger_file_preview">In order to preview this file, MEGA needs to download it. %1$s will be downloaded.</string>
+    <!-- Message displayed with progress percentage while the app is doing some background operation -->
+    <string name="login_completing_operation">Completando operación: %1$d%%</string>
+    <!-- Add to album files existed message -->
+    <plurals name="album_add_to_files_existed">
+        <item quantity="one">Este archivo ya existe en “%1$s” y no se puede volver a añadir</item>
+        <item quantity="many">Estos archivos ya existen en “%1$s” y no se pueden volver a añadir</item>
+        <item quantity="other">Estos archivos ya existen en “%1$s” y no se pueden volver a añadir</item>
+    </plurals>
+    <!-- Add to album partial added message -->
+    <plurals name="album_add_to_partial_added_message">
+        <item quantity="one">1 file added to “%1$s”. Some files already exist, and can’t be added again.</item>
+        <item quantity="other">%2$d files added to “%1$s”. Some files already exist, and can’t be added again.</item>
+    </plurals>
 </resources>

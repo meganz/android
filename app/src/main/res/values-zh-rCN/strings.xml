@@ -281,7 +281,7 @@
     <!-- Delete a link label -->
     <string name="context_delete_link">删除链接</string>
     <!-- Title alert before leaving a share. -->
-    <string name="alert_leave_share">离开共享</string>
+    <string name="alert_leave_share">离开文件夹</string>
     <!-- Item menu option upon right click on one or multiple files. -->
     <string name="context_clean_shares_menu">移除共享</string>
     <!-- Item menu option upon right click on one or multiple files. -->

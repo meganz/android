@@ -289,7 +289,7 @@
     <!-- Delete a link label -->
     <string name="context_delete_link">Deletar link</string>
     <!-- Title alert before leaving a share. -->
-    <string name="alert_leave_share">Sair do compartilhamento</string>
+    <string name="alert_leave_share">Sair da pasta</string>
     <!-- Item menu option upon right click on one or multiple files. -->
     <string name="context_clean_shares_menu">Deixar de compartilhar</string>
     <!-- Item menu option upon right click on one or multiple files. -->

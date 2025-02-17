@@ -293,7 +293,7 @@
     <!-- Delete a link label -->
     <string name="context_delete_link">Usuń link</string>
     <!-- Title alert before leaving a share. -->
-    <string name="alert_leave_share">Pozostaw</string>
+    <string name="alert_leave_share">Opuść katalog</string>
     <!-- Item menu option upon right click on one or multiple files. -->
     <string name="context_clean_shares_menu">Usuń udostępnienie</string>
     <!-- Item menu option upon right click on one or multiple files. -->

@@ -281,7 +281,7 @@
     <!-- Delete a link label -->
     <string name="context_delete_link">링크 삭제</string>
     <!-- Title alert before leaving a share. -->
-    <string name="alert_leave_share">공유 떠나기</string>
+    <string name="alert_leave_share">Leave folder</string>
     <!-- Item menu option upon right click on one or multiple files. -->
     <string name="context_clean_shares_menu">공유 제거</string>
     <!-- Item menu option upon right click on one or multiple files. -->

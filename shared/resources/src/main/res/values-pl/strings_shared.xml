@@ -725,8 +725,6 @@
     <string name="display_over_other_apps_permission_screen_message">MEGA potrzebuje twojej uprawnień do wyświetlania w aplikacjach. Oznacza to, że nigdy nie przegapisz kolejnego powiadomienia o połączeniu przychodzącym.</string>
     <!-- Positive action button when permission is not granted and it's required for some feature. Clicking it will redirect to settings screen of device -->
     <string name="general_allow_permission_positive_button">Zezwól</string>
-    <!-- Message displayed with progress percentage while the app is doing some background operation -->
-    <string name="login_completing_operation">Zakończenie operacji: %1$d%%</string>
     <!-- Title for a warning dialog informing the account is in storage over quota and cannot upload anything unless it is upgraded -->
     <string name="dialog_not_enough_space_to_upload_title">Za mało miejsca na wgrywanie nowych plik</string>
     <!-- Message for a warning dialog informing the account is in storage over quota and cannot upload anything unless it is upgraded. Please do not remove the placeholders, it is for highlighting the text as a link. -->
@@ -875,21 +873,21 @@
     <!-- Warning shown to the user when tries to retry some or all of cancelled or failed transfer but they cannot be retried because app does not have read permission over the files anymore -->
     <string name="transfers_completed_some_read_error_retrying">Część lub wszystkie przesłane pliki nie mogą zostać ukończone lub ponownie uruchomione, ponieważ MEGA nie ma już dostępu do plików</string>
     <!-- Title for Offline Folder exposed via SAF -->
-    <string name="general_mega_offline">MEGA Offline files</string>
+    <string name="general_mega_offline">Pliki MEGA Offline</string>
     <!-- Notification content for download final notification. It will inform the user about the location where file/s were downloaded -->
     <string name="transfers_notification_location_content">Lokalizacja:%1$s</string>
     <!-- Notification action for download final notification. It will open the file explorer activity to show the destination folder -->
-    <string name="transfers_notification_location_action">Locate</string>
+    <string name="transfers_notification_location_action">Znajdź</string>
     <!-- Notification content for download final notification in case of a single file downloaded. -->
-    <string name="transfers_notification_title_single_download">Downloaded “%1$s”</string>
+    <string name="transfers_notification_title_single_download">Pobierz ”%1$s”</string>
     <!-- Label for the button or menu option to add a new backup -->
-    <string name="device_center_sync_add_new_backup_button_option">Add new backup</string>
+    <string name="device_center_sync_add_new_backup_button_option">Dodaj nową kopię zapasową</string>
     <!-- Notification content for download final notification in case of a single file downloaded to preview. -->
-    <string name="transfers_notification_title_preview_download">“%1$s” is ready to preview</string>
+    <string name="transfers_notification_title_preview_download">”%1$s” jest gotowy do podglądu</string>
     <!-- Notification action for download final notification. It will open a dialog with installed apps which can open the file -->
     <string name="transfers_notification_preview_action">Podgląd</string>
     <!-- Title for the OS dialog shown with available apps to open a file -->
-    <string name="open_with_os_dialog_title">Open “%1$s” with</string>
+    <string name="open_with_os_dialog_title">Otwórz „%1$s” za pomocą</string>
     <!-- The Scan Confirmation screen error message shown when the new filename does not contain the file extension that was selected -->
     <string name="document_scanning_settings_missing_file_extension_error_message">Brakujące rozszerzenie pliku (%s)</string>
     <!-- The Scan Confirmation screen error message shown when the filename does not end with the expected file extension -->
@@ -897,5 +895,19 @@
     <!-- The Scan Confirmation screen error message shown when the filename has no file extension -->
     <string name="document_scanning_settings_file_extension_required_error_message">Potrzebne jest rozszerzenie pliku</string>
     <!-- Alert text before download a file for preview. Please do not modify the %s placeholder as it will be replaced by the size to be donwloaded -->
-    <string name="alert_larger_file_preview">In order to preview this file, MEGA needs to download it. %1$s will be downloaded.</string>
+    <string name="alert_larger_file_preview">Aby wyświetlić podgląd tego pliku, MEGA musi go pobrać. %1$s zostanie pobrany.</string>
+    <!-- Message displayed with progress percentage while the app is doing some background operation -->
+    <string name="login_completing_operation">Zakończenie operacji: %1$d%%</string>
+    <!-- Add to album files existed message -->
+    <plurals name="album_add_to_files_existed">
+        <item quantity="one">Ten plik istnieje już w ”%1$s” i nie można go ponownie dodać</item>
+        <item quantity="few">Pliki te już istnieją w ”%1$s” i nie można go ponownie dodać</item>
+        <item quantity="many">Pliki te już istnieją w ”%1$s” i nie można go ponownie dodać</item>
+        <item quantity="other">Pliki te już istnieją w ”%1$s” i nie można go ponownie dodać</item>
+    </plurals>
+    <!-- Add to album partial added message -->
+    <plurals name="album_add_to_partial_added_message">
+        <item quantity="one">1 file added to “%1$s”. Some files already exist, and can’t be added again.</item>
+        <item quantity="other">%2$d files added to “%1$s”. Some files already exist, and can’t be added again.</item>
+    </plurals>
 </resources>
