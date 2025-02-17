@@ -7,12 +7,14 @@ import mega.privacy.android.shared.resources.R as sharedResR
 import androidx.activity.compose.LocalOnBackPressedDispatcherOwner
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.WindowInsets
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material.AppBarDefaults
 import androidx.compose.material.ExperimentalMaterialApi
 import androidx.compose.material.Icon
 import androidx.compose.material.ModalBottomSheetValue
+import androidx.compose.material.ScaffoldDefaults
 import androidx.compose.material.SnackbarHostState
 import androidx.compose.material.pullrefresh.PullRefreshIndicator
 import androidx.compose.material.pullrefresh.pullRefresh
@@ -166,6 +168,7 @@ internal fun SyncListScreen(
 
         MegaScaffold(
             scaffoldState = scaffoldState,
+            contentWindowInsets = if (isInCloudDrive) WindowInsets(0.dp) else ScaffoldDefaults.contentWindowInsets,
             topBar = {
                 if (!isInCloudDrive) {
                     MegaAppBar(
@@ -177,6 +180,7 @@ internal fun SyncListScreen(
                         actions = actions,
                         onActionPressed = onActionPressed,
                         elevation = if (isWarningBannerDisplayed) AppBarDefaults.TopAppBarElevation else 0.dp,
+                        windowInsets = WindowInsets(0.dp),
                     )
                 }
             },

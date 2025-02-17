@@ -50,6 +50,8 @@ import androidx.compose.ui.graphics.DefaultAlpha
 import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.unit.dp
 import kotlinx.coroutines.flow.map
+import mega.android.core.ui.theme.values.BackgroundColor
+import mega.android.core.ui.theme.values.TextColor
 import mega.privacy.android.shared.original.core.ui.controls.appbar.AppBarType
 import mega.privacy.android.shared.original.core.ui.controls.appbar.LocalMegaAppBarElevation
 import mega.privacy.android.shared.original.core.ui.controls.appbar.MegaAppBar
@@ -59,8 +61,7 @@ import mega.privacy.android.shared.original.core.ui.controls.text.MegaText
 import mega.privacy.android.shared.original.core.ui.preview.CombinedThemePreviews
 import mega.privacy.android.shared.original.core.ui.theme.MegaOriginalTheme
 import mega.privacy.android.shared.original.core.ui.theme.OriginalTheme
-import mega.android.core.ui.theme.values.BackgroundColor
-import mega.android.core.ui.theme.values.TextColor
+import mega.privacy.android.shared.original.core.ui.theme.extensions.conditional
 import mega.privacy.android.shared.original.core.ui.utils.accumulateDirectionalScrollOffsets
 
 /**
@@ -74,6 +75,7 @@ import mega.privacy.android.shared.original.core.ui.utils.accumulateDirectionalS
  * @param floatingActionButton FloatingActionButton
  * @param scrollableContentState [ScrollableState] of the content. It will be used to set the [topBar] elevation and to hide the [floatingActionButton] in case [hideFloatingActionButtonOnScrollUp] is true
  * @param scrollableContentIsReversed set to true if the scrollable content associated to [scrollableContentState] is reversed to set the elevation for [topBar] correctly
+ * @param shouldAddSnackBarPadding if true, the snackbar will have padding to avoid overlapping with the bottom bar
  * @param hideFloatingActionButtonOnScrollUp if true and the scroll state is set as [scrollableContentState] the fab button will be hidden when the content is scrolled down and shown when is scrolled up again
  * @param blurContent nullable lambda to indicate if blur content and what to do on tap
  * @param content content of your screen. The lambda receives an [PaddingValues] that should be
@@ -92,6 +94,7 @@ fun MegaScaffold(
     floatingActionButton: @Composable () -> Unit = {},
     scrollableContentState: ScrollableState? = null,
     scrollableContentIsReversed: Boolean = false,
+    shouldAddSnackBarPadding: Boolean = true,
     hideFloatingActionButtonOnScrollUp: Boolean = false,
     blurContent: (() -> Unit)? = null,
     content: @Composable (PaddingValues) -> Unit,
@@ -135,6 +138,7 @@ fun MegaScaffold(
                 backgroundAlpha = backgroundAlpha,
                 topBar = topBar,
                 bottomBar = bottomBar,
+                shouldAddSnackBarPadding = shouldAddSnackBarPadding,
                 floatingActionButton = {
                     AnimatedVisibility(
                         visible = isFabVisible,
@@ -159,6 +163,7 @@ fun MegaScaffold(
                 backgroundAlpha = backgroundAlpha,
                 topBar = topBar,
                 bottomBar = bottomBar,
+                shouldAddSnackBarPadding = shouldAddSnackBarPadding,
                 floatingActionButton = floatingActionButton,
                 blurContent = blurContent,
                 content = content
@@ -178,6 +183,7 @@ private fun MegaScaffold(
     bottomBar: @Composable () -> Unit = {},
     floatingActionButton: @Composable () -> Unit = {},
     blurContent: (() -> Unit)? = null,
+    shouldAddSnackBarPadding: Boolean = true,
     content: @Composable (PaddingValues) -> Unit,
 ) {
     CompositionLocalProvider(LocalSnackBarHostState provides scaffoldState.snackbarHostState) {
@@ -198,8 +204,10 @@ private fun MegaScaffold(
             },
             snackbarHost = {
                 SnackbarHost(
-                    modifier = Modifier.navigationBarsPadding(),
-                    hostState = it,
+                    modifier = Modifier.conditional(shouldAddSnackBarPadding) {
+                        navigationBarsPadding()
+                    },
+                    hostState = scaffoldState.snackbarHostState,
                 ) { data ->
                     MegaSnackbar(snackbarData = data)
                 }
@@ -304,4 +312,3 @@ val LocalSnackBarHostState = compositionLocalOf<SnackbarHostState?> { null }
 private const val animationScale = 0.2f
 private const val animationDuration = 300
 private val animationSpecs = TweenSpec<Float>(durationMillis = animationDuration)
-

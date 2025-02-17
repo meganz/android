@@ -8,7 +8,6 @@ import androidx.compose.foundation.Canvas
 import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.isSystemInDarkTheme
 import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
@@ -20,7 +19,6 @@ import androidx.compose.material.MaterialTheme
 import androidx.compose.material.Scaffold
 import androidx.compose.material.Snackbar
 import androidx.compose.material.SnackbarHost
-import androidx.compose.material.Text
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Add
 import androidx.compose.material.rememberScaffoldState
@@ -50,7 +48,6 @@ import mega.privacy.android.legacy.core.ui.controls.tooltips.LegacyMegaTooltip
 import mega.privacy.android.shared.original.core.ui.controls.tab.Tabs
 import mega.privacy.android.shared.original.core.ui.theme.OriginalTheme
 import mega.privacy.android.shared.original.core.ui.theme.extensions.white_black
-import mega.privacy.android.shared.original.core.ui.theme.red_600
 import mega.privacy.android.shared.original.core.ui.utils.showAutoDurationSnackbar
 
 /**
@@ -256,19 +253,6 @@ private fun ChatRoomItem.matches(searchQuery: String): Boolean =
             || title.normalize().contains(searchQuery, true)
             || lastMessage?.contains(searchQuery, true) == true
             || lastMessage?.normalize()?.contains(searchQuery, true) == true
-
-@Composable
-private fun TabText(titleStringRes: Int, hasUnreadMessages: Boolean) {
-    Row {
-        Text(stringResource(titleStringRes))
-
-        if (hasUnreadMessages) {
-            Canvas(modifier = Modifier.size(4.dp)) {
-                drawCircle(color = red_600, center = Offset(20f, 20f))
-            }
-        }
-    }
-}
 
 @Composable
 private fun FabButton(showFabButton: Boolean, onStartChatClick: (isFabClicked: Boolean) -> Unit) {

@@ -1,9 +1,11 @@
 package mega.privacy.android.feature.sync.ui.megapicker
 
+import mega.privacy.android.shared.resources.R as sharedR
 import androidx.activity.compose.LocalOnBackPressedDispatcherOwner
 import androidx.compose.foundation.isSystemInDarkTheme
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.WindowInsets
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.LazyListState
@@ -38,7 +40,6 @@ import mega.privacy.android.shared.original.core.ui.preview.BooleanProvider
 import mega.privacy.android.shared.original.core.ui.preview.CombinedThemePreviews
 import mega.privacy.android.shared.original.core.ui.theme.OriginalTheme
 import mega.privacy.android.shared.original.core.ui.utils.showAutoDurationSnackbar
-import mega.privacy.android.shared.resources.R as sharedR
 import nz.mega.sdk.MegaApiJava
 
 @Composable
@@ -69,6 +70,7 @@ internal fun MegaPickerScreen(
     var showCreateNewFolderDialog by rememberSaveable { mutableStateOf(false) }
 
     Scaffold(
+        contentWindowInsets = WindowInsets(0.dp),
         topBar = {
             MegaAppBar(
                 appBarType = AppBarType.BACK_NAVIGATION,
@@ -83,6 +85,7 @@ internal fun MegaPickerScreen(
                 } else {
                     stringResource(sharedR.string.general_select_folder)
                 },
+                windowInsets = WindowInsets(0.dp),
                 elevation = 0.dp,
                 onNavigationPressed = {
                     onBackPressedDispatcher?.onBackPressed()

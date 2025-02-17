@@ -4,15 +4,15 @@ import mega.privacy.android.icon.pack.R as iconPackR
 import androidx.activity.compose.BackHandler
 import androidx.activity.compose.LocalOnBackPressedDispatcherOwner
 import androidx.compose.foundation.isSystemInDarkTheme
-import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.WindowInsets
+import androidx.compose.foundation.layout.consumeWindowInsets
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.LazyListState
 import androidx.compose.material.ModalBottomSheetState
 import androidx.compose.material.ModalBottomSheetValue
-import androidx.compose.material.Scaffold
-import androidx.compose.material.SnackbarHost
 import androidx.compose.material.SnackbarHostState
 import androidx.compose.material.rememberModalBottomSheetState
+import androidx.compose.material.rememberScaffoldState
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.rememberCoroutineScope
@@ -47,8 +47,8 @@ import mega.privacy.android.legacy.core.ui.controls.lists.MenuActionHeader
 import mega.privacy.android.legacy.core.ui.model.SearchWidgetState
 import mega.privacy.android.shared.original.core.ui.controls.appbar.AppBarType
 import mega.privacy.android.shared.original.core.ui.controls.appbar.MegaAppBar
+import mega.privacy.android.shared.original.core.ui.controls.layouts.MegaScaffold
 import mega.privacy.android.shared.original.core.ui.controls.sheets.BottomSheet
-import mega.privacy.android.shared.original.core.ui.controls.snackbars.MegaSnackbar
 import mega.privacy.android.shared.original.core.ui.model.MenuAction
 import mega.privacy.android.shared.original.core.ui.preview.CombinedThemePreviews
 import mega.privacy.android.shared.original.core.ui.theme.OriginalTheme
@@ -150,6 +150,7 @@ internal fun DeviceCenterScreen(
     }
     BottomSheet(
         modalSheetState = modalSheetState,
+        bottomInsetPadding = false,
         expandedRoundedCorners = true,
         sheetBody = {
             DeviceBottomSheetBody(
@@ -166,7 +167,10 @@ internal fun DeviceCenterScreen(
             )
         },
         content = {
-            Scaffold(
+            MegaScaffold(
+                scaffoldState = rememberScaffoldState(snackbarHostState = snackbarHostState),
+                shouldAddSnackBarPadding = false,
+                contentWindowInsets = WindowInsets(0.dp),
                 topBar = {
                     DeviceCenterAppBar(
                         uiState,
@@ -179,11 +183,6 @@ internal fun DeviceCenterScreen(
                         onSearchCloseClicked,
                         onSearchClicked
                     )
-                },
-                snackbarHost = {
-                    SnackbarHost(hostState = snackbarHostState) { snackbarData ->
-                        MegaSnackbar(snackbarData = snackbarData)
-                    }
                 },
                 content = { paddingValues ->
                     when {
@@ -215,7 +214,7 @@ internal fun DeviceCenterScreen(
                                 onBackupFolderClicked = onBackupFolderClicked,
                                 onNonBackupFolderClicked = onNonBackupFolderClicked,
                                 onInfoClicked = onInfoOptionClicked,
-                                modifier = Modifier.padding(paddingValues),
+                                modifier = Modifier.consumeWindowInsets(paddingValues)
                             )
                         }
                     }
@@ -262,6 +261,7 @@ private fun DeviceCenterAppBar(
                 }
             },
             onActionPressed = onActionPressed,
+            windowInsets = WindowInsets(0.dp),
         )
     } else {
         LegacySearchAppBar(
@@ -304,6 +304,7 @@ private fun DeviceCenterAppBar(
                 return@let list
             },
             isHideAfterSearch = true,
+            windowInsets = WindowInsets(0.dp),
             modifier = Modifier.testTag(DEVICE_CENTER_TOOLBAR),
         )
     }

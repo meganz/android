@@ -22,6 +22,7 @@ import androidx.compose.ui.res.pluralStringResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.intl.Locale
 import androidx.compose.ui.unit.dp
+import mega.android.core.ui.theme.values.TextColor
 import mega.privacy.android.core.formatter.formatFileSize
 import mega.privacy.android.core.formatter.formatModifiedDate
 import mega.privacy.android.core.ui.mapper.FileTypeIconMapper
@@ -39,7 +40,6 @@ import mega.privacy.android.shared.original.core.ui.controls.skeleton.ListItemLo
 import mega.privacy.android.shared.original.core.ui.controls.text.MegaText
 import mega.privacy.android.shared.original.core.ui.preview.CombinedThemePreviews
 import mega.privacy.android.shared.original.core.ui.theme.OriginalTheme
-import mega.android.core.ui.theme.values.TextColor
 
 @Composable
 internal fun MegaFolderPickerView(

@@ -9,6 +9,7 @@ import androidx.compose.foundation.clickable
 import androidx.compose.foundation.isSystemInDarkTheme
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.WindowInsets
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
@@ -38,6 +39,7 @@ import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import de.palm.composestateevents.EventEffect
 import kotlinx.coroutines.launch
+import mega.android.core.ui.theme.values.TextColor
 import mega.privacy.android.analytics.Analytics
 import mega.privacy.android.domain.entity.sync.SyncType
 import mega.privacy.android.feature.sync.R
@@ -59,7 +61,6 @@ import mega.privacy.android.shared.original.core.ui.model.MegaSpanStyleWithAnnot
 import mega.privacy.android.shared.original.core.ui.model.SpanIndicator
 import mega.privacy.android.shared.original.core.ui.preview.CombinedThemePreviews
 import mega.privacy.android.shared.original.core.ui.theme.OriginalTheme
-import mega.android.core.ui.theme.values.TextColor
 import mega.privacy.android.shared.original.core.ui.utils.showAutoDurationSnackbar
 import mega.privacy.mobile.analytics.event.AndroidSyncAllFilesAccessDialogDisplayedEvent
 import mega.privacy.mobile.analytics.event.AndroidSyncSelectDeviceFolderButtonPressedEvent
@@ -117,6 +118,8 @@ private fun SyncNewFolderScreenScaffold(
 
     MegaScaffold(
         scaffoldState = scaffoldState,
+        shouldAddSnackBarPadding = false,
+        contentWindowInsets = WindowInsets(0.dp),
         topBar = {
             MegaAppBar(
                 modifier = Modifier.testTag(TAG_SYNC_NEW_FOLDER_SCREEN_TOOLBAR),
@@ -126,6 +129,7 @@ private fun SyncNewFolderScreenScaffold(
                     else -> stringResource(R.string.sync_toolbar_title)
                 },
                 onNavigationPressed = { onBackClicked() },
+                windowInsets = WindowInsets(0.dp),
                 elevation = if (isWarningBannerDisplayed) AppBarDefaults.TopAppBarElevation else 0.dp,
             )
         },
