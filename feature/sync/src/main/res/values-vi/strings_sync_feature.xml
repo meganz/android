@@ -119,7 +119,7 @@
     <!-- Selecting a specific location in MEGA. This is the text of the button -->
     <string name="sync_general_select">Chọn</string>
     <!-- Sync stalled issue reason is no file issue detailed description-->
-    <string name="sync_stalled_issue_file_issue_detail">Một mục gặp phải vấn&#160;đề và cần quyết&#160;định giải&#160;quyết của bạn</string>
+    <string name="sync_stalled_issue_file_issue_detail">Một mục có một vấn đề cần bạn quyết định để giải quyết</string>
     <!-- Sync stalled issue reason is delete or move detailed description-->
     <string name="sync_stalled_issue_delete_or_move_detail">Đang chờ các quy trình khác được hoàn&#160;thành</string>
     <!-- Sync stalled issue reason is upload issue detailed description-->
@@ -135,7 +135,7 @@
     <!-- Sync stalled issue reason is Folder Matched Against File detailed description-->
     <string name="sync_stalled_issue_folder_matched_against_file_detail">Tệp&#160;tin bạn đang cố đồng&#160;bộ hóa không có phần mở rộng dịnh&#160;dạng tệp và có cùng tên với một thư&#160;mục hiện có sẵn</string>
     <!-- Sync stalled issue reason is Local and remote changed since last sync detailed description-->
-    <string name="sync_stalled_issue_local_and_remote_change_last_sync_detail">Tệp&#160;tin này đã được thay&#160;đổi cả trên MEGA và cục&#160;bộ kể từ khi nó được đồng&#160;bộ hóa lần cuối.</string>
+    <string name="sync_stalled_issue_local_and_remote_change_last_sync_detail">Tệp này đã được thay đổi cả trong MEGA và cục bộ kể từ khi nó được đồng bộ hóa lần cuối.</string>
     <!-- Sync stalled issue reason is Local and remote not synced detailed description-->
     <string name="sync_stalled_issue_local_and_remote_not_synced_detail">Tệp tin này có các bản&#160;sao mâu&#160;thuẫn nhau</string>
     <!-- Sync stalled issue reason is Name clash detailed description-->

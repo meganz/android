@@ -692,8 +692,6 @@
     <string name="display_over_other_apps_permission_screen_message">MEGA需要您的授权才能显示在其它应用程序上方。这意味着您永远不会错过另一个来电通知。</string>
     <!-- Positive action button when permission is not granted and it's required for some feature. Clicking it will redirect to settings screen of device -->
     <string name="general_allow_permission_positive_button">允许权限</string>
-    <!-- Message displayed with progress percentage while the app is doing some background operation -->
-    <string name="login_completing_operation">完成进度：%1$d%%</string>
     <!-- Title for a warning dialog informing the account is in storage over quota and cannot upload anything unless it is upgraded -->
     <string name="dialog_not_enough_space_to_upload_title">空间不足，无法上传新文件</string>
     <!-- Message for a warning dialog informing the account is in storage over quota and cannot upload anything unless it is upgraded. Please do not remove the placeholders, it is for highlighting the text as a link. -->
@@ -856,4 +854,14 @@
     <string name="document_scanning_settings_file_extension_required_error_message">需要文件扩展名</string>
     <!-- Alert text before download a file for preview. Please do not modify the %s placeholder as it will be replaced by the size to be donwloaded -->
     <string name="alert_larger_file_preview">为了预览此文件，MEGA需要下载它。%1$s将被下载。</string>
+    <!-- Message displayed with progress percentage while the app is doing some background operation -->
+    <string name="login_completing_operation">完成进度：%1$d%%</string>
+    <!-- Add to album files existed message -->
+    <plurals name="album_add_to_files_existed">
+        <item quantity="other">这些文件已经存在于“%1$s”，并且无法再次添加</item>
+    </plurals>
+    <!-- Add to album partial added message -->
+    <plurals name="album_add_to_partial_added_message">
+        <item quantity="other">%2$d个文件已添加到“%1$s”。有些文件已经存在，无法再次添加。</item>
+    </plurals>
 </resources>

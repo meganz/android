@@ -285,7 +285,7 @@
     <!-- Delete a link label -->
     <string name="context_delete_link">Link verwijderen</string>
     <!-- Title alert before leaving a share. -->
-    <string name="alert_leave_share">Deling verlaten</string>
+    <string name="alert_leave_share">De map verlaten</string>
     <!-- Item menu option upon right click on one or multiple files. -->
     <string name="context_clean_shares_menu">Deling verwijderen</string>
     <!-- Item menu option upon right click on one or multiple files. -->

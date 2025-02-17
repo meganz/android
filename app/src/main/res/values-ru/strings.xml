@@ -293,7 +293,7 @@
     <!-- Delete a link label -->
     <string name="context_delete_link">Удалить ссылку</string>
     <!-- Title alert before leaving a share. -->
-    <string name="alert_leave_share">Покинуть общее пользование</string>
+    <string name="alert_leave_share">Покинуть папку</string>
     <!-- Item menu option upon right click on one or multiple files. -->
     <string name="context_clean_shares_menu">Закрыть доступ</string>
     <!-- Item menu option upon right click on one or multiple files. -->

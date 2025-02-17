@@ -281,7 +281,7 @@
     <!-- Delete a link label -->
     <string name="context_delete_link">Xóa liên kết</string>
     <!-- Title alert before leaving a share. -->
-    <string name="alert_leave_share">Từ bỏ chia sẻ</string>
+    <string name="alert_leave_share">Rời khỏi thư mục</string>
     <!-- Item menu option upon right click on one or multiple files. -->
     <string name="context_clean_shares_menu">Loại bỏ chia sẻ</string>
     <!-- Item menu option upon right click on one or multiple files. -->

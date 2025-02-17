@@ -714,8 +714,6 @@
     <string name="display_over_other_apps_permission_screen_message">MEGA are nevoie de permisiunea dvs. pentru a afișa peste aplicații. Aceasta înseamnă că nu veți pierde niciodată o altă notificare de apel primit.</string>
     <!-- Positive action button when permission is not granted and it's required for some feature. Clicking it will redirect to settings screen of device -->
     <string name="general_allow_permission_positive_button">Acordă permisiunea</string>
-    <!-- Message displayed with progress percentage while the app is doing some background operation -->
-    <string name="login_completing_operation">Finalizarea operațiunii: %1$d%%</string>
     <!-- Title for a warning dialog informing the account is in storage over quota and cannot upload anything unless it is upgraded -->
     <string name="dialog_not_enough_space_to_upload_title">Nu este suficient spațiu pentru a încărca fișiere noi</string>
     <!-- Message for a warning dialog informing the account is in storage over quota and cannot upload anything unless it is upgraded. Please do not remove the placeholders, it is for highlighting the text as a link. -->
@@ -865,7 +863,7 @@
     <!-- Notification content for download final notification. It will inform the user about the location where file/s were downloaded -->
     <string name="transfers_notification_location_content">Locatie: %1$s</string>
     <!-- Notification action for download final notification. It will open the file explorer activity to show the destination folder -->
-    <string name="transfers_notification_location_action">Locate</string>
+    <string name="transfers_notification_location_action">Localiza</string>
     <!-- Notification content for download final notification in case of a single file downloaded. -->
     <string name="transfers_notification_title_single_download">Descărcat „%1$s”</string>
     <!-- Label for the button or menu option to add a new backup -->
@@ -883,5 +881,18 @@
     <!-- The Scan Confirmation screen error message shown when the filename has no file extension -->
     <string name="document_scanning_settings_file_extension_required_error_message">Extensia de fișier este necesară</string>
     <!-- Alert text before download a file for preview. Please do not modify the %s placeholder as it will be replaced by the size to be donwloaded -->
-    <string name="alert_larger_file_preview">In order to preview this file, MEGA needs to download it. %1$s will be downloaded.</string>
+    <string name="alert_larger_file_preview">Pentru a previzualiza acest fișier, MEGA trebuie să îl descarce. %1$s va fi descărcat.</string>
+    <!-- Message displayed with progress percentage while the app is doing some background operation -->
+    <string name="login_completing_operation">Finalizarea operațiunii: %1$d%%</string>
+    <!-- Add to album files existed message -->
+    <plurals name="album_add_to_files_existed">
+        <item quantity="one">Acest fișier există deja în „%1$s” și nu poate fi adăugat din nou</item>
+        <item quantity="few">Aceste fișiere există deja în „%1$s” și nu poate fi adăugat din nou</item>
+        <item quantity="other">Aceste fișiere există deja în „%1$s” și nu poate fi adăugat din nou</item>
+    </plurals>
+    <!-- Add to album partial added message -->
+    <plurals name="album_add_to_partial_added_message">
+        <item quantity="one">1 file added to “%1$s”. Some files already exist, and can’t be added again.</item>
+        <item quantity="other">%2$d files added to “%1$s”. Some files already exist, and can’t be added again.</item>
+    </plurals>
 </resources>

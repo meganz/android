@@ -281,7 +281,7 @@
     <!-- Delete a link label -->
     <string name="context_delete_link">リンクを削除</string>
     <!-- Title alert before leaving a share. -->
-    <string name="alert_leave_share">共有を解除</string>
+    <string name="alert_leave_share">フォルダを離れる</string>
     <!-- Item menu option upon right click on one or multiple files. -->
     <string name="context_clean_shares_menu">共有を削除</string>
     <!-- Item menu option upon right click on one or multiple files. -->

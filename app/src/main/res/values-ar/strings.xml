@@ -301,7 +301,7 @@
     <!-- Delete a link label -->
     <string name="context_delete_link">حذف الرابط</string>
     <!-- Title alert before leaving a share. -->
-    <string name="alert_leave_share">مغادرة المشاركة</string>
+    <string name="alert_leave_share">Leave folder</string>
     <!-- Item menu option upon right click on one or multiple files. -->
     <string name="context_clean_shares_menu">إزالة المشاركة</string>
     <!-- Item menu option upon right click on one or multiple files. -->
