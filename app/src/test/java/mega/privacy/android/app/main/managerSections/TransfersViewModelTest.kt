@@ -23,6 +23,7 @@ import mega.privacy.android.domain.entity.node.TypedNode
 import mega.privacy.android.domain.entity.transfer.CompletedTransfer
 import mega.privacy.android.domain.entity.transfer.Transfer
 import mega.privacy.android.domain.entity.transfer.TransferAppData
+import mega.privacy.android.domain.entity.transfer.TransferEvent
 import mega.privacy.android.domain.entity.transfer.TransferState
 import mega.privacy.android.domain.exception.chat.ChatUploadNotRetriedException
 import mega.privacy.android.domain.usecase.GetNodeByIdUseCase
@@ -536,6 +537,38 @@ internal class TransfersViewModelTest {
                 assertThat(actual.readRetryError).isEqualTo(1)
             }
         }
+
+    @Test
+    fun `test that getAllActiveTransfers does not return preview downloads`() = runTest {
+        val activeTransfer1 = mock<Transfer> {
+            on { appData } doReturn emptyList()
+        }
+        val activeTransfer2 = mock<Transfer> {
+            on { appData } doReturn listOf(TransferAppData.PreviewDownload)
+        }
+        val activeTransfers = listOf(activeTransfer1, activeTransfer2)
+        val expected = listOf(activeTransfer1)
+
+        whenever(getInProgressTransfersUseCase()) doReturn activeTransfers
+
+        underTest.getAllActiveTransfers().join()
+
+        assertThat(underTest.getActiveTransfers()).isEqualTo(expected)
+    }
+
+    @Test
+    fun `test that monitorTransferEventsUseCase filters preview downloads`() = runTest {
+        val transfer = mock<Transfer> {
+            on { appData } doReturn listOf(TransferAppData.PreviewDownload)
+        }
+        val startEvent = TransferEvent.TransferStartEvent(transfer)
+
+        initViewModel()
+
+        whenever(monitorTransferEventsUseCase()) doReturn flowOf(startEvent)
+
+        assertThat(underTest.getActiveTransfers()).isEqualTo(emptyList<Transfer>())
+    }
 
     companion object {
         @JvmField

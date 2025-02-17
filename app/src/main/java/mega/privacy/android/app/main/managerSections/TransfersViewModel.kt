@@ -29,6 +29,7 @@ import mega.privacy.android.domain.entity.transfer.TransferAppData
 import mega.privacy.android.domain.entity.transfer.TransferEvent
 import mega.privacy.android.domain.entity.transfer.TransferState
 import mega.privacy.android.domain.entity.transfer.isBackgroundTransfer
+import mega.privacy.android.domain.entity.transfer.isPreviewDownload
 import mega.privacy.android.domain.qualifier.IoDispatcher
 import mega.privacy.android.domain.usecase.GetNodeByIdUseCase
 import mega.privacy.android.domain.usecase.chat.message.pendingmessages.RetryChatUploadUseCase
@@ -131,6 +132,7 @@ class TransfersViewModel @Inject constructor(
                     if (it.transfer.isStreamingTransfer
                         || it.transfer.isBackgroundTransfer()
                         || it.transfer.isFolderTransfer
+                        || it.transfer.isPreviewDownload()
                         || transferCallback > it.transfer.notificationNumber
                     ) return@collect
                     transferCallback = it.transfer.notificationNumber
@@ -194,6 +196,7 @@ class TransfersViewModel @Inject constructor(
         viewModelScope.launch {
             runCatching {
                 val transfers = getInProgressTransfersUseCase()
+                    .filterNot { it.isPreviewDownload() }
                 _activeTransfers.update { transfers }
             }.onFailure { exception ->
                 Timber.e(exception)
