@@ -3,7 +3,10 @@ package mega.privacy.android.domain.usecase.transfers
 import mega.privacy.android.domain.repository.FileSystemRepository
 import javax.inject.Inject
 
-class GetFileNameFromContentUri @Inject constructor(
+/**
+ * Use case to get the file name from a content Uri
+ */
+class GetFileNameFromStringUriUseCase @Inject constructor(
     private val fileSystemRepository: FileSystemRepository
 ) {
     /**
@@ -12,6 +15,5 @@ class GetFileNameFromContentUri @Inject constructor(
      * @param uriOrPathString a string representing the Uri
      */
     suspend operator fun invoke(uriOrPathString: String): String? =
-        fileSystemRepository.takeIf { it.isContentUri(uriOrPathString) }
-            ?.getFileNameFromUri(uriOrPathString)
+        fileSystemRepository.getFileNameFromUri(uriOrPathString)
 }

@@ -167,6 +167,80 @@ internal class FileFacadeTest {
     }
 
     @Test
+    fun `test that getFileNameFromUri returns correct result from DocumentFile file`() = runTest {
+        mockStatic(Uri::class.java).use { _ ->
+            mockStatic(DocumentFile::class.java).use {
+                val expected = "File name"
+                val testUri = "file:///example"
+                val file = File(temporaryFolder, "file.txt")
+                file.createNewFile()
+                val uri = mock<Uri> {
+                    on { this.scheme } doReturn "file"
+                    on { this.path } doReturn file.path
+                }
+                val documentFile = mock<DocumentFile> {
+                    on { name } doReturn expected
+                }
+
+                whenever(Uri.parse(testUri)).thenReturn(uri)
+                whenever(DocumentFile.fromFile(file)) doReturn documentFile
+
+                assertThat(underTest.getFileNameFromUri(testUri)).isEqualTo(expected)
+            }
+        }
+    }
+
+    @Test
+    fun `test that getFileNameFromUri returns correct result from DocumentFile tree uri`() =
+        runTest {
+            mockStatic(Uri::class.java).use { _ ->
+                mockStatic(DocumentFile::class.java).use {
+                    mockStatic(DocumentsContract::class.java).use {
+                        val expected = "File name"
+                        val testUri = "file:///example"
+                        val uri = mock<Uri> {
+                            on { this.scheme } doReturn "file"
+                            on { this.path } doReturn testUri
+                        }
+                        val documentFile = mock<DocumentFile> {
+                            on { name } doReturn expected
+                        }
+
+                        whenever(Uri.parse(testUri)).thenReturn(uri)
+                        whenever(DocumentsContract.isTreeUri(uri)) doReturn true
+                        whenever(DocumentFile.fromTreeUri(context, uri)) doReturn documentFile
+
+                        assertThat(underTest.getFileNameFromUri(testUri)).isEqualTo(expected)
+                    }
+                }
+            }
+        }
+
+    @Test
+    fun `test that getFileNameFromUri returns correct result from DocumentFile single uri`() =
+        runTest {
+            mockStatic(Uri::class.java).use { _ ->
+                mockStatic(DocumentFile::class.java).use {
+                    val expected = "File name"
+                    val testUri = "file:///example"
+                    val uri = mock<Uri> {
+                        on { this.scheme } doReturn "file"
+                        on { this.path } doReturn testUri
+                    }
+                    val documentFile = mock<DocumentFile> {
+                        on { name } doReturn expected
+                    }
+
+                    whenever(Uri.parse(testUri)).thenReturn(uri)
+                    whenever(DocumentFile.fromSingleUri(context, uri)) doReturn documentFile
+
+                    assertThat(underTest.getFileNameFromUri(testUri)).isEqualTo(expected)
+                }
+            }
+        }
+
+
+    @Test
     fun `test that getFileNameFromUri returns correct result from content resolver`() = runTest {
         mockStatic(Uri::class.java).use { _ ->
             val expected = "File name"

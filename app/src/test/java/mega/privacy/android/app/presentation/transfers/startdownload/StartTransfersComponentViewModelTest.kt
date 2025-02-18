@@ -3,6 +3,7 @@ package mega.privacy.android.app.presentation.transfers.startdownload
 import android.net.Uri
 import app.cash.turbine.test
 import com.google.common.truth.Truth.assertThat
+import de.palm.composestateevents.StateEventWithContentConsumed
 import de.palm.composestateevents.StateEventWithContentTriggered
 import de.palm.composestateevents.triggered
 import kotlinx.coroutines.awaitCancellation
@@ -19,6 +20,7 @@ import mega.privacy.android.app.presentation.mapper.file.FileSizeStringMapper
 import mega.privacy.android.app.presentation.transfers.TransfersConstants
 import mega.privacy.android.app.presentation.transfers.starttransfer.StartTransfersComponentViewModel
 import mega.privacy.android.app.presentation.transfers.starttransfer.model.ConfirmLargeDownloadInfo
+import mega.privacy.android.app.presentation.transfers.starttransfer.model.SaveDestinationInfo
 import mega.privacy.android.app.presentation.transfers.starttransfer.model.StartTransferEvent
 import mega.privacy.android.app.presentation.transfers.starttransfer.model.StartTransferJobInProgress
 import mega.privacy.android.app.presentation.transfers.starttransfer.model.TransferTriggerEvent
@@ -43,6 +45,7 @@ import mega.privacy.android.domain.usecase.node.GetFilePreviewDownloadPathUseCas
 import mega.privacy.android.domain.usecase.offline.GetOfflinePathForNodeUseCase
 import mega.privacy.android.domain.usecase.setting.IsAskBeforeLargeDownloadsSettingUseCase
 import mega.privacy.android.domain.usecase.setting.SetAskBeforeLargeDownloadsSettingUseCase
+import mega.privacy.android.domain.usecase.transfers.GetFileNameFromStringUriUseCase
 import mega.privacy.android.domain.usecase.transfers.active.ClearActiveTransfersIfFinishedUseCase
 import mega.privacy.android.domain.usecase.transfers.active.MonitorOngoingActiveTransfersUseCase
 import mega.privacy.android.domain.usecase.transfers.chatuploads.SetAskedResumeTransfersUseCase
@@ -140,6 +143,7 @@ class StartTransfersComponentViewModelTest {
     private val insertPendingDownloadsForNodesUseCase =
         mock<InsertPendingDownloadsForNodesUseCase>()
     private val areTransfersPausedUseCase = mock<AreTransfersPausedUseCase>()
+    private val getFileNameFromStringUriUseCase = mock<GetFileNameFromStringUriUseCase>()
 
     private val node: TypedFileNode = mock()
     private val nodes = listOf(node)
@@ -200,6 +204,7 @@ class StartTransfersComponentViewModelTest {
             invalidateCancelTokenUseCase = invalidateCancelTokenUseCase,
             getCurrentTimeInMillisUseCase = getCurrentTimeInMillisUseCase,
             areTransfersPausedUseCase = areTransfersPausedUseCase,
+            getFileNameFromStringUriUseCase = getFileNameFromStringUriUseCase,
         )
     }
 
@@ -242,6 +247,7 @@ class StartTransfersComponentViewModelTest {
             startUploadsWorkerAndWaitUntilIsStartedUseCase,
             getCurrentTimeInMillisUseCase,
             areTransfersPausedUseCase,
+            getFileNameFromStringUriUseCase,
         )
         initialStub()
     }
@@ -373,21 +379,55 @@ class StartTransfersComponentViewModelTest {
         runTest {
             commonStub()
             val uriString = "content:/destination"
+            val destinationName = "destinationName"
             val destinationUri = mock<Uri> {
                 on { toString() } doReturn uriString
             }
             val startDownloadNode = TransferTriggerEvent.StartDownloadNode(nodes)
-            whenever(shouldAskDownloadDestinationUseCase()).thenReturn(true)
-            underTest.startDownloadWithoutConfirmation(startDownloadNode)
-            whenever(shouldPromptToSaveDestinationUseCase()).thenReturn(true)
+            val expected = SaveDestinationInfo(
+                destination = uriString,
+                destinationName = destinationName
+            )
 
+            whenever(shouldAskDownloadDestinationUseCase()).thenReturn(true)
+            whenever(shouldPromptToSaveDestinationUseCase()).thenReturn(true)
+            whenever(getFileNameFromStringUriUseCase(uriString)).thenReturn(destinationName)
+
+            underTest.startDownloadWithoutConfirmation(startDownloadNode)
             underTest.startDownloadWithDestination(destinationUri)
 
             assertThat(underTest.uiState.value.promptSaveDestination)
                 .isInstanceOf(StateEventWithContentTriggered::class.java)
             assertThat((underTest.uiState.value.promptSaveDestination as StateEventWithContentTriggered).content)
-                .isEqualTo(uriString)
+                .isEqualTo(expected)
 
+        }
+
+    @Test
+    fun `test that consumePromptSaveDestination updates state`() =
+        runTest {
+            commonStub()
+            val uriString = "content:/destination"
+            val destinationName = "destinationName"
+            val destinationUri = mock<Uri> {
+                on { toString() } doReturn uriString
+            }
+            val startDownloadNode = TransferTriggerEvent.StartDownloadNode(nodes)
+            val expected = SaveDestinationInfo(
+                destination = uriString,
+                destinationName = destinationName
+            )
+
+            whenever(shouldAskDownloadDestinationUseCase()).thenReturn(true)
+            whenever(shouldPromptToSaveDestinationUseCase()).thenReturn(true)
+            whenever(getFileNameFromStringUriUseCase(uriString)).thenReturn(destinationName)
+
+            underTest.startDownloadWithoutConfirmation(startDownloadNode)
+            underTest.startDownloadWithDestination(destinationUri)
+            underTest.consumePromptSaveDestination()
+
+            assertThat(underTest.uiState.value.promptSaveDestination)
+                .isInstanceOf(StateEventWithContentConsumed::class.java)
         }
 
     @Test

@@ -9,7 +9,7 @@ import mega.privacy.android.app.featuretoggle.AppFeatures
 import mega.privacy.android.core.test.extension.CoroutineMainDispatcherExtension
 import mega.privacy.android.core.ui.mapper.FileTypeIconMapper
 import mega.privacy.android.domain.usecase.featureflag.GetFeatureFlagValueUseCase
-import mega.privacy.android.domain.usecase.transfers.GetFileNameFromContentUri
+import mega.privacy.android.domain.usecase.transfers.GetFileNameFromStringUriUseCase
 import org.junit.jupiter.api.Assertions.assertTrue
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
@@ -26,7 +26,7 @@ class UploadDestinationViewModelTest {
 
 
     private val getFeatureFlagValueUseCase = mock<GetFeatureFlagValueUseCase>()
-    private val getFileNameFromContentUri = mock<GetFileNameFromContentUri>()
+    private val getFileNameFromStringUriUseCase = mock<GetFileNameFromStringUriUseCase>()
     private val importFilesErrorMessageMapper = mock<ImportFilesErrorMessageMapper>()
     private val importFileErrorMessageMapper = mock<ImportFileErrorMessageMapper>()
     private val fileTypeIconMapper = mock<FileTypeIconMapper>()
@@ -36,14 +36,14 @@ class UploadDestinationViewModelTest {
     fun setup() {
         reset(
             getFeatureFlagValueUseCase,
-            getFileNameFromContentUri,
+            getFileNameFromStringUriUseCase,
             importFilesErrorMessageMapper,
             importFileErrorMessageMapper,
             fileTypeIconMapper,
         )
         viewModel = UploadDestinationViewModel(
             getFeatureFlagValueUseCase = getFeatureFlagValueUseCase,
-            getFileNameFromContentUri = getFileNameFromContentUri,
+            getFileNameFromStringUriUseCase = getFileNameFromStringUriUseCase,
             importFilesErrorMessageMapper = importFilesErrorMessageMapper,
             importFileErrorMessageMapper = importFileErrorMessageMapper,
             fileTypeIconMapper = fileTypeIconMapper,
@@ -67,8 +67,8 @@ class UploadDestinationViewModelTest {
         whenever(getFeatureFlagValueUseCase.invoke(AppFeatures.NewUploadDestinationActivity))
             .thenReturn(true)
         val fileUriList = listOf(uri1, uri2)
-        whenever(getFileNameFromContentUri.invoke("path1")).thenReturn("file1")
-        whenever(getFileNameFromContentUri.invoke("path2")).thenReturn("file2")
+        whenever(getFileNameFromStringUriUseCase.invoke("path1")).thenReturn("file1")
+        whenever(getFileNameFromStringUriUseCase.invoke("path2")).thenReturn("file2")
         viewModel.updateUri(fileUriList)
         val uiState = viewModel.uiState.value
         assertThat(uiState.importUiItems.size).isEqualTo(2)
@@ -84,8 +84,8 @@ class UploadDestinationViewModelTest {
         }
         whenever(getFeatureFlagValueUseCase.invoke(AppFeatures.NewUploadDestinationActivity))
             .thenReturn(true)
-        whenever(getFileNameFromContentUri.invoke("path1")).thenReturn("file1")
-        whenever(getFileNameFromContentUri.invoke("path2")).thenReturn("file2")
+        whenever(getFileNameFromStringUriUseCase.invoke("path1")).thenReturn("file1")
+        whenever(getFileNameFromStringUriUseCase.invoke("path2")).thenReturn("file2")
         whenever(importFileErrorMessageMapper("file1")).thenReturn("")
         whenever(importFileErrorMessageMapper("file2")).thenReturn("")
         val fileUriList = listOf(uri1, uri2)
@@ -127,7 +127,7 @@ class UploadDestinationViewModelTest {
             }
             whenever(getFeatureFlagValueUseCase.invoke(AppFeatures.NewUploadDestinationActivity))
                 .thenReturn(true)
-            whenever(getFileNameFromContentUri.invoke("ab/cs")).thenReturn("ab/cs")
+            whenever(getFileNameFromStringUriUseCase.invoke("ab/cs")).thenReturn("ab/cs")
             whenever(importFileErrorMessageMapper("")).thenReturn("Invalid characters")
             whenever(importFileErrorMessageMapper("file2")).thenReturn("")
             val fileUriList = listOf(uri1, uri2)
@@ -165,7 +165,7 @@ class UploadDestinationViewModelTest {
             }
             whenever(getFeatureFlagValueUseCase.invoke(AppFeatures.NewUploadDestinationActivity))
                 .thenReturn(true)
-            whenever(getFileNameFromContentUri.invoke("path1")).thenReturn("file1")
+            whenever(getFileNameFromStringUriUseCase.invoke("path1")).thenReturn("file1")
             whenever(importFileErrorMessageMapper("")).thenReturn("Invalid characters")
             whenever(importFileErrorMessageMapper("file2")).thenReturn("")
             val fileUriList = listOf(uri1, uri2)

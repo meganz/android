@@ -20,7 +20,7 @@ import java.io.File
  */
 data class StartTransferViewState(
     val oneOffViewEvent: StateEventWithContent<StartTransferEvent> = consumed(),
-    val promptSaveDestination: StateEventWithContent<String> = consumed(),
+    val promptSaveDestination: StateEventWithContent<SaveDestinationInfo> = consumed(),
     val jobInProgressState: StartTransferJobInProgress? = null,
     val confirmLargeDownload: ConfirmLargeDownloadInfo? = null,
     val askDestinationForDownload: TransferTriggerEvent.DownloadTriggerEvent? = null,
@@ -29,3 +29,11 @@ data class StartTransferViewState(
     val isStorageOverQuota: Boolean = false,
     val previewFileToOpen: File? = null,
 )
+
+/**
+ * Data class defining the info required to prompt the save destination dialog.
+ *
+ * @property destination The destination path.
+ * @property destinationName The destination name.
+ */
+data class SaveDestinationInfo(val destination: String, val destinationName: String)

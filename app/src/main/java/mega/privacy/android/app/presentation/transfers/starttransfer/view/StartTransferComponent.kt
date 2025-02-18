@@ -49,6 +49,7 @@ import mega.privacy.android.app.presentation.node.action.HandleFileAction
 import mega.privacy.android.app.presentation.permissions.NotificationsPermissionActivity
 import mega.privacy.android.app.presentation.snackbar.LegacySnackBarWrapper
 import mega.privacy.android.app.presentation.transfers.starttransfer.StartTransfersComponentViewModel
+import mega.privacy.android.app.presentation.transfers.starttransfer.model.SaveDestinationInfo
 import mega.privacy.android.app.presentation.transfers.starttransfer.model.StartTransferEvent
 import mega.privacy.android.app.presentation.transfers.starttransfer.model.StartTransferViewState
 import mega.privacy.android.app.presentation.transfers.starttransfer.model.TransferTriggerEvent
@@ -318,7 +319,9 @@ private fun StartTransferComponent(
             }
         })
 
-    var showPromptSaveDestinationDialog by rememberSaveable { mutableStateOf<String?>(null) }
+    var showPromptSaveDestinationDialog by rememberSaveable {
+        mutableStateOf<SaveDestinationInfo?>(null)
+    }
     EventEffect(
         event = uiState.promptSaveDestination,
         onConsumed = onPromptSaveDestinationConsumed,
@@ -400,29 +403,26 @@ private fun StartTransferComponent(
             }
         }
     }
-    showPromptSaveDestinationDialog?.let { destination ->
+    showPromptSaveDestinationDialog?.let { saveDestinationInfo ->
         //this dialog will be updated once we have a dialog defined for this case that follows our DS
         ConfirmationDialog(
-            title = null,
-            text = stringResource(id = sharedR.string.transfers_dialog_save_download_location_title),
-            buttonOption1Text = stringResource(id = sharedR.string.transfers_dialog_save_download_location_only_this_time_option),
-            buttonOption2Text = stringResource(id = sharedR.string.transfers_dialog_save_download_location_always_here_option),
+            title = stringResource(
+                id = sharedR.string.transfers_dialog_save_download_location_title,
+                saveDestinationInfo.destinationName
+            ),
+            confirmButtonText = stringResource(id = sharedR.string.transfers_dialog_save_download_location_always_here_option),
             cancelButtonText = stringResource(id = sharedR.string.transfers_dialog_save_download_location_always_ask_option),
-            onOption1 = {
-                //nothing in this case, just dismiss
+            onConfirm = {
+                onSaveDestination(saveDestinationInfo.destination)
                 showPromptSaveDestinationDialog = null
             },
-            onOption2 = {
-                onSaveDestination(destination)
+            onDismiss = {
                 showPromptSaveDestinationDialog = null
             },
             onCancel = {
                 onDoNotPromptToSaveDestinationAgain()
                 showPromptSaveDestinationDialog = null
             },
-            onDismiss = {
-                showPromptSaveDestinationDialog = null
-            }
         )
     }
     if (showResumeChatUploadsAlertDialog) {

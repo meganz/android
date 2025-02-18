@@ -403,8 +403,12 @@ internal class FileFacade @Inject constructor(
             scheme == "content" && authority?.startsWith("com.android.externalstorage") == true
         }
 
-    override suspend fun getFileNameFromUri(uriString: String): String? {
-        val cursor = context.contentResolver.query(uriString.toUri(), null, null, null, null)
+    override suspend fun getFileNameFromUri(uriString: String): String? = with(uriString.toUri()) {
+        getDocumentFileFromUri(this)?.let { documentFile ->
+            return documentFile.name
+        }
+
+        val cursor = context.contentResolver.query(this, null, null, null, null)
         return cursor?.use {
             if (cursor.moveToFirst()) {
                 cursor.getColumnIndex(OpenableColumns.DISPLAY_NAME).takeIf { it >= 0 }

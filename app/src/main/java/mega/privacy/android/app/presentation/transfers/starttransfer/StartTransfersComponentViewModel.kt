@@ -22,6 +22,7 @@ import mega.privacy.android.app.middlelayer.iar.OnCompleteListener
 import mega.privacy.android.app.presentation.mapper.file.FileSizeStringMapper
 import mega.privacy.android.app.presentation.transfers.TransfersConstants
 import mega.privacy.android.app.presentation.transfers.starttransfer.model.ConfirmLargeDownloadInfo
+import mega.privacy.android.app.presentation.transfers.starttransfer.model.SaveDestinationInfo
 import mega.privacy.android.app.presentation.transfers.starttransfer.model.StartTransferEvent
 import mega.privacy.android.app.presentation.transfers.starttransfer.model.StartTransferEvent.Message.SlowDownloadPreviewFinished
 import mega.privacy.android.app.presentation.transfers.starttransfer.model.StartTransferEvent.Message.SlowDownloadPreviewInProgress
@@ -49,6 +50,7 @@ import mega.privacy.android.domain.usecase.node.GetFilePreviewDownloadPathUseCas
 import mega.privacy.android.domain.usecase.offline.GetOfflinePathForNodeUseCase
 import mega.privacy.android.domain.usecase.setting.IsAskBeforeLargeDownloadsSettingUseCase
 import mega.privacy.android.domain.usecase.setting.SetAskBeforeLargeDownloadsSettingUseCase
+import mega.privacy.android.domain.usecase.transfers.GetFileNameFromStringUriUseCase
 import mega.privacy.android.domain.usecase.transfers.active.ClearActiveTransfersIfFinishedUseCase
 import mega.privacy.android.domain.usecase.transfers.active.MonitorOngoingActiveTransfersUseCase
 import mega.privacy.android.domain.usecase.transfers.chatuploads.SetAskedResumeTransfersUseCase
@@ -118,6 +120,7 @@ internal class StartTransfersComponentViewModel @Inject constructor(
     private val invalidateCancelTokenUseCase: InvalidateCancelTokenUseCase,
     private val getCurrentTimeInMillisUseCase: GetCurrentTimeInMillisUseCase,
     private val areTransfersPausedUseCase: AreTransfersPausedUseCase,
+    private val getFileNameFromStringUriUseCase: GetFileNameFromStringUriUseCase,
 ) : ViewModel(), DefaultLifecycleObserver {
 
     private val _uiState = MutableStateFlow(StartTransferViewState())
@@ -236,10 +239,23 @@ internal class StartTransfersComponentViewModel @Inject constructor(
         consumeAskDestination()
         if (destinationUri != null && originalEvent != null) {
             viewModelScope.launch {
-                startDownloadNodes(originalEvent, destinationUri.toString())
+                val destination = destinationUri.toString()
+                startDownloadNodes(originalEvent, destination)
                 if (runCatching { shouldPromptToSaveDestinationUseCase() }.getOrDefault(false)) {
+                    val destinationName =
+                        runCatching { getFileNameFromStringUriUseCase(destination) }
+                            .onFailure { Timber.e(it) }
+                            .getOrNull()
+
                     _uiState.update {
-                        it.copy(promptSaveDestination = triggered(destinationUri.toString()))
+                        it.copy(
+                            promptSaveDestination = triggered(
+                                SaveDestinationInfo(
+                                    destination = destination,
+                                    destinationName = destinationName ?: destination
+                                )
+                            )
+                        )
                     }
                 }
             }
