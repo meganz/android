@@ -47,8 +47,9 @@ sealed interface StartTransferEvent {
 
     /**
      * Transfer cannot proceed because transfers' queue is paused.
+     * @param triggerEvent, the event that was initiated while the transfers are paused
      */
-    data object PausedTransfers : StartTransferEvent
+    data class PausedTransfers(val triggerEvent: TransferTriggerEvent) : StartTransferEvent
 
     /**
      * Copy offline has finished

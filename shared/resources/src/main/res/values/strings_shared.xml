@@ -899,4 +899,8 @@
         <item quantity="one">‘%1$s’ was removed</item>
         <item quantity="other">Removed %2$d items from queue</item>
     </plurals>
+    <!-- Title for the dialog to inform that a transfer is needed to preview a file and transfers are paused-->
+    <string name="transfers_preview_paused_dialog_title">Transfers are paused</string>
+    <!-- Message for the dialog to inform that a transfer is needed to preview a file and transfers are paused-->
+    <string name="transfers_preview_paused_dialog_text">To preview “%1$s” you will need to unpause transfers</string>
 </resources>

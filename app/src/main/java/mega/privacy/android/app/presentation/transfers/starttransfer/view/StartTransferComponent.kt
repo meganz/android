@@ -52,7 +52,8 @@ import mega.privacy.android.app.presentation.transfers.starttransfer.StartTransf
 import mega.privacy.android.app.presentation.transfers.starttransfer.model.StartTransferEvent
 import mega.privacy.android.app.presentation.transfers.starttransfer.model.StartTransferViewState
 import mega.privacy.android.app.presentation.transfers.starttransfer.model.TransferTriggerEvent
-import mega.privacy.android.app.presentation.transfers.starttransfer.view.dialog.ResumeTransfersDialog
+import mega.privacy.android.app.presentation.transfers.starttransfer.view.dialog.ResumeChatTransfersDialog
+import mega.privacy.android.app.presentation.transfers.starttransfer.view.dialog.ResumePreviewTransfersDialog
 import mega.privacy.android.app.presentation.transfers.starttransfer.view.filespermission.FilesPermissionDialog
 import mega.privacy.android.app.presentation.transfers.view.dialog.NotEnoughSpaceForUploadDialog
 import mega.privacy.android.app.presentation.transfers.view.dialog.TransferInProgressDialog
@@ -210,7 +211,6 @@ internal fun createStartTransferView(
     }
 }
 
-
 @Composable
 private fun StartTransferComponent(
     uiState: StartTransferViewState,
@@ -232,7 +232,8 @@ private fun StartTransferComponent(
     val context = LocalContext.current
     val coroutineScope = rememberCoroutineScope()
     var showOfflineAlertDialog by rememberSaveable { mutableStateOf(false) }
-    var showResumeTransfersAlertDialog by rememberSaveable { mutableStateOf(false) }
+    var showResumeChatUploadsAlertDialog by rememberSaveable { mutableStateOf(false) }
+    var showResumePreviewDownloadsAlertDialog by rememberSaveable { mutableStateOf<String?>(null) }
     val showQuotaExceededDialog = rememberSaveable(stateSaver = storageStateSaver) {
         mutableStateOf(null)
     }
@@ -289,8 +290,20 @@ private fun StartTransferComponent(
                     showOfflineAlertDialog = true
                 }
 
-                StartTransferEvent.PausedTransfers -> {
-                    showResumeTransfersAlertDialog = true
+                is StartTransferEvent.PausedTransfers -> {
+                    when {
+                        it.triggerEvent is TransferTriggerEvent.StartChatUpload -> {
+                            showResumeChatUploadsAlertDialog = true
+                        }
+
+                        it.triggerEvent is TransferTriggerEvent.StartDownloadForPreview -> {
+                            showResumePreviewDownloadsAlertDialog =
+                                it.triggerEvent.node?.name ?: run {
+                                    Timber.w("Empty name for file preview")
+                                    ""
+                                }
+                        }
+                    }
                 }
 
                 is StartTransferEvent.FinishCopyOffline -> {
@@ -412,14 +425,28 @@ private fun StartTransferComponent(
             }
         )
     }
-    if (showResumeTransfersAlertDialog) {
-        ResumeTransfersDialog(onResume = {
-            onResumeTransfers()
-            showResumeTransfersAlertDialog = false
-        }, onDismiss = {
-            onAskedResumeTransfers()
-            showResumeTransfersAlertDialog = false
-        })
+    if (showResumeChatUploadsAlertDialog) {
+        ResumeChatTransfersDialog(
+            onResume = {
+                onResumeTransfers()
+                showResumeChatUploadsAlertDialog = false
+            },
+            onDismiss = {
+                onAskedResumeTransfers()
+                showResumeChatUploadsAlertDialog = false
+            })
+    }
+    showResumePreviewDownloadsAlertDialog?.let { fileName ->
+        ResumePreviewTransfersDialog(
+            fileName = fileName,
+            onResume = {
+                onResumeTransfers()
+                showResumePreviewDownloadsAlertDialog = null
+            },
+            onDismiss = {
+                onAskedResumeTransfers()
+                showResumePreviewDownloadsAlertDialog = null
+            })
     }
 }
 

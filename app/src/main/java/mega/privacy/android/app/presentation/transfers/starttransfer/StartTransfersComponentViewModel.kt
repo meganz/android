@@ -64,6 +64,7 @@ import mega.privacy.android.domain.usecase.transfers.filespermission.SetRequestF
 import mega.privacy.android.domain.usecase.transfers.offline.SaveOfflineNodesToDevice
 import mega.privacy.android.domain.usecase.transfers.offline.SaveUriToDeviceUseCase
 import mega.privacy.android.domain.usecase.transfers.overquota.MonitorStorageOverQuotaUseCase
+import mega.privacy.android.domain.usecase.transfers.paused.AreTransfersPausedUseCase
 import mega.privacy.android.domain.usecase.transfers.paused.PauseTransfersQueueUseCase
 import mega.privacy.android.domain.usecase.transfers.pending.DeleteAllPendingTransfersUseCase
 import mega.privacy.android.domain.usecase.transfers.pending.InsertPendingDownloadsForNodesUseCase
@@ -116,6 +117,7 @@ internal class StartTransfersComponentViewModel @Inject constructor(
     private val monitorStorageOverQuotaUseCase: MonitorStorageOverQuotaUseCase,
     private val invalidateCancelTokenUseCase: InvalidateCancelTokenUseCase,
     private val getCurrentTimeInMillisUseCase: GetCurrentTimeInMillisUseCase,
+    private val areTransfersPausedUseCase: AreTransfersPausedUseCase,
 ) : ViewModel(), DefaultLifecycleObserver {
 
     private val _uiState = MutableStateFlow(StartTransferViewState())
@@ -161,7 +163,6 @@ internal class StartTransfersComponentViewModel @Inject constructor(
                         uris = transferTriggerEvent.uris,
                         isVoiceClip = transferTriggerEvent.isVoiceClip
                     )
-                    checkAndHandleTransfersPaused()
                 }
 
                 is TransferTriggerEvent.StartUpload -> {
@@ -175,6 +176,7 @@ internal class StartTransfersComponentViewModel @Inject constructor(
                     )
                 }
             }
+            checkAndHandleTransfersPaused(transferTriggerEvent)
         }
     }
 
@@ -759,9 +761,16 @@ internal class StartTransfersComponentViewModel @Inject constructor(
         }
     }
 
-    private fun checkAndHandleTransfersPaused() {
-        if (runCatching { shouldAskForResumeTransfersUseCase() }.getOrDefault(false)) {
-            _uiState.updateEventAndClearProgress(StartTransferEvent.PausedTransfers)
+    private fun checkAndHandleTransfersPaused(triggerEvent: TransferTriggerEvent) {
+        if (runCatching {
+                when (triggerEvent.checkPausedTransfers) {
+                    TransferTriggerEvent.CheckPausedTransfersType.Never -> false
+                    TransferTriggerEvent.CheckPausedTransfersType.OncePerPausedState -> shouldAskForResumeTransfersUseCase()
+                    TransferTriggerEvent.CheckPausedTransfersType.Always -> areTransfersPausedUseCase()
+                }
+            }.getOrDefault(false)
+        ) {
+            _uiState.updateEventAndClearProgress(StartTransferEvent.PausedTransfers(triggerEvent))
         }
     }
 

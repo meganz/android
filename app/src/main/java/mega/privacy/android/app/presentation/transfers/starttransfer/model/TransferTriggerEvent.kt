@@ -21,11 +21,18 @@ sealed interface TransferTriggerEvent {
     val type: TransferType
 
     /**
+     * Check if transfers are paused when receiving this trigger event
+     */
+    val checkPausedTransfers get() = CheckPausedTransfersType.Never
+
+    /**
      * Event to start uploading to the chat
      */
     sealed interface StartChatUpload : TransferTriggerEvent {
         override val type: TransferType
             get() = TransferType.CHAT_UPLOAD
+
+        override val checkPausedTransfers get() = CheckPausedTransfersType.OncePerPausedState
 
         /**
          * The id of the chat where these files will be attached
@@ -157,6 +164,7 @@ sealed interface TransferTriggerEvent {
         override val nodes = node?.let { listOf(node) } ?: emptyList()
         override val isHighPriority: Boolean = true
         override val appData = TransferAppData.PreviewDownload
+        override val checkPausedTransfers = CheckPausedTransfersType.Always
     }
 
     /**
@@ -219,5 +227,25 @@ sealed interface TransferTriggerEvent {
         ) : StartUpload {
             override val isHighPriority = false
         }
+    }
+
+    /**
+     * Specify the need to check if transfers are paused when the [TransferTriggerEvent] is emitted
+     */
+    enum class CheckPausedTransfersType {
+        /**
+         * No need to check if transfers are paused
+         */
+        Never,
+
+        /**
+         * Only be checked once, until transfers are paused again
+         */
+        OncePerPausedState,
+
+        /**
+         * Paused transfers should be checked on each [TransferTriggerEvent] emission
+         */
+        Always,
     }
 }

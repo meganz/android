@@ -26,6 +26,7 @@ import mega.privacy.android.core.test.extension.CoroutineMainDispatcherExtension
 import mega.privacy.android.domain.entity.node.NodeId
 import mega.privacy.android.domain.entity.node.TypedFileNode
 import mega.privacy.android.domain.entity.node.TypedFolderNode
+import mega.privacy.android.domain.entity.node.chat.ChatDefaultFile
 import mega.privacy.android.domain.entity.transfer.TransferStage
 import mega.privacy.android.domain.entity.transfer.TransferType
 import mega.privacy.android.domain.entity.transfer.pending.PendingTransfer
@@ -57,6 +58,7 @@ import mega.privacy.android.domain.usecase.transfers.filespermission.SetRequestF
 import mega.privacy.android.domain.usecase.transfers.offline.SaveOfflineNodesToDevice
 import mega.privacy.android.domain.usecase.transfers.offline.SaveUriToDeviceUseCase
 import mega.privacy.android.domain.usecase.transfers.overquota.MonitorStorageOverQuotaUseCase
+import mega.privacy.android.domain.usecase.transfers.paused.AreTransfersPausedUseCase
 import mega.privacy.android.domain.usecase.transfers.paused.PauseTransfersQueueUseCase
 import mega.privacy.android.domain.usecase.transfers.pending.DeleteAllPendingTransfersUseCase
 import mega.privacy.android.domain.usecase.transfers.pending.InsertPendingDownloadsForNodesUseCase
@@ -135,14 +137,13 @@ class StartTransfersComponentViewModelTest {
     private val startUploadsWorkerAndWaitUntilIsStartedUseCase =
         mock<StartUploadsWorkerAndWaitUntilIsStartedUseCase>()
     private val getCurrentTimeInMillisUseCase = mock<GetCurrentTimeInMillisUseCase>()
-
+    private val insertPendingDownloadsForNodesUseCase =
+        mock<InsertPendingDownloadsForNodesUseCase>()
+    private val areTransfersPausedUseCase = mock<AreTransfersPausedUseCase>()
 
     private val node: TypedFileNode = mock()
     private val nodes = listOf(node)
     private val parentNode: TypedFolderNode = mock()
-    private val insertPendingDownloadsForNodesUseCase =
-        mock<InsertPendingDownloadsForNodesUseCase>()
-
     private val startDownloadEvent = TransferTriggerEvent.StartDownloadNode(nodes)
     private val startUploadFilesEvent =
         TransferTriggerEvent.StartUpload.Files(mapOf(DESTINATION to null), parentId)
@@ -198,6 +199,7 @@ class StartTransfersComponentViewModelTest {
             monitorStorageOverQuotaUseCase = monitorStorageOverQuotaUseCase,
             invalidateCancelTokenUseCase = invalidateCancelTokenUseCase,
             getCurrentTimeInMillisUseCase = getCurrentTimeInMillisUseCase,
+            areTransfersPausedUseCase = areTransfersPausedUseCase,
         )
     }
 
@@ -239,6 +241,7 @@ class StartTransfersComponentViewModelTest {
             insertPendingUploadsForFilesUseCase,
             startUploadsWorkerAndWaitUntilIsStartedUseCase,
             getCurrentTimeInMillisUseCase,
+            areTransfersPausedUseCase,
         )
         initialStub()
     }
@@ -414,10 +417,26 @@ class StartTransfersComponentViewModelTest {
         runTest {
             commonStub()
             whenever(shouldAskForResumeTransfersUseCase()).thenReturn(true)
-            underTest.startTransfer(
+            val triggerEvent =
                 TransferTriggerEvent.StartChatUpload.Files(CHAT_ID, listOf(uploadUri))
+            underTest.startTransfer(triggerEvent)
+            assertCurrentEventIsEqualTo(StartTransferEvent.PausedTransfers(triggerEvent))
+        }
+
+    @Test
+    fun `test that paused transfers event is emitted when transfers are paused and start a preview download`() =
+        runTest {
+            commonStub()
+            stubMonitorPendingTransfers(
+                TransferType.DOWNLOAD,
+                flow { awaitCancellation() } //no events when it's paused
             )
-            assertCurrentEventIsEqualTo(StartTransferEvent.PausedTransfers)
+            whenever(areTransfersPausedUseCase()).thenReturn(true)
+            whenever(getFilePreviewDownloadPathUseCase()).thenReturn("/path")
+            val triggerEvent =
+                TransferTriggerEvent.StartDownloadForPreview(mock<ChatDefaultFile>())
+            underTest.startTransfer(triggerEvent)
+            assertCurrentEventIsEqualTo(StartTransferEvent.PausedTransfers(triggerEvent))
         }
 
     @Test
