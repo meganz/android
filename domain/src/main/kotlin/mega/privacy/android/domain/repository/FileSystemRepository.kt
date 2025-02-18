@@ -4,6 +4,7 @@ import kotlinx.coroutines.flow.Flow
 import mega.privacy.android.domain.entity.FileTypeInfo
 import mega.privacy.android.domain.entity.document.DocumentEntity
 import mega.privacy.android.domain.entity.document.DocumentFolder
+import mega.privacy.android.domain.entity.file.FileStorageType
 import mega.privacy.android.domain.entity.node.FileNode
 import mega.privacy.android.domain.entity.uri.UriPath
 import java.io.File
@@ -497,4 +498,9 @@ interface FileSystemRepository {
      * Returns Offline Files Root Folder
      */
     suspend fun getOfflineFilesRootFolder(): File
+
+    /**
+     * Returns device model or SD Card based on file location
+     */
+    suspend fun getFileStorageTypeName(file: File): FileStorageType
 }

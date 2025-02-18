@@ -7,6 +7,7 @@ import kotlinx.coroutines.flow.Flow
 import mega.privacy.android.domain.entity.document.DocumentEntity
 import mega.privacy.android.domain.entity.document.DocumentFolder
 import mega.privacy.android.domain.entity.document.DocumentMetadata
+import mega.privacy.android.domain.entity.file.FileStorageType
 import mega.privacy.android.domain.entity.uri.UriPath
 import java.io.File
 import java.io.IOException
@@ -520,4 +521,9 @@ interface FileGateway {
      * @return the new [UriPath] of the renamed file, null if the file wasn't renamed
      */
     fun renameFileSync(uriPath: UriPath, newName: String): UriPath?
+
+    /**
+     * Returns device model or SD Card based on file location
+     */
+    suspend fun getFileStorageTypeName(file: File): FileStorageType
 }

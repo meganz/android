@@ -5,8 +5,8 @@ import android.content.Intent
 import androidx.activity.compose.ManagedActivityResultLauncher
 import androidx.activity.result.ActivityResult
 import mega.privacy.android.app.main.FileExplorerActivity
-import mega.privacy.android.app.main.FileStorageActivity
-import mega.privacy.android.app.main.FileStorageActivity.PickFolderType
+import mega.privacy.android.app.presentation.filestorage.FileStorageActivity
+import mega.privacy.android.app.presentation.filestorage.FileStorageActivity.PickFolderType
 
 /**
  * Selects a new Local Folder by starting an [Intent] to [FileStorageActivity] and retrieving the

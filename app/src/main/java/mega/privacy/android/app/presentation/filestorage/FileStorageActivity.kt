@@ -1,5 +1,6 @@
-package mega.privacy.android.app.main
+package mega.privacy.android.app.presentation.filestorage
 
+import mega.privacy.android.shared.resources.R as sharedR
 import android.Manifest
 import android.annotation.SuppressLint
 import android.content.ActivityNotFoundException
@@ -17,6 +18,7 @@ import android.widget.ImageView
 import android.widget.RelativeLayout
 import android.widget.TextView
 import androidx.activity.enableEdgeToEdge
+import androidx.activity.viewModels
 import androidx.appcompat.widget.Toolbar
 import androidx.core.content.FileProvider
 import androidx.core.text.HtmlCompat
@@ -27,10 +29,12 @@ import androidx.recyclerview.widget.RecyclerView
 import com.anggrayudi.storage.file.StorageId
 import com.anggrayudi.storage.file.getAbsolutePath
 import com.anggrayudi.storage.file.id
+import dagger.hilt.android.AndroidEntryPoint
 import mega.privacy.android.app.FileDocument
 import mega.privacy.android.app.MimeTypeList.Companion.typeForName
 import mega.privacy.android.app.R
 import mega.privacy.android.app.activities.PasscodeActivity
+import mega.privacy.android.app.arch.extensions.collectFlow
 import mega.privacy.android.app.components.SimpleDividerItemDecoration
 import mega.privacy.android.app.extensions.consumeInsetsWithToolbar
 import mega.privacy.android.app.interfaces.Scrollable
@@ -46,6 +50,7 @@ import mega.privacy.android.app.utils.Util
 import mega.privacy.android.app.utils.createViewFolderIntent
 import mega.privacy.android.app.utils.permission.PermissionUtils.hasPermissions
 import mega.privacy.android.app.utils.permission.PermissionUtils.requestPermission
+import mega.privacy.android.domain.entity.file.FileStorageType
 import timber.log.Timber
 import java.io.File
 import java.util.Collections
@@ -54,8 +59,10 @@ import java.util.Stack
 /**
  * Activity to browse local files and folders on the device
  */
+@AndroidEntryPoint
 class FileStorageActivity : PasscodeActivity(), Scrollable {
 
+    private val viewModel: FileStorageViewModel by viewModels()
     private var mode: Mode? = null
     private var path: File? = null
     private var root: File? = null
@@ -141,9 +148,6 @@ class FileStorageActivity : PasscodeActivity(), Scrollable {
                 }
             }
             serializedNodes = intent.getStringArrayListExtra(EXTRA_SERIALIZED_NODES)
-        } else if (mode == Mode.BROWSE_FILES) {
-            supportActionBar?.title =
-                getString(R.string.browse_files_label)
         }
 
         if (savedInstanceState?.containsKey(PATH) == true) {
@@ -204,6 +208,31 @@ class FileStorageActivity : PasscodeActivity(), Scrollable {
                 }
             }
             checkPath()
+        }
+        observeUiState()
+
+        if (mode == Mode.BROWSE_FILES) {
+            viewModel.updateTitle(path)
+        }
+    }
+
+    private fun observeUiState() {
+        collectFlow(viewModel.uiState) {
+            if (mode == Mode.BROWSE_FILES) {
+                supportActionBar?.title = when (it.storageType) {
+                    is FileStorageType.Internal -> {
+                        it.storageType.deviceModel
+                    }
+
+                    is FileStorageType.SdCard -> {
+                        getString(sharedR.string.general_sd_card)
+                    }
+
+                    is FileStorageType.Unknown -> {
+                        getString(R.string.browse_files_label)
+                    }
+                }
+            }
         }
     }
 

@@ -308,7 +308,7 @@
             </intent-filter>
         </activity>
         <activity
-            android:name=".main.FileStorageActivity"
+            android:name=".presentation.filestorage.FileStorageActivity"
             android:configChanges="orientation|screenSize" />
         <activity
             android:name=".presentation.folderlink.FolderLinkComposeActivity"

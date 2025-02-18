@@ -903,4 +903,6 @@
     <string name="transfers_preview_paused_dialog_title">Transfers are paused</string>
     <!-- Message for the dialog to inform that a transfer is needed to preview a file and transfers are paused-->
     <string name="transfers_preview_paused_dialog_text">To preview “%1$s” you will need to unpause transfers</string>
+    <!--SD Card text shown as title in FileStorage screen -->
+    <string name="general_sd_card">SD Card</string>
 </resources>

@@ -4,8 +4,11 @@ import android.content.ContentResolver
 import android.content.Context
 import android.database.Cursor
 import android.net.Uri
+import android.os.Build
 import android.os.Environment
 import android.os.ParcelFileDescriptor
+import android.os.storage.StorageManager
+import android.os.storage.StorageVolume
 import android.provider.DocumentsContract
 import android.provider.OpenableColumns
 import android.webkit.MimeTypeMap
@@ -17,10 +20,13 @@ import kotlinx.coroutines.test.UnconfinedTestDispatcher
 import kotlinx.coroutines.test.runTest
 import kotlinx.coroutines.test.setMain
 import mega.privacy.android.data.extensions.toUri
+import mega.privacy.android.data.gateway.DeviceGateway
 import mega.privacy.android.data.mapper.file.DocumentFileMapper
 import mega.privacy.android.domain.entity.document.DocumentEntity
 import mega.privacy.android.domain.entity.document.DocumentMetadata
+import mega.privacy.android.domain.entity.file.FileStorageType
 import mega.privacy.android.domain.entity.uri.UriPath
+import org.junit.jupiter.api.AfterAll
 import org.junit.jupiter.api.Assertions.assertEquals
 import org.junit.jupiter.api.BeforeAll
 import org.junit.jupiter.api.Test
@@ -33,6 +39,7 @@ import org.mockito.kotlin.doReturn
 import org.mockito.kotlin.mock
 import org.mockito.kotlin.verify
 import org.mockito.kotlin.whenever
+import org.robolectric.annotation.Config
 import java.io.File
 
 @ExperimentalCoroutinesApi
@@ -42,6 +49,8 @@ internal class FileFacadeTest {
     private lateinit var underTest: FileFacade
     private val context: Context = mock()
     private val documentFileMapper: DocumentFileMapper = mock()
+    private val environmentMock = mockStatic(Environment::class.java)
+    private val deviceGateway = mock<DeviceGateway>()
 
     @TempDir
     lateinit var temporaryFolder: File
@@ -49,13 +58,21 @@ internal class FileFacadeTest {
     @BeforeAll
     fun setUp() {
         Dispatchers.setMain(UnconfinedTestDispatcher())
-        underTest = FileFacade(context, documentFileMapper)
+        underTest = FileFacade(
+            context = context,
+            documentFileMapper = documentFileMapper,
+            deviceGateway = deviceGateway
+        )
+    }
+
+    @AfterAll
+    fun clearMock() {
+        environmentMock.close()
     }
 
     @Test
     fun `test that get external path by content uri returns the uri string`() = runTest {
         val uriMock = mockStatic(Uri::class.java)
-        val environmentMock = mockStatic(android.os.Environment::class.java)
         val contentUri =
             "content://com.android.externalstorage.documents/tree/primary%3ASync%2FsomeFolder"
         val expected = "/storage/emulated/0/Sync/someFolder"
@@ -72,7 +89,6 @@ internal class FileFacadeTest {
         assertThat(expected).isEqualTo(actual)
 
         uriMock.close()
-        environmentMock.close()
     }
 
     @Test
@@ -80,12 +96,10 @@ internal class FileFacadeTest {
         val file = mock<File> {
             on { absolutePath } doReturn "/storage/emulated/0"
         }
-        val environmentMock = mockStatic(Environment::class.java)
         whenever(Environment.getExternalStorageDirectory()).thenReturn(file)
         val actual = underTest.buildExternalStorageFile("/Mega.txt")
 
         assertThat(actual.path).isEqualTo("/storage/emulated/0/Mega.txt")
-        environmentMock.close()
     }
 
     @Test
@@ -611,6 +625,123 @@ internal class FileFacadeTest {
             }
         }
     }
+
+    @Test
+    fun `test that getFileStorageTypeName returns null if file absolute path is null`() = runTest {
+        val testFile = mock<File> {
+            on { absolutePath } doReturn null
+        }
+
+        val result = underTest.getFileStorageTypeName(testFile)
+
+        assertThat(result).isEqualTo(FileStorageType.Unknown)
+    }
+
+    @Test
+    fun `test that getFileStorageTypeName returns Build model when file is in primary external storage`() =
+        runTest {
+            val primaryStorage = File("/storage/emulated/0")
+            whenever(Environment.getExternalStorageDirectory()).thenReturn(primaryStorage)
+            whenever(deviceGateway.getDeviceModel()).thenReturn("SM-8673")
+            val testFile = mock<File> {
+                on { absolutePath } doReturn "/storage/emulated/0/test.txt"
+            }
+
+            val result = underTest.getFileStorageTypeName(testFile)
+
+            assertThat(result).isEqualTo(FileStorageType.Internal("SM-8673"))
+        }
+
+    @Test
+    @Config(sdk = [Build.VERSION_CODES.R])
+    fun `test that getFileStorageTypeName returns SD Card when file is on SD card (API 30+)`() =
+        runTest {
+            val primaryStorage = File("/storage/emulated/0")
+            whenever(Environment.getExternalStorageDirectory()).thenReturn(primaryStorage)
+            whenever(deviceGateway.getSdkVersionInt()).thenReturn(Build.VERSION_CODES.R)
+            val storageManager = mock<StorageManager>()
+            val directoryFile = mock<File> {
+                on { absolutePath } doReturn "/storage/sdcard"
+            }
+            val storageVolume = mock<StorageVolume> {
+                on { isRemovable } doReturn true
+                on { directory } doReturn directoryFile
+            }
+            whenever(storageManager.storageVolumes).thenReturn(listOf(storageVolume))
+            whenever(context.getSystemService(StorageManager::class.java)).thenReturn(storageManager)
+
+            val testFile = mock<File> {
+                on { absolutePath } doReturn "/storage/sdcard/test.txt"
+            }
+
+            val result = underTest.getFileStorageTypeName(testFile)
+
+            assertThat(result).isEqualTo(FileStorageType.SdCard)
+        }
+
+    @Test
+    @Config(sdk = [Build.VERSION_CODES.Q])
+    fun `test that getFileStorageTypeName returns SD Card via UUID when file is on SD card (pre API 30)`() =
+        runTest {
+            whenever(Environment.getExternalStorageDirectory()).thenReturn(File("/storage/emulated/0"))
+            whenever(deviceGateway.getSdkVersionInt()).thenReturn(Build.VERSION_CODES.Q)
+
+            val storageManager = mock<StorageManager>()
+            val storageVolume = mock<StorageVolume> {
+                on { isRemovable } doReturn true
+                on { uuid } doReturn "1234-5678"
+            }
+            whenever(storageManager.storageVolumes).thenReturn(listOf(storageVolume))
+            whenever(context.getSystemService(StorageManager::class.java)).thenReturn(storageManager)
+
+            val testFile = mock<File> {
+                on { absolutePath } doReturn "/storage/1234-5678/test.txt"
+            }
+
+            val result = underTest.getFileStorageTypeName(testFile)
+
+            assertThat(result).isEqualTo(FileStorageType.SdCard)
+        }
+
+
+    @Test
+    fun `test that getFileStorageTypeName returns SD Card when file is in fallback SD path`() =
+        runTest {
+            whenever(Environment.getExternalStorageDirectory()).thenReturn(File("/storage/emulated/0"))
+
+            val storageManager = mock<StorageManager> {
+                on { storageVolumes } doReturn emptyList()
+            }
+            whenever(context.getSystemService(StorageManager::class.java)).thenReturn(storageManager)
+
+            val testFile = mock<File> {
+                on { absolutePath } doReturn "/mnt/extSdCard/test.txt"
+            }
+
+            val result = underTest.getFileStorageTypeName(testFile)
+
+            assertThat(result).isEqualTo(FileStorageType.SdCard)
+        }
+
+    @Test
+    fun `test that getFileStorageTypeName returns null when file is not in primary or SD storage`() =
+        runTest {
+            whenever(Environment.getExternalStorageDirectory()).thenReturn(File("/storage/emulated/0"))
+
+            val storageManager = mock<StorageManager> {
+                on { storageVolumes } doReturn emptyList()
+            }
+            whenever(context.getSystemService(StorageManager::class.java)).thenReturn(storageManager)
+
+            val testFile = mock<File> {
+                on { absolutePath } doReturn "/some/unknown/path.txt"
+            }
+
+            val result = underTest.getFileStorageTypeName(testFile)
+
+            assertThat(result).isEqualTo(FileStorageType.Unknown)
+        }
+
 
     private fun stubGetDocumentFileFromUri(documentFile: DocumentFile): Uri {
         val uri = mock<Uri> {

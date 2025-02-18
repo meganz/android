@@ -13,6 +13,8 @@ import android.net.Uri
 import android.os.Build
 import android.os.Environment
 import android.os.StatFs
+import android.os.storage.StorageManager
+import android.os.storage.StorageVolume
 import android.provider.DocumentsContract
 import android.provider.MediaStore
 import android.provider.MediaStore.MediaColumns.DATA
@@ -44,11 +46,13 @@ import kotlinx.coroutines.sync.Semaphore
 import kotlinx.coroutines.sync.withPermit
 import kotlinx.coroutines.withContext
 import mega.privacy.android.data.extensions.toUri
+import mega.privacy.android.data.gateway.DeviceGateway
 import mega.privacy.android.data.gateway.FileGateway
 import mega.privacy.android.data.mapper.file.DocumentFileMapper
 import mega.privacy.android.domain.entity.document.DocumentEntity
 import mega.privacy.android.domain.entity.document.DocumentFolder
 import mega.privacy.android.domain.entity.document.DocumentMetadata
+import mega.privacy.android.domain.entity.file.FileStorageType
 import mega.privacy.android.domain.entity.uri.UriPath
 import mega.privacy.android.domain.exception.FileNotCreatedException
 import mega.privacy.android.domain.exception.NotEnoughStorageException
@@ -77,6 +81,7 @@ const val INTENT_EXTRA_NODE_HANDLE = "NODE_HANDLE"
 internal class FileFacade @Inject constructor(
     @ApplicationContext private val context: Context,
     private val documentFileMapper: DocumentFileMapper,
+    private val deviceGateway: DeviceGateway,
 ) : FileGateway {
 
     override val localDCIMFolderPath: String
@@ -951,6 +956,59 @@ internal class FileFacade @Inject constructor(
             }
         }
         return null
+    }
+
+    @SuppressLint("NewApi")
+    override suspend fun getFileStorageTypeName(file: File): FileStorageType {
+        val filePath = file.absolutePath ?: return FileStorageType.Unknown
+        // Check if the file is in the primary external storage (internal storage)
+        val primaryExternalStorage = Environment.getExternalStorageDirectory()
+        if (filePath.startsWith(primaryExternalStorage.absolutePath)) {
+            return FileStorageType.Internal(deviceGateway.getDeviceModel())
+        }
+        // Check if the file is on an SD card (removable storage)
+        val storageManager = context.getSystemService(StorageManager::class.java)
+        storageManager.storageVolumes.forEach { volume ->
+            if (volume.isRemovable) {
+                // For Android R (API 30) and above, use volume.directory
+                if (deviceGateway.getSdkVersionInt() >= Build.VERSION_CODES.R) {
+                    volume.directory?.absolutePath?.let { volumePath ->
+                        if (filePath.startsWith(volumePath)) {
+                            return FileStorageType.SdCard
+                        }
+                    }
+                } else {
+                    volume.uuid?.let { uuid ->
+                        val possiblePath = "/storage/$uuid"
+                        if (filePath.startsWith(possiblePath)) {
+                            return FileStorageType.SdCard
+                        }
+                    }
+                    // Additional fallback
+                    runCatching {
+                        val getPathMethod = StorageVolume::class.java.getMethod("getPath")
+                        val volumePath = getPathMethod.invoke(volume) as? String
+                        if (volumePath != null && filePath.startsWith(volumePath)) {
+                            return FileStorageType.SdCard
+                        }
+                    }
+                }
+            }
+        }
+        // Fallback for older devices: check common SD card paths
+        val possibleSdPaths = arrayOf(
+            Environment.getExternalStorageDirectory().path,
+            "/storage/sdcard1",
+            "/mnt/extSdCard",
+            "/storage/extSdCard",
+            "/storage/removable/sdcard1"
+        )
+        possibleSdPaths.forEach { path ->
+            if (filePath.startsWith(path)) {
+                return FileStorageType.SdCard
+            }
+        }
+        return FileStorageType.Unknown
     }
 
     private companion object {
