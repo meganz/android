@@ -13,7 +13,6 @@ import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.catch
 import kotlinx.coroutines.flow.conflate
 import kotlinx.coroutines.flow.filter
-import kotlinx.coroutines.flow.lastOrNull
 import kotlinx.coroutines.flow.onEach
 import kotlinx.coroutines.flow.takeWhile
 import kotlinx.coroutines.flow.update
@@ -78,6 +77,7 @@ import timber.log.Timber
 import java.io.File
 import javax.inject.Inject
 import kotlin.time.Duration.Companion.seconds
+import kotlinx.coroutines.flow.collect
 
 /**
  * View model to handle start transfers component
@@ -423,23 +423,21 @@ internal class StartTransfersComponentViewModel @Inject constructor(
                 is TransferTriggerEvent.DownloadTriggerEvent -> TransferType.DOWNLOAD
                 is TransferTriggerEvent.StartUpload -> TransferType.GENERAL_UPLOAD
             }
-            val lastPendingTransfers =
-                monitorPendingTransfersUntilResolvedUseCase(transferType).onEach { pendingTransfers ->
-                    Timber.d("Pending transfers to process: ${pendingTransfers.size}")
-                    if (pendingTransfers.isNotEmpty()) {
-                        _uiState.updateJobInProgress(
-                            StartTransferJobInProgress.ScanningTransfers(
-                                stage = pendingTransfers.minOf { it.scanningFoldersData.stage },
-                                fileCount = pendingTransfers.sumOf { it.scanningFoldersData.fileCount },
-                                folderCount = pendingTransfers.sumOf { it.scanningFoldersData.folderCount },
-                                createdFolderCount = pendingTransfers.sumOf { it.scanningFoldersData.createdFolderCount },
-                            )
+            monitorPendingTransfersUntilResolvedUseCase(transferType).onEach { pendingTransfers ->
+                Timber.d("Pending transfers to process: ${pendingTransfers.size}")
+                if (pendingTransfers.isNotEmpty()) {
+                    _uiState.updateJobInProgress(
+                        StartTransferJobInProgress.ScanningTransfers(
+                            stage = pendingTransfers.minOf { it.scanningFoldersData.stage },
+                            fileCount = pendingTransfers.sumOf { it.scanningFoldersData.fileCount },
+                            folderCount = pendingTransfers.sumOf { it.scanningFoldersData.folderCount },
+                            createdFolderCount = pendingTransfers.sumOf { it.scanningFoldersData.createdFolderCount },
                         )
-                    }
+                    )
                 }
-                    .catch { error = it }
-                    .filter { it.isNotEmpty() }
-                    .lastOrNull()
+            }
+                .catch { error = it }
+                .collect() //just wait until finishes
 
             Timber.d("Scanning finished")
             invalidateCancelTokenUseCase()
@@ -449,10 +447,6 @@ internal class StartTransfersComponentViewModel @Inject constructor(
                     is TransferTriggerEvent.DownloadTriggerEvent -> {
                         StartTransferEvent.FinishDownloadProcessing(
                             exception = error,
-                            totalNodes = transferTriggerEvent.nodes.size,
-                            totalFiles = lastPendingTransfers?.sumOf { it.startedFiles } ?: 0,
-                            totalAlreadyDownloaded = lastPendingTransfers?.sumOf { it.alreadyTransferred }
-                                ?: 0,
                             triggerEvent = transferTriggerEvent,
                         )
                     }

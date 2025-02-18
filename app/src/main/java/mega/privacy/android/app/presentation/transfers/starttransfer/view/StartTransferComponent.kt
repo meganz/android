@@ -23,10 +23,10 @@ import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.platform.ComposeView
 import androidx.compose.ui.platform.LocalContext
-import androidx.compose.ui.platform.LocalLifecycleOwner
 import androidx.compose.ui.platform.ViewCompositionStrategy
 import androidx.compose.ui.res.stringResource
 import androidx.hilt.navigation.compose.hiltViewModel
+import androidx.lifecycle.compose.LocalLifecycleOwner
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.google.accompanist.permissions.ExperimentalPermissionsApi
 import com.google.accompanist.permissions.isGranted
@@ -35,8 +35,6 @@ import com.google.accompanist.permissions.shouldShowRationale
 import de.palm.composestateevents.EventEffect
 import de.palm.composestateevents.StateEventWithContent
 import de.palm.composestateevents.consumed
-import kotlinx.coroutines.coroutineScope
-import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.launch
@@ -257,13 +255,14 @@ private fun StartTransferComponent(
         action = {
             when (it) {
                 is StartTransferEvent.FinishDownloadProcessing -> {
-                    consumeFinishProcessing(
-                        event = it,
-                        snackBarHostState = snackBarHostState,
-                        showQuotaExceededDialog = showQuotaExceededDialog,
-                        context = context,
-                        transferTriggerEvent = it.triggerEvent,
-                    )
+                    it.exception?.let {
+                        downloadScanningFinishedWithError(
+                            exception = it,
+                            snackBarHostState = snackBarHostState,
+                            showQuotaExceededDialog = showQuotaExceededDialog,
+                            context = context,
+                        )
+                    }
                     onScanningFinished(it)
                 }
 
@@ -455,85 +454,13 @@ private val storageStateSaver = Saver<StorageState?, Int>(
     restore = { StorageState.entries.getOrNull(it) }
 )
 
-private suspend fun consumeFinishProcessing(
-    event: StartTransferEvent.FinishDownloadProcessing,
+private suspend fun downloadScanningFinishedWithError(
+    exception: Throwable,
     snackBarHostState: SnackbarHostState,
     showQuotaExceededDialog: MutableState<StorageState?>,
     context: Context,
-    transferTriggerEvent: TransferTriggerEvent?,
 ) {
-    var delayed = false
-    when (event.exception) {
-        null -> {
-            val message = when {
-                transferTriggerEvent is TransferTriggerEvent.StartDownloadForPreview -> {
-                    null //to be improved in TRAN-772
-                }
-
-                event.totalAlreadyDownloaded == 0 -> {
-                    // Delayed to avoid showing the snackbar and the transfers widget just at the same time because it sometimes causes a flick animation
-                    delayed = true
-                    context.resources.getQuantityString(
-                        R.plurals.download_started,
-                        event.totalNodes,
-                        event.totalNodes,
-                    )
-                }
-
-                event.filesToDownload == 0 -> {
-                    context.resources.getQuantityString(
-                        R.plurals.already_downloaded_service,
-                        event.totalFiles,
-                        event.totalFiles,
-                    )
-                }
-
-                event.totalAlreadyDownloaded == 1 -> {
-                    context.resources.getQuantityString(
-                        R.plurals.file_already_downloaded_and_files_pending_download,
-                        event.filesToDownload,
-                        event.filesToDownload
-                    )
-                }
-
-                event.filesToDownload == 1 -> {
-                    context.resources.getQuantityString(
-                        R.plurals.files_already_downloaded_and_file_pending_download,
-                        event.totalAlreadyDownloaded,
-                        event.totalAlreadyDownloaded
-                    )
-                }
-
-                else -> {
-                    StringBuilder().append(
-                        context.resources.getQuantityString(
-                            R.plurals.file_already_downloaded,
-                            event.totalAlreadyDownloaded,
-                            event.totalAlreadyDownloaded
-                        )
-                    ).append(" ").append(
-                        context.resources.getQuantityString(
-                            R.plurals.file_pending_download,
-                            event.filesToDownload,
-                            event.filesToDownload
-                        )
-                    ).toString()
-                }
-            }
-            if (message != null) {
-                if (delayed) {
-                    coroutineScope {
-                        launch {
-                            delay(100)
-                            snackBarHostState.showAutoDurationSnackbar(message)
-                        }
-                    }
-                } else {
-                    snackBarHostState.showAutoDurationSnackbar(message)
-                }
-            }
-        }
-
+    when (exception) {
         is QuotaExceededMegaException -> {
             showQuotaExceededDialog.value = StorageState.Red
         }
@@ -543,7 +470,7 @@ private suspend fun consumeFinishProcessing(
         }
 
         else -> {
-            Timber.e(event.exception)
+            Timber.e(exception)
             snackBarHostState.showAutoDurationSnackbar(context.getString(R.string.general_error))
         }
     }

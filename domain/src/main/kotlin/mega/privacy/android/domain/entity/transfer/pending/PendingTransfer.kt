@@ -52,15 +52,11 @@ data class PendingTransfer(
     )
 
     /**
-     * If true, this Pending transfer is not needed anymore, either because the transfer has already started or failed.
+     * If true, this Pending transfer is not needed anymore, either because the transfer has already started, scanned or failed.
      */
     fun resolved() = state in listOf(
+        PendingTransferState.SdkScanned,
         PendingTransferState.AlreadyStarted,
         PendingTransferState.ErrorStarting,
     )
-
-    /**
-     * If true, this pending transfer is still needed to start or monitor the start of the transfer.
-     */
-    fun notResolved() = !resolved()
 }

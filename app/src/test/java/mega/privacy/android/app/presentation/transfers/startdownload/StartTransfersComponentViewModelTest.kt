@@ -831,7 +831,7 @@ class StartTransfersComponentViewModelTest {
 
                 assertThat(underTest.uiState.value.jobInProgressState).isNull()
                 assertCurrentEventIsEqualTo(
-                    StartTransferEvent.FinishDownloadProcessing(null, 1, 1, 0, triggerEvent)
+                    StartTransferEvent.FinishDownloadProcessing(null, triggerEvent)
                 )
             }
 

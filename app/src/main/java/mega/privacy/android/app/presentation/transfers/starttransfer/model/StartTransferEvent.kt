@@ -13,21 +13,12 @@ sealed interface StartTransferEvent {
     /**
      * Download transfers scanning has finished
      * @param exception [Throwable] in case of not correctly finished
-     * @param totalNodes
-     * @param totalFiles total files on this nodes
-     * @param totalAlreadyDownloaded total files already downloaded, so they won't be downloaded
      * @param triggerEvent the event that triggered the start of the transfers
-     * @property filesToDownload
      */
     data class FinishDownloadProcessing(
         val exception: Throwable?,
-        val totalNodes: Int,
-        val totalFiles: Int,
-        val totalAlreadyDownloaded: Int,
         val triggerEvent: TransferTriggerEvent,
-    ) : StartTransferEvent {
-        val filesToDownload = totalFiles - totalAlreadyDownloaded
-    }
+    ) : StartTransferEvent
 
     /**
      * Upload transfers canning has finished.
