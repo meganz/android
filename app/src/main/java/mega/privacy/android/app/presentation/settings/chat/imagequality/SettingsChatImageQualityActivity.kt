@@ -25,9 +25,9 @@ class SettingsChatImageQualityActivity : AppCompatActivity() {
 
     @SuppressLint("CommitTransaction")
     override fun onCreate(savedInstanceState: Bundle?) {
-        appContainerWrapper.setPasscodeCheck(passCodeFacade)
         enableEdgeToEdgeAndConsumeInsets()
         super.onCreate(savedInstanceState)
+        appContainerWrapper.setPasscodeCheck(passCodeFacade)
         setContentView(R.layout.settings_activity)
         setSupportActionBar(findViewById(R.id.settings_toolbar))
         if (savedInstanceState == null) {
