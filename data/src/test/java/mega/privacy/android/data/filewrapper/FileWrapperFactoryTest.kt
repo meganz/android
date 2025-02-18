@@ -43,7 +43,7 @@ class FileWrapperFactoryTest {
 
     @Test
     fun `test that null is returned if document metadata from gateway is null`() =
-        Mockito.mockStatic(Uri::class.java).use {
+        Mockito.mockStatic(Uri::class.java).useNoResult {
             val (uriPath, _) = commonStub(documentMetadata = null)
 
             val actual = underTest(uriPath)
@@ -53,20 +53,21 @@ class FileWrapperFactoryTest {
 
 
     @Test
-    fun `test that name is correctly set from gateway`() = Mockito.mockStatic(Uri::class.java).use {
-        val expectedName = "name"
-        val (uriPath, _) = commonStub(documentMetadata = DocumentMetadata(expectedName))
+    fun `test that name is correctly set from gateway`() =
+        Mockito.mockStatic(Uri::class.java).useNoResult {
+            val expectedName = "name"
+            val (uriPath, _) = commonStub(documentMetadata = DocumentMetadata(expectedName))
 
-        val actual = underTest(uriPath)
+            val actual = underTest(uriPath)
 
-        assertThat(actual?.name).isEqualTo(expectedName)
-    }
+            assertThat(actual?.name).isEqualTo(expectedName)
+        }
 
     @ParameterizedTest
     @ValueSource(booleans = [true, false])
     fun `test that isFolder is correctly set from gateway`(
         isFolder: Boolean,
-    ) = Mockito.mockStatic(Uri::class.java).use {
+    ) = Mockito.mockStatic(Uri::class.java).useNoResult {
         val (uriPath, _) = commonStub(documentMetadata = DocumentMetadata("name", isFolder))
 
         val actual = underTest(uriPath)
@@ -78,7 +79,7 @@ class FileWrapperFactoryTest {
     @ValueSource(booleans = [true, false])
     fun `test that file descriptor is fetched from the gateway in a lazy way`(
         write: Boolean,
-    ) = Mockito.mockStatic(Uri::class.java).use {
+    ) = Mockito.mockStatic(Uri::class.java).useNoResult {
         val (uriPath, _) = commonStub()
         val expected = 59845
         val fileDescriptor = mock<ParcelFileDescriptor> {
@@ -94,8 +95,8 @@ class FileWrapperFactoryTest {
     }
 
     @Test
-    fun `test that children uris are not fetched when it is a file`(): Unit =
-        Mockito.mockStatic(Uri::class.java).use {
+    fun `test that children uris are not fetched when it is a file`() =
+        Mockito.mockStatic(Uri::class.java).useNoResult {
             val (uriPath, uri) = commonStub()
 
             val actual = underTest(uriPath)
@@ -105,8 +106,8 @@ class FileWrapperFactoryTest {
         }
 
     @Test
-    fun `test that children uris are fetched from the gateway on demand when it is a folder`(): Unit =
-        Mockito.mockStatic(Uri::class.java).use {
+    fun `test that children uris are fetched from the gateway on demand when it is a folder`() =
+        Mockito.mockStatic(Uri::class.java).useNoResult {
             val (uriPath, uri) = commonStub(
                 "content://folder",
                 documentMetadata = DocumentMetadata("name", true)
@@ -132,7 +133,7 @@ class FileWrapperFactoryTest {
     @ValueSource(booleans = [true, false])
     fun `test that child existence are checked from the gateway`(
         expected: Boolean,
-    ) = Mockito.mockStatic(Uri::class.java).use {
+    ) = Mockito.mockStatic(Uri::class.java).useNoResult {
         val (uriPath, _) = commonStub(
             "content://folder",
             documentMetadata = DocumentMetadata("parent", true)
@@ -147,7 +148,7 @@ class FileWrapperFactoryTest {
     @ValueSource(booleans = [true, false])
     fun `test that child is correctly created from gateway child`(
         asFolder: Boolean,
-    ) = Mockito.mockStatic(Uri::class.java).use {
+    ) = Mockito.mockStatic(Uri::class.java).useNoResult {
         val childName = "child"
         val (uriPath, _) = commonStub("content://folder", DocumentMetadata("parent", true))
         val (uriPathChild, _) = commonStub(
@@ -174,7 +175,7 @@ class FileWrapperFactoryTest {
 
     @Test
     fun `test that parent is returned from the gateway`() =
-        Mockito.mockStatic(Uri::class.java).use {
+        Mockito.mockStatic(Uri::class.java).useNoResult {
             val (uriPath, _) =
                 commonStub(documentMetadata = DocumentMetadata("parent", true))
             val (uriPathParent, _) = commonStub("content://folder")
@@ -186,7 +187,7 @@ class FileWrapperFactoryTest {
 
     @Test
     fun `test that path is returned from the gateway`() =
-        Mockito.mockStatic(Uri::class.java).use {
+        Mockito.mockStatic(Uri::class.java).useNoResult {
             val (uriPath, _) = commonStub()
             val expected = "/path"
             whenever(fileGateway.getExternalPathByContentUriSync(uriPath.value)) doReturn expected
@@ -198,7 +199,7 @@ class FileWrapperFactoryTest {
     @ValueSource(booleans = [true, false])
     fun `test that delete file invokes the correct gateway method`(
         result: Boolean,
-    ) = Mockito.mockStatic(Uri::class.java).use {
+    ) = Mockito.mockStatic(Uri::class.java).useNoResult {
         val (uriPath, _) = commonStub()
         whenever(fileGateway.deleteIfItIsAFileSync(uriPath)) doReturn result
         val actual = underTest(uriPath)?.deleteFile()
@@ -210,7 +211,7 @@ class FileWrapperFactoryTest {
     @ValueSource(booleans = [true, false])
     fun `test that delete folder invokes the correct gateway method`(
         result: Boolean,
-    ) = Mockito.mockStatic(Uri::class.java).use {
+    ) = Mockito.mockStatic(Uri::class.java).useNoResult {
         val (uriPath, _) = commonStub()
         whenever(fileGateway.deleteIfItIsAnEmptyFolder(uriPath)) doReturn result
         val actual = underTest(uriPath)?.deleteFolderIfEmpty()
@@ -222,18 +223,18 @@ class FileWrapperFactoryTest {
     @ValueSource(booleans = [true, false])
     fun `test that set modification time invokes the correct gateway method`(
         result: Boolean,
-    ) = Mockito.mockStatic(Uri::class.java).use {
+    ) = Mockito.mockStatic(Uri::class.java).useNoResult {
         val (uriPath, _) = commonStub()
         val mTime = 4985739254L
         whenever(fileGateway.setLastModifiedSync(uriPath, mTime)) doReturn result
-        val actual = underTest(uriPath)?.deleteFile()
+        val actual = underTest(uriPath)?.setModificationTime(mTime)
         assertThat(actual).isEqualTo(result)
         verify(fileGateway).setLastModifiedSync(uriPath, mTime)
     }
 
     @Test
     fun `test that renamed file is returned from the gateway`() =
-        Mockito.mockStatic(Uri::class.java).use {
+        Mockito.mockStatic(Uri::class.java).useNoResult {
             val (uriPath, _) = commonStub()
             val (uriPathRenamed, _) = commonStub("content://renamed")
             val newName = "renamed"
@@ -255,6 +256,10 @@ class FileWrapperFactoryTest {
         whenever(Uri.parse(uriString)).thenReturn(uri)
         whenever(fileGateway.getDocumentMetadataSync(uri)) doReturn documentMetadata
         return uriPath to uri
+    }
+
+    inline fun <T : java.lang.AutoCloseable?, R> T.useNoResult(block: (T) -> R) {
+        this.use(block)
     }
 
     companion object {

@@ -912,16 +912,34 @@ internal class FileFacade @Inject constructor(
         updateFileMTime(uriPath, newTime) || updateDocumentFileMTime(uriPath, newTime)
 
     private fun updateFileMTime(uriPath: UriPath, newTime: Long): Boolean =
-        getExternalPathByContentUriSync(uriPath.value)?.let {
-            File(it).takeIf { it.exists() }?.setLastModified(newTime)
-        } == true
+        runCatching {
+            setLastModifiedForFile(uriPath.value, newTime)
+                ?: getExternalPathByContentUriSync(uriPath.value)?.let {
+                    setLastModifiedForFile(it, newTime)
+                }
+        }.onFailure {
+            Timber.e(it, "Failed to update file mtime")
+        }.getOrDefault(false) == true
+
+    private fun setLastModifiedForFile(path: String, newTime: Long) =
+        File(path).takeIf { file -> file.exists() }?.setLastModified(newTime)
 
     private fun updateDocumentFileMTime(uriPath: UriPath, newTime: Long): Boolean {
         val contentValues = ContentValues().apply {
             put(DocumentsContract.Document.COLUMN_LAST_MODIFIED, newTime)
         }
+        val updateResult = runCatching {
+            context.contentResolver.update(
+                uriPath.toUri(),
+                contentValues,
+                null,
+                null
+            )
+        }.onFailure {
+            Timber.e(it, "Failed to update document file mtime")
+        }.getOrDefault(0)
 
-        return context.contentResolver.update(uriPath.toUri(), contentValues, null, null) > 0
+        return updateResult > 0
     }
 
     override fun renameFileSync(uriPath: UriPath, newName: String): UriPath? {
