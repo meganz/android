@@ -89,7 +89,7 @@ class DefaultOverQuotaNotificationBuilder @Inject constructor(
             PendingIntent.FLAG_CANCEL_CURRENT or PendingIntent.FLAG_IMMUTABLE
         )
         val upgradeButtonText =
-            context.getString(if (!isLoggedIn) R.string.login_text else if (isFreeAccount) sharedR.string.general_upgrade_button else R.string.plans_depleted_transfer_overquota)
+            context.getString(if (!isLoggedIn) sharedR.string.login_text else if (isFreeAccount) sharedR.string.general_upgrade_button else R.string.plans_depleted_transfer_overquota)
 
         val builder = NotificationCompat.Builder(
             context,

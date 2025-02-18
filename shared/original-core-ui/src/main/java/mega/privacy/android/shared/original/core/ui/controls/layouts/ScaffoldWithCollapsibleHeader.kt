@@ -452,7 +452,7 @@ private fun Header() = Box(
 
 private fun getSampleToolbarActions(): List<MenuAction> = listOf(
     object : MenuActionString(
-        iconPackR.drawable.ic_alert_circle_regular_medium_outline, R.string.password_text, "circle"
+        iconPackR.drawable.ic_alert_circle_regular_medium_outline, mega.privacy.android.shared.resources.R.string.password_text, "circle"
     ) {},
-    object : MenuActionWithoutIcon(R.string.password_text, "password") {},
+    object : MenuActionWithoutIcon(mega.privacy.android.shared.resources.R.string.password_text, "password") {},
 )

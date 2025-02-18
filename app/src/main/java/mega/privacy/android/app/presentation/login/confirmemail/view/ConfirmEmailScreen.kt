@@ -199,7 +199,7 @@ internal fun ConfirmEmailScreen(
                     )
                     errorTextId = null
                 },
-                label = stringResource(id = R.string.email_text),
+                label = stringResource(id = mega.privacy.android.shared.resources.R.string.email_text),
                 imeAction = ImeAction.Done,
                 keyboardActions = KeyboardActions(),
                 value = emailValueState,

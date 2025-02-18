@@ -1,12 +1,16 @@
 package mega.privacy.android.app.presentation.login.view
 
+import mega.android.core.ui.components.MegaText as MegaText3
 import mega.privacy.android.shared.resources.R as sharedR
 import androidx.compose.foundation.isSystemInDarkTheme
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.width
+import androidx.compose.foundation.layout.wrapContentHeight
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.MaterialTheme
@@ -21,6 +25,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.focus.FocusRequester
 import androidx.compose.ui.focus.focusRequester
+import androidx.compose.ui.platform.LocalConfiguration
 import androidx.compose.ui.platform.LocalSoftwareKeyboardController
 import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.res.stringResource
@@ -32,10 +37,11 @@ import mega.android.core.ui.components.inputfields.DEFAULT_VERIFICATION_INPUT_LE
 import mega.android.core.ui.components.inputfields.VerificationTextInputField
 import mega.android.core.ui.theme.AndroidTheme
 import mega.android.core.ui.theme.AppTheme
+import mega.android.core.ui.theme.devicetype.DeviceType
+import mega.android.core.ui.theme.devicetype.LocalDeviceType
 import mega.android.core.ui.theme.spacing.LocalSpacing
 import mega.android.core.ui.theme.values.TextColor
 import mega.privacy.android.app.R
-import mega.privacy.android.app.presentation.extensions.isDarkMode
 import mega.privacy.android.app.presentation.login.model.LoginState
 import mega.privacy.android.app.presentation.login.model.MultiFactorAuthState
 import mega.privacy.android.app.presentation.twofactorauthentication.view.TwoFactorAuthenticationField
@@ -45,8 +51,9 @@ import mega.privacy.android.shared.original.core.ui.controls.progressindicator.M
 import mega.privacy.android.shared.original.core.ui.controls.text.MegaText
 import mega.privacy.android.shared.original.core.ui.preview.CombinedThemePreviews
 
+
 /**
- * Two Factor Authentication screen.
+ * Legacy Two Factor Authentication screen.
  * @param state LoginState object.
  * @param on2FAPinChanged Callback to notify the pin changed.
  * @param on2FAChanged Callback to notify the 2FA changed.
@@ -55,35 +62,7 @@ import mega.privacy.android.shared.original.core.ui.preview.CombinedThemePreview
  * @param modifier Modifier.
  */
 @Composable
-fun TwoFactorAuthentication(
-    state: LoginState,
-    on2FAPinChanged: (String, Int) -> Unit,
-    on2FAChanged: (String) -> Unit,
-    onLostAuthenticatorDevice: () -> Unit,
-    onFirstTime2FAConsumed: () -> Unit,
-    modifier: Modifier = Modifier,
-) {
-    if (state.isLoginNewDesignEnabled) {
-        NewTwoFactorAuthentication(
-            state = state,
-            on2FAChanged = on2FAChanged,
-            onLostAuthenticatorDevice = onLostAuthenticatorDevice,
-            modifier = modifier
-        )
-    } else {
-        LegacyTwoFactorAuthentication(
-            state = state,
-            on2FAPinChanged = on2FAPinChanged,
-            on2FAChanged = on2FAChanged,
-            onLostAuthenticatorDevice = onLostAuthenticatorDevice,
-            onFirstTime2FAConsumed = onFirstTime2FAConsumed,
-            modifier = modifier
-        )
-    }
-}
-
-@Composable
-private fun LegacyTwoFactorAuthentication(
+fun LegacyTwoFactorAuthentication(
     state: LoginState,
     on2FAPinChanged: (String, Int) -> Unit,
     on2FAChanged: (String) -> Unit,
@@ -148,8 +127,15 @@ private fun LegacyTwoFactorAuthentication(
     }
 }
 
+/**
+ * New Two Factor Authentication screen.
+ * @param state LoginState object.
+ * @param on2FAChanged Callback to notify the 2FA changed.
+ * @param onLostAuthenticatorDevice Callback to notify the user lost the authenticator device.
+ * @param modifier Modifier.
+ */
 @Composable
-private fun NewTwoFactorAuthentication(
+fun NewTwoFactorAuthentication(
     state: LoginState,
     on2FAChanged: (String) -> Unit,
     onLostAuthenticatorDevice: () -> Unit,
@@ -163,15 +149,26 @@ private fun NewTwoFactorAuthentication(
         request.requestFocus()
         softKeyboard?.show()
     }
-    AndroidTheme(isDark = state.themeMode.isDarkMode()) {
-        Box(modifier = modifier.fillMaxWidth()) {
+    val orientation = LocalConfiguration.current.orientation
+    val contentModifier = if (LocalDeviceType.current == DeviceType.Tablet) {
+        Modifier
+            .fillMaxHeight()
+            .width(tabletScreenWidth(orientation))
+    } else {
+        Modifier
+            .padding(horizontal = LocalSpacing.current.x16)
+            .wrapContentHeight()
+    }
+    Box(modifier = modifier.fillMaxWidth()) {
+        Column(
+            modifier = Modifier.fillMaxSize(),
+            horizontalAlignment = Alignment.CenterHorizontally
+        ) {
             Column(
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .padding(horizontal = 16.dp)
+                modifier = contentModifier
                     .verticalScroll(scrollState),
             ) {
-                MegaText(
+                MegaText3(
                     modifier = Modifier.padding(
                         vertical = LocalSpacing.current.x24
                     ),
@@ -202,15 +199,15 @@ private fun NewTwoFactorAuthentication(
                     onClick = onLostAuthenticatorDevice
                 )
             }
+        }
 
-            if (state.multiFactorAuthState != null && state.multiFactorAuthState != MultiFactorAuthState.Failed) {
-                LargeHUD(
-                    modifier = Modifier
-                        .testTag(TWO_FA_PROGRESS_TEST_TAG)
-                        .fillMaxSize()
-                        .align(Alignment.Center),
-                )
-            }
+        if (state.multiFactorAuthState != null && state.multiFactorAuthState != MultiFactorAuthState.Failed) {
+            LargeHUD(
+                modifier = Modifier
+                    .testTag(TWO_FA_PROGRESS_TEST_TAG)
+                    .fillMaxSize()
+                    .align(Alignment.Center),
+            )
         }
     }
 }
@@ -226,7 +223,6 @@ private fun NewTwoFactorAuthenticationPreview() {
     AndroidTheme(isDark = isSystemInDarkTheme()) {
         NewTwoFactorAuthentication(
             state = LoginState(
-                isLoginNewDesignEnabled = true,
                 themeMode = ThemeMode.System,
                 multiFactorAuthState = MultiFactorAuthState.Checking
             ),

@@ -56,7 +56,7 @@ class LoginViewTest {
     @Test
     fun `test that email field is shown if login is required`() {
         setupRule(stateWithLoginRequired)
-        composeRule.onNodeWithText(fromId(R.string.email_text)).assertExists()
+        composeRule.onNodeWithText(fromId(mega.privacy.android.shared.resources.R.string.email_text)).assertExists()
     }
 
     @Test
@@ -69,7 +69,7 @@ class LoginViewTest {
     @Test
     fun `test that password field is shown if login is required`() {
         setupRule(stateWithLoginRequired)
-        composeRule.onNodeWithText(fromId(R.string.password_text)).assertExists()
+        composeRule.onNodeWithText(fromId(mega.privacy.android.shared.resources.R.string.password_text)).assertExists()
     }
 
     @Test
@@ -82,7 +82,7 @@ class LoginViewTest {
     @Test
     fun `test that log in button is shown if login is required`() {
         setupRule(stateWithLoginRequired)
-        composeRule.onNodeWithText(fromId(R.string.login_text)).assertExists()
+        composeRule.onNodeWithText(fromId(mega.privacy.android.shared.resources.R.string.login_text)).assertExists()
     }
 
     @Test

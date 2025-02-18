@@ -1,6 +1,6 @@
 package mega.privacy.android.app.presentation.login.view
 
-import mega.privacy.android.shared.resources.R as SharedRes
+import mega.privacy.android.shared.resources.R as sharedR
 import android.content.res.Configuration
 import androidx.activity.compose.BackHandler
 import androidx.annotation.StringRes
@@ -28,7 +28,6 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
-import androidx.compose.foundation.layout.statusBarsPadding
 import androidx.compose.foundation.layout.widthIn
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.RoundedCornerShape
@@ -77,14 +76,10 @@ import androidx.compose.ui.tooling.preview.PreviewParameterProvider
 import androidx.compose.ui.unit.dp
 import de.palm.composestateevents.EventEffect
 import kotlinx.coroutines.delay
-import mega.android.core.ui.components.toolbar.AppBarNavigationType
-import mega.android.core.ui.components.toolbar.MegaTopAppBar
-import mega.android.core.ui.theme.AndroidTheme
 import mega.android.core.ui.theme.values.TextColor
 import mega.privacy.android.app.R
 import mega.privacy.android.app.featuretoggle.AppFeatures
 import mega.privacy.android.app.presentation.apiserver.view.ChangeApiServerDialog
-import mega.privacy.android.app.presentation.extensions.isDarkMode
 import mega.privacy.android.app.presentation.extensions.login.error
 import mega.privacy.android.app.presentation.login.model.LoginError
 import mega.privacy.android.app.presentation.login.model.LoginState
@@ -153,21 +148,11 @@ fun LoginView(
         scaffoldState = scaffoldState,
         topBar = {
             if (state.is2FARequired || state.multiFactorAuthState != null) {
-                if (state.isLoginNewDesignEnabled) {
-                    AndroidTheme(isDark = state.themeMode.isDarkMode()) {
-                        MegaTopAppBar(
-                            modifier = Modifier.statusBarsPadding(),
-                            navigationType = AppBarNavigationType.Back(onBackPressed),
-                            title = stringResource(R.string.settings_2fa)
-                        )
-                    }
-                } else {
-                    MegaAppBar(
-                        appBarType = AppBarType.BACK_NAVIGATION,
-                        title = stringResource(R.string.login_verification),
-                        onNavigationPressed = onBackPressed,
-                    )
-                }
+                MegaAppBar(
+                    appBarType = AppBarType.BACK_NAVIGATION,
+                    title = stringResource(R.string.login_verification),
+                    onNavigationPressed = onBackPressed,
+                )
             }
         },
     ) { paddingValues ->
@@ -190,7 +175,7 @@ fun LoginView(
                     modifier = Modifier.padding(paddingValues),
                 )
 
-                is2FARequired || multiFactorAuthState != null -> TwoFactorAuthentication(
+                is2FARequired || multiFactorAuthState != null -> LegacyTwoFactorAuthentication(
                     state = this,
                     on2FAPinChanged = on2FAPinChanged,
                     on2FAChanged = on2FAChanged,
@@ -265,7 +250,7 @@ private fun RequireLogin(
         )
         LabelTextField(
             onTextChange = onEmailChanged,
-            label = stringResource(id = R.string.email_text),
+            label = stringResource(id = sharedR.string.email_text),
             imeAction = ImeAction.Next,
             keyboardActions = KeyboardActions(onNext = { passwordFocusRequester.requestFocus() }),
             modifier = Modifier
@@ -323,7 +308,7 @@ private fun RequireLogin(
                 )
                 .fillMaxWidth()
                 .testTag(LOGIN_BUTTON_TAG),
-            textId = R.string.login_text,
+            textId = sharedR.string.login_text,
             onClick = { clickLogin(onLoginClicked, focusManager) },
             enabled = !state.isLocalLogoutInProgress
         )
@@ -394,7 +379,7 @@ private fun clickLogin(onLoginClicked: () -> Unit, focusManager: FocusManager) {
 }
 
 @Composable
-private fun LoginInProgress(
+fun LoginInProgress(
     state: LoginState,
     modifier: Modifier = Modifier,
 ) {
@@ -517,7 +502,7 @@ private fun LoginInProgressText(
     ) {
         MegaText(
             text = if (progress != null) {
-                stringResource(SharedRes.string.login_completing_operation, progress.intValue)
+                stringResource(sharedR.string.login_completing_operation, progress.intValue)
             } else {
                 stringResource(id = currentTextId)
             },

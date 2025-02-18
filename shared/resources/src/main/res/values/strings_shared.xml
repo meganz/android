@@ -905,4 +905,28 @@
     <string name="transfers_preview_paused_dialog_text">To preview “%1$s” you will need to unpause transfers</string>
     <!--SD Card text shown as title in FileStorage screen -->
     <string name="general_sd_card">SD Card</string>
+    <!--The title of the Login page-->
+    <string name="login_page_title">Log in to your MEGA account</string>
+    <!--Message to be shown to the user when they entered an invalid email-->
+    <string name="login_invalid_email_error_message">Enter a valid email address</string>
+    <!--Message to be shown to the user when they entered an invalid format password-->
+    <string name="login_invalid_password_error_message">Enter your password</string>
+    <!--Message to be shown to the user when they entered the wrong credential-->
+    <string name="login_wrong_credential_error_message">Invalid email address or password</string>
+    <!--Message to be shown to he user when the account is not validated -->
+    <string name="login_account_not_validated">Your account signup is incomplete or has been cancelled. Check your email inbox.</string>
+    <!--Message to be shown to the user when login fails due to multiple failed attempts-->
+    <string name="login_too_many_attempts_error_message">You have attempted to log in too many times. Wait and try again.</string>
+    <!--The footer text to be shown where a user can sign up if they do not have a MEGA account-->
+    <string name="login_page_sign_up_action_footer_text">Don’t have a MEGA account? [A]Sign up[/A]</string>
+    <!-- Title of setting Two-Factor Authentication -->
+    <string name="settings_2fa">Two-factor authentication</string>
+    <!-- email label -->
+    <string name="email_text">Email address</string>
+    <!-- password label -->
+    <string name="password_text">Password</string>
+    <!-- Login button -->
+    <string name="login_text">Log&#160;in</string>
+    <!--The text where user forgot their password and will navigate to reset it-->
+    <string name="login_page_forgot_password_text">Forgot password?</string>
 </resources>

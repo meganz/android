@@ -980,7 +980,7 @@ abstract class BaseActivity : AppCompatActivity(), ActivityLauncher, PermissionR
                     myAccountInfo.accountType == MegaAccountDetails.ACCOUNT_TYPE_FREE
                 getString(if (isFreeAccount) sharedR.string.general_upgrade_button else R.string.plans_depleted_transfer_overquota)
             } else {
-                getString(R.string.login_text)
+                getString(sharedR.string.login_text)
             }
             setOnClickListener {
                 transferGeneralOverQuotaWarning?.dismiss()

@@ -557,7 +557,7 @@ class FileProviderActivity : AppCompatActivity(), MegaRequestListenerInterface,
             }
         }
         bLoginLol = findViewById<Button?>(R.id.button_login).apply {
-            text = getString(R.string.login_text)
+            text = getString(sharedR.string.login_text)
             setOnClickListener { submitForm() }
         }
         loginCreateAccount = findViewById<LinearLayout?>(R.id.login_create_account_layout).apply {

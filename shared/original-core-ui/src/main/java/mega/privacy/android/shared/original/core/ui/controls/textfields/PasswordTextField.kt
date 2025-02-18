@@ -112,7 +112,7 @@ fun PasswordTextField(
             interactionSource = interactionSource,
             singleLine = true,
         ) {
-            val hintString = hint ?: stringResource(id = R.string.password_text)
+            val hintString = hint ?: stringResource(id = mega.privacy.android.shared.resources.R.string.password_text)
             TextFieldDefaults.TextFieldDecorationBox(
                 value = text,
                 innerTextField = it,

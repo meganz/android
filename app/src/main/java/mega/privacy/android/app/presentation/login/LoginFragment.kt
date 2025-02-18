@@ -29,6 +29,7 @@ import com.google.android.material.dialog.MaterialAlertDialogBuilder
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.sync.Mutex
+import mega.android.core.ui.theme.AndroidTheme
 import mega.privacy.android.app.MegaApplication.Companion.getChatManagement
 import mega.privacy.android.app.MegaApplication.Companion.isIsHeartBeatAlive
 import mega.privacy.android.app.MegaApplication.Companion.setHeartBeatAlive
@@ -49,6 +50,7 @@ import mega.privacy.android.app.presentation.login.model.LoginFragmentType
 import mega.privacy.android.app.presentation.login.model.LoginIntentState
 import mega.privacy.android.app.presentation.login.model.LoginState
 import mega.privacy.android.app.presentation.login.view.LoginView
+import mega.privacy.android.app.presentation.login.view.NewLoginView
 import mega.privacy.android.app.presentation.settings.startscreen.util.StartScreenUtil.setStartScreenTimeStamp
 import mega.privacy.android.app.providers.FileProviderActivity
 import mega.privacy.android.app.upgradeAccount.ChooseAccountActivity
@@ -128,27 +130,50 @@ class LoginFragment : Fragment() {
             if (ongoingTransfersExist == true) showCancelTransfersDialog()
         }
 
-        OriginalTheme(isDark = uiState.themeMode.isDarkMode()) {
-            LoginView(
-                state = uiState,
-                onEmailChanged = viewModel::onEmailChanged,
-                onPasswordChanged = viewModel::onPasswordChanged,
-                onLoginClicked = {
-                    LoginActivity.isBackFromLoginPage = false
-                    viewModel.onLoginClicked(false)
-                    billingViewModel.loadSkus()
-                    billingViewModel.loadPurchases()
-                },
-                onForgotPassword = { onForgotPassword(uiState.accountSession?.email) },
-                onCreateAccount = ::onCreateAccount,
-                onSnackbarMessageConsumed = viewModel::onSnackbarMessageConsumed,
-                on2FAPinChanged = viewModel::on2FAPinChanged,
-                on2FAChanged = viewModel::on2FAChanged,
-                onLostAuthenticatorDevice = ::onLostAuthenticationDevice,
-                onBackPressed = { onBackPressed(uiState) },
-                onFirstTime2FAConsumed = viewModel::onFirstTime2FAConsumed,
-                onReportIssue = ::openLoginIssueHelpdeskPage,
-            )
+        if (uiState.isLoginNewDesignEnabled) {
+            AndroidTheme(isDark = uiState.themeMode.isDarkMode()) {
+                NewLoginView(
+                    state = uiState,
+                    onEmailChanged = viewModel::onEmailChanged,
+                    onPasswordChanged = viewModel::onPasswordChanged,
+                    onLoginClicked = {
+                        LoginActivity.isBackFromLoginPage = false
+                        viewModel.onLoginClicked(false)
+                        billingViewModel.loadSkus()
+                        billingViewModel.loadPurchases()
+                    },
+                    onForgotPassword = { onForgotPassword(uiState.accountSession?.email) },
+                    onCreateAccount = ::onCreateAccount,
+                    onSnackbarMessageConsumed = viewModel::onSnackbarMessageConsumed,
+                    on2FAChanged = viewModel::on2FAChanged,
+                    onLostAuthenticatorDevice = ::onLostAuthenticationDevice,
+                    onBackPressed = { onBackPressed(uiState) },
+                    onReportIssue = ::openLoginIssueHelpdeskPage,
+                )
+            }
+        } else {
+            OriginalTheme(isDark = uiState.themeMode.isDarkMode()) {
+                LoginView(
+                    state = uiState,
+                    onEmailChanged = viewModel::onEmailChanged,
+                    onPasswordChanged = viewModel::onPasswordChanged,
+                    onLoginClicked = {
+                        LoginActivity.isBackFromLoginPage = false
+                        viewModel.onLoginClicked(false)
+                        billingViewModel.loadSkus()
+                        billingViewModel.loadPurchases()
+                    },
+                    onForgotPassword = { onForgotPassword(uiState.accountSession?.email) },
+                    onCreateAccount = ::onCreateAccount,
+                    onSnackbarMessageConsumed = viewModel::onSnackbarMessageConsumed,
+                    on2FAPinChanged = viewModel::on2FAPinChanged,
+                    on2FAChanged = viewModel::on2FAChanged,
+                    onLostAuthenticatorDevice = ::onLostAuthenticationDevice,
+                    onBackPressed = { onBackPressed(uiState) },
+                    onFirstTime2FAConsumed = viewModel::onFirstTime2FAConsumed,
+                    onReportIssue = ::openLoginIssueHelpdeskPage,
+                )
+            }
         }
 
         // Hide splash after UI is rendered, to prevent blinking
@@ -833,7 +858,7 @@ class LoginFragment : Fragment() {
      */
     private fun showCancelTransfersDialog() = AlertDialog.Builder(requireContext()).apply {
         setMessage(R.string.login_warning_abort_transfers)
-        setPositiveButton(R.string.login_text) { _, _ -> viewModel.onLoginClicked(true) }
+        setPositiveButton(sharedR.string.login_text) { _, _ -> viewModel.onLoginClicked(true) }
         setNegativeButton(sharedR.string.general_dialog_cancel_button) { _, _ -> viewModel.resetOngoingTransfers() }
         setCancelable(false)
         show()

@@ -82,6 +82,7 @@ import mega.privacy.android.shared.original.core.ui.preview.CombinedThemePreview
 import mega.privacy.android.shared.original.core.ui.theme.OriginalTheme
 import mega.android.core.ui.theme.values.TextColor
 import mega.privacy.android.shared.original.core.ui.utils.showAutoDurationSnackbar
+import mega.privacy.android.shared.resources.R as sharedR
 
 @OptIn(ExperimentalComposeUiApi::class)
 @Composable
@@ -325,7 +326,7 @@ private fun CreateAccountView(
                         email = emailInput.trim().lowercase()
                         onEmailInputChanged(email.orEmpty())
                     },
-                    label = stringResource(id = R.string.email_text),
+                    label = stringResource(id = sharedR.string.email_text),
                     imeAction = ImeAction.Next,
                     keyboardActions = KeyboardActions(onNext = { passwordFocusRequester.requestFocus() }),
                     modifier = Modifier
@@ -351,7 +352,7 @@ private fun CreateAccountView(
                         onPasswordInputChanged(password.orEmpty())
 
                     },
-                    hint = stringResource(id = R.string.password_text),
+                    hint = stringResource(id = sharedR.string.password_text),
                     imeAction = ImeAction.Next,
                     keyboardActions = KeyboardActions(onNext = { confirmPasswordFocusRequester.requestFocus() }),
                     modifier = Modifier
@@ -541,7 +542,7 @@ private fun CreateAccountView(
                     TextMegaButton(
                         modifier = Modifier
                             .testTag(CREATE_ACCOUNT_LOGIN_BUTTON_TAG),
-                        textId = R.string.login_text,
+                        textId = sharedR.string.login_text,
                         onClick = {
                             onButtonClicked(
                                 action = onLoginClicked,

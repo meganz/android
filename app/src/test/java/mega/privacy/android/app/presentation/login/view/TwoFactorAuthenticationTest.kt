@@ -68,12 +68,10 @@ class TwoFactorAuthenticationTest {
         on2FAChanged: (String) -> Unit = {},
     ) {
         composeTestRule.setContent {
-            TwoFactorAuthentication(
+            NewTwoFactorAuthentication(
                 state = state,
                 on2FAChanged = on2FAChanged,
                 onLostAuthenticatorDevice = {},
-                on2FAPinChanged = { _, _ -> },
-                onFirstTime2FAConsumed = {}
             )
         }
     }

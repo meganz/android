@@ -76,6 +76,7 @@ import mega.privacy.android.shared.original.core.ui.theme.extensions.conditional
 import mega.android.core.ui.theme.values.TextColor
 import mega.privacy.android.shared.original.core.ui.utils.showAutoDurationSnackbar
 import timber.log.Timber
+import mega.privacy.android.shared.resources.R as sharedR
 
 @OptIn(ExperimentalComposeUiApi::class)
 @Composable
@@ -182,7 +183,7 @@ internal fun TourScreen(
                 ) {
                     TextMegaButton(
                         modifier = Modifier.testTag(BUTTON_LOGIN_TAG),
-                        textId = R.string.login_text,
+                        textId = sharedR.string.login_text,
                         onClick = onLoginClick
                     )
 
