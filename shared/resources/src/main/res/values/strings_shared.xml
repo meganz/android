@@ -894,4 +894,9 @@
     <string name="audio_queue_single_item_removed_message">’%1$s’ was removed</string>
     <!-- Message when successfully deleting items from the audio queue. %1$d will be replaced with the removal count when multiple items are removed. -->
     <string name="audio_queue_multiple_items_removed_message">Removed %1$d items from queue</string>
+    <!-- Message when successfully deleting items from the audio queue. %1$s will be replaced with the item name %2$d will be replaced with the removal count. -->
+    <plurals name="audio_queue_items_removal_success_message">
+        <item quantity="one">‘%1$s’ was removed</item>
+        <item quantity="other">Removed %2$d items from queue</item>
+    </plurals>
 </resources>

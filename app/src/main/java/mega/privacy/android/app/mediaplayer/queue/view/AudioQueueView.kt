@@ -47,16 +47,12 @@ internal fun AudioQueueView(
     ) {
         coroutineScope.launch {
             scaffoldState.snackbarHostState.showAutoDurationSnackbar(
-                if (uiState.removedItems.size == 1)
-                    context.resources.getString(
-                        R.string.audio_queue_single_item_removed_message,
-                        uiState.removedItems.first().nodeName
-                    )
-                else
-                    context.resources.getString(
-                        R.string.audio_queue_multiple_items_removed_message,
-                        uiState.removedItems.size
-                    )
+                context.resources.getQuantityString(
+                    R.plurals.audio_queue_items_removal_success_message,
+                    uiState.removedItems.size,
+                    uiState.removedItems.first().nodeName,
+                    uiState.removedItems.size
+                )
             )
             viewModel.clearRemovedItemHandles()
         }
