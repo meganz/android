@@ -2,6 +2,8 @@ package mega.privacy.android.app.mediaplayer.queue.audio
 
 import androidx.lifecycle.ViewModel
 import dagger.hilt.android.lifecycle.HiltViewModel
+import de.palm.composestateevents.consumed
+import de.palm.composestateevents.triggered
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.update
@@ -196,23 +198,29 @@ class AudioQueueViewModel @Inject constructor(
         }
 
     internal fun removeSelectedItems(
-        removedIds: List<Long> = _uiState.value.selectedItemHandles.toList(),
+        handles: List<Long> = _uiState.value.selectedItemHandles.toList(),
     ) {
-        val updatedItems = _uiState.value.items
-            .filterNot { item -> removedIds.contains(item.id.longValue) }
+        val currentItems = _uiState.value.items
+        val updatedItems = currentItems
+            .filterNot { it.id.longValue in handles }
             .updateOriginalData()
+
+        val removedItems = handles.mapNotNull { handle ->
+            currentItems.firstOrNull { it.id.longValue == handle }
+        }
 
         _uiState.update {
             it.copy(
                 items = updatedItems,
                 selectedItemHandles = emptyList(),
-                removedItemHandles = removedIds
+                removedItems = removedItems,
+                itemsRemovedEvent = triggered
             )
         }
     }
 
     internal fun clearRemovedItemHandles() =
-        _uiState.update { it.copy(removedItemHandles = emptyList()) }
+        _uiState.update { it.copy(removedItems = emptyList()) }
 
     internal fun updateSearchMode(isSearchMode: Boolean) {
         if (isSearchMode.not()) {
@@ -244,4 +252,10 @@ class AudioQueueViewModel @Inject constructor(
         _uiState.update {
             it.copy(isSelectMode = isSelectMode)
         }
+
+    internal fun onItemsRemovedEventConsumed() {
+        _uiState.update {
+            it.copy(itemsRemovedEvent = consumed)
+        }
+    }
 }

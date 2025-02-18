@@ -40,8 +40,9 @@ interface MediaPlayerServiceGateway {
      * Seek to the index
      *
      * @param index the index that is sought to
+     * @param handle the handle that is sought to
      */
-    fun seekTo(index: Int)
+    fun seekTo(index: Int, handle: Long)
 
     /**
      * Set playWhenReady

@@ -511,14 +511,12 @@ class AudioPlayerService : LifecycleService(), LifecycleEventObserver, MediaPlay
         }
     }
 
-    /**
-     * Seek to the index
-     *
-     * @param index the index that is sought to
-     */
-    override fun seekTo(index: Int) {
+    override fun seekTo(index: Int, handle: Long) {
         mediaPlayerGateway.playerSeekTo(index)
-        viewModelGateway.resetRetryState()
+        with(viewModelGateway) {
+            resetRetryState()
+            setCurrentPlayingHandle(handle)
+        }
     }
 
     /**

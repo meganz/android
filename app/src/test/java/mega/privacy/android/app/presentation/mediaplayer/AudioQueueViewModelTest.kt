@@ -2,6 +2,8 @@ package mega.privacy.android.app.presentation.mediaplayer
 
 import app.cash.turbine.test
 import com.google.common.truth.Truth.assertThat
+import de.palm.composestateevents.consumed
+import de.palm.composestateevents.triggered
 import kotlinx.coroutines.test.runTest
 import mega.privacy.android.app.mediaplayer.mapper.MediaQueueItemUiEntityMapper
 import mega.privacy.android.app.mediaplayer.playlist.PlaylistItem
@@ -123,7 +125,7 @@ class AudioQueueViewModelTest {
         nodeId: NodeId,
         itemType: MediaQueueItemType = testType,
         name: String = testName,
-        testIsSelected: Boolean = false,
+        testIsSelected: Boolean = false
     ) = mock<MediaQueueItemUiEntity> {
         on { id }.thenReturn(nodeId)
         on { type }.thenReturn(itemType)
@@ -313,7 +315,7 @@ class AudioQueueViewModelTest {
         }
 
     @Test
-    fun `test that state is updated correctly after removing selected items`() =
+    fun `test that state is updated correctly after selected all items which type is next`() =
         runTest {
             val testItems = (1..3).map {
                 getMockedMediaQueueItem(
@@ -347,7 +349,7 @@ class AudioQueueViewModelTest {
         }
 
     @Test
-    fun `test that state is updated correctly after selected all items which type is next`() =
+    fun `test that state is updated correctly after removing selected items`() =
         runTest {
             val item = getMockedMediaQueueItem(NodeId(1L))
             val testItem = getMockedMediaQueueItem(NodeId(1L), testIsSelected = true)
@@ -363,19 +365,13 @@ class AudioQueueViewModelTest {
             initUnderTest()
 
             underTest.initMediaQueueItemList(list)
-            underTest.onItemClicked(0, item)
+            underTest.removeSelectedItems(listOf(1))
             underTest.uiState.test {
                 awaitItem().let {
-                    assertThat(it.items.size).isEqualTo(3)
-                    assertThat(it.selectedItemHandles).isNotEmpty()
-                }
-                underTest.removeSelectedItems()
-                awaitItem().let {
                     assertThat(it.items.size).isEqualTo(2)
-                    assertThat(it.selectedItemHandles).isEmpty()
-                    assertThat(it.removedItemHandles).isNotEmpty()
-                    assertThat(it.removedItemHandles.size).isEqualTo(1)
-                    assertThat(it.removedItemHandles.first()).isEqualTo(1)
+                    assertThat(it.removedItems).isNotEmpty()
+                    assertThat(it.removedItems.size).isEqualTo(1)
+                    assertThat(it.removedItems.first().id.longValue).isEqualTo(1)
                 }
             }
         }
@@ -397,12 +393,11 @@ class AudioQueueViewModelTest {
             initUnderTest()
 
             underTest.initMediaQueueItemList(list)
-            underTest.onItemClicked(0, item)
-            underTest.removeSelectedItems()
+            underTest.removeSelectedItems(listOf(1))
             underTest.uiState.test {
-                assertThat(awaitItem().removedItemHandles).isNotEmpty()
+                assertThat(awaitItem().removedItems).isNotEmpty()
                 underTest.clearRemovedItemHandles()
-                assertThat(awaitItem().removedItemHandles).isEmpty()
+                assertThat(awaitItem().removedItems).isEmpty()
             }
         }
 
@@ -458,6 +453,29 @@ class AudioQueueViewModelTest {
                 assertThat(awaitItem().isSelectMode).isTrue()
                 underTest.enableSelectMode(false)
                 assertThat(awaitItem().isSelectMode).isFalse()
+            }
+        }
+
+    @Test
+    fun `test that itemsRemovedEvent is consumed after onItemsRemovedEventConsumed is invoked`() =
+        runTest {
+            val item = getMockedMediaQueueItem(NodeId(1L))
+            val list = (1..3).map {
+                if (it == 1) {
+                    initMediaQueueItemMapperResult(it.toLong(), item)
+                } else {
+                    initMediaQueueItemMapperResult(it.toLong())
+                }
+                getPlaylistItem(it.toLong())
+            }
+            initUnderTest()
+
+            underTest.initMediaQueueItemList(list)
+            underTest.removeSelectedItems(listOf(1))
+            underTest.uiState.test {
+                assertThat(awaitItem().itemsRemovedEvent).isEqualTo(triggered)
+                underTest.onItemsRemovedEventConsumed()
+                assertThat(awaitItem().itemsRemovedEvent).isEqualTo(consumed)
             }
         }
 }

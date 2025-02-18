@@ -221,12 +221,10 @@ class AudioQueueFragment : Fragment() {
             simpleAudioPlayerView?.isVisible = !it
         }
 
-        viewLifecycleOwner.collectFlow(audioQueueViewModel.uiState.map { it.removedItemHandles }
-            .distinctUntilChanged()) { removeItemIds ->
-            if (removeItemIds.isNotEmpty()) {
-                playerServiceViewModelGateway?.removeSelectedItems(removeItemIds)
-                audioQueueViewModel.clearRemovedItemHandles()
-                actionMode?.finish()
+        viewLifecycleOwner.collectFlow(audioQueueViewModel.uiState.map { it.removedItems }
+            .distinctUntilChanged()) { removeItems ->
+            if (removeItems.isNotEmpty()) {
+                playerServiceViewModelGateway?.removeSelectedItems(removeItems.map { it.id.longValue })
             }
         }
     }
@@ -276,7 +274,7 @@ class AudioQueueFragment : Fragment() {
             if (!audioQueueViewModel.isParticipatingInChatCall()) {
                 playerServiceViewModelGateway?.getIndexFromPlaylistItems(item.id.longValue)
                     ?.let { index ->
-                        serviceGateway?.seekTo(index)
+                        serviceGateway?.seekTo(index, item.id.longValue)
                     }
             }
             (requireActivity() as MediaPlayerActivity).closeSearch()
@@ -310,6 +308,7 @@ class AudioQueueFragment : Fragment() {
             playlistActionModeCallback = PlaylistActionModeCallback(
                 removeSelections = {
                     audioQueueViewModel.removeSelectedItems()
+                    actionMode?.finish()
                 },
                 clearSelections = {
                     audioQueueViewModel.clearAllSelectedItems()

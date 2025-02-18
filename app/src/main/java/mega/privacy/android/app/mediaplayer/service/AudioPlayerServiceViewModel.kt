@@ -1123,17 +1123,19 @@ class AudioPlayerServiceViewModel @Inject constructor(
 
     override fun setCurrentPlayingHandle(handle: Long) {
         playingHandle = handle
-        playlistItemsFlow.value.first.let { playlistItems ->
-            playingPosition = playlistItems.indexOfFirst { (nodeHandle) ->
-                nodeHandle == handle
-            }.takeIf { index -> index in playlistItems.indices } ?: 0
-            recreateAndUpdatePlaylistItems(
-                originalItems = playlistItemsFlow.value.first,
-                isBuildPlaySources = false
-            )
-        }
+        val playlistItems = playlistItemsFlow.value.first
+        updatePlayingPosition(handle, playlistItems)
+        recreateAndUpdatePlaylistItems(
+            originalItems = playlistItems,
+            isBuildPlaySources = false
+        )
         postPlayingThumbnail()
         mediaItemTransitionState.update { handle }
+    }
+
+    private fun updatePlayingPosition(handle: Long, playlistItems: List<PlaylistItem>) {
+        playingPosition = playlistItems.indexOfFirst { it.nodeHandle == handle }
+            .takeIf { it in playlistItems.indices } ?: 0
     }
 
     override fun getPlaylistItem(handle: String?): PlaylistItem? =
@@ -1204,6 +1206,7 @@ class AudioPlayerServiceViewModel @Inject constructor(
             playlistItems.removeIf { it.nodeHandle == selectedItem.nodeHandle }
             playSourceChanged.removeIf { it.mediaId.toLong() == selectedItem.nodeHandle }
         }
+        updatePlayingPosition(playingHandle, newItems)
         playlistItemsFlow.update { it.copy(newItems, playingPosition) }
         updatePlaySource()
         itemsSelectedMap.clear()
