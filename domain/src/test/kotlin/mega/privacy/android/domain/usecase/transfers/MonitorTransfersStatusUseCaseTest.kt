@@ -8,6 +8,7 @@ import kotlinx.coroutines.test.runTest
 import mega.privacy.android.domain.entity.TransfersStatusInfo
 import mega.privacy.android.domain.entity.transfer.ActiveTransferTotals
 import mega.privacy.android.domain.entity.transfer.MonitorOngoingActiveTransfersResult
+import mega.privacy.android.domain.entity.transfer.TransferAppData
 import mega.privacy.android.domain.entity.transfer.TransferType
 import mega.privacy.android.domain.usecase.transfers.active.MonitorOngoingActiveTransfersUseCase
 import org.junit.jupiter.api.BeforeAll
@@ -130,6 +131,57 @@ internal class MonitorTransfersStatusUseCaseTest {
                 assertThat(actual).isEqualTo(expected)
             }
         }
+
+    @Test
+    fun `test that value with correct values is emitted when a new active transfer total is received with preview downloads`() =
+        runTest {
+            val group1 = mock<ActiveTransferTotals.Group> {
+                on { totalFiles } doReturn 1
+                on { finishedFiles } doReturn 0
+                on { completedFiles } doReturn 0
+                on { alreadyTransferred } doReturn 0
+                on { totalBytes } doReturn 10L
+                on { transferredBytes } doReturn 5L
+                on { appData } doReturn listOf(TransferAppData.PreviewDownload)
+            }
+            val group2 = mock<ActiveTransferTotals.Group> {
+                on { totalFiles } doReturn 5
+                on { finishedFiles } doReturn 2
+                on { completedFiles } doReturn 3
+                on { alreadyTransferred } doReturn 1
+                on { totalBytes } doReturn 500L
+                on { transferredBytes } doReturn 200L
+                on { appData } doReturn emptyList()
+            }
+            val activeTransferTotals = ActiveTransferTotals(
+                transfersType = TransferType.DOWNLOAD,
+                totalTransfers = 6,
+                totalFileTransfers = 6,
+                pausedFileTransfers = 0,
+                totalFinishedTransfers = 2,
+                totalFinishedFileTransfers = 2,
+                totalCompletedFileTransfers = 3,
+                totalBytes = 510L,
+                transferredBytes = 205L,
+                totalAlreadyTransferredFiles = 1,
+                totalCancelled = 0,
+                groups = listOf(group1, group2),
+            )
+            val flowsMap = stubActiveTransfersFlows()
+            val expected = TransfersStatusInfo(
+                totalSizeToTransfer = 500L,
+                totalSizeTransferred = 200L,
+                pendingDownloads = 3,
+            )
+            flowsMap[TransferType.DOWNLOAD]?.update {
+                it.copy(activeTransferTotals = activeTransferTotals)
+            }
+
+            underTest().test {
+                assertThat(awaitItem()).isEqualTo(expected)
+            }
+        }
+
 
     private fun stubActiveTransfersFlows(paused: Boolean = false) =
         TransferType.entries.filterNot { it == TransferType.NONE }.associateWith { type ->
