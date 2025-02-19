@@ -6,6 +6,7 @@ import androidx.compose.ui.test.onNodeWithTag
 import androidx.compose.ui.test.onNodeWithText
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import mega.privacy.android.app.fromId
+import mega.privacy.android.app.presentation.login.model.LoginError
 import mega.privacy.android.app.presentation.login.model.LoginState
 import mega.privacy.android.app.presentation.login.view.LoginTestTags
 import mega.privacy.android.app.presentation.login.view.NewLoginView
@@ -64,5 +65,47 @@ class NewLoginViewTest {
             .assertExists()
         composeRule.onNodeWithTag(LoginTestTags.FORGOT_PASSWORD_BUTTON)
             .assertExists()
+    }
+
+    @Test
+    fun `test that invalid email address shows when email is invalid`() {
+        setupRule(
+            state = stateWithLoginRequired.copy(
+                emailError = LoginError.NotValidEmail
+            )
+        )
+
+        composeRule.onNodeWithText(fromId(sharedR.string.login_invalid_email_error_message))
+            .assertExists()
+        composeRule.onNodeWithText(fromId(sharedR.string.login_invalid_password_error_message))
+            .assertDoesNotExist()
+    }
+
+    @Test
+    fun `test that invalid email address shows when email is empty`() {
+        setupRule(
+            state = stateWithLoginRequired.copy(
+                emailError = LoginError.EmptyEmail
+            )
+        )
+
+        composeRule.onNodeWithText(fromId(sharedR.string.login_invalid_email_error_message))
+            .assertExists()
+        composeRule.onNodeWithText(fromId(sharedR.string.login_invalid_password_error_message))
+            .assertDoesNotExist()
+    }
+
+    @Test
+    fun `test that invalid password shows when password is empty`() {
+        setupRule(
+            state = stateWithLoginRequired.copy(
+                passwordError = LoginError.EmptyPassword
+            )
+        )
+
+        composeRule.onNodeWithText(fromId(sharedR.string.login_invalid_password_error_message))
+            .assertExists()
+        composeRule.onNodeWithText(fromId(sharedR.string.login_invalid_email_error_message))
+            .assertDoesNotExist()
     }
 }

@@ -26,6 +26,7 @@ import mega.privacy.android.app.middlelayer.installreferrer.InstallReferrerHandl
 import mega.privacy.android.app.presentation.extensions.error
 import mega.privacy.android.app.presentation.extensions.getState
 import mega.privacy.android.app.presentation.extensions.messageId
+import mega.privacy.android.app.presentation.extensions.newError
 import mega.privacy.android.app.presentation.login.model.LoginError
 import mega.privacy.android.app.presentation.login.model.LoginFragmentType
 import mega.privacy.android.app.presentation.login.model.LoginIntentState
@@ -45,6 +46,8 @@ import mega.privacy.android.domain.exception.LoginBlockedAccount
 import mega.privacy.android.domain.exception.LoginException
 import mega.privacy.android.domain.exception.LoginLoggedOutFromOtherLocation
 import mega.privacy.android.domain.exception.LoginMultiFactorAuthRequired
+import mega.privacy.android.domain.exception.LoginTooManyAttempts
+import mega.privacy.android.domain.exception.LoginWrongEmailOrPassword
 import mega.privacy.android.domain.exception.LoginWrongMultiFactorAuth
 import mega.privacy.android.domain.exception.QuerySignupLinkException
 import mega.privacy.android.domain.exception.login.FetchNodesErrorAccess
@@ -674,16 +677,33 @@ class LoginViewModel @Inject constructor(
         _state.update { loginState ->
             //If LoginBlockedAccount will processed at the `onEvent` when receive an EVENT_ACCOUNT_BLOCKED
             //If LoginLoggedOutFromOtherLocation will be handled in the Activity
-            val error = this.error
-                .takeUnless { this is LoginLoggedOutFromOtherLocation || this is LoginBlockedAccount }
-            loginState.copy(
-                isLoginInProgress = false,
-                isLoginRequired = true,
-                is2FAEnabled = is2FARequest,
-                is2FARequired = false,
-                loginException = this.takeIf { exception -> exception is LoginLoggedOutFromOtherLocation },
-                snackbarMessage = error?.let { triggered(it) } ?: consumed()
-            )
+            if (loginState.isLoginNewDesignEnabled) {
+                val snackbarMessage = this.newError
+                    .takeIf {
+                        // in the new design we don't show snackbar for these errors
+                        this !is LoginTooManyAttempts
+                                && this !is LoginWrongEmailOrPassword
+                    }?.let { triggered(it) }
+                loginState.copy(
+                    isLoginInProgress = false,
+                    isLoginRequired = true,
+                    is2FAEnabled = is2FARequest,
+                    is2FARequired = false,
+                    loginException = this,
+                    snackbarMessage = snackbarMessage ?: consumed()
+                )
+            } else {
+                val error = this.error
+                    .takeUnless { this is LoginLoggedOutFromOtherLocation || this is LoginBlockedAccount }
+                loginState.copy(
+                    isLoginInProgress = false,
+                    isLoginRequired = true,
+                    is2FAEnabled = is2FARequest,
+                    is2FARequired = false,
+                    loginException = this.takeIf { exception -> exception is LoginLoggedOutFromOtherLocation },
+                    snackbarMessage = error?.let { triggered(it) } ?: consumed()
+                )
+            }
         }
 
     private fun LoginStatus.checkStatus(

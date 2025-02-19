@@ -3,10 +3,6 @@ package mega.privacy.android.app.presentation.login.view
 import mega.privacy.android.shared.resources.R as sharedR
 import android.content.res.Configuration
 import androidx.activity.compose.BackHandler
-import androidx.annotation.StringRes
-import androidx.compose.animation.AnimatedVisibility
-import androidx.compose.animation.fadeIn
-import androidx.compose.animation.fadeOut
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.gestures.detectTapGestures
 import androidx.compose.foundation.isSystemInDarkTheme
@@ -24,13 +20,10 @@ import androidx.compose.foundation.layout.wrapContentSize
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material3.IconButton
-import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.SnackbarDuration
 import androidx.compose.material3.SnackbarHostState
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableIntStateOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.saveable.rememberSaveable
@@ -42,7 +35,6 @@ import androidx.compose.ui.input.pointer.pointerInput
 import androidx.compose.ui.platform.LocalConfiguration
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalFocusManager
-import androidx.compose.ui.platform.LocalInspectionMode
 import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
@@ -57,7 +49,6 @@ import androidx.compose.ui.tooling.preview.PreviewParameter
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import de.palm.composestateevents.EventEffect
-import kotlinx.coroutines.delay
 import mega.android.core.ui.components.LinkSpannedText
 import mega.android.core.ui.components.MegaScaffold
 import mega.android.core.ui.components.MegaSnackbar
@@ -82,8 +73,8 @@ import mega.android.core.ui.theme.values.TextColor
 import mega.privacy.android.app.R
 import mega.privacy.android.app.presentation.apiserver.view.ChangeApiServerDialog
 import mega.privacy.android.app.presentation.extensions.isDarkMode
+import mega.privacy.android.app.presentation.extensions.login.newError
 import mega.privacy.android.app.presentation.login.model.LoginState
-import mega.privacy.android.domain.entity.Progress
 import mega.privacy.android.domain.entity.account.AccountSession
 import mega.privacy.android.shared.original.core.ui.preview.CombinedThemePhoneLandscapePreviews
 import mega.privacy.android.shared.original.core.ui.preview.CombinedThemePreviews
@@ -223,8 +214,6 @@ private fun RequireLogin(
     val scrollState = rememberScrollState()
     val focusManager = LocalFocusManager.current
     val orientation = LocalConfiguration.current.orientation
-    var email by rememberSaveable { mutableStateOf("") }
-    var password by rememberSaveable { mutableStateOf("") }
 
     Box(
         modifier = modifier
@@ -290,12 +279,14 @@ private fun RequireLogin(
                 imeAction = ImeAction.Next,
                 capitalization = KeyboardCapitalization.None,
                 label = stringResource(id = sharedR.string.email_text),
-                text = email,
+                text = state.accountSession?.email.orEmpty(),
                 onValueChanged = {
-                    email = it.trim()
-                    onEmailChanged(email)
+                    onEmailChanged(it.trim())
                 },
-                errorText = null
+                errorText = when {
+                    state.emailError != null -> stringResource(state.emailError.newError)
+                    else -> null
+                }
             )
 
             PasswordTextInputField(
@@ -305,12 +296,14 @@ private fun RequireLogin(
                         top = 16.dp, start = 16.dp, end = 16.dp
                     ),
                 label = stringResource(id = sharedR.string.password_text),
-                text = password,
+                text = state.password.orEmpty(),
                 onValueChanged = {
-                    password = it
                     onPasswordChanged(it)
                 },
-                errorText = null
+                errorText = when {
+                    state.passwordError != null -> stringResource(state.passwordError.newError)
+                    else -> null
+                }
             )
 
             PrimaryFilledButton(
@@ -366,47 +359,6 @@ private fun RequireLogin(
                 }
             )
         }
-    }
-}
-
-/**
- * Composable to show current status text with a fade in/out animation.
- */
-@Composable
-private fun LoginInProgressText(
-    modifier: Modifier,
-    @StringRes stringId: Int,
-    progress: Progress? = null,
-    textChangeDuration: Long = 200,
-) {
-    val isInPreview = LocalInspectionMode.current // To avoid text being hidden in previews
-    var visible by rememberSaveable { mutableStateOf(isInPreview) }
-    var currentTextId by rememberSaveable { mutableIntStateOf(stringId) }
-
-    AnimatedVisibility(
-        visible = visible,
-        enter = fadeIn(),
-        exit = fadeOut(),
-    ) {
-        MegaText(
-            text = if (progress != null) {
-                stringResource(sharedR.string.login_completing_operation, progress.intValue)
-            } else {
-                stringResource(id = currentTextId)
-            },
-            style = MaterialTheme.typography.bodySmall,
-            modifier = modifier,
-            textAlign = TextAlign.Center,
-            textColor = TextColor.Primary,
-            minLines = 2
-        )
-    }
-
-    LaunchedEffect(stringId) {
-        visible = false
-        delay(textChangeDuration)
-        currentTextId = stringId
-        visible = true
     }
 }
 
