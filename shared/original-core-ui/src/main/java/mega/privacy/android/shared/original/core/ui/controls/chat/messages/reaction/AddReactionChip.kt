@@ -38,7 +38,7 @@ internal fun AddReactionChip(
 ) {
     Box(
         modifier = Modifier
-            .size(32.dp, 24.dp)
+            .size(addReactionChipWidth, 24.dp)
             .clip(RoundedCornerShape(12.dp))
             .background(color = MegaOriginalTheme.colors.background.surface2)
             .border(
@@ -57,6 +57,11 @@ internal fun AddReactionChip(
         )
     }
 }
+
+/**
+ * Width of the add reaction chip
+ */
+internal val addReactionChipWidth = 32.dp
 
 @CombinedThemePreviews
 @Composable

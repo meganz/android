@@ -55,7 +55,7 @@ fun ReactionChip(
             verticalAlignment = Alignment.CenterVertically,
             horizontalArrangement = Arrangement.Center,
             modifier = Modifier
-                .size(44.dp, 24.dp)
+                .size(reactionsChipWidth, reactionsChipHeight)
                 .clip(RoundedCornerShape(12.dp))
                 .conditional(interactionEnabled) {
                     combinedClickable(
@@ -88,6 +88,15 @@ fun ReactionChip(
 
 }
 
+/**
+ * Width of the reaction chip
+ */
+internal val reactionsChipWidth = 44.dp
+
+/**
+ * Height of the reaction chip
+ */
+internal val reactionsChipHeight = 24.dp
 
 @CombinedThemePreviews
 @Composable

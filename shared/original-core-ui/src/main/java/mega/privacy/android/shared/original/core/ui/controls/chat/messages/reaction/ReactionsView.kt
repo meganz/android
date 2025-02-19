@@ -12,8 +12,10 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalLayoutDirection
 import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.tooling.preview.PreviewParameter
+import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.LayoutDirection
 import androidx.compose.ui.unit.dp
+import mega.privacy.android.shared.original.core.ui.controls.chat.avatarWidth
 import mega.privacy.android.shared.original.core.ui.controls.chat.messages.reaction.model.UIReaction
 import mega.privacy.android.shared.original.core.ui.preview.BooleanProvider
 import mega.privacy.android.shared.original.core.ui.preview.CombinedThemeRtlPreviews
@@ -47,8 +49,8 @@ fun ReactionsView(
             modifier = modifier
                 .padding(vertical = 4.dp)
                 .testTag(TEST_TAG_REACTIONS_VIEW),
-            horizontalArrangement = Arrangement.spacedBy(4.dp),
-            verticalArrangement = Arrangement.spacedBy(4.dp),
+            horizontalArrangement = Arrangement.spacedBy(itemSpacing),
+            verticalArrangement = Arrangement.spacedBy(itemSpacing),
         ) {
             reactions.forEach {
                 ReactionChip(
@@ -65,6 +67,28 @@ fun ReactionsView(
             )
         }
     }
+}
+
+/**
+ * Calculate the height of the reaction set
+ */
+fun computeReactionsViewApproximateHeight(
+    amountOfReactions: Int,
+    screenWidth: Dp,
+): Dp =
+    if (amountOfReactions == 0) {
+        0.dp
+    } else {
+        val rows = (amountOfReactions / calculateItemsPerRow(screenWidth)).toInt() + 1
+        val verticalPaddings = 22.dp
+        reactionsChipHeight * rows.toFloat() + itemSpacing * (rows - 1) + verticalPaddings
+    }
+
+private fun calculateItemsPerRow(screenWidth: Dp): Int {
+    val availableWidth = screenWidth - addReactionChipWidth - avatarWidth
+    val numElements = availableWidth / (reactionsChipWidth + itemSpacing)
+
+    return numElements.toInt().coerceAtLeast(1)
 }
 
 internal val reactionsList = listOf(
@@ -92,3 +116,4 @@ private fun ReactionsViewRtlPreview(
 }
 
 internal const val TEST_TAG_REACTIONS_VIEW = "chat_view:message:reactions_view"
+private val itemSpacing = 4.dp

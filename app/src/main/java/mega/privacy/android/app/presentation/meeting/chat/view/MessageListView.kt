@@ -44,11 +44,12 @@ import mega.privacy.android.app.presentation.meeting.chat.model.messages.UiChatM
 import mega.privacy.android.app.presentation.meeting.chat.model.messages.header.ChatUnreadHeaderMessage
 import mega.privacy.android.app.presentation.meeting.chat.model.messages.management.ParticipantUiMessage
 import mega.privacy.android.app.presentation.meeting.chat.view.message.FirstMessageHeader
-import mega.privacy.android.shared.original.core.ui.controls.chat.messages.LoadingMessagesHeader
-import mega.privacy.android.shared.original.core.ui.controls.chat.messages.reaction.model.UIReaction
 import mega.privacy.android.domain.entity.chat.ChatMessageStatus
 import mega.privacy.android.domain.entity.chat.messages.PendingAttachmentMessage
 import mega.privacy.android.domain.entity.chat.messages.TypedMessage
+import mega.privacy.android.shared.original.core.ui.controls.chat.messages.LoadingMessagesHeader
+import mega.privacy.android.shared.original.core.ui.controls.chat.messages.reaction.computeReactionsViewApproximateHeight
+import mega.privacy.android.shared.original.core.ui.controls.chat.messages.reaction.model.UIReaction
 import timber.log.Timber
 
 @Composable
@@ -277,7 +278,9 @@ private fun computeLastItemAvatarPosition(
 ): State<LastItemAvatarPosition?> {
     val avatarHeight: Float
     val bottomPaddingPixels: Float
-    with(LocalDensity.current) {
+    val currentDensity = LocalDensity.current
+    val screenWidth = LocalConfiguration.current.screenWidthDp.dp
+    with(currentDensity) {
         avatarHeight = 20.dp.toPx()
         bottomPaddingPixels = bottomPadding.toPx()
     }
@@ -287,22 +290,30 @@ private fun computeLastItemAvatarPosition(
             (pagingItems.peekOrNull(lastVisibleIndex.intValue) as? AvatarMessage)
                 ?.takeIf { !it.displayAsMine && it.userHandle != -1L }
                 ?.let { lastVisibleMessage ->
+                    val reactionsHeight = with(currentDensity) {
+                        computeReactionsViewApproximateHeight(
+                            lastVisibleMessage.reactions.size,
+                            screenWidth
+                        ).toPx()
+                    }
                     val visibleItems = scrollState.layoutInfo.visibleItemsInfo
                     val lastVisibleItem = visibleItems.firstOrNull() ?: return@derivedStateOf null
-                    val secondLastVisibleItem =
-                        visibleItems.getOrNull(1) ?: return@derivedStateOf null
+                    val secondLastVisibleItem = visibleItems.getOrNull(1)
                     val secondLastVisibleMessage =
                         pagingItems.peekOrNull(lastVisibleIndex.intValue + 1) as? AvatarMessage
                     val nextMessage =
                         pagingItems.peekOrNull(lastVisibleIndex.intValue - 1) as? AvatarMessage
                     val lastVisibleHasEnoughSpaceForAvatar =
-                        secondLastVisibleItem.offset > avatarHeight
+                        secondLastVisibleItem?.offset?.let { it > avatarHeight } != false
                     val lastVisibleIsFullyBVisible = bottomPaddingPixels > -lastVisibleItem.offset
+                    val lastVisibleShowingReactions =
+                        reactionsHeight > 0 && lastVisibleItem.offset > -reactionsHeight
                     val singleMessage =
                         lastVisibleMessage.userHandle != nextMessage?.userHandle && lastVisibleMessage.userHandle != secondLastVisibleMessage?.userHandle
                     when {
                         singleMessage && lastVisibleItem.size < minSizeToAnimate -> LastItemAvatarPosition.Bottom // No animation when it's only one small message
                         lastVisibleMessage.userHandle != secondLastVisibleMessage?.userHandle && !lastVisibleHasEnoughSpaceForAvatar -> LastItemAvatarPosition.Top // Last visible message is the first message of the user in this block and there's not enough space (it's disappearing down the screen)
+                        lastVisibleMessage.userHandle != nextMessage?.userHandle && lastVisibleShowingReactions -> LastItemAvatarPosition.Bottom // Last visible message is the last one of the user, but still scrolling reactions, so still needs to show at the bottom of the message (without reactions)
                         lastVisibleIndex.intValue == 0 && lastVisibleMessage.userHandle != nextMessage?.userHandle && lastVisibleIsFullyBVisible -> LastItemAvatarPosition.Bottom // Need to take content padding into account for the very last message
                         else -> LastItemAvatarPosition.Scrolling// The avatar will be drawn in the list to simulate scrolling
                     }
