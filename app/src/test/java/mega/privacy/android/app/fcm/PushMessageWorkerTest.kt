@@ -37,6 +37,7 @@ import mega.privacy.android.domain.usecase.call.GetChatCallUseCase
 import mega.privacy.android.domain.usecase.call.IsChatStatusConnectedForCallUseCase
 import mega.privacy.android.domain.usecase.chat.IsChatNotifiableUseCase
 import mega.privacy.android.domain.usecase.chat.MonitorChatConnectionStateUseCase
+import mega.privacy.android.domain.usecase.contact.GetMyUserHandleUseCase
 import mega.privacy.android.domain.usecase.login.BackgroundFastLoginUseCase
 import mega.privacy.android.domain.usecase.login.InitialiseMegaChatUseCase
 import mega.privacy.android.domain.usecase.meeting.MonitorChatCallUpdatesUseCase
@@ -88,6 +89,7 @@ class PushMessageWorkerTest {
     private val setFakeIncomingCallStateUseCase = mock<SetFakeIncomingCallStateUseCase>()
     private val isChatStatusConnectedForCallUseCase = mock<IsChatStatusConnectedForCallUseCase>()
     private val monitorChatConnectionStateUseCase = mock<MonitorChatConnectionStateUseCase>()
+    private val getMyUserHandleUseCase = mock<GetMyUserHandleUseCase>()
     private val getChatCallUseCase = mock<GetChatCallUseCase>()
     private val ioDispatcher = UnconfinedTestDispatcher()
 
@@ -137,6 +139,7 @@ class PushMessageWorkerTest {
             isChatStatusConnectedForCallUseCase = isChatStatusConnectedForCallUseCase,
             monitorChatConnectionStateUseCase = monitorChatConnectionStateUseCase,
             monitorChatCallUpdatesUseCase = monitorChatCallUpdatesUseCase,
+            getMyUserHandleUseCase = getMyUserHandleUseCase,
             getChatCallUseCase = getChatCallUseCase,
             ioDispatcher = ioDispatcher,
             loginMutex = mock()

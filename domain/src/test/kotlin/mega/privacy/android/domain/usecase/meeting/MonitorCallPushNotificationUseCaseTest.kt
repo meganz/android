@@ -20,6 +20,7 @@ import mega.privacy.android.domain.repository.CallRepository
 import mega.privacy.android.domain.repository.ContactsRepository
 import mega.privacy.android.domain.usecase.call.IsChatStatusConnectedForCallUseCase
 import mega.privacy.android.domain.usecase.chat.MonitorChatConnectionStateUseCase
+import mega.privacy.android.domain.usecase.contact.GetMyUserHandleUseCase
 import org.junit.jupiter.api.AfterAll
 import org.junit.jupiter.api.BeforeAll
 import org.junit.jupiter.api.BeforeEach
@@ -38,6 +39,8 @@ class MonitorCallPushNotificationUseCaseTest {
     private val contactsRepository = mock<ContactsRepository>()
     private val setFakeIncomingCallStateUseCase = mock<SetFakeIncomingCallStateUseCase>()
     private val setPendingToHangUpCallUseCase = mock<SetPendingToHangUpCallUseCase>()
+    private val getMyUserHandleUseCase = mock<GetMyUserHandleUseCase>()
+
     private val defaultDispatcher = UnconfinedTestDispatcher()
 
     private lateinit var underTest: MonitorCallPushNotificationUseCase
@@ -59,6 +62,7 @@ class MonitorCallPushNotificationUseCaseTest {
             setPendingToHangUpCallUseCase = setPendingToHangUpCallUseCase,
             contactsRepository = contactsRepository,
             isChatStatusConnectedForCallUseCase = isChatStatusConnectedForCallUseCase,
+            getMyUserHandleUseCase = getMyUserHandleUseCase,
             defaultDispatcher = testDispatcher
         )
     }
@@ -76,6 +80,7 @@ class MonitorCallPushNotificationUseCaseTest {
             setPendingToHangUpCallUseCase,
             contactsRepository,
             isChatStatusConnectedForCallUseCase,
+            getMyUserHandleUseCase
         )
     }
 

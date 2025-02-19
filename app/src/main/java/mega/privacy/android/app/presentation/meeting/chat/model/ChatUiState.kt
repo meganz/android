@@ -181,4 +181,11 @@ data class ChatUiState(
      * True if the chat is a waiting room, false otherwise.
      */
     val isWaitingRoom = chat?.isWaitingRoom == true
+
+    /**
+     * Check if I'm participating in the call
+     */
+    val isParticipating = myUserHandle?.let {
+        callInThisChat?.peerIdParticipants?.contains(it)
+    }
 }

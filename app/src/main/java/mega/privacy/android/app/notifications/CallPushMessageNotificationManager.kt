@@ -73,6 +73,7 @@ class CallPushMessageNotificationManager @Inject constructor(
      * @param chatId    Chat Id
      */
     fun remove(chatId: Long) {
+        Timber.d("Remove call push message notification")
         hide(chatId)
         rtcAudioManagerGateway.stopIncomingCallSounds()
         rtcAudioManagerGateway.removeRTCAudioManagerRingIn()

@@ -15,7 +15,7 @@ internal fun ReturnToCallBanner(
     isAudioPermissionGranted: Boolean,
     onAnswerCall: () -> Unit,
 ) = with(uiState) {
-    if (!isConnected || (callsInOtherChats.isEmpty() && callInThisChat == null)) return@with null
+    if (!isConnected || (chat?.isOneToOneChat == true && isParticipating == true) || (callsInOtherChats.isEmpty() && callInThisChat == null)) return@with null
 
     val context = LocalContext.current
 

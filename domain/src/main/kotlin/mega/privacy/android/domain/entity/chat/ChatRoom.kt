@@ -72,4 +72,10 @@ data class ChatRoom(
      * @return True if the chat has the change in question, false otherwise.
      */
     fun hasChanged(change: ChatRoomChange) = changes?.contains(change) == true
+
+    /**
+     * Check if is one to one chat
+     */
+    val isOneToOneChat
+        get():Boolean = !isGroup
 }

@@ -9,6 +9,7 @@ import kotlinx.coroutines.flow.flow
 import kotlinx.coroutines.flow.flowOn
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.merge
+import mega.privacy.android.domain.entity.call.CallCompositionChanges
 import mega.privacy.android.domain.entity.call.ChatCallChanges
 import mega.privacy.android.domain.entity.call.ChatCallStatus
 import mega.privacy.android.domain.entity.meeting.CallPushMessageNotificationActionType
@@ -17,6 +18,7 @@ import mega.privacy.android.domain.qualifier.DefaultDispatcher
 import mega.privacy.android.domain.repository.CallRepository
 import mega.privacy.android.domain.repository.ContactsRepository
 import mega.privacy.android.domain.usecase.call.IsChatStatusConnectedForCallUseCase
+import mega.privacy.android.domain.usecase.contact.GetMyUserHandleUseCase
 import javax.inject.Inject
 
 /**
@@ -30,6 +32,7 @@ class MonitorCallPushNotificationUseCase @Inject constructor(
     private val callRepository: CallRepository,
     private val setFakeIncomingCallUseCase: SetFakeIncomingCallStateUseCase,
     private val setPendingToHangUpCallUseCase: SetPendingToHangUpCallUseCase,
+    private val getMyUserHandleUseCase: GetMyUserHandleUseCase,
     private val contactsRepository: ContactsRepository,
     private val isChatStatusConnectedForCallUseCase: IsChatStatusConnectedForCallUseCase,
     @DefaultDispatcher private val defaultDispatcher: CoroutineDispatcher,
@@ -91,7 +94,11 @@ class MonitorCallPushNotificationUseCase @Inject constructor(
 
                     if (isNotification) {
                         result[chatId] =
-                            if (call == null) CallPushMessageNotificationActionType.Missed else CallPushMessageNotificationActionType.Update
+                            when {
+                                call == null -> CallPushMessageNotificationActionType.Missed
+                                call.peerIdParticipants?.contains(getMyUserHandleUseCase()) == true -> CallPushMessageNotificationActionType.Remove
+                                else -> CallPushMessageNotificationActionType.Update
+                            }
                     }
 
                     if (call == null) {
@@ -158,6 +165,14 @@ class MonitorCallPushNotificationUseCase @Inject constructor(
                                 }
                             }
                         }
+                    }
+
+                    if (contains(ChatCallChanges.CallComposition) &&
+                        call.callCompositionChange == CallCompositionChanges.Added &&
+                        call.peerIdParticipants?.contains(getMyUserHandleUseCase()) == true
+                    ) {
+                        result[call.chatId] =
+                            CallPushMessageNotificationActionType.Remove
                     }
                 }
 

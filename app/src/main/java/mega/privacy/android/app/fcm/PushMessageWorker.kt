@@ -54,6 +54,7 @@ import mega.privacy.android.domain.usecase.call.GetChatCallUseCase
 import mega.privacy.android.domain.usecase.call.IsChatStatusConnectedForCallUseCase
 import mega.privacy.android.domain.usecase.chat.IsChatNotifiableUseCase
 import mega.privacy.android.domain.usecase.chat.MonitorChatConnectionStateUseCase
+import mega.privacy.android.domain.usecase.contact.GetMyUserHandleUseCase
 import mega.privacy.android.domain.usecase.login.BackgroundFastLoginUseCase
 import mega.privacy.android.domain.usecase.login.InitialiseMegaChatUseCase
 import mega.privacy.android.domain.usecase.meeting.MonitorChatCallUpdatesUseCase
@@ -104,6 +105,7 @@ class PushMessageWorker @AssistedInject constructor(
     private val isChatStatusConnectedForCallUseCase: IsChatStatusConnectedForCallUseCase,
     private val monitorChatConnectionStateUseCase: MonitorChatConnectionStateUseCase,
     private val monitorChatCallUpdatesUseCase: MonitorChatCallUpdatesUseCase,
+    private val getMyUserHandleUseCase: GetMyUserHandleUseCase,
     private val getChatCallUseCase: GetChatCallUseCase,
     @IoDispatcher private val ioDispatcher: CoroutineDispatcher,
     @LoginMutex private val loginMutex: Mutex,
@@ -170,10 +172,15 @@ class PushMessageWorker @AssistedInject constructor(
                             .collectLatest {
                                 if (isChatStatusConnectedForCallUseCase(pushMessage.chatId)) {
                                     Timber.d("Chat status is connected for call")
-                                    if (getChatCallUseCase(pushMessage.chatId) == null) {
-                                        Timber.d("No call found.")
+                                    val chatCall = getChatCallUseCase(pushMessage.chatId)
+                                    if (chatCall == null || chatCall.status != ChatCallStatus.UserNoPresent || chatCall.peerIdParticipants?.contains(
+                                            getMyUserHandleUseCase()
+                                        ) == true
+                                    ) {
+                                        Timber.d("No call found or participating from another client")
                                         cancel()
                                     } else {
+
                                         Timber.d("Monitor call updates")
                                         monitorChatCallUpdatesUseCase()
                                             .filter { update -> update.chatId == pushMessage.chatId }
@@ -191,6 +198,15 @@ class PushMessageWorker @AssistedInject constructor(
                                                         cancel()
                                                         monitorChatConnectionStateUseCaseJob?.cancel()
                                                     }
+                                                }
+
+                                                if (call.changes?.contains(ChatCallChanges.CallComposition) == true && chatCall.peerIdParticipants?.contains(
+                                                        getMyUserHandleUseCase()
+                                                    ) == true
+                                                ) {
+                                                    Timber.d("Participating from another client")
+                                                    cancel()
+                                                    monitorChatConnectionStateUseCaseJob?.cancel()
                                                 }
                                             }
                                     }
