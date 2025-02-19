@@ -221,15 +221,16 @@ class FileWrapperFactoryTest {
 
     @ParameterizedTest
     @ValueSource(booleans = [true, false])
-    fun `test that set modification time invokes the correct gateway method`(
+    fun `test that set modification time invokes the correct gateway method converting seconds to milliseconds`(
         result: Boolean,
     ) = Mockito.mockStatic(Uri::class.java).useNoResult {
         val (uriPath, _) = commonStub()
         val mTime = 4985739254L
-        whenever(fileGateway.setLastModifiedSync(uriPath, mTime)) doReturn result
+        val mTimeMillis = mTime * 1_000
+        whenever(fileGateway.setLastModifiedSync(uriPath, mTimeMillis)) doReturn result
         val actual = underTest(uriPath)?.setModificationTime(mTime)
         assertThat(actual).isEqualTo(result)
-        verify(fileGateway).setLastModifiedSync(uriPath, mTime)
+        verify(fileGateway).setLastModifiedSync(uriPath, mTimeMillis)
     }
 
     @Test

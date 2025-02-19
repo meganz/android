@@ -26,34 +26,80 @@ class FileWrapper(
     private val renameFunction: (newName: String) -> FileWrapper?,
 ) {
 
+    /**
+     * Get the detached file descriptor for this file or folder.
+     * @param write if true, the file descriptor will be opened in write mode, otherwise in read mode
+     * @return the file descriptor or null if the operation failed
+     */
     @Keep
     fun getFileDescriptor(write: Boolean) =
         getDetachedFileDescriptorFunction(write)
 
+    /**
+     * Get the children uris of this folder.
+     * @return the list of children uris or an empty list if the file is not a folder
+     */
     @Keep
     fun getChildrenUris(): List<String> = getChildrenUrisFunction()
 
+    /**
+     * Check if a child file exists.
+     * @param name the name of the file to check
+     * @return true if the child file exists, false otherwise
+     */
     @Keep
     fun childFileExists(name: String) = childFileExistsFunction(name)
 
+    /**
+     * Create a child file or folder.
+     * @param name the name of the new file or folder
+     * @param asFolder if true, a folder will be created, otherwise a file
+     * @return the [FileWrapper] of the newly created file or folder, or null if the operation failed
+     */
     @Keep
     fun createChildFile(name: String, asFolder: Boolean) = createChildFileFunction(name, asFolder)
 
+    /**
+     * Get the parent file or folder.
+     * @return the [FileWrapper] of the parent folder or null if the operation failed
+     */
     @Keep
     fun getParentFile(): FileWrapper? = getParentUriFunction()
 
+    /**
+     * Get the path of the file or folder.
+     * @return the path or null if the operation failed
+     */
     @Keep
     fun getPath(): String? = getPathFunction()
 
+    /**
+     * Delete the file or folder.
+     * @return true if the operation was successful, false otherwise
+     */
     @Keep
     fun deleteFile(): Boolean = deleteFileFunction()
 
+    /**
+     * Delete the folder if it's empty.
+     * @return true if the operation was successful, false otherwise
+     */
     @Keep
     fun deleteFolderIfEmpty(): Boolean = deleteFolderIfEmptyFunction()
 
+    /**
+     * Sets the modification time of the file or folder.
+     * @param newTime the new modification time in seconds since epoch
+     * @return true if the operation was successful, false otherwise
+     */
     @Keep
     fun setModificationTime(newTime: Long): Boolean = setModificationTimeFunction(newTime)
 
+    /**
+     * Rename the file or folder.
+     * @param newName the new name of the file or folder
+     * @return the [FileWrapper] of the renamed file or folder, or null if the operation failed
+     */
     @Keep
     fun rename(newName: String): FileWrapper? = renameFunction(newName)
 

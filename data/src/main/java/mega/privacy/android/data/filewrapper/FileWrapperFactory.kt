@@ -47,7 +47,7 @@ internal class FileWrapperFactory(private val fileGateway: FileGateway) {
                         fileGateway.deleteIfItIsAnEmptyFolder(uriPath)
                     },
                     setModificationTimeFunction = {
-                        fileGateway.setLastModifiedSync(uriPath, it)
+                        fileGateway.setLastModifiedSync(uriPath, it * 1_000)
                     },
                     renameFunction = {
                         fileGateway.renameFileSync(uriPath, it)?.let {
