@@ -1296,13 +1296,7 @@ internal class MegaApiFacade @Inject constructor(
         node: MegaNode,
         expireTime: Long?,
         listener: MegaRequestListenerInterface,
-    ) {
-        if (expireTime != null && expireTime > 0) {
-            megaApi.exportNode(node, expireTime.toInt(), listener)
-        } else {
-            megaApi.exportNode(node, listener)
-        }
-    }
+    ) = megaApi.exportNode(node, expireTime?.toInt() ?: 0, listener)
 
     override fun getDeviceName(deviceId: String, listener: MegaRequestListenerInterface?) =
         megaApi.getDeviceName(deviceId, listener)

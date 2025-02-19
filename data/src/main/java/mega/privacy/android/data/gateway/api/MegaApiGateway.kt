@@ -2726,10 +2726,28 @@ interface MegaApiGateway {
 
 
     /**
-     * Export a MegaNode
+     * Generate a public link of a file/folder in MEGA
      *
-     * @param node the MegaNode to export
-     * @param expireTime the time in seconds since epoch to set as expiry date
+     * The associated request type with this request is MegaRequest::TYPE_EXPORT
+     * Valid data in the MegaRequest object received on callbacks:
+     * - MegaRequest::getNodeHandle - Returns the handle of the node
+     * - MegaRequest::getAccess - Returns true
+     * - MegaRequest::getNumber - Returns expire time
+     * - MegaRequest::getFlag - Returns true if writable
+     * - MegaRequest::getTransferTag - Returns if share key is shared with mega
+     *
+     * Valid data in the MegaRequest object received in onRequestFinish when the error code
+     * is MegaError::API_OK:
+     * - MegaRequest::getLink - Public link
+     * - MegaRequest::getPrivateKey - Authentication token (only if writable=true)
+     * - MegaRequest::getPassword - Returns base64 encryption key used for share-key (only if
+     * writable=true and megaHosted=true)
+     *
+     * If the MEGA account is a business account and it's status is expired, onRequestFinish
+     * will be called with the error code MegaError::API_EBUSINESSPASTDUE.
+     *
+     * @param node MegaNode to get the public link
+     * @param expireTime Unix timestamp until the public link will be valid
      * @param listener MegaRequestListener to track this request
      */
     fun exportNode(
