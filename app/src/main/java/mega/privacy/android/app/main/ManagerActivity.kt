@@ -3202,7 +3202,7 @@ class ManagerActivity : PasscodeActivity(), NavigationView.OnNavigationItemSelec
         firstNavigationLevel: Boolean, showSearch: Boolean,
     ) {
         if (drawerItem == DrawerItem.HOMEPAGE && homepageScreen == HomepageScreen.FULLSCREEN_OFFLINE) {
-            supportActionBar?.subtitle = null
+            supportActionBar?.subtitle = fullscreenOfflineComposeFragment?.getCurrentPageSubTitle()
             supportActionBar?.title = fullscreenOfflineComposeFragment?.getCurrentPageTitle()
                 ?: getString(R.string.section_saved_for_offline_new)
             viewModel.setIsFirstNavigationLevel(firstNavigationLevel)

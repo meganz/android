@@ -47,7 +47,7 @@ class OfflineComposeViewModel @Inject constructor(
             title = savedStateHandle["title"] ?: ""
         )
     )
-    private val parentStack = ArrayDeque<Pair<Int, String>>()
+    private val parentStack = ArrayDeque<Pair<Int, String?>>()
 
     /**
      * Flow of [OfflineUiState] UI State
@@ -309,9 +309,18 @@ class OfflineComposeViewModel @Inject constructor(
     /**
      * Update title
      */
-    fun updateTitle(title: String) {
+    fun updateTitle(title: String?) {
         _uiState.update {
             it.copy(title = title)
+        }
+    }
+
+    /**
+     * Update default title
+     */
+    fun updateDefaultTitle(defaultTitle: String) {
+        _uiState.update {
+            it.copy(defaultTitle = defaultTitle)
         }
     }
 }

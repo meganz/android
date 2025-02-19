@@ -27,14 +27,26 @@ data class OfflineUiState(
     val offlineNodes: List<OfflineNodeUIItem> = emptyList(),
     val selectedNodeHandles: List<Long> = emptyList(),
     val parentId: Int = -1,
-    val title: String = "",
+    val title: String? = null,
+    val defaultTitle: String = "",
     val currentViewType: ViewType = ViewType.LIST,
     val isOnline: Boolean = false,
     val searchQuery: String? = null,
     val closeSearchViewEvent: StateEvent = consumed,
     val openFolderInPageEvent: StateEventWithContent<OfflineFileInformation> = consumed(),
-    val openOfflineNodeEvent: StateEventWithContent<OfflineFileInformation> = consumed()
+    val openOfflineNodeEvent: StateEventWithContent<OfflineFileInformation> = consumed(),
 ) {
+
+    /**
+     * Actual title to show, it's [title] if it's not null or blank, [defaultTitle] otherwise
+     */
+    val actualTitle = title?.takeIf { it.isNotBlank() } ?: defaultTitle
+
+    /**
+     * Actual subtitle to show, it's default title if [actualTitle] is not null, null otherwise
+     */
+    val actualSubtitle = if (title.isNullOrEmpty()) null else defaultTitle
+
     /**
      * Get the selected offline nodes
      */

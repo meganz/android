@@ -45,4 +45,37 @@ class OfflineUiStateTest {
 
         assertThat(underTest.selectedOfflineNodes).containsExactly(offlineNodeUIItem.offlineNode)
     }
+
+    @Test
+    fun `test that actualTitle returns title if it is not null`() {
+        val title = "Title"
+        val underTest = OfflineUiState(title = title)
+
+        assertThat(underTest.actualTitle).isEqualTo(title)
+    }
+
+    @Test
+    fun `test that actualTitle returns default title if title is null`() {
+        val defaultTitle = "Title"
+        val underTest = OfflineUiState(title = null, defaultTitle = defaultTitle)
+
+        assertThat(underTest.actualTitle).isEqualTo(defaultTitle)
+    }
+
+    @Test
+    fun `test that actualSubTitle returns default title if title is not null`() {
+        val title = "Title"
+        val defaultTitle = "Default Title"
+        val underTest = OfflineUiState(title = title, defaultTitle = defaultTitle)
+
+        assertThat(underTest.actualSubtitle).isEqualTo(defaultTitle)
+    }
+
+    @Test
+    fun `test that actualSubTitle returns null if title is null`() {
+        val defaultTitle = "Title"
+        val underTest = OfflineUiState(title = null, defaultTitle = defaultTitle)
+
+        assertThat(underTest.actualSubtitle).isNull()
+    }
 }
