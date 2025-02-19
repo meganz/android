@@ -2945,8 +2945,6 @@
     <string name="theme_system_default">Системная</string>
     <!-- Option of color theme, follow the system battery saver settings. -->
     <string name="theme_battery_saver">Устанавливается функцией экономии заряда батареи</string>
-    <!-- Cloud Drive screen subtitle indicating a destination is required to be selected -->
-    <string name="cloud_drive_select_destination">Выбрать целевую папку</string>
     <!-- Warning which alerts the user before discard changes -->
     <string name="discard_changes_warning">Отменить изменения и закрыть редактор?</string>
     <!-- Action discard -->
@@ -3808,8 +3806,6 @@
     <string name="shared_items_verify_credentials_verify_person_banner_label">Чтобы общая папка стала доступной, человек, который поделился ею с вами, также должен подтвердить вас.</string>
     <!--Name of the action on menu where %s will be replaced by the contact name that needs to be verified-->
     <string name="shared_items_bottom_sheet_menu_verify_user">Подтвердить %s</string>
-    <!-- Context of snackbar when downloading the file that needs to be downloaded for previewing. -->
-    <string name="cloud_drive_snackbar_preparing_file_for_preview_context">Подготовка файла к превью</string>
     <!-- Note for each achievement, which shows how many days left before achievement will expire. -->
     <plurals name="account_achievements_bonus_expiration_date">
         <item quantity="one">Бонус истекает через %1$d день</item>

@@ -289,7 +289,7 @@
     <!-- Delete a link label -->
     <string name="context_delete_link">Eliminar enlace</string>
     <!-- Title alert before leaving a share. -->
-    <string name="alert_leave_share">Leave folder</string>
+    <string name="alert_leave_share">Abandonar carpeta</string>
     <!-- Item menu option upon right click on one or multiple files. -->
     <string name="context_clean_shares_menu">Dejar de compartir</string>
     <!-- Item menu option upon right click on one or multiple files. -->
@@ -2872,8 +2872,6 @@
     <string name="theme_system_default">Predeterminado</string>
     <!-- Option of color theme, follow the system battery saver settings. -->
     <string name="theme_battery_saver">Definido por el modo ahorro</string>
-    <!-- Cloud Drive screen subtitle indicating a destination is required to be selected -->
-    <string name="cloud_drive_select_destination">Seleccionar destino</string>
     <!-- Warning which alerts the user before discard changes -->
     <string name="discard_changes_warning">¿Descartar los cambios y cerrar el editor?</string>
     <!-- Action discard -->
@@ -3712,8 +3710,6 @@
     <string name="shared_items_verify_credentials_verify_person_banner_label">Para acceder a la carpeta compartida, la persona que la ha compartido contigo también debe verificar tus credenciales.</string>
     <!--Name of the action on menu where %s will be replaced by the contact name that needs to be verified-->
     <string name="shared_items_bottom_sheet_menu_verify_user">Verificar %s</string>
-    <!-- Context of snackbar when downloading the file that needs to be downloaded for previewing. -->
-    <string name="cloud_drive_snackbar_preparing_file_for_preview_context">Preparando archivo para vista previa</string>
     <!-- Note for each achievement, which shows how many days left before achievement will expire. -->
     <plurals name="account_achievements_bonus_expiration_date">
         <item quantity="one">El bono caducará en %1$d día.</item>

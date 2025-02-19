@@ -2726,8 +2726,6 @@
     <string name="theme_system_default">デフォルトシステム</string>
     <!-- Option of color theme, follow the system battery saver settings. -->
     <string name="theme_battery_saver">バッテリーセーバーで設定</string>
-    <!-- Cloud Drive screen subtitle indicating a destination is required to be selected -->
-    <string name="cloud_drive_select_destination">宛先を選択</string>
     <!-- Warning which alerts the user before discard changes -->
     <string name="discard_changes_warning">変更内容を破棄してエディタを閉じてもよろしいですか？</string>
     <!-- Action discard -->
@@ -3520,8 +3518,6 @@
     <string name="shared_items_verify_credentials_verify_person_banner_label">共有フォルダにアクセスするには、あなたと共有した人もあなたを認証する必要があります。</string>
     <!--Name of the action on menu where %s will be replaced by the contact name that needs to be verified-->
     <string name="shared_items_bottom_sheet_menu_verify_user">%sさんを認証</string>
-    <!-- Context of snackbar when downloading the file that needs to be downloaded for previewing. -->
-    <string name="cloud_drive_snackbar_preparing_file_for_preview_context">プレビュー用にファイルを準備しています</string>
     <!-- Note for each achievement, which shows how many days left before achievement will expire. -->
     <plurals name="account_achievements_bonus_expiration_date">
         <item quantity="other">ボーナスは%1$d日後に有効期限が切れます</item>

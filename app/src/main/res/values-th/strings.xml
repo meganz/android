@@ -2726,8 +2726,6 @@
     <string name="theme_system_default">ค่าเริ่มต้นของระบบ</string>
     <!-- Option of color theme, follow the system battery saver settings. -->
     <string name="theme_battery_saver">ตั้งค่าโดยโหมดประหยัดแบตเตอรี่</string>
-    <!-- Cloud Drive screen subtitle indicating a destination is required to be selected -->
-    <string name="cloud_drive_select_destination">เลือกปลายทาง</string>
     <!-- Warning which alerts the user before discard changes -->
     <string name="discard_changes_warning">ยกเลิกการเปลี่ยนแปลงและปิดตัวแก้ไขหรือไม่</string>
     <!-- Action discard -->
@@ -3520,8 +3518,6 @@
     <string name="shared_items_verify_credentials_verify_person_banner_label">หากต้องการเข้าถึงโฟลเดอร์ที่แชร์ บุคคลที่แชร์โฟลเดอร์กับคุณควรมีการตรวจสอบด้วย</string>
     <!--Name of the action on menu where %s will be replaced by the contact name that needs to be verified-->
     <string name="shared_items_bottom_sheet_menu_verify_user">ตรวจสอบ %s</string>
-    <!-- Context of snackbar when downloading the file that needs to be downloaded for previewing. -->
-    <string name="cloud_drive_snackbar_preparing_file_for_preview_context">กำลังเตรียมไฟล์เพื่อแสดงตัวอย่าง</string>
     <!-- Note for each achievement, which shows how many days left before achievement will expire. -->
     <plurals name="account_achievements_bonus_expiration_date">
         <item quantity="other">โบนัสจะหมดอายุภายใน %1$d วัน</item>

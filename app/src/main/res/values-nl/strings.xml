@@ -2799,8 +2799,6 @@
     <string name="theme_system_default">Systeem standaard</string>
     <!-- Option of color theme, follow the system battery saver settings. -->
     <string name="theme_battery_saver">Ingesteld door Batterijbesparing</string>
-    <!-- Cloud Drive screen subtitle indicating a destination is required to be selected -->
-    <string name="cloud_drive_select_destination">Selecteer bestemming</string>
     <!-- Warning which alerts the user before discard changes -->
     <string name="discard_changes_warning">Wijzigingen negeren en de editor sluiten?</string>
     <!-- Action discard -->
@@ -3616,8 +3614,6 @@
     <string name="shared_items_verify_credentials_verify_person_banner_label">Om toegang te krijgen tot de gedeelde map, moet de persoon die deze met u heeft gedeeld, u ook verifiëren.</string>
     <!--Name of the action on menu where %s will be replaced by the contact name that needs to be verified-->
     <string name="shared_items_bottom_sheet_menu_verify_user">%sverifiëren</string>
-    <!-- Context of snackbar when downloading the file that needs to be downloaded for previewing. -->
-    <string name="cloud_drive_snackbar_preparing_file_for_preview_context">Bestand voorbereiden als voorbeeld</string>
     <!-- Note for each achievement, which shows how many days left before achievement will expire. -->
     <plurals name="account_achievements_bonus_expiration_date">
         <item quantity="one">Bonus verloopt over %1$d dag</item>

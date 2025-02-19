@@ -2726,8 +2726,6 @@
     <string name="theme_system_default">Mặc định hệ thống</string>
     <!-- Option of color theme, follow the system battery saver settings. -->
     <string name="theme_battery_saver">Tuân theo Tiết Kiệm Pin</string>
-    <!-- Cloud Drive screen subtitle indicating a destination is required to be selected -->
-    <string name="cloud_drive_select_destination">Chọn vi trí đích</string>
     <!-- Warning which alerts the user before discard changes -->
     <string name="discard_changes_warning">Loại bỏ các thay&#160;đổi và đóng trình soạn&#160;thảo?</string>
     <!-- Action discard -->
@@ -3520,8 +3518,6 @@
     <string name="shared_items_verify_credentials_verify_person_banner_label">Để có thể truy cập thư mục này, người chia sẻ thư mục này cho bạn cũng cần phải xác thực bạn.</string>
     <!--Name of the action on menu where %s will be replaced by the contact name that needs to be verified-->
     <string name="shared_items_bottom_sheet_menu_verify_user">Xác thực %s</string>
-    <!-- Context of snackbar when downloading the file that needs to be downloaded for previewing. -->
-    <string name="cloud_drive_snackbar_preparing_file_for_preview_context">Đang chuẩn bị tệp để xem trước</string>
     <!-- Note for each achievement, which shows how many days left before achievement will expire. -->
     <plurals name="account_achievements_bonus_expiration_date">
         <item quantity="other">Phần&#160;thưởng hết&#160;hạn trong %1$d ngày</item>

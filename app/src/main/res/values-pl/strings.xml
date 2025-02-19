@@ -2945,8 +2945,6 @@
     <string name="theme_system_default">Domyślne ustawienia systemu</string>
     <!-- Option of color theme, follow the system battery saver settings. -->
     <string name="theme_battery_saver">Ustawienie przez Battery Saver</string>
-    <!-- Cloud Drive screen subtitle indicating a destination is required to be selected -->
-    <string name="cloud_drive_select_destination">Wybierz miejsce na dysku</string>
     <!-- Warning which alerts the user before discard changes -->
     <string name="discard_changes_warning">Odrzucić zmiany i zamknąć edytor?</string>
     <!-- Action discard -->
@@ -3808,8 +3806,6 @@
     <string name="shared_items_verify_credentials_verify_person_banner_label">Aby uzyskać dostęp do udostępnionego katalogu, osoba, która go udostępniła, również powinna Cię zweryfikować.</string>
     <!--Name of the action on menu where %s will be replaced by the contact name that needs to be verified-->
     <string name="shared_items_bottom_sheet_menu_verify_user">Zweryfikuj %s</string>
-    <!-- Context of snackbar when downloading the file that needs to be downloaded for previewing. -->
-    <string name="cloud_drive_snackbar_preparing_file_for_preview_context">Przygotowanie pliku do podglądu</string>
     <!-- Note for each achievement, which shows how many days left before achievement will expire. -->
     <plurals name="account_achievements_bonus_expiration_date">
         <item quantity="one">Bonus wygasa za %1$d dzień</item>

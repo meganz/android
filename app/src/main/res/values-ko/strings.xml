@@ -2726,8 +2726,6 @@
     <string name="theme_system_default">시스템 기본값</string>
     <!-- Option of color theme, follow the system battery saver settings. -->
     <string name="theme_battery_saver">배터리 세이버 설정에 따름</string>
-    <!-- Cloud Drive screen subtitle indicating a destination is required to be selected -->
-    <string name="cloud_drive_select_destination">목적지 선택</string>
     <!-- Warning which alerts the user before discard changes -->
     <string name="discard_changes_warning">변경사항을 취소하고 편집기를 닫을까요?</string>
     <!-- Action discard -->
@@ -3520,8 +3518,6 @@
     <string name="shared_items_verify_credentials_verify_person_banner_label">공유된 폴더에 접근하려면, 당신에게 공유해준 사람도 당신을 인증해야 합니다.</string>
     <!--Name of the action on menu where %s will be replaced by the contact name that needs to be verified-->
     <string name="shared_items_bottom_sheet_menu_verify_user">%s 님 인증</string>
-    <!-- Context of snackbar when downloading the file that needs to be downloaded for previewing. -->
-    <string name="cloud_drive_snackbar_preparing_file_for_preview_context">파일 미리보기 준비 중</string>
     <!-- Note for each achievement, which shows how many days left before achievement will expire. -->
     <plurals name="account_achievements_bonus_expiration_date">
         <item quantity="other">%1$d일 내에 보너스가 만료됩니다</item>

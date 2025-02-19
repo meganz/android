@@ -2872,8 +2872,6 @@
     <string name="theme_system_default">Implicită a sistemului</string>
     <!-- Option of color theme, follow the system battery saver settings. -->
     <string name="theme_battery_saver">Setat în funcție de economisirea bateriei</string>
-    <!-- Cloud Drive screen subtitle indicating a destination is required to be selected -->
-    <string name="cloud_drive_select_destination">Selectează destinația</string>
     <!-- Warning which alerts the user before discard changes -->
     <string name="discard_changes_warning">Înlături modificările și închizi editorul?</string>
     <!-- Action discard -->
@@ -3712,8 +3710,6 @@
     <string name="shared_items_verify_credentials_verify_person_banner_label">Pentru a accesa folderul partajat, persoana care l-a partajat cu dvs. ar trebui să vă verifice și pe dvs.</string>
     <!--Name of the action on menu where %s will be replaced by the contact name that needs to be verified-->
     <string name="shared_items_bottom_sheet_menu_verify_user">Verifică pe %s</string>
-    <!-- Context of snackbar when downloading the file that needs to be downloaded for previewing. -->
-    <string name="cloud_drive_snackbar_preparing_file_for_preview_context">Se pregătește fișierul pentru previzualizare</string>
     <!-- Note for each achievement, which shows how many days left before achievement will expire. -->
     <plurals name="account_achievements_bonus_expiration_date">
         <item quantity="one">Bonusul expiră în %1$d zi</item>

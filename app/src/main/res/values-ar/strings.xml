@@ -301,7 +301,7 @@
     <!-- Delete a link label -->
     <string name="context_delete_link">حذف الرابط</string>
     <!-- Title alert before leaving a share. -->
-    <string name="alert_leave_share">Leave folder</string>
+    <string name="alert_leave_share">غادر المجلد</string>
     <!-- Item menu option upon right click on one or multiple files. -->
     <string name="context_clean_shares_menu">إزالة المشاركة</string>
     <!-- Item menu option upon right click on one or multiple files. -->
@@ -3091,8 +3091,6 @@
     <string name="theme_system_default">افتراضي النظام</string>
     <!-- Option of color theme, follow the system battery saver settings. -->
     <string name="theme_battery_saver">اضبط حسب موفر البطارية</string>
-    <!-- Cloud Drive screen subtitle indicating a destination is required to be selected -->
-    <string name="cloud_drive_select_destination">اختر الوجهة</string>
     <!-- Warning which alerts the user before discard changes -->
     <string name="discard_changes_warning">تجاهل التغييرات وأغلق المحرر؟</string>
     <!-- Action discard -->
@@ -4000,8 +3998,6 @@
     <string name="shared_items_verify_credentials_verify_person_banner_label">للوصول إلى المجلد المشارك يجب على الشخص الذي شاركه معك التحقق منك أيضًا.</string>
     <!--Name of the action on menu where %s will be replaced by the contact name that needs to be verified-->
     <string name="shared_items_bottom_sheet_menu_verify_user">تحقق من %s</string>
-    <!-- Context of snackbar when downloading the file that needs to be downloaded for previewing. -->
-    <string name="cloud_drive_snackbar_preparing_file_for_preview_context">تحضير الملف للعرض</string>
     <!-- Note for each achievement, which shows how many days left before achievement will expire. -->
     <plurals name="account_achievements_bonus_expiration_date">
         <item quantity="zero">تنتهي صلاحية المكافأة في %1$d يوم</item>

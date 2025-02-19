@@ -2726,8 +2726,6 @@
     <string name="theme_system_default">系統預設</string>
     <!-- Option of color theme, follow the system battery saver settings. -->
     <string name="theme_battery_saver">由省電模式設定</string>
-    <!-- Cloud Drive screen subtitle indicating a destination is required to be selected -->
-    <string name="cloud_drive_select_destination">選擇目的地</string>
     <!-- Warning which alerts the user before discard changes -->
     <string name="discard_changes_warning">捨棄更改並關閉編輯器？</string>
     <!-- Action discard -->
@@ -3520,8 +3518,6 @@
     <string name="shared_items_verify_credentials_verify_person_banner_label">若要存取共享資料夾，與您共享它的人也應驗證您。</string>
     <!--Name of the action on menu where %s will be replaced by the contact name that needs to be verified-->
     <string name="shared_items_bottom_sheet_menu_verify_user">驗證%s</string>
-    <!-- Context of snackbar when downloading the file that needs to be downloaded for previewing. -->
-    <string name="cloud_drive_snackbar_preparing_file_for_preview_context">正在準備檔案預覽</string>
     <!-- Note for each achievement, which shows how many days left before achievement will expire. -->
     <plurals name="account_achievements_bonus_expiration_date">
         <item quantity="other">獎勵將在%1$d天後到期</item>

@@ -242,8 +242,8 @@
         <item quantity="many">Compartilhar links</item>
         <item quantity="other">Compartilhar links</item>
     </plurals>
-    <!-- Title of the dialog to ask the user to use the selected location as default location for next downloads-->
-    <string name="transfers_dialog_save_download_location_title">Fazer o download nesta localização?</string>
+    <!-- Title of the dialog to ask the user to use the selected location as default location for next downloads. Please do not modify the %s placeholder as it will be replaced by the name of the folder where the files will be downloaded-->
+    <string name="transfers_dialog_save_download_location_title">Salvar todos downloads em “%1$s”?</string>
     <!-- Option to don't use the selected location as default location for next downloads-->
     <string name="transfers_dialog_save_download_location_only_this_time_option">Somente esta vez</string>
     <!-- Option to use the selected location as default location for next downloads-->
@@ -896,4 +896,54 @@
         <item quantity="many">%2$d de arquivos foram adicionados a “%1$s”. Alguns arquivos já existem e não podem ser adicionados novamente.</item>
         <item quantity="other">%2$d arquivos foram adicionados a “%1$s”. Alguns arquivos já existem e não podem ser adicionados novamente.</item>
     </plurals>
+    <!--Content on the Multi-Factor Authentication Login page -->
+    <string name="multi_factor_auth_login_verification_content">Digite o código de seis dígitos do seu aplicativo de autenticação.</string>
+    <!--Message to be shown to the user when they entered an incorrect verification code-->
+    <string name="multi_factor_auth_login_verification_input_error_text">Código de verificação incorreto</string>
+    <!-- Snackbar text to inform the user that preview may take some time because it needs to be downloaded -->
+    <string name="transfers_preview_slow_snackbar">Preparando o arquivo para visualização. Consulte a notificação para mais informações.</string>
+    <!-- Notification text for preview downloads.  Please do not modify the %s placeholder as it will be replaced by the name of the file to be donwloaded -->
+    <string name="transfers_notification_downloading_preview">Preparando %1$s para ser visualizado</string>
+    <!-- Notification text for preview downloads, paused state.  Please do not modify the %s placeholder as it will be replaced by the name of the file to be donwloaded -->
+    <string name="transfers_notification_downloading_preview_paused">Preparando %1$s para visualização (em pausa)</string>
+    <!-- Message when successfully deleting single item from the audio queue. %1$s will be replaced with the item name -->
+    <string name="audio_queue_single_item_removed_message">“%1$s” foi removido</string>
+    <!-- Message when successfully deleting items from the audio queue. %1$d will be replaced with the removal count when multiple items are removed. -->
+    <string name="audio_queue_multiple_items_removed_message">Removed %1$d items from queue</string>
+    <!-- Message when successfully deleting items from the audio queue. %1$s will be replaced with the item name %2$d will be replaced with the removal count. -->
+    <plurals name="audio_queue_items_removal_success_message">
+        <item quantity="one">“%s” foi removido</item>
+        <item quantity="many">%2$d de itens foram eliminados da lista</item>
+        <item quantity="other">%2$d itens foram eliminados da lista</item>
+    </plurals>
+    <!-- Title for the dialog to inform that a transfer is needed to preview a file and transfers are paused-->
+    <string name="transfers_preview_paused_dialog_title">Transferências foram pausadas</string>
+    <!-- Message for the dialog to inform that a transfer is needed to preview a file and transfers are paused-->
+    <string name="transfers_preview_paused_dialog_text">Para visualizar “%1$s”, você vai precisar retomar as transferências</string>
+    <!--SD Card text shown as title in FileStorage screen -->
+    <string name="general_sd_card">Cartão SD</string>
+    <!--The title of the Login page-->
+    <string name="login_page_title">Faça login na sua conta do MEGA</string>
+    <!--Message to be shown to the user when they entered an invalid email-->
+    <string name="login_invalid_email_error_message">Por favor, digite um email válido</string>
+    <!--Message to be shown to the user when they entered an invalid format password-->
+    <string name="login_invalid_password_error_message">Digite a sua senha</string>
+    <!--Message to be shown to the user when they entered the wrong credential-->
+    <string name="login_wrong_credential_error_message">Email ou senha inválidos</string>
+    <!--Message to be shown to he user when the account is not validated -->
+    <string name="login_account_not_validated">O cadastro da sua conta está incompleto ou foi cancelado. Verifique o seu email.</string>
+    <!--Message to be shown to the user when login fails due to multiple failed attempts-->
+    <string name="login_too_many_attempts_error_message">Você tentou fazer login muitas vezes - espere e tente novamente.</string>
+    <!--The footer text to be shown where a user can sign up if they do not have a MEGA account-->
+    <string name="login_page_sign_up_action_footer_text">Ainda não tem uma conta no MEGA? [A]Cadastre-se[/A]</string>
+    <!-- Title of setting Two-Factor Authentication -->
+    <string name="settings_2fa">Autenticação de dois fatores</string>
+    <!-- email label -->
+    <string name="email_text">Email</string>
+    <!-- password label -->
+    <string name="password_text">Senha</string>
+    <!-- Login button -->
+    <string name="login_text">Fazer login</string>
+    <!--The text where user forgot their password and will navigate to reset it-->
+    <string name="login_page_forgot_password_text">Esqueceu a sua senha?</string>
 </resources>
