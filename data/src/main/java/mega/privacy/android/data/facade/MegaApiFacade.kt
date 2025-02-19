@@ -1041,22 +1041,6 @@ internal class MegaApiFacade @Inject constructor(
         listener: MegaRequestListenerInterface,
     ) = megaApi.submitPurchaseReceipt(gateway, receipt, listener)
 
-    override fun submitPurchaseReceipt(
-        gateway: Int,
-        receipt: String?,
-        lastPublicHandle: Long,
-        lastPublicHandleType: Int,
-        lastAccessTimestamp: Long,
-        listener: MegaRequestListenerInterface,
-    ) = megaApi.submitPurchaseReceipt(
-        gateway,
-        receipt,
-        lastPublicHandle,
-        lastPublicHandleType,
-        lastAccessTimestamp,
-        listener,
-    )
-
     override fun setMyChatFilesFolder(nodeHandle: Long, listener: MegaRequestListenerInterface) =
         megaApi.setMyChatFilesFolder(
             nodeHandle,

@@ -18,10 +18,8 @@ import mega.privacy.android.app.utils.TimeUtils
 import mega.privacy.android.data.database.DatabaseHandler
 import mega.privacy.android.data.facade.AccountInfoWrapper
 import mega.privacy.android.data.gateway.api.MegaApiGateway
-import mega.privacy.android.data.model.MegaAttributes
 import mega.privacy.android.domain.entity.account.AccountDetail
 import mega.privacy.android.domain.entity.billing.MegaPurchase
-import nz.mega.sdk.MegaApiJava
 import nz.mega.sdk.MegaError
 import nz.mega.sdk.MegaRequest
 import timber.log.Timber
@@ -108,9 +106,6 @@ class AccountInfoFacade @Inject constructor(
         val json = purchase.receipt
         Timber.d("ORIGINAL JSON:$json") //Print JSON in logs to help debug possible payments issues
 
-        val attributes: MegaAttributes? = db.get().attributes
-
-        val lastPublicHandle = attributes?.lastPublicHandle ?: megaApiGateway.getInvalidHandle()
         val listener = OptionalMegaRequestListenerInterface(
             onRequestFinish = { _, error ->
                 if (error.errorCode != MegaError.API_OK) {
@@ -121,16 +116,7 @@ class AccountInfoFacade @Inject constructor(
 
         if (purchase.level > myAccountInfo.levelAccountDetails) {
             Timber.d("megaApi.submitPurchaseReceipt is invoked")
-            if (lastPublicHandle == MegaApiJava.INVALID_HANDLE) {
-                megaApiGateway.submitPurchaseReceipt(PAYMENT_GATEWAY, json, listener)
-            } else {
-                attributes?.run {
-                    megaApiGateway.submitPurchaseReceipt(
-                        PAYMENT_GATEWAY, json, lastPublicHandle,
-                        lastPublicHandleType, lastPublicHandleTimeStamp, listener
-                    )
-                }
-            }
+            megaApiGateway.submitPurchaseReceipt(PAYMENT_GATEWAY, json, listener)
         }
     }
 
