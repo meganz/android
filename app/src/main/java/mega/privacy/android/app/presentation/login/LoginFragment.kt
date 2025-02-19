@@ -839,8 +839,13 @@ class LoginFragment : Fragment() {
                 Constants.ACTION_REFRESH == intentAction || Constants.ACTION_REFRESH_API_SERVER == intentAction ->
                     return
 
-                is2FARequired || multiFactorAuthState != null ->
-                    showConfirmLogoutDialog()
+                is2FARequired || multiFactorAuthState != null -> {
+                    if (isLoginNewDesignEnabled) {
+                        viewModel.stopLogin()
+                    } else {
+                        showConfirmLogoutDialog()
+                    }
+                }
 
                 loginMutex.isLocked || isLoginInProgress || isFastLoginInProgress || fetchNodesUpdate != null ->
                     activity?.moveTaskToBack(true)
