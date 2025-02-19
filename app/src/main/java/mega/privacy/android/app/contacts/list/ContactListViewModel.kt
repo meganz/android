@@ -11,7 +11,7 @@ import dagger.hilt.android.lifecycle.HiltViewModel
 import dagger.hilt.android.qualifiers.ApplicationContext
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.flow.MutableStateFlow
-import kotlinx.coroutines.flow.asStateFlow
+import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.catch
 import kotlinx.coroutines.flow.collectLatest
 import kotlinx.coroutines.flow.combine
@@ -80,15 +80,13 @@ internal class ContactListViewModel @Inject constructor(
 ) : ViewModel() {
     private val queryString = MutableStateFlow<String?>(null)
     private val contacts: MutableStateFlow<List<ContactItem>> = MutableStateFlow(emptyList())
-    private val _state = MutableStateFlow(ContactListState())
-
     private var monitorSFUServerUpgradeJob: Job? = null
 
     /**
      * State of the UI for the contact list screen.
      */
-    val state = _state.asStateFlow()
-
+    val state: StateFlow<ContactListState>
+        field: MutableStateFlow<ContactListState> = MutableStateFlow(ContactListState())
 
     init {
         viewModelScope.launch {
@@ -124,8 +122,8 @@ internal class ContactListViewModel @Inject constructor(
                     .map { it.incomingContactRequests.size }
                     .catch { Timber.e(it) }
                     .collectLatest {
-                        _state.update { state ->
-                            state.copy(
+                        state.update { current ->
+                            current.copy(
                                 contactActionItems = listOf(
                                     ContactActionItem(
                                         Type.REQUESTS,
@@ -187,8 +185,8 @@ internal class ContactListViewModel @Inject constructor(
         runCatching {
             get1On1ChatIdUseCase(userHandle)
         }.onSuccess { chatId ->
-            _state.update {
-                it.copy(
+            state.update { current: ContactListState ->
+                current.copy(
                     shouldOpenChatWithId = chatId
                 )
             }
@@ -201,7 +199,7 @@ internal class ContactListViewModel @Inject constructor(
      * Reset chat navigation state
      */
     fun onChatOpened() {
-        _state.update {
+        state.update {
             it.copy(
                 shouldOpenChatWithId = null
             )
@@ -307,14 +305,14 @@ internal class ContactListViewModel @Inject constructor(
     }
 
     private fun showForceUpdateDialog() {
-        _state.update { it.copy(showForceUpdateDialog = true) }
+        state.update { it.copy(showForceUpdateDialog = true) }
     }
 
     /**
      * Set to false to hide the dialog
      */
     fun onForceUpdateDialogDismissed() {
-        _state.update { it.copy(showForceUpdateDialog = false) }
+        state.update { it.copy(showForceUpdateDialog = false) }
     }
 
     /**
