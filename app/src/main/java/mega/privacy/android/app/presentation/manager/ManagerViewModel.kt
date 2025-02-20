@@ -544,7 +544,6 @@ class ManagerViewModel @Inject constructor(
             monitorChatListItemUpdates().catch {
                 Timber.e("An error occurred while monitoring the Chat List Item Updates $it")
             }.collect {
-                Timber.d("The Chat List Item Updates is $it")
                 if (it.isPreview) {
                     return@collect
                 }
