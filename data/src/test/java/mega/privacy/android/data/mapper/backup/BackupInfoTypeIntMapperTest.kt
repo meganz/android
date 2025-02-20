@@ -24,8 +24,14 @@ internal class BackupInfoTypeIntMapperTest {
 
     @ParameterizedTest(name = "when backupInfoType is {1}, then sdkType is {0}")
     @MethodSource("provideParameters")
-    fun `test that the mapping is correct`(sdkType: Int, backupInfoType: BackupInfoType) {
+    fun `test that the direct mapping is correct`(sdkType: Int, backupInfoType: BackupInfoType) {
         Truth.assertThat(underTest(backupInfoType)).isEqualTo(sdkType)
+    }
+
+    @ParameterizedTest(name = "when sdkType is {0}, then backupInfoType is {1}")
+    @MethodSource("provideParameters")
+    fun `test that the inverse mapping is correct`(sdkType: Int, backupInfoType: BackupInfoType) {
+        Truth.assertThat(underTest(sdkType)).isEqualTo(backupInfoType)
     }
 
     private fun provideParameters() = Stream.of(
