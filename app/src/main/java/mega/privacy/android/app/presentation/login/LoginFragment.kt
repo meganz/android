@@ -149,6 +149,7 @@ class LoginFragment : Fragment() {
                     onLostAuthenticatorDevice = ::onLostAuthenticationDevice,
                     onBackPressed = { onBackPressed(uiState) },
                     onReportIssue = ::openLoginIssueHelpdeskPage,
+                    onLoginExceptionConsumed = viewModel::setLoginErrorConsumed,
                 )
             }
         } else {

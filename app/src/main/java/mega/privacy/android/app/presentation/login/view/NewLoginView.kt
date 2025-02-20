@@ -23,6 +23,7 @@ import androidx.compose.material3.IconButton
 import androidx.compose.material3.SnackbarDuration
 import androidx.compose.material3.SnackbarHostState
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -53,6 +54,7 @@ import mega.android.core.ui.components.LinkSpannedText
 import mega.android.core.ui.components.MegaScaffold
 import mega.android.core.ui.components.MegaSnackbar
 import mega.android.core.ui.components.MegaText
+import mega.android.core.ui.components.banner.InlineErrorBanner
 import mega.android.core.ui.components.button.PrimaryFilledButton
 import mega.android.core.ui.components.button.TextOnlyButton
 import mega.android.core.ui.components.image.MegaIcon
@@ -76,6 +78,8 @@ import mega.privacy.android.app.presentation.extensions.isDarkMode
 import mega.privacy.android.app.presentation.extensions.login.newError
 import mega.privacy.android.app.presentation.login.model.LoginState
 import mega.privacy.android.domain.entity.account.AccountSession
+import mega.privacy.android.domain.exception.LoginTooManyAttempts
+import mega.privacy.android.domain.exception.LoginWrongEmailOrPassword
 import mega.privacy.android.shared.original.core.ui.preview.CombinedThemePhoneLandscapePreviews
 import mega.privacy.android.shared.original.core.ui.preview.CombinedThemePreviews
 import mega.privacy.android.shared.original.core.ui.theme.OriginalTheme
@@ -110,6 +114,7 @@ fun NewLoginView(
     onBackPressed: () -> Unit,
     onReportIssue: () -> Unit,
     modifier: Modifier = Modifier,
+    onLoginExceptionConsumed: () -> Unit = {},
 ) {
     val snackbarHostState = remember { SnackbarHostState() }
     var showChangeApiServerDialog by rememberSaveable { mutableStateOf(false) }
@@ -167,6 +172,7 @@ fun NewLoginView(
                     onCreateAccount = onCreateAccount,
                     onChangeApiServer = { showChangeApiServerDialog = true },
                     modifier = Modifier.padding(paddingValues),
+                    onLoginExceptionConsumed = onLoginExceptionConsumed,
                 )
 
                 is2FARequired || multiFactorAuthState != null -> NewTwoFactorAuthentication(
@@ -210,10 +216,22 @@ private fun RequireLogin(
     onCreateAccount: () -> Unit,
     onChangeApiServer: () -> Unit,
     modifier: Modifier = Modifier,
+    onLoginExceptionConsumed: () -> Unit = {},
 ) {
     val scrollState = rememberScrollState()
     val focusManager = LocalFocusManager.current
     val orientation = LocalConfiguration.current.orientation
+    var wrongCredentials by remember { mutableStateOf(false) }
+    var tooManyAttempts by remember { mutableStateOf(false) }
+
+    LaunchedEffect(state.loginException) {
+        if (state.loginException is LoginWrongEmailOrPassword) {
+            wrongCredentials = true
+        } else if (state.loginException is LoginTooManyAttempts) {
+            tooManyAttempts = true
+        }
+        onLoginExceptionConsumed()
+    }
 
     Box(
         modifier = modifier
@@ -281,10 +299,14 @@ private fun RequireLogin(
                 label = stringResource(id = sharedR.string.email_text),
                 text = state.accountSession?.email.orEmpty(),
                 onValueChanged = {
+                    wrongCredentials = false
+                    tooManyAttempts = false
                     onEmailChanged(it.trim())
                 },
                 errorText = when {
                     state.emailError != null -> stringResource(state.emailError.newError)
+                    wrongCredentials -> ""
+                    tooManyAttempts -> ""
                     else -> null
                 }
             )
@@ -298,13 +320,41 @@ private fun RequireLogin(
                 label = stringResource(id = sharedR.string.password_text),
                 text = state.password.orEmpty(),
                 onValueChanged = {
+                    wrongCredentials = false
+                    tooManyAttempts = false
                     onPasswordChanged(it)
                 },
                 errorText = when {
                     state.passwordError != null -> stringResource(state.passwordError.newError)
+                    wrongCredentials -> ""
+                    tooManyAttempts -> ""
                     else -> null
                 }
             )
+            if (wrongCredentials) {
+                InlineErrorBanner(
+                    modifier = Modifier
+                        .testTag(LoginTestTags.WRONG_CREDENTIAL_BANNER)
+                        .fillMaxWidth()
+                        .padding(
+                            top = 24.dp, start = 16.dp, end = 16.dp
+                        ),
+                    body = stringResource(sharedR.string.login_wrong_credential_error_message),
+                    showCancelButton = false
+                )
+            }
+
+            if (tooManyAttempts) {
+                InlineErrorBanner(
+                    modifier = Modifier
+                        .testTag(LoginTestTags.TOO_MANY_ATTEMPTS_BANNER)
+                        .fillMaxWidth()
+                        .padding(top = 24.dp, start = 16.dp, end = 16.dp),
+                    body = stringResource(sharedR.string.login_too_many_attempts_error_message),
+                    showCancelButton = false
+                )
+            }
+
 
             PrimaryFilledButton(
                 modifier = Modifier

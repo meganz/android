@@ -10,6 +10,8 @@ import mega.privacy.android.app.presentation.login.model.LoginError
 import mega.privacy.android.app.presentation.login.model.LoginState
 import mega.privacy.android.app.presentation.login.view.LoginTestTags
 import mega.privacy.android.app.presentation.login.view.NewLoginView
+import mega.privacy.android.domain.exception.LoginTooManyAttempts
+import mega.privacy.android.domain.exception.LoginWrongEmailOrPassword
 import org.junit.Rule
 import org.junit.Test
 import org.junit.runner.RunWith
@@ -107,5 +109,33 @@ class NewLoginViewTest {
             .assertExists()
         composeRule.onNodeWithText(fromId(sharedR.string.login_invalid_email_error_message))
             .assertDoesNotExist()
+    }
+
+    @Test
+    fun `test that wrong email or password shows when email or password is incorrect`() {
+        setupRule(
+            state = stateWithLoginRequired.copy(
+                loginException = LoginWrongEmailOrPassword()
+            )
+        )
+
+        composeRule.onNodeWithText(fromId(sharedR.string.login_wrong_credential_error_message))
+            .assertExists()
+        composeRule.onNodeWithTag(LoginTestTags.WRONG_CREDENTIAL_BANNER)
+            .assertExists()
+    }
+
+    @Test
+    fun `test that too many attempts shows when too many attempts`() {
+        setupRule(
+            state = stateWithLoginRequired.copy(
+                loginException = LoginTooManyAttempts()
+            )
+        )
+
+        composeRule.onNodeWithText(fromId(sharedR.string.login_too_many_attempts_error_message))
+            .assertExists()
+        composeRule.onNodeWithTag(LoginTestTags.TOO_MANY_ATTEMPTS_BANNER)
+            .assertExists()
     }
 }
