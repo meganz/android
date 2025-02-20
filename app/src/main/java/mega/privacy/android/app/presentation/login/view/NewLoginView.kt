@@ -72,6 +72,7 @@ import mega.android.core.ui.theme.devicetype.LocalDeviceType
 import mega.android.core.ui.theme.values.IconColor
 import mega.android.core.ui.theme.values.LinkColor
 import mega.android.core.ui.theme.values.TextColor
+import mega.privacy.android.analytics.Analytics
 import mega.privacy.android.app.R
 import mega.privacy.android.app.presentation.apiserver.view.ChangeApiServerDialog
 import mega.privacy.android.app.presentation.extensions.isDarkMode
@@ -83,6 +84,7 @@ import mega.privacy.android.domain.exception.LoginWrongEmailOrPassword
 import mega.privacy.android.shared.original.core.ui.preview.CombinedThemePhoneLandscapePreviews
 import mega.privacy.android.shared.original.core.ui.preview.CombinedThemePreviews
 import mega.privacy.android.shared.original.core.ui.theme.OriginalTheme
+import mega.privacy.mobile.analytics.event.LoginHelpButtonPressedEvent
 
 /**
  * Login fragment view.
@@ -141,7 +143,10 @@ fun NewLoginView(
                     navigationType = AppBarNavigationType.Back(onBackPressed),
                     trailingIcons = {
                         IconButton(
-                            onClick = onReportIssue,
+                            onClick = {
+                                onReportIssue()
+                                Analytics.tracker.trackEvent(LoginHelpButtonPressedEvent)
+                            },
                         ) {
                             MegaIcon(
                                 painter = painterResource(id = mega.privacy.android.icon.pack.R.drawable.ic_help_circle_medium_regular_outline),
