@@ -288,8 +288,6 @@ class UploadFolderActivity : PasscodeActivity(), Scrollable {
                 getString(mega.privacy.android.shared.resources.R.string.general_select_folder)
         }
         binding.uploadButton.setOnClickListener {
-            actionMode?.finish()
-            invalidateOptionsMenu()
             if (type == UploadFolderType.SINGLE_SELECT) {
                 setResult(
                     Activity.RESULT_OK, Intent().apply {
@@ -300,6 +298,8 @@ class UploadFolderActivity : PasscodeActivity(), Scrollable {
             } else {
                 showProgress(true)
                 viewModel.upload()
+                actionMode?.finish()
+                invalidateOptionsMenu()
             }
         }
 
