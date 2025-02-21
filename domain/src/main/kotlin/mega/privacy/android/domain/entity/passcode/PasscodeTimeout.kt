@@ -31,4 +31,8 @@ sealed interface PasscodeTimeout {
             fun ofMinutes(minutes: Int) = TimeSpan.ofSeconds(minutes * 60)
         }
     }
+
+    companion object {
+        val DEFAULT = TimeSpan.ofSeconds(30)
+    }
 }

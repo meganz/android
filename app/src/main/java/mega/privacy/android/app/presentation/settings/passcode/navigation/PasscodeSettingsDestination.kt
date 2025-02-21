@@ -44,9 +44,7 @@ internal fun NavGraphBuilder.passCodeSettings(
             if (!isSuccess) {
                 Timber.w("Set passcode pin failed when enabling passcode")
             } else {
-                if (uiState.timeout == null) {
-                    navigateToSelectTimeout()
-                }
+                viewModel.onPasscodeEnabled()
             }
         }
 
