@@ -143,18 +143,7 @@ internal fun SaveScannedDocumentsFilenameGroup(
                 placeholder = "",
                 showIndicatorLine = isFocused || (filenameValidationStatus != null && filenameValidationStatus != ScanFilenameValidationStatus.ValidFilename),
                 onTextChange = { newTextFieldValue ->
-                    // The entire filename, including the file extension, is retrieved in the text
-                    // input before any file input manipulations. Remove the selected file extension
-                    // from the input before calling onFilenameChanged
-                    val newText = newTextFieldValue.text
-                    val fileSuffix = scanFileType.fileSuffix
-
-                    val textToUse = if (newText.endsWith(fileSuffix)) {
-                        newText.substringBeforeLast(fileSuffix)
-                    } else {
-                        newText
-                    }
-                    onFilenameChanged(textToUse)
+                    onFilenameChanged(newTextFieldValue.text)
 
                     if (keepWholeSelection) {
                         keepWholeSelection = false
