@@ -84,7 +84,9 @@ import mega.privacy.android.domain.exception.LoginWrongEmailOrPassword
 import mega.privacy.android.shared.original.core.ui.preview.CombinedThemePhoneLandscapePreviews
 import mega.privacy.android.shared.original.core.ui.preview.CombinedThemePreviews
 import mega.privacy.android.shared.original.core.ui.theme.OriginalTheme
+import mega.privacy.mobile.analytics.event.LoginButtonPressedEvent
 import mega.privacy.mobile.analytics.event.LoginHelpButtonPressedEvent
+import mega.privacy.mobile.analytics.event.SignUpButtonOnLoginPagePressedEvent
 
 /**
  * Login fragment view.
@@ -130,7 +132,7 @@ fun NewLoginView(
             MegaSnackbar(snackbarHostState)
         },
         topBar = {
-            if (state.is2FARequired || state.multiFactorAuthState != null) {
+            if (state.is2FARequired && !showLoginInProgress) {
                 MegaTopAppBar(
                     modifier = Modifier.statusBarsPadding(),
                     navigationType = AppBarNavigationType.Back(onBackPressed),
@@ -370,6 +372,7 @@ private fun RequireLogin(
                 text = stringResource(id = sharedR.string.login_text),
                 isLoading = false,
                 onClick = {
+                    Analytics.tracker.trackEvent(LoginButtonPressedEvent)
                     focusManager.clearFocus(true)
                     onLoginClicked()
                 },
@@ -410,6 +413,7 @@ private fun RequireLogin(
                 ),
                 baseStyle = AppTheme.typography.bodyMedium.copy(textAlign = TextAlign.Center),
                 onAnnotationClick = {
+                    Analytics.tracker.trackEvent(SignUpButtonOnLoginPagePressedEvent)
                     onCreateAccount()
                 }
             )

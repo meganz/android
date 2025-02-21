@@ -181,12 +181,15 @@ fun NewTwoFactorAuthentication(
                         .testTag(TWO_FA_INPUT_FIELD_TEST_TAG)
                         .focusRequester(request),
                     value = code,
-                    isCodeCorrect = state.multiFactorAuthState?.let { it == MultiFactorAuthState.Passed },
+                    isCodeCorrect = state.multiFactorAuthState?.takeIf {
+                        it != MultiFactorAuthState.Checking
+                                && it != MultiFactorAuthState.Fixed
+                    }?.let { it == MultiFactorAuthState.Passed },
                     errorText = stringResource(sharedR.string.multi_factor_auth_login_verification_input_error_text),
                     onValueChange = {
                         code = it
+                        on2FAChanged(code)
                         if (code.length == DEFAULT_VERIFICATION_INPUT_LENGTH) {
-                            on2FAChanged(code)
                             softKeyboard?.hide()
                         }
                     }
@@ -201,7 +204,7 @@ fun NewTwoFactorAuthentication(
             }
         }
 
-        if (state.multiFactorAuthState != null && state.multiFactorAuthState != MultiFactorAuthState.Failed) {
+        if (state.multiFactorAuthState == MultiFactorAuthState.Checking) {
             LargeHUD(
                 modifier = Modifier
                     .testTag(TWO_FA_PROGRESS_TEST_TAG)

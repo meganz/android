@@ -94,6 +94,8 @@ import mega.privacy.android.domain.usecase.transfers.paused.CheckIfTransfersShou
 import mega.privacy.android.domain.usecase.transfers.uploads.StartUploadsWorkerUseCase
 import mega.privacy.android.domain.usecase.workers.StopCameraUploadsUseCase
 import mega.privacy.mobile.analytics.event.AccountRegistrationEvent
+import mega.privacy.mobile.analytics.event.MultiFactorAuthVerificationFailedEvent
+import mega.privacy.mobile.analytics.event.MultiFactorAuthVerificationSuccessEvent
 import timber.log.Timber
 import javax.inject.Inject
 
@@ -610,13 +612,17 @@ class LoginViewModel @Inject constructor(
                         pin2FA,
                         DisableChatApiUseCase { MegaApplication.getInstance()::disableMegaChatApi }
                     ).collectLatest { status ->
-                        _state.update { it.copy(multiFactorAuthState = MultiFactorAuthState.Passed) }
                         status.checkStatus(email = email)
+                        if (status == LoginStatus.LoginSucceed) {
+                            _state.update { it.copy(multiFactorAuthState = MultiFactorAuthState.Passed) }
+                            Analytics.tracker.trackEvent(MultiFactorAuthVerificationSuccessEvent)
+                        }
                     }
                 }.onFailure { exception ->
                     if (exception !is LoginException) return@onFailure
 
                     if (exception is LoginWrongMultiFactorAuth) {
+                        Analytics.tracker.trackEvent(MultiFactorAuthVerificationFailedEvent)
                         _state.update {
                             it.copy(
                                 isLoginInProgress = false,
@@ -893,6 +899,11 @@ class LoginViewModel @Inject constructor(
     fun on2FAChanged(twoFA: String) = twoFA.getTwoFactorAuthentication()?.let {
         updateTwoFAState(it)
         performLoginWith2FA(twoFA)
+    } ?: run {
+        _state.update { state ->
+            state.copy(multiFactorAuthState = MultiFactorAuthState.Fixed
+                .takeUnless { state.multiFactorAuthState == MultiFactorAuthState.Failed })
+        }
     }
 
     private fun updateTwoFAState(twoFA: List<String>) {
