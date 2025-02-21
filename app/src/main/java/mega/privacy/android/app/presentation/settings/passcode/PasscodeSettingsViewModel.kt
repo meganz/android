@@ -8,6 +8,7 @@ import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
+import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.catch
 import kotlinx.coroutines.flow.filterNotNull
 import kotlinx.coroutines.flow.mapLatest
@@ -43,11 +44,13 @@ class PasscodeSettingsViewModel @Inject constructor(
     private val setPasscodeTimeoutUseCase: SetPasscodeTimeoutUseCase,
 ) : ViewModel() {
 
+
+    private val _state = MutableStateFlow(PasscodeSettingsUIState.INITIAL)
+
     /**
      * State
      */
-    val state: StateFlow<PasscodeSettingsUIState>
-        field:MutableStateFlow<PasscodeSettingsUIState> = MutableStateFlow(PasscodeSettingsUIState.INITIAL)
+    val state: StateFlow<PasscodeSettingsUIState> = _state.asStateFlow()
 
     init {
         viewModelScope.launch {
@@ -67,7 +70,7 @@ class PasscodeSettingsViewModel @Inject constructor(
                 }).catch {
                     Timber.e(it, "An error was thrown in the passcode settings ui state flow")
                 }.collect {
-                    state.update(it)
+                    _state.update(it)
                 }
             }.onFailure {
                 Timber.e(
