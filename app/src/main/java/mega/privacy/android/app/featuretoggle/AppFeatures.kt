@@ -144,7 +144,7 @@ enum class AppFeatures(override val description: String, private val defaultValu
      */
     SearchWithDescription(
         "Enable search with description",
-        false
+        true
     ),
 
     /**
