@@ -42,6 +42,7 @@ class MediaSessionHelper(
                             KeyEvent.KEYCODE_MEDIA_PLAY,
                             KeyEvent.KEYCODE_MEDIA_PAUSE,
                             KeyEvent.KEYCODE_HEADSETHOOK,
+                            KeyEvent.KEYCODE_MEDIA_PLAY_PAUSE,
                                 -> onPlayPauseClicked()
 
                             KeyEvent.KEYCODE_MEDIA_NEXT -> onNextClicked()
