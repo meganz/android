@@ -39,6 +39,7 @@ import mega.privacy.mobile.analytics.event.AndroidSyncRenameAllItemsEvent
  * @param onBackupFolderClicked Callback invoked when the user clicks to manage backup folders.
  * @param onSelectStopBackupDestinationClicked Callback invoked when the user clicks to stop a backup destination.
  * @param onOpenUpgradeAccountClicked Callback invoked when the user clicks to upgrade their account.
+ * @param onCameraUploadsSettingsClicked Callback invoked when the user clicks to see the Camera Uploads settings.
  * @param isInCloudDrive Indicates whether the user is currently within the cloud drive context. Defaults to false.
  * @param selectedChip The currently selected chip in the sync list UI. Defaults to [SyncChip.SYNC_FOLDERS].
  * @param onOpenMegaFolderClicked Callback invoked when the user clicks to open a specific Mega folder.
@@ -50,6 +51,7 @@ fun SyncListRoute(
     onBackupFolderClicked: () -> Unit,
     onSelectStopBackupDestinationClicked: () -> Unit,
     onOpenUpgradeAccountClicked: () -> Unit,
+    onCameraUploadsSettingsClicked: () -> Unit,
     isInCloudDrive: Boolean = false,
     selectedChip: SyncChip = SyncChip.SYNC_FOLDERS,
     onFabExpanded: (Boolean) -> Unit = {},
@@ -72,6 +74,7 @@ fun SyncListRoute(
         viewModel = hiltViewModel(),
         selectedChip = selectedChip,
         onOpenMegaFolderClicked = onOpenMegaFolderClicked,
+        onCameraUploadsSettingsClicked = onCameraUploadsSettingsClicked,
         onFabExpanded = onFabExpanded,
     )
 }
@@ -82,6 +85,7 @@ internal fun SyncListRoute(
     onSyncFolderClicked: () -> Unit,
     onBackupFolderClicked: () -> Unit,
     onOpenMegaFolderClicked: (handle: Long) -> Unit,
+    onCameraUploadsSettingsClicked: () -> Unit,
     onSelectStopBackupDestinationClicked: () -> Unit,
     onOpenUpgradeAccountClicked: () -> Unit,
     syncFoldersViewModel: SyncFoldersViewModel,
@@ -104,6 +108,7 @@ internal fun SyncListRoute(
         isInCloudDrive = isInCloudDrive,
         stalledIssuesCount = state.stalledIssuesCount,
         onOpenMegaFolderClicked = onOpenMegaFolderClicked,
+        onCameraUploadsSettingsClicked = onCameraUploadsSettingsClicked,
         onSyncFolderClicked = { onSyncFolderClicked() },
         onBackupFolderClicked = { onBackupFolderClicked() },
         actionSelected = { item, selectedAction ->

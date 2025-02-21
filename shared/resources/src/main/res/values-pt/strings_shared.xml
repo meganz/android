@@ -244,8 +244,6 @@
     </plurals>
     <!-- Title of the dialog to ask the user to use the selected location as default location for next downloads. Please do not modify the %s placeholder as it will be replaced by the name of the folder where the files will be downloaded-->
     <string name="transfers_dialog_save_download_location_title">Salvar todos downloads em “%1$s”?</string>
-    <!-- Option to don't use the selected location as default location for next downloads-->
-    <string name="transfers_dialog_save_download_location_only_this_time_option">Somente esta vez</string>
     <!-- Option to use the selected location as default location for next downloads-->
     <string name="transfers_dialog_save_download_location_always_here_option">Sempre fazer o download aqui</string>
     <!-- Option to don't use the selected location as default location for next downloads and don't ask again-->

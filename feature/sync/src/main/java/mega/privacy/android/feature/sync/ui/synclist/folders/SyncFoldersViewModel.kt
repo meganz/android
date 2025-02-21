@@ -14,13 +14,19 @@ import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.onEach
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
+import mega.privacy.android.domain.entity.backup.Backup
 import mega.privacy.android.domain.entity.node.TypedFolderNode
 import mega.privacy.android.domain.usecase.GetFolderTreeInfo
 import mega.privacy.android.domain.usecase.GetNodeByIdUseCase
 import mega.privacy.android.domain.entity.node.NodeId
+import mega.privacy.android.domain.usecase.GetNodePathByIdUseCase
 import mega.privacy.android.domain.usecase.GetRootNodeUseCase
 import mega.privacy.android.domain.usecase.account.IsStorageOverQuotaUseCase
 import mega.privacy.android.domain.usecase.account.MonitorAccountDetailUseCase
+import mega.privacy.android.domain.usecase.camerauploads.GetCameraUploadsBackupUseCase
+import mega.privacy.android.domain.usecase.camerauploads.GetMediaUploadsBackupUseCase
+import mega.privacy.android.domain.usecase.camerauploads.MonitorCameraUploadsSettingsActionsUseCase
+import mega.privacy.android.domain.usecase.camerauploads.MonitorCameraUploadsStatusInfoUseCase
 import mega.privacy.android.domain.usecase.environment.MonitorBatteryInfoUseCase
 import mega.privacy.android.domain.usecase.featureflag.GetFeatureFlagValueUseCase
 import mega.privacy.android.domain.usecase.node.MoveDeconfiguredBackupNodesUseCase
@@ -36,6 +42,7 @@ import mega.privacy.android.feature.sync.domain.usecase.sync.ResumeSyncUseCase
 import mega.privacy.android.feature.sync.domain.usecase.sync.option.SetUserPausedSyncUseCase
 import mega.privacy.android.feature.sync.ui.mapper.sync.SyncUiItemMapper
 import mega.privacy.android.feature.sync.ui.model.StopBackupOption
+import mega.privacy.android.feature.sync.ui.model.SyncUiItem
 import mega.privacy.android.shared.sync.featuretoggles.SyncFeatures
 import timber.log.Timber
 import javax.inject.Inject
@@ -52,12 +59,17 @@ internal class SyncFoldersViewModel @Inject constructor(
     private val refreshSyncUseCase: RefreshSyncUseCase,
     private val monitorBatteryInfoUseCase: MonitorBatteryInfoUseCase,
     private val getNodeByIdUseCase: GetNodeByIdUseCase,
+    private val getNodePathByIdUseCase: GetNodePathByIdUseCase,
     private val getFolderTreeInfo: GetFolderTreeInfo,
     private val isStorageOverQuotaUseCase: IsStorageOverQuotaUseCase,
     private val monitorAccountDetailUseCase: MonitorAccountDetailUseCase,
     private val getRootNodeUseCase: GetRootNodeUseCase,
     private val moveDeconfiguredBackupNodesUseCase: MoveDeconfiguredBackupNodesUseCase,
     private val removeDeconfiguredBackupNodesUseCase: RemoveDeconfiguredBackupNodesUseCase,
+    private val getCameraUploadsBackupUseCase: GetCameraUploadsBackupUseCase,
+    private val getMediaUploadsBackupUseCase: GetMediaUploadsBackupUseCase,
+    private val monitorCameraUploadsSettingsActionsUseCase: MonitorCameraUploadsSettingsActionsUseCase,
+    private val monitorCameraUploadsStatusInfoUseCase: MonitorCameraUploadsStatusInfoUseCase,
     private val getFeatureFlagValueUseCase: GetFeatureFlagValueUseCase,
 ) : ViewModel() {
 
@@ -92,6 +104,18 @@ internal class SyncFoldersViewModel @Inject constructor(
             monitorAccountDetailUseCase().collect {
                 checkOverQuotaStatus()
             }
+        }
+
+        viewModelScope.launch {
+            monitorCameraUploadsSettingsActionsUseCase()
+                .catch { Timber.e(it) }
+                .collect { onSyncRefresh() }
+        }
+
+        viewModelScope.launch {
+            monitorCameraUploadsStatusInfoUseCase()
+                .catch { Timber.e(it) }
+                .collect { onSyncRefresh() }
         }
     }
 
@@ -145,8 +169,7 @@ internal class SyncFoldersViewModel @Inject constructor(
                         it.localPaths.firstOrNull()?.contains(sync.deviceStoragePath)
                             ?: (it.nodeNames.first().contains(sync.megaStoragePath))
                     },
-                    expanded = _uiState.value.syncUiItems.firstOrNull { it.id == sync.id }?.expanded
-                        ?: false,
+                    expanded = _uiState.value.syncUiItems.firstOrNull { it.id == sync.id }?.expanded == true,
                     numberOfFiles = numOfFiles,
                     numberOfFolders = numOfFolders,
                     totalSizeInBytes = totalSizeInBytes,
@@ -155,15 +178,67 @@ internal class SyncFoldersViewModel @Inject constructor(
             }
         }
             .onEach { syncs ->
+                val syncsList: MutableList<SyncUiItem> = emptyList<SyncUiItem>().toMutableList()
+                getCameraUploadsOrMediaUploadsSyncUiItem(getCameraUploadsBackupUseCase())?.let {
+                    syncsList.add(it)
+                }
+                getCameraUploadsOrMediaUploadsSyncUiItem(getMediaUploadsBackupUseCase())?.let {
+                    syncsList.add(it)
+                }
+                syncsList.addAll(syncs)
                 _uiState.update {
                     it.copy(
-                        syncUiItems = syncs,
+                        syncUiItems = syncsList,
                         isRefreshing = false,
                         isLoading = false,
                     )
                 }
             }
             .launchIn(viewModelScope)
+    }
+
+    private suspend fun getCameraUploadsOrMediaUploadsSyncUiItem(cameraUploadsOrMediaUploadsBackup: Backup?): SyncUiItem? {
+        var megaStoragePath = ""
+        var numOfFiles = 0
+        var numOfFolders = 0
+        var totalSizeInBytes = 0L
+        var creationTime = 0L
+
+        cameraUploadsOrMediaUploadsBackup?.let { backup ->
+            runCatching {
+                getNodeByIdUseCase(NodeId(backup.targetNode))
+            }.onSuccess { node ->
+                node?.let { folder ->
+                    megaStoragePath = getNodePathByIdUseCase(NodeId(backup.targetNode))
+                    creationTime = folder.creationTime
+                    runCatching {
+                        getFolderTreeInfo(folder as TypedFolderNode)
+                    }.onSuccess { folderTreeInfo ->
+                        with(folderTreeInfo) {
+                            numOfFiles = numberOfFiles
+                            numOfFolders =
+                                numberOfFolders - 1 //we don't want to count itself
+                            totalSizeInBytes = totalCurrentSizeInBytes
+                        }
+                    }.onFailure {
+                        Timber.e(it)
+                    }
+                }
+            }.onFailure {
+                Timber.e(it)
+            }
+
+            return syncUiItemMapper(backup).copy(
+                hasStalledIssues = false,
+                expanded = _uiState.value.syncUiItems.firstOrNull { it.id == backup.backupId }?.expanded == true,
+                numberOfFiles = numOfFiles,
+                numberOfFolders = numOfFolders,
+                totalSizeInBytes = totalSizeInBytes,
+                creationTime = creationTime,
+                megaStoragePath = megaStoragePath,
+            )
+        }
+        return null
     }
 
     private fun checkOverQuotaStatus() {

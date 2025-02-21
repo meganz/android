@@ -17,9 +17,14 @@ import mega.privacy.android.domain.entity.node.NodeId
 import mega.privacy.android.domain.entity.sync.SyncType
 import mega.privacy.android.domain.usecase.GetFolderTreeInfo
 import mega.privacy.android.domain.usecase.GetNodeByIdUseCase
+import mega.privacy.android.domain.usecase.GetNodePathByIdUseCase
 import mega.privacy.android.domain.usecase.GetRootNodeUseCase
 import mega.privacy.android.domain.usecase.account.IsStorageOverQuotaUseCase
 import mega.privacy.android.domain.usecase.account.MonitorAccountDetailUseCase
+import mega.privacy.android.domain.usecase.camerauploads.GetCameraUploadsBackupUseCase
+import mega.privacy.android.domain.usecase.camerauploads.GetMediaUploadsBackupUseCase
+import mega.privacy.android.domain.usecase.camerauploads.MonitorCameraUploadsSettingsActionsUseCase
+import mega.privacy.android.domain.usecase.camerauploads.MonitorCameraUploadsStatusInfoUseCase
 import mega.privacy.android.domain.usecase.environment.MonitorBatteryInfoUseCase
 import mega.privacy.android.domain.usecase.featureflag.GetFeatureFlagValueUseCase
 import mega.privacy.android.domain.usecase.node.MoveDeconfiguredBackupNodesUseCase
@@ -68,12 +73,19 @@ class SyncFoldersViewModelTest {
     private val refreshSyncUseCase: RefreshSyncUseCase = mock()
     private val monitorBatteryInfoUseCase: MonitorBatteryInfoUseCase = mock()
     private val getNodeByIdUseCase: GetNodeByIdUseCase = mock()
+    private val getNodePathByIdUseCase: GetNodePathByIdUseCase = mock()
     private val getFolderTreeInfo: GetFolderTreeInfo = mock()
     private val isStorageOverQuotaUseCase: IsStorageOverQuotaUseCase = mock()
     private val monitorAccountDetailUseCase: MonitorAccountDetailUseCase = mock()
     private val getRootNodeUseCase: GetRootNodeUseCase = mock()
     private val moveDeconfiguredBackupNodesUseCase: MoveDeconfiguredBackupNodesUseCase = mock()
     private val removeDeconfiguredBackupNodesUseCase: RemoveDeconfiguredBackupNodesUseCase = mock()
+    private val getCameraUploadsBackupUseCase: GetCameraUploadsBackupUseCase = mock()
+    private val getMediaUploadsBackupUseCase: GetMediaUploadsBackupUseCase = mock()
+    private val monitorCameraUploadsSettingsActionsUseCase: MonitorCameraUploadsSettingsActionsUseCase =
+        mock()
+    private val monitorCameraUploadsStatusInfoUseCase: MonitorCameraUploadsStatusInfoUseCase =
+        mock()
     private val getFeatureFlagValueUseCase: GetFeatureFlagValueUseCase = mock()
     private lateinit var underTest: SyncFoldersViewModel
 
@@ -159,6 +171,9 @@ class SyncFoldersViewModelTest {
             monitorAccountDetailUseCase,
             getRootNodeUseCase,
             moveDeconfiguredBackupNodesUseCase,
+            getNodePathByIdUseCase,
+            getCameraUploadsBackupUseCase,
+            monitorCameraUploadsStatusInfoUseCase,
             getFeatureFlagValueUseCase,
         )
     }
@@ -404,12 +419,17 @@ class SyncFoldersViewModelTest {
             refreshSyncUseCase = refreshSyncUseCase,
             monitorBatteryInfoUseCase = monitorBatteryInfoUseCase,
             getNodeByIdUseCase = getNodeByIdUseCase,
+            getNodePathByIdUseCase = getNodePathByIdUseCase,
             getFolderTreeInfo = getFolderTreeInfo,
             isStorageOverQuotaUseCase = isStorageOverQuotaUseCase,
             monitorAccountDetailUseCase = monitorAccountDetailUseCase,
             getRootNodeUseCase = getRootNodeUseCase,
             moveDeconfiguredBackupNodesUseCase = moveDeconfiguredBackupNodesUseCase,
             removeDeconfiguredBackupNodesUseCase = removeDeconfiguredBackupNodesUseCase,
+            getCameraUploadsBackupUseCase = getCameraUploadsBackupUseCase,
+            getMediaUploadsBackupUseCase = getMediaUploadsBackupUseCase,
+            monitorCameraUploadsSettingsActionsUseCase = monitorCameraUploadsSettingsActionsUseCase,
+            monitorCameraUploadsStatusInfoUseCase = monitorCameraUploadsStatusInfoUseCase,
             getFeatureFlagValueUseCase = getFeatureFlagValueUseCase,
         )
     }

@@ -18,5 +18,15 @@ enum class SyncType {
     /**
      * Represents a Backup (one-way) Sync Type
      */
-    TYPE_BACKUP
+    TYPE_BACKUP,
+
+    /**
+     * Represents a Camera Uploads Sync Type
+     */
+    TYPE_CAMERA_UPLOADS,
+
+    /**
+     * Represents a Media Uploads Sync Type
+     */
+    TYPE_MEDIA_UPLOADS,
 }

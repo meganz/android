@@ -31,6 +31,7 @@ internal fun SyncFoldersRoute(
     onSelectStopBackupDestinationClicked: () -> Unit,
     issuesInfoClicked: () -> Unit,
     onOpenMegaFolderClicked: (handle: Long) -> Unit,
+    onCameraUploadsSettingsClicked: () -> Unit,
     viewModel: SyncFoldersViewModel,
     uiState: SyncFoldersUiState,
     snackBarHostState: SnackbarHostState,
@@ -64,6 +65,7 @@ internal fun SyncFoldersRoute(
         onOpenMegaFolderClicked = { syncUiItem ->
             onOpenMegaFolderClicked(syncUiItem.megaStorageNodeId.longValue)
         },
+        onCameraUploadsSettingsClicked = onCameraUploadsSettingsClicked,
         isLowBatteryLevel = uiState.isLowBatteryLevel,
         isLoading = uiState.isLoading,
         deviceName = deviceName,

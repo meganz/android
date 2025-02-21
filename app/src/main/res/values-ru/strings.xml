@@ -2478,20 +2478,6 @@
     <string name="invite_contact_chooser_title">Пригласить друзей</string>
     <!-- Action button label -->
     <string name="invite_contact_action_button">Пригласить друзей&#8230;</string>
-    <!-- Message displayed when multiple download starts and all files has already been downloaded before. Placeholder: number of files -->
-    <plurals name="file_already_downloaded">
-        <item quantity="one">%d файл уже скачан.</item>
-        <item quantity="few">%d файла уже скачано.</item>
-        <item quantity="many">%d файлов уже скачано.</item>
-        <item quantity="other">%d файла уже скачано.</item>
-    </plurals>
-    <!-- When a multiple download is started, some of the files could have already been downloaded before. This message shows the number of files that are pending. Placeholder: number of files -->
-    <plurals name="file_pending_download">
-        <item quantity="one">%d файл в ожидании.</item>
-        <item quantity="few">%d файла в ожидании.</item>
-        <item quantity="many">%d файлов в ожидании.</item>
-        <item quantity="other">%d файла в ожидании.</item>
-    </plurals>
     <!-- Title of the login screen -->
     <string name="login_to_mega">Вход в MEGA</string>
     <!-- Title of the create account screen -->
@@ -2999,20 +2985,6 @@
     <string name="error_share_owner_storage_quota">Владелец общего ресурса превысил лимит хранения данных.</string>
     <!-- A message shown when uploading, copying or moving something to an incoming share and the owner’s account is over its storage quota. -->
     <string name="warning_share_owner_storage_quota">Файл не может быть отправлен, поскольку получатель превысил лимит хранения данных.</string>
-    <!-- Message displayed when multiple download starts and 1 file has already been downloaded before and 1 or multiple files are being downloaded. Placeholder: number of files -->
-    <plurals name="file_already_downloaded_and_files_pending_download">
-        <item quantity="one">1 файл уже скачан. %d файл в ожидании.</item>
-        <item quantity="few">1 файл уже скачан. %d файла в ожидании.</item>
-        <item quantity="many">1 файл уже скачан. %d файлов в ожидании.</item>
-        <item quantity="other">1 файл уже скачан. %d файла в ожидании.</item>
-    </plurals>
-    <!-- Message displayed when multiple download starts and 1 or multiple files have already been downloaded before and 1 file is being downloaded. Placeholder: number of files -->
-    <plurals name="files_already_downloaded_and_file_pending_download">
-        <item quantity="one">%d файл уже скачан. 1 файл в ожидании.</item>
-        <item quantity="few">%d файла уже скачано. 1 файл в ожидании.</item>
-        <item quantity="many">%d файлов уже скачано. 1 файл в ожидании.</item>
-        <item quantity="other">%d файла уже скачано. 1 файл в ожидании.</item>
-    </plurals>
     <!-- Message displayed when 1 node (file or folder) has been successfully moved to the rubbish bin and 1 or multiple nodes have not been moved successfully. Placeholder: number of nodes -->
     <plurals name="node_correctly_and_nodes_incorrectly_moved_to_rubbish">
         <item quantity="one">1 элемент перемещён в Корзину, но другой не перемещён. Попробуйте ещё раз позже.</item>
@@ -5035,13 +5007,6 @@
         <item quantity="few">Каждые %1$s месяца в день %2$d</item>
         <item quantity="many">Каждые %1$s месяцев в день %2$d</item>
         <item quantity="other">Каждые %1$s месяца в день %2$d</item>
-    </plurals>
-    <!-- Message when many downloads start. Plural more than 1 file. Placeholder is for include the number of downloads in runtime. -->
-    <plurals name="download_started">
-        <item quantity="one">Скачивание запущено</item>
-        <item quantity="few">Запущено %1$d скачивания</item>
-        <item quantity="many">Запущено %1$d скачиваний</item>
-        <item quantity="other">Запущено %1$d скачивания</item>
     </plurals>
     <!-- Message when many downloads finish. Plural more than 1 file. Placeholder is for include the number of downloads in runtime. -->
     <plurals name="download_complete">

@@ -2362,16 +2362,6 @@
     <string name="invite_contact_chooser_title">Einen Freund einladen via</string>
     <!-- Action button label -->
     <string name="invite_contact_action_button">Einen Freund einladen via&#8230;</string>
-    <!-- Message displayed when multiple download starts and all files has already been downloaded before. Placeholder: number of files -->
-    <plurals name="file_already_downloaded">
-        <item quantity="one">%d Datei bereits heruntergeladen.</item>
-        <item quantity="other">%d Dateien bereits heruntergeladen.</item>
-    </plurals>
-    <!-- When a multiple download is started, some of the files could have already been downloaded before. This message shows the number of files that are pending. Placeholder: number of files -->
-    <plurals name="file_pending_download">
-        <item quantity="one">%d Datei in der Warteschlange.</item>
-        <item quantity="other">%d Dateien in der Warteschlange.</item>
-    </plurals>
     <!-- Title of the login screen -->
     <string name="login_to_mega">In MEGA einloggen</string>
     <!-- Title of the create account screen -->
@@ -2853,16 +2843,6 @@
     <string name="error_share_owner_storage_quota">Der Eigentümer der Freigabe hat sein Speicherlimit überschritten.</string>
     <!-- A message shown when uploading, copying or moving something to an incoming share and the owner’s account is over its storage quota. -->
     <string name="warning_share_owner_storage_quota">Die Datei kann nicht versendet werden, da der Empfänger sein Speicherplatzlimit überschritten hat.</string>
-    <!-- Message displayed when multiple download starts and 1 file has already been downloaded before and 1 or multiple files are being downloaded. Placeholder: number of files -->
-    <plurals name="file_already_downloaded_and_files_pending_download">
-        <item quantity="one">1 Datei bereits heruntergeladen. %d Datei in der Warteschlange.</item>
-        <item quantity="other">1 Datei bereits heruntergeladen. %d Dateien in der Warteschlange.</item>
-    </plurals>
-    <!-- Message displayed when multiple download starts and 1 or multiple files have already been downloaded before and 1 file is being downloaded. Placeholder: number of files -->
-    <plurals name="files_already_downloaded_and_file_pending_download">
-        <item quantity="one">%d Datei bereits heruntergeladen. 1 Datei in der Warteschlange.</item>
-        <item quantity="other">%d Dateien bereits heruntergeladen. 1 Datei in der Warteschlange.</item>
-    </plurals>
     <!-- Message displayed when 1 node (file or folder) has been successfully moved to the rubbish bin and 1 or multiple nodes have not been moved successfully. Placeholder: number of nodes -->
     <plurals name="node_correctly_and_nodes_incorrectly_moved_to_rubbish">
         <item quantity="one">Ein Element wurde in den Papierkorb verschoben, ein anderes jedoch nicht. Bitte versuchen Sie es später noch einmal.</item>
@@ -4599,11 +4579,6 @@
     <plurals name="meetings_schedule_meeting_recurrence_specific_day_every_number_of_months_label">
         <item quantity="one">Jeden Monat am %2$d.</item>
         <item quantity="other">Jeden %1$s. Monat am %2$d.</item>
-    </plurals>
-    <!-- Message when many downloads start. Plural more than 1 file. Placeholder is for include the number of downloads in runtime. -->
-    <plurals name="download_started">
-        <item quantity="one">Download gestartet</item>
-        <item quantity="other">%1$d Downloads gestartet</item>
     </plurals>
     <!-- Message when many downloads finish. Plural more than 1 file. Placeholder is for include the number of downloads in runtime. -->
     <plurals name="download_complete">

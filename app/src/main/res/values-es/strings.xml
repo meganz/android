@@ -1709,7 +1709,7 @@
     <!-- label to indicate that a share is still pending on outgoing shares of a node -->
     <string name="pending_outshare_indicator">(Pendiente)</string>
     <!-- Title of the dialog to disable the rich links previews on chat -->
-    <string name="option_enable_chat_rich_preview">Vista previa del enlace</string>
+    <string name="option_enable_chat_rich_preview">Vista previa de la URL enriquecida</string>
     <!-- Button to allow the rich links previews on chat -->
     <string name="button_always_rich_links">Permitir siempre</string>
     <!-- Button do not allow now the rich links previews on chat -->
@@ -2420,18 +2420,6 @@
     <string name="invite_contact_chooser_title">Invita a un amigo a través de</string>
     <!-- Action button label -->
     <string name="invite_contact_action_button">Invita a un amigo a través de&#8230;</string>
-    <!-- Message displayed when multiple download starts and all files has already been downloaded before. Placeholder: number of files -->
-    <plurals name="file_already_downloaded">
-        <item quantity="one">%d archivo descargado anteriormente.</item>
-        <item quantity="many">%d de archivos descargados anteriormente.</item>
-        <item quantity="other">%d archivos descargados anteriormente.</item>
-    </plurals>
-    <!-- When a multiple download is started, some of the files could have already been downloaded before. This message shows the number of files that are pending. Placeholder: number of files -->
-    <plurals name="file_pending_download">
-        <item quantity="one">%d archivo pendiente.</item>
-        <item quantity="many">%d de archivos pendientes.</item>
-        <item quantity="other">%d archivos pendientes.</item>
-    </plurals>
     <!-- Title of the login screen -->
     <string name="login_to_mega">Iniciar sesión en MEGA</string>
     <!-- Title of the create account screen -->
@@ -2926,18 +2914,6 @@
     <string name="error_share_owner_storage_quota">El propietario de la carpeta compartida ha superado la cuota de almacenamiento disponible.</string>
     <!-- A message shown when uploading, copying or moving something to an incoming share and the owner’s account is over its storage quota. -->
     <string name="warning_share_owner_storage_quota">El archivo no se puede enviar porque el destinatario ha superado su límite de almacenamiento.</string>
-    <!-- Message displayed when multiple download starts and 1 file has already been downloaded before and 1 or multiple files are being downloaded. Placeholder: number of files -->
-    <plurals name="file_already_downloaded_and_files_pending_download">
-        <item quantity="one">1 archivo descargado anteriormente. %d archivo pendiente.</item>
-        <item quantity="many">1 archivo descargado anteriormente. %d de archivos pendientes.</item>
-        <item quantity="other">1 archivo descargado anteriormente. %d archivos pendientes.</item>
-    </plurals>
-    <!-- Message displayed when multiple download starts and 1 or multiple files have already been downloaded before and 1 file is being downloaded. Placeholder: number of files -->
-    <plurals name="files_already_downloaded_and_file_pending_download">
-        <item quantity="one">%d archivo descargado anteriormente. 1 archivo pendiente.</item>
-        <item quantity="many">%d archivos descargados anteriormente. 1 archivo pendiente.</item>
-        <item quantity="other">%d archivos descargados anteriormente. 1 archivo pendiente.</item>
-    </plurals>
     <!-- Message displayed when 1 node (file or folder) has been successfully moved to the rubbish bin and 1 or multiple nodes have not been moved successfully. Placeholder: number of nodes -->
     <plurals name="node_correctly_and_nodes_incorrectly_moved_to_rubbish">
         <item quantity="one">Se ha movido 1 elemento a la Papelera pero el otro no se ha podido mover. Inténtalo más tarde.</item>
@@ -4817,12 +4793,6 @@
         <item quantity="one">El día %2$d de cada mes</item>
         <item quantity="many">Cada %1$s meses el día %2$d</item>
         <item quantity="other">Cada %1$s meses el día %2$d</item>
-    </plurals>
-    <!-- Message when many downloads start. Plural more than 1 file. Placeholder is for include the number of downloads in runtime. -->
-    <plurals name="download_started">
-        <item quantity="one">Descarga iniciada</item>
-        <item quantity="many">Se han iniciado %1$d de descargas</item>
-        <item quantity="other">Se han iniciado %1$d descargas</item>
     </plurals>
     <!-- Message when many downloads finish. Plural more than 1 file. Placeholder is for include the number of downloads in runtime. -->
     <plurals name="download_complete">

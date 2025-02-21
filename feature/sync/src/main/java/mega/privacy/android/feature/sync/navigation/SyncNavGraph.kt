@@ -297,6 +297,7 @@ internal fun NavGraphBuilder.syncNavGraph(
                 onOpenMegaFolderClicked = { handle ->
                     megaNavigator.openSyncMegaFolder(context, handle)
                 },
+                onCameraUploadsSettingsClicked = { megaNavigator.openSettingsCameraUploads(context) },
             )
         }
     }

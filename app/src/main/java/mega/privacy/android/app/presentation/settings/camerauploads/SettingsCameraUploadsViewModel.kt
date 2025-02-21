@@ -32,6 +32,7 @@ import mega.privacy.android.domain.entity.node.NodeId
 import mega.privacy.android.domain.qualifier.ApplicationScope
 import mega.privacy.android.domain.usecase.camerauploads.AreLocationTagsEnabledUseCase
 import mega.privacy.android.domain.usecase.camerauploads.AreUploadFileNamesKeptUseCase
+import mega.privacy.android.domain.usecase.camerauploads.BroadcastCameraUploadsSettingsActionUseCase
 import mega.privacy.android.domain.usecase.camerauploads.CheckEnableCameraUploadsStatusUseCase
 import mega.privacy.android.domain.usecase.camerauploads.ClearCameraUploadsRecordUseCase
 import mega.privacy.android.domain.usecase.camerauploads.DeleteCameraUploadsTemporaryRootDirectoryUseCase
@@ -151,6 +152,7 @@ import javax.inject.Inject
  * @property stopCameraUploadsUseCase Stops the Camera Uploads operation
  * @property uploadOptionUiItemMapper UI Mapper that maps the Upload Option into [UploadOptionUiItem]
  * @property videoQualityUiItemMapper UI Mapper that maps the Video Quality into [VideoQualityUiItem]
+ * @property broadcastCameraUploadsSettingsActionUseCase Broadcasts camera uploads settings action
  */
 @HiltViewModel
 internal class SettingsCameraUploadsViewModel @Inject constructor(
@@ -203,6 +205,7 @@ internal class SettingsCameraUploadsViewModel @Inject constructor(
     private val stopCameraUploadsUseCase: StopCameraUploadsUseCase,
     private val uploadOptionUiItemMapper: UploadOptionUiItemMapper,
     private val videoQualityUiItemMapper: VideoQualityUiItemMapper,
+    private val broadcastCameraUploadsSettingsActionUseCase: BroadcastCameraUploadsSettingsActionUseCase,
 ) : ViewModel() {
 
     private val _uiState = MutableStateFlow(SettingsCameraUploadsUiState())
@@ -314,6 +317,8 @@ internal class SettingsCameraUploadsViewModel @Inject constructor(
                         CameraUploadsSettingsAction.DisableMediaUploads -> {
                             onMediaUploadsStateChanged(enabled = false)
                         }
+
+                        else -> Unit
                     }
                 }
         }
@@ -409,6 +414,7 @@ internal class SettingsCameraUploadsViewModel @Inject constructor(
                         // Disable Camera Uploads
                         setCameraUploadsEnabled(false)
                         stopCameraUploadsUseCase(CameraUploadsRestartMode.StopAndDisable)
+                        broadcastCameraUploadsSettingsActionUseCase(CameraUploadsSettingsAction.CameraUploadsDisabled)
                     }
                 } else {
                     Timber.d("User must be connected to the Internet to update the Camera Uploads state")
@@ -482,6 +488,7 @@ internal class SettingsCameraUploadsViewModel @Inject constructor(
             runCatching {
                 setupCameraUploadsSettingUseCase(isEnabled = true)
                 setCameraUploadsEnabled(true)
+                broadcastCameraUploadsSettingsActionUseCase(CameraUploadsSettingsAction.CameraUploadsEnabled)
             }.onSuccess {
                 showSnackbar(R.string.settings_camera_notif_initializing_title)
             }.onFailure { exception ->
@@ -739,11 +746,13 @@ internal class SettingsCameraUploadsViewModel @Inject constructor(
                                 secondaryFolderPath = if (!isCurrentSecondaryFolderPathValid) "" else it.secondaryFolderPath,
                             )
                         }
+                        broadcastCameraUploadsSettingsActionUseCase(CameraUploadsSettingsAction.MediaUploadsEnabled)
                     } else {
                         // Disable Media Uploads
                         disableMediaUploadsSettingsUseCase()
                         stopCameraUploadsUseCase(CameraUploadsRestartMode.Stop)
                         _uiState.update { it.copy(isMediaUploadsEnabled = false) }
+                        broadcastCameraUploadsSettingsActionUseCase(CameraUploadsSettingsAction.MediaUploadsDisabled)
                     }
                 } else {
                     Timber.d("User must be connected to the Internet to update the Media Uploads state")

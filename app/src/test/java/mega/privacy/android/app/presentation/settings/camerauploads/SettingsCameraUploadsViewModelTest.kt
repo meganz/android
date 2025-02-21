@@ -14,7 +14,6 @@ import kotlinx.coroutines.test.TestScope
 import kotlinx.coroutines.test.UnconfinedTestDispatcher
 import kotlinx.coroutines.test.runTest
 import mega.privacy.android.app.R
-import mega.privacy.android.app.presentation.settings.camerauploads.SettingsCameraUploadsViewModel
 import mega.privacy.android.app.presentation.settings.camerauploads.mapper.UploadOptionUiItemMapper
 import mega.privacy.android.app.presentation.settings.camerauploads.mapper.VideoQualityUiItemMapper
 import mega.privacy.android.app.presentation.settings.camerauploads.model.UploadConnectionType
@@ -34,6 +33,7 @@ import mega.privacy.android.domain.entity.node.TypedFolderNode
 import mega.privacy.android.domain.entity.settings.camerauploads.UploadOption
 import mega.privacy.android.domain.usecase.camerauploads.AreLocationTagsEnabledUseCase
 import mega.privacy.android.domain.usecase.camerauploads.AreUploadFileNamesKeptUseCase
+import mega.privacy.android.domain.usecase.camerauploads.BroadcastCameraUploadsSettingsActionUseCase
 import mega.privacy.android.domain.usecase.camerauploads.CheckEnableCameraUploadsStatusUseCase
 import mega.privacy.android.domain.usecase.camerauploads.ClearCameraUploadsRecordUseCase
 import mega.privacy.android.domain.usecase.camerauploads.DeleteCameraUploadsTemporaryRootDirectoryUseCase
@@ -171,6 +171,8 @@ internal class SettingsCameraUploadsViewModelTest {
     private val stopCameraUploadsUseCase = mock<StopCameraUploadsUseCase>()
     private val uploadOptionUiItemMapper = Mockito.spy(UploadOptionUiItemMapper())
     private val videoQualityUiItemMapper = Mockito.spy(VideoQualityUiItemMapper())
+    private val broadcastCameraUploadsSettingsActionUseCase =
+        mock<BroadcastCameraUploadsSettingsActionUseCase>()
 
     private val fakeMonitorCameraUploadsSettingsActionsFlow =
         MutableSharedFlow<CameraUploadsSettingsAction>()
@@ -229,6 +231,7 @@ internal class SettingsCameraUploadsViewModelTest {
             setupSecondaryFolderUseCase,
             startCameraUploadUseCase,
             stopCameraUploadsUseCase,
+            broadcastCameraUploadsSettingsActionUseCase,
         )
     }
 
@@ -334,6 +337,7 @@ internal class SettingsCameraUploadsViewModelTest {
             stopCameraUploadsUseCase = stopCameraUploadsUseCase,
             uploadOptionUiItemMapper = uploadOptionUiItemMapper,
             videoQualityUiItemMapper = videoQualityUiItemMapper,
+            broadcastCameraUploadsSettingsActionUseCase = broadcastCameraUploadsSettingsActionUseCase,
         )
     }
 
@@ -436,6 +440,30 @@ internal class SettingsCameraUploadsViewModelTest {
                     assertThat(state.requestMediaPermissions).isEqualTo(triggered)
                 }
             }
+
+        @Test
+        fun `test that disabling camera uploads will emit the proper event`() = runTest {
+            initializeUnderTest(isCameraUploadsEnabled = true)
+            whenever(isConnectedToInternetUseCase()).thenReturn(true)
+
+            underTest.onCameraUploadsStateChanged(enabled = false)
+
+            verify(broadcastCameraUploadsSettingsActionUseCase).invoke(CameraUploadsSettingsAction.CameraUploadsDisabled)
+        }
+
+        @Test
+        fun `test that enabling camera uploads will emit the proper event`() = runTest {
+            initializeUnderTest(isCameraUploadsEnabled = false)
+            whenever(isConnectedToInternetUseCase()).thenReturn(true)
+            whenever(checkEnableCameraUploadsStatusUseCase()).thenReturn(
+                EnableCameraUploadsStatus.CAN_ENABLE_CAMERA_UPLOADS
+            )
+
+            underTest.onCameraUploadsStateChanged(enabled = true)
+            underTest.onMediaPermissionsGranted()
+
+            verify(broadcastCameraUploadsSettingsActionUseCase).invoke(CameraUploadsSettingsAction.CameraUploadsEnabled)
+        }
 
         @ParameterizedTest(name = "is camera uploads enabled: {0}")
         @ValueSource(booleans = [true, false])
@@ -1398,6 +1426,34 @@ internal class SettingsCameraUploadsViewModelTest {
                     assertThat(state.secondaryFolderPath).isEqualTo(expectedSecondaryFolderPath)
                 }
             }
+
+        @Test
+        fun `test that enabling media uploads will emit the proper event`() = runTest {
+            initializeUnderTest(
+                isCameraUploadsEnabled = true,
+                isMediaUploadsEnabled = false,
+            )
+            whenever(isConnectedToInternetUseCase()).thenReturn(true)
+            whenever(isSecondaryFolderPathValidUseCase(any())).thenReturn(true)
+
+            underTest.onMediaUploadsStateChanged(enabled = true)
+
+            verify(broadcastCameraUploadsSettingsActionUseCase).invoke(CameraUploadsSettingsAction.MediaUploadsEnabled)
+        }
+
+        @Test
+        fun `test that disabling media uploads will emit the proper event`() = runTest {
+            initializeUnderTest(
+                isCameraUploadsEnabled = true,
+                isMediaUploadsEnabled = true,
+            )
+            whenever(isConnectedToInternetUseCase()).thenReturn(true)
+            whenever(isSecondaryFolderPathValidUseCase(any())).thenReturn(true)
+
+            underTest.onMediaUploadsStateChanged(enabled = false)
+
+            verify(broadcastCameraUploadsSettingsActionUseCase).invoke(CameraUploadsSettingsAction.MediaUploadsDisabled)
+        }
 
         @ParameterizedTest(name = "is media uploads enabled: {0}")
         @ValueSource(booleans = [true, false])

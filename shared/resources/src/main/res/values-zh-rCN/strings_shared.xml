@@ -227,9 +227,7 @@
         <item quantity="other">共享链接</item>
     </plurals>
     <!-- Title of the dialog to ask the user to use the selected location as default location for next downloads. Please do not modify the %s placeholder as it will be replaced by the name of the folder where the files will be downloaded-->
-    <string name="transfers_dialog_save_download_location_title">Save all your downloaded files to “%1$s”?</string>
-    <!-- Option to don't use the selected location as default location for next downloads-->
-    <string name="transfers_dialog_save_download_location_only_this_time_option">只有这次</string>
+    <string name="transfers_dialog_save_download_location_title">将所有下载的文件保存到“%1$s”？</string>
     <!-- Option to use the selected location as default location for next downloads-->
     <string name="transfers_dialog_save_download_location_always_here_option">总是下载到此处</string>
     <!-- Option to don't use the selected location as default location for next downloads and don't ask again-->
@@ -389,7 +387,7 @@
     <!-- Unlimited call and meeting duration available in the pro plan -->
     <string name="cancel_account_plan_call_meeting_duration_pro">无限制</string>
     <!-- Row label for call and meeting participants in the comparison table -->
-    <string name="account_cancel_account_plan_call_meeting_participants">通话和会议参与者人数</string>
+    <string name="account_cancel_account_plan_call_meeting_participants">通话和会议参与者</string>
     <!-- Limit on call and meeting participants in the free plan -->
     <string name="account_cancel_account_free_plan_call_meeting_participants">最多100人</string>
     <!-- Unlimited call and meeting participants available in the pro plan -->
@@ -869,26 +867,25 @@
     <!--Message to be shown to the user when they entered an incorrect verification code-->
     <string name="multi_factor_auth_login_verification_input_error_text">验证码不正确</string>
     <!-- Snackbar text to inform the user that preview may take some time because it needs to be downloaded -->
-    <string name="transfers_preview_slow_snackbar">Preparing file for preview. See notification for details.</string>
+    <string name="transfers_preview_slow_snackbar">正在准备文件预览。详情请参阅通知。</string>
     <!-- Notification text for preview downloads.  Please do not modify the %s placeholder as it will be replaced by the name of the file to be donwloaded -->
     <string name="transfers_notification_downloading_preview">正在准备%1$s用于预览</string>
     <!-- Notification text for preview downloads, paused state.  Please do not modify the %s placeholder as it will be replaced by the name of the file to be donwloaded -->
-    <string name="transfers_notification_downloading_preview_paused">Preparing %1$s for preview (paused)</string>
+    <string name="transfers_notification_downloading_preview_paused">正在准备预览%1$s（已暂停）</string>
     <!-- Message when successfully deleting single item from the audio queue. %1$s will be replaced with the item name -->
-    <string name="audio_queue_single_item_removed_message">’%1$s’ was removed</string>
+    <string name="audio_queue_single_item_removed_message">“%1$s”已移除</string>
     <!-- Message when successfully deleting items from the audio queue. %1$d will be replaced with the removal count when multiple items are removed. -->
     <string name="audio_queue_multiple_items_removed_message">Removed %1$d items from queue</string>
     <!-- Message when successfully deleting items from the audio queue. %1$s will be replaced with the item name %2$d will be replaced with the removal count. -->
     <plurals name="audio_queue_items_removal_success_message">
-        <item quantity="one">‘%1$s’ was removed</item>
-        <item quantity="other">Removed %2$d items from queue</item>
+        <item quantity="other">已从队列移除%2$d项目</item>
     </plurals>
     <!-- Title for the dialog to inform that a transfer is needed to preview a file and transfers are paused-->
-    <string name="transfers_preview_paused_dialog_title">Transfers are paused</string>
+    <string name="transfers_preview_paused_dialog_title">传输暂停</string>
     <!-- Message for the dialog to inform that a transfer is needed to preview a file and transfers are paused-->
-    <string name="transfers_preview_paused_dialog_text">To preview “%1$s” you will need to unpause transfers</string>
+    <string name="transfers_preview_paused_dialog_text">预览“%1$s”，您需要取消暂停传输</string>
     <!--SD Card text shown as title in FileStorage screen -->
-    <string name="general_sd_card">SD card</string>
+    <string name="general_sd_card">SD卡</string>
     <!--The title of the Login page-->
     <string name="login_page_title">登入您的MEGA帐户</string>
     <!--Message to be shown to the user when they entered an invalid email-->

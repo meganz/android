@@ -64,6 +64,7 @@ internal fun SyncCard(
     issuesInfoClicked: () -> Unit,
     onOpenDeviceFolderClicked: (String) -> Unit,
     onOpenMegaFolderClicked: () -> Unit,
+    onCameraUploadsSettingsClicked: () -> Unit,
     isLowBatteryLevel: Boolean,
     @StringRes errorRes: Int?,
     deviceName: String,
@@ -111,6 +112,7 @@ internal fun SyncCard(
                 removeFolderClicked = removeFolderClicked,
                 issuesInfoClicked = issuesInfoClicked,
                 onOpenMegaFolderClicked = onOpenMegaFolderClicked,
+                onCameraUploadsSettingsClicked = onCameraUploadsSettingsClicked,
                 isLowBatteryLevel = isLowBatteryLevel,
                 isError = errorRes != null,
                 expanded = sync.expanded,
@@ -142,6 +144,8 @@ private fun SyncCardHeader(
             Image(
                 painter = when (syncType) {
                     SyncType.TYPE_BACKUP -> painterResource(id = IconPackR.drawable.ic_folder_backup_medium_solid)
+                    SyncType.TYPE_CAMERA_UPLOADS -> painterResource(id = IconPackR.drawable.ic_folder_camera_uploads_medium_solid)
+                    SyncType.TYPE_MEDIA_UPLOADS -> painterResource(id = IconPackR.drawable.ic_folder_camera_uploads_medium_solid)
                     else -> painterResource(IconPackR.drawable.ic_folder_sync_medium_solid)
                 },
                 contentDescription = null,
@@ -163,18 +167,21 @@ private fun SyncCardHeader(
                         }
 
                         status == SyncStatus.PAUSED -> stringResource(id = R.string.sync_list_sync_state_paused)
+                        status == SyncStatus.DISABLED -> stringResource(id = sharedR.string.sync_list_sync_state_disabled)
                         else -> stringResource(id = sharedR.string.sync_list_sync_state_up_to_date)
                     },
                     statusIcon = when {
                         hasStalledIssues -> iconPackR.drawable.ic_alert_circle_regular_medium_outline
                         status == SyncStatus.SYNCING -> coreR.drawable.ic_sync_02
                         status == SyncStatus.PAUSED -> coreR.drawable.ic_pause
+                        status == SyncStatus.DISABLED -> coreR.drawable.ic_alert_triangle
                         else -> coreR.drawable.ic_check_circle
                     },
                     statusColor = when {
                         hasStalledIssues -> StatusColor.Error
                         status == SyncStatus.SYNCING -> StatusColor.Info
                         status == SyncStatus.PAUSED -> null
+                        status == SyncStatus.DISABLED -> StatusColor.Warning
                         else -> StatusColor.Success
                     },
                 )
@@ -315,6 +322,7 @@ private fun SyncCardFooter(
     removeFolderClicked: () -> Unit,
     issuesInfoClicked: () -> Unit,
     onOpenMegaFolderClicked: () -> Unit,
+    onCameraUploadsSettingsClicked: () -> Unit,
     isLowBatteryLevel: Boolean,
     isError: Boolean,
     expanded: Boolean,
@@ -359,40 +367,51 @@ private fun SyncCardFooter(
                 icon = iconPackR.drawable.ic_folder_open_medium_regular_outline,
                 text = stringResource(id = sharedR.string.general_open_button),
             )
-            MegaButtonWithIconAndText(
-                modifier = Modifier
-                    .padding(end = 16.dp)
-                    .defaultMinSize(minWidth = 56.dp, minHeight = 32.dp),
-                onClick = {
-                    Analytics.tracker.trackEvent(SyncCardPauseRunButtonPressedEvent)
-                    pauseRunClicked()
-                },
-                icon = if (isSyncRunning) {
-                    coreR.drawable.ic_pause
-                } else {
-                    coreR.drawable.ic_play_circle
-                },
-                text = if (isSyncRunning) {
-                    stringResource(id = R.string.sync_card_pause_sync)
-                } else {
-                    stringResource(id = R.string.sync_card_run_sync)
-                },
-                enabled = !isLowBatteryLevel && !isError
-            )
-            MegaButtonWithIconAndText(
-                modifier = Modifier
-                    .padding(end = 8.dp)
-                    .defaultMinSize(minWidth = 56.dp, minHeight = 32.dp),
-                onClick = {
-                    Analytics.tracker.trackEvent(SyncCardStopButtonPressedEvent)
-                    removeFolderClicked()
-                },
-                icon = coreR.drawable.ic_minus_circle,
-                text = when (syncType) {
-                    SyncType.TYPE_BACKUP -> stringResource(sharedR.string.sync_stop_backup_button)
-                    else -> stringResource(sharedR.string.sync_stop_sync_button)
-                },
-            )
+            if (syncType == SyncType.TYPE_CAMERA_UPLOADS || syncType == SyncType.TYPE_MEDIA_UPLOADS) {
+                MegaButtonWithIconAndText(
+                    modifier = Modifier
+                        .padding(end = 8.dp)
+                        .defaultMinSize(minWidth = 56.dp, minHeight = 32.dp),
+                    onClick = onCameraUploadsSettingsClicked,
+                    icon = coreR.drawable.ic_gear_six_regular_outline,
+                    text = stringResource(id = sharedR.string.general_settings),
+                )
+            } else {
+                MegaButtonWithIconAndText(
+                    modifier = Modifier
+                        .padding(end = 16.dp)
+                        .defaultMinSize(minWidth = 56.dp, minHeight = 32.dp),
+                    onClick = {
+                        Analytics.tracker.trackEvent(SyncCardPauseRunButtonPressedEvent)
+                        pauseRunClicked()
+                    },
+                    icon = if (isSyncRunning) {
+                        coreR.drawable.ic_pause
+                    } else {
+                        coreR.drawable.ic_play_circle
+                    },
+                    text = if (isSyncRunning) {
+                        stringResource(id = R.string.sync_card_pause_sync)
+                    } else {
+                        stringResource(id = R.string.sync_card_run_sync)
+                    },
+                    enabled = !isLowBatteryLevel && !isError
+                )
+                MegaButtonWithIconAndText(
+                    modifier = Modifier
+                        .padding(end = 8.dp)
+                        .defaultMinSize(minWidth = 56.dp, minHeight = 32.dp),
+                    onClick = {
+                        Analytics.tracker.trackEvent(SyncCardStopButtonPressedEvent)
+                        removeFolderClicked()
+                    },
+                    icon = coreR.drawable.ic_minus_circle,
+                    text = when (syncType) {
+                        SyncType.TYPE_BACKUP -> stringResource(sharedR.string.sync_stop_backup_button)
+                        else -> stringResource(sharedR.string.sync_stop_sync_button)
+                    },
+                )
+            }
         }
     }
 }
@@ -424,6 +443,7 @@ private fun SyncCardExpandedPreview(
             issuesInfoClicked = {},
             onOpenDeviceFolderClicked = {},
             onOpenMegaFolderClicked = {},
+            onCameraUploadsSettingsClicked = {},
             isLowBatteryLevel = false,
             errorRes = null,
             deviceName = "Device Name",
@@ -458,6 +478,7 @@ private fun SyncCardExpandedWithBannerPreview(
             issuesInfoClicked = {},
             onOpenDeviceFolderClicked = {},
             onOpenMegaFolderClicked = {},
+            onCameraUploadsSettingsClicked = {},
             isLowBatteryLevel = false,
             errorRes = sharedR.string.general_sync_active_sync_below_path,
             deviceName = "Device Name",
@@ -492,6 +513,7 @@ private fun SyncCardCollapsedPreview(
             issuesInfoClicked = {},
             onOpenDeviceFolderClicked = {},
             onOpenMegaFolderClicked = {},
+            onCameraUploadsSettingsClicked = {},
             isLowBatteryLevel = false,
             errorRes = null,
             deviceName = "Device Name",
@@ -526,6 +548,7 @@ private fun SyncCardCollapsedWithBannerPreview(
             issuesInfoClicked = {},
             onOpenDeviceFolderClicked = {},
             onOpenMegaFolderClicked = {},
+            onCameraUploadsSettingsClicked = {},
             isLowBatteryLevel = false,
             errorRes = sharedR.string.general_sync_active_sync_below_path,
             deviceName = "Device Name",

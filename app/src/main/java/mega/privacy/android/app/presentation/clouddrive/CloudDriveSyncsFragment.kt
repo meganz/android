@@ -329,6 +329,9 @@ class CloudDriveSyncsFragment : Fragment() {
                                                 )
                                             }
                                         },
+                                        onCameraUploadsSettingsClicked = {
+                                            megaNavigator.openSettingsCameraUploads(activity)
+                                        },
                                         onFabExpanded = { isExpanded ->
                                             if (isExpanded) {
                                                 transfersManagementViewModel.hideTransfersWidget()

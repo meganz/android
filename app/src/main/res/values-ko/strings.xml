@@ -2304,14 +2304,6 @@
     <string name="invite_contact_chooser_title">다음을 통해 친구 초대</string>
     <!-- Action button label -->
     <string name="invite_contact_action_button">다음을 통해 친구 초대&#8230;</string>
-    <!-- Message displayed when multiple download starts and all files has already been downloaded before. Placeholder: number of files -->
-    <plurals name="file_already_downloaded">
-        <item quantity="other">%d개의 파일이 이미 다운로드 되었습니다.</item>
-    </plurals>
-    <!-- When a multiple download is started, some of the files could have already been downloaded before. This message shows the number of files that are pending. Placeholder: number of files -->
-    <plurals name="file_pending_download">
-        <item quantity="other">파일 %d개 대기 중.</item>
-    </plurals>
     <!-- Title of the login screen -->
     <string name="login_to_mega">MEGA에 로그인</string>
     <!-- Title of the create account screen -->
@@ -2780,14 +2772,6 @@
     <string name="error_share_owner_storage_quota">공유 소유자의 저장소 할당량 초과.</string>
     <!-- A message shown when uploading, copying or moving something to an incoming share and the owner’s account is over its storage quota. -->
     <string name="warning_share_owner_storage_quota">대상 이용자의 저장소 할당량이 초과되어 파일을 전송할 수 없습니다.</string>
-    <!-- Message displayed when multiple download starts and 1 file has already been downloaded before and 1 or multiple files are being downloaded. Placeholder: number of files -->
-    <plurals name="file_already_downloaded_and_files_pending_download">
-        <item quantity="other">1개의 파일이 이미 다운로드 되었습니다. %d개의 파일이 대기 중입니다.</item>
-    </plurals>
-    <!-- Message displayed when multiple download starts and 1 or multiple files have already been downloaded before and 1 file is being downloaded. Placeholder: number of files -->
-    <plurals name="files_already_downloaded_and_file_pending_download">
-        <item quantity="other">%d개의 파일이 이미 다운로드 되었습니다. 1개의 파일이 대기 중입니다.</item>
-    </plurals>
     <!-- Message displayed when 1 node (file or folder) has been successfully moved to the rubbish bin and 1 or multiple nodes have not been moved successfully. Placeholder: number of nodes -->
     <plurals name="node_correctly_and_nodes_incorrectly_moved_to_rubbish">
         <item quantity="other">1개의 항목이 휴지통으로 이동되었으나 %d개 항목이 이동되지 않았습니다. 나중에 다시 시도하세요.</item>
@@ -4381,10 +4365,6 @@
     <!-- Subtitle of option to set a recurrence in Schedule meeting screen when the recurrence occurs specific day of the month every 1 or more months -->
     <plurals name="meetings_schedule_meeting_recurrence_specific_day_every_number_of_months_label">
         <item quantity="other">매 %1$s개월마다 %2$d번째 날</item>
-    </plurals>
-    <!-- Message when many downloads start. Plural more than 1 file. Placeholder is for include the number of downloads in runtime. -->
-    <plurals name="download_started">
-        <item quantity="other">다운로드 %1$d개 시작</item>
     </plurals>
     <!-- Message when many downloads finish. Plural more than 1 file. Placeholder is for include the number of downloads in runtime. -->
     <plurals name="download_complete">

@@ -85,6 +85,7 @@ internal fun SyncListScreen(
     onSyncFolderClicked: () -> Unit,
     onBackupFolderClicked: () -> Unit,
     onOpenMegaFolderClicked: (handle: Long) -> Unit,
+    onCameraUploadsSettingsClicked: () -> Unit,
     actionSelected: (item: StalledIssueUiItem, selectedAction: StalledIssueResolutionAction) -> Unit,
     snackBarHostState: SnackbarHostState,
     syncPermissionsManager: SyncPermissionsManager,
@@ -260,6 +261,7 @@ internal fun SyncListScreen(
                     syncPermissionsManager = syncPermissionsManager,
                     onSelectStopBackupDestinationClicked = onSelectStopBackupDestinationClicked,
                     onOpenUpgradeAccountClicked = onOpenUpgradeAccountClicked,
+                    onCameraUploadsSettingsClicked = onCameraUploadsSettingsClicked,
                     syncFoldersViewModel = syncFoldersViewModel,
                     syncStalledIssuesViewModel = syncStalledIssuesViewModel,
                     syncSolvedIssuesViewModel = syncSolvedIssuesViewModel,
@@ -283,6 +285,7 @@ private fun SyncListScreenContent(
     onAddNewSyncClicked: () -> Unit,
     onAddNewBackupClicked: () -> Unit,
     onOpenMegaFolderClicked: (handle: Long) -> Unit,
+    onCameraUploadsSettingsClicked: () -> Unit,
     syncPermissionsManager: SyncPermissionsManager,
     onSelectStopBackupDestinationClicked: () -> Unit,
     onOpenUpgradeAccountClicked: () -> Unit,
@@ -321,7 +324,7 @@ private fun SyncListScreenContent(
             )
         } else if (syncFoldersUiState.syncUiItems.isNotEmpty() && syncFoldersUiState.isLowBatteryLevel) {
             WarningBanner(
-                textString = stringResource(id = mega.privacy.android.shared.resources.R.string.general_message_sync_paused_low_battery_level),
+                textString = stringResource(id = sharedResR.string.general_message_sync_paused_low_battery_level),
                 onCloseClick = null
             )
         }
@@ -344,6 +347,7 @@ private fun SyncListScreenContent(
                 onSelectStopBackupDestinationClicked = onSelectStopBackupDestinationClicked,
                 stalledIssueDetailsClicked = stalledIssuesDetailsClicked,
                 onOpenMegaFolderClicked = onOpenMegaFolderClicked,
+                onCameraUploadsSettingsClicked = onCameraUploadsSettingsClicked,
                 moreClicked = moreClicked,
                 issuesInfoClicked = {
                     checkedChip = STALLED_ISSUES
@@ -399,6 +403,7 @@ private fun SelectedChipScreen(
     onAddNewBackupClicked: () -> Unit,
     onSelectStopBackupDestinationClicked: () -> Unit,
     onOpenMegaFolderClicked: (handle: Long) -> Unit,
+    onCameraUploadsSettingsClicked: () -> Unit,
     stalledIssueDetailsClicked: (StalledIssueUiItem) -> Unit,
     moreClicked: (StalledIssueUiItem) -> Unit,
     issuesInfoClicked: () -> Unit,
@@ -424,6 +429,7 @@ private fun SelectedChipScreen(
                 deviceName = deviceName,
                 isBackupForAndroidEnabled = isBackupForAndroidEnabled,
                 onOpenMegaFolderClicked = onOpenMegaFolderClicked,
+                onCameraUploadsSettingsClicked = onCameraUploadsSettingsClicked,
             )
         }
 

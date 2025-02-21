@@ -2420,18 +2420,6 @@
     <string name="invite_contact_chooser_title">Invită un prieten via</string>
     <!-- Action button label -->
     <string name="invite_contact_action_button">Invită un prieten via&#8230;</string>
-    <!-- Message displayed when multiple download starts and all files has already been downloaded before. Placeholder: number of files -->
-    <plurals name="file_already_downloaded">
-        <item quantity="one">%d fișier descărcat deja.</item>
-        <item quantity="few">%d fișiere descărcate deja.</item>
-        <item quantity="other">%d de fișiere descărcate deja.</item>
-    </plurals>
-    <!-- When a multiple download is started, some of the files could have already been downloaded before. This message shows the number of files that are pending. Placeholder: number of files -->
-    <plurals name="file_pending_download">
-        <item quantity="one">%d fișier în așteptare.</item>
-        <item quantity="few">%d fișiere în așteptare.</item>
-        <item quantity="other">%d de fișiere în așteptare.</item>
-    </plurals>
     <!-- Title of the login screen -->
     <string name="login_to_mega">Conectați-vă la MEGA</string>
     <!-- Title of the create account screen -->
@@ -2926,18 +2914,6 @@
     <string name="error_share_owner_storage_quota">Proprietarul partajării depășește cota de stocare.</string>
     <!-- A message shown when uploading, copying or moving something to an incoming share and the owner’s account is over its storage quota. -->
     <string name="warning_share_owner_storage_quota">Fișierul nu poate fi trimis deoarece utilizatorul țintă și-a depășit cota sa de stocare.</string>
-    <!-- Message displayed when multiple download starts and 1 file has already been downloaded before and 1 or multiple files are being downloaded. Placeholder: number of files -->
-    <plurals name="file_already_downloaded_and_files_pending_download">
-        <item quantity="one">1 fișier descărcat deja. %d fișier în așteptare.</item>
-        <item quantity="few">1 fișier descărcat deja. %d fișiere în așteptare.</item>
-        <item quantity="other">1 fișier descărcat deja. %d de fișiere în așteptare.</item>
-    </plurals>
-    <!-- Message displayed when multiple download starts and 1 or multiple files have already been downloaded before and 1 file is being downloaded. Placeholder: number of files -->
-    <plurals name="files_already_downloaded_and_file_pending_download">
-        <item quantity="one">1 fișier descărcat deja. %d fișier în așteptare.</item>
-        <item quantity="few">%d fișiere descărcate deja. 1 fișier în așteptare.</item>
-        <item quantity="other">%d de fișiere descărcate deja. 1 fișier în așteptare.</item>
-    </plurals>
     <!-- Message displayed when 1 node (file or folder) has been successfully moved to the rubbish bin and 1 or multiple nodes have not been moved successfully. Placeholder: number of nodes -->
     <plurals name="node_correctly_and_nodes_incorrectly_moved_to_rubbish">
         <item quantity="one">1 element a fost mutat în Coșul de gunoi, însă celălalt nu a fost mutat. Încearcă din nou mai târziu.</item>
@@ -4817,12 +4793,6 @@
         <item quantity="one">În fiecare lună, în ziua %2$d</item>
         <item quantity="few">La fiecare %1$s luni, în ziua %2$d</item>
         <item quantity="other">La fiecare %1$s luni, în ziua %2$d</item>
-    </plurals>
-    <!-- Message when many downloads start. Plural more than 1 file. Placeholder is for include the number of downloads in runtime. -->
-    <plurals name="download_started">
-        <item quantity="one">Descărcarea a început</item>
-        <item quantity="few">%1$d descărcări au început</item>
-        <item quantity="other">%1$d de descărcări au început</item>
     </plurals>
     <!-- Message when many downloads finish. Plural more than 1 file. Placeholder is for include the number of downloads in runtime. -->
     <plurals name="download_complete">

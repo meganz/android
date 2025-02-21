@@ -96,6 +96,7 @@ class SyncFoldersScreenTest {
                 onAddNewBackupClicked = {},
                 issuesInfoClicked = {},
                 onOpenMegaFolderClicked = {},
+                onCameraUploadsSettingsClicked = {},
                 uiState = syncFoldersUiState,
                 snackBarHostState = SnackbarHostState(),
                 deviceName = "Device Name",
@@ -127,6 +128,7 @@ class SyncFoldersScreenTest {
                 deviceName = "Device Name",
                 isBackupForAndroidEnabled = true,
                 onOpenMegaFolderClicked = {},
+                onCameraUploadsSettingsClicked = {},
             )
         }
 
@@ -161,6 +163,7 @@ class SyncFoldersScreenTest {
                 deviceName = "Device Name",
                 isBackupForAndroidEnabled = true,
                 onOpenMegaFolderClicked = {},
+                onCameraUploadsSettingsClicked = {},
             )
         }
 
@@ -184,6 +187,7 @@ class SyncFoldersScreenTest {
                 issuesInfoClicked = {},
                 onOpenDeviceFolderClicked = {},
                 onOpenMegaFolderClicked = {},
+                onCameraUploadsSettingsClicked = {},
                 isLowBatteryLevel = false,
                 isLoading = true,
                 deviceName = "Device Name",
@@ -271,6 +275,7 @@ class SyncFoldersScreenTest {
                 issuesInfoClicked = {},
                 onOpenDeviceFolderClicked = {},
                 onOpenMegaFolderClicked = {},
+                onCameraUploadsSettingsClicked = {},
                 isLowBatteryLevel = false,
                 isLoading = false,
                 deviceName = "Device Name",
@@ -305,6 +310,7 @@ class SyncFoldersScreenTest {
                 issuesInfoClicked = {},
                 onOpenDeviceFolderClicked = {},
                 onOpenMegaFolderClicked = {},
+                onCameraUploadsSettingsClicked = {},
                 isLowBatteryLevel = false,
                 isLoading = false,
                 deviceName = "Device Name",
@@ -340,6 +346,7 @@ class SyncFoldersScreenTest {
                 issuesInfoClicked = {},
                 onOpenDeviceFolderClicked = {},
                 onOpenMegaFolderClicked = {},
+                onCameraUploadsSettingsClicked = {},
                 isLowBatteryLevel = false,
                 isLoading = false,
                 deviceName = "Device Name",

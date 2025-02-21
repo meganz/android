@@ -228,8 +228,6 @@
     </plurals>
     <!-- Title of the dialog to ask the user to use the selected location as default location for next downloads. Please do not modify the %s placeholder as it will be replaced by the name of the folder where the files will be downloaded-->
     <string name="transfers_dialog_save_download_location_title">ダウンロードしたファイルをすべて「%1$s」に保存しますか？</string>
-    <!-- Option to don't use the selected location as default location for next downloads-->
-    <string name="transfers_dialog_save_download_location_only_this_time_option">今回だけ</string>
     <!-- Option to use the selected location as default location for next downloads-->
     <string name="transfers_dialog_save_download_location_always_here_option">常にここにダウンロード</string>
     <!-- Option to don't use the selected location as default location for next downloads and don't ask again-->
@@ -389,7 +387,7 @@
     <!-- Unlimited call and meeting duration available in the pro plan -->
     <string name="cancel_account_plan_call_meeting_duration_pro">無制限</string>
     <!-- Row label for call and meeting participants in the comparison table -->
-    <string name="account_cancel_account_plan_call_meeting_participants">通話とミーティングの参加者</string>
+    <string name="account_cancel_account_plan_call_meeting_participants">通話＆ミーティングの参加者</string>
     <!-- Limit on call and meeting participants in the free plan -->
     <string name="account_cancel_account_free_plan_call_meeting_participants">最大100人</string>
     <!-- Unlimited call and meeting participants available in the pro plan -->

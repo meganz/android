@@ -2304,14 +2304,6 @@
     <string name="invite_contact_chooser_title">Mời bạn bè bằng</string>
     <!-- Action button label -->
     <string name="invite_contact_action_button">Mời bạn bè thông qua&#8230;</string>
-    <!-- Message displayed when multiple download starts and all files has already been downloaded before. Placeholder: number of files -->
-    <plurals name="file_already_downloaded">
-        <item quantity="other">%d tệp tin đã được tải xuống từ trước.</item>
-    </plurals>
-    <!-- When a multiple download is started, some of the files could have already been downloaded before. This message shows the number of files that are pending. Placeholder: number of files -->
-    <plurals name="file_pending_download">
-        <item quantity="other">%d tệp tin đang chờ.</item>
-    </plurals>
     <!-- Title of the login screen -->
     <string name="login_to_mega">Đăng&#160;nhập vào MEGA</string>
     <!-- Title of the create account screen -->
@@ -2780,14 +2772,6 @@
     <string name="error_share_owner_storage_quota">Chủ sở hữu dùng hết lượng băng thông.</string>
     <!-- A message shown when uploading, copying or moving something to an incoming share and the owner’s account is over its storage quota. -->
     <string name="warning_share_owner_storage_quota">Tệp tin không thể gửi tới người đã chọn vì họ đã dùng hết lượng băng thông lưu trữ của mình.</string>
-    <!-- Message displayed when multiple download starts and 1 file has already been downloaded before and 1 or multiple files are being downloaded. Placeholder: number of files -->
-    <plurals name="file_already_downloaded_and_files_pending_download">
-        <item quantity="other">1 tệp tin đã được tải xuống. %d tệp tin đang chờ.</item>
-    </plurals>
-    <!-- Message displayed when multiple download starts and 1 or multiple files have already been downloaded before and 1 file is being downloaded. Placeholder: number of files -->
-    <plurals name="files_already_downloaded_and_file_pending_download">
-        <item quantity="other">%d tệp tin đã được tải xuống. 1 tệp tin đang chờ.</item>
-    </plurals>
     <!-- Message displayed when 1 node (file or folder) has been successfully moved to the rubbish bin and 1 or multiple nodes have not been moved successfully. Placeholder: number of nodes -->
     <plurals name="node_correctly_and_nodes_incorrectly_moved_to_rubbish">
         <item quantity="other">1 mục đã được chuyển vào Thùng Rác và %d mục đã không được chuyển. Thử lại sau.</item>
@@ -4381,10 +4365,6 @@
     <!-- Subtitle of option to set a recurrence in Schedule meeting screen when the recurrence occurs specific day of the month every 1 or more months -->
     <plurals name="meetings_schedule_meeting_recurrence_specific_day_every_number_of_months_label">
         <item quantity="other">Mỗi %1$s tháng vào ngày %2$d</item>
-    </plurals>
-    <!-- Message when many downloads start. Plural more than 1 file. Placeholder is for include the number of downloads in runtime. -->
-    <plurals name="download_started">
-        <item quantity="other">%1$d mục tải&#160;xuống đã được bắt&#160;đầu</item>
     </plurals>
     <!-- Message when many downloads finish. Plural more than 1 file. Placeholder is for include the number of downloads in runtime. -->
     <plurals name="download_complete">

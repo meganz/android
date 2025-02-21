@@ -252,8 +252,6 @@
     </plurals>
     <!-- Title of the dialog to ask the user to use the selected location as default location for next downloads. Please do not modify the %s placeholder as it will be replaced by the name of the folder where the files will be downloaded-->
     <string name="transfers_dialog_save_download_location_title">Save all your downloaded files to “%1$s”?</string>
-    <!-- Option to don't use the selected location as default location for next downloads-->
-    <string name="transfers_dialog_save_download_location_only_this_time_option">Tylko tym razem</string>
     <!-- Option to use the selected location as default location for next downloads-->
     <string name="transfers_dialog_save_download_location_always_here_option">Zawsze pobieraj tutaj</string>
     <!-- Option to don't use the selected location as default location for next downloads and don't ask again-->
@@ -413,7 +411,7 @@
     <!-- Unlimited call and meeting duration available in the pro plan -->
     <string name="cancel_account_plan_call_meeting_duration_pro">BEZ OGRANICZEŃ</string>
     <!-- Row label for call and meeting participants in the comparison table -->
-    <string name="account_cancel_account_plan_call_meeting_participants">Uczestnicy połączeń i spotkań</string>
+    <string name="account_cancel_account_plan_call_meeting_participants">Zadzwoń do uczestników spotkania</string>
     <!-- Limit on call and meeting participants in the free plan -->
     <string name="account_cancel_account_free_plan_call_meeting_participants">Do 100</string>
     <!-- Unlimited call and meeting participants available in the pro plan -->
