@@ -26,6 +26,12 @@ sealed interface TransferTriggerEvent {
     val checkPausedTransfers get() = CheckPausedTransfersType.Never
 
     /**
+     * If true and notification permission is not granted, the transfer should not start until user responds to permission request.
+     * Useful in case the fragment or activity is closed once the transfer starts, so permission request is not hidden.
+     */
+    val waitNotificationPermissionResponseToStart: Boolean
+
+    /**
      * Event to start uploading to the chat
      */
     sealed interface StartChatUpload : TransferTriggerEvent {
@@ -55,6 +61,7 @@ sealed interface TransferTriggerEvent {
         data class Files(
             override val chatId: Long,
             override val uris: List<Uri>,
+            override val waitNotificationPermissionResponseToStart: Boolean = false,
         ) : StartChatUpload {
             override val isVoiceClip = false
         }
@@ -67,6 +74,7 @@ sealed interface TransferTriggerEvent {
         data class VoiceClip(
             override val chatId: Long,
             val file: File,
+            override val waitNotificationPermissionResponseToStart: Boolean = false,
         ) : StartChatUpload {
             override val uris get() = listOf(file.toUri())
             override val isVoiceClip = true
@@ -118,6 +126,7 @@ sealed interface TransferTriggerEvent {
     data class StartDownloadForOffline(
         val node: TypedNode?,
         override val isHighPriority: Boolean = false,
+        override val waitNotificationPermissionResponseToStart: Boolean = false,
     ) : DownloadTriggerEvent {
         override val nodes = node?.let { listOf(node) } ?: emptyList()
         override val appData = TransferAppData.OfflineDownload
@@ -131,6 +140,7 @@ sealed interface TransferTriggerEvent {
     data class StartDownloadNode(
         override val nodes: List<TypedNode>,
         override val isHighPriority: Boolean = false,
+        override val waitNotificationPermissionResponseToStart: Boolean = false,
     ) : DownloadTriggerEvent
 
     /**
@@ -140,7 +150,9 @@ sealed interface TransferTriggerEvent {
      */
     data class CopyOfflineNode(
         val nodeIds: List<NodeId>,
-    ) : CopyTriggerEvent
+    ) : CopyTriggerEvent {
+        override val waitNotificationPermissionResponseToStart = false
+    }
 
     /**
      * Copy uri
@@ -151,6 +163,7 @@ sealed interface TransferTriggerEvent {
     data class CopyUri(
         val name: String,
         val uri: Uri,
+        override val waitNotificationPermissionResponseToStart: Boolean = false,
     ) : CopyTriggerEvent
 
     /**
@@ -160,6 +173,7 @@ sealed interface TransferTriggerEvent {
      */
     data class StartDownloadForPreview(
         val node: TypedNode?,
+        override val waitNotificationPermissionResponseToStart: Boolean = false,
     ) : DownloadTriggerEvent {
         override val nodes = node?.let { listOf(node) } ?: emptyList()
         override val isHighPriority: Boolean = true
@@ -193,6 +207,7 @@ sealed interface TransferTriggerEvent {
         data class Files(
             override val pathsAndNames: Map<String, String?>,
             override val destinationId: NodeId,
+            override val waitNotificationPermissionResponseToStart: Boolean = false,
         ) : StartUpload {
             override val isHighPriority = false
         }
@@ -210,6 +225,7 @@ sealed interface TransferTriggerEvent {
             override val destinationId: NodeId,
             val isEditMode: Boolean,
             val fromHomePage: Boolean,
+            override val waitNotificationPermissionResponseToStart: Boolean = false,
         ) : StartUpload {
             override val pathsAndNames = mapOf(path to null)
             override val isHighPriority = true
@@ -224,6 +240,7 @@ sealed interface TransferTriggerEvent {
             val collisionChoice: NameCollisionChoice?,
             override val pathsAndNames: Map<String, String?>,
             override val destinationId: NodeId,
+            override val waitNotificationPermissionResponseToStart: Boolean = false,
         ) : StartUpload {
             override val isHighPriority = false
         }

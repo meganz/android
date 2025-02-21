@@ -399,7 +399,8 @@ class UploadFolderViewModel @Inject constructor(
                 transferTriggerEvent = triggered(
                     TransferTriggerEvent.StartUpload.Files(
                         pathsAndNames,
-                        NodeId(parentHandle)
+                        NodeId(parentHandle),
+                        waitNotificationPermissionResponseToStart = true
                     )
                 )
             )

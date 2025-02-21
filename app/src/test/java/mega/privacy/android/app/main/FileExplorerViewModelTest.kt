@@ -196,7 +196,8 @@ internal class FileExplorerViewModelTest {
         val expected = triggered(
             TransferTriggerEvent.StartUpload.Files(
                 mapOf(file.absolutePath to null),
-                NodeId(parentHandle)
+                NodeId(parentHandle),
+                waitNotificationPermissionResponseToStart = true,
             )
         )
 
@@ -220,7 +221,8 @@ internal class FileExplorerViewModelTest {
         val expected = triggered(
             TransferTriggerEvent.StartUpload.Files(
                 mapOf(uri.toString() to fileName),
-                NodeId(parentHandle)
+                NodeId(parentHandle),
+                waitNotificationPermissionResponseToStart = true,
             )
         )
 
@@ -249,7 +251,8 @@ internal class FileExplorerViewModelTest {
         val expected = triggered(
             TransferTriggerEvent.StartUpload.Files(
                 mapOf(uri.toString() to renamedName),
-                NodeId(parentHandle)
+                NodeId(parentHandle),
+                waitNotificationPermissionResponseToStart = true,
             )
         )
 

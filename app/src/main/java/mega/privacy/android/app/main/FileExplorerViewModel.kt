@@ -532,6 +532,7 @@ class FileExplorerViewModel @Inject constructor(
                     TransferTriggerEvent.StartUpload.Files(
                         pathsAndNames = pathsAndNames,
                         destinationId = destinationId,
+                        waitNotificationPermissionResponseToStart = true,
                     )
                 )
             )

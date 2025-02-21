@@ -88,7 +88,10 @@ internal fun StartTransferComponent(
     var showFilesPermissionRequest by rememberSaveable { mutableStateOf(false) }
     var showStorageOverQuotaWarning by rememberSaveable { mutableStateOf(false) }
     val notificationPermission = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
-        rememberPermissionState(Manifest.permission.POST_NOTIFICATIONS)
+        rememberPermissionState(Manifest.permission.POST_NOTIFICATIONS) {
+            // we don't need notifications granted to start, but sometimes we wait user response to start, check [TransferTriggerEvent.waitForNotificationPermissionResponseToStart]
+            viewModel.startTransferAfterPermissionRequest()
+        }
     } else {
         null
     }
@@ -128,6 +131,10 @@ internal fun StartTransferComponent(
                     )
                 } else if (!permissionStatus.isGranted) {
                     notificationPermission.launchPermissionRequest()
+                    if (triggerEvent.waitNotificationPermissionResponseToStart) {
+                        viewModel.transferEventWaitingForPermissionRequest(triggerEvent)
+                        return@EventEffect
+                    }
                 }
             }
             when {
