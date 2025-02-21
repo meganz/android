@@ -9,6 +9,7 @@ import mega.privacy.android.app.presentation.transfers.starttransfer.model.Trans
 import mega.privacy.android.domain.entity.ChatRoomPermission
 import mega.privacy.android.domain.entity.StorageState
 import mega.privacy.android.domain.entity.call.ChatCall
+import mega.privacy.android.domain.entity.call.ChatCallStatus
 import mega.privacy.android.domain.entity.chat.ChatHistoryLoadStatus
 import mega.privacy.android.domain.entity.chat.ChatRoom
 import mega.privacy.android.domain.entity.chat.ChatScheduledMeeting
@@ -183,9 +184,9 @@ data class ChatUiState(
     val isWaitingRoom = chat?.isWaitingRoom == true
 
     /**
-     * Check if I'm participating in the call
+     * Check if I'm participating in the call with another client
      */
-    val isParticipating = myUserHandle?.let {
-        callInThisChat?.peerIdParticipants?.contains(it)
+    val isParticipatingWithAnotherClient = myUserHandle?.let {
+        callInThisChat?.peerIdParticipants?.contains(it) == true && callInThisChat.status == ChatCallStatus.UserNoPresent
     }
 }
