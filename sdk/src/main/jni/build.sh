@@ -154,9 +154,9 @@ ICU_DOWNLOAD_URL=https://github.com/unicode-org/icu/releases/download/release-71
 ICU_SHA1="0b6a02293a81ccfb2a743ce1faa009770ed8a12c"
 ICU_SOURCE_VERSION=icuSource-${ICU_VERSION}
 
-WEBRTC_DOWNLOAD_URL=https://mega.nz/file/F0YThaQR#FgoSW-XuxwHVr-9SNmVcP_JWG8B0Q6ogT9By3fEiEDc
+WEBRTC_DOWNLOAD_URL=https://mega.nz/file/N2k2XRaA#bS9iudrjiULmMaGbBKErsYosELbnU22b8Zj213Ti1nE
 # Expected SHA1 checksum of "megachat/webrtc/libwebrtc_arm64.a" in downloaded WebRTC library
-WEBRTC_SHA1=a82c138885bfbc6e9c2eb08c6b314ae196a7673f
+WEBRTC_SHA1=c4442ce8bf7567d3980e14941a313311cf0483cb
 
 function setupEnv()
 {
@@ -721,28 +721,28 @@ rm -rf ../tmpLibs
 mkdir ../tmpLibs
 if [ -n "`echo ${BUILD_ARCHS} | grep -w x86`" ]; then
     echo "* Running ndk-build x86"
-    ${NDK_BUILD} NDK_LIBS_OUT=${TARGET_LIB_DIR} -j${JOBS} APP_ABI=x86 &>> ${LOG_FILE}
+    ${NDK_BUILD} V=1 NDK_LIBS_OUT=${TARGET_LIB_DIR} -j${JOBS} APP_ABI=x86 &>> ${LOG_FILE}
     mv ${TARGET_LIB_DIR}/x86 ../tmpLibs/
     echo "* ndk-build finished for x86"
 fi
 
 if [ -n "`echo ${BUILD_ARCHS} | grep -w armeabi-v7a`" ]; then
     echo "* Running ndk-build arm 32bits"
-    ${NDK_BUILD} NDK_LIBS_OUT=${TARGET_LIB_DIR} -j${JOBS} APP_ABI=armeabi-v7a &>> ${LOG_FILE}
+    ${NDK_BUILD} V=1 NDK_LIBS_OUT=${TARGET_LIB_DIR} -j${JOBS} APP_ABI=armeabi-v7a &>> ${LOG_FILE}
     mv ${TARGET_LIB_DIR}/armeabi-v7a ../tmpLibs/
     echo "* ndk-build finished for arm 32bits"
 fi
 
 if [ -n "`echo ${BUILD_ARCHS} | grep -w x86_64`" ]; then
     echo "* Running ndk-build x86_64"
-    ${NDK_BUILD} NDK_LIBS_OUT=${TARGET_LIB_DIR} -j${JOBS} APP_ABI=x86_64 &>> ${LOG_FILE}
+    ${NDK_BUILD} V=1 NDK_LIBS_OUT=${TARGET_LIB_DIR} -j${JOBS} APP_ABI=x86_64 &>> ${LOG_FILE}
     mv ${TARGET_LIB_DIR}/x86_64 ../tmpLibs/
     echo "* ndk-build finished for x86_64"
 fi
 
 if [ -n "`echo ${BUILD_ARCHS} | grep -w arm64-v8a`" ]; then
     echo "* Running ndk-build arm 64bits"
-    ${NDK_BUILD} NDK_LIBS_OUT=${TARGET_LIB_DIR} -j${JOBS} APP_ABI=arm64-v8a &>> ${LOG_FILE}
+    ${NDK_BUILD} V=1 NDK_LIBS_OUT=${TARGET_LIB_DIR} -j${JOBS} APP_ABI=arm64-v8a &>> ${LOG_FILE}
     echo "* ndk-build finished for arm 64bits"
     mv ${TARGET_LIB_DIR}/arm64-v8a ../tmpLibs/
 fi
