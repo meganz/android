@@ -329,20 +329,6 @@ pipeline {
             }
         }
 
-        stage('Enable Permanent Logging') {
-            when {
-                expression { triggerByDeliverQaCmd() || triggerByPushToDevelop() }
-            }
-            steps {
-                script {
-                    BUILD_STEP = 'Enable Permanent Logging'
-
-                    def featureFlagFile = "app/src/main/assets/featuretoggle/feature_flags.json"
-                    common.setFeatureFlag(featureFlagFile, "PermanentLogging", true)
-                    sh("cat $featureFlagFile")
-                }
-            }
-        }
         stage('Build APK(GMS)') {
             when {
                 expression { triggerByDeliverQaCmd() || triggerByPushToDevelop() }
