@@ -430,7 +430,9 @@ class FileStorageActivity : PasscodeActivity(), Scrollable {
 
     private fun checkMenuVisibility() {
         openInFileManagerMenuItem?.isVisible =
-            mode == Mode.BROWSE_FILES && !isInCacheDirectory(path)
+            mode == Mode.BROWSE_FILES
+                    && !isInCacheDirectory(path)
+                    && this.createViewFolderIntent(Uri.fromFile(path)) != null
     }
 
     /*
