@@ -694,6 +694,7 @@ class FileExplorerActivity : PasscodeActivity(), MegaRequestListenerInterface,
                 }.firstOrNull()
             onProcessAsyncInfo(documents)
         }
+        viewModel.textInfo.observe(this) { dismissAlertDialogIfExists(statusDialog) }
 
         collectFlow(viewModel.uiState) { fileExplorerState ->
             if (fileExplorerState.shouldFinishScreen) {
