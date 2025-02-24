@@ -2,13 +2,14 @@
  * This script is to promote Alpha builds to Beta or Production in Google Play Store
  */
 
+
 import com.google.api.services.androidpublisher.AndroidPublisher
 import com.google.api.services.androidpublisher.model.Track
 import com.google.api.services.androidpublisher.model.TrackRelease
 import com.google.jenkins.plugins.credentials.oauth.GoogleRobotCredentials
-import org.jenkinsci.plugins.googleplayandroidpublisher.Util
-import org.jenkinsci.plugins.googleplayandroidpublisher.CredentialsHandler
 import hudson.model.Item
+import org.jenkinsci.plugins.googleplayandroidpublisher.CredentialsHandler
+import org.jenkinsci.plugins.googleplayandroidpublisher.Util
 
 @Library('jenkins-android-shared-lib') _
 /**
@@ -23,6 +24,18 @@ BUILD_STEP = ''
 
 properties([
         parameters([
+                activeChoice(
+                        choiceType: 'PT_SINGLE_SELECT',
+                        description: 'Application',
+                        filterLength: 1,
+                        filterable: false,
+                        name: 'PACKAGE',
+                        randomName: 'choice-parameter-162835245454545',
+                        script: groovyScript(
+                                fallbackScript: [classpath: [], oldScript: '', sandbox: false, script: ''],
+                                script: [classpath: [], oldScript: '', sandbox: false, script: 'return ["Select", "MEGA", "MEGA VPN", "MEGA Pass"]']
+                        )
+                ),
                 activeChoice(
                         choiceType: 'PT_SINGLE_SELECT',
                         description: 'Target track/channel to promote to',
@@ -57,7 +70,7 @@ properties([
                         filterLength: 1,
                         filterable: false,
                         randomName: 'choice-parameter-162835228262015',
-                        referencedParameters: '',
+                        referencedParameters: 'PACKAGE',
                         script: groovyScript(
                                 fallbackScript: [classpath: [], oldScript: '', sandbox: false, script: ''],
                                 script: [classpath: [], oldScript: '', sandbox: false, script: '''
@@ -75,7 +88,14 @@ properties([
                                     import jenkins.model.Jenkins
 
                                     def googleCredentialsId = 'GOOGLE_PLAY_SERVICE_ACCOUNT_CREDENTIAL'
-                                    def packageName = 'mega.privacy.android.app'
+                                    def packageName
+                                    if (PACKAGE == "MEGA VPN") {
+                                        packageName = "mega.vpn.android.app"
+                                    } else if (PACKAGE == "MEGA Pass") {
+                                        packageName = "mega.pwm.android.app"
+                                    } else {
+                                        packageName = "mega.privacy.android.app"
+                                    }
                                   
                                     
                                     // Get credentials
@@ -161,18 +181,22 @@ pipeline {
                     String versionCode = extractVersionCode(params.VERSION)
                     String fullVersion = "v$versionName($versionCode)"
                     String percentage = params.PERCENTAGE
+                    String app = params.PACKAGE
                     String message = "${buildLog}\n"
                     if (isHaltRollout(percentage)) {
-                        message += "Hi <!subteam^S02B2PB5SG7>, halting the $track rollout for $fullVersion has failed, please check."
+                        message += "Hi <!subteam^S02B2PB5SG7>, halting the $track rollout for $app $fullVersion has failed, please check."
                     } else {
-                        message += "Hi <!subteam^S02B2PB5SG7>, the promotion to $track has failed for $fullVersion at ${percentage}% rollout, please check."
+                        message += "Hi <!subteam^S02B2PB5SG7>, the promotion to $track has failed for $app $fullVersion at ${percentage}% rollout, please check."
                     }
 
-                    def slackChannelId = common.fetchSlackChannelIdsByReleaseVersion(versionName)[0]
-                    if (slackChannelId == "") {
-                        slackSend(channel: "android", color: "danger", message: message)
-                    } else {
-                        slackSend channel: slackChannelId, color: "danger", message: message, replyBroadcast: true
+                    // Limit to MEGA app for now because success message is not supported yet for VPN and PWM
+                    if (app == "MEGA") {
+                        def slackChannelId = common.fetchSlackChannelIdsByReleaseVersion(versionName)[0]
+                        if (slackChannelId == "") {
+                            slackSend(channel: "android", color: "danger", message: message)
+                        } else {
+                            slackSend channel: slackChannelId, color: "danger", message: message, replyBroadcast: true
+                        }
                     }
                 }
             }
@@ -185,25 +209,35 @@ pipeline {
                 String versionCode = extractVersionCode(params.VERSION)
                 String fullVersion = "v$versionName($versionCode)"
                 String percentage = params.PERCENTAGE
+                String app = params.PACKAGE
                 String packageLink = ""
                 withCredentials([string(credentialsId: 'JIRA_BASE_URL', variable: 'JIRA_BASE_URL')]) {
-                    packageLink = "${env.JIRA_BASE_URL}/issues/?jql=fixVersion%20%3D%20%22Android%20$versionName%22%20%20ORDER%20BY%20priority%20DESC%2C%20updated%20DESC"
+                    if (app == "MEGA VPN") {
+                        packageLink = "${env.JIRA_BASE_URL}/issues?jql=project%20%3D%20VPN%20AND%20fixVersion%20%3D%20%22VPN%20Android%20$versionName%22%20%20ORDER%20BY%20priority%20DESC%2C%20updated%20DESC"
+                    } else if (app == "MEGA Pass") {
+                        packageLink = "${env.JIRA_BASE_URL}/issues?jql=project%20%3D%20PASS%20AND%20fixVersion%20%3D%20%22PWM%20Android%20$versionName%22%20%20ORDER%20BY%20priority%20DESC%2C%20updated%20DESC"
+                    } else {
+                        packageLink = "${env.JIRA_BASE_URL}/issues/?jql=fixVersion%20%3D%20%22Android%20$versionName%22%20%20ORDER%20BY%20priority%20DESC%2C%20updated%20DESC"
+                    }
                 }
                 String userType = track == 'production' ? "users" : "testers"
 
                 String message = ""
                 if (isHaltRollout(percentage)) {
-                    message = "The Android team has halted the $track roll out process in Google Play for $fullVersion."
+                    message = "The Android team has halted the $track roll out process of the $app ($fullVersion) on Google Play."
                 } else {
-                    message = "The Android team has started the $track roll out process in Google Play for $fullVersion. It is now being offered to ${percentage}% of $track $userType.\n" +
+                    message = "The Android team has started the $track roll out process in Google Play for $app ($fullVersion). It is now being offered to ${percentage}% of $track $userType.\n" +
                             "Here is the <$packageLink|v$versionName> Jira Release Package."
                 }
 
-                def slackChannelId = common.fetchSlackChannelIdsByReleaseVersion(versionName)[0]
-                if (slackChannelId == "") {
-                    slackSend(channel: "android", message: message)
-                } else {
-                    slackSend channel: slackChannelId, message: message, replyBroadcast: true
+                // Limit to MEGA app for now because success message is not supported yet for VPN and PWM
+                if (app == "MEGA") {
+                    def slackChannelId = common.fetchSlackChannelIdsByReleaseVersion(versionName)[0]
+                    if (slackChannelId == "") {
+                        slackSend(channel: "android", message: message)
+                    } else {
+                        slackSend channel: slackChannelId, message: message, replyBroadcast: true
+                    }
                 }
             }
         }
@@ -238,7 +272,7 @@ pipeline {
                     BUILD_STEP = 'Deploy'
 
                     def googleCredentialsId = 'GOOGLE_PLAY_SERVICE_ACCOUNT_CREDENTIAL'
-                    def packageName = 'mega.privacy.android.app'
+                    def packageName = getPackageName(params.PACKAGE)
                     def versionCode = extractVersionCode(params.VERSION)
                     def trackName = params.TRACK.toLowerCase()
                     def rolloutPercentage = params.PERCENTAGE
@@ -250,12 +284,16 @@ pipeline {
                                 versionCode
                         )
                     } else {
+                        def versionCodes = params.PACKAGE == 'MEGA' ? "233140859, $versionCode" : "$versionCode"
+                        def releaseName = extractReleaseName(params.VERSION)
+
                         androidApkMove googleCredentialsId: "$googleCredentialsId",
                                 applicationId: "$packageName",
                                 trackName: "$trackName",
                                 rolloutPercentage: "$rolloutPercentage",
                                 fromVersionCode: true,
-                                versionCodes: "233140859, $versionCode"
+                                releaseName: "$releaseName",
+                                versionCodes: "$versionCodes"
                     }
                 }
             }
@@ -309,6 +347,12 @@ private def haltRollout(googleCredentialsId, packageName, trackName, versionCode
  * @param params
  */
 def validateParams(params) {
+    if (!params.PACKAGE) {
+        error("'PACKAGE' parameter is missing. Please specify the application.")
+    } else if (params.PACKAGE == 'Select') {
+        error("'PACKAGE' was not selected. Please choose a valid application (e.g MEGA, MEGA VPN, MEGA Pass).")
+    }
+
     if (!params.TRACK) {
         error("'TRACK' parameter is missing. Please specify the target track.")
     } else if (params.TRACK == 'Select') {
@@ -351,6 +395,36 @@ private def extractVersionCode(String version) {
         return matcher[0][1]
     } else {
         error("Unable to extract version code")
+    }
+}
+
+/**
+ * Extract release name
+ * @param input eg. 14.1(242330236) - Currently in alpha at 100% rollout
+ * @return release name eg. 14.1(242330236)
+ *
+ * Explanation:
+ * (\d+\.\d+) → Captures the version name, e.g., "2.4".
+ * (?:\.\d+)? → Optionally captures the patch version, e.g., "2.4.1".
+ * \( → Matches the literal opening parenthesis (.
+ * (\d+) → Captures the version code, e.g., "250510417".
+ * \) → Matches the literal closing parenthesis ).
+ */
+private static def extractReleaseName(String input) {
+    def matcher = input =~ /(\d+\.\d+(?:\.\d+)?)\((\d+)\)/
+    if (matcher.find()) {
+        return "${matcher.group(1)}(${matcher.group(2)})"
+    }
+    return null
+}
+
+private static def getPackageName(String name) {
+    if (name == "MEGA VPN") {
+        return "mega.vpn.android.app"
+    } else if (name == "MEGA Pass") {
+        return "mega.pwm.android.app"
+    } else {
+        return "mega.privacy.android.app"
     }
 }
 
