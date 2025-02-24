@@ -8,7 +8,6 @@ import mega.privacy.android.domain.entity.node.NodeId
  * The favourite list load state
  */
 sealed interface FavouriteLoadState {
-    val showSearch: Boolean
     val isConnected: Boolean
 
     /**
@@ -20,7 +19,6 @@ sealed interface FavouriteLoadState {
      * @param isBusinessAccountExpired if the business account is expired
      * @param isHiddenNodesOnboarded if is hidden nodes onboarded
      * @param hiddenNodeEnabled if hidden node is enabled
-     * @param showSearch show search
      * @param isConnected is connected
      */
     data class Success(
@@ -30,7 +28,6 @@ sealed interface FavouriteLoadState {
         val isBusinessAccountExpired: Boolean = false,
         val isHiddenNodesOnboarded: Boolean? = null,
         val hiddenNodeEnabled: Boolean = false,
-        override val showSearch: Boolean,
         override val isConnected: Boolean,
     ) :
         FavouriteLoadState
@@ -39,7 +36,6 @@ sealed interface FavouriteLoadState {
      * Loading state
      */
     data class Loading(
-        override val showSearch: Boolean,
         override val isConnected: Boolean,
     ) : FavouriteLoadState
 
@@ -47,7 +43,6 @@ sealed interface FavouriteLoadState {
      * Favourite list is empty
      */
     data class Empty(
-        override val showSearch: Boolean,
         override val isConnected: Boolean,
     ) : FavouriteLoadState
 
@@ -57,7 +52,6 @@ sealed interface FavouriteLoadState {
      */
     data class Error(
         val exception: MegaException,
-        override val showSearch: Boolean,
         override val isConnected: Boolean,
     ) : FavouriteLoadState
 }

@@ -1,6 +1,7 @@
 package mega.privacy.android.app.presentation.node
 
 import mega.privacy.android.app.main.DrawerItem
+import mega.privacy.android.app.main.HomepageScreen
 import mega.privacy.android.app.presentation.manager.model.SharesTab
 import mega.privacy.android.domain.entity.node.NodeSourceType
 import javax.inject.Inject
@@ -18,8 +19,16 @@ class NodeSourceTypeMapper @Inject constructor() {
      * @param drawerItem the selected drawer item from manager activity
      * @param sharesTab selected shares tab
      */
-    operator fun invoke(drawerItem: DrawerItem?, sharesTab: SharesTab?) = when (drawerItem) {
-        DrawerItem.HOMEPAGE -> NodeSourceType.HOME
+    operator fun invoke(
+        drawerItem: DrawerItem?,
+        homepageScreen: HomepageScreen?,
+        sharesTab: SharesTab?,
+    ) = when (drawerItem) {
+        DrawerItem.HOMEPAGE -> when (homepageScreen) {
+            HomepageScreen.FAVOURITES -> NodeSourceType.FAVOURITES
+            else -> NodeSourceType.HOME
+        }
+
         DrawerItem.CLOUD_DRIVE -> NodeSourceType.CLOUD_DRIVE
         DrawerItem.BACKUPS -> NodeSourceType.BACKUPS
         DrawerItem.RUBBISH_BIN -> NodeSourceType.RUBBISH_BIN

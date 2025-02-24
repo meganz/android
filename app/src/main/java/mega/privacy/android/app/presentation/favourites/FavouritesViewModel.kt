@@ -17,7 +17,6 @@ import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 import mega.privacy.android.app.MimeTypeList
 import mega.privacy.android.app.featuretoggle.ApiFeatures
-import mega.privacy.android.app.featuretoggle.AppFeatures
 import mega.privacy.android.app.presentation.favourites.facade.StringUtilWrapper
 import mega.privacy.android.app.presentation.favourites.model.Favourite
 import mega.privacy.android.app.presentation.favourites.model.FavouriteItem
@@ -90,12 +89,11 @@ class FavouritesViewModel @Inject constructor(
     private val getBusinessStatusUseCase: GetBusinessStatusUseCase,
 ) : ViewModel() {
 
-    private val query = MutableStateFlow<String?>(null)
     private var isConnected: Boolean = true
     private lateinit var order: MutableStateFlow<FavouriteSortOrder>
     private val selected = MutableStateFlow<Set<NodeId>>(emptySet())
     private val _state =
-        MutableStateFlow<FavouriteLoadState>(FavouriteLoadState.Loading(false, isConnected = true))
+        MutableStateFlow<FavouriteLoadState>(FavouriteLoadState.Loading(isConnected = true))
 
     /**
      * The favouritesState for observing the favourites state.
@@ -125,7 +123,6 @@ class FavouritesViewModel @Inject constructor(
         order = MutableStateFlow(getFavouriteSortOrderUseCase())
         return combine(
             order,
-            query,
             getAllFavoritesUseCase(),
             selected,
             monitorConnectivityUseCase(),
@@ -143,8 +140,7 @@ class FavouritesViewModel @Inject constructor(
                 isHiddenNodesOnboardedFlow,
                 favouritesFlow,
                 monitorShowHiddenItemsUseCase(),
-                query,
-            ) { accountDetail, isHiddenNodesOnboarded, favouritesState, showHiddenItems, search ->
+            ) { accountDetail, isHiddenNodesOnboarded, favouritesState, showHiddenItems ->
                 if (favouritesState is FavouriteLoadState.Success) {
                     val accountType = accountDetail.levelDetail?.accountType
                     val businessStatus =
@@ -169,7 +165,7 @@ class FavouritesViewModel @Inject constructor(
                             hiddenNodeEnabled = true,
                         )
                     } else {
-                        FavouriteLoadState.Empty(search != null, isConnected)
+                        FavouriteLoadState.Empty(isConnected)
                     }
                 } else {
                     favouritesState
@@ -202,16 +198,14 @@ class FavouritesViewModel @Inject constructor(
 
     private suspend fun mapToFavourite(
         order: FavouriteSortOrder,
-        search: String?,
         nodes: List<TypedNode>,
         selectedNodes: Set<NodeId>,
         isConnected: Boolean,
     ): FavouriteLoadState {
         this@FavouritesViewModel.isConnected = isConnected
-        return if (nodes.isEmpty()) FavouriteLoadState.Empty(search != null, isConnected)
+        return if (nodes.isEmpty()) FavouriteLoadState.Empty(isConnected)
         else FavouriteLoadState.Success(
-            favourites = createFavouriteItemsList(order, nodes, search, selectedNodes),
-            showSearch = search != null,
+            favourites = createFavouriteItemsList(order, nodes, selectedNodes),
             selectedItems = selectedNodes,
             isConnected = isConnected,
         )
@@ -220,41 +214,16 @@ class FavouritesViewModel @Inject constructor(
     private suspend fun createFavouriteItemsList(
         order: FavouriteSortOrder,
         nodes: List<TypedNode>,
-        search: String?,
         selectedNodes: Set<NodeId>,
     ) = listOf(
         headerMapper(order)
-    ) + nodes.filter {
-        search == null || it.name.contains(search, ignoreCase = true)
-    }.mapTypedNodesListToFavourites(selectedNodes)
+    ) + nodes.mapTypedNodesListToFavourites(selectedNodes)
         .sortBy(order)
         .map {
             FavouriteListItem(
                 favourite = it,
             )
         }
-
-
-    /**
-     * Determine that search menu whether is shown.
-     * @return true is shown.
-     */
-    fun shouldShowSearchMenu() = _state.value.showSearch
-
-    /**
-     * Filter the items that matches the query
-     * @param queryString search query
-     */
-    fun searchQuery(queryString: String) {
-        query.update { queryString }
-    }
-
-    /**
-     * Exit search mode
-     */
-    fun exitSearch() {
-        query.update { null }
-    }
 
     /**
      * The logic that item is clicked

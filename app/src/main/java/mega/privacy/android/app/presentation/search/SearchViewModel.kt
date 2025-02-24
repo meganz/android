@@ -41,6 +41,7 @@ import mega.privacy.android.domain.entity.SortOrder
 import mega.privacy.android.domain.entity.account.business.BusinessAccountStatus
 import mega.privacy.android.domain.entity.node.NodeId
 import mega.privacy.android.domain.entity.node.NodeSourceType
+import mega.privacy.android.domain.entity.node.NodeSourceType.FAVOURITES
 import mega.privacy.android.domain.entity.node.NodeSourceType.OTHER
 import mega.privacy.android.domain.entity.node.TypedNode
 import mega.privacy.android.domain.entity.preference.ViewType
@@ -219,7 +220,8 @@ class SearchViewModel @Inject constructor(
         searchTarget = nodeSourceTypeToSearchTargetMapper(nodeSourceType),
         searchCategory = state.value.typeSelectedFilterOption?.let {
             typeFilterToSearchMapper(it.type)
-        } ?: SearchCategory.ALL,
+        } ?: takeIf { nodeSourceType == FAVOURITES }?.let { SearchCategory.FAVOURITES }
+        ?: SearchCategory.ALL,
         modificationDate = state.value.dateModifiedSelectedFilterOption?.date,
         creationDate = state.value.dateAddedSelectedFilterOption?.date,
         description = if (state.value.searchDescriptionEnabled == true) getCurrentQueryWithSearchByTags() else null,

@@ -8,6 +8,7 @@ import mega.privacy.android.domain.entity.search.DateFilterOption
 import mega.privacy.android.domain.entity.search.SearchCategory
 import mega.privacy.android.domain.entity.search.SearchParameters
 import mega.privacy.android.domain.entity.search.SearchTarget
+import mega.privacy.android.domain.repository.FavouritesRepository
 import mega.privacy.android.domain.repository.SearchRepository
 import mega.privacy.android.domain.usecase.GetCloudSortOrder
 import mega.privacy.android.domain.usecase.node.AddNodesTypeUseCase
@@ -21,8 +22,32 @@ class SearchUseCaseTest {
 
     private val getCloudSortOrder: GetCloudSortOrder = mock()
     private val searchRepository: SearchRepository = mock()
+    private val favouritesRepository: FavouritesRepository = mock()
     private val addNodesTypeUseCase: AddNodesTypeUseCase = mock()
-    private val underTest = SearchUseCase(getCloudSortOrder, searchRepository, addNodesTypeUseCase)
+    private val underTest = SearchUseCase(
+        getCloudSortOrder = getCloudSortOrder,
+        searchRepository = searchRepository,
+        favouritesRepository = favouritesRepository,
+        addNodesTypeUseCase = addNodesTypeUseCase
+    )
+
+    @Test
+    fun `test that getAllFavorites is called when query is empty and parentHandle is invalid and nodeSourceType is FAVOURITES`() =
+        runTest {
+            whenever(searchRepository.getInvalidHandle()).thenReturn(NodeId(-1))
+            underTest(
+                parentHandle = NodeId(-1),
+                nodeSourceType = NodeSourceType.FAVOURITES,
+                searchParameters = SearchParameters(
+                    query = "",
+                    searchTarget = SearchTarget.ALL,
+                    searchCategory = SearchCategory.FAVOURITES,
+                    description = null,
+                    tag = null,
+                )
+            )
+            verify(favouritesRepository).getAllFavorites()
+        }
 
     @Test
     fun `test that getInShares is called when query is empty and parentHandle is invalid and searchTarget is INCOMING_SHARE`() =

@@ -81,5 +81,12 @@ enum class SearchCategory {
      *
      * shows only documents which is matching the search keyword
      */
-    DOCUMENTS
+    DOCUMENTS,
+
+    /**
+     * FAVOURITES
+     *
+     * shows only favourites nodes which is matching the search keyword
+     */
+    FAVOURITES
 }

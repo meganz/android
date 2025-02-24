@@ -41,6 +41,11 @@ enum class NodeSourceType {
     INCOMING_SHARES,
 
     /**
+     * When node source is inside Favourites
+     */
+    FAVOURITES,
+
+    /**
      * When node source is other tabs
      */
     OTHER,

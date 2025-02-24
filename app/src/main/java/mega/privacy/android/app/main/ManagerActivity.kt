@@ -177,7 +177,7 @@ import mega.privacy.android.app.presentation.copynode.mapper.CopyRequestMessageM
 import mega.privacy.android.app.presentation.documentscanner.dialogs.DocumentScanningErrorDialog
 import mega.privacy.android.app.presentation.extensions.isDarkMode
 import mega.privacy.android.app.presentation.extensions.serializable
-import mega.privacy.android.app.presentation.favourites.FavouriteFolderViewModel
+import mega.privacy.android.app.presentation.favourites.FavouriteFolderFragment
 import mega.privacy.android.app.presentation.fileinfo.FileInfoActivity
 import mega.privacy.android.app.presentation.filelink.FileLinkComposeActivity
 import mega.privacy.android.app.presentation.filestorage.FileStorageActivity
@@ -365,7 +365,6 @@ class ManagerActivity : PasscodeActivity(), NavigationView.OnNavigationItemSelec
     internal val incomingSharesViewModel: IncomingSharesComposeViewModel by viewModels()
     private val outgoingSharesViewModel: OutgoingSharesComposeViewModel by viewModels()
     private val linksViewModel: LinksViewModel by viewModels()
-    private val favouriteFolderViewModel: FavouriteFolderViewModel by viewModels()
     internal val rubbishBinViewModel: RubbishBinViewModel by viewModels()
     private val callInProgressViewModel: OngoingCallViewModel by viewModels()
     private val userInfoViewModel: UserInfoViewModel by viewModels()
@@ -3939,6 +3938,7 @@ class ManagerActivity : PasscodeActivity(), NavigationView.OnNavigationItemSelec
             incomingParentHandle = getHandleFromIncomingSharesViewModel(),
             outgoingParentHandle = getHandleFromOutgoingSharesViewModel(),
             linksParentHandle = getHandleFromLinksViewModel(),
+            favouritesParentHandle = getParentHandleForFavourites() ?: -1L,
             nodeSourceType = nodeSourceType,
         )
 
@@ -4080,6 +4080,12 @@ class ManagerActivity : PasscodeActivity(), NavigationView.OnNavigationItemSelec
 
     private val backupsFragment: BackupsFragment?
         get() = supportFragmentManager.findFragmentByTag(FragmentTag.BACKUPS.tag) as? BackupsFragment
+
+    private val favouriteFolderFragment: FavouriteFolderFragment?
+        get() = supportFragmentManager.findFragmentById(R.id.nav_host_fragment)
+            ?.childFragmentManager?.fragments?.firstOrNull {
+                it is FavouriteFolderFragment
+            } as? FavouriteFolderFragment
 
     private val mediaDiscoveryFragment: MediaDiscoveryFragment?
         get() = supportFragmentManager.findFragmentByTag(FragmentTag.MEDIA_DISCOVERY.tag) as? MediaDiscoveryFragment
@@ -4396,13 +4402,18 @@ class ManagerActivity : PasscodeActivity(), NavigationView.OnNavigationItemSelec
             }
         }
         if (drawerItem === DrawerItem.HOMEPAGE) {
-            // Get the Searchable again at onCreateOptionsMenu() after screen rotation
-            mHomepageSearchable = findHomepageSearchable()
-            if (searchExpand) {
-                openSearchView()
+            if (homepageScreen == HomepageScreen.FAVOURITES) {
+                searchMenuItem?.isVisible = true
             } else {
-                if (mHomepageSearchable != null) {
-                    searchMenuItem?.isVisible = mHomepageSearchable?.shouldShowSearchMenu() == true
+                // Get the Searchable again at onCreateOptionsMenu() after screen rotation
+                mHomepageSearchable = findHomepageSearchable()
+                if (searchExpand) {
+                    openSearchView()
+                } else {
+                    if (mHomepageSearchable != null) {
+                        searchMenuItem?.isVisible =
+                            mHomepageSearchable?.shouldShowSearchMenu() == true
+                    }
                 }
             }
         }
@@ -4413,7 +4424,11 @@ class ManagerActivity : PasscodeActivity(), NavigationView.OnNavigationItemSelec
     fun openSearchOnHomepage() {
         viewModel.setIsFirstNavigationLevel(true)
         Util.resetActionBar(supportActionBar)
-        nodeSourceType = nodeSourceTypeMapper(drawerItem = drawerItem, sharesTab = tabItemShares)
+        nodeSourceType = nodeSourceTypeMapper(
+            drawerItem = drawerItem,
+            homepageScreen = homepageScreen,
+            sharesTab = tabItemShares
+        )
         lifecycleScope.launch {
             navigateToSearchActivity()
         }
@@ -6438,7 +6453,7 @@ class ManagerActivity : PasscodeActivity(), NavigationView.OnNavigationItemSelec
      */
     fun getHandleFromLinksViewModel() = linksViewModel.getCurrentNodeHandle()
 
-    private fun getParentHandleForFavourites() = favouriteFolderViewModel.getParentNodeHandle()
+    private fun getParentHandleForFavourites() = favouriteFolderFragment?.getParentNodeHandle()
 
     fun hideFabButton() {
         initFabButtonShow = false

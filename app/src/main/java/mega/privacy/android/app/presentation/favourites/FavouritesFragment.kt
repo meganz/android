@@ -35,7 +35,6 @@ import mega.privacy.android.app.arch.extensions.collectFlow
 import mega.privacy.android.app.components.CustomizedGridLayoutManager
 import mega.privacy.android.app.databinding.FragmentFavouritesBinding
 import mega.privacy.android.app.fragments.homepage.EventObserver
-import mega.privacy.android.app.fragments.homepage.HomepageSearchable
 import mega.privacy.android.app.fragments.homepage.SortByHeaderViewModel
 import mega.privacy.android.app.fragments.homepage.main.HomepageFragmentDirections
 import mega.privacy.android.app.main.ManagerActivity
@@ -60,7 +59,6 @@ import mega.privacy.android.app.presentation.imagepreview.model.ImagePreviewMenu
 import mega.privacy.android.app.utils.Constants
 import mega.privacy.android.app.utils.Constants.FAVOURITES_ADAPTER
 import mega.privacy.android.app.utils.MegaNodeUtil
-import mega.privacy.android.app.utils.RunOnUIThreadUtils
 import mega.privacy.android.app.utils.TextUtil.formatEmptyScreenText
 import mega.privacy.android.app.utils.Util
 import mega.privacy.android.app.utils.callManager
@@ -80,7 +78,7 @@ import javax.inject.Inject
  * The Fragment for favourites
  */
 @AndroidEntryPoint
-class FavouritesFragment : Fragment(), HomepageSearchable {
+class FavouritesFragment : Fragment() {
     private val viewModel by viewModels<FavouritesViewModel>()
     private val sortByHeaderViewModel by activityViewModels<SortByHeaderViewModel>()
     private lateinit var binding: FragmentFavouritesBinding
@@ -160,44 +158,6 @@ class FavouritesFragment : Fragment(), HomepageSearchable {
     }
 
     /**
-     * onDestroy
-     */
-    override fun onDestroy() {
-        super.onDestroy()
-        viewModel.exitSearch()
-    }
-
-    /**
-     * shouldShowSearchMenu
-     */
-    override fun shouldShowSearchMenu(): Boolean = viewModel.shouldShowSearchMenu()
-
-    /**
-     * searchReady
-     */
-    override fun searchReady() {
-        // Rotate screen in action mode, the keyboard would pop up again, hide it
-        if (actionMode != null) {
-            RunOnUIThreadUtils.post { callManager { it.hideKeyboardSearch() } }
-        }
-        viewModel.searchQuery("")
-    }
-
-    /**
-     * exitSearch
-     */
-    override fun exitSearch() {
-        viewModel.exitSearch()
-    }
-
-    /**
-     * searchQuery
-     */
-    override fun searchQuery(query: String) {
-        viewModel.searchQuery(query)
-    }
-
-    /**
      * Setup adapter
      */
     private fun setupAdapter() {
@@ -245,9 +205,6 @@ class FavouritesFragment : Fragment(), HomepageSearchable {
                         handleConnectivityState(favouritesState.isConnected)
                         switchViewType(sortByHeaderState.viewType)
                         setViewVisible(favouritesState)
-                        if (!favouritesState.showSearch) {
-                            requireActivity().invalidateOptionsMenu()
-                        }
                         if (favouritesState is FavouriteLoadState.Success) {
                             if (isList) {
                                 listAdapter.updateSelectionMode(favouritesState.selectedItems.isNotEmpty())

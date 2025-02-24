@@ -9,7 +9,7 @@ import androidx.activity.OnBackPressedCallback
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.view.isVisible
 import androidx.fragment.app.Fragment
-import androidx.fragment.app.activityViewModels
+import androidx.fragment.app.viewModels
 import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.lifecycleScope
 import androidx.lifecycle.repeatOnLifecycle
@@ -51,7 +51,7 @@ import javax.inject.Inject
  */
 @AndroidEntryPoint
 class FavouriteFolderFragment : Fragment() {
-    private val viewModel by activityViewModels<FavouriteFolderViewModel>()
+    private val viewModel by viewModels<FavouriteFolderViewModel>()
     private lateinit var binding: FragmentFavouriteFolderBinding
     private lateinit var adapter: FavouritesAdapter
 
@@ -113,6 +113,11 @@ class FavouriteFolderFragment : Fragment() {
         )
     }
 
+    /**
+     * Returns the parent node handle
+     */
+    fun getParentNodeHandle() = viewModel.getParentNodeHandle()
+
     private fun initData() {
         viewModel.init(arguments?.getLong(KEY_ARGUMENT_PARENT_HANDLE) ?: -1)
     }
@@ -156,6 +161,7 @@ class FavouriteFolderFragment : Fragment() {
                 viewModel.childrenNodesState.collect { childrenState ->
                     setViewVisible(childrenState)
                     if (childrenState is ChildrenNodesLoadState.Success) {
+
                         setToolbarText(childrenState.title)
                         // According to the state to enable the onBackPressedCallback
                         onBackPressedCallback.isEnabled = childrenState.isBackPressedEnable
@@ -208,7 +214,10 @@ class FavouriteFolderFragment : Fragment() {
      * Set toolbar text
      */
     private fun setToolbarText(nodeName: String) {
-        (activity as AppCompatActivity).supportActionBar?.title = nodeName
+        (activity as AppCompatActivity).supportActionBar?.apply {
+            show()
+            title = nodeName
+        }
     }
 
     /**

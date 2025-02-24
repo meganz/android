@@ -1319,6 +1319,7 @@ class ManagerViewModelTest {
                 incomingParentHandle = 456789,
                 outgoingParentHandle = 567890,
                 linksParentHandle = 678901,
+                favouritesParentHandle = 43434,
                 nodeSourceType = NodeSourceType.LINKS
             )
             assertThat(actual).isEqualTo(expectedParentHandle)

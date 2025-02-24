@@ -1176,6 +1176,7 @@ class ManagerViewModel @Inject constructor(
         incomingParentHandle: Long,
         outgoingParentHandle: Long,
         linksParentHandle: Long,
+        favouritesParentHandle: Long,
         nodeSourceType: NodeSourceType,
     ): Long = when (nodeSourceType) {
         NodeSourceType.CLOUD_DRIVE -> browserParentHandle
@@ -1184,6 +1185,7 @@ class ManagerViewModel @Inject constructor(
         NodeSourceType.LINKS -> linksParentHandle
         NodeSourceType.RUBBISH_BIN -> rubbishBinParentHandle
         NodeSourceType.BACKUPS -> backupsParentHandle
+        NodeSourceType.FAVOURITES -> favouritesParentHandle
         NodeSourceType.HOME, NodeSourceType.OTHER -> getRootNodeUseCase()?.id?.longValue
             ?: MegaApiJava.INVALID_HANDLE
     }

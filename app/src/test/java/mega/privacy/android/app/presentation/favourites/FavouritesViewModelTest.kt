@@ -11,7 +11,6 @@ import kotlinx.coroutines.flow.flow
 import kotlinx.coroutines.flow.flowOf
 import kotlinx.coroutines.test.UnconfinedTestDispatcher
 import kotlinx.coroutines.test.runTest
-import mega.privacy.android.app.presentation.favourites.FavouritesViewModel
 import mega.privacy.android.app.presentation.favourites.facade.StringUtilWrapper
 import mega.privacy.android.app.presentation.favourites.model.FavouriteFile
 import mega.privacy.android.app.presentation.favourites.model.FavouriteHeaderItem
@@ -249,93 +248,6 @@ class FavouritesViewModelTest {
             underTest.onOrderChange(SortOrder.ORDER_CREATION_DESC)
             val sortedItems = awaitItem()
             verifyInOrder(sortedItems, timeDescending)
-        }
-    }
-
-
-    @Test
-    fun `test that show search is false by default`() = runTest {
-        underTest.favouritesState.test {
-            assertThat(awaitItem().showSearch).isFalse()
-        }
-    }
-
-    @Test
-    fun `test that showSearch value is set to true if viewmodel is set to search mode`() =
-        runTest {
-            underTest.favouritesState.test {
-                assertThat(awaitItem().showSearch).isFalse()
-                underTest.searchQuery("")
-                assertThat(awaitItem().showSearch).isTrue()
-            }
-        }
-
-    @Test
-    fun `test that list is filtered according to query string`() = runTest {
-        underTest.favouritesState.test {
-            val items = awaitItem()
-            verifyDefaultSortOrder(items)
-
-            underTest.searchQuery(evenString)
-
-            val filteredItems = awaitItem()
-            assertThat(filteredItems).isInstanceOf(FavouriteLoadState.Success::class.java)
-            assertThat((filteredItems as FavouriteLoadState.Success).favourites.drop(1)
-                .mapNotNull { it.favourite?.typedNode?.name }
-                .all { it.startsWith(evenString) }).isTrue()
-        }
-    }
-
-    @Test
-    fun `test that s filtered list retains its sort order`() = runTest {
-        val timeDescendingOddOnly = timeDescending.filter { it.mod(2) != 0 }
-        underTest.favouritesState.test {
-            val items = awaitItem()
-            verifyDefaultSortOrder(items)
-
-            underTest.searchQuery(oddString)
-
-            val filteredItems = awaitItem()
-            val expected = timeDescendingOddOnly.reversed()
-            verifyInOrder(filteredItems, expected)
-        }
-    }
-
-    @Test
-    fun `test that sorted list retain their filter`() = runTest {
-        val timeDescendingOddOnly = timeDescending.filter { it.mod(2) != 0 }
-        whenever(mapFavouriteSortOrderUseCase(any())).thenReturn(
-            FavouriteSortOrder.ModifiedDate(
-                true
-            )
-        )
-        whenever(getAllFavorites()).thenReturn(flowOf(descendingTimeNodes))
-
-        initViewModel()
-
-        underTest.favouritesState.test {
-            val items = awaitItem()
-            verifyDefaultSortOrder(items)
-            underTest.searchQuery(oddString)
-
-            val filteredItems = awaitItem()
-            val expected = timeDescendingOddOnly.reversed()
-            verifyInOrder(
-                filteredItems,
-                expected,
-                "Items contain odd values in ascending time order"
-            )
-            underTest.onOrderChange(SortOrder.ORDER_CREATION_DESC)
-
-            val sortedItems = awaitItem()
-            verifyInOrder(
-                sortedItems,
-                timeDescendingOddOnly,
-                "Items contain odd values in descending time order"
-            )
-            assertThat((sortedItems as FavouriteLoadState.Success).favourites.drop(1)
-                .mapNotNull { it.favourite?.typedNode?.name }
-                .all { it.startsWith(oddString) }).isTrue()
         }
     }
 
