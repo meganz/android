@@ -13,8 +13,8 @@ import dagger.hilt.android.qualifiers.ApplicationContext
 import mega.privacy.android.app.MimeTypeList.Companion.typeForName
 import mega.privacy.android.app.R
 import mega.privacy.android.app.featuretoggle.AppFeatures
-import mega.privacy.android.app.presentation.filestorage.FileStorageActivity
 import mega.privacy.android.app.main.ManagerActivity
+import mega.privacy.android.app.presentation.filestorage.FileStorageActivity
 import mega.privacy.android.app.presentation.manager.model.TransfersTab
 import mega.privacy.android.app.presentation.mapper.file.FileSizeStringMapper
 import mega.privacy.android.app.presentation.transfers.EXTRA_TAB
@@ -32,6 +32,7 @@ import mega.privacy.android.domain.usecase.featureflag.GetFeatureFlagValueUseCas
 import mega.privacy.android.domain.usecase.file.GetPathByDocumentContentUriUseCase
 import mega.privacy.android.domain.usecase.file.IsContentUriUseCase
 import java.io.File
+import java.util.zip.ZipFile
 import javax.inject.Inject
 
 /**
@@ -129,27 +130,39 @@ class DefaultTransfersActionGroupFinishNotificationBuilder @Inject constructor(
         }
 
         val previewFile = File(group.destination + group.singleFileName)
+        val isZipFile = runCatching { ZipFile(previewFile) }.getOrNull()?.let { true } == true
         var previewIntent: Intent? = Intent(Intent.ACTION_VIEW).apply {
             flags = Intent.FLAG_GRANT_READ_URI_PERMISSION
         }
         previewIntent =
-            if (previewFile.exists() && MegaApiUtils.isIntentAvailable(context, previewIntent)) {
-                FileProvider.getUriForFile(
-                    context,
-                    Constants.AUTHORITY_STRING_FILE_PROVIDER,
-                    previewFile
-                )?.let { uri ->
-                    previewIntent?.let {
-                        it.setDataAndType(uri, typeForName(previewFile.name).type)
-                        val chooserTitle = resources.getString(
-                            sharedR.string.open_with_os_dialog_title,
-                            group.singleFileName
-                        )
-                        Intent.createChooser(it, chooserTitle)
+            when {
+                previewFile.exists() && isZipFile -> {
+                    Intent(context, ManagerActivity::class.java).apply {
+                        action = Constants.ACTION_EXPLORE_ZIP
+                        putExtra(Constants.EXTRA_PATH_ZIP, previewFile.absolutePath)
                     }
                 }
-            } else {
-                null
+
+                previewFile.exists() && MegaApiUtils.isIntentAvailable(context, previewIntent) -> {
+                    FileProvider.getUriForFile(
+                        context,
+                        Constants.AUTHORITY_STRING_FILE_PROVIDER,
+                        previewFile
+                    )?.let { uri ->
+                        previewIntent?.let {
+                            it.setDataAndType(uri, typeForName(previewFile.name).type)
+                            val chooserTitle = resources.getString(
+                                sharedR.string.open_with_os_dialog_title,
+                                group.singleFileName
+                            )
+                            Intent.createChooser(it, chooserTitle)
+                        }
+                    }
+                }
+
+                else -> {
+                    null
+                }
             } ?: run {
                 val warningMessage = resources.getString(R.string.intent_not_available)
                 Intent(context, ManagerActivity::class.java).apply {
