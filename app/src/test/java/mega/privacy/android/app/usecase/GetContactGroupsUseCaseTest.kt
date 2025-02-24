@@ -8,7 +8,9 @@ import kotlinx.coroutines.test.runTest
 import mega.privacy.android.app.contacts.group.data.ContactGroupItem
 import mega.privacy.android.app.contacts.group.data.ContactGroupUser
 import mega.privacy.android.app.contacts.usecase.GetContactGroupsUseCase
+import mega.privacy.android.app.presentation.meeting.model.newChatRoom
 import mega.privacy.android.domain.repository.AvatarRepository
+import mega.privacy.android.domain.repository.ChatParticipantsRepository
 import mega.privacy.android.domain.repository.ChatRepository
 import mega.privacy.android.domain.repository.ContactsRepository
 import org.junit.jupiter.api.AfterEach
@@ -20,7 +22,6 @@ import org.mockito.Mockito.reset
 import org.mockito.kotlin.any
 import org.mockito.kotlin.mock
 import org.mockito.kotlin.whenever
-import mega.privacy.android.app.presentation.meeting.model.newChatRoom
 import java.io.File
 
 @TestInstance(TestInstance.Lifecycle.PER_CLASS)
@@ -31,6 +32,7 @@ class GetContactGroupsUseCaseTest {
     private val chatRepository = mock<ChatRepository>()
     private val avatarRepository = mock<AvatarRepository>()
     private val contactsRepository = mock<ContactsRepository>()
+    private val chatParticipantsRepository = mock<ChatParticipantsRepository>()
 
     private val firstHandle = 666L
     private val lastHandle = 777L
@@ -93,7 +95,8 @@ class GetContactGroupsUseCaseTest {
             chatRepository = chatRepository,
             avatarRepository = avatarRepository,
             contactsRepository = contactsRepository,
-            UnconfinedTestDispatcher()
+            chatParticipantsRepository = chatParticipantsRepository,
+            coroutineDispatcher = UnconfinedTestDispatcher()
         )
     }
 
@@ -103,6 +106,7 @@ class GetContactGroupsUseCaseTest {
             chatRepository,
             avatarRepository,
             contactsRepository,
+            chatParticipantsRepository
         )
     }
 
@@ -121,6 +125,9 @@ class GetContactGroupsUseCaseTest {
     @Test
     fun `test that empty list is returned if chat room has no peer handles`() = runTest {
         whenever(chatRepository.getChatRooms()).thenReturn(noPeerHandleRoom)
+        whenever(chatRepository.getMyUserHandle()).thenReturn(123L)
+        whenever(chatParticipantsRepository.getChatParticipantsHandles(anyLong(), any()))
+            .thenReturn(emptyList())
         assertThat(underTest()).isEmpty()
     }
 
@@ -130,6 +137,13 @@ class GetContactGroupsUseCaseTest {
         val name = "name"
         val file = "avatar_file"
         val color = 69
+        whenever(chatRepository.getMyUserHandle()).thenReturn(123L)
+        whenever(
+            chatParticipantsRepository.getChatParticipantsHandles(
+                anyLong(),
+                any()
+            )
+        ).thenReturn(listOf(firstHandle, lastHandle))
         whenever(chatRepository.getChatRooms()).thenReturn(validRooms)
         whenever(contactsRepository.getUserEmail(any(), any())).thenReturn(email)
         whenever(contactsRepository.getUserFirstName(any(), any(), any())).thenReturn(name)
