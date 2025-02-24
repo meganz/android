@@ -8,7 +8,9 @@ import mega.privacy.android.app.presentation.documentscanner.model.DocumentScann
 import mega.privacy.android.app.presentation.transfers.starttransfer.model.TransferTriggerEvent
 import mega.privacy.android.domain.entity.ChatRoomPermission
 import mega.privacy.android.domain.entity.StorageState
+import mega.privacy.android.domain.entity.call.CallCompositionChanges
 import mega.privacy.android.domain.entity.call.ChatCall
+import mega.privacy.android.domain.entity.call.ChatCallChanges
 import mega.privacy.android.domain.entity.call.ChatCallStatus
 import mega.privacy.android.domain.entity.chat.ChatHistoryLoadStatus
 import mega.privacy.android.domain.entity.chat.ChatRoom
@@ -189,4 +191,12 @@ data class ChatUiState(
     val isParticipatingWithAnotherClient = myUserHandle?.let {
         callInThisChat?.peerIdParticipants?.contains(it) == true && callInThisChat.status == ChatCallStatus.UserNoPresent
     }
+
+    /**
+     * Check if the one-to-one call is ending
+     */
+    val isOneToOneCallBeingEnded = chat?.isOneToOneChat == true &&
+            callInThisChat?.changes?.contains(ChatCallChanges.CallComposition) == true &&
+            callInThisChat.callCompositionChange == CallCompositionChanges.Removed &&
+            (callInThisChat.peerIdCallCompositionChange == myUserHandle || callInThisChat.numParticipants == 0)
 }

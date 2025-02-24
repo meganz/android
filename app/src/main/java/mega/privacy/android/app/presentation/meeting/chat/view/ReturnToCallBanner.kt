@@ -8,6 +8,7 @@ import mega.privacy.android.app.presentation.meeting.chat.extension.isJoined
 import mega.privacy.android.app.presentation.meeting.chat.model.ChatUiState
 import mega.privacy.android.app.presentation.meeting.chat.view.navigation.startMeetingActivity
 import mega.privacy.android.shared.original.core.ui.controls.chat.ReturnToCallBanner
+import timber.log.Timber
 
 @Composable
 internal fun ReturnToCallBanner(
@@ -15,7 +16,12 @@ internal fun ReturnToCallBanner(
     isAudioPermissionGranted: Boolean,
     onAnswerCall: () -> Unit,
 ) = with(uiState) {
-    if (!isConnected || (chat?.isOneToOneChat == true && isParticipatingWithAnotherClient == true) || (callsInOtherChats.isEmpty() && callInThisChat == null)) return@with null
+
+    if (!isConnected ||
+        (chat?.isOneToOneChat == true && (isParticipatingWithAnotherClient == true || isOneToOneCallBeingEnded)) ||
+        (callsInOtherChats.isEmpty() && callInThisChat == null)
+    ) return@with null
+
 
     val context = LocalContext.current
 
