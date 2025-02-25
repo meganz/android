@@ -10,7 +10,6 @@ import mega.privacy.android.domain.repository.TransferRepository
 import mega.privacy.android.domain.usecase.featureflag.GetFeatureFlagValueUseCase
 import mega.privacy.android.domain.usecase.file.GetExternalPathByContentUriUseCase
 import mega.privacy.android.domain.usecase.file.IsExternalStorageContentUriUseCase
-import mega.privacy.android.domain.usecase.node.GetFilePreviewDownloadPathUseCase
 import javax.inject.Inject
 
 /**
@@ -36,14 +35,19 @@ class GetFileDestinationAndAppDataForDownloadUseCase @Inject constructor(
         val appData: TransferAppData?
         when {
             fileSystemRepository.isSDCardPathOrUri(uriPathFolderDestination.value) -> {
-                downloadDestination = transferRepository.getOrCreateSDCardTransfersCacheFolder()
-                    ?.path
-                folderDestination = downloadDestination?.let { UriPath(it) }
-                appData =
-                    TransferAppData.SdCardDownload(
-                        targetPathForSDK = downloadDestination ?: "",
-                        finalTargetUri = uriPathFolderDestination.value
-                    )
+                if (getFeatureFlagValueUseCase(DomainFeatures.AllowToChooseDownloadDestination)) {
+                    appData = null
+                    folderDestination = uriPathFolderDestination
+                } else {
+                    downloadDestination = transferRepository.getOrCreateSDCardTransfersCacheFolder()
+                        ?.path
+                    folderDestination = downloadDestination?.let { UriPath(it) }
+                    appData =
+                        TransferAppData.SdCardDownload(
+                            targetPathForSDK = downloadDestination ?: "",
+                            finalTargetUri = uriPathFolderDestination.value
+                        )
+                }
             }
 
             isExternalStorageContentUriUseCase(uriPathFolderDestination.value) -> {

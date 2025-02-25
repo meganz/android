@@ -12,7 +12,6 @@ import mega.privacy.android.domain.repository.TransferRepository
 import mega.privacy.android.domain.usecase.featureflag.GetFeatureFlagValueUseCase
 import mega.privacy.android.domain.usecase.file.GetExternalPathByContentUriUseCase
 import mega.privacy.android.domain.usecase.file.IsExternalStorageContentUriUseCase
-import mega.privacy.android.domain.usecase.node.GetFilePreviewDownloadPathUseCase
 import org.junit.jupiter.api.BeforeAll
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
@@ -79,23 +78,41 @@ class GetFileDestinationAndAppDataForDownloadUseCaseTest {
         }
 
     @Test
-    fun `test that external cache folder and SdCardDownload app data is returned when the destination is a sd card path`() =
+    fun `test that external cache folder and SdCardDownload app data is returned when the destination is a sd card path  and AllowToChooseDownloadDestination is disabled`() =
         runTest {
             val cachePath = "Cache"
             val cacheFolder = File(cachePath)
-            whenever(fileSystemRepository.isSDCardPathOrUri(PATH_STRING)) doReturn true
-            whenever(transferRepository.getOrCreateSDCardTransfersCacheFolder()) doReturn cacheFolder
             val expectedUri = UriPath(cachePath)
             val expectedAppData = TransferAppData.SdCardDownload(
                 targetPathForSDK = cachePath,
                 finalTargetUri = PATH_STRING
             )
 
+            whenever(fileSystemRepository.isSDCardPathOrUri(PATH_STRING)) doReturn true
+            whenever(getFeatureFlagValueUseCase(DomainFeatures.AllowToChooseDownloadDestination)) doReturn false
+            whenever(transferRepository.getOrCreateSDCardTransfersCacheFolder()) doReturn cacheFolder
+
             val (actualUri, actualAppData) = underTest(UriPath(PATH_STRING))
 
             assertAll(
                 { assertThat(actualUri).isEqualTo(expectedUri) },
                 { assertThat(actualAppData).isEqualTo(expectedAppData) },
+            )
+        }
+
+    @Test
+    fun `test that external cache folder and SdCardDownload app data is NOT returned when the destination is a sd card path and AllowToChooseDownloadDestination is enabled`() =
+        runTest {
+            val expectedUri = UriPath(PATH_STRING)
+
+            whenever(fileSystemRepository.isSDCardPathOrUri(PATH_STRING)) doReturn true
+            whenever(getFeatureFlagValueUseCase(DomainFeatures.AllowToChooseDownloadDestination)) doReturn true
+
+            val (actualUri, actualAppData) = underTest(UriPath(PATH_STRING))
+
+            assertAll(
+                { assertThat(actualUri).isEqualTo(expectedUri) },
+                { assertThat(actualAppData).isNull() },
             )
         }
 
