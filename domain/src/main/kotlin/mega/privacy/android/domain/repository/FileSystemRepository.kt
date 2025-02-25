@@ -455,6 +455,11 @@ interface FileSystemRepository {
     suspend fun getDocumentEntities(uris: List<UriPath>): List<DocumentEntity>
 
     /**
+     * Get a [DocumentEntity] from an [UriPath], or null if it doesn't exist
+     */
+    suspend fun getDocumentEntity(uri: UriPath): DocumentEntity?
+
+    /**
      * Get file from uri
      *
      * @param uri

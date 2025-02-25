@@ -38,8 +38,8 @@ import java.net.URI
 import java.net.URLConnection
 import javax.inject.Inject
 import javax.inject.Singleton
-
 /**
+
  * Default implementation of [FileSystemRepository]
  *
  * @property context
@@ -447,6 +447,9 @@ internal class FileSystemRepositoryImpl @Inject constructor(
         withContext(ioDispatcher) {
             fileGateway.getDocumentEntities(uris.map { Uri.parse(it.value) })
         }
+
+    override suspend fun getDocumentEntity(uri: UriPath): DocumentEntity? =
+        getDocumentEntities(listOf(uri)).firstOrNull()
 
     override suspend fun getFileFromUri(uri: UriPath): File? = withContext(ioDispatcher) {
         fileGateway.getFileFromUri(Uri.parse(uri.value))?.also {
