@@ -2,14 +2,15 @@ package mega.privacy.android.app.presentation.settings.cookiesettings
 
 import app.cash.turbine.test
 import com.google.common.truth.Truth.assertThat
+import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.test.runTest
+import mega.privacy.android.app.InstantExecutorExtension
 import mega.privacy.android.app.fragments.settingsFragments.cookie.CookieSettingsViewModel
 import mega.privacy.android.core.test.extension.CoroutineMainDispatcherExtension
 import mega.privacy.android.domain.entity.settings.cookie.CookieType
 import mega.privacy.android.domain.usecase.featureflag.GetFeatureFlagValueUseCase
 import mega.privacy.android.domain.usecase.login.GetSessionTransferURLUseCase
-import mega.privacy.android.domain.usecase.setting.BroadcastCookieSettingsSavedUseCase
 import mega.privacy.android.domain.usecase.setting.GetCookieSettingsUseCase
 import mega.privacy.android.domain.usecase.setting.UpdateCookieSettingsUseCase
 import mega.privacy.android.domain.usecase.setting.UpdateCrashAndPerformanceReportersUseCase
@@ -17,6 +18,7 @@ import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.TestInstance
 import org.junit.jupiter.api.extension.ExtendWith
+import org.junit.jupiter.api.extension.RegisterExtension
 import org.junit.jupiter.params.ParameterizedTest
 import org.junit.jupiter.params.provider.Arguments
 import org.junit.jupiter.params.provider.MethodSource
@@ -25,10 +27,8 @@ import org.mockito.kotlin.mock
 import org.mockito.kotlin.reset
 import org.mockito.kotlin.verify
 import org.mockito.kotlin.whenever
-import mega.privacy.android.app.InstantExecutorExtension
 import java.util.stream.Stream
 
-@ExtendWith(CoroutineMainDispatcherExtension::class)
 @ExperimentalCoroutinesApi
 @TestInstance(TestInstance.Lifecycle.PER_CLASS)
 @ExtendWith(value = [InstantExecutorExtension::class])
@@ -37,20 +37,20 @@ class CookieSettingsViewModelTest {
     private lateinit var underTest: CookieSettingsViewModel
     private val getCookieSettingsUseCase = mock<GetCookieSettingsUseCase>()
     private val updateCookieSettingsUseCase = mock<UpdateCookieSettingsUseCase>()
-    private val broadcastCookieSettingsSavedUseCase = mock<BroadcastCookieSettingsSavedUseCase>()
     private val updateCrashAndPerformanceReportersUseCase =
         mock<UpdateCrashAndPerformanceReportersUseCase>()
     private val getFeatureFlagValueUseCase = mock<GetFeatureFlagValueUseCase>()
     private val getSessionTransferURLUseCase = mock<GetSessionTransferURLUseCase>()
+    private val coroutineScope = CoroutineScope(extension.testDispatcher)
 
     fun initTestClass() {
         underTest = CookieSettingsViewModel(
             getCookieSettingsUseCase = getCookieSettingsUseCase,
             updateCookieSettingsUseCase = updateCookieSettingsUseCase,
-            broadcastCookieSettingsSavedUseCase = broadcastCookieSettingsSavedUseCase,
             getFeatureFlagValueUseCase = getFeatureFlagValueUseCase,
             updateCrashAndPerformanceReportersUseCase = updateCrashAndPerformanceReportersUseCase,
             getSessionTransferURLUseCase = getSessionTransferURLUseCase,
+            applicationScope = coroutineScope
         )
     }
 
@@ -59,7 +59,6 @@ class CookieSettingsViewModelTest {
         reset(
             getCookieSettingsUseCase,
             updateCookieSettingsUseCase,
-            broadcastCookieSettingsSavedUseCase,
             getFeatureFlagValueUseCase,
             updateCrashAndPerformanceReportersUseCase,
             getSessionTransferURLUseCase,
@@ -126,9 +125,31 @@ class CookieSettingsViewModelTest {
         runTest {
             val enabledCookies = setOf(CookieType.ESSENTIAL)
             whenever(updateCookieSettingsUseCase(enabledCookies)).thenReturn(Unit)
-            whenever(broadcastCookieSettingsSavedUseCase(enabledCookies)).thenReturn(Unit)
             initTestClass()
             underTest.saveCookieSettings()
             verify(updateCrashAndPerformanceReportersUseCase).invoke()
         }
+
+    @Test
+    fun `test that update cookie is invoked when changeCookie is called`() = runTest {
+        val cookie = CookieType.ESSENTIAL
+        val enable = true
+        initTestClass()
+        underTest.changeCookie(cookie, enable)
+        verify(updateCookieSettingsUseCase).invoke(any())
+    }
+
+    @Test
+    fun `test that toggleCookies is invoked when toggleCookies is called`() = runTest {
+        val enable = true
+        initTestClass()
+        underTest.toggleCookies(enable)
+        verify(updateCookieSettingsUseCase).invoke(any())
+    }
+
+    companion object {
+        @JvmField
+        @RegisterExtension
+        val extension = CoroutineMainDispatcherExtension()
+    }
 }

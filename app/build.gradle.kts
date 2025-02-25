@@ -334,6 +334,7 @@ dependencies {
     implementation(lib.zoomable.image.subsampling.image)
     implementation(lib.telephoto.flick)
     implementation(lib.commonmark.java)
+    implementation(google.ump)
 
     // Debug
     debugImplementation(lib.nocturn)

@@ -67,17 +67,13 @@ object SettingsConstants {
     const val KEY_SUB_FOLDER_MEDIA_DISCOVERY = "settings_sub_folder_media_discovery"
     const val KEY_HIDDEN_ITEMS = "settings_hidden_items"
 
-    /* PassCode Lock settings */
-    const val KEY_PASSCODE_ENABLE = "settings_passcode_enable"
-    const val KEY_RESET_PASSCODE = "settings_change_passcode"
-    const val KEY_FINGERPRINT_ENABLE = "settings_fingerprint_enable"
-    const val KEY_REQUIRE_PASSCODE = "settings_require_passcode"
-
     /* Cookie settings  */
     const val KEY_COOKIE_ACCEPT = "settings_cookie_accept"
     const val KEY_COOKIE_ANALYTICS = "settings_cookie_performance_analytics"
     const val KEY_COOKIE_POLICIES = "setting_cookie_policies"
     const val KEY_COOKIE_ADS = "settings_cookie_advertisement"
+    const val KEY_ADS_SETTING = "ads_settings"
+    const val KEY_ADS_PERSONALIZATION = "ads_personalization"
 
     const val REPORT_ISSUE = "settings_help_report_issue"
 }

@@ -3,6 +3,27 @@
     xmlns:app="http://schemas.android.com/apk/res-auto"
     android:background="@color/white">
 
+    <androidx.preference.PreferenceCategory
+        android:key="ads_settings"
+        android:title="@string/settings_cookie_settings_label_ad_settings"
+        app:isPreferenceVisible="false"
+        app:allowDividerAbove="false"
+        app:allowDividerBelow="false">
+        <androidx.preference.Preference
+            android:key="ads_personalization"
+            android:title="@string/settings_cookie_settings_label_ads_personalization"
+            app:allowDividerAbove="true"
+            app:allowDividerBelow="true"
+            app:iconSpaceReserved="false" />
+    </androidx.preference.PreferenceCategory>
+
+    <androidx.preference.PreferenceCategory
+        android:key="settings_cookie"
+        android:title="@string/settings_about_cookie_settings"
+        app:isPreferenceVisible="false"
+        app:allowDividerAbove="false"
+        app:allowDividerBelow="false" />
+
     <mega.privacy.android.app.presentation.settings.MegaSwitchPreference
         android:key="settings_cookie_accept"
         android:title="@string/preference_cookies_accept"
@@ -45,5 +66,4 @@
         app:allowDividerBelow="false"
         app:iconSpaceReserved="false"
         app:shouldDisableView="false" />
-
 </androidx.preference.PreferenceScreen>
