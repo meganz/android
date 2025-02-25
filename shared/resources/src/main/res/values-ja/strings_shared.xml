@@ -228,8 +228,6 @@
     </plurals>
     <!-- Title of the dialog to ask the user to use the selected location as default location for next downloads. Please do not modify the %s placeholder as it will be replaced by the name of the folder where the files will be downloaded-->
     <string name="transfers_dialog_save_download_location_title">ダウンロードしたファイルをすべて「%1$s」に保存しますか？</string>
-    <!-- Option to don't use the selected location as default location for next downloads-->
-    <string name="transfers_dialog_save_download_location_only_this_time_option">今回だけ</string>
     <!-- Option to use the selected location as default location for next downloads-->
     <string name="transfers_dialog_save_download_location_always_here_option">常にここにダウンロード</string>
     <!-- Option to don't use the selected location as default location for next downloads and don't ask again-->
@@ -383,13 +381,13 @@
     <!-- Feature indicating MEGA VPN availability, available in the pro plan -->
     <string name="account_cancel_account_screen_plan_mega_vpn">MEGA&#160;VPN</string>
     <!-- Row label for call and meeting duration in the comparison table -->
-    <string name="account_cancel_account_screen_plan_call_meeting_duration">通話＆ミーティング時間</string>
+    <string name="account_cancel_account_screen_plan_call_meeting_duration">Call &amp;amp;amp;amp; meeting duration</string>
     <!-- Call and meeting duration limit in the free plan -->
     <string name="account_cancel_account_screen_plan_call_meeting_duration_free">最大1時間</string>
     <!-- Unlimited call and meeting duration available in the pro plan -->
     <string name="cancel_account_plan_call_meeting_duration_pro">無制限</string>
     <!-- Row label for call and meeting participants in the comparison table -->
-    <string name="account_cancel_account_plan_call_meeting_participants">通話とミーティングの参加者</string>
+    <string name="account_cancel_account_plan_call_meeting_participants">Call &amp;amp;amp;amp; meeting participants</string>
     <!-- Limit on call and meeting participants in the free plan -->
     <string name="account_cancel_account_free_plan_call_meeting_participants">最大100人</string>
     <!-- Unlimited call and meeting participants available in the pro plan -->
@@ -726,10 +724,6 @@
     <string name="sync_stop_backup_confirm_dialog_move_option">フォルダの移動</string>
     <!-- Explanatory text for the move option of the dialog to confirm stop a backup -->
     <string name="sync_stop_backup_confirm_dialog_move_option_text">このフォルダを別の場所に移動すると、お持ちのデータに完全にアクセスできるようになります。</string>
-    <!-- Label text of the destination for the move option of the dialog to confirm stop a backup -->
-    <string name="sync_stop_backup_confirm_dialog_move_option_destination_label">移動先：</string>
-    <!-- Label text of the destination for the move option of the dialog to confirm stop a backup -->
-    <string name="sync_stop_backup_confirm_dialog_move_option_select_destination_button">クラウドドライブ</string>
     <!-- Delete option of the dialog to confirm stop a backup -->
     <string name="sync_stop_backup_confirm_dialog_delete_option">フォルダを恒久的に削除</string>
     <!-- Explanatory text for the delete option of the dialog to confirm stop a backup -->
@@ -912,4 +906,18 @@
     <string name="login_text">ログイン</string>
     <!--The text where user forgot their password and will navigate to reset it-->
     <string name="login_page_forgot_password_text">パスワードをお忘れですか？</string>
+    <!-- Sync state up to date -->
+    <string name="sync_list_sync_state_disabled">無効になっています</string>
+    <!-- Name of the Camera uploads feature -->
+    <string name="general_camera_uploads">カメラアップロード</string>
+    <!-- Name of the Camera uploads feature -->
+    <string name="general_media_uploads">メディアアップロード</string>
+    <!-- Generic settings label text -->
+    <string name="general_settings">設定</string>
+    <!-- Ad settings label in the cookie settings page -->
+    <string name="settings_cookie_settings_label_ad_settings">広告設定</string>
+    <!-- Ads personalization label in the cookie settings page -->
+    <string name="settings_cookie_settings_label_ads_personalization">Ads personalization</string>
+    <!-- Cookie settings title in the cookie settings page -->
+    <string name="settings_cookie_setting_title_cookie_and_ad_settings">Cookie and Ad settings</string>
 </resources>

@@ -235,9 +235,7 @@
         <item quantity="other">Links delen</item>
     </plurals>
     <!-- Title of the dialog to ask the user to use the selected location as default location for next downloads. Please do not modify the %s placeholder as it will be replaced by the name of the folder where the files will be downloaded-->
-    <string name="transfers_dialog_save_download_location_title">Save all your downloaded files to “%1$s”?</string>
-    <!-- Option to don't use the selected location as default location for next downloads-->
-    <string name="transfers_dialog_save_download_location_only_this_time_option">Alleen deze keer</string>
+    <string name="transfers_dialog_save_download_location_title">Sla al uw gedownloade bestanden op in “%1$s”?</string>
     <!-- Option to use the selected location as default location for next downloads-->
     <string name="transfers_dialog_save_download_location_always_here_option">Altijd hier downloaden</string>
     <!-- Option to don't use the selected location as default location for next downloads and don't ask again-->
@@ -391,13 +389,13 @@
     <!-- Feature indicating MEGA VPN availability, available in the pro plan -->
     <string name="account_cancel_account_screen_plan_mega_vpn">MEGA&#160;VPN</string>
     <!-- Row label for call and meeting duration in the comparison table -->
-    <string name="account_cancel_account_screen_plan_call_meeting_duration">Duur van het gesprek en de vergadering</string>
+    <string name="account_cancel_account_screen_plan_call_meeting_duration">Call &amp;amp;amp;amp; meeting duration</string>
     <!-- Call and meeting duration limit in the free plan -->
     <string name="account_cancel_account_screen_plan_call_meeting_duration_free">Tot 1 uur</string>
     <!-- Unlimited call and meeting duration available in the pro plan -->
     <string name="cancel_account_plan_call_meeting_duration_pro">Onbeperkt</string>
     <!-- Row label for call and meeting participants in the comparison table -->
-    <string name="account_cancel_account_plan_call_meeting_participants">Deelnemers aan de oproep en vergadering</string>
+    <string name="account_cancel_account_plan_call_meeting_participants">Call &amp;amp;amp;amp; meeting participants</string>
     <!-- Limit on call and meeting participants in the free plan -->
     <string name="account_cancel_account_free_plan_call_meeting_participants">Tot 100</string>
     <!-- Unlimited call and meeting participants available in the pro plan -->
@@ -738,10 +736,6 @@
     <string name="sync_stop_backup_confirm_dialog_move_option">Map verplaatsten</string>
     <!-- Explanatory text for the move option of the dialog to confirm stop a backup -->
     <string name="sync_stop_backup_confirm_dialog_move_option_text">Verplaats deze map naar een andere lokatie om volledige toegang tot uw gegevens te krijgen.</string>
-    <!-- Label text of the destination for the move option of the dialog to confirm stop a backup -->
-    <string name="sync_stop_backup_confirm_dialog_move_option_destination_label">Verplaatsen naar:</string>
-    <!-- Label text of the destination for the move option of the dialog to confirm stop a backup -->
-    <string name="sync_stop_backup_confirm_dialog_move_option_select_destination_button">Cloud schijf</string>
     <!-- Delete option of the dialog to confirm stop a backup -->
     <string name="sync_stop_backup_confirm_dialog_delete_option">Map permanent verwijderen</string>
     <!-- Explanatory text for the delete option of the dialog to confirm stop a backup -->
@@ -885,26 +879,26 @@
     <!--Message to be shown to the user when they entered an incorrect verification code-->
     <string name="multi_factor_auth_login_verification_input_error_text">Onjuiste verificatiecode</string>
     <!-- Snackbar text to inform the user that preview may take some time because it needs to be downloaded -->
-    <string name="transfers_preview_slow_snackbar">Preparing file for preview. See notification for details.</string>
+    <string name="transfers_preview_slow_snackbar">Het bestand klaarmaken voor een voorbeeldweergave. Zie meldingen voor meer informatie.</string>
     <!-- Notification text for preview downloads.  Please do not modify the %s placeholder as it will be replaced by the name of the file to be donwloaded -->
     <string name="transfers_notification_downloading_preview">Voorbereiden %1$s voor een voorvertoning</string>
     <!-- Notification text for preview downloads, paused state.  Please do not modify the %s placeholder as it will be replaced by the name of the file to be donwloaded -->
-    <string name="transfers_notification_downloading_preview_paused">Preparing %1$s for preview (paused)</string>
+    <string name="transfers_notification_downloading_preview_paused">%1$svoorbereiden voor een weergave (gepauzeerd)</string>
     <!-- Message when successfully deleting single item from the audio queue. %1$s will be replaced with the item name -->
-    <string name="audio_queue_single_item_removed_message">’%1$s’ was removed</string>
+    <string name="audio_queue_single_item_removed_message">\’%1$s\’ was  verwijderd</string>
     <!-- Message when successfully deleting items from the audio queue. %1$d will be replaced with the removal count when multiple items are removed. -->
     <string name="audio_queue_multiple_items_removed_message">Removed %1$d items from queue</string>
     <!-- Message when successfully deleting items from the audio queue. %1$s will be replaced with the item name %2$d will be replaced with the removal count. -->
     <plurals name="audio_queue_items_removal_success_message">
-        <item quantity="one">‘%1$s’ was removed</item>
-        <item quantity="other">Removed %2$d items from queue</item>
+        <item quantity="one">\’%1$s\’ was verwijderd</item>
+        <item quantity="other">%2$d items verwijderd uit de wachtrij</item>
     </plurals>
     <!-- Title for the dialog to inform that a transfer is needed to preview a file and transfers are paused-->
-    <string name="transfers_preview_paused_dialog_title">Transfers are paused</string>
+    <string name="transfers_preview_paused_dialog_title">Overdrachten zijn gepauzeerd</string>
     <!-- Message for the dialog to inform that a transfer is needed to preview a file and transfers are paused-->
-    <string name="transfers_preview_paused_dialog_text">To preview “%1$s” you will need to unpause transfers</string>
+    <string name="transfers_preview_paused_dialog_text">Om een voorbeeld te bekijken van “%1$s”moet u de overdrachten de-pauzeren</string>
     <!--SD Card text shown as title in FileStorage screen -->
-    <string name="general_sd_card">SD card</string>
+    <string name="general_sd_card">SD-kaart</string>
     <!--The title of the Login page-->
     <string name="login_page_title">Inloggen in uw MEGA-account</string>
     <!--Message to be shown to the user when they entered an invalid email-->
@@ -929,4 +923,18 @@
     <string name="login_text">Log&#160;in</string>
     <!--The text where user forgot their password and will navigate to reset it-->
     <string name="login_page_forgot_password_text">Wachtwoord vergeten?</string>
+    <!-- Sync state up to date -->
+    <string name="sync_list_sync_state_disabled">Uitgeschakeld</string>
+    <!-- Name of the Camera uploads feature -->
+    <string name="general_camera_uploads">Camera uploads</string>
+    <!-- Name of the Camera uploads feature -->
+    <string name="general_media_uploads">Media uploads</string>
+    <!-- Generic settings label text -->
+    <string name="general_settings">Instellingen</string>
+    <!-- Ad settings label in the cookie settings page -->
+    <string name="settings_cookie_settings_label_ad_settings">Advertentie-instellingen</string>
+    <!-- Ads personalization label in the cookie settings page -->
+    <string name="settings_cookie_settings_label_ads_personalization">Ads personalization</string>
+    <!-- Cookie settings title in the cookie settings page -->
+    <string name="settings_cookie_setting_title_cookie_and_ad_settings">Cookie and Ad settings</string>
 </resources>
