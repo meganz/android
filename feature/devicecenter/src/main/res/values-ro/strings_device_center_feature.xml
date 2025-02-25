@@ -56,8 +56,6 @@
     <string name="device_center_list_view_item_sub_state_logged_out">Sincronizarea sau backupul au fost oprite pe măsură ce parcă v-ați deconectat de la aplicația desktop. Conectați-vă din nou prin aplicația desktop și reluați sincronizarea sau backup-ul.</string>
     <!-- The name of the Device or Folder Sub State when its code is INSUFFICIENT_DISK_SPACE -->
     <string name="device_center_list_view_item_sub_state_insufficient_disk_space">Spațiu insuficient pentru descărcare.</string>
-    <!-- The name of the Device Status informing the User that Camera Uploads is disabled for the Current Device -->
-    <string name="device_center_list_view_item_status_camera_uploads_disabled">Încărcări camere sunt dezactivate</string>
     <!-- The Error Message shown in the Rename Device Dialog when the User submits an empty Device Name -->
     <string name="device_center_rename_device_dialog_error_message_empty_device_name">Introduceți un nume de dispozitiv.</string>
     <!-- The Error Message shown in the Rename Device Dialog when the User submits a new Device Name that already exists in the current list of Devices -->

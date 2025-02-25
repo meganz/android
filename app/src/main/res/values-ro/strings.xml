@@ -2832,8 +2832,6 @@
     <string name="dialog_cookie_alert_title">Gestionați cookie-urile</string>
     <!-- Body for Cookie dialog, visible for new users. Please, keep the placeholders to format the string. -->
     <string name="dialog_cookie_alert_message">Folosim cookie-uri și tehnologii similare pentru a ne ajuta să ne îmbunătățim serviciile. Aflați mai multe în [A]Politica privind cookie-urile[/A].</string>
-    <!-- Cookie dialog message showed when there are unsaved settings. -->
-    <string name="dialog_cookie_alert_unsaved">Setările privind cookie-urile nu au fost salvate.</string>
     <!-- Snackbar message showed when there settings has been saved successfully. -->
     <string name="dialog_cookie_snackbar_saved">Modificările la setările privind cookie-urile au fost salvate</string>
     <!-- Preference screen item title -->

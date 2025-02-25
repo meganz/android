@@ -55,7 +55,7 @@
     <!-- The name of the Device or Folder Sub State when its code is INSUFFICIENT_DISK_SPACE -->
     <string name="general_sync_insufficient_disk_space">Insufficient storage space on your device</string>
     <!-- The name for specific Sub States to indicate that an unknown error occurred -->
-    <string name="general_sync_message_unknown_error">An unknown error occurred. Contact support&#64;mega.nz.</string>
+    <string name="general_sync_message_unknown_error">An unknown error occurred. Contact support@mega.nz.</string>
     <!-- The name for specific Sub States to indicate that the Node is in the Rubbish Bin -->
     <string name="general_sync_message_node_in_rubbish_bin">Folder can’t be synced or backed up as the MEGA folder is in the Rubbish bin</string>
     <!-- The name for specific Sub States to indicate that the local drive cannot be located at this time -->
@@ -389,13 +389,13 @@
     <!-- Feature indicating MEGA VPN availability, available in the pro plan -->
     <string name="account_cancel_account_screen_plan_mega_vpn">MEGA&#160;VPN</string>
     <!-- Row label for call and meeting duration in the comparison table -->
-    <string name="account_cancel_account_screen_plan_call_meeting_duration">Call &amp;amp;amp; meeting duration</string>
+    <string name="account_cancel_account_screen_plan_call_meeting_duration">Call &amp;amp;amp;amp; meeting duration</string>
     <!-- Call and meeting duration limit in the free plan -->
     <string name="account_cancel_account_screen_plan_call_meeting_duration_free">Up to 1 hour</string>
     <!-- Unlimited call and meeting duration available in the pro plan -->
     <string name="cancel_account_plan_call_meeting_duration_pro">Unlimited</string>
     <!-- Row label for call and meeting participants in the comparison table -->
-    <string name="account_cancel_account_plan_call_meeting_participants">Call &amp;amp;amp; meeting participants</string>
+    <string name="account_cancel_account_plan_call_meeting_participants">Call &amp;amp;amp;amp; meeting participants</string>
     <!-- Limit on call and meeting participants in the free plan -->
     <string name="account_cancel_account_free_plan_call_meeting_participants">Up to 100</string>
     <!-- Unlimited call and meeting participants available in the pro plan -->
@@ -831,8 +831,8 @@
     <string name="syncs_tab_view_other_devices">View other devices in Device centre</string>
     <!-- The snackbar message of you and others raised your hands -->
     <plurals name="transfers_completed_read_error_retrying">
-        <item quantity="one">Your upload can’t be completed or retried, because MEGA can no longer access the file</item>
-        <item quantity="other">Some or all of your uploads can’t be completed or retried, because MEGA can no longer access the files</item>
+        <item quantity="one"></item>
+        <item quantity="other"></item>
     </plurals>
     <!-- Warning shown to the user when tries to retry a cancelled or failed transfer but it cannot be retried because app does not have read permission over the file anymore -->
     <string name="transfers_completed_one_read_error_retrying">Your upload can’t be completed or retried, because MEGA can no longer access the file</string>

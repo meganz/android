@@ -2832,8 +2832,6 @@
     <string name="dialog_cookie_alert_title">Gerenciar cookies</string>
     <!-- Body for Cookie dialog, visible for new users. Please, keep the placeholders to format the string. -->
     <string name="dialog_cookie_alert_message">Usamos cookies e tecnologias semelhantes para melhorar os nossos serviços. Para mais informações, acesse a nossa [A]Política de cookies[/A].</string>
-    <!-- Cookie dialog message showed when there are unsaved settings. -->
-    <string name="dialog_cookie_alert_unsaved">As configurações dos cookies não foram salvas.</string>
     <!-- Snackbar message showed when there settings has been saved successfully. -->
     <string name="dialog_cookie_snackbar_saved">As alterações nas configurações dos cookies foram salvas</string>
     <!-- Preference screen item title -->

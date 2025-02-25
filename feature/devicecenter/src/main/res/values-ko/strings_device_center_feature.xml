@@ -56,8 +56,6 @@
     <string name="device_center_list_view_item_sub_state_logged_out">데스크톱 앱에서 로그아웃한 것으로 나타나서 동기화 또는 백업이 멈추었습니다. 데스크톱 앱에서 다시 로그인하고, 동기화 또는 백업을 재개하세요.</string>
     <!-- The name of the Device or Folder Sub State when its code is INSUFFICIENT_DISK_SPACE -->
     <string name="device_center_list_view_item_sub_state_insufficient_disk_space">다운로드에 필요한 공간 부족</string>
-    <!-- The name of the Device Status informing the User that Camera Uploads is disabled for the Current Device -->
-    <string name="device_center_list_view_item_status_camera_uploads_disabled">카메라 업로드 비활성화됨</string>
     <!-- The Error Message shown in the Rename Device Dialog when the User submits an empty Device Name -->
     <string name="device_center_rename_device_dialog_error_message_empty_device_name">장치 이름을 입력하세요.</string>
     <!-- The Error Message shown in the Rename Device Dialog when the User submits a new Device Name that already exists in the current list of Devices -->

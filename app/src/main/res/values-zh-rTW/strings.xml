@@ -2690,8 +2690,6 @@
     <string name="dialog_cookie_alert_title">管理cookies</string>
     <!-- Body for Cookie dialog, visible for new users. Please, keep the placeholders to format the string. -->
     <string name="dialog_cookie_alert_message">我們使用cookie和類似技術來幫助我們改善我們的服務。在我們的[A]Cookie政策[/A]中瞭解更多資訊。</string>
-    <!-- Cookie dialog message showed when there are unsaved settings. -->
-    <string name="dialog_cookie_alert_unsaved">Cookie設定未儲存。</string>
     <!-- Snackbar message showed when there settings has been saved successfully. -->
     <string name="dialog_cookie_snackbar_saved">Cookie設定變更已儲存</string>
     <!-- Preference screen item title -->

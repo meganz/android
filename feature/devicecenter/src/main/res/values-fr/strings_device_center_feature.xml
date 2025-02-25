@@ -56,8 +56,6 @@
     <string name="device_center_list_view_item_sub_state_logged_out">La synchronisation ou la sauvegarde a été arrêtée, car il semble que vous vous êtes déconnecté de l’appli pour ordinateur. Reconnectez-vous dans l’appli pour ordinateur et reprenez la synchronisation ou la sauvegarde.</string>
     <!-- The name of the Device or Folder Sub State when its code is INSUFFICIENT_DISK_SPACE -->
     <string name="device_center_list_view_item_sub_state_insufficient_disk_space">Il n’y a pas suffisamment d’espace pour télécharger.</string>
-    <!-- The name of the Device Status informing the User that Camera Uploads is disabled for the Current Device -->
-    <string name="device_center_list_view_item_status_camera_uploads_disabled">Les Téléversements de l’appareil photo sont désactivés</string>
     <!-- The Error Message shown in the Rename Device Dialog when the User submits an empty Device Name -->
     <string name="device_center_rename_device_dialog_error_message_empty_device_name">Saisissez un nom d’appareil</string>
     <!-- The Error Message shown in the Rename Device Dialog when the User submits a new Device Name that already exists in the current list of Devices -->

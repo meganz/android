@@ -381,13 +381,13 @@
     <!-- Feature indicating MEGA VPN availability, available in the pro plan -->
     <string name="account_cancel_account_screen_plan_mega_vpn">MEGA&#160;VPN</string>
     <!-- Row label for call and meeting duration in the comparison table -->
-    <string name="account_cancel_account_screen_plan_call_meeting_duration">Call &amp;amp;amp; meeting duration</string>
+    <string name="account_cancel_account_screen_plan_call_meeting_duration">Call &amp;amp;amp;amp; meeting duration</string>
     <!-- Call and meeting duration limit in the free plan -->
     <string name="account_cancel_account_screen_plan_call_meeting_duration_free">최대 1시간</string>
     <!-- Unlimited call and meeting duration available in the pro plan -->
     <string name="cancel_account_plan_call_meeting_duration_pro">무제한</string>
     <!-- Row label for call and meeting participants in the comparison table -->
-    <string name="account_cancel_account_plan_call_meeting_participants">Call &amp;amp;amp; meeting participants</string>
+    <string name="account_cancel_account_plan_call_meeting_participants">Call &amp;amp;amp;amp; meeting participants</string>
     <!-- Limit on call and meeting participants in the free plan -->
     <string name="account_cancel_account_free_plan_call_meeting_participants">최대 100명</string>
     <!-- Unlimited call and meeting participants available in the pro plan -->
@@ -724,10 +724,6 @@
     <string name="sync_stop_backup_confirm_dialog_move_option">폴더 이동</string>
     <!-- Explanatory text for the move option of the dialog to confirm stop a backup -->
     <string name="sync_stop_backup_confirm_dialog_move_option_text">당신의 데이터에 대한 완전한 접근을 얻으려면 이 폴더를 다른 위치로 옮기세요.</string>
-    <!-- Label text of the destination for the move option of the dialog to confirm stop a backup -->
-    <string name="sync_stop_backup_confirm_dialog_move_option_destination_label">여기로 이동:</string>
-    <!-- Label text of the destination for the move option of the dialog to confirm stop a backup -->
-    <string name="sync_stop_backup_confirm_dialog_move_option_select_destination_button">클라우드 드라이브</string>
     <!-- Delete option of the dialog to confirm stop a backup -->
     <string name="sync_stop_backup_confirm_dialog_delete_option">폴더 영구 삭제</string>
     <!-- Explanatory text for the delete option of the dialog to confirm stop a backup -->
@@ -913,4 +909,18 @@
     <string name="login_text">로그인</string>
     <!--The text where user forgot their password and will navigate to reset it-->
     <string name="login_page_forgot_password_text">암호를 잊었나요?</string>
+    <!-- Sync state up to date -->
+    <string name="sync_list_sync_state_disabled">비활성화됨</string>
+    <!-- Name of the Camera uploads feature -->
+    <string name="general_camera_uploads">카메라 업로드</string>
+    <!-- Name of the Camera uploads feature -->
+    <string name="general_media_uploads">미디어 업로드</string>
+    <!-- Generic settings label text -->
+    <string name="general_settings">설정</string>
+    <!-- Ad settings label in the cookie settings page -->
+    <string name="settings_cookie_settings_label_ad_settings">Ad settings</string>
+    <!-- Ads personalization label in the cookie settings page -->
+    <string name="settings_cookie_settings_label_ads_personalization">Ads personalization</string>
+    <!-- Cookie settings title in the cookie settings page -->
+    <string name="settings_cookie_setting_title_cookie_and_ad_settings">Cookie and Ad settings</string>
 </resources>

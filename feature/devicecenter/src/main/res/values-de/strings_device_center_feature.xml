@@ -56,8 +56,6 @@
     <string name="device_center_list_view_item_sub_state_logged_out">Die Synchronisierung oder das Backup wurde angehalten, da Sie sich anscheinend aus der Desktop-App ausgeloggt haben. Loggen Sie sich in die Desktop-App wieder ein und aktivieren Sie die Synchronisierung bzw. das Backup erneut.</string>
     <!-- The name of the Device or Folder Sub State when its code is INSUFFICIENT_DISK_SPACE -->
     <string name="device_center_list_view_item_sub_state_insufficient_disk_space">Nicht genügend Speicherplatz für den Download.</string>
-    <!-- The name of the Device Status informing the User that Camera Uploads is disabled for the Current Device -->
-    <string name="device_center_list_view_item_status_camera_uploads_disabled">Kamera-Uploads deaktiviert</string>
     <!-- The Error Message shown in the Rename Device Dialog when the User submits an empty Device Name -->
     <string name="device_center_rename_device_dialog_error_message_empty_device_name">Geben Sie einen Gerätenamen ein.</string>
     <!-- The Error Message shown in the Rename Device Dialog when the User submits a new Device Name that already exists in the current list of Devices -->

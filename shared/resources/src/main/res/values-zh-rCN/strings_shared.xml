@@ -381,13 +381,13 @@
     <!-- Feature indicating MEGA VPN availability, available in the pro plan -->
     <string name="account_cancel_account_screen_plan_mega_vpn">MEGA&#160;VPN</string>
     <!-- Row label for call and meeting duration in the comparison table -->
-    <string name="account_cancel_account_screen_plan_call_meeting_duration">通话和会议时长</string>
+    <string name="account_cancel_account_screen_plan_call_meeting_duration">Call &amp;amp;amp;amp; meeting duration</string>
     <!-- Call and meeting duration limit in the free plan -->
     <string name="account_cancel_account_screen_plan_call_meeting_duration_free">最多1小时</string>
     <!-- Unlimited call and meeting duration available in the pro plan -->
     <string name="cancel_account_plan_call_meeting_duration_pro">无限制</string>
     <!-- Row label for call and meeting participants in the comparison table -->
-    <string name="account_cancel_account_plan_call_meeting_participants">通话和会议参与者</string>
+    <string name="account_cancel_account_plan_call_meeting_participants">Call &amp;amp;amp;amp; meeting participants</string>
     <!-- Limit on call and meeting participants in the free plan -->
     <string name="account_cancel_account_free_plan_call_meeting_participants">最多100人</string>
     <!-- Unlimited call and meeting participants available in the pro plan -->
@@ -724,10 +724,6 @@
     <string name="sync_stop_backup_confirm_dialog_move_option">移动文件夹</string>
     <!-- Explanatory text for the move option of the dialog to confirm stop a backup -->
     <string name="sync_stop_backup_confirm_dialog_move_option_text">将此文件夹移至其它位置以完全访问您的数据。</string>
-    <!-- Label text of the destination for the move option of the dialog to confirm stop a backup -->
-    <string name="sync_stop_backup_confirm_dialog_move_option_destination_label">移动到：</string>
-    <!-- Label text of the destination for the move option of the dialog to confirm stop a backup -->
-    <string name="sync_stop_backup_confirm_dialog_move_option_select_destination_button">云盘</string>
     <!-- Delete option of the dialog to confirm stop a backup -->
     <string name="sync_stop_backup_confirm_dialog_delete_option">永久删除文件夹</string>
     <!-- Explanatory text for the delete option of the dialog to confirm stop a backup -->
@@ -910,4 +906,18 @@
     <string name="login_text">登&#160;入</string>
     <!--The text where user forgot their password and will navigate to reset it-->
     <string name="login_page_forgot_password_text">忘记密码了？</string>
+    <!-- Sync state up to date -->
+    <string name="sync_list_sync_state_disabled">已禁用</string>
+    <!-- Name of the Camera uploads feature -->
+    <string name="general_camera_uploads">相机上传</string>
+    <!-- Name of the Camera uploads feature -->
+    <string name="general_media_uploads">媒体上传</string>
+    <!-- Generic settings label text -->
+    <string name="general_settings">设置</string>
+    <!-- Ad settings label in the cookie settings page -->
+    <string name="settings_cookie_settings_label_ad_settings">广告设置</string>
+    <!-- Ads personalization label in the cookie settings page -->
+    <string name="settings_cookie_settings_label_ads_personalization">Ads personalization</string>
+    <!-- Cookie settings title in the cookie settings page -->
+    <string name="settings_cookie_setting_title_cookie_and_ad_settings">Cookie and Ad settings</string>
 </resources>

@@ -56,8 +56,6 @@
     <string name="device_center_list_view_item_sub_state_logged_out">Đồng&#160;bộ hóa hoặc sao&#160;lưu đã bị dừng do có vẻ như bạn đã đăng&#160;xuất khỏi app cho máy&#160;tính. Đăng&#160;nhập vào lại app cho máy&#160;tính để tiếp&#160;tục đồng&#160;bộ hóa hoặc sao&#160;lưu.</string>
     <!-- The name of the Device or Folder Sub State when its code is INSUFFICIENT_DISK_SPACE -->
     <string name="device_center_list_view_item_sub_state_insufficient_disk_space">Không đủ dung&#160;lượng cho việc tải&#160;xuống.</string>
-    <!-- The name of the Device Status informing the User that Camera Uploads is disabled for the Current Device -->
-    <string name="device_center_list_view_item_status_camera_uploads_disabled">Đăng tải camêra đã tắt</string>
     <!-- The Error Message shown in the Rename Device Dialog when the User submits an empty Device Name -->
     <string name="device_center_rename_device_dialog_error_message_empty_device_name">Điền tên thiết&#160;bị</string>
     <!-- The Error Message shown in the Rename Device Dialog when the User submits a new Device Name that already exists in the current list of Devices -->

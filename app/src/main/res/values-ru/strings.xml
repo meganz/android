@@ -2903,8 +2903,6 @@
     <string name="dialog_cookie_alert_title">Управление куки-файлами</string>
     <!-- Body for Cookie dialog, visible for new users. Please, keep the placeholders to format the string. -->
     <string name="dialog_cookie_alert_message">Мы используем куки и аналогичные технологии, чтобы улучшать наши сервисы. Подробнее в нашей [A]Политике в отношении куки-файлов[/A].</string>
-    <!-- Cookie dialog message showed when there are unsaved settings. -->
-    <string name="dialog_cookie_alert_unsaved">Настройки куки-файлов не сохранены.</string>
     <!-- Snackbar message showed when there settings has been saved successfully. -->
     <string name="dialog_cookie_snackbar_saved">Изменения настроек куки-файлов сохранены</string>
     <!-- Preference screen item title -->

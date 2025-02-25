@@ -184,13 +184,12 @@
     </plurals>
     <!-- Text of the video section playlist detail video number -->
     <plurals name="video_section_playlist_detail_video_number">
-        <item quantity="one">%1$d video</item>
-        <item quantity="other">%1$d videos</item>
+        <item quantity="other">%1$d video</item>
     </plurals>
     <!-- Warning shown when the user clicks on a web link and there is no app available at the moment for opening it. -->
     <string name="chat_click_link_in_message_intent_not_available">You may not have any apps installed which can open this website</string>
     <!-- Message when deleting a singular playlist of the video section playlists tab. %1$s will be replaced the name of deleted playlist -->
-    <string name="video_section_playlists_delete_playlists_message_singular">“%1$s” deleted</string>
+    <string name="video_section_playlists_delete_playlists_message_singular">“%1$s” dihapus</string>
     <!-- The name of the Settings Camera Uploads Option, which decides whether or not the Device must be charged for Camera Uploads to start uploading content -->
     <string name="settings_camera_uploads_upload_only_while_charging_option_name">Upload only while charging</string>
     <!-- Text for the header of the screen to add a new sync folder -->
@@ -338,7 +337,7 @@
     <!-- label for tag text field in add tags page -->
     <string name="add_tags_text_label_tag">Tag</string>
     <!-- label for add tags page add button -->
-    <string name="add_tags_button_label_add">Add “#%1$s” tag</string>
+    <string name="add_tags_button_label_add">Tambahkan tag “#%1$s”</string>
     <!-- label for add tags page existing tags label -->
     <string name="add_tags_label_existing_tags">Tag yang ada</string>
     <!-- error label for add tags page when special characters added -->
@@ -380,23 +379,23 @@
     <!-- Rewind duration available in the free plan -->
     <string name="account_cancel_account_screen_plan_rewind_free">Hingga 30 hari (hanya lihat)</string>
     <!-- Rewind duration available in the current plan. %1s represents the number of days. -->
-    <string name="account_cancel_account_screen_plan_rewind_current">Up to %1s days</string>
+    <string name="account_cancel_account_screen_plan_rewind_current">Hingga %1s hari</string>
     <!-- Feature indicating MEGA VPN availability, available in the pro plan -->
     <string name="account_cancel_account_screen_plan_mega_vpn">MEGA&#160;VPN</string>
     <!-- Row label for call and meeting duration in the comparison table -->
-    <string name="account_cancel_account_screen_plan_call_meeting_duration">Call &amp;amp;amp; meeting duration</string>
+    <string name="account_cancel_account_screen_plan_call_meeting_duration">Call &amp;amp;amp;amp; meeting duration</string>
     <!-- Call and meeting duration limit in the free plan -->
     <string name="account_cancel_account_screen_plan_call_meeting_duration_free">Hingga 1 jam</string>
     <!-- Unlimited call and meeting duration available in the pro plan -->
     <string name="cancel_account_plan_call_meeting_duration_pro">TAK TERBATAS</string>
     <!-- Row label for call and meeting participants in the comparison table -->
-    <string name="account_cancel_account_plan_call_meeting_participants">Call &amp;amp;amp; meeting participants</string>
+    <string name="account_cancel_account_plan_call_meeting_participants">Call &amp;amp;amp;amp; meeting participants</string>
     <!-- Limit on call and meeting participants in the free plan -->
     <string name="account_cancel_account_free_plan_call_meeting_participants">Hingga 100</string>
     <!-- Unlimited call and meeting participants available in the pro plan -->
     <string name="account_cancel_account_pro_plan_call_meeting_participants">TAK TERBATAS</string>
     <!-- Button label to keep the current pro plan -->
-    <string name="account_cancel_account_plan_keep_pro_plan">Keep %1s</string>
+    <string name="account_cancel_account_plan_keep_pro_plan">Simpan %1s</string>
     <!-- Button label to continue with the cancellation -->
     <string name="account_cancel_account_plan_continue_cancellation">Lanjutkan pembatalan</string>
     <!-- error label for add tags page when tag character limit reached -->
@@ -730,10 +729,6 @@
     <string name="sync_stop_backup_confirm_dialog_move_option">Pindahkan folder</string>
     <!-- Explanatory text for the move option of the dialog to confirm stop a backup -->
     <string name="sync_stop_backup_confirm_dialog_move_option_text">Move this folder to another location to get full access to your data.</string>
-    <!-- Label text of the destination for the move option of the dialog to confirm stop a backup -->
-    <string name="sync_stop_backup_confirm_dialog_move_option_destination_label">Pindah ke:</string>
-    <!-- Label text of the destination for the move option of the dialog to confirm stop a backup -->
-    <string name="sync_stop_backup_confirm_dialog_move_option_select_destination_button">Cloud drive</string>
     <!-- Delete option of the dialog to confirm stop a backup -->
     <string name="sync_stop_backup_confirm_dialog_delete_option">Hapus folder secara permanen</string>
     <!-- Explanatory text for the delete option of the dialog to confirm stop a backup -->
@@ -920,4 +915,18 @@
     <string name="login_text">Masuk</string>
     <!--The text where user forgot their password and will navigate to reset it-->
     <string name="login_page_forgot_password_text">Lupa password?</string>
+    <!-- Sync state up to date -->
+    <string name="sync_list_sync_state_disabled">Membatalkan</string>
+    <!-- Name of the Camera uploads feature -->
+    <string name="general_camera_uploads">Unggahan camera</string>
+    <!-- Name of the Camera uploads feature -->
+    <string name="general_media_uploads">Unggahan media</string>
+    <!-- Generic settings label text -->
+    <string name="general_settings">Pengaturan</string>
+    <!-- Ad settings label in the cookie settings page -->
+    <string name="settings_cookie_settings_label_ad_settings">Ad settings</string>
+    <!-- Ads personalization label in the cookie settings page -->
+    <string name="settings_cookie_settings_label_ads_personalization">Ads personalization</string>
+    <!-- Cookie settings title in the cookie settings page -->
+    <string name="settings_cookie_setting_title_cookie_and_ad_settings">Cookie and Ad settings</string>
 </resources>

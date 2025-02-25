@@ -56,8 +56,6 @@
     <string name="device_center_list_view_item_sub_state_logged_out">由於您似乎已登出桌面應用程式，因此同步或備份已停止。使用桌面應用程式重新登入，然後恢復同步或備份。</string>
     <!-- The name of the Device or Folder Sub State when its code is INSUFFICIENT_DISK_SPACE -->
     <string name="device_center_list_view_item_sub_state_insufficient_disk_space">空間不足，無法下載。</string>
-    <!-- The name of the Device Status informing the User that Camera Uploads is disabled for the Current Device -->
-    <string name="device_center_list_view_item_status_camera_uploads_disabled">相機上傳已停用</string>
     <!-- The Error Message shown in the Rename Device Dialog when the User submits an empty Device Name -->
     <string name="device_center_rename_device_dialog_error_message_empty_device_name">輸入裝置名稱。</string>
     <!-- The Error Message shown in the Rename Device Dialog when the User submits a new Device Name that already exists in the current list of Devices -->

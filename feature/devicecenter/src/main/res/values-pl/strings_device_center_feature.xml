@@ -56,8 +56,6 @@
     <string name="device_center_list_view_item_sub_state_logged_out">Synchronizacja lub tworzenie kopii zapasowych zostało zatrzymane, ponieważ wydaje się, że wylogowałeś się z aplikacji desktopowej. Zaloguj się ponownie za pomocą aplikacji desktopowerj aby wznowić synchronizację lub tworzenie kopii zapasowych.</string>
     <!-- The name of the Device or Folder Sub State when its code is INSUFFICIENT_DISK_SPACE -->
     <string name="device_center_list_view_item_sub_state_insufficient_disk_space">Niewystarczająca ilość miejsca do pobrania.</string>
-    <!-- The name of the Device Status informing the User that Camera Uploads is disabled for the Current Device -->
-    <string name="device_center_list_view_item_status_camera_uploads_disabled">Przesyłanie z kamery wyłączone</string>
     <!-- The Error Message shown in the Rename Device Dialog when the User submits an empty Device Name -->
     <string name="device_center_rename_device_dialog_error_message_empty_device_name">Wprowadź nazwę urządzenia.</string>
     <!-- The Error Message shown in the Rename Device Dialog when the User submits a new Device Name that already exists in the current list of Devices -->

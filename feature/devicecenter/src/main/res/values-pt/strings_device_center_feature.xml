@@ -56,8 +56,6 @@
     <string name="device_center_list_view_item_sub_state_logged_out">A sincronização ou o backup foram interrompidos porque você parece ter se desconectado do aplicativo para desktop. Faça login novamente no aplicativo para desktop e para retomar a sincronização ou o backup.</string>
     <!-- The name of the Device or Folder Sub State when its code is INSUFFICIENT_DISK_SPACE -->
     <string name="device_center_list_view_item_sub_state_insufficient_disk_space">Não há espaço suficiente para fazer o download.</string>
-    <!-- The name of the Device Status informing the User that Camera Uploads is disabled for the Current Device -->
-    <string name="device_center_list_view_item_status_camera_uploads_disabled">Uploads da câmera desativados</string>
     <!-- The Error Message shown in the Rename Device Dialog when the User submits an empty Device Name -->
     <string name="device_center_rename_device_dialog_error_message_empty_device_name">Digite o nome do dispositivo</string>
     <!-- The Error Message shown in the Rename Device Dialog when the User submits a new Device Name that already exists in the current list of Devices -->
