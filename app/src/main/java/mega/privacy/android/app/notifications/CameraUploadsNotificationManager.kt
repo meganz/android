@@ -85,6 +85,7 @@ class CameraUploadsNotificationManager @Inject constructor(
 
     suspend fun showNotification(cameraUploadsStatusInfo: CameraUploadsStatusInfo) {
         when (cameraUploadsStatusInfo) {
+            is CameraUploadsStatusInfo.Unknown -> {}
             is CameraUploadsStatusInfo.Started -> cancelAllNotifications()
             is CameraUploadsStatusInfo.Finished -> {
                 cancelNotification()

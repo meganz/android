@@ -3,6 +3,7 @@ package mega.privacy.android.feature.sync.ui.mapper.sync
 import mega.privacy.android.data.mapper.backup.BackupInfoTypeIntMapper
 import mega.privacy.android.domain.entity.backup.Backup
 import mega.privacy.android.domain.entity.backup.BackupInfoType
+import mega.privacy.android.domain.entity.camerauploads.CameraUploadsStatusInfo
 import mega.privacy.android.domain.entity.node.NodeId
 import mega.privacy.android.domain.entity.sync.SyncError
 import mega.privacy.android.domain.entity.sync.SyncType
@@ -37,15 +38,30 @@ internal class SyncUiItemMapper @Inject constructor(
         )
 
     operator fun invoke(backup: Backup): SyncUiItem =
+        getSyncUiItemFromBackup(backup = backup, cuStatusInfo = null)
+
+    operator fun invoke(cuBackup: Backup, cuStatusInfo: CameraUploadsStatusInfo): SyncUiItem =
+        getSyncUiItemFromBackup(backup = cuBackup, cuStatusInfo = cuStatusInfo)
+
+    private fun getSyncUiItemFromBackup(
+        backup: Backup,
+        cuStatusInfo: CameraUploadsStatusInfo? = null
+    ): SyncUiItem =
         SyncUiItem(
             id = backup.backupId,
             syncType = when (backupInfoTypeIntMapper(backup.backupType)) {
+                BackupInfoType.TWO_WAY_SYNC -> SyncType.TYPE_TWOWAY
+                BackupInfoType.UP_SYNC -> SyncType.TYPE_BACKUP
                 BackupInfoType.CAMERA_UPLOADS -> SyncType.TYPE_CAMERA_UPLOADS
                 BackupInfoType.MEDIA_UPLOADS -> SyncType.TYPE_MEDIA_UPLOADS
                 else -> SyncType.TYPE_UNKNOWN
             },
             folderPairName = backup.backupName,
-            status = syncStatusMapper(backup.state),
+            status = syncStatusMapper(
+                backupState = backup.state,
+                backupType = backupInfoTypeIntMapper(backup.backupType),
+                cuStatusInfo = cuStatusInfo
+            ),
             hasStalledIssues = false,
             deviceStoragePath = backup.localFolder,
             megaStoragePath = backup.targetFolderPath,

@@ -162,11 +162,16 @@ private fun SyncCardHeader(
                     statusText = when {
                         hasStalledIssues -> stringResource(id = R.string.sync_folders_sync_state_failed)
                         status == SyncStatus.SYNCING -> when (syncType) {
-                            SyncType.TYPE_BACKUP -> stringResource(id = sharedR.string.sync_list_sync_state_updating)
+                            SyncType.TYPE_BACKUP,
+                            SyncType.TYPE_CAMERA_UPLOADS,
+                            SyncType.TYPE_MEDIA_UPLOADS,
+                                -> stringResource(id = sharedR.string.sync_list_sync_state_updating)
+
                             else -> stringResource(id = R.string.sync_list_sync_state_syncing)
                         }
 
                         status == SyncStatus.PAUSED -> stringResource(id = R.string.sync_list_sync_state_paused)
+                        status == SyncStatus.ERROR -> stringResource(id = R.string.sync_folders_sync_state_failed)
                         status == SyncStatus.DISABLED -> stringResource(id = sharedR.string.sync_list_sync_state_disabled)
                         else -> stringResource(id = sharedR.string.sync_list_sync_state_up_to_date)
                     },
@@ -174,6 +179,7 @@ private fun SyncCardHeader(
                         hasStalledIssues -> iconPackR.drawable.ic_alert_circle_regular_medium_outline
                         status == SyncStatus.SYNCING -> coreR.drawable.ic_sync_02
                         status == SyncStatus.PAUSED -> coreR.drawable.ic_pause
+                        status == SyncStatus.ERROR -> iconPackR.drawable.ic_alert_circle_regular_medium_outline
                         status == SyncStatus.DISABLED -> coreR.drawable.ic_alert_triangle
                         else -> coreR.drawable.ic_check_circle
                     },
@@ -181,6 +187,7 @@ private fun SyncCardHeader(
                         hasStalledIssues -> StatusColor.Error
                         status == SyncStatus.SYNCING -> StatusColor.Info
                         status == SyncStatus.PAUSED -> null
+                        status == SyncStatus.ERROR -> StatusColor.Error
                         status == SyncStatus.DISABLED -> StatusColor.Warning
                         else -> StatusColor.Success
                     },

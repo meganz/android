@@ -107,7 +107,7 @@ class SyncFoldersViewModelTest {
             folderPairName = "folderPair",
             status = SyncStatus.SYNCING,
             deviceStoragePath = "DCIM",
-            hasStalledIssues = false,
+            hasStalledIssues = true,
             megaStoragePath = "photos",
             megaStorageNodeId = NodeId(1234L),
             expanded = false
