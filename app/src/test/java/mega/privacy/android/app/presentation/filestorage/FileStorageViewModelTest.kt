@@ -5,12 +5,14 @@ import com.google.common.truth.Truth.assertThat
 import kotlinx.coroutines.test.runTest
 import mega.privacy.android.core.test.extension.CoroutineMainDispatcherExtension
 import mega.privacy.android.domain.entity.file.FileStorageType
+import mega.privacy.android.domain.entity.uri.UriPath
 import mega.privacy.android.domain.usecase.file.GetFileStorageTypeNameUseCase
 import org.junit.jupiter.api.AfterEach
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.TestInstance
 import org.junit.jupiter.api.extension.ExtendWith
+import org.mockito.kotlin.doReturn
 import org.mockito.kotlin.mock
 import org.mockito.kotlin.reset
 import org.mockito.kotlin.whenever
@@ -35,9 +37,13 @@ class FileStorageViewModelTest {
 
     @Test
     fun `test that storageType is updated correctly when file is valid`() = runTest {
-        val file = mock<File>()
+        val path = "foo"
+        val file = mock<File> {
+            on { absolutePath } doReturn path
+        }
+        val uriPath = UriPath(path)
         val storageType = FileStorageType.SdCard
-        whenever(getFileStorageTypeNameUseCase.invoke(file)).thenReturn(storageType)
+        whenever(getFileStorageTypeNameUseCase.invoke(uriPath)).thenReturn(storageType)
         underTest.updateTitle(file)
         underTest.uiState.test {
             val state = awaitItem()

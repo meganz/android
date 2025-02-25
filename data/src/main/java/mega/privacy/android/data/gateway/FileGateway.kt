@@ -525,5 +525,5 @@ interface FileGateway {
     /**
      * Returns device model or SD Card based on file location
      */
-    suspend fun getFileStorageTypeName(file: File): FileStorageType
+    suspend fun getFileStorageTypeName(path: String?): FileStorageType
 }

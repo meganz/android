@@ -63,14 +63,14 @@ class DocumentFileFacade @Inject constructor(
     override fun getDocumentId(documentFile: DocumentFile): String =
         DocumentsContract.getDocumentId(documentFile.uri)
 
-    override fun fromUri(uri: Uri): DocumentFile? =
-        DocumentsContract.isTreeUri(uri).let { isTreeUri ->
-            if (isTreeUri) {
-                fromTreeUri(uri)
-            } else {
-                fromSingleUri(uri)
-            }
+    override fun fromUri(uri: Uri): DocumentFile? {
+        val file = uri.takeIf { (uri.scheme == "file") }?.path?.let { File(it) }
+        return when {
+            file?.exists() == true -> DocumentFile.fromFile(file)
+            DocumentsContract.isTreeUri(uri) -> fromTreeUri(uri)
+            else -> fromSingleUri(uri)
         }
+    }
 
     override fun getAbsolutePathFromContentUri(uri: Uri): String? =
         fromUri(uri)?.getAbsolutePath(context)

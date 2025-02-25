@@ -9,7 +9,6 @@ import android.os.Environment
 import android.os.ParcelFileDescriptor
 import android.os.storage.StorageManager
 import android.os.storage.StorageVolume
-import android.provider.DocumentsContract
 import android.provider.OpenableColumns
 import android.webkit.MimeTypeMap
 import androidx.documentfile.provider.DocumentFile
@@ -22,6 +21,7 @@ import kotlinx.coroutines.test.setMain
 import mega.privacy.android.data.extensions.toUri
 import mega.privacy.android.data.gateway.DeviceGateway
 import mega.privacy.android.data.mapper.file.DocumentFileMapper
+import mega.privacy.android.data.wrapper.DocumentFileWrapper
 import mega.privacy.android.domain.entity.document.DocumentEntity
 import mega.privacy.android.domain.entity.document.DocumentMetadata
 import mega.privacy.android.domain.entity.file.FileStorageType
@@ -51,6 +51,7 @@ internal class FileFacadeTest {
     private val documentFileMapper: DocumentFileMapper = mock()
     private val environmentMock = mockStatic(Environment::class.java)
     private val deviceGateway = mock<DeviceGateway>()
+    private val documentFileWrapper = mock<DocumentFileWrapper>()
 
     @TempDir
     lateinit var temporaryFolder: File
@@ -61,7 +62,8 @@ internal class FileFacadeTest {
         underTest = FileFacade(
             context = context,
             documentFileMapper = documentFileMapper,
-            deviceGateway = deviceGateway
+            deviceGateway = deviceGateway,
+            documentFileWrapper = documentFileWrapper,
         )
     }
 
@@ -169,24 +171,22 @@ internal class FileFacadeTest {
     @Test
     fun `test that getFileNameFromUri returns correct result from DocumentFile file`() = runTest {
         mockStatic(Uri::class.java).use { _ ->
-            mockStatic(DocumentFile::class.java).use {
-                val expected = "File name"
-                val testUri = "file:///example"
-                val file = File(temporaryFolder, "file.txt")
-                file.createNewFile()
-                val uri = mock<Uri> {
-                    on { this.scheme } doReturn "file"
-                    on { this.path } doReturn file.path
-                }
-                val documentFile = mock<DocumentFile> {
-                    on { name } doReturn expected
-                }
-
-                whenever(Uri.parse(testUri)).thenReturn(uri)
-                whenever(DocumentFile.fromFile(file)) doReturn documentFile
-
-                assertThat(underTest.getFileNameFromUri(testUri)).isEqualTo(expected)
+            val expected = "File name"
+            val testUri = "file:///example"
+            val file = File(temporaryFolder, "file.txt")
+            file.createNewFile()
+            val uri = mock<Uri> {
+                on { this.scheme } doReturn "file"
+                on { this.path } doReturn file.path
             }
+            val documentFile = mock<DocumentFile> {
+                on { name } doReturn expected
+            }
+
+            whenever(Uri.parse(testUri)).thenReturn(uri)
+            whenever(documentFileWrapper.fromUri(uri)) doReturn documentFile
+
+            assertThat(underTest.getFileNameFromUri(testUri)).isEqualTo(expected)
         }
     }
 
@@ -194,25 +194,17 @@ internal class FileFacadeTest {
     fun `test that getFileNameFromUri returns correct result from DocumentFile tree uri`() =
         runTest {
             mockStatic(Uri::class.java).use { _ ->
-                mockStatic(DocumentFile::class.java).use {
-                    mockStatic(DocumentsContract::class.java).use {
-                        val expected = "File name"
-                        val testUri = "file:///example"
-                        val uri = mock<Uri> {
-                            on { this.scheme } doReturn "file"
-                            on { this.path } doReturn testUri
-                        }
-                        val documentFile = mock<DocumentFile> {
-                            on { name } doReturn expected
-                        }
-
-                        whenever(Uri.parse(testUri)).thenReturn(uri)
-                        whenever(DocumentsContract.isTreeUri(uri)) doReturn true
-                        whenever(DocumentFile.fromTreeUri(context, uri)) doReturn documentFile
-
-                        assertThat(underTest.getFileNameFromUri(testUri)).isEqualTo(expected)
-                    }
+                val expected = "File name"
+                val testUri = "file:///example"
+                val uri = mock<Uri>()
+                val documentFile = mock<DocumentFile> {
+                    on { name } doReturn expected
                 }
+
+                whenever(Uri.parse(testUri)).thenReturn(uri)
+                whenever(documentFileWrapper.fromUri(uri)) doReturn documentFile
+
+                assertThat(underTest.getFileNameFromUri(testUri)).isEqualTo(expected)
             }
         }
 
@@ -220,22 +212,20 @@ internal class FileFacadeTest {
     fun `test that getFileNameFromUri returns correct result from DocumentFile single uri`() =
         runTest {
             mockStatic(Uri::class.java).use { _ ->
-                mockStatic(DocumentFile::class.java).use {
-                    val expected = "File name"
-                    val testUri = "file:///example"
-                    val uri = mock<Uri> {
-                        on { this.scheme } doReturn "file"
-                        on { this.path } doReturn testUri
-                    }
-                    val documentFile = mock<DocumentFile> {
-                        on { name } doReturn expected
-                    }
-
-                    whenever(Uri.parse(testUri)).thenReturn(uri)
-                    whenever(DocumentFile.fromSingleUri(context, uri)) doReturn documentFile
-
-                    assertThat(underTest.getFileNameFromUri(testUri)).isEqualTo(expected)
+                val expected = "File name"
+                val testUri = "file:///example"
+                val uri = mock<Uri> {
+                    on { this.scheme } doReturn "file"
+                    on { this.path } doReturn testUri
                 }
+                val documentFile = mock<DocumentFile> {
+                    on { name } doReturn expected
+                }
+
+                whenever(Uri.parse(testUri)).thenReturn(uri)
+                whenever(documentFileWrapper.fromUri(uri)) doReturn documentFile
+
+                assertThat(underTest.getFileNameFromUri(testUri)).isEqualTo(expected)
             }
         }
 
@@ -384,68 +374,53 @@ internal class FileFacadeTest {
     @Test
     fun `test that getDocumentEntities returns the mapped entities from a list of content uris`() =
         runTest {
-            mockStatic(DocumentFile::class.java).use {
-                mockStatic(DocumentsContract::class.java).use {
-                    val uri = mock<Uri> {
-                        on { this.scheme } doReturn "content"
-                    }
-                    val doc = mock<DocumentFile>()
-                    val expected = mock<DocumentEntity>()
-                    whenever(DocumentsContract.isTreeUri(uri)) doReturn false
-                    whenever(DocumentFile.fromSingleUri(context, uri)) doReturn doc
-                    whenever(documentFileMapper(doc, 0, 0)) doReturn expected
-
-                    val actual = underTest.getDocumentEntities(listOf(uri))
-
-                    assertThat(actual).containsExactly(expected)
-                }
+            val uri = mock<Uri> {
+                on { this.scheme } doReturn "content"
             }
+            val doc = mock<DocumentFile>()
+            val expected = mock<DocumentEntity>()
+            whenever(documentFileWrapper.fromUri(uri)) doReturn doc
+            whenever(documentFileMapper(doc, 0, 0)) doReturn expected
+
+            val actual = underTest.getDocumentEntities(listOf(uri))
+
+            assertThat(actual).containsExactly(expected)
         }
 
     @Test
     fun `test that getDocumentMetadata returns the mapped entity from a content uri file`() =
         runTest {
-            mockStatic(DocumentFile::class.java).use {
-                mockStatic(DocumentsContract::class.java).use {
-                    val uri = mock<Uri> {
-                        on { this.scheme } doReturn "content"
-                    }
-                    val doc = mock<DocumentFile> {
-                        on { name } doReturn "file.txt"
-                        on { this.isDirectory } doReturn false
-                    }
-                    val expected = DocumentMetadata(doc.name.orEmpty(), doc.isDirectory)
-                    whenever(DocumentsContract.isTreeUri(uri)) doReturn false
-                    whenever(DocumentFile.fromSingleUri(context, uri)) doReturn doc
-
-                    val actual = underTest.getDocumentMetadataSync(uri)
-
-                    assertThat(actual).isEqualTo(expected)
-                }
+            val uri = mock<Uri> {
+                on { this.scheme } doReturn "content"
             }
+            val doc = mock<DocumentFile> {
+                on { name } doReturn "file.txt"
+                on { this.isDirectory } doReturn false
+            }
+            val expected = DocumentMetadata(doc.name.orEmpty(), doc.isDirectory)
+            whenever(documentFileWrapper.fromUri(uri)) doReturn doc
+
+            val actual = underTest.getDocumentMetadataSync(uri)
+
+            assertThat(actual).isEqualTo(expected)
         }
 
     @Test
     fun `test that getDocumentMetadata returns the correct values from a content uri folder`() =
         runTest {
-            mockStatic(DocumentFile::class.java).use {
-                mockStatic(DocumentsContract::class.java).use {
-                    val uri = mock<Uri> {
-                        on { this.scheme } doReturn "content"
-                    }
-                    val doc = mock<DocumentFile> {
-                        on { name } doReturn "folder"
-                        on { this.isDirectory } doReturn true
-                    }
-                    val expected = DocumentMetadata(doc.name.orEmpty(), doc.isDirectory)
-                    whenever(DocumentsContract.isTreeUri(uri)) doReturn true
-                    whenever(DocumentFile.fromTreeUri(context, uri)) doReturn doc
-
-                    val actual = underTest.getDocumentMetadataSync(uri)
-
-                    assertThat(actual).isEqualTo(expected)
-                }
+            val uri = mock<Uri> {
+                on { this.scheme } doReturn "content"
             }
+            val doc = mock<DocumentFile> {
+                on { name } doReturn "folder"
+                on { this.isDirectory } doReturn true
+            }
+            val expected = DocumentMetadata(doc.name.orEmpty(), doc.isDirectory)
+            whenever(documentFileWrapper.fromUri(uri)) doReturn doc
+
+            val actual = underTest.getDocumentMetadataSync(uri)
+
+            assertThat(actual).isEqualTo(expected)
         }
 
     @ParameterizedTest
@@ -453,71 +428,59 @@ internal class FileFacadeTest {
     fun `test that getDocumentMetadata returns the correct values from a file uri`(
         isDirectory: Boolean,
     ) = runTest {
-        mockStatic(DocumentFile::class.java).use {
-            val file = File(temporaryFolder, "file.txt")
-            file.createNewFile()
-            val uri = mock<Uri> {
-                on { this.scheme } doReturn "file"
-                on { this.path } doReturn file.path
-            }
-            val doc = mock<DocumentFile> {
-                on { name } doReturn "name"
-                on { this.isDirectory } doReturn isDirectory
-            }
-            val expected = DocumentMetadata(doc.name.orEmpty(), doc.isDirectory)
-            whenever(DocumentFile.fromFile(file)) doReturn doc
-
-            val actual = underTest.getDocumentMetadataSync(uri)
-
-            assertThat(actual).isEqualTo(expected)
+        val file = File(temporaryFolder, "file.txt")
+        file.createNewFile()
+        val uri = mock<Uri> {
+            on { this.scheme } doReturn "file"
+            on { this.path } doReturn file.path
         }
+        val doc = mock<DocumentFile> {
+            on { name } doReturn "name"
+            on { this.isDirectory } doReturn isDirectory
+        }
+        val expected = DocumentMetadata(doc.name.orEmpty(), doc.isDirectory)
+        whenever(documentFileWrapper.fromUri(uri)) doReturn doc
+
+        val actual = underTest.getDocumentMetadataSync(uri)
+
+        assertThat(actual).isEqualTo(expected)
     }
 
     @Test
     fun `test that getFolderChildUris returns the correct child uris`() =
         runTest {
-            mockStatic(DocumentFile::class.java).use {
-                mockStatic(DocumentsContract::class.java).use {
-                    val uri = mock<Uri> {
-                        on { this.scheme } doReturn "content"
-                    }
-                    val expected = mock<Uri>()
-                    val child = mock<DocumentFile> {
-                        on { this.uri } doReturn expected
-                    }
-                    val doc = mock<DocumentFile> {
-                        on { this.isDirectory } doReturn true
-                        on { this.listFiles() } doReturn arrayOf(child)
-                    }
-                    whenever(DocumentsContract.isTreeUri(uri)) doReturn true
-                    whenever(DocumentFile.fromTreeUri(context, uri)) doReturn doc
-
-                    val actual = underTest.getFolderChildUrisSync(uri)
-
-                    assertThat(actual).containsExactly(expected)
-                }
+            val uri = mock<Uri> {
+                on { this.scheme } doReturn "content"
             }
+            val expected = mock<Uri>()
+            val child = mock<DocumentFile> {
+                on { this.uri } doReturn expected
+            }
+            val doc = mock<DocumentFile> {
+                on { this.isDirectory } doReturn true
+                on { this.listFiles() } doReturn arrayOf(child)
+            }
+            whenever(documentFileWrapper.fromUri(uri)) doReturn doc
+
+            val actual = underTest.getFolderChildUrisSync(uri)
+
+            assertThat(actual).containsExactly(expected)
         }
 
     @ParameterizedTest(name = "pauseTransfers: {0}")
     @ValueSource(booleans = [true, false])
     fun `test that canReadUri returns correctly`(canRead: Boolean) = runTest {
         mockStatic(Uri::class.java).use {
-            mockStatic(DocumentFile::class.java).use {
-                mockStatic(DocumentsContract::class.java).use {
-                    val uriString = "content://com.android.externalstorage.documents/tree/"
-                    val uri = mock<Uri>()
-                    val documentFile = mock<DocumentFile> {
-                        on { canRead() } doReturn canRead
-                    }
-
-                    whenever(Uri.parse(uriString)).thenReturn(uri)
-                    whenever(DocumentsContract.isTreeUri(uri)) doReturn false
-                    whenever(DocumentFile.fromSingleUri(context, uri)) doReturn documentFile
-
-                    assertThat(underTest.canReadUri(uriString)).isEqualTo(canRead)
-                }
+            val uriString = "content://com.android.externalstorage.documents/tree/"
+            val uri = mock<Uri>()
+            val documentFile = mock<DocumentFile> {
+                on { canRead() } doReturn canRead
             }
+
+            whenever(Uri.parse(uriString)).thenReturn(uri)
+            whenever(documentFileWrapper.fromUri(uri)) doReturn documentFile
+
+            assertThat(underTest.canReadUri(uriString)).isEqualTo(canRead)
         }
     }
 
@@ -526,27 +489,24 @@ internal class FileFacadeTest {
     fun `test that childFileExistsSync returns the correct child uris`(
         result: Boolean,
     ) = mockStatic(Uri::class.java).use {
-        mockStatic(DocumentFile::class.java).use {
-            mockStatic(DocumentsContract::class.java).use {
-                val childName = "child.txt"
-                val childDoc = mock<DocumentFile> {
-                    on { this.name } doReturn if (result) childName else "another"
-                }
-                val doc = mock<DocumentFile> {
-                    on { this.name } doReturn "foo"
-                    on { this.isDirectory } doReturn true
-                    on { this.listFiles() } doReturn arrayOf(childDoc)
-                }
-                val uri = stubGetDocumentFileFromUri(doc)
-                val uriPath = UriPath("content://foo")
-                whenever(Uri.parse(uriPath.value)) doReturn uri
-
-
-                val actual = underTest.childFileExistsSync(uriPath, childName)
-
-                assertThat(actual).isEqualTo(result)
-            }
+        val childName = "child.txt"
+        val childDoc = mock<DocumentFile> {
+            on { this.name } doReturn if (result) childName else "another"
         }
+        val doc = mock<DocumentFile> {
+            on { this.name } doReturn "foo"
+            on { this.isDirectory } doReturn true
+            on { this.listFiles() } doReturn arrayOf(childDoc)
+        }
+        val uri = stubGetDocumentFileFromUri(doc)
+        val uriPath = UriPath("content://foo")
+        whenever(Uri.parse(uriPath.value)) doReturn uri
+        whenever(documentFileWrapper.fromUri(uri)) doReturn doc
+
+
+        val actual = underTest.childFileExistsSync(uriPath, childName)
+
+        assertThat(actual).isEqualTo(result)
     }
 
     @ParameterizedTest
@@ -554,65 +514,57 @@ internal class FileFacadeTest {
     fun `test createChildFileSync returns the file created with gateway`(
         asFolder: Boolean,
     ) = mockStatic(Uri::class.java).use {
-        mockStatic(DocumentFile::class.java).use {
-            mockStatic(DocumentsContract::class.java).use {
-                mockStatic(MimeTypeMap::class.java).use {
+        mockStatic(MimeTypeMap::class.java).use {
 
-                    val doc = mock<DocumentFile> {
-                        on { this.isDirectory } doReturn true
-                    }
-                    val childName = "child"
-                    val expected = UriPath("child")
-                    val createdUri = mock<Uri> {
-                        on { this.toString() } doReturn expected.value
-                    }
-                    val childDocument = mock<DocumentFile> {
-                        on { this.uri } doReturn createdUri
-                    }
-                    if (asFolder) {
-                        whenever(doc.createDirectory(childName)) doReturn childDocument
-                    } else {
-                        whenever(MimeTypeMap.getSingleton()) doReturn mock()
-                        whenever(
-                            doc.createFile("application/octet-stream", childName)
-                        ) doReturn childDocument
-                    }
-                    val uri = stubGetDocumentFileFromUri(doc)
-                    val uriPath = UriPath("content://foo")
-                    whenever(Uri.parse(uriPath.value)) doReturn uri
-
-                    val actual = underTest.createChildFileSync(uriPath, childName, asFolder)
-                    assertThat(actual).isEqualTo(expected)
-                }
+            val doc = mock<DocumentFile> {
+                on { this.isDirectory } doReturn true
             }
+            val childName = "child"
+            val expected = UriPath("child")
+            val createdUri = mock<Uri> {
+                on { this.toString() } doReturn expected.value
+            }
+            val childDocument = mock<DocumentFile> {
+                on { this.uri } doReturn createdUri
+            }
+            if (asFolder) {
+                whenever(doc.createDirectory(childName)) doReturn childDocument
+            } else {
+                whenever(MimeTypeMap.getSingleton()) doReturn mock()
+                whenever(
+                    doc.createFile("application/octet-stream", childName)
+                ) doReturn childDocument
+            }
+            val uri = stubGetDocumentFileFromUri(doc)
+            val uriPath = UriPath("content://foo")
+            whenever(Uri.parse(uriPath.value)) doReturn uri
+
+            val actual = underTest.createChildFileSync(uriPath, childName, asFolder)
+            assertThat(actual).isEqualTo(expected)
         }
     }
 
     @Test
     fun `test that getParentSync returns the correct parent uri`() =
         mockStatic(Uri::class.java).use {
-            mockStatic(DocumentFile::class.java).use {
-                mockStatic(DocumentsContract::class.java).use {
-                    val expected = UriPath("parent")
-                    val parentUri = mock<Uri> {
-                        on { this.toString() } doReturn expected.value
-                    }
-                    val parentDoc = mock<DocumentFile> {
-                        on { this.uri } doReturn parentUri
-                    }
-                    val doc = mock<DocumentFile> {
-                        on { this.parentFile } doReturn parentDoc
-                    }
-                    val uri = stubGetDocumentFileFromUri(doc)
-                    val uriPath = UriPath("content://foo")
-                    whenever(Uri.parse(uriPath.value)) doReturn uri
-
-
-                    val actual = underTest.getParentSync(uriPath)
-
-                    assertThat(actual).isEqualTo(expected)
-                }
+            val expected = UriPath("parent")
+            val parentUri = mock<Uri> {
+                on { this.toString() } doReturn expected.value
             }
+            val parentDoc = mock<DocumentFile> {
+                on { this.uri } doReturn parentUri
+            }
+            val doc = mock<DocumentFile> {
+                on { this.parentFile } doReturn parentDoc
+            }
+            val uri = stubGetDocumentFileFromUri(doc)
+            val uriPath = UriPath("content://foo")
+            whenever(Uri.parse(uriPath.value)) doReturn uri
+
+
+            val actual = underTest.getParentSync(uriPath)
+
+            assertThat(actual).isEqualTo(expected)
         }
 
     @ParameterizedTest
@@ -620,21 +572,17 @@ internal class FileFacadeTest {
     fun `test that deleteIfItIsAFileSync deletes the document only if it is a file`(
         isFile: Boolean,
     ) = mockStatic(Uri::class.java).use {
-        mockStatic(DocumentFile::class.java).use {
-            mockStatic(DocumentsContract::class.java).use {
-                val doc = mock<DocumentFile> {
-                    on { this.isFile } doReturn isFile
-                    on { this.delete() } doReturn true
-                }
-                val uri = stubGetDocumentFileFromUri(doc)
-                val uriPath = UriPath("content://foo")
-                whenever(Uri.parse(uriPath.value)) doReturn uri
-
-                val actual = underTest.deleteIfItIsAFileSync(uriPath)
-
-                assertThat(actual).isEqualTo(isFile)
-            }
+        val doc = mock<DocumentFile> {
+            on { this.isFile } doReturn isFile
+            on { this.delete() } doReturn true
         }
+        val uri = stubGetDocumentFileFromUri(doc)
+        val uriPath = UriPath("content://foo")
+        whenever(Uri.parse(uriPath.value)) doReturn uri
+
+        val actual = underTest.deleteIfItIsAFileSync(uriPath)
+
+        assertThat(actual).isEqualTo(isFile)
     }
 
     @ParameterizedTest
@@ -642,22 +590,18 @@ internal class FileFacadeTest {
     fun `test that deleteIfItIsAnEmptyFolder deletes the document only if it is a folder`(
         isFolder: Boolean,
     ) = mockStatic(Uri::class.java).use {
-        mockStatic(DocumentFile::class.java).use {
-            mockStatic(DocumentsContract::class.java).use {
-                val doc = mock<DocumentFile> {
-                    on { this.isDirectory } doReturn isFolder
-                    on { this.listFiles() } doReturn emptyArray()
-                    on { this.delete() } doReturn true
-                }
-                val uri = stubGetDocumentFileFromUri(doc)
-                val uriPath = UriPath("content://foo")
-                whenever(Uri.parse(uriPath.value)) doReturn uri
-
-                val actual = underTest.deleteIfItIsAnEmptyFolder(uriPath)
-
-                assertThat(actual).isEqualTo(isFolder)
-            }
+        val doc = mock<DocumentFile> {
+            on { this.isDirectory } doReturn isFolder
+            on { this.listFiles() } doReturn emptyArray()
+            on { this.delete() } doReturn true
         }
+        val uri = stubGetDocumentFileFromUri(doc)
+        val uriPath = UriPath("content://foo")
+        whenever(Uri.parse(uriPath.value)) doReturn uri
+
+        val actual = underTest.deleteIfItIsAnEmptyFolder(uriPath)
+
+        assertThat(actual).isEqualTo(isFolder)
     }
 
     @ParameterizedTest
@@ -665,48 +609,37 @@ internal class FileFacadeTest {
     fun `test that deleteIfItIsAnEmptyFolder deletes the document only if the folder is empty`(
         isEmpty: Boolean,
     ) = mockStatic(Uri::class.java).use {
-        mockStatic(DocumentFile::class.java).use {
-            mockStatic(DocumentsContract::class.java).use {
-                val files = if (isEmpty) emptyArray() else arrayOf(mock<DocumentFile>())
-                val doc = mock<DocumentFile> {
-                    on { this.isDirectory } doReturn true
-                    on { this.listFiles() } doReturn files
-                    on { this.delete() } doReturn true
-                }
-                val uri = stubGetDocumentFileFromUri(doc)
-                val uriPath = UriPath("content://foo")
-                whenever(Uri.parse(uriPath.value)) doReturn uri
-
-                val actual = underTest.deleteIfItIsAnEmptyFolder(uriPath)
-
-                assertThat(actual).isEqualTo(isEmpty)
-            }
+        val files = if (isEmpty) emptyArray() else arrayOf(mock<DocumentFile>())
+        val doc = mock<DocumentFile> {
+            on { this.isDirectory } doReturn true
+            on { this.listFiles() } doReturn files
+            on { this.delete() } doReturn true
         }
+        val uri = stubGetDocumentFileFromUri(doc)
+        val uriPath = UriPath("content://foo")
+        whenever(Uri.parse(uriPath.value)) doReturn uri
+
+        val actual = underTest.deleteIfItIsAnEmptyFolder(uriPath)
+
+        assertThat(actual).isEqualTo(isEmpty)
     }
 
     @Test
     fun `test that renameFileSync renames the document`(): Unit = mockStatic(Uri::class.java).use {
-        mockStatic(DocumentFile::class.java).use {
-            mockStatic(DocumentsContract::class.java).use {
-                val newName = "renamed"
-                val doc = mock<DocumentFile>()
-                val uri = stubGetDocumentFileFromUri(doc)
-                val uriPath = UriPath("content://foo")
-                whenever(Uri.parse(uriPath.value)) doReturn uri
+        val newName = "renamed"
+        val doc = mock<DocumentFile>()
+        val uri = stubGetDocumentFileFromUri(doc)
+        val uriPath = UriPath("content://foo")
+        whenever(Uri.parse(uriPath.value)) doReturn uri
 
-                underTest.renameFileSync(uriPath, newName)
-                verify(doc).renameTo(newName)
-            }
-        }
+        underTest.renameFileSync(uriPath, newName)
+        verify(doc).renameTo(newName)
     }
 
     @Test
     fun `test that getFileStorageTypeName returns null if file absolute path is null`() = runTest {
-        val testFile = mock<File> {
-            on { absolutePath } doReturn null
-        }
 
-        val result = underTest.getFileStorageTypeName(testFile)
+        val result = underTest.getFileStorageTypeName(null)
 
         assertThat(result).isEqualTo(FileStorageType.Unknown)
     }
@@ -717,9 +650,7 @@ internal class FileFacadeTest {
             val primaryStorage = File("/storage/emulated/0")
             whenever(Environment.getExternalStorageDirectory()).thenReturn(primaryStorage)
             whenever(deviceGateway.getDeviceModel()).thenReturn("SM-8673")
-            val testFile = mock<File> {
-                on { absolutePath } doReturn "/storage/emulated/0/test.txt"
-            }
+            val testFile = "/storage/emulated/0/test.txt"
 
             val result = underTest.getFileStorageTypeName(testFile)
 
@@ -744,9 +675,7 @@ internal class FileFacadeTest {
             whenever(storageManager.storageVolumes).thenReturn(listOf(storageVolume))
             whenever(context.getSystemService(StorageManager::class.java)).thenReturn(storageManager)
 
-            val testFile = mock<File> {
-                on { absolutePath } doReturn "/storage/sdcard/test.txt"
-            }
+            val testFile = "/storage/sdcard/test.txt"
 
             val result = underTest.getFileStorageTypeName(testFile)
 
@@ -768,9 +697,7 @@ internal class FileFacadeTest {
             whenever(storageManager.storageVolumes).thenReturn(listOf(storageVolume))
             whenever(context.getSystemService(StorageManager::class.java)).thenReturn(storageManager)
 
-            val testFile = mock<File> {
-                on { absolutePath } doReturn "/storage/1234-5678/test.txt"
-            }
+            val testFile = "/storage/1234-5678/test.txt"
 
             val result = underTest.getFileStorageTypeName(testFile)
 
@@ -788,9 +715,7 @@ internal class FileFacadeTest {
             }
             whenever(context.getSystemService(StorageManager::class.java)).thenReturn(storageManager)
 
-            val testFile = mock<File> {
-                on { absolutePath } doReturn "/mnt/extSdCard/test.txt"
-            }
+            val testFile = "/mnt/extSdCard/test.txt"
 
             val result = underTest.getFileStorageTypeName(testFile)
 
@@ -807,9 +732,7 @@ internal class FileFacadeTest {
             }
             whenever(context.getSystemService(StorageManager::class.java)).thenReturn(storageManager)
 
-            val testFile = mock<File> {
-                on { absolutePath } doReturn "/some/unknown/path.txt"
-            }
+            val testFile = "/some/unknown/path.txt"
 
             val result = underTest.getFileStorageTypeName(testFile)
 
@@ -821,8 +744,7 @@ internal class FileFacadeTest {
         val uri = mock<Uri> {
             on { this.scheme } doReturn "content"
         }
-        whenever(DocumentsContract.isTreeUri(uri)) doReturn false
-        whenever(DocumentFile.fromSingleUri(context, uri)) doReturn documentFile
+        whenever(documentFileWrapper.fromUri(uri)) doReturn documentFile
         return uri
     }
 }

@@ -488,7 +488,7 @@ internal class FileSystemRepositoryImpl @Inject constructor(
     override suspend fun getOfflineFilesRootFolder(): File =
         File(fileGateway.getOfflineFilesRootPath())
 
-    override suspend fun getFileStorageTypeName(file: File) = withContext(ioDispatcher) {
-        fileGateway.getFileStorageTypeName(file)
+    override suspend fun getFileStorageTypeName(path: String?) = withContext(ioDispatcher) {
+        fileGateway.getFileStorageTypeName(path)
     }
 }

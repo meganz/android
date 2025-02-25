@@ -8,6 +8,7 @@ import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import mega.privacy.android.app.presentation.filestorage.model.FileStorageUiState
+import mega.privacy.android.domain.entity.uri.UriPath
 import mega.privacy.android.domain.usecase.file.GetFileStorageTypeNameUseCase
 import java.io.File
 import javax.inject.Inject
@@ -34,7 +35,7 @@ class FileStorageViewModel @Inject constructor(
         viewModelScope.launch {
             runCatching {
                 requireNotNull(file)
-                getFileStorageTypeNameUseCase(file)
+                getFileStorageTypeNameUseCase(UriPath(file.absolutePath))
             }.onSuccess { type ->
                 _uiState.update {
                     it.copy(storageType = type)

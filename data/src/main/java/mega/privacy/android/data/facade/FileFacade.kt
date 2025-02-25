@@ -49,6 +49,7 @@ import mega.privacy.android.data.extensions.toUri
 import mega.privacy.android.data.gateway.DeviceGateway
 import mega.privacy.android.data.gateway.FileGateway
 import mega.privacy.android.data.mapper.file.DocumentFileMapper
+import mega.privacy.android.data.wrapper.DocumentFileWrapper
 import mega.privacy.android.domain.entity.document.DocumentEntity
 import mega.privacy.android.domain.entity.document.DocumentFolder
 import mega.privacy.android.domain.entity.document.DocumentMetadata
@@ -82,6 +83,7 @@ internal class FileFacade @Inject constructor(
     @ApplicationContext private val context: Context,
     private val documentFileMapper: DocumentFileMapper,
     private val deviceGateway: DeviceGateway,
+    private val documentFileWrapper: DocumentFileWrapper,
 ) : FileGateway {
 
     override val localDCIMFolderPath: String
@@ -763,14 +765,8 @@ internal class FileFacade @Inject constructor(
             ?.map { it.uri })
             .orEmpty()
 
-    private fun getDocumentFileFromUri(uri: Uri): DocumentFile? {
-        val file = uri.takeIf { (uri.scheme == "file") }?.path?.let { File(it) }
-        return when {
-            file?.exists() == true -> DocumentFile.fromFile(file)
-            DocumentsContract.isTreeUri(uri) -> DocumentFile.fromTreeUri(context, uri)
-            else -> DocumentFile.fromSingleUri(context, uri)
-        }
-    }
+    private fun getDocumentFileFromUri(uri: Uri): DocumentFile? =
+        documentFileWrapper.fromUri(uri)
 
     @RequiresPermission(android.Manifest.permission.MANAGE_EXTERNAL_STORAGE)
     override suspend fun getFileFromUri(uri: Uri): File? {
@@ -981,8 +977,8 @@ internal class FileFacade @Inject constructor(
     }
 
     @SuppressLint("NewApi")
-    override suspend fun getFileStorageTypeName(file: File): FileStorageType {
-        val filePath = file.absolutePath ?: return FileStorageType.Unknown
+    override suspend fun getFileStorageTypeName(path: String?): FileStorageType {
+        val filePath = path ?: return FileStorageType.Unknown
         // Check if the file is in the primary external storage (internal storage)
         val primaryExternalStorage = Environment.getExternalStorageDirectory()
         if (filePath.startsWith(primaryExternalStorage.absolutePath)) {
