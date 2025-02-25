@@ -27,28 +27,11 @@ class GetCookieDialogUseCase @Inject constructor(
         isExternalAdsEnabledFeature: ApiFeature,
     ): CookieDialog {
         val cookieSettings = getCookieSettingsUseCase()
-
-        val shouldShowCookieDialogWithAds = shouldShowCookieDialogWithAdsUseCase(
-            cookieSettings,
-            isExternalAdsEnabledFeature
-        )
-
-        return if (shouldShowCookieDialogWithAds) {
-            //ADVERTISEMENT cookie is not set, so we need to set it to false
-            if (!cookieSettings.contains(CookieType.ADS_CHECK) &&
-                cookieSettings.contains(CookieType.ADVERTISEMENT)
-            ) {
-                updateCookieSettingsUseCase(cookieSettings - CookieType.ADVERTISEMENT)
-            }
-            val cookiePolicyLink = getSessionTransferURLUseCase("cookie")
-            CookieDialog(CookieDialogType.CookieDialogWithAds, cookiePolicyLink)
+        val shouldShowGenericCookieDialog = shouldShowGenericCookieDialogUseCase(cookieSettings)
+        return if (shouldShowGenericCookieDialog) {
+            CookieDialog(CookieDialogType.GenericCookieDialog, "https://mega.nz/cookie")
         } else {
-            val shouldShowGenericCookieDialog = shouldShowGenericCookieDialogUseCase(cookieSettings)
-            if (shouldShowGenericCookieDialog) {
-                CookieDialog(CookieDialogType.GenericCookieDialog, "https://mega.nz/cookie")
-            } else {
-                CookieDialog(CookieDialogType.None)
-            }
+            CookieDialog(CookieDialogType.None)
         }
     }
 }
