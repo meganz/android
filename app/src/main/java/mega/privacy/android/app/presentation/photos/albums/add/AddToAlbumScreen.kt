@@ -107,7 +107,7 @@ internal fun AddToAlbumScreen(
                         )
                     } else {
                         context.resources.getQuantityString(
-                            sharedR.plurals.album_add_to_partial_added_message,
+                            sharedR.plurals.album_add_to_files_exist_message,
                             state.numAddedItems,
                             state.mediaHolderName,
                             state.numAddedItems,

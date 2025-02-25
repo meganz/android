@@ -726,6 +726,11 @@
         <item quantity="one">Added to “%1$s”</item>
         <item quantity="other">Added %2$d items to “%1$s”</item>
     </plurals>
+    <!-- Add to album some files exist message -->
+    <plurals name="album_add_to_files_exist_message">
+        <item quantity="one">1 file added to “%1$s”. Duplicate files cannot be added again.</item>
+        <item quantity="other">%2$d files added to “%1$s”. Duplicate files cannot be added again.</item>
+    </plurals>
     <!-- Name for a general button which action is "Open" something -->
     <string name="general_open_button">Open</string>
     <!-- Bottom sheet option title for add the video to playlist from video section -->
