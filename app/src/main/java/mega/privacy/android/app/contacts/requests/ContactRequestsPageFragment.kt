@@ -10,9 +10,8 @@ import android.widget.ImageView
 import androidx.annotation.DrawableRes
 import androidx.annotation.StringRes
 import androidx.compose.foundation.clickable
-//noinspection UsingMaterialAndMaterial3Libraries
+import androidx.compose.material.ExperimentalMaterialApi
 import androidx.compose.material.ModalBottomSheetValue
-//noinspection UsingMaterialAndMaterial3Libraries
 import androidx.compose.material.rememberModalBottomSheetState
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
@@ -156,15 +155,13 @@ class ContactRequestsPageFragment : Fragment() {
         binding.list.setHasFixedSize(true)
         binding.list.addItemDecoration(
             DividerItemDecoration(requireContext(), DividerItemDecoration.VERTICAL).apply {
-                ResourcesCompat.getDrawable(
-                    resources,
-                    R.drawable.contact_list_divider,
-                    null
-                )?.let {
-                    setDrawable(
-                        it
-                    )
-                }
+                setDrawable(
+                    ResourcesCompat.getDrawable(
+                        resources,
+                        R.drawable.contact_list_divider,
+                        null
+                    )!!
+                )
             }
         )
         binding.list.addOnScrollListener(object : RecyclerView.OnScrollListener() {
@@ -179,7 +176,7 @@ class ContactRequestsPageFragment : Fragment() {
         setupBottomSheet()
     }
 
-    @OptIn(ExperimentalComposeUiApi::class)
+    @OptIn(ExperimentalMaterialApi::class, ExperimentalComposeUiApi::class)
     private fun setupBottomSheet() {
         binding.composeContactRequestBottomSheet.apply {
             setViewCompositionStrategy(ViewCompositionStrategy.DisposeOnViewTreeLifecycleDestroyed)

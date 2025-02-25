@@ -1,6 +1,7 @@
 package mega.privacy.android.app.contacts.list.dialog
 
 import mega.privacy.android.shared.resources.R as sharedR
+import android.Manifest
 import android.content.DialogInterface
 import android.os.Bundle
 import android.view.LayoutInflater
@@ -36,6 +37,7 @@ import mega.privacy.android.app.utils.Constants.SELECTED_CHATS
 import mega.privacy.android.app.utils.Constants.SELECTED_CONTACTS
 import mega.privacy.android.app.utils.Constants.SELECTED_USERS
 import mega.privacy.android.app.utils.ContactUtil
+import mega.privacy.android.app.utils.permission.PermissionUtils
 import mega.privacy.android.domain.entity.node.NodeId
 import mega.privacy.android.domain.entity.user.ContactAvatar
 import mega.privacy.android.domain.entity.user.UserId
@@ -182,7 +184,7 @@ class ContactBottomSheetDialogFragment : BaseBottomSheetDialogFragment() {
     override fun onSaveInstanceState(outState: Bundle) {
         outState.putBoolean(STATE_SHOW_REMOVE_DIALOG, removeContactDialog?.isShowing ?: false)
         if (nodePermissionsDialog?.isShowing == true && folderHandle != null) {
-            folderHandle?.let { outState.putLong(STATE_NODE_FOLDER, it) }
+            outState.putLong(STATE_NODE_FOLDER, folderHandle!!)
             outState.putStringArrayList(STATE_NODE_CONTACTS, selectedContacts)
         }
         super.onSaveInstanceState(outState)
@@ -232,7 +234,11 @@ class ContactBottomSheetDialogFragment : BaseBottomSheetDialogFragment() {
         binding.optionCall.setOnClickListener {
             MegaApplication.userWaitingForCall = contactHandle
             if (CallUtil.canCallBeStartedFromContactOption(requireActivity())) {
-                viewModel.onCallTap(video = false)
+                val audio = PermissionUtils.hasPermissions(
+                    requireContext(),
+                    Manifest.permission.RECORD_AUDIO
+                )
+                viewModel.onCallTap(video = false, audio = audio)
             }
             dismiss()
         }
@@ -281,7 +287,7 @@ class ContactBottomSheetDialogFragment : BaseBottomSheetDialogFragment() {
     private fun showNodePermissionsDialog() {
         if (nodePermissionsDialog?.isShowing == true) nodePermissionsDialog?.dismiss()
 
-        val node = folderHandle?.let { megaApi.getNodeByHandle(it) }
+        val node = megaApi.getNodeByHandle(folderHandle!!)
         if (node?.isFolder == true) {
             val permissions = arrayOf(
                 getString(R.string.file_properties_shared_folder_read_only),

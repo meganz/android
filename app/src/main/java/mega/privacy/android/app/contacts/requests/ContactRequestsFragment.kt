@@ -2,6 +2,8 @@ package mega.privacy.android.app.contacts.requests
 
 import android.os.Bundle
 import android.view.LayoutInflater
+import android.view.Menu
+import android.view.MenuInflater
 import android.view.View
 import android.view.ViewGroup
 import androidx.fragment.app.Fragment
@@ -9,13 +11,13 @@ import androidx.fragment.app.viewModels
 import com.google.android.material.tabs.TabLayoutMediator
 import dagger.hilt.android.AndroidEntryPoint
 import mega.privacy.android.app.R
-import mega.privacy.android.app.arch.extensions.collectFlow
 import mega.privacy.android.app.contacts.ContactsActivity
 import mega.privacy.android.app.contacts.requests.adapter.ContactRequestPageAdapter
 import mega.privacy.android.app.contacts.requests.adapter.ContactRequestPageAdapter.Tabs
 import mega.privacy.android.app.data.extensions.observeOnce
 import mega.privacy.android.app.databinding.FragmentContactRequestsBinding
 import mega.privacy.android.app.utils.ColorUtils.setElevationWithColor
+import mega.privacy.android.app.utils.MenuUtils.setupSearchView
 import mega.privacy.android.app.utils.Util
 
 /**
@@ -42,6 +44,7 @@ class ContactRequestsFragment : Fragment() {
         savedInstanceState: Bundle?
     ): View {
         binding = FragmentContactRequestsBinding.inflate(inflater, container, false)
+        setHasOptionsMenu(true)
         return binding.root
     }
 
@@ -62,17 +65,18 @@ class ContactRequestsFragment : Fragment() {
                 pagePosition?.let { setViewPagerPosition(it) }
             }
         }
-
-        (requireActivity() as? ContactsActivity)?.queryState?.let {
-            viewLifecycleOwner.collectFlow(it) { query ->
-                viewModel.setQuery(query)
-            }
-        }
     }
 
     override fun onSaveInstanceState(outState: Bundle) {
         super.onSaveInstanceState(outState)
         outState.putInt(STATE_PAGER_POSITION, binding.pager.currentItem)
+    }
+
+    override fun onCreateOptionsMenu(menu: Menu, inflater: MenuInflater) {
+        inflater.inflate(R.menu.fragment_contact_search, menu)
+        menu.findItem(R.id.action_search)?.setupSearchView { query ->
+            viewModel.setQuery(query)
+        }
     }
 
     private fun setupView() {
