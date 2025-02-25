@@ -379,7 +379,7 @@ private fun clickLogin(onLoginClicked: () -> Unit, focusManager: FocusManager) {
 }
 
 @Composable
-fun LoginInProgress(
+private fun LoginInProgress(
     state: LoginState,
     modifier: Modifier = Modifier,
 ) {
