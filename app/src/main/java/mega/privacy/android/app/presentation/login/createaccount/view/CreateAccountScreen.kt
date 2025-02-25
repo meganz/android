@@ -405,7 +405,7 @@ private fun CreateAccountView(
                     imeAction = ImeAction.Done,
                     keyboardActions = KeyboardActions(onDone = {
                         onButtonClicked(
-                            action = onLoginClicked,
+                            action = onCreateAccountClicked,
                             focusManager = focusManager
                         )
                     }),
