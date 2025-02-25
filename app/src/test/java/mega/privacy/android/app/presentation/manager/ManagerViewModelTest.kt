@@ -8,6 +8,7 @@ import com.google.common.truth.Truth.assertThat
 import com.google.mlkit.vision.documentscanner.GmsDocumentScanner
 import com.jraska.livedata.test
 import de.palm.composestateevents.triggered
+import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -19,6 +20,7 @@ import kotlinx.coroutines.flow.filterNot
 import kotlinx.coroutines.flow.flowOf
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.test.StandardTestDispatcher
+import kotlinx.coroutines.test.UnconfinedTestDispatcher
 import kotlinx.coroutines.test.advanceUntilIdle
 import kotlinx.coroutines.test.runTest
 import mega.privacy.android.app.InstantExecutorExtension
@@ -33,6 +35,7 @@ import mega.privacy.android.app.middlelayer.scanner.ScannerHandler
 import mega.privacy.android.app.presentation.documentscanner.model.DocumentScanningError
 import mega.privacy.android.app.presentation.manager.model.SharesTab
 import mega.privacy.android.app.presentation.meeting.chat.model.InfoToShow
+import mega.privacy.android.app.presentation.psa.legacy.LegacyPsaGlobalState
 import mega.privacy.android.app.presentation.transfers.starttransfer.model.TransferTriggerEvent
 import mega.privacy.android.app.presentation.versions.mapper.VersionHistoryRemoveMessageMapper
 import mega.privacy.android.app.service.scanner.InsufficientRAMToLaunchDocumentScanner
@@ -354,7 +357,8 @@ class ManagerViewModelTest {
     private val deleteNodeVersionsUseCase: DeleteNodeVersionsUseCase = mock()
     private val versionHistoryRemoveMessageMapper: VersionHistoryRemoveMessageMapper = mock()
     private val backgroundFastLoginUseCase: BackgroundFastLoginUseCase = mock()
-
+    private val legacyState = mock<LegacyPsaGlobalState>()
+    private val appScope: CoroutineScope = CoroutineScope(UnconfinedTestDispatcher())
 
     private fun initViewModel() {
         underTest = ManagerViewModel(
@@ -443,7 +447,9 @@ class ManagerViewModelTest {
             monitorChatListItemUpdates = { monitorChatListItemUpdates },
             deleteNodeVersionsUseCase = deleteNodeVersionsUseCase,
             versionHistoryRemoveMessageMapper = versionHistoryRemoveMessageMapper,
-            backgroundFastLoginUseCase = backgroundFastLoginUseCase
+            backgroundFastLoginUseCase = backgroundFastLoginUseCase,
+            legacyState = legacyState,
+            appScope = appScope,
         )
     }
 
@@ -497,7 +503,8 @@ class ManagerViewModelTest {
             scannerHandler,
             createFolderNodeUseCase,
             deleteNodeVersionsUseCase,
-            versionHistoryRemoveMessageMapper
+            versionHistoryRemoveMessageMapper,
+            legacyState
         )
         wheneverBlocking { getCloudSortOrder() }.thenReturn(SortOrder.ORDER_DEFAULT_ASC)
         whenever(getUsersCallLimitRemindersUseCase()).thenReturn(emptyFlow())
@@ -1301,11 +1308,14 @@ class ManagerViewModelTest {
     }
 
     @Test
-    internal fun `test that dismiss calls the use case`() = runTest {
+    internal fun `test that dismissPsa invokes use case and clears legacyState`() = runTest {
         val expected = 123
+
         underTest.dismissPsa(expected)
         testScheduler.advanceUntilIdle()
+
         verify(dismissPsaUseCase).invoke(expected)
+        verify(legacyState).clearPsa()
     }
 
     @Test
