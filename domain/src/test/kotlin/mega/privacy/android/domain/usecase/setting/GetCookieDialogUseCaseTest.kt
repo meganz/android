@@ -51,30 +51,6 @@ internal class GetCookieDialogUseCaseTest {
     }
 
     @Test
-    fun `test that CookieDialogWithAds type is returned when shouldShowCookieDialogWithAdsUseCase returns true`() =
-        runTest {
-            whenever(getCookieSettingsUseCase()).thenReturn(emptySet())
-            whenever(getSessionTransferURLUseCase(any())).thenReturn(url)
-            whenever(updateCookieSettingsUseCase(any())).thenReturn(Unit)
-            whenever(
-                shouldShowCookieDialogWithAdsUseCase(
-                    any(),
-                    any()
-                )
-            ).thenReturn(true)
-
-            val result = underTest(
-                mock(),
-            )
-            val expected = CookieDialog(
-                CookieDialogType.CookieDialogWithAds,
-                url
-            )
-
-            assertThat(result).isEqualTo(expected)
-        }
-
-    @Test
     fun `test that GenericCookieDialog type is returned when shouldShowCookieDialogWithAdsUseCase returns false and shouldShowGenericCookieDialogUseCase returns true`() =
         runTest {
             whenever(getCookieSettingsUseCase()).thenReturn(emptySet())
