@@ -7,6 +7,7 @@ import androidx.lifecycle.viewModelScope
 import dagger.hilt.android.lifecycle.HiltViewModel
 import de.palm.composestateevents.consumed
 import de.palm.composestateevents.triggered
+import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
@@ -33,6 +34,7 @@ import mega.privacy.android.app.presentation.extensions.getState
 import mega.privacy.android.app.presentation.manager.model.ManagerState
 import mega.privacy.android.app.presentation.manager.model.SharesTab
 import mega.privacy.android.app.presentation.meeting.chat.model.InfoToShow
+import mega.privacy.android.app.presentation.psa.legacy.LegacyPsaGlobalState
 import mega.privacy.android.app.presentation.transfers.starttransfer.model.TransferTriggerEvent
 import mega.privacy.android.app.presentation.versions.mapper.VersionHistoryRemoveMessageMapper
 import mega.privacy.android.app.service.scanner.InsufficientRAMToLaunchDocumentScanner
@@ -58,6 +60,7 @@ import mega.privacy.android.domain.entity.node.NodeSourceType
 import mega.privacy.android.domain.entity.uri.UriPath
 import mega.privacy.android.domain.entity.user.UserChanges
 import mega.privacy.android.domain.extension.mapAsync
+import mega.privacy.android.domain.qualifier.ApplicationScope
 import mega.privacy.android.domain.usecase.GetCloudSortOrder
 import mega.privacy.android.domain.usecase.GetExtendedAccountDetail
 import mega.privacy.android.domain.usecase.GetNodeByIdUseCase
@@ -274,6 +277,8 @@ class ManagerViewModel @Inject constructor(
     private val deleteNodeVersionsUseCase: DeleteNodeVersionsUseCase,
     private val versionHistoryRemoveMessageMapper: VersionHistoryRemoveMessageMapper,
     private val backgroundFastLoginUseCase: BackgroundFastLoginUseCase,
+    private val legacyState: LegacyPsaGlobalState,
+    @ApplicationScope private val appScope: CoroutineScope,
 ) : ViewModel() {
 
     /**
@@ -1155,7 +1160,10 @@ class ManagerViewModel @Inject constructor(
      *
      * @param psaId
      */
-    fun dismissPsa(psaId: Int) = viewModelScope.launch { dismissPsaUseCase(psaId) }
+    fun dismissPsa(psaId: Int) = appScope.launch {
+        dismissPsaUseCase(psaId)
+        legacyState.clearPsa()
+    }
 
     /**
      * Get the parent handle from where the search is performed
