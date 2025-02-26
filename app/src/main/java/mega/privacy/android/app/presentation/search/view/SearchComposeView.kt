@@ -165,7 +165,7 @@ fun SearchComposeView(
                         onItemClicked = onItemClick,
                         onLongClick = onLongClick,
                         sortOrder = sortOrder,
-                        highlightText = if (state.searchDescriptionEnabled == true && state.searchTagsEnabled == true) highlightText else "",
+                        highlightText = if (state.searchDescriptionEnabled == true || state.searchTagsEnabled == true) highlightText else "",
                         isListView = state.currentViewType == ViewType.LIST,
                         onSortOrderClick = onSortOrderClick,
                         onChangeViewTypeClick = onChangeViewTypeClick,
