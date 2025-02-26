@@ -2746,7 +2746,7 @@ internal class ChatViewModelTest {
     fun `test that on download node for preview updates state correctly`() = runTest {
         val node = mock<ChatDefaultFile>()
         initTestClass()
-        underTest.onDownloadForPreviewChatNode(node)
+        underTest.onDownloadForPreviewChatNode(node, false)
         underTest.state.test {
             val actual = awaitItem()
             assertThat(actual.downloadEvent)

@@ -11,8 +11,8 @@ import de.palm.composestateevents.triggered
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.catch
+import kotlinx.coroutines.flow.collect
 import kotlinx.coroutines.flow.conflate
-import kotlinx.coroutines.flow.filter
 import kotlinx.coroutines.flow.onEach
 import kotlinx.coroutines.flow.takeWhile
 import kotlinx.coroutines.flow.update
@@ -77,7 +77,6 @@ import timber.log.Timber
 import java.io.File
 import javax.inject.Inject
 import kotlin.time.Duration.Companion.seconds
-import kotlinx.coroutines.flow.collect
 
 /**
  * View model to handle start transfers component
@@ -221,6 +220,7 @@ internal class StartTransfersComponentViewModel @Inject constructor(
                 }
 
                 is TransferTriggerEvent.StartDownloadForPreview -> {
+                    _uiState.update { it.copy(isOpenWithAction = transferTriggerEvent.isOpenWith) }
                     startDownloadNodeForPreview(transferTriggerEvent)
                 }
             }
@@ -590,7 +590,7 @@ internal class StartTransfersComponentViewModel @Inject constructor(
      */
     fun consumePreviewFileOpened() {
         _uiState.update {
-            it.copy(previewFileToOpen = null)
+            it.copy(previewFileToOpen = null, isOpenWithAction = false)
         }
     }
 

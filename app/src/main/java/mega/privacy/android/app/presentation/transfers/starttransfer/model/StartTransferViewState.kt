@@ -16,6 +16,7 @@ import java.io.File
  * @property triggerEventWithoutPermission user needs to answer requested permission after triggering this event
  * @property isStorageOverQuota True if the user is in storage over quota state.
  * @property previewFileToOpen
+ * @property isOpenWithAction True if the user is opening a file with another app.
  * @constructor Create empty Start transfer view state
  */
 data class StartTransferViewState(
@@ -28,6 +29,7 @@ data class StartTransferViewState(
     val triggerEventWithoutPermission: TransferTriggerEvent? = null,
     val isStorageOverQuota: Boolean = false,
     val previewFileToOpen: File? = null,
+    val isOpenWithAction: Boolean = false,
 )
 
 /**

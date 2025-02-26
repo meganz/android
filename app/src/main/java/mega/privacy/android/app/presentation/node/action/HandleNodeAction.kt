@@ -111,6 +111,7 @@ fun HandleNodeAction(
                         openOtherFile(
                             file = it,
                             typedFileNode = typedFileNode,
+                            isOpenWith = false,
                             fileTypeInfo = typedFileNode.type,
                             nodeActionsViewModel = nodeActionsViewModel,
                             snackBarHostState = snackBarHostState,
@@ -137,6 +138,7 @@ fun HandleNodeAction(
 @Composable
 fun HandleFileAction(
     file: File,
+    isOpenWith: Boolean,
     snackBarHostState: SnackbarHostState,
     onActionHandled: () -> Unit,
     coroutineScope: CoroutineScope = rememberCoroutineScope(),
@@ -148,6 +150,7 @@ fun HandleFileAction(
         openOtherFile(
             file = file,
             typedFileNode = null,
+            isOpenWith = isOpenWith,
             fileTypeInfo = nodeActionsViewModel.getTypeInfo(file),
             nodeActionsViewModel = nodeActionsViewModel,
             snackBarHostState = snackBarHostState,
@@ -334,13 +337,14 @@ private suspend fun Intent.openShareIntent(
 private suspend fun openOtherFile(
     file: File,
     typedFileNode: TypedFileNode?,
+    isOpenWith: Boolean,
     fileTypeInfo: FileTypeInfo,
     nodeActionsViewModel: NodeActionsViewModel,
     snackBarHostState: SnackbarHostState,
     coroutineScope: CoroutineScope,
     context: Context,
 ) {
-    if (fileTypeInfo is ZipFileTypeInfo) {
+    if (isOpenWith.not() && fileTypeInfo is ZipFileTypeInfo) {
         openZipFile(
             context = context,
             localFile = file,

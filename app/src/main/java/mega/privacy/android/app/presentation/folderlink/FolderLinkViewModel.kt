@@ -854,7 +854,12 @@ class FolderLinkViewModel @Inject constructor(
         }.onSuccess { linkNode ->
             _state.update {
                 it.copy(
-                    downloadEvent = triggered(TransferTriggerEvent.StartDownloadForPreview(linkNode))
+                    downloadEvent = triggered(
+                        TransferTriggerEvent.StartDownloadForPreview(
+                            node = linkNode,
+                            isOpenWith = false
+                        )
+                    )
                 )
             }
         }.onFailure {

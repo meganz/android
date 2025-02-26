@@ -346,6 +346,7 @@ private fun StartTransferComponent(
     if (uiState.previewFileToOpen != null) {
         HandleFileAction(
             file = uiState.previewFileToOpen,
+            isOpenWith = uiState.isOpenWithAction,
             snackBarHostState = snackBarHostState,
             onActionHandled = onPreviewOpened,
         )

@@ -340,7 +340,14 @@ class NodeActionsViewModel @Inject constructor(
      */
     fun downloadNodeForPreview(fileNode: TypedFileNode) {
         _state.update {
-            it.copy(downloadEvent = triggered(TransferTriggerEvent.StartDownloadForPreview(fileNode)))
+            it.copy(
+                downloadEvent = triggered(
+                    TransferTriggerEvent.StartDownloadForPreview(
+                        node = fileNode,
+                        isOpenWith = false
+                    )
+                )
+            )
         }
     }
 
@@ -360,10 +367,17 @@ class NodeActionsViewModel @Inject constructor(
      * Download node for preview
      * Triggers TransferTriggerEvent.StartDownloadNode with parameter [TypedNode]
      */
-    fun downloadNodeForPreview() {
+    fun downloadNodeForPreview(isOpenWith: Boolean) {
         state.value.selectedNodes.firstOrNull()?.let { node ->
             _state.update {
-                it.copy(downloadEvent = triggered(TransferTriggerEvent.StartDownloadForPreview(node)))
+                it.copy(
+                    downloadEvent = triggered(
+                        TransferTriggerEvent.StartDownloadForPreview(
+                            node = node,
+                            isOpenWith = isOpenWith
+                        )
+                    )
+                )
             }
         }
     }

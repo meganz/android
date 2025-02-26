@@ -4,10 +4,10 @@ import android.app.Activity
 import android.content.Intent
 import android.net.Uri
 import dagger.hilt.android.scopes.ActivityScoped
-import mega.privacy.android.app.presentation.filestorage.FileStorageActivity
 import mega.privacy.android.app.main.ManagerActivity
 import mega.privacy.android.app.presentation.extensions.serializable
 import mega.privacy.android.app.presentation.filelink.FileLinkComposeActivity
+import mega.privacy.android.app.presentation.filestorage.FileStorageActivity
 import mega.privacy.android.app.presentation.login.LoginActivity
 import mega.privacy.android.app.presentation.manager.model.TransfersTab
 import mega.privacy.android.app.utils.Constants
@@ -105,6 +105,16 @@ class ManagerRedirectIntentMapper @Inject constructor(private val activity: Acti
                     action = Constants.ACTION_SHOW_WARNING
                     intent.getStringExtra(Constants.INTENT_EXTRA_WARNING_MESSAGE)?.let {
                         putExtra(Constants.INTENT_EXTRA_WARNING_MESSAGE, it)
+                    }
+                }
+
+            Constants.ACTION_EXPLORE_ZIP -> Intent(activity, LoginActivity::class.java)
+                .apply {
+                    putExtra(Constants.VISIBLE_FRAGMENT, Constants.LOGIN_FRAGMENT)
+                    flags = Intent.FLAG_ACTIVITY_CLEAR_TOP
+                    action = Constants.ACTION_EXPLORE_ZIP
+                    intent.getStringExtra(Constants.EXTRA_PATH_ZIP)?.let {
+                        putExtra(Constants.EXTRA_PATH_ZIP, it)
                     }
                 }
 

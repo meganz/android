@@ -137,7 +137,7 @@ class NodeActionHandler(
             is ShareFolderMenuAction -> shareFolderActivityLauncher?.launch(longArrayOf(node.id.longValue))
             is RestoreMenuAction -> restoreFromRubbishLauncher?.launch(longArrayOf(node.id.longValue))
             is SendToChatMenuAction -> sendToChatLauncher?.launch(longArrayOf(node.id.longValue))
-            is OpenWithMenuAction -> nodeActionsViewModel.downloadNodeForPreview()
+            is OpenWithMenuAction -> nodeActionsViewModel.downloadNodeForPreview(true)
             is DownloadMenuAction -> nodeActionsViewModel.downloadNode()
             is AvailableOfflineMenuAction -> nodeActionsViewModel.downloadNodeForOffline()
             is HideMenuAction -> {
@@ -159,7 +159,7 @@ class NodeActionHandler(
     fun handleAction(action: MenuAction, nodes: List<TypedNode>) {
         nodeActionsViewModel.updateSelectedNodes(nodes)
         when (action) {
-            is OpenWithMenuAction -> nodeActionsViewModel.downloadNodeForPreview()
+            is OpenWithMenuAction -> nodeActionsViewModel.downloadNodeForPreview(true)
             is DownloadMenuAction -> nodeActionsViewModel.downloadNode()
             is AvailableOfflineMenuAction -> nodeActionsViewModel.downloadNodeForOffline()
             is ShareFolderMenuAction -> {

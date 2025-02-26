@@ -157,9 +157,11 @@ sealed interface TransferTriggerEvent {
      * Event to start downloading node for preview
      *
      * @param node the node to be downloaded for preview
+     * @param isOpenWith True if is opened with another app action
      */
     data class StartDownloadForPreview(
         val node: TypedNode?,
+        val isOpenWith: Boolean,
     ) : DownloadTriggerEvent {
         override val nodes = node?.let { listOf(node) } ?: emptyList()
         override val isHighPriority: Boolean = true
