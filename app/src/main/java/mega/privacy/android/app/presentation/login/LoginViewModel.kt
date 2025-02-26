@@ -176,6 +176,7 @@ class LoginViewModel @Inject constructor(
                 Timber.e(it)
             }
         }
+        setupInitialState()
     }
 
     private fun enableAndMonitorRequestStatusProgressEvent() {
@@ -205,7 +206,7 @@ class LoginViewModel @Inject constructor(
     /**
      * Reset some states values.
      */
-    fun setupInitialState() {
+    private fun setupInitialState() {
         viewModelScope.launch {
             merge(
                 flowOf(getSessionUseCase()).map { session ->

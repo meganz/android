@@ -7,6 +7,7 @@ import de.palm.composestateevents.triggered
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.distinctUntilChanged
+import kotlinx.coroutines.flow.emptyFlow
 import kotlinx.coroutines.flow.flow
 import kotlinx.coroutines.flow.flowOf
 import kotlinx.coroutines.flow.map
@@ -18,12 +19,12 @@ import kotlinx.coroutines.test.runTest
 import mega.privacy.android.app.AnalyticsTestExtension
 import mega.privacy.android.app.InstantExecutorExtension
 import mega.privacy.android.app.R
-import mega.privacy.android.app.featuretoggle.AppFeatures
 import mega.privacy.android.app.middlelayer.installreferrer.InstallReferrerDetails
 import mega.privacy.android.app.middlelayer.installreferrer.InstallReferrerHandler
 import mega.privacy.android.app.presentation.login.model.LoginError
 import mega.privacy.android.core.test.extension.CoroutineMainDispatcherExtension
 import mega.privacy.android.domain.entity.Progress
+import mega.privacy.android.domain.entity.ThemeMode
 import mega.privacy.android.domain.entity.login.EphemeralCredentials
 import mega.privacy.android.domain.exception.MegaException
 import mega.privacy.android.domain.usecase.GetThemeMode
@@ -186,9 +187,18 @@ internal class LoginViewModelTest {
         whenever(monitorRequestStatusProgressEventUseCase()).thenReturn(
             requestStatusProgressFakeFlow
         )
-        whenever(getFeatureFlagValueUseCase(AppFeatures.RequestStatusProgressDialog)).thenReturn(
+        whenever(getFeatureFlagValueUseCase(any())).thenReturn(
             true
         )
+        whenever(getSessionUseCase()).thenReturn(null)
+        whenever(monitorAccountBlockedUseCase()).thenReturn(emptyFlow())
+        whenever(rootNodeExistsUseCase()).thenReturn(false)
+        whenever(hasPreferencesUseCase()).thenReturn(false)
+        whenever(hasCameraSyncEnabledUseCase()).thenReturn(false)
+        whenever(isCameraUploadsEnabledUseCase()).thenReturn(false)
+        whenever(isFirstLaunchUseCase()).thenReturn(false)
+        whenever(monitorFetchNodesFinishUseCase()).thenReturn(emptyFlow())
+        whenever(getThemeMode()).thenReturn(flowOf(ThemeMode.System))
     }
 
     @AfterEach
@@ -307,6 +317,7 @@ internal class LoginViewModelTest {
                         assertThat(awaitItem()).isInstanceOf(consumed().javaClass)
                         onLoginClicked(false)
                         assertThat(awaitItem()).isInstanceOf(triggered(R.string.error_server_connection_problem).javaClass)
+                        cancelAndIgnoreRemainingEvents()
                     }
             }
         }
@@ -326,6 +337,7 @@ internal class LoginViewModelTest {
                 assertThat(awaitItem().passwordError).isNull()
                 assertThat(awaitItem().ongoingTransfersExist).isNull()
                 assertThat(awaitItem().snackbarMessage).isInstanceOf(consumed().javaClass)
+                cancelAndIgnoreRemainingEvents()
             }
         }
     }
