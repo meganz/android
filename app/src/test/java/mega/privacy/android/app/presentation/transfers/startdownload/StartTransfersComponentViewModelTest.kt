@@ -474,7 +474,7 @@ class StartTransfersComponentViewModelTest {
             whenever(areTransfersPausedUseCase()).thenReturn(true)
             whenever(getFilePreviewDownloadPathUseCase()).thenReturn("/path")
             val triggerEvent =
-                TransferTriggerEvent.StartDownloadForPreview(mock<ChatDefaultFile>())
+                TransferTriggerEvent.StartDownloadForPreview(mock<ChatDefaultFile>(), false)
             underTest.startTransfer(triggerEvent)
             assertCurrentEventIsEqualTo(StartTransferEvent.PausedTransfers(triggerEvent))
         }
@@ -1056,7 +1056,7 @@ class StartTransfersComponentViewModelTest {
     private fun provideStartDownloadEvents() = listOf(
         TransferTriggerEvent.StartDownloadNode(nodes),
         TransferTriggerEvent.StartDownloadForOffline(node),
-        TransferTriggerEvent.StartDownloadForPreview(node),
+        TransferTriggerEvent.StartDownloadForPreview(node, false),
 
         )
 

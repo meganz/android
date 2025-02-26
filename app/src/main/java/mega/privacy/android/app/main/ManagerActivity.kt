@@ -5516,7 +5516,7 @@ class ManagerActivity : PasscodeActivity(), NavigationView.OnNavigationItemSelec
      * @param node Node to be downloaded.
      */
     fun saveNodeByTap(node: MegaNode) {
-        startDownloadViewModel.onDownloadForPreviewClicked(NodeId(node.handle))
+        startDownloadViewModel.onDownloadForPreviewClicked(NodeId(node.handle), false)
     }
 
     /**
@@ -5526,7 +5526,7 @@ class ManagerActivity : PasscodeActivity(), NavigationView.OnNavigationItemSelec
      * @param node Node to be downloaded.
      */
     fun saveNodeByOpenWith(node: MegaNode) {
-        startDownloadViewModel.onDownloadForPreviewClicked(NodeId(node.handle))
+        startDownloadViewModel.onDownloadForPreviewClicked(NodeId(node.handle), true)
     }
 
     /**

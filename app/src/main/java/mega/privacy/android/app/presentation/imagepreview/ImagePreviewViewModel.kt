@@ -495,7 +495,7 @@ class ImagePreviewViewModel @Inject constructor(
                     imageNode = _state.value.currentImageNode,
                 ) {
                     if (downloadForPreview) {
-                        TransferTriggerEvent.StartDownloadForPreview(it)
+                        TransferTriggerEvent.StartDownloadForPreview(node = it, isOpenWith = false)
                     } else {
                         TransferTriggerEvent.StartDownloadNode(listOf(it))
                     }

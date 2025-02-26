@@ -1521,9 +1521,16 @@ class ChatViewModel @Inject constructor(
      *
      * @param file [ChatFile]
      */
-    fun onDownloadForPreviewChatNode(file: ChatFile) {
+    fun onDownloadForPreviewChatNode(file: ChatFile, isOpenWith: Boolean) {
         _state.update {
-            it.copy(downloadEvent = triggered(TransferTriggerEvent.StartDownloadForPreview(file)))
+            it.copy(
+                downloadEvent = triggered(
+                    TransferTriggerEvent.StartDownloadForPreview(
+                        node = file,
+                        isOpenWith = isOpenWith
+                    )
+                )
+            )
         }
     }
 

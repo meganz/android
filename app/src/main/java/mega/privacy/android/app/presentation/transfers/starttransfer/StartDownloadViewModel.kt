@@ -58,11 +58,16 @@ class StartDownloadViewModel @Inject constructor(
     /**
      * Triggers the event related to download a node for preview with its [nodeId]
      */
-    fun onDownloadForPreviewClicked(nodeId: NodeId) {
+    fun onDownloadForPreviewClicked(nodeId: NodeId, isOpenWith: Boolean) {
         viewModelScope.launch {
             val node = getNodeByIdUseCase(nodeId)
             _state.update {
-                triggered(TransferTriggerEvent.StartDownloadForPreview(node))
+                triggered(
+                    TransferTriggerEvent.StartDownloadForPreview(
+                        node = node,
+                        isOpenWith = isOpenWith
+                    )
+                )
             }
         }
     }
