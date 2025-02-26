@@ -19,7 +19,6 @@ import mega.privacy.android.app.presentation.favourites.model.mapper.FavouriteMa
 import mega.privacy.android.app.presentation.favourites.model.mapper.HeaderMapper
 import mega.privacy.android.app.utils.wrapper.FetchNodeWrapper
 import mega.privacy.android.core.test.extension.CoroutineMainDispatcherExtension
-import mega.privacy.android.domain.entity.SortOrder
 import mega.privacy.android.domain.entity.VideoFileTypeInfo
 import mega.privacy.android.domain.entity.account.AccountDetail
 import mega.privacy.android.domain.entity.favourite.FavouriteSortOrder
@@ -221,33 +220,6 @@ class FavouritesViewModelTest {
         )
         underTest.favouritesState.test {
             assertThat(awaitItem()).isInstanceOf(FavouriteLoadState.Success::class.java)
-        }
-    }
-
-    @Test
-    fun `test that favourites are mapped according to returned order`() = runTest {
-        underTest.favouritesState.test {
-            val items = awaitItem()
-            verifyDefaultSortOrder(items)
-        }
-    }
-
-    @Test
-    fun `test that sort order is changed when set from event`() = runTest {
-        val sortOrder = FavouriteSortOrder.ModifiedDate(false)
-        whenever(getFavouriteSortOrderUseCase()).thenReturn(sortOrder)
-        whenever(mapFavouriteSortOrderUseCase(any())).thenReturn(sortOrder.copy(sortDescending = !sortOrder.sortDescending))
-
-        whenever(getAllFavorites()).thenReturn(flowOf(descendingTimeNodes))
-
-        initViewModel()
-
-        underTest.favouritesState.test {
-            val items = awaitItem()
-            verifyDefaultSortOrder(items)
-            underTest.onOrderChange(SortOrder.ORDER_CREATION_DESC)
-            val sortedItems = awaitItem()
-            verifyInOrder(sortedItems, timeDescending)
         }
     }
 

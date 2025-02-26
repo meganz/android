@@ -11,6 +11,7 @@ import mega.privacy.android.domain.entity.search.SearchTarget
 import mega.privacy.android.domain.repository.FavouritesRepository
 import mega.privacy.android.domain.repository.SearchRepository
 import mega.privacy.android.domain.usecase.GetCloudSortOrder
+import mega.privacy.android.domain.usecase.favourites.SortFavouritesUseCase
 import mega.privacy.android.domain.usecase.node.AddNodesTypeUseCase
 import org.junit.jupiter.api.Test
 import org.mockito.kotlin.mock
@@ -24,10 +25,13 @@ class SearchUseCaseTest {
     private val searchRepository: SearchRepository = mock()
     private val favouritesRepository: FavouritesRepository = mock()
     private val addNodesTypeUseCase: AddNodesTypeUseCase = mock()
+    private val sortFavouritesUseCase: SortFavouritesUseCase = mock()
+
     private val underTest = SearchUseCase(
         getCloudSortOrder = getCloudSortOrder,
         searchRepository = searchRepository,
         favouritesRepository = favouritesRepository,
+        sortFavouritesUseCase = sortFavouritesUseCase,
         addNodesTypeUseCase = addNodesTypeUseCase
     )
 

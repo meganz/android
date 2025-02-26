@@ -10,6 +10,7 @@ import mega.privacy.android.domain.entity.node.NodeId
 import mega.privacy.android.domain.exception.ParentNotAFolderException
 import mega.privacy.android.domain.repository.NodeRepository
 import mega.privacy.android.domain.usecase.AddNodeType
+import mega.privacy.android.domain.usecase.GetCloudSortOrder
 import javax.inject.Inject
 
 /**
@@ -18,6 +19,7 @@ import javax.inject.Inject
 class GetFavouriteFolderInfoUseCase @Inject constructor(
     private val nodeRepository: NodeRepository,
     private val addNodeType: AddNodeType,
+    private val getCloudSortOrder: GetCloudSortOrder,
 ) {
     /**
      * Get children nodes by node
@@ -36,7 +38,7 @@ class GetFavouriteFolderInfoUseCase @Inject constructor(
     private suspend fun getFavouriteFolderInfo(parentHandle: Long): FavouriteFolderInfo {
         val parent = nodeRepository.getNodeById(NodeId(parentHandle)) as? FolderNode
             ?: throw ParentNotAFolderException("Attempted to fetch favourite folder info for node: $parentHandle")
-        val children = nodeRepository.getNodeChildren(parent.id)
+        val children = nodeRepository.getNodeChildren(parent.id, getCloudSortOrder())
             .map { addNodeType(it) }
         return FavouriteFolderInfo(
             children = children,

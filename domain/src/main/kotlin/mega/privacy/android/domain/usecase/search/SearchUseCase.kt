@@ -10,6 +10,7 @@ import mega.privacy.android.domain.entity.search.SearchTarget
 import mega.privacy.android.domain.repository.FavouritesRepository
 import mega.privacy.android.domain.repository.SearchRepository
 import mega.privacy.android.domain.usecase.GetCloudSortOrder
+import mega.privacy.android.domain.usecase.favourites.SortFavouritesUseCase
 import mega.privacy.android.domain.usecase.node.AddNodesTypeUseCase
 import javax.inject.Inject
 
@@ -22,6 +23,7 @@ class SearchUseCase @Inject constructor(
     private val getCloudSortOrder: GetCloudSortOrder,
     private val searchRepository: SearchRepository,
     private val favouritesRepository: FavouritesRepository,
+    private val sortFavouritesUseCase: SortFavouritesUseCase,
     private val addNodesTypeUseCase: AddNodesTypeUseCase,
 ) {
 
@@ -43,7 +45,8 @@ class SearchUseCase @Inject constructor(
         val invalidNodeHandle = searchRepository.getInvalidHandle()
         val searchList = when {
             // Favourites Root (No Search applied)
-            query.isEmpty() && parentHandle == invalidNodeHandle && nodeSourceType == NodeSourceType.FAVOURITES -> favouritesRepository.getAllFavorites()
+            query.isEmpty() && parentHandle == invalidNodeHandle && nodeSourceType == NodeSourceType.FAVOURITES ->
+                sortFavouritesUseCase(favouritesRepository.getAllFavorites())
 
             // Incoming Shares Root (No Search applied)
             query.isEmpty() && parentHandle == invalidNodeHandle && searchTarget == SearchTarget.INCOMING_SHARE -> searchRepository.getInShares()

@@ -4,6 +4,7 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.CoroutineDispatcher
+import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.async
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -11,6 +12,7 @@ import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.catch
 import kotlinx.coroutines.flow.collectLatest
 import kotlinx.coroutines.flow.combine
+import kotlinx.coroutines.flow.flatMapLatest
 import kotlinx.coroutines.flow.flowOf
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
@@ -30,7 +32,6 @@ import mega.privacy.android.domain.entity.account.business.BusinessAccountStatus
 import mega.privacy.android.domain.entity.favourite.FavouriteSortOrder
 import mega.privacy.android.domain.entity.node.NodeId
 import mega.privacy.android.domain.entity.node.TypedFileNode
-import mega.privacy.android.domain.entity.node.TypedFolderNode
 import mega.privacy.android.domain.entity.node.TypedNode
 import mega.privacy.android.domain.qualifier.DefaultDispatcher
 import mega.privacy.android.domain.usecase.GetBusinessStatusUseCase
@@ -119,11 +120,14 @@ class FavouritesViewModel @Inject constructor(
         return result.getOrNull() ?: false
     }
 
+    @OptIn(ExperimentalCoroutinesApi::class)
     private suspend fun combineFavouriteLoadStateFlow(): Flow<FavouriteLoadState> {
         order = MutableStateFlow(getFavouriteSortOrderUseCase())
         return combine(
             order,
-            getAllFavoritesUseCase(),
+            order.flatMapLatest {
+                getAllFavoritesUseCase()
+            },
             selected,
             monitorConnectivityUseCase(),
             ::mapToFavourite
@@ -218,7 +222,6 @@ class FavouritesViewModel @Inject constructor(
     ) = listOf(
         headerMapper(order)
     ) + nodes.mapTypedNodesListToFavourites(selectedNodes)
-        .sortBy(order)
         .map {
             FavouriteListItem(
                 favourite = it,
@@ -298,56 +301,6 @@ class FavouritesViewModel @Inject constructor(
                 Timber.e(it)
             }.getOrNull()
         }
-
-    /**
-     * Sort order for FavouriteInfo list and place the folders at the top
-     * @param order sort order
-     * @return List<FavouriteInfo>
-     */
-    private fun List<Favourite>.sortBy(order: FavouriteSortOrder): List<Favourite> =
-        this.sortedWith { item1, item2 ->
-            if (order.sortDescending) {
-                item2.typedNode.compareTo(item1.typedNode, order)
-            } else {
-                item1.typedNode.compareTo(item2.typedNode, order)
-            }
-        }
-
-    private fun TypedNode.compareTo(other: TypedNode, order: FavouriteSortOrder): Int {
-        return when (this) {
-            is TypedFileNode -> this.compareToFile(other, order)
-            is TypedFolderNode -> this.compareToFolder(other, order)
-            else -> 0
-        }
-    }
-
-
-    private fun TypedFileNode.compareToFile(
-        other: TypedNode,
-        order: FavouriteSortOrder,
-    ): Int {
-        val otherFile = other as? TypedFileNode ?: return compareFileToFolder(order)
-        return when (order) {
-            FavouriteSortOrder.Label -> label.compareTo(otherFile.label)
-            is FavouriteSortOrder.ModifiedDate -> modificationTime.compareTo(otherFile.modificationTime)
-            is FavouriteSortOrder.Name -> name.compareTo(otherFile.name)
-            is FavouriteSortOrder.Size -> size.compareTo(otherFile.size)
-        }
-    }
-
-    private fun compareFileToFolder(order: FavouriteSortOrder) = if (order.sortDescending) -1 else 1
-
-    private fun TypedFolderNode.compareToFolder(
-        other: TypedNode,
-        order: FavouriteSortOrder,
-    ): Int {
-        val otherFolder = other as? TypedFolderNode ?: return compareFolderToFile(order)
-        return if (order is FavouriteSortOrder.Label) label.compareTo(otherFolder.label) else name.compareTo(
-            otherFolder.name
-        )
-    }
-
-    private fun compareFolderToFile(order: FavouriteSortOrder) = if (order.sortDescending) 1 else -1
 
     /**
      * On order change

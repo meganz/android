@@ -5,7 +5,9 @@ import com.google.common.truth.Truth.assertThat
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.flow.emptyFlow
 import kotlinx.coroutines.flow.flowOf
+import kotlinx.coroutines.runBlocking
 import kotlinx.coroutines.test.runTest
+import mega.privacy.android.domain.entity.SortOrder
 import mega.privacy.android.domain.entity.node.FileNode
 import mega.privacy.android.domain.entity.node.FolderNode
 import mega.privacy.android.domain.entity.node.NodeId
@@ -23,16 +25,20 @@ class GetFavouriteFolderInfoUseCaseTest {
     lateinit var underTest: GetFavouriteFolderInfoUseCase
 
     private val nodeRepository = mock<NodeRepository>()
-
+    private val getCloudSortOrder = mock<GetCloudSortOrder>()
     private val addNodeType = mock<AddNodeType>()
 
     @Before
     fun setUp() {
         underTest = GetFavouriteFolderInfoUseCase(
             nodeRepository = nodeRepository,
-            addNodeType = addNodeType
+            addNodeType = addNodeType,
+            getCloudSortOrder = getCloudSortOrder
         )
         whenever(nodeRepository.monitorNodeUpdates()).thenReturn(emptyFlow())
+        runBlocking {
+            whenever(getCloudSortOrder()).thenReturn(SortOrder.ORDER_NONE)
+        }
     }
 
     @Test
@@ -57,7 +63,7 @@ class GetFavouriteFolderInfoUseCaseTest {
         }
         val nodeId = NodeId(1)
         whenever(nodeRepository.getNodeById(nodeId)).thenReturn(folderNode)
-        whenever(nodeRepository.getNodeChildren(folderNode.id)).thenReturn(emptyList())
+        whenever(nodeRepository.getNodeChildren(folderNode.id, SortOrder.ORDER_NONE)).thenReturn(emptyList())
 
         underTest(nodeId.longValue).test {
             assertThat(awaitItem().name).isEqualTo(first)
@@ -75,7 +81,7 @@ class GetFavouriteFolderInfoUseCaseTest {
         val nodeId = NodeId(1)
         val children = listOf(mock<FileNode>())
         whenever(nodeRepository.getNodeById(nodeId)).thenReturn(folderNode)
-        whenever(nodeRepository.getNodeChildren(folderNode.id)).thenReturn(children)
+        whenever(nodeRepository.getNodeChildren(folderNode.id, SortOrder.ORDER_NONE)).thenReturn(children)
 
         underTest(nodeId.longValue).test {
             assertThat(awaitItem().children).isNotEmpty()

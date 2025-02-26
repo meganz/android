@@ -24,6 +24,7 @@ class GetAllFavoritesUseCase @Inject constructor(
     private val favouritesRepository: FavouritesRepository,
     private val nodeRepository: NodeRepository,
     private val addNodeType: AddNodeType,
+    private val sortFavouritesUseCase: SortFavouritesUseCase,
 ) {
     /**
      * get favourites
@@ -36,6 +37,7 @@ class GetAllFavoritesUseCase @Inject constructor(
             emitAll(nodeRepository.monitorNodeUpdates()
                 .mapLatest { favouritesRepository.getAllFavorites() })
         }.mapLatest { list ->
-            list.map { addNodeType(it) }
+            sortFavouritesUseCase(list)
+                .map { addNodeType(it) }
         }
 }

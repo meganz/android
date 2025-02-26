@@ -161,7 +161,6 @@ class FavouriteFolderFragment : Fragment() {
                 viewModel.childrenNodesState.collect { childrenState ->
                     setViewVisible(childrenState)
                     if (childrenState is ChildrenNodesLoadState.Success) {
-
                         setToolbarText(childrenState.title)
                         // According to the state to enable the onBackPressedCallback
                         onBackPressedCallback.isEnabled = childrenState.isBackPressedEnable
