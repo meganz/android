@@ -4,6 +4,7 @@ import android.view.Surface
 import androidx.annotation.OptIn
 import androidx.media3.common.MediaItem
 import androidx.media3.common.Player
+import androidx.media3.exoplayer.ExoPlayer
 import androidx.media3.exoplayer.source.ShuffleOrder
 import androidx.media3.ui.PlayerView
 import kotlinx.coroutines.flow.Flow
@@ -34,7 +35,7 @@ interface MediaPlayerGateway {
         repeatToggleMode: RepeatToggleMode,
         nameChangeCallback: (title: String?, artist: String?, album: String?) -> Unit,
         mediaPlayerCallback: MediaPlayerCallback,
-    )
+    ): ExoPlayer
 
     /**
      * create player control notification

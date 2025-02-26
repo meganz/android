@@ -71,6 +71,7 @@ import mega.privacy.android.domain.exception.BlockedMegaException
 import mega.privacy.android.domain.exception.QuotaExceededMegaException
 import mega.privacy.android.domain.qualifier.ApplicationScope
 import mega.privacy.android.domain.qualifier.IoDispatcher
+import mega.privacy.android.domain.qualifier.MainDispatcher
 import mega.privacy.android.domain.usecase.GetFileTypeInfoByNameUseCase
 import mega.privacy.android.domain.usecase.GetLocalFilePathUseCase
 import mega.privacy.android.domain.usecase.GetLocalLinkFromMegaApiUseCase
@@ -115,6 +116,7 @@ class VideoPlayerViewModel @Inject constructor(
     @ApplicationContext private val context: Context,
     @VideoPlayer private val mediaPlayerGateway: MediaPlayerGateway,
     @ApplicationScope private val applicationScope: CoroutineScope,
+    @MainDispatcher private val mainDispatcher: CoroutineDispatcher,
     @IoDispatcher private val ioDispatcher: CoroutineDispatcher,
     private val videoPlayerItemMapper: VideoPlayerItemMapper,
     private val getVideoNodeByHandleUseCase: GetVideoNodeByHandleUseCase,
@@ -292,17 +294,18 @@ class VideoPlayerViewModel @Inject constructor(
         }
     }
 
-    private fun buildPlaybackSourcesForPlayer(mediaPlaySources: MediaPlaySources) {
-        Timber.d("Playback sources: ${mediaPlaySources.mediaItems.size} items")
-        with(mediaPlayerGateway) {
-            buildPlaySources(mediaPlaySources)
-            setPlayWhenReady(_uiState.value.isPaused && mediaPlaySources.isRestartPlaying)
-            playerPrepare()
+    private fun buildPlaybackSourcesForPlayer(mediaPlaySources: MediaPlaySources) =
+        viewModelScope.launch(mainDispatcher) {
+            Timber.d("Playback sources: ${mediaPlaySources.mediaItems.size} items")
+            with(mediaPlayerGateway) {
+                buildPlaySources(mediaPlaySources)
+                setPlayWhenReady(_uiState.value.isPaused && mediaPlaySources.isRestartPlaying)
+                playerPrepare()
+            }
+            mediaPlaySources.nameToDisplay?.let { name ->
+                _uiState.update { it.copy(metadata = Metadata(null, null, null, nodeName = name)) }
+            }
         }
-        mediaPlaySources.nameToDisplay?.let { name ->
-            _uiState.update { it.copy(metadata = Metadata(null, null, null, nodeName = name)) }
-        }
-    }
 
     private suspend fun setPlayingItem(handle: Long, fileName: String?, source: Int) {
         val node = getVideoNodeByHandleUseCase(handle)
@@ -696,9 +699,8 @@ class VideoPlayerViewModel @Inject constructor(
         }
 
     private suspend fun isLocalFile(node: TypedFileNode, localPath: String): Boolean {
-        val isFingerPrintAvailable = node.fingerprint?.let {
-            it == getFingerprintUseCase(localPath)
-        } ?: false
+        val isFingerPrintAvailable =
+            node.fingerprint?.let { it == getFingerprintUseCase(localPath) } == true
         return isOnMegaDownloads(node) || isFingerPrintAvailable
     }
 

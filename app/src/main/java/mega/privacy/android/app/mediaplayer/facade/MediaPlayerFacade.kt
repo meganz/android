@@ -78,7 +78,7 @@ class MediaPlayerFacade @Inject constructor(
         repeatToggleMode: RepeatToggleMode,
         nameChangeCallback: (title: String?, artist: String?, album: String?) -> Unit,
         mediaPlayerCallback: MediaPlayerCallback,
-    ) {
+    ): ExoPlayer {
         trackSelector = DefaultTrackSelector(context)
         val renderersFactory = DefaultRenderersFactory(context).setExtensionRendererMode(
             DefaultRenderersFactory.EXTENSION_RENDERER_MODE_ON
@@ -166,6 +166,7 @@ class MediaPlayerFacade @Inject constructor(
         }
         player = MediaMegaPlayer(exoPlayer)
         playerNotificationManager?.setPlayer(player)
+        return exoPlayer
     }
 
     private fun switchRendererToTextTrackType() {

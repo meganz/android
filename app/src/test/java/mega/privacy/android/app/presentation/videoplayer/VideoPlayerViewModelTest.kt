@@ -9,7 +9,9 @@ import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.flowOf
+import kotlinx.coroutines.test.StandardTestDispatcher
 import kotlinx.coroutines.test.UnconfinedTestDispatcher
+import kotlinx.coroutines.test.advanceUntilIdle
 import kotlinx.coroutines.test.runTest
 import mega.privacy.android.app.TimberJUnit5Extension
 import mega.privacy.android.app.mediaplayer.gateway.MediaPlayerGateway
@@ -171,6 +173,7 @@ class VideoPlayerViewModelTest {
             context = context,
             mediaPlayerGateway = mediaPlayerGateway,
             applicationScope = CoroutineScope(UnconfinedTestDispatcher()),
+            mainDispatcher = StandardTestDispatcher(),
             ioDispatcher = UnconfinedTestDispatcher(),
             videoPlayerItemMapper = videoPlayerItemMapper,
             getVideoNodeByHandleUseCase = getVideoNodeByHandleUseCase,
@@ -432,6 +435,7 @@ class VideoPlayerViewModelTest {
                 fileName = testFileName
             )
             underTest.initVideoPlaybackSources(intent)
+            advanceUntilIdle()
             underTest.uiState.test {
                 val actual = awaitItem()
                 actual.mediaPlaySources?.let { sources ->
