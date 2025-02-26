@@ -79,6 +79,10 @@ CPP_SOURCES= sdk/src/attrmap.cpp \
     sdk/src/syncinternals/syncuploadthrottlingfile.cpp \
     sdk/src/syncinternals/syncuploadthrottlingmanager.cpp \
     sdk/src/totp.cpp \
+    sdk/src/dns_lookup_pseudomessage.cpp \
+    sdk/src/network_connectivity_test.cpp \
+    sdk/src/udp_socket_tester.cpp \
+    sdk/src/udp_socket.cpp
 
 C_SOURCES = sdk/src/mega_glob.c
 
@@ -156,7 +160,12 @@ HEADERS= sdk/include/mega.h \
         sdk/include/mega/syncinternals/synciuploadthrottlingmanager.h \
         sdk/include/mega/syncinternals/syncuploadthrottlingfile.h \
         sdk/include/mega/syncinternals/syncuploadthrottlingmanager.h \
-        sdk/include/mega/totp.h
+        sdk/include/mega/totp.h \
+        sdk/include/mega/dns_lookup_pseudomessage.h \
+        sdk/include/mega/network_connectivity_test_helpers.h \
+        sdk/include/mega/network_connectivity_test.h \
+        sdk/include/mega/udp_socket_tester.h \
+        sdk/include/mega/udp_socket.h
 
 # impl layer headers
 HEADERS += \
