@@ -21,6 +21,7 @@ import org.mockito.kotlin.verifyNoInteractions
 import org.mockito.kotlin.whenever
 import kotlin.collections.component1
 import kotlin.collections.component2
+import kotlin.collections.singleOrNull
 
 @TestInstance(TestInstance.Lifecycle.PER_CLASS)
 class ActiveTransferTotalsMapperTest {
@@ -186,6 +187,7 @@ class ActiveTransferTotalsMapperTest {
                             alreadyTransferred = fileTransfers.count { it.isAlreadyTransferred },
                             destination = "destination$groupId",
                             singleFileName = "file$groupId",
+                            singleTransferTag = fileTransfers.singleOrNull()?.tag,
                             startTime = groupId.toLong(),
                             pausedFiles = fileTransfers.count { it.isPaused },
                             totalBytes = fileTransfers.sumOf { it.totalBytes },
@@ -236,6 +238,7 @@ class ActiveTransferTotalsMapperTest {
                             alreadyTransferred = fileTransfers.count { it.isAlreadyTransferred },
                             destination = "destination$groupId",
                             singleFileName = "file$groupId",
+                            singleTransferTag = fileTransfers.singleOrNull()?.tag,
                             startTime = groupId.toLong(),
                             pausedFiles = fileTransfers.count { it.isPaused },
                             totalBytes = fileTransfers.sumOf { it.totalBytes },
@@ -279,6 +282,7 @@ class ActiveTransferTotalsMapperTest {
                             alreadyTransferred = fileTransfers.count { it.isAlreadyTransferred },
                             destination = "destination$groupId",
                             singleFileName = "file$groupId",
+                            singleTransferTag = fileTransfers.singleOrNull()?.tag,
                             startTime = groupId.toLong(),
                             pausedFiles = fileTransfers.count { it.isPaused },
                             totalBytes = fileTransfers.sumOf { it.totalBytes },
@@ -323,6 +327,7 @@ class ActiveTransferTotalsMapperTest {
                     alreadyTransferred = 0,
                     destination = "",
                     singleFileName = null,
+                    singleTransferTag = 0,
                     startTime = 0,
                     pausedFiles = 0,
                     totalBytes = 0,
@@ -349,6 +354,7 @@ class ActiveTransferTotalsMapperTest {
                         alreadyTransferred = 0,
                         destination = "destination$groupId",
                         singleFileName = "file$groupId",
+                        singleTransferTag = entity.tag,
                         startTime = groupId.toLong(),
                         pausedFiles = 0,
                         totalBytes = 0,
@@ -370,6 +376,7 @@ class ActiveTransferTotalsMapperTest {
                             alreadyTransferred = fileTransfers.count { it.isAlreadyTransferred },
                             destination = "destination$groupId",
                             singleFileName = "file$groupId",
+                            singleTransferTag = fileTransfers.singleOrNull()?.tag,
                             startTime = groupId.toLong(),
                             pausedFiles = fileTransfers.count { it.isPaused },
                             totalBytes = fileTransfers.sumOf { it.totalBytes },

@@ -9,6 +9,7 @@ import mega.privacy.android.domain.entity.transfer.TransferType
 import mega.privacy.android.domain.entity.transfer.getTransferGroup
 import mega.privacy.android.domain.repository.TransferRepository
 import javax.inject.Inject
+import kotlin.collections.singleOrNull
 
 /**
  * Mapper for converting a list of [ActiveTransferEntity] into [ActiveTransferTotals].
@@ -49,6 +50,7 @@ internal class ActiveTransferTotalsMapper @Inject constructor(
                             alreadyTransferred = activeTransfersFiles.count { it.isAlreadyTransferred },
                             destination = dest,
                             singleFileName = fileName,
+                            singleTransferTag = activeTransfersFiles.singleOrNull()?.tag,
                             startTime = startTime,
                             pausedFiles = activeTransfersFiles.count { it.isPaused },
                             totalBytes = activeTransfersFiles.sumOf { it.totalBytes },

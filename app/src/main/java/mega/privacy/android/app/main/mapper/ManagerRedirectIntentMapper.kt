@@ -118,6 +118,17 @@ class ManagerRedirectIntentMapper @Inject constructor(private val activity: Acti
                     }
                 }
 
+            Constants.ACTION_CANCEL_TRANSFER -> Intent(activity, LoginActivity::class.java)
+                .apply {
+                    putExtra(Constants.VISIBLE_FRAGMENT, Constants.LOGIN_FRAGMENT)
+                    flags = Intent.FLAG_ACTIVITY_CLEAR_TOP
+                    action = Constants.ACTION_CANCEL_TRANSFER
+                    putExtra(
+                        Constants.INTENT_EXTRA_TAG,
+                        intent.getIntExtra(Constants.INTENT_EXTRA_TAG, -1)
+                    )
+                }
+
             Constants.ACTION_IPC -> Intent(activity, LoginActivity::class.java)
                 .apply {
                     putExtra(Constants.VISIBLE_FRAGMENT, Constants.LOGIN_FRAGMENT)

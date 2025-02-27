@@ -688,14 +688,19 @@ internal class StartTransfersComponentViewModel @Inject constructor(
             .let { finishedGroups ->
                 alreadyFinishedPreviewGroups.addAll(finishedGroups.map { it.groupId })
                 finishedGroups.forEach { group ->
-                    val file = File(group.destination + group.singleFileName)
-                    val duration = group.durationFromStart(getCurrentTimeInMillisUseCase())
-                    if (duration < 6.seconds) {
-                        previewFile(file)
-                    } else {
-                        _uiState.updateEventAndClearProgress(
-                            SlowDownloadPreviewFinished(file)
-                        )
+                    if (group.completedFiles == 1) {
+                        val file = File(group.destination + group.singleFileName)
+                        val duration = group.durationFromStart(getCurrentTimeInMillisUseCase())
+                        if (duration < 6.seconds) {
+                            previewFile(file)
+                        } else {
+                            _uiState.updateEventAndClearProgress(
+                                SlowDownloadPreviewFinished(file)
+                            )
+                        }
+                    }
+                    if (group.singleTransferTag == uiState.value.transferTagToCancel) {
+                        setTransferTagToCancel(null)
                     }
                 }
             }
@@ -911,6 +916,9 @@ internal class StartTransfersComponentViewModel @Inject constructor(
         _uiState.update { state -> state.copy(transferTagToCancel = transferTagToCancel) }
     }
 
+    /**
+     * Confirms the cancellation of a transfer and proceeds with the action.
+     */
     fun cancelTransferConfirmed() {
         uiState.value.transferTagToCancel?.let {
             viewModelScope.launch {
@@ -921,6 +929,9 @@ internal class StartTransfersComponentViewModel @Inject constructor(
         }
     }
 
+    /**
+     * Cancels the cancellation of a transfer.
+     */
     fun cancelTransferCancelled() {
         setTransferTagToCancel(null)
     }
