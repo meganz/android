@@ -45,6 +45,7 @@ import mega.privacy.android.domain.usecase.node.GetFilePreviewDownloadPathUseCas
 import mega.privacy.android.domain.usecase.offline.GetOfflinePathForNodeUseCase
 import mega.privacy.android.domain.usecase.setting.IsAskBeforeLargeDownloadsSettingUseCase
 import mega.privacy.android.domain.usecase.setting.SetAskBeforeLargeDownloadsSettingUseCase
+import mega.privacy.android.domain.usecase.transfers.CancelTransferByTagUseCase
 import mega.privacy.android.domain.usecase.transfers.GetFileNameFromStringUriUseCase
 import mega.privacy.android.domain.usecase.transfers.active.ClearActiveTransfersIfFinishedUseCase
 import mega.privacy.android.domain.usecase.transfers.active.MonitorOngoingActiveTransfersUseCase
@@ -144,6 +145,7 @@ class StartTransfersComponentViewModelTest {
         mock<InsertPendingDownloadsForNodesUseCase>()
     private val areTransfersPausedUseCase = mock<AreTransfersPausedUseCase>()
     private val getFileNameFromStringUriUseCase = mock<GetFileNameFromStringUriUseCase>()
+    private val cancelTransferByTagUseCase = mock<CancelTransferByTagUseCase>()
 
     private val node: TypedFileNode = mock()
     private val nodes = listOf(node)
@@ -205,6 +207,7 @@ class StartTransfersComponentViewModelTest {
             getCurrentTimeInMillisUseCase = getCurrentTimeInMillisUseCase,
             areTransfersPausedUseCase = areTransfersPausedUseCase,
             getFileNameFromStringUriUseCase = getFileNameFromStringUriUseCase,
+            cancelTransferByTagUseCase = cancelTransferByTagUseCase,
         )
     }
 
@@ -248,6 +251,7 @@ class StartTransfersComponentViewModelTest {
             getCurrentTimeInMillisUseCase,
             areTransfersPausedUseCase,
             getFileNameFromStringUriUseCase,
+            cancelTransferByTagUseCase,
         )
         initialStub()
     }
@@ -1051,6 +1055,49 @@ class StartTransfersComponentViewModelTest {
                     assertThat(awaitItem().triggerEventWithoutPermission).isNull()
                 }
             }
+    }
+
+    @Test
+    fun `test that startTransfer with CancelPreviewDownload updates state correctly`() = runTest {
+        val transferTagToCancel = 1
+        underTest.uiState.test {
+            assertThat(awaitItem().transferTagToCancel).isNull()
+            underTest.startTransfer(TransferTriggerEvent.CancelPreviewDownload(transferTagToCancel))
+            assertThat(awaitItem().transferTagToCancel).isEqualTo(transferTagToCancel)
+        }
+    }
+
+    @Test
+    fun `test that cancelTransferConfirmed invokes correctly and reset the transfer to cancel`() =
+        runTest {
+            val transferTagToCancel = 1
+
+            whenever(cancelTransferByTagUseCase(transferTagToCancel)).thenReturn(Unit)
+
+            with(underTest) {
+                startTransfer(TransferTriggerEvent.CancelPreviewDownload(transferTagToCancel))
+                cancelTransferConfirmed()
+
+                uiState.test {
+                    assertThat(awaitItem().transferTagToCancel).isNull()
+                }
+            }
+
+            verify(cancelTransferByTagUseCase).invoke(transferTagToCancel)
+        }
+
+    @Test
+    fun `test that cancelTransferCancelled resets the transfer to cancel `() = runTest {
+        val transferTagToCancel = 1
+
+        with(underTest) {
+            startTransfer(TransferTriggerEvent.CancelPreviewDownload(transferTagToCancel))
+            cancelTransferCancelled()
+
+            uiState.test {
+                assertThat(awaitItem().transferTagToCancel).isNull()
+            }
+        }
     }
 
     private fun provideStartDownloadEvents() = listOf(

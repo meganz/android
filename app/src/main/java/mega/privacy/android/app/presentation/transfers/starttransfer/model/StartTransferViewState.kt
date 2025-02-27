@@ -17,6 +17,7 @@ import java.io.File
  * @property isStorageOverQuota True if the user is in storage over quota state.
  * @property previewFileToOpen
  * @property isOpenWithAction True if the user is opening a file with another app.
+ * @property transferTagToCancel A transfer tag if there is a user's request to cancel it, null otherwise.
  * @constructor Create empty Start transfer view state
  */
 data class StartTransferViewState(
@@ -30,6 +31,7 @@ data class StartTransferViewState(
     val isStorageOverQuota: Boolean = false,
     val previewFileToOpen: File? = null,
     val isOpenWithAction: Boolean = false,
+    val transferTagToCancel: Int? = null,
 )
 
 /**

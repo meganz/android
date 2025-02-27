@@ -49,6 +49,7 @@ import mega.privacy.android.domain.usecase.node.GetFilePreviewDownloadPathUseCas
 import mega.privacy.android.domain.usecase.offline.GetOfflinePathForNodeUseCase
 import mega.privacy.android.domain.usecase.setting.IsAskBeforeLargeDownloadsSettingUseCase
 import mega.privacy.android.domain.usecase.setting.SetAskBeforeLargeDownloadsSettingUseCase
+import mega.privacy.android.domain.usecase.transfers.CancelTransferByTagUseCase
 import mega.privacy.android.domain.usecase.transfers.GetFileNameFromStringUriUseCase
 import mega.privacy.android.domain.usecase.transfers.active.ClearActiveTransfersIfFinishedUseCase
 import mega.privacy.android.domain.usecase.transfers.active.MonitorOngoingActiveTransfersUseCase
@@ -120,6 +121,7 @@ internal class StartTransfersComponentViewModel @Inject constructor(
     private val getCurrentTimeInMillisUseCase: GetCurrentTimeInMillisUseCase,
     private val areTransfersPausedUseCase: AreTransfersPausedUseCase,
     private val getFileNameFromStringUriUseCase: GetFileNameFromStringUriUseCase,
+    private val cancelTransferByTagUseCase: CancelTransferByTagUseCase,
 ) : ViewModel(), DefaultLifecycleObserver {
 
     private val _uiState = MutableStateFlow(StartTransferViewState())
@@ -176,6 +178,10 @@ internal class StartTransfersComponentViewModel @Inject constructor(
                         destinationId = transferTriggerEvent.destinationId,
                         transferTriggerEvent = transferTriggerEvent,
                     )
+                }
+
+                is TransferTriggerEvent.CancelPreviewDownload -> {
+                    setTransferTagToCancel(transferTriggerEvent.transferTag)
                 }
             }
             checkAndHandleTransfersPaused(transferTriggerEvent)
@@ -894,6 +900,29 @@ internal class StartTransfersComponentViewModel @Inject constructor(
                 _uiState.update { state -> state.copy(isStorageOverQuota = isStorageOverQuota) }
             }
         }
+    }
+
+    /**
+     * Set the transfer tag to cancel.
+     *
+     * @param transferTagToCancel The transfer tag to cancel, null if no transfer to cancel.
+     */
+    private fun setTransferTagToCancel(transferTagToCancel: Int?) {
+        _uiState.update { state -> state.copy(transferTagToCancel = transferTagToCancel) }
+    }
+
+    fun cancelTransferConfirmed() {
+        uiState.value.transferTagToCancel?.let {
+            viewModelScope.launch {
+                runCatching { cancelTransferByTagUseCase(it) }
+                    .onFailure { Timber.e(it) }
+            }
+            setTransferTagToCancel(null)
+        }
+    }
+
+    fun cancelTransferCancelled() {
+        setTransferTagToCancel(null)
     }
 
     companion object {

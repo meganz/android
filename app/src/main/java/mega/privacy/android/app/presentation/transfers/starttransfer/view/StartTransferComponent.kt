@@ -54,6 +54,7 @@ import mega.privacy.android.app.presentation.transfers.starttransfer.model.Trans
 import mega.privacy.android.app.presentation.transfers.starttransfer.view.dialog.ResumeChatTransfersDialog
 import mega.privacy.android.app.presentation.transfers.starttransfer.view.dialog.ResumePreviewTransfersDialog
 import mega.privacy.android.app.presentation.transfers.starttransfer.view.filespermission.FilesPermissionDialog
+import mega.privacy.android.app.presentation.transfers.view.dialog.CancelTransferDialog
 import mega.privacy.android.app.presentation.transfers.view.dialog.NotEnoughSpaceForUploadDialog
 import mega.privacy.android.app.presentation.transfers.view.dialog.TransferInProgressDialog
 import mega.privacy.android.app.upgradeAccount.UpgradeAccountActivity
@@ -180,6 +181,8 @@ internal fun StartTransferComponent(
         navigateToStorageSettings = navigateToStorageSettings,
         onPreviewFile = viewModel::previewFile,
         onPreviewOpened = viewModel::consumePreviewFileOpened,
+        onCancelTransferConfirmed = viewModel::cancelTransferConfirmed,
+        onCancelTransferCancelled = viewModel::cancelTransferCancelled,
     )
 }
 
@@ -234,6 +237,8 @@ private fun StartTransferComponent(
     navigateToStorageSettings: () -> Unit,
     onPreviewFile: (File) -> Unit,
     onPreviewOpened: () -> Unit,
+    onCancelTransferConfirmed: () -> Unit,
+    onCancelTransferCancelled: () -> Unit,
 ) {
     val context = LocalContext.current
     val coroutineScope = rememberCoroutineScope()
@@ -454,6 +459,13 @@ private fun StartTransferComponent(
                 onAskedResumeTransfers()
                 showResumePreviewDownloadsAlertDialog = null
             })
+    }
+    uiState.transferTagToCancel?.let {
+        CancelTransferDialog(
+            title = "Cancel download?",
+            onCancelTransfer = onCancelTransferConfirmed,
+            onDismiss = onCancelTransferCancelled
+        )
     }
 }
 
