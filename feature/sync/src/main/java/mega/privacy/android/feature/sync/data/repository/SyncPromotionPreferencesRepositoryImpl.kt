@@ -25,4 +25,9 @@ internal class SyncPromotionPreferencesRepositoryImpl @Inject constructor(
     override suspend fun increaseNumberOfTimesShown(currentTimestamp: Long) {
         syncPromotionDataStore.increaseNumberOfTimesShown(currentTimestamp)
     }
+
+    companion object {
+        const val MAX_NUMBER_OF_TIMES = 6
+        const val TWO_WEEKS_IN_DAYS = 14L
+    }
 }

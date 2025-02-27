@@ -58,10 +58,12 @@ class SyncPromotionViewModel @Inject constructor(
 
     /**
      * Set that Sync Promotion has been shown
+     *
+     * @param doNotShowAgain True to do not show it again or False otherwise
      */
-    fun setSyncPromotionShown() = viewModelScope.launch {
+    fun setSyncPromotionShown(doNotShowAgain: Boolean = false) = viewModelScope.launch {
         runCatching {
-            setSyncPromotionShownUseCase()
+            setSyncPromotionShownUseCase(doNotShowAgain)
         }.onFailure { error -> Timber.d(error) }
     }
 }

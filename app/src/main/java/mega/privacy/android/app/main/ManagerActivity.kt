@@ -1245,11 +1245,22 @@ class ManagerActivity : PasscodeActivity(), NavigationView.OnNavigationItemSelec
                         sheetBody = {
                             SyncPromotionBottomSheet(
                                 modifier = Modifier.semantics { testTagsAsResourceId = true },
-                                onSyncNewFolderClicked = {
+                                onSyncFoldersClicked = {
+                                    syncPromotionViewModel.setSyncPromotionShown(doNotShowAgain = true)
                                     megaNavigator.openNewSync(
                                         context = this@ManagerActivity,
                                         syncType = SyncType.TYPE_TWOWAY
                                     )
+                                },
+                                onBackUpFoldersClicked = {
+                                    syncPromotionViewModel.setSyncPromotionShown(doNotShowAgain = true)
+                                    megaNavigator.openNewSync(
+                                        context = this@ManagerActivity,
+                                        syncType = SyncType.TYPE_BACKUP
+                                    )
+                                },
+                                onLearnMoreClicked = {
+                                    syncPromotionViewModel.setSyncPromotionShown(doNotShowAgain = true)
                                 },
                                 hideSheet = { coroutineScope.launch { syncPromotionViewModel.onConsumeShouldShowSyncPromotion() } })
                         },

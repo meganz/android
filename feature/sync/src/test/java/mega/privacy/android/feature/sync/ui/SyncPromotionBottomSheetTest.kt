@@ -72,8 +72,10 @@ class SyncPromotionBottomSheetTest {
     @Test
     fun `test that body is shown`() = runTest {
         initComposeRule()
-        composeRule.onNodeWithText(context.getString(R.string.sync_promotion_bottom_sheet_body_message))
-            .assertExists().assertIsDisplayed()
+        composeRule.onNodeWithText(
+            context.getString(R.string.sync_promotion_bottom_sheet_body_text)
+                .replace("[U]", "").replace("[/U]", "")
+        ).assertExists().assertIsDisplayed()
     }
 
     @Test
@@ -95,7 +97,7 @@ class SyncPromotionBottomSheetTest {
     }
 
     @Test
-    fun `test that click the primary button on a non free account sends the right analytics tracker event`() {
+    fun `test that click the primary button sends the right analytics tracker event`() {
         initComposeRule()
         coroutineScope.launch {
             modalSheetState.show()
@@ -108,12 +110,24 @@ class SyncPromotionBottomSheetTest {
     }
 
     @Test
-    fun `test that click the secondary button sends the right analytics tracker event`() {
+    fun `test that click the secondary button does not send any analytics tracker event`() {
         initComposeRule()
         coroutineScope.launch {
             modalSheetState.show()
 
             composeRule.onNodeWithText(context.getString(R.string.sync_promotion_bottom_sheet_secondary_button_text))
+                .assertExists().assertIsDisplayed().performClick()
+            assertThat(analyticsRule.events).isEmpty()
+        }
+    }
+
+    @Test
+    fun `test that click the Learn more button sends the right analytics tracker event`() {
+        initComposeRule()
+        coroutineScope.launch {
+            modalSheetState.show()
+
+            composeRule.onNodeWithText(context.getString(R.string.sync_promotion_bottom_sheet_body_text))
                 .assertExists().assertIsDisplayed().performClick()
             assertThat(analyticsRule.events).contains(
                 SyncPromotionBottomSheetLearnMoreButtonPressedEvent
@@ -137,7 +151,9 @@ class SyncPromotionBottomSheetTest {
                 modalSheetState = modalSheetState,
                 sheetBody = {
                     SyncPromotionBottomSheet(
-                        onSyncNewFolderClicked = {},
+                        onSyncFoldersClicked = {},
+                        onBackUpFoldersClicked = {},
+                        onLearnMoreClicked = {},
                     )
                 },
                 expandedRoundedCorners = true,
