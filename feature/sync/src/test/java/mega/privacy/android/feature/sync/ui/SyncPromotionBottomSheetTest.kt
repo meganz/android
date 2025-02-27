@@ -22,6 +22,7 @@ import mega.privacy.android.feature.sync.ui.views.SYNC_PROMOTION_BOTTOM_SHEET_IM
 import mega.privacy.android.feature.sync.ui.views.SyncPromotionBottomSheet
 import mega.privacy.android.shared.original.core.ui.controls.sheets.BottomSheet
 import mega.privacy.android.shared.resources.R
+import mega.privacy.mobile.analytics.event.SyncPromotionBottomSheetBackUpFoldersButtonPressedEvent
 import mega.privacy.mobile.analytics.event.SyncPromotionBottomSheetLearnMoreButtonPressedEvent
 import mega.privacy.mobile.analytics.event.SyncPromotionBottomSheetSyncFoldersButtonPressedEvent
 import org.junit.Before
@@ -110,14 +111,16 @@ class SyncPromotionBottomSheetTest {
     }
 
     @Test
-    fun `test that click the secondary button does not send any analytics tracker event`() {
+    fun `test that click the secondary button sends the right analytics tracker event`() {
         initComposeRule()
         coroutineScope.launch {
             modalSheetState.show()
 
             composeRule.onNodeWithText(context.getString(R.string.sync_promotion_bottom_sheet_secondary_button_text))
                 .assertExists().assertIsDisplayed().performClick()
-            assertThat(analyticsRule.events).isEmpty()
+            assertThat(analyticsRule.events).contains(
+                SyncPromotionBottomSheetBackUpFoldersButtonPressedEvent
+            )
         }
     }
 

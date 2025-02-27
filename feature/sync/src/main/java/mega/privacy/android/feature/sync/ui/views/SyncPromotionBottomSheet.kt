@@ -41,6 +41,7 @@ import mega.privacy.android.shared.original.core.ui.model.MegaSpanStyle
 import mega.privacy.android.shared.original.core.ui.model.MegaSpanStyleWithAnnotation
 import mega.privacy.android.shared.original.core.ui.model.SpanIndicator
 import mega.privacy.android.shared.original.core.ui.preview.CombinedThemePhoneLandscapePreviews
+import mega.privacy.mobile.analytics.event.SyncPromotionBottomSheetBackUpFoldersButtonPressedEvent
 import mega.privacy.mobile.analytics.event.SyncPromotionBottomSheetLearnMoreButtonPressedEvent
 import mega.privacy.mobile.analytics.event.SyncPromotionBottomSheetSyncFoldersButtonPressedEvent
 
@@ -134,6 +135,7 @@ fun SyncPromotionBottomSheet(
         RaisedDefaultMegaButton(
             text = stringResource(sharedR.string.sync_promotion_bottom_sheet_secondary_button_text),
             onClick = {
+                Analytics.tracker.trackEvent(SyncPromotionBottomSheetBackUpFoldersButtonPressedEvent)
                 onBackUpFoldersClicked()
                 hideSheet()
             },
