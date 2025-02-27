@@ -25,7 +25,8 @@ import mega.privacy.android.app.globalmanagement.MyAccountInfo
 import mega.privacy.android.app.main.ManagerActivity
 import mega.privacy.android.app.presentation.account.AccountStorageViewModel
 import mega.privacy.android.app.presentation.billing.BillingViewModel
-import mega.privacy.android.app.presentation.extensions.isDarkMode
+import mega.privacy.android.app.presentation.container.MegaAppContainer
+import mega.privacy.android.app.presentation.passcode.model.PasscodeCryptObjectFactory
 import mega.privacy.android.app.service.iar.RatingHandlerImpl
 import mega.privacy.android.app.upgradeAccount.UpgradeAccountViewModel.Companion.getProductId
 import mega.privacy.android.app.upgradeAccount.view.ChooseAccountView
@@ -39,7 +40,6 @@ import mega.privacy.android.domain.entity.billing.BillingEvent
 import mega.privacy.android.domain.entity.billing.MegaPurchase
 import mega.privacy.android.domain.usecase.GetThemeMode
 import mega.privacy.android.domain.usecase.featureflag.GetFeatureFlagValueUseCase
-import mega.privacy.android.shared.original.core.ui.theme.OriginalTheme
 import mega.privacy.mobile.analytics.event.OnboardingUpsellingDialogVariantAViewProPlansButtonEvent
 import mega.privacy.mobile.analytics.event.OnboardingUpsellingDialogVariantBFreePlanContinueButtonPressedEvent
 import mega.privacy.mobile.analytics.event.OnboardingUpsellingDialogVariantBProIIIPlanContinueButtonPressedEvent
@@ -63,6 +63,9 @@ class ChooseAccountFragment : Fragment() {
 
     @Inject
     lateinit var myAccountInfo: MyAccountInfo
+
+    @Inject
+    lateinit var passcodeCryptObjectFactory: PasscodeCryptObjectFactory
 
     private val chooseAccountViewModel by activityViewModels<ChooseAccountViewModel>()
 
@@ -104,7 +107,10 @@ class ChooseAccountFragment : Fragment() {
 
         val mode by getThemeMode()
             .collectAsStateWithLifecycle(initialValue = ThemeMode.System)
-        OriginalTheme(isDark = mode.isDarkMode()) {
+        MegaAppContainer(
+            themeMode = mode,
+            passcodeCryptObjectFactory = passcodeCryptObjectFactory
+        ) {
             val modifier = Modifier
                 .semantics {
                     testTagsAsResourceId = true

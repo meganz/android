@@ -54,6 +54,8 @@ import mega.privacy.android.domain.exception.ProductNotFoundException
 import mega.privacy.android.domain.qualifier.ApplicationScope
 import mega.privacy.android.domain.qualifier.IoDispatcher
 import mega.privacy.android.domain.qualifier.MainDispatcher
+import mega.privacy.android.domain.repository.AccountRepository
+import mega.privacy.android.domain.repository.security.LoginRepository
 import timber.log.Timber
 import java.util.concurrent.atomic.AtomicReference
 import javax.inject.Inject
@@ -81,6 +83,8 @@ internal class BillingFacade @Inject constructor(
     private val accountInfoWrapper: AccountInfoWrapper,
     private val productDetailsListCache: Cache<List<ProductDetails>>,
     private val activeSubscription: Cache<MegaPurchase>,
+    private val accountRepository: AccountRepository,
+    private val loginRepository: LoginRepository,
 ) : BillingGateway, PurchasesUpdatedListener, DefaultLifecycleObserver {
     private val mutex = Mutex()
     private val proceedPurchaseMutex = Mutex()
@@ -94,12 +98,24 @@ internal class BillingFacade @Inject constructor(
         applicationScope.launch(mainDispatcher) {
             ProcessLifecycleOwner.get().lifecycle.addObserver(this@BillingFacade)
         }
+        applicationScope.launch(exceptionHandler) {
+            loginRepository.monitorFetchNodesFinish().collect {
+                if (it) {
+                    queryPurchase()
+                }
+            }
+        }
     }
 
     override fun onStart(owner: LifecycleOwner) {
         applicationScope.launch(exceptionHandler) {
             ensureConnect()
-            queryPurchase()
+            if (skusCache.get().isNullOrEmpty()) {
+                querySkus()
+            }
+            if (accountRepository.isUserLoggedIn()) {
+                queryPurchase()
+            }
         }
     }
 

@@ -1130,14 +1130,6 @@ abstract class BaseActivity : AppCompatActivity(), ActivityLauncher, PermissionR
         requestPermission(this, requestCode, *permissions)
     }
 
-    /**
-     * Initializes billing manager.
-     */
-    protected fun preloadPayment() {
-        billingViewModel.loadSkus()
-        billingViewModel.loadPurchases()
-    }
-
     private fun onPurchasesUpdated(
         purchases: List<MegaPurchase>,
         activeSubscription: MegaPurchase?,

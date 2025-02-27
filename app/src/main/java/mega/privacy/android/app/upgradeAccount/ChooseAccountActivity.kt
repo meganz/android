@@ -4,14 +4,14 @@ import android.content.Intent
 import android.os.Bundle
 import android.view.MenuItem
 import androidx.activity.enableEdgeToEdge
+import androidx.appcompat.app.AppCompatActivity
 import mega.privacy.android.app.R
-import mega.privacy.android.app.activities.PasscodeActivity
 import mega.privacy.android.app.constants.IntentConstants
 import mega.privacy.android.app.main.ManagerActivity
 import mega.privacy.android.app.utils.Constants
 import mega.privacy.android.domain.entity.AccountType
 
-open class ChooseAccountActivity : PasscodeActivity() {
+open class ChooseAccountActivity : AppCompatActivity() {
 
     override fun onCreate(savedInstanceState: Bundle?) {
         enableEdgeToEdge()

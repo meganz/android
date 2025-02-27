@@ -1425,7 +1425,6 @@ class ManagerActivity : PasscodeActivity(), NavigationView.OnNavigationItemSelec
                 MegaMessageService.getToken(workManager, crashReporter)
             }
             userInfoViewModel.getUserInfo()
-            preloadPayment()
             if (savedInstanceState == null) {
                 // Check the consistency of the offline nodes in the database and sync files
                 viewModel.startOfflineSyncWorker()
