@@ -4401,7 +4401,11 @@ class ManagerActivity : PasscodeActivity(), NavigationView.OnNavigationItemSelec
             }
         }
         if (drawerItem === DrawerItem.HOMEPAGE) {
-            if (homepageScreen == HomepageScreen.FAVOURITES) {
+            if (listOf(
+                    HomepageScreen.FAVOURITES,
+                    HomepageScreen.DOCUMENTS
+                ).contains(homepageScreen)
+            ) {
                 searchMenuItem?.isVisible = true
             } else {
                 // Get the Searchable again at onCreateOptionsMenu() after screen rotation

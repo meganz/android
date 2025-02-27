@@ -26,6 +26,7 @@ class NodeSourceTypeMapper @Inject constructor() {
     ) = when (drawerItem) {
         DrawerItem.HOMEPAGE -> when (homepageScreen) {
             HomepageScreen.FAVOURITES -> NodeSourceType.FAVOURITES
+            HomepageScreen.DOCUMENTS -> NodeSourceType.DOCUMENTS
             else -> NodeSourceType.HOME
         }
 

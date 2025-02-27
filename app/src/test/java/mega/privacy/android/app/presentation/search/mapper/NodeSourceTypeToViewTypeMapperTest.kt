@@ -1,7 +1,6 @@
 package mega.privacy.android.app.presentation.search.mapper
 
 import com.google.common.truth.Truth.assertThat
-import mega.privacy.android.app.presentation.search.mapper.NodeSourceTypeToViewTypeMapper
 import mega.privacy.android.app.utils.Constants
 import mega.privacy.android.domain.entity.node.NodeSourceType
 import org.junit.jupiter.api.TestInstance
@@ -32,6 +31,8 @@ class NodeSourceTypeToViewTypeMapperTest {
         Arguments.of(NodeSourceType.OUTGOING_SHARES, Constants.OUTGOING_SHARES_ADAPTER),
         Arguments.of(NodeSourceType.INCOMING_SHARES, Constants.INCOMING_SHARES_ADAPTER),
         Arguments.of(NodeSourceType.RUBBISH_BIN, Constants.RUBBISH_BIN_ADAPTER),
+        Arguments.of(NodeSourceType.FAVOURITES, Constants.FAVOURITES_ADAPTER),
+        Arguments.of(NodeSourceType.DOCUMENTS, Constants.DOCUMENTS_BROWSE_ADAPTER),
         Arguments.of(NodeSourceType.OTHER, null),
     )
 }

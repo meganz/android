@@ -19,7 +19,6 @@ import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 import mega.privacy.android.app.domain.usecase.GetNodeByHandle
 import mega.privacy.android.app.featuretoggle.ApiFeatures
-import mega.privacy.android.app.featuretoggle.AppFeatures
 import mega.privacy.android.app.presentation.documentsection.model.DocumentSectionUiState
 import mega.privacy.android.app.presentation.documentsection.model.DocumentUiEntity
 import mega.privacy.android.app.presentation.documentsection.model.DocumentUiEntityMapper
@@ -83,7 +82,6 @@ class DocumentSectionViewModel @Inject constructor(
     private val _uiState = MutableStateFlow(DocumentSectionUiState())
     internal val uiState = _uiState.asStateFlow()
 
-    private var searchQuery = ""
     private val originalData = mutableListOf<DocumentUiEntity>()
     private var showHiddenItems: Boolean? = null
 
@@ -172,7 +170,7 @@ class DocumentSectionViewModel @Inject constructor(
                 showHiddenItems = showHiddenItems,
                 isPaid = _uiState.value.accountType?.isPaid,
                 isBusinessAccountExpired = _uiState.value.isBusinessAccountExpired,
-            ).updateOriginalData().filterDocumentsBySearchQuery()
+            ).updateOriginalData()
         }.onSuccess { documentList ->
             val sortOrder = getCloudSortOrder()
             _uiState.update {
@@ -196,50 +194,11 @@ class DocumentSectionViewModel @Inject constructor(
         originalData.addAll(data)
     }
 
-    private fun List<DocumentUiEntity>.filterDocumentsBySearchQuery() =
-        filter { document ->
-            document.name.contains(searchQuery, true)
-        }
-
     private fun checkViewType() {
         viewModelScope.launch {
             monitorViewType().collect { viewType ->
                 _uiState.update { it.copy(currentViewType = viewType) }
             }
-        }
-    }
-
-    internal fun shouldShowSearchMenu() = _uiState.value.allDocuments.isNotEmpty()
-
-    internal fun searchReady() {
-        if (_uiState.value.searchMode)
-            return
-
-        _uiState.update { it.copy(searchMode = true) }
-        searchQuery = ""
-    }
-
-    internal fun searchQuery(query: String) {
-        if (searchQuery == query)
-            return
-
-        searchQuery = query
-        searchNodeByQueryString()
-    }
-
-    internal fun exitSearch() {
-        _uiState.update { it.copy(searchMode = false) }
-        searchQuery = ""
-        searchNodeByQueryString()
-    }
-
-    private fun searchNodeByQueryString() {
-        val documents = originalData.filterDocumentsBySearchQuery()
-        _uiState.update {
-            it.copy(
-                allDocuments = documents,
-                scrollToTop = true
-            )
         }
     }
 

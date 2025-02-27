@@ -41,6 +41,12 @@ class NodeSourceTypeMapperTest {
             NodeSourceType.FAVOURITES
         ),
         Arguments.of(
+            DrawerItem.HOMEPAGE,
+            HomepageScreen.DOCUMENTS,
+            SharesTab.NONE,
+            NodeSourceType.DOCUMENTS
+        ),
+        Arguments.of(
             DrawerItem.CLOUD_DRIVE,
             HomepageScreen.HOMEPAGE,
             SharesTab.NONE,
