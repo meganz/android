@@ -183,6 +183,7 @@ internal fun StartTransferComponent(
         onPreviewOpened = viewModel::consumePreviewFileOpened,
         onCancelTransferConfirmed = viewModel::cancelTransferConfirmed,
         onCancelTransferCancelled = viewModel::cancelTransferCancelled,
+        onConsumeCancelTransferResult = viewModel::onConsumeCancelTransferResult,
     )
 }
 
@@ -239,6 +240,7 @@ private fun StartTransferComponent(
     onPreviewOpened: () -> Unit,
     onCancelTransferConfirmed: () -> Unit,
     onCancelTransferCancelled: () -> Unit,
+    onConsumeCancelTransferResult: () -> Unit,
 ) {
     val context = LocalContext.current
     val coroutineScope = rememberCoroutineScope()
@@ -462,11 +464,26 @@ private fun StartTransferComponent(
     }
     uiState.transferTagToCancel?.let {
         CancelTransferDialog(
-            title = "Cancel download?",
+            title = stringResource(sharedR.string.transfers_cancel_download_warning_title),
             onCancelTransfer = onCancelTransferConfirmed,
             onDismiss = onCancelTransferCancelled
         )
     }
+    EventEffect(
+        event = uiState.cancelTransferResult,
+        onConsumed = onConsumeCancelTransferResult,
+        action = {
+            snackBarHostState.showAutoDurationSnackbar(
+                context.getString(
+                    if (it.success) {
+                        sharedR.string.transfers_cancel_download_success_message
+                    } else {
+                        R.string.general_error
+                    }
+                )
+            )
+        }
+    )
 }
 
 private val storageStateSaver = Saver<StorageState?, Int>(

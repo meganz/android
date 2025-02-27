@@ -36,7 +36,10 @@ fun CancelTransferDialog(
 @Composable
 private fun CancelTransferDialogPreview() {
     OriginalTheme(isDark = isSystemInDarkTheme()) {
-        CancelTransferDialog(title = "Cancel transfer?", onCancelTransfer = {}, onDismiss = {})
+        CancelTransferDialog(
+            title = stringResource(sharedR.string.transfers_cancel_download_warning_title),
+            onCancelTransfer = {},
+            onDismiss = {})
     }
 }
 

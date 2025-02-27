@@ -24,6 +24,7 @@ import mega.privacy.android.domain.entity.transfer.ActiveTransferTotals
 import mega.privacy.android.domain.entity.transfer.TransferEvent
 import mega.privacy.android.domain.entity.transfer.TransferProgressResult
 import mega.privacy.android.domain.entity.transfer.TransferType
+import mega.privacy.android.domain.entity.transfer.isPreviewDownload
 import mega.privacy.android.domain.monitoring.CrashReporter
 import mega.privacy.android.domain.qualifier.IoDispatcher
 import mega.privacy.android.domain.usecase.featureflag.GetFeatureFlagValueUseCase
@@ -133,8 +134,12 @@ class DownloadsWorker @AssistedInject constructor(
     override suspend fun createFinishSummaryNotification(): Notification =
         transfersFinishNotificationSummaryBuilder(type)
 
-    override suspend fun createActionGroupFinishNotification(group: ActiveTransferTotals.Group): Notification =
-        transfersActionGroupFinishNotificationBuilder(group, type)
+    override suspend fun createActionGroupFinishNotification(group: ActiveTransferTotals.Group): Notification? =
+        if (group.isPreviewDownload() && group.completedFiles == 0) {
+            null
+        } else {
+            transfersActionGroupFinishNotificationBuilder(group, type)
+        }
 
     override suspend fun createProgressSummaryNotification(): Notification =
         transfersProgressNotificationSummaryBuilder(type)

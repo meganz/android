@@ -20,6 +20,7 @@ import kotlinx.coroutines.launch
 import mega.privacy.android.app.middlelayer.iar.OnCompleteListener
 import mega.privacy.android.app.presentation.mapper.file.FileSizeStringMapper
 import mega.privacy.android.app.presentation.transfers.TransfersConstants
+import mega.privacy.android.app.presentation.transfers.starttransfer.model.CancelTransferResult
 import mega.privacy.android.app.presentation.transfers.starttransfer.model.ConfirmLargeDownloadInfo
 import mega.privacy.android.app.presentation.transfers.starttransfer.model.SaveDestinationInfo
 import mega.privacy.android.app.presentation.transfers.starttransfer.model.StartTransferEvent
@@ -923,10 +924,26 @@ internal class StartTransfersComponentViewModel @Inject constructor(
         uiState.value.transferTagToCancel?.let {
             viewModelScope.launch {
                 runCatching { cancelTransferByTagUseCase(it) }
-                    .onFailure { Timber.e(it) }
+                    .onSuccess { setCancelTransferResult(true) }
+                    .onFailure {
+                        Timber.e(it)
+                        setCancelTransferResult(false)
+                    }
             }
             setTransferTagToCancel(null)
         }
+    }
+
+    private fun setCancelTransferResult(success: Boolean) {
+        _uiState.update { state ->
+            state.copy(
+                cancelTransferResult = triggered(CancelTransferResult(success))
+            )
+        }
+    }
+
+    fun onConsumeCancelTransferResult() {
+        _uiState.update { state -> state.copy(cancelTransferResult = consumed()) }
     }
 
     /**

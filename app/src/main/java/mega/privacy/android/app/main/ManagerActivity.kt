@@ -2698,6 +2698,15 @@ class ManagerActivity : PasscodeActivity(), NavigationView.OnNavigationItemSelec
                     showSnackbar(SNACKBAR_TYPE, message, -1)
                 }
 
+                Constants.ACTION_CANCEL_TRANSFER -> {
+                    val invalidTag = -1
+                    intent.getIntExtra(Constants.INTENT_EXTRA_TAG, invalidTag).let { tag ->
+                        tag.takeUnless { it == invalidTag }?.let {
+                            startDownloadViewModel.onCancelPreviewDownload(tag)
+                        }
+                    }
+                }
+
                 Constants.ACTION_TAKE_SELFIE -> {
                     Timber.d("Intent take selfie")
                     Util.checkTakePicture(this, Constants.TAKE_PHOTO_CODE)

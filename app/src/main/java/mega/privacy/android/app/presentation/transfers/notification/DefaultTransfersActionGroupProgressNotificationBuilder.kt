@@ -122,84 +122,53 @@ class DefaultTransfersActionGroupProgressNotificationBuilder @Inject constructor
                 it,
             )
         }
-        val intent = when {
-            isPreviewPaused -> {
-                Intent(context, ResumeTransfersReceiver::class.java)
+        val cancelTransferIntent = Intent(context, ManagerActivity::class.java).apply {
+            action = Constants.ACTION_CANCEL_TRANSFER
+            putExtra(Constants.INTENT_EXTRA_TAG, group.singleTransferTag)
+        }
+        val locateFileIntent = Intent(context, ManagerActivity::class.java).apply {
+            action = Constants.ACTION_LOCATE_DOWNLOADED_FILE
+            putExtra(Constants.INTENT_EXTRA_IS_OFFLINE_PATH, isOfflineDownload)
+            putExtra(FileStorageActivity.EXTRA_PATH, destination)
+            group.singleFileName?.let {
+                putExtra(FileStorageActivity.EXTRA_FILE_NAME, it)
             }
-
-            isPreviewDownload -> {
-                null
-            }
-
-            getFeatureFlagValueUseCase(AppFeatures.TransfersSection) -> {
+        }
+        val openTransfersSectionIntent =
+            if (getFeatureFlagValueUseCase(AppFeatures.TransfersSection)) {
                 Intent(context, TransfersActivity::class.java).apply {
                     putExtra(EXTRA_TAB, COMPLETED_TAB_INDEX)
                 }
-            }
-
-            else -> {
+            } else {
                 Intent(context, ManagerActivity::class.java).apply {
                     action = Constants.ACTION_SHOW_TRANSFERS
                     putExtra(ManagerActivity.TRANSFERS_TAB, TransfersTab.COMPLETED_TAB)
                 }
             }
+        val pendingIntent = if (!isPreviewDownload) {
+            PendingIntent.getActivity(
+                context,
+                0,
+                openTransfersSectionIntent,
+                PendingIntent.FLAG_UPDATE_CURRENT or PendingIntent.FLAG_IMMUTABLE
+            )
+        } else {
+            null
         }
-        val pendingIntent = intent?.let {
-            if (isPreviewPaused) {
-                PendingIntent.getBroadcast(
-                    context,
-                    0,
-                    intent,
-                    PendingIntent.FLAG_UPDATE_CURRENT or PendingIntent.FLAG_IMMUTABLE
-                )
+        val actionPendingIntent = PendingIntent.getActivity(
+            context,
+            System.currentTimeMillis()
+                .toInt(), // Unique request code to make sure old intents are not reused
+            if (isPreviewDownload) {
+                cancelTransferIntent
             } else {
-                PendingIntent.getActivity(
-                    context,
-                    0,
-                    intent,
-                    PendingIntent.FLAG_UPDATE_CURRENT or PendingIntent.FLAG_IMMUTABLE
-                )
-            }
-        }
-
-        val actionIntent = when {
-            isPreviewDownload -> {
-                intent
-            }
-
-            else -> {
-                Intent(context, ManagerActivity::class.java).apply {
-                    action = Constants.ACTION_LOCATE_DOWNLOADED_FILE
-                    putExtra(Constants.INTENT_EXTRA_IS_OFFLINE_PATH, isOfflineDownload)
-                    putExtra(FileStorageActivity.EXTRA_PATH, destination)
-                    group.singleFileName?.let {
-                        putExtra(FileStorageActivity.EXTRA_FILE_NAME, it)
-                    }
-                }
-            }
-        }
-
-        val actionPendingIntent = actionIntent?.let {
-            if (isPreviewPaused) {
-                pendingIntent
-            } else {
-                PendingIntent.getActivity(
-                    context,
-                    System.currentTimeMillis()
-                        .toInt(), // Unique request code to make sure old intents are not reused
-                    actionIntent,
-                    PendingIntent.FLAG_UPDATE_CURRENT or PendingIntent.FLAG_IMMUTABLE
-                )
-            }
-        }
-
+                locateFileIntent
+            },
+            PendingIntent.FLAG_UPDATE_CURRENT or PendingIntent.FLAG_IMMUTABLE
+        )
         val actionText = when {
-            isPreviewDownload && paused -> {
-                resources.getString(R.string.option_resume_transfers)
-            }
-
             isPreviewDownload -> {
-                null
+                resources.getString(sharedR.string.general_dialog_cancel_button)
             }
 
             else -> {
@@ -222,11 +191,22 @@ class DefaultTransfersActionGroupProgressNotificationBuilder @Inject constructor
                 contentText?.let {
                     setContentText(it)
                 }
-                actionText?.let {
+                addAction(
+                    iconPackR.drawable.ic_stat_notify,
+                    actionText,
+                    actionPendingIntent
+                )
+                if (isPreviewPaused) {
+                    val resumeTransfersPendingIntent = PendingIntent.getBroadcast(
+                        context,
+                        0,
+                        Intent(context, ResumeTransfersReceiver::class.java),
+                        PendingIntent.FLAG_UPDATE_CURRENT or PendingIntent.FLAG_IMMUTABLE
+                    )
                     addAction(
                         iconPackR.drawable.ic_stat_notify,
-                        actionText,
-                        actionPendingIntent
+                        resources.getString(R.string.option_resume_transfers),
+                        resumeTransfersPendingIntent
                     )
                 }
             }
