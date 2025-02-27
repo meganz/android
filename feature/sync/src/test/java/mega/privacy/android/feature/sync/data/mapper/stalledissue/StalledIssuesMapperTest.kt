@@ -34,7 +34,7 @@ internal class StalledIssuesMapperTest {
                     syncType = SyncType.TYPE_TWOWAY,
                     pairName = "",
                     localFolderPath = syncLocalFolderPath,
-                    remoteFolder = RemoteFolder(id = 1L, name = stalledIssueNodeName),
+                    remoteFolder = RemoteFolder(id = NodeId(1L), name = stalledIssueNodeName),
                     syncStatus = SyncStatus.SYNCED
                 )
             )

@@ -1373,7 +1373,7 @@ class ManagerViewModelTest {
                 syncType = SyncType.TYPE_TWOWAY,
                 pairName = "folder name",
                 localFolderPath = "folder name",
-                remoteFolder = RemoteFolder(id = 1L, name = "folder name"),
+                remoteFolder = RemoteFolder(id = NodeId(1L), name = "folder name"),
                 syncStatus = SyncStatus.SYNCING,
             )
             testScheduler.advanceUntilIdle()

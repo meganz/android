@@ -5,6 +5,7 @@ import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.test.UnconfinedTestDispatcher
 import kotlinx.coroutines.test.runTest
 import mega.privacy.android.data.gateway.FileGateway
+import mega.privacy.android.domain.entity.node.NodeId
 import mega.privacy.android.domain.entity.sync.SyncType
 import mega.privacy.android.feature.sync.data.gateway.SyncDebrisGateway
 import mega.privacy.android.feature.sync.domain.entity.FolderPair
@@ -74,7 +75,7 @@ class SyncDebrisRepositoryImplTest {
                 syncType = SyncType.TYPE_TWOWAY,
                 pairName = "",
                 localFolderPath = "storage/emulated/0/sync",
-                remoteFolder = RemoteFolder(id = 12L, name = "some folder"),
+                remoteFolder = RemoteFolder(id = NodeId(12L), name = "some folder"),
                 syncStatus = SyncStatus.SYNCED
             ),
             FolderPair(
@@ -82,7 +83,7 @@ class SyncDebrisRepositoryImplTest {
                 syncType = SyncType.TYPE_TWOWAY,
                 pairName = "",
                 localFolderPath = "storage/emulated/0/anothersync",
-                remoteFolder = RemoteFolder(id = 434L, name = "some other folder"),
+                remoteFolder = RemoteFolder(id = NodeId(434L), name = "some other folder"),
                 syncStatus = SyncStatus.SYNCED
             ),
         )

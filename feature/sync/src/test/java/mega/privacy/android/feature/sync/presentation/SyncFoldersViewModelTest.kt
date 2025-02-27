@@ -95,7 +95,7 @@ class SyncFoldersViewModelTest {
             syncType = SyncType.TYPE_TWOWAY,
             pairName = "folderPair",
             localFolderPath = "DCIM",
-            remoteFolder = RemoteFolder(id = 233L, name = "photos"),
+            remoteFolder = RemoteFolder(id = NodeId(233L), name = "photos"),
             syncStatus = SyncStatus.SYNCING
         )
     )
@@ -273,7 +273,7 @@ class SyncFoldersViewModelTest {
     @Test
     fun `test that confirm the remove action for a Backup with move option removes folder pair and moves remote folder to selected folder`() =
         runTest {
-            val remoteFolder = RemoteFolder(123L, "Selected Folder")
+            val remoteFolder = RemoteFolder(NodeId(123L), "Selected Folder")
             whenever(syncUiItemMapper(folderPairs)).thenReturn(syncUiItems)
             val syncUiItem = syncUiItems.first { it.syncType == SyncType.TYPE_BACKUP }
             whenever(removeFolderPairUseCase(syncUiItem.id)).thenReturn(Unit)
@@ -289,7 +289,7 @@ class SyncFoldersViewModelTest {
             verify(removeFolderPairUseCase).invoke(folderPairId = syncUiItem.id)
             verify(moveDeconfiguredBackupNodesUseCase).invoke(
                 deconfiguredBackupRoot = syncUiItem.megaStorageNodeId,
-                backupDestination = NodeId(remoteFolder.id)
+                backupDestination = remoteFolder.id
             )
         }
 

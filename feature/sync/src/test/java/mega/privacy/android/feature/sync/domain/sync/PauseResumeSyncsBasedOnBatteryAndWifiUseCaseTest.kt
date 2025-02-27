@@ -3,6 +3,7 @@ package mega.privacy.android.feature.sync.domain.sync
 import kotlinx.coroutines.flow.flowOf
 import kotlinx.coroutines.test.runTest
 import mega.privacy.android.domain.entity.BatteryInfo
+import mega.privacy.android.domain.entity.node.NodeId
 import mega.privacy.android.domain.entity.sync.SyncType
 import mega.privacy.android.domain.usecase.IsOnWifiNetworkUseCase
 import mega.privacy.android.feature.sync.domain.entity.FolderPair
@@ -44,14 +45,14 @@ class PauseResumeSyncsBasedOnBatteryAndWifiUseCaseTest {
             syncType = SyncType.TYPE_TWOWAY,
             pairName = "name",
             localFolderPath = "localPath",
-            remoteFolder = RemoteFolder(123L, "remotePath"),
+            remoteFolder = RemoteFolder(NodeId(123L), "remotePath"),
             syncStatus = SyncStatus.SYNCING
         ), FolderPair(
             id = secondSyncId,
             syncType = SyncType.TYPE_TWOWAY,
             pairName = "name2",
             localFolderPath = "localPath2",
-            remoteFolder = RemoteFolder(234L, "remotePath2"),
+            remoteFolder = RemoteFolder(NodeId(234L), "remotePath2"),
             syncStatus = SyncStatus.SYNCING
         )
     )

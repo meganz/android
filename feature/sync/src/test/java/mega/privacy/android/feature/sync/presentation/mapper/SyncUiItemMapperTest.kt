@@ -35,7 +35,7 @@ class SyncUiItemMapperTest {
         syncType = SyncType.TYPE_TWOWAY,
         pairName = "folderPair",
         localFolderPath = "DCIM",
-        remoteFolder = RemoteFolder(id = 233L, name = "photos"),
+        remoteFolder = RemoteFolder(id = NodeId(233L), name = "photos"),
         syncStatus = SyncStatus.SYNCING,
         syncError = null
     )

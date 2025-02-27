@@ -2,6 +2,7 @@ package mega.privacy.android.feature.sync.domain
 
 import com.google.common.truth.Truth.assertThat
 import kotlinx.coroutines.test.runTest
+import mega.privacy.android.domain.entity.node.NodeId
 import mega.privacy.android.domain.entity.sync.SyncType
 import mega.privacy.android.feature.sync.domain.entity.FolderPair
 import mega.privacy.android.feature.sync.domain.entity.RemoteFolder
@@ -52,7 +53,7 @@ class IsOnboardingRequiredUseCaseTest {
             syncType = SyncType.TYPE_TWOWAY,
             pairName = "",
             localFolderPath = "",
-            remoteFolder = RemoteFolder(id = 1, name = ""),
+            remoteFolder = RemoteFolder(id = NodeId(1L), name = ""),
             syncStatus = SyncStatus.SYNCING
         )
         whenever(syncPreferencesRepository.getOnboardingShown()).thenReturn(false)

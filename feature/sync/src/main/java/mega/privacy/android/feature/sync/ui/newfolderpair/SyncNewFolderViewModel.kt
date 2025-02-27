@@ -16,6 +16,7 @@ import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.collectLatest
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
+import mega.privacy.android.domain.entity.node.NodeId
 import mega.privacy.android.domain.entity.sync.SyncType
 import mega.privacy.android.domain.repository.BackupRepository.Companion.BACKUPS_FOLDER_DEFAULT_NAME
 import mega.privacy.android.domain.usecase.account.IsStorageOverQuotaUseCase
@@ -75,7 +76,12 @@ internal class SyncNewFolderViewModel @AssistedInject constructor(
         }
         if (remoteFolderHandle != null && remoteFolderName != null) {
             _state.update { state ->
-                state.copy(selectedMegaFolder = RemoteFolder(remoteFolderHandle, remoteFolderName))
+                state.copy(
+                    selectedMegaFolder = RemoteFolder(
+                        NodeId(remoteFolderHandle),
+                        remoteFolderName
+                    )
+                )
             }
         }
     }
@@ -196,7 +202,7 @@ internal class SyncNewFolderViewModel @AssistedInject constructor(
             syncType = state.value.syncType,
             name = null,
             localPath = state.value.selectedLocalFolder,
-            remotePath = RemoteFolder(-1L, ""),
+            remotePath = RemoteFolder(NodeId(-1L), ""),
         )
     }
 

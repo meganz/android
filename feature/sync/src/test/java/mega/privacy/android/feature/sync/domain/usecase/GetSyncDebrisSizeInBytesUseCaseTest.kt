@@ -3,6 +3,7 @@ package mega.privacy.android.feature.sync.domain.usecase
 import com.google.common.truth.Truth.assertThat
 import kotlinx.coroutines.flow.flowOf
 import kotlinx.coroutines.test.runTest
+import mega.privacy.android.domain.entity.node.NodeId
 import mega.privacy.android.domain.entity.sync.SyncType
 import mega.privacy.android.feature.sync.domain.entity.FolderPair
 import mega.privacy.android.feature.sync.domain.entity.RemoteFolder
@@ -47,7 +48,7 @@ class GetSyncDebrisSizeInBytesUseCaseTest {
             syncType = SyncType.TYPE_TWOWAY,
             pairName = "Sync",
             localFolderPath = "/storage/emulated/0/Sync",
-            remoteFolder = RemoteFolder(1244L, "sync_mobile"),
+            remoteFolder = RemoteFolder(NodeId(1244L), "sync_mobile"),
             syncStatus = SyncStatus.SYNCED,
         )
         val secondSync = FolderPair(
@@ -55,7 +56,7 @@ class GetSyncDebrisSizeInBytesUseCaseTest {
             syncType = SyncType.TYPE_TWOWAY,
             pairName = "Trip_to_NZ",
             localFolderPath = "/storage/emulated/0/Trip_to_nz",
-            remoteFolder = RemoteFolder(1244L, "NZ_trip"),
+            remoteFolder = RemoteFolder(NodeId(1244L), "NZ_trip"),
             syncStatus = SyncStatus.SYNCED,
         )
         val firstSyncDebrisSizeInBytes = 1000L

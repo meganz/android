@@ -32,7 +32,7 @@ internal class SyncUiItemMapper @Inject constructor(
             hasStalledIssues = false,
             deviceStoragePath = folderPair.localFolderPath,
             megaStoragePath = folderPair.remoteFolder.name,
-            megaStorageNodeId = NodeId(folderPair.remoteFolder.id),
+            megaStorageNodeId = folderPair.remoteFolder.id,
             expanded = false,
             error = deviceFolderUINodeErrorMessageMapper(folderPair.syncError)
         )

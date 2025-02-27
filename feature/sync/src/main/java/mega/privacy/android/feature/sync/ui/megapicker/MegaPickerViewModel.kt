@@ -171,7 +171,7 @@ internal class MegaPickerViewModel @Inject constructor(
         val id = state.value.currentFolder?.id?.longValue
         val name = state.value.currentFolder?.name
         if (id != null && name != null) {
-            setSelectedMegaFolderUseCase(RemoteFolder(id, name))
+            setSelectedMegaFolderUseCase(RemoteFolder(NodeId(id), name))
         }
     }
 

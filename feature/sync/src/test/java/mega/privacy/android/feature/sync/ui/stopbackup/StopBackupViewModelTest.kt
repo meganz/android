@@ -7,6 +7,7 @@ import kotlinx.coroutines.awaitCancellation
 import kotlinx.coroutines.flow.flow
 import kotlinx.coroutines.test.runTest
 import mega.privacy.android.core.test.extension.CoroutineMainDispatcherExtension
+import mega.privacy.android.domain.entity.node.NodeId
 import mega.privacy.android.feature.sync.domain.entity.RemoteFolder
 import mega.privacy.android.feature.sync.domain.usecase.sync.option.MonitorSelectedMegaFolderUseCase
 import mega.privacy.android.feature.sync.ui.stopbackup.model.StopBackupState
@@ -66,7 +67,7 @@ internal class StopBackupViewModelTest {
 
     @Test
     fun `test that when mega folder is selected state is also updated`() = runTest {
-        val remoteFolder = RemoteFolder(123L, "Selected Folder")
+        val remoteFolder = RemoteFolder(NodeId(123L), "Selected Folder")
         whenever(monitorSelectedMegaFolderUseCase()).thenReturn(flow {
             emit(remoteFolder)
             awaitCancellation()

@@ -3,6 +3,7 @@ package mega.privacy.android.feature.sync.data.mapper
 import com.google.common.truth.Truth
 import mega.privacy.android.data.mapper.backup.SyncErrorMapper
 import mega.privacy.android.data.mapper.sync.SyncTypeMapper
+import mega.privacy.android.domain.entity.node.NodeId
 import mega.privacy.android.domain.entity.sync.SyncType
 import mega.privacy.android.feature.sync.domain.entity.FolderPair
 import mega.privacy.android.feature.sync.domain.entity.RemoteFolder
@@ -53,7 +54,7 @@ internal class FolderPairMapperTest {
             syncType = SyncType.TYPE_TWOWAY,
             pairName = "",
             localFolderPath = syncLocalFolder,
-            remoteFolder = RemoteFolder(id = 1L, name = syncRemoteFolder),
+            remoteFolder = RemoteFolder(id = NodeId(1L), name = syncRemoteFolder),
             syncStatus = SyncStatus.SYNCED
         )
 

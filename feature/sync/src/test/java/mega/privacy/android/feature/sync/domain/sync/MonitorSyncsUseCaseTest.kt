@@ -6,6 +6,7 @@ import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.awaitCancellation
 import kotlinx.coroutines.flow.flow
 import kotlinx.coroutines.test.runTest
+import mega.privacy.android.domain.entity.node.NodeId
 import mega.privacy.android.domain.entity.sync.SyncType
 import mega.privacy.android.feature.sync.domain.entity.FolderPair
 import mega.privacy.android.feature.sync.domain.entity.RemoteFolder
@@ -35,7 +36,7 @@ class MonitorSyncsUseCaseTest {
             syncType = SyncType.TYPE_TWOWAY,
             pairName = "folderPair",
             localFolderPath = "DCIM",
-            remoteFolder = RemoteFolder(id = 233L, name = "photos"),
+            remoteFolder = RemoteFolder(id = NodeId(233L), name = "photos"),
             syncStatus = SyncStatus.SYNCING
         )
     )

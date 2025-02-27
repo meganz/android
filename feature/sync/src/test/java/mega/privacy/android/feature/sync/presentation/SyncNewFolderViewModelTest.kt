@@ -148,7 +148,7 @@ internal class SyncNewFolderViewModelTest {
                     syncType = SyncType.TYPE_TWOWAY,
                     pairName = "Pair Name",
                     localFolderPath = localFolderPath,
-                    remoteFolder = RemoteFolder(5678L, "Remote Folder"),
+                    remoteFolder = RemoteFolder(NodeId(5678L), "Remote Folder"),
                     syncStatus = SyncStatus.SYNCED,
                 )
             )
@@ -186,7 +186,7 @@ internal class SyncNewFolderViewModelTest {
                     syncType = SyncType.TYPE_BACKUP,
                     pairName = "Pair Name",
                     localFolderPath = localFolderPath,
-                    remoteFolder = RemoteFolder(5678L, "Remote Folder"),
+                    remoteFolder = RemoteFolder(NodeId(5678L), "Remote Folder"),
                     syncStatus = SyncStatus.SYNCED,
                 )
             )
@@ -208,7 +208,7 @@ internal class SyncNewFolderViewModelTest {
     @MethodSource("syncTypeParameters")
     fun `test that when mega folder is updated state is also updated`(syncType: SyncType) =
         runTest {
-            val remoteFolder = RemoteFolder(123L, "someFolder")
+            val remoteFolder = RemoteFolder(NodeId(123L), "someFolder")
             whenever(monitorSelectedMegaFolderUseCase()).thenReturn(flow {
                 emit(remoteFolder)
                 awaitCancellation()
@@ -231,9 +231,9 @@ internal class SyncNewFolderViewModelTest {
     fun `test that next click creates new folder pair and navigates to next screen`(syncType: SyncType) =
         runTest {
             val remoteFolder = if (syncType == SyncType.TYPE_TWOWAY) {
-                RemoteFolder(123L, "someFolder")
+                RemoteFolder(NodeId(123L), "someFolder")
             } else {
-                RemoteFolder(-1L, "")
+                RemoteFolder(NodeId(-1L), "")
             }
             whenever(isStorageOverQuotaUseCase()).thenReturn(false)
             whenever(monitorSelectedMegaFolderUseCase()).thenReturn(flow {
@@ -270,7 +270,7 @@ internal class SyncNewFolderViewModelTest {
     @Test
     fun `test that next click creates backups node, new folder pair and navigates to next screen`() =
         runTest {
-            val remoteFolder = RemoteFolder(-1L, "")
+            val remoteFolder = RemoteFolder(NodeId(-1L), "")
             whenever(isStorageOverQuotaUseCase()).thenReturn(false)
             whenever(monitorSelectedMegaFolderUseCase()).thenReturn(flow {
                 emit(remoteFolder)
@@ -363,7 +363,7 @@ internal class SyncNewFolderViewModelTest {
     fun `test that selected mega folder is set when view model is initiated with remote folder parameters`(
     ) = runTest {
 
-        val remoteFolder = RemoteFolder(123L, "someFolder")
+        val remoteFolder = RemoteFolder(NodeId(123L), "someFolder")
         whenever(monitorSelectedMegaFolderUseCase()).thenReturn(flow {
             awaitCancellation()
         })
@@ -403,12 +403,12 @@ internal class SyncNewFolderViewModelTest {
 
     private fun initViewModel(
         syncType: SyncType,
-        remoteFolderHandle: Long? = null,
+        remoteFolderHandle: NodeId? = null,
         remoteFolderName: String? = null,
     ) {
         underTest = SyncNewFolderViewModel(
             syncType = syncType,
-            remoteFolderHandle = remoteFolderHandle,
+            remoteFolderHandle = remoteFolderHandle?.longValue,
             remoteFolderName = remoteFolderName,
             monitorSelectedMegaFolderUseCase = monitorSelectedMegaFolderUseCase,
             syncFolderPairUseCase = syncFolderPairUseCase,

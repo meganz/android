@@ -324,7 +324,7 @@ internal class SyncFoldersViewModel @Inject constructor(
                                             runCatching {
                                                 moveDeconfiguredBackupNodesUseCase(
                                                     deconfiguredBackupRoot = megaStorageNodeId,
-                                                    backupDestination = NodeId(selectedFolder.id),
+                                                    backupDestination = selectedFolder.id,
                                                 )
                                             }.onFailure {
                                                 Timber.e(it)

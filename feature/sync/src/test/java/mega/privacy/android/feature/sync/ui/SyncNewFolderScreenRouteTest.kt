@@ -1,5 +1,6 @@
 package mega.privacy.android.feature.sync.ui
 
+import mega.privacy.android.shared.resources.R as sharedResR
 import androidx.activity.ComponentActivity
 import androidx.compose.ui.test.assertIsDisplayed
 import androidx.compose.ui.test.junit4.createAndroidComposeRule
@@ -10,6 +11,7 @@ import androidx.test.ext.junit.runners.AndroidJUnit4
 import com.google.common.truth.Truth.assertThat
 import kotlinx.coroutines.flow.StateFlow
 import mega.privacy.android.core.test.AnalyticsTestRule
+import mega.privacy.android.domain.entity.node.NodeId
 import mega.privacy.android.domain.entity.sync.SyncType
 import mega.privacy.android.feature.sync.R
 import mega.privacy.android.feature.sync.domain.entity.RemoteFolder
@@ -19,9 +21,8 @@ import mega.privacy.android.feature.sync.ui.newfolderpair.SyncNewFolderViewModel
 import mega.privacy.android.feature.sync.ui.newfolderpair.TAG_SYNC_NEW_FOLDER_SCREEN_SYNC_BUTTON
 import mega.privacy.android.feature.sync.ui.newfolderpair.TAG_SYNC_NEW_FOLDER_SCREEN_TOOLBAR
 import mega.privacy.android.feature.sync.ui.permissions.SyncPermissionsManager
-import mega.privacy.android.shared.original.core.ui.controls.appbar.APP_BAR_BACK_BUTTON_TAG
-import mega.privacy.android.shared.resources.R as sharedResR
 import mega.privacy.android.feature.sync.ui.views.SELECT_DEVICE_FOLDER_OPTION_TEST_TAG
+import mega.privacy.android.shared.original.core.ui.controls.appbar.APP_BAR_BACK_BUTTON_TAG
 import mega.privacy.mobile.analytics.event.AndroidSyncSelectDeviceFolderButtonPressedEvent
 import mega.privacy.mobile.analytics.event.SyncNewFolderScreenBackNavigationEvent
 import org.junit.Rule
@@ -174,7 +175,7 @@ class SyncNewFolderScreenRouteTest {
                 syncType = SyncType.TYPE_TWOWAY,
                 deviceName = "Device Name",
                 selectedMegaFolder = RemoteFolder(
-                    id = 0, megaFolderName
+                    id = NodeId(0L), megaFolderName
                 ),
             )
         )
