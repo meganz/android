@@ -23,6 +23,7 @@ data class DocumentEntity(
     val isFolder: Boolean = false,
     val numFiles: Int = 0,
     val numFolders: Int = 0,
+    val canRead: Boolean = true,
     val originalName: String = name,
 ) {
     /**

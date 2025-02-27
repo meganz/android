@@ -7,6 +7,7 @@ import static mega.privacy.android.app.utils.Util.getNumberItemChildren;
 import static mega.privacy.android.app.utils.Util.getSizeString;
 
 import android.content.Context;
+import android.net.Uri;
 import android.util.DisplayMetrics;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -95,7 +96,8 @@ public class FileStorageAdapter extends RecyclerView.Adapter<FileStorageAdapter.
         holder.textViewFileName.setText(document.getName());
 
         if (document.isFolder()) {
-            String items = getNumberItemChildren(document.getFile(), context);
+            int childrenCount = document.getTotalChildren();
+            String items =  context.getResources().getQuantityString(R.plurals.general_num_items, childrenCount, childrenCount);
             holder.textViewFileSize.setText(items);
         } else {
             long documentSize = document.getSize();
@@ -122,18 +124,16 @@ public class FileStorageAdapter extends RecyclerView.Adapter<FileStorageAdapter.
                     holder.imageView.setImageResource(mega.privacy.android.icon.pack.R.drawable.ic_folder_medium_solid);
                 } else {
                     if (MimeTypeList.typeForName(document.getName()).isImage() || MimeTypeList.typeForName(document.getName()).isVideo()) {
-                        String filePath = document.getFile().getAbsolutePath();
-                        String key = megaApi.getFingerprint(filePath);
-                        if (!TextUtil.isTextEmpty(key)) {
+                        Uri uri = document.getUri();
+
                             Coil.imageLoader(context).enqueue(
                                     new ImageRequest.Builder(context)
                                             .placeholder(MimeTypeList.typeForName(document.getName()).getIconResourceId())
-                                            .data(filePath)
+                                            .data(uri)
                                             .target(holder.imageView)
                                             .transformations(new RoundedCornersTransformation(context.getResources().getDimensionPixelSize(R.dimen.thumbnail_corner_radius)))
                                             .build()
                             );
-                        }
                     } else {
                         holder.imageView.setImageResource(MimeTypeList.typeForName(document.getName()).getIconResourceId());
                     }
@@ -196,7 +196,7 @@ public class FileStorageAdapter extends RecyclerView.Adapter<FileStorageAdapter.
             return false;
         }
 
-        return document.getFile().canRead();
+        return true;
     }
 
     public FileDocument getItem(int position) {

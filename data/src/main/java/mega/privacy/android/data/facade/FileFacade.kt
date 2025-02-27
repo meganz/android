@@ -388,7 +388,9 @@ internal class FileFacade @Inject constructor(
         return contentResolver.insert(MediaStore.Video.Media.EXTERNAL_CONTENT_URI, contentValues)
     }
 
-    override suspend fun isFileUri(uriString: String) = uriString.toUri().scheme == "file"
+    override suspend fun isFileUri(uriString: String) = isFileUri(uriString.toUri())
+
+    private fun isFileUri(uri: Uri) = uri.scheme == "file"
 
     override suspend fun isFilePath(path: String) = File(path).isFile
 
@@ -572,10 +574,10 @@ internal class FileFacade @Inject constructor(
         context.contentResolver.delete(uri, null, null) > 0
 
     override suspend fun getFilesInDocumentFolder(folder: UriPath): DocumentFolder {
-        val uri = Uri.parse(folder.value)
+        val uri = folder.toUri()
         val semaphore = Semaphore(10)
-        val document = if (isFileUri(folder.value)) {
-            DocumentFile.fromFile(Uri.parse(folder.value).toFile())
+        val document = if (isFileUri(uri)) {
+            DocumentFile.fromFile(uri.toFile())
         } else {
             DocumentFile.fromTreeUri(context, uri)
         } ?: throw FileNotFoundException()
@@ -786,7 +788,7 @@ internal class FileFacade @Inject constructor(
                 if (writePermission) "rw" else "r"
             )
         }.onFailure {
-            Timber.e(it, "Error getting file descriptor for $uriPath")
+            Timber.w(it, "Error getting file descriptor for $uriPath")
         }.getOrNull()
 
     override suspend fun getFileDescriptor(

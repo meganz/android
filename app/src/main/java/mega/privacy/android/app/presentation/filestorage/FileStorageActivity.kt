@@ -9,6 +9,7 @@ import android.content.res.Configuration
 import android.net.Uri
 import android.os.Bundle
 import android.os.Handler
+import android.os.Looper
 import android.provider.DocumentsContract
 import android.view.Menu
 import android.view.MenuItem
@@ -20,17 +21,18 @@ import android.widget.TextView
 import androidx.activity.enableEdgeToEdge
 import androidx.activity.viewModels
 import androidx.appcompat.widget.Toolbar
-import androidx.core.content.FileProvider
 import androidx.core.text.HtmlCompat
 import androidx.core.view.WindowInsetsCompat
 import androidx.documentfile.provider.DocumentFile
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.anggrayudi.storage.file.StorageId
-import com.anggrayudi.storage.file.getAbsolutePath
 import com.anggrayudi.storage.file.id
 import dagger.hilt.android.AndroidEntryPoint
-import mega.privacy.android.app.FileDocument
+import de.palm.composestateevents.StateEventWithContentTriggered
+import kotlinx.coroutines.flow.distinctUntilChanged
+import kotlinx.coroutines.flow.distinctUntilChangedBy
+import kotlinx.coroutines.flow.map
 import mega.privacy.android.app.MimeTypeList.Companion.typeForName
 import mega.privacy.android.app.R
 import mega.privacy.android.app.activities.PasscodeActivity
@@ -40,6 +42,7 @@ import mega.privacy.android.app.extensions.consumeInsetsWithToolbar
 import mega.privacy.android.app.interfaces.Scrollable
 import mega.privacy.android.app.main.adapters.FileStorageAdapter
 import mega.privacy.android.app.main.adapters.FileStorageAdapter.CenterSmoothScroller
+import mega.privacy.android.app.presentation.filestorage.model.FileStorageUiState
 import mega.privacy.android.app.utils.ColorUtils.changeStatusBarColorForElevation
 import mega.privacy.android.app.utils.ColorUtils.getColorHexString
 import mega.privacy.android.app.utils.Constants
@@ -50,10 +53,10 @@ import mega.privacy.android.app.utils.Util
 import mega.privacy.android.app.utils.createViewFolderIntent
 import mega.privacy.android.app.utils.permission.PermissionUtils.hasPermissions
 import mega.privacy.android.app.utils.permission.PermissionUtils.requestPermission
+import mega.privacy.android.data.extensions.toUri
 import mega.privacy.android.domain.entity.file.FileStorageType
+import mega.privacy.android.domain.entity.uri.UriPath
 import timber.log.Timber
-import java.io.File
-import java.util.Collections
 import java.util.Stack
 
 /**
@@ -64,9 +67,6 @@ class FileStorageActivity : PasscodeActivity(), Scrollable {
 
     private val viewModel: FileStorageViewModel by viewModels()
     private var mode: Mode? = null
-    private var path: File? = null
-    private var root: File? = null
-    private var highlightFilePath: String? = null
     private lateinit var lastPositionStack: Stack<Int>
     private lateinit var viewContainer: RelativeLayout
     private var contentText: TextView? = null
@@ -82,6 +82,7 @@ class FileStorageActivity : PasscodeActivity(), Scrollable {
     private var serializedNodes: ArrayList<String>? = null
     private var adapter: FileStorageAdapter? = null
     private var toolbarView: Toolbar? = null
+    private var loading: View? = null
 
     /**
      * onCreate
@@ -98,11 +99,11 @@ class FileStorageActivity : PasscodeActivity(), Scrollable {
         )
         viewContainer = findViewById(R.id.file_storage_container)
         contentText = findViewById(R.id.file_storage_content_text)
-        listView = findViewById(R.id.file_storage_list_view)
         emptyImageView = findViewById(R.id.file_storage_empty_image)
         emptyTextView = findViewById(R.id.file_storage_empty_text)
         toolbarView = findViewById(R.id.toolbar_filestorage)
         listView = findViewById(R.id.file_storage_list_view)
+        loading = findViewById(R.id.loading)
 
         lastPositionStack = Stack()
         prompt = intent.getStringExtra(EXTRA_PROMPT)
@@ -115,15 +116,11 @@ class FileStorageActivity : PasscodeActivity(), Scrollable {
             return
         } else if (pickFolderType == PickFolderType.CAMERA_UPLOADS_FOLDER) {
             openPickCUFolderFromSystem()
+            observeEvents()
             return
         } else if (pickFolderType == PickFolderType.DOWNLOAD_FOLDER) {
-            if (Util.isAndroid11OrUpper()) {
-                path = FileUtil.buildDefaultDownloadDir(this)
-                path?.mkdirs()
-                finishPickFolder()
-                return
-            }
             openPickDownloadFolderFromSystem()
+            observeEvents()
             return
         }
         if (!hasPermissions(this, Manifest.permission.WRITE_EXTERNAL_STORAGE)) {
@@ -152,7 +149,7 @@ class FileStorageActivity : PasscodeActivity(), Scrollable {
 
         if (savedInstanceState?.containsKey(PATH) == true) {
             savedInstanceState.getString(PATH)?.let {
-                path = File(it)
+                viewModel.setRootPath(UriPath(it))
             }
         }
 
@@ -199,39 +196,56 @@ class FileStorageActivity : PasscodeActivity(), Scrollable {
             intent.extras?.let {
                 val extraPath = it.getString(EXTRA_PATH)
                 if (!extraPath.isNullOrEmpty()) {
-                    path = File(extraPath)
-                    root = path
-                    if (it.containsKey(EXTRA_FILE_NAME)) {
-                        highlightFilePath =
-                            extraPath.trimEnd('/') + File.separator + it.getString(EXTRA_FILE_NAME)
-                    }
+                    viewModel.setRootPath(
+                        uriPath = UriPath(extraPath),
+                        updateStorageType = mode == Mode.BROWSE_FILES,
+                        highlightFileName = it.getString(EXTRA_FILE_NAME)
+                    )
                 }
             }
-            checkPath()
         }
         observeUiState()
-
-        if (mode == Mode.BROWSE_FILES) {
-            viewModel.updateTitle(path)
-        }
+        observeEvents()
     }
 
     private fun observeUiState() {
-        collectFlow(viewModel.uiState) {
-            if (mode == Mode.BROWSE_FILES) {
-                supportActionBar?.title = when (it.storageType) {
-                    is FileStorageType.Internal -> {
-                        it.storageType.deviceModel
-                    }
-
-                    is FileStorageType.SdCard -> {
-                        getString(sharedR.string.general_sd_card)
-                    }
-
-                    is FileStorageType.Unknown -> {
-                        getString(R.string.browse_files_label)
+        collectFlow(viewModel.uiState.distinctUntilChangedBy { (it as? FileStorageUiState.Loaded)?.children }) {
+            when (it) {
+                is FileStorageUiState.Loaded -> {
+                    checkMenuVisibility(it.currentFolder?.uriPath)
+                    contentText?.text = it.currentFolderPath
+                    adapter?.setFiles(it.children)
+                    showEmptyState()
+                    it.getHighlightFilePosition()?.let { highlightFilePosition ->
+                        Handler(Looper.getMainLooper()).post {
+                            val smoothScroller = CenterSmoothScroller(listView?.context)
+                            smoothScroller.targetPosition = highlightFilePosition
+                            mLayoutManager?.startSmoothScroll(smoothScroller)
+                        }
                     }
                 }
+
+                FileStorageUiState.Loading -> {
+                    showLoadingState()
+                }
+            }
+        }
+        collectFlow(viewModel.uiLoadedState.map { it.storageType }.distinctUntilChanged()) {
+            if (mode == Mode.BROWSE_FILES) {
+                supportActionBar?.title = when (it) {
+                    is FileStorageType.Internal -> it.deviceModel
+                    is FileStorageType.SdCard -> getString(sharedR.string.general_sd_card)
+                    is FileStorageType.Unknown -> getString(R.string.browse_files_label)
+                }
+            }
+        }
+    }
+
+    private fun observeEvents() {
+        collectFlow(viewModel.uiLoadedState.map { it.folderPickedEvent }.distinctUntilChanged()) {
+            (it as? StateEventWithContentTriggered)?.content?.let { uriPath ->
+                viewModel.consumeFolderPickedEvent()
+                finishPickFolder(uriPath)
             }
         }
     }
@@ -244,7 +258,7 @@ class FileStorageActivity : PasscodeActivity(), Scrollable {
         openInFileManagerMenuItem =
             menu.findItem(R.id.action_open_in_file_manager)
         if (mode == Mode.BROWSE_FILES) {
-            checkMenuVisibility()
+            checkMenuVisibility(null)
         }
         return super.onCreateOptionsMenu(menu)
     }
@@ -262,19 +276,20 @@ class FileStorageActivity : PasscodeActivity(), Scrollable {
             }
 
             R.id.action_open_in_file_manager -> {
-                try {
-                    val intent = this.createViewFolderIntent(Uri.fromFile(path))
-                    if (intent != null) {
-                        startActivity(intent)
-                        return true
+                runCatching {
+                    viewModel.getCurrentPath()?.toUri()?.let {
+                        this.createViewFolderIntent(it)
                     }
-                } catch (e: Exception) {
+                }.onFailure { e ->
                     Timber.e(e)
+                }.getOrNull()?.let {
+                    startActivity(it)
+                } ?: run {
+                    showSnackbar(
+                        viewContainer,
+                        resources.getString(R.string.filestorage_snackbar_file_manager_is_not_available)
+                    )
                 }
-                showSnackbar(
-                    viewContainer,
-                    resources.getString(R.string.filestorage_snackbar_file_manager_is_not_available)
-                )
                 return true
             }
 
@@ -306,7 +321,7 @@ class FileStorageActivity : PasscodeActivity(), Scrollable {
                     ), REQUEST_SAVE_RK
             )
         } catch (e: Exception) {
-            Timber.d("Can not handle action Intent.ACTION_CREATE_DOCUMENT")
+            Timber.d(e, "Can not handle action Intent.ACTION_CREATE_DOCUMENT")
         }
     }
 
@@ -374,6 +389,10 @@ class FileStorageActivity : PasscodeActivity(), Scrollable {
      * Hides both if the root view with Internal storage and External storage is shown.
      */
     private fun showEmptyState() {
+        loading?.apply {
+            animate().cancel()
+            visibility = View.GONE
+        }
         if ((adapter?.itemCount ?: 0) > 0) {
             listView?.visibility = View.VISIBLE
             emptyImageView?.visibility = View.GONE
@@ -385,18 +404,19 @@ class FileStorageActivity : PasscodeActivity(), Scrollable {
         }
     }
 
-    /**
-     * Changes the path shown in the screen or finish the activity if the current one is not valid.
-     */
-    private fun checkPath() {
-        path?.let {
-            changeFolder(it)
-        } ?: run {
-            Timber.e("Current path is not valid (null)")
-            Util.showErrorAlertDialog(
-                getString(R.string.error_io_problem),
-                true, this
-            )
+    private fun showLoadingState() {
+        //this should probably change to skimmer effect once migrated to compose
+        listView?.visibility = View.GONE
+        emptyImageView?.visibility = View.GONE
+        emptyTextView?.visibility = View.GONE
+        loading?.apply {
+            alpha = 0f
+            visibility = View.VISIBLE
+            animate()
+                .alpha(1f)
+                .setDuration(800)
+                .setStartDelay(500)
+                .start()
         }
     }
 
@@ -412,7 +432,7 @@ class FileStorageActivity : PasscodeActivity(), Scrollable {
      * onSaveInstanceState
      */
     public override fun onSaveInstanceState(outState: Bundle) {
-        path?.let { outState.putString(PATH, it.absolutePath) }
+        viewModel.getCurrentPath()?.let { outState.putString(PATH, it.value) }
         super.onSaveInstanceState(outState)
     }
 
@@ -421,116 +441,22 @@ class FileStorageActivity : PasscodeActivity(), Scrollable {
      * @param newPath New folder path
      */
     @SuppressLint("NewApi")
-    private fun changeFolder(newPath: File) {
-        setFiles(newPath)
-        path = newPath
-        contentText?.text = path?.absolutePath
-        checkMenuVisibility()
+    private fun changeFolder(newPath: UriPath) {
+        viewModel.goToChild(uriPath = newPath)
+        checkMenuVisibility(newPath)
     }
 
-    private fun checkMenuVisibility() {
+    private fun checkMenuVisibility(currentPath: UriPath?) {
         openInFileManagerMenuItem?.isVisible =
             mode == Mode.BROWSE_FILES
-                    && !isInCacheDirectory(path)
-                    && this.createViewFolderIntent(Uri.fromFile(path)) != null
+                    && !viewModel.isInCacheDirectory()
+                    && currentPath?.toUri()
+                ?.let { this.createViewFolderIntent(it) != null } == true
     }
 
-    /*
-     * Check if the folder is in the cache directory by matching last two directories
-     * e.g. mega.privacy.android.app/cache
-     */
-    private fun isInCacheDirectory(folderPath: File?): Boolean {
-        if (folderPath == null) return false
-        var cacheDir = externalCacheDir
-        if (cacheDir == null) cacheDir = getCacheDir()
-        if (cacheDir == null) return false
-        val cacheDirParent = cacheDir.parentFile ?: return false
-        return folderPath
-            .absolutePath
-            .contains(cacheDirParent.name + "/" + cacheDir.name)
-    }
-
-    /*
-     * Update file list for new folder
-     */
-    private fun setFiles(path: File?) {
-        val documents: MutableList<FileDocument> = ArrayList()
-        if (path == null || !path.canRead()) {
-            Util.showErrorAlertDialog(
-                getString(R.string.error_io_problem),
-                true, this
-            )
-            return
-        }
-
-        val files = path.listFiles()
-        var highlightFilePosition = -1
-        var isHighlightFileFound = false
-
-        if (files != null) {
-            for (file in files) {
-                val isHighlighted =
-                    highlightFilePath != null && highlightFilePath == file.absolutePath
-                val document = FileDocument(file, isHighlighted)
-                if (document.isHidden) {
-                    continue
-                }
-                documents.add(document)
-                if (isHighlighted) {
-                    isHighlightFileFound = true
-                }
-            }
-
-            Collections.sort(documents, CustomComparator())
-
-            if (isHighlightFileFound) {
-                for (i in documents.indices) {
-                    if (documents[i].isHighlighted) {
-                        highlightFilePosition = i
-                        break
-                    }
-                }
-            }
-        }
-
-        adapter?.setFiles(documents)
-
-        if (highlightFilePosition != -1) {
-            val smoothScroller: RecyclerView.SmoothScroller = CenterSmoothScroller(
-                listView?.context
-            )
-            smoothScroller.targetPosition = highlightFilePosition
-            mLayoutManager?.startSmoothScroll(smoothScroller)
-        }
-
-        showEmptyState()
-    }
-
-    /**
-     * Sort the files and folder
-     *//*
-     * Comparator to sort the files
-     */
-    inner class CustomComparator : Comparator<FileDocument> {
-        /**
-         * Compare two files
-         */
-        override fun compare(o1: FileDocument, o2: FileDocument): Int {
-            if (o1.isFolder != o2.isFolder) {
-                return if (o1.isFolder) -1 else 1
-            }
-            return o1.name.compareTo(o2.name, ignoreCase = true)
-        }
-    }
-
-    private fun finishPickFolder() {
-        if (path?.absolutePath?.isEmpty() == true) {
-            Timber.e("The new Local Folder is invalid")
-        } else {
-            Timber.d("Successfully selected the new Local Folder")
-        }
+    private fun finishPickFolder(uriPath: UriPath) {
         val intent = Intent()
-        intent.putExtra(EXTRA_PATH, path?.absolutePath)
+        intent.putExtra(EXTRA_PATH, uriPath.value)
         intent.putExtra(EXTRA_IS_FOLDER_IN_SD_CARD, isFolderInSDCard)
         intent.putExtra(EXTRA_DOCUMENT_HASHES, documentHashes)
         intent.putStringArrayListExtra(EXTRA_SERIALIZED_NODES, serializedNodes)
@@ -547,24 +473,18 @@ class FileStorageActivity : PasscodeActivity(), Scrollable {
         Timber.d("Position: %s", position)
         val document = adapter?.getDocumentAt(position) ?: return
         if (document.isFolder) {
-            if (!document.file.canRead()) {
-                return
+            if (document.canRead) {
+                document.isHidden
+                lastPositionStack.push(mLayoutManager?.findFirstCompletelyVisibleItemPosition())
             }
-            lastPositionStack.push(mLayoutManager?.findFirstCompletelyVisibleItemPosition())
-            changeFolder(document.file)
+            changeFolder(document.uriPath)
         } else if (mode == Mode.BROWSE_FILES) {
-            val file = adapter?.getItem(position)?.file
-            if (file != null && FileUtil.isFileAvailable(file)) {
+            val documentFile = adapter?.getItem(position)
+            if (documentFile != null) {
                 val intent = Intent(Intent.ACTION_VIEW)
                 intent.addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION)
-                val uri =
-                    FileProvider.getUriForFile(this, Constants.AUTHORITY_STRING_FILE_PROVIDER, file)
-                if (uri != null) {
-                    intent.setDataAndType(uri, typeForName(file.name).type)
-                } else {
-                    Timber.w("The file cannot be opened, uri is null")
-                    return
-                }
+                val uri = documentFile.uriPath.toUri()
+                intent.setDataAndType(uri, typeForName(documentFile.name).type)
                 if (MegaApiUtils.isIntentAvailable(this, intent)) {
                     startActivity(intent)
                 }
@@ -582,12 +502,9 @@ class FileStorageActivity : PasscodeActivity(), Scrollable {
      */
     override fun onBackPressed() {
         retryConnectionsAndSignalPresence()
-        // Finish activity if at the root
-        if (path == root) {
-            super.onBackPressed()
-        } else {
-            // Go one level higher otherwise
-            path?.parentFile?.let { changeFolder(it) }
+        // Go one level higher if not at root, otherwise finish
+        if (viewModel.goToParent()) {
+
             var lastVisiblePosition = 0
             if (lastPositionStack.isNotEmpty()) {
                 lastVisiblePosition = lastPositionStack.pop()
@@ -595,6 +512,8 @@ class FileStorageActivity : PasscodeActivity(), Scrollable {
             if (lastVisiblePosition >= 0) {
                 mLayoutManager?.scrollToPositionWithOffset(lastVisiblePosition, 0)
             }
+        } else {
+            super.onBackPressed()
         }
     }
 
@@ -628,7 +547,7 @@ class FileStorageActivity : PasscodeActivity(), Scrollable {
                 )
                 isFolderInPrimaryStorage = setPathAndCheckIfIsPrimary(uri)
                 isFolderInSDCard = !isFolderInPrimaryStorage
-                finishPickFolder()
+                viewModel.folderPicked(uri.toString())
             }
 
             REQUEST_PICK_DOWNLOAD_FOLDER -> {
@@ -642,7 +561,7 @@ class FileStorageActivity : PasscodeActivity(), Scrollable {
                     dbH.sdCardUri = uri.toString()
                 }
 
-                finishPickFolder()
+                viewModel.folderPicked(uri.toString())
             }
         }
     }
@@ -661,7 +580,7 @@ class FileStorageActivity : PasscodeActivity(), Scrollable {
             return true
         }
 
-        path = File(documentFile.getAbsolutePath(this))
+        viewModel.setRootPath(UriPath(uri.toString()))
         val documentId = documentFile.id
 
         return documentId == StorageId.PRIMARY || documentId.contains(StorageId.PRIMARY)

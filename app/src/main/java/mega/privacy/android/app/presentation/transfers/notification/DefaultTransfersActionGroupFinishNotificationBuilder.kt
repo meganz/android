@@ -101,17 +101,16 @@ class DefaultTransfersActionGroupFinishNotificationBuilder @Inject constructor(
             }
         } + (titleSuffix?.let { ". $it." } ?: "")
 
-        val destination = runCatching {
-            if (isContentUriUseCase(group.destination)) {
-                getPathByDocumentContentUriUseCase(group.destination)
-            } else {
-                group.destination
-            }
-        }.getOrNull() ?: group.destination
         val destinationText = when {
             isOfflineDownload -> context.getString(R.string.section_saved_for_offline_new)
             isPreviewDownload -> null
-            else -> destination
+            else -> runCatching {
+                if (isContentUriUseCase(group.destination)) {
+                    getPathByDocumentContentUriUseCase(group.destination)
+                } else {
+                    group.destination
+                }
+            }.getOrNull() ?: group.destination
         }
         val contentText = destinationText?.let {
             resources.getString(
@@ -202,7 +201,7 @@ class DefaultTransfersActionGroupFinishNotificationBuilder @Inject constructor(
             Intent(context, ManagerActivity::class.java).apply {
                 action = Constants.ACTION_LOCATE_DOWNLOADED_FILE
                 putExtra(Constants.INTENT_EXTRA_IS_OFFLINE_PATH, isOfflineDownload)
-                putExtra(FileStorageActivity.EXTRA_PATH, destination)
+                putExtra(FileStorageActivity.EXTRA_PATH, group.destination)
                 group.singleFileName?.let {
                     putExtra(FileStorageActivity.EXTRA_FILE_NAME, it)
                 }
