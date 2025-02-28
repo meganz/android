@@ -21,7 +21,6 @@ import mega.privacy.android.domain.entity.camerauploads.CameraUploadsStatusInfo
 import mega.privacy.android.domain.entity.node.TypedFolderNode
 import mega.privacy.android.domain.usecase.GetFolderTreeInfo
 import mega.privacy.android.domain.usecase.GetNodeByIdUseCase
-import mega.privacy.android.domain.entity.node.NodeId
 import mega.privacy.android.domain.usecase.GetNodePathByIdUseCase
 import mega.privacy.android.domain.usecase.GetRootNodeUseCase
 import mega.privacy.android.domain.usecase.account.IsStorageOverQuotaUseCase
@@ -219,10 +218,10 @@ internal class SyncFoldersViewModel @Inject constructor(
 
         cameraUploadsOrMediaUploadsBackup?.let { backup ->
             runCatching {
-                getNodeByIdUseCase(NodeId(backup.targetNode))
+                getNodeByIdUseCase(backup.targetNode)
             }.onSuccess { node ->
                 node?.let { folder ->
-                    megaStoragePath = getNodePathByIdUseCase(NodeId(backup.targetNode))
+                    megaStoragePath = getNodePathByIdUseCase(backup.targetNode)
                     creationTime = folder.creationTime
                     runCatching {
                         getFolderTreeInfo(folder as TypedFolderNode)

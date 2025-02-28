@@ -24,7 +24,8 @@ internal class BackupEntityMapper @Inject constructor(
             id = backup.id,
             encryptedBackupId = encryptData(backup.backupId.toString()) ?: return null,
             backupType = backup.backupType,
-            encryptedTargetNode = encryptData(backup.targetNode.toString()) ?: return null,
+            encryptedTargetNode = encryptData(backup.targetNode.longValue.toString())
+                ?: return null,
             encryptedLocalFolder = encryptData(backup.localFolder) ?: return null,
             encryptedBackupName = encryptData(backup.backupName) ?: return null,
             state = backupStateIntMapper(backup.state),

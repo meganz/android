@@ -4,7 +4,6 @@ import mega.privacy.android.data.mapper.backup.BackupInfoTypeIntMapper
 import mega.privacy.android.domain.entity.backup.Backup
 import mega.privacy.android.domain.entity.backup.BackupInfoType
 import mega.privacy.android.domain.entity.camerauploads.CameraUploadsStatusInfo
-import mega.privacy.android.domain.entity.node.NodeId
 import mega.privacy.android.domain.entity.sync.SyncError
 import mega.privacy.android.domain.entity.sync.SyncType
 import mega.privacy.android.feature.sync.data.mapper.SyncStatusMapper
@@ -65,7 +64,7 @@ internal class SyncUiItemMapper @Inject constructor(
             hasStalledIssues = false,
             deviceStoragePath = backup.localFolder,
             megaStoragePath = backup.targetFolderPath,
-            megaStorageNodeId = NodeId(backup.targetNode),
+            megaStorageNodeId = backup.targetNode,
             expanded = false,
             error = deviceFolderUINodeErrorMessageMapper(SyncError.NO_SYNC_ERROR)
         )

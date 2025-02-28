@@ -5,6 +5,7 @@ import kotlinx.coroutines.test.runTest
 import mega.privacy.android.domain.entity.BackupState
 import mega.privacy.android.domain.entity.backup.Backup
 import mega.privacy.android.domain.entity.backup.BackupInfoType
+import mega.privacy.android.domain.entity.node.NodeId
 import mega.privacy.android.domain.repository.CameraUploadsRepository
 import org.junit.jupiter.api.BeforeAll
 import org.junit.jupiter.api.BeforeEach
@@ -36,7 +37,7 @@ internal class UpdateSecondaryFolderBackupNameUseCaseTest {
     private val testBackup = Backup(
         backupId = 123L,
         backupType = 123,
-        targetNode = 123L,
+        targetNode = NodeId(123L),
         localFolder = "test/local/folder/path/secondary",
         backupName = "Media Uploads",
         state = BackupState.ACTIVE,

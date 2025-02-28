@@ -8,6 +8,7 @@ import mega.privacy.android.data.database.entity.BackupEntity
 import mega.privacy.android.data.mapper.camerauploads.BackupStateIntMapper
 import mega.privacy.android.domain.entity.BackupState
 import mega.privacy.android.domain.entity.backup.Backup
+import mega.privacy.android.domain.entity.node.NodeId
 import org.junit.jupiter.api.BeforeAll
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
@@ -56,7 +57,7 @@ internal class BackupEntityMapperTest {
             id = 1,
             backupId = backupId,
             backupType = backupType,
-            targetNode = targetNode,
+            targetNode = NodeId(targetNode),
             localFolder = localFolder,
             backupName = backupName,
             state = state,

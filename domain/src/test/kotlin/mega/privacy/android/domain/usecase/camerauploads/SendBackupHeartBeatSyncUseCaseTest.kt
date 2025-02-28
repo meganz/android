@@ -9,6 +9,7 @@ import mega.privacy.android.domain.entity.BackupState
 import mega.privacy.android.domain.entity.backup.Backup
 import mega.privacy.android.domain.entity.camerauploads.CameraUploadsFolderState
 import mega.privacy.android.domain.entity.camerauploads.CameraUploadsState
+import mega.privacy.android.domain.entity.node.NodeId
 import mega.privacy.android.domain.repository.CameraUploadsRepository
 import org.junit.jupiter.api.BeforeAll
 import org.junit.jupiter.api.BeforeEach
@@ -57,7 +58,7 @@ internal class SendBackupHeartBeatSyncUseCaseTest {
     private val fakeBackup = Backup(
         backupId = 123L,
         backupType = 123,
-        targetNode = 123L,
+        targetNode = NodeId(123L),
         localFolder = "local",
         backupName = "camera uploads",
         state = BackupState.INVALID,
@@ -69,7 +70,7 @@ internal class SendBackupHeartBeatSyncUseCaseTest {
     private val doNotSyncBackup = Backup(
         backupId = 123L,
         backupType = 123,
-        targetNode = 123L,
+        targetNode = NodeId(123L),
         localFolder = "local",
         backupName = "camera uploads",
         state = BackupState.PAUSE_UPLOADS,

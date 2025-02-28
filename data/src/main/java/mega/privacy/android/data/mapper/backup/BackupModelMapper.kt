@@ -4,6 +4,7 @@ import mega.privacy.android.data.cryptography.DecryptData
 import mega.privacy.android.data.database.entity.BackupEntity
 import mega.privacy.android.data.mapper.camerauploads.BackupStateMapper
 import mega.privacy.android.domain.entity.backup.Backup
+import mega.privacy.android.domain.entity.node.NodeId
 import javax.inject.Inject
 
 /**
@@ -24,7 +25,8 @@ internal class BackupModelMapper @Inject constructor(
             id = entity.id,
             backupId = decryptData(entity.encryptedBackupId)?.toLong() ?: return null,
             backupType = entity.backupType,
-            targetNode = decryptData(entity.encryptedTargetNode)?.toLong() ?: return null,
+            targetNode = decryptData(entity.encryptedTargetNode)?.toLong()?.let { NodeId(it) }
+                ?: return null,
             localFolder = decryptData(entity.encryptedLocalFolder) ?: return null,
             backupName = decryptData(entity.encryptedBackupName) ?: return null,
             state = backupStateMapper(entity.state),
