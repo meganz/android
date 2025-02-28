@@ -162,7 +162,7 @@ internal class LegacyTransfersFragment : TransfersBaseFragment(), SelectModeInte
 
     override fun notifyItemChanged() = updateActionModeTitle()
 
-    override fun getAdapter(): RotatableAdapter? = adapter
+    override fun getAdapter(): RotatableAdapter? = getSafeAdapter()
 
     override fun activateActionMode() {
         getSafeAdapter()?.let {
