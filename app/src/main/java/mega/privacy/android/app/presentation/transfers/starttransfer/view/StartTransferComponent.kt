@@ -51,6 +51,7 @@ import mega.privacy.android.app.presentation.transfers.starttransfer.model.SaveD
 import mega.privacy.android.app.presentation.transfers.starttransfer.model.StartTransferEvent
 import mega.privacy.android.app.presentation.transfers.starttransfer.model.StartTransferViewState
 import mega.privacy.android.app.presentation.transfers.starttransfer.model.TransferTriggerEvent
+import mega.privacy.android.app.presentation.transfers.starttransfer.model.TransferTriggerEvent.StartUpload
 import mega.privacy.android.app.presentation.transfers.starttransfer.view.dialog.ResumeChatTransfersDialog
 import mega.privacy.android.app.presentation.transfers.starttransfer.view.dialog.ResumePreviewTransfersDialog
 import mega.privacy.android.app.presentation.transfers.starttransfer.view.filespermission.FilesPermissionDialog
@@ -120,7 +121,7 @@ internal fun StartTransferComponent(
         event = event,
         onConsumed = onConsumeEvent,
         action = { triggerEvent ->
-            if (uiState.isStorageOverQuota) {
+            if (uiState.isStorageOverQuota && event is StartUpload) {
                 showStorageOverQuotaWarning = true
                 return@EventEffect
             }
