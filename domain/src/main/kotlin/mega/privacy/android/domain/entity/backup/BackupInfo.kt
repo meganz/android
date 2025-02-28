@@ -1,5 +1,6 @@
 package mega.privacy.android.domain.entity.backup
 
+import mega.privacy.android.domain.entity.node.NodeId
 import mega.privacy.android.domain.entity.sync.SyncError
 
 /**
@@ -8,7 +9,7 @@ import mega.privacy.android.domain.entity.sync.SyncError
  *
  * @property id The Backup ID
  * @property type Any of the [BackupInfoType] values
- * @property rootHandle The Backup Root Handle
+ * @property rootHandle The Backup Root NodeId(Handle)
  * @property localFolderPath The name of the backed up Local Folder
  * @property deviceId The Device ID where the Backup originated
  * @property userAgent Any of the [BackupInfoUserAgent] values, which associates the Device where the
@@ -28,7 +29,7 @@ import mega.privacy.android.domain.entity.sync.SyncError
 data class BackupInfo(
     val id: Long,
     val type: BackupInfoType,
-    val rootHandle: Long,
+    val rootHandle: NodeId,
     val localFolderPath: String?,
     val deviceId: String?,
     val userAgent: BackupInfoUserAgent,

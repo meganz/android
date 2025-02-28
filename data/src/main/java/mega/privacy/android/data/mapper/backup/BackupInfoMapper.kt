@@ -1,6 +1,7 @@
 package mega.privacy.android.data.mapper.backup
 
 import mega.privacy.android.domain.entity.backup.BackupInfo
+import mega.privacy.android.domain.entity.node.NodeId
 import nz.mega.sdk.MegaBackupInfo
 import javax.inject.Inject
 
@@ -31,7 +32,7 @@ internal class BackupInfoMapper @Inject constructor(
         BackupInfo(
             id = megaBackupInfo.id(),
             type = backupInfoTypeMapper(megaBackupInfo.type()),
-            rootHandle = megaBackupInfo.root(),
+            rootHandle = NodeId(megaBackupInfo.root()),
             localFolderPath = megaBackupInfo.localFolder(),
             deviceId = megaBackupInfo.deviceId(),
             userAgent = backupInfoUserAgentMapper(megaBackupInfo.deviceUserAgent()),

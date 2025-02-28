@@ -3,6 +3,7 @@ package mega.privacy.android.feature.devicecenter.ui.mapper
 import com.google.common.truth.Truth.assertThat
 import mega.privacy.android.domain.entity.backup.BackupInfoType
 import mega.privacy.android.domain.entity.backup.BackupInfoUserAgent
+import mega.privacy.android.domain.entity.node.NodeId
 import mega.privacy.android.feature.devicecenter.domain.entity.DeviceCenterNodeStatus
 import mega.privacy.android.feature.devicecenter.domain.entity.DeviceFolderNode
 import mega.privacy.android.feature.devicecenter.domain.entity.OtherDeviceNode
@@ -66,7 +67,7 @@ internal class DeviceUINodeListMapperTest {
                 id = folderId,
                 name = folderName,
                 status = folderStatus,
-                rootHandle = folderRootHandle,
+                rootHandle = NodeId(folderRootHandle),
                 type = folderType,
                 userAgent = folderUserAgent,
                 localFolderPath = "storage/emulated/0/DCIM/Camera"

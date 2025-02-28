@@ -6,6 +6,7 @@ import mega.privacy.android.domain.entity.backup.BackupInfoHeartbeatStatus
 import mega.privacy.android.domain.entity.backup.BackupInfoState
 import mega.privacy.android.domain.entity.backup.BackupInfoType
 import mega.privacy.android.domain.entity.backup.BackupInfoUserAgent
+import mega.privacy.android.domain.entity.node.NodeId
 import mega.privacy.android.domain.entity.sync.SyncError
 import mega.privacy.android.feature.devicecenter.domain.entity.DeviceCenterNodeStatus
 import mega.privacy.android.feature.devicecenter.domain.entity.DeviceFolderNode
@@ -36,7 +37,7 @@ internal class DeviceFolderNodeMapperTest {
         val backupName = "Backup One"
         val backupType = BackupInfoType.CAMERA_UPLOADS
         val backupUserAgent = BackupInfoUserAgent.ANDROID
-        val backupRootHandle = 789012L
+        val backupRootHandle = NodeId(789012L)
         val localPath = "storage/emulated/0/DCIM/Camera"
         val backupInfoList = listOf<BackupInfo>(
             mock {
@@ -71,7 +72,7 @@ internal class DeviceFolderNodeMapperTest {
         val backupType = BackupInfoType.CAMERA_UPLOADS
         val backupUserAgent = BackupInfoUserAgent.ANDROID
         val backupSubState = SyncError.STORAGE_OVERQUOTA
-        val backupRootHandle = 789012L
+        val backupRootHandle = NodeId(789012L)
         val localPath = "storage/emulated/0/DCIM/Camera"
         val backupInfoList = listOf<BackupInfo>(
             mock {
@@ -111,7 +112,7 @@ internal class DeviceFolderNodeMapperTest {
         val backupName = "Backup One"
         val backupType = BackupInfoType.CAMERA_UPLOADS
         val backupUserAgent = BackupInfoUserAgent.ANDROID
-        val backupRootHandle = 789012L
+        val backupRootHandle = NodeId(789012L)
         val localPath = "storage/emulated/0/DCIM/Camera"
         val backupInfoList = listOf<BackupInfo>(
             mock {
@@ -151,7 +152,7 @@ internal class DeviceFolderNodeMapperTest {
         val backupName = "Backup One"
         val backupType = BackupInfoType.CAMERA_UPLOADS
         val backupUserAgent = BackupInfoUserAgent.ANDROID
-        val backupRootHandle = 789012L
+        val backupRootHandle = NodeId(789012L)
         val localPath = "storage/emulated/0/DCIM/Camera"
         val backupInfoList = listOf<BackupInfo>(
             mock {
@@ -192,7 +193,7 @@ internal class DeviceFolderNodeMapperTest {
         val backupName = "Backup One"
         val backupType = BackupInfoType.CAMERA_UPLOADS
         val backupUserAgent = BackupInfoUserAgent.ANDROID
-        val backupRootHandle = 789012L
+        val backupRootHandle = NodeId(789012L)
         val localPath = "storage/emulated/0/DCIM/Camera"
         val backupInfoList = listOf<BackupInfo>(
             mock {
@@ -233,7 +234,7 @@ internal class DeviceFolderNodeMapperTest {
         val backupName = "Backup One"
         val backupType = BackupInfoType.CAMERA_UPLOADS
         val backupUserAgent = BackupInfoUserAgent.ANDROID
-        val backupRootHandle = 789012L
+        val backupRootHandle = NodeId(789012L)
         val localPath = "storage/emulated/0/DCIM/Camera"
         val backupInfoList = listOf<BackupInfo>(
             mock {
@@ -267,7 +268,7 @@ internal class DeviceFolderNodeMapperTest {
         val backupName = "Some Sync"
         val backupType = BackupInfoType.TWO_WAY_SYNC
         val backupUserAgent = BackupInfoUserAgent.ANDROID
-        val backupRootHandle = 789012L
+        val backupRootHandle = NodeId(789012L)
         val localPath = "storage/emulated/0/DCIM/Camera"
         val backupInfoList = listOf<BackupInfo>(
             mock {
@@ -301,7 +302,7 @@ internal class DeviceFolderNodeMapperTest {
         val backupName = "Backup One"
         val backupType = BackupInfoType.CAMERA_UPLOADS
         val backupUserAgent = BackupInfoUserAgent.ANDROID
-        val backupRootHandle = 789012L
+        val backupRootHandle = NodeId(789012L)
         val localPath = "storage/emulated/0/DCIM/Camera"
         val backupInfoList = listOf<BackupInfo>(
             mock {
@@ -340,7 +341,7 @@ internal class DeviceFolderNodeMapperTest {
         val backupId = 123456L
         val backupName = "Backup One"
         val backupUserAgent = BackupInfoUserAgent.ANDROID
-        val backupRootHandle = 789012L
+        val backupRootHandle = NodeId(789012L)
         val localPath = "storage/emulated/0/DCIM/Camera"
         val backupInfoList = listOf<BackupInfo>(
             mock {
@@ -388,7 +389,7 @@ internal class DeviceFolderNodeMapperTest {
                 on { type }.thenReturn(backupType)
                 on { timestamp }.thenReturn(currentTimeInSeconds.minus(TimeUnit.HOURS.toSeconds(2)))
                 on { lastActivityTimestamp }.thenReturn(0L)
-                on { rootHandle }.thenReturn(MegaApiJava.INVALID_HANDLE)
+                on { rootHandle }.thenReturn(NodeId(MegaApiJava.INVALID_HANDLE))
                 on { userAgent }.thenReturn(backupUserAgent)
                 on { localFolderPath }.thenReturn(localPath)
             },
@@ -398,7 +399,7 @@ internal class DeviceFolderNodeMapperTest {
                 id = backupId.toString(),
                 name = backupName,
                 status = DeviceCenterNodeStatus.Offline,
-                rootHandle = MegaApiJava.INVALID_HANDLE,
+                rootHandle = NodeId(MegaApiJava.INVALID_HANDLE),
                 type = backupType,
                 userAgent = backupUserAgent,
                 localFolderPath = localPath,
@@ -420,7 +421,7 @@ internal class DeviceFolderNodeMapperTest {
         val backupId = 123456L
         val backupName = "Backup One"
         val backupUserAgent = BackupInfoUserAgent.WINDOWS
-        val backupRootHandle = 789012L
+        val backupRootHandle = NodeId(789012L)
         val localPath = "storage/emulated/0/DCIM/Camera"
         val backupInfoList = listOf<BackupInfo>(
             mock {
@@ -469,7 +470,7 @@ internal class DeviceFolderNodeMapperTest {
                 on { type }.thenReturn(backupType)
                 on { timestamp }.thenReturn(currentTimeInSeconds.minus(TimeUnit.HOURS.toSeconds(1)))
                 on { lastActivityTimestamp }.thenReturn(0L)
-                on { rootHandle }.thenReturn(MegaApiJava.INVALID_HANDLE)
+                on { rootHandle }.thenReturn(NodeId(MegaApiJava.INVALID_HANDLE))
                 on { userAgent }.thenReturn(backupUserAgent)
                 on { localFolderPath }.thenReturn(localPath)
             },
@@ -479,7 +480,7 @@ internal class DeviceFolderNodeMapperTest {
                 id = backupId.toString(),
                 name = backupName,
                 status = DeviceCenterNodeStatus.Offline,
-                rootHandle = MegaApiJava.INVALID_HANDLE,
+                rootHandle = NodeId(MegaApiJava.INVALID_HANDLE),
                 type = backupType,
                 userAgent = backupUserAgent,
                 localFolderPath = localPath,
@@ -565,7 +566,7 @@ internal class DeviceFolderNodeMapperTest {
         val backupId = 123456L
         val backupName = "Backup One"
         val backupUserAgent = BackupInfoUserAgent.UNKNOWN
-        val backupRootHandle = 789012L
+        val backupRootHandle = NodeId(789012L)
         val localPath = "storage/emulated/0/DCIM/Camera"
         val backupInfoList = listOf<BackupInfo>(
             mock {
@@ -607,7 +608,7 @@ internal class DeviceFolderNodeMapperTest {
         val backupName = "Backup One"
         val backupType = BackupInfoType.INVALID
         val backupUserAgent = BackupInfoUserAgent.WINDOWS
-        val backupRootHandle = 789012L
+        val backupRootHandle = NodeId(789012L)
         val localPath = "storage/emulated/0/DCIM/Camera"
         val backupInfoList = listOf<BackupInfo>(
             mock {
@@ -650,7 +651,7 @@ internal class DeviceFolderNodeMapperTest {
         val backupName = "Backup One"
         val backupType = BackupInfoType.INVALID
         val backupUserAgent = BackupInfoUserAgent.WINDOWS
-        val backupRootHandle = 789012L
+        val backupRootHandle = NodeId(789012L)
         val localPath = "storage/emulated/0/DCIM/Camera"
         val backupInfoList = listOf<BackupInfo>(
             mock {
@@ -687,7 +688,7 @@ internal class DeviceFolderNodeMapperTest {
         val backupName = "Backup One"
         val backupType = BackupInfoType.CAMERA_UPLOADS
         val backupUserAgent = BackupInfoUserAgent.ANDROID
-        val backupRootHandle = 789012L
+        val backupRootHandle = NodeId(789012L)
         val localPath = "storage/emulated/0/DCIM/Camera"
         val backupInfoList = listOf<BackupInfo>(
             mock {
@@ -724,7 +725,7 @@ internal class DeviceFolderNodeMapperTest {
         val backupType = BackupInfoType.CAMERA_UPLOADS
         val backupUserAgent = BackupInfoUserAgent.ANDROID
         val backupProgress = 75
-        val backupRootHandle = 789012L
+        val backupRootHandle = NodeId(789012L)
         val localPath = "storage/emulated/0/DCIM/Camera"
         val backupInfoList = listOf<BackupInfo>(
             mock {
@@ -761,7 +762,7 @@ internal class DeviceFolderNodeMapperTest {
         val backupName = "Backup One"
         val backupType = BackupInfoType.CAMERA_UPLOADS
         val backupUserAgent = BackupInfoUserAgent.WINDOWS
-        val backupRootHandle = 789012L
+        val backupRootHandle = NodeId(789012L)
         val localPath = "storage/emulated/0/DCIM/Camera"
         val backupInfoList = listOf<BackupInfo>(
             mock {
