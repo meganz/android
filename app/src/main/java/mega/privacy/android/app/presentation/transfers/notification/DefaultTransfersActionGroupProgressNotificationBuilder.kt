@@ -15,7 +15,6 @@ import kotlinx.coroutines.launch
 import mega.privacy.android.app.R
 import mega.privacy.android.app.featuretoggle.AppFeatures
 import mega.privacy.android.app.main.ManagerActivity
-import mega.privacy.android.app.presentation.filestorage.FileStorageActivity
 import mega.privacy.android.app.presentation.manager.model.TransfersTab
 import mega.privacy.android.app.presentation.transfers.EXTRA_TAB
 import mega.privacy.android.app.presentation.transfers.TransfersActivity
@@ -126,14 +125,6 @@ class DefaultTransfersActionGroupProgressNotificationBuilder @Inject constructor
             action = Constants.ACTION_CANCEL_TRANSFER
             putExtra(Constants.INTENT_EXTRA_TAG, group.singleTransferTag)
         }
-        val locateFileIntent = Intent(context, ManagerActivity::class.java).apply {
-            action = Constants.ACTION_LOCATE_DOWNLOADED_FILE
-            putExtra(Constants.INTENT_EXTRA_IS_OFFLINE_PATH, isOfflineDownload)
-            putExtra(FileStorageActivity.EXTRA_PATH, destination)
-            group.singleFileName?.let {
-                putExtra(FileStorageActivity.EXTRA_FILE_NAME, it)
-            }
-        }
         val openTransfersSectionIntent =
             if (getFeatureFlagValueUseCase(AppFeatures.TransfersSection)) {
                 Intent(context, TransfersActivity::class.java).apply {
@@ -162,7 +153,7 @@ class DefaultTransfersActionGroupProgressNotificationBuilder @Inject constructor
             if (isPreviewDownload) {
                 cancelTransferIntent
             } else {
-                locateFileIntent
+                openTransfersSectionIntent
             },
             PendingIntent.FLAG_UPDATE_CURRENT or PendingIntent.FLAG_IMMUTABLE
         )
