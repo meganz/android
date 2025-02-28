@@ -18,7 +18,6 @@ import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 import mega.privacy.android.app.domain.usecase.GetNodeByHandle
 import mega.privacy.android.app.featuretoggle.ApiFeatures
-import mega.privacy.android.app.featuretoggle.AppFeatures
 import mega.privacy.android.app.presentation.audiosection.mapper.AudioUiEntityMapper
 import mega.privacy.android.app.presentation.audiosection.model.AudioSectionState
 import mega.privacy.android.app.presentation.audiosection.model.AudioUiEntity
@@ -78,7 +77,6 @@ class AudioSectionViewModel @Inject constructor(
      */
     val state: StateFlow<AudioSectionState> = _state.asStateFlow()
 
-    private var searchQuery = ""
     private val originalData = mutableListOf<TypedAudioNode>()
     private val originalEntities = mutableListOf<AudioUiEntity>()
     private var showHiddenItems: Boolean? = null
@@ -169,7 +167,7 @@ class AudioSectionViewModel @Inject constructor(
             showHiddenItems = this@AudioSectionViewModel.showHiddenItems,
             isPaid = _state.value.accountType?.isPaid,
             isBusinessAccountExpired = _state.value.isBusinessAccountExpired
-        ).updateOriginalEntities().filterAudiosBySearchQuery()
+        ).updateOriginalEntities()
 
         val sortOrder = getCloudSortOrder()
         _state.update {
@@ -192,11 +190,6 @@ class AudioSectionViewModel @Inject constructor(
         }
         originalData.addAll(data)
     }
-
-    private fun List<AudioUiEntity>.filterAudiosBySearchQuery() =
-        filter { audio ->
-            audio.name.contains(searchQuery, true)
-        }
 
     private fun List<AudioUiEntity>.updateOriginalEntities() = also { entities ->
         if (originalEntities.isNotEmpty()) {
@@ -299,42 +292,6 @@ class AudioSectionViewModel @Inject constructor(
                 selectedHandles.remove(item.id.longValue)
             }
         }
-
-    internal fun shouldShowSearchMenu() = _state.value.allAudios.isNotEmpty()
-
-    internal fun searchReady() {
-        if (_state.value.searchMode)
-            return
-
-        _state.update { it.copy(searchMode = true) }
-        searchQuery = ""
-    }
-
-    internal fun searchQuery(query: String) {
-        if (searchQuery == query)
-            return
-
-        searchQuery = query
-        searchNodeByQueryString()
-    }
-
-    internal fun exitSearch() {
-        _state.update { it.copy(searchMode = false) }
-        searchQuery = ""
-        refreshNodes()
-    }
-
-    private fun searchNodeByQueryString() {
-        val audios = originalEntities.filter { audio ->
-            audio.name.contains(searchQuery, true)
-        }
-        _state.update {
-            it.copy(
-                allAudios = audios,
-                scrollToTop = true
-            )
-        }
-    }
 
     internal suspend fun getSelectedNodes(): List<TypedNode> =
         _state.value.selectedAudioHandles.mapNotNull {

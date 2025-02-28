@@ -4423,7 +4423,8 @@ class ManagerActivity : PasscodeActivity(), NavigationView.OnNavigationItemSelec
         if (drawerItem === DrawerItem.HOMEPAGE) {
             if (listOf(
                     HomepageScreen.FAVOURITES,
-                    HomepageScreen.DOCUMENTS
+                    HomepageScreen.DOCUMENTS,
+                    HomepageScreen.AUDIO
                 ).contains(homepageScreen)
             ) {
                 searchMenuItem?.isVisible = true

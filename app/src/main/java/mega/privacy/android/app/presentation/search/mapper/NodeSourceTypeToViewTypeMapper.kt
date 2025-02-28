@@ -23,6 +23,7 @@ class NodeSourceTypeToViewTypeMapper @Inject constructor() {
         NodeSourceType.BACKUPS -> Constants.BACKUPS_ADAPTER
         NodeSourceType.FAVOURITES -> Constants.FAVOURITES_ADAPTER
         NodeSourceType.DOCUMENTS -> Constants.DOCUMENTS_BROWSE_ADAPTER
+        NodeSourceType.AUDIO -> Constants.AUDIO_BROWSE_ADAPTER
         NodeSourceType.OTHER -> null
     }
 }

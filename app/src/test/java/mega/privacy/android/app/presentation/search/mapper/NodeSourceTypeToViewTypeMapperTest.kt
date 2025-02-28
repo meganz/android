@@ -33,6 +33,7 @@ class NodeSourceTypeToViewTypeMapperTest {
         Arguments.of(NodeSourceType.RUBBISH_BIN, Constants.RUBBISH_BIN_ADAPTER),
         Arguments.of(NodeSourceType.FAVOURITES, Constants.FAVOURITES_ADAPTER),
         Arguments.of(NodeSourceType.DOCUMENTS, Constants.DOCUMENTS_BROWSE_ADAPTER),
+        Arguments.of(NodeSourceType.AUDIO, Constants.AUDIO_BROWSE_ADAPTER),
         Arguments.of(NodeSourceType.OTHER, null),
     )
 }

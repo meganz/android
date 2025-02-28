@@ -27,6 +27,7 @@ class NodeSourceTypeMapper @Inject constructor() {
         DrawerItem.HOMEPAGE -> when (homepageScreen) {
             HomepageScreen.FAVOURITES -> NodeSourceType.FAVOURITES
             HomepageScreen.DOCUMENTS -> NodeSourceType.DOCUMENTS
+            HomepageScreen.AUDIO -> NodeSourceType.AUDIO
             else -> NodeSourceType.HOME
         }
 

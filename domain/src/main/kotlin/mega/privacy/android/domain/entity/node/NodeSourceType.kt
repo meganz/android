@@ -51,6 +51,11 @@ enum class NodeSourceType {
     DOCUMENTS,
 
     /**
+     * When node source is inside Audio section
+     */
+    AUDIO,
+
+    /**
      * When node source is other tabs
      */
     OTHER,

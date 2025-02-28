@@ -41,13 +41,10 @@ import mega.privacy.android.domain.entity.SortOrder
 import mega.privacy.android.domain.entity.account.business.BusinessAccountStatus
 import mega.privacy.android.domain.entity.node.NodeId
 import mega.privacy.android.domain.entity.node.NodeSourceType
-import mega.privacy.android.domain.entity.node.NodeSourceType.DOCUMENTS
-import mega.privacy.android.domain.entity.node.NodeSourceType.FAVOURITES
 import mega.privacy.android.domain.entity.node.NodeSourceType.OTHER
 import mega.privacy.android.domain.entity.node.TypedNode
 import mega.privacy.android.domain.entity.preference.ViewType
 import mega.privacy.android.domain.entity.search.DateFilterOption
-import mega.privacy.android.domain.entity.search.SearchCategory
 import mega.privacy.android.domain.entity.search.SearchParameters
 import mega.privacy.android.domain.entity.search.TypeFilterOption
 import mega.privacy.android.domain.usecase.GetBusinessStatusUseCase
@@ -219,13 +216,10 @@ class SearchViewModel @Inject constructor(
     private fun getSearchParameters() = SearchParameters(
         query = getCurrentQueryWithSearchByTags(),
         searchTarget = nodeSourceTypeToSearchTargetMapper(nodeSourceType),
-        searchCategory = state.value.typeSelectedFilterOption?.let {
-            typeFilterToSearchMapper(it.type)
-        } ?: when (nodeSourceType) {
-            FAVOURITES -> SearchCategory.FAVOURITES
-            DOCUMENTS -> SearchCategory.DOCUMENTS
-            else -> SearchCategory.ALL
-        },
+        searchCategory = typeFilterToSearchMapper(
+            state.value.typeSelectedFilterOption?.type,
+            nodeSourceType
+        ),
         modificationDate = state.value.dateModifiedSelectedFilterOption?.date,
         creationDate = state.value.dateAddedSelectedFilterOption?.date,
         description = if (state.value.searchDescriptionEnabled == true) getCurrentQueryWithSearchByTags() else null,
@@ -309,7 +303,10 @@ class SearchViewModel @Inject constructor(
     private fun getEmptySearchState() =
         emptySearchViewMapper(
             isSearchChipEnabled = true,
-            category = typeFilterToSearchMapper(state.value.typeSelectedFilterOption?.type),
+            category = typeFilterToSearchMapper(
+                state.value.typeSelectedFilterOption?.type,
+                nodeSourceType
+            ),
             searchQuery = state.value.searchQuery,
             isDateFilterApplied = state.value.dateAddedSelectedFilterOption != null || state.value.dateModifiedSelectedFilterOption != null
         )

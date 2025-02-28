@@ -69,7 +69,7 @@ class SearchViewModelTest {
     private val cancelCancelTokenUseCase: CancelCancelTokenUseCase = mock()
     private val searchFilterMapper: SearchFilterMapper = mock()
     private val nodeSourceTypeToSearchTargetMapper: NodeSourceTypeToSearchTargetMapper = mock()
-    private val typeFilterToSearchMapper: TypeFilterToSearchMapper = mock()
+    private val typeFilterToSearchMapper = TypeFilterToSearchMapper()
     private val emptySearchViewMapper: EmptySearchViewMapper = mock()
     private val stateHandle: SavedStateHandle = mock()
     private val setViewType: SetViewType = mock()
@@ -153,7 +153,6 @@ class SearchViewModelTest {
             cancelCancelTokenUseCase,
             searchFilterMapper,
             nodeSourceTypeToSearchTargetMapper,
-            typeFilterToSearchMapper,
             emptySearchViewMapper,
             monitorOfflineNodeUpdatesUseCase,
             typeFilterStringMapper,
