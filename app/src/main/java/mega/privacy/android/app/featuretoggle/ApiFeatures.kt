@@ -46,6 +46,15 @@ enum class ApiFeatures(
         defaultValue = false,
         checkRemote = true,
     ),
+
+    /**
+     * Note to yourself feature flag
+     */
+    NoteToYourselfFlag(
+        "ff_n2s",
+        "Enable note to yourself",
+        false
+    ),
     ;
 
     companion object : FeatureFlagValueProvider {
