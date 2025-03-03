@@ -99,6 +99,7 @@ class ChatRoomMapperTest {
             isWaitingRoom = megaChatRoom.isWaitingRoom,
             isOpenInvite = megaChatRoom.isOpenInvite,
             isSpeakRequest = megaChatRoom.isSpeakRequest,
+            isNoteToSelf = megaChatRoom.isGroup == false && megaChatRoom.peerCount == 1L,
             changes = listOf(ChatRoomChange.ChatMode, ChatRoomChange.UpdatePreviewers),
         )
         Truth.assertThat(underTest.invoke(megaChatRoom)).isEqualTo(chatRoom)

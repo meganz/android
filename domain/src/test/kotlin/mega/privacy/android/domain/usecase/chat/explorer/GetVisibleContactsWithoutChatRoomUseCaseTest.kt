@@ -272,6 +272,7 @@ class GetVisibleContactsWithoutChatRoomUseCaseTest {
         withIsWaitingRoom: Boolean = false,
         withIsOpenInvite: Boolean = false,
         withIsSpeakRequest: Boolean = false,
+        withIsNoteToSelf: Boolean = false,
         withChanges: List<ChatRoomChange>? = null,
     ) = ChatRoom(
         chatId = withChatId,
@@ -298,6 +299,7 @@ class GetVisibleContactsWithoutChatRoomUseCaseTest {
         isWaitingRoom = withIsWaitingRoom,
         isOpenInvite = withIsOpenInvite,
         isSpeakRequest = withIsSpeakRequest,
+        isNoteToSelf = withIsNoteToSelf,
         changes = withChanges
     )
 }

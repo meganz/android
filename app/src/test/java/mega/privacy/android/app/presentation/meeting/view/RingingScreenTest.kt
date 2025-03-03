@@ -212,6 +212,7 @@ class RingingScreenTest {
             isWaitingRoom = false,
             isOpenInvite = false,
             isSpeakRequest = false,
+            isNoteToSelf = false,
             changes = null
         )
     }

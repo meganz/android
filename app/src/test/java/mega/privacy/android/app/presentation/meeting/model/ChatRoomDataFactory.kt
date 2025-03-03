@@ -29,6 +29,7 @@ internal fun newChatRoom(
     withIsWaitingRoom: Boolean = false,
     withIsOpenInvite: Boolean = false,
     withIsSpeakRequest: Boolean = false,
+    withIsNoteToSelf: Boolean = false,
     withChanges: List<ChatRoomChange>? = null,
 ) = ChatRoom(
     chatId = withChatId,
@@ -55,5 +56,6 @@ internal fun newChatRoom(
     isWaitingRoom = withIsWaitingRoom,
     isOpenInvite = withIsOpenInvite,
     isSpeakRequest = withIsSpeakRequest,
+    isNoteToSelf = withIsNoteToSelf,
     changes = withChanges
 )

@@ -37,6 +37,7 @@ internal class ChatRoomMapper @Inject constructor(
         isWaitingRoom = megaChatRoom.isWaitingRoom,
         isOpenInvite = megaChatRoom.isOpenInvite,
         isSpeakRequest = megaChatRoom.isSpeakRequest,
+        isNoteToSelf = megaChatRoom.isGroup == false && megaChatRoom.peerCount == 1L,
         changes = chatRoomChangesMapper(megaChatRoom.changes),
     )
 

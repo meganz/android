@@ -385,6 +385,7 @@ private fun ChatAppBarPreview() {
                     isMeeting = false,
                     isWaitingRoom = false,
                     isOpenInvite = false,
+                    isNoteToSelf = false,
                     isSpeakRequest = false,
                 ),
                 userChatStatus = UserChatStatus.Away,

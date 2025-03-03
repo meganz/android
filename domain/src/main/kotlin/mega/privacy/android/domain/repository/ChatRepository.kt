@@ -147,6 +147,13 @@ interface ChatRepository {
     suspend fun getChatRooms(): List<ChatRoom>
 
     /**
+     * Get note to self chat
+     *
+     * @return  [ChatRoom]
+     */
+    suspend fun getNoteToSelfChat(): ChatRoom?
+
+    /**
      * Get all chat rooms
      *
      * @return  List of [CombinedChatRoom]

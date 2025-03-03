@@ -173,6 +173,7 @@ private fun PreviewContactInfoContentWithChatRoom() {
         isWaitingRoom = true,
         isOpenInvite = true,
         isSpeakRequest = true,
+        isNoteToSelf = false,
         peerPrivilegesList = emptyList()
     )
     OriginalTheme(isDark = isSystemInDarkTheme()) {

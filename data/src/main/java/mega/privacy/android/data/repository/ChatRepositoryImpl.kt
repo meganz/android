@@ -352,6 +352,13 @@ internal class ChatRepositoryImpl @Inject constructor(
                 .map { chatRoomMapper(it) }
         }
 
+    override suspend fun getNoteToSelfChat(): ChatRoom? =
+        withContext(ioDispatcher) {
+            megaChatApiGateway.getNoteToSelfChat()?.let {
+                chatRoomMapper(it)
+            }
+        }
+
     override suspend fun getAllChatRooms(): List<CombinedChatRoom> =
         withContext(ioDispatcher) {
             megaChatApiGateway.getChatRooms().mapNotNull { chatRoom ->

@@ -42,6 +42,7 @@ class IsValidWaitingRoomUseCaseTest {
         isMeeting = false,
         isWaitingRoom = true,
         isOpenInvite = false,
+        isNoteToSelf = false,
         isSpeakRequest = false
     )
 

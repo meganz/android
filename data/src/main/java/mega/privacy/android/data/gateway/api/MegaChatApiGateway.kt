@@ -231,6 +231,13 @@ interface MegaChatApiGateway {
     fun getChatRooms(): List<MegaChatRoom>
 
     /**
+     * Get note to self chat
+     *
+     * @return  [MegaChatRoom]
+     */
+    fun getNoteToSelfChat(): MegaChatRoom?
+
+    /**
      * Get meeting chat rooms
      *
      * @return  The list of chat rooms
