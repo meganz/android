@@ -271,7 +271,6 @@
         <activity android:name=".main.megachat.chat.explorer.ChatExplorerActivity" />
         <activity android:name=".main.megachat.NodeAttachmentHistoryActivity" />
         <activity android:name=".main.CountryCodePickerActivity" />
-        <activity android:name=".providers.PasscodeFileProviderActivity" />
         <activity
             android:name=".providers.FileProviderActivity"
             android:exported="true"
@@ -465,10 +464,6 @@
         <activity
             android:name=".activities.settingsActivities.FileManagementPreferencesActivity"
             android:label="@string/settings_file_management_category"
-            android:launchMode="singleTop" />
-        <activity
-            android:name=".activities.settingsActivities.LegacyPasscodePreferencesActivity"
-            android:label="@string/settings_passcode_lock_switch"
             android:launchMode="singleTop" />
         <activity
             android:name=".activities.settingsActivities.CookiePreferencesActivity"
@@ -745,7 +740,7 @@
             android:launchMode="singleTop"
             android:windowSoftInputMode="adjustResize" />
         <activity android:name=".presentation.photos.albums.add.AddToAlbumActivity" />
-        <activity android:name="mega.privacy.android.app.presentation.settings.container.SettingsContainerActivity" />
+        <activity android:name="mega.privacy.android.app.presentation.settings.compose.SettingsHomeActivity" />
 
         <meta-data
             android:name="com.google.android.gms.ads.APPLICATION_ID"

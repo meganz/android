@@ -29,7 +29,9 @@ import mega.privacy.android.domain.usecase.ToggleAutoAcceptQRLinks
 import mega.privacy.android.domain.usecase.call.MonitorCallSoundEnabledUseCase
 import mega.privacy.android.domain.usecase.call.SetCallsSoundEnabledStateUseCase
 import mega.privacy.android.domain.usecase.setting.EnableFileVersionsOption
+import mega.privacy.android.navigation.settings.FeatureSettingEntryPoint
 import mega.privacy.android.navigation.settings.FeatureSettings
+import mega.privacy.android.navigation.settings.MoreSettingEntryPoint
 import org.mockito.kotlin.any
 import org.mockito.kotlin.anyOrNull
 import org.mockito.kotlin.mock
@@ -173,4 +175,14 @@ object TestSettingsModule {
     @Provides
     @ElementsIntoSet
     fun provideFeatureSettingsSet(): Set<@JvmSuppressWildcards FeatureSettings> = setOf()
+
+    @Provides
+    @ElementsIntoSet
+    fun provideAppFeatureSettingEntryPoints(): Set<@JvmSuppressWildcards FeatureSettingEntryPoint> =
+        setOf()
+
+    @Provides
+    @ElementsIntoSet
+    fun provideAddMoreSettingsEntryPoints(): Set<@JvmSuppressWildcards MoreSettingEntryPoint> =
+        setOf()
 }

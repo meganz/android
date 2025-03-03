@@ -261,6 +261,9 @@ dependencies {
     implementation(lib.kotlinx.collections.immutable)
     implementation(lib.mega.core.ui)
     implementation(androidx.material3)
+    implementation(androidx.material3.adaptive)
+    implementation(androidx.material3.adaptive.layout)
+    implementation(androidx.material3.adaptive.navigation)
 
     // Google
     implementation(google.gson)

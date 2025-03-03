@@ -5,11 +5,16 @@ import dagger.Provides
 import dagger.hilt.InstallIn
 import dagger.hilt.components.SingletonComponent
 import dagger.multibindings.ElementsIntoSet
+import mega.privacy.android.app.presentation.settings.compose.navigation.appFeatureSettings
+import mega.privacy.android.app.presentation.settings.compose.navigation.appFeatureSettingsEntryPoints
+import mega.privacy.android.app.presentation.settings.compose.navigation.appMoreSettingsEntryPoints
 import mega.privacy.android.app.presentation.settings.model.PreferenceResource
 import mega.privacy.android.domain.repository.SettingsRepository
 import mega.privacy.android.domain.usecase.GetPreference
 import mega.privacy.android.domain.usecase.PutPreference
+import mega.privacy.android.navigation.settings.FeatureSettingEntryPoint
 import mega.privacy.android.navigation.settings.FeatureSettings
+import mega.privacy.android.navigation.settings.MoreSettingEntryPoint
 
 /**
  * Settings module
@@ -21,6 +26,16 @@ import mega.privacy.android.navigation.settings.FeatureSettings
 abstract class SettingsModule {
 
     companion object {
+
+        @Provides
+        @ElementsIntoSet
+        fun provideAppFeatureSettingEntryPoints(): Set<@JvmSuppressWildcards FeatureSettingEntryPoint> =
+            appFeatureSettingsEntryPoints
+
+        @Provides
+        @ElementsIntoSet
+        fun provideAddMoreSettingsEntryPoints(): Set<@JvmSuppressWildcards MoreSettingEntryPoint> =
+            appMoreSettingsEntryPoints
 
         @Provides
         @ElementsIntoSet
@@ -76,7 +91,8 @@ abstract class SettingsModule {
 
         @Provides
         @ElementsIntoSet
-        fun provideFeatureSettingsSet(): Set<@JvmSuppressWildcards FeatureSettings> = setOf()
+        fun provideFeatureSettingsSet(): Set<@JvmSuppressWildcards FeatureSettings> =
+            appFeatureSettings
     }
 
 }
