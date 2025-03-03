@@ -1,4 +1,5 @@
 TOP_PATH := $(call my-dir)
+LOCAL_LDFLAGS += "-Wl,-z,max-page-size=16384"
 NDK_PROJECT_PATH := $(TOP_PATH)
 include $(TOP_PATH)/curl/Android.mk
 include $(TOP_PATH)/cryptopp/Android.mk

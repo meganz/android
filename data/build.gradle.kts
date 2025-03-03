@@ -67,8 +67,9 @@ dependencies {
 
     // Logging
     implementation(lib.bundles.logging)
+    // sqlcipherlib
+    api(project(":android-database-sqlcipher"))
 
-    implementation(lib.sqlcipher)
     implementation(androidx.security.crypto)
     implementation(google.tink)
 

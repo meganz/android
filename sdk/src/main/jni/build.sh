@@ -473,7 +473,7 @@ if [ ! -f ${LIBUV}/${LIBUV_SOURCE_FILE}.ready ]; then
 
         pushd ${LIBUV}/${LIBUV} &>> ${LOG_FILE}
         ./autogen.sh &>> ${LOG_FILE}
-        ./configure --host "${TARGET_HOST}" --with-pic --disable-shared --prefix="${BASE_PATH}/${LIBUV}/${LIBUV}"/libuv-android-${ABI} &>> ${LOG_FILE}
+        LDFLAGS+="-Wl,-z,max-page-size=16384" ./configure --host "${TARGET_HOST}" --with-pic --disable-shared --prefix="${BASE_PATH}/${LIBUV}/${LIBUV}"/libuv-android-${ABI} &>> ${LOG_FILE}
         make clean &>> ${LOG_FILE}
         make -j${JOBS} &>> ${LOG_FILE}
         make install &>> ${LOG_FILE}
@@ -562,7 +562,7 @@ if [ ! -f ${CURL}/${CURL_SOURCE_FILE}.ready ]; then
         fi
 
         pushd ${CURL}/ares &>> ${LOG_FILE}
-        ./configure --host "${TARGET_HOST}" --with-pic --disable-shared --prefix="${BASE_PATH}/${CURL}"/ares/ares-android-${ABI} &>> ${LOG_FILE}
+        LDFLAGS+="-Wl,-z,max-page-size=16384" ./configure --host "${TARGET_HOST}" --with-pic --disable-shared --prefix="${BASE_PATH}/${CURL}"/ares/ares-android-${ABI} &>> ${LOG_FILE}
         make clean &>> ${LOG_FILE}
         make -j${JOBS} &>> ${LOG_FILE}
         make install &>> ${LOG_FILE}
@@ -576,7 +576,7 @@ if [ ! -f ${CURL}/${CURL_SOURCE_FILE}.ready ]; then
         ln -s ${BASE_PATH}/megachat/webrtc/libwebrtc_${WEBRTC_SUFFIX}.a boringssl/lib/libssl.a
 
         LIBS=-lc++ ./configure --host "${TARGET_HOST}" --with-pic --disable-shared --prefix="${BASE_PATH}/${CURL}/${CURL}"/curl-android-${ABI} --with-ssl="${PWD}"/boringssl/ \
-        --disable-ares --enable-threaded-resolver ${CURL_EXTRA} &>> ${LOG_FILE}
+          --disable-ares --enable-threaded-resolver ${CURL_EXTRA} &>> ${LOG_FILE}
         make clean &>> ${LOG_FILE}
         make -j${JOBS} &>> ${LOG_FILE}
         make install &>> ${LOG_FILE}
@@ -663,7 +663,7 @@ if [ ! -f ${ICU}/${ICU_SOURCE_FILE}.ready ]; then
 
     mkdir -p linux && cd linux
 
-    CONFIGURE_LINUX_OPTIONS="--enable-static --enable-shared=no --enable-extras=no --enable-strict=no --enable-icuio=no --enable-layout=no --enable-layoutex=no --enable-tools=yes --enable-tests=no --enable-samples=no --enable-dyload=no"
+    LDFLAGS+="-Wl,-z,max-page-size=16384" CONFIGURE_LINUX_OPTIONS="--enable-static --enable-shared=no --enable-extras=no --enable-strict=no --enable-icuio=no --enable-layout=no --enable-layoutex=no --enable-tools=yes --enable-tests=no --enable-samples=no --enable-dyload=no"
     ../source/runConfigureICU Linux CFLAGS="-Os" CXXFLAGS="--std=c++11" ${CONFIGURE_LINUX_OPTIONS} &>> ${LOG_FILE}
 
     make -j${JOBS} &>> ${LOG_FILE}

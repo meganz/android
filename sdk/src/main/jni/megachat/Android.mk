@@ -35,6 +35,7 @@ LOCAL_SRC_FILES := $(addprefix sdk/third-party/libevent/, buffer.c bufferevent.c
 LOCAL_C_INCLUDES += $(LOCAL_PATH)/sdk/third-party/libevent/include $(LOCAL_PATH)/sdk/third-party/libevent $(LOCAL_PATH)/sdk/third-party/libevent/compat $(LOCAL_PATH)/include
 LOCAL_EXPORT_C_INCLUDES := $(LOCAL_PATH)/sdk/third-party/libevent/include $(LOCAL_PATH)/sdk/third-party/libevent $(LOCAL_PATH)/sdk/third-party/libevent/compat $(LOCAL_PATH)/include
 LOCAL_CFLAGS += -fvisibility=hidden -fdata-sections -ffunction-sections
+LOCAL_LDFLAGS += "-Wl,-z,max-page-size=16384"
 LOCAL_STATIC_LIBRARIES := ssl crypto
 LOCAL_EXPORT_CFLAGS :=
 include $(BUILD_STATIC_LIBRARY)
@@ -46,6 +47,7 @@ LOCAL_SRC_FILES := $(addprefix sdk/third-party/libws/src/, libws.c libws_compat.
 LOCAL_C_INCLUDES += $(LOCAL_PATH)/sdk/third-party/libws/src/ $(LOCAL_PATH)/include
 LOCAL_EXPORT_C_INCLUDES := $(LOCAL_PATH)/sdk/third-party/libws/src/
 LOCAL_CFLAGS += -fvisibility=hidden -fdata-sections -ffunction-sections
+LOCAL_LDFLAGS += "-Wl,-z,max-page-size=16384"
 LOCAL_STATIC_LIBRARIES := ssl crypto libevent2
 LOCAL_EXPORT_CFLAGS :=
 include $(BUILD_STATIC_LIBRARY)
@@ -56,14 +58,17 @@ LOCAL_CFLAGS := -fvisibility=hidden -fvisibility-inlines-hidden -fdata-sections 
 LOCAL_SRC_FILES := $(addprefix sdk/src/, megachatapi.cpp megachatapi_impl.cpp strongvelope/strongvelope.cpp presenced.cpp base64url.cpp chatClient.cpp chatd.cpp kareredb.cpp chatclientDb.cpp url.cpp karereCommon.cpp userAttrCache.cpp base/logger.cpp base/cservices.cpp net/websocketsIO.cpp karereDbSchema.cpp)
 LOCAL_C_INCLUDES += $(local_c_includes)
 LOCAL_EXPORT_C_INCLUDES += $(local_c_includes)
+LOCAL_LDFLAGS += "-Wl,-z,max-page-size=16384"
 LOCAL_STATIC_LIBRARIES := curl cryptopp megasdk
 
 ifeq ($(USE_LIBWEBSOCKETS),true)
 LOCAL_CFLAGS += -DUSE_LIBWEBSOCKETS=1
 LOCAL_SRC_FILES += $(addprefix sdk/src/, net/libwebsocketsIO.cpp waiter/libuvWaiter.cpp)
+LOCAL_LDFLAGS += "-Wl,-z,max-page-size=16384"
 LOCAL_STATIC_LIBRARIES += libwebsockets
 else
 LOCAL_SRC_FILES += $(addprefix sdk/src/, net/libwsIO.cpp waiter/libeventWaiter.cpp)
+LOCAL_LDFLAGS += "-Wl,-z,max-page-size=16384"
 LOCAL_STATIC_LIBRARIES += libws
 endif
 
@@ -71,8 +76,10 @@ ifeq ($(DISABLE_WEBRTC),false)
 LOCAL_SRC_FILES += $(addprefix sdk/src/, sfu.cpp)
 LOCAL_SRC_FILES += $(addprefix sdk/src/, rtcCrypto.cpp)
 LOCAL_SRC_FILES += $(addprefix sdk/src/rtcModule/, webrtc.cpp webrtcAdapter.cpp rtcStats.cpp)
+LOCAL_LDFLAGS += "-Wl,-z,max-page-size=16384"
 LOCAL_STATIC_LIBRARIES += webrtc
 else
+LOCAL_LDFLAGS += "-Wl,-z,max-page-size=16384"
 LOCAL_CFLAGS += -DKARERE_DISABLE_WEBRTC=1 -DSVC_DISABLE_STROPHE
 LOCAL_EXPORT_CFLAGS += -DKARERE_DISABLE_WEBRTC=1 -DSVC_DISABLE_STROPHE
 endif
