@@ -399,9 +399,12 @@ pipeline {
                                 for FILE in *.txt; do
                                     curl -u${ARTIFACTORY_USER}:${ARTIFACTORY_ACCESS_TOKEN} -T ${FILE} \"${TARGET_PATH}\"
                                 done
+                                
+                                echo Uploading mapping.txt
+                                zip -j mapping.txt.zip ${WORKSPACE}/app/build/outputs/mapping/gmsRelease/mapping.txt
+                                curl -u${ARTIFACTORY_USER}:${ARTIFACTORY_ACCESS_TOKEN} -T mapping.txt.zip \"${TARGET_PATH}\"
                             '''
                         }
-
                     }
                 }
             }
