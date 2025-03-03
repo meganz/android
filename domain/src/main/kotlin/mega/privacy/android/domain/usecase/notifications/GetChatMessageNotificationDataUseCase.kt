@@ -3,6 +3,7 @@ package mega.privacy.android.domain.usecase.notifications
 import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.async
 import kotlinx.coroutines.withContext
+import mega.privacy.android.domain.entity.chat.ChatMessageStatus
 import mega.privacy.android.domain.entity.notifications.ChatMessageNotificationData
 import mega.privacy.android.domain.qualifier.IoDispatcher
 import mega.privacy.android.domain.usecase.GetChatRoomUseCase
@@ -40,33 +41,41 @@ class GetChatMessageNotificationDataUseCase @Inject constructor(
         defaultSound: String?,
     ): ChatMessageNotificationData? = withContext(ioDispatcher) {
         getChatMessageUseCase(chatId, msgId)?.let { message ->
-            if (message.isDeleted) {
-                ChatMessageNotificationData(msg = message)
-            } else {
-                val chatRoom = getChatRoomUseCase(chatId) ?: return@withContext null
-                val senderName = async {
-                    runCatching {
-                        getMessageSenderNameUseCase(
-                            message.userHandle,
-                            chatId
-                        )
-                    }.getOrNull()
+            when {
+                message.status == ChatMessageStatus.SEEN -> {
+                    ChatMessageNotificationData(msg = message, isMessageSeen = true)
                 }
-                val senderAvatar = async {
-                    runCatching { getUserAvatarUseCase(message.userHandle) }.getOrNull()
-                }
-                val senderAvatarColor = getUserAvatarColorUseCase(message.userHandle)
-                val notificationBehaviour =
-                    getChatMessageNotificationBehaviourUseCase(shouldBeep, defaultSound)
 
-                ChatMessageNotificationData(
-                    chat = chatRoom,
-                    msg = message,
-                    senderName = senderName.await().orEmpty(),
-                    senderAvatar = senderAvatar.await(),
-                    senderAvatarColor = senderAvatarColor,
-                    notificationBehaviour = notificationBehaviour
-                )
+                message.isDeleted -> {
+                    ChatMessageNotificationData(msg = message)
+                }
+
+                else -> {
+                    val chatRoom = getChatRoomUseCase(chatId) ?: return@withContext null
+                    val senderName = async {
+                        runCatching {
+                            getMessageSenderNameUseCase(
+                                message.userHandle,
+                                chatId
+                            )
+                        }.getOrNull()
+                    }
+                    val senderAvatar = async {
+                        runCatching { getUserAvatarUseCase(message.userHandle) }.getOrNull()
+                    }
+                    val senderAvatarColor = getUserAvatarColorUseCase(message.userHandle)
+                    val notificationBehaviour =
+                        getChatMessageNotificationBehaviourUseCase(shouldBeep, defaultSound)
+
+                    ChatMessageNotificationData(
+                        chat = chatRoom,
+                        msg = message,
+                        senderName = senderName.await().orEmpty(),
+                        senderAvatar = senderAvatar.await(),
+                        senderAvatarColor = senderAvatarColor,
+                        notificationBehaviour = notificationBehaviour
+                    )
+                }
             }
         }
     }

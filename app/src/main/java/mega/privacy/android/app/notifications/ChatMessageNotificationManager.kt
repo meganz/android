@@ -62,9 +62,24 @@ class ChatMessageNotificationManager @Inject constructor(
     ) = with(chatMessageNotificationData) {
         val notificationId = MegaApiJava.userHandleToBase64(msg.messageId).hashCode()
 
-        if (msg.isDeleted || chat?.chatId == MegaApplication.openChatId) {
-            notificationManagerCompat.cancel(notificationId)
-            return@with
+        when {
+            msg.isDeleted -> {
+                Timber.d("Message deleted. Removing notification")
+                notificationManagerCompat.cancel(notificationId)
+                return@with
+            }
+
+            chatMessageNotificationData.isMessageSeen -> {
+                Timber.d("Message seen. Removing notification")
+                notificationManagerCompat.cancel(notificationId)
+                return@with
+            }
+
+            chat?.chatId == MegaApplication.openChatId -> {
+                Timber.d("Chat opened. Removing notification")
+                notificationManagerCompat.cancel(notificationId)
+                return@with
+            }
         }
 
         val intent = Intent(context, ManagerActivity::class.java).apply {

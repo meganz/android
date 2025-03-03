@@ -6,6 +6,7 @@ import kotlinx.coroutines.test.UnconfinedTestDispatcher
 import kotlinx.coroutines.test.runTest
 import mega.privacy.android.domain.entity.NotificationBehaviour
 import mega.privacy.android.domain.entity.chat.ChatMessage
+import mega.privacy.android.domain.entity.chat.ChatMessageStatus
 import mega.privacy.android.domain.entity.chat.ChatRoom
 import mega.privacy.android.domain.entity.notifications.ChatMessageNotificationData
 import mega.privacy.android.domain.usecase.GetChatRoomUseCase
@@ -17,6 +18,7 @@ import org.junit.jupiter.api.AfterAll
 import org.junit.jupiter.api.BeforeAll
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.TestInstance
+import org.mockito.kotlin.doReturn
 import org.mockito.kotlin.mock
 import org.mockito.kotlin.reset
 import org.mockito.kotlin.whenever
@@ -80,6 +82,24 @@ class GetChatMessageNotificationDataUseCaseTest {
             Truth.assertThat(underTest.invoke(true, chatId, msgId, defaultSound))
                 .isEqualTo(chatMessageNotificationData)
         }
+
+    @Test
+    fun `test that when a message is seen all the ChatMessageNotificationData are empty except the message`() =
+        runTest {
+            val message = mock<ChatMessage> {
+                on { status } doReturn ChatMessageStatus.SEEN
+            }
+            val chatMessageNotificationData = ChatMessageNotificationData(
+                msg = message,
+                isMessageSeen = true,
+            )
+
+            whenever(getChatMessageUseCase(chatId, msgId)).thenReturn(message)
+
+            Truth.assertThat(underTest.invoke(true, chatId, msgId, defaultSound))
+                .isEqualTo(chatMessageNotificationData)
+        }
+
 
     @Test
     fun `test that when ChatMessageNotificationData is returned with all the properties`() =

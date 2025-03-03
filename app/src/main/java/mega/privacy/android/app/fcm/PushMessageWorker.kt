@@ -240,7 +240,6 @@ class PushMessageWorker @AssistedInject constructor(
                             runCatching { DEFAULT_NOTIFICATION_URI.toString() }.getOrNull()
                         ) ?: return@withContext Result.failure()
 
-
                         chatMessageNotificationManager.show(
                             applicationContext,
                             data,

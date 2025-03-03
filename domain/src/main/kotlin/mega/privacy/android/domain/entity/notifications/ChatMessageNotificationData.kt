@@ -22,4 +22,5 @@ data class ChatMessageNotificationData(
     val senderAvatar: File? = null,
     val senderAvatarColor: Int? = null,
     val notificationBehaviour: NotificationBehaviour? = null,
+    val isMessageSeen: Boolean = false,
 )
