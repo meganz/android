@@ -53,7 +53,6 @@ import mega.privacy.android.shared.original.core.ui.model.MenuAction
 import mega.privacy.android.shared.original.core.ui.preview.CombinedThemePreviews
 import mega.privacy.android.shared.original.core.ui.theme.OriginalTheme
 import mega.privacy.android.shared.original.core.ui.utils.showAutoDurationSnackbar
-import mega.privacy.android.shared.sync.featuretoggles.SyncFeatures
 import mega.privacy.android.shared.sync.ui.SyncEmptyState
 
 /**
@@ -165,7 +164,6 @@ internal fun DeviceCenterScreen(
                 onBottomSheetDismissed = {
                     coroutineScope.launch { modalSheetState.hide() }
                 },
-                isBackupForAndroidEnabled = uiState.enabledFlags.contains(SyncFeatures.BackupForAndroid),
             )
         },
         content = {

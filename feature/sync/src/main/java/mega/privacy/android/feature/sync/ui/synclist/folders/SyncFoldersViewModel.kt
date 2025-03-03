@@ -30,7 +30,6 @@ import mega.privacy.android.domain.usecase.camerauploads.GetMediaUploadsBackupUs
 import mega.privacy.android.domain.usecase.camerauploads.MonitorCameraUploadsSettingsActionsUseCase
 import mega.privacy.android.domain.usecase.camerauploads.MonitorCameraUploadsStatusInfoUseCase
 import mega.privacy.android.domain.usecase.environment.MonitorBatteryInfoUseCase
-import mega.privacy.android.domain.usecase.featureflag.GetFeatureFlagValueUseCase
 import mega.privacy.android.domain.usecase.node.MoveDeconfiguredBackupNodesUseCase
 import mega.privacy.android.domain.usecase.node.RemoveDeconfiguredBackupNodesUseCase
 import mega.privacy.android.feature.sync.domain.entity.SyncStatus
@@ -45,7 +44,6 @@ import mega.privacy.android.feature.sync.domain.usecase.sync.option.SetUserPause
 import mega.privacy.android.feature.sync.ui.mapper.sync.SyncUiItemMapper
 import mega.privacy.android.feature.sync.ui.model.StopBackupOption
 import mega.privacy.android.feature.sync.ui.model.SyncUiItem
-import mega.privacy.android.shared.sync.featuretoggles.SyncFeatures
 import timber.log.Timber
 import javax.inject.Inject
 
@@ -72,7 +70,6 @@ internal class SyncFoldersViewModel @Inject constructor(
     private val getMediaUploadsBackupUseCase: GetMediaUploadsBackupUseCase,
     private val monitorCameraUploadsSettingsActionsUseCase: MonitorCameraUploadsSettingsActionsUseCase,
     private val monitorCameraUploadsStatusInfoUseCase: MonitorCameraUploadsStatusInfoUseCase,
-    private val getFeatureFlagValueUseCase: GetFeatureFlagValueUseCase,
 ) : ViewModel() {
 
     private val _uiState = MutableStateFlow(SyncFoldersUiState(emptyList()))
@@ -81,7 +78,6 @@ internal class SyncFoldersViewModel @Inject constructor(
     private var loadSyncsJob: Job? = null
 
     init {
-        checkFeatureFlags()
         viewModelScope.launch {
             runCatching {
                 _uiState.update { state -> state.copy(isLoading = true) }
@@ -114,20 +110,6 @@ internal class SyncFoldersViewModel @Inject constructor(
             monitorCameraUploadsSettingsActionsUseCase()
                 .catch { Timber.e(it) }
                 .collect { loadSyncs() }
-        }
-    }
-
-    private fun checkFeatureFlags() {
-        viewModelScope.launch {
-            runCatching {
-                getFeatureFlagValueUseCase(SyncFeatures.BackupForAndroid)
-            }.onSuccess { isBackupForAndroidEnabled ->
-                if (isBackupForAndroidEnabled) {
-                    _uiState.update {
-                        it.copy(enabledFlags = uiState.value.enabledFlags.plus(SyncFeatures.BackupForAndroid))
-                    }
-                }
-            }.onFailure(Timber::e)
         }
     }
 

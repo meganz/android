@@ -36,7 +36,6 @@ internal fun SyncFoldersRoute(
     uiState: SyncFoldersUiState,
     snackBarHostState: SnackbarHostState,
     deviceName: String,
-    isBackupForAndroidEnabled: Boolean,
 ) {
     val context = LocalContext.current
 
@@ -69,7 +68,6 @@ internal fun SyncFoldersRoute(
         isLowBatteryLevel = uiState.isLowBatteryLevel,
         isLoading = uiState.isLoading,
         deviceName = deviceName,
-        isBackupForAndroidEnabled = isBackupForAndroidEnabled,
     )
 
     uiState.syncUiItemToRemove?.let { syncUiItemToRemove ->

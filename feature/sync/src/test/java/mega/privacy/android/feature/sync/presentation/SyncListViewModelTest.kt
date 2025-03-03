@@ -11,7 +11,6 @@ import mega.privacy.android.core.test.extension.CoroutineMainDispatcherExtension
 import mega.privacy.android.domain.entity.node.NodeId
 import mega.privacy.android.domain.usecase.backup.GetDeviceIdUseCase
 import mega.privacy.android.domain.usecase.backup.GetDeviceNameUseCase
-import mega.privacy.android.domain.usecase.featureflag.GetFeatureFlagValueUseCase
 import mega.privacy.android.feature.sync.R
 import mega.privacy.android.feature.sync.domain.entity.SolvedIssue
 import mega.privacy.android.feature.sync.domain.entity.StallIssueType
@@ -28,7 +27,6 @@ import mega.privacy.android.feature.sync.ui.mapper.stalledissue.StalledIssueItem
 import mega.privacy.android.feature.sync.ui.model.StalledIssueUiItem
 import mega.privacy.android.feature.sync.ui.synclist.SyncListAction
 import mega.privacy.android.feature.sync.ui.synclist.SyncListViewModel
-import mega.privacy.android.shared.sync.featuretoggles.SyncFeatures
 import org.junit.jupiter.api.AfterEach
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.TestInstance
@@ -53,7 +51,6 @@ class SyncListViewModelTest {
     private val monitorSyncByWiFiUseCase: MonitorSyncByWiFiUseCase = mock()
     private val getDeviceIdUseCase: GetDeviceIdUseCase = mock()
     private val getDeviceNameUseCase: GetDeviceNameUseCase = mock()
-    private val getFeatureFlagValueUseCase: GetFeatureFlagValueUseCase = mock()
 
     private val stalledIssues = listOf(
         StalledIssue(
@@ -160,13 +157,6 @@ class SyncListViewModelTest {
             }
         }
 
-    @Test
-    fun `test that check feature flags method updates the state properly`() = runTest {
-        whenever(getFeatureFlagValueUseCase(SyncFeatures.BackupForAndroid)).thenReturn(true)
-        initViewModel()
-        assertThat(underTest.state.value.enabledFlags.contains(SyncFeatures.BackupForAndroid))
-    }
-
     private fun initViewModel() {
         underTest = SyncListViewModel(
             setOnboardingShownUseCase = setOnboardingShownUseCase,
@@ -178,7 +168,6 @@ class SyncListViewModelTest {
             monitorSyncByWiFiUseCase = monitorSyncByWiFiUseCase,
             getDeviceIdUseCase = getDeviceIdUseCase,
             getDeviceNameUseCase = getDeviceNameUseCase,
-            getFeatureFlagValueUseCase = getFeatureFlagValueUseCase,
         )
     }
 }

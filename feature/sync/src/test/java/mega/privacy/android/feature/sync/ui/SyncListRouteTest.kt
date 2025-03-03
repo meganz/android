@@ -26,7 +26,6 @@ import mega.privacy.android.feature.sync.ui.synclist.stalledissues.SyncStalledIs
 import mega.privacy.android.shared.original.core.ui.controls.buttons.MULTI_FAB_MAIN_FAB_TEST_TAG
 import mega.privacy.android.shared.original.core.ui.controls.buttons.MULTI_FAB_OPTION_ROW_TEST_TAG
 import mega.privacy.android.shared.resources.R
-import mega.privacy.android.shared.sync.featuretoggles.SyncFeatures
 import mega.privacy.mobile.analytics.event.AndroidBackupFABButtonPressedEvent
 import mega.privacy.mobile.analytics.event.AndroidSyncMultiFABButtonPressedEvent
 import org.junit.Before
@@ -73,12 +72,11 @@ class SyncListRouteTest {
 
     @Before
     fun setupMock(): Unit = runBlocking {
-        whenever(state.value).thenReturn(SyncListState(enabledFlags = setOf(SyncFeatures.BackupForAndroid)))
+        whenever(state.value).thenReturn(SyncListState())
         whenever(viewModel.state).thenReturn(state)
         whenever(syncFoldersUiState.value).thenReturn(
             SyncFoldersUiState(
                 syncUiItems = synUiItems,
-                enabledFlags = setOf(SyncFeatures.BackupForAndroid)
             )
         )
         whenever(syncFoldersViewModel.uiState).thenReturn(syncFoldersUiState)

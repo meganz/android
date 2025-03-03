@@ -42,7 +42,6 @@ internal class DeviceBottomSheetBodyTest {
                 onAddNewSyncClicked = {},
                 onAddBackupClicked = {},
                 onBottomSheetDismissed = {},
-                isBackupForAndroidEnabled = true,
             )
         }
         composeTestRule.onNodeWithTag(BOTTOM_SHEET_CONTAINER)
@@ -69,7 +68,6 @@ internal class DeviceBottomSheetBodyTest {
                 onAddNewSyncClicked = {},
                 onAddBackupClicked = {},
                 onBottomSheetDismissed = {},
-                isBackupForAndroidEnabled = true,
             )
         }
         composeTestRule.onNodeWithTag(BOTTOM_SHEET_CONTAINER)

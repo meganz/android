@@ -40,7 +40,6 @@ import mega.privacy.android.feature.sync.ui.views.TAG_SYNC_LIST_SCREEN_NO_ITEMS
 import mega.privacy.android.shared.original.core.ui.controls.buttons.RaisedDefaultMegaButton
 import mega.privacy.android.shared.original.core.ui.controls.skeleton.CardItemLoadingSkeleton
 import mega.privacy.android.shared.original.core.ui.controls.text.MegaText
-import mega.privacy.android.shared.original.core.ui.preview.BooleanProvider
 import mega.privacy.android.shared.original.core.ui.preview.CombinedThemePreviews
 import mega.privacy.android.shared.original.core.ui.theme.OriginalTheme
 import mega.privacy.android.shared.original.core.ui.theme.extensions.h6Medium
@@ -63,7 +62,6 @@ internal fun SyncFoldersScreen(
     isLowBatteryLevel: Boolean,
     isLoading: Boolean,
     deviceName: String,
-    isBackupForAndroidEnabled: Boolean,
     modifier: Modifier = Modifier,
 ) {
     Box(
@@ -82,7 +80,6 @@ internal fun SyncFoldersScreen(
                     SyncFoldersScreenEmptyState(
                         onAddNewSyncClicked = onAddNewSyncClicked,
                         onAddNewBackupClicked = onAddNewBackupClicked,
-                        isBackupForAndroidEnabled = isBackupForAndroidEnabled,
                         modifier = Modifier
                             .fillParentMaxHeight()
                             .fillParentMaxWidth()
@@ -129,22 +126,15 @@ internal fun SyncFoldersScreen(
 private fun SyncFoldersScreenEmptyState(
     onAddNewSyncClicked: () -> Unit,
     onAddNewBackupClicked: () -> Unit,
-    isBackupForAndroidEnabled: Boolean,
     modifier: Modifier = Modifier,
 ) {
     val isLandscape =
         LocalConfiguration.current.orientation == Configuration.ORIENTATION_LANDSCAPE
 
     Column(
-        modifier = if (isBackupForAndroidEnabled) {
-            modifier
-                .verticalScroll(rememberScrollState())
-                .padding(all = if (isLandscape) 0.dp else 48.dp)
-        } else {
-            modifier
-                .verticalScroll(rememberScrollState())
-                .padding(horizontal = 32.dp)
-        },
+        modifier = modifier
+            .verticalScroll(rememberScrollState())
+            .padding(all = if (isLandscape) 0.dp else 48.dp),
         horizontalAlignment = Alignment.CenterHorizontally,
         verticalArrangement = Arrangement.Center,
     ) {
@@ -153,60 +143,35 @@ private fun SyncFoldersScreenEmptyState(
             contentDescription = "Sync folders empty state image",
         )
         MegaText(
-            text = if (isBackupForAndroidEnabled) {
-                stringResource(id = sharedResR.string.device_center_sync_backup_list_empty_state_title)
-            } else {
-                stringResource(id = sharedResR.string.device_center_sync_list_empty_state_title)
-            },
+            text = stringResource(id = sharedResR.string.device_center_sync_backup_list_empty_state_title),
             textColor = TextColor.Primary,
             modifier = Modifier.padding(top = 32.dp),
             style = MaterialTheme.typography.h6Medium
         )
-        if (isBackupForAndroidEnabled) {
-            MegaText(
-                text = stringResource(id = sharedResR.string.device_center_sync_backup_list_empty_state_message),
-                textColor = TextColor.Secondary,
-                modifier = Modifier
-                    .padding(top = 16.dp)
-                    .testTag(TEST_TAG_SYNC_LIST_SCREEN_EMPTY_STATUS_TEXT),
-                style = MaterialTheme.typography.subtitle2.copy(textAlign = TextAlign.Center),
-            )
-        } else {
-            MegaText(
-                text = stringResource(id = sharedResR.string.device_center_sync_list_empty_state_message),
-                textColor = TextColor.Secondary,
-                modifier = Modifier.padding(top = 16.dp),
-                style = MaterialTheme.typography.subtitle2.copy(textAlign = TextAlign.Center),
-            )
-        }
-
-        if (isBackupForAndroidEnabled) {
-            RaisedDefaultMegaButton(
-                textId = sharedResR.string.device_center_sync_add_new_syn_button_option,
-                onClick = onAddNewSyncClicked,
-                modifier = Modifier
-                    .padding(top = if (isLandscape) 32.dp else 48.dp)
-                    .defaultMinSize(minWidth = 232.dp)
-                    .testTag(TEST_TAG_SYNC_LIST_SCREEN_EMPTY_STATUS_SYNC_BUTTON),
-            )
-            RaisedDefaultMegaButton(
-                textId = sharedResR.string.device_center_sync_add_new_backup_button_option,
-                onClick = onAddNewBackupClicked,
-                modifier = Modifier
-                    .padding(top = 24.dp)
-                    .defaultMinSize(minWidth = 232.dp)
-                    .testTag(TEST_TAG_SYNC_LIST_SCREEN_EMPTY_STATUS_BACKUP_BUTTON),
-            )
-        } else {
-            RaisedDefaultMegaButton(
-                textId = sharedResR.string.device_center_sync_add_new_syn_button_option,
-                onClick = onAddNewSyncClicked,
-                modifier = Modifier
-                    .padding(top = if (isLandscape) 32.dp else 162.dp)
-                    .defaultMinSize(minWidth = 232.dp)
-                    .testTag(TEST_TAG_SYNC_LIST_SCREEN_EMPTY_STATUS_SYNC_BUTTON),
-            )
-        }
+        MegaText(
+            text = stringResource(id = sharedResR.string.device_center_sync_backup_list_empty_state_message),
+            textColor = TextColor.Secondary,
+            modifier = Modifier
+                .padding(top = 16.dp)
+                .testTag(TEST_TAG_SYNC_LIST_SCREEN_EMPTY_STATUS_TEXT),
+            style = MaterialTheme.typography.subtitle2.copy(textAlign = TextAlign.Center),
+        )
+        RaisedDefaultMegaButton(
+            textId = sharedResR.string.device_center_sync_add_new_syn_button_option,
+            onClick = onAddNewSyncClicked,
+            modifier = Modifier
+                .padding(top = if (isLandscape) 32.dp else 48.dp)
+                .defaultMinSize(minWidth = 232.dp)
+                .testTag(TEST_TAG_SYNC_LIST_SCREEN_EMPTY_STATUS_SYNC_BUTTON),
+        )
+        RaisedDefaultMegaButton(
+            textId = sharedResR.string.device_center_sync_add_new_backup_button_option,
+            onClick = onAddNewBackupClicked,
+            modifier = Modifier
+                .padding(top = 24.dp)
+                .defaultMinSize(minWidth = 232.dp)
+                .testTag(TEST_TAG_SYNC_LIST_SCREEN_EMPTY_STATUS_BACKUP_BUTTON),
+        )
     }
 }
 
@@ -234,9 +199,7 @@ private fun SyncFoldersScreenLoadingState() {
 @Composable
 @Preview(name = "5-inch Device Portrait", widthDp = 360, heightDp = 640)
 @Preview(name = "5-inch Device Portrait", widthDp = 640, heightDp = 360)
-private fun SyncFoldersScreenEmptyStatePreview(
-    @PreviewParameter(BooleanProvider::class) isFreeAccount: Boolean,
-) {
+private fun SyncFoldersScreenEmptyStatePreview() {
     OriginalTheme(isDark = isSystemInDarkTheme()) {
         SyncFoldersScreen(
             syncUiItems = emptyList(),
@@ -252,7 +215,6 @@ private fun SyncFoldersScreenEmptyStatePreview(
             isLowBatteryLevel = false,
             isLoading = false,
             deviceName = "Device Name",
-            isBackupForAndroidEnabled = true,
         )
     }
 }
@@ -278,7 +240,6 @@ private fun SyncFoldersScreenLoadingStatePreview() {
             isLowBatteryLevel = false,
             isLoading = true,
             deviceName = "Device Name",
-            isBackupForAndroidEnabled = true,
         )
     }
 }
@@ -315,7 +276,6 @@ private fun SyncFoldersScreenSyncingPreview(
             isLowBatteryLevel = false,
             isLoading = false,
             deviceName = "Device Name",
-            isBackupForAndroidEnabled = true,
         )
     }
 }
@@ -352,7 +312,6 @@ private fun SyncFoldersScreenSyncingWithStalledIssuesPreview(
             isLowBatteryLevel = false,
             isLoading = false,
             deviceName = "Device Name",
-            isBackupForAndroidEnabled = true,
         )
     }
 }

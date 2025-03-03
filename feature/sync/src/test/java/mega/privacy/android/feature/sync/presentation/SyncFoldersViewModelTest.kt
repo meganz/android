@@ -26,7 +26,6 @@ import mega.privacy.android.domain.usecase.camerauploads.GetMediaUploadsBackupUs
 import mega.privacy.android.domain.usecase.camerauploads.MonitorCameraUploadsSettingsActionsUseCase
 import mega.privacy.android.domain.usecase.camerauploads.MonitorCameraUploadsStatusInfoUseCase
 import mega.privacy.android.domain.usecase.environment.MonitorBatteryInfoUseCase
-import mega.privacy.android.domain.usecase.featureflag.GetFeatureFlagValueUseCase
 import mega.privacy.android.domain.usecase.node.MoveDeconfiguredBackupNodesUseCase
 import mega.privacy.android.domain.usecase.node.RemoveDeconfiguredBackupNodesUseCase
 import mega.privacy.android.feature.sync.domain.entity.FolderPair
@@ -47,7 +46,6 @@ import mega.privacy.android.feature.sync.ui.model.SyncUiItem
 import mega.privacy.android.feature.sync.ui.synclist.folders.SyncFoldersAction
 import mega.privacy.android.feature.sync.ui.synclist.folders.SyncFoldersUiState
 import mega.privacy.android.feature.sync.ui.synclist.folders.SyncFoldersViewModel
-import mega.privacy.android.shared.sync.featuretoggles.SyncFeatures
 import org.junit.jupiter.api.AfterEach
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
@@ -86,7 +84,6 @@ class SyncFoldersViewModelTest {
         mock()
     private val monitorCameraUploadsStatusInfoUseCase: MonitorCameraUploadsStatusInfoUseCase =
         mock()
-    private val getFeatureFlagValueUseCase: GetFeatureFlagValueUseCase = mock()
     private lateinit var underTest: SyncFoldersViewModel
 
     private val folderPairs = listOf(
@@ -174,7 +171,6 @@ class SyncFoldersViewModelTest {
             getNodePathByIdUseCase,
             getCameraUploadsBackupUseCase,
             monitorCameraUploadsStatusInfoUseCase,
-            getFeatureFlagValueUseCase,
         )
     }
 
@@ -388,13 +384,6 @@ class SyncFoldersViewModelTest {
             assertThat(underTest.uiState.value.isStorageOverQuota).isFalse()
         }
 
-    @Test
-    fun `test that check feature flags method updates the state properly`() = runTest {
-        whenever(getFeatureFlagValueUseCase(SyncFeatures.BackupForAndroid)).thenReturn(true)
-        initViewModel()
-        assertThat(underTest.uiState.value.enabledFlags.contains(SyncFeatures.BackupForAndroid))
-    }
-
     private fun getSyncUiItem(status: SyncStatus): SyncUiItem = SyncUiItem(
         id = 3L,
         syncType = SyncType.TYPE_TWOWAY,
@@ -430,7 +419,6 @@ class SyncFoldersViewModelTest {
             getMediaUploadsBackupUseCase = getMediaUploadsBackupUseCase,
             monitorCameraUploadsSettingsActionsUseCase = monitorCameraUploadsSettingsActionsUseCase,
             monitorCameraUploadsStatusInfoUseCase = monitorCameraUploadsStatusInfoUseCase,
-            getFeatureFlagValueUseCase = getFeatureFlagValueUseCase,
         )
     }
 }

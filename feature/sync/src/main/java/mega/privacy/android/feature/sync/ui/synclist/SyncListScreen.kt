@@ -1,6 +1,5 @@
 package mega.privacy.android.feature.sync.ui.synclist
 
-import mega.privacy.android.core.R as CoreUiR
 import mega.privacy.android.icon.pack.R as iconPackR
 import mega.privacy.android.shared.resources.R as sharedR
 import mega.privacy.android.shared.resources.R as sharedResR
@@ -12,7 +11,6 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material.AppBarDefaults
 import androidx.compose.material.ExperimentalMaterialApi
-import androidx.compose.material.Icon
 import androidx.compose.material.ModalBottomSheetValue
 import androidx.compose.material.ScaffoldDefaults
 import androidx.compose.material.SnackbarHostState
@@ -62,7 +60,6 @@ import mega.privacy.android.shared.original.core.ui.controls.appbar.AppBarType
 import mega.privacy.android.shared.original.core.ui.controls.appbar.MegaAppBar
 import mega.privacy.android.shared.original.core.ui.controls.banners.ActionBanner
 import mega.privacy.android.shared.original.core.ui.controls.banners.WarningBanner
-import mega.privacy.android.shared.original.core.ui.controls.buttons.MegaFloatingActionButton
 import mega.privacy.android.shared.original.core.ui.controls.buttons.MegaMultiFloatingActionButton
 import mega.privacy.android.shared.original.core.ui.controls.buttons.MultiFloatingActionButtonItem
 import mega.privacy.android.shared.original.core.ui.controls.buttons.MultiFloatingActionButtonState
@@ -75,7 +72,6 @@ import mega.privacy.android.shared.original.core.ui.controls.layouts.MegaScaffol
 import mega.privacy.android.shared.original.core.ui.controls.sheets.BottomSheet
 import mega.privacy.android.shared.original.core.ui.model.MenuAction
 import mega.privacy.android.shared.original.core.ui.utils.ComposableLifecycle
-import mega.privacy.android.shared.sync.featuretoggles.SyncFeatures
 import mega.privacy.mobile.analytics.event.AndroidBackupFABButtonPressedEvent
 import mega.privacy.mobile.analytics.event.AndroidSyncMultiFABButtonPressedEvent
 
@@ -115,8 +111,6 @@ internal fun SyncListScreen(
     val scaffoldState = rememberScaffoldState(snackbarHostState = snackBarHostState)
 
     val syncFoldersState by syncFoldersViewModel.uiState.collectAsStateWithLifecycle()
-    val isBackupForAndroidEnabled =
-        syncFoldersState.enabledFlags.contains(SyncFeatures.BackupForAndroid)
 
     BottomSheet(
         modalSheetState = modalSheetState,
@@ -187,8 +181,8 @@ internal fun SyncListScreen(
             },
             floatingActionButton = {
                 if (syncFoldersState.syncUiItems.isNotEmpty() || syncFoldersState.isLoading) {
-                    if (isBackupForAndroidEnabled) {
-                        MegaMultiFloatingActionButton(items = listOf(
+                    MegaMultiFloatingActionButton(
+                        items = listOf(
                             MultiFloatingActionButtonItem(
                                 icon = painterResource(id = iconPackR.drawable.ic_sync_01),
                                 label = stringResource(id = R.string.sync_toolbar_title),
@@ -209,31 +203,21 @@ internal fun SyncListScreen(
                                 },
                             ),
                         ),
-                            modifier = Modifier.testTag(TEST_TAG_SYNC_LIST_SCREEN_FAB),
-                            multiFabState = multiFabState,
-                            onStateChanged = { state ->
-                                if (state == MultiFloatingActionButtonState.EXPANDED) {
-                                    Analytics.tracker.trackEvent(
-                                        AndroidSyncMultiFABButtonPressedEvent
-                                    )
-                                }
-                                onFabExpanded(state == MultiFloatingActionButtonState.EXPANDED)
-                                multiFabState.value = state
-                            })
-                    } else {
-                        MegaFloatingActionButton(
-                            onClick = onSyncFolderClicked,
-                            modifier = Modifier.testTag(TEST_TAG_SYNC_LIST_SCREEN_FAB)
-                        ) {
-                            Icon(
-                                painter = painterResource(CoreUiR.drawable.ic_plus),
-                                contentDescription = stringResource(id = sharedResR.string.device_center_sync_add_new_syn_button_option),
-                            )
+                        modifier = Modifier.testTag(TEST_TAG_SYNC_LIST_SCREEN_FAB),
+                        multiFabState = multiFabState,
+                        onStateChanged = { state ->
+                            if (state == MultiFloatingActionButtonState.EXPANDED) {
+                                Analytics.tracker.trackEvent(
+                                    AndroidSyncMultiFABButtonPressedEvent
+                                )
+                            }
+                            onFabExpanded(state == MultiFloatingActionButtonState.EXPANDED)
+                            multiFabState.value = state
                         }
-                    }
+                    )
                 }
             },
-            blurContent = if (isBackupForAndroidEnabled && multiFabState.value == MultiFloatingActionButtonState.EXPANDED) { ->
+            blurContent = if (multiFabState.value == MultiFloatingActionButtonState.EXPANDED) { ->
                 multiFabState.value = MultiFloatingActionButtonState.COLLAPSED
             } else {
                 null
@@ -359,7 +343,6 @@ private fun SyncListScreenContent(
                 syncFoldersUiState = syncFoldersUiState,
                 snackBarHostState = snackBarHostState,
                 deviceName = deviceName,
-                isBackupForAndroidEnabled = syncFoldersUiState.enabledFlags.contains(SyncFeatures.BackupForAndroid),
             )
             PullRefreshIndicator(
                 modifier = Modifier.align(Alignment.TopCenter),
@@ -414,7 +397,6 @@ private fun SelectedChipScreen(
     syncFoldersUiState: SyncFoldersUiState,
     snackBarHostState: SnackbarHostState,
     deviceName: String,
-    isBackupForAndroidEnabled: Boolean,
 ) {
     when (checkedChip) {
         SYNC_FOLDERS -> {
@@ -427,7 +409,6 @@ private fun SelectedChipScreen(
                 uiState = syncFoldersUiState,
                 snackBarHostState = snackBarHostState,
                 deviceName = deviceName,
-                isBackupForAndroidEnabled = isBackupForAndroidEnabled,
                 onOpenMegaFolderClicked = onOpenMegaFolderClicked,
                 onCameraUploadsSettingsClicked = onCameraUploadsSettingsClicked,
             )

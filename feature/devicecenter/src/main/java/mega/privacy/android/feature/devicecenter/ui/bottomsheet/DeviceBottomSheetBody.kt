@@ -59,7 +59,6 @@ internal fun DeviceBottomSheetBody(
     onAddNewSyncClicked: (DeviceUINode) -> Unit,
     onAddBackupClicked: (DeviceUINode) -> Unit,
     onBottomSheetDismissed: () -> Unit,
-    isBackupForAndroidEnabled: Boolean,
 ) {
     Column(Modifier.testTag(BOTTOM_SHEET_CONTAINER)) {
         MenuActionNodeHeaderWithBody(
@@ -99,7 +98,6 @@ internal fun DeviceBottomSheetBody(
                         onBottomSheetDismissed()
                         onAddBackupClicked(device)
                     },
-                    isBackupForAndroidEnabled = isBackupForAndroidEnabled,
                 )
             }
 
@@ -177,7 +175,6 @@ private fun DeviceBottomSheetBodyPreview(
             onAddNewSyncClicked = {},
             onAddBackupClicked = {},
             onBottomSheetDismissed = {},
-            isBackupForAndroidEnabled = true,
         )
     }
 }

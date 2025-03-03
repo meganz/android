@@ -41,7 +41,6 @@ import mega.privacy.android.feature.sync.ui.views.TEST_TAG_SYNC_ITEM_VIEW
 import mega.privacy.android.shared.original.core.ui.controls.dialogs.internal.CANCEL_TAG
 import mega.privacy.android.shared.original.core.ui.controls.dialogs.internal.CONFIRM_TAG
 import mega.privacy.android.shared.original.core.ui.controls.dialogs.internal.TITLE_TAG
-import mega.privacy.android.shared.sync.featuretoggles.SyncFeatures
 import mega.privacy.mobile.analytics.event.SyncCardExpandedEvent
 import mega.privacy.mobile.analytics.event.SyncFoldersListDisplayedEvent
 import org.junit.Rule
@@ -100,7 +99,6 @@ class SyncFoldersScreenTest {
                 uiState = syncFoldersUiState,
                 snackBarHostState = SnackbarHostState(),
                 deviceName = "Device Name",
-                isBackupForAndroidEnabled = false,
             )
         }
 
@@ -112,7 +110,6 @@ class SyncFoldersScreenTest {
     fun `test that folders list empty state is properly displayed when there are no synced folders`() {
         val syncFoldersUiState = SyncFoldersUiState(
             syncUiItems = emptyList(),
-            enabledFlags = setOf(SyncFeatures.BackupForAndroid)
         )
         whenever(state.value).thenReturn(syncFoldersUiState)
         whenever(viewModel.uiState).thenReturn(state)
@@ -126,7 +123,6 @@ class SyncFoldersScreenTest {
                 uiState = syncFoldersUiState,
                 snackBarHostState = SnackbarHostState(),
                 deviceName = "Device Name",
-                isBackupForAndroidEnabled = true,
                 onOpenMegaFolderClicked = {},
                 onCameraUploadsSettingsClicked = {},
             )
@@ -147,7 +143,6 @@ class SyncFoldersScreenTest {
     fun `test that click the empty state buttons don't send any analytics tracker event`() {
         val syncFoldersUiState = SyncFoldersUiState(
             syncUiItems = emptyList(),
-            enabledFlags = setOf(SyncFeatures.BackupForAndroid)
         )
         whenever(state.value).thenReturn(syncFoldersUiState)
         whenever(viewModel.uiState).thenReturn(state)
@@ -161,7 +156,6 @@ class SyncFoldersScreenTest {
                 uiState = syncFoldersUiState,
                 snackBarHostState = SnackbarHostState(),
                 deviceName = "Device Name",
-                isBackupForAndroidEnabled = true,
                 onOpenMegaFolderClicked = {},
                 onCameraUploadsSettingsClicked = {},
             )
@@ -191,7 +185,6 @@ class SyncFoldersScreenTest {
                 isLowBatteryLevel = false,
                 isLoading = true,
                 deviceName = "Device Name",
-                isBackupForAndroidEnabled = false,
             )
         }
         composeTestRule.onNodeWithTag(TEST_TAG_SYNC_LIST_SCREEN_LOADING_STATE).assertIsDisplayed()
@@ -279,7 +272,6 @@ class SyncFoldersScreenTest {
                 isLowBatteryLevel = false,
                 isLoading = false,
                 deviceName = "Device Name",
-                isBackupForAndroidEnabled = false,
             )
         }
         assertThat(analyticsRule.events).contains(SyncFoldersListDisplayedEvent)
@@ -314,7 +306,6 @@ class SyncFoldersScreenTest {
                 isLowBatteryLevel = false,
                 isLoading = false,
                 deviceName = "Device Name",
-                isBackupForAndroidEnabled = false,
             )
         }
         composeTestRule.onNodeWithTag(TEST_TAG_SYNC_ITEM_VIEW).assertIsDisplayed().performClick()
@@ -350,7 +341,6 @@ class SyncFoldersScreenTest {
                 isLowBatteryLevel = false,
                 isLoading = false,
                 deviceName = "Device Name",
-                isBackupForAndroidEnabled = false,
             )
         }
         analyticsRule.events.clear()
