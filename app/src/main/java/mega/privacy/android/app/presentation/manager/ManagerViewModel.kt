@@ -1483,6 +1483,18 @@ class ManagerViewModel @Inject constructor(
         backgroundFastLoginUseCase()
     }.isSuccess
 
+    /**
+     * Set the value of [ManagerState.showHomeFabOptionsBottomSheet] in order to display the bottom sheet
+     */
+    fun showHomeFabOptionsBottomSheet() =
+        _state.update { it.copy(showHomeFabOptionsBottomSheet = true) }
+
+    /**
+     * Consume [ManagerState.showHomeFabOptionsBottomSheet]
+     */
+    fun onConsumeShowHomeFabOptionsBottomSheet() =
+        _state.update { it.copy(showHomeFabOptionsBottomSheet = false) }
+
     internal companion object {
         internal const val IS_FIRST_LOGIN_KEY = "EXTRA_FIRST_LOGIN"
         private const val INVALID_HANDLE = -1L

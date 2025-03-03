@@ -134,6 +134,7 @@ import mega.privacy.android.app.interfaces.MeetingBottomSheetDialogActionListene
 import mega.privacy.android.app.interfaces.SnackbarShower
 import mega.privacy.android.app.interfaces.showSnackbarWithChat
 import mega.privacy.android.app.main.ads.AdsContainer
+import mega.privacy.android.app.main.bottomsheets.HomeFabOptionsBottomSheet
 import mega.privacy.android.app.main.controllers.NodeController
 import mega.privacy.android.app.main.dialog.ClearRubbishBinDialogFragment
 import mega.privacy.android.app.main.dialog.Enable2FADialogFragment
@@ -532,6 +533,7 @@ class ManagerActivity : PasscodeActivity(), NavigationView.OnNavigationItemSelec
     private lateinit var documentScanningErrorDialogComposeView: ComposeView
     private lateinit var freePlanLimitParticipantsDialogComposeView: ComposeView
     private lateinit var syncPromotionBottomSheetComposeView: ComposeView
+    private lateinit var fabOptionsBottomSheetComposeView: ComposeView
     private lateinit var requestStatusProgressComposeView: ComposeView
     private lateinit var bottomNavigationView: BottomNavigationView
     private lateinit var navigationView: NavigationView
@@ -914,6 +916,7 @@ class ManagerActivity : PasscodeActivity(), NavigationView.OnNavigationItemSelec
             systemBarInsets = insets
             appBarLayout.updatePadding(top = insets.top)
             ViewCompat.onApplyWindowInsets(syncPromotionBottomSheetComposeView, windowInsets)
+            ViewCompat.onApplyWindowInsets(fabOptionsBottomSheetComposeView, windowInsets)
             ViewCompat.onApplyWindowInsets(freePlanLimitParticipantsDialogComposeView, windowInsets)
             findViewById<LinearLayout>(R.id.fragment_layout).updatePadding(bottom = insets.bottom)
             // Set minimum height so that system bar padding is there when both bottom nav and ads are hidden
@@ -1013,6 +1016,7 @@ class ManagerActivity : PasscodeActivity(), NavigationView.OnNavigationItemSelec
             findViewById(R.id.free_plan_limit_dialog_compose_view)
         syncPromotionBottomSheetComposeView =
             findViewById(R.id.sync_promotion_bottom_sheet_compose_view)
+        fabOptionsBottomSheetComposeView = findViewById(R.id.options_bottom_sheet_compose_view)
         requestStatusProgressComposeView =
             findViewById(R.id.request_status_progress_compose_view)
         adsContainerView = findViewById(R.id.ads_web_compose_view)
@@ -1108,6 +1112,7 @@ class ManagerActivity : PasscodeActivity(), NavigationView.OnNavigationItemSelec
 
         setRequestStatusProgressComposeView()
         setSyncPromotionBottomSheetComposeView()
+        setFabOptionsBottomSheetComposeView()
 
         freePlanLimitParticipantsDialogComposeView.apply {
             isVisible = true
@@ -1263,6 +1268,72 @@ class ManagerActivity : PasscodeActivity(), NavigationView.OnNavigationItemSelec
                                     syncPromotionViewModel.setSyncPromotionShown(doNotShowAgain = true)
                                 },
                                 hideSheet = { coroutineScope.launch { syncPromotionViewModel.onConsumeShouldShowSyncPromotion() } })
+                        },
+                        expandedRoundedCorners = true,
+                    )
+                }
+            }
+        }
+    }
+
+    private fun setFabOptionsBottomSheetComposeView() {
+        fabOptionsBottomSheetComposeView.apply {
+            isVisible = true
+            setViewCompositionStrategy(ViewCompositionStrategy.DisposeOnViewTreeLifecycleDestroyed)
+            setContent {
+                val themeMode by getThemeMode().collectAsStateWithLifecycle(initialValue = ThemeMode.System)
+                val isDark = themeMode.isDarkMode()
+                val state by viewModel.state.collectAsStateWithLifecycle()
+                val coroutineScope = rememberCoroutineScope()
+                val fabOptionsBottomSheetState = rememberModalBottomSheetState(
+                    initialValue = ModalBottomSheetValue.Hidden,
+                    confirmValueChange = {
+                        true
+                    },
+                    skipHalfExpanded = true,
+                )
+                OriginalTheme(isDark = isDark) {
+                    LaunchedEffect(fabOptionsBottomSheetState.targetValue) {
+                        if (fabOptionsBottomSheetState.targetValue == ModalBottomSheetValue.Hidden) {
+                            coroutineScope.launch { viewModel.onConsumeShowHomeFabOptionsBottomSheet() }
+                        }
+                    }
+                    LaunchedEffect(state.showHomeFabOptionsBottomSheet) {
+                        if (state.showHomeFabOptionsBottomSheet) {
+                            fabOptionsBottomSheetState.show()
+                        } else {
+                            fabOptionsBottomSheetState.hide()
+                        }
+                    }
+                    BottomSheet(
+                        modalSheetState = fabOptionsBottomSheetState,
+                        sheetElevation = if (fabOptionsBottomSheetState.isVisible) ModalBottomSheetDefaults.Elevation else 0.dp,
+                        sheetBody = {
+                            HomeFabOptionsBottomSheet(
+                                onUploadFilesClicked = { uploadBottomSheetDialogActionHandler.uploadFiles() },
+                                onUploadFolderClicked = { uploadBottomSheetDialogActionHandler.uploadFolder() },
+                                onScanDocumentClicked = { viewModel.prepareDocumentScanner() },
+                                onCaptureClicked = { uploadBottomSheetDialogActionHandler.takePictureAndUpload() },
+                                onCreateNewTextFileClicked = {
+                                    uploadBottomSheetDialogActionHandler.showNewTextFileDialog(null)
+                                },
+                                onAddNewSyncClicked = {
+                                    megaNavigator.openNewSync(
+                                        context = this@ManagerActivity,
+                                        syncType = SyncType.TYPE_TWOWAY
+                                    )
+                                },
+                                onAddNewBackupClicked = {
+                                    megaNavigator.openNewSync(
+                                        context = this@ManagerActivity,
+                                        syncType = SyncType.TYPE_BACKUP
+                                    )
+                                },
+                                onNewChatClicked = {
+                                    getFragmentByType(HomepageFragment::class.java)?.openNewChatActivity()
+                                },
+                                hideSheet = { coroutineScope.launch { viewModel.onConsumeShowHomeFabOptionsBottomSheet() } }
+                            )
                         },
                         expandedRoundedCorners = true,
                     )
@@ -4802,14 +4873,7 @@ class ManagerActivity : PasscodeActivity(), NavigationView.OnNavigationItemSelec
                 performOnBack()
             }
         } else if (isInMainHomePage) {
-            val fragment = getFragmentByType(
-                HomepageFragment::class.java
-            )
-            if (fragment?.isFabExpanded == true) {
-                fragment.collapseFab()
-            } else {
-                performOnBack()
-            }
+            performOnBack()
         } else {
             handleBackPressIfFullscreenOfflineFragmentOpened()
         }
@@ -5691,11 +5755,13 @@ class ManagerActivity : PasscodeActivity(), NavigationView.OnNavigationItemSelec
     }
 
     /**
-     * Shows the upload bottom sheet fragment taking into account the upload type received as param.
+     * Shows the upload bottom sheet taking into account the upload type received as param.
      *
      * @param uploadType Indicates the type of upload:
      * - GENERAL_UPLOAD if nothing special has to be taken into account.
-     * - DOCUMENTS_UPLOAD if an upload from Documents section.
+     * - DOCUMENTS_UPLOAD if action is from Documents section.
+     * - HOMEPAGE_UPLOAD if action is from Home section
+     * - CLOUD_DRIVE_UPLOAD if action is from Cloud Drive section
      */
     @JvmOverloads
     fun showUploadPanel(uploadType: Int = if (drawerItem === DrawerItem.HOMEPAGE) UploadBottomSheetDialogFragment.HOMEPAGE_UPLOAD else if (drawerItem === DrawerItem.CLOUD_DRIVE) UploadBottomSheetDialogFragment.CLOUD_DRIVE_UPLOAD else UploadBottomSheetDialogFragment.GENERAL_UPLOAD) {
@@ -5704,9 +5770,14 @@ class ManagerActivity : PasscodeActivity(), NavigationView.OnNavigationItemSelec
             requestPermission(this, Constants.REQUEST_READ_WRITE_STORAGE, *permissions)
             return
         }
-        if (bottomSheetDialogFragment.isBottomSheetDialogShown()) return
-        bottomSheetDialogFragment = UploadBottomSheetDialogFragment.newInstance(uploadType)
-        bottomSheetDialogFragment?.show(supportFragmentManager, bottomSheetDialogFragment?.tag)
+
+        if (drawerItem == DrawerItem.HOMEPAGE && homepageScreen == HomepageScreen.HOMEPAGE) {
+            viewModel.showHomeFabOptionsBottomSheet()
+        } else {
+            if (bottomSheetDialogFragment.isBottomSheetDialogShown()) return
+            bottomSheetDialogFragment = UploadBottomSheetDialogFragment.newInstance(uploadType)
+            bottomSheetDialogFragment?.show(supportFragmentManager, bottomSheetDialogFragment?.tag)
+        }
     }
 
     private val readAndWritePermissions: Array<String>

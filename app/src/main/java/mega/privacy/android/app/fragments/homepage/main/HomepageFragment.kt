@@ -1,9 +1,5 @@
 package mega.privacy.android.app.fragments.homepage.main
 
-import android.animation.Animator
-import android.animation.AnimatorListenerAdapter
-import android.animation.AnimatorSet
-import android.animation.ObjectAnimator
 import android.annotation.SuppressLint
 import android.app.Activity
 import android.content.Intent
@@ -11,13 +7,11 @@ import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import android.view.Window
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.appcompat.app.AlertDialog
 import androidx.constraintlayout.widget.ConstraintLayout
 import androidx.core.content.ContextCompat
 import androidx.core.view.isVisible
-import androidx.core.view.updatePadding
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.activityViewModels
 import androidx.fragment.app.viewModels
@@ -40,7 +34,6 @@ import mega.privacy.android.analytics.Analytics
 import mega.privacy.android.app.R
 import mega.privacy.android.app.arch.extensions.collectFlow
 import mega.privacy.android.app.components.search.FloatingSearchView
-import mega.privacy.android.app.databinding.FabMaskLayoutBinding
 import mega.privacy.android.app.databinding.FragmentHomepageBinding
 import mega.privacy.android.app.fragments.homepage.banner.BannerAdapter
 import mega.privacy.android.app.fragments.homepage.banner.BannerClickHandler
@@ -56,24 +49,17 @@ import mega.privacy.android.app.utils.ColorUtils
 import mega.privacy.android.app.utils.Constants
 import mega.privacy.android.app.utils.Constants.SNACKBAR_TYPE
 import mega.privacy.android.app.utils.RunOnUIThreadUtils.post
-import mega.privacy.android.app.utils.RunOnUIThreadUtils.runDelay
 import mega.privacy.android.app.utils.Util
 import mega.privacy.android.app.utils.ViewUtils.waitForLayout
 import mega.privacy.android.app.utils.callManager
 import mega.privacy.android.domain.usecase.featureflag.GetFeatureFlagValueUseCase
 import mega.privacy.android.navigation.MegaNavigator
-import mega.privacy.mobile.analytics.event.HomeFABClosedEvent
-import mega.privacy.mobile.analytics.event.HomeFABExpandedEvent
 import mega.privacy.mobile.analytics.event.HomeFABPressedEvent
-import mega.privacy.mobile.analytics.event.HomeNewChatFABPressedEvent
-import mega.privacy.mobile.analytics.event.HomeNewChatTextPressedEvent
 import mega.privacy.mobile.analytics.event.HomeScreenAudioTilePressedEvent
 import mega.privacy.mobile.analytics.event.HomeScreenDocsTilePressedEvent
 import mega.privacy.mobile.analytics.event.HomeScreenEvent
 import mega.privacy.mobile.analytics.event.HomeScreenSearchMenuToolbarEvent
 import mega.privacy.mobile.analytics.event.HomeScreenVideosTilePressedEvent
-import mega.privacy.mobile.analytics.event.HomeUploadFABPressedEvent
-import mega.privacy.mobile.analytics.event.HomeUploadTextPressedEvent
 import mega.privacy.mobile.analytics.event.OfflineTabEvent
 import mega.privacy.mobile.analytics.event.RecentsTabEvent
 import nz.mega.sdk.MegaBanner
@@ -85,15 +71,7 @@ import javax.inject.Inject
 class HomepageFragment : Fragment() {
 
     companion object {
-        private const val FAB_ANIM_DURATION = 200L
-        private const val FAB_MASK_OUT_DELAY = 200L
-        private const val ALPHA_TRANSPARENT = 0f
-        private const val ALPHA_OPAQUE = 1f
-        private const val FAB_DEFAULT_ANGEL = 0f
-        private const val FAB_ROTATE_ANGEL = 135f
         private const val SLIDE_OFFSET_CHANGE_BACKGROUND = 0.8f
-        private const val KEY_CONTACT_TYPE = "contactType"
-        private const val KEY_IS_FAB_EXPANDED = "isFabExpanded"
         const val BOTTOM_SHEET_ELEVATION = 2f    // 2dp, for the overlay opacity is 7%
         private const val BOTTOM_SHEET_CORNER_SIZE = 8f  // 8dp
         private const val KEY_IS_BOTTOM_SHEET_EXPANDED = "isBottomSheetExpanded"
@@ -125,12 +103,6 @@ class HomepageFragment : Fragment() {
     /** The fab button in normal state */
     private lateinit var fabMain: FloatingActionButton
 
-    /** The main fab button in expanded state */
-    private lateinit var fabMaskMain: FloatingActionButton
-
-    /** The layout for showing the full screen grey mask at FAB expanded state */
-    private lateinit var fabMaskLayoutDataBinding: FabMaskLayoutBinding
-
     /** The view pager in the bottom sheet, containing 2 pages: Recents and Offline */
     private lateinit var viewPager: ViewPager2
 
@@ -142,11 +114,7 @@ class HomepageFragment : Fragment() {
     /** The list of all sub views of the TabLayout*/
     private val tabsChildren = ArrayList<View>()
 
-    private var windowContent: ViewGroup? = null
-
     private var startScreenDialog: AlertDialog? = null
-
-    var isFabExpanded = false
 
     private val openNewChatLauncher =
         registerForActivityResult(ActivityResultContracts.StartActivityForResult()) {
@@ -204,8 +172,6 @@ class HomepageFragment : Fragment() {
         viewDataBinding = FragmentHomepageBinding.inflate(inflater, container, false)
         rootView = viewDataBinding.root
 
-        isFabExpanded = savedInstanceState?.getBoolean(KEY_IS_FAB_EXPANDED) ?: false
-
         // Fully expand the BottomSheet if it had been, e.g. rotate screen
         if (savedInstanceState?.getBoolean(KEY_IS_BOTTOM_SHEET_EXPANDED) == true) {
             rootView.waitForLayout {
@@ -222,13 +188,12 @@ class HomepageFragment : Fragment() {
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
-        setupMask()
         setupSearchView()
         setupBannerView()
         setupCategories()
         setupBottomSheetUI()
         setupBottomSheetBehavior()
-        setupFabs()
+        setupFab()
 
         (activity as? ManagerActivity)?.apply {
             adjustTransferWidgetPositionInHomepage()
@@ -395,7 +360,6 @@ class HomepageFragment : Fragment() {
         super.onSaveInstanceState(outState)
 
         outState.putBoolean(START_SCREEN_DIALOG_SHOWN, isAlertDialogShown(startScreenDialog))
-        outState.putBoolean(KEY_IS_FAB_EXPANDED, isFabExpanded)
         if (this::bottomSheetBehavior.isInitialized) {
             outState.putBoolean(
                 KEY_IS_BOTTOM_SHEET_EXPANDED,
@@ -477,15 +441,6 @@ class HomepageFragment : Fragment() {
         viewModel.bannerList.observe(viewLifecycleOwner) {
             bannerViewPager.refreshData(it)
         }
-    }
-
-    /**
-     * Inflate the layout of the full screen mask
-     * The mask will actually be shown after clicking to expand the FAB
-     */
-    private fun setupMask() {
-        windowContent = activity?.window?.findViewById(Window.ID_ANDROID_CONTENT)
-        fabMaskLayoutDataBinding = FabMaskLayoutBinding.inflate(layoutInflater, windowContent, false)
     }
 
     /**
@@ -647,61 +602,14 @@ class HomepageFragment : Fragment() {
     }
 
     /**
-     * Set up the Fab and Fabs in the expanded status
+     * Set up the FAB
      */
-    private fun setupFabs() {
+    private fun setupFab() {
         fabMain = viewDataBinding.fabHomeMain
-        fabMaskMain = fabMaskLayoutDataBinding.fabsInMask.fabMain
 
         fabMain.setOnClickListener {
             Analytics.tracker.trackEvent(HomeFABPressedEvent)
-            fabMainClickCallback()
-        }
-
-        fabMaskMain.setOnClickListener {
-            Analytics.tracker.trackEvent(HomeFABPressedEvent)
-            fabMainClickCallback()
-        }
-
-        fabMaskLayoutDataBinding.root.setOnClickListener {
-            Analytics.tracker.trackEvent(HomeFABPressedEvent)
-            fabMainClickCallback()
-        }
-
-        fabMaskLayoutDataBinding.fabsInMask.fabChat.setOnClickListener {
-            Analytics.tracker.trackEvent(HomeNewChatFABPressedEvent)
-            fabMainClickCallback()
-            runDelay(FAB_MASK_OUT_DELAY) {
-                openNewChatActivity()
-            }
-        }
-
-        fabMaskLayoutDataBinding.fabsInMask.textChat.setOnClickListener {
-            Analytics.tracker.trackEvent(HomeNewChatTextPressedEvent)
-            fabMainClickCallback()
-            runDelay(FAB_MASK_OUT_DELAY) {
-                openNewChatActivity()
-            }
-        }
-
-        fabMaskLayoutDataBinding.fabsInMask.fabUpload.setOnClickListener {
-            Analytics.tracker.trackEvent(HomeUploadFABPressedEvent)
-            fabMainClickCallback()
-            runDelay(FAB_MASK_OUT_DELAY) {
-                showUploadPanel()
-            }
-        }
-
-        fabMaskLayoutDataBinding.fabsInMask.textUpload.setOnClickListener {
-            Analytics.tracker.trackEvent(HomeUploadTextPressedEvent)
-            fabMainClickCallback()
-            runDelay(FAB_MASK_OUT_DELAY) {
-                showUploadPanel()
-            }
-        }
-
-        if (isFabExpanded) {
-            expandFab()
+            showUploadPanel()
         }
     }
 
@@ -724,18 +632,12 @@ class HomepageFragment : Fragment() {
     }
 
     @Suppress("deprecation")
-    private fun openNewChatActivity() = doIfOnline(true) {
+    fun openNewChatActivity() = doIfOnline(true) {
         openNewChatLauncher.launch(Intent(activity, StartConversationActivity::class.java))
     }
 
     private fun showUploadPanel() = doIfOnline(true) {
         (activity as ManagerActivity).showUploadPanel()
-    }
-
-    private fun fabMainClickCallback() = if (isFabExpanded) {
-        collapseFab()
-    } else {
-        expandFab()
     }
 
     /**
@@ -752,139 +654,6 @@ class HomepageFragment : Fragment() {
         fabMainParams.bottomMargin =
             resources.getDimensionPixelSize(R.dimen.fab_margin_span) + extendsHeight
         fabMain.layoutParams = fabMainParams
-
-        val fabMaskMainParams = fabMaskMain.layoutParams as ConstraintLayout.LayoutParams
-        fabMaskMainParams.bottomMargin =
-            resources.getDimensionPixelSize(R.dimen.fab_margin_span) + extendsHeight
-        fabMaskMain.layoutParams = fabMaskMainParams
-    }
-
-    fun collapseFab() {
-        Analytics.tracker.trackEvent(HomeFABClosedEvent)
-        rotateFab(false)
-        showOut(
-            fabMaskLayoutDataBinding.fabsInMask.fabChat,
-            fabMaskLayoutDataBinding.fabsInMask.fabUpload,
-            fabMaskLayoutDataBinding.fabsInMask.textChat,
-            fabMaskLayoutDataBinding.fabsInMask.textUpload
-        )
-        // After animation completed, then remove mask.
-        runDelay(FAB_MASK_OUT_DELAY) {
-            removeMask()
-            fabMain.visibility = View.VISIBLE
-            isFabExpanded = false
-        }
-    }
-
-    private fun expandFab() {
-        Analytics.tracker.trackEvent(HomeFABExpandedEvent)
-        fabMain.visibility = View.GONE
-        if (fabMaskLayoutDataBinding.root.parent == null) {
-            addMask()
-        }
-        (activity as? ManagerActivity)?.systemBarInsets?.let { insets ->
-            fabMaskLayoutDataBinding.fabsInMask.container.updatePadding(bottom = insets.bottom)
-        }
-        // Need to do so, otherwise, fabMaskMain.background is null.
-        post {
-            rotateFab(true)
-            showIn(
-                fabMaskLayoutDataBinding.fabsInMask.fabChat,
-                fabMaskLayoutDataBinding.fabsInMask.fabUpload,
-                fabMaskLayoutDataBinding.fabsInMask.textChat,
-                fabMaskLayoutDataBinding.fabsInMask.textUpload
-            )
-            isFabExpanded = true
-        }
-    }
-
-    /**
-     * Present the expanded FABs with animated transition
-     */
-    private fun showIn(vararg fabs: View) {
-        for (fab in fabs) {
-            fab.visibility = View.VISIBLE
-            fab.alpha = ALPHA_TRANSPARENT
-            fab.translationY = fab.height.toFloat()
-
-            fab.animate()
-                .setDuration(FAB_ANIM_DURATION)
-                .translationY(0f)
-                .setListener(object :
-                    AnimatorListenerAdapter() {/* No need to override any methods here. */ })
-                .alpha(ALPHA_OPAQUE)
-                .start()
-        }
-    }
-
-    /**
-     * Hide the expanded FABs with animated transition
-     */
-    private fun showOut(vararg fabs: View) {
-        for (fab in fabs) {
-            fab.animate()
-                .setDuration(FAB_ANIM_DURATION)
-                .translationY(fab.height.toFloat())
-                .setListener(object : AnimatorListenerAdapter() {
-                    override fun onAnimationEnd(animation: Animator) {
-                        fab.visibility = View.GONE
-                        super.onAnimationEnd(animation)
-                    }
-                }).alpha(ALPHA_TRANSPARENT)
-                .start()
-        }
-    }
-
-    /**
-     * Showing the full screen mask by adding the mask layout to the window content
-     */
-    private fun addMask() {
-        windowContent?.addView(fabMaskLayoutDataBinding.root)
-    }
-
-    /**
-     * Removing the full screen mask
-     */
-    private fun removeMask() {
-        windowContent?.removeView(fabMaskLayoutDataBinding.root)
-    }
-
-    /**
-     * Animate the appearance of the main FAB when expanding and collapsing
-     *
-     * @param isExpand true if the FAB is being expanded, false for being collapsed
-     */
-    private fun rotateFab(isExpand: Boolean) {
-        val rotateAnim = ObjectAnimator.ofFloat(
-            fabMaskMain, "rotation",
-            if (isExpand) FAB_ROTATE_ANGEL else FAB_DEFAULT_ANGEL
-        )
-
-        // The tint of the icon in the middle of the FAB
-        val tintAnim = ObjectAnimator.ofArgb(
-            fabMaskMain.drawable.mutate(), "tint",
-            ContextCompat.getColor(
-                requireContext(),
-                if (isExpand) R.color.color_icon_primary
-                else R.color.color_icon_inverse
-            )
-        )
-
-        // The background tint of the FAB
-        val backgroundTintAnim = ObjectAnimator.ofArgb(
-            fabMaskMain.background.mutate(), "tint",
-            ContextCompat.getColor(
-                requireContext(),
-                if (isExpand) R.color.color_background_surface_2
-                else R.color.color_button_primary
-            )
-        )
-
-        AnimatorSet().apply {
-            duration = FAB_ANIM_DURATION
-            playTogether(rotateAnim, backgroundTintAnim, tintAnim)
-            start()
-        }
     }
 
     /**
@@ -892,7 +661,6 @@ class HomepageFragment : Fragment() {
      */
     fun hideFabButton() {
         fabMain.hide()
-        fabMaskMain.hide()
     }
 
     /**
@@ -900,7 +668,6 @@ class HomepageFragment : Fragment() {
      */
     fun showFabButton() {
         fabMain.show()
-        fabMaskMain.show()
     }
 
     /**

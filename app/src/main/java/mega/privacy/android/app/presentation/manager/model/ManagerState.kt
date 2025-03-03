@@ -43,6 +43,7 @@ import mega.privacy.android.domain.entity.node.RestoreNodeResult
  * @property uploadEvent                                Event to trigger upload actions
  * @property gmsDocumentScanner                         The prepared ML Kit Document Scanner
  * @property documentScanningError                      The specific Error returned when using the modern Document Scanner
+ * @property showHomeFabOptionsBottomSheet              True to show the Home Fab options bottom sheet or False otherwise
  */
 data class ManagerState(
     val isFirstNavigationLevel: Boolean = true,
@@ -72,4 +73,5 @@ data class ManagerState(
     val uploadEvent: StateEventWithContent<TransferTriggerEvent.StartUpload> = consumed(),
     val gmsDocumentScanner: GmsDocumentScanner? = null,
     val documentScanningError: DocumentScanningError? = null,
+    val showHomeFabOptionsBottomSheet: Boolean = false
 )
