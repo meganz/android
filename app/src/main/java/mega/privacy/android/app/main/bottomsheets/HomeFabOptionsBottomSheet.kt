@@ -14,6 +14,8 @@ import mega.privacy.android.shared.original.core.ui.preview.CombinedThemePreview
 import mega.privacy.android.shared.original.core.ui.theme.OriginalTheme
 import mega.privacy.android.shared.resources.R as sharedResR
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.rememberScrollState
+import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.MaterialTheme
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
@@ -37,7 +39,9 @@ fun HomeFabOptionsBottomSheet(
     hideSheet: () -> Unit = {},
 ) {
     Column(
-        modifier = Modifier.padding(8.dp)
+        modifier = Modifier
+            .verticalScroll(rememberScrollState())
+            .padding(8.dp)
     ) {
         MegaText(
             text = stringResource(R.string.context_upload),
