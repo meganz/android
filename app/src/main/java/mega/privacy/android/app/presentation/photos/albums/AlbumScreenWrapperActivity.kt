@@ -19,6 +19,7 @@ import mega.privacy.android.app.R
 import mega.privacy.android.app.getLink.GetLinkViewModel
 import mega.privacy.android.app.main.FileExplorerActivity
 import mega.privacy.android.app.main.ManagerActivity
+import mega.privacy.android.app.presentation.extensions.getStorageState
 import mega.privacy.android.app.presentation.extensions.isDarkMode
 import mega.privacy.android.app.presentation.passcode.model.PasscodeCryptObjectFactory
 import mega.privacy.android.app.presentation.photos.albums.coverselection.AlbumCoverSelectionScreen
@@ -34,6 +35,8 @@ import mega.privacy.android.app.presentation.psa.PsaContainer
 import mega.privacy.android.app.presentation.security.check.PasscodeContainer
 import mega.privacy.android.app.presentation.settings.model.StorageTargetPreference
 import mega.privacy.android.app.upgradeAccount.UpgradeAccountActivity
+import mega.privacy.android.app.utils.AlertsAndWarnings.showOverDiskQuotaPaywallWarning
+import mega.privacy.android.domain.entity.StorageState
 import mega.privacy.android.domain.entity.ThemeMode
 import mega.privacy.android.domain.entity.node.NodeId
 import mega.privacy.android.domain.entity.photos.AlbumId
@@ -175,15 +178,19 @@ class AlbumScreenWrapperActivity : BaseActivity() {
                 AlbumImportScreen(
                     albumImportViewModel = albumImportViewModel,
                     onShareLink = { link ->
-                        val intent = Intent(Intent.ACTION_SEND).apply {
-                            type = "text/plain"
-                            putExtra(Intent.EXTRA_TEXT, link)
+                        if (getStorageState() == StorageState.PayWall) {
+                            showOverDiskQuotaPaywallWarning()
+                        } else {
+                            val intent = Intent(Intent.ACTION_SEND).apply {
+                                type = "text/plain"
+                                putExtra(Intent.EXTRA_TEXT, link)
+                            }
+                            val shareIntent = Intent.createChooser(
+                                intent,
+                                getString(R.string.general_share)
+                            )
+                            startActivity(shareIntent)
                         }
-                        val shareIntent = Intent.createChooser(
-                            intent,
-                            getString(R.string.general_share)
-                        )
-                        startActivity(shareIntent)
                     },
                     onPreviewPhoto = {
                         imagePreviewProvider.onPreviewPhoto(

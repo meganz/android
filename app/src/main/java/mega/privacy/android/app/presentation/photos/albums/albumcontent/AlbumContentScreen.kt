@@ -16,6 +16,8 @@ import androidx.compose.material.Icon
 import androidx.compose.material.MaterialTheme
 import androidx.compose.material.Snackbar
 import androidx.compose.material.Text
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.Add
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.derivedStateOf
@@ -60,6 +62,7 @@ import mega.privacy.android.legacy.core.ui.controls.LegacyMegaEmptyView
 import mega.privacy.android.shared.original.core.ui.controls.progressindicator.MegaLinearProgressIndicator
 import mega.privacy.android.shared.original.core.ui.theme.black
 import mega.privacy.android.shared.original.core.ui.theme.dark_grey
+import mega.privacy.android.shared.original.core.ui.theme.extensions.white_black
 import mega.privacy.android.shared.original.core.ui.theme.white
 import mega.privacy.mobile.analytics.event.AlbumAddPhotosFABEvent
 import mega.privacy.mobile.analytics.event.RemoveItemsFromAlbumDialogButtonEvent
@@ -402,19 +405,9 @@ private fun AddFabButton(
             .size(56.dp)
     ) {
         Icon(
-            painter = painterResource(
-                id = if (MaterialTheme.colors.isLight) {
-                    R.drawable.ic_add_white
-                } else {
-                    R.drawable.ic_add
-                }
-            ),
+            imageVector = Icons.Filled.Add,
             contentDescription = "Add",
-            tint = if (!MaterialTheme.colors.isLight) {
-                Color.Black
-            } else {
-                Color.White
-            }
+            tint = MaterialTheme.colors.white_black
         )
     }
 }

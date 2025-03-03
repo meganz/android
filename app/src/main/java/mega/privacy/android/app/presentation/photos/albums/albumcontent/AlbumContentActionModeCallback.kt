@@ -9,8 +9,11 @@ import mega.privacy.android.analytics.Analytics
 import mega.privacy.android.app.R
 import mega.privacy.android.app.featuretoggle.ApiFeatures
 import mega.privacy.android.app.featuretoggle.AppFeatures
+import mega.privacy.android.app.presentation.extensions.getStorageState
 import mega.privacy.android.app.presentation.hidenode.HiddenNodesOnboardingActivity
+import mega.privacy.android.app.utils.AlertsAndWarnings.showOverDiskQuotaPaywallWarning
 import mega.privacy.android.app.utils.MegaNodeUtil
+import mega.privacy.android.domain.entity.StorageState
 import mega.privacy.android.domain.entity.photos.Album
 import mega.privacy.mobile.analytics.event.AlbumContentHideNodeMenuItemEvent
 import mega.privacy.mobile.analytics.event.AlbumContentRemoveItemsEvent
@@ -98,7 +101,11 @@ class AlbumContentActionModeCallback(
 
             R.id.cab_menu_remove_photos -> {
                 Analytics.tracker.trackEvent(AlbumContentRemoveItemsEvent)
-                showRemoveDialog()
+                if (getStorageState() == StorageState.PayWall) {
+                    showOverDiskQuotaPaywallWarning()
+                } else {
+                    showRemoveDialog()
+                }
             }
         }
         return true

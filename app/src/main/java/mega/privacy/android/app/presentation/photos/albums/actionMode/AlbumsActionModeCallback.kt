@@ -6,8 +6,11 @@ import android.view.MenuItem
 import androidx.appcompat.view.ActionMode
 import mega.privacy.android.analytics.Analytics
 import mega.privacy.android.app.R
+import mega.privacy.android.app.presentation.extensions.getStorageState
 import mega.privacy.android.app.presentation.photos.PhotosFragment
 import mega.privacy.android.app.presentation.photos.albums.model.AlbumsViewState
+import mega.privacy.android.app.utils.AlertsAndWarnings.showOverDiskQuotaPaywallWarning
+import mega.privacy.android.domain.entity.StorageState
 import mega.privacy.android.domain.entity.photos.Album
 import mega.privacy.mobile.analytics.event.AlbumDeselectAllEvent
 import mega.privacy.mobile.analytics.event.AlbumListShareLinkMenuItemEvent
@@ -53,22 +56,34 @@ class AlbumsActionModeCallback(
         when (item?.itemId) {
             R.id.action_menu_get_link -> {
                 Analytics.tracker.trackEvent(AlbumListShareLinkMenuItemEvent)
-                val selectedAlbums = fragment.albumsViewModel.state.value.selectedAlbumIds
-                if (selectedAlbums.size == 1) {
-                    fragment.openAlbumGetLinkScreen()
+                if (getStorageState() == StorageState.PayWall) {
+                    showOverDiskQuotaPaywallWarning()
                 } else {
-                    fragment.openAlbumGetMultipleLinksScreen()
+                    val selectedAlbums = fragment.albumsViewModel.state.value.selectedAlbumIds
+                    if (selectedAlbums.size == 1) {
+                        fragment.openAlbumGetLinkScreen()
+                    } else {
+                        fragment.openAlbumGetMultipleLinksScreen()
+                    }
+                    fragment.albumsViewModel.clearAlbumSelection()
                 }
-                fragment.albumsViewModel.clearAlbumSelection()
             }
 
             R.id.action_delete -> {
                 Analytics.tracker.trackEvent(AlbumsListDeleteAlbumsEvent)
-                fragment.albumsViewModel.showDeleteAlbumsConfirmation()
+                if (getStorageState() == StorageState.PayWall) {
+                    showOverDiskQuotaPaywallWarning()
+                } else {
+                    fragment.albumsViewModel.showDeleteAlbumsConfirmation()
+                }
             }
 
             R.id.action_menu_remove_link -> {
-                fragment.albumsViewModel.showRemoveLinkDialog()
+                if (getStorageState() == StorageState.PayWall) {
+                    showOverDiskQuotaPaywallWarning()
+                } else {
+                    fragment.albumsViewModel.showRemoveLinkDialog()
+                }
             }
 
             R.id.action_context_select_all -> {

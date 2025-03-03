@@ -40,6 +40,7 @@ import mega.privacy.android.app.activities.contract.SelectFolderToCopyActivityCo
 import mega.privacy.android.app.activities.contract.SelectFolderToImportActivityContract
 import mega.privacy.android.app.activities.contract.SelectFolderToMoveActivityContract
 import mega.privacy.android.app.modalbottomsheet.nodelabel.NodeLabelBottomSheetDialogFragment
+import mega.privacy.android.app.presentation.extensions.getStorageState
 import mega.privacy.android.app.presentation.extensions.isDarkMode
 import mega.privacy.android.app.presentation.fileinfo.FileInfoActivity
 import mega.privacy.android.app.presentation.hidenode.HiddenNodesOnboardingActivity
@@ -63,6 +64,7 @@ import mega.privacy.android.app.presentation.security.check.PasscodeContainer
 import mega.privacy.android.app.presentation.settings.model.StorageTargetPreference
 import mega.privacy.android.app.presentation.transfers.attach.NodeAttachmentView
 import mega.privacy.android.app.presentation.transfers.attach.NodeAttachmentViewModel
+import mega.privacy.android.app.utils.AlertsAndWarnings.showOverDiskQuotaPaywallWarning
 import mega.privacy.android.app.utils.Constants
 import mega.privacy.android.app.utils.Constants.SNACKBAR_TYPE
 import mega.privacy.android.app.utils.LinksUtil
@@ -71,6 +73,7 @@ import mega.privacy.android.app.utils.MegaNodeUtil
 import mega.privacy.android.app.utils.MegaNodeUtil.onNodeTapped
 import mega.privacy.android.domain.entity.AccountType
 import mega.privacy.android.domain.entity.ImageFileTypeInfo
+import mega.privacy.android.domain.entity.StorageState
 import mega.privacy.android.domain.entity.ThemeMode
 import mega.privacy.android.domain.entity.node.ImageNode
 import mega.privacy.android.domain.entity.node.NameCollision
@@ -358,6 +361,10 @@ class ImagePreviewActivity : BaseActivity() {
     }
 
     private fun getNodeLink(imageNode: ImageNode) {
+        if (getStorageState() == StorageState.PayWall) {
+            showOverDiskQuotaPaywallWarning()
+            return
+        }
         LinksUtil.showGetLinkActivity(this, imageNode.id.longValue)
     }
 

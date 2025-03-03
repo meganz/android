@@ -73,12 +73,15 @@ import coil.request.ImageRequest
 import kotlinx.coroutines.delay
 import mega.privacy.android.analytics.Analytics
 import mega.privacy.android.app.R
+import mega.privacy.android.app.presentation.extensions.getStorageState
 import mega.privacy.android.app.presentation.photos.albums.model.AlbumTitle
 import mega.privacy.android.app.presentation.photos.albums.model.AlbumsViewState
 import mega.privacy.android.app.presentation.photos.albums.model.UIAlbum
 import mega.privacy.android.app.presentation.photos.model.PhotoDownload
 import mega.privacy.android.app.presentation.photos.timeline.view.AlbumListSkeletonView
+import mega.privacy.android.app.utils.AlertsAndWarnings.showOverDiskQuotaPaywallWarning
 import mega.privacy.android.app.utils.Util.dp2px
+import mega.privacy.android.domain.entity.StorageState
 import mega.privacy.android.domain.entity.photos.Album
 import mega.privacy.android.domain.entity.photos.AlbumId
 import mega.privacy.android.domain.entity.photos.Photo
@@ -123,6 +126,7 @@ fun AlbumsView(
     onRemoveLinkDialogConfirmClick: () -> Unit = {},
     onRemoveLinkDialogCancelClick: () -> Unit = {},
     resetRemovedLinksCount: () -> Unit = {},
+    isStorageExceeded: () -> Boolean = { false },
 ) {
     val isLight = MaterialTheme.colors.isLight
     val isPortrait = LocalConfiguration.current.orientation == Configuration.ORIENTATION_PORTRAIT
@@ -204,8 +208,12 @@ fun AlbumsView(
                     FloatingActionButton(
                         onClick = {
                             Analytics.tracker.trackEvent(CreateAlbumFABEvent)
-                            setShowCreateAlbumDialog(true)
-                            setDialogInputPlaceholder(placeholderText)
+                            if (isStorageExceeded()) {
+                                showOverDiskQuotaPaywallWarning()
+                            } else {
+                                setShowCreateAlbumDialog(true)
+                                setDialogInputPlaceholder(placeholderText)
+                            }
                         },
                     ) {
                         Icon(

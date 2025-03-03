@@ -19,8 +19,11 @@ import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 import mega.privacy.android.app.R
 import mega.privacy.android.app.featuretoggle.ApiFeatures
+import mega.privacy.android.app.presentation.extensions.getStorageState
 import mega.privacy.android.app.presentation.videosection.mapper.VideoPlaylistUIEntityMapper
 import mega.privacy.android.app.presentation.videosection.model.VideoPlaylistUIEntity
+import mega.privacy.android.app.utils.AlertsAndWarnings.showOverDiskQuotaPaywallWarning
+import mega.privacy.android.domain.entity.StorageState
 import mega.privacy.android.domain.entity.account.AccountDetail
 import mega.privacy.android.domain.entity.account.business.BusinessAccountStatus
 import mega.privacy.android.domain.entity.node.NodeId
@@ -207,6 +210,11 @@ internal class AddToAlbumViewModel @Inject constructor(
     }
 
     fun setupNewAlbum(defaultAlbumName: String) {
+        if (getStorageState() == StorageState.PayWall) {
+            showOverDiskQuotaPaywallWarning()
+            return
+        }
+
         val albumNameSuggestion = getNextDefaultAlbumNameUseCase(
             defaultName = defaultAlbumName,
             currentNames = state.value.existingAlbumNames,
@@ -262,6 +270,11 @@ internal class AddToAlbumViewModel @Inject constructor(
     }
 
     fun addPhotosToAlbum() = viewModelScope.launch {
+        if (getStorageState() == StorageState.PayWall) {
+            showOverDiskQuotaPaywallWarning()
+            return@launch
+        }
+
         val album = state.value.selectedAlbum ?: return@launch
         val photos = albumsMap[album.id].orEmpty()
         val nodeIds = nodeIds
@@ -334,6 +347,11 @@ internal class AddToAlbumViewModel @Inject constructor(
     }
 
     fun setupNewPlaylist(defaultPlaylistName: String) {
+        if (getStorageState() == StorageState.PayWall) {
+            showOverDiskQuotaPaywallWarning()
+            return
+        }
+
         val playlistNameSuggestion = getNextDefaultAlbumNameUseCase(
             defaultName = defaultPlaylistName,
             currentNames = state.value.existingPlaylistNames,
@@ -389,6 +407,11 @@ internal class AddToAlbumViewModel @Inject constructor(
     }
 
     fun addVideosToPlaylist() {
+        if (getStorageState() == StorageState.PayWall) {
+            showOverDiskQuotaPaywallWarning()
+            return
+        }
+
         val playlist = state.value.selectedPlaylist ?: return
         val videos = playlistsMap[playlist.id].orEmpty()
         val nodeIds = nodeIds

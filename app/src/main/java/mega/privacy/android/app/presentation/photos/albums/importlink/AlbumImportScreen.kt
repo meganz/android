@@ -66,8 +66,11 @@ import androidx.lifecycle.viewmodel.compose.viewModel
 import kotlinx.coroutines.launch
 import mega.privacy.android.analytics.Analytics
 import mega.privacy.android.app.R
+import mega.privacy.android.app.presentation.extensions.getStorageState
 import mega.privacy.android.app.presentation.photos.albums.view.DynamicView
 import mega.privacy.android.app.presentation.transfers.starttransfer.view.StartTransferComponent
+import mega.privacy.android.app.utils.AlertsAndWarnings.showOverDiskQuotaPaywallWarning
+import mega.privacy.android.domain.entity.StorageState
 import mega.privacy.android.domain.entity.photos.Album
 import mega.privacy.android.domain.entity.photos.Photo
 import mega.privacy.android.legacy.core.ui.controls.LegacyMegaEmptyView
@@ -228,12 +231,16 @@ internal fun AlbumImportScreen(
                     isLogin = state.isLogin,
                     onImport = {
                         if (state.isNetworkConnected) {
-                            val photos = state.selectedPhotos.ifEmpty { state.photos }
-                            albumImportViewModel.validateImportConstraint(
-                                album = state.album,
-                                photos = photos,
-                            )
-                            albumImportViewModel.clearSelection()
+                            if (getStorageState() == StorageState.PayWall) {
+                                showOverDiskQuotaPaywallWarning()
+                            } else {
+                                val photos = state.selectedPhotos.ifEmpty { state.photos }
+                                albumImportViewModel.validateImportConstraint(
+                                    album = state.album,
+                                    photos = photos,
+                                )
+                                albumImportViewModel.clearSelection()
+                            }
                         } else {
                             coroutineScope.launch {
                                 scaffoldState.snackbarHostState.showAutoDurationSnackbar(
