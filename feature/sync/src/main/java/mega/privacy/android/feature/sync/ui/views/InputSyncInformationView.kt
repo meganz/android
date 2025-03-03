@@ -46,7 +46,7 @@ internal fun InputSyncInformationView(
     selectedDeviceFolder: String = "",
     selectedMegaFolder: String = "",
 ) {
-    Column(modifier = Modifier.padding(top = 16.dp, start = 16.dp, end = 16.dp, bottom = 48.dp)) {
+    Column(modifier = Modifier.padding(top = 8.dp, start = 16.dp, end = 16.dp, bottom = 16.dp)) {
         MegaCardWithHeader(
             header = {
                 Header(

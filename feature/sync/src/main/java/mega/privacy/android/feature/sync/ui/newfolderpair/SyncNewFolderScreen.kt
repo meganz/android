@@ -2,6 +2,7 @@ package mega.privacy.android.feature.sync.ui.newfolderpair
 
 import mega.privacy.android.shared.resources.R as sharedResR
 import android.Manifest
+import android.content.res.Configuration
 import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.animation.AnimatedVisibility
@@ -28,6 +29,7 @@ import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.platform.LocalConfiguration
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.res.stringResource
@@ -59,8 +61,10 @@ import mega.privacy.android.shared.original.core.ui.controls.text.MegaText
 import mega.privacy.android.shared.original.core.ui.model.MegaSpanStyle
 import mega.privacy.android.shared.original.core.ui.model.MegaSpanStyleWithAnnotation
 import mega.privacy.android.shared.original.core.ui.model.SpanIndicator
+import mega.privacy.android.shared.original.core.ui.preview.CombinedThemePhoneLandscapePreviews
 import mega.privacy.android.shared.original.core.ui.preview.CombinedThemePreviews
 import mega.privacy.android.shared.original.core.ui.theme.OriginalTheme
+import mega.privacy.android.shared.original.core.ui.theme.extensions.conditional
 import mega.privacy.android.shared.original.core.ui.utils.showAutoDurationSnackbar
 import mega.privacy.mobile.analytics.event.AndroidSyncAllFilesAccessDialogDisplayedEvent
 import mega.privacy.mobile.analytics.event.AndroidSyncSelectDeviceFolderButtonPressedEvent
@@ -201,7 +205,9 @@ private fun SyncNewFolderScreenContent(
     val coroutineScope = rememberCoroutineScope()
 
     Column(
-        modifier.verticalScroll(scrollState)
+        modifier
+            .fillMaxWidth()
+            .verticalScroll(scrollState)
     ) {
         val launcher = rememberLauncherForActivityResult(
             ActivityResultContracts.RequestPermission()
@@ -274,16 +280,6 @@ private fun SyncNewFolderScreenContent(
             })
         }
 
-        MegaText(
-            text = when (syncType) {
-                SyncType.TYPE_BACKUP -> stringResource(id = sharedResR.string.sync_add_new_backup_header_text)
-                else -> stringResource(id = sharedResR.string.sync_add_new_sync_folder_header_text)
-            },
-            textColor = TextColor.Primary,
-            modifier = Modifier.padding(start = 16.dp, top = 16.dp),
-            style = MaterialTheme.typography.subtitle2
-        )
-
         if (showStorageOverQuota) {
             MegaAlertDialog(
                 title = stringResource(sharedResR.string.sync_error_dialog_insufficient_storage_title),
@@ -300,82 +296,100 @@ private fun SyncNewFolderScreenContent(
             )
         }
 
-        InputSyncInformationView(
-            syncType = syncType,
-            deviceName = deviceName,
-            selectDeviceFolderClicked = {
-                Analytics.tracker.trackEvent(AndroidSyncSelectDeviceFolderButtonPressedEvent)
-                if (syncPermissionsManager.isManageExternalStoragePermissionGranted()) {
-                    runCatching {
-                        onSelectFolder()
-                    }.onFailure {
-                        coroutineScope.launch {
-                            snackBarHostState.showAutoDurationSnackbar(context.getString(sharedResR.string.general_no_picker_warning))
-                        }
-                    }
-                } else {
-                    if (showSyncPermissionBanner) {
-                        syncPermissionsManager.launchAppSettingFileStorageAccess()
-                        showSyncPermissionBanner = false
-                        onShowSyncPermissionBannerValueChanged(false)
-                    } else {
-                        if (syncPermissionsManager.isSDKAboveOrEqualToR()) {
-                            showAllowAppAccessDialog = true
-                            Analytics.tracker.trackEvent(
-                                AndroidSyncAllFilesAccessDialogDisplayedEvent
-                            )
-                        } else {
-                            launcher.launch(Manifest.permission.WRITE_EXTERNAL_STORAGE)
-                        }
-                    }
-                }
-            },
-            selectMegaFolderClicked = {
-                selectMegaFolderClicked()
-            },
-            selectedDeviceFolder = selectedLocalFolder,
-            selectedMegaFolder = selectedMegaFolder?.name ?: ""
-        )
-
-        Box(
-            Modifier
-                .fillMaxWidth()
-                .testTag(TAG_SYNC_NEW_FOLDER_SCREEN_SYNC_BUTTON),
-            contentAlignment = Alignment.Center
-        ) {
-            var buttonClicked by remember { mutableStateOf(false) }
-            val buttonEnabled = when (syncType) {
-                SyncType.TYPE_BACKUP -> selectedLocalFolder.isNotBlank() && syncPermissionsManager.isManageExternalStoragePermissionGranted()
-                else -> selectedLocalFolder.isNotBlank() && selectedMegaFolder != null && syncPermissionsManager.isManageExternalStoragePermissionGranted()
-            }
-
-            RaisedDefaultMegaButton(
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .padding(bottom = 16.dp, start = 16.dp, end = 16.dp),
-                textId = when (syncType) {
-                    SyncType.TYPE_BACKUP -> {
-                        if (buttonClicked) {
-                            sharedResR.string.sync_list_sync_state_updating
-                        } else {
-                            sharedResR.string.sync_add_new_backup_proceed_button_label
-                        }
-                    }
-
-                    else -> {
-                        if (buttonClicked) {
-                            R.string.sync_list_sync_state_syncing
-                        } else {
-                            R.string.sync_button_label
-                        }
-                    }
+        val isLandscape =
+            LocalConfiguration.current.orientation == Configuration.ORIENTATION_LANDSCAPE
+        Column(modifier = Modifier.conditional(isLandscape) { fillMaxWidth(0.45f).align(Alignment.CenterHorizontally) }) {
+            MegaText(
+                text = when (syncType) {
+                    SyncType.TYPE_BACKUP -> stringResource(id = sharedResR.string.sync_add_new_backup_header_text)
+                    else -> stringResource(id = sharedResR.string.sync_add_new_sync_folder_header_text)
                 },
-                onClick = {
-                    buttonClicked = true
-                    syncClicked()
-                },
-                enabled = buttonEnabled && buttonClicked.not()
+                textColor = TextColor.Primary,
+                modifier = Modifier.padding(start = 16.dp, top = 16.dp),
+                style = MaterialTheme.typography.subtitle2
             )
+
+            InputSyncInformationView(
+                syncType = syncType,
+                deviceName = deviceName,
+                selectDeviceFolderClicked = {
+                    Analytics.tracker.trackEvent(AndroidSyncSelectDeviceFolderButtonPressedEvent)
+                    if (syncPermissionsManager.isManageExternalStoragePermissionGranted()) {
+                        runCatching {
+                            onSelectFolder()
+                        }.onFailure {
+                            coroutineScope.launch {
+                                snackBarHostState.showAutoDurationSnackbar(
+                                    context.getString(
+                                        sharedResR.string.general_no_picker_warning
+                                    )
+                                )
+                            }
+                        }
+                    } else {
+                        if (showSyncPermissionBanner) {
+                            syncPermissionsManager.launchAppSettingFileStorageAccess()
+                            showSyncPermissionBanner = false
+                            onShowSyncPermissionBannerValueChanged(false)
+                        } else {
+                            if (syncPermissionsManager.isSDKAboveOrEqualToR()) {
+                                showAllowAppAccessDialog = true
+                                Analytics.tracker.trackEvent(
+                                    AndroidSyncAllFilesAccessDialogDisplayedEvent
+                                )
+                            } else {
+                                launcher.launch(Manifest.permission.WRITE_EXTERNAL_STORAGE)
+                            }
+                        }
+                    }
+                },
+                selectMegaFolderClicked = {
+                    selectMegaFolderClicked()
+                },
+                selectedDeviceFolder = selectedLocalFolder,
+                selectedMegaFolder = selectedMegaFolder?.name ?: ""
+            )
+
+            Box(
+                Modifier
+                    .fillMaxWidth()
+                    .testTag(TAG_SYNC_NEW_FOLDER_SCREEN_SYNC_BUTTON),
+                contentAlignment = Alignment.Center
+            ) {
+                var buttonClicked by remember { mutableStateOf(false) }
+                val buttonEnabled = when (syncType) {
+                    SyncType.TYPE_BACKUP -> selectedLocalFolder.isNotBlank() && syncPermissionsManager.isManageExternalStoragePermissionGranted()
+                    else -> selectedLocalFolder.isNotBlank() && selectedMegaFolder != null && syncPermissionsManager.isManageExternalStoragePermissionGranted()
+                }
+
+                RaisedDefaultMegaButton(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .padding(bottom = 16.dp, start = 16.dp, end = 16.dp),
+                    textId = when (syncType) {
+                        SyncType.TYPE_BACKUP -> {
+                            if (buttonClicked) {
+                                sharedResR.string.sync_list_sync_state_updating
+                            } else {
+                                sharedResR.string.sync_add_new_backup_proceed_button_label
+                            }
+                        }
+
+                        else -> {
+                            if (buttonClicked) {
+                                R.string.sync_list_sync_state_syncing
+                            } else {
+                                R.string.sync_button_label
+                            }
+                        }
+                    },
+                    onClick = {
+                        buttonClicked = true
+                        syncClicked()
+                    },
+                    enabled = buttonEnabled && buttonClicked.not()
+                )
+            }
         }
     }
 }
@@ -385,6 +399,7 @@ internal const val TAG_SYNC_NEW_FOLDER_SCREEN_SYNC_BUTTON =
     "sync_new_folder_screen_sync_button_test_tag"
 
 @CombinedThemePreviews
+@CombinedThemePhoneLandscapePreviews
 @Composable
 private fun SyncNewFolderScreenPreview(
     @PreviewParameter(SyncTypePreviewProvider::class) syncType: SyncType
