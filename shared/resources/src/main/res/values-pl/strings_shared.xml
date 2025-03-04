@@ -405,13 +405,13 @@
     <!-- Feature indicating MEGA VPN availability, available in the pro plan -->
     <string name="account_cancel_account_screen_plan_mega_vpn">MEGA&#160;VPN</string>
     <!-- Row label for call and meeting duration in the comparison table -->
-    <string name="account_cancel_account_screen_plan_call_meeting_duration">Call &amp;amp;amp;amp; meeting duration</string>
+    <string name="account_cancel_account_screen_plan_call_meeting_duration">Czas trwania połączenia i spotkania</string>
     <!-- Call and meeting duration limit in the free plan -->
     <string name="account_cancel_account_screen_plan_call_meeting_duration_free">Do 1 godziny</string>
     <!-- Unlimited call and meeting duration available in the pro plan -->
     <string name="cancel_account_plan_call_meeting_duration_pro">BEZ OGRANICZEŃ</string>
     <!-- Row label for call and meeting participants in the comparison table -->
-    <string name="account_cancel_account_plan_call_meeting_participants">Call &amp;amp;amp;amp; meeting participants</string>
+    <string name="account_cancel_account_plan_call_meeting_participants">Uczestnicy rozmowy i spotkania</string>
     <!-- Limit on call and meeting participants in the free plan -->
     <string name="account_cancel_account_free_plan_call_meeting_participants">Do 100</string>
     <!-- Unlimited call and meeting participants available in the pro plan -->
@@ -623,12 +623,10 @@
     <string name="sync_promotion_bottom_sheet_whats_new_label">Co nowego</string>
     <!-- Title of the bottom sheet to promote Sync feature -->
     <string name="sync_promotion_bottom_sheet_title">Łatwa, automatyczna synchronizacja</string>
-    <!-- Body message of the bottom sheet to promote Sync feature -->
-    <string name="sync_promotion_bottom_sheet_body_message">Synchronizuj katalog na urządzeniu z MEGA, aby uzyskać dostęp do najnowszej wersji plik w dowolnym miejscu</string>
     <!-- Text of the primary button of the bottom sheet to promote Sync feature for Pro users ("Sync folders") -->
     <string name="sync_promotion_bottom_sheet_primary_button_text_pro">Synchronizuj katalogi</string>
-    <!-- Text of the secondary button of the bottom sheet to promote Sync feature ("Learn more") -->
-    <string name="sync_promotion_bottom_sheet_secondary_button_text">Dowiedz się więcej</string>
+    <!-- Text of the secondary button of the bottom sheet to promote Sync feature ("Back up folders") -->
+    <string name="sync_promotion_bottom_sheet_secondary_button_text">Utwórz kopie zapasowe katalogów</string>
     <!-- Snackbar message displayed when sync option is selected -->
     <string name="settings_sync_option_updated_message">Zaktualizowano opcje synchronizacji</string>
     <!-- Title of the Contact Permission Explanation -->
@@ -917,20 +915,20 @@
     <!-- Notification text for preview downloads, paused state.  Please do not modify the %s placeholder as it will be replaced by the name of the file to be donwloaded -->
     <string name="transfers_notification_downloading_preview_paused">Przygotowanie %1$s do podglądu (wstrzymane)</string>
     <!-- Message when successfully deleting single item from the audio queue. %1$s will be replaced with the item name -->
-    <string name="audio_queue_single_item_removed_message">”%1$s„ został usunięty</string>
+    <string name="audio_queue_single_item_removed_message">”%1$s” został usunięty</string>
     <!-- Message when successfully deleting items from the audio queue. %1$d will be replaced with the removal count when multiple items are removed. -->
     <string name="audio_queue_multiple_items_removed_message">Removed %1$d items from queue</string>
     <!-- Message when successfully deleting items from the audio queue. %1$s will be replaced with the item name %2$d will be replaced with the removal count. -->
     <plurals name="audio_queue_items_removal_success_message">
-        <item quantity="one">”%1$s„ został usunięty</item>
-        <item quantity="few">Usunięto %2$d elementy z kolejki</item>
-        <item quantity="many">Usunięto %2$d elementy z kolejki</item>
+        <item quantity="one">”%1$s” został usunięty z kolejki</item>
+        <item quantity="few">Usunięto %2$d element z kolejki</item>
+        <item quantity="many">Usunięto %2$d element z kolejki</item>
         <item quantity="other">Usunięto %2$d elementy z kolejki</item>
     </plurals>
     <!-- Title for the dialog to inform that a transfer is needed to preview a file and transfers are paused-->
     <string name="transfers_preview_paused_dialog_title">Przelewy są wstrzymane</string>
     <!-- Message for the dialog to inform that a transfer is needed to preview a file and transfers are paused-->
-    <string name="transfers_preview_paused_dialog_text">Aby wyświetlić podgląd ”%1$s” będziesz musiał przerwać transfery</string>
+    <string name="transfers_preview_paused_dialog_text">Aby wyświetlić podgląd ”%1$s” będziesz musiał wznowić wstrzymane transfery</string>
     <!--SD Card text shown as title in FileStorage screen -->
     <string name="general_sd_card">Karta SD</string>
     <!--The title of the Login page-->
@@ -968,7 +966,28 @@
     <!-- Ad settings label in the cookie settings page -->
     <string name="settings_cookie_settings_label_ad_settings">Ustawienia reklam</string>
     <!-- Ads personalization label in the cookie settings page -->
-    <string name="settings_cookie_settings_label_ads_personalization">Ads personalization</string>
+    <string name="settings_cookie_settings_label_ads_personalization">Personalizacja reklam</string>
     <!-- Cookie settings title in the cookie settings page -->
-    <string name="settings_cookie_setting_title_cookie_and_ad_settings">Cookie and Ad settings</string>
+    <string name="settings_cookie_setting_title_cookie_and_ad_settings">Ustawienia plików cookie i reklam</string>
+    <!-- Body text of the bottom sheet to promote Sync feature. The placeholders are to underline text -->
+    <string name="sync_promotion_bottom_sheet_body_text">Synchronizuj lub utwórz kopię zapasową folderu na urządzeniu z katalog w MEGA. [U] Dowiedz się więcej [/U]</string>
+    <!-- This is the final button when creating a folder in the dialog where the user inserts the folder name -->
+    <string name="transfers_cancel_download_warning_title">Anuluj pobieranie?</string>
+    <!-- Confirmation message informing a download was successfully cancelled -->
+    <string name="transfers_cancel_download_success_message">Download cancelled</string>
+    <!-- Title of note to self chat -->
+    <string name="chat_note_to_self_chat_title">Uwaga dla siebie</string>
+    <!-- First message header in note to self chat -->
+    <string name="chat_note_to_self_chat_first_message_header">Zachowaj to dla siebie</string>
+    <!-- First message description in note to self chat -->
+    <string name="chat_note_to_self_chat_first_message_description">Wysyłaj sobie poufne informacje, zdjęcia i filmy, lub pomysły na następne duże przedsięwzięcie. Synchronizowane na wszystkich urządzeniach i chronione szyfrowanie z zerową wiedzą.</string>
+    <!-- Add to album some files exist message -->
+    <plurals name="album_add_to_files_exist_message">
+        <item quantity="one">1 plik dodany do ”%1$s”. Nie można ponownie dodać zduplikowanych plików.</item>
+        <item quantity="few">%2$d pliki dodane do ”%1$s”. Nie można ponownie dodać zduplikowanych plików.</item>
+        <item quantity="many">%2$d pliki dodane do ”%1$s”. Nie można ponownie dodać zduplikowanych plików.</item>
+        <item quantity="other">%2$d pliki dodane do ”%1$s”. Nie można ponownie dodać zduplikowanych plików.</item>
+    </plurals>
+    <!-- Snack bar message informing that profile's QR code is uploaded to the Cloud Drive-->
+    <string name="transfers_start_upload_profile_qr_code_message">Saving %1$s to Cloud drive&#8230;</string>
 </resources>

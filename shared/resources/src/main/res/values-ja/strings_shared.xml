@@ -381,13 +381,13 @@
     <!-- Feature indicating MEGA VPN availability, available in the pro plan -->
     <string name="account_cancel_account_screen_plan_mega_vpn">MEGA&#160;VPN</string>
     <!-- Row label for call and meeting duration in the comparison table -->
-    <string name="account_cancel_account_screen_plan_call_meeting_duration">Call &amp;amp;amp;amp; meeting duration</string>
+    <string name="account_cancel_account_screen_plan_call_meeting_duration">通話とミーティングの時間</string>
     <!-- Call and meeting duration limit in the free plan -->
     <string name="account_cancel_account_screen_plan_call_meeting_duration_free">最大1時間</string>
     <!-- Unlimited call and meeting duration available in the pro plan -->
     <string name="cancel_account_plan_call_meeting_duration_pro">無制限</string>
     <!-- Row label for call and meeting participants in the comparison table -->
-    <string name="account_cancel_account_plan_call_meeting_participants">Call &amp;amp;amp;amp; meeting participants</string>
+    <string name="account_cancel_account_plan_call_meeting_participants">通話とミーティングの参加者</string>
     <!-- Limit on call and meeting participants in the free plan -->
     <string name="account_cancel_account_free_plan_call_meeting_participants">最大100人</string>
     <!-- Unlimited call and meeting participants available in the pro plan -->
@@ -590,12 +590,10 @@
     <string name="sync_promotion_bottom_sheet_whats_new_label">新機能</string>
     <!-- Title of the bottom sheet to promote Sync feature -->
     <string name="sync_promotion_bottom_sheet_title">簡単に自動同期</string>
-    <!-- Body message of the bottom sheet to promote Sync feature -->
-    <string name="sync_promotion_bottom_sheet_body_message">デバイス上のフォルダをMEGAと同期すると、どこからでもお持ちのファイルの最新バージョンにアクセスできます</string>
     <!-- Text of the primary button of the bottom sheet to promote Sync feature for Pro users ("Sync folders") -->
     <string name="sync_promotion_bottom_sheet_primary_button_text_pro">フォルダを同期</string>
-    <!-- Text of the secondary button of the bottom sheet to promote Sync feature ("Learn more") -->
-    <string name="sync_promotion_bottom_sheet_secondary_button_text">もっと詳しく知る</string>
+    <!-- Text of the secondary button of the bottom sheet to promote Sync feature ("Back up folders") -->
+    <string name="sync_promotion_bottom_sheet_secondary_button_text">フォルダをバックアップ</string>
     <!-- Snackbar message displayed when sync option is selected -->
     <string name="settings_sync_option_updated_message">同期オプションが更新されました</string>
     <!-- Title of the Contact Permission Explanation -->
@@ -869,7 +867,7 @@
     <!-- Notification text for preview downloads, paused state.  Please do not modify the %s placeholder as it will be replaced by the name of the file to be donwloaded -->
     <string name="transfers_notification_downloading_preview_paused">%1$sをプレビュー用に準備しています（一時停止）</string>
     <!-- Message when successfully deleting single item from the audio queue. %1$s will be replaced with the item name -->
-    <string name="audio_queue_single_item_removed_message">「%1$s」が削除されました。</string>
+    <string name="audio_queue_single_item_removed_message">「%1$s」が削除されました</string>
     <!-- Message when successfully deleting items from the audio queue. %1$d will be replaced with the removal count when multiple items are removed. -->
     <string name="audio_queue_multiple_items_removed_message">Removed %1$d items from queue</string>
     <!-- Message when successfully deleting items from the audio queue. %1$s will be replaced with the item name %2$d will be replaced with the removal count. -->
@@ -879,7 +877,7 @@
     <!-- Title for the dialog to inform that a transfer is needed to preview a file and transfers are paused-->
     <string name="transfers_preview_paused_dialog_title">転送は一時停止されています</string>
     <!-- Message for the dialog to inform that a transfer is needed to preview a file and transfers are paused-->
-    <string name="transfers_preview_paused_dialog_text">「%1$s」をプレビューするには、転送の一時停止を解除する必要があります。</string>
+    <string name="transfers_preview_paused_dialog_text">「%1$s」をプレビューするには、一時停止した転送を再開する必要があります</string>
     <!--SD Card text shown as title in FileStorage screen -->
     <string name="general_sd_card">SDカード</string>
     <!--The title of the Login page-->
@@ -917,7 +915,25 @@
     <!-- Ad settings label in the cookie settings page -->
     <string name="settings_cookie_settings_label_ad_settings">広告設定</string>
     <!-- Ads personalization label in the cookie settings page -->
-    <string name="settings_cookie_settings_label_ads_personalization">Ads personalization</string>
+    <string name="settings_cookie_settings_label_ads_personalization">広告のパーソナライズ</string>
     <!-- Cookie settings title in the cookie settings page -->
-    <string name="settings_cookie_setting_title_cookie_and_ad_settings">Cookie and Ad settings</string>
+    <string name="settings_cookie_setting_title_cookie_and_ad_settings">クッキーと広告の設定</string>
+    <!-- Body text of the bottom sheet to promote Sync feature. The placeholders are to underline text -->
+    <string name="sync_promotion_bottom_sheet_body_text">デバイス上のフォルダをMEGA上のフォルダと同期またはバックアップできます。[U]詳細はこちら[/U]</string>
+    <!-- This is the final button when creating a folder in the dialog where the user inserts the folder name -->
+    <string name="transfers_cancel_download_warning_title">ダウンロードをキャンセルしますか？</string>
+    <!-- Confirmation message informing a download was successfully cancelled -->
+    <string name="transfers_cancel_download_success_message">Download cancelled</string>
+    <!-- Title of note to self chat -->
+    <string name="chat_note_to_self_chat_title">自分へのメモ</string>
+    <!-- First message header in note to self chat -->
+    <string name="chat_note_to_self_chat_first_message_header">秘密にしておく</string>
+    <!-- First message description in note to self chat -->
+    <string name="chat_note_to_self_chat_first_message_description">自分自身に秘密の情報、写真や動画、次の大きな事業のアイデアなどを送れます。また、お持ちのすべてのデバイスで同期でき、ゼロ知識暗号化で保護されます。</string>
+    <!-- Add to album some files exist message -->
+    <plurals name="album_add_to_files_exist_message">
+        <item quantity="other">%2$d個のファイルが「%1$s」に追加されました。重複したファイルを再度追加することはできません。</item>
+    </plurals>
+    <!-- Snack bar message informing that profile's QR code is uploaded to the Cloud Drive-->
+    <string name="transfers_start_upload_profile_qr_code_message">クラウドドライブに%1$sを保存中&#8230;</string>
 </resources>

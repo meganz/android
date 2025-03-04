@@ -724,11 +724,6 @@
         <item quantity="one">Added to “%1$s”</item>
         <item quantity="other">Added %2$d items to “%1$s”</item>
     </plurals>
-    <!-- Add to album some files exist message -->
-    <plurals name="album_add_to_files_exist_message">
-        <item quantity="one">1 file added to “%1$s”. Duplicate files cannot be added again.</item>
-        <item quantity="other">%2$d files added to “%1$s”. Duplicate files cannot be added again.</item>
-    </plurals>
     <!-- Name for a general button which action is "Open" something -->
     <string name="general_open_button">Open</string>
     <!-- Bottom sheet option title for add the video to playlist from video section -->
@@ -945,13 +940,18 @@
     <!-- This is the final button when creating a folder in the dialog where the user inserts the folder name -->
     <string name="transfers_cancel_download_warning_title">Cancel download?</string>
     <!-- Confirmation message informing a download was successfully cancelled -->
-    <string name="transfers_cancel_download_success_message">Download cancelled with success</string>
+    <string name="transfers_cancel_download_success_message">Download cancelled</string>
     <!-- Title of note to self chat -->
     <string name="chat_note_to_self_chat_title">Note to self</string>
     <!-- First message header in note to self chat -->
     <string name="chat_note_to_self_chat_first_message_header">Keep it to yourself</string>
     <!-- First message description in note to self chat -->
     <string name="chat_note_to_self_chat_first_message_description">Send yourself sensitive information, pics and videos, or ideas for your next big venture. Synced across all your devices, and protected with zero-knowledge encryption.</string>
+    <!-- Add to album some files exist message -->
+    <plurals name="album_add_to_files_exist_message">
+        <item quantity="one">1 file added to “%1$s”. Duplicate files cannot be added again.</item>
+        <item quantity="other">%2$d files added to “%1$s”. Duplicate files cannot be added again.</item>
+    </plurals>
     <!-- Snack bar message informing that profile's QR code is uploaded to the Cloud Drive-->
-    <string name="transfers_start_upload_profile_qr_code_message">Saving %1$s in Cloud Drive&#8230;</string>
+    <string name="transfers_start_upload_profile_qr_code_message">Saving %1$s to Cloud drive&#8230;</string>
 </resources>

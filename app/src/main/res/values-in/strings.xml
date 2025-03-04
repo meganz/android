@@ -281,7 +281,7 @@
     <!-- Delete a link label -->
     <string name="context_delete_link">Hapus tautan</string>
     <!-- Title alert before leaving a share. -->
-    <string name="alert_leave_share">Leave folder</string>
+    <string name="alert_leave_share">Tinggalkan folder</string>
     <!-- Item menu option upon right click on one or multiple files. -->
     <string name="context_clean_shares_menu">Hapus berbagi</string>
     <!-- Item menu option upon right click on one or multiple files. -->
@@ -432,8 +432,6 @@
     <string name="upload_can_not_open">Tidak dapat membuka file terpilih</string>
     <!-- when a zip file is downloaded and clicked, the app unzips the file. This is the status text while unzipping the file -->
     <string name="unzipping_process">Membuka file</string>
-    <!-- error message while browsing the local filesystem -->
-    <string name="error_io_problem">Masalah file system</string>
     <!-- error message while browsing the local filesystem -->
     <string name="general_error">Terjadi error saat menjalankan aksi</string>
     <!-- menu item -->
@@ -1631,7 +1629,7 @@
     <!-- label to indicate that a share is still pending on outgoing shares of a node -->
     <string name="pending_outshare_indicator">(Tertunda)</string>
     <!-- Title of the dialog to disable the rich links previews on chat -->
-    <string name="option_enable_chat_rich_preview">Pratinjau URL Kaya</string>
+    <string name="option_enable_chat_rich_preview">Aktifkan pratinjau tautan terkirim</string>
     <!-- Button to allow the rich links previews on chat -->
     <string name="button_always_rich_links">Selalu Izinkan</string>
     <!-- Button do not allow now the rich links previews on chat -->
@@ -1639,9 +1637,9 @@
     <!-- Button do not allow the rich links previews on chat -->
     <string name="button_never_rich_links">Tidak pernah</string>
     <!-- Title of the dialog to enable the rich links previews on chat -->
-    <string name="title_enable_rich_links">Aktifkan pratinjau URL kaya</string>
+    <string name="title_enable_rich_links">Aktifkan pratinjau tautan terkirim</string>
     <!-- Text of the dialog to enable the rich links previews on chat -->
-    <string name="text_enable_rich_links">Tingkatkan pengalaman Obrolan MEGA. Konten URL akan diambil tanpa enkripsi tanpa pengetahuan.</string>
+    <string name="text_enable_rich_links">Menghasilkan pratinjau tautan yang anda kirim dalam obrolan. Perhatikan bahwa mengambil pratinjau ini tidak dilindungi oleh enkripsi zero-knowledge.</string>
     <!-- when the user tries to creates a MEGA account or tries to change his password and the password strength is very weak -->
     <string name="error_password">Harap masukkan kata sandi yang lebih kuat</string>
     <!-- title of the notification for an acceptance of a contact request -->

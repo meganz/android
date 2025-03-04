@@ -381,13 +381,13 @@
     <!-- Feature indicating MEGA VPN availability, available in the pro plan -->
     <string name="account_cancel_account_screen_plan_mega_vpn">MEGA&#160;VPN</string>
     <!-- Row label for call and meeting duration in the comparison table -->
-    <string name="account_cancel_account_screen_plan_call_meeting_duration">Call &amp;amp;amp;amp; meeting duration</string>
+    <string name="account_cancel_account_screen_plan_call_meeting_duration">通话和会议时长</string>
     <!-- Call and meeting duration limit in the free plan -->
     <string name="account_cancel_account_screen_plan_call_meeting_duration_free">最多1小时</string>
     <!-- Unlimited call and meeting duration available in the pro plan -->
     <string name="cancel_account_plan_call_meeting_duration_pro">无限制</string>
     <!-- Row label for call and meeting participants in the comparison table -->
-    <string name="account_cancel_account_plan_call_meeting_participants">Call &amp;amp;amp;amp; meeting participants</string>
+    <string name="account_cancel_account_plan_call_meeting_participants">通话和会议参与者</string>
     <!-- Limit on call and meeting participants in the free plan -->
     <string name="account_cancel_account_free_plan_call_meeting_participants">最多100人</string>
     <!-- Unlimited call and meeting participants available in the pro plan -->
@@ -590,12 +590,10 @@
     <string name="sync_promotion_bottom_sheet_whats_new_label">新增内容</string>
     <!-- Title of the bottom sheet to promote Sync feature -->
     <string name="sync_promotion_bottom_sheet_title">轻松，自动的同步</string>
-    <!-- Body message of the bottom sheet to promote Sync feature -->
-    <string name="sync_promotion_bottom_sheet_body_message">将您设备上的文件夹与MEGA同步，随时随地访问您文件的最新版本</string>
     <!-- Text of the primary button of the bottom sheet to promote Sync feature for Pro users ("Sync folders") -->
     <string name="sync_promotion_bottom_sheet_primary_button_text_pro">同步文件夹</string>
-    <!-- Text of the secondary button of the bottom sheet to promote Sync feature ("Learn more") -->
-    <string name="sync_promotion_bottom_sheet_secondary_button_text">了解更多</string>
+    <!-- Text of the secondary button of the bottom sheet to promote Sync feature ("Back up folders") -->
+    <string name="sync_promotion_bottom_sheet_secondary_button_text">备份文件夹</string>
     <!-- Snackbar message displayed when sync option is selected -->
     <string name="settings_sync_option_updated_message">同步选项已更新</string>
     <!-- Title of the Contact Permission Explanation -->
@@ -869,17 +867,17 @@
     <!-- Notification text for preview downloads, paused state.  Please do not modify the %s placeholder as it will be replaced by the name of the file to be donwloaded -->
     <string name="transfers_notification_downloading_preview_paused">正在准备预览%1$s（已暂停）</string>
     <!-- Message when successfully deleting single item from the audio queue. %1$s will be replaced with the item name -->
-    <string name="audio_queue_single_item_removed_message">“%1$s”已移除</string>
+    <string name="audio_queue_single_item_removed_message">已删除“%1$s”</string>
     <!-- Message when successfully deleting items from the audio queue. %1$d will be replaced with the removal count when multiple items are removed. -->
     <string name="audio_queue_multiple_items_removed_message">Removed %1$d items from queue</string>
     <!-- Message when successfully deleting items from the audio queue. %1$s will be replaced with the item name %2$d will be replaced with the removal count. -->
     <plurals name="audio_queue_items_removal_success_message">
-        <item quantity="other">已从队列移除%2$d项目</item>
+        <item quantity="other">已从队列中移除%2$d个项目</item>
     </plurals>
     <!-- Title for the dialog to inform that a transfer is needed to preview a file and transfers are paused-->
     <string name="transfers_preview_paused_dialog_title">传输暂停</string>
     <!-- Message for the dialog to inform that a transfer is needed to preview a file and transfers are paused-->
-    <string name="transfers_preview_paused_dialog_text">预览“%1$s”，您需要取消暂停传输</string>
+    <string name="transfers_preview_paused_dialog_text">若要预览“%1$s”，您需要恢复暂停的传输</string>
     <!--SD Card text shown as title in FileStorage screen -->
     <string name="general_sd_card">SD卡</string>
     <!--The title of the Login page-->
@@ -917,7 +915,25 @@
     <!-- Ad settings label in the cookie settings page -->
     <string name="settings_cookie_settings_label_ad_settings">广告设置</string>
     <!-- Ads personalization label in the cookie settings page -->
-    <string name="settings_cookie_settings_label_ads_personalization">Ads personalization</string>
+    <string name="settings_cookie_settings_label_ads_personalization">广告个性化</string>
     <!-- Cookie settings title in the cookie settings page -->
-    <string name="settings_cookie_setting_title_cookie_and_ad_settings">Cookie and Ad settings</string>
+    <string name="settings_cookie_setting_title_cookie_and_ad_settings">Cookie和广告设置</string>
+    <!-- Body text of the bottom sheet to promote Sync feature. The placeholders are to underline text -->
+    <string name="sync_promotion_bottom_sheet_body_text">将您设备上的文件夹与MEGA上的文件夹同步或备份。[U]了解更多[/U]</string>
+    <!-- This is the final button when creating a folder in the dialog where the user inserts the folder name -->
+    <string name="transfers_cancel_download_warning_title">取消下载？</string>
+    <!-- Confirmation message informing a download was successfully cancelled -->
+    <string name="transfers_cancel_download_success_message">Download cancelled</string>
+    <!-- Title of note to self chat -->
+    <string name="chat_note_to_self_chat_title">隐私笔记</string>
+    <!-- First message header in note to self chat -->
+    <string name="chat_note_to_self_chat_first_message_header">保留自己的隐私</string>
+    <!-- First message description in note to self chat -->
+    <string name="chat_note_to_self_chat_first_message_description">将敏感信息、照片、视频或下一次大冒险的想法发送给自己。它们会在您的所有设备上同步，并使用零知识加密进行保护。</string>
+    <!-- Add to album some files exist message -->
+    <plurals name="album_add_to_files_exist_message">
+        <item quantity="other">已添加%2$d个文件到“%1$s”。重复的文件无法再次添加。</item>
+    </plurals>
+    <!-- Snack bar message informing that profile's QR code is uploaded to the Cloud Drive-->
+    <string name="transfers_start_upload_profile_qr_code_message">Saving %1$s to Cloud drive&#8230;</string>
 </resources>

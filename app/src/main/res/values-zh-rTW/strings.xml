@@ -433,8 +433,6 @@
     <!-- when a zip file is downloaded and clicked, the app unzips the file. This is the status text while unzipping the file -->
     <string name="unzipping_process">解壓檔案</string>
     <!-- error message while browsing the local filesystem -->
-    <string name="error_io_problem">檔案系統問題</string>
-    <!-- error message while browsing the local filesystem -->
     <string name="general_error">執行操作時發生錯誤</string>
     <!-- menu item -->
     <string name="my_account_change_password">更改密碼</string>
@@ -1631,7 +1629,7 @@
     <!-- label to indicate that a share is still pending on outgoing shares of a node -->
     <string name="pending_outshare_indicator">（等待）</string>
     <!-- Title of the dialog to disable the rich links previews on chat -->
-    <string name="option_enable_chat_rich_preview">預覽網址</string>
+    <string name="option_enable_chat_rich_preview">啟用傳送連結預覽</string>
     <!-- Button to allow the rich links previews on chat -->
     <string name="button_always_rich_links">總是允許</string>
     <!-- Button do not allow now the rich links previews on chat -->
@@ -1639,9 +1637,9 @@
     <!-- Button do not allow the rich links previews on chat -->
     <string name="button_never_rich_links">尚未</string>
     <!-- Title of the dialog to enable the rich links previews on chat -->
-    <string name="title_enable_rich_links">啟用網址連結預覽功能</string>
+    <string name="title_enable_rich_links">啟用傳送連結預覽</string>
     <!-- Text of the dialog to enable the rich links previews on chat -->
-    <string name="text_enable_rich_links">提升MEGA Chat使用體驗。為了顯示內容預覽，系統將在沒有零知識的加密情況下對連結進行檢索。</string>
+    <string name="text_enable_rich_links">預覽您在對話中傳送的連結。 請注意，檢索這些預覽不受零知識加密的保護。</string>
     <!-- when the user tries to creates a MEGA account or tries to change his password and the password strength is very weak -->
     <string name="error_password">請輸入一組更高強度的密碼</string>
     <!-- title of the notification for an acceptance of a contact request -->

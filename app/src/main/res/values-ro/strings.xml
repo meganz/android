@@ -445,8 +445,6 @@
     <!-- when a zip file is downloaded and clicked, the app unzips the file. This is the status text while unzipping the file -->
     <string name="unzipping_process">Se dezarhivează fișierul</string>
     <!-- error message while browsing the local filesystem -->
-    <string name="error_io_problem">Problemă cu sistemul de fișiere</string>
-    <!-- error message while browsing the local filesystem -->
     <string name="general_error">Eroare petrecută la executarea acțiunii</string>
     <!-- menu item -->
     <string name="my_account_change_password">Modifică parola</string>
@@ -1709,7 +1707,7 @@
     <!-- label to indicate that a share is still pending on outgoing shares of a node -->
     <string name="pending_outshare_indicator">(În așteptare)</string>
     <!-- Title of the dialog to disable the rich links previews on chat -->
-    <string name="option_enable_chat_rich_preview">Previzualizări îmbogățite ale URL-urilor</string>
+    <string name="option_enable_chat_rich_preview">Enable sent link previews</string>
     <!-- Button to allow the rich links previews on chat -->
     <string name="button_always_rich_links">Permite întotdeauna</string>
     <!-- Button do not allow now the rich links previews on chat -->
@@ -1717,9 +1715,9 @@
     <!-- Button do not allow the rich links previews on chat -->
     <string name="button_never_rich_links">Niciodată</string>
     <!-- Title of the dialog to enable the rich links previews on chat -->
-    <string name="title_enable_rich_links">Activează previzualizările îmbogățite ale URL-urilor</string>
+    <string name="title_enable_rich_links">Enable sent link previews</string>
     <!-- Text of the dialog to enable the rich links previews on chat -->
-    <string name="text_enable_rich_links">Îmbunătățește experiența MEGA Chat. Conținutul URL-urilor va fi preluat fără criptare tip zero cunoștințe.</string>
+    <string name="text_enable_rich_links">Generates a preview of the links you send in chat. Note that retrieving these previews isn’t protected by zero-knowledge encryption.</string>
     <!-- when the user tries to creates a MEGA account or tries to change his password and the password strength is very weak -->
     <string name="error_password">Vă rugăm să introduceți o parolă mai puternică</string>
     <!-- title of the notification for an acceptance of a contact request -->

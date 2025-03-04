@@ -25,7 +25,7 @@
     <!-- The name of the Device or Folder Status which signifies that it is disabled -->
     <string name="device_center_list_view_item_status_disabled">ปิดใช้งานแล้ว</string>
     <!-- The name of the Device or Folder Status which signifies that it is offline -->
-    <string name="device_center_list_view_item_status_offline">Inactive</string>
+    <string name="device_center_list_view_item_status_offline">ไม่ได้ใช้งาน</string>
     <!-- The name of the Device or Folder Status which signifies that the backup procedure has been paused -->
     <string name="device_center_list_view_item_status_paused">พักแล้ว</string>
     <!-- The name of the Device or Folder Status which signifies that the backup procedure has been stopped -->

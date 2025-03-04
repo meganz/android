@@ -439,8 +439,6 @@
     <!-- when a zip file is downloaded and clicked, the app unzips the file. This is the status text while unzipping the file -->
     <string name="unzipping_process">Entpacke Datei</string>
     <!-- error message while browsing the local filesystem -->
-    <string name="error_io_problem">Problem mit dem Dateisystem</string>
-    <!-- error message while browsing the local filesystem -->
     <string name="general_error">Bei der Ausführung dieser Aktion ist ein Fehler aufgetreten</string>
     <!-- menu item -->
     <string name="my_account_change_password">Passwort ändern</string>
@@ -1670,7 +1668,7 @@
     <!-- label to indicate that a share is still pending on outgoing shares of a node -->
     <string name="pending_outshare_indicator">(Wartezustand)</string>
     <!-- Title of the dialog to disable the rich links previews on chat -->
-    <string name="option_enable_chat_rich_preview">URL-Vorschau</string>
+    <string name="option_enable_chat_rich_preview">Vorschau für gesendete Links aktivieren</string>
     <!-- Button to allow the rich links previews on chat -->
     <string name="button_always_rich_links">Immer erlauben</string>
     <!-- Button do not allow now the rich links previews on chat -->
@@ -1678,9 +1676,9 @@
     <!-- Button do not allow the rich links previews on chat -->
     <string name="button_never_rich_links">keine</string>
     <!-- Title of the dialog to enable the rich links previews on chat -->
-    <string name="title_enable_rich_links">URL-Ansicht aktivieren</string>
+    <string name="title_enable_rich_links">Vorschau für gesendete Links aktivieren</string>
     <!-- Text of the dialog to enable the rich links previews on chat -->
-    <string name="text_enable_rich_links">Verbessern Sie Ihre MEGA-Chat-Erfahrung. URL-Inhalte werden ohne Zero-Knowledge-Verschlüsselung abgerufen.</string>
+    <string name="text_enable_rich_links">Erzeugt eine Vorschau für die Links, die Sie in Chats versenden. Beachten Sie, dass der Abruf dieser Vorschauen nicht durch Zero-Knowledge-Verschlüsselung geschützt erfolgt.</string>
     <!-- when the user tries to creates a MEGA account or tries to change his password and the password strength is very weak -->
     <string name="error_password">Bitte wählen Sie ein stärkeres Passwort</string>
     <!-- title of the notification for an acceptance of a contact request -->

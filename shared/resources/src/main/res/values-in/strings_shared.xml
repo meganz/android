@@ -383,13 +383,13 @@
     <!-- Feature indicating MEGA VPN availability, available in the pro plan -->
     <string name="account_cancel_account_screen_plan_mega_vpn">MEGA&#160;VPN</string>
     <!-- Row label for call and meeting duration in the comparison table -->
-    <string name="account_cancel_account_screen_plan_call_meeting_duration">Call &amp;amp;amp;amp; meeting duration</string>
+    <string name="account_cancel_account_screen_plan_call_meeting_duration">Durasi panggilan dan rapat</string>
     <!-- Call and meeting duration limit in the free plan -->
     <string name="account_cancel_account_screen_plan_call_meeting_duration_free">Hingga 1 jam</string>
     <!-- Unlimited call and meeting duration available in the pro plan -->
     <string name="cancel_account_plan_call_meeting_duration_pro">TAK TERBATAS</string>
     <!-- Row label for call and meeting participants in the comparison table -->
-    <string name="account_cancel_account_plan_call_meeting_participants">Call &amp;amp;amp;amp; meeting participants</string>
+    <string name="account_cancel_account_plan_call_meeting_participants">Peserta panggilan dan rapat</string>
     <!-- Limit on call and meeting participants in the free plan -->
     <string name="account_cancel_account_free_plan_call_meeting_participants">Hingga 100</string>
     <!-- Unlimited call and meeting participants available in the pro plan -->
@@ -413,7 +413,7 @@
     <!-- Title shown when cancelling the current plan in the instructions screen, informing the user about the account is not managed by google -->
     <string name="account_cancellation_instructions_not_managed_by_google">Your subscription is not managed by Google</string>
     <!-- Message shown when cancelling the current plan in the instructions screen, informing the user about how to cancel subscription -->
-    <string name="account_cancellation_instructions_message_apple_description">This is because you subscribed to MEGA via Apple. To cancel your subscription, you will need to:</string>
+    <string name="account_cancellation_instructions_message_apple_description">Ini karena anda berlangganan MEGA melalui Apple. Untuk membatalkan langganan anda, anda harus:</string>
     <!-- Label for the subscription managed by App Store on Cancellation instructions screen-->
     <string name="account_cancellation_instructions_ios_device">On an iOS Device</string>
     <!-- Step 1: instruction step no.1 to Open the settings App to cancel the subscription from iOS device-->
@@ -427,7 +427,7 @@
     <!-- Step 5: instruction step no.5 to Select Cancel subscription of the App inside subscription section in the iOS device-->
     <string name="account_cancellation_instructions_open_select_cancel_subscription">5. Tap [A]Cancel subscription[/A].</string>
     <!-- Message description to provide the user with more details on how to cancel your subscription on a computer or other device. -->
-    <string name="account_cancellation_instructions_detailed_instructions">[A]Tap here[/A] for detailed instructions on how to cancel your subscription on a computer or other device.</string>
+    <string name="account_cancellation_instructions_detailed_instructions">[A]Ketuk di sini[/A] untuk petunjuk terperinci tentang cara membatalkan langganan anda di komputer atau perangkat lain.</string>
     <!-- Title shown when needing to cancel the subscription using a web browser -->
     <string name="account_cancellation_instructions_cancellation_web_browser_needed">Anda perlu membatalkan langganan anda menggunakan browser web</string>
     <!-- Title shown when needing to reactivate the subscription using a web browser -->
@@ -594,12 +594,10 @@
     <string name="sync_promotion_bottom_sheet_whats_new_label">Apa yang baru</string>
     <!-- Title of the bottom sheet to promote Sync feature -->
     <string name="sync_promotion_bottom_sheet_title">Easy, automated sync</string>
-    <!-- Body message of the bottom sheet to promote Sync feature -->
-    <string name="sync_promotion_bottom_sheet_body_message">Sync a folder on your device with MEGA to access the latest version of your files anywhere</string>
     <!-- Text of the primary button of the bottom sheet to promote Sync feature for Pro users ("Sync folders") -->
     <string name="sync_promotion_bottom_sheet_primary_button_text_pro">Sync folders</string>
-    <!-- Text of the secondary button of the bottom sheet to promote Sync feature ("Learn more") -->
-    <string name="sync_promotion_bottom_sheet_secondary_button_text">Pelajari selengkapnya</string>
+    <!-- Text of the secondary button of the bottom sheet to promote Sync feature ("Back up folders") -->
+    <string name="sync_promotion_bottom_sheet_secondary_button_text">Back up folders</string>
     <!-- Snackbar message displayed when sync option is selected -->
     <string name="settings_sync_option_updated_message">Sync options updated</string>
     <!-- Title of the Contact Permission Explanation -->
@@ -877,18 +875,18 @@
     <!-- Notification text for preview downloads, paused state.  Please do not modify the %s placeholder as it will be replaced by the name of the file to be donwloaded -->
     <string name="transfers_notification_downloading_preview_paused">Preparing %1$s for preview (paused)</string>
     <!-- Message when successfully deleting single item from the audio queue. %1$s will be replaced with the item name -->
-    <string name="audio_queue_single_item_removed_message">’%1$s’ was removed</string>
+    <string name="audio_queue_single_item_removed_message">‟%1$s” was removed</string>
     <!-- Message when successfully deleting items from the audio queue. %1$d will be replaced with the removal count when multiple items are removed. -->
     <string name="audio_queue_multiple_items_removed_message">Removed %1$d items from queue</string>
     <!-- Message when successfully deleting items from the audio queue. %1$s will be replaced with the item name %2$d will be replaced with the removal count. -->
     <plurals name="audio_queue_items_removal_success_message">
-        <item quantity="one">‘%1$s’ was removed</item>
-        <item quantity="other">Removed %2$d items from queue</item>
+        <item quantity="one">“%1$s” was removed from the queue</item>
+        <item quantity="other">Removed %2$d items from the queue</item>
     </plurals>
     <!-- Title for the dialog to inform that a transfer is needed to preview a file and transfers are paused-->
     <string name="transfers_preview_paused_dialog_title">Transfers are paused</string>
     <!-- Message for the dialog to inform that a transfer is needed to preview a file and transfers are paused-->
-    <string name="transfers_preview_paused_dialog_text">To preview “%1$s” you will need to unpause transfers</string>
+    <string name="transfers_preview_paused_dialog_text">To preview “%1$s” you will need to resume paused transfers</string>
     <!--SD Card text shown as title in FileStorage screen -->
     <string name="general_sd_card">SD card</string>
     <!--The title of the Login page-->
@@ -926,7 +924,26 @@
     <!-- Ad settings label in the cookie settings page -->
     <string name="settings_cookie_settings_label_ad_settings">Ad settings</string>
     <!-- Ads personalization label in the cookie settings page -->
-    <string name="settings_cookie_settings_label_ads_personalization">Ads personalization</string>
+    <string name="settings_cookie_settings_label_ads_personalization">Ads personalisation</string>
     <!-- Cookie settings title in the cookie settings page -->
-    <string name="settings_cookie_setting_title_cookie_and_ad_settings">Cookie and Ad settings</string>
+    <string name="settings_cookie_setting_title_cookie_and_ad_settings">Cookie and ad settings</string>
+    <!-- Body text of the bottom sheet to promote Sync feature. The placeholders are to underline text -->
+    <string name="sync_promotion_bottom_sheet_body_text">Sync or back up a folder on your device with a folder on MEGA. [U]Learn more[/U]</string>
+    <!-- This is the final button when creating a folder in the dialog where the user inserts the folder name -->
+    <string name="transfers_cancel_download_warning_title">Cancel download?</string>
+    <!-- Confirmation message informing a download was successfully cancelled -->
+    <string name="transfers_cancel_download_success_message">Download cancelled</string>
+    <!-- Title of note to self chat -->
+    <string name="chat_note_to_self_chat_title">Note to self</string>
+    <!-- First message header in note to self chat -->
+    <string name="chat_note_to_self_chat_first_message_header">Keep it to yourself</string>
+    <!-- First message description in note to self chat -->
+    <string name="chat_note_to_self_chat_first_message_description">Send yourself sensitive information, pics and videos, or ideas for your next big venture. Synced across all your devices, and protected with zero-knowledge encryption.</string>
+    <!-- Add to album some files exist message -->
+    <plurals name="album_add_to_files_exist_message">
+        <item quantity="one">1 file added to “%1$s”. Duplicate files cannot be added again.</item>
+        <item quantity="other">%2$d files added to “%1$s”. Duplicate files cannot be added again.</item>
+    </plurals>
+    <!-- Snack bar message informing that profile's QR code is uploaded to the Cloud Drive-->
+    <string name="transfers_start_upload_profile_qr_code_message">Saving %1$s to Cloud drive&#8230;</string>
 </resources>

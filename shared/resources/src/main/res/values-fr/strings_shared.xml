@@ -243,7 +243,7 @@
         <item quantity="other">Partager des liens</item>
     </plurals>
     <!-- Title of the dialog to ask the user to use the selected location as default location for next downloads. Please do not modify the %s placeholder as it will be replaced by the name of the folder where the files will be downloaded-->
-    <string name="transfers_dialog_save_download_location_title">Save all your downloaded files to “%1$s”?</string>
+    <string name="transfers_dialog_save_download_location_title">Enregistrer tous vos fichiers téléchargés dans&#160;«%1$s»&#160;?</string>
     <!-- Option to use the selected location as default location for next downloads-->
     <string name="transfers_dialog_save_download_location_always_here_option">Toujours télécharger ici</string>
     <!-- Option to don't use the selected location as default location for next downloads and don't ask again-->
@@ -397,13 +397,13 @@
     <!-- Feature indicating MEGA VPN availability, available in the pro plan -->
     <string name="account_cancel_account_screen_plan_mega_vpn">MEGA&#160;VPN</string>
     <!-- Row label for call and meeting duration in the comparison table -->
-    <string name="account_cancel_account_screen_plan_call_meeting_duration">Call &amp;amp;amp;amp; meeting duration</string>
+    <string name="account_cancel_account_screen_plan_call_meeting_duration">Durée des appels et réunions</string>
     <!-- Call and meeting duration limit in the free plan -->
     <string name="account_cancel_account_screen_plan_call_meeting_duration_free">Jusqu’à 1&#160;heure</string>
     <!-- Unlimited call and meeting duration available in the pro plan -->
     <string name="cancel_account_plan_call_meeting_duration_pro">Ilimitée</string>
     <!-- Row label for call and meeting participants in the comparison table -->
-    <string name="account_cancel_account_plan_call_meeting_participants">Call &amp;amp;amp;amp; meeting participants</string>
+    <string name="account_cancel_account_plan_call_meeting_participants">Participants aux appels et réunions</string>
     <!-- Limit on call and meeting participants in the free plan -->
     <string name="account_cancel_account_free_plan_call_meeting_participants">Jusqu’à 100</string>
     <!-- Unlimited call and meeting participants available in the pro plan -->
@@ -612,12 +612,10 @@
     <string name="sync_promotion_bottom_sheet_whats_new_label">Nouveautés</string>
     <!-- Title of the bottom sheet to promote Sync feature -->
     <string name="sync_promotion_bottom_sheet_title">Synchronisation simple et automatique</string>
-    <!-- Body message of the bottom sheet to promote Sync feature -->
-    <string name="sync_promotion_bottom_sheet_body_message">Synchronisez un dossier sur votre appareil avec MEGA pour accéder à la version la plus récente de vos fichiers où que vous soyez</string>
     <!-- Text of the primary button of the bottom sheet to promote Sync feature for Pro users ("Sync folders") -->
     <string name="sync_promotion_bottom_sheet_primary_button_text_pro">Synchroniser les dossiers</string>
-    <!-- Text of the secondary button of the bottom sheet to promote Sync feature ("Learn more") -->
-    <string name="sync_promotion_bottom_sheet_secondary_button_text">En apprendre davantage</string>
+    <!-- Text of the secondary button of the bottom sheet to promote Sync feature ("Back up folders") -->
+    <string name="sync_promotion_bottom_sheet_secondary_button_text">Sauvegarder les dossiers</string>
     <!-- Snackbar message displayed when sync option is selected -->
     <string name="settings_sync_option_updated_message">Options de synchronisation mises à jour</string>
     <!-- Title of the Contact Permission Explanation -->
@@ -849,25 +847,25 @@
         <item quantity="other"></item>
     </plurals>
     <!-- Warning shown to the user when tries to retry a cancelled or failed transfer but it cannot be retried because app does not have read permission over the file anymore -->
-    <string name="transfers_completed_one_read_error_retrying">Your upload can’t be completed or retried, because MEGA can no longer access the file</string>
+    <string name="transfers_completed_one_read_error_retrying">Votre téléversement ne peut pas être terminé ou réessayé, car MEGA ne peut plus accéder au fichier</string>
     <!-- Warning shown to the user when tries to retry some or all of cancelled or failed transfer but they cannot be retried because app does not have read permission over the files anymore -->
-    <string name="transfers_completed_some_read_error_retrying">Some or all of your uploads can’t be completed or retried, because MEGA can no longer access the files</string>
+    <string name="transfers_completed_some_read_error_retrying">Certains ou tous vos téléversements ne peuvent pas être terminés ou réessayés, car MEGA ne peut plus accéder aux fichiers</string>
     <!-- Title for Offline Folder exposed via SAF -->
-    <string name="general_mega_offline">MEGA Offline files</string>
+    <string name="general_mega_offline">Fichiers MEGA Offline</string>
     <!-- Notification content for download final notification. It will inform the user about the location where file/s were downloaded -->
-    <string name="transfers_notification_location_content">Location: %1$s</string>
+    <string name="transfers_notification_location_content">Lieu&#160;: %1$s</string>
     <!-- Notification action for download final notification. It will open the file explorer activity to show the destination folder -->
-    <string name="transfers_notification_location_action">Locate</string>
+    <string name="transfers_notification_location_action">Localiser</string>
     <!-- Notification content for download final notification in case of a single file downloaded. -->
-    <string name="transfers_notification_title_single_download">Downloaded “%1$s”</string>
+    <string name="transfers_notification_title_single_download">Téléchargé&#160;«%1$s»</string>
     <!-- Label for the button or menu option to add a new backup -->
-    <string name="device_center_sync_add_new_backup_button_option">Add new backup</string>
+    <string name="device_center_sync_add_new_backup_button_option">Ajouter une nouvelle sauvegarde</string>
     <!-- Notification content for download final notification in case of a single file downloaded to preview. -->
-    <string name="transfers_notification_title_preview_download">“%1$s” is ready to preview</string>
+    <string name="transfers_notification_title_preview_download">«%1$s» est prêt à être prévisualisé</string>
     <!-- Notification action for download final notification. It will open a dialog with installed apps which can open the file -->
     <string name="transfers_notification_preview_action">Aperçu</string>
     <!-- Title for the OS dialog shown with available apps to open a file -->
-    <string name="open_with_os_dialog_title">Open “%1$s” with</string>
+    <string name="open_with_os_dialog_title">Ouvrir&#160;«%1$s» avec</string>
     <!-- The Scan Confirmation screen error message shown when the new filename does not contain the file extension that was selected -->
     <string name="document_scanning_settings_missing_file_extension_error_message">Extension de fichier manquante (%s)</string>
     <!-- The Scan Confirmation screen error message shown when the filename does not end with the expected file extension -->
@@ -875,44 +873,47 @@
     <!-- The Scan Confirmation screen error message shown when the filename has no file extension -->
     <string name="document_scanning_settings_file_extension_required_error_message">Une extension de fichier est nécessaire</string>
     <!-- Alert text before download a file for preview. Please do not modify the %s placeholder as it will be replaced by the size to be donwloaded -->
-    <string name="alert_larger_file_preview">In order to preview this file, MEGA needs to download it. %1$s will be downloaded.</string>
+    <string name="alert_larger_file_preview">Pour prévisualiser ce fichier, MEGA doit le télécharger. %1$s sera téléchargé.</string>
     <!-- Message displayed with progress percentage while the app is doing some background operation -->
     <string name="login_completing_operation">Finalisation de l\’opération&#160;: %1$d%%</string>
     <!-- Add to album files existed message -->
     <plurals name="album_add_to_files_existed">
-        <item quantity="one">This file already exists in “%1$s” and cannot be added again</item>
-        <item quantity="other">These files already exist in “%1$s” and cannot be added again</item>
+        <item quantity="one">Ce fichier existe déjà dans&#160;«%1$s» et ne peut pas être ajouté à nouveau</item>
+        <item quantity="many">Ces fichiers existent déjà dans&#160;«%1$s» et ne peut pas être ajouté à nouveau</item>
+        <item quantity="other">Ces fichiers existent déjà dans&#160;«%1$s» et ne peut pas être ajouté à nouveau</item>
     </plurals>
     <!-- Add to album partial added message -->
     <plurals name="album_add_to_partial_added_message">
-        <item quantity="one">1 file added to “%1$s”. Some files already exist, and can’t be added again.</item>
-        <item quantity="other">%2$d files added to “%1$s”. Some files already exist, and can’t be added again.</item>
+        <item quantity="one">1 fichier ajouté à&#160;«%1$s». Certains fichiers existent déjà et ne peuvent pas être ajoutés à nouveau.</item>
+        <item quantity="many">%2$d fichiers ajoutés à&#160;«%1$s». Certains fichiers existent déjà et ne peuvent pas être ajoutés à nouveau.</item>
+        <item quantity="other">%2$d fichiers ajoutés à&#160;«%1$s». Certains fichiers existent déjà et ne peuvent pas être ajoutés à nouveau.</item>
     </plurals>
     <!--Content on the Multi-Factor Authentication Login page -->
     <string name="multi_factor_auth_login_verification_content">Saisissez le code à six chiffres généré par votre appli d’authentification.</string>
     <!--Message to be shown to the user when they entered an incorrect verification code-->
     <string name="multi_factor_auth_login_verification_input_error_text">Le code de vérification est erroné</string>
     <!-- Snackbar text to inform the user that preview may take some time because it needs to be downloaded -->
-    <string name="transfers_preview_slow_snackbar">Preparing file for preview. See notification for details.</string>
+    <string name="transfers_preview_slow_snackbar">Préparation du fichier pour la prévisualisation. Voir la notification pour plus de détails.</string>
     <!-- Notification text for preview downloads.  Please do not modify the %s placeholder as it will be replaced by the name of the file to be donwloaded -->
-    <string name="transfers_notification_downloading_preview">Preparing %1$s for preview</string>
+    <string name="transfers_notification_downloading_preview">Préparation %1$s pour un aperçu</string>
     <!-- Notification text for preview downloads, paused state.  Please do not modify the %s placeholder as it will be replaced by the name of the file to be donwloaded -->
-    <string name="transfers_notification_downloading_preview_paused">Preparing %1$s for preview (paused)</string>
+    <string name="transfers_notification_downloading_preview_paused">Préparation %1$s pour un aperçu (en pause)</string>
     <!-- Message when successfully deleting single item from the audio queue. %1$s will be replaced with the item name -->
-    <string name="audio_queue_single_item_removed_message">’%1$s’ was removed</string>
+    <string name="audio_queue_single_item_removed_message">«%1$s» a été supprimé</string>
     <!-- Message when successfully deleting items from the audio queue. %1$d will be replaced with the removal count when multiple items are removed. -->
     <string name="audio_queue_multiple_items_removed_message">Removed %1$d items from queue</string>
     <!-- Message when successfully deleting items from the audio queue. %1$s will be replaced with the item name %2$d will be replaced with the removal count. -->
     <plurals name="audio_queue_items_removal_success_message">
-        <item quantity="one">‘%1$s’ was removed</item>
-        <item quantity="other">Removed %2$d items from queue</item>
+        <item quantity="one">«%1$s» a été retiré de la file d\’attente</item>
+        <item quantity="many">Supprimé %2$d éléments de la file d\’attente</item>
+        <item quantity="other">Supprimé %2$d éléments de la file d\’attente</item>
     </plurals>
     <!-- Title for the dialog to inform that a transfer is needed to preview a file and transfers are paused-->
-    <string name="transfers_preview_paused_dialog_title">Transfers are paused</string>
+    <string name="transfers_preview_paused_dialog_title">Les transferts sont suspendus</string>
     <!-- Message for the dialog to inform that a transfer is needed to preview a file and transfers are paused-->
-    <string name="transfers_preview_paused_dialog_text">To preview “%1$s” you will need to unpause transfers</string>
+    <string name="transfers_preview_paused_dialog_text">Pour prévisualiser&#160;«%1$s» vous devrez reprendre les transferts suspendus</string>
     <!--SD Card text shown as title in FileStorage screen -->
-    <string name="general_sd_card">SD card</string>
+    <string name="general_sd_card">Carte SD</string>
     <!--The title of the Login page-->
     <string name="login_page_title">Connectez-vous à votre compte MEGA</string>
     <!--Message to be shown to the user when they entered an invalid email-->
@@ -946,9 +947,29 @@
     <!-- Generic settings label text -->
     <string name="general_settings">Paramètres</string>
     <!-- Ad settings label in the cookie settings page -->
-    <string name="settings_cookie_settings_label_ad_settings">Ad settings</string>
+    <string name="settings_cookie_settings_label_ad_settings">Paramètres de l\’annonce</string>
     <!-- Ads personalization label in the cookie settings page -->
-    <string name="settings_cookie_settings_label_ads_personalization">Ads personalization</string>
+    <string name="settings_cookie_settings_label_ads_personalization">Personnalisation des annonces</string>
     <!-- Cookie settings title in the cookie settings page -->
-    <string name="settings_cookie_setting_title_cookie_and_ad_settings">Cookie and Ad settings</string>
+    <string name="settings_cookie_setting_title_cookie_and_ad_settings">Paramètres relatifs aux cookies et aux annonces</string>
+    <!-- Body text of the bottom sheet to promote Sync feature. The placeholders are to underline text -->
+    <string name="sync_promotion_bottom_sheet_body_text">Synchroniser ou sauvegarder un dossier sur votre appareil avec un dossier sur MEGA. [U]En apprendre davantage[/U]</string>
+    <!-- This is the final button when creating a folder in the dialog where the user inserts the folder name -->
+    <string name="transfers_cancel_download_warning_title">Annuler le téléchargement&#160;?</string>
+    <!-- Confirmation message informing a download was successfully cancelled -->
+    <string name="transfers_cancel_download_success_message">Download cancelled</string>
+    <!-- Title of note to self chat -->
+    <string name="chat_note_to_self_chat_title">Note pour moi-même</string>
+    <!-- First message header in note to self chat -->
+    <string name="chat_note_to_self_chat_first_message_header">Gardez-le pour vous</string>
+    <!-- First message description in note to self chat -->
+    <string name="chat_note_to_self_chat_first_message_description">Envoyez-vous des renseignements sensibles, des photos et des vidéos, ou des idées pour votre prochaine grande entreprise. Synchronisé sur tous vos appareils et protégé par un chiffrement à divulgation nulle de connaissance.</string>
+    <!-- Add to album some files exist message -->
+    <plurals name="album_add_to_files_exist_message">
+        <item quantity="one">1 fichier ajouté à&#160;«%1$s». Les fichiers dupliqués ne peuvent pas être ajoutés à nouveau.</item>
+        <item quantity="many">%2$d fichiers ajoutés à&#160;«%1$s». Les fichiers dupliqués ne peuvent pas être ajoutés à nouveau.</item>
+        <item quantity="other">%2$d fichiers ajoutés à&#160;«%1$s». Les fichiers dupliqués ne peuvent pas être ajoutés à nouveau.</item>
+    </plurals>
+    <!-- Snack bar message informing that profile's QR code is uploaded to the Cloud Drive-->
+    <string name="transfers_start_upload_profile_qr_code_message">Saving %1$s to Cloud drive&#8230;</string>
 </resources>

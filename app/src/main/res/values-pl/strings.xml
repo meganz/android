@@ -451,8 +451,6 @@
     <!-- when a zip file is downloaded and clicked, the app unzips the file. This is the status text while unzipping the file -->
     <string name="unzipping_process">Pakowanie pliku</string>
     <!-- error message while browsing the local filesystem -->
-    <string name="error_io_problem">Problem z systemem plików</string>
-    <!-- error message while browsing the local filesystem -->
     <string name="general_error">Wystąpił błąd podczas wykonywania operacji</string>
     <!-- menu item -->
     <string name="my_account_change_password">Zmień hasło</string>
@@ -1748,7 +1746,7 @@
     <!-- label to indicate that a share is still pending on outgoing shares of a node -->
     <string name="pending_outshare_indicator">(Oczekujące)</string>
     <!-- Title of the dialog to disable the rich links previews on chat -->
-    <string name="option_enable_chat_rich_preview">Zaawansowane podglądy adresów URL</string>
+    <string name="option_enable_chat_rich_preview">Włącz podgląd wysłanych linków</string>
     <!-- Button to allow the rich links previews on chat -->
     <string name="button_always_rich_links">Pozwalaj zawsze</string>
     <!-- Button do not allow now the rich links previews on chat -->
@@ -1756,9 +1754,9 @@
     <!-- Button do not allow the rich links previews on chat -->
     <string name="button_never_rich_links">Nigdy</string>
     <!-- Title of the dialog to enable the rich links previews on chat -->
-    <string name="title_enable_rich_links">Włącz podgląd linków</string>
+    <string name="title_enable_rich_links">Włącz podgląd wysłanych linków</string>
     <!-- Text of the dialog to enable the rich links previews on chat -->
-    <string name="text_enable_rich_links">Wzmocnij wrażenia MEGA Czatu. Zawartość URL będzie pobierana bez szyfrowania z zerową świadomością.</string>
+    <string name="text_enable_rich_links">Generuje podgląd linków wysyłanych na czacie. Należy pamiętać, że pobieranie tych podglądów nie jest chronione szyfrowaniem z zerową wiedzą.</string>
     <!-- when the user tries to creates a MEGA account or tries to change his password and the password strength is very weak -->
     <string name="error_password">Wprowadź mocniejsze hasło</string>
     <!-- title of the notification for an acceptance of a contact request -->

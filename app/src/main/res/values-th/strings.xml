@@ -271,7 +271,7 @@
     <!-- Hint how to cancel the download -->
     <string name="download_touch_to_show">ดูการถ่ายโอน</string>
     <!-- message when trying to open a downloaded file but there isn’t any app that open that file. Example: a user downloads a pdf but doesn’t have any app to read a pdf -->
-    <string name="intent_not_available">There’s no suitable app to open this file on your device</string>
+    <string name="intent_not_available">ไม่พบแอปที่เหมาะสมสำหรับเปิดไฟล์นี้บนอุปกรณ์ของคุณ</string>
     <!-- Message when trying to open a location message but there isn’t any app that open that location. -->
     <string name="intent_not_available_location">ไม่มีแอปบนอุปกรณ์ของคุณเพื่อเปิดตำแหน่งนี้</string>
     <!-- Message displayed when user tries to open a file with a 3rd party app using the option "Open with" but there isn't any app installed in the device which can open that file type, e.g. user tries to open a ".txt" but doesn’t have any installed 3rd party app which supports ".txt" files. -->
@@ -281,7 +281,7 @@
     <!-- Delete a link label -->
     <string name="context_delete_link">ลบลิงก์</string>
     <!-- Title alert before leaving a share. -->
-    <string name="alert_leave_share">Leave folder</string>
+    <string name="alert_leave_share">ออกจากโฟลเดอร์</string>
     <!-- Item menu option upon right click on one or multiple files. -->
     <string name="context_clean_shares_menu">ลบแชร์ออก</string>
     <!-- Item menu option upon right click on one or multiple files. -->
@@ -432,8 +432,6 @@
     <string name="upload_can_not_open">ไม่สามารถเปิดไฟล์ที่เลือกได้</string>
     <!-- when a zip file is downloaded and clicked, the app unzips the file. This is the status text while unzipping the file -->
     <string name="unzipping_process">กำลังแยกไฟล์</string>
-    <!-- error message while browsing the local filesystem -->
-    <string name="error_io_problem">มีปัญหาของระบบไฟล์</string>
     <!-- error message while browsing the local filesystem -->
     <string name="general_error">มีข้อผิดพลาดเกิดขึ้นเมื่อกำลังดำเนินการ</string>
     <!-- menu item -->
@@ -1631,7 +1629,7 @@
     <!-- label to indicate that a share is still pending on outgoing shares of a node -->
     <string name="pending_outshare_indicator">(รอดำเนินการ)</string>
     <!-- Title of the dialog to disable the rich links previews on chat -->
-    <string name="option_enable_chat_rich_preview">แสดงตัวอย่าง URL</string>
+    <string name="option_enable_chat_rich_preview">เปิดใช้งานการดูตัวอย่างลิงก์ที่ส่ง</string>
     <!-- Button to allow the rich links previews on chat -->
     <string name="button_always_rich_links">อนุญาตเสมอ</string>
     <!-- Button do not allow now the rich links previews on chat -->
@@ -1639,9 +1637,9 @@
     <!-- Button do not allow the rich links previews on chat -->
     <string name="button_never_rich_links">ไม่เคยมี</string>
     <!-- Title of the dialog to enable the rich links previews on chat -->
-    <string name="title_enable_rich_links">เปิดใช้งานตัวอย่าง URL</string>
+    <string name="title_enable_rich_links">เปิดใช้งานการดูตัวอย่างลิงก์ที่ส่ง</string>
     <!-- Text of the dialog to enable the rich links previews on chat -->
-    <string name="text_enable_rich_links">เพิ่มประสบการณ์ MEGA Chat โดยที่เนื้อหา URL จะได้รับการดึงข้อมูลด้วยวิธีซีโร่-นอว์เลจ</string>
+    <string name="text_enable_rich_links">ฟีเจอร์นี้จะสร้างตัวอย่างลิงก์ที่คุณส่งในแชทให้เห็นก่อนเปิดจริง โปรดทราบว่าการดึงข้อมูลตัวอย่างเหล่านี้ไม่ได้มีการเข้ารหัสด้วยวิธีซีโร่-นอว์เลจเพื่อป้องกันข้อมูลส่วนตัว</string>
     <!-- when the user tries to creates a MEGA account or tries to change his password and the password strength is very weak -->
     <string name="error_password">กรุณากรอกรหัสผ่านที่คาดเดายากกว่านี้</string>
     <!-- title of the notification for an acceptance of a contact request -->
@@ -1917,7 +1915,7 @@
     <!-- Title of compression queue size option in settings -->
     <string name="settings_video_compression_queue_size_title">หากวิดีโอที่บีบอัดมีขนาดใหญ่กว่า</string>
     <!-- Text of the alert when a FREE user tries to disable the RB scheduler -->
-    <string name="settings_rb_scheduler_alert_disabling">To disable automatic Rubbish bin emptying or set a longer retention period, you need to subscribe to one of our plans.</string>
+    <string name="settings_rb_scheduler_alert_disabling">หากต้องการปิดการล้างถังขยะอัตโนมัติ หรือตั้งระยะเวลาการเก็บรักษาไฟล์ในถังขยะให้นานขึ้น คุณจำเป็นต้องสมัครใช้งานแผนของเรา</string>
     <!-- Picker text to choose custom retention time. This option indicates several days -->
     <string name="hint_days">วัน</string>
     <!-- Title of the option to generate a public chat link -->
@@ -4863,17 +4861,17 @@
     <!-- Image or Video no map location info-->
     <string name="file_properties_info_map_location_no_location_info">ไม่มีข้อมูลเกี่ยวกับตำแหน่งที่ตั้ง</string>
     <!-- Logout warning dialog title if user has offline files or transfers in progress -->
-    <string name="logout_warning_dialog_title">Logging out now will result in lost data</string>
+    <string name="logout_warning_dialog_title">หากออกจากระบบตอนนี้ ข้อมูลบางส่วนอาจสูญหาย</string>
     <!-- Logout warning dialog positive button text -->
-    <string name="logout_warning_dialog_positive_button">Log out anyway</string>
+    <string name="logout_warning_dialog_positive_button">ออกจากระบบต่อไป</string>
     <!-- Logout warning dialog message if offline files exists -->
-    <string name="logout_warning_dialog_offline_message">If you log out now, your offline files will be deleted</string>
+    <string name="logout_warning_dialog_offline_message">หากคุณออกจากระบบในขณะนี้ ไฟล์ออฟไลน์ของคุณจะถูกลบ</string>
     <!-- Logout warning dialog message if user has transfers in progress. -->
-    <string name="logout_warning_dialog_transfers_message">If you log out now, your transfers won’t be completed and the data will be deleted</string>
+    <string name="logout_warning_dialog_transfers_message">หากคุณออกจากระบบในขณะนี้ การถ่ายโอนของคุณจะไม่เสร็จสมบูรณ์ และข้อมูลจะถูกลบ</string>
     <!-- Warning warning dialog message if user has offline files or transfers in progress. -->
-    <string name="logout_warning_dialog_offline_and_transfers_message">If you log out now, any pending transfers and offline files will be deleted</string>
+    <string name="logout_warning_dialog_offline_and_transfers_message">หากคุณออกจากระบบในขณะนี้ การถ่ายโอนที่รอดำเนินการและไฟล์ออฟไลน์ทั้งหมดจะถูกลบ</string>
     <!-- Toolbar action menu button in file storage screen to open 3rd-party File Manager -->
-    <string name="filestorage_menu_option_open_in_file_manager">Open in file manager</string>
+    <string name="filestorage_menu_option_open_in_file_manager">เปิดในตัวจัดการไฟล์</string>
     <!-- Snackbar message when file storage screen is unable to open 3rd-party File Manager -->
-    <string name="filestorage_snackbar_file_manager_is_not_available">A suitable file manager app is not available on this device</string>
+    <string name="filestorage_snackbar_file_manager_is_not_available">ไม่มีแอปตัวจัดการไฟล์ที่เหมาะสมบนอุปกรณ์นี้</string>
 </resources>

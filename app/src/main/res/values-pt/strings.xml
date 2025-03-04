@@ -445,8 +445,6 @@
     <!-- when a zip file is downloaded and clicked, the app unzips the file. This is the status text while unzipping the file -->
     <string name="unzipping_process">Descompactando arquivo</string>
     <!-- error message while browsing the local filesystem -->
-    <string name="error_io_problem">Problema no sistema de arquivos</string>
-    <!-- error message while browsing the local filesystem -->
     <string name="general_error">Aconteceu um erro ao executar esta ação</string>
     <!-- menu item -->
     <string name="my_account_change_password">Alterar senha</string>
@@ -785,7 +783,7 @@
         <item quantity="other">Esta pasta está compartilhada com %1$d contatos. Você quer deixar de compartilhar?</item>
     </plurals>
     <!-- Error message when the credentials to login are incorrect. -->
-    <string name="error_incorrect_email_or_password">E-mail ou senha inválidos. Por favor, tente novamente.</string>
+    <string name="error_incorrect_email_or_password">Email ou senha inválidos - tente novamente.</string>
     <!-- Error message when trying to login and the account is suspended. -->
     <string name="error_account_suspended">A sua conta foi suspensa for infringir os Termos de serviço. Para mais informações, entre em contato com support&#64;mega.nz</string>
     <!-- Error message when to many attempts to login. -->
@@ -1709,7 +1707,7 @@
     <!-- label to indicate that a share is still pending on outgoing shares of a node -->
     <string name="pending_outshare_indicator">(Pendente)</string>
     <!-- Title of the dialog to disable the rich links previews on chat -->
-    <string name="option_enable_chat_rich_preview">Visualização de URLs avançadas</string>
+    <string name="option_enable_chat_rich_preview">Ativar a visualização dos links enviados</string>
     <!-- Button to allow the rich links previews on chat -->
     <string name="button_always_rich_links">Permitir sempre</string>
     <!-- Button do not allow now the rich links previews on chat -->
@@ -1717,9 +1715,9 @@
     <!-- Button do not allow the rich links previews on chat -->
     <string name="button_never_rich_links">Nunca</string>
     <!-- Title of the dialog to enable the rich links previews on chat -->
-    <string name="title_enable_rich_links">Ativar a visualização de URLs avançadas</string>
+    <string name="title_enable_rich_links">Ativar a visualização dos links enviados</string>
     <!-- Text of the dialog to enable the rich links previews on chat -->
-    <string name="text_enable_rich_links">Melhore a sua experiência no MEGA chat. O conteúdo de URLs será recuperado sem criptografia de conhecimento zero.</string>
+    <string name="text_enable_rich_links">Permite visualizar os links que você enviar nos chats. Tenha em mente que a obtenção destas visualizações não é protegida pela criptografia de conhecimento zero.</string>
     <!-- when the user tries to creates a MEGA account or tries to change his password and the password strength is very weak -->
     <string name="error_password">Por favor, digite uma senha mais segura</string>
     <!-- title of the notification for an acceptance of a contact request -->

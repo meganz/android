@@ -91,25 +91,25 @@
     <!-- Sync stalled issue reason is upload issue-->
     <string name="sync_stalled_issue_upload_issue">Masalah unggah</string>
     <!-- Sync stalled issue reason is download issue-->
-    <string name="sync_stalled_issue_download_issue">Download problem</string>
+    <string name="sync_stalled_issue_download_issue">Masalah unduhan</string>
     <!-- Sync stalled issue reason is can not create folder-->
     <string name="sync_stalled_issue_cannot_create_folder">Tidak dapat membuat folder</string>
     <!-- Sync stalled issue reason is can not perform deletion-->
-    <string name="sync_stalled_issue_cannot_perform_deletion">Can’t delete item</string>
+    <string name="sync_stalled_issue_cannot_perform_deletion">Tidak dapat menghapus item</string>
     <!-- Sync stalled issue reason is can not support tree depth-->
-    <string name="sync_stalled_issue_cannot_support_tree_depth">Sync item exceeds maximum folder depth</string>
+    <string name="sync_stalled_issue_cannot_support_tree_depth">Item sinkronisasi melebihi kedalaman folder maksimum</string>
     <!-- Sync stalled issue reason is Folder Matched Against File-->
     <string name="sync_stalled_issue_folder_matched_against_file">File yang anda coba sinkronkan tidak memiliki ekstensi dan memiliki nama yang sama dengan folder yang ada</string>
     <!-- Sync stalled issue reason is Local and remote changed since last sync-->
-    <string name="sync_stalled_issue_local_and_remote_change_last_sync">Item changed since last sync</string>
+    <string name="sync_stalled_issue_local_and_remote_change_last_sync">Item berubah sejak sinkronisasi terakhir</string>
     <!-- Sync stalled issue reason is Local and remote not synced-->
-    <string name="sync_stalled_issue_local_and_remote_not_synced">File or folder conflict</string>
+    <string name="sync_stalled_issue_local_and_remote_not_synced">Konflik file atau folder</string>
     <!-- Sync stalled issue reason is Name clash-->
-    <string name="sync_stalled_issue_name_clash">File or folder name conflict</string>
+    <string name="sync_stalled_issue_name_clash">Konflik nama file atau folder</string>
     <!-- Sync chip folder chip title-->
     <string name="sync_folders">Folder</string>
     <!-- Sync stalled issue count chip title for 1 or more stalled issues-->
-    <string name="sync_stalled_issues">Issues (%d)</string>
+    <string name="sync_stalled_issues">Masalah (%d)</string>
     <!-- Sync stalled issue count chip title for 0 stalled issues-->
     <string name="sync_stalled_issue_zero">Masalah</string>
     <!-- Sync start sync button -->
@@ -121,7 +121,7 @@
     <!-- Sync stalled issue reason is no file issue detailed description-->
     <string name="sync_stalled_issue_file_issue_detail">Item memiliki masalah yang membutuhkan keputusan Anda untuk menyelesaikannya</string>
     <!-- Sync stalled issue reason is delete or move detailed description-->
-    <string name="sync_stalled_issue_delete_or_move_detail">Waiting for other processes to complete</string>
+    <string name="sync_stalled_issue_delete_or_move_detail">Menunggu proses lain selesai</string>
     <!-- Sync stalled issue reason is upload issue detailed description-->
     <string name="sync_stalled_issue_upload_issue_detail">Tidak dapat mencapai folder tujuan</string>
     <!-- Sync stalled issue reason is download issue detailed description-->
@@ -131,19 +131,19 @@
     <!-- Sync stalled issue reason is can not perform deletion detailed description-->
     <string name="sync_stalled_issue_cannot_perform_deletion_detail">Filesystem error preventing folder access.</string>
     <!-- Sync stalled issue reason is can not support tree depth detailed description-->
-    <string name="sync_stalled_issue_cannot_support_tree_depth_detail">Target is too deep on your folder structure.\nMove it to a location that is less than 64 folders deep.</string>
+    <string name="sync_stalled_issue_cannot_support_tree_depth_detail">Target terlalu dalam pada struktur folder anda.\nPindahkan ke lokasi yang kedalamannya kurang dari 64 folder.</string>
     <!-- Sync stalled issue reason is Folder Matched Against File detailed description-->
     <string name="sync_stalled_issue_folder_matched_against_file_detail">File yang anda coba sinkronkan tidak memiliki ekstensi dan memiliki nama yang sama dengan folder yang ada</string>
     <!-- Sync stalled issue reason is Local and remote changed since last sync detailed description-->
     <string name="sync_stalled_issue_local_and_remote_change_last_sync_detail">File ini telah diubah baik di MEGA maupun lokal sejak terakhir disinkronkan.</string>
     <!-- Sync stalled issue reason is Local and remote not synced detailed description-->
-    <string name="sync_stalled_issue_local_and_remote_not_synced_detail">This file has conflicting copies</string>
+    <string name="sync_stalled_issue_local_and_remote_not_synced_detail">File ini memiliki salinan yang saling bertentangan</string>
     <!-- Sync stalled issue reason is Name clash detailed description-->
     <string name="sync_stalled_issue_name_clash_detail">Ada beberapa item dengan nama yang sama di satu sisi sinkronisasi anda yang semuanya akan menjadi item tunggal yang sama di sisi lain sinkronisasi anda</string>
     <!-- Sync notification title description sync monitoring-->
-    <string name="sync_stalled_issues_move_or_rename_message_mega">A move or rename action was detected in MEGA, but couldn’t be replicated locally.</string>
+    <string name="sync_stalled_issues_move_or_rename_message_mega">Tindakan pindah atau ganti nama terdeteksi di MEGA, tetapi tidak dapat direplikasi secara lokal.</string>
     <!-- Sync notification title description sync monitoring-->
-    <string name="sync_stalled_issues_move_or_rename_message_local">A move or rename action was detected locally, but couldn’t be replicated in MEGA.</string>
+    <string name="sync_stalled_issues_move_or_rename_message_local">Tindakan pindah atau ganti nama terdeteksi secara lokal, tetapi tidak dapat direplikasi di MEGA.</string>
     <!-- Sync stalled issue delete or move scanning detail-->
     <string name="sync_stalled_issue_delete_or_move_scanning_detail">Menunggu pemindaian selesai untuk menentukan apakah file dipindahkan atau dihapus.</string>
 </resources>

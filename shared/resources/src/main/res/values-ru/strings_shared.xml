@@ -405,13 +405,13 @@
     <!-- Feature indicating MEGA VPN availability, available in the pro plan -->
     <string name="account_cancel_account_screen_plan_mega_vpn">MEGA&#160;VPN</string>
     <!-- Row label for call and meeting duration in the comparison table -->
-    <string name="account_cancel_account_screen_plan_call_meeting_duration">Call &amp;amp;amp;amp; meeting duration</string>
+    <string name="account_cancel_account_screen_plan_call_meeting_duration">Длительнось звонка и встречи</string>
     <!-- Call and meeting duration limit in the free plan -->
     <string name="account_cancel_account_screen_plan_call_meeting_duration_free">До 1 часа</string>
     <!-- Unlimited call and meeting duration available in the pro plan -->
     <string name="cancel_account_plan_call_meeting_duration_pro">Неограниченно</string>
     <!-- Row label for call and meeting participants in the comparison table -->
-    <string name="account_cancel_account_plan_call_meeting_participants">Call &amp;amp;amp;amp; meeting participants</string>
+    <string name="account_cancel_account_plan_call_meeting_participants">Участники звонка и встречи</string>
     <!-- Limit on call and meeting participants in the free plan -->
     <string name="account_cancel_account_free_plan_call_meeting_participants">До 100</string>
     <!-- Unlimited call and meeting participants available in the pro plan -->
@@ -623,12 +623,10 @@
     <string name="sync_promotion_bottom_sheet_whats_new_label">Что нового</string>
     <!-- Title of the bottom sheet to promote Sync feature -->
     <string name="sync_promotion_bottom_sheet_title">Простая автоматическая синхронизация</string>
-    <!-- Body message of the bottom sheet to promote Sync feature -->
-    <string name="sync_promotion_bottom_sheet_body_message">Синхронизируйте папку на своём устройстве с MEGA, чтобы иметь доступ к актуальным версиям файлов в любом месте</string>
     <!-- Text of the primary button of the bottom sheet to promote Sync feature for Pro users ("Sync folders") -->
     <string name="sync_promotion_bottom_sheet_primary_button_text_pro">Синхронизировать папки</string>
-    <!-- Text of the secondary button of the bottom sheet to promote Sync feature ("Learn more") -->
-    <string name="sync_promotion_bottom_sheet_secondary_button_text">Узнать больше</string>
+    <!-- Text of the secondary button of the bottom sheet to promote Sync feature ("Back up folders") -->
+    <string name="sync_promotion_bottom_sheet_secondary_button_text">Резервное копирование папок</string>
     <!-- Snackbar message displayed when sync option is selected -->
     <string name="settings_sync_option_updated_message">Параметры синхронизации обновлены</string>
     <!-- Title of the Contact Permission Explanation -->
@@ -923,14 +921,14 @@
     <!-- Message when successfully deleting items from the audio queue. %1$s will be replaced with the item name %2$d will be replaced with the removal count. -->
     <plurals name="audio_queue_items_removal_success_message">
         <item quantity="one">«%1$s» удалён из очереди</item>
-        <item quantity="few">%1$d элемента удалены из очереди</item>
-        <item quantity="many">%1$d элементов удалено из очереди</item>
-        <item quantity="other">%1$d элемента удалено из очереди</item>
+        <item quantity="few">%2$d элемента удалены из очереди</item>
+        <item quantity="many">%2$d элементов удалено из очереди</item>
+        <item quantity="other">%2$d элемента удалено из очереди</item>
     </plurals>
     <!-- Title for the dialog to inform that a transfer is needed to preview a file and transfers are paused-->
     <string name="transfers_preview_paused_dialog_title">Передачи приостановлены</string>
     <!-- Message for the dialog to inform that a transfer is needed to preview a file and transfers are paused-->
-    <string name="transfers_preview_paused_dialog_text">Для предварительного просмотра»%1$s» вам нужно будет приостановить переводы</string>
+    <string name="transfers_preview_paused_dialog_text">Чтобы просмотреть «%1$s», нужно возобновить приостановленные передачи</string>
     <!--SD Card text shown as title in FileStorage screen -->
     <string name="general_sd_card">SD-карта</string>
     <!--The title of the Login page-->
@@ -968,7 +966,28 @@
     <!-- Ad settings label in the cookie settings page -->
     <string name="settings_cookie_settings_label_ad_settings">Настройки рекламы</string>
     <!-- Ads personalization label in the cookie settings page -->
-    <string name="settings_cookie_settings_label_ads_personalization">Ads personalization</string>
+    <string name="settings_cookie_settings_label_ads_personalization">Персонализация рекламы</string>
     <!-- Cookie settings title in the cookie settings page -->
-    <string name="settings_cookie_setting_title_cookie_and_ad_settings">Cookie and Ad settings</string>
+    <string name="settings_cookie_setting_title_cookie_and_ad_settings">Настройки куки-файлов и рекламы</string>
+    <!-- Body text of the bottom sheet to promote Sync feature. The placeholders are to underline text -->
+    <string name="sync_promotion_bottom_sheet_body_text">Синхронизируйте папку на устройстве с папкой в MEGA или создайте резервную копию. [U]Подробнее[/U]</string>
+    <!-- This is the final button when creating a folder in the dialog where the user inserts the folder name -->
+    <string name="transfers_cancel_download_warning_title">Отменить скачивание?</string>
+    <!-- Confirmation message informing a download was successfully cancelled -->
+    <string name="transfers_cancel_download_success_message">Download cancelled</string>
+    <!-- Title of note to self chat -->
+    <string name="chat_note_to_self_chat_title">Заметка для себя</string>
+    <!-- First message header in note to self chat -->
+    <string name="chat_note_to_self_chat_first_message_header">Сохраните себе</string>
+    <!-- First message description in note to self chat -->
+    <string name="chat_note_to_self_chat_first_message_description">Отправляйте себе конфиденциальную информацию, фото и видео или идеи для следующего большого начинания. Синхронизируется на всех ваших устройствах и защищено шифрованием с нулевым разглашением.</string>
+    <!-- Add to album some files exist message -->
+    <plurals name="album_add_to_files_exist_message">
+        <item quantity="one">1 файл добавлен в «%1$s». Дубликаты файлов нельзя добавить ещё раз.</item>
+        <item quantity="few">%2$d файла добавлены в «%1$s». Дубликаты файлов нельзя добавить ещё раз.</item>
+        <item quantity="many">%2$d файлов добавлено в «%1$s». Дубликаты файлов нельзя добавить ещё раз.</item>
+        <item quantity="other">%2$d файла добавлено в «%1$s». Дубликаты файлов нельзя добавить ещё раз.</item>
+    </plurals>
+    <!-- Snack bar message informing that profile's QR code is uploaded to the Cloud Drive-->
+    <string name="transfers_start_upload_profile_qr_code_message">Сохранение %1$s на Облачном диске&#8230;</string>
 </resources>
