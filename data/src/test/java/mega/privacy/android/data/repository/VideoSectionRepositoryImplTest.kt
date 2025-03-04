@@ -168,7 +168,7 @@ class VideoSectionRepositoryImplTest {
         whenever(megaApiGateway.isInBackups(node)).thenReturn(false)
         whenever(typedVideoNodeMapper(fileNode, node.duration, null)).thenReturn(typedVideoNode)
         initUnderTest()
-        val actual = underTest.getAllVideos(SortOrder.ORDER_MODIFICATION_DESC)
+        val actual = underTest.getAllVideos("", null, null, SortOrder.ORDER_MODIFICATION_DESC)
         assertThat(actual).isNotEmpty()
         assertThat(actual.size).isEqualTo(1)
         assertThat(actual[0]).isEqualTo(typedVideoNode)

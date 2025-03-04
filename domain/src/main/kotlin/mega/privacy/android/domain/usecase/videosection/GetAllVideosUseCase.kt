@@ -14,7 +14,20 @@ class GetAllVideosUseCase @Inject constructor(
 ) {
     /**
      * Get the all video nodes
+     *
+     * @param searchQuery
+     * @param tag
+     * @param description
      */
-    suspend operator fun invoke(): List<TypedVideoNode> =
-        videoSectionRepository.getAllVideos(getCloudSortOrder())
+    suspend operator fun invoke(
+        searchQuery: String = "",
+        tag: String? = null,
+        description: String? = null,
+    ): List<TypedVideoNode> =
+        videoSectionRepository.getAllVideos(
+            searchQuery = searchQuery,
+            tag = tag,
+            description = description,
+            order = getCloudSortOrder()
+        )
 }

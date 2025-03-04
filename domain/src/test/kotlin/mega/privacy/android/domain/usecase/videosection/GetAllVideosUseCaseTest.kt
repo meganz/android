@@ -14,6 +14,9 @@ import org.junit.jupiter.api.BeforeAll
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.TestInstance
+import org.mockito.kotlin.any
+import org.mockito.kotlin.anyOrNull
+import org.mockito.kotlin.eq
 import org.mockito.kotlin.mock
 import org.mockito.kotlin.reset
 import org.mockito.kotlin.whenever
@@ -51,17 +54,31 @@ class GetAllVideosUseCaseTest {
     @Test
     fun `test that videos is not empty`() = runTest {
         val list = listOf(mock<TypedVideoNode>())
-        whenever(videoSectionRepository.getAllVideos(order)).thenReturn(list)
+        whenever(
+            videoSectionRepository.getAllVideos(
+                searchQuery = any(),
+                tag = anyOrNull(),
+                description = anyOrNull(),
+                order = eq(order)
+            )
+        ).thenReturn(list)
         whenever(getCloudSortOrder()).thenReturn(order)
-        assertThat(underTest()).isNotEmpty()
+        assertThat(underTest("", null, null)).isNotEmpty()
     }
 
     @Test
     fun `test that video is empty`() {
         runTest {
-            whenever(videoSectionRepository.getAllVideos(order)).thenReturn(emptyList())
+            whenever(
+                videoSectionRepository.getAllVideos(
+                    searchQuery = any(),
+                    tag = anyOrNull(),
+                    description = anyOrNull(),
+                    order = eq(order)
+                )
+            ).thenReturn(emptyList())
             whenever(getCloudSortOrder()).thenReturn(order)
-            assertThat(underTest()).isEmpty()
+            assertThat(underTest("", null, null)).isEmpty()
         }
     }
 }

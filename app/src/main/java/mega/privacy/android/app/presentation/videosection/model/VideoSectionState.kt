@@ -51,6 +51,8 @@ import mega.privacy.android.legacy.core.ui.model.SearchWidgetState
  * @property addToPlaylistHandle the handle of the video to be added to playlist
  * @property isLaunchVideoToPlaylistActivity true if launching the VideoToPlaylistActivity
  * @property addToPlaylistTitles the titles of the playlists to add the video to
+ * @property searchDescriptionEnabled is search by description enabled via feature flag
+ * @property searchTagsEnabled is search by tags enabled via feature flag
  */
 data class VideoSectionState(
     val allVideos: List<VideoUIEntity> = emptyList(),
@@ -94,4 +96,6 @@ data class VideoSectionState(
     val addToPlaylistHandle: Long? = null,
     val isLaunchVideoToPlaylistActivity: Boolean = false,
     val addToPlaylistTitles: List<String>? = null,
+    val searchDescriptionEnabled: Boolean? = null,
+    val searchTagsEnabled: Boolean? = null,
 )

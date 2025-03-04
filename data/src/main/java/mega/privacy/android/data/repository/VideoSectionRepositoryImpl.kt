@@ -72,10 +72,20 @@ internal class VideoSectionRepositoryImpl @Inject constructor(
     private val videoPlaylistsMap: MutableMap<Long, UserSet> = mutableMapOf()
     private val videoSetsMap: MutableMap<NodeId, MutableSet<Long>> = mutableMapOf()
 
-    override suspend fun getAllVideos(order: SortOrder): List<TypedVideoNode> =
+    override suspend fun getAllVideos(
+        searchQuery: String,
+        tag: String?,
+        description: String?,
+        order: SortOrder,
+    ): List<TypedVideoNode> =
         withContext(ioDispatcher) {
             val offlineItems = getAllOfflineNodeHandle()
-            getAllVideoMegaNodes(order).map { megaNode ->
+            getAllVideoMegaNodes(
+                searchQuery = searchQuery,
+                tag = tag,
+                description = description,
+                order = order
+            ).map { megaNode ->
                 val isOutShared =
                     megaApiGateway.getMegaNodeByHandle(megaNode.parentHandle)?.isOutShare == true
                 typedVideoNodeMapper(
@@ -86,11 +96,20 @@ internal class VideoSectionRepositoryImpl @Inject constructor(
             }
         }
 
-    private suspend fun getAllVideoMegaNodes(order: SortOrder): List<MegaNode> {
+    private suspend fun getAllVideoMegaNodes(
+        searchQuery: String = "",
+        tag: String? = null,
+        description: String? = null,
+        order: SortOrder,
+    ): List<MegaNode> {
         val megaCancelToken = cancelTokenProvider.getOrCreateCancelToken()
         val filter = megaSearchFilterMapper(
             searchTarget = SearchTarget.ROOT_NODES,
-            searchCategory = SearchCategory.VIDEO
+            searchCategory = SearchCategory.VIDEO,
+            searchQuery = searchQuery,
+            tag = tag,
+            description = description,
+            useAndForTextQuery = description == null && tag == null,
         )
         return megaApiGateway.searchWithFilter(
             filter,
@@ -121,7 +140,9 @@ internal class VideoSectionRepositoryImpl @Inject constructor(
         offlineItems: Map<String, Offline>,
     ): FavouritesVideoPlaylist {
         val favouriteVideos =
-            getAllVideoMegaNodes(sortOrder).filter { it.isFavourite }.map { megaNode ->
+            getAllVideoMegaNodes(
+                order = sortOrder
+            ).filter { it.isFavourite }.map { megaNode ->
                 val isOutShared =
                     megaApiGateway.getMegaNodeByHandle(megaNode.parentHandle)?.isOutShare == true
                 typedVideoNodeMapper(

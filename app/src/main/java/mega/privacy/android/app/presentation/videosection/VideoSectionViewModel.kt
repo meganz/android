@@ -146,6 +146,7 @@ class VideoSectionViewModel @Inject constructor(
     private var searchQueryJob: Job? = null
 
     init {
+        checkSearchFlags()
         refreshNodesIfAnyUpdates()
         viewModelScope.launch {
             monitorVideoPlaylistSetsUpdateUseCase().conflate()
@@ -195,6 +196,35 @@ class VideoSectionViewModel @Inject constructor(
             }
         }
     }
+
+    /**
+     * Check if the search by tags and description flags are enabled
+     */
+    fun checkSearchFlags() {
+        viewModelScope.launch {
+            runCatching {
+                val description = getFeatureFlagValueUseCase(AppFeatures.SearchWithDescription)
+                val tags = getFeatureFlagValueUseCase(AppFeatures.SearchWithTags)
+                description to tags
+            }.onSuccess { (description, tags) ->
+                _state.update {
+                    it.copy(searchDescriptionEnabled = description, searchTagsEnabled = tags)
+                }
+            }.onFailure {
+                Timber.e("Get feature flag failed $it")
+            }
+        }
+    }
+
+    // Get current query adjusted by search by tags
+    private fun getCurrentQueryWithSearchByTags() =
+        getCurrentSearchQuery().takeUnless {
+            state.value.searchTagsEnabled == true && getCurrentSearchQuery().startsWith(
+                "#"
+            )
+        }.orEmpty()
+
+    private fun getCurrentSearchQuery() = state.value.query.orEmpty()
 
     private suspend fun isHiddenNodesActive(): Boolean {
         val result = runCatching {
@@ -332,7 +362,6 @@ class VideoSectionViewModel @Inject constructor(
             .filterVideosByDuration()
             .filterVideosByLocation()
             .updateOriginalEntities()
-            .filterVideosBySearchQuery()
 
         val sortOrder = getCloudSortOrder()
         _state.update {
@@ -346,7 +375,11 @@ class VideoSectionViewModel @Inject constructor(
     }
 
     private suspend fun getVideoUIEntityList() =
-        getAllVideosUseCase().filterNonSensitiveItems(
+        getAllVideosUseCase(
+            searchQuery = getCurrentSearchQuery(),
+            tag = if (state.value.searchTagsEnabled == true) getCurrentSearchQuery().removePrefix("#") else null,
+            description = if (state.value.searchDescriptionEnabled == true) getCurrentQueryWithSearchByTags() else null
+        ).filterNonSensitiveItems(
             showHiddenItems = this@VideoSectionViewModel.showHiddenItems,
             isPaid = _state.value.accountType?.isPaid,
             isBusinessAccountExpired = _state.value.isBusinessAccountExpired
@@ -358,11 +391,6 @@ class VideoSectionViewModel @Inject constructor(
         }
         originalData.addAll(data)
     }
-
-    private fun List<VideoUIEntity>.filterVideosBySearchQuery() =
-        filter { video ->
-            video.name.contains(_state.value.query ?: "", true)
-        }
 
     private fun List<VideoUIEntity>.updateOriginalEntities() = also { data ->
         if (originalEntities.isNotEmpty()) {
@@ -387,7 +415,6 @@ class VideoSectionViewModel @Inject constructor(
             }
         }
     }
-
 
     private fun List<VideoUIEntity>.filterVideosByDuration() =
         filter {
@@ -453,22 +480,13 @@ class VideoSectionViewModel @Inject constructor(
             }
 
             if (_tabState.value.selectedTab == VideoSectionTab.All) {
-                searchNodeByQueryString()
+                refreshNodes()
+                _state.update {
+                    it.copy(scrollToTop = true)
+                }
             } else {
                 searchPlaylistByQueryString()
             }
-        }
-    }
-
-    private fun searchNodeByQueryString() {
-        val videos = originalEntities.filter { video ->
-            video.name.contains(_state.value.query ?: "", true)
-        }
-        _state.update {
-            it.copy(
-                allVideos = videos,
-                scrollToTop = true
-            )
         }
     }
 

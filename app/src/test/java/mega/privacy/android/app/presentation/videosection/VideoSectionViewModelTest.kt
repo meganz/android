@@ -15,6 +15,7 @@ import kotlinx.coroutines.test.runTest
 import mega.privacy.android.app.AnalyticsTestExtension
 import mega.privacy.android.app.TimberJUnit5Extension
 import mega.privacy.android.app.domain.usecase.GetNodeByHandle
+import mega.privacy.android.app.featuretoggle.AppFeatures
 import mega.privacy.android.app.presentation.videosection.mapper.VideoPlaylistUIEntityMapper
 import mega.privacy.android.app.presentation.videosection.mapper.VideoUIEntityMapper
 import mega.privacy.android.app.presentation.videosection.model.DurationFilterOption
@@ -74,8 +75,10 @@ import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.TestInstance
 import org.junit.jupiter.api.extension.ExtendWith
 import org.junit.jupiter.api.extension.RegisterExtension
+import org.mockito.ArgumentMatchers.anyString
 import org.mockito.kotlin.any
 import org.mockito.kotlin.anyOrNull
+import org.mockito.kotlin.eq
 import org.mockito.kotlin.mock
 import org.mockito.kotlin.reset
 import org.mockito.kotlin.verify
@@ -250,9 +253,27 @@ class VideoSectionViewModelTest {
             assertThat(initial.videoPlaylists).isEmpty()
             assertThat(initial.currentVideoPlaylist).isNull()
             assertThat(initial.isVideoPlaylistCreatedSuccessfully).isFalse()
+            assertThat(initial.searchTagsEnabled).isFalse()
+            assertThat(initial.searchDescriptionEnabled).isFalse()
             cancelAndIgnoreRemainingEvents()
         }
     }
+
+    @Test
+    fun `test that searchDescriptionEnabled and searchTagsEnabled are updated correctly`() =
+        runTest {
+            initVideosReturned()
+            whenever(getFeatureFlagValueUseCase(AppFeatures.SearchWithDescription)).thenReturn(true)
+            whenever(getFeatureFlagValueUseCase(AppFeatures.SearchWithTags)).thenReturn(true)
+            underTest.checkSearchFlags()
+
+            underTest.state.drop(1).test {
+                val actual = awaitItem()
+                assertThat(actual.searchDescriptionEnabled).isTrue()
+                assertThat(actual.searchTagsEnabled).isTrue()
+                cancelAndIgnoreRemainingEvents()
+            }
+        }
 
     @Test
     fun `test that the videos are retrieved when the nodes are refreshed`() = runTest {
@@ -272,7 +293,13 @@ class VideoSectionViewModelTest {
 
     private suspend fun initVideosReturned() {
         whenever(getCloudSortOrder()).thenReturn(SortOrder.ORDER_MODIFICATION_DESC)
-        whenever(getAllVideosUseCase()).thenReturn(listOf(mock(), mock()))
+        whenever(
+            getAllVideosUseCase(
+                searchQuery = anyString(),
+                tag = anyOrNull(),
+                description = anyOrNull()
+            )
+        ).thenReturn(listOf(mock(), mock()))
         whenever(videoUIEntityMapper(any())).thenReturn(expectedVideo)
     }
 
@@ -482,7 +509,7 @@ class VideoSectionViewModelTest {
     @Test
     fun `test that the sortOrder is updated when order is changed`() = runTest {
         whenever(getCloudSortOrder()).thenReturn(SortOrder.ORDER_MODIFICATION_DESC)
-        whenever(getAllVideosUseCase()).thenReturn(emptyList())
+        whenever(getAllVideosUseCase(anyString(), anyOrNull(), anyOrNull())).thenReturn(emptyList())
 
         underTest.refreshWhenOrderChanged()
 
@@ -499,16 +526,18 @@ class VideoSectionViewModelTest {
         val expectedVideo = mock<VideoUIEntity> { on { name }.thenReturn("video name") }
         val video = mock<VideoUIEntity> { on { name }.thenReturn("name") }
 
-        whenever(getCloudSortOrder()).thenReturn(SortOrder.ORDER_MODIFICATION_DESC)
-        whenever(getAllVideosUseCase()).thenReturn(listOf(expectedTypedVideoNode, videoNode))
+        initVideosReturned()
+        initUnderTest()
+
+        whenever(getAllVideosUseCase(eq("video"), anyOrNull(), anyOrNull())).thenReturn(
+            listOf(
+                expectedTypedVideoNode
+            )
+        )
         whenever(videoUIEntityMapper(expectedTypedVideoNode)).thenReturn(expectedVideo)
         whenever(videoUIEntityMapper(videoNode)).thenReturn(video)
 
-        underTest.refreshNodes()
-
-        underTest.state.drop(1).test {
-            assertThat(awaitItem().allVideos.size).isEqualTo(2)
-
+        underTest.state.drop(3).test {
             underTest.searchQuery("video")
             assertThat(awaitItem().query).isEqualTo("video")
             assertThat(awaitItem().allVideos.size).isEqualTo(1)
@@ -522,7 +551,7 @@ class VideoSectionViewModelTest {
             initVideosReturned()
             initUnderTest()
 
-            underTest.state.drop(1).test {
+            underTest.state.drop(2).test {
                 underTest.refreshNodes()
                 assertThat(awaitItem().allVideos).isNotEmpty()
 
@@ -538,7 +567,7 @@ class VideoSectionViewModelTest {
             initVideosReturned()
             initUnderTest()
 
-            underTest.state.drop(1).test {
+            underTest.state.drop(2).test {
                 underTest.refreshNodes()
                 assertThat(awaitItem().allVideos.size).isEqualTo(2)
 
@@ -592,7 +621,7 @@ class VideoSectionViewModelTest {
 
         underTest.onTabSelected(VideoSectionTab.Playlists)
 
-        underTest.state.drop(1).test {
+        underTest.state.drop(2).test {
             val actual = awaitItem()
             assertThat(actual.videoPlaylists.size).isEqualTo(2)
             assertThat(actual.isPlaylistProgressBarShown).isFalse()
@@ -625,7 +654,7 @@ class VideoSectionViewModelTest {
 
             underTest.onTabSelected(VideoSectionTab.Playlists)
 
-            underTest.state.drop(1).test {
+            underTest.state.drop(2).test {
                 assertThat(awaitItem().videoPlaylists).isNotEmpty()
 
                 underTest.onVideoPlaylistItemClicked(videoPlaylistUIEntity, 0)
@@ -642,7 +671,7 @@ class VideoSectionViewModelTest {
 
             underTest.onTabSelected(VideoSectionTab.Playlists)
 
-            underTest.state.drop(1).test {
+            underTest.state.drop(2).test {
                 assertThat(awaitItem().videoPlaylists.size).isEqualTo(2)
 
                 underTest.onVideoPlaylistItemClicked(videoPlaylistUIEntity, 0)
@@ -662,7 +691,7 @@ class VideoSectionViewModelTest {
 
             underTest.onTabSelected(VideoSectionTab.Playlists)
 
-            underTest.state.drop(1).test {
+            underTest.state.drop(2).test {
                 assertThat(awaitItem().videoPlaylists.size).isEqualTo(2)
 
                 underTest.selectAllVideoPlaylists()
@@ -846,7 +875,7 @@ class VideoSectionViewModelTest {
             initUnderTest()
             underTest.updateCurrentVideoPlaylist(videoPlaylistUIEntity)
             underTest.addVideosToPlaylist(testPlaylistID, testVideoIDs)
-            underTest.state.drop(1).test {
+            underTest.state.drop(2).test {
                 val actual = awaitItem()
                 assertThat(actual.numberOfAddedVideos).isEqualTo(testVideoIDs.size)
                 val updated = awaitItem()
@@ -888,7 +917,7 @@ class VideoSectionViewModelTest {
             initUnderTest()
             underTest.updateCurrentVideoPlaylist(videoPlaylistUIEntity)
             underTest.removeVideosFromPlaylist(testPlaylistID, testVideoElementIDs)
-            underTest.state.drop(1).test {
+            underTest.state.drop(2).test {
                 val actual = awaitItem()
                 assertThat(actual.numberOfRemovedItems).isEqualTo(testVideoElementIDs.size)
                 val updated = awaitItem()
@@ -1080,7 +1109,11 @@ class VideoSectionViewModelTest {
             val videoOfDurationMoreThan20 = getVideoUIEntityWithDuration(1260.seconds)
 
             whenever(getCloudSortOrder()).thenReturn(SortOrder.ORDER_MODIFICATION_DESC)
-            whenever(getAllVideosUseCase()).thenReturn(
+            whenever(
+                getAllVideosUseCase(
+                    anyString(), anyOrNull(), anyOrNull()
+                )
+            ).thenReturn(
                 listOf(typedVideoNode1, typedVideoNode2, typedVideoNode3)
             )
             whenever(videoUIEntityMapper(typedVideoNode1)).thenReturn(videoOfDurationLessThan4)
@@ -1113,7 +1146,7 @@ class VideoSectionViewModelTest {
             val videoOfDurationMoreThan20 = getVideoUIEntityWithDuration(1260.seconds)
 
             whenever(getCloudSortOrder()).thenReturn(SortOrder.ORDER_MODIFICATION_DESC)
-            whenever(getAllVideosUseCase()).thenReturn(
+            whenever(getAllVideosUseCase(anyString(), anyOrNull(), anyOrNull())).thenReturn(
                 listOf(typedVideoNode1, typedVideoNode2, typedVideoNode3)
             )
             whenever(videoUIEntityMapper(typedVideoNode1)).thenReturn(videoOfDurationLessThan4)
@@ -1235,7 +1268,7 @@ class VideoSectionViewModelTest {
         val typedVideoNode3 = getTypedVideoNode(3)
 
         whenever(getCloudSortOrder()).thenReturn(SortOrder.ORDER_MODIFICATION_DESC)
-        whenever(getAllVideosUseCase()).thenReturn(
+        whenever(getAllVideosUseCase(anyString(), anyOrNull(), anyOrNull())).thenReturn(
             listOf(typedVideoNode1, typedVideoNode2, typedVideoNode3)
         )
         whenever(getSyncUploadsFolderIdsUseCase()).thenReturn(listOf(7))
@@ -1289,7 +1322,7 @@ class VideoSectionViewModelTest {
             mock<TypedVideoNode> { on { id }.thenReturn(NodeId(handle.toLong())) }
         }
         initVideosReturned()
-        whenever(getAllVideosUseCase()).thenReturn(typedNodes)
+        whenever(getAllVideosUseCase(anyString(), anyOrNull(), anyOrNull())).thenReturn(typedNodes)
 
         underTest.refreshNodes()
         delay(100)
@@ -1370,10 +1403,15 @@ class VideoSectionViewModelTest {
                 on { id }.thenReturn(expectedId)
             }
             initVideosReturned()
-            whenever(getAllVideosUseCase()).thenReturn(listOf(mock(), expectedVideoNode))
+            whenever(getAllVideosUseCase(anyString(), anyOrNull(), anyOrNull())).thenReturn(
+                listOf(
+                    mock(),
+                    expectedVideoNode
+                )
+            )
             initUnderTest()
 
-            underTest.state.drop(1).test {
+            underTest.state.drop(2).test {
                 underTest.refreshNodes()
                 assertThat(awaitItem().allVideos.size).isEqualTo(2)
 
@@ -1411,7 +1449,7 @@ class VideoSectionViewModelTest {
             underTest.onTabSelected(VideoSectionTab.Playlists)
             underTest.updateCurrentVideoPlaylist(videoPlaylistUIEntity)
 
-            underTest.state.drop(1).test {
+            underTest.state.drop(2).test {
                 assertThat(awaitItem().videoPlaylists).isNotEmpty()
                 underTest.onVideoItemOfPlaylistClicked(videoUIEntity, 0)
                 assertThat(awaitItem().clickedPlaylistDetailItem).isEqualTo(expectedVideoNode)
@@ -1447,7 +1485,7 @@ class VideoSectionViewModelTest {
             underTest.onTabSelected(VideoSectionTab.Playlists)
             underTest.updateCurrentVideoPlaylist(videoPlaylistUIEntity)
 
-            underTest.state.drop(1).test {
+            underTest.state.drop(2).test {
                 assertThat(awaitItem().videoPlaylists).isNotEmpty()
                 underTest.playAllButtonClicked()
                 assertThat(awaitItem().clickedPlaylistDetailItem).isEqualTo(expectedVideoNode)
@@ -1479,7 +1517,7 @@ class VideoSectionViewModelTest {
             whenever(getNodeByIdUseCase(expectedId)).thenReturn(mockTypedNode)
             initUnderTest()
 
-            underTest.state.drop(1).test {
+            underTest.state.drop(2).test {
                 underTest.refreshNodes()
                 assertThat(awaitItem().allVideos).isNotEmpty()
 
@@ -1579,7 +1617,7 @@ class VideoSectionViewModelTest {
             initUnderTest()
             underTest.setCurrentDestinationRoute(videoSectionRoute)
 
-            underTest.state.drop(1).test {
+            underTest.state.drop(2).test {
                 underTest.refreshNodes()
                 assertThat(awaitItem().allVideos).isNotEmpty()
 
@@ -1602,7 +1640,7 @@ class VideoSectionViewModelTest {
             whenever(getNodeByIdUseCase(expectedId)).thenReturn(mockTypedNode)
             initUnderTest()
 
-            underTest.state.drop(1).test {
+            underTest.state.drop(2).test {
                 underTest.refreshNodes()
                 assertThat(awaitItem().allVideos).isNotEmpty()
 
@@ -1627,7 +1665,7 @@ class VideoSectionViewModelTest {
             whenever(getNodeByIdUseCase(expectedId)).thenReturn(mockTypedNode)
             initUnderTest()
 
-            underTest.state.drop(1).test {
+            underTest.state.drop(2).test {
                 underTest.refreshNodes()
                 assertThat(awaitItem().allVideos).isNotEmpty()
 
@@ -1688,7 +1726,7 @@ class VideoSectionViewModelTest {
 
             initUnderTest()
             underTest.refreshRecentlyWatchedVideos()
-            underTest.state.drop(1).test {
+            underTest.state.drop(2).test {
                 assertThat(awaitItem().groupedVideoRecentlyWatchedItems).isEqualTo(
                     expectedRecentlyWatchedItems
                 )
@@ -1741,7 +1779,7 @@ class VideoSectionViewModelTest {
             initUnderTest()
             underTest.clearRecentlyWatchedVideos()
 
-            underTest.state.drop(1).test {
+            underTest.state.drop(2).test {
                 val actual = awaitItem()
                 assertThat(actual.groupedVideoRecentlyWatchedItems).isEmpty()
                 assertThat(actual.clearRecentlyWatchedVideosSuccess).isEqualTo(triggered)
@@ -1755,7 +1793,7 @@ class VideoSectionViewModelTest {
             initUnderTest()
             underTest.removeRecentlyWatchedItem(12345L)
 
-            underTest.state.drop(1).test {
+            underTest.state.drop(2).test {
                 val actual = awaitItem()
                 assertThat(actual.removeRecentlyWatchedItemSuccess).isEqualTo(triggered)
                 cancelAndIgnoreRemainingEvents()
@@ -1768,7 +1806,7 @@ class VideoSectionViewModelTest {
             initUnderTest()
             underTest.clearRecentlyWatchedVideos()
 
-            underTest.state.drop(1).test {
+            underTest.state.drop(2).test {
                 assertThat(awaitItem().clearRecentlyWatchedVideosSuccess).isEqualTo(triggered)
                 underTest.resetClearRecentlyWatchedVideosSuccess()
                 assertThat(awaitItem().clearRecentlyWatchedVideosSuccess).isEqualTo(consumed)
@@ -1782,7 +1820,7 @@ class VideoSectionViewModelTest {
             initUnderTest()
             underTest.removeRecentlyWatchedItem(12345L)
 
-            underTest.state.drop(1).test {
+            underTest.state.drop(2).test {
                 assertThat(awaitItem().removeRecentlyWatchedItemSuccess).isEqualTo(triggered)
                 underTest.resetRemoveRecentlyWatchedItemSuccess()
                 assertThat(awaitItem().removeRecentlyWatchedItemSuccess).isEqualTo(consumed)
