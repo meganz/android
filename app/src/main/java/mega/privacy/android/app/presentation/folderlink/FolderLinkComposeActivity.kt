@@ -22,6 +22,10 @@ import androidx.lifecycle.lifecycleScope
 import com.google.android.material.dialog.MaterialAlertDialogBuilder
 import dagger.hilt.android.AndroidEntryPoint
 import de.palm.composestateevents.EventEffect
+import kotlinx.coroutines.flow.combine
+import kotlinx.coroutines.flow.distinctUntilChanged
+import kotlinx.coroutines.flow.launchIn
+import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.launch
 import mega.privacy.android.app.MegaApplication
 import mega.privacy.android.app.MimeTypeList
@@ -171,6 +175,17 @@ class FolderLinkComposeActivity : PasscodeActivity(),
         enableEdgeToEdgeAndConsumeInsets()
         super.onCreate(savedInstanceState)
 
+        viewModel.state.map { it.shouldShowAdsForLink }
+            .distinctUntilChanged()
+            .combine(googleAdsManager.isAdsFeatureEnabled) { shouldShowAdsForLink, isAdsFeatureEnabled ->
+                if (shouldShowAdsForLink && isAdsFeatureEnabled) {
+                    googleAdsManager.checkLatestConsentInformation(
+                        activity = this,
+                        onConsentInformationUpdated = { googleAdsManager.fetchAdRequest() }
+                    )
+                }
+            }.launchIn(lifecycleScope)
+
         setContent {
             StartFolderLinkView()
         }
@@ -187,14 +202,8 @@ class FolderLinkComposeActivity : PasscodeActivity(),
         lifecycleScope.launch {
             runCatching {
                 googleAdsManager.checkForAdsAvailability()
-                if (googleAdsManager.isAdsEnabled()) {
-                    googleAdsManager.checkLatestConsentInformation(
-                        activity = this@FolderLinkComposeActivity,
-                        onConsentInformationUpdated = { googleAdsManager.fetchAdRequest() }
-                    )
-                }
             }.onFailure {
-                Timber.e("Failed to fetch latest consent information : ${it.message}")
+                Timber.e("Failed to check for ads availability: $it")
             }
         }
     }

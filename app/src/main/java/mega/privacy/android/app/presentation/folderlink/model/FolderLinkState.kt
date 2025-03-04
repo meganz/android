@@ -44,6 +44,7 @@ import mega.privacy.android.domain.entity.preference.ViewType
  * @property storageStatusDialogState   State of StorageStatusDialog
  * @property showErrorDialogEvent       Event to show error dialog with String id of title and content
  * @property snackBarMessage            String id of content for snack bar
+ * @property shouldShowAdsForLink       Whether ads should be shown for the link
  */
 data class FolderLinkState(
     val isInitialState: Boolean = true,
@@ -74,4 +75,5 @@ data class FolderLinkState(
     val openFile: StateEventWithContent<Intent> = consumed(),
     val downloadEvent: StateEventWithContent<TransferTriggerEvent.DownloadTriggerEvent> = consumed(),
     val snackbarMessageContent: StateEventWithContent<String> = consumed(),
+    val shouldShowAdsForLink: Boolean = false
 )

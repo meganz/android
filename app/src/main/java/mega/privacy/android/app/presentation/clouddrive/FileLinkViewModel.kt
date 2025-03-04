@@ -38,6 +38,7 @@ import mega.privacy.android.domain.exception.QuotaExceededMegaException
 import mega.privacy.android.domain.exception.node.ForeignNodeException
 import mega.privacy.android.domain.usecase.HasCredentialsUseCase
 import mega.privacy.android.domain.usecase.RootNodeExistsUseCase
+import mega.privacy.android.domain.usecase.advertisements.QueryAdsUseCase
 import mega.privacy.android.domain.usecase.filelink.GetFileUrlByPublicLinkUseCase
 import mega.privacy.android.domain.usecase.filelink.GetPublicNodeUseCase
 import mega.privacy.android.domain.usecase.mediaplayer.MegaApiHttpServerIsRunningUseCase
@@ -77,6 +78,7 @@ class FileLinkViewModel @Inject constructor(
     private val nodeContentUriIntentMapper: NodeContentUriIntentMapper,
     private val getNodePreviewFileUseCase: GetNodePreviewFileUseCase,
     val monitorMiscLoadedUseCase: MonitorMiscLoadedUseCase,
+    private val queryAdsUseCase: QueryAdsUseCase,
 ) : ViewModel() {
 
     private val _state = MutableStateFlow(FileLinkState())
@@ -141,6 +143,7 @@ class FileLinkViewModel @Inject constructor(
                 _state.update {
                     it.copyWithTypedNode(node, iconResource)
                 }
+                queryAds(node.id.longValue)
                 resetJobInProgressState()
             }
             .onFailure { exception ->
@@ -168,6 +171,18 @@ class FileLinkViewModel @Inject constructor(
                     }
                 }
             }
+    }
+
+    private fun queryAds(handle: Long) {
+        viewModelScope.launch {
+            runCatching {
+                queryAdsUseCase(handle)
+            }.onSuccess { value ->
+                _state.update { it.copy(shouldShowAdsForLink = value) }
+            }.onFailure {
+                Timber.e(it)
+            }
+        }
     }
 
     /**

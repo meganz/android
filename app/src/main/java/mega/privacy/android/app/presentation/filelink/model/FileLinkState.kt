@@ -33,6 +33,7 @@ import mega.privacy.android.domain.exception.PublicNodeException
  * @property errorMessage           State to show error message
  * @property overQuotaError         State to show over quota error
  * @property foreignNodeError       State to show foreign node error
+ * @property shouldShowAdsForLink          Whether should show ads
  */
 data class FileLinkState(
     val showLoginScreenEvent: StateEvent = consumed,
@@ -55,6 +56,7 @@ data class FileLinkState(
     val errorMessage: StateEventWithContent<Int> = consumed(),
     val overQuotaError: StateEventWithContent<StorageState> = consumed(),
     val foreignNodeError: StateEvent = consumed,
+    val shouldShowAdsForLink: Boolean = false
 ) {
     /**
      * Creates a copy of this view state with the info that can be extracted directly from typedNode

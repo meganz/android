@@ -18,6 +18,7 @@ import mega.privacy.android.app.presentation.mapper.GetStringFromStringResMapper
 import mega.privacy.android.app.presentation.meeting.chat.view.message.attachment.NodeContentUriIntentMapper
 import mega.privacy.android.app.utils.Constants
 import mega.privacy.android.core.test.extension.CoroutineMainDispatcherExtension
+import mega.privacy.android.domain.entity.FolderInfo
 import mega.privacy.android.domain.entity.folderlink.FetchFolderNodesResult
 import mega.privacy.android.domain.entity.folderlink.FolderLoginStatus
 import mega.privacy.android.domain.entity.node.FileNode
@@ -41,8 +42,10 @@ import mega.privacy.android.domain.usecase.RootNodeExistsUseCase
 import mega.privacy.android.domain.usecase.StopAudioService
 import mega.privacy.android.domain.usecase.account.GetAccountTypeUseCase
 import mega.privacy.android.domain.usecase.achievements.AreAchievementsEnabledUseCase
+import mega.privacy.android.domain.usecase.advertisements.QueryAdsUseCase
 import mega.privacy.android.domain.usecase.contact.GetCurrentUserEmail
 import mega.privacy.android.domain.usecase.file.GetFileUriUseCase
+import mega.privacy.android.domain.usecase.filelink.GetPublicLinkInformationUseCase
 import mega.privacy.android.domain.usecase.folderlink.ContainsMediaItemUseCase
 import mega.privacy.android.domain.usecase.folderlink.FetchFolderNodesUseCase
 import mega.privacy.android.domain.usecase.folderlink.GetFolderLinkChildrenNodesUseCase
@@ -67,6 +70,8 @@ import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.TestInstance
 import org.junit.jupiter.api.extension.ExtendWith
+import org.junit.jupiter.params.ParameterizedTest
+import org.junit.jupiter.params.provider.ValueSource
 import org.mockito.Mockito
 import org.mockito.kotlin.any
 import org.mockito.kotlin.anyOrNull
@@ -120,6 +125,8 @@ class FolderLinkViewModelTest {
         mock()
     private val isUserLoggedInUseCase: IsUserLoggedInUseCase = mock()
     private val stopAudioService: StopAudioService = mock()
+    private val getPublicLinkInformationUseCase: GetPublicLinkInformationUseCase = mock()
+    private val queryAdsUseCase: QueryAdsUseCase = mock()
 
 
     @BeforeEach
@@ -165,7 +172,9 @@ class FolderLinkViewModelTest {
             getNodePreviewFileUseCase,
             updateCrashAndPerformanceReportersUseCase,
             isUserLoggedInUseCase,
-            stopAudioService
+            stopAudioService,
+            getPublicLinkInformationUseCase,
+            queryAdsUseCase
         )
     }
 
@@ -207,7 +216,9 @@ class FolderLinkViewModelTest {
             isUserLoggedInUseCase = isUserLoggedInUseCase,
             stopAudioService = stopAudioService,
             applicationScope = CoroutineScope(UnconfinedTestDispatcher()),
-            monitorMiscLoadedUseCase = mock()
+            monitorMiscLoadedUseCase = mock(),
+            getPublicLinkInformationUseCase = getPublicLinkInformationUseCase,
+            queryAdsUseCase = queryAdsUseCase
         )
     }
 
@@ -245,6 +256,11 @@ class FolderLinkViewModelTest {
         val fetchFolderNodeResult = FetchFolderNodesResult(mock(), mock(), childrenNodes)
         whenever(loginToFolderUseCase(folderLink)).thenReturn(FolderLoginStatus.SUCCESS)
         whenever(fetchFolderNodesUseCase(anyOrNull())).thenReturn(fetchFolderNodeResult)
+        val folderInfo = mock<FolderInfo> {
+            on { id }.thenReturn(NodeId(1234L))
+        }
+        whenever(getPublicLinkInformationUseCase(folderLink)).thenReturn(folderInfo)
+        whenever(queryAdsUseCase(folderInfo.id.longValue)).thenReturn(false)
         underTest.state.test {
             underTest.folderLogin(folderLink)
             val newValue = expectMostRecentItem()
@@ -751,4 +767,26 @@ class FolderLinkViewModelTest {
         underTest.stopAudioPlayerServiceWithoutLogin()
         verify(stopAudioService, times(0)).invoke()
     }
+
+    @ParameterizedTest
+    @ValueSource(booleans = [true, false])
+    fun `test that show ads for link is returned correctly`(shouldShowAdsForLink: Boolean) =
+        runTest {
+            val folderLink = "abcd"
+            val childNode = mock<TypedFolderNode>()
+            val childrenNodes = listOf(childNode)
+            val fetchFolderNodeResult = FetchFolderNodesResult(mock(), mock(), childrenNodes)
+            whenever(loginToFolderUseCase(folderLink)).thenReturn(FolderLoginStatus.SUCCESS)
+            whenever(fetchFolderNodesUseCase(anyOrNull())).thenReturn(fetchFolderNodeResult)
+            val folderInfo = mock<FolderInfo> {
+                on { id }.thenReturn(NodeId(1234L))
+            }
+            whenever(getPublicLinkInformationUseCase(folderLink)).thenReturn(folderInfo)
+            whenever(queryAdsUseCase(folderInfo.id.longValue)).thenReturn(shouldShowAdsForLink)
+            underTest.folderLogin(folderLink)
+            underTest.state.test {
+                val newValue = expectMostRecentItem()
+                assertThat(newValue.shouldShowAdsForLink).isEqualTo(shouldShowAdsForLink)
+            }
+        }
 }

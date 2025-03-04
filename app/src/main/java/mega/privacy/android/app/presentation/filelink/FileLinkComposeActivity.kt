@@ -18,6 +18,10 @@ import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.lifecycle.lifecycleScope
 import dagger.hilt.android.AndroidEntryPoint
 import de.palm.composestateevents.EventEffect
+import kotlinx.coroutines.flow.combine
+import kotlinx.coroutines.flow.distinctUntilChanged
+import kotlinx.coroutines.flow.launchIn
+import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.launch
 import mega.privacy.android.app.MegaApplication.Companion.isClosedChat
 import mega.privacy.android.app.MimeTypeList.Companion.typeForName
@@ -127,6 +131,17 @@ class FileLinkComposeActivity : PasscodeActivity(),
         viewModel.handleIntent(intent)
         viewModel.checkLoginRequired()
 
+        viewModel.state.map { it.shouldShowAdsForLink }
+            .distinctUntilChanged()
+            .combine(googleAdsManager.isAdsFeatureEnabled) { shouldShowAdsForLink, isAdsFeatureEnabled ->
+                if (shouldShowAdsForLink && isAdsFeatureEnabled) {
+                    googleAdsManager.checkLatestConsentInformation(
+                        activity = this,
+                        onConsentInformationUpdated = { googleAdsManager.fetchAdRequest() }
+                    )
+                }
+            }.launchIn(lifecycleScope)
+
         setContent {
             val themeMode by getThemeMode()
                 .collectAsStateWithLifecycle(initialValue = ThemeMode.System)
@@ -207,14 +222,8 @@ class FileLinkComposeActivity : PasscodeActivity(),
         lifecycleScope.launch {
             runCatching {
                 googleAdsManager.checkForAdsAvailability()
-                if (googleAdsManager.isAdsEnabled()) {
-                    googleAdsManager.checkLatestConsentInformation(
-                        activity = this@FileLinkComposeActivity,
-                        onConsentInformationUpdated = { googleAdsManager.fetchAdRequest() }
-                    )
-                }
             }.onFailure {
-                Timber.e("Failed to fetch latest consent information : ${it.message}")
+                Timber.e("Failed to check for ads availability: $it")
             }
         }
     }

@@ -31,7 +31,12 @@ class GoogleAdsManager @Inject constructor(
     private val shouldShowGenericCookieDialogUseCase: ShouldShowGenericCookieDialogUseCase,
 ) {
 
-    private var isAdsFeatureEnabled: Boolean = false
+    private val _isAdsFeatureEnabled = MutableStateFlow(false)
+
+    /**
+     * Flow to provide if the ads feature is enabled.
+     */
+    val isAdsFeatureEnabled = _isAdsFeatureEnabled.asStateFlow()
 
     private val _request = MutableStateFlow<AdManagerAdRequest?>(null)
 
@@ -53,11 +58,11 @@ class GoogleAdsManager @Inject constructor(
      */
     suspend fun checkForAdsAvailability() {
         runCatching {
-            isAdsFeatureEnabled =
+            _isAdsFeatureEnabled.value =
                 getFeatureFlagValueUseCase(ApiFeatures.GoogleAdsFeatureFlag)
             Timber.d("Ads feature enabled: $isAdsFeatureEnabled")
         }.onFailure {
-            isAdsFeatureEnabled = false
+            _isAdsFeatureEnabled.value = false
             Timber.e(it, "Error getting feature flag value")
         }
     }
@@ -65,7 +70,7 @@ class GoogleAdsManager @Inject constructor(
     /**
      * Check if ads are enabled.
      */
-    fun isAdsEnabled() = isAdsFeatureEnabled
+    fun isAdsEnabled() = _isAdsFeatureEnabled.value
 
     /**
      * Check the latest consent information from UMP and show the consent form if required.

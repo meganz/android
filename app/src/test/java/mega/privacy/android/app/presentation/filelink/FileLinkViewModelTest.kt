@@ -15,6 +15,7 @@ import mega.privacy.android.core.test.extension.CoroutineMainDispatcherExtension
 import mega.privacy.android.core.ui.mapper.FileTypeIconMapper
 import mega.privacy.android.domain.entity.StaticImageFileTypeInfo
 import mega.privacy.android.domain.entity.node.NodeContentUri
+import mega.privacy.android.domain.entity.node.NodeId
 import mega.privacy.android.domain.entity.node.NodeNameCollision
 import mega.privacy.android.domain.entity.node.NodeNameCollisionType
 import mega.privacy.android.domain.entity.node.TypedFileNode
@@ -23,6 +24,7 @@ import mega.privacy.android.domain.entity.node.publiclink.PublicNodeNameCollisio
 import mega.privacy.android.domain.exception.PublicNodeException
 import mega.privacy.android.domain.usecase.HasCredentialsUseCase
 import mega.privacy.android.domain.usecase.RootNodeExistsUseCase
+import mega.privacy.android.domain.usecase.advertisements.QueryAdsUseCase
 import mega.privacy.android.domain.usecase.filelink.GetFileUrlByPublicLinkUseCase
 import mega.privacy.android.domain.usecase.filelink.GetPublicNodeUseCase
 import mega.privacy.android.domain.usecase.mediaplayer.MegaApiHttpServerIsRunningUseCase
@@ -38,6 +40,8 @@ import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.TestInstance
 import org.junit.jupiter.api.extension.ExtendWith
+import org.junit.jupiter.params.ParameterizedTest
+import org.junit.jupiter.params.provider.ValueSource
 import org.mockito.Mockito
 import org.mockito.kotlin.any
 import org.mockito.kotlin.anyOrNull
@@ -66,6 +70,7 @@ class FileLinkViewModelTest {
     private val megaNavigator = mock<MegaNavigator>()
     private val nodeContentUriIntentMapper = mock<NodeContentUriIntentMapper>()
     private val getNodePreviewFileUseCase = mock<GetNodePreviewFileUseCase>()
+    private val queryAdsUseCase = mock<QueryAdsUseCase>()
 
     private val url = "https://mega.co.nz/abc"
     private val filePreviewPath = "data/cache/xyz.jpg"
@@ -90,7 +95,8 @@ class FileLinkViewModelTest {
             getFileLinkNodeContentUriUseCase,
             megaNavigator,
             nodeContentUriIntentMapper,
-            getNodePreviewFileUseCase
+            getNodePreviewFileUseCase,
+            queryAdsUseCase
         )
         initViewModel()
     }
@@ -113,6 +119,7 @@ class FileLinkViewModelTest {
             nodeContentUriIntentMapper = nodeContentUriIntentMapper,
             getNodePreviewFileUseCase = getNodePreviewFileUseCase,
             monitorMiscLoadedUseCase = mock(),
+            queryAdsUseCase = queryAdsUseCase
         )
     }
 
@@ -431,6 +438,7 @@ class FileLinkViewModelTest {
                     extension = "jpg"
                 )
             )
+            on { id }.thenReturn(NodeId(1234567890L))
         }
 
     @Test
@@ -456,4 +464,18 @@ class FileLinkViewModelTest {
                     .containsExactly(link)
             }
         }
+
+    @ParameterizedTest
+    @ValueSource(booleans = [true, false])
+    fun `test that show ads for link is set as expected`(shouldShowAdsForLink: Boolean) = runTest {
+        val publicNode = mockFileNode()
+        whenever(getPublicNodeUseCase(any())).thenReturn(publicNode)
+        whenever(queryAdsUseCase(publicNode.id.longValue)).thenReturn(shouldShowAdsForLink)
+        underTest.getPublicNode(url)
+
+        underTest.state.test {
+            val result = expectMostRecentItem()
+            assertThat(result.shouldShowAdsForLink).isEqualTo(shouldShowAdsForLink)
+        }
+    }
 }

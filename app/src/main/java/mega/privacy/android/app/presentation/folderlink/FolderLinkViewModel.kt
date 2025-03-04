@@ -63,8 +63,10 @@ import mega.privacy.android.domain.usecase.RootNodeExistsUseCase
 import mega.privacy.android.domain.usecase.StopAudioService
 import mega.privacy.android.domain.usecase.account.GetAccountTypeUseCase
 import mega.privacy.android.domain.usecase.achievements.AreAchievementsEnabledUseCase
+import mega.privacy.android.domain.usecase.advertisements.QueryAdsUseCase
 import mega.privacy.android.domain.usecase.contact.GetCurrentUserEmail
 import mega.privacy.android.domain.usecase.file.GetFileUriUseCase
+import mega.privacy.android.domain.usecase.filelink.GetPublicLinkInformationUseCase
 import mega.privacy.android.domain.usecase.folderlink.ContainsMediaItemUseCase
 import mega.privacy.android.domain.usecase.folderlink.FetchFolderNodesUseCase
 import mega.privacy.android.domain.usecase.folderlink.GetFolderLinkChildrenNodesUseCase
@@ -134,6 +136,8 @@ class FolderLinkViewModel @Inject constructor(
     private val stopAudioService: StopAudioService,
     @ApplicationScope private val applicationScope: CoroutineScope,
     val monitorMiscLoadedUseCase: MonitorMiscLoadedUseCase,
+    private val getPublicLinkInformationUseCase: GetPublicLinkInformationUseCase,
+    private val queryAdsUseCase: QueryAdsUseCase,
 ) : ViewModel() {
 
     /**
@@ -184,6 +188,7 @@ class FolderLinkViewModel @Inject constructor(
                         )
                     }
                     with(state.value) {
+                        queryAds(folderLink)
                         if (!isNodesFetched) {
                             fetchNodes(folderSubHandle)
                         }
@@ -627,6 +632,20 @@ class FolderLinkViewModel @Inject constructor(
                 }
                 _state.update { it.copy(url = folderUrl, folderSubHandle = folderSubHandle) }
             } ?: Timber.w("url NULL")
+        }
+    }
+
+    private fun queryAds(url: String) {
+        viewModelScope.launch {
+            runCatching {
+                val info = getPublicLinkInformationUseCase(url)
+                Timber.d("Public link info: $info")
+                queryAdsUseCase(info.id.longValue)
+            }.onSuccess { value ->
+                _state.update { it.copy(shouldShowAdsForLink = value) }
+            }.onFailure {
+                Timber.e(it)
+            }
         }
     }
 
