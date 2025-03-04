@@ -244,7 +244,10 @@ class AudioPlayerService : LifecycleService(), LifecycleEventObserver, MediaPlay
                     when {
                         state == MEDIA_PLAYER_STATE_ENDED && !isPaused() -> setPaused(true)
 
-                        state == MEDIA_PLAYER_STATE_READY && mediaPlayerGateway.getPlayWhenReady() -> {
+                        state == MEDIA_PLAYER_STATE_READY -> {
+                            if (!mediaPlayerGateway.getPlayWhenReady()) {
+                                setPlayWhenReady(true)
+                            }
                             if (!isNotificationCreated) {
                                 createPlayerControlNotification()
                             }
