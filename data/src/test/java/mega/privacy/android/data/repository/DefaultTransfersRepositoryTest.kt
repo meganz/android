@@ -782,7 +782,7 @@ class DefaultTransfersRepositoryTest {
         }
 
     @Test
-    fun `test that addCompletedTransferFromFailedPendingTransfer call local storage gateway addCompletedTransfer and app event gateway broadcastCompletedTransfer with the mapped transfers`() =
+    fun `test that addCompletedTransferFromFailedPendingTransfer call local storage gateway addCompletedTransfer and app event gateway broadcastCompletedTransfer with the mapped transfer`() =
         runTest {
             val transfer = mock<PendingTransfer>()
             val size = 100L
@@ -792,6 +792,22 @@ class DefaultTransfersRepositoryTest {
                 .thenReturn(expected)
             underTest.addCompletedTransferFromFailedPendingTransfer(transfer, size, error)
             verify(megaLocalRoomGateway).addCompletedTransfer(expected)
+            verify(appEventGateway).broadcastCompletedTransfer(CompletedTransferState.Error)
+        }
+
+    @Test
+    fun `test that addCompletedTransferFromFailedPendingTransfers call local storage gateway addCompletedTransfers and app event gateway broadcastCompletedTransfer with the mapped transfers`() =
+        runTest {
+            val transfers = (0..10).map { mock<PendingTransfer>() }
+            val error = mock<MegaException>()
+            val expected = transfers.map { pendingTransfer ->
+                mock<CompletedTransfer>().also {
+                    whenever(completedTransferPendingTransferMapper(pendingTransfer, 0L, error))
+                        .thenReturn(it)
+                }
+            }
+            underTest.addCompletedTransferFromFailedPendingTransfers(transfers, error)
+            verify(megaLocalRoomGateway).addCompletedTransfers(expected)
             verify(appEventGateway).broadcastCompletedTransfer(CompletedTransferState.Error)
         }
 
@@ -1238,7 +1254,7 @@ class DefaultTransfersRepositoryTest {
             transferType: TransferType,
         ) = runTest {
             val groups = mock<List<ActiveTransferTotals.Group>>()
-            val firstActiveTransferTotals = mock<ActiveTransferTotals>{
+            val firstActiveTransferTotals = mock<ActiveTransferTotals> {
                 on { this.groups } doReturn groups
             }
             val secondActiveTransferTotals = mock<ActiveTransferTotals>()

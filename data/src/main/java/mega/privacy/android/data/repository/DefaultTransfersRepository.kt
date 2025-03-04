@@ -482,6 +482,18 @@ internal class DefaultTransfersRepository @Inject constructor(
         appEventGateway.broadcastCompletedTransfer(CompletedTransferState.Error)
     }
 
+    override suspend fun addCompletedTransferFromFailedPendingTransfers(
+        pendingTransfers: List<PendingTransfer>,
+        error: Throwable,
+    ) = withContext(ioDispatcher) {
+        val completedTransfers = pendingTransfers.map {
+            completedTransferPendingTransferMapper(it, 0L, error)
+        }
+        megaLocalRoomGateway.addCompletedTransfers(completedTransfers)
+        removeInProgressTransfers(pendingTransfers.mapNotNull { it.transferTag }.toSet())
+        appEventGateway.broadcastCompletedTransfer(CompletedTransferState.Error)
+    }
+
     override suspend fun addCompletedTransfersIfNotExist(transfers: List<Transfer>) {
         withContext(ioDispatcher) {
             megaLocalRoomGateway.getCompletedTransfers().firstOrNull().orEmpty()

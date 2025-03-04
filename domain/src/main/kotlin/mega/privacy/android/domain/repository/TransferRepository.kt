@@ -212,6 +212,17 @@ interface TransferRepository {
     )
 
     /**
+     * Add failed completed transfers from a failed pending transfer list
+     *
+     * @param pendingTransfer
+     * @param error The error that caused this pending transfer to fail
+     */
+    suspend fun addCompletedTransferFromFailedPendingTransfers(
+        pendingTransfer: List<PendingTransfer>,
+        error: Throwable,
+    )
+
+    /**
      * Add completed transfers if not exist
      *
      * @param transfers

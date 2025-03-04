@@ -103,10 +103,10 @@ class CorrectActiveTransfersUseCase @Inject constructor(
             )
             notInProgressPendingTransfersWaitingSdkScanning
                 .filterNot { it.isPreviewDownload() }
-                .forEach {
-                    transferRepository.addCompletedTransferFromFailedPendingTransfer(
+                .takeIf { it.isNotEmpty() }
+                ?.let {
+                    transferRepository.addCompletedTransferFromFailedPendingTransfers(
                         it,
-                        0L,
                         UnknownError()
                     )
                 }

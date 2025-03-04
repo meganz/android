@@ -236,10 +236,8 @@ internal class CorrectActiveTransfersUseCaseTest {
         underTest(transferType)
 
         verify(updatePendingTransferStateUseCase)(expected, PendingTransferState.ErrorStarting)
-        expected.forEach {
-            verify(transferRepository)
-                .addCompletedTransferFromFailedPendingTransfer(eq(it), any(), any())
-        }
+        verify(transferRepository)
+            .addCompletedTransferFromFailedPendingTransfers(eq(expected), any())
     }
 
     @Test
@@ -261,8 +259,7 @@ internal class CorrectActiveTransfersUseCaseTest {
         underTest(transferType)
 
         verifyNoInteractions(updatePendingTransferStateUseCase)
-        verify(transferRepository, never()).addCompletedTransferFromFailedPendingTransfer(
-            any(),
+        verify(transferRepository, never()).addCompletedTransferFromFailedPendingTransfers(
             any(),
             any()
         )
@@ -292,8 +289,7 @@ internal class CorrectActiveTransfersUseCaseTest {
                 pendingTransfers,
                 PendingTransferState.ErrorStarting
             )
-            verify(transferRepository, never()).addCompletedTransferFromFailedPendingTransfer(
-                any(),
+            verify(transferRepository, never()).addCompletedTransferFromFailedPendingTransfers(
                 any(),
                 any()
             )
