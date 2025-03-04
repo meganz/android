@@ -6,10 +6,9 @@ import androidx.compose.ui.test.junit4.createAndroidComposeRule
 import androidx.compose.ui.test.onNodeWithText
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import mega.privacy.android.app.presentation.mapper.file.FileSizeStringMapper
-import mega.privacy.android.app.presentation.meeting.chat.view.message.link.FolderLinkContent
-import mega.privacy.android.app.presentation.meeting.chat.view.message.link.FolderLinkMessageView
 import mega.privacy.android.app.utils.TextUtil
 import mega.privacy.android.domain.entity.FolderInfo
+import mega.privacy.android.domain.entity.node.NodeId
 import org.junit.Rule
 import org.junit.Test
 import org.junit.runner.RunWith
@@ -25,6 +24,7 @@ class FolderLinkMessageViewTest {
         initComposeRuleContent(
             content = FolderLinkContent(
                 folderInfo = FolderInfo(
+                    id = NodeId(123L),
                     folderName = folderName,
                     numFolders = 0,
                     numFiles = 0,
@@ -46,6 +46,7 @@ class FolderLinkMessageViewTest {
         initComposeRuleContent(
             content = FolderLinkContent(
                 folderInfo = FolderInfo(
+                    id = NodeId(123L),
                     folderName = "",
                     numFolders = numFolders,
                     numFiles = numFiles,
@@ -67,6 +68,7 @@ class FolderLinkMessageViewTest {
         initComposeRuleContent(
             content = FolderLinkContent(
                 folderInfo = FolderInfo(
+                    id = NodeId(123L),
                     folderName = "",
                     numFolders = 0,
                     numFiles = 0,

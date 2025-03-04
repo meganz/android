@@ -14,11 +14,12 @@ import androidx.compose.ui.unit.dp
 import mega.privacy.android.app.R
 import mega.privacy.android.app.presentation.mapper.file.FileSizeStringMapper
 import mega.privacy.android.app.utils.TextUtil
+import mega.privacy.android.domain.entity.FolderInfo
+import mega.privacy.android.domain.entity.node.NodeId
 import mega.privacy.android.shared.original.core.ui.controls.chat.messages.ChatBubble
 import mega.privacy.android.shared.original.core.ui.controls.chat.messages.RichLinkContentView
 import mega.privacy.android.shared.original.core.ui.preview.BooleanProvider
 import mega.privacy.android.shared.original.core.ui.preview.CombinedThemePreviews
-import mega.privacy.android.domain.entity.FolderInfo
 import mega.privacy.android.shared.original.core.ui.theme.OriginalTheme
 
 /**
@@ -61,6 +62,7 @@ private fun FolderLinkMessageViewPreview(
                 linkContent = FolderLinkContent(
                     link = "https://mega.nz/folder/1234567890",
                     folderInfo = FolderInfo(
+                        id = NodeId(1234567890L),
                         folderName = "Folder name",
                         numFolders = 3,
                         numFiles = 24,

@@ -128,6 +128,50 @@ internal class AdsRepositoryImplTest {
         }
 
     @Test
+    fun `test that query ads returns successfully if no error is thrown`() =
+        runTest(ioDispatcher) {
+            val api = mock<MegaApiJava>()
+            val request = mock<MegaRequest> {
+                on { numDetails }.thenReturn(0)
+            }
+            val error = mock<MegaError> {
+                on { errorCode }.thenReturn(MegaError.API_OK)
+            }
+            whenever(adsGateway.queryAds(any(), any(), any())).thenAnswer {
+                (it.arguments[2] as OptionalMegaRequestListenerInterface).onRequestFinish(
+                    api,
+                    request,
+                    error
+                )
+            }
+            val actual = underTest.queryAds(0L)
+            assertThat(actual).isEqualTo(true)
+        }
+
+    @Test
+    fun `test that query ads throws an exception when the api returns an error`() =
+        runTest(ioDispatcher) {
+            val api = mock<MegaApiJava>()
+            val request = mock<MegaRequest> {
+                on { numDetails }.thenReturn(0)
+            }
+            val error = mock<MegaError> {
+                on { errorCode }.thenReturn(MegaError.API_OK + 1)
+            }
+            whenever(adsGateway.queryAds(any(), any(), any())).thenAnswer {
+                (it.arguments[2] as OptionalMegaRequestListenerInterface).onRequestFinish(
+                    api,
+                    request,
+                    error
+                )
+            }
+            assertFailsWith(
+                exceptionClass = MegaException::class,
+                block = { underTest.queryAds(0L) }
+            )
+        }
+
+    @Test
     fun `test that set ads closing timestamp invoke correctly`() =
         runTest {
             val testTimestamp = 123456L

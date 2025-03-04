@@ -46,6 +46,20 @@ internal class AdsRepositoryImpl @Inject constructor(
         }
     }
 
+    override suspend fun queryAds(linkHandle: Long): Boolean = withContext(ioDispatcher) {
+        suspendCancellableCoroutine { continuation ->
+            val listener = continuation.getRequestListener("queryAds") { request ->
+                request.numDetails == 0
+            }
+
+            adsGateway.queryAds(
+                adFlags = MegaApiJava.ADS_DEFAULT,
+                publicHandle = linkHandle,
+                listener = listener
+            )
+        }
+    }
+
     override fun monitorAdsClosingTimestamp() = uiPreferencesGateway.monitorAdsClosingTimestamp()
         .flowOn(ioDispatcher)
 

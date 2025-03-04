@@ -25,4 +25,9 @@ interface AdsRepository {
      * Set ads closing timestamp
      */
     suspend fun setAdsClosingTimestamp(timestamp: Long)
+
+    /**
+     * Query ads
+     */
+    suspend fun queryAds(linkHandle: Long): Boolean
 }

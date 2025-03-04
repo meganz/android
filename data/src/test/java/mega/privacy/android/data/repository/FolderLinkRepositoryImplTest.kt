@@ -59,7 +59,7 @@ class FolderLinkRepositoryImplTest {
     private val megaLocalStorageGateway = mock<MegaLocalStorageGateway>()
     private val untypedNode = mock<FolderNode>()
     private val nodeMapper: NodeMapper = mock()
-    private val folderInfoMapper: FolderInfoMapper = mock()
+    private val folderInfoMapper: FolderInfoMapper = FolderInfoMapper()
     private val fileTypeInfoMapper: FileTypeInfoMapper = mock()
     private val imageNodeMapper: ImageNodeMapper = mock()
     private val megaSearchFilterMapper = mock<MegaSearchFilterMapper>()
@@ -169,6 +169,7 @@ class FolderLinkRepositoryImplTest {
     @Test
     fun `test that valid folder info of public link is returned`() = runTest {
         val expectedResult = FolderInfo(
+            id = NodeId(123L),
             currentSize = 1000L,
             numVersions = 1,
             numFiles = 2,
@@ -192,6 +193,7 @@ class FolderLinkRepositoryImplTest {
         val mockMegaRequest = mock<MegaRequest> {
             on { megaFolderInfo }.thenReturn(mockMegaFolderInfo)
             on { text }.thenReturn(expectedResult.folderName)
+            on { nodeHandle }.thenReturn(123L)
         }
 
         whenever(megaApiFolderGateway.getPublicLinkInformation(any(), any())).thenAnswer {
@@ -201,8 +203,6 @@ class FolderLinkRepositoryImplTest {
                 mockMegaError
             )
         }
-
-        whenever(folderInfoMapper(any(), any())).thenReturn(expectedResult)
 
         val folderLink = "folder_link"
         assertThat(underTest.getPublicLinkInformation(folderLink)).isEqualTo(expectedResult)

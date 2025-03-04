@@ -2,10 +2,10 @@ package mega.privacy.android.data.mapper
 
 import com.google.common.truth.Truth.assertThat
 import mega.privacy.android.domain.entity.FolderInfo
+import mega.privacy.android.domain.entity.node.NodeId
 import nz.mega.sdk.MegaFolderInfo
-import org.junit.jupiter.api.Test
-import org.junit.jupiter.api.BeforeAll
 import org.junit.jupiter.api.BeforeEach
+import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.TestInstance
 import org.mockito.kotlin.mock
 
@@ -22,6 +22,7 @@ class FolderInfoMapperTest {
     @Test
     fun `test that folder info type can be mapped correctly`() {
         val expectedResult = FolderInfo(
+            id = NodeId(123L),
             currentSize = 1000L,
             numVersions = 1,
             numFiles = 2,
@@ -38,7 +39,7 @@ class FolderInfoMapperTest {
             on { versionsSize }.thenReturn(expectedResult.versionsSize)
         }
 
-        val result = underTest(megaFolderInfo, expectedResult.folderName)
+        val result = underTest(123L, megaFolderInfo, expectedResult.folderName)
         assertThat(result).isEqualTo(expectedResult)
     }
 }
