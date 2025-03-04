@@ -210,6 +210,7 @@ sealed interface TransferTriggerEvent {
             override val pathsAndNames: Map<String, String?>,
             override val destinationId: NodeId,
             override val waitNotificationPermissionResponseToStart: Boolean = false,
+            val specificStartMessage: String? = null
         ) : StartUpload {
             override val isHighPriority = false
         }

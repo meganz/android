@@ -1,5 +1,6 @@
 package mega.privacy.android.app.presentation.qrcode
 
+import android.content.Context
 import android.graphics.Bitmap
 import androidx.compose.ui.unit.sp
 import androidx.test.ext.junit.runners.AndroidJUnit4
@@ -17,7 +18,6 @@ import kotlinx.coroutines.test.setMain
 import mega.privacy.android.app.middlelayer.scanner.ScannerHandler
 import mega.privacy.android.app.presentation.avatar.mapper.AvatarContentMapper
 import mega.privacy.android.app.presentation.avatar.model.PhotoAvatarContent
-import mega.privacy.android.app.presentation.qrcode.QRCodeViewModel
 import mega.privacy.android.app.presentation.qrcode.mapper.MyQRCodeTextErrorMapper
 import mega.privacy.android.app.presentation.qrcode.model.BarcodeScanResult
 import mega.privacy.android.app.presentation.qrcode.mycode.model.MyCodeUIState
@@ -49,6 +49,8 @@ import org.junit.jupiter.api.TestInstance
 import org.junit.runner.RunWith
 import org.mockito.kotlin.any
 import org.mockito.kotlin.anyOrNull
+import org.mockito.kotlin.anyVararg
+import org.mockito.kotlin.doReturn
 import org.mockito.kotlin.mock
 import org.mockito.kotlin.verifyNoInteractions
 import org.mockito.kotlin.whenever
@@ -83,6 +85,7 @@ class QRCodeViewModelTest {
     private val getRootNodeUseCase = mock<GetRootNodeUseCase>()
     private val monitorStorageStateEventUseCase = mock<MonitorStorageStateEventUseCase>()
     private val checkFileNameCollisionsUseCase = mock<CheckFileNameCollisionsUseCase>()
+    private val context = mock<Context>()
 
     private val initialContactLink = "https://contact_link1"
 
@@ -110,6 +113,7 @@ class QRCodeViewModelTest {
             getRootNodeUseCase = getRootNodeUseCase,
             monitorStorageStateEventUseCase = monitorStorageStateEventUseCase,
             checkFileNameCollisionsUseCase = checkFileNameCollisionsUseCase,
+            context = context,
         )
     }
 
@@ -357,13 +361,16 @@ class QRCodeViewModelTest {
     @Test
     fun `test that state is updated correctly if a file upload needs to start`() = runTest {
         val file = mock<File>()
+        val message = "message"
         val parentHandle = 123L
         val expected = triggered(
             TransferTriggerEvent.StartUpload.Files(
                 mapOf(file.absolutePath to null),
-                NodeId(parentHandle)
+                NodeId(parentHandle),
+                specificStartMessage = message,
             )
         )
+        whenever(context.getString(any(), anyVararg())) doReturn message
 
         underTest.uiState.map { it.uploadEvent }.test {
             awaitItem()

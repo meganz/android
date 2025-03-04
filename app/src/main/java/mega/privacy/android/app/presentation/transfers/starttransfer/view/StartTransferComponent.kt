@@ -52,6 +52,7 @@ import mega.privacy.android.app.presentation.transfers.starttransfer.model.Start
 import mega.privacy.android.app.presentation.transfers.starttransfer.model.StartTransferViewState
 import mega.privacy.android.app.presentation.transfers.starttransfer.model.TransferTriggerEvent
 import mega.privacy.android.app.presentation.transfers.starttransfer.model.TransferTriggerEvent.StartUpload
+import mega.privacy.android.app.presentation.transfers.starttransfer.model.TransferTriggerEvent.StartUpload.Files
 import mega.privacy.android.app.presentation.transfers.starttransfer.view.dialog.ResumeChatTransfersDialog
 import mega.privacy.android.app.presentation.transfers.starttransfer.view.dialog.ResumePreviewTransfersDialog
 import mega.privacy.android.app.presentation.transfers.starttransfer.view.filespermission.FilesPermissionDialog
@@ -282,11 +283,12 @@ private fun StartTransferComponent(
                 }
 
                 is StartTransferEvent.FinishUploadProcessing -> {
-                    val message = context.resources.getQuantityString(
-                        R.plurals.upload_began,
-                        it.totalFiles,
-                        it.totalFiles,
-                    )
+                    val message = (it.triggerEvent as? Files)?.specificStartMessage
+                        ?: context.resources.getQuantityString(
+                            R.plurals.upload_began,
+                            it.totalFiles,
+                            it.totalFiles,
+                        )
                     snackBarHostState.showAutoDurationSnackbar(message)
                     onScanningFinished(it)
                 }
