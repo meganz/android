@@ -8,17 +8,22 @@ import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.combinedClickable
+import androidx.compose.foundation.horizontalScroll
 import androidx.compose.foundation.isSystemInDarkTheme
+import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.aspectRatio
+import androidx.compose.foundation.layout.defaultMinSize
 import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
+import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.text.InlineTextContent
@@ -46,17 +51,20 @@ import androidx.compose.ui.text.AnnotatedString
 import androidx.compose.ui.text.Placeholder
 import androidx.compose.ui.text.PlaceholderVerticalAlign
 import androidx.compose.ui.text.TextLayoutResult
+import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import coil.compose.AsyncImage
 import coil.request.ImageRequest
+import mega.android.core.ui.theme.values.TextColor
 import mega.privacy.android.app.R
 import mega.privacy.android.app.presentation.time.mapper.DurationInSecondsTextMapper
+import mega.privacy.android.shared.original.core.ui.controls.chip.HighlightChip
+import mega.privacy.android.shared.original.core.ui.controls.text.HighlightedText
 import mega.privacy.android.shared.original.core.ui.controls.text.MegaText
 import mega.privacy.android.shared.original.core.ui.preview.CombinedThemePreviews
 import mega.privacy.android.shared.original.core.ui.theme.OriginalTheme
 import mega.privacy.android.shared.original.core.ui.theme.extensions.textColorSecondary
-import mega.android.core.ui.theme.values.TextColor
 import kotlin.time.Duration
 import kotlin.time.DurationUnit
 import kotlin.time.toDuration
@@ -75,6 +83,9 @@ internal fun VideoItemView(
     onClick: () -> Unit,
     thumbnailData: Any?,
     modifier: Modifier = Modifier,
+    description: String? = null,
+    tags: List<String>? = null,
+    highlightText: String = "",
     collectionTitle: String? = null,
     showMenuButton: Boolean = true,
     nodeAvailableOffline: Boolean = false,
@@ -94,13 +105,13 @@ internal fun VideoItemView(
             )
             .padding(vertical = 8.dp, horizontal = 16.dp)
             .fillMaxWidth()
-            .height(80.dp)
+            .defaultMinSize(minHeight = 80.dp)
             .testTag(VIDEO_ITEM_VIEW_TEST_TAG)
     ) {
         VideoThumbnailView(
             icon = icon,
             modifier = Modifier
-                .fillMaxHeight()
+                .align(Alignment.Top)
                 .blur(16.dp.takeIf { isSensitive } ?: 0.dp),
             thumbnailData = thumbnailData,
             duration = durationInSecondsTextMapper(duration),
@@ -118,6 +129,9 @@ internal fun VideoItemView(
             onMenuClick = onMenuClick,
             labelColor = labelColor,
             isSharedWithPublicLink = isSharedWithPublicLink,
+            description = description,
+            tags = tags,
+            highlightText = highlightText,
         )
 
         if (showMenuButton) {
@@ -130,10 +144,9 @@ internal fun VideoItemView(
                 ),
                 contentDescription = VIDEO_ITEM_MENU_ICON_CONTENT_DESCRIPTION,
                 modifier = Modifier
-                    .align(Alignment.CenterVertically)
                     .clickable(enabled = !isSelected, onClick = onMenuClick)
+                    .padding(top = 25.dp)
                     .testTag(VIDEO_ITEM_MENU_ICON_TEST_TAG),
-                alignment = Alignment.CenterEnd,
             )
         }
     }
@@ -149,6 +162,7 @@ internal fun VideoThumbnailView(
 ) {
     Box(
         modifier = modifier
+            .padding(top = 4.dp)
             .width(130.dp)
             .aspectRatio(1.77f)
     ) {
@@ -214,12 +228,30 @@ internal fun VideoInfoView(
     onMenuClick: () -> Unit,
     modifier: Modifier = Modifier,
     collectionTitle: String? = null,
+    description: String? = null,
+    tags: List<String>? = null,
+    highlightText: String = "",
 ) {
     Column(modifier = modifier) {
         VideoNameAndLabelView(
             name = name,
-            labelColor = labelColor
+            labelColor = labelColor,
+            highlightText = highlightText
         )
+
+        description?.let {
+            if (highlightText.isNotBlank() && it.contains(highlightText, ignoreCase = true)) {
+                HighlightedText(
+                    modifier = Modifier
+                        .testTag(VIDEO_ITEM_NODE_DESCRIPTION)
+                        .padding(start = 10.dp),
+                    text = description,
+                    highlightText = highlightText,
+                    highlightFontWeight = FontWeight.Bold,
+                    textColor = TextColor.Secondary,
+                )
+            }
+        }
 
         collectionTitle?.let {
             CollectionTitleView(
@@ -235,6 +267,30 @@ internal fun VideoInfoView(
             isSharedWithPublicLink = isSharedWithPublicLink,
             onMenuClick = onMenuClick
         )
+
+        tags?.let {
+            if (highlightText.isNotBlank()) {
+                val tagHighlightText = highlightText.removePrefix("#")
+                if (it.any { tag -> tag.contains(tagHighlightText, ignoreCase = true) }) {
+                    Row(
+                        modifier = Modifier
+                            .horizontalScroll(rememberScrollState())
+                            .padding(top = 5.dp)
+                            .testTag(VIDEO_ITEM_NODE_TAGS),
+                        horizontalArrangement = Arrangement.spacedBy(8.dp)
+                    ) {
+                        Spacer(modifier = Modifier.width(2.dp))
+                        tags.forEach { tag ->
+                            HighlightChip(
+                                text = "#$tag",
+                                highlightText = tagHighlightText,
+                            )
+                        }
+                        Spacer(modifier = Modifier.width(2.dp))
+                    }
+                }
+            }
+        }
     }
 }
 
@@ -244,6 +300,7 @@ internal fun VideoNameAndLabelView(
     labelColor: Color?,
     modifier: Modifier = Modifier,
     maxLines: Int = 2,
+    highlightText: String = "",
 ) {
     val inlineContentId = "box"
     val ellipsis = "..."
@@ -257,6 +314,7 @@ internal fun VideoNameAndLabelView(
     val textLayoutResultState = remember { mutableStateOf<TextLayoutResult?>(null) }
     val textLayoutResult = textLayoutResultState.value
 
+    // Adjust the text to show ellipsis when it overflows, and show label icon afterwards
     LaunchedEffect(textLayoutResult) {
         if (textLayoutResult == null) return@LaunchedEffect
         if (textLayoutResult.hasVisualOverflow) {
@@ -305,18 +363,33 @@ internal fun VideoNameAndLabelView(
             }
         )
 
-        MegaText(
-            modifier = Modifier
-                .padding(start = 10.dp)
-                .align(Alignment.CenterVertically)
-                .testTag(VIDEO_ITEM_NAME_VIEW_TEST_TAG),
-            text = finalText,
-            maxLines = maxLines,
-            textColor = TextColor.Primary,
-            style = MaterialTheme.typography.subtitle1,
-            inlineContent = inlineContent,
-            onTextLayout = { textLayoutResultState.value = it }
-        )
+        if (highlightText.isNotBlank()) {
+            HighlightedText(
+                modifier = Modifier
+                    .padding(start = 10.dp)
+                    .align(Alignment.CenterVertically)
+                    .testTag(VIDEO_ITEM_NAME_VIEW_TEST_TAG),
+                text = finalText,
+                highlightText = highlightText,
+                maxLines = maxLines,
+                textColor = TextColor.Primary,
+                style = MaterialTheme.typography.subtitle1,
+                inlineContent = inlineContent,
+            )
+        } else {
+            MegaText(
+                modifier = Modifier
+                    .padding(start = 10.dp)
+                    .align(Alignment.CenterVertically)
+                    .testTag(VIDEO_ITEM_NAME_VIEW_TEST_TAG),
+                text = finalText,
+                maxLines = maxLines,
+                textColor = TextColor.Primary,
+                style = MaterialTheme.typography.subtitle1,
+                inlineContent = inlineContent,
+                onTextLayout = { textLayoutResultState.value = it }
+            )
+        }
     }
 }
 
@@ -402,14 +475,15 @@ private fun VideoItemViewWithFavouritePreview() {
             name = "testing_video_file_name_long_name_testing.mp4",
             fileSize = "1.3MB",
             duration = 240.toDuration(DurationUnit.SECONDS),
-            collectionTitle = "Favourites",
             isFavourite = true,
-            onClick = {},
-            thumbnailData = null,
-            nodeAvailableOffline = true,
             isSelected = true,
             isSharedWithPublicLink = true,
-            labelColor = Color.Red
+            labelColor = Color.Red,
+            onClick = {},
+            thumbnailData = null,
+            collectionTitle = "Favourites",
+            nodeAvailableOffline = true,
+            highlightText = ""
         )
     }
 }
@@ -423,13 +497,16 @@ private fun VideoItemViewWithoutFavouritePreview() {
             name = "name.mp4",
             fileSize = "1.3MB",
             duration = 240.toDuration(DurationUnit.SECONDS),
-            collectionTitle = "abc",
             isFavourite = false,
-            onClick = {},
-            thumbnailData = null,
             isSelected = false,
             isSharedWithPublicLink = false,
-            labelColor = Color.Red
+            labelColor = Color.Red,
+            onClick = {},
+            thumbnailData = null,
+            collectionTitle = "abc",
+            highlightText = "test",
+            description = "Test description",
+            tags = listOf("Test", "tag2", "tag3", "tag4", "tag5")
         )
     }
 }
@@ -441,13 +518,15 @@ private fun VideoInfoViewPreview() {
         VideoInfoView(
             name = "testing_video_file_name_long_name_testing_testing_video_file_name_long_name_testing_testing_video_file_name_long_name_testing.mp4",
             fileSize = "1.3MB",
+            highlightText = "test",
+            description = "Test description",
             isSelected = true,
             showMenuButton = true,
             nodeAvailableOffline = true,
             isSharedWithPublicLink = true,
             labelColor = Color.Red,
             onMenuClick = {},
-            modifier = Modifier.height(87.dp)
+            modifier = Modifier.height(87.dp),
         )
     }
 }
@@ -557,3 +636,14 @@ const val VIDEO_ITEM_COLLECTION_TITLE_ICON_CONTENT_DESCRIPTION = "collection tit
  */
 const val VIDEO_ITEM_COLLECTION_TITLE_TEST_TAG =
     "video_item:collection_title_view"
+
+/**
+ * Test tag for the video item node tags
+ */
+const val VIDEO_ITEM_NODE_TAGS =
+    "video_item:node_tags"
+/**
+ * Test tag for the video item node description
+ */
+const val VIDEO_ITEM_NODE_DESCRIPTION =
+    "video_item:node_description"

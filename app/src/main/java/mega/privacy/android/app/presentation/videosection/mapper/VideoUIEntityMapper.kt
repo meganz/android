@@ -17,6 +17,8 @@ class VideoUIEntityMapper @Inject constructor() {
         id = typedVideoNode.id,
         parentId = typedVideoNode.parentId,
         name = typedVideoNode.name,
+        description = typedVideoNode.description,
+        tags = typedVideoNode.tags,
         size = typedVideoNode.size,
         fileTypeInfo = typedVideoNode.type,
         duration = typedVideoNode.duration,

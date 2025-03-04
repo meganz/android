@@ -157,6 +157,7 @@ internal fun VideoSectionComposeView(
             allVideoView = {
                 AllVideosView(
                     items = uiState.allVideos,
+                    highlightText = uiState.highlightText,
                     shouldApplySensitiveMode = uiState.hiddenNodeEnabled
                             && uiState.accountType?.isPaid == true
                             && !uiState.isBusinessAccountExpired,

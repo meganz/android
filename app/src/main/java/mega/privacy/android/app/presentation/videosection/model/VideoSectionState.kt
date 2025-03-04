@@ -98,4 +98,9 @@ data class VideoSectionState(
     val addToPlaylistTitles: List<String>? = null,
     val searchDescriptionEnabled: Boolean? = null,
     val searchTagsEnabled: Boolean? = null,
-)
+) {
+    /**
+     * The highlight text for search by tags or description
+     */
+    val highlightText get() = if (searchTagsEnabled == true || searchDescriptionEnabled == true) query.orEmpty() else ""
+}

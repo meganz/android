@@ -55,6 +55,7 @@ import nz.mega.sdk.MegaNode
 @Composable
 internal fun AllVideosView(
     items: List<VideoUIEntity>,
+    highlightText: String = "",
     shouldApplySensitiveMode: Boolean,
     progressBarShowing: Boolean,
     searchMode: Boolean,
@@ -207,6 +208,8 @@ internal fun AllVideosView(
                             VideoItemView(
                                 icon = iconPackR.drawable.ic_video_section_video_default_thumbnail,
                                 name = videoItem.name,
+                                description = videoItem.description?.replace("\n", " "),
+                                tags = videoItem.tags,
                                 fileSize = formatFileSize(videoItem.size, LocalContext.current),
                                 duration = videoItem.duration,
                                 isFavourite = videoItem.isFavourite,
@@ -220,6 +223,7 @@ internal fun AllVideosView(
                                     ) else null,
                                 thumbnailData = ThumbnailRequest(videoItem.id),
                                 nodeAvailableOffline = videoItem.nodeAvailableOffline,
+                                highlightText = highlightText,
                                 onClick = { onClick(videoItem, it) },
                                 onMenuClick = { onMenuClick(videoItem) },
                                 onLongClick = { onLongClick(videoItem, it) },

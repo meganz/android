@@ -10,11 +10,11 @@ import kotlin.time.Duration
  * @property id NodeId
  * @property parentId the video's parent id
  * @property name the video's name
+ * @property description the video's description
+ * @property tags the video's tags
  * @property size the video's size
  * @property fileTypeInfo the video's file type info
- * @property durationString the video's duration String
  * @property duration the video's duration
- * @property thumbnail the video's thumbnail
  * @property isFavourite the video if is Favourite
  * @property nodeAvailableOffline the video if is available for offline
  * @property isSharedItems the video if is share
@@ -31,6 +31,8 @@ data class VideoUIEntity(
     val id: NodeId,
     val parentId: NodeId,
     val name: String,
+    val description: String? = null,
+    val tags: List<String>? = null,
     val size: Long,
     val fileTypeInfo: FileTypeInfo,
     val duration: Duration,
