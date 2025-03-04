@@ -1,6 +1,6 @@
 package mega.privacy.android.domain.usecase.notifications
 
-import com.google.common.truth.Truth
+import com.google.common.truth.Truth.assertThat
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.test.UnconfinedTestDispatcher
 import kotlinx.coroutines.test.runTest
@@ -70,39 +70,36 @@ class GetChatMessageNotificationDataUseCaseTest {
     }
 
     @Test
-    fun `test that when a message is deleted all the ChatMessageNotificationData are empty except the message`() =
-        runTest {
-            val message = mock<ChatMessage> {
-                on { isDeleted }.thenReturn(true)
-            }
-
-            val chatMessageNotificationData = ChatMessageNotificationData(msg = message)
-            whenever(getChatMessageUseCase(chatId, msgId)).thenReturn(message)
-
-            Truth.assertThat(underTest.invoke(true, chatId, msgId, defaultSound))
-                .isEqualTo(chatMessageNotificationData)
+    fun `test that when a message is deleted a DeletedMessage is returned`() = runTest {
+        val chat = mock<ChatRoom>()
+        val message = mock<ChatMessage> {
+            on { isDeleted }.thenReturn(true)
         }
+        val expectedData = ChatMessageNotificationData.DeletedMessage(chat = chat, msg = message)
+
+        whenever(getChatRoomUseCase(chatId)).thenReturn(chat)
+        whenever(getChatMessageUseCase(chatId, msgId)).thenReturn(message)
+
+        assertThat(underTest.invoke(true, chatId, msgId, defaultSound)).isEqualTo(expectedData)
+    }
 
     @Test
-    fun `test that when a message is seen all the ChatMessageNotificationData are empty except the message`() =
-        runTest {
-            val message = mock<ChatMessage> {
-                on { status } doReturn ChatMessageStatus.SEEN
-            }
-            val chatMessageNotificationData = ChatMessageNotificationData(
-                msg = message,
-                isMessageSeen = true,
-            )
-
-            whenever(getChatMessageUseCase(chatId, msgId)).thenReturn(message)
-
-            Truth.assertThat(underTest.invoke(true, chatId, msgId, defaultSound))
-                .isEqualTo(chatMessageNotificationData)
+    fun `test that when a message is seen a SeenMessage is returned`() = runTest {
+        val chat = mock<ChatRoom>()
+        val message = mock<ChatMessage> {
+            on { status } doReturn ChatMessageStatus.SEEN
         }
+        val expectedData = ChatMessageNotificationData.SeenMessage(chat = chat, msg = message)
+
+        whenever(getChatRoomUseCase(chatId)).thenReturn(chat)
+        whenever(getChatMessageUseCase(chatId, msgId)).thenReturn(message)
+
+        assertThat(underTest.invoke(true, chatId, msgId, defaultSound)).isEqualTo(expectedData)
+    }
 
 
     @Test
-    fun `test that when ChatMessageNotificationData is returned with all the properties`() =
+    fun `test that when the message is not deleted nor seen a Message is returned with all the properties`() =
         runTest {
             val shouldBeep = true
             val message = mock<ChatMessage> {
@@ -113,7 +110,7 @@ class GetChatMessageNotificationDataUseCaseTest {
             val senderAvatar = File("filePath")
             val senderAvatarColor = 125
             val notificationBehaviour = mock<NotificationBehaviour>()
-            val chatMessageNotificationData = ChatMessageNotificationData(
+            val expectedData = ChatMessageNotificationData.Message(
                 chat = chat,
                 msg = message,
                 senderName = senderName,
@@ -121,6 +118,7 @@ class GetChatMessageNotificationDataUseCaseTest {
                 senderAvatarColor = senderAvatarColor,
                 notificationBehaviour = notificationBehaviour
             )
+
             whenever(getChatMessageUseCase(chatId, msgId)).thenReturn(message)
             whenever(getChatRoomUseCase(chatId)).thenReturn(chat)
             whenever(getMessageSenderNameUseCase(userHandle, chatId)).thenReturn(senderName)
@@ -129,7 +127,8 @@ class GetChatMessageNotificationDataUseCaseTest {
             whenever(getChatMessageNotificationBehaviourUseCase(shouldBeep, defaultSound))
                 .thenReturn(notificationBehaviour)
 
-            Truth.assertThat(underTest.invoke(shouldBeep, chatId, msgId, defaultSound))
-                .isEqualTo(chatMessageNotificationData)
+            assertThat(underTest.invoke(shouldBeep, chatId, msgId, defaultSound)).isEqualTo(
+                expectedData
+            )
         }
 }

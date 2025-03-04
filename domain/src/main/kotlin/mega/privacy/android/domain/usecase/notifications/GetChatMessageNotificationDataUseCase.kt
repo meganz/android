@@ -40,18 +40,18 @@ class GetChatMessageNotificationDataUseCase @Inject constructor(
         msgId: Long,
         defaultSound: String?,
     ): ChatMessageNotificationData? = withContext(ioDispatcher) {
+        val chatRoom = getChatRoomUseCase(chatId) ?: return@withContext null
         getChatMessageUseCase(chatId, msgId)?.let { message ->
             when {
                 message.status == ChatMessageStatus.SEEN -> {
-                    ChatMessageNotificationData(msg = message, isMessageSeen = true)
+                    ChatMessageNotificationData.SeenMessage(chat = chatRoom, msg = message)
                 }
 
                 message.isDeleted -> {
-                    ChatMessageNotificationData(msg = message)
+                    ChatMessageNotificationData.DeletedMessage(chat = chatRoom, msg = message)
                 }
 
                 else -> {
-                    val chatRoom = getChatRoomUseCase(chatId) ?: return@withContext null
                     val senderName = async {
                         runCatching {
                             getMessageSenderNameUseCase(
@@ -67,7 +67,7 @@ class GetChatMessageNotificationDataUseCase @Inject constructor(
                     val notificationBehaviour =
                         getChatMessageNotificationBehaviourUseCase(shouldBeep, defaultSound)
 
-                    ChatMessageNotificationData(
+                    ChatMessageNotificationData.Message(
                         chat = chatRoom,
                         msg = message,
                         senderName = senderName.await().orEmpty(),

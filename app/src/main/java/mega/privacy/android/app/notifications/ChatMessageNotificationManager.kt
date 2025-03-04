@@ -60,32 +60,39 @@ class ChatMessageNotificationManager @Inject constructor(
         chatMessageNotificationData: ChatMessageNotificationData,
         fileDurationMapper: FileDurationMapper,
     ) = with(chatMessageNotificationData) {
-        val notificationId = MegaApiJava.userHandleToBase64(msg.messageId).hashCode()
+        val messageNotificationId = MegaApiJava.userHandleToBase64(msg.messageId).hashCode()
+        val summaryNotificationId = MegaApiJava.userHandleToBase64(chat.chatId).hashCode()
+        val unreadCount = chat.unreadCount
 
-        when {
-            msg.isDeleted -> {
+        when (this) {
+            is ChatMessageNotificationData.DeletedMessage -> {
                 Timber.d("Message deleted. Removing notification")
-                notificationManagerCompat.cancel(notificationId)
+                notificationManagerCompat.cancel(messageNotificationId)
+                checkIfShouldCancelSummaryNotification(unreadCount, summaryNotificationId)
                 return@with
             }
 
-            chatMessageNotificationData.isMessageSeen -> {
+            is ChatMessageNotificationData.SeenMessage -> {
                 Timber.d("Message seen. Removing notification")
-                notificationManagerCompat.cancel(notificationId)
+                notificationManagerCompat.cancel(messageNotificationId)
+                checkIfShouldCancelSummaryNotification(unreadCount, summaryNotificationId)
                 return@with
             }
 
-            chat?.chatId == MegaApplication.openChatId -> {
-                Timber.d("Chat opened. Removing notification")
-                notificationManagerCompat.cancel(notificationId)
-                return@with
+            is ChatMessageNotificationData.Message -> {
+                if (chat.chatId == MegaApplication.openChatId) {
+                    Timber.d("Chat opened. Removing notification")
+                    notificationManagerCompat.cancel(messageNotificationId)
+                    checkIfShouldCancelSummaryNotification(unreadCount, summaryNotificationId)
+                    return@with
+                }
             }
         }
 
         val intent = Intent(context, ManagerActivity::class.java).apply {
             flags = Intent.FLAG_ACTIVITY_CLEAR_TOP
             action = Constants.ACTION_CHAT_NOTIFICATION_MESSAGE
-            putExtra(Constants.CHAT_ID, chat?.chatId)
+            putExtra(Constants.CHAT_ID, chat.chatId)
         }
 
         val pendingIntent = PendingIntent.getActivity(
@@ -96,7 +103,7 @@ class ChatMessageNotificationManager @Inject constructor(
         )
 
         val notificationColor = ContextCompat.getColor(context, R.color.red_600_red_300)
-        val title = EmojiUtilsShortcodes.emojify(chat?.title)
+        val title = EmojiUtilsShortcodes.emojify(chat.title)
 
         val msgContent = EmojiUtilsShortcodes.emojify(
             getMsgContent(
@@ -107,12 +114,7 @@ class ChatMessageNotificationManager @Inject constructor(
         )
 
         val largeIcon =
-            getAvatar(
-                context,
-                senderAvatar,
-                chat ?: return@with,
-                senderAvatarColor ?: return@with
-            )?.let {
+            getAvatar(context, senderAvatar, chat, senderAvatarColor)?.let {
                 Util.getCircleBitmap(it)
             }
 
@@ -129,26 +131,47 @@ class ChatMessageNotificationManager @Inject constructor(
             it.conversationTitle = title
         }
 
-        val builder =
+        val groupKey = GROUP_KEY + chat.chatId
+
+        val summaryNotification =
             NotificationCompat.Builder(context, Constants.NOTIFICATION_CHANNEL_CHAT_ID)
+                .setSmallIcon(iconPackR.drawable.ic_stat_notify)
+                .setColor(ContextCompat.getColor(context, R.color.red_600_red_300))
+                .setGroup(groupKey)
+                .setGroupSummary(true)
+                .build()
+
+        val messageNotification =
+            NotificationCompat.Builder(context, Constants.NOTIFICATION_CHANNEL_CHAT_ID)
+                .setSmallIcon(iconPackR.drawable.ic_stat_notify)
+                .setAutoCancel(true)
+                .setColor(notificationColor)
+                .setStyle(messagingStyleContent)
+                .setContentIntent(pendingIntent)
+                .setWhen(msg.timestamp * 1000)
+                .setOnlyAlertOnce(true)
+                .setPriority(NotificationManager.IMPORTANCE_HIGH)
                 .apply {
-                    setSmallIcon(iconPackR.drawable.ic_stat_notify)
-                    setAutoCancel(true)
-                    setShowWhen(true)
-                    setGroup(GROUP_KEY)
-                    color = notificationColor
-                    setStyle(messagingStyleContent)
-                    setContentIntent(pendingIntent)
-                    setWhen(msg.timestamp * 1000)
-                    setOnlyAlertOnce(true)
-                    notificationBehaviour?.sound?.let { setSound(it.toUri()) }
+                    notificationBehaviour.sound?.let { setSound(it.toUri()) }
                         ?: setSilent(true)
-                    setChannelId(Constants.NOTIFICATION_CHANNEL_CHAT_SUMMARY_ID_V2)
-                    priority = NotificationManager.IMPORTANCE_HIGH
                     largeIcon?.let { setLargeIcon(it) }
                 }
+                .setGroup(groupKey)
+                .build()
 
-        notificationManagerCompat.notify(notificationId, builder.build())
+        Timber.d("Showing notification for chat groupKey: $groupKey, notificationId: $messageNotificationId")
+        notificationManagerCompat.notify(summaryNotificationId, summaryNotification)
+        notificationManagerCompat.notify(messageNotificationId, messageNotification)
+    }
+
+    private fun checkIfShouldCancelSummaryNotification(
+        unreadCount: Int,
+        summaryNotificationId: Int,
+    ) {
+        if (unreadCount == 0) {
+            Timber.d("No unread messages in chat. Removing summary notification $summaryNotificationId")
+            notificationManagerCompat.cancel(summaryNotificationId)
+        }
     }
 
     private fun getMsgContent(
