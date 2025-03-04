@@ -14,6 +14,7 @@
 .idea/deploymentTargetSelector.xml
 .idea/appInsightsSettings.xml
 .idea/other.xml
+.idea/AndroidProjectSystem.xml
 
 # User-specific stuff:
 .idea/workspace.xml
