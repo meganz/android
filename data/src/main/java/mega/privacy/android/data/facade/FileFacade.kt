@@ -760,12 +760,13 @@ internal class FileFacade @Inject constructor(
             DocumentMetadata(doc.name.orEmpty(), doc.isDirectory)
         }
 
-    override fun getFolderChildUrisSync(uri: Uri): List<Uri> =
-        (getDocumentFileFromUri(uri)
+    override fun getFolderChildUrisSync(uri: Uri): List<Uri> = runCatching {
+        getDocumentFileFromUri(uri)
             ?.takeIf { it.isDirectory }
             ?.listFiles()
-            ?.map { it.uri })
-            .orEmpty()
+            ?.map { it.uri }
+            ?: emptyList()
+    }.getOrDefault(emptyList())
 
     private fun getDocumentFileFromUri(uri: Uri): DocumentFile? =
         documentFileWrapper.fromUri(uri)

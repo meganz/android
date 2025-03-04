@@ -36,6 +36,7 @@ import org.junit.jupiter.params.ParameterizedTest
 import org.junit.jupiter.params.provider.ValueSource
 import org.mockito.Mockito.mockStatic
 import org.mockito.kotlin.doReturn
+import org.mockito.kotlin.doThrow
 import org.mockito.kotlin.mock
 import org.mockito.kotlin.verify
 import org.mockito.kotlin.whenever
@@ -445,6 +446,38 @@ internal class FileFacadeTest {
 
         assertThat(actual).isEqualTo(expected)
     }
+
+    @Test
+    fun `test that getFolderChildUris returns and empty list if getting DocumentFile throws an exception`() =
+        runTest {
+            val uri = mock<Uri> {
+                on { this.scheme } doReturn "content"
+            }
+
+            whenever(documentFileWrapper.fromUri(uri)) doThrow RuntimeException()
+
+            val actual = underTest.getFolderChildUrisSync(uri)
+
+            assertThat(actual).isEmpty()
+        }
+
+    @Test
+    fun `test that getFolderChildUris returns and empty list if listFiles throws an exception`() =
+        runTest {
+            val uri = mock<Uri> {
+                on { this.scheme } doReturn "content"
+            }
+            val doc = mock<DocumentFile> {
+                on { this.isDirectory } doReturn true
+                on { this.listFiles() } doThrow RuntimeException()
+            }
+
+            whenever(documentFileWrapper.fromUri(uri)) doReturn doc
+
+            val actual = underTest.getFolderChildUrisSync(uri)
+
+            assertThat(actual).isEmpty()
+        }
 
     @Test
     fun `test that getFolderChildUris returns the correct child uris`() =
