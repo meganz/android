@@ -92,7 +92,15 @@ class SyncFoldersViewModelTest {
             syncType = SyncType.TYPE_TWOWAY,
             pairName = "folderPair",
             localFolderPath = "DCIM",
-            remoteFolder = RemoteFolder(id = NodeId(233L), name = "photos"),
+            remoteFolder = RemoteFolder(id = NodeId(1234L), name = "photos"),
+            syncStatus = SyncStatus.SYNCING
+        ),
+        FolderPair(
+            id = 4L,
+            syncType = SyncType.TYPE_BACKUP,
+            pairName = "folderPair",
+            localFolderPath = "Backup",
+            remoteFolder = RemoteFolder(id = NodeId(5678L), name = "Backup"),
             syncStatus = SyncStatus.SYNCING
         )
     )
@@ -124,7 +132,7 @@ class SyncFoldersViewModelTest {
 
     private val stalledIssues = listOf(
         StalledIssue(
-            syncId = 1L,
+            syncId = 3L,
             nodeIds = listOf(NodeId(3L)),
             localPaths = listOf("DCIM/photo.jpg"),
             issueType = StallIssueType.DownloadIssue,
@@ -151,7 +159,7 @@ class SyncFoldersViewModelTest {
             flowOf(accountDetail)
         )
 
-        whenever(monitorStalledIssuesUseCase()).thenReturn(flowOf(emptyList()))
+        whenever(monitorStalledIssuesUseCase()).thenReturn(flowOf(stalledIssues))
     }
 
     @AfterEach
@@ -190,7 +198,6 @@ class SyncFoldersViewModelTest {
     @Test
     fun `test that card click change the state to expanded`() = runTest {
         whenever(isStorageOverQuotaUseCase()).thenReturn(false)
-        whenever(monitorStalledIssuesUseCase()).thenReturn(flowOf(emptyList()))
         whenever(syncUiItemMapper(folderPairs)).thenReturn(syncUiItems)
         val expectedState = SyncFoldersUiState(
             syncUiItems.map { if (it == syncUiItems.first()) it.copy(expanded = true) else it },
@@ -356,7 +363,6 @@ class SyncFoldersViewModelTest {
     fun `test that the folder is in error status when the stalled issues are not empty`() =
         runTest {
             whenever(syncUiItemMapper(folderPairs)).thenReturn(syncUiItems)
-            whenever(monitorStalledIssuesUseCase()).thenReturn(flowOf(stalledIssues))
             val expectedState = SyncFoldersUiState(
                 syncUiItems.map { if (it == syncUiItems.first()) it.copy(hasStalledIssues = true) else it },
             )

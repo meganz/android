@@ -130,7 +130,7 @@ internal class SyncFoldersViewModel @Inject constructor(
                     var numOfFolders = 0
                     var totalSizeInBytes = 0L
                     var creationTime = 0L
-                    syncs.map { sync ->
+                    val syncsWithUpdatedDetails = syncs.map { sync ->
 
                         runCatching {
                             getNodeByIdUseCase(sync.megaStorageNodeId)
@@ -176,7 +176,7 @@ internal class SyncFoldersViewModel @Inject constructor(
                         cameraUploadsOrMediaUploadsBackup = getMediaUploadsBackupUseCase(),
                         cuStatusInfo = cuStatusInfo,
                     )?.let { syncsList.add(it) }
-                    syncsList.addAll(syncs)
+                    syncsList.addAll(syncsWithUpdatedDetails)
                     _uiState.update {
                         it.copy(
                             syncUiItems = syncsList,
