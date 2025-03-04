@@ -1,8 +1,10 @@
 package mega.privacy.android.app.service.inappupdate
 
+import android.annotation.SuppressLint
 import android.app.Activity
 import android.content.Context
 import android.view.ViewGroup
+import android.widget.FrameLayout
 import androidx.activity.ComponentActivity
 import androidx.activity.result.ActivityResultLauncher
 import androidx.activity.result.IntentSenderRequest
@@ -27,6 +29,7 @@ import kotlinx.coroutines.launch
 import kotlinx.coroutines.suspendCancellableCoroutine
 import mega.privacy.android.analytics.Analytics
 import mega.privacy.android.app.R
+import mega.privacy.android.app.main.ManagerActivity
 import mega.privacy.android.app.middlelayer.inappupdate.InAppUpdateHandler
 import mega.privacy.android.domain.qualifier.ApplicationScope
 import mega.privacy.android.domain.usecase.inappupdate.ResetInAppUpdateStatisticsUseCase
@@ -169,11 +172,12 @@ class InAppUpdateHandlerImpl @Inject constructor(
             }
         }
 
+    @SuppressLint("RestrictedApi")
     private fun popupSnackBarForCompleteUpdate(duration: Int) {
         val contentView =
             (context as? Activity)?.findViewById<ViewGroup>((android.R.id.content))?.getChildAt(0)
         contentView?.let { view ->
-            Snackbar.make(
+            val snackbar = Snackbar.make(
                 view,
                 context.getString(R.string.general_app_update_message_download_success),
                 duration
@@ -182,8 +186,21 @@ class InAppUpdateHandlerImpl @Inject constructor(
                     Analytics.tracker.trackEvent(InAppUpdateRestartButtonPressedEvent)
                     completeUpdate()
                 }
-                show()
             }
+
+            (context as? ManagerActivity)?.systemBarInsets?.let { insets ->
+                val snackbarLayout = snackbar.view as? Snackbar.SnackbarLayout
+                val params = snackbarLayout?.layoutParams as? FrameLayout.LayoutParams
+                params?.setMargins(
+                    0,
+                    0,
+                    0,
+                    insets.bottom
+                )
+                snackbarLayout?.layoutParams = params
+            }
+            snackbar.show()
+
             Analytics.tracker.trackEvent(InAppUpdateDownloadSuccessMessageDisplayedEvent)
         }
     }
