@@ -125,7 +125,7 @@ interface MegaChatApiGateway {
      */
     fun createChat(
         isGroup: Boolean,
-        peers: MegaChatPeerList,
+        peers: MegaChatPeerList?,
         listener: MegaChatRequestListenerInterface,
     )
 

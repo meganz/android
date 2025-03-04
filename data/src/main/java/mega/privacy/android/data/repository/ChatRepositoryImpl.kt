@@ -793,7 +793,7 @@ internal class ChatRepositoryImpl @Inject constructor(
             chatRoom?.getPeerHandle(peerNo)
         }
 
-    override suspend fun createChat(isGroup: Boolean, userHandles: List<Long>) =
+    override suspend fun createChat(isGroup: Boolean, userHandles: List<Long>?) =
         withContext(ioDispatcher) {
             suspendCancellableCoroutine { continuation ->
                 val listener = continuation.getChatRequestListener("onRequestCreateChatCompleted") {
@@ -801,7 +801,7 @@ internal class ChatRepositoryImpl @Inject constructor(
                 }
                 megaChatApiGateway.createChat(
                     isGroup = isGroup,
-                    peers = megaChatPeerListMapper(userHandles),
+                    peers = if(userHandles == null) null else megaChatPeerListMapper(userHandles),
                     listener = listener
                 )
             }

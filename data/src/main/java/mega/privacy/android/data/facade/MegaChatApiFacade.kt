@@ -209,7 +209,7 @@ internal class MegaChatApiFacade @Inject constructor(
 
     override fun createChat(
         isGroup: Boolean,
-        peers: MegaChatPeerList,
+        peers: MegaChatPeerList?,
         listener: MegaChatRequestListenerInterface,
     ) = chatApi.createChat(isGroup, peers, listener)
 

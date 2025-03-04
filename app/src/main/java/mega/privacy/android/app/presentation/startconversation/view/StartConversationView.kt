@@ -4,10 +4,8 @@ import mega.privacy.android.icon.pack.R as IconR
 import mega.privacy.android.shared.resources.R as sharedR
 import android.content.res.Configuration
 import androidx.compose.foundation.Image
-import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.isSystemInDarkTheme
-import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
@@ -61,7 +59,7 @@ import mega.privacy.android.shared.original.core.ui.preview.CombinedThemePreview
 import mega.privacy.android.shared.original.core.ui.theme.OriginalTheme
 import mega.privacy.android.shared.original.core.ui.theme.grey_alpha_012
 import mega.android.core.ui.theme.values.TextColor
-import mega.privacy.android.app.presentation.contact.view.NoteToSelfView
+import mega.privacy.android.app.presentation.meeting.chat.view.NoteToSelfView
 import mega.privacy.android.shared.original.core.ui.theme.white_alpha_012
 
 /**

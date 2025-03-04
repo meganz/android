@@ -1,4 +1,4 @@
-package mega.privacy.android.app.presentation.contact.view
+package mega.privacy.android.app.presentation.meeting.chat.view
 
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.isSystemInDarkTheme
@@ -22,6 +22,7 @@ import mega.privacy.android.shared.original.core.ui.theme.OriginalTheme
 import mega.privacy.android.shared.resources.R as sharedR
 import androidx.compose.foundation.Image
 import mega.android.core.ui.theme.values.TextColor
+import mega.privacy.android.app.R
 import mega.privacy.android.shared.original.core.ui.theme.extensions.subtitle1medium
 
 /**
@@ -60,7 +61,7 @@ internal fun NoteToSelfView(
                     .size(40.dp)
 
                 Image(
-                    painter = painterResource(id = mega.privacy.android.app.R.drawable.note_avatar),
+                    painter = painterResource(id = R.drawable.note_avatar),
                     contentDescription = stringResource(id = sharedR.string.chat_note_to_self_chat_title) + "icon",
                     modifier = avatarModifier
                         .testTag(NOTE_TO_SELF_ITEM_AVATAR_IMAGE),

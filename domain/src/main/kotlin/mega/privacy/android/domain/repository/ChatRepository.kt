@@ -443,10 +443,10 @@ interface ChatRepository {
      * @param userHandles List of contact handles.
      * @return The chat conversation handle.
      */
-    suspend fun createChat(isGroup: Boolean, userHandles: List<Long>): Long
+    suspend fun createChat(isGroup: Boolean, userHandles: List<Long>?): Long
 
     /**
-     * Creates a groupal chat for one or more participants
+     * Creates a group chat for one or more participants
      *
      * @param title Null-terminated character string with the chat title. If the title
      * is longer than 30 characters, it will be truncated to that maximum length.
