@@ -20,15 +20,16 @@ import kotlinx.coroutines.flow.filter
 import kotlinx.coroutines.flow.filterNot
 import kotlinx.coroutines.flow.lastOrNull
 import kotlinx.coroutines.flow.onCompletion
-import kotlinx.coroutines.flow.transform
 import kotlinx.coroutines.flow.transformWhile
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 import mega.privacy.android.data.extensions.collectChunked
+import mega.privacy.android.data.extensions.onEachSampled
 import mega.privacy.android.data.extensions.onFirst
 import mega.privacy.android.data.extensions.skipUnstable
 import mega.privacy.android.data.mapper.transfer.OverQuotaNotificationBuilder
 import mega.privacy.android.domain.entity.transfer.ActiveTransferTotals
+import mega.privacy.android.domain.entity.transfer.MonitorOngoingActiveTransfersResult
 import mega.privacy.android.domain.entity.transfer.TransferEvent
 import mega.privacy.android.domain.entity.transfer.TransferProgressResult
 import mega.privacy.android.domain.entity.transfer.TransferType
@@ -42,9 +43,6 @@ import mega.privacy.android.domain.usecase.transfers.active.GetActiveTransferTot
 import mega.privacy.android.domain.usecase.transfers.active.HandleTransferEventUseCase
 import mega.privacy.android.domain.usecase.transfers.paused.AreTransfersPausedUseCase
 import timber.log.Timber
-import java.time.Instant
-import java.time.Instant.MIN
-import java.time.Instant.now
 import kotlin.time.Duration.Companion.milliseconds
 
 /**
@@ -136,7 +134,12 @@ abstract class AbstractTransfersWorker(
             return@transformWhile it.pendingWork
         }
         .onEachSampled(
-            notificationSamplePeriod ?: ON_TRANSFER_UPDATE_REFRESH_MILLIS
+            (notificationSamplePeriod ?: ON_TRANSFER_UPDATE_REFRESH_MILLIS).milliseconds,
+            shouldEmitImmediately = { previous, new ->
+                hasAnyPausedChange(previous, new)
+                        || new.activeTransferTotals.hasCompleted()
+                        || new.activeTransferTotals.groups.any { it.finished() }
+            }
         ) { (transferTotals, paused, transferOverQuota, storageOverQuota) ->
             if (storageOverQuota || transferOverQuota) {
                 showOverQuotaNotification(storageOverQuota = storageOverQuota)
@@ -224,23 +227,18 @@ abstract class AbstractTransfersWorker(
         Timber.d("${this@AbstractTransfersWorker::class.java.simpleName} Finished")
     }
 
-    /**
-     * Similar to onEach but it will run the action only if periodMillis time has passed since last time action was run
-     * As opposite of the behaviour of Flow.sample, if an action is omitted because it won't be run later, it only runs when a new value is emitted
-     * Action will always be run with first emitted value, action can be skipped with last emitted value.
-     */
-    private fun <T> Flow<T>.onEachSampled(
-        periodMillis: Long,
-        action: suspend (T) -> Unit,
-    ): Flow<T> {
-        var initial: Instant = MIN
-        return this.transform {
-            val now = now()
-            if (periodMillis == 0L || now.isAfter(initial.plusMillis(periodMillis))) {
-                initial = now
-                action(it)
-            }
-            return@transform emit(it)
+    private fun hasAnyPausedChange(
+        previous: MonitorOngoingActiveTransfersResult?,
+        new: MonitorOngoingActiveTransfersResult,
+    ): Boolean {
+        if (previous == null || previous.activeTransferTotals.groups.size != new.activeTransferTotals.groups.size) return true
+        if (new.paused != previous.paused) return true
+        if (new.activeTransferTotals.allPaused() != new.activeTransferTotals.allPaused()) return true
+
+        val previousMap = previous.activeTransferTotals.groups.associateBy { it.groupId }
+        return new.activeTransferTotals.groups.any { new ->
+            val old = previousMap[new.groupId]
+            old == null || new.allPaused() != old.allPaused()
         }
     }
 

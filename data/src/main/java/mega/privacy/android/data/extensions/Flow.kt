@@ -7,16 +7,17 @@ import kotlinx.coroutines.coroutineScope
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.FlowCollector
-import kotlinx.coroutines.flow.distinctUntilChanged
 import kotlinx.coroutines.flow.mapLatest
 import kotlinx.coroutines.flow.onCompletion
 import kotlinx.coroutines.flow.onEach
+import kotlinx.coroutines.flow.transform
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.sync.Mutex
 import kotlinx.coroutines.sync.withLock
 import kotlinx.coroutines.withContext
 import kotlin.coroutines.cancellation.CancellationException
 import kotlin.time.Duration
+import kotlin.time.Duration.Companion.milliseconds
 
 private class TimeChunkedFlow<T>(
     private val upstream: Flow<T>,
@@ -177,5 +178,43 @@ fun <T> Flow<T>.skipUnstable(timeout: Duration, validator: (T) -> Boolean): Flow
             delay(timeout)
         }
         value
+    }
+}
+
+/**
+ * Similar to `onEach`, but the [action] will only be executed if either:
+ * - The specified [period] has passed since the last execution.
+ * - The [shouldEmitImmediately] function returns `true` for the new value.
+ *
+ * Unlike `Flow.sample`, if a value is skipped, it will not be executed later. The [action] is only triggered
+ * at the moment a new value is emitted and meets the criteria.
+ *
+ * The [action] will always run for the first emitted value but may be skipped for the last one.
+ *
+ * @param period The minimum duration between executions of [action], unless [shouldEmitImmediately] forces it.
+ * @param shouldEmitImmediately A function that determines whether a new value should trigger the [action] immediately, regardless of [period].
+ * @param getCurrentTimeMillis optional parameter to inject current time in millis for testing purposes
+ * @param action The action to perform on each sampled emission.
+ */
+fun <T> Flow<T>.onEachSampled(
+    period: Duration,
+    shouldEmitImmediately: ((previous: T?, new: T) -> Boolean)? = null,
+    getCurrentTimeMillis: () -> Long = { System.currentTimeMillis() },
+    action: suspend (T) -> Unit,
+): Flow<T> {
+    var lastEmission: Long =
+        Long.MIN_VALUE + 1 // +1 to avoid overflow on tests where current time can be 0
+    var previous: T? = null
+    return this.transform {
+        val now = getCurrentTimeMillis()
+        if (period == Duration.ZERO
+            || shouldEmitImmediately?.invoke(previous, it) == true
+            || (now - lastEmission).milliseconds >= period
+        ) {
+            lastEmission = now
+            action(it)
+        }
+        previous = it
+        return@transform emit(it)
     }
 }
