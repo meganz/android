@@ -3,11 +3,14 @@ package mega.privacy.android.app.presentation.videoplayer
 import android.content.Context
 import android.content.Intent
 import android.net.Uri
+import androidx.lifecycle.SavedStateHandle
+import androidx.media3.common.MediaItem
 import app.cash.turbine.test
 import com.google.common.truth.Truth.assertThat
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.flow.MutableSharedFlow
+import kotlinx.coroutines.flow.drop
 import kotlinx.coroutines.flow.flowOf
 import kotlinx.coroutines.test.StandardTestDispatcher
 import kotlinx.coroutines.test.UnconfinedTestDispatcher
@@ -16,9 +19,12 @@ import kotlinx.coroutines.test.runTest
 import mega.privacy.android.app.TimberJUnit5Extension
 import mega.privacy.android.app.mediaplayer.gateway.MediaPlayerGateway
 import mega.privacy.android.app.mediaplayer.queue.model.MediaQueueItemType
+import mega.privacy.android.app.mediaplayer.service.Metadata
 import mega.privacy.android.app.presentation.myaccount.InstantTaskExecutorExtension
 import mega.privacy.android.app.presentation.videoplayer.mapper.VideoPlayerItemMapper
+import mega.privacy.android.app.presentation.videoplayer.model.MediaPlaybackState
 import mega.privacy.android.app.presentation.videoplayer.model.VideoPlayerItem
+import mega.privacy.android.app.presentation.videoplayer.model.VideoSize
 import mega.privacy.android.app.utils.Constants.BACKUPS_ADAPTER
 import mega.privacy.android.app.utils.Constants.CONTACT_FILE_ADAPTER
 import mega.privacy.android.app.utils.Constants.FAVOURITES_ADAPTER
@@ -39,6 +45,8 @@ import mega.privacy.android.app.utils.Constants.INTENT_EXTRA_KEY_OFFLINE_PATH_DI
 import mega.privacy.android.app.utils.Constants.INTENT_EXTRA_KEY_PARENT_ID
 import mega.privacy.android.app.utils.Constants.INTENT_EXTRA_KEY_PARENT_NODE_HANDLE
 import mega.privacy.android.app.utils.Constants.INTENT_EXTRA_KEY_REBUILD_PLAYLIST
+import mega.privacy.android.app.utils.Constants.INTENT_EXTRA_KEY_VIDEO_COLLECTION_ID
+import mega.privacy.android.app.utils.Constants.INTENT_EXTRA_KEY_VIDEO_COLLECTION_TITLE
 import mega.privacy.android.app.utils.Constants.INVALID_VALUE
 import mega.privacy.android.app.utils.Constants.LINKS_ADAPTER
 import mega.privacy.android.app.utils.Constants.OFFLINE_ADAPTER
@@ -52,6 +60,7 @@ import mega.privacy.android.app.utils.Constants.ZIP_ADAPTER
 import mega.privacy.android.app.utils.FileUtil
 import mega.privacy.android.core.test.extension.CoroutineMainDispatcherExtension
 import mega.privacy.android.domain.entity.VideoFileTypeInfo
+import mega.privacy.android.domain.entity.mediaplayer.RepeatToggleMode
 import mega.privacy.android.domain.entity.node.FileNode
 import mega.privacy.android.domain.entity.node.Node
 import mega.privacy.android.domain.entity.node.NodeId
@@ -87,11 +96,14 @@ import mega.privacy.android.domain.usecase.mediaplayer.videoplayer.GetVideoNodes
 import mega.privacy.android.domain.usecase.mediaplayer.videoplayer.GetVideoNodesUseCase
 import mega.privacy.android.domain.usecase.mediaplayer.videoplayer.GetVideosByParentHandleFromMegaApiFolderUseCase
 import mega.privacy.android.domain.usecase.mediaplayer.videoplayer.GetVideosBySearchTypeUseCase
+import mega.privacy.android.domain.usecase.mediaplayer.videoplayer.MonitorVideoRepeatModeUseCase
+import mega.privacy.android.domain.usecase.mediaplayer.videoplayer.SetVideoRepeatModeUseCase
 import mega.privacy.android.domain.usecase.node.backup.GetBackupsNodeUseCase
 import mega.privacy.android.domain.usecase.offline.GetOfflineNodeInformationByIdUseCase
 import mega.privacy.android.domain.usecase.setting.MonitorSubFolderMediaDiscoverySettingsUseCase
 import mega.privacy.android.domain.usecase.thumbnailpreview.GetThumbnailUseCase
 import mega.privacy.android.domain.usecase.transfers.MonitorTransferEventsUseCase
+import mega.privacy.android.domain.usecase.videosection.SaveVideoRecentlyWatchedUseCase
 import nz.mega.sdk.MegaApiJava.INVALID_HANDLE
 import org.junit.jupiter.api.AfterEach
 import org.junit.jupiter.api.BeforeEach
@@ -102,13 +114,17 @@ import org.junit.jupiter.params.ParameterizedTest
 import org.junit.jupiter.params.provider.MethodSource
 import org.junit.jupiter.params.provider.ValueSource
 import org.mockito.Mockito
+import org.mockito.Mockito.mockStatic
 import org.mockito.kotlin.any
 import org.mockito.kotlin.mock
 import org.mockito.kotlin.reset
+import org.mockito.kotlin.verify
 import org.mockito.kotlin.whenever
 import java.io.File
+import java.time.Instant
 import kotlin.time.Duration
 import kotlin.time.Duration.Companion.seconds
+import kotlin.use
 
 @ExtendWith(
     value = [
@@ -160,6 +176,10 @@ class VideoPlayerViewModelTest {
     private val fakeMonitorTransferEventsFlow =
         MutableSharedFlow<TransferEvent.TransferTemporaryErrorEvent>()
     private val getFileByPathUseCase = mock<GetFileByPathUseCase>()
+    private val monitorVideoRepeatModeUseCase = mock<MonitorVideoRepeatModeUseCase>()
+    private val saveVideoRecentlyWatchedUseCase = mock<SaveVideoRecentlyWatchedUseCase>()
+    private val setVideoRepeatModeUseCase = mock<SetVideoRepeatModeUseCase>()
+    private val savedStateHandle = SavedStateHandle(mapOf())
 
     private val testHandle: Long = 123456
     private val testFileName = "test.mp4"
@@ -167,6 +187,8 @@ class VideoPlayerViewModelTest {
     private val testDuration = 200.seconds
     private val testAbsolutePath = "https://www.example.com"
     private val testTitle = "video queue title"
+    private val expectedCollectionId = 123456L
+    private val expectedCollectionTitle = "collection title"
 
     private fun initViewModel() {
         underTest = VideoPlayerViewModel(
@@ -206,7 +228,13 @@ class VideoPlayerViewModelTest {
             getFingerprintUseCase = getFingerprintUseCase,
             monitorTransferEventsUseCase = monitorTransferEventsUseCase,
             getFileByPathUseCase = getFileByPathUseCase,
+            monitorVideoRepeatModeUseCase = monitorVideoRepeatModeUseCase,
+            saveVideoRecentlyWatchedUseCase = saveVideoRecentlyWatchedUseCase,
+            setVideoRepeatModeUseCase = setVideoRepeatModeUseCase,
+            savedStateHandle = savedStateHandle
         )
+        savedStateHandle[INTENT_EXTRA_KEY_VIDEO_COLLECTION_ID] = expectedCollectionId
+        savedStateHandle[INTENT_EXTRA_KEY_VIDEO_COLLECTION_TITLE] = expectedCollectionTitle
     }
 
     @BeforeEach
@@ -254,6 +282,9 @@ class VideoPlayerViewModelTest {
             getFingerprintUseCase,
             monitorTransferEventsUseCase,
             getFileByPathUseCase,
+            monitorVideoRepeatModeUseCase,
+            saveVideoRecentlyWatchedUseCase,
+            setVideoRepeatModeUseCase
         )
     }
 
@@ -445,7 +476,7 @@ class VideoPlayerViewModelTest {
                     assertThat(sources.newIndexForCurrentItem).isEqualTo(INVALID_VALUE)
                     assertThat(sources.nameToDisplay).isEqualTo(testFileName)
                 }
-                assertThat(actual.metadata?.nodeName).isEqualTo(testFileName)
+                assertThat(actual.metadata.nodeName).isEqualTo(testFileName)
             }
         }
 
@@ -989,4 +1020,158 @@ class VideoPlayerViewModelTest {
         ).thenReturn(parentHandle)
         whenever(initParentNode()).thenReturn(testParentNode)
     }
+
+    @Test
+    fun `test that metadata is updated correctly`() = runTest {
+        initViewModel()
+        val testTitle = "title"
+        val testArist = "artist"
+        val testAlbum = "album"
+        val testNodeName = "nodeName"
+        val testMetadata = Metadata(
+            title = testTitle,
+            artist = testArist,
+            album = testAlbum,
+            nodeName = testNodeName
+        )
+        underTest.updateMetadata(testMetadata)
+        testScheduler.advanceUntilIdle()
+        underTest.uiState.test {
+            val actual = awaitItem()
+            assertThat(actual.metadata.title).isEqualTo(testTitle)
+            assertThat(actual.metadata.artist).isEqualTo(testArist)
+            assertThat(actual.metadata.album).isEqualTo(testAlbum)
+            assertThat(actual.metadata.nodeName).isEqualTo(testNodeName)
+        }
+    }
+
+    @Test
+    fun `test that currentPlayingVideoSize is updated correctly`() = runTest {
+        initViewModel()
+        val testWidth = 1920
+        val testHeight = 1080
+        val testVideoSize = VideoSize(width = testWidth, height = testHeight)
+        underTest.updateCurrentPlayingVideoSize(testVideoSize)
+        testScheduler.advanceUntilIdle()
+        underTest.uiState.test {
+            val actual = awaitItem()
+            assertThat(actual.currentPlayingVideoSize?.width).isEqualTo(testWidth)
+            assertThat(actual.currentPlayingVideoSize?.height).isEqualTo(testHeight)
+        }
+    }
+
+    @Test
+    fun `test that state is updated correctly after updateCurrentPlayingHandle is invoked`() =
+        runTest {
+            val testHandle = 2L
+            val handleNotInItems = 4L
+            val testItems = (1..3).map {
+                initVideoPlayerItem(it.toLong(), it.toString(), 200.seconds)
+            }
+            initViewModel()
+            underTest.updateCurrentPlayingHandle(testHandle, testItems)
+            testScheduler.advanceUntilIdle()
+            underTest.uiState.test {
+                awaitItem().let {
+                    assertThat(it.currentPlayingIndex).isEqualTo(
+                        testItems.indexOfFirst { it.nodeHandle == testHandle }
+                    )
+                    assertThat(it.currentPlayingHandle).isEqualTo(testHandle)
+                }
+                underTest.updateCurrentPlayingHandle(handleNotInItems, testItems)
+                awaitItem().let {
+                    assertThat(it.currentPlayingIndex).isEqualTo(0)
+                    assertThat(it.currentPlayingHandle).isEqualTo(handleNotInItems)
+                }
+            }
+        }
+
+    @Test
+    fun `test that correct functions are invoked after setRepeatToggleModeForPlayer is invoked`() =
+        runTest {
+            val testMode = RepeatToggleMode.REPEAT_ONE
+            initViewModel()
+            underTest.setRepeatToggleModeForPlayer(testMode)
+            verify(setVideoRepeatModeUseCase).invoke(testMode.ordinal)
+            verify(mediaPlayerGateway).setRepeatToggleMode(testMode)
+        }
+
+    @Test
+    fun `test that updateRepeatToggleMode is updated correctly`() =
+        runTest {
+            val testRepeatOneMode = RepeatToggleMode.REPEAT_ONE
+            val testRepeatNoneMode = RepeatToggleMode.REPEAT_NONE
+            initViewModel()
+            underTest.updateRepeatToggleMode(testRepeatOneMode)
+            testScheduler.advanceUntilIdle()
+            underTest.uiState.test {
+                assertThat(awaitItem().repeatToggleMode).isEqualTo(testRepeatOneMode)
+                underTest.updateRepeatToggleMode(testRepeatNoneMode)
+                assertThat(awaitItem().repeatToggleMode).isEqualTo(testRepeatNoneMode)
+            }
+        }
+
+    @Test
+    fun `test that saveVideoRecentlyWatchedUseCase is invoked as expected when saveVideoWatchedTime is called`() =
+        runTest {
+            val expectedId = 1L
+            val instant = Instant.ofEpochMilli(2000L)
+            mockStatic(Instant::class.java).use {
+                it.`when`<Instant> { Instant.now() }.thenReturn(instant)
+                val testMediaItem = MediaItem.Builder()
+                    .setMediaId(expectedId.toString())
+                    .build()
+                whenever(mediaPlayerGateway.getCurrentMediaItem()).thenReturn(testMediaItem)
+                underTest.saveVideoWatchedTime()
+
+                verify(saveVideoRecentlyWatchedUseCase).invoke(
+                    expectedId,
+                    2,
+                    expectedCollectionId,
+                    expectedCollectionTitle
+                )
+            }
+        }
+
+    @Test
+    fun `test that mediaPlaybackState is updated correctly`() = runTest {
+        val testPlayingState = MediaPlaybackState.Playing
+        val testPausedState = MediaPlaybackState.Paused
+        initViewModel()
+        underTest.updatePlaybackState(testPlayingState)
+        testScheduler.advanceUntilIdle()
+        underTest.uiState.test {
+            assertThat(awaitItem().mediaPlaybackState).isEqualTo(testPlayingState)
+            underTest.updatePlaybackState(testPausedState)
+            assertThat(awaitItem().mediaPlaybackState).isEqualTo(testPausedState)
+        }
+    }
+
+    @Test
+    fun `test that snackBarMessage is updated correctly`() = runTest {
+        val testMessage = "test message"
+        initViewModel()
+        underTest.updateSnackBarMessage(testMessage)
+        testScheduler.advanceUntilIdle()
+        underTest.uiState.test {
+            assertThat(awaitItem().snackBarMessage).isEqualTo(testMessage)
+            underTest.updateSnackBarMessage(null)
+            assertThat(awaitItem().snackBarMessage).isNull()
+        }
+    }
+
+    @Test
+    fun `test that isRetry is updated correctly after onPlayerError is invoked more than 6 times`() =
+        runTest {
+            initViewModel()
+            underTest.uiState.drop(1).test {
+                underTest.onPlayerError()
+                assertThat(awaitItem().isRetry).isTrue()
+                repeat(6) {
+                    underTest.onPlayerError()
+                }
+                assertThat(awaitItem().isRetry).isFalse()
+                cancelAndIgnoreRemainingEvents()
+            }
+        }
 }

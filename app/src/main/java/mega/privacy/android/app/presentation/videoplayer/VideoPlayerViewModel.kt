@@ -4,6 +4,7 @@ import android.content.Context
 import android.content.Intent
 import android.net.Uri
 import android.os.Build
+import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import androidx.media3.common.MediaItem
@@ -12,8 +13,10 @@ import dagger.hilt.android.qualifiers.ApplicationContext
 import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.flow.MutableStateFlow
-import kotlinx.coroutines.flow.asStateFlow
+import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.catch
+import kotlinx.coroutines.flow.collectLatest
+import kotlinx.coroutines.flow.conflate
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
@@ -25,8 +28,10 @@ import mega.privacy.android.app.mediaplayer.model.MediaPlaySources
 import mega.privacy.android.app.mediaplayer.queue.model.MediaQueueItemType
 import mega.privacy.android.app.mediaplayer.service.Metadata
 import mega.privacy.android.app.presentation.videoplayer.mapper.VideoPlayerItemMapper
+import mega.privacy.android.app.presentation.videoplayer.model.MediaPlaybackState
 import mega.privacy.android.app.presentation.videoplayer.model.VideoPlayerItem
 import mega.privacy.android.app.presentation.videoplayer.model.VideoPlayerUiState
+import mega.privacy.android.app.presentation.videoplayer.model.VideoSize
 import mega.privacy.android.app.utils.Constants
 import mega.privacy.android.app.utils.Constants.BACKUPS_ADAPTER
 import mega.privacy.android.app.utils.Constants.CONTACT_FILE_ADAPTER
@@ -48,6 +53,8 @@ import mega.privacy.android.app.utils.Constants.INTENT_EXTRA_KEY_ORDER_GET_CHILD
 import mega.privacy.android.app.utils.Constants.INTENT_EXTRA_KEY_PARENT_ID
 import mega.privacy.android.app.utils.Constants.INTENT_EXTRA_KEY_PARENT_NODE_HANDLE
 import mega.privacy.android.app.utils.Constants.INTENT_EXTRA_KEY_REBUILD_PLAYLIST
+import mega.privacy.android.app.utils.Constants.INTENT_EXTRA_KEY_VIDEO_COLLECTION_ID
+import mega.privacy.android.app.utils.Constants.INTENT_EXTRA_KEY_VIDEO_COLLECTION_TITLE
 import mega.privacy.android.app.utils.Constants.INVALID_SIZE
 import mega.privacy.android.app.utils.Constants.INVALID_VALUE
 import mega.privacy.android.app.utils.Constants.LINKS_ADAPTER
@@ -64,6 +71,7 @@ import mega.privacy.android.app.utils.FileUtil
 import mega.privacy.android.app.utils.ThumbnailUtils
 import mega.privacy.android.domain.entity.SortOrder
 import mega.privacy.android.domain.entity.VideoFileTypeInfo
+import mega.privacy.android.domain.entity.mediaplayer.RepeatToggleMode
 import mega.privacy.android.domain.entity.node.TypedFileNode
 import mega.privacy.android.domain.entity.node.TypedVideoNode
 import mega.privacy.android.domain.entity.transfer.TransferEvent
@@ -97,17 +105,20 @@ import mega.privacy.android.domain.usecase.mediaplayer.videoplayer.GetVideoNodes
 import mega.privacy.android.domain.usecase.mediaplayer.videoplayer.GetVideoNodesUseCase
 import mega.privacy.android.domain.usecase.mediaplayer.videoplayer.GetVideosByParentHandleFromMegaApiFolderUseCase
 import mega.privacy.android.domain.usecase.mediaplayer.videoplayer.GetVideosBySearchTypeUseCase
+import mega.privacy.android.domain.usecase.mediaplayer.videoplayer.MonitorVideoRepeatModeUseCase
+import mega.privacy.android.domain.usecase.mediaplayer.videoplayer.SetVideoRepeatModeUseCase
 import mega.privacy.android.domain.usecase.node.backup.GetBackupsNodeUseCase
 import mega.privacy.android.domain.usecase.offline.GetOfflineNodeInformationByIdUseCase
 import mega.privacy.android.domain.usecase.setting.MonitorSubFolderMediaDiscoverySettingsUseCase
 import mega.privacy.android.domain.usecase.thumbnailpreview.GetThumbnailUseCase
 import mega.privacy.android.domain.usecase.transfers.MonitorTransferEventsUseCase
+import mega.privacy.android.domain.usecase.videosection.SaveVideoRecentlyWatchedUseCase
 import nz.mega.sdk.MegaApiJava.INVALID_HANDLE
 import timber.log.Timber
 import java.io.File
+import java.time.Instant
 import javax.inject.Inject
 import kotlin.time.Duration.Companion.seconds
-
 /**
  * ViewModel for video player.
  */
@@ -149,15 +160,35 @@ class VideoPlayerViewModel @Inject constructor(
     private val getFingerprintUseCase: GetFingerprintUseCase,
     private val monitorTransferEventsUseCase: MonitorTransferEventsUseCase,
     private val getFileByPathUseCase: GetFileByPathUseCase,
+    private val monitorVideoRepeatModeUseCase: MonitorVideoRepeatModeUseCase,
+    private val saveVideoRecentlyWatchedUseCase: SaveVideoRecentlyWatchedUseCase,
+    private val setVideoRepeatModeUseCase: SetVideoRepeatModeUseCase,
+    savedStateHandle: SavedStateHandle,
 ) : ViewModel() {
-    private val _uiState = MutableStateFlow(VideoPlayerUiState())
-    internal val uiState = _uiState.asStateFlow()
+    val uiState: StateFlow<VideoPlayerUiState>
+        field: MutableStateFlow<VideoPlayerUiState> = MutableStateFlow(VideoPlayerUiState())
 
     private var needStopStreamingServer = false
     private var playerRetry = 0
 
+    private val collectionTitle: String? by lazy {
+        savedStateHandle[INTENT_EXTRA_KEY_VIDEO_COLLECTION_TITLE]
+    }
+
+    private val collectionId: Long? by lazy {
+        savedStateHandle[INTENT_EXTRA_KEY_VIDEO_COLLECTION_ID]
+    }
+
     init {
         setupTransferListener()
+        viewModelScope.launch {
+            monitorVideoRepeatModeUseCase().conflate()
+                .catch {
+                    Timber.e(it)
+                }.collectLatest { mode ->
+                    uiState.update { it.copy(repeatToggleMode = mode) }
+                }
+        }
     }
 
     /**
@@ -172,13 +203,13 @@ class VideoPlayerViewModel @Inject constructor(
                     if (event is TransferEvent.TransferTemporaryErrorEvent) {
                         val error = event.error
                         val transfer = event.transfer
-                        if (transfer.nodeHandle == _uiState.value.currentPlayingHandle
+                        if (transfer.nodeHandle == uiState.value.currentPlayingHandle
                             && ((error is QuotaExceededMegaException
                                     && !transfer.isForeignOverQuota
                                     && error.value != 0L)
                                     || error is BlockedMegaException)
                         ) {
-                            _uiState.update { it.copy(error = error) }
+                            uiState.update { it.copy(error = error) }
                         }
                     }
                 }
@@ -262,7 +293,7 @@ class VideoPlayerViewModel @Inject constructor(
 
     private fun logInvalidParam(message: String) {
         Timber.d("Build playback sources failed: $message")
-        _uiState.update { it.copy(isRetry = false) }
+        uiState.update { it.copy(isRetry = false) }
     }
 
     private suspend fun setupStreamingServer(launchSource: Int): Boolean {
@@ -289,7 +320,7 @@ class VideoPlayerViewModel @Inject constructor(
             newIndexForCurrentItem = INVALID_VALUE,
             nameToDisplay = fileName
         ).also { sources ->
-            _uiState.update { it.copy(mediaPlaySources = sources) }
+            uiState.update { it.copy(mediaPlaySources = sources) }
             buildPlaybackSourcesForPlayer(sources)
         }
     }
@@ -299,11 +330,11 @@ class VideoPlayerViewModel @Inject constructor(
             Timber.d("Playback sources: ${mediaPlaySources.mediaItems.size} items")
             with(mediaPlayerGateway) {
                 buildPlaySources(mediaPlaySources)
-                setPlayWhenReady(_uiState.value.isPaused && mediaPlaySources.isRestartPlaying)
+                setPlayWhenReady(true && mediaPlaySources.isRestartPlaying)
                 playerPrepare()
             }
             mediaPlaySources.nameToDisplay?.let { name ->
-                _uiState.update { it.copy(metadata = Metadata(null, null, null, nodeName = name)) }
+                uiState.update { it.copy(metadata = Metadata(null, null, null, nodeName = name)) }
             }
         }
 
@@ -319,7 +350,7 @@ class VideoPlayerViewModel @Inject constructor(
             duration = node?.duration ?: 0.seconds,
         )
 
-        _uiState.update { it.copy(items = listOf(playingItem)) }
+        uiState.update { it.copy(items = listOf(playingItem)) }
     }
 
     private suspend fun getThumbnailForNode(
@@ -437,7 +468,7 @@ class VideoPlayerViewModel @Inject constructor(
             nameToDisplay = null
         )
 
-        _uiState.update {
+        uiState.update {
             it.copy(
                 items = videoPlayerItems,
                 mediaPlaySources = mediaPlaySources,
@@ -727,4 +758,59 @@ class VideoPlayerViewModel @Inject constructor(
             }
         }
     }
+
+    internal fun updateMetadata(metadata: Metadata) =
+        uiState.update { it.copy(metadata = metadata) }
+
+    internal fun updateCurrentPlayingVideoSize(videoSize: VideoSize?) =
+        uiState.update { it.copy(currentPlayingVideoSize = videoSize) }
+
+    internal fun updateCurrentPlayingHandle(
+        handle: Long,
+        items: List<VideoPlayerItem> = uiState.value.items
+    ) {
+        val playingIndex = items.indexOfFirst { it.nodeHandle == handle }.takeIf { it != -1 } ?: 0
+        uiState.update {
+            it.copy(
+                currentPlayingHandle = handle,
+                currentPlayingIndex = playingIndex
+            )
+        }
+    }
+
+    internal fun setRepeatToggleModeForPlayer(mode: RepeatToggleMode) = viewModelScope.launch {
+        mediaPlayerGateway.setRepeatToggleMode(mode)
+        setVideoRepeatModeUseCase(mode.ordinal)
+    }
+
+    internal fun updateRepeatToggleMode(mode: RepeatToggleMode) =
+        uiState.update { it.copy(repeatToggleMode = mode) }
+
+    internal fun saveVideoWatchedTime() = viewModelScope.launch {
+        mediaPlayerGateway.getCurrentMediaItem()?.mediaId?.toLong()?.let {
+            saveVideoRecentlyWatchedUseCase(
+                it,
+                Instant.now().toEpochMilli() / 1000,
+                collectionId ?: 0L,
+                collectionTitle
+            )
+        }
+    }
+
+    internal fun updatePlaybackState(state: MediaPlaybackState) =
+        uiState.update { it.copy(mediaPlaybackState = state) }
+
+    internal fun onPlayerError() {
+        playerRetry++
+        Timber.d("playerRetry: $playerRetry")
+        uiState.update { it.copy(isRetry = playerRetry <= MAX_RETRY) }
+    }
+
+    internal fun updateSnackBarMessage(message: String?) =
+        uiState.update { it.copy(snackBarMessage = message) }
+
+    companion object {
+        private const val MAX_RETRY = 6
+    }
 }
+

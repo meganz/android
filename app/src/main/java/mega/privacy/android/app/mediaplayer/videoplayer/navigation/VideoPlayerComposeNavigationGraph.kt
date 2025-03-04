@@ -8,6 +8,7 @@ import androidx.navigation.NavOptions
 import androidx.navigation.navigation
 import com.google.accompanist.navigation.material.BottomSheetNavigator
 import com.google.accompanist.navigation.material.ExperimentalMaterialNavigationApi
+import mega.privacy.android.app.presentation.videoplayer.VideoPlayerViewModel
 
 internal const val VideoPlayerNavigationRoute = "videoPlayer"
 
@@ -15,6 +16,7 @@ internal const val VideoPlayerNavigationRoute = "videoPlayer"
 internal fun NavGraphBuilder.videoPlayerComposeNavigationGraph(
     bottomSheetNavigator: BottomSheetNavigator,
     scaffoldState: ScaffoldState,
+    viewModel: VideoPlayerViewModel,
     player: ExoPlayer?,
 ) {
     navigation(
@@ -24,6 +26,7 @@ internal fun NavGraphBuilder.videoPlayerComposeNavigationGraph(
         videoPlayerScreen(
             bottomSheetNavigator = bottomSheetNavigator,
             scaffoldState = scaffoldState,
+            viewModel = viewModel,
             player = player,
         )
     }
