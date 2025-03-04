@@ -33,6 +33,7 @@ import mega.privacy.android.app.domain.usecase.UpdateApp
 import mega.privacy.android.app.domain.usecase.VibrateDevice
 import mega.privacy.android.app.featuretoggle.QAFeatures
 import mega.privacy.android.app.navigation.QaFeatureSettings
+import mega.privacy.android.app.navigation.qaSettingsEntryPoint
 import mega.privacy.android.app.presentation.featureflag.ShakeDetectorViewModel
 import mega.privacy.android.app.presentation.featureflag.model.FeatureFlagMapper
 import mega.privacy.android.app.presentation.featureflag.model.toFeatureFlag
@@ -42,6 +43,7 @@ import mega.privacy.android.domain.entity.Feature
 import mega.privacy.android.domain.featuretoggle.FeatureFlagValueProvider
 import mega.privacy.android.domain.qualifier.ApplicationScope
 import mega.privacy.android.domain.qualifier.IoDispatcher
+import mega.privacy.android.navigation.settings.FeatureSettingEntryPoint
 import mega.privacy.android.navigation.settings.FeatureSettings
 
 /**
@@ -223,4 +225,8 @@ class QAModule {
     @IntoSet
     fun provideQaSettings(): @JvmSuppressWildcards FeatureSettings =
         QaFeatureSettings()
+
+    @Provides
+    @IntoSet
+    fun provideQaEntryPoint(): @JvmSuppressWildcards FeatureSettingEntryPoint = qaSettingsEntryPoint
 }

@@ -6,7 +6,7 @@ import androidx.annotation.StringRes
 import kotlinx.parcelize.Parcelize
 
 
-interface SettingEntryPoint : Parcelable  {
+interface SettingEntryPoint : Parcelable {
     val key: String
     val title: Int
     val icon: Int

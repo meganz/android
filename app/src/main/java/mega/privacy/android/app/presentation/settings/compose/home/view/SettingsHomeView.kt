@@ -108,6 +108,7 @@ internal fun SettingsHomeView(
                     SettingContainerView(
                         navHostController = detailNavigator,
                         destination = settingEntryPoint?.destination,
+                        modifier = Modifier.padding(paddingValues)
                     )
                 }
 
