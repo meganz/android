@@ -13,7 +13,6 @@ import kotlinx.coroutines.flow.flowOn
 import kotlinx.coroutines.sync.Mutex
 import kotlinx.coroutines.sync.withLock
 import kotlinx.coroutines.withContext
-import mega.privacy.android.data.extensions.isPath
 import mega.privacy.android.data.extensions.toUri
 import mega.privacy.android.data.gateway.CacheGateway
 import mega.privacy.android.data.gateway.DeviceGateway
@@ -27,7 +26,6 @@ import mega.privacy.android.domain.entity.document.DocumentEntity
 import mega.privacy.android.domain.entity.document.DocumentFolder
 import mega.privacy.android.domain.entity.node.FileNode
 import mega.privacy.android.domain.entity.uri.UriPath
-import mega.privacy.android.domain.exception.NullFileException
 import mega.privacy.android.domain.qualifier.IoDispatcher
 import mega.privacy.android.domain.repository.FileSystemRepository
 import timber.log.Timber
@@ -38,6 +36,7 @@ import java.net.URI
 import java.net.URLConnection
 import javax.inject.Inject
 import javax.inject.Singleton
+
 /**
 
  * Default implementation of [FileSystemRepository]
@@ -302,16 +301,21 @@ internal class FileSystemRepositoryImpl @Inject constructor(
         directory: File,
         destinationUri: String,
     ): Boolean = withContext(ioDispatcher) {
-        val sdCardUri = Uri.parse(destinationUri) ?: throw NullFileException()
-        val directorySdCardStringUri = moveSdDocumentMutex.withLock {
-            documentFileWrapper.fromUri(sdCardUri)?.let {
-                it.findFile(directory.name) ?: it.createDirectory(directory.name)
-            }?.uri?.toString() ?: throw NullFileException()
+        val directorySdCardStringUri = Uri.parse(destinationUri)?.let { sdCardUri ->
+            moveSdDocumentMutex.withLock {
+                documentFileWrapper.fromUri(sdCardUri)?.let {
+                    it.findFile(directory.name) ?: it.createDirectory(directory.name)
+                }?.uri?.toString()
+            }
+        } ?: run {
+            Timber.w("Error getting SD card uri")
+            null
         }
 
         directory.listFiles()?.forEach { childFile ->
             if (childFile.isDirectory) {
-                moveDirectoryToSd(childFile, directorySdCardStringUri)
+                directorySdCardStringUri?.let { moveDirectoryToSd(childFile, it) }
+                    ?: Timber.w("Error moving directory to SD card")
             } else {
                 moveFileToSd(childFile, destinationUri, listOf(directory.name))
             }
