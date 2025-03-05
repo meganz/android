@@ -62,6 +62,7 @@ import mega.privacy.android.legacy.core.ui.model.SearchWidgetState
 import mega.privacy.android.navigation.MegaNavigator
 import mega.privacy.android.shared.original.core.ui.theme.OriginalTheme
 import mega.privacy.mobile.analytics.event.AllVideosTabEvent
+import mega.privacy.mobile.analytics.event.HideNodeMultiSelectMenuItemEvent
 import mega.privacy.mobile.analytics.event.PlaylistsTabEvent
 import timber.log.Timber
 import javax.inject.Inject
@@ -411,6 +412,7 @@ class VideoSectionFragment : Fragment() {
     }
 
     suspend fun handleHideNodeClick() {
+        Analytics.tracker.trackEvent(HideNodeMultiSelectMenuItemEvent)
         var isPaid: Boolean
         var isHiddenNodesOnboarded: Boolean
         var isBusinessAccountExpired: Boolean

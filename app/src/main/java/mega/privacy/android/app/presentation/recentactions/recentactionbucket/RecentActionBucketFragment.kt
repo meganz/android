@@ -31,6 +31,7 @@ import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.ensureActive
 import kotlinx.coroutines.flow.collectLatest
 import kotlinx.coroutines.launch
+import mega.privacy.android.analytics.Analytics
 import mega.privacy.android.app.MimeTypeList
 import mega.privacy.android.app.R
 import mega.privacy.android.app.components.SimpleDividerItemDecoration
@@ -68,6 +69,7 @@ import mega.privacy.android.data.qualifier.MegaApi
 import mega.privacy.android.domain.entity.node.NodeId
 import mega.privacy.android.domain.usecase.featureflag.GetFeatureFlagValueUseCase
 import mega.privacy.android.navigation.MegaNavigator
+import mega.privacy.mobile.analytics.event.HideNodeMultiSelectMenuItemEvent
 import nz.mega.sdk.MegaApiAndroid
 import nz.mega.sdk.MegaApiJava
 import nz.mega.sdk.MegaChatApiJava.MEGACHAT_INVALID_HANDLE
@@ -540,6 +542,8 @@ class RecentActionBucketFragment : Fragment() {
     }
 
     fun onHideClicked(nodeIds: List<NodeId>) {
+        Analytics.tracker.trackEvent(HideNodeMultiSelectMenuItemEvent)
+
         val isHiddenNodesOnboarded = viewModel.state.value.isHiddenNodesOnboarded ?: false
         val isPaid = viewModel.state.value.accountType?.isPaid ?: false
         val isBusinessAccountExpired = viewModel.state.value.isBusinessAccountExpired

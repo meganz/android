@@ -28,6 +28,7 @@ import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.flow.distinctUntilChanged
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.launch
+import mega.privacy.android.analytics.Analytics
 import mega.privacy.android.app.R
 import mega.privacy.android.app.arch.extensions.collectFlow
 import mega.privacy.android.app.fragments.homepage.SortByHeaderViewModel
@@ -48,6 +49,7 @@ import mega.privacy.android.domain.entity.node.NodeId
 import mega.privacy.android.domain.usecase.GetThemeMode
 import mega.privacy.android.navigation.MegaNavigator
 import mega.privacy.android.shared.original.core.ui.theme.OriginalTheme
+import mega.privacy.mobile.analytics.event.HideNodeMultiSelectMenuItemEvent
 import timber.log.Timber
 import javax.inject.Inject
 
@@ -232,6 +234,7 @@ class AudioSectionFragment : Fragment() {
     }
 
     suspend fun handleHideNodeClick() {
+        Analytics.tracker.trackEvent(HideNodeMultiSelectMenuItemEvent)
         var isPaid: Boolean
         var isHiddenNodesOnboarded: Boolean
         var isBusinessAccountExpired: Boolean

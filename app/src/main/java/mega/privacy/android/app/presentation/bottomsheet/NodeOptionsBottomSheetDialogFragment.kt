@@ -97,6 +97,7 @@ import mega.privacy.android.domain.usecase.featureflag.GetFeatureFlagValueUseCas
 import mega.privacy.android.navigation.MegaNavigator
 import mega.privacy.android.shared.original.core.ui.controls.controlssliders.MegaSwitch
 import mega.privacy.mobile.analytics.event.CloudDriveHideNodeMenuItemEvent
+import mega.privacy.mobile.analytics.event.HideNodeMenuItemEvent
 import nz.mega.sdk.MegaNode
 import nz.mega.sdk.MegaShare
 import timber.log.Timber
@@ -1393,6 +1394,11 @@ class NodeOptionsBottomSheetDialogFragment : BaseBottomSheetDialogFragment() {
             // We only want to send analytics for when the action is hiding
             Analytics.tracker.trackEvent(CloudDriveHideNodeMenuItemEvent)
         }
+
+        if (!node.isMarkedSensitive) {
+            Analytics.tracker.trackEvent(HideNodeMenuItemEvent)
+        }
+
         val isPaid = accountType?.isPaid ?: false
         val isHiddenNodesOnboarded = isHiddenNodesOnboarded ?: false
 

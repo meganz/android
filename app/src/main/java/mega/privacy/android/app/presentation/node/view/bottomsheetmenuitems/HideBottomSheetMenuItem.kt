@@ -31,7 +31,9 @@ import mega.privacy.android.shared.original.core.ui.model.MenuAction
 import mega.privacy.android.shared.original.core.ui.model.MenuActionWithIcon
 import mega.privacy.android.shared.original.core.ui.theme.grey_alpha_070
 import mega.android.core.ui.theme.values.TextColor
+import mega.privacy.android.analytics.Analytics
 import mega.privacy.android.shared.original.core.ui.theme.white_alpha_070
+import mega.privacy.mobile.analytics.event.HideNodeMenuItemEvent
 import javax.inject.Inject
 
 /**
@@ -121,6 +123,7 @@ class HideBottomSheetMenuItem @Inject constructor(
         parentCoroutineScope: CoroutineScope,
     ): () -> Unit = {
         parentCoroutineScope.launch {
+            Analytics.tracker.trackEvent(HideNodeMenuItemEvent)
             val isHiddenNodesOnboarded = isHiddenNodesOnboardedUseCase()
             if (!this@HideBottomSheetMenuItem.isPaid || isBusinessAccountExpired) {
                 actionHandler(menuAction, node)

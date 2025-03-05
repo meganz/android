@@ -4,6 +4,7 @@ import androidx.navigation.NavHostController
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.launch
+import mega.privacy.android.analytics.Analytics
 import mega.privacy.android.app.featuretoggle.ApiFeatures
 import mega.privacy.android.app.featuretoggle.AppFeatures
 import mega.privacy.android.app.presentation.node.model.menuaction.HideDropdownMenuAction
@@ -17,6 +18,7 @@ import mega.privacy.android.domain.usecase.account.MonitorAccountDetailUseCase
 import mega.privacy.android.domain.usecase.featureflag.GetFeatureFlagValueUseCase
 import mega.privacy.android.domain.usecase.node.IsHidingActionAllowedUseCase
 import mega.privacy.android.shared.original.core.ui.model.MenuAction
+import mega.privacy.mobile.analytics.event.HideNodeMultiSelectMenuItemEvent
 import javax.inject.Inject
 
 /**
@@ -72,6 +74,7 @@ class HideDropdownMenuItem @Inject constructor(
         parentScope: CoroutineScope,
     ): () -> Unit = {
         parentScope.launch {
+            Analytics.tracker.trackEvent(HideNodeMultiSelectMenuItemEvent)
             val isHiddenNodesOnboarded = isHiddenNodesOnboardedUseCase()
             if (!this@HideDropdownMenuItem.isPaid || isBusinessAccountExpired) {
                 actionHandler(menuAction, selectedNodes)

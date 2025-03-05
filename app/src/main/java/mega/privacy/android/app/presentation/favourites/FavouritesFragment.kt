@@ -29,6 +29,7 @@ import com.google.android.material.snackbar.Snackbar
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.launch
+import mega.privacy.android.analytics.Analytics
 import mega.privacy.android.app.MimeTypeList
 import mega.privacy.android.app.R
 import mega.privacy.android.app.arch.extensions.collectFlow
@@ -69,6 +70,7 @@ import mega.privacy.android.domain.entity.node.NodeId
 import mega.privacy.android.domain.entity.preference.ViewType
 import mega.privacy.android.domain.usecase.featureflag.GetFeatureFlagValueUseCase
 import mega.privacy.android.navigation.MegaNavigator
+import mega.privacy.mobile.analytics.event.HideNodeMenuItemEvent
 import nz.mega.sdk.MegaChatApiJava
 import nz.mega.sdk.MegaNode
 import timber.log.Timber
@@ -575,6 +577,8 @@ class FavouritesFragment : Fragment() {
     fun onHideClicked(
         nodeIds: List<NodeId>,
     ) {
+        Analytics.tracker.trackEvent(HideNodeMenuItemEvent)
+
         val isHiddenNodesOnboarded = viewModel.isHiddenNodesOnboarded()
         val isPaid = viewModel.getIsPaidAccount()
         val isBusinessAccountExpired = viewModel.getIsBusinessAccountExpired()
