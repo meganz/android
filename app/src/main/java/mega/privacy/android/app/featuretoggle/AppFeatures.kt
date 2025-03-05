@@ -152,7 +152,7 @@ enum class AppFeatures(override val description: String, private val defaultValu
      */
     SearchWithTags(
         "Enable search with tags",
-        false
+        true
     ),
 
     /**
@@ -165,7 +165,7 @@ enum class AppFeatures(override val description: String, private val defaultValu
      */
     NodeWithTags(
         "Enable node with tags",
-        false
+        true
     ),
 
     /**
