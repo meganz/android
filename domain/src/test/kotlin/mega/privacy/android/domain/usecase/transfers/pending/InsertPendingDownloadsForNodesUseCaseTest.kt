@@ -120,14 +120,11 @@ class InsertPendingDownloadsForNodesUseCaseTest {
     fun `test that active transfer group is created with correct parameters`(
         multipleNodes: Boolean,
     ) = runTest {
-        val singleFileName = "file.txt"
         val time = 349853489L
         val nodes = if (multipleNodes) (0..5).map { index ->
             mock<DefaultTypedFileNode>()
         } else {
-            listOf(mock<DefaultTypedFileNode> {
-                on { name } doReturn singleFileName
-            })
+            listOf(mock<DefaultTypedFileNode>())
         }
         val uriPath = UriPath(PATH_STRING)
         whenever(
@@ -144,7 +141,6 @@ class InsertPendingDownloadsForNodesUseCaseTest {
             ActiveTransferGroupImpl(
                 transferType = TransferType.DOWNLOAD,
                 destination = uriPath.value,
-                singleFileName = if (multipleNodes) null else singleFileName,
                 startTime = time
             )
         )

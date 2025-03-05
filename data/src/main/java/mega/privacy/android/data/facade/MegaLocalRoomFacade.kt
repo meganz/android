@@ -245,10 +245,7 @@ internal class MegaLocalRoomFacade @Inject constructor(
 
     override suspend fun insertOrUpdateActiveTransfers(activeTransfers: List<ActiveTransfer>) =
         activeTransfers.map { activeTransferEntityMapper(it) }.let { mappedActiveTransfers ->
-            activeTransferDao.get().insertOrUpdateActiveTransfers(
-                mappedActiveTransfers,
-                MAX_INSERT_LIST_SIZE
-            )
+            activeTransferDao.get().insertOrUpdateActiveTransfers(mappedActiveTransfers)
         }
 
     override suspend fun deleteAllActiveTransfersByType(transferType: TransferType) =

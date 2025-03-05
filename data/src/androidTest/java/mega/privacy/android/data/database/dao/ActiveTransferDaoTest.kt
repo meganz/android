@@ -34,6 +34,7 @@ class ActiveTransferDaoTest {
                 isAlreadyTransferred = false,
                 isCancelled = true,
                 appData = emptyList(),
+                fileName = "file$index.txt"
             )
         }
     }
@@ -69,6 +70,7 @@ class ActiveTransferDaoTest {
             appData = listOf(
                 TransferAppData.CameraUpload, TransferAppData.OriginalContentUri("content://uri"),
             ),
+            fileName = "fileName"
         )
         activeTransferDao.insertOrUpdateActiveTransfer(newEntity)
         val actual = activeTransferDao.getActiveTransferByTag(newEntity.tag)
@@ -76,9 +78,10 @@ class ActiveTransferDaoTest {
     }
 
     @Test
-    fun test_that_insert_a_duplicated_transfer_replaces_original_one() = runTest {
-        val firstEntity = entities.first()
-        val modified = firstEntity.copy(isFinished = !firstEntity.isFinished)
+    fun test_that_insert_a_duplicated_transfer_updates_the_original_one() = runTest {
+        val firstEntity = entities.first { !it.isFinished }
+        val modified =
+            firstEntity.copy(isFinished = !firstEntity.isFinished, fileName = "newFileName.txt")
         activeTransferDao.insertOrUpdateActiveTransfer(modified)
         val result = activeTransferDao.getCurrentActiveTransfersByType(firstEntity.transferType)
         assertThat(result).contains(modified)
@@ -86,10 +89,10 @@ class ActiveTransferDaoTest {
     }
 
     @Test
-    fun test_that_insert_a_duplicated_transfer_replaces_original_one_only_if_not_finished() =
+    fun test_that_insert_a_duplicated_transfer_updates_the_original_one_only_if_not_finished() =
         runTest {
             val entitiesToModified = entities.associateBy { it.copy(isPaused = !it.isPaused) }
-            activeTransferDao.insertOrUpdateActiveTransfers(entitiesToModified.values.toList(), 5)
+            activeTransferDao.insertOrUpdateActiveTransfers(entitiesToModified.values.toList())
 
             entitiesToModified.forEach { (original, modified) ->
                 val result = activeTransferDao.getActiveTransferByTag(original.tag)

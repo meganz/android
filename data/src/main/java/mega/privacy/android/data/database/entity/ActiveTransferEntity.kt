@@ -34,6 +34,8 @@ internal data class ActiveTransferEntity(
     @PrimaryKey
     @ColumnInfo(name = "tag")
     override val tag: Int,
+    @ColumnInfo(name = "file_name", defaultValue = "")
+    override val fileName: String,
     @ColumnInfo(name = "transfer_type")
     override val transferType: TransferType,
     @ColumnInfo(name = "total_bytes")

@@ -10,7 +10,6 @@ internal class ActiveTransferGroupEntityMapper @Inject constructor() {
             groupId = groupId,
             transferType = transferType,
             destination = destination,
-            singleFileName = singleFileName,
             startTime = startTime,
         )
     }

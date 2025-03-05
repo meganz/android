@@ -52,6 +52,7 @@ class ActiveTransferEntityMapperTest {
                                             TransferAppData.CameraUpload,
                                             TransferAppData.OriginalContentUri("content://uri")
                                         ),
+                                        fileName = FILE_NAME,
                                     ),
                                     ActiveTransferEntity(
                                         tag = TAG,
@@ -66,6 +67,7 @@ class ActiveTransferEntityMapperTest {
                                             TransferAppData.CameraUpload,
                                             TransferAppData.OriginalContentUri("content://uri")
                                         ),
+                                        fileName = FILE_NAME,
                                     )
                                 )
                             }
@@ -78,6 +80,7 @@ class ActiveTransferEntityMapperTest {
     companion object {
         private const val TAG = 2
         private const val TOTAL = 1024L
+        private const val FILE_NAME = "foo.txt"
     }
 
 
@@ -96,5 +99,6 @@ class ActiveTransferEntityMapperTest {
         override val isAlreadyTransferred: Boolean,
         override val isCancelled: Boolean,
         override val appData: List<TransferAppData>,
+        override val fileName: String,
     ) : ActiveTransfer
 }

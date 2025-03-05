@@ -168,7 +168,6 @@ class ActiveTransferTotalsMapperTest {
                     groupId = groupId,
                     transferType = transferType,
                     destination = "destination$groupId",
-                    singleFileName = "file$groupId",
                     startTime = groupId.toLong(),
                 )
                 entity.copy(appData = listOf(TransferAppData.TransferGroup(groupId.toLong())))
@@ -186,7 +185,7 @@ class ActiveTransferTotalsMapperTest {
                             completedFiles = 0,
                             alreadyTransferred = fileTransfers.count { it.isAlreadyTransferred },
                             destination = "destination$groupId",
-                            singleFileName = "file$groupId",
+                            singleFileName = null,
                             singleTransferTag = fileTransfers.singleOrNull()?.tag,
                             startTime = groupId.toLong(),
                             pausedFiles = fileTransfers.count { it.isPaused },
@@ -213,7 +212,6 @@ class ActiveTransferTotalsMapperTest {
                     groupId = groupId,
                     transferType = transferType,
                     destination = "destination$groupId",
-                    singleFileName = "file$groupId",
                     startTime = groupId.toLong(),
                 )
                 entity.copy(appData = listOf(TransferAppData.TransferGroup(groupId.toLong())))
@@ -237,7 +235,7 @@ class ActiveTransferTotalsMapperTest {
                             completedFiles = expectedCompleted,
                             alreadyTransferred = fileTransfers.count { it.isAlreadyTransferred },
                             destination = "destination$groupId",
-                            singleFileName = "file$groupId",
+                            singleFileName = null,
                             singleTransferTag = fileTransfers.singleOrNull()?.tag,
                             startTime = groupId.toLong(),
                             pausedFiles = fileTransfers.count { it.isPaused },
@@ -260,7 +258,6 @@ class ActiveTransferTotalsMapperTest {
                     groupId = groupId,
                     transferType = transferType,
                     destination = "destination$groupId",
-                    singleFileName = "file$groupId",
                     startTime = groupId.toLong(),
                 )
                 entity.copy(appData = listOf(TransferAppData.TransferGroup(groupId.toLong())))
@@ -281,7 +278,7 @@ class ActiveTransferTotalsMapperTest {
                             completedFiles = fileTransfers.count { it.isFinished && transferredBytes[it.tag] == it.totalBytes },
                             alreadyTransferred = fileTransfers.count { it.isAlreadyTransferred },
                             destination = "destination$groupId",
-                            singleFileName = "file$groupId",
+                            singleFileName = null,
                             singleTransferTag = fileTransfers.singleOrNull()?.tag,
                             startTime = groupId.toLong(),
                             pausedFiles = fileTransfers.count { it.isPaused },
@@ -353,7 +350,7 @@ class ActiveTransferTotalsMapperTest {
                         completedFiles = 0,
                         alreadyTransferred = 0,
                         destination = "destination$groupId",
-                        singleFileName = "file$groupId",
+                        singleFileName = null,
                         singleTransferTag = entity.tag,
                         startTime = groupId.toLong(),
                         pausedFiles = 0,
@@ -375,7 +372,7 @@ class ActiveTransferTotalsMapperTest {
                             completedFiles = 0,
                             alreadyTransferred = fileTransfers.count { it.isAlreadyTransferred },
                             destination = "destination$groupId",
-                            singleFileName = "file$groupId",
+                            singleFileName = null,
                             singleTransferTag = fileTransfers.singleOrNull()?.tag,
                             startTime = groupId.toLong(),
                             pausedFiles = fileTransfers.count { it.isPaused },
@@ -393,6 +390,48 @@ class ActiveTransferTotalsMapperTest {
             verifyNoInteractions(transferRepository)
         }
 
+    @ParameterizedTest(name = "Transfer Type {0}")
+    @EnumSource(TransferType::class)
+    fun `test that mapper correctly maps single file name if group contains only one file`(
+        transferType: TransferType,
+    ) = runTest {
+        val entities = createEntities(transferType).mapIndexed { index, entity ->
+            val groupId = index
+            whenever(transferRepository.getActiveTransferGroupById(groupId)) doReturn ActiveTransferGroupImpl(
+                groupId = groupId,
+                transferType = transferType,
+                destination = "destination$groupId",
+                startTime = groupId.toLong(),
+            )
+            entity.copy(appData = listOf(TransferAppData.TransferGroup(groupId.toLong())))
+        }.filterNot { it.isFolderTransfer }
+        val transferredBytes = emptyMap<Int, Long>()
+        val expected = entities
+            .groupBy { it.getTransferGroup()?.groupId }
+            .mapNotNull { (key, activeTransfer) ->
+                key?.toInt()?.let { groupId ->
+                    ActiveTransferTotals.Group(
+                        groupId = groupId,
+                        totalFiles = activeTransfer.size,
+                        finishedFiles = activeTransfer.count { it.isFinished },
+                        completedFiles = 0,
+                        alreadyTransferred = activeTransfer.count { it.isAlreadyTransferred },
+                        destination = "destination$groupId",
+                        singleFileName = activeTransfer.singleOrNull()?.fileName,
+                        singleTransferTag = activeTransfer.singleOrNull()?.tag,
+                        startTime = groupId.toLong(),
+                        pausedFiles = activeTransfer.count { it.isPaused },
+                        totalBytes = activeTransfer.sumOf { it.totalBytes },
+                        transferredBytes = activeTransfer.sumOf {
+                            if (it.isFinished) it.totalBytes else 0L
+                        },
+                    )
+                }
+            }
+        val actual = underTest(transferType, entities, transferredBytes).groups
+        assertThat(actual).containsExactlyElementsIn(expected)
+    }
+
 
     private fun createEntities(transferType: TransferType) = (0..20).map { tag ->
         ActiveTransferEntity(
@@ -405,6 +444,7 @@ class ActiveTransferTotalsMapperTest {
             isAlreadyTransferred = tag.rem(9) == 0,
             isCancelled = tag.rem(7) == 0,
             appData = emptyList(),
+            fileName = "File$tag.txt"
         )
     }
 }

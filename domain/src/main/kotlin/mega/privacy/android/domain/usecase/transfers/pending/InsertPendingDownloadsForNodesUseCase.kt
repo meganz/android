@@ -49,7 +49,6 @@ class InsertPendingDownloadsForNodesUseCase @Inject constructor(
             ActiveTransferGroupImpl(
                 transferType = TransferType.DOWNLOAD,
                 destination = destination.value,
-                singleFileName = nodes.singleOrNull()?.name,
                 startTime = timeSystemRepository.getCurrentTimeInMillis(),
             )
         )

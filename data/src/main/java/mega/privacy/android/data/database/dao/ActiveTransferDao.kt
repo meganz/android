@@ -29,7 +29,7 @@ internal interface ActiveTransferDao {
 
     @Query(
         "UPDATE active_transfers " +
-                "SET is_finished = :isFinished, is_paused = :isPaused, is_already_downloaded = :isAlreadyTransferred, total_bytes = :totalBytes, is_cancelled = :isCancelled " +
+                "SET is_finished = :isFinished, is_paused = :isPaused, is_already_downloaded = :isAlreadyTransferred, total_bytes = :totalBytes, is_cancelled = :isCancelled, file_name = :fileName " +
                 "WHERE tag = :tag " +
                 "AND is_finished = 0"
     )
@@ -40,6 +40,7 @@ internal interface ActiveTransferDao {
         totalBytes: Long,
         isAlreadyTransferred: Boolean,
         isCancelled: Boolean,
+        fileName: String,
     )
 
     @Transaction
@@ -53,6 +54,7 @@ internal interface ActiveTransferDao {
                 totalBytes = entity.totalBytes,
                 isAlreadyTransferred = entity.isAlreadyTransferred,
                 isCancelled = entity.isCancelled,
+                fileName = entity.fileName
             )
         }
     }
@@ -63,12 +65,9 @@ internal interface ActiveTransferDao {
     @Transaction
     suspend fun insertOrUpdateActiveTransfers(
         entities: List<ActiveTransferEntity>,
-        chunkSize: Int,
     ) {
-        entities.chunked(chunkSize).forEach { chunk ->
-            chunk.forEach { entity ->
-                insertOrUpdateActiveTransfer(entity)
-            }
+        entities.forEach { entity ->
+            insertOrUpdateActiveTransfer(entity)
         }
     }
 

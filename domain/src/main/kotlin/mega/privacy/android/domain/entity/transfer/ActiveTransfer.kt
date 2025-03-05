@@ -29,4 +29,9 @@ interface ActiveTransfer : TypedTransfer, AppDataOwner {
      * True if the transfer finished because it was cancelled before ending
      */
     val isCancelled: Boolean
+
+    /**
+     * Name of the file that is being transferred.
+     */
+    val fileName: String
 }

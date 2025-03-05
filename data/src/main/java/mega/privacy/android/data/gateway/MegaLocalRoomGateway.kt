@@ -203,7 +203,7 @@ interface MegaLocalRoomGateway {
     suspend fun getCurrentActiveTransfers(): List<ActiveTransfer>
 
     /**
-     * Insert a new active transfer or update it if there's already an active transfer with the same tag
+     * Insert a new active transfer or update it if there's already an active transfer with the same tag but it's not yet finished
      */
     suspend fun insertOrUpdateActiveTransfer(activeTransfer: ActiveTransfer)
 
