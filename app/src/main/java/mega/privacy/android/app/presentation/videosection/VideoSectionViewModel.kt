@@ -216,14 +216,6 @@ class VideoSectionViewModel @Inject constructor(
         }
     }
 
-    // Get current query adjusted by search by tags
-    private fun getCurrentQueryWithSearchByTags() =
-        getCurrentSearchQuery().takeUnless {
-            state.value.searchTagsEnabled == true && getCurrentSearchQuery().startsWith(
-                "#"
-            )
-        }.orEmpty()
-
     private fun getCurrentSearchQuery() = state.value.query.orEmpty()
 
     private suspend fun isHiddenNodesActive(): Boolean {
@@ -378,7 +370,7 @@ class VideoSectionViewModel @Inject constructor(
         getAllVideosUseCase(
             searchQuery = getCurrentSearchQuery(),
             tag = if (state.value.searchTagsEnabled == true) getCurrentSearchQuery().removePrefix("#") else null,
-            description = if (state.value.searchDescriptionEnabled == true) getCurrentQueryWithSearchByTags() else null
+            description = if (state.value.searchDescriptionEnabled == true) getCurrentSearchQuery() else null
         ).filterNonSensitiveItems(
             showHiddenItems = this@VideoSectionViewModel.showHiddenItems,
             isPaid = _state.value.accountType?.isPaid,

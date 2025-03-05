@@ -214,7 +214,7 @@ class SearchViewModel @Inject constructor(
     }
 
     private fun getSearchParameters() = SearchParameters(
-        query = getCurrentQueryWithSearchByTags(),
+        query = getCurrentSearchQuery(),
         searchTarget = nodeSourceTypeToSearchTargetMapper(nodeSourceType),
         searchCategory = typeFilterToSearchMapper(
             state.value.typeSelectedFilterOption?.type,
@@ -222,7 +222,7 @@ class SearchViewModel @Inject constructor(
         ),
         modificationDate = state.value.dateModifiedSelectedFilterOption?.date,
         creationDate = state.value.dateAddedSelectedFilterOption?.date,
-        description = if (state.value.searchDescriptionEnabled == true) getCurrentQueryWithSearchByTags() else null,
+        description = if (state.value.searchDescriptionEnabled == true) getCurrentSearchQuery() else null,
         tag = if (state.value.searchTagsEnabled == true) getCurrentSearchQuery()
             .removePrefix("#")
             .takeIf {
@@ -230,14 +230,6 @@ class SearchViewModel @Inject constructor(
             }
         else null
     )
-
-    // Get current query adjusted by search by tags
-    private fun getCurrentQueryWithSearchByTags() =
-        getCurrentSearchQuery().takeUnless {
-            state.value.searchTagsEnabled == true && getCurrentSearchQuery().startsWith(
-                "#"
-            )
-        }.orEmpty()
 
     // If folder is opened from search screen we are setting query as empty
     private fun getCurrentSearchQuery() =
