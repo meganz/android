@@ -79,10 +79,10 @@ class CookieSettingsFragment : SettingsBaseFragment(),
                 if (showAdsCookiePreference) uiState.cookiePolicyWithAdsLink else COOKIE_URL
         }
         viewModel.onEnabledCookies().observe(viewLifecycleOwner, ::showCookies)
-        viewModel.onUpdateResult().observe(viewLifecycleOwner) { success ->
-            if (success) {
+        viewLifecycleOwner.collectFlow(viewModel.onUpdateResult()) { value ->
+            if (value == true) {
                 (context?.applicationContext as MegaApplication?)?.checkEnabledCookies()
-            } else if (isVisible) {
+            } else if (value == false) {
                 Toast.makeText(requireContext(), R.string.error_unknown, Toast.LENGTH_LONG).show()
             }
         }

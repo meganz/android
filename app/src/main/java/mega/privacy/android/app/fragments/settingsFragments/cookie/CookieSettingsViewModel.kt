@@ -8,6 +8,7 @@ import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
@@ -42,7 +43,7 @@ class CookieSettingsViewModel @Inject constructor(
     val uiState = _uiState.asStateFlow()
 
     private val enabledCookies = MutableLiveData(mutableSetOf(CookieType.ESSENTIAL))
-    private val updateResult = MutableLiveData<Boolean>()
+    private val updateResult = MutableStateFlow<Boolean?>(null)
     private val savedCookiesSize = MutableLiveData(1)
 
     init {
@@ -52,7 +53,7 @@ class CookieSettingsViewModel @Inject constructor(
     }
 
     fun onEnabledCookies(): LiveData<MutableSet<CookieType>> = enabledCookies
-    fun onUpdateResult(): LiveData<Boolean> = updateResult
+    fun onUpdateResult(): StateFlow<Boolean?> = updateResult.asStateFlow()
 
     /**
      * Change cookie state
@@ -138,6 +139,7 @@ class CookieSettingsViewModel @Inject constructor(
     fun saveCookieSettings() {
         saveCookieJob?.cancel()
         saveCookieJob = applicationScope.launch {
+            updateResult.value = null
             if (uiState.value.showAdsCookiePreference) {
                 addAdsCheckCookieIfNeeded()
             }
