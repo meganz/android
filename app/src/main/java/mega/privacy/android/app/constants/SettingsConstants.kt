@@ -71,7 +71,6 @@ object SettingsConstants {
     const val KEY_COOKIE_ACCEPT = "settings_cookie_accept"
     const val KEY_COOKIE_ANALYTICS = "settings_cookie_performance_analytics"
     const val KEY_COOKIE_POLICIES = "setting_cookie_policies"
-    const val KEY_COOKIE_ADS = "settings_cookie_advertisement"
     const val KEY_ADS_SETTING = "ads_settings"
     const val KEY_ADS_PERSONALIZATION = "ads_personalization"
 

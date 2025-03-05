@@ -10,7 +10,6 @@ import mega.privacy.android.app.fragments.settingsFragments.cookie.CookieSetting
 import mega.privacy.android.core.test.extension.CoroutineMainDispatcherExtension
 import mega.privacy.android.domain.entity.settings.cookie.CookieType
 import mega.privacy.android.domain.usecase.featureflag.GetFeatureFlagValueUseCase
-import mega.privacy.android.domain.usecase.login.GetSessionTransferURLUseCase
 import mega.privacy.android.domain.usecase.setting.GetCookieSettingsUseCase
 import mega.privacy.android.domain.usecase.setting.UpdateCookieSettingsUseCase
 import mega.privacy.android.domain.usecase.setting.UpdateCrashAndPerformanceReportersUseCase
@@ -40,7 +39,6 @@ class CookieSettingsViewModelTest {
     private val updateCrashAndPerformanceReportersUseCase =
         mock<UpdateCrashAndPerformanceReportersUseCase>()
     private val getFeatureFlagValueUseCase = mock<GetFeatureFlagValueUseCase>()
-    private val getSessionTransferURLUseCase = mock<GetSessionTransferURLUseCase>()
     private val coroutineScope = CoroutineScope(extension.testDispatcher)
 
     fun initTestClass() {
@@ -49,8 +47,7 @@ class CookieSettingsViewModelTest {
             updateCookieSettingsUseCase = updateCookieSettingsUseCase,
             getFeatureFlagValueUseCase = getFeatureFlagValueUseCase,
             updateCrashAndPerformanceReportersUseCase = updateCrashAndPerformanceReportersUseCase,
-            getSessionTransferURLUseCase = getSessionTransferURLUseCase,
-            applicationScope = coroutineScope
+            applicationScope = coroutineScope,
         )
     }
 
@@ -61,7 +58,6 @@ class CookieSettingsViewModelTest {
             updateCookieSettingsUseCase,
             getFeatureFlagValueUseCase,
             updateCrashAndPerformanceReportersUseCase,
-            getSessionTransferURLUseCase,
         )
     }
 
@@ -69,13 +65,6 @@ class CookieSettingsViewModelTest {
         return Stream.of(
             Arguments.of(true, true),
             Arguments.of(false, false)
-        )
-    }
-
-    private fun provideCookiePolicyWithAdsLinkParameters(): Stream<Arguments> {
-        return Stream.of(
-            Arguments.of("https://mega.nz/testcookie", "https://mega.nz/testcookie"),
-            Arguments.of(null, null)
         )
     }
 
@@ -90,20 +79,6 @@ class CookieSettingsViewModelTest {
         underTest.uiState.test {
             val state = awaitItem()
             assertThat(state.showAdsCookiePreference).isEqualTo(expected)
-        }
-    }
-
-    @ParameterizedTest(name = "when sessionTransferURL is {0} then cookiePolicyWithAdsLink is: {1}")
-    @MethodSource("provideCookiePolicyWithAdsLinkParameters")
-    fun `test that cookiePolicyWithAdsLink is updated when getSessionTransferURLUseCase is successful`(
-        link: String?,
-        expected: String?,
-    ) = runTest {
-        whenever(getSessionTransferURLUseCase(any())).thenReturn(link)
-        initTestClass()
-        underTest.uiState.test {
-            val state = awaitItem()
-            assertThat(state.cookiePolicyWithAdsLink).isEqualTo(expected)
         }
     }
 

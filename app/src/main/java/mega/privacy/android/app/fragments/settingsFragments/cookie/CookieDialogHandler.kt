@@ -86,9 +86,7 @@ class CookieDialogHandler @Inject constructor(
         getCookieDialogJob?.cancel()
         getCookieDialogJob = applicationScope.launch(ioDispatcher) {
             runCatching {
-                val cookieDialog = getCookieDialogUseCase(
-                    ApiFeatures.GoogleAdsFeatureFlag
-                )
+                val cookieDialog = getCookieDialogUseCase()
                 Timber.d("cookieDialog: $cookieDialog")
                 withContext(mainDispatcher) {
                     action(cookieDialog)

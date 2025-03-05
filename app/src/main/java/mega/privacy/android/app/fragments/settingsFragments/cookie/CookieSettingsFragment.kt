@@ -21,14 +21,12 @@ import mega.privacy.android.app.components.TwoButtonsPreference
 import mega.privacy.android.app.constants.SettingsConstants.KEY_ADS_PERSONALIZATION
 import mega.privacy.android.app.constants.SettingsConstants.KEY_ADS_SETTING
 import mega.privacy.android.app.constants.SettingsConstants.KEY_COOKIE_ACCEPT
-import mega.privacy.android.app.constants.SettingsConstants.KEY_COOKIE_ADS
 import mega.privacy.android.app.constants.SettingsConstants.KEY_COOKIE_ANALYTICS
 import mega.privacy.android.app.constants.SettingsConstants.KEY_COOKIE_POLICIES
 import mega.privacy.android.app.constants.SettingsConstants.KEY_COOKIE_SETTINGS
 import mega.privacy.android.app.fragments.settingsFragments.SettingsBaseFragment
 import mega.privacy.android.app.presentation.advertisements.GoogleAdsManager
 import mega.privacy.android.domain.entity.settings.cookie.CookieType
-import mega.privacy.android.domain.entity.settings.cookie.CookieType.ADVERTISEMENT
 import mega.privacy.android.domain.entity.settings.cookie.CookieType.ANALYTICS
 import javax.inject.Inject
 
@@ -43,10 +41,7 @@ class CookieSettingsFragment : SettingsBaseFragment(),
 
     private var acceptCookiesPreference: SwitchPreferenceCompat? = null
     private var analyticsCookiesPreference: SwitchPreferenceCompat? = null
-    private var adsCookiesPreference: SwitchPreferenceCompat? = null
     private var policiesPreference: TwoButtonsPreference? = null
-    private var showAdsCookiePreference = false
-    private var cookiePolicyLink: String? = null
     private var adsSettings: PreferenceCategory? = null
     private var adsPersonalization: Preference? = null
     private var settingsCookie: PreferenceCategory? = null
@@ -56,7 +51,6 @@ class CookieSettingsFragment : SettingsBaseFragment(),
 
         acceptCookiesPreference = findPreference(KEY_COOKIE_ACCEPT)
         analyticsCookiesPreference = findPreference(KEY_COOKIE_ANALYTICS)
-        adsCookiesPreference = findPreference(KEY_COOKIE_ADS)
         policiesPreference = findPreference(KEY_COOKIE_POLICIES)
         adsSettings = findPreference(KEY_ADS_SETTING) as? PreferenceCategory
         adsPersonalization = findPreference(KEY_ADS_PERSONALIZATION)
@@ -70,13 +64,8 @@ class CookieSettingsFragment : SettingsBaseFragment(),
     }
 
     private fun setupObservers() {
-        collectFlow(viewModel.uiState) { uiState ->
-            //Ads cookie preference is temporarily disabled & hidden during Google Ads implementation
-            showAdsCookiePreference = false //uiState.showAdsCookiePreference
-            adsCookiesPreference?.isVisible = showAdsCookiePreference
-            updateAcceptCookiesPreference(showAdsCookiePreference)
-            cookiePolicyLink =
-                if (showAdsCookiePreference) uiState.cookiePolicyWithAdsLink else COOKIE_URL
+        collectFlow(viewModel.uiState) { _ ->
+            updateAcceptCookiesPreference()
         }
         viewModel.onEnabledCookies().observe(viewLifecycleOwner, ::showCookies)
         viewLifecycleOwner.collectFlow(viewModel.onUpdateResult()) { value ->
@@ -99,16 +88,9 @@ class CookieSettingsFragment : SettingsBaseFragment(),
         }
         acceptCookiesPreference?.onPreferenceChangeListener = this
         analyticsCookiesPreference?.onPreferenceChangeListener = this
-        adsCookiesPreference?.onPreferenceChangeListener = this
         policiesPreference?.apply {
             setButton1(getString(R.string.settings_about_cookie_policy)) {
-                cookiePolicyLink?.let { openBrowser(it.toUri()) } ?: run {
-                    Toast.makeText(
-                        requireContext(),
-                        R.string.general_something_went_wrong_error,
-                        Toast.LENGTH_SHORT
-                    ).show()
-                }
+                openBrowser(COOKIE_URL.toUri())
             }
             setButton2(getString(R.string.settings_about_privacy_policy)) {
                 openBrowser(PRIVACY_URL.toUri())
@@ -121,16 +103,9 @@ class CookieSettingsFragment : SettingsBaseFragment(),
      * Update the accept cookies preference based on the current state of the other cookies
      * preferences.
      *
-     * @param showAdsCookiePreference   True if the ads cookie preference should be taken into
-     *                                  account, false otherwise
      */
-    private fun updateAcceptCookiesPreference(showAdsCookiePreference: Boolean) {
-        if (showAdsCookiePreference) {
-            acceptCookiesPreference?.isChecked = analyticsCookiesPreference?.isChecked ?: false ||
-                    adsCookiesPreference?.isChecked ?: false
-        } else {
-            acceptCookiesPreference?.isChecked = analyticsCookiesPreference?.isChecked ?: false
-        }
+    private fun updateAcceptCookiesPreference() {
+        acceptCookiesPreference?.isChecked = analyticsCookiesPreference?.isChecked == true
     }
 
     /**
@@ -140,9 +115,7 @@ class CookieSettingsFragment : SettingsBaseFragment(),
      */
     private fun showCookies(cookies: Set<CookieType>) {
         analyticsCookiesPreference?.isChecked = cookies.contains(ANALYTICS) == true
-        adsCookiesPreference?.isChecked =
-            cookies.contains(ADVERTISEMENT) == true
-        updateAcceptCookiesPreference(showAdsCookiePreference)
+        updateAcceptCookiesPreference()
     }
 
     /**
@@ -159,7 +132,6 @@ class CookieSettingsFragment : SettingsBaseFragment(),
         when (preference.key) {
             acceptCookiesPreference?.key -> viewModel.toggleCookies(enable)
             analyticsCookiesPreference?.key -> viewModel.changeCookie(ANALYTICS, enable)
-            adsCookiesPreference?.key -> viewModel.changeCookie(ADVERTISEMENT, enable)
         }
 
         return false
