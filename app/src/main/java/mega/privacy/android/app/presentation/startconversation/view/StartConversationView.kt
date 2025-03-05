@@ -88,7 +88,7 @@ fun StartConversationView(
         topBar = {
             if (state.contactItemList.isEmpty()) {
                 SimpleTopAppBar(
-                    titleId = R.string.group_chat_start_conversation_label,
+                    titleId = R.string.fab_label_new_chat,
                     elevation = !firstItemVisible,
                     onBackPressed = onBackPressed
                 )
@@ -101,7 +101,7 @@ fun StartConversationView(
                     onBackPressed = onBackPressed,
                     onSearchClicked = onSearchClicked,
                     elevation = !firstItemVisible,
-                    title = stringResource(R.string.group_chat_start_conversation_label),
+                    title = stringResource(R.string.fab_label_new_chat),
                     hintId = R.string.hint_action_search
                 )
             }
@@ -112,6 +112,8 @@ fun StartConversationView(
             modifier = Modifier.padding(paddingValues)
         ) {
             state.apply {
+                val contactsList = filteredContactList ?: contactItemList
+
                 if (buttonsVisible) {
                     if (fromChat) {
                         item {
@@ -119,6 +121,7 @@ fun StartConversationView(
                                 action = buttons[0],
                                 onButtonClicked = onButtonClicked,
                                 onInviteContactsClicked = onInviteContactsClicked,
+                                isInviteButtonVisible = contactItemList.isNotEmpty(),
                                 withDivider = false
                             )
                         }
@@ -133,7 +136,6 @@ fun StartConversationView(
                     }
                 }
 
-                val contactsList = filteredContactList ?: contactItemList
                 var header = ""
 
                 when {
@@ -142,7 +144,7 @@ fun StartConversationView(
 
                         if (isNoteToYourselfFeatureFlagEnabled) {
                             item(key = "Note to self") {
-                                NoteToSelfView(onNoteToSelfClicked)
+                                NoteToSelfView(onNoteToSelfClicked, isHint = isNoteToSelfChatEmpty)
                             }
                         }
 
@@ -163,7 +165,7 @@ fun StartConversationView(
                         item(key = "Contacts header") { ContactsHeader() }
                         if (isNoteToYourselfFeatureFlagEnabled) {
                             item(key = "Note to self") {
-                                NoteToSelfView(onNoteToSelfClicked)
+                                NoteToSelfView(onNoteToSelfClicked, isHint = isNoteToSelfChatEmpty)
                             }
                         }
                         item(key = "Empty contacts") { EmptyContactsView(onInviteContactsClicked) }
@@ -222,6 +224,7 @@ private fun ActionButtons(
     onButtonClicked: (StartConversationAction) -> Unit = {},
     onInviteContactsClicked: () -> Unit,
     withDivider: Boolean = true,
+    isInviteButtonVisible: Boolean = false,
 ) {
     Column(
         modifier = Modifier
@@ -241,7 +244,9 @@ private fun ActionButtons(
             ActionText(actionText = action.title)
         }
 
-        InviteContactsButton(onInviteContactsClicked)
+        if (isInviteButtonVisible) {
+            InviteContactsButton(onInviteContactsClicked)
+        }
 
         if (withDivider) {
             Divider(

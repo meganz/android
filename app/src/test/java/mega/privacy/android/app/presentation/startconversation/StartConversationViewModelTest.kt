@@ -44,6 +44,9 @@ import org.mockito.kotlin.mock
 import org.mockito.kotlin.whenever
 import org.mockito.kotlin.wheneverBlocking
 import mega.privacy.android.app.InstantExecutorExtension
+import mega.privacy.android.domain.usecase.chat.CreateNoteToSelfChatUseCase
+import mega.privacy.android.domain.usecase.chat.GetNoteToSelfChatUseCase
+import mega.privacy.android.domain.usecase.chat.IsAnEmptyChatUseCase
 
 @ExtendWith(InstantExecutorExtension::class)
 @TestInstance(TestInstance.Lifecycle.PER_CLASS)
@@ -100,6 +103,9 @@ class StartConversationViewModelTest {
     private val requestUserLastGreenUseCase = mock<RequestUserLastGreenUseCase>()
     private val createGroupChatRoomUseCase = mock<CreateGroupChatRoomUseCase>()
     private val getFeatureFlagValueUseCase = mock<GetFeatureFlagValueUseCase>()
+    private val getNoteToSelfChatUseCase = mock<GetNoteToSelfChatUseCase>()
+    private val createNoteToSelfChatUseCase = mock<CreateNoteToSelfChatUseCase>()
+    private val isAnEmptyChatUseCase = mock<IsAnEmptyChatUseCase>()
 
     @BeforeEach
     fun resetMocks() {
@@ -139,6 +145,9 @@ class StartConversationViewModelTest {
             requestUserLastGreenUseCase = requestUserLastGreenUseCase,
             monitorConnectivityUseCase = monitorConnectivityUseCase,
             getFeatureFlagValueUseCase = getFeatureFlagValueUseCase,
+            getNoteToSelfChatUseCase = getNoteToSelfChatUseCase,
+            createNoteToSelfChatUseCase = createNoteToSelfChatUseCase,
+            isAnEmptyChatUseCase = isAnEmptyChatUseCase,
             savedStateHandle = savedStateHandle,
         )
     }

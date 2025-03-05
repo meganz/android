@@ -28,6 +28,9 @@ import mega.privacy.android.domain.usecase.GetVisibleContactsUseCase
 import mega.privacy.android.domain.usecase.MonitorContactUpdates
 import mega.privacy.android.domain.usecase.account.contactrequest.MonitorContactRequestUpdatesUseCase
 import mega.privacy.android.domain.usecase.chat.CreateGroupChatRoomUseCase
+import mega.privacy.android.domain.usecase.chat.CreateNoteToSelfChatUseCase
+import mega.privacy.android.domain.usecase.chat.GetNoteToSelfChatUseCase
+import mega.privacy.android.domain.usecase.chat.IsAnEmptyChatUseCase
 import mega.privacy.android.domain.usecase.chat.StartConversationUseCase
 import mega.privacy.android.domain.usecase.contact.AddNewContactsUseCase
 import mega.privacy.android.domain.usecase.contact.MonitorChatOnlineStatusUseCase
@@ -52,6 +55,9 @@ import javax.inject.Inject
  * @property monitorContactRequestUpdatesUseCase                   [MonitorContactRequestUpdatesUseCase]
  * @property addNewContactsUseCase                          [AddNewContactsUseCase]
  * @property requestUserLastGreenUseCase                    [RequestUserLastGreenUseCase]
+ * @property getNoteToSelfChatUseCase                       [GetNoteToSelfChatUseCase]
+ * @property createNoteToSelfChatUseCase                    [CreateNoteToSelfChatUseCase]
+ * @property isAnEmptyChatUseCase                           [IsAnEmptyChatUseCase]
  * @property state                    Current view state as [StartConversationState]
  */
 @HiltViewModel
@@ -68,6 +74,9 @@ class StartConversationViewModel @Inject constructor(
     private val addNewContactsUseCase: AddNewContactsUseCase,
     private val requestUserLastGreenUseCase: RequestUserLastGreenUseCase,
     private val getFeatureFlagValueUseCase: GetFeatureFlagValueUseCase,
+    private val getNoteToSelfChatUseCase: GetNoteToSelfChatUseCase,
+    private val createNoteToSelfChatUseCase: CreateNoteToSelfChatUseCase,
+    private val isAnEmptyChatUseCase: IsAnEmptyChatUseCase,
     monitorConnectivityUseCase: MonitorConnectivityUseCase,
     savedStateHandle: SavedStateHandle,
 ) : ViewModel() {
@@ -194,8 +203,66 @@ class StartConversationViewModel @Inject constructor(
                         isNoteToYourselfFeatureFlagEnabled = flag,
                     )
                 }
+
+                if (flag) {
+                    getNoteToSelfChat()
+                }
             }
         }
+    }
+
+    /**
+     * Get note to self chat
+     */
+    private fun getNoteToSelfChat() =
+        viewModelScope.launch {
+            runCatching {
+                getNoteToSelfChatUseCase()
+            }.onFailure { exception ->
+                Timber.e(exception)
+            }.onSuccess { chat ->
+                chat?.apply {
+                    Timber.d("Note to self chat is already created")
+                    checkIfNoteToSelfIsEmpty(chatId)
+                } ?: run {
+                    Timber.d("Note to self chat is not created")
+                    createNoteToSelfChat()
+                }
+            }
+        }
+
+    /**
+     * Create note to self chat
+     */
+    private fun createNoteToSelfChat() =
+        viewModelScope.launch {
+            runCatching {
+                createNoteToSelfChatUseCase().run {
+                    getNoteToSelfChatUseCase()?.apply {
+                        Timber.d("Note to self chat successfully created")
+                        checkIfNoteToSelfIsEmpty(chatId = chatId)
+                    }
+                }
+            }
+        }
+
+    /**
+     * Check if note to self chat is empty
+     *
+     * @param chatId  Chat id
+     */
+    private fun checkIfNoteToSelfIsEmpty(chatId: Long) {
+        viewModelScope.launch {
+            runCatching {
+                isAnEmptyChatUseCase(chatId)
+            }.onFailure { exception ->
+                Timber.e(exception)
+            }.onSuccess { isChatEmpty ->
+                Timber.d("Check if note to self chat is empty: $isChatEmpty")
+                _state.update { it.copy(isNoteToSelfChatEmpty = isChatEmpty) }
+            }
+        }
+
     }
 
     private suspend fun getContactsData(contactList: List<ContactItem>) {

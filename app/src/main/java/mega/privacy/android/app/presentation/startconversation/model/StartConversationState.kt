@@ -19,6 +19,7 @@ import mega.privacy.android.legacy.core.ui.model.SearchWidgetState
  * @property result              Handle of the new chat conversation.
  * @property fromChat            True if the screen is opened from chat, false otherwise.
  * @property isNoteToYourselfFeatureFlagEnabled   True if the note to yourself feature flag is enabled, false if not.
+ * @property isNoteToSelfChatEmpty True if the chat is empty. False, otherwise.
  */
 data class StartConversationState(
     val buttons: List<StartConversationAction> = StartConversationAction.entries.toList(),
@@ -33,4 +34,5 @@ data class StartConversationState(
     val result: Long? = null,
     val fromChat: Boolean = false,
     val isNoteToYourselfFeatureFlagEnabled: Boolean = false,
+    val isNoteToSelfChatEmpty: Boolean = true,
 )
