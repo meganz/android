@@ -226,7 +226,7 @@ class SearchViewModel @Inject constructor(
         tag = if (state.value.searchTagsEnabled == true) getCurrentSearchQuery()
             .removePrefix("#")
             .takeIf {
-                nodeSourceType != NodeSourceType.RUBBISH_BIN && nodeSourceType != NodeSourceType.INCOMING_SHARES
+                nodeSourceType != NodeSourceType.RUBBISH_BIN
             }
         else null
     )
