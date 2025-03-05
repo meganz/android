@@ -274,10 +274,6 @@
     <string name="general_low_tier_plan_essential_label">MEGA&#160;Essential</string>
     <!-- The Body Text of a Settings Camera Uploads Option that decides whether or not the Device must be charged for Camera Uploads to start uploading content -->
     <string name="settings_camera_uploads_upload_only_while_charging_option_body">Uploads will be paused until you start charging your device. Uploads will still remain paused if your battery is below 20%.</string>
-    <!-- Title of the synced folder list empty state -->
-    <string name="device_center_sync_list_empty_state_title">No syncs set up</string>
-    <!-- Message of the synced folder list empty state -->
-    <string name="device_center_sync_list_empty_state_message">Sync a folder on your device with a folder on MEGA.</string>
     <!-- Label for the button or menu option to add a new sync -->
     <string name="device_center_sync_add_new_syn_button_option">Add new sync</string>
     <!-- Text for the Sync solved issues chip -->
@@ -954,4 +950,6 @@
     </plurals>
     <!-- Snack bar message informing that profile's QR code is uploaded to the Cloud Drive-->
     <string name="transfers_start_upload_profile_qr_code_message">Saving %1$s to Cloud drive&#8230;</string>
+    <!-- Warning shown after trying to cancel a download, but the request failed -->
+    <string name="transfers_error_cancelling_download">Something went wrong. Download was not cancelled.</string>
 </resources>

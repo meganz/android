@@ -481,7 +481,7 @@ private fun StartTransferComponent(
                     if (it.success) {
                         sharedR.string.transfers_cancel_download_success_message
                     } else {
-                        R.string.general_error
+                        sharedR.string.transfers_error_cancelling_download
                     }
                 )
             )
