@@ -3659,4 +3659,15 @@ interface MegaApiGateway {
      * @param listener MegaRequestListener to track this request
      */
     fun removeVersions(listener: MegaRequestListenerInterface)
+
+    /**
+     * Allow to resend the verification email for Weak Account Protection
+     * The verification email will be resent to the same address as it was previously sent to.
+     * This function can be called if the the reason for being blocked is: 700: the account is suspended for Weak Account Protection.
+     * If the logged in account is not suspended or is suspended for some other reason, onRequestFinish will be called with the error code MegaError::API_EACCESS.
+     * If the logged in account has not been sent the unlock email before, onRequestFinish will be called with the error code MegaError::API_EARGS.
+     * If the logged in account has already sent the unlock email and until it's available again, onRequestFinish will be called with the error code MegaError::API_ETEMPUNAVAIL.
+     * @param listener MegaRequestListener to track this request
+     */
+    fun resendVerificationEmail(listener: MegaRequestListenerInterface)
 }

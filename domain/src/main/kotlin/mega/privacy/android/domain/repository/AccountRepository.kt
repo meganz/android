@@ -743,4 +743,9 @@ interface AccountRepository {
      * Broadcast misc loaded
      */
     suspend fun broadcastMiscLoaded()
+
+    /**
+     *  Resend the verification email for Weak Account Protection
+     */
+    suspend fun resendVerificationEmail()
 }

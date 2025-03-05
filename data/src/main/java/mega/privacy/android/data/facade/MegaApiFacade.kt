@@ -1546,4 +1546,7 @@ internal class MegaApiFacade @Inject constructor(
     override fun removeVersions(listener: MegaRequestListenerInterface) {
         megaApi.removeVersions(listener)
     }
+
+    override fun resendVerificationEmail(listener: MegaRequestListenerInterface) =
+        megaApi.resendVerificationEmail(listener)
 }

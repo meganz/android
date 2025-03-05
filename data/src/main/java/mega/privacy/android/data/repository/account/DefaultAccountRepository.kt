@@ -1410,6 +1410,24 @@ internal class DefaultAccountRepository @Inject constructor(
 
     override suspend fun broadcastMiscLoaded() = appEventGateway.broadcastMiscLoaded()
 
+    override suspend fun resendVerificationEmail() = withContext(ioDispatcher) {
+        suspendCancellableCoroutine { continuation ->
+            val listener = OptionalMegaRequestListenerInterface(
+                onRequestFinish = { request, error ->
+                    if (error.errorCode == MegaError.API_OK) {
+                        continuation.resumeWith(
+                            Result.success(Unit)
+                        )
+                    } else {
+                        continuation.failWithError(error, "resendVerificationEmail")
+                    }
+                }
+            )
+
+            megaApiGateway.resendVerificationEmail(listener)
+        }
+    }
+
     companion object {
         private const val LAST_SYNC_TIMESTAMP_FILE = "last_sync_timestamp"
         private const val USER_INTERFACE_PREFERENCES = "USER_INTERFACE_PREFERENCES"
