@@ -102,15 +102,13 @@ import mega.android.core.ui.theme.values.LinkColor
 import mega.android.core.ui.theme.values.TextColor
 import mega.privacy.android.analytics.Analytics
 import mega.privacy.android.app.R
-import mega.privacy.android.app.presentation.apiserver.view.ChangeApiServerDialog
-import mega.privacy.android.app.presentation.extensions.isDarkMode
+import mega.privacy.android.app.presentation.apiserver.view.NewChangeApiServerDialog
 import mega.privacy.android.app.presentation.extensions.login.newError
 import mega.privacy.android.app.presentation.login.model.LoginState
 import mega.privacy.android.domain.entity.Progress
 import mega.privacy.android.domain.entity.account.AccountSession
 import mega.privacy.android.domain.exception.LoginTooManyAttempts
 import mega.privacy.android.domain.exception.LoginWrongEmailOrPassword
-import mega.privacy.android.shared.original.core.ui.theme.OriginalTheme
 import mega.privacy.mobile.analytics.event.LoginButtonPressedEvent
 import mega.privacy.mobile.analytics.event.LoginHelpButtonPressedEvent
 import mega.privacy.mobile.analytics.event.SignUpButtonOnLoginPagePressedEvent
@@ -231,9 +229,7 @@ fun NewLoginView(
         }
 
         if (showChangeApiServerDialog) {
-            OriginalTheme(isDark = state.themeMode.isDarkMode()) {
-                ChangeApiServerDialog(onDismissRequest = { showChangeApiServerDialog = false })
-            }
+            NewChangeApiServerDialog(onDismissRequest = { showChangeApiServerDialog = false })
         }
     }
 }
