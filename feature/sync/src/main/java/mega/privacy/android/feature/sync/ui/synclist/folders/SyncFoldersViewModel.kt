@@ -16,7 +16,9 @@ import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.onStart
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
+import mega.privacy.android.data.mapper.backup.BackupInfoTypeIntMapper
 import mega.privacy.android.domain.entity.backup.Backup
+import mega.privacy.android.domain.entity.backup.BackupInfoType
 import mega.privacy.android.domain.entity.camerauploads.CameraUploadsStatusInfo
 import mega.privacy.android.domain.entity.node.TypedFolderNode
 import mega.privacy.android.domain.usecase.GetFolderTreeInfo
@@ -27,6 +29,10 @@ import mega.privacy.android.domain.usecase.account.IsStorageOverQuotaUseCase
 import mega.privacy.android.domain.usecase.account.MonitorAccountDetailUseCase
 import mega.privacy.android.domain.usecase.camerauploads.GetCameraUploadsBackupUseCase
 import mega.privacy.android.domain.usecase.camerauploads.GetMediaUploadsBackupUseCase
+import mega.privacy.android.domain.usecase.camerauploads.GetPrimaryFolderNodeUseCase
+import mega.privacy.android.domain.usecase.camerauploads.GetPrimaryFolderPathUseCase
+import mega.privacy.android.domain.usecase.camerauploads.GetSecondaryFolderNodeUseCase
+import mega.privacy.android.domain.usecase.camerauploads.GetSecondaryFolderPathUseCase
 import mega.privacy.android.domain.usecase.camerauploads.MonitorCameraUploadsSettingsActionsUseCase
 import mega.privacy.android.domain.usecase.camerauploads.MonitorCameraUploadsStatusInfoUseCase
 import mega.privacy.android.domain.usecase.environment.MonitorBatteryInfoUseCase
@@ -70,6 +76,11 @@ internal class SyncFoldersViewModel @Inject constructor(
     private val getMediaUploadsBackupUseCase: GetMediaUploadsBackupUseCase,
     private val monitorCameraUploadsSettingsActionsUseCase: MonitorCameraUploadsSettingsActionsUseCase,
     private val monitorCameraUploadsStatusInfoUseCase: MonitorCameraUploadsStatusInfoUseCase,
+    private val backupInfoTypeIntMapper: BackupInfoTypeIntMapper,
+    private val getPrimaryFolderNodeUseCase: GetPrimaryFolderNodeUseCase,
+    private val getPrimaryFolderPathUseCase: GetPrimaryFolderPathUseCase,
+    private val getSecondaryFolderNodeUseCase: GetSecondaryFolderNodeUseCase,
+    private val getSecondaryFolderPathUseCase: GetSecondaryFolderPathUseCase,
 ) : ViewModel() {
 
     private val _uiState = MutableStateFlow(SyncFoldersUiState(emptyList()))
@@ -192,6 +203,7 @@ internal class SyncFoldersViewModel @Inject constructor(
         cameraUploadsOrMediaUploadsBackup: Backup?,
         cuStatusInfo: CameraUploadsStatusInfo,
     ): SyncUiItem? {
+        var localPath = ""
         var megaStoragePath = ""
         var numOfFiles = 0
         var numOfFolders = 0
@@ -200,10 +212,19 @@ internal class SyncFoldersViewModel @Inject constructor(
 
         cameraUploadsOrMediaUploadsBackup?.let { backup ->
             runCatching {
-                getNodeByIdUseCase(backup.targetNode)
+                when (backupInfoTypeIntMapper(backup.backupType)) {
+                    BackupInfoType.CAMERA_UPLOADS -> getPrimaryFolderNodeUseCase()
+                    BackupInfoType.MEDIA_UPLOADS -> getSecondaryFolderNodeUseCase()
+                    else -> getNodeByIdUseCase(backup.targetNode)
+                }
             }.onSuccess { node ->
                 node?.let { folder ->
-                    megaStoragePath = getNodePathByIdUseCase(backup.targetNode)
+                    localPath = when (backupInfoTypeIntMapper(backup.backupType)) {
+                        BackupInfoType.CAMERA_UPLOADS -> getPrimaryFolderPathUseCase()
+                        BackupInfoType.MEDIA_UPLOADS -> getSecondaryFolderPathUseCase()
+                        else -> backup.localFolder
+                    }
+                    megaStoragePath = getNodePathByIdUseCase(folder.id)
                     creationTime = folder.creationTime
                     runCatching {
                         getFolderTreeInfo(folder as TypedFolderNode)
@@ -229,6 +250,7 @@ internal class SyncFoldersViewModel @Inject constructor(
                 numberOfFolders = numOfFolders,
                 totalSizeInBytes = totalSizeInBytes,
                 creationTime = creationTime,
+                deviceStoragePath = localPath,
                 megaStoragePath = megaStoragePath,
             )
         }
