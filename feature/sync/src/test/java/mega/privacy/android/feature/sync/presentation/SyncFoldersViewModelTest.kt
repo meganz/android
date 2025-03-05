@@ -8,6 +8,7 @@ import kotlinx.coroutines.flow.flowOf
 import kotlinx.coroutines.runBlocking
 import kotlinx.coroutines.test.runTest
 import mega.privacy.android.core.test.extension.CoroutineMainDispatcherExtension
+import mega.privacy.android.data.mapper.backup.BackupInfoTypeIntMapper
 import mega.privacy.android.domain.entity.AccountType
 import mega.privacy.android.domain.entity.BatteryInfo
 import mega.privacy.android.domain.entity.account.AccountDetail
@@ -23,6 +24,10 @@ import mega.privacy.android.domain.usecase.account.IsStorageOverQuotaUseCase
 import mega.privacy.android.domain.usecase.account.MonitorAccountDetailUseCase
 import mega.privacy.android.domain.usecase.camerauploads.GetCameraUploadsBackupUseCase
 import mega.privacy.android.domain.usecase.camerauploads.GetMediaUploadsBackupUseCase
+import mega.privacy.android.domain.usecase.camerauploads.GetPrimaryFolderNodeUseCase
+import mega.privacy.android.domain.usecase.camerauploads.GetPrimaryFolderPathUseCase
+import mega.privacy.android.domain.usecase.camerauploads.GetSecondaryFolderNodeUseCase
+import mega.privacy.android.domain.usecase.camerauploads.GetSecondaryFolderPathUseCase
 import mega.privacy.android.domain.usecase.camerauploads.MonitorCameraUploadsSettingsActionsUseCase
 import mega.privacy.android.domain.usecase.camerauploads.MonitorCameraUploadsStatusInfoUseCase
 import mega.privacy.android.domain.usecase.environment.MonitorBatteryInfoUseCase
@@ -84,6 +89,11 @@ class SyncFoldersViewModelTest {
         mock()
     private val monitorCameraUploadsStatusInfoUseCase: MonitorCameraUploadsStatusInfoUseCase =
         mock()
+    private val backupInfoTypeIntMapper: BackupInfoTypeIntMapper = mock()
+    private val getPrimaryFolderNodeUseCase: GetPrimaryFolderNodeUseCase = mock()
+    private val getPrimaryFolderPathUseCase: GetPrimaryFolderPathUseCase = mock()
+    private val getSecondaryFolderNodeUseCase: GetSecondaryFolderNodeUseCase = mock()
+    private val getSecondaryFolderPathUseCase: GetSecondaryFolderPathUseCase = mock()
     private lateinit var underTest: SyncFoldersViewModel
 
     private val folderPairs = listOf(
@@ -179,6 +189,11 @@ class SyncFoldersViewModelTest {
             getNodePathByIdUseCase,
             getCameraUploadsBackupUseCase,
             monitorCameraUploadsStatusInfoUseCase,
+            backupInfoTypeIntMapper,
+            getPrimaryFolderNodeUseCase,
+            getPrimaryFolderPathUseCase,
+            getSecondaryFolderNodeUseCase,
+            getSecondaryFolderPathUseCase,
         )
     }
 
@@ -425,6 +440,11 @@ class SyncFoldersViewModelTest {
             getMediaUploadsBackupUseCase = getMediaUploadsBackupUseCase,
             monitorCameraUploadsSettingsActionsUseCase = monitorCameraUploadsSettingsActionsUseCase,
             monitorCameraUploadsStatusInfoUseCase = monitorCameraUploadsStatusInfoUseCase,
+            backupInfoTypeIntMapper = backupInfoTypeIntMapper,
+            getPrimaryFolderNodeUseCase = getPrimaryFolderNodeUseCase,
+            getPrimaryFolderPathUseCase = getPrimaryFolderPathUseCase,
+            getSecondaryFolderNodeUseCase = getSecondaryFolderNodeUseCase,
+            getSecondaryFolderPathUseCase = getSecondaryFolderPathUseCase,
         )
     }
 }

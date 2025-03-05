@@ -1206,6 +1206,18 @@ internal class SettingsCameraUploadsViewModelTest {
 
                 verify(stopCameraUploadsUseCase).invoke(CameraUploadsRestartMode.Stop)
             }
+
+        @Test
+        fun `test that setting the new local primary folder emits the proper event`() = runTest {
+            val newPath = "new/primary/folder/path"
+            initializeUnderTest()
+            whenever(isFolderPathExistingUseCase(newPath)).thenReturn(true)
+            whenever(isPrimaryFolderPathUnrelatedToSecondaryFolderUseCase(newPath)).thenReturn(true)
+
+            underTest.onLocalPrimaryFolderSelected(newPath)
+
+            verify(broadcastCameraUploadsSettingsActionUseCase).invoke(CameraUploadsSettingsAction.CameraUploadsLocalFolderChanged)
+        }
     }
 
     /**
@@ -1262,6 +1274,16 @@ internal class SettingsCameraUploadsViewModelTest {
 
                 verify(stopCameraUploadsUseCase).invoke(CameraUploadsRestartMode.Stop)
             }
+
+        @Test
+        fun `test that setting the new primary folder node emits the proper event`() = runTest {
+            whenever(isNewFolderNodeValidUseCase(any())).thenReturn(true)
+            initializeUnderTest()
+
+            underTest.onPrimaryFolderNodeSelected(NodeId(123456L))
+
+            verify(broadcastCameraUploadsSettingsActionUseCase).invoke(CameraUploadsSettingsAction.CameraUploadsMegaNodeChanged)
+        }
 
         @Test
         fun `test that the exception is caught when setting the primary folder name`() = runTest {
@@ -1608,6 +1630,18 @@ internal class SettingsCameraUploadsViewModelTest {
 
                 verify(stopCameraUploadsUseCase).invoke(CameraUploadsRestartMode.Stop)
             }
+
+        @Test
+        fun `test that setting the new local secondary folder emits the proper event`() = runTest {
+            val newPath = "new/secondary/folder/path"
+            initializeUnderTest()
+            whenever(isFolderPathExistingUseCase(newPath)).thenReturn(true)
+            whenever(isSecondaryFolderPathUnrelatedToPrimaryFolderUseCase(newPath)).thenReturn(true)
+
+            underTest.onLocalSecondaryFolderSelected(newPath)
+
+            verify(broadcastCameraUploadsSettingsActionUseCase).invoke(CameraUploadsSettingsAction.MediaUploadsLocalFolderChanged)
+        }
     }
 
     /**
@@ -1664,6 +1698,16 @@ internal class SettingsCameraUploadsViewModelTest {
 
                 verify(stopCameraUploadsUseCase).invoke(CameraUploadsRestartMode.Stop)
             }
+
+        @Test
+        fun `test that setting the new secondary folder node emits the proper event`() = runTest {
+            whenever(isNewFolderNodeValidUseCase(any())).thenReturn(true)
+            initializeUnderTest()
+
+            underTest.onSecondaryFolderNodeSelected(NodeId(123456L))
+
+            verify(broadcastCameraUploadsSettingsActionUseCase).invoke(CameraUploadsSettingsAction.MediaUploadsMegaNodeChanged)
+        }
 
         @Test
         fun `test that the exception is caught when setting the secondary folder name`() = runTest {

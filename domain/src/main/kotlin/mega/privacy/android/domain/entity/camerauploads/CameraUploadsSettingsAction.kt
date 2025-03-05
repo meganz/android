@@ -21,6 +21,16 @@ sealed interface CameraUploadsSettingsAction {
     data object MediaUploadsDisabled : CameraUploadsSettingsAction
 
     /**
+     * Media Uploads MEGA folder node has been changed
+     */
+    data object MediaUploadsMegaNodeChanged : CameraUploadsSettingsAction
+
+    /**
+     * Media Uploads local folder has been changed
+     */
+    data object MediaUploadsLocalFolderChanged : CameraUploadsSettingsAction
+
+    /**
      * Enable Camera Uploads action has been performed
      */
     data object CameraUploadsEnabled : CameraUploadsSettingsAction
@@ -34,4 +44,14 @@ sealed interface CameraUploadsSettingsAction {
      * Disable Camera Uploads action has been performed
      */
     data object CameraUploadsDisabled : CameraUploadsSettingsAction
+
+    /**
+     * Camera Uploads MEGA folder node has been changed
+     */
+    data object CameraUploadsMegaNodeChanged : CameraUploadsSettingsAction
+
+    /**
+     * Camera Uploads local folder has been changed
+     */
+    data object CameraUploadsLocalFolderChanged : CameraUploadsSettingsAction
 }
