@@ -5,6 +5,9 @@ import dagger.Provides
 import dagger.hilt.InstallIn
 import dagger.hilt.components.SingletonComponent
 import dagger.multibindings.ElementsIntoSet
+import dagger.multibindings.IntoSet
+import mega.privacy.android.app.presentation.settings.compose.appearance.navigation.AppearanceFeatureSetting
+import mega.privacy.android.app.presentation.settings.compose.appearance.navigation.appearanceSettingEntryPoint
 import mega.privacy.android.app.presentation.settings.compose.navigation.appFeatureSettings
 import mega.privacy.android.app.presentation.settings.compose.navigation.appFeatureSettingsEntryPoints
 import mega.privacy.android.app.presentation.settings.compose.navigation.appMoreSettingsEntryPoints
@@ -36,6 +39,11 @@ abstract class SettingsModule {
         @ElementsIntoSet
         fun provideAddMoreSettingsEntryPoints(): Set<@JvmSuppressWildcards MoreSettingEntryPoint> =
             appMoreSettingsEntryPoints
+
+        @Provides
+        @IntoSet
+        fun provideAppearanceSettingEntryPoint(): FeatureSettingEntryPoint =
+            appearanceSettingEntryPoint
 
         @Provides
         @ElementsIntoSet
@@ -93,6 +101,10 @@ abstract class SettingsModule {
         @ElementsIntoSet
         fun provideFeatureSettingsSet(): Set<@JvmSuppressWildcards FeatureSettings> =
             appFeatureSettings
+
+        @Provides
+        @IntoSet
+        fun provideAppearanceFeatureSettings(): FeatureSettings = AppearanceFeatureSetting
     }
 
 }

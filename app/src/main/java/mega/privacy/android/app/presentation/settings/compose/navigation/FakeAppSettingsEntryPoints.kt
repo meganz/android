@@ -20,13 +20,7 @@ import mega.privacy.android.navigation.settings.FeatureSettings
 import mega.privacy.android.navigation.settings.MoreSettingEntryPoint
 
 internal val appFeatureSettingsEntryPoints = setOf<FeatureSettingEntryPoint>(
-    FeatureSettingEntryPoint(
-        key = "appearance",
-        title = R.string.settings_appearance,
-        icon = iconPackR.drawable.ic_gear_six_medium_regular_outline,
-        preferredOrdinal = 10,
-        destination = FakeSetting1,
-    ),
+
     FeatureSettingEntryPoint(
         key = "file_management",
         title = R.string.settings_file_management_category,

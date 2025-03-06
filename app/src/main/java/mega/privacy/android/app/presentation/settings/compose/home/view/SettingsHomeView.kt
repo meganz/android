@@ -20,6 +20,7 @@ import androidx.compose.material3.adaptive.currentWindowAdaptiveInfo
 import androidx.compose.material3.adaptive.layout.AnimatedPane
 import androidx.compose.material3.adaptive.layout.ListDetailPaneScaffold
 import androidx.compose.material3.adaptive.layout.ListDetailPaneScaffoldRole
+import androidx.compose.material3.adaptive.navigation.ThreePaneScaffoldNavigator
 import androidx.compose.material3.adaptive.navigation.rememberListDetailPaneScaffoldNavigator
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
@@ -34,6 +35,7 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.res.vectorResource
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
+import androidx.navigation.NavHostController
 import androidx.navigation.compose.rememberNavController
 import androidx.window.core.layout.WindowWidthSizeClass
 import kotlinx.collections.immutable.ImmutableList
@@ -99,9 +101,11 @@ internal fun SettingsHomeView(
                     topBar = {
                         MegaTopAppBar(
                             modifier = Modifier.statusBarsPadding(),
-                            navigationType = if (backVisible) AppBarNavigationType.Back(
-                                navigator::navigateBack
-                            ) else AppBarNavigationType.None,
+                            navigationType = if (backVisible) AppBarNavigationType.Back {
+                                navigator.handleDetailBackAction(
+                                    detailNavigator
+                                )
+                            } else AppBarNavigationType.None,
                             title = title,
                         )
                     }
@@ -118,6 +122,15 @@ internal fun SettingsHomeView(
     )
 
 
+}
+
+@OptIn(ExperimentalMaterial3AdaptiveApi::class)
+private fun ThreePaneScaffoldNavigator<SettingEntryPoint>.handleDetailBackAction(
+    detailNavigator: NavHostController,
+) {
+    if (detailNavigator.navigateUp().not()) {
+        navigateBack()
+    }
 }
 
 @Composable
