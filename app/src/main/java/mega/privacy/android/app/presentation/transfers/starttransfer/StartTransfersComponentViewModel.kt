@@ -51,6 +51,7 @@ import mega.privacy.android.domain.usecase.offline.GetOfflinePathForNodeUseCase
 import mega.privacy.android.domain.usecase.setting.IsAskBeforeLargeDownloadsSettingUseCase
 import mega.privacy.android.domain.usecase.setting.SetAskBeforeLargeDownloadsSettingUseCase
 import mega.privacy.android.domain.usecase.transfers.CancelTransferByTagUseCase
+import mega.privacy.android.domain.usecase.transfers.DeleteCacheFilesUseCase
 import mega.privacy.android.domain.usecase.transfers.GetFileNameFromStringUriUseCase
 import mega.privacy.android.domain.usecase.transfers.active.ClearActiveTransfersIfFinishedUseCase
 import mega.privacy.android.domain.usecase.transfers.active.MonitorOngoingActiveTransfersUseCase
@@ -123,6 +124,7 @@ internal class StartTransfersComponentViewModel @Inject constructor(
     private val areTransfersPausedUseCase: AreTransfersPausedUseCase,
     private val getFileNameFromStringUriUseCase: GetFileNameFromStringUriUseCase,
     private val cancelTransferByTagUseCase: CancelTransferByTagUseCase,
+    private val deleteCacheFilesUseCase: DeleteCacheFilesUseCase,
 ) : ViewModel(), DefaultLifecycleObserver {
 
     private val _uiState = MutableStateFlow(StartTransferViewState())
@@ -358,7 +360,12 @@ internal class StartTransfersComponentViewModel @Inject constructor(
                 nodes = listOf(event.node),
                 isHighPriority = true,
                 getUri = {
-                    runCatching { getFilePreviewDownloadPathUseCase() }
+                    runCatching {
+                        getFilePreviewDownloadPathUseCase().also {
+                            // delete the existing file if already exists, because if the preview exists and we need to download it means it's outdated
+                            runCatching { deleteCacheFilesUseCase(listOf(UriPath(it + event.node.name))) }
+                        }
+                    }
                         .onFailure { Timber.e(it) }
                         .getOrNull()
                 },

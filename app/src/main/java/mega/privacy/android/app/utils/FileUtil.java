@@ -299,7 +299,7 @@ public class FileUtil {
 
         File file = new File(getDownloadLocationForPreviewingFiles() + "/" + node.getName());
 
-        return isFileAvailable(file) ? file.getAbsolutePath() : null;
+        return isFileAvailable(file) && node.getSize() == file.length()? file.getAbsolutePath() : null;
     }
 
     /**

@@ -47,6 +47,7 @@ import mega.privacy.android.domain.usecase.offline.GetOfflinePathForNodeUseCase
 import mega.privacy.android.domain.usecase.setting.IsAskBeforeLargeDownloadsSettingUseCase
 import mega.privacy.android.domain.usecase.setting.SetAskBeforeLargeDownloadsSettingUseCase
 import mega.privacy.android.domain.usecase.transfers.CancelTransferByTagUseCase
+import mega.privacy.android.domain.usecase.transfers.DeleteCacheFilesUseCase
 import mega.privacy.android.domain.usecase.transfers.GetFileNameFromStringUriUseCase
 import mega.privacy.android.domain.usecase.transfers.active.ClearActiveTransfersIfFinishedUseCase
 import mega.privacy.android.domain.usecase.transfers.active.MonitorOngoingActiveTransfersUseCase
@@ -147,6 +148,7 @@ class StartTransfersComponentViewModelTest {
     private val areTransfersPausedUseCase = mock<AreTransfersPausedUseCase>()
     private val getFileNameFromStringUriUseCase = mock<GetFileNameFromStringUriUseCase>()
     private val cancelTransferByTagUseCase = mock<CancelTransferByTagUseCase>()
+    private val deleteCacheFilesUseCase = mock<DeleteCacheFilesUseCase>()
 
     private val node: TypedFileNode = mock()
     private val nodes = listOf(node)
@@ -209,6 +211,7 @@ class StartTransfersComponentViewModelTest {
             areTransfersPausedUseCase = areTransfersPausedUseCase,
             getFileNameFromStringUriUseCase = getFileNameFromStringUriUseCase,
             cancelTransferByTagUseCase = cancelTransferByTagUseCase,
+            deleteCacheFilesUseCase = deleteCacheFilesUseCase,
         )
     }
 
@@ -253,6 +256,7 @@ class StartTransfersComponentViewModelTest {
             areTransfersPausedUseCase,
             getFileNameFromStringUriUseCase,
             cancelTransferByTagUseCase,
+            deleteCacheFilesUseCase,
         )
         initialStub()
     }
@@ -286,6 +290,16 @@ class StartTransfersComponentViewModelTest {
         }
         underTest.startTransfer(startEvent)
         verify(startDownloadsWorkerAndWaitUntilIsStartedUseCase).invoke()
+    }
+
+    @Test
+    fun `test that preview file is deleted before starting to download it`() = runTest {
+        commonStub()
+        val previewCachePath = "/cache/preview"
+        whenever(getFilePreviewDownloadPathUseCase()) doReturn previewCachePath
+        val startEvent = TransferTriggerEvent.StartDownloadForPreview(node, false)
+        underTest.startTransfer(startEvent)
+        verify(deleteCacheFilesUseCase).invoke(listOf(UriPath(previewCachePath + node.name)))
     }
 
     @ParameterizedTest
@@ -418,10 +432,6 @@ class StartTransfersComponentViewModelTest {
                 on { toString() } doReturn uriString
             }
             val startDownloadNode = TransferTriggerEvent.StartDownloadNode(nodes)
-            val expected = SaveDestinationInfo(
-                destination = uriString,
-                destinationName = destinationName
-            )
 
             whenever(shouldAskDownloadDestinationUseCase()).thenReturn(true)
             whenever(shouldPromptToSaveDestinationUseCase()).thenReturn(true)
@@ -1177,6 +1187,7 @@ class StartTransfersComponentViewModelTest {
     private suspend fun commonStub() {
         whenever(isAskBeforeLargeDownloadsSettingUseCase()).thenReturn(false)
         whenever(node.id).thenReturn(nodeId)
+        whenever(node.name).thenReturn(NODE_NAME)
         whenever(node.parentId).thenReturn(parentId)
         whenever(parentNode.id).thenReturn(parentId)
 
@@ -1206,5 +1217,6 @@ class StartTransfersComponentViewModelTest {
         private val nodeId = NodeId(NODE_HANDLE)
         private val parentId = NodeId(PARENT_NODE_HANDLE)
         private const val DESTINATION = "/destination/"
+        private const val NODE_NAME = "node.txt"
     }
 }
