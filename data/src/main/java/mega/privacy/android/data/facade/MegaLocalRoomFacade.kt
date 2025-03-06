@@ -48,7 +48,7 @@ import mega.privacy.android.domain.entity.camerauploads.CameraUploadsRecord
 import mega.privacy.android.domain.entity.camerauploads.CameraUploadsRecordUploadStatus
 import mega.privacy.android.domain.entity.chat.ChatPendingChanges
 import mega.privacy.android.domain.entity.transfer.ActiveTransfer
-import mega.privacy.android.domain.entity.transfer.ActiveTransferGroup
+import mega.privacy.android.domain.entity.transfer.ActiveTransferActionGroup
 import mega.privacy.android.domain.entity.transfer.CompletedTransfer
 import mega.privacy.android.domain.entity.transfer.TransferType
 import mega.privacy.android.domain.entity.transfer.pending.InsertPendingTransferRequest
@@ -257,11 +257,11 @@ internal class MegaLocalRoomFacade @Inject constructor(
     override suspend fun setActiveTransferAsCancelledByTag(tags: List<Int>) =
         activeTransferDao.get().setActiveTransferAsCancelledByTag(tags)
 
-    override suspend fun insertActiveTransferGroup(activeTransferGroup: ActiveTransferGroup) =
+    override suspend fun insertActiveTransferGroup(activeTransferActionGroup: ActiveTransferActionGroup) =
         activeTransferGroupDao.get()
-            .insertActiveTransferGroup(activeTransferGroupEntityMapper(activeTransferGroup))
+            .insertActiveTransferGroup(activeTransferGroupEntityMapper(activeTransferActionGroup))
 
-    override suspend fun getActiveTransferGroup(groupId: Int): ActiveTransferGroup? =
+    override suspend fun getActiveTransferGroup(groupId: Int): ActiveTransferActionGroup? =
         activeTransferGroupDao.get().getActiveTransferGroupById(groupId)
 
     override suspend fun deleteActiveTransferGroup(groupId: Int) {

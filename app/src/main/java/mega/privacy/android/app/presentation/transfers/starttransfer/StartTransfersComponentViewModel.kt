@@ -672,7 +672,7 @@ internal class StartTransfersComponentViewModel @Inject constructor(
                 .catch {
                     Timber.e(it)
                 }.collect { (transferTotals, _) ->
-                    transferTotals.groups
+                    transferTotals.actionGroups
                         .filter { it.isPreviewDownload() }
                         .takeIf { it.isNotEmpty() }?.let { previewGroups ->
                             if (active) {
@@ -684,8 +684,8 @@ internal class StartTransfersComponentViewModel @Inject constructor(
         }
     }
 
-    private fun checkFinishedPreviews(groups: List<ActiveTransferTotals.Group>) {
-        groups.filter { it.finished() && !alreadyFinishedPreviewGroups.contains(it.groupId) }
+    private fun checkFinishedPreviews(actionGroups: List<ActiveTransferTotals.ActionGroup>) {
+        actionGroups.filter { it.finished() && !alreadyFinishedPreviewGroups.contains(it.groupId) }
             .let { finishedGroups ->
                 alreadyFinishedPreviewGroups.addAll(finishedGroups.map { it.groupId })
                 finishedGroups.forEach { group ->
@@ -707,8 +707,8 @@ internal class StartTransfersComponentViewModel @Inject constructor(
             }
     }
 
-    private fun checkSlowPreviews(groups: List<ActiveTransferTotals.Group>) {
-        groups.filter {
+    private fun checkSlowPreviews(actionGroups: List<ActiveTransferTotals.ActionGroup>) {
+        actionGroups.filter {
             !it.finished()
                     && !alreadySlowNotifiedGroups.contains(it.groupId)
                     && it.durationFromStart(getCurrentTimeInMillisUseCase()) > 2.seconds

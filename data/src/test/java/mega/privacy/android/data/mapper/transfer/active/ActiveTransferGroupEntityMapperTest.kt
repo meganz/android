@@ -2,8 +2,8 @@ package mega.privacy.android.data.mapper.transfer.active
 
 import com.google.common.truth.Truth.assertThat
 import kotlinx.coroutines.test.runTest
-import mega.privacy.android.data.database.entity.ActiveTransferGroupEntity
-import mega.privacy.android.domain.entity.transfer.ActiveTransferGroupImpl
+import mega.privacy.android.data.database.entity.ActiveTransferActionGroupEntity
+import mega.privacy.android.domain.entity.transfer.ActiveTransferActionGroupImpl
 import mega.privacy.android.domain.entity.transfer.TransferType
 import org.junit.jupiter.api.BeforeAll
 import org.junit.jupiter.api.TestInstance
@@ -26,9 +26,9 @@ class ActiveTransferGroupEntityMapperTest {
         transferType: TransferType,
     ) = runTest {
         val activeTransferGroup =
-            ActiveTransferGroupImpl(GROUP_ID, transferType, DESTINATION, START_TIME)
+            ActiveTransferActionGroupImpl(GROUP_ID, transferType, DESTINATION, START_TIME)
         val expected =
-            ActiveTransferGroupEntity(GROUP_ID, transferType, DESTINATION, START_TIME)
+            ActiveTransferActionGroupEntity(GROUP_ID, transferType, DESTINATION, START_TIME)
         val actual = underTest(activeTransferGroup)
         assertThat(expected).isEqualTo(actual)
     }

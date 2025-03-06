@@ -7,7 +7,7 @@ import androidx.test.ext.junit.runners.AndroidJUnit4
 import com.google.common.truth.Truth.assertThat
 import kotlinx.coroutines.test.runTest
 import mega.privacy.android.data.database.MegaDatabase
-import mega.privacy.android.data.database.entity.ActiveTransferGroupEntity
+import mega.privacy.android.data.database.entity.ActiveTransferActionGroupEntity
 import mega.privacy.android.domain.entity.transfer.TransferType
 import org.junit.After
 import org.junit.Before
@@ -36,7 +36,7 @@ class ActiveTransferGroupDaoTest {
 
     @Test
     fun test_that_insert_a_new_entity_actually_inserts_the_entity() = runTest {
-        val newEntity = ActiveTransferGroupEntity(
+        val newEntity = ActiveTransferActionGroupEntity(
             groupId = 6434,
             transferType = TransferType.DOWNLOAD,
             destination = "destination",
@@ -48,7 +48,7 @@ class ActiveTransferGroupDaoTest {
 
     @Test
     fun test_that_delete_an_entity_actually_deletes_the_entity() = runTest {
-        val newEntity = ActiveTransferGroupEntity(
+        val newEntity = ActiveTransferActionGroupEntity(
             groupId = 6434,
             transferType = TransferType.DOWNLOAD,
             destination = "destination",

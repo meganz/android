@@ -4,7 +4,7 @@ import com.google.common.truth.Truth.assertThat
 import kotlinx.coroutines.test.runTest
 import mega.privacy.android.domain.entity.node.DefaultTypedFileNode
 import mega.privacy.android.domain.entity.node.NodeId
-import mega.privacy.android.domain.entity.transfer.ActiveTransferGroupImpl
+import mega.privacy.android.domain.entity.transfer.ActiveTransferActionGroupImpl
 import mega.privacy.android.domain.entity.transfer.TransferAppData
 import mega.privacy.android.domain.entity.transfer.TransferType
 import mega.privacy.android.domain.entity.transfer.pending.InsertPendingTransferRequest
@@ -138,7 +138,7 @@ class InsertPendingDownloadsForNodesUseCaseTest {
             appData = null,
         )
         verify(transferRepository).insertActiveTransferGroup(
-            ActiveTransferGroupImpl(
+            ActiveTransferActionGroupImpl(
                 transferType = TransferType.DOWNLOAD,
                 destination = uriPath.value,
                 startTime = time

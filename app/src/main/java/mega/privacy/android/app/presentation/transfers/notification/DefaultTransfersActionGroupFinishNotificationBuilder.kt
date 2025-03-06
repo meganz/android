@@ -47,19 +47,19 @@ class DefaultTransfersActionGroupFinishNotificationBuilder @Inject constructor(
 ) : TransfersActionGroupFinishNotificationBuilder {
     private val resources get() = context.resources
     override suspend fun invoke(
-        group: ActiveTransferTotals.Group,
+        actionGroup: ActiveTransferTotals.ActionGroup,
         transferType: TransferType,
     ): Notification {
-        val totalCompleted = group.completedFiles
-        val totalFinished = group.finishedFiles
-        val errorCount = group.finishedFilesWithErrors
-        val alreadyTransferredCount = group.alreadyTransferred
+        val totalCompleted = actionGroup.completedFiles
+        val totalFinished = actionGroup.finishedFiles
+        val errorCount = actionGroup.finishedFilesWithErrors
+        val alreadyTransferredCount = actionGroup.alreadyTransferred
         val isDownload = transferType == TransferType.DOWNLOAD
         if (!isDownload) {
             throw NotImplementedError("Group notifications are not yet implemented for uploads")
         }
-        val isPreviewDownload = group.isPreviewDownload()
-        val isOfflineDownload = group.isOfflineDownload()
+        val isPreviewDownload = actionGroup.isPreviewDownload()
+        val isOfflineDownload = actionGroup.isOfflineDownload()
         val titleSuffix = when {
             errorCount > 0 && alreadyTransferredCount > 0 ->
                 "${alreadyMsg(alreadyTransferredCount)}, ${errorMsg(errorCount)}"
@@ -78,7 +78,7 @@ class DefaultTransfersActionGroupFinishNotificationBuilder @Inject constructor(
                 )
             }
 
-            totalCompleted > 1 || group.singleFileName == null -> {
+            totalCompleted > 1 || actionGroup.singleFileName == null -> {
                 resources.getQuantityString(
                     R.plurals.download_service_final_notification,
                     totalCompleted,
@@ -89,14 +89,14 @@ class DefaultTransfersActionGroupFinishNotificationBuilder @Inject constructor(
             isPreviewDownload -> {
                 resources.getString(
                     sharedR.string.transfers_notification_title_preview_download,
-                    group.singleFileName
+                    actionGroup.singleFileName
                 )
             }
 
             else -> {
                 resources.getString(
                     sharedR.string.transfers_notification_title_single_download,
-                    group.singleFileName
+                    actionGroup.singleFileName
                 )
             }
         } + (titleSuffix?.let { ". $it." } ?: "")
@@ -105,12 +105,12 @@ class DefaultTransfersActionGroupFinishNotificationBuilder @Inject constructor(
             isOfflineDownload -> context.getString(R.string.section_saved_for_offline_new)
             isPreviewDownload -> null
             else -> runCatching {
-                if (isContentUriUseCase(group.destination)) {
-                    getPathByDocumentContentUriUseCase(group.destination)
+                if (isContentUriUseCase(actionGroup.destination)) {
+                    getPathByDocumentContentUriUseCase(actionGroup.destination)
                 } else {
-                    group.destination
+                    actionGroup.destination
                 }
-            }.getOrNull() ?: group.destination
+            }.getOrNull() ?: actionGroup.destination
         }
         val contentText = destinationText?.let {
             resources.getString(
@@ -121,14 +121,14 @@ class DefaultTransfersActionGroupFinishNotificationBuilder @Inject constructor(
             if (titleSuffix == null) {
                 it + "\n" + resources.getString(
                     R.string.general_total_size,
-                    fileSizeStringMapper(group.totalBytes)
+                    fileSizeStringMapper(actionGroup.totalBytes)
                 )
             } else {
                 it
             }
         }
 
-        val previewFile = File(group.destination + group.singleFileName)
+        val previewFile = File(actionGroup.destination + actionGroup.singleFileName)
         val isZipFile = runCatching { ZipFile(previewFile) }.getOrNull()?.let { true } == true
         var previewIntent: Intent? = Intent(Intent.ACTION_VIEW).apply {
             flags = Intent.FLAG_GRANT_READ_URI_PERMISSION
@@ -152,7 +152,7 @@ class DefaultTransfersActionGroupFinishNotificationBuilder @Inject constructor(
                             it.setDataAndType(uri, typeForName(previewFile.name).type)
                             val chooserTitle = resources.getString(
                                 sharedR.string.open_with_os_dialog_title,
-                                group.singleFileName
+                                actionGroup.singleFileName
                             )
                             Intent.createChooser(it, chooserTitle)
                         }
@@ -201,8 +201,8 @@ class DefaultTransfersActionGroupFinishNotificationBuilder @Inject constructor(
             Intent(context, ManagerActivity::class.java).apply {
                 action = Constants.ACTION_LOCATE_DOWNLOADED_FILE
                 putExtra(Constants.INTENT_EXTRA_IS_OFFLINE_PATH, isOfflineDownload)
-                putExtra(FileStorageActivity.EXTRA_PATH, group.destination)
-                group.singleFileName?.let {
+                putExtra(FileStorageActivity.EXTRA_PATH, actionGroup.destination)
+                actionGroup.singleFileName?.let {
                     putExtra(FileStorageActivity.EXTRA_FILE_NAME, it)
                 }
             }
@@ -235,7 +235,7 @@ class DefaultTransfersActionGroupFinishNotificationBuilder @Inject constructor(
                 contentText?.let {
                     setContentText(it)
                 }
-                if (group.completedFiles > 0 || group.alreadyTransferred > 0) {
+                if (actionGroup.completedFiles > 0 || actionGroup.alreadyTransferred > 0) {
                     addAction(
                         iconPackR.drawable.ic_stat_notify,
                         actionText,

@@ -11,7 +11,7 @@ import mega.privacy.android.domain.entity.camerauploads.CameraUploadsRecord
 import mega.privacy.android.domain.entity.camerauploads.CameraUploadsRecordUploadStatus
 import mega.privacy.android.domain.entity.chat.ChatPendingChanges
 import mega.privacy.android.domain.entity.transfer.ActiveTransfer
-import mega.privacy.android.domain.entity.transfer.ActiveTransferGroup
+import mega.privacy.android.domain.entity.transfer.ActiveTransferActionGroup
 import mega.privacy.android.domain.entity.transfer.CompletedTransfer
 import mega.privacy.android.domain.entity.transfer.TransferType
 import mega.privacy.android.domain.entity.transfer.pending.InsertPendingTransferRequest
@@ -230,15 +230,15 @@ interface MegaLocalRoomGateway {
     /**
      * Insert a new active transfer group and returns it's id
      */
-    suspend fun insertActiveTransferGroup(activeTransferGroup: ActiveTransferGroup): Long
+    suspend fun insertActiveTransferGroup(activeTransferActionGroup: ActiveTransferActionGroup): Long
 
     /**
-     * Get the [ActiveTransferGroup] by [groupId]
+     * Get the [ActiveTransferActionGroup] by [groupId]
      */
-    suspend fun getActiveTransferGroup(groupId: Int): ActiveTransferGroup?
+    suspend fun getActiveTransferGroup(groupId: Int): ActiveTransferActionGroup?
 
     /**
-     * Delete the [ActiveTransferGroup] by [groupId]
+     * Delete the [ActiveTransferActionGroup] by [groupId]
      */
     suspend fun deleteActiveTransferGroup(groupId: Int)
 

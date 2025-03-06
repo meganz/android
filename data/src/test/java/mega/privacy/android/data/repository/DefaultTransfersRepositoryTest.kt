@@ -41,7 +41,7 @@ import mega.privacy.android.data.repository.DefaultTransfersRepository.Companion
 import mega.privacy.android.domain.entity.node.NodeId
 import mega.privacy.android.domain.entity.node.TypedFileNode
 import mega.privacy.android.domain.entity.transfer.ActiveTransfer
-import mega.privacy.android.domain.entity.transfer.ActiveTransferGroup
+import mega.privacy.android.domain.entity.transfer.ActiveTransferActionGroup
 import mega.privacy.android.domain.entity.transfer.ActiveTransferTotals
 import mega.privacy.android.domain.entity.transfer.CompletedTransfer
 import mega.privacy.android.domain.entity.transfer.CompletedTransferState
@@ -1253,9 +1253,9 @@ class DefaultTransfersRepositoryTest {
         fun `test that previous groups are send to activeTransferTotalsMapper after first emission`(
             transferType: TransferType,
         ) = runTest {
-            val groups = mock<List<ActiveTransferTotals.Group>>()
+            val actionGroups = mock<List<ActiveTransferTotals.ActionGroup>>()
             val firstActiveTransferTotals = mock<ActiveTransferTotals> {
-                on { this.groups } doReturn groups
+                on { this.actionGroups } doReturn actionGroups
             }
             val secondActiveTransferTotals = mock<ActiveTransferTotals>()
             val firstList = listOf(mock<ActiveTransfer>())
@@ -1268,7 +1268,7 @@ class DefaultTransfersRepositoryTest {
                     type = transferType,
                     list = firstList,
                     transferredBytes = emptyMap(),
-                    previousGroups = null
+                    previousActionGroups = null
                 )
             ) doReturn firstActiveTransferTotals
             whenever(
@@ -1276,7 +1276,7 @@ class DefaultTransfersRepositoryTest {
                     type = transferType,
                     list = secondList,
                     transferredBytes = emptyMap(),
-                    previousGroups = groups //this comes from first emission
+                    previousActionGroups = actionGroups //this comes from first emission
                 )
             ) doReturn secondActiveTransferTotals
             underTest.getActiveTransferTotalsByType(transferType).test {
@@ -1761,17 +1761,17 @@ class DefaultTransfersRepositoryTest {
     @Test
     fun `test that insert Active Transfer Group returns room gateway result`() = runTest {
         val expected = 123L
-        val activeTransferGroup = mock<ActiveTransferGroup>()
-        whenever(megaLocalRoomGateway.insertActiveTransferGroup(activeTransferGroup))
+        val activeTransferActionGroup = mock<ActiveTransferActionGroup>()
+        whenever(megaLocalRoomGateway.insertActiveTransferGroup(activeTransferActionGroup))
             .thenReturn(expected)
 
-        assertThat(underTest.insertActiveTransferGroup(activeTransferGroup)).isEqualTo(expected)
+        assertThat(underTest.insertActiveTransferGroup(activeTransferActionGroup)).isEqualTo(expected)
     }
 
     @Test
     fun `test that get Active Transfer Group returns room gateway entity`() = runTest {
         val groupId = 435834379
-        val expected = mock<ActiveTransferGroup>()
+        val expected = mock<ActiveTransferActionGroup>()
         whenever(megaLocalRoomGateway.getActiveTransferGroup(groupId)).thenReturn(expected)
 
         assertThat(underTest.getActiveTransferGroupById(groupId)).isEqualTo(expected)

@@ -3,7 +3,7 @@ package mega.privacy.android.data.mapper.transfer.active
 import com.google.common.truth.Truth.assertThat
 import kotlinx.coroutines.test.runTest
 import mega.privacy.android.data.database.entity.ActiveTransferEntity
-import mega.privacy.android.domain.entity.transfer.ActiveTransferGroupImpl
+import mega.privacy.android.domain.entity.transfer.ActiveTransferActionGroupImpl
 import mega.privacy.android.domain.entity.transfer.ActiveTransferTotals
 import mega.privacy.android.domain.entity.transfer.TransferAppData
 import mega.privacy.android.domain.entity.transfer.TransferType
@@ -164,7 +164,7 @@ class ActiveTransferTotalsMapperTest {
         runTest {
             val entities = createEntities(transferType).mapIndexed { index, entity ->
                 val groupId = index.mod(5)
-                whenever(transferRepository.getActiveTransferGroupById(groupId)) doReturn ActiveTransferGroupImpl(
+                whenever(transferRepository.getActiveTransferGroupById(groupId)) doReturn ActiveTransferActionGroupImpl(
                     groupId = groupId,
                     transferType = transferType,
                     destination = "destination$groupId",
@@ -178,7 +178,7 @@ class ActiveTransferTotalsMapperTest {
                 .mapNotNull { (key, activeTransfers) ->
                     key?.toInt()?.let { groupId ->
                         val fileTransfers = activeTransfers.filter { !it.isFolderTransfer }
-                        ActiveTransferTotals.Group(
+                        ActiveTransferTotals.ActionGroup(
                             groupId = groupId,
                             totalFiles = fileTransfers.size,
                             finishedFiles = fileTransfers.count { it.isFinished },
@@ -196,7 +196,7 @@ class ActiveTransferTotalsMapperTest {
                         )
                     }
                 }
-            val actual = underTest(transferType, entities, transferredBytes).groups
+            val actual = underTest(transferType, entities, transferredBytes).actionGroups
             assertThat(actual).containsExactlyElementsIn(expected)
         }
 
@@ -208,7 +208,7 @@ class ActiveTransferTotalsMapperTest {
         runTest {
             val entities = createEntities(transferType).mapIndexed { index, entity ->
                 val groupId = index.mod(5)
-                whenever(transferRepository.getActiveTransferGroupById(groupId)) doReturn ActiveTransferGroupImpl(
+                whenever(transferRepository.getActiveTransferGroupById(groupId)) doReturn ActiveTransferActionGroupImpl(
                     groupId = groupId,
                     transferType = transferType,
                     destination = "destination$groupId",
@@ -228,7 +228,7 @@ class ActiveTransferTotalsMapperTest {
                         val fileTransfers = activeTransfers.filter { !it.isFolderTransfer }
                         val expectedCompleted = activeTransfers.filter { !it.isFolderTransfer }
                             .count { it !in subSetWithErrors }
-                        ActiveTransferTotals.Group(
+                        ActiveTransferTotals.ActionGroup(
                             groupId = groupId,
                             totalFiles = fileTransfers.size,
                             finishedFiles = fileTransfers.size,
@@ -244,7 +244,7 @@ class ActiveTransferTotalsMapperTest {
                         )
                     }
                 }
-            val actual = underTest(transferType, entitiesFinished, transferredBytes).groups
+            val actual = underTest(transferType, entitiesFinished, transferredBytes).actionGroups
             assertThat(actual).containsExactlyElementsIn(expected)
         }
 
@@ -254,7 +254,7 @@ class ActiveTransferTotalsMapperTest {
         runTest {
             val entities = createEntities(transferType).mapIndexed { index, entity ->
                 val groupId = index.mod(5)
-                whenever(transferRepository.getActiveTransferGroupById(groupId)) doReturn ActiveTransferGroupImpl(
+                whenever(transferRepository.getActiveTransferGroupById(groupId)) doReturn ActiveTransferActionGroupImpl(
                     groupId = groupId,
                     transferType = transferType,
                     destination = "destination$groupId",
@@ -271,7 +271,7 @@ class ActiveTransferTotalsMapperTest {
                 .mapNotNull { (key, activeTransfers) ->
                     key?.toInt()?.let { groupId ->
                         val fileTransfers = activeTransfers.filter { !it.isFolderTransfer }
-                        ActiveTransferTotals.Group(
+                        ActiveTransferTotals.ActionGroup(
                             groupId = groupId,
                             totalFiles = fileTransfers.size,
                             finishedFiles = fileTransfers.count { it.isFinished },
@@ -289,7 +289,7 @@ class ActiveTransferTotalsMapperTest {
                         )
                     }
                 }
-            val actual = underTest(transferType, entities, transferredBytes).groups
+            val actual = underTest(transferType, entities, transferredBytes).actionGroups
             assertThat(actual).containsExactlyElementsIn(expected)
         }
 
@@ -316,7 +316,7 @@ class ActiveTransferTotalsMapperTest {
             entities,
             emptyMap(),
             listOf(
-                ActiveTransferTotals.Group(
+                ActiveTransferTotals.ActionGroup(
                     groupId = 0,
                     totalFiles = 0,
                     finishedFiles = 0,
@@ -331,7 +331,7 @@ class ActiveTransferTotalsMapperTest {
                     transferredBytes = 0,
                 )
             )
-        ).groups.single().appData
+        ).actionGroups.single().appData
         assertThat(actual).containsExactlyElementsIn(appData)
     }
 
@@ -339,11 +339,11 @@ class ActiveTransferTotalsMapperTest {
     @EnumSource(TransferType::class)
     fun `test that groups are not fetched from repository if was in previous groups`(transferType: TransferType) =
         runTest {
-            val groups = mutableListOf<ActiveTransferTotals.Group>()
+            val actionGroups = mutableListOf<ActiveTransferTotals.ActionGroup>()
             val entities = createEntities(transferType).mapIndexed { index, entity ->
                 val groupId = index.mod(5)
-                groups.add(
-                    ActiveTransferTotals.Group(
+                actionGroups.add(
+                    ActiveTransferTotals.ActionGroup(
                         groupId = groupId,
                         totalFiles = 0,
                         finishedFiles = 0,
@@ -365,7 +365,7 @@ class ActiveTransferTotalsMapperTest {
                 .mapNotNull { (key, activeTransfers) ->
                     key?.toInt()?.let { groupId ->
                         val fileTransfers = activeTransfers.filter { !it.isFolderTransfer }
-                        ActiveTransferTotals.Group(
+                        ActiveTransferTotals.ActionGroup(
                             groupId = groupId,
                             totalFiles = fileTransfers.size,
                             finishedFiles = fileTransfers.count { it.isFinished },
@@ -385,7 +385,12 @@ class ActiveTransferTotalsMapperTest {
                     }
                 }
             val actual =
-                underTest(transferType, entities, emptyMap(), previousGroups = groups).groups
+                underTest(
+                    transferType,
+                    entities,
+                    emptyMap(),
+                    previousActionGroups = actionGroups
+                ).actionGroups
             assertThat(actual).containsExactlyElementsIn(expected)
             verifyNoInteractions(transferRepository)
         }
@@ -397,7 +402,7 @@ class ActiveTransferTotalsMapperTest {
     ) = runTest {
         val entities = createEntities(transferType).mapIndexed { index, entity ->
             val groupId = index
-            whenever(transferRepository.getActiveTransferGroupById(groupId)) doReturn ActiveTransferGroupImpl(
+            whenever(transferRepository.getActiveTransferGroupById(groupId)) doReturn ActiveTransferActionGroupImpl(
                 groupId = groupId,
                 transferType = transferType,
                 destination = "destination$groupId",
@@ -410,7 +415,7 @@ class ActiveTransferTotalsMapperTest {
             .groupBy { it.getTransferGroup()?.groupId }
             .mapNotNull { (key, activeTransfer) ->
                 key?.toInt()?.let { groupId ->
-                    ActiveTransferTotals.Group(
+                    ActiveTransferTotals.ActionGroup(
                         groupId = groupId,
                         totalFiles = activeTransfer.size,
                         finishedFiles = activeTransfer.count { it.isFinished },
@@ -428,7 +433,7 @@ class ActiveTransferTotalsMapperTest {
                     )
                 }
             }
-        val actual = underTest(transferType, entities, transferredBytes).groups
+        val actual = underTest(transferType, entities, transferredBytes).actionGroups
         assertThat(actual).containsExactlyElementsIn(expected)
     }
 

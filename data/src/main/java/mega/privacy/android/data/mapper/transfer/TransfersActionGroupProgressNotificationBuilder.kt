@@ -13,7 +13,7 @@ interface TransfersActionGroupProgressNotificationBuilder {
      * Invoke.
      */
     suspend operator fun invoke(
-        group: ActiveTransferTotals.Group,
+        actionGroup: ActiveTransferTotals.ActionGroup,
         transferType: TransferType,
         paused: Boolean,
     ): Notification

@@ -6,7 +6,7 @@ import mega.privacy.android.domain.entity.node.NodeId
 import mega.privacy.android.domain.entity.node.TypedNode
 import mega.privacy.android.domain.entity.node.ViewerNode
 import mega.privacy.android.domain.entity.transfer.ActiveTransfer
-import mega.privacy.android.domain.entity.transfer.ActiveTransferGroup
+import mega.privacy.android.domain.entity.transfer.ActiveTransferActionGroup
 import mega.privacy.android.domain.entity.transfer.ActiveTransferTotals
 import mega.privacy.android.domain.entity.transfer.CompletedTransfer
 import mega.privacy.android.domain.entity.transfer.CompletedTransferState
@@ -604,17 +604,17 @@ interface TransferRepository {
     suspend fun getBandwidthOverQuotaDelay(): Duration
 
     /**
-     * Insert a new [ActiveTransferGroup].
-     * If there's an existing [ActiveTransferGroup] with the same id, it will be ignored
+     * Insert a new [ActiveTransferActionGroup].
+     * If there's an existing [ActiveTransferActionGroup] with the same id, it will be ignored
      */
-    suspend fun insertActiveTransferGroup(activeTransferGroup: ActiveTransferGroup): Long
+    suspend fun insertActiveTransferGroup(activeTransferActionGroup: ActiveTransferActionGroup): Long
 
     /**
-     * Get the [ActiveTransferGroup] by id
+     * Get the [ActiveTransferActionGroup] by id
      *
-     * @return [ActiveTransferGroup] with this [id] or null if it's not found
+     * @return [ActiveTransferActionGroup] with this [id] or null if it's not found
      */
-    suspend fun getActiveTransferGroupById(id: Int): ActiveTransferGroup?
+    suspend fun getActiveTransferGroupById(id: Int): ActiveTransferActionGroup?
 
     /**
      * Downloads a file node in background.

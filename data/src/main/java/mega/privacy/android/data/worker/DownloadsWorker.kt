@@ -134,20 +134,20 @@ class DownloadsWorker @AssistedInject constructor(
     override suspend fun createFinishSummaryNotification(): Notification =
         transfersFinishNotificationSummaryBuilder(type)
 
-    override suspend fun createActionGroupFinishNotification(group: ActiveTransferTotals.Group): Notification? =
-        if (group.isPreviewDownload() && group.completedFiles == 0) {
+    override suspend fun createActionGroupFinishNotification(actionGroup: ActiveTransferTotals.ActionGroup): Notification? =
+        if (actionGroup.isPreviewDownload() && actionGroup.completedFiles == 0) {
             null
         } else {
-            transfersActionGroupFinishNotificationBuilder(group, type)
+            transfersActionGroupFinishNotificationBuilder(actionGroup, type)
         }
 
     override suspend fun createProgressSummaryNotification(): Notification =
         transfersProgressNotificationSummaryBuilder(type)
 
     override suspend fun createActionGroupProgressNotification(
-        group: ActiveTransferTotals.Group,
+        actionGroup: ActiveTransferTotals.ActionGroup,
         paused: Boolean,
-    ): Notification = transfersActionGroupProgressNotificationBuilder(group, type, paused)
+    ): Notification = transfersActionGroupProgressNotificationBuilder(actionGroup, type, paused)
 
     companion object {
         /**

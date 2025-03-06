@@ -1,7 +1,7 @@
 package mega.privacy.android.domain.usecase.transfers.pending
 
 import mega.privacy.android.domain.entity.node.TypedNode
-import mega.privacy.android.domain.entity.transfer.ActiveTransferGroupImpl
+import mega.privacy.android.domain.entity.transfer.ActiveTransferActionGroupImpl
 import mega.privacy.android.domain.entity.transfer.TransferAppData
 import mega.privacy.android.domain.entity.transfer.TransferType
 import mega.privacy.android.domain.entity.transfer.pending.InsertPendingTransferRequest
@@ -46,7 +46,7 @@ class InsertPendingDownloadsForNodesUseCase @Inject constructor(
             destination
         )
         val transferGroupId = transferRepository.insertActiveTransferGroup(
-            ActiveTransferGroupImpl(
+            ActiveTransferActionGroupImpl(
                 transferType = TransferType.DOWNLOAD,
                 destination = destination.value,
                 startTime = timeSystemRepository.getCurrentTimeInMillis(),

@@ -138,7 +138,7 @@ abstract class AbstractTransfersWorker(
             shouldEmitImmediately = { previous, new ->
                 hasAnyPausedChange(previous, new)
                         || new.activeTransferTotals.hasCompleted()
-                        || new.activeTransferTotals.groups.any { it.finished() }
+                        || new.activeTransferTotals.actionGroups.any { it.finished() }
             }
         ) { (transferTotals, paused, transferOverQuota, storageOverQuota) ->
             if (storageOverQuota || transferOverQuota) {
@@ -167,7 +167,7 @@ abstract class AbstractTransfersWorker(
 
     private val alreadyFinishedGroups = mutableListOf<Int>()
     private suspend fun checkFinishedGroups(transferTotals: ActiveTransferTotals) {
-        transferTotals.groups.filter { it.finished() && !alreadyFinishedGroups.contains(it.groupId) }
+        transferTotals.actionGroups.filter { it.finished() && !alreadyFinishedGroups.contains(it.groupId) }
             .also { finishedGroups ->
                 alreadyFinishedGroups.addAll(finishedGroups.map { it.groupId })
                 finishedGroups.forEach {
@@ -180,7 +180,7 @@ abstract class AbstractTransfersWorker(
         transferTotals: ActiveTransferTotals,
         paused: Boolean,
     ) {
-        transferTotals.groups.filter { alreadyFinishedGroups.contains(it.groupId).not() }
+        transferTotals.actionGroups.filter { alreadyFinishedGroups.contains(it.groupId).not() }
             .onEach {
                 showActionGroupProgressNotification(it, paused)
             }
@@ -231,12 +231,12 @@ abstract class AbstractTransfersWorker(
         previous: MonitorOngoingActiveTransfersResult?,
         new: MonitorOngoingActiveTransfersResult,
     ): Boolean {
-        if (previous == null || previous.activeTransferTotals.groups.size != new.activeTransferTotals.groups.size) return true
+        if (previous == null || previous.activeTransferTotals.actionGroups.size != new.activeTransferTotals.actionGroups.size) return true
         if (new.paused != previous.paused) return true
         if (new.activeTransferTotals.allPaused() != new.activeTransferTotals.allPaused()) return true
 
-        val previousMap = previous.activeTransferTotals.groups.associateBy { it.groupId }
-        return new.activeTransferTotals.groups.any { new ->
+        val previousMap = previous.activeTransferTotals.actionGroups.associateBy { it.groupId }
+        return new.activeTransferTotals.actionGroups.any { new ->
             val old = previousMap[new.groupId]
             old == null || new.allPaused() != old.allPaused()
         }
@@ -363,20 +363,20 @@ abstract class AbstractTransfersWorker(
     /**
      * Creates a group finish notification.
      */
-    open suspend fun createActionGroupFinishNotification(group: ActiveTransferTotals.Group): Notification? =
+    open suspend fun createActionGroupFinishNotification(actionGroup: ActiveTransferTotals.ActionGroup): Notification? =
         null
 
     @SuppressLint("MissingPermission")
     private suspend fun showActionGroupFinishedNotification(
-        group: ActiveTransferTotals.Group,
+        actionGroup: ActiveTransferTotals.ActionGroup,
     ) {
         if (areNotificationsEnabledUseCase()) {
-            notificationManager.cancel(NOTIFICATION_GROUP_MULTIPLAYER * updateNotificationId + group.groupId)
+            notificationManager.cancel(NOTIFICATION_GROUP_MULTIPLAYER * updateNotificationId + actionGroup.groupId)
             finalNotificationId?.let { finalNotificationId ->
                 createFinishSummaryNotification()?.let { summaryNotification ->
-                    createActionGroupFinishNotification(group)?.let { groupNotification ->
+                    createActionGroupFinishNotification(actionGroup)?.let { groupNotification ->
                         val groupNotificationId =
-                            NOTIFICATION_GROUP_MULTIPLAYER * finalNotificationId + group.groupId
+                            NOTIFICATION_GROUP_MULTIPLAYER * finalNotificationId + actionGroup.groupId
                         notificationManager.notify(
                             finalNotificationId,
                             summaryNotification,
@@ -395,23 +395,23 @@ abstract class AbstractTransfersWorker(
      * Creates a group progress notification.
      */
     open suspend fun createActionGroupProgressNotification(
-        group: ActiveTransferTotals.Group,
+        actionGroup: ActiveTransferTotals.ActionGroup,
         paused: Boolean,
     ): Notification? = null
 
     @SuppressLint("MissingPermission")
     private suspend fun showActionGroupProgressNotification(
-        group: ActiveTransferTotals.Group,
+        actionGroup: ActiveTransferTotals.ActionGroup,
         paused: Boolean,
     ) {
         if (areNotificationsEnabledUseCase()) {
             createProgressSummaryNotification()?.let { summaryNotification ->
                 createActionGroupProgressNotification(
-                    group,
+                    actionGroup,
                     paused,
                 )?.let { groupNotification ->
                     val groupNotificationId =
-                        NOTIFICATION_GROUP_MULTIPLAYER * updateNotificationId + group.groupId
+                        NOTIFICATION_GROUP_MULTIPLAYER * updateNotificationId + actionGroup.groupId
                     notificationManager.notify(
                         updateNotificationId,
                         summaryNotification,

@@ -26,7 +26,7 @@ class MonitorTransfersStatusUseCase @Inject constructor(
         combine(TransferType.entries.filter { it != TransferType.NONE }.map {
             monitorOngoingActiveTransfersUseCase(it).map { results ->
                 val totalsWithoutPreviews = results.activeTransferTotals.let { totals ->
-                    totals.groups.filter { group -> group.isPreviewDownload() }
+                    totals.actionGroups.filter { group -> group.isPreviewDownload() }
                         .let { previewGroups ->
                             totals.copy(
                                 totalFileTransfers = totals.totalFileTransfers
@@ -41,7 +41,7 @@ class MonitorTransfersStatusUseCase @Inject constructor(
                                         - previewGroups.sumOf { group -> group.transferredBytes },
                                 totalAlreadyTransferredFiles = totals.totalAlreadyTransferredFiles
                                         - previewGroups.sumOf { group -> group.alreadyTransferred },
-                                groups = totals.groups
+                                actionGroups = totals.actionGroups
                                     .filterNot { group -> group.isPreviewDownload() }
                             )
                         }

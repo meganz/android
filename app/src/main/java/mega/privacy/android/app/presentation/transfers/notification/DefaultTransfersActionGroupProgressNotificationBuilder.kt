@@ -46,7 +46,7 @@ class DefaultTransfersActionGroupProgressNotificationBuilder @Inject constructor
 ) : TransfersActionGroupProgressNotificationBuilder {
     private val resources get() = context.resources
     override suspend fun invoke(
-        group: ActiveTransferTotals.Group,
+        actionGroup: ActiveTransferTotals.ActionGroup,
         transferType: TransferType,
         paused: Boolean,
     ): Notification {
@@ -54,32 +54,32 @@ class DefaultTransfersActionGroupProgressNotificationBuilder @Inject constructor
         if (!isDownload) {
             throw NotImplementedError("Group notifications are not yet implemented for uploads")
         }
-        val isPreviewDownload = group.isPreviewDownload()
+        val isPreviewDownload = actionGroup.isPreviewDownload()
         val isPreviewPaused = isPreviewDownload && paused
-        val isOfflineDownload = group.isOfflineDownload()
+        val isOfflineDownload = actionGroup.isOfflineDownload()
         val notificationTitle = when {
             isPreviewPaused -> {
                 resources.getString(
                     sharedR.string.transfers_notification_downloading_preview_paused,
-                    group.singleFileName
+                    actionGroup.singleFileName
                 )
             }
 
             isPreviewDownload -> {
                 resources.getString(
                     sharedR.string.transfers_notification_downloading_preview,
-                    group.singleFileName
+                    actionGroup.singleFileName
                 )
             }
 
-            group.totalBytes == 0L -> {
+            actionGroup.totalBytes == 0L -> {
                 context.getString(R.string.download_preparing_files)
             }
 
             else -> {
-                val inProgress = group.finishedFiles + 1
-                val totalTransfers = group.totalFiles
-                val areTransfersPaused = paused || group.allPaused()
+                val inProgress = actionGroup.finishedFiles + 1
+                val totalTransfers = actionGroup.totalFiles
+                val areTransfersPaused = paused || actionGroup.allPaused()
 
                 val stringId = when {
                     areTransfersPaused -> R.string.download_service_notification_paused
@@ -92,16 +92,16 @@ class DefaultTransfersActionGroupProgressNotificationBuilder @Inject constructor
         }
         val subText = Util.getProgressSize(
             context,
-            group.transferredBytes,
-            group.totalBytes
+            actionGroup.transferredBytes,
+            actionGroup.totalBytes
         )
         val destination = runCatching {
-            if (isContentUriUseCase(group.destination)) {
-                getPathByDocumentContentUriUseCase(group.destination)
+            if (isContentUriUseCase(actionGroup.destination)) {
+                getPathByDocumentContentUriUseCase(actionGroup.destination)
             } else {
-                group.destination
+                actionGroup.destination
             }
-        }.getOrNull() ?: group.destination
+        }.getOrNull() ?: actionGroup.destination
         val destinationText = when {
             isOfflineDownload -> {
                 context.getString(R.string.section_saved_for_offline_new)
@@ -123,7 +123,7 @@ class DefaultTransfersActionGroupProgressNotificationBuilder @Inject constructor
         }
         val cancelTransferIntent = Intent(context, ManagerActivity::class.java).apply {
             action = Constants.ACTION_CANCEL_TRANSFER
-            putExtra(Constants.INTENT_EXTRA_TAG, group.singleTransferTag)
+            putExtra(Constants.INTENT_EXTRA_TAG, actionGroup.singleTransferTag)
         }
         val openTransfersSectionIntent =
             if (getFeatureFlagValueUseCase(AppFeatures.TransfersSection)) {
@@ -176,7 +176,7 @@ class DefaultTransfersActionGroupProgressNotificationBuilder @Inject constructor
             .setOnlyAlertOnce(true)
             .setAutoCancel(false)
             .setSubText(subText)
-            .setProgress(100, group.progress.intValue, false)
+            .setProgress(100, actionGroup.progress.intValue, false)
             .setContentIntent(pendingIntent)
             .apply {
                 contentText?.let {

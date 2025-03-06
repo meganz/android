@@ -12,7 +12,7 @@ interface TransfersActionGroupFinishNotificationBuilder {
      * Creates a final notification from ActiveTransferTotals
      */
     suspend operator fun invoke(
-        group: ActiveTransferTotals.Group,
+        actionGroup: ActiveTransferTotals.ActionGroup,
         transferType: TransferType,
     ): Notification
 }

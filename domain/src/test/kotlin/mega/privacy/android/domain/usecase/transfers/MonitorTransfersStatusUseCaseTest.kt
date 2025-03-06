@@ -135,7 +135,7 @@ internal class MonitorTransfersStatusUseCaseTest {
     @Test
     fun `test that value with correct values is emitted when a new active transfer total is received with preview downloads`() =
         runTest {
-            val group1 = mock<ActiveTransferTotals.Group> {
+            val actionGroup1 = mock<ActiveTransferTotals.ActionGroup> {
                 on { totalFiles } doReturn 1
                 on { finishedFiles } doReturn 0
                 on { completedFiles } doReturn 0
@@ -144,7 +144,7 @@ internal class MonitorTransfersStatusUseCaseTest {
                 on { transferredBytes } doReturn 5L
                 on { appData } doReturn listOf(TransferAppData.PreviewDownload)
             }
-            val group2 = mock<ActiveTransferTotals.Group> {
+            val actionGroup2 = mock<ActiveTransferTotals.ActionGroup> {
                 on { totalFiles } doReturn 5
                 on { finishedFiles } doReturn 2
                 on { completedFiles } doReturn 3
@@ -165,7 +165,7 @@ internal class MonitorTransfersStatusUseCaseTest {
                 transferredBytes = 205L,
                 totalAlreadyTransferredFiles = 1,
                 totalCancelled = 0,
-                groups = listOf(group1, group2),
+                actionGroups = listOf(actionGroup1, actionGroup2),
             )
             val flowsMap = stubActiveTransfersFlows()
             val expected = TransfersStatusInfo(

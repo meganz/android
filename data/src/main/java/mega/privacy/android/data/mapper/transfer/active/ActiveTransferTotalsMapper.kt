@@ -21,27 +21,27 @@ internal class ActiveTransferTotalsMapper @Inject constructor(
      * @param type
      * @param list the list of active transfers of which the total will be calculated
      * @param transferredBytes Map of transfer tag to transferred bytes
-     * @param previousGroups The previously returned groups, this will be used to optimize performance, as groups can't be changed.
+     * @param previousActionGroups The previously returned groups, this will be used to optimize performance, as groups can't be changed.
      */
     suspend operator fun invoke(
         type: TransferType,
         list: List<ActiveTransfer>,
         transferredBytes: Map<Int, Long>,
-        previousGroups: List<ActiveTransferTotals.Group>? = null,
+        previousActionGroups: List<ActiveTransferTotals.ActionGroup>? = null,
     ): ActiveTransferTotals {
         val onlyFiles = list.filter { !it.isFolderTransfer }
-        val groups = onlyFiles
+        val actionGroups = onlyFiles
             .groupBy { it.getTransferGroup()?.groupId }
             .mapNotNull { (key, activeTransfersFiles) ->
                 key?.toInt()?.let { groupId ->
-                    val previousGroup = previousGroups?.firstOrNull { it.groupId == groupId }
+                    val previousGroup = previousActionGroups?.firstOrNull { it.groupId == groupId }
                     val transferGroup = if (previousGroup == null) {
                         transferRepository.get().getActiveTransferGroupById(groupId)
                     } else null
                     val destination = previousGroup?.destination ?: transferGroup?.destination
                     val startTime = previousGroup?.startTime ?: transferGroup?.startTime ?: 0
                     destination?.let { dest ->
-                        ActiveTransferTotals.Group(
+                        ActiveTransferTotals.ActionGroup(
                             groupId = groupId,
                             totalFiles = activeTransfersFiles.size,
                             finishedFiles = activeTransfersFiles.count { it.isFinished },
@@ -80,7 +80,7 @@ internal class ActiveTransferTotalsMapper @Inject constructor(
             },
             totalAlreadyTransferredFiles = onlyFiles.count { it.isAlreadyTransferred },
             totalCancelled = list.count { it.isCancelled },
-            groups = groups
+            actionGroups = actionGroups
         )
     }
 }

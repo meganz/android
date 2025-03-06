@@ -22,7 +22,7 @@ import mega.privacy.android.data.database.dao.SyncSolvedIssuesDao
 import mega.privacy.android.data.database.dao.UserPausedSyncsDao
 import mega.privacy.android.data.database.dao.VideoRecentlyWatchedDao
 import mega.privacy.android.data.database.entity.ActiveTransferEntity
-import mega.privacy.android.data.database.entity.ActiveTransferGroupEntity
+import mega.privacy.android.data.database.entity.ActiveTransferActionGroupEntity
 import mega.privacy.android.data.database.entity.BackupEntity
 import mega.privacy.android.data.database.entity.CameraUploadsRecordEntity
 import mega.privacy.android.data.database.entity.ChatPendingChangesEntity
@@ -47,7 +47,7 @@ import timber.log.Timber
         CompletedTransferEntity::class,
         CompletedTransferEntityLegacy::class,
         ActiveTransferEntity::class,
-        ActiveTransferGroupEntity::class,
+        ActiveTransferActionGroupEntity::class,
         BackupEntity::class,
         OfflineEntity::class,
         SyncSolvedIssueEntity::class,

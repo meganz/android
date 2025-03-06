@@ -62,7 +62,7 @@ import mega.privacy.android.domain.entity.node.NodeId
 import mega.privacy.android.domain.entity.node.TypedNode
 import mega.privacy.android.domain.entity.node.ViewerNode
 import mega.privacy.android.domain.entity.transfer.ActiveTransfer
-import mega.privacy.android.domain.entity.transfer.ActiveTransferGroup
+import mega.privacy.android.domain.entity.transfer.ActiveTransferActionGroup
 import mega.privacy.android.domain.entity.transfer.ActiveTransferTotals
 import mega.privacy.android.domain.entity.transfer.CompletedTransfer
 import mega.privacy.android.domain.entity.transfer.CompletedTransferState
@@ -623,7 +623,7 @@ internal class DefaultTransfersRepository @Inject constructor(
                             type = transferType,
                             list = activeTransfers,
                             transferredBytes = transferredBytes,
-                            previousGroups = previousTotals?.groups
+                            previousActionGroups = previousTotals?.actionGroups
                         )
                     }.filterNotNull() //skip first null value
             )
@@ -856,12 +856,12 @@ internal class DefaultTransfersRepository @Inject constructor(
         megaApiGateway.getBandwidthOverQuotaDelay().seconds
     }
 
-    override suspend fun insertActiveTransferGroup(activeTransferGroup: ActiveTransferGroup) =
+    override suspend fun insertActiveTransferGroup(activeTransferActionGroup: ActiveTransferActionGroup) =
         withContext(ioDispatcher) {
-            megaLocalRoomGateway.insertActiveTransferGroup(activeTransferGroup)
+            megaLocalRoomGateway.insertActiveTransferGroup(activeTransferActionGroup)
         }
 
-    override suspend fun getActiveTransferGroupById(id: Int): ActiveTransferGroup? =
+    override suspend fun getActiveTransferGroupById(id: Int): ActiveTransferActionGroup? =
         withContext(ioDispatcher) {
             megaLocalRoomGateway.getActiveTransferGroup(id)
         }

@@ -38,7 +38,7 @@ object MegaDatabaseConstant {
     /**
      * Table Active Transfer Groups
      */
-    const val TABLE_ACTIVE_TRANSFER_GROUPS = "active_transfer_groups"
+    const val TABLE_ACTIVE_TRANSFER_ACTION_GROUPS = "active_transfer_groups"
 
     /**
      * Table Backups
