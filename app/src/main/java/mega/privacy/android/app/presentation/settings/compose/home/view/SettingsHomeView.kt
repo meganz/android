@@ -11,11 +11,10 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.statusBarsPadding
 import androidx.compose.foundation.layout.systemBars
 import androidx.compose.foundation.layout.windowInsetsPadding
+import androidx.compose.foundation.layout.wrapContentWidth
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.LazyListScope
 import androidx.compose.foundation.lazy.items
-import androidx.compose.material.Icon
-import androidx.compose.material.MaterialTheme
 import androidx.compose.material3.adaptive.ExperimentalMaterial3AdaptiveApi
 import androidx.compose.material3.adaptive.currentWindowAdaptiveInfo
 import androidx.compose.material3.adaptive.layout.AnimatedPane
@@ -29,6 +28,7 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.vector.ImageVector
+import androidx.compose.ui.graphics.vector.rememberVectorPainter
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.res.vectorResource
@@ -41,6 +41,7 @@ import kotlinx.collections.immutable.persistentListOf
 import mega.android.core.ui.components.MegaScaffold
 import mega.android.core.ui.components.MegaText
 import mega.android.core.ui.components.button.MegaOutlinedButton
+import mega.android.core.ui.components.image.MegaIcon
 import mega.android.core.ui.components.toolbar.AppBarNavigationType
 import mega.android.core.ui.components.toolbar.MegaTopAppBar
 import mega.android.core.ui.theme.AndroidThemeForPreviews
@@ -182,20 +183,24 @@ private fun LazyListScope.listEntryPoints(
     items(items) {
         Row(
             modifier = Modifier
-                .padding(8.dp)
+                .fillMaxWidth()
+                .padding(vertical = 16.dp)
                 .clickable {
                     onNavigateToItem(it)
                 },
             horizontalArrangement = Arrangement.SpaceBetween
         ) {
-            Row {
-                Icon(painterResource(it.icon), contentDescription = null)
+            Row(
+                modifier = Modifier.wrapContentWidth(),
+                horizontalArrangement = Arrangement.Start
+            ) {
+                MegaIcon(painter = painterResource(it.icon), tint = null, contentDescription = null)
                 MegaText(text = stringResource(it.title), textColor = TextColor.Primary)
             }
-            Icon(
-                imageVector = ImageVector.vectorResource(id = R.drawable.ic_chevron_right),
+            MegaIcon(
+                painter = rememberVectorPainter(ImageVector.vectorResource(id = R.drawable.ic_chevron_right)),
+                tint = null,
                 contentDescription = null,
-                tint = MaterialTheme.colors.secondary
             )
         }
     }
