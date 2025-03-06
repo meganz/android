@@ -122,7 +122,7 @@ internal fun StartTransferComponent(
         event = event,
         onConsumed = onConsumeEvent,
         action = { triggerEvent ->
-            if (uiState.isStorageOverQuota && event is StartUpload) {
+            if (uiState.isStorageOverQuota && triggerEvent is StartUpload) {
                 showStorageOverQuotaWarning = true
                 return@EventEffect
             }
