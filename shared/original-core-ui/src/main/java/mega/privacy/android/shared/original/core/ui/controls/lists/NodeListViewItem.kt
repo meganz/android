@@ -27,6 +27,7 @@ import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
+import mega.android.core.ui.theme.values.TextColor
 import mega.privacy.android.core.R
 import mega.privacy.android.shared.original.core.ui.controls.chip.HighlightChip
 import mega.privacy.android.shared.original.core.ui.controls.images.ThumbnailView
@@ -36,7 +37,6 @@ import mega.privacy.android.shared.original.core.ui.controls.text.MegaText
 import mega.privacy.android.shared.original.core.ui.preview.CombinedThemePreviews
 import mega.privacy.android.shared.original.core.ui.theme.MegaOriginalTheme
 import mega.privacy.android.shared.original.core.ui.theme.OriginalTheme
-import mega.android.core.ui.theme.values.TextColor
 
 /**
  * Generic two line list item
@@ -246,15 +246,18 @@ fun NodeListViewItem(
             }
         },
         customRow = {
-            tags?.let {
-                if (highlightText.isNotBlank()) {
-                    val tagHighlightText = highlightText.removePrefix("#")
-                    if (it.any { tag -> tag.contains(tagHighlightText, ignoreCase = true) }) {
+            if (highlightText.isNotBlank() && !tags.isNullOrEmpty()) {
+                val tagHighlightText = highlightText.removePrefix("#")
+                tags.filter { it.contains(tagHighlightText, ignoreCase = true) }
+                    .takeIf { it.isNotEmpty() }
+                    ?.let { matchingTags ->
                         Row(
-                            modifier = Modifier.horizontalScroll(rememberScrollState()).testTag(TAGS_TAG),
+                            modifier = Modifier
+                                .horizontalScroll(rememberScrollState())
+                                .testTag(TAGS_TAG),
                             horizontalArrangement = Arrangement.spacedBy(8.dp)
                         ) {
-                            tags.forEach { tag ->
+                            matchingTags.forEach { tag ->
                                 HighlightChip(
                                     text = "#$tag",
                                     highlightText = tagHighlightText,
@@ -262,7 +265,6 @@ fun NodeListViewItem(
                             }
                         }
                     }
-                }
             }
         },
         trailingIcons = {

@@ -268,10 +268,11 @@ internal fun VideoInfoView(
             onMenuClick = onMenuClick
         )
 
-        tags?.let {
-            if (highlightText.isNotBlank()) {
-                val tagHighlightText = highlightText.removePrefix("#")
-                if (it.any { tag -> tag.contains(tagHighlightText, ignoreCase = true) }) {
+        if (highlightText.isNotBlank() && !tags.isNullOrEmpty()) {
+            val tagHighlightText = highlightText.removePrefix("#")
+            tags.filter { it.contains(tagHighlightText, ignoreCase = true) }
+                .takeIf { it.isNotEmpty() }
+                ?.let { matchingTags ->
                     Row(
                         modifier = Modifier
                             .horizontalScroll(rememberScrollState())
@@ -280,7 +281,7 @@ internal fun VideoInfoView(
                         horizontalArrangement = Arrangement.spacedBy(8.dp)
                     ) {
                         Spacer(modifier = Modifier.width(2.dp))
-                        tags.forEach { tag ->
+                        matchingTags.forEach { tag ->
                             HighlightChip(
                                 text = "#$tag",
                                 highlightText = tagHighlightText,
@@ -289,7 +290,6 @@ internal fun VideoInfoView(
                         Spacer(modifier = Modifier.width(2.dp))
                     }
                 }
-            }
         }
     }
 }
