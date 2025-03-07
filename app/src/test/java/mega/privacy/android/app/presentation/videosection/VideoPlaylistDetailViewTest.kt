@@ -113,7 +113,8 @@ class VideoPlaylistDetailViewTest {
                 onBackPressed = onBackPressed,
                 onMenuActionClick = onMenuActionClick,
                 enableFavouritesPlaylistMenu = enableFavouritesPlaylistMenu,
-                onRemoveFavouriteOptionClicked = onRemoveFavouriteOptionClicked
+                onRemoveFavouriteOptionClicked = onRemoveFavouriteOptionClicked,
+                isStorageOverQuota = { false },
             )
         }
     }

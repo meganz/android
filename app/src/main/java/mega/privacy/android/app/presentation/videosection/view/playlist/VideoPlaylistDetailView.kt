@@ -67,6 +67,7 @@ import mega.privacy.android.shared.original.core.ui.preview.CombinedThemePreview
 import mega.privacy.android.shared.original.core.ui.theme.OriginalTheme
 import mega.privacy.android.shared.original.core.ui.theme.extensions.grey_050_grey_800
 import mega.android.core.ui.theme.values.TextColor
+import mega.privacy.android.app.utils.AlertsAndWarnings.showOverDiskQuotaPaywallWarning
 import mega.privacy.android.shared.original.core.ui.utils.showAutoDurationSnackbar
 import nz.mega.sdk.MegaNode
 
@@ -100,6 +101,7 @@ fun VideoPlaylistDetailView(
     onMenuActionClick: (VideoSectionMenuAction?) -> Unit,
     enableFavouritesPlaylistMenu: Boolean,
     onRemoveFavouriteOptionClicked: () -> Unit,
+    isStorageOverQuota: () -> Boolean,
     modifier: Modifier = Modifier,
     errorMessage: Int? = null,
 ) {
@@ -373,10 +375,18 @@ fun VideoPlaylistDetailView(
         modalSheetState = modalSheetState,
         coroutineScope = coroutineScope,
         onRenameVideoPlaylistClicked = {
-            showRenameVideoPlaylistDialog = true
+            if (isStorageOverQuota()) {
+                showOverDiskQuotaPaywallWarning()
+            } else {
+                showRenameVideoPlaylistDialog = true
+            }
         },
         onDeleteVideoPlaylistClicked = {
-            showDeleteVideoPlaylistDialog = true
+            if (isStorageOverQuota()) {
+                showOverDiskQuotaPaywallWarning()
+            } else {
+                showDeleteVideoPlaylistDialog = true
+            }
         }
     )
 
@@ -631,7 +641,8 @@ private fun VideoPlaylistDetailViewPreview() {
             onMenuClick = {},
             onMenuActionClick = {},
             enableFavouritesPlaylistMenu = false,
-            onRemoveFavouriteOptionClicked = {}
+            onRemoveFavouriteOptionClicked = {},
+            isStorageOverQuota = { false },
         )
     }
 }
@@ -664,7 +675,8 @@ private fun VideoPlaylistDetailViewUnderActionModePreview() {
             onMenuClick = {},
             onMenuActionClick = {},
             enableFavouritesPlaylistMenu = false,
-            onRemoveFavouriteOptionClicked = {}
+            onRemoveFavouriteOptionClicked = {},
+            isStorageOverQuota = { false },
         )
     }
 }

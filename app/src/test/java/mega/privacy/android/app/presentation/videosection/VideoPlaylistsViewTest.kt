@@ -81,7 +81,8 @@ class VideoPlaylistsViewTest {
                 onDeleteDialogPositiveButtonClicked = onDeleteDialogPositiveButtonClicked,
                 onRenameDialogPositiveButtonClicked = onRenameDialogPositiveButtonClicked,
                 onDeletePlaylistsDialogPositiveButtonClicked = onDeletePlaylistsDialogPositiveButtonClicked,
-                onDeleteDialogNegativeButtonClicked = onDeleteDialogNegativeButtonClicked
+                onDeleteDialogNegativeButtonClicked = onDeleteDialogNegativeButtonClicked,
+                isStorageOverQuota = { false },
             )
         }
     }

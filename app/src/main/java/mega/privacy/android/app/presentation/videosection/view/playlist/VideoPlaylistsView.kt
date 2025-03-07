@@ -45,6 +45,7 @@ import mega.privacy.android.analytics.Analytics
 import mega.privacy.android.app.R
 import mega.privacy.android.app.presentation.videosection.model.VideoPlaylistUIEntity
 import mega.privacy.android.app.presentation.videosection.view.VideoSectionLoadingView
+import mega.privacy.android.app.utils.AlertsAndWarnings.showOverDiskQuotaPaywallWarning
 import mega.privacy.android.domain.entity.node.NodeId
 import mega.privacy.android.domain.entity.node.thumbnail.ThumbnailRequest
 import mega.privacy.android.legacy.core.ui.controls.LegacyMegaEmptyViewWithImage
@@ -84,6 +85,7 @@ internal fun VideoPlaylistsView(
     deletedVideoPlaylistTitles: List<String> = emptyList(),
     errorMessage: Int? = null,
     onLongClick: ((item: VideoPlaylistUIEntity, index: Int) -> Unit) = { _, _ -> },
+    isStorageOverQuota: () -> Boolean,
 ) {
     var showCreateVideoPlaylistDialog by rememberSaveable { mutableStateOf(false) }
     var showRenameVideoPlaylistDialog by rememberSaveable { mutableStateOf(false) }
@@ -161,8 +163,12 @@ internal fun VideoPlaylistsView(
             CreateVideoPlaylistFabButton(
                 showFabButton = scrollNotInProgress,
                 onCreateVideoPlaylistClick = {
-                    showCreateVideoPlaylistDialog = true
-                    setDialogInputPlaceholder(placeholderText)
+                    if (isStorageOverQuota()) {
+                        showOverDiskQuotaPaywallWarning()
+                    } else {
+                        showCreateVideoPlaylistDialog = true
+                        setDialogInputPlaceholder(placeholderText)
+                    }
                 }
             )
         }
@@ -303,10 +309,18 @@ internal fun VideoPlaylistsView(
             modalSheetState = modalSheetState,
             coroutineScope = coroutineScope,
             onRenameVideoPlaylistClicked = {
-                showRenameVideoPlaylistDialog = true
+                if (isStorageOverQuota()) {
+                    showOverDiskQuotaPaywallWarning()
+                } else {
+                    showRenameVideoPlaylistDialog = true
+                }
             },
             onDeleteVideoPlaylistClicked = {
-                updateShowDeleteVideoPlaylist(true)
+                if (isStorageOverQuota()) {
+                    showOverDiskQuotaPaywallWarning()
+                } else {
+                    updateShowDeleteVideoPlaylist(true)
+                }
             }
         )
     }
@@ -410,7 +424,8 @@ private fun VideoPlaylistsViewPreview() {
             onDeletedMessageShown = {},
             setInputValidity = {},
             onDeletePlaylistsDialogPositiveButtonClicked = {},
-            onDeleteDialogNegativeButtonClicked = {}
+            onDeleteDialogNegativeButtonClicked = {},
+            isStorageOverQuota = { false },
         )
     }
 }
@@ -440,7 +455,8 @@ private fun VideoPlaylistsViewCreateDialogShownPreview() {
             setInputValidity = {},
             onDeletedMessageShown = {},
             onDeletePlaylistsDialogPositiveButtonClicked = {},
-            onDeleteDialogNegativeButtonClicked = {}
+            onDeleteDialogNegativeButtonClicked = {},
+            isStorageOverQuota = { false },
         )
     }
 }

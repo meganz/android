@@ -18,6 +18,7 @@ import mega.privacy.android.analytics.Analytics
 import mega.privacy.android.app.presentation.bottomsheet.NodeOptionsBottomSheetDialogFragment.Companion.VIDEO_PLAYLIST_DETAIL
 import mega.privacy.android.app.presentation.bottomsheet.NodeOptionsBottomSheetDialogFragment.Companion.VIDEO_RECENTLY_WATCHED_MODE
 import mega.privacy.android.app.presentation.bottomsheet.NodeOptionsBottomSheetDialogFragment.Companion.VIDEO_SECTION_MODE
+import mega.privacy.android.app.presentation.extensions.getStorageState
 import mega.privacy.android.app.presentation.videosection.VideoSectionViewModel
 import mega.privacy.android.app.presentation.videosection.model.VideoPlaylistUIEntity
 import mega.privacy.android.app.presentation.videosection.model.VideoSectionMenuAction
@@ -26,6 +27,7 @@ import mega.privacy.android.app.presentation.videosection.view.playlist.VideoPla
 import mega.privacy.android.app.presentation.videosection.view.playlist.videoPlaylistDetailRoute
 import mega.privacy.android.app.presentation.videosection.view.recentlywatched.VideoRecentlyWatchedView
 import mega.privacy.android.app.presentation.videosection.view.recentlywatched.videoRecentlyWatchedRoute
+import mega.privacy.android.domain.entity.StorageState
 import mega.privacy.mobile.analytics.event.RecentlyWatchedOpenedButtonPressedEvent
 
 @Composable
@@ -192,7 +194,8 @@ internal fun VideoSectionNavHost(
                 onRemoveFavouriteOptionClicked = {
                     viewModel.removeFavourites()
                     viewModel.clearAllSelectedVideosOfPlaylist()
-                }
+                },
+                isStorageOverQuota = { getStorageState() == StorageState.PayWall },
             )
         }
 
