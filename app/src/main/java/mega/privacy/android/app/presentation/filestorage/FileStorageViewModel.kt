@@ -8,19 +8,23 @@ import de.palm.composestateevents.triggered
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.filterIsInstance
-import kotlinx.coroutines.flow.mapNotNull
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import mega.privacy.android.app.FileDocument
 import mega.privacy.android.app.presentation.filestorage.model.FileStorageUiState
+import mega.privacy.android.app.utils.Constants
+import mega.privacy.android.data.extensions.isFile
+import mega.privacy.android.data.extensions.toUri
 import mega.privacy.android.domain.entity.file.FileStorageType
 import mega.privacy.android.domain.entity.uri.UriPath
 import mega.privacy.android.domain.usecase.file.GetDocumentEntityUseCase
 import mega.privacy.android.domain.usecase.file.GetExternalPathByContentUriUseCase
 import mega.privacy.android.domain.usecase.file.GetFileStorageTypeNameUseCase
+import mega.privacy.android.domain.usecase.file.GetFileUriUseCase
 import mega.privacy.android.domain.usecase.file.GetFilesInDocumentFolderUseCase
 import mega.privacy.android.domain.usecase.file.GetPathByDocumentContentUriUseCase
 import mega.privacy.android.domain.usecase.file.IsUriPathInCacheUseCase
+import java.io.File
 import javax.inject.Inject
 
 /**
@@ -34,6 +38,7 @@ class FileStorageViewModel @Inject constructor(
     private val isUriPathInCacheUseCase: IsUriPathInCacheUseCase,
     private val getDocumentEntityUseCase: GetDocumentEntityUseCase,
     private val getExternalPathByContentUriUseCase: GetExternalPathByContentUriUseCase,
+    private val getFileUriUseCase: GetFileUriUseCase,
 ) : ViewModel() {
 
     /**
@@ -99,7 +104,33 @@ class FileStorageViewModel @Inject constructor(
     /**
      * @return current path
      */
-    fun getCurrentPath() = (uiState.value as? FileStorageUiState.Loaded)?.currentFolder?.uriPath
+    fun getCurrentUriPath() = (uiState.value as? FileStorageUiState.Loaded)?.currentFolder?.uriPath
+
+    /**
+     * Get "content://" Uri of the current path if possible
+     */
+    suspend fun getCurrentPathContentUri(): String? = getCurrentUriPath()?.let {
+        when {
+            it.isPath() -> File(it.value)
+            it.isFile() -> File(it.toUri().path ?: return@let null)
+            it.toUri().scheme == "content" -> return@let it.value
+            else -> return@let null
+        }.let { file ->
+            getFileUriUseCase(file, Constants.AUTHORITY_STRING_FILE_PROVIDER)
+        }
+    }
+
+    /**
+     * Get file path of the current uriPath, if possible
+     */
+    fun getCurrentFilePath(): String? = getCurrentUriPath()?.let {
+        when {
+            it.isPath() -> it.value
+            it.isFile() -> it.toUri().path
+            else -> null
+        }
+    }
+
 
     fun folderPicked(uriString: String) {
         viewModelScope.launch {

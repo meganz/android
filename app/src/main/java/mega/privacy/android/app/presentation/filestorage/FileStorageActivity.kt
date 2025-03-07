@@ -21,9 +21,11 @@ import android.widget.TextView
 import androidx.activity.enableEdgeToEdge
 import androidx.activity.viewModels
 import androidx.appcompat.widget.Toolbar
+import androidx.core.net.toUri
 import androidx.core.text.HtmlCompat
 import androidx.core.view.WindowInsetsCompat
 import androidx.documentfile.provider.DocumentFile
+import androidx.lifecycle.lifecycleScope
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.anggrayudi.storage.file.StorageId
@@ -33,6 +35,7 @@ import de.palm.composestateevents.StateEventWithContentTriggered
 import kotlinx.coroutines.flow.distinctUntilChanged
 import kotlinx.coroutines.flow.distinctUntilChangedBy
 import kotlinx.coroutines.flow.map
+import kotlinx.coroutines.launch
 import mega.privacy.android.app.MimeTypeList.Companion.typeForName
 import mega.privacy.android.app.R
 import mega.privacy.android.app.activities.PasscodeActivity
@@ -276,19 +279,15 @@ class FileStorageActivity : PasscodeActivity(), Scrollable {
             }
 
             R.id.action_open_in_file_manager -> {
-                runCatching {
-                    viewModel.getCurrentPath()?.toUri()?.let {
-                        this.createViewFolderIntent(it)
+                lifecycleScope.launch {
+                    viewFolderIntent()?.let {
+                        startActivity(it)
+                    } ?: run {
+                        showSnackbar(
+                            viewContainer,
+                            resources.getString(R.string.filestorage_snackbar_file_manager_is_not_available)
+                        )
                     }
-                }.onFailure { e ->
-                    Timber.e(e)
-                }.getOrNull()?.let {
-                    startActivity(it)
-                } ?: run {
-                    showSnackbar(
-                        viewContainer,
-                        resources.getString(R.string.filestorage_snackbar_file_manager_is_not_available)
-                    )
                 }
                 return true
             }
@@ -296,6 +295,15 @@ class FileStorageActivity : PasscodeActivity(), Scrollable {
             else -> return super.onOptionsItemSelected(item)
         }
     }
+
+    private suspend fun viewFolderIntent(): Intent? =
+        runCatching {
+            viewModel.getCurrentPathContentUri()?.let {
+                createViewFolderIntent(it.toUri(), viewModel.getCurrentFilePath())
+            }
+        }.onFailure { e ->
+            Timber.e(e)
+        }.getOrNull()
 
 
     /**
@@ -432,7 +440,7 @@ class FileStorageActivity : PasscodeActivity(), Scrollable {
      * onSaveInstanceState
      */
     public override fun onSaveInstanceState(outState: Bundle) {
-        viewModel.getCurrentPath()?.let { outState.putString(PATH, it.value) }
+        viewModel.getCurrentUriPath()?.let { outState.putString(PATH, it.value) }
         super.onSaveInstanceState(outState)
     }
 
@@ -447,11 +455,12 @@ class FileStorageActivity : PasscodeActivity(), Scrollable {
     }
 
     private fun checkMenuVisibility(currentPath: UriPath?) {
-        openInFileManagerMenuItem?.isVisible =
-            mode == Mode.BROWSE_FILES
-                    && !viewModel.isInCacheDirectory()
-                    && currentPath?.toUri()
-                ?.let { this.createViewFolderIntent(it) != null } == true
+        lifecycleScope.launch {
+            openInFileManagerMenuItem?.isVisible =
+                mode == Mode.BROWSE_FILES
+                        && !viewModel.isInCacheDirectory()
+                        && viewFolderIntent() != null
+        }
     }
 
     private fun finishPickFolder(uriPath: UriPath) {
