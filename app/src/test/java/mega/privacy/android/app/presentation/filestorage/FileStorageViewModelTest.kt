@@ -247,6 +247,21 @@ class FileStorageViewModelTest {
             }
         }
 
+    @Test
+    fun `test that document clicked event is consumed`() =
+        runTest {
+            val uriString = "content://"
+            whenever(getExternalPathByContentUriUseCase(uriString)) doReturn "/path"
+
+            underTest.folderPicked(uriString)
+            underTest.consumeFolderPickedEvent()
+
+            underTest.uiState.test {
+                val state = awaitItem() as? FileStorageUiState.Loaded
+                assertThat(state?.folderPickedEvent).isEqualTo(consumed())
+            }
+        }
+
     private suspend fun commonStub(
         uriPath: UriPath,
         children: List<DocumentEntity> = emptyList(),

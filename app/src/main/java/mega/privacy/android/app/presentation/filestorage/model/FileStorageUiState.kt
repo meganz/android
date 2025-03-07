@@ -1,13 +1,20 @@
 package mega.privacy.android.app.presentation.filestorage.model
 
+import android.net.Uri
 import de.palm.composestateevents.StateEventWithContent
 import de.palm.composestateevents.consumed
 import mega.privacy.android.app.FileDocument
 import mega.privacy.android.domain.entity.file.FileStorageType
 import mega.privacy.android.domain.entity.uri.UriPath
 
+/**
+ * File storage ui state
+ */
 sealed interface FileStorageUiState {
 
+    /**
+     * Loading state
+     */
     data object Loading : FileStorageUiState
 
     /**
@@ -18,6 +25,7 @@ sealed interface FileStorageUiState {
      * @property storageType Storage type of current folder
      * @property isInCacheDirectory If the current folder is in cache directory
      * @property folderPickedEvent event triggered when a folder is picked with the system folder picker
+     * @property openWithThirdPartyAppEvent event triggered when a file needs to be opened in a third party app
      */
     data class Loaded(
         val currentFolderPath: String = "",
@@ -26,6 +34,7 @@ sealed interface FileStorageUiState {
         val storageType: FileStorageType = FileStorageType.Unknown,
         val isInCacheDirectory: Boolean = false,
         val folderPickedEvent: StateEventWithContent<UriPath> = consumed(),
+        val openWithThirdPartyAppEvent: StateEventWithContent<Pair<Uri, String>> = consumed(),
     ) : FileStorageUiState {
 
         /**
