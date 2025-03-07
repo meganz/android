@@ -60,6 +60,8 @@ import mega.privacy.android.shared.original.core.ui.theme.OriginalTheme
 import mega.privacy.android.shared.original.core.ui.theme.grey_alpha_012
 import mega.android.core.ui.theme.values.TextColor
 import mega.privacy.android.app.presentation.meeting.chat.view.NoteToSelfView
+import mega.privacy.android.shared.original.core.ui.controls.dividers.DividerType
+import mega.privacy.android.shared.original.core.ui.controls.dividers.MegaDivider
 import mega.privacy.android.shared.original.core.ui.theme.white_alpha_012
 
 /**
@@ -88,7 +90,7 @@ fun StartConversationView(
         topBar = {
             if (state.contactItemList.isEmpty()) {
                 SimpleTopAppBar(
-                    titleId = R.string.fab_label_new_chat,
+                    titleId = if (state.fromChat) R.string.fab_label_new_chat else R.string.group_chat_start_conversation_label,
                     elevation = !firstItemVisible,
                     onBackPressed = onBackPressed
                 )
@@ -101,7 +103,7 @@ fun StartConversationView(
                     onBackPressed = onBackPressed,
                     onSearchClicked = onSearchClicked,
                     elevation = !firstItemVisible,
-                    title = stringResource(R.string.fab_label_new_chat),
+                    title = stringResource(if (state.fromChat) R.string.fab_label_new_chat else R.string.group_chat_start_conversation_label),
                     hintId = R.string.hint_action_search
                 )
             }
@@ -115,13 +117,14 @@ fun StartConversationView(
                 val contactsList = filteredContactList ?: contactItemList
 
                 if (buttonsVisible) {
+                    val isInviteButtonVisible = contactItemList.isNotEmpty()
                     if (fromChat) {
                         item {
                             ActionButtons(
                                 action = buttons[0],
                                 onButtonClicked = onButtonClicked,
                                 onInviteContactsClicked = onInviteContactsClicked,
-                                isInviteButtonVisible = contactItemList.isNotEmpty(),
+                                isInviteButtonVisible = isInviteButtonVisible,
                                 withDivider = false
                             )
                         }
@@ -130,7 +133,8 @@ fun StartConversationView(
                             ActionButtons(
                                 action = button,
                                 onButtonClicked = onButtonClicked,
-                                onInviteContactsClicked = onInviteContactsClicked
+                                onInviteContactsClicked = onInviteContactsClicked,
+                                isInviteButtonVisible = isInviteButtonVisible && button == StartConversationAction.JoinMeeting
                             )
                         }
                     }
@@ -244,16 +248,16 @@ private fun ActionButtons(
             ActionText(actionText = action.title)
         }
 
-        if (isInviteButtonVisible) {
-            InviteContactsButton(onInviteContactsClicked)
+        if (withDivider) {
+            MegaDivider(dividerType = DividerType.BigStartPadding)
         }
 
-        if (withDivider) {
-            Divider(
-                modifier = Modifier.padding(start = 72.dp),
-                color = if (MaterialTheme.colors.isLight) grey_alpha_012 else white_alpha_012,
-                thickness = 1.dp
-            )
+        if (isInviteButtonVisible) {
+            InviteContactsButton(onInviteContactsClicked)
+
+            if (withDivider) {
+                MegaDivider(dividerType = DividerType.BigStartPadding)
+            }
         }
     }
 }
