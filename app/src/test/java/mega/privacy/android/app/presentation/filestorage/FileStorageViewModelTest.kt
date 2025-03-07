@@ -14,6 +14,7 @@ import mega.privacy.android.domain.entity.uri.UriPath
 import mega.privacy.android.domain.usecase.file.GetDocumentEntityUseCase
 import mega.privacy.android.domain.usecase.file.GetExternalPathByContentUriUseCase
 import mega.privacy.android.domain.usecase.file.GetFileStorageTypeNameUseCase
+import mega.privacy.android.domain.usecase.file.GetFileUriUseCase
 import mega.privacy.android.domain.usecase.file.GetFilesInDocumentFolderUseCase
 import mega.privacy.android.domain.usecase.file.GetPathByDocumentContentUriUseCase
 import mega.privacy.android.domain.usecase.file.IsUriPathInCacheUseCase
@@ -41,6 +42,7 @@ class FileStorageViewModelTest {
     private val isUriPathInCacheUseCase = mock<IsUriPathInCacheUseCase>()
     private val getDocumentEntityUseCase = mock<GetDocumentEntityUseCase>()
     private val getExternalPathByContentUriUseCase = mock<GetExternalPathByContentUriUseCase>()
+    private val getFileUriUseCase = mock<GetFileUriUseCase>()
 
     @BeforeEach
     fun setUp() {
@@ -51,6 +53,7 @@ class FileStorageViewModelTest {
             isUriPathInCacheUseCase,
             getDocumentEntityUseCase,
             getExternalPathByContentUriUseCase,
+            getFileUriUseCase,
         )
     }
 
@@ -62,6 +65,7 @@ class FileStorageViewModelTest {
             getFilesInDocumentFolderUseCase,
             isUriPathInCacheUseCase,
             getDocumentEntityUseCase,
+            getFileUriUseCase,
         )
     }
 
