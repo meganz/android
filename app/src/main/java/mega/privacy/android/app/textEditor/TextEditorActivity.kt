@@ -62,6 +62,7 @@ import mega.privacy.android.app.presentation.transfers.attach.NodeAttachmentView
 import mega.privacy.android.app.presentation.transfers.attach.createNodeAttachmentView
 import mega.privacy.android.app.presentation.transfers.starttransfer.model.TransferTriggerEvent
 import mega.privacy.android.app.presentation.transfers.starttransfer.view.createStartTransferView
+import mega.privacy.android.app.textEditor.TextEditorViewModel.Companion.CONVERTED_FILE_NAME
 import mega.privacy.android.app.textEditor.TextEditorViewModel.Companion.VIEW_MODE
 import mega.privacy.android.app.usecase.exception.MegaException
 import mega.privacy.android.app.utils.AlertsAndWarnings
@@ -126,6 +127,7 @@ import nz.mega.sdk.MegaChatApi
 import nz.mega.sdk.MegaChatApiJava.MEGACHAT_INVALID_HANDLE
 import nz.mega.sdk.MegaShare
 import timber.log.Timber
+import java.io.File
 import javax.inject.Inject
 import kotlin.math.roundToInt
 
@@ -341,6 +343,9 @@ class TextEditorActivity : PasscodeActivity(), SnackbarShower, Scrollable {
             errorReadingContentDialog?.dismiss()
         }
         binding.contentWebView.destroy()
+        File(cacheDir, CONVERTED_FILE_NAME).apply {
+            if (exists()) delete()
+        }
         super.onDestroy()
     }
 
@@ -840,11 +845,10 @@ class TextEditorActivity : PasscodeActivity(), SnackbarShower, Scrollable {
             binding.contentText.isVisible = !isMarkDownFile
             binding.contentWebView.isVisible = isMarkDownFile
         }
-        collectFlow(viewModel.uiState.map { it.convertedHtmlContent }) { htmlContent ->
-            htmlContent?.let {
-                binding.contentWebView.loadDataWithBaseURL(null, it, "text/html", "UTF-8", null)
-                viewModel.updateHtmlContent(null)
-            }
+
+        collectFlow(viewModel.uiState.map { it.markDownFileLoaded }) { isLoaded ->
+            binding.loadingLayout.isVisible = !isLoaded
+            binding.editFab.isVisible = isLoaded
         }
     }
 
@@ -879,10 +883,7 @@ class TextEditorActivity : PasscodeActivity(), SnackbarShower, Scrollable {
                 text = binding.contentEditText.text
             }
 
-            binding.contentWebView.apply {
-                isVisible = viewModel.uiState.value.isMarkDownFile
-                viewModel.convertMarkDownToHtml()
-            }
+            binding.contentWebView.isVisible = viewModel.uiState.value.isMarkDownFile
 
             if (viewModel.canShowEditFab() && currentUIState == STATE_SHOWN) {
                 binding.editFab.show()
@@ -943,15 +944,18 @@ class TextEditorActivity : PasscodeActivity(), SnackbarShower, Scrollable {
         val firstLineNumber = content.getFirstLineNumber()
         binding.contentText.setText(currentContent, firstLineNumber)
         binding.contentEditText.setText(currentContent, firstLineNumber)
-        binding.contentWebView.apply {
-            viewModel.convertMarkDownToHtml()
+        if (viewModel.uiState.value.isMarkDownFile) {
+            viewModel.convertMarkDownToHtml(this, binding.contentWebView)
         }
         binding.fileEditorScrollView.isVisible = true
         binding.fileEditorScrollView.smoothScrollTo(0, 0)
-        binding.loadingLayout.isVisible = false
+        binding.loadingLayout.isVisible = false || viewModel.uiState.value.isMarkDownFile
         requestedOrientation = ActivityInfo.SCREEN_ORIENTATION_UNSPECIFIED
 
-        if (viewModel.canShowEditFab() && currentUIState == STATE_SHOWN) {
+        if (viewModel.canShowEditFab()
+            && currentUIState == STATE_SHOWN
+            && !viewModel.uiState.value.isMarkDownFile
+        ) {
             binding.editFab.show()
         }
 
@@ -1176,14 +1180,14 @@ class TextEditorActivity : PasscodeActivity(), SnackbarShower, Scrollable {
                 pagination.size()
             )
 
-            isVisible = true
+            isVisible = !viewModel.uiState.value.isMarkDownFile
         }
 
-        if (pagination.shouldShowNext()) {
+        if (pagination.shouldShowNext() && !viewModel.uiState.value.isMarkDownFile) {
             binding.next.show()
         }
 
-        if (pagination.shouldShowPrevious()) {
+        if (pagination.shouldShowPrevious() && !viewModel.uiState.value.isMarkDownFile) {
             binding.previous.show()
         }
 

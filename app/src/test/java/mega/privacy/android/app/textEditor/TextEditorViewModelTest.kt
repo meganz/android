@@ -105,6 +105,7 @@ internal class TextEditorViewModelTest {
             isNodeInBackupsUseCase = isNodeInBackupsUseCase,
             savedStateHandle = savedStateHandle,
             getBusinessStatusUseCase = getBusinessStatusUseCase,
+            crashReporter = mock()
         )
     }
 
@@ -423,19 +424,6 @@ internal class TextEditorViewModelTest {
         arrayOf("file.txt", false),
         arrayOf(null, false),
     )
-
-    @Test
-    fun `convertMarkDownToHtml should update UI state with converted HTML`() = runTest {
-        val expectedContent = "markdown content"
-        advanceUntilIdle()
-        underTest.uiState.test {
-            assertThat(awaitItem().convertedHtmlContent).isEqualTo(null)
-            underTest.updateHtmlContent(expectedContent)
-            assertThat(awaitItem().convertedHtmlContent).isEqualTo(expectedContent)
-            underTest.updateHtmlContent(null)
-            assertThat(awaitItem().convertedHtmlContent).isEqualTo(null)
-        }
-    }
 
     companion object {
         @JvmField
