@@ -15,6 +15,7 @@ import mega.privacy.android.data.listener.OptionalMegaRequestListenerInterface
 import mega.privacy.android.data.mapper.node.MegaNodeMapper
 import mega.privacy.android.data.wrapper.StringWrapper
 import mega.privacy.android.domain.entity.node.TypedNode
+import mega.privacy.android.domain.entity.uri.UriPath
 import mega.privacy.android.domain.qualifier.IoDispatcher
 import mega.privacy.android.domain.repository.thumbnailpreview.ThumbnailPreviewRepository
 import nz.mega.sdk.MegaError
@@ -242,19 +243,20 @@ internal class ThumbnailPreviewRepositoryImpl @Inject constructor(
     }
 
 
-    override suspend fun createThumbnail(handle: Long, file: File) = withContext(ioDispatcher) {
-        val thumbnailFileName = getThumbnailOrPreviewFileName(handle)
-        val thumbnailFile = getThumbnailFile(thumbnailFileName)
-        requireNotNull(thumbnailFile)
-        megaApi.createThumbnail(file.absolutePath, thumbnailFile.absolutePath)
-    }
+    override suspend fun createThumbnail(handle: Long, uriPath: UriPath) =
+        withContext(ioDispatcher) {
+            val thumbnailFileName = getThumbnailOrPreviewFileName(handle)
+            val thumbnailFile = getThumbnailFile(thumbnailFileName)
+            requireNotNull(thumbnailFile)
+            megaApi.createThumbnail(uriPath.value, thumbnailFile.absolutePath)
+        }
 
 
-    override suspend fun createPreview(handle: Long, file: File) = withContext(ioDispatcher) {
+    override suspend fun createPreview(handle: Long, uriPath: UriPath) = withContext(ioDispatcher) {
         val previewFileName = getThumbnailOrPreviewFileName(handle)
         val previewFile = getPreviewFile(previewFileName)
         requireNotNull(previewFile)
-        megaApi.createPreview(file.absolutePath, previewFile.absolutePath)
+        megaApi.createPreview(uriPath.value, previewFile.absolutePath)
     }
 
     override suspend fun createPreview(name: String, file: File) =

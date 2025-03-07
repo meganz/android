@@ -1,7 +1,7 @@
 package mega.privacy.android.domain.usecase.thumbnailpreview
 
+import mega.privacy.android.domain.entity.uri.UriPath
 import mega.privacy.android.domain.repository.thumbnailpreview.ThumbnailPreviewRepository
-import java.io.File
 import javax.inject.Inject
 
 
@@ -16,9 +16,9 @@ class CreateImageOrVideoPreviewUseCase @Inject constructor(
      * Invoke.
      *
      * @param nodeHandle Node handle of the file already in the Cloud.
-     * @param localFile Local file.
+     * @param uriPath Local file.
      */
-    suspend operator fun invoke(nodeHandle: Long, localFile: File) {
-        thumbnailPreviewRepository.createPreview(nodeHandle, localFile)
+    suspend operator fun invoke(nodeHandle: Long, uriPath: UriPath) {
+        thumbnailPreviewRepository.createPreview(nodeHandle, uriPath)
     }
 }

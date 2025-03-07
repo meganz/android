@@ -30,6 +30,7 @@ import mega.privacy.android.domain.entity.camerauploads.CameraUploadsTransferPro
 import mega.privacy.android.domain.entity.node.NodeId
 import mega.privacy.android.domain.entity.transfer.TransferAppData
 import mega.privacy.android.domain.entity.transfer.TransferEvent
+import mega.privacy.android.domain.entity.uri.UriPath
 import mega.privacy.android.domain.exception.NotEnoughStorageException
 import mega.privacy.android.domain.repository.FileSystemRepository
 import mega.privacy.android.domain.usecase.CreateTempFileAndRemoveCoordinatesUseCase
@@ -732,7 +733,7 @@ class UploadCameraUploadsRecordsUseCase @Inject constructor(
         path: String,
         nodeId: NodeId,
     ) = runCatching {
-        File(path).let {
+        UriPath(path).let {
             val nodeHandle = nodeId.longValue
             if (deleteThumbnailUseCase(nodeId.longValue)) {
                 createImageOrVideoThumbnailUseCase(nodeHandle, it)

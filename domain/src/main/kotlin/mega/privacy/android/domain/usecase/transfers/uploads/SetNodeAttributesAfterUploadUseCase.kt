@@ -1,7 +1,9 @@
 package mega.privacy.android.domain.usecase.transfers.uploads
 
+import mega.privacy.android.domain.entity.node.NodeId
 import mega.privacy.android.domain.entity.transfer.TransferAppData
 import mega.privacy.android.domain.entity.uri.UriPath
+import mega.privacy.android.domain.usecase.GetNodeByIdUseCase
 import mega.privacy.android.domain.usecase.file.IsImageFileUseCase
 import mega.privacy.android.domain.usecase.file.IsPdfFileUseCase
 import mega.privacy.android.domain.usecase.file.IsVideoFileUseCase
@@ -9,7 +11,7 @@ import mega.privacy.android.domain.usecase.thumbnailpreview.CreateImageOrVideoPr
 import mega.privacy.android.domain.usecase.thumbnailpreview.CreateImageOrVideoThumbnailUseCase
 import mega.privacy.android.domain.usecase.thumbnailpreview.CreatePdfPreviewUseCase
 import mega.privacy.android.domain.usecase.thumbnailpreview.CreatePdfThumbnailUseCase
-import java.io.File
+import mega.privacy.android.domain.usecase.thumbnailpreview.GetPublicNodeThumbnailUseCase
 import javax.inject.Inject
 
 /**
@@ -36,6 +38,7 @@ class SetNodeAttributesAfterUploadUseCase @Inject constructor(
     private val isPdfFileUseCase: IsPdfFileUseCase,
     private val createPdfThumbnailUseCase: CreatePdfThumbnailUseCase,
     private val createPdfPreviewUseCase: CreatePdfPreviewUseCase,
+    private val getPublicNodeThumbnailUseCase: GetPublicNodeThumbnailUseCase,
 ) {
 
     /**
@@ -48,19 +51,20 @@ class SetNodeAttributesAfterUploadUseCase @Inject constructor(
         nodeHandle: Long,
         uriPath: UriPath,
         appData: List<TransferAppData>?,
-        ) {
-        val localPath = uriPath.value
-        val localFile = File(localPath)
+    ) {
         val isVideoOrImage = isVideoFileUseCase(uriPath) || isImageFileUseCase(uriPath)
         val isPdf = isPdfFileUseCase(uriPath)
 
         if (isVideoOrImage) {
-            createImageOrVideoThumbnailUseCase(nodeHandle = nodeHandle, localFile = localFile)
-            createImageOrVideoPreviewUseCase(nodeHandle = nodeHandle, localFile = localFile)
+            if (getPublicNodeThumbnailUseCase(nodeHandle) == null) {
+                createImageOrVideoThumbnailUseCase(nodeHandle = nodeHandle, uriPath = uriPath)
+                createImageOrVideoPreviewUseCase(nodeHandle = nodeHandle, uriPath = uriPath)
+            }
             setNodeCoordinatesUseCase(
                 nodeHandle = nodeHandle,
                 uriPath = uriPath,
-                geolocation = appData?.filterIsInstance<TransferAppData.Geolocation>()?.firstOrNull(),
+                geolocation = appData?.filterIsInstance<TransferAppData.Geolocation>()
+                    ?.firstOrNull(),
             )
         } else if (isPdf) {
             createPdfThumbnailUseCase(nodeHandle = nodeHandle, uriPath = uriPath)

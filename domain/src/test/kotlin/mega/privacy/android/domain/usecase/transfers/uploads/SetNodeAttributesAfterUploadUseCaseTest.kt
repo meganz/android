@@ -11,10 +11,9 @@ import mega.privacy.android.domain.usecase.thumbnailpreview.CreateImageOrVideoPr
 import mega.privacy.android.domain.usecase.thumbnailpreview.CreateImageOrVideoThumbnailUseCase
 import mega.privacy.android.domain.usecase.thumbnailpreview.CreatePdfPreviewUseCase
 import mega.privacy.android.domain.usecase.thumbnailpreview.CreatePdfThumbnailUseCase
-import org.junit.jupiter.api.Assertions.*
+import mega.privacy.android.domain.usecase.thumbnailpreview.GetPublicNodeThumbnailUseCase
 import org.junit.jupiter.api.BeforeAll
 import org.junit.jupiter.api.BeforeEach
-import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.TestInstance
 import org.junit.jupiter.params.ParameterizedTest
 import org.junit.jupiter.params.provider.Arguments
@@ -24,9 +23,10 @@ import org.mockito.kotlin.mock
 import org.mockito.kotlin.never
 import org.mockito.kotlin.reset
 import org.mockito.kotlin.verify
+import org.mockito.kotlin.verifyNoInteractions
 import org.mockito.kotlin.whenever
-import java.io.File
 import java.util.stream.Stream
+import kotlin.test.Test
 
 @ExperimentalCoroutinesApi
 @TestInstance(TestInstance.Lifecycle.PER_CLASS)
@@ -42,16 +42,10 @@ class SetNodeAttributesAfterUploadUseCaseTest {
     private val isPdfFileUseCase: IsPdfFileUseCase = mock()
     private val createPdfThumbnailUseCase: CreatePdfThumbnailUseCase = mock()
     private val createPdfPreviewUseCase: CreatePdfPreviewUseCase = mock()
+    private val getPublicNodeThumbnailUseCase = mock<GetPublicNodeThumbnailUseCase>()
 
-    private val fileName = "testName"
     private val nodeHandle = 1L
-    private val localPath = "test/local/$fileName"
-    private val localFile =File(localPath)
-    private val uriPath = UriPath(localPath)
-    private val thumbnailCache = "test/thumbnail/cache"
-    private val previewCache = "test/preview/cache"
-    private val thumbnailPath = "$thumbnailCache/$fileName"
-    private val previewPath = "$previewCache/$fileName"
+    private val uriPath = UriPath("test/local/testName")
 
     @BeforeAll
     fun setUp() {
@@ -63,7 +57,8 @@ class SetNodeAttributesAfterUploadUseCaseTest {
             isImageFileUseCase = isImageFileUseCase,
             isPdfFileUseCase = isPdfFileUseCase,
             createPdfThumbnailUseCase = createPdfThumbnailUseCase,
-            createPdfPreviewUseCase = createPdfPreviewUseCase
+            createPdfPreviewUseCase = createPdfPreviewUseCase,
+            getPublicNodeThumbnailUseCase = getPublicNodeThumbnailUseCase
         )
     }
 
@@ -77,7 +72,8 @@ class SetNodeAttributesAfterUploadUseCaseTest {
             isImageFileUseCase,
             isPdfFileUseCase,
             createPdfThumbnailUseCase,
-            createPdfPreviewUseCase
+            createPdfPreviewUseCase,
+            getPublicNodeThumbnailUseCase,
         )
     }
 
@@ -93,9 +89,9 @@ class SetNodeAttributesAfterUploadUseCaseTest {
         whenever(isVideoFileUseCase(uriPath)).thenReturn(isVideoFile)
         whenever(isImageFileUseCase(uriPath)).thenReturn(isImageFile)
         whenever(isPdfFileUseCase(uriPath)).thenReturn(isPdfFile)
-        whenever(createImageOrVideoThumbnailUseCase(nodeHandle, localFile)).thenReturn(Unit)
+        whenever(createImageOrVideoThumbnailUseCase(nodeHandle, uriPath)).thenReturn(Unit)
         whenever(createPdfThumbnailUseCase(nodeHandle, uriPath)).thenReturn(Unit)
-        whenever(createImageOrVideoPreviewUseCase(nodeHandle, localFile)).thenReturn(Unit)
+        whenever(createImageOrVideoPreviewUseCase(nodeHandle, uriPath)).thenReturn(Unit)
         whenever(createPdfPreviewUseCase(nodeHandle, uriPath)).thenReturn(Unit)
         whenever(setNodeCoordinatesUseCase(uriPath, nodeHandle)).thenReturn(Unit)
 
@@ -103,25 +99,25 @@ class SetNodeAttributesAfterUploadUseCaseTest {
 
         when {
             isVideoFile || isImageFile -> {
-                verify(createImageOrVideoThumbnailUseCase).invoke(nodeHandle, localFile)
+                verify(createImageOrVideoThumbnailUseCase).invoke(nodeHandle, uriPath)
                 verify(createPdfThumbnailUseCase, never()).invoke(nodeHandle, uriPath)
-                verify(createImageOrVideoPreviewUseCase).invoke(nodeHandle, localFile)
+                verify(createImageOrVideoPreviewUseCase).invoke(nodeHandle, uriPath)
                 verify(createPdfPreviewUseCase, never()).invoke(nodeHandle, uriPath)
                 verify(setNodeCoordinatesUseCase).invoke(uriPath, nodeHandle)
             }
 
             isPdfFile -> {
-                verify(createImageOrVideoThumbnailUseCase, never()).invoke(nodeHandle, localFile)
+                verify(createImageOrVideoThumbnailUseCase, never()).invoke(nodeHandle, uriPath)
                 verify(createPdfThumbnailUseCase).invoke(nodeHandle, uriPath)
-                verify(createImageOrVideoPreviewUseCase, never()).invoke(nodeHandle, localFile)
+                verify(createImageOrVideoPreviewUseCase, never()).invoke(nodeHandle, uriPath)
                 verify(createPdfPreviewUseCase).invoke(nodeHandle, uriPath)
                 verify(setNodeCoordinatesUseCase, never()).invoke(uriPath, nodeHandle)
             }
 
             else -> {
-                verify(createImageOrVideoThumbnailUseCase, never()).invoke(nodeHandle, localFile)
+                verify(createImageOrVideoThumbnailUseCase, never()).invoke(nodeHandle, uriPath)
                 verify(createPdfThumbnailUseCase, never()).invoke(nodeHandle, uriPath)
-                verify(createImageOrVideoPreviewUseCase, never()).invoke(nodeHandle, localFile)
+                verify(createImageOrVideoPreviewUseCase, never()).invoke(nodeHandle, uriPath)
                 verify(createPdfPreviewUseCase, never()).invoke(nodeHandle, uriPath)
                 verify(setNodeCoordinatesUseCase, never()).invoke(uriPath, nodeHandle)
             }
@@ -131,8 +127,8 @@ class SetNodeAttributesAfterUploadUseCaseTest {
     @ParameterizedTest
     @ValueSource(booleans = [true, false])
     fun `test that geolocation appdata parameter is set when is an image or video file and app data contains it`(
-        isVideoFile: Boolean
-    ) = runTest{
+        isVideoFile: Boolean,
+    ) = runTest {
         whenever(isVideoFileUseCase(uriPath)).thenReturn(isVideoFile)
         whenever(isImageFileUseCase(uriPath)).thenReturn(!isVideoFile)
         whenever(isPdfFileUseCase(uriPath)).thenReturn(false)
@@ -141,6 +137,20 @@ class SetNodeAttributesAfterUploadUseCaseTest {
         underTest.invoke(nodeHandle, uriPath, appData = appData)
 
         verify(setNodeCoordinatesUseCase).invoke(uriPath, nodeHandle, geolocation)
+    }
+
+    @ParameterizedTest
+    @ValueSource(booleans = [true, false])
+    fun `test that thumbnail is not generated if already exists`(
+        isVideoFile: Boolean,
+    ) = runTest {
+        whenever(getPublicNodeThumbnailUseCase(nodeHandle)).thenReturn(mock())
+        whenever(isVideoFileUseCase(uriPath)).thenReturn(isVideoFile)
+        whenever(isImageFileUseCase(uriPath)).thenReturn(!isVideoFile)
+        whenever(isPdfFileUseCase(uriPath)).thenReturn(false)
+        underTest.invoke(nodeHandle, uriPath, appData = null)
+        verifyNoInteractions(createImageOrVideoThumbnailUseCase)
+        verifyNoInteractions(createImageOrVideoPreviewUseCase)
     }
 
     private fun provideParameters() = Stream.of(

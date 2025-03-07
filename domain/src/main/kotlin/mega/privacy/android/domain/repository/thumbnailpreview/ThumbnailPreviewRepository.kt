@@ -1,6 +1,7 @@
 package mega.privacy.android.domain.repository.thumbnailpreview
 
 import mega.privacy.android.domain.entity.node.TypedNode
+import mega.privacy.android.domain.entity.uri.UriPath
 import mega.privacy.android.domain.exception.MegaException
 import java.io.File
 
@@ -103,21 +104,21 @@ interface ThumbnailPreviewRepository {
      * Create a thumbnail for an image
      *
      * @param handle
-     * @param file
+     * @param uriPath of the image
      * @return True if the thumbnail was successfully created, otherwise false.
      */
 
-    suspend fun createThumbnail(handle: Long, file: File): Boolean
+    suspend fun createThumbnail(handle: Long, uriPath: UriPath): Boolean
 
     /**
      * Create a preview for an image
      *
      * @param handle
-     * @param file
+     * @param uriPath of the image
      * @return True if the preview was successfully created, otherwise false.
      */
 
-    suspend fun createPreview(handle: Long, file: File): Boolean
+    suspend fun createPreview(handle: Long, uriPath: UriPath): Boolean
 
     /**
      * Create a preview for an image or video

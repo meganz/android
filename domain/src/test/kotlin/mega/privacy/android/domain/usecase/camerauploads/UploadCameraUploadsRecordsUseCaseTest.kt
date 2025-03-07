@@ -24,6 +24,7 @@ import mega.privacy.android.domain.entity.node.TypedFileNode
 import mega.privacy.android.domain.entity.transfer.Transfer
 import mega.privacy.android.domain.entity.transfer.TransferAppData
 import mega.privacy.android.domain.entity.transfer.TransferEvent
+import mega.privacy.android.domain.entity.uri.UriPath
 import mega.privacy.android.domain.exception.NotEnoughStorageException
 import mega.privacy.android.domain.repository.FileSystemRepository
 import mega.privacy.android.domain.usecase.CreateTempFileAndRemoveCoordinatesUseCase
@@ -753,10 +754,10 @@ internal class UploadCameraUploadsRecordsUseCaseTest {
 
             verify(deleteThumbnailUseCase).invoke(transferFinished.nodeHandle)
             verify(createImageOrVideoThumbnailUseCase)
-                .invoke(transferFinished.nodeHandle, File(record.filePath))
+                .invoke(transferFinished.nodeHandle, UriPath(record.filePath))
             verify(deletePreviewUseCase).invoke(transferFinished.nodeHandle)
             verify(createImageOrVideoPreviewUseCase)
-                .invoke(transferFinished.nodeHandle, File(record.filePath))
+                .invoke(transferFinished.nodeHandle, UriPath(record.filePath))
         }
 
         @ParameterizedTest(name = "when folder type is {0}")
@@ -787,10 +788,10 @@ internal class UploadCameraUploadsRecordsUseCaseTest {
             )
             verify(deleteThumbnailUseCase, never()).invoke(transferFinished.nodeHandle)
             verify(createImageOrVideoThumbnailUseCase, never())
-                .invoke(transferFinished.nodeHandle, File(record.filePath))
+                .invoke(transferFinished.nodeHandle, UriPath(record.filePath))
             verify(deletePreviewUseCase, never()).invoke(transferFinished.nodeHandle)
             verify(createImageOrVideoPreviewUseCase, never())
-                .invoke(transferFinished.nodeHandle, File(record.filePath))
+                .invoke(transferFinished.nodeHandle, UriPath(record.filePath))
             verify(setCameraUploadsRecordUploadStatusUseCase, never()).invoke(
                 mediaId = record.mediaId,
                 timestamp = record.timestamp,
