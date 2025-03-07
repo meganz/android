@@ -36,7 +36,6 @@ import kotlinx.coroutines.flow.distinctUntilChanged
 import kotlinx.coroutines.flow.distinctUntilChangedBy
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.launch
-import mega.privacy.android.app.MimeTypeList.Companion.typeForName
 import mega.privacy.android.app.R
 import mega.privacy.android.app.activities.PasscodeActivity
 import mega.privacy.android.app.arch.extensions.collectFlow
@@ -56,7 +55,6 @@ import mega.privacy.android.app.utils.Util
 import mega.privacy.android.app.utils.createViewFolderIntent
 import mega.privacy.android.app.utils.permission.PermissionUtils.hasPermissions
 import mega.privacy.android.app.utils.permission.PermissionUtils.requestPermission
-import mega.privacy.android.data.extensions.toUri
 import mega.privacy.android.domain.entity.file.FileStorageType
 import mega.privacy.android.domain.entity.uri.UriPath
 import timber.log.Timber
@@ -251,6 +249,18 @@ class FileStorageActivity : PasscodeActivity(), Scrollable {
                 finishPickFolder(uriPath)
             }
         }
+        collectFlow(viewModel.uiLoadedState.map { it.openWithThirdPartyAppEvent }
+            .distinctUntilChanged()) {
+            (it as? StateEventWithContentTriggered)?.content?.let { (uri, type) ->
+                val intent = Intent(Intent.ACTION_VIEW)
+                intent.addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION)
+                intent.setDataAndType(uri, type)
+                if (MegaApiUtils.isIntentAvailable(this, intent)) {
+                    startActivity(intent)
+                }
+                viewModel.consumeDocumentClickedEvent()
+            }
+        }
     }
 
     /**
@@ -299,7 +309,7 @@ class FileStorageActivity : PasscodeActivity(), Scrollable {
     private suspend fun viewFolderIntent(): Intent? =
         runCatching {
             viewModel.getCurrentPathContentUri()?.let {
-                createViewFolderIntent(it.toUri(), viewModel.getCurrentFilePath())
+                createViewFolderIntent(it, viewModel.getCurrentFilePath())
             }
         }.onFailure { e ->
             Timber.e(e)
@@ -488,16 +498,9 @@ class FileStorageActivity : PasscodeActivity(), Scrollable {
             }
             changeFolder(document.uriPath)
         } else if (mode == Mode.BROWSE_FILES) {
-            val documentFile = adapter?.getItem(position)
-            if (documentFile != null) {
-                val intent = Intent(Intent.ACTION_VIEW)
-                intent.addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION)
-                val uri = documentFile.uriPath.toUri()
-                intent.setDataAndType(uri, typeForName(documentFile.name).type)
-                if (MegaApiUtils.isIntentAvailable(this, intent)) {
-                    startActivity(intent)
-                }
-            } else {
+            adapter?.getItem(position)?.let {
+                viewModel.documentClicked(it)
+            } ?: run {
                 showSnackbar(
                     viewContainer,
                     getString(R.string.corrupt_video_dialog_text)

@@ -1,5 +1,7 @@
 package mega.privacy.android.app.presentation.filestorage
 
+import android.net.Uri
+import androidx.core.net.toUri
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import dagger.hilt.android.lifecycle.HiltViewModel
@@ -11,6 +13,7 @@ import kotlinx.coroutines.flow.filterIsInstance
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import mega.privacy.android.app.FileDocument
+import mega.privacy.android.app.MimeTypeList.Companion.typeForName
 import mega.privacy.android.app.presentation.filestorage.model.FileStorageUiState
 import mega.privacy.android.app.utils.Constants
 import mega.privacy.android.data.extensions.isFile
@@ -109,14 +112,19 @@ class FileStorageViewModel @Inject constructor(
     /**
      * Get "content://" Uri of the current path if possible
      */
-    suspend fun getCurrentPathContentUri(): String? = getCurrentUriPath()?.let {
+    suspend fun getCurrentPathContentUri(): Uri? = getCurrentUriPath()?.let {
+        getContentUriForUriPath(it)
+    }
+
+    private suspend fun getContentUriForUriPath(it: UriPath): Uri? {
+        val uri = it.toUri()
         when {
             it.isPath() -> File(it.value)
-            it.isFile() -> File(it.toUri().path ?: return@let null)
-            it.toUri().scheme == "content" -> return@let it.value
-            else -> return@let null
+            it.isFile() -> File(uri.path ?: return null)
+            uri.scheme == "content" -> return uri
+            else -> return null
         }.let { file ->
-            getFileUriUseCase(file, Constants.AUTHORITY_STRING_FILE_PROVIDER)
+            return getFileUriUseCase(file, Constants.AUTHORITY_STRING_FILE_PROVIDER).toUri()
         }
     }
 
@@ -132,6 +140,9 @@ class FileStorageViewModel @Inject constructor(
     }
 
 
+    /**
+     * Folder has been picked with the system picker
+     */
     fun folderPicked(uriString: String) {
         viewModelScope.launch {
             // This is used in legacy code expecting path instead of content Uri
@@ -143,8 +154,33 @@ class FileStorageViewModel @Inject constructor(
         }
     }
 
+    /**
+     * Consume folder picked event
+     */
     fun consumeFolderPickedEvent() {
         uiState.update { it.getOrCreateLoaded().copy(folderPickedEvent = consumed()) }
+    }
+
+    /**
+     * Document clicked
+     */
+    fun documentClicked(fileDocument: FileDocument) {
+        viewModelScope.launch {
+            getContentUriForUriPath(fileDocument.uriPath)?.let { contentUri ->
+                val type = typeForName(fileDocument.name).type
+                uiState.update {
+                    it.getOrCreateLoaded()
+                        .copy(openWithThirdPartyAppEvent = triggered(Pair(contentUri, type)))
+                }
+            }
+        }
+    }
+
+    /**
+     * Consume document click event
+     */
+    fun consumeDocumentClickedEvent() {
+        uiState.update { it.getOrCreateLoaded().copy(openWithThirdPartyAppEvent = consumed()) }
     }
 
     /**
