@@ -69,7 +69,6 @@ internal fun LazyListScope.myAccountSettingsEntryView(
             }
             MegaIcon(
                 painter = rememberVectorPainter(ImageVector.vectorResource(id = R.drawable.ic_chevron_right)),
-                tint = null,
                 contentDescription = null,
             )
         }

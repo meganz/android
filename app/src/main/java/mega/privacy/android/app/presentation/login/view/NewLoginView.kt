@@ -33,6 +33,7 @@ import androidx.compose.foundation.layout.widthIn
 import androidx.compose.foundation.layout.wrapContentSize
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.foundation.text.KeyboardActions
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
@@ -345,6 +346,14 @@ private fun RequireLogin(
                     .padding(
                         top = 16.dp, start = 16.dp, end = 16.dp
                     ),
+                imeAction = ImeAction.Done,
+                keyboardActions = KeyboardActions(
+                    onDone = {
+                        Analytics.tracker.trackEvent(LoginButtonPressedEvent)
+                        focusManager.clearFocus(true)
+                        onLoginClicked()
+                    },
+                ),
                 label = stringResource(id = sharedR.string.password_text),
                 text = state.password.orEmpty(),
                 onValueChanged = {

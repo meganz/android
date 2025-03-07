@@ -194,12 +194,11 @@ private fun LazyListScope.listEntryPoints(
                 modifier = Modifier.wrapContentWidth(),
                 horizontalArrangement = Arrangement.Start
             ) {
-                MegaIcon(painter = painterResource(it.icon), tint = null, contentDescription = null)
+                MegaIcon(painter = painterResource(it.icon), contentDescription = null)
                 MegaText(text = stringResource(it.title), textColor = TextColor.Primary)
             }
             MegaIcon(
                 painter = rememberVectorPainter(ImageVector.vectorResource(id = R.drawable.ic_chevron_right)),
-                tint = null,
                 contentDescription = null,
             )
         }
