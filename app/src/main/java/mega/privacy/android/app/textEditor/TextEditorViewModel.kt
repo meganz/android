@@ -5,7 +5,11 @@ import android.content.Context
 import android.content.Intent
 import android.content.SharedPreferences
 import android.net.Uri
+import android.view.View
+import android.webkit.WebView
+import androidx.core.content.FileProvider
 import androidx.core.net.toUri
+import androidx.core.view.isVisible
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.SavedStateHandle
@@ -32,6 +36,7 @@ import mega.privacy.android.app.presentation.transfers.starttransfer.model.Trans
 import mega.privacy.android.app.utils.AlertsAndWarnings.showConfirmRemoveLinkDialog
 import mega.privacy.android.app.utils.CacheFolderManager
 import mega.privacy.android.app.utils.ChatUtil.authorizeNodeIfPreview
+import mega.privacy.android.app.utils.Constants.AUTHORITY_STRING_FILE_PROVIDER
 import mega.privacy.android.app.utils.Constants.CHAT_ID
 import mega.privacy.android.app.utils.Constants.EXTRA_SERIALIZE_STRING
 import mega.privacy.android.app.utils.Constants.FILE_LINK_ADAPTER
@@ -68,6 +73,7 @@ import mega.privacy.android.domain.entity.node.NodeNameCollisionType
 import mega.privacy.android.domain.entity.node.ViewerNode
 import mega.privacy.android.domain.entity.uri.UriPath
 import mega.privacy.android.domain.exception.node.NodeDoesNotExistsException
+import mega.privacy.android.domain.monitoring.CrashReporter
 import mega.privacy.android.domain.qualifier.IoDispatcher
 import mega.privacy.android.domain.usecase.GetBusinessStatusUseCase
 import mega.privacy.android.domain.usecase.GetNodeByIdUseCase
@@ -140,6 +146,7 @@ class TextEditorViewModel @Inject constructor(
     private val isNodeInBackupsUseCase: IsNodeInBackupsUseCase,
     private val savedStateHandle: SavedStateHandle,
     private val getBusinessStatusUseCase: GetBusinessStatusUseCase,
+    private val crashReporter: CrashReporter,
 ) : ViewModel() {
 
     companion object {
@@ -159,6 +166,9 @@ class TextEditorViewModel @Inject constructor(
                 color: #555;
             }
         """.trimIndent()
+
+        internal const val CONVERTED_FILE_NAME = "markdown_converted_content.html"
+        internal const val CHUCK_SIZE = 100 * 1024 //100KB
     }
 
     private val handle: Long
@@ -1058,32 +1068,70 @@ class TextEditorViewModel @Inject constructor(
         }
     }
 
-    internal fun convertMarkDownToHtml() {
+    internal fun convertMarkDownToHtml(context: Context, webView: WebView) {
         viewModelScope.launch(ioDispatcher) {
             getPagination()?.getEditedText()?.let { content ->
-                val document = Parser.builder().build().parse(content)
-                val htmlContent = HtmlRenderer.builder().build().render(document)
-                val convertedHtmlContent = generateHtmlContent(htmlContent)
-                _uiState.update { it.copy(convertedHtmlContent = convertedHtmlContent) }
+                crashReporter.log("The MD file size is ${content.length}")
+                val tempHtmlFile = File(context.cacheDir, CONVERTED_FILE_NAME)
+
+                writeMarkdownAsHtmlToFile(content, tempHtmlFile)
+
+                withContext(Dispatchers.Main) {
+                    val uri: Uri =
+                        FileProvider.getUriForFile(
+                            context,
+                            AUTHORITY_STRING_FILE_PROVIDER,
+                            tempHtmlFile
+                        )
+
+                    webView.settings.allowFileAccess = true
+                    webView.settings.allowContentAccess = true
+                    webView.loadUrl(uri.toString())
+                    _uiState.update { it.copy(markDownFileLoaded = true) }
+                }
             }
         }
     }
 
-    private fun generateHtmlContent(content: String) =
-        """
-            <html>
-                <head>
-                    <style>
-                        $BLOCKQUOTE_STYLE
-                    </style>
-                </head>
-                <body>
-                    $content
-                </body>
-            </html>
-        """.trimIndent()
+    private suspend fun writeMarkdownAsHtmlToFile(content: String, file: File) {
+        withContext(Dispatchers.IO) {
+            val chunkSize = CHUCK_SIZE
+            val safeChunks = splitContentSafely(content, chunkSize)
 
-    internal fun updateHtmlContent(value: String?) {
-        _uiState.update { it.copy(convertedHtmlContent = value) }
+            file.bufferedWriter().use { writer ->
+                writer.write("<html><head><style>$BLOCKQUOTE_STYLE</style></head><body>")
+
+                val parser = Parser.builder().build()
+                val renderer = HtmlRenderer.builder().build()
+
+                safeChunks.forEach { chunk ->
+                    val document = parser.parse(chunk)
+                    val htmlChunk = renderer.render(document)
+                    writer.write(htmlChunk)
+                }
+
+                writer.write("</body></html>")
+            }
+        }
+    }
+
+    private fun splitContentSafely(content: String, chunkSize: Int): List<String> {
+        val result = mutableListOf<String>()
+        var currentChunk = StringBuilder()
+
+        content.split("\n").forEach { line ->
+            if (currentChunk.length + line.length > chunkSize) {
+                result.add(currentChunk.toString())
+                currentChunk = StringBuilder(line)
+            } else {
+                currentChunk.append(line).append("\n")
+            }
+        }
+
+        if (currentChunk.isNotEmpty()) {
+            result.add(currentChunk.toString())
+        }
+
+        return result
     }
 }

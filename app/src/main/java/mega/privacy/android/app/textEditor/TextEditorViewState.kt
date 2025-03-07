@@ -13,7 +13,6 @@ import mega.privacy.android.domain.entity.AccountType
  * @property isNodeInBackups if the node is in backups
  * @property isBusinessAccountExpired if the business account is expired
  * @property isMarkDownFile if the file is a markdown file
- * @property convertedHtmlContent the converted HTML content
  */
 data class TextEditorViewState(
     val transferEvent: StateEventWithContent<TransferTriggerEvent> = consumed(),
@@ -22,5 +21,5 @@ data class TextEditorViewState(
     val isNodeInBackups: Boolean = false,
     val isBusinessAccountExpired: Boolean = false,
     val isMarkDownFile: Boolean = false,
-    val convertedHtmlContent: String? = null,
+    val markDownFileLoaded: Boolean = false,
 )
