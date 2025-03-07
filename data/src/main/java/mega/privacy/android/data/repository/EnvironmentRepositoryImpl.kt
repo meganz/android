@@ -17,6 +17,7 @@ import mega.privacy.android.data.mapper.environment.ThermalStateMapper
 import mega.privacy.android.data.model.protobuf.TombstoneProtos
 import mega.privacy.android.data.wrapper.ApplicationIpAddressWrapper
 import mega.privacy.android.domain.entity.AppInfo
+import mega.privacy.android.domain.entity.BatteryInfo
 import mega.privacy.android.domain.entity.DeviceInfo
 import mega.privacy.android.domain.qualifier.IoDispatcher
 import mega.privacy.android.domain.repository.EnvironmentRepository
@@ -90,6 +91,8 @@ internal class EnvironmentRepositoryImpl @Inject constructor(
 
     override fun monitorThermalState() =
         deviceGateway.monitorThermalState.map { thermalStateMapper(it) }
+
+    override fun getBatteryInfo(): BatteryInfo = deviceGateway.getBatteryInfo()
 
     override fun monitorBatteryInfo() =
         deviceGateway.monitorBatteryInfo

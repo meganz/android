@@ -12,4 +12,7 @@ internal data class SyncFoldersUiState(
     val showConfirmRemoveSyncFolderDialog: Boolean = false,
     val syncUiItemToRemove: SyncUiItem? = null,
     @StringRes val snackbarMessage: Int? = null,
-)
+) {
+    val isWarningBannerDisplayed =
+        (syncUiItems.isNotEmpty() && isLowBatteryLevel) || isStorageOverQuota
+}

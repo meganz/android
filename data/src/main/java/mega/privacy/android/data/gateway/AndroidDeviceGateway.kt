@@ -2,6 +2,7 @@ package mega.privacy.android.data.gateway
 
 import android.app.ActivityManager
 import android.content.Context
+import android.content.Context.BATTERY_SERVICE
 import android.content.Intent
 import android.net.ConnectivityManager
 import android.os.BatteryManager
@@ -132,6 +133,13 @@ internal class AndroidDeviceGateway @Inject constructor(
 
     override fun getCurrentMinute(): Int = LocalTime.now().minute
 
+    override fun getBatteryInfo(): BatteryInfo {
+        val batteryManager = context.getSystemService(BATTERY_SERVICE) as BatteryManager
+        val level = batteryManager.getIntProperty(BatteryManager.BATTERY_PROPERTY_CAPACITY)
+        val isCharging = batteryManager.isCharging
+        return BatteryInfo(level = level, isCharging = isCharging)
+    }
+
     override val monitorBatteryInfo =
         context.registerReceiverAsFlow(
             flags = ContextCompat.RECEIVER_EXPORTED,
@@ -153,7 +161,7 @@ internal class AndroidDeviceGateway @Inject constructor(
         ).map {
             it.action
         }.catch {
-            Timber.e("An Exception occurred when monitoring the device power connection", it)
+            Timber.e(it, "An Exception occurred when monitoring the device power connection")
         }.toSharedFlow(appScope)
 }
 

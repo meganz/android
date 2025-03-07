@@ -79,6 +79,11 @@ interface EnvironmentRepository {
     fun monitorThermalState(): Flow<ThermalState>
 
     /**
+     * Get battery info
+     */
+    fun getBatteryInfo(): BatteryInfo
+
+    /**
      * Monitor battery info
      */
     fun monitorBatteryInfo(): Flow<BatteryInfo>

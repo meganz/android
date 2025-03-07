@@ -30,6 +30,7 @@ import mega.privacy.android.domain.usecase.camerauploads.GetSecondaryFolderNodeU
 import mega.privacy.android.domain.usecase.camerauploads.GetSecondaryFolderPathUseCase
 import mega.privacy.android.domain.usecase.camerauploads.MonitorCameraUploadsSettingsActionsUseCase
 import mega.privacy.android.domain.usecase.camerauploads.MonitorCameraUploadsStatusInfoUseCase
+import mega.privacy.android.domain.usecase.environment.GetBatteryInfoUseCase
 import mega.privacy.android.domain.usecase.environment.MonitorBatteryInfoUseCase
 import mega.privacy.android.domain.usecase.node.MoveDeconfiguredBackupNodesUseCase
 import mega.privacy.android.domain.usecase.node.RemoveDeconfiguredBackupNodesUseCase
@@ -75,6 +76,7 @@ class SyncFoldersViewModelTest {
     private val setUserPausedSyncsUseCase: SetUserPausedSyncUseCase = mock()
     private val refreshSyncUseCase: RefreshSyncUseCase = mock()
     private val monitorBatteryInfoUseCase: MonitorBatteryInfoUseCase = mock()
+    private val getBatteryInfoUseCase: GetBatteryInfoUseCase = mock()
     private val getNodeByIdUseCase: GetNodeByIdUseCase = mock()
     private val getNodePathByIdUseCase: GetNodePathByIdUseCase = mock()
     private val getFolderTreeInfo: GetFolderTreeInfo = mock()
@@ -157,6 +159,7 @@ class SyncFoldersViewModelTest {
             emit(folderPairs)
             awaitCancellation()
         })
+        whenever(getBatteryInfoUseCase()).thenReturn(BatteryInfo(100, true))
         whenever(monitorBatteryInfoUseCase()).thenReturn(flowOf(BatteryInfo(100, true)))
 
         val accountLevelDetail = mock<AccountLevelDetail> {
@@ -194,6 +197,8 @@ class SyncFoldersViewModelTest {
             getPrimaryFolderPathUseCase,
             getSecondaryFolderNodeUseCase,
             getSecondaryFolderPathUseCase,
+            getBatteryInfoUseCase,
+            monitorBatteryInfoUseCase
         )
     }
 
@@ -427,6 +432,7 @@ class SyncFoldersViewModelTest {
             monitorStalledIssuesUseCase = monitorStalledIssuesUseCase,
             setUserPausedSyncsUseCase = setUserPausedSyncsUseCase,
             refreshSyncUseCase = refreshSyncUseCase,
+            getBatteryInfoUseCase = getBatteryInfoUseCase,
             monitorBatteryInfoUseCase = monitorBatteryInfoUseCase,
             getNodeByIdUseCase = getNodeByIdUseCase,
             getNodePathByIdUseCase = getNodePathByIdUseCase,

@@ -174,7 +174,7 @@ internal fun SyncListScreen(
                         },
                         actions = actions,
                         onActionPressed = onActionPressed,
-                        elevation = if (isWarningBannerDisplayed) AppBarDefaults.TopAppBarElevation else 0.dp,
+                        elevation = if (isWarningBannerDisplayed || syncFoldersState.isWarningBannerDisplayed) AppBarDefaults.TopAppBarElevation else 0.dp,
                         windowInsets = WindowInsets(0.dp),
                     )
                 }

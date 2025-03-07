@@ -35,6 +35,7 @@ import mega.privacy.android.domain.usecase.camerauploads.GetSecondaryFolderNodeU
 import mega.privacy.android.domain.usecase.camerauploads.GetSecondaryFolderPathUseCase
 import mega.privacy.android.domain.usecase.camerauploads.MonitorCameraUploadsSettingsActionsUseCase
 import mega.privacy.android.domain.usecase.camerauploads.MonitorCameraUploadsStatusInfoUseCase
+import mega.privacy.android.domain.usecase.environment.GetBatteryInfoUseCase
 import mega.privacy.android.domain.usecase.environment.MonitorBatteryInfoUseCase
 import mega.privacy.android.domain.usecase.node.MoveDeconfiguredBackupNodesUseCase
 import mega.privacy.android.domain.usecase.node.RemoveDeconfiguredBackupNodesUseCase
@@ -63,6 +64,7 @@ internal class SyncFoldersViewModel @Inject constructor(
     private val monitorStalledIssuesUseCase: MonitorSyncStalledIssuesUseCase,
     private val setUserPausedSyncsUseCase: SetUserPausedSyncUseCase,
     private val refreshSyncUseCase: RefreshSyncUseCase,
+    private val getBatteryInfoUseCase: GetBatteryInfoUseCase,
     private val monitorBatteryInfoUseCase: MonitorBatteryInfoUseCase,
     private val getNodeByIdUseCase: GetNodeByIdUseCase,
     private val getNodePathByIdUseCase: GetNodePathByIdUseCase,
@@ -102,14 +104,7 @@ internal class SyncFoldersViewModel @Inject constructor(
         }
 
         checkOverQuotaStatus()
-
-        viewModelScope.launch {
-            monitorBatteryInfoUseCase().collect { batteryInfo ->
-                _uiState.update { state ->
-                    state.copy(isLowBatteryLevel = batteryInfo.level < LOW_BATTERY_LEVEL && !batteryInfo.isCharging)
-                }
-            }
-        }
+        getAndMonitorBatteryInfo()
 
         viewModelScope.launch {
             monitorAccountDetailUseCase().collect {
@@ -270,6 +265,19 @@ internal class SyncFoldersViewModel @Inject constructor(
             }.onFailure {
                 Timber.e(it)
             }
+        }
+    }
+
+    private fun getAndMonitorBatteryInfo() {
+        viewModelScope.launch {
+            monitorBatteryInfoUseCase()
+                .onStart { emit(getBatteryInfoUseCase()) }
+                .catch { Timber.e(it) }
+                .collect { batteryInfo ->
+                    _uiState.update { state ->
+                        state.copy(isLowBatteryLevel = batteryInfo.level < LOW_BATTERY_LEVEL && !batteryInfo.isCharging)
+                    }
+                }
         }
     }
 
