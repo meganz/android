@@ -88,9 +88,7 @@ import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.collectLatest
 import kotlinx.coroutines.flow.distinctUntilChanged
 import kotlinx.coroutines.launch
-import me.saket.telephoto.flick.FlickToDismiss
 import me.saket.telephoto.flick.FlickToDismissState
-import me.saket.telephoto.flick.rememberFlickToDismissState
 import me.saket.telephoto.zoomable.DoubleClickToZoomListener
 import me.saket.telephoto.zoomable.ZoomSpec
 import me.saket.telephoto.zoomable.ZoomableImageState
@@ -98,6 +96,7 @@ import me.saket.telephoto.zoomable.ZoomableState
 import me.saket.telephoto.zoomable.coil.ZoomableAsyncImage
 import me.saket.telephoto.zoomable.rememberZoomableImageState
 import me.saket.telephoto.zoomable.rememberZoomableState
+import mega.android.core.ui.theme.values.TextColor
 import mega.privacy.android.analytics.Analytics
 import mega.privacy.android.app.R
 import mega.privacy.android.app.presentation.imagepreview.ImagePreviewViewModel
@@ -115,7 +114,6 @@ import mega.privacy.android.shared.original.core.ui.theme.extensions.black_white
 import mega.privacy.android.shared.original.core.ui.theme.extensions.white_alpha_070_grey_alpha_070
 import mega.privacy.android.shared.original.core.ui.theme.extensions.white_black
 import mega.privacy.android.shared.original.core.ui.theme.grey_100
-import mega.android.core.ui.theme.values.TextColor
 import mega.privacy.android.shared.original.core.ui.utils.showAutoDurationSnackbar
 import mega.privacy.mobile.analytics.event.ImagePreviewHideNodeMenuToolBarEvent
 
@@ -724,14 +722,14 @@ private fun ImagePreviewContent(
     modifier: Modifier = Modifier,
     imageState: ZoomableImageState? = null,
 ) {
-    val flickState = rememberFlickToDismissState(dismissThresholdRatio = 0.25f)
-    HandleFlickStateEffect(
-        flickState = flickState,
-        onSwitchFullScreenMode = onSwitchFullScreenMode,
-        onFlick = onFlick
-    )
-    FlickToDismiss(
-        state = flickState,
+    // Temporarily disable flick to dismiss for AND-20421
+    //    val flickState = rememberFlickToDismissState(dismissThresholdRatio = 0.25f)
+    //    HandleFlickStateEffect(
+    //        flickState = flickState,
+    //        onSwitchFullScreenMode = onSwitchFullScreenMode,
+    //        onFlick = onFlick
+    //    )
+    Box(
         modifier = modifier
             .fillMaxSize(),
     ) {
