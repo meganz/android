@@ -1549,4 +1549,11 @@ internal class MegaApiFacade @Inject constructor(
 
     override fun resendVerificationEmail(listener: MegaRequestListenerInterface) =
         megaApi.resendVerificationEmail(listener)
+
+    override fun resumeCreateAccount(
+        session: String,
+        listener: MegaRequestListenerInterface,
+    ) {
+        megaApi.resumeCreateAccount(session, listener)
+    }
 }

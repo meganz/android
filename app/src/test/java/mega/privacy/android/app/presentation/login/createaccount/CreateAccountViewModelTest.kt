@@ -4,6 +4,8 @@ import androidx.lifecycle.SavedStateHandle
 import app.cash.turbine.test
 import com.google.common.truth.Truth.assertThat
 import de.palm.composestateevents.StateEventWithContentTriggered
+import kotlinx.coroutines.CoroutineDispatcher
+import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -56,11 +58,12 @@ class CreateAccountViewModelTest {
     private val connectivityFlow = MutableStateFlow(true)
 
     private lateinit var underTest: CreateAccountViewModel
-
+    private val testDispatcher: CoroutineDispatcher = UnconfinedTestDispatcher()
+    private val applicationScope: CoroutineScope = CoroutineScope(testDispatcher)
 
     @BeforeAll
     fun setup() {
-        Dispatchers.setMain(UnconfinedTestDispatcher())
+        Dispatchers.setMain(testDispatcher)
         whenever(monitorConnectivityUseCase()).thenReturn(connectivityFlow)
         underTest = CreateAccountViewModel(
             savedStateHandle = savedStateHandle,
@@ -70,7 +73,8 @@ class CreateAccountViewModelTest {
             createAccountUseCase = createAccountUseCase,
             saveEphemeralCredentialsUseCase = saveEphemeralCredentialsUseCase,
             clearEphemeralCredentialsUseCase = clearEphemeralCredentialsUseCase,
-            saveLastRegisteredEmailUseCase = saveLastRegisteredEmailUseCase
+            saveLastRegisteredEmailUseCase = saveLastRegisteredEmailUseCase,
+            applicationScope = applicationScope
         )
     }
 

@@ -3670,4 +3670,31 @@ interface MegaApiGateway {
      * @param listener MegaRequestListener to track this request
      */
     fun resendVerificationEmail(listener: MegaRequestListenerInterface)
+
+    /**
+     * Resume a registration process
+     * <p>
+     * When a user begins the account registration process by calling MegaApi::createAccount,
+     * an ephemeral account is created.
+     * <p>
+     * Until the user successfully confirms the signup link sent to the provided email address,
+     * you can resume the ephemeral session in order to change the email address, resend the
+     * signup link (@see MegaApi::sendSignupLink) and also to receive notifications in case the
+     * user confirms the account using another client (MegaGlobalListener::onAccountUpdate or
+     * MegaListener::onAccountUpdate). It is also possible to cancel the registration process by
+     * MegaApi::cancelCreateAccount, which invalidates the signup link associated to the ephemeral
+     * session (the session will be still valid).
+     * <p>
+     * The associated request type with this request is MegaRequest::TYPE_CREATE_ACCOUNT.
+     * Valid data in the MegaRequest object received on callbacks:
+     * - MegaRequest::getSessionKey - Returns the session id to resume the process
+     * - MegaRequest::getParamType - Returns the value MegaApi::RESUME_ACCOUNT
+     * <p>
+     * In case the account is already confirmed, the associated request will fail with
+     * error MegaError::API_EARGS.
+     *
+     * @param sid      Session id valid for the ephemeral account (@see MegaApi::createAccount)
+     * @param listener MegaRequestListener to track this request
+     */
+    fun resumeCreateAccount(session: String, listener: MegaRequestListenerInterface)
 }

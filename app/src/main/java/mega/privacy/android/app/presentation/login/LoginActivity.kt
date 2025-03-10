@@ -35,10 +35,6 @@ import mega.privacy.android.app.presentation.openlink.OpenLinkActivity
 import mega.privacy.android.app.utils.Constants
 import mega.privacy.android.app.utils.Util
 import mega.privacy.android.domain.exception.LoginLoggedOutFromOtherLocation
-import nz.mega.sdk.MegaApiJava
-import nz.mega.sdk.MegaError
-import nz.mega.sdk.MegaRequest
-import nz.mega.sdk.MegaRequestListenerInterface
 import timber.log.Timber
 import javax.inject.Inject
 
@@ -48,7 +44,7 @@ import javax.inject.Inject
  * @property chatRequestHandler       [MegaChatRequestHandler]
  */
 @AndroidEntryPoint
-class LoginActivity : BaseActivity(), MegaRequestListenerInterface {
+class LoginActivity : BaseActivity() {
 
     @Inject
     lateinit var chatRequestHandler: MegaChatRequestHandler
@@ -63,7 +59,6 @@ class LoginActivity : BaseActivity(), MegaRequestListenerInterface {
     private var loginFragment: LoginFragment? = null
 
     private var visibleFragment = 0
-    private var sessionTemp: String? = null
     private var emailTemp: String? = null
     private var passwdTemp: String? = null
     private var firstNameTemp: String? = null
@@ -102,7 +97,6 @@ class LoginActivity : BaseActivity(), MegaRequestListenerInterface {
 
     override fun onDestroy() {
         Timber.d("onDestroy")
-        megaApi.removeRequestListener(this)
         chatRequestHandler.setIsLoggingRunning(false)
         super.onDestroy()
     }
@@ -154,10 +148,9 @@ class LoginActivity : BaseActivity(), MegaRequestListenerInterface {
                 visibleFragment = Constants.CONFIRM_EMAIL_FRAGMENT
                 emailTemp = it.email
                 passwdTemp = it.password
-                sessionTemp = it.session
                 firstNameTemp = it.firstName
                 lastNameTemp = it.lastName
-                megaApi.resumeCreateAccount(sessionTemp, this@LoginActivity)
+                resumeCreateAccount(it.session.orEmpty())
             } ?: run {
                 if (!intent.hasExtra(Constants.VISIBLE_FRAGMENT) && savedInstanceState == null) {
                     val session = viewModel.getSession()
@@ -397,34 +390,16 @@ class LoginActivity : BaseActivity(), MegaRequestListenerInterface {
         viewModel.setTemporalEmail(emailTemp)
     }
 
-    override fun onRequestStart(api: MegaApiJava, request: MegaRequest) {
-        Timber.d("onRequestStart - ${request.requestString}")
-    }
-
-    override fun onRequestUpdate(api: MegaApiJava, request: MegaRequest) {
-        Timber.d("onRequestUpdate - ${request.requestString}")
-    }
-
-    override fun onRequestFinish(api: MegaApiJava, request: MegaRequest, e: MegaError) {
-        Timber.d("onRequestFinish - ${request.requestString}_${e.errorCode}")
-
-        if (request.type == MegaRequest.TYPE_CREATE_ACCOUNT) {
-            try {
-                if (request.paramType == 1) {
-                    if (e.errorCode == MegaError.API_OK) {
-                        viewModel.setIsWaitingForConfirmAccount()
-                    } else {
-                        cancelConfirmationAccount()
-                    }
-                } // In case getParamType == 3 (creating ephemeral account ++) we don't need to trigger a fetch nodes (sdk performs internal)
-                if (request.paramType == 4) {
-                    if (e.errorCode == MegaError.API_OK) {
-                        //Resuming ephemeral account ++, we need to trigger a fetch nodes
-                        megaApi.fetchNodes()
-                    }
-                }
-            } catch (exc: Exception) {
-                Timber.e(exc)
+    private fun resumeCreateAccount(session: String) {
+        lifecycleScope.launch {
+            runCatching {
+                Timber.d("resume create account")
+                viewModel.resumeCreateAccount(session)
+            }.onSuccess {
+                viewModel.setIsWaitingForConfirmAccount()
+            }.onFailure {
+                Timber.e(it)
+                cancelConfirmationAccount()
             }
         }
     }
@@ -440,10 +415,6 @@ class LoginActivity : BaseActivity(), MegaRequestListenerInterface {
         passwdTemp = null
         emailTemp = null
         viewModel.setTourAsPendingFragment()
-    }
-
-    override fun onRequestTemporaryError(api: MegaApiJava, request: MegaRequest, e: MegaError) {
-        Timber.w("onRequestTemporaryError - ${request.requestString}")
     }
 
     public override fun onSaveInstanceState(outState: Bundle) {

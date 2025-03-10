@@ -58,6 +58,7 @@ import mega.privacy.android.domain.usecase.RootNodeExistsUseCase
 import mega.privacy.android.domain.usecase.account.ClearUserCredentialsUseCase
 import mega.privacy.android.domain.usecase.account.MonitorAccountBlockedUseCase
 import mega.privacy.android.domain.usecase.account.MonitorStorageStateEventUseCase
+import mega.privacy.android.domain.usecase.account.ResumeCreateAccountUseCase
 import mega.privacy.android.domain.usecase.camerauploads.EstablishCameraUploadsSyncHandlesUseCase
 import mega.privacy.android.domain.usecase.camerauploads.HasCameraSyncEnabledUseCase
 import mega.privacy.android.domain.usecase.camerauploads.HasPreferencesUseCase
@@ -147,6 +148,7 @@ class LoginViewModel @Inject constructor(
     private val checkIfTransfersShouldBePausedUseCase: CheckIfTransfersShouldBePausedUseCase,
     private val isFirstLaunchUseCase: IsFirstLaunchUseCase,
     private val getThemeMode: GetThemeMode,
+    private val resumeCreateAccountUseCase: ResumeCreateAccountUseCase,
 ) : ViewModel() {
 
     private val _state = MutableStateFlow(LoginState())
@@ -1034,6 +1036,11 @@ class LoginViewModel @Inject constructor(
             clearUserCredentialsUseCase()
         }
     }
+
+    /**
+     * Resume create account
+     */
+    suspend fun resumeCreateAccount(session: String) = resumeCreateAccountUseCase(session)
 
     companion object {
         /**

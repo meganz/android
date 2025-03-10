@@ -748,4 +748,9 @@ interface AccountRepository {
      *  Resend the verification email for Weak Account Protection
      */
     suspend fun resendVerificationEmail()
+
+    /**
+     * Resume create account
+     */
+    suspend fun resumeCreateAccount(session: String)
 }

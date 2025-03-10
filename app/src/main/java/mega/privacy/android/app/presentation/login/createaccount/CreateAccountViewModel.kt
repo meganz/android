@@ -6,6 +6,7 @@ import androidx.lifecycle.viewModelScope
 import dagger.hilt.android.lifecycle.HiltViewModel
 import de.palm.composestateevents.consumed
 import de.palm.composestateevents.triggered
+import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.update
@@ -15,6 +16,7 @@ import mega.privacy.android.app.presentation.login.createaccount.model.CreateAcc
 import mega.privacy.android.domain.entity.changepassword.PasswordStrength
 import mega.privacy.android.domain.entity.login.EphemeralCredentials
 import mega.privacy.android.domain.exception.account.CreateAccountException
+import mega.privacy.android.domain.qualifier.ApplicationScope
 import mega.privacy.android.domain.usecase.GetPasswordStrengthUseCase
 import mega.privacy.android.domain.usecase.IsEmailValidUseCase
 import mega.privacy.android.domain.usecase.account.CreateAccountUseCase
@@ -38,6 +40,7 @@ class CreateAccountViewModel @Inject constructor(
     private val saveEphemeralCredentialsUseCase: SaveEphemeralCredentialsUseCase,
     private val clearEphemeralCredentialsUseCase: ClearEphemeralCredentialsUseCase,
     private val saveLastRegisteredEmailUseCase: SaveLastRegisteredEmailUseCase,
+    @ApplicationScope private val applicationScope: CoroutineScope
 ) : ViewModel() {
     private val _uiState = MutableStateFlow(CreateAccountUIState())
 
@@ -248,7 +251,7 @@ class CreateAccountViewModel @Inject constructor(
     }
 
     private fun saveLastRegisteredEmail(email: String) {
-        viewModelScope.launch {
+        applicationScope.launch {
             runCatching {
                 saveLastRegisteredEmailUseCase(email)
             }.onFailure { Timber.e(it) }
@@ -256,7 +259,7 @@ class CreateAccountViewModel @Inject constructor(
     }
 
     private fun saveEphemeral(ephemeral: EphemeralCredentials) {
-        viewModelScope.launch {
+        applicationScope.launch {
             runCatching {
                 clearEphemeralCredentialsUseCase()
                 saveEphemeralCredentialsUseCase(ephemeral)

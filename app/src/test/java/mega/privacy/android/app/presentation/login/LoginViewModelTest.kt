@@ -32,6 +32,7 @@ import mega.privacy.android.domain.usecase.RootNodeExistsUseCase
 import mega.privacy.android.domain.usecase.account.ClearUserCredentialsUseCase
 import mega.privacy.android.domain.usecase.account.MonitorAccountBlockedUseCase
 import mega.privacy.android.domain.usecase.account.MonitorStorageStateEventUseCase
+import mega.privacy.android.domain.usecase.account.ResumeCreateAccountUseCase
 import mega.privacy.android.domain.usecase.camerauploads.EstablishCameraUploadsSyncHandlesUseCase
 import mega.privacy.android.domain.usecase.camerauploads.HasCameraSyncEnabledUseCase
 import mega.privacy.android.domain.usecase.camerauploads.HasPreferencesUseCase
@@ -132,6 +133,7 @@ internal class LoginViewModelTest {
         mock<CheckIfTransfersShouldBePausedUseCase>()
     private val isFirstLaunchUseCase = mock<IsFirstLaunchUseCase>()
     private val getThemeMode = mock<GetThemeMode>()
+    private val resumeCreateAccountUseCase = mock<ResumeCreateAccountUseCase>()
 
     @BeforeEach
     fun setUp() {
@@ -179,7 +181,8 @@ internal class LoginViewModelTest {
             monitorRequestStatusProgressEventUseCase = monitorRequestStatusProgressEventUseCase,
             checkIfTransfersShouldBePausedUseCase = checkIfTransfersShouldBePausedUseCase,
             isFirstLaunchUseCase = isFirstLaunchUseCase,
-            getThemeMode = getThemeMode
+            getThemeMode = getThemeMode,
+            resumeCreateAccountUseCase = resumeCreateAccountUseCase
         )
     }
 
@@ -455,6 +458,13 @@ internal class LoginViewModelTest {
             val state = awaitItem()
             assertThat(state.requestStatusProgress).isNull()
         }
+    }
+
+    @Test
+    fun `test that resumeCreateAccount is invoked when calling resumeCreateAccount`() = runTest {
+        underTest.resumeCreateAccount("session")
+        advanceUntilIdle()
+        verify(resumeCreateAccountUseCase).invoke("session")
     }
 
     companion object {

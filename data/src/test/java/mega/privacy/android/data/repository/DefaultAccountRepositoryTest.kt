@@ -2172,4 +2172,36 @@ class DefaultAccountRepositoryTest {
             underTest.broadcastMiscLoaded()
             verify(appEventGateway).broadcastMiscLoaded()
         }
+
+    @Test
+    fun `test resumeCreateAccount throws MegaException`() = runTest {
+        val session = "test_session"
+        val megaError = mock<MegaError> {
+            on { errorCode } doReturn MegaError.API_EFAILED
+        }
+
+        whenever(megaApiGateway.resumeCreateAccount(any(), any())).thenAnswer {
+            val listener = it.arguments[1] as OptionalMegaRequestListenerInterface
+            listener.onRequestFinish(mock(), mock(), megaError)
+        }
+
+        assertThrows<MegaException> {
+            underTest.resumeCreateAccount(session)
+        }
+    }
+
+    @Test
+    fun `test that resumeCreateAccount returns success`() = runTest {
+        val session = "test_session"
+        whenever(megaApiGateway.resumeCreateAccount(any(), any())).thenAnswer {
+            (it.arguments[1] as OptionalMegaRequestListenerInterface).onRequestFinish(
+                mock(),
+                mock(),
+                mock { on { errorCode }.thenReturn(MegaError.API_OK) }
+            )
+        }
+        assertDoesNotThrow {
+            underTest.resumeCreateAccount(session)
+        }
+    }
 }
