@@ -90,7 +90,7 @@ fun StartConversationView(
         topBar = {
             if (state.contactItemList.isEmpty()) {
                 SimpleTopAppBar(
-                    titleId = if (state.fromChat) R.string.fab_label_new_chat else R.string.group_chat_start_conversation_label,
+                    titleId = R.string.fab_label_new_chat,
                     elevation = !firstItemVisible,
                     onBackPressed = onBackPressed
                 )
@@ -103,7 +103,7 @@ fun StartConversationView(
                     onBackPressed = onBackPressed,
                     onSearchClicked = onSearchClicked,
                     elevation = !firstItemVisible,
-                    title = stringResource(if (state.fromChat) R.string.fab_label_new_chat else R.string.group_chat_start_conversation_label),
+                    title = stringResource(R.string.fab_label_new_chat),
                     hintId = R.string.hint_action_search
                 )
             }
