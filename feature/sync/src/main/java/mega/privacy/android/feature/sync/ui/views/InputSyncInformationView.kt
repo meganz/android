@@ -1,8 +1,9 @@
 package mega.privacy.android.feature.sync.ui.views
 
 import mega.privacy.android.core.R as CoreUiR
+import mega.privacy.android.icon.pack.R as iconPackR
+import mega.privacy.android.shared.resources.R as sharedResR
 import androidx.annotation.DrawableRes
-import androidx.compose.foundation.Image
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.isSystemInDarkTheme
 import androidx.compose.foundation.layout.Arrangement
@@ -15,27 +16,25 @@ import androidx.compose.material.MaterialTheme
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.graphics.ColorFilter
+import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.tooling.preview.PreviewParameter
 import androidx.compose.ui.tooling.preview.PreviewParameterProvider
 import androidx.compose.ui.unit.dp
-import mega.privacy.android.domain.entity.sync.SyncType
-import mega.privacy.android.icon.pack.R as iconPackR
+import mega.android.core.ui.theme.values.IconColor
 import mega.android.core.ui.theme.values.TextColor
+import mega.privacy.android.domain.entity.sync.SyncType
 import mega.privacy.android.feature.sync.R
 import mega.privacy.android.feature.sync.ui.newfolderpair.SyncNewFolderScreen
 import mega.privacy.android.shared.original.core.ui.controls.cards.MegaCardWithHeader
 import mega.privacy.android.shared.original.core.ui.controls.dividers.DividerType
 import mega.privacy.android.shared.original.core.ui.controls.dividers.MegaDivider
+import mega.privacy.android.shared.original.core.ui.controls.images.MegaIcon
 import mega.privacy.android.shared.original.core.ui.controls.text.MegaText
 import mega.privacy.android.shared.original.core.ui.preview.CombinedThemePreviews
 import mega.privacy.android.shared.original.core.ui.theme.OriginalTheme
-import mega.privacy.android.shared.original.core.ui.theme.extensions.textColorSecondary
-import mega.privacy.android.shared.resources.R as sharedResR
-import androidx.compose.ui.platform.testTag
 
 @Composable
 internal fun InputSyncInformationView(
@@ -115,13 +114,13 @@ private fun Header(
         horizontalArrangement = Arrangement.Center,
         verticalAlignment = Alignment.CenterVertically,
     ) {
-        Image(
+        MegaIcon(
             painter = painterResource(imageResource),
             contentDescription = null,
             modifier = modifier
                 .size(20.dp)
                 .padding(end = 8.dp),
-            colorFilter = ColorFilter.tint(MaterialTheme.colors.textColorSecondary)
+            tint = IconColor.Secondary
         )
         MegaText(
             text = text,
@@ -145,11 +144,11 @@ private fun TwoLinesItem(
             .padding(top = 16.dp, bottom = 16.dp)
             .fillMaxWidth()
     ) {
-        Image(
+        MegaIcon(
             painter = painterResource(imageResource),
             contentDescription = null,
             modifier = Modifier.padding(start = 24.dp, end = 24.dp),
-            colorFilter = ColorFilter.tint(MaterialTheme.colors.textColorSecondary)
+            tint = IconColor.Secondary
         )
         Column {
             MegaText(
