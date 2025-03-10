@@ -365,12 +365,12 @@ def validateParams(params) {
         error("'PERCENTAGE' parameter was not selected. Please choose a valid rollout percentage (e.g., 25, 50, 100, or Halt Rollout).")
     }
 
-    if (!params.VERSION) {
+    if (!params.VERSION || params.VERSION.trim().isEmpty()) {
         error("'VERSION' parameter is missing. Please specify the version of the build (e.g., 14.1(242330236)).")
-    } else if (params.PERCENTAGE == 'Select') {
+    } else if (params.VERSION == 'Select') {
         error("'VERSION' parameter was not selected. Please choose a version (e.g., 14.1(242330236)).")
     } else if (!isValidVersion(params.VERSION)) {
-        error("Invalid 'VERSION' parameter was selected. Please choose a valid version (e.g., 14.1(242330236)).")
+        error("Invalid 'VERSION' parameter was selected. Please choose a valid version (e.g., 14.1(242330236)). Selected value: '${params.VERSION}'.")
     }
 }
 
