@@ -5,11 +5,9 @@ import android.content.Context
 import android.content.Intent
 import android.content.SharedPreferences
 import android.net.Uri
-import android.view.View
 import android.webkit.WebView
 import androidx.core.content.FileProvider
 import androidx.core.net.toUri
-import androidx.core.view.isVisible
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.SavedStateHandle
@@ -247,7 +245,7 @@ class TextEditorViewModel @Inject constructor(
      */
     private fun isNodeInBackups(): Boolean = getNode()?.let {
         megaApi.isInVault(it)
-    } ?: false
+    } == true
 
     fun getNodeAccess(): Int = megaApi.getAccess(getNode())
 
@@ -268,11 +266,9 @@ class TextEditorViewModel @Inject constructor(
 
     private fun getFileUri(): Uri? = textEditorData.value?.fileUri
 
-    private fun getFileSize(): Long? = textEditorData.value?.fileSize
-
     fun getAdapterType(): Int = textEditorData.value?.adapterType ?: INVALID_VALUE
 
-    fun isEditableAdapter(): Boolean = textEditorData.value?.editableAdapter ?: false
+    fun isEditableAdapter(): Boolean = textEditorData.value?.editableAdapter == true
 
     fun getMsgChat(): MegaChatMessage? = textEditorData.value?.msgChat
 
@@ -307,10 +303,6 @@ class TextEditorViewModel @Inject constructor(
     fun isReadingContent(): Boolean = isReadingContent
 
     fun needsReadOrIsReadingContent(): Boolean = needsReadContent || isReadingContent
-
-    fun errorSettingContent() {
-        errorSettingContent = true
-    }
 
     fun thereIsErrorSettingContent(): Boolean = errorSettingContent
 
@@ -350,7 +342,6 @@ class TextEditorViewModel @Inject constructor(
      * Sets all necessary values from params if available.
      *
      * @param intent      Received intent.
-     * @param mi          Current phone memory info in case is needed to read the file on streaming.
      * @param preferences Preference data.
      */
     fun setInitialValues(
@@ -448,7 +439,7 @@ class TextEditorViewModel @Inject constructor(
         setEditableAdapter()
 
         fileName.value = intent.getStringExtra(INTENT_EXTRA_KEY_FILE_NAME) ?: getNode()?.name ?: ""
-        val isMarkDownFile = fileName.value?.endsWith(".md", ignoreCase = true) ?: false
+        val isMarkDownFile = fileName.value?.endsWith(".md", ignoreCase = true) == true
         _uiState.update { it.copy(isMarkDownFile = isMarkDownFile) }
 
         this.preferences = preferences
@@ -543,7 +534,7 @@ class TextEditorViewModel @Inject constructor(
      * Downloads the file in background in case some error happened trying to read it with streaming,
      * and tries to read it from local if the download finishes with success.
      */
-    private suspend fun downloadFileForReading() {
+    private fun downloadFileForReading() {
         downloadBackgroundFileJob = viewModelScope.launch(ioDispatcher) {
             runCatching {
                 localFileUri =
@@ -628,10 +619,9 @@ class TextEditorViewModel @Inject constructor(
      * Starts the save file content action by creating a temp file, setting the new or modified text,
      * and then uploading it to the Cloud.
      *
-     * @param activity Current activity.
      * @param fromHome True if is creating file from Home page, false otherwise.
      */
-    fun saveFile(activity: Activity, fromHome: Boolean) {
+    fun saveFile(fromHome: Boolean) {
         if (!isFileEdited() && !isCreateMode()) {
             setViewMode()
             return
@@ -909,8 +899,6 @@ class TextEditorViewModel @Inject constructor(
 
     /**
      * Manages the download action.
-     *
-     * @param nodeSaver Required object to save nodes.
      */
     fun downloadFile() {
         when (getAdapterType()) {

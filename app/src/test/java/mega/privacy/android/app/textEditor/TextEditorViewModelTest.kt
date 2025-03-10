@@ -74,7 +74,7 @@ internal class TextEditorViewModelTest {
             invoke()
         }.thenReturn(false)
     }
-    private val isNodeInBackupsUseCase = mock<IsNodeInBackupsUseCase>() {
+    private val isNodeInBackupsUseCase = mock<IsNodeInBackupsUseCase> {
         onBlocking {
             invoke(any())
         }.thenReturn(false)

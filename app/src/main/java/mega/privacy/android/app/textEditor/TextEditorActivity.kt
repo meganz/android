@@ -4,7 +4,6 @@ import mega.privacy.android.shared.resources.R as sharedR
 import android.animation.Animator
 import android.animation.AnimatorListenerAdapter
 import android.annotation.SuppressLint
-import android.app.Activity
 import android.content.Intent
 import android.content.pm.ActivityInfo
 import android.os.Bundle
@@ -100,7 +99,6 @@ import mega.privacy.android.app.utils.MegaNodeUtil.selectFolderToMove
 import mega.privacy.android.app.utils.MenuUtils.toggleAllMenuItemsVisibility
 import mega.privacy.android.app.utils.Util
 import mega.privacy.android.app.utils.Util.isOnline
-import mega.privacy.android.app.utils.Util.showKeyboardDelayed
 import mega.privacy.android.app.utils.ViewUtils.hideKeyboard
 import mega.privacy.android.app.utils.permission.PermissionUtils.checkNotificationsPermission
 import mega.privacy.android.domain.entity.StorageState
@@ -189,10 +187,7 @@ class TextEditorActivity : PasscodeActivity(), SnackbarShower, Scrollable {
                 }
 
                 if (viewModel.isCreateMode()) {
-                    viewModel.saveFile(
-                        this@TextEditorActivity,
-                        intent.getBooleanExtra(FROM_HOME_PAGE, false)
-                    )
+                    viewModel.saveFile(intent.getBooleanExtra(FROM_HOME_PAGE, false))
                 } else if (viewModel.isReadingContent()) {
                     viewModel.finishBeforeClosing()
                 }
@@ -273,6 +268,16 @@ class TextEditorActivity : PasscodeActivity(), SnackbarShower, Scrollable {
 
             binding.fileEditorToolbar.updatePadding(top = insets.top)
             statusBarHeight = insets.top
+
+            val imeHeight = windowInsets.getInsets(WindowInsetsCompat.Type.ime()).bottom
+            val isImeVisible = windowInsets.isVisible(WindowInsetsCompat.Type.ime())
+            binding.contentEditText.updateLayoutParams<ViewGroup.MarginLayoutParams> {
+                bottomMargin = if (isImeVisible) {
+                    imeHeight
+                } else {
+                    0
+                }
+            }
             WindowInsetsCompat.CONSUMED
         }
     }
@@ -281,7 +286,7 @@ class TextEditorActivity : PasscodeActivity(), SnackbarShower, Scrollable {
         val result = runCatching {
             getFeatureFlagValueUseCase(ApiFeatures.HiddenNodesInternalRelease)
         }
-        return result.getOrNull() ?: false
+        return result.getOrNull() == true
     }
 
     override fun onSaveInstanceState(outState: Bundle) {
@@ -358,10 +363,7 @@ class TextEditorActivity : PasscodeActivity(), SnackbarShower, Scrollable {
 
             R.id.action_save -> {
                 Analytics.tracker.trackEvent(TextEditorSaveEditMenuToolbarEvent)
-                viewModel.saveFile(
-                    this,
-                    intent.getBooleanExtra(FROM_HOME_PAGE, false)
-                )
+                viewModel.saveFile(intent.getBooleanExtra(FROM_HOME_PAGE, false))
             }
 
             R.id.action_download -> {
@@ -894,11 +896,7 @@ class TextEditorActivity : PasscodeActivity(), SnackbarShower, Scrollable {
             binding.contentText.isVisible = false
             binding.contentWebView.isVisible = false
 
-            binding.contentEditText.apply {
-                isVisible = true
-                showKeyboardDelayed(this)
-            }
-
+            binding.contentEditText.isVisible = true
             binding.editFab.hide()
         }
     }
@@ -988,7 +986,7 @@ class TextEditorActivity : PasscodeActivity(), SnackbarShower, Scrollable {
      * @return True if the dialog is shown, false otherwise.
      */
     private fun isDiscardChangesConfirmationDialogShown(): Boolean =
-        discardChangesDialog?.isShowing ?: false
+        discardChangesDialog?.isShowing == true
 
     /**
      * Manages the rename action.
@@ -1011,7 +1009,7 @@ class TextEditorActivity : PasscodeActivity(), SnackbarShower, Scrollable {
      *
      * @return True if the dialog is shown, false otherwise.
      */
-    private fun isRenameDialogShown(): Boolean = renameDialog?.isShowing ?: false
+    private fun isRenameDialogShown(): Boolean = renameDialog?.isShowing == true
 
     /**
      * Manages the import node action.
@@ -1061,7 +1059,7 @@ class TextEditorActivity : PasscodeActivity(), SnackbarShower, Scrollable {
      * @return True if it is shown, false otherwise.
      */
     private fun isErrorReadingContentDialogShown(): Boolean =
-        errorReadingContentDialog?.isShowing ?: false
+        errorReadingContentDialog?.isShowing == true
 
     /**
      * Hides some UI elements: Toolbar, bottom view and edit button.
@@ -1276,7 +1274,7 @@ class TextEditorActivity : PasscodeActivity(), SnackbarShower, Scrollable {
         var isHiddenNodesOnboarded: Boolean
         var isBusinessAccountExpired: Boolean
         with(viewModel.uiState.value) {
-            isPaid = this.accountType?.isPaid ?: false
+            isPaid = this.accountType?.isPaid == true
             isHiddenNodesOnboarded = this.isHiddenNodesOnboarded
             isBusinessAccountExpired = this.isBusinessAccountExpired
         }
@@ -1317,7 +1315,7 @@ class TextEditorActivity : PasscodeActivity(), SnackbarShower, Scrollable {
         )
 
     private fun handleHiddenNodesOnboardingResult(result: ActivityResult) {
-        if (result.resultCode != Activity.RESULT_OK) return
+        if (result.resultCode != RESULT_OK) return
 
         viewModel.hideOrUnhideNode(
             nodeId = NodeId(tempNodeId?.longValue ?: 0),
