@@ -1,6 +1,5 @@
 package mega.privacy.android.app.notifications
 
-import mega.privacy.android.icon.pack.R as iconPackR
 import android.Manifest
 import android.app.NotificationManager
 import android.app.PendingIntent
@@ -29,6 +28,7 @@ import mega.privacy.android.domain.entity.chat.ChatRoom
 import mega.privacy.android.domain.entity.chat.ContainsMetaType
 import mega.privacy.android.domain.entity.node.FileNode
 import mega.privacy.android.domain.entity.notifications.ChatMessageNotificationData
+import mega.privacy.android.icon.pack.R as iconPackR
 import mega.privacy.android.shared.original.core.ui.controls.chat.messages.toFormattedText
 import nz.mega.sdk.MegaApiJava
 import timber.log.Timber
@@ -137,6 +137,7 @@ class ChatMessageNotificationManager @Inject constructor(
             NotificationCompat.Builder(context, Constants.NOTIFICATION_CHANNEL_CHAT_ID)
                 .setSmallIcon(iconPackR.drawable.ic_stat_notify)
                 .setColor(ContextCompat.getColor(context, R.color.red_600_red_300))
+                .setContentIntent(pendingIntent)
                 .setGroup(groupKey)
                 .setGroupSummary(true)
                 .build()
