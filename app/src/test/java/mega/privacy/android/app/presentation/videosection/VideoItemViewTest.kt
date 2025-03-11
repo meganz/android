@@ -146,7 +146,7 @@ class VideoItemViewTest {
     }
 
     @Test
-    fun `test that that description is visible when matches with highlight text`() {
+    fun `test that description is visible when matches with highlight text`() {
         setComposeContent(
             description = "This is a description with highlight text",
             highlightText = "highlight"
@@ -155,12 +155,21 @@ class VideoItemViewTest {
     }
 
     @Test
-    fun `test that that tags are visible when matches with highlight text`() {
+    fun `test that tags are visible when matches with highlight text`() {
         setComposeContent(
             tags = listOf("tag1", "tag2", "highlight", "tag3"),
             highlightText = "highlight"
         )
         composeTestRule.onNodeWithTag(VIDEO_ITEM_NODE_TAGS, true).assertIsDisplayed()
+    }
+
+    @Test
+    fun `test that tags are not visible when highlight text is # only`() {
+        setComposeContent(
+            tags = listOf("tag1", "tag2", "highlight", "tag3"),
+            highlightText = "#"
+        )
+        composeTestRule.onNodeWithTag(VIDEO_ITEM_NODE_TAGS, true).assertIsNotDisplayed()
     }
 
     private fun String.assertIsNotDisplayedWithTag() =

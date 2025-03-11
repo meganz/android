@@ -246,8 +246,8 @@ fun NodeListViewItem(
             }
         },
         customRow = {
-            if (highlightText.isNotBlank() && !tags.isNullOrEmpty()) {
-                val tagHighlightText = highlightText.removePrefix("#")
+            val tagHighlightText = highlightText.removePrefix("#")
+            if (tagHighlightText.isNotBlank() && !tags.isNullOrEmpty()) {
                 tags.filter { it.contains(tagHighlightText, ignoreCase = true) }
                     .takeIf { it.isNotEmpty() }
                     ?.let { matchingTags ->
