@@ -57,6 +57,6 @@ internal class TypeFilterToSearchMapperTest {
     private fun provideParametersForSourceType() = Stream.of(
         Arguments.of(NodeSourceType.FAVOURITES, SearchCategory.FAVOURITES),
         Arguments.of(NodeSourceType.AUDIO, SearchCategory.AUDIO),
-        Arguments.of(NodeSourceType.DOCUMENTS, SearchCategory.DOCUMENTS),
+        Arguments.of(NodeSourceType.DOCUMENTS, SearchCategory.ALL_DOCUMENTS),
     )
 }

@@ -32,7 +32,7 @@ class TypeFilterToSearchMapper @Inject constructor() {
         }
     } ?: when (nodeSourceType) {
         NodeSourceType.FAVOURITES -> SearchCategory.FAVOURITES
-        NodeSourceType.DOCUMENTS -> SearchCategory.DOCUMENTS
+        NodeSourceType.DOCUMENTS -> SearchCategory.ALL_DOCUMENTS
         NodeSourceType.AUDIO -> SearchCategory.AUDIO
         else -> SearchCategory.ALL
     }
