@@ -1,5 +1,6 @@
 package mega.privacy.android.app.upgradeAccount.view.components
 
+import mega.privacy.android.shared.resources.R as sharedR
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.height
@@ -13,6 +14,7 @@ import androidx.compose.ui.text.SpanStyle
 import androidx.compose.ui.text.style.TextDecoration
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import mega.android.core.ui.theme.values.TextColor
 import mega.privacy.android.app.R
 import mega.privacy.android.app.upgradeAccount.model.LocalisedSubscription
 import mega.privacy.android.app.upgradeAccount.view.ChooseAccountPreviewProvider.Companion.localisedSubscriptionsList
@@ -31,7 +33,6 @@ import mega.privacy.android.shared.original.core.ui.preview.CombinedThemePreview
 import mega.privacy.android.shared.original.core.ui.theme.OriginalTheme
 import mega.privacy.android.shared.original.core.ui.theme.extensions.body2medium
 import mega.privacy.android.shared.original.core.ui.theme.extensions.body4
-import mega.android.core.ui.theme.values.TextColor
 import java.util.Locale
 
 /**
@@ -133,6 +134,12 @@ internal fun SubscriptionDetails(
             )
             testTag = if (isMonthly) "_monthly_no_price" else "_yearly_no_price"
         }
+    }
+    if (formattedPrice?.currencyCode == "INR" && !isMonthly && subscription.yearlyAmount.value.toInt() > 15000) {
+        subscriptionDetailsBodyString = stringResource(
+            id = sharedR.string.account_upgrade_account_subscription_details_body_yearly_with_price_for_indian,
+            formattedPrice.price,
+        )
     }
     Column(
         modifier = Modifier
