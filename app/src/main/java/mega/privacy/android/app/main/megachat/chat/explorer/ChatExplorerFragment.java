@@ -636,6 +636,10 @@ public class ChatExplorerFragment extends Fragment implements CheckScrollInterfa
         viewModel.clearSelections();
     }
 
+    public boolean isSelectMode() {
+        return !viewModel.getUiState().getValue().getSelectedItems().isEmpty();
+    }
+
     public void search(String s) {
         viewModel.search(s);
     }

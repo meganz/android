@@ -33,6 +33,7 @@ import mega.privacy.android.app.databinding.FragmentFileexplorerlistBinding
 import mega.privacy.android.app.domain.usecase.search.LegacySearchUseCase
 import mega.privacy.android.app.fragments.homepage.EventObserver
 import mega.privacy.android.app.fragments.homepage.SortByHeaderViewModel
+import mega.privacy.android.app.main.FileExplorerActivity.Companion.ACTION_SAVE_TO_CLOUD
 import mega.privacy.android.app.main.FileExplorerActivity.Companion.CLOUD_FRAGMENT
 import mega.privacy.android.app.main.adapters.MegaExplorerAdapter
 import mega.privacy.android.app.main.adapters.RotatableAdapter
@@ -678,45 +679,52 @@ class CloudDriveExplorerFragment : RotatableFragment(), CheckScrollInterface, Se
             Timber.d("onBackPressed")
             if (selectFile && activity.isMultiselect && adapter.multipleSelected)
                 hideMultipleSelect()
+            val parentNode = megaApi.getParentNode(megaApi.getNodeByHandle(parentHandle))
+                ?: when {
+                    activity.intent.action == ACTION_SAVE_TO_CLOUD -> {
+                        megaApi.rootNode?.takeIf { parentHandle != it.handle }
+                    }
 
-            megaApi.getParentNode(megaApi.getNodeByHandle(parentHandle))?.let { parentNode ->
-                if (modeCloud == FileExplorerActivity.SELECT)
-                    activateButton(shouldShowOptionsBar(parentNode))
-
-                setParentHandle(parentNode.handle)
-                if (parentNode.type == MegaNode.TYPE_ROOT)
-                    activity.hideTabs(false, CLOUD_FRAGMENT)
-
-                activity.changeTitle()
-
-                if (modeCloud == FileExplorerActivity.MOVE || modeCloud == FileExplorerActivity.COPY) {
-                    activity.parentMoveCopy()?.let {
-                        activateButton(modeCloud == FileExplorerActivity.COPY || it.handle != parentNode.handle)
-                    } ?: activateButton(true)
+                    else -> null
                 }
 
-                recyclerView.isVisible = true
-                binding.fileListEmptyImage.isVisible = false
-                binding.fileListEmptyText.isVisible = false
+            if (parentNode == null) return 0
 
-                updateNodesByAdapter(megaApi.getChildren(parentNode, order))
-                var lastVisiblePosition = 0
-                if (lastPositionStack.isNotEmpty()) {
-                    lastVisiblePosition = lastPositionStack.pop()
-                    Timber.d("Pop of the stack $lastVisiblePosition position")
-                }
-                Timber.d("Scroll to $lastVisiblePosition position")
+            if (modeCloud == FileExplorerActivity.SELECT)
+                activateButton(shouldShowOptionsBar(parentNode))
 
-                if (lastVisiblePosition >= 0) {
-                    if (sortByHeaderViewModel.isListView()) {
-                        listLayoutManager
-                    } else {
-                        gridLayoutManager
-                    }?.scrollToPositionWithOffset(lastVisiblePosition, 0)
-                }
+            setParentHandle(parentNode.handle)
+            if (parentNode.type == MegaNode.TYPE_ROOT)
+                activity.hideTabs(false, CLOUD_FRAGMENT)
 
-                2
-            } ?: 0
+            activity.changeTitle()
+
+            if (modeCloud == FileExplorerActivity.MOVE || modeCloud == FileExplorerActivity.COPY) {
+                activity.parentMoveCopy()?.let {
+                    activateButton(modeCloud == FileExplorerActivity.COPY || it.handle != parentNode.handle)
+                } ?: activateButton(true)
+            }
+
+            recyclerView.isVisible = true
+            binding.fileListEmptyImage.isVisible = false
+            binding.fileListEmptyText.isVisible = false
+
+            updateNodesByAdapter(megaApi.getChildren(parentNode, order))
+            var lastVisiblePosition = 0
+            if (lastPositionStack.isNotEmpty()) {
+                lastVisiblePosition = lastPositionStack.pop()
+                Timber.d("Pop of the stack $lastVisiblePosition position")
+            }
+            Timber.d("Scroll to $lastVisiblePosition position")
+
+            if (lastVisiblePosition >= 0) {
+                if (sortByHeaderViewModel.isListView()) {
+                    listLayoutManager
+                } else {
+                    gridLayoutManager
+                }?.scrollToPositionWithOffset(lastVisiblePosition, 0)
+            }
+            2
         }
 
     private fun setParentHandle(handle: Long) {

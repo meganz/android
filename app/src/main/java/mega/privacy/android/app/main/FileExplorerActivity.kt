@@ -51,15 +51,6 @@ import mega.privacy.android.app.interfaces.SnackbarShower
 import mega.privacy.android.app.listeners.CreateChatListener
 import mega.privacy.android.app.listeners.CreateFolderListener
 import mega.privacy.android.app.listeners.GetAttrUserListener
-import mega.privacy.android.app.main.FileExplorerActivity.Companion.CAMERA
-import mega.privacy.android.app.main.FileExplorerActivity.Companion.COPY
-import mega.privacy.android.app.main.FileExplorerActivity.Companion.IMPORT
-import mega.privacy.android.app.main.FileExplorerActivity.Companion.MOVE
-import mega.privacy.android.app.main.FileExplorerActivity.Companion.SAVE
-import mega.privacy.android.app.main.FileExplorerActivity.Companion.SELECT
-import mega.privacy.android.app.main.FileExplorerActivity.Companion.SELECT_CAMERA_FOLDER
-import mega.privacy.android.app.main.FileExplorerActivity.Companion.SHARE_LINK
-import mega.privacy.android.app.main.FileExplorerActivity.Companion.UPLOAD
 import mega.privacy.android.app.main.adapters.FileExplorerPagerAdapter
 import mega.privacy.android.app.main.legacycontact.AddContactActivity
 import mega.privacy.android.app.main.legacycontact.AddContactActivity.Companion.ALLOW_ADD_PARTICIPANTS
@@ -281,7 +272,11 @@ class FileExplorerActivity : PasscodeActivity(), MegaRequestListenerInterface,
                 when (importFragmentSelected) {
                     CHAT_FRAGMENT -> {
                         if (ACTION_UPLOAD_TO_CHAT == action) {
-                            viewModel.handleBackNavigation()
+                            if (chatExplorer != null && chatExplorer?.isSelectMode == true) {
+                                chatExplorer?.clearSelections()
+                            } else {
+                                viewModel.handleBackNavigation()
+                            }
                         } else {
                             chatExplorer = chatExplorerFragment
 
@@ -1290,6 +1285,7 @@ class FileExplorerActivity : PasscodeActivity(), MegaRequestListenerInterface,
 
     private fun setRootTitle() {
         Timber.d("setRootTitle")
+        supportActionBar?.setHomeAsUpIndicator(tintIcon(this, R.drawable.ic_close_white))
         supportActionBar?.title = when {
             mode == SELECT -> {
                 if (isSelectFile) {
@@ -1345,7 +1341,7 @@ class FileExplorerActivity : PasscodeActivity(), MegaRequestListenerInterface,
                                     setRootTitle()
                                     supportActionBar?.setSubtitle(R.string.general_select_to_download)
                                 } else {
-                                    supportActionBar?.setTitle(
+                                    setToolbarTitle(
                                         megaApi.getNodeByHandle(
                                             cDriveExplorer?.parentHandle ?: return
                                         )?.name
@@ -1362,7 +1358,7 @@ class FileExplorerActivity : PasscodeActivity(), MegaRequestListenerInterface,
                     if (cDriveExplorer?.parentHandle == -1L || cDriveExplorer?.parentHandle == megaApi.rootNode?.handle) {
                         setRootTitle()
                     } else {
-                        supportActionBar?.setTitle(
+                        setToolbarTitle(
                             megaApi.getNodeByHandle(
                                 cDriveExplorer?.parentHandle
                                     ?: return
@@ -1383,7 +1379,7 @@ class FileExplorerActivity : PasscodeActivity(), MegaRequestListenerInterface,
                         tabShown = CHAT_TAB
                     }
 
-                    supportActionBar?.setTitle(getString(R.string.title_file_explorer_send_link))
+                    supportActionBar?.title = getString(R.string.title_file_explorer_send_link)
                 } else if (f is CloudDriveExplorerFragment) {
                     if (tabShown != NO_TABS) {
                         tabShown = CLOUD_TAB
@@ -1392,7 +1388,7 @@ class FileExplorerActivity : PasscodeActivity(), MegaRequestListenerInterface,
                     if (f.parentHandle == -1L || f.parentHandle == megaApi.rootNode?.handle) {
                         setRootTitle()
                     } else {
-                        supportActionBar?.setTitle(megaApi.getNodeByHandle(f.parentHandle)?.name)
+                        setToolbarTitle(megaApi.getNodeByHandle(f.parentHandle)?.name)
                     }
 
                     showFabButton(false)
@@ -1406,7 +1402,7 @@ class FileExplorerActivity : PasscodeActivity(), MegaRequestListenerInterface,
                     if (deepBrowserTree == 0) {
                         setRootTitle()
                     } else {
-                        supportActionBar?.setTitle(megaApi.getNodeByHandle(f.parentHandle)?.name)
+                        setToolbarTitle(megaApi.getNodeByHandle(f.parentHandle)?.name)
                     }
                 } else if (f is CloudDriveExplorerFragment) {
                     if (tabShown != NO_TABS) {
@@ -1416,7 +1412,7 @@ class FileExplorerActivity : PasscodeActivity(), MegaRequestListenerInterface,
                     if (f.parentHandle == -1L || f.parentHandle == megaApi.rootNode?.handle) {
                         setRootTitle()
                     } else {
-                        supportActionBar?.setTitle(megaApi.getNodeByHandle(f.parentHandle)?.name)
+                        setToolbarTitle(megaApi.getNodeByHandle(f.parentHandle)?.name)
                     }
                 }
                 showFabButton(false)
@@ -1426,7 +1422,7 @@ class FileExplorerActivity : PasscodeActivity(), MegaRequestListenerInterface,
                         tabShown = CHAT_TAB
                     }
 
-                    supportActionBar?.setTitle(getString(R.string.title_chat_explorer))
+                    supportActionBar?.title = getString(R.string.title_chat_explorer)
                 } else if (f is IncomingSharesExplorerFragment) {
                     if (tabShown != NO_TABS) {
                         tabShown = INCOMING_TAB
@@ -1435,7 +1431,7 @@ class FileExplorerActivity : PasscodeActivity(), MegaRequestListenerInterface,
                     if (deepBrowserTree == 0) {
                         setRootTitle()
                     } else {
-                        supportActionBar?.setTitle(megaApi.getNodeByHandle(f.parentHandle)?.name)
+                        setToolbarTitle(megaApi.getNodeByHandle(f.parentHandle)?.name)
                     }
 
                     showFabButton(false)
@@ -1444,6 +1440,11 @@ class FileExplorerActivity : PasscodeActivity(), MegaRequestListenerInterface,
         }
 
         invalidateOptionsMenu()
+    }
+
+    private fun setToolbarTitle(title: String?) {
+        supportActionBar?.title = title
+        supportActionBar?.setHomeAsUpIndicator(tintIcon(this, R.drawable.ic_arrow_back_white))
     }
 
     override fun onSaveInstanceState(outState: Bundle) {
