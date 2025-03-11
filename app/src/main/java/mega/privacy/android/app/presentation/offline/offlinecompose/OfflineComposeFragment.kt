@@ -126,6 +126,9 @@ class OfflineComposeFragment : Fragment(), ActionMode.Callback {
                             showOptionPanelBottomSheet(it.offlineNode.handle.toLong())
                         }
                     )
+                    LaunchedEffect(args.path) {
+                        viewModel.navigateToPath(args.path, args.rootFolderOnly)
+                    }
                     LaunchedEffect(defaultTitle) {
                         viewModel.updateDefaultTitle(defaultTitle)
                     }

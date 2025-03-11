@@ -25,6 +25,7 @@ import mega.privacy.android.domain.usecase.viewtype.MonitorViewType
 import mega.privacy.android.shared.original.core.ui.utils.pop
 import mega.privacy.android.shared.original.core.ui.utils.push
 import timber.log.Timber
+import java.io.File
 import javax.inject.Inject
 
 /**
@@ -59,6 +60,21 @@ class OfflineComposeViewModel @Inject constructor(
         monitorOfflineWarningMessage()
         monitorOfflineNodeUpdates()
         monitorViewTypeUpdate()
+    }
+
+    /**
+     * Navigates to the specified path, if exists
+     */
+    fun navigateToPath(path: String, rootFolderOnly: Boolean) {
+        if (path.isBlank() || path == File.separator) return
+        viewModelScope.launch {
+            path.split(File.separator).filterNot { it.isBlank() }.forEach { child ->
+                loadOfflineNodes()
+                uiState.value.offlineNodes.find { it.offlineNode.name == child }?.let {
+                    onItemClicked(it, rootFolderOnly)
+                } ?: return@forEach
+            }
+        }
     }
 
     private fun monitorConnectivity() {

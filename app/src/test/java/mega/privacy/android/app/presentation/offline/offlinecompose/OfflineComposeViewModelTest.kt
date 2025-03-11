@@ -25,13 +25,14 @@ import org.junit.jupiter.api.TestInstance
 import org.junit.jupiter.api.extension.ExtendWith
 import org.junit.jupiter.params.ParameterizedTest
 import org.junit.jupiter.params.provider.ValueSource
-import org.mockito.Mockito.mock
 import org.mockito.kotlin.any
 import org.mockito.kotlin.anyOrNull
 import org.mockito.kotlin.doReturn
+import org.mockito.kotlin.mock
 import org.mockito.kotlin.reset
 import org.mockito.kotlin.verify
 import org.mockito.kotlin.whenever
+import java.io.File
 
 @ExtendWith(CoroutineMainDispatcherExtension::class)
 @ExperimentalCoroutinesApi
@@ -306,6 +307,34 @@ class OfflineComposeViewModelTest {
             )
         )
         assertThat(underTest.uiState.value.selectedNodeHandles.size).isEqualTo(1)
+    }
+
+    @Test
+    fun `test that navigateToPath navigates to children if found`() = runTest {
+        val parentId = -1
+        val childId = 3453
+        val grandChildId = 845
+        val child = mock<OfflineFileInformation> {
+            on { isFolder } doReturn true
+            on { name } doReturn "folder"
+            on { id } doReturn childId
+        }
+        val grandChild = mock<OfflineFileInformation> {
+            on { isFolder } doReturn true
+            on { name } doReturn "subFolder"
+            on { id } doReturn grandChildId
+        }
+        val path = File.separator + child.name + File.separator + grandChild.name + File.separator
+
+        whenever(getOfflineNodesByParentIdUseCase(parentId)).thenReturn(listOf(child))
+        whenever(getOfflineNodesByParentIdUseCase(childId)).thenReturn(listOf(grandChild))
+        whenever(getOfflineNodesByParentIdUseCase(grandChildId)).thenReturn(listOf(mock()))
+
+        underTest.navigateToPath(
+            path = path,
+            rootFolderOnly = false
+        )
+        assertThat(underTest.uiState.value.parentId).isEqualTo(grandChildId)
     }
 
     private suspend fun stubCommon() {
