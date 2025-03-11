@@ -4,30 +4,53 @@ import android.os.Parcelable
 import androidx.annotation.DrawableRes
 import androidx.annotation.StringRes
 import kotlinx.parcelize.Parcelize
+import mega.privacy.mobile.analytics.core.event.identifier.ItemSelectedEventIdentifier
 
 
-interface SettingEntryPoint : Parcelable {
-    val key: String
-    val title: Int
-    val icon: Int
-    val preferredOrdinal: Int
-    val destination: Parcelable
+interface SettingEntryPoint {
+    val navData: NavData
+    val analyticsEvent: ItemSelectedEventIdentifier
+
+    @Parcelize
+    data class NavData(
+        val key: String,
+        val title: Int,
+        val icon: Int,
+        val preferredOrdinal: Int,
+        val destination: Parcelable,
+    ) : Parcelable
 }
 
-@Parcelize
-data class FeatureSettingEntryPoint(
-    override val key: String,
-    @StringRes override val title: Int,
-    @DrawableRes override val icon: Int,
-    override val preferredOrdinal: Int,
-    override val destination: Parcelable,
-) : SettingEntryPoint
+class FeatureSettingEntryPoint(
+    key: String,
+    @StringRes title: Int,
+    @DrawableRes icon: Int,
+    val preferredOrdinal: Int,
+    val destination: Parcelable,
+    override val analyticsEvent: ItemSelectedEventIdentifier,
+) : SettingEntryPoint {
+    override val navData = SettingEntryPoint.NavData(
+        key,
+        title,
+        icon,
+        preferredOrdinal,
+        destination,
+    )
+}
 
-@Parcelize
-data class MoreSettingEntryPoint(
-    override val key: String,
-    @StringRes override val title: Int,
-    @DrawableRes override val icon: Int,
-    override val preferredOrdinal: Int,
-    override val destination: Parcelable,
-) : SettingEntryPoint
+class MoreSettingEntryPoint(
+    key: String,
+    @StringRes title: Int,
+    @DrawableRes icon: Int,
+    val preferredOrdinal: Int,
+    val destination: Parcelable,
+    override val analyticsEvent: ItemSelectedEventIdentifier,
+) : SettingEntryPoint {
+    override val navData = SettingEntryPoint.NavData(
+        key,
+        title,
+        icon,
+        preferredOrdinal,
+        destination,
+    )
+}

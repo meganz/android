@@ -23,6 +23,7 @@ import androidx.compose.material3.adaptive.layout.ListDetailPaneScaffoldRole
 import androidx.compose.material3.adaptive.navigation.ThreePaneScaffoldNavigator
 import androidx.compose.material3.adaptive.navigation.rememberListDetailPaneScaffoldNavigator
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableIntStateOf
 import androidx.compose.runtime.remember
@@ -30,6 +31,7 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.graphics.vector.rememberVectorPainter
+import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.res.vectorResource
@@ -48,10 +50,12 @@ import mega.android.core.ui.components.toolbar.AppBarNavigationType
 import mega.android.core.ui.components.toolbar.MegaTopAppBar
 import mega.android.core.ui.theme.AndroidThemeForPreviews
 import mega.android.core.ui.theme.values.TextColor
+import mega.privacy.android.analytics.Analytics
 import mega.privacy.android.app.R
 import mega.privacy.android.app.presentation.settings.compose.container.view.SettingContainerView
 import mega.privacy.android.app.presentation.settings.compose.home.model.SettingsHomeState
 import mega.privacy.android.navigation.settings.SettingEntryPoint
+import mega.privacy.mobile.analytics.event.SettingsScreenEvent
 
 @OptIn(ExperimentalMaterial3AdaptiveApi::class)
 @Composable
@@ -59,7 +63,11 @@ internal fun SettingsHomeView(
     state: SettingsHomeState,
     onBackPressed: () -> Unit,
 ) {
-    val navigator = rememberListDetailPaneScaffoldNavigator<SettingEntryPoint>()
+    LaunchedEffect(Unit) {
+        Analytics.tracker.trackEvent(SettingsScreenEvent)
+    }
+
+    val navigator = rememberListDetailPaneScaffoldNavigator<SettingEntryPoint.NavData>()
 
     BackHandler(navigator.canNavigateBack()) {
         navigator.navigateBack()
@@ -78,7 +86,10 @@ internal fun SettingsHomeView(
                     state = state,
                     onNavigateToItem = { settingEntryPoint ->
                         // Navigate to the detail pane with the passed item
-                        navigator.navigateTo(ListDetailPaneScaffoldRole.Detail, settingEntryPoint)
+                        navigator.navigateTo(
+                            pane = ListDetailPaneScaffoldRole.Detail,
+                            content = settingEntryPoint.navData
+                        )
                     },
                     onBackPressed = onBackPressed
                 )
@@ -125,7 +136,7 @@ internal fun SettingsHomeView(
 }
 
 @OptIn(ExperimentalMaterial3AdaptiveApi::class)
-private fun ThreePaneScaffoldNavigator<SettingEntryPoint>.handleDetailBackAction(
+private fun ThreePaneScaffoldNavigator<*>.handleDetailBackAction(
     detailNavigator: NavHostController,
 ) {
     if (detailNavigator.navigateUp().not()) {
@@ -199,16 +210,18 @@ private fun LazyListScope.listEntryPoints(
                 .fillMaxWidth()
                 .padding(vertical = 16.dp)
                 .clickable {
+                    Analytics.tracker.trackEvent(it.analyticsEvent)
                     onNavigateToItem(it)
-                },
+                }
+                .testTag(SETTING_ITEM_TEST_TAG_ROOT + it.navData.key),
             horizontalArrangement = Arrangement.SpaceBetween
         ) {
             Row(
                 modifier = Modifier.wrapContentWidth(),
                 horizontalArrangement = Arrangement.Start
             ) {
-                MegaIcon(painter = painterResource(it.icon), contentDescription = null)
-                MegaText(text = stringResource(it.title), textColor = TextColor.Primary)
+                MegaIcon(painter = painterResource(it.navData.icon), contentDescription = null)
+                MegaText(text = stringResource(it.navData.title), textColor = TextColor.Primary)
             }
             MegaIcon(
                 painter = rememberVectorPainter(ImageVector.vectorResource(id = R.drawable.ic_chevron_right)),
@@ -232,3 +245,5 @@ private fun SettingsHomeViewPreview() {
         )
     }
 }
+
+internal const val SETTING_ITEM_TEST_TAG_ROOT = "settings_home_view:setting_item_"
