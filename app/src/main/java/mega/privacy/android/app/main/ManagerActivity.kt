@@ -1227,7 +1227,9 @@ class ManagerActivity : PasscodeActivity(), NavigationView.OnNavigationItemSelec
 
                 OriginalTheme(isDark = isDark) {
                     LaunchedEffect(syncPromotionBottomSheetState.targetValue) {
-                        if (syncPromotionBottomSheetState.targetValue == ModalBottomSheetValue.Hidden) {
+                        if (syncPromotionBottomSheetState.currentValue != ModalBottomSheetValue.Hidden &&
+                            syncPromotionBottomSheetState.targetValue == ModalBottomSheetValue.Hidden
+                        ) {
                             coroutineScope.launch { syncPromotionViewModel.onConsumeShouldShowSyncPromotion() }
                         }
                     }
@@ -1254,14 +1256,16 @@ class ManagerActivity : PasscodeActivity(), NavigationView.OnNavigationItemSelec
                                     syncPromotionViewModel.setSyncPromotionShown(doNotShowAgain = true)
                                     megaNavigator.openNewSync(
                                         context = this@ManagerActivity,
-                                        syncType = SyncType.TYPE_TWOWAY
+                                        syncType = SyncType.TYPE_TWOWAY,
+                                        isFromManagerActivity = true,
                                     )
                                 },
                                 onBackUpFoldersClicked = {
                                     syncPromotionViewModel.setSyncPromotionShown(doNotShowAgain = true)
                                     megaNavigator.openNewSync(
                                         context = this@ManagerActivity,
-                                        syncType = SyncType.TYPE_BACKUP
+                                        syncType = SyncType.TYPE_BACKUP,
+                                        isFromManagerActivity = true,
                                     )
                                 },
                                 onLearnMoreClicked = {
