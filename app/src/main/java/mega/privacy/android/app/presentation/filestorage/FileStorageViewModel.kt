@@ -203,10 +203,10 @@ class FileStorageViewModel @Inject constructor(
             parent = parent,
         )
         val children = getChildren(currentDocument, highlightFileName)
-        uiState.update {
-            val loaded = it.getOrCreateLoaded()
+        uiState.update { uiState ->
+            val loaded = uiState.getOrCreateLoaded()
             loaded.getOrCreateLoaded().copy(
-                currentFolderPath = getPathByDocumentContentUriUseCase(uriPath.value)
+                currentFolderPath = getPathByDocumentContentUriUseCase(uriPath.value)?.takeIf { it.isNotBlank() }
                     ?: uriPath.value,
                 currentFolder = currentDocument,
                 children = children,
