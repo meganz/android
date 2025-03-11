@@ -282,10 +282,6 @@
     <string name="general_low_tier_plan_essential_label">MEGA&#160;Essential</string>
     <!-- The Body Text of a Settings Camera Uploads Option that decides whether or not the Device must be charged for Camera Uploads to start uploading content -->
     <string name="settings_camera_uploads_upload_only_while_charging_option_body">I caricamenti verranno sospesi fino a quando non inizierai a caricare il dispositivo. I caricamenti rimarranno comunque in pausa se la batteria è inferiore al 20%.</string>
-    <!-- Title of the synced folder list empty state -->
-    <string name="device_center_sync_list_empty_state_title">Nessuna sincronizzazione configurata</string>
-    <!-- Message of the synced folder list empty state -->
-    <string name="device_center_sync_list_empty_state_message">Sincronizza una cartella sul tuo dispositivo con una cartella su MEGA.</string>
     <!-- Label for the button or menu option to add a new sync -->
     <string name="device_center_sync_add_new_syn_button_option">Aggiungi una nuova sincronizzazione</string>
     <!-- Text for the Sync solved issues chip -->
@@ -970,4 +966,16 @@
     </plurals>
     <!-- Snack bar message informing that profile's QR code is uploaded to the Cloud Drive-->
     <string name="transfers_start_upload_profile_qr_code_message">Saving %1$s to Cloud drive&#8230;</string>
+    <!-- Warning shown after trying to cancel a download, but the request failed -->
+    <string name="transfers_error_cancelling_download">Something went wrong. Download was not cancelled.</string>
+    <!-- Body for the subscription details section, which is shown to the Indian user to provide details about subscription. This string is shown if user selects yearly subscription and the amount is more than Rs.15,000. Please keep these placeholders [A], [/A], [B], [/B], [C], [/C]. They will be used to format the string. -->
+    <string name="account_upgrade_account_subscription_details_body_yearly_with_price_for_indian">You will be charged %1$s immediately but your subscription will not automatically renew after 12 months due to government regulations. It will be your responsibility to renew your subscription after it has expired. You can manage or cancel your subscription anytime via Subscriptions in [A]Google&#160;Play[/A]. By upgrading your account, you agree to MEGA’s [B]Terms of Service[/B] and [C]Privacy and Data Policy[/C].</string>
+    <!-- The name of the Device or Folder Status which signifies that it is currently uploading -->
+    <string name="device_center_list_view_item_status_uploading">Upload&#8230;</string>
+    <!-- The name of the Device or Folder Status which signifies that it is currently uploading with a percentage completion -->
+    <string name="device_center_list_view_item_status_uploading_with_progress">%1$d%% uploading&#8230;</string>
+    <!-- The name of the Device or Folder Status which signifies that it is inactive -->
+    <string name="device_center_list_view_item_status_inactive">Inattivo</string>
+    <!-- The name of the Device or Folder Status which signifies that some action is needed -->
+    <string name="device_center_list_view_item_status_attention_needed">Attention needed</string>
 </resources>

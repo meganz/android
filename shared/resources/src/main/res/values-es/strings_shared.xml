@@ -282,10 +282,6 @@
     <string name="general_low_tier_plan_essential_label">MEGA&#160;Essential</string>
     <!-- The Body Text of a Settings Camera Uploads Option that decides whether or not the Device must be charged for Camera Uploads to start uploading content -->
     <string name="settings_camera_uploads_upload_only_while_charging_option_body">Las subidas solo se realizarán cuando el dispositivo se esté cargando y la batería esté por encima del 20%.</string>
-    <!-- Title of the synced folder list empty state -->
-    <string name="device_center_sync_list_empty_state_title">Ninguna sincronización configurada</string>
-    <!-- Message of the synced folder list empty state -->
-    <string name="device_center_sync_list_empty_state_message">Sincroniza una carpeta de tu dispositivo con una carpeta de MEGA.</string>
     <!-- Label for the button or menu option to add a new sync -->
     <string name="device_center_sync_add_new_syn_button_option">Añadir sincronización</string>
     <!-- Text for the Sync solved issues chip -->
@@ -615,7 +611,7 @@
     <!-- Text of the primary button of the bottom sheet to promote Sync feature for Pro users ("Sync folders") -->
     <string name="sync_promotion_bottom_sheet_primary_button_text_pro">Sincronizar carpetas</string>
     <!-- Text of the secondary button of the bottom sheet to promote Sync feature ("Back up folders") -->
-    <string name="sync_promotion_bottom_sheet_secondary_button_text">Back up folders</string>
+    <string name="sync_promotion_bottom_sheet_secondary_button_text">Back up de carpetas</string>
     <!-- Snackbar message displayed when sync option is selected -->
     <string name="settings_sync_option_updated_message">Opciones de sincronización actualizadas</string>
     <!-- Title of the Contact Permission Explanation -->
@@ -899,18 +895,19 @@
     <!-- Notification text for preview downloads, paused state.  Please do not modify the %s placeholder as it will be replaced by the name of the file to be donwloaded -->
     <string name="transfers_notification_downloading_preview_paused">Preparando %1$s para ser previsualizado (en pausa)</string>
     <!-- Message when successfully deleting single item from the audio queue. %1$s will be replaced with the item name -->
-    <string name="audio_queue_single_item_removed_message">‟%1$s” was removed</string>
+    <string name="audio_queue_single_item_removed_message">“%1$s” ha sido eliminado</string>
     <!-- Message when successfully deleting items from the audio queue. %1$d will be replaced with the removal count when multiple items are removed. -->
     <string name="audio_queue_multiple_items_removed_message">Removed %1$d items from queue</string>
     <!-- Message when successfully deleting items from the audio queue. %1$s will be replaced with the item name %2$d will be replaced with the removal count. -->
     <plurals name="audio_queue_items_removal_success_message">
-        <item quantity="one">“%1$s” was removed from the queue</item>
-        <item quantity="other">Removed %2$d items from the queue</item>
+        <item quantity="one">“%1$s” ha sido eliminado de la cola</item>
+        <item quantity="many">Se han eliminado %2$d de elementos de la cola</item>
+        <item quantity="other">Se han eliminado %2$d elementos de la cola</item>
     </plurals>
     <!-- Title for the dialog to inform that a transfer is needed to preview a file and transfers are paused-->
     <string name="transfers_preview_paused_dialog_title">Las transferencias están pausadas</string>
     <!-- Message for the dialog to inform that a transfer is needed to preview a file and transfers are paused-->
-    <string name="transfers_preview_paused_dialog_text">To preview “%1$s” you will need to resume paused transfers</string>
+    <string name="transfers_preview_paused_dialog_text">Para previsualizar “%1$s” necesitarás reactivar las transferencias</string>
     <!--SD Card text shown as title in FileStorage screen -->
     <string name="general_sd_card">Tarjeta SD</string>
     <!--The title of the Login page-->
@@ -948,26 +945,39 @@
     <!-- Ad settings label in the cookie settings page -->
     <string name="settings_cookie_settings_label_ad_settings">Ajustes de anuncios</string>
     <!-- Ads personalization label in the cookie settings page -->
-    <string name="settings_cookie_settings_label_ads_personalization">Ads personalisation</string>
+    <string name="settings_cookie_settings_label_ads_personalization">Personalización de anuncios</string>
     <!-- Cookie settings title in the cookie settings page -->
     <string name="settings_cookie_setting_title_cookie_and_ad_settings">Ajustes de cookies y anuncios</string>
     <!-- Body text of the bottom sheet to promote Sync feature. The placeholders are to underline text -->
-    <string name="sync_promotion_bottom_sheet_body_text">Sync or back up a folder on your device with a folder on MEGA. [U]Learn more[/U]</string>
+    <string name="sync_promotion_bottom_sheet_body_text">Sincroniza o haz un backup de una carpeta en tu dispositivo con una carpeta de MEGA. [U]Más información[/U]</string>
     <!-- This is the final button when creating a folder in the dialog where the user inserts the folder name -->
-    <string name="transfers_cancel_download_warning_title">Cancel download?</string>
+    <string name="transfers_cancel_download_warning_title">¿Cancelar la descarga?</string>
     <!-- Confirmation message informing a download was successfully cancelled -->
     <string name="transfers_cancel_download_success_message">Download cancelled</string>
     <!-- Title of note to self chat -->
     <string name="chat_note_to_self_chat_title">Mis notas</string>
     <!-- First message header in note to self chat -->
-    <string name="chat_note_to_self_chat_first_message_header">Keep it to yourself</string>
+    <string name="chat_note_to_self_chat_first_message_header">Solo para tus ojos</string>
     <!-- First message description in note to self chat -->
-    <string name="chat_note_to_self_chat_first_message_description">Send yourself sensitive information, pics and videos, or ideas for your next big venture. Synced across all your devices, and protected with zero-knowledge encryption.</string>
+    <string name="chat_note_to_self_chat_first_message_description">Envíate información confidencial, fotos y videos, o ideas para tu próximo gran proyecto. Estará todo sincronizado en tus dispositivos y protegido con cifrado de conocimiento cero.</string>
     <!-- Add to album some files exist message -->
     <plurals name="album_add_to_files_exist_message">
-        <item quantity="one">1 file added to “%1$s”. Duplicate files cannot be added again.</item>
-        <item quantity="other">%2$d files added to “%1$s”. Duplicate files cannot be added again.</item>
+        <item quantity="one">Se ha añadido 1 archivo a “%1$s”. No se pueden añadir archivos duplicados.</item>
+        <item quantity="many">%2$d archivos añadidos a “%1$s%1$s”. No se pueden añadir archivos duplicados.</item>
+        <item quantity="other">%2$d archivos añadidos a “%1$s”. No se pueden añadir archivos duplicados.</item>
     </plurals>
     <!-- Snack bar message informing that profile's QR code is uploaded to the Cloud Drive-->
-    <string name="transfers_start_upload_profile_qr_code_message">Saving %1$s to Cloud drive&#8230;</string>
+    <string name="transfers_start_upload_profile_qr_code_message">Guardando %1$s en la Nube...</string>
+    <!-- Warning shown after trying to cancel a download, but the request failed -->
+    <string name="transfers_error_cancelling_download">Algo ha salido mal. La descarga no se ha cancelado.</string>
+    <!-- Body for the subscription details section, which is shown to the Indian user to provide details about subscription. This string is shown if user selects yearly subscription and the amount is more than Rs.15,000. Please keep these placeholders [A], [/A], [B], [/B], [C], [/C]. They will be used to format the string. -->
+    <string name="account_upgrade_account_subscription_details_body_yearly_with_price_for_indian">You will be charged %1$s immediately but your subscription will not automatically renew after 12 months due to government regulations. It will be your responsibility to renew your subscription after it has expired. You can manage or cancel your subscription anytime via Subscriptions in [A]Google&#160;Play[/A]. By upgrading your account, you agree to MEGA’s [B]Terms of Service[/B] and [C]Privacy and Data Policy[/C].</string>
+    <!-- The name of the Device or Folder Status which signifies that it is currently uploading -->
+    <string name="device_center_list_view_item_status_uploading">Subiendo&#8230;</string>
+    <!-- The name of the Device or Folder Status which signifies that it is currently uploading with a percentage completion -->
+    <string name="device_center_list_view_item_status_uploading_with_progress">%1$d%% subiendo...</string>
+    <!-- The name of the Device or Folder Status which signifies that it is inactive -->
+    <string name="device_center_list_view_item_status_inactive">Inactivo</string>
+    <!-- The name of the Device or Folder Status which signifies that some action is needed -->
+    <string name="device_center_list_view_item_status_attention_needed">Atención necesaria</string>
 </resources>
