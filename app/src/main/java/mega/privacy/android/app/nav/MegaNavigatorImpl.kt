@@ -433,13 +433,18 @@ internal class MegaNavigatorImpl @Inject constructor(
     }
 
     override fun openNewSync(
-        context: Context, syncType: SyncType, isFromCloudDrive: Boolean, remoteFolderHandle: Long?,
+        context: Context,
+        syncType: SyncType,
+        isFromManagerActivity: Boolean,
+        isFromCloudDrive: Boolean,
+        remoteFolderHandle: Long?,
         remoteFolderName: String?,
     ) {
         context.startActivity(Intent(context, SyncHostActivity::class.java).apply {
             data = "https://mega.nz/${
                 getSyncNewFolderRoute(
                     syncType = syncType,
+                    isFromManagerActivity = isFromManagerActivity,
                     remoteFolderHandle = remoteFolderHandle,
                     remoteFolderName = remoteFolderName
                 )

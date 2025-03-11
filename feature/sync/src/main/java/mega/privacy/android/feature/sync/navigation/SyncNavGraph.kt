@@ -70,24 +70,29 @@ private const val syncEmptyRoute = "$syncRoute/empty"
  * Route to the add new sync screen
  */
 private const val syncNewFolderRoute =
-    "$syncRoute/new-folder/{syncType}/{remoteFolderHandle}/{remoteFolderName}"
+    "$syncRoute/new-folder/{syncType}/{isFromManagerActivity}/{remoteFolderHandle}/{remoteFolderName}"
 
 /**
  * Gets the route to the add new sync screen and allow set some allowed possible parameters through it
  *
  * @param syncType The [SyncType] for the new sync
+ * @param isFromManagerActivity Indicates if the new sync is being set from Manager Activity. False by default
+ * @param remoteFolderHandle The MEGA folder handle for the new sync
+ * @param remoteFolderName The MEGA folder name for the new sync
  * @return The route to the the add new sync screen with the allowed possible parameters
  */
 fun getSyncNewFolderRoute(
     syncType: SyncType,
+    isFromManagerActivity: Boolean = false,
     remoteFolderHandle: Long? = null,
     remoteFolderName: String? = null,
 ): String {
     val syncTypeJson = GsonBuilder().create().toJson(syncType)
-    return syncNewFolderRoute.replace(oldValue = "{syncType}", newValue = syncTypeJson).replace(
-        oldValue = "{remoteFolderHandle}",
-        newValue = remoteFolderHandle.toString()
-    ).replace(oldValue = "{remoteFolderName}", newValue = remoteFolderName.toString())
+    return syncNewFolderRoute
+        .replace(oldValue = "{syncType}", newValue = syncTypeJson)
+        .replace(oldValue = "{isFromManagerActivity}", newValue = isFromManagerActivity.toString())
+        .replace(oldValue = "{remoteFolderHandle}", newValue = remoteFolderHandle.toString())
+        .replace(oldValue = "{remoteFolderName}", newValue = remoteFolderName.toString())
 }
 
 /**-
@@ -148,6 +153,9 @@ internal fun NavGraphBuilder.syncNavGraph(
                 navArgument("syncType") {
                     nullable = false
                 },
+                navArgument("isFromManagerActivity") {
+                    nullable = false
+                },
                 navArgument("remoteFolderHandle") {
                     nullable = true
                 },
@@ -160,15 +168,15 @@ internal fun NavGraphBuilder.syncNavGraph(
             val syncType = GsonBuilder().create()
                 .fromJson(navBackStackEntry.arguments?.getString("syncType"), SyncType::class.java)
                 ?: SyncType.TYPE_TWOWAY
-
+            val isFromManagerActivity =
+                navBackStackEntry.arguments?.getString("isFromManagerActivity")?.toBoolean() == true
             val remoteFolderHandle =
                 navBackStackEntry.arguments?.getString("remoteFolderHandle")?.toLongOrNull()
             val remoteFolderName = navBackStackEntry.arguments?.getString("remoteFolderName")
 
             Timber.d(
-                "Sync Type = $syncType | Remote Folder Handle = $remoteFolderHandle | Remote Folder Name = $remoteFolderName"
+                "Sync Type = $syncType | Is From Manager Activity = $isFromManagerActivity | Remote Folder Handle = $remoteFolderHandle | Remote Folder Name = $remoteFolderName"
             )
-
 
             val viewModel =
                 hiltViewModel<SyncNewFolderViewModel, SyncNewFolderViewModel.SyncNewFolderViewModelFactory> { factory ->
@@ -208,7 +216,7 @@ internal fun NavGraphBuilder.syncNavGraph(
                     openUpgradeAccountPage()
                 },
                 onBackClicked = {
-                    if (shouldNavigateToSyncList) {
+                    if (shouldNavigateToSyncList && isFromManagerActivity.not()) {
                         navFromNewFolderRouteToListRoute()
                     } else {
                         if (!navController.popBackStack()) {

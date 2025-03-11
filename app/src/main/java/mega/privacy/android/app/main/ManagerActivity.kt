@@ -1320,13 +1320,15 @@ class ManagerActivity : PasscodeActivity(), NavigationView.OnNavigationItemSelec
                                 onAddNewSyncClicked = {
                                     megaNavigator.openNewSync(
                                         context = this@ManagerActivity,
-                                        syncType = SyncType.TYPE_TWOWAY
+                                        syncType = SyncType.TYPE_TWOWAY,
+                                        isFromManagerActivity = true,
                                     )
                                 },
                                 onAddNewBackupClicked = {
                                     megaNavigator.openNewSync(
                                         context = this@ManagerActivity,
-                                        syncType = SyncType.TYPE_BACKUP
+                                        syncType = SyncType.TYPE_BACKUP,
+                                        isFromManagerActivity = true,
                                     )
                                 },
                                 onNewChatClicked = {

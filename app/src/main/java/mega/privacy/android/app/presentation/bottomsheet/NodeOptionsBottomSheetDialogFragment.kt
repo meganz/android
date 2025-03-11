@@ -917,6 +917,7 @@ class NodeOptionsBottomSheetDialogFragment : BaseBottomSheetDialogFragment() {
         megaNavigator.openNewSync(
             context = managerActivity,
             syncType = SyncType.TYPE_TWOWAY,
+            isFromManagerActivity = true,
             remoteFolderHandle = node.handle,
             remoteFolderName = node.name,
         )
