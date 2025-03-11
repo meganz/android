@@ -148,7 +148,11 @@ fun StartConversationView(
 
                         if (isNoteToYourselfFeatureFlagEnabled) {
                             item(key = "Note to self") {
-                                NoteToSelfView(onNoteToSelfClicked, isHint = isNoteToSelfChatEmpty)
+                                NoteToSelfView(
+                                    onNoteToSelfClicked,
+                                    isHint = isNoteToSelfChatEmpty,
+                                    isNew = isNoteToSelfNew
+                                )
                             }
                         }
 
@@ -169,7 +173,11 @@ fun StartConversationView(
                         item(key = "Contacts header") { ContactsHeader() }
                         if (isNoteToYourselfFeatureFlagEnabled) {
                             item(key = "Note to self") {
-                                NoteToSelfView(onNoteToSelfClicked, isHint = isNoteToSelfChatEmpty)
+                                NoteToSelfView(
+                                    onNoteToSelfClicked,
+                                    isHint = isNoteToSelfChatEmpty,
+                                    isNew = isNoteToSelfNew
+                                )
                             }
                         }
                         item(key = "Empty contacts") { EmptyContactsView(onInviteContactsClicked) }

@@ -25,6 +25,8 @@ import androidx.compose.foundation.Image
 import mega.android.core.ui.theme.values.IconColor
 import mega.android.core.ui.theme.values.TextColor
 import mega.privacy.android.app.R
+import mega.privacy.android.shared.original.core.ui.controls.chip.MegaChip
+import mega.privacy.android.shared.original.core.ui.controls.chip.TagChipStyle
 import mega.privacy.android.shared.original.core.ui.theme.extensions.subtitle1medium
 
 /**
@@ -37,6 +39,7 @@ import mega.privacy.android.shared.original.core.ui.theme.extensions.subtitle1me
 internal fun NoteToSelfView(
     onNoteToSelfClicked: (() -> Unit)?,
     isHint: Boolean = false,
+    isNew: Boolean = false,
     modifier: Modifier = Modifier,
 ) {
     Column(modifier = modifier) {
@@ -53,15 +56,13 @@ internal fun NoteToSelfView(
                 .padding(end = 16.dp),
             verticalAlignment = Alignment.CenterVertically
         ) {
-            Box(
-                modifier = modifier,
-            ) {
+            Box {
                 if (isHint) {
                     MegaIcon(
                         painter = painterResource(id = mega.privacy.android.core.R.drawable.file_icon),
                         contentDescription = null,
                         modifier = Modifier
-                            .testTag(NOTE_TO_SELF_ITEM_AVATAR_IMAGE)
+                            .testTag(NOTE_TO_SELF_ITEM_HINT_BUTTON)
                             .padding(
                                 horizontal = 24.dp,
                                 vertical = 8.dp
@@ -84,13 +85,30 @@ internal fun NoteToSelfView(
                 }
             }
             Column {
-                Row(verticalAlignment = Alignment.CenterVertically) {
+                Row(
+                    modifier = Modifier
+                        .fillMaxWidth(),
+                    verticalAlignment = Alignment.CenterVertically
+                ) {
                     MegaText(
-                        modifier = Modifier.testTag(NOTE_TO_SELF_ITEM_TITLE_TEXT),
+                        modifier = Modifier
+                            .testTag(NOTE_TO_SELF_ITEM_TITLE_TEXT)
+                            .padding(top = 2.dp)
+                            .weight(1f),
                         text = stringResource(id = sharedR.string.chat_note_to_self_chat_title),
                         textColor = TextColor.Primary,
                         style = MaterialTheme.typography.subtitle1medium,
                     )
+
+                    if (isNew && isHint) {
+                        MegaChip(
+                            selected = true,
+                            text = stringResource(sharedR.string.notifications_notification_item_new_tag),
+                            style = TagChipStyle,
+                            modifier = Modifier
+                                .testTag(NOTE_TO_SELF_ITEM_NEW_LABEL)
+                        )
+                    }
                 }
             }
         }
@@ -104,6 +122,7 @@ private fun PreviewNoteToSelfView() {
     OriginalTheme(isDark = isSystemInDarkTheme()) {
         NoteToSelfView(
             isHint = true,
+            isNew = true,
             onNoteToSelfClicked = {}
         )
     }
@@ -115,6 +134,7 @@ private fun PreviewNoteToSelfAvatarView() {
     OriginalTheme(isDark = isSystemInDarkTheme()) {
         NoteToSelfView(
             isHint = false,
+            isNew = true,
             onNoteToSelfClicked = {}
         )
     }
@@ -122,3 +142,6 @@ private fun PreviewNoteToSelfAvatarView() {
 
 internal const val NOTE_TO_SELF_ITEM_TITLE_TEXT = "note_to_self_item:title_text"
 internal const val NOTE_TO_SELF_ITEM_AVATAR_IMAGE = "note_to_self_item:avatar_image"
+internal const val NOTE_TO_SELF_ITEM_HINT_BUTTON = "note_to_self_item:hint_button"
+internal const val NOTE_TO_SELF_ITEM_NEW_LABEL = "note_to_self_item:new_label"
+

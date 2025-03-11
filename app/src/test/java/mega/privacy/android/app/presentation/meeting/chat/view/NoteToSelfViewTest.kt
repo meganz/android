@@ -18,9 +18,18 @@ class NoteToSelfViewTest {
 
     @Test
     fun `test that avatar is shown`() {
-        initComposeRuleContent()
+        initComposeRuleContent(isHint = false)
         composeRule.onNodeWithTag(
             NOTE_TO_SELF_ITEM_AVATAR_IMAGE,
+            useUnmergedTree = true
+        ).assertIsDisplayed()
+    }
+
+    @Test
+    fun `test that hint is shown`() {
+        initComposeRuleContent(isHint = true)
+        composeRule.onNodeWithTag(
+            NOTE_TO_SELF_ITEM_HINT_BUTTON,
             useUnmergedTree = true
         ).assertIsDisplayed()
     }
@@ -34,10 +43,21 @@ class NoteToSelfViewTest {
         ).assertIsDisplayed()
     }
 
-    private fun initComposeRuleContent() {
+    @Test
+    fun `test that new is shown`() {
+        initComposeRuleContent(isNew = true, isHint = true)
+        composeRule.onNodeWithTag(
+            NOTE_TO_SELF_ITEM_NEW_LABEL,
+            useUnmergedTree = true
+        ).assertIsDisplayed()
+    }
+
+    private fun initComposeRuleContent(isNew: Boolean = false, isHint: Boolean = false) {
         composeRule.setContent {
             NoteToSelfView(
                 onNoteToSelfClicked = {},
+                isNew = isNew,
+                isHint = isHint
             )
         }
     }
