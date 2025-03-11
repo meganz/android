@@ -239,20 +239,6 @@ internal fun VideoInfoView(
             highlightText = highlightText
         )
 
-        description?.let {
-            if (highlightText.isNotBlank() && it.contains(highlightText, ignoreCase = true)) {
-                HighlightedText(
-                    modifier = Modifier
-                        .testTag(VIDEO_ITEM_NODE_DESCRIPTION)
-                        .padding(start = 10.dp),
-                    text = description,
-                    highlightText = highlightText,
-                    highlightFontWeight = FontWeight.Bold,
-                    textColor = TextColor.Secondary,
-                )
-            }
-        }
-
         collectionTitle?.let {
             CollectionTitleView(
                 collectionTitle = it
@@ -267,6 +253,21 @@ internal fun VideoInfoView(
             isSharedWithPublicLink = isSharedWithPublicLink,
             onMenuClick = onMenuClick
         )
+
+        description?.let {
+            if (highlightText.isNotBlank() && it.contains(highlightText, ignoreCase = true)) {
+                HighlightedText(
+                    modifier = Modifier
+                        .testTag(VIDEO_ITEM_NODE_DESCRIPTION)
+                        .padding(start = 10.dp, top = 5.dp, bottom = 5.dp),
+                    text = description,
+                    highlightText = highlightText,
+                    highlightFontWeight = FontWeight.Bold,
+                    style = MaterialTheme.typography.caption,
+                    textColor = TextColor.Secondary,
+                )
+            }
+        }
 
         val tagHighlightText = highlightText.removePrefix("#")
         if (tagHighlightText.isNotBlank() && !tags.isNullOrEmpty()) {
@@ -373,7 +374,9 @@ internal fun VideoNameAndLabelView(
                 highlightText = highlightText,
                 maxLines = maxLines,
                 textColor = TextColor.Primary,
-                style = MaterialTheme.typography.subtitle1,
+                style = MaterialTheme.typography.subtitle2.copy(
+                    fontWeight = FontWeight.Medium
+                ),
                 inlineContent = inlineContent,
             )
         } else {
@@ -385,7 +388,9 @@ internal fun VideoNameAndLabelView(
                 text = finalText,
                 maxLines = maxLines,
                 textColor = TextColor.Primary,
-                style = MaterialTheme.typography.subtitle1,
+                style = MaterialTheme.typography.subtitle2.copy(
+                    fontWeight = FontWeight.Medium
+                ),
                 inlineContent = inlineContent,
                 onTextLayout = { textLayoutResultState.value = it }
             )
@@ -642,6 +647,7 @@ const val VIDEO_ITEM_COLLECTION_TITLE_TEST_TAG =
  */
 const val VIDEO_ITEM_NODE_TAGS =
     "video_item:node_tags"
+
 /**
  * Test tag for the video item node description
  */
