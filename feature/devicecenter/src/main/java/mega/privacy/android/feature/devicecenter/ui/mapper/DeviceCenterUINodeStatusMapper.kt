@@ -1,6 +1,7 @@
 package mega.privacy.android.feature.devicecenter.ui.mapper
 
-import mega.privacy.android.feature.devicecenter.domain.entity.DeviceCenterNodeStatus
+import mega.privacy.android.feature.devicecenter.domain.entity.DeviceFolderStatus
+import mega.privacy.android.feature.devicecenter.domain.entity.DeviceStatus
 import mega.privacy.android.feature.devicecenter.ui.model.status.DeviceCenterUINodeStatus
 import mega.privacy.android.shared.sync.DeviceFolderUINodeErrorMessageMapper
 import javax.inject.Inject
@@ -18,48 +19,46 @@ internal class DeviceCenterUINodeStatusMapper @Inject constructor(
     /**
      * Invocation function
      *
-     * @param status The [DeviceCenterNodeStatus]
+     * @param status The [DeviceFolderStatus]
      * @return the corresponding [DeviceCenterUINodeStatus]
      */
-    operator fun invoke(status: DeviceCenterNodeStatus) = when (status) {
-        DeviceCenterNodeStatus.Stopped -> DeviceCenterUINodeStatus.Stopped
-        DeviceCenterNodeStatus.Disabled -> DeviceCenterUINodeStatus.Disabled
-        DeviceCenterNodeStatus.Offline -> DeviceCenterUINodeStatus.Offline
-        DeviceCenterNodeStatus.UpToDate -> DeviceCenterUINodeStatus.UpToDate
+    operator fun invoke(status: DeviceFolderStatus) = when (status) {
+        DeviceFolderStatus.Inactive -> DeviceCenterUINodeStatus.Inactive
 
-        is DeviceCenterNodeStatus.Error -> DeviceCenterUINodeStatus.Error(
+        is DeviceFolderStatus.Error -> DeviceCenterUINodeStatus.Error(
             specificErrorMessage = status.errorSubState?.let { errorSubState ->
                 deviceFolderUINodeErrorMessageMapper(errorSubState)
             }
         )
 
-        is DeviceCenterNodeStatus.Blocked -> DeviceCenterUINodeStatus.Blocked(
-            specificErrorMessage = status.errorSubState?.let { errorSubState ->
-                deviceFolderUINodeErrorMessageMapper(errorSubState)
-            }
-        )
+        DeviceFolderStatus.Paused -> DeviceCenterUINodeStatus.Paused
 
-        is DeviceCenterNodeStatus.Overquota -> DeviceCenterUINodeStatus.Overquota(
-            specificErrorMessage = status.errorSubState?.let { errorSubState ->
-                deviceFolderUINodeErrorMessageMapper(errorSubState)
-            }
-        )
+        DeviceFolderStatus.Disabled -> DeviceCenterUINodeStatus.Disabled
 
-        DeviceCenterNodeStatus.Paused -> DeviceCenterUINodeStatus.Paused
-        DeviceCenterNodeStatus.Initializing -> DeviceCenterUINodeStatus.Initializing
-        DeviceCenterNodeStatus.Scanning -> DeviceCenterUINodeStatus.Scanning
-        is DeviceCenterNodeStatus.Syncing -> {
+        is DeviceFolderStatus.Updating -> {
             if (status.progress > 0) {
-                DeviceCenterUINodeStatus.SyncingWithPercentage(status.progress)
+                DeviceCenterUINodeStatus.UpdatingWithPercentage(status.progress)
             } else {
-                DeviceCenterUINodeStatus.Syncing
+                DeviceCenterUINodeStatus.Updating
             }
         }
 
-        DeviceCenterNodeStatus.Stalled -> DeviceCenterUINodeStatus.Blocked(null)
+        DeviceFolderStatus.UpToDate -> DeviceCenterUINodeStatus.UpToDate
+        else -> DeviceCenterUINodeStatus.Unknown
+    }
 
-        DeviceCenterNodeStatus.NothingSetUp -> DeviceCenterUINodeStatus.NothingSetUp
-
+    /**
+     * Invocation function
+     *
+     * @param status The [DeviceFolderStatus]
+     * @return the corresponding [DeviceCenterUINodeStatus]
+     */
+    operator fun invoke(status: DeviceStatus) = when (status) {
+        DeviceStatus.Inactive -> DeviceCenterUINodeStatus.Inactive
+        DeviceStatus.AttentionNeeded -> DeviceCenterUINodeStatus.AttentionNeeded
+        DeviceStatus.Updating -> DeviceCenterUINodeStatus.Updating
+        DeviceStatus.UpToDate -> DeviceCenterUINodeStatus.UpToDate
+        DeviceStatus.NothingSetUp -> DeviceCenterUINodeStatus.NothingSetUp
         else -> DeviceCenterUINodeStatus.Unknown
     }
 }

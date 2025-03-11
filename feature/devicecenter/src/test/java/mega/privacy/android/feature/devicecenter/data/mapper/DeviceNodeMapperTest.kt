@@ -2,7 +2,7 @@ package mega.privacy.android.feature.devicecenter.data.mapper
 
 import com.google.common.truth.Truth.assertThat
 import mega.privacy.android.domain.entity.backup.BackupInfo
-import mega.privacy.android.feature.devicecenter.domain.entity.DeviceCenterNodeStatus
+import mega.privacy.android.feature.devicecenter.domain.entity.DeviceStatus
 import mega.privacy.android.feature.devicecenter.domain.entity.DeviceFolderNode
 import mega.privacy.android.feature.devicecenter.domain.entity.OtherDeviceNode
 import mega.privacy.android.feature.devicecenter.domain.entity.OwnDeviceNode
@@ -50,7 +50,7 @@ internal class DeviceNodeMapperTest {
         val currentDeviceFolderNodes = listOf<DeviceFolderNode>(
             mock { on { name }.thenReturn("Current Device Folder One") }
         )
-        val currentDeviceStatus = DeviceCenterNodeStatus.NothingSetUp
+        val currentDeviceStatus = DeviceStatus.NothingSetUp
 
         whenever(deviceFolderNodeMapper(currentDeviceBackupInfo)).thenReturn(
             currentDeviceFolderNodes
@@ -98,7 +98,7 @@ internal class DeviceNodeMapperTest {
         val currentDeviceFolderNodes = listOf<DeviceFolderNode>(
             mock { on { name }.thenReturn("Current Device Folder One") }
         )
-        val currentDeviceStatus = DeviceCenterNodeStatus.NothingSetUp
+        val currentDeviceStatus = DeviceStatus.NothingSetUp
         whenever(deviceFolderNodeMapper(currentDeviceBackupInfo)).thenReturn(
             currentDeviceFolderNodes
         )
@@ -114,7 +114,7 @@ internal class DeviceNodeMapperTest {
         val otherDeviceFolderNodes = listOf<DeviceFolderNode>(
             mock { on { name }.thenReturn("Other Device Folder One") }
         )
-        val otherDeviceStatus = DeviceCenterNodeStatus.Overquota(null)
+        val otherDeviceStatus = DeviceStatus.AttentionNeeded
         whenever(deviceFolderNodeMapper(otherDeviceBackupInfo)).thenReturn(otherDeviceFolderNodes)
         whenever(
             deviceNodeStatusMapper(
@@ -163,7 +163,7 @@ internal class DeviceNodeMapperTest {
         val currentDeviceFolderNodes = listOf<DeviceFolderNode>(
             mock { on { name }.thenReturn("Current Device Folder One") }
         )
-        val currentDeviceStatus = DeviceCenterNodeStatus.NothingSetUp
+        val currentDeviceStatus = DeviceStatus.NothingSetUp
         whenever(deviceFolderNodeMapper(currentDeviceBackupInfo)).thenReturn(
             currentDeviceFolderNodes
         )
@@ -175,7 +175,7 @@ internal class DeviceNodeMapperTest {
         ).thenReturn(currentDeviceStatus)
 
         // Other Device/s
-        val otherDeviceStatus = DeviceCenterNodeStatus.Unknown
+        val otherDeviceStatus = DeviceStatus.Unknown
         whenever(deviceFolderNodeMapper(emptyList())).thenReturn(emptyList())
         whenever(
             deviceNodeStatusMapper(

@@ -753,13 +753,13 @@ private val otherDeviceUINodeTwo = OtherDeviceUINode(
     id = "5E6F-7G8H",
     name = "HUAWEI P30",
     icon = DeviceIconType.Android,
-    status = DeviceCenterUINodeStatus.Offline,
+    status = DeviceCenterUINodeStatus.Inactive,
     folders = emptyList(),
 )
 private val otherDeviceUINodeThree = OtherDeviceUINode(
     id = "9I1J-2K3L",
     name = "Macbook Pro",
     icon = DeviceIconType.Mac,
-    status = DeviceCenterUINodeStatus.Offline,
+    status = DeviceCenterUINodeStatus.Inactive,
     folders = emptyList(),
 )

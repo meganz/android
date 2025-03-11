@@ -136,7 +136,7 @@ private fun getTitleText(uiNodeName: String) = uiNodeName.ifBlank {
  */
 @Composable
 private fun getStatusText(uiNodeStatus: DeviceCenterUINodeStatus) =
-    if (uiNodeStatus is DeviceCenterUINodeStatus.SyncingWithPercentage) {
+    if (uiNodeStatus is DeviceCenterUINodeStatus.UpdatingWithPercentage) {
         // Apply String Formatting for this UI Status
         stringResource(uiNodeStatus.name, uiNodeStatus.progress)
     } else {
@@ -196,7 +196,7 @@ private class DeviceBottomSheetBodyPreviewProvider : PreviewParameterProvider<De
                 id = "9012-3456",
                 name = "Other Device",
                 icon = DeviceIconType.IOS,
-                status = DeviceCenterUINodeStatus.Offline,
+                status = DeviceCenterUINodeStatus.Inactive,
                 folders = emptyList(),
             )
         )

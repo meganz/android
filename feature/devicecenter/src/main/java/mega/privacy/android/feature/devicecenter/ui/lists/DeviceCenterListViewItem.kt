@@ -122,11 +122,18 @@ internal fun DeviceCenterListViewItem(
  */
 @Composable
 private fun getStatusText(uiNodeStatus: DeviceCenterUINodeStatus) =
-    if (uiNodeStatus is DeviceCenterUINodeStatus.SyncingWithPercentage) {
-        // Apply String Formatting for this UI Status
-        stringResource(uiNodeStatus.name, uiNodeStatus.progress)
-    } else {
-        stringResource(uiNodeStatus.name)
+    when (uiNodeStatus) {
+        is DeviceCenterUINodeStatus.UpdatingWithPercentage -> {
+            // Apply String Formatting for this UI Status
+            stringResource(uiNodeStatus.name, uiNodeStatus.progress)
+        }
+
+        is DeviceCenterUINodeStatus.UploadingWithPercentage -> {
+            // Apply String Formatting for this UI Status
+            stringResource(uiNodeStatus.name, uiNodeStatus.progress)
+        }
+
+        else -> stringResource(uiNodeStatus.name)
     }
 
 /**

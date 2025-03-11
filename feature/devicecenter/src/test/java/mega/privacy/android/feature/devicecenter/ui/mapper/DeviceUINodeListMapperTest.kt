@@ -4,8 +4,9 @@ import com.google.common.truth.Truth.assertThat
 import mega.privacy.android.domain.entity.backup.BackupInfoType
 import mega.privacy.android.domain.entity.backup.BackupInfoUserAgent
 import mega.privacy.android.domain.entity.node.NodeId
-import mega.privacy.android.feature.devicecenter.domain.entity.DeviceCenterNodeStatus
 import mega.privacy.android.feature.devicecenter.domain.entity.DeviceFolderNode
+import mega.privacy.android.feature.devicecenter.domain.entity.DeviceFolderStatus
+import mega.privacy.android.feature.devicecenter.domain.entity.DeviceStatus
 import mega.privacy.android.feature.devicecenter.domain.entity.OtherDeviceNode
 import mega.privacy.android.feature.devicecenter.domain.entity.OwnDeviceNode
 import mega.privacy.android.feature.devicecenter.ui.model.BackupDeviceFolderUINode
@@ -53,11 +54,11 @@ internal class DeviceUINodeListMapperTest {
     fun `test that the mapping for the current device is correct`(isCurrentDevice: Boolean) {
         val deviceId = "12345-6789"
         val deviceName = "Device Name"
-        val deviceStatus = DeviceCenterNodeStatus.UpToDate
+        val deviceStatus = DeviceStatus.UpToDate
 
         val folderId = "0123-456"
         val folderName = "Backup Folder One"
-        val folderStatus = DeviceCenterNodeStatus.UpToDate
+        val folderStatus = DeviceFolderStatus.UpToDate
         val folderType = BackupInfoType.BACKUP_UPLOAD
         val folderUserAgent = BackupInfoUserAgent.WINDOWS
         val folderRootHandle = 789012L
@@ -128,7 +129,7 @@ internal class DeviceUINodeListMapperTest {
             )
         }
 
-        whenever(deviceCenterUINodeStatusMapper(DeviceCenterNodeStatus.UpToDate)).thenReturn(
+        whenever(deviceCenterUINodeStatusMapper(DeviceStatus.UpToDate)).thenReturn(
             expectedUINodeStatus
         )
         whenever(

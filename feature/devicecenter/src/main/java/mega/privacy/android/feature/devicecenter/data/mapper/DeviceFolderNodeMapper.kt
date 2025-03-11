@@ -5,7 +5,7 @@ import mega.privacy.android.domain.entity.backup.BackupInfoHeartbeatStatus
 import mega.privacy.android.domain.entity.backup.BackupInfoState
 import mega.privacy.android.domain.entity.backup.BackupInfoType
 import mega.privacy.android.domain.entity.sync.SyncError
-import mega.privacy.android.feature.devicecenter.domain.entity.DeviceCenterNodeStatus
+import mega.privacy.android.feature.devicecenter.domain.entity.DeviceFolderStatus
 import mega.privacy.android.feature.devicecenter.domain.entity.DeviceFolderNode
 import nz.mega.sdk.MegaApiJava
 import java.util.concurrent.TimeUnit
@@ -41,39 +41,69 @@ internal class DeviceFolderNodeMapper @Inject constructor() {
      * Returns the Folder Status of a Backup
      *
      * The order for detecting the appropriate Folder Status is
-     * 1. Stopped - [isStopped]
-     * 2. Overquota - [isOverquota]
-     * 3. Blocked - [isBlocked]
-     * 4. Failed - [isFailed]
-     * 5. Stalled - [isStalled]
-     * 6. Disabled - [isDisabled]
-     * 7. Offline - [isOffline]
-     * 8. Paused - [isPaused]
-     * 9. Up to Date - [isUpToDate]
+     * 1. Inactive - [isInactive]
+     * 2. Stopped - [isStopped]
+     * 3. Overquota - [isOverquota]
+     * 4. Blocked - [isBlocked]
+     * 5. Failed - [isFailed]
+     * 6. Stalled - [isStalled]
+     * 7. Disabled - [isDisabled]
+     * 8. Offline - [isOffline]
+     * 9. Paused - [isPaused]
      * 10. Initializing - [isInitializing]
      * 11. Syncing - [isSyncing]
      * 12. Scanning - [isScanning]
+     * 13 Up to Date - [isUpToDate]
      *
-     * If there is no matching Folder Status, [DeviceCenterNodeStatus.Unknown] is returned
+     * If there is no matching Folder Status, [DeviceFolderStatus.Unknown] is returned
      *
      * @param currentTimeInSeconds The current time the [DeviceFolderNodeMapper] was invoked in
      * seconds
      * @return The Folder Status
      */
     private fun BackupInfo.getDeviceFolderStatus(currentTimeInSeconds: Long) = when {
-        isStopped() -> DeviceCenterNodeStatus.Stopped
-        isOverquota() -> DeviceCenterNodeStatus.Overquota(subState)
-        isBlocked() -> DeviceCenterNodeStatus.Blocked(subState)
-        isFailed() -> DeviceCenterNodeStatus.Error(subState)
-        isStalled() -> DeviceCenterNodeStatus.Stalled
-        isDisabled() -> DeviceCenterNodeStatus.Disabled
-        isOffline(currentTimeInSeconds) -> DeviceCenterNodeStatus.Offline
-        isPaused() -> DeviceCenterNodeStatus.Paused
-        isUpToDate() -> DeviceCenterNodeStatus.UpToDate
-        isInitializing() -> DeviceCenterNodeStatus.Initializing
-        isSyncing() -> DeviceCenterNodeStatus.Syncing(progress)
-        isScanning() -> DeviceCenterNodeStatus.Scanning
-        else -> DeviceCenterNodeStatus.Unknown
+        isInactive(currentTimeInSeconds) -> DeviceFolderStatus.Inactive
+
+        isStopped() || isOverquota() || isBlocked() || isFailed() || isStalled() ->
+            DeviceFolderStatus.Error(subState)
+
+        isDisabled() -> {
+            when (type) {
+                BackupInfoType.CAMERA_UPLOADS, BackupInfoType.MEDIA_UPLOADS -> DeviceFolderStatus.Disabled
+                else -> DeviceFolderStatus.Error(subState)
+            }
+        }
+
+        isOffline(currentTimeInSeconds) -> DeviceFolderStatus.Error(subState)
+
+        isPaused() -> {
+            when (type) {
+                BackupInfoType.CAMERA_UPLOADS, BackupInfoType.MEDIA_UPLOADS -> DeviceFolderStatus.Disabled
+                else -> DeviceFolderStatus.Paused
+            }
+        }
+
+        isInitializing() || isSyncing() || isScanning() -> DeviceFolderStatus.Updating(progress)
+
+        isUpToDate() -> DeviceFolderStatus.UpToDate
+        else -> DeviceFolderStatus.Unknown
+    }
+
+    /**
+     * Checks whether the Backup is Inactive or not
+     *
+     * A Backup is Inactive if the last Heartbeat was more than 60 days ago
+     *
+     * @param currentTimeInSeconds The current time the [DeviceFolderNodeMapper] was invoked in seconds
+     * @return true if the following conditions are met, and false if otherwise
+     */
+    private fun BackupInfo.isInactive(currentTimeInSeconds: Long): Boolean {
+        val maxLastHeartbeatTime = TimeUnit.DAYS.toSeconds(60)
+        val lastHeartbeat = maxOf(timestamp, lastActivityTimestamp)
+        // How much time has passed since the last Heartbeat
+        val heartbeatTimeDifference = currentTimeInSeconds - lastHeartbeat
+        val isLastHeartbeatOutOfRange = heartbeatTimeDifference > maxLastHeartbeatTime
+        return isLastHeartbeatOutOfRange
     }
 
     /**

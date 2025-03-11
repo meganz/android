@@ -55,7 +55,7 @@ internal class DeviceBottomSheetBodyTest {
             id = "9012-3456",
             name = "Test Device 2",
             icon = DeviceIconType.IOS,
-            status = DeviceCenterUINodeStatus.Blocked(specificErrorMessage = null),
+            status = DeviceCenterUINodeStatus.Error(specificErrorMessage = null),
             folders = emptyList(),
         )
         composeTestRule.setContent {

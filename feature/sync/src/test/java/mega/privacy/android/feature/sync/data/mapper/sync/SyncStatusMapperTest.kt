@@ -117,8 +117,8 @@ class SyncStatusMapperTest {
         Arguments.of(BackupState.INVALID, BackupInfoType.CAMERA_UPLOADS, SyncStatus.ERROR),
         Arguments.of(BackupState.INVALID, BackupInfoType.MEDIA_UPLOADS, SyncStatus.ERROR),
 
-        Arguments.of(BackupState.NOT_INITIALIZED, BackupInfoType.TWO_WAY_SYNC, SyncStatus.DISABLED),
-        Arguments.of(BackupState.NOT_INITIALIZED, BackupInfoType.UP_SYNC, SyncStatus.DISABLED),
+        Arguments.of(BackupState.NOT_INITIALIZED, BackupInfoType.TWO_WAY_SYNC, SyncStatus.ERROR),
+        Arguments.of(BackupState.NOT_INITIALIZED, BackupInfoType.UP_SYNC, SyncStatus.ERROR),
         Arguments.of(
             BackupState.NOT_INITIALIZED,
             BackupInfoType.CAMERA_UPLOADS,
@@ -143,9 +143,9 @@ class SyncStatusMapperTest {
         Arguments.of(
             BackupState.TEMPORARILY_DISABLED,
             BackupInfoType.TWO_WAY_SYNC,
-            SyncStatus.DISABLED
+            SyncStatus.ERROR
         ),
-        Arguments.of(BackupState.TEMPORARILY_DISABLED, BackupInfoType.UP_SYNC, SyncStatus.DISABLED),
+        Arguments.of(BackupState.TEMPORARILY_DISABLED, BackupInfoType.UP_SYNC, SyncStatus.ERROR),
         Arguments.of(
             BackupState.TEMPORARILY_DISABLED,
             BackupInfoType.CAMERA_UPLOADS,
@@ -157,25 +157,33 @@ class SyncStatusMapperTest {
             SyncStatus.DISABLED
         ),
 
-        Arguments.of(BackupState.DISABLED, BackupInfoType.TWO_WAY_SYNC, SyncStatus.DISABLED),
-        Arguments.of(BackupState.DISABLED, BackupInfoType.UP_SYNC, SyncStatus.DISABLED),
+        Arguments.of(BackupState.DISABLED, BackupInfoType.TWO_WAY_SYNC, SyncStatus.ERROR),
+        Arguments.of(BackupState.DISABLED, BackupInfoType.UP_SYNC, SyncStatus.ERROR),
         Arguments.of(BackupState.DISABLED, BackupInfoType.CAMERA_UPLOADS, SyncStatus.DISABLED),
         Arguments.of(BackupState.DISABLED, BackupInfoType.MEDIA_UPLOADS, SyncStatus.DISABLED),
 
         Arguments.of(BackupState.PAUSE_UPLOADS, BackupInfoType.TWO_WAY_SYNC, SyncStatus.PAUSED),
         Arguments.of(BackupState.PAUSE_UPLOADS, BackupInfoType.UP_SYNC, SyncStatus.PAUSED),
-        Arguments.of(BackupState.PAUSE_UPLOADS, BackupInfoType.CAMERA_UPLOADS, SyncStatus.PAUSED),
-        Arguments.of(BackupState.PAUSE_UPLOADS, BackupInfoType.MEDIA_UPLOADS, SyncStatus.PAUSED),
+        Arguments.of(BackupState.PAUSE_UPLOADS, BackupInfoType.CAMERA_UPLOADS, SyncStatus.DISABLED),
+        Arguments.of(BackupState.PAUSE_UPLOADS, BackupInfoType.MEDIA_UPLOADS, SyncStatus.DISABLED),
 
         Arguments.of(BackupState.PAUSE_DOWNLOADS, BackupInfoType.TWO_WAY_SYNC, SyncStatus.PAUSED),
         Arguments.of(BackupState.PAUSE_DOWNLOADS, BackupInfoType.UP_SYNC, SyncStatus.PAUSED),
-        Arguments.of(BackupState.PAUSE_DOWNLOADS, BackupInfoType.CAMERA_UPLOADS, SyncStatus.PAUSED),
-        Arguments.of(BackupState.PAUSE_DOWNLOADS, BackupInfoType.MEDIA_UPLOADS, SyncStatus.PAUSED),
+        Arguments.of(
+            BackupState.PAUSE_DOWNLOADS,
+            BackupInfoType.CAMERA_UPLOADS,
+            SyncStatus.DISABLED
+        ),
+        Arguments.of(
+            BackupState.PAUSE_DOWNLOADS,
+            BackupInfoType.MEDIA_UPLOADS,
+            SyncStatus.DISABLED
+        ),
 
         Arguments.of(BackupState.PAUSE_ALL, BackupInfoType.TWO_WAY_SYNC, SyncStatus.PAUSED),
         Arguments.of(BackupState.PAUSE_ALL, BackupInfoType.UP_SYNC, SyncStatus.PAUSED),
-        Arguments.of(BackupState.PAUSE_ALL, BackupInfoType.CAMERA_UPLOADS, SyncStatus.PAUSED),
-        Arguments.of(BackupState.PAUSE_ALL, BackupInfoType.MEDIA_UPLOADS, SyncStatus.PAUSED),
+        Arguments.of(BackupState.PAUSE_ALL, BackupInfoType.CAMERA_UPLOADS, SyncStatus.DISABLED),
+        Arguments.of(BackupState.PAUSE_ALL, BackupInfoType.MEDIA_UPLOADS, SyncStatus.DISABLED),
 
         Arguments.of(BackupState.DELETED, BackupInfoType.TWO_WAY_SYNC, SyncStatus.ERROR),
         Arguments.of(BackupState.DELETED, BackupInfoType.UP_SYNC, SyncStatus.ERROR),
@@ -204,7 +212,7 @@ class SyncStatusMapperTest {
         ),
         Arguments.of(
             CameraUploadsStatusInfo.FolderUnavailable(CameraUploadFolderType.Secondary),
-            SyncStatus.PAUSED
+            SyncStatus.DISABLED
         ),
 
         Arguments.of(
@@ -239,19 +247,19 @@ class SyncStatusMapperTest {
 
         Arguments.of(
             CameraUploadsStatusInfo.Finished(CameraUploadsFinishedReason.BATTERY_LEVEL_TOO_LOW),
-            SyncStatus.PAUSED
+            SyncStatus.DISABLED
         ),
         Arguments.of(
             CameraUploadsStatusInfo.Finished(CameraUploadsFinishedReason.NETWORK_CONNECTION_REQUIREMENT_NOT_MET),
-            SyncStatus.PAUSED
+            SyncStatus.DISABLED
         ),
         Arguments.of(
             CameraUploadsStatusInfo.Finished(CameraUploadsFinishedReason.ACCOUNT_STORAGE_OVER_QUOTA),
-            SyncStatus.PAUSED
+            SyncStatus.DISABLED
         ),
         Arguments.of(
             CameraUploadsStatusInfo.Finished(CameraUploadsFinishedReason.DEVICE_CHARGING_REQUIREMENT_NOT_MET),
-            SyncStatus.PAUSED
+            SyncStatus.DISABLED
         ),
 
         Arguments.of(mock<CameraUploadsStatusInfo.Finished>(), SyncStatus.SYNCED),
@@ -274,7 +282,7 @@ class SyncStatusMapperTest {
 
         Arguments.of(
             CameraUploadsStatusInfo.FolderUnavailable(CameraUploadFolderType.Primary),
-            SyncStatus.PAUSED
+            SyncStatus.DISABLED
         ),
         Arguments.of(
             CameraUploadsStatusInfo.FolderUnavailable(CameraUploadFolderType.Secondary),
@@ -313,19 +321,19 @@ class SyncStatusMapperTest {
 
         Arguments.of(
             CameraUploadsStatusInfo.Finished(CameraUploadsFinishedReason.BATTERY_LEVEL_TOO_LOW),
-            SyncStatus.PAUSED
+            SyncStatus.DISABLED
         ),
         Arguments.of(
             CameraUploadsStatusInfo.Finished(CameraUploadsFinishedReason.NETWORK_CONNECTION_REQUIREMENT_NOT_MET),
-            SyncStatus.PAUSED
+            SyncStatus.DISABLED
         ),
         Arguments.of(
             CameraUploadsStatusInfo.Finished(CameraUploadsFinishedReason.ACCOUNT_STORAGE_OVER_QUOTA),
-            SyncStatus.PAUSED
+            SyncStatus.DISABLED
         ),
         Arguments.of(
             CameraUploadsStatusInfo.Finished(CameraUploadsFinishedReason.DEVICE_CHARGING_REQUIREMENT_NOT_MET),
-            SyncStatus.PAUSED
+            SyncStatus.DISABLED
         ),
 
         Arguments.of(mock<CameraUploadsStatusInfo.Finished>(), SyncStatus.SYNCED),

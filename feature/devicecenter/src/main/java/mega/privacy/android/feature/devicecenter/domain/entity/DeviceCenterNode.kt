@@ -6,12 +6,8 @@ package mega.privacy.android.feature.devicecenter.domain.entity
  *
  * @property id The Node ID
  * @property name The Node Name
- * @property status The Node Status
  */
 interface DeviceCenterNode {
     val id: String
-
     val name: String
-
-    val status: DeviceCenterNodeStatus
 }

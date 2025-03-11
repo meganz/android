@@ -4,7 +4,7 @@ import com.google.common.truth.Truth.assertThat
 import mega.privacy.android.domain.entity.backup.BackupInfoType
 import mega.privacy.android.domain.entity.backup.BackupInfoUserAgent
 import mega.privacy.android.domain.entity.node.NodeId
-import mega.privacy.android.feature.devicecenter.domain.entity.DeviceCenterNodeStatus
+import mega.privacy.android.feature.devicecenter.domain.entity.DeviceFolderStatus
 import mega.privacy.android.feature.devicecenter.domain.entity.DeviceFolderNode
 import mega.privacy.android.feature.devicecenter.ui.model.BackupDeviceFolderUINode
 import mega.privacy.android.feature.devicecenter.ui.model.NonBackupDeviceFolderUINode
@@ -47,7 +47,7 @@ internal class DeviceFolderUINodeListMapperTest {
     fun `test that the mapping results in a backup folder`() {
         val folderId = "12345-6789"
         val folderName = "Backup Folder One"
-        val folderStatus = DeviceCenterNodeStatus.UpToDate
+        val folderStatus = DeviceFolderStatus.UpToDate
         val folderType = BackupInfoType.BACKUP_UPLOAD
         val folderUserAgent = BackupInfoUserAgent.WINDOWS
         val folderRootHandle = 789012L
@@ -96,7 +96,7 @@ internal class DeviceFolderUINodeListMapperTest {
     ) {
         val folderId = "12345-6789"
         val folderName = "Backup Folder One"
-        val folderStatus = DeviceCenterNodeStatus.UpToDate
+        val folderStatus = DeviceFolderStatus.UpToDate
         val folderUserAgent = BackupInfoUserAgent.WINDOWS
         val folderRootHandle = 789012L
         val localPath = "storage/emulated/0/DCIM/Camera"

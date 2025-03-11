@@ -18,7 +18,7 @@ import mega.privacy.android.domain.entity.node.NodeId
 data class DeviceFolderNode(
     override val id: String,
     override val name: String,
-    override val status: DeviceCenterNodeStatus,
+    val status: DeviceFolderStatus,
     val rootHandle: NodeId,
     val localFolderPath: String,
     val type: BackupInfoType,

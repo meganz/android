@@ -43,17 +43,15 @@ private class DeviceCenterUINodeStatusProvider :
     override val values = listOf(
         DeviceCenterUINodeStatus.Unknown,
         DeviceCenterUINodeStatus.UpToDate,
-        DeviceCenterUINodeStatus.Initializing,
-        DeviceCenterUINodeStatus.Scanning,
-        DeviceCenterUINodeStatus.Syncing,
-        DeviceCenterUINodeStatus.SyncingWithPercentage(50),
+        DeviceCenterUINodeStatus.Updating,
+        DeviceCenterUINodeStatus.UpdatingWithPercentage(50),
+        DeviceCenterUINodeStatus.Uploading,
+        DeviceCenterUINodeStatus.UploadingWithPercentage(50),
         DeviceCenterUINodeStatus.NothingSetUp,
         DeviceCenterUINodeStatus.Disabled,
-        DeviceCenterUINodeStatus.Offline,
+        DeviceCenterUINodeStatus.Inactive,
         DeviceCenterUINodeStatus.Paused,
-        DeviceCenterUINodeStatus.Stopped,
-        DeviceCenterUINodeStatus.Overquota(specificErrorMessage = R.string.general_sync_storage_overquota),
+        DeviceCenterUINodeStatus.AttentionNeeded,
         DeviceCenterUINodeStatus.Error(specificErrorMessage = R.string.general_sync_put_nodes_error),
-        DeviceCenterUINodeStatus.Blocked(specificErrorMessage = R.string.general_sync_account_blocked),
     ).asSequence()
 }

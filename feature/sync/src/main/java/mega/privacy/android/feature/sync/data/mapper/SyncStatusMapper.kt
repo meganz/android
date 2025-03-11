@@ -51,10 +51,10 @@ internal class SyncStatusMapper @Inject constructor() {
                         -> SyncStatus.ERROR
 
                     CameraUploadsStatusInfo.FolderUnavailable(CameraUploadFolderType.Primary) ->
-                        if (backupType == BackupInfoType.CAMERA_UPLOADS) SyncStatus.ERROR else SyncStatus.PAUSED
+                        if (backupType == BackupInfoType.CAMERA_UPLOADS) SyncStatus.ERROR else SyncStatus.DISABLED
 
                     CameraUploadsStatusInfo.FolderUnavailable(CameraUploadFolderType.Secondary) ->
-                        if (backupType == BackupInfoType.MEDIA_UPLOADS) SyncStatus.ERROR else SyncStatus.PAUSED
+                        if (backupType == BackupInfoType.MEDIA_UPLOADS) SyncStatus.ERROR else SyncStatus.DISABLED
 
                     CameraUploadsStatusInfo.Finished(CameraUploadsFinishedReason.DISABLED) -> SyncStatus.DISABLED
 
@@ -70,16 +70,27 @@ internal class SyncStatusMapper @Inject constructor() {
                     CameraUploadsStatusInfo.Finished(CameraUploadsFinishedReason.NETWORK_CONNECTION_REQUIREMENT_NOT_MET),
                     CameraUploadsStatusInfo.Finished(CameraUploadsFinishedReason.ACCOUNT_STORAGE_OVER_QUOTA),
                     CameraUploadsStatusInfo.Finished(CameraUploadsFinishedReason.DEVICE_CHARGING_REQUIREMENT_NOT_MET),
-                        -> SyncStatus.PAUSED
+                        -> SyncStatus.DISABLED
 
                     else -> SyncStatus.SYNCED
                 }
             } ?: SyncStatus.SYNCED
         }
 
-        BackupState.PAUSE_UPLOADS, BackupState.PAUSE_DOWNLOADS, BackupState.PAUSE_ALL -> SyncStatus.PAUSED
-        BackupState.NOT_INITIALIZED, BackupState.TEMPORARILY_DISABLED, BackupState.DISABLED -> SyncStatus.DISABLED
+        BackupState.PAUSE_UPLOADS, BackupState.PAUSE_DOWNLOADS, BackupState.PAUSE_ALL -> {
+            when (backupType) {
+                BackupInfoType.CAMERA_UPLOADS, BackupInfoType.MEDIA_UPLOADS -> SyncStatus.DISABLED
+                else -> SyncStatus.PAUSED
+            }
+        }
+
+        BackupState.NOT_INITIALIZED, BackupState.TEMPORARILY_DISABLED, BackupState.DISABLED -> {
+            when (backupType) {
+                BackupInfoType.CAMERA_UPLOADS, BackupInfoType.MEDIA_UPLOADS -> SyncStatus.DISABLED
+                else -> SyncStatus.ERROR
+            }
+        }
+
         BackupState.INVALID, BackupState.DELETED, BackupState.FAILED -> SyncStatus.ERROR
-        else -> SyncStatus.SYNCING
     }
 }

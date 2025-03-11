@@ -2,8 +2,9 @@ package mega.privacy.android.feature.devicecenter.data.mapper
 
 import com.google.common.truth.Truth.assertThat
 import mega.privacy.android.domain.entity.sync.SyncError
-import mega.privacy.android.feature.devicecenter.domain.entity.DeviceCenterNodeStatus
+import mega.privacy.android.feature.devicecenter.domain.entity.DeviceStatus
 import mega.privacy.android.feature.devicecenter.domain.entity.DeviceFolderNode
+import mega.privacy.android.feature.devicecenter.domain.entity.DeviceFolderStatus
 import org.junit.jupiter.api.BeforeAll
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.TestInstance
@@ -32,14 +33,14 @@ internal class DeviceNodeStatusMapperTest {
                 folders = emptyList(),
                 isCurrentDevice = true,
             )
-        ).isEqualTo(DeviceCenterNodeStatus.NothingSetUp)
+        ).isEqualTo(DeviceStatus.NothingSetUp)
     }
 
     @ParameterizedTest(name = "expected current device status: {1}")
     @MethodSource("provideParameters")
-    fun `test that the calculated device status is returned if the current device camera uploads is enabled`(
+    fun `test that the calculated device status is returned for current device`(
         folders: List<DeviceFolderNode>,
-        expectedDeviceStatus: DeviceCenterNodeStatus,
+        expectedDeviceStatus: DeviceStatus,
     ) {
         assertThat(
             underTest(
@@ -53,7 +54,7 @@ internal class DeviceNodeStatusMapperTest {
     @MethodSource("provideParameters")
     fun `test that the calculated device status is returned for other devices`(
         folders: List<DeviceFolderNode>,
-        expectedDeviceStatus: DeviceCenterNodeStatus,
+        expectedDeviceStatus: DeviceStatus,
     ) {
         assertThat(
             underTest(
@@ -63,101 +64,130 @@ internal class DeviceNodeStatusMapperTest {
         ).isEqualTo(expectedDeviceStatus)
     }
 
-    @ParameterizedTest(name = "expected other device status: {1}")
-    @MethodSource("provideParameters")
-    fun `test that unknown device status is returned for other devices when folders are empty`(
-        folders: List<DeviceFolderNode>,
-        expectedDeviceStatus: DeviceCenterNodeStatus,
-    ) {
+    @Test
+    fun `test that unknown device status is returned for other devices when folders are empty`() {
         assertThat(
             underTest(
                 folders = emptyList(),
                 isCurrentDevice = false,
             )
-        ).isEqualTo(DeviceCenterNodeStatus.Unknown)
+        ).isEqualTo(DeviceStatus.Unknown)
     }
 
 
     private fun provideParameters() = Stream.of(
         Arguments.of(
             listOf<DeviceFolderNode>(
-                mock { on { status }.thenReturn(DeviceCenterNodeStatus.Syncing(50)) },
-                mock { on { status }.thenReturn(DeviceCenterNodeStatus.Scanning) }
-            ), DeviceCenterNodeStatus.Syncing(0)
+                mock { on { status }.thenReturn(DeviceFolderStatus.Updating(50)) },
+                mock { on { status }.thenReturn(DeviceFolderStatus.Updating(0)) }
+            ), DeviceStatus.Updating
         ),
         Arguments.of(
             listOf<DeviceFolderNode>(
-                mock { on { status }.thenReturn(DeviceCenterNodeStatus.Scanning) },
-                mock { on { status }.thenReturn(DeviceCenterNodeStatus.Initializing) }
+                mock { on { status }.thenReturn(DeviceFolderStatus.Updating(0)) },
+                mock { on { status }.thenReturn(DeviceFolderStatus.Updating(0)) }
             ),
-            DeviceCenterNodeStatus.Scanning,
+            DeviceStatus.Updating,
         ),
         Arguments.of(
             listOf<DeviceFolderNode>(
-                mock { on { status }.thenReturn(DeviceCenterNodeStatus.Initializing) },
-                mock { on { status }.thenReturn(DeviceCenterNodeStatus.Paused) }
+                mock { on { status }.thenReturn(DeviceFolderStatus.Updating(0)) },
+                mock { on { status }.thenReturn(DeviceFolderStatus.Paused) }
             ),
-            DeviceCenterNodeStatus.Initializing,
+            DeviceStatus.AttentionNeeded,
         ),
         Arguments.of(
             listOf<DeviceFolderNode>(
-                mock { on { status }.thenReturn(DeviceCenterNodeStatus.Paused) },
-                mock { on { status }.thenReturn(DeviceCenterNodeStatus.Overquota(SyncError.STORAGE_OVERQUOTA)) }
+                mock { on { status }.thenReturn(DeviceFolderStatus.Paused) },
+                mock { on { status }.thenReturn(DeviceFolderStatus.Error(SyncError.STORAGE_OVERQUOTA)) }
             ),
-            DeviceCenterNodeStatus.Paused,
+            DeviceStatus.AttentionNeeded,
         ),
         Arguments.of(
             listOf<DeviceFolderNode>(
-                mock { on { status }.thenReturn(DeviceCenterNodeStatus.Overquota(SyncError.STORAGE_OVERQUOTA)) },
-                mock { on { status }.thenReturn(DeviceCenterNodeStatus.Blocked(SyncError.ACCOUNT_BLOCKED)) }
+                mock { on { status }.thenReturn(DeviceFolderStatus.Error(SyncError.STORAGE_OVERQUOTA)) },
+                mock { on { status }.thenReturn(DeviceFolderStatus.Error(SyncError.ACCOUNT_BLOCKED)) }
             ),
-            DeviceCenterNodeStatus.Overquota(null),
+            DeviceStatus.AttentionNeeded,
         ),
         Arguments.of(
             listOf<DeviceFolderNode>(
-                mock { on { status }.thenReturn(DeviceCenterNodeStatus.Blocked(SyncError.ACCOUNT_BLOCKED)) },
-                mock { on { status }.thenReturn(DeviceCenterNodeStatus.Error(SyncError.INSUFFICIENT_DISK_SPACE)) },
+                mock { on { status }.thenReturn(DeviceFolderStatus.Error(SyncError.ACCOUNT_BLOCKED)) },
+                mock { on { status }.thenReturn(DeviceFolderStatus.Error(SyncError.INSUFFICIENT_DISK_SPACE)) },
             ),
-            DeviceCenterNodeStatus.Blocked(null),
+            DeviceStatus.AttentionNeeded,
         ),
         Arguments.of(
             listOf<DeviceFolderNode>(
-                mock { on { status }.thenReturn(DeviceCenterNodeStatus.Error(SyncError.INSUFFICIENT_DISK_SPACE)) },
-                mock { on { status }.thenReturn(DeviceCenterNodeStatus.UpToDate) }
+                mock { on { status }.thenReturn(DeviceFolderStatus.Error(SyncError.INSUFFICIENT_DISK_SPACE)) },
+                mock { on { status }.thenReturn(DeviceFolderStatus.UpToDate) }
             ),
-            DeviceCenterNodeStatus.Error(null),
+            DeviceStatus.AttentionNeeded,
         ),
         Arguments.of(
             listOf<DeviceFolderNode>(
-                mock { on { status }.thenReturn(DeviceCenterNodeStatus.UpToDate) },
-                mock { on { status }.thenReturn(DeviceCenterNodeStatus.Offline) }
+                mock { on { status }.thenReturn(DeviceFolderStatus.UpToDate) },
+                mock { on { status }.thenReturn(DeviceFolderStatus.Error(null)) }
             ),
-            DeviceCenterNodeStatus.UpToDate,
+            DeviceStatus.AttentionNeeded,
         ),
         Arguments.of(
             listOf<DeviceFolderNode>(
-                mock { on { status }.thenReturn(DeviceCenterNodeStatus.Offline) },
-                mock { on { status }.thenReturn(DeviceCenterNodeStatus.Disabled) }
+                mock { on { status }.thenReturn(DeviceFolderStatus.Error(null)) },
+                mock { on { status }.thenReturn(DeviceFolderStatus.Disabled) }
             ),
-            DeviceCenterNodeStatus.Offline,
+            DeviceStatus.AttentionNeeded,
         ),
         Arguments.of(
             listOf<DeviceFolderNode>(
-                mock { on { status }.thenReturn(DeviceCenterNodeStatus.Disabled) },
-                mock { on { status }.thenReturn(DeviceCenterNodeStatus.Stopped) }
+                mock { on { status }.thenReturn(DeviceFolderStatus.Disabled) },
+                mock { on { status }.thenReturn(DeviceFolderStatus.Error(null)) }
             ),
-            DeviceCenterNodeStatus.Disabled,
+            DeviceStatus.AttentionNeeded,
         ),
         Arguments.of(
             listOf<DeviceFolderNode>(
-                mock { on { status }.thenReturn(DeviceCenterNodeStatus.Stopped) },
-                mock { on { status }.thenReturn(DeviceCenterNodeStatus.Unknown) }
+                mock { on { status }.thenReturn(DeviceFolderStatus.Error(null)) },
+                mock { on { status }.thenReturn(DeviceFolderStatus.Unknown) }
             ),
-            DeviceCenterNodeStatus.Stopped,
+            DeviceStatus.AttentionNeeded,
         ),
         Arguments.of(
-            listOf<DeviceFolderNode>(mock { on { status }.thenReturn(DeviceCenterNodeStatus.Unknown) }),
-            DeviceCenterNodeStatus.Unknown,
+            listOf<DeviceFolderNode>(mock { on { status }.thenReturn(DeviceFolderStatus.Unknown) }),
+            DeviceStatus.Unknown,
+        ),
+
+        Arguments.of(
+            listOf<DeviceFolderNode>(
+                mock { on { status }.thenReturn(DeviceFolderStatus.UpToDate) },
+                mock { on { status }.thenReturn(DeviceFolderStatus.Error(null)) },
+                mock { on { status }.thenReturn(DeviceFolderStatus.Inactive) }
+            ),
+            DeviceStatus.Inactive,
+        ),
+        Arguments.of(
+            listOf<DeviceFolderNode>(
+                mock { on { status }.thenReturn(DeviceFolderStatus.UpToDate) },
+                mock { on { status }.thenReturn(DeviceFolderStatus.Updating(0)) },
+                mock { on { status }.thenReturn(DeviceFolderStatus.Error(null)) }
+            ),
+            DeviceStatus.AttentionNeeded,
+        ),
+        Arguments.of(
+            listOf<DeviceFolderNode>(
+                mock { on { status }.thenReturn(DeviceFolderStatus.UpToDate) },
+                mock { on { status }.thenReturn(DeviceFolderStatus.Updating(0)) },
+                mock { on { status }.thenReturn(DeviceFolderStatus.UpToDate) }
+            ),
+            DeviceStatus.Updating,
+        ),
+        Arguments.of(
+            listOf<DeviceFolderNode>(
+                mock { on { status }.thenReturn(DeviceFolderStatus.UpToDate) },
+                mock { on { status }.thenReturn(DeviceFolderStatus.UpToDate) },
+                mock { on { status }.thenReturn(DeviceFolderStatus.UpToDate) }
+            ),
+            DeviceStatus.UpToDate,
         ),
     )
 }

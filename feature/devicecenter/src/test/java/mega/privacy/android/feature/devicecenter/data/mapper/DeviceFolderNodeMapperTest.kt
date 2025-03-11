@@ -8,7 +8,7 @@ import mega.privacy.android.domain.entity.backup.BackupInfoType
 import mega.privacy.android.domain.entity.backup.BackupInfoUserAgent
 import mega.privacy.android.domain.entity.node.NodeId
 import mega.privacy.android.domain.entity.sync.SyncError
-import mega.privacy.android.feature.devicecenter.domain.entity.DeviceCenterNodeStatus
+import mega.privacy.android.feature.devicecenter.domain.entity.DeviceFolderStatus
 import mega.privacy.android.feature.devicecenter.domain.entity.DeviceFolderNode
 import nz.mega.sdk.MegaApiJava
 import org.junit.jupiter.api.BeforeAll
@@ -26,13 +26,15 @@ import java.util.concurrent.TimeUnit
 internal class DeviceFolderNodeMapperTest {
     private lateinit var underTest: DeviceFolderNodeMapper
 
+    private val currentTimeInSeconds = System.currentTimeMillis() / 1000L
+
     @BeforeAll
     fun setUp() {
         underTest = DeviceFolderNodeMapper()
     }
 
     @Test
-    fun `test that the mapped device folder has a stopped status`() {
+    fun `test that the mapped device folder has an error status`() {
         val backupId = 123456L
         val backupName = "Backup One"
         val backupType = BackupInfoType.CAMERA_UPLOADS
@@ -48,13 +50,14 @@ internal class DeviceFolderNodeMapperTest {
                 on { type }.thenReturn(backupType)
                 on { rootHandle }.thenReturn(backupRootHandle)
                 on { localFolderPath }.thenReturn(localPath)
+                on { lastActivityTimestamp }.thenReturn(currentTimeInSeconds)
             },
         )
         val expected = listOf(
             DeviceFolderNode(
                 id = backupId.toString(),
                 name = backupName,
-                status = DeviceCenterNodeStatus.Stopped,
+                status = DeviceFolderStatus.Error(null),
                 rootHandle = backupRootHandle,
                 type = backupType,
                 userAgent = backupUserAgent,
@@ -66,7 +69,7 @@ internal class DeviceFolderNodeMapperTest {
 
     @ParameterizedTest(name = "when backup state is {0}")
     @EnumSource(value = BackupInfoState::class, names = ["FAILED", "TEMPORARY_DISABLED"])
-    fun `test that the mapped device folder has an overquota status`(backupState: BackupInfoState) {
+    fun `test that the mapped device folder has an error status if account is overquota`(backupState: BackupInfoState) {
         val backupId = 123456L
         val backupName = "Backup One"
         val backupType = BackupInfoType.CAMERA_UPLOADS
@@ -84,93 +87,14 @@ internal class DeviceFolderNodeMapperTest {
                 on { rootHandle }.thenReturn(backupRootHandle)
                 on { userAgent }.thenReturn(backupUserAgent)
                 on { localFolderPath }.thenReturn(localPath)
+                on { lastActivityTimestamp }.thenReturn(currentTimeInSeconds)
             },
         )
         val expected = listOf(
             DeviceFolderNode(
                 id = backupId.toString(),
                 name = backupName,
-                status = DeviceCenterNodeStatus.Overquota(backupSubState),
-                rootHandle = backupRootHandle,
-                type = backupType,
-                userAgent = backupUserAgent,
-                localFolderPath = localPath,
-            )
-        )
-        assertThat(underTest(backupInfoList)).isEqualTo(expected)
-    }
-
-    @ParameterizedTest(name = "and backup sub state is {0}")
-    @EnumSource(
-        value = SyncError::class,
-        names = ["ACCOUNT_EXPIRED", "ACCOUNT_BLOCKED", "NO_SYNC_ERROR"],
-    )
-    fun `test that the mapped device folder has a blocked status when the backup state is failed`(
-        backupSubState: SyncError,
-    ) {
-        val backupId = 123456L
-        val backupName = "Backup One"
-        val backupType = BackupInfoType.CAMERA_UPLOADS
-        val backupUserAgent = BackupInfoUserAgent.ANDROID
-        val backupRootHandle = NodeId(789012L)
-        val localPath = "storage/emulated/0/DCIM/Camera"
-        val backupInfoList = listOf<BackupInfo>(
-            mock {
-                on { id }.thenReturn(backupId)
-                on { name }.thenReturn(backupName)
-                on { state }.thenReturn(BackupInfoState.FAILED)
-                on { subState }.thenReturn(backupSubState)
-                on { type }.thenReturn(backupType)
-                on { rootHandle }.thenReturn(backupRootHandle)
-                on { userAgent }.thenReturn(backupUserAgent)
-                on { localFolderPath }.thenReturn(localPath)
-            },
-        )
-        val expected = listOf(
-            DeviceFolderNode(
-                id = backupId.toString(),
-                name = backupName,
-                status = DeviceCenterNodeStatus.Blocked(backupSubState),
-                rootHandle = backupRootHandle,
-                type = backupType,
-                userAgent = backupUserAgent,
-                localFolderPath = localPath,
-            )
-        )
-        assertThat(underTest(backupInfoList)).isEqualTo(expected)
-    }
-
-    @ParameterizedTest(name = "and backup sub state is {0}")
-    @EnumSource(
-        value = SyncError::class,
-        names = ["ACCOUNT_EXPIRED", "ACCOUNT_BLOCKED", "NO_SYNC_ERROR"],
-    )
-    fun `test that the mapped device folder has a blocked status when the backup state is temporary disabled`(
-        backupSubState: SyncError,
-    ) {
-        val backupId = 123456L
-        val backupName = "Backup One"
-        val backupType = BackupInfoType.CAMERA_UPLOADS
-        val backupUserAgent = BackupInfoUserAgent.ANDROID
-        val backupRootHandle = NodeId(789012L)
-        val localPath = "storage/emulated/0/DCIM/Camera"
-        val backupInfoList = listOf<BackupInfo>(
-            mock {
-                on { id }.thenReturn(backupId)
-                on { name }.thenReturn(backupName)
-                on { state }.thenReturn(BackupInfoState.TEMPORARY_DISABLED)
-                on { subState }.thenReturn(backupSubState)
-                on { type }.thenReturn(backupType)
-                on { rootHandle }.thenReturn(backupRootHandle)
-                on { userAgent }.thenReturn(backupUserAgent)
-                on { localFolderPath }.thenReturn(localPath)
-            },
-        )
-        val expected = listOf(
-            DeviceFolderNode(
-                id = backupId.toString(),
-                name = backupName,
-                status = DeviceCenterNodeStatus.Blocked(backupSubState),
+                status = DeviceFolderStatus.Error(backupSubState),
                 rootHandle = backupRootHandle,
                 type = backupType,
                 userAgent = backupUserAgent,
@@ -205,13 +129,14 @@ internal class DeviceFolderNodeMapperTest {
                 on { rootHandle }.thenReturn(backupRootHandle)
                 on { userAgent }.thenReturn(backupUserAgent)
                 on { localFolderPath }.thenReturn(localPath)
+                on { lastActivityTimestamp }.thenReturn(currentTimeInSeconds)
             },
         )
         val expected = listOf(
             DeviceFolderNode(
                 id = backupId.toString(),
                 name = backupName,
-                status = DeviceCenterNodeStatus.Error(backupSubState),
+                status = DeviceFolderStatus.Error(backupSubState),
                 rootHandle = backupRootHandle,
                 type = backupType,
                 userAgent = backupUserAgent,
@@ -246,13 +171,14 @@ internal class DeviceFolderNodeMapperTest {
                 on { rootHandle }.thenReturn(backupRootHandle)
                 on { userAgent }.thenReturn(backupUserAgent)
                 on { localFolderPath }.thenReturn(localPath)
+                on { lastActivityTimestamp }.thenReturn(currentTimeInSeconds)
             },
         )
         val expected = listOf(
             DeviceFolderNode(
                 id = backupId.toString(),
                 name = backupName,
-                status = DeviceCenterNodeStatus.Error(backupSubState),
+                status = DeviceFolderStatus.Error(backupSubState),
                 rootHandle = backupRootHandle,
                 type = backupType,
                 userAgent = backupUserAgent,
@@ -263,7 +189,7 @@ internal class DeviceFolderNodeMapperTest {
     }
 
     @Test
-    fun `test that the mapped device folder has a stalled status`() {
+    fun `test that the mapped device folder has an error status when has stalled issues`() {
         val backupId = 123456L
         val backupName = "Some Sync"
         val backupType = BackupInfoType.TWO_WAY_SYNC
@@ -280,13 +206,14 @@ internal class DeviceFolderNodeMapperTest {
                 on { type }.thenReturn(backupType)
                 on { rootHandle }.thenReturn(backupRootHandle)
                 on { localFolderPath }.thenReturn(localPath)
+                on { lastActivityTimestamp }.thenReturn(currentTimeInSeconds)
             },
         )
         val expected = listOf(
             DeviceFolderNode(
                 id = backupId.toString(),
                 name = backupName,
-                status = DeviceCenterNodeStatus.Stalled,
+                status = DeviceFolderStatus.Error(null),
                 rootHandle = backupRootHandle,
                 type = backupType,
                 userAgent = backupUserAgent,
@@ -313,13 +240,14 @@ internal class DeviceFolderNodeMapperTest {
                 on { rootHandle }.thenReturn(backupRootHandle)
                 on { userAgent }.thenReturn(backupUserAgent)
                 on { localFolderPath }.thenReturn(localPath)
+                on { lastActivityTimestamp }.thenReturn(currentTimeInSeconds)
             },
         )
         val expected = listOf(
             DeviceFolderNode(
                 id = backupId.toString(),
                 name = backupName,
-                status = DeviceCenterNodeStatus.Disabled,
+                status = DeviceFolderStatus.Disabled,
                 rootHandle = backupRootHandle,
                 type = backupType,
                 userAgent = backupUserAgent,
@@ -334,7 +262,7 @@ internal class DeviceFolderNodeMapperTest {
         value = BackupInfoType::class,
         names = ["CAMERA_UPLOADS", "MEDIA_UPLOADS"]
     )
-    fun `test that the mapped mobile device folder has an offline status if it is beyond the maximum created backup time`(
+    fun `test that the mapped mobile device folder has an error status if it is offline (beyond the maximum created backup time)`(
         backupType: BackupInfoType,
     ) {
         val currentTimeInSeconds = System.currentTimeMillis() / 1000L
@@ -359,7 +287,7 @@ internal class DeviceFolderNodeMapperTest {
             DeviceFolderNode(
                 id = backupId.toString(),
                 name = backupName,
-                status = DeviceCenterNodeStatus.Offline,
+                status = DeviceFolderStatus.Error(null),
                 rootHandle = backupRootHandle,
                 type = backupType,
                 userAgent = backupUserAgent,
@@ -374,7 +302,7 @@ internal class DeviceFolderNodeMapperTest {
         value = BackupInfoType::class,
         names = ["CAMERA_UPLOADS", "MEDIA_UPLOADS"]
     )
-    fun `test that the mapped mobile device folder has an offline status if it has an invalid handle`(
+    fun `test that the mapped mobile device folder has an error status if it has an invalid handle`(
         backupType: BackupInfoType,
     ) {
         val currentTimeInSeconds = System.currentTimeMillis() / 1000L
@@ -398,7 +326,7 @@ internal class DeviceFolderNodeMapperTest {
             DeviceFolderNode(
                 id = backupId.toString(),
                 name = backupName,
-                status = DeviceCenterNodeStatus.Offline,
+                status = DeviceFolderStatus.Error(null),
                 rootHandle = NodeId(MegaApiJava.INVALID_HANDLE),
                 type = backupType,
                 userAgent = backupUserAgent,
@@ -414,7 +342,7 @@ internal class DeviceFolderNodeMapperTest {
         names = ["CAMERA_UPLOADS", "MEDIA_UPLOADS"],
         mode = EnumSource.Mode.EXCLUDE,
     )
-    fun `test that the mapped non-mobile device folder has an offline status if it is beyond the maximum created backup time`(
+    fun `test that the mapped non-mobile device folder has an error status if it is beyond the maximum created backup time`(
         backupType: BackupInfoType,
     ) {
         val currentTimeInSeconds = System.currentTimeMillis() / 1000L
@@ -439,7 +367,7 @@ internal class DeviceFolderNodeMapperTest {
             DeviceFolderNode(
                 id = backupId.toString(),
                 name = backupName,
-                status = DeviceCenterNodeStatus.Offline,
+                status = DeviceFolderStatus.Error(null),
                 rootHandle = backupRootHandle,
                 type = backupType,
                 userAgent = backupUserAgent,
@@ -455,7 +383,7 @@ internal class DeviceFolderNodeMapperTest {
         names = ["CAMERA_UPLOADS", "MEDIA_UPLOADS"],
         mode = EnumSource.Mode.EXCLUDE,
     )
-    fun `test that the mapped non-mobile device folder has an offline status if it is has an invalid handle`(
+    fun `test that the mapped non-mobile device folder has an error status if it is has an invalid handle`(
         backupType: BackupInfoType,
     ) {
         val currentTimeInSeconds = System.currentTimeMillis() / 1000L
@@ -479,7 +407,7 @@ internal class DeviceFolderNodeMapperTest {
             DeviceFolderNode(
                 id = backupId.toString(),
                 name = backupName,
-                status = DeviceCenterNodeStatus.Offline,
+                status = DeviceFolderStatus.Error(null),
                 rootHandle = NodeId(MegaApiJava.INVALID_HANDLE),
                 type = backupType,
                 userAgent = backupUserAgent,
@@ -496,7 +424,7 @@ internal class DeviceFolderNodeMapperTest {
     )
     fun `test that the mapped device folder has a paused status when the backup type is a two way sync`(
         backupState: BackupInfoState,
-    ) = testPausedStatus(
+    ) = testPausedOrDisabledStatus(
         backupType = BackupInfoType.TWO_WAY_SYNC,
         backupState = backupState,
     )
@@ -508,7 +436,7 @@ internal class DeviceFolderNodeMapperTest {
     )
     fun `test that the mapped device folder has a paused status when the backup type is an upload sync`(
         backupState: BackupInfoState,
-    ) = testPausedStatus(
+    ) = testPausedOrDisabledStatus(
         backupType = BackupInfoType.UP_SYNC,
         backupState = backupState,
     )
@@ -518,9 +446,9 @@ internal class DeviceFolderNodeMapperTest {
         value = BackupInfoState::class,
         names = ["PAUSE_UP", "PAUSE_FULL"]
     )
-    fun `test that the mapped device folder has a paused status when the backup type is camera uploads`(
+    fun `test that the mapped device folder has a disabled status when the backup type is camera uploads`(
         backupState: BackupInfoState,
-    ) = testPausedStatus(
+    ) = testPausedOrDisabledStatus(
         backupType = BackupInfoType.CAMERA_UPLOADS,
         backupState = backupState,
     )
@@ -530,9 +458,9 @@ internal class DeviceFolderNodeMapperTest {
         value = BackupInfoState::class,
         names = ["PAUSE_UP", "PAUSE_FULL"]
     )
-    fun `test that the mapped device folder has a paused status when the backup type is media uploads`(
+    fun `test that the mapped device folder has a disabled status when the backup type is media uploads`(
         backupState: BackupInfoState,
-    ) = testPausedStatus(
+    ) = testPausedOrDisabledStatus(
         backupType = BackupInfoType.MEDIA_UPLOADS,
         backupState = backupState,
     )
@@ -544,7 +472,7 @@ internal class DeviceFolderNodeMapperTest {
     )
     fun `test that the mapped device folder has a paused status when the backup type is a backup upload`(
         backupState: BackupInfoState,
-    ) = testPausedStatus(
+    ) = testPausedOrDisabledStatus(
         backupType = BackupInfoType.BACKUP_UPLOAD,
         backupState = backupState,
     )
@@ -556,12 +484,15 @@ internal class DeviceFolderNodeMapperTest {
     )
     fun `test that the mapped device folder has a paused status when the backup type is a download sync`(
         backupState: BackupInfoState,
-    ) = testPausedStatus(
+    ) = testPausedOrDisabledStatus(
         backupType = BackupInfoType.DOWN_SYNC,
         backupState = backupState,
     )
 
-    private fun testPausedStatus(backupType: BackupInfoType, backupState: BackupInfoState) {
+    private fun testPausedOrDisabledStatus(
+        backupType: BackupInfoType,
+        backupState: BackupInfoState,
+    ) {
         val currentTimeInSeconds = System.currentTimeMillis() / 1000L
         val backupId = 123456L
         val backupName = "Backup One"
@@ -585,7 +516,10 @@ internal class DeviceFolderNodeMapperTest {
             DeviceFolderNode(
                 id = backupId.toString(),
                 name = backupName,
-                status = DeviceCenterNodeStatus.Paused,
+                status = when (backupType) {
+                    BackupInfoType.CAMERA_UPLOADS, BackupInfoType.MEDIA_UPLOADS -> DeviceFolderStatus.Disabled
+                    else -> DeviceFolderStatus.Paused
+                },
                 rootHandle = backupRootHandle,
                 type = backupType,
                 userAgent = backupUserAgent,
@@ -628,7 +562,7 @@ internal class DeviceFolderNodeMapperTest {
             DeviceFolderNode(
                 id = backupId.toString(),
                 name = backupName,
-                status = DeviceCenterNodeStatus.UpToDate,
+                status = DeviceFolderStatus.UpToDate,
                 rootHandle = backupRootHandle,
                 type = backupType,
                 userAgent = backupUserAgent,
@@ -671,7 +605,7 @@ internal class DeviceFolderNodeMapperTest {
             DeviceFolderNode(
                 id = backupId.toString(),
                 name = backupName,
-                status = DeviceCenterNodeStatus.UpToDate,
+                status = DeviceFolderStatus.UpToDate,
                 rootHandle = backupRootHandle,
                 type = backupType,
                 userAgent = backupUserAgent,
@@ -682,7 +616,7 @@ internal class DeviceFolderNodeMapperTest {
     }
 
     @Test
-    fun `test that the mapped device folder has an initializing status`() {
+    fun `test that the mapped device folder has an updating status when the heartbeat status is unknown`() {
         val currentTimeInSeconds = System.currentTimeMillis() / 1000L
         val backupId = 123456L
         val backupName = "Backup One"
@@ -707,7 +641,7 @@ internal class DeviceFolderNodeMapperTest {
             DeviceFolderNode(
                 id = backupId.toString(),
                 name = backupName,
-                status = DeviceCenterNodeStatus.Initializing,
+                status = DeviceFolderStatus.Updating(0),
                 rootHandle = backupRootHandle,
                 type = backupType,
                 userAgent = backupUserAgent,
@@ -718,7 +652,7 @@ internal class DeviceFolderNodeMapperTest {
     }
 
     @Test
-    fun `test that the mapped device folder has a syncing status`() {
+    fun `test that the mapped device folder has an updating status the heartbeat status is syncing`() {
         val currentTimeInSeconds = System.currentTimeMillis() / 1000L
         val backupId = 123456L
         val backupName = "Backup One"
@@ -745,7 +679,7 @@ internal class DeviceFolderNodeMapperTest {
             DeviceFolderNode(
                 id = backupId.toString(),
                 name = backupName,
-                status = DeviceCenterNodeStatus.Syncing(backupProgress),
+                status = DeviceFolderStatus.Updating(backupProgress),
                 rootHandle = backupRootHandle,
                 type = backupType,
                 userAgent = backupUserAgent,
@@ -756,7 +690,7 @@ internal class DeviceFolderNodeMapperTest {
     }
 
     @Test
-    fun `test that the mapped device folder has a scanning status`() {
+    fun `test that the mapped device folder has an updating status the heartbeat status is pending`() {
         val currentTimeInSeconds = System.currentTimeMillis() / 1000L
         val backupId = 123456L
         val backupName = "Backup One"
@@ -781,7 +715,7 @@ internal class DeviceFolderNodeMapperTest {
             DeviceFolderNode(
                 id = backupId.toString(),
                 name = backupName,
-                status = DeviceCenterNodeStatus.Scanning,
+                status = DeviceFolderStatus.Updating(0),
                 rootHandle = backupRootHandle,
                 type = backupType,
                 userAgent = backupUserAgent,

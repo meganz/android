@@ -160,10 +160,10 @@ internal class DeviceCenterViewModelTest {
                 assertThat(secondState.itemsToDisplay).isEqualTo(listOf(ownDeviceFolderUINode))
 
                 val updatedOwnDeviceFolderUINode = ownDeviceFolderUINode.copy(
-                    status = DeviceCenterUINodeStatus.Initializing,
+                    status = DeviceCenterUINodeStatus.Updating,
                 )
                 val updatedOwnDeviceUINode = ownDeviceUINode.copy(
-                    status = DeviceCenterUINodeStatus.Initializing,
+                    status = DeviceCenterUINodeStatus.Updating,
                     folders = listOf(updatedOwnDeviceFolderUINode)
                 )
                 whenever(
@@ -198,7 +198,7 @@ internal class DeviceCenterViewModelTest {
 
                 val updatedOwnDeviceUINode = ownDeviceUINode.copy(
                     id = "9012-3456",
-                    status = DeviceCenterUINodeStatus.Initializing,
+                    status = DeviceCenterUINodeStatus.Updating,
                 )
                 whenever(
                     deviceUINodeListMapper(
@@ -226,7 +226,7 @@ internal class DeviceCenterViewModelTest {
                 assertThat(firstState.itemsToDisplay).isEqualTo(listOf(ownDeviceUINode))
 
                 val updatedOwnDeviceUINode = ownDeviceUINode.copy(
-                    status = DeviceCenterUINodeStatus.Initializing,
+                    status = DeviceCenterUINodeStatus.Updating,
                 )
                 whenever(
                     deviceUINodeListMapper(
