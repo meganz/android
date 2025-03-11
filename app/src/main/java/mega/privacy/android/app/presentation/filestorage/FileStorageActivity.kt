@@ -210,7 +210,7 @@ class FileStorageActivity : PasscodeActivity(), Scrollable {
     }
 
     private fun observeUiState() {
-        collectFlow(viewModel.uiState.distinctUntilChangedBy { (it as? FileStorageUiState.Loaded)?.children }) {
+        collectFlow(viewModel.uiState) {
             when (it) {
                 is FileStorageUiState.Loaded -> {
                     checkMenuVisibility(it.currentFolder?.uriPath)
