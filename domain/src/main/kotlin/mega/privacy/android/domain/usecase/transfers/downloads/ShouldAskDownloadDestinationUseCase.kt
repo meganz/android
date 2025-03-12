@@ -18,7 +18,7 @@ class ShouldAskDownloadDestinationUseCase @Inject constructor(
      * Invoke
      */
     suspend operator fun invoke(): Boolean =
-        getFeatureFlagValueUseCase(DomainFeatures.AllowToChooseDownloadDestination) || transferRepository.allowUserToSetDownloadDestination()
+        (getFeatureFlagValueUseCase(DomainFeatures.AllowToChooseDownloadDestination) || transferRepository.allowUserToSetDownloadDestination())
                 && (settingsRepository.isStorageAskAlways() || settingsRepository.getStorageDownloadLocation() == null)
 
 }

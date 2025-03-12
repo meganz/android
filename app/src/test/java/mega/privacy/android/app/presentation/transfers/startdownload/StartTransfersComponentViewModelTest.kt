@@ -453,6 +453,13 @@ class StartTransfersComponentViewModelTest {
         }
 
     @Test
+    fun `test that saveDoNotPromptToSaveDestinationUseCase is set to false when saveDestination is invoked`() =
+        runTest {
+            underTest.saveDestination("destination")
+            verify(saveDoNotPromptToSaveDestinationUseCase).invoke()
+        }
+
+    @Test
     fun `test that setStorageDownloadLocationUseCase is invoked when saveDestination is invoked`() =
         runTest {
             val destination = "destination"

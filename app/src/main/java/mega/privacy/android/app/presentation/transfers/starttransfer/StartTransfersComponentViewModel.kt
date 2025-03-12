@@ -546,6 +546,7 @@ internal class StartTransfersComponentViewModel @Inject constructor(
     fun saveDestination(destination: String) {
         viewModelScope.launch {
             runCatching {
+                saveDoNotPromptToSaveDestinationUseCase()
                 setStorageDownloadLocationUseCase(destination)
                 setStorageDownloadAskAlwaysUseCase(false)
             }.onFailure {
