@@ -1,8 +1,8 @@
 package mega.privacy.android.app.listeners
 
-import mega.privacy.android.shared.resources.R as sharedR
 import mega.privacy.android.app.R
 import mega.privacy.android.app.presentation.weakaccountprotection.WeakAccountProtectionAlertActivity
+import mega.privacy.android.shared.resources.R as sharedR
 import nz.mega.sdk.MegaApiJava
 import nz.mega.sdk.MegaError
 import nz.mega.sdk.MegaRequest

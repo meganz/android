@@ -1,5 +1,6 @@
 package mega.privacy.android.app.presentation.login.confirmemail
 
+import android.content.Intent
 import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.ViewGroup
@@ -10,10 +11,15 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.ComposeView
 import androidx.compose.ui.platform.ViewCompositionStrategy
 import androidx.fragment.app.Fragment
+import androidx.fragment.app.viewModels
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
+import androidx.lifecycle.lifecycleScope
 import dagger.hilt.android.AndroidEntryPoint
+import kotlinx.coroutines.launch
+import mega.android.core.ui.theme.AndroidTheme
 import mega.privacy.android.app.presentation.extensions.isDarkMode
 import mega.privacy.android.app.presentation.login.confirmemail.view.ConfirmEmailRoute
+import mega.privacy.android.app.presentation.login.confirmemail.view.NewConfirmEmailRoute
 import mega.privacy.android.app.presentation.login.model.LoginFragmentType
 import mega.privacy.android.domain.entity.ThemeMode
 import mega.privacy.android.domain.usecase.GetThemeMode
@@ -31,6 +37,8 @@ class ConfirmEmailFragment : Fragment() {
      */
     @Inject
     lateinit var getThemeMode: GetThemeMode
+
+    private val viewModel: ConfirmEmailViewModel by viewModels()
 
     internal var onShowPendingFragment: ((fragmentType: LoginFragmentType) -> Unit)? = null
     internal var onSetTemporalEmail: ((email: String) -> Unit)? = null
@@ -59,25 +67,67 @@ class ConfirmEmailFragment : Fragment() {
         setViewCompositionStrategy(ViewCompositionStrategy.DisposeOnViewTreeLifecycleDestroyed)
         setContent {
             val themeMode by getThemeMode().collectAsStateWithLifecycle(initialValue = ThemeMode.System)
+            val uiState by viewModel.uiState.collectAsStateWithLifecycle()
 
-            OriginalTheme(isDark = themeMode.isDarkMode()) {
-                ConfirmEmailRoute(
-                    modifier = Modifier
-                        .systemBarsPadding()
-                        .fillMaxSize(),
-                    email = emailTemp.orEmpty(),
-                    fullName = firstNameTemp,
-                    onShowPendingFragment = {
-                        onShowPendingFragment?.invoke(it)
-                    },
-                    onSetTemporalEmail = {
-                        onSetTemporalEmail?.invoke(it)
-                    },
-                    onCancelConfirmationAccount = {
-                        onCancelConfirmationAccount?.invoke()
-                    }
-                )
+            if (uiState.isNewRegistrationUiEnabled == true) {
+                AndroidTheme(isDark = themeMode.isDarkMode()) {
+                    NewConfirmEmailRoute(
+                        modifier = Modifier
+                            .systemBarsPadding()
+                            .fillMaxSize(),
+                        email = emailTemp.orEmpty(),
+                        fullName = firstNameTemp,
+                        onShowPendingFragment = {
+                            onShowPendingFragment?.invoke(it)
+                        },
+                        onSetTemporalEmail = {
+                            onSetTemporalEmail?.invoke(it)
+                        },
+                        onCancelConfirmationAccount = {
+                            onCancelConfirmationAccount?.invoke()
+                        },
+                        viewModel = viewModel,
+                        sendFeedbackEmail = ::sendFeedbackEmail,
+                        onNavigateToChangeEmailAddress = {
+
+                        }
+                    )
+                }
+            } else if (uiState.isNewRegistrationUiEnabled == false) {
+                OriginalTheme(isDark = themeMode.isDarkMode()) {
+                    ConfirmEmailRoute(
+                        modifier = Modifier
+                            .systemBarsPadding()
+                            .fillMaxSize(),
+                        email = emailTemp.orEmpty(),
+                        fullName = firstNameTemp,
+                        onShowPendingFragment = {
+                            onShowPendingFragment?.invoke(it)
+                        },
+                        onSetTemporalEmail = {
+                            onSetTemporalEmail?.invoke(it)
+                        },
+                        onCancelConfirmationAccount = {
+                            onCancelConfirmationAccount?.invoke()
+                        },
+                        viewModel = viewModel
+                    )
+                }
             }
+        }
+    }
+
+    private fun sendFeedbackEmail(email: String) {
+        viewLifecycleOwner.lifecycleScope.launch {
+            val emailIntent = Intent(Intent.ACTION_SEND).apply {
+                type = "text/plain"
+                putExtra(Intent.EXTRA_EMAIL, arrayOf(email))
+                putExtra(Intent.EXTRA_SUBJECT, "Mega Feedback")
+                putExtra(Intent.EXTRA_TEXT, viewModel.generateSupportEmailBody())
+            }
+            val intent = Intent.createChooser(emailIntent, " ")
+            intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK)
+            startActivity(intent)
         }
     }
 

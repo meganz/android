@@ -9,14 +9,17 @@ import kotlinx.coroutines.flow.catch
 import kotlinx.coroutines.flow.collectLatest
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
+import mega.privacy.android.app.featuretoggle.AppFeatures
 import mega.privacy.android.app.presentation.login.confirmemail.model.ConfirmEmailUiState
 import mega.privacy.android.app.presentation.login.model.LoginFragmentType
 import mega.privacy.android.domain.exception.MegaException
 import mega.privacy.android.domain.usecase.account.CancelCreateAccountUseCase
 import mega.privacy.android.domain.usecase.createaccount.MonitorAccountConfirmationUseCase
+import mega.privacy.android.domain.usecase.featureflag.GetFeatureFlagValueUseCase
 import mega.privacy.android.domain.usecase.login.SaveLastRegisteredEmailUseCase
 import mega.privacy.android.domain.usecase.login.confirmemail.ResendSignUpLinkUseCase
 import mega.privacy.android.domain.usecase.network.MonitorConnectivityUseCase
+import mega.privacy.android.domain.usecase.support.GenerateSupportEmailBodyUseCase
 import timber.log.Timber
 import javax.inject.Inject
 
@@ -32,6 +35,8 @@ class ConfirmEmailViewModel @Inject constructor(
     private val cancelCreateAccountUseCase: CancelCreateAccountUseCase,
     private val saveLastRegisteredEmailUseCase: SaveLastRegisteredEmailUseCase,
     private val monitorConnectivityUseCase: MonitorConnectivityUseCase,
+    private val getFeatureFlagValueUseCase: GetFeatureFlagValueUseCase,
+    private val generateSupportEmailBodyUseCase: GenerateSupportEmailBodyUseCase,
 ) : ViewModel() {
 
     private val _uiState = MutableStateFlow(ConfirmEmailUiState())
@@ -45,6 +50,18 @@ class ConfirmEmailViewModel @Inject constructor(
         }
 
         monitorConnectivity()
+
+        viewModelScope.launch {
+            runCatching {
+                getFeatureFlagValueUseCase(AppFeatures.RegistrationRevamp)
+            }.onSuccess { isEnabled ->
+                _uiState.update {
+                    it.copy(isNewRegistrationUiEnabled = isEnabled)
+                }
+            }.onFailure {
+                Timber.e(it)
+            }
+        }
     }
 
     private fun monitorConnectivity() {
@@ -71,6 +88,7 @@ class ConfirmEmailViewModel @Inject constructor(
     internal fun resendSignUpLink(email: String, fullName: String?) {
         viewModelScope.launch {
             Timber.d("Resending the sign-up link")
+            _uiState.update { it.copy(isLoading = true) }
             runCatching { resendSignUpLinkUseCase(email = email, fullName = fullName) }
                 .onSuccess { email ->
                     updateRegisteredEmail(email)
@@ -84,12 +102,14 @@ class ConfirmEmailViewModel @Inject constructor(
                         }
                     }
                 }
+            _uiState.update { it.copy(isLoading = false) }
         }
     }
 
     internal fun cancelCreateAccount() {
         viewModelScope.launch {
             Timber.d("Cancelling the registration process")
+            _uiState.update { it.copy(isLoading = true) }
             runCatching { cancelCreateAccountUseCase() }
                 .onSuccess { email ->
                     updateRegisteredEmail(email)
@@ -103,6 +123,7 @@ class ConfirmEmailViewModel @Inject constructor(
                         }
                     }
                 }
+            _uiState.update { it.copy(isLoading = false) }
         }
     }
 
@@ -143,4 +164,13 @@ class ConfirmEmailViewModel @Inject constructor(
             }.onFailure { Timber.e(it) }
         }
     }
+
+    /**
+     * Generate the support email body
+     */
+    suspend fun generateSupportEmailBody() = runCatching {
+        generateSupportEmailBodyUseCase()
+    }.onFailure { Timber.e(it) }
+        .getOrNull()
+        .orEmpty()
 }

@@ -8,9 +8,11 @@ import mega.privacy.android.core.test.extension.CoroutineMainDispatcherExtension
 import mega.privacy.android.domain.exception.MegaException
 import mega.privacy.android.domain.usecase.account.CancelCreateAccountUseCase
 import mega.privacy.android.domain.usecase.createaccount.MonitorAccountConfirmationUseCase
+import mega.privacy.android.domain.usecase.featureflag.GetFeatureFlagValueUseCase
 import mega.privacy.android.domain.usecase.login.SaveLastRegisteredEmailUseCase
 import mega.privacy.android.domain.usecase.login.confirmemail.ResendSignUpLinkUseCase
 import mega.privacy.android.domain.usecase.network.MonitorConnectivityUseCase
+import mega.privacy.android.domain.usecase.support.GenerateSupportEmailBodyUseCase
 import org.junit.jupiter.api.AfterEach
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
@@ -34,6 +36,8 @@ class ConfirmEmailViewModelTest {
     private val cancelCreateAccountUseCase: CancelCreateAccountUseCase = mock()
     private val saveLastRegisteredEmailUseCase: SaveLastRegisteredEmailUseCase = mock()
     private val monitorConnectivityUseCase: MonitorConnectivityUseCase = mock()
+    private val generateSupportEmailBodyUseCase: GenerateSupportEmailBodyUseCase = mock()
+    private val getFeatureFlagValueUseCase: GetFeatureFlagValueUseCase = mock()
 
     private lateinit var underTest: ConfirmEmailViewModel
 
@@ -53,7 +57,9 @@ class ConfirmEmailViewModelTest {
             resendSignUpLinkUseCase = resendSignUpLinkUseCase,
             cancelCreateAccountUseCase = cancelCreateAccountUseCase,
             saveLastRegisteredEmailUseCase = saveLastRegisteredEmailUseCase,
-            monitorConnectivityUseCase = monitorConnectivityUseCase
+            monitorConnectivityUseCase = monitorConnectivityUseCase,
+            generateSupportEmailBodyUseCase = generateSupportEmailBodyUseCase,
+            getFeatureFlagValueUseCase = getFeatureFlagValueUseCase
         )
     }
 
@@ -64,7 +70,8 @@ class ConfirmEmailViewModelTest {
             resendSignUpLinkUseCase,
             cancelCreateAccountUseCase,
             saveLastRegisteredEmailUseCase,
-            monitorConnectivityUseCase
+            monitorConnectivityUseCase,
+            getFeatureFlagValueUseCase
         )
     }
 
@@ -195,5 +202,13 @@ class ConfirmEmailViewModelTest {
         underTest.uiState.test {
             assertThat(expectMostRecentItem().errorMessage).isNull()
         }
+    }
+
+    @Test
+    fun `test that generate support email body returns the correct value`() = runTest {
+        val body = "body"
+        whenever(generateSupportEmailBodyUseCase()) doReturn body
+
+        assertThat(underTest.generateSupportEmailBody()).isEqualTo(body)
     }
 }
