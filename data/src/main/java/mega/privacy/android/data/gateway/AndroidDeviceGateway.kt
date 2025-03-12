@@ -4,6 +4,7 @@ import android.app.ActivityManager
 import android.content.Context
 import android.content.Context.BATTERY_SERVICE
 import android.content.Intent
+import android.icu.util.Calendar
 import android.net.ConnectivityManager
 import android.os.BatteryManager
 import android.os.Build
@@ -139,6 +140,8 @@ internal class AndroidDeviceGateway @Inject constructor(
         val isCharging = batteryManager.isCharging
         return BatteryInfo(level = level, isCharging = isCharging)
     }
+
+    override fun getTimezone(): String = Calendar.getInstance().timeZone.id
 
     override val monitorBatteryInfo =
         context.registerReceiverAsFlow(

@@ -168,4 +168,12 @@ internal class EnvironmentRepositoryImplTest {
             cancelAndIgnoreRemainingEvents()
         }
     }
+
+    @Test
+    fun `test that getTimezone returns the correct timezone`() = runTest {
+        val expectedTimezone = "expectedTimezone"
+        whenever(deviceGateway.getTimezone()).thenReturn(expectedTimezone)
+
+        assertThat(underTest.getTimezone()).isEqualTo(expectedTimezone)
+    }
 }

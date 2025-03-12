@@ -135,4 +135,6 @@ internal class EnvironmentRepositoryImpl @Inject constructor(
             }
         }
     }
+
+    override fun getTimezone(): String = deviceGateway.getTimezone()
 }

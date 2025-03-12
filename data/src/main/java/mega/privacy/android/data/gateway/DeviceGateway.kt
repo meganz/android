@@ -125,4 +125,9 @@ interface DeviceGateway {
      * Get the number of available processors
      */
     fun getAvailableProcessors(): Int
+
+    /**
+     * Get current timezone
+     */
+    fun getTimezone(): String
 }

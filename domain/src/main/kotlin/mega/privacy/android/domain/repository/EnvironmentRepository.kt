@@ -104,4 +104,10 @@ interface EnvironmentRepository {
      * Get historical process exit reasons and log to Timber
      */
     suspend fun getHistoricalProcessExitReasons()
+
+    /**
+     * Get timezone
+     *
+     */
+    fun getTimezone(): String
 }
