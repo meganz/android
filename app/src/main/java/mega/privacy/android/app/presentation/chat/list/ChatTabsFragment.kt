@@ -541,15 +541,15 @@ class ChatTabsFragment : Fragment() {
 
                 menu.apply {
                     findItem(R.id.menu_chat_unmute)?.isVisible =
-                        selectedItems.all { it.isMuted }
+                        selectedItems.all { it.isMuted && it.isActive }
                     findItem(R.id.menu_chat_mute)?.isVisible =
-                        selectedItems.all { !it.isMuted }
+                        selectedItems.all { !it.isMuted && it.isActive }
                     findItem(R.id.menu_chat_select_all)?.isVisible =
                         selectedItems.size != currentItems.size
                     findItem(R.id.menu_chat_leave)?.isVisible =
                         selectedItems.all {
-                            it is ChatRoomItem.GroupChatRoomItem
-                                    || it is ChatRoomItem.MeetingChatRoomItem
+                            (it is ChatRoomItem.GroupChatRoomItem
+                                    || it is ChatRoomItem.MeetingChatRoomItem) && it.isActive
                         }
                 }
                 return true

@@ -293,15 +293,17 @@ internal fun ChatRoomItemBottomSheetView(
                     }
 
                     item is ChatRoomItem.GroupChatRoomItem -> {
-                        ChatDivider()
-                        MenuItem(
-                            modifier = Modifier.testTag("leave"),
-                            res = R.drawable.ic_log_out,
-                            text = R.string.general_leave,
-                            description = "Leave",
-                            tintRed = true,
-                            onClick = onLeaveClick
-                        )
+                        if (item.isActive) {
+                            ChatDivider()
+                            MenuItem(
+                                modifier = Modifier.testTag("leave"),
+                                res = R.drawable.ic_log_out,
+                                text = R.string.general_leave,
+                                description = "Leave",
+                                tintRed = true,
+                                onClick = onLeaveClick
+                            )
+                        }
                     }
                 }
             }
