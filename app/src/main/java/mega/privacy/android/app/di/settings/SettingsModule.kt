@@ -5,12 +5,13 @@ import dagger.Provides
 import dagger.hilt.InstallIn
 import dagger.hilt.components.SingletonComponent
 import dagger.multibindings.ElementsIntoSet
-import dagger.multibindings.IntoSet
 import mega.privacy.android.app.presentation.settings.compose.appearance.navigation.AppearanceFeatureSetting
 import mega.privacy.android.app.presentation.settings.compose.appearance.navigation.appearanceSettingEntryPoint
 import mega.privacy.android.app.presentation.settings.compose.navigation.appFeatureSettings
 import mega.privacy.android.app.presentation.settings.compose.navigation.appFeatureSettingsEntryPoints
 import mega.privacy.android.app.presentation.settings.compose.navigation.appMoreSettingsEntryPoints
+import mega.privacy.android.app.presentation.settings.compose.security.navigation.SecurityFeatureSetting
+import mega.privacy.android.app.presentation.settings.compose.security.navigation.securitySettingEntryPoint
 import mega.privacy.android.app.presentation.settings.model.PreferenceResource
 import mega.privacy.android.domain.repository.SettingsRepository
 import mega.privacy.android.domain.usecase.GetPreference
@@ -41,9 +42,9 @@ abstract class SettingsModule {
             appMoreSettingsEntryPoints
 
         @Provides
-        @IntoSet
-        fun provideAppearanceSettingEntryPoint(): FeatureSettingEntryPoint =
-            appearanceSettingEntryPoint
+        @ElementsIntoSet
+        fun provideAppearanceSettingEntryPoint(): Set<@JvmSuppressWildcards FeatureSettingEntryPoint> =
+            setOf(appearanceSettingEntryPoint, securitySettingEntryPoint)
 
         @Provides
         @ElementsIntoSet
@@ -103,8 +104,11 @@ abstract class SettingsModule {
             appFeatureSettings
 
         @Provides
-        @IntoSet
-        fun provideAppearanceFeatureSettings(): FeatureSettings = AppearanceFeatureSetting
+        @ElementsIntoSet
+        fun provideAppearanceFeatureSettings(): Set<@JvmSuppressWildcards FeatureSettings> = setOf(
+            AppearanceFeatureSetting,
+            SecurityFeatureSetting,
+        )
     }
 
 }

@@ -25,7 +25,6 @@ import mega.privacy.mobile.analytics.event.ChatAndMeetingsSettingsItemSelectedEv
 import mega.privacy.mobile.analytics.event.FileManagementSettingsItemSelectedEvent
 import mega.privacy.mobile.analytics.event.HelpAndFeedbackSettingsItemSelectedEvent
 import mega.privacy.mobile.analytics.event.MediaSettingsItemSelectedEvent
-import mega.privacy.mobile.analytics.event.SecuritySettingsItemSelectedEvent
 import mega.privacy.mobile.analytics.event.SyncSettingsItemSelectedEvent
 
 internal val appFeatureSettingsEntryPoints = setOf<FeatureSettingEntryPoint>(
@@ -69,14 +68,6 @@ internal val appFeatureSettingsEntryPoints = setOf<FeatureSettingEntryPoint>(
         preferredOrdinal = 60,
         destination = FakeSetting1,
         analyticsEvent = ChatAndMeetingsSettingsItemSelectedEvent,
-    ),
-    FeatureSettingEntryPoint(
-        key = "security",
-        title = R.string.settings_security_options_title,
-        icon = iconPackR.drawable.ic_gear_six_medium_regular_outline,
-        preferredOrdinal = 70,
-        destination = FakeSetting1,
-        analyticsEvent = SecuritySettingsItemSelectedEvent,
     ),
     FeatureSettingEntryPoint(
         key = "advanced",

@@ -49,6 +49,7 @@ import mega.android.core.ui.components.image.MegaIcon
 import mega.android.core.ui.components.toolbar.AppBarNavigationType
 import mega.android.core.ui.components.toolbar.MegaTopAppBar
 import mega.android.core.ui.theme.AndroidThemeForPreviews
+import mega.android.core.ui.theme.values.IconColor
 import mega.android.core.ui.theme.values.TextColor
 import mega.privacy.android.analytics.Analytics
 import mega.privacy.android.app.R
@@ -220,11 +221,16 @@ private fun LazyListScope.listEntryPoints(
                 modifier = Modifier.wrapContentWidth(),
                 horizontalArrangement = Arrangement.Start
             ) {
-                MegaIcon(painter = painterResource(it.navData.icon), contentDescription = null)
+                MegaIcon(
+                    painter = painterResource(it.navData.icon),
+                    tint = IconColor.Primary,
+                    contentDescription = null
+                )
                 MegaText(text = stringResource(it.navData.title), textColor = TextColor.Primary)
             }
             MegaIcon(
                 painter = rememberVectorPainter(ImageVector.vectorResource(id = R.drawable.ic_chevron_right)),
+                tint = IconColor.Primary,
                 contentDescription = null,
             )
         }
