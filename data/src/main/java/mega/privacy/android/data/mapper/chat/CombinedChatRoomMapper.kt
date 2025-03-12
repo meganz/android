@@ -45,5 +45,6 @@ internal class CombinedChatRoomMapper @Inject constructor(
         megaChatRoom.isWaitingRoom,
         megaChatRoom.isOpenInvite,
         megaChatRoom.isSpeakRequest,
+        megaChatRoom.isNoteToSelf
     )
 }

@@ -109,6 +109,61 @@ sealed class ChatRoomItem(
     )
 
     /**
+     * Note to self chat room item
+     *
+     * @property userChatStatus
+     * @property avatar
+     * @property peerHandle
+     * @property peerEmail
+     * @property chatId
+     * @property title
+     * @property lastMessage
+     * @property lastMessageType
+     * @property currentCallStatus
+     * @property unreadCount
+     * @property hasPermissions
+     * @property isActive
+     * @property isMuted
+     * @property isArchived
+     * @property lastTimestamp
+     * @property lastTimestampFormatted
+     * @property highlight
+     * @property header
+     * @constructor Create empty Individual chat room item
+     */
+    data class NoteToSelfChatRoomItem(
+        val userChatStatus: UserChatStatus? = null,
+        val avatar: ChatAvatarItem? = null,
+        val peerHandle: Long? = null,
+        val peerEmail: String? = null,
+        override val call: ChatCall? = null,
+        override val chatId: Long,
+        override val title: String,
+        override val lastMessage: String? = null,
+        override val lastMessageType: ChatRoomLastMessage = ChatRoomLastMessage.Unknown,
+        override val currentCallStatus: ChatRoomItemStatus = ChatRoomItemStatus.NotStarted,
+        override val unreadCount: Int = 0,
+        override val hasPermissions: Boolean = false,
+        override val isActive: Boolean = false,
+        override val isMuted: Boolean = false,
+        override val isArchived: Boolean = false,
+        override val lastTimestamp: Long = 0L,
+        override val lastTimestampFormatted: String? = null,
+        override val highlight: Boolean = false,
+        override val header: String? = null,
+    ) : ChatRoomItem(
+        call, chatId, title, lastMessage, lastMessageType, currentCallStatus,
+        unreadCount, hasPermissions, isActive, isMuted, isArchived, lastTimestamp,
+        lastTimestampFormatted, highlight, header
+    ) {
+        /**
+         * Check if the note to self chat room is empty
+         */
+        val isEmptyNoteToSelfChatRoom
+            get():Boolean = lastMessageType == ChatRoomLastMessage.Invalid || lastMessageType == ChatRoomLastMessage.Unknown
+    }
+
+    /**
      * Group chat room item
      *
      * @property isPublic
@@ -287,6 +342,7 @@ sealed class ChatRoomItem(
         is IndividualChatRoomItem -> avatar?.let(::listOf)
         is GroupChatRoomItem -> avatars
         is MeetingChatRoomItem -> avatars
+        is NoteToSelfChatRoomItem -> null
     }
 
     /**
@@ -342,6 +398,28 @@ sealed class ChatRoomItem(
             header = header,
             userChatStatus = userChatStatus ?: this.userChatStatus,
             avatar = avatarItems?.firstOrNull() ?: this.avatar,
+            peerHandle = peerHandle ?: this.peerHandle,
+            peerEmail = peerEmail ?: this.peerEmail,
+        )
+
+        is NoteToSelfChatRoomItem -> copy(
+            call = null,
+            chatId = chatId,
+            title = title,
+            lastMessage = lastMessage,
+            lastMessageType = lastMessageType,
+            currentCallStatus = currentCallStatus,
+            unreadCount = 0,
+            hasPermissions = hasPermissions,
+            isActive = isActive,
+            isArchived = isArchived,
+            isMuted = false,
+            lastTimestamp = lastTimestamp,
+            lastTimestampFormatted = lastTimestampFormatted,
+            highlight = highlight,
+            header = header,
+            userChatStatus = null,
+            avatar = null,
             peerHandle = peerHandle ?: this.peerHandle,
             peerEmail = peerEmail ?: this.peerEmail,
         )

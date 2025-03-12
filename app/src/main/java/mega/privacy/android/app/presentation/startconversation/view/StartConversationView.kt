@@ -57,12 +57,10 @@ import mega.privacy.android.shared.original.core.ui.controls.buttons.RaisedDefau
 import mega.privacy.android.shared.original.core.ui.controls.text.MegaText
 import mega.privacy.android.shared.original.core.ui.preview.CombinedThemePreviews
 import mega.privacy.android.shared.original.core.ui.theme.OriginalTheme
-import mega.privacy.android.shared.original.core.ui.theme.grey_alpha_012
 import mega.android.core.ui.theme.values.TextColor
 import mega.privacy.android.app.presentation.meeting.chat.view.NoteToSelfView
 import mega.privacy.android.shared.original.core.ui.controls.dividers.DividerType
 import mega.privacy.android.shared.original.core.ui.controls.dividers.MegaDivider
-import mega.privacy.android.shared.original.core.ui.theme.white_alpha_012
 
 /**
  * Composable function that displays the Start Conversation screen.

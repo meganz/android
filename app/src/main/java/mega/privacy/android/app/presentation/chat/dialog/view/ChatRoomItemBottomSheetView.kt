@@ -95,6 +95,7 @@ internal fun ChatRoomItemBottomSheetView(
         ) {
             val (avatarImage, titleText, subtitleText, statusIcon) = createRefs()
             val subtitle = when (item) {
+                is ChatRoomItem.NoteToSelfChatRoomItem -> null
                 is IndividualChatRoomItem -> item.peerEmail
                 is ChatRoomItem.GroupChatRoomItem -> stringResource(id = R.string.group_chat_label)
                 is ChatRoomItem.MeetingChatRoomItem -> {

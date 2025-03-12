@@ -9,35 +9,34 @@ import org.junit.Rule
 import org.junit.Test
 import org.junit.runner.RunWith
 
+
 @RunWith(AndroidJUnit4::class)
-class NoteToSelfViewTest {
+class NoteToSelfAvatarViewTest {
 
     @get:Rule
     var composeRule = createAndroidComposeRule<ComponentActivity>()
 
     @Test
-    fun `test that text is shown`() {
-        initComposeRuleContent()
+    fun `test that avatar is shown`() {
+        initComposeRuleContent(isHint = false)
         composeRule.onNodeWithTag(
-            NOTE_TO_SELF_ITEM_TITLE_TEXT,
+            NOTE_TO_SELF_ITEM_AVATAR_IMAGE,
             useUnmergedTree = true
         ).assertIsDisplayed()
     }
 
     @Test
-    fun `test that new is shown`() {
-        initComposeRuleContent(isNew = true, isHint = true)
+    fun `test that hint is shown`() {
+        initComposeRuleContent(isHint = true)
         composeRule.onNodeWithTag(
-            NOTE_TO_SELF_ITEM_NEW_LABEL,
+            NOTE_TO_SELF_ITEM_HINT_BUTTON,
             useUnmergedTree = true
         ).assertIsDisplayed()
     }
 
-    private fun initComposeRuleContent(isNew: Boolean = false, isHint: Boolean = false) {
+    private fun initComposeRuleContent(isHint: Boolean = false) {
         composeRule.setContent {
-            NoteToSelfView(
-                onNoteToSelfClicked = {},
-                isNew = isNew,
+            NoteToSelfAvatarView(
                 isHint = isHint
             )
         }

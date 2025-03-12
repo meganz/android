@@ -58,6 +58,21 @@ class ChatRoomItemMapper @Inject constructor() {
                 )
             }
 
+            chatRoom.isNoteToSelf -> {
+                ChatRoomItem.NoteToSelfChatRoomItem(
+                    peerHandle = chatRoom.peerHandle,
+                    chatId = chatRoom.chatId,
+                    title = chatRoom.title,
+                    lastMessage = chatRoom.lastMessage,
+                    lastMessageType = chatRoom.lastMessageType,
+                    hasPermissions = hasPermissions,
+                    isActive = chatRoom.isActive,
+                    isArchived = chatRoom.isArchived,
+                    lastTimestamp = chatRoom.lastTimestamp,
+                    highlight = highLight,
+                )
+            }
+
             else -> {
                 ChatRoomItem.IndividualChatRoomItem(
                     peerHandle = chatRoom.peerHandle,

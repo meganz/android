@@ -55,6 +55,7 @@ internal class CombinedChatRoomMapperTest {
                 on { isWaitingRoom }.thenReturn(false)
                 on { isOpenInvite }.thenReturn(false)
                 on { isSpeakRequest }.thenReturn(false)
+                on { isNoteToSelf }.thenReturn(false)
             }
             val megaChatListItem = mock<MegaChatListItem> {
                 on { unreadCount }.thenReturn(0)
@@ -100,6 +101,7 @@ internal class CombinedChatRoomMapperTest {
                 isWaitingRoom = megaChatRoom.isWaitingRoom,
                 isOpenInvite = megaChatRoom.isOpenInvite,
                 isSpeakRequest = megaChatRoom.isSpeakRequest,
+                isNoteToSelf = megaChatRoom.isNoteToSelf
             )
             val actual = underTest(megaChatRoom = megaChatRoom, megaChatListItem = megaChatListItem)
 

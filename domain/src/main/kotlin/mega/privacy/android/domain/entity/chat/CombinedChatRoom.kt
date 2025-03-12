@@ -34,6 +34,7 @@ import mega.privacy.android.domain.entity.ChatRoomPermission
  * @property isWaitingRoom      If chat room is a waiting room.
  * @property isOpenInvite       If open invite option in enabled.
  * @property isSpeakRequest     If speaker request in enabled.
+ * @property isNoteToSelf       If chat room is note to self.
  */
 data class CombinedChatRoom constructor(
     val chatId: Long,
@@ -64,4 +65,5 @@ data class CombinedChatRoom constructor(
     val isWaitingRoom: Boolean = false,
     val isOpenInvite: Boolean = false,
     val isSpeakRequest: Boolean = false,
+    val isNoteToSelf: Boolean = false,
 )
