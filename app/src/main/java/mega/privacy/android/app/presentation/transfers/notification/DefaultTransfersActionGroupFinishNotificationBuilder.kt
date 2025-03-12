@@ -10,7 +10,6 @@ import androidx.core.app.NotificationCompat
 import androidx.core.content.ContextCompat
 import androidx.core.content.FileProvider
 import dagger.hilt.android.qualifiers.ApplicationContext
-import mega.privacy.android.app.MimeTypeList.Companion.typeForName
 import mega.privacy.android.app.R
 import mega.privacy.android.app.featuretoggle.AppFeatures
 import mega.privacy.android.app.main.ManagerActivity
@@ -22,8 +21,10 @@ import mega.privacy.android.app.presentation.transfers.TransfersActivity
 import mega.privacy.android.app.presentation.transfers.view.COMPLETED_TAB_INDEX
 import mega.privacy.android.app.utils.Constants
 import mega.privacy.android.app.utils.MegaApiUtils
+import mega.privacy.android.data.mapper.FileTypeInfoMapper
 import mega.privacy.android.data.mapper.transfer.TransfersActionGroupFinishNotificationBuilder
 import mega.privacy.android.data.worker.AbstractTransfersWorker.Companion.FINAL_SUMMARY_GROUP
+import mega.privacy.android.domain.entity.ZipFileTypeInfo
 import mega.privacy.android.domain.entity.transfer.ActiveTransferTotals
 import mega.privacy.android.domain.entity.transfer.TransferType
 import mega.privacy.android.domain.entity.transfer.isOfflineDownload
@@ -44,6 +45,7 @@ class DefaultTransfersActionGroupFinishNotificationBuilder @Inject constructor(
     private val isContentUriUseCase: IsContentUriUseCase,
     private val getPathByDocumentContentUriUseCase: GetPathByDocumentContentUriUseCase,
     private val fileSizeStringMapper: FileSizeStringMapper,
+    private val fileTypeInfoMapper: FileTypeInfoMapper,
 ) : TransfersActionGroupFinishNotificationBuilder {
     private val resources get() = context.resources
     override suspend fun invoke(
@@ -128,28 +130,32 @@ class DefaultTransfersActionGroupFinishNotificationBuilder @Inject constructor(
             }
         }
 
-        val previewFile = File(actionGroup.destination + actionGroup.singleFileName)
-        val isZipFile = runCatching { ZipFile(previewFile) }.getOrNull()?.let { true } == true
+        val previewFile = actionGroup.singleFileName?.let {
+            File(actionGroup.destination + actionGroup.singleFileName)
+        }
+        val type = previewFile?.let { fileTypeInfoMapper(it.name) }
+        val isZipFile = type is ZipFileTypeInfo && runCatching { ZipFile(previewFile) }.isSuccess
         var previewIntent: Intent? = Intent(Intent.ACTION_VIEW).apply {
             flags = Intent.FLAG_GRANT_READ_URI_PERMISSION
         }
         previewIntent =
             when {
-                previewFile.exists() && isZipFile -> {
+                previewFile?.exists() == true && isZipFile -> {
                     Intent(context, ManagerActivity::class.java).apply {
                         action = Constants.ACTION_EXPLORE_ZIP
                         putExtra(Constants.EXTRA_PATH_ZIP, previewFile.absolutePath)
                     }
                 }
 
-                previewFile.exists() && MegaApiUtils.isIntentAvailable(context, previewIntent) -> {
+                previewFile?.exists() == true
+                        && MegaApiUtils.isIntentAvailable(context, previewIntent) -> {
                     FileProvider.getUriForFile(
                         context,
                         Constants.AUTHORITY_STRING_FILE_PROVIDER,
                         previewFile
                     )?.let { uri ->
                         previewIntent?.let {
-                            it.setDataAndType(uri, typeForName(previewFile.name).type)
+                            it.setDataAndType(uri, type?.mimeType)
                             val chooserTitle = resources.getString(
                                 sharedR.string.open_with_os_dialog_title,
                                 actionGroup.singleFileName
