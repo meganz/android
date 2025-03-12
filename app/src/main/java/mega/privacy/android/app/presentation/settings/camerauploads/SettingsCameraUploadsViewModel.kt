@@ -15,6 +15,7 @@ import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.catch
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
+import mega.privacy.android.analytics.Analytics
 import mega.privacy.android.app.R
 import mega.privacy.android.app.presentation.settings.camerauploads.mapper.UploadOptionUiItemMapper
 import mega.privacy.android.app.presentation.settings.camerauploads.mapper.VideoQualityUiItemMapper
@@ -77,6 +78,10 @@ import mega.privacy.android.domain.usecase.camerauploads.SetupSecondaryFolderUse
 import mega.privacy.android.domain.usecase.network.IsConnectedToInternetUseCase
 import mega.privacy.android.domain.usecase.workers.StartCameraUploadUseCase
 import mega.privacy.android.domain.usecase.workers.StopCameraUploadsUseCase
+import mega.privacy.mobile.analytics.event.CameraUploadsDisabledEvent
+import mega.privacy.mobile.analytics.event.CameraUploadsEnabledEvent
+import mega.privacy.mobile.analytics.event.MediaUploadsDisabledEvent
+import mega.privacy.mobile.analytics.event.MediaUploadsEnabledEvent
 import timber.log.Timber
 import javax.inject.Inject
 
@@ -415,6 +420,7 @@ internal class SettingsCameraUploadsViewModel @Inject constructor(
                         setCameraUploadsEnabled(false)
                         stopCameraUploadsUseCase(CameraUploadsRestartMode.StopAndDisable)
                         broadcastCameraUploadsSettingsActionUseCase(CameraUploadsSettingsAction.CameraUploadsDisabled)
+                        Analytics.tracker.trackEvent(CameraUploadsDisabledEvent)
                     }
                 } else {
                     Timber.d("User must be connected to the Internet to update the Camera Uploads state")
@@ -490,6 +496,7 @@ internal class SettingsCameraUploadsViewModel @Inject constructor(
                 setCameraUploadsEnabled(true)
                 broadcastCameraUploadsSettingsActionUseCase(CameraUploadsSettingsAction.CameraUploadsEnabled)
             }.onSuccess {
+                Analytics.tracker.trackEvent(CameraUploadsEnabledEvent)
                 showSnackbar(R.string.settings_camera_notif_initializing_title)
             }.onFailure { exception ->
                 Timber.e(exception, "An error occurred when enabling Camera Uploads")
@@ -747,12 +754,14 @@ internal class SettingsCameraUploadsViewModel @Inject constructor(
                             )
                         }
                         broadcastCameraUploadsSettingsActionUseCase(CameraUploadsSettingsAction.MediaUploadsEnabled)
+                        Analytics.tracker.trackEvent(MediaUploadsEnabledEvent)
                     } else {
                         // Disable Media Uploads
                         disableMediaUploadsSettingsUseCase()
                         stopCameraUploadsUseCase(CameraUploadsRestartMode.Stop)
                         _uiState.update { it.copy(isMediaUploadsEnabled = false) }
                         broadcastCameraUploadsSettingsActionUseCase(CameraUploadsSettingsAction.MediaUploadsDisabled)
+                        Analytics.tracker.trackEvent(MediaUploadsDisabledEvent)
                     }
                 } else {
                     Timber.d("User must be connected to the Internet to update the Media Uploads state")

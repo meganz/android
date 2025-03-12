@@ -13,6 +13,7 @@ import kotlinx.coroutines.flow.flow
 import kotlinx.coroutines.test.TestScope
 import kotlinx.coroutines.test.UnconfinedTestDispatcher
 import kotlinx.coroutines.test.runTest
+import mega.privacy.android.app.AnalyticsTestExtension
 import mega.privacy.android.app.R
 import mega.privacy.android.app.presentation.settings.camerauploads.mapper.UploadOptionUiItemMapper
 import mega.privacy.android.app.presentation.settings.camerauploads.mapper.VideoQualityUiItemMapper
@@ -79,6 +80,9 @@ import mega.privacy.android.domain.usecase.featureflag.GetFeatureFlagValueUseCas
 import mega.privacy.android.domain.usecase.network.IsConnectedToInternetUseCase
 import mega.privacy.android.domain.usecase.workers.StartCameraUploadUseCase
 import mega.privacy.android.domain.usecase.workers.StopCameraUploadsUseCase
+import mega.privacy.mobile.analytics.event.CameraUploadsEnabledEvent
+import mega.privacy.mobile.analytics.event.MediaUploadsDisabledEvent
+import mega.privacy.mobile.analytics.event.MediaUploadsEnabledEvent
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.DisplayName
 import org.junit.jupiter.api.Nested
@@ -86,6 +90,7 @@ import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.TestInstance
 import org.junit.jupiter.api.assertDoesNotThrow
 import org.junit.jupiter.api.extension.ExtendWith
+import org.junit.jupiter.api.extension.RegisterExtension
 import org.junit.jupiter.params.ParameterizedTest
 import org.junit.jupiter.params.provider.EnumSource
 import org.junit.jupiter.params.provider.MethodSource
@@ -463,6 +468,7 @@ internal class SettingsCameraUploadsViewModelTest {
             underTest.onMediaPermissionsGranted()
 
             verify(broadcastCameraUploadsSettingsActionUseCase).invoke(CameraUploadsSettingsAction.CameraUploadsEnabled)
+            assertThat(analyticsExtension.events.first()).isEqualTo(CameraUploadsEnabledEvent)
         }
 
         @ParameterizedTest(name = "is camera uploads enabled: {0}")
@@ -568,6 +574,9 @@ internal class SettingsCameraUploadsViewModelTest {
                     val state = awaitItem()
                     assertThat(state.isCameraUploadsEnabled).isTrue()
                     assertThat(state.isMediaUploadsEnabled).isTrue()
+                    assertThat(analyticsExtension.events.first()).isEqualTo(
+                        CameraUploadsEnabledEvent
+                    )
                 }
             }
 
@@ -583,6 +592,9 @@ internal class SettingsCameraUploadsViewModelTest {
 
                 underTest.uiState.test {
                     assertThat(awaitItem().snackbarMessage).isEqualTo(triggered(R.string.settings_camera_notif_initializing_title))
+                    assertThat(analyticsExtension.events.first()).isEqualTo(
+                        CameraUploadsEnabledEvent
+                    )
                 }
             }
 
@@ -622,11 +634,15 @@ internal class SettingsCameraUploadsViewModelTest {
                 underTest.onRegularBusinessAccountSubUserPromptAcknowledged()
 
                 verify(setupCameraUploadsSettingUseCase).invoke(isEnabled = true)
+
                 underTest.uiState.test {
                     val state = awaitItem()
                     assertThat(state.businessAccountPromptType).isNull()
                     assertThat(state.isCameraUploadsEnabled).isTrue()
                     assertThat(state.isMediaUploadsEnabled).isTrue()
+                    assertThat(analyticsExtension.events.first()).isEqualTo(
+                        CameraUploadsEnabledEvent
+                    )
                 }
             }
 
@@ -1380,6 +1396,7 @@ internal class SettingsCameraUploadsViewModelTest {
             verify(disableMediaUploadsSettingsUseCase).invoke()
             underTest.uiState.test {
                 assertThat(awaitItem().isMediaUploadsEnabled).isFalse()
+                assertThat(analyticsExtension.events.first()).isEqualTo(MediaUploadsDisabledEvent)
             }
         }
 
@@ -1424,6 +1441,7 @@ internal class SettingsCameraUploadsViewModelTest {
                     val state = awaitItem()
                     assertThat(state.isMediaUploadsEnabled).isTrue()
                     assertThat(state.secondaryFolderPath).isEmpty()
+                    assertThat(analyticsExtension.events.first()).isEqualTo(MediaUploadsEnabledEvent)
                 }
             }
 
@@ -1446,6 +1464,7 @@ internal class SettingsCameraUploadsViewModelTest {
                     val state = awaitItem()
                     assertThat(state.isMediaUploadsEnabled).isTrue()
                     assertThat(state.secondaryFolderPath).isEqualTo(expectedSecondaryFolderPath)
+                    assertThat(analyticsExtension.events.first()).isEqualTo(MediaUploadsEnabledEvent)
                 }
             }
 
@@ -1460,6 +1479,7 @@ internal class SettingsCameraUploadsViewModelTest {
 
             underTest.onMediaUploadsStateChanged(enabled = true)
 
+            assertThat(analyticsExtension.events.first()).isEqualTo(MediaUploadsEnabledEvent)
             verify(broadcastCameraUploadsSettingsActionUseCase).invoke(CameraUploadsSettingsAction.MediaUploadsEnabled)
         }
 
@@ -1474,6 +1494,7 @@ internal class SettingsCameraUploadsViewModelTest {
 
             underTest.onMediaUploadsStateChanged(enabled = false)
 
+            assertThat(analyticsExtension.events.first()).isEqualTo(MediaUploadsDisabledEvent)
             verify(broadcastCameraUploadsSettingsActionUseCase).invoke(CameraUploadsSettingsAction.MediaUploadsDisabled)
         }
 
@@ -1488,6 +1509,12 @@ internal class SettingsCameraUploadsViewModelTest {
 
             underTest.onMediaUploadsStateChanged(enabled = isMediaUploadsEnabled)
 
+            assertThat(analyticsExtension.events.first()).isEqualTo(
+                if (isMediaUploadsEnabled)
+                    MediaUploadsEnabledEvent
+                else
+                    MediaUploadsDisabledEvent
+            )
             verify(stopCameraUploadsUseCase).invoke(CameraUploadsRestartMode.Stop)
         }
 
@@ -1759,5 +1786,11 @@ internal class SettingsCameraUploadsViewModelTest {
                     assertThat(awaitItem().secondaryFolderName).isEqualTo(folderName)
                 }
             }
+    }
+
+    companion object {
+        @JvmField
+        @RegisterExtension
+        val analyticsExtension = AnalyticsTestExtension()
     }
 }
