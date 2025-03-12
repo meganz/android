@@ -109,13 +109,6 @@ class FileStorageViewModel @Inject constructor(
      */
     fun getCurrentUriPath() = (uiState.value as? FileStorageUiState.Loaded)?.currentFolder?.uriPath
 
-    /**
-     * Get "content://" Uri of the current path if possible
-     */
-    suspend fun getCurrentPathContentUri(): Uri? = getCurrentUriPath()?.let {
-        getContentUriForUriPath(it)
-    }
-
     private suspend fun getContentUriForUriPath(it: UriPath): Uri? {
         val uri = it.toUri()
         when {

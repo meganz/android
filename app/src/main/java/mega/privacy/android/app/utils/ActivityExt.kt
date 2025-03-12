@@ -4,7 +4,6 @@ import android.app.Activity
 import android.content.Intent
 import android.net.Uri
 import android.os.Build
-import android.provider.DocumentsContract
 import android.util.DisplayMetrics
 import android.view.WindowInsets
 import androidx.annotation.IdRes
@@ -72,16 +71,13 @@ fun Activity.canHandleIntent(intent: Intent) =
 /**
  * Create intent to view a folder in 3rd-party file manager
  */
-fun Activity.createViewFolderIntent(folderContentUri: Uri, path: String?): Intent? {
+fun Activity.createViewFolderIntent(folderUri: Uri): Intent? {
     val intent = Intent(Intent.ACTION_VIEW).apply {
-        putExtra("android.provider.extra.INITIAL_URI", folderContentUri)
-        putExtra("org.openintents.extra.ABSOLUTE_PATH", path)
+        putExtra("android.provider.extra.INITIAL_URI", folderUri)
+        putExtra("org.openintents.extra.ABSOLUTE_PATH", folderUri)
         addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION or Intent.FLAG_ACTIVITY_NEW_TASK)
     }
-    intent.setDataAndType(folderContentUri, "resource/folder")
-    if (canHandleIntent(intent)) return intent
-
-    intent.setDataAndType(folderContentUri, DocumentsContract.Document.MIME_TYPE_DIR)
+    intent.setDataAndType(folderUri, "resource/folder")
     if (canHandleIntent(intent)) return intent
     return null
 }

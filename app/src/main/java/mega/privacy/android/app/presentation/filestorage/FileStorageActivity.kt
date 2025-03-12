@@ -33,7 +33,6 @@ import com.anggrayudi.storage.file.id
 import dagger.hilt.android.AndroidEntryPoint
 import de.palm.composestateevents.StateEventWithContentTriggered
 import kotlinx.coroutines.flow.distinctUntilChanged
-import kotlinx.coroutines.flow.distinctUntilChangedBy
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.launch
 import mega.privacy.android.app.R
@@ -306,10 +305,10 @@ class FileStorageActivity : PasscodeActivity(), Scrollable {
         }
     }
 
-    private suspend fun viewFolderIntent(): Intent? =
+    private fun viewFolderIntent(): Intent? =
         runCatching {
-            viewModel.getCurrentPathContentUri()?.let {
-                createViewFolderIntent(it, viewModel.getCurrentFilePath())
+            viewModel.getCurrentFilePath()?.toUri()?.let {
+                createViewFolderIntent(it)
             }
         }.onFailure { e ->
             Timber.e(e)
