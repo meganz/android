@@ -88,7 +88,7 @@ internal fun ConfirmEmailRoute(
         }
     }
 
-    val successMessage = stringResource(id = R.string.confirm_email_misspelled_email_sent)
+    val successMessage = stringResource(id = SharedResR.string.general_email_resend_success_message)
     LaunchedEffect(uiState.shouldShowSuccessMessage) {
         if (uiState.shouldShowSuccessMessage) {
             snackBarHostState.showAutoDurationSnackbar(

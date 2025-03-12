@@ -83,6 +83,7 @@ import mega.android.core.ui.components.MegaText
 import mega.android.core.ui.components.banner.InlineErrorBanner
 import mega.android.core.ui.components.button.PrimaryFilledButton
 import mega.android.core.ui.components.button.TextOnlyButton
+import mega.android.core.ui.components.dialogs.BasicDialog
 import mega.android.core.ui.components.image.MegaIcon
 import mega.android.core.ui.components.indicators.MegaAnimatedLinearProgressIndicator
 import mega.android.core.ui.components.inputfields.PasswordTextInputField
@@ -106,7 +107,11 @@ import mega.privacy.android.app.R
 import mega.privacy.android.app.presentation.apiserver.view.NewChangeApiServerDialog
 import mega.privacy.android.app.presentation.extensions.login.newError
 import mega.privacy.android.app.presentation.login.model.LoginState
+import mega.privacy.android.app.presentation.login.view.LoginTestTags.ACCOUNT_BLOCKED_DIALOG
+import mega.privacy.android.app.presentation.login.view.LoginTestTags.ACCOUNT_LOCKED_DIALOG
 import mega.privacy.android.domain.entity.Progress
+import mega.privacy.android.domain.entity.account.AccountBlockedDetail
+import mega.privacy.android.domain.entity.account.AccountBlockedType
 import mega.privacy.android.domain.entity.account.AccountSession
 import mega.privacy.android.domain.exception.LoginTooManyAttempts
 import mega.privacy.android.domain.exception.LoginWrongEmailOrPassword
@@ -143,6 +148,10 @@ fun NewLoginView(
     onLostAuthenticatorDevice: () -> Unit,
     onBackPressed: () -> Unit,
     onReportIssue: () -> Unit,
+    onResetAccountBlockedEvent: () -> Unit,
+    onResendVerificationEmail: () -> Unit,
+    onResetResendVerificationEmailEvent: () -> Unit,
+    stopLogin: () -> Unit,
     modifier: Modifier = Modifier,
     onLoginExceptionConsumed: () -> Unit = {},
 ) {
@@ -196,6 +205,7 @@ fun NewLoginView(
 
                 isLoginRequired -> RequireLogin(
                     state = this,
+                    snackbarHostState = snackbarHostState,
                     onEmailChanged = onEmailChanged,
                     onPasswordChanged = onPasswordChanged,
                     onLoginClicked = onLoginClicked,
@@ -204,6 +214,10 @@ fun NewLoginView(
                     onChangeApiServer = { showChangeApiServerDialog = true },
                     modifier = Modifier.padding(paddingValues),
                     onLoginExceptionConsumed = onLoginExceptionConsumed,
+                    onResendVerificationEmail = onResendVerificationEmail,
+                    onResetAccountBlockedEvent = onResetAccountBlockedEvent,
+                    onResetResendVerificationEmailEvent = onResetResendVerificationEmailEvent,
+                    stopLogin = stopLogin
                 )
 
                 is2FARequired || multiFactorAuthState != null -> NewTwoFactorAuthentication(
@@ -238,12 +252,17 @@ fun NewLoginView(
 @Composable
 private fun RequireLogin(
     state: LoginState,
+    snackbarHostState: SnackbarHostState,
     onEmailChanged: (String) -> Unit,
     onPasswordChanged: (String) -> Unit,
     onLoginClicked: () -> Unit,
     onForgotPassword: () -> Unit,
     onCreateAccount: () -> Unit,
     onChangeApiServer: () -> Unit,
+    onResendVerificationEmail: () -> Unit,
+    onResetAccountBlockedEvent: () -> Unit,
+    onResetResendVerificationEmailEvent: () -> Unit,
+    stopLogin: () -> Unit,
     modifier: Modifier = Modifier,
     onLoginExceptionConsumed: () -> Unit = {},
 ) {
@@ -252,6 +271,7 @@ private fun RequireLogin(
     val orientation = LocalConfiguration.current.orientation
     var wrongCredentials by remember { mutableStateOf(false) }
     var tooManyAttempts by remember { mutableStateOf(false) }
+    var accountBlockedDetail by remember { mutableStateOf<AccountBlockedDetail?>(null) }
 
     LaunchedEffect(state.loginException) {
         if (state.loginException is LoginWrongEmailOrPassword) {
@@ -260,6 +280,32 @@ private fun RequireLogin(
             tooManyAttempts = true
         }
         onLoginExceptionConsumed()
+    }
+
+    EventEffect(event = state.accountBlockedEvent, onConsumed = onResetAccountBlockedEvent) {
+        accountBlockedDetail = it
+    }
+
+    val resendVerificationEmailSuccessMessage =
+        stringResource(sharedR.string.general_email_resend_success_message)
+    val resendVerificationEmailFailureMessage =
+        stringResource(sharedR.string.general_request_failed_message)
+
+    EventEffect(
+        event = state.resendVerificationEmailEvent,
+        onConsumed = onResetResendVerificationEmailEvent
+    ) {
+        val message = if (it) {
+            resendVerificationEmailSuccessMessage
+        } else {
+            resendVerificationEmailFailureMessage
+        }
+        accountBlockedDetail = null
+        stopLogin()
+        snackbarHostState.showSnackbar(
+            message = message,
+            duration = SnackbarDuration.Short
+        )
     }
 
     Box(
@@ -447,6 +493,33 @@ private fun RequireLogin(
                     onCreateAccount()
                 }
             )
+
+            accountBlockedDetail?.let {
+                if (it.type == AccountBlockedType.TOS_COPYRIGHT || it.type == AccountBlockedType.TOS_NON_COPYRIGHT || it.type == AccountBlockedType.SUBUSER_DISABLED) {
+                    BasicDialog(
+                        modifier = Modifier.testTag(ACCOUNT_BLOCKED_DIALOG),
+                        title = stringResource(id = sharedR.string.general_unable_to_login),
+                        description = it.text,
+                        positiveButtonText = stringResource(id = sharedR.string.document_scanning_error_dialog_confirm_button),
+                        onPositiveButtonClicked = {
+                            accountBlockedDetail = null
+                        }
+                    )
+                } else if (it.type == AccountBlockedType.VERIFICATION_EMAIL) {
+                    BasicDialog(
+                        modifier = Modifier.testTag(ACCOUNT_LOCKED_DIALOG),
+                        title = stringResource(id = sharedR.string.general_check_inbox),
+                        description = it.text,
+                        negativeButtonText = stringResource(id = sharedR.string.document_scanning_error_dialog_confirm_button),
+                        onNegativeButtonClicked = {
+                            accountBlockedDetail = null
+                            stopLogin()
+                        },
+                        positiveButtonText = stringResource(id = sharedR.string.general_resend_email),
+                        onPositiveButtonClicked = onResendVerificationEmail
+                    )
+                }
+            }
         }
     }
 }
@@ -627,6 +700,7 @@ private fun EmptyLoginViewPreview() {
 
         RequireLogin(
             state = state,
+            snackbarHostState = SnackbarHostState(),
             onEmailChanged = {
                 state = state.copy(accountSession = AccountSession(email = it))
             },
@@ -635,6 +709,11 @@ private fun EmptyLoginViewPreview() {
             onForgotPassword = {},
             onCreateAccount = {},
             onChangeApiServer = {},
+            onResetAccountBlockedEvent = {},
+            onResendVerificationEmail = {},
+            onLoginExceptionConsumed = {},
+            onResetResendVerificationEmailEvent = {},
+            stopLogin = {}
         )
     }
 }
@@ -657,6 +736,10 @@ private fun LoginViewPreview(
             onLostAuthenticatorDevice = {},
             onBackPressed = {},
             onReportIssue = {},
+            onResetAccountBlockedEvent = {},
+            onResetResendVerificationEmailEvent = {},
+            onResendVerificationEmail = {},
+            stopLogin = {}
         )
     }
 }
@@ -679,6 +762,10 @@ private fun LandscapeLoginViewPreview(
             onLostAuthenticatorDevice = {},
             onBackPressed = {},
             onReportIssue = {},
+            onResetAccountBlockedEvent = {},
+            onResetResendVerificationEmailEvent = {},
+            onResendVerificationEmail = {},
+            stopLogin = {}
         )
     }
 }

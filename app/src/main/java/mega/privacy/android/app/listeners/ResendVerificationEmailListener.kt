@@ -1,5 +1,6 @@
 package mega.privacy.android.app.listeners
 
+import mega.privacy.android.shared.resources.R as sharedR
 import mega.privacy.android.app.R
 import mega.privacy.android.app.presentation.weakaccountprotection.WeakAccountProtectionAlertActivity
 import nz.mega.sdk.MegaApiJava
@@ -46,7 +47,7 @@ class ResendVerificationEmailListener(
         if (request.type == MegaRequest.TYPE_RESEND_VERIFICATION_EMAIL) {
             when (e.errorCode) {
                 MegaError.API_OK -> {
-                    activity.showSnackbar(R.string.confirm_email_misspelled_email_sent)
+                    activity.showSnackbar(sharedR.string.general_email_resend_success_message)
                 }
 
                 MegaError.API_ETEMPUNAVAIL -> {

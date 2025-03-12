@@ -67,9 +67,12 @@ import mega.privacy.android.app.utils.AlertDialogUtil.dismissAlertDialogIfExists
 import mega.privacy.android.app.utils.AlertDialogUtil.isAlertDialogShown
 import mega.privacy.android.app.utils.AlertsAndWarnings.showForeignStorageOverQuotaWarningDialog
 import mega.privacy.android.app.utils.ColorUtils.setStatusBarTextColor
+import mega.privacy.android.app.utils.Constants.ACCOUNT_BLOCKED_STRING
+import mega.privacy.android.app.utils.Constants.ACCOUNT_BLOCKED_TYPE
 import mega.privacy.android.app.utils.Constants.ACTION_OVERQUOTA_STORAGE
 import mega.privacy.android.app.utils.Constants.ACTION_PRE_OVERQUOTA_STORAGE
 import mega.privacy.android.app.utils.Constants.ACTION_SHOW_UPGRADE_ACCOUNT
+import mega.privacy.android.app.utils.Constants.ACTION_SHOW_WARNING_ACCOUNT_BLOCKED
 import mega.privacy.android.app.utils.Constants.BROADCAST_ACTION_INTENT_SSL_VERIFICATION_FAILED
 import mega.privacy.android.app.utils.Constants.BUSINESS
 import mega.privacy.android.app.utils.Constants.DISMISS_ACTION_SNACKBAR
@@ -883,34 +886,46 @@ abstract class BaseActivity : AppCompatActivity(), ActivityLauncher, PermissionR
             AccountBlockedType.NOT_BLOCKED -> {}
             AccountBlockedType.TOS_COPYRIGHT -> megaChatApi.logout(
                 ChatLogoutListener(
-                    this,
-                    getString(R.string.dialog_account_suspended_ToS_copyright_message),
                     resetSdkLoggerUseCase
-                )
+                ) {
+                    showAccountBlockedDialog(
+                        AccountBlockedType.TOS_COPYRIGHT,
+                        getString(sharedR.string.dialog_account_suspended_ToS_copyright_message)
+                    )
+                }
             )
 
             AccountBlockedType.TOS_NON_COPYRIGHT -> megaChatApi.logout(
                 ChatLogoutListener(
-                    this,
-                    getString(R.string.dialog_account_suspended_ToS_non_copyright_message),
                     resetSdkLoggerUseCase
-                )
+                ) {
+                    showAccountBlockedDialog(
+                        AccountBlockedType.TOS_NON_COPYRIGHT,
+                        getString(sharedR.string.dialog_account_suspended_ToS_non_copyright_message)
+                    )
+                }
             )
 
             AccountBlockedType.SUBUSER_DISABLED -> megaChatApi.logout(
                 ChatLogoutListener(
-                    this,
-                    getString(R.string.error_business_disabled),
                     resetSdkLoggerUseCase
-                )
+                ) {
+                    showAccountBlockedDialog(
+                        AccountBlockedType.SUBUSER_DISABLED,
+                        getString(sharedR.string.error_business_disabled)
+                    )
+                }
             )
 
             AccountBlockedType.SUBUSER_REMOVED -> megaChatApi.logout(
                 ChatLogoutListener(
-                    this,
-                    getString(R.string.error_business_removed),
-                    resetSdkLoggerUseCase
-                )
+                    resetSdkLoggerUseCase,
+                ) {
+                    showAccountBlockedDialog(
+                        AccountBlockedType.SUBUSER_REMOVED,
+                        getString(sharedR.string.error_business_removed)
+                    )
+                }
             )
 
             AccountBlockedType.VERIFICATION_SMS -> {
@@ -931,9 +946,10 @@ abstract class BaseActivity : AppCompatActivity(), ActivityLauncher, PermissionR
             }
 
             AccountBlockedType.VERIFICATION_EMAIL -> {
-                if (!MegaApplication.isBlockedDueToWeakAccount && !MegaApplication.isWebOpenDueToEmailVerification) {
-                    startActivity(Intent(this, WeakAccountProtectionAlertActivity::class.java))
-                }
+                showAccountBlockedDialog(
+                    AccountBlockedType.VERIFICATION_EMAIL,
+                    getString(sharedR.string.login_account_suspension_email_verification_message)
+                )
             }
 
             else -> Util.showErrorAlertDialog(accountBlockedDetail.text, false, this)
@@ -945,6 +961,40 @@ abstract class BaseActivity : AppCompatActivity(), ActivityLauncher, PermissionR
      */
     protected fun setFinishActivityAtError(finishActivityAtError: Boolean) {
         this.finishActivityAtError = finishActivityAtError
+    }
+
+    private fun showAccountBlockedDialog(
+        accountBlockedType: AccountBlockedType,
+        accountBlockedString: String,
+    ) {
+        if (!TextUtil.isTextEmpty(accountBlockedString)) {
+            if (this is LoginActivity) {
+                this.showAccountBlockedDialog(
+                    AccountBlockedDetail(
+                        accountBlockedType,
+                        accountBlockedString
+                    )
+                )
+            } else {
+                if (this is WeakAccountProtectionAlertActivity && accountBlockedType == AccountBlockedType.VERIFICATION_EMAIL) {
+                    return
+                } else {
+                    val loginIntent =
+                        Intent(this, LoginActivity::class.java).apply {
+                            action = ACTION_SHOW_WARNING_ACCOUNT_BLOCKED
+                            addFlags(Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_CLEAR_TASK)
+                            putExtra(VISIBLE_FRAGMENT, LOGIN_FRAGMENT)
+                            putExtra(
+                                ACCOUNT_BLOCKED_STRING, accountBlockedString
+                            )
+                            putExtra(
+                                ACCOUNT_BLOCKED_TYPE, accountBlockedType
+                            )
+                        }
+                    startActivity(loginIntent)
+                }
+            }
+        }
     }
 
     /**
@@ -1100,7 +1150,7 @@ abstract class BaseActivity : AppCompatActivity(), ActivityLauncher, PermissionR
 
             if (state == MegaChatApi.INIT_ERROR) {
                 // The megaChatApi cannot be recovered, then logout
-                megaChatApi.logout(ChatLogoutListener(this, resetSdkLoggerUseCase))
+                megaChatApi.logout(ChatLogoutListener(resetSdkLoggerUseCase))
                 return true
             }
         }

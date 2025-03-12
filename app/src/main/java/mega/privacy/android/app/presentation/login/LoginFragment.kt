@@ -1,6 +1,7 @@
 package mega.privacy.android.app.presentation.login
 
 import mega.privacy.android.shared.resources.R as sharedR
+import android.annotation.SuppressLint
 import android.app.Activity
 import android.content.Intent
 import android.net.Uri
@@ -25,17 +26,21 @@ import androidx.core.content.FileProvider
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.activityViewModels
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
+import androidx.lifecycle.lifecycleScope
 import com.google.android.material.dialog.MaterialAlertDialogBuilder
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.delay
+import kotlinx.coroutines.launch
 import kotlinx.coroutines.sync.Mutex
 import mega.android.core.ui.theme.AndroidTheme
+import mega.privacy.android.app.MegaApplication
 import mega.privacy.android.app.MegaApplication.Companion.getChatManagement
 import mega.privacy.android.app.MegaApplication.Companion.isIsHeartBeatAlive
 import mega.privacy.android.app.MegaApplication.Companion.setHeartBeatAlive
 import mega.privacy.android.app.R
 import mega.privacy.android.app.activities.WebViewActivity
 import mega.privacy.android.app.constants.IntentConstants
+import mega.privacy.android.app.featuretoggle.AppFeatures
 import mega.privacy.android.app.main.FileExplorerActivity
 import mega.privacy.android.app.main.ManagerActivity
 import mega.privacy.android.app.presentation.billing.BillingViewModel
@@ -52,6 +57,7 @@ import mega.privacy.android.app.presentation.login.model.LoginState
 import mega.privacy.android.app.presentation.login.view.LoginView
 import mega.privacy.android.app.presentation.login.view.NewLoginView
 import mega.privacy.android.app.presentation.settings.startscreen.util.StartScreenUtil.setStartScreenTimeStamp
+import mega.privacy.android.app.presentation.weakaccountprotection.WeakAccountProtectionAlertActivity
 import mega.privacy.android.app.providers.FileProviderActivity
 import mega.privacy.android.app.upgradeAccount.ChooseAccountActivity
 import mega.privacy.android.app.utils.AlertsAndWarnings.showOverDiskQuotaPaywallWarning
@@ -63,9 +69,12 @@ import mega.privacy.android.app.utils.ConstantsUrl.RECOVERY_URL_EMAIL
 import mega.privacy.android.app.utils.TextUtil
 import mega.privacy.android.app.utils.Util
 import mega.privacy.android.domain.entity.StorageState
+import mega.privacy.android.domain.entity.account.AccountBlockedDetail
+import mega.privacy.android.domain.entity.account.AccountBlockedType
 import mega.privacy.android.domain.entity.support.SupportEmailTicket
 import mega.privacy.android.domain.qualifier.LoginMutex
 import mega.privacy.android.domain.usecase.GetThemeMode
+import mega.privacy.android.domain.usecase.featureflag.GetFeatureFlagValueUseCase
 import mega.privacy.android.shared.original.core.ui.theme.OriginalTheme
 import nz.mega.sdk.MegaError
 import timber.log.Timber
@@ -82,6 +91,9 @@ class LoginFragment : Fragment() {
     @Inject
     @LoginMutex
     lateinit var loginMutex: Mutex
+
+    @Inject
+    lateinit var getFeatureFlagValueUseCase: GetFeatureFlagValueUseCase
 
     private val viewModel: LoginViewModel by activityViewModels()
 
@@ -150,6 +162,10 @@ class LoginFragment : Fragment() {
                     onBackPressed = { onBackPressed(uiState) },
                     onReportIssue = ::openLoginIssueHelpdeskPage,
                     onLoginExceptionConsumed = viewModel::setLoginErrorConsumed,
+                    onResetAccountBlockedEvent = viewModel::resetAccountBlockedEvent,
+                    onResendVerificationEmail = viewModel::resendVerificationEmail,
+                    onResetResendVerificationEmailEvent = viewModel::resetResendVerificationEmailEvent,
+                    stopLogin = viewModel::stopLogin,
                 )
             }
         } else {
@@ -199,6 +215,7 @@ class LoginFragment : Fragment() {
     /**
      * Gets data from the intent and performs the corresponding action if necessary.
      */
+    @SuppressLint("NewApi")
     private fun setupIntent() = (requireActivity() as LoginActivity).intent?.let { intent ->
         intentAction = intent.action
 
@@ -234,8 +251,22 @@ class LoginFragment : Fragment() {
                 Constants.ACTION_SHOW_WARNING_ACCOUNT_BLOCKED -> {
                     val accountBlockedString =
                         intent.getStringExtra(Constants.ACCOUNT_BLOCKED_STRING)
-                    if (!TextUtil.isTextEmpty(accountBlockedString)) {
-                        Util.showErrorAlertDialog(accountBlockedString, false, activity)
+                    val accountBlockedType: AccountBlockedType? =
+                        intent.getSerializableExtra(
+                            Constants.ACCOUNT_BLOCKED_TYPE,
+                            AccountBlockedType::class.java
+                        )
+
+                    if (accountBlockedString != null && accountBlockedType != null && !TextUtil.isTextEmpty(
+                            accountBlockedString
+                        )
+                    ) {
+                        showAccountBlockedDialog(
+                            AccountBlockedDetail(
+                                accountBlockedType,
+                                accountBlockedString
+                            )
+                        )
                     }
                 }
 
@@ -457,6 +488,27 @@ class LoginFragment : Fragment() {
         }
 
         viewModel.intentSet()
+    }
+
+    fun showAccountBlockedDialog(accountBlockedDetail: AccountBlockedDetail) {
+        viewLifecycleOwner.lifecycleScope.launch {
+            if (getFeatureFlagValueUseCase(AppFeatures.LoginRevamp) && (accountBlockedDetail.type == AccountBlockedType.TOS_COPYRIGHT || accountBlockedDetail.type == AccountBlockedType.TOS_NON_COPYRIGHT || accountBlockedDetail.type == AccountBlockedType.SUBUSER_DISABLED || accountBlockedDetail.type == AccountBlockedType.VERIFICATION_EMAIL)) {
+                viewModel.triggerAccountBlockedEvent(accountBlockedDetail)
+            } else {
+                if (accountBlockedDetail.type == AccountBlockedType.VERIFICATION_EMAIL) {
+                    if (!MegaApplication.isBlockedDueToWeakAccount && !MegaApplication.isWebOpenDueToEmailVerification) {
+                        startActivity(
+                            Intent(
+                                activity,
+                                WeakAccountProtectionAlertActivity::class.java
+                            )
+                        )
+                    }
+                } else if (!TextUtil.isTextEmpty(accountBlockedDetail.text)) {
+                    Util.showErrorAlertDialog(accountBlockedDetail.text, false, activity)
+                }
+            }
+        }
     }
 
     /**

@@ -101,7 +101,7 @@
                     android:layout_height="wrap_content"
                     android:layout_alignParentRight="true"
                     android:layout_marginRight="18dp"
-                    android:text="@string/resend_email_label"
+                    android:text="@string/general_resend_email"
                     style="?attr/materialButtonStyle"/>
             </RelativeLayout>
 

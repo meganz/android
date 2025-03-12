@@ -34,6 +34,7 @@ import mega.privacy.android.app.presentation.meeting.view.dialog.ACTION_JOIN_AS_
 import mega.privacy.android.app.presentation.openlink.OpenLinkActivity
 import mega.privacy.android.app.utils.Constants
 import mega.privacy.android.app.utils.Util
+import mega.privacy.android.domain.entity.account.AccountBlockedDetail
 import mega.privacy.android.domain.exception.LoginLoggedOutFromOtherLocation
 import timber.log.Timber
 import javax.inject.Inject
@@ -449,6 +450,12 @@ class LoginActivity : BaseActivity() {
         intent.putExtra(ACTION_JOIN_AS_GUEST, "any")
         intent.data = Uri.parse(meetingLink)
         startActivity(intent)
+    }
+
+    public fun showAccountBlockedDialog(accountBlockedDetail: AccountBlockedDetail) {
+        if (visibleFragment == Constants.LOGIN_FRAGMENT) {
+            loginFragment?.showAccountBlockedDialog(accountBlockedDetail)
+        }
     }
 
     companion object {

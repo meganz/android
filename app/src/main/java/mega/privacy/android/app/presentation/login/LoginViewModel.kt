@@ -35,6 +35,7 @@ import mega.privacy.android.app.presentation.login.model.MultiFactorAuthState
 import mega.privacy.android.app.presentation.twofactorauthentication.extensions.getTwoFactorAuthentication
 import mega.privacy.android.app.presentation.twofactorauthentication.extensions.getUpdatedTwoFactorAuthentication
 import mega.privacy.android.app.utils.Constants
+import mega.privacy.android.domain.entity.account.AccountBlockedDetail
 import mega.privacy.android.domain.entity.account.AccountBlockedType
 import mega.privacy.android.domain.entity.account.AccountSession
 import mega.privacy.android.domain.entity.camerauploads.CameraUploadsRestartMode
@@ -58,6 +59,7 @@ import mega.privacy.android.domain.usecase.RootNodeExistsUseCase
 import mega.privacy.android.domain.usecase.account.ClearUserCredentialsUseCase
 import mega.privacy.android.domain.usecase.account.MonitorAccountBlockedUseCase
 import mega.privacy.android.domain.usecase.account.MonitorStorageStateEventUseCase
+import mega.privacy.android.domain.usecase.account.ResendVerificationEmailUseCase
 import mega.privacy.android.domain.usecase.account.ResumeCreateAccountUseCase
 import mega.privacy.android.domain.usecase.camerauploads.EstablishCameraUploadsSyncHandlesUseCase
 import mega.privacy.android.domain.usecase.camerauploads.HasCameraSyncEnabledUseCase
@@ -148,6 +150,7 @@ class LoginViewModel @Inject constructor(
     private val checkIfTransfersShouldBePausedUseCase: CheckIfTransfersShouldBePausedUseCase,
     private val isFirstLaunchUseCase: IsFirstLaunchUseCase,
     private val getThemeMode: GetThemeMode,
+    private val resendVerificationEmailUseCase: ResendVerificationEmailUseCase,
     private val resumeCreateAccountUseCase: ResumeCreateAccountUseCase,
 ) : ViewModel() {
 
@@ -285,11 +288,25 @@ class LoginViewModel @Inject constructor(
         checkTemporalCredentials()
 
         viewModelScope.launch {
+            val blockedTypes = if (getFeatureFlagValueUseCase(AppFeatures.LoginRevamp)) {
+                setOf(
+                    AccountBlockedType.TOS_COPYRIGHT,
+                    AccountBlockedType.TOS_NON_COPYRIGHT,
+                    AccountBlockedType.VERIFICATION_EMAIL,
+                    AccountBlockedType.SUBUSER_DISABLED
+                )
+            } else {
+                setOf(
+                    AccountBlockedType.TOS_COPYRIGHT,
+                    AccountBlockedType.TOS_NON_COPYRIGHT
+                )
+            }
+
             monitorAccountBlockedUseCase()
-                .filter {
-                    it.type == AccountBlockedType.TOS_COPYRIGHT
-                            || it.type == AccountBlockedType.TOS_NON_COPYRIGHT
-                }.collectLatest { stopLogin() }
+                .filter { it.type in blockedTypes }
+                .collectLatest {
+                    if (it.type == AccountBlockedType.VERIFICATION_EMAIL) resetFetchNodesUpdate() else stopLogin()
+                }
         }
     }
 
@@ -333,6 +350,14 @@ class LoginViewModel @Inject constructor(
                 is2FARequired = false,
                 isAlreadyLoggedIn = true,
                 fetchNodesUpdate = cleanFetchNodesUpdate
+            )
+        }
+    }
+
+    fun resetFetchNodesUpdate() {
+        _state.update {
+            it.copy(
+                fetchNodesUpdate = null
             )
         }
     }
@@ -1034,6 +1059,37 @@ class LoginViewModel @Inject constructor(
     fun clearUserCredentials() {
         viewModelScope.launch {
             clearUserCredentialsUseCase()
+        }
+    }
+
+    fun triggerAccountBlockedEvent(accountBlockedDetail: AccountBlockedDetail) {
+        _state.update { it.copy(accountBlockedEvent = triggered(accountBlockedDetail)) }
+    }
+
+    fun resetAccountBlockedEvent() {
+        _state.update { it.copy(accountBlockedEvent = consumed()) }
+    }
+
+    fun resetResendVerificationEmailEvent() {
+        _state.update { it.copy(resendVerificationEmailEvent = consumed()) }
+    }
+
+    fun resendVerificationEmail() = viewModelScope.launch {
+        runCatching {
+            resendVerificationEmailUseCase()
+        }.onSuccess {
+            _state.update {
+                it.copy(
+                    resendVerificationEmailEvent = triggered(true)
+                )
+            }
+        }.onFailure { throwable ->
+            Timber.e(throwable)
+            _state.update {
+                it.copy(
+                    resendVerificationEmailEvent = triggered(false)
+                )
+            }
         }
     }
 

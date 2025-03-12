@@ -2,6 +2,7 @@ package mega.privacy.android.app.presentation.login
 
 import app.cash.turbine.test
 import com.google.common.truth.Truth.assertThat
+import de.palm.composestateevents.StateEventWithContentTriggered
 import de.palm.composestateevents.consumed
 import de.palm.composestateevents.triggered
 import kotlinx.coroutines.ExperimentalCoroutinesApi
@@ -32,6 +33,7 @@ import mega.privacy.android.domain.usecase.RootNodeExistsUseCase
 import mega.privacy.android.domain.usecase.account.ClearUserCredentialsUseCase
 import mega.privacy.android.domain.usecase.account.MonitorAccountBlockedUseCase
 import mega.privacy.android.domain.usecase.account.MonitorStorageStateEventUseCase
+import mega.privacy.android.domain.usecase.account.ResendVerificationEmailUseCase
 import mega.privacy.android.domain.usecase.account.ResumeCreateAccountUseCase
 import mega.privacy.android.domain.usecase.camerauploads.EstablishCameraUploadsSyncHandlesUseCase
 import mega.privacy.android.domain.usecase.camerauploads.HasCameraSyncEnabledUseCase
@@ -133,6 +135,7 @@ internal class LoginViewModelTest {
         mock<CheckIfTransfersShouldBePausedUseCase>()
     private val isFirstLaunchUseCase = mock<IsFirstLaunchUseCase>()
     private val getThemeMode = mock<GetThemeMode>()
+    private val resendVerificationEmailUseCase = mock<ResendVerificationEmailUseCase>()
     private val resumeCreateAccountUseCase = mock<ResumeCreateAccountUseCase>()
 
     @BeforeEach
@@ -182,6 +185,7 @@ internal class LoginViewModelTest {
             checkIfTransfersShouldBePausedUseCase = checkIfTransfersShouldBePausedUseCase,
             isFirstLaunchUseCase = isFirstLaunchUseCase,
             getThemeMode = getThemeMode,
+            resendVerificationEmailUseCase = resendVerificationEmailUseCase,
             resumeCreateAccountUseCase = resumeCreateAccountUseCase
         )
     }
@@ -209,7 +213,8 @@ internal class LoginViewModelTest {
         reset(
             monitorRequestStatusProgressEventUseCase,
             checkIfTransfersShouldBePausedUseCase,
-            isFirstLaunchUseCase
+            isFirstLaunchUseCase,
+            resendVerificationEmailUseCase
         )
     }
 
@@ -459,6 +464,48 @@ internal class LoginViewModelTest {
             assertThat(state.requestStatusProgress).isNull()
         }
     }
+
+    @Test
+    fun `test that resend Verification Email UseCase should be triggered when resend email is clicked`() =
+        runTest {
+            underTest.resendVerificationEmail()
+            advanceUntilIdle()
+            verify(resendVerificationEmailUseCase).invoke()
+        }
+
+    @Test
+    fun `test that resend email success event is triggered when resend email use case returns success`() =
+        runTest {
+            whenever(resendVerificationEmailUseCase()).thenReturn(Unit)
+            underTest.resendVerificationEmail()
+            advanceUntilIdle()
+            underTest.state.test {
+                val item = awaitItem()
+                assertThat(item.resendVerificationEmailEvent).isInstanceOf(
+                    StateEventWithContentTriggered::class.java
+                )
+                if (item.resendVerificationEmailEvent is StateEventWithContentTriggered) {
+                    assertThat(item.resendVerificationEmailEvent.content).isTrue()
+                }
+            }
+        }
+
+    @Test
+    fun `test that resend email failure event is triggered when resend email use case throws error`() =
+        runTest {
+            whenever(resendVerificationEmailUseCase()).thenThrow(RuntimeException())
+            underTest.resendVerificationEmail()
+            advanceUntilIdle()
+            underTest.state.test {
+                val item = awaitItem()
+                assertThat(item.resendVerificationEmailEvent).isInstanceOf(
+                    StateEventWithContentTriggered::class.java
+                )
+                if (item.resendVerificationEmailEvent is StateEventWithContentTriggered) {
+                    assertThat(item.resendVerificationEmailEvent.content).isFalse()
+                }
+            }
+        }
 
     @Test
     fun `test that resumeCreateAccount is invoked when calling resumeCreateAccount`() = runTest {
