@@ -19,9 +19,9 @@ class FileExplorerPagerAdapter(private val fm: FragmentManager, lifeCycle: Lifec
     var tabRemoved = false
 
     private val fragments = mapOf(
-        0 to CloudDriveExplorerFragment(),
-        1 to IncomingSharesExplorerFragment(),
-        2 to ChatExplorerFragment()
+        TAB_POSITION_CLOUD_DRIVE to CloudDriveExplorerFragment(),
+        TAB_POSITION_INCOMING to IncomingSharesExplorerFragment(),
+        TAB_POSITION_CHAT to ChatExplorerFragment()
     )
 
     override fun createFragment(position: Int): Fragment {
@@ -40,5 +40,9 @@ class FileExplorerPagerAdapter(private val fm: FragmentManager, lifeCycle: Lifec
 
     companion object {
         private const val PAGE_COUNT = 3
+
+        internal const val TAB_POSITION_CLOUD_DRIVE = 0
+        internal const val TAB_POSITION_INCOMING = 1
+        internal const val TAB_POSITION_CHAT = 2
     }
 }
