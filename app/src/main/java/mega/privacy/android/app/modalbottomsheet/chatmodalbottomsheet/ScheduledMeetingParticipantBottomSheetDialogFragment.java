@@ -26,6 +26,7 @@ import android.widget.TextView;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
+import androidx.lifecycle.ViewModelProvider;
 
 import dagger.hilt.android.AndroidEntryPoint;
 import mega.privacy.android.app.MegaApplication;
@@ -33,9 +34,9 @@ import mega.privacy.android.app.R;
 import mega.privacy.android.app.components.RoundedImageView;
 import mega.privacy.android.app.components.twemoji.EmojiTextView;
 import mega.privacy.android.app.main.controllers.ChatController;
-import mega.privacy.android.app.main.megachat.GroupChatInfoActivity;
 import mega.privacy.android.app.modalbottomsheet.BaseBottomSheetDialogFragment;
 import mega.privacy.android.app.myAccount.MyAccountActivity;
+import mega.privacy.android.app.presentation.meeting.ScheduledMeetingInfoViewModel;
 import mega.privacy.android.app.utils.ContactUtil;
 import nz.mega.sdk.MegaApiAndroid;
 import nz.mega.sdk.MegaChatRoom;
@@ -43,7 +44,9 @@ import nz.mega.sdk.MegaUser;
 import timber.log.Timber;
 
 @AndroidEntryPoint
-public class ParticipantBottomSheetDialogFragment extends BaseBottomSheetDialogFragment implements View.OnClickListener {
+public class ScheduledMeetingParticipantBottomSheetDialogFragment extends BaseBottomSheetDialogFragment implements View.OnClickListener {
+
+    private ScheduledMeetingInfoViewModel viewModel = null;
 
     private MegaChatRoom selectedChat;
     private long chatId = INVALID_HANDLE;
@@ -53,8 +56,8 @@ public class ParticipantBottomSheetDialogFragment extends BaseBottomSheetDialogF
     private EmojiTextView titleNameContactChatPanel;
     private RoundedImageView contactImageView;
 
-    public static ParticipantBottomSheetDialogFragment newInstance(long chatId, long participantHandle) {
-        ParticipantBottomSheetDialogFragment fragment = new ParticipantBottomSheetDialogFragment();
+    public static ScheduledMeetingParticipantBottomSheetDialogFragment newInstance(long chatId, long participantHandle) {
+        ScheduledMeetingParticipantBottomSheetDialogFragment fragment = new ScheduledMeetingParticipantBottomSheetDialogFragment();
         Bundle arguments = new Bundle();
         arguments.putLong(CHAT_ID, chatId);
         arguments.putLong(CONTACT_HANDLE, participantHandle);
@@ -75,10 +78,9 @@ public class ParticipantBottomSheetDialogFragment extends BaseBottomSheetDialogF
         } else if (savedInstanceState != null) {
             chatId = savedInstanceState.getLong(CHAT_ID, INVALID_HANDLE);
             participantHandle = savedInstanceState.getLong(CONTACT_HANDLE, INVALID_HANDLE);
-        } else {
-            chatId = ((GroupChatInfoActivity) requireActivity()).getChatHandle();
-            participantHandle = ((GroupChatInfoActivity) requireActivity()).getSelectedHandleParticipant();
         }
+
+        viewModel = new ViewModelProvider(requireActivity()).get(ScheduledMeetingInfoViewModel.class);
 
         selectedChat = megaChatApi.getChatRoom(chatId);
 
@@ -252,23 +254,35 @@ public class ParticipantBottomSheetDialogFragment extends BaseBottomSheetDialogF
         if (id == R.id.contact_info_group_participants_chat) {
             ContactUtil.openContactInfoActivity(requireActivity(), chatC.getParticipantEmail(participantHandle));
         } else if (id == R.id.start_chat_group_participants_chat) {
-            ((GroupChatInfoActivity) requireActivity()).startConversation(participantHandle);
+            if (viewModel != null) {
+                viewModel.onSendMsgTap();
+            }
         } else if (id == R.id.contact_list_option_call_layout) {
             MegaApplication.setUserWaitingForCall(participantHandle);
             if (canCallBeStartedFromContactOption(requireActivity())) {
-                ((GroupChatInfoActivity) requireActivity()).startCall();
+                if (viewModel != null) {
+                    viewModel.onStartCallTap();
+                }
             }
         } else if (id == R.id.change_permissions_group_participants_chat) {
-            ((GroupChatInfoActivity) requireActivity()).showChangePermissionsDialog(participantHandle, selectedChat);
+            if (viewModel != null) {
+                viewModel.onChangePermissionsTap();
+            }
         } else if (id == R.id.remove_group_participants_chat) {
-            ((GroupChatInfoActivity) requireActivity()).showRemoveParticipantConfirmation(participantHandle);
+            if (viewModel != null) {
+                viewModel.onRemoveParticipantTap(true);
+            }
         } else if (id == R.id.edit_profile_group_participants_chat) {
             Intent editProfile = new Intent(requireActivity(), MyAccountActivity.class);
             startActivity(editProfile);
         } else if (id == R.id.leave_group_participants_chat) {
-            ((GroupChatInfoActivity) requireActivity()).showConfirmationLeaveChat();
+            if (viewModel != null) {
+                viewModel.onLeaveGroupTap();
+            }
         } else if (id == R.id.invite_group_participants_chat) {
-            ((GroupChatInfoActivity) requireActivity()).inviteContact(chatC.getParticipantEmail(participantHandle));
+            if (viewModel != null) {
+                viewModel.onInviteContactTap();
+            }
         }
 
         dismissAllowingStateLoss();
@@ -279,23 +293,5 @@ public class ParticipantBottomSheetDialogFragment extends BaseBottomSheetDialogF
         super.onSaveInstanceState(outState);
         outState.putLong(CHAT_ID, chatId);
         outState.putLong(CONTACT_HANDLE, participantHandle);
-    }
-
-    public void updateContactData() {
-        if (participantHandle == megaApi.getMyUser().getHandle()) {
-            String myFullName = chatC.getMyFullName();
-            if (isTextEmpty(myFullName)) {
-                myFullName = megaChatApi.getMyEmail();
-            }
-
-            titleNameContactChatPanel.setText(myFullName);
-            setImageAvatar(megaApi.getMyUser().getHandle(), megaChatApi.getMyEmail(), myFullName, contactImageView);
-        } else {
-            String fullName = chatC.getParticipantFullName(participantHandle);
-            titleNameContactChatPanel.setText(fullName);
-            String email = chatC.getParticipantEmail(participantHandle);
-
-            setImageAvatar(participantHandle, isTextEmpty(email) ? MegaApiAndroid.userHandleToBase64(participantHandle) : email, fullName, contactImageView);
-        }
     }
 }

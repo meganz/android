@@ -1,6 +1,5 @@
 package mega.privacy.android.app.presentation.meeting
 
-import mega.privacy.android.shared.resources.R as sharedR
 import android.content.DialogInterface
 import android.content.Intent
 import android.os.Bundle
@@ -45,7 +44,7 @@ import mega.privacy.android.app.meeting.activity.MeetingActivity.Companion.MEETI
 import mega.privacy.android.app.meeting.activity.MeetingActivity.Companion.MEETING_VIDEO_ENABLE
 import mega.privacy.android.app.modalbottomsheet.BaseBottomSheetDialogFragment
 import mega.privacy.android.app.modalbottomsheet.ModalBottomSheetUtil.isBottomSheetDialogShown
-import mega.privacy.android.app.modalbottomsheet.chatmodalbottomsheet.ParticipantBottomSheetDialogFragment
+import mega.privacy.android.app.modalbottomsheet.chatmodalbottomsheet.ScheduledMeetingParticipantBottomSheetDialogFragment
 import mega.privacy.android.app.presentation.chat.dialog.ManageMeetingLinkBottomSheetDialogFragment
 import mega.privacy.android.app.presentation.chat.list.view.MeetingLinkBottomSheet
 import mega.privacy.android.app.presentation.extensions.isDarkMode
@@ -72,6 +71,7 @@ import mega.privacy.android.domain.entity.chat.ChatParticipant
 import mega.privacy.android.domain.usecase.GetThemeMode
 import mega.privacy.android.navigation.MegaNavigator
 import mega.privacy.android.shared.original.core.ui.theme.OriginalTheme
+import mega.privacy.android.shared.resources.R as sharedR
 import mega.privacy.mobile.analytics.event.MeetingInfoAddParticipantButtonTappedEvent
 import mega.privacy.mobile.analytics.event.MeetingInfoLeaveMeetingButtonTappedEvent
 import mega.privacy.mobile.analytics.event.ScheduledMeetingEditMenuToolbarEvent
@@ -325,7 +325,7 @@ class ScheduledMeetingInfoActivity : PasscodeActivity(), SnackbarShower {
         viewModel.onParticipantTap(participant)
 
         bottomSheetDialogFragment =
-            ParticipantBottomSheetDialogFragment.newInstance(chatRoomId, participant.handle)
+            ScheduledMeetingParticipantBottomSheetDialogFragment.newInstance(chatRoomId, participant.handle)
         bottomSheetDialogFragment?.show(supportFragmentManager, bottomSheetDialogFragment?.tag)
     }
 
