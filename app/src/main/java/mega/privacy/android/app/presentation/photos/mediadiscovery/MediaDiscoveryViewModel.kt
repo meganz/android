@@ -429,7 +429,7 @@ class MediaDiscoveryViewModel @Inject constructor(
         return if (currentZoomLevel == ZoomLevel.Grid_1) {
             currentDate != previousDate
         } else {
-            currentDate.month != previousDate.month
+            currentDate.month != previousDate.month || currentDate.year != previousDate.year
         }
     }
 
