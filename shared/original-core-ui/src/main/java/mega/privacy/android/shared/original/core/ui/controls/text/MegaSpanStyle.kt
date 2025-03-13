@@ -15,6 +15,7 @@ import androidx.compose.ui.text.style.BaselineShift
 import androidx.compose.ui.text.style.TextDecoration
 import androidx.compose.ui.text.style.TextGeometricTransform
 import androidx.compose.ui.unit.TextUnit
+import mega.android.core.ui.theme.values.LinkColor
 import mega.privacy.android.shared.original.core.ui.theme.MegaOriginalTheme
 import mega.android.core.ui.theme.values.TextColor
 
@@ -74,7 +75,7 @@ fun megaSpanStyle(
 )
 
 /**
- * Mega span style
+ * Mega span style with TextColor
  *
  * @param base
  * @param color
@@ -84,3 +85,16 @@ fun megaSpanStyle(
     base: SpanStyle,
     color: TextColor,
 ) = base.copy(color = MegaOriginalTheme.textColor(textColor = color))
+
+
+/**
+ * Mega span style with LinkColor
+ *
+ * @param base
+ * @param linkColor
+ */
+@Composable
+fun megaSpanStyle(
+    base: SpanStyle,
+    linkColor: LinkColor,
+) = base.copy(color = MegaOriginalTheme.linkColor(linkColor = linkColor))

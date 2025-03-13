@@ -11,6 +11,7 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.staticCompositionLocalOf
 import mega.android.core.ui.theme.values.BackgroundColor
 import mega.android.core.ui.theme.values.IconColor
+import mega.android.core.ui.theme.values.LinkColor
 import mega.android.core.ui.theme.values.SupportColor
 import mega.android.core.ui.theme.values.TextColor
 import mega.android.core.ui.tokens.theme.tokens.AndroidNewSemanticTokensDark
@@ -100,6 +101,10 @@ internal object MegaOriginalTheme {
     @Composable
     fun supportColor(supportColor: SupportColor) =
         supportColor.getSupportColor(LocalMegaColors.current.support)
+
+    @Composable
+    fun linkColor(linkColor: LinkColor) =
+        linkColor.getLinkColor(LocalMegaColors.current.link)
 
 }
 

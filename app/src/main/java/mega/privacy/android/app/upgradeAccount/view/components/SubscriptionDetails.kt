@@ -14,6 +14,7 @@ import androidx.compose.ui.text.SpanStyle
 import androidx.compose.ui.text.style.TextDecoration
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import mega.android.core.ui.theme.values.LinkColor
 import mega.android.core.ui.theme.values.TextColor
 import mega.privacy.android.app.R
 import mega.privacy.android.app.upgradeAccount.model.LocalisedSubscription
@@ -164,19 +165,19 @@ internal fun SubscriptionDetails(
                 SpanIndicator('A') to MegaSpanStyleWithAnnotation(
                     MegaSpanStyle(
                         SpanStyle(textDecoration = TextDecoration.None),
-                        color = TextColor.Accent,
+                        linkColor = LinkColor.Primary,
                     ), PLAY_STORE_SUBSCRIPTION_URL
                 ),
                 SpanIndicator('B') to MegaSpanStyleWithAnnotation(
                     MegaSpanStyle(
                         SpanStyle(textDecoration = TextDecoration.None),
-                        color = TextColor.Accent,
+                        linkColor = LinkColor.Primary,
                     ), Constants.TERMS_OF_SERVICE_URL
                 ),
                 SpanIndicator('C') to MegaSpanStyleWithAnnotation(
                     megaSpanStyle = MegaSpanStyle(
                         spanStyle = SpanStyle(textDecoration = TextDecoration.None),
-                        color = TextColor.Accent,
+                        linkColor = LinkColor.Primary,
                     ),
                     annotation = "https://mega.nz/privacy"
                 ),
