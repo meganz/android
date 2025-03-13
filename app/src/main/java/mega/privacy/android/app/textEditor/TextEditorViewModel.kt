@@ -1070,6 +1070,9 @@ class TextEditorViewModel @Inject constructor(
 
     internal fun convertMarkDownToHtml(context: Context, webView: WebView) {
         viewModelScope.launch(ioDispatcher) {
+            if (_uiState.value.markDownFileLoaded) {
+                _uiState.update { it.copy(markDownFileLoaded = false) }
+            }
             getPagination()?.getEditedText()?.let { content ->
                 crashReporter.log("The MD file size is ${content.length}")
                 val tempHtmlFile = File(context.cacheDir, CONVERTED_FILE_NAME)
