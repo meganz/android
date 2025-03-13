@@ -21,6 +21,7 @@ import kotlinx.coroutines.launch
 import mega.privacy.android.app.MegaApplication
 import mega.privacy.android.app.R
 import mega.privacy.android.app.components.ChatManagement
+import mega.privacy.android.app.featuretoggle.ApiFeatures
 import mega.privacy.android.app.meeting.gateway.RTCAudioManagerGateway
 import mega.privacy.android.app.presentation.chat.list.model.ChatsTabState
 import mega.privacy.android.app.presentation.chat.mapper.ChatRoomTimestampMapper
@@ -45,16 +46,19 @@ import mega.privacy.android.domain.usecase.call.OpenOrStartCallUseCase
 import mega.privacy.android.domain.usecase.call.StartChatCallNoRingingUseCase
 import mega.privacy.android.domain.usecase.chat.ArchiveChatUseCase
 import mega.privacy.android.domain.usecase.chat.ClearChatHistoryUseCase
+import mega.privacy.android.domain.usecase.chat.CreateNoteToSelfChatUseCase
 import mega.privacy.android.domain.usecase.chat.GetChatsUnreadStatusUseCase
 import mega.privacy.android.domain.usecase.chat.GetChatsUseCase
 import mega.privacy.android.domain.usecase.chat.GetChatsUseCase.ChatRoomType
 import mega.privacy.android.domain.usecase.chat.GetCurrentChatStatusUseCase
 import mega.privacy.android.domain.usecase.chat.GetMeetingTooltipsUseCase
+import mega.privacy.android.domain.usecase.chat.GetNoteToSelfChatUseCase
 import mega.privacy.android.domain.usecase.chat.HasArchivedChatsUseCase
 import mega.privacy.android.domain.usecase.chat.LeaveChatUseCase
 import mega.privacy.android.domain.usecase.chat.MonitorLeaveChatUseCase
 import mega.privacy.android.domain.usecase.chat.SetNextMeetingTooltipUseCase
 import mega.privacy.android.domain.usecase.contact.MonitorHasAnyContactUseCase
+import mega.privacy.android.domain.usecase.featureflag.GetFeatureFlagValueUseCase
 import mega.privacy.android.domain.usecase.meeting.MonitorChatCallUpdatesUseCase
 import mega.privacy.android.domain.usecase.meeting.MonitorScheduledMeetingCanceledUseCase
 import mega.privacy.android.domain.usecase.meeting.StartMeetingInWaitingRoomChatUseCase
@@ -85,6 +89,8 @@ import javax.inject.Inject
  * @property setNextMeetingTooltipUseCase               [SetNextMeetingTooltipUseCase]
  * @property monitorScheduledMeetingCanceledUseCase     [MonitorScheduledMeetingCanceledUseCase]
  * @property getChatsUnreadStatusUseCase                [GetChatsUnreadStatusUseCase]
+ * @property createNoteToSelfChatUseCase                [CreateNoteToSelfChatUseCase]
+ * @property getNoteToSelfChatUseCase                   [GetNoteToSelfChatUseCase]
  * @property startMeetingInWaitingRoomChatUseCase       [StartMeetingInWaitingRoomChatUseCase]
  */
 @OptIn(ExperimentalCoroutinesApi::class)
@@ -114,6 +120,9 @@ class ChatTabsViewModel @Inject constructor(
     private val monitorChatCallUpdatesUseCase: MonitorChatCallUpdatesUseCase,
     private val hasArchivedChatsUseCase: HasArchivedChatsUseCase,
     private val monitorHasAnyContactUseCase: MonitorHasAnyContactUseCase,
+    private val getFeatureFlagValueUseCase: GetFeatureFlagValueUseCase,
+    private val getNoteToSelfChatUseCase: GetNoteToSelfChatUseCase,
+    private val createNoteToSelfChatUseCase: CreateNoteToSelfChatUseCase,
 ) : ViewModel() {
 
     private val state = MutableStateFlow(ChatsTabState())
@@ -127,6 +136,7 @@ class ChatTabsViewModel @Inject constructor(
     fun getState(): StateFlow<ChatsTabState> = state
 
     init {
+        getApiFeatureFlag()
         signalChatPresence()
         requestChats()
         retrieveChatStatus()
@@ -137,6 +147,73 @@ class ChatTabsViewModel @Inject constructor(
         viewModelScope.launch {
             monitorScheduledMeetingCanceledUseCase().conflate()
                 .collect { messageResId -> triggerSnackbarMessage(messageResId) }
+        }
+    }
+
+    /**
+     * Get note to yourself api feature flag
+     */
+    fun getApiFeatureFlag() {
+        viewModelScope.launch {
+            runCatching {
+                getFeatureFlagValueUseCase(ApiFeatures.NoteToYourselfFlag)
+            }.onFailure { exception ->
+                Timber.e(exception)
+            }.onSuccess { flag ->
+                state.update { state ->
+                    state.copy(
+                        isNoteToYourselfFeatureFlagEnabled = flag,
+                    )
+                }
+
+                if (flag) {
+                    getNoteToSelfChat()
+                }
+            }
+        }
+    }
+
+    /**
+     * Get note to self chat
+     */
+    fun getNoteToSelfChat() =
+        viewModelScope.launch {
+            runCatching {
+                getNoteToSelfChatUseCase()
+            }.onFailure { exception ->
+                Timber.e(exception)
+            }.onSuccess { chat ->
+                chat?.apply {
+                    Timber.d("Note to self chat is already created, chatID $chatId")
+                    state.update { state ->
+                        state.copy(
+                            noteToSelfChatId = chatId,
+                        )
+                    }
+                } ?: run {
+                    Timber.d("Note to self chat is not created")
+                    createNoteToSelfChat()
+                }
+            }
+        }
+
+    /**
+     * Create note to self chat
+     */
+    fun createNoteToSelfChat() {
+        viewModelScope.launch {
+            runCatching {
+                createNoteToSelfChatUseCase().let {
+                    getNoteToSelfChatUseCase()?.let { chatRoom ->
+                        Timber.d("Note to self chat successfully created, chatID ${chatRoom.chatId}")
+                        state.update { state ->
+                            state.copy(
+                                noteToSelfChatId = chatRoom.chatId,
+                            )
+                        }
+                    }
+                }
+            }
         }
     }
 
@@ -206,15 +283,24 @@ class ChatTabsViewModel @Inject constructor(
                 .conflate()
                 .catch { Timber.e(it) }
                 .collect { items ->
+                    val sortedChats = sortChats(items)
                     state.update {
                         it.copy(
                             areChatsLoading = false,
-                            chats = items
+                            chats = sortedChats
                         )
                     }
                 }
         }
     }
+
+    /**
+     * Sort chats by note to self chat
+     *
+     * @param items List of [ChatRoomItem]
+     */
+    private fun sortChats(items: List<ChatRoomItem>): List<ChatRoomItem> =
+        items.sortedByDescending { it.chatId == state.value.noteToSelfChatId }
 
     /**
      * Request Meeting Rooms

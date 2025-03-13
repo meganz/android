@@ -180,6 +180,7 @@ fun ChatTabsView(
                     onItemClick = onItemClick,
                     isMeetingView = isMeetingView,
                     tooltip = state.tooltip,
+                    isNew = state.isNewFeature,
                     onItemMoreClick = onItemMoreClick,
                     onItemSelected = onItemSelected,
                     onScrollInProgress = { showFabButton = !it },

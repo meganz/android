@@ -541,9 +541,9 @@ class ChatTabsFragment : Fragment() {
 
                 menu.apply {
                     findItem(R.id.menu_chat_unmute)?.isVisible =
-                        selectedItems.all { it.isMuted && it.isActive }
+                        selectedItems.all { it.isMuted && it.isActive && it !is ChatRoomItem.NoteToSelfChatRoomItem }
                     findItem(R.id.menu_chat_mute)?.isVisible =
-                        selectedItems.all { !it.isMuted && it.isActive }
+                        selectedItems.all { !it.isMuted && it.isActive && it !is ChatRoomItem.NoteToSelfChatRoomItem }
                     findItem(R.id.menu_chat_select_all)?.isVisible =
                         selectedItems.size != currentItems.size
                     findItem(R.id.menu_chat_leave)?.isVisible =

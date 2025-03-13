@@ -86,6 +86,7 @@ fun ChatListView(
     selectedIds: List<Long>,
     scrollToTop: Boolean,
     isMeetingView: Boolean,
+    isNew: Boolean = false,
     modifier: Modifier = Modifier,
     hasAnyContact: Boolean = false,
     isLoading: Boolean = false,
@@ -104,11 +105,24 @@ fun ChatListView(
             .fillMaxSize()
             .background(MaterialTheme.colors.surface)
     ) {
+        val showEmptyStateAndNoteToSelfChat =
+            !isMeetingView && (items.size == 1 && items.first() is ChatRoomItem.NoteToSelfChatRoomItem)
+
+        if (!isLoading && (items.isEmpty() || showEmptyStateAndNoteToSelfChat)) {
+            EmptyView(
+                isMeetingView = isMeetingView,
+                onEmptyButtonClick = onEmptyButtonClick,
+                hasAnyContact = hasAnyContact,
+                onScheduleMeeting = onScheduleMeeting,
+            )
+        }
+
         if (items.isNotEmpty()) {
             ListView(
                 items = items,
                 selectedIds = selectedIds,
                 scrollToTop = scrollToTop,
+                isNew = isNew,
                 tooltip = tooltip,
                 onItemClick = onItemClick,
                 onItemMoreClick = onItemMoreClick,
@@ -117,14 +131,6 @@ fun ChatListView(
                 onScrollInProgress = onScrollInProgress,
                 onShowNextTooltip = onShowNextTooltip,
             )
-        } else {
-            if (!isLoading)
-                EmptyView(
-                    isMeetingView = isMeetingView,
-                    onEmptyButtonClick = onEmptyButtonClick,
-                    hasAnyContact = hasAnyContact,
-                    onScheduleMeeting = onScheduleMeeting,
-                )
         }
     }
 }
@@ -132,6 +138,7 @@ fun ChatListView(
 @Composable
 private fun ListView(
     items: List<ChatRoomItem>,
+    isNew: Boolean = false,
     selectedIds: List<Long>,
     scrollToTop: Boolean,
     tooltip: MeetingTooltipItem,
@@ -150,7 +157,8 @@ private fun ListView(
 
     LazyColumn(
         state = listState,
-        modifier = modifier.testTag("chat_room_list:list")
+        modifier = modifier
+            .testTag("chat_room_list:list")
     ) {
         itemsIndexed(
             items = items,
@@ -178,6 +186,7 @@ private fun ListView(
                     modifier = modifier.testTag("chat_room_list:item"),
                     item = item,
                     isSelected = selectionEnabled && selectedIds.contains(item.chatId),
+                    isNew = isNew,
                     isSelectionEnabled = selectionEnabled,
                     onItemClick = onItemClick,
                     onItemMoreClick = onItemMoreClick,

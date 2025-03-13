@@ -52,6 +52,7 @@ data class ChatsTabState(
     val hasAnyContact: Boolean = false,
     val isNoteToYourselfFeatureFlagEnabled: Boolean = false,
     val noteToSelfChatId: Long? = null,
+    val isNewFeature: Boolean = false,
 ) {
     /**
      * Check if only note to self chat is present

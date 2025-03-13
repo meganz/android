@@ -6,6 +6,7 @@ import androidx.annotation.DrawableRes
 import androidx.annotation.StringRes
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxWidth
@@ -28,25 +29,31 @@ import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.style.TextAlign
-import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.constraintlayout.compose.ChainStyle
 import androidx.constraintlayout.compose.ConstraintLayout
 import androidx.constraintlayout.compose.Dimension
+import mega.android.core.ui.theme.values.TextColor
 import mega.privacy.android.app.R
 import mega.privacy.android.app.presentation.chat.list.view.ChatAvatarView
 import mega.privacy.android.app.presentation.chat.list.view.ChatDivider
 import mega.privacy.android.app.presentation.chat.list.view.ChatUserStatusView
+import mega.privacy.android.app.presentation.meeting.chat.view.NoteToSelfAvatarView
 import mega.privacy.android.domain.entity.chat.ChatAvatarItem
 import mega.privacy.android.domain.entity.chat.ChatRoomItem
+import mega.privacy.android.domain.entity.chat.ChatRoomItem.GroupChatRoomItem
 import mega.privacy.android.domain.entity.chat.ChatRoomItem.IndividualChatRoomItem
+import mega.privacy.android.domain.entity.chat.ChatRoomItem.MeetingChatRoomItem
+import mega.privacy.android.domain.entity.chat.ChatRoomItem.NoteToSelfChatRoomItem
 import mega.privacy.android.domain.entity.contacts.UserChatStatus
 import mega.privacy.android.domain.entity.meeting.ChatRoomItemStatus
+import mega.privacy.android.shared.original.core.ui.controls.text.LongTextBehaviour
+import mega.privacy.android.shared.original.core.ui.controls.text.MegaText
 import mega.privacy.android.shared.original.core.ui.theme.extensions.grey_alpha_054_white_alpha_054
 import mega.privacy.android.shared.original.core.ui.theme.extensions.red_600_red_300
+import mega.privacy.android.shared.original.core.ui.theme.extensions.subtitle1medium
 import mega.privacy.android.shared.original.core.ui.theme.extensions.textColorPrimary
-import mega.privacy.android.shared.original.core.ui.theme.extensions.textColorSecondary
 import kotlin.random.Random
 
 /**
@@ -80,6 +87,11 @@ internal fun ChatRoomItemBottomSheetView(
         return
     }
 
+    val isNoteToSelf = item is NoteToSelfChatRoomItem
+    val isGroup = item is GroupChatRoomItem
+    val isMeeting = item is MeetingChatRoomItem
+    val isOneToOne = item is IndividualChatRoomItem
+
     Column(
         modifier = modifier
             .fillMaxWidth()
@@ -94,45 +106,63 @@ internal fun ChatRoomItemBottomSheetView(
                 .verticalScroll(rememberScrollState())
         ) {
             val (avatarImage, titleText, subtitleText, statusIcon) = createRefs()
-            val subtitle = when (item) {
-                is ChatRoomItem.NoteToSelfChatRoomItem -> null
-                is IndividualChatRoomItem -> item.peerEmail
-                is ChatRoomItem.GroupChatRoomItem -> stringResource(id = R.string.group_chat_label)
-                is ChatRoomItem.MeetingChatRoomItem -> {
+            val subtitle = when {
+                isOneToOne -> item.peerEmail
+                isGroup -> stringResource(id = R.string.group_chat_label)
+                isMeeting -> {
                     when {
                         item.isRecurring() -> stringResource(id = R.string.meetings_list_recurring_meeting_label)
                         item.isPending -> stringResource(id = R.string.meetings_list_one_off_meeting_label)
                         else -> stringResource(id = R.string.context_meeting)
                     }
                 }
+
+                else -> null
             }
 
-            ChatAvatarView(
-                avatars = item.getChatAvatars(),
-                modifier = Modifier
+            if (isNoteToSelf) {
+                Box(modifier = Modifier
                     .size(40.dp)
                     .constrainAs(avatarImage) {
                         start.linkTo(parent.start)
                         top.linkTo(parent.top)
                         bottom.linkTo(parent.bottom)
-                    }
-            )
+                    }) {
+                    NoteToSelfAvatarView(
+                        isHint = item.isEmptyNoteToSelfChatRoom,
+                        modifier = Modifier
+                            .align(Alignment.Center)
+                            .testTag("chat_room_item:avatar_image")
+                            .size(if (item.isEmptyNoteToSelfChatRoom) 24.dp else 40.dp),
+                    )
+                }
+            } else {
+                ChatAvatarView(
+                    avatars = item.getChatAvatars(),
+                    modifier = Modifier
+                        .size(40.dp)
+                        .constrainAs(avatarImage) {
+                            start.linkTo(parent.start)
+                            top.linkTo(parent.top)
+                            bottom.linkTo(parent.bottom)
+                        }
+                )
+            }
 
-            Text(
-                text = item.title,
-                style = MaterialTheme.typography.subtitle1,
-                color = MaterialTheme.colors.textColorPrimary,
-                maxLines = 1,
-                overflow = TextOverflow.Ellipsis,
+            MegaText(
                 modifier = Modifier.constrainAs(titleText) {
                     linkTo(avatarImage.end, parent.end, 16.dp, 32.dp, 0.dp, 0.dp, 0f)
                     top.linkTo(parent.top)
                     bottom.linkTo(subtitleText.top)
                     width = Dimension.preferredWrapContent
-                }
+                },
+                text = if (isNoteToSelf) stringResource(id = sharedR.string.chat_note_to_self_chat_title) else item.title,
+                textColor = TextColor.Primary,
+                style = if (isNoteToSelf) MaterialTheme.typography.subtitle1medium else MaterialTheme.typography.subtitle1,
+                overflow = LongTextBehaviour.Ellipsis(maxLines = 1),
             )
 
-            val userStatus = if (item is IndividualChatRoomItem) item.userChatStatus else null
+            val userStatus = if (isOneToOne) item.userChatStatus else null
             if (userStatus != null) {
                 ChatUserStatusView(
                     userChatStatus = userStatus,
@@ -145,18 +175,17 @@ internal fun ChatRoomItemBottomSheetView(
             }
 
             if (!subtitle.isNullOrBlank()) {
-                Text(
-                    text = subtitle,
-                    color = MaterialTheme.colors.textColorSecondary,
-                    style = MaterialTheme.typography.subtitle2,
-                    maxLines = 1,
-                    overflow = TextOverflow.Ellipsis,
+                MegaText(
                     modifier = Modifier.constrainAs(subtitleText) {
                         linkTo(avatarImage.end, parent.end, 16.dp, 16.dp, 0.dp, 0.dp, 0f)
                         top.linkTo(titleText.bottom)
                         bottom.linkTo(parent.bottom)
                         width = Dimension.preferredWrapContent
-                    }
+                    },
+                    text = subtitle,
+                    textColor = TextColor.Secondary,
+                    style = MaterialTheme.typography.subtitle2,
+                    overflow = LongTextBehaviour.Ellipsis(maxLines = 1),
                 )
             }
 
@@ -180,7 +209,7 @@ internal fun ChatRoomItemBottomSheetView(
                     onClick = onUnarchiveClick
                 )
             } else {
-                if (item is ChatRoomItem.MeetingChatRoomItem) {
+                if (isMeeting) {
                     if (item.currentCallStatus == ChatRoomItemStatus.NotJoined) {
                         MenuItem(
                             modifier = Modifier.testTag("join_meeting"),
@@ -223,8 +252,6 @@ internal fun ChatRoomItemBottomSheetView(
                     }
                 }
 
-                val isGroup = item !is IndividualChatRoomItem
-
                 if (isGroup || item.hasPermissions) {
                     MenuItem(
                         modifier = Modifier.testTag("info"),
@@ -237,7 +264,7 @@ internal fun ChatRoomItemBottomSheetView(
                     ChatDivider()
                 }
 
-                if (item.hasPermissions) {
+                if (item.hasPermissions && (!isNoteToSelf || !item.isEmptyNoteToSelfChatRoom)) {
                     MenuItem(
                         modifier = Modifier.testTag("clear_chat_history"),
                         res = R.drawable.ic_eraser,
@@ -248,7 +275,7 @@ internal fun ChatRoomItemBottomSheetView(
                     ChatDivider()
                 }
 
-                if ((isGroup && item.isActive) || (isGroup.not() && item.hasPermissions)) {
+                if (!isNoteToSelf && ((isGroup && item.isActive) || (isGroup.not() && item.hasPermissions))) {
                     if (item.isMuted) {
                         MenuItem(
                             modifier = Modifier.testTag("unmute"),
@@ -280,7 +307,6 @@ internal fun ChatRoomItemBottomSheetView(
 
                 when {
                     canCancel(item) -> {
-
                         ChatDivider()
                         MenuItem(
                             modifier = Modifier.testTag("cancel"),
@@ -292,18 +318,16 @@ internal fun ChatRoomItemBottomSheetView(
                         )
                     }
 
-                    item is ChatRoomItem.GroupChatRoomItem -> {
-                        if (item.isActive) {
-                            ChatDivider()
-                            MenuItem(
-                                modifier = Modifier.testTag("leave"),
-                                res = R.drawable.ic_log_out,
-                                text = R.string.general_leave,
-                                description = "Leave",
-                                tintRed = true,
-                                onClick = onLeaveClick
-                            )
-                        }
+                    isGroup && item.isActive -> {
+                        ChatDivider()
+                        MenuItem(
+                            modifier = Modifier.testTag("leave"),
+                            res = R.drawable.ic_log_out,
+                            text = R.string.general_leave,
+                            description = "Leave",
+                            tintRed = true,
+                            onClick = onLeaveClick
+                        )
                     }
                 }
             }
@@ -317,7 +341,7 @@ internal fun ChatRoomItemBottomSheetView(
  * @param item  [ChatRoomItem] of the scheduled meeting
  */
 private fun canCancel(item: ChatRoomItem?): Boolean =
-    item is ChatRoomItem.MeetingChatRoomItem && item.isPending && item.hasPermissions
+    item is MeetingChatRoomItem && item.isPending && item.hasPermissions
 
 @Composable
 private fun MenuItem(
@@ -384,10 +408,30 @@ private fun PreviewIndividualChatRoomItemBottomSheetView() {
 
 @Preview
 @Composable
+private fun PreviewNoteToSelfChatRoomItemBottomSheetView() {
+    ChatRoomItemBottomSheetView(
+        modifier = Modifier.background(Color.White),
+        item = MeetingChatRoomItem(
+            chatId = Random.nextLong(),
+            schedId = Random.nextLong(),
+            title = "Photos Sprint #1",
+            lastMessage = "Anna: Seeya all soon!",
+            avatars = listOf(ChatAvatarItem("A"), ChatAvatarItem("J")),
+            lastTimestampFormatted = "1 May 2022 17:53",
+            unreadCount = Random.nextInt(150),
+            isMuted = Random.nextBoolean(),
+            isRecurringMonthly = Random.nextBoolean(),
+            isPublic = Random.nextBoolean(),
+        ),
+    )
+}
+
+@Preview
+@Composable
 private fun PreviewGroupChatRoomItemBottomSheetView() {
     ChatRoomItemBottomSheetView(
         modifier = Modifier.background(Color.White),
-        item = ChatRoomItem.GroupChatRoomItem(
+        item = GroupChatRoomItem(
             chatId = Random.nextLong(),
             title = "Vanuatu - Lakatoro&Lorsup (May)",
             lastMessage = "Anna: Seeya all soon!",
@@ -405,7 +449,7 @@ private fun PreviewGroupChatRoomItemBottomSheetView() {
 private fun PreviewMeetingChatRoomItemBottomSheetView() {
     ChatRoomItemBottomSheetView(
         modifier = Modifier.background(Color.White),
-        item = ChatRoomItem.MeetingChatRoomItem(
+        item = MeetingChatRoomItem(
             chatId = Random.nextLong(),
             schedId = Random.nextLong(),
             title = "Photos Sprint #1",

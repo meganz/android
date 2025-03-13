@@ -53,17 +53,26 @@ import mega.privacy.android.shared.original.core.ui.controls.text.MegaText
 import mega.privacy.android.shared.original.core.ui.preview.CombinedThemeComponentPreviews
 import mega.privacy.android.shared.original.core.ui.theme.OriginalTheme
 import mega.privacy.android.shared.original.core.ui.theme.extensions.grey_alpha_054_white_alpha_054
-import mega.privacy.android.shared.original.core.ui.theme.extensions.textColorPrimary
 import mega.privacy.android.shared.original.core.ui.theme.extensions.textColorSecondary
 import mega.android.core.ui.theme.values.TextColor
 import mega.privacy.android.shared.original.core.ui.utils.shimmerEffect
 import mega.privacy.android.icon.pack.R as iconR
+import mega.privacy.android.shared.resources.R as sharedR
+import androidx.compose.foundation.layout.Box
+import androidx.compose.ui.Alignment
+import mega.privacy.android.app.presentation.meeting.chat.view.NOTE_TO_SELF_ITEM_NEW_LABEL
+import mega.privacy.android.app.presentation.meeting.chat.view.NoteToSelfAvatarView
+import mega.privacy.android.domain.entity.chat.ChatRoomItem.NoteToSelfChatRoomItem
+import mega.privacy.android.shared.original.core.ui.controls.chip.MegaChip
+import mega.privacy.android.shared.original.core.ui.controls.chip.TagChipStyle
+import mega.privacy.android.shared.original.core.ui.theme.extensions.subtitle1medium
 
 /**
  * Chat room item view
  *
  * @param item                  [ChatRoomItem]
  * @param isSelected
+ * @param isNew
  * @param isSelectionEnabled
  * @param onItemClick
  * @param onItemMoreClick
@@ -75,6 +84,7 @@ import mega.privacy.android.icon.pack.R as iconR
 internal fun ChatRoomItemView(
     item: ChatRoomItem,
     isSelected: Boolean,
+    isNew: Boolean = false,
     isSelectionEnabled: Boolean,
     onItemClick: (Long) -> Unit,
     onItemMoreClick: (ChatRoomItem) -> Unit,
@@ -88,15 +98,17 @@ internal fun ChatRoomItemView(
     val callDurationFromInitialTimestamp = item.getDurationFromInitialTimestamp()
     val shouldShownCallDuration =
         item.hasCallInProgress() && callDurationFromInitialTimestamp != null
+    val isNoteToSelfChat = item is NoteToSelfChatRoomItem
+    val isEmptyNoteToSelfChat = isNoteToSelfChat && item.isEmptyNoteToSelfChatRoom
 
     ConstraintLayout(
         modifier = modifier
             .fillMaxWidth()
-            .height(88.dp)
+            .height(if (isNoteToSelfChat && isEmptyNoteToSelfChat) 56.dp else 88.dp)
             .background(MaterialTheme.colors.surface)
             .combinedClickable(
                 onClick = {
-                    if (isSelectionEnabled) {
+                    if (isSelectionEnabled && !isEmptyNoteToSelfChat) {
                         hapticFeedback.performHapticFeedback(LongPress)
                         onItemSelected(item.chatId)
                     } else {
@@ -104,8 +116,10 @@ internal fun ChatRoomItemView(
                     }
                 },
                 onLongClick = {
-                    hapticFeedback.performHapticFeedback(LongPress)
-                    onItemSelected(item.chatId)
+                    if (!isEmptyNoteToSelfChat) {
+                        hapticFeedback.performHapticFeedback(LongPress)
+                        onItemSelected(item.chatId)
+                    }
                 },
             )
             .indication(
@@ -129,47 +143,69 @@ internal fun ChatRoomItemView(
             unreadCountIcon,
         ) = createRefs()
 
-        if (isSelected) {
-            Image(
-                imageVector = ImageVector.vectorResource(id = R.drawable.ic_select_contact),
-                contentDescription = "Selected item",
-                modifier = Modifier
-                    .testTag("chat_room_item:selected_image")
+        when {
+            isSelected -> {
+                Image(
+                    imageVector = ImageVector.vectorResource(id = R.drawable.ic_select_contact),
+                    contentDescription = "Selected item",
+                    modifier = Modifier
+                        .testTag("chat_room_item:selected_image")
+                        .size(40.dp)
+                        .constrainAs(avatarImage) {
+                            start.linkTo(parent.start, 16.dp)
+                            top.linkTo(parent.top)
+                            bottom.linkTo(parent.bottom)
+                        },
+                )
+            }
+
+            isNoteToSelfChat -> {
+                Box(modifier = Modifier
                     .size(40.dp)
                     .constrainAs(avatarImage) {
                         start.linkTo(parent.start, 16.dp)
                         top.linkTo(parent.top)
                         bottom.linkTo(parent.bottom)
-                    },
-            )
-        } else {
-            ChatAvatarView(
-                avatars = item.getChatAvatars(),
-                modifier = Modifier
-                    .testTag("chat_room_item:avatar_image")
-                    .size(40.dp)
-                    .constrainAs(avatarImage) {
-                        start.linkTo(parent.start, 16.dp)
-                        top.linkTo(parent.top)
-                        bottom.linkTo(parent.bottom)
-                    },
-            )
+                    }) {
+                    NoteToSelfAvatarView(
+                        isHint = isEmptyNoteToSelfChat,
+                        modifier = Modifier
+                            .align(Alignment.Center)
+                            .testTag("chat_room_item:avatar_image")
+                            .size(if (isEmptyNoteToSelfChat) 24.dp else 40.dp),
+                    )
+                }
+            }
+
+            else -> {
+                ChatAvatarView(
+                    avatars = item.getChatAvatars(),
+                    modifier = Modifier
+                        .testTag("chat_room_item:avatar_image")
+                        .size(40.dp)
+                        .constrainAs(avatarImage) {
+                            start.linkTo(parent.start, 16.dp)
+                            top.linkTo(parent.top)
+                            bottom.linkTo(parent.bottom)
+                        },
+                )
+            }
         }
 
-        Text(
-            text = item.title,
-            style = MaterialTheme.typography.subtitle1,
-            color = MaterialTheme.colors.textColorPrimary,
-            maxLines = 1,
-            overflow = TextOverflow.Ellipsis,
-            modifier = Modifier
-                .testTag("chat_room_item:title_text")
-                .constrainAs(titleText) {
-                    linkTo(avatarImage.end, parent.end, 16.dp, 74.dp, 72.dp, 0.dp, 0f)
-                    top.linkTo(parent.top)
-                    bottom.linkTo(middleText.top)
-                    width = Dimension.preferredWrapContent
-                }
+        val textModifier = Modifier
+            .testTag("chat_room_item:title_text")
+            .constrainAs(titleText) {
+                linkTo(avatarImage.end, parent.end, 16.dp, 74.dp, 72.dp, 0.dp, 0f)
+                top.linkTo(parent.top)
+                bottom.linkTo(middleText.top)
+                width = Dimension.preferredWrapContent
+            }
+        MegaText(
+            text = if (isNoteToSelfChat) stringResource(id = sharedR.string.chat_note_to_self_chat_title) else item.title,
+            textColor = TextColor.Primary,
+            style = if (isNoteToSelfChat) MaterialTheme.typography.subtitle1medium else MaterialTheme.typography.subtitle1,
+            overflow = LongTextBehaviour.Ellipsis(maxLines = 1),
+            modifier = if (isNoteToSelfChat) textModifier else textModifier
                 .shimmerEffect(isLoading, CircleShape),
         )
 
@@ -200,7 +236,7 @@ internal fun ChatRoomItemView(
                         top.linkTo(titleText.top)
                         bottom.linkTo(titleText.bottom)
                         visibility =
-                            if (item.isPublicChat()) Visibility.Gone else Visibility.Visible
+                            if (item.isPublicChat() || isNoteToSelfChat) Visibility.Gone else Visibility.Visible
                     },
             )
 
@@ -215,7 +251,8 @@ internal fun ChatRoomItemView(
                         start.linkTo(privateIcon.end, 2.dp, 4.dp)
                         top.linkTo(titleText.top)
                         bottom.linkTo(titleText.bottom)
-                        visibility = if (item.isMuted) Visibility.Visible else Visibility.Gone
+                        visibility =
+                            if (item.isMuted && !isNoteToSelfChat) Visibility.Visible else Visibility.Gone
                     },
             )
 
@@ -230,7 +267,7 @@ internal fun ChatRoomItemView(
                         start.linkTo(muteIcon.end, 2.dp, 4.dp)
                         top.linkTo(titleText.top)
                         bottom.linkTo(titleText.bottom)
-                        visibility = if (item.isRecurringMeeting())
+                        visibility = if (item.isRecurringMeeting() && !isNoteToSelfChat)
                             Visibility.Visible
                         else
                             Visibility.Gone
@@ -247,7 +284,7 @@ internal fun ChatRoomItemView(
                         start.linkTo(recurringIcon.end, 2.dp, 4.dp)
                         top.linkTo(titleText.top)
                         bottom.linkTo(titleText.bottom)
-                        visibility = if (hasOngoingCall)
+                        visibility = if (hasOngoingCall && !isNoteToSelfChat)
                             Visibility.Visible
                         else
                             Visibility.Gone
@@ -267,44 +304,46 @@ internal fun ChatRoomItemView(
                     top.linkTo(titleText.bottom)
                     bottom.linkTo(bottomText.top)
                     visibility =
-                        if (!isLoading && item.isLastMessageVoiceClip)
+                        if (!isLoading && item.isLastMessageVoiceClip && !isNoteToSelfChat)
                             Visibility.Visible
                         else
                             Visibility.Gone
                 },
         )
 
-        MiddleTextView(
-            modifier = Modifier
-                .testTag(TEST_TAG_MIDDLE_TEXT)
-                .constrainAs(middleText) {
-                    linkTo(
-                        start = lastMessageIcon.end,
-                        end = unreadCountIcon.start,
-                        startMargin = 2.dp,
-                        endMargin = 8.dp,
-                        startGoneMargin = 72.dp,
-                        endGoneMargin = 6.dp,
-                        bias = 0f
-                    )
-                    top.linkTo(titleText.bottom)
-                    bottom.linkTo(bottomText.top, 5.dp)
-                    width = Dimension.preferredWrapContent
-                }
-                .padding(vertical = if (isLoading) 2.dp else 0.dp)
-                .shimmerEffect(isLoading, CircleShape),
-            lastMessage = item.lastMessage,
-            isPending = isPending,
-            scheduledTimestamp = if (item is MeetingChatRoomItem) item.scheduledTimestampFormatted else null,
-            highlight = item.highlight,
-            shouldShownCallDuration = shouldShownCallDuration,
-            isRecurringDaily = item is MeetingChatRoomItem && item.isRecurringDaily,
-            isRecurringWeekly = item is MeetingChatRoomItem && item.isRecurringWeekly,
-            isRecurringMonthly = item is MeetingChatRoomItem && item.isRecurringMonthly,
-            isNormalMessage = item.isLastMessageNormal
-        )
+        if (!isNoteToSelfChat || !isEmptyNoteToSelfChat) {
+            MiddleTextView(
+                modifier = Modifier
+                    .testTag(TEST_TAG_MIDDLE_TEXT)
+                    .constrainAs(middleText) {
+                        linkTo(
+                            start = lastMessageIcon.end,
+                            end = unreadCountIcon.start,
+                            startMargin = 2.dp,
+                            endMargin = 8.dp,
+                            startGoneMargin = 72.dp,
+                            endGoneMargin = 6.dp,
+                            bias = 0f
+                        )
+                        top.linkTo(titleText.bottom)
+                        bottom.linkTo(bottomText.top, 5.dp)
+                        width = Dimension.preferredWrapContent
+                    }
+                    .padding(vertical = if (isLoading) 2.dp else 0.dp)
+                    .shimmerEffect(isLoading, CircleShape),
+                lastMessage = item.lastMessage,
+                isPending = isPending,
+                scheduledTimestamp = if (item is MeetingChatRoomItem) item.scheduledTimestampFormatted else null,
+                highlight = item.highlight,
+                shouldShownCallDuration = shouldShownCallDuration,
+                isRecurringDaily = item is MeetingChatRoomItem && item.isRecurringDaily,
+                isRecurringWeekly = item is MeetingChatRoomItem && item.isRecurringWeekly,
+                isRecurringMonthly = item is MeetingChatRoomItem && item.isRecurringMonthly,
+                isNormalMessage = item.isLastMessageNormal
+            )
+        }
 
-        if (shouldShownCallDuration) {
+        if (shouldShownCallDuration && !isNoteToSelfChat) {
             CallChronometer(
                 modifier = Modifier
                     .testTag(if (isPending) TEST_TAG_BOTTOM_TEXT_CALL_CHRONOMETER else TEST_TAG_MIDDLE_TEXT_CALL_CHRONOMETER)
@@ -320,37 +359,42 @@ internal fun ChatRoomItemView(
             )
         }
 
-        BottomTextView(
-            modifier = Modifier
-                .testTag(TEST_TAG_BOTTOM_TEXT)
-                .constrainAs(bottomText) {
-                    linkTo(
-                        start = parent.start,
-                        end = unreadCountIcon.start,
-                        startMargin = 72.dp,
-                        endMargin = 8.dp,
-                        startGoneMargin = 72.dp,
-                        endGoneMargin = 6.dp,
-                        bias = 0f
-                    )
-                    top.linkTo(middleText.bottom, 4.dp)
-                    bottom.linkTo(parent.bottom)
-                    width = Dimension.preferredWrapContent
-                }
-                .shimmerEffect(isLoading, CircleShape),
-            isRecurring = item is MeetingChatRoomItem && item.isRecurring(),
-            isPending = isPending,
-            highlight = item.highlight,
-            lastTimestamp = item.lastTimestampFormatted,
-            shouldShownCallDuration = shouldShownCallDuration,
-            lastMessage = item.lastMessage,
-        )
+        if (!isNoteToSelfChat || !isEmptyNoteToSelfChat) {
+            BottomTextView(
+                modifier = Modifier
+                    .testTag(TEST_TAG_BOTTOM_TEXT)
+                    .constrainAs(bottomText) {
+                        linkTo(
+                            start = parent.start,
+                            end = unreadCountIcon.start,
+                            startMargin = 72.dp,
+                            endMargin = 8.dp,
+                            startGoneMargin = 72.dp,
+                            endGoneMargin = 6.dp,
+                            bias = 0f
+                        )
+                        top.linkTo(middleText.bottom, 4.dp)
+                        bottom.linkTo(parent.bottom)
+                        width = Dimension.preferredWrapContent
+                    }
+                    .shimmerEffect(isLoading, CircleShape),
+                isRecurring = item is MeetingChatRoomItem && item.isRecurring(),
+                isPending = isPending,
+                highlight = item.highlight,
+                lastTimestamp = item.lastTimestampFormatted,
+                shouldShownCallDuration = shouldShownCallDuration,
+                lastMessage = item.lastMessage,
+            )
+        }
+
 
         IconButton(
             onClick = {
                 if (isSelectionEnabled) {
-                    hapticFeedback.performHapticFeedback(LongPress)
-                    onItemSelected(item.chatId)
+                    if (!isEmptyNoteToSelfChat) {
+                        hapticFeedback.performHapticFeedback(LongPress)
+                        onItemSelected(item.chatId)
+                    }
                 } else {
                     onItemMoreClick(item)
                 }
@@ -362,7 +406,7 @@ internal fun ChatRoomItemView(
                     end.linkTo(parent.end, 16.dp)
                     top.linkTo(parent.top)
                     bottom.linkTo(parent.bottom)
-                    visibility = if (!isLoading)
+                    visibility = if (!isLoading || isNoteToSelfChat)
                         Visibility.Visible
                     else
                         Visibility.Gone
@@ -384,12 +428,28 @@ internal fun ChatRoomItemView(
                     end.linkTo(moreButton.start, 8.dp)
                     top.linkTo(parent.top)
                     bottom.linkTo(parent.bottom)
-                    visibility = if (!isLoading && item.unreadCount > 0)
+                    visibility = if (!isLoading && item.unreadCount > 0 && !isNoteToSelfChat)
                         Visibility.Visible
                     else
                         Visibility.Gone
                 },
         )
+
+        if (isNoteToSelfChat && isEmptyNoteToSelfChat && isNew) {
+            MegaChip(
+                selected = true,
+                text = stringResource(sharedR.string.notifications_notification_item_new_tag),
+                style = TagChipStyle,
+                modifier = Modifier
+                    .testTag(NOTE_TO_SELF_ITEM_NEW_LABEL)
+                    .constrainAs(unreadCountIcon) {
+                        end.linkTo(moreButton.start, 16.dp)
+                        top.linkTo(parent.top)
+                        bottom.linkTo(parent.bottom)
+                        visibility = Visibility.Visible
+                    },
+            )
+        }
 
         createVerticalChain(
             titleText,
@@ -530,6 +590,24 @@ private fun PreviewIndividualChatRoomItem(
     }
 }
 
+@CombinedThemeComponentPreviews
+@Composable
+private fun PreviewNoteToSelfChatRoomItem(
+    @PreviewParameter(ChatRoomItemProvider::class) itemToSelected: Pair<ChatRoomItem, Boolean>,
+) {
+    OriginalTheme(isDark = isSystemInDarkTheme()) {
+        ChatRoomItemView(
+            item = itemToSelected.first,
+            isSelected = itemToSelected.second,
+            isNew = true,
+            isSelectionEnabled = itemToSelected.second,
+            onItemClick = {},
+            onItemMoreClick = {},
+            onItemSelected = {},
+        )
+    }
+}
+
 
 class ChatRoomItemProvider : PreviewParameterProvider<Pair<ChatRoomItem, Boolean>> {
     override val values = sequenceOf(
@@ -583,7 +661,18 @@ class ChatRoomItemProvider : PreviewParameterProvider<Pair<ChatRoomItem, Boolean
             chatId = 1L,
             title = "Photos Meeting #1325",
             isPublic = true,
-        ) to false
+        ) to false,
+        NoteToSelfChatRoomItem(
+            chatId = 1L,
+            title = "Mieko Kawakami",
+            peerEmail = "mieko@miekokawakami.jp",
+            lastMessage = "Call ended",
+            lastTimestampFormatted = "Monday 14:25",
+            unreadCount = 0,
+            highlight = false,
+            avatar = ChatAvatarItem("M", color = "#FEBC00".toColorInt()),
+            isMuted = false,
+        ) to true,
     )
 }
 
