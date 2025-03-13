@@ -6,6 +6,7 @@ import androidx.lifecycle.viewModelScope
 import dagger.hilt.android.lifecycle.HiltViewModel
 import de.palm.composestateevents.consumed
 import de.palm.composestateevents.triggered
+import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.catch
@@ -683,7 +684,17 @@ class LoginViewModel @Inject constructor(
 
         viewModelScope.launch {
             getAccountCredentialsUseCase()?.updateCredentials() ?: return@launch
-
+            var retry = 1
+            while (loginMutex.isLocked && retry <= 3) {
+                Timber.d("Wait for the isLoggingIn lock to be available")
+                delay(1000L * retry)
+                if (rootNodeExistsUseCase()) {
+                    Timber.d("Root node exists")
+                    _state.update { it.copy(intentState = LoginIntentState.ReadyForFinalSetup) }
+                    return@launch
+                }
+                retry++
+            }
             if (loginMutex.isLocked) {
                 Timber.w("Another login is processing")
                 pendingAction = ACTION_OPEN_APP

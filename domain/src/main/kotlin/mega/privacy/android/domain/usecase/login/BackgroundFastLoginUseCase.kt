@@ -31,25 +31,26 @@ class BackgroundFastLoginUseCase @Inject constructor(
      *
      */
     suspend operator fun invoke(): String {
-        loginMutex.lock()
+        try {
+            loginMutex.lock()
 
-        val session = getSessionUseCase() ?: run {
+            val session = getSessionUseCase() ?: run {
+                throw SessionNotRetrievedException()
+            }
+
+            if (!getRootNodeExistsUseCase()) {
+                initialiseMegaChatUseCase(session)
+                loginRepository.fastLogin(session)
+                loginRepository.fetchNodes()
+                // return new session
+                return getSessionUseCase().orEmpty()
+            }
+
+            return session
+        } catch (e: Exception) {
+            throw e
+        } finally {
             runCatching { loginMutex.unlock() }
-            throw SessionNotRetrievedException()
         }
-
-        if (!getRootNodeExistsUseCase()) {
-            initialiseMegaChatUseCase(session)
-            loginRepository.fastLogin(session)
-            loginRepository.fetchNodes()
-            // return new session
-            runCatching { loginMutex.unlock() }
-            return getSessionUseCase().orEmpty()
-        }
-
-        runCatching { loginMutex.unlock() }
-
-        return session
-
     }
 }
