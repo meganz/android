@@ -96,7 +96,7 @@ data class LoginState(
     val requestStatusProgress: Progress? = null,
     val isFirstTimeLaunch: Boolean = false,
     val themeMode: ThemeMode = ThemeMode.System,
-    val isLoginNewDesignEnabled: Boolean = false,
+    val isLoginNewDesignEnabled: Boolean? = null,
     val accountBlockedEvent: StateEventWithContent<AccountBlockedDetail> = consumed(),
     val resendVerificationEmailEvent: StateEventWithContent<Boolean> = consumed(),
 ) {

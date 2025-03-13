@@ -1,6 +1,5 @@
 package mega.privacy.android.app.presentation.login.view
 
-import mega.privacy.android.shared.resources.R as sharedR
 import android.content.res.Configuration
 import androidx.activity.compose.BackHandler
 import androidx.annotation.StringRes
@@ -115,6 +114,7 @@ import mega.privacy.android.domain.entity.account.AccountBlockedType
 import mega.privacy.android.domain.entity.account.AccountSession
 import mega.privacy.android.domain.exception.LoginTooManyAttempts
 import mega.privacy.android.domain.exception.LoginWrongEmailOrPassword
+import mega.privacy.android.shared.resources.R as sharedR
 import mega.privacy.mobile.analytics.event.LoginButtonPressedEvent
 import mega.privacy.mobile.analytics.event.LoginHelpButtonPressedEvent
 import mega.privacy.mobile.analytics.event.SignUpButtonOnLoginPagePressedEvent
@@ -670,14 +670,14 @@ private fun LoginInProgressText(
 
 internal fun tabletScreenWidth(orientation: Int): Dp {
     return when (orientation) {
-        Configuration.ORIENTATION_LANDSCAPE -> authScreenWidthTabletLandscape.dp
-        Configuration.ORIENTATION_PORTRAIT -> authScreenWidthTabletPortrait.dp
-        else -> authScreenWidthTabletPortrait.dp
+        Configuration.ORIENTATION_LANDSCAPE -> screenWidthTabletLandscape.dp
+        Configuration.ORIENTATION_PORTRAIT -> screenWidthTabletPortrait.dp
+        else -> screenWidthTabletPortrait.dp
     }
 }
 
-internal const val authScreenWidthTabletPortrait = 348
-internal const val authScreenWidthTabletLandscape = 357
+internal const val screenWidthTabletPortrait = 348
+internal const val screenWidthTabletLandscape = 357
 
 internal object LoginTestTags {
     private const val LOGIN_SCREEN = "login_screen"

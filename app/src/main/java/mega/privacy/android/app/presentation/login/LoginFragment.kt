@@ -1,6 +1,5 @@
 package mega.privacy.android.app.presentation.login
 
-import mega.privacy.android.shared.resources.R as sharedR
 import android.annotation.SuppressLint
 import android.app.Activity
 import android.content.Intent
@@ -76,6 +75,7 @@ import mega.privacy.android.domain.qualifier.LoginMutex
 import mega.privacy.android.domain.usecase.GetThemeMode
 import mega.privacy.android.domain.usecase.featureflag.GetFeatureFlagValueUseCase
 import mega.privacy.android.shared.original.core.ui.theme.OriginalTheme
+import mega.privacy.android.shared.resources.R as sharedR
 import nz.mega.sdk.MegaError
 import timber.log.Timber
 import javax.inject.Inject
@@ -142,7 +142,7 @@ class LoginFragment : Fragment() {
             if (ongoingTransfersExist == true) showCancelTransfersDialog()
         }
 
-        if (uiState.isLoginNewDesignEnabled) {
+        if (uiState.isLoginNewDesignEnabled == true) {
             AndroidTheme(isDark = uiState.themeMode.isDarkMode()) {
                 NewLoginView(
                     state = uiState,
@@ -168,7 +168,7 @@ class LoginFragment : Fragment() {
                     stopLogin = viewModel::stopLogin,
                 )
             }
-        } else {
+        } else if (uiState.isLoginNewDesignEnabled == false) {
             OriginalTheme(isDark = uiState.themeMode.isDarkMode()) {
                 LoginView(
                     state = uiState,
@@ -908,7 +908,7 @@ class LoginFragment : Fragment() {
                     return
 
                 is2FARequired || multiFactorAuthState != null -> {
-                    if (isLoginNewDesignEnabled) {
+                    if (isLoginNewDesignEnabled == true) {
                         viewModel.stopLogin()
                     } else {
                         showConfirmLogoutDialog()

@@ -711,7 +711,7 @@ class LoginViewModel @Inject constructor(
         _state.update { loginState ->
             //If LoginBlockedAccount will processed at the `onEvent` when receive an EVENT_ACCOUNT_BLOCKED
             //If LoginLoggedOutFromOtherLocation will be handled in the Activity
-            if (loginState.isLoginNewDesignEnabled) {
+            if (loginState.isLoginNewDesignEnabled == true) {
                 val snackbarMessage = this.newError
                     .takeIf {
                         // in the new design we don't show snackbar for these errors
