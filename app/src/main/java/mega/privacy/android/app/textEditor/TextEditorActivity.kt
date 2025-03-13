@@ -849,8 +849,10 @@ class TextEditorActivity : PasscodeActivity(), SnackbarShower, Scrollable {
         }
 
         collectFlow(viewModel.uiState.map { it.markDownFileLoaded }) { isLoaded ->
-            binding.loadingLayout.isVisible = !isLoaded
-            binding.editFab.isVisible = isLoaded
+            if (viewModel.uiState.value.isMarkDownFile) {
+                binding.loadingLayout.isVisible = !isLoaded
+                binding.editFab.isVisible = isLoaded
+            }
         }
     }
 
@@ -927,6 +929,11 @@ class TextEditorActivity : PasscodeActivity(), SnackbarShower, Scrollable {
     private fun showContentRead(content: Pagination) {
         val currentContent = content.getCurrentPageText()
 
+        if (viewModel.uiState.value.isMarkDownFile) {
+            binding.loadingLayout.isVisible = true
+            viewModel.convertMarkDownToHtml(this, binding.contentWebView)
+        }
+
         if (viewModel.needsReadOrIsReadingContent()
             || (content.isNotEmpty() && currentContent == binding.contentText.text.toString())
         ) {
@@ -942,9 +949,6 @@ class TextEditorActivity : PasscodeActivity(), SnackbarShower, Scrollable {
         val firstLineNumber = content.getFirstLineNumber()
         binding.contentText.setText(currentContent, firstLineNumber)
         binding.contentEditText.setText(currentContent, firstLineNumber)
-        if (viewModel.uiState.value.isMarkDownFile) {
-            viewModel.convertMarkDownToHtml(this, binding.contentWebView)
-        }
         binding.fileEditorScrollView.isVisible = true
         binding.fileEditorScrollView.smoothScrollTo(0, 0)
         binding.loadingLayout.isVisible = false || viewModel.uiState.value.isMarkDownFile
