@@ -35,6 +35,7 @@ import mega.privacy.android.app.fragments.homepage.EventObserver
 import mega.privacy.android.app.fragments.homepage.SortByHeaderViewModel
 import mega.privacy.android.app.main.FileExplorerActivity.Companion.ACTION_SAVE_TO_CLOUD
 import mega.privacy.android.app.main.FileExplorerActivity.Companion.CLOUD_FRAGMENT
+import mega.privacy.android.app.main.adapters.FileExplorerPagerAdapter.Companion.TAB_POSITION_INCOMING
 import mega.privacy.android.app.main.adapters.MegaExplorerAdapter
 import mega.privacy.android.app.main.adapters.RotatableAdapter
 import mega.privacy.android.app.main.managerSections.RotatableFragment
@@ -682,7 +683,9 @@ class CloudDriveExplorerFragment : RotatableFragment(), CheckScrollInterface, Se
             val parentNode = megaApi.getParentNode(megaApi.getNodeByHandle(parentHandle))
                 ?: when {
                     activity.intent.action == ACTION_SAVE_TO_CLOUD -> {
-                        megaApi.rootNode?.takeIf { parentHandle != it.handle }
+                        megaApi.rootNode?.takeIf { parentHandle != it.handle }?.also {
+                            fileExplorerActivity.setCurrentTab(TAB_POSITION_INCOMING)
+                        }
                     }
 
                     else -> null

@@ -2697,6 +2697,13 @@ class FileExplorerActivity : PasscodeActivity(), MegaRequestListenerInterface,
         )
     }
 
+    internal fun setCurrentTab(position: Int) {
+        val itemCount = binding.explorerTabsPager.adapter?.itemCount ?: 0
+        if (position in 0 until itemCount) {
+            binding.explorerTabsPager.setCurrentItem(position, false)
+        }
+    }
+
     companion object {
         private const val SHOULD_RESTART_SEARCH = "SHOULD_RESTART_SEARCH"
         private const val QUERY_AFTER_SEARCH = "QUERY_AFTER_SEARCH"
