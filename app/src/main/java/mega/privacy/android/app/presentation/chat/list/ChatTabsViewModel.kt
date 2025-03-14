@@ -89,8 +89,6 @@ import javax.inject.Inject
  * @property setNextMeetingTooltipUseCase               [SetNextMeetingTooltipUseCase]
  * @property monitorScheduledMeetingCanceledUseCase     [MonitorScheduledMeetingCanceledUseCase]
  * @property getChatsUnreadStatusUseCase                [GetChatsUnreadStatusUseCase]
- * @property createNoteToSelfChatUseCase                [CreateNoteToSelfChatUseCase]
- * @property getNoteToSelfChatUseCase                   [GetNoteToSelfChatUseCase]
  * @property startMeetingInWaitingRoomChatUseCase       [StartMeetingInWaitingRoomChatUseCase]
  */
 @OptIn(ExperimentalCoroutinesApi::class)
@@ -120,13 +118,11 @@ class ChatTabsViewModel @Inject constructor(
     private val monitorChatCallUpdatesUseCase: MonitorChatCallUpdatesUseCase,
     private val hasArchivedChatsUseCase: HasArchivedChatsUseCase,
     private val monitorHasAnyContactUseCase: MonitorHasAnyContactUseCase,
-    private val getFeatureFlagValueUseCase: GetFeatureFlagValueUseCase,
-    private val getNoteToSelfChatUseCase: GetNoteToSelfChatUseCase,
-    private val createNoteToSelfChatUseCase: CreateNoteToSelfChatUseCase,
 ) : ViewModel() {
 
     private val state = MutableStateFlow(ChatsTabState())
     private var meetingsRequested = false
+    private var noteToSelfChatId: Long? = -1L
 
     private var monitorChatCallUpdatesJob: Job? = null
 
@@ -136,7 +132,6 @@ class ChatTabsViewModel @Inject constructor(
     fun getState(): StateFlow<ChatsTabState> = state
 
     init {
-        getApiFeatureFlag()
         signalChatPresence()
         requestChats()
         retrieveChatStatus()
@@ -151,69 +146,13 @@ class ChatTabsViewModel @Inject constructor(
     }
 
     /**
-     * Get note to yourself api feature flag
+     * Set note to self chat
+     *
+     * @param id
      */
-    fun getApiFeatureFlag() {
-        viewModelScope.launch {
-            runCatching {
-                getFeatureFlagValueUseCase(ApiFeatures.NoteToYourselfFlag)
-            }.onFailure { exception ->
-                Timber.e(exception)
-            }.onSuccess { flag ->
-                state.update { state ->
-                    state.copy(
-                        isNoteToYourselfFeatureFlagEnabled = flag,
-                    )
-                }
-
-                if (flag) {
-                    getNoteToSelfChat()
-                }
-            }
-        }
-    }
-
-    /**
-     * Get note to self chat
-     */
-    fun getNoteToSelfChat() =
-        viewModelScope.launch {
-            runCatching {
-                getNoteToSelfChatUseCase()
-            }.onFailure { exception ->
-                Timber.e(exception)
-            }.onSuccess { chat ->
-                chat?.apply {
-                    Timber.d("Note to self chat is already created, chatID $chatId")
-                    state.update { state ->
-                        state.copy(
-                            noteToSelfChatId = chatId,
-                        )
-                    }
-                } ?: run {
-                    Timber.d("Note to self chat is not created")
-                    createNoteToSelfChat()
-                }
-            }
-        }
-
-    /**
-     * Create note to self chat
-     */
-    fun createNoteToSelfChat() {
-        viewModelScope.launch {
-            runCatching {
-                createNoteToSelfChatUseCase().let {
-                    getNoteToSelfChatUseCase()?.let { chatRoom ->
-                        Timber.d("Note to self chat successfully created, chatID ${chatRoom.chatId}")
-                        state.update { state ->
-                            state.copy(
-                                noteToSelfChatId = chatRoom.chatId,
-                            )
-                        }
-                    }
-                }
-            }
+    fun setNoteToSelfChatId(id: Long) {
+        if (noteToSelfChatId != id) {
+            this.noteToSelfChatId = id
         }
     }
 
@@ -300,7 +239,7 @@ class ChatTabsViewModel @Inject constructor(
      * @param items List of [ChatRoomItem]
      */
     private fun sortChats(items: List<ChatRoomItem>): List<ChatRoomItem> =
-        items.sortedByDescending { it.chatId == state.value.noteToSelfChatId }
+        items.sortedByDescending { it.chatId == noteToSelfChatId }
 
     /**
      * Request Meeting Rooms

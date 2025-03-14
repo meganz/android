@@ -23,6 +23,7 @@ import mega.privacy.android.analytics.Analytics
 import mega.privacy.android.app.main.legacycontact.AddContactActivity
 import mega.privacy.android.app.presentation.contact.invite.InviteContactActivity
 import mega.privacy.android.app.presentation.container.MegaAppContainer
+import mega.privacy.android.app.presentation.meeting.NoteToSelfChatViewModel
 import mega.privacy.android.app.presentation.passcode.model.PasscodeCryptObjectFactory
 import mega.privacy.android.app.presentation.startconversation.model.StartConversationAction
 import mega.privacy.android.app.presentation.startconversation.view.StartConversationView
@@ -32,6 +33,7 @@ import mega.privacy.android.domain.usecase.GetThemeMode
 import mega.privacy.mobile.analytics.event.GroupChatPressedEvent
 import mega.privacy.mobile.analytics.event.InviteContactsPressedEvent
 import javax.inject.Inject
+import kotlin.getValue
 
 /**
  * Activity which allows to start a new chat conversation.
@@ -49,6 +51,7 @@ class StartConversationActivity : ComponentActivity() {
     lateinit var getThemeMode: GetThemeMode
 
     private val viewModel by viewModels<StartConversationViewModel>()
+    private val noteToSelfChatViewModel by viewModels<NoteToSelfChatViewModel>()
 
     lateinit var resultLauncher: ActivityResultLauncher<Intent>
     private lateinit var addContactActivityLauncher: ActivityResultLauncher<Intent>
@@ -115,7 +118,7 @@ class StartConversationActivity : ComponentActivity() {
     private fun StartConversationView() {
         val themeMode by getThemeMode().collectAsState(initial = ThemeMode.System)
         val uiState by viewModel.state.collectAsState()
-
+        val noteToSelfChatUIState by noteToSelfChatViewModel.state.collectAsState()
 
         MegaAppContainer(
             themeMode = themeMode,
@@ -123,6 +126,7 @@ class StartConversationActivity : ComponentActivity() {
         ) {
             StartConversationView(
                 state = uiState,
+                noteToSelfChatUIState = noteToSelfChatUIState,
                 onButtonClicked = ::onActionTap,
                 onContactClicked = viewModel::onContactTap,
                 onSearchTextChange = viewModel::setTypedSearch,

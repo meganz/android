@@ -5,16 +5,13 @@ import com.google.common.truth.Truth
 import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.emptyFlow
 import kotlinx.coroutines.flow.flowOf
-import kotlinx.coroutines.runBlocking
 import kotlinx.coroutines.test.runTest
 import mega.privacy.android.app.components.ChatManagement
-import mega.privacy.android.app.featuretoggle.ApiFeatures
 import mega.privacy.android.app.meeting.gateway.RTCAudioManagerGateway
 import mega.privacy.android.app.presentation.chat.mapper.ChatRoomTimestampMapper
 import mega.privacy.android.app.usecase.chat.GetLastMessageUseCase
 import mega.privacy.android.core.test.extension.CoroutineMainDispatcherExtension
 import mega.privacy.android.data.gateway.api.MegaChatApiGateway
-import mega.privacy.android.domain.entity.chat.ChatRoom
 import mega.privacy.android.domain.entity.chat.MeetingTooltipItem
 import mega.privacy.android.domain.usecase.SignalChatPresenceActivity
 import mega.privacy.android.domain.usecase.call.AnswerChatCallUseCase
@@ -23,18 +20,15 @@ import mega.privacy.android.domain.usecase.call.OpenOrStartCallUseCase
 import mega.privacy.android.domain.usecase.call.StartChatCallNoRingingUseCase
 import mega.privacy.android.domain.usecase.chat.ArchiveChatUseCase
 import mega.privacy.android.domain.usecase.chat.ClearChatHistoryUseCase
-import mega.privacy.android.domain.usecase.chat.CreateNoteToSelfChatUseCase
 import mega.privacy.android.domain.usecase.chat.GetChatsUnreadStatusUseCase
 import mega.privacy.android.domain.usecase.chat.GetChatsUseCase
 import mega.privacy.android.domain.usecase.chat.GetCurrentChatStatusUseCase
 import mega.privacy.android.domain.usecase.chat.GetMeetingTooltipsUseCase
-import mega.privacy.android.domain.usecase.chat.GetNoteToSelfChatUseCase
 import mega.privacy.android.domain.usecase.chat.HasArchivedChatsUseCase
 import mega.privacy.android.domain.usecase.chat.LeaveChatUseCase
 import mega.privacy.android.domain.usecase.chat.MonitorLeaveChatUseCase
 import mega.privacy.android.domain.usecase.chat.SetNextMeetingTooltipUseCase
 import mega.privacy.android.domain.usecase.contact.MonitorHasAnyContactUseCase
-import mega.privacy.android.domain.usecase.featureflag.GetFeatureFlagValueUseCase
 import mega.privacy.android.domain.usecase.meeting.CancelScheduledMeetingUseCase
 import mega.privacy.android.domain.usecase.meeting.LoadMessagesUseCase
 import mega.privacy.android.domain.usecase.meeting.MonitorChatCallUpdatesUseCase
@@ -83,9 +77,6 @@ internal class ChatTabsViewModelTest {
     private val monitorChatCallUpdatesUseCase: MonitorChatCallUpdatesUseCase = mock()
     private val hasArchivedChatsUseCase: HasArchivedChatsUseCase = mock()
     private val monitorHasAnyContactUseCase: MonitorHasAnyContactUseCase = mock()
-    private val getFeatureFlagValueUseCase: GetFeatureFlagValueUseCase = mock()
-    private val getNoteToSelfChatUseCase: GetNoteToSelfChatUseCase = mock()
-    private val createNoteToSelfChatUseCase: CreateNoteToSelfChatUseCase = mock()
 
     @BeforeEach
     fun resetMocks() {
@@ -114,16 +105,10 @@ internal class ChatTabsViewModelTest {
             getChatsUnreadStatusUseCase,
             startMeetingInWaitingRoomChatUseCase,
             monitorChatCallUpdatesUseCase,
-            getFeatureFlagValueUseCase,
-            getNoteToSelfChatUseCase,
-            createNoteToSelfChatUseCase
         )
     }
 
     private fun initTestClass() {
-        runBlocking {
-            commonStub()
-        }
         underTest = ChatTabsViewModel(
             archiveChatUseCase,
             leaveChatUseCase,
@@ -149,15 +134,7 @@ internal class ChatTabsViewModelTest {
             monitorChatCallUpdatesUseCase,
             hasArchivedChatsUseCase,
             monitorHasAnyContactUseCase,
-            getFeatureFlagValueUseCase,
-            getNoteToSelfChatUseCase,
-            createNoteToSelfChatUseCase
         )
-    }
-
-    private suspend fun commonStub() = runTest {
-        whenever(getFeatureFlagValueUseCase(ApiFeatures.NoteToYourselfFlag)).thenReturn(true)
-
     }
 
     @ParameterizedTest
@@ -213,41 +190,6 @@ internal class ChatTabsViewModelTest {
             underTest.checkHasArchivedChats()
             val updatedState = awaitItem()
             Truth.assertThat(updatedState.hasArchivedChats).isTrue()
-        }
-    }
-
-    @Test
-    fun `test that noteToSelfChatId updated when calling getNoteToSelfChatUseCase`() = runTest {
-        initTestClass()
-        val chatRoom = mock<ChatRoom> {
-            on { chatId }.thenReturn(123L)
-            on { isNoteToSelf }.thenReturn(true)
-        }
-        whenever(getNoteToSelfChatUseCase()).thenReturn(chatRoom)
-        underTest.getState().test {
-            val state = awaitItem()
-            Truth.assertThat(state.noteToSelfChatId).isNull()
-            underTest.getNoteToSelfChat()
-            val updatedState = awaitItem()
-            Truth.assertThat(updatedState.noteToSelfChatId).isNotNull()
-        }
-    }
-
-    @Test
-    fun `test that noteToSelfChatId updated when calling createNoteToSelfChatUseCase`() = runTest {
-        initTestClass()
-        val chatRoom = mock<ChatRoom> {
-            on { chatId }.thenReturn(123L)
-            on { isNoteToSelf }.thenReturn(true)
-        }
-        whenever(getNoteToSelfChatUseCase()).thenReturn(chatRoom)
-        whenever(createNoteToSelfChatUseCase()).thenReturn(123L)
-        underTest.getState().test {
-            val state = awaitItem()
-            Truth.assertThat(state.noteToSelfChatId).isNull()
-            underTest.createNoteToSelfChat()
-            val updatedState = awaitItem()
-            Truth.assertThat(updatedState.noteToSelfChatId).isNotNull()
         }
     }
 }

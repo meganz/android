@@ -10,6 +10,7 @@ import org.junit.Rule
 import org.junit.Test
 import org.junit.runner.RunWith
 import mega.privacy.android.app.onNodeWithText
+import mega.privacy.android.app.presentation.meeting.model.NoteToSelfChatUIState
 import mega.privacy.android.app.presentation.startconversation.view.TEST_TAG_RAISED_DEFAULT_MEGA_BUTTON
 
 @RunWith(AndroidJUnit4::class)
@@ -51,10 +52,12 @@ class StartConversationViewTest {
 
     private fun initComposeRuleContent(
         state: StartConversationState = StartConversationState(),
+        noteToSelfChatUIState: NoteToSelfChatUIState = NoteToSelfChatUIState(),
     ) {
         composeRule.setContent {
             StartConversationView(
                 state = state,
+                noteToSelfChatUIState = noteToSelfChatUIState,
                 onSearchTextChange = {},
                 onCloseSearchClicked = {},
                 onSearchClicked = {},

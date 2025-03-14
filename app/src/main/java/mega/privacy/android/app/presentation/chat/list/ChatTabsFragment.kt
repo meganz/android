@@ -31,6 +31,8 @@ import com.google.firebase.crashlytics.ktx.crashlytics
 import com.google.firebase.ktx.Firebase
 import dagger.hilt.android.AndroidEntryPoint
 import de.palm.composestateevents.EventEffect
+import kotlinx.coroutines.flow.distinctUntilChanged
+import kotlinx.coroutines.flow.map
 import mega.privacy.android.analytics.Analytics
 import mega.privacy.android.app.BaseActivity
 import mega.privacy.android.app.MegaApplication
@@ -47,6 +49,7 @@ import mega.privacy.android.app.presentation.chat.list.view.ChatTabsView
 import mega.privacy.android.app.presentation.contact.invite.InviteContactActivity
 import mega.privacy.android.app.presentation.extensions.isDarkMode
 import mega.privacy.android.app.presentation.meeting.CreateScheduledMeetingActivity
+import mega.privacy.android.app.presentation.meeting.NoteToSelfChatViewModel
 import mega.privacy.android.app.presentation.meeting.ScheduledMeetingManagementViewModel
 import mega.privacy.android.app.presentation.meeting.WaitingRoomActivity
 import mega.privacy.android.app.presentation.meeting.model.ShareLinkOption
@@ -117,6 +120,7 @@ class ChatTabsFragment : Fragment() {
 
     private val viewModel by viewModels<ChatTabsViewModel>()
     private val scheduledMeetingManagementViewModel by viewModels<ScheduledMeetingManagementViewModel>()
+    private val noteToSelfChatViewModel by viewModels<NoteToSelfChatViewModel>()
 
     private val bluetoothPermissionLauncher =
         registerForActivityResult(ActivityResultContracts.RequestPermission()) { isGrant ->
@@ -205,6 +209,7 @@ class ChatTabsFragment : Fragment() {
                 val mode by getThemeMode().collectAsStateWithLifecycle(initialValue = ThemeMode.System)
                 val chatsTabState by viewModel.getState().collectAsStateWithLifecycle()
                 val managementState by scheduledMeetingManagementViewModel.state.collectAsStateWithLifecycle()
+                val noteToSelfChatState by noteToSelfChatViewModel.state.collectAsStateWithLifecycle()
 
                 EventEffect(
                     managementState.meetingLinkCreated,
@@ -236,6 +241,7 @@ class ChatTabsFragment : Fragment() {
                     ChatTabsView(
                         state = chatsTabState,
                         managementState = managementState,
+                        noteToSelfChatState = noteToSelfChatState,
                         showMeetingTab = showMeetingTab,
                         onTabSelected = ::onTabSelected,
                         onItemClick = ::onItemClick,
@@ -317,6 +323,13 @@ class ChatTabsFragment : Fragment() {
                 ChatStatusDialogFragment().show(childFragmentManager, ChatStatusDialogFragment.TAG)
             }
             setupMenu()
+        }
+
+        viewLifecycleOwner.collectFlow(noteToSelfChatViewModel.state.map { it.noteToSelfChatId }
+            .distinctUntilChanged()) {
+            it?.let {
+                viewModel.setNoteToSelfChatId(id = it)
+            }
         }
     }
 

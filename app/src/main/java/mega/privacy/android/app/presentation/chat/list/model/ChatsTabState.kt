@@ -3,7 +3,6 @@ package mega.privacy.android.app.presentation.chat.list.model
 import de.palm.composestateevents.StateEventWithContent
 import de.palm.composestateevents.consumed
 import mega.privacy.android.app.presentation.data.SnackBarItem
-import mega.privacy.android.domain.entity.ChatRoomLastMessage
 import mega.privacy.android.domain.entity.chat.ChatRoomItem
 import mega.privacy.android.domain.entity.chat.ChatStatus
 import mega.privacy.android.domain.entity.chat.MeetingTooltipItem
@@ -28,8 +27,6 @@ import mega.privacy.android.domain.entity.chat.MeetingTooltipItem
  * @property showForceUpdateDialog
  * @property hasArchivedChats
  * @property hasAnyContact
- * @property isNoteToYourselfFeatureFlagEnabled
- * @property noteToSelfChatId
  * @constructor Create empty Chat tab state
  */
 data class ChatsTabState(
@@ -50,30 +47,5 @@ data class ChatsTabState(
     val showForceUpdateDialog: Boolean = false,
     val hasArchivedChats: Boolean = false,
     val hasAnyContact: Boolean = false,
-    val isNoteToYourselfFeatureFlagEnabled: Boolean = false,
-    val noteToSelfChatId: Long? = null,
-    val isNewFeature: Boolean = false,
-) {
-    /**
-     * Check if only note to self chat is present
-     */
-    val isOnlyNoteToSelfChat
-        get():Boolean = noteToSelfChatRoomItem != null && chats.size == 1 && chats.contains(
-            noteToSelfChatRoomItem
-        )
+)
 
-    /**
-     * Get note to self chat room item
-     */
-    val noteToSelfChatRoomItem
-        get():ChatRoomItem? = chats.find { it.chatId == noteToSelfChatId }
-
-    /**
-     * Check if the note to self chat room is empty
-     */
-    val isEmptyNoteToSelfChatRoom
-        get():Boolean {
-            noteToSelfChatRoomItem?.apply { return lastMessageType == ChatRoomLastMessage.Invalid || lastMessageType == ChatRoomLastMessage.Unknown }
-            return true
-        }
-}

@@ -11,7 +11,6 @@ import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.test.StandardTestDispatcher
 import kotlinx.coroutines.test.runTest
 import mega.privacy.android.app.R
-import mega.privacy.android.app.presentation.startconversation.StartConversationViewModel
 import mega.privacy.android.app.presentation.startconversation.model.StartConversationAction
 import mega.privacy.android.core.test.extension.CoroutineMainDispatcherExtension
 import mega.privacy.android.domain.entity.contacts.ContactData
@@ -29,7 +28,6 @@ import mega.privacy.android.domain.usecase.contact.AddNewContactsUseCase
 import mega.privacy.android.domain.usecase.contact.MonitorChatOnlineStatusUseCase
 import mega.privacy.android.domain.usecase.contact.MonitorChatPresenceLastGreenUpdatesUseCase
 import mega.privacy.android.domain.usecase.contact.RequestUserLastGreenUseCase
-import mega.privacy.android.domain.usecase.featureflag.GetFeatureFlagValueUseCase
 import mega.privacy.android.domain.usecase.network.MonitorConnectivityUseCase
 import mega.privacy.android.legacy.core.ui.model.SearchWidgetState
 import org.junit.jupiter.api.BeforeEach
@@ -44,9 +42,6 @@ import org.mockito.kotlin.mock
 import org.mockito.kotlin.whenever
 import org.mockito.kotlin.wheneverBlocking
 import mega.privacy.android.app.InstantExecutorExtension
-import mega.privacy.android.domain.usecase.chat.CreateNoteToSelfChatUseCase
-import mega.privacy.android.domain.usecase.chat.GetNoteToSelfChatUseCase
-import mega.privacy.android.domain.usecase.chat.IsAnEmptyChatUseCase
 
 @ExtendWith(InstantExecutorExtension::class)
 @TestInstance(TestInstance.Lifecycle.PER_CLASS)
@@ -102,10 +97,6 @@ class StartConversationViewModelTest {
     private val addNewContactsUseCase = mock<AddNewContactsUseCase>()
     private val requestUserLastGreenUseCase = mock<RequestUserLastGreenUseCase>()
     private val createGroupChatRoomUseCase = mock<CreateGroupChatRoomUseCase>()
-    private val getFeatureFlagValueUseCase = mock<GetFeatureFlagValueUseCase>()
-    private val getNoteToSelfChatUseCase = mock<GetNoteToSelfChatUseCase>()
-    private val createNoteToSelfChatUseCase = mock<CreateNoteToSelfChatUseCase>()
-    private val isAnEmptyChatUseCase = mock<IsAnEmptyChatUseCase>()
 
     @BeforeEach
     fun resetMocks() {
@@ -116,8 +107,7 @@ class StartConversationViewModelTest {
             applyContactUpdates,
             addNewContactsUseCase,
             requestUserLastGreenUseCase,
-            createGroupChatRoomUseCase,
-            getFeatureFlagValueUseCase
+            createGroupChatRoomUseCase
         )
         savedStateHandle = SavedStateHandle(mapOf())
         wheneverBlocking { getVisibleContactsUseCase() }.thenReturn(emptyList())
@@ -144,10 +134,6 @@ class StartConversationViewModelTest {
             addNewContactsUseCase = addNewContactsUseCase,
             requestUserLastGreenUseCase = requestUserLastGreenUseCase,
             monitorConnectivityUseCase = monitorConnectivityUseCase,
-            getFeatureFlagValueUseCase = getFeatureFlagValueUseCase,
-            getNoteToSelfChatUseCase = getNoteToSelfChatUseCase,
-            createNoteToSelfChatUseCase = createNoteToSelfChatUseCase,
-            isAnEmptyChatUseCase = isAnEmptyChatUseCase,
             savedStateHandle = savedStateHandle,
         )
     }

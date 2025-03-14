@@ -17,7 +17,6 @@ import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.lazy.rememberLazyListState
-import androidx.compose.material.Divider
 import androidx.compose.material.MaterialTheme
 import androidx.compose.material.Scaffold
 import androidx.compose.material.SnackbarDuration
@@ -59,6 +58,7 @@ import mega.privacy.android.shared.original.core.ui.preview.CombinedThemePreview
 import mega.privacy.android.shared.original.core.ui.theme.OriginalTheme
 import mega.android.core.ui.theme.values.TextColor
 import mega.privacy.android.app.presentation.meeting.chat.view.NoteToSelfView
+import mega.privacy.android.app.presentation.meeting.model.NoteToSelfChatUIState
 import mega.privacy.android.shared.original.core.ui.controls.dividers.DividerType
 import mega.privacy.android.shared.original.core.ui.controls.dividers.MegaDivider
 
@@ -68,6 +68,7 @@ import mega.privacy.android.shared.original.core.ui.controls.dividers.MegaDivide
 @Composable
 fun StartConversationView(
     state: StartConversationState,
+    noteToSelfChatUIState: NoteToSelfChatUIState,
     onContactClicked: (ContactItem) -> Unit,
     onSearchTextChange: (String) -> Unit,
     onCloseSearchClicked: () -> Unit,
@@ -144,12 +145,12 @@ fun StartConversationView(
                     contactsList.isNotEmpty() -> {
                         item(key = "Contacts header") { ContactsHeader() }
 
-                        if (isNoteToYourselfFeatureFlagEnabled) {
+                        if (noteToSelfChatUIState.isNoteToYourselfFeatureFlagEnabled) {
                             item(key = "Note to self") {
                                 NoteToSelfView(
                                     onNoteToSelfClicked,
-                                    isHint = isNoteToSelfChatEmpty,
-                                    isNew = isNoteToSelfNew
+                                    isHint = noteToSelfChatUIState.isNoteToSelfChatEmpty,
+                                    isNew = noteToSelfChatUIState.isNewFeature
                                 )
                             }
                         }
@@ -169,12 +170,12 @@ fun StartConversationView(
 
                     else -> {
                         item(key = "Contacts header") { ContactsHeader() }
-                        if (isNoteToYourselfFeatureFlagEnabled) {
+                        if (noteToSelfChatUIState.isNoteToYourselfFeatureFlagEnabled) {
                             item(key = "Note to self") {
                                 NoteToSelfView(
                                     onNoteToSelfClicked,
-                                    isHint = isNoteToSelfChatEmpty,
-                                    isNew = isNoteToSelfNew
+                                    isHint = noteToSelfChatUIState.isNoteToSelfChatEmpty,
+                                    isNew = noteToSelfChatUIState.isNewFeature
                                 )
                             }
                         }
@@ -310,7 +311,6 @@ private fun HeaderItem(text: String) {
 
 @Composable
 private fun EmptyContactsView(onInviteContactsClicked: () -> Unit) {
-    val isDark = isSystemInDarkTheme()
     Column(
         modifier = Modifier
             .padding(horizontal = 40.dp)
@@ -328,7 +328,7 @@ private fun EmptyContactsView(onInviteContactsClicked: () -> Unit) {
                 modifier = Modifier
                     .padding(vertical = 10.dp)
                     .size(120.dp),
-                painter = painterResource(id =  IconR.drawable.ic_user_glass),
+                painter = painterResource(id = IconR.drawable.ic_user_glass),
                 contentDescription = "Empty contacts image",
             )
         }
@@ -394,6 +394,7 @@ private fun PreviewStartConversationView() {
     OriginalTheme(isDark = isSystemInDarkTheme()) {
         StartConversationView(
             state = StartConversationState(),
+            noteToSelfChatUIState = NoteToSelfChatUIState(),
             onButtonClicked = {},
             onContactClicked = {},
             onSearchTextChange = {},

@@ -39,6 +39,7 @@ import mega.privacy.android.app.R
 import mega.privacy.android.app.extensions.normalize
 import mega.privacy.android.app.presentation.chat.list.model.ChatTab
 import mega.privacy.android.app.presentation.chat.list.model.ChatsTabState
+import mega.privacy.android.app.presentation.meeting.model.NoteToSelfChatUIState
 import mega.privacy.android.app.presentation.meeting.model.ScheduledMeetingManagementUiState
 import mega.privacy.android.app.presentation.meeting.view.dialog.CancelScheduledMeetingDialog
 import mega.privacy.android.app.presentation.meeting.view.dialog.ForceAppUpdateDialog
@@ -55,6 +56,7 @@ import mega.privacy.android.shared.original.core.ui.utils.showAutoDurationSnackb
  *
  * @param state             [ChatsTabState]
  * @param managementState   [ScheduledMeetingManagementUiState]
+ * @param noteToSelfChatState   [NoteToSelfChatUIState]
  * @param showMeetingTab    True to show Meeting tab as initial tab or false (default) otherwise
  * @param onTabSelected
  * @param onItemClick
@@ -66,6 +68,7 @@ import mega.privacy.android.shared.original.core.ui.utils.showAutoDurationSnackb
 fun ChatTabsView(
     state: ChatsTabState,
     managementState: ScheduledMeetingManagementUiState,
+    noteToSelfChatState: NoteToSelfChatUIState,
     showMeetingTab: Boolean = false,
     onTabSelected: (ChatTab) -> Unit = {},
     onItemClick: (Long) -> Unit = {},
@@ -180,7 +183,7 @@ fun ChatTabsView(
                     onItemClick = onItemClick,
                     isMeetingView = isMeetingView,
                     tooltip = state.tooltip,
-                    isNew = state.isNewFeature,
+                    isNew = noteToSelfChatState.isNewFeature,
                     onItemMoreClick = onItemMoreClick,
                     onItemSelected = onItemSelected,
                     onScrollInProgress = { showFabButton = !it },
@@ -279,6 +282,7 @@ private fun PreviewEmptyView() {
         ChatTabsView(
             state = ChatsTabState(currentUnreadStatus = true to false),
             managementState = ScheduledMeetingManagementUiState(),
+            noteToSelfChatState = NoteToSelfChatUIState(),
         )
     }
 }

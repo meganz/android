@@ -17,7 +17,6 @@ import mega.privacy.android.app.R
 import mega.privacy.android.app.data.extensions.findItemByHandle
 import mega.privacy.android.app.data.extensions.replaceIfExists
 import mega.privacy.android.app.data.extensions.sortList
-import mega.privacy.android.app.featuretoggle.ApiFeatures
 import mega.privacy.android.app.presentation.extensions.getStateFlow
 import mega.privacy.android.app.presentation.startconversation.model.StartConversationState
 import mega.privacy.android.domain.entity.contacts.ContactItem
@@ -28,15 +27,11 @@ import mega.privacy.android.domain.usecase.GetVisibleContactsUseCase
 import mega.privacy.android.domain.usecase.MonitorContactUpdates
 import mega.privacy.android.domain.usecase.account.contactrequest.MonitorContactRequestUpdatesUseCase
 import mega.privacy.android.domain.usecase.chat.CreateGroupChatRoomUseCase
-import mega.privacy.android.domain.usecase.chat.CreateNoteToSelfChatUseCase
-import mega.privacy.android.domain.usecase.chat.GetNoteToSelfChatUseCase
-import mega.privacy.android.domain.usecase.chat.IsAnEmptyChatUseCase
 import mega.privacy.android.domain.usecase.chat.StartConversationUseCase
 import mega.privacy.android.domain.usecase.contact.AddNewContactsUseCase
 import mega.privacy.android.domain.usecase.contact.MonitorChatOnlineStatusUseCase
 import mega.privacy.android.domain.usecase.contact.MonitorChatPresenceLastGreenUpdatesUseCase
 import mega.privacy.android.domain.usecase.contact.RequestUserLastGreenUseCase
-import mega.privacy.android.domain.usecase.featureflag.GetFeatureFlagValueUseCase
 import mega.privacy.android.domain.usecase.network.MonitorConnectivityUseCase
 import mega.privacy.android.legacy.core.ui.model.SearchWidgetState
 import timber.log.Timber
@@ -55,9 +50,6 @@ import javax.inject.Inject
  * @property monitorContactRequestUpdatesUseCase                   [MonitorContactRequestUpdatesUseCase]
  * @property addNewContactsUseCase                          [AddNewContactsUseCase]
  * @property requestUserLastGreenUseCase                    [RequestUserLastGreenUseCase]
- * @property getNoteToSelfChatUseCase                       [GetNoteToSelfChatUseCase]
- * @property createNoteToSelfChatUseCase                    [CreateNoteToSelfChatUseCase]
- * @property isAnEmptyChatUseCase                           [IsAnEmptyChatUseCase]
  * @property state                    Current view state as [StartConversationState]
  */
 @HiltViewModel
@@ -73,10 +65,6 @@ class StartConversationViewModel @Inject constructor(
     private val monitorContactRequestUpdatesUseCase: MonitorContactRequestUpdatesUseCase,
     private val addNewContactsUseCase: AddNewContactsUseCase,
     private val requestUserLastGreenUseCase: RequestUserLastGreenUseCase,
-    private val getFeatureFlagValueUseCase: GetFeatureFlagValueUseCase,
-    private val getNoteToSelfChatUseCase: GetNoteToSelfChatUseCase,
-    private val createNoteToSelfChatUseCase: CreateNoteToSelfChatUseCase,
-    private val isAnEmptyChatUseCase: IsAnEmptyChatUseCase,
     monitorConnectivityUseCase: MonitorConnectivityUseCase,
     savedStateHandle: SavedStateHandle,
 ) : ViewModel() {
@@ -110,7 +98,6 @@ class StartConversationViewModel @Inject constructor(
     )
 
     init {
-        getApiFeatureFlag()
         observeStateChanges()
         getContacts()
         observeContactUpdates()
@@ -186,83 +173,6 @@ class StartConversationViewModel @Inject constructor(
             }
             getContactsData(contactList)
         }
-    }
-
-    /**
-     * Get note to yourself api feature flag
-     */
-    private fun getApiFeatureFlag() {
-        viewModelScope.launch {
-            runCatching {
-                getFeatureFlagValueUseCase(ApiFeatures.NoteToYourselfFlag)
-            }.onFailure { exception ->
-                Timber.e(exception)
-            }.onSuccess { flag ->
-                _state.update { state ->
-                    state.copy(
-                        isNoteToYourselfFeatureFlagEnabled = flag,
-                    )
-                }
-
-                if (flag) {
-                    getNoteToSelfChat()
-                }
-            }
-        }
-    }
-
-    /**
-     * Get note to self chat
-     */
-    private fun getNoteToSelfChat() =
-        viewModelScope.launch {
-            runCatching {
-                getNoteToSelfChatUseCase()
-            }.onFailure { exception ->
-                Timber.e(exception)
-            }.onSuccess { chat ->
-                chat?.apply {
-                    Timber.d("Note to self chat is already created")
-                    checkIfNoteToSelfIsEmpty(chatId)
-                } ?: run {
-                    Timber.d("Note to self chat is not created")
-                    createNoteToSelfChat()
-                }
-            }
-        }
-
-    /**
-     * Create note to self chat
-     */
-    private fun createNoteToSelfChat() =
-        viewModelScope.launch {
-            runCatching {
-                createNoteToSelfChatUseCase().run {
-                    getNoteToSelfChatUseCase()?.apply {
-                        Timber.d("Note to self chat successfully created")
-                        checkIfNoteToSelfIsEmpty(chatId = chatId)
-                    }
-                }
-            }
-        }
-
-    /**
-     * Check if note to self chat is empty
-     *
-     * @param chatId  Chat id
-     */
-    private fun checkIfNoteToSelfIsEmpty(chatId: Long) {
-        viewModelScope.launch {
-            runCatching {
-                isAnEmptyChatUseCase(chatId)
-            }.onFailure { exception ->
-                Timber.e(exception)
-            }.onSuccess { isChatEmpty ->
-                Timber.d("Check if note to self chat is empty: $isChatEmpty")
-                _state.update { it.copy(isNoteToSelfChatEmpty = isChatEmpty) }
-            }
-        }
-
     }
 
     private suspend fun getContactsData(contactList: List<ContactItem>) {

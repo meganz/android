@@ -801,7 +801,7 @@ internal class ChatRepositoryImpl @Inject constructor(
                 }
                 megaChatApiGateway.createChat(
                     isGroup = isGroup,
-                    peers = if(userHandles == null) null else megaChatPeerListMapper(userHandles),
+                    peers = if (userHandles == null) null else megaChatPeerListMapper(userHandles),
                     listener = listener
                 )
             }
