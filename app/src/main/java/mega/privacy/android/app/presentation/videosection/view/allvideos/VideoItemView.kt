@@ -8,13 +8,10 @@ import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.combinedClickable
-import androidx.compose.foundation.horizontalScroll
 import androidx.compose.foundation.isSystemInDarkTheme
-import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
-import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.aspectRatio
 import androidx.compose.foundation.layout.defaultMinSize
 import androidx.compose.foundation.layout.fillMaxHeight
@@ -23,7 +20,6 @@ import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
-import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.text.InlineTextContent
@@ -59,12 +55,13 @@ import coil.request.ImageRequest
 import mega.android.core.ui.theme.values.TextColor
 import mega.privacy.android.app.R
 import mega.privacy.android.app.presentation.time.mapper.DurationInSecondsTextMapper
-import mega.privacy.android.shared.original.core.ui.controls.chip.HighlightChip
+import mega.privacy.android.shared.original.core.ui.controls.lists.TagsRow
 import mega.privacy.android.shared.original.core.ui.controls.text.HighlightedText
 import mega.privacy.android.shared.original.core.ui.controls.text.MegaText
 import mega.privacy.android.shared.original.core.ui.preview.CombinedThemePreviews
 import mega.privacy.android.shared.original.core.ui.theme.OriginalTheme
 import mega.privacy.android.shared.original.core.ui.theme.extensions.textColorSecondary
+import mega.privacy.android.shared.original.core.ui.utils.normalize
 import kotlin.time.Duration
 import kotlin.time.DurationUnit
 import kotlin.time.toDuration
@@ -254,43 +251,32 @@ internal fun VideoInfoView(
             onMenuClick = onMenuClick
         )
 
-        description?.let {
-            if (highlightText.isNotBlank() && it.contains(highlightText, ignoreCase = true)) {
-                HighlightedText(
-                    modifier = Modifier
-                        .testTag(VIDEO_ITEM_NODE_DESCRIPTION)
-                        .padding(start = 10.dp, top = 5.dp, bottom = 5.dp),
-                    text = description,
+        if (highlightText.isNotBlank()) {
+            if (description != null) {
+                val normalizedHighlight = remember(highlightText) { highlightText.normalize() }
+                val normalizedDescription = remember(description) { description.normalize() }
+                if (normalizedDescription.contains(normalizedHighlight, ignoreCase = true)) {
+                    HighlightedText(
+                        modifier = Modifier
+                            .testTag(VIDEO_ITEM_NODE_DESCRIPTION)
+                            .padding(start = 10.dp, top = 5.dp, bottom = 5.dp),
+                        text = description,
+                        highlightText = highlightText,
+                        highlightFontWeight = FontWeight.Bold,
+                        style = MaterialTheme.typography.caption,
+                        textColor = TextColor.Secondary,
+                    )
+                }
+            }
+
+            if (!tags.isNullOrEmpty()) {
+                TagsRow(
+                    tags = tags,
                     highlightText = highlightText,
-                    highlightFontWeight = FontWeight.Bold,
-                    style = MaterialTheme.typography.caption,
-                    textColor = TextColor.Secondary,
+                    addSpacing = true,
+                    modifier = Modifier.testTag(VIDEO_ITEM_NODE_TAGS),
                 )
             }
-        }
-
-        val tagHighlightText = highlightText.removePrefix("#")
-        if (tagHighlightText.isNotBlank() && !tags.isNullOrEmpty()) {
-            tags.filter { it.contains(tagHighlightText, ignoreCase = true) }
-                .takeIf { it.isNotEmpty() }
-                ?.let { matchingTags ->
-                    Row(
-                        modifier = Modifier
-                            .horizontalScroll(rememberScrollState())
-                            .padding(top = 5.dp)
-                            .testTag(VIDEO_ITEM_NODE_TAGS),
-                        horizontalArrangement = Arrangement.spacedBy(8.dp)
-                    ) {
-                        Spacer(modifier = Modifier.width(2.dp))
-                        matchingTags.forEach { tag ->
-                            HighlightChip(
-                                text = "#$tag",
-                                highlightText = tagHighlightText,
-                            )
-                        }
-                        Spacer(modifier = Modifier.width(2.dp))
-                    }
-                }
         }
     }
 }
@@ -372,6 +358,7 @@ internal fun VideoNameAndLabelView(
                     .testTag(VIDEO_ITEM_NAME_VIEW_TEST_TAG),
                 text = finalText,
                 highlightText = highlightText,
+                highlightFontWeight = FontWeight.Bold,
                 maxLines = maxLines,
                 textColor = TextColor.Primary,
                 style = MaterialTheme.typography.subtitle2.copy(

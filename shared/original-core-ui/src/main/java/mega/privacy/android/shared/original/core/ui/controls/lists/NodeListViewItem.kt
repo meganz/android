@@ -14,10 +14,12 @@ import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.Icon
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.remember
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.alpha
 import androidx.compose.ui.draw.blur
@@ -37,6 +39,7 @@ import mega.privacy.android.shared.original.core.ui.controls.text.MegaText
 import mega.privacy.android.shared.original.core.ui.preview.CombinedThemePreviews
 import mega.privacy.android.shared.original.core.ui.theme.MegaOriginalTheme
 import mega.privacy.android.shared.original.core.ui.theme.OriginalTheme
+import mega.privacy.android.shared.original.core.ui.utils.normalize
 
 /**
  * Generic two line list item
@@ -233,8 +236,10 @@ fun NodeListViewItem(
             }
         },
         description = {
-            description?.let {
-                if (highlightText.isNotBlank() && it.contains(highlightText, ignoreCase = true)) {
+            if (description != null && highlightText.isNotBlank()) {
+                val normalizedHighlight = remember(highlightText) { highlightText.normalize() }
+                val normalizedDescription = remember(description) { description.normalize() }
+                if (normalizedDescription.contains(normalizedHighlight, ignoreCase = true)) {
                     HighlightedText(
                         modifier = Modifier.testTag(DESCRIPTION_TAG),
                         text = description,
@@ -246,25 +251,12 @@ fun NodeListViewItem(
             }
         },
         customRow = {
-            val tagHighlightText = highlightText.removePrefix("#")
-            if (tagHighlightText.isNotBlank() && !tags.isNullOrEmpty()) {
-                tags.filter { it.contains(tagHighlightText, ignoreCase = true) }
-                    .takeIf { it.isNotEmpty() }
-                    ?.let { matchingTags ->
-                        Row(
-                            modifier = Modifier
-                                .horizontalScroll(rememberScrollState())
-                                .testTag(TAGS_TAG),
-                            horizontalArrangement = Arrangement.spacedBy(8.dp)
-                        ) {
-                            matchingTags.forEach { tag ->
-                                HighlightChip(
-                                    text = "#$tag",
-                                    highlightText = tagHighlightText,
-                                )
-                            }
-                        }
-                    }
+            if (highlightText.isNotBlank() && tags != null) {
+                TagsRow(
+                    tags = tags,
+                    highlightText = highlightText,
+                    modifier = Modifier.testTag(TAGS_TAG),
+                )
             }
         },
         trailingIcons = {
@@ -302,6 +294,51 @@ fun NodeListViewItem(
         }
     )
 }
+
+/**
+ * Tags row with highlight
+ */
+@Composable
+fun TagsRow(
+    tags: List<String>,
+    highlightText: String,
+    addSpacing: Boolean = false,
+    modifier: Modifier = Modifier,
+) {
+    val tagHighlightText = remember(highlightText) {
+        highlightText.removePrefix("#").normalize()
+    }
+
+    val matchingTags = remember(tags, tagHighlightText) {
+        if (tagHighlightText.isNotBlank()) {
+            tags.filter {
+                it.normalize().contains(tagHighlightText, ignoreCase = true)
+            }
+        } else {
+            emptyList()
+        }
+    }
+    if (matchingTags.isNotEmpty()) {
+        Row(
+            modifier = modifier.horizontalScroll(rememberScrollState()),
+            horizontalArrangement = Arrangement.spacedBy(8.dp)
+        ) {
+            if (addSpacing) {
+                Spacer(modifier = Modifier.width(2.dp))
+            }
+            matchingTags.forEach { tag ->
+                HighlightChip(
+                    text = "#$tag",
+                    highlightText = tagHighlightText,
+                )
+            }
+            if (addSpacing) {
+                Spacer(modifier = Modifier.width(2.dp))
+            }
+        }
+    }
+}
+
 
 @Composable
 private fun Circle(color: Color, modifier: Modifier = Modifier) {
