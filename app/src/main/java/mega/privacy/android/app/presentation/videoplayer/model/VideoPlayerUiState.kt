@@ -2,6 +2,7 @@ package mega.privacy.android.app.presentation.videoplayer.model
 
 import mega.privacy.android.app.mediaplayer.model.MediaPlaySources
 import mega.privacy.android.app.mediaplayer.service.Metadata
+import mega.privacy.android.domain.entity.AccountType
 import mega.privacy.android.domain.entity.mediaplayer.RepeatToggleMode
 import mega.privacy.android.domain.exception.MegaException
 
@@ -34,4 +35,20 @@ data class VideoPlayerUiState(
     val currentPlayingVideoSize: VideoSize? = null,
     val mediaPlaybackState: MediaPlaybackState = MediaPlaybackState.Playing,
     val snackBarMessage: String? = null,
+    val isNodeInRubbishBin: Boolean = false,
+    val nodeIsNull: Boolean = false,
+    val isHideMenuActionVisible: Boolean = false,
+    val isUnhideMenuActionVisible: Boolean = false,
+    val canRemoveFromChat: Boolean = false,
+    val shouldShowShare: Boolean = false,
+    val shouldShowGetLink: Boolean = true,
+    val shouldShowRemoveLink: Boolean = true,
+    val isAccess: Boolean = true,
+    val isRubbishBinShown: Boolean = false,
+    val shouldShowAddTo: Boolean = false,
+    val accountType: AccountType? = null,
+    val isBusinessAccountExpired: Boolean = false,
+    val hiddenNodeEnabled: Boolean = false,
+    val isHiddenNodesOnboarded: Boolean = false,
+    val showHiddenItems: Boolean? = null,
 )

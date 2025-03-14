@@ -8,6 +8,7 @@ import android.widget.ProgressBar
 import androidx.compose.foundation.layout.WindowInsets
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.navigationBars
+import androidx.compose.foundation.layout.padding
 import androidx.compose.material.ScaffoldState
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.DisposableEffect
@@ -29,8 +30,8 @@ import androidx.compose.ui.platform.LocalLayoutDirection
 import androidx.compose.ui.semantics.semantics
 import androidx.compose.ui.semantics.testTagsAsResourceId
 import androidx.compose.ui.unit.Density
-import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.LayoutDirection
+import androidx.compose.ui.unit.dp
 import androidx.compose.ui.viewinterop.AndroidViewBinding
 import androidx.core.view.isVisible
 import androidx.lifecycle.compose.LocalLifecycleOwner
@@ -52,6 +53,7 @@ import mega.privacy.android.app.databinding.VideoPlayerPlayerViewBinding
 import mega.privacy.android.app.presentation.videoplayer.VideoPlayerController
 import mega.privacy.android.app.presentation.videoplayer.VideoPlayerViewModel
 import mega.privacy.android.app.presentation.videoplayer.model.MediaPlaybackState
+import mega.privacy.android.app.presentation.videoplayer.view.VideoPlayerTopBar
 import mega.privacy.android.app.utils.Constants.AUDIO_PLAYER_TOOLBAR_INIT_HIDE_DELAY_MS
 import mega.privacy.android.shared.original.core.ui.controls.layouts.MegaScaffold
 import mega.privacy.android.shared.original.core.ui.controls.sheets.MegaBottomSheetLayout
@@ -60,10 +62,12 @@ import mega.privacy.android.shared.original.core.ui.controls.sheets.MegaBottomSh
 @OptIn(ExperimentalComposeUiApi::class, ExperimentalMaterialNavigationApi::class)
 @Composable
 internal fun VideoPlayerScreen(
+    launchSource: Int,
+    shouldShowAddTo: Boolean,
     bottomSheetNavigator: BottomSheetNavigator,
     scaffoldState: ScaffoldState,
     viewModel: VideoPlayerViewModel,
-    player: ExoPlayer?,
+    player: ExoPlayer?
 ) {
     val lifecycle = LocalLifecycleOwner.current.lifecycle
     val context = LocalContext.current
@@ -135,12 +139,15 @@ internal fun VideoPlayerScreen(
                                     }
                                 }
 
-                                fun toggleControllerVisibility(visible: Boolean) {
+                                fun toggleControllerVisibility(
+                                    visible: Boolean,
+                                    isAutoHidden: Boolean = false,
+                                ) {
                                     autoHideJob?.cancel()
                                     isControllerViewVisible = visible
                                     updateControllerView(visible)
 
-                                    if (visible) {
+                                    if (visible && isAutoHidden) {
                                         autoHideJob = coroutineScope.launch {
                                             delay(AUDIO_PLAYER_TOOLBAR_INIT_HIDE_DELAY_MS)
                                             isControllerViewVisible = false
@@ -168,7 +175,8 @@ internal fun VideoPlayerScreen(
                                 )
 
                                 playerComposeView.player = player
-                                toggleControllerVisibility(true)
+                                playerComposeView.controllerShowTimeoutMs = 0
+                                toggleControllerVisibility(true, true)
                             }
                     },
                 ) {
@@ -189,6 +197,36 @@ internal fun VideoPlayerScreen(
                     root.findViewById<View>(R.id.track_name).isVisible =
                         orientation == ORIENTATION_PORTRAIT
                 }
+
+                if (isControllerViewVisible) {
+                    VideoPlayerTopBar(
+                        modifier = Modifier.padding(
+                            end = if (orientation == ORIENTATION_PORTRAIT)
+                                0.dp
+                            else
+                                navigationBarHeight
+                        ),
+                        title = if (orientation == ORIENTATION_PORTRAIT) {
+                            ""
+                        } else {
+                            uiState.metadata.title ?: uiState.metadata.nodeName
+                        },
+                        launchSource = launchSource,
+                        isInRubbish = uiState.isNodeInRubbishBin,
+                        canRemoveFromChat = uiState.canRemoveFromChat,
+                        nodeIsNull = uiState.nodeIsNull,
+                        shouldShowHideNode = uiState.isHideMenuActionVisible,
+                        shouldShowUnhideNode = uiState.isUnhideMenuActionVisible,
+                        shouldShowShare = uiState.shouldShowShare,
+                        shouldShowGetLink = uiState.shouldShowGetLink,
+                        shouldShowRemoveLink = uiState.shouldShowRemoveLink,
+                        isAccess = uiState.isAccess,
+                        isRubbishBinShown = uiState.isRubbishBinShown,
+                        shouldShowAddTo = shouldShowAddTo,
+                        onBackPressed = { },
+                        onMenuActionClicked = { },
+                    )
+                }
             }
         }
     }
@@ -199,10 +237,8 @@ private fun getNavigationBarHeight(
     orientation: Int,
     density: Density,
     layoutDirection: LayoutDirection,
-): Dp {
-    return if (orientation == Configuration.ORIENTATION_LANDSCAPE) {
-        with(density) { WindowInsets.navigationBars.getRight(density, layoutDirection).toDp() }
-    } else {
-        with(density) { WindowInsets.navigationBars.getBottom(density).toDp() }
-    }
+) = if (orientation == Configuration.ORIENTATION_LANDSCAPE) {
+    with(density) { WindowInsets.navigationBars.getRight(density, layoutDirection).toDp() }
+} else {
+    with(density) { WindowInsets.navigationBars.getBottom(density).toDp() }
 }

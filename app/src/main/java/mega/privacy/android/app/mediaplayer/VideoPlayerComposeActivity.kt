@@ -21,6 +21,7 @@ import androidx.activity.enableEdgeToEdge
 import androidx.activity.viewModels
 import androidx.appcompat.app.AppCompatDelegate
 import androidx.compose.material.rememberScaffoldState
+import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -29,9 +30,7 @@ import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.lifecycle.lifecycleScope
 import androidx.media3.exoplayer.ExoPlayer
 import androidx.navigation.compose.NavHost
-import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
-import androidx.navigation.navOptions
 import com.google.accompanist.navigation.material.ExperimentalMaterialNavigationApi
 import com.google.accompanist.navigation.material.rememberBottomSheetNavigator
 import dagger.hilt.android.AndroidEntryPoint
@@ -40,14 +39,14 @@ import kotlinx.coroutines.flow.onEach
 import mega.privacy.android.analytics.Analytics
 import mega.privacy.android.app.R
 import mega.privacy.android.app.activities.PasscodeActivity
-import mega.privacy.android.app.components.session.SessionContainer
 import mega.privacy.android.app.di.mediaplayer.VideoPlayer
 import mega.privacy.android.app.mediaplayer.gateway.MediaPlayerGateway
 import mega.privacy.android.app.mediaplayer.service.AudioPlayerService
 import mega.privacy.android.app.mediaplayer.service.MediaPlayerCallback
 import mega.privacy.android.app.mediaplayer.service.Metadata
-import mega.privacy.android.app.mediaplayer.videoplayer.navigation.navigateToVideoPlayerComposeGraph
+import mega.privacy.android.app.mediaplayer.videoplayer.navigation.VideoPlayerNavigationGraph
 import mega.privacy.android.app.mediaplayer.videoplayer.navigation.videoPlayerComposeNavigationGraph
+import mega.privacy.android.app.presentation.container.AppContainer
 import mega.privacy.android.app.presentation.extensions.isDarkMode
 import mega.privacy.android.app.presentation.passcode.model.PasscodeCryptObjectFactory
 import mega.privacy.android.app.presentation.psa.PsaContainer
@@ -58,6 +57,9 @@ import mega.privacy.android.app.presentation.videoplayer.model.VideoSize
 import mega.privacy.android.app.utils.ChatUtil
 import mega.privacy.android.app.utils.ChatUtil.AUDIOFOCUS_DEFAULT
 import mega.privacy.android.app.utils.ChatUtil.getRequest
+import mega.privacy.android.app.utils.Constants.INTENT_EXTRA_KEY_ADAPTER_TYPE
+import mega.privacy.android.app.utils.Constants.INTENT_EXTRA_KEY_VIDEO_ADD_TO_ALBUM
+import mega.privacy.android.app.utils.Constants.INVALID_VALUE
 import mega.privacy.android.domain.entity.ThemeMode
 import mega.privacy.android.domain.entity.mediaplayer.RepeatToggleMode
 import mega.privacy.android.domain.usecase.GetThemeMode
@@ -141,47 +143,45 @@ class VideoPlayerComposeActivity : PasscodeActivity() {
         super.onCreate(savedInstanceState)
         enableEdgeToEdge()
         currentOrientation = resources.configuration.orientation
+        val launchSource = intent.getIntExtra(INTENT_EXTRA_KEY_ADAPTER_TYPE, INVALID_VALUE)
+        val shouldShowAddTo = intent.getBooleanExtra(INTENT_EXTRA_KEY_VIDEO_ADD_TO_ALBUM, false)
         observeRotationSettingsChange()
         val player = createPlayer()
         setContent {
             val mode by getThemeMode().collectAsStateWithLifecycle(initialValue = ThemeMode.System)
             var passcodeEnabled by remember { mutableStateOf(true) }
 
-            SessionContainer {
-                OriginalTheme(isDark = mode.isDarkMode()) {
+            val containers: List<@Composable (@Composable () -> Unit) -> Unit> = listOf(
+                { OriginalTheme(isDark = mode.isDarkMode(), content = it) },
+                {
                     PasscodeContainer(
                         passcodeCryptObjectFactory = passcodeCryptObjectFactory,
                         canLock = { passcodeEnabled },
-                        content = {
-                            PsaContainer {
-                                val bottomSheetNavigator = rememberBottomSheetNavigator()
-                                val navHostController =
-                                    rememberNavController(bottomSheetNavigator)
-                                val scaffoldState = rememberScaffoldState()
+                        content = it
+                    )
+                },
+                { PsaContainer(content = it) }
+            )
 
-                                NavHost(
-                                    navController = navHostController,
-                                    startDestination = "start"
-                                ) {
-                                    composable("start") {
-                                        navHostController.navigateToVideoPlayerComposeGraph(
-                                            navOptions = navOptions {
-                                                popUpTo("start") {
-                                                    inclusive = true
-                                                }
-                                            }
-                                        )
-                                    }
+            AppContainer(
+                containers = containers
+            ) {
+                val bottomSheetNavigator = rememberBottomSheetNavigator()
+                val navHostController =
+                    rememberNavController(bottomSheetNavigator)
+                val scaffoldState = rememberScaffoldState()
 
-                                    videoPlayerComposeNavigationGraph(
-                                        bottomSheetNavigator = bottomSheetNavigator,
-                                        scaffoldState = scaffoldState,
-                                        viewModel = videoPlayerViewModel,
-                                        player = player
-                                    )
-                                }
-                            }
-                        }
+                NavHost(
+                    navController = navHostController,
+                    startDestination = VideoPlayerNavigationGraph
+                ) {
+                    videoPlayerComposeNavigationGraph(
+                        launchSource = launchSource,
+                        shouldShowAddTo = shouldShowAddTo,
+                        bottomSheetNavigator = bottomSheetNavigator,
+                        scaffoldState = scaffoldState,
+                        viewModel = videoPlayerViewModel,
+                        player = player
                     )
                 }
             }
@@ -227,6 +227,7 @@ class VideoPlayerComposeActivity : PasscodeActivity() {
                         if (uiState.value.currentPlayingHandle != handle.toLong())
                             Analytics.tracker.trackEvent(VideoPlayerIsActivatedEvent)
                         updateCurrentPlayingHandle(handle.toLong())
+                        checkActionsVisible(handle.toLong())
                         saveVideoWatchedTime()
                         if (isUpdateName) {
                             val nodeName = uiState.value.items.find {
