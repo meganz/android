@@ -116,6 +116,7 @@ import mega.privacy.android.shared.original.core.ui.theme.extensions.white_black
 import mega.privacy.android.shared.original.core.ui.theme.grey_100
 import mega.privacy.android.shared.original.core.ui.utils.showAutoDurationSnackbar
 import mega.privacy.mobile.analytics.event.ImagePreviewHideNodeMenuToolBarEvent
+import mega.privacy.mobile.analytics.event.MagnifierMenuItemEvent
 
 @Composable
 internal fun ImagePreviewScreen(
@@ -338,6 +339,7 @@ internal fun ImagePreviewScreen(
                                 onClickGetLink = { onClickGetLink(imageNode) },
                                 onClickMagnifier = {
                                     coroutineScope.launch {
+                                        Analytics.tracker.trackEvent(MagnifierMenuItemEvent)
                                         viewModel.switchMagnifierMode()
                                     }
                                 },
