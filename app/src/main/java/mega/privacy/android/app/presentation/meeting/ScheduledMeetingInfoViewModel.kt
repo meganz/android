@@ -41,7 +41,6 @@ import mega.privacy.android.domain.entity.contacts.InviteContactRequest
 import mega.privacy.android.domain.entity.meeting.WaitingRoomReminders
 import mega.privacy.android.domain.entity.node.NodeId
 import mega.privacy.android.domain.entity.user.UserChanges
-import mega.privacy.android.domain.usecase.GetChatParticipants
 import mega.privacy.android.domain.usecase.GetChatRoomUseCase
 import mega.privacy.android.domain.usecase.GetVisibleContactsUseCase
 import mega.privacy.android.domain.usecase.InviteToChat
@@ -58,6 +57,7 @@ import mega.privacy.android.domain.usecase.chat.MonitorChatRoomUpdatesUseCase
 import mega.privacy.android.domain.usecase.chat.StartConversationUseCase
 import mega.privacy.android.domain.usecase.chat.UpdateChatPermissionsUseCase
 import mega.privacy.android.domain.usecase.chat.message.SendTextMessageUseCase
+import mega.privacy.android.domain.usecase.chat.participants.MonitorChatParticipantsUseCase
 import mega.privacy.android.domain.usecase.contact.GetMyFullNameUseCase
 import mega.privacy.android.domain.usecase.contact.InviteContactWithEmailUseCase
 import mega.privacy.android.domain.usecase.meeting.GetScheduledMeetingByChatUseCase
@@ -76,7 +76,7 @@ import javax.inject.Inject
  * ScheduledMeetingInfoActivity view model.
  *
  * @property getChatRoomUseCase                                    [GetChatRoomUseCase]
- * @property getChatParticipants                            [GetChatParticipants]
+ * @property monitorChatParticipantsUseCase                            [MonitorChatParticipantsUseCase]
  * @property getScheduledMeetingByChatUseCase               [GetScheduledMeetingByChatUseCase]
  * @property getVisibleContactsUseCase                      [GetVisibleContactsUseCase]
  * @property inviteToChat                                   [InviteToChat]
@@ -107,7 +107,7 @@ import javax.inject.Inject
 @HiltViewModel
 class ScheduledMeetingInfoViewModel @Inject constructor(
     private val getChatRoomUseCase: GetChatRoomUseCase,
-    private val getChatParticipants: GetChatParticipants,
+    private val monitorChatParticipantsUseCase: MonitorChatParticipantsUseCase,
     private val getScheduledMeetingByChatUseCase: GetScheduledMeetingByChatUseCase,
     private val getVisibleContactsUseCase: GetVisibleContactsUseCase,
     private val inviteToChat: InviteToChat,
@@ -312,7 +312,7 @@ class ScheduledMeetingInfoViewModel @Inject constructor(
      */
     private fun loadAllChatParticipants() = viewModelScope.launch {
         runCatching {
-            getChatParticipants(uiState.value.chatId)
+            monitorChatParticipantsUseCase(uiState.value.chatId)
                 .catch { exception ->
                     Timber.e(exception)
                 }

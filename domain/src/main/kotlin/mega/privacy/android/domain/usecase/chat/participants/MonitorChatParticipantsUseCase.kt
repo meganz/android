@@ -1,4 +1,4 @@
-package mega.privacy.android.domain.usecase
+package mega.privacy.android.domain.usecase.chat.participants
 
 import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.flow.Flow
@@ -25,24 +25,24 @@ import javax.inject.Inject
 /**
  * Default get chat participants use case implementation.
  *
- * @property chatRepository                 [ChatRepository]
- * @property chatParticipantsRepository     [ChatParticipantsRepository]
- * @property contactsRepository             [ContactsRepository]
- * @property avatarRepository               [AvatarRepository]
- * @property requestUserLastGreenUseCase        [RequestUserLastGreenUseCase]
- * @property defaultDispatcher              [CoroutineDispatcher]
+ * @property chatRepository                 [mega.privacy.android.domain.repository.ChatRepository]
+ * @property chatParticipantsRepository     [mega.privacy.android.domain.repository.ChatParticipantsRepository]
+ * @property contactsRepository             [mega.privacy.android.domain.repository.ContactsRepository]
+ * @property avatarRepository               [mega.privacy.android.domain.repository.AvatarRepository]
+ * @property requestUserLastGreenUseCase        [mega.privacy.android.domain.usecase.contact.RequestUserLastGreenUseCase]
+ * @property defaultDispatcher              [kotlinx.coroutines.CoroutineDispatcher]
 
  */
-class DefaultGetChatParticipants @Inject constructor(
+class MonitorChatParticipantsUseCase @Inject constructor(
     private val chatRepository: ChatRepository,
     private val chatParticipantsRepository: ChatParticipantsRepository,
     private val contactsRepository: ContactsRepository,
     private val avatarRepository: AvatarRepository,
     private val requestUserLastGreenUseCase: RequestUserLastGreenUseCase,
     @DefaultDispatcher private val defaultDispatcher: CoroutineDispatcher,
-) : GetChatParticipants {
+) {
 
-    override fun invoke(chatId: Long): Flow<List<ChatParticipant>> = flow {
+    operator fun invoke(chatId: Long): Flow<List<ChatParticipant>> = flow {
         val participants = mutableListOf<ChatParticipant>().apply {
             addAll(getParticipants(chatId, true))
         }
@@ -125,11 +125,13 @@ class DefaultGetChatParticipants @Inject constructor(
                     val currentItemIndex = indexOfFirst { it.handle == update.userHandle }
                     val currentItem = get(currentItemIndex)
                     if (update.status != UserChatStatus.Online) {
-                        this@DefaultGetChatParticipants.requestUserLastGreenUseCase(update.userHandle)
+                        this@MonitorChatParticipantsUseCase.requestUserLastGreenUseCase(update.userHandle)
                         set(currentItemIndex, currentItem.copy(status = update.status))
                     } else {
-                        set(currentItemIndex,
-                            currentItem.copy(status = update.status, lastSeen = null))
+                        set(
+                            currentItemIndex,
+                            currentItem.copy(status = update.status, lastSeen = null)
+                        )
                     }
                 }
                 this
@@ -211,14 +213,20 @@ class DefaultGetChatParticipants @Inject constructor(
                                                     ),
                                                     areCredentialsVerified = chatParticipantsRepository.areCredentialsVerified(
                                                         newItem
-                                                ),
-                                                defaultAvatarColor = chatParticipantsRepository.getAvatarColor(
-                                                    newItem
-                                                ),
-                                                data = newItem.data.copy(alias = chatParticipantsRepository.getAlias(
-                                                    newItem),
-                                                    avatarUri = chatParticipantsRepository.getAvatarUri(
-                                                        newItem)?.toString())))
+                                                    ),
+                                                    defaultAvatarColor = chatParticipantsRepository.getAvatarColor(
+                                                        newItem
+                                                    ),
+                                                    data = newItem.data.copy(
+                                                        alias = chatParticipantsRepository.getAlias(
+                                                            newItem
+                                                        ),
+                                                        avatarUri = chatParticipantsRepository.getAvatarUri(
+                                                            newItem
+                                                        )?.toString()
+                                                    )
+                                                )
+                                            )
                                         }
                                     }
                                 }
@@ -235,7 +243,8 @@ class DefaultGetChatParticipants @Inject constructor(
                                         currentItem.copy(
                                             privilege = chatParticipantsRepository.getPermissions(
                                                 chatId,
-                                                currentItem),
+                                                currentItem
+                                            ),
                                             privilegesUpdated = !currentItem.privilegesUpdated
                                         )
                                 }
@@ -262,10 +271,12 @@ class DefaultGetChatParticipants @Inject constructor(
                                 }
                             }
                             this[currentItemIndex] =
-                                currentItem.copy(defaultAvatarColor = avatarRepository.getMyAvatarColor(),
+                                currentItem.copy(
+                                    defaultAvatarColor = avatarRepository.getMyAvatarColor(),
                                     avatarUpdateTimestamp = System.currentTimeMillis(),
                                     data = currentItem.data.copy(
-                                        avatarUri = avatarUri)
+                                        avatarUri = avatarUri
+                                    )
                                 )
                         }
                     }
@@ -281,9 +292,16 @@ class DefaultGetChatParticipants @Inject constructor(
                         if (participant.isMe) {
                             val currentItemIndex = indexOfFirst { it.handle == participant.handle }
                             val currentItem = get(currentItemIndex)
-                            set(currentItemIndex,
-                                currentItem.copy(data = currentItem.data.copy(fullName = contactsRepository.getUserFullName(
-                                    currentItem.handle))))
+                            set(
+                                currentItemIndex,
+                                currentItem.copy(
+                                    data = currentItem.data.copy(
+                                        fullName = contactsRepository.getUserFullName(
+                                            currentItem.handle
+                                        )
+                                    )
+                                )
+                            )
                         }
                     }
                 }
@@ -323,7 +341,9 @@ class DefaultGetChatParticipants @Inject constructor(
                                         currentItem.copy(
                                             data = currentItem.data.copy(
                                                 alias = chatParticipantsRepository.getAlias(
-                                                    currentItem))
+                                                    currentItem
+                                                )
+                                            )
                                         )
                                 }
                             }
@@ -340,7 +360,8 @@ class DefaultGetChatParticipants @Inject constructor(
                                     this[currentItemIndex] =
                                         currentItem.copy(
                                             areCredentialsVerified = chatParticipantsRepository.areCredentialsVerified(
-                                                currentItem)
+                                                currentItem
+                                            )
                                         )
                                 }
                             }
@@ -356,25 +377,30 @@ class DefaultGetChatParticipants @Inject constructor(
                                 val currentItem = this[currentItemIndex]
                                 if (changes.contains(UserChanges.Avatar)) {
                                     this[currentItemIndex] =
-                                        currentItem.copy(defaultAvatarColor = avatarRepository.getAvatarColor(
-                                            currentItem.handle),
+                                        currentItem.copy(
+                                            defaultAvatarColor = avatarRepository.getAvatarColor(
+                                                currentItem.handle
+                                            ),
                                             avatarUpdateTimestamp = System.currentTimeMillis(),
                                             data = currentItem.data.copy(
                                                 avatarUri = chatParticipantsRepository.getAvatarUri(
                                                     currentItem,
                                                     true
-                                                )?.toString())
+                                                )?.toString()
+                                            )
                                         )
                                 }
 
                                 if (changes.contains(UserChanges.Firstname) || changes.contains(
-                                        UserChanges.Lastname)
+                                        UserChanges.Lastname
+                                    )
                                 ) {
                                     this[currentItemIndex] =
                                         currentItem.copy(
                                             data = currentItem.data.copy(
                                                 fullName = contactsRepository.getUserFullName(
-                                                    currentItem.handle)
+                                                    currentItem.handle
+                                                )
                                             )
                                         )
                                 }

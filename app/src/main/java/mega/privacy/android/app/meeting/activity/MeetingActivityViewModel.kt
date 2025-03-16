@@ -75,7 +75,6 @@ import mega.privacy.android.domain.entity.meeting.ParticipantsSection
 import mega.privacy.android.domain.entity.node.NodeId
 import mega.privacy.android.domain.entity.user.UserChanges
 import mega.privacy.android.domain.usecase.CheckChatLinkUseCase
-import mega.privacy.android.domain.usecase.GetChatParticipants
 import mega.privacy.android.domain.usecase.GetChatRoomUseCase
 import mega.privacy.android.domain.usecase.MonitorUserUpdates
 import mega.privacy.android.domain.usecase.QueryChatLinkUseCase
@@ -100,6 +99,7 @@ import mega.privacy.android.domain.usecase.chat.MonitorChatConnectionStateUseCas
 import mega.privacy.android.domain.usecase.chat.MonitorChatRoomUpdatesUseCase
 import mega.privacy.android.domain.usecase.chat.StartConversationUseCase
 import mega.privacy.android.domain.usecase.chat.UpdateChatPermissionsUseCase
+import mega.privacy.android.domain.usecase.chat.participants.MonitorChatParticipantsUseCase
 import mega.privacy.android.domain.usecase.contact.GetMyFullNameUseCase
 import mega.privacy.android.domain.usecase.contact.GetMyUserHandleUseCase
 import mega.privacy.android.domain.usecase.contact.InviteContactWithHandleUseCase
@@ -135,7 +135,7 @@ import javax.inject.Inject
  * @property meetingActivityRepository                      [MeetingActivityRepository]
  * @property answerChatCallUseCase                          [AnswerChatCallUseCase]
  * @property rtcAudioManagerGateway                         [RTCAudioManagerGateway]
- * @property getChatParticipants                            [GetChatParticipants]
+ * @property monitorChatParticipantsUseCase                            [MonitorChatParticipantsUseCase]
  * @property chatManagement                                 [ChatManagement]
  * @property setChatVideoInDeviceUseCase                    [SetChatVideoInDeviceUseCase]
  * @property checkChatLink                                  [CheckChatLinkUseCase]
@@ -180,7 +180,7 @@ class MeetingActivityViewModel @Inject constructor(
     private val chatManagement: ChatManagement,
     private val setChatVideoInDeviceUseCase: SetChatVideoInDeviceUseCase,
     private val checkChatLink: CheckChatLinkUseCase,
-    private val getChatParticipants: GetChatParticipants,
+    private val monitorChatParticipantsUseCase: MonitorChatParticipantsUseCase,
     monitorConnectivityUseCase: MonitorConnectivityUseCase,
     private val monitorChatCallUpdatesUseCase: MonitorChatCallUpdatesUseCase,
     private val monitorChatSessionUpdatesUseCase: MonitorChatSessionUpdatesUseCase,
@@ -2113,7 +2113,7 @@ class MeetingActivityViewModel @Inject constructor(
      */
     private fun startMonitoringChatParticipantsUpdated(chatId: Long) = viewModelScope.launch {
         runCatching {
-            getChatParticipants(chatId)
+            monitorChatParticipantsUseCase(chatId)
                 .catch { exception ->
                     Timber.e(exception)
                 }

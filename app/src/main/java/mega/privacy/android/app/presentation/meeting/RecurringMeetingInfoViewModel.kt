@@ -14,7 +14,7 @@ import mega.privacy.android.data.gateway.DeviceGateway
 import mega.privacy.android.domain.entity.chat.ChatScheduledMeeting
 import mega.privacy.android.domain.entity.chat.ScheduledMeetingChanges
 import mega.privacy.android.domain.entity.meeting.OccurrenceFrequencyType
-import mega.privacy.android.domain.usecase.GetChatParticipants
+import mega.privacy.android.domain.usecase.chat.participants.MonitorChatParticipantsUseCase
 import mega.privacy.android.domain.usecase.meeting.FetchNumberOfScheduledMeetingOccurrencesByChat
 import mega.privacy.android.domain.usecase.meeting.FetchScheduledMeetingOccurrencesByChatUseCase
 import mega.privacy.android.domain.usecase.meeting.GetScheduledMeetingByChatUseCase
@@ -31,7 +31,7 @@ import javax.inject.Inject
  * @property getScheduledMeetingByChatUseCase                       [GetScheduledMeetingByChatUseCase]
  * @property fetchScheduledMeetingOccurrencesByChatUseCase          [FetchScheduledMeetingOccurrencesByChatUseCase]
  * @property fetchNumberOfScheduledMeetingOccurrencesByChat         [FetchNumberOfScheduledMeetingOccurrencesByChat]
- * @property getChatParticipants                                    [GetChatParticipants]
+ * @property monitorChatParticipantsUseCase                                    [MonitorChatParticipantsUseCase]
  * @property monitorScheduledMeetingUpdates                         [MonitorScheduledMeetingUpdatesUseCase]
  * @property monitorScheduledMeetingOccurrencesUpdatesUseCase       [MonitorScheduledMeetingOccurrencesUpdatesUseCase]
  * @property state                                                  Current view state as [RecurringMeetingInfoState]
@@ -43,7 +43,7 @@ class RecurringMeetingInfoViewModel @Inject constructor(
     private val getScheduledMeetingByChatUseCase: GetScheduledMeetingByChatUseCase,
     private val fetchScheduledMeetingOccurrencesByChatUseCase: FetchScheduledMeetingOccurrencesByChatUseCase,
     private val fetchNumberOfScheduledMeetingOccurrencesByChat: FetchNumberOfScheduledMeetingOccurrencesByChat,
-    private val getChatParticipants: GetChatParticipants,
+    private val monitorChatParticipantsUseCase: MonitorChatParticipantsUseCase,
     private val deviceGateway: DeviceGateway,
     private val monitorScheduledMeetingUpdates: MonitorScheduledMeetingUpdatesUseCase,
     private val monitorScheduledMeetingOccurrencesUpdatesUseCase: MonitorScheduledMeetingOccurrencesUpdatesUseCase,
@@ -115,7 +115,7 @@ class RecurringMeetingInfoViewModel @Inject constructor(
      */
     private fun loadAllChatParticipants() = viewModelScope.launch {
         runCatching {
-            getChatParticipants(state.value.chatId)
+            monitorChatParticipantsUseCase(state.value.chatId)
                 .catch { exception ->
                     Timber.e(exception)
                 }

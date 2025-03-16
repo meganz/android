@@ -2,7 +2,6 @@ package mega.privacy.android.app.di.chat
 
 import android.app.NotificationManager
 import androidx.core.app.NotificationChannelCompat
-import dagger.Binds
 import dagger.Module
 import dagger.Provides
 import dagger.hilt.InstallIn
@@ -12,8 +11,6 @@ import dagger.multibindings.IntoSet
 import mega.privacy.android.app.utils.Constants
 import mega.privacy.android.domain.repository.CallRepository
 import mega.privacy.android.domain.repository.ChatRepository
-import mega.privacy.android.domain.usecase.DefaultGetChatParticipants
-import mega.privacy.android.domain.usecase.GetChatParticipants
 import mega.privacy.android.domain.usecase.InviteToChat
 import mega.privacy.android.domain.usecase.MonitorChatListItemUpdates
 import mega.privacy.android.domain.usecase.RemoveFromChat
@@ -31,13 +28,6 @@ import mega.privacy.android.domain.usecase.meeting.GetScheduledMeeting
 @Module
 @InstallIn(SingletonComponent::class, ViewModelComponent::class)
 abstract class ChatModule {
-
-    /**
-     * Get chat participants
-     */
-    @Binds
-    abstract fun bindGetChatParticipants(useCase: DefaultGetChatParticipants): GetChatParticipants
-
 
     companion object {
 

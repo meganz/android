@@ -28,7 +28,6 @@ import mega.privacy.android.domain.entity.StorageStateEvent
 import mega.privacy.android.domain.entity.chat.ChatConnectionState
 import mega.privacy.android.domain.entity.chat.ChatConnectionStatus
 import mega.privacy.android.domain.usecase.CheckChatLinkUseCase
-import mega.privacy.android.domain.usecase.GetChatParticipants
 import mega.privacy.android.domain.usecase.GetChatRoomUseCase
 import mega.privacy.android.domain.usecase.MonitorUserUpdates
 import mega.privacy.android.domain.usecase.QueryChatLinkUseCase
@@ -53,6 +52,7 @@ import mega.privacy.android.domain.usecase.chat.MonitorChatConnectionStateUseCas
 import mega.privacy.android.domain.usecase.chat.MonitorChatRoomUpdatesUseCase
 import mega.privacy.android.domain.usecase.chat.StartConversationUseCase
 import mega.privacy.android.domain.usecase.chat.UpdateChatPermissionsUseCase
+import mega.privacy.android.domain.usecase.chat.participants.MonitorChatParticipantsUseCase
 import mega.privacy.android.domain.usecase.contact.GetMyFullNameUseCase
 import mega.privacy.android.domain.usecase.contact.GetMyUserHandleUseCase
 import mega.privacy.android.domain.usecase.contact.InviteContactWithHandleUseCase
@@ -98,7 +98,7 @@ class MeetingActivityViewModelTest {
     private val chatManagement: ChatManagement = mock()
     private val setChatVideoInDeviceUseCase: SetChatVideoInDeviceUseCase = mock()
     private val checkChatLink: CheckChatLinkUseCase = mock()
-    private val getChatParticipants: GetChatParticipants = mock()
+    private val monitorChatParticipantsUseCase: MonitorChatParticipantsUseCase = mock()
     private val monitorConnectivityUseCase: MonitorConnectivityUseCase = mock()
     private val monitorFinishActivityUseCase: MonitorFinishActivityUseCase = mock()
     private val monitorChatCallUpdatesUseCase: MonitorChatCallUpdatesUseCase = mock()
@@ -163,7 +163,7 @@ class MeetingActivityViewModelTest {
             setChatVideoInDeviceUseCase,
             checkChatLink,
             context,
-            getChatParticipants,
+            monitorChatParticipantsUseCase,
             monitorConnectivityUseCase,
             monitorFinishActivityUseCase,
             monitorChatCallUpdatesUseCase,
@@ -234,7 +234,7 @@ class MeetingActivityViewModelTest {
             setChatVideoInDeviceUseCase = setChatVideoInDeviceUseCase,
             checkChatLink = checkChatLink,
             context = context,
-            getChatParticipants = getChatParticipants,
+            monitorChatParticipantsUseCase = monitorChatParticipantsUseCase,
             monitorConnectivityUseCase = monitorConnectivityUseCase,
             monitorChatCallUpdatesUseCase = monitorChatCallUpdatesUseCase,
             monitorChatSessionUpdatesUseCase = monitorChatSessionUpdatesUseCase,
