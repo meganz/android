@@ -36,11 +36,13 @@ class SettingsHomeViewKtTest {
     fun `test that screen view event is tracked`() {
         composeTestRule.setContent {
             SettingsHomeView(
-                SettingsHomeState.Loading(
+                state = SettingsHomeState.Loading(
                     featureEntryPoints = persistentListOf(),
                     moreEntryPoints = persistentListOf(),
-                )
-            ) { }
+                ),
+                onBackPressed = {},
+                initialScreen = null,
+            )
         }
 
         assertThat(analyticsRule.events).contains(SettingsScreenEvent)
@@ -51,7 +53,7 @@ class SettingsHomeViewKtTest {
 
         composeTestRule.setContent {
             SettingsHomeView(
-                SettingsHomeState.Data(
+                state = SettingsHomeState.Data(
                     myAccountState = MyAccountSettingsState(UserId(12L), "", ""),
                     featureEntryPoints = persistentListOf(
                         FeatureSettingEntryPoint(
@@ -64,8 +66,10 @@ class SettingsHomeViewKtTest {
                         )
                     ),
                     moreEntryPoints = persistentListOf()
-                )
-            ) { }
+                ),
+                onBackPressed = {},
+                initialScreen = null,
+            )
         }
 
         composeTestRule.onNodeWithTag(SETTING_ITEM_TEST_TAG_ROOT).performClick()

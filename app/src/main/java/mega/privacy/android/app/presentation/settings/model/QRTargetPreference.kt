@@ -9,4 +9,5 @@ import mega.privacy.android.navigation.settings.arguments.TargetPreference
 data object QRTargetPreference : TargetPreference {
     override val preferenceId = SettingsConstants.KEY_QR_CODE_AUTO_ACCEPT
     override val requiresNavigation = false
+    override val rootKey = "security"
 }

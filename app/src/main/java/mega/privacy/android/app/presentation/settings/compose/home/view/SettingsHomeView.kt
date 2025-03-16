@@ -63,12 +63,22 @@ import mega.privacy.mobile.analytics.event.SettingsScreenEvent
 internal fun SettingsHomeView(
     state: SettingsHomeState,
     onBackPressed: () -> Unit,
+    initialScreen: SettingEntryPoint.NavData?,
 ) {
     LaunchedEffect(Unit) {
         Analytics.tracker.trackEvent(SettingsScreenEvent)
     }
 
     val navigator = rememberListDetailPaneScaffoldNavigator<SettingEntryPoint.NavData>()
+
+    LaunchedEffect(initialScreen) {
+        initialScreen?.let {
+            navigator.navigateTo(
+                pane = ListDetailPaneScaffoldRole.Detail,
+                content = it
+            )
+        }
+    }
 
     BackHandler(navigator.canNavigateBack()) {
         navigator.navigateBack()
@@ -248,6 +258,7 @@ private fun SettingsHomeViewPreview() {
                 persistentListOf(),
             ),
             onBackPressed = {},
+            initialScreen = null,
         )
     }
 }

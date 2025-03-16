@@ -32,11 +32,7 @@ class SettingsNavigatorImpl @Inject constructor(
     ) {
         coroutineScope.launch {
             if (getFeatureFlagValueUseCase(AppFeatures.SettingsComposeUI)) {
-                Intent(context, SettingsHomeActivity::class.java).apply {
-                    putExtra(INITIAL_PREFERENCE, targetPreference?.preferenceId)
-                    putExtra(NAVIGATE_TO_INITIAL_PREFERENCE, targetPreference?.requiresNavigation)
-                    context.startActivity(this)
-                }
+                context.startActivity(SettingsHomeActivity.getIntent(context, targetPreference))
             } else {
                 Intent(context, SettingsActivity::class.java).apply {
                     putExtra(INITIAL_PREFERENCE, targetPreference?.preferenceId)

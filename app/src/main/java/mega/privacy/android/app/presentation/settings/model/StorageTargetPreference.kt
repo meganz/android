@@ -9,4 +9,5 @@ import mega.privacy.android.navigation.settings.arguments.TargetPreference
 data object StorageTargetPreference : TargetPreference {
     override val preferenceId = SettingsConstants.KEY_STORAGE_FILE_MANAGEMENT
     override val requiresNavigation = true
+    override val rootKey = "file_management"
 }

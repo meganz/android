@@ -9,5 +9,5 @@ package mega.privacy.android.navigation.settings.arguments
 interface TargetPreference {
     val preferenceId: String
     val requiresNavigation: Boolean
+    val rootKey: String
 }
-

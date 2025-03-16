@@ -1,10 +1,13 @@
 package mega.privacy.android.app.presentation.settings.compose
 
+import android.content.Context
+import android.content.Intent
 import android.os.Bundle
 import androidx.activity.compose.BackHandler
 import androidx.activity.compose.setContent
 import androidx.activity.enableEdgeToEdge
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.getValue
 import androidx.fragment.app.FragmentActivity
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.navigation.compose.rememberNavController
@@ -18,8 +21,8 @@ import mega.privacy.android.app.presentation.security.check.PasscodeContainer
 import mega.privacy.android.app.presentation.settings.compose.home.SettingsHomeDestinationWrapper
 import mega.privacy.android.domain.entity.ThemeMode
 import mega.privacy.android.domain.usecase.GetThemeMode
+import mega.privacy.android.navigation.settings.arguments.TargetPreference
 import javax.inject.Inject
-import androidx.compose.runtime.getValue
 
 @AndroidEntryPoint
 class SettingsHomeActivity : FragmentActivity() {
@@ -34,6 +37,7 @@ class SettingsHomeActivity : FragmentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         enableEdgeToEdge()
         super.onCreate(savedInstanceState)
+        val initialRoot = intent.getStringExtra(INITIAL_PREFERENCE_ROOT_KEY)
         setContent {
             val themeMode by getThemeMode().collectAsStateWithLifecycle(initialValue = ThemeMode.System)
 
@@ -58,9 +62,21 @@ class SettingsHomeActivity : FragmentActivity() {
                 }
 
                 SettingsHomeDestinationWrapper(
-                    onBackPressed = ::finishAfterTransition
+                    onBackPressed = ::finishAfterTransition,
+                    initialSetting = initialRoot?.let { Pair(it, null) }
                 )
             }
         }
+    }
+
+    companion object {
+        fun getIntent(
+            context: Context,
+            targetPreference: TargetPreference?,
+        ) = Intent(context, SettingsHomeActivity::class.java).apply {
+            putExtra(INITIAL_PREFERENCE_ROOT_KEY, targetPreference?.rootKey)
+        }
+
+        private const val INITIAL_PREFERENCE_ROOT_KEY = "InitialPreferenceRootKey"
     }
 }
