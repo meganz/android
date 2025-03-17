@@ -358,7 +358,7 @@ internal fun VideoNameAndLabelView(
                     .testTag(VIDEO_ITEM_NAME_VIEW_TEST_TAG),
                 text = finalText,
                 highlightText = highlightText,
-                highlightFontWeight = FontWeight.Bold,
+                highlightFontWeight = FontWeight.Medium,
                 maxLines = maxLines,
                 textColor = TextColor.Primary,
                 style = MaterialTheme.typography.subtitle2.copy(
