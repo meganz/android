@@ -2,7 +2,6 @@
 
 package mega.privacy.android.app.main
 
-import mega.privacy.android.shared.resources.R as sharedR
 import android.Manifest
 import android.annotation.SuppressLint
 import android.app.Activity
@@ -323,6 +322,7 @@ import mega.privacy.android.navigation.settings.arguments.TargetPreference
 import mega.privacy.android.shared.original.core.ui.controls.sheets.BottomSheet
 import mega.privacy.android.shared.original.core.ui.controls.widgets.setTransfersWidgetContent
 import mega.privacy.android.shared.original.core.ui.theme.OriginalTheme
+import mega.privacy.android.shared.resources.R as sharedR
 import mega.privacy.mobile.analytics.event.ArchivedChatsMenuItemEvent
 import mega.privacy.mobile.analytics.event.ChatRoomDNDMenuItemEvent
 import mega.privacy.mobile.analytics.event.ChatRoomsBottomNavigationItemEvent
@@ -2986,7 +2986,7 @@ class ManagerActivity : PasscodeActivity(), NavigationView.OnNavigationItemSelec
     ) {
         lifecycle.withStarted {
             with(fileBrowserViewModel) {
-                if (isFromSyncTab().not() || (isFromSyncTab() && state().openedFolderNodeHandles.size == 1)) {
+                if (isFromSyncTab().not() || (isFromSyncTab() && state().openedFolderNodeHandles.size == 1) || state().isMediaDiscoveryOpenedByIconClick) {
                     // this call back shouldn't be called when media discovery is already opened from the Manager Activity directly from sync tab
                     // this should be called only when file browser is already opened (state().openedFolderNodeHandles.size == 1)
                     showMediaDiscovery(
@@ -4912,7 +4912,7 @@ class ManagerActivity : PasscodeActivity(), NavigationView.OnNavigationItemSelec
         with(fileBrowserViewModel) {
             when {
                 // User is exploring a Sync Folder
-                isSyncFolderOpen() || (isFromSyncTab() && isMediaDiscoveryOpen().not()) -> {
+                (isSyncFolderOpen() || isFromSyncTab()) && isMediaDiscoveryOpen().not() -> {
                     lifecycleScope.launch {
                         if (isAtAccessedFolder()) {
                             if (isFromSyncTab().not()) {
@@ -4927,12 +4927,7 @@ class ManagerActivity : PasscodeActivity(), NavigationView.OnNavigationItemSelec
                             goBackToRootLevel()
                             resetSyncFolderVisibility()
                         } else {
-                            if (isMediaDiscoveryOpen()) {
-                                exitMediaDiscovery(performBackNavigation = performBackNavigation)
-                                removeFragment(mediaDiscoveryFragment)
-                            } else {
-                                performBackNavigation()
-                            }
+                            performBackNavigation()
                         }
                     }
                 }
@@ -4950,18 +4945,23 @@ class ManagerActivity : PasscodeActivity(), NavigationView.OnNavigationItemSelec
                                 checkCloudDriveAccessFromNotification(isNotFromNotificationAction = {
                                     if (isAccessedFolderExited()) {
                                         resetIsAccessedFolderExited()
-                                        // Go back to Device Center
-                                        if (isFromSyncTab().not()) {
-                                            selectDrawerItem(DrawerItem.DEVICE_CENTER)
-                                        } else {
-                                            lifecycleScope.launch {
-                                                if (isFromSyncTab()) {
-                                                    goBackToRootLevel()
-                                                }
-                                                fileBrowserViewModel.onTabChanged(CloudDriveTab.SYNC)
-                                                resetSyncFolderVisibility()
+                                        // Go back to Device Center or Sync List
+                                        when {
+                                            isSyncFolderOpen() -> {
+                                                megaNavigator.openSyncs(this@ManagerActivity)
                                             }
 
+                                            isFromSyncTab().not() -> {
+                                                selectDrawerItem(DrawerItem.DEVICE_CENTER)
+                                            }
+
+                                            else -> {
+                                                fileBrowserViewModel.onTabChanged(CloudDriveTab.SYNC)
+                                            }
+                                        }
+                                        lifecycleScope.launch {
+                                            goBackToRootLevel()
+                                            resetSyncFolderVisibility()
                                         }
                                     } else {
                                         goBackToBottomNavigationItem(bottomNavigationCurrentItem)
