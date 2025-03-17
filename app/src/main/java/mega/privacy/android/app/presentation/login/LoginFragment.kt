@@ -130,9 +130,19 @@ class LoginFragment : Fragment() {
         with(uiState) {
             intentState?.apply {
                 when (this) {
-                    LoginIntentState.ReadyForInitialSetup -> finishSetupIntent(uiState)
-                    LoginIntentState.ReadyForFinalSetup -> readyToFinish(uiState)
-                    else -> { /* Nothing to update */
+                    LoginIntentState.ReadyForInitialSetup -> {
+                        Timber.d("Ready to initial setup")
+                        finishSetupIntent(uiState)
+                    }
+
+                    LoginIntentState.ReadyForFinalSetup -> {
+                        Timber.d("Ready to finish")
+                        readyToFinish(uiState)
+                    }
+
+                    else -> {
+                        /* Nothing to update */
+                        Timber.d("Intent state: $this")
                     }
                 }
             }
@@ -536,16 +546,20 @@ class LoginFragment : Fragment() {
      */
     private fun readyToFinish(uiState: LoginState) {
         (requireActivity() as LoginActivity).intent?.apply {
+            Timber.d("Intent not null")
+
             @Suppress("UNCHECKED_CAST")
             intentShareInfo = getBooleanExtra(FileExplorerActivity.EXTRA_FROM_SHARE, false)
 
             when {
                 intentShareInfo -> {
+                    Timber.d("Intent to share")
                     toSharePage()
                     return
                 }
 
                 Constants.ACTION_FILE_EXPLORER_UPLOAD == action && Constants.TYPE_TEXT_PLAIN == type -> {
+                    Timber.d("Intent to FileExplorerActivity")
                     startActivity(
                         Intent(
                             requireContext(),
@@ -570,6 +584,7 @@ class LoginFragment : Fragment() {
                 }
 
                 Constants.ACTION_REFRESH == action && activity != null -> {
+                    Timber.d("Intent to refresh")
                     requireActivity().apply {
                         setResult(Activity.RESULT_OK)
                         finish()
@@ -593,6 +608,8 @@ class LoginFragment : Fragment() {
             Timber.d("OK fetch nodes")
 
             if (intentAction != null && intentDataString != null) {
+                Timber.d("Intent action: $intentAction")
+
                 when (intentAction) {
                     Constants.ACTION_CHANGE_MAIL -> {
                         Timber.d("Action change mail after fetch nodes")
@@ -625,7 +642,9 @@ class LoginFragment : Fragment() {
             }
             if (!uiState.pressedBackWhileLogin) {
                 Timber.d("NOT backWhileLogin")
+
                 if (intentParentHandle != -1L) {
+                    Timber.d("Activity result OK")
                     val intent = Intent()
                     intent.putExtra("PARENT_HANDLE", intentParentHandle)
                     loginActivity.setResult(Activity.RESULT_OK, intent)
@@ -635,6 +654,7 @@ class LoginFragment : Fragment() {
                     val refreshActivityIntent =
                         requireActivity().intent.parcelable<Intent>(LAUNCH_INTENT)
                     if (uiState.isAlreadyLoggedIn) {
+                        Timber.d("isAlreadyLoggedIn")
                         intent = Intent(requireContext(), ManagerActivity::class.java)
                         setStartScreenTimeStamp(requireContext())
                         when (intentAction) {
@@ -664,6 +684,7 @@ class LoginFragment : Fragment() {
                                 with(requireActivity()) {
                                     setStartScreenTimeStamp(this)
 
+                                    Timber.d("First login")
                                     startActivity(Intent(this, ManagerActivity::class.java).apply {
                                         putExtra(IntentConstants.EXTRA_FIRST_LOGIN, true)
                                     })
@@ -697,8 +718,10 @@ class LoginFragment : Fragment() {
                     }
 
                     if (viewModel.getStorageState() === StorageState.PayWall) {
+                        Timber.d("show Paywall warning")
                         showOverDiskQuotaPaywallWarning(activity, true)
                     } else {
+                        Timber.d("First launch")
                         loginActivity.startActivity(
                             intent.apply {
                                 putExtra(
@@ -708,6 +731,7 @@ class LoginFragment : Fragment() {
                             },
                         )
                     }
+                    Timber.d("LoginActivity finish")
                     loginActivity.finish()
                 }
             }
