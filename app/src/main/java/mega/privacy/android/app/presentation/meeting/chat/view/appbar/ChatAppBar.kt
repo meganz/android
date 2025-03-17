@@ -41,6 +41,7 @@ import mega.privacy.android.shared.original.core.ui.controls.appbar.MegaAppBar
 import mega.privacy.android.shared.original.core.ui.preview.CombinedThemePreviews
 import mega.privacy.android.shared.original.core.ui.theme.OriginalTheme
 import mega.privacy.android.shared.original.core.ui.utils.showAutoDurationSnackbar
+import mega.privacy.android.shared.resources.R as sharedR
 import mega.privacy.mobile.analytics.event.ChatConversationAddParticipantsMenuToolbarEvent
 import mega.privacy.mobile.analytics.event.ChatConversationArchiveMenuToolbarEvent
 import mega.privacy.mobile.analytics.event.ChatConversationCallMenuToolbarEvent
@@ -99,8 +100,8 @@ internal fun ChatAppBar(
     }
     MegaAppBar(
         appBarType = AppBarType.BACK_NAVIGATION,
-        title = uiState.title.orEmpty(),
-        subtitle = getSubtitle(uiState = uiState),
+        title = if (uiState.isNoteToSelf) stringResource(id = sharedR.string.chat_note_to_self_chat_title) else uiState.title.orEmpty(),
+        subtitle = if (uiState.isNoteToSelf) null else getSubtitle(uiState = uiState),
         modifier = Modifier.clickable {
             with(uiState) {
                 if (!isJoiningOrLeaving && !isPreviewMode && isConnected
@@ -111,8 +112,8 @@ internal fun ChatAppBar(
             }
         },
         onNavigationPressed = onBackPressed,
-        titleIcons = { TitleIcons(uiState) },
-        marqueeSubtitle = uiState.userLastGreen != null,
+        titleIcons = { if (uiState.isNoteToSelf) null else TitleIcons(uiState) },
+        marqueeSubtitle = if (uiState.isNoteToSelf) false else uiState.userLastGreen != null,
         actions = getChatRoomActions(uiState, canSelect),
         onActionPressed = onActionPressed@{
             when (it) {
@@ -193,7 +194,7 @@ private fun getChatRoomActions(uiState: ChatUiState, canSelect: Boolean): List<C
 
             val hasModeratorPermission = myPermission == ChatRoomPermission.Moderator
 
-            if (haveWritePermission) {
+            if (haveWritePermission && !isNoteToSelf) {
                 add(ChatRoomMenuAction.AudioCall(!hasACallInThisChat && (!isWaitingRoom || hasModeratorPermission)))
 
                 if (!isGroup) {
@@ -201,15 +202,15 @@ private fun getChatRoomActions(uiState: ChatUiState, canSelect: Boolean): List<C
                 }
             }
 
-            if (isGroup && (hasModeratorPermission || isActive && isOpenInvite)) {
+            if (!isNoteToSelf && isGroup && (hasModeratorPermission || isActive && isOpenInvite)) {
                 add(ChatRoomMenuAction.AddParticipants)
             }
 
-            if (isGroup || myPermission != ChatRoomPermission.ReadOnly) {
+            if (isNoteToSelf || isGroup || myPermission != ChatRoomPermission.ReadOnly) {
                 add(ChatRoomMenuAction.Info)
             }
 
-            if ((isGroup && hasModeratorPermission) || (!isGroup && myPermission != ChatRoomPermission.ReadOnly)) {
+            if (isNoteToSelf || (isGroup && hasModeratorPermission) || (!isGroup && myPermission != ChatRoomPermission.ReadOnly)) {
                 add(ChatRoomMenuAction.Clear)
             }
 
@@ -219,11 +220,11 @@ private fun getChatRoomActions(uiState: ChatUiState, canSelect: Boolean): List<C
                 add(ChatRoomMenuAction.Archive)
             }
 
-            if (hasModeratorPermission && (uiState.isGroup || uiState.isMeeting) && uiState.hasACallInThisChat) {
+            if (!isNoteToSelf && hasModeratorPermission && (isGroup || isMeeting) && hasACallInThisChat) {
                 add(ChatRoomMenuAction.EndCallForAll)
             }
 
-            if ((isGroup && isActive) || (!isGroup && hasModeratorPermission)) {
+            if (!isNoteToSelf && ((isGroup && isActive) || (!isGroup && hasModeratorPermission))) {
                 if (isChatNotificationMute) {
                     add(ChatRoomMenuAction.Unmute)
                 } else {

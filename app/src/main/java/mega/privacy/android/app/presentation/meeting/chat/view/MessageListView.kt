@@ -262,7 +262,11 @@ internal fun MessageListView(
             // fix issue empty header for empty group
             if (pagingItems.loadState.mediator?.append?.endOfPaginationReached == true) {
                 item {
-                    FirstMessageHeader(uiState.title, uiState.scheduledMeeting)
+                    FirstMessageHeader(
+                        title = uiState.title,
+                        isNoteToSelfChat = uiState.isNoteToSelf,
+                        scheduledMeeting = uiState.scheduledMeeting
+                    )
                 }
             }
         }

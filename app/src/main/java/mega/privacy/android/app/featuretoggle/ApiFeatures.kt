@@ -51,7 +51,7 @@ enum class ApiFeatures(
      * Note to yourself feature flag
      */
     NoteToYourselfFlag(
-        "ff_n2s",
+        "n2s",
         "Enable note to yourself",
         false
     ),

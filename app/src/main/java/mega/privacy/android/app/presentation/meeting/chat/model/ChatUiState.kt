@@ -120,6 +120,11 @@ data class ChatUiState(
     val title = chat?.title
 
     /**
+     * Is note to self chat
+     */
+    val isNoteToSelf = chat?.isNoteToSelf == true
+
+    /**
      * True if the chat is private, false otherwise.
      */
     val isPrivateChat = chat?.isPublic == false

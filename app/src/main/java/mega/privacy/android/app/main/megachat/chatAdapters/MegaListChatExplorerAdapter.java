@@ -211,7 +211,9 @@ public class MegaListChatExplorerAdapter extends RecyclerView.Adapter<MegaListCh
 
             int userStatus = megaChatApi.getUserOnlineStatus(handle);
             setContactStatus(userStatus, holder.stateIcon, holder.lastSeenStateText, StatusIconLocation.STANDARD);
-            setContactLastGreen(context, userStatus, contact.getLastGreen(), holder.lastSeenStateText);
+            if(contact != null) {
+                setContactLastGreen(context, userStatus, contact.getLastGreen(), holder.lastSeenStateText);
+            }
         }
 
 

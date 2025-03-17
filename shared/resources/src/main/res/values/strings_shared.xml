@@ -954,6 +954,14 @@
     <string name="transfers_error_cancelling_download">Something went wrong. Download was not cancelled.</string>
     <!-- Body for the subscription details section, which is shown to the Indian user to provide details about subscription. This string is shown if user selects yearly subscription and the amount is more than Rs.15,000. Please keep these placeholders [A], [/A], [B], [/B], [C], [/C]. They will be used to format the string. -->
     <string name="account_upgrade_account_subscription_details_body_yearly_with_price_for_indian">You will be charged %1$s immediately but your subscription will not automatically renew after 12 months due to government regulations. It will be your responsibility to renew your subscription after it has expired. You can manage or cancel your subscription anytime via Subscriptions in [A]Google&#160;Play[/A]. By upgrading your account, you agree to MEGA’s [B]Terms of Service[/B] and [C]Privacy and Data Policy[/C].</string>
+    <!-- The name of the Device or Folder Status which signifies that it is currently uploading -->
+    <string name="device_center_list_view_item_status_uploading">Uploading&#8230;</string>
+    <!-- The name of the Device or Folder Status which signifies that it is currently uploading with a percentage completion -->
+    <string name="device_center_list_view_item_status_uploading_with_progress">%1$d%% uploading&#8230;</string>
+    <!-- The name of the Device or Folder Status which signifies that it is inactive -->
+    <string name="device_center_list_view_item_status_inactive">Inactive</string>
+    <!-- The name of the Device or Folder Status which signifies that some action is needed -->
+    <string name="device_center_list_view_item_status_attention_needed">Attention needed</string>
     <!--General Unable to log in-->
     <string name="general_unable_to_login">Unable to log in</string>
     <!--General check inbox-->
@@ -965,7 +973,7 @@
     <!-- Message displayed when email is successfully resent -->
     <string name="general_email_resend_success_message">Email sent</string>
     <!--General Request Network Failed text-->
-    <string name="general_request_failed_message">Something wrong, try again</string>
+    <string name="general_request_failed_message">Something went wrong</string>
     <!-- Message error shown when trying to log in on an account that has been suspended due to breaches of copyright -->
     <string name="dialog_account_suspended_ToS_copyright_message">Your MEGA account has been suspended due to repeated allegations of copyright infringements. This means you cannot access your account or data within it.\nCheck your email inbox for more information on how to file a counter-notice.</string>
     <!-- Message error shown when trying to log in on an account that has been terminated due to breaches of all reasons of breaching Terms of Service, except copyright. -->
@@ -974,14 +982,6 @@
     <string name="error_business_disabled">Your account has been deactivated by your administrator. Please contact your Business account administrator for further details.</string>
     <!-- An error message which appears to sub-users of a business account when they try to login and they are deleted. -->
     <string name="error_business_removed">Your account has been removed by your administrator. Please contact your Business account administrator for further details.</string>
-    <!-- The name of the Device or Folder Status which signifies that it is currently uploading -->
-    <string name="device_center_list_view_item_status_uploading">Uploading&#8230;</string>
-    <!-- The name of the Device or Folder Status which signifies that it is currently uploading with a percentage completion -->
-    <string name="device_center_list_view_item_status_uploading_with_progress">%1$d%% uploading&#8230;</string>
-    <!-- The name of the Device or Folder Status which signifies that it is inactive -->
-    <string name="device_center_list_view_item_status_inactive">Inactive</string>
-    <!-- The name of the Device or Folder Status which signifies that some action is needed -->
-    <string name="device_center_list_view_item_status_attention_needed">Attention needed</string>
     <!--The title of the Email Confirmation page-->
     <string name="email_confirmation_title">Email confirmation</string>
     <!--The Content of the Email Confirmation page-->
@@ -998,4 +998,6 @@
     <string name="email_confirmation_dialog_cancel_registration_cancel_button">Yes, cancel</string>
     <!-- Text for the "Don’t cancel" button in the cancel registration dialog -->
     <string name="email_confirmation_dialog_cancel_registration_dismiss_button">Don’t cancel</string>
+    <!-- First message header paragraph in note to self chat -->
+    <string name="chat_note_to_self_chat_first_message_header_paragraph">A private space for pictures, important information, or big ideas. Always synced, and protected with zero-knowledge encryption.</string>
 </resources>
