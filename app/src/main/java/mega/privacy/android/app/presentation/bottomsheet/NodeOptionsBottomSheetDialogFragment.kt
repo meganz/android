@@ -58,6 +58,7 @@ import mega.privacy.android.app.presentation.bottomsheet.model.NodeBottomSheetUI
 import mega.privacy.android.app.presentation.bottomsheet.model.NodeDeviceCenterInformation
 import mega.privacy.android.app.presentation.bottomsheet.model.NodeShareInformation
 import mega.privacy.android.app.presentation.contact.authenticitycredendials.AuthenticityCredentialsActivity
+import mega.privacy.android.app.presentation.extensions.getStorageState
 import mega.privacy.android.app.presentation.fileinfo.FileInfoActivity
 import mega.privacy.android.app.presentation.hidenode.HiddenNodesOnboardingActivity
 import mega.privacy.android.app.presentation.manager.model.SharesTab
@@ -67,6 +68,7 @@ import mega.privacy.android.app.presentation.transfers.starttransfer.StartDownlo
 import mega.privacy.android.app.presentation.videosection.VideoSectionViewModel
 import mega.privacy.android.app.utils.AlertDialogUtil.dismissAlertDialogIfExists
 import mega.privacy.android.app.utils.AlertDialogUtil.isAlertDialogShown
+import mega.privacy.android.app.utils.AlertsAndWarnings.showOverDiskQuotaPaywallWarning
 import mega.privacy.android.app.utils.Constants
 import mega.privacy.android.app.utils.ContactUtil
 import mega.privacy.android.app.utils.MegaApiUtils
@@ -88,6 +90,7 @@ import mega.privacy.android.app.utils.wrapper.MegaNodeUtilWrapper
 import mega.privacy.android.domain.entity.AccountType
 import mega.privacy.android.domain.entity.ImageFileTypeInfo
 import mega.privacy.android.domain.entity.ShareData
+import mega.privacy.android.domain.entity.StorageState
 import mega.privacy.android.domain.entity.VideoFileTypeInfo
 import mega.privacy.android.domain.entity.node.NodeId
 import mega.privacy.android.domain.entity.node.thumbnail.ThumbnailRequest
@@ -1376,7 +1379,11 @@ class NodeOptionsBottomSheetDialogFragment : BaseBottomSheetDialogFragment() {
      * @param node The [MegaNode] to be downloaded
      */
     private fun onDownloadClicked(node: MegaNode) {
-        startDownloadViewModel.onDownloadClicked(NodeId(node.handle))
+        if (mode == VIDEO_PLAYLIST_DETAIL && getStorageState() == StorageState.PayWall) {
+            showOverDiskQuotaPaywallWarning()
+        } else {
+            startDownloadViewModel.onDownloadClicked(NodeId(node.handle))
+        }
         setStateBottomSheetBehaviorHidden()
     }
 
@@ -1451,7 +1458,11 @@ class NodeOptionsBottomSheetDialogFragment : BaseBottomSheetDialogFragment() {
             refreshView()
             Util.showSnackbar(activity, resources.getString(R.string.file_removed_offline))
         } else {
-            startDownloadViewModel.onSaveOfflineClicked(nodeId)
+            if (mode == VIDEO_PLAYLIST_DETAIL && getStorageState() == StorageState.PayWall) {
+                showOverDiskQuotaPaywallWarning()
+            } else {
+                startDownloadViewModel.onSaveOfflineClicked(nodeId)
+            }
         }
         setStateBottomSheetBehaviorHidden()
     }
@@ -1479,9 +1490,13 @@ class NodeOptionsBottomSheetDialogFragment : BaseBottomSheetDialogFragment() {
     }
 
     private fun onLinkClicked(node: MegaNode) {
-        (requireActivity() as ManagerActivity).showGetLinkActivity(
-            node.handle
-        )
+        if (mode == VIDEO_PLAYLIST_DETAIL && getStorageState() == StorageState.PayWall) {
+            showOverDiskQuotaPaywallWarning()
+        } else {
+            (requireActivity() as ManagerActivity).showGetLinkActivity(
+                node.handle
+            )
+        }
         setStateBottomSheetBehaviorHidden()
     }
 

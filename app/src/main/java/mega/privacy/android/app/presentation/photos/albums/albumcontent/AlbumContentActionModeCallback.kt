@@ -38,7 +38,11 @@ class AlbumContentActionModeCallback(
     override fun onActionItemClicked(mode: ActionMode?, item: MenuItem?): Boolean {
         when (item?.itemId) {
             R.id.cab_menu_download -> {
-                saveToDevice()
+                if (getStorageState() == StorageState.PayWall) {
+                    showOverDiskQuotaPaywallWarning()
+                } else {
+                    saveToDevice()
+                }
                 clearSelection()
             }
 

@@ -288,7 +288,11 @@ fun VideoPlaylistDetailView(
                     confirmButtonText = stringResource(id = sharedR.string.video_section_playlist_detail_remove_videos_dialog_remove_button),
                     onDeleteButtonClicked = {
                         showDeleteVideosDialog = false
-                        onDeleteVideosDialogPositiveButtonClicked(playlist)
+                        if (isStorageOverQuota()) {
+                            showOverDiskQuotaPaywallWarning()
+                        } else {
+                            onDeleteVideosDialogPositiveButtonClicked(playlist)
+                        }
                     },
                     onDismiss = {
                         showDeleteVideosDialog = false
