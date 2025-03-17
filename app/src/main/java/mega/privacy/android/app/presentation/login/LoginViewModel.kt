@@ -848,27 +848,20 @@ class LoginViewModel @Inject constructor(
                 if (update.progress?.floatValue == 1F) {
                     Timber.d("fetch nodes finished")
                     prefetchTimeline()
-
                     _state.update {
                         it.copy(
                             intentState = LoginIntentState.ReadyForFinalSetup,
                             fetchNodesUpdate = update
                         )
                     }
-
-                    /*In case the app crash or restarts, we need to restart the worker
-                    in order to monitor current transfers and update the related notification.*/
-                    establishCameraUploadsSyncHandlesUseCase()
-                    startDownloadWorkerUseCase()
-                    startChatUploadsWorkerUseCase()
-                    startUploadsWorkerUseCase()
-                    checkIfTransfersShouldBePausedUseCase()
+                    startWorkers()
                 } else {
                     Timber.d("fetch nodes update")
                     _state.update { it.copy(fetchNodesUpdate = update) }
                 }
             }
         }.onFailure { exception ->
+            Timber.e(exception)
             if (exception !is FetchNodesException) return@launch
 
             _state.update { state ->
@@ -887,8 +880,32 @@ class LoginViewModel @Inject constructor(
     }
 
     private suspend fun prefetchTimeline() {
-        if (!getFeatureFlagValueUseCase(AppFeatures.PrefetchTimeline)) return
-        getTimelinePhotosUseCase()
+        runCatching {
+            if (!getFeatureFlagValueUseCase(AppFeatures.PrefetchTimeline)) return@runCatching
+            getTimelinePhotosUseCase()
+        }.onFailure {
+            Timber.e(it)
+        }
+    }
+
+    private suspend fun startWorkers() {
+        /* In case the app crash or restarts, we need to restart the worker in order to
+           monitor current transfers and update the related notification. */
+        val workers = listOf<suspend () -> Unit>(
+            { establishCameraUploadsSyncHandlesUseCase() },
+            { startDownloadWorkerUseCase() },
+            { startChatUploadsWorkerUseCase() },
+            { startUploadsWorkerUseCase() },
+            { checkIfTransfersShouldBePausedUseCase() }
+        )
+
+        workers.forEach { worker ->
+            runCatching {
+                worker()
+            }.onFailure { error ->
+                Timber.e(error, "Worker failed to start")
+            }
+        }
     }
 
     /**
