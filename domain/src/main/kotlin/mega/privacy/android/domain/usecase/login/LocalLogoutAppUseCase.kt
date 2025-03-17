@@ -4,6 +4,7 @@ import mega.privacy.android.domain.entity.camerauploads.CameraUploadFolderType
 import mega.privacy.android.domain.entity.camerauploads.CameraUploadsRestartMode
 import mega.privacy.android.domain.repository.AccountRepository
 import mega.privacy.android.domain.repository.AlbumRepository
+import mega.privacy.android.domain.repository.BannerRepository
 import mega.privacy.android.domain.repository.BillingRepository
 import mega.privacy.android.domain.repository.PhotosRepository
 import mega.privacy.android.domain.repository.PushesRepository
@@ -36,12 +37,14 @@ class LocalLogoutAppUseCase @Inject constructor(
     private val settingsRepository: SettingsRepository,
     private val clearTransfersPreferencesUseCase: ClearTransfersPreferencesUseCase,
     private val setSecurityUpgradeInAppUseCase: SetSecurityUpgradeInAppUseCase,
+    private val bannerRepository: BannerRepository,
 ) {
 
     /**
      * Invoke.
      */
     suspend operator fun invoke() {
+        bannerRepository.clearCache()
         with(transferRepository) {
             cancelTransfers()
             deleteAllActiveTransfers()

@@ -6,6 +6,7 @@ import mega.privacy.android.domain.entity.camerauploads.CameraUploadFolderType
 import mega.privacy.android.domain.entity.camerauploads.CameraUploadsRestartMode
 import mega.privacy.android.domain.repository.AccountRepository
 import mega.privacy.android.domain.repository.AlbumRepository
+import mega.privacy.android.domain.repository.BannerRepository
 import mega.privacy.android.domain.repository.BillingRepository
 import mega.privacy.android.domain.repository.PhotosRepository
 import mega.privacy.android.domain.repository.PushesRepository
@@ -46,6 +47,7 @@ class LocalLogoutAppUseCaseTest {
     private val clearCameraUploadsRecordUseCase = mock<ClearCameraUploadsRecordUseCase>()
     private val clearTransfersPreferencesUseCase = mock<ClearTransfersPreferencesUseCase>()
     private val setSecurityUpgradeInAppUseCase = mock<SetSecurityUpgradeInAppUseCase>()
+    private val bannerRepository = mock<BannerRepository>()
 
     @BeforeAll
     fun setUp() {
@@ -64,6 +66,7 @@ class LocalLogoutAppUseCaseTest {
             clearCameraUploadsRecordUseCase = clearCameraUploadsRecordUseCase,
             clearTransfersPreferencesUseCase = clearTransfersPreferencesUseCase,
             setSecurityUpgradeInAppUseCase = setSecurityUpgradeInAppUseCase,
+            bannerRepository = bannerRepository
         )
     }
 
@@ -81,6 +84,7 @@ class LocalLogoutAppUseCaseTest {
             clearCameraUploadsRecordUseCase,
             clearTransfersPreferencesUseCase,
             setSecurityUpgradeInAppUseCase,
+            bannerRepository
         )
     }
 
@@ -108,5 +112,6 @@ class LocalLogoutAppUseCaseTest {
         verify(clearCameraUploadsRecordUseCase)
             .invoke(listOf(CameraUploadFolderType.Primary, CameraUploadFolderType.Secondary))
         verify(setSecurityUpgradeInAppUseCase).invoke(false)
+        verify(bannerRepository).clearCache()
     }
 }
