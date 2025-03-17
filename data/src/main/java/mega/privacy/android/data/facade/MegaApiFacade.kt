@@ -1556,4 +1556,14 @@ internal class MegaApiFacade @Inject constructor(
     ) {
         megaApi.resumeCreateAccount(session, listener)
     }
+
+    override fun getBanners(listener: MegaRequestListenerInterface) = megaApi.getBanners(listener)
+
+    override fun dismissBanner(id: Int, listener: MegaRequestListenerInterface?) {
+        if (listener == null) {
+            megaApi.dismissBanner(id)
+        } else {
+            megaApi.dismissBanner(id, listener)
+        }
+    }
 }

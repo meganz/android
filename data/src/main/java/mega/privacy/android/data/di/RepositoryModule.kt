@@ -64,6 +64,7 @@ import mega.privacy.android.data.repository.ZipBrowserRepositoryImpl
 import mega.privacy.android.data.repository.account.BusinessRepositoryImpl
 import mega.privacy.android.data.repository.account.DefaultAccountRepository
 import mega.privacy.android.data.repository.apiserver.ApiServerRepositoryImpl
+import mega.privacy.android.data.repository.banner.BannerRepositoryImpl
 import mega.privacy.android.data.repository.chat.ChatMessageRepositoryImpl
 import mega.privacy.android.data.repository.filemanagement.ShareRepositoryImpl
 import mega.privacy.android.data.repository.files.FingerprintRepositoryImpl
@@ -79,6 +80,7 @@ import mega.privacy.android.domain.repository.AlbumRepository
 import mega.privacy.android.domain.repository.AudioSectionRepository
 import mega.privacy.android.domain.repository.AvatarRepository
 import mega.privacy.android.domain.repository.BackupRepository
+import mega.privacy.android.domain.repository.BannerRepository
 import mega.privacy.android.domain.repository.BillingRepository
 import mega.privacy.android.domain.repository.BusinessRepository
 import mega.privacy.android.domain.repository.CacheRepository
@@ -366,4 +368,8 @@ internal abstract class RepositoryModule {
 
     @Binds
     abstract fun bindFingerprintRepository(implementation: FingerprintRepositoryImpl): FingerprintRepository
+
+    @Binds
+    @Singleton
+    abstract fun bindBannerRepository(repository: BannerRepositoryImpl): BannerRepository
 }

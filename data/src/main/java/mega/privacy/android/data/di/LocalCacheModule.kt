@@ -13,6 +13,7 @@ import mega.privacy.android.data.qualifier.FileVersionsOption
 import mega.privacy.android.data.qualifier.OriginalPathForNodeCache
 import mega.privacy.android.data.qualifier.OriginalPathForPendingMessageCache
 import mega.privacy.android.domain.entity.account.MegaSku
+import mega.privacy.android.domain.entity.banner.Banner
 import mega.privacy.android.domain.entity.billing.MegaPurchase
 import mega.privacy.android.domain.entity.billing.PaymentMethodFlags
 import mega.privacy.android.domain.entity.billing.Pricing
@@ -76,4 +77,8 @@ internal object LocalCacheModule {
     @Provides
     @Singleton
     fun provideChatOriginalPathForPendingMessageCache(): Cache<Map<Long, String>> = PermanentCache()
+
+    @Provides
+    @Singleton
+    fun provideBannersCache(): Cache<List<Banner>> = PermanentCache()
 }

@@ -3697,4 +3697,30 @@ interface MegaApiGateway {
      * @param listener MegaRequestListener to track this request
      */
     fun resumeCreateAccount(session: String, listener: MegaRequestListenerInterface)
+
+    /**
+     * Requests a list of all Smart Banners available for current user.
+     * <p>
+     * The response value is stored as a MegaBannerList.
+     * <p>
+     * The associated request type with this request is MegaRequest::TYPE_GET_BANNERS
+     * Valid data in the MegaRequest object received in onRequestFinish when the error code
+     * is MegaError::API_OK:
+     * - MegaRequest::getMegaBannerList: the list of banners
+     * <p>
+     * On the onRequestFinish error, the error code associated to the MegaError can be:
+     * - MegaError::API_EACCESS - If called with no user being logged in.
+     * - MegaError::API_EINTERNAL - If the internally used user attribute exists but can't be decoded.
+     * - MegaError::API_ENOENT if there are no banners to return to the user.
+     *
+     * @param listener MegaRequestListener to track this request
+     */
+    fun getBanners(listener: MegaRequestListenerInterface)
+
+    /**
+     * No longer show the Smart Banner with the specified id to the current user.
+     *
+     * @param id The identifier of the Smart Banner
+     */
+    fun dismissBanner(id: Int, listener: MegaRequestListenerInterface? = null)
 }
