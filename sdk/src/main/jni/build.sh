@@ -287,9 +287,66 @@ function createMEGAchatBindings
     popd &>> ${LOG_FILE}
 }
 
-if (( $# != 1 )); then
-    echo "Usage: $0 <all | bindings | clean | clean_mega>";
-    exit 0 
+# There is a random issue with the arm64-v8a target that sometimes the file is not generated correctly.
+# This function checks if the file is smaller than 100 bytes and re-generates it if needed.
+# This is a workaround until the issue is fixed.
+function ensureArm64TargetExists {
+  echo "* Ensuring arm64-v8a target exists" &>>${LOG_FILE}
+  echo sync  &>>${LOG_FILE}
+  sync
+
+  local TARGET_FILE=${TARGET_LIB_DIR}/arm64-v8a/libmega.so
+  local SOURCE_FILE=../obj/local/arm64-v8a/libmega.so
+
+  # Get file size in bytes (works on both macOS and Linux)
+  if [[ "$OSTYPE" == "darwin"* ]]; then
+    FILE_SIZE=$(stat -f %z "$TARGET_FILE")
+  else
+    FILE_SIZE=$(stat -c %s "$TARGET_FILE")
+  fi
+
+  echo ls -l ${TARGET_FILE} &>>${LOG_FILE}
+  ls -l ${TARGET_FILE} &>>${LOG_FILE}
+
+  if [ "$FILE_SIZE" -le 100 ]; then
+      echo "File ${TARGET_FILE} is smaller than 100 bytes. Re-generating..." &>>${LOG_FILE}
+
+      echo file ${SOURCE_FILE} &>>${LOG_FILE}
+      file ${SOURCE_FILE} &>>${LOG_FILE}
+
+      echo sha1sum ${SOURCE_FILE} &>>${LOG_FILE}
+      sha1sum ${SOURCE_FILE} &>>${LOG_FILE}
+
+      if [[ "$OSTYPE" == "darwin"* ]]; then
+        LLVM_STRIP=${NDK_ROOT}/toolchains/llvm/prebuilt/darwin-x86_64/bin/llvm-strip
+      else
+        LLVM_STRIP=${NDK_ROOT}/toolchains/llvm/prebuilt/linux-x86_64/bin/llvm-strip
+      fi
+
+      echo ${LLVM_STRIP} --strip-unneeded -o ${TARGET_FILE} ${SOURCE_FILE} &>>${LOG_FILE}
+      ${LLVM_STRIP} --strip-unneeded -o ${TARGET_FILE} ${SOURCE_FILE} &>>${LOG_FILE}
+
+      echo ls -l ${TARGET_FILE} &>>${LOG_FILE}
+      ls -l ${TARGET_FILE} &>>${LOG_FILE}
+
+      # run file command to check if the file is an ELF 64-bit LSB file
+      echo file ${TARGET_FILE} &>>${LOG_FILE}
+      output=$(file ${TARGET_FILE})
+      echo "$output" &>>${LOG_FILE}
+
+      # if target file is still invalid, exit with failure
+      if [[ "$output" != *"ELF 64-bit"* ]]; then
+          echo "Error: ${TARGET_FILE} is not an ELF 64-bit LSB file." &>>${LOG_FILE}
+          exit 1
+      fi
+  else
+      echo "File ${TARGET_FILE} is larger than 100 bytes. Do nothing." &>>${LOG_FILE}
+  fi
+}
+
+if (($# != 1)); then
+  echo "Usage: $0 <all | bindings | clean | clean_mega>"
+  exit 0
 fi
 
 if [ "$1" == "bindings" ]; then
@@ -743,6 +800,7 @@ fi
 if [ -n "`echo ${BUILD_ARCHS} | grep -w arm64-v8a`" ]; then
     echo "* Running ndk-build arm 64bits"
     ${NDK_BUILD} V=1 NDK_LIBS_OUT=${TARGET_LIB_DIR} -j${JOBS} APP_ABI=arm64-v8a &>> ${LOG_FILE}
+  ensureArm64TargetExists
     echo "* ndk-build finished for arm 64bits"
     mv ${TARGET_LIB_DIR}/arm64-v8a ../tmpLibs/
 fi

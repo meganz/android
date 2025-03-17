@@ -88,13 +88,11 @@ pipeline {
 
                     // upload SDK build log if SDK build fails
                     String sdkBuildMessage = ""
-                    if (BUILD_STEP == "Build SDK") {
-                        if (fileExists(SDK_LOG_FILE_NAME)) {
-                            def sdkLog = common.uploadFileToArtifactory(SDK_LOG_FILE_NAME)
-                            sdkBuildMessage = "<br/>SDK BuildLog:\t[SDK build log](${sdkLog})"
-                        } else {
-                            sdkBuildMessage = "<br/>SDK Build log not available."
-                        }
+                    if (fileExists(SDK_LOG_FILE_NAME)) {
+                        def sdkLog = common.uploadFileToArtifactory(SDK_LOG_FILE_NAME)
+                        sdkBuildMessage = "<br/>SDK BuildLog:\t[SDK build log](${sdkLog})"
+                    } else {
+                        sdkBuildMessage = "<br/>SDK Build log not available."
                     }
 
                     String message = publishSdkFailureMessage("<br/>") +
@@ -118,7 +116,18 @@ pipeline {
                     slackSend color: "good", message: firebaseUploadSuccessMessage("\n", false)
                 } else if (triggerByPublishSdkCmd()) {
                     slackSend color: "good", message: publishSdkSuccessMessage("\n", true)
-                    common.sendToMR(publishSdkSuccessMessage("<br/>", true))
+
+                    // upload SDK build log if SDK build fails
+                    String sdkBuildMessage
+                    if (fileExists(SDK_LOG_FILE_NAME)) {
+                        def sdkLog = common.uploadFileToArtifactory(SDK_LOG_FILE_NAME)
+                        sdkBuildMessage = "<br/>SDK BuildLog:\t[SDK build log](${sdkLog})"
+                    } else {
+                        sdkBuildMessage = "<br/>SDK Build log not available."
+                    }
+
+                    String message = publishSdkSuccessMessage("<br/>", true) + sdkBuildMessage
+                    common.sendToMR(message)
                 }
             }
         }
@@ -134,6 +143,11 @@ pipeline {
 
                     // load the common library script
                     common = load('jenkinsfile/common.groovy')
+
+                    // send command acknowledgement to MR
+                    common.sendToMR(":runner: Android CD pipeline has started!!!(BuildNumber: ${env.BUILD_NUMBER}))" +
+                            "<br/><b>Command</b>: ${env.gitlabTriggerPhrase}"
+                    )
                 }
             }
         }
@@ -489,7 +503,8 @@ private String firebaseUploadFailureMessage(String lineBreak, String logFile, bo
     }
     message += "Build Log: <${logFile}|${CONSOLE_LOG_FILE}>"
     if (env.gitlabTargetBranch == "develop" && env.gitlabSourceBranch == "develop") {
-        message += "${lineBreak}Hi <!subteam^S02B2PB5SG7>,  latest `develop` has build failure, please check."  //notify all Android devs
+        message += "${lineBreak}Hi <!subteam^S02B2PB5SG7>,  latest `develop` has build failure, please check."
+        //notify all Android devs
     }
 
     return message
@@ -574,7 +589,7 @@ private String publishSdkSuccessMessage(String lineBreak, boolean useCommenterAs
             "${lineBreak}Chat SDK Commit:\t${getMegaChatSdkGitHash()}" +
             "${lineBreak}Version:\tnz.mega.sdk:sdk:${getSdkVersionText()}" +
             "${lineBreak}Trigger Reason:\t${gitlabTriggerPhrase}" +
-            "${lineBreak}AAR Artifactory Page: ${getSdkAarArtifactoryPage()}"
+            "${lineBreak}AAR Download Link: [sdk-${getSdkVersionText()}.aar](${getSdkAarArtifactoryLink()})"
 }
 
 /**
@@ -827,9 +842,9 @@ private String getSdkVersionText() {
  *
  * @return download link
  */
-private String getSdkAarArtifactoryPage() {
+private String getSdkAarArtifactoryLink() {
     String version = getSdkVersionText()
-    return "${env.ARTIFACTORY_BASE_URL}/ui/repos/tree/Properties/mega-gradle/mega-sdk-android/nz/mega/sdk/sdk/${version}/sdk-${version}.aar"
+    return "${env.ARTIFACTORY_BASE_URL}:443/artifactory/mega-gradle/mega-sdk-android/nz/mega/sdk/sdk/${version}/sdk-${version}.aar"
 }
 
 /**
