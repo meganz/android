@@ -13,11 +13,13 @@ import mega.privacy.android.data.listener.OptionalMegaChatRequestListenerInterfa
 import mega.privacy.android.data.mapper.chat.ChatPermissionsMapper
 import mega.privacy.android.data.mapper.chat.UserStatusToIntMapper
 import mega.privacy.android.data.mapper.contact.UserChatStatusMapper
+import mega.privacy.android.data.mapper.contact.UserVisibilityMapper
 import mega.privacy.android.data.mapper.handles.MegaHandleListMapper
 import mega.privacy.android.domain.entity.ChatRoomPermission
 import mega.privacy.android.domain.entity.chat.ChatParticipant
 import mega.privacy.android.domain.entity.contacts.ContactData
 import mega.privacy.android.domain.entity.contacts.UserChatStatus
+import mega.privacy.android.domain.entity.user.UserVisibility
 import mega.privacy.android.domain.exception.ChatRoomDoesNotExistException
 import mega.privacy.android.domain.exception.NullMegaHandleListException
 import mega.privacy.android.domain.qualifier.IoDispatcher
@@ -83,6 +85,7 @@ internal class DefaultChatParticipantsRepository @Inject constructor(
     private val getChatParticipantFullNameUseCase: GetChatParticipantFullNameUseCase,
     @IoDispatcher private val ioDispatcher: CoroutineDispatcher,
     private val userChatStatusMapper: UserChatStatusMapper,
+    private val userVisibilityMapper: UserVisibilityMapper,
 ) : ChatParticipantsRepository {
 
     override suspend fun getAllChatParticipants(
@@ -111,7 +114,8 @@ internal class DefaultChatParticipantsRepository @Inject constructor(
                     data = ContactData(
                         fullName = myName,
                         alias = null,
-                        avatarUri = null
+                        avatarUri = null,
+                        userVisibility = UserVisibility.Unknown,
                     ),
                     email = myEmail,
                     isMe = true,
@@ -130,6 +134,7 @@ internal class DefaultChatParticipantsRepository @Inject constructor(
                         val participantAvatarColor = async { getUserAvatarColorUseCase(handle) }
                         val participantAlias =
                             async { megaChatApiGateway.getUserAliasFromCache(handle) }
+                        val user = async { megaApiGateway.getContact(participantEmail.await()) }
 
                         participants.add(
                             ChatParticipant(
@@ -137,7 +142,8 @@ internal class DefaultChatParticipantsRepository @Inject constructor(
                                 data = ContactData(
                                     fullName = participantName.await(),
                                     alias = participantAlias.await(),
-                                    avatarUri = null
+                                    avatarUri = null,
+                                    userVisibility = userVisibilityMapper(user.await()),
                                 ),
                                 email = participantEmail.await(),
                                 isMe = false,
@@ -171,13 +177,15 @@ internal class DefaultChatParticipantsRepository @Inject constructor(
                 val fullName = async { getContactFullNameUseCase(handle) }
                 val email = async { getContactEmail(handle) }
                 val avatarColor = async { getUserAvatarColorUseCase(handle) }
+                val user = async { email.await()?.let { megaApiGateway.getContact(it) } }
                 participants.add(
                     ChatParticipant(
                         handle = handle,
                         data = ContactData(
                             fullName = fullName.await(),
                             alias = alias.await(),
-                            avatarUri = null
+                            avatarUri = null,
+                            userVisibility = userVisibilityMapper(user.await()),
                         ),
                         email = email.await() ?: "",
                         isMe = false,

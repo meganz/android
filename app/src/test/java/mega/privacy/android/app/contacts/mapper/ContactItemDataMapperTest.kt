@@ -146,6 +146,7 @@ class ContactItemDataMapperTest {
                 fullName = expectedFullName,
                 alias = expectedAlias,
                 avatarUri = expectedAvatarUri,
+                userVisibility = UserVisibility.Unknown,
             ),
             defaultAvatarColor = defaultAvatarColour,
             visibility = UserVisibility.Visible,

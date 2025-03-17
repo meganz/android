@@ -2,7 +2,6 @@ package mega.privacy.android.app.presentation.meeting.chat.view.message.contact
 
 import com.google.common.truth.Truth
 import kotlinx.coroutines.test.runTest
-import mega.privacy.android.app.presentation.meeting.chat.view.message.contact.ContactMessageViewModel
 import mega.privacy.android.core.test.extension.CoroutineMainDispatcherExtension
 import mega.privacy.android.domain.entity.contacts.ContactData
 import mega.privacy.android.domain.entity.contacts.ContactItem
@@ -73,6 +72,7 @@ internal class ContactMessageViewModelTest {
                 fullName = "fullName",
                 alias = "alias",
                 avatarUri = null,
+                userVisibility = UserVisibility.Unknown,
             ),
             status = UserChatStatus.Away,
             visibility = UserVisibility.Visible,
@@ -94,6 +94,7 @@ internal class ContactMessageViewModelTest {
                 fullName = "",
                 alias = "alias",
                 avatarUri = null,
+                userVisibility = UserVisibility.Unknown,
             ),
             status = UserChatStatus.Away,
             visibility = UserVisibility.Visible,
@@ -109,6 +110,7 @@ internal class ContactMessageViewModelTest {
                 fullName = "fullName",
                 alias = "alias",
                 avatarUri = null,
+                userVisibility = UserVisibility.Unknown,
             ),
             status = UserChatStatus.Away,
             visibility = UserVisibility.Visible,

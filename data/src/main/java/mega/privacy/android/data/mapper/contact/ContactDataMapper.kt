@@ -1,6 +1,7 @@
 package mega.privacy.android.data.mapper.contact
 
 import mega.privacy.android.domain.entity.contacts.ContactData
+import mega.privacy.android.domain.entity.user.UserVisibility
 import javax.inject.Inject
 
 /**
@@ -20,9 +21,11 @@ internal class ContactDataMapper @Inject constructor() {
         fullName: String?,
         alias: String?,
         avatarUri: String?,
+        userVisibility: UserVisibility?,
     ) = ContactData(
         fullName = fullName,
         alias = alias,
         avatarUri = avatarUri,
+        userVisibility = userVisibility ?: UserVisibility.Unknown
     )
 }

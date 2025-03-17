@@ -19,7 +19,9 @@ class ContactItemMapperTest {
     private val expectedFullName = "Clark Kent"
     private val expectedAlias = "Superman"
     private val expectedAvatar = "<S>"
-    private val expectedContactData = ContactData(expectedFullName, expectedAlias, expectedAvatar)
+    private val expectedVisibility = UserVisibility.Visible
+    private val expectedContactData =
+        ContactData(expectedFullName, expectedAlias, expectedAvatar, expectedVisibility)
     private val userHandle = 1L
     private val userEmail = "superman@kripton.com"
     private val userTimestamp = 100L
@@ -33,7 +35,7 @@ class ContactItemMapperTest {
             on { email }.thenReturn(userEmail)
             on { timestamp }.thenReturn(userTimestamp)
         }
-        underTest = ContactItemMapper(userChatStatusMapper)
+        underTest = ContactItemMapper(userChatStatusMapper, UserVisibilityMapper())
     }
 
     @Test
@@ -76,26 +78,6 @@ class ContactItemMapperTest {
             chatRoomId = null,
         )
         Truth.assertThat(actual.timestamp).isEqualTo(userTimestamp)
-    }
-
-    @Test
-    fun `test ContactItem visibility is mapped from MegaUser visibility`() {
-        UserVisibility.values().forEach { visibility ->
-            val sdkValue =
-                ContactItemMapper.userVisibility.entries.find { it.value == visibility }?.key
-            whenever(user.visibility).thenReturn(sdkValue)
-            val actual =
-                underTest.invoke(
-                    megaUser = user,
-                    contactData = expectedContactData,
-                    defaultAvatarColor = avatarColor,
-                    areCredentialsVerified = true,
-                    status = status,
-                    lastSeen = null,
-                    chatRoomId = null,
-                )
-            Truth.assertThat(actual.visibility).isEqualTo(visibility)
-        }
     }
 
     @Test

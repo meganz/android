@@ -10,11 +10,13 @@ import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.merge
 import kotlinx.coroutines.withContext
 import mega.privacy.android.domain.entity.ChatRoomLastMessage
+import mega.privacy.android.domain.entity.call.ChatCallChanges
 import mega.privacy.android.domain.entity.chat.ChatListItemChanges
 import mega.privacy.android.domain.entity.chat.ChatParticipant
 import mega.privacy.android.domain.entity.contacts.ContactData
-import mega.privacy.android.domain.entity.call.ChatCallChanges
 import mega.privacy.android.domain.entity.user.UserChanges
+import mega.privacy.android.domain.entity.user.UserId
+import mega.privacy.android.domain.entity.user.UserVisibility
 import mega.privacy.android.domain.qualifier.DefaultDispatcher
 import mega.privacy.android.domain.repository.AvatarRepository
 import mega.privacy.android.domain.repository.CallRepository
@@ -166,6 +168,10 @@ class MonitorWaitingRoomParticipantsUseCase @Inject constructor(
                             fullName = it.data.fullName,
                             alias = chatParticipantsRepository.getAlias(it),
                             avatarUri = chatParticipantsRepository.getAvatarUri(it)?.toString(),
+                            userVisibility = contactsRepository.getContactItem(
+                                UserId(it.handle),
+                                true
+                            )?.visibility ?: UserVisibility.Unknown
                         ),
                         email = it.email,
                         isMe = false,

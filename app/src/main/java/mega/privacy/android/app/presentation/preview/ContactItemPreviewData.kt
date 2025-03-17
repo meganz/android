@@ -9,7 +9,12 @@ internal val contactItemForPreviews get() = contactItemForPreviews(-1)
 internal fun contactItemForPreviews(id: Int) = ContactItem(
     handle = id.toLong(),
     email = "email$id@mega.nz",
-    contactData = ContactData("Full name $id", "Alias $id", null),
+    contactData = ContactData(
+        fullName = "Full name $id",
+        alias = "Alias $id",
+        avatarUri = null,
+        userVisibility = UserVisibility.Unknown,
+    ),
     defaultAvatarColor = "blue",
     visibility = UserVisibility.Visible,
     timestamp = 2345262L,

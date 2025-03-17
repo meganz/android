@@ -8,14 +8,12 @@ import androidx.compose.ui.test.junit4.createComposeRule
 import androidx.compose.ui.test.onNodeWithTag
 import androidx.compose.ui.test.performClick
 import androidx.test.ext.junit.runners.AndroidJUnit4
-import mega.privacy.android.app.presentation.meeting.view.ParticipantInCallItem
-import mega.privacy.android.app.presentation.meeting.view.TEST_TAG_ADMIT_PARTICIPANT_ICON
-import mega.privacy.android.app.presentation.meeting.view.TEST_TAG_DENY_PARTICIPANT_ICON
 import mega.privacy.android.domain.entity.ChatRoomPermission
 import mega.privacy.android.domain.entity.chat.ChatParticipant
 import mega.privacy.android.domain.entity.contacts.ContactData
 import mega.privacy.android.domain.entity.contacts.UserChatStatus
 import mega.privacy.android.domain.entity.meeting.ParticipantsSection
+import mega.privacy.android.domain.entity.user.UserVisibility
 import org.junit.Rule
 import org.junit.Test
 import org.junit.runner.RunWith
@@ -146,7 +144,10 @@ class ParticipantInCallItemTest {
 
     private fun getChatParticipant(): ChatParticipant = ChatParticipant(
         handle = 555L,
-        data = ContactData(fullName = "Name5", alias = null, avatarUri = null),
+        data = ContactData(
+            fullName = "Name5", alias = null, avatarUri = null,
+            userVisibility = UserVisibility.Unknown,
+        ),
         email = "name2@mega.nz",
         isMe = false,
         privilege = ChatRoomPermission.Moderator,

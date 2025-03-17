@@ -1,6 +1,5 @@
 package mega.privacy.android.app.presentation.meeting.view
 
-import mega.privacy.android.icon.pack.R as IconR
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Box
@@ -36,12 +35,14 @@ import mega.privacy.android.app.presentation.contact.view.DefaultAvatarView
 import mega.privacy.android.app.presentation.contact.view.UriAvatarView
 import mega.privacy.android.app.presentation.extensions.getAvatarFirstLetter
 import mega.privacy.android.domain.entity.ChatRoomPermission
+import mega.privacy.android.domain.entity.call.CallParticipantData
 import mega.privacy.android.domain.entity.chat.ChatParticipant
 import mega.privacy.android.domain.entity.contacts.ContactData
 import mega.privacy.android.domain.entity.contacts.UserChatStatus
-import mega.privacy.android.domain.entity.call.CallParticipantData
 import mega.privacy.android.domain.entity.meeting.MeetingParticipantNotInCallStatus
 import mega.privacy.android.domain.entity.meeting.ParticipantsSection
+import mega.privacy.android.domain.entity.user.UserVisibility
+import mega.privacy.android.icon.pack.R as IconR
 import mega.privacy.android.shared.original.core.ui.controls.buttons.MegaButtonWithIcon
 import mega.privacy.android.shared.original.core.ui.controls.buttons.TextMegaButton
 import mega.privacy.android.shared.original.core.ui.theme.OriginalTheme
@@ -309,7 +310,12 @@ fun PreviewParticipantInWaitingRoomItem() {
             isGuest = false,
             participant = ChatParticipant(
                 handle = 111L,
-                data = ContactData(fullName = "Name1", alias = null, avatarUri = null),
+                data = ContactData(
+                    fullName = "Name1",
+                    alias = null,
+                    avatarUri = null,
+                    userVisibility = UserVisibility.Unknown,
+                ),
                 email = "name1@mega.nz",
                 isMe = false,
                 privilege = ChatRoomPermission.Standard,
@@ -336,7 +342,12 @@ fun PreviewMeParticipantInCallItem() {
             isGuest = false,
             participant = ChatParticipant(
                 handle = 222L,
-                data = ContactData(fullName = "Name2", alias = null, avatarUri = null),
+                data = ContactData(
+                    fullName = "Name2",
+                    alias = null,
+                    avatarUri = null,
+                    userVisibility = UserVisibility.Unknown,
+                ),
                 email = "name2@mega.nz",
                 isMe = true,
                 privilege = ChatRoomPermission.Moderator,
@@ -366,7 +377,12 @@ fun PreviewParticipantInCallItem() {
             isGuest = false,
             participant = ChatParticipant(
                 handle = 333L,
-                data = ContactData(fullName = "Name3", alias = null, avatarUri = null),
+                data = ContactData(
+                    fullName = "Name3",
+                    alias = null,
+                    avatarUri = null,
+                    userVisibility = UserVisibility.Unknown,
+                ),
                 email = "name3@mega.nz",
                 isMe = false,
                 privilege = ChatRoomPermission.Moderator,
@@ -392,7 +408,12 @@ fun PreviewGuestParticipantInCallItem() {
             isGuest = true,
             participant = ChatParticipant(
                 handle = 666L,
-                data = ContactData(fullName = "Name6", alias = null, avatarUri = null),
+                data = ContactData(
+                    fullName = "Name6",
+                    alias = null,
+                    avatarUri = null,
+                    userVisibility = UserVisibility.Unknown,
+                ),
                 email = "name6@mega.nz",
                 isMe = false,
                 privilege = ChatRoomPermission.Moderator,
@@ -418,7 +439,12 @@ fun PreviewParticipantNotInCallItem() {
             isGuest = false,
             participant = ChatParticipant(
                 handle = 444L,
-                data = ContactData(fullName = "Name4", alias = null, avatarUri = null),
+                data = ContactData(
+                    fullName = "Name4",
+                    alias = null,
+                    avatarUri = null,
+                    userVisibility = UserVisibility.Unknown,
+                ),
                 email = "name2@mega.nz",
                 isMe = false,
                 privilege = ChatRoomPermission.Moderator,
@@ -445,7 +471,12 @@ fun PreviewParticipantNotInCallRingingItem() {
             isGuest = false,
             participant = ChatParticipant(
                 handle = 444L,
-                data = ContactData(fullName = "Name4", alias = null, avatarUri = null),
+                data = ContactData(
+                    fullName = "Name4",
+                    alias = null,
+                    avatarUri = null,
+                    userVisibility = UserVisibility.Unknown,
+                ),
                 email = "name2@mega.nz",
                 isMe = false,
                 privilege = ChatRoomPermission.Moderator,
@@ -473,7 +504,12 @@ fun PreviewParticipantNotInCallNoResponseItem() {
             isGuest = false,
             participant = ChatParticipant(
                 handle = 444L,
-                data = ContactData(fullName = "Name4", alias = null, avatarUri = null),
+                data = ContactData(
+                    fullName = "Name4",
+                    alias = null,
+                    avatarUri = null,
+                    userVisibility = UserVisibility.Unknown,
+                ),
                 email = "name2@mega.nz",
                 isMe = false,
                 privilege = ChatRoomPermission.Moderator,
@@ -501,7 +537,12 @@ fun PreviewParticipantNotInCallItemNonHost() {
             isGuest = false,
             participant = ChatParticipant(
                 handle = 444L,
-                data = ContactData(fullName = "Name4", alias = null, avatarUri = null),
+                data = ContactData(
+                    fullName = "Name4",
+                    alias = null,
+                    avatarUri = null,
+                    userVisibility = UserVisibility.Unknown,
+                ),
                 email = "name2@mega.nz",
                 isMe = false,
                 privilege = ChatRoomPermission.Moderator,
@@ -529,7 +570,12 @@ fun PreviewGuestParticipantNotInCallItem() {
             isGuest = true,
             participant = ChatParticipant(
                 handle = 555L,
-                data = ContactData(fullName = "Name5", alias = null, avatarUri = null),
+                data = ContactData(
+                    fullName = "Name5",
+                    alias = null,
+                    avatarUri = null,
+                    userVisibility = UserVisibility.Unknown,
+                ),
                 email = "name2@mega.nz",
                 isMe = false,
                 privilege = ChatRoomPermission.Moderator,

@@ -25,7 +25,7 @@ internal class UserMapperTest {
 
     @BeforeAll
     fun setup() {
-        underTest = UserMapper(userChangeMapper)
+        underTest = UserMapper(userChangeMapper, UserVisibilityMapper())
     }
 
     @TestFactory

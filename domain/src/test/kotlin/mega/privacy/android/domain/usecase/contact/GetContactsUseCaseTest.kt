@@ -126,8 +126,14 @@ class GetContactsUseCaseTest {
     fun `test that first name is updated when changed`() = runTest {
         val userHandle = 1L
         val userEmail = "email"
-        val initial = ContactData(fullName = "Initial", alias = "alias", avatarUri = null)
-        val expected = ContactData(fullName = "Expected", alias = "alias", avatarUri = null)
+        val initial = ContactData(
+            fullName = "Initial", alias = "alias", avatarUri = null,
+            userVisibility = UserVisibility.Unknown,
+        )
+        val expected = ContactData(
+            fullName = "Expected", alias = "alias", avatarUri = null,
+            userVisibility = UserVisibility.Unknown,
+        )
         val changes = listOf(UserChanges.Firstname)
 
         stubContact(
@@ -154,8 +160,14 @@ class GetContactsUseCaseTest {
     fun `test that last name is updated when changed`() = runTest {
         val userHandle = 1L
         val userEmail = "email"
-        val initial = ContactData(fullName = "Initial", alias = "alias", avatarUri = null)
-        val expected = ContactData(fullName = "Expected", alias = "alias", avatarUri = null)
+        val initial = ContactData(
+            fullName = "Initial", alias = "alias", avatarUri = null,
+            userVisibility = UserVisibility.Unknown,
+        )
+        val expected = ContactData(
+            fullName = "Expected", alias = "alias", avatarUri = null,
+            userVisibility = UserVisibility.Unknown,
+        )
         val changes = listOf(UserChanges.Lastname)
 
         stubContact(
@@ -182,9 +194,15 @@ class GetContactsUseCaseTest {
     fun `test that avatar is updated when changed`() = runTest {
         val userHandle = 1L
         val userEmail = "email"
-        val initial = ContactData(fullName = "Initial", alias = "alias", avatarUri = null)
+        val initial = ContactData(
+            fullName = "Initial", alias = "alias", avatarUri = null,
+            userVisibility = UserVisibility.Unknown,
+        )
         val newUri = "newUri"
-        val expected = ContactData(fullName = "Expected", alias = "alias", avatarUri = newUri)
+        val expected = ContactData(
+            fullName = "Expected", alias = "alias", avatarUri = newUri,
+            userVisibility = UserVisibility.Unknown,
+        )
         val changes = listOf(UserChanges.Firstname)
 
         stubContact(
@@ -214,7 +232,8 @@ class GetContactsUseCaseTest {
         val userHandle = 1L
         val notUserHandle = userHandle + 1
         val oldAlias = ContactData(
-            fullName = "name", alias = "oldAlias", avatarUri = null
+            fullName = "name", alias = "oldAlias", avatarUri = null,
+            userVisibility = UserVisibility.Unknown,
         )
 
         stubContact(
@@ -223,7 +242,8 @@ class GetContactsUseCaseTest {
         stubGlobalUpdate(notUserEmail, notUserHandle, listOf(UserChanges.Alias))
 
         val newAlias = ContactData(
-            fullName = "name", alias = "newAlias", avatarUri = null
+            fullName = "name", alias = "newAlias", avatarUri = null,
+            userVisibility = UserVisibility.Unknown,
         )
         contactsRepository.stub {
             onBlocking { getContactData(any()) } doReturn newAlias
@@ -441,7 +461,10 @@ class GetContactsUseCaseTest {
             handle = userHandle,
             email = userEmail,
             contactData = ContactData(
-                fullName = fullName, alias = alias, avatarUri = null
+                fullName = fullName,
+                alias = alias,
+                avatarUri = null,
+                userVisibility = UserVisibility.Unknown,
             ),
             defaultAvatarColor = null,
             visibility = UserVisibility.Visible,

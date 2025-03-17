@@ -132,7 +132,10 @@ class ReferralBonusViewTest {
             contact = ContactItem(
                 handle = 1L,
                 email = email,
-                contactData = ContactData(fullName = name, alias = "KG", avatarUri = avatar),
+                contactData = ContactData(
+                    fullName = name, alias = "KG", avatarUri = avatar,
+                    userVisibility = UserVisibility.Unknown,
+                ),
                 defaultAvatarColor = null,
                 visibility = UserVisibility.Visible,
                 timestamp = 0,

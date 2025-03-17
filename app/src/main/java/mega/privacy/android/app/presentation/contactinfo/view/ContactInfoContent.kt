@@ -1,6 +1,5 @@
 package mega.privacy.android.app.presentation.contactinfo.view
 
-import mega.privacy.android.icon.pack.R as iconPackR
 import androidx.compose.foundation.isSystemInDarkTheme
 import androidx.compose.foundation.layout.Column
 import androidx.compose.material.Divider
@@ -25,6 +24,7 @@ import mega.privacy.android.domain.entity.contacts.ContactData
 import mega.privacy.android.domain.entity.contacts.ContactItem
 import mega.privacy.android.domain.entity.contacts.UserChatStatus
 import mega.privacy.android.domain.entity.user.UserVisibility
+import mega.privacy.android.icon.pack.R as iconPackR
 import mega.privacy.android.shared.original.core.ui.controls.controlssliders.MegaSwitch
 import mega.privacy.android.shared.original.core.ui.controls.lists.MenuActionListTile
 import mega.privacy.android.shared.original.core.ui.preview.CombinedThemePreviews
@@ -111,6 +111,7 @@ private fun PreviewContactInfoContent() {
         alias = "Iron Man",
         avatarUri = "https://avatar.uri.com",
         fullName = "Tony Stark",
+        userVisibility = UserVisibility.Unknown,
     )
     OriginalTheme(isDark = isSystemInDarkTheme()) {
         ContactInfoContent(
@@ -148,6 +149,7 @@ private fun PreviewContactInfoContentWithChatRoom() {
         alias = "Iron Man",
         avatarUri = "https://avatar.uri.com",
         fullName = "Tony Stark",
+        userVisibility = UserVisibility.Unknown,
     )
     val chatRoom = ChatRoom(
         chatId = 123456L,

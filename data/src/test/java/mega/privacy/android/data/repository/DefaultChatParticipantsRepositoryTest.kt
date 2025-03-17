@@ -10,6 +10,7 @@ import mega.privacy.android.data.listener.OptionalMegaChatRequestListenerInterfa
 import mega.privacy.android.data.mapper.chat.ChatPermissionsMapper
 import mega.privacy.android.data.mapper.chat.UserStatusToIntMapper
 import mega.privacy.android.data.mapper.contact.UserChatStatusMapper
+import mega.privacy.android.data.mapper.contact.UserVisibilityMapper
 import mega.privacy.android.data.mapper.handles.MegaHandleListMapper
 import mega.privacy.android.domain.exception.MegaException
 import mega.privacy.android.domain.usecase.GetMyAvatarColorUseCase
@@ -61,31 +62,32 @@ internal class DefaultChatParticipantsRepositoryTest {
     private val userChatStatusMapper: UserChatStatusMapper = mock()
     private val getChatParticipantEmailUseCase: GetChatParticipantEmailUseCase = mock()
     private val getChatParticipantFullNameUseCase: GetChatParticipantFullNameUseCase = mock()
-
+    private val userVisibilityMapper = mock<UserVisibilityMapper>()
 
     @BeforeAll
     fun setup() {
         underTest = DefaultChatParticipantsRepository(
-            megaChatApiGateway,
-            megaApiGateway,
-            getMyAvatarColorUseCase,
-            requestUserLastGreenUseCase,
-            getContactEmail,
-            getUserAvatarColorUseCase,
-            chatPermissionsMapper,
-            megaHandleListMapper,
-            userStatusToIntMapper,
-            getMyAvatarFileUseCase,
-            getAvatarFileFromEmailUseCase,
-            getAvatarFileFromHandleUseCase,
-            getUserAliasUseCase,
-            areCredentialsVerifiedUseCase,
-            getContactFullNameUseCase,
-            getUserPrivilegeUseCase,
-            getChatParticipantEmailUseCase,
-            getChatParticipantFullNameUseCase,
-            UnconfinedTestDispatcher(),
-            userChatStatusMapper,
+            megaChatApiGateway = megaChatApiGateway,
+            megaApiGateway = megaApiGateway,
+            getMyAvatarColorUseCase = getMyAvatarColorUseCase,
+            requestUserLastGreenUseCase = requestUserLastGreenUseCase,
+            getContactEmail = getContactEmail,
+            getUserAvatarColorUseCase = getUserAvatarColorUseCase,
+            chatPermissionsMapper = chatPermissionsMapper,
+            megaHandleListMapper = megaHandleListMapper,
+            userStatusToIntMapper = userStatusToIntMapper,
+            getMyAvatarFileUseCase = getMyAvatarFileUseCase,
+            getAvatarFileFromEmailUseCase = getAvatarFileFromEmailUseCase,
+            getAvatarFileFromHandleUseCase = getAvatarFileFromHandleUseCase,
+            getUserAliasUseCase = getUserAliasUseCase,
+            areCredentialsVerifiedUseCase = areCredentialsVerifiedUseCase,
+            getContactFullNameUseCase = getContactFullNameUseCase,
+            getUserPrivilegeUseCase = getUserPrivilegeUseCase,
+            getChatParticipantEmailUseCase = getChatParticipantEmailUseCase,
+            getChatParticipantFullNameUseCase = getChatParticipantFullNameUseCase,
+            ioDispatcher = UnconfinedTestDispatcher(),
+            userChatStatusMapper = userChatStatusMapper,
+            userVisibilityMapper = userVisibilityMapper,
         )
     }
 

@@ -45,9 +45,10 @@ class AddNewContactsUseCaseTest {
                 handle = 1,
                 email = "qwerty@uiop.com",
                 contactData = ContactData(
-                    "Full Name",
-                    "alias",
-                    "https://cdn.pixabay.com/photo/2023/05/05/11/07/sweet-7972193_1280.jpg"
+                    fullName = "Full Name",
+                    alias = "alias",
+                    avatarUri = "https://cdn.pixabay.com/photo/2023/05/05/11/07/sweet-7972193_1280.jpg",
+                    userVisibility = UserVisibility.Unknown,
                 ),
                 defaultAvatarColor = "#fff",
                 visibility = UserVisibility.Visible,
@@ -76,9 +77,10 @@ class AddNewContactsUseCaseTest {
                 handle = 1,
                 email = "qwerty@uiop.com",
                 contactData = ContactData(
-                    "Full Name",
-                    "alias",
-                    "https://cdn.pixabay.com/photo/2023/05/05/11/07/sweet-7972193_1280.jpg"
+                    fullName = "Full Name",
+                    alias = "alias",
+                    avatarUri = "https://cdn.pixabay.com/photo/2023/05/05/11/07/sweet-7972193_1280.jpg",
+                    userVisibility = UserVisibility.Unknown,
                 ),
                 defaultAvatarColor = "#fff",
                 visibility = UserVisibility.Visible,
@@ -92,9 +94,10 @@ class AddNewContactsUseCaseTest {
                 handle = 2,
                 email = "test@test.com",
                 contactData = ContactData(
-                    "Full Name",
-                    "alias",
-                    "https://cdn.pixabay.com/photo/2023/05/05/11/07/sweet-7972193_1280.jpg"
+                    fullName = "Full Name",
+                    alias = "alias",
+                    avatarUri = "https://cdn.pixabay.com/photo/2023/05/05/11/07/sweet-7972193_1280.jpg",
+                    userVisibility = UserVisibility.Unknown,
                 ),
                 defaultAvatarColor = "#fff",
                 visibility = UserVisibility.Visible,

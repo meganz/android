@@ -35,7 +35,10 @@ class ReferralBonusesViewModelTest {
     private val contact = ContactItem(
         handle = 1L,
         email = emails[0],
-        contactData = ContactData(name, "KG", null),
+        contactData = ContactData(
+            fullName = name, alias = "KG", avatarUri = null,
+            userVisibility = UserVisibility.Unknown,
+        ),
         defaultAvatarColor = null,
         visibility = UserVisibility.Visible,
         timestamp = 0,
@@ -49,7 +52,10 @@ class ReferralBonusesViewModelTest {
             ContactItem(
                 handle = 1L,
                 email = emails.get(0),
-                contactData = ContactData(name, "KG", null),
+                contactData = ContactData(
+                    fullName = name, alias = "KG", avatarUri = null,
+                    userVisibility = UserVisibility.Unknown,
+                ),
                 defaultAvatarColor = null,
                 visibility = UserVisibility.Visible,
                 timestamp = 0,

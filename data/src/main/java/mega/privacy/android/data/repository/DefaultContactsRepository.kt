@@ -46,6 +46,7 @@ import mega.privacy.android.data.mapper.contact.ContactItemMapper
 import mega.privacy.android.data.mapper.contact.ContactRequestActionMapper
 import mega.privacy.android.data.mapper.contact.UserChatStatusMapper
 import mega.privacy.android.data.mapper.contact.UserMapper
+import mega.privacy.android.data.mapper.contact.UserVisibilityMapper
 import mega.privacy.android.data.model.ChatUpdate
 import mega.privacy.android.data.model.GlobalUpdate
 import mega.privacy.android.data.wrapper.ContactWrapper
@@ -119,6 +120,7 @@ internal class DefaultContactsRepository @Inject constructor(
     private val userMapper: UserMapper,
     @ApplicationScope private val sharingScope: CoroutineScope,
     private val contactGateway: ContactGateway,
+    private val userVisibilityMapper: UserVisibilityMapper,
 ) : ContactsRepository {
 
     override fun monitorContactRequestUpdates(): Flow<List<ContactRequest>> =
@@ -217,7 +219,12 @@ internal class DefaultContactsRepository @Inject constructor(
             val alias = runCatching { getUserAlias(contactItem.handle) }.getOrNull()
             val avatarUri = getAvatarUri(email)
 
-            contactDataMapper(fullName, alias, avatarUri)
+            contactDataMapper(
+                fullName = fullName,
+                alias = alias,
+                avatarUri = avatarUri,
+                userVisibility = contactItem.visibility
+            )
         }
 
     override suspend fun getContactItem(userId: UserId, skipCache: Boolean): ContactItem? =
@@ -451,9 +458,10 @@ internal class DefaultContactsRepository @Inject constructor(
         checkLastGreen(status, megaUser.handle)
 
         val contactData = contactDataMapper(
-            fullName?.ifEmpty { null },
-            alias?.ifEmpty { null },
-            avatarUri
+            fullName = fullName?.ifEmpty { null },
+            alias = alias?.ifEmpty { null },
+            avatarUri = avatarUri,
+            userVisibility = userVisibilityMapper(megaUser),
         )
 
         val chatRoom = megaChatApiGateway.getChatRoomByUser(megaUser.handle)

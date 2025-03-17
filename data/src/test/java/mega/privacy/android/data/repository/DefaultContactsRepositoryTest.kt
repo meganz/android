@@ -31,6 +31,7 @@ import mega.privacy.android.data.mapper.contact.ContactItemMapper
 import mega.privacy.android.data.mapper.contact.ContactRequestActionMapper
 import mega.privacy.android.data.mapper.contact.UserChatStatusMapper
 import mega.privacy.android.data.mapper.contact.UserMapper
+import mega.privacy.android.data.mapper.contact.UserVisibilityMapper
 import mega.privacy.android.data.model.ChatUpdate
 import mega.privacy.android.data.model.GlobalUpdate
 import mega.privacy.android.data.wrapper.ContactWrapper
@@ -110,6 +111,9 @@ class DefaultContactsRepositoryTest {
     private val error = mock<MegaError> { on { errorCode }.thenReturn(MegaError.API_EARGS) }
     private val testDispatcher = UnconfinedTestDispatcher()
     private val userChatStatusMapper: UserChatStatusMapper = mock()
+    private val userVisibilityMapper =
+        mock<UserVisibilityMapper> { on { invoke(anyOrNull()) } doReturn UserVisibility.Unknown }
+
     private val userMapper: UserMapper = mock()
 
     private val request = mock<MegaRequest> {
@@ -154,7 +158,8 @@ class DefaultContactsRepositoryTest {
             userChatStatusMapper = userChatStatusMapper,
             userMapper = userMapper,
             sharingScope = CoroutineScope(UnconfinedTestDispatcher()),
-            contactGateway = contactGateway
+            contactGateway = contactGateway,
+            userVisibilityMapper = userVisibilityMapper,
         )
     }
 
@@ -1007,7 +1012,10 @@ class DefaultContactsRepositoryTest {
         whenever(cacheGateway.buildAvatarFile(any())).thenReturn(cacheFile)
         whenever(megaChatApiGateway.getUserAliasFromCache(any())).thenReturn(testName)
 
-        val expectedContactData = contactDataMapper(expectedFullName, testName, avatarUri)
+        val expectedContactData = contactDataMapper(
+            fullName = expectedFullName, alias = testName, avatarUri = avatarUri,
+            userVisibility = UserVisibility.Unknown,
+        )
         return contactItemMapper(
             megaUser,
             expectedContactData,
@@ -1084,7 +1092,10 @@ class DefaultContactsRepositoryTest {
         whenever(megaApiGateway.getUserAvatarColor(megaUser)).thenReturn(expectedColor)
         whenever(megaApiGateway.areCredentialsVerified(any())).thenReturn(expectedCredentials)
 
-        val expectedContactData = contactDataMapper(expectedFullName, expectedAlias, avatarUri)
+        val expectedContactData = contactDataMapper(
+            fullName = expectedFullName, alias = expectedAlias, avatarUri = avatarUri,
+            userVisibility = UserVisibility.Unknown,
+        )
         val expectedContact = contactItemMapper(
             megaUser,
             expectedContactData,

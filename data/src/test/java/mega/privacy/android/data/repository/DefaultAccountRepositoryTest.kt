@@ -39,6 +39,7 @@ import mega.privacy.android.data.mapper.changepassword.PasswordStrengthMapper
 import mega.privacy.android.data.mapper.contact.MyAccountCredentialsMapper
 import mega.privacy.android.data.mapper.contact.UserChangeMapper
 import mega.privacy.android.data.mapper.contact.UserMapper
+import mega.privacy.android.data.mapper.contact.UserVisibilityMapper
 import mega.privacy.android.data.mapper.login.AccountSessionMapper
 import mega.privacy.android.data.mapper.login.UserCredentialsMapper
 import mega.privacy.android.data.mapper.settings.CookieSettingsIntMapper
@@ -215,7 +216,7 @@ class DefaultAccountRepositoryTest {
 
     @BeforeAll
     fun setUp() {
-        userMapper = UserMapper(UserChangeMapper())
+        userMapper = UserMapper(UserChangeMapper(), UserVisibilityMapper())
         underTest = DefaultAccountRepository(
             context = mock(),
             myAccountInfoFacade = accountInfoWrapper,

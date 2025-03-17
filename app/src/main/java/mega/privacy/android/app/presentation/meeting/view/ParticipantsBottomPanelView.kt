@@ -57,15 +57,16 @@ import mega.privacy.android.domain.entity.call.CallType
 import mega.privacy.android.domain.entity.chat.ChatParticipant
 import mega.privacy.android.domain.entity.contacts.ContactData
 import mega.privacy.android.domain.entity.meeting.ParticipantsSection
+import mega.privacy.android.domain.entity.user.UserVisibility
 import mega.privacy.android.legacy.core.ui.controls.chips.CallTextButtonChip
 import mega.privacy.android.shared.original.core.ui.controls.buttons.RaisedDefaultMegaButton
 import mega.privacy.android.shared.original.core.ui.controls.buttons.TextMegaButton
 import mega.privacy.android.shared.original.core.ui.controls.controlssliders.MegaSwitch
 import mega.privacy.android.shared.original.core.ui.controls.snackbars.MegaSnackbar
 import mega.privacy.android.shared.original.core.ui.theme.OriginalTheme
+import mega.privacy.android.shared.original.core.ui.theme.extensions.accent_900_accent_050
 import mega.privacy.android.shared.original.core.ui.theme.extensions.black_white
 import mega.privacy.android.shared.original.core.ui.theme.extensions.grey_200_grey_700
-import mega.privacy.android.shared.original.core.ui.theme.extensions.accent_900_accent_050
 import mega.privacy.android.shared.original.core.ui.theme.extensions.textColorPrimary
 import mega.privacy.android.shared.original.core.ui.utils.isScreenOrientationLandscape
 import mega.privacy.android.shared.original.core.ui.utils.showAutoDurationSnackbar
@@ -1245,7 +1246,12 @@ private fun get6UsersInWaitingRoomIDs(): List<Long> =
 private fun getListWith4Participants(): List<ChatParticipant> {
     val participant1 = ChatParticipant(
         handle = 111L,
-        data = ContactData(fullName = "Pepa", alias = null, avatarUri = null),
+        data = ContactData(
+            fullName = "Pepa",
+            alias = null,
+            avatarUri = null,
+            userVisibility = UserVisibility.Unknown,
+        ),
         email = "pepa+test55@mega.nz",
         isMe = false,
         privilege = ChatRoomPermission.Standard,
@@ -1254,7 +1260,12 @@ private fun getListWith4Participants(): List<ChatParticipant> {
 
     val participant2 = ChatParticipant(
         handle = 222L,
-        data = ContactData(fullName = "Juan", alias = null, avatarUri = null),
+        data = ContactData(
+            fullName = "Juan",
+            alias = null,
+            avatarUri = null,
+            userVisibility = UserVisibility.Unknown,
+        ),
         email = "juan+test255@mega.nz",
         isMe = false,
         privilege = ChatRoomPermission.Standard,
@@ -1262,7 +1273,12 @@ private fun getListWith4Participants(): List<ChatParticipant> {
     )
     val participant3 = ChatParticipant(
         handle = 333L,
-        data = ContactData(fullName = "Rober", alias = null, avatarUri = null),
+        data = ContactData(
+            fullName = "Rober",
+            alias = null,
+            avatarUri = null,
+            userVisibility = UserVisibility.Unknown,
+        ),
         email = "rober+test255@mega.nz",
         isMe = false,
         privilege = ChatRoomPermission.Standard,
@@ -1270,7 +1286,12 @@ private fun getListWith4Participants(): List<ChatParticipant> {
     )
     val participant4 = ChatParticipant(
         handle = 444L,
-        data = ContactData(fullName = "Marta", alias = null, avatarUri = null),
+        data = ContactData(
+            fullName = "Marta",
+            alias = null,
+            avatarUri = null,
+            userVisibility = UserVisibility.Unknown,
+        ),
         email = "marta+test255@mega.nz",
         isMe = false,
         privilege = ChatRoomPermission.Standard,
@@ -1288,7 +1309,12 @@ private fun getListWith4Participants(): List<ChatParticipant> {
 private fun getListWith6Participants(): List<ChatParticipant> {
     val participant1 = ChatParticipant(
         handle = 111L,
-        data = ContactData(fullName = "Pepa", alias = null, avatarUri = null),
+        data = ContactData(
+            fullName = "Pepa",
+            alias = null,
+            avatarUri = null,
+            userVisibility = UserVisibility.Unknown,
+        ),
         email = "pepa+test55@mega.nz",
         isMe = false,
         privilege = ChatRoomPermission.Standard,
@@ -1297,7 +1323,12 @@ private fun getListWith6Participants(): List<ChatParticipant> {
 
     val participant2 = ChatParticipant(
         handle = 222L,
-        data = ContactData(fullName = "Juan", alias = null, avatarUri = null),
+        data = ContactData(
+            fullName = "Juan",
+            alias = null,
+            avatarUri = null,
+            userVisibility = UserVisibility.Unknown,
+        ),
         email = "juan+test255@mega.nz",
         isMe = false,
         privilege = ChatRoomPermission.Standard,
@@ -1305,7 +1336,12 @@ private fun getListWith6Participants(): List<ChatParticipant> {
     )
     val participant3 = ChatParticipant(
         handle = 333L,
-        data = ContactData(fullName = "Rober", alias = null, avatarUri = null),
+        data = ContactData(
+            fullName = "Rober",
+            alias = null,
+            avatarUri = null,
+            userVisibility = UserVisibility.Unknown,
+        ),
         email = "rober+test255@mega.nz",
         isMe = false,
         privilege = ChatRoomPermission.Standard,
@@ -1313,7 +1349,12 @@ private fun getListWith6Participants(): List<ChatParticipant> {
     )
     val participant4 = ChatParticipant(
         handle = 444L,
-        data = ContactData(fullName = "Marta", alias = null, avatarUri = null),
+        data = ContactData(
+            fullName = "Marta",
+            alias = null,
+            avatarUri = null,
+            userVisibility = UserVisibility.Unknown,
+        ),
         email = "marta+test255@mega.nz",
         isMe = false,
         privilege = ChatRoomPermission.Standard,
@@ -1322,7 +1363,12 @@ private fun getListWith6Participants(): List<ChatParticipant> {
 
     val participant5 = ChatParticipant(
         handle = 555L,
-        data = ContactData(fullName = "Luis", alias = null, avatarUri = null),
+        data = ContactData(
+            fullName = "Luis",
+            alias = null,
+            avatarUri = null,
+            userVisibility = UserVisibility.Unknown,
+        ),
         email = "luis+test255@mega.nz",
         isMe = false,
         privilege = ChatRoomPermission.Standard,
@@ -1331,7 +1377,12 @@ private fun getListWith6Participants(): List<ChatParticipant> {
 
     val participant6 = ChatParticipant(
         handle = 666L,
-        data = ContactData(fullName = "Rosa", alias = null, avatarUri = null),
+        data = ContactData(
+            fullName = "Rosa",
+            alias = null,
+            avatarUri = null,
+            userVisibility = UserVisibility.Unknown,
+        ),
         email = "rosa+test255@mega.nz",
         isMe = false,
         privilege = ChatRoomPermission.Standard,

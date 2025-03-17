@@ -128,6 +128,7 @@ class ContactInfoViewModelTest {
         alias = "Iron Man",
         avatarUri = "https://avatar.uri.com",
         fullName = "Tony Stark",
+        userVisibility = UserVisibility.Unknown,
     )
     private val contactItem = ContactItem(
         handle = testHandle,

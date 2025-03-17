@@ -2,7 +2,6 @@ package mega.privacy.android.data.mapper.contact
 
 import mega.privacy.android.domain.entity.contacts.ContactData
 import mega.privacy.android.domain.entity.contacts.ContactItem
-import mega.privacy.android.domain.entity.user.UserVisibility
 import nz.mega.sdk.MegaUser
 import javax.inject.Inject
 
@@ -11,6 +10,7 @@ import javax.inject.Inject
  */
 internal class ContactItemMapper @Inject constructor(
     private val userChatStatusMapper: UserChatStatusMapper,
+    private val userVisibilityMapper: UserVisibilityMapper
 ) {
     /**
      * Invoke
@@ -37,21 +37,11 @@ internal class ContactItemMapper @Inject constructor(
         email = megaUser.email,
         contactData = contactData,
         defaultAvatarColor = defaultAvatarColor,
-        visibility = userVisibility[megaUser.visibility] ?: UserVisibility.Unknown,
+        visibility = userVisibilityMapper(megaUser),
         timestamp = megaUser.timestamp,
         areCredentialsVerified = areCredentialsVerified,
         status = userChatStatusMapper(status),
         lastSeen = lastSeen,
         chatroomId = chatRoomId,
     )
-
-    companion object {
-        internal val userVisibility = mapOf(
-            MegaUser.VISIBILITY_UNKNOWN to UserVisibility.Unknown,
-            MegaUser.VISIBILITY_HIDDEN to UserVisibility.Hidden,
-            MegaUser.VISIBILITY_VISIBLE to UserVisibility.Visible,
-            MegaUser.VISIBILITY_INACTIVE to UserVisibility.Inactive,
-            MegaUser.VISIBILITY_BLOCKED to UserVisibility.Blocked,
-        )
-    }
 }

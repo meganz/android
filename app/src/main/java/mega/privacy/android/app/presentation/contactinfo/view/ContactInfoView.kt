@@ -154,6 +154,7 @@ private fun ContactInfoPreview() {
         alias = "Iron Man",
         avatarUri = "https://avatar.uri.com",
         fullName = "Tony Stark",
+        userVisibility = UserVisibility.Unknown
     )
     ContactInfoView(
         uiState = ContactInfoUiState(

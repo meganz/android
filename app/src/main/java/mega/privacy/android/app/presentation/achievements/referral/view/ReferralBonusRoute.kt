@@ -247,20 +247,21 @@ private fun ReferralBonusViewPreview() {
                     // @see https://pixabay.com/service/faq/
                     ReferralBonusAchievements(
                         contact = ContactItem(
-                            1,
-                            "qwerty@uiop.com",
-                            ContactData(
-                                "Full Name",
-                                "alias",
-                                "https://cdn.pixabay.com/photo/2023/05/05/11/07/sweet-7972193_1280.jpg"
+                            handle = 1,
+                            email = "qwerty@uiop.com",
+                            contactData = ContactData(
+                                fullName = "Full Name",
+                                alias = "alias",
+                                avatarUri = "https://cdn.pixabay.com/photo/2023/05/05/11/07/sweet-7972193_1280.jpg",
+                                userVisibility = UserVisibility.Unknown,
                             ),
-                            "#fff",
-                            UserVisibility.Visible,
-                            1231231,
-                            true,
-                            UserChatStatus.Online,
-                            null,
-                            null,
+                            defaultAvatarColor = "#fff",
+                            visibility = UserVisibility.Visible,
+                            timestamp = 1231231,
+                            areCredentialsVerified = true,
+                            status = UserChatStatus.Online,
+                            lastSeen = null,
+                            chatroomId = null,
                         ),
                         expirationInDays = 1,
                         awardId = 1,

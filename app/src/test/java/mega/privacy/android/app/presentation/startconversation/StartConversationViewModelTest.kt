@@ -10,6 +10,7 @@ import kotlinx.coroutines.flow.filter
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.test.StandardTestDispatcher
 import kotlinx.coroutines.test.runTest
+import mega.privacy.android.app.InstantExecutorExtension
 import mega.privacy.android.app.R
 import mega.privacy.android.app.presentation.startconversation.model.StartConversationAction
 import mega.privacy.android.core.test.extension.CoroutineMainDispatcherExtension
@@ -41,7 +42,6 @@ import org.mockito.kotlin.anyOrNull
 import org.mockito.kotlin.mock
 import org.mockito.kotlin.whenever
 import org.mockito.kotlin.wheneverBlocking
-import mega.privacy.android.app.InstantExecutorExtension
 
 @ExtendWith(InstantExecutorExtension::class)
 @TestInstance(TestInstance.Lifecycle.PER_CLASS)
@@ -50,7 +50,10 @@ class StartConversationViewModelTest {
     private lateinit var underTest: StartConversationViewModel
 
     private var savedStateHandle = SavedStateHandle(mapOf())
-    private val emptyContactData = ContactData(null, null, null)
+    private val emptyContactData = ContactData(
+        fullName = null, alias = null, avatarUri = null,
+        userVisibility = UserVisibility.Unknown,
+    )
     private val testContact = ContactItem(
         handle = 123L,
         email = "email@mega.nz",
@@ -232,12 +235,14 @@ class StartConversationViewModelTest {
         underTest.state.map { it.filteredContactList }.drop(1).test {
             underTest.setTypedSearch("email1")
             assertThat(awaitItem()).isEqualTo(listOf(getContact(1)))
+            cancelAndIgnoreRemainingEvents()
         }
     }
 
     @Test
     fun `test that filtered contacts do not exist if the typed search is removed`() = runTest {
         whenever(getVisibleContactsUseCase()).thenReturn(testContactList)
+        wheneverBlocking { getContactDataUseCase(any()) }.thenReturn(emptyContactData)
         initTestClass()
 
         testScheduler.advanceUntilIdle()
@@ -246,6 +251,7 @@ class StartConversationViewModelTest {
             assertThat(awaitItem()).isEqualTo(listOf(getContact(1)))
             underTest.setTypedSearch("")
             assertThat(awaitItem()).isNull()
+            cancelAndIgnoreRemainingEvents()
         }
     }
 
