@@ -21,6 +21,9 @@ internal interface ContactDao {
     @Query("SELECT * FROM contacts WHERE handle = :handle")
     suspend fun getContactByHandle(handle: String?): ContactEntity?
 
+    @Query("SELECT * FROM contacts WHERE handle = :handle")
+    fun monitorContactByHandle(handle: String?): Flow<ContactEntity>
+
     @Query("DELETE FROM contacts")
     suspend fun deleteAllContact()
 

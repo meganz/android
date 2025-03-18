@@ -2,6 +2,8 @@ package mega.privacy.android.app.main.megachat.chat.explorer
 
 import app.cash.turbine.test
 import com.google.common.truth.Truth.assertThat
+import kotlinx.coroutines.flow.emptyFlow
+import kotlinx.coroutines.flow.flow
 import kotlinx.coroutines.test.runTest
 import mega.privacy.android.app.presentation.contact.mapper.UserContactMapper
 import mega.privacy.android.core.test.extension.CoroutineMainDispatcherExtension
@@ -19,9 +21,9 @@ import mega.privacy.android.domain.entity.user.UserVisibility
 import mega.privacy.android.domain.usecase.chat.GetActiveChatListItemsUseCase
 import mega.privacy.android.domain.usecase.chat.GetArchivedChatListItemsUseCase
 import mega.privacy.android.domain.usecase.chat.explorer.GetVisibleContactsWithoutChatRoomUseCase
-import mega.privacy.android.domain.usecase.contact.GetContactFromCacheByHandleUseCase
 import mega.privacy.android.domain.usecase.contact.GetUserOnlineStatusByHandleUseCase
 import mega.privacy.android.domain.usecase.contact.GetUserUseCase
+import mega.privacy.android.domain.usecase.contact.MonitorContactByHandleUseCase
 import mega.privacy.android.domain.usecase.contact.RequestUserLastGreenUseCase
 import org.junit.After
 import org.junit.Before
@@ -46,7 +48,7 @@ class ChatExplorerViewModelTest {
     private val getActiveChatListItemsUseCase: GetActiveChatListItemsUseCase = mock()
     private val getArchivedChatListItemsUseCase: GetArchivedChatListItemsUseCase = mock()
     private val getUserUseCase: GetUserUseCase = mock()
-    private val getContactFromCacheByHandleUseCase: GetContactFromCacheByHandleUseCase = mock()
+    private val monitorContactByHandleUseCase: MonitorContactByHandleUseCase = mock()
     private val getUserOnlineStatusByHandleUseCase: GetUserOnlineStatusByHandleUseCase = mock()
     private val requestUserLastGreenUseCase: RequestUserLastGreenUseCase = mock()
     private val getVisibleContactsWithoutChatRoomUseCase: GetVisibleContactsWithoutChatRoomUseCase =
@@ -61,7 +63,7 @@ class ChatExplorerViewModelTest {
             getActiveChatListItemsUseCase = getActiveChatListItemsUseCase,
             getArchivedChatListItemsUseCase = getArchivedChatListItemsUseCase,
             getUserUseCase = getUserUseCase,
-            getContactFromCacheByHandleUseCase = getContactFromCacheByHandleUseCase,
+            monitorContactByHandleUseCase = monitorContactByHandleUseCase,
             getUserOnlineStatusByHandleUseCase = getUserOnlineStatusByHandleUseCase,
             requestUserLastGreenUseCase = requestUserLastGreenUseCase,
             getVisibleContactsWithoutChatRoomUseCase = getVisibleContactsWithoutChatRoomUseCase,
@@ -83,7 +85,7 @@ class ChatExplorerViewModelTest {
             getActiveChatListItemsUseCase,
             getArchivedChatListItemsUseCase,
             getUserUseCase,
-            getContactFromCacheByHandleUseCase,
+            monitorContactByHandleUseCase,
             getUserOnlineStatusByHandleUseCase,
             requestUserLastGreenUseCase,
             getVisibleContactsWithoutChatRoomUseCase,
@@ -124,11 +126,15 @@ class ChatExplorerViewModelTest {
         val activeChatListItems = listOf(firstItem, secondItem, thirdItem, fourthItem)
         whenever(getActiveChatListItemsUseCase()) doReturn activeChatListItems
         whenever(getUserUseCase(UserId(firstPeerHandle))) doReturn null
-        whenever(getContactFromCacheByHandleUseCase(firstPeerHandle)) doReturn null
+        whenever(monitorContactByHandleUseCase(firstPeerHandle)) doReturn emptyFlow()
         val user = newUser()
         whenever(getUserUseCase(UserId(secondPeerHandle))) doReturn user
         val cachedContact = newContact()
-        whenever(getContactFromCacheByHandleUseCase(secondPeerHandle)) doReturn cachedContact
+        whenever(monitorContactByHandleUseCase(secondPeerHandle)) doReturn flow {
+            emit(
+                cachedContact
+            )
+        }
 
         underTest.addSelectedItem(
             ChatExplorerListItem(
@@ -478,7 +484,7 @@ class ChatExplorerViewModelTest {
             )
             whenever(getArchivedChatListItemsUseCase()) doReturn listOf(item)
             whenever(getUserUseCase(UserId(peerHandle))) doReturn newUser(withHandle = 2L)
-            whenever(getContactFromCacheByHandleUseCase(peerHandle)) doReturn null
+            whenever(monitorContactByHandleUseCase(peerHandle)) doReturn emptyFlow()
 
             underTest.getChats()
 
@@ -500,7 +506,7 @@ class ChatExplorerViewModelTest {
             val userHandle = 2L
             whenever(getUserUseCase(UserId(peerHandle))) doReturn newUser(withHandle = userHandle)
             whenever(getUserOnlineStatusByHandleUseCase(peerHandle)) doReturn UserChatStatus.Offline
-            whenever(getContactFromCacheByHandleUseCase(peerHandle)) doReturn null
+            whenever(monitorContactByHandleUseCase(peerHandle)) doReturn emptyFlow()
 
             underTest.getChats()
 
@@ -522,7 +528,7 @@ class ChatExplorerViewModelTest {
             val userHandle = 2L
             whenever(getUserUseCase(UserId(peerHandle))) doReturn newUser(withHandle = userHandle)
             whenever(getUserOnlineStatusByHandleUseCase(peerHandle)) doReturn UserChatStatus.Away
-            whenever(getContactFromCacheByHandleUseCase(peerHandle)) doReturn null
+            whenever(monitorContactByHandleUseCase(peerHandle)) doReturn emptyFlow()
 
             underTest.getChats()
 
@@ -544,7 +550,7 @@ class ChatExplorerViewModelTest {
             val userHandle = 2L
             whenever(getUserUseCase(UserId(peerHandle))) doReturn newUser(withHandle = userHandle)
             whenever(getUserOnlineStatusByHandleUseCase(peerHandle)) doReturn UserChatStatus.Online
-            whenever(getContactFromCacheByHandleUseCase(peerHandle)) doReturn null
+            whenever(monitorContactByHandleUseCase(peerHandle)) doReturn emptyFlow()
 
             underTest.getChats()
 
@@ -566,7 +572,7 @@ class ChatExplorerViewModelTest {
             val userHandle = 2L
             whenever(getUserUseCase(UserId(peerHandle))) doReturn newUser(withHandle = userHandle)
             whenever(getUserOnlineStatusByHandleUseCase(peerHandle)) doReturn UserChatStatus.Busy
-            whenever(getContactFromCacheByHandleUseCase(peerHandle)) doReturn null
+            whenever(monitorContactByHandleUseCase(peerHandle)) doReturn emptyFlow()
 
             underTest.getChats()
 
@@ -588,7 +594,7 @@ class ChatExplorerViewModelTest {
             val userHandle = 2L
             whenever(getUserUseCase(UserId(peerHandle))) doReturn newUser(withHandle = userHandle)
             whenever(getUserOnlineStatusByHandleUseCase(peerHandle)) doReturn UserChatStatus.Invalid
-            whenever(getContactFromCacheByHandleUseCase(peerHandle)) doReturn null
+            whenever(monitorContactByHandleUseCase(peerHandle)) doReturn emptyFlow()
 
             underTest.getChats()
 

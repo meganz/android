@@ -7,6 +7,7 @@ import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
+import kotlinx.coroutines.flow.firstOrNull
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import mega.privacy.android.app.main.model.chat.explorer.ChatExplorerSearchUiState
@@ -23,9 +24,9 @@ import mega.privacy.android.domain.qualifier.DefaultDispatcher
 import mega.privacy.android.domain.usecase.chat.GetActiveChatListItemsUseCase
 import mega.privacy.android.domain.usecase.chat.GetArchivedChatListItemsUseCase
 import mega.privacy.android.domain.usecase.chat.explorer.GetVisibleContactsWithoutChatRoomUseCase
-import mega.privacy.android.domain.usecase.contact.GetContactFromCacheByHandleUseCase
 import mega.privacy.android.domain.usecase.contact.GetUserOnlineStatusByHandleUseCase
 import mega.privacy.android.domain.usecase.contact.GetUserUseCase
+import mega.privacy.android.domain.usecase.contact.MonitorContactByHandleUseCase
 import mega.privacy.android.domain.usecase.contact.RequestUserLastGreenUseCase
 import nz.mega.sdk.MegaChatApiJava.MEGACHAT_INVALID_HANDLE
 import timber.log.Timber
@@ -37,7 +38,7 @@ import javax.inject.Inject
  * @property getActiveChatListItemsUseCase Use case to get the list of active chat items.
  * @property getArchivedChatListItemsUseCase Use case to get the list of archived chat items.
  * @property getUserUseCase Use case to get [User].
- * @property getContactFromCacheByHandleUseCase Use case to get a contact from cache by its handle.
+ * @property monitorContactByHandleUseCase Use case to get a contact from cache by its handle.
  * @property getUserOnlineStatusByHandleUseCase Get user online status from user handle.
  * @property requestUserLastGreenUseCase Request last green.
  * @property getVisibleContactsWithoutChatRoomUseCase Use case to retrieve the list of contacts that have no chat room.
@@ -48,7 +49,7 @@ class ChatExplorerViewModel @Inject constructor(
     private val getActiveChatListItemsUseCase: GetActiveChatListItemsUseCase,
     private val getArchivedChatListItemsUseCase: GetArchivedChatListItemsUseCase,
     private val getUserUseCase: GetUserUseCase,
-    private val getContactFromCacheByHandleUseCase: GetContactFromCacheByHandleUseCase,
+    private val monitorContactByHandleUseCase: MonitorContactByHandleUseCase,
     private val getUserOnlineStatusByHandleUseCase: GetUserOnlineStatusByHandleUseCase,
     private val requestUserLastGreenUseCase: RequestUserLastGreenUseCase,
     private val getVisibleContactsWithoutChatRoomUseCase: GetVisibleContactsWithoutChatRoomUseCase,
@@ -166,7 +167,7 @@ class ChatExplorerViewModel @Inject constructor(
                             )
                         }
                     }
-            }.onFailure { Timber.e("Failed to retrieve active chat list items", it) }
+            }.onFailure { Timber.e(it, "Failed to retrieve active chat list items") }
     }
 
     private suspend fun getNonActiveChatRooms(): List<ChatExplorerListItem> = buildList {
@@ -204,7 +205,7 @@ class ChatExplorerViewModel @Inject constructor(
                         )
                     }
                 }
-            }.onFailure { Timber.e("Failed to retrieve archived chat list items", it) }
+            }.onFailure { Timber.e(it, "Failed to retrieve archived chat list items") }
     }
 
     private suspend fun getContact(handle: Long): ContactItemUiState? {
@@ -218,15 +219,15 @@ class ChatExplorerViewModel @Inject constructor(
                             Timber.d("Requesting the user's last green")
                             runCatching { requestUserLastGreenUseCase(user.handle) }
                                 .onFailure {
-                                    Timber.e("Failed to request the user's last green", it)
+                                    Timber.e(it, "Failed to request the user's last green")
                                 }
                         }
                     }
-                    .onFailure { Timber.e("Failed to retrieve user's online status", it) }
+                    .onFailure { Timber.e(it, "Failed to retrieve user's online status") }
             }
 
             val cachedContact = runCatching {
-                getContactFromCacheByHandleUseCase(handle)
+                monitorContactByHandleUseCase(handle).firstOrNull()
             }.getOrNull()
             ContactItemUiState(
                 contact = cachedContact,
@@ -253,7 +254,7 @@ class ChatExplorerViewModel @Inject constructor(
                     )
                 }
             }.onFailure {
-                Timber.e("Failed to retrieve visible contacts without chat rooms", it)
+                Timber.e(it, "Failed to retrieve visible contacts without chat rooms")
             }
     }
 

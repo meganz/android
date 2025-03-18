@@ -8,7 +8,7 @@ import javax.inject.Inject
  *
  * @property contactsRepository [ContactsRepository]
  */
-class GetContactFromCacheByHandleUseCase @Inject constructor(
+class MonitorContactByHandleUseCase @Inject constructor(
     private val contactsRepository: ContactsRepository,
 ) {
 
@@ -17,6 +17,6 @@ class GetContactFromCacheByHandleUseCase @Inject constructor(
      *
      * @param contactId The ID of the contact.
      */
-    suspend operator fun invoke(contactId: Long) =
-        contactsRepository.getContactFromCacheByHandle(contactId)
+    operator fun invoke(contactId: Long) =
+        contactsRepository.monitorContactByHandle(contactId)
 }

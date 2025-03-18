@@ -6,6 +6,8 @@ import com.google.common.truth.Truth.assertThat
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.ExperimentalCoroutinesApi
+import kotlinx.coroutines.awaitCancellation
+import kotlinx.coroutines.flow.flow
 import kotlinx.coroutines.flow.flowOf
 import kotlinx.coroutines.test.UnconfinedTestDispatcher
 import kotlinx.coroutines.test.runTest
@@ -878,6 +880,7 @@ class DefaultContactsRepositoryTest {
     @Test
     fun `test that save contact database when call saveContact with value`() =
         runTest {
+            whenever(megaLocalRoomGateway.getContactByHandle(any())).thenReturn(null)
             underTest.createOrUpdateContact(
                 -1L,
                 "myEmail",
@@ -1536,20 +1539,15 @@ class DefaultContactsRepositoryTest {
     fun `test that the correct contact is returned when the local contact is not null`() = runTest {
         val contactId = 123L
         val contact = Contact(userId = contactId, email = "email@test.com")
-        whenever(megaLocalRoomGateway.getContactByHandle(contactId)) doReturn contact
+        whenever(megaLocalRoomGateway.monitorContactByHandle(contactId)) doReturn flow {
+            emit(contact)
+            awaitCancellation()
+        }
 
-        val actual = underTest.getContactFromCacheByHandle(contactId)
-
-        assertThat(actual).isEqualTo(contact)
+        underTest.monitorContactByHandle(contactId).test {
+            assertThat(awaitItem()).isEqualTo(contact)
+            cancelAndIgnoreRemainingEvents()
+        }
     }
 
-    @Test
-    fun `test that NULL is returned when the local contact is null`() = runTest {
-        val contactId = 123L
-        whenever(megaLocalRoomGateway.getContactByHandle(contactId)) doReturn null
-
-        val actual = underTest.getContactFromCacheByHandle(contactId)
-
-        assertThat(actual).isNull()
-    }
 }

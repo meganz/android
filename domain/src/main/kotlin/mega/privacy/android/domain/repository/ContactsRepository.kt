@@ -495,5 +495,5 @@ interface ContactsRepository {
      * @param contactId The contact's ID
      * @return The [Contact]
      */
-    suspend fun getContactFromCacheByHandle(contactId: Long): Contact?
+    fun monitorContactByHandle(contactId: Long): Flow<Contact>
 }

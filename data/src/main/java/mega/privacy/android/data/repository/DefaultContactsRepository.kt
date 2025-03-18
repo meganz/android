@@ -411,7 +411,7 @@ internal class DefaultContactsRepository @Inject constructor(
                 if (changes.contains(UserChanges.Firstname) || changes.contains(UserChanges.Lastname)) {
                     val fullName = runCatching { getUserFullName(megaUser.handle) }.getOrNull()
                     updatedContact?.contactData?.copy(fullName = fullName)?.let { contactData ->
-                        updatedContact = updatedContact?.copy(contactData = contactData)
+                        updatedContact = updatedContact.copy(contactData = contactData)
                     }
                 }
 
@@ -422,7 +422,7 @@ internal class DefaultContactsRepository @Inject constructor(
                 if (changes.contains(UserChanges.Avatar)) {
                     val avatarUri = getAvatarUri(megaUser.email)
                     updatedContact?.contactData?.copy(avatarUri = avatarUri)?.let { contactData ->
-                        updatedContact = updatedContact?.copy(contactData = contactData)
+                        updatedContact = updatedContact.copy(contactData = contactData)
                     }
                 }
 
@@ -1023,8 +1023,7 @@ internal class DefaultContactsRepository @Inject constructor(
             megaApiGateway.outgoingContactRequests().map(contactRequestMapper)
         }
 
-    override suspend fun getContactFromCacheByHandle(contactId: Long): Contact? =
-        withContext(ioDispatcher) {
-            megaLocalRoomGateway.getContactByHandle(contactId)
-        }
+    override fun monitorContactByHandle(contactId: Long): Flow<Contact> =
+        megaLocalRoomGateway.monitorContactByHandle(contactId)
+            .flowOn(ioDispatcher)
 }

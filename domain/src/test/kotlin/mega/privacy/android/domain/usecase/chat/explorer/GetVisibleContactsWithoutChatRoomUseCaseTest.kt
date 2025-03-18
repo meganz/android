@@ -3,6 +3,8 @@ package mega.privacy.android.domain.usecase.chat.explorer
 import com.google.common.truth.Truth.assertThat
 import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.ExperimentalCoroutinesApi
+import kotlinx.coroutines.flow.emptyFlow
+import kotlinx.coroutines.flow.flow
 import kotlinx.coroutines.test.UnconfinedTestDispatcher
 import kotlinx.coroutines.test.runTest
 import mega.privacy.android.domain.entity.ChatRoomPermission
@@ -16,8 +18,8 @@ import mega.privacy.android.domain.entity.user.UserChanges
 import mega.privacy.android.domain.entity.user.UserVisibility
 import mega.privacy.android.domain.repository.ContactsRepository
 import mega.privacy.android.domain.usecase.chat.GetChatRoomByUserUseCase
-import mega.privacy.android.domain.usecase.contact.GetContactFromCacheByHandleUseCase
 import mega.privacy.android.domain.usecase.contact.GetUserOnlineStatusByHandleUseCase
+import mega.privacy.android.domain.usecase.contact.MonitorContactByHandleUseCase
 import mega.privacy.android.domain.usecase.contact.RequestUserLastGreenUseCase
 import org.junit.jupiter.api.AfterEach
 import org.junit.jupiter.api.BeforeEach
@@ -41,7 +43,7 @@ class GetVisibleContactsWithoutChatRoomUseCaseTest {
     private val getChatRoomByUserUseCase: GetChatRoomByUserUseCase = mock()
     private val getUserOnlineStatusByHandleUseCase: GetUserOnlineStatusByHandleUseCase = mock()
     private val requestUserLastGreenUseCase: RequestUserLastGreenUseCase = mock()
-    private val getContactFromCacheByHandleUseCase: GetContactFromCacheByHandleUseCase = mock()
+    private val monitorContactByHandleUseCase: MonitorContactByHandleUseCase = mock()
 
     @OptIn(ExperimentalCoroutinesApi::class)
     private val defaultDispatcher: CoroutineDispatcher = UnconfinedTestDispatcher()
@@ -53,7 +55,7 @@ class GetVisibleContactsWithoutChatRoomUseCaseTest {
             getChatRoomByUserUseCase = getChatRoomByUserUseCase,
             getUserOnlineStatusByHandleUseCase = getUserOnlineStatusByHandleUseCase,
             requestUserLastGreenUseCase = requestUserLastGreenUseCase,
-            getContactFromCacheByHandleUseCase = getContactFromCacheByHandleUseCase,
+            monitorContactByHandleUseCase = monitorContactByHandleUseCase,
             defaultDispatcher = defaultDispatcher
         )
     }
@@ -109,6 +111,7 @@ class GetVisibleContactsWithoutChatRoomUseCaseTest {
             )
             whenever(contactsRepository.getAvailableContacts()) doReturn availableContacts
             whenever(getChatRoomByUserUseCase(userHandle)) doReturn null
+            whenever(monitorContactByHandleUseCase(userHandle)) doReturn emptyFlow()
 
             underTest()
 
@@ -190,7 +193,7 @@ class GetVisibleContactsWithoutChatRoomUseCaseTest {
             userId = userHandle,
             email = contactEmail
         )
-        whenever(getContactFromCacheByHandleUseCase(userHandle)) doReturn contact
+        whenever(monitorContactByHandleUseCase(userHandle)) doReturn flow { emit(contact) }
 
         val actual = underTest()
 
@@ -220,7 +223,7 @@ class GetVisibleContactsWithoutChatRoomUseCaseTest {
                 userId = userHandle,
                 email = null
             )
-            whenever(getContactFromCacheByHandleUseCase(userHandle)) doReturn contact
+            whenever(monitorContactByHandleUseCase(userHandle)) doReturn flow { emit(contact) }
 
             val actual = underTest()
 

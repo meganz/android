@@ -2,7 +2,9 @@ package mega.privacy.android.data.facade
 
 import dagger.Lazy
 import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.emitAll
 import kotlinx.coroutines.flow.first
+import kotlinx.coroutines.flow.flow
 import kotlinx.coroutines.flow.map
 import mega.privacy.android.data.cryptography.DecryptData
 import mega.privacy.android.data.cryptography.EncryptData
@@ -136,9 +138,18 @@ internal class MegaLocalRoomFacade @Inject constructor(
         }
     }
 
-    override suspend fun getContactByHandle(handle: Long): Contact? =
-        contactDao.get().getContactByHandle(encryptData(handle.toString()))
-            ?.let { contactModelMapper(it) }
+    override suspend fun getContactByHandle(handle: Long): Contact? {
+        val encryptedHandle = encryptData(handle.toString())
+        return contactDao.get().getContactByHandle(encryptedHandle)?.let { entity ->
+            contactModelMapper(entity)
+        }
+    }
+
+    override fun monitorContactByHandle(handle: Long): Flow<Contact> =
+        flow {
+            val encryptedHandle = encryptData(handle.toString())
+            emitAll(contactDao.get().monitorContactByHandle(encryptedHandle))
+        }.map { contactModelMapper(it) }
 
     override suspend fun getContactByEmail(email: String?): Contact? =
         contactDao.get().getContactByEmail(encryptData(email))?.let { contactModelMapper(it) }

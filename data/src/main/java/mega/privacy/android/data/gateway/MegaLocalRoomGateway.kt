@@ -89,6 +89,14 @@ interface MegaLocalRoomGateway {
     suspend fun getContactByHandle(handle: Long): Contact?
 
     /**
+     * Monitor contact by handle
+     *
+     * @param handle
+     * @return
+     */
+    fun monitorContactByHandle(handle: Long): Flow<Contact>
+
+    /**
      * Find contact by email
      *
      * @param email

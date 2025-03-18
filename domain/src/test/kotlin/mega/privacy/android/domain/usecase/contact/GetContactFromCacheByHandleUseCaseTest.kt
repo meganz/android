@@ -1,6 +1,8 @@
 package mega.privacy.android.domain.usecase.contact
 
+import app.cash.turbine.test
 import com.google.common.truth.Truth.assertThat
+import kotlinx.coroutines.flow.flow
 import kotlinx.coroutines.test.runTest
 import mega.privacy.android.domain.entity.Contact
 import mega.privacy.android.domain.repository.ContactsRepository
@@ -16,13 +18,13 @@ import org.mockito.kotlin.whenever
 @TestInstance(TestInstance.Lifecycle.PER_CLASS)
 class GetContactFromCacheByHandleUseCaseTest {
 
-    private lateinit var underTest: GetContactFromCacheByHandleUseCase
+    private lateinit var underTest: MonitorContactByHandleUseCase
 
     private val contactsRepository: ContactsRepository = mock()
 
     @BeforeEach
     fun setUp() {
-        underTest = GetContactFromCacheByHandleUseCase(
+        underTest = MonitorContactByHandleUseCase(
             contactsRepository = contactsRepository
         )
     }
@@ -39,10 +41,15 @@ class GetContactFromCacheByHandleUseCaseTest {
             userId = 456L,
             email = "test@test.com"
         )
-        whenever(contactsRepository.getContactFromCacheByHandle(contactId)) doReturn contact
+        whenever(contactsRepository.monitorContactByHandle(contactId)) doReturn flow {
+            emit(
+                contact
+            )
+        }
 
-        val actual = underTest(contactId)
-
-        assertThat(actual).isEqualTo(contact)
+        underTest(contactId).test {
+            assertThat(awaitItem()).isEqualTo(contact)
+            cancelAndIgnoreRemainingEvents()
+        }
     }
 }
