@@ -3,7 +3,6 @@ package mega.privacy.android.app.components.dragger;
 import static mega.privacy.android.app.utils.Constants.LOCATION_INDEX_LEFT;
 import static mega.privacy.android.app.utils.Constants.LOCATION_INDEX_TOP;
 
-import android.graphics.RectF;
 import android.view.SurfaceView;
 import android.view.View;
 import android.widget.ImageView;
@@ -12,8 +11,6 @@ import androidx.annotation.NonNull;
 import androidx.core.view.ViewCompat;
 import androidx.core.view.ViewPropertyAnimatorListenerAdapter;
 import androidx.core.view.ViewPropertyAnimatorUpdateListener;
-
-import com.facebook.drawee.view.SimpleDraweeView;
 
 import timber.log.Timber;
 
@@ -33,14 +30,7 @@ public class ExitViewAnimator<D extends DraggableView> extends ReturnOriginViewA
 
         if (currentView != null) {
             if (screenPosition != null) {
-                if (currentView instanceof SimpleDraweeView) {
-                    SimpleDraweeView simpleDraweeView = (SimpleDraweeView) currentView;
-                    RectF bounds = new RectF();
-                    simpleDraweeView.getHierarchy().getActualImageBounds(bounds);
-                    scaleX = ((float) screenPosition[2]) / (bounds.right - bounds.left);
-                    scaleY = ((float) screenPosition[3]) / (bounds.bottom - bounds.top);
-                    Timber.d("SimpleDraweeView scale: %s %s", scaleX, scaleY);
-                } else if (currentView instanceof ImageView) {
+                if (currentView instanceof ImageView) {
                     imageView = (ImageView) currentView;
                     scaleX = ((float) screenPosition[2]) / imageView.getDrawable().getIntrinsicWidth();
                     scaleY = ((float) screenPosition[3]) / imageView.getDrawable().getIntrinsicHeight();

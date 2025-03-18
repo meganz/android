@@ -19,8 +19,7 @@
             app:corner_radius="60dp"
             android:layout_width="40dp"
             android:layout_height="40dp"
-            android:scaleType="fitCenter"
-            app:roundedCornerRadius="20dp" />
+            android:scaleType="fitCenter" />
 
         <ImageView
             android:id="@+id/delete_icon_chip"

@@ -599,9 +599,6 @@
                 android:name="mega.privacy.android.app.initializer.MegaApiFolderInitializer"
                 android:value="androidx.startup" />
             <meta-data
-                android:name="mega.privacy.android.app.initializer.fresco.FrescoInitializer"
-                android:value="androidx.startup" />
-            <meta-data
                 android:name="mega.privacy.android.app.initializer.AnalyticsInitializer"
                 android:value="androidx.startup" />
             <meta-data

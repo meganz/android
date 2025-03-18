@@ -308,10 +308,6 @@ dependencies {
         kspTest(google.hilt.android.compiler)
     }
 
-    // Fresco
-    implementation(lib.bundles.fresco)
-    implementation(lib.facebook.inferannotation)
-
     // Retrofit
     implementation(lib.retrofit)
     implementation(lib.retrofit.gson)

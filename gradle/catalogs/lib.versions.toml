@@ -4,7 +4,6 @@ bannerviewpager = "3.4.0"
 billing-client = "6.2.0"
 coil = "2.7.0"
 coroutines = "1.8.0"
-fresco = "3.4.0"
 javax = "1"
 kotlin = "2.0.0"
 kotlin-ktx = "1.15.0"
@@ -40,11 +39,6 @@ coil-compose = { module = "io.coil-kt:coil-compose", version.ref = "coil" }
 coroutines-android = { module = "org.jetbrains.kotlinx:kotlinx-coroutines-android", version.ref = "coroutines" }
 coroutines-core = { module = "org.jetbrains.kotlinx:kotlinx-coroutines-core", version.ref = "coroutines" }
 coroutines-test = { module = "org.jetbrains.kotlinx:kotlinx-coroutines-test", version.ref = "coroutines" }
-facebook-inferannotation = "com.facebook.infer.annotation:infer-annotation:0.18.0"
-fresco = { module = "com.facebook.fresco:fresco", version.ref = "fresco" }
-fresco-gif = { module = "com.facebook.fresco:animated-gif", version.ref = "fresco" }
-fresco-webp = { module = "com.facebook.fresco:animated-webp", version.ref = "fresco" }
-fresco-webpsupport = { module = "com.facebook.fresco:webpsupport", version.ref = "fresco" }
 javax-inject = { module = "javax.inject:javax.inject", version.ref = "javax" }
 kotlin-ktx = { module = "androidx.core:core-ktx", version.ref = "kotlin-ktx" }
 kotlin-stdlib = { module = "org.jetbrains.kotlin:kotlin-stdlib", version.ref = "kotlin" }
@@ -84,6 +78,5 @@ kotlinx-collections-immutable = { group = "org.jetbrains.kotlinx", name = "kotli
 commonmark-java = {module = "org.commonmark:commonmark", version.ref = "commonmark-java"}
 
 [bundles]
-fresco = ["fresco", "fresco-gif", "fresco-webp", "fresco-webpsupport"]
 logging = ["logging-slf4j", "logging-logback", "logging-timber"]
 unit-test = ["coroutines-test", "kotlin-test"]
