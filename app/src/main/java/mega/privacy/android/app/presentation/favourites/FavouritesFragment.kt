@@ -70,7 +70,7 @@ import mega.privacy.android.domain.entity.node.NodeId
 import mega.privacy.android.domain.entity.preference.ViewType
 import mega.privacy.android.domain.usecase.featureflag.GetFeatureFlagValueUseCase
 import mega.privacy.android.navigation.MegaNavigator
-import mega.privacy.mobile.analytics.event.HideNodeMenuItemEvent
+import mega.privacy.mobile.analytics.event.HideNodeMultiSelectMenuItemEvent
 import nz.mega.sdk.MegaChatApiJava
 import nz.mega.sdk.MegaNode
 import timber.log.Timber
@@ -577,7 +577,7 @@ class FavouritesFragment : Fragment() {
     fun onHideClicked(
         nodeIds: List<NodeId>,
     ) {
-        Analytics.tracker.trackEvent(HideNodeMenuItemEvent)
+        Analytics.tracker.trackEvent(HideNodeMultiSelectMenuItemEvent)
 
         val isHiddenNodesOnboarded = viewModel.isHiddenNodesOnboarded()
         val isPaid = viewModel.getIsPaidAccount()
