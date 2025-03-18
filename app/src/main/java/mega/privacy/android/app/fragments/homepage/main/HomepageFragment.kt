@@ -52,6 +52,7 @@ import mega.privacy.android.app.utils.RunOnUIThreadUtils.post
 import mega.privacy.android.app.utils.Util
 import mega.privacy.android.app.utils.ViewUtils.waitForLayout
 import mega.privacy.android.app.utils.callManager
+import mega.privacy.android.domain.entity.banner.Banner
 import mega.privacy.android.domain.usecase.featureflag.GetFeatureFlagValueUseCase
 import mega.privacy.android.navigation.MegaNavigator
 import mega.privacy.mobile.analytics.event.HomeFABPressedEvent
@@ -62,7 +63,6 @@ import mega.privacy.mobile.analytics.event.HomeScreenSearchMenuToolbarEvent
 import mega.privacy.mobile.analytics.event.HomeScreenVideosTilePressedEvent
 import mega.privacy.mobile.analytics.event.OfflineTabEvent
 import mega.privacy.mobile.analytics.event.RecentsTabEvent
-import nz.mega.sdk.MegaBanner
 import nz.mega.sdk.MegaChatApiJava.MEGACHAT_INVALID_HANDLE
 import javax.inject.Inject
 
@@ -98,7 +98,7 @@ class HomepageFragment : Fragment() {
 
     private lateinit var bottomSheetBehavior: HomepageBottomSheetBehavior<View>
     private lateinit var searchInputView: FloatingSearchView
-    private lateinit var bannerViewPager: BannerViewPager<MegaBanner>
+    private lateinit var bannerViewPager: BannerViewPager<Banner>
 
     /** The fab button in normal state */
     private lateinit var fabMain: FloatingActionButton
@@ -245,8 +245,6 @@ class HomepageFragment : Fragment() {
      * Show the UI appearance for network connected status (normal UI)
      */
     private fun showOnlineMode() {
-        if (viewModel.isRootNodeNull()) return
-
         viewPager.isUserInputEnabled = true
         viewDataBinding.category.root.isVisible = true
         viewDataBinding.bannerView.isVisible = true
@@ -418,7 +416,7 @@ class HomepageFragment : Fragment() {
         bannerAdapter.setClickBannerCallback(BannerClickHandler(this))
 
         bannerViewPager =
-            viewDataBinding.bannerView as BannerViewPager<MegaBanner>
+            viewDataBinding.bannerView as BannerViewPager<Banner>
         bannerViewPager.setIndicatorSliderGap(BannerUtils.dp2px(6f))
             .setScrollDuration(800)
             .setAutoPlay(false)
@@ -438,7 +436,7 @@ class HomepageFragment : Fragment() {
             .setAdapter(bannerAdapter)
             .create()
 
-        viewModel.bannerList.observe(viewLifecycleOwner) {
+        viewLifecycleOwner.collectFlow(viewModel.banners) {
             bannerViewPager.refreshData(it)
         }
     }
@@ -620,7 +618,7 @@ class HomepageFragment : Fragment() {
      * @param operation the operation to be executed if online
      */
     private fun doIfOnline(showSnackBar: Boolean, operation: () -> Unit) {
-        if (viewModel.isConnected.value && !viewModel.isRootNodeNull()) {
+        if (viewModel.isConnected.value) {
             operation()
         } else if (showSnackBar) {
             (activity as ManagerActivity).showSnackbar(

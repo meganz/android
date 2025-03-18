@@ -10,10 +10,9 @@ import mega.privacy.android.app.R
 import mega.privacy.android.app.fragments.homepage.main.HomePageViewModel
 import mega.privacy.android.app.utils.Util
 import mega.privacy.android.app.utils.ViewUtils.debounceClick
-import nz.mega.sdk.MegaBanner
+import mega.privacy.android.domain.entity.banner.Banner
 
-class BannerAdapter(private val viewModel: HomePageViewModel)
-    : BaseBannerAdapter<MegaBanner>() {
+class BannerAdapter(private val viewModel: HomePageViewModel) : BaseBannerAdapter<Banner>() {
 
     private var clickBannerCallback: ClickBannerCallback? = null
 
@@ -25,9 +24,10 @@ class BannerAdapter(private val viewModel: HomePageViewModel)
         clickBannerCallback = cb
     }
 
+
     override fun bindData(
-        holder: BaseViewHolder<MegaBanner>,
-        data: MegaBanner?,
+        holder: BaseViewHolder<Banner>,
+        data: Banner?,
         position: Int,
         pageSize: Int,
     ) {
