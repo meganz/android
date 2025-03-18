@@ -11,6 +11,7 @@ import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
+import mega.privacy.android.app.featuretoggle.AppFeatures
 import mega.privacy.android.app.presentation.login.createaccount.model.CreateAccountStatus
 import mega.privacy.android.app.presentation.login.createaccount.model.CreateAccountUIState
 import mega.privacy.android.domain.entity.changepassword.PasswordStrength
@@ -20,6 +21,7 @@ import mega.privacy.android.domain.qualifier.ApplicationScope
 import mega.privacy.android.domain.usecase.GetPasswordStrengthUseCase
 import mega.privacy.android.domain.usecase.IsEmailValidUseCase
 import mega.privacy.android.domain.usecase.account.CreateAccountUseCase
+import mega.privacy.android.domain.usecase.featureflag.GetFeatureFlagValueUseCase
 import mega.privacy.android.domain.usecase.login.ClearEphemeralCredentialsUseCase
 import mega.privacy.android.domain.usecase.login.SaveEphemeralCredentialsUseCase
 import mega.privacy.android.domain.usecase.login.SaveLastRegisteredEmailUseCase
@@ -40,7 +42,8 @@ class CreateAccountViewModel @Inject constructor(
     private val saveEphemeralCredentialsUseCase: SaveEphemeralCredentialsUseCase,
     private val clearEphemeralCredentialsUseCase: ClearEphemeralCredentialsUseCase,
     private val saveLastRegisteredEmailUseCase: SaveLastRegisteredEmailUseCase,
-    @ApplicationScope private val applicationScope: CoroutineScope
+    private val getFeatureFlagValueUseCase: GetFeatureFlagValueUseCase,
+    @ApplicationScope private val applicationScope: CoroutineScope,
 ) : ViewModel() {
     private val _uiState = MutableStateFlow(CreateAccountUIState())
 
@@ -51,12 +54,29 @@ class CreateAccountViewModel @Inject constructor(
 
     init {
         monitorConnectivity()
+        setupInitialState()
     }
 
     private fun monitorConnectivity() {
         viewModelScope.launch {
             monitorConnectivityUseCase().collect {
                 _uiState.update { state -> state.copy(isConnected = it) }
+            }
+        }
+    }
+
+    private fun setupInitialState() {
+        viewModelScope.launch {
+            runCatching {
+                getFeatureFlagValueUseCase(AppFeatures.RegistrationRevamp).let { flag ->
+                    _uiState.update { state ->
+                        state.copy(
+                            isNewRegistrationUiEnabled = flag,
+                        )
+                    }
+                }
+            }.onFailure {
+                Timber.e(it)
             }
         }
     }

@@ -87,6 +87,7 @@ import mega.privacy.android.shared.resources.R as sharedR
 @OptIn(ExperimentalComposeUiApi::class)
 @Composable
 internal fun CreateAccountRoute(
+    uiState: CreateAccountUIState,
     onNavigateToLogin: () -> Unit,
     openTermsAndServiceLink: () -> Unit,
     openEndToEndEncryptionLink: () -> Unit,
@@ -94,7 +95,6 @@ internal fun CreateAccountRoute(
     modifier: Modifier = Modifier,
     viewModel: CreateAccountViewModel = hiltViewModel(),
 ) {
-    val uiState by viewModel.uiState.collectAsStateWithLifecycle()
     CreateAccountScreen(
         uiState = uiState,
         onFirstNameInputChanged = viewModel::onFirstNameInputChanged,

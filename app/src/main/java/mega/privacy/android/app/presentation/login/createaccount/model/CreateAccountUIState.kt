@@ -67,4 +67,9 @@ data class CreateAccountUIState(
      * Show No network warning
      */
     val showNoNetworkWarning: Boolean = false,
+
+    /**
+     * Is New Design Revamp enabled
+     */
+    val isNewRegistrationUiEnabled: Boolean? = null,
 )

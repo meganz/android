@@ -9,6 +9,7 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Modifier
 import androidx.fragment.app.Fragment
+import androidx.fragment.app.viewModels
 import androidx.fragment.compose.content
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import dagger.hilt.android.AndroidEntryPoint
@@ -25,6 +26,7 @@ import mega.privacy.android.domain.usecase.GetThemeMode
 import mega.privacy.android.shared.original.core.ui.theme.OriginalTheme
 import timber.log.Timber
 import javax.inject.Inject
+import kotlin.getValue
 
 /**
  * Create Account Compose Fragment.
@@ -38,6 +40,8 @@ class CreateAccountComposeFragment : Fragment() {
     @Inject
     lateinit var getThemeMode: GetThemeMode
 
+    private val viewModel: CreateAccountViewModel by viewModels()
+
     /**
      * Called to have the fragment instantiate its user interface view.
      */
@@ -47,14 +51,30 @@ class CreateAccountComposeFragment : Fragment() {
         savedInstanceState: Bundle?,
     ) = content {
         val themeMode by getThemeMode().collectAsStateWithLifecycle(initialValue = ThemeMode.System)
-        OriginalTheme(isDark = themeMode.isDarkMode()) {
-            CreateAccountRoute(
-                onNavigateToLogin = ::navigateToLogin,
-                openTermsAndServiceLink = { openLink(TERMS_OF_SERVICE_URL) },
-                openEndToEndEncryptionLink = { openLink(Constants.URL_E2EE) },
-                setTemporalDataForAccountCreation = ::setTemporalDataForAccountCreation,
-                modifier = Modifier.fillMaxSize(),
-            )
+        val uiState by viewModel.uiState.collectAsStateWithLifecycle()
+        if (uiState.isNewRegistrationUiEnabled == true) {
+            //Replace with New Design for create account screen
+            OriginalTheme(isDark = themeMode.isDarkMode()) {
+                CreateAccountRoute(
+                    uiState = uiState,
+                    onNavigateToLogin = ::navigateToLogin,
+                    openTermsAndServiceLink = { openLink(TERMS_OF_SERVICE_URL) },
+                    openEndToEndEncryptionLink = { openLink(Constants.URL_E2EE) },
+                    setTemporalDataForAccountCreation = ::setTemporalDataForAccountCreation,
+                    modifier = Modifier.fillMaxSize(),
+                )
+            }
+        } else if (uiState.isNewRegistrationUiEnabled == false) {
+            OriginalTheme(isDark = themeMode.isDarkMode()) {
+                CreateAccountRoute(
+                    uiState = uiState,
+                    onNavigateToLogin = ::navigateToLogin,
+                    openTermsAndServiceLink = { openLink(TERMS_OF_SERVICE_URL) },
+                    openEndToEndEncryptionLink = { openLink(Constants.URL_E2EE) },
+                    setTemporalDataForAccountCreation = ::setTemporalDataForAccountCreation,
+                    modifier = Modifier.fillMaxSize(),
+                )
+            }
         }
     }
 
@@ -77,11 +97,11 @@ class CreateAccountComposeFragment : Fragment() {
                 flags = Intent.FLAG_ACTIVITY_CLEAR_TOP
                 data = Uri.parse(url)
             })
-        } catch (e: Exception) {
+        } catch (_: Exception) {
             try {
                 startActivity(Intent(Intent.ACTION_VIEW).setData(Uri.parse(url)))
             } catch (e: Exception) {
-                Timber.w("Exception trying to open installed browser apps", e)
+                Timber.e(e, "Exception trying to open installed browser apps")
             }
         }
     }

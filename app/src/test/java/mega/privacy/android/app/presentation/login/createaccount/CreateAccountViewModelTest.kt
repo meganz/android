@@ -13,6 +13,7 @@ import kotlinx.coroutines.test.UnconfinedTestDispatcher
 import kotlinx.coroutines.test.resetMain
 import kotlinx.coroutines.test.runTest
 import kotlinx.coroutines.test.setMain
+import mega.privacy.android.app.featuretoggle.AppFeatures
 import mega.privacy.android.app.presentation.login.createaccount.CreateAccountViewModel.Companion.KEY_CONFIRM_PASSWORD
 import mega.privacy.android.app.presentation.login.createaccount.CreateAccountViewModel.Companion.KEY_E2EE
 import mega.privacy.android.app.presentation.login.createaccount.CreateAccountViewModel.Companion.KEY_EMAIL
@@ -27,6 +28,7 @@ import mega.privacy.android.domain.exception.account.CreateAccountException
 import mega.privacy.android.domain.usecase.GetPasswordStrengthUseCase
 import mega.privacy.android.domain.usecase.IsEmailValidUseCase
 import mega.privacy.android.domain.usecase.account.CreateAccountUseCase
+import mega.privacy.android.domain.usecase.featureflag.GetFeatureFlagValueUseCase
 import mega.privacy.android.domain.usecase.login.ClearEphemeralCredentialsUseCase
 import mega.privacy.android.domain.usecase.login.SaveEphemeralCredentialsUseCase
 import mega.privacy.android.domain.usecase.login.SaveLastRegisteredEmailUseCase
@@ -36,6 +38,8 @@ import org.junit.jupiter.api.BeforeAll
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.TestInstance
+import org.junit.jupiter.params.ParameterizedTest
+import org.junit.jupiter.params.provider.ValueSource
 import org.mockito.kotlin.any
 import org.mockito.kotlin.mock
 import org.mockito.kotlin.reset
@@ -54,6 +58,7 @@ class CreateAccountViewModelTest {
     private val saveEphemeralCredentialsUseCase: SaveEphemeralCredentialsUseCase = mock()
     private val clearEphemeralCredentialsUseCase: ClearEphemeralCredentialsUseCase = mock()
     private val saveLastRegisteredEmailUseCase: SaveLastRegisteredEmailUseCase = mock()
+    private val getFeatureFlagValueUseCase: GetFeatureFlagValueUseCase = mock()
     private val savedStateHandle = SavedStateHandle()
     private val connectivityFlow = MutableStateFlow(true)
 
@@ -74,7 +79,8 @@ class CreateAccountViewModelTest {
             saveEphemeralCredentialsUseCase = saveEphemeralCredentialsUseCase,
             clearEphemeralCredentialsUseCase = clearEphemeralCredentialsUseCase,
             saveLastRegisteredEmailUseCase = saveLastRegisteredEmailUseCase,
-            applicationScope = applicationScope
+            getFeatureFlagValueUseCase = getFeatureFlagValueUseCase,
+            applicationScope = applicationScope,
         )
     }
 
@@ -87,7 +93,8 @@ class CreateAccountViewModelTest {
             createAccountUseCase,
             saveEphemeralCredentialsUseCase,
             clearEphemeralCredentialsUseCase,
-            saveLastRegisteredEmailUseCase
+            saveLastRegisteredEmailUseCase,
+            getFeatureFlagValueUseCase
         )
     }
 
@@ -95,6 +102,19 @@ class CreateAccountViewModelTest {
     @AfterAll
     fun tearDown() {
         Dispatchers.resetMain()
+    }
+
+
+    @ParameterizedTest
+    @ValueSource(booleans = [true, false])
+    fun `test that ui state is updated based on value from RegistrationRevamp feature flag on init`(
+        value: Boolean,
+    ) = runTest {
+        whenever(getFeatureFlagValueUseCase(AppFeatures.RegistrationRevamp)).thenReturn(value)
+        setup()
+        underTest.uiState.test {
+            assertThat(awaitItem().isNewRegistrationUiEnabled).isEqualTo(value)
+        }
     }
 
     @Test
