@@ -14,6 +14,7 @@ import mega.privacy.android.feature.sync.domain.entity.SyncNotificationType
 import mega.privacy.android.feature.sync.domain.entity.SyncStatus
 import mega.privacy.android.feature.sync.domain.repository.SyncNotificationRepository
 import mega.privacy.android.feature.sync.domain.usecase.notifcation.GetSyncNotificationUseCase
+import mega.privacy.android.shared.resources.R as sharedResR
 import org.junit.jupiter.api.BeforeAll
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
@@ -42,12 +43,31 @@ internal class GetSyncNotificationUseCaseTest {
     }
 
     @Test
+    fun `test that use case returns null when no sync set up`() = runTest {
+        val isBatteryLow = false
+        val isUserOnWifi = true
+        val isSyncOnlyByWifi = true
+        val syncs = emptyList<FolderPair>()
+        val stalledIssues = emptyList<StalledIssue>()
+
+        val result = underTest(
+            isBatteryLow,
+            isUserOnWifi,
+            isSyncOnlyByWifi,
+            syncs,
+            stalledIssues
+        )
+
+        assertThat(result).isEqualTo(null)
+    }
+
+    @Test
     fun `test that use case returns sync notification when battery is low and notification was not shown`() =
         runTest {
             val isBatteryLow = true
             val isUserOnWifi = true
             val isSyncOnlyByWifi = true
-            val syncs = emptyList<FolderPair>()
+            val syncs = listOf(mock<FolderPair> { on { syncError } doReturn mock() })
             val stalledIssues = emptyList<StalledIssue>()
             val notification: SyncNotificationMessage = mock()
             whenever(syncNotificationRepository.getDisplayedNotificationsByType(SyncNotificationType.BATTERY_LOW)).thenReturn(
@@ -95,7 +115,7 @@ internal class GetSyncNotificationUseCaseTest {
             val isBatteryLow = false
             val isUserOnWifi = false
             val isSyncOnlyByWifi = true
-            val syncs = emptyList<FolderPair>()
+            val syncs = listOf(mock<FolderPair> { on { syncError } doReturn mock() })
             val stalledIssues = emptyList<StalledIssue>()
             val notification: SyncNotificationMessage = mock()
             whenever(syncNotificationRepository.getDisplayedNotificationsByType(SyncNotificationType.NOT_CONNECTED_TO_WIFI)).thenReturn(
@@ -199,8 +219,8 @@ internal class GetSyncNotificationUseCaseTest {
             whenever(syncNotificationRepository.getDisplayedNotificationsByType(SyncNotificationType.ERROR)).thenReturn(
                 listOf(
                     SyncNotificationMessage(
-                        title = "",
-                        text = "",
+                        title = sharedResR.string.general_sync_notification_generic_error_title,
+                        text = sharedResR.string.general_sync_notification_generic_error_text,
                         syncNotificationType = SyncNotificationType.ERROR,
                         notificationDetails = NotificationDetails(
                             "localPath",
@@ -233,7 +253,8 @@ internal class GetSyncNotificationUseCaseTest {
             val isBatteryLow = false
             val isUserOnWifi = true
             val isSyncOnlyByWifi = true
-            val syncs = emptyList<FolderPair>()
+            val syncs =
+                listOf(mock<FolderPair> { on { syncError } doReturn SyncError.NO_SYNC_ERROR })
             val stalledIssues = listOf(mock<StalledIssue>())
             val notification: SyncNotificationMessage = mock()
             whenever(
@@ -278,9 +299,9 @@ internal class GetSyncNotificationUseCaseTest {
             ).thenReturn(
                 listOf(
                     SyncNotificationMessage(
-                        title = "",
-                        text = "",
-                        syncNotificationType = SyncNotificationType.ERROR,
+                        title = sharedResR.string.general_sync_notification_stalled_issues_title,
+                        text = sharedResR.string.general_sync_notification_stalled_issues_text,
+                        syncNotificationType = SyncNotificationType.STALLED_ISSUE,
                         notificationDetails = NotificationDetails(
                             "localPath",
                             SyncError.NO_SYNC_ERROR.ordinal

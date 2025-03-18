@@ -1,6 +1,7 @@
 package mega.privacy.android.domain.usecase.environment
 
 import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.onStart
 import mega.privacy.android.domain.entity.BatteryInfo
 import mega.privacy.android.domain.repository.EnvironmentRepository
 import javax.inject.Inject
@@ -16,4 +17,5 @@ class MonitorBatteryInfoUseCase @Inject constructor(
      * Invoke
      */
     operator fun invoke(): Flow<BatteryInfo> = environmentRepository.monitorBatteryInfo()
+        .onStart { emit(environmentRepository.getBatteryInfo()) }
 }

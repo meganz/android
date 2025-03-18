@@ -10,6 +10,7 @@ import mega.privacy.android.feature.sync.data.mapper.notification.SyncShownNotif
 import mega.privacy.android.feature.sync.domain.entity.NotificationDetails
 import mega.privacy.android.feature.sync.domain.entity.SyncNotificationMessage
 import mega.privacy.android.feature.sync.domain.entity.SyncNotificationType
+import mega.privacy.android.shared.resources.R as sharedResR
 import org.junit.jupiter.api.AfterEach
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.TestInstance
@@ -48,8 +49,8 @@ class SyncShownNotificationEntityToSyncNotificationMessageMapperTest {
             notificationType = "BATTERY_LOW",
         )
         val notificationMessage = SyncNotificationMessage(
-            title = "Notification title",
-            text = "Notification text",
+            title = sharedResR.string.general_sync_notification_low_battery_title,
+            text = sharedResR.string.general_sync_notification_low_battery_text,
             syncNotificationType = SyncNotificationType.BATTERY_LOW,
             notificationDetails = NotificationDetails(path = "", errorCode = null)
         )
@@ -68,8 +69,8 @@ class SyncShownNotificationEntityToSyncNotificationMessageMapperTest {
             notificationType = "NOT_CONNECTED_TO_WIFI",
         )
         val notificationMessage = SyncNotificationMessage(
-            title = "Notification title",
-            text = "Notification text",
+            title = sharedResR.string.general_sync_notification_lost_wifi_title,
+            text = sharedResR.string.general_sync_notification_lost_wifi_text,
             syncNotificationType = SyncNotificationType.NOT_CONNECTED_TO_WIFI,
             notificationDetails = NotificationDetails(path = "", errorCode = null)
         )
@@ -142,8 +143,8 @@ class SyncShownNotificationEntityToSyncNotificationMessageMapperTest {
     @Test
     fun `test that mapper converts from domain to battery low notification`() {
         val notificationMessage = SyncNotificationMessage(
-            title = "Notification title",
-            text = "Notification text",
+            title = sharedResR.string.general_sync_notification_low_battery_title,
+            text = sharedResR.string.general_sync_notification_low_battery_text,
             syncNotificationType = SyncNotificationType.BATTERY_LOW,
             notificationDetails = NotificationDetails(path = "", errorCode = null)
         )
@@ -161,8 +162,8 @@ class SyncShownNotificationEntityToSyncNotificationMessageMapperTest {
     @Test
     fun `test that mapper converts from domain to not connect to wifi notification`() {
         val notificationMessage = SyncNotificationMessage(
-            title = "Notification title",
-            text = "Notification text",
+            title = sharedResR.string.general_sync_notification_lost_wifi_title,
+            text = sharedResR.string.general_sync_notification_lost_wifi_text,
             syncNotificationType = SyncNotificationType.NOT_CONNECTED_TO_WIFI,
             notificationDetails = NotificationDetails(path = "", errorCode = null)
         )
@@ -180,8 +181,8 @@ class SyncShownNotificationEntityToSyncNotificationMessageMapperTest {
     @Test
     fun `test that mapper converts from domain to error notification`() {
         val notificationMessage = SyncNotificationMessage(
-            title = "Notification title",
-            text = "Notification text",
+            title = sharedResR.string.general_sync_notification_generic_error_title,
+            text = sharedResR.string.general_sync_notification_generic_error_text,
             syncNotificationType = SyncNotificationType.ERROR,
             notificationDetails = NotificationDetails(path = "/example/path", errorCode = 3)
         )
@@ -204,8 +205,8 @@ class SyncShownNotificationEntityToSyncNotificationMessageMapperTest {
     @Test
     fun `test that mapper converts from domain to stalled issue notification`() {
         val notificationMessage = SyncNotificationMessage(
-            title = "Notification title",
-            text = "Notification text",
+            title = sharedResR.string.general_sync_notification_stalled_issues_title,
+            text = sharedResR.string.general_sync_notification_stalled_issues_text,
             syncNotificationType = SyncNotificationType.STALLED_ISSUE,
             notificationDetails = NotificationDetails(path = "/example/path", errorCode = null)
         )

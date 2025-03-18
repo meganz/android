@@ -20,6 +20,7 @@ import mega.privacy.android.feature.sync.domain.entity.StalledIssue
 import mega.privacy.android.feature.sync.domain.entity.SyncNotificationMessage
 import mega.privacy.android.feature.sync.domain.entity.SyncNotificationType
 import mega.privacy.android.feature.sync.domain.entity.SyncStatus
+import mega.privacy.android.shared.resources.R as sharedResR
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.TestInstance
@@ -71,8 +72,18 @@ internal class SyncNotificationRepositoryImplTest {
                 SyncShownNotificationEntity(notificationType = notificationType.name)
             )
             val notificationMessage = SyncNotificationMessage(
-                title = "Notification title",
-                text = "Notification text",
+                title = when (notificationType) {
+                    SyncNotificationType.BATTERY_LOW -> sharedResR.string.general_sync_notification_low_battery_title
+                    SyncNotificationType.NOT_CONNECTED_TO_WIFI -> sharedResR.string.general_sync_notification_lost_wifi_title
+                    SyncNotificationType.ERROR -> sharedResR.string.general_sync_notification_generic_error_title
+                    SyncNotificationType.STALLED_ISSUE -> sharedResR.string.general_sync_notification_stalled_issues_title
+                },
+                text = when (notificationType) {
+                    SyncNotificationType.BATTERY_LOW -> sharedResR.string.general_sync_notification_low_battery_text
+                    SyncNotificationType.NOT_CONNECTED_TO_WIFI -> sharedResR.string.general_sync_notification_lost_wifi_text
+                    SyncNotificationType.ERROR -> sharedResR.string.general_sync_notification_generic_error_text
+                    SyncNotificationType.STALLED_ISSUE -> sharedResR.string.general_sync_notification_stalled_issues_text
+                },
                 syncNotificationType = notificationType,
                 notificationDetails = NotificationDetails(path = "Path", errorCode = 0)
             )
@@ -90,12 +101,24 @@ internal class SyncNotificationRepositoryImplTest {
 
     @ParameterizedTest
     @EnumSource(SyncNotificationType::class)
-    fun `test that setDisplayedNotification sets notification with correct type`() =
+    fun `test that setDisplayedNotification sets notification with correct type`(
+        notificationType: SyncNotificationType,
+    ) =
         runTest {
             val notificationMessage = SyncNotificationMessage(
-                title = "Notification title",
-                text = "Notification text",
-                syncNotificationType = SyncNotificationType.STALLED_ISSUE,
+                title = when (notificationType) {
+                    SyncNotificationType.BATTERY_LOW -> sharedResR.string.general_sync_notification_low_battery_title
+                    SyncNotificationType.NOT_CONNECTED_TO_WIFI -> sharedResR.string.general_sync_notification_lost_wifi_title
+                    SyncNotificationType.ERROR -> sharedResR.string.general_sync_notification_generic_error_title
+                    SyncNotificationType.STALLED_ISSUE -> sharedResR.string.general_sync_notification_stalled_issues_title
+                },
+                text = when (notificationType) {
+                    SyncNotificationType.BATTERY_LOW -> sharedResR.string.general_sync_notification_low_battery_text
+                    SyncNotificationType.NOT_CONNECTED_TO_WIFI -> sharedResR.string.general_sync_notification_lost_wifi_text
+                    SyncNotificationType.ERROR -> sharedResR.string.general_sync_notification_generic_error_text
+                    SyncNotificationType.STALLED_ISSUE -> sharedResR.string.general_sync_notification_stalled_issues_text
+                },
+                syncNotificationType = notificationType,
                 notificationDetails = NotificationDetails(path = "Path", errorCode = null)
             )
             val notificationEntity =
@@ -150,8 +173,8 @@ internal class SyncNotificationRepositoryImplTest {
     fun `test that getSyncErrorsNotification returns a generic error notification message`() =
         runTest {
             val notificationMessage = SyncNotificationMessage(
-                title = "Notification title",
-                text = "Notification text",
+                title = sharedResR.string.general_sync_notification_generic_error_title,
+                text = sharedResR.string.general_sync_notification_generic_error_text,
                 syncNotificationType = SyncNotificationType.ERROR,
                 notificationDetails = NotificationDetails(path = "somePath", errorCode = 1)
             )

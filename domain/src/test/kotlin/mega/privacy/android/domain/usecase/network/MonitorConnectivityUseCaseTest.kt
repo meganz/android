@@ -36,6 +36,7 @@ class MonitorConnectivityUseCaseTest {
         }
 
         underTest().test {
+            assertThat(awaitItem()).isTrue()
             assertThat(awaitItem()).isFalse()
         }
     }
@@ -53,6 +54,7 @@ class MonitorConnectivityUseCaseTest {
         }
 
         underTest().test {
+            assertThat(awaitItem()).isTrue()
             assertThat(awaitItem()).isFalse()
             connectivityFlow.emit(ConnectivityState.Connected(true))
             assertThat(awaitItem()).isTrue()

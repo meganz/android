@@ -27,6 +27,7 @@ import mega.privacy.android.feature.sync.domain.usecase.sync.MonitorSyncsUseCase
 import mega.privacy.android.feature.sync.domain.usecase.sync.PauseResumeSyncsBasedOnBatteryAndWiFiUseCase
 import mega.privacy.android.feature.sync.domain.usecase.sync.option.MonitorSyncByWiFiUseCase
 import mega.privacy.android.feature.sync.ui.SyncMonitorViewModel
+import mega.privacy.android.shared.resources.R as sharedResR
 import org.junit.jupiter.api.AfterEach
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
@@ -141,8 +142,8 @@ class SyncMonitorViewModelTest {
         val syncs = emptyList<FolderPair>()
         val stalledIssues = emptyList<StalledIssue>()
         val notificationMessage = SyncNotificationMessage(
-            title = "Notification title",
-            text = "Notification text",
+            title = sharedResR.string.general_sync_notification_low_battery_title,
+            text = sharedResR.string.general_sync_notification_low_battery_text,
             syncNotificationType = SyncNotificationType.BATTERY_LOW,
             notificationDetails = NotificationDetails(path = "", errorCode = 0)
         )
@@ -185,8 +186,8 @@ class SyncMonitorViewModelTest {
     @Test
     fun `test that onNotificationShown removes notification`() = runTest {
         val notificationMessage = SyncNotificationMessage(
-            title = "Notification title",
-            text = "Notification text",
+            title = sharedResR.string.general_sync_notification_low_battery_title,
+            text = sharedResR.string.general_sync_notification_low_battery_text,
             syncNotificationType = SyncNotificationType.BATTERY_LOW,
             notificationDetails = NotificationDetails(path = "", errorCode = 0)
         )

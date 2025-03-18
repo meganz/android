@@ -1,5 +1,6 @@
 package mega.privacy.android.feature.sync.domain.entity
 
+import androidx.annotation.StringRes
 import kotlinx.serialization.Serializable
 
 /**
@@ -12,8 +13,8 @@ import kotlinx.serialization.Serializable
  * containing error code and the path of the folder that caused the notification.
  */
 data class SyncNotificationMessage(
-    val title: String,
-    val text: String,
+    @StringRes val title: Int,
+    @StringRes val text: Int,
     val syncNotificationType: SyncNotificationType,
     val notificationDetails: NotificationDetails,
 )

@@ -33,6 +33,11 @@ class GetSyncNotificationUseCase @Inject constructor(
         val isNetworkConstraintRespected = isSyncOnlyByWifi && isUserOnWifi || !isSyncOnlyByWifi
 
         return when {
+            syncs.isEmpty() -> {
+                resetAllNotifications()
+                null
+            }
+
             isBatteryLow -> {
                 getBatteryLowNotification()
             }
@@ -56,13 +61,17 @@ class GetSyncNotificationUseCase @Inject constructor(
             }
 
             else -> {
-                resetBatteryLowNotification()
-                resetNetworkConstraintNotification()
-                resetSyncErrorsNotification()
-                resetSyncStalledIssuesNotification()
+                resetAllNotifications()
                 null
             }
         }
+    }
+
+    private suspend fun resetAllNotifications() {
+        resetBatteryLowNotification()
+        resetNetworkConstraintNotification()
+        resetSyncErrorsNotification()
+        resetSyncStalledIssuesNotification()
     }
 
     private suspend fun resetBatteryLowNotification() {

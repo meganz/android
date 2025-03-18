@@ -3,6 +3,7 @@ package mega.privacy.android.feature.sync.data.mapper.notification
 import mega.privacy.android.feature.sync.domain.entity.NotificationDetails
 import mega.privacy.android.feature.sync.domain.entity.SyncNotificationMessage
 import mega.privacy.android.feature.sync.domain.entity.SyncNotificationType
+import mega.privacy.android.shared.resources.R as sharedResR
 import javax.inject.Inject
 
 internal class StalledIssuesToNotificationMessageMapper @Inject constructor() {
@@ -10,9 +11,8 @@ internal class StalledIssuesToNotificationMessageMapper @Inject constructor() {
     operator fun invoke(
         issuePath: String,
     ): SyncNotificationMessage = SyncNotificationMessage(
-        // This will be replaced with transifex strings when UI layer is implemented
-        title = "Sync issues detected",
-        text = "View and resolve issues",
+        title = sharedResR.string.general_sync_notification_stalled_issues_title,
+        text = sharedResR.string.general_sync_notification_stalled_issues_text,
         syncNotificationType = SyncNotificationType.STALLED_ISSUE,
         notificationDetails = NotificationDetails(
             path = issuePath,
