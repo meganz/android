@@ -22,7 +22,7 @@ import mega.privacy.android.app.components.ChatManagement
 import mega.privacy.android.app.getLink.BaseLinkViewModel
 import mega.privacy.android.app.presentation.mapper.GetStringFromStringResMapper
 import mega.privacy.android.app.presentation.meeting.model.MeetingState
-import mega.privacy.android.app.presentation.meeting.model.ScheduledMeetingInfoUiState
+import mega.privacy.android.app.presentation.meeting.model.ChatInfoUiState
 import mega.privacy.android.app.usecase.chat.SetChatVideoInDeviceUseCase
 import mega.privacy.android.app.utils.CallUtil
 import mega.privacy.android.app.utils.ChatUtil
@@ -51,6 +51,7 @@ import mega.privacy.android.domain.usecase.SetPublicChatToPrivate
 import mega.privacy.android.domain.usecase.call.GetChatCallUseCase
 import mega.privacy.android.domain.usecase.call.MonitorSFUServerUpgradeUseCase
 import mega.privacy.android.domain.usecase.call.OpenOrStartCallUseCase
+import mega.privacy.android.domain.usecase.chat.ArchiveChatUseCase
 import mega.privacy.android.domain.usecase.chat.Get1On1ChatIdUseCase
 import mega.privacy.android.domain.usecase.chat.LeaveChatUseCase
 import mega.privacy.android.domain.usecase.chat.MonitorChatRoomUpdatesUseCase
@@ -71,9 +72,10 @@ import mega.privacy.android.domain.usecase.setting.MonitorUpdatePushNotification
 import mega.privacy.mobile.analytics.event.SendMeetingLinkToChatScheduledMeetingEvent
 import timber.log.Timber
 import javax.inject.Inject
+import mega.privacy.android.shared.resources.R as sharedR
 
 /**
- * ScheduledMeetingInfoActivity view model.
+ * ChatInfoActivity view model.
  *
  * @property getChatRoomUseCase                                    [GetChatRoomUseCase]
  * @property monitorChatParticipantsUseCase                            [MonitorChatParticipantsUseCase]
@@ -102,10 +104,10 @@ import javax.inject.Inject
  * @property monitorUserUpdates                             [MonitorUserUpdates]
  * @property getChatCallUseCase                             [GetChatCallUseCase]
  * @property monitorChatCallUpdatesUseCase                  [MonitorChatCallUpdatesUseCase]
- * @property uiState                    Current view state as [ScheduledMeetingInfoUiState]
+ * @property uiState                    Current view state as [ChatInfoUiState]
  */
 @HiltViewModel
-class ScheduledMeetingInfoViewModel @Inject constructor(
+class ChatInfoViewModel @Inject constructor(
     private val getChatRoomUseCase: GetChatRoomUseCase,
     private val monitorChatParticipantsUseCase: MonitorChatParticipantsUseCase,
     private val getScheduledMeetingByChatUseCase: GetScheduledMeetingByChatUseCase,
@@ -136,11 +138,12 @@ class ScheduledMeetingInfoViewModel @Inject constructor(
     private val monitorSFUServerUpgradeUseCase: MonitorSFUServerUpgradeUseCase,
     private val getChatCallUseCase: GetChatCallUseCase,
     private val monitorChatCallUpdatesUseCase: MonitorChatCallUpdatesUseCase,
+    private val archiveChatUseCase: ArchiveChatUseCase,
     get1On1ChatIdUseCase: Get1On1ChatIdUseCase,
     sendTextMessageUseCase: SendTextMessageUseCase,
 ) : BaseLinkViewModel(get1On1ChatIdUseCase, sendTextMessageUseCase) {
 
-    private val _uiState = MutableStateFlow(ScheduledMeetingInfoUiState())
+    private val _uiState = MutableStateFlow(ChatInfoUiState())
     val uiState = _uiState.asStateFlow()
 
     val is24HourFormat by lazy { deviceGateway.is24HourFormat() }
@@ -190,7 +193,7 @@ class ScheduledMeetingInfoViewModel @Inject constructor(
         if (newChatId != megaChatApiGateway.getChatInvalidHandle() && newChatId != uiState.value.chatId) {
             _uiState.update {
                 it.copy(
-                    chatId = newChatId
+                    chatId = newChatId,
                 )
             }
             scheduledMeetingId = newScheduledMeetingId
@@ -220,6 +223,8 @@ class ScheduledMeetingInfoViewModel @Inject constructor(
                                 chatId = chatId,
                                 chatTitle = title,
                                 isHost = ownPrivilege == ChatRoomPermission.Moderator,
+                                isArchived = isArchived,
+                                isNoteToSelf = isNoteToSelf,
                                 isOpenInvite = isOpenInvite || ownPrivilege == ChatRoomPermission.Moderator,
                                 enabledAllowNonHostAddParticipantsOption = isOpenInvite,
                                 enabledWaitingRoomOption = isWaitingRoom,
@@ -427,8 +432,16 @@ class ScheduledMeetingInfoViewModel @Inject constructor(
                             isOpenInvite
                         }
 
+                        val archiveValue = if (chat.hasChanged(ChatRoomChange.Archive)) {
+                            Timber.d("Changes in Archive")
+                            chat.isArchived
+                        } else {
+                            isArchived
+                        }
+
                         copy(
                             isHost = hostValue,
+                            isArchived = archiveValue,
                             chatTitle = titleValue,
                             isPublic = publicValue,
                             retentionTimeSeconds = retentionTimeValue,
@@ -530,7 +543,7 @@ class ScheduledMeetingInfoViewModel @Inject constructor(
                             }
 
                             ScheduledMeetingChanges.EndDate,
-                            -> _uiState.update { state ->
+                                -> _uiState.update { state ->
                                 state.copy(
                                     scheduledMeeting = state.scheduledMeeting?.copy(
                                         startDateTime = scheduledMeetReceived.endDateTime,
@@ -949,6 +962,40 @@ class ScheduledMeetingInfoViewModel @Inject constructor(
         _uiState.update {
             it.copy(selected = participant)
         }
+
+    /**
+     * Archive or unarchive the current chat
+     */
+    fun archiveChat() {
+        viewModelScope.launch {
+            val shouldArchive = uiState.value.isArchived == false
+            val title = if (uiState.value.isNoteToSelf) getStringFromStringResMapper(
+                sharedR.string.chat_note_to_self_chat_title
+            ) else uiState.value.chatTitle
+
+            runCatching {
+                archiveChatUseCase(
+                    chatId = uiState.value.chatId,
+                    archive = shouldArchive
+                )
+            }.onFailure { exception ->
+                Timber.e(exception)
+                triggerSnackbarMessage(
+                    getStringFromStringResMapper(
+                        if (shouldArchive) R.string.error_archive_chat else R.string.error_unarchive_chat,
+                        title
+                    )
+                )
+            }.onSuccess {
+                triggerSnackbarMessage(
+                    getStringFromStringResMapper(
+                        if (shouldArchive) R.string.success_archive_chat else R.string.success_unarchive_chat,
+                        title
+                    )
+                )
+            }
+        }
+    }
 
     /**
      * Enable or disable the option Allow non-host add participants to the chat room if there is internet connection, shows an error if not.

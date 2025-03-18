@@ -1,9 +1,9 @@
 package mega.privacy.android.app.presentation.meeting.model
 
 /**
- * Enum class defining the available actions for scheduled meeting info screen.
+ * Enum class defining the available actions for chat info screen.
  */
-enum class ScheduledMeetingInfoAction {
+enum class ChatInfoAction {
 
     /**
      * Create or remove meeting link.
@@ -36,9 +36,19 @@ enum class ScheduledMeetingInfoAction {
     ShareFiles,
 
     /**
+     * Share files.
+     */
+    Files,
+
+    /**
      * Share meeting link option for non-hosts.
      */
     ShareMeetingLinkNonHosts,
+
+    /**
+     * Manage Meeting history.
+     */
+    ManageMeetingHistory,
 
     /**
      * Manage Chat history.
@@ -54,4 +64,14 @@ enum class ScheduledMeetingInfoAction {
      * Enabled Encrypted key rotation.
      */
     EnabledEncryptedKeyRotation,
+
+    /**
+     * Archive
+     */
+    Archive,
+
+    /**
+     * Unarchive
+     */
+    Unarchive,
 }

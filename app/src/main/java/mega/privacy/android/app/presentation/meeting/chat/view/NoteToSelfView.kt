@@ -33,7 +33,7 @@ import mega.privacy.android.shared.original.core.ui.theme.extensions.subtitle1me
 
 @Composable
 internal fun NoteToSelfView(
-    onNoteToSelfClicked: (() -> Unit)?,
+    onNoteToSelfClicked: (() -> Unit)? = null,
     isHint: Boolean = false,
     isNew: Boolean = false,
     modifier: Modifier = Modifier,

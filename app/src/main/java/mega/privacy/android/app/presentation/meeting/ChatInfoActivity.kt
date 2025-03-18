@@ -51,8 +51,8 @@ import mega.privacy.android.app.presentation.extensions.isDarkMode
 import mega.privacy.android.app.presentation.meeting.CreateScheduledMeetingActivity.Companion.MEETING_LINK_CREATED_TAG
 import mega.privacy.android.app.presentation.meeting.CreateScheduledMeetingActivity.Companion.MEETING_LINK_TAG
 import mega.privacy.android.app.presentation.meeting.CreateScheduledMeetingActivity.Companion.MEETING_TITLE_TAG
-import mega.privacy.android.app.presentation.meeting.model.ScheduledMeetingInfoAction
-import mega.privacy.android.app.presentation.meeting.view.ScheduledMeetingInfoView
+import mega.privacy.android.app.presentation.meeting.model.ChatInfoAction
+import mega.privacy.android.app.presentation.meeting.view.ChatInfoView
 import mega.privacy.android.app.presentation.security.PasscodeCheck
 import mega.privacy.android.app.utils.AlertDialogUtil
 import mega.privacy.android.app.utils.ChatUtil.createMuteNotificationsAlertDialogOfAChat
@@ -72,6 +72,8 @@ import mega.privacy.android.domain.usecase.GetThemeMode
 import mega.privacy.android.navigation.MegaNavigator
 import mega.privacy.android.shared.original.core.ui.theme.OriginalTheme
 import mega.privacy.android.shared.resources.R as sharedR
+import kotlinx.coroutines.flow.distinctUntilChanged
+import kotlinx.coroutines.flow.map
 import mega.privacy.mobile.analytics.event.MeetingInfoAddParticipantButtonTappedEvent
 import mega.privacy.mobile.analytics.event.MeetingInfoLeaveMeetingButtonTappedEvent
 import mega.privacy.mobile.analytics.event.ScheduledMeetingEditMenuToolbarEvent
@@ -94,7 +96,7 @@ import javax.inject.Inject
  * @property editSchedMeetLauncher
  */
 @AndroidEntryPoint
-class ScheduledMeetingInfoActivity : PasscodeActivity(), SnackbarShower {
+class ChatInfoActivity : PasscodeActivity(), SnackbarShower {
 
     /**
      * The centralized navigator in the :app module
@@ -105,7 +107,8 @@ class ScheduledMeetingInfoActivity : PasscodeActivity(), SnackbarShower {
     @Inject
     lateinit var getThemeMode: GetThemeMode
 
-    private val viewModel by viewModels<ScheduledMeetingInfoViewModel>()
+    private val viewModel by viewModels<ChatInfoViewModel>()
+    private val noteToSelfChatViewModel by viewModels<NoteToSelfChatViewModel>()
     private val scheduledMeetingManagementViewModel by viewModels<ScheduledMeetingManagementViewModel>()
     private val waitingRoomManagementViewModel by viewModels<WaitingRoomManagementViewModel>()
 
@@ -169,7 +172,10 @@ class ScheduledMeetingInfoActivity : PasscodeActivity(), SnackbarShower {
             -1L
         )
 
-        viewModel.setChatId(newChatId = chatId, newScheduledMeetingId = schedId)
+        viewModel.setChatId(
+            newChatId = chatId,
+            newScheduledMeetingId = schedId,
+        )
         scheduledMeetingManagementViewModel.setChatId(newChatId = chatId)
 
         setContent { MainComposeView() }
@@ -271,7 +277,7 @@ class ScheduledMeetingInfoActivity : PasscodeActivity(), SnackbarShower {
                     Timber.d("Open Invite participants screen")
                     addContactLauncher.launch(
                         Intent(
-                            this@ScheduledMeetingInfoActivity,
+                            this@ChatInfoActivity,
                             AddContactActivity::class.java
                         )
                             .putExtra(
@@ -325,7 +331,10 @@ class ScheduledMeetingInfoActivity : PasscodeActivity(), SnackbarShower {
         viewModel.onParticipantTap(participant)
 
         bottomSheetDialogFragment =
-            ScheduledMeetingParticipantBottomSheetDialogFragment.newInstance(chatRoomId, participant.handle)
+            ScheduledMeetingParticipantBottomSheetDialogFragment.newInstance(
+                chatRoomId,
+                participant.handle
+            )
         bottomSheetDialogFragment?.show(supportFragmentManager, bottomSheetDialogFragment?.tag)
     }
 
@@ -413,7 +422,7 @@ class ScheduledMeetingInfoActivity : PasscodeActivity(), SnackbarShower {
      * @param chatId Chat id.
      */
     private fun openChatCall(chatId: Long) {
-        val intentOpenCall = Intent(this@ScheduledMeetingInfoActivity, MeetingActivity::class.java)
+        val intentOpenCall = Intent(this@ChatInfoActivity, MeetingActivity::class.java)
         intentOpenCall.action = MEETING_ACTION_IN
         intentOpenCall.putExtra(MEETING_CHAT_ID, chatId)
         intentOpenCall.putExtra(MEETING_AUDIO_ENABLE, true)
@@ -427,7 +436,7 @@ class ScheduledMeetingInfoActivity : PasscodeActivity(), SnackbarShower {
      */
     private fun openSharedFiles() {
         val intent =
-            Intent(this@ScheduledMeetingInfoActivity, NodeAttachmentHistoryActivity::class.java)
+            Intent(this@ChatInfoActivity, NodeAttachmentHistoryActivity::class.java)
         intent.putExtra("chatId", chatRoomId)
         startActivity(intent)
     }
@@ -438,12 +447,12 @@ class ScheduledMeetingInfoActivity : PasscodeActivity(), SnackbarShower {
     private fun onChatNotificationsTap() {
         if (enabledChatNotification) {
             createMuteNotificationsAlertDialogOfAChat(
-                this@ScheduledMeetingInfoActivity,
+                this@ChatInfoActivity,
                 chatRoomId
             )
         } else {
             MegaApplication.getPushNotificationSettingManagement().controlMuteNotificationsOfAChat(
-                this@ScheduledMeetingInfoActivity,
+                this@ChatInfoActivity,
                 Constants.NOTIFICATIONS_ENABLED,
                 chatRoomId
             )
@@ -499,7 +508,7 @@ class ScheduledMeetingInfoActivity : PasscodeActivity(), SnackbarShower {
         MegaApplication.getInstance().openCallService(chatId)
         passcodeFacade.enablePassCode()
 
-        val intent = Intent(this@ScheduledMeetingInfoActivity, MeetingActivity::class.java).apply {
+        val intent = Intent(this@ChatInfoActivity, MeetingActivity::class.java).apply {
             addFlags(Intent.FLAG_ACTIVITY_NEW_TASK)
             action = MEETING_ACTION_IN
             putExtra(MEETING_CHAT_ID, chatId)
@@ -525,6 +534,7 @@ class ScheduledMeetingInfoActivity : PasscodeActivity(), SnackbarShower {
         val isDark = themeMode.isDarkMode()
         val uiState by viewModel.uiState.collectAsStateWithLifecycle()
         val managementState by scheduledMeetingManagementViewModel.state.collectAsStateWithLifecycle()
+        val noteToSelfChatState by noteToSelfChatViewModel.state.collectAsStateWithLifecycle()
 
         val coroutineScope = rememberCoroutineScope()
         val modalSheetState = rememberModalBottomSheetState(
@@ -560,9 +570,10 @@ class ScheduledMeetingInfoActivity : PasscodeActivity(), SnackbarShower {
                     showMeetingShareOptions()
                 }
             ) {
-                ScheduledMeetingInfoView(
+                ChatInfoView(
                     state = uiState,
                     managementState = managementState,
+                    noteToSelfChatState = noteToSelfChatState,
                     onButtonClicked = ::onActionTap,
                     onEditClicked = { onEditTap() },
                     onAddParticipantsClicked = {
@@ -621,7 +632,7 @@ class ScheduledMeetingInfoActivity : PasscodeActivity(), SnackbarShower {
         Analytics.tracker.trackEvent(ScheduledMeetingEditMenuToolbarEvent)
         editSchedMeetLauncher.launch(
             Intent(
-                this@ScheduledMeetingInfoActivity,
+                this@ChatInfoActivity,
                 CreateScheduledMeetingActivity::class.java
             ).putExtra(CHAT_ID, chatRoomId)
         )
@@ -630,37 +641,41 @@ class ScheduledMeetingInfoActivity : PasscodeActivity(), SnackbarShower {
     /**
      * Tap in a button action
      */
-    private fun onActionTap(action: ScheduledMeetingInfoAction) {
+    private fun onActionTap(action: ChatInfoAction) {
         when (action) {
-            ScheduledMeetingInfoAction.MeetingLink -> {
+            ChatInfoAction.MeetingLink -> {
                 if (!scheduledMeetingManagementViewModel.state.value.enabledMeetingLinkOption) {
                     Analytics.tracker.trackEvent(ScheduledMeetingSettingEnableMeetingLinkButtonEvent)
                 }
                 scheduledMeetingManagementViewModel.onMeetingLinkTap()
             }
 
-            ScheduledMeetingInfoAction.ShareMeetingLink,
-            ScheduledMeetingInfoAction.ShareMeetingLinkNonHosts,
+            ChatInfoAction.ShareMeetingLink,
+            ChatInfoAction.ShareMeetingLinkNonHosts,
                 -> {
                 Analytics.tracker.trackEvent(ScheduledMeetingShareMeetingLinkButtonEvent)
                 showGetChatLinkPanel()
             }
 
-            ScheduledMeetingInfoAction.ChatNotifications -> onChatNotificationsTap()
-            ScheduledMeetingInfoAction.AllowNonHostAddParticipants -> {
+            ChatInfoAction.ChatNotifications -> onChatNotificationsTap()
+            ChatInfoAction.AllowNonHostAddParticipants -> {
                 Analytics.tracker.trackEvent(ScheduledMeetingSettingEnableOpenInviteButtonEvent)
                 viewModel.onAllowAddParticipantsTap()
             }
 
-            ScheduledMeetingInfoAction.ShareFiles -> openSharedFiles()
-            ScheduledMeetingInfoAction.ManageChatHistory -> openManageChatHistory()
-            ScheduledMeetingInfoAction.EnableEncryptedKeyRotation -> showConfirmationPrivateChatDialog()
-            ScheduledMeetingInfoAction.EnabledEncryptedKeyRotation -> {}
-            ScheduledMeetingInfoAction.WaitingRoom -> {
+            ChatInfoAction.ShareFiles, ChatInfoAction.Files -> openSharedFiles()
+            ChatInfoAction.ManageChatHistory, ChatInfoAction.ManageMeetingHistory -> openManageChatHistory()
+            ChatInfoAction.EnableEncryptedKeyRotation -> showConfirmationPrivateChatDialog()
+            ChatInfoAction.EnabledEncryptedKeyRotation -> {}
+            ChatInfoAction.WaitingRoom -> {
                 if (!viewModel.uiState.value.enabledWaitingRoomOption) {
                     Analytics.tracker.trackEvent(WaitingRoomEnableButtonEvent)
                 }
                 viewModel.setWaitingRoom()
+            }
+
+            ChatInfoAction.Archive, ChatInfoAction.Unarchive -> {
+                viewModel.archiveChat()
             }
         }
     }

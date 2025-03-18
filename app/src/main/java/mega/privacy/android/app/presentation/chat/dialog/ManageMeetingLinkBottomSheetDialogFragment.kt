@@ -12,9 +12,9 @@ import mega.privacy.android.app.R
 import mega.privacy.android.app.arch.extensions.collectFlow
 import mega.privacy.android.app.databinding.BottomSheetManageMeetingLinkBinding
 import mega.privacy.android.app.modalbottomsheet.BaseBottomSheetDialogFragment
-import mega.privacy.android.app.presentation.meeting.ScheduledMeetingInfoViewModel
+import mega.privacy.android.app.presentation.meeting.ChatInfoViewModel
 import mega.privacy.android.app.presentation.meeting.ScheduledMeetingManagementViewModel
-import mega.privacy.android.app.presentation.meeting.model.ScheduledMeetingInfoUiState
+import mega.privacy.android.app.presentation.meeting.model.ChatInfoUiState
 import mega.privacy.android.app.utils.Constants
 import mega.privacy.android.app.utils.ScheduledMeetingDateUtil
 import mega.privacy.android.domain.entity.chat.ChatScheduledMeeting
@@ -25,7 +25,7 @@ import nz.mega.sdk.MegaChatApiJava
  */
 class ManageMeetingLinkBottomSheetDialogFragment : BaseBottomSheetDialogFragment() {
 
-    private val viewModel by activityViewModels<ScheduledMeetingInfoViewModel>()
+    private val viewModel by activityViewModels<ChatInfoViewModel>()
     private val scheduledMeetingManagementViewModel by activityViewModels<ScheduledMeetingManagementViewModel>()
 
     private lateinit var binding: BottomSheetManageMeetingLinkBinding
@@ -54,7 +54,7 @@ class ManageMeetingLinkBottomSheetDialogFragment : BaseBottomSheetDialogFragment
     }
 
     private fun collectFlows() {
-        collectFlow(viewModel.uiState) { state: ScheduledMeetingInfoUiState ->
+        collectFlow(viewModel.uiState) { state: ChatInfoUiState ->
             if (chatRoomId != state.chatId)
                 chatRoomId = state.chatId
 

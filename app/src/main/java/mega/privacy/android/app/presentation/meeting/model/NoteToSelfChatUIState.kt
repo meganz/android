@@ -21,10 +21,4 @@ data class NoteToSelfChatUIState(
      */
     val noteToSelfChatId
         get() = noteToSelfChatRoom?.chatId
-
-    /**
-     * Check if it is archived
-     */
-    val isArchived
-        get() = noteToSelfChatRoom?.isArchived
 }

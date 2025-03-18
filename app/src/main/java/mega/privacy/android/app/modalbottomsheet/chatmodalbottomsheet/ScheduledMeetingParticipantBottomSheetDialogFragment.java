@@ -36,7 +36,7 @@ import mega.privacy.android.app.components.twemoji.EmojiTextView;
 import mega.privacy.android.app.main.controllers.ChatController;
 import mega.privacy.android.app.modalbottomsheet.BaseBottomSheetDialogFragment;
 import mega.privacy.android.app.myAccount.MyAccountActivity;
-import mega.privacy.android.app.presentation.meeting.ScheduledMeetingInfoViewModel;
+import mega.privacy.android.app.presentation.meeting.ChatInfoViewModel;
 import mega.privacy.android.app.utils.ContactUtil;
 import nz.mega.sdk.MegaApiAndroid;
 import nz.mega.sdk.MegaChatRoom;
@@ -46,7 +46,7 @@ import timber.log.Timber;
 @AndroidEntryPoint
 public class ScheduledMeetingParticipantBottomSheetDialogFragment extends BaseBottomSheetDialogFragment implements View.OnClickListener {
 
-    private ScheduledMeetingInfoViewModel viewModel = null;
+    private ChatInfoViewModel viewModel = null;
 
     private MegaChatRoom selectedChat;
     private long chatId = INVALID_HANDLE;
@@ -80,7 +80,7 @@ public class ScheduledMeetingParticipantBottomSheetDialogFragment extends BaseBo
             participantHandle = savedInstanceState.getLong(CONTACT_HANDLE, INVALID_HANDLE);
         }
 
-        viewModel = new ViewModelProvider(requireActivity()).get(ScheduledMeetingInfoViewModel.class);
+        viewModel = new ViewModelProvider(requireActivity()).get(ChatInfoViewModel.class);
 
         selectedChat = megaChatApi.getChatRoom(chatId);
 

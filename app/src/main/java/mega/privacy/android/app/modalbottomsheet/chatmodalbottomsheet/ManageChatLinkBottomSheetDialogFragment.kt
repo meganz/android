@@ -13,8 +13,8 @@ import mega.privacy.android.app.R
 import mega.privacy.android.app.arch.extensions.collectFlow
 import mega.privacy.android.app.databinding.BottomSheetManageChatLinkBinding
 import mega.privacy.android.app.modalbottomsheet.BaseBottomSheetDialogFragment
-import mega.privacy.android.app.presentation.meeting.ScheduledMeetingInfoViewModel
-import mega.privacy.android.app.presentation.meeting.model.ScheduledMeetingInfoUiState
+import mega.privacy.android.app.presentation.meeting.ChatInfoViewModel
+import mega.privacy.android.app.presentation.meeting.model.ChatInfoUiState
 import mega.privacy.android.app.utils.ChatUtil.showConfirmationRemoveChatLink
 import mega.privacy.android.app.utils.Constants
 import mega.privacy.android.app.utils.Constants.COPIED_TEXT_LABEL
@@ -29,7 +29,7 @@ class ManageChatLinkBottomSheetDialogFragment : BaseBottomSheetDialogFragment() 
         private const val CHAT_TITLE = "CHAT_TITLE"
     }
 
-    private val viewModel by activityViewModels<ScheduledMeetingInfoViewModel>()
+    private val viewModel by activityViewModels<ChatInfoViewModel>()
 
     private lateinit var binding: BottomSheetManageChatLinkBinding
 
@@ -68,7 +68,7 @@ class ManageChatLinkBottomSheetDialogFragment : BaseBottomSheetDialogFragment() 
     }
 
     private fun collectFlows() {
-        collectFlow(viewModel.uiState) { state: ScheduledMeetingInfoUiState ->
+        collectFlow(viewModel.uiState) { state: ChatInfoUiState ->
             myFullName = state.myFullName
         }
     }

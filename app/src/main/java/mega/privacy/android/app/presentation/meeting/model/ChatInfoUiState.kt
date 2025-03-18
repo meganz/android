@@ -3,14 +3,13 @@ package mega.privacy.android.app.presentation.meeting.model
 import androidx.recyclerview.widget.DiffUtil
 import de.palm.composestateevents.StateEventWithContent
 import de.palm.composestateevents.consumed
-import mega.privacy.android.app.presentation.meeting.ScheduledMeetingInfoViewModel
 import mega.privacy.android.domain.entity.ChatRoomPermission
 import mega.privacy.android.domain.entity.chat.ChatParticipant
 import mega.privacy.android.domain.entity.chat.ChatScheduledMeeting
 import mega.privacy.android.domain.entity.contacts.ContactItem
 
 /**
- * Data class defining the state of [ScheduledMeetingInfoViewModel]
+ * Data class defining the state of [ChatInfoViewModel]
  *
  * @property chatId                                     Chat id.
  * @property scheduledMeeting                           [ChatScheduledMeeting].
@@ -45,8 +44,9 @@ import mega.privacy.android.domain.entity.contacts.ContactItem
  * @property showForceUpdateDialog                      True if the force update dialog should be shown, false if not.
  * @property myPermission                               My permission in the chat room.
  * @property shouldShowParticipantsLimitWarning         True if the participants limit warning should be shown, false if not.
+ * @property noteToSelfChatId                           Note to self chat id.
  */
-data class ScheduledMeetingInfoUiState(
+data class ChatInfoUiState(
     val chatId: Long = -1L,
     val scheduledMeeting: ChatScheduledMeeting? = null,
     val finish: Boolean = false,
@@ -68,7 +68,7 @@ data class ScheduledMeetingInfoUiState(
     val leaveGroupDialog: Boolean = false,
     val addParticipantsNoContactsDialog: Boolean = false,
     val addParticipantsNoContactsLeftToAddDialog: Boolean = false,
-    val buttons: List<ScheduledMeetingInfoAction> = ScheduledMeetingInfoAction.entries,
+    val buttons: List<ChatInfoAction> = ChatInfoAction.entries,
     val participantItemList: List<ChatParticipant> = emptyList(),
     val firstParticipant: ChatParticipant? = null,
     val secondParticipant: ChatParticipant? = null,
@@ -80,6 +80,8 @@ data class ScheduledMeetingInfoUiState(
     val showForceUpdateDialog: Boolean = false,
     val myPermission: ChatRoomPermission = ChatRoomPermission.Unknown,
     val shouldShowParticipantsLimitWarning: Boolean = false,
+    val isNoteToSelf: Boolean = false,
+    val isArchived: Boolean = false,
 ) {
 
     /**

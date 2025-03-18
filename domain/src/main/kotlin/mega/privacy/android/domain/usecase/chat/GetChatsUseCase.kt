@@ -110,8 +110,7 @@ class GetChatsUseCase @Inject constructor(
         flow {
             val mutex = Mutex()
             val chats = mutableMapOf<Long, ChatRoomItem>()
-
-            emit(chats.addChatRooms(mutex, chatRoomType))
+            emit(sortChats(chats.addChatRooms(mutex, chatRoomType)))
 
             emitAll(
                 flowOf(
@@ -134,10 +133,19 @@ class GetChatsUseCase @Inject constructor(
                         meetingTimeMapper
                     ),
                 ).flattenMerge().mapLatest {
-                    it.sorted(chatRoomType).addHeaders(chatRoomType, headerTimeMapper)
+                    sortChats(it.sorted(chatRoomType).addHeaders(chatRoomType, headerTimeMapper))
                 }
             )
         }
+
+
+    /**
+     * Sort chats by note to self chat
+     *
+     * @param items List of [ChatRoomItem]
+     */
+    private fun sortChats(items: List<ChatRoomItem>): List<ChatRoomItem> =
+        items.sortedByDescending { it is ChatRoomItem.NoteToSelfChatRoomItem }
 
     private suspend fun MutableMap<Long, ChatRoomItem>.addChatRooms(
         mutex: Mutex,

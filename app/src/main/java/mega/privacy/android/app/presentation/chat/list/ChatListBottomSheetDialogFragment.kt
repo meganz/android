@@ -29,7 +29,7 @@ import mega.privacy.android.app.presentation.data.SnackBarItem
 import mega.privacy.android.app.presentation.extensions.isDarkMode
 import mega.privacy.android.app.presentation.meeting.CreateScheduledMeetingActivity
 import mega.privacy.android.app.presentation.meeting.RecurringMeetingInfoActivity
-import mega.privacy.android.app.presentation.meeting.ScheduledMeetingInfoActivity
+import mega.privacy.android.app.presentation.meeting.ChatInfoActivity
 import mega.privacy.android.app.presentation.meeting.ScheduledMeetingManagementViewModel
 import mega.privacy.android.app.utils.ChatUtil
 import mega.privacy.android.app.utils.Constants
@@ -168,6 +168,15 @@ class ChatListBottomSheetDialogFragment : BottomSheetDialogFragment() {
         val item = viewModel.getChatItem(chatId) ?: return
         val intent =
             when {
+                item is ChatRoomItem.NoteToSelfChatRoomItem -> {
+                    Intent(
+                        requireContext(),
+                        ChatInfoActivity::class.java
+                    ).apply {
+                        putExtra(Constants.CHAT_ID, chatId)
+                    }
+                }
+
                 item is ChatRoomItem.IndividualChatRoomItem -> {
                     Intent(context, ContactInfoActivity::class.java).apply {
                         putExtra(Constants.NAME, item.peerEmail)
@@ -178,7 +187,7 @@ class ChatListBottomSheetDialogFragment : BottomSheetDialogFragment() {
                     editSchedMeetLauncher.launch(
                         Intent(
                             requireContext(),
-                            ScheduledMeetingInfoActivity::class.java
+                            ChatInfoActivity::class.java
                         ).apply {
                             putExtra(Constants.CHAT_ID, chatId)
                             putExtra(Constants.SCHEDULED_MEETING_ID, item.schedId)

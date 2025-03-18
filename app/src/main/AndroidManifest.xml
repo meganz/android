@@ -689,7 +689,7 @@
             android:launchMode="singleTop"
             android:windowSoftInputMode="adjustNothing" />
         <activity
-            android:name=".presentation.meeting.ScheduledMeetingInfoActivity"
+            android:name=".presentation.meeting.ChatInfoActivity"
             android:launchMode="singleTop"
             android:windowSoftInputMode="adjustNothing" />
         <activity

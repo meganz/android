@@ -31,8 +31,6 @@ import com.google.firebase.crashlytics.ktx.crashlytics
 import com.google.firebase.ktx.Firebase
 import dagger.hilt.android.AndroidEntryPoint
 import de.palm.composestateevents.EventEffect
-import kotlinx.coroutines.flow.distinctUntilChanged
-import kotlinx.coroutines.flow.map
 import mega.privacy.android.analytics.Analytics
 import mega.privacy.android.app.BaseActivity
 import mega.privacy.android.app.MegaApplication
@@ -323,13 +321,6 @@ class ChatTabsFragment : Fragment() {
                 ChatStatusDialogFragment().show(childFragmentManager, ChatStatusDialogFragment.TAG)
             }
             setupMenu()
-        }
-
-        viewLifecycleOwner.collectFlow(noteToSelfChatViewModel.state.map { it.noteToSelfChatId }
-            .distinctUntilChanged()) {
-            it?.let {
-                viewModel.setNoteToSelfChatId(id = it)
-            }
         }
     }
 
