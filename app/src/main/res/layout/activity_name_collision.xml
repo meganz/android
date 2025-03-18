@@ -4,8 +4,8 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:orientation="vertical"
     android:background="?android:colorBackground"
+    android:orientation="vertical"
     tools:context=".namecollision.NameCollisionActivity">
 
     <com.google.android.material.appbar.MaterialToolbar
@@ -13,6 +13,18 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:minHeight="?attr/actionBarSize" />
+
+    <FrameLayout
+        android:id="@+id/progress_bar_container"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        tools:visibility="gone">
+
+        <ProgressBar
+            android:layout_width="match_parent"
+            android:layout_height="56dp"
+            android:layout_gravity="center" />
+    </FrameLayout>
 
     <ScrollView
         android:id="@+id/scroll_view"

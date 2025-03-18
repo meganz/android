@@ -7,6 +7,7 @@ import android.content.Intent
 import android.os.Build
 import android.os.Bundle
 import android.view.MenuItem
+import android.view.View
 import androidx.activity.enableEdgeToEdge
 import androidx.activity.viewModels
 import androidx.constraintlayout.widget.ConstraintSet
@@ -134,7 +135,7 @@ class NameCollisionActivity : PasscodeActivity() {
         addStartUploadTransferView()
         setSupportActionBar(binding.toolbar)
         supportActionBar?.apply {
-            title = getString(R.string.title_duplicated_items)
+            title = ""
             setHomeButtonEnabled(true)
             setDisplayHomeAsUpEnabled(true)
         }
@@ -229,8 +230,13 @@ class NameCollisionActivity : PasscodeActivity() {
             finish()
             return
         }
+
+        // Don't populate UI if copying to the original folder as it will automatically replicate the file
         if (viewModel.isCopyToOrigin)
             return
+
+        supportActionBar?.title = getString(R.string.title_duplicated_items)
+        binding.progressBarContainer.visibility = View.GONE
 
         val collision = collisionResult.nameCollision
         val isFile = collision.isFile
