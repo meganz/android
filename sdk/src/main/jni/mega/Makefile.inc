@@ -313,8 +313,8 @@ CPP_SOURCES += \
     sdk/src/fuse/unsupported/service_context.cpp
 
 OBJECTS=$(CPP_SOURCES:.cpp=.o) $(C_SOURCES:.c=.o)
-C_WRAPPER_SOURCES = sdk/src/megaapi.cpp sdk/src/megaapi_impl.cpp
-C_WRAPPER_OBJECTS = sdk/src/megaapi.o sdk/src/megaapi_impl.o
+C_WRAPPER_SOURCES = sdk/src/megaapi.cpp sdk/src/megaapi_impl.cpp sdk/src/megaapi_impl_sync.cpp
+C_WRAPPER_OBJECTS = sdk/src/megaapi.o sdk/src/megaapi_impl.o sdk/src/megaapi_impl_sync.o
 
 PYTHON_WRAPS=python_wrap.cxx
 PYTHON_HEADERS=python_wrap.h 
