@@ -234,6 +234,7 @@ fun ExpandedSearchAppBar(
         val focusRequester = remember { FocusRequester() }
         val iconColor = if (MaterialTheme.colors.isLight) Color.Black else Color.White
         val keyboardController = LocalSoftwareKeyboardController.current
+        var isClosingSearch by remember { mutableStateOf(false) }
         TextField(
             modifier = Modifier
                 .fillMaxWidth()
@@ -242,8 +243,12 @@ fun ExpandedSearchAppBar(
                 .testTag(SEARCH_TOOLBAR_TEXT_VIEW_TEST_TAG),
             value = textFieldValue,
             onValueChange = {
-                textFieldValue = it
-                onSearchTextChange(it.text)
+                if (isClosingSearch) {
+                    isClosingSearch = false
+                } else {
+                    textFieldValue = it
+                    onSearchTextChange(it.text)
+                }
             },
             placeholder = {
                 Text(
@@ -257,7 +262,10 @@ fun ExpandedSearchAppBar(
             leadingIcon = {
                 IconButton(
                     modifier = Modifier.testTag(SEARCH_TOOLBAR_BACK_BUTTON_TEST_TAG),
-                    onClick = onCloseClicked
+                    onClick = {
+                        isClosingSearch = true
+                        onCloseClicked()
+                    }
                 ) {
                     Icon(
                         imageVector = Icons.Filled.ArrowBack,
