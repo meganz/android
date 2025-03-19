@@ -879,8 +879,14 @@ internal class FileFacade @Inject constructor(
             parentDocumentFile?.isDirectory != true -> null
             asFolder -> parentDocumentFile.createDirectory(childName)
             else -> parentDocumentFile.createFile(getMimeTypeFromFileName(childName), childName)
-        }?.let {
-            UriPath(it.uri.toString())
+        }?.let { documentFile ->
+            documentFile.let {
+                if (documentFile.name != childName) {
+                    documentFile.renameTo(childName)
+                }
+
+                UriPath(documentFile.uri.toString())
+            }
         }
     }
 
