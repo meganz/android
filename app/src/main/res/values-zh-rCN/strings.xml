@@ -1129,8 +1129,6 @@
     <string name="context_contact_already_invited">%s已被邀请。请查看您的待处理请求。</string>
     <!-- Button to resend the create account email to a new email address in case the previous email address was misspelled -->
     <string name="confirm_email_misspelled_resend">重新发送</string>
-    <!-- Text shown after the confirmation email has been sent to the new email address -->
-    <string name="confirm_email_misspelled_email_sent">邮件已发送</string>
     <!-- text_copyright_alert_title -->
     <string name="copyright_alert_title">致所有用户的版权警告</string>
     <!-- text_copyright_alert_first_paragraph -->
@@ -2392,8 +2390,6 @@
     <string name="verify_email_and_follow_steps">请按照[A]验证电子邮件[/A]中的步骤解锁您的帐户。</string>
     <!-- Question which takes the user to a help screen -->
     <string name="why_am_i_seeing_this">为什么我会看到这个？</string>
-    <!-- Label of a button which action is resend an email -->
-    <string name="resend_email_label">重新发送电子邮件</string>
     <!-- Error shown when the user tries to resend the email to unblock their account before the time needed to permit send it again -->
     <string name="resend_email_error">电子邮件已发送。请等待几分钟后重试。</string>
     <!-- Title of a helping view about locked accounts -->
@@ -4594,10 +4590,6 @@
     <string name="meetings_call_recording_stopped_snackbar_message">%1$s已停止录制</string>
     <!-- Name of the Gallery item in the attachment panel, in chat, for attaching files from Gallery -->
     <string name="chat_attach_panel_gallery">图库</string>
-    <!-- Preference screen item title for Ads Cookie -->
-    <string name="settings_cookies_settings_ads_title">广告Cookies</string>
-    <!-- Preference screen item summary for Ads Cookie-->
-    <string name="settings_cookies_settings_ads_summary">由我们认可的广告合作伙伴用于收集有关您的浏览活动的数据，并自定义您在我们的服务和其它网站上看到的广告。不接受这些cookies意味着您仍然会看到广告，但它们不会是个性化的。</string>
     <!-- Body for Cookie dialog, visible for users, who will see the advertisements, as we want users to accept Advertisement cookies as well. Please, keep the placeholders to format the string. -->
     <string name="dialog_ads_cookie_alert_message">我们使用cookies和类似技术来帮助我们改善服务并用于广告目的。继续使用MEGA即表示您同意我们更新后的[A]Cookie政策[/A]条款。</string>
     <!-- Description of feature, which will be available for user, if they buy plan. This means the user won't see Advertisements if they buy a Pro plan. -->

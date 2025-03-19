@@ -693,7 +693,7 @@
     <!-- Title of Favourites video playlist in the video section -->
     <string name="video_section_title_favourite_playlist">Favoritos</string>
     <!-- Title of the synced folder list empty state -->
-    <string name="device_center_sync_backup_list_empty_state_title">No se ha configurado ninguna conexión</string>
+    <string name="device_center_sync_backup_list_empty_state_title">No tienes nada configurado</string>
     <!-- Message of the synced folder list empty state -->
     <string name="device_center_sync_backup_list_empty_state_message">Sincroniza o haz un backup de una carpeta en tu dispositivo con una carpeta de MEGA</string>
     <!-- subtitle of meeting title in schedule meeting for title disclaimer -->
@@ -911,7 +911,7 @@
     <!--SD Card text shown as title in FileStorage screen -->
     <string name="general_sd_card">Tarjeta SD</string>
     <!--The title of the Login page-->
-    <string name="login_page_title">Iniciar sesión en tu cuenta de MEGA</string>
+    <string name="login_page_title">Inicia sesión en tu cuenta de MEGA</string>
     <!--Message to be shown to the user when they entered an invalid email-->
     <string name="login_invalid_email_error_message">Introduce una dirección de correo electrónico válida</string>
     <!--Message to be shown to the user when they entered an invalid format password-->
@@ -931,7 +931,7 @@
     <!-- password label -->
     <string name="password_text">Contraseña</string>
     <!-- Login button -->
-    <string name="login_text">Iniciar&#160;sesión</string>
+    <string name="login_text">Inicia sesión con tu cuenta de MEGA</string>
     <!--The text where user forgot their password and will navigate to reset it-->
     <string name="login_page_forgot_password_text">¿Has olvidado tu contraseña?</string>
     <!-- Sync state up to date -->
@@ -971,7 +971,7 @@
     <!-- Warning shown after trying to cancel a download, but the request failed -->
     <string name="transfers_error_cancelling_download">Algo ha salido mal. La descarga no se ha cancelado.</string>
     <!-- Body for the subscription details section, which is shown to the Indian user to provide details about subscription. This string is shown if user selects yearly subscription and the amount is more than Rs.15,000. Please keep these placeholders [A], [/A], [B], [/B], [C], [/C]. They will be used to format the string. -->
-    <string name="account_upgrade_account_subscription_details_body_yearly_with_price_for_indian">You will be charged %1$s immediately but your subscription will not automatically renew after 12 months due to government regulations. It will be your responsibility to renew your subscription after it has expired. You can manage or cancel your subscription anytime via Subscriptions in [A]Google&#160;Play[/A]. By upgrading your account, you agree to MEGA’s [B]Terms of Service[/B] and [C]Privacy and Data Policy[/C].</string>
+    <string name="account_upgrade_account_subscription_details_body_yearly_with_price_for_indian">Se te cobrarán %1$s de inmediato, pero tu suscripción no se renovará automáticamente después de 12 meses debido a las regulaciones gubernamentales. Será tu responsabilidad renovar la suscripción una vez que haya caducado. Puedes gestionar o cancelar tu suscripción en cualquier momento a través de Suscripciones en [A]Google&#160;Play[/A]. Al ampliar tu cuenta, aceptas los [B]Términos de servicio[/B] y la [C]Política de privacidad y de datos[/C] de MEGA.</string>
     <!-- The name of the Device or Folder Status which signifies that it is currently uploading -->
     <string name="device_center_list_view_item_status_uploading">Subiendo&#8230;</string>
     <!-- The name of the Device or Folder Status which signifies that it is currently uploading with a percentage completion -->
@@ -980,4 +980,58 @@
     <string name="device_center_list_view_item_status_inactive">Inactivo</string>
     <!-- The name of the Device or Folder Status which signifies that some action is needed -->
     <string name="device_center_list_view_item_status_attention_needed">Atención necesaria</string>
+    <!--General Unable to log in-->
+    <string name="general_unable_to_login">No se puede iniciar sesión</string>
+    <!--General check inbox-->
+    <string name="general_check_inbox">Comprueba tu correo</string>
+    <!--Message to be shown to user when account is temporarily suspended and requires email verification -->
+    <string name="login_account_suspension_email_verification_message">Tu cuenta ha sido bloqueada para protegerte tras detectar un inicio de sesión malicioso, por lo que requerimos que restablezcas tu contraseña. Revisa el correo electrónico que enviamos a tu dirección de correo para obtener instrucciones sobre cómo desbloquear tu cuenta y consejos sobre cómo evitar otro bloqueo.</string>
+    <!--General Resend email-->
+    <string name="general_resend_email">Reenviar correo</string>
+    <!-- Message displayed when email is successfully resent -->
+    <string name="general_email_resend_success_message">Correo enviado</string>
+    <!--General Request Network Failed text-->
+    <string name="general_request_failed_message">Algo ha ido mal</string>
+    <!-- Message error shown when trying to log in on an account that has been suspended due to breaches of copyright -->
+    <string name="dialog_account_suspended_ToS_copyright_message">Tu cuenta de MEGA ha sido suspendida debido a repetidas notificaciones de presuntas infracciones de derechos de autor. Como consecuencia, no podrás acceder a tu cuenta ni a tus datos.\nRevisa el correo electrónico que enviamos a tu dirección de correo para obtener más información sobre cómo presentar una contranotificación.</string>
+    <!-- Message error shown when trying to log in on an account that has been terminated due to breaches of all reasons of breaching Terms of Service, except copyright. -->
+    <string name="dialog_account_suspended_ToS_non_copyright_message">Hemos cerrado tu cuenta debido a un incumplimiento de los Términos de servicio de MEGA.\nNo podrás recuperar el acceso a tus datos ni estás autorizado a registrar una nueva cuenta de MEGA.</string>
+    <!-- Error message appears to sub-users of a business account when they try to login and they are disabled. -->
+    <string name="error_business_disabled">Tu cuenta ha sido desactivada por tu administrador. Ponte en contacto con el administrador de tu cuenta Business para más información.</string>
+    <!-- An error message which appears to sub-users of a business account when they try to login and they are deleted. -->
+    <string name="error_business_removed">Tu cuenta ha sido eliminada por tu administrador. Ponte en contacto con el administrador de tu cuenta Business para más información.</string>
+    <!--The title of the Email Confirmation page-->
+    <string name="email_confirmation_title">Confirmación por correo</string>
+    <!--The Content of the Email Confirmation page-->
+    <string name="email_confirmation_content">Se te ha enviado un correo a [P]%s[/P] con un enlace. Toca en el enlace para verificar tu dirección de correo y así activar tu cuenta. \n\nSi no recibes ese correo electrónico, revisa tu carpeta de spam o prueba de nuevo. Para cualquier otro problema, contacta con [A]%s[/A]</string>
+    <!-- Button to resend the create account email to a new email address in case the previous email address was misspelled -->
+    <string name="general_resend_button">Reenviar</string>
+    <!-- General change email address -->
+    <string name="general_change_email_address">Cambiar correo electrónico</string>
+    <!-- Title for the cancel registration dialog -->
+    <string name="email_confirmation_dialog_cancel_registration_title">¿Cancelar la creación de la cuenta?</string>
+    <!-- Content for the cancel registration dialog -->
+    <string name="email_confirmation_dialog_cancel_registration_content">Esto cancelará el proceso de registro.</string>
+    <!-- Text for the "Yes, cancel" button in the cancel registration dialog -->
+    <string name="email_confirmation_dialog_cancel_registration_cancel_button">Sí, cancelar</string>
+    <!-- Text for the "Don’t cancel" button in the cancel registration dialog -->
+    <string name="email_confirmation_dialog_cancel_registration_dismiss_button">No cancelar</string>
+    <!-- First message header paragraph in note to self chat -->
+    <string name="chat_note_to_self_chat_first_message_header_paragraph">Un espacio privado para fotografías, información importante o grandes ideas. Siempre sincronizado y protegido con cifrado de conocimiento cero.</string>
+    <!-- Title of the notification displayed when Syncs are paused due to low battery conditions -->
+    <string name="general_sync_notification_low_battery_title">Syncing paused due to low battery</string>
+    <!-- Text of the notification displayed when Syncs are paused due to low battery conditions -->
+    <string name="general_sync_notification_low_battery_text">Connect to power source to resume</string>
+    <!-- Title of the notification displayed when Syncs are paused due to lost Wi-Fi conditions -->
+    <string name="general_sync_notification_lost_wifi_title">Syncing paused due to lost connection</string>
+    <!-- Text of the notification displayed when Syncs are paused due to lost Wi-Fi conditions -->
+    <string name="general_sync_notification_lost_wifi_text">Reconnect to Wi-Fi to resume</string>
+    <!-- Title of the notification displayed when Syncs are stopped due to some sync error -->
+    <string name="general_sync_notification_generic_error_title">Syncing has stopped</string>
+    <!-- Text of the notification displayed when Syncs are stopped due to some sync error -->
+    <string name="general_sync_notification_generic_error_text">Go to the Help Centre to understand why</string>
+    <!-- Title of the notification displayed when a Sync has stalled issues -->
+    <string name="general_sync_notification_stalled_issues_title">Sync issues detected</string>
+    <!-- Text of the notification displayed when a Sync has stalled issues -->
+    <string name="general_sync_notification_stalled_issues_text">View and resolve issues</string>
 </resources>

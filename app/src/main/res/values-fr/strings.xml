@@ -1179,8 +1179,6 @@
     <string name="context_contact_already_invited">%s a déjà été invité. Consultez les demandes en attente.</string>
     <!-- Button to resend the create account email to a new email address in case the previous email address was misspelled -->
     <string name="confirm_email_misspelled_resend">Renvoyer</string>
-    <!-- Text shown after the confirmation email has been sent to the new email address -->
-    <string name="confirm_email_misspelled_email_sent">Le courriel a été envoyé</string>
     <!-- text_copyright_alert_title -->
     <string name="copyright_alert_title">Avertissement sur le droit d’auteur à tous les utilisateurs</string>
     <!-- text_copyright_alert_first_paragraph -->
@@ -2514,8 +2512,6 @@
     <string name="verify_email_and_follow_steps">Veuillez suivre les étapes du [A]courriel de confirmation[/A] afin de déverrouiller votre compte.</string>
     <!-- Question which takes the user to a help screen -->
     <string name="why_am_i_seeing_this">Pourquoi vois-je ceci ?</string>
-    <!-- Label of a button which action is resend an email -->
-    <string name="resend_email_label">Renvoyer le courriel</string>
     <!-- Error shown when the user tries to resend the email to unblock their account before the time needed to permit send it again -->
     <string name="resend_email_error">Le courriel a déjà été envoyé. Veuillez patienter quelques minutes avant de réessayer.</string>
     <!-- Title of a helping view about locked accounts -->
@@ -5034,10 +5030,6 @@
     <string name="meetings_call_recording_stopped_snackbar_message">%1$s a arrêté l’enregistrement</string>
     <!-- Name of the Gallery item in the attachment panel, in chat, for attaching files from Gallery -->
     <string name="chat_attach_panel_gallery">Galerie</string>
-    <!-- Preference screen item title for Ads Cookie -->
-    <string name="settings_cookies_settings_ads_title">Témoins publicitaires</string>
-    <!-- Preference screen item summary for Ads Cookie-->
-    <string name="settings_cookies_settings_ads_summary">Utilisés par nos partenaires publicitaires agréés pour collecter des données sur vos activités de navigation et personnaliser les publicités que vous voyez sur nos services et sur d’autres sites web. Ne pas accepter ces témoins implique que vous continuerez à voir des publicités, mais elles ne seront pas personnalisées.</string>
     <!-- Body for Cookie dialog, visible for users, who will see the advertisements, as we want users to accept Advertisement cookies as well. Please, keep the placeholders to format the string. -->
     <string name="dialog_ads_cookie_alert_message">Nous utilisons des témoins et des technologies semblables pour nous aider à améliorer nos services, ainsi qu’à des fins publicitaires. En continuant à utiliser MEGA, vous acceptez les conditions de notre [A]Politique d’utilisation des Témoins[/A] mise à jour.</string>
     <!-- Description of feature, which will be available for user, if they buy plan. This means the user won't see Advertisements if they buy a Pro plan. -->

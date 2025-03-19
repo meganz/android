@@ -671,7 +671,7 @@
     <!-- Title of Favourites video playlist in the video section -->
     <string name="video_section_title_favourite_playlist">Ưa thích</string>
     <!-- Title of the synced folder list empty state -->
-    <string name="device_center_sync_backup_list_empty_state_title">Không có kết&#160;nối nào được thiết&#160;lập</string>
+    <string name="device_center_sync_backup_list_empty_state_title">No devices are set up</string>
     <!-- Message of the synced folder list empty state -->
     <string name="device_center_sync_backup_list_empty_state_message">Đồng&#160;bộ hoặc sao lưu một thư&#160;mục trong thiết&#160;bị của bạn với một thư&#160;mục trên MEGA</string>
     <!-- subtitle of meeting title in schedule meeting for title disclaimer -->
@@ -898,7 +898,7 @@
     <!-- password label -->
     <string name="password_text">Mật khẩu</string>
     <!-- Login button -->
-    <string name="login_text">Đăng&#160;nhập</string>
+    <string name="login_text">Log in with your MEGA account</string>
     <!--The text where user forgot their password and will navigate to reset it-->
     <string name="login_page_forgot_password_text">Quên mất mật khẩu?</string>
     <!-- Sync state up to date -->
@@ -945,4 +945,58 @@
     <string name="device_center_list_view_item_status_inactive">Không hoạt động</string>
     <!-- The name of the Device or Folder Status which signifies that some action is needed -->
     <string name="device_center_list_view_item_status_attention_needed">Attention needed</string>
+    <!--General Unable to log in-->
+    <string name="general_unable_to_login">Không thể đăng&#160;nhập</string>
+    <!--General check inbox-->
+    <string name="general_check_inbox">Xin kiểm tra hộp thư email</string>
+    <!--Message to be shown to user when account is temporarily suspended and requires email verification -->
+    <string name="login_account_suspension_email_verification_message">Tài&#160;khoản của bạn đã bị khóa để bảo&#160;vệ bạn vì có phát&#160;hiện phiên đăng&#160;nhập đáng nghi&#160;ngờ, vì vậy chúng&#160;tôi yêu&#160;cầu bạn đặt lại mật&#160;khẩu của mình. Kiểm&#160;tra hộp thư email của bạn để xem hướng&#160;dẫn mở khóa tài&#160;khoản và mẹo về cách ngăn&#160;chặn điều này lặp&#160;lại.</string>
+    <!--General Resend email-->
+    <string name="general_resend_email">Gửi lại email</string>
+    <!-- Message displayed when email is successfully resent -->
+    <string name="general_email_resend_success_message">Email đã được gửi</string>
+    <!--General Request Network Failed text-->
+    <string name="general_request_failed_message">Có vấn đề xảy ra</string>
+    <!-- Message error shown when trying to log in on an account that has been suspended due to breaches of copyright -->
+    <string name="dialog_account_suspended_ToS_copyright_message">Tài&#160;khoản MEGA của quý&#160;vị đã bị đình&#160;chỉ do đã nhiều lần bị cáo&#160;buộc vi&#160;phạm bản&#160;quyền. Điều này có nghĩa là quý&#160;vị không được phép truy&#160;cập tài&#160;khoản của mình hoặc bất cứ dữ&#160;liệu bên trong.\nKiểm&#160;tra hộp thư email của quý&#160;vị để biết thêm thông&#160;tin và về cách gửi đơn phản&#160;đối.</string>
+    <!-- Message error shown when trying to log in on an account that has been terminated due to breaches of all reasons of breaching Terms of Service, except copyright. -->
+    <string name="dialog_account_suspended_ToS_non_copyright_message">Tài&#160;khoản của bạn đã bị chấm&#160;dứt do vi&#160;phạm Điều&#160;Khoản Dịch&#160;Vụ của MEGA. \nBạn sẽ không thể lấy lại quyền truy&#160;cập vào dữ&#160;liệu đã được lưu&#160;trữ của mình hoặc được phép đăng&#160;ký tài&#160;khoản MEGA mới.</string>
+    <!-- Error message appears to sub-users of a business account when they try to login and they are disabled. -->
+    <string name="error_business_disabled">Tài khoản nhân viên của bạn đã bị đình chỉ bởi ban quản trị. Xin liên hệ với ban tổng quản lý tài khoản doanh nghiệp của bạn để tìm hiểu lý do.</string>
+    <!-- An error message which appears to sub-users of a business account when they try to login and they are deleted. -->
+    <string name="error_business_removed">Tài khoản này đã bị xóa bởi ban quản lý. Xin liên hệ trực tiếp với người quản lý tài khoản trong công ty để biết thêm chi tiết.</string>
+    <!--The title of the Email Confirmation page-->
+    <string name="email_confirmation_title">Xác nhận email</string>
+    <!--The Content of the Email Confirmation page-->
+    <string name="email_confirmation_content">Chúng&#160;tôi đã gửi một email đến [P]%s[/P] với đường liên&#160;kết. Nhấn vào đường liên&#160;kết để xác&#160;thực địa&#160;chỉ email của bạn và để kích&#160;hoạt tài&#160;khoản. \n\nNếu bạn không nhận được email, hãy kiểm&#160;tra thư&#160;mục thư rác của bạn hoặc thử lại. Bất kỳ vấn&#160;đề nào khác, xin liên&#160;hệ [A]%s[/A]</string>
+    <!-- Button to resend the create account email to a new email address in case the previous email address was misspelled -->
+    <string name="general_resend_button">Gửi lại</string>
+    <!-- General change email address -->
+    <string name="general_change_email_address">Đổi email</string>
+    <!-- Title for the cancel registration dialog -->
+    <string name="email_confirmation_dialog_cancel_registration_title">Hủy việc tạo tài&#160;khoản?</string>
+    <!-- Content for the cancel registration dialog -->
+    <string name="email_confirmation_dialog_cancel_registration_content">Việc này sẽ hủy quá&#160;trình đăng&#160;ký.</string>
+    <!-- Text for the "Yes, cancel" button in the cancel registration dialog -->
+    <string name="email_confirmation_dialog_cancel_registration_cancel_button">Đúng, hủy</string>
+    <!-- Text for the "Don’t cancel" button in the cancel registration dialog -->
+    <string name="email_confirmation_dialog_cancel_registration_dismiss_button">Đừng hủy</string>
+    <!-- First message header paragraph in note to self chat -->
+    <string name="chat_note_to_self_chat_first_message_header_paragraph">A private space for pictures, important information, or big ideas. Always synced, and protected with zero-knowledge encryption.</string>
+    <!-- Title of the notification displayed when Syncs are paused due to low battery conditions -->
+    <string name="general_sync_notification_low_battery_title">Syncing paused due to low battery</string>
+    <!-- Text of the notification displayed when Syncs are paused due to low battery conditions -->
+    <string name="general_sync_notification_low_battery_text">Connect to power source to resume</string>
+    <!-- Title of the notification displayed when Syncs are paused due to lost Wi-Fi conditions -->
+    <string name="general_sync_notification_lost_wifi_title">Syncing paused due to lost connection</string>
+    <!-- Text of the notification displayed when Syncs are paused due to lost Wi-Fi conditions -->
+    <string name="general_sync_notification_lost_wifi_text">Reconnect to Wi-Fi to resume</string>
+    <!-- Title of the notification displayed when Syncs are stopped due to some sync error -->
+    <string name="general_sync_notification_generic_error_title">Syncing has stopped</string>
+    <!-- Text of the notification displayed when Syncs are stopped due to some sync error -->
+    <string name="general_sync_notification_generic_error_text">Go to the Help Centre to understand why</string>
+    <!-- Title of the notification displayed when a Sync has stalled issues -->
+    <string name="general_sync_notification_stalled_issues_title">Sync issues detected</string>
+    <!-- Text of the notification displayed when a Sync has stalled issues -->
+    <string name="general_sync_notification_stalled_issues_text">View and resolve issues</string>
 </resources>

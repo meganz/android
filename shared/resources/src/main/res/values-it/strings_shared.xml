@@ -693,7 +693,7 @@
     <!-- Title of Favourites video playlist in the video section -->
     <string name="video_section_title_favourite_playlist">Preferiti</string>
     <!-- Title of the synced folder list empty state -->
-    <string name="device_center_sync_backup_list_empty_state_title">Non è stata impostata alcuna connessione</string>
+    <string name="device_center_sync_backup_list_empty_state_title">No devices are set up</string>
     <!-- Message of the synced folder list empty state -->
     <string name="device_center_sync_backup_list_empty_state_message">Effettua la sincronizzazione o il backup di una cartella sul tuo dispositivo con una cartella su MEGA</string>
     <!-- subtitle of meeting title in schedule meeting for title disclaimer -->
@@ -930,7 +930,7 @@
     <!-- password label -->
     <string name="password_text">Password</string>
     <!-- Login button -->
-    <string name="login_text">Entra</string>
+    <string name="login_text">Log in with your MEGA account</string>
     <!--The text where user forgot their password and will navigate to reset it-->
     <string name="login_page_forgot_password_text">Password dimenticata?</string>
     <!-- Sync state up to date -->
@@ -978,4 +978,58 @@
     <string name="device_center_list_view_item_status_inactive">Inattivo</string>
     <!-- The name of the Device or Folder Status which signifies that some action is needed -->
     <string name="device_center_list_view_item_status_attention_needed">Attention needed</string>
+    <!--General Unable to log in-->
+    <string name="general_unable_to_login">Impossibile effettuare il login</string>
+    <!--General check inbox-->
+    <string name="general_check_inbox">Controlla la tua casella di posta elettronica</string>
+    <!--Message to be shown to user when account is temporarily suspended and requires email verification -->
+    <string name="login_account_suspension_email_verification_message">Il tuo account è stato temporaneamente bloccato per proteggerti dopo aver rilevato un accesso dannoso, quindi ti chiediamo di reimpostare la password. Controlla la tua casella di posta elettronica per istruzioni su come sbloccare il tuo account e suggerimenti su come evitarlo in futuro.</string>
+    <!--General Resend email-->
+    <string name="general_resend_email">Re-invia email</string>
+    <!-- Message displayed when email is successfully resent -->
+    <string name="general_email_resend_success_message">E-mail inviata</string>
+    <!--General Request Network Failed text-->
+    <string name="general_request_failed_message">Qualcosa è andato storto</string>
+    <!-- Message error shown when trying to log in on an account that has been suspended due to breaches of copyright -->
+    <string name="dialog_account_suspended_ToS_copyright_message">Il tuo account MEGA è stato sospeso a causa di ripetute accuse di violazione di copyright. Questo significa che non puoi accedere al tuo account o ai dati al suo interno.\nControlla la tua casella di posta elettronica per maggiori informazioni su come puoi inviare una contro-notifica.</string>
+    <!-- Message error shown when trying to log in on an account that has been terminated due to breaches of all reasons of breaching Terms of Service, except copyright. -->
+    <string name="dialog_account_suspended_ToS_non_copyright_message">Il tuo account è stato chiuso a causa di una violazione dei Termini di servizio di MEGA.\nNon potrai riottenere accesso ai tuoi dati archiviati o registrare un nuovo account MEGA.</string>
+    <!-- Error message appears to sub-users of a business account when they try to login and they are disabled. -->
+    <string name="error_business_disabled">Il tuo account è stato disabilitato dal tuo amministratore. Per favore, contatta il tuo amministratore degli account business per ottenere maggiori dettagli.</string>
+    <!-- An error message which appears to sub-users of a business account when they try to login and they are deleted. -->
+    <string name="error_business_removed">Il tuo account è stato rimosso dal tuo amministratore. Per favore, contatta il tuo amministratore degli account business per ottenere maggiori dettagli.</string>
+    <!--The title of the Email Confirmation page-->
+    <string name="email_confirmation_title">Conferma dell\’email</string>
+    <!--The Content of the Email Confirmation page-->
+    <string name="email_confirmation_content">Abbiamo inviato un\’email a [P]%s[/P] con un link. Tocca sul link per verificare il tuo indirizzo email e attivare il tuo account.\n\nSe non hai ricevuto l\’email, controlla la tua cartella Spam o riprova. Per qualsiasi altro problema, per favore contatta [A]%s[/A]</string>
+    <!-- Button to resend the create account email to a new email address in case the previous email address was misspelled -->
+    <string name="general_resend_button">Reinvia</string>
+    <!-- General change email address -->
+    <string name="general_change_email_address">Cambia e-mail</string>
+    <!-- Title for the cancel registration dialog -->
+    <string name="email_confirmation_dialog_cancel_registration_title">Annullare la creazione dell\’account?</string>
+    <!-- Content for the cancel registration dialog -->
+    <string name="email_confirmation_dialog_cancel_registration_content">Questa azione annullerà il processo di registrazione.</string>
+    <!-- Text for the "Yes, cancel" button in the cancel registration dialog -->
+    <string name="email_confirmation_dialog_cancel_registration_cancel_button">Sì, annulla</string>
+    <!-- Text for the "Don’t cancel" button in the cancel registration dialog -->
+    <string name="email_confirmation_dialog_cancel_registration_dismiss_button">Non annullare</string>
+    <!-- First message header paragraph in note to self chat -->
+    <string name="chat_note_to_self_chat_first_message_header_paragraph">A private space for pictures, important information, or big ideas. Always synced, and protected with zero-knowledge encryption.</string>
+    <!-- Title of the notification displayed when Syncs are paused due to low battery conditions -->
+    <string name="general_sync_notification_low_battery_title">Syncing paused due to low battery</string>
+    <!-- Text of the notification displayed when Syncs are paused due to low battery conditions -->
+    <string name="general_sync_notification_low_battery_text">Connect to power source to resume</string>
+    <!-- Title of the notification displayed when Syncs are paused due to lost Wi-Fi conditions -->
+    <string name="general_sync_notification_lost_wifi_title">Syncing paused due to lost connection</string>
+    <!-- Text of the notification displayed when Syncs are paused due to lost Wi-Fi conditions -->
+    <string name="general_sync_notification_lost_wifi_text">Reconnect to Wi-Fi to resume</string>
+    <!-- Title of the notification displayed when Syncs are stopped due to some sync error -->
+    <string name="general_sync_notification_generic_error_title">Syncing has stopped</string>
+    <!-- Text of the notification displayed when Syncs are stopped due to some sync error -->
+    <string name="general_sync_notification_generic_error_text">Go to the Help Centre to understand why</string>
+    <!-- Title of the notification displayed when a Sync has stalled issues -->
+    <string name="general_sync_notification_stalled_issues_title">Sync issues detected</string>
+    <!-- Text of the notification displayed when a Sync has stalled issues -->
+    <string name="general_sync_notification_stalled_issues_text">View and resolve issues</string>
 </resources>

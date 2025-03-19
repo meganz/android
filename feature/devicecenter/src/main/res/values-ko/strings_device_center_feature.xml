@@ -14,10 +14,6 @@
     <string name="device_center_list_view_item_title_unknown_device">알 수 없는 장치</string>
     <!-- The name of the Device or Folder Status which signifies that it is Up to Date -->
     <string name="device_center_list_view_item_status_up_to_date">최신</string>
-    <!-- The name of the Device or Folder Status which signifies that it is currently initializing -->
-    <string name="device_center_list_view_item_status_initialising">초기화중&#8230;</string>
-    <!-- The name of the Device or Folder Status which signifies that it is currently scanning -->
-    <string name="device_center_list_view_item_status_scanning">스캔 중&#8230;</string>
     <!-- The name of the Device or Folder Status which signifies that it is currently updating its backup contents -->
     <string name="device_center_list_view_item_status_updating">업데이트 중&#8230;</string>
     <!-- The name of the Device or Folder Status which signifies that it is currently updating its backup contents with a percentage completion -->
@@ -25,17 +21,11 @@
     <!-- The name of the Device or Folder Status which signifies that it is disabled -->
     <string name="device_center_list_view_item_status_disabled">비활성화됨</string>
     <!-- The name of the Device or Folder Status which signifies that it is offline -->
-    <string name="device_center_list_view_item_status_offline">Inactive</string>
+    <string name="device_center_list_view_item_status_offline">비활성</string>
     <!-- The name of the Device or Folder Status which signifies that the backup procedure has been paused -->
     <string name="device_center_list_view_item_status_paused">일시정지 중</string>
-    <!-- The name of the Device or Folder Status which signifies that the backup procedure has been stopped -->
-    <string name="device_center_list_view_item_status_backup_stopped">백업 정지됨</string>
-    <!-- The name of the Device or Folder Status which signifies that it has exceeded the maximum allowed Transfer quota -->
-    <string name="device_center_list_view_item_status_out_of_quota">할당량 초과</string>
     <!-- The name of the Device or Folder Status which signifies that an error has occurred -->
     <string name="device_center_list_view_item_status_error">오류</string>
-    <!-- The name of the Device or Folder Status which signifies that it is blocked due to a certain issue -->
-    <string name="device_center_list_view_item_status_blocked">차단됨</string>
     <!-- The title of the Device Center feature -->
     <string name="device_center_top_app_bar_title">장치 센터</string>
     <!-- The name of one of the Device Center Bottom Sheet items which takes the User to the Camera uploads feature when clicked -->

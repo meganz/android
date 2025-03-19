@@ -1129,8 +1129,6 @@
     <string name="context_contact_already_invited">%sさんはすでに招待されました。保留中の要求を確認してください。</string>
     <!-- Button to resend the create account email to a new email address in case the previous email address was misspelled -->
     <string name="confirm_email_misspelled_resend">再送</string>
-    <!-- Text shown after the confirmation email has been sent to the new email address -->
-    <string name="confirm_email_misspelled_email_sent">メールが送信されました</string>
     <!-- text_copyright_alert_title -->
     <string name="copyright_alert_title">すべてのユーザー様に対する著作権の警告</string>
     <!-- text_copyright_alert_first_paragraph -->
@@ -2392,8 +2390,6 @@
     <string name="verify_email_and_follow_steps">[A]検証メール[/A]に記載されている手順に従って、アカウントのロックを解除してください。</string>
     <!-- Question which takes the user to a help screen -->
     <string name="why_am_i_seeing_this">これが表示されている理由は？</string>
-    <!-- Label of a button which action is resend an email -->
-    <string name="resend_email_label">メールを再送</string>
     <!-- Error shown when the user tries to resend the email to unblock their account before the time needed to permit send it again -->
     <string name="resend_email_error">メールは既に送信されています。数分待ってから再試行してください。</string>
     <!-- Title of a helping view about locked accounts -->
@@ -4594,10 +4590,6 @@
     <string name="meetings_call_recording_stopped_snackbar_message">%1$sさんが録音を停止しました</string>
     <!-- Name of the Gallery item in the attachment panel, in chat, for attaching files from Gallery -->
     <string name="chat_attach_panel_gallery">ギャラリー</string>
-    <!-- Preference screen item title for Ads Cookie -->
-    <string name="settings_cookies_settings_ads_title">広告クッキー</string>
-    <!-- Preference screen item summary for Ads Cookie-->
-    <string name="settings_cookies_settings_ads_summary">お客様の閲覧活動に関するデータを収集し、当社のサービスや他のウェブサイトで表示される広告をカスタマイズするために、当社の承認された広告パートナーによって使用されます。これらのクッキーを受け入れない場合、広告は引き続き表示される一方で、パーソナライズされません。</string>
     <!-- Body for Cookie dialog, visible for users, who will see the advertisements, as we want users to accept Advertisement cookies as well. Please, keep the placeholders to format the string. -->
     <string name="dialog_ads_cookie_alert_message">当社では、サービスの向上および広告目的としてクッキー（Cookie）および同様のテクノロジーを使用しています。MEGAのご使用を続けることで、当社の更新された[A]クッキーポリシー[/A]の条件に同意されたことになります。</string>
     <!-- Description of feature, which will be available for user, if they buy plan. This means the user won't see Advertisements if they buy a Pro plan. -->

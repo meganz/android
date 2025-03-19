@@ -675,7 +675,7 @@
     <!-- Title of Favourites video playlist in the video section -->
     <string name="video_section_title_favourite_playlist">Favorit</string>
     <!-- Title of the synced folder list empty state -->
-    <string name="device_center_sync_backup_list_empty_state_title">No connections are set up</string>
+    <string name="device_center_sync_backup_list_empty_state_title">No devices are set up</string>
     <!-- Message of the synced folder list empty state -->
     <string name="device_center_sync_backup_list_empty_state_message">Sync or back up a folder on your device with a folder on MEGA</string>
     <!-- subtitle of meeting title in schedule meeting for title disclaimer -->
@@ -906,7 +906,7 @@
     <!-- password label -->
     <string name="password_text">Kata Sandi</string>
     <!-- Login button -->
-    <string name="login_text">Masuk</string>
+    <string name="login_text">Log in with your MEGA account</string>
     <!--The text where user forgot their password and will navigate to reset it-->
     <string name="login_page_forgot_password_text">Lupa password?</string>
     <!-- Sync state up to date -->
@@ -918,11 +918,11 @@
     <!-- Generic settings label text -->
     <string name="general_settings">Pengaturan</string>
     <!-- Ad settings label in the cookie settings page -->
-    <string name="settings_cookie_settings_label_ad_settings">Ad settings</string>
+    <string name="settings_cookie_settings_label_ad_settings">Pengaturan iklan</string>
     <!-- Ads personalization label in the cookie settings page -->
     <string name="settings_cookie_settings_label_ads_personalization">Ads personalisation</string>
     <!-- Cookie settings title in the cookie settings page -->
-    <string name="settings_cookie_setting_title_cookie_and_ad_settings">Cookie and ad settings</string>
+    <string name="settings_cookie_setting_title_cookie_and_ad_settings">Pengaturan cookie dan iklan</string>
     <!-- Body text of the bottom sheet to promote Sync feature. The placeholders are to underline text -->
     <string name="sync_promotion_bottom_sheet_body_text">Sync or back up a folder on your device with a folder on MEGA. [U]Learn more[/U]</string>
     <!-- This is the final button when creating a folder in the dialog where the user inserts the folder name -->
@@ -930,9 +930,9 @@
     <!-- Confirmation message informing a download was successfully cancelled -->
     <string name="transfers_cancel_download_success_message">Download cancelled</string>
     <!-- Title of note to self chat -->
-    <string name="chat_note_to_self_chat_title">Note to self</string>
+    <string name="chat_note_to_self_chat_title">Catatan untuk diri sendiri</string>
     <!-- First message header in note to self chat -->
-    <string name="chat_note_to_self_chat_first_message_header">Keep it to yourself</string>
+    <string name="chat_note_to_self_chat_first_message_header">Simpan untuk dirimu sendiri</string>
     <!-- First message description in note to self chat -->
     <string name="chat_note_to_self_chat_first_message_description">Send yourself sensitive information, pics and videos, or ideas for your next big venture. Synced across all your devices, and protected with zero-knowledge encryption.</string>
     <!-- Add to album some files exist message -->
@@ -953,5 +953,59 @@
     <!-- The name of the Device or Folder Status which signifies that it is inactive -->
     <string name="device_center_list_view_item_status_inactive">Tidak aktif</string>
     <!-- The name of the Device or Folder Status which signifies that some action is needed -->
-    <string name="device_center_list_view_item_status_attention_needed">Attention needed</string>
+    <string name="device_center_list_view_item_status_attention_needed">Diperlukan perhatian</string>
+    <!--General Unable to log in-->
+    <string name="general_unable_to_login">Tidak dapat masuk</string>
+    <!--General check inbox-->
+    <string name="general_check_inbox">Periksa kotak masuk anda</string>
+    <!--Message to be shown to user when account is temporarily suspended and requires email verification -->
+    <string name="login_account_suspension_email_verification_message">Akun anda telah dikunci untuk perlindungan anda setelah mendeteksi login berbahaya, jadi kami meminta anda untuk mengatur ulang kata sandi anda. Periksa kotak masuk email anda untuk petunjuk tentang membuka kunci akun anda dan kiat tentang cara mencegah hal ini terjadi lagi.</string>
+    <!--General Resend email-->
+    <string name="general_resend_email">Kirim ulang Email</string>
+    <!-- Message displayed when email is successfully resent -->
+    <string name="general_email_resend_success_message">E-mail terkirim</string>
+    <!--General Request Network Failed text-->
+    <string name="general_request_failed_message">Terjadi kesalahan</string>
+    <!-- Message error shown when trying to log in on an account that has been suspended due to breaches of copyright -->
+    <string name="dialog_account_suspended_ToS_copyright_message">Akun MEGA anda telah ditangguhkan karena dugaan berulang pelanggaran hak cipta. Ini berarti anda tidak dapat mengakses akun atau data anda di dalamnya.\nPeriksa kotak masuk email anda untuk informasi lebih lanjut tentang cara mengajukan pemberitahuan balasan.</string>
+    <!-- Message error shown when trying to log in on an account that has been terminated due to breaches of all reasons of breaching Terms of Service, except copyright. -->
+    <string name="dialog_account_suspended_ToS_non_copyright_message">Akun anda dihentikan karena pelanggaran Ketentuan Layanan MEGA.\nAnda tidak akan dapat memperoleh kembali akses ke data yang disimpan atau diberi wewenang untuk mendaftar akun MEGA baru.</string>
+    <!-- Error message appears to sub-users of a business account when they try to login and they are disabled. -->
+    <string name="error_business_disabled">Akun anda telah dinonaktifkan oleh administrator anda. Anda dapat menghubungi administrator akun bisnis anda untuk rincian lebih lanjut.</string>
+    <!-- An error message which appears to sub-users of a business account when they try to login and they are deleted. -->
+    <string name="error_business_removed">Akun anda telah dihapus oleh administrator anda. Silakan hubungi administrator akun bisnis anda untuk rincian lebih lanjut.</string>
+    <!--The title of the Email Confirmation page-->
+    <string name="email_confirmation_title">Konfirmasi email</string>
+    <!--The Content of the Email Confirmation page-->
+    <string name="email_confirmation_content">Kami telah mengirim email ke [P]%s[/P] dengan link. Ketuk tautan untuk memverifikasi alamat email anda dan mengaktifkan akun anda. \n\nJika anda tidak menerima email, periksa folder spam anda atau coba lagi. Untuk masalah lainnya, hubungi [A]%s[/A]</string>
+    <!-- Button to resend the create account email to a new email address in case the previous email address was misspelled -->
+    <string name="general_resend_button">Kirim lagi</string>
+    <!-- General change email address -->
+    <string name="general_change_email_address">Ganti e-mail</string>
+    <!-- Title for the cancel registration dialog -->
+    <string name="email_confirmation_dialog_cancel_registration_title">Batalkan pembuatan akun?</string>
+    <!-- Content for the cancel registration dialog -->
+    <string name="email_confirmation_dialog_cancel_registration_content">Ini akan membatalkan proses pendaftaran.</string>
+    <!-- Text for the "Yes, cancel" button in the cancel registration dialog -->
+    <string name="email_confirmation_dialog_cancel_registration_cancel_button">Ya, batalkan</string>
+    <!-- Text for the "Don’t cancel" button in the cancel registration dialog -->
+    <string name="email_confirmation_dialog_cancel_registration_dismiss_button">Jangan batalkan</string>
+    <!-- First message header paragraph in note to self chat -->
+    <string name="chat_note_to_self_chat_first_message_header_paragraph">Ruang pribadi untuk gambar, informasi penting, atau ide-ide besar. Selalu disinkronkan, dan dilindungi dengan enkripsi zero-knowledge.</string>
+    <!-- Title of the notification displayed when Syncs are paused due to low battery conditions -->
+    <string name="general_sync_notification_low_battery_title">Syncing paused due to low battery</string>
+    <!-- Text of the notification displayed when Syncs are paused due to low battery conditions -->
+    <string name="general_sync_notification_low_battery_text">Connect to power source to resume</string>
+    <!-- Title of the notification displayed when Syncs are paused due to lost Wi-Fi conditions -->
+    <string name="general_sync_notification_lost_wifi_title">Syncing paused due to lost connection</string>
+    <!-- Text of the notification displayed when Syncs are paused due to lost Wi-Fi conditions -->
+    <string name="general_sync_notification_lost_wifi_text">Reconnect to Wi-Fi to resume</string>
+    <!-- Title of the notification displayed when Syncs are stopped due to some sync error -->
+    <string name="general_sync_notification_generic_error_title">Syncing has stopped</string>
+    <!-- Text of the notification displayed when Syncs are stopped due to some sync error -->
+    <string name="general_sync_notification_generic_error_text">Go to the Help Centre to understand why</string>
+    <!-- Title of the notification displayed when a Sync has stalled issues -->
+    <string name="general_sync_notification_stalled_issues_title">Sync issues detected</string>
+    <!-- Text of the notification displayed when a Sync has stalled issues -->
+    <string name="general_sync_notification_stalled_issues_text">View and resolve issues</string>
 </resources>

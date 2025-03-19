@@ -671,7 +671,7 @@
     <!-- Title of Favourites video playlist in the video section -->
     <string name="video_section_title_favourite_playlist">お気に入り</string>
     <!-- Title of the synced folder list empty state -->
-    <string name="device_center_sync_backup_list_empty_state_title">接続が設定されていません</string>
+    <string name="device_center_sync_backup_list_empty_state_title">デバイスが設定されていません</string>
     <!-- Message of the synced folder list empty state -->
     <string name="device_center_sync_backup_list_empty_state_message">デバイス上のフォルダをMEGA上のフォルダと同期またはバックアップできます</string>
     <!-- subtitle of meeting title in schedule meeting for title disclaimer -->
@@ -897,7 +897,7 @@
     <!-- password label -->
     <string name="password_text">パスワード</string>
     <!-- Login button -->
-    <string name="login_text">ログイン</string>
+    <string name="login_text">MEGAアカウントでログイン</string>
     <!--The text where user forgot their password and will navigate to reset it-->
     <string name="login_page_forgot_password_text">パスワードをお忘れですか？</string>
     <!-- Sync state up to date -->
@@ -935,7 +935,7 @@
     <!-- Warning shown after trying to cancel a download, but the request failed -->
     <string name="transfers_error_cancelling_download">問題が発生しました。ダウンロードはキャンセルされませんでした。</string>
     <!-- Body for the subscription details section, which is shown to the Indian user to provide details about subscription. This string is shown if user selects yearly subscription and the amount is more than Rs.15,000. Please keep these placeholders [A], [/A], [B], [/B], [C], [/C]. They will be used to format the string. -->
-    <string name="account_upgrade_account_subscription_details_body_yearly_with_price_for_indian">You will be charged %1$s immediately but your subscription will not automatically renew after 12 months due to government regulations. It will be your responsibility to renew your subscription after it has expired. You can manage or cancel your subscription anytime via Subscriptions in [A]Google&#160;Play[/A]. By upgrading your account, you agree to MEGA’s [B]Terms of Service[/B] and [C]Privacy and Data Policy[/C].</string>
+    <string name="account_upgrade_account_subscription_details_body_yearly_with_price_for_indian">すぐに%1$sが請求されますが、政府の規制により、12か月後に自動的にサブスクリプションが更新されることはありません。サブスクリプション期間終了後の更新は、お客様の責任となります。[A]Google&#160;Play[/A]のサブスクリプション（定期購入）からいつでもサブスクリプションの管理または解約ができます。アカウントをアップグレードしていただくことで、MEGAの[B]サービスご利用規約[/B]および[C]プライバシーとデータポリシー[/C]に同意したものとみなされます。</string>
     <!-- The name of the Device or Folder Status which signifies that it is currently uploading -->
     <string name="device_center_list_view_item_status_uploading">アップロード中&#8230;</string>
     <!-- The name of the Device or Folder Status which signifies that it is currently uploading with a percentage completion -->
@@ -944,4 +944,58 @@
     <string name="device_center_list_view_item_status_inactive">非アクティブ</string>
     <!-- The name of the Device or Folder Status which signifies that some action is needed -->
     <string name="device_center_list_view_item_status_attention_needed">注意が必要です</string>
+    <!--General Unable to log in-->
+    <string name="general_unable_to_login">ログインできません</string>
+    <!--General check inbox-->
+    <string name="general_check_inbox">受信トレイを確認してください</string>
+    <!--Message to be shown to user when account is temporarily suspended and requires email verification -->
+    <string name="login_account_suspension_email_verification_message">悪意のあるログインが検出されたため、保護のためアカウントがロックされました。そのため、パスワードをリセットする必要があります。アカウントのロックを解除する手順と、このような問題の再発防止策のヒントについては、メールの受信箱を確認してください。</string>
+    <!--General Resend email-->
+    <string name="general_resend_email">メールを再送</string>
+    <!-- Message displayed when email is successfully resent -->
+    <string name="general_email_resend_success_message">メールが送信されました</string>
+    <!--General Request Network Failed text-->
+    <string name="general_request_failed_message">ちょと、うまく行かなかったようです</string>
+    <!-- Message error shown when trying to log in on an account that has been suspended due to breaches of copyright -->
+    <string name="dialog_account_suspended_ToS_copyright_message">度重なる著作権侵害の申し立てにより、あなたのMEGAアカウントは停止されました。これは、アカウントまたはアカウント内のデータにアクセスできないことを意味します。\n異議申し立て通知を提出する方法の詳細については、メール受信箱を確認してください。</string>
+    <!-- Message error shown when trying to log in on an account that has been terminated due to breaches of all reasons of breaching Terms of Service, except copyright. -->
+    <string name="dialog_account_suspended_ToS_non_copyright_message">MEGAのご利用規約違反により、あなたのアカウントは停止されました。\n保管されたデータへのアクセスを回復したり、MEGAアカウントを新規サインアップしたりすることはできません。</string>
+    <!-- Error message appears to sub-users of a business account when they try to login and they are disabled. -->
+    <string name="error_business_disabled">あなたのアカウントはあなたの管理者によって無効化されました。詳細については、あなたのビジネスアカウント管理者にお問い合わせください。</string>
+    <!-- An error message which appears to sub-users of a business account when they try to login and they are deleted. -->
+    <string name="error_business_removed">あなたのアカウントはあなたの管理者によって削除されました。詳細については、あなたのビジネスアカウント管理者にお問い合わせください。</string>
+    <!--The title of the Email Confirmation page-->
+    <string name="email_confirmation_title">メールのご確認</string>
+    <!--The Content of the Email Confirmation page-->
+    <string name="email_confirmation_content">[P]%s[/P]にリンクを記載したメールを送信いたしました。リンクをタップしてメールアドレスを認証し、アカウントを有効にしてください。\n\nメールが届かない場合は、迷惑メールフォルダをご確認いただくか、もう一度お試しください。その他の問題については、[A]%s[/A]までご連絡ください。</string>
+    <!-- Button to resend the create account email to a new email address in case the previous email address was misspelled -->
+    <string name="general_resend_button">再送</string>
+    <!-- General change email address -->
+    <string name="general_change_email_address">メールを変更する</string>
+    <!-- Title for the cancel registration dialog -->
+    <string name="email_confirmation_dialog_cancel_registration_title">アカウントの作成をキャンセルしますか？</string>
+    <!-- Content for the cancel registration dialog -->
+    <string name="email_confirmation_dialog_cancel_registration_content">これにより、サインアッププロセスがキャンセルされます。</string>
+    <!-- Text for the "Yes, cancel" button in the cancel registration dialog -->
+    <string name="email_confirmation_dialog_cancel_registration_cancel_button">はい、キャンセルします</string>
+    <!-- Text for the "Don’t cancel" button in the cancel registration dialog -->
+    <string name="email_confirmation_dialog_cancel_registration_dismiss_button">キャンセルしない</string>
+    <!-- First message header paragraph in note to self chat -->
+    <string name="chat_note_to_self_chat_first_message_header_paragraph">写真、重要な情報、大きなアイデア用のプライベートスペースです。常に同期され、ゼロナレッジ暗号化で保護されています。</string>
+    <!-- Title of the notification displayed when Syncs are paused due to low battery conditions -->
+    <string name="general_sync_notification_low_battery_title">Syncing paused due to low battery</string>
+    <!-- Text of the notification displayed when Syncs are paused due to low battery conditions -->
+    <string name="general_sync_notification_low_battery_text">Connect to power source to resume</string>
+    <!-- Title of the notification displayed when Syncs are paused due to lost Wi-Fi conditions -->
+    <string name="general_sync_notification_lost_wifi_title">Syncing paused due to lost connection</string>
+    <!-- Text of the notification displayed when Syncs are paused due to lost Wi-Fi conditions -->
+    <string name="general_sync_notification_lost_wifi_text">Reconnect to Wi-Fi to resume</string>
+    <!-- Title of the notification displayed when Syncs are stopped due to some sync error -->
+    <string name="general_sync_notification_generic_error_title">Syncing has stopped</string>
+    <!-- Text of the notification displayed when Syncs are stopped due to some sync error -->
+    <string name="general_sync_notification_generic_error_text">Go to the Help Centre to understand why</string>
+    <!-- Title of the notification displayed when a Sync has stalled issues -->
+    <string name="general_sync_notification_stalled_issues_title">Sync issues detected</string>
+    <!-- Text of the notification displayed when a Sync has stalled issues -->
+    <string name="general_sync_notification_stalled_issues_text">View and resolve issues</string>
 </resources>

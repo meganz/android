@@ -704,7 +704,7 @@
     <!-- Title of Favourites video playlist in the video section -->
     <string name="video_section_title_favourite_playlist">Избранное</string>
     <!-- Title of the synced folder list empty state -->
-    <string name="device_center_sync_backup_list_empty_state_title">Операции не настроены</string>
+    <string name="device_center_sync_backup_list_empty_state_title">Нет настроенных устройств</string>
     <!-- Message of the synced folder list empty state -->
     <string name="device_center_sync_backup_list_empty_state_message">Синхронизируйте или создайте резервную копию папки на устройстве с папкой в MEGA</string>
     <!-- subtitle of meeting title in schedule meeting for title disclaimer -->
@@ -948,7 +948,7 @@
     <!-- password label -->
     <string name="password_text">Пароль</string>
     <!-- Login button -->
-    <string name="login_text">Войти</string>
+    <string name="login_text">Войти в аккаунт MEGA</string>
     <!--The text where user forgot their password and will navigate to reset it-->
     <string name="login_page_forgot_password_text">Забыли пароль?</string>
     <!-- Sync state up to date -->
@@ -989,7 +989,7 @@
     <!-- Warning shown after trying to cancel a download, but the request failed -->
     <string name="transfers_error_cancelling_download">Что-то пошло не так. Скачивание не было отменено.</string>
     <!-- Body for the subscription details section, which is shown to the Indian user to provide details about subscription. This string is shown if user selects yearly subscription and the amount is more than Rs.15,000. Please keep these placeholders [A], [/A], [B], [/B], [C], [/C]. They will be used to format the string. -->
-    <string name="account_upgrade_account_subscription_details_body_yearly_with_price_for_indian">You will be charged %1$s immediately but your subscription will not automatically renew after 12 months due to government regulations. It will be your responsibility to renew your subscription after it has expired. You can manage or cancel your subscription anytime via Subscriptions in [A]Google&#160;Play[/A]. By upgrading your account, you agree to MEGA’s [B]Terms of Service[/B] and [C]Privacy and Data Policy[/C].</string>
+    <string name="account_upgrade_account_subscription_details_body_yearly_with_price_for_indian">У вас немедленно будет списано %1$s, но в соответствии с правительственными постановлениями ваша подписка не будет автоматически продлена через 12 месяцев. Вы сами отвечаете за продление подписки после ее истечения. Управлять подпиской или отменить её можно в любое время в разделе «Подписки» в [A]Google&#160;Play[/A]. Улучшая аккаунт, вы соглашаетесь с [B]Условиями использования[/B] и [C]Политикой конфиденциальности и данных[/C] MEGA.</string>
     <!-- The name of the Device or Folder Status which signifies that it is currently uploading -->
     <string name="device_center_list_view_item_status_uploading">Загрузка&#8230;</string>
     <!-- The name of the Device or Folder Status which signifies that it is currently uploading with a percentage completion -->
@@ -998,4 +998,58 @@
     <string name="device_center_list_view_item_status_inactive">Неактивно</string>
     <!-- The name of the Device or Folder Status which signifies that some action is needed -->
     <string name="device_center_list_view_item_status_attention_needed">Обратите внимание</string>
+    <!--General Unable to log in-->
+    <string name="general_unable_to_login">Не удалось войти</string>
+    <!--General check inbox-->
+    <string name="general_check_inbox">Проверьте электронную почту</string>
+    <!--Message to be shown to user when account is temporarily suspended and requires email verification -->
+    <string name="login_account_suspension_email_verification_message">Ваш аккаунт был заблокирован для вашей защиты после обнаружения вредоносного входа в систему, поэтому вам необходимо сменить пароль. Проверьте электронную почту, чтобы получить инструкции по разблокировке аккаунта и советы о том, как предотвратить повторение этой ситуации.</string>
+    <!--General Resend email-->
+    <string name="general_resend_email">Отправить письмо</string>
+    <!-- Message displayed when email is successfully resent -->
+    <string name="general_email_resend_success_message">Письмо отправлено</string>
+    <!--General Request Network Failed text-->
+    <string name="general_request_failed_message">Что-то пошло не так</string>
+    <!-- Message error shown when trying to log in on an account that has been suspended due to breaches of copyright -->
+    <string name="dialog_account_suspended_ToS_copyright_message">Ваш аккаунт MEGA был заблокирован из-за неоднократных обвинений в нарушении авторских прав. Это означает, что вы не можете получить доступ к аккаунту или данным в нём. \nля получения дополнительной информации о том, как подать встречное заявление, проверьте свою электронную почту.</string>
+    <!-- Message error shown when trying to log in on an account that has been terminated due to breaches of all reasons of breaching Terms of Service, except copyright. -->
+    <string name="dialog_account_suspended_ToS_non_copyright_message">Ваш аккаунт был удалён из-за нарушения Условий использования MEGA.\nВы не сможете восстановить доступ к сохранённым данным или получить разрешение на регистрацию нового аккаунта MEGA.</string>
+    <!-- Error message appears to sub-users of a business account when they try to login and they are disabled. -->
+    <string name="error_business_disabled">Администратор деактивировал ваш аккаунт. Пожалуйста, обратитесь к администратору вашего бизнес-аккаунта за подробностями.</string>
+    <!-- An error message which appears to sub-users of a business account when they try to login and they are deleted. -->
+    <string name="error_business_removed">Ваш аккаунт был удалён администратором. Пожалуйста, свяжитесь с администратором вашего бизнес-аккаунта для получения более подробной информации.</string>
+    <!--The title of the Email Confirmation page-->
+    <string name="email_confirmation_title">Подтверждение электронной почты</string>
+    <!--The Content of the Email Confirmation page-->
+    <string name="email_confirmation_content">Мы отправили письмо со ссылкой на [P]%s[/P]. Перейдите по ссылке, чтобы подтвердить адрес электронной почты и активировать аккаунт.\n\nЕсли вы не получили письмо, проверьте папку со спамом или повторите попытку. По любым другим вопросам пишите на [A]%s[/A]</string>
+    <!-- Button to resend the create account email to a new email address in case the previous email address was misspelled -->
+    <string name="general_resend_button">Выслать повторно</string>
+    <!-- General change email address -->
+    <string name="general_change_email_address">Изменить адрес почты</string>
+    <!-- Title for the cancel registration dialog -->
+    <string name="email_confirmation_dialog_cancel_registration_title">Отменить регистрацию аккаунта?</string>
+    <!-- Content for the cancel registration dialog -->
+    <string name="email_confirmation_dialog_cancel_registration_content">Регистрация будет отменена.</string>
+    <!-- Text for the "Yes, cancel" button in the cancel registration dialog -->
+    <string name="email_confirmation_dialog_cancel_registration_cancel_button">Да, отменить</string>
+    <!-- Text for the "Don’t cancel" button in the cancel registration dialog -->
+    <string name="email_confirmation_dialog_cancel_registration_dismiss_button">Не отменять</string>
+    <!-- First message header paragraph in note to self chat -->
+    <string name="chat_note_to_self_chat_first_message_header_paragraph">Личное пространство для изображений, важной информации или больших идей. Всегда синхронизируется и защищено шифрованием с нулевым разглашением.</string>
+    <!-- Title of the notification displayed when Syncs are paused due to low battery conditions -->
+    <string name="general_sync_notification_low_battery_title">Syncing paused due to low battery</string>
+    <!-- Text of the notification displayed when Syncs are paused due to low battery conditions -->
+    <string name="general_sync_notification_low_battery_text">Connect to power source to resume</string>
+    <!-- Title of the notification displayed when Syncs are paused due to lost Wi-Fi conditions -->
+    <string name="general_sync_notification_lost_wifi_title">Syncing paused due to lost connection</string>
+    <!-- Text of the notification displayed when Syncs are paused due to lost Wi-Fi conditions -->
+    <string name="general_sync_notification_lost_wifi_text">Reconnect to Wi-Fi to resume</string>
+    <!-- Title of the notification displayed when Syncs are stopped due to some sync error -->
+    <string name="general_sync_notification_generic_error_title">Syncing has stopped</string>
+    <!-- Text of the notification displayed when Syncs are stopped due to some sync error -->
+    <string name="general_sync_notification_generic_error_text">Go to the Help Centre to understand why</string>
+    <!-- Title of the notification displayed when a Sync has stalled issues -->
+    <string name="general_sync_notification_stalled_issues_title">Sync issues detected</string>
+    <!-- Text of the notification displayed when a Sync has stalled issues -->
+    <string name="general_sync_notification_stalled_issues_text">View and resolve issues</string>
 </resources>

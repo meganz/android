@@ -271,7 +271,7 @@
     <!-- Hint how to cancel the download -->
     <string name="download_touch_to_show">전송 보기</string>
     <!-- message when trying to open a downloaded file but there isn’t any app that open that file. Example: a user downloads a pdf but doesn’t have any app to read a pdf -->
-    <string name="intent_not_available">There’s no suitable app to open this file on your device</string>
+    <string name="intent_not_available">장치에 이 파일을 실행할 적합한 앱이 없습니다</string>
     <!-- Message when trying to open a location message but there isn’t any app that open that location. -->
     <string name="intent_not_available_location">이 위치를 열 수 있는 앱이 기기에 없습니다</string>
     <!-- Message displayed when user tries to open a file with a 3rd party app using the option "Open with" but there isn't any app installed in the device which can open that file type, e.g. user tries to open a ".txt" but doesn’t have any installed 3rd party app which supports ".txt" files. -->
@@ -281,7 +281,7 @@
     <!-- Delete a link label -->
     <string name="context_delete_link">링크 삭제</string>
     <!-- Title alert before leaving a share. -->
-    <string name="alert_leave_share">Leave folder</string>
+    <string name="alert_leave_share">폴더 나가기</string>
     <!-- Item menu option upon right click on one or multiple files. -->
     <string name="context_clean_shares_menu">공유 제거</string>
     <!-- Item menu option upon right click on one or multiple files. -->
@@ -1129,8 +1129,6 @@
     <string name="context_contact_already_invited">%s님이 이미 초대되었습니다. 보류중인 요청을 확인하세요.</string>
     <!-- Button to resend the create account email to a new email address in case the previous email address was misspelled -->
     <string name="confirm_email_misspelled_resend">재발송</string>
-    <!-- Text shown after the confirmation email has been sent to the new email address -->
-    <string name="confirm_email_misspelled_email_sent">이메일 발송됨</string>
     <!-- text_copyright_alert_title -->
     <string name="copyright_alert_title">모든 이용자에게 저작권 경고</string>
     <!-- text_copyright_alert_first_paragraph -->
@@ -1629,7 +1627,7 @@
     <!-- label to indicate that a share is still pending on outgoing shares of a node -->
     <string name="pending_outshare_indicator">(대기중)</string>
     <!-- Title of the dialog to disable the rich links previews on chat -->
-    <string name="option_enable_chat_rich_preview">Enable sent link previews</string>
+    <string name="option_enable_chat_rich_preview">보낸 링크 미리보기 활성화</string>
     <!-- Button to allow the rich links previews on chat -->
     <string name="button_always_rich_links">항상 허용</string>
     <!-- Button do not allow now the rich links previews on chat -->
@@ -1637,9 +1635,9 @@
     <!-- Button do not allow the rich links previews on chat -->
     <string name="button_never_rich_links">절대 안함</string>
     <!-- Title of the dialog to enable the rich links previews on chat -->
-    <string name="title_enable_rich_links">Enable sent link previews</string>
+    <string name="title_enable_rich_links">보낸 링크 미리보기 활성화</string>
     <!-- Text of the dialog to enable the rich links previews on chat -->
-    <string name="text_enable_rich_links">Generates a preview of the links you send in chat. Note that retrieving these previews isn’t protected by zero-knowledge encryption.</string>
+    <string name="text_enable_rich_links">대화에 보낸 링크에 대한 미리보기를 생성합니다. 이러한 미리보기를 수신하는 것은 영지식 암호화의 보호를 받지 않는다는 점을 참고하세요.</string>
     <!-- when the user tries to creates a MEGA account or tries to change his password and the password strength is very weak -->
     <string name="error_password">더 강력한 암호를 입력하세요</string>
     <!-- title of the notification for an acceptance of a contact request -->
@@ -1915,7 +1913,7 @@
     <!-- Title of compression queue size option in settings -->
     <string name="settings_video_compression_queue_size_title">압축할 비디오가 다음보다 크면</string>
     <!-- Text of the alert when a FREE user tries to disable the RB scheduler -->
-    <string name="settings_rb_scheduler_alert_disabling">To disable automatic Rubbish bin emptying or set a longer retention period, you need to subscribe to one of our plans.</string>
+    <string name="settings_rb_scheduler_alert_disabling">휴지통 비우기 스케줄러를 해제하거나 더 긴 보유 기간을 설정하려면, 요금제를 구독하여야 합니다.</string>
     <!-- Picker text to choose custom retention time. This option indicates several days -->
     <string name="hint_days">일</string>
     <!-- Title of the option to generate a public chat link -->
@@ -2392,8 +2390,6 @@
     <string name="verify_email_and_follow_steps">계정을 잠금 해제하려면 [A]인증 메일[/A]의 절차를 따라주세요.</string>
     <!-- Question which takes the user to a help screen -->
     <string name="why_am_i_seeing_this">이게 왜 보여지나요?</string>
-    <!-- Label of a button which action is resend an email -->
-    <string name="resend_email_label">이메일 재발송</string>
     <!-- Error shown when the user tries to resend the email to unblock their account before the time needed to permit send it again -->
     <string name="resend_email_error">이메일이 이미 발송되었습니다. 몇 분 기다린 후 다시 시도하세요.</string>
     <!-- Title of a helping view about locked accounts -->
@@ -4594,10 +4590,6 @@
     <string name="meetings_call_recording_stopped_snackbar_message">%1$s 님이 녹화를 멈췄습니다</string>
     <!-- Name of the Gallery item in the attachment panel, in chat, for attaching files from Gallery -->
     <string name="chat_attach_panel_gallery">갤러리</string>
-    <!-- Preference screen item title for Ads Cookie -->
-    <string name="settings_cookies_settings_ads_title">광고 쿠키</string>
-    <!-- Preference screen item summary for Ads Cookie-->
-    <string name="settings_cookies_settings_ads_summary">당신의 브라우징 활동과 관련한 데이터를 수집하고 당신이 우리 서비스와 다른 웹사이트에서 보는 광고를 개인화하기 위해 우리의 승인된 광고 파트너들에 의해 쓰입니다. 이러한 쿠키를 허용하지 않는 것은 당신은 여전히 광고를 보게 되지만 개인화 되지 않는다는 것을 뜻합니다.</string>
     <!-- Body for Cookie dialog, visible for users, who will see the advertisements, as we want users to accept Advertisement cookies as well. Please, keep the placeholders to format the string. -->
     <string name="dialog_ads_cookie_alert_message">우리는 우리의 서비스를 향상시키고 광고를 하기 위한 목적으로 쿠키 그리고 이와 유사한 기술을 이용합니다. MEGA를 계속 이용함으로써 당신은 우리의 개정된 [A]쿠키 정책[/A]에 동의함을 뜻합니다.</string>
     <!-- Description of feature, which will be available for user, if they buy plan. This means the user won't see Advertisements if they buy a Pro plan. -->
@@ -4861,17 +4853,17 @@
     <!-- Image or Video no map location info-->
     <string name="file_properties_info_map_location_no_location_info">위치 정보 없음</string>
     <!-- Logout warning dialog title if user has offline files or transfers in progress -->
-    <string name="logout_warning_dialog_title">Logging out now will result in lost data</string>
+    <string name="logout_warning_dialog_title">지금 로그아웃하면 데이터를 잃습니다</string>
     <!-- Logout warning dialog positive button text -->
-    <string name="logout_warning_dialog_positive_button">Log out anyway</string>
+    <string name="logout_warning_dialog_positive_button">어쨌든 로그아웃</string>
     <!-- Logout warning dialog message if offline files exists -->
-    <string name="logout_warning_dialog_offline_message">If you log out now, your offline files will be deleted</string>
+    <string name="logout_warning_dialog_offline_message">지금 로그아웃 하면, 오프라인 파일이 삭제됩니다</string>
     <!-- Logout warning dialog message if user has transfers in progress. -->
-    <string name="logout_warning_dialog_transfers_message">If you log out now, your transfers won’t be completed and the data will be deleted</string>
+    <string name="logout_warning_dialog_transfers_message">지금 로그아웃 하면, 전송이 완료되지 않고 데이터가 삭제됩니다</string>
     <!-- Warning warning dialog message if user has offline files or transfers in progress. -->
-    <string name="logout_warning_dialog_offline_and_transfers_message">If you log out now, any pending transfers and offline files will be deleted</string>
+    <string name="logout_warning_dialog_offline_and_transfers_message">지금 로그아웃 하면 대기 중인 전송과 오프라인 파일이 삭제됩니다</string>
     <!-- Toolbar action menu button in file storage screen to open 3rd-party File Manager -->
-    <string name="filestorage_menu_option_open_in_file_manager">Open in file manager</string>
+    <string name="filestorage_menu_option_open_in_file_manager">파일 관리자에서 열기</string>
     <!-- Snackbar message when file storage screen is unable to open 3rd-party File Manager -->
-    <string name="filestorage_snackbar_file_manager_is_not_available">A suitable file manager app is not available on this device</string>
+    <string name="filestorage_snackbar_file_manager_is_not_available">이 장치에 이용 가능한 적합한 파일 관리자 앱이 없습니다</string>
 </resources>

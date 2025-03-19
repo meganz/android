@@ -14,10 +14,6 @@
     <string name="device_center_list_view_item_title_unknown_device">Perangkat tidak dikenal</string>
     <!-- The name of the Device or Folder Status which signifies that it is Up to Date -->
     <string name="device_center_list_view_item_status_up_to_date">Terkini</string>
-    <!-- The name of the Device or Folder Status which signifies that it is currently initializing -->
-    <string name="device_center_list_view_item_status_initialising">Memulai&#8230;</string>
-    <!-- The name of the Device or Folder Status which signifies that it is currently scanning -->
-    <string name="device_center_list_view_item_status_scanning">Memindai&#8230;</string>
     <!-- The name of the Device or Folder Status which signifies that it is currently updating its backup contents -->
     <string name="device_center_list_view_item_status_updating">Memperbarui&#8230;</string>
     <!-- The name of the Device or Folder Status which signifies that it is currently updating its backup contents with a percentage completion -->
@@ -28,14 +24,8 @@
     <string name="device_center_list_view_item_status_offline">Tidak aktif</string>
     <!-- The name of the Device or Folder Status which signifies that the backup procedure has been paused -->
     <string name="device_center_list_view_item_status_paused">Berhenti sementara</string>
-    <!-- The name of the Device or Folder Status which signifies that the backup procedure has been stopped -->
-    <string name="device_center_list_view_item_status_backup_stopped">Pencadangan dihentikan</string>
-    <!-- The name of the Device or Folder Status which signifies that it has exceeded the maximum allowed Transfer quota -->
-    <string name="device_center_list_view_item_status_out_of_quota">Habis kuota</string>
     <!-- The name of the Device or Folder Status which signifies that an error has occurred -->
     <string name="device_center_list_view_item_status_error">Kesalahan</string>
-    <!-- The name of the Device or Folder Status which signifies that it is blocked due to a certain issue -->
-    <string name="device_center_list_view_item_status_blocked">Terblokir</string>
     <!-- The title of the Device Center feature -->
     <string name="device_center_top_app_bar_title">Pusat perangkat</string>
     <!-- The name of one of the Device Center Bottom Sheet items which takes the User to the Camera uploads feature when clicked -->

@@ -1179,8 +1179,6 @@
     <string name="context_contact_already_invited">%s já foi convidado. Revise as suas solicitações pendentes.</string>
     <!-- Button to resend the create account email to a new email address in case the previous email address was misspelled -->
     <string name="confirm_email_misspelled_resend">Reenviar</string>
-    <!-- Text shown after the confirmation email has been sent to the new email address -->
-    <string name="confirm_email_misspelled_email_sent">E-mail enviado</string>
     <!-- text_copyright_alert_title -->
     <string name="copyright_alert_title">Aviso de direitos autorais a todos os usuários</string>
     <!-- text_copyright_alert_first_paragraph -->
@@ -2514,8 +2512,6 @@
     <string name="verify_email_and_follow_steps">Siga os passos do [A]e-mail de verificação[/A] para desbloquear a sua conta.</string>
     <!-- Question which takes the user to a help screen -->
     <string name="why_am_i_seeing_this">Por que estou vendo isso?</string>
-    <!-- Label of a button which action is resend an email -->
-    <string name="resend_email_label">Reenviar e-mail</string>
     <!-- Error shown when the user tries to resend the email to unblock their account before the time needed to permit send it again -->
     <string name="resend_email_error">O e-mail já foi enviado. Espere alguns minutos antes de tentar novamente.</string>
     <!-- Title of a helping view about locked accounts -->
@@ -4555,7 +4551,7 @@
     <!-- Description of the dialog, shown for disputed or taken down file. The dialog will be shown, when user will try to open file, which was taken down  -->
     <string name="dialog_taken_down_file_description">Este arquivo foi removido de acordo com a nossa [A]Política do guia de remoção[/A]. Você pode disputar esta remoção se acreditar que cometemos um erro.</string>
     <!-- Text of the button to show the dialog to update to pro -->
-    <string name="general_pro_only">Somente para usuários Pro</string>
+    <string name="general_pro_only">Somente usuários Pro</string>
     <!-- Title of the link access section where information is displayed to the user about link access-->
     <string name="cloud_drive_title_link_access">Acesso ao link</string>
     <!-- Text of setting expiry date to link-->
@@ -5034,10 +5030,6 @@
     <string name="meetings_call_recording_stopped_snackbar_message">%1$s deixou de gravar</string>
     <!-- Name of the Gallery item in the attachment panel, in chat, for attaching files from Gallery -->
     <string name="chat_attach_panel_gallery">Galeria</string>
-    <!-- Preference screen item title for Ads Cookie -->
-    <string name="settings_cookies_settings_ads_title">Cookies de publicidade</string>
-    <!-- Preference screen item summary for Ads Cookie-->
-    <string name="settings_cookies_settings_ads_summary">Usados por parceiros de publicidade aprovados para coletar dados sobre as suas atividades de navegação e personalizar os anúncios que você vê nos nossos serviços e em outros sites. Não aceitar esses cookies significa que você ainda verá anúncios, mas eles não personalizados.</string>
     <!-- Body for Cookie dialog, visible for users, who will see the advertisements, as we want users to accept Advertisement cookies as well. Please, keep the placeholders to format the string. -->
     <string name="dialog_ads_cookie_alert_message">Nós usamos cookies e tecnologias similares para melhorar os nossos serviços e com fins publicitários. Ao continuar usado o MEGA, você concorda com os termos da nossa [A]Política de cookies[/A] atualizada.</string>
     <!-- Description of feature, which will be available for user, if they buy plan. This means the user won't see Advertisements if they buy a Pro plan. -->

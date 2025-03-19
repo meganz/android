@@ -14,10 +14,6 @@
     <string name="device_center_list_view_item_title_unknown_device">端末が不明です</string>
     <!-- The name of the Device or Folder Status which signifies that it is Up to Date -->
     <string name="device_center_list_view_item_status_up_to_date">最新版</string>
-    <!-- The name of the Device or Folder Status which signifies that it is currently initializing -->
-    <string name="device_center_list_view_item_status_initialising">初期化中&#8230;</string>
-    <!-- The name of the Device or Folder Status which signifies that it is currently scanning -->
-    <string name="device_center_list_view_item_status_scanning">スキャン中&#8230;</string>
     <!-- The name of the Device or Folder Status which signifies that it is currently updating its backup contents -->
     <string name="device_center_list_view_item_status_updating">更新中&#8230;</string>
     <!-- The name of the Device or Folder Status which signifies that it is currently updating its backup contents with a percentage completion -->
@@ -28,14 +24,8 @@
     <string name="device_center_list_view_item_status_offline">非アクティブ</string>
     <!-- The name of the Device or Folder Status which signifies that the backup procedure has been paused -->
     <string name="device_center_list_view_item_status_paused">一時停止中</string>
-    <!-- The name of the Device or Folder Status which signifies that the backup procedure has been stopped -->
-    <string name="device_center_list_view_item_status_backup_stopped">バックアップが停止しました</string>
-    <!-- The name of the Device or Folder Status which signifies that it has exceeded the maximum allowed Transfer quota -->
-    <string name="device_center_list_view_item_status_out_of_quota">容量不足</string>
     <!-- The name of the Device or Folder Status which signifies that an error has occurred -->
     <string name="device_center_list_view_item_status_error">エラー</string>
-    <!-- The name of the Device or Folder Status which signifies that it is blocked due to a certain issue -->
-    <string name="device_center_list_view_item_status_blocked">ブロックされています</string>
     <!-- The title of the Device Center feature -->
     <string name="device_center_top_app_bar_title">デバイスセンター</string>
     <!-- The name of one of the Device Center Bottom Sheet items which takes the User to the Camera uploads feature when clicked -->

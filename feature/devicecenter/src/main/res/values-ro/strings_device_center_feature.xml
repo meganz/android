@@ -14,10 +14,6 @@
     <string name="device_center_list_view_item_title_unknown_device">Dispozitiv necunoscut</string>
     <!-- The name of the Device or Folder Status which signifies that it is Up to Date -->
     <string name="device_center_list_view_item_status_up_to_date">La zi</string>
-    <!-- The name of the Device or Folder Status which signifies that it is currently initializing -->
-    <string name="device_center_list_view_item_status_initialising">Se inițializează&#8230;</string>
-    <!-- The name of the Device or Folder Status which signifies that it is currently scanning -->
-    <string name="device_center_list_view_item_status_scanning">Se scanează&#8230;</string>
     <!-- The name of the Device or Folder Status which signifies that it is currently updating its backup contents -->
     <string name="device_center_list_view_item_status_updating">Se actualizează&#8230;</string>
     <!-- The name of the Device or Folder Status which signifies that it is currently updating its backup contents with a percentage completion -->
@@ -28,14 +24,8 @@
     <string name="device_center_list_view_item_status_offline">Inactiv</string>
     <!-- The name of the Device or Folder Status which signifies that the backup procedure has been paused -->
     <string name="device_center_list_view_item_status_paused">Pus pe pauză</string>
-    <!-- The name of the Device or Folder Status which signifies that the backup procedure has been stopped -->
-    <string name="device_center_list_view_item_status_backup_stopped">Backup oprit</string>
-    <!-- The name of the Device or Folder Status which signifies that it has exceeded the maximum allowed Transfer quota -->
-    <string name="device_center_list_view_item_status_out_of_quota">În afara cotei</string>
     <!-- The name of the Device or Folder Status which signifies that an error has occurred -->
     <string name="device_center_list_view_item_status_error">Eroare</string>
-    <!-- The name of the Device or Folder Status which signifies that it is blocked due to a certain issue -->
-    <string name="device_center_list_view_item_status_blocked">Blocat</string>
     <!-- The title of the Device Center feature -->
     <string name="device_center_top_app_bar_title">Centrul de dispozitive</string>
     <!-- The name of one of the Device Center Bottom Sheet items which takes the User to the Camera uploads feature when clicked -->

@@ -267,7 +267,7 @@
         <item quantity="other">شارك الروابط</item>
     </plurals>
     <!-- Title of the dialog to ask the user to use the selected location as default location for next downloads. Please do not modify the %s placeholder as it will be replaced by the name of the folder where the files will be downloaded-->
-    <string name="transfers_dialog_save_download_location_title">Save all your downloaded files to “%1$s”?</string>
+    <string name="transfers_dialog_save_download_location_title">احفظ جميع الملفات التي تم تنزيلها في «%1$s»؟</string>
     <!-- Option to use the selected location as default location for next downloads-->
     <string name="transfers_dialog_save_download_location_always_here_option">قم بالتنزيل دائمًا هنا</string>
     <!-- Option to don't use the selected location as default location for next downloads and don't ask again-->
@@ -644,7 +644,7 @@
     <!-- Text of the primary button of the bottom sheet to promote Sync feature for Pro users ("Sync folders") -->
     <string name="sync_promotion_bottom_sheet_primary_button_text_pro">مجلدات المزامنة</string>
     <!-- Text of the secondary button of the bottom sheet to promote Sync feature ("Back up folders") -->
-    <string name="sync_promotion_bottom_sheet_secondary_button_text">Back up folders</string>
+    <string name="sync_promotion_bottom_sheet_secondary_button_text">مجلدات النسخ الاحتياطي</string>
     <!-- Snackbar message displayed when sync option is selected -->
     <string name="settings_sync_option_updated_message">تم تحديث خيارات المزامنة</string>
     <!-- Title of the Contact Permission Explanation -->
@@ -726,7 +726,7 @@
     <!-- Title of Favourites video playlist in the video section -->
     <string name="video_section_title_favourite_playlist">المفضلة</string>
     <!-- Title of the synced folder list empty state -->
-    <string name="device_center_sync_backup_list_empty_state_title">لم يتم إعداد أي اتصالات</string>
+    <string name="device_center_sync_backup_list_empty_state_title">لم يتم إعداد أي أجهزة</string>
     <!-- Message of the synced folder list empty state -->
     <string name="device_center_sync_backup_list_empty_state_message">قم بمزامنة مجلد أو نسخه احتياطيًا على جهازك باستخدام مجلد على ميغا MEGA</string>
     <!-- subtitle of meeting title in schedule meeting for title disclaimer -->
@@ -885,25 +885,25 @@
         <item quantity="other"></item>
     </plurals>
     <!-- Warning shown to the user when tries to retry a cancelled or failed transfer but it cannot be retried because app does not have read permission over the file anymore -->
-    <string name="transfers_completed_one_read_error_retrying">Your upload can’t be completed or retried, because MEGA can no longer access the file</string>
+    <string name="transfers_completed_one_read_error_retrying">لا يمكن إكمال الترفيع أو إعادة المحاولة لأن ميغا MEGA لم تعد قادرة على الوصول إلى الملف</string>
     <!-- Warning shown to the user when tries to retry some or all of cancelled or failed transfer but they cannot be retried because app does not have read permission over the files anymore -->
-    <string name="transfers_completed_some_read_error_retrying">Some or all of your uploads can’t be completed or retried, because MEGA can no longer access the files</string>
+    <string name="transfers_completed_some_read_error_retrying">لا يمكن إكمال بعض أو كل الترفيعات الخاصة بك أو إعادة المحاولة لأن ميغا MEGA لم تعد قادرة على الوصول إلى الملفات</string>
     <!-- Title for Offline Folder exposed via SAF -->
-    <string name="general_mega_offline">MEGA Offline files</string>
+    <string name="general_mega_offline">ملفات ميغا MEGA في دون اتصال بالإنترنت</string>
     <!-- Notification content for download final notification. It will inform the user about the location where file/s were downloaded -->
-    <string name="transfers_notification_location_content">Location: %1$s</string>
+    <string name="transfers_notification_location_content">الموقع: %1$s</string>
     <!-- Notification action for download final notification. It will open the file explorer activity to show the destination folder -->
-    <string name="transfers_notification_location_action">Locate</string>
+    <string name="transfers_notification_location_action">حدد موقع</string>
     <!-- Notification content for download final notification in case of a single file downloaded. -->
-    <string name="transfers_notification_title_single_download">Downloaded “%1$s”</string>
+    <string name="transfers_notification_title_single_download">تم تنزيل «%1$s»</string>
     <!-- Label for the button or menu option to add a new backup -->
-    <string name="device_center_sync_add_new_backup_button_option">Add new backup</string>
+    <string name="device_center_sync_add_new_backup_button_option">إضافة نسخة احتياطية جديدة</string>
     <!-- Notification content for download final notification in case of a single file downloaded to preview. -->
-    <string name="transfers_notification_title_preview_download">“%1$s” is ready to preview</string>
+    <string name="transfers_notification_title_preview_download">«%1$s» جاهز للعرض</string>
     <!-- Notification action for download final notification. It will open a dialog with installed apps which can open the file -->
     <string name="transfers_notification_preview_action">عرض</string>
     <!-- Title for the OS dialog shown with available apps to open a file -->
-    <string name="open_with_os_dialog_title">Open “%1$s” with</string>
+    <string name="open_with_os_dialog_title">افتح »%1$s» مع</string>
     <!-- The Scan Confirmation screen error message shown when the new filename does not contain the file extension that was selected -->
     <string name="document_scanning_settings_missing_file_extension_error_message">ملف بدون لاحقة  (%s)</string>
     <!-- The Scan Confirmation screen error message shown when the filename does not end with the expected file extension -->
@@ -911,44 +911,56 @@
     <!-- The Scan Confirmation screen error message shown when the filename has no file extension -->
     <string name="document_scanning_settings_file_extension_required_error_message">لاحقة الملف مطلوبة</string>
     <!-- Alert text before download a file for preview. Please do not modify the %s placeholder as it will be replaced by the size to be donwloaded -->
-    <string name="alert_larger_file_preview">In order to preview this file, MEGA needs to download it. %1$s will be downloaded.</string>
+    <string name="alert_larger_file_preview">من أجل معاينة هذا الملف، تحتاج ميغا MEGA إلى تنزيله.  سيتم تنزيل %1$s.</string>
     <!-- Message displayed with progress percentage while the app is doing some background operation -->
     <string name="login_completing_operation">إكمال العملية: %1$d%%</string>
     <!-- Add to album files existed message -->
     <plurals name="album_add_to_files_existed">
-        <item quantity="one">This file already exists in “%1$s” and cannot be added again</item>
-        <item quantity="other">These files already exist in “%1$s” and cannot be added again</item>
+        <item quantity="zero">هذا الملف موجود بالفعل في «%1$s» ولا يمكن إضافته مرة أخرى</item>
+        <item quantity="one">هذا الملف موجود بالفعل في «%1$s» ولا يمكن إضافته مرة أخرى</item>
+        <item quantity="two">هذان الملفان موجودان بالفعل في «%1$s» ولا يمكن إضافتهما مرة أخرى</item>
+        <item quantity="few">هذه الملفات موجودة بالفعل في «%1$s» ولا يمكن إضافتهم مرة أخرى</item>
+        <item quantity="many">هذه الملفات موجودة بالفعل في «%1$s» ولا يمكن إضافتهم مرة أخرى</item>
+        <item quantity="other">هذه الملفات موجودة بالفعل في «%1$s» ولا يمكن إضافتهم مرة أخرى</item>
     </plurals>
     <!-- Add to album partial added message -->
     <plurals name="album_add_to_partial_added_message">
-        <item quantity="one">1 file added to “%1$s”. Some files already exist, and can’t be added again.</item>
-        <item quantity="other">%2$d files added to “%1$s”. Some files already exist, and can’t be added again.</item>
+        <item quantity="zero">تمت إضافة %2$d ملف إلى «%1$s». بعض الملفات موجودة بالفعل ولا يمكن إضافتهم مرة أخرى.</item>
+        <item quantity="one">تمت إضافة 1 ملف إلى «%1$s». بعض الملفات موجودة بالفعل ولا يمكن إضافتهم مرة أخرى.</item>
+        <item quantity="two">تمت إضافة %2$d ملفين إلى «%1$s». بعض الملفات موجودة بالفعل ولا يمكن إضافتهم مرة أخرى.</item>
+        <item quantity="few">تمت إضافة %2$d ملفات إلى «%1$s». بعض الملفات موجودة بالفعل ولا يمكن إضافتهم مرة أخرى.</item>
+        <item quantity="many">تمت إضافة %2$d ملف إلى «%1$s». بعض الملفات موجودة بالفعل ولا يمكن إضافتهم مرة أخرى.</item>
+        <item quantity="other">تمت إضافة %2$d ملف إلى «%1$s». بعض الملفات موجودة بالفعل ولا يمكن إضافتهم مرة أخرى.</item>
     </plurals>
     <!--Content on the Multi-Factor Authentication Login page -->
     <string name="multi_factor_auth_login_verification_content">أدخل الرمز المكون من 6 أرقام من تطبيق المصادقة الخاص بك.</string>
     <!--Message to be shown to the user when they entered an incorrect verification code-->
     <string name="multi_factor_auth_login_verification_input_error_text">رمز التحقق غير الصحيح</string>
     <!-- Snackbar text to inform the user that preview may take some time because it needs to be downloaded -->
-    <string name="transfers_preview_slow_snackbar">Preparing file for preview. See notification for details.</string>
+    <string name="transfers_preview_slow_snackbar">إعداد الملف للعرض. راجع الإشعار للحصول على التفاصيل.</string>
     <!-- Notification text for preview downloads.  Please do not modify the %s placeholder as it will be replaced by the name of the file to be donwloaded -->
-    <string name="transfers_notification_downloading_preview">Preparing %1$s for preview</string>
+    <string name="transfers_notification_downloading_preview">جاري تحضير %1$s للعرض</string>
     <!-- Notification text for preview downloads, paused state.  Please do not modify the %s placeholder as it will be replaced by the name of the file to be donwloaded -->
-    <string name="transfers_notification_downloading_preview_paused">Preparing %1$s for preview (paused)</string>
+    <string name="transfers_notification_downloading_preview_paused">جاري تحضير %1$s للعرض (متوقف مؤقتاً)</string>
     <!-- Message when successfully deleting single item from the audio queue. %1$s will be replaced with the item name -->
-    <string name="audio_queue_single_item_removed_message">‟%1$s” was removed</string>
+    <string name="audio_queue_single_item_removed_message">تمت إزالة ”%1$s“</string>
     <!-- Message when successfully deleting items from the audio queue. %1$d will be replaced with the removal count when multiple items are removed. -->
     <string name="audio_queue_multiple_items_removed_message">Removed %1$d items from queue</string>
     <!-- Message when successfully deleting items from the audio queue. %1$s will be replaced with the item name %2$d will be replaced with the removal count. -->
     <plurals name="audio_queue_items_removal_success_message">
-        <item quantity="one">“%1$s” was removed from the queue</item>
-        <item quantity="other">Removed %2$d items from the queue</item>
+        <item quantity="zero">تمت إزالة %2$d عنصر من قائمة الانتظار</item>
+        <item quantity="one">تمت إزالة ”%1$s“ من قائمة الانتظار</item>
+        <item quantity="two">تمت إزالة %2$d عنصرين من قائمة الانتظار</item>
+        <item quantity="few">تمت إزالة %2$d عناصر من قائمة الانتظار</item>
+        <item quantity="many">تمت إزالة %2$d عنصر من قائمة الانتظار</item>
+        <item quantity="other">تمت إزالة %2$d عنصر من قائمة الانتظار</item>
     </plurals>
     <!-- Title for the dialog to inform that a transfer is needed to preview a file and transfers are paused-->
-    <string name="transfers_preview_paused_dialog_title">Transfers are paused</string>
+    <string name="transfers_preview_paused_dialog_title">تم إيقاف عمليات تراسل المعطيات مؤقتًا</string>
     <!-- Message for the dialog to inform that a transfer is needed to preview a file and transfers are paused-->
-    <string name="transfers_preview_paused_dialog_text">To preview “%1$s” you will need to resume paused transfers</string>
+    <string name="transfers_preview_paused_dialog_text">لعرض »%1$s» ستحتاج إلى استئناف عمليات تراسل المعطيات المتوقفة مؤقتًا</string>
     <!--SD Card text shown as title in FileStorage screen -->
-    <string name="general_sd_card">SD card</string>
+    <string name="general_sd_card">بطاقة ذاكرة SD</string>
     <!--The title of the Login page-->
     <string name="login_page_title">قم بتسجيل الدخول إلى حساب ميغا MEGA الخاص بك</string>
     <!--Message to be shown to the user when they entered an invalid email-->
@@ -970,7 +982,7 @@
     <!-- password label -->
     <string name="password_text">كلمة السر</string>
     <!-- Login button -->
-    <string name="login_text">تسجيل الدخول</string>
+    <string name="login_text">قم بتسجيل الدخول باستخدام حساب ميغا MEGA الخاص بك</string>
     <!--The text where user forgot their password and will navigate to reset it-->
     <string name="login_page_forgot_password_text">نسيت كلمة المرور؟</string>
     <!-- Sync state up to date -->
@@ -982,40 +994,98 @@
     <!-- Generic settings label text -->
     <string name="general_settings">الاعدادات</string>
     <!-- Ad settings label in the cookie settings page -->
-    <string name="settings_cookie_settings_label_ad_settings">Ad settings</string>
+    <string name="settings_cookie_settings_label_ad_settings">إعدادات الإعلانات</string>
     <!-- Ads personalization label in the cookie settings page -->
-    <string name="settings_cookie_settings_label_ads_personalization">Ads personalisation</string>
+    <string name="settings_cookie_settings_label_ads_personalization">تخصيص الإعلانات</string>
     <!-- Cookie settings title in the cookie settings page -->
-    <string name="settings_cookie_setting_title_cookie_and_ad_settings">Cookie and ad settings</string>
+    <string name="settings_cookie_setting_title_cookie_and_ad_settings">إعدادات ملفات تعريف الارتباط Cookie والإعلانات</string>
     <!-- Body text of the bottom sheet to promote Sync feature. The placeholders are to underline text -->
-    <string name="sync_promotion_bottom_sheet_body_text">Sync or back up a folder on your device with a folder on MEGA. [U]Learn more[/U]</string>
+    <string name="sync_promotion_bottom_sheet_body_text">قم بمزامنة مجلد على جهازك أو نسخه احتياطيًا باستخدام مجلد على ميغا MEGA. [U]اعرف المزيد[/U]</string>
     <!-- This is the final button when creating a folder in the dialog where the user inserts the folder name -->
-    <string name="transfers_cancel_download_warning_title">Cancel download?</string>
+    <string name="transfers_cancel_download_warning_title">إلغاء التنزيل؟</string>
     <!-- Confirmation message informing a download was successfully cancelled -->
     <string name="transfers_cancel_download_success_message">Download cancelled</string>
     <!-- Title of note to self chat -->
-    <string name="chat_note_to_self_chat_title">Note to self</string>
+    <string name="chat_note_to_self_chat_title">ملاحظة لنفسي</string>
     <!-- First message header in note to self chat -->
-    <string name="chat_note_to_self_chat_first_message_header">Keep it to yourself</string>
+    <string name="chat_note_to_self_chat_first_message_header">احتفظ بها لنفسك</string>
     <!-- First message description in note to self chat -->
-    <string name="chat_note_to_self_chat_first_message_description">Send yourself sensitive information, pics and videos, or ideas for your next big venture. Synced across all your devices, and protected with zero-knowledge encryption.</string>
+    <string name="chat_note_to_self_chat_first_message_description">أرسل لنفسك معلومات حساسة أو صورًا ومقاطع فيديو أو أفكارًا لمشروعك الكبير القادم. متزامنة عبر جميع أجهزتك ومحمية بتشفير المعرفة الصفرية.</string>
     <!-- Add to album some files exist message -->
     <plurals name="album_add_to_files_exist_message">
-        <item quantity="one">1 file added to “%1$s”. Duplicate files cannot be added again.</item>
-        <item quantity="other">%2$d files added to “%1$s”. Duplicate files cannot be added again.</item>
+        <item quantity="zero">تمت إضافة %2$d ملف إلى »%1$s». لا يمكن إضافة الملفات المكررة مرة أخرى.</item>
+        <item quantity="one">تمت إضافة 1 ملف إلى »%1$s». لا يمكن إضافة الملفات المكررة مرة أخرى.</item>
+        <item quantity="two">تمت إضافة %2$d ملفين إلى »%1$s». لا يمكن إضافة الملفات المكررة مرة أخرى.</item>
+        <item quantity="few">تمت إضافة %2$d ملفات إلى »%1$s». لا يمكن إضافة الملفات المكررة مرة أخرى.</item>
+        <item quantity="many">تمت إضافة %2$d ملف إلى »%1$s». لا يمكن إضافة الملفات المكررة مرة أخرى.</item>
+        <item quantity="other">تمت إضافة %2$d ملف إلى »%1$s». لا يمكن إضافة الملفات المكررة مرة أخرى.</item>
     </plurals>
     <!-- Snack bar message informing that profile's QR code is uploaded to the Cloud Drive-->
-    <string name="transfers_start_upload_profile_qr_code_message">Saving %1$s to Cloud drive&#8230;</string>
+    <string name="transfers_start_upload_profile_qr_code_message">جاري حفظ %1$s إلى السواقة السحابية...</string>
     <!-- Warning shown after trying to cancel a download, but the request failed -->
-    <string name="transfers_error_cancelling_download">Something went wrong. Download was not cancelled.</string>
+    <string name="transfers_error_cancelling_download">حدث خطأ ما. لم يتم إلغاء التنزيل.</string>
     <!-- Body for the subscription details section, which is shown to the Indian user to provide details about subscription. This string is shown if user selects yearly subscription and the amount is more than Rs.15,000. Please keep these placeholders [A], [/A], [B], [/B], [C], [/C]. They will be used to format the string. -->
-    <string name="account_upgrade_account_subscription_details_body_yearly_with_price_for_indian">You will be charged %1$s immediately but your subscription will not automatically renew after 12 months due to government regulations. It will be your responsibility to renew your subscription after it has expired. You can manage or cancel your subscription anytime via Subscriptions in [A]Google&#160;Play[/A]. By upgrading your account, you agree to MEGA’s [B]Terms of Service[/B] and [C]Privacy and Data Policy[/C].</string>
+    <string name="account_upgrade_account_subscription_details_body_yearly_with_price_for_indian">سيتم محاسبتك بمبلغ %1$s على الفور ولكن لن يتم تجديد اشتراكك تلقائيًا بعد 12 شهرًا بسبب اللوائح الحكومية. تقع على عاتقك مسؤولية تجديد اشتراكك بعد انتهاء صلاحيته. يمكنك إدارة أو إلغاء اشتراكك في أي وقت عبر الاشتراكات في غوغل بلاي [A]Google&#160;Play[/A]. من خلال ترقية حسابك فإنك توافق على [B]شروط الخدمة[/B] و [C]سياسة الخصوصية والبيانات[/C] الخاصين بميغا MEGA.</string>
     <!-- The name of the Device or Folder Status which signifies that it is currently uploading -->
     <string name="device_center_list_view_item_status_uploading">جاري الرفع\u2026</string>
     <!-- The name of the Device or Folder Status which signifies that it is currently uploading with a percentage completion -->
-    <string name="device_center_list_view_item_status_uploading_with_progress">%1$d%% uploading&#8230;</string>
+    <string name="device_center_list_view_item_status_uploading_with_progress">%1$d%% جاري الترفيع...</string>
     <!-- The name of the Device or Folder Status which signifies that it is inactive -->
-    <string name="device_center_list_view_item_status_inactive">Inactive</string>
+    <string name="device_center_list_view_item_status_inactive">غير نشط</string>
     <!-- The name of the Device or Folder Status which signifies that some action is needed -->
-    <string name="device_center_list_view_item_status_attention_needed">Attention needed</string>
+    <string name="device_center_list_view_item_status_attention_needed">الانتباه مطلوب</string>
+    <!--General Unable to log in-->
+    <string name="general_unable_to_login">غير قادر على تسجيل الدخول</string>
+    <!--General check inbox-->
+    <string name="general_check_inbox">تحقق من صندوق البريد الوارد ببريدك الالكتروني</string>
+    <!--Message to be shown to user when account is temporarily suspended and requires email verification -->
+    <string name="login_account_suspension_email_verification_message">تم قفل حسابك لحمايتك بعد اكتشاف تسجيل دخول ضار لذلك نطلب منك إعادة تعيين كلمة المرور الخاصة بك. تحقق من صندوق البريد الإلكتروني الخاص بك للحصول على إرشادات حول إلغاء قفل حسابك ونصائح حول كيفية منع حدوث ذلك مرة أخرى.</string>
+    <!--General Resend email-->
+    <string name="general_resend_email">إعادة إرسال البريد الإلكتروني</string>
+    <!-- Message displayed when email is successfully resent -->
+    <string name="general_email_resend_success_message">تم إرسال البريد الالكتروني</string>
+    <!--General Request Network Failed text-->
+    <string name="general_request_failed_message">حدث خطأ ما</string>
+    <!-- Message error shown when trying to log in on an account that has been suspended due to breaches of copyright -->
+    <string name="dialog_account_suspended_ToS_copyright_message">تم تعليق حساب ميغا MEGA الخاص بك بسبب الادعاءات المتكررة بانتهاكات حقوق الطبع والنشر. هذا يعني أنه لا يمكنك الوصول إلى حسابك أو البيانات الموجودة فيه.\nتحقق من صندوق البريد الإلكتروني الخاص بك للحصول على مزيد من المعلومات حول كيفية تقديم إشعار مضاد.</string>
+    <!-- Message error shown when trying to log in on an account that has been terminated due to breaches of all reasons of breaching Terms of Service, except copyright. -->
+    <string name="dialog_account_suspended_ToS_non_copyright_message">تم إنهاء حسابك بسبب خرق شروط الخدمة الخاصة بميغا MEGA.\nلن تتمكن من استعادة الوصول إلى بياناتك المخزنة أو السماح لك بالتسجيل للحصول على حساب ميغا MEGA جديد.</string>
+    <!-- Error message appears to sub-users of a business account when they try to login and they are disabled. -->
+    <string name="error_business_disabled">تم إلغاء تفعيل حسابك من قبل مديرك. يرجى الاتصال مع مدير حساب الاعمال خاصتك للحصول على مزيد من التفاصيل.</string>
+    <!-- An error message which appears to sub-users of a business account when they try to login and they are deleted. -->
+    <string name="error_business_removed">تمت إزالة حسابك من قبل مشرف الحساب الخاص بك. يرجى الاتصال بمشرف حساب الأعمال لمزيد من التفاصيل.</string>
+    <!--The title of the Email Confirmation page-->
+    <string name="email_confirmation_title">تأكيد البريد الإلكتروني</string>
+    <!--The Content of the Email Confirmation page-->
+    <string name="email_confirmation_content">لقد أرسلنا بريدًا إلكترونيًا إلى [P]%s[/P] مع رابط. انقر فوق الرابط للتحقق من عنوان بريدك الإلكتروني وتفعيل حسابك. \n\nإذا لم تستلم البريد الإلكتروني، فتحقق من مجلد الرسائل غير المرغوب فيها أو حاول مرة أخرى. لأي مشاكل أخرى، تواصل مع [A]%s[/A]</string>
+    <!-- Button to resend the create account email to a new email address in case the previous email address was misspelled -->
+    <string name="general_resend_button">إعادة إرسال</string>
+    <!-- General change email address -->
+    <string name="general_change_email_address">تغيير البريد الإلكتروني</string>
+    <!-- Title for the cancel registration dialog -->
+    <string name="email_confirmation_dialog_cancel_registration_title">إلغاء التسجيل؟</string>
+    <!-- Content for the cancel registration dialog -->
+    <string name="email_confirmation_dialog_cancel_registration_content">سيؤدي هذا إلى إلغاء عملية تسجيل الحساب.</string>
+    <!-- Text for the "Yes, cancel" button in the cancel registration dialog -->
+    <string name="email_confirmation_dialog_cancel_registration_cancel_button">نعم، إلغاء</string>
+    <!-- Text for the "Don’t cancel" button in the cancel registration dialog -->
+    <string name="email_confirmation_dialog_cancel_registration_dismiss_button">لا تلغي</string>
+    <!-- First message header paragraph in note to self chat -->
+    <string name="chat_note_to_self_chat_first_message_header_paragraph">مساحة خاصة للصور أو المعلومات المهمة أو الأفكار الكبيرة. تتم مزامنتها وحمايتها دائمًا باستخدام تشفير المعرفة الصفرية.</string>
+    <!-- Title of the notification displayed when Syncs are paused due to low battery conditions -->
+    <string name="general_sync_notification_low_battery_title">Syncing paused due to low battery</string>
+    <!-- Text of the notification displayed when Syncs are paused due to low battery conditions -->
+    <string name="general_sync_notification_low_battery_text">Connect to power source to resume</string>
+    <!-- Title of the notification displayed when Syncs are paused due to lost Wi-Fi conditions -->
+    <string name="general_sync_notification_lost_wifi_title">Syncing paused due to lost connection</string>
+    <!-- Text of the notification displayed when Syncs are paused due to lost Wi-Fi conditions -->
+    <string name="general_sync_notification_lost_wifi_text">Reconnect to Wi-Fi to resume</string>
+    <!-- Title of the notification displayed when Syncs are stopped due to some sync error -->
+    <string name="general_sync_notification_generic_error_title">Syncing has stopped</string>
+    <!-- Text of the notification displayed when Syncs are stopped due to some sync error -->
+    <string name="general_sync_notification_generic_error_text">Go to the Help Centre to understand why</string>
+    <!-- Title of the notification displayed when a Sync has stalled issues -->
+    <string name="general_sync_notification_stalled_issues_title">Sync issues detected</string>
+    <!-- Text of the notification displayed when a Sync has stalled issues -->
+    <string name="general_sync_notification_stalled_issues_text">View and resolve issues</string>
 </resources>

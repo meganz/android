@@ -671,7 +671,7 @@
     <!-- Title of Favourites video playlist in the video section -->
     <string name="video_section_title_favourite_playlist">收藏</string>
     <!-- Title of the synced folder list empty state -->
-    <string name="device_center_sync_backup_list_empty_state_title">沒有設定連線</string>
+    <string name="device_center_sync_backup_list_empty_state_title">未設定任何裝置</string>
     <!-- Message of the synced folder list empty state -->
     <string name="device_center_sync_backup_list_empty_state_message">將裝置上的資料夾與MEGA上的資料夾同步或備份</string>
     <!-- subtitle of meeting title in schedule meeting for title disclaimer -->
@@ -897,7 +897,7 @@
     <!-- password label -->
     <string name="password_text">密碼</string>
     <!-- Login button -->
-    <string name="login_text">登&#160;入</string>
+    <string name="login_text">使用您的MEGA帳戶登入</string>
     <!--The text where user forgot their password and will navigate to reset it-->
     <string name="login_page_forgot_password_text">忘記密碼？</string>
     <!-- Sync state up to date -->
@@ -935,7 +935,7 @@
     <!-- Warning shown after trying to cancel a download, but the request failed -->
     <string name="transfers_error_cancelling_download">出了點問題。下載未被取消。</string>
     <!-- Body for the subscription details section, which is shown to the Indian user to provide details about subscription. This string is shown if user selects yearly subscription and the amount is more than Rs.15,000. Please keep these placeholders [A], [/A], [B], [/B], [C], [/C]. They will be used to format the string. -->
-    <string name="account_upgrade_account_subscription_details_body_yearly_with_price_for_indian">You will be charged %1$s immediately but your subscription will not automatically renew after 12 months due to government regulations. It will be your responsibility to renew your subscription after it has expired. You can manage or cancel your subscription anytime via Subscriptions in [A]Google&#160;Play[/A]. By upgrading your account, you agree to MEGA’s [B]Terms of Service[/B] and [C]Privacy and Data Policy[/C].</string>
+    <string name="account_upgrade_account_subscription_details_body_yearly_with_price_for_indian">您將立即被收取%1$s費用l，但由於政府規定，您的訂閱不會在12個月後自動續訂。訂閱到期後，您必須自己設定續訂。您可以隨時透過[A]Google&#160;Play[/A]中的訂閱管理或取消訂閱。升級您的帳戶，即表示您同意MEGA的[B]服務條款[/B]和[C]隱私權與資料政策[/C]。</string>
     <!-- The name of the Device or Folder Status which signifies that it is currently uploading -->
     <string name="device_center_list_view_item_status_uploading">正在上傳⋯</string>
     <!-- The name of the Device or Folder Status which signifies that it is currently uploading with a percentage completion -->
@@ -944,4 +944,58 @@
     <string name="device_center_list_view_item_status_inactive">非活躍</string>
     <!-- The name of the Device or Folder Status which signifies that some action is needed -->
     <string name="device_center_list_view_item_status_attention_needed">需要注意</string>
+    <!--General Unable to log in-->
+    <string name="general_unable_to_login">無法登入</string>
+    <!--General check inbox-->
+    <string name="general_check_inbox">檢查您的收件匣</string>
+    <!--Message to be shown to user when account is temporarily suspended and requires email verification -->
+    <string name="login_account_suspension_email_verification_message">為了保護您的安全，在偵測到惡意登入後，您的帳戶已被鎖定，因此我們要求您重設密碼。檢查您的電子郵件收件匣以瞭解有關解鎖帳戶的說明，以及如何防止這種情況再次發生的提示。</string>
+    <!--General Resend email-->
+    <string name="general_resend_email">重發電子郵件</string>
+    <!-- Message displayed when email is successfully resent -->
+    <string name="general_email_resend_success_message">已發送信件</string>
+    <!--General Request Network Failed text-->
+    <string name="general_request_failed_message">出錯了</string>
+    <!-- Message error shown when trying to log in on an account that has been suspended due to breaches of copyright -->
+    <string name="dialog_account_suspended_ToS_copyright_message">由於多次侵犯版權的指控，您的MEGA帳戶已被暫停。這意味著您無法存取您的帳戶或當中的資料。\n檢查您的電子郵件收件匣，瞭解有關如何提交反對通知的更多資訊。</string>
+    <!-- Message error shown when trying to log in on an account that has been terminated due to breaches of all reasons of breaching Terms of Service, except copyright. -->
+    <string name="dialog_account_suspended_ToS_non_copyright_message">由於違反MEGA的服務條款，您的帳戶已被終止。\n您將無法再存取您儲存的資料，也無法獲得註冊新MEGA帳戶的授權。</string>
+    <!-- Error message appears to sub-users of a business account when they try to login and they are disabled. -->
+    <string name="error_business_disabled">您的帳戶已被您的管理員停用。相關詳細資訊，請與您的商業帳戶管理員聯絡。</string>
+    <!-- An error message which appears to sub-users of a business account when they try to login and they are deleted. -->
+    <string name="error_business_removed">您的帳戶已被管理員刪除。有關更多資訊，請與您的商業帳戶管理員聯繫。</string>
+    <!--The title of the Email Confirmation page-->
+    <string name="email_confirmation_title">電子郵件確認</string>
+    <!--The Content of the Email Confirmation page-->
+    <string name="email_confirmation_content">我們已向[P]%s[/P]發送了一封帶有連結的電子郵件。點擊連結以驗證您的電子郵件地址並啟動您的帳戶。\n\n如果您沒有收到電子郵件，請檢查您的垃圾郵件資料夾或重試。如有任何其它問題，請聯繫[A]%s[/A]</string>
+    <!-- Button to resend the create account email to a new email address in case the previous email address was misspelled -->
+    <string name="general_resend_button">重新發送</string>
+    <!-- General change email address -->
+    <string name="general_change_email_address">更改電子郵件地址</string>
+    <!-- Title for the cancel registration dialog -->
+    <string name="email_confirmation_dialog_cancel_registration_title">取消建立帳戶？</string>
+    <!-- Content for the cancel registration dialog -->
+    <string name="email_confirmation_dialog_cancel_registration_content">這將取消註冊程序。</string>
+    <!-- Text for the "Yes, cancel" button in the cancel registration dialog -->
+    <string name="email_confirmation_dialog_cancel_registration_cancel_button">是，取消</string>
+    <!-- Text for the "Don’t cancel" button in the cancel registration dialog -->
+    <string name="email_confirmation_dialog_cancel_registration_dismiss_button">不要取消</string>
+    <!-- First message header paragraph in note to self chat -->
+    <string name="chat_note_to_self_chat_first_message_header_paragraph">存放圖片、重要資訊或重要創意的私人空間。始終保持同步，並受到零知識加密的保護。</string>
+    <!-- Title of the notification displayed when Syncs are paused due to low battery conditions -->
+    <string name="general_sync_notification_low_battery_title">Syncing paused due to low battery</string>
+    <!-- Text of the notification displayed when Syncs are paused due to low battery conditions -->
+    <string name="general_sync_notification_low_battery_text">Connect to power source to resume</string>
+    <!-- Title of the notification displayed when Syncs are paused due to lost Wi-Fi conditions -->
+    <string name="general_sync_notification_lost_wifi_title">Syncing paused due to lost connection</string>
+    <!-- Text of the notification displayed when Syncs are paused due to lost Wi-Fi conditions -->
+    <string name="general_sync_notification_lost_wifi_text">Reconnect to Wi-Fi to resume</string>
+    <!-- Title of the notification displayed when Syncs are stopped due to some sync error -->
+    <string name="general_sync_notification_generic_error_title">Syncing has stopped</string>
+    <!-- Text of the notification displayed when Syncs are stopped due to some sync error -->
+    <string name="general_sync_notification_generic_error_text">Go to the Help Centre to understand why</string>
+    <!-- Title of the notification displayed when a Sync has stalled issues -->
+    <string name="general_sync_notification_stalled_issues_title">Sync issues detected</string>
+    <!-- Text of the notification displayed when a Sync has stalled issues -->
+    <string name="general_sync_notification_stalled_issues_text">View and resolve issues</string>
 </resources>

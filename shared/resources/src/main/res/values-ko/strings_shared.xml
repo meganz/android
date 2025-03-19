@@ -227,7 +227,7 @@
         <item quantity="other">링크 공유</item>
     </plurals>
     <!-- Title of the dialog to ask the user to use the selected location as default location for next downloads. Please do not modify the %s placeholder as it will be replaced by the name of the folder where the files will be downloaded-->
-    <string name="transfers_dialog_save_download_location_title">Save all your downloaded files to “%1$s”?</string>
+    <string name="transfers_dialog_save_download_location_title">모든 다운로드한 파일을 “%1$s”에 저장할까요?</string>
     <!-- Option to use the selected location as default location for next downloads-->
     <string name="transfers_dialog_save_download_location_always_here_option">항상 여기에 다운로드</string>
     <!-- Option to don't use the selected location as default location for next downloads and don't ask again-->
@@ -589,7 +589,7 @@
     <!-- Text of the primary button of the bottom sheet to promote Sync feature for Pro users ("Sync folders") -->
     <string name="sync_promotion_bottom_sheet_primary_button_text_pro">폴더 동기화</string>
     <!-- Text of the secondary button of the bottom sheet to promote Sync feature ("Back up folders") -->
-    <string name="sync_promotion_bottom_sheet_secondary_button_text">Back up folders</string>
+    <string name="sync_promotion_bottom_sheet_secondary_button_text">백업 폴더</string>
     <!-- Snackbar message displayed when sync option is selected -->
     <string name="settings_sync_option_updated_message">동기화 옵션 업데이트됨</string>
     <!-- Title of the Contact Permission Explanation -->
@@ -671,7 +671,7 @@
     <!-- Title of Favourites video playlist in the video section -->
     <string name="video_section_title_favourite_playlist">즐겨찾기</string>
     <!-- Title of the synced folder list empty state -->
-    <string name="device_center_sync_backup_list_empty_state_title">설정된 연결 없음</string>
+    <string name="device_center_sync_backup_list_empty_state_title">설정된 장치 없음</string>
     <!-- Message of the synced folder list empty state -->
     <string name="device_center_sync_backup_list_empty_state_message">장치의 폴더를 MEGA의 폴더와 동기화 또는 백업하세요.</string>
     <!-- subtitle of meeting title in schedule meeting for title disclaimer -->
@@ -789,19 +789,19 @@
     <!-- Message to enter confirm password -->
     <string name="general_confirm_your_password">암호를 확인하세요</string>
     <!-- The Screen Toolbar Title for configuring the scan settings -->
-    <string name="document_scanning_settings_toolbar_title">Scan settings</string>
+    <string name="document_scanning_settings_toolbar_title">스캔 설정</string>
     <!-- Title of the camera setting screen -->
-    <string name="camera_settings_title">Camera settings</string>
+    <string name="camera_settings_title">카메라 설정</string>
     <!-- Title of the save location in the camera setting screen -->
-    <string name="camera_settings_save_location_title">Save location</string>
+    <string name="camera_settings_save_location_title">저장 위치</string>
     <!-- Description of the save location in the camera setting screen -->
-    <string name="camera_settings_save_location_description">Enable geotagging for photos and videos</string>
+    <string name="camera_settings_save_location_description">사진과 동영상에 위치 정보 저장 활성화</string>
     <!-- Message when user denies location permission in the camera setting screen -->
-    <string name="camera_settings_save_location_permission_denied">Allow MEGA to access this device’s location to continue</string>
+    <string name="camera_settings_save_location_permission_denied">계속 하려면 MEGA가 이 장치의 위치에 접근하는 것을 허용해주세요</string>
     <!-- Warning message to indicate that cannot select a currently synced folder -->
-    <string name="sync_local_device_folder_currently_synced_message">This folder is already synced</string>
+    <string name="sync_local_device_folder_currently_synced_message">이 폴더는 이미 동기화 되었습니다</string>
     <!-- Warning message to indicate that cannot select a currently backed up folder -->
-    <string name="sync_local_device_folder_currently_backed_up_message">This folder is already backed up</string>
+    <string name="sync_local_device_folder_currently_backed_up_message">이 폴더는 이미 백업되었습니다</string>
     <!-- The name of every users root drive in the cloud of MEGA. -->
     <string name="general_section_cloud_drive">클라우드 드라이브</string>
     <!-- App Bar Title in of Cloud Drive Bottom Menu -->
@@ -809,76 +809,73 @@
     <!-- Tab bar title of Syncs tab -->
     <string name="general_syncs">동기화</string>
     <!-- Text under the syncs list -->
-    <string name="syncs_tab_view_other_devices">View other devices in Device centre</string>
+    <string name="syncs_tab_view_other_devices">장치 센터에서 다른 장치 보기</string>
     <!-- The snackbar message of you and others raised your hands -->
     <plurals name="transfers_completed_read_error_retrying">
         <item quantity="other"></item>
     </plurals>
     <!-- Warning shown to the user when tries to retry a cancelled or failed transfer but it cannot be retried because app does not have read permission over the file anymore -->
-    <string name="transfers_completed_one_read_error_retrying">Your upload can’t be completed or retried, because MEGA can no longer access the file</string>
+    <string name="transfers_completed_one_read_error_retrying">MEGA가 더 이상 파일에 접근할 수 없기 때문에 업로드를 완료하거나 재시도할 수 없습니다</string>
     <!-- Warning shown to the user when tries to retry some or all of cancelled or failed transfer but they cannot be retried because app does not have read permission over the files anymore -->
-    <string name="transfers_completed_some_read_error_retrying">Some or all of your uploads can’t be completed or retried, because MEGA can no longer access the files</string>
+    <string name="transfers_completed_some_read_error_retrying">MEGA가 더 이상 파일에 접근할 수 없기 때문에 일부 또는 모든 업로드를 완료하거나 재시도할 수 없습니다</string>
     <!-- Title for Offline Folder exposed via SAF -->
-    <string name="general_mega_offline">MEGA Offline files</string>
+    <string name="general_mega_offline">MEGA 오프라인 파일</string>
     <!-- Notification content for download final notification. It will inform the user about the location where file/s were downloaded -->
     <string name="transfers_notification_location_content">위치: %1$s</string>
     <!-- Notification action for download final notification. It will open the file explorer activity to show the destination folder -->
-    <string name="transfers_notification_location_action">Locate</string>
+    <string name="transfers_notification_location_action">위치 보기</string>
     <!-- Notification content for download final notification in case of a single file downloaded. -->
-    <string name="transfers_notification_title_single_download">Downloaded “%1$s”</string>
+    <string name="transfers_notification_title_single_download">“%1$s” 다운로드함</string>
     <!-- Label for the button or menu option to add a new backup -->
-    <string name="device_center_sync_add_new_backup_button_option">Add new backup</string>
+    <string name="device_center_sync_add_new_backup_button_option">새 백업 추가</string>
     <!-- Notification content for download final notification in case of a single file downloaded to preview. -->
-    <string name="transfers_notification_title_preview_download">“%1$s” is ready to preview</string>
+    <string name="transfers_notification_title_preview_download">“%1$s” 미리보기 준비 완료</string>
     <!-- Notification action for download final notification. It will open a dialog with installed apps which can open the file -->
     <string name="transfers_notification_preview_action">미리 보기</string>
     <!-- Title for the OS dialog shown with available apps to open a file -->
-    <string name="open_with_os_dialog_title">Open “%1$s” with</string>
+    <string name="open_with_os_dialog_title">다음으로 “%1$s” 열기</string>
     <!-- The Scan Confirmation screen error message shown when the new filename does not contain the file extension that was selected -->
-    <string name="document_scanning_settings_missing_file_extension_error_message">Missing file extension (%s)</string>
+    <string name="document_scanning_settings_missing_file_extension_error_message">파일 확장자 없음 (%s)</string>
     <!-- The Scan Confirmation screen error message shown when the filename does not end with the expected file extension -->
-    <string name="document_scanning_settings_non_matching_file_extension_error_message">File extension doesn’t match file type</string>
+    <string name="document_scanning_settings_non_matching_file_extension_error_message">파일 확장자가 파일 형식과 일치하지 않습니다</string>
     <!-- The Scan Confirmation screen error message shown when the filename has no file extension -->
-    <string name="document_scanning_settings_file_extension_required_error_message">File extension is needed</string>
+    <string name="document_scanning_settings_file_extension_required_error_message">파일 확장자가 필요합니다</string>
     <!-- Alert text before download a file for preview. Please do not modify the %s placeholder as it will be replaced by the size to be donwloaded -->
-    <string name="alert_larger_file_preview">In order to preview this file, MEGA needs to download it. %1$s will be downloaded.</string>
+    <string name="alert_larger_file_preview">이 파일을 미리 보려면, MEGA가 다운로드 하여야 합니다. %1$s를/을 다운로드할 것입니다.</string>
     <!-- Message displayed with progress percentage while the app is doing some background operation -->
     <string name="login_completing_operation">작업 완료 중: %1$d%%</string>
     <!-- Add to album files existed message -->
     <plurals name="album_add_to_files_existed">
-        <item quantity="one">This file already exists in “%1$s” and cannot be added again</item>
-        <item quantity="other">These files already exist in “%1$s” and cannot be added again</item>
+        <item quantity="other">이 파일들은 이미 “%1$s”에 존재하며 다시 추가할 수 없습니다</item>
     </plurals>
     <!-- Add to album partial added message -->
     <plurals name="album_add_to_partial_added_message">
-        <item quantity="one">1 file added to “%1$s”. Some files already exist, and can’t be added again.</item>
-        <item quantity="other">%2$d files added to “%1$s”. Some files already exist, and can’t be added again.</item>
+        <item quantity="other">파일 %2$d개가 “%1$s”에 추가되었습니다. 일부 파일은 이미 존재하여, 다시 추가할 수 없습니다.</item>
     </plurals>
     <!--Content on the Multi-Factor Authentication Login page -->
     <string name="multi_factor_auth_login_verification_content">인증기 앱의 6자리 코드를 입력하세요.</string>
     <!--Message to be shown to the user when they entered an incorrect verification code-->
     <string name="multi_factor_auth_login_verification_input_error_text">잘못된 인증 코드</string>
     <!-- Snackbar text to inform the user that preview may take some time because it needs to be downloaded -->
-    <string name="transfers_preview_slow_snackbar">Preparing file for preview. See notification for details.</string>
+    <string name="transfers_preview_slow_snackbar">파일의 미리보기를 준비하고 있습니다. 자세한 내용은 알림을 보세요.</string>
     <!-- Notification text for preview downloads.  Please do not modify the %s placeholder as it will be replaced by the name of the file to be donwloaded -->
     <string name="transfers_notification_downloading_preview">미리 보기를 위해 %1$s 준비 중</string>
     <!-- Notification text for preview downloads, paused state.  Please do not modify the %s placeholder as it will be replaced by the name of the file to be donwloaded -->
-    <string name="transfers_notification_downloading_preview_paused">Preparing %1$s for preview (paused)</string>
+    <string name="transfers_notification_downloading_preview_paused">%1$s의 미리보기를 준비 중 (일시정지됨)</string>
     <!-- Message when successfully deleting single item from the audio queue. %1$s will be replaced with the item name -->
-    <string name="audio_queue_single_item_removed_message">‟%1$s” was removed</string>
+    <string name="audio_queue_single_item_removed_message">‟%1$s” 제거됨</string>
     <!-- Message when successfully deleting items from the audio queue. %1$d will be replaced with the removal count when multiple items are removed. -->
     <string name="audio_queue_multiple_items_removed_message">Removed %1$d items from queue</string>
     <!-- Message when successfully deleting items from the audio queue. %1$s will be replaced with the item name %2$d will be replaced with the removal count. -->
     <plurals name="audio_queue_items_removal_success_message">
-        <item quantity="one">“%1$s” was removed from the queue</item>
-        <item quantity="other">Removed %2$d items from the queue</item>
+        <item quantity="other">대기열에서 항목 %2$d개 제거함</item>
     </plurals>
     <!-- Title for the dialog to inform that a transfer is needed to preview a file and transfers are paused-->
-    <string name="transfers_preview_paused_dialog_title">Transfers are paused</string>
+    <string name="transfers_preview_paused_dialog_title">전송 일시정지됨</string>
     <!-- Message for the dialog to inform that a transfer is needed to preview a file and transfers are paused-->
-    <string name="transfers_preview_paused_dialog_text">To preview “%1$s” you will need to resume paused transfers</string>
+    <string name="transfers_preview_paused_dialog_text">“%1$s”를/을 미리 보려면 전송을 재개하여야 합니다</string>
     <!--SD Card text shown as title in FileStorage screen -->
-    <string name="general_sd_card">SD card</string>
+    <string name="general_sd_card">SD 카드</string>
     <!--The title of the Login page-->
     <string name="login_page_title">MEGA 계정에 로그인</string>
     <!--Message to be shown to the user when they entered an invalid email-->
@@ -900,7 +897,7 @@
     <!-- password label -->
     <string name="password_text">암호</string>
     <!-- Login button -->
-    <string name="login_text">로그인</string>
+    <string name="login_text">MEGA 계정으로 로그인</string>
     <!--The text where user forgot their password and will navigate to reset it-->
     <string name="login_page_forgot_password_text">암호를 잊었나요?</string>
     <!-- Sync state up to date -->
@@ -912,40 +909,93 @@
     <!-- Generic settings label text -->
     <string name="general_settings">설정</string>
     <!-- Ad settings label in the cookie settings page -->
-    <string name="settings_cookie_settings_label_ad_settings">Ad settings</string>
+    <string name="settings_cookie_settings_label_ad_settings">광고 설정</string>
     <!-- Ads personalization label in the cookie settings page -->
-    <string name="settings_cookie_settings_label_ads_personalization">Ads personalisation</string>
+    <string name="settings_cookie_settings_label_ads_personalization">광고 개인화</string>
     <!-- Cookie settings title in the cookie settings page -->
-    <string name="settings_cookie_setting_title_cookie_and_ad_settings">Cookie and ad settings</string>
+    <string name="settings_cookie_setting_title_cookie_and_ad_settings">쿠키와 광고 설정</string>
     <!-- Body text of the bottom sheet to promote Sync feature. The placeholders are to underline text -->
-    <string name="sync_promotion_bottom_sheet_body_text">Sync or back up a folder on your device with a folder on MEGA. [U]Learn more[/U]</string>
+    <string name="sync_promotion_bottom_sheet_body_text">장치의 폴더를 MEGA의 폴더와 동기화 또는 백업하세요. [U]더 알아보기[/U]</string>
     <!-- This is the final button when creating a folder in the dialog where the user inserts the folder name -->
-    <string name="transfers_cancel_download_warning_title">Cancel download?</string>
+    <string name="transfers_cancel_download_warning_title">다운로드를 취소할까요?</string>
     <!-- Confirmation message informing a download was successfully cancelled -->
     <string name="transfers_cancel_download_success_message">Download cancelled</string>
     <!-- Title of note to self chat -->
-    <string name="chat_note_to_self_chat_title">Note to self</string>
+    <string name="chat_note_to_self_chat_title">나에게 쓴 노트</string>
     <!-- First message header in note to self chat -->
-    <string name="chat_note_to_self_chat_first_message_header">Keep it to yourself</string>
+    <string name="chat_note_to_self_chat_first_message_header">나를 위해 보관</string>
     <!-- First message description in note to self chat -->
-    <string name="chat_note_to_self_chat_first_message_description">Send yourself sensitive information, pics and videos, or ideas for your next big venture. Synced across all your devices, and protected with zero-knowledge encryption.</string>
+    <string name="chat_note_to_self_chat_first_message_description">자신에게 민감한 정보, 사진과 동영상, 다음 벤처를 위한 아이디어를 보내세요. 모든 장치에서 동기화되고 영지식 암호화로 보호됩니다.</string>
     <!-- Add to album some files exist message -->
     <plurals name="album_add_to_files_exist_message">
-        <item quantity="one">1 file added to “%1$s”. Duplicate files cannot be added again.</item>
-        <item quantity="other">%2$d files added to “%1$s”. Duplicate files cannot be added again.</item>
+        <item quantity="other">파일 %2$d개가 “%1$s”에 추가되었습니다. 중복 파일은 다시 추가할 수 없습니다.</item>
     </plurals>
     <!-- Snack bar message informing that profile's QR code is uploaded to the Cloud Drive-->
-    <string name="transfers_start_upload_profile_qr_code_message">Saving %1$s to Cloud drive&#8230;</string>
+    <string name="transfers_start_upload_profile_qr_code_message">클라우드 드라이브에 %1$s를/을 저장하는 중...</string>
     <!-- Warning shown after trying to cancel a download, but the request failed -->
-    <string name="transfers_error_cancelling_download">Something went wrong. Download was not cancelled.</string>
+    <string name="transfers_error_cancelling_download">무언가 잘못 되었습니다. 다운로드가 취소되지 않았습니다.</string>
     <!-- Body for the subscription details section, which is shown to the Indian user to provide details about subscription. This string is shown if user selects yearly subscription and the amount is more than Rs.15,000. Please keep these placeholders [A], [/A], [B], [/B], [C], [/C]. They will be used to format the string. -->
-    <string name="account_upgrade_account_subscription_details_body_yearly_with_price_for_indian">You will be charged %1$s immediately but your subscription will not automatically renew after 12 months due to government regulations. It will be your responsibility to renew your subscription after it has expired. You can manage or cancel your subscription anytime via Subscriptions in [A]Google&#160;Play[/A]. By upgrading your account, you agree to MEGA’s [B]Terms of Service[/B] and [C]Privacy and Data Policy[/C].</string>
+    <string name="account_upgrade_account_subscription_details_body_yearly_with_price_for_indian">즉시 %1$s가/이 청구되지만 정부 규제로 인하여 당신의 구독은 12개월 후 자동으로 갱신되지 않습니다. 기간이 만료된 이후 구독을 갱신하는 것은 당신의 책임입니다. [A]Google&#160;Play[/A]의 구독을 통하여 당신의 구독을 언제든지 관리하거나 취소할 수 있습니다. 당신의 계정을 업그레이드함으로써, 당신은 MEGA의 [B]이용 약관[/B]과 [C]개인정보 및 데이터 정책[/C]에 동의하는 것입니다.</string>
     <!-- The name of the Device or Folder Status which signifies that it is currently uploading -->
     <string name="device_center_list_view_item_status_uploading">업로드 중...</string>
     <!-- The name of the Device or Folder Status which signifies that it is currently uploading with a percentage completion -->
-    <string name="device_center_list_view_item_status_uploading_with_progress">%1$d%% uploading&#8230;</string>
+    <string name="device_center_list_view_item_status_uploading_with_progress">%1$d%% 업로드 중...</string>
     <!-- The name of the Device or Folder Status which signifies that it is inactive -->
-    <string name="device_center_list_view_item_status_inactive">Inactive</string>
+    <string name="device_center_list_view_item_status_inactive">비활성</string>
     <!-- The name of the Device or Folder Status which signifies that some action is needed -->
-    <string name="device_center_list_view_item_status_attention_needed">Attention needed</string>
+    <string name="device_center_list_view_item_status_attention_needed">주목 필요</string>
+    <!--General Unable to log in-->
+    <string name="general_unable_to_login">로그인할 수 없음</string>
+    <!--General check inbox-->
+    <string name="general_check_inbox">수신함을 확인하세요</string>
+    <!--Message to be shown to user when account is temporarily suspended and requires email verification -->
+    <string name="login_account_suspension_email_verification_message">당신의 계정이 위협적인 로그인이 감지된 후 당신의 보호를 위해 잠겼으며, 암호를 재설정할 것을 요구합니다. 계정을 잠금 해제하는 방법과 이런 일이 다시 일어나지 않게 하는 팁을 확인하려면 이메일 수신함을 확인하세요.</string>
+    <!--General Resend email-->
+    <string name="general_resend_email">이메일 재발송</string>
+    <!-- Message displayed when email is successfully resent -->
+    <string name="general_email_resend_success_message">이메일 발송됨</string>
+    <!--General Request Network Failed text-->
+    <string name="general_request_failed_message">뭔가 잘못됐습니다</string>
+    <!-- Message error shown when trying to log in on an account that has been suspended due to breaches of copyright -->
+    <string name="dialog_account_suspended_ToS_copyright_message">당신의 MEGA 계정이 반복된 저작권 침해 혐의로 인해 정지 되었습니다. 이것은 당신의 계정이나 그 안의 데이터에 접근할 수 없다는 뜻입니다.\n이의 제기를 제출하는 방법에 대한 자세한 정보는 이메일 수신함을 확인하세요.</string>
+    <!-- Message error shown when trying to log in on an account that has been terminated due to breaches of all reasons of breaching Terms of Service, except copyright. -->
+    <string name="dialog_account_suspended_ToS_non_copyright_message">당신의 계정이 MEGA의 이용 약관 위반으로 삭제되었습니다.\n저장된 데이터에 대한 접근 또는 새 MEGA 계정에 가입하는 것이 금지됩니다.</string>
+    <!-- Error message appears to sub-users of a business account when they try to login and they are disabled. -->
+    <string name="error_business_disabled">당신의 계정은 관리자에 의해 정지되었습니다. 자세한 사항은 비즈니스 계정 관리자에게 연락하세요.</string>
+    <!-- An error message which appears to sub-users of a business account when they try to login and they are deleted. -->
+    <string name="error_business_removed">당신의 계정이 관리자에 의해 삭제되었습니다. 자세한 사항은 당신의 비즈니스 계정 관리자에게 문의하세요.</string>
+    <!--The title of the Email Confirmation page-->
+    <string name="email_confirmation_title">이메일 확인</string>
+    <!--The Content of the Email Confirmation page-->
+    <string name="email_confirmation_content">우리가 [P]%s[/P]로 링크가 있는 이메일을 보냈습니다. 당신의 이메일 주소를 확인하고 계정을 활성화하려면 링크를 탭하세요.\n\n만약 이메일을 받지 못 했다면 스팸 폴더를 확인하거나 다시 시도하세요. 다른 문제가 있다면 [A]%s[/A]로 연락하세요</string>
+    <!-- Button to resend the create account email to a new email address in case the previous email address was misspelled -->
+    <string name="general_resend_button">재발송</string>
+    <!-- General change email address -->
+    <string name="general_change_email_address">이메일 변경</string>
+    <!-- Title for the cancel registration dialog -->
+    <string name="email_confirmation_dialog_cancel_registration_title">가입을 취소할까요?</string>
+    <!-- Content for the cancel registration dialog -->
+    <string name="email_confirmation_dialog_cancel_registration_content">이것은 가입 과정을 취소합니다.</string>
+    <!-- Text for the "Yes, cancel" button in the cancel registration dialog -->
+    <string name="email_confirmation_dialog_cancel_registration_cancel_button">네, 취소합니다</string>
+    <!-- Text for the "Don’t cancel" button in the cancel registration dialog -->
+    <string name="email_confirmation_dialog_cancel_registration_dismiss_button">취소하지 마세요</string>
+    <!-- First message header paragraph in note to self chat -->
+    <string name="chat_note_to_self_chat_first_message_header_paragraph">사진, 중요한 정보, 큰 아이디어를 위한 비공개 공간입니다. 항상 동기화 되고, 영지식 암호화로 보호됩니다.</string>
+    <!-- Title of the notification displayed when Syncs are paused due to low battery conditions -->
+    <string name="general_sync_notification_low_battery_title">Syncing paused due to low battery</string>
+    <!-- Text of the notification displayed when Syncs are paused due to low battery conditions -->
+    <string name="general_sync_notification_low_battery_text">Connect to power source to resume</string>
+    <!-- Title of the notification displayed when Syncs are paused due to lost Wi-Fi conditions -->
+    <string name="general_sync_notification_lost_wifi_title">Syncing paused due to lost connection</string>
+    <!-- Text of the notification displayed when Syncs are paused due to lost Wi-Fi conditions -->
+    <string name="general_sync_notification_lost_wifi_text">Reconnect to Wi-Fi to resume</string>
+    <!-- Title of the notification displayed when Syncs are stopped due to some sync error -->
+    <string name="general_sync_notification_generic_error_title">Syncing has stopped</string>
+    <!-- Text of the notification displayed when Syncs are stopped due to some sync error -->
+    <string name="general_sync_notification_generic_error_text">Go to the Help Centre to understand why</string>
+    <!-- Title of the notification displayed when a Sync has stalled issues -->
+    <string name="general_sync_notification_stalled_issues_title">Sync issues detected</string>
+    <!-- Text of the notification displayed when a Sync has stalled issues -->
+    <string name="general_sync_notification_stalled_issues_text">View and resolve issues</string>
 </resources>

@@ -1129,8 +1129,6 @@
     <string name="context_contact_already_invited">%s đã được mời rồi. Kiểm&#160;tra lại các lời yêu&#160;cầu đang chờ.</string>
     <!-- Button to resend the create account email to a new email address in case the previous email address was misspelled -->
     <string name="confirm_email_misspelled_resend">Gửi lại</string>
-    <!-- Text shown after the confirmation email has been sent to the new email address -->
-    <string name="confirm_email_misspelled_email_sent">Email đã được gửi</string>
     <!-- text_copyright_alert_title -->
     <string name="copyright_alert_title">Thông báo mới về luật bản quyền</string>
     <!-- text_copyright_alert_first_paragraph -->
@@ -2392,8 +2390,6 @@
     <string name="verify_email_and_follow_steps">Xin làm theo hướng dẫn có trong [A]thư e-mail xác thực[/A] để mở khóa tài khoản.</string>
     <!-- Question which takes the user to a help screen -->
     <string name="why_am_i_seeing_this">Tại sao tôi đang thấy cái này?</string>
-    <!-- Label of a button which action is resend an email -->
-    <string name="resend_email_label">Gửi lại e-mail</string>
     <!-- Error shown when the user tries to resend the email to unblock their account before the time needed to permit send it again -->
     <string name="resend_email_error">E-mail đã được gửi đi rồi. Xin chờ vài phút trước khi gửi lại cái mới.</string>
     <!-- Title of a helping view about locked accounts -->
@@ -4594,10 +4590,6 @@
     <string name="meetings_call_recording_stopped_snackbar_message">%1$s đã chấm&#160;dứt ghi âm hình</string>
     <!-- Name of the Gallery item in the attachment panel, in chat, for attaching files from Gallery -->
     <string name="chat_attach_panel_gallery">Thư Viện Phim Ảnh</string>
-    <!-- Preference screen item title for Ads Cookie -->
-    <string name="settings_cookies_settings_ads_title">Cookies Quảng&#160;Cáo</string>
-    <!-- Preference screen item summary for Ads Cookie-->
-    <string name="settings_cookies_settings_ads_summary">Được sử&#160;dụng bởi các đối&#160;tác quảng&#160;cáo đã được phê&#160;duyệt của chúng&#160;tôi để thu&#160;thập dữ&#160;liệu về các hoạt&#160;động duyệt web của bạn và tùy&#160;chỉnh quảng&#160;cáo bạn thấy trên các dịch&#160;vụ của chúng&#160;tôi và trên các trang web khác. Không chấp&#160;nhận các cookies này có nghĩa là bạn vẫn sẽ thấy quảng&#160;cáo nhưng nội&#160;dung sẽ không liên&#160;quan.</string>
     <!-- Body for Cookie dialog, visible for users, who will see the advertisements, as we want users to accept Advertisement cookies as well. Please, keep the placeholders to format the string. -->
     <string name="dialog_ads_cookie_alert_message">Chúng&#160;tôi sử dụng cookies và các công&#160;nghệ tương&#160;tự để giúp chúng&#160;tôi cải&#160;thiện dịch&#160;vụ của mình và cho mục&#160;đích quảng&#160;cáo. Với việc tiếp&#160;tục sử&#160;dụng MEGA là bạn đồng&#160;ý với các điều&#160;khoản được cập&#160;nhật nêu trong [A]Chính&#160;Sách Cookie[/A]</string>
     <!-- Description of feature, which will be available for user, if they buy plan. This means the user won't see Advertisements if they buy a Pro plan. -->

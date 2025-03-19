@@ -1204,8 +1204,6 @@
     <string name="context_contact_already_invited">%s уже приглашён. Проверьте отправленные запросы.</string>
     <!-- Button to resend the create account email to a new email address in case the previous email address was misspelled -->
     <string name="confirm_email_misspelled_resend">Выслать повторно</string>
-    <!-- Text shown after the confirmation email has been sent to the new email address -->
-    <string name="confirm_email_misspelled_email_sent">Письмо отправлено</string>
     <!-- text_copyright_alert_title -->
     <string name="copyright_alert_title">Предупреждение о защите авторских прав</string>
     <!-- text_copyright_alert_first_paragraph -->
@@ -2575,8 +2573,6 @@
     <string name="verify_email_and_follow_steps">Пожалуйста, следуйте инструкциям в [A]письме с подтверждением[/A], чтобы разблокировать аккаунт.</string>
     <!-- Question which takes the user to a help screen -->
     <string name="why_am_i_seeing_this">Почему я это вижу?</string>
-    <!-- Label of a button which action is resend an email -->
-    <string name="resend_email_label">Выслать письмо повторно</string>
     <!-- Error shown when the user tries to resend the email to unblock their account before the time needed to permit send it again -->
     <string name="resend_email_error">Письмо уже отправлено. Пожалуйста, подождите несколько минут, прежде чем попробовать снова.</string>
     <!-- Title of a helping view about locked accounts -->
@@ -5254,10 +5250,6 @@
     <string name="meetings_call_recording_stopped_snackbar_message">Пользователь %1$s остановил запись</string>
     <!-- Name of the Gallery item in the attachment panel, in chat, for attaching files from Gallery -->
     <string name="chat_attach_panel_gallery">Галерея</string>
-    <!-- Preference screen item title for Ads Cookie -->
-    <string name="settings_cookies_settings_ads_title">Рекламные куки</string>
-    <!-- Preference screen item summary for Ads Cookie-->
-    <string name="settings_cookies_settings_ads_summary">Используются нашими одобренными рекламными партнерами для сбора данных о вашей активности в Интернете и настройки рекламы, которую вы видите в наших сервисах и на других веб-сайтах. Если вы не примете эти куки-файлы, вы всё равно будете видеть рекламу, но она не будет персонализированной.</string>
     <!-- Body for Cookie dialog, visible for users, who will see the advertisements, as we want users to accept Advertisement cookies as well. Please, keep the placeholders to format the string. -->
     <string name="dialog_ads_cookie_alert_message">Мы используем куки и аналогичные технологии для улучшения наших сервисов и в рекламных целях. Продолжая использовать MEGA, вы соглашаетесь с условиями нашей обновлённой [A]Политики в отношении куки-файлов[/A].</string>
     <!-- Description of feature, which will be available for user, if they buy plan. This means the user won't see Advertisements if they buy a Pro plan. -->

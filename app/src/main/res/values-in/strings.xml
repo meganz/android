@@ -1129,8 +1129,6 @@
     <string name="context_contact_already_invited">%s sudah diundang. Periksa permintaan anda yang tertunda.</string>
     <!-- Button to resend the create account email to a new email address in case the previous email address was misspelled -->
     <string name="confirm_email_misspelled_resend">Kirim lagi</string>
-    <!-- Text shown after the confirmation email has been sent to the new email address -->
-    <string name="confirm_email_misspelled_email_sent">E-mail terkirim</string>
     <!-- text_copyright_alert_title -->
     <string name="copyright_alert_title">Peringatan hak cipta untuk semua pengguna</string>
     <!-- text_copyright_alert_first_paragraph -->
@@ -2392,8 +2390,6 @@
     <string name="verify_email_and_follow_steps">Silakan ikuti langkah-langkah di [A]e-mail verifikasi[/A]untuk membuka kunci akun anda .</string>
     <!-- Question which takes the user to a help screen -->
     <string name="why_am_i_seeing_this">Mengapa saya melihat ini?</string>
-    <!-- Label of a button which action is resend an email -->
-    <string name="resend_email_label">Kirim ulang e-mail</string>
     <!-- Error shown when the user tries to resend the email to unblock their account before the time needed to permit send it again -->
     <string name="resend_email_error">E-mail sudah terkirim. Harap tunggu beberapa menit sebelum mencoba lagi.</string>
     <!-- Title of a helping view about locked accounts -->
@@ -4594,10 +4590,6 @@
     <string name="meetings_call_recording_stopped_snackbar_message">%1$s berhenti merekam</string>
     <!-- Name of the Gallery item in the attachment panel, in chat, for attaching files from Gallery -->
     <string name="chat_attach_panel_gallery">Galeri</string>
-    <!-- Preference screen item title for Ads Cookie -->
-    <string name="settings_cookies_settings_ads_title">Cookie Iklan</string>
-    <!-- Preference screen item summary for Ads Cookie-->
-    <string name="settings_cookies_settings_ads_summary">Digunakan oleh mitra periklanan kami yang disetujui untuk mengumpulkan data tentang aktivitas penjelajahan anda dan menyesuaikan iklan yang anda lihat di layanan kami dan di situs web lain. Tidak menerima cookie ini berarti anda masih akan melihat iklan tetapi iklan tersebut tidak akan dipersonalisasi.</string>
     <!-- Body for Cookie dialog, visible for users, who will see the advertisements, as we want users to accept Advertisement cookies as well. Please, keep the placeholders to format the string. -->
     <string name="dialog_ads_cookie_alert_message">Kami menggunakan cookie dan teknologi serupa untuk membantu kami meningkatkan layanan kami dan untuk tujuan periklanan. Dengan terus menggunakan MEGA, anda setuju dengan ketentuan pembaruan kami [A]Kebijakan Cookie[/A].</string>
     <!-- Description of feature, which will be available for user, if they buy plan. This means the user won't see Advertisements if they buy a Pro plan. -->

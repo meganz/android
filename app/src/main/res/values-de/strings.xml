@@ -1154,8 +1154,6 @@
     <string name="context_contact_already_invited">%s wurde bereits eingeladen. Bitte überprüfen Sie Ihre aktuellen Anfragen.</string>
     <!-- Button to resend the create account email to a new email address in case the previous email address was misspelled -->
     <string name="confirm_email_misspelled_resend">Erneut senden</string>
-    <!-- Text shown after the confirmation email has been sent to the new email address -->
-    <string name="confirm_email_misspelled_email_sent">E-Mail versandt</string>
     <!-- text_copyright_alert_title -->
     <string name="copyright_alert_title">Hinweis zur Wahrung von Urheberrechten</string>
     <!-- text_copyright_alert_first_paragraph -->
@@ -2453,8 +2451,6 @@
     <string name="verify_email_and_follow_steps">Zur Entsperrung Ihres Accounts befolgen Sie bitte die in der [A]Bestätigungs-E-Mail[/A] beschriebenen Schritte.</string>
     <!-- Question which takes the user to a help screen -->
     <string name="why_am_i_seeing_this">Warum wird mir das angezeigt?</string>
-    <!-- Label of a button which action is resend an email -->
-    <string name="resend_email_label">E-Mail erneut senden</string>
     <!-- Error shown when the user tries to resend the email to unblock their account before the time needed to permit send it again -->
     <string name="resend_email_error">E-Mail bereits gesendet. Bitte warten Sie einige Minuten, bevor Sie es erneut versuchen.</string>
     <!-- Title of a helping view about locked accounts -->
@@ -4814,10 +4810,6 @@
     <string name="meetings_call_recording_stopped_snackbar_message">%1$s hat die Aufzeichnung beendet</string>
     <!-- Name of the Gallery item in the attachment panel, in chat, for attaching files from Gallery -->
     <string name="chat_attach_panel_gallery">Galerie</string>
-    <!-- Preference screen item title for Ads Cookie -->
-    <string name="settings_cookies_settings_ads_title">Werbe-Cookies</string>
-    <!-- Preference screen item summary for Ads Cookie-->
-    <string name="settings_cookies_settings_ads_summary">Verwendet von unseren autorisierten Werbepartnern, um Daten über Ihre Browsing-Aktivitäten zu sammeln und die Werbung, die Sie auf unseren Diensten und auf anderen Websites sehen, zu individualisieren. Wenn Sie diese Cookies nicht akzeptieren, werden Sie zwar weiterhin Werbeanzeigen sehen, diese werden aber nicht personalisiert sein.</string>
     <!-- Body for Cookie dialog, visible for users, who will see the advertisements, as we want users to accept Advertisement cookies as well. Please, keep the placeholders to format the string. -->
     <string name="dialog_ads_cookie_alert_message">Wir verwenden Cookies und verwandte Technologien zur Verbesserung unserer Dienste und zu Werbezwecken. Durch die weitere Nutzung von MEGA erklären Sie sich mit den Bedingungen unserer aktualisierten [A]Cookie-Richtlinien[/A] einverstanden.</string>
     <!-- Description of feature, which will be available for user, if they buy plan. This means the user won't see Advertisements if they buy a Pro plan. -->

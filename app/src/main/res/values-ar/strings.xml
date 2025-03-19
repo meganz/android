@@ -291,7 +291,7 @@
     <!-- Hint how to cancel the download -->
     <string name="download_touch_to_show">عرض عمليات تراسل المعطيات</string>
     <!-- message when trying to open a downloaded file but there isn’t any app that open that file. Example: a user downloads a pdf but doesn’t have any app to read a pdf -->
-    <string name="intent_not_available">There’s no suitable app to open this file on your device</string>
+    <string name="intent_not_available">لا يوجد تطبيق مناسب لفتح هذا الملف على جهازك</string>
     <!-- Message when trying to open a location message but there isn’t any app that open that location. -->
     <string name="intent_not_available_location">لا توجد تطبيقات متاحة على جهازك لفتح هذا الموقع</string>
     <!-- Message displayed when user tries to open a file with a 3rd party app using the option "Open with" but there isn't any app installed in the device which can open that file type, e.g. user tries to open a ".txt" but doesn’t have any installed 3rd party app which supports ".txt" files. -->
@@ -1254,8 +1254,6 @@
     <string name="context_contact_already_invited">%s تمت دعوته بالفعل. تحقق من طلباتك قيد الانتظار.</string>
     <!-- Button to resend the create account email to a new email address in case the previous email address was misspelled -->
     <string name="confirm_email_misspelled_resend">إعادة إرسال</string>
-    <!-- Text shown after the confirmation email has been sent to the new email address -->
-    <string name="confirm_email_misspelled_email_sent">تم إرسال البريد الالكتروني</string>
     <!-- text_copyright_alert_title -->
     <string name="copyright_alert_title">تحذير حقوق النشر لكل المستخدمين</string>
     <!-- text_copyright_alert_first_paragraph -->
@@ -1824,7 +1822,7 @@
     <!-- label to indicate that a share is still pending on outgoing shares of a node -->
     <string name="pending_outshare_indicator">(قيد الانتظار)</string>
     <!-- Title of the dialog to disable the rich links previews on chat -->
-    <string name="option_enable_chat_rich_preview">Enable sent link previews</string>
+    <string name="option_enable_chat_rich_preview">تمكين عرض الرابط المرسل</string>
     <!-- Button to allow the rich links previews on chat -->
     <string name="button_always_rich_links">السماح دائماً</string>
     <!-- Button do not allow now the rich links previews on chat -->
@@ -1832,9 +1830,9 @@
     <!-- Button do not allow the rich links previews on chat -->
     <string name="button_never_rich_links">أبداً</string>
     <!-- Title of the dialog to enable the rich links previews on chat -->
-    <string name="title_enable_rich_links">Enable sent link previews</string>
+    <string name="title_enable_rich_links">تمكين عرض الرابط المرسل</string>
     <!-- Text of the dialog to enable the rich links previews on chat -->
-    <string name="text_enable_rich_links">Generates a preview of the links you send in chat. Note that retrieving these previews isn’t protected by zero-knowledge encryption.</string>
+    <string name="text_enable_rich_links">يقوم بإنشاء عرض محتوى للروابط التي ترسلها في المحادثة. لاحظ أن استرداد هذه العروض للمحتوى غير محمي بتشفير المعرفة الصفرية.</string>
     <!-- when the user tries to creates a MEGA account or tries to change his password and the password strength is very weak -->
     <string name="error_password">يرجى ادخال كلمة مرور قوية</string>
     <!-- title of the notification for an acceptance of a contact request -->
@@ -2697,8 +2695,6 @@
     <string name="verify_email_and_follow_steps">يرجى اتباع الخطوات الواردة في [A]بريد الالكتروني للتحقق[/A] لفتح حسابك.</string>
     <!-- Question which takes the user to a help screen -->
     <string name="why_am_i_seeing_this">لماذا أرى هذا؟</string>
-    <!-- Label of a button which action is resend an email -->
-    <string name="resend_email_label">إعادة إرسال البريد الإلكتروني</string>
     <!-- Error shown when the user tries to resend the email to unblock their account before the time needed to permit send it again -->
     <string name="resend_email_error">تم إرسال البريد الإلكتروني بالفعل. يرجى الانتظار بضع دقائق قبل المحاولة مرة أخرى.</string>
     <!-- Title of a helping view about locked accounts -->
@@ -5694,10 +5690,6 @@
     <string name="meetings_call_recording_stopped_snackbar_message">%1$s أوقف التسجيل</string>
     <!-- Name of the Gallery item in the attachment panel, in chat, for attaching files from Gallery -->
     <string name="chat_attach_panel_gallery">المعرض</string>
-    <!-- Preference screen item title for Ads Cookie -->
-    <string name="settings_cookies_settings_ads_title">ملفات تعريف الارتباط Cookies الإعلانية</string>
-    <!-- Preference screen item summary for Ads Cookie-->
-    <string name="settings_cookies_settings_ads_summary">يستخدمها شركاؤنا الإعلانيون المعتمدون لجمع بيانات حول أنشطة التصفح الخاصة بك وتخصيص الإعلانات التي تراها على خدماتنا وعلى مواقع الويب الأخرى. إن عدم قبول ملفات تعريف الارتباط cookies هذه يعني أنك ستظل ترى الإعلانات ولكن لن يتم تخصيصها.</string>
     <!-- Body for Cookie dialog, visible for users, who will see the advertisements, as we want users to accept Advertisement cookies as well. Please, keep the placeholders to format the string. -->
     <string name="dialog_ads_cookie_alert_message">نحن نستخدم ملفات تعريف الارتباط cookies والتقنيات المشابهة لمساعدتنا على تحسين خدماتنا ولأغراض إعلانية. من خلال الاستمرار في استخدام ميغا MEGA فإنك توافق على شروط [A]سياسة ملفات تعريف الارتباط cookies[/A] المحدثة لدينا.</string>
     <!-- Description of feature, which will be available for user, if they buy plan. This means the user won't see Advertisements if they buy a Pro plan. -->
@@ -6011,7 +6003,7 @@
     <!-- Warning warning dialog message if user has offline files or transfers in progress. -->
     <string name="logout_warning_dialog_offline_and_transfers_message">إذا قمت بتسجيل الخروج الآن فسيتم حذف أي عمليات تراسل المعطيات معلقة وملفات غير متصلة بالإنترنت</string>
     <!-- Toolbar action menu button in file storage screen to open 3rd-party File Manager -->
-    <string name="filestorage_menu_option_open_in_file_manager">Open in file manager</string>
+    <string name="filestorage_menu_option_open_in_file_manager">افتح في إدارة الملفات</string>
     <!-- Snackbar message when file storage screen is unable to open 3rd-party File Manager -->
-    <string name="filestorage_snackbar_file_manager_is_not_available">A suitable file manager app is not available on this device</string>
+    <string name="filestorage_snackbar_file_manager_is_not_available">لا يتوفر تطبيق مدير ملفات مناسب على هذا الجهاز</string>
 </resources>

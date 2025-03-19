@@ -693,7 +693,7 @@
     <!-- Title of Favourites video playlist in the video section -->
     <string name="video_section_title_favourite_playlist">Favoris</string>
     <!-- Title of the synced folder list empty state -->
-    <string name="device_center_sync_backup_list_empty_state_title">Aucune connexion n\’est configurée</string>
+    <string name="device_center_sync_backup_list_empty_state_title">No devices are set up</string>
     <!-- Message of the synced folder list empty state -->
     <string name="device_center_sync_backup_list_empty_state_message">Synchronisez ou sauvegardez un dossier sur votre appareil avec un dossier sur MEGA</string>
     <!-- subtitle of meeting title in schedule meeting for title disclaimer -->
@@ -931,7 +931,7 @@
     <!-- password label -->
     <string name="password_text">Mot de passe</string>
     <!-- Login button -->
-    <string name="login_text">Me&#160;connecter</string>
+    <string name="login_text">Log in with your MEGA account</string>
     <!--The text where user forgot their password and will navigate to reset it-->
     <string name="login_page_forgot_password_text">Mot de passe oublié ?</string>
     <!-- Sync state up to date -->
@@ -967,17 +967,71 @@
         <item quantity="other">%2$d fichiers ajoutés à&#160;«%1$s». Les fichiers dupliqués ne peuvent pas être ajoutés à nouveau.</item>
     </plurals>
     <!-- Snack bar message informing that profile's QR code is uploaded to the Cloud Drive-->
-    <string name="transfers_start_upload_profile_qr_code_message">Saving %1$s to Cloud drive&#8230;</string>
+    <string name="transfers_start_upload_profile_qr_code_message">Enregistrement %1$s vers Disque nuagique&#8230;</string>
     <!-- Warning shown after trying to cancel a download, but the request failed -->
-    <string name="transfers_error_cancelling_download">Something went wrong. Download was not cancelled.</string>
+    <string name="transfers_error_cancelling_download">Quelque chose s\’est mal passé. Le téléchargement n\’a pas été annulé.</string>
     <!-- Body for the subscription details section, which is shown to the Indian user to provide details about subscription. This string is shown if user selects yearly subscription and the amount is more than Rs.15,000. Please keep these placeholders [A], [/A], [B], [/B], [C], [/C]. They will be used to format the string. -->
-    <string name="account_upgrade_account_subscription_details_body_yearly_with_price_for_indian">You will be charged %1$s immediately but your subscription will not automatically renew after 12 months due to government regulations. It will be your responsibility to renew your subscription after it has expired. You can manage or cancel your subscription anytime via Subscriptions in [A]Google&#160;Play[/A]. By upgrading your account, you agree to MEGA’s [B]Terms of Service[/B] and [C]Privacy and Data Policy[/C].</string>
+    <string name="account_upgrade_account_subscription_details_body_yearly_with_price_for_indian">Vous serez débité %1$s immédiatement, mais votre abonnement ne sera pas automatiquement renouvelé après 12 mois en raison de réglementations gouvernementales. Il sera de votre responsabilité de renouveler votre abonnement une fois celui-ci expiré. Vous pouvez gérer ou annuler votre abonnement à tout moment via Abonnements dans [A]Google&#160;Play[/A]. En mettant à niveau votre compte, vous acceptez les conditions de MEGA [B]Conditions générales d’utilisation[/B] et [C]Politique de protection des renseignements personnels et des données[/C].</string>
     <!-- The name of the Device or Folder Status which signifies that it is currently uploading -->
     <string name="device_center_list_view_item_status_uploading">Téléversement&#8230;</string>
     <!-- The name of the Device or Folder Status which signifies that it is currently uploading with a percentage completion -->
-    <string name="device_center_list_view_item_status_uploading_with_progress">%1$d%% uploading&#8230;</string>
+    <string name="device_center_list_view_item_status_uploading_with_progress">%1$d%% téléversement...</string>
     <!-- The name of the Device or Folder Status which signifies that it is inactive -->
     <string name="device_center_list_view_item_status_inactive">inactif</string>
     <!-- The name of the Device or Folder Status which signifies that some action is needed -->
-    <string name="device_center_list_view_item_status_attention_needed">Attention needed</string>
+    <string name="device_center_list_view_item_status_attention_needed">Attention requise</string>
+    <!--General Unable to log in-->
+    <string name="general_unable_to_login">Connexion impossible</string>
+    <!--General check inbox-->
+    <string name="general_check_inbox">Vérifiez votre boîte de réception</string>
+    <!--Message to be shown to user when account is temporarily suspended and requires email verification -->
+    <string name="login_account_suspension_email_verification_message">Une connexion malveillante a été détectée. Afin de vous protéger, votre compte a été verrouillé. Nous vous demandons donc de réinitialiser votre mot de passe. Nous vous avons envoyé un courriel avec des instructions pour déverrouiller votre compte, ainsi que des conseils pour éviter que cela ne se reproduise.</string>
+    <!--General Resend email-->
+    <string name="general_resend_email">Renvoyer le courriel</string>
+    <!-- Message displayed when email is successfully resent -->
+    <string name="general_email_resend_success_message">Le courriel a été envoyé</string>
+    <!--General Request Network Failed text-->
+    <string name="general_request_failed_message">Un problème est survenu</string>
+    <!-- Message error shown when trying to log in on an account that has been suspended due to breaches of copyright -->
+    <string name="dialog_account_suspended_ToS_copyright_message">Votre compte MEGA a été désactivé en raison d’allégations répétées de violation des droits d’auteur. Cela signifie que vous ne pouvez ni accéder à votre compte ni à ses données.\nPour de plus amples renseignements sur la manière de déposer un contre-avis, vérifiez votre boîte de réception des courriels.</string>
+    <!-- Message error shown when trying to log in on an account that has been terminated due to breaches of all reasons of breaching Terms of Service, except copyright. -->
+    <string name="dialog_account_suspended_ToS_non_copyright_message">Votre compte a été résilié en raison du non-respect des Conditions générales d’utilisation de MEGA.\nVous ne pourrez pas accéder à vos données stockées de nouveau ni être autorisé à créer un nouveau compte MEGA.</string>
+    <!-- Error message appears to sub-users of a business account when they try to login and they are disabled. -->
+    <string name="error_business_disabled">Votre compte a été désactivé par la personne qui l’administre. Contactez l’administrateur de votre compte Pour&#160;entreprise pour obtenir plus de précisions.</string>
+    <!-- An error message which appears to sub-users of a business account when they try to login and they are deleted. -->
+    <string name="error_business_removed">Votre compte a été supprimé par votre administrateur. Veuillez contacter l’administrateur de votre compte Pour&#160;entreprise pour plus de précisions.</string>
+    <!--The title of the Email Confirmation page-->
+    <string name="email_confirmation_title">Confirmation par courriel</string>
+    <!--The Content of the Email Confirmation page-->
+    <string name="email_confirmation_content">Nous avons envoyé un courriel avec un lien à [P]%s[/P]. Touchez le lien pour confirmer votre adresse courriel et activer votre compte.\n\nSi vous n’avez pas reçu le courriel, vérifiez votre dossier de pourriel (indésirables) ou réessayez. Pour tout autre problème, contactez [A]%s[/A]</string>
+    <!-- Button to resend the create account email to a new email address in case the previous email address was misspelled -->
+    <string name="general_resend_button">Renvoyer</string>
+    <!-- General change email address -->
+    <string name="general_change_email_address">Changer l’adresse courriel</string>
+    <!-- Title for the cancel registration dialog -->
+    <string name="email_confirmation_dialog_cancel_registration_title">Annuler la création du compte ?</string>
+    <!-- Content for the cancel registration dialog -->
+    <string name="email_confirmation_dialog_cancel_registration_content">Le processus d’inscription sera annulé.</string>
+    <!-- Text for the "Yes, cancel" button in the cancel registration dialog -->
+    <string name="email_confirmation_dialog_cancel_registration_cancel_button">Oui, annuler</string>
+    <!-- Text for the "Don’t cancel" button in the cancel registration dialog -->
+    <string name="email_confirmation_dialog_cancel_registration_dismiss_button">Ne pas annuler</string>
+    <!-- First message header paragraph in note to self chat -->
+    <string name="chat_note_to_self_chat_first_message_header_paragraph">Un espace privé pour des photos, des renseignements importants ou de grandes idées. Toujours synchronisé et protégé par un chiffrement à divulgation nulle de connaissance.</string>
+    <!-- Title of the notification displayed when Syncs are paused due to low battery conditions -->
+    <string name="general_sync_notification_low_battery_title">Syncing paused due to low battery</string>
+    <!-- Text of the notification displayed when Syncs are paused due to low battery conditions -->
+    <string name="general_sync_notification_low_battery_text">Connect to power source to resume</string>
+    <!-- Title of the notification displayed when Syncs are paused due to lost Wi-Fi conditions -->
+    <string name="general_sync_notification_lost_wifi_title">Syncing paused due to lost connection</string>
+    <!-- Text of the notification displayed when Syncs are paused due to lost Wi-Fi conditions -->
+    <string name="general_sync_notification_lost_wifi_text">Reconnect to Wi-Fi to resume</string>
+    <!-- Title of the notification displayed when Syncs are stopped due to some sync error -->
+    <string name="general_sync_notification_generic_error_title">Syncing has stopped</string>
+    <!-- Text of the notification displayed when Syncs are stopped due to some sync error -->
+    <string name="general_sync_notification_generic_error_text">Go to the Help Centre to understand why</string>
+    <!-- Title of the notification displayed when a Sync has stalled issues -->
+    <string name="general_sync_notification_stalled_issues_title">Sync issues detected</string>
+    <!-- Text of the notification displayed when a Sync has stalled issues -->
+    <string name="general_sync_notification_stalled_issues_text">View and resolve issues</string>
 </resources>
