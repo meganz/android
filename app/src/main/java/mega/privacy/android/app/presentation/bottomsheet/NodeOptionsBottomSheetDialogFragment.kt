@@ -623,10 +623,7 @@ class NodeOptionsBottomSheetDialogFragment : BaseBottomSheetDialogFragment() {
 
                         viewLifecycleOwner.lifecycleScope.launch {
                             optionAddVideoToPlaylistItem.visibility =
-                                if (mode == VIDEO_SECTION_MODE && getFeatureFlagValueUseCase(
-                                        AppFeatures.AddVideoToPlaylistFromVideoSection
-                                    )
-                                ) {
+                                if (mode == VIDEO_SECTION_MODE) {
                                     View.VISIBLE
                                 } else {
                                     View.GONE

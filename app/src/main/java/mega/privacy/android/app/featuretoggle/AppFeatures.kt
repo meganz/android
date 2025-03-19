@@ -57,14 +57,6 @@ enum class AppFeatures(override val description: String, private val defaultValu
     ),
 
     /**
-     * Add video to playlist from video section
-     */
-    AddVideoToPlaylistFromVideoSection(
-        "Enable add video to playlist from video section",
-        true
-    ),
-
-    /**
      * New contact request screen
      */
     NewContactRequestScreen(
