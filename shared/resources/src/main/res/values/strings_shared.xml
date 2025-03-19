@@ -682,7 +682,7 @@
     <!-- Title of Favourites video playlist in the video section -->
     <string name="video_section_title_favourite_playlist">Favourites</string>
     <!-- Title of the synced folder list empty state -->
-    <string name="device_center_sync_backup_list_empty_state_title">No devices are set up</string>
+    <string name="device_center_sync_backup_list_empty_state_title">No syncs or backups have been set up yet</string>
     <!-- Message of the synced folder list empty state -->
     <string name="device_center_sync_backup_list_empty_state_message">Sync or back up a folder on your device with a folder on MEGA</string>
     <!-- subtitle of meeting title in schedule meeting for title disclaimer -->
@@ -1016,4 +1016,6 @@
     <string name="general_sync_notification_stalled_issues_title">Sync issues detected</string>
     <!-- Text of the notification displayed when a Sync has stalled issues -->
     <string name="general_sync_notification_stalled_issues_text">View and resolve issues</string>
+    <!-- The name of the Device or Folder Status which signifies that an error has occurred -->
+    <string name="device_center_list_view_item_status_error">Error</string>
 </resources>
