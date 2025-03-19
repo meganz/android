@@ -160,7 +160,7 @@ private fun SyncCardHeader(
                 MegaStatusIndicator(
                     modifier = Modifier.padding(top = 2.dp, bottom = 2.dp),
                     statusText = when {
-                        hasStalledIssues -> stringResource(id = R.string.sync_folders_sync_state_failed)
+                        hasStalledIssues -> stringResource(id = sharedR.string.device_center_list_view_item_status_error)
                         status == SyncStatus.SYNCING -> when (syncType) {
                             SyncType.TYPE_BACKUP,
                             SyncType.TYPE_CAMERA_UPLOADS,
@@ -171,7 +171,7 @@ private fun SyncCardHeader(
                         }
 
                         status == SyncStatus.PAUSED -> stringResource(id = R.string.sync_list_sync_state_paused)
-                        status == SyncStatus.ERROR -> stringResource(id = R.string.sync_folders_sync_state_failed)
+                        status == SyncStatus.ERROR -> stringResource(id = sharedR.string.device_center_list_view_item_status_error)
                         status == SyncStatus.DISABLED -> stringResource(id = sharedR.string.sync_list_sync_state_disabled)
                         else -> stringResource(id = sharedR.string.sync_list_sync_state_up_to_date)
                     },
