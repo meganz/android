@@ -898,7 +898,7 @@ class ManagerActivity : PasscodeActivity(), NavigationView.OnNavigationItemSelec
             Timber.d("Backup warning dialog is not shown")
         }
         checkForInAppUpdate()
-        checkForInAppAdvertisement()
+        checkForInAppAdvertisement(forceAskConsent = false)
     }
 
     /**
@@ -952,7 +952,7 @@ class ManagerActivity : PasscodeActivity(), NavigationView.OnNavigationItemSelec
         }
     }
 
-    private fun checkForInAppAdvertisement() {
+    private fun checkForInAppAdvertisement(forceAskConsent: Boolean) {
         lifecycleScope.launch {
             runCatching {
                 googleAdsManager.checkForAdsAvailability()
@@ -960,7 +960,8 @@ class ManagerActivity : PasscodeActivity(), NavigationView.OnNavigationItemSelec
                     setupAdsView()
                     googleAdsManager.checkLatestConsentInformation(
                         activity = this@ManagerActivity,
-                        onConsentInformationUpdated = { fetchNewAd() }
+                        onConsentInformationUpdated = { fetchNewAd() },
+                        forceAskConsent = forceAskConsent
                     )
                 }
             }.onFailure {
@@ -2458,7 +2459,8 @@ class ManagerActivity : PasscodeActivity(), NavigationView.OnNavigationItemSelec
     }
 
     private fun isShowingAds(): Boolean {
-        return (isTablet() || isPortrait()) && googleAdsManager.isAdsEnabled() &&
+        return (isTablet() || isPortrait()) && googleAdsManager.isAdsEnabled()
+                && googleAdsManager.hasAdsRequest() &&
                 (drawerItem == DrawerItem.CLOUD_DRIVE
                         || drawerItem == DrawerItem.CHAT
                         || drawerItem == DrawerItem.SHARED_ITEMS
@@ -3141,7 +3143,13 @@ class ManagerActivity : PasscodeActivity(), NavigationView.OnNavigationItemSelec
         }
         Timber.d("Should force refresh contact database after logging in for the first time - $firstTimeAfterInstallation")
         userInfoViewModel.refreshContactDatabase(firstTimeAfterInstallation)
-        cookieDialogHandler.showDialogIfNeeded(this)
+        cookieDialogHandler.showDialogIfNeeded(
+            context = this,
+            onButtonClicked = {
+                handleShowingAds()
+                checkForInAppAdvertisement(forceAskConsent = true)
+            },
+        )
     }
 
     fun setToolbarTitle(title: String?) {
@@ -3461,7 +3469,7 @@ class ManagerActivity : PasscodeActivity(), NavigationView.OnNavigationItemSelec
             }
             resetNavigationViewMenu(bottomNavigationView.menu)
             supportInvalidateOptionsMenu()
-            checkForInAppAdvertisement()
+            checkForInAppAdvertisement(forceAskConsent = false)
             userInfoViewModel.getUserInfo()
         } catch (e: Exception) {
             Timber.w(e)

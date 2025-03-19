@@ -73,12 +73,19 @@ class GoogleAdsManager @Inject constructor(
     fun isAdsEnabled() = _isAdsFeatureEnabled.value
 
     /**
+     * Check if ads are ready to be requested.
+     */
+    fun hasAdsRequest() = _request.value != null
+
+    /**
      * Check the latest consent information from UMP and show the consent form if required.
      * @param activity The activity to check the consent information.
+     * @param forceAskConsent True to force showing the consent form, false otherwise. it avoids showing the dialog if the user is viewing the generic cookie dialog.
      * @param onConsentInformationUpdated Callback to be called when the consent information is updated.
      */
     suspend fun checkLatestConsentInformation(
         activity: Activity,
+        forceAskConsent: Boolean = true,
         onConsentInformationUpdated: () -> Unit = { fetchAdRequest() },
     ) {
         Timber.d("Checking latest consent information")
@@ -97,7 +104,7 @@ class GoogleAdsManager @Inject constructor(
 
             val successCallback = ConsentInformation.OnConsentInfoUpdateSuccessListener {
                 Timber.d("success loading consent $shouldShowGenericCookieDialog")
-                if (shouldShowGenericCookieDialog.not()) {
+                if (forceAskConsent || shouldShowGenericCookieDialog.not()) {
                     UserMessagingPlatform.loadAndShowConsentFormIfRequired(activity) { loadAndShowError: FormError? ->
                         if (loadAndShowError != null) {
                             Timber.e("Error loading or showing consent form: ${loadAndShowError.message}")

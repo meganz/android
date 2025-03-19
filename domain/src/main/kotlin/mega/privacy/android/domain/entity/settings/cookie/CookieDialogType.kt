@@ -11,11 +11,6 @@ enum class CookieDialogType {
     GenericCookieDialog,
 
     /**
-     * Show cookie dialog with ads.
-     */
-    CookieDialogWithAds,
-
-    /**
      * Do not show any cookie dialog.
      */
     None
