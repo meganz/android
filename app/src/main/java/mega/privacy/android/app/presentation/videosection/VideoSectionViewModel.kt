@@ -432,7 +432,7 @@ class VideoSectionViewModel @Inject constructor(
         if (selectTab == VideoSectionTab.Playlists && originalPlaylistEntities.isEmpty()) {
             loadVideoPlaylists()
         }
-        if (_state.value.searchState == SearchWidgetState.EXPANDED) {
+        if (_state.value.searchState == SearchWidgetState.EXPANDED && selectTab != tabState.value.selectedTab) {
             exitSearch()
         }
         if (_state.value.isInSelection) {
@@ -447,6 +447,9 @@ class VideoSectionViewModel @Inject constructor(
     internal fun refreshWhenOrderChanged() =
         viewModelScope.launch {
             val sortOrder = getCloudSortOrder()
+            // If the sort order is the same, do not refresh
+            if (state.value.sortOrder == sortOrder)
+                return@launch
             _state.update {
                 it.copy(
                     sortOrder = sortOrder,

@@ -2,6 +2,8 @@ package mega.privacy.android.app.presentation.videosection.view
 
 import androidx.activity.compose.BackHandler
 import androidx.activity.compose.LocalOnBackPressedDispatcherOwner
+import androidx.compose.foundation.layout.WindowInsets
+import androidx.compose.foundation.layout.ime
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.foundation.pager.rememberPagerState
@@ -95,6 +97,7 @@ internal fun VideoSectionComposeView(
 
     MegaScaffold(
         modifier = Modifier.semantics { testTagsAsResourceId = true },
+        contentWindowInsets = WindowInsets.ime,
         topBar = {
             VideoSectionTopBar(
                 tab = tabState.selectedTab,
