@@ -186,7 +186,7 @@ class VideoPlayerFragment : Fragment() {
             requireContext(),
             object : ScaleGestureDetector.SimpleOnScaleGestureListener() {
                 override fun onScale(detector: ScaleGestureDetector): Boolean {
-                    if (!viewModel.screenLockState.value && viewModel.isPlayerZoomInEnabled()) {
+                    if (!viewModel.screenLockState.value) {
                         zoomLevel = (zoomLevel * detector.scaleFactor).coerceIn(1.0f, maxZoom)
                         updateTransformations()
                     }

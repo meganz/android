@@ -49,14 +49,6 @@ enum class AppFeatures(override val description: String, private val defaultValu
     ),
 
     /**
-     * Enable the video player zoom in feature
-     */
-    VideoPlayerZoomInEnable(
-        "Enable add video player zoom in",
-        true
-    ),
-
-    /**
      * New contact request screen
      */
     NewContactRequestScreen(

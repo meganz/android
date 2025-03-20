@@ -224,7 +224,6 @@ class LegacyVideoPlayerViewModel @Inject constructor(
     private val monitorSubFolderMediaDiscoverySettingsUseCase: MonitorSubFolderMediaDiscoverySettingsUseCase,
     monitorVideoRepeatModeUseCase: MonitorVideoRepeatModeUseCase,
     savedStateHandle: SavedStateHandle,
-    private val getFeatureFlagValueUseCase: GetFeatureFlagValueUseCase,
     private val getOfflineNodesByParentIdUseCase: GetOfflineNodesByParentIdUseCase,
     private val getThumbnailUseCase: GetThumbnailUseCase,
     private val getOfflineNodeInformationByIdUseCase: GetOfflineNodeInformationByIdUseCase,
@@ -323,8 +322,6 @@ class LegacyVideoPlayerViewModel @Inject constructor(
 
     private var currentPlayingVideoSize: Pair<Int, Int>? = null
 
-    private var isZoomInEnabled = false
-
     private val _isSubtitleDialogShown = savedStateHandle.getStateFlow(
         viewModelScope,
         subtitleDialogShowKey,
@@ -359,9 +356,6 @@ class LegacyVideoPlayerViewModel @Inject constructor(
     }
 
     init {
-        viewModelScope.launch {
-            isZoomInEnabled = getFeatureFlagValueUseCase(AppFeatures.VideoPlayerZoomInEnable)
-        }
         viewModelScope.launch {
             combine(
                 _isSubtitleShown,
@@ -1959,8 +1953,6 @@ class LegacyVideoPlayerViewModel @Inject constructor(
     internal suspend fun getCurrentPlayingNode() = withContext(ioDispatcher) {
         megaApiGateway.getMegaNodeByHandle(playingHandle)
     }
-
-    internal fun isPlayerZoomInEnabled() = isZoomInEnabled
 
     companion object {
         private const val MEGA_SCREENSHOTS_FOLDER_NAME = "MEGA Screenshots/"
