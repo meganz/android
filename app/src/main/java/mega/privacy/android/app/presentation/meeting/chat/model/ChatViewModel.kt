@@ -153,6 +153,8 @@ import java.util.Date
 import java.util.Locale
 import java.util.concurrent.TimeUnit
 import javax.inject.Inject
+import mega.privacy.android.shared.resources.R as sharedR
+import mega.privacy.android.app.presentation.mapper.GetStringFromStringResMapper
 
 /**
  * Extra Action
@@ -261,6 +263,7 @@ class ChatViewModel @Inject constructor(
     private val areTransfersPausedUseCase: AreTransfersPausedUseCase,
     private val pauseTransfersQueueUseCase: PauseTransfersQueueUseCase,
     private val scannerHandler: ScannerHandler,
+    private val getStringFromStringResMapper: GetStringFromStringResMapper,
     actionFactories: Set<@JvmSuppressWildcards (ChatViewModel) -> MessageAction>,
 ) : ViewModel() {
     private val _state = MutableStateFlow(ChatUiState())
@@ -354,7 +357,7 @@ class ChatViewModel @Inject constructor(
         runCatching {
             setUsersCallLimitRemindersUseCase(if (enabled) UsersCallLimitReminders.Enabled else UsersCallLimitReminders.Disabled)
         }.onFailure { exception ->
-            Timber.e("An error occurred when setting the call limit reminder", exception)
+            Timber.e("An error occurred when setting the call limit reminder $exception")
         }
     }
 
@@ -917,9 +920,13 @@ class ChatViewModel @Inject constructor(
      */
     fun archiveChat() {
         viewModelScope.launch {
+            val title = if (_state.value.isNoteToSelf) getStringFromStringResMapper(
+                sharedR.string.chat_note_to_self_chat_title
+            ) else _state.value.title
+
             runCatching { archiveChatUseCase(chatId, true) }
                 .onSuccess {
-                    broadcastChatArchivedUseCase(_state.value.title.orEmpty())
+                    broadcastChatArchivedUseCase(title.orEmpty())
                     _state.update { state ->
                         state.copy(
                             actionToManageEvent = triggered(
@@ -934,7 +941,7 @@ class ChatViewModel @Inject constructor(
                             infoToShowEvent = triggered(
                                 InfoToShow.StringWithParams(
                                     stringId = R.string.error_archive_chat,
-                                    args = state.title?.let { title -> listOf(title) }.orEmpty()
+                                    args = title?.let { title -> listOf(title) }.orEmpty()
                                 )
                             )
                         )
@@ -948,6 +955,10 @@ class ChatViewModel @Inject constructor(
      */
     fun unarchiveChat() {
         viewModelScope.launch {
+            val title = if (_state.value.isNoteToSelf) getStringFromStringResMapper(
+                sharedR.string.chat_note_to_self_chat_title
+            ) else _state.value.title
+
             runCatching { archiveChatUseCase(chatId, false) }
                 .onSuccess {
                     _state.update { state ->
@@ -955,7 +966,7 @@ class ChatViewModel @Inject constructor(
                             infoToShowEvent = triggered(
                                 InfoToShow.StringWithParams(
                                     stringId = R.string.success_unarchive_chat,
-                                    args = state.title?.let { title -> listOf(title) }.orEmpty()
+                                    args = title?.let { title -> listOf(title) }.orEmpty()
                                 )
                             )
                         )
@@ -968,7 +979,7 @@ class ChatViewModel @Inject constructor(
                             infoToShowEvent = triggered(
                                 InfoToShow.StringWithParams(
                                     stringId = R.string.error_unarchive_chat,
-                                    args = state.title?.let { title -> listOf(title) }.orEmpty()
+                                    args = title?.let { title -> listOf(title) }.orEmpty()
                                 )
                             )
                         )
@@ -1657,7 +1668,7 @@ class ChatViewModel @Inject constructor(
                         }
                     }
                     if (it !is CancellationException) {
-                        Timber.e("Error recording voice clip", it)
+                        Timber.e("Error recording voice clip $it")
                     }
                 }
             } ?: run {

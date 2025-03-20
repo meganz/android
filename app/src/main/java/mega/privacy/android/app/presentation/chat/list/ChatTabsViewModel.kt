@@ -25,6 +25,7 @@ import mega.privacy.android.app.meeting.gateway.RTCAudioManagerGateway
 import mega.privacy.android.app.presentation.chat.list.model.ChatsTabState
 import mega.privacy.android.app.presentation.chat.mapper.ChatRoomTimestampMapper
 import mega.privacy.android.app.presentation.data.SnackBarItem
+import mega.privacy.android.app.presentation.mapper.GetStringFromStringResMapper
 import mega.privacy.android.app.usecase.chat.GetLastMessageUseCase
 import mega.privacy.android.app.utils.CallUtil
 import mega.privacy.android.data.gateway.api.MegaChatApiGateway
@@ -61,6 +62,7 @@ import mega.privacy.android.domain.usecase.meeting.StartMeetingInWaitingRoomChat
 import nz.mega.sdk.MegaChatError
 import timber.log.Timber
 import java.util.concurrent.TimeUnit
+import mega.privacy.android.shared.resources.R as sharedR
 import javax.inject.Inject
 
 /**
@@ -114,6 +116,7 @@ class ChatTabsViewModel @Inject constructor(
     private val monitorChatCallUpdatesUseCase: MonitorChatCallUpdatesUseCase,
     private val hasArchivedChatsUseCase: HasArchivedChatsUseCase,
     private val monitorHasAnyContactUseCase: MonitorHasAnyContactUseCase,
+    private val getStringFromStringResMapper: GetStringFromStringResMapper,
 ) : ViewModel() {
 
     private val state = MutableStateFlow(ChatsTabState())
@@ -434,7 +437,11 @@ class ChatTabsViewModel @Inject constructor(
             var stringParam: String? = null
             var intParam: Int? = null
             if (singleParam) {
-                stringParam = state.value.findChatItem(chatIds.first())?.title
+                stringParam = state.value.findChatItem(chatIds.first())?.let {
+                    if (it is ChatRoomItem.NoteToSelfChatRoomItem) getStringFromStringResMapper(
+                        sharedR.string.chat_note_to_self_chat_title
+                    ) else it.title
+                }
             } else {
                 intParam = chatIds.size
             }

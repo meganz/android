@@ -68,15 +68,18 @@ fun ArchivedChatsView(
         modifier = Modifier.systemBarsPadding(),
         sheetState = sheetState,
         sheetContent = {
-            val item = sheetItem
-            if (item != null) {
-                ChatRoomItemBottomSheetView(
-                    item = item,
-                    onUnarchiveClick = { onItemUnarchived(item.chatId).also { hideSheet() } },
-                )
-            } else {
-                hideSheet()
-            }
+            ChatRoomItemBottomSheetView(
+                item = sheetItem,
+                onUnarchiveClick = {
+                    sheetItem?.let {
+                        onItemUnarchived(it.chatId)
+                        scope.launch {
+                            sheetState.hide()
+                        }
+
+                    }
+                },
+            )
         }
     ) {
         Scaffold(
@@ -113,12 +116,21 @@ fun ArchivedChatsView(
                 onItemClick = onItemClick,
                 onItemMoreClick = { chatItem ->
                     sheetItem = chatItem
-                    scope.launch { sheetState.show() }
+                    scope.launch {
+                        sheetState.show()
+                    }
                 },
                 onFirstItemVisible = { showElevation = !it }
             )
         }
     }
+
+    BackHandler(enabled = sheetState.isVisible) {
+        scope.launch {
+            sheetState.hide()
+        }
+    }
+
 
     LaunchedEffect(searchQuery) {
         searchQuery.takeIf(String::isNotBlank)?.let { searchQuery ->

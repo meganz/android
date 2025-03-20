@@ -31,6 +31,7 @@ import mega.privacy.android.app.meeting.gateway.RTCAudioManagerGateway
 import mega.privacy.android.app.middlelayer.scanner.ScannerHandler
 import mega.privacy.android.app.objects.GifData
 import mega.privacy.android.app.presentation.documentscanner.model.DocumentScanningError
+import mega.privacy.android.app.presentation.mapper.GetStringFromStringResMapper
 import mega.privacy.android.app.presentation.meeting.chat.mapper.ForwardMessagesResultMapper
 import mega.privacy.android.app.presentation.meeting.chat.mapper.InviteParticipantResultMapper
 import mega.privacy.android.app.presentation.meeting.chat.mapper.ParticipantNameMapper
@@ -200,6 +201,7 @@ internal class ChatViewModelTest {
     private val isChatNotificationMuteUseCase: IsChatNotificationMuteUseCase = mock()
     private val getParticipantFirstNameUseCase: GetParticipantFirstNameUseCase = mock()
     private val getMyUserHandleUseCase: GetMyUserHandleUseCase = mock()
+    private val getStringFromStringResMapper: GetStringFromStringResMapper = mock()
     private val monitorChatRoomUpdatesUseCase: MonitorChatRoomUpdatesUseCase = mock {
         onBlocking { invoke(any()) } doReturn emptyFlow()
     }
@@ -388,6 +390,7 @@ internal class ChatViewModelTest {
             areTransfersPausedUseCase,
             pauseTransfersQueueUseCase,
             scannerHandler,
+            getStringFromStringResMapper
         )
         whenever(getUsersCallLimitRemindersUseCase()).thenReturn(emptyFlow())
         wheneverBlocking { isAnonymousModeUseCase() } doReturn false
@@ -511,6 +514,7 @@ internal class ChatViewModelTest {
             pauseTransfersQueueUseCase = pauseTransfersQueueUseCase,
             actionFactories = setOf(),
             scannerHandler = scannerHandler,
+            getStringFromStringResMapper = getStringFromStringResMapper,
         )
     }
 

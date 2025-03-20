@@ -9,6 +9,7 @@ import kotlinx.coroutines.test.runTest
 import mega.privacy.android.app.components.ChatManagement
 import mega.privacy.android.app.meeting.gateway.RTCAudioManagerGateway
 import mega.privacy.android.app.presentation.chat.mapper.ChatRoomTimestampMapper
+import mega.privacy.android.app.presentation.mapper.GetStringFromStringResMapper
 import mega.privacy.android.app.usecase.chat.GetLastMessageUseCase
 import mega.privacy.android.core.test.extension.CoroutineMainDispatcherExtension
 import mega.privacy.android.data.gateway.api.MegaChatApiGateway
@@ -69,6 +70,7 @@ internal class ChatTabsViewModelTest {
     private val isParticipatingInChatCallUseCase: IsParticipatingInChatCallUseCase = mock()
     private val getMeetingTooltipsUseCase: GetMeetingTooltipsUseCase = mock()
     private val setNextMeetingTooltipUseCase: SetNextMeetingTooltipUseCase = mock()
+    private val getStringFromStringResMapper: GetStringFromStringResMapper = mock()
     private val monitorScheduledMeetingCanceledUseCase: MonitorScheduledMeetingCanceledUseCase =
         mock()
     private val getChatsUnreadStatusUseCase: GetChatsUnreadStatusUseCase = mock()
@@ -105,6 +107,7 @@ internal class ChatTabsViewModelTest {
             getChatsUnreadStatusUseCase,
             startMeetingInWaitingRoomChatUseCase,
             monitorChatCallUpdatesUseCase,
+            getStringFromStringResMapper
         )
     }
 
@@ -134,6 +137,7 @@ internal class ChatTabsViewModelTest {
             monitorChatCallUpdatesUseCase,
             hasArchivedChatsUseCase,
             monitorHasAnyContactUseCase,
+            getStringFromStringResMapper
         )
     }
 

@@ -13,12 +13,15 @@ import mega.privacy.android.app.R
 import mega.privacy.android.app.presentation.chat.archived.model.ArchivedChatsState
 import mega.privacy.android.app.presentation.chat.mapper.ChatRoomTimestampMapper
 import mega.privacy.android.app.presentation.data.SnackBarItem
+import mega.privacy.android.app.presentation.mapper.GetStringFromStringResMapper
 import mega.privacy.android.app.usecase.chat.GetLastMessageUseCase
 import mega.privacy.android.domain.usecase.chat.ArchiveChatUseCase
 import mega.privacy.android.domain.usecase.chat.GetChatsUseCase
 import mega.privacy.android.domain.usecase.chat.GetChatsUseCase.ChatRoomType
 import timber.log.Timber
 import javax.inject.Inject
+import mega.privacy.android.shared.resources.R as sharedR
+import mega.privacy.android.domain.entity.chat.ChatRoomItem
 
 /**
  * Archived chats view model
@@ -27,6 +30,7 @@ import javax.inject.Inject
  * @property getLastMessageUseCase
  * @property chatRoomTimestampMapper
  * @property archiveChatUseCase
+ * @property getStringFromStringResMapper   [GetStringFromStringResMapper]
  */
 @HiltViewModel
 class ArchivedChatsViewModel @Inject constructor(
@@ -34,6 +38,7 @@ class ArchivedChatsViewModel @Inject constructor(
     private val getLastMessageUseCase: GetLastMessageUseCase,
     private val chatRoomTimestampMapper: ChatRoomTimestampMapper,
     private val archiveChatUseCase: ArchiveChatUseCase,
+    private val getStringFromStringResMapper: GetStringFromStringResMapper,
 ) : ViewModel() {
 
     private val state = MutableStateFlow(ArchivedChatsState())
@@ -69,7 +74,12 @@ class ArchivedChatsViewModel @Inject constructor(
      */
     fun unarchiveChat(chatId: Long) {
         viewModelScope.launch {
-            val chatTitle = state.value.items.firstOrNull { it.chatId == chatId }?.title
+            val chatTitle = state.value.items.firstOrNull { it.chatId == chatId }?.let {
+                if (it is ChatRoomItem.NoteToSelfChatRoomItem) getStringFromStringResMapper(
+                    sharedR.string.chat_note_to_self_chat_title
+                ) else it.title
+            }
+
             runCatching { archiveChatUseCase(chatId, false) }
                 .onSuccess {
                     val snackBarItem = SnackBarItem(
