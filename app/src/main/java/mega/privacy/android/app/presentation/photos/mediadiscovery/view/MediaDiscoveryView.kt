@@ -74,7 +74,6 @@ import mega.privacy.android.app.presentation.photos.model.DateCard
 import mega.privacy.android.app.presentation.photos.model.TimeBarTab
 import mega.privacy.android.app.presentation.photos.timeline.view.PhotosSkeletonView
 import mega.privacy.android.app.presentation.photos.view.CardListView
-import mega.privacy.android.app.presentation.photos.view.EmptyView
 import mega.privacy.android.app.presentation.photos.view.FilterDialog
 import mega.privacy.android.app.presentation.photos.view.PhotosGridView
 import mega.privacy.android.app.presentation.photos.view.SortByDialog
@@ -583,7 +582,7 @@ private fun ListViewIconButton(
         onClick = onSwitchListView,
     ) {
         Icon(
-            painter = painterResource(id = R.drawable.ic_list_view),
+            painter = painterResource(id = iconPackR.drawable.ic_list_small_small_regular_outline),
             contentDescription = "",
             tint = MaterialTheme.colors.textColorSecondary
         )
