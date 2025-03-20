@@ -162,12 +162,11 @@ private fun SyncCardHeader(
                     statusText = when {
                         hasStalledIssues -> stringResource(id = sharedR.string.device_center_list_view_item_status_error)
                         status == SyncStatus.SYNCING -> when (syncType) {
-                            SyncType.TYPE_BACKUP,
                             SyncType.TYPE_CAMERA_UPLOADS,
                             SyncType.TYPE_MEDIA_UPLOADS,
-                                -> stringResource(id = sharedR.string.sync_list_sync_state_updating)
+                                -> stringResource(id = sharedR.string.device_center_list_view_item_status_uploading)
 
-                            else -> stringResource(id = R.string.sync_list_sync_state_syncing)
+                            else -> stringResource(id = sharedR.string.sync_list_sync_state_updating)
                         }
 
                         status == SyncStatus.PAUSED -> stringResource(id = R.string.sync_list_sync_state_paused)

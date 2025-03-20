@@ -66,7 +66,8 @@ internal class DeviceFolderUINodeListMapperTest {
         val expectedUINodeStatus = DeviceCenterUINodeStatus.UpToDate
         val expectedFolderUINodeIcon = FolderIconType.Backup
 
-        whenever(deviceCenterUINodeStatusMapper(folderStatus)).thenReturn(expectedUINodeStatus)
+        whenever(deviceCenterUINodeStatusMapper(folderType, folderStatus))
+            .thenReturn(expectedUINodeStatus)
         whenever(deviceFolderUINodeIconMapper(folderType)).thenReturn(expectedFolderUINodeIcon)
 
         assertThat(
@@ -114,7 +115,8 @@ internal class DeviceFolderUINodeListMapperTest {
         val expectedUINodeStatus = DeviceCenterUINodeStatus.UpToDate
         val expectedFolderUINodeIcon = FolderIconType.CameraUploads
 
-        whenever(deviceCenterUINodeStatusMapper(folderStatus)).thenReturn(expectedUINodeStatus)
+        whenever(deviceCenterUINodeStatusMapper(folderType, folderStatus))
+            .thenReturn(expectedUINodeStatus)
         whenever(deviceFolderUINodeIconMapper(folderType)).thenReturn(expectedFolderUINodeIcon)
 
         val expectedList = listOf(
