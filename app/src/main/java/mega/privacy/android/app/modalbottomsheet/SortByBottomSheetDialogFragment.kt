@@ -112,7 +112,7 @@ class SortByBottomSheetDialogFragment : BaseBottomSheetDialogFragment() {
                             SortOrder.ORDER_FAV_ASC,
                             SortOrder.ORDER_LABEL_ASC,
                             SortOrder.ORDER_DEFAULT_ASC,
-                            -> setSelectedColor(binding.sortByNameAsc)
+                                -> setSelectedColor(binding.sortByNameAsc)
 
                             SortOrder.ORDER_DEFAULT_DESC -> setSelectedColor(binding.sortByNameDesc)
                             SortOrder.ORDER_MODIFICATION_DESC -> setSelectedColor(binding.sortByNewestDate)
@@ -229,6 +229,7 @@ class SortByBottomSheetDialogFragment : BaseBottomSheetDialogFragment() {
     private fun setNewOrder(order: SortOrder) {
         lifecycleScope.launch {
             if (sortByHeaderViewModel.oldOrder.value == order) {
+                setStateBottomSheetBehaviorHidden()
                 return@launch
             }
 
@@ -236,7 +237,7 @@ class SortByBottomSheetDialogFragment : BaseBottomSheetDialogFragment() {
                 ORDER_FAVOURITES,
                 ORDER_CLOUD,
                 ORDER_VIDEO_PLAYLIST,
-                -> {
+                    -> {
                     sortByHeaderViewModel.setOrderCloud(order).join()
                     sortByHeaderViewModel.updateWhenOrderChanged(
                         SortOrderState(
