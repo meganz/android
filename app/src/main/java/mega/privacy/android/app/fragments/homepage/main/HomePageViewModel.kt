@@ -103,6 +103,10 @@ class HomePageViewModel @Inject constructor(
         viewModelScope.launch {
             runCatching {
                 dismissBannerUseCase(banner.id)
+            }.onSuccess {
+                _banners.update { banners ->
+                    banners.filter { it.id != banner.id }
+                }
             }.onFailure {
                 Timber.e(it)
             }

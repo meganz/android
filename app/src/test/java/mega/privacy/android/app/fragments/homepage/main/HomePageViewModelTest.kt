@@ -111,9 +111,17 @@ class HomePageViewModelTest {
             val banner = mock<Banner> {
                 on { id } doReturn 1
             }
+            whenever(getBannersUseCase()).thenReturn(listOf(banner))
+            underTest.getBanners()
+            underTest.banners.test {
+                assertThat(awaitItem()).isEqualTo(listOf(banner))
+            }
             underTest.dismissBanner(banner)
 
             verify(dismissBannerUseCase).invoke(1)
+            underTest.banners.test {
+                assertThat(awaitItem()).isEmpty()
+            }
         }
 
     @Test
