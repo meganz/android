@@ -48,8 +48,8 @@ internal class DeviceFolderNodeMapper @Inject constructor() {
      * 5. Failed - [isFailed]
      * 6. Stalled - [isStalled]
      * 7. Disabled - [isDisabled]
-     * 8. Offline - [isOffline]
-     * 9. Paused - [isPaused]
+     * 8. Paused - [isPaused]
+     * 9. Offline - [isOffline]
      * 10. Initializing - [isInitializing]
      * 11. Syncing - [isSyncing]
      * 12. Scanning - [isScanning]
@@ -74,14 +74,14 @@ internal class DeviceFolderNodeMapper @Inject constructor() {
             }
         }
 
-        isOffline(currentTimeInSeconds) -> DeviceFolderStatus.Error(subState)
-
         isPaused() -> {
             when (type) {
                 BackupInfoType.CAMERA_UPLOADS, BackupInfoType.MEDIA_UPLOADS -> DeviceFolderStatus.Disabled
                 else -> DeviceFolderStatus.Paused
             }
         }
+
+        isOffline(currentTimeInSeconds) -> DeviceFolderStatus.Error(subState)
 
         isInitializing() || isSyncing() || isScanning() -> DeviceFolderStatus.Updating(progress)
 
@@ -134,7 +134,6 @@ internal class DeviceFolderNodeMapper @Inject constructor() {
     ) && subState in listOf(
         SyncError.ACCOUNT_EXPIRED,
         SyncError.ACCOUNT_BLOCKED,
-        SyncError.NO_SYNC_ERROR
     )
 
     /**
@@ -219,6 +218,7 @@ internal class DeviceFolderNodeMapper @Inject constructor() {
      */
     private fun BackupInfo.isTwoWaySyncPaused() =
         type == BackupInfoType.TWO_WAY_SYNC && state in listOf(
+            BackupInfoState.TEMPORARY_DISABLED,
             BackupInfoState.PAUSE_UP,
             BackupInfoState.PAUSE_DOWN,
             BackupInfoState.PAUSE_FULL,
@@ -236,7 +236,12 @@ internal class DeviceFolderNodeMapper @Inject constructor() {
             BackupInfoType.CAMERA_UPLOADS,
             BackupInfoType.MEDIA_UPLOADS,
             BackupInfoType.BACKUP_UPLOAD,
-        ) && state in listOf(BackupInfoState.PAUSE_UP, BackupInfoState.PAUSE_FULL)
+        ) && state in listOf(
+            BackupInfoState.TEMPORARY_DISABLED,
+            BackupInfoState.PAUSE_UP,
+            BackupInfoState.PAUSE_FULL,
+            BackupInfoState.DELETED,
+        )
 
     /**
      * Checks whether a Backup on a Download Sync is Paused or not
@@ -245,6 +250,7 @@ internal class DeviceFolderNodeMapper @Inject constructor() {
      */
     private fun BackupInfo.isDownloadSyncPaused() =
         type == BackupInfoType.DOWN_SYNC && state in listOf(
+            BackupInfoState.TEMPORARY_DISABLED,
             BackupInfoState.PAUSE_DOWN,
             BackupInfoState.PAUSE_FULL,
             BackupInfoState.DELETED,
