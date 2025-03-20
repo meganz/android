@@ -1,5 +1,6 @@
 package mega.privacy.android.app.featuretoggle
 
+import mega.privacy.android.app.featuretoggle.AppFeatures.entries
 import mega.privacy.android.domain.entity.Feature
 import mega.privacy.android.domain.featuretoggle.FeatureFlagValuePriority
 import mega.privacy.android.domain.featuretoggle.FeatureFlagValueProvider
@@ -71,14 +72,6 @@ enum class AppFeatures(override val description: String, private val defaultValu
     NewVideoPlayer(
         "Enable new video player",
         false,
-    ),
-
-    /**
-     * Enables the report issue button on the login screen
-     */
-    LoginReportIssueButton(
-        "Enables the report issue button on the login screen feature",
-        true,
     ),
 
     /**

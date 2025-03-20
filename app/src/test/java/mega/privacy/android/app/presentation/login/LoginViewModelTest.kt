@@ -56,7 +56,6 @@ import mega.privacy.android.domain.usecase.login.MonitorEphemeralCredentialsUseC
 import mega.privacy.android.domain.usecase.login.MonitorFetchNodesFinishUseCase
 import mega.privacy.android.domain.usecase.login.QuerySignupLinkUseCase
 import mega.privacy.android.domain.usecase.login.SaveEphemeralCredentialsUseCase
-import mega.privacy.android.domain.usecase.login.SaveLastRegisteredEmailUseCase
 import mega.privacy.android.domain.usecase.network.IsConnectedToInternetUseCase
 import mega.privacy.android.domain.usecase.photos.GetTimelinePhotosUseCase
 import mega.privacy.android.domain.usecase.requeststatus.EnableRequestStatusMonitorUseCase
@@ -120,7 +119,6 @@ internal class LoginViewModelTest {
     private val startDownloadWorkerUseCase = mock<StartDownloadWorkerUseCase>()
     private val startChatUploadsWorkerUseCase = mock<StartChatUploadsWorkerUseCase>()
     private val getLastRegisteredEmailUseCase = mock<GetLastRegisteredEmailUseCase>()
-    private val saveLastRegisteredEmailUseCase = mock<SaveLastRegisteredEmailUseCase>()
     private val clearLastRegisteredEmailUseCase = mock<ClearLastRegisteredEmailUseCase>()
     private val installReferrerHandler = mock<InstallReferrerHandler>()
     private val clearUserCredentialsUseCase = mock<ClearUserCredentialsUseCase>()
@@ -174,7 +172,6 @@ internal class LoginViewModelTest {
             startChatUploadsWorkerUseCase = startChatUploadsWorkerUseCase,
             loginMutex = mock(),
             getLastRegisteredEmailUseCase = getLastRegisteredEmailUseCase,
-            saveLastRegisteredEmailUseCase = saveLastRegisteredEmailUseCase,
             clearLastRegisteredEmailUseCase = clearLastRegisteredEmailUseCase,
             installReferrerHandler = installReferrerHandler,
             clearUserCredentialsUseCase = clearUserCredentialsUseCase,
@@ -249,7 +246,6 @@ internal class LoginViewModelTest {
                 assertThat(ongoingTransfersExist).isNull()
                 assertThat(isPendingToFinishActivity).isFalse()
                 assertThat(isPendingToShowFragment).isNull()
-                assertThat(enabledFlags).isEmpty()
                 assertThat(isCheckingSignupLink).isFalse()
                 assertThat(snackbarMessage).isInstanceOf(consumed().javaClass)
                 assertThat(isFirstTimeLaunch).isFalse()

@@ -28,6 +28,7 @@ import mega.privacy.android.app.presentation.extensions.error
 import mega.privacy.android.app.presentation.extensions.getState
 import mega.privacy.android.app.presentation.extensions.messageId
 import mega.privacy.android.app.presentation.extensions.newError
+import mega.privacy.android.app.presentation.login.LoginViewModel.Companion.ACTION_FORCE_RELOAD_ACCOUNT
 import mega.privacy.android.app.presentation.login.model.LoginError
 import mega.privacy.android.app.presentation.login.model.LoginFragmentType
 import mega.privacy.android.app.presentation.login.model.LoginIntentState
@@ -84,7 +85,6 @@ import mega.privacy.android.domain.usecase.login.MonitorEphemeralCredentialsUseC
 import mega.privacy.android.domain.usecase.login.MonitorFetchNodesFinishUseCase
 import mega.privacy.android.domain.usecase.login.QuerySignupLinkUseCase
 import mega.privacy.android.domain.usecase.login.SaveEphemeralCredentialsUseCase
-import mega.privacy.android.domain.usecase.login.SaveLastRegisteredEmailUseCase
 import mega.privacy.android.domain.usecase.network.IsConnectedToInternetUseCase
 import mega.privacy.android.domain.usecase.photos.GetTimelinePhotosUseCase
 import mega.privacy.android.domain.usecase.requeststatus.EnableRequestStatusMonitorUseCase
@@ -138,7 +138,6 @@ class LoginViewModel @Inject constructor(
     private val getTimelinePhotosUseCase: GetTimelinePhotosUseCase,
     private val startDownloadWorkerUseCase: StartDownloadWorkerUseCase,
     private val startChatUploadsWorkerUseCase: StartChatUploadsWorkerUseCase,
-    private val saveLastRegisteredEmailUseCase: SaveLastRegisteredEmailUseCase,
     private val getLastRegisteredEmailUseCase: GetLastRegisteredEmailUseCase,
     private val clearLastRegisteredEmailUseCase: ClearLastRegisteredEmailUseCase,
     private val installReferrerHandler: InstallReferrerHandler,
@@ -257,11 +256,6 @@ class LoginViewModel @Inject constructor(
                                 { state: LoginState -> state }
                             }
                         }
-                    }
-                },
-                flowOf(getFeatureFlagValueUseCase(AppFeatures.LoginReportIssueButton)).map { enabled ->
-                    { state: LoginState ->
-                        state.copy(enabledFlags = if (enabled) state.enabledFlags + AppFeatures.LoginReportIssueButton else state.enabledFlags - AppFeatures.LoginReportIssueButton)
                     }
                 },
                 flowOf(isFirstLaunchUseCase()).map { isFirstLaunch ->
@@ -400,7 +394,7 @@ class LoginViewModel @Inject constructor(
                     DisableChatApiUseCase { MegaApplication.getInstance()::disableMegaChatApi },
                 )
             }.onFailure {
-                Timber.w("Exception in local logout.", it)
+                Timber.w(it, "Exception in local logout.")
             }
             _state.update { it.copy(isLocalLogoutInProgress = false) }
         }
@@ -957,8 +951,9 @@ class LoginViewModel @Inject constructor(
         performLoginWith2FA(twoFA)
     } ?: run {
         _state.update { state ->
-            state.copy(multiFactorAuthState = MultiFactorAuthState.Fixed
-                .takeUnless { state.multiFactorAuthState == MultiFactorAuthState.Failed })
+            state.copy(
+                multiFactorAuthState = MultiFactorAuthState.Fixed
+                    .takeUnless { state.multiFactorAuthState == MultiFactorAuthState.Failed })
         }
     }
 
@@ -1008,17 +1003,6 @@ class LoginViewModel @Inject constructor(
                 val ephemeral = monitorEphemeralCredentialsUseCase().firstOrNull() ?: return@launch
                 clearEphemeralCredentialsUseCase()
                 saveEphemeralCredentialsUseCase(ephemeral.copy(email = email))
-            }.onFailure { Timber.e(it) }
-        }
-    }
-
-    /**
-     * Save last registered email address to local storage
-     */
-    fun saveLastRegisteredEmail(email: String) {
-        viewModelScope.launch {
-            runCatching {
-                saveLastRegisteredEmailUseCase(email)
             }.onFailure { Timber.e(it) }
         }
     }

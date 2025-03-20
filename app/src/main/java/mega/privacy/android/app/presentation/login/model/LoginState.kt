@@ -6,7 +6,6 @@ import de.palm.composestateevents.StateEventWithContent
 import de.palm.composestateevents.consumed
 import mega.privacy.android.app.R
 import mega.privacy.android.app.presentation.extensions.messageId
-import mega.privacy.android.domain.entity.Feature
 import mega.privacy.android.domain.entity.Progress
 import mega.privacy.android.domain.entity.ThemeMode
 import mega.privacy.android.domain.entity.account.AccountBlockedDetail
@@ -48,7 +47,6 @@ import mega.privacy.android.domain.exception.LoginException
  * @property ongoingTransfersExist      True if exist ongoing transfers, false if not. Null if pending to check.
  * @property isPendingToFinishActivity  True if should finish the activity, false otherwise.
  * @property isPendingToShowFragment    [LoginFragmentType] if pending, null otherwise.
- * @property enabledFlags               Enabled Feature Flags
  * @property isCheckingSignupLink       True if it is checking a signup link, false otherwise.
  * @property snackbarMessage            Message to show in Snackbar.
  * @property isFastLoginInProgress      True if a fast login is in progress, false otherwise.
@@ -89,7 +87,6 @@ data class LoginState(
     val ongoingTransfersExist: Boolean? = null,
     val isPendingToFinishActivity: Boolean = false,
     val isPendingToShowFragment: LoginFragmentType? = null,
-    val enabledFlags: Set<Feature> = emptySet(),
     val isCheckingSignupLink: Boolean = false,
     val snackbarMessage: StateEventWithContent<Int> = consumed(),
     val loginTemporaryError: TemporaryWaitingError? = null,

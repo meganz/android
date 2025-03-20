@@ -1,6 +1,5 @@
 package mega.privacy.android.app.presentation.login.view
 
-import mega.privacy.android.shared.resources.R as sharedR
 import android.content.res.Configuration
 import androidx.activity.compose.BackHandler
 import androidx.annotation.StringRes
@@ -78,7 +77,6 @@ import de.palm.composestateevents.EventEffect
 import kotlinx.coroutines.delay
 import mega.android.core.ui.theme.values.TextColor
 import mega.privacy.android.app.R
-import mega.privacy.android.app.featuretoggle.AppFeatures
 import mega.privacy.android.app.presentation.apiserver.view.ChangeApiServerDialog
 import mega.privacy.android.app.presentation.extensions.login.error
 import mega.privacy.android.app.presentation.login.model.LoginError
@@ -101,6 +99,7 @@ import mega.privacy.android.shared.original.core.ui.controls.textfields.Password
 import mega.privacy.android.shared.original.core.ui.preview.CombinedThemePhoneLandscapePreviews
 import mega.privacy.android.shared.original.core.ui.preview.CombinedThemePreviews
 import mega.privacy.android.shared.original.core.ui.theme.OriginalTheme
+import mega.privacy.android.shared.resources.R as sharedR
 
 /**
  * Login fragment view.
@@ -333,23 +332,22 @@ private fun RequireLogin(
                 textColor = TextColor.Secondary,
             )
         }
-        if (state.enabledFlags.contains(AppFeatures.LoginReportIssueButton)) {
-            Row(
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .clickable {
-                        onReportIssue()
-                    }
-                    .padding(start = 22.dp, top = 18.dp, end = 22.dp),
-            ) {
-                MegaText(
-                    modifier = Modifier.testTag(TROUBLE_LOGIN_TAG),
-                    text = stringResource(id = R.string.general_login_label_trouble_logging_in),
-                    style = MaterialTheme.typography.subtitle2,
-                    textColor = TextColor.Primary,
-                )
-            }
+        Row(
+            modifier = Modifier
+                .fillMaxWidth()
+                .clickable {
+                    onReportIssue()
+                }
+                .padding(start = 22.dp, top = 18.dp, end = 22.dp),
+        ) {
+            MegaText(
+                modifier = Modifier.testTag(TROUBLE_LOGIN_TAG),
+                text = stringResource(id = R.string.general_login_label_trouble_logging_in),
+                style = MaterialTheme.typography.subtitle2,
+                textColor = TextColor.Primary,
+            )
         }
+
         Row(
             modifier = Modifier.padding(end = 22.dp),
             verticalAlignment = Alignment.CenterVertically
