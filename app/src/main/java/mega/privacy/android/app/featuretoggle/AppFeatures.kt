@@ -116,11 +116,6 @@ enum class AppFeatures(override val description: String, private val defaultValu
     ),
 
     /**
-     * Raise to speak in a call
-     */
-    RaiseToSpeak("Raise to speak in a call or a meeting", true),
-
-    /**
      * To enable the new add and manage description feature to node
      */
     NodeWithTags(

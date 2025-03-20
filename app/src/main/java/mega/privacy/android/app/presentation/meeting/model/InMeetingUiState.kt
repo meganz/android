@@ -45,7 +45,6 @@ import timber.log.Timber
  * @property shouldFinish                           True, if the activity should finish. False, if not.
  * @property minutesToEndMeeting                    Minutes to end the meeting
  * @property showMeetingEndWarningDialog            True, show the dialog to warn the user that the meeting is going to end. False otherwise
- * @property isRaiseToSpeakFeatureFlagEnabled       True, if Raise to speak feature flag enabled. False, otherwise.
  * @property anotherCall                            Another call in progress or on hold.
  * @property showCallOptionsBottomSheet             True, if should be shown the call options bottom panel. False, otherwise
  * @property isEphemeralAccount                     True, if it's ephemeral account. False, if not.
@@ -96,7 +95,6 @@ data class InMeetingUiState(
     val shouldFinish: Boolean = false,
     val minutesToEndMeeting: Int? = null,
     val showMeetingEndWarningDialog: Boolean = false,
-    val isRaiseToSpeakFeatureFlagEnabled: Boolean = false,
     val anotherCall: ChatCall? = null,
     val showCallOptionsBottomSheet: Boolean = false,
     val isEphemeralAccount: Boolean? = null,

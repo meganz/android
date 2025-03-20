@@ -69,7 +69,6 @@ import mega.privacy.android.domain.entity.meeting.ParticipantsSection
  * @property userToShowInHandRaisedSnackbar             User identifiers with changes in the raised hand that should be shown in the snackbar.
  * @property shouldParticipantInCallListBeShown         True, it must be shown. False, must be hidden
  * @property handRaisedSnackbarMsg                      Message to show in Snackbar.
- * @property isRaiseToSpeakFeatureFlagEnabled           True, if Raise to speak feature flag enabled. False, otherwise.
  * @property isWaitingForGroupHandRaisedSnackbars       Waiting for group hand raised snackbars.
  * @property showLowerHandButtonInSnackbar              True, show lower hand button. False, show view button.
  * @property isPictureInPictureFeatureFlagEnabled       True, if Picture in Picture feature flag enabled. False, otherwise.
@@ -126,7 +125,6 @@ data class MeetingState(
     val myUserHandle: Long? = null,
     val shouldParticipantInCallListBeShown: Boolean = false,
     val handRaisedSnackbarMsg: StateEventWithContent<String> = consumed(),
-    val isRaiseToSpeakFeatureFlagEnabled: Boolean = false,
     val userToShowInHandRaisedSnackbar: Map<Long, Boolean> = emptyMap(),
     val isWaitingForGroupHandRaisedSnackbars: Boolean = false,
     val showLowerHandButtonInSnackbar: Boolean = false,

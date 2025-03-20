@@ -361,20 +361,6 @@ class InMeetingViewModel @Inject constructor(
 
         viewModelScope.launch {
             runCatching {
-                getFeatureFlagValueUseCase(AppFeatures.RaiseToSpeak).let { flag ->
-                    _state.update { state ->
-                        state.copy(
-                            isRaiseToSpeakFeatureFlagEnabled = flag,
-                        )
-                    }
-                }
-            }.onFailure {
-                Timber.e(it)
-            }
-        }
-
-        viewModelScope.launch {
-            runCatching {
                 getFeatureFlagValueUseCase(AppFeatures.PictureInPicture).let { flag ->
                     _state.update { state ->
                         state.copy(
@@ -516,7 +502,7 @@ class InMeetingViewModel @Inject constructor(
                         isEphemeralAccount()
                         getMyUserHandle()
                         isOneToOneCall()?.let {
-                            if (it && status == ChatCallStatus.InProgress && state.value.isRaiseToSpeakFeatureFlagEnabled) {
+                            if (it && status == ChatCallStatus.InProgress) {
                                 Timber.d("Call recovered, check the participants with raised  hand")
                                 updateParticipantsWithRaisedHand(call)
                             }
@@ -3504,7 +3490,7 @@ class InMeetingViewModel @Inject constructor(
      * Set raised hand suggestion shown
      */
     fun setRaisedHandSuggestionShown() {
-        if (_state.value.isRaiseToSpeakFeatureFlagEnabled.not() || isOneToOneCall() == true) return
+        if (isOneToOneCall() == true) return
         viewModelScope.launch {
             runCatching {
                 setRaiseToHandSuggestionShownUseCase()
@@ -3519,7 +3505,7 @@ class InMeetingViewModel @Inject constructor(
      * Hide raise to hand popup
      */
     fun hideRaiseToHandPopup() {
-        if (_state.value.isRaiseToSpeakFeatureFlagEnabled.not() || isOneToOneCall() == true) return
+        if (isOneToOneCall() == true) return
         _state.update {
             it.copy(
                 isRaiseToHandSuggestionShown = true
@@ -3531,7 +3517,7 @@ class InMeetingViewModel @Inject constructor(
      * Check if raise to hand feature tooltip is shown
      */
     fun checkRaiseToHandFeatureTooltipIsShown() {
-        if (_state.value.isRaiseToSpeakFeatureFlagEnabled.not() || isOneToOneCall() == true) return
+        if (isOneToOneCall() == true) return
         viewModelScope.launch {
             runCatching {
                 val value = isRaiseToHandSuggestionShownUseCase()

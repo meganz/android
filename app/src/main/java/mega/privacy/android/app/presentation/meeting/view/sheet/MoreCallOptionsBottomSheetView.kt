@@ -119,7 +119,7 @@ private fun BottomSheetContent(
 
             Column(modifier = Modifier.verticalScroll(rememberScrollState()))
             {
-                if (isRaiseToSpeakFeatureFlagEnabled && isOneToOneCall == false && isCallOnHold == false) {
+                if (isOneToOneCall == false && isCallOnHold == false) {
                     BottomSheetMenuItemView(
                         modifier = Modifier.testTag(CALL_OPTIONS_BOTTOM_SHEET_RAISE_HAND_BUTTON),
                         res = R.drawable.raise_hand_icon,
@@ -175,7 +175,6 @@ private fun MoreCallOptionsBottomSheetViewWithoutCallOnHoldPreview() {
         coroutineScope = coroutineScope,
         uiState = InMeetingUiState(
             showCallOptionsBottomSheet = true,
-            isRaiseToSpeakFeatureFlagEnabled = false,
             anotherCall = null, call = ChatCall(
                 chatId = 123L,
                 callId = 456L,
@@ -203,7 +202,6 @@ private fun MoreCallOptionsBottomSheetViewWithCallOnHoldPreview() {
         coroutineScope = coroutineScope,
         uiState = InMeetingUiState(
             showCallOptionsBottomSheet = true,
-            isRaiseToSpeakFeatureFlagEnabled = false,
             anotherCall = null, call = ChatCall(
                 chatId = 123L,
                 callId = 456L,
@@ -231,7 +229,6 @@ private fun MoreCallOptionsBottomSheetViewWithSwapCallsPreview() {
         coroutineScope = coroutineScope,
         uiState = InMeetingUiState(
             showCallOptionsBottomSheet = true,
-            isRaiseToSpeakFeatureFlagEnabled = false,
             anotherCall = ChatCall(
                 chatId = 123L,
                 callId = 456L,
@@ -263,7 +260,6 @@ private fun MoreCallOptionsBottomSheetViewWithRaiseHandPreview() {
         coroutineScope = coroutineScope,
         uiState = InMeetingUiState(
             showCallOptionsBottomSheet = true,
-            isRaiseToSpeakFeatureFlagEnabled = true,
             anotherCall = ChatCall(
                 chatId = 123L,
                 callId = 456L,
@@ -295,7 +291,6 @@ private fun MoreCallOptionsBottomSheetViewWithLowerHandPreview() {
         coroutineScope = coroutineScope,
         uiState = InMeetingUiState(
             showCallOptionsBottomSheet = true,
-            isRaiseToSpeakFeatureFlagEnabled = true,
         ),
         meetingState = MeetingState(),
         onPutCallOnHold = { },
