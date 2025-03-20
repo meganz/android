@@ -305,6 +305,7 @@ class UploadFolderActivity : PasscodeActivity(), Scrollable {
 
         showProgress(true)
         binding.mainLayout.addView(
+            //here
             createStartTransferView(
                 this,
                 viewModel.uiState.map { it.transferTriggerEvent },
@@ -314,22 +315,24 @@ class UploadFolderActivity : PasscodeActivity(), Scrollable {
                         this,
                         StorageTargetPreference
                     )
-                }
-            ) { event ->
-                if (event is StartTransferEvent.FinishUploadProcessing) {
-                    val total = ((event.triggerEvent as? TransferTriggerEvent.StartUpload.Files)
-                        ?.pathsAndNames?.size ?: 0)
-                    if (total > 0) {
-                        resources.getQuantityString(
-                            R.plurals.upload_began,
-                            total,
-                            total,
-                        )
-                    } else {
-                        getString(R.string.no_uploads_empty_folder)
-                    }.let { onActivityResult(it) }
-                }
-            }
+                },
+                onScanningFinished = { event ->
+                    if (event is StartTransferEvent.FinishUploadProcessing) {
+                        val total = ((event.triggerEvent as? TransferTriggerEvent.StartUpload.Files)
+                            ?.pathsAndNames?.size ?: 0)
+                        if (total > 0) {
+                            resources.getQuantityString(
+                                R.plurals.upload_began,
+                                total,
+                                total,
+                            )
+                        } else {
+                            getString(R.string.no_uploads_empty_folder)
+                        }.let { onActivityResult(it) }
+                    }
+                },
+                onCancelNotEnoughSpaceForUploadDialog = { finish() }
+            )
         )
     }
 
@@ -438,7 +441,8 @@ class UploadFolderActivity : PasscodeActivity(), Scrollable {
             }
 
             actionMode == null -> startSupportActionMode(object : ActionMode.Callback {
-                override fun onPrepareActionMode(mode: ActionMode?, menu: Menu?): Boolean = true
+                override fun onPrepareActionMode(mode: ActionMode?, menu: Menu?): Boolean =
+                    true
 
                 override fun onCreateActionMode(mode: ActionMode?, menu: Menu?): Boolean {
                     actionMode = mode
@@ -446,7 +450,10 @@ class UploadFolderActivity : PasscodeActivity(), Scrollable {
                     return true
                 }
 
-                override fun onActionItemClicked(mode: ActionMode?, item: MenuItem?): Boolean = true
+                override fun onActionItemClicked(
+                    mode: ActionMode?,
+                    item: MenuItem?,
+                ): Boolean = true
 
                 override fun onDestroyActionMode(mode: ActionMode?) {
                     actionMode = null
@@ -547,7 +554,8 @@ class UploadFolderActivity : PasscodeActivity(), Scrollable {
                     setImageResource(CoreUiR.drawable.ic_select_folder)
                     isVisible = true
 
-                    val animator = AnimatorInflater.loadAnimator(context, R.animator.icon_select)
+                    val animator =
+                        AnimatorInflater.loadAnimator(context, R.animator.icon_select)
                     animator.setTarget(this)
                     animatorList.add(animator)
                 }

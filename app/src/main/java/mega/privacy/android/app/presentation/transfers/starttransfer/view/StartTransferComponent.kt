@@ -84,6 +84,7 @@ internal fun StartTransferComponent(
     snackBarHostState: SnackbarHostState,
     onScanningFinished: (StartTransferEvent) -> Unit = {},
     viewModel: StartTransfersComponentViewModel = hiltViewModel(),
+    onCancelNotEnoughSpaceForUploadDialog: () -> Unit = {},
     navigateToStorageSettings: () -> Unit,
 ) {
     val uiState by viewModel.uiState.collectAsStateWithLifecycle()
@@ -164,7 +165,10 @@ internal fun StartTransferComponent(
     }
 
     if (showStorageOverQuotaWarning) {
-        NotEnoughSpaceForUploadDialog(onCancel = { showStorageOverQuotaWarning = false })
+        NotEnoughSpaceForUploadDialog(onCancel = {
+            onCancelNotEnoughSpaceForUploadDialog()
+            showStorageOverQuotaWarning = false
+        })
     }
 
     StartTransferComponent(
@@ -201,6 +205,7 @@ internal fun createStartTransferView(
     transferEventState: Flow<StateEventWithContent<TransferTriggerEvent>>,
     onConsumeEvent: () -> Unit,
     navigateToStorageSettings: () -> Unit,
+    onCancelNotEnoughSpaceForUploadDialog: () -> Unit = {},
     onScanningFinished: (StartTransferEvent) -> Unit = {},
 ): View = ComposeView(activity).apply {
     setViewCompositionStrategy(ViewCompositionStrategy.DisposeOnViewTreeLifecycleDestroyed)
@@ -217,6 +222,7 @@ internal fun createStartTransferView(
                 onConsumeEvent = onConsumeEvent,
                 snackBarHostState = snackbarHostState,
                 onScanningFinished = onScanningFinished,
+                onCancelNotEnoughSpaceForUploadDialog = onCancelNotEnoughSpaceForUploadDialog,
                 navigateToStorageSettings = navigateToStorageSettings,
             )
         }

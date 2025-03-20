@@ -190,9 +190,9 @@ class TextEditorActivity : PasscodeActivity(), SnackbarShower, Scrollable {
                     viewModel.saveFile(intent.getBooleanExtra(FROM_HOME_PAGE, false))
                 } else if (viewModel.isReadingContent()) {
                     viewModel.finishBeforeClosing()
+                    finish()
                 }
                 retryConnectionsAndSignalPresence()
-                finish()
             }
         }
     }
@@ -797,13 +797,19 @@ class TextEditorActivity : PasscodeActivity(), SnackbarShower, Scrollable {
                 activity = this,
                 transferEventState = viewModel.uiState.map { it.transferEvent },
                 onConsumeEvent = {
+                    viewModel.consumeTransferEvent()
+                },
+                onScanningFinished = {
                     val isTextFileUpload = viewModel.uiState.value.transferEvent
                         .let { it is StateEventWithContentTriggered && (it.content is TransferTriggerEvent.StartUpload.TextFile) }
 
-                    viewModel.consumeTransferEvent()
-
-                    // Close activity if a text file upload is triggered
+                    // Close activity if a text file upload is triggered successfully
                     if (isTextFileUpload) {
+                        finish()
+                    }
+                },
+                onCancelNotEnoughSpaceForUploadDialog = {
+                    if (!viewModel.isFileEdited()) {
                         finish()
                     }
                 },
