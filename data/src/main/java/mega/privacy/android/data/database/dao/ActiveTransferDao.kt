@@ -43,7 +43,6 @@ internal interface ActiveTransferDao {
         fileName: String,
     )
 
-    @Transaction
     suspend fun insertOrUpdateActiveTransfer(entity: ActiveTransferEntity) {
         val id = insertActiveTransfer(entity)
         if (id == -1L) {
@@ -60,7 +59,7 @@ internal interface ActiveTransferDao {
     }
 
     /**
-     * Transaction to insert a list of entities but splitting the insert to avoid SQLiteException too many SQL variables
+     * Transaction to insert or update a list of entities into the database.
      */
     @Transaction
     suspend fun insertOrUpdateActiveTransfers(

@@ -27,8 +27,6 @@ import kotlinx.coroutines.flow.scan
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.suspendCancellableCoroutine
-import kotlinx.coroutines.sync.Mutex
-import kotlinx.coroutines.sync.withLock
 import kotlinx.coroutines.withContext
 import mega.privacy.android.data.constant.CacheFolderConstant
 import mega.privacy.android.data.extensions.failWithError
@@ -82,7 +80,6 @@ import mega.privacy.android.domain.qualifier.ApplicationScope
 import mega.privacy.android.domain.qualifier.IoDispatcher
 import mega.privacy.android.domain.repository.TransferRepository
 import mega.privacy.android.domain.usecase.login.MonitorFetchNodesFinishUseCase
-import nz.mega.sdk.MegaError
 import nz.mega.sdk.MegaError.API_OK
 import nz.mega.sdk.MegaNode
 import nz.mega.sdk.MegaTransfer
@@ -144,8 +141,8 @@ internal class DefaultTransfersRepository @Inject constructor(
     /**
      * to store current transferred bytes in memory instead of in database
      */
-    private val transferredBytesFlows =
-        HashMap<TransferType, MutableStateFlow<Map<Int, Long>>>()
+    private val transferredBytesFlows: Map<TransferType, MutableStateFlow<Map<Int, Long>>> =
+        TransferType.entries.associateWith { MutableStateFlow(mapOf()) }
 
     init {
         //pause transfers if db indicates it should be paused
@@ -358,7 +355,7 @@ internal class DefaultTransfersRepository @Inject constructor(
         suspendCancellableCoroutine { continuation ->
             val listener = OptionalMegaRequestListenerInterface(
                 onRequestFinish = { _, error ->
-                    if (error.errorCode == MegaError.API_OK) {
+                    if (error.errorCode == API_OK) {
                         continuation.resumeWith(Result.success(Unit))
                     } else {
                         continuation.failWithError(error, "cancelTransferByTag")
@@ -723,14 +720,8 @@ internal class DefaultTransfersRepository @Inject constructor(
             )
         }
 
-    private val transferredBytesFlowMutex = Mutex()
-    private suspend fun transferredBytesFlow(transferType: TransferType): MutableStateFlow<Map<Int, Long>> {
-        transferredBytesFlowMutex.withLock {
-            return transferredBytesFlows[transferType]
-                ?: MutableStateFlow<Map<Int, Long>>(mapOf()).also {
-                    transferredBytesFlows[transferType] = it
-                }
-        }
+    private fun transferredBytesFlow(transferType: TransferType): MutableStateFlow<Map<Int, Long>> {
+        return transferredBytesFlows[transferType] ?: error("Unknown transfer type: $transferType")
     }
 
     companion object {
@@ -943,6 +934,3 @@ private fun MegaTransfer.isBackgroundTransfer() =
 
 private fun MegaTransfer.isCUUpload() =
     appData?.contains(AppDataTypeConstants.CameraUpload.sdkTypeValue) == true
-
-private fun MegaTransfer.isChatUpload() =
-    appData?.contains(AppDataTypeConstants.ChatUpload.sdkTypeValue) == true
