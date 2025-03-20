@@ -7,8 +7,7 @@ import nz.mega.sdk.MegaNode
 /**
  * Get Thumbnail Image File Name
  */
-fun MegaNode.getThumbnailFileName(): String =
-    "$base64Handle${JPG_EXTENSION}"
+fun MegaNode.getThumbnailFileName(): String = "$base64Handle"
 
 /**
  * Get Preview Image File Name

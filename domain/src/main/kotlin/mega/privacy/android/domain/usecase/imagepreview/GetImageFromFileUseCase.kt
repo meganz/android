@@ -29,7 +29,7 @@ class GetImageFromFileUseCase @Inject constructor(
         return if (file.exists() && file.canRead()) {
             val isVideo = isVideoFileUseCase(UriPath.fromFile(file))
             val fileName =
-                thumbnailPreviewRepository.getThumbnailOrPreviewFileName(file.name + file.length())
+                thumbnailPreviewRepository.getPreviewFileName(file.name + file.length())
 
             val previewFilePath =
                 "${thumbnailPreviewRepository.getPreviewCacheFolderPath() ?: DEFAULT_PATH}${File.separator}${fileName}"

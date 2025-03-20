@@ -95,7 +95,7 @@ class GetImageFromFileUseCaseTest {
         whenever(file.name).thenReturn(fileName)
         whenever(file.length()).thenReturn(fileLength)
         whenever(isVideoFileUseCase(UriPath(filePath))).thenReturn(isVideo)
-        whenever(thumbnailPreviewRepository.getThumbnailOrPreviewFileName(fileName + fileLength)).thenReturn(
+        whenever(thumbnailPreviewRepository.getPreviewFileName(fileName + fileLength)).thenReturn(
             thumbPreviewFileName
         )
         whenever(thumbnailPreviewRepository.getPreviewCacheFolderPath()).thenReturn(previewCache)
@@ -104,7 +104,7 @@ class GetImageFromFileUseCaseTest {
         underTest.invoke(file)
 
         verify(isVideoFileUseCase).invoke(UriPath(filePath))
-        verify(thumbnailPreviewRepository).getThumbnailOrPreviewFileName(fileName + fileLength)
+        verify(thumbnailPreviewRepository).getPreviewFileName(fileName + fileLength)
         verify(thumbnailPreviewRepository).getPreviewCacheFolderPath()
         verify(fileSystemRepository, times(2)).doesFileExist(previewPath)
 
@@ -129,7 +129,7 @@ class GetImageFromFileUseCaseTest {
         whenever(file.name).thenReturn(fileName)
         whenever(file.length()).thenReturn(fileLength)
         whenever(isVideoFileUseCase(UriPath(filePath))).thenReturn(isVideo)
-        whenever(thumbnailPreviewRepository.getThumbnailOrPreviewFileName(fileName + fileLength)).thenReturn(
+        whenever(thumbnailPreviewRepository.getPreviewFileName(fileName + fileLength)).thenReturn(
             thumbPreviewFileName
         )
         whenever(thumbnailPreviewRepository.getPreviewCacheFolderPath()).thenReturn(previewCache)

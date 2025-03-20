@@ -6,6 +6,7 @@ import kotlinx.coroutines.test.UnconfinedTestDispatcher
 import kotlinx.coroutines.test.advanceUntilIdle
 import kotlinx.coroutines.test.runTest
 import mega.privacy.android.data.constant.CacheFolderConstant
+import mega.privacy.android.data.constant.FileConstant
 import mega.privacy.android.data.gateway.CacheGateway
 import mega.privacy.android.data.gateway.api.MegaApiFolderGateway
 import mega.privacy.android.data.gateway.api.MegaApiGateway
@@ -205,24 +206,38 @@ class ThumbnailPreviewRepositoryImplTest {
     }
 
     @Test
-    fun `test that get thumbnail or preview file name returns correctly for nodeHandle`() =
+    fun `test that get thumbnail file name returns correctly for nodeHandle`() =
         runTest {
-            val expected = megaApi.handleToBase64(nodeHandle) + ".jpg"
-            assertThat(underTest.getThumbnailOrPreviewFileName(nodeHandle)).isEqualTo(expected)
+            val expected = megaApi.handleToBase64(nodeHandle)
+            assertThat(underTest.getThumbnailFileName(nodeHandle)).isEqualTo(expected)
         }
 
     @Test
-    fun `test that get thumbnail or preview file name returns correctly for string`() =
+    fun `test that get preview file name returns correctly for nodeHandle`() =
+        runTest {
+            val expected = "${megaApi.handleToBase64(nodeHandle)}${FileConstant.JPG_EXTENSION}"
+            assertThat(underTest.getPreviewFileName(nodeHandle)).isEqualTo(expected)
+        }
+
+    @Test
+    fun `test that get thumbnail file name returns correctly for string`() =
+        runTest {
+            val testString = "test"
+            val expected = "testEncoded"
+            whenever(stringWrapper.encodeBase64(testString)).thenReturn(expected)
+            assertThat(underTest.getThumbnailFileName(testString)).isEqualTo(expected)
+        }
+
+    @Test
+    fun `test that get preview file name returns correctly for string`() =
         runTest {
             val testString = "test"
             val testStringEncoded = "testEncoded"
             whenever(stringWrapper.encodeBase64(testString)).thenReturn(
                 testStringEncoded
             )
-            val expected = "$testStringEncoded.jpg"
-            assertThat(underTest.getThumbnailOrPreviewFileName(testString)).isEqualTo(
-                expected
-            )
+            val expected = "$testStringEncoded${FileConstant.JPG_EXTENSION}"
+            assertThat(underTest.getPreviewFileName(testString)).isEqualTo(expected)
         }
 
     @Test
@@ -231,7 +246,7 @@ class ThumbnailPreviewRepositoryImplTest {
             val testString = "test"
             val testStringEncoded = "testEncoded"
             val previewFileName = "$testStringEncoded.jpg"
-            whenever(underTest.getThumbnailOrPreviewFileName(testString)).thenReturn(
+            whenever(underTest.getPreviewFileName(testString)).thenReturn(
                 previewFileName
             )
             whenever(cacheGateway.getCacheFile(any(), any())).thenReturn(null)
@@ -251,7 +266,7 @@ class ThumbnailPreviewRepositoryImplTest {
             val previewFile = mock<File>()
             val sourcePath = "../cache/sample.jpg"
             val destinationPath = ".../previewsMEGA/$previewFileName"
-            whenever(underTest.getThumbnailOrPreviewFileName(testString)).thenReturn(
+            whenever(underTest.getPreviewFileName(testString)).thenReturn(
                 previewFileName
             )
             whenever(

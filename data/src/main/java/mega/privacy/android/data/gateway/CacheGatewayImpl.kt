@@ -32,15 +32,24 @@ internal class CacheGatewayImpl @Inject constructor(
         }
 
     override suspend fun getOrCreateChatCacheFolder(): File? = withContext(ioDispatcher) {
-        File(context.filesDir, CacheFolderConstant.CHAT_TEMPORARY_FOLDER).takeIf { it.exists() || it.mkdir() }
+        File(
+            context.filesDir,
+            CacheFolderConstant.CHAT_TEMPORARY_FOLDER
+        ).takeIf { it.exists() || it.mkdir() }
     }
 
-    override suspend fun getCacheFile(folderName: String, fileName: String): File? =
-        withContext(ioDispatcher) {
-            return@withContext getOrCreateCacheFolder(folderName)?.takeIf { it.exists() }?.let {
-                File(it, fileName)
-            }
+    override suspend fun getCacheFile(folderName: String, fileName: String): File? {
+        val formattedName = if (folderName == CacheFolderConstant.THUMBNAIL_FOLDER) {
+            // Thumbnail file name does not contain extension, because it can be either JPG or PNG
+            fileName.substringBeforeLast(".")
+        } else {
+            fileName
         }
+
+        return getOrCreateCacheFolder(folderName)
+            ?.takeIf { it.exists() }
+            ?.let { folder -> File(folder, formattedName) }
+    }
 
     override suspend fun clearCacheDirectory() {
         try {

@@ -37,7 +37,7 @@ internal class ThumbnailPreviewRepositoryImpl @Inject constructor(
         withContext(ioDispatcher) {
             cacheGateway.getCacheFile(
                 CacheFolderConstant.THUMBNAIL_FOLDER,
-                getThumbnailOrPreviewFileName(handle)
+                getThumbnailFileName(handle)
             )?.takeIf { it.exists() }
         }
 
@@ -53,7 +53,7 @@ internal class ThumbnailPreviewRepositoryImpl @Inject constructor(
     private suspend fun getThumbnailFile(node: MegaNode): File? =
         cacheGateway.getCacheFile(
             CacheFolderConstant.THUMBNAIL_FOLDER,
-            "${node.base64Handle}${FileConstant.JPG_EXTENSION}"
+            "${node.base64Handle}"
         )
 
     override suspend fun getThumbnailFromServer(handle: Long): File? =
@@ -245,7 +245,7 @@ internal class ThumbnailPreviewRepositoryImpl @Inject constructor(
 
     override suspend fun createThumbnail(handle: Long, uriPath: UriPath) =
         withContext(ioDispatcher) {
-            val thumbnailFileName = getThumbnailOrPreviewFileName(handle)
+            val thumbnailFileName = getThumbnailFileName(handle)
             val thumbnailFile = getThumbnailFile(thumbnailFileName)
             requireNotNull(thumbnailFile)
             megaApi.createThumbnail(uriPath.value, thumbnailFile.absolutePath)
@@ -253,7 +253,7 @@ internal class ThumbnailPreviewRepositoryImpl @Inject constructor(
 
 
     override suspend fun createPreview(handle: Long, uriPath: UriPath) = withContext(ioDispatcher) {
-        val previewFileName = getThumbnailOrPreviewFileName(handle)
+        val previewFileName = getPreviewFileName(handle)
         val previewFile = getPreviewFile(previewFileName)
         requireNotNull(previewFile)
         megaApi.createPreview(uriPath.value, previewFile.absolutePath)
@@ -261,30 +261,40 @@ internal class ThumbnailPreviewRepositoryImpl @Inject constructor(
 
     override suspend fun createPreview(name: String, file: File) =
         withContext(ioDispatcher) {
-            val previewFileName = getThumbnailOrPreviewFileName(name)
+            val previewFileName = getPreviewFileName(name)
             val previewFile = getPreviewFile(previewFileName)
             requireNotNull(previewFile)
             megaApi.createPreview(file.absolutePath, previewFile.absolutePath)
         }
 
     override suspend fun deleteThumbnail(handle: Long) = withContext(ioDispatcher) {
-        val thumbnailFileName = getThumbnailOrPreviewFileName(handle)
+        val thumbnailFileName = getThumbnailFileName(handle)
         getThumbnailFile(thumbnailFileName)?.takeIf { it.exists() }?.delete()
     }
 
     override suspend fun deletePreview(handle: Long) = withContext(ioDispatcher) {
-        val previewFileName = getThumbnailOrPreviewFileName(handle)
+        val previewFileName = getPreviewFileName(handle)
         getPreviewFile(previewFileName)?.takeIf { it.exists() }?.delete()
     }
 
-    override suspend fun getThumbnailOrPreviewFileName(nodeHandle: Long) =
+    override suspend fun getThumbnailFileName(nodeHandle: Long): String =
         withContext(ioDispatcher) {
-            "${megaApi.handleToBase64(nodeHandle)}.jpg"
+            megaApi.handleToBase64(nodeHandle)
         }
 
-    override suspend fun getThumbnailOrPreviewFileName(name: String) =
+    override suspend fun getPreviewFileName(nodeHandle: Long): String =
         withContext(ioDispatcher) {
-            "${stringWrapper.encodeBase64(name)}.jpg"
+            "${megaApi.handleToBase64(nodeHandle)}${FileConstant.JPG_EXTENSION}"
+        }
+
+    override suspend fun getThumbnailFileName(name: String): String =
+        withContext(ioDispatcher) {
+            stringWrapper.encodeBase64(name)
+        }
+
+    override suspend fun getPreviewFileName(name: String): String =
+        withContext(ioDispatcher) {
+            "${stringWrapper.encodeBase64(name)}${FileConstant.JPG_EXTENSION}"
         }
 
     override suspend fun setThumbnail(nodeHandle: Long, srcFilePath: String) =

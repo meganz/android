@@ -148,20 +148,36 @@ interface ThumbnailPreviewRepository {
     suspend fun deletePreview(handle: Long): Boolean?
 
     /**
-     * Get thumbnail or preview file name based on the node handle.
+     * Get preview file name based on the node handle.
      *
      * @param nodeHandle
      * @return The name.
      */
-    suspend fun getThumbnailOrPreviewFileName(nodeHandle: Long): String
+    suspend fun getPreviewFileName(nodeHandle: Long): String
 
     /**
-     * Get thumbnail or preview file name based on the string.
+     * Get thumbnail file name based on the node handle.
+     *
+     * @param nodeHandle
+     * @return The name.
+     */
+    suspend fun getThumbnailFileName(nodeHandle: Long): String
+
+    /**
+     * Get preview file name based on the string.
      *
      * @param name
      * @return The name.
      */
-    suspend fun getThumbnailOrPreviewFileName(name: String): String
+    suspend fun getPreviewFileName(name: String): String
+
+    /**
+     * Get thumbnail file name based on the string.
+     *
+     * @param name
+     * @return The name.
+     */
+    suspend fun getThumbnailFileName(name: String): String
 
     /**
      * Set the thumbnail of a MegaNode
