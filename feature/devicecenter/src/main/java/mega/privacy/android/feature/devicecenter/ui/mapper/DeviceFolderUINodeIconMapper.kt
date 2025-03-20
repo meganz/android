@@ -19,13 +19,13 @@ internal class DeviceFolderUINodeIconMapper @Inject constructor() {
     operator fun invoke(backupInfoType: BackupInfoType) = when (backupInfoType) {
         BackupInfoType.CAMERA_UPLOADS,
         BackupInfoType.MEDIA_UPLOADS,
-        -> FolderIconType.CameraUploads
+            -> FolderIconType.CameraUploads
 
         BackupInfoType.INVALID,
         BackupInfoType.UP_SYNC,
         BackupInfoType.DOWN_SYNC,
         BackupInfoType.TWO_WAY_SYNC,
-        -> FolderIconType.Sync
+            -> FolderIconType.Sync
 
         BackupInfoType.BACKUP_UPLOAD -> FolderIconType.Backup
     }
