@@ -15,7 +15,6 @@ import kotlinx.coroutines.test.advanceUntilIdle
 import kotlinx.coroutines.test.runTest
 import mega.privacy.android.app.domain.usecase.GetNodeListByIds
 import mega.privacy.android.app.featuretoggle.ApiFeatures
-import mega.privacy.android.app.featuretoggle.AppFeatures
 import mega.privacy.android.app.presentation.mapper.TimelinePreferencesMapper
 import mega.privacy.android.app.presentation.photos.model.DateCard
 import mega.privacy.android.app.presentation.photos.model.FilterMediaType
@@ -269,9 +268,7 @@ internal class TimelineViewModelTest {
     fun `test that a single photo returned is returned by the state`() = runTest {
         val expectedDate = LocalDateTime.now()
         val photo = mock<Photo.Image> { on { modificationTime }.thenReturn(expectedDate) }
-        whenever(getFeatureFlagValueUseCase(AppFeatures.RememberTimelinePreferences)).thenReturn(
-            false
-        )
+        whenever(getTimelineFilterPreferencesUseCase()).thenReturn(null)
         whenever(getTimelinePhotosUseCase()).thenReturn(flowOf(listOf(photo)))
 
         initViewModel()
@@ -629,10 +626,6 @@ internal class TimelineViewModelTest {
     @Test
     fun `test that if there is no preference set yet the saved timeline state is false`() =
         runTest {
-            whenever(getFeatureFlagValueUseCase(AppFeatures.RememberTimelinePreferences)).thenReturn(
-                true
-            )
-
             whenever(getTimelineFilterPreferencesUseCase()).thenReturn(null)
 
             underTest.state.test {
@@ -665,10 +658,6 @@ internal class TimelineViewModelTest {
         val expectedDate = LocalDateTime.now()
         val photo = mock<Photo.Image> { on { modificationTime }.thenReturn(expectedDate) }
         whenever(getTimelinePhotosUseCase()).thenReturn(flowOf(listOf(photo)))
-
-        whenever(getFeatureFlagValueUseCase(AppFeatures.RememberTimelinePreferences)).thenReturn(
-            true
-        )
 
         whenever(getTimelineFilterPreferencesUseCase()).thenReturn(mapOf())
 

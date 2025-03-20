@@ -74,14 +74,6 @@ enum class AppFeatures(override val description: String, private val defaultValu
     ),
 
     /**
-     * Enable the remember timeline preferences feature
-     */
-    RememberTimelinePreferences(
-        "Remember the Timeline filter preferences",
-        true,
-    ),
-
-    /**
      * Shares compose
      */
     SharesCompose(

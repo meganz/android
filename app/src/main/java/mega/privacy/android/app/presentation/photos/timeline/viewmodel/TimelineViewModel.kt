@@ -17,7 +17,6 @@ import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 import mega.privacy.android.app.domain.usecase.GetNodeListByIds
 import mega.privacy.android.app.featuretoggle.ApiFeatures
-import mega.privacy.android.app.featuretoggle.AppFeatures
 import mega.privacy.android.app.presentation.mapper.TimelinePreferencesMapper
 import mega.privacy.android.app.presentation.photos.PhotosCache.updatePhotos
 import mega.privacy.android.app.presentation.photos.model.DateCard
@@ -313,9 +312,8 @@ class TimelineViewModel @Inject constructor(
 
     private suspend fun handlePhotos(photos: List<Photo>) {
         Timber.v("TimelineViewModel photos flow=>" + photos.size)
-        if (getFeatureFlagValueUseCase(AppFeatures.RememberTimelinePreferences)) {
-            handleTimelinePhotosUseCase()
-        }
+        handleTimelinePhotosUseCase()
+
         val showingPhotos = withContext(defaultDispatcher) { filterMedias(photos) }
         handleAndUpdatePhotosUIState(
             sourcePhotos = photos,

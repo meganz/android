@@ -33,7 +33,6 @@ import androidx.compose.material.icons.filled.Check
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.produceState
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
@@ -59,13 +58,8 @@ fun PhotosFilterView(
     onMediaTypeSelected: (FilterMediaType) -> Unit = {},
     onSourceSelected: (TimelinePhotosSource) -> Unit = {},
     applyFilter: (Boolean) -> Unit = {},
-    isRememberTimelinePreferencesEnabled: suspend () -> Boolean = { false },
 ) {
     val scrollState = rememberScrollState()
-
-    val isRememberTimelinePreferenceAppFeatureEnabled by produceState(initialValue = false) {
-        value = isRememberTimelinePreferencesEnabled()
-    }
 
     var isCheckboxChecked by rememberSaveable {
         mutableStateOf(timelineViewState.rememberFilter)
@@ -85,24 +79,22 @@ fun PhotosFilterView(
                 onSourceSelected = onSourceSelected
             )
 
-            if (isRememberTimelinePreferenceAppFeatureEnabled) {
-                Row(
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .padding(all = 16.dp),
-                    verticalAlignment = Alignment.CenterVertically,
-                    horizontalArrangement = Arrangement.SpaceBetween,
-                ) {
-                    Text(
-                        text = stringResource(id = R.string.photos_timeline_filter_remember_preferences),
-                        color = MaterialTheme.colors.onPrimary,
-                    )
+            Row(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .padding(all = 16.dp),
+                verticalAlignment = Alignment.CenterVertically,
+                horizontalArrangement = Arrangement.SpaceBetween,
+            ) {
+                Text(
+                    text = stringResource(id = R.string.photos_timeline_filter_remember_preferences),
+                    color = MaterialTheme.colors.onPrimary,
+                )
 
-                    Checkbox(
-                        checked = isCheckboxChecked,
-                        onCheckedChange = { isCheckboxChecked = !isCheckboxChecked },
-                    )
-                }
+                Checkbox(
+                    checked = isCheckboxChecked,
+                    onCheckedChange = { isCheckboxChecked = !isCheckboxChecked },
+                )
             }
         }
 

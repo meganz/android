@@ -17,7 +17,6 @@ import mega.privacy.android.app.presentation.photos.timeline.viewmodel.TimelineV
 import mega.privacy.android.shared.original.core.ui.theme.OriginalTheme
 import mega.privacy.android.domain.entity.ThemeMode
 import mega.privacy.android.domain.usecase.GetThemeMode
-import mega.privacy.android.domain.usecase.featureflag.GetFeatureFlagValueUseCase
 import javax.inject.Inject
 
 /**
@@ -31,9 +30,6 @@ class PhotosFilterFragment : Fragment() {
 
     @Inject
     lateinit var getThemeMode: GetThemeMode
-
-    @Inject
-    lateinit var getFeatureFlagUseCase: GetFeatureFlagValueUseCase
 
     companion object {
         @JvmStatic
@@ -59,7 +55,6 @@ class PhotosFilterFragment : Fragment() {
                     PhotosFilterScreen(
                         timelineViewModel = timelineViewModel,
                         onExitScreen = { activity?.onBackPressedDispatcher?.onBackPressed() },
-                        getFeatureFlagUseCase = getFeatureFlagUseCase,
                     )
                 }
             }
