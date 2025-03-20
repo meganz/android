@@ -39,7 +39,6 @@ class VideoPlaylistDetailTopBarTest {
         selectedSize: Int = 0,
         onMenuActionClick: (VideoSectionMenuAction?) -> Unit = {},
         onBackPressed: () -> Unit = {},
-        enableFavouritesPlaylistMenu: Boolean = false,
         isHideMenuActionVisible: Boolean = false,
         isUnhideMenuActionVisible: Boolean = false,
     ) {
@@ -52,8 +51,7 @@ class VideoPlaylistDetailTopBarTest {
                 isHideMenuActionVisible = isHideMenuActionVisible,
                 onMenuActionClick = onMenuActionClick,
                 onBackPressed = onBackPressed,
-                isSystemVideoPlaylist = isSystemVideoPlaylist,
-                enableFavouritesPlaylistMenu = enableFavouritesPlaylistMenu
+                isSystemVideoPlaylist = isSystemVideoPlaylist
             )
         }
     }
@@ -150,16 +148,9 @@ class VideoPlaylistDetailTopBarTest {
     }
 
     @Test
-    fun `test that more action is displayed when isSystemVideoPlaylist is false`() {
-        setComposeContent(isSystemVideoPlaylist = false, enableFavouritesPlaylistMenu = true)
-        TEST_TAG_VIDEO_SECTION_MORE_ACTION.assertIsDisplayed()
-    }
-
-    @Test
     fun `test that sort by action is displayed and VideoSectionSortByAction is invoked after is pressed`() {
         setComposeContent(
             isSystemVideoPlaylist = true,
-            enableFavouritesPlaylistMenu = true,
             onMenuActionClick = onMenuActionClick
         )
         TEST_TAG_VIDEO_SECTION_SORT_BY_ACTION.apply {

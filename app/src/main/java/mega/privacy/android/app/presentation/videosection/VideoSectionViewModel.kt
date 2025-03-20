@@ -1275,9 +1275,6 @@ class VideoSectionViewModel @Inject constructor(
         it.copy(addToPlaylistTitles = titles)
     }
 
-    internal suspend fun enableFavouritesPlaylistMenu() =
-        getFeatureFlagValueUseCase(AppFeatures.FavouritesPlaylistMenuEnabled)
-
     internal fun removeFavourites() = viewModelScope.launch {
         runCatching {
             _state.value.selectedVideoElementIDs.let { handles ->

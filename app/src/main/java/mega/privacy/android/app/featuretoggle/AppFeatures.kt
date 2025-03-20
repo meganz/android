@@ -33,14 +33,6 @@ enum class AppFeatures(override val description: String, private val defaultValu
     ),
 
     /**
-     * Enable the menu of Favourites playlist
-     */
-    FavouritesPlaylistMenuEnabled(
-        "Enable Favourites playlist menu",
-        true
-    ),
-
-    /**
      * Enable compose implementation of the main settings screen
      */
     SettingsComposeUI(

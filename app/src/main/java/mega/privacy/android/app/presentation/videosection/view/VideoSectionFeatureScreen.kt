@@ -2,11 +2,6 @@ package mega.privacy.android.app.presentation.videosection.view
 
 import androidx.activity.compose.LocalOnBackPressedDispatcherOwner
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.LaunchedEffect
-import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.saveable.rememberSaveable
-import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
@@ -66,11 +61,6 @@ internal fun VideoSectionNavHost(
     viewModel: VideoSectionViewModel = hiltViewModel(),
 ) {
     val state = viewModel.state.collectAsStateWithLifecycle().value
-
-    var enableFavouritesPlaylistMenu by rememberSaveable { mutableStateOf(false) }
-    LaunchedEffect(enableFavouritesPlaylistMenu) {
-        enableFavouritesPlaylistMenu = viewModel.enableFavouritesPlaylistMenu()
-    }
 
     val onDeleteVideosDialogPositiveButtonClicked: (VideoPlaylistUIEntity) -> Unit = { playlist ->
         val removedVideoIDs = state.selectedVideoElementIDs
@@ -190,7 +180,6 @@ internal fun VideoSectionNavHost(
                         }
                     }
                 },
-                enableFavouritesPlaylistMenu = enableFavouritesPlaylistMenu,
                 onRemoveFavouriteOptionClicked = {
                     viewModel.removeFavourites()
                     viewModel.clearAllSelectedVideosOfPlaylist()

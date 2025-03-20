@@ -21,7 +21,6 @@ internal fun VideoPlaylistDetailTopBar(
     isUnhideMenuActionVisible: Boolean,
     onMenuActionClick: (VideoSectionMenuAction?) -> Unit,
     onBackPressed: () -> Unit,
-    enableFavouritesPlaylistMenu: Boolean,
 ) {
     if (isActionMode) {
         SelectModeAppBar(
@@ -63,7 +62,6 @@ internal fun VideoPlaylistDetailTopBar(
             title = title,
             onNavigationPressed = onBackPressed,
             actions = when {
-                isSystemVideoPlaylist && !enableFavouritesPlaylistMenu -> emptyList()
                 isSystemVideoPlaylist -> listOf(VideoSectionMenuAction.VideoSectionSortByAction)
                 else -> listOf(VideoSectionMenuAction.VideoSectionMoreAction)
             },

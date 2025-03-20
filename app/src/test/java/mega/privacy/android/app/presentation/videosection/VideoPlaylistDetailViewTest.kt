@@ -83,7 +83,6 @@ class VideoPlaylistDetailViewTest {
         onPlayAllClicked: () -> Unit = {},
         onBackPressed: () -> Unit = {},
         onMenuActionClick: (VideoSectionMenuAction?) -> Unit = {},
-        enableFavouritesPlaylistMenu: Boolean = false,
         onRemoveFavouriteOptionClicked: () -> Unit = {},
     ) {
         composeTestRule.setContent {
@@ -112,7 +111,6 @@ class VideoPlaylistDetailViewTest {
                 onPlayAllClicked = onPlayAllClicked,
                 onBackPressed = onBackPressed,
                 onMenuActionClick = onMenuActionClick,
-                enableFavouritesPlaylistMenu = enableFavouritesPlaylistMenu,
                 onRemoveFavouriteOptionClicked = onRemoveFavouriteOptionClicked,
                 isStorageOverQuota = { false },
             )

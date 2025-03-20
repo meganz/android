@@ -48,11 +48,13 @@ import androidx.compose.ui.semantics.semantics
 import androidx.compose.ui.semantics.testTagsAsResourceId
 import androidx.compose.ui.unit.dp
 import kotlinx.coroutines.launch
+import mega.android.core.ui.theme.values.TextColor
 import mega.privacy.android.app.presentation.videosection.model.FavouritesPlaylistBottomSheetOption
 import mega.privacy.android.app.presentation.videosection.model.VideoPlaylistUIEntity
 import mega.privacy.android.app.presentation.videosection.model.VideoSectionMenuAction
 import mega.privacy.android.app.presentation.videosection.model.VideoUIEntity
 import mega.privacy.android.app.presentation.videosection.view.allvideos.VideoItemView
+import mega.privacy.android.app.utils.AlertsAndWarnings.showOverDiskQuotaPaywallWarning
 import mega.privacy.android.app.utils.MegaNodeUtil
 import mega.privacy.android.core.formatter.formatFileSize
 import mega.privacy.android.domain.entity.node.NodeId
@@ -66,8 +68,6 @@ import mega.privacy.android.shared.original.core.ui.controls.text.MegaText
 import mega.privacy.android.shared.original.core.ui.preview.CombinedThemePreviews
 import mega.privacy.android.shared.original.core.ui.theme.OriginalTheme
 import mega.privacy.android.shared.original.core.ui.theme.extensions.grey_050_grey_800
-import mega.android.core.ui.theme.values.TextColor
-import mega.privacy.android.app.utils.AlertsAndWarnings.showOverDiskQuotaPaywallWarning
 import mega.privacy.android.shared.original.core.ui.utils.showAutoDurationSnackbar
 import nz.mega.sdk.MegaNode
 
@@ -99,7 +99,6 @@ fun VideoPlaylistDetailView(
     onLongClick: ((item: VideoUIEntity, index: Int) -> Unit),
     onBackPressed: () -> Unit,
     onMenuActionClick: (VideoSectionMenuAction?) -> Unit,
-    enableFavouritesPlaylistMenu: Boolean,
     onRemoveFavouriteOptionClicked: () -> Unit,
     isStorageOverQuota: () -> Boolean,
     modifier: Modifier = Modifier,
@@ -229,8 +228,7 @@ fun VideoPlaylistDetailView(
                     }
                 },
                 onBackPressed = onBackPressed,
-                isSystemVideoPlaylist = isSystemVideoPlaylist,
-                enableFavouritesPlaylistMenu = enableFavouritesPlaylistMenu
+                isSystemVideoPlaylist = isSystemVideoPlaylist
             )
         },
         floatingActionButton = {
@@ -357,11 +355,7 @@ fun VideoPlaylistDetailView(
                                     nodeAvailableOffline = videoItem.nodeAvailableOffline,
                                     onClick = { onClick(videoItem, it) },
                                     onMenuClick = { onMenuClick(videoItem) },
-                                    onLongClick = {
-                                        if (!isSystemVideoPlaylist || enableFavouritesPlaylistMenu) {
-                                            onLongClick(videoItem, it)
-                                        }
-                                    },
+                                    onLongClick = { onLongClick(videoItem, it) },
                                     modifier = Modifier
                                         .alpha(0.5f.takeIf {
                                             shouldApplySensitiveMode && (videoItem.isMarkedSensitive || videoItem.isSensitiveInherited)
@@ -644,7 +638,6 @@ private fun VideoPlaylistDetailViewPreview() {
             onLongClick = { _, _ -> },
             onMenuClick = {},
             onMenuActionClick = {},
-            enableFavouritesPlaylistMenu = false,
             onRemoveFavouriteOptionClicked = {},
             isStorageOverQuota = { false },
         )
@@ -678,7 +671,6 @@ private fun VideoPlaylistDetailViewUnderActionModePreview() {
             onLongClick = { _, _ -> },
             onMenuClick = {},
             onMenuActionClick = {},
-            enableFavouritesPlaylistMenu = false,
             onRemoveFavouriteOptionClicked = {},
             isStorageOverQuota = { false },
         )
