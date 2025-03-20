@@ -143,14 +143,6 @@ enum class AppFeatures(override val description: String, private val defaultValu
     ),
 
     /**
-     *  Cloud Drive and Sync in a single screen with the Two Tabs (Cloud Drive and Syncs)
-     */
-    CloudDriveAndSyncs(
-        "Implement Cloud Drive and Sync in a single screen with the Two Tabs (Cloud Drive and Syncs)",
-        true,
-    ),
-
-    /**
      *  Login Revamp with new components
      */
     LoginRevamp(

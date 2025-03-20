@@ -3,12 +3,12 @@ package mega.privacy.android.app.presentation.clouddrive
 import androidx.annotation.StringRes
 
 /**
- * Interface that defines what methods the Activity should implement for [FileBrowserComposeFragment]
+ * Interface that defines what methods the Activity should implement for [CloudDriveSyncsFragment]
  */
 interface FileBrowserActionListener {
 
     /**
-     * Exits the [FileBrowserComposeFragment]
+     * Exits the [CloudDriveSyncsFragment]
      */
     fun exitCloudDrive()
 
