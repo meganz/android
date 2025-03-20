@@ -26,9 +26,16 @@ class GetNoteToSelfChatUseCaseTest {
 
 
     @Test
-    fun `test that use case returns null`() = runTest {
-        whenever(chatRepository.getNoteToSelfChat()).thenReturn(null)
+    fun `test that use case create note to self chat`() = runTest {
+        whenever(
+            chatRepository.createChat(
+                isGroup = false,
+                userHandles = null
+            )
+        ).thenReturn(123L)
+        whenever(chatRepository.getNoteToSelfChat()).thenReturn(chatRoom)
+
         val actual = underTest()
-        Truth.assertThat(actual?.chatId).isNull()
+        Truth.assertThat(actual?.chatId).isNotNull()
     }
 }

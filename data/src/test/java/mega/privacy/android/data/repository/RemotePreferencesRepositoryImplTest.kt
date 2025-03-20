@@ -102,6 +102,37 @@ internal class RemotePreferencesRepositoryImplTest {
     }
 
     @Test
+    fun `setNoteToSelfChatNewLabelPreference should update app preferences`() =
+        runTest(ioDispatcher) {
+            val counter = "3"
+            val encodedItemName = "Q1JFQVRF"
+            val preference = mapOf("aN2Sb" to encodedItemName)
+            whenever(stringWrapper.encodeBase64(counter)).thenReturn(encodedItemName)
+            whenever(megaStringMapMapper.invoke(any<MegaStringMap>())).thenReturn(preference)
+            whenever(
+                megaApiGateway.setUserAttribute(
+                    eq(MegaApiJava.USER_ATTR_APPS_PREFS),
+                    any<MegaStringMap>(),
+                    any()
+                )
+            ).thenAnswer {
+                ((it.arguments[2]) as OptionalMegaRequestListenerInterface).onRequestFinish(
+                    mock(),
+                    mock { on { megaStringMap }.thenReturn(mock()) },
+                    mock { on { errorCode }.thenReturn(MegaError.API_OK) }
+                )
+            }
+
+            underTest.setNoteToSelfChatNewLabelPreference(counter)
+
+            verify(megaApiGateway).setUserAttribute(
+                eq(MegaApiJava.USER_ATTR_APPS_PREFS),
+                any<MegaStringMap>(),
+                any()
+            )
+        }
+
+    @Test
     fun `getMeetingTooltipPreference should return meeting tooltip preference`() =
         runTest(ioDispatcher) {
             val item = MeetingTooltipItem.CREATE
@@ -121,5 +152,28 @@ internal class RemotePreferencesRepositoryImplTest {
             val result = underTest.getMeetingTooltipPreference()
 
             assertThat(result).isEqualTo(item)
+        }
+
+    @Test
+    fun `getNoteToSelfChatNewLabelPreference should return note to self chat new label preference`() =
+        runTest(ioDispatcher) {
+            val counter = "3"
+            val encodedItemName = "Q1JFQVRF"
+            val preference = mapOf("aN2Sb" to encodedItemName)
+
+            whenever(stringWrapper.decodeBase64(encodedItemName)).thenReturn(counter)
+            whenever(megaStringMapMapper.invoke(any<MegaStringMap>())).thenReturn(preference)
+            whenever(megaApiGateway.getUserAttribute(eq(MegaApiJava.USER_ATTR_APPS_PREFS), any()))
+                .thenAnswer {
+                    ((it.arguments[1]) as OptionalMegaRequestListenerInterface).onRequestFinish(
+                        mock(),
+                        mock { on { megaStringMap }.thenReturn(mock()) },
+                        mock { on { errorCode }.thenReturn(MegaError.API_OK) }
+                    )
+                }
+
+            val result = underTest.getNoteToSelfChatNewLabelPreference()
+
+            assertThat(result).isEqualTo(counter)
         }
 }

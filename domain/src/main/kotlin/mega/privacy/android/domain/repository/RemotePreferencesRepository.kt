@@ -20,4 +20,18 @@ interface RemotePreferencesRepository {
      * @return  [MeetingTooltipItem]
      */
     suspend fun getMeetingTooltipPreference(): MeetingTooltipItem
+
+    /**
+     * Set note to self chat new label preference
+     *
+     * @param counter
+     */
+    suspend fun setNoteToSelfChatNewLabelPreference(counter: String)
+
+    /**
+     * Get note to self chat new label preference
+     *
+     * @return  counter
+     */
+    suspend fun getNoteToSelfChatNewLabelPreference(): String
 }

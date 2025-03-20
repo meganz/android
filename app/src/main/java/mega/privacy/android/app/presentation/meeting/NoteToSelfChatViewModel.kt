@@ -9,7 +9,6 @@ import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import mega.privacy.android.app.featuretoggle.ApiFeatures
 import mega.privacy.android.app.presentation.meeting.model.NoteToSelfChatUIState
-import mega.privacy.android.domain.usecase.chat.CreateNoteToSelfChatUseCase
 import mega.privacy.android.domain.usecase.chat.GetNoteToSelfChatUseCase
 import mega.privacy.android.domain.usecase.chat.IsAnEmptyChatUseCase
 import mega.privacy.android.domain.usecase.featureflag.GetFeatureFlagValueUseCase
@@ -25,7 +24,6 @@ import javax.inject.Inject
 class NoteToSelfChatViewModel @Inject constructor(
     private val getFeatureFlagValueUseCase: GetFeatureFlagValueUseCase,
     private val getNoteToSelfChatUseCase: GetNoteToSelfChatUseCase,
-    private val createNoteToSelfChatUseCase: CreateNoteToSelfChatUseCase,
     private val isAnEmptyChatUseCase: IsAnEmptyChatUseCase,
 ) : ViewModel() {
 
@@ -62,21 +60,13 @@ class NoteToSelfChatViewModel @Inject constructor(
      * Get note to self chat
      */
     private suspend fun getNoteToSelfChat() {
-        getNoteToSelfChatUseCase().let { chatRoom ->
-            chatRoom
-                ?: createNoteToSelfChatUseCase().let {
-                    Timber.d("Note to self chat created: $this")
-                    getNoteToSelfChatUseCase()
-                }
-        }?.let { chatRoom ->
-            Timber.d("Note to self chat found: ${chatRoom.chatId}")
+        getNoteToSelfChatUseCase()?.let { noteToSelfChatRoom ->
             _state.update { state ->
                 state.copy(
-                    noteToSelfChatRoom = chatRoom,
+                    noteToSelfChatRoom = noteToSelfChatRoom,
                 )
             }
-
-            isAnEmptyChatUseCase(chatRoom.chatId).let { isChatEmpty ->
+            isAnEmptyChatUseCase(noteToSelfChatRoom.chatId).let { isChatEmpty ->
                 Timber.d("Check if note to self chat is empty: $isChatEmpty")
                 _state.update { it.copy(isNoteToSelfChatEmpty = isChatEmpty) }
             }
