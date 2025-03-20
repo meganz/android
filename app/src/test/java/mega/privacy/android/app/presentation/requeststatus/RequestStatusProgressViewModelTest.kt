@@ -7,10 +7,8 @@ import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.flow
 import kotlinx.coroutines.runBlocking
 import kotlinx.coroutines.test.runTest
-import mega.privacy.android.app.featuretoggle.AppFeatures
 import mega.privacy.android.core.test.extension.CoroutineMainDispatcherExtension
 import mega.privacy.android.domain.entity.Progress
-import mega.privacy.android.domain.usecase.featureflag.GetFeatureFlagValueUseCase
 import mega.privacy.android.domain.usecase.requeststatus.MonitorRequestStatusProgressEventUseCase
 import org.junit.jupiter.api.AfterEach
 import org.junit.jupiter.api.BeforeEach
@@ -31,7 +29,6 @@ class RequestStatusProgressViewModelTest {
     private val monitorRequestStatusProgressEventUseCase =
         mock<MonitorRequestStatusProgressEventUseCase>()
     private val requestStatusProgressFakeFlow = MutableSharedFlow<Progress>()
-    private val getFeatureFlagValueUseCase = mock<GetFeatureFlagValueUseCase>()
 
     @BeforeEach
     fun setUp() {
@@ -43,9 +40,7 @@ class RequestStatusProgressViewModelTest {
 
     private fun initViewModel() {
         underTest = RequestStatusProgressViewModel(
-            monitorRequestStatusProgressEventUseCase = monitorRequestStatusProgressEventUseCase,
-            getFeatureFlagValueUseCase = getFeatureFlagValueUseCase
-        )
+            monitorRequestStatusProgressEventUseCase = monitorRequestStatusProgressEventUseCase,)
     }
 
     @Test
@@ -79,12 +74,9 @@ class RequestStatusProgressViewModelTest {
         }
     }
 
-    private suspend fun stubCommon() {
+    private fun stubCommon() {
         whenever(monitorRequestStatusProgressEventUseCase()).thenReturn(
             requestStatusProgressFakeFlow
-        )
-        whenever(getFeatureFlagValueUseCase(AppFeatures.RequestStatusProgressDialog)).thenReturn(
-            true
         )
     }
 

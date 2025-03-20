@@ -187,21 +187,19 @@ class LoginViewModel @Inject constructor(
     private fun enableAndMonitorRequestStatusProgressEvent() {
         viewModelScope.launch {
             runCatching {
-                if (getFeatureFlagValueUseCase(AppFeatures.RequestStatusProgressDialog)) {
-                    enableRequestStatusMonitorUseCase()
-                    monitorRequestStatusProgressEventUseCase()
-                        .catch { throwable ->
-                            Timber.e(throwable)
-                            // Hide progress bar on error
-                            _state.update {
-                                it.copy(requestStatusProgress = null)
-                            }
-                        }.collect { progress ->
-                            _state.update {
-                                it.copy(requestStatusProgress = progress)
-                            }
+                enableRequestStatusMonitorUseCase()
+                monitorRequestStatusProgressEventUseCase()
+                    .catch { throwable ->
+                        Timber.e(throwable)
+                        // Hide progress bar on error
+                        _state.update {
+                            it.copy(requestStatusProgress = null)
                         }
-                }
+                    }.collect { progress ->
+                        _state.update {
+                            it.copy(requestStatusProgress = progress)
+                        }
+                    }
             }.onFailure {
                 Timber.e(it)
             }

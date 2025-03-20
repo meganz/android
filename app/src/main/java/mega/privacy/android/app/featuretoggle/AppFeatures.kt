@@ -50,15 +50,6 @@ enum class AppFeatures(override val description: String, private val defaultValu
     ),
 
     /**
-     * Enable request status progress dialog
-     */
-    RequestStatusProgressDialog(
-        "Enable request status progress dialog",
-        true
-    ),
-
-
-    /**
      * Enables Map location
      */
     MapLocation(
