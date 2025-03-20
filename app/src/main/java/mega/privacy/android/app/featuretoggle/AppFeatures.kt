@@ -90,11 +90,6 @@ enum class AppFeatures(override val description: String, private val defaultValu
     ),
 
     /**
-     * Permanent logging toggle
-     */
-    PermanentLogging("Permanently enable logging, removing functionality to turn it on/off", true),
-
-    /**
      * App Test toggle
      */
     AppTest("This is a test toggle. It does nothing", false),
