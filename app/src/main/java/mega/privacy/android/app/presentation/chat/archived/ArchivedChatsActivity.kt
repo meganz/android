@@ -8,8 +8,12 @@ import androidx.appcompat.app.AppCompatActivity
 import androidx.compose.runtime.getValue
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import dagger.hilt.android.AndroidEntryPoint
+import kotlinx.coroutines.flow.distinctUntilChanged
+import kotlinx.coroutines.flow.map
+import mega.privacy.android.app.arch.extensions.collectFlow
 import mega.privacy.android.app.presentation.chat.archived.view.ArchivedChatsView
 import mega.privacy.android.app.presentation.extensions.isDarkMode
+import mega.privacy.android.app.presentation.meeting.NoteToSelfChatViewModel
 import mega.privacy.android.app.presentation.security.PasscodeCheck
 import mega.privacy.android.app.utils.Constants
 import mega.privacy.android.domain.entity.ThemeMode
@@ -34,10 +38,19 @@ class ArchivedChatsActivity : AppCompatActivity() {
     lateinit var navigator: MegaNavigator
 
     private val viewModel: ArchivedChatsViewModel by viewModels()
+    private val noteToSelfChatViewModel by viewModels<NoteToSelfChatViewModel>()
 
     override fun onCreate(savedInstanceState: Bundle?) {
         enableEdgeToEdge()
         super.onCreate(savedInstanceState)
+
+        collectFlow(noteToSelfChatViewModel.state.map { it.noteToSelfChatRoom }
+            .distinctUntilChanged()) {
+            it?.also {
+                noteToSelfChatViewModel.getNoteToSelfPreference()
+            }
+        }
+
         setContent {
             val mode by getThemeMode().collectAsStateWithLifecycle(initialValue = ThemeMode.System)
             val state by viewModel.getState().collectAsStateWithLifecycle()

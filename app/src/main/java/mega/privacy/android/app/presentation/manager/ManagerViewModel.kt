@@ -8,6 +8,7 @@ import dagger.hilt.android.lifecycle.HiltViewModel
 import de.palm.composestateevents.consumed
 import de.palm.composestateevents.triggered
 import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
@@ -87,6 +88,7 @@ import mega.privacy.android.domain.usecase.call.GetChatCallUseCase
 import mega.privacy.android.domain.usecase.call.HangChatCallUseCase
 import mega.privacy.android.domain.usecase.camerauploads.EstablishCameraUploadsSyncHandlesUseCase
 import mega.privacy.android.domain.usecase.camerauploads.MonitorCameraUploadsFolderDestinationUseCase
+import mega.privacy.android.domain.usecase.chat.GetNoteToSelfChatUseCase
 import mega.privacy.android.domain.usecase.chat.GetNumUnreadChatsUseCase
 import mega.privacy.android.domain.usecase.chat.MonitorChatArchivedUseCase
 import mega.privacy.android.domain.usecase.chat.link.GetChatLinkContentUseCase
@@ -278,6 +280,7 @@ class ManagerViewModel @Inject constructor(
     private val versionHistoryRemoveMessageMapper: VersionHistoryRemoveMessageMapper,
     private val backgroundFastLoginUseCase: BackgroundFastLoginUseCase,
     private val legacyState: LegacyPsaGlobalState,
+    private val getNoteToSelfChatUseCase: GetNoteToSelfChatUseCase,
     @ApplicationScope private val appScope: CoroutineScope,
 ) : ViewModel() {
 
@@ -360,6 +363,7 @@ class ManagerViewModel @Inject constructor(
     init {
         checkUsersCallLimitReminders()
         getApiFeatureFlag()
+        initialiseNoteToSelfChat()
 
         viewModelScope.launch {
             val order = getCloudSortOrder()
@@ -585,6 +589,23 @@ class ManagerViewModel @Inject constructor(
                         isCallUnlimitedProPlanFeatureFlagEnabled = flag,
                     )
                 }
+            }
+        }
+    }
+
+    /**
+     * Initialise note to self chat
+     */
+    private fun initialiseNoteToSelfChat() {
+        viewModelScope.launch {
+            runCatching {
+                if (getFeatureFlagValueUseCase(ApiFeatures.NoteToYourselfFlag)) {
+                    getNoteToSelfChatUseCase()?.let { noteToSelfChatRoom ->
+                        Timber.d("Note to self chat created")
+                    }
+                }
+            }.onFailure {
+                Timber.e(it, "Note to self chat failed")
             }
         }
     }

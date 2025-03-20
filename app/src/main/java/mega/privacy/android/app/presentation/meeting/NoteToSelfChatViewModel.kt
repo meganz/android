@@ -9,8 +9,10 @@ import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import mega.privacy.android.app.featuretoggle.ApiFeatures
 import mega.privacy.android.app.presentation.meeting.model.NoteToSelfChatUIState
+import mega.privacy.android.domain.usecase.chat.GetNoteToSelfChatNewLabelPreferenceUseCase
 import mega.privacy.android.domain.usecase.chat.GetNoteToSelfChatUseCase
 import mega.privacy.android.domain.usecase.chat.IsAnEmptyChatUseCase
+import mega.privacy.android.domain.usecase.chat.SetNoteToSelfChatNewLabelPreferenceUseCase
 import mega.privacy.android.domain.usecase.featureflag.GetFeatureFlagValueUseCase
 import timber.log.Timber
 import javax.inject.Inject
@@ -25,6 +27,8 @@ class NoteToSelfChatViewModel @Inject constructor(
     private val getFeatureFlagValueUseCase: GetFeatureFlagValueUseCase,
     private val getNoteToSelfChatUseCase: GetNoteToSelfChatUseCase,
     private val isAnEmptyChatUseCase: IsAnEmptyChatUseCase,
+    private val getNoteToSelfChatPreferenceUseCase: GetNoteToSelfChatNewLabelPreferenceUseCase,
+    private val setNoteToSelfChatPreferenceUseCase: SetNoteToSelfChatNewLabelPreferenceUseCase,
 ) : ViewModel() {
 
     private val _state = MutableStateFlow(NoteToSelfChatUIState())
@@ -61,6 +65,7 @@ class NoteToSelfChatViewModel @Inject constructor(
      */
     private suspend fun getNoteToSelfChat() {
         getNoteToSelfChatUseCase()?.let { noteToSelfChatRoom ->
+            Timber.d("Note to self chat found: ${noteToSelfChatRoom.chatId}")
             _state.update { state ->
                 state.copy(
                     noteToSelfChatRoom = noteToSelfChatRoom,
@@ -69,7 +74,58 @@ class NoteToSelfChatViewModel @Inject constructor(
             isAnEmptyChatUseCase(noteToSelfChatRoom.chatId).let { isChatEmpty ->
                 Timber.d("Check if note to self chat is empty: $isChatEmpty")
                 _state.update { it.copy(isNoteToSelfChatEmpty = isChatEmpty) }
+                if (!isChatEmpty) {
+                    setNoteToSelfPreference(0)
+                    _state.update { it.copy(newFeatureLabelCounter = 0) }
+                }
             }
         }
+    }
+
+    /**
+     * Get note to yourself api feature flag
+     */
+    fun getNoteToSelfPreference() {
+        viewModelScope.launch {
+            runCatching {
+                getNoteToSelfChatPreferenceUseCase()
+            }.onFailure { exception ->
+                Timber.e(exception)
+            }.onSuccess { result ->
+                when (result) {
+                    INVALID_VALUE -> {
+                        setNoteToSelfPreference(MAX_VALUE)
+                        _state.update { it.copy(newFeatureLabelCounter = MAX_VALUE) }
+                    }
+
+                    MIN_VALUE -> _state.update { it.copy(newFeatureLabelCounter = result) }
+                    else -> {
+                        var newValue = result - 1
+                        setNoteToSelfPreference(newValue)
+                        _state.update { it.copy(newFeatureLabelCounter = newValue) }
+                    }
+                }
+            }
+        }
+    }
+
+    /**
+     * Get note to yourself api feature flag
+     */
+    private fun setNoteToSelfPreference(counter: Int) {
+        viewModelScope.launch {
+            runCatching {
+                setNoteToSelfChatPreferenceUseCase(counter)
+            }.onFailure { exception ->
+                Timber.e(exception)
+            }
+        }
+    }
+
+    internal companion object {
+        private const val MAX_VALUE = 5
+        private const val MIN_VALUE = 0
+        private const val INVALID_VALUE = -1
+
     }
 }

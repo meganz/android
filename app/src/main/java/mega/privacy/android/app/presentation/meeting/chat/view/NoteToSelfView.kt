@@ -79,7 +79,7 @@ internal fun NoteToSelfView(
                         style = MaterialTheme.typography.subtitle1medium,
                     )
 
-                    if (isNew && isHint) {
+                    if (isNew) {
                         MegaChip(
                             selected = true,
                             text = stringResource(sharedR.string.notifications_notification_item_new_tag),

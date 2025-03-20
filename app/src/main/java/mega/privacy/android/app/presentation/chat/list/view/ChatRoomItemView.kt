@@ -435,7 +435,7 @@ internal fun ChatRoomItemView(
                 },
         )
 
-        if (isNoteToSelfChat && isEmptyNoteToSelfChat && isNew) {
+        if (isNoteToSelfChat && isNew) {
             MegaChip(
                 selected = true,
                 text = stringResource(sharedR.string.notifications_notification_item_new_tag),

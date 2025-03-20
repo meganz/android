@@ -100,6 +100,7 @@ import mega.privacy.android.domain.usecase.camerauploads.EstablishCameraUploadsS
 import mega.privacy.android.domain.usecase.camerauploads.GetPrimarySyncHandleUseCase
 import mega.privacy.android.domain.usecase.camerauploads.GetSecondarySyncHandleUseCase
 import mega.privacy.android.domain.usecase.camerauploads.MonitorCameraUploadsFolderDestinationUseCase
+import mega.privacy.android.domain.usecase.chat.GetNoteToSelfChatUseCase
 import mega.privacy.android.domain.usecase.chat.GetNumUnreadChatsUseCase
 import mega.privacy.android.domain.usecase.chat.MonitorChatArchivedUseCase
 import mega.privacy.android.domain.usecase.chat.link.GetChatLinkContentUseCase
@@ -213,6 +214,8 @@ class ManagerViewModelTest {
     }
     private val getPrimarySyncHandleUseCase = mock<GetPrimarySyncHandleUseCase>()
     private val getSecondarySyncHandleUseCase = mock<GetSecondarySyncHandleUseCase>()
+
+    private val getNoteToSelfChatUseCase = mock<GetNoteToSelfChatUseCase>()
     private val monitorCameraUploadsFolderDestinationUpdateUseCase =
         mock<MonitorCameraUploadsFolderDestinationUseCase> {
             onBlocking { invoke() }.thenReturn(
@@ -448,6 +451,7 @@ class ManagerViewModelTest {
             deleteNodeVersionsUseCase = deleteNodeVersionsUseCase,
             versionHistoryRemoveMessageMapper = versionHistoryRemoveMessageMapper,
             backgroundFastLoginUseCase = backgroundFastLoginUseCase,
+            getNoteToSelfChatUseCase = getNoteToSelfChatUseCase,
             legacyState = legacyState,
             appScope = appScope,
         )
@@ -503,6 +507,7 @@ class ManagerViewModelTest {
             scannerHandler,
             createFolderNodeUseCase,
             deleteNodeVersionsUseCase,
+            getNoteToSelfChatUseCase,
             versionHistoryRemoveMessageMapper,
             legacyState
         )

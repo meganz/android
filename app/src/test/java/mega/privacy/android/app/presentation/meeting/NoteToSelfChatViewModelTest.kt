@@ -7,8 +7,10 @@ import kotlinx.coroutines.test.runTest
 import mega.privacy.android.app.featuretoggle.ApiFeatures
 import mega.privacy.android.core.test.extension.CoroutineMainDispatcherExtension
 import mega.privacy.android.domain.entity.chat.ChatRoom
+import mega.privacy.android.domain.usecase.chat.GetNoteToSelfChatNewLabelPreferenceUseCase
 import mega.privacy.android.domain.usecase.chat.GetNoteToSelfChatUseCase
 import mega.privacy.android.domain.usecase.chat.IsAnEmptyChatUseCase
+import mega.privacy.android.domain.usecase.chat.SetNoteToSelfChatNewLabelPreferenceUseCase
 import mega.privacy.android.domain.usecase.featureflag.GetFeatureFlagValueUseCase
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
@@ -25,6 +27,10 @@ internal class NoteToSelfChatViewModelTest {
     private val getFeatureFlagValueUseCase: GetFeatureFlagValueUseCase = mock()
     private val getNoteToSelfChatUseCase: GetNoteToSelfChatUseCase = mock()
     private val isAnEmptyChatUseCase: IsAnEmptyChatUseCase = mock()
+    private val getNoteToSelfChatPreferenceUseCase: GetNoteToSelfChatNewLabelPreferenceUseCase =
+        mock()
+    private val setNoteToSelfChatPreferenceUseCase: SetNoteToSelfChatNewLabelPreferenceUseCase =
+        mock()
 
     @BeforeEach
     fun resetMocks() {
@@ -34,7 +40,9 @@ internal class NoteToSelfChatViewModelTest {
         reset(
             getFeatureFlagValueUseCase,
             getNoteToSelfChatUseCase,
-            isAnEmptyChatUseCase
+            isAnEmptyChatUseCase,
+            getNoteToSelfChatPreferenceUseCase,
+            setNoteToSelfChatPreferenceUseCase
         )
     }
 
@@ -46,6 +54,8 @@ internal class NoteToSelfChatViewModelTest {
             getFeatureFlagValueUseCase = getFeatureFlagValueUseCase,
             getNoteToSelfChatUseCase = getNoteToSelfChatUseCase,
             isAnEmptyChatUseCase = isAnEmptyChatUseCase,
+            getNoteToSelfChatPreferenceUseCase = getNoteToSelfChatPreferenceUseCase,
+            setNoteToSelfChatPreferenceUseCase = setNoteToSelfChatPreferenceUseCase
         )
     }
 
@@ -68,4 +78,76 @@ internal class NoteToSelfChatViewModelTest {
             Truth.assertThat(updatedState.isNoteToSelfChatEmpty).isTrue()
         }
     }
+
+    @Test
+    fun `test that newFeatureLabelCounter updated when calling getNoteToSelfPreference and it is established`() =
+        runTest {
+            val chatRoom = mock<ChatRoom> {
+                on { chatId }.thenReturn(123L)
+                on { isNoteToSelf }.thenReturn(true)
+            }
+            val invalidValue = -1
+            val currentValue = 3
+            val newValue = 2
+
+            whenever(getNoteToSelfChatUseCase()).thenReturn(chatRoom)
+            whenever(isAnEmptyChatUseCase(123L)).thenReturn(true)
+            whenever(getNoteToSelfChatPreferenceUseCase()).thenReturn(currentValue)
+            initTestClass()
+
+            underTest.state.test {
+                val state = awaitItem()
+                Truth.assertThat(state.newFeatureLabelCounter).isEqualTo(invalidValue)
+                underTest.getNoteToSelfPreference()
+                val updatedState = awaitItem()
+                Truth.assertThat(updatedState.newFeatureLabelCounter).isEqualTo(newValue)
+            }
+        }
+
+
+    @Test
+    fun `test that newFeatureLabelCounter updated when calling getNoteToSelfPreference and it is not established`() =
+        runTest {
+            val chatRoom = mock<ChatRoom> {
+                on { chatId }.thenReturn(123L)
+                on { isNoteToSelf }.thenReturn(true)
+            }
+            val maxValue = 5
+            val invalidValue = -1
+            whenever(getNoteToSelfChatUseCase()).thenReturn(chatRoom)
+            whenever(isAnEmptyChatUseCase(123L)).thenReturn(true)
+            whenever(getNoteToSelfChatPreferenceUseCase()).thenReturn(invalidValue)
+            initTestClass()
+
+            underTest.state.test {
+                val state = awaitItem()
+                Truth.assertThat(state.newFeatureLabelCounter).isEqualTo(invalidValue)
+                underTest.getNoteToSelfPreference()
+                val updatedState = awaitItem()
+                Truth.assertThat(updatedState.newFeatureLabelCounter).isEqualTo(maxValue)
+            }
+        }
+
+    @Test
+    fun `test that newFeatureLabelCounter updated when calling getNoteToSelfPreference and it's consumed`() =
+        runTest {
+            val chatRoom = mock<ChatRoom> {
+                on { chatId }.thenReturn(123L)
+                on { isNoteToSelf }.thenReturn(true)
+            }
+            val invalidValue = -1
+            val consumedValue = 0
+            whenever(getNoteToSelfChatUseCase()).thenReturn(chatRoom)
+            whenever(isAnEmptyChatUseCase(123L)).thenReturn(true)
+            whenever(getNoteToSelfChatPreferenceUseCase()).thenReturn(consumedValue)
+            initTestClass()
+
+            underTest.state.test {
+                val state = awaitItem()
+                Truth.assertThat(state.newFeatureLabelCounter).isEqualTo(invalidValue)
+                underTest.getNoteToSelfPreference()
+                val updatedState = awaitItem()
+                Truth.assertThat(updatedState.newFeatureLabelCounter).isEqualTo(consumedValue)
+            }
+        }
 }
