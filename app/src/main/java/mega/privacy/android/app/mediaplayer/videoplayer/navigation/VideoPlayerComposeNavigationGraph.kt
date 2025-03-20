@@ -14,8 +14,6 @@ internal object VideoPlayerNavigationGraph
 
 @OptIn(ExperimentalMaterialNavigationApi::class)
 internal fun NavGraphBuilder.videoPlayerComposeNavigationGraph(
-    launchSource: Int,
-    shouldShowAddTo: Boolean,
     bottomSheetNavigator: BottomSheetNavigator,
     scaffoldState: ScaffoldState,
     viewModel: VideoPlayerViewModel,
@@ -25,8 +23,6 @@ internal fun NavGraphBuilder.videoPlayerComposeNavigationGraph(
         startDestination = VideoPlayerScreen,
     ) {
         videoPlayerScreen(
-            launchSource = launchSource,
-            shouldShowAddTo = shouldShowAddTo,
             bottomSheetNavigator = bottomSheetNavigator,
             scaffoldState = scaffoldState,
             viewModel = viewModel,

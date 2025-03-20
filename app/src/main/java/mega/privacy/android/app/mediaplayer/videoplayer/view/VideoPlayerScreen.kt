@@ -62,8 +62,6 @@ import mega.privacy.android.shared.original.core.ui.controls.sheets.MegaBottomSh
 @OptIn(ExperimentalComposeUiApi::class, ExperimentalMaterialNavigationApi::class)
 @Composable
 internal fun VideoPlayerScreen(
-    launchSource: Int,
-    shouldShowAddTo: Boolean,
     bottomSheetNavigator: BottomSheetNavigator,
     scaffoldState: ScaffoldState,
     viewModel: VideoPlayerViewModel,
@@ -211,18 +209,7 @@ internal fun VideoPlayerScreen(
                         } else {
                             uiState.metadata.title ?: uiState.metadata.nodeName
                         },
-                        launchSource = launchSource,
-                        isInRubbish = uiState.isNodeInRubbishBin,
-                        canRemoveFromChat = uiState.canRemoveFromChat,
-                        nodeIsNull = uiState.nodeIsNull,
-                        shouldShowHideNode = uiState.isHideMenuActionVisible,
-                        shouldShowUnhideNode = uiState.isUnhideMenuActionVisible,
-                        shouldShowShare = uiState.shouldShowShare,
-                        shouldShowGetLink = uiState.shouldShowGetLink,
-                        shouldShowRemoveLink = uiState.shouldShowRemoveLink,
-                        isAccess = uiState.isAccess,
-                        isRubbishBinShown = uiState.isRubbishBinShown,
-                        shouldShowAddTo = shouldShowAddTo,
+                        menuActions = uiState.menuActions,
                         onBackPressed = { },
                         onMenuActionClicked = { },
                     )

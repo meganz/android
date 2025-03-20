@@ -15,8 +15,6 @@ internal object VideoPlayerScreen
 
 @OptIn(ExperimentalMaterialNavigationApi::class)
 internal fun NavGraphBuilder.videoPlayerScreen(
-    launchSource: Int,
-    shouldShowAddTo: Boolean,
     bottomSheetNavigator: BottomSheetNavigator,
     scaffoldState: ScaffoldState,
     viewModel: VideoPlayerViewModel,
@@ -24,8 +22,6 @@ internal fun NavGraphBuilder.videoPlayerScreen(
 ) {
     composable<VideoPlayerScreen> {
         VideoPlayerScreen(
-            launchSource = launchSource,
-            shouldShowAddTo = shouldShowAddTo,
             bottomSheetNavigator = bottomSheetNavigator,
             scaffoldState = scaffoldState,
             viewModel = viewModel,

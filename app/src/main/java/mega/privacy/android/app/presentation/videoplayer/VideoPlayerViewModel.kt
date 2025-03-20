@@ -30,9 +30,11 @@ import mega.privacy.android.app.mediaplayer.gateway.MediaPlayerGateway
 import mega.privacy.android.app.mediaplayer.model.MediaPlaySources
 import mega.privacy.android.app.mediaplayer.queue.model.MediaQueueItemType
 import mega.privacy.android.app.mediaplayer.service.Metadata
+import mega.privacy.android.app.presentation.videoplayer.mapper.LaunchSourceMapper
 import mega.privacy.android.app.presentation.videoplayer.mapper.VideoPlayerItemMapper
 import mega.privacy.android.app.presentation.videoplayer.model.MediaPlaybackState
 import mega.privacy.android.app.presentation.videoplayer.model.VideoPlayerItem
+import mega.privacy.android.app.presentation.videoplayer.model.VideoPlayerMenuAction
 import mega.privacy.android.app.presentation.videoplayer.model.VideoPlayerUiState
 import mega.privacy.android.app.presentation.videoplayer.model.VideoSize
 import mega.privacy.android.app.utils.Constants
@@ -42,7 +44,6 @@ import mega.privacy.android.app.utils.Constants.FAVOURITES_ADAPTER
 import mega.privacy.android.app.utils.Constants.FILE_BROWSER_ADAPTER
 import mega.privacy.android.app.utils.Constants.FOLDER_LINK_ADAPTER
 import mega.privacy.android.app.utils.Constants.FROM_ALBUM_SHARING
-import mega.privacy.android.app.utils.Constants.FROM_CHAT
 import mega.privacy.android.app.utils.Constants.FROM_IMAGE_VIEWER
 import mega.privacy.android.app.utils.Constants.FROM_MEDIA_DISCOVERY
 import mega.privacy.android.app.utils.Constants.INCOMING_SHARES_ADAPTER
@@ -60,6 +61,7 @@ import mega.privacy.android.app.utils.Constants.INTENT_EXTRA_KEY_ORDER_GET_CHILD
 import mega.privacy.android.app.utils.Constants.INTENT_EXTRA_KEY_PARENT_ID
 import mega.privacy.android.app.utils.Constants.INTENT_EXTRA_KEY_PARENT_NODE_HANDLE
 import mega.privacy.android.app.utils.Constants.INTENT_EXTRA_KEY_REBUILD_PLAYLIST
+import mega.privacy.android.app.utils.Constants.INTENT_EXTRA_KEY_VIDEO_ADD_TO_ALBUM
 import mega.privacy.android.app.utils.Constants.INTENT_EXTRA_KEY_VIDEO_COLLECTION_ID
 import mega.privacy.android.app.utils.Constants.INTENT_EXTRA_KEY_VIDEO_COLLECTION_TITLE
 import mega.privacy.android.app.utils.Constants.INVALID_SIZE
@@ -80,10 +82,8 @@ import mega.privacy.android.domain.entity.SortOrder
 import mega.privacy.android.domain.entity.VideoFileTypeInfo
 import mega.privacy.android.domain.entity.account.business.BusinessAccountStatus
 import mega.privacy.android.domain.entity.mediaplayer.RepeatToggleMode
-import mega.privacy.android.domain.entity.node.NodeId
 import mega.privacy.android.domain.entity.node.TypedFileNode
 import mega.privacy.android.domain.entity.node.TypedVideoNode
-import mega.privacy.android.domain.entity.shares.AccessPermission
 import mega.privacy.android.domain.entity.transfer.TransferEvent
 import mega.privacy.android.domain.exception.BlockedMegaException
 import mega.privacy.android.domain.exception.QuotaExceededMegaException
@@ -98,10 +98,8 @@ import mega.privacy.android.domain.usecase.GetOfflineNodesByParentIdUseCase
 import mega.privacy.android.domain.usecase.GetParentNodeFromMegaApiFolderUseCase
 import mega.privacy.android.domain.usecase.GetRootNodeFromMegaApiFolderUseCase
 import mega.privacy.android.domain.usecase.GetRootNodeUseCase
-import mega.privacy.android.domain.usecase.GetRootParentNodeUseCase
 import mega.privacy.android.domain.usecase.GetRubbishNodeUseCase
 import mega.privacy.android.domain.usecase.GetUserNameByEmailUseCase
-import mega.privacy.android.domain.usecase.HasSensitiveInheritedUseCase
 import mega.privacy.android.domain.usecase.IsHiddenNodesOnboardedUseCase
 import mega.privacy.android.domain.usecase.account.MonitorAccountDetailUseCase
 import mega.privacy.android.domain.usecase.featureflag.GetFeatureFlagValueUseCase
@@ -112,7 +110,6 @@ import mega.privacy.android.domain.usecase.mediaplayer.HttpServerIsRunningUseCas
 import mega.privacy.android.domain.usecase.mediaplayer.HttpServerStartUseCase
 import mega.privacy.android.domain.usecase.mediaplayer.HttpServerStopUseCase
 import mega.privacy.android.domain.usecase.mediaplayer.videoplayer.CanRemoveFromChatUseCase
-import mega.privacy.android.domain.usecase.mediaplayer.videoplayer.GetNodeAccessUseCase
 import mega.privacy.android.domain.usecase.mediaplayer.videoplayer.GetVideoNodeByHandleUseCase
 import mega.privacy.android.domain.usecase.mediaplayer.videoplayer.GetVideoNodesByEmailUseCase
 import mega.privacy.android.domain.usecase.mediaplayer.videoplayer.GetVideoNodesByHandlesUseCase
@@ -125,8 +122,6 @@ import mega.privacy.android.domain.usecase.mediaplayer.videoplayer.GetVideosByPa
 import mega.privacy.android.domain.usecase.mediaplayer.videoplayer.GetVideosBySearchTypeUseCase
 import mega.privacy.android.domain.usecase.mediaplayer.videoplayer.MonitorVideoRepeatModeUseCase
 import mega.privacy.android.domain.usecase.mediaplayer.videoplayer.SetVideoRepeatModeUseCase
-import mega.privacy.android.domain.usecase.node.IsNodeInBackupsUseCase
-import mega.privacy.android.domain.usecase.node.IsNodeInRubbishBinUseCase
 import mega.privacy.android.domain.usecase.node.backup.GetBackupsNodeUseCase
 import mega.privacy.android.domain.usecase.offline.GetOfflineNodeInformationByIdUseCase
 import mega.privacy.android.domain.usecase.setting.MonitorShowHiddenItemsUseCase
@@ -139,6 +134,7 @@ import timber.log.Timber
 import java.io.File
 import java.time.Instant
 import javax.inject.Inject
+import kotlin.Boolean
 import kotlin.time.Duration.Companion.seconds
 
 /**
@@ -185,17 +181,13 @@ class VideoPlayerViewModel @Inject constructor(
     private val monitorVideoRepeatModeUseCase: MonitorVideoRepeatModeUseCase,
     private val saveVideoRecentlyWatchedUseCase: SaveVideoRecentlyWatchedUseCase,
     private val setVideoRepeatModeUseCase: SetVideoRepeatModeUseCase,
-    private val isNodeInRubbishBinUseCase: IsNodeInRubbishBinUseCase,
     private val getFeatureFlagValueUseCase: GetFeatureFlagValueUseCase,
     private val monitorAccountDetailUseCase: MonitorAccountDetailUseCase,
     private val isHiddenNodesOnboardedUseCase: IsHiddenNodesOnboardedUseCase,
     private val monitorShowHiddenItemsUseCase: MonitorShowHiddenItemsUseCase,
     private val getBusinessStatusUseCase: GetBusinessStatusUseCase,
     private val canRemoveFromChatUseCase: CanRemoveFromChatUseCase,
-    private val getNodeAccessUseCase: GetNodeAccessUseCase,
-    private val hasSensitiveInheritedUseCase: HasSensitiveInheritedUseCase,
-    private val getRootParentNodeUseCase: GetRootParentNodeUseCase,
-    private val isNodeInBackupsUseCase: IsNodeInBackupsUseCase,
+    private val launchSourceMapper: LaunchSourceMapper,
     savedStateHandle: SavedStateHandle,
 ) : ViewModel() {
     val uiState: StateFlow<VideoPlayerUiState>
@@ -208,6 +200,10 @@ class VideoPlayerViewModel @Inject constructor(
         savedStateHandle[INTENT_EXTRA_KEY_ADAPTER_TYPE] ?: INVALID_VALUE
     }
 
+    private val shouldShowAddTo: Boolean by lazy {
+        savedStateHandle.get<Boolean>(INTENT_EXTRA_KEY_VIDEO_ADD_TO_ALBUM) == true
+    }
+
     private val chatId: Long by lazy {
         savedStateHandle[INTENT_EXTRA_KEY_CHAT_ID] ?: INVALID_HANDLE
     }
@@ -215,6 +211,9 @@ class VideoPlayerViewModel @Inject constructor(
     private val messageId: Long by lazy {
         savedStateHandle[INTENT_EXTRA_KEY_MSG_ID] ?: INVALID_HANDLE
     }
+
+    private val canRemoveFromChatFunction =
+        suspend { runCatching { canRemoveFromChatUseCase(chatId, messageId) }.getOrDefault(false) }
 
     private val collectionTitle: String? by lazy {
         savedStateHandle[INTENT_EXTRA_KEY_VIDEO_COLLECTION_TITLE]
@@ -278,15 +277,22 @@ class VideoPlayerViewModel @Inject constructor(
                     getBusinessStatusUseCase()
                 } else null
 
+            val actions = getMenuActionsForVideo(
+                launchSource = currentLaunchSources,
+                videoNodeHandle = uiState.value.currentPlayingHandle,
+                isPaidUser = accountType?.isPaid == true,
+                isExpiredBusinessUser = businessStatus == BusinessAccountStatus.Expired
+            )
+
             uiState.update {
                 it.copy(
                     accountType = accountType,
                     isBusinessAccountExpired = businessStatus == BusinessAccountStatus.Expired,
                     hiddenNodeEnabled = true,
                     showHiddenItems = showHiddenItems,
+                    menuActions = actions
                 )
             }
-            checkActionsVisible()
         }.catch { Timber.e(it) }
             .launchIn(viewModelScope)
     }
@@ -858,11 +864,20 @@ class VideoPlayerViewModel @Inject constructor(
         items: List<VideoPlayerItem> = uiState.value.items,
     ) {
         val playingIndex = items.indexOfFirst { it.nodeHandle == handle }.takeIf { it != -1 } ?: 0
-        uiState.update {
-            it.copy(
-                currentPlayingHandle = handle,
-                currentPlayingIndex = playingIndex
+        viewModelScope.launch {
+            val actions = getMenuActionsForVideo(
+                launchSource = currentLaunchSources,
+                videoNodeHandle = handle,
+                isPaidUser = uiState.value.accountType?.isPaid == true,
+                isExpiredBusinessUser = uiState.value.isBusinessAccountExpired
             )
+            uiState.update {
+                it.copy(
+                    currentPlayingHandle = handle,
+                    currentPlayingIndex = playingIndex,
+                    menuActions = actions
+                )
+            }
         }
     }
 
@@ -897,82 +912,22 @@ class VideoPlayerViewModel @Inject constructor(
     internal fun updateSnackBarMessage(message: String?) =
         uiState.update { it.copy(snackBarMessage = message) }
 
-    internal fun checkActionsVisible(handle: Long = uiState.value.currentPlayingHandle) {
-        viewModelScope.launch {
-            if (handle == INVALID_VALUE.toLong()) return@launch
-            val isRubbishBin = runCatching { isNodeInRubbishBinUseCase(NodeId(handle)) }.getOrNull()
-            val node = runCatching { getVideoNodeByHandleUseCase(handle) }.getOrNull()
-
-            if (node == null) {
-                uiState.update { it.copy(nodeIsNull = true) }
-                return@launch
-            }
-
-            val accessLevel = runCatching { getNodeAccessUseCase(node.id) }.getOrNull()
-                ?: AccessPermission.UNKNOWN
-            val isOwner = accessLevel == AccessPermission.OWNER
-            val isFullAccess = accessLevel == AccessPermission.FULL || isOwner
-
-            val shouldShowShare = isOwner
-            val shouldShowGetLink = isOwner && node.exportedData == null
-            val shouldShowRemoveLink = isOwner && node.exportedData != null
-
-            val canRemoveFromChat = if (currentLaunchSources == FROM_CHAT) {
-                runCatching { canRemoveFromChatUseCase(chatId, messageId) }.getOrNull() == true
-            } else {
-                false
-            }
-
-            val rubbishNode = runCatching { getRubbishNodeUseCase() }.getOrNull()
-            val isRubbishBinShown =
-                node.parentId.longValue != rubbishNode?.id?.longValue && isFullAccess
-
-            val hiddenNodesEnabled = isHiddenNodesActive()
-            val isInSharedItems = currentLaunchSources in listOf(
-                INCOMING_SHARES_ADAPTER,
-                OUTGOING_SHARES_ADAPTER,
-                LINKS_ADAPTER
-            )
-            val isSensitiveInherited =
-                runCatching { hasSensitiveInheritedUseCase(node.id) }.getOrNull() == true
-            val isRootParentInShare =
-                runCatching { getRootParentNodeUseCase(node.id)?.isIncomingShare }.getOrNull() == true
-            val isPaidUser = uiState.value.accountType?.isPaid == true
-            val isBusinessAccountExpired = uiState.value.isBusinessAccountExpired
-            val isNodeInBackup =
-                runCatching { isNodeInBackupsUseCase(node.id.longValue) }.getOrNull() == true
-
-            val isHideMenuActionVisible = hiddenNodesEnabled
-                    && !isInSharedItems
-                    && !isRootParentInShare
-                    && !isNodeInBackup
-                    && (!isPaidUser || isBusinessAccountExpired ||
-                    (!node.isMarkedSensitive && !isSensitiveInherited))
-
-            val isUnhideMenuActionVisible = hiddenNodesEnabled
-                    && !isInSharedItems
-                    && !isRootParentInShare
-                    && node.isMarkedSensitive
-                    && isPaidUser
-                    && !isBusinessAccountExpired
-                    && !isSensitiveInherited
-                    && !isNodeInBackup
-
-            uiState.update {
-                it.copy(
-                    isNodeInRubbishBin = isRubbishBin == true,
-                    isHideMenuActionVisible = isHideMenuActionVisible,
-                    isUnhideMenuActionVisible = isUnhideMenuActionVisible,
-                    canRemoveFromChat = canRemoveFromChat,
-                    shouldShowShare = shouldShowShare,
-                    shouldShowGetLink = shouldShowGetLink,
-                    shouldShowRemoveLink = shouldShowRemoveLink,
-                    isRubbishBinShown = isRubbishBinShown,
-                    isAccess = isFullAccess,
-                    nodeIsNull = false
-                )
-            }
-        }
+    private suspend fun getMenuActionsForVideo(
+        launchSource: Int,
+        videoNodeHandle: Long,
+        isPaidUser: Boolean,
+        isExpiredBusinessUser: Boolean,
+    ): List<VideoPlayerMenuAction> {
+        val videoNode = runCatching { getVideoNodeByHandleUseCase(videoNodeHandle) }.getOrNull()
+        if (videoNode == null) return emptyList()
+        return launchSourceMapper(
+            launchSource = launchSource,
+            videoNode = videoNode,
+            shouldShowAddTo = shouldShowAddTo,
+            canRemoveFromChat = canRemoveFromChatFunction,
+            isPaidUser = isPaidUser,
+            isExpiredBusinessUser = isExpiredBusinessUser,
+        )
     }
 
     private suspend fun isHiddenNodesActive(): Boolean {

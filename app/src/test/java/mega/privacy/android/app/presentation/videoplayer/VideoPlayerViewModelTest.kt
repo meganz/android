@@ -21,9 +21,13 @@ import mega.privacy.android.app.mediaplayer.gateway.MediaPlayerGateway
 import mega.privacy.android.app.mediaplayer.queue.model.MediaQueueItemType
 import mega.privacy.android.app.mediaplayer.service.Metadata
 import mega.privacy.android.app.presentation.myaccount.InstantTaskExecutorExtension
+import mega.privacy.android.app.presentation.videoplayer.mapper.LaunchSourceMapper
 import mega.privacy.android.app.presentation.videoplayer.mapper.VideoPlayerItemMapper
 import mega.privacy.android.app.presentation.videoplayer.model.MediaPlaybackState
 import mega.privacy.android.app.presentation.videoplayer.model.VideoPlayerItem
+import mega.privacy.android.app.presentation.videoplayer.model.VideoPlayerMenuAction
+import mega.privacy.android.app.presentation.videoplayer.model.VideoPlayerMenuAction.VideoPlayerDownloadAction
+import mega.privacy.android.app.presentation.videoplayer.model.VideoPlayerMenuAction.VideoPlayerFileInfoAction
 import mega.privacy.android.app.presentation.videoplayer.model.VideoSize
 import mega.privacy.android.app.utils.Constants.BACKUPS_ADAPTER
 import mega.privacy.android.app.utils.Constants.CONTACT_FILE_ADAPTER
@@ -31,7 +35,6 @@ import mega.privacy.android.app.utils.Constants.FAVOURITES_ADAPTER
 import mega.privacy.android.app.utils.Constants.FILE_BROWSER_ADAPTER
 import mega.privacy.android.app.utils.Constants.FOLDER_LINK_ADAPTER
 import mega.privacy.android.app.utils.Constants.FROM_ALBUM_SHARING
-import mega.privacy.android.app.utils.Constants.FROM_CHAT
 import mega.privacy.android.app.utils.Constants.FROM_IMAGE_VIEWER
 import mega.privacy.android.app.utils.Constants.FROM_MEDIA_DISCOVERY
 import mega.privacy.android.app.utils.Constants.INCOMING_SHARES_ADAPTER
@@ -74,7 +77,6 @@ import mega.privacy.android.domain.entity.node.NodeId
 import mega.privacy.android.domain.entity.node.TypedVideoNode
 import mega.privacy.android.domain.entity.offline.OfflineFileInformation
 import mega.privacy.android.domain.entity.offline.OtherOfflineNodeInformation
-import mega.privacy.android.domain.entity.shares.AccessPermission
 import mega.privacy.android.domain.entity.transfer.Transfer
 import mega.privacy.android.domain.entity.transfer.TransferEvent
 import mega.privacy.android.domain.exception.BlockedMegaException
@@ -87,10 +89,8 @@ import mega.privacy.android.domain.usecase.GetOfflineNodesByParentIdUseCase
 import mega.privacy.android.domain.usecase.GetParentNodeFromMegaApiFolderUseCase
 import mega.privacy.android.domain.usecase.GetRootNodeFromMegaApiFolderUseCase
 import mega.privacy.android.domain.usecase.GetRootNodeUseCase
-import mega.privacy.android.domain.usecase.GetRootParentNodeUseCase
 import mega.privacy.android.domain.usecase.GetRubbishNodeUseCase
 import mega.privacy.android.domain.usecase.GetUserNameByEmailUseCase
-import mega.privacy.android.domain.usecase.HasSensitiveInheritedUseCase
 import mega.privacy.android.domain.usecase.IsHiddenNodesOnboardedUseCase
 import mega.privacy.android.domain.usecase.account.MonitorAccountDetailUseCase
 import mega.privacy.android.domain.usecase.featureflag.GetFeatureFlagValueUseCase
@@ -101,7 +101,6 @@ import mega.privacy.android.domain.usecase.mediaplayer.HttpServerIsRunningUseCas
 import mega.privacy.android.domain.usecase.mediaplayer.HttpServerStartUseCase
 import mega.privacy.android.domain.usecase.mediaplayer.HttpServerStopUseCase
 import mega.privacy.android.domain.usecase.mediaplayer.videoplayer.CanRemoveFromChatUseCase
-import mega.privacy.android.domain.usecase.mediaplayer.videoplayer.GetNodeAccessUseCase
 import mega.privacy.android.domain.usecase.mediaplayer.videoplayer.GetVideoNodeByHandleUseCase
 import mega.privacy.android.domain.usecase.mediaplayer.videoplayer.GetVideoNodesByEmailUseCase
 import mega.privacy.android.domain.usecase.mediaplayer.videoplayer.GetVideoNodesByHandlesUseCase
@@ -114,8 +113,6 @@ import mega.privacy.android.domain.usecase.mediaplayer.videoplayer.GetVideosByPa
 import mega.privacy.android.domain.usecase.mediaplayer.videoplayer.GetVideosBySearchTypeUseCase
 import mega.privacy.android.domain.usecase.mediaplayer.videoplayer.MonitorVideoRepeatModeUseCase
 import mega.privacy.android.domain.usecase.mediaplayer.videoplayer.SetVideoRepeatModeUseCase
-import mega.privacy.android.domain.usecase.node.IsNodeInBackupsUseCase
-import mega.privacy.android.domain.usecase.node.IsNodeInRubbishBinUseCase
 import mega.privacy.android.domain.usecase.node.backup.GetBackupsNodeUseCase
 import mega.privacy.android.domain.usecase.offline.GetOfflineNodeInformationByIdUseCase
 import mega.privacy.android.domain.usecase.setting.MonitorShowHiddenItemsUseCase
@@ -141,6 +138,7 @@ import org.mockito.kotlin.whenever
 import org.mockito.kotlin.wheneverBlocking
 import java.io.File
 import java.time.Instant
+import kotlin.Boolean
 import kotlin.time.Duration
 import kotlin.time.Duration.Companion.seconds
 import kotlin.use
@@ -198,7 +196,6 @@ class VideoPlayerViewModelTest {
     private val monitorVideoRepeatModeUseCase = mock<MonitorVideoRepeatModeUseCase>()
     private val saveVideoRecentlyWatchedUseCase = mock<SaveVideoRecentlyWatchedUseCase>()
     private val setVideoRepeatModeUseCase = mock<SetVideoRepeatModeUseCase>()
-    private val isNodeInRubbishBinUseCase = mock<IsNodeInRubbishBinUseCase>()
     private val getFeatureFlagValueUseCase = mock<GetFeatureFlagValueUseCase>()
     private val fakeMonitorAccountDetailFlow = MutableSharedFlow<AccountDetail>()
     private val monitorAccountDetailUseCase = mock<MonitorAccountDetailUseCase>()
@@ -206,10 +203,7 @@ class VideoPlayerViewModelTest {
     private val monitorShowHiddenItemsUseCase = mock<MonitorShowHiddenItemsUseCase>()
     private val getBusinessStatusUseCase = mock<GetBusinessStatusUseCase>()
     private val canRemoveFromChatUseCase = mock<CanRemoveFromChatUseCase>()
-    private val getNodeAccessUseCase = mock<GetNodeAccessUseCase>()
-    private val hasSensitiveInheritedUseCase = mock<HasSensitiveInheritedUseCase>()
-    private val getRootParentNodeUseCase = mock<GetRootParentNodeUseCase>()
-    private val isNodeInBackupsUseCase = mock<IsNodeInBackupsUseCase>()
+    private val launchSourceMapper = mock<LaunchSourceMapper>()
     private val savedStateHandle = SavedStateHandle(mapOf())
 
     private val testHandle: Long = 123456
@@ -264,17 +258,13 @@ class VideoPlayerViewModelTest {
             monitorVideoRepeatModeUseCase = monitorVideoRepeatModeUseCase,
             saveVideoRecentlyWatchedUseCase = saveVideoRecentlyWatchedUseCase,
             setVideoRepeatModeUseCase = setVideoRepeatModeUseCase,
-            isNodeInRubbishBinUseCase = isNodeInRubbishBinUseCase,
             getFeatureFlagValueUseCase = getFeatureFlagValueUseCase,
             monitorAccountDetailUseCase = monitorAccountDetailUseCase,
             isHiddenNodesOnboardedUseCase = isHiddenNodesOnboardedUseCase,
             monitorShowHiddenItemsUseCase = monitorShowHiddenItemsUseCase,
             getBusinessStatusUseCase = getBusinessStatusUseCase,
             canRemoveFromChatUseCase = canRemoveFromChatUseCase,
-            getNodeAccessUseCase = getNodeAccessUseCase,
-            hasSensitiveInheritedUseCase = hasSensitiveInheritedUseCase,
-            getRootParentNodeUseCase = getRootParentNodeUseCase,
-            isNodeInBackupsUseCase = isNodeInBackupsUseCase,
+            launchSourceMapper = launchSourceMapper,
             savedStateHandle = savedStateHandle
         )
         savedStateHandle[INTENT_EXTRA_KEY_VIDEO_COLLECTION_ID] = expectedCollectionId
@@ -339,7 +329,14 @@ class VideoPlayerViewModelTest {
             getFileByPathUseCase,
             monitorVideoRepeatModeUseCase,
             saveVideoRecentlyWatchedUseCase,
-            setVideoRepeatModeUseCase
+            setVideoRepeatModeUseCase,
+            getFeatureFlagValueUseCase,
+            monitorAccountDetailUseCase,
+            isHiddenNodesOnboardedUseCase,
+            monitorShowHiddenItemsUseCase,
+            getBusinessStatusUseCase,
+            canRemoveFromChatUseCase,
+            launchSourceMapper,
         )
     }
 
@@ -1230,140 +1227,29 @@ class VideoPlayerViewModelTest {
         }
 
     @Test
-    fun `test that isRubbishBin is true when checkActionsVisible is invoked`() = runTest {
-        whenever(isNodeInRubbishBinUseCase(any())).thenReturn(true)
-        whenever(getVideoNodeByHandleUseCase(any(), any())).thenReturn(mock())
-
-        underTest.checkActionsVisible(1L)
-        underTest.uiState.test {
-            assertThat(awaitItem().isNodeInRubbishBin).isTrue()
-        }
-    }
-
-    @Test
-    fun `test that nodeIsNull is true when checkActionsVisible is invoked`() = runTest {
-        whenever(getVideoNodeByHandleUseCase(any(), any())).thenReturn(null)
-
-        underTest.checkActionsVisible(1L)
-        underTest.uiState.test {
-            assertThat(awaitItem().nodeIsNull).isTrue()
-        }
-    }
-
-    @Test
-    fun `test that canRemoveFromChat is true when checkActionsVisible is invoked`() = runTest {
-        whenever(getVideoNodeByHandleUseCase(any(), any())).thenReturn(mock())
-        whenever(canRemoveFromChatUseCase(any(), any())).thenReturn(true)
-        savedStateHandle[INTENT_EXTRA_KEY_ADAPTER_TYPE] = FROM_CHAT
-        underTest.checkActionsVisible(1L)
-        underTest.uiState.test {
-            assertThat(awaitItem().canRemoveFromChat).isTrue()
-        }
-    }
-
-    @Test
-    fun `test that shouldShowShare is true when checkActionsVisible is invoked`() = runTest {
-        whenever(getVideoNodeByHandleUseCase(any(), any())).thenReturn(mock())
-        whenever(getNodeAccessUseCase(any())).thenReturn(AccessPermission.OWNER)
-        underTest.checkActionsVisible(1L)
-        underTest.uiState.test {
-            assertThat(awaitItem().shouldShowShare).isTrue()
-        }
-    }
-
-    @Test
-    fun `test that shouldShowGetLink is true when checkActionsVisible is invoked`() = runTest {
-        whenever(getVideoNodeByHandleUseCase(any(), any())).thenReturn(mock())
-        whenever(getNodeAccessUseCase(any())).thenReturn(AccessPermission.OWNER)
-        underTest.checkActionsVisible(1L)
-        underTest.uiState.test {
-            assertThat(awaitItem().shouldShowGetLink).isTrue()
-        }
-    }
-
-    @Test
-    fun `test that shouldShowRemoveLink is true when checkActionsVisible is invoked`() = runTest {
-        val testVideoNode = mock<TypedVideoNode> {
-            on { exportedData }.thenReturn(mock())
-        }
-        whenever(getVideoNodeByHandleUseCase(any(), any())).thenReturn(testVideoNode)
-        whenever(getNodeAccessUseCase(any())).thenReturn(AccessPermission.OWNER)
-        underTest.checkActionsVisible(1L)
-        underTest.uiState.test {
-            assertThat(awaitItem().shouldShowRemoveLink).isTrue()
-        }
-    }
-
-    @ParameterizedTest(name = "and Access is {0}")
-    @MethodSource("provideAccessPermission")
-    fun `test that isRubbishBinShown is true when checkActionsVisible is invoked`(
-        access: AccessPermission,
-    ) = runTest {
-        val testVideoNode = mock<TypedVideoNode> {
-            on { parentId }.thenReturn(NodeId(1L))
-        }
-        whenever(getVideoNodeByHandleUseCase(any(), any())).thenReturn(testVideoNode)
-        whenever(getNodeAccessUseCase(any())).thenReturn(access)
-        underTest.checkActionsVisible(1L)
-        underTest.uiState.test {
-            assertThat(awaitItem().isRubbishBinShown).isTrue()
-        }
-    }
-
-    private fun provideAccessPermission() = listOf(
-        AccessPermission.OWNER,
-        AccessPermission.FULL
-    )
-
-    @ParameterizedTest(name = "and AccessPermission is {0}")
-    @MethodSource("provideAccessPermission")
-    fun `test that isAccess is true when checkActionsVisible is invoked`(
-        access: AccessPermission,
-    ) = runTest {
-        whenever(getVideoNodeByHandleUseCase(any(), any())).thenReturn(mock())
-        whenever(getNodeAccessUseCase(any())).thenReturn(access)
-        underTest.checkActionsVisible(1L)
-        underTest.uiState.test {
-            assertThat(awaitItem().isAccess).isTrue()
-        }
-    }
-
-    @Test
-    fun `test that isHideMenuActionVisible is true when checkActionsVisible is invoked`() =
+    fun `the state is updated correctly when monitorAccountDetailUseCase is triggered`() =
         runTest {
-            val testRootParent = mock<FileNode> {
-                on { isIncomingShare }.thenReturn(false)
-            }
-            whenever(getRootParentNodeUseCase(any())).thenReturn(testRootParent)
-            whenever(isNodeInBackupsUseCase(any())).thenReturn(false)
-            whenever(getVideoNodeByHandleUseCase(any(), any())).thenReturn(mock())
-            underTest.checkActionsVisible(1L)
-            underTest.uiState.test {
-                assertThat(awaitItem().isHideMenuActionVisible).isTrue()
-            }
-        }
-
-    @Test
-    fun `test that isUnhideMenuActionVisible is true when checkActionsVisible is invoked`() =
-        runTest {
-            val testRootParent = mock<FileNode> {
-                on { isIncomingShare }.thenReturn(false)
-            }
-            val testVideoNode = mock<TypedVideoNode> {
-                on { isMarkedSensitive }.thenReturn(true)
-            }
-            whenever(getRootParentNodeUseCase(any())).thenReturn(testRootParent)
-            whenever(hasSensitiveInheritedUseCase(any())).thenReturn(false)
-            whenever(isNodeInBackupsUseCase(any())).thenReturn(false)
-            whenever(getVideoNodeByHandleUseCase(any(), any())).thenReturn(testVideoNode)
             val testAccountType = mock<AccountType> {
-                on { isPaid }.thenReturn(true)
+                on { isBusinessAccount }.thenReturn(true)
             }
+            whenever(getBusinessStatusUseCase()).thenReturn(BusinessAccountStatus.Expired)
+            val testActions = listOf<VideoPlayerMenuAction>(
+                VideoPlayerDownloadAction,
+                VideoPlayerFileInfoAction,
+            )
+            initLaunchSourceMapperReturned(testActions)
             emitAccountDetail(testAccountType)
             advanceUntilIdle()
-            underTest.uiState.drop(1).test {
-                underTest.checkActionsVisible(1L)
-                assertThat(awaitItem().isUnhideMenuActionVisible).isTrue()
+            underTest.uiState.test {
+                val actual = awaitItem()
+                assertThat(actual.accountType?.isBusinessAccount).isTrue()
+                assertThat(actual.isBusinessAccountExpired).isTrue()
+                assertThat(actual.hiddenNodeEnabled).isTrue()
+                assertThat(actual.menuActions).isNotEmpty()
+                assertThat(actual.menuActions.size).isEqualTo(testActions.size)
+                testActions.onEachIndexed { index, item ->
+                    assertThat(actual.menuActions[index]).isEqualTo(item)
+                }
                 cancelAndConsumeRemainingEvents()
             }
         }
@@ -1378,20 +1264,37 @@ class VideoPlayerViewModelTest {
         fakeMonitorAccountDetailFlow.emit(testAccountDetail)
     }
 
+    private suspend fun initLaunchSourceMapperReturned(actions: List<VideoPlayerMenuAction>) {
+        whenever(getVideoNodeByHandleUseCase(any(), any())).thenReturn(mock())
+        whenever(launchSourceMapper(any(), any(), any(), any(), any(), any())).thenReturn(actions)
+    }
+
     @Test
-    fun `the state is updated correctly when account is a business account and expired`() =
+    fun `the state is updated correctly when updateCurrentPlayingHandle is invoked`() =
         runTest {
-            val testAccountType = mock<AccountType> {
-                on { isBusinessAccount }.thenReturn(true)
-            }
-            whenever(getBusinessStatusUseCase()).thenReturn(BusinessAccountStatus.Expired)
-            emitAccountDetail(testAccountType)
+            val testHandle = 1L
+            val testItems: List<VideoPlayerItem> = listOf(
+                initVideoPlayerItem(2L, "", 200.seconds),
+                initVideoPlayerItem(testHandle, testHandle.toString(), 200.seconds),
+            )
+            val testActions = listOf<VideoPlayerMenuAction>(
+                VideoPlayerDownloadAction,
+                VideoPlayerFileInfoAction,
+            )
+            initLaunchSourceMapperReturned(testActions)
+            underTest.updateCurrentPlayingHandle(testHandle, testItems)
             advanceUntilIdle()
             underTest.uiState.test {
                 val actual = awaitItem()
-                assertThat(actual.accountType?.isBusinessAccount).isTrue()
-                assertThat(actual.isBusinessAccountExpired).isTrue()
-                assertThat(actual.hiddenNodeEnabled).isTrue()
+                assertThat(actual.currentPlayingHandle).isEqualTo(testHandle)
+                assertThat(actual.currentPlayingIndex).isEqualTo(
+                    testItems.indexOfFirst { it.nodeHandle == testHandle }
+                )
+                assertThat(actual.menuActions).isNotEmpty()
+                assertThat(actual.menuActions.size).isEqualTo(testActions.size)
+                testActions.onEachIndexed { index, item ->
+                    assertThat(actual.menuActions[index]).isEqualTo(item)
+                }
                 cancelAndConsumeRemainingEvents()
             }
         }

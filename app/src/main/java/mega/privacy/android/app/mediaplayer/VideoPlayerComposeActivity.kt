@@ -57,9 +57,6 @@ import mega.privacy.android.app.presentation.videoplayer.model.VideoSize
 import mega.privacy.android.app.utils.ChatUtil
 import mega.privacy.android.app.utils.ChatUtil.AUDIOFOCUS_DEFAULT
 import mega.privacy.android.app.utils.ChatUtil.getRequest
-import mega.privacy.android.app.utils.Constants.INTENT_EXTRA_KEY_ADAPTER_TYPE
-import mega.privacy.android.app.utils.Constants.INTENT_EXTRA_KEY_VIDEO_ADD_TO_ALBUM
-import mega.privacy.android.app.utils.Constants.INVALID_VALUE
 import mega.privacy.android.domain.entity.ThemeMode
 import mega.privacy.android.domain.entity.mediaplayer.RepeatToggleMode
 import mega.privacy.android.domain.usecase.GetThemeMode
@@ -143,8 +140,6 @@ class VideoPlayerComposeActivity : PasscodeActivity() {
         super.onCreate(savedInstanceState)
         enableEdgeToEdge()
         currentOrientation = resources.configuration.orientation
-        val launchSource = intent.getIntExtra(INTENT_EXTRA_KEY_ADAPTER_TYPE, INVALID_VALUE)
-        val shouldShowAddTo = intent.getBooleanExtra(INTENT_EXTRA_KEY_VIDEO_ADD_TO_ALBUM, false)
         observeRotationSettingsChange()
         val player = createPlayer()
         setContent {
@@ -176,8 +171,6 @@ class VideoPlayerComposeActivity : PasscodeActivity() {
                     startDestination = VideoPlayerNavigationGraph
                 ) {
                     videoPlayerComposeNavigationGraph(
-                        launchSource = launchSource,
-                        shouldShowAddTo = shouldShowAddTo,
                         bottomSheetNavigator = bottomSheetNavigator,
                         scaffoldState = scaffoldState,
                         viewModel = videoPlayerViewModel,
@@ -227,7 +220,6 @@ class VideoPlayerComposeActivity : PasscodeActivity() {
                         if (uiState.value.currentPlayingHandle != handle.toLong())
                             Analytics.tracker.trackEvent(VideoPlayerIsActivatedEvent)
                         updateCurrentPlayingHandle(handle.toLong())
-                        checkActionsVisible(handle.toLong())
                         saveVideoWatchedTime()
                         if (isUpdateName) {
                             val nodeName = uiState.value.items.find {
