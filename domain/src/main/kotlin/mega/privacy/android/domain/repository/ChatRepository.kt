@@ -974,7 +974,6 @@ interface ChatRepository {
      */
     suspend fun getArchivedChatListItems(): List<ChatListItem>
 
-
     /**
      * Set chat opening with link
      */

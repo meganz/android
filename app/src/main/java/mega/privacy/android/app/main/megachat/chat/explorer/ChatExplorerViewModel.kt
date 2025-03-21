@@ -10,10 +10,13 @@ import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.firstOrNull
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
+import mega.privacy.android.app.featuretoggle.ApiFeatures
 import mega.privacy.android.app.main.model.chat.explorer.ChatExplorerSearchUiState
 import mega.privacy.android.app.main.model.chat.explorer.ChatExplorerUiState
 import mega.privacy.android.app.presentation.contact.mapper.UserContactMapper
 import mega.privacy.android.domain.entity.ChatRoomPermission
+import mega.privacy.android.domain.entity.chat.ChatListItem
+import mega.privacy.android.domain.entity.chat.ChatRoomItem
 import mega.privacy.android.domain.entity.contacts.User
 import mega.privacy.android.domain.entity.contacts.UserChatStatus.Busy
 import mega.privacy.android.domain.entity.contacts.UserChatStatus.Invalid
@@ -23,11 +26,14 @@ import mega.privacy.android.domain.entity.user.UserId
 import mega.privacy.android.domain.qualifier.DefaultDispatcher
 import mega.privacy.android.domain.usecase.chat.GetActiveChatListItemsUseCase
 import mega.privacy.android.domain.usecase.chat.GetArchivedChatListItemsUseCase
+import mega.privacy.android.domain.usecase.chat.GetNoteToSelfChatUseCase
+import mega.privacy.android.domain.usecase.chat.IsAnEmptyChatUseCase
 import mega.privacy.android.domain.usecase.chat.explorer.GetVisibleContactsWithoutChatRoomUseCase
 import mega.privacy.android.domain.usecase.contact.GetUserOnlineStatusByHandleUseCase
 import mega.privacy.android.domain.usecase.contact.GetUserUseCase
 import mega.privacy.android.domain.usecase.contact.MonitorContactByHandleUseCase
 import mega.privacy.android.domain.usecase.contact.RequestUserLastGreenUseCase
+import mega.privacy.android.domain.usecase.featureflag.GetFeatureFlagValueUseCase
 import nz.mega.sdk.MegaChatApiJava.MEGACHAT_INVALID_HANDLE
 import timber.log.Timber
 import javax.inject.Inject
@@ -54,6 +60,9 @@ class ChatExplorerViewModel @Inject constructor(
     private val requestUserLastGreenUseCase: RequestUserLastGreenUseCase,
     private val getVisibleContactsWithoutChatRoomUseCase: GetVisibleContactsWithoutChatRoomUseCase,
     private val userContactMapper: UserContactMapper,
+    private val isAnEmptyChatUseCase: IsAnEmptyChatUseCase,
+    private val getFeatureFlagValueUseCase: GetFeatureFlagValueUseCase,
+    private val getNoteToSelfChatUseCase: GetNoteToSelfChatUseCase,
     @DefaultDispatcher private val defaultDispatcher: CoroutineDispatcher,
 ) : ViewModel() {
 
@@ -70,6 +79,27 @@ class ChatExplorerViewModel @Inject constructor(
      * The public property of [ChatExplorerSearchUiState].
      */
     val searchUiState = _searchUiState.asStateFlow()
+
+    init {
+        initialiseNoteToSelfChat()
+    }
+
+    /**
+     * Initialise note to self chat
+     */
+    private fun initialiseNoteToSelfChat() {
+        viewModelScope.launch {
+            runCatching {
+                if (getFeatureFlagValueUseCase(ApiFeatures.NoteToYourselfFlag)) {
+                    getNoteToSelfChatUseCase()?.let { noteToSelfChatRoom ->
+                        Timber.d("Note to self chat created")
+                    }
+                }
+            }.onFailure {
+                Timber.e(it, "Note to self chat failed")
+            }
+        }
+    }
 
     /**
      * Search items based on given query.
@@ -147,12 +177,18 @@ class ChatExplorerViewModel @Inject constructor(
                             )
                         }
 
-                        if (chat.ownPrivilege >= ChatRoomPermission.Standard) {
+                        if (chat.isNoteToSelf || chat.ownPrivilege >= ChatRoomPermission.Standard) {
                             val contact = if (chat.isGroup) {
                                 null
                             } else {
                                 getContact(chat.peerHandle)
                             }
+                            val isEmptyNoteToSelf = if (chat.isNoteToSelf) {
+                                isAnEmptyChatUseCase(chat.chatId)
+                            } else {
+                                false
+                            }
+
                             add(
                                 ChatExplorerListItem(
                                     contactItem = contact,
@@ -160,13 +196,16 @@ class ChatExplorerViewModel @Inject constructor(
                                     title = chat.title,
                                     id = chat.chatId.toString(),
                                     isRecent = index < RECENT_CHATS_MAX_SIZE,
+                                    isNoteToSelf = chat.isNoteToSelf,
                                     isSelected = _uiState.value.selectedItems.any {
                                         chat.chatId.toString() == it.id
-                                    }
+                                    },
+                                    isEmptyNoteToSelf = isEmptyNoteToSelf
                                 )
                             )
                         }
                     }
+
             }.onFailure { Timber.e(it, "Failed to retrieve active chat list items") }
     }
 

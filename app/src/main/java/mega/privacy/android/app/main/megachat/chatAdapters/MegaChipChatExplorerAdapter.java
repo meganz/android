@@ -72,6 +72,8 @@ public class MegaChipChatExplorerAdapter extends RecyclerView.Adapter<MegaChipCh
 
         EmojiTextView textViewName;
         ImageView deleteIcon;
+        ImageView noteToSelfDeleteIconChip;
+        ImageView noteToSelfAvatar;
         RoundedImageView avatar;
         ConstraintLayout itemLayout;
 
@@ -104,8 +106,12 @@ public class MegaChipChatExplorerAdapter extends RecyclerView.Adapter<MegaChipCh
         holder.textViewName = v.findViewById(R.id.name_chip);
         holder.textViewName.setMaxWidthEmojis(dp2px(MAX_WIDTH_ADD_CONTACTS, outMetrics));
         holder.avatar = v.findViewById(R.id.rounded_avatar);
+        holder.noteToSelfAvatar = v.findViewById(R.id.note_to_self_avatar);
+        holder.noteToSelfDeleteIconChip = v.findViewById(R.id.note_to_self_delete_icon_chip);
         holder.deleteIcon = v.findViewById(R.id.delete_icon_chip);
+        holder.noteToSelfDeleteIconChip.setOnClickListener(this);
         holder.deleteIcon.setOnClickListener(this);
+        holder.noteToSelfDeleteIconChip.setTag(holder);
         holder.deleteIcon.setTag(holder);
         v.setTag(holder);
 
@@ -115,11 +121,18 @@ public class MegaChipChatExplorerAdapter extends RecyclerView.Adapter<MegaChipCh
     @Override
     public void onBindViewHolder(MegaChipChatExplorerAdapter.ViewHolderChips holder, int position) {
         Timber.d("onBindViewHolderList");
+        holder.deleteIcon.setVisibility(View.GONE);
+        holder.noteToSelfDeleteIconChip.setVisibility(View.GONE);
 
         ChatExplorerListItem item = getItem(position);
-        if (item.getChat() != null && item.getChat().isGroup()) {
+        if (item.isNoteToSelf()) {
+            holder.noteToSelfDeleteIconChip.setVisibility(View.VISIBLE);
+            holder.textViewName.setText(mega.privacy.android.shared.resources.R.string.chat_note_to_self_chat_title);
+        } else if (item.getChat() != null && item.getChat().isGroup()) {
+            holder.deleteIcon.setVisibility(View.VISIBLE);
             holder.textViewName.setText(item.getTitle());
         } else {
+            holder.deleteIcon.setVisibility(View.VISIBLE);
             String name;
             if (item.getContactItem() != null && item.getContactItem().getContact() != null) {
                 String fullName = item.getContactItem().getContact().getFullName();
@@ -178,7 +191,7 @@ public class MegaChipChatExplorerAdapter extends RecyclerView.Adapter<MegaChipCh
                 Timber.w("Current position error - not valid value");
                 return;
             }
-            if (view.getId() == R.id.delete_icon_chip) {
+            if (view.getId() == R.id.delete_icon_chip || view.getId() == R.id.note_to_self_delete_icon_chip) {
                 ((ChatExplorerFragment) fragment).deleteItemPosition(currentPosition);
             }
         } else {
@@ -209,10 +222,21 @@ public class MegaChipChatExplorerAdapter extends RecyclerView.Adapter<MegaChipCh
 
     public void setUserAvatar(ViewHolderChips holder, ChatExplorerListItem item) {
         Timber.d("setUserAvatar");
+        holder.noteToSelfAvatar.setVisibility(View.GONE);
+        holder.avatar.setVisibility(View.GONE);
 
-        if (item.getChat() != null && item.getChat().isGroup()) {
+        if(item.isNoteToSelf()) {
+            if (item.isEmptyNoteToSelf()) {
+                holder.noteToSelfAvatar.setVisibility(View.VISIBLE);
+            } else {
+                holder.avatar.setVisibility(View.VISIBLE);
+                holder.avatar.setImageResource(R.drawable.note_avatar);
+            }
+        }else if (item.getChat() != null && item.getChat().isGroup()) {
+            holder.avatar.setVisibility(View.VISIBLE);
             holder.avatar.setImageBitmap(getDefaultAvatar(getSpecificAvatarColor(AVATAR_GROUP_CHAT_COLOR), item.getTitle(), AVATAR_SIZE, true));
         } else {
+            holder.avatar.setVisibility(View.VISIBLE);
             User user = null;
             if (item.getContactItem() != null && item.getContactItem().getUser() != null) {
                 user = item.getContactItem().getUser();
@@ -286,5 +310,4 @@ public class MegaChipChatExplorerAdapter extends RecyclerView.Adapter<MegaChipCh
             }
         }
     }
-
 }

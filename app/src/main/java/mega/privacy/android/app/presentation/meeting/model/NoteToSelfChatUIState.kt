@@ -13,7 +13,7 @@ import mega.privacy.android.domain.entity.chat.ChatRoom
 data class NoteToSelfChatUIState(
     val isNoteToYourselfFeatureFlagEnabled: Boolean = false,
     val noteToSelfChatRoom: ChatRoom? = null,
-    val isNoteToSelfChatEmpty: Boolean = true,
+    val isNoteToSelfChatEmpty: Boolean = false,
     val newFeatureLabelCounter: Int = -1,
 ) {
     /**

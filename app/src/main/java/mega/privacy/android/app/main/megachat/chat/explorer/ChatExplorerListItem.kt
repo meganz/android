@@ -12,6 +12,8 @@ import mega.privacy.android.domain.entity.chat.ChatListItem
  * @property isRecent True if the item is a recent contact, false otherwise
  * @property isHeader True is the item is a header item in the list, false otherwise
  * @property isSelected True if the item is selected, false otherwise
+ * @property isNoteToSelf   True if the item is a note to self chat, false otherwise
+ * @property isEmptyNoteToSelf  True if the item is an empty note to self chat, false otherwise
  */
 data class ChatExplorerListItem @JvmOverloads constructor(
     val contactItem: ContactItemUiState? = null,
@@ -21,6 +23,8 @@ data class ChatExplorerListItem @JvmOverloads constructor(
     val isRecent: Boolean = false,
     val isHeader: Boolean = false,
     val isSelected: Boolean = false,
+    val isNoteToSelf: Boolean = false,
+    val isEmptyNoteToSelf: Boolean = false
 ) {
 
     override fun equals(other: Any?): Boolean {
@@ -35,6 +39,7 @@ data class ChatExplorerListItem @JvmOverloads constructor(
         if (id != other.id) return false
         if (isRecent != other.isRecent) return false
         if (isHeader != other.isHeader) return false
+        if (isNoteToSelf != other.isNoteToSelf) return false
 
         return true
     }
@@ -46,6 +51,7 @@ data class ChatExplorerListItem @JvmOverloads constructor(
         result = 31 * result + (id?.hashCode() ?: 0)
         result = 31 * result + isRecent.hashCode()
         result = 31 * result + isHeader.hashCode()
+        result = 31 * result + isNoteToSelf.hashCode()
         return result
     }
 }

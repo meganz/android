@@ -20,11 +20,14 @@ import mega.privacy.android.domain.entity.user.UserId
 import mega.privacy.android.domain.entity.user.UserVisibility
 import mega.privacy.android.domain.usecase.chat.GetActiveChatListItemsUseCase
 import mega.privacy.android.domain.usecase.chat.GetArchivedChatListItemsUseCase
+import mega.privacy.android.domain.usecase.chat.GetNoteToSelfChatUseCase
+import mega.privacy.android.domain.usecase.chat.IsAnEmptyChatUseCase
 import mega.privacy.android.domain.usecase.chat.explorer.GetVisibleContactsWithoutChatRoomUseCase
 import mega.privacy.android.domain.usecase.contact.GetUserOnlineStatusByHandleUseCase
 import mega.privacy.android.domain.usecase.contact.GetUserUseCase
 import mega.privacy.android.domain.usecase.contact.MonitorContactByHandleUseCase
 import mega.privacy.android.domain.usecase.contact.RequestUserLastGreenUseCase
+import mega.privacy.android.domain.usecase.featureflag.GetFeatureFlagValueUseCase
 import org.junit.After
 import org.junit.Before
 import org.junit.Test
@@ -48,11 +51,16 @@ class ChatExplorerViewModelTest {
     private val getActiveChatListItemsUseCase: GetActiveChatListItemsUseCase = mock()
     private val getArchivedChatListItemsUseCase: GetArchivedChatListItemsUseCase = mock()
     private val getUserUseCase: GetUserUseCase = mock()
+    private val isAnEmptyChatUseCase: IsAnEmptyChatUseCase = mock()
+    private val getFeatureFlagValueUseCase: GetFeatureFlagValueUseCase = mock()
+    private val getNoteToSelfChatUseCase: GetNoteToSelfChatUseCase = mock()
+
     private val monitorContactByHandleUseCase: MonitorContactByHandleUseCase = mock()
     private val getUserOnlineStatusByHandleUseCase: GetUserOnlineStatusByHandleUseCase = mock()
     private val requestUserLastGreenUseCase: RequestUserLastGreenUseCase = mock()
     private val getVisibleContactsWithoutChatRoomUseCase: GetVisibleContactsWithoutChatRoomUseCase =
         mock()
+
     private lateinit var userContactMapper: UserContactMapper
 
     @Before
@@ -68,6 +76,9 @@ class ChatExplorerViewModelTest {
             requestUserLastGreenUseCase = requestUserLastGreenUseCase,
             getVisibleContactsWithoutChatRoomUseCase = getVisibleContactsWithoutChatRoomUseCase,
             userContactMapper = userContactMapper,
+            isAnEmptyChatUseCase = isAnEmptyChatUseCase,
+            getFeatureFlagValueUseCase = getFeatureFlagValueUseCase,
+            getNoteToSelfChatUseCase = getNoteToSelfChatUseCase,
             defaultDispatcher = extension.testDispatcher
         )
     }
@@ -89,6 +100,9 @@ class ChatExplorerViewModelTest {
             getUserOnlineStatusByHandleUseCase,
             requestUserLastGreenUseCase,
             getVisibleContactsWithoutChatRoomUseCase,
+            isAnEmptyChatUseCase,
+            getFeatureFlagValueUseCase,
+            getNoteToSelfChatUseCase
         )
     }
 

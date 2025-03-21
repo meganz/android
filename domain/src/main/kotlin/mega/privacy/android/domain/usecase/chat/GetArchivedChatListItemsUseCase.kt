@@ -17,5 +17,6 @@ class GetArchivedChatListItemsUseCase @Inject constructor(
      *
      * @return List of archived chat items
      */
-    suspend operator fun invoke() = chatRepository.getArchivedChatListItems()
+    suspend operator fun invoke() =
+        chatRepository.getArchivedChatListItems().sortedByDescending { it.isNoteToSelf }
 }

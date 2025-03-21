@@ -33,6 +33,7 @@ internal class ChatListItemMapper @Inject constructor(
         megaChatListItem.peerHandle,
         megaChatListItem.lastMessagePriv,
         megaChatListItem.lastMessageHandle,
-        megaChatListItem.numPreviewers
+        megaChatListItem.numPreviewers,
+        megaChatListItem.isNoteToSelf
     )
 }

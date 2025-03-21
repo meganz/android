@@ -1018,4 +1018,6 @@
     <string name="general_sync_notification_stalled_issues_text">View and resolve issues</string>
     <!-- The name of the Device or Folder Status which signifies that an error has occurred -->
     <string name="device_center_list_view_item_status_error">Error</string>
+    <!-- Hint shown in the field to write a message in the note to self chat screen -->
+    <string name="chat_note_to_self_chat_message_hint">Write a message to yourself</string>
 </resources>

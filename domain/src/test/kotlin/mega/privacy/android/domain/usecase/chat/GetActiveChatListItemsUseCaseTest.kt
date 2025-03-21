@@ -23,7 +23,7 @@ class GetActiveChatListItemsUseCaseTest {
     @BeforeEach
     fun setUp() {
         underTest = GetActiveChatListItemsUseCase(
-            chatRepository = chatRepository
+            chatRepository = chatRepository,
         )
     }
 
@@ -33,12 +33,17 @@ class GetActiveChatListItemsUseCaseTest {
     }
 
     @Test
-    fun `test that the correct list of active chat items is returned`() = runTest {
-        val chatItems = listOf(ChatListItem(chatId = 123L))
+    fun `test that the correct list of active chat items is returned and sorted`() = runTest {
+        val chatItems = listOf(
+            ChatListItem(chatId = 123L, isNoteToSelf = false),
+            ChatListItem(chatId = 456L, isNoteToSelf = true),
+            ChatListItem(chatId = 789L, isNoteToSelf = false)
+        )
+        val sortedList = chatItems.sortedByDescending { it.isNoteToSelf }
         whenever(chatRepository.getActiveChatListItems()) doReturn chatItems
 
         val actual = underTest()
 
-        Truth.assertThat(actual).isEqualTo(chatItems)
+        Truth.assertThat(actual).isEqualTo(sortedList)
     }
 }

@@ -27,6 +27,7 @@ import mega.privacy.android.domain.entity.ChatRoomPermission
  * @property lastMessagePriv        Last message.
  * @property lastMessageHandle      Last message user handle.
  * @property numPreviewers          Num of previewers.
+ * @property isNoteToSelf           If chat room is a note to self chat room.
  */
 data class ChatListItem(
     val chatId: Long,
@@ -50,4 +51,5 @@ data class ChatListItem(
     val lastMessagePriv: Int = 0,
     val lastMessageHandle: Long = -1,
     val numPreviewers: Long = -1,
+    val isNoteToSelf: Boolean = false,
 )

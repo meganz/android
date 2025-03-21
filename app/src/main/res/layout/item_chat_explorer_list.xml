@@ -1,5 +1,6 @@
 <RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:rounded="http://schemas.android.com/apk/res-auto"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:id="@+id/chat_explorer_list_item_layout"
     android:layout_width="match_parent"
@@ -25,13 +26,13 @@
         android:id="@+id/item_container"
         android:layout_width="match_parent"
         android:layout_height="72dp"
-        android:paddingRight="12dp">
+        android:paddingEnd="12dp">
 
         <RelativeLayout
             android:id="@+id/chat_explorer_list_relative_layout_avatar"
             android:layout_width="40dp"
             android:layout_height="40dp"
-            android:layout_marginLeft="16dp"
+            android:layout_marginStart="16dp"
             android:layout_centerVertical="true">
 
             <mega.privacy.android.app.components.RoundedImageView
@@ -40,21 +41,32 @@
                 android:layout_height="match_parent"
                 android:layout_centerInParent="true"
                 android:scaleType="fitCenter"
+                android:visibility="visible"
                 rounded:corner_radius="30dp" />
+
+            <ImageView
+                android:id="@+id/note_to_self_avatar"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_centerInParent="true"
+                android:contentDescription="@null"
+                android:src="@drawable/file_icon"
+                android:visibility="gone"
+                app:tint="?attr/colorSecondary" />
 
         </RelativeLayout>
 
         <RelativeLayout
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_toRightOf="@id/chat_explorer_list_relative_layout_avatar"
+            android:layout_toEndOf="@id/chat_explorer_list_relative_layout_avatar"
             android:layout_centerVertical="true">
 
             <LinearLayout
                 android:id="@+id/chat_explorer_list_title_layout"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:layout_marginLeft="16dp">
+                android:layout_marginStart="16dp">
 
                 <mega.privacy.android.app.components.twemoji.EmojiTextView
                     android:id="@+id/chat_explorer_list_title"
@@ -62,14 +74,14 @@
                     android:layout_height="wrap_content"
                     rounded:emojiSize="14sp"
                     android:singleLine="true"
-                    android:textAppearance="?attr/textAppearanceSubtitle1" />
+                    android:textAppearance="?attr/textAppearanceSubtitle1"/>
 
                 <ImageView
                     android:id="@+id/chat_explorer_list_contact_state"
                     android:layout_width="12dp"
                     android:layout_height="12dp"
                     android:layout_marginTop="5dp"
-                    android:layout_marginLeft="6dp"
+                    android:layout_marginStart="6dp"
                     android:background="@null"
                     tools:src="@drawable/ic_offline_light" />
             </LinearLayout>
@@ -79,7 +91,7 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_below="@id/chat_explorer_list_title_layout"
-                android:layout_marginLeft="16dp"
+                android:layout_marginStart="16dp"
                 android:layout_marginTop="2dp"
                 android:ellipsize="end"
                 android:singleLine="true"
@@ -90,7 +102,7 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_below="@id/chat_explorer_list_title_layout"
-                android:layout_marginLeft="16dp"
+                android:layout_marginStart="16dp"
                 android:layout_marginTop="2dp"
                 android:singleLine="true"
                 android:textAppearance="@style/TextAppearance.Mega.Subtitle2.Secondary" />

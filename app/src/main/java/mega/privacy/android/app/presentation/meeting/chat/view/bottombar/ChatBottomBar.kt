@@ -6,6 +6,7 @@ import androidx.compose.foundation.interaction.collectIsPressedAsState
 import androidx.compose.foundation.isSystemInDarkTheme
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.padding
+import mega.privacy.android.shared.resources.R as sharedR
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
@@ -159,7 +160,7 @@ fun ChatBottomBarContent(
         ChatInputTextToolbar(
             onAttachmentClick = onAttachmentClick,
             text = uiState.sendingText,
-            placeholder = stringResource(
+            placeholder = if (uiState.isNoteToSelf) stringResource(sharedR.string.chat_note_to_self_chat_message_hint) else stringResource(
                 R.string.type_message_hint_with_customized_title,
                 uiState.title.orEmpty()
             ),

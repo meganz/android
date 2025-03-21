@@ -28,7 +28,6 @@ import android.view.animation.AnimationUtils;
 import android.widget.ImageView;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
-
 import androidx.recyclerview.widget.RecyclerView;
 
 import java.io.File;
@@ -46,6 +45,7 @@ import mega.privacy.android.app.main.megachat.chat.explorer.ChatExplorerFragment
 import mega.privacy.android.app.main.megachat.chat.explorer.ChatExplorerListItem;
 import mega.privacy.android.app.main.megachat.chat.explorer.ContactItemUiState;
 import mega.privacy.android.domain.entity.chat.ChatListItem;
+import mega.privacy.android.domain.entity.chat.CombinedChatRoom;
 import nz.mega.sdk.MegaApiAndroid;
 import nz.mega.sdk.MegaChatApiAndroid;
 import nz.mega.sdk.MegaChatRoom;
@@ -101,6 +101,7 @@ public class MegaListChatExplorerAdapter extends RecyclerView.Adapter<MegaListCh
         RelativeLayout itemLayout;
         RelativeLayout itemContainer;
         RoundedImageView avatarImage;
+        ImageView noteToSelfAvatar;
         EmojiTextView titleText;
         ImageView stateIcon;
         MarqueeTextView lastSeenStateText;
@@ -134,6 +135,7 @@ public class MegaListChatExplorerAdapter extends RecyclerView.Adapter<MegaListCh
         holder.itemContainer = v.findViewById(R.id.item_container);
         holder.itemLayout = v.findViewById(R.id.chat_explorer_list_item_layout);
         holder.avatarImage = v.findViewById(R.id.chat_explorer_list_avatar);
+        holder.noteToSelfAvatar = v.findViewById(R.id.note_to_self_avatar);
         holder.titleText = v.findViewById(R.id.chat_explorer_list_title);
         holder.stateIcon = v.findViewById(R.id.chat_explorer_list_contact_state);
         holder.lastSeenStateText = v.findViewById(R.id.chat_explorer_list_last_seen_state);
@@ -168,9 +170,32 @@ public class MegaListChatExplorerAdapter extends RecyclerView.Adapter<MegaListCh
 
         holder.headerLayout.setVisibility(View.GONE);
         holder.itemContainer.setVisibility(View.VISIBLE);
-        holder.titleText.setText(item.getTitle());
 
-        if (chat != null && chat.isGroup()) {
+        holder.avatarImage.setVisibility(View.GONE);
+        holder.noteToSelfAvatar.setVisibility(View.GONE);
+
+        if (item.isNoteToSelf()) {
+            holder.titleText.setText(mega.privacy.android.shared.resources.R.string.chat_note_to_self_chat_title);
+            holder.titleText.setTextAppearance(context, R.style.TextAppearance_Mega_Subtitle1_Medium);
+
+            if ((isItemChecked(position) && !isSearchEnabled()) || (isSearchEnabled() && isSearchItemChecked(position))) {
+                holder.avatarImage.setVisibility(View.VISIBLE);
+                holder.avatarImage.setImageResource(R.drawable.ic_chat_avatar_select);
+            } else if (item.isEmptyNoteToSelf()) {
+                holder.noteToSelfAvatar.setVisibility(View.VISIBLE);
+            } else {
+                holder.avatarImage.setVisibility(View.VISIBLE);
+                holder.avatarImage.setImageResource(R.drawable.note_avatar);
+            }
+
+            holder.stateIcon.setVisibility(View.GONE);
+            holder.lastSeenStateText.setVisibility(View.GONE);
+            holder.participantsText.setVisibility(View.GONE);
+
+        } else if (chat != null && chat.isGroup()) {
+            holder.titleText.setText(item.getTitle());
+            holder.titleText.setTextAppearance(context, R.style.textAppearanceSubtitle1);
+            holder.avatarImage.setVisibility(View.VISIBLE);
 
             if ((isItemChecked(position) && !isSearchEnabled()) || (isSearchEnabled() && isSearchItemChecked(position))) {
                 holder.avatarImage.setImageResource(R.drawable.ic_chat_avatar_select);
@@ -184,9 +209,11 @@ public class MegaListChatExplorerAdapter extends RecyclerView.Adapter<MegaListCh
             long peerCount = chatRoom.getPeerCount() + 1;
             holder.participantsText.setText(context.getResources().getQuantityString(R.plurals.subtitle_of_group_chat, (int) peerCount, peerCount));
         } else {
-
+            holder.titleText.setText(item.getTitle());
+            holder.titleText.setTextAppearance(context, R.style.textAppearanceSubtitle1);
             holder.participantsText.setVisibility(View.GONE);
             ContactItemUiState contact = item.getContactItem();
+            holder.avatarImage.setVisibility(View.VISIBLE);
 
             long handle = -1;
 

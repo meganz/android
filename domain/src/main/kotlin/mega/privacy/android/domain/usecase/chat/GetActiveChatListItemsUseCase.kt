@@ -17,5 +17,6 @@ class GetActiveChatListItemsUseCase @Inject constructor(
      *
      * @return List of active chat items.
      */
-    suspend operator fun invoke() = chatRepository.getActiveChatListItems()
+    suspend operator fun invoke() =
+        chatRepository.getActiveChatListItems().sortedByDescending { it.isNoteToSelf }
 }
