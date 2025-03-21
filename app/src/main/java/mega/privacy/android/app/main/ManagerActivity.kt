@@ -3788,6 +3788,9 @@ class ManagerActivity : PasscodeActivity(), NavigationView.OnNavigationItemSelec
         transfersManagementViewModel.setInTransfersSection(drawerItem == DrawerItem.TRANSFERS)
         when (item) {
             DrawerItem.CLOUD_DRIVE -> {
+                if (deviceCenterFragment?.isVisible == true) {
+                    removeFragment(deviceCenterFragment)
+                }
                 // Synchronize the setting of different operations
                 lifecycleScope.launch {
                     if (cloudDriveNodeHandle != INVALID_HANDLE) {
