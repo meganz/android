@@ -16,6 +16,7 @@ import kotlinx.coroutines.launch
 import kotlinx.coroutines.suspendCancellableCoroutine
 import kotlinx.coroutines.withContext
 import mega.privacy.android.data.extensions.failWithError
+import mega.privacy.android.data.extensions.failWithException
 import mega.privacy.android.data.extensions.getChatRequestListener
 import mega.privacy.android.data.extensions.getRequestListener
 import mega.privacy.android.data.extensions.toException
@@ -43,6 +44,7 @@ import mega.privacy.android.domain.exception.LoginTooManyAttempts
 import mega.privacy.android.domain.exception.LoginUnknownStatus
 import mega.privacy.android.domain.exception.LoginWrongEmailOrPassword
 import mega.privacy.android.domain.exception.LoginWrongMultiFactorAuth
+import mega.privacy.android.domain.exception.account.AccountExistedException
 import mega.privacy.android.domain.exception.login.FetchNodesBlockedAccount
 import mega.privacy.android.domain.exception.login.FetchNodesErrorAccess
 import mega.privacy.android.domain.exception.login.FetchNodesUnknownStatus
@@ -504,9 +506,21 @@ internal class DefaultLoginRepository @Inject constructor(
     override suspend fun resendSignupLink(email: String, fullName: String?): String =
         withContext(ioDispatcher) {
             suspendCancellableCoroutine { continuation ->
-                val listener = continuation.getRequestListener("resendSignupLink") {
-                    it.email
-                }
+                val listener = OptionalMegaRequestListenerInterface(
+                    onRequestFinish = { request, error ->
+                        when (error.errorCode) {
+                            MegaError.API_OK -> continuation.resumeWith(Result.success(request.email))
+                            MegaError.API_EEXIST -> continuation.failWithException(
+                                AccountExistedException(
+                                    errorCode = error.errorCode,
+                                    errorString = error.errorString
+                                )
+                            )
+
+                            else -> continuation.failWithError(error, "resendSignupLink")
+                        }
+                    }
+                )
                 megaApiGateway.resendSignupLink(email, fullName, listener)
             }
         }
