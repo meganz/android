@@ -22,6 +22,7 @@ internal class FolderPairMapper @Inject constructor(
         model: MegaSync,
         megaFolderName: String,
         syncStats: MegaSyncStats?,
+        isStorageOverQuota: Boolean,
     ): FolderPair =
         FolderPair(
             id = model.backupId,
@@ -29,7 +30,11 @@ internal class FolderPairMapper @Inject constructor(
             pairName = model.name,
             localFolderPath = model.localFolder,
             remoteFolder = RemoteFolder(NodeId(model.megaHandle), megaFolderName),
-            syncStatus = mapSyncStatus(syncStats, model.runState),
+            syncStatus = mapSyncStatus(
+                syncStats = syncStats,
+                runningState = model.runState,
+                isStorageOverQuota = isStorageOverQuota,
+            ),
             syncError = syncErrorMapper(model.error)
         )
 }

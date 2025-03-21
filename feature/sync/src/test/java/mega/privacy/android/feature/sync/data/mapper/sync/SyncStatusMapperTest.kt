@@ -30,16 +30,37 @@ class SyncStatusMapperTest {
     fun `test that the sync status is paused if the run state is paused`() {
         val runState = MegaSync.SyncRunningState.RUNSTATE_SUSPENDED.swigValue()
 
-        val syncStatus = underTest(syncStats = megaSyncStats, runningState = runState)
+        val syncStatus = underTest(
+            syncStats = megaSyncStats,
+            runningState = runState,
+            isStorageOverQuota = false,
+        )
 
         assertThat(syncStatus).isEqualTo(SyncStatus.PAUSED)
+    }
+
+    @Test
+    fun `test that the sync status is error if the run state is paused and storage is over quota`() {
+        val runState = MegaSync.SyncRunningState.RUNSTATE_SUSPENDED.swigValue()
+
+        val syncStatus = underTest(
+            syncStats = megaSyncStats,
+            runningState = runState,
+            isStorageOverQuota = true,
+        )
+
+        assertThat(syncStatus).isEqualTo(SyncStatus.ERROR)
     }
 
     @Test
     fun `test that the sync status is synced if sync stats are null and run state is running`() {
         val runState = MegaSync.SyncRunningState.RUNSTATE_RUNNING.swigValue()
 
-        val syncStatus = underTest(syncStats = megaSyncStats, runningState = runState)
+        val syncStatus = underTest(
+            syncStats = megaSyncStats,
+            runningState = runState,
+            isStorageOverQuota = false,
+        )
 
         assertThat(syncStatus).isEqualTo(SyncStatus.SYNCED)
     }
@@ -50,7 +71,11 @@ class SyncStatusMapperTest {
         whenever(megaSyncStats.isSyncing).thenReturn(true)
         whenever(megaSyncStats.isScanning).thenReturn(false)
 
-        val syncStatus = underTest(syncStats = megaSyncStats, runningState = runState)
+        val syncStatus = underTest(
+            syncStats = megaSyncStats,
+            runningState = runState,
+            isStorageOverQuota = false,
+        )
 
         assertThat(syncStatus).isEqualTo(SyncStatus.SYNCING)
     }
@@ -61,7 +86,11 @@ class SyncStatusMapperTest {
         whenever(megaSyncStats.isSyncing).thenReturn(false)
         whenever(megaSyncStats.isScanning).thenReturn(true)
 
-        val syncStatus = underTest(syncStats = megaSyncStats, runningState = runState)
+        val syncStatus = underTest(
+            syncStats = megaSyncStats,
+            runningState = runState,
+            isStorageOverQuota = false,
+        )
 
         assertThat(syncStatus).isEqualTo(SyncStatus.SYNCING)
     }

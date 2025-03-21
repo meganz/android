@@ -17,6 +17,7 @@ import mega.privacy.android.domain.entity.sync.SyncError
 import mega.privacy.android.domain.entity.sync.SyncType
 import mega.privacy.android.domain.exception.MegaException
 import mega.privacy.android.domain.exception.MegaSyncException
+import mega.privacy.android.domain.repository.AccountRepository
 import mega.privacy.android.feature.sync.data.gateway.SyncGateway
 import mega.privacy.android.feature.sync.data.gateway.SyncStatsCacheGateway
 import mega.privacy.android.feature.sync.data.gateway.SyncWorkManagerGateway
@@ -66,6 +67,7 @@ class SyncRepositoryImplTest {
     private val unconfinedTestDispatcher = UnconfinedTestDispatcher(scheduler)
     private val testScope = CoroutineScope(unconfinedTestDispatcher)
     private val syncByWifiToNetworkTypeMapper: SyncByWifiToNetworkTypeMapper = mock()
+    private val accountRepository: AccountRepository = mock()
 
 
     @BeforeAll
@@ -83,6 +85,7 @@ class SyncRepositoryImplTest {
             syncTypeMapper = syncTypeMapper,
             syncWorkManagerGateway = syncWorkManagerGateway,
             syncByWifiToNetworkTypeMapper = syncByWifiToNetworkTypeMapper,
+            accountRepository = accountRepository,
             appScope = testScope,
         )
     }
@@ -93,6 +96,7 @@ class SyncRepositoryImplTest {
             megaApiGateway,
             syncGateway,
             syncStatsCacheGateway,
+            accountRepository,
         )
     }
 

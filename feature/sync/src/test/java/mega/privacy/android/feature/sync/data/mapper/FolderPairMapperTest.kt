@@ -47,7 +47,7 @@ internal class FolderPairMapperTest {
         val syncStats: MegaSyncStats = mock()
 
         whenever(syncTypeMapper(MegaSync.SyncType.swigToEnum(model.type))).thenReturn(SyncType.TYPE_TWOWAY)
-        whenever(syncStatusMapper(syncStats, model.runState)).thenReturn(SyncStatus.SYNCED)
+        whenever(syncStatusMapper(syncStats, model.runState, false)).thenReturn(SyncStatus.SYNCED)
 
         val expected = FolderPair(
             id = syncId,
@@ -62,6 +62,7 @@ internal class FolderPairMapperTest {
             model = model,
             megaFolderName = syncRemoteFolder,
             syncStats = syncStats,
+            isStorageOverQuota = false,
         )
 
         Truth.assertThat(actual).isEqualTo(expected)

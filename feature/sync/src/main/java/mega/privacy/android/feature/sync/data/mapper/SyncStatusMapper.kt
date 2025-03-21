@@ -20,8 +20,12 @@ internal class SyncStatusMapper @Inject constructor() {
     operator fun invoke(
         syncStats: MegaSyncStats?,
         runningState: Int,
+        isStorageOverQuota: Boolean,
     ): SyncStatus = when {
-        runningState == SyncRunningState.RUNSTATE_SUSPENDED.swigValue() -> SyncStatus.PAUSED
+        runningState == SyncRunningState.RUNSTATE_SUSPENDED.swigValue() -> {
+            if (isStorageOverQuota) SyncStatus.ERROR else SyncStatus.PAUSED
+        }
+
         syncStats == null -> SyncStatus.SYNCED
         syncStats.isScanning || syncStats.isSyncing -> SyncStatus.SYNCING
         else -> SyncStatus.SYNCED
