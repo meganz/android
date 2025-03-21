@@ -88,7 +88,9 @@ import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.collectLatest
 import kotlinx.coroutines.flow.distinctUntilChanged
 import kotlinx.coroutines.launch
+import me.saket.telephoto.flick.FlickToDismiss
 import me.saket.telephoto.flick.FlickToDismissState
+import me.saket.telephoto.flick.rememberFlickToDismissState
 import me.saket.telephoto.zoomable.DoubleClickToZoomListener
 import me.saket.telephoto.zoomable.ZoomSpec
 import me.saket.telephoto.zoomable.ZoomableImageState
@@ -724,14 +726,14 @@ private fun ImagePreviewContent(
     modifier: Modifier = Modifier,
     imageState: ZoomableImageState? = null,
 ) {
-    // Temporarily disable flick to dismiss for AND-20421
-    //    val flickState = rememberFlickToDismissState(dismissThresholdRatio = 0.25f)
-    //    HandleFlickStateEffect(
-    //        flickState = flickState,
-    //        onSwitchFullScreenMode = onSwitchFullScreenMode,
-    //        onFlick = onFlick
-    //    )
-    Box(
+    val flickState = rememberFlickToDismissState(dismissThresholdRatio = 0.25f)
+    HandleFlickStateEffect(
+        flickState = flickState,
+        onSwitchFullScreenMode = onSwitchFullScreenMode,
+        onFlick = onFlick
+    )
+    FlickToDismiss(
+        state = flickState,
         modifier = modifier
             .fillMaxSize(),
     ) {
