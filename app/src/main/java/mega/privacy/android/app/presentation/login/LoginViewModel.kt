@@ -13,7 +13,7 @@ import kotlinx.coroutines.flow.catch
 import kotlinx.coroutines.flow.collectLatest
 import kotlinx.coroutines.flow.filter
 import kotlinx.coroutines.flow.firstOrNull
-import kotlinx.coroutines.flow.flowOf
+import kotlinx.coroutines.flow.flow
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.merge
 import kotlinx.coroutines.flow.update
@@ -215,7 +215,7 @@ class LoginViewModel @Inject constructor(
     private fun setupInitialState() {
         viewModelScope.launch {
             merge(
-                flowOf(getSessionUseCase()).map { session ->
+                flow { emit(getSessionUseCase()) }.map { session ->
                     { state: LoginState ->
                         state.copy(
                             intentState = LoginIntentState.ReadyForInitialSetup,
@@ -229,20 +229,20 @@ class LoginViewModel @Inject constructor(
                             isLoginRequired = session == null,
                         )
                     }
-                },
-                flowOf(rootNodeExistsUseCase()).map { exists ->
+                }.catch { Timber.e(it) },
+                flow { emit(rootNodeExistsUseCase()) }.map { exists ->
                     { state: LoginState -> state.copy(rootNodesExists = exists) }
-                },
-                flowOf(hasPreferencesUseCase()).map { hasPreferences ->
+                }.catch { Timber.e(it) },
+                flow { emit(hasPreferencesUseCase()) }.map { hasPreferences ->
                     { state: LoginState -> state.copy(hasPreferences = hasPreferences) }
-                },
-                flowOf(hasCameraSyncEnabledUseCase()).map { hasCameraSyncEnabled ->
+                }.catch { Timber.e(it) },
+                flow { emit(hasCameraSyncEnabledUseCase()) }.map { hasCameraSyncEnabled ->
                     { state: LoginState -> state.copy(hasCUSetting = hasCameraSyncEnabled) }
-                },
-                flowOf(isCameraUploadsEnabledUseCase()).map { isCameraSyncEnabled ->
+                }.catch { Timber.e(it) },
+                flow { emit(isCameraUploadsEnabledUseCase()) }.map { isCameraSyncEnabled ->
                     { state: LoginState -> state.copy(isCUSettingEnabled = isCameraSyncEnabled) }
-                },
-                monitorFetchNodesFinishUseCase().map {
+                }.catch { Timber.e(it) },
+                monitorFetchNodesFinishUseCase().catch { Timber.e(it) }.map {
                     with(pendingAction) {
                         when (this) {
                             ACTION_FORCE_RELOAD_ACCOUNT -> {
@@ -259,26 +259,28 @@ class LoginViewModel @Inject constructor(
                         }
                     }
                 },
-                flowOf(getFeatureFlagValueUseCase(AppFeatures.LoginReportIssueButton)).map { enabled ->
+                flow { emit(getFeatureFlagValueUseCase(AppFeatures.LoginReportIssueButton))}.catch { Timber.e(it) }.map { enabled ->
                     { state: LoginState ->
                         state.copy(enabledFlags = if (enabled) state.enabledFlags + AppFeatures.LoginReportIssueButton else state.enabledFlags - AppFeatures.LoginReportIssueButton)
                     }
                 },
-                flowOf(isFirstLaunchUseCase()).map { isFirstLaunch ->
+                flow { emit(isFirstLaunchUseCase()) }.catch { Timber.e(it) }.map { isFirstLaunch ->
                     { state: LoginState ->
                         state.copy(isFirstTimeLaunch = isFirstLaunch)
                     }
                 },
-                getThemeMode().map { themeMode ->
+                getThemeMode().catch { Timber.e(it) }.map { themeMode ->
                     { state: LoginState ->
                         state.copy(themeMode = themeMode)
                     }
                 },
-                flowOf(getFeatureFlagValueUseCase(AppFeatures.LoginRevamp)).map { enabled ->
-                    { state: LoginState ->
-                        state.copy(isLoginNewDesignEnabled = enabled)
-                    }
-                },
+                flow { emit(getFeatureFlagValueUseCase(AppFeatures.LoginRevamp)) }
+                    .catch { Timber.e(it) }
+                    .map { enabled ->
+                        { state: LoginState ->
+                            state.copy(isLoginNewDesignEnabled = enabled)
+                        }
+                    },
             ).collect {
                 _state.update(it)
             }
