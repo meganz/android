@@ -128,7 +128,10 @@ properties([
                                                 } else if (status == "halted") {
                                                     rolloutInfo = "at halted status)"
                                                 } 
-                                                def versionName = release.getName().replaceFirst(/\\([^)]*\\)$/, " - Currently in $name $rolloutInfo")
+                                                // Remove hash from the version name if exists, e.g. 14.1(242330236)(a476f33326) to 14.1(242330236)
+                                                String versionName = release.getName().replaceFirst(/([^()]+\\([^)]*\\)).*/, { fullMatch, versionPart ->
+                                                    return "${versionPart} - Currently in ${name} ${rolloutInfo}"
+                                                })
                                                 versions.add(versionName)
                                             }
                                         }
