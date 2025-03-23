@@ -1581,6 +1581,7 @@ class NodeOptionsBottomSheetDialogFragment : BaseBottomSheetDialogFragment() {
 
     private fun onRestoreClicked(node: MegaNode) {
         (requireActivity() as ManagerActivity).restoreFromRubbish(listOf(node))
+        dismissAllowingStateLoss()
         setStateBottomSheetBehaviorHidden()
     }
 
