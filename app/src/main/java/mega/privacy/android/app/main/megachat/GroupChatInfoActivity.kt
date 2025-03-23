@@ -1,12 +1,13 @@
 package mega.privacy.android.app.main.megachat
 
-import mega.privacy.android.shared.resources.R as sharedR
 import android.Manifest
+import android.annotation.SuppressLint
 import android.content.BroadcastReceiver
 import android.content.Context
 import android.content.DialogInterface
 import android.content.Intent
 import android.content.IntentFilter
+import android.os.Build
 import android.os.Bundle
 import android.os.CountDownTimer
 import android.text.InputFilter
@@ -25,6 +26,7 @@ import android.widget.TextView
 import androidx.activity.enableEdgeToEdge
 import androidx.activity.viewModels
 import androidx.appcompat.app.AlertDialog
+import androidx.core.content.ContextCompat
 import androidx.lifecycle.lifecycleScope
 import androidx.recyclerview.widget.DefaultItemAnimator
 import androidx.recyclerview.widget.LinearLayoutManager
@@ -87,9 +89,11 @@ import mega.privacy.android.domain.entity.chat.ChatListItemChanges
 import mega.privacy.android.domain.entity.contacts.UserChatStatus
 import mega.privacy.android.domain.usecase.MonitorChatListItemUpdates
 import mega.privacy.android.domain.usecase.chat.MonitorChatConnectionStateUseCase
+import mega.privacy.android.domain.usecase.chat.participants.MonitorChatParticipantsUseCase
 import mega.privacy.android.domain.usecase.contact.MonitorChatOnlineStatusUseCase
 import mega.privacy.android.domain.usecase.contact.MonitorChatPresenceLastGreenUpdatesUseCase
 import mega.privacy.android.navigation.MegaNavigator
+import mega.privacy.android.shared.resources.R as sharedR
 import nz.mega.sdk.MegaApiAndroid
 import nz.mega.sdk.MegaApiJava
 import nz.mega.sdk.MegaChatApi
@@ -143,6 +147,9 @@ class GroupChatInfoActivity : PasscodeActivity(), MegaChatRequestListenerInterfa
     @Inject
     lateinit var navigator: MegaNavigator
 
+    @Inject
+    lateinit var monitorChatParticipantsUseCase: MonitorChatParticipantsUseCase
+
     lateinit var binding: ActivityGroupChatPropertiesBinding
     private val viewModel by viewModels<GroupChatInfoViewModel>()
 
@@ -180,8 +187,7 @@ class GroupChatInfoActivity : PasscodeActivity(), MegaChatRequestListenerInterfa
         override fun onReceive(context: Context, intent: Intent?) {
             intent?.let {
                 it.action?.let { action ->
-                    if (action == BroadcastConstants.ACTION_UPDATE_NICKNAME || action == BroadcastConstants.ACTION_UPDATE_FIRST_NAME ||
-                        action == BroadcastConstants.ACTION_UPDATE_LAST_NAME || action == BroadcastConstants.ACTION_UPDATE_CREDENTIALS
+                    if (action == BroadcastConstants.ACTION_UPDATE_CREDENTIALS
                     ) {
                         val userHandle = intent.getLongExtra(
                             BroadcastConstants.EXTRA_USER_HANDLE,
@@ -189,13 +195,6 @@ class GroupChatInfoActivity : PasscodeActivity(), MegaChatRequestListenerInterfa
                         )
                         if (userHandle != MegaApiJava.INVALID_HANDLE) {
                             updateAdapter(userHandle)
-                            if (action != BroadcastConstants.ACTION_UPDATE_CREDENTIALS
-                                && bottomSheetDialogFragment is ParticipantBottomSheetDialogFragment
-                                && bottomSheetDialogFragment.isBottomSheetDialogShown()
-                                && selectedHandleParticipant == userHandle
-                            ) {
-                                (bottomSheetDialogFragment as ParticipantBottomSheetDialogFragment).updateContactData()
-                            }
                         }
                     }
                 }
@@ -281,11 +280,9 @@ class GroupChatInfoActivity : PasscodeActivity(), MegaChatRequestListenerInterfa
 
             val contactUpdateFilter =
                 IntentFilter(BroadcastConstants.BROADCAST_ACTION_INTENT_FILTER_CONTACT_UPDATE)
-            contactUpdateFilter.addAction(BroadcastConstants.ACTION_UPDATE_NICKNAME)
-            contactUpdateFilter.addAction(BroadcastConstants.ACTION_UPDATE_FIRST_NAME)
-            contactUpdateFilter.addAction(BroadcastConstants.ACTION_UPDATE_LAST_NAME)
             contactUpdateFilter.addAction(BroadcastConstants.ACTION_UPDATE_CREDENTIALS)
-            registerReceiver(contactUpdateReceiver, contactUpdateFilter)
+            registerSdkAppropriateReceiver(contactUpdateReceiver, contactUpdateFilter)
+            monitorParticipants(chatHandle)
             setParticipants()
             updateAdapterHeader()
 
@@ -299,6 +296,41 @@ class GroupChatInfoActivity : PasscodeActivity(), MegaChatRequestListenerInterfa
                     showEndCallForAllDialog()
                 }
             }
+        }
+    }
+
+    @SuppressLint("UnspecifiedRegisterReceiverFlag")
+    private fun registerSdkAppropriateReceiver(
+        broadcastReceiver: BroadcastReceiver,
+        filter: IntentFilter,
+    ) {
+        try {
+            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
+                ContextCompat.registerReceiver(
+                    this, broadcastReceiver, filter, ContextCompat.RECEIVER_NOT_EXPORTED
+                )
+            } else {
+                super.registerReceiver(broadcastReceiver, filter)
+            }
+        } catch (e: IllegalStateException) {
+            Timber.e(e, "IllegalStateException registering receiver")
+        }
+    }
+
+    private fun monitorParticipants(chatId: Long) {
+        lifecycleScope.launch {
+            monitorChatParticipantsUseCase(chatId)
+                .collect {
+                    it.forEach { participant ->
+                        updateAdapter(participant.handle)
+                        if (bottomSheetDialogFragment is ParticipantBottomSheetDialogFragment
+                            && bottomSheetDialogFragment.isBottomSheetDialogShown()
+                            && selectedHandleParticipant == participant.handle
+                        ) {
+                            (bottomSheetDialogFragment as ParticipantBottomSheetDialogFragment).updateContactData()
+                        }
+                    }
+                }
         }
     }
 
@@ -642,7 +674,7 @@ class GroupChatInfoActivity : PasscodeActivity(), MegaChatRequestListenerInterfa
             chatLink
                 ?: return,
             chat?.ownPrivilege == MegaChatRoom.PRIV_MODERATOR,
-            chat?.title, chat?.isMeeting ?: false
+            chat?.title, chat?.isMeeting == true
         )
 
         bottomSheetDialogFragment?.show(supportFragmentManager, bottomSheetDialogFragment?.tag)
@@ -1581,7 +1613,7 @@ class GroupChatInfoActivity : PasscodeActivity(), MegaChatRequestListenerInterfa
         }
     }
 
-    fun getChatRoom() = megaChatApi.getChatRoom(chatHandle)
+    fun getChatRoom(): MegaChatRoom = megaChatApi.getChatRoom(chatHandle)
 
     public override fun onSaveInstanceState(outState: Bundle) {
         super.onSaveInstanceState(outState)
