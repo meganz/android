@@ -38,7 +38,6 @@ import androidx.preference.PreferenceManager
 import com.google.android.material.animation.AnimationUtils.FAST_OUT_LINEAR_IN_INTERPOLATOR
 import com.google.android.material.dialog.MaterialAlertDialogBuilder
 import dagger.hilt.android.AndroidEntryPoint
-import de.palm.composestateevents.StateEventWithContentTriggered
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.launch
 import mega.privacy.android.analytics.Analytics
@@ -59,7 +58,7 @@ import mega.privacy.android.app.presentation.hidenode.HiddenNodesOnboardingActiv
 import mega.privacy.android.app.presentation.settings.model.StorageTargetPreference
 import mega.privacy.android.app.presentation.transfers.attach.NodeAttachmentViewModel
 import mega.privacy.android.app.presentation.transfers.attach.createNodeAttachmentView
-import mega.privacy.android.app.presentation.transfers.starttransfer.model.TransferTriggerEvent
+import mega.privacy.android.app.presentation.transfers.starttransfer.model.StartTransferEvent
 import mega.privacy.android.app.presentation.transfers.starttransfer.view.createStartTransferView
 import mega.privacy.android.app.textEditor.TextEditorViewModel.Companion.CONVERTED_FILE_NAME
 import mega.privacy.android.app.textEditor.TextEditorViewModel.Companion.VIEW_MODE
@@ -188,11 +187,12 @@ class TextEditorActivity : PasscodeActivity(), SnackbarShower, Scrollable {
 
                 if (viewModel.isCreateMode()) {
                     viewModel.saveFile(intent.getBooleanExtra(FROM_HOME_PAGE, false))
+                    return //it will finish once saved successfully
                 } else if (viewModel.isReadingContent()) {
                     viewModel.finishBeforeClosing()
-                    finish()
                 }
                 retryConnectionsAndSignalPresence()
+                finish()
             }
         }
     }
@@ -800,11 +800,8 @@ class TextEditorActivity : PasscodeActivity(), SnackbarShower, Scrollable {
                     viewModel.consumeTransferEvent()
                 },
                 onScanningFinished = {
-                    val isTextFileUpload = viewModel.uiState.value.transferEvent
-                        .let { it is StateEventWithContentTriggered && (it.content is TransferTriggerEvent.StartUpload.TextFile) }
-
-                    // Close activity if a text file upload is triggered successfully
-                    if (isTextFileUpload) {
+                    // Close activity if upload has started successfully
+                    if (it is StartTransferEvent.FinishUploadProcessing) {
                         finish()
                     }
                 },

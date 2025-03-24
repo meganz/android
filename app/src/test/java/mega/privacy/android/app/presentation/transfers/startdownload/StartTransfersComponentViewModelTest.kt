@@ -581,32 +581,6 @@ class StartTransfersComponentViewModelTest {
         }
 
     @Test
-    fun `test that failed text file upload event is emitted when monitorActiveTransferFinishedUseCase emits a value and transferTriggerEvent is StartUploadTextFile`() =
-        runTest {
-            setup()
-            commonStub()
-            stubMonitorPendingTransfers(TransferType.GENERAL_UPLOAD, flow {
-                throw (RuntimeException())
-            })
-
-            underTest.startTransfer(startUploadTextFileEvent)
-            underTest.onResume(mock())
-            underTest.uiState.test {
-                val expected =
-                    triggered(
-                        StartTransferEvent.Message.FailedTextFileUpload(
-                            isEditMode = startUploadTextFileEvent.isEditMode,
-                            isCloudFile = startUploadTextFileEvent.fromHomePage
-                        )
-                    )
-
-                val actual = awaitItem().oneOffViewEvent
-
-                assertThat(actual).isEqualTo(expected)
-            }
-        }
-
-    @Test
     fun `test that start download with destination trigger save offline nodes to device when event is CopyOfflineNode`() =
         runTest {
             commonStub()

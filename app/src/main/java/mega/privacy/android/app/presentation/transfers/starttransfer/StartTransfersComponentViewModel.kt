@@ -465,13 +465,6 @@ internal class StartTransfersComponentViewModel @Inject constructor(
                         )
                     }
 
-                    is TransferTriggerEvent.StartUpload.TextFile -> {
-                        StartTransferEvent.Message.FailedTextFileUpload(
-                            isEditMode = transferTriggerEvent.isEditMode,
-                            isCloudFile = transferTriggerEvent.fromHomePage
-                        )
-                    }
-
                     is TransferTriggerEvent.StartUpload -> {
                         StartTransferEvent.FinishUploadProcessing(
                             totalFiles = transferTriggerEvent.pathsAndNames.size,

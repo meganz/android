@@ -305,7 +305,6 @@ class UploadFolderActivity : PasscodeActivity(), Scrollable {
 
         showProgress(true)
         binding.mainLayout.addView(
-            //here
             createStartTransferView(
                 this,
                 viewModel.uiState.map { it.transferTriggerEvent },
