@@ -23,10 +23,10 @@ import kotlinx.coroutines.flow.onCompletion
 import kotlinx.coroutines.flow.transformWhile
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
-import mega.privacy.android.data.extensions.collectChunked
-import mega.privacy.android.data.extensions.onEachSampled
-import mega.privacy.android.data.extensions.onFirst
-import mega.privacy.android.data.extensions.skipUnstable
+import mega.privacy.android.domain.extension.collectChunked
+import mega.privacy.android.domain.extension.onEachSampled
+import mega.privacy.android.domain.extension.onFirst
+import mega.privacy.android.domain.extension.skipUnstable
 import mega.privacy.android.data.mapper.transfer.OverQuotaNotificationBuilder
 import mega.privacy.android.domain.entity.transfer.ActiveTransferTotals
 import mega.privacy.android.domain.entity.transfer.MonitorOngoingActiveTransfersResult

@@ -1,4 +1,4 @@
-package mega.privacy.android.data.extensions
+package mega.privacy.android.domain.extension
 
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.Job
@@ -126,7 +126,7 @@ fun <T> Flow<T>.chunked(
     }
 
 /**
- * Returns a flow emitting every [chunkDuration] a list of the values received since last emission, if any.
+ * Collects the values of the given flow every [chunkDuration], grouping the values in a list of the values received since last emission, if any.
  *
  * If [flushOnIdleDuration] is lower than [chunkDuration] and no new values are received during [flushOnIdleDuration] a new list will be emitted
  *
@@ -135,7 +135,6 @@ fun <T> Flow<T>.chunked(
  * @param chunkDuration duration of the chunks to emit
  * @param flushOnIdleDuration duration to emit the chunk if no values are received in this period
  * @param collector collector to emit the chunks
- * @return flow emitting every [chunkDuration] a list of the values received since last
  */
 suspend fun <T> Flow<T>.collectChunked(
     chunkDuration: Duration,

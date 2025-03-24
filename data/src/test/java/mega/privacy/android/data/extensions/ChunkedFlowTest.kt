@@ -19,6 +19,9 @@ import kotlinx.coroutines.test.advanceTimeBy
 import kotlinx.coroutines.test.runTest
 import kotlinx.coroutines.yield
 import mega.privacy.android.core.test.extension.CoroutineMainDispatcherExtension
+import mega.privacy.android.domain.extension.ChunkCancelledWithPendingValuesException
+import mega.privacy.android.domain.extension.chunked
+import mega.privacy.android.domain.extension.collectChunked
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.extension.RegisterExtension
 import kotlin.math.ceil

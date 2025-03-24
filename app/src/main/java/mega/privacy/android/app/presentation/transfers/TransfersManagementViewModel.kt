@@ -15,7 +15,7 @@ import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import mega.privacy.android.app.presentation.transfers.model.mapper.TransfersInfoMapper
 import mega.privacy.android.app.utils.livedata.SingleLiveEvent
-import mega.privacy.android.data.extensions.skipUnstable
+import mega.privacy.android.domain.extension.skipUnstable
 import mega.privacy.android.domain.entity.TransfersStatusInfo
 import mega.privacy.android.domain.entity.transfer.CompletedTransferState
 import mega.privacy.android.domain.qualifier.IoDispatcher
