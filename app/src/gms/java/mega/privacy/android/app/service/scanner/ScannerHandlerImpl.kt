@@ -103,9 +103,15 @@ class ScannerHandlerImpl @Inject constructor(
                         } else {
                             UnexpectedErrorInDocumentScanner()
                         }
+
+                    val errorInfo = if (it is MlKitException) {
+                        "The error code is ${it.errorCode}, error message is ${it.message}"
+                    } else {
+                        "The exception is not MlKitException, message is ${it.message}"
+                    }
                     Timber.e(
                         exception,
-                        "An Exception occurred when installing the ML Kit Document Scanner",
+                        "An Exception occurred when installing the ML Kit Document Scanner, $errorInfo",
                     )
                     continuation.resumeWith(Result.failure(exception))
                 }
