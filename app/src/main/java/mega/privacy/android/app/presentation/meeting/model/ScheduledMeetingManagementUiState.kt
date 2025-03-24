@@ -7,6 +7,7 @@ import mega.privacy.android.app.presentation.extensions.getDateFormatted
 import mega.privacy.android.app.presentation.extensions.getEndTimeFormatted
 import mega.privacy.android.app.presentation.extensions.getStartTimeFormatted
 import mega.privacy.android.domain.entity.AccountType
+import mega.privacy.android.domain.entity.ChatRoomPermission
 import mega.privacy.android.domain.entity.chat.ChatRoom
 import mega.privacy.android.domain.entity.chat.ChatRoomItem
 import mega.privacy.android.domain.entity.chat.ChatScheduledMeetingOccurr
@@ -143,6 +144,12 @@ data class ScheduledMeetingManagementUiState(
      * @return True, if has free plan. False, if has pro plan.
      */
     fun hasFreePlan() = subscriptionPlan == AccountType.FREE
+
+    /**
+     * Check if it's host
+     */
+    val isHost
+        get() = chatRoom?.ownPrivilege == ChatRoomPermission.Moderator
 
     companion object {
         /**

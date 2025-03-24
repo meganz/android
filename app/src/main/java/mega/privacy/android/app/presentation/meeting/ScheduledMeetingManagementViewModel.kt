@@ -47,6 +47,7 @@ import mega.privacy.android.domain.usecase.call.GetChatCallUseCase
 import mega.privacy.android.domain.usecase.chat.ArchiveChatUseCase
 import mega.privacy.android.domain.usecase.chat.CreateChatLinkUseCase
 import mega.privacy.android.domain.usecase.chat.Get1On1ChatIdUseCase
+import mega.privacy.android.domain.usecase.chat.MonitorChatRoomUpdatesUseCase
 import mega.privacy.android.domain.usecase.chat.link.RemoveChatLinkUseCase
 import mega.privacy.android.domain.usecase.chat.message.SendTextMessageUseCase
 import mega.privacy.android.domain.usecase.contact.GetMyFullNameUseCase
@@ -123,6 +124,7 @@ class ScheduledMeetingManagementViewModel @Inject constructor(
     private val monitorUserUpdates: MonitorUserUpdates,
     private val getScheduledMeetingByChatUseCase: GetScheduledMeetingByChatUseCase,
     private val isDevice24HourFormatUseCase: IsDevice24HourFormatUseCase,
+    private val monitorChatRoomUpdatesUseCase: MonitorChatRoomUpdatesUseCase,
     get1On1ChatIdUseCase: Get1On1ChatIdUseCase,
     sendTextMessageUseCase: SendTextMessageUseCase,
 ) : BaseLinkViewModel(get1On1ChatIdUseCase, sendTextMessageUseCase) {
@@ -167,6 +169,22 @@ class ScheduledMeetingManagementViewModel @Inject constructor(
             }
         }
     }
+
+    /**
+     * Get chat room updates
+     *
+     * @param chatId Chat id.
+     */
+    private fun getChatRoomUpdates(chatId: Long) =
+        viewModelScope.launch {
+            monitorChatRoomUpdatesUseCase(chatId).collectLatest { chat ->
+                _state.update { state ->
+                    state.copy(
+                        chatRoom = chat,
+                    )
+                }
+            }
+        }
 
     /**
      * Get my full name
@@ -510,6 +528,7 @@ class ScheduledMeetingManagementViewModel @Inject constructor(
 
                 queryChatLink()
                 getChatListItemUpdates()
+                getChatRoomUpdates(chat.chatId)
             }
 
         }.onFailure { exception ->

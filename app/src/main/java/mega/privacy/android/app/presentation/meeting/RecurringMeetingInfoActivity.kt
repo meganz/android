@@ -25,7 +25,6 @@ import mega.privacy.android.app.presentation.extensions.isDarkMode
 import mega.privacy.android.app.presentation.meeting.view.RecurringMeetingInfoView
 import mega.privacy.android.app.upgradeAccount.UpgradeAccountActivity
 import mega.privacy.android.app.utils.Constants
-import mega.privacy.android.domain.entity.ChatRoomPermission
 import mega.privacy.android.domain.entity.ThemeMode
 import mega.privacy.android.domain.usecase.GetThemeMode
 import mega.privacy.android.domain.usecase.featureflag.GetFeatureFlagValueUseCase
@@ -110,12 +109,10 @@ class RecurringMeetingInfoActivity : PasscodeActivity() {
                 managementState = managementState,
                 onBackPressed = { finish() },
                 onOccurrenceClicked = { occurrence ->
-                    if (managementState.chatRoom?.ownPrivilege == ChatRoomPermission.Moderator) {
-                        scheduledMeetingManagementViewModel.let {
-                            it.onOccurrenceTap(occurrence)
-                            managementState.chatId?.let { chatId ->
-                                it.monitorLoadedMessages(chatId)
-                            }
+                    scheduledMeetingManagementViewModel.let {
+                        it.onOccurrenceTap(occurrence)
+                        managementState.chatId?.let { chatId ->
+                            it.monitorLoadedMessages(chatId)
                         }
                     }
                 },

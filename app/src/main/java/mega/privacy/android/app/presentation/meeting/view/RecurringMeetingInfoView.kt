@@ -141,6 +141,7 @@ fun RecurringMeetingInfoView(
                         OccurrenceItemView(
                             modifier = Modifier.testTag("Occurrence_item_view"),
                             state = state,
+                            isHost = managementState.isHost,
                             occurrence = state.occurrencesList[i],
                             onOccurrenceClicked = onOccurrenceClicked
                         )
@@ -245,12 +246,14 @@ private fun RecurringMeetingInfoAppBar(
  * View of a occurrence in the list
  *
  * @param state                    [RecurringMeetingInfoState]
+ * @param isHost                    True, if it's host. False if not.
  * @param occurrence               [ChatScheduledMeetingOccurr]
  * @param onOccurrenceClicked      Detect when a occurrence is clicked
  */
 @Composable
 private fun OccurrenceItemView(
     state: RecurringMeetingInfoState,
+    isHost: Boolean,
     occurrence: ChatScheduledMeetingOccurr,
     onOccurrenceClicked: (ChatScheduledMeetingOccurr) -> Unit,
     modifier: Modifier = Modifier,
@@ -321,19 +324,22 @@ private fun OccurrenceItemView(
                     }
                 }
             }
-            Box(
-                modifier = Modifier
-                    .wrapContentSize(Alignment.CenterEnd)
-            ) {
-                Row(modifier = Modifier.align(Alignment.Center)) {
-                    Icon(
-                        modifier = Modifier
-                            .padding(start = 30.dp, end = 20.dp)
-                            .clickable { onOccurrenceClicked(occurrence) },
-                        painter = painterResource(id = CoreUiR.drawable.ic_dots_vertical_grey),
-                        contentDescription = "Three dots icon",
-                        tint = grey_alpha_054.takeIf { isLight } ?: white_alpha_054
-                    )
+
+            if (isHost) {
+                Box(
+                    modifier = Modifier
+                        .wrapContentSize(Alignment.CenterEnd)
+                ) {
+                    Row(modifier = Modifier.align(Alignment.Center)) {
+                        Icon(
+                            modifier = Modifier
+                                .padding(start = 30.dp, end = 20.dp)
+                                .clickable { onOccurrenceClicked(occurrence) },
+                            painter = painterResource(id = CoreUiR.drawable.ic_dots_vertical_grey),
+                            contentDescription = "Three dots icon",
+                            tint = grey_alpha_054.takeIf { isLight } ?: white_alpha_054
+                        )
+                    }
                 }
             }
         }
