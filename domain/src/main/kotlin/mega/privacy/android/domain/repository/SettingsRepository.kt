@@ -488,4 +488,18 @@ interface SettingsRepository {
      * @param enabled
      */
     suspend fun enableGeoTagging(enabled: Boolean)
+
+    /**
+     * get rubbish bin auto purge period
+     *
+     * @return number of days
+     */
+    suspend fun getRubbishBinAutopurgePeriod(): Int
+
+    /**
+     * set rubbish bin auto purge period
+     *
+     * @param days
+     */
+    suspend fun setRubbishBinAutopurgePeriod(days: Int)
 }

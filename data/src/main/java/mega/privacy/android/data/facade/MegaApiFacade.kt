@@ -1566,4 +1566,12 @@ internal class MegaApiFacade @Inject constructor(
             megaApi.dismissBanner(id, listener)
         }
     }
+
+    override fun getRubbishBinAutopurgePeriod(listener: MegaRequestListenerInterface) {
+        megaApi.getRubbishBinAutopurgePeriod(listener)
+    }
+
+    override fun setRubbishBinAutopurgePeriod(days: Int, listener: MegaRequestListenerInterface) {
+        megaApi.setRubbishBinAutopurgePeriod(days, listener)
+    }
 }

@@ -10,6 +10,7 @@ import kotlinx.coroutines.test.UnconfinedTestDispatcher
 import kotlinx.coroutines.test.runTest
 import mega.privacy.android.data.cache.Cache
 import mega.privacy.android.data.database.DatabaseHandler
+import mega.privacy.android.data.facade.AccountInfoWrapper
 import mega.privacy.android.data.gateway.FileGateway
 import mega.privacy.android.data.gateway.MegaLocalStorageGateway
 import mega.privacy.android.data.gateway.api.MegaApiGateway
@@ -20,6 +21,7 @@ import mega.privacy.android.data.gateway.preferences.FileManagementPreferencesGa
 import mega.privacy.android.data.gateway.preferences.UIPreferencesGateway
 import mega.privacy.android.data.mapper.StartScreenMapper
 import mega.privacy.android.domain.exception.MegaException
+import nz.mega.sdk.MegaAccountDetails
 import nz.mega.sdk.MegaApiJava
 import nz.mega.sdk.MegaError
 import nz.mega.sdk.MegaRequest
@@ -64,6 +66,7 @@ internal class DefaultSettingsRepositoryTest {
     private val startScreenMapper: StartScreenMapper = mock()
     private val fileManagementPreferencesGateway: FileManagementPreferencesGateway = mock()
     private val fileVersionsOptionCache: Cache<Boolean> = mock()
+    private val myAccountInfoFacade: AccountInfoWrapper = mock()
 
     @BeforeAll
     fun setUp() {
@@ -81,6 +84,7 @@ internal class DefaultSettingsRepositoryTest {
             startScreenMapper = startScreenMapper,
             fileManagementPreferencesGateway = fileManagementPreferencesGateway,
             fileVersionsOptionCache = fileVersionsOptionCache,
+            myAccountInfoFacade = myAccountInfoFacade
         )
     }
 
@@ -333,4 +337,114 @@ internal class DefaultSettingsRepositoryTest {
                 awaitComplete()
             }
         }
+
+    @Test
+    fun `setRubbishBinAutopurgePeriod completes successfully`() = runTest {
+        val days = 30
+        val api = mock<MegaApiJava>()
+        val request = mock<MegaRequest>()
+        val error = mock<MegaError> {
+            on { errorCode }.thenReturn(MegaError.API_OK)
+        }
+
+        whenever(megaApiGateway.setRubbishBinAutopurgePeriod(any(), any())).thenAnswer {
+            (it.arguments[1] as MegaRequestListenerInterface).onRequestFinish(
+                api,
+                request,
+                error
+            )
+        }
+
+        underTest.setRubbishBinAutopurgePeriod(days)
+    }
+
+    @Test
+    fun `getRubbishBinAutopurgePeriod returns correct period when API_OK`() = runTest {
+        val expectedDays = 30
+        val api = mock<MegaApiJava>()
+        val request = mock<MegaRequest> {
+            on { number }.thenReturn(expectedDays.toLong())
+        }
+        val error = mock<MegaError> {
+            on { errorCode }.thenReturn(MegaError.API_OK)
+        }
+
+        whenever(megaApiGateway.getRubbishBinAutopurgePeriod(any())).thenAnswer {
+            (it.arguments[0] as MegaRequestListenerInterface).onRequestFinish(
+                api,
+                request,
+                error
+            )
+        }
+
+        val actualDays = underTest.getRubbishBinAutopurgePeriod()
+        assertThat(actualDays).isEqualTo(expectedDays)
+    }
+
+    @Test
+    fun `getRubbishBinAutopurgePeriod returns default period for free account when API_ENOENT`() =
+        runTest {
+            val expectedDays = 30
+            val api = mock<MegaApiJava>()
+            val request = mock<MegaRequest>()
+            val error = mock<MegaError> {
+                on { errorCode }.thenReturn(MegaError.API_ENOENT)
+            }
+
+            whenever(myAccountInfoFacade.accountTypeId).thenReturn(MegaAccountDetails.ACCOUNT_TYPE_FREE)
+            whenever(megaApiGateway.getRubbishBinAutopurgePeriod(any())).thenAnswer {
+                (it.arguments[0] as MegaRequestListenerInterface).onRequestFinish(
+                    api,
+                    request,
+                    error
+                )
+            }
+
+            val actualDays = underTest.getRubbishBinAutopurgePeriod()
+            assertThat(actualDays).isEqualTo(expectedDays)
+        }
+
+    @Test
+    fun `getRubbishBinAutopurgePeriod returns default period for pro account when API_ENOENT`() =
+        runTest {
+            val expectedDays = 90
+            val api = mock<MegaApiJava>()
+            val request = mock<MegaRequest>()
+            val error = mock<MegaError> {
+                on { errorCode }.thenReturn(MegaError.API_ENOENT)
+            }
+
+            whenever(myAccountInfoFacade.accountTypeId).thenReturn(MegaAccountDetails.ACCOUNT_TYPE_PROI)
+            whenever(megaApiGateway.getRubbishBinAutopurgePeriod(any())).thenAnswer {
+                (it.arguments[0] as MegaRequestListenerInterface).onRequestFinish(
+                    api,
+                    request,
+                    error
+                )
+            }
+
+            val actualDays = underTest.getRubbishBinAutopurgePeriod()
+            assertThat(actualDays).isEqualTo(expectedDays)
+        }
+
+    @Test
+    fun `getRubbishBinAutopurgePeriod throws exception when API error occurs`() = runTest {
+        val api = mock<MegaApiJava>()
+        val request = mock<MegaRequest>()
+        val error = mock<MegaError> {
+            on { errorCode }.thenReturn(MegaError.API_EFAILED)
+        }
+
+        whenever(megaApiGateway.getRubbishBinAutopurgePeriod(any())).thenAnswer {
+            (it.arguments[0] as MegaRequestListenerInterface).onRequestFinish(
+                api,
+                request,
+                error
+            )
+        }
+
+        assertThrows<MegaException> {
+            underTest.getRubbishBinAutopurgePeriod()
+        }
+    }
 }

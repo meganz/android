@@ -23,6 +23,7 @@ import mega.privacy.android.data.extensions.getRequestListener
 import mega.privacy.android.data.extensions.getValueFor
 import mega.privacy.android.data.extensions.hasParam
 import mega.privacy.android.data.extensions.isTypeWithParam
+import mega.privacy.android.data.facade.AccountInfoWrapper
 import mega.privacy.android.data.gateway.FileGateway
 import mega.privacy.android.data.gateway.MegaLocalStorageGateway
 import mega.privacy.android.data.gateway.api.MegaApiGateway
@@ -50,6 +51,7 @@ import mega.privacy.android.domain.exception.EnableMultiFactorAuthException
 import mega.privacy.android.domain.exception.SettingNotFoundException
 import mega.privacy.android.domain.qualifier.IoDispatcher
 import mega.privacy.android.domain.repository.SettingsRepository
+import nz.mega.sdk.MegaAccountDetails
 import nz.mega.sdk.MegaApiJava
 import nz.mega.sdk.MegaError
 import nz.mega.sdk.MegaError.API_ENOENT
@@ -95,6 +97,7 @@ internal class DefaultSettingsRepository @Inject constructor(
     private val uiPreferencesGateway: UIPreferencesGateway,
     private val startScreenMapper: StartScreenMapper,
     private val fileManagementPreferencesGateway: FileManagementPreferencesGateway,
+    private val myAccountInfoFacade: AccountInfoWrapper,
     @FileVersionsOption private val fileVersionsOptionCache: Cache<Boolean>,
 ) : SettingsRepository {
     private val showHiddenNodesFlow: MutableStateFlow<Boolean> = MutableStateFlow(false)
@@ -605,4 +608,36 @@ internal class DefaultSettingsRepository @Inject constructor(
     override fun monitorGeoTaggingStatus(): Flow<Boolean?> =
         uiPreferencesGateway.monitorGeoTaggingStatus()
             .flowOn(ioDispatcher)
+
+    override suspend fun setRubbishBinAutopurgePeriod(days: Int) = withContext(ioDispatcher) {
+        return@withContext suspendCancellableCoroutine { continuation ->
+            val listener = continuation.getRequestListener("setRubbishBinAutopurgePeriod") {}
+            megaApiGateway.setRubbishBinAutopurgePeriod(days, listener)
+        }
+    }
+
+    override suspend fun getRubbishBinAutopurgePeriod() = withContext(ioDispatcher) {
+        return@withContext suspendCancellableCoroutine { continuation ->
+            val listener = OptionalMegaRequestListenerInterface(
+                onRequestFinish = { request: MegaRequest, error: MegaError ->
+                    when (error.errorCode) {
+                        API_ENOENT -> if (myAccountInfoFacade.accountTypeId == MegaAccountDetails.ACCOUNT_TYPE_FREE) {
+                            continuation.resumeWith(Result.success(DAYS_USER_FREE))
+                        } else {
+                            continuation.resumeWith(Result.success(DAYS_USER_PRO))
+                        }
+
+                        API_OK -> continuation.resumeWith(Result.success(request.number.toInt()))
+                        else -> continuation.failWithError(error, "getRubbishBinAutopurgePeriod")
+                    }
+                }
+            )
+            megaApiGateway.getRubbishBinAutopurgePeriod(listener)
+        }
+    }
+
+    companion object {
+        private const val DAYS_USER_FREE = 30
+        private const val DAYS_USER_PRO = 90
+    }
 }
