@@ -28,9 +28,7 @@ import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.suspendCancellableCoroutine
 import kotlinx.coroutines.withContext
-import mega.privacy.android.data.constant.CacheFolderConstant
 import mega.privacy.android.data.extensions.failWithError
-import mega.privacy.android.data.extensions.getFileName
 import mega.privacy.android.data.extensions.getRequestListener
 import mega.privacy.android.data.gateway.AppEventGateway
 import mega.privacy.android.data.gateway.CacheGateway
@@ -58,7 +56,6 @@ import mega.privacy.android.data.mapper.transfer.active.ActiveTransferTotalsMapp
 import mega.privacy.android.data.model.GlobalTransfer
 import mega.privacy.android.domain.entity.node.NodeId
 import mega.privacy.android.domain.entity.node.TypedNode
-import mega.privacy.android.domain.entity.node.ViewerNode
 import mega.privacy.android.domain.entity.transfer.ActiveTransfer
 import mega.privacy.android.domain.entity.transfer.ActiveTransferActionGroup
 import mega.privacy.android.domain.entity.transfer.ActiveTransferTotals
@@ -74,14 +71,12 @@ import mega.privacy.android.domain.entity.transfer.pending.InsertPendingTransfer
 import mega.privacy.android.domain.entity.transfer.pending.PendingTransfer
 import mega.privacy.android.domain.entity.transfer.pending.PendingTransferState
 import mega.privacy.android.domain.entity.transfer.pending.UpdatePendingTransferRequest
-import mega.privacy.android.domain.exception.NullFileException
 import mega.privacy.android.domain.exception.node.NodeDoesNotExistsException
 import mega.privacy.android.domain.qualifier.ApplicationScope
 import mega.privacy.android.domain.qualifier.IoDispatcher
 import mega.privacy.android.domain.repository.TransferRepository
 import mega.privacy.android.domain.usecase.login.MonitorFetchNodesFinishUseCase
 import nz.mega.sdk.MegaError.API_OK
-import nz.mega.sdk.MegaNode
 import nz.mega.sdk.MegaTransfer
 import nz.mega.sdk.MegaTransfer.COLLISION_CHECK_FINGERPRINT
 import nz.mega.sdk.MegaTransfer.COLLISION_RESOLUTION_NEW_WITH_N
@@ -855,77 +850,6 @@ internal class DefaultTransfersRepository @Inject constructor(
     override suspend fun getActiveTransferGroupById(id: Int): ActiveTransferActionGroup? =
         withContext(ioDispatcher) {
             megaLocalRoomGateway.getActiveTransferGroup(id)
-        }
-
-    @Deprecated(
-        "ViewerNode should be replaced by [TypedNode], there's a similar use-case to download any type of [TypedNode] and receive a flow of the progress: StartDownloadUseCase. Please add [TransferAppData.BackgroundTransfer] to avoid this transfers to be added in the counters of the DownloadService notification",
-        replaceWith = ReplaceWith("StartDownloadUseCase")
-    )
-    override suspend fun downloadBackgroundFile(viewerNode: ViewerNode): String =
-        withContext(ioDispatcher) {
-            getMegaNode(viewerNode)?.let { node ->
-                val file = cacheGateway.getCacheFile(
-                    CacheFolderConstant.TEMPORARY_FOLDER,
-                    node.getFileName()
-                ) ?: throw NullFileException()
-                suspendCancellableCoroutine { continuation ->
-                    val listener = OptionalMegaTransferListenerInterface(
-                        onTransferFinish = { _, error ->
-                            if (error.errorCode == API_OK) {
-                                continuation.resumeWith(Result.success(file.absolutePath))
-                            } else {
-                                continuation.failWithError(error, "downloadBackgroundFile")
-                            }
-                        }
-                    )
-                    megaApiGateway.startDownload(
-                        node = node,
-                        localPath = file.absolutePath,
-                        fileName = file.name,
-                        appData = AppDataTypeConstants.BackgroundTransfer.sdkTypeValue,
-                        startFirst = true,
-                        cancelToken = null,
-                        collisionCheck = COLLISION_CHECK_FINGERPRINT,
-                        collisionResolution = COLLISION_RESOLUTION_NEW_WITH_N,
-                        listener = listener
-                    )
-                }
-            } ?: throw NullPointerException()
-        }
-
-    private suspend fun getMegaNode(viewerNode: ViewerNode): MegaNode? = withContext(ioDispatcher) {
-        when (viewerNode) {
-            is ViewerNode.ChatNode -> getMegaNodeFromChat(viewerNode)
-            is ViewerNode.FileLinkNode -> MegaNode.unserialize(viewerNode.serializedNode)
-            is ViewerNode.FolderLinkNode -> getMegaNodeFromFolderLink(viewerNode)
-            is ViewerNode.GeneralNode -> megaApiGateway.getMegaNodeByHandle(viewerNode.id)
-        }
-    }
-
-    private suspend fun getMegaNodeFromChat(chatNode: ViewerNode.ChatNode) =
-        withContext(ioDispatcher) {
-            with(chatNode) {
-                val messageChat = megaChatApiGateway.getMessage(chatId, messageId)
-                    ?: megaChatApiGateway.getMessageFromNodeHistory(chatId, messageId)
-
-                if (messageChat != null) {
-                    val node = messageChat.megaNodeList.get(0)
-                    val chat = megaChatApiGateway.getChatRoom(chatId)
-
-                    if (chat?.isPreview == true) {
-                        megaApiGateway.authorizeChatNode(node, chat.authorizationToken)
-                    } else {
-                        node
-                    }
-                } else null
-            }
-        }
-
-    private suspend fun getMegaNodeFromFolderLink(folderLinkNode: ViewerNode.FolderLinkNode) =
-        withContext(ioDispatcher) {
-            megaApiFolderGateway.getMegaNodeByHandle(folderLinkNode.id)?.let {
-                megaApiFolderGateway.authorizeNode(it)
-            }
         }
 }
 

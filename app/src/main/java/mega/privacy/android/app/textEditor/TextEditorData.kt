@@ -2,7 +2,7 @@ package mega.privacy.android.app.textEditor
 
 import android.net.Uri
 import mega.privacy.android.app.utils.Constants.INVALID_VALUE
-import mega.privacy.android.domain.entity.node.ViewerNode
+import mega.privacy.android.domain.entity.node.TypedNode
 import nz.mega.sdk.MegaApiAndroid
 import nz.mega.sdk.MegaChatMessage
 import nz.mega.sdk.MegaChatRoom
@@ -20,7 +20,6 @@ import nz.mega.sdk.MegaNode
  * @property msgChat            [MegaChatMessage]
  * @property chatRoom           [MegaChatRoom]
  * @property needStopHttpServer True if the sever was initialized, false otherwise.
- * @property viewerNode         [ViewerNode]
  */
 data class TextEditorData(
     var api: MegaApiAndroid? = null,
@@ -32,5 +31,4 @@ data class TextEditorData(
     var msgChat: MegaChatMessage? = null,
     var chatRoom: MegaChatRoom? = null,
     var needStopHttpServer: Boolean = false,
-    var viewerNode: ViewerNode? = null
 )

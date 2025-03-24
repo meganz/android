@@ -23,10 +23,12 @@ import kotlinx.coroutines.async
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.catch
+import kotlinx.coroutines.flow.collect
 import kotlinx.coroutines.flow.launchIn
 import kotlinx.coroutines.flow.onEach
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
+import kotlinx.coroutines.runBlocking
 import kotlinx.coroutines.withContext
 import mega.privacy.android.app.R
 import mega.privacy.android.app.listeners.ExportListener
@@ -61,6 +63,8 @@ import mega.privacy.android.app.utils.RunOnUIThreadUtils.runDelay
 import mega.privacy.android.app.utils.TextUtil.isTextEmpty
 import mega.privacy.android.app.utils.livedata.SingleLiveEvent
 import mega.privacy.android.app.utils.notifyObserver
+import mega.privacy.android.data.constant.CacheFolderConstant
+import mega.privacy.android.data.extensions.getFileName
 import mega.privacy.android.data.qualifier.MegaApi
 import mega.privacy.android.data.qualifier.MegaApiFolder
 import mega.privacy.android.domain.entity.account.business.BusinessAccountStatus
@@ -68,7 +72,9 @@ import mega.privacy.android.domain.entity.document.DocumentEntity
 import mega.privacy.android.domain.entity.node.NameCollision
 import mega.privacy.android.domain.entity.node.NodeId
 import mega.privacy.android.domain.entity.node.NodeNameCollisionType
-import mega.privacy.android.domain.entity.node.ViewerNode
+import mega.privacy.android.domain.entity.node.TypedNode
+import mega.privacy.android.domain.entity.node.chat.ChatFile
+import mega.privacy.android.domain.entity.transfer.TransferAppData
 import mega.privacy.android.domain.entity.uri.UriPath
 import mega.privacy.android.domain.exception.node.NodeDoesNotExistsException
 import mega.privacy.android.domain.monitoring.CrashReporter
@@ -78,6 +84,7 @@ import mega.privacy.android.domain.usecase.GetNodeByIdUseCase
 import mega.privacy.android.domain.usecase.IsHiddenNodesOnboardedUseCase
 import mega.privacy.android.domain.usecase.UpdateNodeSensitiveUseCase
 import mega.privacy.android.domain.usecase.account.MonitorAccountDetailUseCase
+import mega.privacy.android.domain.usecase.cache.GetCacheFileUseCase
 import mega.privacy.android.domain.usecase.favourites.IsAvailableOfflineUseCase
 import mega.privacy.android.domain.usecase.file.CheckFileNameCollisionsUseCase
 import mega.privacy.android.domain.usecase.filelink.GetPublicNodeFromSerializedDataUseCase
@@ -87,7 +94,7 @@ import mega.privacy.android.domain.usecase.node.CheckNodesNameCollisionWithActio
 import mega.privacy.android.domain.usecase.node.IsNodeInBackupsUseCase
 import mega.privacy.android.domain.usecase.node.MonitorNodeUpdatesUseCase
 import mega.privacy.android.domain.usecase.node.chat.GetChatFileUseCase
-import mega.privacy.android.domain.usecase.transfers.downloads.DownloadBackgroundFile
+import mega.privacy.android.domain.usecase.transfers.downloads.DownloadNodeUseCase
 import nz.mega.sdk.MegaApiAndroid
 import nz.mega.sdk.MegaApiJava.INVALID_HANDLE
 import nz.mega.sdk.MegaChatApiAndroid
@@ -115,7 +122,6 @@ import javax.inject.Inject
  * @property megaApi                    Needed to manage nodes.
  * @property megaApiFolder              Needed to manage folder link nodes.
  * @property megaChatApi                Needed to get text file info from chats.
- * @property downloadBackgroundFile     Use case for downloading the file in background if required.
  * @property ioDispatcher
  * @property getNodeByIdUseCase
  * @property getChatFileUseCase
@@ -130,7 +136,8 @@ class TextEditorViewModel @Inject constructor(
     private val checkFileNameCollisionsUseCase: CheckFileNameCollisionsUseCase,
     private val checkNodesNameCollisionWithActionUseCase: CheckNodesNameCollisionWithActionUseCase,
     private val checkChatNodesNameCollisionAndCopyUseCase: CheckChatNodesNameCollisionAndCopyUseCase,
-    private val downloadBackgroundFile: DownloadBackgroundFile,
+    private val getCacheFileUseCase: GetCacheFileUseCase,
+    private val downloadNodeUseCase: DownloadNodeUseCase,
     @IoDispatcher private val ioDispatcher: CoroutineDispatcher,
     private val getNodeByIdUseCase: GetNodeByIdUseCase,
     private val getChatFileUseCase: GetChatFileUseCase,
@@ -375,7 +382,6 @@ class TextEditorViewModel @Inject constructor(
                         )
                         textEditorData.value?.let {
                             it.node = node
-                            it.viewerNode = ViewerNode.ChatNode(node.handle, chatId, msgId)
                         }
                     }
                 }
@@ -395,7 +401,6 @@ class TextEditorViewModel @Inject constructor(
                     val node = MegaNode.unserialize(serializedNode)
                     textEditorData.value?.let {
                         it.node = node
-                        it.viewerNode = ViewerNode.FileLinkNode(node.handle, serializedNode)
                     }
                 }
             }
@@ -407,8 +412,6 @@ class TextEditorViewModel @Inject constructor(
                     val authorizedNode = megaApiFolder.authorizeNode(node)
                     textEditorData.value?.let {
                         it.node = authorizedNode
-                        it.viewerNode =
-                            ViewerNode.FolderLinkNode(authorizedNode?.handle ?: INVALID_HANDLE)
                     }
                 }
             }
@@ -419,7 +422,6 @@ class TextEditorViewModel @Inject constructor(
                 )
                 textEditorData.value?.let {
                     it.node = node
-                    it.viewerNode = node?.let { n -> ViewerNode.GeneralNode(n.handle) }
                 }
             }
         }
@@ -438,7 +440,8 @@ class TextEditorViewModel @Inject constructor(
 
         setEditableAdapter()
 
-        fileName.value = intent.getStringExtra(INTENT_EXTRA_KEY_FILE_NAME) ?: getNode()?.name ?: ""
+        fileName.value =
+            intent.getStringExtra(INTENT_EXTRA_KEY_FILE_NAME) ?: getNode()?.name ?: ""
         val isMarkDownFile = fileName.value?.endsWith(".md", ignoreCase = true) == true
         _uiState.update { it.copy(isMarkDownFile = isMarkDownFile) }
 
@@ -537,8 +540,25 @@ class TextEditorViewModel @Inject constructor(
     private fun downloadFileForReading() {
         downloadBackgroundFileJob = viewModelScope.launch(ioDispatcher) {
             runCatching {
-                localFileUri =
-                    downloadBackgroundFile(textEditorData.value?.viewerNode ?: return@launch)
+                val nodeFileName = textEditorData.value?.node?.getFileName() ?: return@launch
+                val typedNode = getTypedNode() ?: return@launch
+                getCacheFileUseCase(
+                    CacheFolderConstant.TEMPORARY_FOLDER,
+                    nodeFileName,
+                )?.absolutePath?.let { destination ->
+                    localFileUri = destination
+                    downloadNodeUseCase(
+                        node = typedNode,
+                        destinationPath = destination,
+                        appData = listOf(TransferAppData.BackgroundTransfer),
+                        isHighPriority = true,
+                    )
+                        .catch {
+                            Timber.e(it)
+                            showFatalError()
+                        }
+                        .collect()
+                } ?: return@launch
 
                 if (!readLocalFile()) {
                     showFatalError()
@@ -734,17 +754,19 @@ class TextEditorViewModel @Inject constructor(
      * @param newParentHandle
      */
     fun importNode(newParentHandle: Long) {
-        runCatching {
-            val viewerNode = textEditorData.value?.viewerNode
-            if (viewerNode !is ViewerNode.ChatNode) throw IllegalStateException("ViewerNode must be a ChatNode type")
-            importChatNode(
-                chatId = viewerNode.chatId,
-                messageId = viewerNode.messageId,
-                newParentNode = NodeId(newParentHandle)
-            )
-        }.onFailure {
-            throwable.value = it
-            Timber.e(it)
+        viewModelScope.launch {
+            runCatching {
+                val chatFile = getTypedNode()
+                if (chatFile !is ChatFile) throw IllegalStateException("TypedNode must be a ChatFile type")
+                importChatNode(
+                    chatId = chatFile.chatId,
+                    messageId = chatFile.messageId,
+                    newParentNode = NodeId(newParentHandle)
+                )
+            }.onFailure {
+                throwable.value = it
+                Timber.e(it)
+            }
         }
     }
 
@@ -915,46 +937,38 @@ class TextEditorViewModel @Inject constructor(
 
             else -> {
                 viewModelScope.launch {
-                    when (getAdapterType()) {
-                        FROM_CHAT -> {
-                            val chatId =
-                                textEditorData.value?.chatRoom?.chatId ?: INVALID_HANDLE
-                            val msgId = textEditorData.value?.msgChat?.msgId ?: INVALID_HANDLE
-                            val nodes = listOfNotNull(getChatFileUseCase(chatId, msgId))
-                            updateTransferEvent(
-                                TransferTriggerEvent.StartDownloadNode(nodes)
-                            )
-                        }
-
-                        FOLDER_LINK_ADAPTER -> {
-                            val nodeId = NodeId(getNode()?.handle ?: INVALID_HANDLE)
-                            val nodes = listOfNotNull(getPublicChildNodeFromIdUseCase(nodeId))
-                            updateTransferEvent(
-                                TransferTriggerEvent.StartDownloadNode(nodes)
-                            )
-                        }
-
-                        FILE_LINK_ADAPTER -> {
-                            val node = getNode()?.serialize()?.let {
-                                getPublicNodeFromSerializedDataUseCase(it)
-                            }
-                            val nodes = listOfNotNull(node)
-                            updateTransferEvent(
-                                TransferTriggerEvent.StartDownloadNode(nodes)
-                            )
-                        }
-
-                        else -> {
-                            val node = getNode()?.handle?.let {
-                                getNodeByIdUseCase(NodeId(it))
-                            }
-                            val nodes = listOfNotNull(node)
-                            updateTransferEvent(
-                                TransferTriggerEvent.StartDownloadNode(nodes)
-                            )
-                        }
-                    }
+                    val typedNode = getTypedNode() ?: return@launch
+                    updateTransferEvent(
+                        TransferTriggerEvent.StartDownloadNode(listOfNotNull(typedNode))
+                    )
                 }
+            }
+        }
+    }
+
+    private suspend fun getTypedNode(): TypedNode? = when (getAdapterType()) {
+        OFFLINE_ADAPTER, ZIP_ADAPTER -> null
+        FROM_CHAT -> {
+            val chatId =
+                textEditorData.value?.chatRoom?.chatId ?: INVALID_HANDLE
+            val msgId = textEditorData.value?.msgChat?.msgId ?: INVALID_HANDLE
+            getChatFileUseCase(chatId, msgId)
+        }
+
+        FOLDER_LINK_ADAPTER -> {
+            val nodeId = NodeId(getNode()?.handle ?: INVALID_HANDLE)
+            getPublicChildNodeFromIdUseCase(nodeId)
+        }
+
+        FILE_LINK_ADAPTER -> {
+            getNode()?.serialize()?.let {
+                getPublicNodeFromSerializedDataUseCase(it)
+            }
+        }
+
+        else -> {
+            getNode()?.handle?.let {
+                getNodeByIdUseCase(NodeId(it))
             }
         }
     }

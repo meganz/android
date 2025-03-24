@@ -8,6 +8,7 @@ import com.jraska.livedata.test
 import de.palm.composestateevents.StateEventWithContentTriggered
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.flow.MutableSharedFlow
+import kotlinx.coroutines.flow.emptyFlow
 import kotlinx.coroutines.flow.flowOf
 import kotlinx.coroutines.test.StandardTestDispatcher
 import kotlinx.coroutines.test.advanceUntilIdle
@@ -17,23 +18,34 @@ import mega.privacy.android.app.data.extensions.observeOnce
 import mega.privacy.android.app.presentation.myaccount.InstantTaskExecutorExtension
 import mega.privacy.android.app.presentation.transfers.starttransfer.model.TransferTriggerEvent
 import mega.privacy.android.app.utils.Constants.INTENT_EXTRA_KEY_FILE_NAME
+import mega.privacy.android.app.utils.Constants.INTENT_EXTRA_KEY_HANDLE
+import mega.privacy.android.app.utils.FileUtil
 import mega.privacy.android.core.test.extension.CoroutineMainDispatcherExtension
+import mega.privacy.android.data.constant.CacheFolderConstant
 import mega.privacy.android.domain.entity.account.AccountDetail
 import mega.privacy.android.domain.entity.node.MoveRequestResult
 import mega.privacy.android.domain.entity.node.NodeId
 import mega.privacy.android.domain.entity.node.NodeNameCollisionType
 import mega.privacy.android.domain.entity.node.NodeNameCollisionWithActionResult
 import mega.privacy.android.domain.entity.node.NodeUpdate
+import mega.privacy.android.domain.entity.node.TypedFileNode
 import mega.privacy.android.domain.entity.node.chat.ChatDefaultFile
+import mega.privacy.android.domain.entity.transfer.TransferAppData
 import mega.privacy.android.domain.usecase.GetBusinessStatusUseCase
+import mega.privacy.android.domain.usecase.GetNodeByIdUseCase
 import mega.privacy.android.domain.usecase.IsHiddenNodesOnboardedUseCase
 import mega.privacy.android.domain.usecase.account.MonitorAccountDetailUseCase
+import mega.privacy.android.domain.usecase.cache.GetCacheFileUseCase
 import mega.privacy.android.domain.usecase.favourites.IsAvailableOfflineUseCase
 import mega.privacy.android.domain.usecase.node.CheckChatNodesNameCollisionAndCopyUseCase
 import mega.privacy.android.domain.usecase.node.CheckNodesNameCollisionWithActionUseCase
 import mega.privacy.android.domain.usecase.node.IsNodeInBackupsUseCase
 import mega.privacy.android.domain.usecase.node.MonitorNodeUpdatesUseCase
 import mega.privacy.android.domain.usecase.node.chat.GetChatFileUseCase
+import mega.privacy.android.domain.usecase.transfers.downloads.DownloadNodeUseCase
+import nz.mega.sdk.MegaApiAndroid
+import nz.mega.sdk.MegaApiJava.INVALID_HANDLE
+import nz.mega.sdk.MegaNode
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.TestInstance
@@ -41,11 +53,16 @@ import org.junit.jupiter.api.extension.ExtendWith
 import org.junit.jupiter.api.extension.RegisterExtension
 import org.junit.jupiter.params.ParameterizedTest
 import org.junit.jupiter.params.provider.MethodSource
+import org.mockito.Mockito.anyString
+import org.mockito.Mockito.mockStatic
 import org.mockito.kotlin.any
 import org.mockito.kotlin.doReturn
+import org.mockito.kotlin.eq
 import org.mockito.kotlin.mock
 import org.mockito.kotlin.reset
+import org.mockito.kotlin.verify
 import org.mockito.kotlin.whenever
+import java.io.File
 
 
 @ExperimentalCoroutinesApi
@@ -81,19 +98,24 @@ internal class TextEditorViewModelTest {
     }
     private val savedStateHandle = mock<SavedStateHandle>()
     private val getBusinessStatusUseCase = mock<GetBusinessStatusUseCase>()
+    private val megaApi = mock<MegaApiAndroid>()
+    private val getCacheFileUseCase = mock<GetCacheFileUseCase>()
+    private val downloadNodeUseCase = mock<DownloadNodeUseCase>()
+    private val getNodeByIdUseCase = mock<GetNodeByIdUseCase>()
 
     @BeforeEach
     fun setUp() {
         underTest = TextEditorViewModel(
-            megaApi = mock(),
+            megaApi = megaApi,
             megaApiFolder = mock(),
             megaChatApi = mock(),
             checkFileNameCollisionsUseCase = mock(),
             checkNodesNameCollisionWithActionUseCase = checkNodesNameCollisionWithActionUseCase,
             checkChatNodesNameCollisionAndCopyUseCase = checkChatNodesNameCollisionAndCopyUseCase,
-            downloadBackgroundFile = mock(),
+            getCacheFileUseCase = getCacheFileUseCase,
+            downloadNodeUseCase = downloadNodeUseCase,
             ioDispatcher = StandardTestDispatcher(),
-            getNodeByIdUseCase = mock(),
+            getNodeByIdUseCase = getNodeByIdUseCase,
             getChatFileUseCase = getChatFileUseCase,
             getPublicChildNodeFromIdUseCase = mock(),
             getPublicNodeFromSerializedDataUseCase = mock(),
@@ -111,7 +133,14 @@ internal class TextEditorViewModelTest {
 
     @BeforeEach
     fun resetMocks() {
-        reset(checkNodesNameCollisionWithActionUseCase, checkChatNodesNameCollisionAndCopyUseCase)
+        reset(
+            checkNodesNameCollisionWithActionUseCase,
+            checkChatNodesNameCollisionAndCopyUseCase,
+            megaApi,
+            getCacheFileUseCase,
+            downloadNodeUseCase,
+            getNodeByIdUseCase,
+        )
     }
 
     @Test
@@ -418,6 +447,48 @@ internal class TextEditorViewModelTest {
                 assertThat(actual.isMarkDownFile).isEqualTo(expectedResult)
             }
         }
+
+    @Test
+    fun `test that typed node is downloaded to cache`() = runTest {
+        mockStatic(FileUtil::class.java).use {
+            val nodeHandle = 343L
+            val nodeExtension = "txt"
+            val nodeName = "text.$nodeExtension"
+
+            val testIntent = mock<Intent> {
+                on { getLongExtra(INTENT_EXTRA_KEY_HANDLE, INVALID_HANDLE) } doReturn nodeHandle
+            }
+            val typedNode = mock<TypedFileNode>()
+            val destination = "/cache/folder/$nodeName"
+
+            val megaNode = mock<MegaNode> {
+                on { handle } doReturn nodeHandle
+                on { name } doReturn nodeName
+            }
+            val file = File(destination)
+
+            whenever(megaApi.getNodeByHandle(nodeHandle)) doReturn megaNode
+            whenever(getNodeByIdUseCase(NodeId(nodeHandle))) doReturn typedNode
+            whenever(FileUtil.getLocalFile(megaNode)) doReturn null
+            whenever(
+                getCacheFileUseCase(eq(CacheFolderConstant.TEMPORARY_FOLDER), anyString())
+            ) doReturn file
+            whenever(downloadNodeUseCase(any(), anyString(), any(), any())) doReturn emptyFlow()
+
+            underTest.setInitialValues(testIntent, mock())
+            underTest.readFileContent()
+
+            advanceUntilIdle()
+
+            verify(downloadNodeUseCase)(
+                node = typedNode,
+                destinationPath = destination,
+                appData = listOf(TransferAppData.BackgroundTransfer),
+                isHighPriority = true,
+            )
+        }
+    }
+
 
     private fun provideIsMarkDownFileTestData() = listOf(
         arrayOf("file.md", true),

@@ -19,7 +19,7 @@ fun MegaNode.getPreviewFileName(): String =
  * Get Full Image File Name
  */
 fun MegaNode.getFileName(): String =
-    "$base64Handle.${MimeTypeList.typeForName(name).extension}"
+    "$base64Handle.${name.substringAfterLast(".", "")}"
 
 /**
  * Check if Node is a Video
