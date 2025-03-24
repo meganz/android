@@ -5,7 +5,7 @@ import kotlinx.coroutines.test.runTest
 import mega.privacy.android.domain.entity.uri.UriPath
 import mega.privacy.android.domain.repository.FileSystemRepository
 import mega.privacy.android.domain.repository.PermissionRepository
-import mega.privacy.android.domain.usecase.file.DoesPathHaveSufficientSpaceUseCase
+import mega.privacy.android.domain.usecase.file.DoesUriPathHaveSufficientSpaceUseCase
 import mega.privacy.android.domain.usecase.transfers.GetCacheFileForUploadUseCase
 import mega.privacy.android.domain.usecase.transfers.GetPathForUploadUseCase
 import org.junit.jupiter.api.BeforeAll
@@ -30,7 +30,7 @@ class GetPathForUploadUseCaseTest {
     private lateinit var underTest: GetPathForUploadUseCase
 
     private val getCacheFileForUploadUseCase = mock<GetCacheFileForUploadUseCase>()
-    private val doesPathHaveSufficientSpaceUseCase = mock<DoesPathHaveSufficientSpaceUseCase>()
+    private val doesUriPathHaveSufficientSpaceUseCase = mock<DoesUriPathHaveSufficientSpaceUseCase>()
     private val fileSystemRepository = mock<FileSystemRepository>()
     private val permissionRepository = mock<PermissionRepository>()
 
@@ -38,7 +38,7 @@ class GetPathForUploadUseCaseTest {
     fun setup() {
         underTest = GetPathForUploadUseCase(
             getCacheFileForUploadUseCase = getCacheFileForUploadUseCase,
-            doesPathHaveSufficientSpaceUseCase = doesPathHaveSufficientSpaceUseCase,
+            doesUriPathHaveSufficientSpaceUseCase = doesUriPathHaveSufficientSpaceUseCase,
             fileSystemRepository = fileSystemRepository,
             permissionRepository = permissionRepository,
         )
@@ -48,14 +48,14 @@ class GetPathForUploadUseCaseTest {
     fun resetMocks() = runTest {
         reset(
             getCacheFileForUploadUseCase,
-            doesPathHaveSufficientSpaceUseCase,
+            doesUriPathHaveSufficientSpaceUseCase,
             fileSystemRepository,
             permissionRepository,
         )
         whenever(fileSystemRepository.isFileUri(any())).thenReturn(false)
         whenever(fileSystemRepository.isContentUri(any())).thenReturn(false)
         whenever(fileSystemRepository.isFilePath(any())).thenReturn(false)
-        whenever(doesPathHaveSufficientSpaceUseCase(any(), any())).thenReturn(true)
+        whenever(doesUriPathHaveSufficientSpaceUseCase(any(), any())).thenReturn(true)
     }
 
     @ParameterizedTest(name = " and isChatUpload is {0}")
@@ -123,7 +123,7 @@ class GetPathForUploadUseCaseTest {
             val filePath = "/folder/example.txt"
             val file = File(filePath)
             whenever(permissionRepository.hasManageExternalStoragePermission()).thenReturn(false)
-            whenever(doesPathHaveSufficientSpaceUseCase(any(), any())) doReturn false
+            whenever(doesUriPathHaveSufficientSpaceUseCase(any(), any())) doReturn false
             whenever(fileSystemRepository.isContentUri(any())).thenReturn(true)
             whenever(fileSystemRepository.getFileNameFromUri(uriString)).thenReturn(filePath)
             whenever(getCacheFileForUploadUseCase(any(), any())).thenReturn(file)

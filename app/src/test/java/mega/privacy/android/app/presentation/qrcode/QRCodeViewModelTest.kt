@@ -36,7 +36,7 @@ import mega.privacy.android.domain.usecase.avatar.GetMyAvatarFileUseCase
 import mega.privacy.android.domain.usecase.contact.GetCurrentUserEmail
 import mega.privacy.android.domain.usecase.contact.InviteContactWithHandleUseCase
 import mega.privacy.android.domain.usecase.file.CheckFileNameCollisionsUseCase
-import mega.privacy.android.domain.usecase.file.DoesPathHaveSufficientSpaceUseCase
+import mega.privacy.android.domain.usecase.file.DoesUriPathHaveSufficientSpaceUseCase
 import mega.privacy.android.domain.usecase.qrcode.CreateContactLinkUseCase
 import mega.privacy.android.domain.usecase.qrcode.DeleteQRCodeUseCase
 import mega.privacy.android.domain.usecase.qrcode.QueryScannedContactLinkUseCase
@@ -80,7 +80,7 @@ class QRCodeViewModelTest {
     private val myQRCodeTextErrorMapper = mock<MyQRCodeTextErrorMapper>()
     private val scannerHandler = mock<ScannerHandler>()
     private val getCurrentUserEmail = mock<GetCurrentUserEmail>()
-    private val doesPathHaveSufficientSpaceUseCase = mock<DoesPathHaveSufficientSpaceUseCase>()
+    private val doesUriPathHaveSufficientSpaceUseCase = mock<DoesUriPathHaveSufficientSpaceUseCase>()
     private val scanMediaFileUseCase = mock<ScanMediaFileUseCase>()
     private val getRootNodeUseCase = mock<GetRootNodeUseCase>()
     private val monitorStorageStateEventUseCase = mock<MonitorStorageStateEventUseCase>()
@@ -108,7 +108,7 @@ class QRCodeViewModelTest {
             myQRCodeTextErrorMapper = myQRCodeTextErrorMapper,
             scannerHandler = scannerHandler,
             getCurrentUserEmail = getCurrentUserEmail,
-            doesPathHaveSufficientSpaceUseCase = doesPathHaveSufficientSpaceUseCase,
+            doesUriPathHaveSufficientSpaceUseCase = doesUriPathHaveSufficientSpaceUseCase,
             scanMediaFileUseCase = scanMediaFileUseCase,
             getRootNodeUseCase = getRootNodeUseCase,
             monitorStorageStateEventUseCase = monitorStorageStateEventUseCase,

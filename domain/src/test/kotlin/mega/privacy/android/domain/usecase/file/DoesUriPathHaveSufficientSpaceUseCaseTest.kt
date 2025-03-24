@@ -1,9 +1,8 @@
 package mega.privacy.android.domain.usecase.file
 
 import com.google.common.truth.Truth.assertThat
-import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.test.runTest
-import mega.privacy.android.domain.repository.FileSystemRepository
+import mega.privacy.android.domain.entity.uri.UriPath
 import org.junit.jupiter.api.BeforeAll
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
@@ -14,48 +13,47 @@ import org.mockito.kotlin.reset
 import org.mockito.kotlin.stub
 
 
-@OptIn(ExperimentalCoroutinesApi::class)
 @TestInstance(TestInstance.Lifecycle.PER_CLASS)
-internal class DoesPathHaveSufficientSpaceUseCaseTest {
-    private lateinit var underTest: DoesPathHaveSufficientSpaceUseCase
+internal class DoesUriPathHaveSufficientSpaceUseCaseTest {
+    private lateinit var underTest: DoesUriPathHaveSufficientSpaceUseCase
 
-    private val fileSystemRepository = mock<FileSystemRepository>()
+    private val getDiskSpaceBytesUseCase = mock<GetDiskSpaceBytesUseCase>()
 
     @BeforeAll
     fun setUp() {
-        underTest = DoesPathHaveSufficientSpaceUseCase(
-            fileSystemRepository = fileSystemRepository
+        underTest = DoesUriPathHaveSufficientSpaceUseCase(
+            getDiskSpaceBytesUseCase = getDiskSpaceBytesUseCase
         )
     }
 
     @BeforeEach
     fun resetMocks() {
-        reset(fileSystemRepository)
+        reset(getDiskSpaceBytesUseCase)
     }
 
     @Test
     internal fun `test that false is returned if the path has less space than required, `() =
         runTest {
             val required = 123L
-            fileSystemRepository.stub { onBlocking { getDiskSpaceBytes(any()) }.thenReturn(required - 1) }
+            getDiskSpaceBytesUseCase.stub { onBlocking { invoke(any()) }.thenReturn(required - 1) }
 
-            assertThat(underTest("", required)).isFalse()
+            assertThat(underTest(UriPath(""), required)).isFalse()
         }
 
     @Test
     internal fun `test that true is returned if the path has more space than required`() =
         runTest {
             val required = 123L
-            fileSystemRepository.stub { onBlocking { getDiskSpaceBytes(any()) }.thenReturn(required + 1) }
+            getDiskSpaceBytesUseCase.stub { onBlocking { invoke(any()) }.thenReturn(required + 1) }
 
-            assertThat(underTest("", required)).isTrue()
+            assertThat(underTest(UriPath(""), required)).isTrue()
         }
 
     @Test
     internal fun `test that false is returned if file repository throws an error`() = runTest {
         val required = 123L
-        fileSystemRepository.stub { onBlocking { getDiskSpaceBytes(any()) }.thenAnswer { throw IllegalArgumentException() } }
+        getDiskSpaceBytesUseCase.stub { onBlocking { invoke(any()) }.thenAnswer { throw IllegalArgumentException() } }
 
-        assertThat(underTest("", required)).isFalse()
+        assertThat(underTest(UriPath(""), required)).isFalse()
     }
 }

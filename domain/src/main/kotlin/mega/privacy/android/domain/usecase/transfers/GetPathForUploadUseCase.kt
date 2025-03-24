@@ -4,7 +4,7 @@ import mega.privacy.android.domain.entity.uri.UriPath
 import mega.privacy.android.domain.exception.NotEnoughStorageException
 import mega.privacy.android.domain.repository.FileSystemRepository
 import mega.privacy.android.domain.repository.PermissionRepository
-import mega.privacy.android.domain.usecase.file.DoesPathHaveSufficientSpaceUseCase
+import mega.privacy.android.domain.usecase.file.DoesUriPathHaveSufficientSpaceUseCase
 import java.io.File
 import javax.inject.Inject
 
@@ -16,7 +16,7 @@ import javax.inject.Inject
  */
 class GetPathForUploadUseCase @Inject constructor(
     private val getCacheFileForUploadUseCase: GetCacheFileForUploadUseCase,
-    private val doesPathHaveSufficientSpaceUseCase: DoesPathHaveSufficientSpaceUseCase,
+    private val doesUriPathHaveSufficientSpaceUseCase: DoesUriPathHaveSufficientSpaceUseCase,
     private val fileSystemRepository: FileSystemRepository,
     private val permissionRepository: PermissionRepository,
 ) {
@@ -49,7 +49,11 @@ class GetPathForUploadUseCase @Inject constructor(
                             isChatUpload = isChatUpload,
                         )?.also { destination ->
                             val size = fileSystemRepository.getFileSizeFromUri(it) ?: 0L
-                            if (!doesPathHaveSufficientSpaceUseCase(destination.parent, size)) {
+                            if (!doesUriPathHaveSufficientSpaceUseCase(
+                                    UriPath(destination.parent),
+                                    size
+                                )
+                            ) {
                                 throw NotEnoughStorageException()
                             }
                             fileSystemRepository.copyContentUriToFile(

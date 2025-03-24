@@ -1,5 +1,6 @@
 package mega.privacy.android.domain.usecase.file
 
+import mega.privacy.android.domain.entity.uri.UriPath
 import mega.privacy.android.domain.repository.CacheRepository
 import mega.privacy.android.domain.repository.FileSystemRepository
 import javax.inject.Inject
@@ -8,7 +9,7 @@ import javax.inject.Inject
  * Does cache have sufficient space for all the files identified by uris
  */
 class DoesCacheHaveSufficientSpaceForUrisUseCase @Inject constructor(
-    private val doesPathHaveSufficientSpaceUseCase: DoesPathHaveSufficientSpaceUseCase,
+    private val doesUriPathHaveSufficientSpaceUseCase: DoesUriPathHaveSufficientSpaceUseCase,
     private val fileSystemRepository: FileSystemRepository,
     private val cacheRepository: CacheRepository,
 ) {
@@ -20,8 +21,8 @@ class DoesCacheHaveSufficientSpaceForUrisUseCase @Inject constructor(
      */
     suspend operator fun invoke(uris: List<String>) =
         cacheRepository.getCacheFolder(TEMPORARY_FOLDER)?.path?.let { cacheFolderPath ->
-            doesPathHaveSufficientSpaceUseCase(
-                path = cacheFolderPath,
+            doesUriPathHaveSufficientSpaceUseCase(
+                uriPath = UriPath(cacheFolderPath),
                 requiredSpace = uris.sumOf { fileSystemRepository.getFileSizeFromUri(it) ?: 0L }
             )
         } ?: false

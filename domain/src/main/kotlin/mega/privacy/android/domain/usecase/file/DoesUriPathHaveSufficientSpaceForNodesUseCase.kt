@@ -11,8 +11,7 @@ import javax.inject.Inject
  */
 class DoesUriPathHaveSufficientSpaceForNodesUseCase @Inject constructor(
     private val totalFileSizeOfNodesUseCase: TotalFileSizeOfNodesUseCase,
-    private val doesPathHaveSufficientSpaceUseCase: DoesPathHaveSufficientSpaceUseCase,
-    private val fileSystemRepository: FileSystemRepository,
+    private val doesUriPathHaveSufficientSpaceUseCase: DoesUriPathHaveSufficientSpaceUseCase,
 ) {
     /**
      * Invoke
@@ -22,16 +21,8 @@ class DoesUriPathHaveSufficientSpaceForNodesUseCase @Inject constructor(
      * @return true if path has sufficient space, otherwise false
      */
     suspend operator fun invoke(destinationUriPath: UriPath, nodes: List<TypedNode>): Boolean =
-        doesPathHaveSufficientSpaceUseCase(
-            path = when {
-                fileSystemRepository.isExternalStorageContentUri(destinationUriPath.value) ->
-                    fileSystemRepository.getExternalPathByContentUri(destinationUriPath.value)
-
-                fileSystemRepository.isFileUri(destinationUriPath.value) ->
-                    fileSystemRepository.getFileFromFileUri(destinationUriPath.value).absolutePath
-
-                else -> null
-            } ?: destinationUriPath.value,
+        doesUriPathHaveSufficientSpaceUseCase(
+            uriPath = destinationUriPath,
             requiredSpace = totalFileSizeOfNodesUseCase(nodes)
         )
 

@@ -68,7 +68,7 @@ interface FileSystemRepository {
 
 
     /**
-     * Get disk space
+     * Get disk space at the given path.
      *
      * @param path
      * @return disk space at path in bytes

@@ -2,6 +2,7 @@ package mega.privacy.android.domain.usecase.file
 
 import com.google.common.truth.Truth.assertThat
 import kotlinx.coroutines.test.runTest
+import mega.privacy.android.domain.entity.uri.UriPath
 import mega.privacy.android.domain.repository.CacheRepository
 import mega.privacy.android.domain.repository.FileSystemRepository
 import org.junit.jupiter.api.BeforeAll
@@ -22,14 +23,15 @@ import java.io.File
 class DoesCacheHaveSufficientSpaceForUrisUseCaseTest {
     private lateinit var underTest: DoesCacheHaveSufficientSpaceForUrisUseCase
 
-    private val doesPathHaveSufficientSpaceUseCase = mock<DoesPathHaveSufficientSpaceUseCase>()
+    private val doesUriPathHaveSufficientSpaceUseCase =
+        mock<DoesUriPathHaveSufficientSpaceUseCase>()
     private val fileSystemRepository = mock<FileSystemRepository>()
     private val cacheRepository = mock<CacheRepository>()
 
     @BeforeAll
     fun setup() {
         underTest = DoesCacheHaveSufficientSpaceForUrisUseCase(
-            doesPathHaveSufficientSpaceUseCase,
+            doesUriPathHaveSufficientSpaceUseCase,
             fileSystemRepository,
             cacheRepository,
         )
@@ -37,7 +39,7 @@ class DoesCacheHaveSufficientSpaceForUrisUseCaseTest {
 
     @BeforeEach
     fun resetMocks() = reset(
-        doesPathHaveSufficientSpaceUseCase,
+        doesUriPathHaveSufficientSpaceUseCase,
         fileSystemRepository,
         cacheRepository,
     )
@@ -59,7 +61,12 @@ class DoesCacheHaveSufficientSpaceForUrisUseCaseTest {
             whenever(fileSystemRepository.getFileSizeFromUri(uriString)) doReturn uriSize
         }
         whenever(cacheRepository.getCacheFolder(any())) doReturn destination
-        whenever(doesPathHaveSufficientSpaceUseCase(destination.path, totalSpace)) doReturn expected
+        whenever(
+            doesUriPathHaveSufficientSpaceUseCase(
+                UriPath(destination.path),
+                totalSpace
+            )
+        ) doReturn expected
 
         val actual = underTest(urisToSize.keys.toList())
 
@@ -79,6 +86,6 @@ class DoesCacheHaveSufficientSpaceForUrisUseCaseTest {
         val actual = underTest(urisToSize.keys.toList())
 
         assertThat(actual).isEqualTo(false)
-        verifyNoInteractions(doesPathHaveSufficientSpaceUseCase, fileSystemRepository)
+        verifyNoInteractions(doesUriPathHaveSufficientSpaceUseCase, fileSystemRepository)
     }
 }

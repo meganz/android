@@ -44,7 +44,7 @@ import mega.privacy.android.domain.usecase.avatar.GetMyAvatarFileUseCase
 import mega.privacy.android.domain.usecase.contact.GetCurrentUserEmail
 import mega.privacy.android.domain.usecase.contact.InviteContactWithHandleUseCase
 import mega.privacy.android.domain.usecase.file.CheckFileNameCollisionsUseCase
-import mega.privacy.android.domain.usecase.file.DoesPathHaveSufficientSpaceUseCase
+import mega.privacy.android.domain.usecase.file.DoesUriPathHaveSufficientSpaceUseCase
 import mega.privacy.android.domain.usecase.qrcode.CreateContactLinkUseCase
 import mega.privacy.android.domain.usecase.qrcode.DeleteQRCodeUseCase
 import mega.privacy.android.domain.usecase.qrcode.QueryScannedContactLinkUseCase
@@ -76,7 +76,7 @@ class QRCodeViewModel @Inject constructor(
     private val myQRCodeTextErrorMapper: MyQRCodeTextErrorMapper,
     private val scannerHandler: ScannerHandler,
     private val getCurrentUserEmail: GetCurrentUserEmail,
-    private val doesPathHaveSufficientSpaceUseCase: DoesPathHaveSufficientSpaceUseCase,
+    private val doesUriPathHaveSufficientSpaceUseCase: DoesUriPathHaveSufficientSpaceUseCase,
     private val scanMediaFileUseCase: ScanMediaFileUseCase,
     private val getRootNodeUseCase: GetRootNodeUseCase,
     private val monitorStorageStateEventUseCase: MonitorStorageStateEventUseCase,
@@ -358,7 +358,7 @@ class QRCodeViewModel @Inject constructor(
                 return@launch
             }
 
-            if (!doesPathHaveSufficientSpaceUseCase(parentPath, qrFile.length())) {
+            if (!doesUriPathHaveSufficientSpaceUseCase(UriPath(parentPath), qrFile.length())) {
                 setResultMessage(R.string.error_not_enough_free_space)
                 return@launch
             }
