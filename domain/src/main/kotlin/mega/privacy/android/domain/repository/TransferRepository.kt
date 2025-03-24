@@ -457,12 +457,22 @@ interface TransferRepository {
     /**
      * @return a flow that emits true if DownloadsWorker is enqueued. false otherwise
      */
-    fun isDownloadsWorkerEnqueuedFlow(): Flow<Boolean>
+    fun monitorIsDownloadsWorkerEnqueued(): Flow<Boolean>
+
+    /**
+     * @return a flow that emits true if DownloadsWorker is finished (not running or enqueued). false otherwise
+     */
+    fun monitorIsDownloadsWorkerFinished(): Flow<Boolean>
 
     /**
      * @return a flow that emits true if ChatUploadsWorker is enqueued. false otherwise
      */
-    fun isChatUploadsWorkerEnqueuedFlow(): Flow<Boolean>
+    fun monitorIsChatUploadsWorkerEnqueued(): Flow<Boolean>
+
+    /**
+     * @return a flow that emits true if ChatUploadsWorker is finished (not running or enqueued). false otherwise
+     */
+    fun monitorIsChatUploadsWorkerFinished(): Flow<Boolean>
 
     /**
      * @return true if the user can choose download's destination. False means downloads will be saved to default destination. See [settingsRepository.setDefaultStorageDownloadLocation()]
@@ -487,7 +497,12 @@ interface TransferRepository {
     /**
      * @return a flow that emits true if UploadsWorker is enqueued. false otherwise
      */
-    fun isUploadsWorkerEnqueuedFlow(): Flow<Boolean>
+    fun monitorIsUploadsWorkerEnqueued(): Flow<Boolean>
+
+    /**
+     * @return a flow that emits true if UploadsWorker is finished (not running or enqueued). false otherwise
+     */
+    fun monitorIsUploadsWorkerFinished(): Flow<Boolean>
 
 
     /**

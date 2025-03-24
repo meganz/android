@@ -17,6 +17,6 @@ class StartUploadsWorkerAndWaitUntilIsStartedUseCase @Inject constructor(
      */
     suspend operator fun invoke() {
         startUploadsWorkerUseCase()
-        transferRepository.isUploadsWorkerEnqueuedFlow().first { !it }
+        transferRepository.monitorIsUploadsWorkerEnqueued().first { !it }
     }
 }

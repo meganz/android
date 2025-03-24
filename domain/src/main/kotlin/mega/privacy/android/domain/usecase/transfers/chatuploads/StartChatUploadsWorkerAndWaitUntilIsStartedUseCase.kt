@@ -17,6 +17,6 @@ class StartChatUploadsWorkerAndWaitUntilIsStartedUseCase @Inject constructor(
      */
     suspend operator fun invoke() {
         startChatUploadsWorkerUseCase()
-        transferRepository.isChatUploadsWorkerEnqueuedFlow().first { !it }
+        transferRepository.monitorIsChatUploadsWorkerEnqueued().first { !it }
     }
 }

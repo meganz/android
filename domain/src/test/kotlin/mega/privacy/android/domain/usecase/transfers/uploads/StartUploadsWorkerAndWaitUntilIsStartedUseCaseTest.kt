@@ -41,7 +41,7 @@ class StartUploadsWorkerAndWaitUntilIsStartedUseCaseTest {
     fun `test that startUploadsWorkerUseCase is invoked and suspend function returns when repository emits false in isUploadsWorkerEnqueuedFlow`() =
         runTest {
             val enqueuedFlow = MutableStateFlow(true)
-            whenever(transferRepository.isUploadsWorkerEnqueuedFlow()).thenReturn(enqueuedFlow)
+            whenever(transferRepository.monitorIsUploadsWorkerEnqueued()).thenReturn(enqueuedFlow)
             launch {
                 assertThat(enqueuedFlow.value).isTrue()
                 underTest()

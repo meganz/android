@@ -1429,15 +1429,35 @@ class DefaultTransfersRepositoryTest {
 
         @ParameterizedTest
         @EnumSource(WorkInfo.State::class)
-        fun `test that isDownloadsWorkerEnqueuedFlow returns workerManagerGateway values`(state: WorkInfo.State) =
+        fun `test that monitorIsDownloadsWorkerEnqueued returns workerManagerGateway values`(state: WorkInfo.State) =
             runTest {
                 val workInfo = mock<WorkInfo> {
                     on { this.state }.thenReturn(state)
                 }
                 whenever(workerManagerGateway.monitorDownloadsStatusInfo())
                     .thenReturn(flowOf(listOf(workInfo)))
-                underTest.isDownloadsWorkerEnqueuedFlow().test {
+                underTest.monitorIsDownloadsWorkerEnqueued().test {
                     if (state == WorkInfo.State.ENQUEUED) {
+                        assertThat(awaitItem()).isTrue()
+                    } else {
+                        assertThat(awaitItem()).isFalse()
+                    }
+                    cancelAndIgnoreRemainingEvents()
+                }
+
+            }
+
+        @ParameterizedTest
+        @EnumSource(WorkInfo.State::class)
+        fun `test that monitorIsDownloadsWorkerFinished returns workerManagerGateway values`(state: WorkInfo.State) =
+            runTest {
+                val workInfo = mock<WorkInfo> {
+                    on { this.state }.thenReturn(state)
+                }
+                whenever(workerManagerGateway.monitorDownloadsStatusInfo())
+                    .thenReturn(flowOf(listOf(workInfo)))
+                underTest.monitorIsDownloadsWorkerFinished().test {
+                    if (state.isFinished) {
                         assertThat(awaitItem()).isTrue()
                     } else {
                         assertThat(awaitItem()).isFalse()
@@ -1456,15 +1476,35 @@ class DefaultTransfersRepositoryTest {
 
         @ParameterizedTest
         @EnumSource(WorkInfo.State::class)
-        fun `test that isUploadsWorkerEnqueuedFlow returns workerManagerGateway values`(state: WorkInfo.State) =
+        fun `test that monitorIsUploadsWorkerEnqueued returns workerManagerGateway values`(state: WorkInfo.State) =
             runTest {
                 val workInfo = mock<WorkInfo> {
                     on { this.state }.thenReturn(state)
                 }
                 whenever(workerManagerGateway.monitorUploadsStatusInfo())
                     .thenReturn(flowOf(listOf(workInfo)))
-                underTest.isUploadsWorkerEnqueuedFlow().test {
+                underTest.monitorIsUploadsWorkerEnqueued().test {
                     if (state == WorkInfo.State.ENQUEUED) {
+                        assertThat(awaitItem()).isTrue()
+                    } else {
+                        assertThat(awaitItem()).isFalse()
+                    }
+                    cancelAndIgnoreRemainingEvents()
+                }
+
+            }
+
+        @ParameterizedTest
+        @EnumSource(WorkInfo.State::class)
+        fun `test that monitorUploadsStatusInfo returns workerManagerGateway values`(state: WorkInfo.State) =
+            runTest {
+                val workInfo = mock<WorkInfo> {
+                    on { this.state }.thenReturn(state)
+                }
+                whenever(workerManagerGateway.monitorUploadsStatusInfo())
+                    .thenReturn(flowOf(listOf(workInfo)))
+                underTest.monitorIsUploadsWorkerFinished().test {
+                    if (state.isFinished) {
                         assertThat(awaitItem()).isTrue()
                     } else {
                         assertThat(awaitItem()).isFalse()
@@ -1765,7 +1805,9 @@ class DefaultTransfersRepositoryTest {
         whenever(megaLocalRoomGateway.insertActiveTransferGroup(activeTransferActionGroup))
             .thenReturn(expected)
 
-        assertThat(underTest.insertActiveTransferGroup(activeTransferActionGroup)).isEqualTo(expected)
+        assertThat(underTest.insertActiveTransferGroup(activeTransferActionGroup)).isEqualTo(
+            expected
+        )
     }
 
     @Test

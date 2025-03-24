@@ -41,7 +41,7 @@ class StartChatUploadsWorkerAndWaitUntilIsStartedUseCaseTest {
     fun `test that startChatUploadsWorkerUseCase is invoked and suspend function returns when repository emits false in isChatUploadsWorkerEnqueuedFlow`() =
         runTest {
             val enqueuedFlow = MutableStateFlow(true)
-            whenever(transferRepository.isChatUploadsWorkerEnqueuedFlow()).thenReturn(enqueuedFlow)
+            whenever(transferRepository.monitorIsChatUploadsWorkerEnqueued()).thenReturn(enqueuedFlow)
             launch {
                 assertThat(enqueuedFlow.value).isTrue()
                 underTest()

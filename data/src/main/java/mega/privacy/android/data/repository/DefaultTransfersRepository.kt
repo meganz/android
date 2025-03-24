@@ -527,18 +527,28 @@ internal class DefaultTransfersRepository @Inject constructor(
         workerManagerGateway.enqueueChatUploadsWorkerRequest()
     }
 
-    override fun isDownloadsWorkerEnqueuedFlow() =
+    override fun monitorIsDownloadsWorkerEnqueued() =
         workerManagerGateway.monitorDownloadsStatusInfo().map { workInfos ->
             workInfos.any { it.state == WorkInfo.State.ENQUEUED }
+        }
+
+    override fun monitorIsDownloadsWorkerFinished() =
+        workerManagerGateway.monitorDownloadsStatusInfo().map { workInfos ->
+            workInfos.any { it.state.isFinished }
         }
 
     override suspend fun allowUserToSetDownloadDestination(): Boolean = withContext(ioDispatcher) {
         deviceGateway.getSdkVersionInt() < Build.VERSION_CODES.R
     }
 
-    override fun isChatUploadsWorkerEnqueuedFlow() =
+    override fun monitorIsChatUploadsWorkerEnqueued() =
         workerManagerGateway.monitorChatUploadsStatusInfo().map { workInfos ->
             workInfos.any { it.state == WorkInfo.State.ENQUEUED }
+        }
+
+    override fun monitorIsChatUploadsWorkerFinished() =
+        workerManagerGateway.monitorChatUploadsStatusInfo().map { workInfos ->
+            workInfos.any { it.state.isFinished }
         }
 
     override suspend fun getActiveTransferByTag(tag: Int) = withContext(ioDispatcher) {
@@ -733,9 +743,14 @@ internal class DefaultTransfersRepository @Inject constructor(
         workerManagerGateway.enqueueUploadsWorkerRequest()
     }
 
-    override fun isUploadsWorkerEnqueuedFlow() =
+    override fun monitorIsUploadsWorkerEnqueued() =
         workerManagerGateway.monitorUploadsStatusInfo().map { workInfos ->
             workInfos.any { it.state == WorkInfo.State.ENQUEUED }
+        }
+
+    override fun monitorIsUploadsWorkerFinished() =
+        workerManagerGateway.monitorUploadsStatusInfo().map { workInfos ->
+            workInfos.any { it.state.isFinished }
         }
 
     override suspend fun updateInProgressTransfer(transfer: Transfer) {
