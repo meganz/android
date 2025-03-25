@@ -26,12 +26,15 @@ import mega.privacy.android.domain.usecase.camerauploads.GetCameraUploadsBackupU
 import mega.privacy.android.domain.usecase.camerauploads.GetMediaUploadsBackupUseCase
 import mega.privacy.android.domain.usecase.camerauploads.GetPrimaryFolderNodeUseCase
 import mega.privacy.android.domain.usecase.camerauploads.GetPrimaryFolderPathUseCase
+import mega.privacy.android.domain.usecase.camerauploads.GetPrimarySyncHandleUseCase
 import mega.privacy.android.domain.usecase.camerauploads.GetSecondaryFolderNodeUseCase
 import mega.privacy.android.domain.usecase.camerauploads.GetSecondaryFolderPathUseCase
+import mega.privacy.android.domain.usecase.camerauploads.GetSecondarySyncHandleUseCase
 import mega.privacy.android.domain.usecase.camerauploads.MonitorCameraUploadsSettingsActionsUseCase
 import mega.privacy.android.domain.usecase.camerauploads.MonitorCameraUploadsStatusInfoUseCase
 import mega.privacy.android.domain.usecase.environment.GetBatteryInfoUseCase
 import mega.privacy.android.domain.usecase.environment.MonitorBatteryInfoUseCase
+import mega.privacy.android.domain.usecase.node.MonitorNodeUpdatesUseCase
 import mega.privacy.android.domain.usecase.node.MoveDeconfiguredBackupNodesUseCase
 import mega.privacy.android.domain.usecase.node.RemoveDeconfiguredBackupNodesUseCase
 import mega.privacy.android.feature.sync.domain.entity.FolderPair
@@ -96,6 +99,9 @@ class SyncFoldersViewModelTest {
     private val getPrimaryFolderPathUseCase: GetPrimaryFolderPathUseCase = mock()
     private val getSecondaryFolderNodeUseCase: GetSecondaryFolderNodeUseCase = mock()
     private val getSecondaryFolderPathUseCase: GetSecondaryFolderPathUseCase = mock()
+    private val monitorNodeUpdatesUseCase: MonitorNodeUpdatesUseCase = mock()
+    private val getPrimarySyncHandleUseCase: GetPrimarySyncHandleUseCase = mock()
+    private val getSecondarySyncHandleUseCase: GetSecondarySyncHandleUseCase = mock()
     private lateinit var underTest: SyncFoldersViewModel
 
     private val folderPairs = listOf(
@@ -198,7 +204,10 @@ class SyncFoldersViewModelTest {
             getSecondaryFolderNodeUseCase,
             getSecondaryFolderPathUseCase,
             getBatteryInfoUseCase,
-            monitorBatteryInfoUseCase
+            monitorBatteryInfoUseCase,
+            monitorNodeUpdatesUseCase,
+            getPrimarySyncHandleUseCase,
+            getSecondarySyncHandleUseCase,
         )
     }
 
@@ -451,6 +460,9 @@ class SyncFoldersViewModelTest {
             getPrimaryFolderPathUseCase = getPrimaryFolderPathUseCase,
             getSecondaryFolderNodeUseCase = getSecondaryFolderNodeUseCase,
             getSecondaryFolderPathUseCase = getSecondaryFolderPathUseCase,
+            monitorNodeUpdatesUseCase = monitorNodeUpdatesUseCase,
+            getPrimarySyncHandleUseCase = getPrimarySyncHandleUseCase,
+            getSecondarySyncHandleUseCase = getSecondarySyncHandleUseCase,
         )
     }
 }

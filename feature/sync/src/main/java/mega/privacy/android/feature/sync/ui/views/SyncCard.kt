@@ -54,6 +54,8 @@ import mega.privacy.mobile.analytics.event.SyncCardOpenDeviceFolderButtonPressed
 import mega.privacy.mobile.analytics.event.SyncCardOpenMegaFolderButtonPressedEvent
 import mega.privacy.mobile.analytics.event.SyncCardPauseRunButtonPressedEvent
 import mega.privacy.mobile.analytics.event.SyncCardStopButtonPressedEvent
+import kotlin.io.path.Path
+import kotlin.io.path.name
 
 @Composable
 internal fun SyncCard(
@@ -74,7 +76,10 @@ internal fun SyncCard(
         content = {
             SyncCardHeader(
                 syncType = sync.syncType,
-                folderPairName = sync.folderPairName,
+                folderPairName = when (sync.syncType) {
+                    SyncType.TYPE_CAMERA_UPLOADS, SyncType.TYPE_MEDIA_UPLOADS -> Path(sync.megaStoragePath).name
+                    else -> sync.folderPairName
+                },
                 status = sync.status,
                 hasStalledIssues = sync.hasStalledIssues,
                 method = stringResource(id = sync.method)

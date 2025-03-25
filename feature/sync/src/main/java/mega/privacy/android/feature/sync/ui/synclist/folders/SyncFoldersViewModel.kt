@@ -31,12 +31,15 @@ import mega.privacy.android.domain.usecase.camerauploads.GetCameraUploadsBackupU
 import mega.privacy.android.domain.usecase.camerauploads.GetMediaUploadsBackupUseCase
 import mega.privacy.android.domain.usecase.camerauploads.GetPrimaryFolderNodeUseCase
 import mega.privacy.android.domain.usecase.camerauploads.GetPrimaryFolderPathUseCase
+import mega.privacy.android.domain.usecase.camerauploads.GetPrimarySyncHandleUseCase
 import mega.privacy.android.domain.usecase.camerauploads.GetSecondaryFolderNodeUseCase
 import mega.privacy.android.domain.usecase.camerauploads.GetSecondaryFolderPathUseCase
+import mega.privacy.android.domain.usecase.camerauploads.GetSecondarySyncHandleUseCase
 import mega.privacy.android.domain.usecase.camerauploads.MonitorCameraUploadsSettingsActionsUseCase
 import mega.privacy.android.domain.usecase.camerauploads.MonitorCameraUploadsStatusInfoUseCase
 import mega.privacy.android.domain.usecase.environment.GetBatteryInfoUseCase
 import mega.privacy.android.domain.usecase.environment.MonitorBatteryInfoUseCase
+import mega.privacy.android.domain.usecase.node.MonitorNodeUpdatesUseCase
 import mega.privacy.android.domain.usecase.node.MoveDeconfiguredBackupNodesUseCase
 import mega.privacy.android.domain.usecase.node.RemoveDeconfiguredBackupNodesUseCase
 import mega.privacy.android.feature.sync.domain.entity.SyncStatus
@@ -83,6 +86,9 @@ internal class SyncFoldersViewModel @Inject constructor(
     private val getPrimaryFolderPathUseCase: GetPrimaryFolderPathUseCase,
     private val getSecondaryFolderNodeUseCase: GetSecondaryFolderNodeUseCase,
     private val getSecondaryFolderPathUseCase: GetSecondaryFolderPathUseCase,
+    private val monitorNodeUpdatesUseCase: MonitorNodeUpdatesUseCase,
+    private val getPrimarySyncHandleUseCase: GetPrimarySyncHandleUseCase,
+    private val getSecondarySyncHandleUseCase: GetSecondarySyncHandleUseCase,
 ) : ViewModel() {
 
     private val _uiState = MutableStateFlow(SyncFoldersUiState(emptyList()))
@@ -116,6 +122,18 @@ internal class SyncFoldersViewModel @Inject constructor(
             monitorCameraUploadsSettingsActionsUseCase()
                 .catch { Timber.e(it) }
                 .collect { loadSyncs() }
+        }
+
+        viewModelScope.launch {
+            monitorNodeUpdatesUseCase()
+                .catch { Timber.e(it) }
+                .collect { updatedNodes ->
+                    val handles =
+                        setOf(getPrimarySyncHandleUseCase(), getSecondarySyncHandleUseCase())
+                    updatedNodes.changes.keys.find {
+                        handles.contains(it.id.longValue)
+                    }?.run { loadSyncs() }
+                }
         }
     }
 
