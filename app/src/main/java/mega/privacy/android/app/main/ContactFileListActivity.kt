@@ -1,6 +1,5 @@
 package mega.privacy.android.app.main
 
-import mega.privacy.android.shared.resources.R as sharedR
 import android.Manifest
 import android.content.BroadcastReceiver
 import android.content.Context
@@ -43,13 +42,13 @@ import mega.privacy.android.app.activities.PasscodeActivity
 import mega.privacy.android.app.activities.contract.NameCollisionActivityContract
 import mega.privacy.android.app.activities.contract.SelectFolderToCopyActivityContract
 import mega.privacy.android.app.arch.extensions.collectFlow
-import mega.privacy.android.app.constants.BroadcastConstants.BROADCAST_ACTION_DESTROY_ACTION_MODE
 import mega.privacy.android.app.constants.BroadcastConstants.BROADCAST_ACTION_INTENT_MANAGE_SHARE
 import mega.privacy.android.app.extensions.consumeInsetsWithToolbar
 import mega.privacy.android.app.interfaces.ActionNodeCallback
 import mega.privacy.android.app.interfaces.SnackbarShower
 import mega.privacy.android.app.modalbottomsheet.ContactFileListBottomSheetDialogFragment
 import mega.privacy.android.app.modalbottomsheet.ModalBottomSheetUtil.isBottomSheetDialogShown
+import mega.privacy.android.app.modalbottomsheet.OnFolderLeaveCallBack
 import mega.privacy.android.app.modalbottomsheet.UploadBottomSheetDialogFragment
 import mega.privacy.android.app.presentation.bottomsheet.UploadBottomSheetDialogActionListener
 import mega.privacy.android.app.presentation.contact.ContactFileListViewModel
@@ -97,6 +96,7 @@ import mega.privacy.android.domain.usecase.GetThemeMode
 import mega.privacy.android.domain.usecase.file.CheckFileNameCollisionsUseCase
 import mega.privacy.android.domain.usecase.node.GetNodeByHandleUseCase
 import mega.privacy.android.shared.original.core.ui.theme.OriginalTheme
+import mega.privacy.android.shared.resources.R as sharedR
 import mega.privacy.mobile.analytics.event.DocumentScanInitiatedEvent
 import nz.mega.sdk.MegaApiJava
 import nz.mega.sdk.MegaApiJava.INVALID_HANDLE
@@ -118,7 +118,7 @@ import javax.inject.Inject
 @AndroidEntryPoint
 internal class ContactFileListActivity : PasscodeActivity(), MegaGlobalListenerInterface,
     MegaRequestListenerInterface, UploadBottomSheetDialogActionListener, ActionNodeCallback,
-    SnackbarShower {
+    OnFolderLeaveCallBack, SnackbarShower {
 
     @Inject
     lateinit var getNodeByHandleUseCase: GetNodeByHandleUseCase
@@ -167,13 +167,12 @@ internal class ContactFileListActivity : PasscodeActivity(), MegaGlobalListenerI
             statusDialog?.dismiss()
         }
     }
-    private val destroyActionModeReceiver: BroadcastReceiver = object : BroadcastReceiver() {
-        override fun onReceive(context: Context, intent: Intent?) {
-            if (intent?.action == null || intent.action != BROADCAST_ACTION_DESTROY_ACTION_MODE) return
-            contactFileListFragment?.takeIf { it.isVisible }?.let {
-                it.clearSelections()
-                it.hideMultipleSelect()
-            }
+
+    override fun onFolderLeave() {
+        Timber.d("onFolderLeave")
+        contactFileListFragment?.takeIf { it.isVisible }?.let {
+            it.clearSelections()
+            it.hideMultipleSelect()
         }
     }
 
@@ -380,10 +379,6 @@ internal class ContactFileListActivity : PasscodeActivity(), MegaGlobalListenerI
         }
         megaApi.addGlobalListener(this)
         registerReceiver(manageShareReceiver, IntentFilter(BROADCAST_ACTION_INTENT_MANAGE_SHARE))
-        registerReceiver(
-            destroyActionModeReceiver,
-            IntentFilter(BROADCAST_ACTION_DESTROY_ACTION_MODE)
-        )
         val extras = intent.extras
         if (extras != null) {
             userEmail = extras.getString(Constants.NAME)
@@ -630,7 +625,6 @@ internal class ContactFileListActivity : PasscodeActivity(), MegaGlobalListenerI
         megaApi.removeGlobalListener(this)
         megaApi.removeRequestListener(this)
         unregisterReceiver(manageShareReceiver)
-        unregisterReceiver(destroyActionModeReceiver)
         dismissAlertDialogIfExists(newFolderDialog)
     }
 

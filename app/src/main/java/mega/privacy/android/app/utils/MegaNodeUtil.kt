@@ -1,7 +1,5 @@
 package mega.privacy.android.app.utils
 
-import mega.privacy.android.icon.pack.R as IconPackR
-import mega.privacy.android.shared.resources.R as sharedR
 import android.app.Activity
 import android.content.Context
 import android.content.Intent
@@ -26,7 +24,6 @@ import mega.privacy.android.app.MegaApplication
 import mega.privacy.android.app.MimeTypeList
 import mega.privacy.android.app.R
 import mega.privacy.android.app.activities.WebViewActivity
-import mega.privacy.android.app.constants.BroadcastConstants
 import mega.privacy.android.app.di.getDbHandler
 import mega.privacy.android.app.interfaces.ActivityLauncher
 import mega.privacy.android.app.interfaces.SnackbarShower
@@ -37,6 +34,7 @@ import mega.privacy.android.app.main.DrawerItem
 import mega.privacy.android.app.main.FileExplorerActivity
 import mega.privacy.android.app.main.ManagerActivity
 import mega.privacy.android.app.main.listeners.MultipleRequestListener
+import mega.privacy.android.app.modalbottomsheet.OnFolderLeaveCallBack
 import mega.privacy.android.app.presentation.extensions.getStorageState
 import mega.privacy.android.app.textEditor.TextEditorActivity
 import mega.privacy.android.app.textEditor.TextEditorViewModel.Companion.EDIT_MODE
@@ -80,7 +78,9 @@ import mega.privacy.android.app.utils.Util.getSizeString
 import mega.privacy.android.app.utils.Util.isOnline
 import mega.privacy.android.app.utils.Util.showSnackbar
 import mega.privacy.android.domain.entity.StorageState
+import mega.privacy.android.icon.pack.R as IconPackR
 import mega.privacy.android.navigation.MegaNavigator
+import mega.privacy.android.shared.resources.R as sharedR
 import nz.mega.sdk.MegaApiAndroid
 import nz.mega.sdk.MegaApiJava
 import nz.mega.sdk.MegaApiJava.INVALID_HANDLE
@@ -867,14 +867,12 @@ object MegaNodeUtil {
                 } else {
                     leaveMultipleIncomingShares(activity, snackbarShower, handles!!)
                 }
-                MegaApplication.getInstance()
-                    .sendBroadcast(
-                        Intent(BroadcastConstants.BROADCAST_ACTION_DESTROY_ACTION_MODE).setPackage(
-                            activity.applicationContext.packageName
-                        )
-                    )
+                (activity as? OnFolderLeaveCallBack)?.onFolderLeave()
             }
-            .setNegativeButton(activity.getString(sharedR.string.general_dialog_cancel_button), null)
+            .setNegativeButton(
+                activity.getString(sharedR.string.general_dialog_cancel_button),
+                null
+            )
             .show()
     }
 

@@ -1,7 +1,5 @@
 package mega.privacy.android.app.presentation.contactinfo
 
-import mega.privacy.android.icon.pack.R as iconPackR
-import mega.privacy.android.shared.resources.R as sharedR
 import android.Manifest
 import android.app.Activity
 import android.content.BroadcastReceiver
@@ -60,7 +58,6 @@ import mega.privacy.android.app.activities.contract.SelectFolderToShareActivityC
 import mega.privacy.android.app.arch.extensions.collectFlow
 import mega.privacy.android.app.components.AppBarStateChangeListener
 import mega.privacy.android.app.components.twemoji.EmojiEditText
-import mega.privacy.android.app.constants.BroadcastConstants.BROADCAST_ACTION_DESTROY_ACTION_MODE
 import mega.privacy.android.app.constants.BroadcastConstants.BROADCAST_ACTION_INTENT_MANAGE_SHARE
 import mega.privacy.android.app.databinding.ActivityChatContactPropertiesBinding
 import mega.privacy.android.app.databinding.LayoutMenuReturnCallBinding
@@ -75,6 +72,7 @@ import mega.privacy.android.app.meeting.activity.MeetingActivity
 import mega.privacy.android.app.modalbottomsheet.ContactFileListBottomSheetDialogFragment
 import mega.privacy.android.app.modalbottomsheet.ContactNicknameBottomSheetDialogFragment
 import mega.privacy.android.app.modalbottomsheet.ModalBottomSheetUtil.isBottomSheetDialogShown
+import mega.privacy.android.app.modalbottomsheet.OnFolderLeaveCallBack
 import mega.privacy.android.app.presentation.contact.authenticitycredendials.AuthenticityCredentialsActivity
 import mega.privacy.android.app.presentation.contactinfo.model.ContactInfoUiState
 import mega.privacy.android.app.presentation.extensions.iconRes
@@ -116,8 +114,10 @@ import mega.privacy.android.domain.entity.node.NameCollision
 import mega.privacy.android.domain.entity.node.NodeId
 import mega.privacy.android.domain.entity.node.UnTypedNode
 import mega.privacy.android.domain.usecase.GetThemeMode
+import mega.privacy.android.icon.pack.R as iconPackR
 import mega.privacy.android.navigation.MegaNavigator
 import mega.privacy.android.shared.original.core.ui.theme.OriginalTheme
+import mega.privacy.android.shared.resources.R as sharedR
 import nz.mega.sdk.MegaApiJava
 import nz.mega.sdk.MegaApiJava.INVALID_HANDLE
 import nz.mega.sdk.MegaChatApiJava
@@ -132,7 +132,8 @@ import javax.inject.Inject
  * Contact info activity
  */
 @AndroidEntryPoint
-class ContactInfoActivity : BaseActivity(), ActionNodeCallback, MegaRequestListenerInterface {
+class ContactInfoActivity : BaseActivity(), ActionNodeCallback, MegaRequestListenerInterface,
+    OnFolderLeaveCallBack {
 
     /**
      * object handles passcode lock behaviours
@@ -210,13 +211,10 @@ class ContactInfoActivity : BaseActivity(), ActionNodeCallback, MegaRequestListe
         }
     }
 
-    private val destroyActionModeReceiver: BroadcastReceiver = object : BroadcastReceiver() {
-        override fun onReceive(context: Context, intent: Intent) {
-            if (intent.action == BROADCAST_ACTION_DESTROY_ACTION_MODE) {
-                if (sharedFoldersFragment?.isVisible == true) {
-                    hideSelectMode()
-                }
-            }
+    override fun onFolderLeave() {
+        if (sharedFoldersFragment?.isVisible == true) {
+            Timber.d("onFolderLeave")
+            hideSelectMode()
         }
     }
 
@@ -470,10 +468,6 @@ class ContactInfoActivity : BaseActivity(), ActionNodeCallback, MegaRequestListe
         registerReceiver(
             manageShareReceiver,
             IntentFilter(BROADCAST_ACTION_INTENT_MANAGE_SHARE)
-        )
-        registerReceiver(
-            destroyActionModeReceiver,
-            IntentFilter(BROADCAST_ACTION_DESTROY_ACTION_MODE)
         )
     }
 
@@ -1268,8 +1262,10 @@ class ContactInfoActivity : BaseActivity(), ActionNodeCallback, MegaRequestListe
         }
 
         val builder = MaterialAlertDialogBuilder(this)
-            .setTitle(getString(viewModel.nickName
-                ?.let { R.string.edit_nickname } ?: run { R.string.add_nickname })
+            .setTitle(
+                getString(
+                    viewModel.nickName
+                        ?.let { R.string.edit_nickname } ?: run { R.string.add_nickname })
             )
             .setPositiveButton(getString(R.string.button_set)) { _, _ ->
                 val name = emojiEditText.text.toString()
@@ -1338,7 +1334,6 @@ class ContactInfoActivity : BaseActivity(), ActionNodeCallback, MegaRequestListe
         drawableShare?.colorFilter = null
         megaApi.removeRequestListener(this)
         unregisterReceiver(manageShareReceiver)
-        unregisterReceiver(destroyActionModeReceiver)
     }
 
     /**
