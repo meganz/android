@@ -28,6 +28,7 @@ import androidx.recyclerview.widget.GridLayoutManager
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import dagger.hilt.android.AndroidEntryPoint
+import kotlinx.coroutines.ensureActive
 import kotlinx.coroutines.flow.collectLatest
 import kotlinx.coroutines.launch
 import mega.privacy.android.app.MimeTypeList
@@ -112,6 +113,12 @@ class RecentActionBucketFragment : Fragment() {
         registerForActivityResult(
             ActivityResultContracts.StartActivityForResult(),
             ::handleHiddenNodesOnboardingResult,
+        )
+
+    internal val addToAlbumLauncher: ActivityResultLauncher<Intent> =
+        registerForActivityResult(
+            ActivityResultContracts.StartActivityForResult(),
+            ::handleAddToAlbumResult,
         )
 
     private var tempNodeIds: List<NodeId> = listOf()
@@ -366,9 +373,11 @@ class RecentActionBucketFragment : Fragment() {
                     handle = node.handle,
                     viewType = RECENTS_BUCKET_ADAPTER,
                     parentId = node.parentHandle,
-                    nodeHandles = getNodesHandles(false)
+                    nodeHandles = getNodesHandles(false),
+                    enableAddToAlbum = true,
                 )
             }.onFailure {
+                ensureActive() // make sure view is still active
                 (activity as ManagerActivity).showSnackbar(
                     SNACKBAR_TYPE,
                     getString(R.string.intent_not_available),
@@ -414,6 +423,7 @@ class RecentActionBucketFragment : Fragment() {
             menuOptionsSource = menuOptionSource,
             anchorImageNodeId = NodeId(node.handle),
             params = mapOf(DefaultImageNodeFetcher.NODE_IDS to nodeIds),
+            enableAddToAlbum = true,
         )
         putThumbnailLocation(
             intent,
@@ -569,6 +579,13 @@ class RecentActionBucketFragment : Fragment() {
             tempNodeIds.size,
             tempNodeIds.size
         )
+        Util.showSnackbar(requireActivity(), message)
+    }
+
+    private fun handleAddToAlbumResult(result: ActivityResult) {
+        if (result.resultCode != Activity.RESULT_OK) return
+        val message = result.data?.getStringExtra("message") ?: return
+
         Util.showSnackbar(requireActivity(), message)
     }
 }

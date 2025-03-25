@@ -2,21 +2,13 @@
 <layer-list xmlns:android="http://schemas.android.com/apk/res/android">
     <item android:id="@android:id/background">
         <shape>
-            <gradient
-                android:angle="270"
-                android:centerColor="@color/grey_012_white_023"
-                android:centerY="0.50"
-                android:endColor="@color/grey_012_white_023"
-                android:startColor="@color/grey_012_white_023" />
+            <solid android:color="@color/grey_012_white_023" />
         </shape>
     </item>
     <item android:id="@android:id/progress">
         <clip>
             <shape>
-                <gradient
-                    android:angle="90"
-                    android:endColor="@color/teal_300_teal_200"
-                    android:startColor="@color/teal_300_teal_200" />
+                <solid android:color="@color/color_support_success" />
             </shape>
         </clip>
     </item>

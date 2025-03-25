@@ -38,9 +38,11 @@ import dagger.hilt.android.AndroidEntryPoint
 import dagger.hilt.android.EntryPointAccessors
 import dagger.hilt.components.SingletonComponent
 import kotlinx.coroutines.launch
+import mega.privacy.android.analytics.Analytics
 import mega.privacy.android.app.R
 import mega.privacy.android.app.di.mediaplayer.AudioPlayer
 import mega.privacy.android.app.mediaplayer.AudioPlayerActivity
+import mega.privacy.android.app.mediaplayer.MediaSessionHelper
 import mega.privacy.android.app.mediaplayer.gateway.AudioPlayerServiceViewModelGateway
 import mega.privacy.android.app.mediaplayer.gateway.MediaPlayerGateway
 import mega.privacy.android.app.mediaplayer.gateway.MediaPlayerServiceGateway
@@ -54,10 +56,16 @@ import mega.privacy.android.app.utils.ChatUtil.STREAM_MUSIC_DEFAULT
 import mega.privacy.android.app.utils.ChatUtil.getAudioFocus
 import mega.privacy.android.app.utils.ChatUtil.getRequest
 import mega.privacy.android.app.utils.Constants
+import mega.privacy.android.app.utils.Constants.INTENT_EXTRA_KEY_ADAPTER_TYPE
+import mega.privacy.android.app.utils.Constants.INVALID_VALUE
 import mega.privacy.android.app.utils.Constants.NOTIFICATION_CHANNEL_AUDIO_PLAYER_ID
 import mega.privacy.android.domain.entity.mediaplayer.RepeatToggleMode
 import mega.privacy.android.domain.monitoring.CrashReporter
-import mega.privacy.android.domain.usecase.IsUserLoggedIn
+import mega.privacy.android.domain.usecase.login.IsUserLoggedInUseCase
+import mega.privacy.mobile.analytics.event.AudioPlayerIsActivatedEvent
+import mega.privacy.mobile.analytics.event.AudioPlayerLoopPlayingItemEnabledEvent
+import mega.privacy.mobile.analytics.event.AudioPlayerLoopQueueEnabledEvent
+import mega.privacy.mobile.analytics.event.AudioPlayerShuffleEnabledEvent
 import timber.log.Timber
 import javax.inject.Inject
 
@@ -83,7 +91,7 @@ class AudioPlayerService : LifecycleService(), LifecycleEventObserver, MediaPlay
      * IsUserLoggedIn
      */
     @Inject
-    lateinit var isUserLoggedIn: IsUserLoggedIn
+    lateinit var isUserLoggedInUseCase: IsUserLoggedInUseCase
 
     /**
      * CrashReporter
@@ -112,6 +120,8 @@ class AudioPlayerService : LifecycleService(), LifecycleEventObserver, MediaPlay
 
     private var currentNotification: Notification? = null
 
+    private var adapterType = INVALID_VALUE
+
     // We need keep it as Runnable here, because we need remove it from handler later,
     // using lambda doesn't work when remove it from handler.
     private val resumePlayRunnable = Runnable {
@@ -122,6 +132,7 @@ class AudioPlayerService : LifecycleService(), LifecycleEventObserver, MediaPlay
         audioClosable = true
     }
 
+    private lateinit var mediaSessionHelper: MediaSessionHelper
     private var audioManager: AudioManager? = null
     private var audioFocusRequest: AudioFocusRequest? = null
     private var audioFocusRequested = false
@@ -140,7 +151,7 @@ class AudioPlayerService : LifecycleService(), LifecycleEventObserver, MediaPlay
                 }
 
                 AudioManager.AUDIOFOCUS_GAIN -> {
-                    if (!mediaPlayerGateway.getPlayWhenReady()) {
+                    if (!mediaPlayerGateway.getPlayWhenReady() && isForeground) {
                         setPlayWhenReady(true)
                     }
                 }
@@ -159,6 +170,7 @@ class AudioPlayerService : LifecycleService(), LifecycleEventObserver, MediaPlay
 
     override fun onCreate() {
         super.onCreate()
+        Analytics.tracker.trackEvent(AudioPlayerIsActivatedEvent)
         if (!isNotificationCreated) {
             createPlayerControlNotification()
             isNotificationCreated = true
@@ -166,8 +178,8 @@ class AudioPlayerService : LifecycleService(), LifecycleEventObserver, MediaPlay
         createPlayer()
         audioManager = (getSystemService(AUDIO_SERVICE) as AudioManager)
         audioFocusRequest = getRequest(audioFocusListener, AUDIOFOCUS_DEFAULT)
+        initMediaSession()
         observeData()
-
         ProcessLifecycleOwner.get().lifecycle.addObserver(this)
         registerReceiver(headsetPlugReceiver, IntentFilter(Intent.ACTION_HEADSET_PLUG))
     }
@@ -206,11 +218,21 @@ class AudioPlayerService : LifecycleService(), LifecycleEventObserver, MediaPlay
                     setShuffleEnabled(shuffleModeEnabled)
 
                     if (shuffleModeEnabled) {
+                        Analytics.tracker.trackEvent(AudioPlayerShuffleEnabledEvent)
                         mediaPlayerGateway.setShuffleOrder(newShuffleOrder())
                     }
                 }
 
                 override fun onRepeatModeChangedCallback(repeatToggleMode: RepeatToggleMode) {
+                    when (repeatToggleMode) {
+                        RepeatToggleMode.REPEAT_ONE ->
+                            Analytics.tracker.trackEvent(AudioPlayerLoopPlayingItemEnabledEvent)
+
+                        RepeatToggleMode.REPEAT_ALL ->
+                            Analytics.tracker.trackEvent(AudioPlayerLoopQueueEnabledEvent)
+
+                        else -> {}
+                    }
                     setAudioRepeatMode(repeatToggleMode)
                 }
 
@@ -222,7 +244,10 @@ class AudioPlayerService : LifecycleService(), LifecycleEventObserver, MediaPlay
                     when {
                         state == MEDIA_PLAYER_STATE_ENDED && !isPaused() -> setPaused(true)
 
-                        state == MEDIA_PLAYER_STATE_READY && mediaPlayerGateway.getPlayWhenReady() -> {
+                        state == MEDIA_PLAYER_STATE_READY -> {
+                            if (!mediaPlayerGateway.getPlayWhenReady()) {
+                                setPlayWhenReady(true)
+                            }
                             if (!isNotificationCreated) {
                                 createPlayerControlNotification()
                             }
@@ -348,6 +373,9 @@ class AudioPlayerService : LifecycleService(), LifecycleEventObserver, MediaPlay
                 lifecycleScope.launch {
                     if (viewModelGateway.buildPlayerSource(intent)) {
                         MiniAudioPlayerController.notifyAudioPlayerPlaying(true)
+                        intent?.getIntExtra(INTENT_EXTRA_KEY_ADAPTER_TYPE, INVALID_VALUE)?.let {
+                            adapterType = it
+                        }
                     }
                 }
             }
@@ -411,6 +439,20 @@ class AudioPlayerService : LifecycleService(), LifecycleEventObserver, MediaPlay
         }
     }
 
+    private fun initMediaSession() {
+        mediaSessionHelper = MediaSessionHelper(
+            applicationContext,
+            onPlayPauseClicked = { setPlayWhenReady(!mediaPlayerGateway.getPlayWhenReady()) },
+            onNextClicked = { mediaPlayerGateway.playNext() },
+            onPreviousClicked = { mediaPlayerGateway.playPrev() }
+        )
+        audioFocusRequest?.let {
+            if (audioManager?.requestAudioFocus(it) == AudioManager.AUDIOFOCUS_REQUEST_GRANTED) {
+                mediaSessionHelper.setupMediaSession()
+            }
+        }
+    }
+
     override fun monitorMediaNotAllowPlayState() =
         mediaPlayerGateway.monitorMediaNotAllowPlayState()
 
@@ -445,6 +487,7 @@ class AudioPlayerService : LifecycleService(), LifecycleEventObserver, MediaPlay
         // Remove observer when the service is destroyed to avoid the memory leak, causing Service cannot be stopped.
         ProcessLifecycleOwner.get().lifecycle.removeObserver(this)
         unregisterReceiver(headsetPlugReceiver)
+        mediaSessionHelper.releaseMediaSession()
     }
 
     override fun stopPlayer() {
@@ -471,14 +514,12 @@ class AudioPlayerService : LifecycleService(), LifecycleEventObserver, MediaPlay
         }
     }
 
-    /**
-     * Seek to the index
-     *
-     * @param index the index that is sought to
-     */
-    override fun seekTo(index: Int) {
+    override fun seekTo(index: Int, handle: Long) {
         mediaPlayerGateway.playerSeekTo(index)
-        viewModelGateway.resetRetryState()
+        with(viewModelGateway) {
+            resetRetryState()
+            setCurrentPlayingHandle(handle)
+        }
     }
 
     /**
@@ -541,11 +582,13 @@ class AudioPlayerService : LifecycleService(), LifecycleEventObserver, MediaPlay
 
     override fun stopAudioServiceWhenAudioPlayerClosedWithUserNotLogin() {
         lifecycleScope.launch {
-            if (!isUserLoggedIn()) {
+            if (!isUserLoggedInUseCase()) {
                 stopPlayer()
             }
         }
     }
+
+    override fun getCurrentAdapterType(): Int = adapterType
 
     override fun playing() = mediaPlayerGateway.mediaPlayerIsPlaying()
 

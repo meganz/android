@@ -92,8 +92,10 @@ class OpenLinkViewModelTest {
             underTest.decodeUrl(url)
 
             // Then
-            underTest.state.test {
-                assertThat(expectMostRecentItem().isLoggedIn).isEqualTo(expected)
+            underTest.uiState.test {
+                val state = expectMostRecentItem()
+                assertThat(state.isLoggedIn).isEqualTo(expected)
+                assertThat(state.urlRedirectionEvent).isEqualTo(true)
             }
         }
 
@@ -118,7 +120,7 @@ class OpenLinkViewModelTest {
             underTest.decodeUrl(url)
 
             // Then
-            underTest.state.test {
+            underTest.uiState.test {
                 assertThat(expectMostRecentItem().decodedUrl).isEqualTo(decodedLink)
             }
         }
@@ -136,7 +138,7 @@ class OpenLinkViewModelTest {
             underTest.getAccountInvitationEmail(link)
 
             // Then
-            underTest.state.test {
+            underTest.uiState.test {
                 assertThat(expectMostRecentItem().accountInvitationEmail).isEqualTo(email)
             }
         }
@@ -153,7 +155,7 @@ class OpenLinkViewModelTest {
             underTest.getAccountInvitationEmail(link)
 
             // Then
-            underTest.state.test {
+            underTest.uiState.test {
                 assertThat(expectMostRecentItem().accountInvitationEmail).isEqualTo(null)
             }
         }
@@ -201,8 +203,8 @@ class OpenLinkViewModelTest {
             underTest.logout()
 
             // Then
-            underTest.state.test {
-                assertThat(expectMostRecentItem().isLogoutCompleted).isTrue()
+            underTest.uiState.test {
+                assertThat(expectMostRecentItem().logoutCompletedEvent).isTrue()
                 assertThat(MegaApplication.urlConfirmationLink).isEqualTo(null)
             }
         }
@@ -221,11 +223,29 @@ class OpenLinkViewModelTest {
             underTest.logout()
 
             // Then
-            underTest.state.test {
-                assertThat(expectMostRecentItem().isLogoutCompleted).isFalse()
+            underTest.uiState.test {
+                assertThat(expectMostRecentItem().logoutCompletedEvent).isFalse()
                 assertThat(MegaApplication.urlConfirmationLink).isEqualTo(confirmationLink)
             }
         }
+
+    @Test
+    fun `test that urlRedirectionEvent is reset when consumed`() = runTest {
+        underTest.onUrlRedirectionEventConsumed()
+
+        underTest.uiState.test {
+            assertThat(expectMostRecentItem().urlRedirectionEvent).isFalse()
+        }
+    }
+
+    @Test
+    fun `test that logoutCompletedEvent is reset when consumed`() = runTest {
+        underTest.onLogoutCompletedEventConsumed()
+
+        underTest.uiState.test {
+            assertThat(expectMostRecentItem().logoutCompletedEvent).isFalse()
+        }
+    }
 
     @AfterEach
     fun resetMocks() {

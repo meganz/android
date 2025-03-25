@@ -9,6 +9,8 @@ import mega.privacy.android.app.databinding.MyAccountUsageContainerBinding
 import mega.privacy.android.app.utils.StringUtils.formatColorTag
 import mega.privacy.android.app.utils.StringUtils.toSpannedHtmlText
 import mega.privacy.android.app.utils.TimeUtils
+import mega.privacy.android.domain.entity.StorageState
+import mega.privacy.android.domain.entity.transfer.UsedTransferStatus
 import nz.mega.sdk.MegaApiAndroid
 import nz.mega.sdk.MegaApiJava
 
@@ -31,6 +33,7 @@ object MyAccountViewUtil {
      */
     fun MyAccountUsageContainerBinding.update(
         context: Context,
+        storageState: StorageState,
         isFreeAccount: Boolean,
         totalStorage: String,
         totalTransfer: String,
@@ -38,6 +41,7 @@ object MyAccountViewUtil {
         usedStoragePercentage: Int,
         usedTransfer: String,
         usedTransferPercentage: Int,
+        usedTransferStatus: UsedTransferStatus,
     ) {
         usageLayoutBusiness.isVisible = false
         storageLayout.isVisible = true
@@ -48,7 +52,7 @@ object MyAccountViewUtil {
             storageProgressBar.progress = 0
             storageProgress.text = getGettingInfo(context)
         } else {
-            val isStorageOverQuota = usedStoragePercentage >= 100
+            val isStorageOverQuota = storageState == StorageState.Red
 
             storageProgressPercentage.apply {
                 isVisible = true
@@ -56,28 +60,25 @@ object MyAccountViewUtil {
                     R.string.used_storage_transfer_percentage,
                     usedStoragePercentage.toString()
                 )
+            }
 
-                setTextAppearance(
-                    if (isStorageOverQuota) {
-                        R.style.TextAppearance_Mega_Body2_Medium_Red600Red300
-                    } else {
-                        R.style.TextAppearance_Mega_Body2_Medium_Accent
-                    }
+            storageProgressBar.progress = usedStoragePercentage
+
+            val storageColors = when (storageState) {
+                StorageState.Red -> ContextCompat.getColorStateList(
+                    context,
+                    R.color.color_support_error
                 )
-            }
 
-            storageProgressBar.apply {
-                progress = usedStoragePercentage
-                progressDrawable =
-                    ContextCompat.getDrawable(
-                        context,
-                        if (isStorageOverQuota) {
-                            R.drawable.storage_transfer_circular_progress_bar_warning
-                        } else {
-                            R.drawable.storage_transfer_circular_progress_bar
-                        }
-                    )
+                StorageState.Orange -> ContextCompat.getColorStateList(
+                    context,
+                    R.color.color_support_warning
+                )
+
+                else -> ContextCompat.getColorStateList(context, R.color.color_support_success)
             }
+            storageProgressBar.progressTintList = storageColors
+            storageProgressPercentage.setTextColor(storageColors)
 
             storageProgress.text = context.getString(
                 R.string.used_storage_transfer,
@@ -85,7 +86,7 @@ object MyAccountViewUtil {
                 totalStorage
             ).let { text ->
                 if (isStorageOverQuota) {
-                    text.formatColorTag(storageProgress.context, 'A', R.color.red_600_red_300)
+                    text.formatColorTag(storageProgress.context, 'A', R.color.color_text_error)
                         .toSpannedHtmlText()
                 } else {
                     text.replace("[A]", "")
@@ -110,6 +111,22 @@ object MyAccountViewUtil {
             }
 
             transferProgressBar.progress = usedTransferPercentage
+
+            val transferColors = when (usedTransferStatus) {
+                UsedTransferStatus.Full -> ContextCompat.getColorStateList(
+                    context,
+                    R.color.color_support_error
+                )
+
+                UsedTransferStatus.AlmostFull -> ContextCompat.getColorStateList(
+                    context,
+                    R.color.color_support_warning
+                )
+
+                else -> ContextCompat.getColorStateList(context, R.color.color_support_success)
+            }
+            transferProgressBar.progressTintList = transferColors
+            transferProgressPercentage.setTextColor(transferColors)
 
             transferProgress.text = context.getString(
                 R.string.used_storage_transfer,

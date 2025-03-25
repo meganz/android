@@ -7,6 +7,8 @@ import static mega.privacy.android.app.utils.Util.getNumberItemChildren;
 import static mega.privacy.android.app.utils.Util.getSizeString;
 
 import android.content.Context;
+import android.net.Uri;
+import android.util.DisplayMetrics;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.View.OnClickListener;
@@ -15,6 +17,7 @@ import android.widget.ImageView;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
 
+import androidx.recyclerview.widget.LinearSmoothScroller;
 import androidx.recyclerview.widget.RecyclerView;
 
 import java.util.List;
@@ -22,12 +25,13 @@ import java.util.List;
 import coil.Coil;
 import coil.request.ImageRequest;
 import coil.transform.RoundedCornersTransformation;
+import coil.util.CoilUtils;
 import mega.privacy.android.app.FileDocument;
 import mega.privacy.android.app.MegaApplication;
 import mega.privacy.android.app.MimeTypeList;
 import mega.privacy.android.app.R;
-import mega.privacy.android.app.main.FileStorageActivity;
-import mega.privacy.android.app.main.FileStorageActivity.Mode;
+import mega.privacy.android.app.presentation.filestorage.FileStorageActivity;
+import mega.privacy.android.app.presentation.filestorage.FileStorageActivity.Mode;
 import mega.privacy.android.app.utils.TextUtil;
 import nz.mega.sdk.MegaApiAndroid;
 import timber.log.Timber;
@@ -92,12 +96,15 @@ public class FileStorageAdapter extends RecyclerView.Adapter<FileStorageAdapter.
         holder.textViewFileName.setText(document.getName());
 
         if (document.isFolder()) {
-            String items = getNumberItemChildren(document.getFile(), context);
+            int childrenCount = document.getTotalChildren();
+            String items =  context.getResources().getQuantityString(R.plurals.general_num_items, childrenCount, childrenCount);
             holder.textViewFileSize.setText(items);
         } else {
             long documentSize = document.getSize();
             holder.textViewFileSize.setText(getSizeString(documentSize, context));
         }
+
+        holder.itemLayout.setBackgroundResource(document.isHighlighted() ? R.color.color_background_surface_2 : android.R.color.transparent);
 
         resetImageView(holder.imageView);
 
@@ -117,18 +124,16 @@ public class FileStorageAdapter extends RecyclerView.Adapter<FileStorageAdapter.
                     holder.imageView.setImageResource(mega.privacy.android.icon.pack.R.drawable.ic_folder_medium_solid);
                 } else {
                     if (MimeTypeList.typeForName(document.getName()).isImage() || MimeTypeList.typeForName(document.getName()).isVideo()) {
-                        String filePath = document.getFile().getAbsolutePath();
-                        String key = megaApi.getFingerprint(filePath);
-                        if (!TextUtil.isTextEmpty(key)) {
+                        Uri uri = document.getUri();
+
                             Coil.imageLoader(context).enqueue(
                                     new ImageRequest.Builder(context)
                                             .placeholder(MimeTypeList.typeForName(document.getName()).getIconResourceId())
-                                            .data(filePath)
+                                            .data(uri)
                                             .target(holder.imageView)
                                             .transformations(new RoundedCornersTransformation(context.getResources().getDimensionPixelSize(R.dimen.thumbnail_corner_radius)))
                                             .build()
                             );
-                        }
                     } else {
                         holder.imageView.setImageResource(MimeTypeList.typeForName(document.getName()).getIconResourceId());
                     }
@@ -148,6 +153,7 @@ public class FileStorageAdapter extends RecyclerView.Adapter<FileStorageAdapter.
         int margin = dp2px(ICON_MARGIN_DP);
         params.setMargins(margin, margin, margin, margin);
         imageView.setLayoutParams(params);
+        CoilUtils.dispose(imageView);
     }
 
     /**
@@ -190,7 +196,7 @@ public class FileStorageAdapter extends RecyclerView.Adapter<FileStorageAdapter.
             return false;
         }
 
-        return document.getFile().canRead();
+        return true;
     }
 
     public FileDocument getItem(int position) {
@@ -208,4 +214,24 @@ public class FileStorageAdapter extends RecyclerView.Adapter<FileStorageAdapter.
             ((FileStorageActivity) context).itemClick(currentPosition);
         }
     }
+
+
+    public static class CenterSmoothScroller extends LinearSmoothScroller {
+
+        public CenterSmoothScroller(Context context) {
+            super(context);
+        }
+
+        @Override
+        public int calculateDtToFit(int viewStart, int viewEnd, int boxStart, int boxEnd, int snapPreference) {
+            // Calculate the distance needed to center the view
+            return (boxStart + (boxEnd - boxStart) / 2) - (viewStart + (viewEnd - viewStart) / 2);
+        }
+
+        @Override
+        protected float calculateSpeedPerPixel(DisplayMetrics displayMetrics) {
+            return 50f / displayMetrics.densityDpi;
+        }
+    }
 }
+

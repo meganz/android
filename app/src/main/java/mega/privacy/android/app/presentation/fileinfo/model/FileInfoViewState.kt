@@ -2,6 +2,7 @@ package mega.privacy.android.app.presentation.fileinfo.model
 
 import de.palm.composestateevents.StateEventWithContent
 import de.palm.composestateevents.consumed
+import mega.privacy.android.app.presentation.account.model.AccountDeactivatedStatus
 import mega.privacy.android.app.presentation.transfers.starttransfer.model.TransferTriggerEvent
 import mega.privacy.android.app.utils.LocationInfo
 import mega.privacy.android.domain.entity.FolderTreeInfo
@@ -50,13 +51,12 @@ import mega.privacy.android.domain.entity.shares.AccessPermission
  * @param requiredExtraAction an initiated action that needs to be confirmed by the user or more data needs to be specified (typically by an alert dialog)
  * @param isRemindersForContactVerificationEnabled checks if reminders for contact verification is enabled
  * @param tagsEnabled checks if tags are enabled
- * @param isProAccount checks if the user is a PRO account
- * @param isBusinessAccountActive checks if the Business account user is currently active
  * @param tags list of tags for the node
  * @param mapLocationEnabled checks if GIS location is enabled
  * @param longitude the longitude of the node
  * @param latitude the latitude of the node
  * @param isPhoto true if the node is a photo (Image or Video)
+ * @param accountDeactivatedStatus the status of the account if it's deactivated
  */
 internal data class FileInfoViewState(
     val title: String = "",
@@ -95,13 +95,12 @@ internal data class FileInfoViewState(
     val requiredExtraAction: FileInfoExtraAction? = null,
     val isRemindersForContactVerificationEnabled: Boolean = false,
     val tagsEnabled: Boolean = false,
-    val isProAccount: Boolean = false,
-    val isBusinessAccountActive: Boolean? = null,
     val tags: List<String> = emptyList(),
     val mapLocationEnabled: Boolean = false,
     val longitude: Double = 0.0,
     val latitude: Double = 0.0,
     val isPhoto: Boolean = false,
+    val accountDeactivatedStatus: AccountDeactivatedStatus? = null,
 ) {
 
     /**
@@ -144,8 +143,11 @@ internal data class FileInfoViewState(
     /**
      * Check Conditions to enable tags field
      */
-    fun canEnableTags() = tagsEnabled && !isNodeInRubbish && !isNodeInBackups &&
-            accessPermission == AccessPermission.OWNER
+    fun canEditTags() = tagsEnabled && !isNodeInRubbish && !isNodeInBackups &&
+            (accessPermission == AccessPermission.OWNER || accessPermission == AccessPermission.FULL)
+
+    fun canViewTags() = tagsEnabled && !isNodeInRubbish && !isNodeInBackups &&
+            (accessPermission == AccessPermission.READ || accessPermission == AccessPermission.READWRITE)
 
     /**
      * Creates a copy of this view state with the info that can be extracted directly from folderTreeInfo

@@ -33,15 +33,12 @@ import mega.privacy.android.app.MimeTypeList
 import mega.privacy.android.app.R
 import mega.privacy.android.app.arch.extensions.collectFlow
 import mega.privacy.android.app.components.CustomizedGridLayoutManager
-import mega.privacy.android.app.components.scrollBar.FastScrollerScrollListener
 import mega.privacy.android.app.databinding.FragmentFavouritesBinding
 import mega.privacy.android.app.fragments.homepage.EventObserver
-import mega.privacy.android.app.fragments.homepage.HomepageSearchable
 import mega.privacy.android.app.fragments.homepage.SortByHeaderViewModel
 import mega.privacy.android.app.fragments.homepage.main.HomepageFragmentDirections
 import mega.privacy.android.app.main.ManagerActivity
 import mega.privacy.android.app.mediaplayer.miniplayer.MiniAudioPlayerController
-import mega.privacy.android.app.modalbottomsheet.UploadBottomSheetDialogFragment.Companion.DOCUMENTS_UPLOAD
 import mega.privacy.android.app.presentation.bottomsheet.NodeOptionsBottomSheetDialogFragment
 import mega.privacy.android.app.presentation.favourites.adapter.FavouritesAdapter
 import mega.privacy.android.app.presentation.favourites.adapter.FavouritesGridAdapter
@@ -62,7 +59,6 @@ import mega.privacy.android.app.presentation.imagepreview.model.ImagePreviewMenu
 import mega.privacy.android.app.utils.Constants
 import mega.privacy.android.app.utils.Constants.FAVOURITES_ADAPTER
 import mega.privacy.android.app.utils.MegaNodeUtil
-import mega.privacy.android.app.utils.RunOnUIThreadUtils
 import mega.privacy.android.app.utils.TextUtil.formatEmptyScreenText
 import mega.privacy.android.app.utils.Util
 import mega.privacy.android.app.utils.callManager
@@ -82,7 +78,7 @@ import javax.inject.Inject
  * The Fragment for favourites
  */
 @AndroidEntryPoint
-class FavouritesFragment : Fragment(), HomepageSearchable {
+class FavouritesFragment : Fragment() {
     private val viewModel by viewModels<FavouritesViewModel>()
     private val sortByHeaderViewModel by activityViewModels<SortByHeaderViewModel>()
     private lateinit var binding: FragmentFavouritesBinding
@@ -149,17 +145,6 @@ class FavouritesFragment : Fragment(), HomepageSearchable {
         gridLayoutManager = GridLayoutManager(requireContext(), 2)
         listLayoutManager = LinearLayoutManager(requireContext())
         setupAdapter()
-
-        binding.fastscroll.setUpScrollListener(object : FastScrollerScrollListener {
-            override fun onScrolled() {
-                hideFabButton()
-            }
-
-            override fun onScrolledToTop() {
-                showFabButton()
-            }
-
-        })
         return binding.root
     }
 
@@ -169,48 +154,7 @@ class FavouritesFragment : Fragment(), HomepageSearchable {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
         setupFlow()
-        setupAddFabButton()
         setupMiniAudioPlayer()
-    }
-
-    /**
-     * onDestroy
-     */
-    override fun onDestroy() {
-        super.onDestroy()
-        viewModel.exitSearch()
-    }
-
-    /**
-     * shouldShowSearchMenu
-     */
-    override fun shouldShowSearchMenu(): Boolean = viewModel.shouldShowSearchMenu()
-
-    /**
-     * searchReady
-     */
-    override fun searchReady() {
-        // Rotate screen in action mode, the keyboard would pop up again, hide it
-        if (actionMode != null) {
-            RunOnUIThreadUtils.post { callManager { it.hideKeyboardSearch() } }
-        }
-        viewModel.searchQuery("")
-        hideFabButton()
-    }
-
-    /**
-     * exitSearch
-     */
-    override fun exitSearch() {
-        viewModel.exitSearch()
-        showFabButton()
-    }
-
-    /**
-     * searchQuery
-     */
-    override fun searchQuery(query: String) {
-        viewModel.searchQuery(query)
     }
 
     /**
@@ -261,9 +205,6 @@ class FavouritesFragment : Fragment(), HomepageSearchable {
                         handleConnectivityState(favouritesState.isConnected)
                         switchViewType(sortByHeaderState.viewType)
                         setViewVisible(favouritesState)
-                        if (!favouritesState.showSearch) {
-                            requireActivity().invalidateOptionsMenu()
-                        }
                         if (favouritesState is FavouriteLoadState.Success) {
                             if (isList) {
                                 listAdapter.updateSelectionMode(favouritesState.selectedItems.isNotEmpty())
@@ -324,7 +265,6 @@ class FavouritesFragment : Fragment(), HomepageSearchable {
     private fun handleSelectedItems(selectedItems: Set<NodeId>) {
         val selectedCount = selectedItems.size
         if (selectedCount > 0) {
-            hideFabButton()
             if (!isActionMode) {
                 activateActionMode()
                 isActionMode = true
@@ -340,7 +280,6 @@ class FavouritesFragment : Fragment(), HomepageSearchable {
         } else {
             actionMode?.finish()
             this@FavouritesFragment.isActionMode = false
-            showFabButton()
         }
     }
 
@@ -512,28 +451,6 @@ class FavouritesFragment : Fragment(), HomepageSearchable {
         lifecycle.addObserver(audioPlayerController)
     }
 
-    /**
-     * Setup add fab button
-     */
-    private fun setupAddFabButton() {
-        binding.addFabButton.setOnClickListener {
-            (requireActivity() as ManagerActivity).showUploadPanel(DOCUMENTS_UPLOAD)
-        }
-    }
-
-    /**
-     * Hides the fabButton
-     */
-    fun hideFabButton() {
-        binding.addFabButton.hide()
-    }
-
-    /**
-     * Shows the fabButton
-     */
-    fun showFabButton() {
-        binding.addFabButton.show()
-    }
 
     /**
      * Update the menu UI
@@ -651,6 +568,10 @@ class FavouritesFragment : Fragment(), HomepageSearchable {
         }
     }
 
+    /**
+     * on hide clicked
+     * @param nodeIds List<NodeId>
+     */
     fun onHideClicked(
         nodeIds: List<NodeId>,
     ) {

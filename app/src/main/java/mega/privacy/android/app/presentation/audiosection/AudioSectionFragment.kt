@@ -30,7 +30,6 @@ import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.launch
 import mega.privacy.android.app.R
 import mega.privacy.android.app.arch.extensions.collectFlow
-import mega.privacy.android.app.fragments.homepage.HomepageSearchable
 import mega.privacy.android.app.fragments.homepage.SortByHeaderViewModel
 import mega.privacy.android.app.main.ManagerActivity
 import mega.privacy.android.app.presentation.audiosection.model.AudioUiEntity
@@ -42,14 +41,13 @@ import mega.privacy.android.app.presentation.mapper.GetOptionsForToolbarMapper
 import mega.privacy.android.app.presentation.search.view.MiniAudioPlayerView
 import mega.privacy.android.app.utils.Constants
 import mega.privacy.android.app.utils.Constants.AUDIO_BROWSE_ADAPTER
-import mega.privacy.android.app.utils.Constants.SEARCH_BY_ADAPTER
 import mega.privacy.android.app.utils.Util
 import mega.privacy.android.app.utils.callManager
 import mega.privacy.android.domain.entity.ThemeMode
 import mega.privacy.android.domain.entity.node.NodeId
 import mega.privacy.android.domain.usecase.GetThemeMode
 import mega.privacy.android.navigation.MegaNavigator
-import mega.privacy.android.shared.original.core.ui.theme.OriginalTempTheme
+import mega.privacy.android.shared.original.core.ui.theme.OriginalTheme
 import timber.log.Timber
 import javax.inject.Inject
 
@@ -57,7 +55,7 @@ import javax.inject.Inject
  * The fragment for audio section
  */
 @AndroidEntryPoint
-class AudioSectionFragment : Fragment(), HomepageSearchable {
+class AudioSectionFragment : Fragment() {
     private val audioSectionViewModel by viewModels<AudioSectionViewModel>()
     private val sortByHeaderViewModel: SortByHeaderViewModel by activityViewModels()
 
@@ -95,7 +93,7 @@ class AudioSectionFragment : Fragment(), HomepageSearchable {
         setContent {
             val themeMode by getThemeMode().collectAsStateWithLifecycle(initialValue = ThemeMode.System)
             val uiState by audioSectionViewModel.state.collectAsStateWithLifecycle()
-            OriginalTempTheme(isDark = themeMode.isDarkMode()) {
+            OriginalTheme(isDark = themeMode.isDarkMode()) {
                 ConstraintLayout(
                     modifier = Modifier.fillMaxSize()
                 ) {
@@ -155,7 +153,7 @@ class AudioSectionFragment : Fragment(), HomepageSearchable {
         viewLifecycleOwner.collectFlow(
             audioSectionViewModel.state.map { it.allAudios }.distinctUntilChanged()
         ) { list ->
-            if (!audioSectionViewModel.state.value.searchMode && list.isNotEmpty()) {
+            if (list.isNotEmpty()) {
                 callManager {
                     it.invalidateOptionsMenu()
                 }
@@ -176,10 +174,7 @@ class AudioSectionFragment : Fragment(), HomepageSearchable {
                             contentUri = nodeContentUri,
                             fileNode = it,
                             sortOrder = sortByHeaderViewModel.cloudSortOrder.value,
-                            viewType = if (uiState.searchMode)
-                                SEARCH_BY_ADAPTER
-                            else
-                                AUDIO_BROWSE_ADAPTER,
+                            viewType = AUDIO_BROWSE_ADAPTER,
                             isFolderLink = false,
                             searchedItems = uiState.allAudios.map { it.id.longValue }
                         )
@@ -234,36 +229,6 @@ class AudioSectionFragment : Fragment(), HomepageSearchable {
             nodeId = item.id,
             mode = NodeOptionsBottomSheetDialogFragment.CLOUD_DRIVE_MODE
         )
-    }
-
-    /**
-     * Should show search menu
-     *
-     * @return true if should show search menu, false otherwise
-     */
-    override fun shouldShowSearchMenu(): Boolean = audioSectionViewModel.shouldShowSearchMenu()
-
-    /**
-     * Search ready
-     */
-    override fun searchReady() {
-        audioSectionViewModel.searchReady()
-    }
-
-    /**
-     * Search query
-     *
-     * @param query query string
-     */
-    override fun searchQuery(query: String) {
-        audioSectionViewModel.searchQuery(query)
-    }
-
-    /**
-     * Exit search
-     */
-    override fun exitSearch() {
-        audioSectionViewModel.exitSearch()
     }
 
     suspend fun handleHideNodeClick() {

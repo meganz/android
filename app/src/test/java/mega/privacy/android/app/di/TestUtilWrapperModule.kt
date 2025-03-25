@@ -1,5 +1,6 @@
 package mega.privacy.android.app.di
 
+import dagger.Module
 import dagger.Provides
 import dagger.hilt.components.SingletonComponent
 import dagger.hilt.testing.TestInstallIn
@@ -14,6 +15,7 @@ import org.mockito.kotlin.mock
     replaces = [UtilWrapperModule::class],
     components = [SingletonComponent::class]
 )
+@Module
 object TestUtilWrapperModule {
 
     @Provides

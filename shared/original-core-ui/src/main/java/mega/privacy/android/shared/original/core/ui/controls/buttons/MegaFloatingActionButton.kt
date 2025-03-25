@@ -20,7 +20,7 @@ import androidx.compose.ui.tooling.preview.PreviewParameterProvider
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import mega.privacy.android.shared.original.core.ui.preview.CombinedThemePreviews
-import mega.privacy.android.shared.original.core.ui.theme.OriginalTempTheme
+import mega.privacy.android.shared.original.core.ui.theme.OriginalTheme
 import mega.privacy.android.shared.original.core.ui.theme.MegaOriginalTheme
 
 /**
@@ -120,7 +120,7 @@ enum class FloatingActionButtonStyle(
 private fun MegaFloatingActionButtonPreview(
     @PreviewParameter(FloatingActionButtonPreviewProvider::class) styleEnabled: Pair<FloatingActionButtonStyle, Boolean>,
 ) {
-    OriginalTempTheme(isDark = isSystemInDarkTheme()) {
+    OriginalTheme(isDark = isSystemInDarkTheme()) {
         MegaFloatingActionButton(
             modifier = Modifier.padding(16.dp),
             style = styleEnabled.first,

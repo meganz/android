@@ -19,11 +19,12 @@ import mega.privacy.android.app.presentation.extensions.isDarkMode
 import mega.privacy.android.app.presentation.extensions.parcelable
 import mega.privacy.android.app.presentation.extensions.parcelableArrayList
 import mega.privacy.android.app.presentation.passcode.model.PasscodeCryptObjectFactory
+import mega.privacy.android.app.presentation.psa.PsaContainer
 import mega.privacy.android.app.presentation.security.check.PasscodeContainer
 import mega.privacy.android.app.utils.Constants
 import mega.privacy.android.domain.entity.ThemeMode
 import mega.privacy.android.domain.usecase.GetThemeMode
-import mega.privacy.android.shared.original.core.ui.theme.OriginalTempTheme
+import mega.privacy.android.shared.original.core.ui.theme.OriginalTheme
 import timber.log.Timber
 import javax.inject.Inject
 
@@ -59,6 +60,7 @@ class UploadDestinationActivity : AppCompatActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         enableEdgeToEdge()
         super.onCreate(savedInstanceState)
+        grantUriPermissions(intent)
         setContent {
             val themeMode by getThemeMode()
                 .collectAsStateWithLifecycle(initialValue = ThemeMode.System)
@@ -66,24 +68,26 @@ class UploadDestinationActivity : AppCompatActivity() {
             val isNewUploadActivityEnabled = uploadActivityUiState.isNewUploadScreenEnabled
             if (isNewUploadActivityEnabled != null) {
                 if (isNewUploadActivityEnabled) {
-                    SessionContainer(shouldCheckChatSession = false, shouldFinish = false) {
+                    SessionContainer(shouldFinish = false) {
                         LaunchedEffect(Unit) {
                             handleIntent()
                         }
-                        OriginalTempTheme(isDark = themeMode.isDarkMode()) {
+                        OriginalTheme(isDark = themeMode.isDarkMode()) {
                             PasscodeContainer(
                                 passcodeCryptObjectFactory = passcodeCryptObjectFactory,
                                 content = {
-                                    UploadDestinationView(
-                                        uiState = uploadActivityUiState,
-                                        isValidNameForUpload = uploadDestinationViewModel::isValidNameForUpload,
-                                        consumeNameValidationError = uploadDestinationViewModel::consumeNameValidationError,
-                                        editFileName = uploadDestinationViewModel::editFileName,
-                                        updateFileName = uploadDestinationViewModel::updateFileName,
-                                        navigateToCloudDrive = this::navigateToCloudDrive,
-                                        navigateToChats = this::navigateToChats,
-                                        handleBackPress = this::onBackPressed
-                                    )
+                                    PsaContainer {
+                                        UploadDestinationView(
+                                            uiState = uploadActivityUiState,
+                                            isValidNameForUpload = uploadDestinationViewModel::isValidNameForUpload,
+                                            consumeNameValidationError = uploadDestinationViewModel::consumeNameValidationError,
+                                            editFileName = uploadDestinationViewModel::editFileName,
+                                            updateFileName = uploadDestinationViewModel::updateFileName,
+                                            navigateToCloudDrive = this::navigateToCloudDrive,
+                                            navigateToChats = this::navigateToChats,
+                                            handleBackPress = this::onBackPressed
+                                        )
+                                    }
                                 }
                             )
                         }
@@ -95,6 +99,30 @@ class UploadDestinationActivity : AppCompatActivity() {
                     )
                 }
             }
+        }
+    }
+
+    private fun grantUriPermissions(intent: Intent) {
+        with(intent) {
+            parcelableArrayList<Parcelable>(Intent.EXTRA_STREAM)?.let {
+                it.mapNotNull { item -> item as? Uri }.let { uris ->
+                    uris.forEach { uri -> uri.grantUriPermissions() }
+                    uris.ifEmpty { null }
+                }
+            } ?: (intent.parcelable<Parcelable>(Intent.EXTRA_STREAM) as? Uri)
+                ?.also { uri -> uri.grantUriPermissions() }
+        }
+    }
+
+    private fun Uri.grantUriPermissions() {
+        runCatching {
+            grantUriPermission(
+                packageName,
+                this,
+                Intent.FLAG_GRANT_READ_URI_PERMISSION
+            )
+        }.onFailure {
+            Timber.e(it, "Error granting uri permission")
         }
     }
 

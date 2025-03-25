@@ -31,6 +31,7 @@ import kotlinx.coroutines.withContext
 import mega.privacy.android.analytics.Analytics
 import mega.privacy.android.app.R
 import mega.privacy.android.app.main.ManagerActivity
+import mega.privacy.android.app.presentation.extensions.getStorageState
 import mega.privacy.android.app.presentation.extensions.isDarkMode
 import mega.privacy.android.app.presentation.imagepreview.ImagePreviewActivity
 import mega.privacy.android.app.presentation.imagepreview.fetcher.AlbumContentImageNodeFetcher
@@ -42,7 +43,9 @@ import mega.privacy.android.app.presentation.photos.albums.AlbumsViewModel
 import mega.privacy.android.app.presentation.photos.albums.model.getAlbumType
 import mega.privacy.android.app.presentation.photos.albums.photosselection.AlbumFlow
 import mega.privacy.android.app.presentation.photos.timeline.viewmodel.TimelineViewModel
+import mega.privacy.android.app.utils.AlertsAndWarnings.showOverDiskQuotaPaywallWarning
 import mega.privacy.android.app.utils.Util
+import mega.privacy.android.domain.entity.StorageState
 import mega.privacy.android.domain.entity.ThemeMode
 import mega.privacy.android.domain.entity.node.NodeId
 import mega.privacy.android.domain.entity.photos.Album
@@ -54,7 +57,7 @@ import mega.privacy.android.domain.entity.photos.Photo
 import mega.privacy.android.domain.qualifier.DefaultDispatcher
 import mega.privacy.android.domain.usecase.GetThemeMode
 import mega.privacy.android.domain.usecase.featureflag.GetFeatureFlagValueUseCase
-import mega.privacy.android.shared.original.core.ui.theme.OriginalTempTheme
+import mega.privacy.android.shared.original.core.ui.theme.OriginalTheme
 import mega.privacy.mobile.analytics.event.AlbumContentDeleteAlbumEvent
 import mega.privacy.mobile.analytics.event.AlbumContentScreenEvent
 import mega.privacy.mobile.analytics.event.AlbumContentShareLinkMenuToolbarEvent
@@ -123,7 +126,7 @@ class AlbumContentFragment : Fragment() {
             setContent {
                 val mode by getThemeMode()
                     .collectAsStateWithLifecycle(initialValue = ThemeMode.System)
-                OriginalTempTheme(isDark = mode.isDarkMode()) {
+                OriginalTheme(isDark = mode.isDarkMode()) {
                     AlbumContentScreen(
                         photoDownloaderViewModel = photoDownloaderViewModel,
                         timelineViewModel = timelineViewModel,
@@ -228,12 +231,16 @@ class AlbumContentFragment : Fragment() {
     }
 
     private fun openAlbumPhotosSelection(album: UserAlbum) {
-        val intent = AlbumScreenWrapperActivity.createAlbumPhotosSelectionScreen(
-            context = requireContext(),
-            albumId = album.id,
-            albumFlow = AlbumFlow.Addition,
-        )
-        albumPhotosSelectionLauncher.launch(intent)
+        if (getStorageState() == StorageState.PayWall) {
+            showOverDiskQuotaPaywallWarning()
+        } else {
+            val intent = AlbumScreenWrapperActivity.createAlbumPhotosSelectionScreen(
+                context = requireContext(),
+                albumId = album.id,
+                albumFlow = AlbumFlow.Addition,
+            )
+            albumPhotosSelectionLauncher.launch(intent)
+        }
     }
 
     private fun handleAlbumPhotosSelectionResult(result: ActivityResult) {}
@@ -310,16 +317,28 @@ class AlbumContentFragment : Fragment() {
         when (item.itemId) {
             R.id.action_menu_get_link -> {
                 Analytics.tracker.trackEvent(AlbumContentShareLinkMenuToolbarEvent)
-                openAlbumGetLinkScreen()
+                if (getStorageState() == StorageState.PayWall) {
+                    showOverDiskQuotaPaywallWarning()
+                } else {
+                    openAlbumGetLinkScreen()
+                }
             }
 
             R.id.action_menu_manage_link -> {
                 Analytics.tracker.trackEvent(AlbumContentShareLinkMenuToolbarEvent)
-                openAlbumGetLinkScreen()
+                if (getStorageState() == StorageState.PayWall) {
+                    showOverDiskQuotaPaywallWarning()
+                } else {
+                    openAlbumGetLinkScreen()
+                }
             }
 
             R.id.action_menu_remove_link -> {
-                albumContentViewModel.showRemoveLinkConfirmation()
+                if (getStorageState() == StorageState.PayWall) {
+                    showOverDiskQuotaPaywallWarning()
+                } else {
+                    albumContentViewModel.showRemoveLinkConfirmation()
+                }
             }
 
             R.id.action_menu_sort_by -> {
@@ -332,15 +351,27 @@ class AlbumContentFragment : Fragment() {
 
             R.id.action_menu_delete -> {
                 Analytics.tracker.trackEvent(AlbumContentDeleteAlbumEvent)
-                handleAlbumDeletion()
+                if (getStorageState() == StorageState.PayWall) {
+                    showOverDiskQuotaPaywallWarning()
+                } else {
+                    handleAlbumDeletion()
+                }
             }
 
             R.id.action_menu_rename -> {
-                albumContentViewModel.showRenameDialog(showRenameDialog = true)
+                if (getStorageState() == StorageState.PayWall) {
+                    showOverDiskQuotaPaywallWarning()
+                } else {
+                    albumContentViewModel.showRenameDialog(showRenameDialog = true)
+                }
             }
 
             R.id.action_menu_select_album_cover -> {
-                openAlbumCoverSelectionScreen()
+                if (getStorageState() == StorageState.PayWall) {
+                    showOverDiskQuotaPaywallWarning()
+                } else {
+                    openAlbumCoverSelectionScreen()
+                }
             }
         }
         return super.onOptionsItemSelected(item)

@@ -1,6 +1,8 @@
 package mega.privacy.android.app.presentation.videosection.view.playlist
 
 import mega.privacy.android.shared.resources.R as sharedR
+import android.content.res.Configuration
+import android.os.Build
 import androidx.compose.foundation.background
 import androidx.compose.foundation.interaction.MutableInteractionSource
 import androidx.compose.foundation.isSystemInDarkTheme
@@ -29,6 +31,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.SolidColor
+import androidx.compose.ui.platform.LocalConfiguration
 import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.TextStyle
@@ -42,15 +45,15 @@ import mega.privacy.android.app.constants.StringsConstants
 import mega.privacy.android.legacy.core.ui.controls.dialogs.MegaDialog
 import mega.privacy.android.shared.original.core.ui.controls.text.MegaText
 import mega.privacy.android.shared.original.core.ui.preview.CombinedThemePreviews
-import mega.privacy.android.shared.original.core.ui.theme.OriginalTempTheme
+import mega.privacy.android.shared.original.core.ui.theme.OriginalTheme
 import mega.privacy.android.shared.original.core.ui.theme.black
 import mega.privacy.android.shared.original.core.ui.theme.caption
 import mega.privacy.android.shared.original.core.ui.theme.grey_300
 import mega.privacy.android.shared.original.core.ui.theme.red_400
 import mega.privacy.android.shared.original.core.ui.theme.red_900
-import mega.privacy.android.shared.original.core.ui.theme.teal_200
-import mega.privacy.android.shared.original.core.ui.theme.teal_300
-import mega.privacy.android.shared.original.core.ui.theme.values.TextColor
+import mega.privacy.android.shared.original.core.ui.theme.accent_050
+import mega.privacy.android.shared.original.core.ui.theme.accent_900
+import mega.android.core.ui.theme.values.TextColor
 import mega.privacy.android.shared.original.core.ui.theme.white
 
 @OptIn(ExperimentalMaterialApi::class)
@@ -75,9 +78,9 @@ internal fun CreateVideoPlaylistDialog(
 
     val inputColor = if (isInputValid()) {
         if (MaterialTheme.colors.isLight) {
-            teal_300
+            accent_900
         } else {
-            teal_200
+            accent_050
         }
     } else {
         if (MaterialTheme.colors.isLight) {
@@ -116,9 +119,21 @@ internal fun CreateVideoPlaylistDialog(
         )
     )
 
+    val isLandScape = LocalConfiguration.current.orientation == Configuration.ORIENTATION_LANDSCAPE
+
     MegaDialog(
-        properties = DialogProperties(usePlatformDefaultWidth = false),
+        properties = DialogProperties(
+            usePlatformDefaultWidth = false,
+            decorFitsSystemWindows = false
+        ),
         modifier = modifier
+            .fillMaxWidth(
+                if (isLandScape && Build.VERSION.SDK_INT >= Build.VERSION_CODES.VANILLA_ICE_CREAM) {
+                    0.7f
+                } else {
+                    1f
+                }
+            )
             .padding(horizontal = 40.dp),
         onDismissRequest = onDismissRequest,
         titleString = title,
@@ -217,7 +232,7 @@ internal fun CreateVideoPlaylistDialog(
             ) {
                 Text(
                     text = positiveButtonText,
-                    color = teal_300
+                    color = accent_900
                 )
             }
         },
@@ -238,7 +253,7 @@ internal fun CreateVideoPlaylistDialog(
             ) {
                 Text(
                     stringResource(id = sharedR.string.general_dialog_cancel_button),
-                    color = teal_300
+                    color = accent_900
                 )
             }
         }
@@ -248,7 +263,7 @@ internal fun CreateVideoPlaylistDialog(
 @CombinedThemePreviews
 @Composable
 private fun CreateVideoPlaylistDialogPreview() {
-    OriginalTempTheme(isDark = isSystemInDarkTheme()) {
+    OriginalTheme(isDark = isSystemInDarkTheme()) {
         CreateVideoPlaylistDialog(
             title = "Enter playlist name",
             positiveButtonText = stringResource(id = R.string.general_create),
@@ -266,7 +281,7 @@ private fun CreateVideoPlaylistDialogPreview() {
 @CombinedThemePreviews
 @Composable
 private fun CreateVideoPlaylistDialogWithErrorPreview() {
-    OriginalTempTheme(isDark = isSystemInDarkTheme()) {
+    OriginalTheme(isDark = isSystemInDarkTheme()) {
         CreateVideoPlaylistDialog(
             title = "Enter playlist name",
             positiveButtonText = stringResource(id = R.string.general_create),
@@ -284,7 +299,7 @@ private fun CreateVideoPlaylistDialogWithErrorPreview() {
 @CombinedThemePreviews
 @Composable
 private fun CreateVideoPlaylistDialogWithSameNamePreview() {
-    OriginalTempTheme(isDark = isSystemInDarkTheme()) {
+    OriginalTheme(isDark = isSystemInDarkTheme()) {
         CreateVideoPlaylistDialog(
             title = "Enter playlist name",
             positiveButtonText = stringResource(id = R.string.general_create),

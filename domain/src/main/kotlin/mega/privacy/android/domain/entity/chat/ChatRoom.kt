@@ -36,6 +36,7 @@ import mega.privacy.android.domain.entity.ChatRoomPermission
  * @property isWaitingRoom           If chat room is a waiting room.
  * @property isOpenInvite            True if users with [ChatRoomPermission.Standard], can invite other users into the chat
  * @property isSpeakRequest          True if during calls, non moderator users, must request permission to speak.
+ * @property isNoteToSelf           True chat room is a note to self.
  * @property changes                 Changes [ChatRoomChange].
  */
 data class ChatRoom(
@@ -63,6 +64,7 @@ data class ChatRoom(
     val isWaitingRoom: Boolean,
     val isOpenInvite: Boolean,
     val isSpeakRequest: Boolean,
+    val isNoteToSelf: Boolean,
     val changes: List<ChatRoomChange>? = null,
 ) {
     /**
@@ -72,4 +74,10 @@ data class ChatRoom(
      * @return True if the chat has the change in question, false otherwise.
      */
     fun hasChanged(change: ChatRoomChange) = changes?.contains(change) == true
+
+    /**
+     * Check if is one to one chat
+     */
+    val isOneToOneChat
+        get():Boolean = !isGroup
 }

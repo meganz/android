@@ -171,39 +171,15 @@ val grey_alpha_087 = Color(0xDE000000)
 
 val grey_alpha_090 = Color(0xE6000000)
 
-val teal_050 = Color(0xFFDCF4F0)
+val accent_050 = Color(0xFFf4f4f5)
 
-val teal_100 = Color(0xFFA9E3D8)
-
-val teal_200 = Color(0xFF6DD2BF)
-
-val teal_300 = Color(0xFF008262)
-
-val teal_400 = Color(0xFF00B092)
-
-val teal_500 = Color(0xFF00A07F)
-
-val teal_600 = Color(0xFF009372)
+val accent_900 = Color(0xFF04101e)
 
 val teal_200_alpha_038 = Color(0x616DD2BF)
 
 val teal_300_alpha_020 = Color(0x3300BFA5)
 
 val teal_300_alpha_038 = Color(0x6100BFA5)
-
-val teal_300_alpha_050 = Color(0x8000BFA5)
-
-val teal_300_alpha_090 = Color(0xE600BFA5)
-
-val teal_400_alpha_006 = Color(0x0F00B092)
-
-val teal_400_alpha_036 = Color(0x5C00B092)
-
-val teal_400_alpha_050 = Color(0x8000B092)
-
-val teal_400_alpha_090 = Color(0xE600B092)
-
-val teal_500_alpha_040 = Color(0x6600B092)
 
 val red_200 = Color(0xFFFB938F)
 

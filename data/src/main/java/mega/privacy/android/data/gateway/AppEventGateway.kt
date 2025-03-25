@@ -8,13 +8,14 @@ import mega.privacy.android.domain.entity.backup.BackupInfoType
 import mega.privacy.android.domain.entity.call.AudioDevice
 import mega.privacy.android.domain.entity.camerauploads.CameraUploadsSettingsAction
 import mega.privacy.android.domain.entity.settings.cookie.CookieType
+import mega.privacy.android.domain.entity.transfer.CompletedTransferState
 
 internal interface AppEventGateway {
 
     /**
      * Monitor completed transfer
      */
-    val monitorCompletedTransfer: Flow<Unit>
+    val monitorCompletedTransfer: Flow<CompletedTransferState>
 
     /**
      * Monitor cookie settings saved.
@@ -93,19 +94,7 @@ internal interface AppEventGateway {
      * Monitor transfer failed
      *
      */
-    fun monitorFailedTransfer(): Flow<Boolean>
-
-    /**
-     * Monitor transfer failed
-     *
-     */
     fun monitorSecurityUpgrade(): Flow<Boolean>
-
-    /**
-     * Broadcast transfer failed
-     *
-     */
-    suspend fun broadcastFailedTransfer(isFailed: Boolean)
 
     /**
      * Monitor Finish Activity
@@ -154,8 +143,9 @@ internal interface AppEventGateway {
     /**
      * Broadcast an event when there is a new completed transfer
      *
+     * @param completedTransferState [CompletedTransferState]
      */
-    suspend fun broadcastCompletedTransfer()
+    suspend fun broadcastCompletedTransfer(completedTransferState: CompletedTransferState)
 
     /**
      * Monitor account update.
@@ -398,4 +388,14 @@ internal interface AppEventGateway {
      *
      */
     suspend fun broadcastUpgradeDialogClosed()
+
+    /**
+     * Monitor misc loaded
+     */
+    fun monitorMiscLoaded(): Flow<Unit>
+
+    /**
+     * Broadcast misc loaded
+     */
+    suspend fun broadcastMiscLoaded()
 }

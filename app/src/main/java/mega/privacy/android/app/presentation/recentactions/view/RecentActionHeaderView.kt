@@ -15,8 +15,8 @@ import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.unit.dp
 import mega.privacy.android.shared.original.core.ui.controls.text.MegaText
 import mega.privacy.android.shared.original.core.ui.preview.CombinedThemePreviews
-import mega.privacy.android.shared.original.core.ui.theme.values.TextColor
-import mega.privacy.android.shared.original.core.ui.theme.OriginalTempTheme
+import mega.android.core.ui.theme.values.TextColor
+import mega.privacy.android.shared.original.core.ui.theme.OriginalTheme
 
 /**
  * Composable for the recent actions list sticky header
@@ -51,7 +51,7 @@ internal const val HEADER_TEST_TAG = "recent_action_header_view:text"
 @CombinedThemePreviews
 @Composable
 private fun RecentActionHeaderPreview() {
-    OriginalTempTheme(isDark = isSystemInDarkTheme()) {
+    OriginalTheme(isDark = isSystemInDarkTheme()) {
         RecentActionHeaderView("Monday, April 3, 2024")
     }
 }

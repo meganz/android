@@ -15,7 +15,7 @@ import mega.privacy.android.shared.original.core.ui.controls.chat.messages.ChatB
 import mega.privacy.android.shared.original.core.ui.controls.chat.messages.RichLinkContentView
 import mega.privacy.android.shared.original.core.ui.preview.BooleanProvider
 import mega.privacy.android.shared.original.core.ui.preview.CombinedThemePreviews
-import mega.privacy.android.shared.original.core.ui.theme.OriginalTempTheme
+import mega.privacy.android.shared.original.core.ui.theme.OriginalTheme
 
 /**
  * Chat link message view
@@ -55,7 +55,7 @@ fun ChatLinkMessageView(
 private fun ChatLinkMessageViewPreview(
     @PreviewParameter(BooleanProvider::class) isMe: Boolean,
 ) {
-    OriginalTempTheme(isDark = isSystemInDarkTheme()) {
+    OriginalTheme(isDark = isSystemInDarkTheme()) {
         ChatBubble(isMe = isMe, subContent = {
             ChatLinkMessageView(
                 linkContent = ChatGroupLinkContent(
@@ -78,7 +78,7 @@ private fun ChatLinkMessageViewPreview(
 private fun ChatInvalidLinkMessageViewPreview(
     @PreviewParameter(BooleanProvider::class) isMe: Boolean,
 ) {
-    OriginalTempTheme(isDark = isSystemInDarkTheme()) {
+    OriginalTheme(isDark = isSystemInDarkTheme()) {
         ChatBubble(isMe = isMe, subContent = {
             ChatLinkMessageView(
                 linkContent = ChatGroupLinkContent(

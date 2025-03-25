@@ -1,6 +1,7 @@
 package mega.privacy.android.app.presentation.recentactions.view
 
 
+import mega.privacy.android.icon.pack.R as iconPackR
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.isSystemInDarkTheme
 import androidx.compose.foundation.layout.fillMaxSize
@@ -11,7 +12,6 @@ import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.SpanStyle
-import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.constraintlayout.compose.ConstraintLayout
 import mega.privacy.android.app.R
@@ -20,8 +20,8 @@ import mega.privacy.android.shared.original.core.ui.controls.text.MegaSpannedTex
 import mega.privacy.android.shared.original.core.ui.model.MegaSpanStyle
 import mega.privacy.android.shared.original.core.ui.model.SpanIndicator
 import mega.privacy.android.shared.original.core.ui.preview.CombinedThemePreviews
-import mega.privacy.android.shared.original.core.ui.theme.values.TextColor
-import mega.privacy.android.shared.original.core.ui.theme.OriginalTempTheme
+import mega.privacy.android.shared.original.core.ui.theme.OriginalTheme
+import mega.android.core.ui.theme.values.TextColor
 
 /**
  * Composable for when Recent Actions is hidden in settings
@@ -41,11 +41,11 @@ fun RecentActionsHiddenView(
         val (image, text, button) = createRefs()
 
         Image(
-            painter = painterResource(R.drawable.ic_recents),
+            painter = painterResource(iconPackR.drawable.ic_clock_glass),
             contentDescription = "Recent Actions Icon",
             modifier = Modifier
                 .constrainAs(image) {
-                    bottom.linkTo(text.top, 20.dp)
+                    bottom.linkTo(text.top)
                     start.linkTo(parent.start)
                     end.linkTo(parent.end)
                 }
@@ -56,10 +56,7 @@ fun RecentActionsHiddenView(
             baseStyle = MaterialTheme.typography.body2,
             styles = mapOf(
                 SpanIndicator('B') to MegaSpanStyle(
-                    spanStyle = SpanStyle(
-                        fontWeight = FontWeight.Normal
-                    ),
-                    color = TextColor.Secondary
+                    spanStyle = SpanStyle(),
                 ),
             ),
             color = TextColor.Primary,
@@ -94,7 +91,7 @@ internal const val RECENTS_HIDDEN_BUTTON_TEST_TAG = "recent_actions_hidden_view:
 @CombinedThemePreviews
 @Composable
 private fun RecentActionsHiddenViewPreview() {
-    OriginalTempTheme(isDark = isSystemInDarkTheme()) {
+    OriginalTheme(isDark = isSystemInDarkTheme()) {
         RecentActionsHiddenView()
     }
 }

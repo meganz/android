@@ -1,6 +1,7 @@
 package mega.privacy.android.app.presentation.documentscanner
 
 import android.net.Uri
+import androidx.annotation.VisibleForTesting
 import androidx.core.net.toUri
 import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.ViewModel
@@ -13,14 +14,18 @@ import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
-import mega.privacy.android.app.R
-import mega.privacy.android.app.presentation.documentscanner.model.SaveScannedDocumentsSnackbarMessageUiItem
+import mega.privacy.android.analytics.Analytics
 import mega.privacy.android.app.presentation.documentscanner.model.SaveScannedDocumentsUiState
 import mega.privacy.android.app.presentation.documentscanner.model.ScanDestination
 import mega.privacy.android.app.presentation.documentscanner.model.ScanFileType
+import mega.privacy.android.domain.entity.documentscanner.ScanFilenameValidationStatus
 import mega.privacy.android.domain.entity.uri.UriPath
-import mega.privacy.android.domain.usecase.documentscanner.IsScanFilenameValidUseCase
+import mega.privacy.android.domain.usecase.documentscanner.ValidateScanFilenameUseCase
 import mega.privacy.android.domain.usecase.file.RenameFileAndDeleteOriginalUseCase
+import mega.privacy.mobile.analytics.event.DocumentScannerSaveImageToChatEvent
+import mega.privacy.mobile.analytics.event.DocumentScannerSaveImageToCloudDriveEvent
+import mega.privacy.mobile.analytics.event.DocumentScannerSavePDFToChatEvent
+import mega.privacy.mobile.analytics.event.DocumentScannerSavePDFToCloudDriveEvent
 import timber.log.Timber
 import java.util.Calendar
 import java.util.Locale
@@ -29,14 +34,15 @@ import javax.inject.Inject
 /**
  * The [ViewModel] for Save Scanned Documents
  *
- * @property isScanFilenameValidUseCase Checks whether the filename of the scanned Document/s is valid
+ * @property validateScanFilenameUseCase Validates a given scan filename and returns the
+ * corresponding validation status
  * @property renameFileAndDeleteOriginalUseCase Renames the original File, deletes it and returns
  * the renamed File
  * @property savedStateHandle The Saved State Handle
  */
 @HiltViewModel
 internal class SaveScannedDocumentsViewModel @Inject constructor(
-    private val isScanFilenameValidUseCase: IsScanFilenameValidUseCase,
+    private val validateScanFilenameUseCase: ValidateScanFilenameUseCase,
     private val renameFileAndDeleteOriginalUseCase: RenameFileAndDeleteOriginalUseCase,
     private val savedStateHandle: SavedStateHandle,
 ) : ViewModel() {
@@ -69,14 +75,16 @@ internal class SaveScannedDocumentsViewModel @Inject constructor(
                 ),
             ) { originatedFromChat: Boolean, cloudDriveParentHandle: Long, pdfUri: Uri?, soloImageUri: Uri? ->
                 { state: SaveScannedDocumentsUiState ->
+                    val initialFilename = String.format(
+                        Locale.getDefault(),
+                        INITIAL_FILENAME_FORMAT,
+                        Calendar.getInstance(),
+                    ) + _uiState.value.scanFileType.fileSuffix
+
                     state.copy(
-                        originatedFromChat = originatedFromChat,
                         cloudDriveParentHandle = cloudDriveParentHandle,
-                        filename = String.format(
-                            Locale.getDefault(),
-                            INITIAL_FILENAME_FORMAT,
-                            Calendar.getInstance(),
-                        ),
+                        filename = initialFilename,
+                        originatedFromChat = originatedFromChat,
                         pdfUri = pdfUri,
                         scanDestination = if (originatedFromChat) {
                             ScanDestination.Chat
@@ -96,28 +104,19 @@ internal class SaveScannedDocumentsViewModel @Inject constructor(
      * Updates the filename of the scanned Document/s to be uploaded and displays an Error Message
      * in the filename input if the new filename is invalid
      *
-     * @param filename the new Filename
+     * @param newFilename the new Filename
      */
-    fun onFilenameChanged(filename: String) {
+    fun onFilenameChanged(newFilename: String) {
+        val filenameValidationStatus = validateScanFilenameUseCase(
+            filename = newFilename,
+            fileExtension = _uiState.value.scanFileType.fileSuffix,
+        )
         _uiState.update {
             it.copy(
-                filename = filename,
-                filenameErrorMessage = getFilenameErrorMessage(filename),
+                filename = newFilename,
+                filenameValidationStatus = filenameValidationStatus,
             )
         }
-    }
-
-    /**
-     * Retrieves the Error Message associated with the invalid Filename
-     *
-     * @param filename The filename to be checked.
-     * @return A String resource specifying the type of invalid Filename, or null if the Filename is
-     * valid
-     */
-    private fun getFilenameErrorMessage(filename: String = _uiState.value.filename) = when {
-        isScanFilenameValidUseCase(filename) -> null
-        filename.isBlank() -> R.string.scan_incorrect_name
-        else -> R.string.scan_invalid_characters
     }
 
     /**
@@ -125,9 +124,9 @@ internal class SaveScannedDocumentsViewModel @Inject constructor(
      * Keyboard Event. If the new filename is invalid, a Snackbar is shown displaying an error
      * message
      *
-     * @param filename the new Filename
+     * @param newFilename the new Filename
      */
-    fun onFilenameConfirmed(filename: String) = isConfirmedFilenameValid(filename)
+    fun onFilenameConfirmed(newFilename: String) = isConfirmedFilenameValid(newFilename)
 
     /**
      * Checks if the filename is valid before proceeding to save the Scan/s to the selected
@@ -147,9 +146,10 @@ internal class SaveScannedDocumentsViewModel @Inject constructor(
                         runCatching {
                             renameFileAndDeleteOriginalUseCase(
                                 originalUriPath = UriPath(nonNullUriPath),
-                                newFilename = uiState.actualFilename,
+                                newFilename = uiState.filename,
                             )
                         }.onSuccess { renamedFile ->
+                            logDocumentScanEvent(uiState.scanFileType, uiState.scanDestination)
                             _uiState.update { it.copy(uploadScansEvent = triggered(renamedFile.toUri())) }
                         }.onFailure { exception ->
                             Timber.e("Unable to upload the scan/s due to a renaming issue:\n ${exception.printStackTrace()}")
@@ -164,6 +164,26 @@ internal class SaveScannedDocumentsViewModel @Inject constructor(
         }
     }
 
+    @VisibleForTesting(otherwise = VisibleForTesting.PRIVATE)
+    internal fun logDocumentScanEvent(
+        scanFileType: ScanFileType,
+        scanDestination: ScanDestination,
+    ) {
+        when {
+            scanFileType == ScanFileType.Pdf && scanDestination == ScanDestination.CloudDrive ->
+                Analytics.tracker.trackEvent(DocumentScannerSavePDFToCloudDriveEvent)
+
+            scanFileType == ScanFileType.Pdf && scanDestination == ScanDestination.Chat ->
+                Analytics.tracker.trackEvent(DocumentScannerSavePDFToChatEvent)
+
+            scanFileType == ScanFileType.Jpg && scanDestination == ScanDestination.CloudDrive ->
+                Analytics.tracker.trackEvent(DocumentScannerSaveImageToCloudDriveEvent)
+
+            scanFileType == ScanFileType.Jpg && scanDestination == ScanDestination.Chat ->
+                Analytics.tracker.trackEvent(DocumentScannerSaveImageToChatEvent)
+        }
+    }
+
     /**
      * When the new filename is decided, this checks if the filename is valid or not. If the filename
      * is invalid, the UI State is updated to show a Snackbar with an error message
@@ -171,40 +191,79 @@ internal class SaveScannedDocumentsViewModel @Inject constructor(
      * @param filename The filename to be checked. Defaults to the saved filename in the UI State if
      * it is not provided
      */
-    private fun isConfirmedFilenameValid(filename: String = _uiState.value.filename) =
-        if (isScanFilenameValidUseCase(filename)) {
-            true
-        } else {
-            _uiState.update {
-                it.copy(
-                    snackbarMessage = triggered(
-                        if (filename.isBlank()) {
-                            SaveScannedDocumentsSnackbarMessageUiItem.BlankFilename
-                        } else {
-                            SaveScannedDocumentsSnackbarMessageUiItem.FilenameWithInvalidCharacters
-                        }
-                    )
-                )
+    private fun isConfirmedFilenameValid(filename: String = _uiState.value.filename): Boolean {
+        return when (val filenameValidationStatus = validateScanFilenameUseCase(
+            filename = filename,
+            fileExtension = _uiState.value.scanFileType.fileSuffix,
+        )) {
+            ScanFilenameValidationStatus.ValidFilename -> true
+            ScanFilenameValidationStatus.InvalidFilename -> false
+            else -> {
+                _uiState.update { it.copy(snackbarMessage = triggered(filenameValidationStatus)) }
+                false
             }
-            false
         }
+    }
 
     /**
      * Updates the Scan Destination of the scanned Document/s to be uploaded
      *
-     * @param scanDestination The new Scan Destination
+     * @param newScanDestination The new Scan Destination
      */
-    fun onScanDestinationSelected(scanDestination: ScanDestination) {
-        _uiState.update { it.copy(scanDestination = scanDestination) }
+    fun onScanDestinationSelected(newScanDestination: ScanDestination) {
+        _uiState.update { it.copy(scanDestination = newScanDestination) }
     }
 
     /**
-     * Updates the File Type of the scanned Document/s to be uploaded
+     * When changing the [ScanFileType], update the Filename, Filename Validation Status and
+     * Scan File Type to the UI State
      *
-     * @param scanFileType The new Scan File Type
+     * Filename Logic:
+     *
+     * * If the current Filename ends with the new [ScanFileType] file suffix, there are no changes
+     *
+     *     * Example: If the previous Filename is "Scanned.pdf" and PDF is the new [ScanFileType]
+     *
+     * * Else if the current Filename ends with the old [ScanFileType] file suffix, then replace it
+     * with the new [ScanFileType] suffix
+     *
+     *     * Example: If the previous Filename is "Scanned.pdf" and JPG is the new [ScanFileType],
+     *     then the new Filename is "Scanned.jpg".
+     *
+     *  * Else, simply append the new [ScanFileType] suffix to the current Filename
+     *
+     *     * Example: If the previous Filename is "Scanned" and PDF is the new [ScanFileType], then
+     *     the new Filename is "Scanned.pdf"
+     *
+     * @param newScanFileType The new Scan File Type
      */
-    fun onScanFileTypeSelected(scanFileType: ScanFileType) {
-        _uiState.update { it.copy(scanFileType = scanFileType) }
+    fun onScanFileTypeSelected(newScanFileType: ScanFileType) {
+        val previousSuffix = _uiState.value.scanFileType.fileSuffix
+        val previousFilename = _uiState.value.filename
+        val newSuffix = newScanFileType.fileSuffix
+
+        val updatedFilename = when {
+            previousFilename.endsWith(newSuffix) -> previousFilename
+            previousFilename.endsWith(previousSuffix) -> {
+                previousFilename.substringBeforeLast(
+                    previousSuffix,
+                    ""
+                ) + newSuffix
+            }
+
+            else -> "$previousFilename$newSuffix"
+        }
+        val updatedFileValidationStatus = validateScanFilenameUseCase(
+            filename = updatedFilename,
+            fileExtension = newSuffix,
+        )
+        _uiState.update {
+            it.copy(
+                filename = updatedFilename,
+                filenameValidationStatus = updatedFileValidationStatus,
+                scanFileType = newScanFileType,
+            )
+        }
     }
 
     /**

@@ -25,11 +25,15 @@ import mega.privacy.android.domain.usecase.GetNodeByIdUseCase
 import mega.privacy.android.domain.usecase.IsHiddenNodesOnboardedUseCase
 import mega.privacy.android.domain.usecase.UpdateNodeSensitiveUseCase
 import mega.privacy.android.domain.usecase.account.MonitorAccountDetailUseCase
+import mega.privacy.android.domain.usecase.camerauploads.GetPrimarySyncHandleUseCase
+import mega.privacy.android.domain.usecase.camerauploads.GetSecondaryFolderNodeUseCase
+import mega.privacy.android.domain.usecase.chat.GetMyChatsFilesFolderIdUseCase
 import mega.privacy.android.domain.usecase.contact.GetContactUserNameFromDatabaseUseCase
 import mega.privacy.android.domain.usecase.favourites.IsAvailableOfflineUseCase
 import mega.privacy.android.domain.usecase.network.MonitorConnectivityUseCase
 import mega.privacy.android.domain.usecase.node.IsHidingActionAllowedUseCase
 import mega.privacy.android.domain.usecase.node.IsNodeDeletedFromBackupsUseCase
+import mega.privacy.android.domain.usecase.node.IsNodeSyncedUseCase
 import mega.privacy.android.domain.usecase.offline.RemoveOfflineNodeUseCase
 import mega.privacy.android.domain.usecase.shares.CreateShareKeyUseCase
 import nz.mega.sdk.MegaNode
@@ -40,11 +44,22 @@ import javax.inject.Inject
  * [ViewModel] associated with [NodeOptionsBottomSheetDialogFragment]
  *
  * @property createShareKeyUseCase [CreateShareKeyUseCase]
+ * @property getNodeByIdUseCase [GetNodeByIdUseCase]
  * @property getNodeByHandle [GetNodeByHandle]
  * @property isNodeDeletedFromBackupsUseCase [IsNodeDeletedFromBackupsUseCase]
  * @property monitorConnectivityUseCase [MonitorConnectivityUseCase]
  * @property removeOfflineNodeUseCase [RemoveOfflineNodeUseCase]
  * @property getContactUserNameFromDatabaseUseCase [GetContactUserNameFromDatabaseUseCase]
+ * @property updateNodeSensitiveUseCase [UpdateNodeSensitiveUseCase]
+ * @property monitorAccountDetailUseCase [MonitorAccountDetailUseCase]
+ * @property isHiddenNodesOnboardedUseCase [IsHiddenNodesOnboardedUseCase]
+ * @property isHidingActionAllowedUseCase [IsHidingActionAllowedUseCase]
+ * @property isAvailableOfflineUseCase [IsAvailableOfflineUseCase]
+ * @property getBusinessStatusUseCase [GetBusinessStatusUseCase]
+ * @property getCameraUploadsFolderHandleUseCase [GetPrimarySyncHandleUseCase]
+ * @property getMediaUploadsFolderHandleUseCase [GetSecondaryFolderNodeUseCase]
+ * @property getMyChatsFilesFolderIdUseCase [GetMyChatsFilesFolderIdUseCase]
+ * @property isNodeSyncedUseCase [IsNodeSyncedUseCase]
  */
 @HiltViewModel
 class NodeOptionsViewModel @Inject constructor(
@@ -61,6 +76,10 @@ class NodeOptionsViewModel @Inject constructor(
     private val isHidingActionAllowedUseCase: IsHidingActionAllowedUseCase,
     private val isAvailableOfflineUseCase: IsAvailableOfflineUseCase,
     private val getBusinessStatusUseCase: GetBusinessStatusUseCase,
+    private val getCameraUploadsFolderHandleUseCase: GetPrimarySyncHandleUseCase,
+    private val getMediaUploadsFolderHandleUseCase: GetSecondaryFolderNodeUseCase,
+    private val getMyChatsFilesFolderIdUseCase: GetMyChatsFilesFolderIdUseCase,
+    private val isNodeSyncedUseCase: IsNodeSyncedUseCase,
     savedStateHandle: SavedStateHandle,
 ) : ViewModel() {
 
@@ -137,10 +156,17 @@ class NodeOptionsViewModel @Inject constructor(
                 val isHiddenNodesOnboarded = isHiddenNodesOnboardedUseCase()
                 val isHidingActionAllowed =
                     isHidingActionAllowedUseCase(NodeId(nodeId))
+                val isCameraUploadsFolder = nodeId == getCameraUploadsFolderHandleUseCase()
+                val isMediaUploadsFolder =
+                    nodeId == (getMediaUploadsFolderHandleUseCase()?.id?.longValue ?: false)
+                val isMyChatFilesFolder = nodeId == getMyChatsFilesFolderIdUseCase()?.longValue
+                val isSyncedFolder = isNodeSyncedUseCase(nodeId = NodeId(nodeId))
                 _state.update {
                     it.copy(
                         isHiddenNodesOnboarded = isHiddenNodesOnboarded,
                         isHidingActionAllowed = isHidingActionAllowed,
+                        isUserAttributeFolder = isCameraUploadsFolder || isMediaUploadsFolder || isMyChatFilesFolder,
+                        isSyncedFolder = isSyncedFolder,
                     )
                 }
             }.onFailure {

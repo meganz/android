@@ -15,16 +15,19 @@ import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import dagger.hilt.android.AndroidEntryPoint
 import mega.privacy.android.app.activities.PasscodeActivity
 import mega.privacy.android.app.activities.contract.NameCollisionActivityContract
-import mega.privacy.android.app.main.FileStorageActivity
+import mega.privacy.android.app.presentation.filestorage.FileStorageActivity
 import mega.privacy.android.app.presentation.extensions.isDarkMode
 import mega.privacy.android.app.presentation.qrcode.mapper.QRCodeMapper
+import mega.privacy.android.app.presentation.settings.model.StorageTargetPreference
+import mega.privacy.android.app.presentation.settings.model.QRTargetPreference
 import mega.privacy.android.app.utils.Constants
 import mega.privacy.android.app.utils.Constants.SNACKBAR_TYPE
 import mega.privacy.android.app.utils.ContactUtil
 import mega.privacy.android.domain.entity.ThemeMode
 import mega.privacy.android.domain.entity.node.NameCollision
 import mega.privacy.android.domain.usecase.GetThemeMode
-import mega.privacy.android.shared.original.core.ui.theme.OriginalTempTheme
+import mega.privacy.android.navigation.MegaNavigator
+import mega.privacy.android.shared.original.core.ui.theme.OriginalTheme
 import nz.mega.sdk.MegaApiJava.INVALID_HANDLE
 import javax.inject.Inject
 
@@ -49,6 +52,12 @@ class QRCodeComposeActivity : PasscodeActivity() {
      */
     @Inject
     lateinit var getThemeMode: GetThemeMode
+
+    /**
+     * Mega navigator
+     */
+    @Inject
+    lateinit var megaNavigator: MegaNavigator
 
     private val nameCollisionActivityLauncher = registerForActivityResult(
         NameCollisionActivityContract()
@@ -82,7 +91,7 @@ class QRCodeComposeActivity : PasscodeActivity() {
         setContent {
             val mode by getThemeMode().collectAsStateWithLifecycle(initialValue = ThemeMode.System)
             val viewState by viewModel.uiState.collectAsStateWithLifecycle()
-            OriginalTempTheme(isDark = mode.isDarkMode()) {
+            OriginalTheme(isDark = mode.isDarkMode()) {
                 QRCodeView(
                     viewState = viewState,
                     onBackPressed = onBackPressedDispatcher::onBackPressed,
@@ -101,17 +110,24 @@ class QRCodeComposeActivity : PasscodeActivity() {
                     onCloudDriveClicked = viewModel::saveToCloudDrive,
                     onFileSystemClicked = ::saveToFileSystem,
                     onShowCollision = ::showCollision,
+                    onShowCollisionConsumed = viewModel::resetShowCollision,
                     onUploadFile = {
                         viewModel.uploadFile(
                             qrFile = it.first,
                             parentHandle = it.second
                         )
                     },
-                    onShowCollisionConsumed = viewModel::resetShowCollision,
                     onUploadFileConsumed = viewModel::resetUploadFile,
                     onScanCancelConsumed = viewModel::resetScanCancel,
                     onUploadEventConsumed = viewModel::onUploadEventConsumed,
                     qrCodeMapper = qrCodeMapper,
+                    navigateToQrSettings = { megaNavigator.openSettings(this, QRTargetPreference) },
+                    navigateToStorageSettings = {
+                        megaNavigator.openSettings(
+                            this,
+                            StorageTargetPreference
+                        )
+                    },
                 )
             }
         }

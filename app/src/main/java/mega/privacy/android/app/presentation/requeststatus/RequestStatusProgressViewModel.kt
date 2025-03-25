@@ -40,15 +40,13 @@ class RequestStatusProgressViewModel @Inject constructor(
                     monitorRequestStatusProgressEventUseCase()
                         .catch { throwable ->
                             Timber.e(throwable)
-                            // Dismiss dialog on error
+                            // Hide progress bar on error
                             _uiState.update {
-                                it.copy(progress = -1L)
+                                it.copy(progress = null)
                             }
-                        }.collect { event ->
+                        }.collect { progress ->
                             _uiState.update {
-                                it.copy(
-                                    progress = event.number
-                                )
+                                it.copy(progress = progress)
                             }
                         }
                 }

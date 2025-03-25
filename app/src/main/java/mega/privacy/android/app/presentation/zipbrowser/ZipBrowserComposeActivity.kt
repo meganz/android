@@ -56,7 +56,7 @@ import mega.privacy.android.domain.entity.zipbrowser.ZipEntryType
 import mega.privacy.android.domain.monitoring.CrashReporter
 import mega.privacy.android.domain.usecase.GetThemeMode
 import mega.privacy.android.navigation.MegaNavigator
-import mega.privacy.android.shared.original.core.ui.theme.OriginalTempTheme
+import mega.privacy.android.shared.original.core.ui.theme.OriginalTheme
 import timber.log.Timber
 import java.io.File
 import java.nio.charset.Charset
@@ -92,7 +92,7 @@ class ZipBrowserComposeActivity : PasscodeActivity() {
             val themeMode by getThemeMode().collectAsStateWithLifecycle(
                 initialValue = ThemeMode.System
             )
-            OriginalTempTheme(isDark = themeMode.isDarkMode()) {
+            OriginalTheme(isDark = themeMode.isDarkMode()) {
                 ConstraintLayout(
                     modifier = Modifier.systemBarsPadding().fillMaxSize()
                 ) {

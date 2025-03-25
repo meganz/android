@@ -1,12 +1,10 @@
-import mega.privacy.android.build.shouldApplyDefaultConfiguration
-
 plugins {
     alias(convention.plugins.mega.jvm.library)
     alias(convention.plugins.mega.jvm.test)
     alias(convention.plugins.mega.jvm.jacoco)
     alias(convention.plugins.mega.lint)
     alias(convention.plugins.mega.jvm.hilt)
-    kotlin("plugin.serialization") version "1.9.21"
+    alias(plugin.plugins.kotlin.serialisation)
 }
 
 lint {

@@ -109,6 +109,7 @@
 # Protobuf Library #
 #####################
 -keep class * extends com.google.protobuf.GeneratedMessageLite { *; }
+-keep class com.google.protobuf.** { *; }
 
 #####################
 # Local Lifecycle Owner for version 2.8.2 #

@@ -56,12 +56,12 @@ interface NotificationsRepository {
     suspend fun broadcastHomeBadgeCount(badgeCount: Int)
 
     /**
-     * Check if notifications are enabled for a chat
+     * Returns whether Do-Not-Disturb mode for a chat is enabled or not
      *
-     * @param chatId    handle of the node that identifies the chat room
-     * @return          true if it is enabled, false otherwise
+     * @param chatId MegaHandle that identifies the chat room
+     * @return True if enabled, false otherwise
      */
-    suspend fun isChatEnabled(chatId: Long): Boolean
+    suspend fun isChatDndEnabled(chatId: Long): Boolean
 
     /**
      * Enable or disable notifications for a chat

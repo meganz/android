@@ -10,9 +10,9 @@ import androidx.compose.ui.unit.dp
 import mega.privacy.android.shared.original.core.ui.controls.dividers.DividerType
 import mega.privacy.android.shared.original.core.ui.controls.dividers.MegaDivider
 import mega.privacy.android.shared.original.core.ui.preview.CombinedThemePreviews
-import mega.privacy.android.shared.original.core.ui.theme.OriginalTempTheme
+import mega.privacy.android.shared.original.core.ui.theme.OriginalTheme
 import mega.privacy.android.shared.original.core.ui.theme.extensions.backgroundToken
-import mega.privacy.android.shared.original.core.ui.theme.values.BackgroundColor
+import mega.android.core.ui.theme.values.BackgroundColor
 
 @Composable
 internal fun MegaTable(
@@ -46,7 +46,7 @@ internal fun MegaTable(
 @Composable
 @CombinedThemePreviews
 private fun MegaTablePreview() {
-    OriginalTempTheme(isDark = isSystemInDarkTheme()) {
+    OriginalTheme(isDark = isSystemInDarkTheme()) {
         MegaTable(
             numOfColumn = 2,
             tableCells = listOf(

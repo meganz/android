@@ -4,7 +4,6 @@ import mega.privacy.android.shared.resources.R as sharedR
 import android.app.Activity
 import android.content.Intent
 import android.net.Uri
-import android.os.Build
 import android.os.Bundle
 import android.text.InputType
 import android.util.Base64
@@ -30,11 +29,11 @@ import com.google.android.material.dialog.MaterialAlertDialogBuilder
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.sync.Mutex
+import mega.android.core.ui.theme.AndroidTheme
 import mega.privacy.android.app.MegaApplication.Companion.getChatManagement
 import mega.privacy.android.app.MegaApplication.Companion.isIsHeartBeatAlive
 import mega.privacy.android.app.MegaApplication.Companion.setHeartBeatAlive
 import mega.privacy.android.app.R
-import mega.privacy.android.app.ShareInfo
 import mega.privacy.android.app.activities.WebViewActivity
 import mega.privacy.android.app.constants.IntentConstants
 import mega.privacy.android.app.main.FileExplorerActivity
@@ -51,6 +50,7 @@ import mega.privacy.android.app.presentation.login.model.LoginFragmentType
 import mega.privacy.android.app.presentation.login.model.LoginIntentState
 import mega.privacy.android.app.presentation.login.model.LoginState
 import mega.privacy.android.app.presentation.login.view.LoginView
+import mega.privacy.android.app.presentation.login.view.NewLoginView
 import mega.privacy.android.app.presentation.settings.startscreen.util.StartScreenUtil.setStartScreenTimeStamp
 import mega.privacy.android.app.providers.FileProviderActivity
 import mega.privacy.android.app.upgradeAccount.ChooseAccountActivity
@@ -63,11 +63,10 @@ import mega.privacy.android.app.utils.ConstantsUrl.RECOVERY_URL_EMAIL
 import mega.privacy.android.app.utils.TextUtil
 import mega.privacy.android.app.utils.Util
 import mega.privacy.android.domain.entity.StorageState
-import mega.privacy.android.domain.entity.ThemeMode
 import mega.privacy.android.domain.entity.support.SupportEmailTicket
 import mega.privacy.android.domain.qualifier.LoginMutex
 import mega.privacy.android.domain.usecase.GetThemeMode
-import mega.privacy.android.shared.original.core.ui.theme.OriginalTempTheme
+import mega.privacy.android.shared.original.core.ui.theme.OriginalTheme
 import nz.mega.sdk.MegaError
 import timber.log.Timber
 import javax.inject.Inject
@@ -79,9 +78,6 @@ import javax.inject.Inject
  */
 @AndroidEntryPoint
 class LoginFragment : Fragment() {
-
-    @Inject
-    lateinit var getThemeMode: GetThemeMode
 
     @Inject
     @LoginMutex
@@ -99,7 +95,7 @@ class LoginFragment : Fragment() {
     private var intentAction: String? = null
     private var intentDataString: String? = null
     private var intentParentHandle: Long = -1
-    private var intentShareInfo: ArrayList<ShareInfo>? = null
+    private var intentShareInfo: Boolean = false
 
     override fun onCreateView(
         inflater: LayoutInflater,
@@ -117,7 +113,6 @@ class LoginFragment : Fragment() {
 
     @Composable
     private fun LoginScreen() {
-        val themeMode by getThemeMode().collectAsStateWithLifecycle(initialValue = ThemeMode.System)
         val uiState by viewModel.state.collectAsStateWithLifecycle()
 
         with(uiState) {
@@ -135,27 +130,51 @@ class LoginFragment : Fragment() {
             if (ongoingTransfersExist == true) showCancelTransfersDialog()
         }
 
-        OriginalTempTheme(isDark = themeMode.isDarkMode()) {
-            LoginView(
-                state = uiState,
-                onEmailChanged = viewModel::onEmailChanged,
-                onPasswordChanged = viewModel::onPasswordChanged,
-                onLoginClicked = {
-                    LoginActivity.isBackFromLoginPage = false
-                    viewModel.onLoginClicked(false)
-                    billingViewModel.loadSkus()
-                    billingViewModel.loadPurchases()
-                },
-                onForgotPassword = { onForgotPassword(uiState.accountSession?.email) },
-                onCreateAccount = ::onCreateAccount,
-                onSnackbarMessageConsumed = viewModel::onSnackbarMessageConsumed,
-                on2FAPinChanged = viewModel::on2FAPinChanged,
-                on2FAChanged = viewModel::on2FAChanged,
-                onLostAuthenticatorDevice = ::onLostAuthenticationDevice,
-                onBackPressed = { onBackPressed(uiState) },
-                onFirstTime2FAConsumed = viewModel::onFirstTime2FAConsumed,
-                onReportIssue = ::openLoginIssueHelpdeskPage,
-            )
+        if (uiState.isLoginNewDesignEnabled) {
+            AndroidTheme(isDark = uiState.themeMode.isDarkMode()) {
+                NewLoginView(
+                    state = uiState,
+                    onEmailChanged = viewModel::onEmailChanged,
+                    onPasswordChanged = viewModel::onPasswordChanged,
+                    onLoginClicked = {
+                        LoginActivity.isBackFromLoginPage = false
+                        viewModel.onLoginClicked(false)
+                        billingViewModel.loadSkus()
+                        billingViewModel.loadPurchases()
+                    },
+                    onForgotPassword = { onForgotPassword(uiState.accountSession?.email) },
+                    onCreateAccount = ::onCreateAccount,
+                    onSnackbarMessageConsumed = viewModel::onSnackbarMessageConsumed,
+                    on2FAChanged = viewModel::on2FAChanged,
+                    onLostAuthenticatorDevice = ::onLostAuthenticationDevice,
+                    onBackPressed = { onBackPressed(uiState) },
+                    onReportIssue = ::openLoginIssueHelpdeskPage,
+                    onLoginExceptionConsumed = viewModel::setLoginErrorConsumed,
+                )
+            }
+        } else {
+            OriginalTheme(isDark = uiState.themeMode.isDarkMode()) {
+                LoginView(
+                    state = uiState,
+                    onEmailChanged = viewModel::onEmailChanged,
+                    onPasswordChanged = viewModel::onPasswordChanged,
+                    onLoginClicked = {
+                        LoginActivity.isBackFromLoginPage = false
+                        viewModel.onLoginClicked(false)
+                        billingViewModel.loadSkus()
+                        billingViewModel.loadPurchases()
+                    },
+                    onForgotPassword = { onForgotPassword(uiState.accountSession?.email) },
+                    onCreateAccount = ::onCreateAccount,
+                    onSnackbarMessageConsumed = viewModel::onSnackbarMessageConsumed,
+                    on2FAPinChanged = viewModel::on2FAPinChanged,
+                    on2FAChanged = viewModel::on2FAChanged,
+                    onLostAuthenticatorDevice = ::onLostAuthenticationDevice,
+                    onBackPressed = { onBackPressed(uiState) },
+                    onFirstTime2FAConsumed = viewModel::onFirstTime2FAConsumed,
+                    onReportIssue = ::openLoginIssueHelpdeskPage,
+                )
+            }
         }
 
         // Hide splash after UI is rendered, to prevent blinking
@@ -174,7 +193,6 @@ class LoginFragment : Fragment() {
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
-        viewModel.setupInitialState()
         setupIntent()
     }
 
@@ -255,6 +273,22 @@ class LoginFragment : Fragment() {
                         else -> {
                             Timber.d("intent received $action")
                             when (action) {
+                                Constants.ACTION_LOCATE_DOWNLOADED_FILE -> {
+                                    intentExtras = extras
+                                }
+
+                                Constants.ACTION_SHOW_WARNING -> {
+                                    intentExtras = extras
+                                }
+
+                                Constants.ACTION_EXPLORE_ZIP -> {
+                                    intentExtras = extras
+                                }
+
+                                Constants.ACTION_CANCEL_TRANSFER -> {
+                                    intentExtras = extras
+                                }
+
                                 Constants.ACTION_OPEN_MEGA_FOLDER_LINK,
                                 Constants.ACTION_IMPORT_LINK_FETCH_NODES,
                                 Constants.ACTION_CHANGE_MAIL,
@@ -262,7 +296,7 @@ class LoginFragment : Fragment() {
                                 Constants.ACTION_OPEN_HANDLE_NODE,
                                 Constants.ACTION_OPEN_CHAT_LINK,
                                 Constants.ACTION_JOIN_OPEN_CHAT_LINK,
-                                -> {
+                                    -> {
                                     intentDataString = dataString
                                 }
 
@@ -274,7 +308,7 @@ class LoginFragment : Fragment() {
 
                                 Constants.ACTION_OPEN_FILE_LINK_ROOTNODES_NULL,
                                 Constants.ACTION_OPEN_FOLDER_LINK_ROOTNODES_NULL,
-                                -> {
+                                    -> {
                                     intentData = data
                                 }
                             }
@@ -451,19 +485,10 @@ class LoginFragment : Fragment() {
     private fun readyToFinish(uiState: LoginState) {
         (requireActivity() as LoginActivity).intent?.apply {
             @Suppress("UNCHECKED_CAST")
-            intentShareInfo =
-                if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
-                    getSerializableExtra(
-                        FileExplorerActivity.EXTRA_SHARE_INFOS,
-                        ArrayList::class.java
-                    )
-                } else {
-                    @Suppress("DEPRECATION")
-                    getSerializableExtra(FileExplorerActivity.EXTRA_SHARE_INFOS)
-                } as ArrayList<ShareInfo>?
+            intentShareInfo = getBooleanExtra(FileExplorerActivity.EXTRA_FROM_SHARE, false)
 
             when {
-                intentShareInfo?.isNotEmpty() == true -> {
+                intentShareInfo -> {
                     toSharePage()
                     return
                 }
@@ -622,7 +647,14 @@ class LoginFragment : Fragment() {
                     if (viewModel.getStorageState() === StorageState.PayWall) {
                         showOverDiskQuotaPaywallWarning(activity, true)
                     } else {
-                        loginActivity.startActivity(intent)
+                        loginActivity.startActivity(
+                            intent.apply {
+                                putExtra(
+                                    IntentConstants.EXTRA_FIRST_LAUNCH,
+                                    uiState.isFirstTimeLaunch
+                                )
+                            },
+                        )
                     }
                     loginActivity.finish()
                 }
@@ -654,6 +686,22 @@ class LoginFragment : Fragment() {
                     intent = Intent(requireContext(), FileProviderActivity::class.java)
                     intentExtras?.let { intent.putExtras(it) }
                     intent.data = intentData
+                }
+
+                Constants.ACTION_LOCATE_DOWNLOADED_FILE -> {
+                    intentExtras?.let { intent.putExtras(it) }
+                }
+
+                Constants.ACTION_SHOW_WARNING -> {
+                    intentExtras?.let { intent.putExtras(it) }
+                }
+
+                Constants.ACTION_EXPLORE_ZIP -> {
+                    intentExtras?.let { intent.putExtras(it) }
+                }
+
+                Constants.ACTION_CANCEL_TRANSFER -> {
+                    intentExtras?.let { intent.putExtras(it) }
                 }
 
                 Constants.ACTION_OPEN_FILE_LINK_ROOTNODES_NULL -> {
@@ -689,11 +737,8 @@ class LoginFragment : Fragment() {
      */
     private fun toSharePage() = with(requireActivity()) {
         startActivity(
-            this.intent.setClass(requireContext(), FileExplorerActivity::class.java).apply {
-                putExtra(FileExplorerActivity.EXTRA_SHARE_INFOS, intentShareInfo)
-                action = intent?.getStringExtra(FileExplorerActivity.EXTRA_SHARE_ACTION)
-                type = intent?.getStringExtra(FileExplorerActivity.EXTRA_SHARE_TYPE)
-            })
+            this.intent.setClass(requireContext(), FileExplorerActivity::class.java)
+        )
         finish()
     }
 
@@ -810,8 +855,13 @@ class LoginFragment : Fragment() {
                 Constants.ACTION_REFRESH == intentAction || Constants.ACTION_REFRESH_API_SERVER == intentAction ->
                     return
 
-                is2FARequired || multiFactorAuthState != null ->
-                    showConfirmLogoutDialog()
+                is2FARequired || multiFactorAuthState != null -> {
+                    if (isLoginNewDesignEnabled) {
+                        viewModel.stopLogin()
+                    } else {
+                        showConfirmLogoutDialog()
+                    }
+                }
 
                 loginMutex.isLocked || isLoginInProgress || isFastLoginInProgress || fetchNodesUpdate != null ->
                     activity?.moveTaskToBack(true)
@@ -829,7 +879,7 @@ class LoginFragment : Fragment() {
      */
     private fun showCancelTransfersDialog() = AlertDialog.Builder(requireContext()).apply {
         setMessage(R.string.login_warning_abort_transfers)
-        setPositiveButton(R.string.login_text) { _, _ -> viewModel.onLoginClicked(true) }
+        setPositiveButton(sharedR.string.login_text) { _, _ -> viewModel.onLoginClicked(true) }
         setNegativeButton(sharedR.string.general_dialog_cancel_button) { _, _ -> viewModel.resetOngoingTransfers() }
         setCancelable(false)
         show()

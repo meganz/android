@@ -15,7 +15,6 @@ import kotlinx.coroutines.flow.merge
 import kotlinx.coroutines.flow.shareIn
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
-import mega.privacy.android.app.featuretoggle.ABTestFeatures
 import mega.privacy.android.app.featuretoggle.ApiFeatures
 import mega.privacy.android.app.presentation.settings.SettingsFragment.Companion.COOKIES_URI
 import mega.privacy.android.app.presentation.settings.model.MediaDiscoveryViewSettings
@@ -30,7 +29,6 @@ import mega.privacy.android.domain.usecase.MonitorAutoAcceptQRLinks
 import mega.privacy.android.domain.usecase.MonitorMediaDiscoveryView
 import mega.privacy.android.domain.usecase.MonitorPasscodeLockPreferenceUseCase
 import mega.privacy.android.domain.usecase.MonitorStartScreenPreference
-import mega.privacy.android.domain.usecase.RefreshPasscodeLockPreference
 import mega.privacy.android.domain.usecase.RequestAccountDeletion
 import mega.privacy.android.domain.usecase.RootNodeExistsUseCase
 import mega.privacy.android.domain.usecase.SetMediaDiscoveryView
@@ -55,7 +53,6 @@ import javax.inject.Inject
 class SettingsViewModel @Inject constructor(
     private val getAccountDetailsUseCase: GetAccountDetailsUseCase,
     private val canDeleteAccount: CanDeleteAccount,
-    private val refreshPasscodeLockPreference: RefreshPasscodeLockPreference,
     private val isCameraUploadsEnabledUseCase: IsCameraUploadsEnabledUseCase,
     private val rootNodeExistsUseCase: RootNodeExistsUseCase,
     private val isMultiFactorAuthAvailable: IsMultiFactorAuthAvailable,
@@ -219,8 +216,7 @@ class SettingsViewModel @Inject constructor(
      */
     private fun getCookiePolicyLink() = viewModelScope.launch {
         runCatching {
-            val isAdsFeatureEnabled = getFeatureFlagValueUseCase(ABTestFeatures.ads) &&
-                    getFeatureFlagValueUseCase(ABTestFeatures.adse)
+            val isAdsFeatureEnabled = getFeatureFlagValueUseCase(ApiFeatures.GoogleAdsFeatureFlag)
             val url =
                 if (isAdsFeatureEnabled) getSessionTransferURLUseCase("cookie") else COOKIES_URI
             state.update { it.copy(cookiePolicyLink = url) }
@@ -328,8 +324,6 @@ class SettingsViewModel @Inject constructor(
     fun setShowHiddenItemsEnabled(enabled: Boolean) = viewModelScope.launch {
         setShowHiddenItemsUseCase(enabled)
     }
-
-    suspend fun fetchPasscodeEnabled() = refreshPasscodeLockPreference()
 
     internal fun toggleBackgroundPlay(isEnable: Boolean) {
         toggleBackgroundPlayJob?.cancel()

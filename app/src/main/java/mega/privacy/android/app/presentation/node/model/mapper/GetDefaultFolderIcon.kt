@@ -22,6 +22,7 @@ internal fun getDefaultFolderIcon(
         type is FolderType.RootBackup -> IconPackR.drawable.ic_backup_medium_solid
         type is FolderType.DeviceBackup -> getDeviceFolderIcon((type as FolderType.DeviceBackup).deviceType)
         type is FolderType.ChildBackup -> IconPackR.drawable.ic_folder_backup_medium_solid
+        type is FolderType.Sync -> IconPackR.drawable.ic_folder_sync_medium_solid
         else -> IconPackR.drawable.ic_folder_medium_solid
     }
 }

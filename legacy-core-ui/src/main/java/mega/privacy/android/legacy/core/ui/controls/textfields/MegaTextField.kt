@@ -12,7 +12,6 @@ import androidx.compose.foundation.text.BasicTextField
 import androidx.compose.foundation.text.KeyboardActions
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.foundation.text.selection.LocalTextSelectionColors
-import androidx.compose.foundation.text.selection.TextSelectionColors
 import androidx.compose.material.ExperimentalMaterialApi
 import androidx.compose.material.LocalTextStyle
 import androidx.compose.material.MaterialTheme
@@ -36,7 +35,8 @@ import androidx.compose.ui.text.input.VisualTransformation
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
-import mega.privacy.android.shared.original.core.ui.theme.OriginalTempTheme
+import mega.privacy.android.legacy.core.ui.customTextSelectionColors
+import mega.privacy.android.shared.original.core.ui.theme.OriginalTheme
 import mega.privacy.android.shared.original.core.ui.theme.grey_alpha_012
 import mega.privacy.android.shared.original.core.ui.theme.white_alpha_012
 
@@ -88,10 +88,7 @@ fun MegaTextField(
     }
     val mergedTextStyle = textStyle.merge(TextStyle(color = textColor))
 
-    val customTextSelectionColors = TextSelectionColors(
-        handleColor = MaterialTheme.colors.secondary,
-        backgroundColor = MaterialTheme.colors.secondary
-    )
+    val customTextSelectionColors = customTextSelectionColors()
     var modifiedModifier = modifier
         .background(colors.backgroundColor(enabled).value, shape)
 
@@ -158,7 +155,7 @@ private fun PreviewTextField() {
     var content by remember {
         mutableStateOf("")
     }
-    OriginalTempTheme(isDark = isSystemInDarkTheme()) {
+    OriginalTheme(isDark = isSystemInDarkTheme()) {
         MegaTextField(
             placeholder = { Text(text = "This is the label") },
             value = content,

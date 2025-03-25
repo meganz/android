@@ -7,6 +7,7 @@ import de.palm.composestateevents.triggered
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.distinctUntilChanged
+import kotlinx.coroutines.flow.emptyFlow
 import kotlinx.coroutines.flow.flow
 import kotlinx.coroutines.flow.flowOf
 import kotlinx.coroutines.flow.map
@@ -18,16 +19,15 @@ import kotlinx.coroutines.test.runTest
 import mega.privacy.android.app.AnalyticsTestExtension
 import mega.privacy.android.app.InstantExecutorExtension
 import mega.privacy.android.app.R
-import mega.privacy.android.app.featuretoggle.AppFeatures
-import mega.privacy.android.app.globalmanagement.TransfersManagement
 import mega.privacy.android.app.middlelayer.installreferrer.InstallReferrerDetails
 import mega.privacy.android.app.middlelayer.installreferrer.InstallReferrerHandler
 import mega.privacy.android.app.presentation.login.model.LoginError
 import mega.privacy.android.core.test.extension.CoroutineMainDispatcherExtension
-import mega.privacy.android.domain.entity.Event
-import mega.privacy.android.domain.entity.NormalEvent
+import mega.privacy.android.domain.entity.Progress
+import mega.privacy.android.domain.entity.ThemeMode
 import mega.privacy.android.domain.entity.login.EphemeralCredentials
 import mega.privacy.android.domain.exception.MegaException
+import mega.privacy.android.domain.usecase.GetThemeMode
 import mega.privacy.android.domain.usecase.RootNodeExistsUseCase
 import mega.privacy.android.domain.usecase.account.ClearUserCredentialsUseCase
 import mega.privacy.android.domain.usecase.account.MonitorAccountBlockedUseCase
@@ -37,6 +37,7 @@ import mega.privacy.android.domain.usecase.camerauploads.HasCameraSyncEnabledUse
 import mega.privacy.android.domain.usecase.camerauploads.HasPreferencesUseCase
 import mega.privacy.android.domain.usecase.camerauploads.IsCameraUploadsEnabledUseCase
 import mega.privacy.android.domain.usecase.environment.GetHistoricalProcessExitReasonsUseCase
+import mega.privacy.android.domain.usecase.environment.IsFirstLaunchUseCase
 import mega.privacy.android.domain.usecase.featureflag.GetFeatureFlagValueUseCase
 import mega.privacy.android.domain.usecase.login.ClearEphemeralCredentialsUseCase
 import mega.privacy.android.domain.usecase.login.ClearLastRegisteredEmailUseCase
@@ -62,6 +63,7 @@ import mega.privacy.android.domain.usecase.transfers.CancelTransfersUseCase
 import mega.privacy.android.domain.usecase.transfers.OngoingTransfersExistUseCase
 import mega.privacy.android.domain.usecase.transfers.chatuploads.StartChatUploadsWorkerUseCase
 import mega.privacy.android.domain.usecase.transfers.downloads.StartDownloadWorkerUseCase
+import mega.privacy.android.domain.usecase.transfers.paused.CheckIfTransfersShouldBePausedUseCase
 import mega.privacy.android.domain.usecase.transfers.uploads.StartUploadsWorkerUseCase
 import mega.privacy.android.domain.usecase.workers.StopCameraUploadsUseCase
 import org.junit.jupiter.api.AfterEach
@@ -70,7 +72,6 @@ import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.extension.ExtendWith
 import org.junit.jupiter.api.extension.RegisterExtension
 import org.mockito.kotlin.any
-import org.mockito.kotlin.doReturn
 import org.mockito.kotlin.mock
 import org.mockito.kotlin.reset
 import org.mockito.kotlin.verify
@@ -119,15 +120,18 @@ internal class LoginViewModelTest {
     private val saveLastRegisteredEmailUseCase = mock<SaveLastRegisteredEmailUseCase>()
     private val clearLastRegisteredEmailUseCase = mock<ClearLastRegisteredEmailUseCase>()
     private val installReferrerHandler = mock<InstallReferrerHandler>()
-    private val transfersManagement = mock<TransfersManagement>()
     private val clearUserCredentialsUseCase = mock<ClearUserCredentialsUseCase>()
     private val startUploadsWorkerUseCase = mock<StartUploadsWorkerUseCase>()
     private val getHistoricalProcessExitReasonsUseCase =
         mock<GetHistoricalProcessExitReasonsUseCase>()
     private val enableRequestStatusMonitorUseCase = mock<EnableRequestStatusMonitorUseCase>()
-    private val requestStatusProgressFakeFlow = MutableSharedFlow<Event>()
+    private val requestStatusProgressFakeFlow = MutableSharedFlow<Progress>()
     private val monitorRequestStatusProgressEventUseCase =
         mock<MonitorRequestStatusProgressEventUseCase>()
+    private val checkIfTransfersShouldBePausedUseCase =
+        mock<CheckIfTransfersShouldBePausedUseCase>()
+    private val isFirstLaunchUseCase = mock<IsFirstLaunchUseCase>()
+    private val getThemeMode = mock<GetThemeMode>()
 
     @BeforeEach
     fun setUp() {
@@ -168,12 +172,14 @@ internal class LoginViewModelTest {
             saveLastRegisteredEmailUseCase = saveLastRegisteredEmailUseCase,
             clearLastRegisteredEmailUseCase = clearLastRegisteredEmailUseCase,
             installReferrerHandler = installReferrerHandler,
-            transfersManagement = transfersManagement,
             clearUserCredentialsUseCase = clearUserCredentialsUseCase,
             startUploadsWorkerUseCase = startUploadsWorkerUseCase,
             getHistoricalProcessExitReasonsUseCase = getHistoricalProcessExitReasonsUseCase,
             enableRequestStatusMonitorUseCase = enableRequestStatusMonitorUseCase,
-            monitorRequestStatusProgressEventUseCase = monitorRequestStatusProgressEventUseCase
+            monitorRequestStatusProgressEventUseCase = monitorRequestStatusProgressEventUseCase,
+            checkIfTransfersShouldBePausedUseCase = checkIfTransfersShouldBePausedUseCase,
+            isFirstLaunchUseCase = isFirstLaunchUseCase,
+            getThemeMode = getThemeMode
         )
     }
 
@@ -181,14 +187,27 @@ internal class LoginViewModelTest {
         whenever(monitorRequestStatusProgressEventUseCase()).thenReturn(
             requestStatusProgressFakeFlow
         )
-        whenever(getFeatureFlagValueUseCase(AppFeatures.RequestStatusProgressDialog)).thenReturn(
+        whenever(getFeatureFlagValueUseCase(any())).thenReturn(
             true
         )
+        whenever(getSessionUseCase()).thenReturn(null)
+        whenever(monitorAccountBlockedUseCase()).thenReturn(emptyFlow())
+        whenever(rootNodeExistsUseCase()).thenReturn(false)
+        whenever(hasPreferencesUseCase()).thenReturn(false)
+        whenever(hasCameraSyncEnabledUseCase()).thenReturn(false)
+        whenever(isCameraUploadsEnabledUseCase()).thenReturn(false)
+        whenever(isFirstLaunchUseCase()).thenReturn(false)
+        whenever(monitorFetchNodesFinishUseCase()).thenReturn(emptyFlow())
+        whenever(getThemeMode()).thenReturn(flowOf(ThemeMode.System))
     }
 
     @AfterEach
     fun resetMocks() {
-        reset(monitorRequestStatusProgressEventUseCase)
+        reset(
+            monitorRequestStatusProgressEventUseCase,
+            checkIfTransfersShouldBePausedUseCase,
+            isFirstLaunchUseCase
+        )
     }
 
     @Test
@@ -225,6 +244,7 @@ internal class LoginViewModelTest {
                 assertThat(enabledFlags).isEmpty()
                 assertThat(isCheckingSignupLink).isFalse()
                 assertThat(snackbarMessage).isInstanceOf(consumed().javaClass)
+                assertThat(isFirstTimeLaunch).isFalse()
             }
         }
     }
@@ -297,6 +317,7 @@ internal class LoginViewModelTest {
                         assertThat(awaitItem()).isInstanceOf(consumed().javaClass)
                         onLoginClicked(false)
                         assertThat(awaitItem()).isInstanceOf(triggered(R.string.error_server_connection_problem).javaClass)
+                        cancelAndIgnoreRemainingEvents()
                     }
             }
         }
@@ -316,6 +337,7 @@ internal class LoginViewModelTest {
                 assertThat(awaitItem().passwordError).isNull()
                 assertThat(awaitItem().ongoingTransfersExist).isNull()
                 assertThat(awaitItem().snackbarMessage).isInstanceOf(consumed().javaClass)
+                cancelAndIgnoreRemainingEvents()
             }
         }
     }
@@ -414,18 +436,16 @@ internal class LoginViewModelTest {
 
     @Test
     fun `test that requestStatusProgress is updated when event is received`() = runTest {
-        val newProgress = 50L
-        requestStatusProgressFakeFlow.emit(mock<NormalEvent> {
-            on { number } doReturn newProgress
-        })
+        val newProgress = 0.5f
+        requestStatusProgressFakeFlow.emit(Progress(newProgress))
         underTest.state.test {
             val state = awaitItem()
-            assertThat(state.requestStatusProgress).isEqualTo(newProgress)
+            assertThat(state.requestStatusProgress?.floatValue).isEqualTo(newProgress)
         }
     }
 
     @Test
-    fun `test that requestStatusProgress is set to -1 when exception is thrown`() = runTest {
+    fun `test that requestStatusProgress is set to null when exception is thrown`() = runTest {
         whenever(monitorRequestStatusProgressEventUseCase()).thenReturn(
             flow {
                 throw MegaException(1, "error")
@@ -433,7 +453,7 @@ internal class LoginViewModelTest {
         )
         underTest.state.test {
             val state = awaitItem()
-            assertThat(state.requestStatusProgress).isEqualTo(-1L)
+            assertThat(state.requestStatusProgress).isNull()
         }
     }
 

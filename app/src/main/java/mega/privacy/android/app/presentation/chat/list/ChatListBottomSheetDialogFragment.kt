@@ -21,6 +21,7 @@ import dagger.hilt.android.AndroidEntryPoint
 import mega.privacy.android.analytics.Analytics
 import mega.privacy.android.app.MegaApplication
 import mega.privacy.android.app.R
+import mega.privacy.android.app.activities.PasscodeActivity
 import mega.privacy.android.app.main.megachat.GroupChatInfoActivity
 import mega.privacy.android.app.presentation.chat.dialog.view.ChatRoomItemBottomSheetView
 import mega.privacy.android.app.presentation.contactinfo.ContactInfoActivity
@@ -38,7 +39,7 @@ import mega.privacy.android.domain.entity.ThemeMode
 import mega.privacy.android.domain.entity.chat.ChatRoomItem
 import mega.privacy.android.domain.entity.chat.ChatRoomItem.MeetingChatRoomItem
 import mega.privacy.android.domain.usecase.GetThemeMode
-import mega.privacy.android.shared.original.core.ui.theme.OriginalTempTheme
+import mega.privacy.android.shared.original.core.ui.theme.OriginalTheme
 import mega.privacy.mobile.analytics.event.ScheduledMeetingCancelMenuItemEvent
 import mega.privacy.mobile.analytics.event.ScheduledMeetingEditMenuItemEvent
 import javax.inject.Inject
@@ -113,7 +114,7 @@ class ChatListBottomSheetDialogFragment : BottomSheetDialogFragment() {
             val mode by getThemeMode().collectAsStateWithLifecycle(initialValue = ThemeMode.System)
             val item: ChatRoomItem? by viewModel.getChatRoom(chatId)
                 .collectAsStateWithLifecycle(null, viewLifecycleOwner, Lifecycle.State.STARTED)
-            OriginalTempTheme(isDark = mode.isDarkMode()) {
+            OriginalTheme(isDark = mode.isDarkMode()) {
                 ChatRoomItemBottomSheetView(
                     item = item,
                     onStartMeetingClick = ::onStartMeetingClick,
@@ -236,7 +237,10 @@ class ChatListBottomSheetDialogFragment : BottomSheetDialogFragment() {
     private fun getCallPermissionsRequest(): ActivityResultLauncher<Array<String>> =
         registerForActivityResult(ActivityResultContracts.RequestMultiplePermissions()) {
             if (checkMandatoryCallPermissions(requireActivity())) {
-                viewModel.startMeetingCall(chatId)
+                viewModel.startMeetingCall(
+                    chatId,
+                    (requireActivity() as PasscodeActivity).passcodeFacade::enablePassCode
+                )
             } else {
                 viewModel.updateSnackBar(
                     SnackBarItem(

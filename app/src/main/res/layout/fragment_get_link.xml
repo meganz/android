@@ -251,7 +251,7 @@
                     android:layout_height="wrap_content"
                     android:layout_marginTop="2dp"
                     android:text="@string/learn_more_option"
-                    android:textAppearance="@style/TextAppearance.Mega.Subtitle2.AccentColor" />
+                    android:textAppearance="@style/TextAppearance.Mega.Subtitle2.Link" />
 
             </LinearLayout>
 

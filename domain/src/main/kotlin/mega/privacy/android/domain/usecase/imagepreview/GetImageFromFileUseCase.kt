@@ -1,6 +1,7 @@
 package mega.privacy.android.domain.usecase.imagepreview
 
 import mega.privacy.android.domain.entity.imageviewer.ImageResult
+import mega.privacy.android.domain.entity.uri.UriPath
 import mega.privacy.android.domain.repository.FileSystemRepository
 import mega.privacy.android.domain.repository.thumbnailpreview.ThumbnailPreviewRepository
 import mega.privacy.android.domain.usecase.file.IsVideoFileUseCase
@@ -26,7 +27,7 @@ class GetImageFromFileUseCase @Inject constructor(
         file: File,
     ): ImageResult {
         return if (file.exists() && file.canRead()) {
-            val isVideo = isVideoFileUseCase(file.absolutePath)
+            val isVideo = isVideoFileUseCase(UriPath.fromFile(file))
             val fileName =
                 thumbnailPreviewRepository.getThumbnailOrPreviewFileName(file.name + file.length())
 

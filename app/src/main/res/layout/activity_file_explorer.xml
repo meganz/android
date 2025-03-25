@@ -23,14 +23,14 @@
                 <com.google.android.material.appbar.MaterialToolbar
                     android:id="@+id/toolbar_explorer"
                     android:layout_width="match_parent"
-                    android:background="@android:color/transparent"
-                    android:layout_height="?attr/actionBarSize"/>
+                    android:layout_height="?attr/actionBarSize"
+                    android:background="@android:color/transparent" />
 
                 <com.google.android.material.tabs.TabLayout
                     android:id="@+id/sliding_tabs_file_explorer"
+                    style="@style/Widget.Mega.TabLayout"
                     android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    style="@style/Widget.Mega.TabLayout"/>
+                    android:layout_height="wrap_content" />
 
             </com.google.android.material.appbar.AppBarLayout>
 
@@ -38,13 +38,13 @@
                 android:id="@+id/explorer_tabs_pager"
                 android:layout_width="match_parent"
                 android:layout_height="0dp"
-                android:layout_weight="1"/>
+                android:layout_weight="1" />
 
             <FrameLayout
                 android:id="@+id/cloudDriveFrameLayout"
                 android:layout_width="match_parent"
                 android:layout_height="match_parent"
-                android:visibility="gone"/>
+                android:visibility="gone" />
 
         </LinearLayout>
 
@@ -52,10 +52,10 @@
             android:id="@+id/file_logging_in_layout"
             android:layout_width="fill_parent"
             android:layout_height="fill_parent"
+            android:layout_marginTop="112dp"
             android:gravity="center_horizontal"
             android:orientation="vertical"
-            android:layout_marginTop="112dp"
-            android:visibility="gone" >
+            android:visibility="gone">
 
             <ImageView
                 android:id="@+id/file_login_mega_logo"
@@ -123,19 +123,22 @@
                 android:layout_marginTop="10dp" />
         </LinearLayout>
 
-
+        <androidx.compose.ui.platform.ComposeView
+            android:id="@+id/discard_scan_uploading_warning_dialog_compose_view"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent" />
 
     </RelativeLayout>
 
     <com.google.android.material.floatingactionbutton.FloatingActionButton
-    android:id="@+id/fab_file_explorer"
-    android:layout_width="@dimen/fab_button_diameter"
-    android:layout_height="@dimen/fab_button_diameter"
-    android:elevation="@dimen/elevation_low"
-    android:layout_margin="16dp"
-    android:src="@drawable/ic_send_horizontal_medium_regular_outline"
-    android:stateListAnimator="@anim/button_elevation"
-    android:tint="@android:color/white"
-    android:layout_gravity="bottom|right|end"/>
+        android:id="@+id/fab_file_explorer"
+        android:layout_width="@dimen/fab_button_diameter"
+        android:layout_height="@dimen/fab_button_diameter"
+        android:layout_gravity="bottom|right|end"
+        android:layout_margin="16dp"
+        android:elevation="@dimen/elevation_low"
+        android:src="@drawable/ic_send_horizontal_medium_regular_outline"
+        android:stateListAnimator="@anim/button_elevation"
+        android:tint="@android:color/white" />
 
 </androidx.coordinatorlayout.widget.CoordinatorLayout>

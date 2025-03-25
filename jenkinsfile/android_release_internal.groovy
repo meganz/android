@@ -46,7 +46,7 @@ pipeline {
         LC_ALL = 'en_US.UTF-8'
         LANG = 'en_US.UTF-8'
 
-        NDK_ROOT = '/opt/buildtools/android-sdk/ndk/21.3.6528147'
+        NDK_ROOT = '/opt/buildtools/android-sdk/ndk/27.1.12297006'
         JAVA_HOME = '/opt/buildtools/zulu17.42.19-ca-jdk17.0.7-macosx'
         ANDROID_HOME = '/opt/buildtools/android-sdk'
 
@@ -160,7 +160,7 @@ pipeline {
                 script {
                     BUILD_STEP = 'Build GMS APK'
 
-                    sh './gradlew clean app:assembleGmsRelease'
+                    sh './gradlew --no-daemon clean app:assembleGmsRelease'
                 }
             }
         }
@@ -207,7 +207,7 @@ pipeline {
                                 "GOOGLE_APPLICATION_CREDENTIALS=$FIREBASE_CONFIG",
                                 "RELEASE_NOTES_FOR_CD=${readReleaseNotesForFirebase()}"
                         ]) {
-                            sh './gradlew appDistributionUploadGmsRelease'
+                            sh './gradlew --no-daemon appDistributionUploadGmsRelease'
                         }
                     }
                 }
@@ -219,7 +219,7 @@ pipeline {
                     BUILD_STEP = 'Upload Firebase Crashlytics symbol files'
                     sh """
                     cd $WORKSPACE
-                    ./gradlew app:uploadCrashlyticsSymbolFileGmsRelease
+                    ./gradlew --no-daemon app:uploadCrashlyticsSymbolFileGmsRelease
                     """
                 }
             }
@@ -231,7 +231,7 @@ pipeline {
                     withEnv([
                             "APK_VERSION_NAME_TAG_FOR_CD=_QA"
                     ]) {
-                        sh './gradlew app:assembleGmsQa'
+                        sh './gradlew --no-daemon app:assembleGmsQa'
                     }
                 }
             }
@@ -248,7 +248,7 @@ pipeline {
                                 "GOOGLE_APPLICATION_CREDENTIALS=$FIREBASE_CONFIG",
                                 "RELEASE_NOTES_FOR_CD=${readReleaseNotesForFirebase()}"
                         ]) {
-                            sh './gradlew appDistributionUploadGmsQa'
+                            sh './gradlew --no-daemon appDistributionUploadGmsQa'
                         }
                     }
                 }
@@ -259,7 +259,7 @@ pipeline {
                 script {
                     BUILD_STEP = 'Build GMS AAB'
 
-                    sh './gradlew clean app:bundleGmsRelease'
+                    sh './gradlew --no-daemon clean app:bundleGmsRelease'
                 }
             }
         }

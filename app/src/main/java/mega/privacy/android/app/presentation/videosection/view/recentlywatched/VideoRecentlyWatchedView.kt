@@ -48,7 +48,7 @@ import mega.privacy.android.shared.original.core.ui.controls.appbar.AppBarType
 import mega.privacy.android.shared.original.core.ui.controls.appbar.MegaAppBar
 import mega.privacy.android.shared.original.core.ui.controls.layouts.MegaScaffold
 import mega.privacy.android.shared.original.core.ui.controls.text.MegaText
-import mega.privacy.android.shared.original.core.ui.theme.values.TextColor
+import mega.android.core.ui.theme.values.TextColor
 import mega.privacy.android.shared.original.core.ui.utils.showAutoDurationSnackbar
 import nz.mega.sdk.MegaNode
 
@@ -129,7 +129,7 @@ fun VideoRecentlyWatchedView(
                 group.isEmpty() -> LegacyMegaEmptyViewWithImage(
                     modifier = Modifier.testTag(VIDEO_RECENTLY_WATCHED_EMPTY_TEST_TAG),
                     text = stringResource(id = shareR.string.video_section_empty_hint_no_recently_activity),
-                    imagePainter = painterResource(id = iconPackR.drawable.ic_empty_recently_watched)
+                    imagePainter = painterResource(id = iconPackR.drawable.ic_clock_glass)
                 )
 
                 else -> {

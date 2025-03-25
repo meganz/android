@@ -8,9 +8,8 @@ import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.LazyListState
-import androidx.compose.material.ExperimentalMaterialApi
 import androidx.compose.material.ModalBottomSheetValue
-import androidx.compose.material.Scaffold
+import androidx.compose.material.SnackbarResult
 import androidx.compose.material.rememberModalBottomSheetState
 import androidx.compose.material.rememberScaffoldState
 import androidx.compose.runtime.Composable
@@ -25,6 +24,7 @@ import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import kotlinx.coroutines.launch
+import mega.privacy.android.analytics.Analytics
 import mega.privacy.android.app.R
 import mega.privacy.android.app.presentation.videosection.model.DurationFilterOption
 import mega.privacy.android.app.presentation.videosection.model.LocationFilterOption
@@ -36,14 +36,26 @@ import mega.privacy.android.core.formatter.formatFileSize
 import mega.privacy.android.domain.entity.node.thumbnail.ThumbnailRequest
 import mega.privacy.android.legacy.core.ui.controls.LegacyMegaEmptyViewWithImage
 import mega.privacy.android.legacy.core.ui.controls.lists.HeaderViewItem
+import mega.privacy.android.shared.original.core.ui.controls.layouts.MegaScaffold
 import mega.privacy.android.shared.original.core.ui.preview.CombinedThemePreviews
-import mega.privacy.android.shared.original.core.ui.theme.OriginalTempTheme
+import mega.privacy.android.shared.original.core.ui.theme.OriginalTheme
+import mega.privacy.android.shared.original.core.ui.utils.showAutoDurationSnackbar
+import mega.privacy.mobile.analytics.event.DurationFilterAllDurationsClickedEvent
+import mega.privacy.mobile.analytics.event.DurationFilterBetween10and60SecondsClickedEvent
+import mega.privacy.mobile.analytics.event.DurationFilterBetween1and4MinutesClickedEvent
+import mega.privacy.mobile.analytics.event.DurationFilterBetween4and20MinutesClickedEvent
+import mega.privacy.mobile.analytics.event.DurationFilterLessThan10SecondsClickedEvent
+import mega.privacy.mobile.analytics.event.DurationFilterMoreThan20MinutesClickedEvent
+import mega.privacy.mobile.analytics.event.LocationFilterAllLocationsClickedEvent
+import mega.privacy.mobile.analytics.event.LocationFilterCameraUploadClickedEvent
+import mega.privacy.mobile.analytics.event.LocationFilterCloudDriveClickedEvent
+import mega.privacy.mobile.analytics.event.LocationFilterSharedItemClickedEvent
 import nz.mega.sdk.MegaNode
 
-@OptIn(ExperimentalMaterialApi::class)
 @Composable
 internal fun AllVideosView(
     items: List<VideoUIEntity>,
+    highlightText: String = "",
     shouldApplySensitiveMode: Boolean,
     progressBarShowing: Boolean,
     searchMode: Boolean,
@@ -58,6 +70,9 @@ internal fun AllVideosView(
     onClick: (item: VideoUIEntity, index: Int) -> Unit,
     onMenuClick: (VideoUIEntity) -> Unit,
     onSortOrderClick: () -> Unit,
+    addToPlaylistsTitles: List<String>?,
+    clearAddToPlaylistsTitles: () -> Unit,
+    retryActionCallback: () -> Unit,
     onLongClick: ((item: VideoUIEntity, index: Int) -> Unit) = { _, _ -> },
 ) {
     val coroutineScope = rememberCoroutineScope()
@@ -70,6 +85,32 @@ internal fun AllVideosView(
         initialValue = ModalBottomSheetValue.Hidden,
         skipHalfExpanded = true
     )
+
+    val context = LocalContext.current
+    val scaffoldState = rememberScaffoldState()
+
+    LaunchedEffect(addToPlaylistsTitles) {
+        addToPlaylistsTitles?.let { titles ->
+            if (titles.isNotEmpty()) {
+                scaffoldState.snackbarHostState.showAutoDurationSnackbar(
+                    context.resources.getQuantityString(
+                        sharedR.plurals.video_section_playlists_add_to_playlists_successfully_message,
+                        titles.size,
+                        if (titles.size == 1) titles.first() else titles.size
+                    )
+                )
+            } else {
+                val result = scaffoldState.snackbarHostState.showAutoDurationSnackbar(
+                    message = context.getString(sharedR.string.video_section_playlists_add_to_playlists_failed_message),
+                    actionLabel = context.getString(R.string.message_option_retry)
+                )
+                if (result == SnackbarResult.ActionPerformed) {
+                    retryActionCallback()
+                }
+            }
+            clearAddToPlaylistsTitles()
+        }
+    }
 
     LaunchedEffect(items) {
         if (scrollToTop) {
@@ -89,10 +130,10 @@ internal fun AllVideosView(
         }
     }
 
-    Scaffold(
+    MegaScaffold(
         modifier = modifier,
-        scaffoldState = rememberScaffoldState(),
-    ) { paddingValue ->
+        scaffoldState = scaffoldState,
+    ) {
         val locationTitle =
             stringResource(id = sharedR.string.video_section_videos_location_filter_title)
         val durationTitle =
@@ -135,35 +176,31 @@ internal fun AllVideosView(
                 items.isEmpty() -> LegacyMegaEmptyViewWithImage(
                     modifier = Modifier.testTag(VIDEOS_EMPTY_VIEW_TEST_TAG),
                     text = stringResource(id = R.string.homepage_empty_hint_video),
-                    imagePainter = painterResource(id = iconPackR.drawable.ic_video_section_empty_video)
+                    imagePainter = painterResource(id = iconPackR.drawable.ic_video_glass)
                 )
 
                 else -> {
                     LazyColumn(
                         state = lazyListState,
-                        modifier = Modifier
-                            .padding(paddingValue)
-                            .testTag(VIDEOS_LIST_TEST_TAG)
+                        modifier = Modifier.testTag(VIDEOS_LIST_TEST_TAG)
                     ) {
-                        if (!searchMode) {
-                            item(
-                                key = "header"
-                            ) {
-                                HeaderViewItem(
-                                    modifier = Modifier.padding(
-                                        vertical = 10.dp,
-                                        horizontal = 8.dp
-                                    ),
-                                    onSortOrderClick = onSortOrderClick,
-                                    onChangeViewTypeClick = {},
-                                    onEnterMediaDiscoveryClick = {},
-                                    sortOrder = sortOrder,
-                                    isListView = true,
-                                    showSortOrder = true,
-                                    showChangeViewType = false,
-                                    showMediaDiscoveryButton = false,
-                                )
-                            }
+                        item(
+                            key = "header"
+                        ) {
+                            HeaderViewItem(
+                                modifier = Modifier.padding(
+                                    vertical = 10.dp,
+                                    horizontal = 8.dp
+                                ),
+                                onSortOrderClick = onSortOrderClick,
+                                onChangeViewTypeClick = {},
+                                onEnterMediaDiscoveryClick = {},
+                                sortOrder = sortOrder,
+                                isListView = true,
+                                showSortOrder = true,
+                                showChangeViewType = false,
+                                showMediaDiscoveryButton = false,
+                            )
                         }
 
                         items(count = items.size, key = { items[it].id.longValue }) {
@@ -171,6 +208,8 @@ internal fun AllVideosView(
                             VideoItemView(
                                 icon = iconPackR.drawable.ic_video_section_video_default_thumbnail,
                                 name = videoItem.name,
+                                description = videoItem.description?.replace("\n", " "),
+                                tags = videoItem.tags,
                                 fileSize = formatFileSize(videoItem.size, LocalContext.current),
                                 duration = videoItem.duration,
                                 isFavourite = videoItem.isFavourite,
@@ -184,6 +223,7 @@ internal fun AllVideosView(
                                     ) else null,
                                 thumbnailData = ThumbnailRequest(videoItem.id),
                                 nodeAvailableOffline = videoItem.nodeAvailableOffline,
+                                highlightText = highlightText,
                                 onClick = { onClick(videoItem, it) },
                                 onMenuClick = { onMenuClick(videoItem) },
                                 onLongClick = { onLongClick(videoItem, it) },
@@ -221,6 +261,19 @@ internal fun AllVideosView(
                     } else {
                         LocationFilterOption.AllLocations
                     }
+                when (locationOption) {
+                    LocationFilterOption.AllLocations ->
+                        Analytics.tracker.trackEvent(LocationFilterAllLocationsClickedEvent)
+
+                    LocationFilterOption.CloudDrive ->
+                        Analytics.tracker.trackEvent(LocationFilterCloudDriveClickedEvent)
+
+                    LocationFilterOption.CameraUploads ->
+                        Analytics.tracker.trackEvent(LocationFilterCameraUploadClickedEvent)
+
+                    LocationFilterOption.SharedItems ->
+                        Analytics.tracker.trackEvent(LocationFilterSharedItemClickedEvent)
+                }
                 onLocationFilterItemClicked(locationOption)
             }
         )
@@ -248,6 +301,26 @@ internal fun AllVideosView(
                     } else {
                         DurationFilterOption.AllDurations
                     }
+
+                when (durationOption) {
+                    DurationFilterOption.AllDurations ->
+                        Analytics.tracker.trackEvent(DurationFilterAllDurationsClickedEvent)
+
+                    DurationFilterOption.LessThan10Seconds ->
+                        Analytics.tracker.trackEvent(DurationFilterLessThan10SecondsClickedEvent)
+
+                    DurationFilterOption.Between10And60Seconds ->
+                        Analytics.tracker.trackEvent(DurationFilterBetween10and60SecondsClickedEvent)
+
+                    DurationFilterOption.Between1And4 ->
+                        Analytics.tracker.trackEvent(DurationFilterBetween1and4MinutesClickedEvent)
+
+                    DurationFilterOption.Between4And20 ->
+                        Analytics.tracker.trackEvent(DurationFilterBetween4and20MinutesClickedEvent)
+
+                    DurationFilterOption.MoreThan20 ->
+                        Analytics.tracker.trackEvent(DurationFilterMoreThan20MinutesClickedEvent)
+                }
                 onDurationFilterItemClicked(durationOption)
             }
         )
@@ -257,7 +330,7 @@ internal fun AllVideosView(
 @CombinedThemePreviews
 @Composable
 private fun AllVideosViewPreview() {
-    OriginalTempTheme(isDark = isSystemInDarkTheme()) {
+    OriginalTheme(isDark = isSystemInDarkTheme()) {
         AllVideosView(
             items = emptyList(),
             shouldApplySensitiveMode = false,
@@ -275,6 +348,9 @@ private fun AllVideosViewPreview() {
             selectedDurationFilterOption = DurationFilterOption.MoreThan20,
             onLocationFilterItemClicked = { },
             onDurationFilterItemClicked = { },
+            addToPlaylistsTitles = null,
+            clearAddToPlaylistsTitles = { },
+            retryActionCallback = { }
         )
     }
 }

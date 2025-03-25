@@ -54,6 +54,18 @@ data class AlbumsViewState(
             }
         }
 
+    fun findSystemAlbum(type: String): UIAlbum? {
+        return when (type) {
+            "favourite" -> albums.find { it.id is Album.FavouriteAlbum }
+
+            "gif" -> albums.find { it.id is Album.GifAlbum }
+
+            "raw" -> albums.find { it.id is Album.RawAlbum }
+
+            else -> null
+        }
+    }
+
     fun findUIAlbum(albumId: AlbumId): UIAlbum? {
         return albums.find { uiAlbum -> (uiAlbum.id as? Album.UserAlbum)?.id == albumId }
     }

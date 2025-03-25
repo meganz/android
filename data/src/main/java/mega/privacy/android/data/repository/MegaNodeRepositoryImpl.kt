@@ -134,10 +134,6 @@ internal class MegaNodeRepositoryImpl @Inject constructor(
         megaApiGateway.getRootNode()
     }
 
-    override suspend fun getBackupsNode(): MegaNode? = withContext(ioDispatcher) {
-        megaApiGateway.getBackupsNode()
-    }
-
     override suspend fun isNodeInBackups(megaNode: MegaNode) = withContext(ioDispatcher) {
         megaApiGateway.isInBackups(megaNode)
     }
@@ -187,10 +183,6 @@ internal class MegaNodeRepositoryImpl @Inject constructor(
             megaApiGateway.getUserFromInShare(node, recursive)
         }
 
-    override suspend fun authorizeNode(handle: Long): MegaNode? = withContext(ioDispatcher) {
-        megaApiFolderGateway.authorizeNode(handle)
-    }
-
     @Deprecated(
         message = "getPublicLinks MegaNode implementation has been deprecated. Use untyped node implementation",
         replaceWith = ReplaceWith("mega.privacy.android.domain.repository.filemanagement.ShareRepository#getPublicLinks(SortOrder)")
@@ -207,12 +199,6 @@ internal class MegaNodeRepositoryImpl @Inject constructor(
     override suspend fun hasBackupsChildren(): Boolean = withContext(ioDispatcher) {
         megaApiGateway.getBackupsNode()?.let { megaApiGateway.hasChildren(it) } ?: false
     }
-
-
-    override suspend fun checkAccessErrorExtended(node: MegaNode, level: Int): MegaException =
-        withContext(ioDispatcher) {
-            megaExceptionMapper(megaApiGateway.checkAccessErrorExtended(node, level))
-        }
 
     override suspend fun createShareKey(megaNode: MegaNode) = withContext(ioDispatcher) {
         suspendCancellableCoroutine { continuation ->

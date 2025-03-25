@@ -8,6 +8,7 @@ import kotlinx.coroutines.test.runTest
 import mega.privacy.android.data.cryptography.DecryptData
 import mega.privacy.android.data.cryptography.EncryptData
 import mega.privacy.android.data.database.dao.ActiveTransferDao
+import mega.privacy.android.data.database.dao.ActiveTransferGroupDao
 import mega.privacy.android.data.database.dao.BackupDao
 import mega.privacy.android.data.database.dao.CameraUploadsRecordDao
 import mega.privacy.android.data.database.dao.ChatPendingChangesDao
@@ -15,16 +16,15 @@ import mega.privacy.android.data.database.dao.CompletedTransferDao
 import mega.privacy.android.data.database.dao.ContactDao
 import mega.privacy.android.data.database.dao.OfflineDao
 import mega.privacy.android.data.database.dao.PendingTransferDao
-import mega.privacy.android.data.database.dao.SdTransferDao
 import mega.privacy.android.data.database.dao.VideoRecentlyWatchedDao
 import mega.privacy.android.data.database.entity.ActiveTransferEntity
+import mega.privacy.android.data.database.entity.ActiveTransferGroupEntity
 import mega.privacy.android.data.database.entity.BackupEntity
 import mega.privacy.android.data.database.entity.CameraUploadsRecordEntity
 import mega.privacy.android.data.database.entity.ChatPendingChangesEntity
 import mega.privacy.android.data.database.entity.CompletedTransferEntity
 import mega.privacy.android.data.database.entity.CompletedTransferEntityLegacy
 import mega.privacy.android.data.database.entity.PendingTransferEntity
-import mega.privacy.android.data.database.entity.SdTransferEntity
 import mega.privacy.android.data.database.entity.VideoRecentlyWatchedEntity
 import mega.privacy.android.data.facade.MegaLocalRoomFacade.Companion.MAX_INSERT_LIST_SIZE
 import mega.privacy.android.data.mapper.backup.BackupEntityMapper
@@ -39,25 +39,24 @@ import mega.privacy.android.data.mapper.contact.ContactModelMapper
 import mega.privacy.android.data.mapper.offline.OfflineEntityMapper
 import mega.privacy.android.data.mapper.offline.OfflineModelMapper
 import mega.privacy.android.data.mapper.transfer.active.ActiveTransferEntityMapper
+import mega.privacy.android.data.mapper.transfer.active.ActiveTransferGroupEntityMapper
 import mega.privacy.android.data.mapper.transfer.completed.CompletedTransferEntityMapper
 import mega.privacy.android.data.mapper.transfer.completed.CompletedTransferLegacyModelMapper
 import mega.privacy.android.data.mapper.transfer.completed.CompletedTransferModelMapper
 import mega.privacy.android.data.mapper.transfer.pending.InsertPendingTransferRequestMapper
-import mega.privacy.android.data.mapper.transfer.pending.PendingTransferEntityMapper
 import mega.privacy.android.data.mapper.transfer.pending.PendingTransferModelMapper
-import mega.privacy.android.data.mapper.transfer.sd.SdTransferEntityMapper
-import mega.privacy.android.data.mapper.transfer.sd.SdTransferModelMapper
 import mega.privacy.android.data.mapper.videosection.VideoRecentlyWatchedEntityMapper
 import mega.privacy.android.data.mapper.videosection.VideoRecentlyWatchedItemMapper
 import mega.privacy.android.data.model.VideoRecentlyWatchedItem
 import mega.privacy.android.domain.entity.CameraUploadsRecordType
-import mega.privacy.android.domain.entity.SdTransfer
 import mega.privacy.android.domain.entity.backup.Backup
 import mega.privacy.android.domain.entity.backup.BackupInfoType
 import mega.privacy.android.domain.entity.camerauploads.CameraUploadFolderType
 import mega.privacy.android.domain.entity.camerauploads.CameraUploadsRecord
 import mega.privacy.android.domain.entity.camerauploads.CameraUploadsRecordUploadStatus
 import mega.privacy.android.domain.entity.chat.ChatPendingChanges
+import mega.privacy.android.domain.entity.transfer.ActiveTransferGroup
+import mega.privacy.android.domain.entity.transfer.ActiveTransferGroupImpl
 import mega.privacy.android.domain.entity.transfer.CompletedTransfer
 import mega.privacy.android.domain.entity.transfer.Transfer
 import mega.privacy.android.domain.entity.transfer.TransferType
@@ -95,9 +94,6 @@ internal class MegaLocalRoomFacadeTest {
     private val activeTransferDao = mock<ActiveTransferDao>()
     private val activeTransferEntityMapper = mock<ActiveTransferEntityMapper>()
     private val completedTransferEntityMapper: CompletedTransferEntityMapper = mock()
-    private val sdTransferDao: SdTransferDao = mock()
-    private val sdTransferEntityMapper = mock<SdTransferEntityMapper>()
-    private val sdTransferModelMapper = mock<SdTransferModelMapper>()
     private val backupDao = mock<BackupDao>()
     private val backupEntityMapper = mock<BackupEntityMapper>()
     private val backupModelMapper = mock<BackupModelMapper>()
@@ -116,9 +112,10 @@ internal class MegaLocalRoomFacadeTest {
     private val videoRecentlyWatchedEntityMapper: VideoRecentlyWatchedEntityMapper = mock()
     private val videoRecentlyWatchedItemMapper: VideoRecentlyWatchedItemMapper = mock()
     private val pendingTransferDao = mock<PendingTransferDao>()
-    private val pendingTransferEntityMapper = mock<PendingTransferEntityMapper>()
     private val pendingTransferModelMapper = mock<PendingTransferModelMapper>()
     private val insertPendingTransferRequestMapper = mock<InsertPendingTransferRequestMapper>()
+    private val activeTransferGroupDao = mock<ActiveTransferGroupDao>()
+    private val activeTransferGroupEntityMapper = mock<ActiveTransferGroupEntityMapper>()
 
     @BeforeAll
     fun setUp() {
@@ -135,9 +132,6 @@ internal class MegaLocalRoomFacadeTest {
             decryptData = decryptData,
             completedTransferEntityMapper = completedTransferEntityMapper,
             completedTransferLegacyModelMapper = completedTransferLegacyModelMapper,
-            sdTransferDao = { sdTransferDao },
-            sdTransferEntityMapper = sdTransferEntityMapper,
-            sdTransferModelMapper = sdTransferModelMapper,
             backupDao = { backupDao },
             backupEntityMapper = backupEntityMapper,
             backupModelMapper = backupModelMapper,
@@ -155,9 +149,10 @@ internal class MegaLocalRoomFacadeTest {
             videoRecentlyWatchedItemMapper = videoRecentlyWatchedItemMapper,
             videoRecentlyWatchedEntityMapper = videoRecentlyWatchedEntityMapper,
             pendingTransferDao = { pendingTransferDao },
-            pendingTransferEntityMapper = pendingTransferEntityMapper,
             pendingTransferModelMapper = pendingTransferModelMapper,
             insertPendingTransferRequestMapper = insertPendingTransferRequestMapper,
+            activeTransferGroupDao = { activeTransferGroupDao },
+            activeTransferGroupEntityMapper = activeTransferGroupEntityMapper,
         )
     }
 
@@ -188,8 +183,9 @@ internal class MegaLocalRoomFacadeTest {
             videoRecentlyWatchedEntityMapper,
             pendingTransferDao,
             pendingTransferModelMapper,
-            pendingTransferEntityMapper,
             insertPendingTransferRequestMapper,
+            activeTransferGroupDao,
+            activeTransferGroupEntityMapper,
         )
     }
 
@@ -261,23 +257,6 @@ internal class MegaLocalRoomFacadeTest {
 
             assertThat(underTest.getCompletedTransfers().single().size)
                 .isEqualTo(completedTransferEntities.size)
-        }
-
-    @Test
-    fun `test that insertSdTransfer invokes correctly when call insertSdTransfer`() = runTest {
-        val sdTransferEntity = mock<SdTransferEntity>()
-        val sdTransferModel = mock<SdTransfer>()
-        whenever(sdTransferEntityMapper(sdTransferModel)).thenReturn(sdTransferEntity)
-        underTest.insertSdTransfer(sdTransferModel)
-        verify(sdTransferDao).insertSdTransfer(sdTransferEntity)
-    }
-
-    @Test
-    fun `test that deleteSdTransferByTag invokes correctly when call deleteSdTransferByTag`() =
-        runTest {
-            val tag = 1
-            underTest.deleteSdTransferByTag(tag)
-            verify(sdTransferDao).deleteSdTransferByTag(tag)
         }
 
     @Test
@@ -624,19 +603,6 @@ internal class MegaLocalRoomFacadeTest {
         }
 
     @Test
-    fun `test that getSdTransferByTag returns mapped transfer from dao`() = runTest {
-        val tag = 1
-        val sdTransferEntity = mock<SdTransferEntity>()
-        whenever(sdTransferDao.getSdTransferByTag(tag)) doReturn sdTransferEntity
-        val expected = mock<SdTransfer>()
-        whenever(sdTransferModelMapper(sdTransferEntity)) doReturn expected
-
-        val actual = underTest.getSdTransferByTag(tag)
-
-        assertThat(actual).isEqualTo(expected)
-    }
-
-    @Test
     fun `test that addCompletedTransfers insert the mapped entities`() = runTest {
         val completedTransfers = (0..10).map {
             mock<CompletedTransfer>()
@@ -973,4 +939,37 @@ internal class MegaLocalRoomFacadeTest {
 
             verify(pendingTransferDao).deleteAllPendingTransfers()
         }
+
+    @Test
+    fun `test that insertActiveTransferGroup insert the mapped entities`() = runTest {
+        val groupId: Int? = null
+        val transferType = TransferType.DOWNLOAD
+        val destination = "destination"
+        val singleFileName = "file.txt"
+        val startTime = 987465L
+        val activeTransferGroup =
+            ActiveTransferGroupImpl(groupId, transferType, destination, singleFileName, startTime)
+        val roomEntity =
+            ActiveTransferGroupEntity(groupId, transferType, destination, singleFileName, startTime)
+        whenever(activeTransferGroupEntityMapper(activeTransferGroup)) doReturn roomEntity
+
+        val expected = roomEntity
+
+        underTest.insertActiveTransferGroup(activeTransferGroup)
+
+        verify(activeTransferGroupDao).insertActiveTransferGroup(expected)
+    }
+
+    @Test
+    fun `test that insertActiveTransferGroup returns the new id generated by Dao`() = runTest {
+        val expected = 34387L
+        val activeTransferGroup = mock<ActiveTransferGroup>()
+        val roomEntity = mock<ActiveTransferGroupEntity>()
+        whenever(activeTransferGroupEntityMapper(activeTransferGroup)) doReturn roomEntity
+        whenever(activeTransferGroupDao.insertActiveTransferGroup(roomEntity)) doReturn expected
+
+        val actual = underTest.insertActiveTransferGroup(activeTransferGroup)
+
+        assertThat(actual).isEqualTo(expected)
+    }
 }

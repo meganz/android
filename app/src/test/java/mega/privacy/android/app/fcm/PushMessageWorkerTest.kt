@@ -1,6 +1,5 @@
 package mega.privacy.android.app.fcm
 
-
 import android.content.Context
 import androidx.core.app.NotificationManagerCompat
 import androidx.test.core.app.ApplicationProvider
@@ -17,6 +16,7 @@ import androidx.work.workDataOf
 import com.google.common.truth.Truth.assertThat
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.ExperimentalCoroutinesApi
+import kotlinx.coroutines.flow.emptyFlow
 import kotlinx.coroutines.flow.flowOf
 import kotlinx.coroutines.test.UnconfinedTestDispatcher
 import kotlinx.coroutines.test.runTest
@@ -33,10 +33,15 @@ import mega.privacy.android.domain.exception.EmptyFolderException
 import mega.privacy.android.domain.exception.SessionNotRetrievedException
 import mega.privacy.android.domain.usecase.GetChatRoomUseCase
 import mega.privacy.android.domain.usecase.RetryPendingConnectionsUseCase
+import mega.privacy.android.domain.usecase.call.GetChatCallUseCase
+import mega.privacy.android.domain.usecase.call.IsChatStatusConnectedForCallUseCase
 import mega.privacy.android.domain.usecase.chat.IsChatNotifiableUseCase
+import mega.privacy.android.domain.usecase.chat.MonitorChatConnectionStateUseCase
+import mega.privacy.android.domain.usecase.contact.GetMyUserHandleUseCase
 import mega.privacy.android.domain.usecase.login.BackgroundFastLoginUseCase
 import mega.privacy.android.domain.usecase.login.InitialiseMegaChatUseCase
 import mega.privacy.android.domain.usecase.meeting.MonitorChatCallUpdatesUseCase
+import mega.privacy.android.domain.usecase.meeting.SetFakeIncomingCallStateUseCase
 import mega.privacy.android.domain.usecase.notifications.GetChatMessageNotificationDataUseCase
 import mega.privacy.android.domain.usecase.notifications.PushReceivedUseCase
 import org.junit.Before
@@ -44,12 +49,14 @@ import org.junit.Test
 import org.junit.runner.RunWith
 import org.mockito.kotlin.any
 import org.mockito.kotlin.mock
+import org.mockito.kotlin.stub
 import org.mockito.kotlin.verify
 import org.mockito.kotlin.verifyNoInteractions
 import org.mockito.kotlin.whenever
 import java.util.UUID
 import java.util.concurrent.Executor
 import java.util.concurrent.Executors
+
 
 @OptIn(ExperimentalCoroutinesApi::class)
 @RunWith(AndroidJUnit4::class)
@@ -79,6 +86,11 @@ class PushMessageWorkerTest {
     private val getChatMessageNotificationDataUseCase =
         mock<GetChatMessageNotificationDataUseCase>()
     private val fileDurationMapper = mock<FileDurationMapper>()
+    private val setFakeIncomingCallStateUseCase = mock<SetFakeIncomingCallStateUseCase>()
+    private val isChatStatusConnectedForCallUseCase = mock<IsChatStatusConnectedForCallUseCase>()
+    private val monitorChatConnectionStateUseCase = mock<MonitorChatConnectionStateUseCase>()
+    private val getMyUserHandleUseCase = mock<GetMyUserHandleUseCase>()
+    private val getChatCallUseCase = mock<GetChatCallUseCase>()
     private val ioDispatcher = UnconfinedTestDispatcher()
 
 
@@ -111,7 +123,6 @@ class PushMessageWorkerTest {
             ),
             backgroundFastLoginUseCase = backgroundFastLoginUseCase,
             pushReceivedUseCase = pushReceivedUseCase,
-            monitorChatCallUpdatesUseCase = monitorChatCallUpdatesUseCase,
             retryPendingConnectionsUseCase = retryPendingConnectionsUseCase,
             pushMessageMapper = pushMessageMapper,
             initialiseMegaChatUseCase = initialiseMegaChatUseCase,
@@ -124,6 +135,12 @@ class PushMessageWorkerTest {
             promoPushNotificationManager = promoPushNotificationManager,
             getChatMessageNotificationDataUseCase = getChatMessageNotificationDataUseCase,
             chatMessageNotificationManager = chatMessageNotificationManager,
+            setFakeIncomingCallStateUseCase = setFakeIncomingCallStateUseCase,
+            isChatStatusConnectedForCallUseCase = isChatStatusConnectedForCallUseCase,
+            monitorChatConnectionStateUseCase = monitorChatConnectionStateUseCase,
+            monitorChatCallUpdatesUseCase = monitorChatCallUpdatesUseCase,
+            getMyUserHandleUseCase = getMyUserHandleUseCase,
+            getChatCallUseCase = getChatCallUseCase,
             ioDispatcher = ioDispatcher,
             loginMutex = mock()
         )
@@ -133,6 +150,8 @@ class PushMessageWorkerTest {
         whenever(notificationManager.areNotificationsEnabled()).thenReturn(false)
         whenever(callsPreferencesGateway.getCallsMeetingRemindersPreference())
             .thenReturn(flowOf(CallsMeetingReminders.Disabled))
+        monitorChatCallUpdatesUseCase.stub { on { invoke() }.thenReturn(emptyFlow()) }
+        whenever(monitorChatConnectionStateUseCase()).thenReturn(emptyFlow())
     }
 
     @Test
@@ -146,6 +165,7 @@ class PushMessageWorkerTest {
     fun `test that retryPendingConnections is invoked if fast login success`() = runTest {
         whenever(backgroundFastLoginUseCase()).thenReturn("good_session")
         whenever(pushReceivedUseCase.invoke(any())).thenReturn(Unit)
+        whenever(isChatStatusConnectedForCallUseCase(any())).thenReturn(true)
 
         underTest.doWork()
         verify(retryPendingConnectionsUseCase).invoke(false)
@@ -156,6 +176,7 @@ class PushMessageWorkerTest {
         runTest {
             whenever(backgroundFastLoginUseCase()).thenReturn("good_session")
             whenever(retryPendingConnectionsUseCase(any())).thenThrow(ChatNotInitializedErrorStatus())
+            whenever(isChatStatusConnectedForCallUseCase(any())).thenReturn(true)
 
             underTest.doWork()
             verify(initialiseMegaChatUseCase).invoke("good_session")
@@ -168,6 +189,7 @@ class PushMessageWorkerTest {
             whenever(retryPendingConnectionsUseCase(any())).thenThrow(
                 EmptyFolderException()
             )
+            whenever(isChatStatusConnectedForCallUseCase(any())).thenReturn(true)
 
             underTest.doWork()
             verifyNoInteractions(initialiseMegaChatUseCase)

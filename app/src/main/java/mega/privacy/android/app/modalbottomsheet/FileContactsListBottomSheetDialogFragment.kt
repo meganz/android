@@ -29,7 +29,7 @@ import mega.privacy.android.domain.entity.shares.AccessPermission
 import mega.privacy.android.domain.entity.user.UserId
 import mega.privacy.android.domain.repository.ContactsRepository
 import mega.privacy.android.domain.usecase.GetThemeMode
-import mega.privacy.android.shared.original.core.ui.theme.OriginalTempTheme
+import mega.privacy.android.shared.original.core.ui.theme.OriginalTheme
 import nz.mega.sdk.MegaNode
 import nz.mega.sdk.MegaShare
 import nz.mega.sdk.MegaUser
@@ -137,7 +137,7 @@ class FileContactsListBottomSheetDialogFragment : BaseBottomSheetDialogFragment 
                 }
                 val themeMode by getThemeMode()
                     .collectAsStateWithLifecycle(initialValue = ThemeMode.System)
-                OriginalTempTheme(isDark = themeMode.isDarkMode()) {
+                OriginalTheme(isDark = themeMode.isDarkMode()) {
                     Column(
                         modifier = Modifier
                             .fillMaxWidth()
@@ -146,7 +146,7 @@ class FileContactsListBottomSheetDialogFragment : BaseBottomSheetDialogFragment 
                         contactPermission?.let { contactPermission ->
                             ShareContactOptionsContent(
                                 contactPermission = contactPermission,
-                                allowChangePermission = node == null || !megaApi.isInInbox(node),
+                                allowChangePermission = node == null || !megaApi.isInVault(node),
                                 onInfoClicked = {
                                     email()?.let {
                                         ContactUtil.openContactInfoActivity(requireActivity(), it)

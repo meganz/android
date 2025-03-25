@@ -105,4 +105,37 @@ interface UIPreferencesGateway {
      */
     fun monitorAlmostFullStorageBannerClosingTimestamp(): Flow<Long?>
 
+    /**
+     * Monitor search photos recent queries
+     *
+     * @return the recent queries
+     */
+    fun monitorPhotosRecentQueries(): Flow<List<String>>
+
+    /**
+     * Save recent queries
+     */
+    suspend fun setPhotosRecentQueries(queries: List<String>)
+
+    /**
+     * Monitor ads closing timestamp
+     */
+    fun monitorAdsClosingTimestamp(): Flow<Long?>
+
+    /**
+     * Set ads closing timestamp
+     */
+    suspend fun setAdsClosingTimestamp(timestamp: Long)
+
+    /**
+     * Monitor geo tagging status
+     */
+    fun monitorGeoTaggingStatus(): Flow<Boolean?>
+
+    /**
+     * Enable geo tagging
+     *
+     * @param enabled
+     */
+    suspend fun enableGeoTagging(enabled: Boolean)
 }

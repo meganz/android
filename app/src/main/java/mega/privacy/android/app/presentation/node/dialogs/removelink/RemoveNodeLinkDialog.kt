@@ -10,7 +10,7 @@ import androidx.hilt.navigation.compose.hiltViewModel
 import mega.privacy.android.app.R
 import mega.privacy.android.shared.original.core.ui.controls.dialogs.MegaAlertDialog
 import mega.privacy.android.shared.original.core.ui.preview.CombinedThemePreviews
-import mega.privacy.android.shared.original.core.ui.theme.OriginalTempTheme
+import mega.privacy.android.shared.original.core.ui.theme.OriginalTheme
 
 /**
  * Dialog to remove node link
@@ -43,7 +43,7 @@ private fun RemoveNodeLinkDialogBody(
     onConfirmClicked: () -> Unit,
     onCancelClicked: () -> Unit,
 ) {
-    OriginalTempTheme(isDark = isSystemInDarkTheme()) {
+    OriginalTheme(isDark = isSystemInDarkTheme()) {
         MegaAlertDialog(
             text = pluralStringResource(
                 id = R.plurals.remove_links_warning_text,

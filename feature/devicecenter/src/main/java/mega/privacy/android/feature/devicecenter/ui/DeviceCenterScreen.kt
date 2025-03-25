@@ -1,27 +1,21 @@
 package mega.privacy.android.feature.devicecenter.ui
 
 import mega.privacy.android.icon.pack.R as iconPackR
-import mega.privacy.android.shared.resources.R as sharedR
 import androidx.activity.compose.BackHandler
 import androidx.activity.compose.LocalOnBackPressedDispatcherOwner
 import androidx.compose.foundation.isSystemInDarkTheme
-import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.WindowInsets
+import androidx.compose.foundation.layout.consumeWindowInsets
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.LazyListState
-import androidx.compose.material.ExperimentalMaterialApi
 import androidx.compose.material.ModalBottomSheetState
 import androidx.compose.material.ModalBottomSheetValue
-import androidx.compose.material.Scaffold
-import androidx.compose.material.SnackbarHost
 import androidx.compose.material.SnackbarHostState
 import androidx.compose.material.rememberModalBottomSheetState
+import androidx.compose.material.rememberScaffoldState
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
-import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.rememberCoroutineScope
-import androidx.compose.runtime.saveable.rememberSaveable
-import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalSoftwareKeyboardController
@@ -31,7 +25,6 @@ import androidx.compose.ui.unit.dp
 import de.palm.composestateevents.EventEffect
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.launch
-import mega.privacy.android.analytics.Analytics
 import mega.privacy.android.feature.devicecenter.R
 import mega.privacy.android.feature.devicecenter.ui.bottomsheet.DeviceBottomSheetBody
 import mega.privacy.android.feature.devicecenter.ui.lists.DeviceCenterListViewItem
@@ -54,18 +47,13 @@ import mega.privacy.android.legacy.core.ui.controls.lists.MenuActionHeader
 import mega.privacy.android.legacy.core.ui.model.SearchWidgetState
 import mega.privacy.android.shared.original.core.ui.controls.appbar.AppBarType
 import mega.privacy.android.shared.original.core.ui.controls.appbar.MegaAppBar
-import mega.privacy.android.shared.original.core.ui.controls.dialogs.MegaAlertDialog
+import mega.privacy.android.shared.original.core.ui.controls.layouts.MegaScaffold
 import mega.privacy.android.shared.original.core.ui.controls.sheets.BottomSheet
-import mega.privacy.android.shared.original.core.ui.controls.snackbars.MegaSnackbar
 import mega.privacy.android.shared.original.core.ui.model.MenuAction
 import mega.privacy.android.shared.original.core.ui.preview.CombinedThemePreviews
-import mega.privacy.android.shared.original.core.ui.theme.OriginalTempTheme
+import mega.privacy.android.shared.original.core.ui.theme.OriginalTheme
 import mega.privacy.android.shared.original.core.ui.utils.showAutoDurationSnackbar
-import mega.privacy.android.shared.sync.featuretoggles.SyncFeatures
 import mega.privacy.android.shared.sync.ui.SyncEmptyState
-import mega.privacy.mobile.analytics.event.SyncFeatureUpgradeDialogCancelButtonPressedEvent
-import mega.privacy.mobile.analytics.event.SyncFeatureUpgradeDialogDisplayedEvent
-import mega.privacy.mobile.analytics.event.SyncFeatureUpgradeDialogUpgradeButtonPressedEvent
 
 /**
  * Test tags for the Device Center Screen
@@ -78,8 +66,6 @@ internal const val DEVICE_CENTER_OTHER_DEVICES_HEADER =
 internal const val DEVICE_CENTER_NO_NETWORK_STATE = "device_center_content:no_network_state"
 internal const val DEVICE_CENTER_NOTHING_SETUP_STATE = "device_center_content:nothing_setup_state"
 internal const val DEVICE_CENTER_NO_ITEMS_FOUND_STATE = "device_center_content:no_items_found_state"
-internal const val TEST_TAG_DEVICE_CENTER_SCREEN_UPGRADE_DIALOG =
-    "device_center_screen:upgrade_dialog"
 
 /**
  * A [Composable] that serves as the main View for the Device Center
@@ -100,7 +86,6 @@ internal const val TEST_TAG_DEVICE_CENTER_SCREEN_UPGRADE_DIALOG =
  * @param onFeatureExited Lambda that performs a specific action when the Device Center is exited
  * @param onActionPressed Action for each available option of the app bar menu
  */
-@OptIn(ExperimentalMaterialApi::class)
 @Composable
 internal fun DeviceCenterScreen(
     uiState: DeviceCenterUiState,
@@ -109,9 +94,10 @@ internal fun DeviceCenterScreen(
     onDeviceMenuClicked: (DeviceUINode) -> Unit,
     onBackupFolderClicked: (BackupDeviceFolderUINode) -> Unit,
     onNonBackupFolderClicked: (NonBackupDeviceFolderUINode) -> Unit,
+    onCameraUploadsClicked: () -> Unit,
     onInfoOptionClicked: (DeviceCenterUINode) -> Unit,
-    onAddNewSyncOptionClicked: (DeviceUINode) -> Unit,
-    onAddBackupOptionClicked: (DeviceUINode) -> Unit,
+    onAddNewSyncOptionClicked: () -> Unit,
+    onAddBackupOptionClicked: () -> Unit,
     onRenameDeviceOptionClicked: (DeviceUINode) -> Unit,
     onRenameDeviceCancelled: () -> Unit,
     onRenameDeviceSuccessful: () -> Unit,
@@ -121,7 +107,6 @@ internal fun DeviceCenterScreen(
     onSearchQueryChanged: (query: String) -> Unit,
     onSearchCloseClicked: () -> Unit,
     onSearchClicked: () -> Unit,
-    onOpenUpgradeAccountClicked: () -> Unit,
     onActionPressed: ((MenuAction) -> Unit)? = null,
 ) {
     val context = LocalContext.current
@@ -133,8 +118,6 @@ internal fun DeviceCenterScreen(
         initialValue = ModalBottomSheetValue.Hidden,
         skipHalfExpanded = false,
     )
-
-    var showUpgradeDialog by rememberSaveable { mutableStateOf(false) }
 
     LaunchedEffect(key1 = selectedDevice == null) {
         coroutineScope.launch { modalSheetState.hide() }
@@ -167,36 +150,27 @@ internal fun DeviceCenterScreen(
     }
     BottomSheet(
         modalSheetState = modalSheetState,
+        bottomInsetPadding = false,
         expandedRoundedCorners = true,
         sheetBody = {
             DeviceBottomSheetBody(
                 device = uiState.menuClickedDevice ?: return@BottomSheet,
                 isCameraUploadsEnabled = uiState.isCameraUploadsEnabled,
+                onCameraUploadsClicked = onCameraUploadsClicked,
                 onRenameDeviceClicked = onRenameDeviceOptionClicked,
                 onInfoClicked = onInfoOptionClicked,
-                onAddNewSyncClicked = {
-                    if (uiState.isFreeAccount) {
-                        showUpgradeDialog = true
-                    } else {
-                        onAddNewSyncOptionClicked(uiState.menuClickedDevice)
-                    }
-                },
-                onAddBackupClicked = {
-                    if (uiState.isFreeAccount) {
-                        showUpgradeDialog = true
-                    } else {
-                        onAddBackupOptionClicked(uiState.menuClickedDevice)
-                    }
-                },
+                onAddNewSyncClicked = { onAddNewSyncOptionClicked() },
+                onAddBackupClicked = { onAddBackupOptionClicked() },
                 onBottomSheetDismissed = {
                     coroutineScope.launch { modalSheetState.hide() }
                 },
-                isFreeAccount = uiState.isFreeAccount,
-                isBackupForAndroidEnabled = uiState.enabledFlags.contains(SyncFeatures.BackupForAndroid),
             )
         },
         content = {
-            Scaffold(
+            MegaScaffold(
+                scaffoldState = rememberScaffoldState(snackbarHostState = snackbarHostState),
+                shouldAddSnackBarPadding = false,
+                contentWindowInsets = WindowInsets(0.dp),
                 topBar = {
                     DeviceCenterAppBar(
                         uiState,
@@ -209,11 +183,6 @@ internal fun DeviceCenterScreen(
                         onSearchCloseClicked,
                         onSearchClicked
                     )
-                },
-                snackbarHost = {
-                    SnackbarHost(hostState = snackbarHostState) { snackbarData ->
-                        MegaSnackbar(snackbarData = snackbarData)
-                    }
                 },
                 content = { paddingValues ->
                     when {
@@ -245,7 +214,7 @@ internal fun DeviceCenterScreen(
                                 onBackupFolderClicked = onBackupFolderClicked,
                                 onNonBackupFolderClicked = onNonBackupFolderClicked,
                                 onInfoClicked = onInfoOptionClicked,
-                                modifier = Modifier.padding(paddingValues),
+                                modifier = Modifier.consumeWindowInsets(paddingValues)
                             )
                         }
                     }
@@ -263,38 +232,8 @@ internal fun DeviceCenterScreen(
             )
         }
     )
-
-    if (showUpgradeDialog) {
-        Analytics.tracker.trackEvent(SyncFeatureUpgradeDialogDisplayedEvent)
-        val isBackupForAndroidEnabled = uiState.enabledFlags.contains(SyncFeatures.BackupForAndroid)
-        MegaAlertDialog(
-            title = if (isBackupForAndroidEnabled) {
-                stringResource(id = sharedR.string.device_center_sync_backup_upgrade_dialog_title)
-            } else {
-                stringResource(id = sharedR.string.device_center_sync_upgrade_dialog_title)
-            },
-            body = if (isBackupForAndroidEnabled) {
-                stringResource(id = sharedR.string.device_center_sync_backup_upgrade_dialog_message)
-            } else {
-                stringResource(id = sharedR.string.device_center_sync_upgrade_dialog_message)
-            },
-            confirmButtonText = stringResource(id = sharedR.string.general_upgrade_button),
-            cancelButtonText = stringResource(id = sharedR.string.device_center_sync_upgrade_dialog_cancel_button),
-            onConfirm = {
-                Analytics.tracker.trackEvent(SyncFeatureUpgradeDialogUpgradeButtonPressedEvent)
-                onOpenUpgradeAccountClicked()
-                showUpgradeDialog = false
-            },
-            onDismiss = {
-                Analytics.tracker.trackEvent(SyncFeatureUpgradeDialogCancelButtonPressedEvent)
-                showUpgradeDialog = false
-            },
-            modifier = Modifier.testTag(TEST_TAG_DEVICE_CENTER_SCREEN_UPGRADE_DIALOG)
-        )
-    }
 }
 
-@OptIn(ExperimentalMaterialApi::class)
 @Composable
 private fun DeviceCenterAppBar(
     uiState: DeviceCenterUiState,
@@ -322,6 +261,7 @@ private fun DeviceCenterAppBar(
                 }
             },
             onActionPressed = onActionPressed,
+            windowInsets = WindowInsets(0.dp),
         )
     } else {
         LegacySearchAppBar(
@@ -356,6 +296,7 @@ private fun DeviceCenterAppBar(
                         if (uiState.isCameraUploadsEnabled) {
                             list.add(DeviceMenuAction.Info)
                         }
+                        list.add(DeviceMenuAction.CameraUploads)
                     }
 
                     else -> list.add(DeviceMenuAction.Info)
@@ -363,6 +304,8 @@ private fun DeviceCenterAppBar(
 
                 return@let list
             },
+            isHideAfterSearch = true,
+            windowInsets = WindowInsets(0.dp),
             modifier = Modifier.testTag(DEVICE_CENTER_TOOLBAR),
         )
     }
@@ -500,7 +443,7 @@ private fun DeviceCenterContent(
 @CombinedThemePreviews
 @Composable
 private fun DeviceCenterNoNetworkStatePreview() {
-    OriginalTempTheme(isDark = isSystemInDarkTheme()) {
+    OriginalTheme(isDark = isSystemInDarkTheme()) {
         DeviceCenterScreen(
             uiState = DeviceCenterUiState(isInitialLoadingFinished = true),
             snackbarHostState = SnackbarHostState(),
@@ -508,6 +451,7 @@ private fun DeviceCenterNoNetworkStatePreview() {
             onDeviceMenuClicked = {},
             onBackupFolderClicked = {},
             onNonBackupFolderClicked = {},
+            onCameraUploadsClicked = {},
             onInfoOptionClicked = {},
             onAddNewSyncOptionClicked = {},
             onAddBackupOptionClicked = {},
@@ -520,7 +464,6 @@ private fun DeviceCenterNoNetworkStatePreview() {
             onSearchQueryChanged = {},
             onSearchCloseClicked = {},
             onSearchClicked = {},
-            onOpenUpgradeAccountClicked = {},
         )
     }
 }
@@ -528,7 +471,7 @@ private fun DeviceCenterNoNetworkStatePreview() {
 @CombinedThemePreviews
 @Composable
 private fun DeviceCenterNoItemsFoundPreview() {
-    OriginalTempTheme(isDark = isSystemInDarkTheme()) {
+    OriginalTheme(isDark = isSystemInDarkTheme()) {
         DeviceCenterScreen(
             uiState = DeviceCenterUiState(
                 isInitialLoadingFinished = true,
@@ -542,6 +485,7 @@ private fun DeviceCenterNoItemsFoundPreview() {
             onDeviceMenuClicked = {},
             onBackupFolderClicked = {},
             onNonBackupFolderClicked = {},
+            onCameraUploadsClicked = {},
             onInfoOptionClicked = {},
             onAddNewSyncOptionClicked = {},
             onAddBackupOptionClicked = {},
@@ -554,7 +498,6 @@ private fun DeviceCenterNoItemsFoundPreview() {
             onSearchQueryChanged = {},
             onSearchCloseClicked = {},
             onSearchClicked = {},
-            onOpenUpgradeAccountClicked = {},
         )
     }
 }
@@ -565,7 +508,7 @@ private fun DeviceCenterNoItemsFoundPreview() {
 @CombinedThemePreviews
 @Composable
 private fun DeviceCenterInInitialLoadingPreview() {
-    OriginalTempTheme(isDark = isSystemInDarkTheme()) {
+    OriginalTheme(isDark = isSystemInDarkTheme()) {
         DeviceCenterScreen(
             uiState = DeviceCenterUiState(isNetworkConnected = true),
             snackbarHostState = SnackbarHostState(),
@@ -573,6 +516,7 @@ private fun DeviceCenterInInitialLoadingPreview() {
             onDeviceMenuClicked = {},
             onBackupFolderClicked = {},
             onNonBackupFolderClicked = {},
+            onCameraUploadsClicked = {},
             onInfoOptionClicked = {},
             onAddNewSyncOptionClicked = {},
             onAddBackupOptionClicked = {},
@@ -585,7 +529,6 @@ private fun DeviceCenterInInitialLoadingPreview() {
             onSearchQueryChanged = {},
             onSearchCloseClicked = {},
             onSearchClicked = {},
-            onOpenUpgradeAccountClicked = {},
         )
     }
 }
@@ -606,7 +549,7 @@ private fun DeviceCenterInDeviceViewPreview() {
         isInitialLoadingFinished = true,
         isNetworkConnected = true,
     )
-    OriginalTempTheme(isDark = isSystemInDarkTheme()) {
+    OriginalTheme(isDark = isSystemInDarkTheme()) {
         DeviceCenterScreen(
             uiState = uiState,
             snackbarHostState = SnackbarHostState(),
@@ -614,6 +557,7 @@ private fun DeviceCenterInDeviceViewPreview() {
             onDeviceMenuClicked = {},
             onBackupFolderClicked = {},
             onNonBackupFolderClicked = {},
+            onCameraUploadsClicked = {},
             onInfoOptionClicked = {},
             onAddNewSyncOptionClicked = {},
             onAddBackupOptionClicked = {},
@@ -626,7 +570,6 @@ private fun DeviceCenterInDeviceViewPreview() {
             onSearchQueryChanged = {},
             onSearchCloseClicked = {},
             onSearchClicked = {},
-            onOpenUpgradeAccountClicked = {},
         )
     }
 }
@@ -644,7 +587,7 @@ private fun DeviceCenterInFolderViewEmptyStatePreview() {
         selectedDevice = ownDeviceUINode,
         isNetworkConnected = true,
     )
-    OriginalTempTheme(isDark = isSystemInDarkTheme()) {
+    OriginalTheme(isDark = isSystemInDarkTheme()) {
         DeviceCenterScreen(
             uiState = uiState,
             snackbarHostState = SnackbarHostState(),
@@ -652,6 +595,7 @@ private fun DeviceCenterInFolderViewEmptyStatePreview() {
             onDeviceMenuClicked = {},
             onBackupFolderClicked = {},
             onNonBackupFolderClicked = {},
+            onCameraUploadsClicked = {},
             onInfoOptionClicked = {},
             onAddNewSyncOptionClicked = {},
             onAddBackupOptionClicked = {},
@@ -664,7 +608,6 @@ private fun DeviceCenterInFolderViewEmptyStatePreview() {
             onSearchQueryChanged = {},
             onSearchCloseClicked = {},
             onSearchClicked = {},
-            onOpenUpgradeAccountClicked = {},
         )
     }
 }
@@ -681,7 +624,7 @@ private fun DeviceCenterInFolderViewPreview() {
         selectedDevice = ownDeviceUINodeTwo,
         isNetworkConnected = true,
     )
-    OriginalTempTheme(isDark = isSystemInDarkTheme()) {
+    OriginalTheme(isDark = isSystemInDarkTheme()) {
         DeviceCenterScreen(
             uiState = uiState,
             snackbarHostState = SnackbarHostState(),
@@ -689,6 +632,7 @@ private fun DeviceCenterInFolderViewPreview() {
             onDeviceMenuClicked = {},
             onBackupFolderClicked = {},
             onNonBackupFolderClicked = {},
+            onCameraUploadsClicked = {},
             onInfoOptionClicked = {},
             onAddNewSyncOptionClicked = {},
             onAddBackupOptionClicked = {},
@@ -701,7 +645,6 @@ private fun DeviceCenterInFolderViewPreview() {
             onSearchQueryChanged = {},
             onSearchCloseClicked = {},
             onSearchClicked = {},
-            onOpenUpgradeAccountClicked = {},
         )
     }
 }
@@ -712,7 +655,7 @@ private fun DeviceCenterInFolderViewPreview() {
 @CombinedThemePreviews
 @Composable
 private fun DeviceCenterContentWithOwnDeviceSectionOnlyPreview() {
-    OriginalTempTheme(isDark = isSystemInDarkTheme()) {
+    OriginalTheme(isDark = isSystemInDarkTheme()) {
         DeviceCenterContent(
             itemsToDisplay = listOf(ownDeviceUINode),
             onDeviceClicked = {},
@@ -730,7 +673,7 @@ private fun DeviceCenterContentWithOwnDeviceSectionOnlyPreview() {
 @CombinedThemePreviews
 @Composable
 private fun DeviceCenterContentWithOtherDevicesSectionOnlyPreview() {
-    OriginalTempTheme(isDark = isSystemInDarkTheme()) {
+    OriginalTheme(isDark = isSystemInDarkTheme()) {
         DeviceCenterContent(
             itemsToDisplay = listOf(otherDeviceUINodeOne),
             onDeviceClicked = {},
@@ -748,7 +691,7 @@ private fun DeviceCenterContentWithOtherDevicesSectionOnlyPreview() {
 @CombinedThemePreviews
 @Composable
 private fun DeviceCenterContentWithBothDeviceSectionsPreview() {
-    OriginalTempTheme(isDark = isSystemInDarkTheme()) {
+    OriginalTheme(isDark = isSystemInDarkTheme()) {
         DeviceCenterContent(
             itemsToDisplay = listOf(
                 ownDeviceUINode,
@@ -787,7 +730,7 @@ private val ownDeviceUINode = OwnDeviceUINode(
     id = "1234-5678",
     name = "User's Pixel 6",
     icon = DeviceIconType.Android,
-    status = DeviceCenterUINodeStatus.CameraUploadsDisabled,
+    status = DeviceCenterUINodeStatus.NothingSetUp,
     folders = emptyList(),
 )
 

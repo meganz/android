@@ -1,7 +1,6 @@
 package mega.privacy.android.domain.usecase.node
 
 import com.google.common.truth.Truth
-import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.test.runTest
 import mega.privacy.android.domain.entity.node.NodeAction
 import mega.privacy.android.domain.entity.node.NodeId
@@ -15,6 +14,8 @@ import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.DynamicTest.dynamicTest
 import org.junit.jupiter.api.TestFactory
 import org.junit.jupiter.api.TestInstance
+import org.junit.jupiter.params.ParameterizedTest
+import org.junit.jupiter.params.provider.EnumSource
 import org.mockito.kotlin.mock
 import org.mockito.kotlin.reset
 import org.mockito.kotlin.whenever
@@ -149,6 +150,7 @@ internal class GetAvailableNodeActionsUseCaseTest {
                     runTest {
                         val node = mockNode()
                         whenever(node.isTakenDown).thenReturn(takenDown)
+                        whenever(getNodeAccessPermission(node.id)).thenReturn(if (root) AccessPermission.READ else AccessPermission.OWNER)
                         val result = underTest(node)
 
                         if (root && !takenDown) {
@@ -163,17 +165,21 @@ internal class GetAvailableNodeActionsUseCaseTest {
 
     @TestFactory
     fun `test that Rename action is returned if the non backup node is not a shared node, or is a shared node and has owner permission`() =
-        listOf(true, false).flatMap { owner ->
+        listOf(
+            AccessPermission.OWNER,
+            AccessPermission.READ,
+            AccessPermission.FULL,
+            AccessPermission.READWRITE
+        ).flatMap { permission ->
             mockedNodes.map { (name, mockNode) ->
-                val shared = mockNode.isInShared()
-                dynamicTest("node $name, owner: $owner, in shared: $shared") {
+                dynamicTest("node $name, permission: $permission") {
                     runTest {
                         val node = mockNode()
-                        whenever(getNodeAccessPermission(node.id)).thenReturn(if (owner) AccessPermission.OWNER else AccessPermission.READ)
+                        whenever(getNodeAccessPermission(node.id)).thenReturn(permission)
                         whenever(isNodeInBackupsUseCase(node.id.longValue)).thenReturn(false)
                         val result = underTest(node)
 
-                        if (owner || !shared) {
+                        if (permission == AccessPermission.OWNER || permission == AccessPermission.FULL) {
                             Truth.assertThat(result).contains(NodeAction.Rename)
                         } else {
                             Truth.assertThat(result).doesNotContain(NodeAction.Rename)
@@ -185,19 +191,24 @@ internal class GetAvailableNodeActionsUseCaseTest {
 
     @TestFactory
     fun `test that Move to rubbish action is returned if the non backup node is not a shared node, or is a shared root node and has owner permission`() =
-        listOf(true, false).flatMap { owner ->
+        listOf(
+            AccessPermission.FULL,
+            AccessPermission.READ,
+            AccessPermission.OWNER,
+            AccessPermission.READWRITE,
+            AccessPermission.UNKNOWN
+        ).flatMap { permission ->
             mockedNodes.map { (name, mockNode) ->
                 val shared = mockNode.isInShared()
                 val root = mockNode.isRootInShared()
-                dynamicTest("node: $name, shared: $shared, owner: $owner, in shared root:$root") {
+                dynamicTest("node: $name, shared: $shared, permission: $permission, in shared root:$root") {
                     runTest {
                         val node = mockNode()
-                        whenever(getNodeAccessPermission(node.id)).thenReturn(if (owner) AccessPermission.OWNER else AccessPermission.READ)
                         whenever(isNodeInBackupsUseCase(node.id.longValue)).thenReturn(false)
-
+                        whenever(getNodeAccessPermission(node.id)).thenReturn(permission)
                         val result = underTest(node)
 
-                        if (!shared || (owner && root)) {
+                        if ((permission == AccessPermission.OWNER) || (permission == AccessPermission.FULL && node.parentId.longValue == -1L)) {
                             Truth.assertThat(result).contains(NodeAction.MoveToRubbishBin)
                         } else {
                             Truth.assertThat(result).doesNotContain(NodeAction.MoveToRubbishBin)
@@ -217,7 +228,7 @@ internal class GetAvailableNodeActionsUseCaseTest {
                         val node = mockNode()
                         whenever(node.isTakenDown).thenReturn(takenDown)
                         whenever(isNodeInBackupsUseCase(node.id.longValue)).thenReturn(false)
-
+                        whenever(getNodeAccessPermission(node.id)).thenReturn(if (shared) AccessPermission.READ else AccessPermission.OWNER)
                         val result = underTest(node)
 
                         if (!shared) {
@@ -239,6 +250,7 @@ internal class GetAvailableNodeActionsUseCaseTest {
                 dynamicTest("node: $name, takenDown: $takenDown, inShared: $inShared, folder: $folder") {
                     runTest {
                         val node = mockNode()
+                        whenever(getNodeAccessPermission(node.id)).thenReturn(if (inShared) AccessPermission.READ else AccessPermission.OWNER)
                         whenever(node.isTakenDown).thenReturn(takenDown)
                         val result = underTest(node)
 
@@ -262,6 +274,7 @@ internal class GetAvailableNodeActionsUseCaseTest {
                         runTest {
                             val node = mockNode()
                             whenever(node.isTakenDown).thenReturn(takenDown)
+                            whenever(getNodeAccessPermission(node.id)).thenReturn(if (inShared) AccessPermission.READ else AccessPermission.OWNER)
                             whenever(node.exportedData).thenReturn(if (exported) mock() else null)
                             val result = underTest(node)
 
@@ -287,6 +300,7 @@ internal class GetAvailableNodeActionsUseCaseTest {
                             val node = mockNode()
                             whenever(node.isTakenDown).thenReturn(takenDown)
                             whenever(node.exportedData).thenReturn(if (exported) mock() else null)
+                            whenever(getNodeAccessPermission(node.id)).thenReturn(if (inShared) AccessPermission.READ else AccessPermission.OWNER)
                             val result = underTest(node)
 
                             if (exported && !takenDown && !inShared) {
@@ -311,6 +325,7 @@ internal class GetAvailableNodeActionsUseCaseTest {
                             val node = mockNode()
                             whenever(node.isTakenDown).thenReturn(takenDown)
                             whenever(node.exportedData).thenReturn(if (exported) mock() else null)
+                            whenever(getNodeAccessPermission(node.id)).thenReturn(if (inShared) AccessPermission.READ else AccessPermission.OWNER)
                             val result = underTest(node)
 
                             if (!exported && !takenDown && !inShared) {
@@ -333,6 +348,7 @@ internal class GetAvailableNodeActionsUseCaseTest {
                     runTest {
                         val node = mockNode()
                         whenever(node.isTakenDown).thenReturn(takenDown)
+                        whenever(getNodeAccessPermission(node.id)).thenReturn(if (inShared) AccessPermission.READ else AccessPermission.OWNER)
                         val result = underTest(node)
 
                         if (takenDown && !inShared) {
@@ -344,6 +360,27 @@ internal class GetAvailableNodeActionsUseCaseTest {
                 }
             }
         }
+
+    @ParameterizedTest(name = "folder with access permission : {0}")
+    @EnumSource(AccessPermission::class)
+    fun `test that share folder action is not returned when node is an incoming share`(permission: AccessPermission) {
+        mockedNodes.map { (name, mockNode) ->
+            dynamicTest("node: $name, permission: $permission") {
+                runTest {
+                    val node = mockNode()
+                    whenever(getNodeAccessPermission(node.id)).thenReturn(permission)
+                    whenever(node.isTakenDown).thenReturn(false)
+                    whenever(node.isIncomingShare).thenReturn(false)
+                    val result = underTest(node)
+                    if (permission == AccessPermission.OWNER && mockNode.isFolder()) {
+                        Truth.assertThat(result).contains(NodeAction.ShareFolder)
+                    } else {
+                        Truth.assertThat(result).doesNotContain(NodeAction.ShareFolder)
+                    }
+                }
+            }
+        }
+    }
 
     private val mockedNodes = mapOf(
         "File" to this::mockFile,

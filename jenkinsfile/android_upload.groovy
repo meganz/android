@@ -46,11 +46,11 @@ pipeline {
         LC_ALL = 'en_US.UTF-8'
         LANG = 'en_US.UTF-8'
 
-        NDK_ROOT = '/opt/buildtools/android-sdk/ndk/21.3.6528147'
+        NDK_ROOT = '/opt/buildtools/android-sdk/ndk/27.1.12297006'
         JAVA_HOME = '/opt/buildtools/zulu17.42.19-ca-jdk17.0.7-macosx'
         ANDROID_HOME = '/opt/buildtools/android-sdk'
 
-        PATH = "/opt/buildtools/android-sdk/cmake/3.22.1/bin:/Applications/MEGAcmd.app/Contents/MacOS:/opt/buildtools/zulu17.42.19-ca-jdk17.0.7-macosx/bin:/opt/brew/bin:/opt/brew/opt/gnu-sed/libexec/gnubin:/opt/brew/opt/gnu-tar/libexec/gnubin:/opt/buildtools/android-sdk/platform-tools:/opt/buildtools/android-sdk/build-tools/30.0.3:$PATH"
+        PATH = "/opt/buildtools/android-sdk/cmake/3.22.1/bin:/Applications/MEGAcmd.app/Contents/MacOS:/opt/buildtools/zulu17.42.19-ca-jdk17.0.7-macosx/bin:/opt/brew/bin:/opt/brew/opt/gnu-sed/libexec/gnubin:/opt/brew/opt/gnu-tar/libexec/gnubin:/opt/buildtools/android-sdk/platform-tools:/opt/buildtools/android-sdk/build-tools/30.0.3:/usr/sbin/:$PATH"
 
         CONSOLE_LOG_FILE = 'console.txt'
 
@@ -319,7 +319,7 @@ pipeline {
                         ]) {
                             sh """
                                 cd ${WORKSPACE}
-                                ./gradlew sdk:artifactoryPublish 2>&1  | tee ${ARTIFACTORY_PUBLISH_LOG}
+                                ./gradlew --no-daemon sdk:artifactoryPublish 2>&1  | tee ${ARTIFACTORY_PUBLISH_LOG}
                             """
                         }
 
@@ -329,20 +329,6 @@ pipeline {
             }
         }
 
-        stage('Enable Permanent Logging') {
-            when {
-                expression { triggerByDeliverQaCmd() || triggerByPushToDevelop() }
-            }
-            steps {
-                script {
-                    BUILD_STEP = 'Enable Permanent Logging'
-
-                    def featureFlagFile = "app/src/main/assets/featuretoggle/feature_flags.json"
-                    common.setFeatureFlag(featureFlagFile, "PermanentLogging", true)
-                    sh("cat $featureFlagFile")
-                }
-            }
-        }
         stage('Build APK(GMS)') {
             when {
                 expression { triggerByDeliverQaCmd() || triggerByPushToDevelop() }
@@ -350,7 +336,7 @@ pipeline {
             steps {
                 script {
                     BUILD_STEP = 'Build APK (GMS)'
-                    sh './gradlew app:assembleGmsRelease'
+                    sh './gradlew --no-daemon app:assembleGmsRelease'
                 }
             }
         }
@@ -401,7 +387,7 @@ pipeline {
                         ]) {
                             println("Upload GMS APK, TESTERS_FOR_CD = ${env.TESTERS_FOR_CD}")
                             println("Upload GMS APK, RELEASE_NOTES_FOR_CD = ${env.RELEASE_NOTES_FOR_CD}")
-                            sh './gradlew appDistributionUploadGmsRelease'
+                            sh './gradlew --no-daemon appDistributionUploadGmsRelease'
                         }
                     }
                 }
@@ -417,7 +403,7 @@ pipeline {
                     withEnv([
                             "APK_VERSION_NAME_TAG_FOR_CD=_QA"
                     ]) {
-                        sh './gradlew app:assembleGmsQa'
+                        sh './gradlew --no-daemon app:assembleGmsQa'
                     }
                 }
             }
@@ -441,7 +427,7 @@ pipeline {
                                 "TESTERS_FOR_CD=${parseCommandParameter()["tester"]}",
                                 "TESTER_GROUP_FOR_CD=${parseCommandParameter()["tester-group"]}"
                         ]) {
-                            sh './gradlew appDistributionUploadGmsQa'
+                            sh './gradlew --no-daemon appDistributionUploadGmsQa'
                         }
                     }
                 }
@@ -461,10 +447,10 @@ pipeline {
                             string(credentialsId: 'ARTIFACTORY_ACCESS_TOKEN', variable: 'ARTIFACTORY_ACCESS_TOKEN')
                     ]) {
 
-                        sh "./gradlew runUnitTest"
+                        sh "./gradlew --no-daemon runUnitTest"
                         String artifactoryTargetPath = "${env.ARTIFACTORY_BASE_URL}/artifactory/android-mega/cicd/coverage/"
                         String coverageSummaryFile = "coverage_summary.csv"
-                        sh "./gradlew collectCoverage --modules \"app,data,domain,shared/original-core-ui,feature/sync,feature/devicecenter,legacy-core-ui\" --csv-output ${coverageSummaryFile}"
+                        sh "./gradlew --no-daemon collectCoverage --modules \"app,data,domain,shared/original-core-ui,feature/sync,feature/devicecenter,legacy-core-ui\" --csv-output ${coverageSummaryFile}"
                         sh "curl -u${ARTIFACTORY_USER}:${ARTIFACTORY_ACCESS_TOKEN} -T \"$WORKSPACE/$coverageSummaryFile\" \"${artifactoryTargetPath}/$coverageSummaryFile\""
                     }
                 }

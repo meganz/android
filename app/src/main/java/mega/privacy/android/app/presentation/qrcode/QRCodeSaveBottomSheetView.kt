@@ -17,7 +17,7 @@ import mega.privacy.android.legacy.core.ui.controls.lists.MenuActionHeader
 import mega.privacy.android.shared.original.core.ui.controls.lists.MenuActionListTile
 import mega.privacy.android.shared.original.core.ui.controls.sheets.BottomSheet
 import mega.privacy.android.shared.original.core.ui.preview.CombinedThemePreviews
-import mega.privacy.android.shared.original.core.ui.theme.OriginalTempTheme
+import mega.privacy.android.shared.original.core.ui.theme.OriginalTheme
 
 /**
  * QR code save bottom sheet
@@ -75,7 +75,7 @@ private fun BottomSheetContent(
 @CombinedThemePreviews
 @Composable
 private fun PreviewBottomSheetContent() {
-    OriginalTempTheme(isDark = isSystemInDarkTheme()) {
+    OriginalTheme(isDark = isSystemInDarkTheme()) {
         BottomSheetContent(
             onCloudDriveClicked = { },
             onFileSystemClicked = { }

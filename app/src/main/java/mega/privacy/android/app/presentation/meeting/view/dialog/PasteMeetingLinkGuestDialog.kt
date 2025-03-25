@@ -19,8 +19,8 @@ import mega.privacy.android.shared.original.core.ui.controls.dialogs.MegaAlertDi
 import mega.privacy.android.shared.original.core.ui.controls.text.MegaText
 import mega.privacy.android.shared.original.core.ui.controls.textfields.GenericTextField
 import mega.privacy.android.shared.original.core.ui.preview.CombinedTextAndThemePreviews
-import mega.privacy.android.shared.original.core.ui.theme.OriginalTempTheme
-import mega.privacy.android.shared.original.core.ui.theme.values.TextColor
+import mega.privacy.android.shared.original.core.ui.theme.OriginalTheme
+import mega.android.core.ui.theme.values.TextColor
 
 @Composable
 internal fun PasteMeetingLinkGuestDialog(
@@ -82,7 +82,7 @@ internal fun PasteMeetingLinkGuestDialog(
 @CombinedTextAndThemePreviews
 @Composable
 private fun PasteMeetingLinkGuestDialogWithoutErrorPreview() {
-    OriginalTempTheme(isDark = isSystemInDarkTheme()) {
+    OriginalTheme(isDark = isSystemInDarkTheme()) {
         PasteMeetingLinkGuestDialog(
             meetingLink = "",
             onTextChange = {},
@@ -96,7 +96,7 @@ private fun PasteMeetingLinkGuestDialogWithoutErrorPreview() {
 @CombinedTextAndThemePreviews
 @Composable
 private fun PasteMeetingLinkGuestDialogWithErrorPreview() {
-    OriginalTempTheme(isDark = isSystemInDarkTheme()) {
+    OriginalTheme(isDark = isSystemInDarkTheme()) {
         PasteMeetingLinkGuestDialog(
             meetingLink = "",
             errorText = "error",

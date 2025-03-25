@@ -23,8 +23,8 @@ import mega.privacy.android.feature.sync.R
 import mega.privacy.android.legacy.core.ui.controls.appbar.LegacyTopAppBar
 import mega.privacy.android.shared.original.core.ui.controls.buttons.RaisedDefaultMegaButton
 import mega.privacy.android.shared.original.core.ui.controls.text.MegaText
-import mega.privacy.android.shared.original.core.ui.theme.OriginalTempTheme
-import mega.privacy.android.shared.original.core.ui.theme.values.TextColor
+import mega.privacy.android.shared.original.core.ui.theme.OriginalTheme
+import mega.android.core.ui.theme.values.TextColor
 
 @Composable
 internal fun SyncEmptyScreen(getStartedClicked: () -> Unit) {
@@ -110,7 +110,7 @@ internal const val TAG_SYNC_EMPTY_ONBOARDING_TITLE = "sync_empty_screen_onboardi
 @Preview(uiMode = Configuration.UI_MODE_NIGHT_YES)
 @Composable
 private fun SyncEmptyScreenPreview() {
-    OriginalTempTheme(isDark = isSystemInDarkTheme()) {
+    OriginalTheme(isDark = isSystemInDarkTheme()) {
         SyncEmptyScreen({})
     }
 }

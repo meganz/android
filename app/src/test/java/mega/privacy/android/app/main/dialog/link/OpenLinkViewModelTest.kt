@@ -7,19 +7,16 @@ import kotlinx.coroutines.test.StandardTestDispatcher
 import kotlinx.coroutines.test.TestScope
 import kotlinx.coroutines.test.runTest
 import mega.privacy.android.app.components.ChatManagement
-import mega.privacy.android.app.main.dialog.link.OpenLinkDialogFragment
-import mega.privacy.android.app.main.dialog.link.OpenLinkViewModel
 import mega.privacy.android.app.meeting.gateway.RTCAudioManagerGateway
-import mega.privacy.android.app.objects.PasscodeManagement
 import mega.privacy.android.app.usecase.chat.SetChatVideoInDeviceUseCase
 import mega.privacy.android.core.test.extension.CoroutineMainDispatcherExtension
 import mega.privacy.android.domain.entity.RegexPatternType
 import mega.privacy.android.domain.entity.chat.ChatLinkContent
 import mega.privacy.android.domain.usecase.GetUrlRegexPatternTypeUseCase
-import mega.privacy.android.domain.usecase.chat.GetHandleFromContactLinkUseCase
-import mega.privacy.android.domain.usecase.chat.link.GetChatLinkContentUseCase
 import mega.privacy.android.domain.usecase.call.AnswerChatCallUseCase
 import mega.privacy.android.domain.usecase.call.GetChatCallUseCase
+import mega.privacy.android.domain.usecase.chat.GetHandleFromContactLinkUseCase
+import mega.privacy.android.domain.usecase.chat.link.GetChatLinkContentUseCase
 import mega.privacy.android.domain.usecase.meeting.GetScheduledMeetingByChatUseCase
 import mega.privacy.android.domain.usecase.meeting.StartMeetingInWaitingRoomChatUseCase
 import org.junit.jupiter.api.BeforeAll
@@ -47,7 +44,6 @@ internal class OpenLinkViewModelTest {
     private val setChatVideoInDeviceUseCase: SetChatVideoInDeviceUseCase = mock()
     private val rtcAudioManagerGateway: RTCAudioManagerGateway = mock()
     private val chatManagement: ChatManagement = mock()
-    private val passcodeManagement: PasscodeManagement = mock()
 
     private val testCoroutineDispatcher = StandardTestDispatcher()
     private val testCoroutineScope = TestScope(testCoroutineDispatcher)
@@ -80,7 +76,6 @@ internal class OpenLinkViewModelTest {
             setChatVideoInDeviceUseCase,
             rtcAudioManagerGateway,
             chatManagement,
-            passcodeManagement,
             testCoroutineScope,
         )
     }

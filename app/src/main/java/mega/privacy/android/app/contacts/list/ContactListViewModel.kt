@@ -1,5 +1,6 @@
 package mega.privacy.android.app.contacts.list
 
+import mega.privacy.android.icon.pack.R as IconPackR
 import android.content.Context
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.ViewModel
@@ -10,7 +11,7 @@ import dagger.hilt.android.lifecycle.HiltViewModel
 import dagger.hilt.android.qualifiers.ApplicationContext
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.flow.MutableStateFlow
-import kotlinx.coroutines.flow.asStateFlow
+import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.catch
 import kotlinx.coroutines.flow.collectLatest
 import kotlinx.coroutines.flow.combine
@@ -27,7 +28,6 @@ import mega.privacy.android.app.contacts.list.data.ContactActionItem.Type
 import mega.privacy.android.app.contacts.list.data.ContactItem
 import mega.privacy.android.app.contacts.list.data.ContactListState
 import mega.privacy.android.app.contacts.mapper.ContactItemDataMapper
-import mega.privacy.android.app.objects.PasscodeManagement
 import mega.privacy.android.app.usecase.chat.SetChatVideoInDeviceUseCase
 import mega.privacy.android.app.utils.CallUtil
 import mega.privacy.android.data.gateway.api.MegaChatApiGateway
@@ -52,7 +52,6 @@ import javax.inject.Inject
  * @property get1On1ChatIdUseCase Use case to get 1 on 1 chat id.
  * @property removedContactByEmailUseCase Use case to remove contact by email.
  * @property startCallUseCase Use case to start a call.
- * @property passcodeManagement PasscodeManagement object.
  * @property chatApiGateway MegaChatApiGateway object.
  * @property setChatVideoInDeviceUseCase Use case to set chat video in device.
  * @property chatManagement ChatManagement object.
@@ -69,7 +68,6 @@ internal class ContactListViewModel @Inject constructor(
     private val get1On1ChatIdUseCase: Get1On1ChatIdUseCase,
     private val removedContactByEmailUseCase: RemoveContactByEmailUseCase,
     private val startCallUseCase: StartCallUseCase,
-    private val passcodeManagement: PasscodeManagement,
     private val chatApiGateway: MegaChatApiGateway,
     private val setChatVideoInDeviceUseCase: SetChatVideoInDeviceUseCase,
     private val chatManagement: ChatManagement,
@@ -82,15 +80,13 @@ internal class ContactListViewModel @Inject constructor(
 ) : ViewModel() {
     private val queryString = MutableStateFlow<String?>(null)
     private val contacts: MutableStateFlow<List<ContactItem>> = MutableStateFlow(emptyList())
-    private val _state = MutableStateFlow(ContactListState())
-
     private var monitorSFUServerUpgradeJob: Job? = null
 
     /**
      * State of the UI for the contact list screen.
      */
-    val state = _state.asStateFlow()
-
+    val state: StateFlow<ContactListState>
+        field: MutableStateFlow<ContactListState> = MutableStateFlow(ContactListState())
 
     init {
         viewModelScope.launch {
@@ -126,17 +122,19 @@ internal class ContactListViewModel @Inject constructor(
                     .map { it.incomingContactRequests.size }
                     .catch { Timber.e(it) }
                     .collectLatest {
-                        _state.update { state ->
-                            state.copy(
+                        state.update { current ->
+                            current.copy(
                                 contactActionItems = listOf(
                                     ContactActionItem(
                                         Type.REQUESTS,
                                         context.getString(R.string.section_requests),
-                                        it
+                                        R.drawable.ic_users,
+                                        it,
                                     ),
                                     ContactActionItem(
                                         Type.GROUPS,
-                                        context.getString(R.string.section_groups)
+                                        context.getString(R.string.section_groups),
+                                        IconPackR.drawable.ic_message_chat_circle_medium_regular_outline,
                                     )
                                 )
                             )
@@ -164,7 +162,6 @@ internal class ContactListViewModel @Inject constructor(
                 mutableListOf<ContactItem>().apply {
                     if (newContacts.isNotEmpty()) add(ContactItem.Header(context.getString(R.string.section_recently_added)))
                     addAll(newContacts)
-                    add(ContactItem.Header(context.getString(R.string.section_contacts)))
                 }
             } else {
                 emptyList()
@@ -188,8 +185,8 @@ internal class ContactListViewModel @Inject constructor(
         runCatching {
             get1On1ChatIdUseCase(userHandle)
         }.onSuccess { chatId ->
-            _state.update {
-                it.copy(
+            state.update { current: ContactListState ->
+                current.copy(
                     shouldOpenChatWithId = chatId
                 )
             }
@@ -202,7 +199,7 @@ internal class ContactListViewModel @Inject constructor(
      * Reset chat navigation state
      */
     fun onChatOpened() {
-        _state.update {
+        state.update {
             it.copy(
                 shouldOpenChatWithId = null
             )
@@ -256,7 +253,6 @@ internal class ContactListViewModel @Inject constructor(
                 MegaApplication.getInstance().applicationContext,
                 chatId,
                 true,
-                passcodeManagement
             )
             return
         }
@@ -279,7 +275,6 @@ internal class ContactListViewModel @Inject constructor(
                         chatId,
                         hasLocalAudio,
                         hasLocalVideo,
-                        passcodeManagement
                     )
                 }
             }
@@ -312,14 +307,14 @@ internal class ContactListViewModel @Inject constructor(
     }
 
     private fun showForceUpdateDialog() {
-        _state.update { it.copy(showForceUpdateDialog = true) }
+        state.update { it.copy(showForceUpdateDialog = true) }
     }
 
     /**
      * Set to false to hide the dialog
      */
     fun onForceUpdateDialogDismissed() {
-        _state.update { it.copy(showForceUpdateDialog = false) }
+        state.update { it.copy(showForceUpdateDialog = false) }
     }
 
     /**

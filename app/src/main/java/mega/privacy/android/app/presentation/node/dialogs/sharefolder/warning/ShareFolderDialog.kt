@@ -12,7 +12,7 @@ import mega.privacy.android.shared.original.core.ui.controls.dialogs.MegaAlertDi
 import mega.privacy.android.shared.original.core.ui.preview.CombinedThemePreviews
 import mega.privacy.android.domain.entity.node.NodeId
 import mega.privacy.android.domain.entity.node.TypedNode
-import mega.privacy.android.shared.original.core.ui.theme.OriginalTempTheme
+import mega.privacy.android.shared.original.core.ui.theme.OriginalTheme
 
 /**
  * Share folder dialog
@@ -47,7 +47,7 @@ private fun ShareFolderDialogBody(
     onDismiss: () -> Unit,
     onOkClicked: (List<TypedNode>) -> Unit,
 ) {
-    OriginalTempTheme(isDark = isSystemInDarkTheme()) {
+    OriginalTheme(isDark = isSystemInDarkTheme()) {
         state.info?.let { infoRes ->
             MegaAlertDialog(
                 title = stringResource(id = R.string.backup_share_permission_title),

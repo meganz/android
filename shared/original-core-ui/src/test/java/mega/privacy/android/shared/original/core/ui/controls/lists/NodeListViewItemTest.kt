@@ -25,30 +25,39 @@ class NodeListViewItemTest {
     val composeTestRule = createComposeRule()
 
 
-    private fun setContentWithoutAnyIcons() {
-        composeTestRule.setContent {
-            Scaffold {
-                Text(text = "Empty screen", modifier = Modifier.padding(it))
-                NodeListViewItem(title = "Title", subtitle = "Subtitle", icon = R.drawable.ic_info)
-            }
-        }
-    }
-
-    private fun setContentWithAllIcons() {
+    private fun setContent(
+        title: String = "Title",
+        subtitle: String = "Subtitle",
+        icon: Int = R.drawable.ic_info,
+        accessPermissionIcon: Int? = null,
+        showOffline: Boolean = false,
+        showVersion: Boolean = false,
+        showLink: Boolean = false,
+        isTakenDown: Boolean = false,
+        showFavourite: Boolean = false,
+        onMoreClicked: (() -> Unit)? = null,
+        description: String? = null,
+        highlightText: String = "",
+        tags: List<String>? = null,
+    ) {
         composeTestRule.setContent {
             Scaffold {
                 Text(text = "Empty screen", modifier = Modifier.padding(it))
                 NodeListViewItem(
-                    title = "Title",
-                    subtitle = "Subtitle",
-                    icon = R.drawable.ic_info,
-                    accessPermissionIcon = R.drawable.ic_favorite,
-                    showOffline = true,
-                    showVersion = true,
+                    title = title,
+                    subtitle = subtitle,
+                    icon = icon,
+                    accessPermissionIcon = accessPermissionIcon,
+                    showOffline = showOffline,
+                    showVersion = showVersion,
                     labelColor = MegaOriginalTheme.colors.indicator.pink,
-                    showLink = true,
-                    showFavourite = true,
-                    onMoreClicked = {},
+                    showLink = showLink,
+                    isTakenDown = isTakenDown,
+                    showFavourite = showFavourite,
+                    onMoreClicked = onMoreClicked,
+                    description = description,
+                    highlightText = highlightText,
+                    tags = tags
                 )
             }
         }
@@ -57,7 +66,7 @@ class NodeListViewItemTest {
     @Test
     fun `test that node list view item displays items correctly when only title and subtitle is provided`() {
         // Start the app
-        setContentWithoutAnyIcons()
+        setContent()
 
         // Check that the text is displayed
         composeTestRule.onNodeWithText("Empty screen").assertIsDisplayed()
@@ -91,7 +100,13 @@ class NodeListViewItemTest {
     @Test
     fun `test that  in node list view item displays all icons when correct inputs are provided`() {
         // Start the app
-        setContentWithAllIcons()
+        setContent(accessPermissionIcon = R.drawable.ic_favorite,
+            showOffline = true,
+            showVersion = true,
+            showLink = true,
+            isTakenDown = true,
+            showFavourite = true,
+            onMoreClicked = {})
 
         // Check that the text is displayed
         composeTestRule.onNodeWithText("Empty screen").assertIsDisplayed()
@@ -122,5 +137,49 @@ class NodeListViewItemTest {
         composeTestRule.onNodeWithTag(PERMISSION_ICON_TAG, useUnmergedTree = true)
             .assertIsDisplayed()
 
+        //Check that taken down icon is displayed
+        composeTestRule.onNodeWithTag(TAKEN_DOWN_ICON_TAG, useUnmergedTree = true)
+            .assertIsDisplayed()
+
+    }
+
+    @Test
+    fun `test that node description is displayed when it matches search query`() {
+        setContent(
+            description = "Camera Uploads",
+            highlightText = "camera",
+            tags = listOf("camerauploads", "myuploads")
+        )
+        composeTestRule.onNodeWithTag(DESCRIPTION_TAG, useUnmergedTree = true).assertIsDisplayed()
+    }
+
+    @Test
+    fun `test that node description is not displayed when it does not match search query`() {
+        setContent(
+            description = "Camera Uploads",
+            highlightText = "video",
+            tags = listOf("camerauploads", "myuploads")
+        )
+        composeTestRule.onNodeWithTag(DESCRIPTION_TAG, useUnmergedTree = true).assertDoesNotExist()
+    }
+
+    @Test
+    fun `test that node tags are displayed when they match search query`() {
+        setContent(
+            description = "Camera Uploads",
+            highlightText = "camerauploads",
+            tags = listOf("camerauploads", "myuploads")
+        )
+        composeTestRule.onNodeWithTag(TAGS_TAG, useUnmergedTree = true).assertIsDisplayed()
+    }
+
+    @Test
+    fun `test that node tags are not displayed when they do not match search query`() {
+        setContent(
+            description = "CameraUploads",
+            highlightText = "video",
+            tags = listOf("camerauploads", "myuploads")
+        )
+        composeTestRule.onNodeWithTag(TAGS_TAG, useUnmergedTree = true).assertDoesNotExist()
     }
 }

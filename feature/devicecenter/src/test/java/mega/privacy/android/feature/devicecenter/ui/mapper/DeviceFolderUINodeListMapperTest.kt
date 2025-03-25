@@ -3,6 +3,7 @@ package mega.privacy.android.feature.devicecenter.ui.mapper
 import com.google.common.truth.Truth.assertThat
 import mega.privacy.android.domain.entity.backup.BackupInfoType
 import mega.privacy.android.domain.entity.backup.BackupInfoUserAgent
+import mega.privacy.android.domain.entity.node.NodeId
 import mega.privacy.android.feature.devicecenter.domain.entity.DeviceCenterNodeStatus
 import mega.privacy.android.feature.devicecenter.domain.entity.DeviceFolderNode
 import mega.privacy.android.feature.devicecenter.ui.model.BackupDeviceFolderUINode
@@ -56,7 +57,7 @@ internal class DeviceFolderUINodeListMapperTest {
                 id = folderId,
                 name = folderName,
                 status = folderStatus,
-                rootHandle = folderRootHandle,
+                rootHandle = NodeId(folderRootHandle),
                 type = folderType,
                 userAgent = folderUserAgent,
                 localFolderPath = localPath
@@ -104,7 +105,7 @@ internal class DeviceFolderUINodeListMapperTest {
                 id = folderId,
                 name = folderName,
                 status = folderStatus,
-                rootHandle = folderRootHandle,
+                rootHandle = NodeId(folderRootHandle),
                 type = folderType,
                 userAgent = folderUserAgent,
                 localFolderPath = localPath
@@ -116,21 +117,16 @@ internal class DeviceFolderUINodeListMapperTest {
         whenever(deviceCenterUINodeStatusMapper(folderStatus)).thenReturn(expectedUINodeStatus)
         whenever(deviceFolderUINodeIconMapper(folderType)).thenReturn(expectedFolderUINodeIcon)
 
-        val expectedList =
-            if (folderType in BackupInfoType.CAMERA_UPLOADS..BackupInfoType.MEDIA_UPLOADS) {
-                emptyList()
-            } else {
-                listOf(
-                    NonBackupDeviceFolderUINode(
-                        id = folderId,
-                        name = folderName,
-                        icon = expectedFolderUINodeIcon,
-                        status = expectedUINodeStatus,
-                        rootHandle = folderRootHandle,
-                        localFolderPath = localPath
-                    )
-                )
-            }
+        val expectedList = listOf(
+            NonBackupDeviceFolderUINode(
+                id = folderId,
+                name = folderName,
+                icon = expectedFolderUINodeIcon,
+                status = expectedUINodeStatus,
+                rootHandle = folderRootHandle,
+                localFolderPath = localPath
+            )
+        )
 
         assertThat(
             underTest(

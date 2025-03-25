@@ -31,6 +31,7 @@ import mega.privacy.android.app.presentation.imagepreview.fetcher.FolderLinkMedi
 import mega.privacy.android.app.presentation.imagepreview.model.ImagePreviewFetcherSource
 import mega.privacy.android.app.presentation.imagepreview.model.ImagePreviewMenuSource
 import mega.privacy.android.app.presentation.photos.mediadiscovery.view.MediaDiscoveryScreen
+import mega.privacy.android.app.presentation.settings.model.StorageTargetPreference
 import mega.privacy.android.app.utils.AlertDialogUtil
 import mega.privacy.android.app.utils.Constants.FOLDER_LINK_ADAPTER
 import mega.privacy.android.app.utils.MegaProgressDialogUtil
@@ -40,7 +41,7 @@ import mega.privacy.android.domain.entity.node.NodeId
 import mega.privacy.android.domain.entity.photos.Photo
 import mega.privacy.android.domain.usecase.GetThemeMode
 import mega.privacy.android.navigation.MegaNavigator
-import mega.privacy.android.shared.original.core.ui.theme.OriginalTempTheme
+import mega.privacy.android.shared.original.core.ui.theme.OriginalTheme
 import timber.log.Timber
 import java.io.File
 import javax.inject.Inject
@@ -87,7 +88,7 @@ class MediaDiscoveryActivity : BaseActivity(), PermissionRequester, SnackbarShow
         checkLoginStatus()
         setContent {
             val themeMode by getThemeMode().collectAsStateWithLifecycle(initialValue = ThemeMode.System)
-            OriginalTempTheme(isDark = themeMode.isDarkMode()) {
+            OriginalTheme(isDark = themeMode.isDarkMode()) {
                 MediaDiscoveryScreen(
                     mediaDiscoveryGlobalStateViewModel = mediaDiscoveryGlobalStateViewModel,
                     viewModel = mediaDiscoveryViewModel,
@@ -96,6 +97,12 @@ class MediaDiscoveryActivity : BaseActivity(), PermissionRequester, SnackbarShow
                     onPhotoClicked = this::onClick,
                     onPhotoLongPressed = this::onLongPress,
                     onImportClicked = this::importNode,
+                    navigateToStorageSettings = {
+                        megaNavigator.openSettings(
+                            this,
+                            StorageTargetPreference
+                        )
+                    }
                 )
             }
         }

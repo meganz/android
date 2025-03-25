@@ -23,6 +23,11 @@ interface FolderNode : UnTypedNode {
     val isPendingShare: Boolean
 
     /**
+     * Is the remote folder of a Sync
+     */
+    val isSynced: Boolean
+
+    /**
      * Device
      */
     val device: String?

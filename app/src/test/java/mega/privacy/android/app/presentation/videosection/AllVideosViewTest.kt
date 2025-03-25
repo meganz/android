@@ -60,6 +60,9 @@ class AllVideosViewTest {
         onMenuClick: (VideoUIEntity) -> Unit = { _ -> },
         onSortOrderClick: () -> Unit = {},
         onLongClick: ((item: VideoUIEntity, index: Int) -> Unit) = { _, _ -> },
+        addToPlaylistsTitles: List<String>? = null,
+        clearAddToPlaylistsTitles: () -> Unit = {},
+        retryActionCallback: () -> Unit = {},
     ) {
         composeTestRule.setContent {
             AllVideosView(
@@ -78,7 +81,10 @@ class AllVideosViewTest {
                 onClick = onClick,
                 onMenuClick = onMenuClick,
                 onSortOrderClick = onSortOrderClick,
-                onLongClick = onLongClick
+                onLongClick = onLongClick,
+                addToPlaylistsTitles = addToPlaylistsTitles,
+                clearAddToPlaylistsTitles = clearAddToPlaylistsTitles,
+                retryActionCallback = retryActionCallback
             )
         }
     }

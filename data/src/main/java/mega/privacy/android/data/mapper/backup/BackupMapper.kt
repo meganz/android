@@ -2,6 +2,7 @@ package mega.privacy.android.data.mapper.backup
 
 import mega.privacy.android.domain.entity.BackupState
 import mega.privacy.android.domain.entity.backup.Backup
+import mega.privacy.android.domain.entity.node.NodeId
 import nz.mega.sdk.MegaRequest
 import javax.inject.Inject
 
@@ -20,7 +21,7 @@ internal class BackupMapper @Inject constructor() {
         Backup(
             backupId = parentHandle,
             backupType = totalBytes.toInt(),
-            targetNode = nodeHandle,
+            targetNode = NodeId(nodeHandle),
             localFolder = file,
             backupName = name,
             state = BackupState.fromValue(access),

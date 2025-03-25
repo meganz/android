@@ -140,11 +140,11 @@ LIBWEBSOCKETS_SOURCE_FOLDER=libwebsockets-${LIBWEBSOCKETS_VERSION}
 LIBWEBSOCKETS_DOWNLOAD_URL=https://github.com/warmcat/libwebsockets/archive/refs/heads/v${LIBWEBSOCKETS_VERSION}.zip
 
 PDFVIEWER=pdfviewer
-PDFVIEWER_VERSION=1.9.0
+PDFVIEWER_VERSION=1.9.1
 PDFVIEWER_SOURCE_FILE=PdfiumAndroid-pdfium-android-${PDFVIEWER_VERSION}.zip
 PDFVIEWER_SOURCE_FOLDER=PdfiumAndroid-pdfium-android-${PDFVIEWER_VERSION}
-PDFVIEWER_DOWNLOAD_URL=https://github.com/barteksc/PdfiumAndroid/archive/pdfium-android-${PDFVIEWER_VERSION}.zip
-PDFVIEWER_SHA1="9c346de2fcf328c65c7047f03357a049dc55b403"
+PDFVIEWER_DOWNLOAD_URL=https://github.com/meganz/PdfiumAndroid/archive/refs/tags/pdfium-android-${PDFVIEWER_VERSION}.zip
+PDFVIEWER_SHA1="5e7faf2169749da6609d12e9870b2d89fd8306fa"
 
 ICU=icu
 ICU_VERSION=71_1
@@ -154,9 +154,9 @@ ICU_DOWNLOAD_URL=https://github.com/unicode-org/icu/releases/download/release-71
 ICU_SHA1="0b6a02293a81ccfb2a743ce1faa009770ed8a12c"
 ICU_SOURCE_VERSION=icuSource-${ICU_VERSION}
 
-WEBRTC_DOWNLOAD_URL=https://mega.nz/file/F0YThaQR#FgoSW-XuxwHVr-9SNmVcP_JWG8B0Q6ogT9By3fEiEDc
+WEBRTC_DOWNLOAD_URL=https://mega.nz/file/N2k2XRaA#bS9iudrjiULmMaGbBKErsYosELbnU22b8Zj213Ti1nE
 # Expected SHA1 checksum of "megachat/webrtc/libwebrtc_arm64.a" in downloaded WebRTC library
-WEBRTC_SHA1=a82c138885bfbc6e9c2eb08c6b314ae196a7673f
+WEBRTC_SHA1=c4442ce8bf7567d3980e14941a313311cf0483cb
 
 function setupEnv()
 {
@@ -473,7 +473,7 @@ if [ ! -f ${LIBUV}/${LIBUV_SOURCE_FILE}.ready ]; then
 
         pushd ${LIBUV}/${LIBUV} &>> ${LOG_FILE}
         ./autogen.sh &>> ${LOG_FILE}
-        ./configure --host "${TARGET_HOST}" --with-pic --disable-shared --prefix="${BASE_PATH}/${LIBUV}/${LIBUV}"/libuv-android-${ABI} &>> ${LOG_FILE}
+        LDFLAGS+="-Wl,-z,max-page-size=16384" ./configure --host "${TARGET_HOST}" --with-pic --disable-shared --prefix="${BASE_PATH}/${LIBUV}/${LIBUV}"/libuv-android-${ABI} &>> ${LOG_FILE}
         make clean &>> ${LOG_FILE}
         make -j${JOBS} &>> ${LOG_FILE}
         make install &>> ${LOG_FILE}
@@ -562,7 +562,7 @@ if [ ! -f ${CURL}/${CURL_SOURCE_FILE}.ready ]; then
         fi
 
         pushd ${CURL}/ares &>> ${LOG_FILE}
-        ./configure --host "${TARGET_HOST}" --with-pic --disable-shared --prefix="${BASE_PATH}/${CURL}"/ares/ares-android-${ABI} &>> ${LOG_FILE}
+        LDFLAGS+="-Wl,-z,max-page-size=16384" ./configure --host "${TARGET_HOST}" --with-pic --disable-shared --prefix="${BASE_PATH}/${CURL}"/ares/ares-android-${ABI} &>> ${LOG_FILE}
         make clean &>> ${LOG_FILE}
         make -j${JOBS} &>> ${LOG_FILE}
         make install &>> ${LOG_FILE}
@@ -576,7 +576,7 @@ if [ ! -f ${CURL}/${CURL_SOURCE_FILE}.ready ]; then
         ln -s ${BASE_PATH}/megachat/webrtc/libwebrtc_${WEBRTC_SUFFIX}.a boringssl/lib/libssl.a
 
         LIBS=-lc++ ./configure --host "${TARGET_HOST}" --with-pic --disable-shared --prefix="${BASE_PATH}/${CURL}/${CURL}"/curl-android-${ABI} --with-ssl="${PWD}"/boringssl/ \
-        --disable-ares --enable-threaded-resolver ${CURL_EXTRA} &>> ${LOG_FILE}
+          --disable-ares --enable-threaded-resolver ${CURL_EXTRA} &>> ${LOG_FILE}
         make clean &>> ${LOG_FILE}
         make -j${JOBS} &>> ${LOG_FILE}
         make install &>> ${LOG_FILE}
@@ -663,7 +663,7 @@ if [ ! -f ${ICU}/${ICU_SOURCE_FILE}.ready ]; then
 
     mkdir -p linux && cd linux
 
-    CONFIGURE_LINUX_OPTIONS="--enable-static --enable-shared=no --enable-extras=no --enable-strict=no --enable-icuio=no --enable-layout=no --enable-layoutex=no --enable-tools=yes --enable-tests=no --enable-samples=no --enable-dyload=no"
+    LDFLAGS+="-Wl,-z,max-page-size=16384" CONFIGURE_LINUX_OPTIONS="--enable-static --enable-shared=no --enable-extras=no --enable-strict=no --enable-icuio=no --enable-layout=no --enable-layoutex=no --enable-tools=yes --enable-tests=no --enable-samples=no --enable-dyload=no"
     ../source/runConfigureICU Linux CFLAGS="-Os" CXXFLAGS="--std=c++11" ${CONFIGURE_LINUX_OPTIONS} &>> ${LOG_FILE}
 
     make -j${JOBS} &>> ${LOG_FILE}
@@ -699,7 +699,7 @@ if [ ! -f ${ICU}/${ICU_SOURCE_FILE}.ready ]; then
         export PATH=$ANDROID_TOOLCHAIN/bin:$PATH
 
         rm -rf ${ANDROID_TOOLCHAIN} &>> ${LOG_FILE}
-        $NDK_ROOT/build/tools/make-standalone-toolchain.sh --arch=${ARCH} --platform=${APP_PLATFORM} --install-dir=${ANDROID_TOOLCHAIN} &>> ${LOG_FILE}
+        $NDK_ROOT/build/tools/make_standalone_toolchain.py --arch=${ARCH} --api=${API_LEVEL} --install-dir=${ANDROID_TOOLCHAIN} &>> ${LOG_FILE}
 
         CONFIGURE_ANDROID_OPTIONS="--host=${HOST} --enable-static --enable-shared=no --enable-extras=no --enable-strict=no --enable-icuio=no --enable-layout=no --enable-layoutex=no --enable-tools=no --enable-tests=no --enable-samples=no --enable-dyload=no -with-cross-build=$CROSS_BUILD_DIR"
 
@@ -721,28 +721,28 @@ rm -rf ../tmpLibs
 mkdir ../tmpLibs
 if [ -n "`echo ${BUILD_ARCHS} | grep -w x86`" ]; then
     echo "* Running ndk-build x86"
-    ${NDK_BUILD} NDK_LIBS_OUT=${TARGET_LIB_DIR} -j${JOBS} APP_ABI=x86 &>> ${LOG_FILE}
+    ${NDK_BUILD} V=1 NDK_LIBS_OUT=${TARGET_LIB_DIR} -j${JOBS} APP_ABI=x86 &>> ${LOG_FILE}
     mv ${TARGET_LIB_DIR}/x86 ../tmpLibs/
     echo "* ndk-build finished for x86"
 fi
 
 if [ -n "`echo ${BUILD_ARCHS} | grep -w armeabi-v7a`" ]; then
     echo "* Running ndk-build arm 32bits"
-    ${NDK_BUILD} NDK_LIBS_OUT=${TARGET_LIB_DIR} -j${JOBS} APP_ABI=armeabi-v7a &>> ${LOG_FILE}
+    ${NDK_BUILD} V=1 NDK_LIBS_OUT=${TARGET_LIB_DIR} -j${JOBS} APP_ABI=armeabi-v7a &>> ${LOG_FILE}
     mv ${TARGET_LIB_DIR}/armeabi-v7a ../tmpLibs/
     echo "* ndk-build finished for arm 32bits"
 fi
 
 if [ -n "`echo ${BUILD_ARCHS} | grep -w x86_64`" ]; then
     echo "* Running ndk-build x86_64"
-    ${NDK_BUILD} NDK_LIBS_OUT=${TARGET_LIB_DIR} -j${JOBS} APP_ABI=x86_64 &>> ${LOG_FILE}
+    ${NDK_BUILD} V=1 NDK_LIBS_OUT=${TARGET_LIB_DIR} -j${JOBS} APP_ABI=x86_64 &>> ${LOG_FILE}
     mv ${TARGET_LIB_DIR}/x86_64 ../tmpLibs/
     echo "* ndk-build finished for x86_64"
 fi
 
 if [ -n "`echo ${BUILD_ARCHS} | grep -w arm64-v8a`" ]; then
     echo "* Running ndk-build arm 64bits"
-    ${NDK_BUILD} NDK_LIBS_OUT=${TARGET_LIB_DIR} -j${JOBS} APP_ABI=arm64-v8a &>> ${LOG_FILE}
+    ${NDK_BUILD} V=1 NDK_LIBS_OUT=${TARGET_LIB_DIR} -j${JOBS} APP_ABI=arm64-v8a &>> ${LOG_FILE}
     echo "* ndk-build finished for arm 64bits"
     mv ${TARGET_LIB_DIR}/arm64-v8a ../tmpLibs/
 fi

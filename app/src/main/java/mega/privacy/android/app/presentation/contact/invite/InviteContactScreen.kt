@@ -13,7 +13,6 @@ import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.horizontalScroll
-import androidx.compose.foundation.interaction.MutableInteractionSource
 import androidx.compose.foundation.isSystemInDarkTheme
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
@@ -114,20 +113,21 @@ import mega.privacy.android.shared.original.core.ui.controls.progressindicator.M
 import mega.privacy.android.shared.original.core.ui.controls.text.LongTextBehaviour
 import mega.privacy.android.shared.original.core.ui.controls.text.MegaSpannedText
 import mega.privacy.android.shared.original.core.ui.controls.text.MegaText
+import mega.privacy.android.shared.original.core.ui.controls.buttons.LinkButton
 import mega.privacy.android.shared.original.core.ui.controls.textfields.GenericTextField
 import mega.privacy.android.shared.original.core.ui.model.MegaSpanStyle
 import mega.privacy.android.shared.original.core.ui.model.SpanIndicator
 import mega.privacy.android.shared.original.core.ui.preview.CombinedTextAndThemePreviews
-import mega.privacy.android.shared.original.core.ui.theme.OriginalTempTheme
-import mega.privacy.android.shared.original.core.ui.theme.values.TextColor
+import mega.privacy.android.shared.original.core.ui.theme.OriginalTheme
+import mega.android.core.ui.theme.values.TextColor
 import mega.privacy.android.shared.original.core.ui.utils.rememberPermissionState
 import mega.privacy.android.shared.original.core.ui.utils.showAutoDurationSnackbar
 import mega.privacy.mobile.analytics.event.InviteContactsButtonPressedEvent
 import mega.privacy.mobile.analytics.event.ScanQRCodeButtonPressedEvent
 import timber.log.Timber
-import mega.privacy.android.icon.pack.R as IconPackR
 import mega.privacy.android.icon.pack.R as iconPackR
 import mega.privacy.android.shared.resources.R as sharedR
+import androidx.compose.ui.text.SpanStyle
 
 @OptIn(ExperimentalComposeUiApi::class)
 @Composable
@@ -460,24 +460,15 @@ internal fun InviteContactScreen(
 
             Divider()
 
-            MegaText(
+            LinkButton(
+                onClick = onScanQRCodeClick,
                 modifier = Modifier
                     .fillMaxWidth()
                     .height(56.dp)
-                    .clickable(
-                        interactionSource = remember { MutableInteractionSource() },
-                        indication = null,
-                        onClick = onScanQRCodeClick
-                    )
                     .padding(start = 16.dp)
                     .wrapContentHeight()
                     .testTag(SCAN_QR_CODE_TEXT_TAG),
                 text = stringResource(id = R.string.menu_item_scan_code),
-                textColor = TextColor.Accent,
-                style = MaterialTheme.typography.subtitle2.copy(
-                    fontWeight = FontWeight.W600,
-                    fontSize = 14.sp
-                ),
             )
 
             Divider()
@@ -582,7 +573,7 @@ private fun ContactChipBar(
                     .padding(start = 10.dp)
                     .testTag(SELECTED_CONTACT_CHIP_TAG + it.getContactName()),
                 style = TransparentChipStyle,
-                trailingIcon = IconPackR.drawable.ic_x_circle_medium_regular_solid
+                trailingIcon = iconPackR.drawable.ic_x_circle_medium_regular_solid
             ) { onClick(it) }
         }
     }
@@ -628,17 +619,14 @@ private fun EmptyContactResultBody(
     ) {
         EmptyContactsImage(isDarkMode)
 
+        val emptySpan = MegaSpanStyle(spanStyle = SpanStyle())
         MegaSpannedText(
             modifier = Modifier.testTag(NO_CONTACTS_TEXT_TAG),
             value = stringResource(id = R.string.context_empty_contacts),
-            baseStyle = MaterialTheme.typography.body2,
+            baseStyle = MaterialTheme.typography.subtitle2,
             styles = mapOf(
-                SpanIndicator('A') to MegaSpanStyle(
-                    color = TextColor.Primary
-                ),
-                SpanIndicator('B') to MegaSpanStyle(
-                    color = TextColor.Disabled
-                )
+                SpanIndicator('A') to emptySpan,
+                SpanIndicator('B') to emptySpan,
             ),
             color = TextColor.Disabled
         )
@@ -804,7 +792,7 @@ private fun ContactsPermissionDeniedBody(
                 modifier = Modifier
                     .padding(vertical = 10.dp)
                     .size(120.dp),
-                painter = painterResource(id = if (isDarkMode) mega.privacy.android.icon.pack.R.drawable.ic_empty_user_dark else mega.privacy.android.icon.pack.R.drawable.ic_empty_user),
+                painter = painterResource(id = iconPackR.drawable.ic_user_glass),
                 contentDescription = "Empty contacts image",
             )
         }
@@ -892,7 +880,7 @@ private fun invitePhoneContacts(
 @CombinedTextAndThemePreviews
 @Composable
 private fun InviteContactScreenWithoutSelectedContactsPreview() {
-    OriginalTempTheme(isDark = isSystemInDarkTheme()) {
+    OriginalTheme(isDark = isSystemInDarkTheme()) {
         InviteContactScreen(
             uiState = InviteContactUiState(),
             isDarkMode = isSystemInDarkTheme(),
@@ -914,7 +902,7 @@ private fun InviteContactScreenWithoutSelectedContactsPreview() {
 @CombinedTextAndThemePreviews
 @Composable
 private fun InviteContactScreenWithSelectedContactsPreview() {
-    OriginalTempTheme(isDark = isSystemInDarkTheme()) {
+    OriginalTheme(isDark = isSystemInDarkTheme()) {
         InviteContactScreen(
             uiState = InviteContactUiState(
                 areContactsInitialized = true,

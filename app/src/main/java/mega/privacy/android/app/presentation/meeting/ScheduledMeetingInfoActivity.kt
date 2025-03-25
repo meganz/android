@@ -71,7 +71,7 @@ import mega.privacy.android.domain.entity.ThemeMode
 import mega.privacy.android.domain.entity.chat.ChatParticipant
 import mega.privacy.android.domain.usecase.GetThemeMode
 import mega.privacy.android.navigation.MegaNavigator
-import mega.privacy.android.shared.original.core.ui.theme.OriginalTempTheme
+import mega.privacy.android.shared.original.core.ui.theme.OriginalTheme
 import mega.privacy.mobile.analytics.event.MeetingInfoAddParticipantButtonTappedEvent
 import mega.privacy.mobile.analytics.event.MeetingInfoLeaveMeetingButtonTappedEvent
 import mega.privacy.mobile.analytics.event.ScheduledMeetingEditMenuToolbarEvent
@@ -101,9 +101,6 @@ class ScheduledMeetingInfoActivity : PasscodeActivity(), SnackbarShower {
      */
     @Inject
     lateinit var navigator: MegaNavigator
-
-    @Inject
-    lateinit var passCodeFacade: PasscodeCheck
 
     @Inject
     lateinit var getThemeMode: GetThemeMode
@@ -163,7 +160,7 @@ class ScheduledMeetingInfoActivity : PasscodeActivity(), SnackbarShower {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         enableEdgeToEdge()
-
+        appContainerWrapper.setPasscodeCheck(passcodeFacade)
         collectFlows()
 
         val chatId = intent.getLongExtra(CHAT_ID, -1L)
@@ -500,7 +497,7 @@ class ScheduledMeetingInfoActivity : PasscodeActivity(), SnackbarShower {
     private fun launchCallScreen() {
         val chatId = waitingRoomManagementViewModel.state.value.chatId
         MegaApplication.getInstance().openCallService(chatId)
-        passcodeManagement.showPasscodeScreen = true
+        passcodeFacade.enablePassCode()
 
         val intent = Intent(this@ScheduledMeetingInfoActivity, MeetingActivity::class.java).apply {
             addFlags(Intent.FLAG_ACTIVITY_NEW_TASK)
@@ -548,7 +545,7 @@ class ScheduledMeetingInfoActivity : PasscodeActivity(), SnackbarShower {
             }
         }
 
-        OriginalTempTheme(isDark = isDark) {
+        OriginalTheme(isDark = isDark) {
             MeetingLinkBottomSheet(
                 modalSheetState = modalSheetState,
                 coroutineScope = coroutineScope,

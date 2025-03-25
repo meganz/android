@@ -2,12 +2,12 @@
 anko = "0.10.8"
 bannerviewpager = "3.4.0"
 billing-client = "6.2.0"
-coil = "2.5.0"
+coil = "2.7.0"
 coroutines = "1.8.0"
 fresco = "3.4.0"
 javax = "1"
-kotlin = "1.9.24"
-kotlin-ktx = "1.12.0"
+kotlin = "2.0.0"
+kotlin-ktx = "1.15.0"
 logging-logback = "2.0.0"
 logging-slf4j = "1.7.36"
 logging-timber = "5.0.1"
@@ -18,13 +18,14 @@ kotlinpoet = "1.14.2"
 xray = "1.0"
 nocturn = "1.0"
 karma = "1.3"
-sqlcipher = "4.5.4"
-kotlin-serialisation = "1.6.3"
+kotlin-serialisation = "1.7.3"
 eclipse-jgit = "6.6.0.202305301015-r"
 json = "20240303"
-zoomable-image-coil = "0.13.0"
-mega-core-ui = "2.10.20240531102524"
+mega-telephoto = "1.0.0"
+telephoto = "0.14.0"
+mega-core-ui = "2.98.20250225041804"
 kotlinx-collections-immutable = "0.3.7"
+commonmark-java = "0.24.0"
 
 [libraries]
 bannerviewpager = { module = "com.github.zhpanvip:BannerViewPager", version.ref = "bannerviewpager" }
@@ -39,7 +40,6 @@ coil-compose = { module = "io.coil-kt:coil-compose", version.ref = "coil" }
 coroutines-android = { module = "org.jetbrains.kotlinx:kotlinx-coroutines-android", version.ref = "coroutines" }
 coroutines-core = { module = "org.jetbrains.kotlinx:kotlinx-coroutines-core", version.ref = "coroutines" }
 coroutines-test = { module = "org.jetbrains.kotlinx:kotlinx-coroutines-test", version.ref = "coroutines" }
-documentscanner = 'com.github.meganz.AndroidDocumentScanner:documentscanner:2.0.14'
 facebook-inferannotation = "com.facebook.infer.annotation:infer-annotation:0.18.0"
 fresco = { module = "com.facebook.fresco:fresco", version.ref = "fresco" }
 fresco-gif = { module = "com.facebook.fresco:animated-gif", version.ref = "fresco" }
@@ -61,7 +61,7 @@ shimmerlayout = 'io.supercharge:shimmerlayout:2.1.0'
 simplestorage = { module = "com.anggrayudi:storage", version.ref = "simplestorage" }
 vdurmont-emoji = 'com.vdurmont:emoji-java:4.0.0'
 compose-state-events = { module = "com.github.leonard-palm:compose-state-events", version.ref = "compose-state-events" }
-mega-analytics = "mega.privacy.mobile:analytics-events-android:20241111.105825"
+mega-analytics = "mega.privacy.mobile:analytics-events-android:20250226.132012"
 kotlinpoet = { module = "com.squareup:kotlinpoet", version.ref = "kotlinpoet" }
 balloon = "com.github.skydoves:balloon-compose:1.6.4"
 xray = { module = "mega.privacy.android.xray:xray", version.ref = "xray" }
@@ -69,15 +69,19 @@ nocturn = { module = "mega.privacy.android.nocturn:nocturn", version.ref = "noct
 karma-annotation = { module = "com.mega.karma:annotation", version.ref = "karma" }
 karma-compiler = { module = "com.mega.karma:compiler", version.ref = "karma" }
 karma-core = { module = "com.mega.karma:core", version.ref = "karma" }
-sqlcipher = { module = "net.zetetic:android-database-sqlcipher", version.ref = "sqlcipher" }
 kotlin-serialisation = { module = "org.jetbrains.kotlinx:kotlinx-serialization-json", version.ref = "kotlin-serialisation"}
 eclipse-jgit = { module = "org.eclipse.jgit:org.eclipse.jgit", version.ref = "eclipse-jgit"}
 eclipse-jgit-ssh-jsch = { module = "org.eclipse.jgit:org.eclipse.jgit.ssh.jsch", version.ref = "eclipse-jgit"}
 json = { module = "org.json:json", version.ref = "json"}
-zoomable-image-coil = { module = "me.saket.telephoto:zoomable-image-coil", version.ref = "zoomable-image-coil" }
+zoomable-telephoto = { module = "me.saket.telephoto.mega:zoomable", version.ref = "mega-telephoto" }
+zoomable-image-coil = { module = "me.saket.telephoto.mega:zoomable-image-coil", version.ref = "mega-telephoto" }
+zoomable-image-core = { module = "me.saket.telephoto.mega:zoomable-image-core", version.ref = "mega-telephoto" }
+zoomable-image-subsampling-image = { module = "me.saket.telephoto.mega:zoomable-image-sub-sampling-image", version.ref = "mega-telephoto" }
+telephoto-flick = { module = "me.saket.telephoto:flick", version.ref = "telephoto" }
 mega-core-ui = { group = "mega.android.core", name  = "ui", version.ref = "mega-core-ui" }
 mega-core-ui-tokens = { group = "mega.android.core", name  = "ui-tokens", version.ref = "mega-core-ui"}
 kotlinx-collections-immutable = { group = "org.jetbrains.kotlinx", name = "kotlinx-collections-immutable", version.ref = "kotlinx-collections-immutable" }
+commonmark-java = {module = "org.commonmark:commonmark", version.ref = "commonmark-java"}
 
 [bundles]
 fresco = ["fresco", "fresco-gif", "fresco-webp", "fresco-webpsupport"]

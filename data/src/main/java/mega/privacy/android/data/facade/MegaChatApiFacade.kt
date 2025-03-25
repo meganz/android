@@ -209,7 +209,7 @@ internal class MegaChatApiFacade @Inject constructor(
 
     override fun createChat(
         isGroup: Boolean,
-        peers: MegaChatPeerList,
+        peers: MegaChatPeerList?,
         listener: MegaChatRequestListenerInterface,
     ) = chatApi.createChat(isGroup, peers, listener)
 
@@ -256,6 +256,9 @@ internal class MegaChatApiFacade @Inject constructor(
 
     override fun getChatRooms(): List<MegaChatRoom> =
         chatApi.chatRooms
+
+    override fun getNoteToSelfChat(): MegaChatRoom? =
+        chatApi.getChatRoomsByType(MegaChatApi.CHAT_TYPE_SELF).getOrNull(0)
 
     override fun getMeetingChatRooms(): List<MegaChatRoom>? =
         chatApi.getChatRoomsByType(MegaChatApi.CHAT_TYPE_MEETING_ROOM)
@@ -925,5 +928,13 @@ internal class MegaChatApiFacade @Inject constructor(
         listener: MegaChatRequestListenerInterface,
     ) {
         chatApi.createMeeting(title, speakRequest, waitingRoom, openInvite, listener)
+    }
+
+    override suspend fun setUserTyping(chatId: Long) {
+        chatApi.sendTypingNotification(chatId)
+    }
+
+    override suspend fun setUserStoppedTyping(chatId: Long) {
+        chatApi.sendStopTypingNotification(chatId)
     }
 }

@@ -45,11 +45,11 @@ import mega.privacy.android.shared.original.core.ui.controls.chat.messages.react
 import mega.privacy.android.shared.original.core.ui.controls.chat.messages.reaction.reactionsList
 import mega.privacy.android.shared.original.core.ui.controls.text.MegaText
 import mega.privacy.android.shared.original.core.ui.preview.CombinedThemePreviews
-import mega.privacy.android.shared.original.core.ui.theme.OriginalTempTheme
+import mega.privacy.android.shared.original.core.ui.theme.OriginalTheme
 import mega.privacy.android.shared.original.core.ui.theme.MegaOriginalTheme
 import mega.privacy.android.shared.original.core.ui.theme.extensions.body4
 import mega.privacy.android.shared.original.core.ui.theme.extensions.conditional
-import mega.privacy.android.shared.original.core.ui.theme.values.TextColor
+import mega.android.core.ui.theme.values.TextColor
 
 internal const val TEST_TAG_FORWARD_ICON = "chat_message_container:forward_icon"
 
@@ -96,24 +96,7 @@ fun ChatMessageContainer(
                 )
             },
     ) {
-        if (avatarOrIcon != null) {
-            Box(
-                modifier = Modifier
-                    .width(40.dp)
-                    .height(24.dp)
-                    .align(if (isSelectMode) Alignment.Top else avatarAlignment),
-            ) {
-                if (isSelectMode) {
-                    MegaCheckbox(
-                        checked = isSelected,
-                        onCheckedChange = onSelectionChanged,
-                        modifier = Modifier.align(Alignment.Center)
-                    )
-                } else {
-                    avatarOrIcon(Modifier.align(Alignment.Center))
-                }
-            }
-        }
+
 
         Column(
             modifier = Modifier
@@ -121,36 +104,61 @@ fun ChatMessageContainer(
             verticalArrangement = Arrangement.spacedBy(2.dp),
         ) {
             Row(
-                horizontalArrangement = if (isMine) Arrangement.End else Arrangement.Start,
                 verticalAlignment = Alignment.CenterVertically,
                 modifier = Modifier
                     .fillMaxWidth()
-                    .padding(end = 16.dp),
             ) {
-                val forward: @Composable () -> Unit = {
-                    if (shouldDisplayForwardIcon(
-                            showForwardIcon,
-                            isSelectMode,
-                            isSendError
-                        )
+
+                if (avatarOrIcon != null) {
+                    Box(
+                        modifier = Modifier
+                            .width(avatarWidth)
+                            .height(24.dp)
+                            .align(if (isSelectMode) Alignment.Top else avatarAlignment),
                     ) {
-                        ForwardIcon(
-                            onForwardClicked,
-                            Modifier
-                                .align(Alignment.CenterVertically)
-                                .padding(start = 8.dp, end = 8.dp)
-                        )
+                        if (isSelectMode) {
+                            MegaCheckbox(
+                                checked = isSelected,
+                                onCheckedChange = onSelectionChanged,
+                                modifier = Modifier.align(Alignment.Center)
+                            )
+                        } else {
+                            avatarOrIcon(Modifier.align(Alignment.Center))
+                        }
                     }
                 }
-
-                if (isMine) {
-                    forward()
-                    content(!isSelectMode)
-                } else {
-                    Box(modifier = Modifier.weight(1f, false)) {
-                        content(!isSelectMode)
+                Row(
+                    horizontalArrangement = if (isMine) Arrangement.End else Arrangement.Start,
+                    verticalAlignment = Alignment.CenterVertically,
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .padding(end = 16.dp),
+                ) {
+                    val forward: @Composable () -> Unit = {
+                        if (shouldDisplayForwardIcon(
+                                showForwardIcon,
+                                isSelectMode,
+                                isSendError
+                            )
+                        ) {
+                            ForwardIcon(
+                                onForwardClicked,
+                                Modifier
+                                    .align(Alignment.CenterVertically)
+                                    .padding(start = 8.dp, end = 8.dp)
+                            )
+                        }
                     }
-                    forward()
+
+                    if (isMine) {
+                        forward()
+                        content(!isSelectMode)
+                    } else {
+                        Box(modifier = Modifier.weight(1f, false)) {
+                            content(!isSelectMode)
+                        }
+                        forward()
+                    }
                 }
             }
 
@@ -158,7 +166,7 @@ fun ChatMessageContainer(
                 Box(
                     modifier = Modifier
                         .fillMaxWidth()
-                        .padding(end = 16.dp),
+                        .padding(start = 40.dp, end = 16.dp),
                 ) {
                     if (isSendError) {
                         MegaText(
@@ -212,6 +220,11 @@ private fun ForwardIcon(
     )
 }
 
+/**
+ * Avatar with including paddings
+ */
+internal val avatarWidth = 40.dp
+
 @CombinedThemePreviews
 @Composable
 private fun Preview(
@@ -220,7 +233,7 @@ private fun Preview(
     var isSelected by remember {
         mutableStateOf(parameter.checked)
     }
-    OriginalTempTheme(isDark = isSystemInDarkTheme()) {
+    OriginalTheme(isDark = isSystemInDarkTheme()) {
         LazyColumn() {
             item {
                 ChatMessageContainer(

@@ -1,7 +1,5 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources xmlns:tools="http://schemas.android.com/tools" tools:ignore="ImpliedQuantity, ExtraTranslation, MissingTranslation">
-    <!-- The name of the Device or Folder Sub State when its code is NO_SYNC_ERROR -->
-    <string name="general_sync_no_error">Aucune erreur de synchronisation</string>
     <!-- The name of the Device or Folder Sub State when its code is UNSUPPORTED_FILE_SYSTEM -->
     <string name="general_sync_unsupported_file_system">MEGA ne peut ni synchroniser ni sauvegarder ce dossier, car le système de fichiers de votre appareil n’est pas pris en charge</string>
     <!-- The name of the Device or Folder Sub State when its code is INVALID_REMOTE_TYPE -->
@@ -18,8 +16,6 @@
     <string name="general_sync_account_expired">Impossible de synchroniser ou sauvegarder ce dossier, car votre abonnement est expiré</string>
     <!-- The name of the Device or Folder Sub State when its code is FOREIGN_TARGET_OVERSTORAGE -->
     <string name="general_sync_foreign_target_overshare">Le dossier ne peut pas être synchronisé, car la personne qui l’a partagé a dépassé sa limite d’espace de stockage</string>
-    <!-- The name of the Device or Folder Sub State when its code is REMOTE_PATH_HAS_CHANGED -->
-    <string name="general_sync_remote_path_has_changed">Impossible de trouver le dossier dans MEGA. Soit il a été déplacé, soit il a été supprimé, soit vous n’y avez pas accès</string>
     <!-- The name of the Device or Folder Sub State when its code is SHARE_NON_FULL_ACCESS -->
     <string name="general_sync_share_non_full_access">Impossible de synchroniser le dossier, car c’est un dossier partagé auquel vous n’avez pas l’accès total</string>
     <!-- The name of the Device or Folder Sub State when its code is PUT_NODES_ERROR -->
@@ -36,8 +32,6 @@
     <string name="general_sync_too_many_action_packets">Le compte a été rechargé. Toute mise à jour manquée de vos sauvegardes ou synchronisations n’a pas été appliquée.</string>
     <!-- The name of the Device or Folder Sub State when its code is LOGGED_OUT -->
     <string name="general_sync_logged_out">La synchronisation ou la sauvegarde a été arrêtée, car il semble que vous vous êtes déconnecté de l’appli pour ordinateur. Reconnectez-vous dans l’appli pour ordinateur et reprenez la synchronisation ou la sauvegarde.</string>
-    <!-- The name of the Device or Folder Sub State when its code is MISSING_PARENT_NODE -->
-    <string name="general_sync_missing_parent_node">N/A</string>
     <!-- The name of the Device or Folder Sub State when its code is BACKUP_SOURCE_NOT_BELOW_DRIVE -->
     <string name="general_sync_backup_source_not_below_drive">Impossible de trouver le fichier sur le lecteur externe.</string>
     <!-- The name of the Device or Folder Sub State when its code is ACTIVE_SYNC_SAME_PATH -->
@@ -58,16 +52,10 @@
     <string name="general_sync_unable_to_add_watch">Impossible d’ajouter une surveillance du système de fichier. Assurez-vous qu’il y a suffisamment d’espace et de mémoire libres et que vous avez accordé les droits pour l’emplacement du dossier.</string>
     <!-- The name of the Device or Folder Sub State when its code is UNABLE_TO_RETRIEVE_ROOT_FSID -->
     <string name="general_sync_unable_to_retrieve_root_fsid">Impossible de lire l’emplacement de la synchronisation. Vérifiez que l’emplacement est accessible et que les droits ont été accordés pour l’emplacement du dossier.</string>
-    <!-- The name of the Device or Folder Sub State when its code is UNABLE_TO_OPEN_DATABASE -->
-    <string name="general_sync_unable_to_open_database">Impossible d’ouvrir la base de données d’état du cache</string>
     <!-- The name of the Device or Folder Sub State when its code is INSUFFICIENT_DISK_SPACE -->
     <string name="general_sync_insufficient_disk_space">L’espace de stockage est insuffisant sur votre appareil</string>
-    <!-- The name of the Device or Folder Sub State when its code is FAILURE_ACCESSING_PERSISTENT_STORAGE -->
-    <string name="general_sync_failure_accessing_persistent_storage">Impossible de lire l’emplacement de la synchronisation. Vérifiez que l’emplacement est accessible et que les droits ont été accordés pour l’emplacement du dossier.</string>
     <!-- The name for specific Sub States to indicate that an unknown error occurred -->
     <string name="general_sync_message_unknown_error">Un erreur inconnue est survenue. Contactez support@mega.nz.</string>
-    <!-- The name for specific Sub States to indicate that something went wrong -->
-    <string name="general_sync_message_something_went_wrong">Un problème est survenu</string>
     <!-- The name for specific Sub States to indicate that the Node is in the Rubbish Bin -->
     <string name="general_sync_message_node_in_rubbish_bin">Le dossier ne peut ni être synchronisé ni sauvegardé, car le dossier MEGA est dans la Corbeille</string>
     <!-- The name for specific Sub States to indicate that the local drive cannot be located at this time -->
@@ -92,14 +80,6 @@
     <string name="dialog_onboarding_feature_title_backup_rewind">Ne plus jamais perdre de données</string>
     <!-- Description about Backup and Rewind features on Onboarding dialog (for user to choose account - Free or Pro).  -->
     <string name="dialog_onboarding_feature_description_backup_rewind">Retournez en arrière pour restaurer fichiers et dossiers à une date antérieure jusqu’à 180&#160;jours. Ainsi, vos données sont protégées contre les accidents et les manipulations, inviolables.</string>
-    <!-- Title for MEGA VPN feature on Onboarding dialog (for user to choose account - Free or Pro).  -->
-    <string name="dialog_onboarding_feature_title_vpn">MEGA&#160;VPN</string>
-    <!-- Description about MEGA VPN feature on Onboarding dialog (for user to choose account - Free or Pro).  -->
-    <string name="dialog_onboarding_feature_description_vpn">Protégez votre vie privée en ligne grâce à notre RPV à haut débit</string>
-    <!-- Title for chats and meetings feature on Onboarding dialog (for user to choose account - Free or Pro).  -->
-    <string name="dialog_onboarding_feature_title_chat">Appels et réunions sans restrictions</string>
-    <!-- Description about chats and meetings feature on Onboarding dialog (for user to choose account - Free or Pro).  -->
-    <string name="dialog_onboarding_feature_description_chat">Les réunions, les messages et les appels vidéo sont entièrement privés et protégés, avec un nombre illimité de participants.</string>
     <!-- Search drop down chips filter type file type -->
     <string name="search_dropdown_chip_filter_type_file_type">Type</string>
     <!-- Search drop down chips filter type file type images -->
@@ -137,7 +117,7 @@
     <!-- Search drop down chips filter type date modified older -->
     <string name="search_dropdown_chip_filter_type_date_older">Plus ancien</string>
     <!-- All videos tab title of the video section  -->
-    <string name="video_section_tab_title_all_videos">Vidéos</string>
+    <string name="video_section_tab_title_all_videos">Toutes les vidéos</string>
     <!-- Playlists tab title of the video section  -->
     <string name="video_section_tab_title_playlists">Listes de lecture</string>
     <!-- Location filter title of the video section  -->
@@ -262,10 +242,8 @@
         <item quantity="many">Partagez des liens</item>
         <item quantity="other">Partager des liens</item>
     </plurals>
-    <!-- Title of the dialog to ask the user to use the selected location as default location for next downloads-->
-    <string name="transfers_dialog_save_download_location_title">Télécharger vers cet emplacement ?</string>
-    <!-- Option to don't use the selected location as default location for next downloads-->
-    <string name="transfers_dialog_save_download_location_only_this_time_option">Cette fois seulement</string>
+    <!-- Title of the dialog to ask the user to use the selected location as default location for next downloads. Please do not modify the %s placeholder as it will be replaced by the name of the folder where the files will be downloaded-->
+    <string name="transfers_dialog_save_download_location_title">Enregistrer tous vos fichiers téléchargés dans&#160;«%1$s»&#160;?</string>
     <!-- Option to use the selected location as default location for next downloads-->
     <string name="transfers_dialog_save_download_location_always_here_option">Toujours télécharger ici</string>
     <!-- Option to don't use the selected location as default location for next downloads and don't ask again-->
@@ -288,8 +266,6 @@
     <string name="account_confirm_email_misspelled_email_description">Si une erreur s’est glissée dans votre adresse courriel, corrigez-la et touchez [A]Renvoyer[/A].</string>
     <!-- Title of the insufficient storage error banner -->
     <string name="sync_error_storage_over_quota_banner_title">La synchronisation est interrompue. Votre abonnement MEGA est à court d\’espace de stockage</string>
-    <!-- Title of the insufficient storage error action -->
-    <string name="sync_error_storage_over_quota_banner_action">Surclasser mon compte</string>
     <!-- The warning message shown when the User enables the Device Charging requirement in Settings Camera Uploads, enables Camera Uploads, begins uploading content and the Device is not charged -->
     <string name="camera_uploads_phone_not_charging_message">Le téléversement est en pause, car l’appareil n’est pas en charge</string>
     <!-- Label of the Device Status informing the user that Nothing is set up for the Current Device -->
@@ -306,10 +282,6 @@
     <string name="general_low_tier_plan_essential_label">MEGA&#160;Essential</string>
     <!-- The Body Text of a Settings Camera Uploads Option that decides whether or not the Device must be charged for Camera Uploads to start uploading content -->
     <string name="settings_camera_uploads_upload_only_while_charging_option_body">Les téléversements seront mis en pause jusqu’à ce votre appareil soit en charge. Les téléversements resteront en pause si le niveau de votre batterie est inférieur à 20&#160;%.</string>
-    <!-- Title of the synced folder list empty state -->
-    <string name="device_center_sync_list_empty_state_title">Aucune synchronisation n’est configurée</string>
-    <!-- Message of the synced folder list empty state -->
-    <string name="device_center_sync_list_empty_state_message">Synchronisez un dossier de votre appareil avec un dossier sur MEGA.</string>
     <!-- Label for the button or menu option to add a new sync -->
     <string name="device_center_sync_add_new_syn_button_option">Ajouter une nouvelle synchronisation</string>
     <!-- Text for the Sync solved issues chip -->
@@ -352,36 +324,8 @@
     <string name="cloud_drive_tour_fourth_subtitle">Les téléversements de lappareil photo sont une fonction essentielle de tout appareil mobile et nous avons ce qu\’il vous faut. Ouvrez un compte dès maintenant.</string>
     <!-- Fifth subtitle of the tour screen -->
     <string name="cloud_drive_tour_fifth_subtitle">Réunion vidéo chiffrée sans divulgation de connaissance.</string>
-    <!-- Titles of the tour screen to onboard users with the MEGA application -->
-    <string-array name="cloud_drive_tour_titles">
-        <item>@string/cloud_drive_tour_first_title</item>
-        <item>@string/cloud_drive_tour_second_title</item>
-        <item>@string/cloud_drive_tour_third_title</item>
-        <item>@string/cloud_drive_tour_fourth_title</item>
-        <item>@string/cloud_drive_tour_fifth_title</item>
-    </string-array>
-    <!-- Subtitles of the tour screen to onboard users with the MEGA application -->
-    <string-array name="cloud_drive_tour_subtitles">
-        <item>@string/cloud_drive_tour_first_subtitle</item>
-        <item>@string/cloud_drive_tour_second_subtitle</item>
-        <item>@string/cloud_drive_tour_third_subtitle</item>
-        <item>@string/cloud_drive_tour_fourth_subtitle</item>
-        <item>@string/cloud_drive_tour_fifth_subtitle</item>
-    </string-array>
     <!-- Title of the Raise to Hand Feature Introduction Tooltip -->
     <string name="meetings_raised_hand_tooltip_title">[A]Nouvelle fonction&#160;: lever la main[/A]</string>
-    <!-- Message of the synced folder list empty state for free accounts -->
-    <string name="device_center_sync_list_empty_state_message_free_account">Gardez vos données synchronisés et à jour en optant pour l’un de nos abonnements Pro.</string>
-    <!-- "Upgrade now" label for a button, menu entry, etc -->
-    <string name="general_upgrade_now_label">Surclasser le compte maintenant</string>
-    <!-- Title of the upgrade dialog displayed for free accounts when try to add a new sync -->
-    <string name="device_center_sync_upgrade_dialog_title">Souscrire un abonnement Pro</string>
-    <!-- Message of the upgrade dialog displayed for free accounts when try to add a new sync -->
-    <string name="device_center_sync_upgrade_dialog_message">Nos abonnements Pro libèrent la puissance de synchronisation de votre appareil mobile vers MEGA.</string>
-    <!-- Confirm button text of the upgrade dialog displayed for free accounts when try to add a new sync -->
-    <string name="device_center_sync_upgrade_dialog_confirm_button">Surclasser mon compte</string>
-    <!-- Cancel button text of the upgrade dialog displayed for free accounts when try to add a new sync -->
-    <string name="device_center_sync_upgrade_dialog_cancel_button">Pas maintenant</string>
     <!-- Title of the Warning Dialog shown when the new Local Primary or Secondary Folder is same as, a parent folder or sub-folder of the opposite Local Folder -->
     <string name="settings_camera_uploads_related_new_local_folder_warning_dialog_title">Conflit de dossiers de téléversement</string>
     <!-- Body of the Warning Dialog shown when the new Local Primary or Secondary Folder is same as, a parent folder or sub-folder of the opposite Local Folder -->
@@ -392,12 +336,6 @@
     <string name="general_no_picker_warning">Aucune appli n’est installée sur cet appareil pour sélectionner les dossiers</string>
     <!-- Description of feature, which will be available for user, if they buy plan. This feature means user will be able to sync folders. Keep the bullet point, as this string is part of the bullet point list. -->
     <string name="account_upgrade_account_description_feature_sync">&#8226;&#160;Synchronisez automatiquement les dossiers de votre appareil mobile</string>
-    <!-- The error dialog text displayed when user opens Android Sync while having previously established syncs -->
-    <string name="sync_error_dialog_free_user">Vos synchronisations ont été interrompues. La synchronisation est une fonction des abonnements Pro.</string>
-    <!-- The error dialog confirm action text -->
-    <string name="sync_error_dialog_free_user_confirm_action">Valider</string>
-    <!-- The error banner text displayed when user opens Android Sync while having previously established syncs -->
-    <string name="sync_error_banner_free_user">La synchronisation est interrompue, car votre abonnement MEGA Pro a été annulé. Pour que la synchronisation reprenne, surclassez votre compte.</string>
     <!-- Hidden items -->
     <string name="hidden_items">Éléments cachés</string>
     <!-- Label to indicate that is a Pro only feature -->
@@ -416,8 +354,6 @@
     <string name="add_tags_error_special_characters">Les étiquettes ne peuvent pas comporter d’espaces ni de symboles non alphanumériques. Les étiquettes écrites en majuscules seront affichées en minuscules.</string>
     <!-- error label for add tags page when tag count is maximum -->
     <string name="add_tags_error_max_tags">Le nombre maximal d’étiquettes est de %1$d</string>
-    <!-- error label for add tags page when tag character limit reached -->
-    <string name="add_tags_error_max_characters">Tags must be %1$d characters or less</string>
     <!-- title label for tags page -->
     <string name="add_tags_page_title_label">Étiquettes</string>
     <!-- The placeholder for read only files/folders with no description in info screen-->
@@ -426,8 +362,6 @@
     <string name="video_to_playlist_top_bar_title">Ajouter à la liste de lecture</string>
     <!-- Text of the create new playlist in the page that adds the video to the video playlist -->
     <string name="video_to_playlist_new_playlist_text">Nouvelle liste de lecture</string>
-    <!-- Text of the done button in the page that adds the video to the video playlist -->
-    <string name="video_to_playlist_done_button">Terminé</string>
     <!-- Title shown when cancelling the current plan, informing the user of features they'll miss out on -->
     <string name="account_cancel_account_screen_plan_miss_out_on_features">Vous ne profiterez pas des avantages suivants</string>
     <!-- Message shown when cancelling the plan, indicating that access to features will continue until the plan expires -->
@@ -440,8 +374,6 @@
     <string name="account_cancel_account_screen_plan_free_plan">Gratuit</string>
     <!-- Row label for storage feature in the comparison table -->
     <string name="account_cancel_account_screen_plan_storage">Espace de stockage</string>
-    <!-- Storage amount available in the free plan. %1s represents the amount of storage and the unit -->
-    <string name="account_cancel_account_screen_plan_free_storage">%1s</string>
     <!-- Row label for transfer feature in the comparison table -->
     <string name="account_cancel_account_screen_plan_transfer">Transferts</string>
     <!-- Transfer limit in the free plan -->
@@ -532,10 +464,6 @@
     <string name="account_cancellation_instructions_click_reactivate_subscription">6. Cliquez sur [A]Réactiver l’abonnement[/A].</string>
     <!-- Label for cancellation instructions on a mobile device -->
     <string name="account_cancellation_instructions_on_mobile_device">Sur un appareil mobile</string>
-    <!-- Step 1: instruction step no.1 to visit the MEGA website on the mobile device-->
-    <string name="account_cancellation_instructions_mobile_visit_website">1. Accédez à [A]www.mega.nz[/A] dans votre navigateur Web.</string>
-    <!-- Step 2: instruction step no.2 to Log in to MEGA account on the mobile device from the browser-->
-    <string name="account_cancellation_instructions_mobile_login_account">2. Connectez-vous à votre compte MEGA.</string>
     <!-- Step 3: instruction step no.3 Tap on the user avatar on the MEGA website from the mobile device-->
     <string name="account_cancellation_instructions_tap_avatar">3. Touchez votre avatar.</string>
     <!-- Step 4: instruction step no.4 Tap Cancel subscription on the account from the MEGA website from the mobile device-->
@@ -566,12 +494,6 @@
     <string name="transfers_scanning_folders_dialog_starting_transfers_title">Démarrage des transferts&#8230;</string>
     <!-- Transfers scanning folders dialog info to explain why the app shouldn't be closed -->
     <string name="transfers_scanning_folders_dialog_cancel_info_subtitle">Ne fermez pas l’appli. Si vous la fermez, les transferts qui ne sont pas encore dans la file d’attente seront perdus.</string>
-    <!-- Transfers scanning folders dialog sub-title when the app is scanning a single folder-->
-    <plurals name="transfers_scanning_folders_dialog_scanning_folder_subtitle">
-        <item quantity="one">1&#160;dossier et %1$d&#160;fichier ont été trouvés.</item>
-        <item quantity="many">1&#160;dossier et %1$d&#160;fichiers ont été trouvés.</item>
-        <item quantity="other">1&#160;dossier et %1$d&#160;fichiers ont été trouvés.</item>
-    </plurals>
     <!-- Transfers scanning folders dialog sub-title when the app is scanning multiple folders. This is the folders pluralization part to implement double pluralization in transfers_scanning_folders_dialog_scanning_files_and_folders_subtitle. Example: "134 folders". Example with double pluralization in transfers_scanning_folders_dialog_scanning_files_and_folders_subtitle: "Found 134 folders and 5689 files."-->
     <plurals name="transfers_scanning_folders_dialog_scanning_folders_subtitle">
         <item quantity="one">%1$d&#160;dossier</item>
@@ -590,8 +512,6 @@
     <string name="settings_sync_clear_debris_dialog_title">Nettoyer les débris ?</string>
     <!-- Body of the dialog shown when user clicks to clear debris from settings menu -->
     <string name="settings_sync_clear_debris_dialog_body">Les sauvegardes des versions précédentes de vos fichiers synchronisés seront irrémédiablement supprimées de votre appareil.\n\nParcourez le dossier .debris de votre appareil local pour décider si vous devez restaurer quelque chose.</string>
-    <!-- Cancel button of the dialog shown when user clicks to clear debris from settings menu -->
-    <string name="settings_sync_clear_debris_dialog_cancel">Annuler</string>
     <!-- Continue button of the dialog shown when user clicks to clear debris from settings menu -->
     <string name="settings_sync_clear_debris_dialog_continue">Poursuivre</string>
     <!-- Snackbar message shown when user clears debris from settings menu -->
@@ -602,8 +522,6 @@
         <item quantity="many">%1$s et %2$d de fichiers ont été trouvés</item>
         <item quantity="other">%1$s et %2$d&#160;fichiers ont été trouvés</item>
     </plurals>
-    <!-- Label for the file info information screen no tags label -->
-    <string name="file_info_information_no_tags_label">Aucune étiquette</string>
     <!-- Transfers scanning folders dialog title to inform that the transfers are being cancelled -->
     <string name="transfers_scanning_folders_dialog_cancel_cancelling_title">Annulation des transferts&#8230;</string>
     <!-- error warning message for report issue when not enough characters are typed and user tries to send report-->
@@ -690,16 +608,10 @@
     <string name="sync_promotion_bottom_sheet_whats_new_label">Nouveautés</string>
     <!-- Title of the bottom sheet to promote Sync feature -->
     <string name="sync_promotion_bottom_sheet_title">Synchronisation simple et automatique</string>
-    <!-- Body message of the bottom sheet to promote Sync feature -->
-    <string name="sync_promotion_bottom_sheet_body_message">Synchronisez un dossier sur votre appareil avec MEGA pour accéder à la version la plus récente de vos fichiers où que vous soyez</string>
     <!-- Text of the primary button of the bottom sheet to promote Sync feature for Pro users ("Sync folders") -->
     <string name="sync_promotion_bottom_sheet_primary_button_text_pro">Synchroniser les dossiers</string>
-    <!-- Text of the primary button of the bottom sheet to promote Sync feature for Free users ("Upgrade") -->
-    <string name="sync_promotion_bottom_sheet_primary_button_text_free">Effectuer une mise à niveau pour utiliser la synchronisation</string>
-    <!-- Text of the secondary button of the bottom sheet to promote Sync feature ("Learn more") -->
-    <string name="sync_promotion_bottom_sheet_secondary_button_text">En apprendre davantage</string>
-    <!-- Sync option dialog cancel button -->
-    <string name="settings_sync_option_cancel">Annuler</string>
+    <!-- Text of the secondary button of the bottom sheet to promote Sync feature ("Back up folders") -->
+    <string name="sync_promotion_bottom_sheet_secondary_button_text">Sauvegarder les dossiers</string>
     <!-- Snackbar message displayed when sync option is selected -->
     <string name="settings_sync_option_updated_message">Options de synchronisation mises à jour</string>
     <!-- Title of the Contact Permission Explanation -->
@@ -718,10 +630,6 @@
     <string name="device_center_add_sync_button_option">Ajouter une synchronisation</string>
     <!-- Label for the button or menu option to add a backup -->
     <string name="device_center_add_backup_button_option">Ajouter une sauvegarde</string>
-    <!-- Title of the upgrade dialog displayed for free accounts when try to add a new sync or backup -->
-    <string name="device_center_sync_backup_upgrade_dialog_title">Surclassez votre compte</string>
-    <!-- Message of the upgrade dialog displayed for free accounts when try to add a new sync or backup -->
-    <string name="device_center_sync_backup_upgrade_dialog_message">Libérez la puissance de la synchronisation et de la sauvegarde de votre appareil mobile sur le stockage cloud avec l\’un de nos forfaits premium</string>
     <!-- Title of the share meeting link bottom panel -->
     <string name="meetings_share_link_bottom_sheet_title">Réunion confirmée&#160;: invitez d\’autres personnes à y participer</string>
     <!-- Button text of the send meeting link to chat -->
@@ -758,8 +666,6 @@
     <string name="sync_backup_access_storage_permission_dialog_message">Pour sauvegarder vos fichiers, MEGA doit accéder aux fichiers et aux dossiers de votre appareil. Vos données sont toujours en sécurité chez nous.</string>
     <!-- Text for the warning banner displayed if try to create a new backup but storage permission has not been granted. The placeholders are to underline text -->
     <string name="sync_add_new_backup_storage_permission_banner">MEGA a besoin d\’accéder à l\’espace de stockage de votre appareil pour sauvegarder votre dossier local. [U] Toucher pour autoriser l\’accès [/U]</string>
-    <!--Success message displayed in the Login screen after the account has been activated-->
-    <string name="login_screen_account_confirmed_success_message">Votre compte a été activé. Veuillez vous connecter.</string>
     <!-- Title in the files permission screen -->
     <string name="files_permission_screen_title">Autorisez MEGA à accéder aux fichiers de votre appareil</string>
     <!-- Context message in the files permission screen -->
@@ -776,8 +682,6 @@
     <string name="sync_snackbar_message_confirm_sync_stopped">Synchronisation arrêtée</string>
     <!-- Title of the dialog to confirm stop a backup -->
     <string name="sync_stop_backup_confirm_dialog_title">Arrêter la sauvegarde</string>
-    <!-- Message of the dialog to confirm stop a backup -->
-    <string name="sync_stop_backup_confirm_dialog_message">Cela arrêtera le processus de synchronisation entre les deux dossiers. Une copie sera créée et enregistrée sur votre Disque nuagique.</string>
     <!-- Label for the button to stop a backup -->
     <string name="sync_stop_backup_button">Arrêter la sauvegarde</string>
     <!-- Snackbar message to indicate that backup has been stopped -->
@@ -792,10 +696,6 @@
     <string name="device_center_sync_backup_list_empty_state_title">Aucune connexion n\’est configurée</string>
     <!-- Message of the synced folder list empty state -->
     <string name="device_center_sync_backup_list_empty_state_message">Synchronisez ou sauvegardez un dossier sur votre appareil avec un dossier sur MEGA</string>
-    <!-- Message of the synced folder list empty state for free accounts -->
-    <string name="device_center_sync_backup_list_empty_state_message_free_account">Passez à un compte premium pour protéger et mettre à jour vos renseignements importants grâce à la synchronisation et à la sauvegarde</string>
-    <!-- Synced folder list empty state "See upgrade options" button label -->
-    <string name="device_center_sync_backup_see_upgrade_options_button_label">Voir les options de mise à niveau</string>
     <!-- subtitle of meeting title in schedule meeting for title disclaimer -->
     <string name="meetings_schedule_meeting_meeting_title_disclaimer">MEGA peut voir le nom et la description de votre réunion, mais nous les gardons privés</string>
     <!-- Capital letters. Text of the label of a new historic notifications-->
@@ -806,12 +706,10 @@
     <string name="display_over_other_apps_permission_screen_message">MEGA a besoin de votre autorisation pour s\’afficher sur les applis. Cela signifie que vous ne manquerez plus jamais une notification d\’appel entrant.</string>
     <!-- Positive action button when permission is not granted and it's required for some feature. Clicking it will redirect to settings screen of device -->
     <string name="general_allow_permission_positive_button">Accorder la permission</string>
-    <!-- Message displayed with progress percentage while the app is doing some background operation -->
-    <string name="login_completing_operation">Finalisation de l\’opération&#160;: %1$d%%</string>
     <!-- Title for a warning dialog informing the account is in storage over quota and cannot upload anything unless it is upgraded -->
     <string name="dialog_not_enough_space_to_upload_title">Espace insuffisant pour le téléversement de nouveaux fichiers</string>
     <!-- Message for a warning dialog informing the account is in storage over quota and cannot upload anything unless it is upgraded. Please do not remove the placeholders, it is for highlighting the text as a link. -->
-    <string name="dialog_not_enough_space_to_upload_message">Vous avez dépassé votre quota d\’espace de stockage. Passez à un abonnement plus important ou effacez de l\’espace pour le téléversement de nouveaux fichiers. [A]En apprendre davantage[/A].</string>
+    <string name="dialog_not_enough_space_to_upload_message">Vous avez dépassé votre quota d\’espace de stockage. Passez à un abonnement supérieur ou libérez de l\’espace pour le téléversement de nouveaux fichiers. [A]En apprendre davantage[/A].</string>
     <!-- Name for a general button which action is navigate to the "Upgrade" account -->
     <string name="general_upgrade_button">Abonnez-vous</string>
     <!-- Photos search welcome title -->
@@ -830,7 +728,256 @@
     <string name="album_add_to_media">Ajouter à</string>
     <!-- Add to album success message -->
     <plurals name="album_add_to_message">
-        <item quantity="one">Added to “%1$s”</item>
-        <item quantity="other">Added %2$d items to “%1$s”</item>
+        <item quantity="one">Ajouté à&#160;»%1$s»</item>
+        <item quantity="many">Ajouté %2$d éléments à&#160;»%1$s»</item>
+        <item quantity="other">Ajouté %2$d éléments à&#160;»%1$s»</item>
     </plurals>
+    <!-- Name for a general button which action is "Open" something -->
+    <string name="general_open_button">Ouvrir</string>
+    <!-- Bottom sheet option title for add the video to playlist from video section -->
+    <string name="video_section_bottom_sheet_option_title_add_to_playlist">Ajouter à la liste de lecture</string>
+    <!-- Message of the dialog to confirm stop a backup -->
+    <string name="sync_stop_backup_confirm_dialog_text">Pour cesser de sauvegarder ce dossier, vous devez soit le déplacer soit le supprimer.</string>
+    <!-- Move option of the dialog to confirm stop a backup -->
+    <string name="sync_stop_backup_confirm_dialog_move_option">Déplacez le dossier</string>
+    <!-- Explanatory text for the move option of the dialog to confirm stop a backup -->
+    <string name="sync_stop_backup_confirm_dialog_move_option_text">Déplacez ce dossier vers un autre emplacement pour obtenir un accès total à vos données.</string>
+    <!-- Delete option of the dialog to confirm stop a backup -->
+    <string name="sync_stop_backup_confirm_dialog_delete_option">Supprimer le dossier définitivement</string>
+    <!-- Explanatory text for the delete option of the dialog to confirm stop a backup -->
+    <string name="sync_stop_backup_confirm_dialog_delete_option_text">Le dossier sera supprimé de MEGA. Il ne sera pas supprimé de votre appareil.</string>
+    <!-- Name for a general button which action is "Confirm" something -->
+    <string name="general_confirm_button">Confirmer</string>
+    <!-- The failed Message when adding the video to the playlists from the video section. -->
+    <string name="video_section_playlists_add_to_playlists_failed_message">Impossible d’ajouter l’élément</string>
+    <!-- Text of the add button in the page that adds the video to the video playlist -->
+    <string name="video_to_playlist_add_button">Ajouter</string>
+    <!-- The success Message when adding the video to the playlists from the video section. -->
+    <plurals name="video_section_playlists_add_to_playlists_successfully_message">
+        <item quantity="one">1 élément a été ajouté à&#160;»%1$s»</item>
+        <item quantity="many">1 élément a été ajouté à %1$d liste de lecture</item>
+        <item quantity="other">1 élément a été ajouté à %1$d liste de lecture</item>
+    </plurals>
+    <!-- Name for a general label which action is "Select" something -->
+    <string name="general_select">Sélectionner</string>
+    <!-- Name for a general label which action is "Select folder" -->
+    <string name="general_select_folder">Sélectionner un dossier</string>
+    <!-- Clickable label text to select the destination for the move option of the dialog to confirm stop a backup. Keep the placeholders because "[B][/B]" are in order to make the text clickable and "%1s" in order to display the selected folder name. -->
+    <string name="sync_stop_backup_confirm_dialog_move_option_select_destination">Déplacer vers&#160;: [B]%1s[/B]</string>
+    <!-- Message shown to user when app is connected to the MEGA server -->
+    <string name="login_connected_to_server">Connecté au serveur</string>
+    <!-- User Alert notification for scheduled recurring meeting changes -->
+    <string name="meetings_notification_subtitle_scheduled_recurring_meeting_scheduled_changes">[A]%s[/A] [B]a mis à jour les détails de la réunion récurrente à[/B]</string>
+    <!-- User Alert notification for scheduled recurring meeting hour change -->
+    <string name="meetings_notification_subtitle_scheduled_recurring_meeting_hour_changed">[A]%s[/A] [B]a mis à jour l\’heure de la réunion récurrente à[/B]</string>
+    <!-- User Alert notification for scheduled recurring meeting date of the week change -->
+    <string name="meetings_notification_subtitle_scheduled_recurring_meeting_date_of_the_week_changed">[A]%s[/A] [B]a mis à jour la date de la réunion récurrente à[/B]</string>
+    <!-- User Alert notification for scheduled recurring meeting multiple fields change -->
+    <string name="meetings_notification_subtitle_scheduled_recurring_meeting_multiple_fields_changed">[A]%s[/A] [B]a mis à jour la réunion à[/B]</string>
+    <!-- User Alert notification for canceled occurrences of a scheduled recurring meeting -->
+    <string name="meetings_notification_subtitle_scheduled_recurring_meeting_occurrence_canceled">[A]%s[/A] [B]a annulé la réunion prévue pour[/B]</string>
+    <!-- User Alert notification for scheduled recurring meeting occurrence change -->
+    <string name="meetings_notification_subtitle_scheduled_recurring_meeting_updated_occurrence">[A]%s[/A] [B]a mis à jour une occurrence de réunion vers[/B]</string>
+    <!-- User Alert notification for scheduled meeting date change -->
+    <string name="meetings_notification_subtitle_scheduled_meeting_updated_date">[A]%s[/A] [B]a mis à jour la date de la réunion à[/B]</string>
+    <!-- User Alert notification for scheduled meeting time change -->
+    <string name="meetings_notification_subtitle_scheduled_meeting_updated_time">[A]%s[/A] [B]a mis à jour l\’heure de la réunion à[/B]</string>
+    <!-- User Alert notification for canceled scheduled meeting -->
+    <string name="meetings_notification_subtitle_scheduled_meeting_canceled">[A]%s[/A] [B]a annulé la réunion prévue pour[/B]</string>
+    <!-- Title of the ads free introduction screen -->
+    <string name="payment_ads_free_intro_title">Want MEGA without the ads?</string>
+    <!-- Description of the ads free introduction screen -->
+    <string name="payment_ads_free_intro_description">Upgrade to a Pro plan with plenty of storage and more. Our Pro plans start at just %1$s a month.</string>
+    <!-- The Generous storage label in the ads free introduction screen -->
+    <string name="payment_ads_free_intro_generous_storage_label">Espace de stockage généreux</string>
+    <!-- The Generous storage description in the ads free introduction screen -->
+    <string name="payment_ads_free_intro_generous_storage_description">Stockez des données sans limite, à partir de %1$s</string>
+    <!-- The Transfer sharing label in the ads free introduction screen -->
+    <string name="payment_ads_free_intro_transfer_sharing_label">Partage des transferts</string>
+    <!-- The Transfer sharing description in the ads free introduction screen -->
+    <string name="payment_ads_free_intro_transfer_sharing_description">Les personnes avec qui vous partagez des données peuvent utiliser votre quota de transfert pour télécharger les éléments que vous avez partagés.</string>
+    <!-- The additional security label in the ads free introduction screen -->
+    <string name="payment_ads_free_intro_additional_security_label">MEGA&#160;Pass et MEGA&#160;VPN</string>
+    <!-- The additional security description in the ads free introduction screen -->
+    <string name="payment_ads_free_intro_additional_security_description">Définissez des mots de passe et des dates d’expiration pour les liens de fichier et de dossier.</string>
+    <!-- The button text view pro plan in the ads free introduction screen -->
+    <string name="payment_ads_free_intro_button_view_pro_plan">Afficher les abonnements Pro</string>
+    <!-- Label for call option on settings -->
+    <string name="settings_calls_title">Appels</string>
+    <!-- Label for the sound notifications option on calls settings -->
+    <string name="settings_calls_sound_notifications_title">Notifications sonores</string>
+    <!-- Text for the sound notifications option on calls settings -->
+    <string name="settings_calls_sound_notifications_body">Émettre un son si quelqu’un se joint à un appel ou le quitte.</string>
+    <!-- Text of the remove favourite option of the Favourites playlist bottom sheet  -->
+    <string name="favourites_playlist_bottom_sheet_option_remove_favourite">Supprimer le favori</string>
+    <!-- The empty hint of the Favourites playlist -->
+    <string name="favourites_playlist_empty_hint">Aucun favori</string>
+    <!-- Message to enter confirm password -->
+    <string name="general_confirm_your_password">Confirmez votre mot de passe</string>
+    <!-- The Screen Toolbar Title for configuring the scan settings -->
+    <string name="document_scanning_settings_toolbar_title">Paramètres de numérisation</string>
+    <!-- Title of the camera setting screen -->
+    <string name="camera_settings_title">Paramètres de l\’appareil photo</string>
+    <!-- Title of the save location in the camera setting screen -->
+    <string name="camera_settings_save_location_title">Enregistrer l\’emplacement</string>
+    <!-- Description of the save location in the camera setting screen -->
+    <string name="camera_settings_save_location_description">Activez la géolocalisation pour les photos et les vidéos</string>
+    <!-- Message when user denies location permission in the camera setting screen -->
+    <string name="camera_settings_save_location_permission_denied">Autorisez MEGA à accéder à l\’emplacement de cet appareil pour continuer</string>
+    <!-- Warning message to indicate that cannot select a currently synced folder -->
+    <string name="sync_local_device_folder_currently_synced_message">Ce dossier est déjà synchronisé</string>
+    <!-- Warning message to indicate that cannot select a currently backed up folder -->
+    <string name="sync_local_device_folder_currently_backed_up_message">Ce dossier est déjà sauvegardé</string>
+    <!-- The name of every users root drive in the cloud of MEGA. -->
+    <string name="general_section_cloud_drive">Disque nuagique</string>
+    <!-- App Bar Title in of Cloud Drive Bottom Menu -->
+    <string name="general_drive">Disque</string>
+    <!-- Tab bar title of Syncs tab -->
+    <string name="general_syncs">Synchronisations</string>
+    <!-- Text under the syncs list -->
+    <string name="syncs_tab_view_other_devices">Afficher les autres appareils dans Centre des appareils</string>
+    <!-- The snackbar message of you and others raised your hands -->
+    <plurals name="transfers_completed_read_error_retrying">
+        <item quantity="one"></item>
+        <item quantity="many"></item>
+        <item quantity="other"></item>
+    </plurals>
+    <!-- Warning shown to the user when tries to retry a cancelled or failed transfer but it cannot be retried because app does not have read permission over the file anymore -->
+    <string name="transfers_completed_one_read_error_retrying">Votre téléversement ne peut pas être terminé ou réessayé, car MEGA ne peut plus accéder au fichier</string>
+    <!-- Warning shown to the user when tries to retry some or all of cancelled or failed transfer but they cannot be retried because app does not have read permission over the files anymore -->
+    <string name="transfers_completed_some_read_error_retrying">Certains ou tous vos téléversements ne peuvent pas être terminés ou réessayés, car MEGA ne peut plus accéder aux fichiers</string>
+    <!-- Title for Offline Folder exposed via SAF -->
+    <string name="general_mega_offline">Fichiers MEGA Offline</string>
+    <!-- Notification content for download final notification. It will inform the user about the location where file/s were downloaded -->
+    <string name="transfers_notification_location_content">Lieu&#160;: %1$s</string>
+    <!-- Notification action for download final notification. It will open the file explorer activity to show the destination folder -->
+    <string name="transfers_notification_location_action">Localiser</string>
+    <!-- Notification content for download final notification in case of a single file downloaded. -->
+    <string name="transfers_notification_title_single_download">Téléchargé&#160;«%1$s»</string>
+    <!-- Label for the button or menu option to add a new backup -->
+    <string name="device_center_sync_add_new_backup_button_option">Ajouter une nouvelle sauvegarde</string>
+    <!-- Notification content for download final notification in case of a single file downloaded to preview. -->
+    <string name="transfers_notification_title_preview_download">«%1$s» est prêt à être prévisualisé</string>
+    <!-- Notification action for download final notification. It will open a dialog with installed apps which can open the file -->
+    <string name="transfers_notification_preview_action">Aperçu</string>
+    <!-- Title for the OS dialog shown with available apps to open a file -->
+    <string name="open_with_os_dialog_title">Ouvrir&#160;«%1$s» avec</string>
+    <!-- The Scan Confirmation screen error message shown when the new filename does not contain the file extension that was selected -->
+    <string name="document_scanning_settings_missing_file_extension_error_message">Extension de fichier manquante (%s)</string>
+    <!-- The Scan Confirmation screen error message shown when the filename does not end with the expected file extension -->
+    <string name="document_scanning_settings_non_matching_file_extension_error_message">L\’extension de fichier ne correspond pas au type de fichier</string>
+    <!-- The Scan Confirmation screen error message shown when the filename has no file extension -->
+    <string name="document_scanning_settings_file_extension_required_error_message">Une extension de fichier est nécessaire</string>
+    <!-- Alert text before download a file for preview. Please do not modify the %s placeholder as it will be replaced by the size to be donwloaded -->
+    <string name="alert_larger_file_preview">Pour prévisualiser ce fichier, MEGA doit le télécharger. %1$s sera téléchargé.</string>
+    <!-- Message displayed with progress percentage while the app is doing some background operation -->
+    <string name="login_completing_operation">Finalisation de l\’opération&#160;: %1$d%%</string>
+    <!-- Add to album files existed message -->
+    <plurals name="album_add_to_files_existed">
+        <item quantity="one">Ce fichier existe déjà dans&#160;«%1$s» et ne peut pas être ajouté à nouveau</item>
+        <item quantity="many">Ces fichiers existent déjà dans&#160;«%1$s» et ne peut pas être ajouté à nouveau</item>
+        <item quantity="other">Ces fichiers existent déjà dans&#160;«%1$s» et ne peut pas être ajouté à nouveau</item>
+    </plurals>
+    <!-- Add to album partial added message -->
+    <plurals name="album_add_to_partial_added_message">
+        <item quantity="one">1 fichier ajouté à&#160;«%1$s». Certains fichiers existent déjà et ne peuvent pas être ajoutés à nouveau.</item>
+        <item quantity="many">%2$d fichiers ajoutés à&#160;«%1$s». Certains fichiers existent déjà et ne peuvent pas être ajoutés à nouveau.</item>
+        <item quantity="other">%2$d fichiers ajoutés à&#160;«%1$s». Certains fichiers existent déjà et ne peuvent pas être ajoutés à nouveau.</item>
+    </plurals>
+    <!--Content on the Multi-Factor Authentication Login page -->
+    <string name="multi_factor_auth_login_verification_content">Saisissez le code à six chiffres généré par votre appli d’authentification.</string>
+    <!--Message to be shown to the user when they entered an incorrect verification code-->
+    <string name="multi_factor_auth_login_verification_input_error_text">Le code de vérification est erroné</string>
+    <!-- Snackbar text to inform the user that preview may take some time because it needs to be downloaded -->
+    <string name="transfers_preview_slow_snackbar">Préparation du fichier pour la prévisualisation. Voir la notification pour plus de détails.</string>
+    <!-- Notification text for preview downloads.  Please do not modify the %s placeholder as it will be replaced by the name of the file to be donwloaded -->
+    <string name="transfers_notification_downloading_preview">Préparation %1$s pour un aperçu</string>
+    <!-- Notification text for preview downloads, paused state.  Please do not modify the %s placeholder as it will be replaced by the name of the file to be donwloaded -->
+    <string name="transfers_notification_downloading_preview_paused">Préparation %1$s pour un aperçu (en pause)</string>
+    <!-- Message when successfully deleting single item from the audio queue. %1$s will be replaced with the item name -->
+    <string name="audio_queue_single_item_removed_message">«%1$s» a été supprimé</string>
+    <!-- Message when successfully deleting items from the audio queue. %1$d will be replaced with the removal count when multiple items are removed. -->
+    <string name="audio_queue_multiple_items_removed_message">Removed %1$d items from queue</string>
+    <!-- Message when successfully deleting items from the audio queue. %1$s will be replaced with the item name %2$d will be replaced with the removal count. -->
+    <plurals name="audio_queue_items_removal_success_message">
+        <item quantity="one">«%1$s» a été retiré de la file d\’attente</item>
+        <item quantity="many">Supprimé %2$d éléments de la file d\’attente</item>
+        <item quantity="other">Supprimé %2$d éléments de la file d\’attente</item>
+    </plurals>
+    <!-- Title for the dialog to inform that a transfer is needed to preview a file and transfers are paused-->
+    <string name="transfers_preview_paused_dialog_title">Les transferts sont suspendus</string>
+    <!-- Message for the dialog to inform that a transfer is needed to preview a file and transfers are paused-->
+    <string name="transfers_preview_paused_dialog_text">Pour prévisualiser&#160;«%1$s» vous devrez reprendre les transferts suspendus</string>
+    <!--SD Card text shown as title in FileStorage screen -->
+    <string name="general_sd_card">Carte SD</string>
+    <!--The title of the Login page-->
+    <string name="login_page_title">Connectez-vous à votre compte MEGA</string>
+    <!--Message to be shown to the user when they entered an invalid email-->
+    <string name="login_invalid_email_error_message">Saisissez une adresse courriel valide</string>
+    <!--Message to be shown to the user when they entered an invalid format password-->
+    <string name="login_invalid_password_error_message">Saisissez votre mot de passe</string>
+    <!--Message to be shown to the user when they entered the wrong credential-->
+    <string name="login_wrong_credential_error_message">L’adresse courriel ou le mot de passe est invalide</string>
+    <!--Message to be shown to he user when the account is not validated -->
+    <string name="login_account_not_validated">L\’inscription à votre compte est incomplète ou a été annulée. Vérifiez votre boîte de réception des courriels.</string>
+    <!--Message to be shown to the user when login fails due to multiple failed attempts-->
+    <string name="login_too_many_attempts_error_message">Vous avez tenté de vous connecter trop de fois. Veuillez attendre et réessayer.</string>
+    <!--The footer text to be shown where a user can sign up if they do not have a MEGA account-->
+    <string name="login_page_sign_up_action_footer_text">N’avez-vous pas de compte MEGA ? [A]Inscrivez-vous[/A]</string>
+    <!-- Title of setting Two-Factor Authentication -->
+    <string name="settings_2fa">Authentification à deux facteurs</string>
+    <!-- email label -->
+    <string name="email_text">Adresse courriel</string>
+    <!-- password label -->
+    <string name="password_text">Mot de passe</string>
+    <!-- Login button -->
+    <string name="login_text">Me&#160;connecter</string>
+    <!--The text where user forgot their password and will navigate to reset it-->
+    <string name="login_page_forgot_password_text">Mot de passe oublié ?</string>
+    <!-- Sync state up to date -->
+    <string name="sync_list_sync_state_disabled">Désactivée</string>
+    <!-- Name of the Camera uploads feature -->
+    <string name="general_camera_uploads">Téléversements de l’appareil photo</string>
+    <!-- Name of the Camera uploads feature -->
+    <string name="general_media_uploads">Téléversements des médias</string>
+    <!-- Generic settings label text -->
+    <string name="general_settings">Paramètres</string>
+    <!-- Ad settings label in the cookie settings page -->
+    <string name="settings_cookie_settings_label_ad_settings">Paramètres de l\’annonce</string>
+    <!-- Ads personalization label in the cookie settings page -->
+    <string name="settings_cookie_settings_label_ads_personalization">Personnalisation des annonces</string>
+    <!-- Cookie settings title in the cookie settings page -->
+    <string name="settings_cookie_setting_title_cookie_and_ad_settings">Paramètres relatifs aux cookies et aux annonces</string>
+    <!-- Body text of the bottom sheet to promote Sync feature. The placeholders are to underline text -->
+    <string name="sync_promotion_bottom_sheet_body_text">Synchroniser ou sauvegarder un dossier sur votre appareil avec un dossier sur MEGA. [U]En apprendre davantage[/U]</string>
+    <!-- This is the final button when creating a folder in the dialog where the user inserts the folder name -->
+    <string name="transfers_cancel_download_warning_title">Annuler le téléchargement&#160;?</string>
+    <!-- Confirmation message informing a download was successfully cancelled -->
+    <string name="transfers_cancel_download_success_message">Download cancelled</string>
+    <!-- Title of note to self chat -->
+    <string name="chat_note_to_self_chat_title">Note pour moi-même</string>
+    <!-- First message header in note to self chat -->
+    <string name="chat_note_to_self_chat_first_message_header">Gardez-le pour vous</string>
+    <!-- First message description in note to self chat -->
+    <string name="chat_note_to_self_chat_first_message_description">Envoyez-vous des renseignements sensibles, des photos et des vidéos, ou des idées pour votre prochaine grande entreprise. Synchronisé sur tous vos appareils et protégé par un chiffrement à divulgation nulle de connaissance.</string>
+    <!-- Add to album some files exist message -->
+    <plurals name="album_add_to_files_exist_message">
+        <item quantity="one">1 fichier ajouté à&#160;«%1$s». Les fichiers dupliqués ne peuvent pas être ajoutés à nouveau.</item>
+        <item quantity="many">%2$d fichiers ajoutés à&#160;«%1$s». Les fichiers dupliqués ne peuvent pas être ajoutés à nouveau.</item>
+        <item quantity="other">%2$d fichiers ajoutés à&#160;«%1$s». Les fichiers dupliqués ne peuvent pas être ajoutés à nouveau.</item>
+    </plurals>
+    <!-- Snack bar message informing that profile's QR code is uploaded to the Cloud Drive-->
+    <string name="transfers_start_upload_profile_qr_code_message">Saving %1$s to Cloud drive&#8230;</string>
+    <!-- Warning shown after trying to cancel a download, but the request failed -->
+    <string name="transfers_error_cancelling_download">Something went wrong. Download was not cancelled.</string>
+    <!-- Body for the subscription details section, which is shown to the Indian user to provide details about subscription. This string is shown if user selects yearly subscription and the amount is more than Rs.15,000. Please keep these placeholders [A], [/A], [B], [/B], [C], [/C]. They will be used to format the string. -->
+    <string name="account_upgrade_account_subscription_details_body_yearly_with_price_for_indian">You will be charged %1$s immediately but your subscription will not automatically renew after 12 months due to government regulations. It will be your responsibility to renew your subscription after it has expired. You can manage or cancel your subscription anytime via Subscriptions in [A]Google&#160;Play[/A]. By upgrading your account, you agree to MEGA’s [B]Terms of Service[/B] and [C]Privacy and Data Policy[/C].</string>
+    <!-- The name of the Device or Folder Status which signifies that it is currently uploading -->
+    <string name="device_center_list_view_item_status_uploading">Téléversement&#8230;</string>
+    <!-- The name of the Device or Folder Status which signifies that it is currently uploading with a percentage completion -->
+    <string name="device_center_list_view_item_status_uploading_with_progress">%1$d%% uploading&#8230;</string>
+    <!-- The name of the Device or Folder Status which signifies that it is inactive -->
+    <string name="device_center_list_view_item_status_inactive">inactif</string>
+    <!-- The name of the Device or Folder Status which signifies that some action is needed -->
+    <string name="device_center_list_view_item_status_attention_needed">Attention needed</string>
 </resources>

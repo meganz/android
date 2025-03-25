@@ -5,13 +5,15 @@ import androidx.core.net.toUri
 import mega.privacy.android.domain.entity.node.NodeId
 import mega.privacy.android.domain.entity.node.TypedNode
 import mega.privacy.android.domain.entity.node.namecollision.NameCollisionChoice
+import mega.privacy.android.domain.entity.transfer.TransferAppData
 import mega.privacy.android.domain.entity.transfer.TransferType
 import java.io.File
 
 /**
- * Event to trigger the start of a transfer
+ * Event to trigger some transfer action
  */
 sealed interface TransferTriggerEvent {
+    sealed interface CloudTransfer : TransferTriggerEvent
 
     /**
      * Type of the transfer
@@ -19,11 +21,24 @@ sealed interface TransferTriggerEvent {
     val type: TransferType
 
     /**
+     * Check if transfers are paused when receiving this trigger event
+     */
+    val checkPausedTransfers get() = CheckPausedTransfersType.Never
+
+    /**
+     * If true and notification permission is not granted, the transfer should not start until user responds to permission request.
+     * Useful in case the fragment or activity is closed once the transfer starts, so permission request is not hidden.
+     */
+    val waitNotificationPermissionResponseToStart: Boolean
+
+    /**
      * Event to start uploading to the chat
      */
     sealed interface StartChatUpload : TransferTriggerEvent {
         override val type: TransferType
             get() = TransferType.CHAT_UPLOAD
+
+        override val checkPausedTransfers get() = CheckPausedTransfersType.OncePerPausedState
 
         /**
          * The id of the chat where these files will be attached
@@ -46,6 +61,7 @@ sealed interface TransferTriggerEvent {
         data class Files(
             override val chatId: Long,
             override val uris: List<Uri>,
+            override val waitNotificationPermissionResponseToStart: Boolean = false,
         ) : StartChatUpload {
             override val isVoiceClip = false
         }
@@ -58,6 +74,7 @@ sealed interface TransferTriggerEvent {
         data class VoiceClip(
             override val chatId: Long,
             val file: File,
+            override val waitNotificationPermissionResponseToStart: Boolean = false,
         ) : StartChatUpload {
             override val uris get() = listOf(file.toUri())
             override val isVoiceClip = true
@@ -67,7 +84,7 @@ sealed interface TransferTriggerEvent {
     /**
      * Event to start downloading a list of nodes
      */
-    sealed interface DownloadTriggerEvent : TransferTriggerEvent {
+    sealed interface DownloadTriggerEvent : CloudTransfer {
         override val type: TransferType
             get() = TransferType.DOWNLOAD
 
@@ -80,6 +97,11 @@ sealed interface TransferTriggerEvent {
          * true if this download is a high priority transfer, false otherwise
          */
         val isHighPriority: Boolean
+
+        /**
+         * App data related to this type of download
+         */
+        val appData: TransferAppData? get() = null
     }
 
     /**
@@ -104,8 +126,10 @@ sealed interface TransferTriggerEvent {
     data class StartDownloadForOffline(
         val node: TypedNode?,
         override val isHighPriority: Boolean = false,
+        override val waitNotificationPermissionResponseToStart: Boolean = false,
     ) : DownloadTriggerEvent {
         override val nodes = node?.let { listOf(node) } ?: emptyList()
+        override val appData = TransferAppData.OfflineDownload
     }
 
 
@@ -116,6 +140,7 @@ sealed interface TransferTriggerEvent {
     data class StartDownloadNode(
         override val nodes: List<TypedNode>,
         override val isHighPriority: Boolean = false,
+        override val waitNotificationPermissionResponseToStart: Boolean = false,
     ) : DownloadTriggerEvent
 
     /**
@@ -125,7 +150,9 @@ sealed interface TransferTriggerEvent {
      */
     data class CopyOfflineNode(
         val nodeIds: List<NodeId>,
-    ) : CopyTriggerEvent
+    ) : CopyTriggerEvent {
+        override val waitNotificationPermissionResponseToStart = false
+    }
 
     /**
      * Copy uri
@@ -136,18 +163,24 @@ sealed interface TransferTriggerEvent {
     data class CopyUri(
         val name: String,
         val uri: Uri,
+        override val waitNotificationPermissionResponseToStart: Boolean = false,
     ) : CopyTriggerEvent
 
     /**
      * Event to start downloading node for preview
      *
      * @param node the node to be downloaded for preview
+     * @param isOpenWith True if is opened with another app action
      */
     data class StartDownloadForPreview(
         val node: TypedNode?,
+        val isOpenWith: Boolean,
+        override val waitNotificationPermissionResponseToStart: Boolean = false,
     ) : DownloadTriggerEvent {
         override val nodes = node?.let { listOf(node) } ?: emptyList()
         override val isHighPriority: Boolean = true
+        override val appData = TransferAppData.PreviewDownload
+        override val checkPausedTransfers = CheckPausedTransfersType.Always
     }
 
     /**
@@ -157,7 +190,7 @@ sealed interface TransferTriggerEvent {
      *                          The name will be null in case the original name.
      * @property destinationId the id of the folder where the files will be uploaded.
      */
-    sealed interface StartUpload : TransferTriggerEvent {
+    sealed interface StartUpload : CloudTransfer {
         override val type: TransferType
             get() = TransferType.GENERAL_UPLOAD
 
@@ -176,6 +209,8 @@ sealed interface TransferTriggerEvent {
         data class Files(
             override val pathsAndNames: Map<String, String?>,
             override val destinationId: NodeId,
+            override val waitNotificationPermissionResponseToStart: Boolean = false,
+            val specificStartMessage: String? = null
         ) : StartUpload {
             override val isHighPriority = false
         }
@@ -193,6 +228,7 @@ sealed interface TransferTriggerEvent {
             override val destinationId: NodeId,
             val isEditMode: Boolean,
             val fromHomePage: Boolean,
+            override val waitNotificationPermissionResponseToStart: Boolean = false,
         ) : StartUpload {
             override val pathsAndNames = mapOf(path to null)
             override val isHighPriority = true
@@ -207,8 +243,40 @@ sealed interface TransferTriggerEvent {
             val collisionChoice: NameCollisionChoice?,
             override val pathsAndNames: Map<String, String?>,
             override val destinationId: NodeId,
-        ) : StartUpload{
+            override val waitNotificationPermissionResponseToStart: Boolean = false,
+        ) : StartUpload {
             override val isHighPriority = false
         }
+    }
+
+    /**
+     * Event to cancel a preview download.
+     *
+     * @param transferTag the tag of the transfer to be canceled.
+     */
+    data class CancelPreviewDownload(
+        val transferTag: Int,
+        override val type: TransferType = TransferType.DOWNLOAD,
+        override val waitNotificationPermissionResponseToStart: Boolean = false,
+    ) : TransferTriggerEvent
+
+    /**
+     * Specify the need to check if transfers are paused when the [TransferTriggerEvent] is emitted
+     */
+    enum class CheckPausedTransfersType {
+        /**
+         * No need to check if transfers are paused
+         */
+        Never,
+
+        /**
+         * Only be checked once, until transfers are paused again
+         */
+        OncePerPausedState,
+
+        /**
+         * Paused transfers should be checked on each [TransferTriggerEvent] emission
+         */
+        Always,
     }
 }

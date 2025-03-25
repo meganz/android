@@ -22,6 +22,7 @@ import kotlinx.coroutines.test.TestScope
 import kotlinx.coroutines.test.advanceTimeBy
 import kotlinx.coroutines.test.runTest
 import mega.privacy.android.domain.entity.BatteryInfo
+import mega.privacy.android.domain.entity.node.NodeId
 import mega.privacy.android.domain.entity.sync.SyncError
 import mega.privacy.android.domain.entity.sync.SyncType
 import mega.privacy.android.domain.usecase.IsOnWifiNetworkUseCase
@@ -130,7 +131,7 @@ class SyncWorkerTest {
             syncType = SyncType.TYPE_TWOWAY,
             pairName = "first",
             localFolderPath = "first",
-            remoteFolder = RemoteFolder(id = 1232L, name = "first"),
+            remoteFolder = RemoteFolder(id = NodeId(1232L), name = "first"),
             syncStatus = SyncStatus.SYNCED
         )
         val secondSync = FolderPair(
@@ -138,7 +139,7 @@ class SyncWorkerTest {
             syncType = SyncType.TYPE_TWOWAY,
             pairName = "second",
             localFolderPath = "second",
-            remoteFolder = RemoteFolder(id = 2222L, name = "second"),
+            remoteFolder = RemoteFolder(id = NodeId(2222L), name = "second"),
             syncStatus = SyncStatus.SYNCED
         )
         val thirdSync = FolderPair(
@@ -146,7 +147,7 @@ class SyncWorkerTest {
             syncType = SyncType.TYPE_TWOWAY,
             pairName = "third",
             localFolderPath = "third",
-            remoteFolder = RemoteFolder(id = 3333L, name = "third"),
+            remoteFolder = RemoteFolder(id = NodeId(3333L), name = "third"),
             syncStatus = SyncStatus.PAUSED
         )
         whenever(monitorSyncsUseCase()).thenReturn(flowOf(listOf(firstSync, secondSync, thirdSync)))
@@ -165,7 +166,7 @@ class SyncWorkerTest {
             syncType = SyncType.TYPE_TWOWAY,
             pairName = "first",
             localFolderPath = "first",
-            remoteFolder = RemoteFolder(id = 1232L, name = "first"),
+            remoteFolder = RemoteFolder(id = NodeId(1232L), name = "first"),
             syncStatus = SyncStatus.SYNCING
         )
         val secondSync = FolderPair(
@@ -173,7 +174,7 @@ class SyncWorkerTest {
             syncType = SyncType.TYPE_TWOWAY,
             pairName = "second",
             localFolderPath = "second",
-            remoteFolder = RemoteFolder(id = 1232L, name = "second"),
+            remoteFolder = RemoteFolder(id = NodeId(1232L), name = "second"),
             syncStatus = SyncStatus.SYNCED
         )
         whenever(monitorSyncsUseCase()).thenReturn(flowOf(listOf(firstSync, secondSync)))
@@ -203,7 +204,7 @@ class SyncWorkerTest {
             syncType = SyncType.TYPE_TWOWAY,
             pairName = "first",
             localFolderPath = "first",
-            remoteFolder = RemoteFolder(id = 1232L, name = "first"),
+            remoteFolder = RemoteFolder(id = NodeId(1232L), name = "first"),
             syncStatus = SyncStatus.SYNCED,
             syncError = SyncError.ACTIVE_SYNC_SAME_PATH
         )
@@ -212,7 +213,7 @@ class SyncWorkerTest {
             syncType = SyncType.TYPE_TWOWAY,
             pairName = "second",
             localFolderPath = "second",
-            remoteFolder = RemoteFolder(id = 2222L, name = "second"),
+            remoteFolder = RemoteFolder(id = NodeId(2222L), name = "second"),
             syncStatus = SyncStatus.SYNCED
         )
         whenever(monitorSyncsUseCase()).thenReturn(flowOf(listOf(firstSync, secondSync)))

@@ -7,6 +7,7 @@ import kotlinx.coroutines.Job
 import kotlinx.coroutines.async
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableSharedFlow
+import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.distinctUntilChanged
 import kotlinx.coroutines.flow.filter
 import kotlinx.coroutines.flow.filterIsInstance
@@ -63,7 +64,7 @@ import javax.inject.Singleton
 import kotlin.coroutines.resume
 import kotlin.coroutines.suspendCoroutine
 
-internal typealias AlbumPhotosAddingProgressPool = MutableMap<AlbumId, MutableSharedFlow<AlbumPhotosAddingProgress?>>
+internal typealias AlbumPhotosAddingProgressPool = MutableMap<AlbumId, MutableStateFlow<AlbumPhotosAddingProgress?>>
 internal typealias AlbumPhotosRemovingProgressPool = MutableMap<AlbumId, MutableSharedFlow<AlbumPhotosRemovingProgress?>>
 
 /**
@@ -255,12 +256,13 @@ internal class DefaultAlbumRepository @Inject constructor(
         userSetsFlow.tryEmit(userSets)
     }
 
-    override suspend fun addPhotosToAlbum(albumID: AlbumId, photoIDs: List<NodeId>) {
+    override suspend fun addPhotosToAlbum(albumID: AlbumId, photoIDs: List<NodeId>, isAsync: Boolean) {
         val progressFlow = getAlbumPhotosAddingProgressFlow(albumID)
         progressFlow.tryEmit(
             AlbumPhotosAddingProgress(
                 isProgressing = true,
                 totalAddedPhotos = 0,
+                isAsync = isAsync,
             )
         )
         createAlbumItems(albumID, photoIDs)
@@ -275,6 +277,7 @@ internal class DefaultAlbumRepository @Inject constructor(
                     AlbumPhotosAddingProgress(
                         isProgressing = false,
                         totalAddedPhotos = success,
+                        isAsync = progressFlow.value?.isAsync ?: false,
                     )
                 )
             }
@@ -334,7 +337,7 @@ internal class DefaultAlbumRepository @Inject constructor(
     }
 
     override fun observeAlbumPhotosAddingProgress(albumId: AlbumId): Flow<AlbumPhotosAddingProgress?> =
-        getAlbumPhotosAddingProgressFlow(albumId).distinctUntilChanged()
+        getAlbumPhotosAddingProgressFlow(albumId)
 
     override suspend fun updateAlbumPhotosAddingProgressCompleted(albumId: AlbumId) {
         val progressFlow = getAlbumPhotosAddingProgressFlow(albumId)
@@ -548,7 +551,8 @@ internal class DefaultAlbumRepository @Inject constructor(
         }
     }
 
-    override fun getPublicAlbumNodesData(): Map<NodeId, String> = publicNodesDataMap
+    override fun getPublicAlbumNodesData(): Map<NodeId, String> =
+        publicNodesMap.mapValues { it.value.serialize() }
 
     override suspend fun addBulkPhotosToAlbum(
         albumId: AlbumId,
@@ -737,8 +741,8 @@ internal class DefaultAlbumRepository @Inject constructor(
         userSetsElementsFlow.tryEmit(listOf())
     }
 
-    private fun getAlbumPhotosAddingProgressFlow(albumId: AlbumId): MutableSharedFlow<AlbumPhotosAddingProgress?> =
-        albumPhotosAddingProgressPool.getOrPut(albumId) { MutableSharedFlow(replay = 1) }
+    private fun getAlbumPhotosAddingProgressFlow(albumId: AlbumId): MutableStateFlow<AlbumPhotosAddingProgress?> =
+        albumPhotosAddingProgressPool.getOrPut(albumId) { MutableStateFlow(null) }
 
     private fun getAlbumPhotosRemovingProgressFlow(albumId: AlbumId): MutableSharedFlow<AlbumPhotosRemovingProgress?> =
         albumPhotosRemovingProgressPool.getOrPut(albumId) { MutableSharedFlow(replay = 1) }

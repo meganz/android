@@ -20,7 +20,6 @@ import mega.privacy.android.app.domain.usecase.GetNodeListByIds
 import mega.privacy.android.app.domain.usecase.GetPublicNodeListByIds
 import mega.privacy.android.app.extensions.asHotFlow
 import mega.privacy.android.app.featuretoggle.ApiFeatures
-import mega.privacy.android.app.featuretoggle.AppFeatures
 import mega.privacy.android.app.presentation.clouddrive.mapper.StorageCapacityMapper
 import mega.privacy.android.app.presentation.clouddrive.model.StorageOverQuotaCapacity
 import mega.privacy.android.app.presentation.copynode.mapper.CopyRequestMessageMapper
@@ -206,9 +205,7 @@ class MediaDiscoveryViewModelTest {
         whenever(
             storageCapacityMapper(
                 storageState = any(),
-                isFullStorageOverQuotaBannerEnabled = any(),
-                isAlmostFullStorageQuotaBannerEnabled = any(),
-                isDismissiblePeriodOver = any()
+                shouldShow = any()
             )
         ).thenReturn(
             StorageOverQuotaCapacity.DEFAULT
@@ -598,10 +595,6 @@ class MediaDiscoveryViewModelTest {
         storageOverQuotaCapacity: StorageOverQuotaCapacity,
     ) = runTest {
         commonStub()
-        getFeatureFlagValueUseCase.stub {
-            onBlocking { invoke(AppFeatures.FullStorageOverQuotaBanner) }.thenReturn(true)
-            onBlocking { invoke(AppFeatures.AlmostFullStorageOverQuotaBanner) }.thenReturn(true)
-        }
         whenever((monitorStorageStateUseCase())).thenReturn(
             storageState.asHotFlow()
         )
@@ -616,9 +609,7 @@ class MediaDiscoveryViewModelTest {
         whenever(
             storageCapacityMapper(
                 storageState = storageState,
-                isFullStorageOverQuotaBannerEnabled = true,
-                isAlmostFullStorageQuotaBannerEnabled = true,
-                isDismissiblePeriodOver = isDismissiblePeriodOver
+                shouldShow = isDismissiblePeriodOver
             )
         ).thenReturn(
             storageOverQuotaCapacity

@@ -334,6 +334,7 @@ class AlbumPhotosSelectionViewModel @Inject constructor(
             addPhotosToAlbum(
                 albumId = album.id,
                 photoIds = photoIds.map { NodeId(it) },
+                isAsync = false,
             )
         }
 

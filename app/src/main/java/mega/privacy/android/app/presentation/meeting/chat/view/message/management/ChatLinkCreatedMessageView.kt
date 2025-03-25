@@ -18,9 +18,9 @@ import mega.privacy.android.app.R
 import mega.privacy.android.shared.original.core.ui.model.MegaSpanStyle
 import mega.privacy.android.shared.original.core.ui.model.SpanIndicator
 import mega.privacy.android.shared.original.core.ui.preview.CombinedThemePreviews
-import mega.privacy.android.shared.original.core.ui.theme.values.TextColor
+import mega.android.core.ui.theme.values.TextColor
 import mega.privacy.android.domain.entity.chat.messages.management.ChatLinkCreatedMessage
-import mega.privacy.android.shared.original.core.ui.theme.OriginalTempTheme
+import mega.privacy.android.shared.original.core.ui.theme.OriginalTheme
 
 /**
  * Chat link created message view.
@@ -80,7 +80,7 @@ internal fun ChatLinkCreatedView(
 @CombinedThemePreviews
 @Composable
 private fun ChatLinkCreatedPreview() {
-    OriginalTempTheme(isDark = isSystemInDarkTheme()) {
+    OriginalTheme(isDark = isSystemInDarkTheme()) {
         ChatLinkCreatedView(
             ownerActionFullName = "Name"
         )

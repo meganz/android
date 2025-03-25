@@ -10,7 +10,6 @@ import dagger.hilt.InstallIn
 import dagger.hilt.android.qualifiers.ApplicationContext
 import dagger.hilt.components.SingletonComponent
 import dagger.multibindings.ElementsIntoSet
-import dagger.multibindings.IntoMap
 import dagger.multibindings.IntoSet
 import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.CoroutineScope
@@ -33,17 +32,19 @@ import mega.privacy.android.app.domain.usecase.SetFeatureFlag
 import mega.privacy.android.app.domain.usecase.UpdateApp
 import mega.privacy.android.app.domain.usecase.VibrateDevice
 import mega.privacy.android.app.featuretoggle.QAFeatures
+import mega.privacy.android.app.navigation.QaFeatureSettings
+import mega.privacy.android.app.navigation.qaSettingsEntryPoint
 import mega.privacy.android.app.presentation.featureflag.ShakeDetectorViewModel
 import mega.privacy.android.app.presentation.featureflag.model.FeatureFlagMapper
 import mega.privacy.android.app.presentation.featureflag.model.toFeatureFlag
 import mega.privacy.android.app.presentation.settings.model.PreferenceResource
 import mega.privacy.android.data.preferences.FeatureFlagPreferencesDataStore
-import mega.privacy.android.data.qualifier.FeatureFlagPriorityKey
 import mega.privacy.android.domain.entity.Feature
-import mega.privacy.android.domain.featuretoggle.FeatureFlagValuePriority
 import mega.privacy.android.domain.featuretoggle.FeatureFlagValueProvider
 import mega.privacy.android.domain.qualifier.ApplicationScope
 import mega.privacy.android.domain.qualifier.IoDispatcher
+import mega.privacy.android.navigation.settings.FeatureSettingEntryPoint
+import mega.privacy.android.navigation.settings.FeatureSettings
 
 /**
  * Provides dependencies used in the QA module
@@ -202,11 +203,7 @@ class QAModule {
      * @return Default provider
      */
     @Provides
-    @IntoMap
-    @FeatureFlagPriorityKey(
-        implementingClass = QAFeatures.Companion::class,
-        priority = FeatureFlagValuePriority.Default
-    )
+    @IntoSet
     fun provideFeatureFlagDefaultValueProvider(): @JvmSuppressWildcards FeatureFlagValueProvider =
         QAFeatures.Companion
 
@@ -217,15 +214,19 @@ class QAModule {
      * @return Runtime value provider
      */
     @Provides
-    @IntoMap
-    @FeatureFlagPriorityKey(
-        implementingClass = FeatureFlagPreferencesDataStore::class,
-        priority = FeatureFlagValuePriority.RuntimeOverride
-    )
+    @IntoSet
     fun provideFeatureFlagRuntimeValueProvider(dataStore: FeatureFlagPreferencesDataStore): @JvmSuppressWildcards FeatureFlagValueProvider =
         dataStore
 
     @Provides
     fun provideFeatureFlagMapper(): FeatureFlagMapper = ::toFeatureFlag
 
+    @Provides
+    @IntoSet
+    fun provideQaSettings(): @JvmSuppressWildcards FeatureSettings =
+        QaFeatureSettings()
+
+    @Provides
+    @IntoSet
+    fun provideQaEntryPoint(): @JvmSuppressWildcards FeatureSettingEntryPoint = qaSettingsEntryPoint
 }

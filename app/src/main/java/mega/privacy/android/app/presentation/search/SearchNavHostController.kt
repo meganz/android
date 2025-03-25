@@ -21,7 +21,6 @@ import mega.privacy.android.shared.original.core.ui.controls.sheets.MegaBottomSh
  * @param handleClick Function to handle click
  * @param navigateToLink Function to navigate to link
  * @param showSortOrderBottomSheet Function to show sort order bottom sheet
- * @param trackAnalytics Function to track analytics
  * @param onBackPressed
  * @param nodeActionHandler Node bottom sheet action handler
  * @param navHostController
@@ -33,7 +32,7 @@ import mega.privacy.android.shared.original.core.ui.controls.sheets.MegaBottomSh
 @OptIn(ExperimentalMaterialNavigationApi::class)
 @Composable
 internal fun SearchNavHostController(
-    viewModel: SearchActivityViewModel,
+    viewModel: SearchViewModel,
     navigateToLink: (String) -> Unit,
     showSortOrderBottomSheet: () -> Unit,
     onBackPressed: () -> Unit,
@@ -59,7 +58,7 @@ internal fun SearchNavHostController(
                 navigateToLink = navigateToLink,
                 showSortOrderBottomSheet = showSortOrderBottomSheet,
                 navHostController = navHostController,
-                searchActivityViewModel = viewModel,
+                searchViewModel = viewModel,
                 nodeActionHandler = nodeActionHandler,
                 onBackPressed = onBackPressed,
                 nodeActionsViewModel = nodeActionsViewModel,

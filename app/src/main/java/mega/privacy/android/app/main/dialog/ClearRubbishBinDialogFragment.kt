@@ -18,7 +18,7 @@ import mega.privacy.android.app.presentation.extensions.isDarkMode
 import mega.privacy.android.domain.entity.ThemeMode
 import mega.privacy.android.domain.usecase.GetThemeMode
 import mega.privacy.android.shared.original.core.ui.controls.dialogs.ConfirmationDialog
-import mega.privacy.android.shared.original.core.ui.theme.OriginalTempTheme
+import mega.privacy.android.shared.original.core.ui.theme.OriginalTheme
 import timber.log.Timber
 import javax.inject.Inject
 
@@ -40,7 +40,7 @@ internal class ClearRubbishBinDialogFragment : DialogFragment() {
             setContent {
                 val themeMode by getThemeMode()
                     .collectAsStateWithLifecycle(initialValue = ThemeMode.System)
-                OriginalTempTheme(isDark = themeMode.isDarkMode()) {
+                OriginalTheme(isDark = themeMode.isDarkMode()) {
                     ConfirmationDialog(
                         title = stringResource(id = R.string.context_clear_rubbish),
                         text = stringResource(id = R.string.clear_rubbish_confirmation),

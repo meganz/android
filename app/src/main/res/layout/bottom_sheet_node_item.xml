@@ -230,8 +230,15 @@
                     tools:drawableRight="@drawable/ic_circle_label"
                     tools:text="@string/label_red"
                     tools:textColor="@color/salmon_400_salmon_300" />
-
             </LinearLayout>
+
+            <TextView
+                android:id="@+id/option_add_video_to_playlist"
+                style="@style/BottomSheetOption"
+                android:text="@string/video_section_bottom_sheet_option_title_add_to_playlist"
+                android:visibility="gone"
+                app:drawableStartCompat="@drawable/ic_player_queue"
+                tools:visibility="visible"/>
 
             <LinearLayout
                 android:id="@+id/label_separator"
@@ -240,6 +247,43 @@
                 android:layout_marginStart="72dp"
                 android:background="@color/grey_012_white_012"
                 android:orientation="horizontal" />
+
+            <LinearLayout
+                android:id="@+id/option_sync_layout"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:gravity="center_vertical"
+                android:orientation="horizontal"
+                android:visibility="gone"
+                tools:visibility="visible">
+
+                <TextView
+                    android:id="@+id/option_sync"
+                    style="@style/BottomSheetOption"
+                    android:layout_width="0dp"
+                    android:layout_weight="1"
+                    android:text="@string/sync"
+                    app:drawableStartCompat="@drawable/ic_sync_01" />
+
+                <mega.privacy.android.shared.original.core.ui.controls.chip.MegaChip
+                    android:id="@+id/option_sync_tag"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginEnd="16dp"
+                    app:mega_chip_selected="true"
+                    app:mega_chip_style="TagChipStyle"
+                    app:mega_chip_text="@string/notifications_notification_item_new_tag" />
+            </LinearLayout>
+
+            <LinearLayout
+                android:id="@+id/separator_sync"
+                android:layout_width="match_parent"
+                android:layout_height="1dp"
+                android:layout_marginStart="72dp"
+                android:background="@color/grey_012_white_012"
+                android:orientation="horizontal"
+                android:visibility="gone"
+                tools:visibility="visible" />
 
             <LinearLayout
                 android:id="@+id/remove_recently_watched_item_option"
@@ -413,7 +457,7 @@
                     android:drawablePadding="8dp"
                     android:gravity="end"
                     android:text="@string/general_pro_only"
-                    android:textColor="@color/teal_300"
+                    android:textColor="@color/color_text_primary"
                     android:textSize="16sp"
                     android:visibility="gone" />
 
@@ -427,6 +471,13 @@
                     app:tint="?android:attr/textColorSecondary" />
 
             </LinearLayout>
+
+            <TextView
+                android:id="@+id/add_to_album_option"
+                style="@style/BottomSheetOption"
+                android:text="@string/album_add_to_image"
+                android:visibility="gone"
+                app:drawableStartCompat="@drawable/ic_add_to_album"/>
 
             <TextView
                 android:id="@+id/move_option"

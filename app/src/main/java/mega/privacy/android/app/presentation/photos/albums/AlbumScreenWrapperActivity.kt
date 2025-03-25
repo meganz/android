@@ -8,6 +8,7 @@ import androidx.activity.compose.setContent
 import androidx.activity.enableEdgeToEdge
 import androidx.activity.result.contract.ActivityResultContracts.StartActivityForResult
 import androidx.activity.viewModels
+import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.fragment.app.Fragment
@@ -18,7 +19,9 @@ import mega.privacy.android.app.R
 import mega.privacy.android.app.getLink.GetLinkViewModel
 import mega.privacy.android.app.main.FileExplorerActivity
 import mega.privacy.android.app.main.ManagerActivity
+import mega.privacy.android.app.presentation.extensions.getStorageState
 import mega.privacy.android.app.presentation.extensions.isDarkMode
+import mega.privacy.android.app.presentation.passcode.model.PasscodeCryptObjectFactory
 import mega.privacy.android.app.presentation.photos.albums.coverselection.AlbumCoverSelectionScreen
 import mega.privacy.android.app.presentation.photos.albums.decryptionkey.AlbumDecryptionKeyScreen
 import mega.privacy.android.app.presentation.photos.albums.getlink.AlbumGetLinkScreen
@@ -28,13 +31,19 @@ import mega.privacy.android.app.presentation.photos.albums.importlink.AlbumImpor
 import mega.privacy.android.app.presentation.photos.albums.importlink.ImagePreviewProvider
 import mega.privacy.android.app.presentation.photos.albums.photosselection.AlbumFlow
 import mega.privacy.android.app.presentation.photos.albums.photosselection.AlbumPhotosSelectionScreen
+import mega.privacy.android.app.presentation.psa.PsaContainer
+import mega.privacy.android.app.presentation.security.check.PasscodeContainer
+import mega.privacy.android.app.presentation.settings.model.StorageTargetPreference
 import mega.privacy.android.app.upgradeAccount.UpgradeAccountActivity
+import mega.privacy.android.app.utils.AlertsAndWarnings.showOverDiskQuotaPaywallWarning
+import mega.privacy.android.domain.entity.StorageState
 import mega.privacy.android.domain.entity.ThemeMode
 import mega.privacy.android.domain.entity.node.NodeId
 import mega.privacy.android.domain.entity.photos.AlbumId
 import mega.privacy.android.domain.entity.photos.AlbumLink
 import mega.privacy.android.domain.usecase.GetThemeMode
-import mega.privacy.android.shared.original.core.ui.theme.OriginalTempTheme
+import mega.privacy.android.navigation.MegaNavigator
+import mega.privacy.android.shared.original.core.ui.theme.OriginalTheme
 import javax.inject.Inject
 
 @AndroidEntryPoint
@@ -60,135 +69,162 @@ class AlbumScreenWrapperActivity : BaseActivity() {
     @Inject
     lateinit var imagePreviewProvider: ImagePreviewProvider
 
+    /**
+     * Mega navigator
+     */
+    @Inject
+    lateinit var megaNavigator: MegaNavigator
+
+    @Inject
+    lateinit var passcodeCryptObjectFactory: PasscodeCryptObjectFactory
+
     override fun onCreate(savedInstanceState: Bundle?) {
         enableEdgeToEdge()
         super.onCreate(savedInstanceState)
 
         setContent {
             val themeMode by getThemeMode().collectAsState(initial = ThemeMode.System)
-            OriginalTempTheme(isDark = themeMode.isDarkMode()) {
-                when (albumScreen) {
-                    AlbumScreen.AlbumPhotosSelectionScreen -> {
-                        AlbumPhotosSelectionScreen(
-                            onBackClicked = ::finish,
-                            onCompletion = { albumId, numCommittedPhotos ->
-                                val data = Intent().apply {
-                                    putExtra(ALBUM_ID, albumId.id)
-                                    putExtra(NUM_PHOTOS, numCommittedPhotos)
-                                }
-                                setResult(RESULT_OK, data)
-                                finish()
-                            },
-                        )
-                    }
-
-                    AlbumScreen.AlbumCoverSelectionScreen -> {
-                        AlbumCoverSelectionScreen(
-                            onBackClicked = ::finish,
-                            onCompletion = { message ->
-                                val data = Intent().apply {
-                                    putExtra(MESSAGE, message)
-                                }
-                                setResult(RESULT_OK, data)
-                                finish()
-                            },
-                        )
-                    }
-
-                    AlbumScreen.AlbumGetLinkScreen -> {
-                        AlbumGetLinkScreen(
-                            getLinkViewModel = getLinkViewModel,
-                            createView = ::showFragment,
-                            onBack = ::finish,
-                            onLearnMore = {
-                                val intent = createAlbumDecryptionKeyScreen(this)
-                                startActivity(intent)
-                            },
-                            onShareLink = { album, link ->
-                                val intent = Intent(Intent.ACTION_SEND).apply {
-                                    type = "text/plain"
-                                    putExtra(Intent.EXTRA_SUBJECT, album?.title.orEmpty())
-                                    putExtra(Intent.EXTRA_TEXT, link)
-                                }
-                                val shareIntent = Intent.createChooser(
-                                    intent,
-                                    getString(R.string.general_share)
-                                )
-                                startActivity(shareIntent)
-                            },
-                        )
-                    }
-
-                    AlbumScreen.AlbumGetMultipleLinksScreen -> {
-                        AlbumGetMultipleLinksScreen(
-                            createView = ::showFragment,
-                            onBack = ::finish,
-                            onShareLinks = { albumLinks ->
-                                val linksString = albumLinks.joinToString(System.lineSeparator()) {
-                                    it.link
-                                }
-                                val intent = Intent(Intent.ACTION_SEND).apply {
-                                    type = "text/plain"
-                                    putExtra(Intent.EXTRA_TEXT, linksString)
-                                }
-                                val shareIntent = Intent.createChooser(
-                                    intent,
-                                    getString(R.string.general_share)
-                                )
-                                startActivity(shareIntent)
-                            },
-                        )
-                    }
-
-                    AlbumScreen.AlbumDecryptionKeyScreen -> {
-                        AlbumDecryptionKeyScreen(
-                            onBack = ::finish,
-                        )
-                    }
-
-                    AlbumScreen.AlbumImportScreen -> {
-                        AlbumImportScreen(
-                            albumImportViewModel = albumImportViewModel,
-                            onShareLink = { link ->
-                                val intent = Intent(Intent.ACTION_SEND).apply {
-                                    type = "text/plain"
-                                    putExtra(Intent.EXTRA_TEXT, link)
-                                }
-                                val shareIntent = Intent.createChooser(
-                                    intent,
-                                    getString(R.string.general_share)
-                                )
-                                startActivity(shareIntent)
-                            },
-                            onPreviewPhoto = {
-                                imagePreviewProvider.onPreviewPhoto(
-                                    activity = this,
-                                    photo = it,
-                                )
-                            },
-                            onNavigateFileExplorer = {
-                                val intent = Intent(this, FileExplorerActivity::class.java).apply {
-                                    action = FileExplorerActivity.ACTION_IMPORT_ALBUM
-                                }
-                                selectFolderLauncher.launch(intent)
-                            },
-                            onUpgradeAccount = {
-                                val intent = Intent(this, UpgradeAccountActivity::class.java)
-                                startActivity(intent)
-                            },
-                            onBack = { isBackToHome ->
-                                if (isBackToHome) {
-                                    val intent = Intent(this, ManagerActivity::class.java)
-                                    startActivity(intent)
-                                }
-                                finish()
-                            },
-                        )
-                    }
-
-                    else -> finish()
-                }
+            OriginalTheme(isDark = themeMode.isDarkMode()) {
+                PasscodeContainer(
+                    passcodeCryptObjectFactory = passcodeCryptObjectFactory,
+                    content = { PsaContainer { AlbumScreenContent() } }
+                )
             }
+        }
+    }
+
+    @Composable
+    private fun AlbumScreenContent() {
+        when (albumScreen) {
+            AlbumScreen.AlbumPhotosSelectionScreen -> {
+                AlbumPhotosSelectionScreen(
+                    onBackClicked = ::finish,
+                    onCompletion = { albumId, numCommittedPhotos ->
+                        val data = Intent().apply {
+                            putExtra(ALBUM_ID, albumId.id)
+                            putExtra(NUM_PHOTOS, numCommittedPhotos)
+                        }
+                        setResult(RESULT_OK, data)
+                        finish()
+                    },
+                )
+            }
+
+            AlbumScreen.AlbumCoverSelectionScreen -> {
+                AlbumCoverSelectionScreen(
+                    onBackClicked = ::finish,
+                    onCompletion = { message ->
+                        val data = Intent().apply {
+                            putExtra(MESSAGE, message)
+                        }
+                        setResult(RESULT_OK, data)
+                        finish()
+                    },
+                )
+            }
+
+            AlbumScreen.AlbumGetLinkScreen -> {
+                AlbumGetLinkScreen(
+                    getLinkViewModel = getLinkViewModel,
+                    createView = ::showFragment,
+                    onBack = ::finish,
+                    onLearnMore = {
+                        val intent = createAlbumDecryptionKeyScreen(this)
+                        startActivity(intent)
+                    },
+                    onShareLink = { album, link ->
+                        val intent = Intent(Intent.ACTION_SEND).apply {
+                            type = "text/plain"
+                            putExtra(Intent.EXTRA_SUBJECT, album?.title.orEmpty())
+                            putExtra(Intent.EXTRA_TEXT, link)
+                        }
+                        val shareIntent = Intent.createChooser(
+                            intent,
+                            getString(R.string.general_share)
+                        )
+                        startActivity(shareIntent)
+                    },
+                )
+            }
+
+            AlbumScreen.AlbumGetMultipleLinksScreen -> {
+                AlbumGetMultipleLinksScreen(
+                    createView = ::showFragment,
+                    onBack = ::finish,
+                    onShareLinks = { albumLinks ->
+                        val linksString = albumLinks.joinToString(System.lineSeparator()) {
+                            it.link
+                        }
+                        val intent = Intent(Intent.ACTION_SEND).apply {
+                            type = "text/plain"
+                            putExtra(Intent.EXTRA_TEXT, linksString)
+                        }
+                        val shareIntent = Intent.createChooser(
+                            intent,
+                            getString(R.string.general_share)
+                        )
+                        startActivity(shareIntent)
+                    },
+                )
+            }
+
+            AlbumScreen.AlbumDecryptionKeyScreen -> {
+                AlbumDecryptionKeyScreen(
+                    onBack = ::finish,
+                )
+            }
+
+            AlbumScreen.AlbumImportScreen -> {
+                AlbumImportScreen(
+                    albumImportViewModel = albumImportViewModel,
+                    onShareLink = { link ->
+                        if (getStorageState() == StorageState.PayWall) {
+                            showOverDiskQuotaPaywallWarning()
+                        } else {
+                            val intent = Intent(Intent.ACTION_SEND).apply {
+                                type = "text/plain"
+                                putExtra(Intent.EXTRA_TEXT, link)
+                            }
+                            val shareIntent = Intent.createChooser(
+                                intent,
+                                getString(R.string.general_share)
+                            )
+                            startActivity(shareIntent)
+                        }
+                    },
+                    onPreviewPhoto = {
+                        imagePreviewProvider.onPreviewPhoto(
+                            activity = this,
+                            photo = it,
+                        )
+                    },
+                    onNavigateFileExplorer = {
+                        val intent = Intent(this, FileExplorerActivity::class.java).apply {
+                            action = FileExplorerActivity.ACTION_IMPORT_ALBUM
+                        }
+                        selectFolderLauncher.launch(intent)
+                    },
+                    onUpgradeAccount = {
+                        val intent = Intent(this, UpgradeAccountActivity::class.java)
+                        startActivity(intent)
+                    },
+                    onBack = { isBackToHome ->
+                        if (isBackToHome) {
+                            val intent = Intent(this, ManagerActivity::class.java)
+                            startActivity(intent)
+                        }
+                        finish()
+                    },
+                    navigateToStorageSettings = {
+                        megaNavigator.openSettings(
+                            this,
+                            StorageTargetPreference
+                        )
+                    }
+                )
+            }
+
+            else -> finish()
         }
     }
 

@@ -36,8 +36,8 @@ import mega.privacy.android.shared.original.core.ui.model.MegaSpanStyle
 import mega.privacy.android.shared.original.core.ui.model.SpanIndicator
 import mega.privacy.android.shared.original.core.ui.preview.CombinedTextAndThemePreviews
 import mega.privacy.android.shared.original.core.ui.theme.MegaOriginalTheme
-import mega.privacy.android.shared.original.core.ui.theme.OriginalTempTheme
-import mega.privacy.android.shared.original.core.ui.theme.values.TextColor
+import mega.privacy.android.shared.original.core.ui.theme.OriginalTheme
+import mega.android.core.ui.theme.values.TextColor
 
 /**
  * Type of the notification t
@@ -231,7 +231,7 @@ private class NotificationProvider : PreviewParameterProvider<NotificationItemDe
 private fun NotificationItemViewPreview(
     @PreviewParameter(NotificationProvider::class) notification: NotificationItemDefinition,
 ) {
-    OriginalTempTheme(isDark = isSystemInDarkTheme()) {
+    OriginalTheme(isDark = isSystemInDarkTheme()) {
         NotificationItemView(
             notification.type,
             notification.typeTitle,

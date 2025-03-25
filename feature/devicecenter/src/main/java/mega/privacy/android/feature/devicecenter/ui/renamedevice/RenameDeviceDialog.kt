@@ -20,7 +20,7 @@ import mega.privacy.android.feature.devicecenter.R
 import mega.privacy.android.feature.devicecenter.ui.renamedevice.model.RenameDeviceState
 import mega.privacy.android.legacy.core.ui.controls.dialogs.InputDialog
 import mega.privacy.android.shared.original.core.ui.preview.CombinedThemePreviews
-import mega.privacy.android.shared.original.core.ui.theme.OriginalTempTheme
+import mega.privacy.android.shared.original.core.ui.theme.OriginalTheme
 import mega.privacy.mobile.analytics.event.DeviceCenterSaveNewDeviceNameButtonEvent
 
 /**
@@ -71,6 +71,9 @@ internal fun RenameDeviceDialog(
             renameDeviceViewModel.clearErrorMessage()
             onRenameCancelled.invoke()
         },
+        onInputChange = {
+            renameDeviceViewModel.clearErrorMessage()
+        }
     )
 }
 
@@ -88,6 +91,7 @@ private fun RenameDeviceDialogBody(
     oldDeviceName: String,
     onRenameConfirmed: (String) -> Unit,
     onRenameCancelled: () -> Unit,
+    onInputChange: () -> Unit,
 ) {
     // Saves the input across configuration changes
     var initialInput by rememberSaveable { mutableStateOf(oldDeviceName) }
@@ -98,7 +102,10 @@ private fun RenameDeviceDialogBody(
         confirmButtonText = stringResource(id = R.string.device_center_rename_device_dialog_positive_button),
         cancelButtonText = stringResource(id = sharedR.string.general_dialog_cancel_button),
         text = initialInput,
-        onInputChange = { initialInput = it },
+        onInputChange = {
+            initialInput = it
+            onInputChange()
+        },
         error = uiState.errorMessage?.let { nonNullErrorMessage ->
             if (nonNullErrorMessage == R.string.device_center_rename_device_dialog_error_message_invalid_characters) {
                 stringResource(nonNullErrorMessage).replace(
@@ -122,12 +129,13 @@ private fun RenameDeviceDialogBody(
 private fun PreviewRenameDeviceDialogBody(
     @PreviewParameter(RenameDeviceDialogBodyPreviewProvider::class) renameDeviceState: RenameDeviceState,
 ) {
-    OriginalTempTheme(isDark = isSystemInDarkTheme()) {
+    OriginalTheme(isDark = isSystemInDarkTheme()) {
         RenameDeviceDialogBody(
             uiState = renameDeviceState,
             oldDeviceName = "Samsung Galaxy S21 FE",
             onRenameConfirmed = {},
             onRenameCancelled = {},
+            onInputChange = {},
         )
     }
 }

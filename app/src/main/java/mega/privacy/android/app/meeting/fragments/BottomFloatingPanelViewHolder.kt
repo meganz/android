@@ -15,7 +15,6 @@ import android.widget.Button
 import android.widget.FrameLayout
 import android.widget.LinearLayout
 import android.widget.PopupWindow
-import androidx.compose.foundation.isSystemInDarkTheme
 import androidx.compose.ui.platform.ViewCompositionStrategy
 import androidx.core.content.ContextCompat
 import androidx.core.view.isVisible
@@ -32,7 +31,7 @@ import mega.privacy.android.app.presentation.meeting.WaitingRoomManagementViewMo
 import mega.privacy.android.app.presentation.meeting.view.ParticipantsBottomPanelView
 import mega.privacy.android.app.utils.Util
 import mega.privacy.android.domain.entity.call.AudioDevice
-import mega.privacy.android.shared.original.core.ui.theme.OriginalTempTheme
+import mega.privacy.android.shared.original.core.ui.theme.OriginalTheme
 import mega.privacy.mobile.analytics.event.CallUIMoreButtonPressedEvent
 import mega.privacy.mobile.analytics.event.ParticipantListInviteParticipantRowPressedEvent
 import timber.log.Timber
@@ -240,7 +239,7 @@ class BottomFloatingPanelViewHolder(
         meetingActionButtons.apply {
             isMicOn = savedMicState
             Timber.d("Mic Enabled $isMicOn")
-            isCameraOn = true
+            isCameraOn = savedCamState
             Timber.d("Camera Enabled $isCameraOn")
         }
         updateSpeakerIcon(savedSpeakerState)
@@ -446,7 +445,7 @@ class BottomFloatingPanelViewHolder(
 
             setViewCompositionStrategy(ViewCompositionStrategy.DisposeOnViewTreeLifecycleDestroyed)
             setContent {
-                OriginalTempTheme(isDark = isSystemInDarkTheme()) {
+                OriginalTheme(isDark = true) {
                     ParticipantsBottomPanelView(
                         viewModel = meetingViewModel,
                         waitingRoomManagementViewModel = waitingRoomManagementViewModel,

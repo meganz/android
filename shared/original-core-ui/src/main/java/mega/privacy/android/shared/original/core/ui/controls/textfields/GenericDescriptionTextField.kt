@@ -10,7 +10,6 @@ import androidx.compose.foundation.text.BasicTextField
 import androidx.compose.foundation.text.KeyboardActions
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.foundation.text.selection.LocalTextSelectionColors
-import androidx.compose.foundation.text.selection.TextSelectionColors
 import androidx.compose.material.ExperimentalMaterialApi
 import androidx.compose.material.MaterialTheme
 import androidx.compose.material.Text
@@ -42,8 +41,8 @@ import mega.privacy.android.shared.original.core.ui.controls.text.MegaText
 import mega.privacy.android.shared.original.core.ui.controls.textfields.transformations.PrefixTransformation
 import mega.privacy.android.shared.original.core.ui.preview.CombinedThemePreviews
 import mega.privacy.android.shared.original.core.ui.theme.MegaOriginalTheme
-import mega.privacy.android.shared.original.core.ui.theme.OriginalTempTheme
-import mega.privacy.android.shared.original.core.ui.theme.values.TextColor
+import mega.privacy.android.shared.original.core.ui.theme.OriginalTheme
+import mega.android.core.ui.theme.values.TextColor
 
 /**
  * TextField Generic Description
@@ -91,10 +90,7 @@ fun GenericDescriptionTextField(
             errorLabelColor = MegaOriginalTheme.colors.text.error,
         )
 
-        val customTextSelectionColors = TextSelectionColors(
-            handleColor = MegaOriginalTheme.colors.border.strongSelected,
-            backgroundColor = MegaOriginalTheme.colors.border.strongSelected
-        )
+        val customTextSelectionColors = customTextSelectionColors()
 
         val keyboardOption = KeyboardOptions(
             keyboardType = KeyboardType.Text,
@@ -211,7 +207,7 @@ fun GenericDescriptionTextField(
 @CombinedThemePreviews
 @Composable
 private fun GenericDescriptionTextFieldPreview() {
-    OriginalTempTheme(isDark = isSystemInDarkTheme()) {
+    OriginalTheme(isDark = isSystemInDarkTheme()) {
         var textFieldValue by remember { mutableStateOf("") }
         GenericDescriptionTextField(
             value = textFieldValue,

@@ -2,7 +2,6 @@ package mega.privacy.android.app.presentation.videosection.view
 
 import androidx.activity.compose.BackHandler
 import androidx.activity.compose.LocalOnBackPressedDispatcherOwner
-import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.foundation.pager.rememberPagerState
@@ -34,7 +33,7 @@ import mega.privacy.android.domain.entity.SortOrder
 import mega.privacy.android.legacy.core.ui.model.SearchWidgetState
 import mega.privacy.android.shared.original.core.ui.controls.layouts.MegaScaffold
 
-@OptIn(ExperimentalFoundationApi::class, ExperimentalComposeUiApi::class)
+@OptIn(ExperimentalComposeUiApi::class)
 @Composable
 internal fun VideoSectionComposeView(
     videoSectionViewModel: VideoSectionViewModel,
@@ -46,6 +45,7 @@ internal fun VideoSectionComposeView(
     onPlaylistItemLongClick: (VideoPlaylistUIEntity, index: Int) -> Unit,
     onDeleteDialogButtonClicked: () -> Unit,
     onMenuAction: (VideoSectionMenuAction?) -> Unit,
+    retryActionCallback: () -> Unit,
 ) {
     val uiState by videoSectionViewModel.state.collectAsStateWithLifecycle()
     val tabState by videoSectionViewModel.tabState.collectAsStateWithLifecycle()
@@ -61,11 +61,6 @@ internal fun VideoSectionComposeView(
         initialPageOffsetFraction = 0f
     ) {
         tabState.tabs.size
-    }
-
-    var isRecentlyWatchedEnabled by rememberSaveable { mutableStateOf(false) }
-    LaunchedEffect(isRecentlyWatchedEnabled) {
-        isRecentlyWatchedEnabled = videoSectionViewModel.isRecentlyWatchedEnabled()
     }
 
     var showDeleteVideoPlaylist by rememberSaveable { mutableStateOf(false) }
@@ -152,7 +147,6 @@ internal fun VideoSectionComposeView(
                 isHideMenuActionVisible = uiState.isHideMenuActionVisible,
                 isUnhideMenuActionVisible = uiState.isUnhideMenuActionVisible,
                 isRemoveLinkMenuActionVisible = uiState.isRemoveLinkMenuActionVisible,
-                isRecentlyWatchedEnabled = isRecentlyWatchedEnabled,
             )
         }
     ) { paddingValues ->
@@ -163,6 +157,7 @@ internal fun VideoSectionComposeView(
             allVideoView = {
                 AllVideosView(
                     items = uiState.allVideos,
+                    highlightText = uiState.highlightText,
                     shouldApplySensitiveMode = uiState.hiddenNodeEnabled
                             && uiState.accountType?.isPaid == true
                             && !uiState.isBusinessAccountExpired,
@@ -182,7 +177,13 @@ internal fun VideoSectionComposeView(
                     onSortOrderClick = onSortOrderClick,
                     onClick = onClick,
                     onLongClick = onLongClick,
-                    onMenuClick = onMenuClick
+                    onMenuClick = onMenuClick,
+                    addToPlaylistsTitles = uiState.addToPlaylistTitles,
+                    clearAddToPlaylistsTitles = {
+                        videoSectionViewModel.updateAddToPlaylistHandle(null)
+                        videoSectionViewModel.updateAddToPlaylistTitles(null)
+                    },
+                    retryActionCallback = retryActionCallback
                 )
             },
             playlistsView = {
@@ -201,7 +202,7 @@ internal fun VideoSectionComposeView(
                                 SortOrder.ORDER_FAV_DESC,
                                 SortOrder.ORDER_LABEL_ASC,
                                 SortOrder.ORDER_LABEL_DESC,
-                                -> SortOrder.ORDER_DEFAULT_ASC
+                                    -> SortOrder.ORDER_DEFAULT_ASC
 
                                 else -> uiState.sortOrder
                             }

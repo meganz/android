@@ -72,7 +72,7 @@ import mega.privacy.android.shared.original.core.ui.controls.dialogs.MegaAlertDi
 import mega.privacy.android.shared.original.core.ui.controls.text.AutoSizeText
 import mega.privacy.android.shared.original.core.ui.controls.textfields.GenericTextField
 import mega.privacy.android.shared.original.core.ui.controls.video.MegaVideoTextureView
-import mega.privacy.android.shared.original.core.ui.theme.OriginalTempTheme
+import mega.privacy.android.shared.original.core.ui.theme.OriginalTheme
 import mega.privacy.android.shared.original.core.ui.theme.extensions.grey_020_grey_900
 import mega.privacy.android.shared.original.core.ui.theme.extensions.subtitle2medium
 import mega.privacy.android.shared.original.core.ui.theme.grey_900
@@ -445,7 +445,7 @@ private fun GuestNameInputText(
 )
 @Composable
 internal fun PreviewWaitingRoomView() {
-    OriginalTempTheme(isDark = isSystemInDarkTheme()) {
+    OriginalTheme(isDark = isSystemInDarkTheme()) {
         WaitingRoomView(
             state = WaitingRoomState(
                 chatId = -1,
@@ -475,7 +475,7 @@ internal fun PreviewWaitingRoomView() {
 )
 @Composable
 internal fun PreviewGuestWaitingRoomView() {
-    OriginalTempTheme(isDark = isSystemInDarkTheme()) {
+    OriginalTheme(isDark = isSystemInDarkTheme()) {
         WaitingRoomView(
             state = WaitingRoomState(
                 chatId = -1,

@@ -1,8 +1,6 @@
 package mega.privacy.android.app.presentation.settings
 
 import android.annotation.SuppressLint
-import android.content.Context
-import android.content.Intent
 import android.content.res.Configuration
 import android.os.Bundle
 import androidx.core.view.WindowInsetsControllerCompat
@@ -14,9 +12,6 @@ import mega.privacy.android.app.BaseActivity
 import mega.privacy.android.app.R
 import mega.privacy.android.app.extensions.enableEdgeToEdgeAndConsumeInsets
 import mega.privacy.android.app.presentation.security.PasscodeCheck
-import mega.privacy.android.app.presentation.settings.SettingsFragment.Companion.INITIAL_PREFERENCE
-import mega.privacy.android.app.presentation.settings.SettingsFragment.Companion.NAVIGATE_TO_INITIAL_PREFERENCE
-import mega.privacy.android.app.presentation.settings.model.TargetPreference
 import mega.privacy.android.domain.usecase.GetThemeMode
 import javax.inject.Inject
 
@@ -36,6 +31,7 @@ class SettingsActivity : BaseActivity(),
     override fun onCreate(savedInstanceState: Bundle?) {
         enableEdgeToEdgeAndConsumeInsets()
         super.onCreate(savedInstanceState)
+        appContainerWrapper.setPasscodeCheck(passCodeFacade)
         if (shouldRefreshSessionDueToSDK(true)) return
         setContentView(R.layout.settings_activity)
         setSupportActionBar(findViewById(R.id.settings_toolbar))
@@ -105,15 +101,4 @@ class SettingsActivity : BaseActivity(),
             true
         } ?: false
 
-    companion object {
-        /**
-         * Get an intent to launch the SettingsActivity
-         */
-        fun getIntent(context: Context, targetPreference: TargetPreference? = null): Intent {
-            return Intent(context, SettingsActivity::class.java).apply {
-                putExtra(INITIAL_PREFERENCE, targetPreference?.preferenceId)
-                putExtra(NAVIGATE_TO_INITIAL_PREFERENCE, targetPreference?.requiresNavigation)
-            }
-        }
-    }
 }

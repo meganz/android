@@ -17,10 +17,10 @@ import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.tooling.preview.PreviewParameter
 import androidx.compose.ui.tooling.preview.PreviewParameterProvider
 import androidx.compose.ui.unit.dp
-import mega.privacy.android.shared.original.core.ui.preview.CombinedThemePreviews
+import mega.android.core.ui.theme.values.TextColor
+import mega.privacy.android.shared.original.core.ui.preview.CombinedThemeComponentPreviews
 import mega.privacy.android.shared.original.core.ui.theme.MegaOriginalTheme
-import mega.privacy.android.shared.original.core.ui.theme.OriginalTempTheme
-import mega.privacy.android.shared.original.core.ui.theme.values.TextColor
+import mega.privacy.android.shared.original.core.ui.theme.OriginalTheme
 
 /**
  * Mega text.
@@ -91,6 +91,7 @@ fun MegaText(
     textColor: TextColor,
     maxLines: Int,
     modifier: Modifier = Modifier,
+    overflow: TextOverflow = TextOverflow.Clip,
     inlineContent: Map<String, InlineTextContent> = mapOf(),
     minLines: Int = 1,
     style: TextStyle = LocalTextStyle.current,
@@ -99,6 +100,7 @@ fun MegaText(
 ) = Text(
     text = text,
     modifier = modifier,
+    overflow = overflow,
     color = MegaOriginalTheme.textColor(textColor = textColor),
     maxLines = maxLines,
     minLines = minLines,
@@ -119,12 +121,12 @@ private fun LongTextBehaviour.getTextOverflow() = when (this) {
     is LongTextBehaviour.Marquee -> TextOverflow.Visible
 }
 
-@CombinedThemePreviews
+@CombinedThemeComponentPreviews
 @Composable
 private fun PreviewMiddleEllipsisText(
     @PreviewParameter(MiddleEllipsisTextPreviewProvider::class) text: String,
 ) {
-    OriginalTempTheme(isDark = isSystemInDarkTheme()) {
+    OriginalTheme(isDark = isSystemInDarkTheme()) {
         MegaText(
             text = text,
             textColor = TextColor.Primary,
@@ -133,10 +135,10 @@ private fun PreviewMiddleEllipsisText(
     }
 }
 
-@CombinedThemePreviews
+@CombinedThemeComponentPreviews
 @Composable
 private fun MarqueeTextPreview() {
-    OriginalTempTheme(isDark = isSystemInDarkTheme()) {
+    OriginalTheme(isDark = isSystemInDarkTheme()) {
         MegaText(
             text = "Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua",
             textColor = TextColor.Secondary,
@@ -145,12 +147,12 @@ private fun MarqueeTextPreview() {
     }
 }
 
-@CombinedThemePreviews
+@CombinedThemeComponentPreviews
 @Composable
 private fun MegaTextPreview(
     @PreviewParameter(TextColorProvider::class) textColor: TextColor,
 ) {
-    OriginalTempTheme(isDark = isSystemInDarkTheme()) {
+    OriginalTheme(isDark = isSystemInDarkTheme()) {
         MegaText(
             text = textColor.name,
             textColor = textColor,

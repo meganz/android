@@ -442,8 +442,8 @@ class VideoToPlaylistViewModelTest {
             underTest.uiState.test {
                 val actual = awaitItem()
                 assertThat(actual.addedPlaylistTitles).isNotEmpty()
-                assertThat(actual.addedPlaylistTitles.size).isEqualTo(3)
-                actual.addedPlaylistTitles.forEachIndexed { index, title ->
+                assertThat(actual.addedPlaylistTitles?.size).isEqualTo(3)
+                actual.addedPlaylistTitles?.forEachIndexed { index, title ->
                     assertThat(title).isEqualTo(expectedUserSets[index].name)
                 }
             }

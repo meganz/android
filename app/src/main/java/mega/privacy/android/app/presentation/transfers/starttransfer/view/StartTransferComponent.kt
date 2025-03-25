@@ -7,7 +7,6 @@ import android.content.Context
 import android.content.Intent
 import android.net.Uri
 import android.os.Build
-import android.os.Environment
 import android.view.View
 import androidx.compose.foundation.isSystemInDarkTheme
 import androidx.compose.material.SnackbarHostState
@@ -24,11 +23,10 @@ import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.platform.ComposeView
 import androidx.compose.ui.platform.LocalContext
-import androidx.compose.ui.platform.LocalLifecycleOwner
 import androidx.compose.ui.platform.ViewCompositionStrategy
 import androidx.compose.ui.res.stringResource
-import androidx.core.content.ContextCompat
 import androidx.hilt.navigation.compose.hiltViewModel
+import androidx.lifecycle.compose.LocalLifecycleOwner
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.google.accompanist.permissions.ExperimentalPermissionsApi
 import com.google.accompanist.permissions.isGranted
@@ -37,8 +35,6 @@ import com.google.accompanist.permissions.shouldShowRationale
 import de.palm.composestateevents.EventEffect
 import de.palm.composestateevents.StateEventWithContent
 import de.palm.composestateevents.consumed
-import kotlinx.coroutines.coroutineScope
-import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.launch
@@ -47,16 +43,21 @@ import mega.privacy.android.app.constants.IntentConstants
 import mega.privacy.android.app.interfaces.SnackbarShower
 import mega.privacy.android.app.main.dialog.storagestatus.StorageStatusDialogView
 import mega.privacy.android.app.myAccount.MyAccountActivity
+import mega.privacy.android.app.presentation.node.action.HandleFileAction
 import mega.privacy.android.app.presentation.permissions.NotificationsPermissionActivity
-import mega.privacy.android.app.presentation.settings.SettingsActivity
-import mega.privacy.android.app.presentation.settings.model.TargetPreference
 import mega.privacy.android.app.presentation.snackbar.LegacySnackBarWrapper
 import mega.privacy.android.app.presentation.transfers.starttransfer.StartTransfersComponentViewModel
+import mega.privacy.android.app.presentation.transfers.starttransfer.model.SaveDestinationInfo
 import mega.privacy.android.app.presentation.transfers.starttransfer.model.StartTransferEvent
 import mega.privacy.android.app.presentation.transfers.starttransfer.model.StartTransferViewState
 import mega.privacy.android.app.presentation.transfers.starttransfer.model.TransferTriggerEvent
-import mega.privacy.android.app.presentation.transfers.starttransfer.view.dialog.ResumeTransfersDialog
+import mega.privacy.android.app.presentation.transfers.starttransfer.model.TransferTriggerEvent.StartUpload
+import mega.privacy.android.app.presentation.transfers.starttransfer.model.TransferTriggerEvent.StartUpload.Files
+import mega.privacy.android.app.presentation.transfers.starttransfer.view.dialog.ResumeChatTransfersDialog
+import mega.privacy.android.app.presentation.transfers.starttransfer.view.dialog.ResumePreviewTransfersDialog
 import mega.privacy.android.app.presentation.transfers.starttransfer.view.filespermission.FilesPermissionDialog
+import mega.privacy.android.app.presentation.transfers.view.dialog.CancelTransferDialog
+import mega.privacy.android.app.presentation.transfers.view.dialog.NotEnoughSpaceForUploadDialog
 import mega.privacy.android.app.presentation.transfers.view.dialog.TransferInProgressDialog
 import mega.privacy.android.app.upgradeAccount.UpgradeAccountActivity
 import mega.privacy.android.app.usecase.exception.NotEnoughQuotaMegaException
@@ -66,9 +67,10 @@ import mega.privacy.android.domain.entity.StorageState
 import mega.privacy.android.shared.original.core.ui.controls.dialogs.ConfirmationDialog
 import mega.privacy.android.shared.original.core.ui.controls.dialogs.MegaAlertDialog
 import mega.privacy.android.shared.original.core.ui.navigation.launchFolderPicker
-import mega.privacy.android.shared.original.core.ui.theme.OriginalTempTheme
+import mega.privacy.android.shared.original.core.ui.theme.OriginalTheme
 import mega.privacy.android.shared.original.core.ui.utils.showAutoDurationSnackbar
 import timber.log.Timber
+import java.io.File
 
 /**
  * Helper compose view to show UI related to starting a download transfer
@@ -82,12 +84,17 @@ internal fun StartTransferComponent(
     snackBarHostState: SnackbarHostState,
     onScanningFinished: (StartTransferEvent) -> Unit = {},
     viewModel: StartTransfersComponentViewModel = hiltViewModel(),
+    navigateToStorageSettings: () -> Unit,
 ) {
     val uiState by viewModel.uiState.collectAsStateWithLifecycle()
     val context = LocalContext.current
     var showFilesPermissionRequest by rememberSaveable { mutableStateOf(false) }
+    var showStorageOverQuotaWarning by rememberSaveable { mutableStateOf(false) }
     val notificationPermission = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
-        rememberPermissionState(Manifest.permission.POST_NOTIFICATIONS)
+        rememberPermissionState(Manifest.permission.POST_NOTIFICATIONS) {
+            // we don't need notifications granted to start, but sometimes we wait user response to start, check [TransferTriggerEvent.waitForNotificationPermissionResponseToStart]
+            viewModel.startTransferAfterPermissionRequest()
+        }
     } else {
         null
     }
@@ -115,6 +122,11 @@ internal fun StartTransferComponent(
         event = event,
         onConsumed = onConsumeEvent,
         action = { triggerEvent ->
+            if (uiState.isStorageOverQuota && triggerEvent is StartUpload) {
+                showStorageOverQuotaWarning = true
+                return@EventEffect
+            }
+
             notificationPermission?.status?.let { permissionStatus ->
                 if (permissionStatus.shouldShowRationale) {
                     context.startActivity(
@@ -122,14 +134,13 @@ internal fun StartTransferComponent(
                     )
                 } else if (!permissionStatus.isGranted) {
                     notificationPermission.launchPermissionRequest()
+                    if (triggerEvent.waitNotificationPermissionResponseToStart) {
+                        viewModel.transferEventWaitingForPermissionRequest(triggerEvent)
+                        return@EventEffect
+                    }
                 }
             }
             when {
-                shouldAskForFilesPermission(uiState.requestFilesPermissionDenied, triggerEvent) -> {
-                    viewModel.transferEventWaitingForPermissionRequest(triggerEvent)
-                    showFilesPermissionRequest = true
-                }
-
                 triggerEvent !is TransferTriggerEvent.StartUpload.TextFile
                         && mediaReadPermission?.status?.isGranted == false -> {
                     viewModel.transferEventWaitingForPermissionRequest(triggerEvent)
@@ -152,6 +163,10 @@ internal fun StartTransferComponent(
         )
     }
 
+    if (showStorageOverQuotaWarning) {
+        NotEnoughSpaceForUploadDialog(onCancel = { showStorageOverQuotaWarning = false })
+    }
+
     StartTransferComponent(
         uiState = uiState,
         onOneOffEventConsumed = viewModel::consumeOneOffEvent,
@@ -165,6 +180,12 @@ internal fun StartTransferComponent(
         onAskedResumeTransfers = viewModel::setAskedResumeTransfers,
         snackBarHostState = snackBarHostState,
         onScanningFinished = onScanningFinished,
+        navigateToStorageSettings = navigateToStorageSettings,
+        onPreviewFile = viewModel::previewFile,
+        onPreviewOpened = viewModel::consumePreviewFileOpened,
+        onCancelTransferConfirmed = viewModel::cancelTransferConfirmed,
+        onCancelTransferCancelled = viewModel::cancelTransferCancelled,
+        onConsumeCancelTransferResult = viewModel::onConsumeCancelTransferResult,
     )
 }
 
@@ -175,10 +196,11 @@ internal fun StartTransferComponent(
  * @param onConsumeEvent lambda to consume the download event, typically it will launch the corresponding consume event in the view model,
  * @param onScanningFinished lambda to be called when the scanning process is finished.
  */
-fun createStartTransferView(
+internal fun createStartTransferView(
     activity: Activity,
     transferEventState: Flow<StateEventWithContent<TransferTriggerEvent>>,
     onConsumeEvent: () -> Unit,
+    navigateToStorageSettings: () -> Unit,
     onScanningFinished: (StartTransferEvent) -> Unit = {},
 ): View = ComposeView(activity).apply {
     setViewCompositionStrategy(ViewCompositionStrategy.DisposeOnViewTreeLifecycleDestroyed)
@@ -186,20 +208,20 @@ fun createStartTransferView(
         val downloadEvent by transferEventState.collectAsStateWithLifecycle(
             (transferEventState as? StateFlow)?.value ?: consumed()
         )
-        OriginalTempTheme(isDark = isSystemInDarkTheme()) {
+        OriginalTheme(isDark = isSystemInDarkTheme()) {
             val snackbarHostState = remember { SnackbarHostState() }
             //if we need this view is because we are not using compose views, so we don't have a scaffold to show snack bars and need to launch a View snackbar
             LegacySnackBarWrapper(snackbarHostState = snackbarHostState, activity)
             StartTransferComponent(
-                downloadEvent,
-                onConsumeEvent,
+                event = downloadEvent,
+                onConsumeEvent = onConsumeEvent,
                 snackBarHostState = snackbarHostState,
-                onScanningFinished,
+                onScanningFinished = onScanningFinished,
+                navigateToStorageSettings = navigateToStorageSettings,
             )
         }
     }
 }
-
 
 @Composable
 private fun StartTransferComponent(
@@ -215,11 +237,18 @@ private fun StartTransferComponent(
     onAskedResumeTransfers: () -> Unit,
     snackBarHostState: SnackbarHostState,
     onScanningFinished: (StartTransferEvent) -> Unit = {},
+    navigateToStorageSettings: () -> Unit,
+    onPreviewFile: (File) -> Unit,
+    onPreviewOpened: () -> Unit,
+    onCancelTransferConfirmed: () -> Unit,
+    onCancelTransferCancelled: () -> Unit,
+    onConsumeCancelTransferResult: () -> Unit,
 ) {
     val context = LocalContext.current
     val coroutineScope = rememberCoroutineScope()
     var showOfflineAlertDialog by rememberSaveable { mutableStateOf(false) }
-    var showResumeTransfersAlertDialog by rememberSaveable { mutableStateOf(false) }
+    var showResumeChatUploadsAlertDialog by rememberSaveable { mutableStateOf(false) }
+    var showResumePreviewDownloadsAlertDialog by rememberSaveable { mutableStateOf<String?>(null) }
     val showQuotaExceededDialog = rememberSaveable(stateSaver = storageStateSaver) {
         mutableStateOf(null)
     }
@@ -242,40 +271,73 @@ private fun StartTransferComponent(
         action = {
             when (it) {
                 is StartTransferEvent.FinishDownloadProcessing -> {
-                    consumeFinishProcessing(
-                        event = it,
-                        snackBarHostState = snackBarHostState,
-                        showQuotaExceededDialog = showQuotaExceededDialog,
-                        context = context,
-                        transferTriggerEvent = it.triggerEvent,
-                    )
+                    it.exception?.let {
+                        downloadScanningFinishedWithError(
+                            exception = it,
+                            snackBarHostState = snackBarHostState,
+                            showQuotaExceededDialog = showQuotaExceededDialog,
+                            context = context,
+                        )
+                    }
                     onScanningFinished(it)
                 }
 
                 is StartTransferEvent.FinishUploadProcessing -> {
-                    val message = context.resources.getQuantityString(
-                        R.plurals.upload_began,
-                        it.totalFiles,
-                        it.totalFiles,
-                    )
+                    val message = (it.triggerEvent as? Files)?.specificStartMessage
+                        ?: context.resources.getQuantityString(
+                            R.plurals.upload_began,
+                            it.totalFiles,
+                            it.totalFiles,
+                        )
                     snackBarHostState.showAutoDurationSnackbar(message)
                     onScanningFinished(it)
                 }
 
-                is StartTransferEvent.Message ->
-                    consumeMessage(it, snackBarHostState, context)
+                is StartTransferEvent.Message -> {
+                    consumeMessage(
+                        it,
+                        snackBarHostState,
+                        context,
+                        navigateToStorageSettings,
+                        onPreviewFile,
+                    )
+                }
 
                 StartTransferEvent.NotConnected -> {
                     showOfflineAlertDialog = true
                 }
 
-                StartTransferEvent.PausedTransfers -> {
-                    showResumeTransfersAlertDialog = true
+                is StartTransferEvent.PausedTransfers -> {
+                    when {
+                        it.triggerEvent is TransferTriggerEvent.StartChatUpload -> {
+                            showResumeChatUploadsAlertDialog = true
+                        }
+
+                        it.triggerEvent is TransferTriggerEvent.StartDownloadForPreview -> {
+                            showResumePreviewDownloadsAlertDialog =
+                                it.triggerEvent.node?.name ?: run {
+                                    Timber.w("Empty name for file preview")
+                                    ""
+                                }
+                        }
+                    }
+                }
+
+                is StartTransferEvent.FinishCopyOffline -> {
+                    snackBarHostState.showAutoDurationSnackbar(
+                        context.resources.getQuantityString(
+                            R.plurals.download_complete,
+                            it.totalFiles,
+                            it.totalFiles,
+                        )
+                    )
                 }
             }
         })
 
-    var showPromptSaveDestinationDialog by rememberSaveable { mutableStateOf<String?>(null) }
+    var showPromptSaveDestinationDialog by rememberSaveable {
+        mutableStateOf<SaveDestinationInfo?>(null)
+    }
     EventEffect(
         event = uiState.promptSaveDestination,
         onConsumed = onPromptSaveDestinationConsumed,
@@ -296,6 +358,14 @@ private fun StartTransferComponent(
             cancelButtonText = null,
             onConfirm = { showOfflineAlertDialog = false },
             onDismiss = { showOfflineAlertDialog = false },
+        )
+    }
+    if (uiState.previewFileToOpen != null) {
+        HandleFileAction(
+            file = uiState.previewFileToOpen,
+            isOpenWith = uiState.isOpenWithAction,
+            snackBarHostState = snackBarHostState,
+            onActionHandled = onPreviewOpened,
         )
     }
     showQuotaExceededDialog.value?.let {
@@ -319,9 +389,15 @@ private fun StartTransferComponent(
         )
     }
     uiState.confirmLargeDownload?.let {
+        val textId = if (it.transferTriggerEvent is TransferTriggerEvent.StartDownloadForPreview) {
+            sharedR.string.alert_larger_file_preview
+        } else {
+            R.string.alert_larger_file
+        }
+
         ConfirmationDialog(
             title = stringResource(id = R.string.transfers_confirm_large_download_title),
-            text = stringResource(id = R.string.alert_larger_file, it.sizeString),
+            text = stringResource(id = textId, it.sizeString),
             buttonOption1Text = stringResource(id = R.string.transfers_confirm_large_download_button_start),
             buttonOption2Text = stringResource(id = R.string.transfers_confirm_large_download_button_start_always),
             cancelButtonText = stringResource(id = sharedR.string.general_dialog_cancel_button),
@@ -344,40 +420,73 @@ private fun StartTransferComponent(
             }
         }
     }
-    showPromptSaveDestinationDialog?.let { destination ->
+    showPromptSaveDestinationDialog?.let { saveDestinationInfo ->
         //this dialog will be updated once we have a dialog defined for this case that follows our DS
         ConfirmationDialog(
-            title = null,
-            text = stringResource(id = sharedR.string.transfers_dialog_save_download_location_title),
-            buttonOption1Text = stringResource(id = sharedR.string.transfers_dialog_save_download_location_only_this_time_option),
-            buttonOption2Text = stringResource(id = sharedR.string.transfers_dialog_save_download_location_always_here_option),
+            title = stringResource(
+                id = sharedR.string.transfers_dialog_save_download_location_title,
+                saveDestinationInfo.destinationName
+            ),
+            confirmButtonText = stringResource(id = sharedR.string.transfers_dialog_save_download_location_always_here_option),
             cancelButtonText = stringResource(id = sharedR.string.transfers_dialog_save_download_location_always_ask_option),
-            onOption1 = {
-                //nothing in this case, just dismiss
+            onConfirm = {
+                onSaveDestination(saveDestinationInfo.destination)
                 showPromptSaveDestinationDialog = null
             },
-            onOption2 = {
-                onSaveDestination(destination)
+            onDismiss = {
                 showPromptSaveDestinationDialog = null
             },
             onCancel = {
                 onDoNotPromptToSaveDestinationAgain()
                 showPromptSaveDestinationDialog = null
             },
-            onDismiss = {
-                showPromptSaveDestinationDialog = null
-            }
         )
     }
-    if (showResumeTransfersAlertDialog) {
-        ResumeTransfersDialog(onResume = {
-            onResumeTransfers()
-            showResumeTransfersAlertDialog = false
-        }, onDismiss = {
-            onAskedResumeTransfers()
-            showResumeTransfersAlertDialog = false
-        })
+    if (showResumeChatUploadsAlertDialog) {
+        ResumeChatTransfersDialog(
+            onResume = {
+                onResumeTransfers()
+                showResumeChatUploadsAlertDialog = false
+            },
+            onDismiss = {
+                onAskedResumeTransfers()
+                showResumeChatUploadsAlertDialog = false
+            })
     }
+    showResumePreviewDownloadsAlertDialog?.let { fileName ->
+        ResumePreviewTransfersDialog(
+            fileName = fileName,
+            onResume = {
+                onResumeTransfers()
+                showResumePreviewDownloadsAlertDialog = null
+            },
+            onDismiss = {
+                onAskedResumeTransfers()
+                showResumePreviewDownloadsAlertDialog = null
+            })
+    }
+    uiState.transferTagToCancel?.let {
+        CancelTransferDialog(
+            title = stringResource(sharedR.string.transfers_cancel_download_warning_title),
+            onCancelTransfer = onCancelTransferConfirmed,
+            onDismiss = onCancelTransferCancelled
+        )
+    }
+    EventEffect(
+        event = uiState.cancelTransferResult,
+        onConsumed = onConsumeCancelTransferResult,
+        action = {
+            snackBarHostState.showAutoDurationSnackbar(
+                context.getString(
+                    if (it.success) {
+                        sharedR.string.transfers_cancel_download_success_message
+                    } else {
+                        R.string.general_error
+                    }
+                )
+            )
+        }
+    )
 }
 
 private val storageStateSaver = Saver<StorageState?, Int>(
@@ -385,83 +494,13 @@ private val storageStateSaver = Saver<StorageState?, Int>(
     restore = { StorageState.entries.getOrNull(it) }
 )
 
-private suspend fun consumeFinishProcessing(
-    event: StartTransferEvent.FinishDownloadProcessing,
+private suspend fun downloadScanningFinishedWithError(
+    exception: Throwable,
     snackBarHostState: SnackbarHostState,
     showQuotaExceededDialog: MutableState<StorageState?>,
     context: Context,
-    transferTriggerEvent: TransferTriggerEvent?,
 ) {
-    var delayed = false
-    when (event.exception) {
-        null -> {
-            val message = when {
-                transferTriggerEvent is TransferTriggerEvent.StartDownloadForPreview -> {
-                    context.resources.getString(R.string.cloud_drive_snackbar_preparing_file_for_preview_context)
-                }
-
-                event.totalAlreadyDownloaded == 0 -> {
-                    // Delayed to avoid showing the snackbar and the transfers widget just at the same time because it sometimes causes a flick animation
-                    delayed = true
-                    context.resources.getQuantityString(
-                        R.plurals.download_started,
-                        event.totalNodes,
-                        event.totalNodes,
-                    )
-                }
-
-                event.filesToDownload == 0 -> {
-                    context.resources.getQuantityString(
-                        R.plurals.already_downloaded_service,
-                        event.totalFiles,
-                        event.totalFiles,
-                    )
-                }
-
-                event.totalAlreadyDownloaded == 1 -> {
-                    context.resources.getQuantityString(
-                        R.plurals.file_already_downloaded_and_files_pending_download,
-                        event.filesToDownload,
-                        event.filesToDownload
-                    )
-                }
-
-                event.filesToDownload == 1 -> {
-                    context.resources.getQuantityString(
-                        R.plurals.files_already_downloaded_and_file_pending_download,
-                        event.totalAlreadyDownloaded,
-                        event.totalAlreadyDownloaded
-                    )
-                }
-
-                else -> {
-                    StringBuilder().append(
-                        context.resources.getQuantityString(
-                            R.plurals.file_already_downloaded,
-                            event.totalAlreadyDownloaded,
-                            event.totalAlreadyDownloaded
-                        )
-                    ).append(" ").append(
-                        context.resources.getQuantityString(
-                            R.plurals.file_pending_download,
-                            event.filesToDownload,
-                            event.filesToDownload
-                        )
-                    ).toString()
-                }
-            }
-            if (delayed) {
-                coroutineScope {
-                    launch {
-                        delay(100)
-                        snackBarHostState.showAutoDurationSnackbar(message)
-                    }
-                }
-            } else {
-                snackBarHostState.showAutoDurationSnackbar(message)
-            }
-        }
-
+    when (exception) {
         is QuotaExceededMegaException -> {
             showQuotaExceededDialog.value = StorageState.Red
         }
@@ -471,7 +510,7 @@ private suspend fun consumeFinishProcessing(
         }
 
         else -> {
-            Timber.e(event.exception)
+            Timber.e(exception)
             snackBarHostState.showAutoDurationSnackbar(context.getString(R.string.general_error))
         }
     }
@@ -481,40 +520,33 @@ private suspend fun consumeMessage(
     event: StartTransferEvent.Message,
     snackBarHostState: SnackbarHostState,
     context: Context,
+    navigateToStorageSettings: () -> Unit,
+    previewFile: (File) -> Unit,
 ) {
     //show snack bar with an optional action
     val result = snackBarHostState.showAutoDurationSnackbar(
-        context.getString(event.message),
+        context.getString(event.message, *event.messageArgs),
         event.action?.let { context.getString(it) }
     )
     if (result == SnackbarResult.ActionPerformed && event.actionEvent != null) {
         consumeMessageAction(
             event.actionEvent,
-            context
+            navigateToStorageSettings,
+            previewFile,
         )
     }
 }
 
 private fun consumeMessageAction(
     actionEvent: StartTransferEvent.Message.ActionEvent,
-    context: Context,
+    navigateToStorageSettings: () -> Unit,
+    previewFile: (File) -> Unit,
 ) = when (actionEvent) {
     StartTransferEvent.Message.ActionEvent.GoToFileManagement -> {
-        ContextCompat.startActivity(
-            context,
-            SettingsActivity.getIntent(context, TargetPreference.Storage),
-            null
-        )
+        navigateToStorageSettings()
+    }
+
+    is StartTransferEvent.Message.ActionEvent.OpenPreview -> {
+        previewFile(actionEvent.file)
     }
 }
-
-private fun shouldAskForFilesPermission(
-    requestFilesPermissionDenied: Boolean,
-    transferTriggerEvent: TransferTriggerEvent,
-) = (transferTriggerEvent is TransferTriggerEvent.StartChatUpload
-        || (transferTriggerEvent is TransferTriggerEvent.StartUpload
-        && transferTriggerEvent !is TransferTriggerEvent.StartUpload.TextFile))
-        && Build.VERSION.SDK_INT >= Build.VERSION_CODES.R
-        && requestFilesPermissionDenied.not()
-        && !Environment.isExternalStorageManager()
-

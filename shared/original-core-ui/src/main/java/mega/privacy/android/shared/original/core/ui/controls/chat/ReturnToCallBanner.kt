@@ -15,7 +15,7 @@ import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.unit.dp
 import mega.privacy.android.shared.original.core.ui.controls.meetings.CallChronometer
 import mega.privacy.android.shared.original.core.ui.preview.CombinedThemePreviews
-import mega.privacy.android.shared.original.core.ui.theme.OriginalTempThemeForPreviews
+import mega.privacy.android.shared.original.core.ui.theme.OriginalThemeForPreviews
 import mega.privacy.android.shared.original.core.ui.theme.MegaOriginalTheme
 import kotlin.time.Duration
 
@@ -60,7 +60,7 @@ fun ReturnToCallBanner(
 @CombinedThemePreviews
 @Composable
 private fun ReturnToCallBannerPreview() {
-    OriginalTempThemeForPreviews {
+    OriginalThemeForPreviews {
         ReturnToCallBanner(
             text = "Return to call",
             onBannerClicked = {},

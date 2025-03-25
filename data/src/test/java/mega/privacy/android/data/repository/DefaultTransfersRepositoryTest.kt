@@ -6,19 +6,23 @@ import com.google.common.truth.Truth.assertThat
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.emptyFlow
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.flow.flowOf
 import kotlinx.coroutines.test.UnconfinedTestDispatcher
 import kotlinx.coroutines.test.runTest
 import mega.privacy.android.data.gateway.AppEventGateway
+import mega.privacy.android.data.gateway.CacheGateway
 import mega.privacy.android.data.gateway.DeviceGateway
 import mega.privacy.android.data.gateway.MegaLocalRoomGateway
 import mega.privacy.android.data.gateway.MegaLocalStorageGateway
 import mega.privacy.android.data.gateway.SDCardGateway
 import mega.privacy.android.data.gateway.TransfersPreferencesGateway
 import mega.privacy.android.data.gateway.WorkManagerGateway
+import mega.privacy.android.data.gateway.api.MegaApiFolderGateway
 import mega.privacy.android.data.gateway.api.MegaApiGateway
+import mega.privacy.android.data.gateway.api.MegaChatApiGateway
 import mega.privacy.android.data.listener.OptionalMegaRequestListenerInterface
 import mega.privacy.android.data.listener.OptionalMegaTransferListenerInterface
 import mega.privacy.android.data.mapper.node.MegaNodeMapper
@@ -34,17 +38,19 @@ import mega.privacy.android.data.mapper.transfer.active.ActiveTransferTotalsMapp
 import mega.privacy.android.data.model.GlobalTransfer
 import mega.privacy.android.data.model.RequestEvent
 import mega.privacy.android.data.repository.DefaultTransfersRepository.Companion.TRANSFERS_SD_TEMPORARY_FOLDER
-import mega.privacy.android.domain.entity.SdTransfer
 import mega.privacy.android.domain.entity.node.NodeId
 import mega.privacy.android.domain.entity.node.TypedFileNode
 import mega.privacy.android.domain.entity.transfer.ActiveTransfer
+import mega.privacy.android.domain.entity.transfer.ActiveTransferGroup
 import mega.privacy.android.domain.entity.transfer.ActiveTransferTotals
 import mega.privacy.android.domain.entity.transfer.CompletedTransfer
+import mega.privacy.android.domain.entity.transfer.CompletedTransferState
 import mega.privacy.android.domain.entity.transfer.InProgressTransfer
 import mega.privacy.android.domain.entity.transfer.Transfer
 import mega.privacy.android.domain.entity.transfer.TransferAppData
 import mega.privacy.android.domain.entity.transfer.TransferEvent
 import mega.privacy.android.domain.entity.transfer.TransferStage
+import mega.privacy.android.domain.entity.transfer.TransferState
 import mega.privacy.android.domain.entity.transfer.TransferType
 import mega.privacy.android.domain.entity.transfer.pending.InsertPendingTransferRequest
 import mega.privacy.android.domain.entity.transfer.pending.PendingTransfer
@@ -78,6 +84,7 @@ import org.mockito.kotlin.reset
 import org.mockito.kotlin.verify
 import org.mockito.kotlin.whenever
 import java.io.File
+import kotlin.time.Duration.Companion.seconds
 
 /**
  * Test class for [DefaultTransfersRepository]
@@ -107,6 +114,9 @@ class DefaultTransfersRepositoryTest {
     private val inProgressTransferMapper = mock<InProgressTransferMapper>()
     private val monitorFetchNodesFinishUseCase = mock<MonitorFetchNodesFinishUseCase>()
     private val transfersPreferencesGateway = mock<TransfersPreferencesGateway>()
+    private val cacheGateway = mock<CacheGateway>()
+    private val megaApiFolderGateway = mock<MegaApiFolderGateway>()
+    private val megaChatApiGateway = mock<MegaChatApiGateway>()
 
     private val testScope = CoroutineScope(UnconfinedTestDispatcher())
 
@@ -122,6 +132,8 @@ class DefaultTransfersRepositoryTest {
         stubPauseTransfers(paused)
         return DefaultTransfersRepository(
             megaApiGateway = megaApiGateway,
+            megaChatApiGateway = megaChatApiGateway,
+            megaApiFolderGateway = megaApiFolderGateway,
             ioDispatcher = UnconfinedTestDispatcher(),
             transferEventMapper = transferEventMapper,
             appEventGateway = appEventGateway,
@@ -141,7 +153,8 @@ class DefaultTransfersRepositoryTest {
             deviceGateway = deviceGateway,
             inProgressTransferMapper = inProgressTransferMapper,
             monitorFetchNodesFinishUseCase = monitorFetchNodesFinishUseCase,
-            transfersPreferencesGateway = transfersPreferencesGateway,
+            transfersPreferencesGateway = { transfersPreferencesGateway },
+            cacheGateway = cacheGateway
         )
     }
 
@@ -149,6 +162,8 @@ class DefaultTransfersRepositoryTest {
     fun resetMocks() {
         reset(
             megaApiGateway,
+            megaChatApiGateway,
+            megaApiFolderGateway,
             transferEventMapper,
             appEventGateway,
             transferMapper,
@@ -163,6 +178,11 @@ class DefaultTransfersRepositoryTest {
             sdCardGateway,
             deviceGateway,
             inProgressTransferMapper,
+            cacheGateway,
+            transferAppDataStringMapper,
+            activeTransferTotalsMapper,
+            monitorFetchNodesFinishUseCase,
+            transfersPreferencesGateway,
         )
     }
 
@@ -724,9 +744,11 @@ class DefaultTransfersRepositoryTest {
         }
 
     @Test
-    fun `test that addCompletedTransfers call local storage gateway addCompletedTransfers and app event gateway broadcastCompletedTransfer with the mapped transfers`() =
+    fun `test that addCompletedTransfers call local storage gateway addCompletedTransfers and app event gateway broadcastCompletedTransfer with error`() =
         runTest {
-            val transfer = mock<Transfer>()
+            val transfer = mock<Transfer> {
+                on { it.state } doReturn TransferState.STATE_FAILED
+            }
             val error = mock<MegaException>()
             val expected = listOf(mock<CompletedTransfer>())
             val path = "path"
@@ -737,11 +759,30 @@ class DefaultTransfersRepositoryTest {
             whenever(completedTransferMapper(transfer, error, path)).thenReturn(expected.first())
             underTest.addCompletedTransfers(mapOf(event to path))
             verify(megaLocalRoomGateway).addCompletedTransfers(expected)
-            verify(appEventGateway).broadcastCompletedTransfer()
+            verify(appEventGateway).broadcastCompletedTransfer(CompletedTransferState.Error)
         }
 
     @Test
-    fun `test that addCompletedTransferFromFailedPendingTransfer call local storage gateway addCompletedTransfer and app event gateway broadcastCompletedTransfer with the mapped transfers`() =
+    fun `test that addCompletedTransfers call local storage gateway addCompletedTransfers and app event gateway broadcastCompletedTransfer with completed`() =
+        runTest {
+            val transfer = mock<Transfer> {
+                on { it.state } doReturn TransferState.STATE_COMPLETED
+            }
+            val error = mock<MegaException>()
+            val expected = listOf(mock<CompletedTransfer>())
+            val path = "path"
+            val event = mock<TransferEvent.TransferFinishEvent> {
+                on { it.transfer } doReturn transfer
+                on { it.error } doReturn error
+            }
+            whenever(completedTransferMapper(transfer, error, path)).thenReturn(expected.first())
+            underTest.addCompletedTransfers(mapOf(event to path))
+            verify(megaLocalRoomGateway).addCompletedTransfers(expected)
+            verify(appEventGateway).broadcastCompletedTransfer(CompletedTransferState.Completed)
+        }
+
+    @Test
+    fun `test that addCompletedTransferFromFailedPendingTransfer call local storage gateway addCompletedTransfer and app event gateway broadcastCompletedTransfer with the mapped transfer`() =
         runTest {
             val transfer = mock<PendingTransfer>()
             val size = 100L
@@ -751,69 +792,75 @@ class DefaultTransfersRepositoryTest {
                 .thenReturn(expected)
             underTest.addCompletedTransferFromFailedPendingTransfer(transfer, size, error)
             verify(megaLocalRoomGateway).addCompletedTransfer(expected)
-            verify(appEventGateway).broadcastCompletedTransfer()
+            verify(appEventGateway).broadcastCompletedTransfer(CompletedTransferState.Error)
         }
 
     @Test
-    fun `test that addCompletedTransfer call correctly when call addCompletedTransfersIfNotExist`() =
+    fun `test that addCompletedTransferFromFailedPendingTransfers call local storage gateway addCompletedTransfers and app event gateway broadcastCompletedTransfer with the mapped transfers`() =
         runTest {
-            val transfer1 = CompletedTransfer(
-                id = 1,
-                fileName = "filename1",
-                type = 1,
-                state = 1,
-                size = "1Kb",
-                handle = 1L,
-                path = "filePath",
-                isOffline = false,
-                timestamp = 123L,
-                error = null,
-                originalPath = "originalFilePath",
-                parentHandle = 2L,
-                appData = null,
-            )
-            val transfer2 = CompletedTransfer(
-                id = 1,
-                fileName = "filename2",
-                type = 1,
-                state = 1,
-                size = "1Kb",
-                handle = 1L,
-                path = "filePath",
-                isOffline = false,
-                timestamp = 123L,
-                error = null,
-                originalPath = "originalFilePath",
-                parentHandle = 2L,
-                appData = null,
-            )
-            val existingTransfer1 = CompletedTransfer(
-                id = 3,
-                fileName = "filename1",
-                type = 1,
-                state = 1,
-                size = "1Kb",
-                handle = 1L,
-                path = "filePath",
-                isOffline = false,
-                timestamp = 123L,
-                error = null,
-                originalPath = "originalFilePath",
-                parentHandle = 2L,
-                appData = null,
-            )
-            whenever(megaLocalRoomGateway.getCompletedTransfers())
-                .thenReturn(flowOf(listOf(existingTransfer1)))
+            val transfers = (0..10).map { mock<PendingTransfer>() }
+            val error = mock<MegaException>()
+            val expected = transfers.map { pendingTransfer ->
+                mock<CompletedTransfer>().also {
+                    whenever(completedTransferPendingTransferMapper(pendingTransfer, 0L, error))
+                        .thenReturn(it)
+                }
+            }
+            underTest.addCompletedTransferFromFailedPendingTransfers(transfers, error)
+            verify(megaLocalRoomGateway).addCompletedTransfers(expected)
+            verify(appEventGateway).broadcastCompletedTransfer(CompletedTransferState.Error)
+        }
+
+    @Test
+    fun `test that addCompletedTransfersIfNotExist if there are no completed transfers in data base`() =
+        runTest {
+            val transfer1 = mock<Transfer>()
+            val transfer2 = mock<Transfer>()
+            val completedTransfer1 = getCompletedTransfer("transfer1")
+            val completedTransfer2 = getCompletedTransfer("transfer2")
+
+            whenever(megaLocalRoomGateway.getCompletedTransfers()).thenReturn(flowOf(emptyList()))
+            whenever(completedTransferMapper(transfer1, null)).thenReturn(completedTransfer1)
+            whenever(completedTransferMapper(transfer2, null)).thenReturn(completedTransfer2)
+
             underTest.addCompletedTransfersIfNotExist(listOf(transfer1, transfer2))
-            verify(megaLocalRoomGateway).addCompletedTransfers(listOf(transfer2.copy(id = null)))
+
+            verify(megaLocalRoomGateway).getCompletedTransfers()
+            verify(completedTransferMapper).invoke(transfer1, null)
+            verify(completedTransferMapper).invoke(transfer2, null)
+            verify(megaLocalRoomGateway)
+                .addCompletedTransfers(listOf(completedTransfer1, completedTransfer2))
+        }
+
+    @Test
+    fun `test that addCompletedTransfersIfNotExist invokes correctly if some of the received transfers are not in data base`() =
+        runTest {
+            val transfer1 = mock<Transfer>()
+            val transfer2 = mock<Transfer>()
+            val completedTransfer1 = getCompletedTransfer("transfer1")
+            val completedTransfer2 = getCompletedTransfer("transfer2")
+            val completedTransfer3 = getCompletedTransfer("transfer3")
+
+            whenever(megaLocalRoomGateway.getCompletedTransfers())
+                .thenReturn(flowOf(listOf(completedTransfer1, completedTransfer3)))
+            whenever(completedTransferMapper(transfer1, null)).thenReturn(completedTransfer1)
+            whenever(completedTransferMapper(transfer2, null)).thenReturn(completedTransfer2)
+
+            underTest.addCompletedTransfersIfNotExist(listOf(transfer1, transfer2))
+
+            verify(megaLocalRoomGateway).getCompletedTransfers()
+            verify(completedTransferMapper).invoke(transfer1, null)
+            verify(completedTransferMapper).invoke(transfer2, null)
+            verify(megaLocalRoomGateway).addCompletedTransfers(listOf(completedTransfer2))
         }
 
     @Test
     fun `test that monitorCompletedTransfer returns the result of app event gateway monitorCompletedTransfer`() =
         runTest {
-            whenever(appEventGateway.monitorCompletedTransfer).thenReturn(flowOf(Unit))
+            val expected = CompletedTransferState.Completed
+            whenever(appEventGateway.monitorCompletedTransfer).thenReturn(flowOf(expected))
             underTest.monitorCompletedTransfer().test {
-                assertThat(awaitItem()).isEqualTo(Unit)
+                assertThat(awaitItem()).isEqualTo(expected)
                 awaitComplete()
             }
         }
@@ -825,13 +872,6 @@ class DefaultTransfersRepositoryTest {
             underTest.insertOrUpdateActiveTransfer(activeTransfer)
             verify(megaLocalRoomGateway).insertOrUpdateActiveTransfer(activeTransfer)
         }
-
-    @Test
-    @Suppress("DEPRECATION")
-    fun `test that reset total uploads is invoked`() = runTest {
-        underTest.resetTotalUploads()
-        verify(megaApiGateway).resetTotalUploads()
-    }
 
     @Test
     fun `test that isCompletedTransfersEmpty returns false if completed transfers db contains items`() =
@@ -1040,37 +1080,6 @@ class DefaultTransfersRepositoryTest {
     }
 
     @Test
-    fun `test that insertSdTransfer invokes when insertSdTransfer is called`() = runTest {
-        val sdTransfer = mock<SdTransfer>()
-        underTest.insertSdTransfer(sdTransfer)
-        verify(megaLocalRoomGateway).insertSdTransfer(sdTransfer)
-    }
-
-    @Test
-    fun `test that deleteSdTransferByTag invokes when deleteSdTransferByTag is called`() = runTest {
-        val tag = 1
-        underTest.deleteSdTransferByTag(tag)
-        verify(megaLocalRoomGateway).deleteSdTransferByTag(tag)
-    }
-
-    @Test
-    fun `test that getAllSdTransfers invokes when getAllSdTransfers is called`() = runTest {
-        underTest.getAllSdTransfers()
-        verify(megaLocalRoomGateway).getAllSdTransfers()
-    }
-
-    @Test
-    fun `test that getSdTransferByTag returns transfer from gateway`() = runTest {
-        val tag = 1
-        val expected = mock<SdTransfer>()
-        whenever(megaLocalRoomGateway.getSdTransferByTag(tag)) doReturn expected
-
-        val actual = underTest.getSdTransferByTag(tag)
-
-        assertThat(actual).isEqualTo(expected)
-    }
-
-    @Test
     fun `test that getCompletedTransferById invokes when getCompletedTransferById is called`() =
         runTest {
             val id = 1
@@ -1233,10 +1242,48 @@ class DefaultTransfersRepositoryTest {
             val flow = flowOf(list)
             whenever(megaLocalRoomGateway.getActiveTransfersByType(transferType))
                 .thenReturn(flow)
-            whenever(activeTransferTotalsMapper(eq(transferType), eq(list), any()))
+            whenever(activeTransferTotalsMapper(eq(transferType), eq(list), any(), anyOrNull()))
                 .thenReturn(expected)
             val actual = underTest.getActiveTransferTotalsByType(transferType).first()
             assertThat(actual).isEqualTo(expected)
+        }
+
+        @ParameterizedTest
+        @EnumSource(TransferType::class)
+        fun `test that previous groups are send to activeTransferTotalsMapper after first emission`(
+            transferType: TransferType,
+        ) = runTest {
+            val groups = mock<List<ActiveTransferTotals.Group>>()
+            val firstActiveTransferTotals = mock<ActiveTransferTotals> {
+                on { this.groups } doReturn groups
+            }
+            val secondActiveTransferTotals = mock<ActiveTransferTotals>()
+            val firstList = listOf(mock<ActiveTransfer>())
+            val secondList = listOf(mock<ActiveTransfer>(), mock<ActiveTransfer>())
+            val flow = MutableStateFlow(firstList)
+            whenever(megaLocalRoomGateway.getActiveTransfersByType(transferType))
+                .thenReturn(flow)
+            whenever(
+                activeTransferTotalsMapper(
+                    type = transferType,
+                    list = firstList,
+                    transferredBytes = emptyMap(),
+                    previousGroups = null
+                )
+            ) doReturn firstActiveTransferTotals
+            whenever(
+                activeTransferTotalsMapper(
+                    type = transferType,
+                    list = secondList,
+                    transferredBytes = emptyMap(),
+                    previousGroups = groups //this comes from first emission
+                )
+            ) doReturn secondActiveTransferTotals
+            underTest.getActiveTransferTotalsByType(transferType).test {
+                assertThat(awaitItem()).isEqualTo(firstActiveTransferTotals)
+                flow.emit(secondList)
+                assertThat(awaitItem()).isEqualTo(secondActiveTransferTotals)
+            }
         }
 
         @ParameterizedTest
@@ -1248,7 +1295,7 @@ class DefaultTransfersRepositoryTest {
             val expected = mock<ActiveTransferTotals>()
             whenever(megaLocalRoomGateway.getCurrentActiveTransfersByType(transferType))
                 .thenReturn(list)
-            whenever(activeTransferTotalsMapper(eq(transferType), eq(list), any()))
+            whenever(activeTransferTotalsMapper(eq(transferType), eq(list), any(), anyOrNull()))
                 .thenReturn(expected)
             val actual = underTest.getCurrentActiveTransferTotalsByType(transferType)
             assertThat(actual).isEqualTo(expected)
@@ -1304,7 +1351,7 @@ class DefaultTransfersRepositoryTest {
             val flow = flowOf(list)
             whenever(megaLocalRoomGateway.getActiveTransfersByType(transferType))
                 .thenReturn(flow)
-            whenever(activeTransferTotalsMapper(eq(transferType), eq(list), any()))
+            whenever(activeTransferTotalsMapper(eq(transferType), eq(list), any(), anyOrNull()))
                 .thenReturn(expected)
 
             underTest.getActiveTransferTotalsByType(transferType).test {
@@ -1336,13 +1383,23 @@ class DefaultTransfersRepositoryTest {
             underTest.getCurrentActiveTransferTotalsByType(transferType)
             //here we check that the mapper is called with the proper expectedMap
             val map = expectedMap(transfer)
-            verify(activeTransferTotalsMapper).invoke(eq(transferType), eq(list), eq(map))
+            verify(activeTransferTotalsMapper).invoke(
+                eq(transferType),
+                eq(list),
+                eq(map),
+                anyOrNull()
+            )
 
             // test deleteAllActiveTransfersByType so we also clear the cached values
             underTest.deleteAllActiveTransfersByType(transferType)
             underTest.getCurrentActiveTransferTotalsByType(transferType)
             //here we check that the mapper is called with the proper expectedMap
-            verify(activeTransferTotalsMapper).invoke(eq(transferType), eq(list), eq(emptyMap()))
+            verify(activeTransferTotalsMapper).invoke(
+                eq(transferType),
+                eq(list),
+                eq(emptyMap()),
+                anyOrNull()
+            )
         }
 
         private fun stubActiveTransfer(
@@ -1569,7 +1626,9 @@ class DefaultTransfersRepositoryTest {
         transferType: TransferType,
     ) = runTest {
         val expected = flowOf(listOf(mock<PendingTransfer>()))
-        whenever(megaLocalRoomGateway.monitorPendingTransfersByType(transferType)).thenReturn(expected)
+        whenever(megaLocalRoomGateway.monitorPendingTransfersByType(transferType)).thenReturn(
+            expected
+        )
         val actual = underTest.monitorPendingTransfersByType(transferType)
         assertThat(actual).isEqualTo(expected)
     }
@@ -1677,7 +1736,10 @@ class DefaultTransfersRepositoryTest {
             val flow = flowOf(true)
             whenever(transfersPreferencesGateway.monitorRequestFilesPermissionDenied())
                 .thenReturn(flow)
-            assertThat(underTest.monitorRequestFilesPermissionDenied()).isEqualTo(flow)
+            underTest.monitorRequestFilesPermissionDenied().test {
+                assertThat(awaitItem()).isEqualTo(true)
+                cancelAndIgnoreRemainingEvents()
+            }
         }
 
     @Test
@@ -1686,4 +1748,47 @@ class DefaultTransfersRepositoryTest {
             underTest.clearPreferences()
             verify(transfersPreferencesGateway).clearPreferences()
         }
+
+    @Test
+    fun `test that getBandwidthOverQuotaDelay invokes and returns correctly`() = runTest {
+        val expected = 123L
+
+        whenever(megaApiGateway.getBandwidthOverQuotaDelay()).thenReturn(expected)
+
+        assertThat(underTest.getBandwidthOverQuotaDelay()).isEqualTo(expected.seconds)
+    }
+
+    @Test
+    fun `test that insert Active Transfer Group returns room gateway result`() = runTest {
+        val expected = 123L
+        val activeTransferGroup = mock<ActiveTransferGroup>()
+        whenever(megaLocalRoomGateway.insertActiveTransferGroup(activeTransferGroup))
+            .thenReturn(expected)
+
+        assertThat(underTest.insertActiveTransferGroup(activeTransferGroup)).isEqualTo(expected)
+    }
+
+    @Test
+    fun `test that get Active Transfer Group returns room gateway entity`() = runTest {
+        val groupId = 435834379
+        val expected = mock<ActiveTransferGroup>()
+        whenever(megaLocalRoomGateway.getActiveTransferGroup(groupId)).thenReturn(expected)
+
+        assertThat(underTest.getActiveTransferGroupById(groupId)).isEqualTo(expected)
+    }
+
+    private fun getCompletedTransfer(fileName: String) = CompletedTransfer(
+        fileName = fileName,
+        type = 0,
+        state = 6,
+        size = "234Kb",
+        handle = 1L,
+        path = "parentPath",
+        isOffline = false,
+        timestamp = 123L,
+        error = "error",
+        originalPath = "localPath",
+        parentHandle = 2L,
+        appData = null,
+    )
 }

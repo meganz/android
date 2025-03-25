@@ -3,7 +3,6 @@ package mega.privacy.android.app.main.controllers;
 import static mega.privacy.android.app.listeners.ShareListener.REMOVE_SHARE_LISTENER;
 import static mega.privacy.android.app.listeners.ShareListener.SHARE_LISTENER;
 import static mega.privacy.android.app.utils.Constants.CONTACT_TYPE_BOTH;
-import static mega.privacy.android.app.utils.Constants.MULTIPLE_COPY;
 import static mega.privacy.android.app.utils.Constants.REQUEST_CODE_SELECT_CONTACT;
 import static mega.privacy.android.app.utils.Constants.REQUEST_CODE_SELECT_FOLDER_TO_COPY;
 import static mega.privacy.android.app.utils.Constants.REQUEST_CODE_SELECT_FOLDER_TO_MOVE;
@@ -25,13 +24,11 @@ import mega.privacy.android.app.MegaApplication;
 import mega.privacy.android.app.R;
 import mega.privacy.android.app.interfaces.SnackbarShower;
 import mega.privacy.android.app.listeners.CleanRubbishBinListener;
-import mega.privacy.android.app.listeners.RemoveVersionsListener;
 import mega.privacy.android.app.listeners.ShareListener;
-import mega.privacy.android.app.main.legacycontact.AddContactActivity;
 import mega.privacy.android.app.main.DrawerItem;
 import mega.privacy.android.app.main.FileExplorerActivity;
 import mega.privacy.android.app.main.ManagerActivity;
-import mega.privacy.android.app.main.listeners.MultipleRequestListener;
+import mega.privacy.android.app.main.legacycontact.AddContactActivity;
 import mega.privacy.android.app.presentation.manager.model.SharesTab;
 import mega.privacy.android.app.utils.MegaNodeUtil;
 import nz.mega.sdk.MegaApiAndroid;
@@ -77,46 +74,6 @@ public class NodeController {
         }
         intent.putExtra("COPY_FROM", longArray);
         ((ManagerActivity) context).startActivityForResult(intent, REQUEST_CODE_SELECT_FOLDER_TO_COPY);
-    }
-
-    public void copyNodes(long[] copyHandles, long toHandle) {
-        Timber.d("copyNodes");
-
-        if (!isOnline(context)) {
-            ((SnackbarShower) context).showSnackbar(SNACKBAR_TYPE, context.getString(R.string.error_server_connection_problem), -1);
-            return;
-        }
-
-        MegaNode parent = megaApi.getNodeByHandle(toHandle);
-        if (parent != null) {
-            MultipleRequestListener copyMultipleListener = null;
-            if (copyHandles.length > 1) {
-                Timber.d("Copy multiple files");
-                copyMultipleListener = new MultipleRequestListener(MULTIPLE_COPY, context);
-                for (int i = 0; i < copyHandles.length; i++) {
-                    MegaNode cN = megaApi.getNodeByHandle(copyHandles[i]);
-                    if (cN != null) {
-                        Timber.d("cN != null, i = %d of %d", i, copyHandles.length);
-                        megaApi.copyNode(cN, parent, copyMultipleListener);
-                    } else {
-                        Timber.w("cN == null, i = %d of %d", i, copyHandles.length);
-                    }
-                }
-            } else {
-                Timber.d("Copy one file");
-                MegaNode cN = megaApi.getNodeByHandle(copyHandles[0]);
-                if (cN != null) {
-                    Timber.d("cN != null");
-                    megaApi.copyNode(cN, parent, (ManagerActivity) context);
-                } else {
-                    Timber.w("cN == null");
-                    if (context instanceof ManagerActivity) {
-                        ((ManagerActivity) context).copyError();
-                    }
-                }
-            }
-        }
-
     }
 
     public void chooseLocationToMoveNodes(List<Long> handleList) {
@@ -178,7 +135,7 @@ public class NodeController {
         return node != null
                 && !megaApi.isInCloud(node)
                 && !megaApi.isInRubbish(node)
-                && !megaApi.isInInbox(node);
+                && !megaApi.isInVault(node);
     }
 
     public MegaNode getParent(MegaNode node) {
@@ -259,7 +216,7 @@ public class NodeController {
                             Timber.d("Navigate to TAB RUBBISH first level%s", parentIntentN.getName());
                             firstNavigationLevel = true;
                             ((ManagerActivity) context).setParentHandleRubbish(parentIntentN.getHandle());
-                        } else if (parentIntentN.getHandle() == megaApi.getInboxNode().getHandle()) {
+                        } else if (parentIntentN.getHandle() == megaApi.getVaultNode().getHandle()) {
                             Timber.d("Navigate to BACKUPS first level%s", parentIntentN.getName());
                             firstNavigationLevel = true;
                             ((ManagerActivity) context).setParentHandleBackups(parentIntentN.getHandle());
@@ -318,7 +275,7 @@ public class NodeController {
                             ((ManagerActivity) context).setDeepBrowserTreeIncoming(deepBrowserTreeIncoming, parentIntentN.getHandle());
                             Timber.d("After calculating deepBrowserTreeIncoming: %s", deepBrowserTreeIncoming);
                         }
-                        ((ManagerActivity) context).setTabItemShares(SharesTab.Companion.fromPosition(0));
+                        ((ManagerActivity) context).getSharesViewModel().onTabSelected(SharesTab.Companion.fromPosition(0));
                         break;
                     }
                     default: {
@@ -335,7 +292,7 @@ public class NodeController {
                 drawerItem = DrawerItem.SHARED_ITEMS;
                 ((ManagerActivity) context).setDeepBrowserTreeIncoming(0, -1L);
                 firstNavigationLevel = true;
-                ((ManagerActivity) context).setTabItemShares(SharesTab.Companion.fromPosition(0));
+                ((ManagerActivity) context).getSharesViewModel().onTabSelected(SharesTab.Companion.fromPosition(0));
             }
             ((ManagerActivity) context).setFirstNavigationLevel(firstNavigationLevel);
             ((ManagerActivity) context).setDrawerItem(drawerItem);
@@ -355,7 +312,7 @@ public class NodeController {
             } else if (parentNode.getHandle() == megaApi.getRubbishNode().getHandle()) {
                 Timber.d("The parent is the RUBBISH");
                 return 1;
-            } else if (parentNode.getHandle() == megaApi.getInboxNode().getHandle()) {
+            } else if (parentNode.getHandle() == megaApi.getVaultNode().getHandle()) {
                 Timber.d("The parent is the BACKUPS");
                 return 2;
             } else if (parentNode.getHandle() == -1) {
@@ -463,10 +420,5 @@ public class NodeController {
     public void cleanRubbishBin() {
         Timber.d("cleanRubbishBin");
         megaApi.cleanRubbishBin(new CleanRubbishBinListener(context));
-    }
-
-    public void clearAllVersions() {
-        Timber.d("clearAllVersions");
-        megaApi.removeVersions(new RemoveVersionsListener(context));
     }
 }

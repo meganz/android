@@ -2,6 +2,8 @@ package mega.privacy.android.shared.original.core.ui.theme.extensions
 
 import androidx.compose.material.Colors
 import androidx.compose.ui.graphics.Color
+import mega.privacy.android.shared.original.core.ui.theme.accent_050
+import mega.privacy.android.shared.original.core.ui.theme.accent_900
 import mega.privacy.android.shared.original.core.ui.theme.amber_300
 import mega.privacy.android.shared.original.core.ui.theme.amber_700
 import mega.privacy.android.shared.original.core.ui.theme.black
@@ -48,9 +50,6 @@ import mega.privacy.android.shared.original.core.ui.theme.red_400
 import mega.privacy.android.shared.original.core.ui.theme.red_500
 import mega.privacy.android.shared.original.core.ui.theme.red_600
 import mega.privacy.android.shared.original.core.ui.theme.red_800
-import mega.privacy.android.shared.original.core.ui.theme.teal_200
-import mega.privacy.android.shared.original.core.ui.theme.teal_300
-import mega.privacy.android.shared.original.core.ui.theme.teal_600
 import mega.privacy.android.shared.original.core.ui.theme.transparent
 import mega.privacy.android.shared.original.core.ui.theme.white
 import mega.privacy.android.shared.original.core.ui.theme.white_alpha_005
@@ -255,18 +254,10 @@ val Colors.grey_020_grey_700: Color
     get() = if (isLight) grey_020 else grey_700
 
 /**
- * Color when light [teal_300] and when dark [teal_200]
+ * Color when light [accent_900] and when dark [accent_050]
  */
-val Colors.teal_300_teal_200: Color
-    get() = if (isLight) teal_300 else teal_200
-
-
-/**
- * Color when light [teal_200] and when dark [teal_300]
- * This is the opposite of [teal_300_teal_200] to be used when the background is also the opposite of the theme (snack bars for instance)
- */
-val Colors.teal_200_teal_300: Color
-    get() = if (isLight) teal_200 else teal_300
+val Colors.accent_900_accent_050: Color
+    get() = if (isLight) accent_900 else accent_050
 
 /**
  * Color [white] when light and [grey_alpha_087] when dark
@@ -437,13 +428,10 @@ val Colors.blue_700_blue_200: Color
     get() = if (isLight) blue_700 else blue_200
 
 /**
- * Color when light [teal_600] and when dark [teal_200]
- */
-val Colors.teal_600_teal_200: Color
-    get() = if (isLight) teal_600 else teal_200
-
-/**
  * Color when light [colorButtonBrandhLight] and when dark [colorButtonBrandhDark]
  */
 val Colors.color_button_brand: Color
     get() = if (isLight) colorButtonBrandhLight else colorButtonBrandhDark
+
+val Colors.textSelectionBackground: Color
+    get() = if (isLight) grey_200 else grey_500

@@ -3,6 +3,7 @@ package mega.privacy.android.domain.usecase.file
 import com.google.common.truth.Truth
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.test.runTest
+import mega.privacy.android.domain.entity.uri.UriPath
 import mega.privacy.android.domain.repository.FileSystemRepository
 import org.junit.jupiter.api.AfterAll
 import org.junit.jupiter.api.BeforeAll
@@ -37,17 +38,26 @@ class IsImageFileUseCaseTest {
     @ParameterizedTest(name = "when local path is {0} and content type is {1} the result is {2}")
     @MethodSource("provideParameters")
     fun `test that IsImageFileUseCase returns correctly`(
-        localPath: String,
-        contentType: String?,
+        uriPathString: String,
+        contentTypeFromPath: String?,
+        contentTypeFromUri: String?,
         expectedResult: Boolean,
     ) = runTest {
-        whenever(fileSystemRepository.getGuessContentTypeFromName(localPath)).thenReturn(contentType)
-        Truth.assertThat(underTest.invoke(localPath)).isEqualTo(expectedResult)
+        val uriPath = UriPath(uriPathString)
+        whenever(fileSystemRepository.getGuessContentTypeFromName(uriPathString))
+            .thenReturn(contentTypeFromPath)
+        whenever(fileSystemRepository.getContentTypeFromContentUri(uriPath))
+            .thenReturn(contentTypeFromUri)
+        Truth.assertThat(underTest.invoke(uriPath)).isEqualTo(expectedResult)
     }
 
     private fun provideParameters() = Stream.of(
-        Arguments.of("/", null, false),
-        Arguments.of("/any/video.mp4", "video", false),
-        Arguments.of("/any/image.png", "image", true),
+        Arguments.of("/", null, null, false),
+        Arguments.of("/any/video.mp4", "video", null,  false),
+        Arguments.of("/any/image.png", "image", null, true),
+        Arguments.of("/any/file.pdf", "application/pdf", null, false),
+        Arguments.of("content://any/image.png", null, "image", true),
+        Arguments.of("content://any/file.pdf", null, "application/pdf", false),
+        Arguments.of("content://any/video.mp4", null, "video", false),
     )
 }

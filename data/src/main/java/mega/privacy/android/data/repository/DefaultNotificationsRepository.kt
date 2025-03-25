@@ -195,8 +195,8 @@ internal class DefaultNotificationsRepository @Inject constructor(
         callsPreferencesGateway.getCallsMeetingInvitationsPreference().firstOrNull() ==
                 CallsMeetingInvitations.Enabled
 
-    override suspend fun isChatEnabled(chatId: Long): Boolean = withContext(dispatcher) {
-        _pushNotificationSettings.value.isChatEnabled(chatId)
+    override suspend fun isChatDndEnabled(chatId: Long): Boolean = withContext(dispatcher) {
+        _pushNotificationSettings.value.isChatDndEnabled(chatId)
     }
 
     override suspend fun setChatEnabled(chatId: Long, enabled: Boolean) = withContext(dispatcher) {

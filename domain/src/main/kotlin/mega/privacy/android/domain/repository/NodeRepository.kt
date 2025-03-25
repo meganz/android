@@ -561,11 +561,6 @@ interface NodeRepository {
     ): String
 
     /**
-     * Get banner Quota Time
-     */
-    suspend fun getBannerQuotaTime(): Long
-
-    /**
      * Launches a request to stop sharing a file/folder
      *
      * @param nodeToDisable the node's [NodeId] to stop sharing
@@ -831,4 +826,16 @@ interface NodeRepository {
         deconfiguredBackupRoot: NodeId,
         backupDestination: NodeId,
     ): NodeId
+
+    /**
+     * Check whether the node is synced or not
+     *
+     * @return True if node is synced or False otherwise
+     */
+    suspend fun isNodeSynced(nodeId: NodeId): Boolean
+
+    /**
+     * Remove all versions of a nodes in app
+     */
+    suspend fun removeAllVersions()
 }

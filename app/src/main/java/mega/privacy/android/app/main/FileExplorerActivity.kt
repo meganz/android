@@ -18,22 +18,29 @@ import androidx.activity.viewModels
 import androidx.appcompat.app.AlertDialog
 import androidx.appcompat.widget.AppCompatAutoCompleteTextView
 import androidx.appcompat.widget.SearchView
+import androidx.compose.runtime.getValue
 import androidx.core.content.ContextCompat
 import androidx.core.net.toUri
 import androidx.core.view.isVisible
+import androidx.lifecycle.Lifecycle
+import androidx.lifecycle.compose.collectAsStateWithLifecycle
+import androidx.lifecycle.flowWithLifecycle
 import androidx.lifecycle.lifecycleScope
 import androidx.viewpager2.widget.ViewPager2
 import com.google.android.material.bottomsheet.BottomSheetDialogFragment
 import com.google.android.material.tabs.TabLayout
 import com.google.android.material.tabs.TabLayoutMediator
 import dagger.hilt.android.AndroidEntryPoint
+import kotlinx.coroutines.flow.catch
+import kotlinx.coroutines.flow.firstOrNull
 import kotlinx.coroutines.flow.map
+import kotlinx.coroutines.flow.mapNotNull
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.runBlocking
 import kotlinx.coroutines.sync.Mutex
+import mega.privacy.android.analytics.Analytics
 import mega.privacy.android.app.MegaApplication.Companion.getInstance
 import mega.privacy.android.app.R
-import mega.privacy.android.app.ShareInfo
 import mega.privacy.android.app.activities.PasscodeActivity
 import mega.privacy.android.app.activities.contract.NameCollisionActivityContract
 import mega.privacy.android.app.arch.extensions.collectFlow
@@ -44,15 +51,6 @@ import mega.privacy.android.app.interfaces.SnackbarShower
 import mega.privacy.android.app.listeners.CreateChatListener
 import mega.privacy.android.app.listeners.CreateFolderListener
 import mega.privacy.android.app.listeners.GetAttrUserListener
-import mega.privacy.android.app.main.FileExplorerActivity.Companion.CAMERA
-import mega.privacy.android.app.main.FileExplorerActivity.Companion.COPY
-import mega.privacy.android.app.main.FileExplorerActivity.Companion.IMPORT
-import mega.privacy.android.app.main.FileExplorerActivity.Companion.MOVE
-import mega.privacy.android.app.main.FileExplorerActivity.Companion.SAVE
-import mega.privacy.android.app.main.FileExplorerActivity.Companion.SELECT
-import mega.privacy.android.app.main.FileExplorerActivity.Companion.SELECT_CAMERA_FOLDER
-import mega.privacy.android.app.main.FileExplorerActivity.Companion.SHARE_LINK
-import mega.privacy.android.app.main.FileExplorerActivity.Companion.UPLOAD
 import mega.privacy.android.app.main.adapters.FileExplorerPagerAdapter
 import mega.privacy.android.app.main.legacycontact.AddContactActivity
 import mega.privacy.android.app.main.legacycontact.AddContactActivity.Companion.ALLOW_ADD_PARTICIPANTS
@@ -67,7 +65,11 @@ import mega.privacy.android.app.main.megachat.chat.explorer.ChatExplorerFragment
 import mega.privacy.android.app.main.megachat.chat.explorer.ChatExplorerListItem
 import mega.privacy.android.app.modalbottomsheet.ModalBottomSheetUtil.isBottomSheetDialogShown
 import mega.privacy.android.app.modalbottomsheet.SortByBottomSheetDialogFragment.Companion.newInstance
+import mega.privacy.android.app.presentation.documentscanner.dialogs.DiscardScanUploadingWarningDialog
+import mega.privacy.android.app.presentation.documentscanner.model.ScanFileType
+import mega.privacy.android.app.presentation.extensions.isDarkMode
 import mega.privacy.android.app.presentation.login.LoginActivity
+import mega.privacy.android.app.presentation.settings.model.StorageTargetPreference
 import mega.privacy.android.app.presentation.transfers.starttransfer.model.StartTransferEvent
 import mega.privacy.android.app.presentation.transfers.starttransfer.model.TransferTriggerEvent
 import mega.privacy.android.app.presentation.transfers.starttransfer.view.createStartTransferView
@@ -93,15 +95,23 @@ import mega.privacy.android.app.utils.Util
 import mega.privacy.android.app.utils.permission.PermissionUtils.checkNotificationsPermission
 import mega.privacy.android.data.model.MegaPreferences
 import mega.privacy.android.domain.entity.StorageState
+import mega.privacy.android.domain.entity.ThemeMode
 import mega.privacy.android.domain.entity.contacts.User
 import mega.privacy.android.domain.entity.document.DocumentEntity
 import mega.privacy.android.domain.entity.node.NodeId
 import mega.privacy.android.domain.entity.uri.UriPath
 import mega.privacy.android.domain.entity.user.UserCredentials
 import mega.privacy.android.domain.qualifier.LoginMutex
+import mega.privacy.android.domain.usecase.GetThemeMode
 import mega.privacy.android.domain.usecase.contact.MonitorChatPresenceLastGreenUpdatesUseCase
 import mega.privacy.android.domain.usecase.file.CheckFileNameCollisionsUseCase
 import mega.privacy.android.domain.usecase.node.CopyNodeUseCase
+import mega.privacy.android.navigation.MegaNavigator
+import mega.privacy.android.shared.original.core.ui.theme.OriginalTheme
+import mega.privacy.mobile.analytics.event.DocumentScannerUploadingImageToChatEvent
+import mega.privacy.mobile.analytics.event.DocumentScannerUploadingImageToCloudDriveEvent
+import mega.privacy.mobile.analytics.event.DocumentScannerUploadingPDFToChatEvent
+import mega.privacy.mobile.analytics.event.DocumentScannerUploadingPDFToCloudDriveEvent
 import nz.mega.sdk.MegaApiJava
 import nz.mega.sdk.MegaApiJava.INVALID_HANDLE
 import nz.mega.sdk.MegaChatApi
@@ -150,6 +160,12 @@ class FileExplorerActivity : PasscodeActivity(), MegaRequestListenerInterface,
     MegaGlobalListenerInterface, MegaChatRequestListenerInterface, View.OnClickListener,
     ActionNodeCallback, SnackbarShower {
 
+    /**
+     * The Application Theme Mode
+     */
+    @Inject
+    lateinit var getThemeMode: GetThemeMode
+
     @Inject
     lateinit var monitorChatPresenceLastGreenUpdatesUseCase: MonitorChatPresenceLastGreenUpdatesUseCase
 
@@ -162,6 +178,12 @@ class FileExplorerActivity : PasscodeActivity(), MegaRequestListenerInterface,
     @Inject
     @LoginMutex
     lateinit var loginMutex: Mutex
+
+    /**
+     * Mega navigator
+     */
+    @Inject
+    lateinit var megaNavigator: MegaNavigator
 
     private val viewModel by viewModels<FileExplorerViewModel>()
 
@@ -204,7 +226,6 @@ class FileExplorerActivity : PasscodeActivity(), MegaRequestListenerInterface,
     private var importFileFragment: ImportFilesFragment? = null
     private var statusDialog: AlertDialog? = null
     private var newFolderDialog: AlertDialog? = null
-    private var filePreparedInfos: List<ShareInfo>? = null
     private var mTabsAdapterExplorer: FileExplorerPagerAdapter? = null
     private var nodes: ArrayList<MegaNode>? = null
     private var importFileF = false
@@ -212,7 +233,7 @@ class FileExplorerActivity : PasscodeActivity(), MegaRequestListenerInterface,
     private var action: String? = null
     private var myChatFilesNode: MegaNode? = null
     private val attachNodes: ArrayList<MegaNode> = ArrayList()
-    private val uploadInfos: ArrayList<ShareInfo> = ArrayList()
+    private val uploadDocuments: ArrayList<DocumentEntity> = ArrayList()
     private var filesChecked = 0
     private var searchView: SearchView? = null
     private var needLogin = false
@@ -251,7 +272,11 @@ class FileExplorerActivity : PasscodeActivity(), MegaRequestListenerInterface,
                 when (importFragmentSelected) {
                     CHAT_FRAGMENT -> {
                         if (ACTION_UPLOAD_TO_CHAT == action) {
-                            finishAndRemoveTask()
+                            if (chatExplorer != null && chatExplorer?.isSelectMode == true) {
+                                chatExplorer?.clearSelections()
+                            } else {
+                                viewModel.handleBackNavigation()
+                            }
                         } else {
                             chatExplorer = chatExplorerFragment
 
@@ -268,7 +293,7 @@ class FileExplorerActivity : PasscodeActivity(), MegaRequestListenerInterface,
                     }
 
                     IMPORT_FRAGMENT -> {
-                        finishAndRemoveTask()
+                        viewModel.handleBackNavigation()
                     }
                 }
             } else if (isCloudVisible) {
@@ -334,22 +359,17 @@ class FileExplorerActivity : PasscodeActivity(), MegaRequestListenerInterface,
         showSnackbar(type, binding.fragmentContainerFileExplorer, content, chatId)
     }
 
-    private fun onProcessAsyncInfo(info: List<ShareInfo>?) {
-        if (info == null || info.isEmpty()) {
+    private fun onProcessAsyncInfo(documents: List<DocumentEntity>?) {
+        if (documents.isNullOrEmpty()) {
             Timber.w("Selected items list is null or empty.")
-            finishFileExplorer()
             return
         }
-
-        filePreparedInfos = info
 
         if (needLogin) {
             val loginIntent = intent.setClass(this@FileExplorerActivity, LoginActivity::class.java)
                 .apply {
                     putExtra(Constants.VISIBLE_FRAGMENT, Constants.LOGIN_FRAGMENT)
-                    putExtra(EXTRA_SHARE_ACTION, intent.action)
-                    putExtra(EXTRA_SHARE_TYPE, intent.type)
-                    putExtra(EXTRA_SHARE_INFOS, ArrayList(info))
+                    putExtra(EXTRA_FROM_SHARE, true)
                     // close previous login page
                     addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP)
                     action = Constants.ACTION_FILE_EXPLORER_UPLOAD
@@ -366,7 +386,7 @@ class FileExplorerActivity : PasscodeActivity(), MegaRequestListenerInterface,
         }
 
         if (chatListItems.isNotEmpty()) {
-            onIntentProcessed(filePreparedInfos)
+            onIntentProcessed(documents)
         } else if (importFileF) {
             when {
                 importFragmentSelected != -1 -> chooseFragment(importFragmentSelected)
@@ -621,6 +641,27 @@ class FileExplorerActivity : PasscodeActivity(), MegaRequestListenerInterface,
             WindowManager.LayoutParams.FLAG_NOT_TOUCH_MODAL,
             WindowManager.LayoutParams.FLAG_NOT_TOUCH_MODAL
         )
+
+        binding.discardScanUploadingWarningDialogComposeView.setContent {
+            val themeMode by getThemeMode().collectAsStateWithLifecycle(initialValue = ThemeMode.System)
+            val isDark = themeMode.isDarkMode()
+            val state by viewModel.uiState.collectAsStateWithLifecycle()
+
+            OriginalTheme(isDark = isDark) {
+                if (state.isUploadingScans && state.isScanUploadingAborted) {
+                    DiscardScanUploadingWarningDialog(
+                        hasMultipleScans = state.hasMultipleScans,
+                        onWarningAcknowledged = {
+                            viewModel.setIsScanUploadingAborted(false)
+                            viewModel.setShouldFinishScreen(true)
+                        },
+                        onWarningDismissed = {
+                            viewModel.setIsScanUploadingAborted(false)
+                        },
+                    )
+                }
+            }
+        }
     }
 
     private fun handleImportFromUploadDestination() {
@@ -639,10 +680,23 @@ class FileExplorerActivity : PasscodeActivity(), MegaRequestListenerInterface,
     }
 
     private fun setupObservers() {
-        viewModel.filesInfo.observe(this) { info: List<ShareInfo>? ->
-            onProcessAsyncInfo(info)
+        this.lifecycleScope.launch {
+            val documents = viewModel.uiState
+                .mapNotNull { it.documents.takeIf { it.isNotEmpty() } }
+                .flowWithLifecycle(this@FileExplorerActivity.lifecycle, Lifecycle.State.STARTED)
+                .catch {
+                    Timber.e(it)
+                }.firstOrNull()
+            onProcessAsyncInfo(documents)
         }
         viewModel.textInfo.observe(this) { dismissAlertDialogIfExists(statusDialog) }
+
+        collectFlow(viewModel.uiState) { fileExplorerState ->
+            if (fileExplorerState.shouldFinishScreen) {
+                finishAndRemoveTask()
+                viewModel.setShouldFinishScreen(false)
+            }
+        }
 
         collectFlow(viewModel.copyTargetPathFlow) {
             if (it != null) {
@@ -657,22 +711,24 @@ class FileExplorerActivity : PasscodeActivity(), MegaRequestListenerInterface,
                 viewModel.resetMoveTargetPathState()
             }
         }
-
     }
 
     private fun afterLoginAndFetch() {
         handler = Handler(Looper.getMainLooper())
         Timber.d("SHOW action bar")
 
+        val upButtonRes =
+            if (intent.action == ACTION_SAVE_TO_CLOUD || intent.action == ACTION_UPLOAD_TO_CHAT) {
+                // Use the "X" Button when accessing this Activity from Document Scanner
+                R.drawable.ic_close_white
+            } else {
+                R.drawable.ic_arrow_back_white
+            }
+
         supportActionBar?.apply {
             show()
             Timber.d("supportActionBar.setHomeAsUpIndicator")
-            setHomeAsUpIndicator(
-                tintIcon(
-                    this@FileExplorerActivity,
-                    R.drawable.ic_arrow_back_white
-                )
-            )
+            setHomeAsUpIndicator(tintIcon(this@FileExplorerActivity, upButtonRes))
             setDisplayHomeAsUpEnabled(true)
             setDisplayShowHomeEnabled(true)
         }
@@ -751,13 +807,15 @@ class FileExplorerActivity : PasscodeActivity(), MegaRequestListenerInterface,
                     Timber.d("action = SAVE to Cloud Drive")
                     mode = SAVE
                     isSelectFile = false
-                    parentHandleCloud =
-                        intent.getLongExtra(EXTRA_PARENT_HANDLE, INVALID_HANDLE)
-                    title = getString(R.string.section_cloud_drive)
-                    supportActionBar?.subtitle =
-                        getString(R.string.cloud_drive_select_destination)
-                    setView(CLOUD_TAB, false)
-                    tabShown = NO_TABS
+                    parentHandleCloud = intent.getLongExtra(EXTRA_PARENT_HANDLE, INVALID_HANDLE)
+                    title = getString(R.string.title_upload_explorer)
+
+                    with(binding) {
+                        slidingTabsFileExplorer.isVisible = false
+                        explorerTabsPager.isVisible = false
+                        cloudDriveFrameLayout.isVisible = false
+                    }
+                    chooseFragment(CLOUD_FRAGMENT)
                 }
 
                 ACTION_IMPORT_ALBUM -> {
@@ -768,25 +826,17 @@ class FileExplorerActivity : PasscodeActivity(), MegaRequestListenerInterface,
                 }
 
                 else -> {
-                    Timber.d("action = UPLOAD")
-                    mode = UPLOAD
+                    configureView()
                     title = getString(R.string.title_upload_explorer)
                     importFileF = true
-                    action = intent.action
                     viewModel.ownFilePrepareTask(this, intent)
-                    chooseFragment(IMPORT_FRAGMENT)
-                    createAndShowProgressDialog(
-                        false,
-                        resources.getQuantityString(R.plurals.upload_prepare, 1)
+                    chooseFragment(
+                        if (intent.action == ACTION_UPLOAD_TO_CHAT) {
+                            CHAT_FRAGMENT
+                        } else {
+                            IMPORT_FRAGMENT
+                        }
                     )
-
-                    with(binding) {
-                        cloudDriveFrameLayout.isVisible = true
-                        slidingTabsFileExplorer.isVisible = false
-                        explorerTabsPager.isVisible = false
-                    }
-
-                    tabShown = NO_TABS
                 }
             }
 
@@ -794,6 +844,24 @@ class FileExplorerActivity : PasscodeActivity(), MegaRequestListenerInterface,
         } else {
             Timber.e("intent error")
         }
+    }
+
+    private fun configureView() {
+        Timber.d("action = UPLOAD")
+        mode = UPLOAD
+        action = intent.action
+        createAndShowProgressDialog(
+            false,
+            resources.getQuantityString(R.plurals.upload_prepare, 1)
+        )
+
+        with(binding) {
+            cloudDriveFrameLayout.isVisible = true
+            slidingTabsFileExplorer.isVisible = false
+            explorerTabsPager.isVisible = false
+        }
+
+        tabShown = NO_TABS
     }
 
     /**
@@ -838,6 +906,11 @@ class FileExplorerActivity : PasscodeActivity(), MegaRequestListenerInterface,
             }
         }
     }
+
+    /**
+     * Calls the respective ViewModel function to handle the Back Navigation logic
+     */
+    fun handleBackNavigation() = viewModel.handleBackNavigation()
 
     /**
      * Updates the UI for showing tabs or only a fragment.
@@ -1212,6 +1285,7 @@ class FileExplorerActivity : PasscodeActivity(), MegaRequestListenerInterface,
 
     private fun setRootTitle() {
         Timber.d("setRootTitle")
+        supportActionBar?.setHomeAsUpIndicator(tintIcon(this, R.drawable.ic_close_white))
         supportActionBar?.title = when {
             mode == SELECT -> {
                 if (isSelectFile) {
@@ -1233,9 +1307,7 @@ class FileExplorerActivity : PasscodeActivity(), MegaRequestListenerInterface,
                 getString(R.string.title_file_explorer_send_link)
             }
 
-            mode == SAVE -> {
-                getString(R.string.section_cloud_drive)
-            }
+            mode == SAVE -> getString(R.string.title_upload_explorer)
 
             mode == UPLOAD -> {
                 when (importFragmentSelected) {
@@ -1256,11 +1328,6 @@ class FileExplorerActivity : PasscodeActivity(), MegaRequestListenerInterface,
         Timber.d("changeTitle")
         cDriveExplorer = cloudExplorerFragment
         iSharesExplorer = incomingExplorerFragment
-        supportActionBar?.subtitle = if (mode == SAVE) {
-            getString(R.string.cloud_drive_select_destination)
-        } else {
-            null
-        }
 
         if (tabShown == NO_TABS || mTabsAdapterExplorer == null) {
             if (importFileF) {
@@ -1274,7 +1341,7 @@ class FileExplorerActivity : PasscodeActivity(), MegaRequestListenerInterface,
                                     setRootTitle()
                                     supportActionBar?.setSubtitle(R.string.general_select_to_download)
                                 } else {
-                                    supportActionBar?.setTitle(
+                                    setToolbarTitle(
                                         megaApi.getNodeByHandle(
                                             cDriveExplorer?.parentHandle ?: return
                                         )?.name
@@ -1291,7 +1358,7 @@ class FileExplorerActivity : PasscodeActivity(), MegaRequestListenerInterface,
                     if (cDriveExplorer?.parentHandle == -1L || cDriveExplorer?.parentHandle == megaApi.rootNode?.handle) {
                         setRootTitle()
                     } else {
-                        supportActionBar?.setTitle(
+                        setToolbarTitle(
                             megaApi.getNodeByHandle(
                                 cDriveExplorer?.parentHandle
                                     ?: return
@@ -1312,7 +1379,7 @@ class FileExplorerActivity : PasscodeActivity(), MegaRequestListenerInterface,
                         tabShown = CHAT_TAB
                     }
 
-                    supportActionBar?.setTitle(getString(R.string.title_file_explorer_send_link))
+                    supportActionBar?.title = getString(R.string.title_file_explorer_send_link)
                 } else if (f is CloudDriveExplorerFragment) {
                     if (tabShown != NO_TABS) {
                         tabShown = CLOUD_TAB
@@ -1321,7 +1388,7 @@ class FileExplorerActivity : PasscodeActivity(), MegaRequestListenerInterface,
                     if (f.parentHandle == -1L || f.parentHandle == megaApi.rootNode?.handle) {
                         setRootTitle()
                     } else {
-                        supportActionBar?.setTitle(megaApi.getNodeByHandle(f.parentHandle)?.name)
+                        setToolbarTitle(megaApi.getNodeByHandle(f.parentHandle)?.name)
                     }
 
                     showFabButton(false)
@@ -1335,7 +1402,7 @@ class FileExplorerActivity : PasscodeActivity(), MegaRequestListenerInterface,
                     if (deepBrowserTree == 0) {
                         setRootTitle()
                     } else {
-                        supportActionBar?.setTitle(megaApi.getNodeByHandle(f.parentHandle)?.name)
+                        setToolbarTitle(megaApi.getNodeByHandle(f.parentHandle)?.name)
                     }
                 } else if (f is CloudDriveExplorerFragment) {
                     if (tabShown != NO_TABS) {
@@ -1345,7 +1412,7 @@ class FileExplorerActivity : PasscodeActivity(), MegaRequestListenerInterface,
                     if (f.parentHandle == -1L || f.parentHandle == megaApi.rootNode?.handle) {
                         setRootTitle()
                     } else {
-                        supportActionBar?.setTitle(megaApi.getNodeByHandle(f.parentHandle)?.name)
+                        setToolbarTitle(megaApi.getNodeByHandle(f.parentHandle)?.name)
                     }
                 }
                 showFabButton(false)
@@ -1355,7 +1422,7 @@ class FileExplorerActivity : PasscodeActivity(), MegaRequestListenerInterface,
                         tabShown = CHAT_TAB
                     }
 
-                    supportActionBar?.setTitle(getString(R.string.title_chat_explorer))
+                    supportActionBar?.title = getString(R.string.title_chat_explorer)
                 } else if (f is IncomingSharesExplorerFragment) {
                     if (tabShown != NO_TABS) {
                         tabShown = INCOMING_TAB
@@ -1364,7 +1431,7 @@ class FileExplorerActivity : PasscodeActivity(), MegaRequestListenerInterface,
                     if (deepBrowserTree == 0) {
                         setRootTitle()
                     } else {
-                        supportActionBar?.setTitle(megaApi.getNodeByHandle(f.parentHandle)?.name)
+                        setToolbarTitle(megaApi.getNodeByHandle(f.parentHandle)?.name)
                     }
 
                     showFabButton(false)
@@ -1373,6 +1440,11 @@ class FileExplorerActivity : PasscodeActivity(), MegaRequestListenerInterface,
         }
 
         invalidateOptionsMenu()
+    }
+
+    private fun setToolbarTitle(title: String?) {
+        supportActionBar?.title = title
+        supportActionBar?.setHomeAsUpIndicator(tintIcon(this, R.drawable.ic_arrow_back_white))
     }
 
     override fun onSaveInstanceState(outState: Bundle) {
@@ -1415,7 +1487,7 @@ class FileExplorerActivity : PasscodeActivity(), MegaRequestListenerInterface,
                 chooseFragment(IMPORT_FRAGMENT)
             }
         } else {
-            finishAndRemoveTask()
+            viewModel.handleBackNavigation()
         }
     }
 
@@ -1443,14 +1515,15 @@ class FileExplorerActivity : PasscodeActivity(), MegaRequestListenerInterface,
     private fun startChatUploadService() {
         if (chatListItems.isEmpty()) {
             Timber.w("ERROR null chats to upload")
-            filePreparedInfos = null
             openManagerAndFinish()
             return
         }
 
-        Timber.d("Launch chat upload with files %s", filePreparedInfos?.size)
+        val filePreparedDocuments = viewModel.getDocuments()
+
+        Timber.d("Launch chat upload with files %s", filePreparedDocuments.size)
         val notEmptyAttachedNodes = attachNodes.isNotEmpty()
-        val notEmptyUploadInfo = uploadInfos.isNotEmpty()
+        val notEmptyUploadInfo = uploadDocuments.isNotEmpty()
         filesChecked = 0
 
         if (notEmptyAttachedNodes && !notEmptyUploadInfo) {
@@ -1466,13 +1539,12 @@ class FileExplorerActivity : PasscodeActivity(), MegaRequestListenerInterface,
             return
         }
 
-        val infoToShare = if (notEmptyUploadInfo) uploadInfos else filePreparedInfos
+        val documentsToShare = if (notEmptyUploadInfo) uploadDocuments else filePreparedDocuments
         val chatIds = chatListItems.map { it.chatId }
         val nodeHandles = attachNodes.map { it.handle }
         val nodeIds = nodeHandles.map { NodeId(it) }
-        val files = infoToShare?.map { it.fileAbsolutePath } ?: emptyList()
         checkNotificationsPermission(this)
-        viewModel.uploadFilesToChatIfFeatureFlagIsTrue(chatIds, files, nodeIds,
+        viewModel.uploadFilesToChat(chatIds, documentsToShare ?: emptyList(), nodeIds,
             toDoAfter = {
                 openManagerAndFinish()
             }
@@ -1480,15 +1552,20 @@ class FileExplorerActivity : PasscodeActivity(), MegaRequestListenerInterface,
     }
 
     private fun openManagerAndFinish() {
-        val intent = Intent(this, ManagerActivity::class.java)
-        intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP)
+        val intent = Intent(this, ManagerActivity::class.java).apply {
+            if (isFromUploadDestinationActivity) {
+                addFlags(Intent.FLAG_ACTIVITY_CLEAR_TASK)
+                addFlags(Intent.FLAG_ACTIVITY_NEW_TASK)
+            } else {
+                addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP)
+            }
+        }
         startActivity(intent)
         finish()
     }
 
     private fun finishFileExplorer() {
         dismissAlertDialogIfExists(statusDialog)
-        filePreparedInfos = null
         Timber.d("finish!!!")
         finishAndRemoveTask()
     }
@@ -1497,8 +1574,9 @@ class FileExplorerActivity : PasscodeActivity(), MegaRequestListenerInterface,
      * Checks if files exists in MEGA.
      */
     fun checkIfFilesExistsInMEGA() {
-        for (info in filePreparedInfos ?: return) {
-            val fingerprint = megaApi.getFingerprint(info.fileAbsolutePath)
+        val filePreparedDocuments = viewModel.getDocuments()
+        for (info in filePreparedDocuments) {
+            val fingerprint = megaApi.getFingerprint(info.uri.value)
             val node = megaApi.getNodeByFingerprint(fingerprint)
             if (node != null) {
                 if (node.parentHandle == myChatFilesNode?.handle) {
@@ -1521,13 +1599,13 @@ class FileExplorerActivity : PasscodeActivity(), MegaRequestListenerInterface,
                         }.onSuccess {
                             filesChecked++
                             attachNodes.add(node)
-                            if (filesChecked == (filePreparedInfos ?: return@onSuccess).size) {
+                            if (filesChecked == filePreparedDocuments.size) {
                                 startChatUploadService()
                             }
                         }.onFailure { throwable ->
                             filesChecked++
                             Timber.w("Error copying node into My Chat Files")
-                            if (filesChecked == (filePreparedInfos ?: return@onFailure).size) {
+                            if (filesChecked == filePreparedDocuments.size) {
                                 startChatUploadService()
                             }
                             manageCopyMoveException(throwable)
@@ -1535,12 +1613,12 @@ class FileExplorerActivity : PasscodeActivity(), MegaRequestListenerInterface,
                     }
                 }
             } else {
-                uploadInfos.add(info)
+                uploadDocuments.add(info)
                 filesChecked++
             }
         }
 
-        if (filesChecked == (filePreparedInfos ?: return).size) {
+        if (filesChecked == filePreparedDocuments.size) {
             startChatUploadService()
         }
     }
@@ -1550,7 +1628,7 @@ class FileExplorerActivity : PasscodeActivity(), MegaRequestListenerInterface,
      *
      * @param infos List<ShareInfo> containing all the upload info.
      */
-    private fun onIntentProcessed(infos: List<ShareInfo>?) {
+    private fun onIntentProcessed(infos: List<DocumentEntity>?) {
         Timber.d("onIntentChatProcessed")
         if (intent != null && intent.action !== ACTION_PROCESSED) {
             intent.action = ACTION_PROCESSED
@@ -1574,7 +1652,7 @@ class FileExplorerActivity : PasscodeActivity(), MegaRequestListenerInterface,
     }
 
     private fun onIntentProcessed() {
-        val infos = filePreparedInfos
+        val documents = viewModel.getDocuments()
 
         if (intent != null && intent.action !== ACTION_PROCESSED) {
             intent.action = ACTION_PROCESSED
@@ -1583,7 +1661,7 @@ class FileExplorerActivity : PasscodeActivity(), MegaRequestListenerInterface,
         Timber.d("intent processed!")
 
         if (folderSelected) {
-            if (infos == null) {
+            if (documents.isEmpty()) {
                 dismissAlertDialogIfExists(statusDialog)
                 showSnackbar(getString(R.string.upload_can_not_open))
                 return
@@ -1610,15 +1688,7 @@ class FileExplorerActivity : PasscodeActivity(), MegaRequestListenerInterface,
             lifecycleScope.launch {
                 runCatching {
                     checkFileNameCollisionsUseCase(
-                        files = infos.map {
-                            DocumentEntity(
-                                name = viewModel.uiState.value.fileNames[it.originalFileName]
-                                    ?: it.originalFileName,
-                                size = it.size,
-                                lastModified = it.lastModified,
-                                uri = UriPath(it.fileAbsolutePath),
-                            )
-                        },
+                        files = documents,
                         parentNodeId = NodeId(parentHandle)
                     )
                 }.onSuccess { collisions ->
@@ -1627,8 +1697,8 @@ class FileExplorerActivity : PasscodeActivity(), MegaRequestListenerInterface,
                         nameCollisionActivityLauncher.launch(ArrayList(collisions))
                     }
                     val collidedSharesPath = collisions.map { it.path.value }.toSet()
-                    val sharesWithoutCollision = infos.filter {
-                        collidedSharesPath.contains(it.fileAbsolutePath).not()
+                    val sharesWithoutCollision = documents.filter {
+                        collidedSharesPath.contains(it.uri.value).not()
                     }
                     if (sharesWithoutCollision.isNotEmpty()) {
                         viewModel.uploadFiles(parentHandle)
@@ -1723,20 +1793,24 @@ class FileExplorerActivity : PasscodeActivity(), MegaRequestListenerInterface,
 
             UPLOAD, SAVE -> {
                 Timber.d("mode UPLOAD")
+                if (intent.action == ACTION_SAVE_TO_CLOUD || action == ACTION_UPLOAD_TO_CHAT) {
+                    logDocumentScanEvent(isCloudDrive = true)
+                }
                 if (viewModel.isImportingText(intent)) {
                     val parentNode = megaApi.getNodeByHandle(handle) ?: megaApi.rootNode
                     val info = viewModel.textInfoContent
-                    val names = viewModel.uiState.value.fileNames
 
                     if (info != null) {
-                        val name = names[info.subject]
+                        val name =
+                            viewModel.uiState.value.namesByOriginalName[info.subject]
+                                ?: info.subject
                         createFile(name, info.fileContent, parentNode, info.isUrl)
                     }
 
                     return
                 }
 
-                if (filePreparedInfos == null) {
+                if (viewModel.getDocuments().isEmpty()) {
                     viewModel.ownFilePrepareTask(this, intent)
                     createAndShowProgressDialog(
                         false,
@@ -1811,6 +1885,24 @@ class FileExplorerActivity : PasscodeActivity(), MegaRequestListenerInterface,
         }
     }
 
+    private fun logDocumentScanEvent(isCloudDrive: Boolean) {
+        ScanFileType.entries.getOrNull(intent.getIntExtra(EXTRA_SCAN_FILE_TYPE, 0))?.let { type ->
+            when {
+                type == ScanFileType.Pdf && isCloudDrive ->
+                    Analytics.tracker.trackEvent(DocumentScannerUploadingPDFToCloudDriveEvent)
+
+                type == ScanFileType.Pdf && !isCloudDrive ->
+                    Analytics.tracker.trackEvent(DocumentScannerUploadingPDFToChatEvent)
+
+                type == ScanFileType.Jpg && isCloudDrive ->
+                    Analytics.tracker.trackEvent(DocumentScannerUploadingImageToCloudDriveEvent)
+
+                type == ScanFileType.Jpg && !isCloudDrive ->
+                    Analytics.tracker.trackEvent(DocumentScannerUploadingImageToChatEvent)
+            }
+        }
+    }
+
     /**
      * Goes back to Cloud.
      *
@@ -1821,8 +1913,14 @@ class FileExplorerActivity : PasscodeActivity(), MegaRequestListenerInterface,
     private fun backToCloud(handle: Long, numberUploads: Int, message: String?) {
         Timber.d("handle: %s", handle)
 
-        val startIntent = Intent(this, ManagerActivity::class.java)
-            .addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP)
+        val startIntent = Intent(this, ManagerActivity::class.java).apply {
+            if (isFromUploadDestinationActivity) {
+                addFlags(Intent.FLAG_ACTIVITY_CLEAR_TASK)
+                addFlags(Intent.FLAG_ACTIVITY_NEW_TASK)
+            } else {
+                addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP)
+            }
+        }
 
         if (handle != INVALID_HANDLE) {
             startIntent.action = Constants.ACTION_OPEN_FOLDER
@@ -1839,6 +1937,7 @@ class FileExplorerActivity : PasscodeActivity(), MegaRequestListenerInterface,
         }
 
         startActivity(startIntent)
+        finishAndRemoveTask()
     }
 
     /**
@@ -2107,10 +2206,6 @@ class FileExplorerActivity : PasscodeActivity(), MegaRequestListenerInterface,
         }
     }
 
-    override fun onReloadNeeded(api: MegaApiJava) {
-
-    }
-
     public override fun onDestroy() {
         megaApi.removeGlobalListener(this)
         megaApi.removeRequestListener(this)
@@ -2257,6 +2352,9 @@ class FileExplorerActivity : PasscodeActivity(), MegaRequestListenerInterface,
 
         when (v.id) {
             R.id.fab_file_explorer -> {
+                if (intent.action == ACTION_UPLOAD_TO_CHAT) {
+                    logDocumentScanEvent(isCloudDrive = false)
+                }
                 v.isEnabled = false
                 chatExplorer = chatExplorerFragment
                 chatExplorer?.let { getChatAdded(it.addedChats ?: return) }
@@ -2319,7 +2417,10 @@ class FileExplorerActivity : PasscodeActivity(), MegaRequestListenerInterface,
 
             return
         }
-        if (filePreparedInfos == null) {
+
+        val filePreparedDocuments = viewModel.getDocuments()
+
+        if (filePreparedDocuments.isEmpty()) {
             createAndShowProgressDialog(
                 false,
                 resources.getQuantityString(R.plurals.upload_prepare, 1)
@@ -2327,7 +2428,7 @@ class FileExplorerActivity : PasscodeActivity(), MegaRequestListenerInterface,
 
             viewModel.ownFilePrepareTask(this, intent)
         } else {
-            onIntentProcessed(filePreparedInfos)
+            onIntentProcessed(filePreparedDocuments)
         }
         return
     }
@@ -2575,9 +2676,15 @@ class FileExplorerActivity : PasscodeActivity(), MegaRequestListenerInterface,
     private fun addStartUploadTransferView() {
         binding.root.addView(
             createStartTransferView(
-                this,
-                viewModel.uiState.map { it.uploadEvent },
-                viewModel::consumeUploadEvent
+                activity = this,
+                transferEventState = viewModel.uiState.map { it.uploadEvent },
+                onConsumeEvent = viewModel::consumeUploadEvent,
+                navigateToStorageSettings = {
+                    megaNavigator.openSettings(
+                        this,
+                        StorageTargetPreference
+                    )
+                }
             ) { startTransferEvent ->
                 ((startTransferEvent as StartTransferEvent.FinishUploadProcessing).triggerEvent as TransferTriggerEvent.StartUpload.Files).let {
                     backToCloud(
@@ -2585,10 +2692,16 @@ class FileExplorerActivity : PasscodeActivity(), MegaRequestListenerInterface,
                         it.pathsAndNames.size,
                         null
                     )
-                    finishAndRemoveTask()
                 }
             }
         )
+    }
+
+    internal fun setCurrentTab(position: Int) {
+        val itemCount = binding.explorerTabsPager.adapter?.itemCount ?: 0
+        if (position in 0 until itemCount) {
+            binding.explorerTabsPager.setCurrentItem(position, false)
+        }
     }
 
     companion object {
@@ -2617,19 +2730,9 @@ class FileExplorerActivity : PasscodeActivity(), MegaRequestListenerInterface,
         const val IMPORT_FRAGMENT = 4
 
         /**
-         * Intent extra for share infos.
+         * Intent extra for share flag.
          */
-        const val EXTRA_SHARE_INFOS = "share_infos"
-
-        /**
-         * Intent extra for share action.
-         */
-        const val EXTRA_SHARE_ACTION = "share_action"
-
-        /**
-         * Intent extra for share type.
-         */
-        const val EXTRA_SHARE_TYPE = "share_type"
+        const val EXTRA_FROM_SHARE = "from_share"
 
         /**
          * Intent extra for parent handle.
@@ -2645,6 +2748,16 @@ class FileExplorerActivity : PasscodeActivity(), MegaRequestListenerInterface,
          * Intent extra for the selected MEGA Folder
          */
         const val EXTRA_MEGA_SELECTED_FOLDER = "EXTRA_MEGA_SELECTED_FOLDER"
+
+        /**
+         * Intent extra for the scan file type
+         */
+        const val EXTRA_SCAN_FILE_TYPE = "scan_file_type"
+
+        /**
+         * Intent extra to check whether or not there are multiple scans to be uploaded
+         */
+        const val EXTRA_HAS_MULTIPLE_SCANS = "EXTRA_HAS_MULTIPLE_SCANS"
 
         /**
          * Intent action for processed info.

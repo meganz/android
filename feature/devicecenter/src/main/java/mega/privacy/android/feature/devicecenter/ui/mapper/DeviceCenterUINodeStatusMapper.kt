@@ -56,8 +56,6 @@ internal class DeviceCenterUINodeStatusMapper @Inject constructor(
             }
         }
 
-        DeviceCenterNodeStatus.NoCameraUploads -> DeviceCenterUINodeStatus.CameraUploadsDisabled
-
         DeviceCenterNodeStatus.Stalled -> DeviceCenterUINodeStatus.Blocked(null)
 
         DeviceCenterNodeStatus.NothingSetUp -> DeviceCenterUINodeStatus.NothingSetUp

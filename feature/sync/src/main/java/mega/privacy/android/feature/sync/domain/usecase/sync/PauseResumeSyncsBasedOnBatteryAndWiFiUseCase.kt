@@ -34,7 +34,6 @@ class PauseResumeSyncsBasedOnBatteryAndWiFiUseCase @Inject constructor(
         connectedToInternet: Boolean,
         syncOnlyByWifi: Boolean,
         batteryInfo: BatteryInfo,
-        isFreeAccount: Boolean,
     ) {
         val internetNotAvailable = !connectedToInternet
         val userNotOnWifi = !isOnWifiNetworkUseCase()
@@ -43,7 +42,7 @@ class PauseResumeSyncsBasedOnBatteryAndWiFiUseCase @Inject constructor(
         val isLowBatteryLevel =
             batteryInfo.level < LOW_BATTERY_LEVEL && !batteryInfo.isCharging
 
-        if (internetNotAvailable || syncOnlyByWifi && userNotOnWifi || isLowBatteryLevel || isFreeAccount) {
+        if (internetNotAvailable || syncOnlyByWifi && userNotOnWifi || isLowBatteryLevel) {
             activeSyncs.forEach { pauseSyncUseCase(it.id) }
         } else {
             activeSyncs.forEach { resumeSyncUseCase(it.id) }

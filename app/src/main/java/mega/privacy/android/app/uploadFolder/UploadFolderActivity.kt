@@ -6,8 +6,11 @@ import android.animation.AnimatorInflater
 import android.animation.AnimatorSet
 import android.app.Activity
 import android.content.Intent
+import android.net.Uri
 import android.os.Build
 import android.os.Bundle
+import android.os.Environment
+import android.provider.DocumentsContract
 import android.view.Menu
 import android.view.MenuItem
 import android.widget.ImageView
@@ -20,9 +23,11 @@ import androidx.activity.viewModels
 import androidx.appcompat.view.ActionMode
 import androidx.appcompat.widget.SearchView
 import androidx.core.content.ContextCompat
+import androidx.core.net.toFile
 import androidx.core.view.isVisible
 import androidx.documentfile.provider.DocumentFile
 import androidx.recyclerview.widget.RecyclerView
+import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.flow.map
 import mega.privacy.android.app.R
 import mega.privacy.android.app.activities.PasscodeActivity
@@ -38,6 +43,8 @@ import mega.privacy.android.app.modalbottomsheet.SortByBottomSheetDialogFragment
 import mega.privacy.android.app.namecollision.NameCollisionActivity
 import mega.privacy.android.app.namecollision.data.NameCollisionResultUiEntity
 import mega.privacy.android.app.namecollision.data.NameCollisionUiEntity
+import mega.privacy.android.app.presentation.extensions.serializable
+import mega.privacy.android.app.presentation.settings.model.StorageTargetPreference
 import mega.privacy.android.app.presentation.transfers.starttransfer.model.StartTransferEvent
 import mega.privacy.android.app.presentation.transfers.starttransfer.model.TransferTriggerEvent
 import mega.privacy.android.app.presentation.transfers.starttransfer.view.createStartTransferView
@@ -48,21 +55,36 @@ import mega.privacy.android.app.utils.Constants.INTENT_EXTRA_COLLISION_RESULTS
 import mega.privacy.android.app.utils.Constants.INTENT_EXTRA_KEY_PARENT_NODE_HANDLE
 import mega.privacy.android.app.utils.Constants.ORDER_OFFLINE
 import mega.privacy.android.app.utils.MenuUtils.setupSearchView
+import mega.privacy.android.app.utils.Util
 import mega.privacy.android.domain.entity.node.NameCollision
 import mega.privacy.android.domain.entity.preference.ViewType
+import mega.privacy.android.navigation.MegaNavigator
 import nz.mega.sdk.MegaApiJava.INVALID_HANDLE
 import timber.log.Timber
+import javax.inject.Inject
 
 /**
  * Activity which shows the content of a local folder picked via system picker to upload all its content
  * or part of it.
  */
+@AndroidEntryPoint
 class UploadFolderActivity : PasscodeActivity(), Scrollable {
 
     companion object {
         private const val WAIT_TIME_TO_UPDATE = 150L
         private const val SHADOW = 0.5f
+
+        /**
+         * Upload Folder Type
+         */
+        const val UPLOAD_FOLDER_TYPE = "UPLOAD_FOLDER_TYPE"
     }
+
+    /**
+     * Mega navigator
+     */
+    @Inject
+    lateinit var megaNavigator: MegaNavigator
 
     private val viewModel: UploadFolderViewModel by viewModels()
     private val sortByHeaderViewModel: SortByHeaderViewModel by viewModels()
@@ -87,6 +109,14 @@ class UploadFolderActivity : PasscodeActivity(), Scrollable {
         )
     }
 
+    private val rootFolderUri by lazy(LazyThreadSafetyMode.NONE) {
+        Uri.fromFile(Environment.getExternalStorageDirectory())
+    }
+
+    private val deviceName by lazy(LazyThreadSafetyMode.NONE) {
+        Util.getDeviceName()
+    }
+
     private lateinit var searchMenuItem: MenuItem
 
     private lateinit var collisionsForResult: ActivityResultLauncher<Intent>
@@ -98,6 +128,11 @@ class UploadFolderActivity : PasscodeActivity(), Scrollable {
                 onBackPressedDispatcher.onBackPressed()
             }
         }
+    }
+
+    private val type by lazy {
+        intent.serializable<UploadFolderType>(UPLOAD_FOLDER_TYPE)
+            ?: UploadFolderType.SELECT_AND_UPLOAD
     }
 
     /**
@@ -146,7 +181,12 @@ class UploadFolderActivity : PasscodeActivity(), Scrollable {
 
         if (savedInstanceState == null) {
             intent.data?.let { uri ->
-                DocumentFile.fromTreeUri(this@UploadFolderActivity, uri)?.let { documentFile ->
+                val documentFile = if (DocumentsContract.isTreeUri(uri)) {
+                    DocumentFile.fromTreeUri(this, uri)
+                } else {
+                    DocumentFile.fromFile(uri.toFile())
+                }
+                documentFile?.let {
                     viewModel.retrieveFolderContent(
                         documentFile = documentFile,
                         parentHandle = intent.getLongExtra(
@@ -172,6 +212,8 @@ class UploadFolderActivity : PasscodeActivity(), Scrollable {
             setupSearchView { query ->
                 showProgress(true)
                 viewModel.search(query)
+                binding.uploadButton.isEnabled =
+                    type != UploadFolderType.SINGLE_SELECT || query.isNullOrEmpty()
             }
 
             val query = viewModel.query
@@ -241,11 +283,24 @@ class UploadFolderActivity : PasscodeActivity(), Scrollable {
             finish()
         }
 
+        if (type == UploadFolderType.SINGLE_SELECT) {
+            binding.uploadButton.text =
+                getString(mega.privacy.android.shared.resources.R.string.general_select_folder)
+        }
         binding.uploadButton.setOnClickListener {
-            showProgress(true)
-            viewModel.upload()
-            actionMode?.finish()
-            invalidateOptionsMenu()
+            if (type == UploadFolderType.SINGLE_SELECT) {
+                setResult(
+                    Activity.RESULT_OK, Intent().apply {
+                        data = viewModel.getCurrentFolder().value?.uri
+                    }
+                )
+                finish()
+            } else {
+                showProgress(true)
+                viewModel.upload()
+                actionMode?.finish()
+                invalidateOptionsMenu()
+            }
         }
 
         showProgress(true)
@@ -253,7 +308,13 @@ class UploadFolderActivity : PasscodeActivity(), Scrollable {
             createStartTransferView(
                 this,
                 viewModel.uiState.map { it.transferTriggerEvent },
-                viewModel::consumeTransferTriggerEvent
+                viewModel::consumeTransferTriggerEvent,
+                navigateToStorageSettings = {
+                    megaNavigator.openSettings(
+                        this,
+                        StorageTargetPreference
+                    )
+                }
             ) { event ->
                 if (event is StartTransferEvent.FinishUploadProcessing) {
                     val total = ((event.triggerEvent as? TransferTriggerEvent.StartUpload.Files)
@@ -288,7 +349,11 @@ class UploadFolderActivity : PasscodeActivity(), Scrollable {
         }
         binding.uploadButton.apply {
             alpha = shadow
-            isEnabled = !show
+            isEnabled = if (type == UploadFolderType.SINGLE_SELECT) {
+                viewModel.query.isNullOrEmpty() && !show
+            } else {
+                !show
+            }
         }
 
         if (this::searchMenuItem.isInitialized && !searchMenuItem.isActionViewExpanded) {
@@ -304,7 +369,6 @@ class UploadFolderActivity : PasscodeActivity(), Scrollable {
     private fun setupObservers() {
         collectFlow(sortByHeaderViewModel.state) { state ->
             val viewType = state.viewType
-            switchViewType(viewType)
             viewModel.setIsList(viewType == ViewType.LIST)
         }
 
@@ -330,7 +394,11 @@ class UploadFolderActivity : PasscodeActivity(), Scrollable {
      * @param currentFolder Current folder.
      */
     private fun showCurrentFolder(currentFolder: FolderContent.Data) {
-        supportActionBar?.title = currentFolder.name
+        supportActionBar?.title = if (currentFolder.uri == rootFolderUri) {
+            deviceName
+        } else {
+            currentFolder.name
+        }
     }
 
     /**
@@ -345,7 +413,12 @@ class UploadFolderActivity : PasscodeActivity(), Scrollable {
         folderContentAdapter.submitList(folderContent)
         binding.list.apply {
             isVisible = !isEmpty
-            postDelayed({ showProgress(false) }, WAIT_TIME_TO_UPDATE)
+            postDelayed({
+                showProgress(false)
+                if (isInList != viewModel.isInList()) {
+                    switchViewType(if (viewModel.isInList()) ViewType.LIST else ViewType.GRID)
+                }
+            }, WAIT_TIME_TO_UPDATE)
         }
 
         if (viewModel.query == null && this::searchMenuItem.isInitialized) {
@@ -437,6 +510,7 @@ class UploadFolderActivity : PasscodeActivity(), Scrollable {
      * @param position      Position of the clicked item in the adapter.
      */
     private fun onLongClick(itemClicked: FolderContent.Data, position: Int) {
+        if (type == UploadFolderType.SINGLE_SELECT) return
         when {
             binding.progressBar.isVisible -> return
             else -> {

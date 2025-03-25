@@ -3,7 +3,7 @@
     xmlns:app="http://schemas.android.com/apk/res-auto"
     android:id="@+id/player_view"
     android:layout_width="match_parent"
-    android:layout_height="match_parent"
+    android:layout_height="wrap_content"
     android:background="?attr/colorPrimary"
     app:controller_layout_id="@layout/audio_player_control_in_playlist"
     app:player_layout_id="@layout/audio_player_view_controller_only"

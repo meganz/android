@@ -15,7 +15,6 @@ import mega.privacy.android.app.meeting.activity.MeetingActivity
 import mega.privacy.android.app.meeting.activity.MeetingActivityRepository
 import mega.privacy.android.app.meeting.activity.MeetingActivityViewModel
 import mega.privacy.android.app.meeting.gateway.RTCAudioManagerGateway
-import mega.privacy.android.app.objects.PasscodeManagement
 import mega.privacy.android.app.presentation.mapper.GetPluralStringFromStringResMapper
 import mega.privacy.android.app.presentation.mapper.GetStringFromStringResMapper
 import mega.privacy.android.app.presentation.meeting.mapper.ChatParticipantMapper
@@ -146,7 +145,6 @@ class MeetingActivityViewModelTest {
     private val enableOrDisableAudioUseCase: EnableOrDisableAudioUseCase = mock()
     private val createMeetingUseCase: CreateMeetingUseCase = mock()
     private val startCallUseCase: StartCallUseCase = mock()
-    private val passcodeManagement: PasscodeManagement = mock()
     private val getUserAvatarUseCase: GetUserAvatarUseCase = mock()
 
     private val context: Context = mock()
@@ -203,7 +201,6 @@ class MeetingActivityViewModelTest {
             startVideoDeviceUseCase,
             createMeetingUseCase,
             startCallUseCase,
-            passcodeManagement,
             monitorCallEndedUseCase,
             enableOrDisableAudioUseCase,
             enableOrDisableVideoUseCase,
@@ -278,7 +275,6 @@ class MeetingActivityViewModelTest {
             monitorCallEndedUseCase = monitorCallEndedUseCase,
             createMeetingUseCase = createMeetingUseCase,
             startCallUseCase = startCallUseCase,
-            passcodeManagement = passcodeManagement,
             monitorAudioOutputUseCase = monitorAudioOutputUseCase,
             monitorChatConnectionStateUseCase = monitorChatConnectionStateUseCase,
             getUserAvatarUseCase = getUserAvatarUseCase,

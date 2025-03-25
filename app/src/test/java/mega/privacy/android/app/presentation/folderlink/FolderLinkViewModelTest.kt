@@ -7,8 +7,10 @@ import com.google.common.truth.Truth.assertThat
 import de.palm.composestateevents.StateEventWithContentTriggered
 import de.palm.composestateevents.consumed
 import de.palm.composestateevents.triggered
+import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.flow.emptyFlow
+import kotlinx.coroutines.test.UnconfinedTestDispatcher
 import kotlinx.coroutines.test.runTest
 import mega.privacy.android.app.presentation.copynode.mapper.CopyRequestMessageMapper
 import mega.privacy.android.app.presentation.data.NodeUIItem
@@ -16,6 +18,7 @@ import mega.privacy.android.app.presentation.mapper.GetStringFromStringResMapper
 import mega.privacy.android.app.presentation.meeting.chat.view.message.attachment.NodeContentUriIntentMapper
 import mega.privacy.android.app.utils.Constants
 import mega.privacy.android.core.test.extension.CoroutineMainDispatcherExtension
+import mega.privacy.android.domain.entity.FolderInfo
 import mega.privacy.android.domain.entity.folderlink.FetchFolderNodesResult
 import mega.privacy.android.domain.entity.folderlink.FolderLoginStatus
 import mega.privacy.android.domain.entity.node.FileNode
@@ -36,15 +39,19 @@ import mega.privacy.android.domain.usecase.GetLocalFolderLinkFromMegaApiUseCase
 import mega.privacy.android.domain.usecase.GetPricing
 import mega.privacy.android.domain.usecase.HasCredentialsUseCase
 import mega.privacy.android.domain.usecase.RootNodeExistsUseCase
+import mega.privacy.android.domain.usecase.StopAudioService
 import mega.privacy.android.domain.usecase.account.GetAccountTypeUseCase
 import mega.privacy.android.domain.usecase.achievements.AreAchievementsEnabledUseCase
+import mega.privacy.android.domain.usecase.advertisements.QueryAdsUseCase
 import mega.privacy.android.domain.usecase.contact.GetCurrentUserEmail
 import mega.privacy.android.domain.usecase.file.GetFileUriUseCase
+import mega.privacy.android.domain.usecase.filelink.GetPublicLinkInformationUseCase
 import mega.privacy.android.domain.usecase.folderlink.ContainsMediaItemUseCase
 import mega.privacy.android.domain.usecase.folderlink.FetchFolderNodesUseCase
 import mega.privacy.android.domain.usecase.folderlink.GetFolderLinkChildrenNodesUseCase
 import mega.privacy.android.domain.usecase.folderlink.GetFolderParentNodeUseCase
 import mega.privacy.android.domain.usecase.folderlink.LoginToFolderUseCase
+import mega.privacy.android.domain.usecase.login.IsUserLoggedInUseCase
 import mega.privacy.android.domain.usecase.mediaplayer.MegaApiFolderHttpServerIsRunningUseCase
 import mega.privacy.android.domain.usecase.mediaplayer.MegaApiFolderHttpServerStartUseCase
 import mega.privacy.android.domain.usecase.mediaplayer.MegaApiHttpServerIsRunningUseCase
@@ -55,6 +62,7 @@ import mega.privacy.android.domain.usecase.node.CopyNodesUseCase
 import mega.privacy.android.domain.usecase.node.GetFolderLinkNodeContentUriUseCase
 import mega.privacy.android.domain.usecase.node.GetNodePreviewFileUseCase
 import mega.privacy.android.domain.usecase.node.publiclink.MapNodeToPublicLinkUseCase
+import mega.privacy.android.domain.usecase.setting.UpdateCrashAndPerformanceReportersUseCase
 import mega.privacy.android.domain.usecase.viewtype.MonitorViewType
 import mega.privacy.android.domain.usecase.viewtype.SetViewType
 import mega.privacy.android.navigation.MegaNavigator
@@ -62,11 +70,14 @@ import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.TestInstance
 import org.junit.jupiter.api.extension.ExtendWith
+import org.junit.jupiter.params.ParameterizedTest
+import org.junit.jupiter.params.provider.ValueSource
 import org.mockito.Mockito
 import org.mockito.kotlin.any
 import org.mockito.kotlin.anyOrNull
 import org.mockito.kotlin.mock
 import org.mockito.kotlin.reset
+import org.mockito.kotlin.times
 import org.mockito.kotlin.verify
 import org.mockito.kotlin.whenever
 
@@ -110,6 +121,12 @@ class FolderLinkViewModelTest {
     private val megaNavigator: MegaNavigator = mock()
     private val nodeContentUriIntentMapper: NodeContentUriIntentMapper = mock()
     private val getNodePreviewFileUseCase: GetNodePreviewFileUseCase = mock()
+    private val updateCrashAndPerformanceReportersUseCase: UpdateCrashAndPerformanceReportersUseCase =
+        mock()
+    private val isUserLoggedInUseCase: IsUserLoggedInUseCase = mock()
+    private val stopAudioService: StopAudioService = mock()
+    private val getPublicLinkInformationUseCase: GetPublicLinkInformationUseCase = mock()
+    private val queryAdsUseCase: QueryAdsUseCase = mock()
 
 
     @BeforeEach
@@ -152,44 +169,56 @@ class FolderLinkViewModelTest {
             getFolderLinkNodeContentUriUseCase,
             megaNavigator,
             nodeContentUriIntentMapper,
-            getNodePreviewFileUseCase
+            getNodePreviewFileUseCase,
+            updateCrashAndPerformanceReportersUseCase,
+            isUserLoggedInUseCase,
+            stopAudioService,
+            getPublicLinkInformationUseCase,
+            queryAdsUseCase
         )
     }
 
     private fun initViewModel() {
         underTest = FolderLinkViewModel(
-            isConnectedToInternetUseCase,
-            monitorViewType,
-            loginToFolderUseCase,
-            copyNodesUseCase,
-            copyRequestMessageMapper,
-            hasCredentialsUseCase,
-            rootNodeExistsUseCase,
-            setViewType,
-            fetchFolderNodesUseCase,
-            getFolderParentNodeUseCase,
-            getFolderLinkChildrenNodesUseCase,
-            addNodeType,
-            getStringFromStringResMapper,
-            areAchievementsEnabledUseCase,
-            getAccountTypeUseCase,
-            getCurrentUserEmail,
-            getPricing,
-            containsMediaItemUseCase,
-            getLocalFileForNodeUseCase,
-            getLocalFolderLinkFromMegaApiFolderUseCase,
-            megaApiFolderHttpServerStartUseCase,
-            megaApiFolderHttpServerIsRunningUseCase,
-            httpServerStart,
-            httpServerIsRunning,
-            getLocalFolderLinkFromMegaApiUseCase,
-            getFileUriUseCase,
-            mapNodeToPublicLinkUseCase,
-            checkNodesNameCollisionUseCase,
-            getFolderLinkNodeContentUriUseCase,
-            megaNavigator,
-            nodeContentUriIntentMapper,
-            getNodePreviewFileUseCase
+            isConnectedToInternetUseCase = isConnectedToInternetUseCase,
+            monitorViewType = monitorViewType,
+            loginToFolderUseCase = loginToFolderUseCase,
+            copyNodesUseCase = copyNodesUseCase,
+            copyRequestMessageMapper = copyRequestMessageMapper,
+            hasCredentialsUseCase = hasCredentialsUseCase,
+            rootNodeExistsUseCase = rootNodeExistsUseCase,
+            setViewType = setViewType,
+            fetchFolderNodesUseCase = fetchFolderNodesUseCase,
+            getFolderParentNodeUseCase = getFolderParentNodeUseCase,
+            getFolderLinkChildrenNodesUseCase = getFolderLinkChildrenNodesUseCase,
+            addNodeType = addNodeType,
+            getStringFromStringResMapper = getStringFromStringResMapper,
+            areAchievementsEnabledUseCase = areAchievementsEnabledUseCase,
+            getAccountTypeUseCase = getAccountTypeUseCase,
+            getCurrentUserEmail = getCurrentUserEmail,
+            getPricing = getPricing,
+            containsMediaItemUseCase = containsMediaItemUseCase,
+            getLocalFileForNodeUseCase = getLocalFileForNodeUseCase,
+            getLocalFolderLinkFromMegaApiFolderUseCase = getLocalFolderLinkFromMegaApiFolderUseCase,
+            megaApiFolderHttpServerStartUseCase = megaApiFolderHttpServerStartUseCase,
+            megaApiFolderHttpServerIsRunningUseCase = megaApiFolderHttpServerIsRunningUseCase,
+            httpServerStart = httpServerStart,
+            httpServerIsRunning = httpServerIsRunning,
+            getLocalFolderLinkFromMegaApiUseCase = getLocalFolderLinkFromMegaApiUseCase,
+            getFileUriUseCase = getFileUriUseCase,
+            mapNodeToPublicLinkUseCase = mapNodeToPublicLinkUseCase,
+            checkNodesNameCollisionUseCase = checkNodesNameCollisionUseCase,
+            getFolderLinkNodeContentUriUseCase = getFolderLinkNodeContentUriUseCase,
+            megaNavigator = megaNavigator,
+            nodeContentUriIntentMapper = nodeContentUriIntentMapper,
+            getNodePreviewFileUseCase = getNodePreviewFileUseCase,
+            updateCrashAndPerformanceReportersUseCase = updateCrashAndPerformanceReportersUseCase,
+            isUserLoggedInUseCase = isUserLoggedInUseCase,
+            stopAudioService = stopAudioService,
+            applicationScope = CoroutineScope(UnconfinedTestDispatcher()),
+            monitorMiscLoadedUseCase = mock(),
+            getPublicLinkInformationUseCase = getPublicLinkInformationUseCase,
+            queryAdsUseCase = queryAdsUseCase
         )
     }
 
@@ -200,11 +229,9 @@ class FolderLinkViewModelTest {
             assertThat(initial.isInitialState).isEqualTo(true)
             assertThat(initial.isLoginComplete).isEqualTo(false)
             assertThat(initial.isNodesFetched).isEqualTo(false)
-            assertThat(initial.askForDecryptionKeyDialog).isEqualTo(false)
-            assertThat(initial.collisions).isNull()
-            assertThat(initial.copyResultText).isNull()
-            assertThat(initial.copyThrowable).isNull()
-            assertThat(initial.shouldLogin).isNull()
+            assertThat(initial.askForDecryptionKeyDialogEvent).isEqualTo(consumed)
+            assertThat(initial.collisionsEvent).isEqualTo(consumed())
+            assertThat(initial.copyResultEvent).isEqualTo(consumed())
             assertThat(initial.hasDbCredentials).isFalse()
             assertThat(initial.nodesList).isEmpty()
             assertThat(initial.rootNode).isNull()
@@ -212,12 +239,11 @@ class FolderLinkViewModelTest {
             assertThat(initial.currentViewType).isEqualTo(ViewType.LIST)
             assertThat(initial.title).isEqualTo("")
             assertThat(initial.selectedNodeCount).isEqualTo(0)
-            assertThat(initial.finishActivity).isFalse()
+            assertThat(initial.finishActivityEvent).isEqualTo(consumed)
             assertThat(initial.importNode).isNull()
             assertThat(initial.openFile).isInstanceOf(consumed().javaClass)
             assertThat(initial.selectImportLocation).isEqualTo(consumed)
-            assertThat(initial.errorDialogTitle).isEqualTo(-1)
-            assertThat(initial.errorDialogContent).isEqualTo(-1)
+            assertThat(initial.showErrorDialogEvent).isEqualTo(consumed())
             assertThat(initial.snackBarMessage).isEqualTo(-1)
         }
     }
@@ -225,14 +251,22 @@ class FolderLinkViewModelTest {
     @Test
     fun `test that on login into folder and on result OK values are updated correctly`() = runTest {
         val folderLink = "abcd"
+        val childNode = mock<TypedFolderNode>()
+        val childrenNodes = listOf(childNode)
+        val fetchFolderNodeResult = FetchFolderNodesResult(mock(), mock(), childrenNodes)
         whenever(loginToFolderUseCase(folderLink)).thenReturn(FolderLoginStatus.SUCCESS)
+        whenever(fetchFolderNodesUseCase(anyOrNull())).thenReturn(fetchFolderNodeResult)
+        val folderInfo = mock<FolderInfo> {
+            on { id }.thenReturn(NodeId(1234L))
+        }
+        whenever(getPublicLinkInformationUseCase(folderLink)).thenReturn(folderInfo)
+        whenever(queryAdsUseCase(folderInfo.id.longValue)).thenReturn(false)
         underTest.state.test {
             underTest.folderLogin(folderLink)
             val newValue = expectMostRecentItem()
             assertThat(newValue.isLoginComplete).isTrue()
             assertThat(newValue.isInitialState).isFalse()
-            assertThat(newValue.errorDialogTitle).isEqualTo(-1)
-            assertThat(newValue.errorDialogContent).isEqualTo(-1)
+            assertThat(newValue.showErrorDialogEvent).isEqualTo(consumed())
         }
     }
 
@@ -246,9 +280,8 @@ class FolderLinkViewModelTest {
                 val newValue = expectMostRecentItem()
                 assertThat(newValue.isLoginComplete).isFalse()
                 assertThat(newValue.isInitialState).isFalse()
-                assertThat(newValue.askForDecryptionKeyDialog).isTrue()
-                assertThat(newValue.errorDialogTitle).isEqualTo(-1)
-                assertThat(newValue.errorDialogContent).isEqualTo(-1)
+                assertThat(newValue.askForDecryptionKeyDialogEvent).isEqualTo(triggered)
+                assertThat(newValue.showErrorDialogEvent).isEqualTo(consumed())
             }
         }
 
@@ -263,9 +296,8 @@ class FolderLinkViewModelTest {
                 val newValue = expectMostRecentItem()
                 assertThat(newValue.isLoginComplete).isFalse()
                 assertThat(newValue.isInitialState).isFalse()
-                assertThat(newValue.askForDecryptionKeyDialog).isEqualTo(decryptionIntroduced)
-                assertThat(newValue.errorDialogTitle).isEqualTo(-1)
-                assertThat(newValue.errorDialogContent).isEqualTo(-1)
+                assertThat(newValue.askForDecryptionKeyDialogEvent).isEqualTo(triggered)
+                assertThat(newValue.showErrorDialogEvent).isEqualTo(consumed())
                 assertThat(newValue.snackBarMessage).isEqualTo(-1)
             }
         }
@@ -280,7 +312,7 @@ class FolderLinkViewModelTest {
                 val newValue = expectMostRecentItem()
                 assertThat(newValue.isLoginComplete).isFalse()
                 assertThat(newValue.isInitialState).isFalse()
-                assertThat(newValue.askForDecryptionKeyDialog).isFalse()
+                assertThat(newValue.askForDecryptionKeyDialogEvent).isEqualTo(consumed)
             }
         }
 
@@ -292,7 +324,7 @@ class FolderLinkViewModelTest {
             underTest.state.test {
                 underTest.checkLoginRequired()
                 val value = expectMostRecentItem()
-                assertThat(value.shouldLogin).isTrue()
+                assertThat(value.showLoginEvent).isEqualTo(triggered)
                 assertThat(value.hasDbCredentials).isTrue()
             }
         }
@@ -305,7 +337,7 @@ class FolderLinkViewModelTest {
             underTest.state.test {
                 underTest.checkLoginRequired()
                 val value = expectMostRecentItem()
-                assertThat(value.shouldLogin).isFalse()
+                assertThat(value.showLoginEvent).isEqualTo(consumed)
                 assertThat(value.hasDbCredentials).isTrue()
             }
         }
@@ -315,7 +347,7 @@ class FolderLinkViewModelTest {
         underTest.state.test {
             underTest.resetLaunchCollisionActivity()
             val newValue = expectMostRecentItem()
-            assertThat(newValue.collisions).isNull()
+            assertThat(newValue.collisionsEvent).isEqualTo(consumed())
         }
     }
 
@@ -324,8 +356,7 @@ class FolderLinkViewModelTest {
         underTest.state.test {
             underTest.resetShowCopyResult()
             val newValue = expectMostRecentItem()
-            assertThat(newValue.copyResultText).isNull()
-            assertThat(newValue.copyThrowable).isNull()
+            assertThat(newValue.copyResultEvent).isEqualTo(consumed())
         }
     }
 
@@ -334,7 +365,7 @@ class FolderLinkViewModelTest {
         underTest.state.test {
             underTest.resetAskForDecryptionKeyDialog()
             val newValue = expectMostRecentItem()
-            assertThat(newValue.askForDecryptionKeyDialog).isFalse()
+            assertThat(newValue.askForDecryptionKeyDialogEvent).isEqualTo(consumed)
         }
     }
 
@@ -722,4 +753,40 @@ class FolderLinkViewModelTest {
         whenever(getFolderLinkNodeContentUriUseCase(anyOrNull())).thenReturn(expectedNodeContentUri)
         assertThat(underTest.getNodeContentUri(mock())).isEqualTo(expectedNodeContentUri)
     }
+
+    @Test
+    fun `test that stopAudioService is invoked when the user is not logged in`() = runTest {
+        whenever(isUserLoggedInUseCase()).thenReturn(false)
+        underTest.stopAudioPlayerServiceWithoutLogin()
+        verify(stopAudioService).invoke()
+    }
+
+    @Test
+    fun `test that stopAudioService is not invoked when the user is logged in`() = runTest {
+        whenever(isUserLoggedInUseCase()).thenReturn(true)
+        underTest.stopAudioPlayerServiceWithoutLogin()
+        verify(stopAudioService, times(0)).invoke()
+    }
+
+    @ParameterizedTest
+    @ValueSource(booleans = [true, false])
+    fun `test that show ads for link is returned correctly`(shouldShowAdsForLink: Boolean) =
+        runTest {
+            val folderLink = "abcd"
+            val childNode = mock<TypedFolderNode>()
+            val childrenNodes = listOf(childNode)
+            val fetchFolderNodeResult = FetchFolderNodesResult(mock(), mock(), childrenNodes)
+            whenever(loginToFolderUseCase(folderLink)).thenReturn(FolderLoginStatus.SUCCESS)
+            whenever(fetchFolderNodesUseCase(anyOrNull())).thenReturn(fetchFolderNodeResult)
+            val folderInfo = mock<FolderInfo> {
+                on { id }.thenReturn(NodeId(1234L))
+            }
+            whenever(getPublicLinkInformationUseCase(folderLink)).thenReturn(folderInfo)
+            whenever(queryAdsUseCase(folderInfo.id.longValue)).thenReturn(shouldShowAdsForLink)
+            underTest.folderLogin(folderLink)
+            underTest.state.test {
+                val newValue = expectMostRecentItem()
+                assertThat(newValue.shouldShowAdsForLink).isEqualTo(shouldShowAdsForLink)
+            }
+        }
 }

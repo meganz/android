@@ -3,6 +3,7 @@ PDFVIEWER := pdfviewer
 
 #Prebuilt libraries
 include $(CLEAR_VARS)
+LOCAL_LDFLAGS += "-Wl,-z,max-page-size=16384"
 LOCAL_MODULE := aospPdfium
 
 ARCH_PATH = $(TARGET_ARCH_ABI)
@@ -28,6 +29,7 @@ include $(PREBUILT_SHARED_LIBRARY)
 
 #libmodft2
 include $(CLEAR_VARS)
+LOCAL_LDFLAGS += "-Wl,-z,max-page-size=16384"
 LOCAL_MODULE := libmodft2
 
 LOCAL_SRC_FILES := $(LOCAL_PATH)/$(PDFVIEWER)/lib/$(ARCH_PATH)/libmodft2.so
@@ -36,6 +38,7 @@ include $(PREBUILT_SHARED_LIBRARY)
 
 #libmodpng
 include $(CLEAR_VARS)
+LOCAL_LDFLAGS += "-Wl,-z,max-page-size=16384"
 LOCAL_MODULE := libmodpng
 
 LOCAL_SRC_FILES := $(LOCAL_PATH)/$(PDFVIEWER)/lib/$(ARCH_PATH)/libmodpng.so
@@ -44,6 +47,7 @@ include $(PREBUILT_SHARED_LIBRARY)
 
 #Main JNI library
 include $(CLEAR_VARS)
+LOCAL_LDFLAGS += "-Wl,-z,max-page-size=16384"
 LOCAL_MODULE := jniPdfium
 
 LOCAL_CFLAGS += -DHAVE_PTHREADS

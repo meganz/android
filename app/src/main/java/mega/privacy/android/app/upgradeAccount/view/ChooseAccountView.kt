@@ -46,7 +46,7 @@ import mega.privacy.android.legacy.core.ui.controls.appbar.SimpleTopAppBar
 import mega.privacy.android.legacy.core.ui.controls.text.MegaSpannedText
 import mega.privacy.android.shared.original.core.ui.model.SpanIndicator
 import mega.privacy.android.shared.original.core.ui.preview.CombinedThemePreviews
-import mega.privacy.android.shared.original.core.ui.theme.OriginalTempTheme
+import mega.privacy.android.shared.original.core.ui.theme.OriginalTheme
 import mega.privacy.android.shared.original.core.ui.theme.body2
 import mega.privacy.android.shared.original.core.ui.theme.caption
 import mega.privacy.android.shared.original.core.ui.theme.extensions.black_white
@@ -368,7 +368,7 @@ private fun createPriceText(
 private fun PreviewChooseAccountView(
     @PreviewParameter(ChooseAccountPreviewProvider::class) state: ChooseAccountState,
 ) {
-    OriginalTempTheme(isDark = isSystemInDarkTheme()) {
+    OriginalTheme(isDark = isSystemInDarkTheme()) {
         ChooseAccountView(
             state = state,
             accountStorageUIState = AccountStorageUIState(

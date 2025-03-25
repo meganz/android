@@ -4,7 +4,7 @@ import dagger.Module
 import dagger.Provides
 import dagger.hilt.android.components.ActivityComponent
 import dagger.hilt.testing.TestInstallIn
-import mega.privacy.android.app.di.ActivityModule
+import mega.privacy.android.app.presentation.container.AppContainerWrapper
 import mega.privacy.android.app.presentation.security.PasscodeCheck
 import org.mockito.kotlin.mock
 
@@ -17,4 +17,7 @@ object TestActivityModule {
 
     @Provides
     fun providePasscodeCheck(): PasscodeCheck = mock()
+
+    @Provides
+    fun provideAppContainerWrapper(): AppContainerWrapper = mock()
 }

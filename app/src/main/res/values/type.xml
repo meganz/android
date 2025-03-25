@@ -164,6 +164,10 @@
         <item name="fontFamily">sans-serif-medium</item>
     </style>
 
+    <style name="TextAppearance.Mega.Subtitle1.Medium.Link">
+        <item name="android:textColor">@color/color_link_primary</item>
+    </style>
+
     <style name="TextAppearance.Mega.Subtitle1.Medium.AccentColor">
         <item name="android:textColor">?attr/colorSecondary</item>
     </style>
@@ -325,6 +329,10 @@
 
     <style name="TextAppearance.Mega.Subtitle2.Secondary">
         <item name="android:textColor">?android:attr/textColorSecondary</item>
+    </style>
+
+    <style name="TextAppearance.Mega.Subtitle2.Link">
+        <item name="android:textColor">@color/color_link_primary</item>
     </style>
 
     <style name="TextAppearance.Mega.Subtitle2.AccentColor">
@@ -649,7 +657,7 @@
     </style>
 
     <style name="TextAppearance.Mega.Caption.Teal200">
-        <item name="android:textColor">@color/teal_200</item>
+        <item name="android:textColor">@color/accent_050</item>
     </style>
 
     <!-- Regular, 12sp, 0px, chat own file info -->

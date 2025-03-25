@@ -10,6 +10,7 @@ import kotlinx.coroutines.coroutineScope
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.filterNotNull
+import kotlinx.coroutines.flow.firstOrNull
 import kotlinx.coroutines.flow.launchIn
 import kotlinx.coroutines.flow.onEach
 import kotlinx.coroutines.flow.update
@@ -31,6 +32,7 @@ import mega.privacy.android.data.gateway.api.MegaApiFolderGateway
 import mega.privacy.android.data.gateway.api.MegaApiGateway
 import mega.privacy.android.data.gateway.api.MegaChatApiGateway
 import mega.privacy.android.data.gateway.preferences.CameraUploadsSettingsPreferenceGateway
+import mega.privacy.android.data.gateway.preferences.UIPreferencesGateway
 import mega.privacy.android.data.listener.OptionalMegaRequestListenerInterface
 import mega.privacy.android.data.mapper.FileTypeInfoMapper
 import mega.privacy.android.data.mapper.ImageMapper
@@ -110,6 +112,7 @@ internal class DefaultPhotosRepository @Inject constructor(
     private val megaSearchFilterMapper: MegaSearchFilterMapper,
     private val cancelTokenProvider: CancelTokenProvider,
     private val monitorFetchNodesFinishUseCase: MonitorFetchNodesFinishUseCase,
+    private val uiPreferencesGateway: UIPreferencesGateway,
 ) : PhotosRepository {
     @Volatile
     private var isInitialized: Boolean = false
@@ -210,13 +213,14 @@ internal class DefaultPhotosRepository @Inject constructor(
         node: MegaNode,
         filterSvg: Boolean = true,
         includeRubbishBin: Boolean = false,
+        includeThumbnail: Boolean = true,
     ): Boolean {
         val fileType = fileTypeInfoMapper(node.name, node.duration)
         return node.isFile
                 && fileType is ImageFileTypeInfo
                 && (fileType !is SvgFileTypeInfo || !filterSvg)
                 && (!nodeRepository.isNodeInRubbishBin(NodeId(node.handle)) || includeRubbishBin)
-                && node.hasThumbnail()
+                && (node.hasThumbnail() || !includeThumbnail)
     }
 
     private suspend fun isVideoNodeValid(
@@ -760,7 +764,7 @@ internal class DefaultPhotosRepository @Inject constructor(
                 onRequestFinish = { request, error ->
                     if (error.errorCode == MegaError.API_OK) {
                         if (!request.flag) {
-                            continuation.resumeWith(Result.success(request.publicNode))
+                            continuation.resumeWith(Result.success(request.publicMegaNode))
                         } else {
                             continuation.resumeWithException(IllegalArgumentException("Invalid key for public node"))
                         }
@@ -776,9 +780,10 @@ internal class DefaultPhotosRepository @Inject constructor(
         nodeId: NodeId,
         filterSvg: Boolean,
         includeRubbishBin: Boolean,
+        includeThumbnail: Boolean,
     ): ImageNode? = withContext(ioDispatcher) {
         getMegaNode(nodeId)?.let { megaNode ->
-            if (isImageNodeValid(megaNode, filterSvg, includeRubbishBin) ||
+            if (isImageNodeValid(megaNode, filterSvg, includeRubbishBin, includeThumbnail) ||
                 isVideoNodeValid(megaNode, includeRubbishBin)
             ) {
                 imageNodeMapper(
@@ -890,6 +895,7 @@ internal class DefaultPhotosRepository @Inject constructor(
                 node = it,
                 filterSvg = false,
                 includeRubbishBin = includeRubbishBin,
+                includeThumbnail = false,
             ) || isVideoNodeValid(
                 node = it,
                 includeRubbishBin = includeRubbishBin,
@@ -916,7 +922,7 @@ internal class DefaultPhotosRepository @Inject constructor(
     override suspend fun getImageNodeFromChatMessage(chatId: Long, messageId: Long): ImageNode? =
         withContext(ioDispatcher) {
             getChatNode(chatId, messageId)?.let { megaNode ->
-                if (isImageNodeValid(megaNode) ||
+                if (isImageNodeValid(megaNode, includeThumbnail = false) ||
                     isVideoNodeValid(megaNode)
                 ) {
                     imageNodeMapper(
@@ -1002,6 +1008,14 @@ internal class DefaultPhotosRepository @Inject constructor(
         }
     }
 
+    override suspend fun retrieveRecentQueries(): List<String> = withContext(ioDispatcher) {
+        uiPreferencesGateway.monitorPhotosRecentQueries().firstOrNull().orEmpty()
+    }
+
+    override suspend fun saveRecentQueries(queries: List<String>) = withContext(ioDispatcher) {
+        uiPreferencesGateway.setPhotosRecentQueries(queries)
+    }
+
     override fun clearCache() {
         isInitialized = false
 
@@ -1018,5 +1032,7 @@ internal class DefaultPhotosRepository @Inject constructor(
 
         photosFlow.value = null
         imageNodesFlow.value = null
+
+        appScope.launch { uiPreferencesGateway.setPhotosRecentQueries(listOf()) }
     }
 }

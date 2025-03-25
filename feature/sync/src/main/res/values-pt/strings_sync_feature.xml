@@ -34,8 +34,6 @@
         <item quantity="many">%1$d de arquivos</item>
         <item quantity="other">%1$d arquivos</item>
     </plurals>
-    <!-- Sync options -->
-    <string name="sync_menu_sync_options">Opções de sincronização</string>
     <!-- Sync text when need to solved stalled issues-->
     <string name="sync_menu_clear_issues">Deletar os problemas solucionados</string>
     <!-- Sync message for two way sync-->
@@ -52,14 +50,10 @@
     <string name="sync_stalled_issue_choose_latest_modified_time">Escolha o arquivo com a data de modificação mais recente</string>
     <!-- Sync message when conflict resolved -->
     <string name="sync_stalled_issue_conflict_resolved">Conflito solucionado</string>
-    <!-- Sync message to access storage permission on device -->
-    <string name="sync_access_storage_permission_message">Para fazer o backup dos seus arquivos, o MEGA precisa acessar os arquivos e as pastas deste dispositivo. Os seus dados estão sempre seguros conosco.</string>
     <!-- Sync dialog continue button -->
     <string name="sync_dialog_file_permission_positive_button">Continuar</string>
     <!-- Sync dialog not now button -->
     <string name="sync_dialog_file_permission_negative_button">Agora não</string>
-    <!-- Sync dialog title for storage access -->
-    <string name="sync_dialog_storage_access_title">Acesso a todos os arquivos</string>
     <!-- Sync dialog title for battery optimization -->
     <string name="sync_dialog_battery_optimization_title">Otimização da bateria</string>
     <!-- Sync dialog cancel button text -->
@@ -78,8 +72,6 @@
     <string name="sync_list_sync_state_syncing">Sincronizando&#8230;</string>
     <!-- Sync state failed -->
     <string name="sync_folders_sync_state_failed">Interrompida</string>
-    <!-- Sync state synced -->
-    <string name="sync_list_sync_state_synced">Sincronizada</string>
     <!-- Sync permission title for device storage -->
     <string name="sync_folders_device_storage">Pasta no dispositivo</string>
     <!-- Sync permission title for mega storage -->
@@ -90,22 +82,12 @@
     <string name="sync_card_pause_sync">Pausar</string>
     <!-- Sync Run -->
     <string name="sync_card_run_sync">Continuar</string>
-    <!-- Sync Remove -->
-    <string name="sync_card_remove_sync">Remover</string>
     <!-- Sync dialog for sync over Wi-Fi or mobile data -->
     <string name="sync_dialog_message_wifi_or_mobile_data">Wi-Fi ou dados móveis</string>
     <!-- Sync dialog for sync only over Wi-Fi -->
     <string name="sync_dialog_message_wifi_only">Somente Wi-Fi</string>
     <!-- Sync empty state message -->
     <string name="sync_empty_state_message">Você precisará configurar uma pasta local no seu dispositivo que será sincronizada com uma pasta da sua Nuvem de arquivos</string>
-    <!-- Sync notification title description sync monitoring-->
-    <string name="sync_notification_monitoring_description">Monitorando sincronizações</string>
-    <!-- Snackbar message shown when Wi-Fi only sync option is selected -->
-    <string name="sync_options_changed_to_wifi_only">A sincronização foi alterada para: Somente Wi-Fi</string>
-    <!-- Snackbar message shown when Wi-Fi or mobile data sync option is selected -->
-    <string name="sync_options_changed_to_wifi_and_mobile_data">A sincronização foi alterada para: Wi-Fi ou dados móveis</string>
-    <!-- Sync stalled issue reason is no reason-->
-    <string name="sync_stalled_issue_no_reason">No reason</string>
     <!-- Sync stalled issue reason is no file issue-->
     <string name="sync_stalled_issue_file_issue">Problema com arquivo ou com a pasta</string>
     <!-- Sync stalled issue reason is move or rename-->
@@ -132,8 +114,6 @@
     <string name="sync_stalled_issue_local_and_remote_not_synced">Conflito de arquivo ou de pasta</string>
     <!-- Sync stalled issue reason is Name clash-->
     <string name="sync_stalled_issue_name_clash">Conflito de nome de arquivo ou de pasta</string>
-    <!-- Sync stalled issue reason is Last PlusOne-->
-    <string name="sync_stalled_issue_last_plus_one">Last plus one</string>
     <!-- Sync chip folder chip title-->
     <string name="sync_folders">Pastas</string>
     <!-- Sync stalled issue count chip title for 1 or more stalled issues-->
@@ -144,8 +124,6 @@
     <string name="sync_start_sync">Configurar uma sincronização</string>
     <!-- Text that indicates that a folder is currently empty -->
     <string name="sync_file_browser_empty_folder">Pasta vazia</string>
-    <!-- Selecting a specific location in MEGA. This is the text of the button -->
-    <string name="sync_general_select_to_download">Selecione a pasta</string>
     <!-- Selecting a specific location in MEGA. This is the text of the button -->
     <string name="sync_general_select">Selecionar</string>
     <!-- Sync stalled issue reason is no file issue detailed description-->

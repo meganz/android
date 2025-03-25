@@ -26,11 +26,10 @@ import mega.privacy.android.app.main.ManagerActivity
 import mega.privacy.android.app.main.adapters.MegaTransfersAdapter
 import mega.privacy.android.app.main.adapters.RotatableAdapter
 import mega.privacy.android.app.main.adapters.SelectModeInterface
-import mega.privacy.android.app.presentation.manager.model.TransfersTab
+import mega.privacy.android.app.presentation.transfers.page.TransferPageFragment
 import mega.privacy.android.app.utils.Constants
 import mega.privacy.android.app.utils.Constants.SNACKBAR_TYPE
 import mega.privacy.android.app.utils.TextUtil
-import mega.privacy.android.app.utils.Util
 import mega.privacy.android.app.utils.Util.dp2px
 import mega.privacy.android.app.utils.Util.noChangeRecyclerViewItemAnimator
 import mega.privacy.android.domain.entity.transfer.Transfer
@@ -44,7 +43,15 @@ import timber.log.Timber
 internal class LegacyTransfersFragment : TransfersBaseFragment(), SelectModeInterface,
     TransfersActionBarCallBack.TransfersActionCallback {
 
-    private var adapter: MegaTransfersAdapter? = null
+    private val adapter: MegaTransfersAdapter by lazy(LazyThreadSafetyMode.NONE) {
+        MegaTransfersAdapter(
+            context = requireActivity(),
+            listView = binding.transfersListView,
+            selectModeInterface = this,
+            transfersViewModel = viewModel,
+            onPauseTransfer = ::handlePauseTransfers
+        )
+    }
 
     private var actionMode: ActionMode? = null
 
@@ -62,13 +69,19 @@ internal class LegacyTransfersFragment : TransfersBaseFragment(), SelectModeInte
         return initView(inflater, container)
     }
 
+    override fun onSaveInstanceState(outState: Bundle) {
+        super.onSaveInstanceState(outState)
+
+        getSafeAdapter()?.let {
+            outState.putIntegerArrayList(
+                SELECTED_ITEMS,
+                ArrayList(it.selectedItems)
+            )
+        }
+    }
+
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
-        binding.transfersEmptyImage.setImageResource(
-            if (Util.isScreenInPortrait(requireContext())) {
-                R.drawable.empty_transfer_portrait
-            } else R.drawable.empty_transfer_landscape
-        )
         binding.transfersEmptyText.text = TextUtil.formatEmptyScreenText(
             requireContext(),
             getString(R.string.transfers_empty_new)
@@ -78,22 +91,20 @@ internal class LegacyTransfersFragment : TransfersBaseFragment(), SelectModeInte
 
         setupFlow()
 
+        val selectedItems =
+            savedInstanceState?.getIntegerArrayList(SELECTED_ITEMS).orEmpty().toSet()
         binding.transfersListView.let { recyclerView ->
-            adapter = MegaTransfersAdapter(
-                context = requireActivity(),
-                listView = recyclerView,
-                selectModeInterface = this,
-                transfersViewModel = viewModel,
-                onPauseTransfer = ::handlePauseTransfers
-            )
-
-            adapter?.submitList(activeTransfers)
-            adapter?.setMultipleSelect(false)
+            adapter.submitList(activeTransfers)
             recyclerView.adapter = adapter
             recyclerView.itemAnimator = noChangeRecyclerViewItemAnimator()
         }
 
-        enableDragAndDrop()
+        if (selectedItems.isNotEmpty()) {
+            activateActionMode()
+            adapter.restoreSelectedItem(selectedItems)
+        } else {
+            enableDragAndDrop()
+        }
     }
 
     private fun handlePauseTransfers(transfer: Transfer) {
@@ -104,7 +115,7 @@ internal class LegacyTransfersFragment : TransfersBaseFragment(), SelectModeInte
      * Check whether is in select mode after changing tab or drawer item.
      */
     fun destroyActionModeIfNeed() {
-        adapter?.run {
+        getSafeAdapter()?.run {
             if (isMultipleSelect()) {
                 destroyActionMode()
             }
@@ -115,32 +126,33 @@ internal class LegacyTransfersFragment : TransfersBaseFragment(), SelectModeInte
 
     override fun onDestroyActionMode() {
         clearSelections()
-        adapter?.hideMultipleSelect()
+        getSafeAdapter()?.hideMultipleSelect()
         updateElevation()
     }
 
     override fun cancelTransfers() {
-        adapter?.run {
+        getSafeAdapter()?.run {
             showConfirmationCancelSelectedTransfers(getSelectedTransfers())
         }
     }
 
     override fun selectAll() {
-        adapter?.selectAll()
+        getSafeAdapter()?.selectAll()
     }
 
     override fun clearSelections() {
-        adapter?.clearSelections()
+        getSafeAdapter()?.clearSelections()
     }
 
-    override fun getSelectedTransfers() = adapter?.getSelectedItemsCount() ?: 0
+    override fun getSelectedTransfers() = getSafeAdapter()?.getSelectedItemsCount() ?: 0
 
-    override fun areAllTransfersSelected() = adapter?.run {
+    override fun areAllTransfersSelected() = getSafeAdapter()?.run {
         getSelectedItemsCount() == itemCount
     } == true
 
-    override fun hideTabs(hide: Boolean) =
-        (requireActivity() as ManagerActivity).hideTabs(hide, TransfersTab.PENDING_TAB)
+    override fun hideTabs(hide: Boolean) {
+        (parentFragment as? TransferPageFragment)?.hideTab(hide)
+    }
 
     override fun destroyActionMode() {
         actionMode?.finish()
@@ -150,10 +162,10 @@ internal class LegacyTransfersFragment : TransfersBaseFragment(), SelectModeInte
 
     override fun notifyItemChanged() = updateActionModeTitle()
 
-    override fun getAdapter(): RotatableAdapter? = adapter
+    override fun getAdapter(): RotatableAdapter? = getSafeAdapter()
 
     override fun activateActionMode() {
-        adapter?.let {
+        getSafeAdapter()?.let {
             if (!it.isMultipleSelect()) {
                 it.setMultipleSelect(true)
                 actionMode = (requireActivity() as AppCompatActivity).startSupportActionMode(
@@ -166,12 +178,12 @@ internal class LegacyTransfersFragment : TransfersBaseFragment(), SelectModeInte
     }
 
     override fun multipleItemClick(position: Int) {
-        adapter?.toggleSelection(position)
+        getSafeAdapter()?.toggleSelection(position)
     }
 
     override fun updateActionModeTitle() {
-        if (actionMode != null && activity != null && adapter != null) {
-            val count = adapter?.getSelectedItemsCount()
+        if (actionMode != null && activity != null && getSafeAdapter() != null) {
+            val count = adapter.getSelectedItemsCount()
             val title: String = if (count == 0) {
                 getString(R.string.title_select_transfers)
             } else {
@@ -188,7 +200,7 @@ internal class LegacyTransfersFragment : TransfersBaseFragment(), SelectModeInte
         if (bindingIsInitialized()) {
             (requireActivity() as ManagerActivity).changeAppBarElevation(
                 binding.transfersListView.canScrollVertically(DEFAULT_SCROLL_DIRECTION) ||
-                        adapter?.isMultipleSelect() == true
+                        getSafeAdapter()?.isMultipleSelect() == true
             )
         }
     }
@@ -217,7 +229,7 @@ internal class LegacyTransfersFragment : TransfersBaseFragment(), SelectModeInte
                     val transfers = transfersState.newTransfers
                     Timber.d("new transfer is ${transfers.joinToString { it.fileName }}")
                     if (transfers.isEmpty()) {
-                        adapter?.submitList(emptyList())
+                        getSafeAdapter()?.submitList(emptyList())
                         activateActionMode()
                         destroyActionMode()
                         requireActivity().invalidateOptionsMenu()
@@ -229,12 +241,12 @@ internal class LegacyTransfersFragment : TransfersBaseFragment(), SelectModeInte
         }.launchIn(viewLifecycleOwner.lifecycleScope)
 
         viewLifecycleOwner.collectFlow(viewModel.activeTransfer.sample(500L)) {
-            adapter?.submitList(it)
+            getSafeAdapter()?.submitList(it)
             setEmptyView(it.size)
         }
 
         viewLifecycleOwner.collectFlow(viewModel.areTransfersPaused) {
-            adapter?.areTransfersPaused = it
+            getSafeAdapter()?.areTransfersPaused = it
         }
 
         viewLifecycleOwner.collectFlow(viewModel.uiState) { uiState ->
@@ -379,7 +391,7 @@ internal class LegacyTransfersFragment : TransfersBaseFragment(), SelectModeInte
      * Refresh adapter
      */
     fun refresh() {
-        adapter?.notifyDataSetChanged()
+        getSafeAdapter()?.notifyDataSetChanged()
     }
 
     private fun showConfirmationCancelSelectedTransfers(selectedTransfers: List<Transfer>) {
@@ -402,7 +414,13 @@ internal class LegacyTransfersFragment : TransfersBaseFragment(), SelectModeInte
             .show()
     }
 
+    /**
+     * Get the adapter safely
+     */
+    private fun getSafeAdapter() = if (bindingIsInitialized()) adapter else null
+
     companion object {
+        private const val SELECTED_ITEMS = "SELECTED_ITEMS"
 
         /**
          * Generate a new instance for [LegacyTransfersFragment]

@@ -1,9 +1,11 @@
 package mega.privacy.android.feature.sync.ui.megapicker
 
+import mega.privacy.android.shared.resources.R as sharedR
 import androidx.activity.compose.LocalOnBackPressedDispatcherOwner
 import androidx.compose.foundation.isSystemInDarkTheme
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.WindowInsets
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.LazyListState
@@ -27,7 +29,6 @@ import mega.privacy.android.core.ui.mapper.FileTypeIconMapper
 import mega.privacy.android.domain.entity.node.Node
 import mega.privacy.android.domain.entity.node.NodeId
 import mega.privacy.android.domain.entity.node.TypedNode
-import mega.privacy.android.feature.sync.R
 import mega.privacy.android.feature.sync.ui.createnewfolder.CreateNewFolderDialog
 import mega.privacy.android.feature.sync.ui.createnewfolder.model.CreateNewFolderMenuAction
 import mega.privacy.android.shared.original.core.ui.controls.appbar.AppBarType
@@ -37,21 +38,23 @@ import mega.privacy.android.shared.original.core.ui.controls.snackbars.MegaSnack
 import mega.privacy.android.shared.original.core.ui.model.MenuAction
 import mega.privacy.android.shared.original.core.ui.preview.BooleanProvider
 import mega.privacy.android.shared.original.core.ui.preview.CombinedThemePreviews
-import mega.privacy.android.shared.original.core.ui.theme.OriginalTempTheme
+import mega.privacy.android.shared.original.core.ui.theme.OriginalTheme
 import mega.privacy.android.shared.original.core.ui.utils.showAutoDurationSnackbar
 import nz.mega.sdk.MegaApiJava
 
 @Composable
 internal fun MegaPickerScreen(
     currentFolder: Node?,
-    nodes: List<TypedNodeUiModel>,
+    nodes: List<TypedNodeUiModel>?,
     folderClicked: (TypedNode) -> Unit,
     currentFolderSelected: () -> Unit,
     fileTypeIconMapper: FileTypeIconMapper,
     errorMessageId: Int?,
     errorMessageShown: () -> Unit,
+    isLoading: Boolean,
     isSelectEnabled: Boolean,
     onCreateNewFolderDialogSuccess: (String) -> Unit = {},
+    isStopBackupMegaPicker: Boolean = false,
 ) {
     val snackbarHostState = remember { SnackbarHostState() }
 
@@ -67,16 +70,22 @@ internal fun MegaPickerScreen(
     var showCreateNewFolderDialog by rememberSaveable { mutableStateOf(false) }
 
     Scaffold(
+        contentWindowInsets = WindowInsets(0.dp),
         topBar = {
             MegaAppBar(
                 appBarType = AppBarType.BACK_NAVIGATION,
                 title = currentFolder?.name?.takeIf { showCurrentFolderName }
-                    ?: stringResource(R.string.sync_toolbar_title),
-                subtitle = if (showCurrentFolderName) {
+                    ?: if (isStopBackupMegaPicker) {
+                        stringResource(sharedR.string.general_select_folder)
+                    } else {
+                        stringResource(sharedR.string.general_section_cloud_drive)
+                    },
+                subtitle = if (isStopBackupMegaPicker || showCurrentFolderName) {
                     null
                 } else {
-                    "Select folder"
+                    stringResource(sharedR.string.general_select_folder)
                 },
+                windowInsets = WindowInsets(0.dp),
                 elevation = 0.dp,
                 onNavigationPressed = {
                     onBackPressedDispatcher?.onBackPressed()
@@ -97,7 +106,9 @@ internal fun MegaPickerScreen(
                 currentFolderSelected = currentFolderSelected,
                 fileTypeIconMapper = fileTypeIconMapper,
                 modifier = Modifier.padding(paddingValues),
+                isLoading = isLoading,
                 isSelectEnabled = isSelectEnabled,
+                isStopBackupMegaPicker = isStopBackupMegaPicker,
             )
         },
         snackbarHost = {
@@ -132,11 +143,13 @@ internal fun MegaPickerScreen(
 
 @Composable
 private fun MegaPickerScreenContent(
-    nodes: List<TypedNodeUiModel>,
+    nodes: List<TypedNodeUiModel>?,
     folderClicked: (TypedNode) -> Unit,
     currentFolderSelected: () -> Unit,
     fileTypeIconMapper: FileTypeIconMapper,
+    isLoading: Boolean,
     isSelectEnabled: Boolean,
+    isStopBackupMegaPicker: Boolean,
     modifier: Modifier = Modifier,
 ) {
     Column(modifier) {
@@ -154,7 +167,8 @@ private fun MegaPickerScreenContent(
             onFolderClick = {
                 folderClicked(it)
             },
-            fileTypeIconMapper = fileTypeIconMapper
+            fileTypeIconMapper = fileTypeIconMapper,
+            isLoading = isLoading,
         )
 
         Box(
@@ -164,7 +178,11 @@ private fun MegaPickerScreenContent(
                 modifier = Modifier
                     .fillMaxWidth()
                     .padding(start = 24.dp, top = 8.dp, end = 24.dp, bottom = 8.dp),
-                textId = R.string.sync_general_select_to_download,
+                textId = if (isStopBackupMegaPicker) {
+                    sharedR.string.general_select
+                } else {
+                    sharedR.string.general_select_folder
+                },
                 onClick = {
                     currentFolderSelected()
                 },
@@ -180,7 +198,7 @@ private fun MegaPickerScreenContent(
 private fun SyncNewFolderScreenPreview(
     @PreviewParameter(BooleanProvider::class) isSelectEnabled: Boolean,
 ) {
-    OriginalTempTheme(isDark = isSystemInDarkTheme()) {
+    OriginalTheme(isDark = isSystemInDarkTheme()) {
         MegaPickerScreen(
             null,
             SampleNodeDataProvider.values,
@@ -189,6 +207,7 @@ private fun SyncNewFolderScreenPreview(
             FileTypeIconMapper(),
             errorMessageId = null,
             errorMessageShown = {},
+            isLoading = false,
             isSelectEnabled = isSelectEnabled,
         )
     }

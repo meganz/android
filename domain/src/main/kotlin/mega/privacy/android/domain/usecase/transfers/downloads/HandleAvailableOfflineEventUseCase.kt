@@ -3,9 +3,9 @@ package mega.privacy.android.domain.usecase.transfers.downloads
 import kotlinx.coroutines.NonCancellable
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
-import mega.privacy.android.domain.entity.node.NodeId
 import mega.privacy.android.domain.entity.transfer.TransferEvent
 import mega.privacy.android.domain.entity.transfer.TransferType
+import mega.privacy.android.domain.entity.transfer.isOfflineDownload
 import mega.privacy.android.domain.usecase.BroadcastOfflineFileAvailabilityUseCase
 import mega.privacy.android.domain.usecase.offline.IsOfflineTransferUseCase
 import mega.privacy.android.domain.usecase.offline.SaveOfflineNodeInformationUseCase
@@ -28,7 +28,9 @@ class HandleAvailableOfflineEventUseCase @Inject constructor(
             // saveOfflineNodeInformationUseCase takes a while and the worker can cancel the job, so we need to launch it in a non cancellable context
             withContext(NonCancellable) {
                 launch {
-                    if (isOfflineTransferUseCase(event.transfer)) {
+                    if (event.transfer.isOfflineDownload()
+                        || (!event.transfer.isRootTransfer && isOfflineTransferUseCase(event.transfer)) //app data is not copied to children transfers yet
+                    ) {
                         event.transfer.nodeHandle.takeIf { it != -1L }?.let {
                             saveOfflineNodeInformationUseCase(event)
                             broadcastOfflineFileAvailabilityUseCase(it)

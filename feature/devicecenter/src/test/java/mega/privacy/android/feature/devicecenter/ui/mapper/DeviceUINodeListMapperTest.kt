@@ -3,6 +3,7 @@ package mega.privacy.android.feature.devicecenter.ui.mapper
 import com.google.common.truth.Truth.assertThat
 import mega.privacy.android.domain.entity.backup.BackupInfoType
 import mega.privacy.android.domain.entity.backup.BackupInfoUserAgent
+import mega.privacy.android.domain.entity.node.NodeId
 import mega.privacy.android.feature.devicecenter.domain.entity.DeviceCenterNodeStatus
 import mega.privacy.android.feature.devicecenter.domain.entity.DeviceFolderNode
 import mega.privacy.android.feature.devicecenter.domain.entity.OtherDeviceNode
@@ -51,7 +52,7 @@ internal class DeviceUINodeListMapperTest {
     @ValueSource(booleans = [true, false])
     fun `test that the mapping for the current device is correct`(isCurrentDevice: Boolean) {
         val deviceId = "12345-6789"
-        val deviceName = "MacBook Pro M2"
+        val deviceName = "Device Name"
         val deviceStatus = DeviceCenterNodeStatus.UpToDate
 
         val folderId = "0123-456"
@@ -66,7 +67,7 @@ internal class DeviceUINodeListMapperTest {
                 id = folderId,
                 name = folderName,
                 status = folderStatus,
-                rootHandle = folderRootHandle,
+                rootHandle = NodeId(folderRootHandle),
                 type = folderType,
                 userAgent = folderUserAgent,
                 localFolderPath = "storage/emulated/0/DCIM/Camera"
@@ -93,7 +94,8 @@ internal class DeviceUINodeListMapperTest {
         }
 
         val expectedUINodeStatus = DeviceCenterUINodeStatus.UpToDate
-        val expectedDeviceUINodeIcon = DeviceIconType.Mobile
+        val expectedDeviceUINodeIcon =
+            if (isCurrentDevice) DeviceIconType.Android else DeviceIconType.Mobile
         val expectedFolderUINodeIcon = FolderIconType.Backup
         val expectedFolderUINodeList = listOf(
             BackupDeviceFolderUINode(

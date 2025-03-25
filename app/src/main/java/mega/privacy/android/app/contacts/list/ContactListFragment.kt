@@ -17,6 +17,7 @@ import androidx.recyclerview.widget.RecyclerView
 import dagger.hilt.android.AndroidEntryPoint
 import mega.privacy.android.app.R
 import mega.privacy.android.app.arch.extensions.collectFlow
+import mega.privacy.android.app.components.SpaceBetweenAdaptersDecoration
 import mega.privacy.android.app.contacts.ContactsActivity
 import mega.privacy.android.app.contacts.list.adapter.ContactActionsListAdapter
 import mega.privacy.android.app.contacts.list.adapter.ContactListAdapter
@@ -165,6 +166,12 @@ class ContactListFragment : Fragment() {
             .setStableIdMode(ConcatAdapter.Config.StableIdMode.ISOLATED_STABLE_IDS).build()
         binding.list.adapter =
             ConcatAdapter(adapterConfig, actionsAdapter, recentlyAddedAdapter, contactsAdapter)
+        binding.list.addItemDecoration(
+            SpaceBetweenAdaptersDecoration(
+                addAtTheEndOfAdapter = ContactActionsListAdapter::class.java,
+                spaceDp = 8
+            )
+        )
         binding.list.setHasFixedSize(true)
         binding.list.addOnScrollListener(object : RecyclerView.OnScrollListener() {
             override fun onScrolled(recyclerView: RecyclerView, dx: Int, dy: Int) {

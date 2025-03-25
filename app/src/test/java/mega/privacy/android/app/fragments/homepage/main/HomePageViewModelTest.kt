@@ -1,20 +1,26 @@
 package mega.privacy.android.app.fragments.homepage.main
 
+import androidx.work.impl.utils.forAll
 import app.cash.turbine.test
 import com.google.common.truth.Truth.assertThat
+import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.emptyFlow
 import kotlinx.coroutines.flow.flow
+import kotlinx.coroutines.flow.flowOf
 import kotlinx.coroutines.test.runTest
 import mega.privacy.android.core.test.extension.CoroutineMainDispatcherExtension
 import mega.privacy.android.domain.entity.contacts.OnlineStatus
 import mega.privacy.android.domain.entity.contacts.UserChatStatus
+import mega.privacy.android.domain.entity.node.NodeUpdate
 import mega.privacy.android.domain.usecase.contact.MonitorMyChatOnlineStatusUseCase
+import mega.privacy.android.domain.usecase.login.MonitorFetchNodesFinishUseCase
 import mega.privacy.android.domain.usecase.login.MonitorLogoutUseCase
 import mega.privacy.android.domain.usecase.network.IsConnectedToInternetUseCase
 import mega.privacy.android.domain.usecase.network.MonitorConnectivityUseCase
 import mega.privacy.android.domain.usecase.notifications.MonitorHomeBadgeCountUseCase
 import org.junit.jupiter.api.BeforeAll
 import org.junit.jupiter.api.BeforeEach
+import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.TestInstance
 import org.junit.jupiter.api.extension.ExtendWith
 import org.junit.jupiter.params.ParameterizedTest
@@ -27,11 +33,11 @@ import org.mockito.kotlin.whenever
 @TestInstance(TestInstance.Lifecycle.PER_CLASS)
 class HomePageViewModelTest {
     private val repository: HomepageRepository = mock()
-    private val isConnectedToInternetUseCase: IsConnectedToInternetUseCase = mock()
     private val monitorConnectivityUseCase: MonitorConnectivityUseCase = mock()
     private val monitorLogoutUseCase: MonitorLogoutUseCase = mock()
     private val monitorHomeBadgeCountUseCase: MonitorHomeBadgeCountUseCase = mock()
     private val monitorMyChatOnlineStatusUseCase: MonitorMyChatOnlineStatusUseCase = mock()
+    private val monitorFetchNodesFinishUseCase: MonitorFetchNodesFinishUseCase = mock()
 
     private lateinit var underTest: HomePageViewModel
 
@@ -44,11 +50,11 @@ class HomePageViewModelTest {
     private fun initViewModel() {
         underTest = HomePageViewModel(
             repository,
-            isConnectedToInternetUseCase,
             monitorConnectivityUseCase,
+            monitorFetchNodesFinishUseCase,
             monitorLogoutUseCase,
             monitorHomeBadgeCountUseCase,
-            monitorMyChatOnlineStatusUseCase
+            monitorMyChatOnlineStatusUseCase,
         )
     }
 
@@ -58,9 +64,9 @@ class HomePageViewModelTest {
         whenever(monitorHomeBadgeCountUseCase()).thenReturn(emptyFlow())
         whenever(monitorLogoutUseCase()).thenReturn(emptyFlow())
         whenever(monitorConnectivityUseCase()).thenReturn(emptyFlow())
+        whenever(monitorFetchNodesFinishUseCase()).thenReturn(emptyFlow())
         reset(
             repository,
-            isConnectedToInternetUseCase,
         )
     }
 
@@ -78,6 +84,27 @@ class HomePageViewModelTest {
 
             underTest.uiState.test {
                 assertThat(awaitItem().userChatStatus).isEqualTo(status)
+            }
+        }
+
+    @Test
+    fun `test that isConnected is updated correctly when monitorConnectivityUseCase emit connectivity status`() =
+        runTest {
+            val monitorConnectivityFakeFlow = MutableSharedFlow<Boolean>()
+            whenever(monitorConnectivityUseCase()).thenReturn(monitorConnectivityFakeFlow)
+
+            initViewModel()
+
+            monitorConnectivityFakeFlow.emit(false)
+
+            underTest.isConnected.test {
+                assertThat(awaitItem()).isFalse()
+            }
+
+            monitorConnectivityFakeFlow.emit(true)
+
+            underTest.isConnected.test {
+                assertThat(awaitItem()).isTrue()
             }
         }
 }

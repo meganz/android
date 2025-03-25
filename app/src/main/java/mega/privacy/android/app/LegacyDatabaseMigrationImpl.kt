@@ -207,22 +207,6 @@ class LegacyDatabaseMigrationImpl @Inject constructor(
                     "${SqliteDatabaseHandler.KEY_FIRST_NAME} TEXT, " +
                     "${SqliteDatabaseHandler.KEY_LAST_NAME} TEXT)"
         db.execSQL(CREATE_EPHEMERAL)
-
-        val CREATE_NEW_PENDING_MSG_TABLE =
-            "CREATE TABLE IF NOT EXISTS ${SqliteDatabaseHandler.TABLE_PENDING_MSG_SINGLE}(" +
-                    "${SqliteDatabaseHandler.KEY_ID} INTEGER PRIMARY KEY," +
-                    "${SqliteDatabaseHandler.KEY_PENDING_MSG_ID_CHAT} TEXT, " +
-                    "${SqliteDatabaseHandler.KEY_PENDING_MSG_TIMESTAMP} TEXT, " +
-                    "${SqliteDatabaseHandler.KEY_PENDING_MSG_TEMP_KARERE} TEXT, " +
-                    "${SqliteDatabaseHandler.KEY_PENDING_MSG_FILE_PATH} TEXT, " +
-                    "${SqliteDatabaseHandler.KEY_PENDING_MSG_NAME} TEXT, " +
-                    "${SqliteDatabaseHandler.KEY_PENDING_MSG_NODE_HANDLE} TEXT, " +
-                    "${SqliteDatabaseHandler.KEY_PENDING_MSG_FINGERPRINT} TEXT, " +
-                    "${SqliteDatabaseHandler.KEY_PENDING_MSG_TRANSFER_TAG} INTEGER, " +
-                    "${SqliteDatabaseHandler.KEY_PENDING_MSG_STATE} INTEGER)"
-        db.execSQL(CREATE_NEW_PENDING_MSG_TABLE)
-
-        db.execSQL(SqliteDatabaseHandler.CREATE_SD_TRANSFERS_TABLE)
     }
 
     override fun onUpgrade(db: SupportSQLiteDatabase, oldVersion: Int, newVersion: Int) {
@@ -630,21 +614,6 @@ class LegacyDatabaseMigrationImpl @Inject constructor(
                 }';"
             )
         }
-        if (oldVersion <= 42) {
-            val CREATE_NEW_PENDING_MSG_TABLE =
-                "CREATE TABLE IF NOT EXISTS ${SqliteDatabaseHandler.TABLE_PENDING_MSG_SINGLE}(" +
-                        "${SqliteDatabaseHandler.KEY_ID} INTEGER PRIMARY KEY," +
-                        "${SqliteDatabaseHandler.KEY_PENDING_MSG_ID_CHAT} TEXT, " +
-                        "${SqliteDatabaseHandler.KEY_PENDING_MSG_TIMESTAMP} TEXT, " +
-                        "${SqliteDatabaseHandler.KEY_PENDING_MSG_TEMP_KARERE} TEXT, " +
-                        "${SqliteDatabaseHandler.KEY_PENDING_MSG_FILE_PATH} TEXT, " +
-                        "${SqliteDatabaseHandler.KEY_PENDING_MSG_NAME} TEXT, " +
-                        "${SqliteDatabaseHandler.KEY_PENDING_MSG_NODE_HANDLE} TEXT, " +
-                        "${SqliteDatabaseHandler.KEY_PENDING_MSG_FINGERPRINT} TEXT, " +
-                        "${SqliteDatabaseHandler.KEY_PENDING_MSG_TRANSFER_TAG} INTEGER, " +
-                        "${SqliteDatabaseHandler.KEY_PENDING_MSG_STATE} INTEGER)"
-            db.execSQL(CREATE_NEW_PENDING_MSG_TABLE)
-        }
         if (oldVersion <= 43) {
             db.execSQL("ALTER TABLE ${SqliteDatabaseHandler.TABLE_PREFERENCES} ADD COLUMN ${SqliteDatabaseHandler.KEY_AUTO_PLAY} BOOLEAN;")
             db.execSQL(
@@ -821,7 +790,6 @@ class LegacyDatabaseMigrationImpl @Inject constructor(
                     )
                 }';"
             )
-            db.execSQL(SqliteDatabaseHandler.CREATE_SD_TRANSFERS_TABLE)
         }
         if (oldVersion <= 60) {
             db.execSQL("ALTER TABLE ${SqliteDatabaseHandler.TABLE_PREFERENCES} ADD COLUMN ${SqliteDatabaseHandler.KEY_PASSCODE_LOCK_REQUIRE_TIME} TEXT;")

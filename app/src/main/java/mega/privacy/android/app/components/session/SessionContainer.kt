@@ -1,6 +1,5 @@
 package mega.privacy.android.app.components.session
 
-import android.content.Context
 import android.content.Intent
 import androidx.compose.foundation.gestures.awaitEachGesture
 import androidx.compose.foundation.layout.Box
@@ -26,21 +25,18 @@ import mega.privacy.android.app.utils.Constants
  */
 @Composable
 internal fun SessionContainer(
-    shouldCheckChatSession: Boolean = false,
     shouldFinish: Boolean = true,
     viewModel: SessionViewModel = hiltViewModel(),
     content: @Composable () -> Unit,
 ) {
     LifecycleEventEffect(event = Lifecycle.Event.ON_RESUME) {
-        viewModel.checkSdkSession(shouldCheckChatSession)
+        viewModel.checkSdkSession()
     }
-    val context = LocalContext.current
     val state by viewModel.state.collectAsStateWithLifecycle()
 
-    when {
-        // if root node exists and chat session is valid, show the content
-        // in case shouldCheckChatSession is false, we don't need to check chat session
-        state.isRootNodeExists == true && (!shouldCheckChatSession || state.isChatSessionValid) ->
+
+    when (state.isRootNodeExists) {
+        true ->
             Box(modifier = Modifier.pointerInput(Unit) {
                 awaitEachGesture {
                     do {
@@ -54,14 +50,19 @@ internal fun SessionContainer(
                 content()
             }
 
-        state.isRootNodeExists == false -> navigateToLogin(context, shouldFinish)
+        false -> navigateToLogin(shouldFinish)
+        null -> {}
     }
 }
 
-private fun navigateToLogin(context: Context, shouldFinish: Boolean) {
+@Composable
+private fun navigateToLogin(shouldFinish: Boolean) {
+    val context = LocalContext.current
     context.findActivity()?.let { activity ->
         val intent = Intent(context, LoginActivity::class.java).apply {
-            addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP)
+            if (shouldFinish) {
+                addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP)
+            }
             putExtra(Constants.LAUNCH_INTENT, activity.intent)
         }
         context.startActivity(intent)

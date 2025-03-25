@@ -27,6 +27,7 @@ import kotlinx.coroutines.flow.debounce
 import kotlinx.coroutines.flow.distinctUntilChanged
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.launch
+import mega.privacy.android.analytics.Analytics
 import mega.privacy.android.app.R
 import mega.privacy.android.app.arch.extensions.collectFlow
 import mega.privacy.android.app.fragments.homepage.SortByHeaderViewModel
@@ -44,7 +45,9 @@ import mega.privacy.android.app.presentation.videosection.model.VideoSectionTab
 import mega.privacy.android.app.presentation.videosection.model.VideoUIEntity
 import mega.privacy.android.app.presentation.videosection.view.VideoSectionFeatureScreen
 import mega.privacy.android.app.presentation.videosection.view.videoSectionRoute
+import mega.privacy.android.app.utils.Constants.INTENT_EXTRA_KEY_HANDLE
 import mega.privacy.android.app.utils.Constants.ORDER_CLOUD
+import mega.privacy.android.app.utils.Constants.ORDER_FAVOURITES
 import mega.privacy.android.app.utils.Constants.ORDER_VIDEO_PLAYLIST
 import mega.privacy.android.app.utils.Constants.SEARCH_BY_ADAPTER
 import mega.privacy.android.app.utils.Constants.VIDEO_BROWSE_ADAPTER
@@ -57,7 +60,9 @@ import mega.privacy.android.domain.entity.node.TypedVideoNode
 import mega.privacy.android.domain.usecase.GetThemeMode
 import mega.privacy.android.legacy.core.ui.model.SearchWidgetState
 import mega.privacy.android.navigation.MegaNavigator
-import mega.privacy.android.shared.original.core.ui.theme.OriginalTempTheme
+import mega.privacy.android.shared.original.core.ui.theme.OriginalTheme
+import mega.privacy.mobile.analytics.event.AllVideosTabEvent
+import mega.privacy.mobile.analytics.event.PlaylistsTabEvent
 import timber.log.Timber
 import javax.inject.Inject
 
@@ -94,7 +99,19 @@ class VideoSectionFragment : Fragment() {
                                 currentPlaylist.id,
                                 items.map { NodeId(it.toLong()) })
                         }
+                    }
+                }
+            }
+        }
 
+    private val videoToPlaylistActivityLauncher =
+        registerForActivityResult(ActivityResultContracts.StartActivityForResult()) { result ->
+            when (result.resultCode) {
+                Activity.RESULT_OK -> {
+                    result.data?.getStringArrayListExtra(
+                        VideoToPlaylistActivity.INTENT_SUCCEED_ADDED_PLAYLIST_TITLES
+                    )?.let { titles ->
+                        videoSectionViewModel.updateAddToPlaylistTitles(titles)
                     }
                 }
             }
@@ -114,7 +131,7 @@ class VideoSectionFragment : Fragment() {
         setContent {
             val themeMode by getThemeMode()
                 .collectAsStateWithLifecycle(initialValue = ThemeMode.System)
-            OriginalTempTheme(isDark = themeMode.isDarkMode()) {
+            OriginalTheme(isDark = themeMode.isDarkMode()) {
                 ConstraintLayout(
                     modifier = Modifier.fillMaxSize()
                 ) {
@@ -143,7 +160,12 @@ class VideoSectionFragment : Fragment() {
                         onAddElementsClicked = {
                             navigateToVideoSelectedActivity()
                         },
-                        onMenuAction = ::handleVideoSectionMenuAction
+                        onMenuAction = ::handleVideoSectionMenuAction,
+                        retryActionCallback = {
+                            videoSectionViewModel.state.value.addToPlaylistHandle?.let {
+                                launchAddToPlaylistActivity(it)
+                            }
+                        }
                     )
                 }
             }
@@ -162,14 +184,26 @@ class VideoSectionFragment : Fragment() {
     private fun showSortByPanel() {
         val currentSelectTab = videoSectionViewModel.tabState.value.selectedTab
         (requireActivity() as ManagerActivity).showNewSortByPanel(
-            if (currentSelectTab == VideoSectionTab.All) ORDER_CLOUD else ORDER_VIDEO_PLAYLIST
+            when {
+                currentSelectTab == VideoSectionTab.All -> ORDER_CLOUD
+
+                videoSectionViewModel.state.value.currentVideoPlaylist?.isSystemVideoPlayer == true ->
+                    ORDER_FAVOURITES
+
+                else -> ORDER_VIDEO_PLAYLIST
+            }
         )
     }
 
     private fun handleVideoSectionMenuAction(action: VideoSectionMenuAction?) =
         (activity as? ManagerActivity)?.let { managerActivity ->
             viewLifecycleOwner.lifecycleScope.launch {
-                val selectedVideos = videoSectionViewModel.state.value.selectedVideoHandles
+                val selectedVideos =
+                    if (videoSectionViewModel.state.value.currentVideoPlaylist?.isSystemVideoPlayer == true) {
+                        videoSectionViewModel.state.value.selectedVideoElementIDs
+                    } else {
+                        videoSectionViewModel.state.value.selectedVideoHandles
+                    }
                 when (action) {
                     is VideoSectionMenuAction.VideoSectionDownloadAction ->
                         managerActivity.saveNodesToDevice(
@@ -220,6 +254,9 @@ class VideoSectionFragment : Fragment() {
 
                     is VideoSectionMenuAction.VideoSectionMoveAction ->
                         NodeController(managerActivity).chooseLocationToMoveNodes(selectedVideos)
+
+                    is VideoSectionMenuAction.VideoSectionSortByAction ->
+                        showSortByPanel()
 
                     else -> {}
                 }
@@ -276,6 +313,27 @@ class VideoSectionFragment : Fragment() {
         ) { fileNode ->
             fileNode?.let {
                 openVideoFileFromPlaylist(it)
+            }
+        }
+
+        viewLifecycleOwner.collectFlow(
+            videoSectionViewModel.state.map { it.isLaunchVideoToPlaylistActivity }
+                .distinctUntilChanged()
+        ) { isLaunch ->
+            if (isLaunch) {
+                videoSectionViewModel.state.value.addToPlaylistHandle?.let {
+                    launchAddToPlaylistActivity(it)
+                }
+                videoSectionViewModel.resetIsLaunchVideoToPlaylistActivity()
+            }
+        }
+
+        viewLifecycleOwner.collectFlow(
+            videoSectionViewModel.tabState.map { it.selectedTab }.distinctUntilChanged()
+        ) { tab ->
+            when (tab) {
+                VideoSectionTab.All -> Analytics.tracker.trackEvent(AllVideosTabEvent)
+                VideoSectionTab.Playlists -> Analytics.tracker.trackEvent(PlaylistsTabEvent)
             }
         }
     }
@@ -338,6 +396,14 @@ class VideoSectionFragment : Fragment() {
                 Timber.e(it)
             }
         }
+    }
+
+    private fun launchAddToPlaylistActivity(videoHandle: Long) {
+        videoToPlaylistActivityLauncher.launch(
+            Intent(requireContext(), VideoToPlaylistActivity::class.java).apply {
+                putExtra(INTENT_EXTRA_KEY_HANDLE, videoHandle)
+            }
+        )
     }
 
     private fun showOptionsMenuForItem(item: VideoUIEntity, mode: Int) {

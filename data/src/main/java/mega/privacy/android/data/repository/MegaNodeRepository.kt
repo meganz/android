@@ -49,13 +49,6 @@ interface MegaNodeRepository {
     suspend fun getRootNode(): MegaNode?
 
     /**
-     * Get the Backups node
-     *
-     * @return A node corresponding to the Backups node, null if cannot be retrieved
-     */
-    suspend fun getBackupsNode(): MegaNode?
-
-    /**
      * check whether the node is in Backups or not
      *
      * @return true if the Node is in Backups, and false if otherwise
@@ -135,15 +128,6 @@ interface MegaNodeRepository {
     suspend fun getUserFromInShare(node: MegaNode, recursive: Boolean): MegaUser?
 
     /**
-     * Authorize and return a MegaNode can be downloaded with any instance of MegaApi
-     *
-     * @param handle the handle of the node to authorize
-     * @return a MegaNode that can be downloaded with any instance of MegaApi,
-     *         null if can't be authorized
-     */
-    suspend fun authorizeNode(handle: Long): MegaNode?
-
-    /**
      * Get a list with all public links
      *
      * Valid value for order are: MegaApi::ORDER_NONE, MegaApi::ORDER_DEFAULT_ASC,
@@ -170,22 +154,6 @@ interface MegaNodeRepository {
      * @return True if the Backups node has children, false otherwise.
      */
     suspend fun hasBackupsChildren(): Boolean
-
-    /**
-     * Check access error extended
-     *
-     * @param node
-     * @param level
-     *
-     * - [MegaShare.ACCESS_UNKNOWN]
-     * - [MegaShare.ACCESS_READ]
-     * - [MegaShare.ACCESS_READWRITE]
-     * - [MegaShare.ACCESS_FULL]
-     * - [MegaShare.ACCESS_OWNER]
-     *
-     * @return success or failed
-     */
-    suspend fun checkAccessErrorExtended(node: MegaNode, level: Int): MegaException
 
     /**
      * Get a list with the active and pending outbound sharings for a MegaNode

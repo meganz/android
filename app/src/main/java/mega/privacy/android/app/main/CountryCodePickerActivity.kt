@@ -37,7 +37,6 @@ class CountryCodePickerActivity : PasscodeActivity() {
     }
     private val onBackPressedCallback = object : OnBackPressedCallback(true) {
         override fun handleOnBackPressed() {
-            if (psaWebBrowser != null && psaWebBrowser?.consumeBack() == true) return
             finish()
         }
     }

@@ -1,7 +1,6 @@
 package mega.privacy.android.app.presentation.myaccount.view
 
 import mega.privacy.android.shared.resources.R as sharedR
-import android.content.res.Configuration
 import android.graphics.BitmapFactory
 import androidx.annotation.StringRes
 import androidx.compose.animation.AnimatedVisibility
@@ -24,7 +23,6 @@ import androidx.compose.foundation.layout.wrapContentSize
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.verticalScroll
-import androidx.compose.material.CircularProgressIndicator
 import androidx.compose.material.Icon
 import androidx.compose.material.MaterialTheme
 import androidx.compose.material.Scaffold
@@ -53,6 +51,7 @@ import androidx.compose.ui.layout.onGloballyPositioned
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.platform.testTag
+import androidx.compose.ui.res.colorResource
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.pluralStringResource
 import androidx.compose.ui.res.stringResource
@@ -61,7 +60,7 @@ import androidx.compose.ui.text.buildAnnotatedString
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.text.withStyle
-import androidx.compose.ui.tooling.preview.Preview
+import androidx.compose.ui.tooling.preview.PreviewParameter
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.constraintlayout.compose.ChainStyle
@@ -113,13 +112,20 @@ import mega.privacy.android.app.presentation.myaccount.view.Constants.USAGE_TRAN
 import mega.privacy.android.app.utils.TimeUtils
 import mega.privacy.android.app.utils.Util
 import mega.privacy.android.domain.entity.AccountType
+import mega.privacy.android.domain.entity.StorageState
 import mega.privacy.android.domain.entity.account.business.BusinessAccountStatus
+import mega.privacy.android.domain.entity.transfer.UsedTransferStatus
 import mega.privacy.android.legacy.core.ui.controls.lists.ImageIconItem
 import mega.privacy.android.legacy.core.ui.controls.text.MegaSpannedText
 import mega.privacy.android.shared.original.core.ui.controls.buttons.RaisedDefaultMegaButton
+import mega.privacy.android.shared.original.core.ui.controls.progressindicator.MegaCircularProgressIndicator
+import mega.privacy.android.shared.original.core.ui.controls.text.MegaText
 import mega.privacy.android.shared.original.core.ui.model.SpanIndicator
-import mega.privacy.android.shared.original.core.ui.theme.OriginalTempTheme
+import mega.privacy.android.shared.original.core.ui.preview.BooleanProvider
+import mega.privacy.android.shared.original.core.ui.preview.CombinedThemePreviews
+import mega.privacy.android.shared.original.core.ui.theme.OriginalTheme
 import mega.privacy.android.shared.original.core.ui.theme.black
+import mega.privacy.android.shared.original.core.ui.theme.extensions.accent_900_accent_050
 import mega.privacy.android.shared.original.core.ui.theme.extensions.amber_700_amber_300
 import mega.privacy.android.shared.original.core.ui.theme.extensions.black_white
 import mega.privacy.android.shared.original.core.ui.theme.extensions.blue_700_blue_200
@@ -127,14 +133,14 @@ import mega.privacy.android.shared.original.core.ui.theme.extensions.body2medium
 import mega.privacy.android.shared.original.core.ui.theme.extensions.grey_020_black
 import mega.privacy.android.shared.original.core.ui.theme.extensions.grey_050_grey_700
 import mega.privacy.android.shared.original.core.ui.theme.extensions.grey_050_grey_900
-import mega.privacy.android.shared.original.core.ui.theme.extensions.grey_100_grey_600
 import mega.privacy.android.shared.original.core.ui.theme.extensions.red_600_red_300
 import mega.privacy.android.shared.original.core.ui.theme.extensions.subtitle2medium
-import mega.privacy.android.shared.original.core.ui.theme.extensions.teal_300_teal_200
-import mega.privacy.android.shared.original.core.ui.theme.extensions.teal_600_teal_200
 import mega.privacy.android.shared.original.core.ui.theme.extensions.textColorPrimary
 import mega.privacy.android.shared.original.core.ui.theme.extensions.textColorSecondary
 import mega.privacy.android.shared.original.core.ui.theme.extensions.white_grey_800
+import mega.android.core.ui.theme.values.BackgroundColor
+import mega.android.core.ui.theme.values.SupportColor
+import mega.android.core.ui.theme.values.TextColor
 import mega.privacy.android.shared.original.core.ui.theme.white
 import mega.privacy.android.shared.original.core.ui.utils.showAutoDurationSnackbar
 import java.io.File
@@ -180,6 +186,7 @@ internal object Constants {
  */
 @Composable
 fun MyAccountHomeView(
+    storageState: StorageState,
     uiState: MyAccountHomeUIState,
     uiActions: MyAccountHomeViewActions,
     navController: NavController?,
@@ -254,6 +261,7 @@ fun MyAccountHomeView(
                 screenHeight.dp - headerHeight - accountTypeHeight - TOOLBAR_HEIGHT - HEADER_TOP_PADDING - ACCOUNT_TYPE_TOP_PADDING
 
             AccountInfoSection(
+                storageState = storageState,
                 uiState = uiState,
                 uiActions = uiActions,
                 modifier = Modifier
@@ -355,7 +363,7 @@ internal fun MyAccountHeader(
                 },
             painter = painterResource(id = R.drawable.ic_view_edit_profile),
             contentDescription = "Edit Profile",
-            tint = MaterialTheme.colors.teal_300_teal_200
+            tint = MaterialTheme.colors.accent_900_accent_050
         )
 
         if (email != null) {
@@ -472,6 +480,7 @@ private fun PaymentAlertSection(
 
 @Composable
 private fun AccountInfoSection(
+    storageState: StorageState,
     uiState: MyAccountHomeUIState,
     uiActions: MyAccountHomeViewActions,
     modifier: Modifier = Modifier,
@@ -512,12 +521,14 @@ private fun AccountInfoSection(
                 .fillMaxWidth()
                 .wrapContentHeight()
                 .padding(start = 14.dp, end = 14.dp, top = 12.dp, bottom = 8.dp),
+            storageState = storageState,
             usedStorage = uiState.usedStorage,
             usedTransfer = uiState.usedTransfer,
             totalStorage = uiState.totalStorage,
             totalTransfer = uiState.totalTransfer,
             usedStoragePercentage = uiState.usedStoragePercentage,
             usedTransferPercentage = uiState.usedTransferPercentage,
+            usedTransferStatus = uiState.usedTransferStatus,
             showTransfer = uiState.accountType != AccountType.FREE,
             showProgressBar = (uiState.isBusinessAccount || uiState.isProFlexiAccount).not(),
             onUsageMeterClick = uiActions::onClickUsageMeter
@@ -733,16 +744,29 @@ internal fun AccountTypeSection(
 internal fun UsageMeterSection(
     showTransfer: Boolean,
     showProgressBar: Boolean,
+    storageState: StorageState,
     usedStoragePercentage: Int,
     usedStorage: Long,
     totalStorage: Long,
     usedTransferPercentage: Int,
+    usedTransferStatus: UsedTransferStatus,
     usedTransfer: Long,
     totalTransfer: Long,
     onUsageMeterClick: () -> Unit,
     modifier: Modifier = Modifier,
 ) {
-    val isStorageOverQuota = remember { usedStoragePercentage > 100 }
+    val isStorageOverQuota = storageState == StorageState.Red
+    val storageColor = when (storageState) {
+        StorageState.Red -> SupportColor.Error to TextColor.Error
+        StorageState.Orange -> SupportColor.Warning to TextColor.Warning
+        else -> SupportColor.Success to TextColor.Success
+    }
+
+    val transferColor = when (usedTransferStatus) {
+        UsedTransferStatus.Full -> SupportColor.Error to TextColor.Error
+        UsedTransferStatus.AlmostFull -> SupportColor.Warning to TextColor.Warning
+        else -> SupportColor.Success to TextColor.Success
+    }
     if (showProgressBar) {
         //Layout to show Storage/Transfer usage for Free/Pro accounts except Pro Flexi
         ConstraintLayout(
@@ -768,22 +792,22 @@ internal fun UsageMeterSection(
                         start.linkTo(parent.start, 14.dp)
                     }
             ) {
-                CircularProgressIndicator(
+                MegaCircularProgressIndicator(
                     modifier = Modifier
                         .testTag(USAGE_STORAGE_PROGRESS)
                         .size(50.dp)
                         .align(Alignment.Center),
-                    backgroundColor = MaterialTheme.colors.grey_100_grey_600,
-                    color = if (isStorageOverQuota) MaterialTheme.colors.red_600_red_300 else MaterialTheme.colors.secondary,
+                    supportColor = storageColor.first,
                     strokeWidth = 5.dp,
-                    progress = (usedStoragePercentage.toFloat() / 100).coerceAtMost(1f)
+                    progress = (usedStoragePercentage.toFloat() / 100).coerceAtMost(1f),
+                    backgroundColor = BackgroundColor.Surface3,
                 )
 
-                Text(
+                MegaText(
                     modifier = Modifier.align(Alignment.Center),
                     text = "$usedStoragePercentage%",
                     style = MaterialTheme.typography.body2medium,
-                    color = if (isStorageOverQuota) MaterialTheme.colors.red_600_red_300 else MaterialTheme.colors.secondary
+                    textColor = storageColor.second,
                 )
             }
 
@@ -802,7 +826,7 @@ internal fun UsageMeterSection(
                 },
                 text = buildAnnotatedString {
                     if (isStorageOverQuota) {
-                        withStyle(style = SpanStyle(MaterialTheme.colors.red_600_red_300)) {
+                        withStyle(style = SpanStyle(colorResource(R.color.color_text_error))) {
                             append(formatSize(size = usedStorage))
                         }
                     } else {
@@ -839,21 +863,21 @@ internal fun UsageMeterSection(
                             start.linkTo(guideline)
                         }
                 ) {
-                    CircularProgressIndicator(
+                    MegaCircularProgressIndicator(
                         modifier = Modifier
                             .size(50.dp)
                             .testTag(USAGE_TRANSFER_PROGRESS),
-                        backgroundColor = MaterialTheme.colors.grey_100_grey_600,
-                        color = MaterialTheme.colors.secondary,
+                        supportColor = transferColor.first,
                         strokeWidth = 6.dp,
-                        progress = (usedTransferPercentage.toFloat() / 100).coerceAtMost(1f)
+                        progress = (usedTransferPercentage.toFloat() / 100).coerceAtMost(1f),
+                        backgroundColor = BackgroundColor.Surface3,
                     )
 
-                    Text(
+                    MegaText(
                         modifier = Modifier.align(Alignment.Center),
                         text = "$usedTransferPercentage%",
                         style = MaterialTheme.typography.body2medium,
-                        color = MaterialTheme.colors.secondary
+                        textColor = transferColor.second,
                     )
                 }
 
@@ -929,7 +953,7 @@ internal fun UsageMeterSection(
                 },
                 text = stringResource(id = R.string.transfer_label),
                 style = MaterialTheme.typography.subtitle2medium,
-                color = MaterialTheme.colors.teal_600_teal_200,
+                color = MaterialTheme.colors.accent_900_accent_050,
             )
 
             Text(
@@ -939,7 +963,7 @@ internal fun UsageMeterSection(
                 },
                 text = formatSize(size = usedTransfer),
                 style = MaterialTheme.typography.subtitle2,
-                color = MaterialTheme.colors.teal_600_teal_200,
+                color = MaterialTheme.colors.accent_900_accent_050,
             )
         }
     }
@@ -956,19 +980,21 @@ private fun shouldShowPaymentInfo(uiState: MyAccountHomeUIState): Boolean {
     return timeToCheck.minus(currentTime) <= TIME_TO_SHOW_PAYMENT_INFO_IN_SECONDS
 }
 
-@Preview
-@Preview(uiMode = Configuration.UI_MODE_NIGHT_YES, name = "MyAccountHomePreviewDark")
+@CombinedThemePreviews
 @Composable
-internal fun MyAccountHomePreview() {
-    OriginalTempTheme(isDark = isSystemInDarkTheme()) {
+internal fun MyAccountHomePreview(
+    @PreviewParameter(BooleanProvider::class) isBusinessAccount: Boolean,
+) {
+    OriginalTheme(isDark = isSystemInDarkTheme()) {
         MyAccountHomeView(
+            storageState = StorageState.Red,
             uiState = MyAccountHomeUIState(
                 name = "QWERTY UIOP",
                 email = "qwerty@uiop.com",
                 verifiedPhoneNumber = null,
                 avatarColor = R.color.dark_grey,
                 accountType = AccountType.BUSINESS,
-                isBusinessAccount = true,
+                isBusinessAccount = isBusinessAccount,
                 isMasterBusinessAccount = true,
                 isBusinessProFlexiStatusActive = false,
                 businessProFlexiStatus = BusinessAccountStatus.Expired,

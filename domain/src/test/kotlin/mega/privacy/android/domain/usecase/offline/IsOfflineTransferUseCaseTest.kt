@@ -1,14 +1,15 @@
 package mega.privacy.android.domain.usecase.offline
 
-import com.google.common.truth.Truth
+import com.google.common.truth.Truth.assertThat
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.test.runTest
 import mega.privacy.android.domain.entity.transfer.Transfer
-import mega.privacy.android.domain.repository.FileSystemRepository
 import org.junit.jupiter.api.BeforeAll
 import org.junit.jupiter.api.BeforeEach
-import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.TestInstance
+import org.junit.jupiter.params.ParameterizedTest
+import org.junit.jupiter.params.provider.ValueSource
+import org.mockito.kotlin.doReturn
 import org.mockito.kotlin.mock
 import org.mockito.kotlin.reset
 import org.mockito.kotlin.whenever
@@ -17,56 +18,29 @@ import org.mockito.kotlin.whenever
 @TestInstance(TestInstance.Lifecycle.PER_CLASS)
 class IsOfflineTransferUseCaseTest {
 
-    private val fileSystemRepository: FileSystemRepository = mock()
+    private val isOfflinePathUseCase: IsOfflinePathUseCase = mock()
     private val transfer: Transfer = mock()
 
     private lateinit var underTest: IsOfflineTransferUseCase
 
     @BeforeAll
     fun setup() {
-        underTest = IsOfflineTransferUseCase(fileSystemRepository)
+        underTest = IsOfflineTransferUseCase(isOfflinePathUseCase)
     }
 
     @BeforeEach
     fun resetMocks() {
-        reset(fileSystemRepository)
+        reset(isOfflinePathUseCase)
     }
 
-    @Test
-    fun `test that invoke returns true when the transfer's local path begins with the offline path`() =
-        runTest {
-            stubPaths()
-            whenever(transfer.localPath).thenReturn(pathInOffline)
-            Truth.assertThat(underTest(transfer)).isTrue()
-        }
-
-    @Test
-    fun `test that invoke returns true when the transfer's local path begins with the backup offline path`() =
-        runTest {
-            stubPaths()
-            whenever(transfer.localPath).thenReturn(pathInBackupOffline)
-            Truth.assertThat(underTest(transfer)).isTrue()
-        }
-
-    @Test
-    fun `test that invoke returns false when the transfer's local path does not begin with the offline or backup offline path`() =
-        runTest {
-            stubPaths()
-            whenever(transfer.localPath).thenReturn(randomPath)
-            Truth.assertThat(underTest(transfer)).isFalse()
-        }
-
-    private fun stubPaths() = runTest {
-        whenever(fileSystemRepository.getOfflinePath()).thenReturn(offlinePath)
-        whenever(fileSystemRepository.getOfflineBackupsPath()).thenReturn(offlineBackupPath)
-    }
-
-    companion object {
-        private const val fileName = "file.txt"
-        private const val offlinePath = "offlinePath"
-        private const val offlineBackupPath = "offlinePath/in"
-        private const val pathInOffline = "$offlinePath/$fileName"
-        private const val pathInBackupOffline = "$offlineBackupPath/$fileName"
-        private const val randomPath = "downloads/$fileName"
+    @ParameterizedTest
+    @ValueSource(booleans = [true, false])
+    fun `test that invoke returns the result of is offline path use case for the transfer path`(
+        expected: Boolean,
+    ) = runTest {
+        val path = "some path"
+        whenever(transfer.localPath) doReturn (path)
+        whenever(isOfflinePathUseCase(path)) doReturn expected
+        assertThat(underTest(transfer)).isEqualTo(expected)
     }
 }

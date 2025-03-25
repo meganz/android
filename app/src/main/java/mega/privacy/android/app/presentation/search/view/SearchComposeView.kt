@@ -4,10 +4,7 @@ import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.grid.rememberLazyGridState
 import androidx.compose.foundation.lazy.rememberLazyListState
-import androidx.compose.material.Scaffold
 import androidx.compose.material.SnackbarDuration
-import androidx.compose.material.SnackbarHost
-import androidx.compose.material.SnackbarHostState
 import androidx.compose.material.SnackbarResult
 import androidx.compose.material.rememberScaffoldState
 import androidx.compose.runtime.Composable
@@ -38,7 +35,7 @@ import mega.privacy.android.app.R
 import mega.privacy.android.app.presentation.data.NodeUIItem
 import mega.privacy.android.app.presentation.node.NodeActionHandler
 import mega.privacy.android.app.presentation.search.SearchActivity
-import mega.privacy.android.app.presentation.search.model.SearchActivityState
+import mega.privacy.android.app.presentation.search.model.SearchViewState
 import mega.privacy.android.app.presentation.view.NodesView
 import mega.privacy.android.core.ui.mapper.FileTypeIconMapper
 import mega.privacy.android.domain.entity.SortOrder
@@ -46,12 +43,12 @@ import mega.privacy.android.domain.entity.node.NodeSourceType
 import mega.privacy.android.domain.entity.node.TypedNode
 import mega.privacy.android.domain.entity.preference.ViewType
 import mega.privacy.android.legacy.core.ui.controls.LegacyMegaEmptyViewForSearch
-import mega.privacy.android.shared.original.core.ui.controls.snackbars.MegaSnackbar
+import mega.privacy.android.shared.original.core.ui.controls.layouts.MegaScaffold
 import mega.privacy.android.shared.original.core.ui.preview.CombinedThemePreviews
 
 /**
  * View for Search compose
- * @param state [SearchActivityState]
+ * @param state [SearchViewState]
  * @param sortOrder String
  * @param onItemClick item click listener
  * @param onLongClick item long click listener
@@ -65,7 +62,7 @@ import mega.privacy.android.shared.original.core.ui.preview.CombinedThemePreview
 @OptIn(ExperimentalComposeUiApi::class)
 @Composable
 fun SearchComposeView(
-    state: SearchActivityState,
+    state: SearchViewState,
     sortOrder: String,
     onItemClick: (NodeUIItem<TypedNode>) -> Unit,
     onLongClick: (NodeUIItem<TypedNode>) -> Unit,
@@ -88,7 +85,6 @@ fun SearchComposeView(
     val listState = rememberLazyListState()
     val gridState = rememberLazyGridState()
     val scaffoldState = rememberScaffoldState()
-    val snackBarHostState = remember { SnackbarHostState() }
     var topBarPadding by remember { mutableStateOf(0.dp) }
 
     LaunchedEffect(key1 = state.resetScroll) {
@@ -129,7 +125,7 @@ fun SearchComposeView(
 
         }
     }
-    Scaffold(
+    MegaScaffold(
         modifier = modifier.semantics { testTagsAsResourceId = true },
         topBar = {
             SearchToolBar(
@@ -147,11 +143,7 @@ fun SearchComposeView(
                 navigationLevel = state.navigationLevel
             )
         },
-        snackbarHost = {
-            SnackbarHost(hostState = snackBarHostState) { data ->
-                MegaSnackbar(snackbarData = data)
-            }
-        }
+        scaffoldState = scaffoldState,
     ) { padding ->
         Column(modifier = Modifier.padding(top = topBarPadding)) {
             if ((state.nodeSourceType == NodeSourceType.CLOUD_DRIVE || state.nodeSourceType == NodeSourceType.HOME) && state.navigationLevel.isEmpty()) {
@@ -173,7 +165,7 @@ fun SearchComposeView(
                         onItemClicked = onItemClick,
                         onLongClick = onLongClick,
                         sortOrder = sortOrder,
-                        highlightText = if (state.searchDescriptionEnabled == true && state.searchTagsEnabled == true) highlightText else "",
+                        highlightText = if (state.searchDescriptionEnabled == true || state.searchTagsEnabled == true) highlightText else "",
                         isListView = state.currentViewType == ViewType.LIST,
                         onSortOrderClick = onSortOrderClick,
                         onChangeViewTypeClick = onChangeViewTypeClick,
@@ -227,7 +219,7 @@ private fun <T> T.useDebounce(
 @Composable
 private fun PreviewSearchComposeView() {
     SearchComposeView(
-        state = SearchActivityState(),
+        state = SearchViewState(),
         sortOrder = SortOrder.ORDER_NONE.toString(),
         onItemClick = {},
         onLongClick = {},

@@ -1,9 +1,9 @@
 package mega.privacy.android.app.presentation.search.mapper
 
 import com.google.common.truth.Truth.assertThat
-import mega.privacy.android.app.presentation.search.mapper.TypeFilterToSearchMapper
-import mega.privacy.android.domain.entity.search.TypeFilterOption
+import mega.privacy.android.domain.entity.node.NodeSourceType
 import mega.privacy.android.domain.entity.search.SearchCategory
+import mega.privacy.android.domain.entity.search.TypeFilterOption
 import org.junit.jupiter.api.BeforeAll
 import org.junit.jupiter.api.TestInstance
 import org.junit.jupiter.params.ParameterizedTest
@@ -24,15 +24,24 @@ internal class TypeFilterToSearchMapperTest {
     }
 
     @ParameterizedTest(name = "when filter type is {0}, then the search category is {1}")
-    @MethodSource("provideParameters")
+    @MethodSource("provideParametersForFilters")
     fun `test that the correct search category is returned for a selected type filter`(
         typeFilterOption: TypeFilterOption?,
         searchCategory: SearchCategory,
     ) {
-        assertThat(underTest(typeFilterOption)).isEqualTo(searchCategory)
+        assertThat(underTest(typeFilterOption, NodeSourceType.HOME)).isEqualTo(searchCategory)
     }
 
-    private fun provideParameters() = Stream.of(
+    @ParameterizedTest(name = "when node source type is {0}, then the search category is {1}")
+    @MethodSource("provideParametersForSourceType")
+    fun `test that the correct search category is returned for a provided node source type`(
+        nodeSourceType: NodeSourceType,
+        searchCategory: SearchCategory,
+    ) {
+        assertThat(underTest(null, nodeSourceType)).isEqualTo(searchCategory)
+    }
+
+    private fun provideParametersForFilters() = Stream.of(
         Arguments.of(null, SearchCategory.ALL),
         Arguments.of(TypeFilterOption.Audio, SearchCategory.AUDIO),
         Arguments.of(TypeFilterOption.Video, SearchCategory.VIDEO),
@@ -43,5 +52,11 @@ internal class TypeFilterToSearchMapperTest {
         Arguments.of(TypeFilterOption.Presentation, SearchCategory.PRESENTATION),
         Arguments.of(TypeFilterOption.Spreadsheet, SearchCategory.SPREADSHEET),
         Arguments.of(TypeFilterOption.Other, SearchCategory.OTHER),
+    )
+
+    private fun provideParametersForSourceType() = Stream.of(
+        Arguments.of(NodeSourceType.FAVOURITES, SearchCategory.FAVOURITES),
+        Arguments.of(NodeSourceType.AUDIO, SearchCategory.AUDIO),
+        Arguments.of(NodeSourceType.DOCUMENTS, SearchCategory.DOCUMENTS),
     )
 }

@@ -73,12 +73,15 @@ import coil.request.ImageRequest
 import kotlinx.coroutines.delay
 import mega.privacy.android.analytics.Analytics
 import mega.privacy.android.app.R
+import mega.privacy.android.app.presentation.extensions.getStorageState
 import mega.privacy.android.app.presentation.photos.albums.model.AlbumTitle
 import mega.privacy.android.app.presentation.photos.albums.model.AlbumsViewState
 import mega.privacy.android.app.presentation.photos.albums.model.UIAlbum
 import mega.privacy.android.app.presentation.photos.model.PhotoDownload
 import mega.privacy.android.app.presentation.photos.timeline.view.AlbumListSkeletonView
+import mega.privacy.android.app.utils.AlertsAndWarnings.showOverDiskQuotaPaywallWarning
 import mega.privacy.android.app.utils.Util.dp2px
+import mega.privacy.android.domain.entity.StorageState
 import mega.privacy.android.domain.entity.photos.Album
 import mega.privacy.android.domain.entity.photos.AlbumId
 import mega.privacy.android.domain.entity.photos.Photo
@@ -89,8 +92,8 @@ import mega.privacy.android.shared.original.core.ui.theme.button
 import mega.privacy.android.shared.original.core.ui.theme.caption
 import mega.privacy.android.shared.original.core.ui.theme.grey_alpha_054
 import mega.privacy.android.shared.original.core.ui.theme.subtitle1
-import mega.privacy.android.shared.original.core.ui.theme.teal_200
-import mega.privacy.android.shared.original.core.ui.theme.teal_300
+import mega.privacy.android.shared.original.core.ui.theme.accent_050
+import mega.privacy.android.shared.original.core.ui.theme.accent_900
 import mega.privacy.android.shared.original.core.ui.theme.white
 import mega.privacy.android.shared.original.core.ui.theme.white_alpha_054
 import mega.privacy.android.shared.original.core.ui.utils.showAutoDurationSnackbar
@@ -123,6 +126,7 @@ fun AlbumsView(
     onRemoveLinkDialogConfirmClick: () -> Unit = {},
     onRemoveLinkDialogCancelClick: () -> Unit = {},
     resetRemovedLinksCount: () -> Unit = {},
+    isStorageExceeded: () -> Boolean = { false },
 ) {
     val isLight = MaterialTheme.colors.isLight
     val isPortrait = LocalConfiguration.current.orientation == Configuration.ORIENTATION_PORTRAIT
@@ -204,8 +208,12 @@ fun AlbumsView(
                     FloatingActionButton(
                         onClick = {
                             Analytics.tracker.trackEvent(CreateAlbumFABEvent)
-                            setShowCreateAlbumDialog(true)
-                            setDialogInputPlaceholder(placeholderText)
+                            if (isStorageExceeded()) {
+                                showOverDiskQuotaPaywallWarning()
+                            } else {
+                                setShowCreateAlbumDialog(true)
+                                setDialogInputPlaceholder(placeholderText)
+                            }
                         },
                     ) {
                         Icon(
@@ -310,7 +318,7 @@ fun AlbumsView(
                                             Modifier.border(
                                                 BorderStroke(
                                                     width = 1.dp,
-                                                    color = colorResource(id = R.color.teal_300),
+                                                    color = colorResource(id = R.color.accent_900),
                                                 ),
                                                 shape = RoundedCornerShape(10.dp),
                                             )
@@ -461,7 +469,7 @@ fun DeleteAlbumsConfirmationDialog(
                 Text(
                     text = stringResource(id = R.string.delete_button),
                     style = button,
-                    color = teal_300.takeIf { isLight } ?: teal_200
+                    color = accent_900.takeIf { isLight } ?: accent_050
                 )
             }
         },
@@ -474,7 +482,7 @@ fun DeleteAlbumsConfirmationDialog(
                 Text(
                     text = stringResource(id = sharedR.string.general_dialog_cancel_button),
                     style = button,
-                    color = teal_300.takeIf { isLight } ?: teal_200
+                    color = accent_900.takeIf { isLight } ?: accent_050
                 )
             }
         },

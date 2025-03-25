@@ -4,10 +4,8 @@ import mega.privacy.android.icon.pack.R as IconR
 import mega.privacy.android.shared.resources.R as sharedR
 import android.content.res.Configuration
 import androidx.compose.foundation.Image
-import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.isSystemInDarkTheme
-import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
@@ -16,13 +14,10 @@ import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.navigationBarsPadding
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
-import androidx.compose.foundation.layout.wrapContentSize
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.lazy.rememberLazyListState
-import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.material.Divider
-import androidx.compose.material.Icon
 import androidx.compose.material.MaterialTheme
 import androidx.compose.material.Scaffold
 import androidx.compose.material.SnackbarDuration
@@ -37,14 +32,16 @@ import androidx.compose.runtime.getValue
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.draw.clip
 import androidx.compose.ui.platform.LocalConfiguration
+import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import mega.privacy.android.shared.original.core.ui.controls.images.MegaIcon
+import mega.android.core.ui.theme.values.IconColor
 import mega.privacy.android.app.R
 import mega.privacy.android.app.presentation.contact.view.ContactItemView
 import mega.privacy.android.app.presentation.extensions.getAvatarFirstLetter
@@ -59,9 +56,10 @@ import mega.privacy.android.legacy.core.ui.controls.appbar.SimpleTopAppBar
 import mega.privacy.android.shared.original.core.ui.controls.buttons.RaisedDefaultMegaButton
 import mega.privacy.android.shared.original.core.ui.controls.text.MegaText
 import mega.privacy.android.shared.original.core.ui.preview.CombinedThemePreviews
-import mega.privacy.android.shared.original.core.ui.theme.OriginalTempTheme
+import mega.privacy.android.shared.original.core.ui.theme.OriginalTheme
 import mega.privacy.android.shared.original.core.ui.theme.grey_alpha_012
-import mega.privacy.android.shared.original.core.ui.theme.values.TextColor
+import mega.android.core.ui.theme.values.TextColor
+import mega.privacy.android.app.presentation.meeting.chat.view.NoteToSelfView
 import mega.privacy.android.shared.original.core.ui.theme.white_alpha_012
 
 /**
@@ -76,6 +74,7 @@ fun StartConversationView(
     onBackPressed: () -> Unit,
     onSearchClicked: () -> Unit,
     onInviteContactsClicked: () -> Unit,
+    onNoteToSelfClicked: () -> Unit,
     onButtonClicked: (StartConversationAction) -> Unit = {},
 ) {
     val listState = rememberLazyListState()
@@ -116,15 +115,20 @@ fun StartConversationView(
                 if (buttonsVisible) {
                     if (fromChat) {
                         item {
-                            ActionButton(
+                            ActionButtons(
                                 action = buttons[0],
                                 onButtonClicked = onButtonClicked,
+                                onInviteContactsClicked = onInviteContactsClicked,
                                 withDivider = false
                             )
                         }
                     } else {
                         items(buttons) { button ->
-                            ActionButton(action = button, onButtonClicked = onButtonClicked)
+                            ActionButtons(
+                                action = button,
+                                onButtonClicked = onButtonClicked,
+                                onInviteContactsClicked = onInviteContactsClicked
+                            )
                         }
                     }
                 }
@@ -136,9 +140,9 @@ fun StartConversationView(
                     contactsList.isNotEmpty() -> {
                         item(key = "Contacts header") { ContactsHeader() }
 
-                        if (buttonsVisible) {
-                            item(key = "Invite contacts") {
-                                InviteContactsButton(onInviteContactsClicked)
+                        if (isNoteToYourselfFeatureFlagEnabled) {
+                            item(key = "Note to self") {
+                                NoteToSelfView(onNoteToSelfClicked)
                             }
                         }
 
@@ -157,6 +161,11 @@ fun StartConversationView(
 
                     else -> {
                         item(key = "Contacts header") { ContactsHeader() }
+                        if (isNoteToYourselfFeatureFlagEnabled) {
+                            item(key = "Note to self") {
+                                NoteToSelfView(onNoteToSelfClicked)
+                            }
+                        }
                         item(key = "Empty contacts") { EmptyContactsView(onInviteContactsClicked) }
                     }
                 }
@@ -208,33 +217,32 @@ private fun ContactsHeader() {
 }
 
 @Composable
-private fun ActionButton(
+private fun ActionButtons(
     action: StartConversationAction,
     onButtonClicked: (StartConversationAction) -> Unit = {},
+    onInviteContactsClicked: () -> Unit,
     withDivider: Boolean = true,
 ) {
-    Column(modifier = Modifier
-        .fillMaxWidth()
-        .clickable { onButtonClicked(action) }) {
-        Row(verticalAlignment = Alignment.CenterVertically) {
-            Box(
-                modifier = Modifier
-                    .padding(horizontal = 16.dp, vertical = 8.dp)
-                    .size(40.dp)
-                    .clip(CircleShape)
-                    .background(color = MaterialTheme.colors.secondary)
-                    .wrapContentSize(Alignment.Center)
-
-            ) {
-                Icon(
-                    painter = painterResource(id = action.icon),
-                    contentDescription = "${action.name} icon",
-                    tint = MaterialTheme.colors.primary
-                )
-            }
+    Column(
+        modifier = Modifier
+            .fillMaxWidth()
+    ) {
+        Row(modifier = Modifier
+            .clickable { onButtonClicked(action) }
+            .fillMaxWidth(),
+            verticalAlignment = Alignment.CenterVertically) {
+            MegaIcon(
+                modifier = Modifier.padding(horizontal = 26.dp, vertical = 18.dp),
+                painter = painterResource(id = action.icon),
+                contentDescription = "${action.name} icon",
+                tint = IconColor.Primary
+            )
 
             ActionText(actionText = action.title)
         }
+
+        InviteContactsButton(onInviteContactsClicked)
+
         if (withDivider) {
             Divider(
                 modifier = Modifier.padding(start = 72.dp),
@@ -251,11 +259,11 @@ private fun InviteContactsButton(onInviteContactsClicked: () -> Unit) {
         .clickable { onInviteContactsClicked() }
         .fillMaxWidth(),
         verticalAlignment = Alignment.CenterVertically) {
-        Icon(
+        MegaIcon(
             modifier = Modifier.padding(horizontal = 26.dp, vertical = 18.dp),
             painter = painterResource(id = R.drawable.ic_invite_contacts),
             contentDescription = stringResource(id = R.string.invite_contacts) + "icon",
-            tint = MaterialTheme.colors.secondary
+            tint = IconColor.Primary
         )
 
         ActionText(actionText = R.string.invite_contacts)
@@ -305,7 +313,7 @@ private fun EmptyContactsView(onInviteContactsClicked: () -> Unit) {
                 modifier = Modifier
                     .padding(vertical = 10.dp)
                     .size(120.dp),
-                painter = painterResource(id = if (isDark) IconR.drawable.ic_empty_user_dark else IconR.drawable.ic_empty_user),
+                painter = painterResource(id =  IconR.drawable.ic_user_glass),
                 contentDescription = "Empty contacts image",
             )
         }
@@ -328,11 +336,12 @@ private fun EmptyContactsView(onInviteContactsClicked: () -> Unit) {
         )
 
         RaisedDefaultMegaButton(
+            modifier = Modifier
+                .testTag(TEST_TAG_RAISED_DEFAULT_MEGA_BUTTON)
+                .padding(bottom = 20.dp)
+                .align(Alignment.CenterHorizontally),
             textId = sharedR.string.invite_contacts_action_label,
             onClick = onInviteContactsClicked,
-            modifier = Modifier
-                .padding(bottom = 20.dp)
-                .align(Alignment.CenterHorizontally)
         )
     }
 }
@@ -340,15 +349,18 @@ private fun EmptyContactsView(onInviteContactsClicked: () -> Unit) {
 @CombinedThemePreviews
 @Composable
 private fun PreviewActionButton() {
-    OriginalTempTheme(isDark = isSystemInDarkTheme()) {
-        ActionButton(action = StartConversationAction.NewGroup, onButtonClicked = {})
+    OriginalTheme(isDark = isSystemInDarkTheme()) {
+        ActionButtons(
+            action = StartConversationAction.NewGroup,
+            onButtonClicked = {},
+            onInviteContactsClicked = {})
     }
 }
 
 @CombinedThemePreviews
 @Composable
 private fun PreviewInviteContactsButton() {
-    OriginalTempTheme(isDark = isSystemInDarkTheme()) {
+    OriginalTheme(isDark = isSystemInDarkTheme()) {
         InviteContactsButton(onInviteContactsClicked = {})
     }
 }
@@ -356,7 +368,7 @@ private fun PreviewInviteContactsButton() {
 @CombinedThemePreviews
 @Composable
 private fun PreviewHeaderItem() {
-    OriginalTempTheme(isDark = isSystemInDarkTheme()) {
+    OriginalTheme(isDark = isSystemInDarkTheme()) {
         HeaderItem(text = "A")
     }
 }
@@ -364,7 +376,7 @@ private fun PreviewHeaderItem() {
 @CombinedThemePreviews
 @Composable
 private fun PreviewStartConversationView() {
-    OriginalTempTheme(isDark = isSystemInDarkTheme()) {
+    OriginalTheme(isDark = isSystemInDarkTheme()) {
         StartConversationView(
             state = StartConversationState(),
             onButtonClicked = {},
@@ -373,7 +385,8 @@ private fun PreviewStartConversationView() {
             onCloseSearchClicked = {},
             onBackPressed = {},
             onSearchClicked = {},
-            onInviteContactsClicked = {}
+            onInviteContactsClicked = {},
+            onNoteToSelfClicked = {}
         )
     }
 }
@@ -382,7 +395,9 @@ private fun PreviewStartConversationView() {
 @CombinedThemePreviews
 @Composable
 private fun PreviewEmptyContactsView() {
-    OriginalTempTheme(isDark = isSystemInDarkTheme()) {
+    OriginalTheme(isDark = isSystemInDarkTheme()) {
         EmptyContactsView(onInviteContactsClicked = {})
     }
 }
+
+internal const val TEST_TAG_RAISED_DEFAULT_MEGA_BUTTON = "raised_default_mega_button"

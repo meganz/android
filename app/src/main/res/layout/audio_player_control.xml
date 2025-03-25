@@ -18,18 +18,20 @@
         style="@style/Widget.Mega.TimeBar"
         android:layout_width="0dp"
         android:layout_height="20dp"
-        android:layout_marginStart="16dp"
-        android:layout_marginEnd="16dp"
+        android:layout_marginStart="10dp"
+        android:layout_marginEnd="10dp"
         android:layout_marginBottom="20dp"
-        app:layout_constraintBottom_toTopOf="@id/track_name"
+        app:layout_constraintBottom_toTopOf="@id/play_pause_placeholder"
         app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toStartOf="parent" />
+        app:layout_constraintStart_toStartOf="parent"
+        app:played_color="@color/color_button_brand"
+        app:scrubber_color="@color/color_button_brand" />
 
     <TextView
         android:id="@id/exo_position"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_marginStart="24dp"
+        android:layout_marginHorizontal="16dp"
         android:textAppearance="@style/TextAppearance.Mega.Caption.Variant3"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@id/exo_progress"
@@ -39,7 +41,7 @@
         android:id="@id/exo_duration"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_marginEnd="24dp"
+        android:layout_marginHorizontal="16dp"
         android:textAppearance="@style/TextAppearance.Mega.Caption.Variant3"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintTop_toBottomOf="@id/exo_progress"
@@ -47,32 +49,26 @@
 
     <TextView
         android:id="@+id/track_name"
-        android:layout_width="0dp"
+        android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_marginHorizontal="20dp"
+        android:layout_marginHorizontal="16dp"
         android:layout_marginBottom="@dimen/audio_player_track_name_margin_bottom_small"
         android:ellipsize="marquee"
-        android:gravity="center"
         android:singleLine="true"
         android:textAppearance="@style/TextAppearance.Mega.Subtitle1.Medium.Variant6"
         app:layout_constraintBottom_toTopOf="@id/artist_name"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toStartOf="parent"
         tools:text="Cashew Rhythm" />
 
     <TextView
         android:id="@+id/artist_name"
-        android:layout_width="0dp"
+        android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_marginHorizontal="54dp"
+        android:layout_marginHorizontal="16dp"
         android:layout_marginBottom="10dp"
         android:ellipsize="marquee"
-        android:gravity="center"
         android:singleLine="true"
         android:textAppearance="@style/TextAppearance.Mega.Subtitle2.Normal.Variant"
-        app:layout_constraintBottom_toTopOf="@id/exo_play_pause"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintBottom_toTopOf="@id/exo_progress"
         tools:text="Two Fingers" />
 
     <androidx.constraintlayout.widget.Guideline
@@ -97,36 +93,44 @@
     <ImageButton
         android:id="@id/exo_prev"
         style="@style/AudioPlayerButton"
-        android:src="@drawable/media_player_prev"
+        android:src="@drawable/ic_prev_audio_player"
         app:layout_constraintBottom_toBottomOf="@id/control_button_center"
         app:layout_constraintEnd_toStartOf="@id/play_pause_placeholder"
         app:layout_constraintHorizontal_chainStyle="spread_inside"
         app:layout_constraintStart_toEndOf="@id/exo_rew"
         app:layout_constraintTop_toTopOf="@id/control_button_center" />
 
-    <View
+    <FrameLayout
         android:id="@+id/play_pause_placeholder"
-        android:layout_width="64dp"
-        android:layout_height="64dp"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
         app:layout_constraintBottom_toBottomOf="@id/control_button_center"
         app:layout_constraintEnd_toStartOf="@id/exo_next"
         app:layout_constraintHorizontal_chainStyle="spread_inside"
         app:layout_constraintStart_toEndOf="@id/exo_prev"
-        app:layout_constraintTop_toTopOf="@id/control_button_center" />
+        app:layout_constraintTop_toTopOf="@id/control_button_center">
 
-    <ImageButton
-        android:id="@id/exo_play_pause"
-        style="@style/ExoStyledControls.Button.Center.PlayPause"
+        <ImageButton
+            android:id="@id/exo_play_pause"
+            style="@style/ExoStyledControls.Button.Center.PlayPause"
+            android:layout_width="62dp"
+            android:layout_height="62dp"
+            android:background="@null"
+            app:tint="@color/black_white" />
+    </FrameLayout>
+
+    <ProgressBar
+        android:id="@+id/loading_audio_player_controller_view"
         android:layout_width="64dp"
         android:layout_height="64dp"
-        android:background="@null"
         app:layout_constraintStart_toStartOf="@id/play_pause_placeholder"
-        app:layout_constraintTop_toTopOf="@id/play_pause_placeholder" />
+        app:layout_constraintTop_toTopOf="@id/play_pause_placeholder"
+        android:indeterminateDrawable="@drawable/video_player_progress_indeterminate_anim_large_material" />
 
     <ImageButton
         android:id="@id/exo_next"
         style="@style/AudioPlayerButton"
-        android:src="@drawable/media_player_next"
+        android:src="@drawable/ic_next_audio_player"
         app:layout_constraintBottom_toBottomOf="@id/control_button_center"
         app:layout_constraintEnd_toStartOf="@id/exo_ffwd"
         app:layout_constraintHorizontal_chainStyle="spread_inside"
@@ -148,8 +152,8 @@
         android:id="@id/exo_shuffle"
         style="@style/AudioPlayerButton"
         app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintEnd_toEndOf="@id/exo_prev"
-        app:layout_constraintStart_toStartOf="@id/exo_prev"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintEnd_toStartOf="@id/exo_repeat_toggle"
         tools:src="@drawable/exo_styled_controls_shuffle_on" />
 
     <ImageButton
@@ -157,8 +161,17 @@
         style="@style/AudioPlayerButton"
         android:src="@drawable/exo_styled_controls_repeat_all"
         app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toStartOf="parent" />
+        app:layout_constraintEnd_toStartOf="@id/speed_playback"
+        app:layout_constraintStart_toEndOf="@id/exo_shuffle" />
+
+    <ImageButton
+        android:id="@id/speed_playback"
+        style="@style/AudioPlayerButton"
+        android:src="@drawable/ic_playback_1x"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toStartOf="@id/playlist"
+        app:layout_constraintStart_toEndOf="@+id/exo_repeat_toggle"
+        app:tint="@color/dark_grey_white"/>
 
     <ImageButton
         android:id="@+id/playlist"
@@ -166,8 +179,8 @@
         android:enabled="false"
         android:src="@drawable/ic_player_queue"
         app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintEnd_toEndOf="@id/exo_next"
-        app:layout_constraintStart_toStartOf="@id/exo_next"
-        app:tint="@color/dark_grey_white"/>
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toEndOf="@id/speed_playback"
+        app:tint="@color/dark_grey_white" />
 
 </androidx.constraintlayout.widget.ConstraintLayout>

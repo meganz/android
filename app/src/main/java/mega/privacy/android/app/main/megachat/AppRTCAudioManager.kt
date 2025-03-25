@@ -18,6 +18,7 @@ import android.content.pm.PackageManager
 import android.media.AudioAttributes
 import android.media.AudioDeviceInfo
 import android.media.AudioManager
+import android.media.AudioManager.MODE_IN_COMMUNICATION
 import android.media.MediaPlayer
 import android.media.RingtoneManager
 import android.os.Build
@@ -32,7 +33,7 @@ import mega.privacy.android.app.interfaces.OnProximitySensorListener
 import mega.privacy.android.app.utils.CallUtil
 import mega.privacy.android.app.utils.ChatUtil
 import mega.privacy.android.app.utils.Constants
-import mega.privacy.android.app.utils.VideoCaptureUtils
+import mega.privacy.android.app.utils.Constants.AUDIO_MANAGER_PLAY_VOICE_CLIP
 import mega.privacy.android.app.utils.permission.PermissionUtils.hasPermissions
 import mega.privacy.android.domain.entity.call.AudioDevice
 import mega.privacy.android.domain.entity.call.BluetoothStates
@@ -187,13 +188,17 @@ class AppRTCAudioManager @Inject constructor(
         if (isNear) {
             proximitySensor?.turnOffScreen()
             Timber.d("Screen off")
-
-            if (VideoCaptureUtils.isFrontCameraInUse()) {
+            if (typeAudioManager == AUDIO_MANAGER_PLAY_VOICE_CLIP) {
+                if (isSpeakerOn && selectedAudioDevice != AudioDevice.Earpiece) {
+                    Timber.d("Selecting Earpiece")
+                    selectAudioDevice(AudioDevice.Earpiece, false)
+                }
+            } else {
                 // Sensor reports that a "handset is being held up to a person's ear", or "something is covering the light sensor".
                 if (apprtcContext is MegaApplication && isSpeakerOn &&
                     (bluetoothManager?.bluetoothState != BluetoothStates.SCOConnected)
                 ) {
-                    Timber.d("Disabling the speakerphone and selecting Earpiece")
+                    Timber.d("Selecting Earpiece")
                     selectAudioDevice(AudioDevice.Earpiece, true)
                 }
             }
@@ -201,19 +206,21 @@ class AppRTCAudioManager @Inject constructor(
             // Sensor reports that a "handset is removed from a person's ear", or "the light sensor is no longer covered".
             proximitySensor?.turnOnScreen()
             Timber.d("Screen on")
-            if (apprtcContext is MegaApplication && isSpeakerOn &&
-                (bluetoothManager?.bluetoothState != BluetoothStates.SCOConnected)
-            ) {
-                Timber.d("Enabling the speakerphone: ")
-                selectAudioDevice(AudioDevice.SpeakerPhone, true)
+            if (typeAudioManager != AUDIO_MANAGER_PLAY_VOICE_CLIP) {
+                if (apprtcContext is MegaApplication && isSpeakerOn &&
+                    (bluetoothManager?.bluetoothState != BluetoothStates.SCOConnected)
+                ) {
+                    Timber.d("Selecting Speakerphone")
+                    selectAudioDevice(AudioDevice.SpeakerPhone, true)
+                }
             }
+
         }
         proximitySensorListener?.needToUpdate(isNear)
     }
 
-
     private fun setValues() {
-        if ((typeAudioManager != Constants.AUDIO_MANAGER_CALL_RINGING
+        if ((typeAudioManager != Constants.AUDIO_MANAGER_CALL_RINGING && typeAudioManager != AUDIO_MANAGER_PLAY_VOICE_CLIP
                     && typeAudioManager != Constants.AUDIO_MANAGER_CALL_OUTGOING)
             || bluetoothManager?.bluetoothState == BluetoothStates.HeadsetAvailable
             || bluetoothManager?.bluetoothState == BluetoothStates.SCOConnecting
@@ -529,8 +536,8 @@ class AppRTCAudioManager @Inject constructor(
         val typeFocus: Int
         when (typeAudioManager) {
             Constants.AUDIO_MANAGER_PLAY_VOICE_CLIP -> {
-                typeStream = ChatUtil.STREAM_MUSIC_DEFAULT
-                typeFocus = ChatUtil.AUDIOFOCUS_DEFAULT
+                typeStream = AudioManager.STREAM_MUSIC
+                typeFocus = AudioManager.AUDIOFOCUS_GAIN
             }
 
             Constants.AUDIO_MANAGER_CALL_RINGING -> {
@@ -550,9 +557,9 @@ class AppRTCAudioManager @Inject constructor(
         } else {
             Timber.e("Audio focus request failed")
         }
-        if (typeAudioManager != Constants.AUDIO_MANAGER_PLAY_VOICE_CLIP && typeAudioManager != Constants.AUDIO_MANAGER_CALL_RINGING) {
+        if (typeAudioManager != Constants.AUDIO_MANAGER_CALL_RINGING) {
             Timber.d("Mode communication")
-            audioManager?.mode = AudioManager.MODE_IN_COMMUNICATION
+            audioManager?.mode = MODE_IN_COMMUNICATION
         } else {
             Timber.d("Mode normal")
             audioManager?.mode = AudioManager.MODE_NORMAL
@@ -593,6 +600,9 @@ class AppRTCAudioManager @Inject constructor(
             Timber.e("Trying to stop AudioManager in incorrect state: $amState")
             return
         }
+        if (typeAudioManager != AUDIO_MANAGER_PLAY_VOICE_CLIP) {
+            audioManager?.mode = AudioManager.MODE_NORMAL
+        }
         typeAudioManager = Constants.INVALID_CALL_STATUS
         amState = AudioManagerState.UNINITIALIZED
         unregisterReceiver(wiredHeadsetReceiver)
@@ -602,7 +612,6 @@ class AppRTCAudioManager @Inject constructor(
         // Restore previously stored audio states.
         setSpeakerphoneOn(savedIsSpeakerPhoneOn)
         setMicrophoneMute(savedIsMicrophoneMute)
-        audioManager?.mode = AudioManager.MODE_NORMAL
 
         // Abandon audio focus. Gives the previous focus owner, if any, focus.
         if (audioFocusChangeListener != null) audioManager?.abandonAudioFocus(
@@ -624,8 +633,8 @@ class AppRTCAudioManager @Inject constructor(
         assert(audioDevices?.contains(availableDevice) == true) { "Expected audio devices to contain $availableDevice" }
         when (availableDevice) {
             AudioDevice.SpeakerPhone -> {
-                if (typeAudioManager == Constants.AUDIO_MANAGER_PLAY_VOICE_CLIP) {
-                    audioManager?.mode = AudioManager.MODE_NORMAL
+                if (typeAudioManager == AUDIO_MANAGER_PLAY_VOICE_CLIP) {
+                    audioManager?.mode = MODE_IN_COMMUNICATION
                 }
                 isSpeakerOn = true
                 setSpeakerphoneOn(true)
@@ -635,8 +644,8 @@ class AppRTCAudioManager @Inject constructor(
                 if (!isTemporary) {
                     isSpeakerOn = false
                 }
-                if (typeAudioManager == Constants.AUDIO_MANAGER_PLAY_VOICE_CLIP) {
-                    audioManager?.mode = AudioManager.MODE_IN_COMMUNICATION
+                if (typeAudioManager == AUDIO_MANAGER_PLAY_VOICE_CLIP) {
+                    audioManager?.mode = MODE_IN_COMMUNICATION
                 }
                 setSpeakerphoneOn(false)
             }

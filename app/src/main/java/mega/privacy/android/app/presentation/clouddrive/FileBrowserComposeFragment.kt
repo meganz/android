@@ -1,10 +1,10 @@
 package mega.privacy.android.app.presentation.clouddrive
 
+import mega.privacy.android.icon.pack.R as iconPackR
 import mega.privacy.android.shared.resources.R as sharedR
 import android.app.Activity
 import android.content.Context
 import android.content.Intent
-import android.content.res.Configuration
 import android.net.Uri
 import android.os.Bundle
 import android.view.LayoutInflater
@@ -55,7 +55,6 @@ import mega.privacy.android.app.main.controllers.NodeController
 import mega.privacy.android.app.main.dialog.removelink.RemovePublicLinkDialogFragment
 import mega.privacy.android.app.main.dialog.rubbishbin.ConfirmMoveToRubbishBinDialogFragment
 import mega.privacy.android.app.main.dialog.shares.RemoveAllSharingContactDialogFragment
-import mega.privacy.android.app.presentation.advertisements.model.AdsSlotIDs.TAB_CLOUD_SLOT_ID
 import mega.privacy.android.app.presentation.bottomsheet.NodeOptionsBottomSheetDialogFragment
 import mega.privacy.android.app.presentation.clouddrive.ui.FileBrowserComposeView
 import mega.privacy.android.app.presentation.data.NodeUIItem
@@ -65,6 +64,8 @@ import mega.privacy.android.app.presentation.mapper.GetOptionsForToolbarMapper
 import mega.privacy.android.app.presentation.mapper.OptionsItemInfo
 import mega.privacy.android.app.presentation.node.NodeActionsViewModel
 import mega.privacy.android.app.presentation.node.action.HandleNodeAction
+import mega.privacy.android.app.presentation.photos.albums.add.AddToAlbumActivity
+import mega.privacy.android.app.presentation.settings.model.StorageTargetPreference
 import mega.privacy.android.app.presentation.transfers.starttransfer.view.StartTransferComponent
 import mega.privacy.android.app.sync.fileBackups.FileBackupManager
 import mega.privacy.android.app.utils.CloudStorageOptionControlUtil
@@ -72,7 +73,10 @@ import mega.privacy.android.app.utils.Constants
 import mega.privacy.android.app.utils.MegaNodeUtil
 import mega.privacy.android.app.utils.Util
 import mega.privacy.android.core.ui.mapper.FileTypeIconMapper
+import mega.privacy.android.domain.entity.ImageFileTypeInfo
 import mega.privacy.android.domain.entity.ThemeMode
+import mega.privacy.android.domain.entity.VideoFileTypeInfo
+import mega.privacy.android.domain.entity.node.FileNode
 import mega.privacy.android.domain.entity.node.FolderNode
 import mega.privacy.android.domain.entity.node.MoveRequestResult
 import mega.privacy.android.domain.entity.node.NodeId
@@ -83,7 +87,7 @@ import mega.privacy.android.domain.usecase.GetThemeMode
 import mega.privacy.android.domain.usecase.featureflag.GetFeatureFlagValueUseCase
 import mega.privacy.android.navigation.MegaNavigator
 import mega.privacy.android.shared.original.core.ui.controls.layouts.MegaScaffold
-import mega.privacy.android.shared.original.core.ui.theme.OriginalTempTheme
+import mega.privacy.android.shared.original.core.ui.theme.OriginalTheme
 import mega.privacy.android.shared.original.core.ui.utils.showAutoDurationSnackbar
 import mega.privacy.mobile.analytics.event.CloudDriveHideNodeMenuItemEvent
 import mega.privacy.mobile.analytics.event.CloudDriveScreenEvent
@@ -191,7 +195,7 @@ class FileBrowserComposeFragment : Fragment() {
                     mutableStateOf(null)
                 }
 
-                OriginalTempTheme(isDark = themeMode.isDarkMode()) {
+                OriginalTheme(isDark = themeMode.isDarkMode()) {
                     MegaScaffold(
                         scaffoldState = scaffoldState,
                     ) {
@@ -263,6 +267,12 @@ class FileBrowserComposeFragment : Fragment() {
                                 disableSelectMode()
                             },
                             snackBarHostState = snackbarHostState,
+                            navigateToStorageSettings = {
+                                megaNavigator.openSettings(
+                                    requireActivity(),
+                                    StorageTargetPreference
+                                )
+                            },
                         )
                         EventEffect(
                             event = nodeActionState.downloadEvent,
@@ -289,7 +299,6 @@ class FileBrowserComposeFragment : Fragment() {
                 ExitFileBrowser(uiState.exitFileBrowserEvent) {
                     fileBrowserViewModel.consumeExitFileBrowserEvent()
                 }
-                fileBrowserViewModel.updateStorageCapacityIfNeeded()
                 clickedFile?.let {
                     HandleNodeAction(
                         typedFileNode = it,
@@ -444,21 +453,9 @@ class FileBrowserComposeFragment : Fragment() {
      */
     private fun getEmptyFolderDrawable(isCloudDriveEmpty: Boolean): Pair<Int, Int> {
         return if (isCloudDriveEmpty) {
-            Pair(
-                if (requireActivity().resources.configuration.orientation == Configuration.ORIENTATION_LANDSCAPE) {
-                    R.drawable.ic_empty_cloud_drive
-                } else {
-                    R.drawable.ic_empty_cloud_drive
-                }, R.string.context_empty_cloud_drive
-            )
+            Pair(iconPackR.drawable.ic_empty_cloud_glass, R.string.context_empty_cloud_drive)
         } else {
-            Pair(
-                if (requireActivity().resources.configuration.orientation == Configuration.ORIENTATION_LANDSCAPE) {
-                    R.drawable.ic_zero_landscape_empty_folder
-                } else {
-                    R.drawable.ic_zero_portrait_empty_folder
-                }, R.string.file_browser_empty_folder_new
-            )
+            Pair(iconPackR.drawable.ic_empty_folder_glass, R.string.file_browser_empty_folder_new)
         }
     }
 
@@ -506,7 +503,8 @@ class FileBrowserComposeFragment : Fragment() {
                     )
                     CloudStorageOptionControlUtil.applyControl(menu, control)
 
-                    handleHiddeNodes(selected, nodeList, menu)
+                    handleHiddenNodes(selected, nodeList, menu)
+                    handleAddToAlbum(selected, nodeList, menu)
                 }.onFailure {
                     Timber.e(it)
                 }
@@ -521,7 +519,7 @@ class FileBrowserComposeFragment : Fragment() {
             return result.getOrNull() ?: false
         }
 
-        private suspend fun handleHiddeNodes(
+        private suspend fun handleHiddenNodes(
             selected: List<Long>,
             nodeList: List<NodeUIItem<TypedNode>>,
             menu: Menu,
@@ -559,6 +557,32 @@ class FileBrowserComposeFragment : Fragment() {
                 isPaid && !isBusinessAccountExpired && !hasNonSensitiveNode && !includeSensitiveInheritedNode
         }
 
+        private fun handleAddToAlbum(
+            selected: List<Long>,
+            nodeList: List<NodeUIItem<TypedNode>>,
+            menu: Menu,
+        ) {
+            val mediaNodes = nodeList
+                .filter { it.id.longValue in selected }
+                .filter {
+                    val type = (it.node as? FileNode)?.type
+                    type is ImageFileTypeInfo || type is VideoFileTypeInfo
+                }
+
+            if (mediaNodes.size == selected.size) {
+                if (mediaNodes.all { (it.node as? FileNode)?.type is VideoFileTypeInfo }) {
+                    menu.findItem(R.id.cab_menu_add_to_album)?.isVisible = false
+                    menu.findItem(R.id.cab_menu_add_to)?.isVisible = true
+                } else {
+                    menu.findItem(R.id.cab_menu_add_to_album)?.isVisible = true
+                    menu.findItem(R.id.cab_menu_add_to)?.isVisible = false
+                }
+            } else {
+                menu.findItem(R.id.cab_menu_add_to_album)?.isVisible = false
+                menu.findItem(R.id.cab_menu_add_to)?.isVisible = false
+            }
+        }
+
         override fun onActionItemClicked(mode: ActionMode, item: MenuItem): Boolean {
             Timber.d("onActionItemClicked")
             fileBrowserViewModel.onOptionItemClicked(item)
@@ -570,7 +594,7 @@ class FileBrowserComposeFragment : Fragment() {
             (activity as? ManagerActivity)?.let {
                 it.showFabButton()
                 it.showHideBottomNavigationView(false)
-                it.handleShowingAds(TAB_CLOUD_SLOT_ID)
+                it.handleShowingAds()
                 actionMode = null
             }
         }
@@ -700,6 +724,26 @@ class FileBrowserComposeFragment : Fragment() {
 
                 // This option is only available in the Incoming Shares page
                 OptionItems.LEAVE_SHARE_CLICKED -> Unit
+
+                OptionItems.ADD_TO_ALBUM -> {
+                    val intent = Intent(requireContext(), AddToAlbumActivity::class.java).apply {
+                        val ids = it.selectedNode.map { it.id.longValue }.toTypedArray()
+                        putExtra("ids", ids)
+                        putExtra("type", 0)
+                    }
+                    addToAlbumLauncher.launch(intent)
+                    disableSelectMode()
+                }
+
+                OptionItems.ADD_TO -> {
+                    val intent = Intent(requireContext(), AddToAlbumActivity::class.java).apply {
+                        val ids = it.selectedNode.map { it.id.longValue }.toTypedArray()
+                        putExtra("ids", ids)
+                        putExtra("type", 1)
+                    }
+                    addToAlbumLauncher.launch(intent)
+                    disableSelectMode()
+                }
             }
         }
     }
@@ -763,6 +807,12 @@ class FileBrowserComposeFragment : Fragment() {
             ::handleHiddenNodesOnboardingResult,
         )
 
+    private val addToAlbumLauncher: ActivityResultLauncher<Intent> =
+        registerForActivityResult(
+            ActivityResultContracts.StartActivityForResult(),
+            ::handleAddToAlbumResult,
+        )
+
     private fun handleHiddenNodesOnboardingResult(result: ActivityResult) {
         if (result.resultCode != Activity.RESULT_OK) return
 
@@ -777,6 +827,13 @@ class FileBrowserComposeFragment : Fragment() {
                 tempNodeIds.size,
                 tempNodeIds.size,
             )
+        Util.showSnackbar(requireActivity(), message)
+    }
+
+    private fun handleAddToAlbumResult(result: ActivityResult) {
+        if (result.resultCode != Activity.RESULT_OK) return
+        val message = result.data?.getStringExtra("message") ?: return
+
         Util.showSnackbar(requireActivity(), message)
     }
 }

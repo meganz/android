@@ -59,12 +59,12 @@ fun AppDataOwner.pendingMessageIds() =
  *
  * @return a String representation of the transfer path, null if cannot be retrieved
  */
-fun AppDataOwner.getSDCardTransferPath() = getSDCardDownloadAppData()?.targetPath
+fun AppDataOwner.getSDCardTransferPathForSDK() = getSDCardDownloadAppData()?.targetPathForSDK
 
 /**
  * Get the sdcard transfer target uri, if the transfer is a sdcard transfer
  */
-fun AppDataOwner.getSDCardTransferUri() = getSDCardDownloadAppData()?.targetUri
+fun AppDataOwner.getSDCardFinalTransferUri() = getSDCardDownloadAppData()?.finalTargetUri
 
 /**
  * @return TransferAppData.SdCardDownload associated to this transfer if it's a SdCard download transfer, null otherwise.
@@ -83,4 +83,34 @@ fun AppDataOwner.getChatDownloadAppData(): TransferAppData.ChatDownload? =
     appData
         .filterIsInstance<TransferAppData.ChatDownload>()
         .firstOrNull()
+
+/**
+ * Returns [TransferAppData.Geolocation] associated to this transfer.
+ */
+fun AppDataOwner.getGeolocation(): TransferAppData.Geolocation? = appData
+    .filterIsInstance<TransferAppData.Geolocation>()
+    .firstOrNull()
+
+/**
+ * Returns [TransferAppData.TransferGroup] associated to this transfer.
+ */
+fun AppDataOwner.getTransferGroup(): TransferAppData.TransferGroup? = appData
+    .filterIsInstance<TransferAppData.TransferGroup>()
+    .firstOrNull()
+
+/**
+ * Is preview download
+ *
+ * @return True if the transfer is a preview download, false otherwise.
+ */
+fun AppDataOwner.isPreviewDownload(): Boolean =
+    appData.contains(TransferAppData.PreviewDownload)
+
+/**
+ * Is offline download
+ *
+ * @return True if the transfer is an offline download, false otherwise.
+ */
+fun AppDataOwner.isOfflineDownload(): Boolean =
+    appData.contains(TransferAppData.OfflineDownload)
 

@@ -59,7 +59,7 @@ internal class PasscodeDatastoreMigration @Inject constructor(
             timeOutMilliseconds = oldPreferences.passcodeLockRequireTime?.toLongOrNull(),
             backgroundUTC = null,
             passcodeType = oldPreferences.passcodeLockType,
-            biometricsEnabled = databaseHandler.get().isFingerprintLockEnabled,
+            biometricsEnabled = oldPreferences.fingerprintLock?.toBoolean()
         )
     }
 

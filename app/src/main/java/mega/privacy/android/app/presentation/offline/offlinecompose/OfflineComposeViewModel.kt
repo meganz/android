@@ -25,6 +25,7 @@ import mega.privacy.android.domain.usecase.viewtype.MonitorViewType
 import mega.privacy.android.shared.original.core.ui.utils.pop
 import mega.privacy.android.shared.original.core.ui.utils.push
 import timber.log.Timber
+import java.io.File
 import javax.inject.Inject
 
 /**
@@ -47,7 +48,7 @@ class OfflineComposeViewModel @Inject constructor(
             title = savedStateHandle["title"] ?: ""
         )
     )
-    private val parentStack = ArrayDeque<Pair<Int, String>>()
+    private val parentStack = ArrayDeque<Pair<Int, String?>>()
 
     /**
      * Flow of [OfflineUiState] UI State
@@ -59,6 +60,21 @@ class OfflineComposeViewModel @Inject constructor(
         monitorOfflineWarningMessage()
         monitorOfflineNodeUpdates()
         monitorViewTypeUpdate()
+    }
+
+    /**
+     * Navigates to the specified path, if exists
+     */
+    fun navigateToPath(path: String, rootFolderOnly: Boolean) {
+        if (path.isBlank() || path == File.separator) return
+        viewModelScope.launch {
+            path.split(File.separator).filterNot { it.isBlank() }.forEach { child ->
+                loadOfflineNodes()
+                uiState.value.offlineNodes.find { it.offlineNode.name == child }?.let {
+                    onItemClicked(it, rootFolderOnly)
+                } ?: return@forEach
+            }
+        }
     }
 
     private fun monitorConnectivity() {
@@ -303,6 +319,24 @@ class OfflineComposeViewModel @Inject constructor(
     fun onOpenFolderInPageEventConsumed() {
         _uiState.update {
             it.copy(openFolderInPageEvent = consumed())
+        }
+    }
+
+    /**
+     * Update title
+     */
+    fun updateTitle(title: String?) {
+        _uiState.update {
+            it.copy(title = title)
+        }
+    }
+
+    /**
+     * Update default title
+     */
+    fun updateDefaultTitle(defaultTitle: String) {
+        _uiState.update {
+            it.copy(defaultTitle = defaultTitle)
         }
     }
 }

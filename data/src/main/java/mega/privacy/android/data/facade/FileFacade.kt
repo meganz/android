@@ -13,6 +13,8 @@ import android.net.Uri
 import android.os.Build
 import android.os.Environment
 import android.os.StatFs
+import android.os.storage.StorageManager
+import android.os.storage.StorageVolume
 import android.provider.DocumentsContract
 import android.provider.MediaStore
 import android.provider.MediaStore.MediaColumns.DATA
@@ -43,10 +45,15 @@ import kotlinx.coroutines.isActive
 import kotlinx.coroutines.sync.Semaphore
 import kotlinx.coroutines.sync.withPermit
 import kotlinx.coroutines.withContext
+import mega.privacy.android.data.extensions.toUri
+import mega.privacy.android.data.gateway.DeviceGateway
 import mega.privacy.android.data.gateway.FileGateway
 import mega.privacy.android.data.mapper.file.DocumentFileMapper
+import mega.privacy.android.data.wrapper.DocumentFileWrapper
 import mega.privacy.android.domain.entity.document.DocumentEntity
 import mega.privacy.android.domain.entity.document.DocumentFolder
+import mega.privacy.android.domain.entity.document.DocumentMetadata
+import mega.privacy.android.domain.entity.file.FileStorageType
 import mega.privacy.android.domain.entity.uri.UriPath
 import mega.privacy.android.domain.exception.FileNotCreatedException
 import mega.privacy.android.domain.exception.NotEnoughStorageException
@@ -56,6 +63,7 @@ import java.io.File
 import java.io.FileNotFoundException
 import java.io.FileOutputStream
 import java.io.IOException
+import java.io.InputStream
 import java.util.Stack
 import javax.inject.Inject
 import kotlin.coroutines.coroutineContext
@@ -74,6 +82,8 @@ const val INTENT_EXTRA_NODE_HANDLE = "NODE_HANDLE"
 internal class FileFacade @Inject constructor(
     @ApplicationContext private val context: Context,
     private val documentFileMapper: DocumentFileMapper,
+    private val deviceGateway: DeviceGateway,
+    private val documentFileWrapper: DocumentFileWrapper,
 ) : FileGateway {
 
     override val localDCIMFolderPath: String
@@ -284,15 +294,18 @@ internal class FileFacade @Inject constructor(
         )
     }
 
-    override suspend fun getExternalPathByContentUri(contentUri: String): String? = run {
+    override suspend fun getExternalPathByContentUri(contentUri: String) =
+        getExternalPathByContentUriSync(contentUri)
+
+    override fun getExternalPathByContentUriSync(contentUri: String): String? = run {
+        val externalStorageDir = Environment.getExternalStorageDirectory().path
         contentUri
             .toUri()
             .lastPathSegment
             ?.split(":")
             ?.lastOrNull()
             ?.let {
-                Environment.getExternalStorageDirectory().path +
-                        "/" + it
+                if (it.contains(externalStorageDir)) it else "$externalStorageDir/$it"
             }
     }
 
@@ -350,7 +363,7 @@ internal class FileFacade @Inject constructor(
             if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q) {
                 put(
                     MediaStore.Images.Media.RELATIVE_PATH,
-                    "${Environment.DIRECTORY_PICTURES}/$PHOTO_DIR"
+                    "${Environment.DIRECTORY_DCIM}/$PHOTO_DIR"
                 )
             }
         }
@@ -366,7 +379,7 @@ internal class FileFacade @Inject constructor(
             if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q) {
                 put(
                     MediaStore.Video.Media.RELATIVE_PATH,
-                    "${Environment.DIRECTORY_MOVIES}/$PHOTO_DIR"
+                    "${Environment.DIRECTORY_DCIM}/$PHOTO_DIR"
                 )
             }
         }
@@ -375,7 +388,9 @@ internal class FileFacade @Inject constructor(
         return contentResolver.insert(MediaStore.Video.Media.EXTERNAL_CONTENT_URI, contentValues)
     }
 
-    override suspend fun isFileUri(uriString: String) = uriString.toUri().scheme == "file"
+    override suspend fun isFileUri(uriString: String) = isFileUri(uriString.toUri())
+
+    private fun isFileUri(uri: Uri) = uri.scheme == "file"
 
     override suspend fun isFilePath(path: String) = File(path).isFile
 
@@ -392,8 +407,12 @@ internal class FileFacade @Inject constructor(
             scheme == "content" && authority?.startsWith("com.android.externalstorage") == true
         }
 
-    override suspend fun getFileNameFromUri(uriString: String): String? {
-        val cursor = context.contentResolver.query(uriString.toUri(), null, null, null, null)
+    override suspend fun getFileNameFromUri(uriString: String): String? = with(uriString.toUri()) {
+        getDocumentFileFromUri(this)?.let { documentFile ->
+            return documentFile.name
+        }
+
+        val cursor = context.contentResolver.query(this, null, null, null, null)
         return cursor?.use {
             if (cursor.moveToFirst()) {
                 cursor.getColumnIndex(OpenableColumns.DISPLAY_NAME).takeIf { it >= 0 }
@@ -555,9 +574,13 @@ internal class FileFacade @Inject constructor(
         context.contentResolver.delete(uri, null, null) > 0
 
     override suspend fun getFilesInDocumentFolder(folder: UriPath): DocumentFolder {
-        val uri = Uri.parse(folder.value)
+        val uri = folder.toUri()
         val semaphore = Semaphore(10)
-        val document = DocumentFile.fromTreeUri(context, uri) ?: throw FileNotFoundException()
+        val document = if (isFileUri(uri)) {
+            DocumentFile.fromFile(uri.toFile())
+        } else {
+            DocumentFile.fromTreeUri(context, uri)
+        } ?: throw FileNotFoundException()
         val files = document.listFiles()
         val folders = files.filter { it.isDirectory }
         val countMap = coroutineScope {
@@ -602,8 +625,12 @@ internal class FileFacade @Inject constructor(
         // using stack to avoid recursive call and optimize memory usage
         val stack = Stack<DocumentFile>()
         val uri = Uri.parse(folder.value)
-        val document = DocumentFile.fromTreeUri(context, uri) ?: throw FileNotFoundException()
-        stack.addAll(document.listFiles().toList())
+        val document = if (isFileUri(folder.value)) {
+            DocumentFile.fromFile(Uri.parse(folder.value).toFile())
+        } else {
+            DocumentFile.fromTreeUri(context, uri)
+        } ?: throw FileNotFoundException()
+        stack.addAll(document.listFiles())
         val result = mutableListOf<DocumentEntity>()
         while (stack.isNotEmpty() && coroutineContext.isActive) {
             val file = stack.pop()
@@ -650,8 +677,7 @@ internal class FileFacade @Inject constructor(
         } else {
             val fileName = getFileNameIfHasNameCollision(destination, source.name)
             val fileNameWithoutExtension = fileName.substringBeforeLast(".")
-            val mimeType = MimeTypeMap.getSingleton().getMimeTypeFromExtension(source.extension)
-                ?: "application/octet-stream"
+            val mimeType = getMimeTypeFromExtension(source.extension)
             val newFile = destination.createFile(mimeType, fileNameWithoutExtension)
             newFile?.uri?.let { newUri ->
                 context.contentResolver.openOutputStream(newUri)?.use { output ->
@@ -672,10 +698,8 @@ internal class FileFacade @Inject constructor(
     ) {
         val fileName = getFileNameIfHasNameCollision(destination, name)
         val fileNameWithoutExtension = fileName.substringBeforeLast(".")
-        val extension = fileName.substringAfterLast(".", "")
         val mimeType = context.contentResolver.getType(source)
-            ?: MimeTypeMap.getSingleton().getMimeTypeFromExtension(extension)
-            ?: "application/octet-stream"
+            ?: getMimeTypeFromFileName(fileName)
         val newFile = destination.createFile(mimeType, fileNameWithoutExtension)
         newFile?.uri?.let { newUri ->
             context.contentResolver.openInputStream(source)?.use { input ->
@@ -720,20 +744,32 @@ internal class FileFacade @Inject constructor(
 
     override suspend fun getDocumentEntities(uris: List<Uri>): List<DocumentEntity> {
         return uris.mapNotNull { uri ->
-            if (DocumentsContract.isTreeUri(uri)) {
-                DocumentFile.fromTreeUri(context, uri)
-            } else {
-                DocumentFile.fromSingleUri(context, uri)
-            }?.let { it ->
-                val childFiles = if (it.isDirectory) it.listFiles() else emptyArray()
+            getDocumentFileFromUri(uri)?.let { doc ->
+                val childFiles = if (doc.isDirectory) doc.listFiles() else emptyArray()
                 documentFileMapper(
-                    file = it,
+                    file = doc,
                     numFiles = childFiles.count { it.isFile },
                     numFolders = childFiles.count { it.isDirectory },
                 )
             }
         }
     }
+
+    override fun getDocumentMetadataSync(uri: Uri): DocumentMetadata? =
+        getDocumentFileFromUri(uri)?.let { doc ->
+            DocumentMetadata(doc.name.orEmpty(), doc.isDirectory)
+        }
+
+    override fun getFolderChildUrisSync(uri: Uri): List<Uri> = runCatching {
+        getDocumentFileFromUri(uri)
+            ?.takeIf { it.isDirectory }
+            ?.listFiles()
+            ?.map { it.uri }
+            ?: emptyList()
+    }.getOrDefault(emptyList())
+
+    private fun getDocumentFileFromUri(uri: Uri): DocumentFile? =
+        documentFileWrapper.fromUri(uri)
 
     @RequiresPermission(android.Manifest.permission.MANAGE_EXTERNAL_STORAGE)
     override suspend fun getFileFromUri(uri: Uri): File? {
@@ -746,6 +782,21 @@ internal class FileFacade @Inject constructor(
         return null
     }
 
+    override fun getFileDescriptorSync(uriPath: UriPath, writePermission: Boolean) =
+        runCatching {
+            context.contentResolver.openFileDescriptor(
+                uriPath.toUri(),
+                if (writePermission) "rw" else "r"
+            )
+        }.onFailure {
+            Timber.w(it, "Error getting file descriptor for $uriPath")
+        }.getOrNull()
+
+    override suspend fun getFileDescriptor(
+        uriPath: UriPath,
+        writePermission: Boolean,
+    ) = getFileDescriptorSync(uriPath, writePermission)
+
     private fun getRealPathFromUri(context: Context, uri: Uri): String? {
         when {
             DocumentsContract.isDocumentUri(context, uri) -> {
@@ -753,7 +804,8 @@ internal class FileFacade @Inject constructor(
                     isExternalStorageUri() -> {
                         val docId = DocumentsContract.getDocumentId(uri)
                         val split = docId.split(":")
-                        return Environment.getExternalStorageDirectory().toString() + "/" + split[1]
+                        return Environment.getExternalStorageDirectory()
+                            .toString() + "/" + split[1]
                     }
 
                     isDownloadDocumentUri() -> {
@@ -803,11 +855,113 @@ internal class FileFacade @Inject constructor(
         return null
     }
 
+    override suspend fun getInputStream(uriPath: UriPath): InputStream? =
+        context.contentResolver.openInputStream(uriPath.toUri())
+
+    override suspend fun canReadUri(stringUri: String) =
+        getDocumentFileFromUri(Uri.parse(stringUri))?.canRead() == true
+
+    override fun childFileExistsSync(parentFolder: UriPath, childName: String): Boolean {
+        val parentDocumentFile = getDocumentFileFromUri(parentFolder.toUri())
+        return parentDocumentFile
+            ?.takeIf { it.isDirectory }
+            ?.listFiles()
+            ?.any { it.name == childName } == true
+    }
+
+    override fun createChildFileSync(
+        parentFolder: UriPath,
+        childName: String,
+        asFolder: Boolean,
+    ): UriPath? {
+        val parentDocumentFile = getDocumentFileFromUri(parentFolder.toUri())
+        return when {
+            parentDocumentFile?.isDirectory != true -> null
+            asFolder -> parentDocumentFile.createDirectory(childName)
+            else -> parentDocumentFile.createFile(getMimeTypeFromFileName(childName), childName)
+        }?.let {
+            UriPath(it.uri.toString())
+        }
+    }
+
+    override fun getParentSync(childUriPath: UriPath): UriPath? {
+        val childDocumentFile = getDocumentFileFromUri(childUriPath.toUri())
+        return childDocumentFile?.parentFile?.uri?.toString()?.let { UriPath(it) }
+    }
+
+    override fun deleteIfItIsAFileSync(uriPath: UriPath): Boolean {
+        val documentFile = getDocumentFileFromUri(uriPath.toUri())
+        return if (documentFile?.isFile == true) {
+            documentFile.delete()
+        } else {
+            false
+        }
+    }
+
+    override fun deleteIfItIsAnEmptyFolder(uriPath: UriPath): Boolean {
+        val documentFile = getDocumentFileFromUri(uriPath.toUri())
+        return if (documentFile?.isDirectory == true && documentFile.listFiles().isNullOrEmpty()) {
+            documentFile.delete()
+        } else {
+            false
+        }
+    }
+
+    override fun setLastModifiedSync(uriPath: UriPath, newTime: Long): Boolean =
+        updateFileMTime(uriPath, newTime) || updateDocumentFileMTime(uriPath, newTime)
+
+    private fun updateFileMTime(uriPath: UriPath, newTime: Long): Boolean =
+        runCatching {
+            setLastModifiedForFile(uriPath.value, newTime)
+                ?: getExternalPathByContentUriSync(uriPath.value)?.let {
+                    setLastModifiedForFile(it, newTime)
+                }
+        }.onFailure {
+            Timber.e(it, "Failed to update file mtime")
+        }.getOrDefault(false) == true
+
+    private fun setLastModifiedForFile(path: String, newTime: Long) =
+        File(path).takeIf { file -> file.exists() }?.setLastModified(newTime)
+
+    private fun updateDocumentFileMTime(uriPath: UriPath, newTime: Long): Boolean {
+        val contentValues = ContentValues().apply {
+            put(DocumentsContract.Document.COLUMN_LAST_MODIFIED, newTime)
+        }
+        val updateResult = runCatching {
+            context.contentResolver.update(
+                uriPath.toUri(),
+                contentValues,
+                null,
+                null
+            )
+        }.onFailure {
+            Timber.e(it, "Failed to update document file mtime")
+        }.getOrDefault(0)
+
+        return updateResult > 0
+    }
+
+    override fun renameFileSync(uriPath: UriPath, newName: String): UriPath? {
+        val documentFile = getDocumentFileFromUri(uriPath.toUri())
+        return if (documentFile?.renameTo(newName) == true) {
+            UriPath(documentFile.uri.toString())
+        } else {
+            null
+        }
+    }
+
     private fun isMediaDocumentUri() = "com.android.providers.media.documents"
 
     private fun isDownloadDocumentUri() = "com.android.providers.downloads.documents"
 
     private fun isExternalStorageUri() = "com.android.externalstorage.documents"
+
+    private fun getMimeTypeFromFileName(fileName: String) =
+        getMimeTypeFromExtension(fileName.substringAfterLast(".", ""))
+
+    private fun getMimeTypeFromExtension(extension: String) =
+        MimeTypeMap.getSingleton().getMimeTypeFromExtension(extension)
+            ?: "application/octet-stream"
 
     private fun getDataColumn(
         context: Context,
@@ -823,6 +977,59 @@ internal class FileFacade @Inject constructor(
             }
         }
         return null
+    }
+
+    @SuppressLint("NewApi")
+    override suspend fun getFileStorageTypeName(path: String?): FileStorageType {
+        val filePath = path ?: return FileStorageType.Unknown
+        // Check if the file is in the primary external storage (internal storage)
+        val primaryExternalStorage = Environment.getExternalStorageDirectory()
+        if (filePath.startsWith(primaryExternalStorage.absolutePath)) {
+            return FileStorageType.Internal(deviceGateway.getDeviceModel())
+        }
+        // Check if the file is on an SD card (removable storage)
+        val storageManager = context.getSystemService(StorageManager::class.java)
+        storageManager.storageVolumes.forEach { volume ->
+            if (volume.isRemovable) {
+                // For Android R (API 30) and above, use volume.directory
+                if (deviceGateway.getSdkVersionInt() >= Build.VERSION_CODES.R) {
+                    volume.directory?.absolutePath?.let { volumePath ->
+                        if (filePath.startsWith(volumePath)) {
+                            return FileStorageType.SdCard
+                        }
+                    }
+                } else {
+                    volume.uuid?.let { uuid ->
+                        val possiblePath = "/storage/$uuid"
+                        if (filePath.startsWith(possiblePath)) {
+                            return FileStorageType.SdCard
+                        }
+                    }
+                    // Additional fallback
+                    runCatching {
+                        val getPathMethod = StorageVolume::class.java.getMethod("getPath")
+                        val volumePath = getPathMethod.invoke(volume) as? String
+                        if (volumePath != null && filePath.startsWith(volumePath)) {
+                            return FileStorageType.SdCard
+                        }
+                    }
+                }
+            }
+        }
+        // Fallback for older devices: check common SD card paths
+        val possibleSdPaths = arrayOf(
+            Environment.getExternalStorageDirectory().path,
+            "/storage/sdcard1",
+            "/mnt/extSdCard",
+            "/storage/extSdCard",
+            "/storage/removable/sdcard1"
+        )
+        possibleSdPaths.forEach { path ->
+            if (filePath.startsWith(path)) {
+                return FileStorageType.SdCard
+            }
+        }
+        return FileStorageType.Unknown
     }
 
     private companion object {

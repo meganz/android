@@ -10,10 +10,11 @@ import androidx.compose.ui.semantics.semantics
 import androidx.compose.ui.semantics.testTagsAsResourceId
 import mega.privacy.android.app.mediaplayer.queue.model.MediaQueueItemType
 import mega.privacy.android.app.mediaplayer.queue.model.MediaQueueItemUiEntity
+import mega.privacy.android.domain.entity.node.NodeId
+import mega.privacy.android.domain.entity.node.thumbnail.ThumbnailRequest
 import mega.privacy.android.shared.original.core.ui.controls.lists.DragDropListView
 import mega.privacy.android.shared.original.core.ui.preview.CombinedThemePreviews
-import mega.privacy.android.domain.entity.node.NodeId
-import mega.privacy.android.shared.original.core.ui.theme.OriginalTempTheme
+import mega.privacy.android.shared.original.core.ui.theme.OriginalTheme
 
 @OptIn(ExperimentalComposeUiApi::class)
 @Composable
@@ -25,6 +26,7 @@ internal fun MediaQueueView(
     isSearchMode: Boolean,
     lazyListState: LazyListState,
     modifier: Modifier = Modifier,
+    isSelectMode: Boolean = false,
     indexOfDisabledItem: Int = -1,
     onClick: (index: Int, item: MediaQueueItemUiEntity) -> Unit = { _, _ -> },
     onDragFinished: () -> Unit = { },
@@ -49,7 +51,7 @@ internal fun MediaQueueView(
             name = item.nodeName,
             currentPlayingPosition = currentPlayingPosition,
             duration = item.duration,
-            thumbnailData = item.thumbnail,
+            thumbnailData = ThumbnailRequest(item.id),
             isHeaderVisible = isHeaderVisible,
             isFooterVisible = isFooterVisible,
             queueItemType = item.type,
@@ -57,6 +59,7 @@ internal fun MediaQueueView(
             isPaused = isPaused,
             isSelected = item.isSelected,
             isSearchMode = isSearchMode,
+            isSelectMode = isSelectMode,
             onClick = { onClick(index, item) }
         )
     }
@@ -65,7 +68,7 @@ internal fun MediaQueueView(
 @CombinedThemePreviews
 @Composable
 private fun MediaQueueViewPreview() {
-    OriginalTempTheme(isDark = isSystemInDarkTheme()) {
+    OriginalTheme(isDark = isSystemInDarkTheme()) {
         MediaQueueView(
             items = initPreviewData(),
             currentPlayingPosition = "00:00",
@@ -82,7 +85,7 @@ private fun MediaQueueViewPreview() {
 @CombinedThemePreviews
 @Composable
 private fun MediaQueueViewWithPausedPreview() {
-    OriginalTempTheme(isDark = isSystemInDarkTheme()) {
+    OriginalTheme(isDark = isSystemInDarkTheme()) {
         MediaQueueView(
             items = initPreviewData(),
             currentPlayingPosition = "00:00",

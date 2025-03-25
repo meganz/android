@@ -11,7 +11,6 @@ import kotlinx.coroutines.test.UnconfinedTestDispatcher
 import kotlinx.coroutines.test.advanceUntilIdle
 import kotlinx.coroutines.test.runTest
 import mega.privacy.android.app.presentation.avatar.mapper.AvatarContentMapper
-import mega.privacy.android.app.presentation.manager.UserInfoViewModel
 import mega.privacy.android.core.test.extension.CoroutineMainDispatcherExtension
 import mega.privacy.android.domain.entity.user.UserChanges
 import mega.privacy.android.domain.entity.user.UserUpdate
@@ -21,6 +20,7 @@ import mega.privacy.android.domain.usecase.MonitorContactCacheUpdates
 import mega.privacy.android.domain.usecase.MonitorMyAvatarFile
 import mega.privacy.android.domain.usecase.MonitorUserUpdates
 import mega.privacy.android.domain.usecase.account.UpdateMyAvatarWithNewEmail
+import mega.privacy.android.domain.usecase.achievements.GetAccountAchievementsOverviewUseCase
 import mega.privacy.android.domain.usecase.avatar.GetMyAvatarFileUseCase
 import mega.privacy.android.domain.usecase.contact.GetCurrentUserEmail
 import mega.privacy.android.domain.usecase.contact.ReloadContactDatabase
@@ -64,6 +64,8 @@ internal class UserInfoViewModelTest {
     private val getMyAvatarFileUseCase: GetMyAvatarFileUseCase = mock()
     private val monitorMyAvatarFile: MonitorMyAvatarFile = mock()
     private val checkPasswordReminderUseCase: CheckPasswordReminderUseCase = mock()
+    private val getAccountAchievementsOverviewUseCase: GetAccountAchievementsOverviewUseCase =
+        mock()
 
     @BeforeAll
     fun setUp() {
@@ -84,7 +86,8 @@ internal class UserInfoViewModelTest {
             getMyAvatarColorUseCase = getMyAvatarColorUseCase,
             getMyAvatarFileUseCase = getMyAvatarFileUseCase,
             monitorMyAvatarFile = monitorMyAvatarFile,
-            checkPasswordReminderUseCase = checkPasswordReminderUseCase
+            checkPasswordReminderUseCase = checkPasswordReminderUseCase,
+            getAccountAchievementsOverviewUseCase = getAccountAchievementsOverviewUseCase
         )
     }
 
@@ -99,7 +102,8 @@ internal class UserInfoViewModelTest {
             reloadContactDatabase,
             getMyAvatarFileUseCase,
             monitorMyAvatarFile,
-            checkPasswordReminderUseCase
+            checkPasswordReminderUseCase,
+            getAccountAchievementsOverviewUseCase
         )
     }
 
@@ -200,6 +204,14 @@ internal class UserInfoViewModelTest {
             underTest.state.test {
                 Truth.assertThat(awaitItem().isTestPasswordRequired).isEqualTo(false)
             }
+        }
+
+    @Test
+    fun `test that getAccountAchievementsOverviewUseCase is called when call getUserAchievements`() =
+        runTest {
+            underTest.getUserAchievements()
+            testScheduler.advanceUntilIdle()
+            verify(getAccountAchievementsOverviewUseCase).invoke()
         }
 
     companion object {

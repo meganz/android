@@ -34,17 +34,16 @@ import com.google.android.material.snackbar.BaseTransientBottomBar.LENGTH_LONG
 import com.google.android.material.snackbar.Snackbar
 import com.google.android.material.snackbar.Snackbar.SnackbarLayout
 import dagger.hilt.android.AndroidEntryPoint
-import kotlinx.coroutines.flow.filter
+import kotlinx.coroutines.flow.distinctUntilChanged
+import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.runBlocking
 import mega.privacy.android.analytics.Analytics
 import mega.privacy.android.app.activities.settingsActivities.FileManagementPreferencesActivity
 import mega.privacy.android.app.arch.extensions.collectFlow
-import mega.privacy.android.app.components.saver.AutoPlayInfo
 import mega.privacy.android.app.constants.BroadcastConstants
 import mega.privacy.android.app.databinding.TransferOverquotaLayoutBinding
 import mega.privacy.android.app.globalmanagement.MyAccountInfo
-import mega.privacy.android.app.globalmanagement.TransfersManagement
 import mega.privacy.android.app.interfaces.ActivityLauncher
 import mega.privacy.android.app.interfaces.PermissionRequester
 import mega.privacy.android.app.interfaces.SnackbarShower
@@ -52,14 +51,14 @@ import mega.privacy.android.app.listeners.ChatLogoutListener
 import mega.privacy.android.app.main.ManagerActivity
 import mega.privacy.android.app.meeting.activity.MeetingActivity
 import mega.privacy.android.app.myAccount.MyAccountActivity
-import mega.privacy.android.app.presentation.advertisements.AdsViewModel
 import mega.privacy.android.app.presentation.base.BaseViewModel
 import mega.privacy.android.app.presentation.billing.BillingViewModel
+import mega.privacy.android.app.presentation.container.AppContainerWrapper
 import mega.privacy.android.app.presentation.locale.SupportedLanguageContextWrapper
 import mega.privacy.android.app.presentation.login.LoginActivity
+import mega.privacy.android.app.presentation.transfers.TransfersManagementViewModel
 import mega.privacy.android.app.presentation.verification.SMSVerificationActivity
 import mega.privacy.android.app.presentation.weakaccountprotection.WeakAccountProtectionAlertActivity
-import mega.privacy.android.app.psa.PsaWebBrowser
 import mega.privacy.android.app.service.iar.RatingHandlerImpl
 import mega.privacy.android.app.snackbarListeners.SnackbarNavigateOption
 import mega.privacy.android.app.usecase.exception.NotEnoughQuotaMegaException
@@ -67,7 +66,6 @@ import mega.privacy.android.app.usecase.exception.QuotaExceededMegaException
 import mega.privacy.android.app.utils.AlertDialogUtil.dismissAlertDialogIfExists
 import mega.privacy.android.app.utils.AlertDialogUtil.isAlertDialogShown
 import mega.privacy.android.app.utils.AlertsAndWarnings.showForeignStorageOverQuotaWarningDialog
-import mega.privacy.android.app.utils.AlertsAndWarnings.showResumeTransfersWarning
 import mega.privacy.android.app.utils.ColorUtils.setStatusBarTextColor
 import mega.privacy.android.app.utils.Constants.ACTION_OVERQUOTA_STORAGE
 import mega.privacy.android.app.utils.Constants.ACTION_PRE_OVERQUOTA_STORAGE
@@ -87,7 +85,6 @@ import mega.privacy.android.app.utils.Constants.PERMISSIONS_TYPE
 import mega.privacy.android.app.utils.Constants.SENT_REQUESTS_TYPE
 import mega.privacy.android.app.utils.Constants.SNACKBAR_TYPE
 import mega.privacy.android.app.utils.Constants.VISIBLE_FRAGMENT
-import mega.privacy.android.app.utils.MegaNodeUtil.autoPlayNode
 import mega.privacy.android.app.utils.TextUtil
 import mega.privacy.android.app.utils.TimeUtils
 import mega.privacy.android.app.utils.Util
@@ -104,14 +101,12 @@ import mega.privacy.android.domain.entity.account.AccountBlockedType
 import mega.privacy.android.domain.entity.account.Skus
 import mega.privacy.android.domain.entity.billing.BillingEvent
 import mega.privacy.android.domain.entity.billing.MegaPurchase
-import mega.privacy.android.domain.entity.psa.Psa
 import mega.privacy.android.domain.exception.node.ForeignNodeException
 import mega.privacy.android.domain.usecase.GetAccountDetailsUseCase
 import mega.privacy.android.domain.usecase.MonitorChatSignalPresenceUseCase
 import mega.privacy.android.domain.usecase.ResetSdkLoggerUseCase
 import mega.privacy.android.domain.usecase.login.GetAccountCredentialsUseCase
 import mega.privacy.android.domain.usecase.login.SaveAccountCredentialsUseCase
-import mega.privacy.android.domain.usecase.psa.FetchPsaUseCase
 import mega.privacy.android.domain.usecase.setting.MonitorCookieSettingsSavedUseCase
 import mega.privacy.android.domain.usecase.transfers.overquota.MonitorTransferOverQuotaUseCase
 import mega.privacy.android.domain.usecase.transfers.paused.PauseTransfersQueueUseCase
@@ -135,15 +130,11 @@ import kotlin.time.Duration.Companion.seconds
  * @property megaChatApi                    [MegaChatApiAndroid]
  * @property dbH                            [DatabaseHandler]
  * @property myAccountInfo                  [MyAccountInfo]
- * @property transfersManagement            [TransfersManagement]
  * @property app                            [MegaApplication]
  * @property outMetrics                     [DisplayMetrics]
- * @property isResumeTransfersWarningShown  True if the warning should be shown, false otherwise.
- * @property resumeTransfersWarning         [AlertDialog] for paused transfers.
  * @property getAccountDetailsUseCase
  * @property billingViewModel
  * @property monitorTransferOverQuotaUseCase
- * @property fetchPsaUseCase
  * @property pauseTransfersQueueUseCase
  */
 @AndroidEntryPoint
@@ -168,9 +159,6 @@ abstract class BaseActivity : AppCompatActivity(), ActivityLauncher, PermissionR
     lateinit var myAccountInfo: MyAccountInfo
 
     @Inject
-    lateinit var transfersManagement: TransfersManagement
-
-    @Inject
     lateinit var resetSdkLoggerUseCase: ResetSdkLoggerUseCase
 
     @Inject
@@ -181,9 +169,6 @@ abstract class BaseActivity : AppCompatActivity(), ActivityLauncher, PermissionR
 
     @Inject
     lateinit var monitorCookieSettingsSavedUseCase: MonitorCookieSettingsSavedUseCase
-
-    @Inject
-    lateinit var fetchPsaUseCase: FetchPsaUseCase
 
     @Inject
     lateinit var getAccountCredentialsUseCase: GetAccountCredentialsUseCase
@@ -201,9 +186,15 @@ abstract class BaseActivity : AppCompatActivity(), ActivityLauncher, PermissionR
     @Inject
     lateinit var pauseTransfersQueueUseCase: PauseTransfersQueueUseCase
 
-    protected val billingViewModel by viewModels<BillingViewModel>()
-    protected val adsViewModel: AdsViewModel by viewModels()
+    /**
+     * Psa handler
+     */
+    @Inject
+    lateinit var appContainerWrapper: AppContainerWrapper
+
+    private val billingViewModel by viewModels<BillingViewModel>()
     private val viewModel by viewModels<BaseViewModel>()
+    protected val transfersManagementViewModel: TransfersManagementViewModel by viewModels()
 
     @JvmField
     protected var app: MegaApplication = MegaApplication.getInstance()
@@ -219,12 +210,9 @@ abstract class BaseActivity : AppCompatActivity(), ActivityLauncher, PermissionR
     private var activeSubscriptionSku: String? = null
     private var expiredBusinessAlert: AlertDialog? = null
     private var isExpiredBusinessAlertShown = false
-    private var psaWebBrowserContainer: FrameLayout? = null
     private val uiHandler = Handler(Looper.getMainLooper())
 
     protected val outMetrics: DisplayMetrics by lazy { resources.displayMetrics }
-    var isResumeTransfersWarningShown = false
-    var resumeTransfersWarning: AlertDialog? = null
 
     //Indicates when the activity should finish due to some error
     private var finishActivityAtError = false
@@ -246,21 +234,6 @@ abstract class BaseActivity : AppCompatActivity(), ActivityLauncher, PermissionR
         private set
 
     /**
-     * Contains the info of a node that to be opened in-app.
-     */
-    private var autoPlayInfo: AutoPlayInfo? = null
-
-    /**
-     * Load the psa in the web browser fragment if the psa is a web one and this activity
-     * is on the top of the task stack
-     */
-    open fun handlePsa(psa: Psa) {
-        if (psa.url != null && Util.isTopActivity(javaClass.name, this)) {
-            loadPsaInWebBrowser(psa)
-        }
-    }
-
-    /**
      * Checks if the current activity is in background.
      *
      * @return True if the current activity is in background, false otherwise.
@@ -275,13 +248,6 @@ abstract class BaseActivity : AppCompatActivity(), ActivityLauncher, PermissionR
      */
     protected val isActivityInForeground: Boolean
         get() = !isActivityInBackground
-
-    /**
-     * Every sub-class activity has an embedded PsaWebBrowser fragment, either visible or invisible.
-     * In order to show the newly retrieved PSA at any occasion
-     */
-    protected val psaWebBrowser: PsaWebBrowser?
-        get() = supportFragmentManager.findFragmentById(R.id.psa_web_browser_container) as? PsaWebBrowser
 
     /**
      * Broadcast receiver to manage a possible SSL verification error.
@@ -328,30 +294,6 @@ abstract class BaseActivity : AppCompatActivity(), ActivityLauncher, PermissionR
         }
     }
 
-    /**
-     * Broadcast to show a warning when it tries to upload files to a chat conversation
-     * and the transfers are paused.
-     */
-    @Deprecated("Use StartTransferComponent Composable instead")
-    private val resumeTransfersReceiver: BroadcastReceiver = object : BroadcastReceiver() {
-        override fun onReceive(context: Context?, intent: Intent?) {
-            if (intent?.action != BroadcastConstants.BROADCAST_ACTION_RESUME_TRANSFERS
-                || isResumeTransfersWarningShown || isActivityInBackground
-            ) return
-
-            transfersManagement.hasResumeTransfersWarningAlreadyBeenShown = true
-            showResumeTransfersWarning(this@BaseActivity) {
-                lifecycleScope.launch {
-                    runCatching {
-                        pauseTransfersQueueUseCase(false)
-                    }.onFailure {
-                        Timber.e(it)
-                    }
-                }
-            }
-        }
-    }
-
     private val onBackPressedCallback = object : OnBackPressedCallback(true) {
         override fun handleOnBackPressed() {
             handleGoBack()
@@ -367,7 +309,6 @@ abstract class BaseActivity : AppCompatActivity(), ActivityLauncher, PermissionR
             if (it is BillingEvent.OnPurchaseUpdate) {
                 onPurchasesUpdated(it.purchases, it.activeSubscription)
                 billingViewModel.markHandleBillingEvent()
-                adsViewModel.disableAdsFeature()
             }
         }
 
@@ -407,11 +348,6 @@ abstract class BaseActivity : AppCompatActivity(), ActivityLauncher, PermissionR
             IntentFilter(BroadcastConstants.BROADCAST_ACTION_SHOW_SNACKBAR)
         )
 
-        registerReceiver(
-            resumeTransfersReceiver,
-            IntentFilter(BroadcastConstants.BROADCAST_ACTION_RESUME_TRANSFERS)
-        )
-
         collectFlow(monitorCookieSettingsSavedUseCase()) {
             val view = window.decorView.findViewById<View>(android.R.id.content)
             if (view != null) {
@@ -422,11 +358,11 @@ abstract class BaseActivity : AppCompatActivity(), ActivityLauncher, PermissionR
             }
         }
 
-        collectFlow(monitorTransferOverQuotaUseCase().filter { it }) { isCurrentOverQuota ->
-            if (transfersManagement.shouldShowTransferOverQuotaWarning()) {
-                transfersManagement.isCurrentTransferOverQuota = isCurrentOverQuota
-                transfersManagement.setTransferOverQuotaTimestamp()
+        collectFlow(transfersManagementViewModel.state.map { it.transferOverQuotaWarning }
+            .distinctUntilChanged()) { isTransferOverQuotaWarning ->
+            if (isTransferOverQuotaWarning) {
                 showGeneralTransferOverQuotaWarning()
+                transfersManagementViewModel.onTransferOverQuotaWarningConsumed()
             }
         }
 
@@ -446,18 +382,6 @@ abstract class BaseActivity : AppCompatActivity(), ActivityLauncher, PermissionR
                 showGeneralTransferOverQuotaWarning()
             }
 
-            isResumeTransfersWarningShown = getBoolean(
-                RESUME_TRANSFERS_WARNING_SHOWN, false
-            )
-
-            if (isResumeTransfersWarningShown) {
-                showResumeTransfersWarning(this@BaseActivity) {
-                    lifecycleScope.launch {
-                        pauseTransfersQueueUseCase(false)
-                    }
-                }
-            }
-
             if (getBoolean(SET_DOWNLOAD_LOCATION_SHOWN, false)) {
                 confirmationChecked = getBoolean(IS_CONFIRMATION_CHECKED, false)
                 showConfirmationSaveInSameLocation(getString(DOWNLOAD_LOCATION))
@@ -475,10 +399,6 @@ abstract class BaseActivity : AppCompatActivity(), ActivityLauncher, PermissionR
             }
         }
 
-        // Add an invisible full screen Psa web browser container to the activity.
-        addPsaWebBrowser()
-
-
         if (shouldSetStatusBarTextColor()) {
             setStatusBarTextColor(this)
         }
@@ -492,50 +412,11 @@ abstract class BaseActivity : AppCompatActivity(), ActivityLauncher, PermissionR
      */
     protected open fun shouldSetStatusBarTextColor(): Boolean = true
 
-    /**
-     * Create a fragment container and the web browser fragment, add them to the activity
-     */
-    private fun addPsaWebBrowser() {
-        // Execute after the sub-class activity finish its setContentView()
-        uiHandler.post {
-            psaWebBrowserContainer = FrameLayout(this@BaseActivity)
-            (psaWebBrowserContainer ?: return@post).id = R.id.psa_web_browser_container
-
-            findViewById<ViewGroup>(android.R.id.content)
-                .addView(
-                    psaWebBrowserContainer,
-                    ViewGroup.LayoutParams(
-                        ViewGroup.LayoutParams.MATCH_PARENT,
-                        ViewGroup.LayoutParams.MATCH_PARENT
-                    )
-                )
-        }
-    }
-
-    /**
-     * Add fragment and Display the new url PSA in the web browser
-     *
-     * @param psa the psa to display
-     */
-    private fun loadPsaInWebBrowser(psa: Psa) {
-        if (psaWebBrowserContainer == null || psa.url.isNullOrEmpty()) return
-        // Don't put the fragment to the back stack. Since pressing back key just hide it,
-        // never pop it up. onBackPressed() will let PSA browser to consume the back
-        // key event anyway
-        supportFragmentManager
-            .beginTransaction()
-            .replace(
-                R.id.psa_web_browser_container,
-                PsaWebBrowser.newInstance(psa.url.orEmpty(), psa.id)
-            )
-            .commitAllowingStateLoss()
-    }
 
     override fun onSaveInstanceState(outState: Bundle) {
         outState.apply {
             putBoolean(EXPIRED_BUSINESS_ALERT_SHOWN, isExpiredBusinessAlertShown)
             putBoolean(TRANSFER_OVER_QUOTA_WARNING_SHOWN, isGeneralTransferOverQuotaWarningShown)
-            putBoolean(RESUME_TRANSFERS_WARNING_SHOWN, isResumeTransfersWarningShown)
             putBoolean(SET_DOWNLOAD_LOCATION_SHOWN, isAlertDialogShown(setDownloadLocationDialog))
             putBoolean(IS_CONFIRMATION_CHECKED, confirmationChecked)
             putString(DOWNLOAD_LOCATION, downloadLocation)
@@ -556,21 +437,6 @@ abstract class BaseActivity : AppCompatActivity(), ActivityLauncher, PermissionR
         Util.setAppFontSize(this)
         isActivityInBackground = false
         retryConnectionsAndSignalPresence()
-        fetchPsa()
-    }
-
-    /**
-     * Fetch psa
-     *
-     */
-    fun fetchPsa() {
-        lifecycleScope.launch {
-            kotlin.runCatching { fetchPsaUseCase(System.currentTimeMillis()) }
-                .onFailure { Timber.e(it) }
-                .getOrNull()?.let {
-                    handlePsa(it)
-                }
-        }
     }
 
     override fun attachBaseContext(newBase: Context?) {
@@ -582,28 +448,11 @@ abstract class BaseActivity : AppCompatActivity(), ActivityLauncher, PermissionR
         unregisterReceiver(sslErrorReceiver)
         unregisterReceiver(takenDownFilesReceiver)
         unregisterReceiver(showSnackbarReceiver)
-        unregisterReceiver(resumeTransfersReceiver)
         dismissAlertDialogIfExists(transferGeneralOverQuotaWarning)
         dismissAlertDialogIfExists(transferGeneralOverQuotaWarning)
-        dismissAlertDialogIfExists(resumeTransfersWarning)
         dismissAlertDialogIfExists(setDownloadLocationDialog)
         dismissAlertDialogIfExists(upgradeAlert)
         super.onDestroy()
-    }
-
-    /**
-     * Open the downloaded file.
-     */
-    private fun openDownloadedFile() {
-        autoPlayNode(
-            context = this@BaseActivity,
-            autoPlayInfo = autoPlayInfo ?: return,
-            activityLauncher = this@BaseActivity,
-            snackbarShower = this@BaseActivity,
-            coroutineScope = lifecycleScope
-        )
-
-        autoPlayInfo = null
     }
 
     /**
@@ -807,6 +656,7 @@ abstract class BaseActivity : AppCompatActivity(), ActivityLauncher, PermissionR
      *                      If the value is -1 (MEGACHAT_INVALID_HANDLE) the function ends in chats list view.
      * @param userEmail     Email of the user to be invited.
      * @param forceDarkMode True if want to force to display the snackbar like in dark mode or False otherwise
+     * @param action        To perform when the snackbar action is clicked.
      */
     fun showSnackbar(
         type: Int,
@@ -816,6 +666,7 @@ abstract class BaseActivity : AppCompatActivity(), ActivityLauncher, PermissionR
         idChat: Long = MEGACHAT_INVALID_HANDLE,
         userEmail: String? = null,
         forceDarkMode: Boolean = false,
+        action: () -> Unit = {},
     ) {
         Timber.d("Show snackbar: %s", s)
         snackbar = try {
@@ -926,7 +777,7 @@ abstract class BaseActivity : AppCompatActivity(), ActivityLauncher, PermissionR
                 }
 
                 OPEN_FILE_SNACKBAR_TYPE -> {
-                    setAction(getString(R.string.general_confirmation_open)) { openDownloadedFile() }
+                    setAction(getString(R.string.general_confirmation_open)) { action() }
                     show()
                 }
 
@@ -980,13 +831,24 @@ abstract class BaseActivity : AppCompatActivity(), ActivityLauncher, PermissionR
             return
         }
 
+        val isProFlexiAccount =
+            myAccountInfo.accountType == MegaAccountDetails.ACCOUNT_TYPE_PRO_FLEXI
+
         val builder =
             MaterialAlertDialogBuilder(this, R.style.ThemeOverlay_Mega_MaterialAlertDialog)
                 .apply {
-                    setTitle(R.string.account_business_account_deactivated_dialog_title)
+                    setTitle(
+                        if (isProFlexiAccount) {
+                            sharedR.string.account_pro_flexi_account_deactivated_dialog_title
+                        } else {
+                            R.string.account_business_account_deactivated_dialog_title
+                        }
+                    )
                     setMessage(
                         if (megaApi.isMasterBusinessAccount) {
                             R.string.account_business_account_deactivated_dialog_admin_body
+                        } else if (isProFlexiAccount) {
+                            sharedR.string.account_pro_flexi_account_deactivated_dialog_body
                         } else {
                             R.string.account_business_account_deactivated_dialog_sub_user_body
                         }
@@ -1089,7 +951,7 @@ abstract class BaseActivity : AppCompatActivity(), ActivityLauncher, PermissionR
      * Shows a warning indicating transfer over quota occurred.
      */
     fun showGeneralTransferOverQuotaWarning() = lifecycleScope.launch {
-        if (isActivityInBackground || transfersManagement.isOnTransfersSection || transferGeneralOverQuotaWarning != null) return@launch
+        if (isActivityInBackground || transfersManagementViewModel.isInTransfersSection() || transferGeneralOverQuotaWarning != null) return@launch
         val builder =
             MaterialAlertDialogBuilder(
                 this@BaseActivity,
@@ -1100,13 +962,13 @@ abstract class BaseActivity : AppCompatActivity(), ActivityLauncher, PermissionR
             .setOnDismissListener {
                 isGeneralTransferOverQuotaWarningShown = false
                 transferGeneralOverQuotaWarning = null
-                transfersManagement.resetTransferOverQuotaTimestamp()
+                transfersManagementViewModel.resetTransferOverQuotaTimestamp()
             }
             .setCancelable(false)
         transferGeneralOverQuotaWarning = builder.create()
         transferGeneralOverQuotaWarning?.setCanceledOnTouchOutside(false)
         val stringResource =
-            if (transfersManagement.isCurrentTransferOverQuota) R.string.current_text_depleted_transfer_overquota else R.string.text_depleted_transfer_overquota
+            if (transfersManagementViewModel.isTransferOverQuota()) R.string.current_text_depleted_transfer_overquota else R.string.text_depleted_transfer_overquota
         binding.textTransferOverquota.text = getString(
             stringResource, TimeUtils.getHumanizedTime(megaApi.bandwidthOverquotaDelay)
         )
@@ -1118,7 +980,7 @@ abstract class BaseActivity : AppCompatActivity(), ActivityLauncher, PermissionR
                     myAccountInfo.accountType == MegaAccountDetails.ACCOUNT_TYPE_FREE
                 getString(if (isFreeAccount) sharedR.string.general_upgrade_button else R.string.plans_depleted_transfer_overquota)
             } else {
-                getString(R.string.login_text)
+                getString(sharedR.string.login_text)
             }
             setOnClickListener {
                 transferGeneralOverQuotaWarning?.dismiss()
@@ -1268,14 +1130,6 @@ abstract class BaseActivity : AppCompatActivity(), ActivityLauncher, PermissionR
         requestPermission(this, requestCode, *permissions)
     }
 
-    /**
-     * Initializes billing manager.
-     */
-    protected fun preloadPayment() {
-        billingViewModel.loadSkus()
-        billingViewModel.loadPurchases()
-    }
-
     private fun onPurchasesUpdated(
         purchases: List<MegaPurchase>,
         activeSubscription: MegaPurchase?,
@@ -1319,6 +1173,11 @@ abstract class BaseActivity : AppCompatActivity(), ActivityLauncher, PermissionR
     override fun showSnackbar(type: Int, content: String?, chatId: Long) {
         val rootView = Util.getRootViewFromContext(this)
         showSnackbar(type = type, view = rootView, s = content, idChat = chatId)
+    }
+
+    override fun showSnackbar(type: Int, content: String, action: () -> Unit) {
+        val rootView = Util.getRootViewFromContext(this)
+        showSnackbar(type = type, view = rootView, s = content, action = action)
     }
 
     /**
@@ -1520,7 +1379,6 @@ abstract class BaseActivity : AppCompatActivity(), ActivityLauncher, PermissionR
     companion object {
         private const val EXPIRED_BUSINESS_ALERT_SHOWN = "EXPIRED_BUSINESS_ALERT_SHOWN"
         private const val TRANSFER_OVER_QUOTA_WARNING_SHOWN = "TRANSFER_OVER_QUOTA_WARNING_SHOWN"
-        private const val RESUME_TRANSFERS_WARNING_SHOWN = "RESUME_TRANSFERS_WARNING_SHOWN"
         private const val SET_DOWNLOAD_LOCATION_SHOWN = "SET_DOWNLOAD_LOCATION_SHOWN"
         private const val IS_CONFIRMATION_CHECKED = "IS_CONFIRMATION_CHECKED"
         private const val DOWNLOAD_LOCATION = "DOWNLOAD_LOCATION"

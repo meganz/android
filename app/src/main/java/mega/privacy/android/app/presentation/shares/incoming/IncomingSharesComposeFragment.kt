@@ -1,9 +1,9 @@
 package mega.privacy.android.app.presentation.shares.incoming
 
+import mega.privacy.android.icon.pack.R as iconPackR
 import mega.privacy.android.shared.resources.R as sharedR
 import android.content.Context
 import android.content.Intent
-import android.content.res.Configuration
 import android.net.Uri
 import android.os.Bundle
 import android.view.LayoutInflater
@@ -50,12 +50,12 @@ import mega.privacy.android.app.presentation.bottomsheet.NodeOptionsBottomSheetD
 import mega.privacy.android.app.presentation.clouddrive.OptionItems
 import mega.privacy.android.app.presentation.data.NodeUIItem
 import mega.privacy.android.app.presentation.extensions.isDarkMode
-import mega.privacy.android.app.presentation.manager.model.SharesTab
 import mega.privacy.android.app.presentation.mapper.GetOptionsForToolbarMapper
 import mega.privacy.android.app.presentation.mapper.OptionsItemInfo
 import mega.privacy.android.app.presentation.node.NodeActionsViewModel
 import mega.privacy.android.app.presentation.node.action.HandleNodeAction
 import mega.privacy.android.app.presentation.node.dialogs.leaveshare.LeaveShareDialog
+import mega.privacy.android.app.presentation.settings.model.StorageTargetPreference
 import mega.privacy.android.app.presentation.shares.SharesActionListener
 import mega.privacy.android.app.presentation.shares.incoming.ui.IncomingSharesView
 import mega.privacy.android.app.presentation.snackbar.LegacySnackBarWrapper
@@ -73,7 +73,8 @@ import mega.privacy.android.domain.entity.node.TypedFolderNode
 import mega.privacy.android.domain.entity.node.shares.ShareNode
 import mega.privacy.android.domain.entity.shares.AccessPermission
 import mega.privacy.android.domain.usecase.GetThemeMode
-import mega.privacy.android.shared.original.core.ui.theme.OriginalTempTheme
+import mega.privacy.android.navigation.MegaNavigator
+import mega.privacy.android.shared.original.core.ui.theme.OriginalTheme
 import mega.privacy.android.shared.original.core.ui.utils.showAutoDurationSnackbar
 import timber.log.Timber
 import javax.inject.Inject
@@ -119,15 +120,20 @@ class IncomingSharesComposeFragment : Fragment() {
     @Inject
     lateinit var fileTypeIconMapper: FileTypeIconMapper
 
+    /**
+     * Mega navigator
+     */
+    @Inject
+    lateinit var megaNavigator: MegaNavigator
+
     private val viewModel: IncomingSharesComposeViewModel by activityViewModels()
     private val nodeActionsViewModel: NodeActionsViewModel by viewModels()
     private val sortByHeaderViewModel: SortByHeaderViewModel by activityViewModels()
 
     /**
-     * Flag to restore elevation when checkScroll() is called
-     * This should be removed when the Links tabs page is refactored to Compose
+     * Toggle the elevation of the app bar
      */
-    private var appBarElevationEnabled = false
+    var toggleAppBarElevation: (Boolean) -> Unit = {}
 
     /**
      * onAttach
@@ -172,7 +178,7 @@ class IncomingSharesComposeFragment : Fragment() {
                 var clickedFile: TypedFileNode? by remember {
                     mutableStateOf(null)
                 }
-                OriginalTempTheme(isDark = themeMode.isDarkMode()) {
+                OriginalTheme(isDark = themeMode.isDarkMode()) {
                     IncomingSharesView(
                         uiState = uiState,
                         emptyState = getEmptyFolderDrawable(uiState.isIncomingSharesEmpty),
@@ -218,7 +224,7 @@ class IncomingSharesComposeFragment : Fragment() {
                         onSortOrderClick = { showSortByPanel() },
                         onChangeViewTypeClick = viewModel::onChangeViewTypeClicked,
                         onLinkClicked = ::navigateToLink,
-                        onToggleAppBarElevation = ::toggleAppBarElevation,
+                        onToggleAppBarElevation = toggleAppBarElevation,
                         fileTypeIconMapper = fileTypeIconMapper,
                     )
 
@@ -238,6 +244,12 @@ class IncomingSharesComposeFragment : Fragment() {
                             disableSelectMode()
                         },
                         snackBarHostState = snackbarHostState,
+                        navigateToStorageSettings = {
+                            megaNavigator.openSettings(
+                                requireActivity(),
+                                StorageTargetPreference
+                            )
+                        },
                     )
                     EventEffect(
                         event = nodeActionState.downloadEvent,
@@ -250,7 +262,6 @@ class IncomingSharesComposeFragment : Fragment() {
                     if (!uiState.isInRootLevel) {
                         toggleAppBarElevation(false)
                     }
-                    hideTabs(!uiState.isInRootLevel)
                 }
                 LaunchedEffect(uiState.nodesList.isEmpty()) {
                     sharesActionListener?.updateSharesPageToolbarTitleAndFAB(
@@ -285,38 +296,6 @@ class IncomingSharesComposeFragment : Fragment() {
                 IncomingSharesExitEffect(uiState.exitIncomingSharesEvent) {
                     viewModel.consumeExitIncomingSharesEvent()
                 }
-            }
-        }
-    }
-
-    /**
-     * Display the elevation of the app bar or not
-     */
-    private fun toggleAppBarElevation(withElevation: Boolean) {
-        appBarElevationEnabled = withElevation
-        (activity as? ManagerActivity)?.changeAppBarElevation(withElevation)
-    }
-
-    /**
-     * Hide/Show shares tab
-     *
-     * @param hide true if needs to hide shares tabs
-     */
-    private fun hideTabs(hide: Boolean) {
-        (activity as ManagerActivity?)?.hideTabs(hide, SharesTab.INCOMING_TAB)
-    }
-
-    /**
-     * Check elevation
-     *
-     * @param allowDisable true if allowed to disable elevation
-     */
-    fun checkScroll(allowDisable: Boolean = false) {
-        if (appBarElevationEnabled) {
-            toggleAppBarElevation(true)
-        } else {
-            if (allowDisable) {
-                toggleAppBarElevation(false)
             }
         }
     }
@@ -425,21 +404,9 @@ class IncomingSharesComposeFragment : Fragment() {
      */
     private fun getEmptyFolderDrawable(isPageEmpty: Boolean): Pair<Int, Int> {
         return if (isPageEmpty) {
-            Pair(
-                if (requireActivity().resources.configuration.orientation == Configuration.ORIENTATION_LANDSCAPE) {
-                    R.drawable.incoming_shares_empty
-                } else {
-                    R.drawable.incoming_empty_landscape
-                }, R.string.context_empty_incoming
-            )
+            Pair(iconPackR.drawable.ic_folder_arrow_up_glass, R.string.context_empty_incoming)
         } else {
-            Pair(
-                if (requireActivity().resources.configuration.orientation == Configuration.ORIENTATION_LANDSCAPE) {
-                    R.drawable.ic_zero_landscape_empty_folder
-                } else {
-                    R.drawable.ic_zero_portrait_empty_folder
-                }, R.string.file_browser_empty_folder_new
-            )
+            Pair(iconPackR.drawable.ic_empty_folder_glass, R.string.file_browser_empty_folder_new)
         }
     }
 
@@ -476,7 +443,6 @@ class IncomingSharesComposeFragment : Fragment() {
             (requireActivity() as ManagerActivity).let {
                 it.hideFabButton()
                 it.showHideBottomNavigationView(true)
-                it.hideTabs(true, SharesTab.INCOMING_TAB)
             }
             return true
         }
@@ -525,6 +491,8 @@ class IncomingSharesComposeFragment : Fragment() {
                     control.saveToDevice().isVisible = false
                 }
                 control.trash().isVisible = nonRootNodesPermission
+                control.addToAlbum().isVisible = false
+                control.addTo().isVisible = false
                 CloudStorageOptionControlUtil.applyControl(menu, control)
             }
             return true
@@ -541,7 +509,6 @@ class IncomingSharesComposeFragment : Fragment() {
             (activity as? ManagerActivity)?.let {
                 it.showFabButton()
                 it.showHideBottomNavigationView(false)
-                it.hideTabs(false, SharesTab.INCOMING_TAB)
                 actionMode = null
             }
         }
@@ -661,6 +628,10 @@ class IncomingSharesComposeFragment : Fragment() {
                     viewModel.setShowLeaveShareConfirmationDialog(handleList)
                     disableSelectMode()
                 }
+
+                OptionItems.ADD_TO_ALBUM -> {}
+
+                OptionItems.ADD_TO -> {}
             }
         }
     }

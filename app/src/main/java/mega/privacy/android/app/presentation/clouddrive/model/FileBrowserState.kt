@@ -4,6 +4,7 @@ import androidx.annotation.StringRes
 import de.palm.composestateevents.StateEvent
 import de.palm.composestateevents.StateEventWithContent
 import de.palm.composestateevents.consumed
+import mega.privacy.android.app.presentation.clouddrive.CloudDriveTab
 import mega.privacy.android.app.presentation.clouddrive.model.StorageOverQuotaCapacity.DEFAULT
 import mega.privacy.android.app.presentation.data.NodeUIItem
 import mega.privacy.android.app.presentation.mapper.OptionsItemInfo
@@ -11,7 +12,6 @@ import mega.privacy.android.app.presentation.settings.model.MediaDiscoveryViewSe
 import mega.privacy.android.app.presentation.transfers.starttransfer.model.TransferTriggerEvent
 import mega.privacy.android.domain.entity.AccountType
 import mega.privacy.android.domain.entity.SortOrder
-import mega.privacy.android.domain.entity.node.FileNode
 import mega.privacy.android.domain.entity.node.TypedNode
 import mega.privacy.android.domain.entity.preference.ViewType
 
@@ -30,8 +30,6 @@ import mega.privacy.android.domain.entity.preference.ViewType
  * @property nodesList list of [NodeUIItem]
  * @property sourceNodesList list of [NodeUIItem]
  * @property isInSelection if list is in selection mode or not
- * @property itemIndex index of item clicked
- * @property currentFileNode [FileNode]
  * @property selectedNodeHandles List of selected node handles
  * @property selectedFileNodes number of selected file [NodeUIItem] on Compose
  * @property selectedFolderNodes number of selected folder [NodeUIItem] on Compose
@@ -56,6 +54,7 @@ import mega.privacy.android.domain.entity.preference.ViewType
  * @property storageCapacity the storage capacity
  * @property isBusinessAccountExpired if the business or pro flexi is expired
  * @property hiddenNodeEnabled if hidden node is enabled
+ * @property isSyncFolderOpen Indicates if the node to open is from Sync Folders. False by default.
  */
 data class FileBrowserState(
     val currentViewType: ViewType = ViewType.LIST,
@@ -90,6 +89,10 @@ data class FileBrowserState(
     val storageCapacity: StorageOverQuotaCapacity = DEFAULT,
     val isBusinessAccountExpired: Boolean = false,
     val hiddenNodeEnabled: Boolean = false,
+    val isSyncFolderOpen: Boolean = false,
+    val isRootNode: Boolean = false,
+    val selectedTab: CloudDriveTab = CloudDriveTab.NONE,
+    val isFromSyncTab: Boolean = false,
 ) {
     val hasNoOpenedFolders get() = openedFolderNodeHandles.isEmpty()
 }

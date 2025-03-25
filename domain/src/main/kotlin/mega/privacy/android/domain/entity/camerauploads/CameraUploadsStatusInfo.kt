@@ -8,6 +8,11 @@ import mega.privacy.android.domain.entity.Progress
 sealed interface CameraUploadsStatusInfo {
 
     /**
+     *  object used to notify that the Camera Uploads is unknown for now
+     */
+    data object Unknown : CameraUploadsStatusInfo
+
+    /**
      *  object used to notify that the Camera Uploads has started
      */
     data object Started : CameraUploadsStatusInfo

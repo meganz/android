@@ -24,7 +24,7 @@ class LocationInfoViewTest {
         composeTestRule.setContent {
             LocationInfoView(location = "Drive", onClick = mock)
         }
-        composeTestRule.onNodeWithTag(TEST_TAG_LOCATION).performClick()
+        composeTestRule.onNodeWithTag(TEST_TAG_LOCATION, useUnmergedTree = true).performClick()
         verify(mock).invoke()
     }
 }

@@ -51,9 +51,9 @@ import mega.privacy.android.shared.original.core.ui.controls.lists.MenuActionLis
 import mega.privacy.android.shared.original.core.ui.controls.sheets.BottomSheet
 import mega.privacy.android.shared.original.core.ui.controls.text.MiddleEllipsisText
 import mega.privacy.android.shared.original.core.ui.theme.grey_alpha_070
-import mega.privacy.android.shared.original.core.ui.theme.teal_200
-import mega.privacy.android.shared.original.core.ui.theme.teal_300
-import mega.privacy.android.shared.original.core.ui.theme.values.TextColor
+import mega.privacy.android.shared.original.core.ui.theme.accent_050
+import mega.privacy.android.shared.original.core.ui.theme.accent_900
+import mega.android.core.ui.theme.values.TextColor
 import mega.privacy.android.shared.original.core.ui.theme.white_alpha_070
 import nz.mega.sdk.MegaNode
 
@@ -84,6 +84,7 @@ internal fun ImagePreviewBottomSheet(
     showAvailableOfflineMenu: suspend (ImageNode) -> Boolean,
     showRemoveOfflineMenu: suspend (ImageNode) -> Boolean,
     showMoveToRubbishBin: suspend (ImageNode) -> Boolean,
+    showAddToAlbum: suspend (ImageNode) -> Boolean,
     downloadImage: suspend (ImageNode) -> Flow<ImageResult>,
     getImageThumbnailPath: suspend (ImageResult?) -> String?,
     isAvailableOffline: Boolean = false,
@@ -113,6 +114,7 @@ internal fun ImagePreviewBottomSheet(
     onClickRestore: () -> Unit = {},
     onClickRemove: () -> Unit = {},
     onClickMoveToRubbishBin: () -> Unit = {},
+    onClickAddToAlbum: () -> Unit = {},
 ) {
     val context = LocalContext.current
     val isLight = MaterialTheme.colors.isLight
@@ -217,6 +219,10 @@ internal fun ImagePreviewBottomSheet(
 
             val isMoveToRubbishBinMenuVisible by produceState(false, imageNode) {
                 value = showMoveToRubbishBin(imageNode)
+            }
+
+            val isAddToAlbumMenuVisible by produceState(false, imageNode) {
+                value = showAddToAlbum(imageNode)
             }
 
             Column(
@@ -423,7 +429,7 @@ internal fun ImagePreviewBottomSheet(
                             if (!accountType.isPaid || isBusinessAccountExpired) {
                                 Text(
                                     text = stringResource(id = R.string.general_pro_only),
-                                    color = teal_300.takeIf { isLight } ?: teal_200,
+                                    color = accent_900.takeIf { isLight } ?: accent_050,
                                     fontSize = 16.sp,
                                     fontWeight = FontWeight.W400,
                                     style = MaterialTheme.typography.subtitle1,
@@ -459,6 +465,15 @@ internal fun ImagePreviewBottomSheet(
                         onActionClicked = onClickMove,
                         dividerType = null,
                         modifier = Modifier.testTag(IMAGE_PREVIEW_BOTTOM_SHEET_OPTION_MOVE),
+                    )
+                }
+
+                if (isAddToAlbumMenuVisible) {
+                    MenuActionListTile(
+                        icon = painterResource(id = IconPack.drawable.ic_add_to_album),
+                        text = stringResource(id = SharedResources.string.album_add_to_image),
+                        onActionClicked = onClickAddToAlbum,
+                        dividerType = null,
                     )
                 }
 

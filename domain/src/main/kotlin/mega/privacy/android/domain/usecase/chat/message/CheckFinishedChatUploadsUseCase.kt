@@ -28,7 +28,8 @@ class CheckFinishedChatUploadsUseCase @Inject constructor(
                         if (transfer.nodeHandle != -1L) {
                             attachNodeWithPendingMessageUseCase(
                                 pendingMessage.id,
-                                NodeId(transfer.nodeHandle)
+                                NodeId(transfer.nodeHandle),
+                                transfer.appData,
                             )
                         } else {
                             pendingMessage.updateToErrorUploading()

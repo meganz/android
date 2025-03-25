@@ -56,7 +56,7 @@ class LoginViewTest {
     @Test
     fun `test that email field is shown if login is required`() {
         setupRule(stateWithLoginRequired)
-        composeRule.onNodeWithText(fromId(R.string.email_text)).assertExists()
+        composeRule.onNodeWithText(fromId(mega.privacy.android.shared.resources.R.string.email_text)).assertExists()
     }
 
     @Test
@@ -69,7 +69,7 @@ class LoginViewTest {
     @Test
     fun `test that password field is shown if login is required`() {
         setupRule(stateWithLoginRequired)
-        composeRule.onNodeWithText(fromId(R.string.password_text)).assertExists()
+        composeRule.onNodeWithText(fromId(mega.privacy.android.shared.resources.R.string.password_text)).assertExists()
     }
 
     @Test
@@ -82,7 +82,7 @@ class LoginViewTest {
     @Test
     fun `test that log in button is shown if login is required`() {
         setupRule(stateWithLoginRequired)
-        composeRule.onNodeWithText(fromId(R.string.login_text)).assertExists()
+        composeRule.onNodeWithText(fromId(mega.privacy.android.shared.resources.R.string.login_text)).assertExists()
     }
 
     @Test
@@ -145,8 +145,8 @@ class LoginViewTest {
     }
 
     @Test
-    fun `test that request status progress bar is shown if the request status progress is greater than -1`() {
-        setupRule(LoginState(requestStatusProgress = 500L, isLoginInProgress = true))
+    fun `test that request status progress bar is shown if the request status progress is not null`() {
+        setupRule(LoginState(requestStatusProgress = Progress(0.5f), isLoginInProgress = true))
         composeRule.onNodeWithTag(REQUEST_STATUS_PROGRESS_TEST_TAG).assertExists()
     }
 

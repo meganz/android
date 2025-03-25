@@ -30,10 +30,12 @@ import mega.privacy.android.domain.entity.node.Node
 import mega.privacy.android.domain.entity.node.NodeChanges
 import mega.privacy.android.domain.entity.node.NodeId
 import mega.privacy.android.domain.entity.node.NodeUpdate
+import mega.privacy.android.domain.entity.node.TypedFileNode
 import mega.privacy.android.domain.entity.node.shares.ShareFileNode
 import mega.privacy.android.domain.entity.node.shares.ShareFolderNode
 import mega.privacy.android.domain.entity.preference.ViewType
 import mega.privacy.android.domain.usecase.GetCloudSortOrder
+import mega.privacy.android.domain.usecase.GetNodeByIdUseCase
 import mega.privacy.android.domain.usecase.GetOthersSortOrder
 import mega.privacy.android.domain.usecase.GetParentNodeUseCase
 import mega.privacy.android.domain.usecase.GetRootNodeUseCase
@@ -84,6 +86,7 @@ class OutgoingSharesComposeViewModelTest {
     private val durationInSecondsTextMapper = mock<DurationInSecondsTextMapper>()
     private val monitorContactUpdatesUseCase = mock<MonitorContactUpdates>()
     private val getOthersSortOrder = mock<GetOthersSortOrder>()
+    private val getNodeByIdUseCase = mock<GetNodeByIdUseCase>()
 
     @BeforeEach
     fun setUp() {
@@ -111,6 +114,7 @@ class OutgoingSharesComposeViewModelTest {
             durationInSecondsTextMapper = durationInSecondsTextMapper,
             monitorContactUpdatesUseCase = monitorContactUpdatesUseCase,
             getOthersSortOrder = getOthersSortOrder,
+            getNodeByIdUseCase = getNodeByIdUseCase
         )
     }
 
@@ -494,7 +498,7 @@ class OutgoingSharesComposeViewModelTest {
     @Test
     fun `test that download event is updated when on download for preview option click is invoked`() =
         runTest {
-            val triggered = TransferTriggerEvent.StartDownloadForPreview(node = mock())
+            val triggered = TransferTriggerEvent.StartDownloadForPreview(node = mock(), isOpenWith = false)
             underTest.onDownloadFileTriggered(triggered)
             underTest.state.test {
                 val state = awaitItem()
@@ -503,6 +507,27 @@ class OutgoingSharesComposeViewModelTest {
                     .isInstanceOf(TransferTriggerEvent.StartDownloadForPreview::class.java)
             }
         }
+
+    @Test
+    fun `test that currentNodeName is updated correctly`() = runTest {
+        val nodesListItem1 = mock<ShareFolderNode>()
+        val nodesListItem2 = mock<ShareFileNode>()
+        whenever(nodesListItem1.id.longValue).thenReturn(1L)
+        whenever(nodesListItem2.id.longValue).thenReturn(2L)
+        whenever(getOutgoingSharesChildrenNodeUseCase(underTest.state.value.currentHandle)).thenReturn(
+            listOf(nodesListItem1, nodesListItem2)
+        )
+        whenever(getCloudSortOrder()).thenReturn(SortOrder.ORDER_NONE)
+        val node = mock<TypedFileNode> {
+            on { name } doReturn "test"
+        }
+        whenever(getNodeByIdUseCase(NodeId(underTest.state.value.currentHandle))).thenReturn(node)
+        underTest.refreshNodes()
+        underTest.state.test {
+            val state = awaitItem()
+            assertThat(state.currentNodeName).isEqualTo("test")
+        }
+    }
 
     private suspend fun onDownloadOptionClick() {
         val menuItem = mock<MenuItem>()
@@ -543,6 +568,7 @@ class OutgoingSharesComposeViewModelTest {
             fileDurationMapper,
             monitorOfflineNodeUpdatesUseCase,
             monitorConnectivityUseCase,
+            getNodeByIdUseCase
         )
     }
 }

@@ -4,6 +4,7 @@ import dagger.Lazy
 import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Job
+import kotlinx.coroutines.async
 import kotlinx.coroutines.channels.awaitClose
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.Flow
@@ -53,6 +54,9 @@ import nz.mega.sdk.MegaChatApi
 import nz.mega.sdk.MegaError
 import nz.mega.sdk.MegaRequest
 import timber.log.Timber
+import java.net.HttpURLConnection
+import java.net.InetAddress
+import java.net.URL
 import javax.inject.Inject
 import kotlin.coroutines.Continuation
 import kotlin.coroutines.suspendCoroutine
@@ -77,7 +81,7 @@ internal class DefaultLoginRepository @Inject constructor(
     @ApplicationScope private val applicationScope: CoroutineScope,
     private val setLogoutFlagWrapper: SetLogoutFlagWrapper,
     private val credentialsPreferencesGateway: Lazy<CredentialsPreferencesGateway>,
-    private val crashReporter: CrashReporter
+    private val crashReporter: CrashReporter,
 ) : LoginRepository {
 
     override suspend fun initMegaChat(session: String) =
@@ -222,6 +226,83 @@ internal class DefaultLoginRepository @Inject constructor(
         }
     }
 
+    /**
+     * A temporary method get IP address using DNS resolver, and perform HTTP call to check internet connectivity
+     * @param address domain address to ping, eg mega.io
+     * @return Pair<Boolean, String> isHttpRequestSuccess, message with IP and response code
+     */
+    private suspend fun pingDomainAddress(address: String) = withContext(ioDispatcher) {
+        var isHttpRequestSuccess = true
+        val hostAddress = runCatching {
+            InetAddress.getByName(address).hostAddress
+        }.getOrElse {
+            "DNS lookup failed due to ${it.message}"
+        }
+
+        val httpStatusCode = runCatching {
+            val connection = URL("https://$address").openConnection() as HttpURLConnection
+            connection.apply {
+                setRequestProperty("User-Agent", "MegaAndroid")
+                setRequestProperty("Connection", "close")
+                connectTimeout = 2500
+                readTimeout = 2500
+                connect()
+            }
+            connection.responseCode
+        }.getOrElse {
+            isHttpRequestSuccess = false
+            "Failed due to ${it.message}"
+        }
+
+        isHttpRequestSuccess to "Ping: $address: $hostAddress, HTTP Status: $httpStatusCode"
+    }
+
+    /**
+     * A temporary method to report log to Crashlytics when connectivity issue occurred during login
+     * @param error MegaError
+     */
+    private fun reportLogToCrashlytics(error: MegaError, waitingReason: Int) {
+        applicationScope.launch(ioDispatcher) {
+            val publicIpDeferred = async {
+                getPublicIpAddress()
+            }
+            val googlePingDeferred = async {
+                pingDomainAddress("google.com")
+            }
+            val megaPingDeferred = async {
+                pingDomainAddress("g.api.mega.co.nz")
+            }
+            val publicIp = publicIpDeferred.await()
+            val googlePing = googlePingDeferred.await()
+            val megaPing = megaPingDeferred.await()
+
+            // So don't send log if user doesn't a valid internet connectivity
+            // even though Mobile Data or WiFi is enabled
+            if (!googlePing.first && !megaPing.first) {
+                Timber.w("Ping to mega and google has failed, user may not have valid internet connectivity")
+                return@launch
+            }
+
+            crashReporter.report(
+                Throwable(
+                    """Connection issue occurred during login. 
+                    Error code: ${error.errorCode},
+                    Error value: ${error.value.toInt()},
+                    Waiting reason: RETRY_CONNECTIVITY($waitingReason),
+                    Public IP: $publicIp,
+                    ${googlePing.second},
+                    ${megaPing.second}""".trimIndent()
+                )
+            )
+        }
+    }
+
+    private suspend fun getPublicIpAddress() = withContext(ioDispatcher) {
+        runCatching {
+            URL("https://api.ipify.org/").openStream().bufferedReader().use { it.readLine() }
+        }.getOrDefault("Failed to get public IP address")
+    }
+
     private fun loginRequest(
         loginRequest: (OptionalMegaRequestListenerInterface) -> Unit,
     ) = callbackFlow {
@@ -234,12 +315,13 @@ internal class DefaultLoginRepository @Inject constructor(
                     timerJob = applicationScope.launch(ioDispatcher) {
                         runCatching {
                             delay(WAITING_ERROR_TIMER)
-                            val temporaryError = megaApiGateway.getWaitingReason().let {
+                            val waitingReason = megaApiGateway.getWaitingReason()
+                            val temporaryError = waitingReason.let {
                                 Timber.w("Waiting, retry reason for ${request.requestString}: $it")
                                 temporaryWaitingErrorMapper(it)
                             }
                             if (this.isActive && temporaryError == TemporaryWaitingError.ConnectivityIssues) {
-                                crashReporter.report(Throwable("Connection issue occurred during login. Error code: ${error.errorCode}, waiting reason: MegaApiJava.RETRY_CONNECTIVITY"))
+                                reportLogToCrashlytics(error, waitingReason)
                             }
                             trySend(LoginStatus.LoginWaiting(temporaryError))
                         }

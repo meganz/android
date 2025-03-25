@@ -1,5 +1,6 @@
 package mega.privacy.android.app.presentation.transfers.page
 
+import mega.privacy.android.shared.resources.R as sharedR
 import android.content.DialogInterface
 import android.os.Bundle
 import android.view.LayoutInflater
@@ -10,6 +11,7 @@ import android.view.View
 import android.view.ViewGroup
 import androidx.appcompat.app.AlertDialog
 import androidx.core.view.MenuProvider
+import androidx.core.view.isGone
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.activityViewModels
 import androidx.lifecycle.Lifecycle
@@ -23,19 +25,20 @@ import mega.privacy.android.app.BaseActivity
 import mega.privacy.android.app.R
 import mega.privacy.android.app.arch.extensions.collectFlow
 import mega.privacy.android.app.databinding.FragmentTransferPageBinding
-import mega.privacy.android.app.globalmanagement.TransfersManagement
 import mega.privacy.android.app.main.ManagerActivity
 import mega.privacy.android.app.main.adapters.TransfersPageAdapter
 import mega.privacy.android.app.main.managerSections.CompletedTransfersFragment
 import mega.privacy.android.app.main.managerSections.LegacyTransfersFragment
 import mega.privacy.android.app.main.managerSections.TransfersViewModel
 import mega.privacy.android.app.presentation.manager.model.TransfersTab
+import mega.privacy.android.app.presentation.settings.model.StorageTargetPreference
 import mega.privacy.android.app.presentation.transfers.TransfersManagementViewModel
 import mega.privacy.android.app.presentation.transfers.starttransfer.view.createStartTransferView
 import mega.privacy.android.app.utils.Constants
 import mega.privacy.android.data.qualifier.MegaApi
 import mega.privacy.android.domain.entity.transfer.CompletedTransfer
 import mega.privacy.android.domain.usecase.transfers.paused.AreTransfersPausedUseCase
+import mega.privacy.android.navigation.MegaNavigator
 import mega.privacy.android.shared.original.core.ui.model.TransfersStatus
 import nz.mega.sdk.MegaApiAndroid
 import nz.mega.sdk.MegaChatApiJava
@@ -45,8 +48,6 @@ import javax.inject.Inject
 
 @AndroidEntryPoint
 internal class TransferPageFragment : Fragment() {
-    @Inject
-    lateinit var transfersManagement: TransfersManagement
 
     @Inject
     lateinit var areTransfersPausedUseCase: AreTransfersPausedUseCase
@@ -54,6 +55,12 @@ internal class TransferPageFragment : Fragment() {
     @Inject
     @MegaApi
     lateinit var megaApi: MegaApiAndroid
+
+    /**
+     * Mega navigator
+     */
+    @Inject
+    lateinit var megaNavigator: MegaNavigator
 
     private var _binding: FragmentTransferPageBinding? = null
     val binding: FragmentTransferPageBinding
@@ -98,9 +105,15 @@ internal class TransferPageFragment : Fragment() {
     private fun addStartDownloadTransferView(root: ViewGroup) {
         root.addView(
             createStartTransferView(
-                requireActivity(),
-                transfersViewModel.uiState.map { it.startEvent },
-                transfersViewModel::consumeRetry
+                activity = requireActivity(),
+                transferEventState = transfersViewModel.uiState.map { it.startEvent },
+                onConsumeEvent = transfersViewModel::consumeRetry,
+                navigateToStorageSettings = {
+                    megaNavigator.openSettings(
+                        requireActivity(),
+                        StorageTargetPreference
+                    )
+                }
             )
         )
     }
@@ -211,6 +224,24 @@ internal class TransferPageFragment : Fragment() {
                 clearCompletedTransfers?.isVisible = completedTransfers.isNotEmpty()
             }
         }
+        viewLifecycleOwner.collectFlow(transfersViewModel.uiState) { uiState ->
+            with(uiState) {
+                readRetryError?.let {
+                    (activity as? BaseActivity)?.showSnackbar(
+                        Constants.SNACKBAR_TYPE,
+                        resources.getString(
+                            if (it == 1) {
+                                sharedR.string.transfers_completed_one_read_error_retrying
+                            } else {
+                                sharedR.string.transfers_completed_some_read_error_retrying
+                            }
+                        ),
+                        -1
+                    )
+                    transfersViewModel.onConsumeRetryReadError()
+                }
+            }
+        }
     }
 
     private fun handleDeleteFailedOrCancelledTransfersResult(transfers: List<CompletedTransfer>) {
@@ -300,7 +331,7 @@ internal class TransferPageFragment : Fragment() {
      * @param showCompleted True if should show the Completed tab, false otherwise.
      */
     private fun updateTransfersTab(showCompleted: Boolean) {
-        viewModel.setTransfersTab(if (transfersManagement.getAreFailedTransfers() || showCompleted) TransfersTab.COMPLETED_TAB else TransfersTab.PENDING_TAB)
+        viewModel.setTransfersTab(if (transfersManagementViewModel.shouldCheckTransferError() || showCompleted) TransfersTab.COMPLETED_TAB else TransfersTab.PENDING_TAB)
         when (viewModel.state.value.transfersTab) {
             TransfersTab.COMPLETED_TAB -> {
                 binding.transfersTabsPager.currentItem = TransfersTab.COMPLETED_TAB.position
@@ -308,7 +339,7 @@ internal class TransferPageFragment : Fragment() {
 
             else -> {
                 binding.transfersTabsPager.currentItem = TransfersTab.PENDING_TAB.position
-                if (transfersManagement.shouldShowNetworkWarning) {
+                if (!transfersManagementViewModel.state.value.isOnline) {
                     (activity as BaseActivity).showSnackbar(
                         Constants.SNACKBAR_TYPE,
                         binding.root,
@@ -356,7 +387,7 @@ internal class TransferPageFragment : Fragment() {
         val builder = MaterialAlertDialogBuilder(requireContext())
         builder.setMessage(R.string.confirmation_to_clear_completed_transfers)
             .setPositiveButton(R.string.general_clear) { _: DialogInterface?, _: Int ->
-                transfersViewModel.deleteFailedOrCancelledTransferFiles()
+                transfersViewModel.deleteFailedOrCancelledTransferCacheFiles()
                 viewModel.deleteAllCompletedTransfers()
             }
             .setNegativeButton(R.string.general_dismiss, null)
@@ -397,8 +428,14 @@ internal class TransferPageFragment : Fragment() {
                 Timber.d("Unable to retrieve transfer type value")
             }
         }
+    }
 
-        transfersViewModel.completedTransferRemoved(transfer, false)
+    /**
+     * Hide or show the tab.
+     */
+    fun hideTab(hide: Boolean) {
+        binding.slidingTabsTransfers.isGone = hide
+        binding.transfersTabsPager.disableSwipe(hide)
     }
 
     companion object {

@@ -38,6 +38,7 @@ import mega.privacy.android.app.R
 import mega.privacy.android.app.activities.WebViewActivity
 import mega.privacy.android.app.arch.extensions.collectFlow
 import mega.privacy.android.app.featuretoggle.ApiFeatures
+import mega.privacy.android.app.featuretoggle.AppFeatures
 import mega.privacy.android.app.main.DrawerItem
 import mega.privacy.android.app.main.FileContactListActivity
 import mega.privacy.android.app.main.ManagerActivity
@@ -60,6 +61,7 @@ import mega.privacy.android.app.presentation.contact.authenticitycredendials.Aut
 import mega.privacy.android.app.presentation.fileinfo.FileInfoActivity
 import mega.privacy.android.app.presentation.hidenode.HiddenNodesOnboardingActivity
 import mega.privacy.android.app.presentation.manager.model.SharesTab
+import mega.privacy.android.app.presentation.photos.albums.add.AddToAlbumActivity
 import mega.privacy.android.app.presentation.shares.incoming.IncomingSharesComposeViewModel
 import mega.privacy.android.app.presentation.transfers.starttransfer.StartDownloadViewModel
 import mega.privacy.android.app.presentation.videosection.VideoSectionViewModel
@@ -84,10 +86,15 @@ import mega.privacy.android.app.utils.Util
 import mega.privacy.android.app.utils.ViewUtils.isVisible
 import mega.privacy.android.app.utils.wrapper.MegaNodeUtilWrapper
 import mega.privacy.android.domain.entity.AccountType
+import mega.privacy.android.domain.entity.ImageFileTypeInfo
 import mega.privacy.android.domain.entity.ShareData
+import mega.privacy.android.domain.entity.VideoFileTypeInfo
 import mega.privacy.android.domain.entity.node.NodeId
 import mega.privacy.android.domain.entity.node.thumbnail.ThumbnailRequest
+import mega.privacy.android.domain.entity.sync.SyncType
+import mega.privacy.android.domain.usecase.GetFileTypeInfoByNameUseCase
 import mega.privacy.android.domain.usecase.featureflag.GetFeatureFlagValueUseCase
+import mega.privacy.android.navigation.MegaNavigator
 import mega.privacy.android.shared.original.core.ui.controls.controlssliders.MegaSwitch
 import mega.privacy.mobile.analytics.event.CloudDriveHideNodeMenuItemEvent
 import nz.mega.sdk.MegaNode
@@ -122,11 +129,31 @@ class NodeOptionsBottomSheetDialogFragment : BaseBottomSheetDialogFragment() {
     @Inject
     lateinit var megaNodeUtilWrapper: MegaNodeUtilWrapper
 
+    @Inject
+    lateinit var getFileTypeInfoByNameUseCase: GetFileTypeInfoByNameUseCase
+
+    @Inject
+    lateinit var megaNavigator: MegaNavigator
+
     private val hiddenNodesOnboardingLauncher: ActivityResultLauncher<Intent> =
         registerForActivityResult(
             ActivityResultContracts.StartActivityForResult(),
             ::handleHiddenNodesOnboardingResult,
         )
+
+    private val addToAlbumLauncher: ActivityResultLauncher<Intent> =
+        registerForActivityResult(
+            ActivityResultContracts.StartActivityForResult(),
+            ::handleAddToAlbumResult,
+        )
+
+    private fun handleAddToAlbumResult(result: ActivityResult) {
+        if (result.resultCode == Activity.RESULT_OK) {
+            val message = result.data?.getStringExtra("message") ?: return
+            Util.showSnackbar(requireActivity(), message)
+        }
+        dismiss()
+    }
 
     private val hideHiddenActions: Boolean by lazy {
         arguments?.getBoolean(HIDE_HIDDEN_ACTIONS_KEY) ?: false
@@ -168,6 +195,7 @@ class NodeOptionsBottomSheetDialogFragment : BaseBottomSheetDialogFragment() {
         val permissionsIcon = contentView.findViewById<ImageView>(R.id.permissions_icon)
         val optionEdit = contentView.findViewById<LinearLayout>(R.id.edit_file_option)
         val optionInfo = contentView.findViewById<TextView>(R.id.properties_option)
+        val optionAddToAlbum = contentView.findViewById<TextView>(R.id.add_to_album_option)
         // option Versions
         val optionVersionsLayout =
             contentView.findViewById<LinearLayout>(R.id.option_versions_layout)
@@ -206,14 +234,18 @@ class NodeOptionsBottomSheetDialogFragment : BaseBottomSheetDialogFragment() {
         val optionRemove = contentView.findViewById<TextView>(R.id.remove_option)
         val viewInFolder = contentView.findViewById<TextView>(R.id.view_in_folder_option)
 
+        val optionSync = contentView.findViewById<LinearLayout>(R.id.option_sync_layout)
         val separatorInfo = contentView.findViewById<View>(R.id.separator_info_option)
         val separatorOpen = contentView.findViewById<LinearLayout>(R.id.separator_open_options)
         val separatorDownload =
             contentView.findViewById<LinearLayout>(R.id.separator_download_options)
         val separatorShares = contentView.findViewById<LinearLayout>(R.id.separator_share_options)
         val separatorModify = contentView.findViewById<LinearLayout>(R.id.separator_modify_options)
+        val separatorSync = contentView.findViewById<View>(R.id.separator_sync)
         val optionRemoveRecentlyWatchedItem =
             contentView.findViewById<View>(R.id.remove_recently_watched_item_option)
+        val optionAddVideoToPlaylistItem =
+            contentView.findViewById<View>(R.id.option_add_video_to_playlist)
         if (!Util.isScreenInPortrait(requireContext())) {
             Timber.d("Landscape configuration")
             nodeName.maxWidth = Util.scaleWidthPx(275, resources.displayMetrics)
@@ -338,6 +370,10 @@ class NodeOptionsBottomSheetDialogFragment : BaseBottomSheetDialogFragment() {
                     videoSectionViewModel.removeRecentlyWatchedItem(node.handle)
                     setStateBottomSheetBehaviorHidden()
                 }
+                optionAddVideoToPlaylistItem.setOnClickListener {
+                    videoSectionViewModel.launchVideoToPlaylistActivity(node.handle)
+                    setStateBottomSheetBehaviorHidden()
+                }
 
                 val isTakenDown = node.isTakenDown
                 val accessLevel = megaApi.getAccess(node)
@@ -459,6 +495,26 @@ class NodeOptionsBottomSheetDialogFragment : BaseBottomSheetDialogFragment() {
                     if (accountType?.isPaid != true || isBusinessAccountExpired) View.VISIBLE else View.GONE
                 optionHideHelp.visibility =
                     if (accountType?.isPaid == true && !isBusinessAccountExpired && !node.isMarkedSensitive) View.VISIBLE else View.GONE
+                optionAddToAlbum.let { option ->
+                    val fileType = getFileTypeInfoByNameUseCase(node.name)
+                    if (fileType is ImageFileTypeInfo || fileType is VideoFileTypeInfo) {
+                        option.visibility = View.VISIBLE
+                        option.setText(if (fileType is ImageFileTypeInfo) sharedR.string.album_add_to_image else sharedR.string.album_add_to_media)
+                    } else {
+                        option.visibility = View.GONE
+                    }
+
+                    option.setOnClickListener {
+                        val intent =
+                            Intent(requireContext(), AddToAlbumActivity::class.java).apply {
+                                val ids = listOf(node.handle).toTypedArray()
+                                val type = if (fileType is ImageFileTypeInfo) 0 else 1
+                                putExtra("ids", ids)
+                                putExtra("type", type)
+                            }
+                        addToAlbumLauncher.launch(intent)
+                    }
+                }
                 if (accessLevel != MegaShare.ACCESS_OWNER || isTakenDown) {
                     counterShares--
                     optionShare.visibility = View.GONE
@@ -521,8 +577,31 @@ class NodeOptionsBottomSheetDialogFragment : BaseBottomSheetDialogFragment() {
                 if (mode == DEFAULT_MODE) {
                     mapDrawerItemToMode(state.nodeDeviceCenterInformation)
                 }
+
+                viewLifecycleOwner.lifecycleScope.launch {
+                    if (getFeatureFlagValueUseCase(
+                            AppFeatures.CloudDriveAndSyncs
+                        ) && mode == CLOUD_DRIVE_MODE && !isTakenDown && state.isOnline && state.isSyncActionAllowed
+                    ) {
+                        optionSync.visibility = View.VISIBLE
+                        separatorSync.visibility = View.VISIBLE
+                        optionSync.setOnClickListener {
+                            openNewSyncScreen(node)
+                        }
+                    } else {
+                        optionSync.visibility = View.GONE
+                        separatorSync.visibility = View.GONE
+                        optionSync.setOnClickListener(null)
+                    }
+                }
+
                 when (mode) {
-                    CLOUD_DRIVE_MODE, SEARCH_MODE, VIDEO_RECENTLY_WATCHED_MODE -> {
+                    CLOUD_DRIVE_MODE,
+                    SEARCH_MODE,
+                    VIDEO_RECENTLY_WATCHED_MODE,
+                    VIDEO_SECTION_MODE,
+                    VIDEO_PLAYLIST_DETAIL,
+                        -> {
                         Timber.d("show Cloud bottom sheet")
                         optionRemove.visibility = View.GONE
                         optionLeaveShares.visibility = View.GONE
@@ -530,12 +609,34 @@ class NodeOptionsBottomSheetDialogFragment : BaseBottomSheetDialogFragment() {
                         optionOpenFolder.visibility = View.GONE
                         counterModify--
                         optionRestoreFromRubbish.visibility = View.GONE
+
                         optionRemoveRecentlyWatchedItem.visibility =
                             if (mode == VIDEO_RECENTLY_WATCHED_MODE) {
                                 View.VISIBLE
                             } else {
                                 View.GONE
                             }
+
+                        viewLifecycleOwner.lifecycleScope.launch {
+                            optionAddVideoToPlaylistItem.visibility =
+                                if (mode == VIDEO_SECTION_MODE && getFeatureFlagValueUseCase(
+                                        AppFeatures.AddVideoToPlaylistFromVideoSection
+                                    )
+                                ) {
+                                    View.VISIBLE
+                                } else {
+                                    View.GONE
+                                }
+                        }
+
+                        if (mode in listOf(
+                                VIDEO_SECTION_MODE,
+                                VIDEO_RECENTLY_WATCHED_MODE,
+                                VIDEO_PLAYLIST_DETAIL
+                            )
+                        ) {
+                            optionAddToAlbum.visibility = View.GONE
+                        }
                     }
 
                     BACKUPS_MODE -> {
@@ -598,6 +699,7 @@ class NodeOptionsBottomSheetDialogFragment : BaseBottomSheetDialogFragment() {
                             counterShares--
                             optionSendChat.visibility = View.GONE
                         }
+                        optionAddToAlbum.visibility = View.GONE
                     }
 
                     SHARED_ITEMS_MODE -> {
@@ -651,6 +753,7 @@ class NodeOptionsBottomSheetDialogFragment : BaseBottomSheetDialogFragment() {
                                 counterShares--
                                 optionRemoveLink.visibility = View.GONE
                             }
+                            optionAddToAlbum.visibility = View.GONE
                             when (accessLevel) {
                                 MegaShare.ACCESS_FULL -> {
                                     Timber.d("access FULL")
@@ -805,6 +908,18 @@ class NodeOptionsBottomSheetDialogFragment : BaseBottomSheetDialogFragment() {
             calculatePeekHeight()
         }
         super.onViewCreated(view, savedInstanceState)
+    }
+
+    private fun openNewSyncScreen(node: MegaNode) {
+        val managerActivity =
+            requireActivity() as? ManagerActivity ?: return
+        megaNavigator.openNewSync(
+            context = managerActivity,
+            syncType = SyncType.TYPE_TWOWAY,
+            remoteFolderHandle = node.handle,
+            remoteFolderName = node.name,
+        )
+        dismiss()
     }
 
     private fun onClick(action: () -> Unit) {
@@ -1152,7 +1267,7 @@ class NodeOptionsBottomSheetDialogFragment : BaseBottomSheetDialogFragment() {
         val optionOpenFolder = contentView.findViewById<TextView>(R.id.open_folder_option)
         val optionRubbishBin = contentView.findViewById<TextView>(R.id.rubbish_bin_option)
         val optionRemove = contentView.findViewById<TextView>(R.id.remove_option)
-        if (node != null && megaApi.isInInbox(node)) {
+        if (node != null && megaApi.isInVault(node)) {
             optionEdit.visibility = View.GONE
             optionFavourite.visibility = View.GONE
             optionHideLayout.visibility = View.GONE
@@ -1632,7 +1747,7 @@ class NodeOptionsBottomSheetDialogFragment : BaseBottomSheetDialogFragment() {
             args.putLong(NODE_ID_KEY, nodeId.longValue)
             args.putInt(
                 MODE_KEY,
-                mode?.takeIf { it in DEFAULT_MODE..VIDEO_RECENTLY_WATCHED_MODE } ?: DEFAULT_MODE)
+                mode?.takeIf { it in DEFAULT_MODE..VIDEO_PLAYLIST_DETAIL } ?: DEFAULT_MODE)
             shareData?.let {
                 val shareInfo = NodeShareInformation(
                     user = it.user,
@@ -1703,5 +1818,15 @@ class NodeOptionsBottomSheetDialogFragment : BaseBottomSheetDialogFragment() {
          * For Video Recently Watched
          */
         const val VIDEO_RECENTLY_WATCHED_MODE = 9
+
+        /**
+         * For Video Section
+         */
+        const val VIDEO_SECTION_MODE = 10
+
+        /**
+         * For Video playlist detail
+         */
+        const val VIDEO_PLAYLIST_DETAIL = 11
     }
 }

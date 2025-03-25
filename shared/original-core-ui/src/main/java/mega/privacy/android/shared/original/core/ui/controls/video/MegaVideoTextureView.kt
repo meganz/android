@@ -26,7 +26,7 @@ import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.collectLatest
 import kotlinx.coroutines.flow.flowOf
 import kotlinx.coroutines.withContext
-import mega.privacy.android.shared.original.core.ui.theme.OriginalTempTheme
+import mega.privacy.android.shared.original.core.ui.theme.OriginalTheme
 import mega.privacy.android.shared.original.core.ui.utils.ComposableLifecycle
 import java.nio.ByteBuffer
 
@@ -194,7 +194,7 @@ private fun TextureView.computeBitmapRect(bitmapWidth: Int, bitmapHeight: Int): 
 @Preview(showBackground = true)
 @Composable
 internal fun PreviewMegaVideoTextureView() {
-    OriginalTempTheme(isDark = true) {
+    OriginalTheme(isDark = true) {
         MegaVideoTextureView(
             modifier = Modifier.fillMaxSize(),
             videoStream = flowOf(

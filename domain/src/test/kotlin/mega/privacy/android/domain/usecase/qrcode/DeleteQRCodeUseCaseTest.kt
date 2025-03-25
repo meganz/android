@@ -4,30 +4,38 @@ import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.test.UnconfinedTestDispatcher
 import kotlinx.coroutines.test.runTest
 import mega.privacy.android.domain.exception.MegaException
-import mega.privacy.android.domain.repository.AccountRepository
 import mega.privacy.android.domain.repository.NodeRepository
 import mega.privacy.android.domain.usecase.account.qr.GetQRCodeFileUseCase
-import org.junit.Before
-import org.junit.Test
+import mega.privacy.android.domain.usecase.contact.DeleteContactLinkUseCase
+import org.junit.jupiter.api.BeforeAll
+import org.junit.jupiter.api.BeforeEach
+import org.junit.jupiter.api.Test
+import org.junit.jupiter.api.TestInstance
+import org.junit.jupiter.api.assertThrows
 import org.mockito.kotlin.any
 import org.mockito.kotlin.mock
+import org.mockito.kotlin.reset
 import org.mockito.kotlin.verify
 import org.mockito.kotlin.whenever
 import java.io.File
 
+/**
+ * Test class for [DeleteQRCodeUseCase]
+ */
+@TestInstance(TestInstance.Lifecycle.PER_CLASS)
 @OptIn(ExperimentalCoroutinesApi::class)
-class DeleteQRCodeUseCaseTest {
+internal class DeleteQRCodeUseCaseTest {
 
     private lateinit var underTest: DeleteQRCodeUseCase
 
-    private val accountRepository: AccountRepository = mock()
-    private val nodeRepository: NodeRepository = mock()
-    private val getQRCodeFileUseCase: GetQRCodeFileUseCase = mock()
+    private val deleteContactLinkUseCase = mock<DeleteContactLinkUseCase>()
+    private val nodeRepository = mock<NodeRepository>()
+    private val getQRCodeFileUseCase = mock<GetQRCodeFileUseCase>()
 
-    @Before
-    fun setup() {
+    @BeforeAll
+    fun setUp() {
         underTest = DeleteQRCodeUseCase(
-            accountRepository = accountRepository,
+            deleteContactLinkUseCase = deleteContactLinkUseCase,
             nodeRepository = nodeRepository,
             ioDispatcher = UnconfinedTestDispatcher(),
             getQRCodeFileUseCase = getQRCodeFileUseCase
@@ -35,41 +43,44 @@ class DeleteQRCodeUseCaseTest {
         )
     }
 
+    @BeforeEach
+    fun resetMocks() {
+        reset(deleteContactLinkUseCase, nodeRepository, getQRCodeFileUseCase)
+    }
+
     @Test
-    fun `test that QR code can be deleted successfully`() = runTest {
+    fun `test that the QR code is successfully deleted`() = runTest {
         val contactLink = "https://mega.nz/C!MTAwMDAwMA=="
         val handle = 1000000L
-        val qrFileName = "tester@mega.co.nzQR_code_image.jpg"
         val qrCodeFile: File = mock()
 
         whenever(nodeRepository.convertBase64ToHandle(any())).thenReturn(handle)
         whenever(getQRCodeFileUseCase.invoke()).thenReturn(qrCodeFile)
 
         underTest(contactLink)
-        verify(accountRepository).deleteContactLink(handle)
+
+        verify(deleteContactLinkUseCase).invoke(handle)
     }
 
-    @Test(expected = MegaException::class)
-    fun `test that exception is thrown if MegaApi to delete accountLink fails`() = runTest {
+    @Test
+    fun `test that an exception is thrown if the account link fails to delete`() = runTest {
         val contactLink = "https://mega.nz/C!MTAwMDAwMA=="
         val handle = 1000000L
-        val qrFileName = "tester@mega.co.nzQR_code_image.jpg"
 
         whenever(nodeRepository.convertBase64ToHandle(any())).thenReturn(handle)
-        whenever(accountRepository.deleteContactLink(handle)).thenAnswer {
+        whenever(deleteContactLinkUseCase(handle)).thenAnswer {
             throw MegaException(
                 errorCode = -1,
                 errorString = "error"
             )
         }
 
-        underTest(contactLink)
+        assertThrows<MegaException> { underTest(contactLink) }
     }
 
-    @Test(expected = MegaException::class)
-    fun `test that exception is thrown if accountLink is invalid`() = runTest {
+    @Test
+    fun `test that an exception is thrown if the account link is invalid`() = runTest {
         val contactLink = "https://mega.nz/C!MTAwMDAwMA=="
-        val qrFileName = "tester@mega.co.nzQR_code_image.jpg"
 
         whenever(nodeRepository.convertBase64ToHandle(any())).thenAnswer {
             throw MegaException(
@@ -78,7 +89,6 @@ class DeleteQRCodeUseCaseTest {
             )
         }
 
-        underTest(contactLink)
+        assertThrows<MegaException> { underTest(contactLink) }
     }
-
 }

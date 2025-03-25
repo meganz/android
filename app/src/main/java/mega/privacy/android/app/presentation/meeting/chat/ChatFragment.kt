@@ -7,7 +7,10 @@ import android.view.ViewGroup
 import androidx.compose.foundation.layout.navigationBarsPadding
 import androidx.compose.material.rememberScaffoldState
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.ComposeView
 import androidx.compose.ui.platform.ViewCompositionStrategy
@@ -21,7 +24,9 @@ import com.google.accompanist.navigation.material.ExperimentalMaterialNavigation
 import com.google.accompanist.navigation.material.rememberBottomSheetNavigator
 import dagger.hilt.android.AndroidEntryPoint
 import mega.privacy.android.analytics.Analytics
+import mega.privacy.android.app.MegaApplication
 import mega.privacy.android.app.R
+import mega.privacy.android.app.components.chatsession.ChatSessionContainer
 import mega.privacy.android.app.components.session.SessionContainer
 import mega.privacy.android.app.presentation.extensions.isDarkMode
 import mega.privacy.android.app.presentation.meeting.chat.model.EXTRA_ACTION
@@ -35,12 +40,14 @@ import mega.privacy.android.app.presentation.meeting.chat.view.navigation.startM
 import mega.privacy.android.app.presentation.meeting.chat.view.navigation.startWaitingRoom
 import mega.privacy.android.app.presentation.meeting.chat.view.showPermissionNotAllowedSnackbar
 import mega.privacy.android.app.presentation.passcode.model.PasscodeCryptObjectFactory
+import mega.privacy.android.app.presentation.psa.PsaContainer
 import mega.privacy.android.app.presentation.security.check.PasscodeContainer
+import mega.privacy.android.app.presentation.settings.model.StorageTargetPreference
 import mega.privacy.android.app.utils.Constants
 import mega.privacy.android.domain.entity.ThemeMode
 import mega.privacy.android.domain.usecase.GetThemeMode
 import mega.privacy.android.navigation.MegaNavigator
-import mega.privacy.android.shared.original.core.ui.theme.OriginalTempTheme
+import mega.privacy.android.shared.original.core.ui.theme.OriginalTheme
 import mega.privacy.mobile.analytics.event.ChatConversationScreenEvent
 import javax.inject.Inject
 
@@ -57,7 +64,7 @@ internal class ChatFragment : Fragment() {
      * The centralized navigator in the :app module
      */
     @Inject
-    lateinit var navigator: MegaNavigator
+    lateinit var megaNavigator: MegaNavigator
 
     @OptIn(ExperimentalMaterialNavigationApi::class)
     override fun onCreateView(
@@ -66,90 +73,119 @@ internal class ChatFragment : Fragment() {
         savedInstanceState: Bundle?,
     ): View = ComposeView(requireContext()).apply {
         setViewCompositionStrategy(ViewCompositionStrategy.DisposeOnViewTreeLifecycleDestroyed)
+        MegaApplication.openChatId = requireActivity().intent.getLongExtra(Constants.CHAT_ID, -1L)
+
         setContent {
             val mode by getThemeMode().collectAsStateWithLifecycle(initialValue = ThemeMode.System)
-            SessionContainer(shouldCheckChatSession = true) {
-                OriginalTempTheme(isDark = mode.isDarkMode()) {
-                    PasscodeContainer(
-                        passcodeCryptObjectFactory = passcodeCryptObjectFactory,
-                        content = {
-                            val bottomSheetNavigator = rememberBottomSheetNavigator()
-                            val navHostController = rememberNavController(bottomSheetNavigator)
-                            val chatId =
-                                requireActivity().intent.getLongExtra(Constants.CHAT_ID, -1)
-                            val action = requireActivity().intent.getStringExtra(EXTRA_ACTION)
-                                ?: Constants.ACTION_CHAT_SHOW_MESSAGES
-                            val chatLink = requireActivity().intent.getStringExtra(EXTRA_LINK)
-                            val coroutineScope = rememberCoroutineScope()
+            var passcodeEnabled by remember { mutableStateOf(true) }
 
-                            val scaffoldState = rememberScaffoldState()
+            SessionContainer {
+                ChatSessionContainer {
+                    OriginalTheme(isDark = mode.isDarkMode()) {
+                        PasscodeContainer(
+                            passcodeCryptObjectFactory = passcodeCryptObjectFactory,
+                            canLock = { passcodeEnabled },
+                            content = {
+                                PsaContainer {
+                                    val bottomSheetNavigator = rememberBottomSheetNavigator()
+                                    val navHostController =
+                                        rememberNavController(bottomSheetNavigator)
+                                    val chatId =
+                                        requireActivity().intent.getLongExtra(Constants.CHAT_ID, -1)
+                                    val action =
+                                        requireActivity().intent.getStringExtra(EXTRA_ACTION)
+                                            ?: Constants.ACTION_CHAT_SHOW_MESSAGES
+                                    val chatLink =
+                                        requireActivity().intent.getStringExtra(EXTRA_LINK)
+                                    val coroutineScope = rememberCoroutineScope()
 
-                            //Real chat navigation graph implementation should include the chat list screen and use that as the default route,
-                            NavHost(
-                                navController = navHostController,
-                                startDestination = "start",
-                                modifier = Modifier.navigationBarsPadding()
-                            ) {
+                                    val scaffoldState = rememberScaffoldState()
 
-                                composable("start") {
-                                    navHostController.navigateToChatViewGraph(
-                                        chatId = chatId,
-                                        chatLink = chatLink,
-                                        action = action,
-                                        navOptions = navOptions {
-                                            popUpTo("start") {
-                                                inclusive = true
-                                            }
+                                    //Real chat navigation graph implementation should include the chat list screen and use that as the default route,
+                                    NavHost(
+                                        navController = navHostController,
+                                        startDestination = "start",
+                                        modifier = Modifier.navigationBarsPadding()
+                                    ) {
+
+                                        composable("start") {
+                                            navHostController.navigateToChatViewGraph(
+                                                chatId = chatId,
+                                                chatLink = chatLink,
+                                                action = action,
+                                                navOptions = navOptions {
+                                                    popUpTo("start") {
+                                                        inclusive = true
+                                                    }
+                                                }
+                                            )
                                         }
-                                    )
-                                }
 
-                                chatViewNavigationGraph(
-                                    navController = navHostController,
-                                    bottomSheetNavigator = bottomSheetNavigator,
-                                    scaffoldState = scaffoldState,
-                                    startMeeting = { startMeetingActivity(requireContext(), it) },
-                                    navigateToInviteContact = {
-                                        navigator.openInviteContactActivity(
-                                            requireContext(),
-                                            false
-                                        )
-                                    },
-                                    showGroupOrContactInfoActivity = {
-                                        showGroupOrContactInfoActivity(
-                                            context,
-                                            it
-                                        )
-                                    },
-                                    navigateToChat = { openChatFragment(context, it) },
-                                    navigateToContactInfo = {
-                                        openContactInfoActivity(
-                                            context,
-                                            it
-                                        )
-                                    },
-                                    navigateToMeeting = { chatId, enableAudio, enableVideo ->
-                                        startMeetingActivity(
-                                            context,
-                                            chatId,
-                                            enableAudio,
-                                            enableVideo
-                                        )
-                                    },
-                                    navigateToWaitingRoom = { startWaitingRoom(context, it) },
-                                    onBackPress = { requireActivity().supportFinishAfterTransition() },
-                                    onCameraPermissionDenied = {
-                                        showPermissionNotAllowedSnackbar(
-                                            context,
-                                            coroutineScope,
-                                            scaffoldState.snackbarHostState,
-                                            R.string.chat_attach_pick_from_camera_deny_permission
+                                        chatViewNavigationGraph(
+                                            bottomSheetNavigator = bottomSheetNavigator,
+                                            navController = navHostController,
+                                            scaffoldState = scaffoldState,
+                                            startMeeting = {
+                                                startMeetingActivity(
+                                                    requireContext(),
+                                                    it
+                                                )
+                                            },
+                                            navigateToInviteContact = {
+                                                megaNavigator.openInviteContactActivity(
+                                                    requireContext(),
+                                                    false
+                                                )
+                                            },
+                                            showGroupOrContactInfoActivity = {
+                                                showGroupOrContactInfoActivity(
+                                                    context,
+                                                    it
+                                                )
+                                            },
+                                            navigateToChat = { openChatFragment(context, it) },
+                                            navigateToContactInfo = {
+                                                openContactInfoActivity(
+                                                    context,
+                                                    it
+                                                )
+                                            },
+                                            navigateToMeeting = { chatId, enableAudio, enableVideo ->
+                                                startMeetingActivity(
+                                                    context,
+                                                    chatId,
+                                                    enableAudio,
+                                                    enableVideo
+                                                )
+                                            },
+                                            navigateToWaitingRoom = {
+                                                startWaitingRoom(
+                                                    context,
+                                                    it
+                                                )
+                                            },
+                                            onBackPress = { requireActivity().supportFinishAfterTransition() },
+                                            onCameraPermissionDenied = {
+                                                showPermissionNotAllowedSnackbar(
+                                                    context,
+                                                    coroutineScope,
+                                                    scaffoldState.snackbarHostState,
+                                                    R.string.chat_attach_pick_from_camera_deny_permission
+                                                )
+                                            },
+                                            navigateToStorageSettings = {
+                                                megaNavigator.openSettings(
+                                                    requireActivity(),
+                                                    StorageTargetPreference
+                                                )
+                                            },
+                                            enablePasscodeCheck = { passcodeEnabled = true }
                                         )
                                     }
-                                )
+                                }
                             }
-                        }
-                    )
+                        )
+                    }
                 }
             }
         }
@@ -157,6 +193,17 @@ internal class ChatFragment : Fragment() {
 
     override fun onResume() {
         super.onResume()
+        MegaApplication.openChatId = requireActivity().intent.getLongExtra(Constants.CHAT_ID, -1L)
         Analytics.tracker.trackEvent(ChatConversationScreenEvent)
+    }
+
+    override fun onPause() {
+        super.onPause()
+        MegaApplication.openChatId = -1L
+    }
+
+    override fun onDestroy() {
+        super.onDestroy()
+        MegaApplication.openChatId = -1L
     }
 }

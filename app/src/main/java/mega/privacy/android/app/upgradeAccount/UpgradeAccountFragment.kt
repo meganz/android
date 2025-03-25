@@ -25,7 +25,9 @@ import mega.privacy.android.app.globalmanagement.MyAccountInfo
 import mega.privacy.android.app.myAccount.MyAccountActivity
 import mega.privacy.android.app.presentation.account.AccountStorageViewModel
 import mega.privacy.android.app.presentation.billing.BillingViewModel
-import mega.privacy.android.app.presentation.extensions.isDarkMode
+import mega.privacy.android.app.presentation.container.MegaAppContainer
+import mega.privacy.android.app.presentation.extensions.serializable
+import mega.privacy.android.app.presentation.passcode.model.PasscodeCryptObjectFactory
 import mega.privacy.android.app.service.iar.RatingHandlerImpl
 import mega.privacy.android.app.upgradeAccount.UpgradeAccountViewModel.Companion.getProductId
 import mega.privacy.android.app.upgradeAccount.model.UpgradePayment
@@ -39,7 +41,8 @@ import mega.privacy.android.domain.entity.billing.BillingEvent
 import mega.privacy.android.domain.entity.billing.MegaPurchase
 import mega.privacy.android.domain.usecase.GetThemeMode
 import mega.privacy.android.domain.usecase.featureflag.GetFeatureFlagValueUseCase
-import mega.privacy.android.shared.original.core.ui.theme.OriginalTempTheme
+import mega.privacy.mobile.analytics.event.AdFreeDialogUpgradeAccountPlanPageBuyButtonPressedEvent
+import mega.privacy.mobile.analytics.event.AdsUpgradeAccountPlanPageBuyButtonPressedEvent
 import mega.privacy.mobile.analytics.event.BuyProIEvent
 import mega.privacy.mobile.analytics.event.BuyProIIEvent
 import mega.privacy.mobile.analytics.event.BuyProIIIEvent
@@ -65,10 +68,18 @@ class UpgradeAccountFragment : Fragment() {
     @Inject
     lateinit var myAccountInfo: MyAccountInfo
 
+    @Inject
+    lateinit var passcodeCryptObjectFactory: PasscodeCryptObjectFactory
+
     private val upgradeAccountViewModel by activityViewModels<UpgradeAccountViewModel>()
     private val accountStorageViewModel by activityViewModels<AccountStorageViewModel>()
 
     private val billingViewModel by activityViewModels<BillingViewModel>()
+
+    private val openFromSource by lazy {
+        arguments?.serializable(UpgradeAccountActivity.EXTRA_SOURCE)
+            ?: UpgradeAccountSource.UNKNOWN
+    }
 
     internal lateinit var upgradeAccountActivity: UpgradeAccountActivity
 
@@ -104,7 +115,10 @@ class UpgradeAccountFragment : Fragment() {
         val mode by getThemeMode()
             .collectAsStateWithLifecycle(initialValue = ThemeMode.System)
         BackHandler { trackAndFinish() }
-        OriginalTempTheme(isDark = mode.isDarkMode()) {
+        MegaAppContainer(
+            themeMode = mode,
+            passcodeCryptObjectFactory = passcodeCryptObjectFactory
+        ) {
             UpgradeAccountView(
                 modifier = Modifier.semantics {
                     testTagsAsResourceId = true
@@ -166,11 +180,18 @@ class UpgradeAccountFragment : Fragment() {
         chosenPlan: AccountType,
     ) {
         when (chosenPlan) {
-            AccountType.PRO_LITE -> Analytics.tracker.trackEvent(BuyProLiteEvent)
-            AccountType.PRO_I -> Analytics.tracker.trackEvent(BuyProIEvent)
-            AccountType.PRO_II -> Analytics.tracker.trackEvent(BuyProIIEvent)
-            AccountType.PRO_III -> Analytics.tracker.trackEvent(BuyProIIIEvent)
-            else -> {}
+            AccountType.PRO_LITE -> BuyProLiteEvent
+            AccountType.PRO_I -> BuyProIEvent
+            AccountType.PRO_II -> BuyProIIEvent
+            AccountType.PRO_III -> BuyProIIIEvent
+            else -> null
+        }?.let {
+            Analytics.tracker.trackEvent(it)
+            if (openFromSource == UpgradeAccountSource.ADS_FREE_SCREEN) {
+                Analytics.tracker.trackEvent(AdFreeDialogUpgradeAccountPlanPageBuyButtonPressedEvent)
+            } else if (accountStorageViewModel.isUpgradeAccountDueToAds()) {
+                Analytics.tracker.trackEvent(AdsUpgradeAccountPlanPageBuyButtonPressedEvent)
+            }
         }
 
         billingViewModel.startPurchase(

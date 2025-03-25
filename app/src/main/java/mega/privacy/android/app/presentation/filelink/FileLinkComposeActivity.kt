@@ -2,7 +2,6 @@ package mega.privacy.android.app.presentation.filelink
 
 import mega.privacy.android.shared.resources.R as sharedR
 import android.content.Intent
-import android.content.res.Configuration
 import android.net.Uri
 import android.os.Bundle
 import android.widget.Toast
@@ -19,6 +18,10 @@ import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.lifecycle.lifecycleScope
 import dagger.hilt.android.AndroidEntryPoint
 import de.palm.composestateevents.EventEffect
+import kotlinx.coroutines.flow.combine
+import kotlinx.coroutines.flow.distinctUntilChanged
+import kotlinx.coroutines.flow.launchIn
+import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.launch
 import mega.privacy.android.app.MegaApplication.Companion.isClosedChat
 import mega.privacy.android.app.MimeTypeList.Companion.typeForName
@@ -26,14 +29,12 @@ import mega.privacy.android.app.R
 import mega.privacy.android.app.activities.PasscodeActivity
 import mega.privacy.android.app.activities.contract.NameCollisionActivityContract
 import mega.privacy.android.app.arch.extensions.collectFlow
-import mega.privacy.android.app.extensions.isPortrait
-import mega.privacy.android.app.featuretoggle.ABTestFeatures
 import mega.privacy.android.app.featuretoggle.AppFeatures
 import mega.privacy.android.app.main.DecryptAlertDialog
 import mega.privacy.android.app.main.FileExplorerActivity
 import mega.privacy.android.app.main.ManagerActivity
 import mega.privacy.android.app.main.ManagerActivity.Companion.TRANSFERS_TAB
-import mega.privacy.android.app.presentation.advertisements.model.AdsSlotIDs
+import mega.privacy.android.app.presentation.advertisements.GoogleAdsManager
 import mega.privacy.android.app.presentation.clouddrive.FileLinkViewModel
 import mega.privacy.android.app.presentation.extensions.isDarkMode
 import mega.privacy.android.app.presentation.filelink.view.FileLinkView
@@ -44,7 +45,7 @@ import mega.privacy.android.app.presentation.imagepreview.model.ImagePreviewMenu
 import mega.privacy.android.app.presentation.login.LoginActivity
 import mega.privacy.android.app.presentation.manager.model.TransfersTab
 import mega.privacy.android.app.presentation.pdfviewer.PdfViewerActivity
-import mega.privacy.android.app.presentation.transfers.TransfersManagementViewModel
+import mega.privacy.android.app.presentation.settings.model.StorageTargetPreference
 import mega.privacy.android.app.presentation.transfers.starttransfer.view.StartTransferComponent
 import mega.privacy.android.app.presentation.transfers.view.IN_PROGRESS_TAB_INDEX
 import mega.privacy.android.app.textEditor.TextEditorActivity
@@ -58,7 +59,7 @@ import mega.privacy.android.domain.entity.node.TypedFileNode
 import mega.privacy.android.domain.usecase.GetThemeMode
 import mega.privacy.android.domain.usecase.featureflag.GetFeatureFlagValueUseCase
 import mega.privacy.android.navigation.MegaNavigator
-import mega.privacy.android.shared.original.core.ui.theme.OriginalTempTheme
+import mega.privacy.android.shared.original.core.ui.theme.OriginalTheme
 import nz.mega.sdk.MegaApiJava.INVALID_HANDLE
 import timber.log.Timber
 import javax.inject.Inject
@@ -94,8 +95,13 @@ class FileLinkComposeActivity : PasscodeActivity(),
     @Inject
     lateinit var navigator: MegaNavigator
 
+    /**
+     * [GoogleAdsManager]
+     */
+    @Inject
+    lateinit var googleAdsManager: GoogleAdsManager
+
     private val viewModel: FileLinkViewModel by viewModels()
-    private val transfersManagementViewModel: TransfersManagementViewModel by viewModels()
 
     private var mKey: String? = null
 
@@ -125,12 +131,23 @@ class FileLinkComposeActivity : PasscodeActivity(),
         viewModel.handleIntent(intent)
         viewModel.checkLoginRequired()
 
+        viewModel.state.map { it.shouldShowAdsForLink }
+            .distinctUntilChanged()
+            .combine(googleAdsManager.isAdsFeatureEnabled) { shouldShowAdsForLink, isAdsFeatureEnabled ->
+                if (shouldShowAdsForLink && isAdsFeatureEnabled) {
+                    googleAdsManager.checkLatestConsentInformation(
+                        activity = this,
+                        onConsentInformationUpdated = { googleAdsManager.fetchAdRequest() }
+                    )
+                }
+            }.launchIn(lifecycleScope)
+
         setContent {
             val themeMode by getThemeMode()
                 .collectAsStateWithLifecycle(initialValue = ThemeMode.System)
             val uiState by viewModel.state.collectAsStateWithLifecycle()
             val transferState by transfersManagementViewModel.state.collectAsStateWithLifecycle()
-            val adsUiState by adsViewModel.uiState.collectAsStateWithLifecycle()
+            val request by googleAdsManager.request.collectAsStateWithLifecycle()
 
             EventEffect(
                 event = uiState.openFile,
@@ -145,7 +162,7 @@ class FileLinkComposeActivity : PasscodeActivity(),
             )
 
             val snackBarHostState = remember { SnackbarHostState() }
-            OriginalTempTheme(isDark = themeMode.isDarkMode()) {
+            OriginalTheme(isDark = themeMode.isDarkMode()) {
                 FileLinkView(
                     viewState = uiState,
                     snackBarHostState = snackBarHostState,
@@ -160,71 +177,53 @@ class FileLinkComposeActivity : PasscodeActivity(),
                     onErrorMessageConsumed = viewModel::resetErrorMessage,
                     onOverQuotaErrorConsumed = viewModel::resetOverQuotaError,
                     onForeignNodeErrorConsumed = viewModel::resetForeignNodeError,
-                    adsUiState = adsUiState,
-                    onAdClicked = { uri ->
-                        uri?.let {
-                            val intent = Intent(Intent.ACTION_VIEW, it)
-                            if (intent.resolveActivity(packageManager) != null) {
-                                startActivity(intent)
-                                adsViewModel.onAdConsumed()
-                            } else {
-                                Timber.d("No Application found to can handle Ads intent")
-                                adsViewModel.fetchNewAd()
-                            }
-                        }
-                        adsViewModel.fetchNewAd(AdsSlotIDs.SHARED_LINK_SLOT_ID)
-                    },
-                    onAdDismissed = adsViewModel::onAdConsumed
+                    request = request,
                 )
                 StartTransferComponent(
                     event = uiState.downloadEvent,
                     onConsumeEvent = viewModel::resetDownloadFile,
-                    snackBarHostState = snackBarHostState
+                    snackBarHostState = snackBarHostState,
+                    navigateToStorageSettings = {
+                        megaNavigator.openSettings(
+                            this,
+                            StorageTargetPreference
+                        )
+                    }
                 )
+                EventEffect(
+                    event = uiState.askForDecryptionKeyDialogEvent,
+                    onConsumed = viewModel::resetAskForDecryptionKeyDialog
+                ) {
+                    showAskForDecryptionKeyDialog()
+                }
+
+                EventEffect(
+                    event = uiState.collisionsEvent,
+                    onConsumed = viewModel::resetCollision,
+                ) {
+                    nameCollisionActivityLauncher.launch(arrayListOf(it))
+                }
+
+                EventEffect(
+                    event = uiState.copySuccessEvent,
+                    onConsumed = viewModel::resetCopySuccessEvent,
+                ) {
+                    launchManagerActivity()
+                }
             }
         }
-        setupObserver()
         checkForInAppAdvertisement()
+        collectFlow(viewModel.monitorMiscLoadedUseCase()) {
+            checkForInAppAdvertisement()
+        }
     }
 
     private fun checkForInAppAdvertisement() {
         lifecycleScope.launch {
             runCatching {
-                val isInAppAdvertisementEnabled = true
-                val isAdsEnabled = getFeatureFlagValueUseCase(ABTestFeatures.ads)
-
-                if (isInAppAdvertisementEnabled && isAdsEnabled) {
-                    if (this@FileLinkComposeActivity.isPortrait()) {
-                        adsViewModel.enableAdsFeature()
-                        adsViewModel.fetchNewAd(AdsSlotIDs.SHARED_LINK_SLOT_ID)
-                    }
-                }
+                googleAdsManager.checkForAdsAvailability()
             }.onFailure {
-                Timber.e("Failed to fetch feature flags or ab_ads test flag with error: ${it.message}")
-            }
-        }
-    }
-
-    override fun onConfigurationChanged(newConfig: Configuration) {
-        super.onConfigurationChanged(newConfig)
-        adsViewModel.onScreenOrientationChanged(isPortrait())
-    }
-
-    private fun setupObserver() {
-        this.collectFlow(viewModel.state) {
-            when {
-                it.askForDecryptionDialog -> {
-                    askForDecryptionKeyDialog()
-                }
-
-                it.collision != null -> {
-                    nameCollisionActivityLauncher.launch(arrayListOf(it.collision))
-                    viewModel.resetCollision()
-                }
-
-                it.copySuccess -> {
-                    launchManagerActivity()
-                }
+                Timber.e("Failed to check for ads availability: $it")
             }
         }
     }
@@ -261,10 +260,6 @@ class FileLinkComposeActivity : PasscodeActivity(),
      * Handle widget click
      */
     private fun onTransfersWidgetClick() {
-        transfersManagement.setAreFailedTransfers(false)
-        if (transfersManagement.isOnTransferOverQuota()) {
-            transfersManagement.setHasNotToBeShowDueToTransferOverQuota(true)
-        }
         lifecycleScope.launch {
             val credentials = runCatching { getAccountCredentialsUseCase() }.getOrNull()
             if (megaApi.isLoggedIn == 0 || credentials == null) {
@@ -317,16 +312,16 @@ class FileLinkComposeActivity : PasscodeActivity(),
     /**
      * Show dialog for getting decryption key
      */
-    private fun askForDecryptionKeyDialog() {
+    private fun showAskForDecryptionKeyDialog() {
         Timber.d("askForDecryptionKeyDialog")
         val decryptAlertDialog = DecryptAlertDialog.Builder()
             .setTitle(getString(R.string.alert_decryption_key))
-            .setPosText(R.string.general_decryp).setNegText(sharedR.string.general_dialog_cancel_button)
+            .setPosText(R.string.general_decryp)
+            .setNegText(sharedR.string.general_dialog_cancel_button)
             .setMessage(getString(R.string.message_decryption_key))
             .setErrorMessage(R.string.invalid_decryption_key).setKey(mKey)
             .build()
         decryptAlertDialog.show(supportFragmentManager, TAG_DECRYPT)
-        viewModel.resetAskForDecryptionKeyDialog()
     }
 
     private fun onPreviewClick() {

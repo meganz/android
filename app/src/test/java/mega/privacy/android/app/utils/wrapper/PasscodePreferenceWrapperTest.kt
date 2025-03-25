@@ -3,13 +3,13 @@ package mega.privacy.android.app.utils.wrapper
 import com.google.common.truth.Truth.assertThat
 import kotlinx.coroutines.test.StandardTestDispatcher
 import kotlinx.coroutines.test.runTest
+import mega.privacy.android.app.extensions.asHotFlow
 import mega.privacy.android.app.utils.Constants.PIN_4
 import mega.privacy.android.app.utils.Constants.PIN_6
 import mega.privacy.android.app.utils.Constants.PIN_ALPHANUMERIC
 import mega.privacy.android.app.utils.Constants.REQUIRE_PASSCODE_INVALID
 import mega.privacy.android.app.utils.PasscodeUtil
-import mega.privacy.android.app.utils.PasscodeUtil.Companion.REQUIRE_PASSCODE_IMMEDIATE
-import mega.privacy.android.app.utils.wrapper.PasscodePreferenceWrapper
+import mega.privacy.android.app.utils.PasscodeUtil.REQUIRE_PASSCODE_IMMEDIATE
 import mega.privacy.android.core.test.extension.CoroutineMainDispatcherExtension
 import mega.privacy.android.data.database.DatabaseHandler
 import mega.privacy.android.domain.entity.passcode.PasscodeTimeout
@@ -30,7 +30,6 @@ import org.mockito.Mockito
 import org.mockito.Mockito.mock
 import org.mockito.kotlin.stub
 import org.mockito.kotlin.verify
-import mega.privacy.android.app.extensions.asHotFlow
 
 @TestInstance(TestInstance.Lifecycle.PER_CLASS)
 class PasscodePreferenceWrapperTest {

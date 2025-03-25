@@ -25,7 +25,7 @@ import androidx.lifecycle.compose.LifecycleEventEffect
 import mega.privacy.android.shared.original.core.ui.controls.images.ThumbnailView
 import mega.privacy.android.shared.original.core.ui.controls.textfields.GenericTextField
 import mega.privacy.android.shared.original.core.ui.preview.CombinedThemePreviews
-import mega.privacy.android.shared.original.core.ui.theme.OriginalTempTheme
+import mega.privacy.android.shared.original.core.ui.theme.OriginalTheme
 
 /**
  * Upload Row Item
@@ -95,7 +95,7 @@ fun UploadDestinationRowItem(
 @CombinedThemePreviews
 @Composable
 private fun UploadRowItemPreview() {
-    OriginalTempTheme(isDark = isSystemInDarkTheme()) {
+    OriginalTheme(isDark = isSystemInDarkTheme()) {
         Column {
             UploadDestinationRowItem(
                 importUiItem = ImportUiItem(

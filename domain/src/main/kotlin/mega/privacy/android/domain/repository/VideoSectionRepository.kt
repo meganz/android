@@ -15,16 +15,26 @@ interface VideoSectionRepository {
      * Get all videos
      *
      * @param order the list order
+     * @param searchQuery the search query
+     * @param tag the tag
+     * @param description the description
+     *
      * @return typed video node list
      */
-    suspend fun getAllVideos(order: SortOrder): List<TypedVideoNode>
+    suspend fun getAllVideos(
+        searchQuery: String,
+        tag: String?,
+        description: String?,
+        order: SortOrder,
+    ): List<TypedVideoNode>
 
     /**
      * Get video playlists
      *
+     * @param sortOrder the list order, this is for getting favourites playlist items by sort order
      * @return video playlist lists
      */
-    suspend fun getVideoPlaylists(): List<VideoPlaylist>
+    suspend fun getVideoPlaylists(sortOrder: SortOrder = SortOrder.ORDER_NONE): List<VideoPlaylist>
 
     /**
      * Create a video playlist
@@ -119,7 +129,7 @@ interface VideoSectionRepository {
         handle: Long,
         timestamp: Long,
         collectionId: Long = 0,
-        collectionTitle: String? = null
+        collectionTitle: String? = null,
     )
 
     /**

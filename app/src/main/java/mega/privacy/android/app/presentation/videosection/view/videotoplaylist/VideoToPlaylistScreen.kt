@@ -18,8 +18,8 @@ internal fun VideoToPlaylistScreen(
     val onBackPressedDispatcher = LocalOnBackPressedDispatcherOwner.current?.onBackPressedDispatcher
 
     LaunchedEffect(key1 = uiState.addedPlaylistTitles) {
-        if (uiState.addedPlaylistTitles.isNotEmpty()) {
-            addedVideoFinished(uiState.addedPlaylistTitles)
+        uiState.addedPlaylistTitles?.let {
+            addedVideoFinished(it)
         }
     }
 

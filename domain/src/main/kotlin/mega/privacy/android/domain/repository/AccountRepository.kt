@@ -706,5 +706,41 @@ interface AccountRepository {
      */
     fun monitorAlmostFullStorageBannerClosingTimestamp(): Flow<Long?>
 
+    /**
+     * Create new user account
+     *
+     * @param email User's email to register
+     * @param password Account password
+     * @param firstName User's first name
+     * @param lastName User's last name
+     *
+     * @return EphemeralCredentials if successful
+     */
+    suspend fun createAccount(
+        email: String,
+        password: String,
+        firstName: String,
+        lastName: String,
+    ): EphemeralCredentials
 
+    /**
+     * Get Invalid Handle
+     */
+    fun getInvalidHandle(): Long
+
+    /**
+     * Get Invalid Affiliate Type
+     */
+    fun getInvalidAffiliateType(): Int
+
+
+    /**
+     * Monitor misc loaded
+     */
+    fun monitorMiscLoaded(): Flow<Unit>
+
+    /**
+     * Broadcast misc loaded
+     */
+    suspend fun broadcastMiscLoaded()
 }

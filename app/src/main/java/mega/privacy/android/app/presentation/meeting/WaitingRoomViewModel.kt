@@ -33,7 +33,7 @@ import mega.privacy.android.domain.qualifier.ApplicationScope
 import mega.privacy.android.domain.usecase.CheckChatLinkUseCase
 import mega.privacy.android.domain.usecase.GetMyAvatarColorUseCase
 import mega.privacy.android.domain.usecase.GetUserFullNameUseCase
-import mega.privacy.android.domain.usecase.IsUserLoggedIn
+import mega.privacy.android.domain.usecase.login.IsUserLoggedInUseCase
 import mega.privacy.android.domain.usecase.avatar.GetMyAvatarFileUseCase
 import mega.privacy.android.domain.usecase.chat.GetChatLocalVideoUpdatesUseCase
 import mega.privacy.android.domain.usecase.chat.InitGuestChatSessionUseCase
@@ -81,7 +81,7 @@ import javax.inject.Inject
  * @property initGuestChatSessionUseCase                [InitGuestChatSessionUseCase]
  * @property joinGuestChatCallUseCase                   [JoinGuestChatCallUseCase]
  * @property checkChatLinkUseCase                       [CheckChatLinkUseCase]
- * @property isUserLoggedIn                             [IsUserLoggedIn]
+ * @property isUserLoggedInUseCase                             [IsUserLoggedInUseCase]
  * @property isEphemeralPlusPlusUseCase                 [IsEphemeralPlusPlusUseCase]
  * @property logoutUseCase                              [LogoutUseCase]
  * @property hangChatCallUseCase                        [HangChatCallUseCase]
@@ -110,7 +110,7 @@ class WaitingRoomViewModel @Inject constructor(
     private val initGuestChatSessionUseCase: InitGuestChatSessionUseCase,
     private val joinGuestChatCallUseCase: JoinGuestChatCallUseCase,
     private val checkChatLinkUseCase: CheckChatLinkUseCase,
-    private val isUserLoggedIn: IsUserLoggedIn,
+    private val isUserLoggedInUseCase: IsUserLoggedInUseCase,
     private val chatManagement: ChatManagement,
     private val isEphemeralPlusPlusUseCase: IsEphemeralPlusPlusUseCase,
     private val logoutUseCase: LogoutUseCase,
@@ -158,7 +158,7 @@ class WaitingRoomViewModel @Inject constructor(
      */
     private suspend fun initChatGuestSessionIfNeeded() {
         runCatching {
-            if (!isUserLoggedIn()) {
+            if (!isUserLoggedInUseCase()) {
                 initGuestChatSessionUseCase(anonymousMode = true)
             }
         }.onFailure { exception ->
@@ -174,7 +174,7 @@ class WaitingRoomViewModel @Inject constructor(
      */
     fun loadMeetingDetails(chatId: Long?, chatLink: String?) {
         viewModelScope.launch {
-            val userLoggedIn = isUserLoggedIn()
+            val userLoggedIn = isUserLoggedInUseCase()
             _state.update {
                 it.copy(
                     chatId = chatId ?: -1L,

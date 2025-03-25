@@ -14,7 +14,6 @@ import mega.privacy.android.domain.usecase.DefaultCanDeleteAccount
 import mega.privacy.android.domain.usecase.DefaultIsChatLoggedIn
 import mega.privacy.android.domain.usecase.DefaultMonitorAutoAcceptQRLinks
 import mega.privacy.android.domain.usecase.DefaultMonitorMediaDiscoveryView
-import mega.privacy.android.domain.usecase.DefaultRefreshPasscodeLockPreference
 import mega.privacy.android.domain.usecase.DefaultToggleAutoAcceptQRLinks
 import mega.privacy.android.domain.usecase.FetchAutoAcceptQRLinks
 import mega.privacy.android.domain.usecase.GetChatImageQuality
@@ -22,13 +21,10 @@ import mega.privacy.android.domain.usecase.IsChatLoggedIn
 import mega.privacy.android.domain.usecase.IsMultiFactorAuthAvailable
 import mega.privacy.android.domain.usecase.MonitorAutoAcceptQRLinks
 import mega.privacy.android.domain.usecase.MonitorMediaDiscoveryView
-import mega.privacy.android.domain.usecase.RefreshPasscodeLockPreference
 import mega.privacy.android.domain.usecase.RequestAccountDeletion
 import mega.privacy.android.domain.usecase.SetChatImageQuality
 import mega.privacy.android.domain.usecase.SetMediaDiscoveryView
 import mega.privacy.android.domain.usecase.ToggleAutoAcceptQRLinks
-import mega.privacy.android.domain.usecase.call.GetCallsSoundNotifications
-import mega.privacy.android.domain.usecase.call.SetCallsSoundNotifications
 
 /**
  * Settings use cases module
@@ -41,9 +37,6 @@ abstract class SettingsUseCases {
 
     @Binds
     abstract fun bindCanDeleteAccount(useCase: DefaultCanDeleteAccount): CanDeleteAccount
-
-    @Binds
-    abstract fun bindRefreshPasscodeLockPreference(useCase: DefaultRefreshPasscodeLockPreference): RefreshPasscodeLockPreference
 
     @Binds
     abstract fun bindToggleAutoAcceptQRLinks(useCase: DefaultToggleAutoAcceptQRLinks): ToggleAutoAcceptQRLinks
@@ -81,14 +74,6 @@ abstract class SettingsUseCases {
         @Provides
         fun provideSetChatImageQuality(settingsRepository: SettingsRepository): SetChatImageQuality =
             SetChatImageQuality(settingsRepository::setChatImageQuality)
-
-        @Provides
-        fun provideGetCallsSoundNotifications(settingsRepository: SettingsRepository): GetCallsSoundNotifications =
-            GetCallsSoundNotifications(settingsRepository::getCallsSoundNotifications)
-
-        @Provides
-        fun provideSetCallsSoundNotifications(settingsRepository: SettingsRepository): SetCallsSoundNotifications =
-            SetCallsSoundNotifications(settingsRepository::setCallsSoundNotifications)
 
         /**
          * Provide SetMediaDiscoveryView implementation

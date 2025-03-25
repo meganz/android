@@ -4,8 +4,7 @@ import com.google.common.truth.Truth.assertThat
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.test.runTest
 import mega.privacy.android.domain.entity.node.FileNode
-import mega.privacy.android.domain.entity.node.TypedFileNode
-import mega.privacy.android.domain.repository.FileSystemRepository
+import mega.privacy.android.domain.repository.files.FingerprintRepository
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
 import org.mockito.kotlin.mock
@@ -16,14 +15,14 @@ import java.io.File
 @OptIn(ExperimentalCoroutinesApi::class)
 class IsValidNodeFileUseCaseTest {
 
-    private val fileSystemRepository = mock<FileSystemRepository>()
+    private val fingerprintRepository = mock<FingerprintRepository>()
     private val node = mock<FileNode>()
     private val file = mock<File>()
-    val underTest = IsValidNodeFileUseCase(fileSystemRepository)
+    val underTest = IsValidNodeFileUseCase(fingerprintRepository)
 
     @BeforeEach
     fun resetMock() {
-        reset(fileSystemRepository, node)
+        reset(fingerprintRepository, node)
     }
 
     @Test
@@ -62,7 +61,7 @@ class IsValidNodeFileUseCaseTest {
             whenever(file.absolutePath).thenReturn(filePath)
             whenever(node.size).thenReturn(size)
             whenever(node.fingerprint).thenReturn(nodeFingerPrint)
-            whenever(fileSystemRepository.getFingerprint(filePath)).thenReturn(fileFingerPrint)
+            whenever(fingerprintRepository.getFingerprint(filePath)).thenReturn(fileFingerPrint)
             val actual = underTest(node, file)
             assertThat(actual).isEqualTo(expected)
         }
@@ -79,7 +78,7 @@ class IsValidNodeFileUseCaseTest {
             whenever(file.absolutePath).thenReturn(filePath)
             whenever(node.size).thenReturn(size)
             whenever(node.fingerprint).thenReturn(fingerPrint)
-            whenever(fileSystemRepository.getFingerprint(filePath)).thenReturn(fingerPrint)
+            whenever(fingerprintRepository.getFingerprint(filePath)).thenReturn(fingerPrint)
             val actual = underTest(node, file)
             assertThat(actual).isEqualTo(expected)
         }

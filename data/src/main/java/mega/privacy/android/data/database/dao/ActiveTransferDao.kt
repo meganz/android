@@ -24,11 +24,38 @@ internal interface ActiveTransferDao {
     @Query("SELECT * FROM active_transfers ")
     suspend fun getCurrentActiveTransfers(): List<ActiveTransferEntity>
 
-    @Insert(onConflict = OnConflictStrategy.REPLACE)
-    suspend fun insertOrUpdateActiveTransfer(entity: ActiveTransferEntity)
+    @Insert(onConflict = OnConflictStrategy.IGNORE)
+    suspend fun insertActiveTransfer(entity: ActiveTransferEntity): Long
 
-    @Insert(onConflict = OnConflictStrategy.REPLACE)
-    suspend fun insertOrUpdateActiveTransfers(entities: List<ActiveTransferEntity>)
+    @Query(
+        "UPDATE active_transfers " +
+                "SET is_finished = :isFinished, is_paused = :isPaused, is_already_downloaded = :isAlreadyTransferred, total_bytes = :totalBytes, is_cancelled = :isCancelled " +
+                "WHERE tag = :tag " +
+                "AND is_finished = 0"
+    )
+    suspend fun updateActiveTransferIfNotFinished(
+        tag: Int,
+        isFinished: Boolean,
+        isPaused: Boolean,
+        totalBytes: Long,
+        isAlreadyTransferred: Boolean,
+        isCancelled: Boolean,
+    )
+
+    @Transaction
+    suspend fun insertOrUpdateActiveTransfer(entity: ActiveTransferEntity) {
+        val id = insertActiveTransfer(entity)
+        if (id == -1L) {
+            updateActiveTransferIfNotFinished(
+                tag = entity.tag,
+                isFinished = entity.isFinished,
+                isPaused = entity.isPaused,
+                totalBytes = entity.totalBytes,
+                isAlreadyTransferred = entity.isAlreadyTransferred,
+                isCancelled = entity.isCancelled,
+            )
+        }
+    }
 
     /**
      * Transaction to insert a list of entities but splitting the insert to avoid SQLiteException too many SQL variables
@@ -38,8 +65,10 @@ internal interface ActiveTransferDao {
         entities: List<ActiveTransferEntity>,
         chunkSize: Int,
     ) {
-        entities.chunked(chunkSize).forEach {
-            insertOrUpdateActiveTransfers(it)
+        entities.chunked(chunkSize).forEach { chunk ->
+            chunk.forEach { entity ->
+                insertOrUpdateActiveTransfer(entity)
+            }
         }
     }
 

@@ -11,6 +11,8 @@ import androidx.fragment.app.Fragment
 import androidx.fragment.app.activityViewModels
 import com.google.android.material.transition.MaterialContainerTransform
 import dagger.hilt.android.AndroidEntryPoint
+import kotlinx.coroutines.flow.distinctUntilChanged
+import kotlinx.coroutines.flow.map
 import mega.privacy.android.app.R
 import mega.privacy.android.app.arch.extensions.collectFlow
 import mega.privacy.android.app.databinding.FragmentMyAccountUsageBinding
@@ -98,8 +100,6 @@ class MyAccountUsageFragment : Fragment(), Scrollable {
 
         binding.rubbishSeparator.isVisible = false
         binding.previousVersionsStorageContainer.isVisible = false
-
-        setupAccountDetails()
     }
 
     override fun checkScroll() {
@@ -113,6 +113,10 @@ class MyAccountUsageFragment : Fragment(), Scrollable {
     private fun setupObservers() {
         viewLifecycleOwner.collectFlow(viewModel.state) {
             refreshVersionsInfo(it.versionsInfo, it.isFileVersioningEnabled)
+        }
+        viewLifecycleOwner.collectFlow(viewModel.state.map { it.storageState }
+            .distinctUntilChanged()) {
+            setupAccountDetails()
         }
         viewModel.onUpdateAccountDetails().observe(viewLifecycleOwner) { setupAccountDetails() }
     }
@@ -175,13 +179,15 @@ class MyAccountUsageFragment : Fragment(), Scrollable {
         } else {
             usageBinding.update(
                 requireContext(),
+                viewModel.getStorageState(),
                 viewModel.isFreeAccount(),
                 viewModel.getTotalStorage(),
                 viewModel.getTotalTransfer(),
                 viewModel.getUsedStorage(),
                 viewModel.getUsedStoragePercentage(),
                 viewModel.getUsedTransfer(),
-                viewModel.getUsedTransferPercentage()
+                viewModel.getUsedTransferPercentage(),
+                viewModel.getUsedTransferStatus()
             )
             paymentAlertBinding.root.isVisible = paymentAlertBinding.update(
                 viewModel.getRenewTime(),

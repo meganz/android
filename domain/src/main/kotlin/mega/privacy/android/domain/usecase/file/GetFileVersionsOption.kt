@@ -1,6 +1,6 @@
 package mega.privacy.android.domain.usecase.file
 
-import mega.privacy.android.domain.repository.FileSystemRepository
+import mega.privacy.android.domain.repository.SettingsRepository
 import javax.inject.Inject
 
 /**
@@ -8,12 +8,12 @@ import javax.inject.Inject
  *
  */
 class GetFileVersionsOption @Inject constructor(
-    private val fileSystemRepository: FileSystemRepository,
+    private val settingsRepository: SettingsRepository,
 ) {
     /**
      * Invoke
      *
      */
     suspend operator fun invoke(forceRefresh: Boolean) =
-        fileSystemRepository.getFileVersionsOption(forceRefresh)
+        settingsRepository.getFileVersionsOption(forceRefresh)
 }

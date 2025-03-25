@@ -2,8 +2,10 @@ package mega.privacy.android.feature.sync.presentation.mapper
 
 import com.google.common.truth.Truth.assertThat
 import kotlinx.coroutines.ExperimentalCoroutinesApi
+import mega.privacy.android.data.mapper.backup.BackupInfoTypeIntMapper
 import mega.privacy.android.domain.entity.node.NodeId
 import mega.privacy.android.domain.entity.sync.SyncType
+import mega.privacy.android.feature.sync.data.mapper.SyncStatusMapper
 import mega.privacy.android.feature.sync.domain.entity.FolderPair
 import mega.privacy.android.feature.sync.domain.entity.RemoteFolder
 import mega.privacy.android.feature.sync.domain.entity.SyncStatus
@@ -20,14 +22,20 @@ import org.mockito.kotlin.whenever
 class SyncUiItemMapperTest {
 
     private val deviceFolderUINodeErrorMessageMapper: DeviceFolderUINodeErrorMessageMapper = mock()
-    private val underTest = SyncUiItemMapper(deviceFolderUINodeErrorMessageMapper)
+    private val backupInfoTypeIntMapper: BackupInfoTypeIntMapper = mock()
+    private val syncStatusMapper: SyncStatusMapper = mock()
+    private val underTest = SyncUiItemMapper(
+        deviceFolderUINodeErrorMessageMapper = deviceFolderUINodeErrorMessageMapper,
+        backupInfoTypeIntMapper = backupInfoTypeIntMapper,
+        syncStatusMapper = syncStatusMapper,
+    )
 
     private val folderPair = FolderPair(
         id = 3L,
         syncType = SyncType.TYPE_TWOWAY,
         pairName = "folderPair",
         localFolderPath = "DCIM",
-        remoteFolder = RemoteFolder(id = 233L, name = "photos"),
+        remoteFolder = RemoteFolder(id = NodeId(233L), name = "photos"),
         syncStatus = SyncStatus.SYNCING,
         syncError = null
     )

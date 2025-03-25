@@ -3,16 +3,18 @@ package mega.privacy.android.app.main.managerSections
 import app.cash.turbine.test
 import com.google.common.truth.Truth.assertThat
 import de.palm.composestateevents.StateEventWithContentTriggered
+import de.palm.composestateevents.consumed
 import de.palm.composestateevents.triggered
 import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.ExperimentalCoroutinesApi
+import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.emptyFlow
 import kotlinx.coroutines.flow.flowOf
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.test.StandardTestDispatcher
 import kotlinx.coroutines.test.UnconfinedTestDispatcher
 import kotlinx.coroutines.test.advanceUntilIdle
 import kotlinx.coroutines.test.runTest
-import mega.privacy.android.app.globalmanagement.TransfersManagement
 import mega.privacy.android.app.presentation.transfers.starttransfer.model.TransferTriggerEvent
 import mega.privacy.android.core.test.extension.CoroutineMainDispatcherExtension
 import mega.privacy.android.data.mapper.transfer.TransferAppDataMapper
@@ -21,22 +23,25 @@ import mega.privacy.android.domain.entity.node.TypedNode
 import mega.privacy.android.domain.entity.transfer.CompletedTransfer
 import mega.privacy.android.domain.entity.transfer.Transfer
 import mega.privacy.android.domain.entity.transfer.TransferAppData
+import mega.privacy.android.domain.entity.transfer.TransferEvent
 import mega.privacy.android.domain.entity.transfer.TransferState
 import mega.privacy.android.domain.exception.chat.ChatUploadNotRetriedException
 import mega.privacy.android.domain.usecase.GetNodeByIdUseCase
 import mega.privacy.android.domain.usecase.chat.message.pendingmessages.RetryChatUploadUseCase
+import mega.privacy.android.domain.usecase.file.CanReadUriUseCase
 import mega.privacy.android.domain.usecase.transfers.CancelTransferByTagUseCase
 import mega.privacy.android.domain.usecase.transfers.GetFailedOrCanceledTransfersUseCase
 import mega.privacy.android.domain.usecase.transfers.GetInProgressTransfersUseCase
 import mega.privacy.android.domain.usecase.transfers.GetTransferByTagUseCase
-import mega.privacy.android.domain.usecase.transfers.MonitorFailedTransferUseCase
 import mega.privacy.android.domain.usecase.transfers.MonitorTransferEventsUseCase
 import mega.privacy.android.domain.usecase.transfers.MoveTransferBeforeByTagUseCase
 import mega.privacy.android.domain.usecase.transfers.MoveTransferToFirstByTagUseCase
 import mega.privacy.android.domain.usecase.transfers.MoveTransferToLastByTagUseCase
 import mega.privacy.android.domain.usecase.transfers.completed.DeleteCompletedTransferUseCase
+import mega.privacy.android.domain.usecase.transfers.completed.DeleteFailedOrCancelledTransferCacheFilesUseCase
 import mega.privacy.android.domain.usecase.transfers.completed.MonitorCompletedTransferEventUseCase
 import mega.privacy.android.domain.usecase.transfers.completed.MonitorCompletedTransfersUseCase
+import mega.privacy.android.domain.usecase.transfers.overquota.MonitorTransferOverQuotaUseCase
 import mega.privacy.android.domain.usecase.transfers.paused.MonitorPausedTransfersUseCase
 import mega.privacy.android.domain.usecase.transfers.paused.PauseTransferByTagUseCase
 import nz.mega.sdk.MegaTransfer
@@ -55,9 +60,7 @@ import java.math.BigInteger
 @ExperimentalCoroutinesApi
 internal class TransfersViewModelTest {
     private lateinit var underTest: TransfersViewModel
-    private val transfersManagement: TransfersManagement = mock()
     private val ioDispatcher: CoroutineDispatcher = UnconfinedTestDispatcher()
-    private val monitorFailedTransferUseCase: MonitorFailedTransferUseCase = mock()
     private val moveTransferBeforeByTagUseCase: MoveTransferBeforeByTagUseCase = mock()
     private val moveTransferToFirstByTagUseCase: MoveTransferToFirstByTagUseCase = mock()
     private val moveTransferToLastByTagUseCase: MoveTransferToLastByTagUseCase = mock()
@@ -74,6 +77,12 @@ internal class TransfersViewModelTest {
     private val getNodeByIdUseCase = mock<GetNodeByIdUseCase>()
     private val transferAppDataMapper = mock<TransferAppDataMapper>()
     private val retryChatUploadUseCase = mock<RetryChatUploadUseCase>()
+    private val monitorTransferOverQuotaUseCase = mock<MonitorTransferOverQuotaUseCase> {
+        onBlocking { invoke() } doReturn emptyFlow()
+    }
+    private val deleteFailedOrCancelledTransferCacheFilesUseCase =
+        mock<DeleteFailedOrCancelledTransferCacheFilesUseCase>()
+    private val canReadUriUseCase = mock<CanReadUriUseCase>()
 
     @BeforeEach
     fun setUp() {
@@ -82,9 +91,7 @@ internal class TransfersViewModelTest {
 
     private fun initViewModel() {
         underTest = TransfersViewModel(
-            transfersManagement = transfersManagement,
             ioDispatcher = ioDispatcher,
-            monitorFailedTransferUseCase = monitorFailedTransferUseCase,
             moveTransferBeforeByTagUseCase = moveTransferBeforeByTagUseCase,
             moveTransferToFirstByTagUseCase = moveTransferToFirstByTagUseCase,
             moveTransferToLastByTagUseCase = moveTransferToLastByTagUseCase,
@@ -101,6 +108,9 @@ internal class TransfersViewModelTest {
             getNodeByIdUseCase = getNodeByIdUseCase,
             transferAppDataMapper = transferAppDataMapper,
             retryChatUploadUseCase = retryChatUploadUseCase,
+            monitorTransferOverQuotaUseCase = monitorTransferOverQuotaUseCase,
+            deleteFailedOrCancelledTransferCacheFilesUseCase = deleteFailedOrCancelledTransferCacheFilesUseCase,
+            canReadUriUseCase = canReadUriUseCase,
         )
     }
 
@@ -313,6 +323,7 @@ internal class TransfersViewModelTest {
                 on { handle } doReturn nodeHandle
             }
             val expected = mock<TypedNode>()
+
             whenever(getNodeByIdUseCase(NodeId(nodeHandle))) doReturn expected
 
             underTest.retryTransfer(transfer)
@@ -362,6 +373,8 @@ internal class TransfersViewModelTest {
                 )
             )
 
+            whenever(canReadUriUseCase(path)) doReturn true
+
             underTest.retryTransfer(transfer)
 
             underTest.uiState.map { it.startEvent }.test {
@@ -391,6 +404,7 @@ internal class TransfersViewModelTest {
             whenever(transferAppDataMapper(appDataString)) doReturn listOf(
                 TransferAppData.OriginalContentUri(contentUri)
             )
+            whenever(canReadUriUseCase(contentUri)) doReturn true
 
             underTest.retryTransfer(transfer)
 
@@ -426,15 +440,18 @@ internal class TransfersViewModelTest {
     @Test
     fun `test that retryTransfer resend messages when it is an upload and is a chat upload`() =
         runTest {
+            val path = "path"
             val appData = "appData"
             val chatUpload = TransferAppData.ChatUpload(1L)
             val chatUploadAppData = listOf(chatUpload)
             val transfer = mock<CompletedTransfer> {
                 on { type } doReturn MegaTransfer.TYPE_UPLOAD
                 on { this.appData } doReturn appData
+                on { originalPath } doReturn path
             }
 
             whenever(transferAppDataMapper(appData)).thenReturn(chatUploadAppData)
+            whenever(canReadUriUseCase(path)) doReturn true
 
             underTest.retryTransfer(transfer)
             advanceUntilIdle()
@@ -464,6 +481,7 @@ internal class TransfersViewModelTest {
             )
 
             whenever(transferAppDataMapper(appData)).thenReturn(chatUploadAppData)
+            whenever(canReadUriUseCase(path)) doReturn true
             whenever(retryChatUploadUseCase(chatUploadAppData))
                 .thenThrow(ChatUploadNotRetriedException())
 
@@ -475,6 +493,82 @@ internal class TransfersViewModelTest {
             }
         }
 
+    @Test
+    fun `test that MonitorTransferOverQuotaUseCase updates state`() = runTest {
+        val flow = MutableStateFlow(false)
+
+        whenever(monitorTransferOverQuotaUseCase()).thenReturn(flow)
+
+        initViewModel()
+
+        assertThat(underTest.isOnTransferOverQuota()).isFalse()
+
+        flow.emit(true)
+        advanceUntilIdle()
+
+        assertThat(underTest.isOnTransferOverQuota()).isTrue()
+    }
+
+    @Test
+    fun `test that deleteFailedOrCancelledTransferCacheFiles invokes use case`() = runTest {
+        underTest.deleteFailedOrCancelledTransferCacheFiles()
+
+        verify(deleteFailedOrCancelledTransferCacheFilesUseCase).invoke()
+    }
+
+    @Test
+    fun `test that retryTransfer does not trigger a StartUpload event when it is an upload and cannot read`() =
+        runTest {
+            val path = "path"
+            val parentHandle = 123L
+            val transfer = mock<CompletedTransfer> {
+                on { type } doReturn MegaTransfer.TYPE_UPLOAD
+                on { this.parentHandle } doReturn parentHandle
+                on { originalPath } doReturn path
+            }
+
+            whenever(canReadUriUseCase(path)) doReturn false
+
+            underTest.retryTransfer(transfer)
+
+            underTest.uiState.test {
+                val actual = awaitItem()
+                assertThat(actual.startEvent).isEqualTo(consumed())
+                assertThat(actual.readRetryError).isEqualTo(1)
+            }
+        }
+
+    @Test
+    fun `test that getAllActiveTransfers does not return preview downloads`() = runTest {
+        val activeTransfer1 = mock<Transfer> {
+            on { appData } doReturn emptyList()
+        }
+        val activeTransfer2 = mock<Transfer> {
+            on { appData } doReturn listOf(TransferAppData.PreviewDownload)
+        }
+        val activeTransfers = listOf(activeTransfer1, activeTransfer2)
+        val expected = listOf(activeTransfer1)
+
+        whenever(getInProgressTransfersUseCase()) doReturn activeTransfers
+
+        underTest.getAllActiveTransfers().join()
+
+        assertThat(underTest.getActiveTransfers()).isEqualTo(expected)
+    }
+
+    @Test
+    fun `test that monitorTransferEventsUseCase filters preview downloads`() = runTest {
+        val transfer = mock<Transfer> {
+            on { appData } doReturn listOf(TransferAppData.PreviewDownload)
+        }
+        val startEvent = TransferEvent.TransferStartEvent(transfer)
+
+        initViewModel()
+
+        whenever(monitorTransferEventsUseCase()) doReturn flowOf(startEvent)
+
+        assertThat(underTest.getActiveTransfers()).isEqualTo(emptyList<Transfer>())
+    }
 
     companion object {
         @JvmField

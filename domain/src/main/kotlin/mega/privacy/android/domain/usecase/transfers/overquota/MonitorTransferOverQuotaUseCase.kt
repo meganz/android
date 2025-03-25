@@ -1,5 +1,6 @@
 package mega.privacy.android.domain.usecase.transfers.overquota
 
+import kotlinx.coroutines.flow.onStart
 import mega.privacy.android.domain.repository.TransferRepository
 import javax.inject.Inject
 
@@ -9,6 +10,7 @@ import javax.inject.Inject
  */
 class MonitorTransferOverQuotaUseCase @Inject constructor(
     private val transferRepository: TransferRepository,
+    private val isInTransferOverQuotaUseCase: IsInTransferOverQuotaUseCase,
 ) {
     /**
      * Invoke
@@ -16,4 +18,5 @@ class MonitorTransferOverQuotaUseCase @Inject constructor(
      * @return
      */
     operator fun invoke() = transferRepository.monitorTransferOverQuota()
+        .onStart { isInTransferOverQuotaUseCase() }
 }

@@ -1,8 +1,7 @@
 package mega.privacy.android.app.presentation.settings.startscreen.view
 
-import android.content.res.Configuration
+import mega.privacy.android.icon.pack.R as iconPackR
 import androidx.annotation.DrawableRes
-import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.isSystemInDarkTheme
 import androidx.compose.foundation.layout.Arrangement
@@ -14,10 +13,7 @@ import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.selection.toggleable
-import androidx.compose.material.Divider
-import androidx.compose.material.Icon
 import androidx.compose.material.MaterialTheme
-import androidx.compose.material.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
@@ -29,16 +25,17 @@ import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.semantics.Role
 import androidx.compose.ui.text.font.FontWeight
-import androidx.compose.ui.tooling.preview.Preview
+import androidx.compose.ui.tooling.preview.PreviewParameter
 import androidx.compose.ui.unit.dp
-import mega.privacy.android.icon.pack.R as iconPackR
-import mega.privacy.android.shared.original.core.ui.theme.OriginalTempTheme
-import mega.privacy.android.shared.original.core.ui.theme.grey_alpha_012
-import mega.privacy.android.shared.original.core.ui.theme.grey_alpha_054
-import mega.privacy.android.shared.original.core.ui.theme.grey_alpha_087
-import mega.privacy.android.shared.original.core.ui.theme.white_alpha_012
-import mega.privacy.android.shared.original.core.ui.theme.white_alpha_054
-import mega.privacy.android.shared.original.core.ui.theme.white_alpha_087
+import mega.privacy.android.shared.original.core.ui.controls.dividers.DividerType
+import mega.privacy.android.shared.original.core.ui.controls.dividers.MegaDivider
+import mega.privacy.android.shared.original.core.ui.controls.images.MegaIcon
+import mega.privacy.android.shared.original.core.ui.controls.text.MegaText
+import mega.privacy.android.shared.original.core.ui.preview.BooleanProvider
+import mega.privacy.android.shared.original.core.ui.preview.CombinedThemeComponentPreviews
+import mega.privacy.android.shared.original.core.ui.theme.OriginalTheme
+import mega.android.core.ui.theme.values.IconColor
+import mega.android.core.ui.theme.values.TextColor
 
 /**
  * Start screen option view
@@ -57,9 +54,6 @@ fun StartScreenOptionView(
     onClick: () -> Unit,
     modifier: Modifier = Modifier,
 ) {
-    val startPadding = 18.dp
-    val iconSize = 24.dp
-    val textStartPadding = 30.dp
     Column(
         modifier = modifier
             .toggleable(
@@ -78,26 +72,27 @@ fun StartScreenOptionView(
             verticalAlignment = Alignment.CenterVertically,
             horizontalArrangement = Arrangement.Start,
         ) {
-            Icon(
+            MegaIcon(
                 painter = painterResource(id = icon),
                 contentDescription = null,
                 modifier = Modifier
                     .padding(start = 18.dp)
                     .size(24.dp)
                     .testTag(icon.toString()),
-                tint = if (MaterialTheme.colors.isLight) grey_alpha_054 else white_alpha_054
+                tint = IconColor.Secondary,
             )
-            Text(
+            MegaText(
                 modifier = Modifier
-                    .padding(start = textStartPadding)
+                    .padding(start = 30.dp)
                     .weight(1f, true),
                 text = text,
                 style = MaterialTheme.typography.subtitle1.copy(fontWeight = FontWeight.Medium),
-                color = if (MaterialTheme.colors.isLight) grey_alpha_087 else white_alpha_087
+                textColor = TextColor.Primary
             )
             if (isSelected) {
-                Image(
+                MegaIcon(
                     painter = painterResource(id = iconPackR.drawable.ic_check_medium_regular_outline),
+                    tint = IconColor.Secondary,
                     contentDescription = null,
                     modifier = Modifier
                         .padding(end = 20.dp)
@@ -106,25 +101,20 @@ fun StartScreenOptionView(
                 )
             }
         }
-        Divider(
-            color = if (MaterialTheme.colors.isLight) grey_alpha_012 else white_alpha_012,
-            thickness = 1.dp,
-            startIndent = startPadding + iconSize + textStartPadding
-        )
+        MegaDivider(dividerType = DividerType.BigStartPadding)
     }
 }
 
 /**
  * Start screen option view preview
  */
-@Preview
-@Preview(
-    uiMode = Configuration.UI_MODE_NIGHT_YES
-)
+@CombinedThemeComponentPreviews
 @Composable
-fun StartScreenOptionViewPreview() {
-    var selected by remember { (mutableStateOf(true)) }
-    OriginalTempTheme(isDark = isSystemInDarkTheme()) {
+fun StartScreenOptionViewPreview(
+    @PreviewParameter(BooleanProvider::class) isSelected: Boolean,
+) {
+    var selected by remember { (mutableStateOf(isSelected)) }
+    OriginalTheme(isDark = isSystemInDarkTheme()) {
         Box(modifier = Modifier.background(MaterialTheme.colors.surface)) {
             StartScreenOptionView(
                 iconPackR.drawable.ic_mega_medium_regular_outline,

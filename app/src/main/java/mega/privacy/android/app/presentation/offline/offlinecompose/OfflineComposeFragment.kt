@@ -44,7 +44,7 @@ import mega.privacy.android.core.ui.mapper.FileTypeIconMapper
 import mega.privacy.android.domain.entity.ThemeMode
 import mega.privacy.android.domain.entity.node.NodeId
 import mega.privacy.android.domain.usecase.GetThemeMode
-import mega.privacy.android.shared.original.core.ui.theme.OriginalTempTheme
+import mega.privacy.android.shared.original.core.ui.theme.OriginalTheme
 import timber.log.Timber
 import javax.inject.Inject
 
@@ -101,7 +101,7 @@ class OfflineComposeFragment : Fragment(), ActionMode.Callback {
                 val snackbarHostState = remember { SnackbarHostState() }
                 val coroutineScope = rememberCoroutineScope()
 
-                OriginalTempTheme(isDark = isDarkMode) {
+                OriginalTheme(isDark = isDarkMode) {
                     OfflineFeatureScreen(
                         uiState = uiState,
                         backgroundColor = if (args.rootFolderOnly) backgroundColor else MaterialTheme.colors.background,
@@ -126,9 +126,15 @@ class OfflineComposeFragment : Fragment(), ActionMode.Callback {
                             showOptionPanelBottomSheet(it.offlineNode.handle.toLong())
                         }
                     )
+                    LaunchedEffect(args.path) {
+                        viewModel.navigateToPath(args.path, args.rootFolderOnly)
+                    }
+                    LaunchedEffect(defaultTitle) {
+                        viewModel.updateDefaultTitle(defaultTitle)
+                    }
                     LaunchedEffect(uiState.title, uiState.offlineNodes) {
+                        viewModel.updateTitle(uiState.title)
                         (requireActivity() as? ManagerActivity)?.setToolbarTitleFromFullscreenOfflineFragment(
-                            title = uiState.title.ifEmpty { defaultTitle },
                             firstNavigationLevel = false,
                             showSearch = true
                         )
@@ -175,6 +181,16 @@ class OfflineComposeFragment : Fragment(), ActionMode.Callback {
             }
         }
     }
+
+    /**
+     * Get current page title
+     */
+    fun getCurrentPageTitle(): String = viewModel.uiState.value.actualTitle
+
+    /**
+     * Get current page subtitle
+     */
+    fun getCurrentPageSubTitle(): String? = viewModel.uiState.value.actualSubtitle
 
     /**
      * Checks if the fragment is in search mode

@@ -60,6 +60,7 @@ class Get1On1ChatIdUseCaseTest {
                 isMeeting = false,
                 isWaitingRoom = false,
                 isOpenInvite = false,
+                isNoteToSelf = false,
                 isSpeakRequest = false
             )
         )

@@ -16,6 +16,8 @@ import androidx.compose.material.Icon
 import androidx.compose.material.MaterialTheme
 import androidx.compose.material.Snackbar
 import androidx.compose.material.Text
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.Add
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.derivedStateOf
@@ -60,6 +62,7 @@ import mega.privacy.android.legacy.core.ui.controls.LegacyMegaEmptyView
 import mega.privacy.android.shared.original.core.ui.controls.progressindicator.MegaLinearProgressIndicator
 import mega.privacy.android.shared.original.core.ui.theme.black
 import mega.privacy.android.shared.original.core.ui.theme.dark_grey
+import mega.privacy.android.shared.original.core.ui.theme.extensions.white_black
 import mega.privacy.android.shared.original.core.ui.theme.white
 import mega.privacy.mobile.analytics.event.AlbumAddPhotosFABEvent
 import mega.privacy.mobile.analytics.event.RemoveItemsFromAlbumDialogButtonEvent
@@ -176,9 +179,6 @@ internal fun AlbumContentScreen(
                 FavouriteAlbum -> LegacyMegaEmptyView(
                     imageVector = ImageVector.vectorResource(id = R.drawable.ic_photos_favourite_album),
                     text = stringResource(id = R.string.empty_hint_favourite_album)
-                        .formatColorTag(context, 'A', R.color.grey_900_grey_100)
-                        .formatColorTag(context, 'B', R.color.grey_300_grey_600)
-                        .toSpannedHtmlText()
                 )
 
                 GifAlbum -> Back()
@@ -188,9 +188,6 @@ internal fun AlbumContentScreen(
                 is UserAlbum -> LegacyMegaEmptyView(
                     imageVector = ImageVector.vectorResource(id = R.drawable.ic_photos_user_album_empty),
                     text = stringResource(id = R.string.photos_user_album_empty_album)
-                        .formatColorTag(context, 'A', R.color.grey_900_grey_100)
-                        .formatColorTag(context, 'B', R.color.grey_300_grey_600)
-                        .toSpannedHtmlText()
                 )
 
                 null -> Back()
@@ -204,24 +201,30 @@ internal fun AlbumContentScreen(
         ) {
             val userAlbum = albumContentState.uiAlbum?.id as? UserAlbum
             if (userAlbum != null && albumContentState.isAddingPhotosProgressCompleted) {
-                val message = pluralStringResource(
-                    id = R.plurals.photos_album_selection_added,
-                    count = albumContentState.totalAddedPhotos,
-                    albumContentState.totalAddedPhotos,
-                    userAlbum.title,
-                )
-                Snackbar(
-                    modifier = Modifier
-                        .align(Alignment.CenterHorizontally)
-                        .padding(8.dp),
-                    backgroundColor = black.takeIf { MaterialTheme.colors.isLight } ?: white,
-                ) {
-                    Text(text = message)
-                }
+                if (albumContentState.showProgressMessage) {
+                    val message = pluralStringResource(
+                        id = R.plurals.photos_album_selection_added,
+                        count = albumContentState.totalAddedPhotos,
+                        albumContentState.totalAddedPhotos,
+                        userAlbum.title,
+                    )
+                    Snackbar(
+                        modifier = Modifier
+                            .align(Alignment.CenterHorizontally)
+                            .padding(8.dp),
+                        backgroundColor = black.takeIf { MaterialTheme.colors.isLight } ?: white,
+                    ) {
+                        Text(text = message)
+                    }
 
-                LaunchedEffect(message) {
-                    delay(3000L)
-                    albumContentViewModel.updatePhotosAddingProgressCompleted(albumId = userAlbum.id)
+                    LaunchedEffect(message) {
+                        delay(3000L)
+                        albumContentViewModel.updatePhotosAddingProgressCompleted(albumId = userAlbum.id)
+                    }
+                } else {
+                    LaunchedEffect("${albumContentState.totalAddedPhotos}${userAlbum.title}") {
+                        albumContentViewModel.updatePhotosAddingProgressCompleted(albumId = userAlbum.id)
+                    }
                 }
             }
 
@@ -402,19 +405,9 @@ private fun AddFabButton(
             .size(56.dp)
     ) {
         Icon(
-            painter = painterResource(
-                id = if (MaterialTheme.colors.isLight) {
-                    R.drawable.ic_add_white
-                } else {
-                    R.drawable.ic_add
-                }
-            ),
+            imageVector = Icons.Filled.Add,
             contentDescription = "Add",
-            tint = if (!MaterialTheme.colors.isLight) {
-                Color.Black
-            } else {
-                Color.White
-            }
+            tint = MaterialTheme.colors.white_black
         )
     }
 }

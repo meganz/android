@@ -3,6 +3,7 @@ package mega.privacy.android.data.mapper.transfer.pending
 import mega.privacy.android.data.database.entity.PendingTransferEntity
 import mega.privacy.android.data.mapper.transfer.TransferAppDataMapper
 import mega.privacy.android.domain.entity.transfer.pending.PendingTransfer
+import mega.privacy.android.domain.entity.uri.UriPath
 import javax.inject.Inject
 
 /**
@@ -17,8 +18,8 @@ internal class PendingTransferModelMapper @Inject constructor(
             transferTag = transferTag,
             transferType = transferType,
             nodeIdentifier = nodeIdentifier,
-            path = path,
-            appData = appData?.let { appDataMapper(it) },
+            uriPath = UriPath(path),
+            appData = appData?.let { appDataMapper(it) } ?: emptyList(),
             isHighPriority = isHighPriority,
             scanningFoldersData = with(scanningFoldersData) {
                 PendingTransfer.ScanningFoldersData(
@@ -31,6 +32,7 @@ internal class PendingTransferModelMapper @Inject constructor(
             startedFiles = startedFiles,
             alreadyTransferred = alreadyTransferred,
             state = state,
+            fileName = fileName,
         )
     }
 }

@@ -1,7 +1,9 @@
 package mega.privacy.android.app.presentation.transfers.starttransfer.model
 
+import mega.privacy.android.shared.resources.R as sharedR
 import androidx.annotation.StringRes
 import mega.privacy.android.app.R
+import java.io.File
 
 /**
  * One off events related to start transfers
@@ -11,21 +13,12 @@ sealed interface StartTransferEvent {
     /**
      * Download transfers scanning has finished
      * @param exception [Throwable] in case of not correctly finished
-     * @param totalNodes
-     * @param totalFiles total files on this nodes
-     * @param totalAlreadyDownloaded total files already downloaded, so they won't be downloaded
      * @param triggerEvent the event that triggered the start of the transfers
-     * @property filesToDownload
      */
     data class FinishDownloadProcessing(
         val exception: Throwable?,
-        val totalNodes: Int,
-        val totalFiles: Int,
-        val totalAlreadyDownloaded: Int,
         val triggerEvent: TransferTriggerEvent,
-    ) : StartTransferEvent {
-        val filesToDownload = totalFiles - totalAlreadyDownloaded
-    }
+    ) : StartTransferEvent
 
     /**
      * Upload transfers canning has finished.
@@ -45,8 +38,17 @@ sealed interface StartTransferEvent {
 
     /**
      * Transfer cannot proceed because transfers' queue is paused.
+     * @param triggerEvent, the event that was initiated while the transfers are paused
      */
-    data object PausedTransfers : StartTransferEvent
+    data class PausedTransfers(val triggerEvent: TransferTriggerEvent) : StartTransferEvent
+
+    /**
+     * Copy offline has finished
+     * @property totalFiles total files copied
+     */
+    data class FinishCopyOffline(
+        val totalFiles: Int,
+    ) : StartTransferEvent
 
     /**
      * A message should be shown
@@ -58,15 +60,17 @@ sealed interface StartTransferEvent {
         @StringRes val message: Int,
         @StringRes val action: Int? = null,
         val actionEvent: ActionEvent? = null,
+        vararg val messageArgs: String,
     ) : StartTransferEvent {
         /**
          * The one off event to be triggered with the [action], if [action] is null this parameter will be ignored
          */
-        enum class ActionEvent {
+        sealed interface ActionEvent {
             /**
              * The user have chosen to go to settings to file management (from no sufficient disk space snack bar action)
              */
-            GoToFileManagement
+            data object GoToFileManagement : ActionEvent
+            data class OpenPreview(val file: File, val fileName: String) : ActionEvent
         }
 
         /**
@@ -104,5 +108,17 @@ sealed interface StartTransferEvent {
                 else -> R.string.file_creation_failed
             }, null, null
         )
+
+        data object SlowDownloadPreviewInProgress : Message(
+            sharedR.string.transfers_preview_slow_snackbar
+        )
+
+        data class SlowDownloadPreviewFinished(val file: File) :
+            Message(
+                sharedR.string.transfers_notification_title_preview_download,
+                R.string.general_confirmation_open,
+                ActionEvent.OpenPreview(file, file.name),
+                file.name,
+            )
     }
 }

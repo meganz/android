@@ -10,12 +10,10 @@ import androidx.activity.viewModels
 import androidx.appcompat.app.AppCompatActivity
 import androidx.compose.runtime.getValue
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
-import androidx.lifecycle.lifecycleScope
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
 import dagger.hilt.android.AndroidEntryPoint
-import kotlinx.coroutines.launch
 import mega.privacy.android.analytics.Analytics
 import mega.privacy.android.app.presentation.account.AccountStorageViewModel
 import mega.privacy.android.app.presentation.cancelaccountplan.model.CancellationInstructionsType
@@ -28,7 +26,7 @@ import mega.privacy.android.app.utils.MANAGE_PLAY_STORE_SUBSCRIPTION_URL
 import mega.privacy.android.domain.entity.AccountType
 import mega.privacy.android.domain.entity.ThemeMode
 import mega.privacy.android.domain.usecase.GetThemeMode
-import mega.privacy.android.shared.original.core.ui.theme.OriginalTempTheme
+import mega.privacy.android.shared.original.core.ui.theme.OriginalTheme
 import mega.privacy.mobile.analytics.event.CancelSubscriptionContinueCancellationButtonPressedEvent
 import mega.privacy.mobile.analytics.event.CancelSubscriptionKeepPlanButtonPressedEvent
 import mega.privacy.mobile.analytics.event.SubscriptionCancellationSurveyCancelSubscriptionButtonEvent
@@ -69,7 +67,7 @@ class CancelAccountPlanActivity : AppCompatActivity() {
             val accountUiState by accountStorageViewModel.state.collectAsStateWithLifecycle()
 
             val accountType = uiState.accountType
-            OriginalTempTheme(isDark = themeMode.isDarkMode()) {
+            OriginalTheme(isDark = themeMode.isDarkMode()) {
                 NavHost(
                     navController = navController,
                     startDestination = if (accountType == AccountType.PRO_FLEXI) {
@@ -97,14 +95,10 @@ class CancelAccountPlanActivity : AppCompatActivity() {
                                     when (cancellationInstructionsType) {
                                         CancellationInstructionsType.AppStore,
                                         CancellationInstructionsType.WebClient,
-                                        -> navController.navigate(
-                                            cancellationInstructionsRoute
-                                        )
+                                            -> navController.navigate(cancellationInstructionsRoute)
 
                                         CancellationInstructionsType.PlayStore,
-                                        -> navController.navigate(
-                                            cancellationSurveyRoute
-                                        )
+                                            -> navController.navigate(cancellationSurveyRoute)
                                     }
                                 }
                             })

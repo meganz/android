@@ -24,9 +24,9 @@ import androidx.compose.ui.tooling.preview.Preview
 import mega.privacy.android.shared.original.core.ui.model.MegaSpanStyle
 import mega.privacy.android.shared.original.core.ui.model.MegaSpanStyleWithAnnotation
 import mega.privacy.android.shared.original.core.ui.model.SpanIndicator
-import mega.privacy.android.shared.original.core.ui.theme.OriginalTempTheme
+import mega.privacy.android.shared.original.core.ui.theme.OriginalTheme
 import mega.privacy.android.shared.original.core.ui.theme.MegaOriginalTheme
-import mega.privacy.android.shared.original.core.ui.theme.values.TextColor
+import mega.android.core.ui.theme.values.TextColor
 
 /**
  * High light text from mega format
@@ -171,7 +171,7 @@ private const val ANNOTATION_TAG = "annotationTag"
 @Preview(showBackground = true)
 @Composable
 fun MegaSpannedTextPreviewOne() {
-    OriginalTempTheme(isDark = isSystemInDarkTheme()) {
+    OriginalTheme(isDark = isSystemInDarkTheme()) {
         MegaSpannedText(
             value = "[A]Google Pay[/A] (subscription)",
             baseStyle = MaterialTheme.typography.subtitle1,
@@ -190,7 +190,7 @@ fun MegaSpannedTextPreviewOne() {
 @Preview(showBackground = true)
 @Composable
 fun MegaSpannedTextPreviewTwo() {
-    OriginalTempTheme(isDark = isSystemInDarkTheme()) {
+    OriginalTheme(isDark = isSystemInDarkTheme()) {
         MegaSpannedText(
             value = "Do you want to [A]Google Pay[/A] (subscription)",
             baseStyle = MaterialTheme.typography.subtitle1,
@@ -209,7 +209,7 @@ fun MegaSpannedTextPreviewTwo() {
 @Preview(showBackground = true)
 @Composable
 fun MegaSpannedTextPreviewThree() {
-    OriginalTempTheme(isDark = isSystemInDarkTheme()) {
+    OriginalTheme(isDark = isSystemInDarkTheme()) {
         MegaSpannedText(
             value = "Do you want to [A]Google Pay[/A] [B]Huawei[/B] (subscription)",
             baseStyle = MaterialTheme.typography.subtitle1,
@@ -229,7 +229,7 @@ fun MegaSpannedTextPreviewThree() {
 @Preview(showBackground = true)
 @Composable
 fun MegaSpannedTextPreviewFour() {
-    OriginalTempTheme(isDark = isSystemInDarkTheme()) {
+    OriginalTheme(isDark = isSystemInDarkTheme()) {
         MegaSpannedText(
             value = "Choose [A]Google Pay[/A] (subscription)",
             baseStyle = MaterialTheme.typography.subtitle1,
@@ -244,7 +244,7 @@ fun MegaSpannedTextPreviewFour() {
 @Preview(showBackground = true)
 @Composable
 fun MegaSpannedAlignedTextPreview() {
-    OriginalTempTheme(isDark = isSystemInDarkTheme()) {
+    OriginalTheme(isDark = isSystemInDarkTheme()) {
         MegaSpannedText(
             value = "Do you want to [A]Google Pay[/A] [B]Huawei[/B]\n (subscription)",
             baseStyle = MaterialTheme.typography.subtitle1,
@@ -264,7 +264,7 @@ fun MegaSpannedAlignedTextPreview() {
 @Preview(showBackground = true)
 @Composable
 fun MegaSpannedClickableTextPreview() {
-    OriginalTempTheme(isDark = isSystemInDarkTheme()) {
+    OriginalTheme(isDark = isSystemInDarkTheme()) {
         var counter by remember { mutableStateOf(1) }
         MegaSpannedClickableText(
             value = "Click [A]here[/A] to increase the counter: [B]$counter[/B]\n and [R]here[/R] to reset",

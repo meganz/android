@@ -28,8 +28,6 @@ import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.lifecycle.ViewModelProvider;
 
-import javax.inject.Inject;
-
 import dagger.hilt.android.AndroidEntryPoint;
 import mega.privacy.android.app.MegaApplication;
 import mega.privacy.android.app.R;
@@ -39,7 +37,6 @@ import mega.privacy.android.app.main.controllers.ChatController;
 import mega.privacy.android.app.main.megachat.GroupChatInfoActivity;
 import mega.privacy.android.app.modalbottomsheet.BaseBottomSheetDialogFragment;
 import mega.privacy.android.app.myAccount.MyAccountActivity;
-import mega.privacy.android.app.objects.PasscodeManagement;
 import mega.privacy.android.app.presentation.meeting.ScheduledMeetingInfoActivity;
 import mega.privacy.android.app.presentation.meeting.ScheduledMeetingInfoViewModel;
 import mega.privacy.android.app.utils.ContactUtil;
@@ -50,9 +47,6 @@ import timber.log.Timber;
 
 @AndroidEntryPoint
 public class ParticipantBottomSheetDialogFragment extends BaseBottomSheetDialogFragment implements View.OnClickListener {
-
-    @Inject
-    PasscodeManagement passcodeManagement;
 
     private ScheduledMeetingInfoViewModel viewModel = null;
 
@@ -276,7 +270,7 @@ public class ParticipantBottomSheetDialogFragment extends BaseBottomSheetDialogF
             }
         } else if (id == R.id.contact_list_option_call_layout) {
             MegaApplication.setUserWaitingForCall(participantHandle);
-            if (canCallBeStartedFromContactOption(requireActivity(), passcodeManagement)) {
+            if (canCallBeStartedFromContactOption(requireActivity())) {
                 if (requireActivity() instanceof ScheduledMeetingInfoActivity) {
                     if (viewModel != null) {
                         viewModel.onStartCallTap();

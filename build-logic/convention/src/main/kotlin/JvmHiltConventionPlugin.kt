@@ -15,13 +15,13 @@ class JvmHiltConventionPlugin : Plugin<Project> {
      */
     override fun apply(target: Project) {
         with(target) {
-            pluginManager.apply("kotlin-kapt")
+            pluginManager.apply("com.google.devtools.ksp")
 
             dependencies {
                 add("implementation", google.findLibrary("hilt.core").get())
 
                 if (shouldApplyDefaultConfiguration()) {
-                    "kapt"(google.findLibrary("hilt.android.compiler").get())
+                    "ksp"(google.findLibrary("hilt.android.compiler").get())
                 }
             }
         }

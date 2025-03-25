@@ -27,6 +27,9 @@
                 android:paddingTop="10dp"
                 android:paddingBottom="10dp"
                 android:gravity="start|center_vertical"
+                app:icon="@drawable/ic_message_chat_circle_medium_regular_outline"
+                app:iconTint="@color/color_icon_accent"
+                app:iconPadding="20dp"
                 style="?attr/borderlessButtonStyle"/>
 
             <androidx.recyclerview.widget.RecyclerView

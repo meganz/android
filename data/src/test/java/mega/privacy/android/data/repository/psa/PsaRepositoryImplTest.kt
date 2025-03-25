@@ -9,11 +9,15 @@ import mega.privacy.android.data.gateway.api.MegaApiGateway
 import mega.privacy.android.data.gateway.psa.PsaPreferenceGateway
 import mega.privacy.android.data.mapper.psa.PsaMapper
 import mega.privacy.android.domain.entity.psa.Psa
+import mega.privacy.android.domain.exception.MegaException
 import mega.privacy.android.domain.repository.psa.PsaRepository
+import nz.mega.sdk.MegaApiJava
 import nz.mega.sdk.MegaError
+import nz.mega.sdk.MegaRequest
 import nz.mega.sdk.MegaRequestListenerInterface
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
+import org.junit.jupiter.api.assertThrows
 import org.mockito.kotlin.any
 import org.mockito.kotlin.mock
 import org.mockito.kotlin.stub
@@ -109,4 +113,39 @@ class PsaRepositoryImplTest {
             verify(megaApiGateway).setPsaHandled(psaId)
         }
 
+    @Test
+    fun `test that errors are thrown if returned from gateway`() = runTest {
+        val api = mock<MegaApiJava>()
+        val request = mock<MegaRequest>()
+        val error = mock<MegaError> { on { errorCode }.thenReturn(MegaError.API_EOVERQUOTA) }
+        megaApiGateway.stub {
+            on { getPsa(any()) }.thenAnswer { invocation ->
+                (invocation.arguments[0] as MegaRequestListenerInterface).onRequestFinish(
+                    api = api,
+                    request = request,
+                    e = error
+                )
+            }
+        }
+
+        assertThrows<MegaException> { underTest.fetchPsa(true) }
+    }
+
+    @Test
+    fun `test that null is returned if a not found error is returned from gateway`() = runTest {
+        val api = mock<MegaApiJava>()
+        val request = mock<MegaRequest>()
+        val error = mock<MegaError> { on { errorCode }.thenReturn(MegaError.API_ENOENT) }
+        megaApiGateway.stub {
+            on { getPsa(any()) }.thenAnswer { invocation ->
+                (invocation.arguments[0] as MegaRequestListenerInterface).onRequestFinish(
+                    api = api,
+                    request = request,
+                    e = error
+                )
+            }
+        }
+
+        assertThat(underTest.fetchPsa(true)).isNull()
+    }
 }

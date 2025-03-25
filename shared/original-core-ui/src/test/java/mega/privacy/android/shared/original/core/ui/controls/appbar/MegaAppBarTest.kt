@@ -148,7 +148,7 @@ class MegaAppBarTest {
                 testTag = menuButtonAlert
             ) {}
         val item5 = object : MenuActionWithoutIcon(
-            descriptionRes = R.string.password_text,
+            descriptionRes = mega.privacy.android.shared.resources.R.string.password_text,
             testTag = menuButtonPwd
         ) {}
         return listOf(item1, item2, item3, item4, item5)

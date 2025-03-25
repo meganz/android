@@ -33,7 +33,7 @@ import mega.privacy.android.feature.sync.data.mapper.ListToStringWithDelimitersM
  * @param handleClick Function to handle click
  * @param navHostController Navigation controller
  * @param nodeActionHandler Node bottom sheet action handler
- * @param searchActivityViewModel Search activity view model
+ * @param searchViewModel Search activity view model
  * @param onBackPressed OnBackPressed
  * @param nodeActionsViewModel
  * @param listToStringWithDelimitersMapper
@@ -43,7 +43,7 @@ internal fun NavGraphBuilder.searchNavGraph(
     navigateToLink: (String) -> Unit,
     navHostController: NavHostController,
     nodeActionHandler: NodeActionHandler,
-    searchActivityViewModel: SearchActivityViewModel,
+    searchViewModel: SearchViewModel,
     onBackPressed: () -> Unit,
     nodeActionsViewModel: NodeActionsViewModel,
     handleClick: (TypedNode?) -> Unit,
@@ -55,7 +55,7 @@ internal fun NavGraphBuilder.searchNavGraph(
             navigateToLink = navigateToLink,
             showSortOrderBottomSheet = showSortOrderBottomSheet,
             navHostController = navHostController,
-            searchActivityViewModel = searchActivityViewModel,
+            searchViewModel = searchViewModel,
             onBackPressed = onBackPressed,
             nodeActionHandler = nodeActionHandler,
             fileTypeIconMapper = fileTypeIconMapper,
@@ -76,7 +76,7 @@ internal fun NavGraphBuilder.searchNavGraph(
     )
     searchFilterBottomSheetNavigation(
         navHostController = navHostController,
-        searchActivityViewModel = searchActivityViewModel,
+        searchViewModel = searchViewModel,
     )
     changeLabelBottomSheetNavigation(navHostController)
     changeNodeExtensionDialogNavigation(navHostController)

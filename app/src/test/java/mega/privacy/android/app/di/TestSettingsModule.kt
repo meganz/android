@@ -22,14 +22,16 @@ import mega.privacy.android.domain.usecase.MonitorAutoAcceptQRLinks
 import mega.privacy.android.domain.usecase.MonitorMediaDiscoveryView
 import mega.privacy.android.domain.usecase.MonitorStartScreenPreference
 import mega.privacy.android.domain.usecase.PutPreference
-import mega.privacy.android.domain.usecase.RefreshPasscodeLockPreference
 import mega.privacy.android.domain.usecase.RequestAccountDeletion
 import mega.privacy.android.domain.usecase.SetChatImageQuality
 import mega.privacy.android.domain.usecase.SetMediaDiscoveryView
 import mega.privacy.android.domain.usecase.ToggleAutoAcceptQRLinks
-import mega.privacy.android.domain.usecase.call.GetCallsSoundNotifications
-import mega.privacy.android.domain.usecase.call.SetCallsSoundNotifications
+import mega.privacy.android.domain.usecase.call.MonitorCallSoundEnabledUseCase
+import mega.privacy.android.domain.usecase.call.SetCallsSoundEnabledStateUseCase
 import mega.privacy.android.domain.usecase.setting.EnableFileVersionsOption
+import mega.privacy.android.navigation.settings.FeatureSettingEntryPoint
+import mega.privacy.android.navigation.settings.FeatureSettings
+import mega.privacy.android.navigation.settings.MoreSettingEntryPoint
 import org.mockito.kotlin.any
 import org.mockito.kotlin.anyOrNull
 import org.mockito.kotlin.mock
@@ -56,16 +58,12 @@ object TestSettingsModule {
         mock<MonitorMediaDiscoveryView> { on { invoke() }.thenReturn(emptyFlow()) }
     val getChatImageQuality = mock<GetChatImageQuality> { on { invoke() }.thenReturn(emptyFlow()) }
     val setChatImageQuality = mock<SetChatImageQuality>()
-    val getCallsSoundNotifications =
-        mock<GetCallsSoundNotifications> { on { invoke() }.thenReturn(emptyFlow()) }
-    val setCallsSoundNotifications = mock<SetCallsSoundNotifications>()
+    val monitorCallSoundEnabledUseCase =
+        mock<MonitorCallSoundEnabledUseCase> { on { invoke() }.thenReturn(emptyFlow()) }
+    val setCallsSoundEnabledStateUseCase = mock<SetCallsSoundEnabledStateUseCase>()
 
     @Provides
     fun provideCanDeleteAccount(): CanDeleteAccount = canDeleteAccount
-
-    @Provides
-    fun provideRefreshPasscodeLockPreference(): RefreshPasscodeLockPreference =
-        mock()
 
     @Provides
     fun provideIsMultiFactorAuthAvailable(): IsMultiFactorAuthAvailable =
@@ -111,10 +109,10 @@ object TestSettingsModule {
     fun provideSetChatImageQuality(): SetChatImageQuality = setChatImageQuality
 
     @Provides
-    fun provideGetCallsSoundNotifications(): GetCallsSoundNotifications = getCallsSoundNotifications
+    fun provideGetCallsSoundNotifications(): MonitorCallSoundEnabledUseCase = monitorCallSoundEnabledUseCase
 
     @Provides
-    fun provideSetCallsSoundNotifications(): SetCallsSoundNotifications = setCallsSoundNotifications
+    fun provideSetCallsSoundNotifications(): SetCallsSoundEnabledStateUseCase = setCallsSoundEnabledStateUseCase
 
     @Provides
     fun providePutStringPreference(): PutPreference<String> =
@@ -173,4 +171,18 @@ object TestSettingsModule {
 
     @Provides
     fun provideEnableFileVersionsOption(): EnableFileVersionsOption = mock()
+
+    @Provides
+    @ElementsIntoSet
+    fun provideFeatureSettingsSet(): Set<@JvmSuppressWildcards FeatureSettings> = setOf()
+
+    @Provides
+    @ElementsIntoSet
+    fun provideAppFeatureSettingEntryPoints(): Set<@JvmSuppressWildcards FeatureSettingEntryPoint> =
+        setOf()
+
+    @Provides
+    @ElementsIntoSet
+    fun provideAddMoreSettingsEntryPoints(): Set<@JvmSuppressWildcards MoreSettingEntryPoint> =
+        setOf()
 }

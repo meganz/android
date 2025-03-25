@@ -17,6 +17,7 @@ import androidx.appcompat.view.ActionMode
 import androidx.fragment.app.activityViewModels
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
+import dagger.hilt.android.AndroidEntryPoint
 import mega.privacy.android.app.R
 import mega.privacy.android.app.components.SimpleDividerItemDecoration
 import mega.privacy.android.app.databinding.FragmentContactSharedFolderListBinding
@@ -27,25 +28,35 @@ import mega.privacy.android.app.main.ContactFileListActivity
 import mega.privacy.android.app.main.adapters.MegaNodeAdapter
 import mega.privacy.android.app.presentation.contactinfo.ContactInfoActivity
 import mega.privacy.android.app.presentation.contactinfo.ContactInfoViewModel
+import mega.privacy.android.app.presentation.settings.model.StorageTargetPreference
 import mega.privacy.android.app.presentation.transfers.starttransfer.StartDownloadViewModel
 import mega.privacy.android.app.presentation.transfers.starttransfer.view.createStartTransferView
 import mega.privacy.android.app.utils.Constants
 import mega.privacy.android.app.utils.MegaNodeDialogUtil
 import mega.privacy.android.app.utils.MegaNodeUtil
 import mega.privacy.android.app.utils.Util
+import mega.privacy.android.navigation.MegaNavigator
 import nz.mega.sdk.MegaError
 import nz.mega.sdk.MegaNode
 import nz.mega.sdk.MegaShare
 import timber.log.Timber
+import javax.inject.Inject
 
 /**
  * Fragment for Contact shared Folder
  */
+@AndroidEntryPoint
 class ContactSharedFolderFragment : ContactFileBaseFragment() {
 
     companion object {
         private const val MAX_SHARED_FOLDER_NUMBER_TO_BE_DISPLAYED = 5
     }
+
+    /**
+     * Mega navigator
+     */
+    @Inject
+    lateinit var megaNavigator: MegaNavigator
 
     private var _binding: FragmentContactSharedFolderListBinding? = null
     private val binding: FragmentContactSharedFolderListBinding
@@ -112,9 +123,15 @@ class ContactSharedFolderFragment : ContactFileBaseFragment() {
         activity?.let { activity ->
             rootView.addView(
                 createStartTransferView(
-                    activity,
-                    startDownloadViewModel.state,
-                    startDownloadViewModel::consumeDownloadEvent
+                    activity = activity,
+                    transferEventState = startDownloadViewModel.state,
+                    onConsumeEvent = startDownloadViewModel::consumeDownloadEvent,
+                    navigateToStorageSettings = {
+                        megaNavigator.openSettings(
+                            requireActivity(),
+                            StorageTargetPreference
+                        )
+                    }
                 )
             )
         }
@@ -255,8 +272,8 @@ class ContactSharedFolderFragment : ContactFileBaseFragment() {
      */
     override fun updateActionModeTitle() {
         actionMode?.let {
-            val files = adapter?.selectedNodes?.count { it.isFile } ?: 0
-            val folders = adapter?.selectedNodes?.count { it.isFolder } ?: 0
+            val files = adapter?.selectedNodes?.count { it?.isFile == true } ?: 0
+            val folders = adapter?.selectedNodes?.count { it?.isFolder == true } ?: 0
 
             actionMode?.title = when {
                 (files == 0 && folders == 0) -> 0.toString()
@@ -378,7 +395,7 @@ class ContactSharedFolderFragment : ContactFileBaseFragment() {
         }
 
         override fun onActionItemClicked(mode: ActionMode?, item: MenuItem?): Boolean {
-            val documents = adapter?.selectedNodes ?: listOf()
+            val documents = adapter?.selectedNodes?.filterNotNull().orEmpty()
             when (item?.itemId) {
                 R.id.cab_menu_download -> {
                     contactInfoActivity.downloadFile(documents)

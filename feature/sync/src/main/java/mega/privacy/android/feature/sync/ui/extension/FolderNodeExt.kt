@@ -13,6 +13,7 @@ fun FolderNode.getIcon(): Int = when {
     isShared || isPendingShare -> IconPackR.drawable.ic_folder_outgoing_medium_solid
     isMediaSyncFolder() -> IconPackR.drawable.ic_folder_camera_uploads_medium_solid
     isChatFilesFolder() -> IconPackR.drawable.ic_folder_chat_medium_solid
+    isSynced || isSyncedFolder() -> IconPackR.drawable.ic_folder_sync_medium_solid
     else -> IconPackR.drawable.ic_folder_medium_solid
 }
 
@@ -21,3 +22,6 @@ private fun FolderNode.isMediaSyncFolder(): Boolean =
 
 private fun FolderNode.isChatFilesFolder(): Boolean =
     this is TypedFolderNode && type is FolderType.ChatFilesFolder
+
+private fun FolderNode.isSyncedFolder(): Boolean =
+    this is TypedFolderNode && type is FolderType.Sync

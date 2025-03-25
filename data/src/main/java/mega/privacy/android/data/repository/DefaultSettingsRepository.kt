@@ -7,11 +7,13 @@ import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.emptyFlow
+import kotlinx.coroutines.flow.flowOn
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.onStart
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.suspendCancellableCoroutine
 import kotlinx.coroutines.withContext
+import mega.privacy.android.data.cache.Cache
 import mega.privacy.android.data.database.DatabaseHandler
 import mega.privacy.android.data.extensions.decodeBase64
 import mega.privacy.android.data.extensions.encodeBase64
@@ -31,9 +33,10 @@ import mega.privacy.android.data.gateway.preferences.FileManagementPreferencesGa
 import mega.privacy.android.data.gateway.preferences.UIPreferencesGateway
 import mega.privacy.android.data.listener.OptionalMegaRequestListenerInterface
 import mega.privacy.android.data.mapper.StartScreenMapper
+import mega.privacy.android.data.qualifier.FileVersionsOption
 import mega.privacy.android.domain.entity.CallsMeetingInvitations
 import mega.privacy.android.domain.entity.CallsMeetingReminders
-import mega.privacy.android.domain.entity.CallsSoundNotifications
+import mega.privacy.android.domain.entity.CallsSoundEnabledState
 import mega.privacy.android.domain.entity.ChatImageQuality
 import mega.privacy.android.domain.entity.VideoQuality
 import mega.privacy.android.domain.entity.meeting.UsersCallLimitReminders
@@ -49,6 +52,8 @@ import mega.privacy.android.domain.qualifier.IoDispatcher
 import mega.privacy.android.domain.repository.SettingsRepository
 import nz.mega.sdk.MegaApiJava
 import nz.mega.sdk.MegaError
+import nz.mega.sdk.MegaError.API_ENOENT
+import nz.mega.sdk.MegaError.API_OK
 import nz.mega.sdk.MegaRequest
 import nz.mega.sdk.MegaRequest.TYPE_GET_ATTR_USER
 import nz.mega.sdk.MegaStringMap
@@ -90,25 +95,12 @@ internal class DefaultSettingsRepository @Inject constructor(
     private val uiPreferencesGateway: UIPreferencesGateway,
     private val startScreenMapper: StartScreenMapper,
     private val fileManagementPreferencesGateway: FileManagementPreferencesGateway,
+    @FileVersionsOption private val fileVersionsOptionCache: Cache<Boolean>,
 ) : SettingsRepository {
     private val showHiddenNodesFlow: MutableStateFlow<Boolean> = MutableStateFlow(false)
 
     @Volatile
     private var isShowHiddenNodesPopulated: Boolean = false
-
-    override suspend fun isPasscodeLockPreferenceEnabled() =
-        withContext(ioDispatcher) {
-            databaseHandler.get().preferences
-                ?.passcodeLockEnabled
-                ?.toBooleanStrictOrNull()
-        }
-
-    override suspend fun setPasscodeLockEnabled(enabled: Boolean) {
-        withContext(ioDispatcher) { megaLocalStorageGateway.setPasscodeLockEnabled(enabled) }
-    }
-
-    override suspend fun setPasscodeLockCode(passcodeLockCode: String) =
-        withContext(ioDispatcher) { megaLocalStorageGateway.setPasscodeLockCode(passcodeLockCode) }
 
     override suspend fun fetchContactLinksOption(): Boolean = withContext(ioDispatcher) {
         suspendCoroutine { continuation ->
@@ -280,10 +272,10 @@ internal class DefaultSettingsRepository @Inject constructor(
     override suspend fun setChatImageQuality(quality: ChatImageQuality) =
         withContext(ioDispatcher) { chatPreferencesGateway.setChatImageQualityPreference(quality) }
 
-    override fun getCallsSoundNotifications(): Flow<CallsSoundNotifications> =
+    override fun getCallsSoundNotifications(): Flow<CallsSoundEnabledState> =
         callsPreferencesGateway.getCallsSoundNotificationsPreference()
 
-    override suspend fun setCallsSoundNotifications(soundNotifications: CallsSoundNotifications) =
+    override suspend fun setCallsSoundNotifications(soundNotifications: CallsSoundEnabledState) =
         withContext(ioDispatcher) {
             callsPreferencesGateway.setCallsSoundNotificationsPreference(soundNotifications)
         }
@@ -583,4 +575,34 @@ internal class DefaultSettingsRepository @Inject constructor(
     override suspend fun setRaiseToHandSuggestionShown() = withContext(ioDispatcher) {
         callsPreferencesGateway.setRaiseToHandSuggestionPreference()
     }
+
+    override suspend fun getFileVersionsOption(forceRefresh: Boolean) = withContext(ioDispatcher) {
+        fileVersionsOptionCache.get()?.takeUnless { forceRefresh }
+            ?: fetchFileVersionsOption().also {
+                fileVersionsOptionCache.set(it)
+            }
+    }
+
+    private suspend fun fetchFileVersionsOption(): Boolean = withContext(ioDispatcher) {
+        return@withContext suspendCancellableCoroutine { continuation ->
+            val listener = OptionalMegaRequestListenerInterface(
+                onRequestFinish = { request: MegaRequest, error: MegaError ->
+                    when (error.errorCode) {
+                        API_OK -> continuation.resumeWith(Result.success(request.flag))
+                        API_ENOENT -> continuation.resumeWith(Result.success(false))
+                        else -> continuation.failWithError(error, "fetchFileVersionsOption")
+                    }
+                }
+            )
+            megaApiGateway.getFileVersionsOption(listener)
+        }
+    }
+
+    override suspend fun enableGeoTagging(enabled: Boolean) = withContext(ioDispatcher) {
+        uiPreferencesGateway.enableGeoTagging(enabled)
+    }
+
+    override fun monitorGeoTaggingStatus(): Flow<Boolean?> =
+        uiPreferencesGateway.monitorGeoTaggingStatus()
+            .flowOn(ioDispatcher)
 }

@@ -4,11 +4,12 @@ import androidx.compose.foundation.isSystemInDarkTheme
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.tooling.preview.PreviewParameter
 import androidx.compose.ui.tooling.preview.PreviewParameterProvider
-import mega.privacy.android.app.presentation.account.business.BusinessAccountSuspendedDialog
+import mega.privacy.android.app.presentation.account.business.AccountSuspendedDialog
+import mega.privacy.android.app.presentation.account.model.AccountDeactivatedStatus
 import mega.privacy.android.app.presentation.settings.camerauploads.dialogs.CameraUploadsBusinessAccountDialog
-import mega.privacy.android.shared.original.core.ui.preview.CombinedThemePreviews
 import mega.privacy.android.domain.entity.account.EnableCameraUploadsStatus
-import mega.privacy.android.shared.original.core.ui.theme.OriginalTempTheme
+import mega.privacy.android.shared.original.core.ui.preview.CombinedThemePreviews
+import mega.privacy.android.shared.original.core.ui.theme.OriginalTheme
 
 /**
  * A [Composable] to handle what kind of Business Account Dialog should be displayed, depending on
@@ -40,9 +41,18 @@ internal fun BusinessAccountPromptHandler(
 
             EnableCameraUploadsStatus.SHOW_SUSPENDED_BUSINESS_ACCOUNT_PROMPT,
             EnableCameraUploadsStatus.SHOW_SUSPENDED_MASTER_BUSINESS_ACCOUNT_PROMPT,
-            -> {
-                BusinessAccountSuspendedDialog(
-                    isBusinessAdministratorAccount = cameraUploadsStatus == EnableCameraUploadsStatus.SHOW_SUSPENDED_MASTER_BUSINESS_ACCOUNT_PROMPT,
+            EnableCameraUploadsStatus.SHOW_SUSPENDED_PRO_FLEXI_BUSINESS_ACCOUNT_PROMPT,
+                -> {
+                AccountSuspendedDialog(
+                    accountDeactivatedStatus = when (cameraUploadsStatus) {
+                        EnableCameraUploadsStatus.SHOW_SUSPENDED_MASTER_BUSINESS_ACCOUNT_PROMPT ->
+                            AccountDeactivatedStatus.MASTER_BUSINESS_ACCOUNT_DEACTIVATED
+
+                        EnableCameraUploadsStatus.SHOW_SUSPENDED_PRO_FLEXI_BUSINESS_ACCOUNT_PROMPT ->
+                            AccountDeactivatedStatus.PRO_FLEXI_ACCOUNT_DEACTIVATED
+
+                        else -> AccountDeactivatedStatus.BUSINESS_ACCOUNT_DEACTIVATED
+                    },
                     onAlertAcknowledged = onBusinessAccountPromptDismissed,
                     onAlertDismissed = onBusinessAccountPromptDismissed,
                 )
@@ -59,7 +69,7 @@ internal fun BusinessAccountPromptHandler(
 private fun BusinessAccountPromptHandlerPreview(
     @PreviewParameter(BusinessAccountPromptHandlerParameterProvider::class) businessAccountPromptType: EnableCameraUploadsStatus?,
 ) {
-    OriginalTempTheme(isDark = isSystemInDarkTheme()) {
+    OriginalTheme(isDark = isSystemInDarkTheme()) {
         BusinessAccountPromptHandler(
             businessAccountPromptType = businessAccountPromptType,
             onBusinessAccountPromptDismissed = {},

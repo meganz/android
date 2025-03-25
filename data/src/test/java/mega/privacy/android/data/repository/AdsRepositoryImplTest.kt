@@ -1,12 +1,14 @@
 package mega.privacy.android.data.repository
 
+import app.cash.turbine.test
 import com.google.common.truth.Truth.assertThat
 import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.ExperimentalCoroutinesApi
+import kotlinx.coroutines.flow.flowOf
 import kotlinx.coroutines.test.UnconfinedTestDispatcher
 import kotlinx.coroutines.test.runTest
 import mega.privacy.android.data.gateway.AdsGateway
-import mega.privacy.android.data.gateway.api.MegaApiGateway
+import mega.privacy.android.data.gateway.preferences.UIPreferencesGateway
 import mega.privacy.android.data.listener.OptionalMegaRequestListenerInterface
 import mega.privacy.android.data.mapper.MegaStringListMapper
 import mega.privacy.android.data.mapper.advertisements.AdDetailsMapper
@@ -23,6 +25,7 @@ import org.junit.jupiter.api.TestInstance
 import org.mockito.kotlin.any
 import org.mockito.kotlin.mock
 import org.mockito.kotlin.reset
+import org.mockito.kotlin.verify
 import org.mockito.kotlin.whenever
 import kotlin.test.assertFailsWith
 
@@ -32,10 +35,10 @@ internal class AdsRepositoryImplTest {
     private lateinit var underTest: AdsRepository
 
     private val adsGateway: AdsGateway = mock()
-    private val megaApiGateway: MegaApiGateway = mock()
     private val ioDispatcher: CoroutineDispatcher = UnconfinedTestDispatcher()
     private val adDetailsMapper: AdDetailsMapper = mock()
     private val megaStringListMapper: MegaStringListMapper = mock()
+    private val uiPreferencesGateway: UIPreferencesGateway = mock()
 
     private val testAdDetailsList = listOf(AdDetails("ANDFB", "https://megaad.nz/#z_xyz"))
     private val testAdSlotList = listOf("ANDFB")
@@ -45,9 +48,9 @@ internal class AdsRepositoryImplTest {
         underTest = AdsRepositoryImpl(
             ioDispatcher = ioDispatcher,
             adsGateway = adsGateway,
-            megaApiGateway = megaApiGateway,
             adDetailsMapper = adDetailsMapper,
             megaStringListMapper = megaStringListMapper,
+            uiPreferencesGateway = uiPreferencesGateway
         )
     }
 
@@ -57,6 +60,7 @@ internal class AdsRepositoryImplTest {
             adsGateway,
             adDetailsMapper,
             megaStringListMapper,
+            uiPreferencesGateway
         )
     }
 
@@ -108,5 +112,70 @@ internal class AdsRepositoryImplTest {
                 exceptionClass = MegaException::class,
                 block = { underTest.fetchAdDetails(testAdSlotList, 0L) }
             )
+        }
+
+    @Test
+    fun `test that monitor ads closing timestamp returns successfully`() =
+        runTest {
+            val testTimestamp = 123456L
+            whenever(uiPreferencesGateway.monitorAdsClosingTimestamp()).thenReturn(
+                flowOf(testTimestamp)
+            )
+            underTest.monitorAdsClosingTimestamp().test {
+                assertThat(awaitItem()).isEqualTo(testTimestamp)
+                awaitComplete()
+            }
+        }
+
+    @Test
+    fun `test that query ads returns successfully if no error is thrown`() =
+        runTest(ioDispatcher) {
+            val api = mock<MegaApiJava>()
+            val request = mock<MegaRequest> {
+                on { numDetails }.thenReturn(0)
+            }
+            val error = mock<MegaError> {
+                on { errorCode }.thenReturn(MegaError.API_OK)
+            }
+            whenever(adsGateway.queryAds(any(), any(), any())).thenAnswer {
+                (it.arguments[2] as OptionalMegaRequestListenerInterface).onRequestFinish(
+                    api,
+                    request,
+                    error
+                )
+            }
+            val actual = underTest.queryAds(0L)
+            assertThat(actual).isEqualTo(true)
+        }
+
+    @Test
+    fun `test that query ads throws an exception when the api returns an error`() =
+        runTest(ioDispatcher) {
+            val api = mock<MegaApiJava>()
+            val request = mock<MegaRequest> {
+                on { numDetails }.thenReturn(0)
+            }
+            val error = mock<MegaError> {
+                on { errorCode }.thenReturn(MegaError.API_OK + 1)
+            }
+            whenever(adsGateway.queryAds(any(), any(), any())).thenAnswer {
+                (it.arguments[2] as OptionalMegaRequestListenerInterface).onRequestFinish(
+                    api,
+                    request,
+                    error
+                )
+            }
+            assertFailsWith(
+                exceptionClass = MegaException::class,
+                block = { underTest.queryAds(0L) }
+            )
+        }
+
+    @Test
+    fun `test that set ads closing timestamp invoke correctly`() =
+        runTest {
+            val testTimestamp = 123456L
+            underTest.setAdsClosingTimestamp(testTimestamp)
+            verify(uiPreferencesGateway).setAdsClosingTimestamp(testTimestamp)
         }
 }

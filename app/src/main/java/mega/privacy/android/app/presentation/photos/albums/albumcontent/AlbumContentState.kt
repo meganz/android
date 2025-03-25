@@ -62,6 +62,7 @@ data class AlbumContentState(
     val isHiddenNodesOnboarded: Boolean? = null,
     val isBusinessAccountExpired: Boolean = false,
     val hiddenNodeEnabled: Boolean = false,
+    val showProgressMessage: Boolean = false,
 ) {
     val isAddingPhotosProgressCompleted: Boolean
         get() = !isAddingPhotos && totalAddedPhotos > 0

@@ -15,6 +15,7 @@ import mega.privacy.android.app.utils.MenuUtils.toggleAllMenuItemsVisibility
 class PlaylistActionModeCallback(
     private val removeSelections: () -> Unit,
     private val clearSelections: () -> Unit,
+    private val selectAll: () -> Unit,
 ) :
     ActionMode.Callback {
 
@@ -32,6 +33,9 @@ class PlaylistActionModeCallback(
     override fun onActionItemClicked(mode: ActionMode?, item: MenuItem?): Boolean {
         if (item?.itemId == R.id.remove) {
             removeSelections()
+        }
+        if (item?.itemId == R.id.select_all) {
+            selectAll()
         }
         return true
     }

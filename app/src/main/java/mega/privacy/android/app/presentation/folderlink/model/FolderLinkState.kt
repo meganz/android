@@ -21,11 +21,6 @@ import mega.privacy.android.domain.entity.preference.ViewType
  * @property folderSubHandle            Handle of the folder link
  * @property isLoginComplete            Whether is login is successfully completed
  * @property isNodesFetched             Whether nodes are fetched
- * @property askForDecryptionKeyDialog  Whether to show AskForDecryptionDialog
- * @property collisions                 List of nodes with existing names
- * @property copyResultText             Text to show on successful copy
- * @property copyThrowable              Throwable error on copy
- * @property shouldLogin                Whether to show login screen
  * @property hasDbCredentials           Whether db credentials are valid
  * @property hasMediaItem               Whether current folder has any image/video
  * @property nodesList                  List of nodes to show
@@ -34,7 +29,11 @@ import mega.privacy.android.domain.entity.preference.ViewType
  * @property currentViewType            Whether list or grid view
  * @property title                      Title of the folder
  * @property selectedNodeCount          Count of nodes selected
- * @property finishActivity             Whether to finish the activity
+ * @property askForDecryptionKeyDialogEvent  Event to show AskForDecryptionDialog
+ * @property collisionsEvent            Event with list of nodes with existing names
+ * @property copyResultEvent            Event to show on successful copy text or error
+ * @property showLoginEvent             Event to show login screen
+ * @property finishActivityEvent        Event to finish the activity
  * @property openFile                   State to handle file opening
  * @property downloadEvent              Event to download nodes with DownloadsWorker
  * @property importNode                 Node to import
@@ -43,9 +42,9 @@ import mega.privacy.android.domain.entity.preference.ViewType
  * @property openMoreOption             State to open more option bottom sheet
  * @property moreOptionNode             Node to show more options for
  * @property storageStatusDialogState   State of StorageStatusDialog
- * @property errorDialogTitle           String id of title for error dialog
- * @property errorDialogContent         String id of content for error dialog
+ * @property showErrorDialogEvent       Event to show error dialog with String id of title and content
  * @property snackBarMessage            String id of content for snack bar
+ * @property shouldShowAdsForLink       Whether ads should be shown for the link
  */
 data class FolderLinkState(
     val isInitialState: Boolean = true,
@@ -53,11 +52,6 @@ data class FolderLinkState(
     val folderSubHandle: String? = null,
     val isLoginComplete: Boolean = false,
     val isNodesFetched: Boolean = false,
-    val askForDecryptionKeyDialog: Boolean = false,
-    val collisions: List<NameCollision>? = null,
-    val copyThrowable: Throwable? = null,
-    val copyResultText: String? = null,
-    val shouldLogin: Boolean? = null,
     val hasDbCredentials: Boolean = false,
     val hasMediaItem: Boolean = false,
     val nodesList: List<NodeUIItem<TypedNode>> = listOf(),
@@ -66,16 +60,20 @@ data class FolderLinkState(
     val currentViewType: ViewType = ViewType.LIST,
     val title: String = "",
     val selectedNodeCount: Int = 0,
-    val finishActivity: Boolean = false,
-    val openFile: StateEventWithContent<Intent> = consumed(),
-    val downloadEvent: StateEventWithContent<TransferTriggerEvent.DownloadTriggerEvent> = consumed(),
     val importNode: NodeUIItem<TypedNode>? = null,
-    val selectImportLocation: StateEvent = consumed,
-    val snackbarMessageContent: StateEventWithContent<String> = consumed(),
-    val openMoreOption: StateEvent = consumed,
+    @StringRes val snackBarMessage: Int = -1,
     val moreOptionNode: NodeUIItem<TypedNode>? = null,
     val storageStatusDialogState: StorageStatusDialogState? = null,
-    @StringRes val errorDialogTitle: Int = -1,
-    @StringRes val errorDialogContent: Int = -1,
-    @StringRes val snackBarMessage: Int = -1,
+    val showLoginEvent: StateEvent = consumed,
+    val finishActivityEvent: StateEvent = consumed,
+    val askForDecryptionKeyDialogEvent: StateEvent = consumed,
+    val selectImportLocation: StateEvent = consumed,
+    val openMoreOption: StateEvent = consumed,
+    val collisionsEvent: StateEventWithContent<List<NameCollision>> = consumed(),
+    val copyResultEvent: StateEventWithContent<Pair<String?, Throwable?>> = consumed(),
+    val showErrorDialogEvent: StateEventWithContent<Pair<Int, Int>> = consumed(),
+    val openFile: StateEventWithContent<Intent> = consumed(),
+    val downloadEvent: StateEventWithContent<TransferTriggerEvent.DownloadTriggerEvent> = consumed(),
+    val snackbarMessageContent: StateEventWithContent<String> = consumed(),
+    val shouldShowAdsForLink: Boolean = false
 )

@@ -39,19 +39,11 @@ internal class DeviceNodeStatusMapper @Inject constructor() {
         folders: List<DeviceFolderNode>,
         isCurrentDevice: Boolean,
     ) =
-        if (isCurrentDevice && (folders.isEmpty() || folders.isOnlyCameraUploadsOrMediaUploads())) {
+        if (isCurrentDevice && folders.isEmpty()) {
             DeviceCenterNodeStatus.NothingSetUp
         } else {
             folders.calculateDeviceStatus()
         }
-
-    /**
-     * Checks if Device's Backup Folders are only related to Camera Uploads or Media Uploads
-     *
-     * @return True if folders are only related to Camera Uploads or Media Uploads, or False otherwise
-     */
-    private fun List<DeviceFolderNode>.isOnlyCameraUploadsOrMediaUploads(): Boolean =
-        this.none { it.type != BackupInfoType.CAMERA_UPLOADS && it.type != BackupInfoType.MEDIA_UPLOADS }
 
     /**
      * Retrieves the Device Status based on the highest priority found from the Device's Backup
@@ -65,8 +57,7 @@ internal class DeviceNodeStatusMapper @Inject constructor() {
      * @return The appropriate [DeviceCenterNodeStatus]
      */
     private fun List<DeviceFolderNode>.calculateDeviceStatus(): DeviceCenterNodeStatus =
-        when (this.filter { it.type != BackupInfoType.CAMERA_UPLOADS && it.type != BackupInfoType.MEDIA_UPLOADS }
-            .maxOfOrNull { folder -> folder.status.priority }) {
+        when (this.maxOfOrNull { folder -> folder.status.priority }) {
             // Syncing Devices do not need to display the syncing progress in the UI
             12 -> DeviceCenterNodeStatus.Syncing(progress = 0)
             11 -> DeviceCenterNodeStatus.Scanning

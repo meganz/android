@@ -147,6 +147,13 @@ interface ChatRepository {
     suspend fun getChatRooms(): List<ChatRoom>
 
     /**
+     * Get note to self chat
+     *
+     * @return  [ChatRoom]
+     */
+    suspend fun getNoteToSelfChat(): ChatRoom?
+
+    /**
      * Get all chat rooms
      *
      * @return  List of [CombinedChatRoom]
@@ -436,10 +443,10 @@ interface ChatRepository {
      * @param userHandles List of contact handles.
      * @return The chat conversation handle.
      */
-    suspend fun createChat(isGroup: Boolean, userHandles: List<Long>): Long
+    suspend fun createChat(isGroup: Boolean, userHandles: List<Long>?): Long
 
     /**
-     * Creates a groupal chat for one or more participants
+     * Creates a group chat for one or more participants
      *
      * @param title Null-terminated character string with the chat title. If the title
      * is longer than 30 characters, it will be truncated to that maximum length.
@@ -966,4 +973,34 @@ interface ChatRepository {
      * @return List of archived chat items
      */
     suspend fun getArchivedChatListItems(): List<ChatListItem>
+
+
+    /**
+     * Set chat opening with link
+     */
+    fun setChatOpeningWithLink(chatId: Long)
+
+    /**
+     * Remove chat opening  with link
+     */
+    fun removeChatOpeningWithLink(chatId: Long)
+
+    /**
+     * check if chat is opening with link or not
+     *
+     * @return Boolean
+     */
+    fun isChatOpeningWithLink(chatId: Long): Boolean
+
+    /**
+     * setMyChatFilesFolder
+     * @param nodeHandle
+     * @return node handle [Long]
+     */
+    suspend fun setMyChatFilesFolder(nodeHandle: Long): Long?
+
+    /**
+     * @return the [NodeId] of the folder for saving chat files in user attributes, null if it's not configured yet
+     */
+    suspend fun getMyChatsFilesFolderId(): NodeId?
 }

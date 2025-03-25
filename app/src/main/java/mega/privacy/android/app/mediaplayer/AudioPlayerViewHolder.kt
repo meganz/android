@@ -2,22 +2,25 @@ package mega.privacy.android.app.mediaplayer
 
 import android.animation.Animator
 import android.content.Context
+import android.view.View
 import android.widget.FrameLayout
 import android.widget.ImageButton
 import android.widget.ImageView
 import android.widget.TextView
-import androidx.cardview.widget.CardView
 import androidx.constraintlayout.widget.ConstraintLayout
 import androidx.core.view.isVisible
 import androidx.media3.common.Player
+import mega.privacy.android.analytics.Analytics
 import mega.privacy.android.app.R
 import mega.privacy.android.app.databinding.FragmentAudioPlayerBinding
+import mega.privacy.android.app.mediaplayer.model.SpeedPlaybackItem
 import mega.privacy.android.app.mediaplayer.playlist.PlaylistItem
 import mega.privacy.android.app.mediaplayer.queue.audio.AudioQueueFragment.Companion.SINGLE_PLAYLIST_SIZE
 import mega.privacy.android.app.mediaplayer.service.Metadata
 import mega.privacy.android.app.utils.Constants
 import mega.privacy.android.app.utils.RunOnUIThreadUtils.post
 import mega.privacy.android.app.utils.SimpleAnimatorListener
+import mega.privacy.mobile.analytics.event.AudioPlayerQueueButtonPressedEvent
 
 /**
  * A view holder for audio player, implementing the UI logic of audio player.
@@ -26,12 +29,13 @@ import mega.privacy.android.app.utils.SimpleAnimatorListener
  */
 class AudioPlayerViewHolder(val binding: FragmentAudioPlayerBinding) {
 
-    private val artworkContainer = binding.root.findViewById<CardView>(R.id.artwork_container)
+    private val artworkContainer = binding.root.findViewById<FrameLayout>(R.id.artwork_container)
     private val trackName = binding.root.findViewById<TextView>(R.id.track_name)
     private val artistName = binding.root.findViewById<TextView>(R.id.artist_name)
     private val playlist = binding.root.findViewById<ImageButton>(R.id.playlist)
     private val shuffle =
         binding.root.findViewById<ImageView>(androidx.media3.ui.R.id.exo_shuffle)
+    private val speedPlaybackButton = binding.root.findViewById<ImageButton>(R.id.speed_playback)
 
     /**
      * Update the layout param of artwork of player view.
@@ -149,6 +153,7 @@ class AudioPlayerViewHolder(val binding: FragmentAudioPlayerBinding) {
         togglePlaylistEnabled(context, playlistItems, shuffleEnabled)
 
         playlist.setOnClickListener {
+            Analytics.tracker.trackEvent(AudioPlayerQueueButtonPressedEvent)
             openPlaylist()
         }
     }
@@ -182,7 +187,7 @@ class AudioPlayerViewHolder(val binding: FragmentAudioPlayerBinding) {
                         R.color.grey_050_grey_800
 
                     shuffleEnabled ->
-                        R.color.teal_300_teal_600
+                        R.color.color_button_brand
 
                     else ->
                         R.color.dark_grey_white
@@ -197,6 +202,41 @@ class AudioPlayerViewHolder(val binding: FragmentAudioPlayerBinding) {
      * @param playbackState the state of player
      */
     fun updateLoadingAnimation(@Player.State playbackState: Int?) {
-        binding.loading.isVisible = playbackState == Player.STATE_BUFFERING
+        binding.root.findViewById<View>(R.id.loading_audio_player_controller_view).isVisible =
+            playbackState == Player.STATE_BUFFERING
+        if (playbackState != null) {
+            binding.root.findViewById<View>(R.id.play_pause_placeholder).visibility =
+                if (playbackState > Player.STATE_BUFFERING) View.VISIBLE else View.INVISIBLE
+        }
     }
+
+    /**
+     * Setup speed playback button.
+     *
+     * @param default default SpeedPlaybackItem
+     * @param callback the callback when speed playback button is clicked
+     */
+    fun setupSpeedPlaybackButton(default: SpeedPlaybackItem?, callback: (View) -> Unit) {
+        speedPlaybackButton.setOnClickListener(callback)
+        updateSpeedPlaybackIcon(default ?: SpeedPlaybackItem.PLAYBACK_SPEED_1_X)
+    }
+
+    /**
+     * Update the speed playback icon according to the playback speed
+     *
+     * @param speedPlaybackItem SpeedPlaybackItem
+     */
+    fun updateSpeedPlaybackIcon(speedPlaybackItem: SpeedPlaybackItem) =
+        with(speedPlaybackButton) {
+            setImageResource(speedPlaybackItem.iconId)
+            setColorFilter(
+                context.getColor(
+                    if (speedPlaybackItem != SpeedPlaybackItem.PLAYBACK_SPEED_1_X) {
+                        R.color.color_button_brand
+                    } else {
+                        R.color.dark_grey_white
+                    }
+                )
+            )
+        }
 }

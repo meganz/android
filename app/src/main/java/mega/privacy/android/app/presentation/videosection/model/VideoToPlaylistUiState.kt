@@ -26,5 +26,5 @@ data class VideoToPlaylistUiState(
     val shouldCreateVideoPlaylist: Boolean = false,
     val createDialogErrorMessage: Int? = null,
     val isVideoPlaylistCreatedSuccessfully: Boolean = false,
-    val addedPlaylistTitles: List<String> = emptyList(),
+    val addedPlaylistTitles: List<String>? = null,
 )

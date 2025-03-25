@@ -25,7 +25,7 @@ import mega.privacy.android.app.presentation.extensions.isDarkMode
 import mega.privacy.android.app.presentation.extensions.serializable
 import mega.privacy.android.app.upgradeAccount.UpgradeAccountActivity
 import mega.privacy.android.app.utils.AlertsAndWarnings
-import mega.privacy.android.shared.original.core.ui.theme.OriginalTempTheme
+import mega.privacy.android.shared.original.core.ui.theme.OriginalTheme
 import mega.privacy.android.domain.entity.AccountType
 import mega.privacy.android.domain.entity.StorageState
 import mega.privacy.android.domain.entity.ThemeMode
@@ -56,7 +56,7 @@ internal class StorageStatusDialogFragment : DialogFragment() {
                     .collectAsStateWithLifecycle(initialValue = ThemeMode.System)
                 val uiState by viewModel.state.collectAsStateWithLifecycle()
                 val coroutineScope = rememberCoroutineScope()
-                OriginalTempTheme(isDark = themeMode.isDarkMode()) {
+                OriginalTheme(isDark = themeMode.isDarkMode()) {
                     StorageStatusDialogView(
                         modifier = Modifier.padding(horizontal = 24.dp),
                         state = StorageStatusDialogState(

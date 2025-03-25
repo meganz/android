@@ -14,7 +14,7 @@ import mega.privacy.android.shared.original.core.ui.controls.dividers.DividerTyp
 import mega.privacy.android.shared.original.core.ui.controls.dividers.MegaDivider
 import mega.privacy.android.shared.original.core.ui.controls.lists.GenericTwoLineListItem
 import mega.privacy.android.shared.original.core.ui.preview.CombinedThemePreviews
-import mega.privacy.android.shared.original.core.ui.theme.OriginalTempTheme
+import mega.privacy.android.shared.original.core.ui.theme.OriginalTheme
 
 /**
  * A Composable that displays the User's selected Internet Connection Type used to upload Camera
@@ -55,7 +55,7 @@ internal fun HowToUploadTile(
 private fun HowToUploadTilePreview(
     @PreviewParameter(UploadConnectionTypeParameterProvider::class) uploadConnectionType: UploadConnectionType,
 ) {
-    OriginalTempTheme(isDark = isSystemInDarkTheme()) {
+    OriginalTheme(isDark = isSystemInDarkTheme()) {
         HowToUploadTile(
             uploadConnectionType = uploadConnectionType,
             onItemClicked = {},

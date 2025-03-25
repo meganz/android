@@ -3,33 +3,47 @@ package mega.privacy.android.app.presentation.transfers
 import app.cash.turbine.test
 import com.google.common.truth.Truth.assertThat
 import kotlinx.coroutines.CoroutineDispatcher
+import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.ExperimentalCoroutinesApi
+import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.emptyFlow
+import kotlinx.coroutines.flow.flowOf
+import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.test.UnconfinedTestDispatcher
+import kotlinx.coroutines.test.resetMain
 import kotlinx.coroutines.test.runTest
-import mega.privacy.android.app.globalmanagement.TransfersManagement
+import kotlinx.coroutines.test.setMain
+import mega.privacy.android.app.presentation.transfers.TransfersManagementViewModel.Companion.INVALID_TIMESTAMP
+import mega.privacy.android.app.presentation.transfers.TransfersManagementViewModel.Companion.waitTimeToShowOffline
 import mega.privacy.android.app.presentation.transfers.model.mapper.TransfersInfoMapper
 import mega.privacy.android.core.test.extension.CoroutineMainDispatcherExtension
 import mega.privacy.android.domain.entity.TransfersStatusInfo
+import mega.privacy.android.domain.entity.transfer.CompletedTransferState
 import mega.privacy.android.domain.usecase.network.MonitorConnectivityUseCase
 import mega.privacy.android.domain.usecase.transfers.MonitorLastTransfersHaveBeenCancelledUseCase
 import mega.privacy.android.domain.usecase.transfers.MonitorTransfersStatusUseCase
+import mega.privacy.android.domain.usecase.transfers.completed.MonitorCompletedTransferEventUseCase
+import mega.privacy.android.domain.usecase.transfers.overquota.MonitorTransferOverQuotaUseCase
 import mega.privacy.android.shared.original.core.ui.model.TransfersInfo
 import mega.privacy.android.shared.original.core.ui.model.TransfersStatus
+import org.junit.jupiter.api.AfterAll
 import org.junit.jupiter.api.BeforeAll
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.TestInstance
 import org.junit.jupiter.api.extension.ExtendWith
+import org.junit.jupiter.params.ParameterizedTest
+import org.junit.jupiter.params.provider.EnumSource
 import org.mockito.ArgumentMatchers.eq
 import org.mockito.kotlin.any
 import org.mockito.kotlin.doReturn
 import org.mockito.kotlin.mock
 import org.mockito.kotlin.reset
-import org.mockito.kotlin.verify
 import org.mockito.kotlin.whenever
 
+@OptIn(ExperimentalCoroutinesApi::class)
 @ExtendWith(CoroutineMainDispatcherExtension::class)
 @TestInstance(TestInstance.Lifecycle.PER_CLASS)
 class TransfersManagementViewModelTest {
@@ -38,44 +52,54 @@ class TransfersManagementViewModelTest {
     @OptIn(ExperimentalCoroutinesApi::class)
     private val ioDispatcher: CoroutineDispatcher = UnconfinedTestDispatcher()
     private val transfersInfoMapper = mock<TransfersInfoMapper>()
-    private val transfersManagement = mock<TransfersManagement>()
     private val monitorLastTransfersHaveBeenCancelledUseCase =
         mock<MonitorLastTransfersHaveBeenCancelledUseCase>()
     private val monitorConnectivityUseCase = mock<MonitorConnectivityUseCase>()
 
     private val monitorTransfersStatusFlow = MutableSharedFlow<TransfersStatusInfo>()
-    private val monitorConnectivityUseCaseFlow = MutableStateFlow(false)
+    private var monitorConnectivityUseCaseFlow = MutableStateFlow(false)
     private val monitorLastTransfersHaveBeenCancelledUseCaseFlow = MutableSharedFlow<Unit>()
+    private val monitorCompletedTransferEventUseCase = mock<MonitorCompletedTransferEventUseCase>()
+    private val monitorTransferOverQuotaUseCase = mock<MonitorTransferOverQuotaUseCase>()
 
     @BeforeAll
     fun setup() = runTest {
+        Dispatchers.setMain(ioDispatcher)
+        commonStub()
+        initTest()
+    }
+
+    private fun initTest() {
         //this mocks are only used in viewmodel init, so no need to reset
         val monitorTransfersStatusUseCase = mock<MonitorTransfersStatusUseCase>()
         whenever(monitorTransfersStatusUseCase()) doReturn monitorTransfersStatusFlow
-        commonStub()
-
         underTest = TransfersManagementViewModel(
             getNumPendingTransfersUseCase = mock(),
             isCompletedTransfersEmptyUseCase = mock(),
             transfersInfoMapper = transfersInfoMapper,
-            transfersManagement = transfersManagement,
             ioDispatcher = ioDispatcher,
             monitorConnectivityUseCase = monitorConnectivityUseCase,
             monitorTransfersStatusUseCase = monitorTransfersStatusUseCase,
             monitorLastTransfersHaveBeenCancelledUseCase = monitorLastTransfersHaveBeenCancelledUseCase,
+            monitorCompletedTransfersEventUseCase = monitorCompletedTransferEventUseCase,
             samplePeriod = 0L,
+            monitorTransferOverQuotaUseCase = monitorTransferOverQuotaUseCase,
         )
     }
 
     @BeforeEach
-    fun resetMocks() = runTest {
+    fun resetMocks() {
         reset(
             transfersInfoMapper,
-            transfersManagement,
             monitorConnectivityUseCase,
             monitorLastTransfersHaveBeenCancelledUseCase,
         )
         commonStub()
+    }
+
+    @AfterAll
+    fun tearDown() {
+        Dispatchers.resetMain()
     }
 
     @Test
@@ -105,11 +129,15 @@ class TransfersManagementViewModelTest {
                     totalSizeTransferred = eq(totalSizeTransferred),
                     areTransfersPaused = eq(false),
                     isTransferError = eq(false),
+                    isOnline = eq(true),
                     isTransferOverQuota = eq(false),
                     isStorageOverQuota = eq(false),
                     lastTransfersCancelled = any(),
                 )
             ) doReturn expected
+
+            initTest()
+
             underTest.state.test {
                 awaitItem() // Skip initial value
                 monitorTransfersStatusFlow.emit(transfersStatusInfo)
@@ -119,19 +147,22 @@ class TransfersManagementViewModelTest {
         }
 
     @Test
-    fun `test that when monitorConnectivityUseCase turns to true it calls transfersManagement resetNetworkTimer`() =
+    fun `test that isOnline ui state is updated when monitorConnectivityUseCase emits, skipping unstable offline`() =
         runTest {
-            monitorConnectivityUseCaseFlow.value = false // to ensure it changes to true
-            monitorConnectivityUseCaseFlow.value = true
-            verify(transfersManagement).resetNetworkTimer()
-        }
-
-    @Test
-    fun `test that when monitorConnectivityUseCase turns to false it calls transfersManagement startNetworkTimer`() =
-        runTest {
-            monitorConnectivityUseCaseFlow.value = true // to ensure it changes to false
-            monitorConnectivityUseCaseFlow.value = false
-            verify(transfersManagement).startNetworkTimer()
+            initTest()
+            underTest.state.test {
+                monitorConnectivityUseCaseFlow.emit(true)
+                assertThat(awaitItem().isOnline).isTrue()
+                monitorConnectivityUseCaseFlow.emit(false)
+                delay(waitTimeToShowOffline / 2)
+                monitorConnectivityUseCaseFlow.emit(true)
+                expectNoEvents() //short offline is skipped
+                monitorConnectivityUseCaseFlow.emit(false)
+                delay(waitTimeToShowOffline * 1.1)
+                assertThat(awaitItem().isOnline).isFalse() // long offline is not skipped
+                monitorConnectivityUseCaseFlow.emit(true)
+                assertThat(awaitItem().isOnline).isTrue() // online is updated immediately
+            }
         }
 
     @Test
@@ -142,9 +173,246 @@ class TransfersManagementViewModelTest {
             assertThat(underTest.state.value.lastTransfersCancelled).isTrue()
         }
 
+    @ParameterizedTest(name = " if use case returns {0}")
+    @EnumSource(CompletedTransferState::class)
+    fun `test that monitorFailedTransfers updates state`(
+        completedTransferState: CompletedTransferState,
+    ) = runTest {
+        whenever(monitorCompletedTransferEventUseCase()) doReturn flowOf(completedTransferState)
+
+        initTest()
+
+        underTest.state.map { it.isTransferError }.test {
+            assertThat(awaitItem()).isEqualTo(completedTransferState == CompletedTransferState.Error)
+        }
+    }
+
+    @ParameterizedTest(name = " if use case returns {0}")
+    @EnumSource(CompletedTransferState::class)
+    fun `test that shouldCheckTransferError updates state and returns correctly`(
+        completedTransferState: CompletedTransferState,
+    ) = runTest {
+        whenever(monitorCompletedTransferEventUseCase()) doReturn flowOf(completedTransferState)
+
+        initTest()
+
+        assertThat(underTest.shouldCheckTransferError()).isEqualTo(completedTransferState == CompletedTransferState.Error)
+        underTest.state.map { it.isTransferError }.test {
+            assertThat(awaitItem()).isFalse()
+        }
+    }
+
+    @Test
+    fun `test that shouldCheckTransferError updates transfersInfo in state with Transferring status when transferInfo status is error`() =
+        runTest {
+            val pendingDownloads = 5
+            val pendingUploads = 4
+            val totalSizeTransferred = 3L
+            val totalSizeToTransfer = 5L
+            val transfersStatusInfo = TransfersStatusInfo(
+                totalSizeToTransfer,
+                totalSizeTransferred,
+                pendingUploads,
+                pendingDownloads,
+            )
+            val expected = TransfersInfo(
+                status = TransfersStatus.TransferError,
+                totalSizeAlreadyTransferred = totalSizeTransferred,
+                totalSizeToTransfer = totalSizeToTransfer,
+                uploading = true
+            )
+            val finalExpected = expected.copy(status = TransfersStatus.Transferring)
+
+            whenever(
+                transfersInfoMapper(
+                    numPendingUploads = eq(pendingUploads),
+                    numPendingDownloadsNonBackground = eq(pendingDownloads),
+                    totalSizeToTransfer = eq(totalSizeToTransfer),
+                    totalSizeTransferred = eq(totalSizeTransferred),
+                    areTransfersPaused = eq(false),
+                    isTransferError = eq(true),
+                    isOnline = eq(true),
+                    isTransferOverQuota = eq(false),
+                    isStorageOverQuota = eq(false),
+                    lastTransfersCancelled = any(),
+                )
+            ) doReturn expected
+            whenever(monitorCompletedTransferEventUseCase()) doReturn flowOf(CompletedTransferState.Error)
+
+            initTest()
+
+            with(underTest) {
+                state.map { it.transfersInfo }.test {
+                    awaitItem()
+                    monitorTransfersStatusFlow.emit(transfersStatusInfo)
+                    assertThat(awaitItem()).isEqualTo(expected)
+                }
+
+                shouldCheckTransferError()
+
+                state.map { it.transfersInfo }.test {
+                    assertThat(awaitItem()).isEqualTo(finalExpected)
+                }
+            }
+        }
+
+    @Test
+    fun `test that shouldCheckTransferError updates transfersInfo in state with Completed status when transferInfo status is error`() =
+        runTest {
+            val pendingDownloads = 5
+            val pendingUploads = 4
+            val totalSizeTransferred = 3L
+            val totalSizeToTransfer = 0L
+            val transfersStatusInfo = TransfersStatusInfo(
+                totalSizeToTransfer,
+                totalSizeTransferred,
+                pendingUploads,
+                pendingDownloads,
+            )
+            val expected = TransfersInfo(
+                status = TransfersStatus.TransferError,
+                totalSizeAlreadyTransferred = totalSizeTransferred,
+                totalSizeToTransfer = totalSizeToTransfer,
+                uploading = true
+            )
+            val finalExpected = expected.copy(status = TransfersStatus.Completed)
+
+            whenever(
+                transfersInfoMapper(
+                    numPendingUploads = eq(pendingUploads),
+                    numPendingDownloadsNonBackground = eq(pendingDownloads),
+                    totalSizeToTransfer = eq(totalSizeToTransfer),
+                    totalSizeTransferred = eq(totalSizeTransferred),
+                    areTransfersPaused = eq(false),
+                    isTransferError = eq(true),
+                    isOnline = eq(true),
+                    isTransferOverQuota = eq(false),
+                    isStorageOverQuota = eq(false),
+                    lastTransfersCancelled = any(),
+                )
+            ) doReturn expected
+            whenever(monitorCompletedTransferEventUseCase()) doReturn flowOf(CompletedTransferState.Error)
+
+            initTest()
+
+            with(underTest) {
+                state.map { it.transfersInfo }.test {
+                    awaitItem()
+                    monitorTransfersStatusFlow.emit(transfersStatusInfo)
+                    assertThat(awaitItem()).isEqualTo(expected)
+                }
+
+                shouldCheckTransferError()
+
+                state.map { it.transfersInfo }.test {
+                    assertThat(awaitItem()).isEqualTo(finalExpected)
+                }
+            }
+        }
+
+    @Test
+    fun `test that shouldCheckTransferError does not updates transfersInfo in state when transfer info status is transferring`() =
+        runTest {
+            val pendingDownloads = 5
+            val pendingUploads = 4
+            val totalSizeTransferred = 3L
+            val totalSizeToTransfer = 5L
+            val transfersStatusInfo = TransfersStatusInfo(
+                totalSizeToTransfer,
+                totalSizeTransferred,
+                pendingUploads,
+                pendingDownloads,
+            )
+            val expected = TransfersInfo(
+                status = TransfersStatus.Transferring,
+                totalSizeAlreadyTransferred = totalSizeTransferred,
+                totalSizeToTransfer = totalSizeToTransfer,
+                uploading = true
+            )
+
+            whenever(
+                transfersInfoMapper(
+                    numPendingUploads = eq(pendingUploads),
+                    numPendingDownloadsNonBackground = eq(pendingDownloads),
+                    totalSizeToTransfer = eq(totalSizeToTransfer),
+                    totalSizeTransferred = eq(totalSizeTransferred),
+                    areTransfersPaused = eq(false),
+                    isTransferError = eq(true),
+                    isOnline = eq(true),
+                    isTransferOverQuota = eq(false),
+                    isStorageOverQuota = eq(false),
+                    lastTransfersCancelled = any(),
+                )
+            ) doReturn expected
+            whenever(monitorCompletedTransferEventUseCase()) doReturn flowOf(CompletedTransferState.Error)
+
+            initTest()
+
+            with(underTest) {
+                state.map { it.transfersInfo }.test {
+                    awaitItem()
+                    monitorTransfersStatusFlow.emit(transfersStatusInfo)
+                    assertThat(awaitItem()).isEqualTo(expected)
+                }
+
+                shouldCheckTransferError()
+
+                state.map { it.transfersInfo }.test {
+                    assertThat(awaitItem()).isEqualTo(expected)
+                }
+            }
+        }
+
+    @Test
+    fun `test that monitorTransferOverQuotaUseCase updates state`() = runTest {
+        val flow = MutableStateFlow(false)
+
+        whenever(monitorTransferOverQuotaUseCase()) doReturn flow
+
+        initTest()
+
+        underTest.state.map { it.isTransferOverQuota }.test {
+            assertThat(awaitItem()).isFalse()
+            flow.emit(true)
+            assertThat(awaitItem()).isTrue()
+        }
+    }
+
+    @Test
+    fun `test that transferOverQuotaWarning and transferOverQuotaTimestamp are updated in state if a transfer over quota is received`() =
+        runTest {
+            whenever(monitorTransferOverQuotaUseCase()) doReturn flowOf(true)
+
+            initTest()
+
+            underTest.state.test {
+                val actual = awaitItem()
+                assertThat(actual.transferOverQuotaTimestamp).isNotEqualTo(INVALID_TIMESTAMP)
+                assertThat(actual.transferOverQuotaWarning).isTrue()
+
+                underTest.resetTransferOverQuotaTimestamp()
+
+                assertThat(awaitItem().transferOverQuotaTimestamp).isEqualTo(INVALID_TIMESTAMP)
+
+                underTest.onTransferOverQuotaWarningConsumed()
+
+
+                assertThat(awaitItem().transferOverQuotaWarning).isFalse()
+            }
+        }
+
+    @Test
+    fun `test that isInTransfersSection is updated in state when setInTransfersSection is called`() =
+        runTest {
+            underTest.setInTransfersSection(true)
+            assertThat(underTest.isInTransfersSection()).isTrue()
+
+            underTest.setInTransfersSection(false)
+            assertThat(underTest.isInTransfersSection()).isFalse()
+        }
+
     private fun commonStub() {
-        whenever(transfersManagement.getAreFailedTransfers()) doReturn false
-        whenever(transfersManagement.shouldShowNetworkWarning) doReturn false
+        monitorConnectivityUseCaseFlow = MutableStateFlow(true)
         whenever(monitorConnectivityUseCase()) doReturn monitorConnectivityUseCaseFlow
         whenever(monitorLastTransfersHaveBeenCancelledUseCase()) doReturn monitorLastTransfersHaveBeenCancelledUseCaseFlow
         whenever(
@@ -155,10 +423,13 @@ class TransfersManagementViewModelTest {
                 totalSizeTransferred = any(),
                 areTransfersPaused = any(),
                 isTransferError = any(),
+                isOnline = any(),
                 isTransferOverQuota = any(),
                 isStorageOverQuota = any(),
                 lastTransfersCancelled = any(),
             )
         ) doReturn TransfersInfo()
+        whenever(monitorCompletedTransferEventUseCase()) doReturn emptyFlow()
+        whenever(monitorTransferOverQuotaUseCase()) doReturn emptyFlow()
     }
 }

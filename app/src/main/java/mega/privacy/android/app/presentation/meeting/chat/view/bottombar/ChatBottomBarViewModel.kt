@@ -2,12 +2,14 @@ package mega.privacy.android.app.presentation.meeting.chat.view.bottombar
 
 import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.ViewModel
+import androidx.lifecycle.viewModelScope
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.launch
 import mega.privacy.android.app.presentation.meeting.chat.view.navigation.compose.ChatArgs
 import mega.privacy.android.domain.qualifier.ApplicationScope
 import mega.privacy.android.domain.usecase.chat.SetChatDraftMessageUseCase
+import mega.privacy.android.domain.usecase.chat.SetUserTypingStatusUseCase
 import timber.log.Timber
 import javax.inject.Inject
 
@@ -18,6 +20,7 @@ import javax.inject.Inject
 @HiltViewModel
 class ChatBottomBarViewModel @Inject constructor(
     private val setChatDraftMessageUseCase: SetChatDraftMessageUseCase,
+    private val setUserTypingStatusUseCase: SetUserTypingStatusUseCase,
     @ApplicationScope private val applicationScope: CoroutineScope,
     savedStateHandle: SavedStateHandle,
 ) : ViewModel() {
@@ -42,5 +45,19 @@ class ChatBottomBarViewModel @Inject constructor(
                 Timber.e(it, "Error saving draft message")
             }
         }
+    }
+
+    /**
+     * On user typing
+     */
+    fun onUserTyping() {
+        viewModelScope.launch { setUserTypingStatusUseCase(true, chatId) }
+    }
+
+    /**
+     * On exit typing context
+     */
+    fun onExitTypingContext() {
+        viewModelScope.launch { setUserTypingStatusUseCase(false, chatId) }
     }
 }

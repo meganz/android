@@ -159,7 +159,7 @@ fun AddSubtitleDialog(
 private fun OptionText(
     text: String,
     modifier: Modifier = Modifier,
-    selectedColor: Color = colorResource(id = R.color.teal_200),
+    selectedColor: Color = colorResource(id = R.color.accent_050),
     unselectedColor: Color = Color.White,
     isSelected: Boolean = false,
     onClick: () -> Unit,

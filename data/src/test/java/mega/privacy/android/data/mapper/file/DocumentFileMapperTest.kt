@@ -24,6 +24,7 @@ class DocumentFileMapperTest {
             on { lastModified() }.thenReturn(2)
             on { isDirectory }.thenReturn(true)
             on { this.uri }.thenReturn(uri)
+            on { this.canRead() }.thenReturn(true)
         }
         val expect = DocumentEntity(
             name = "name",
@@ -32,7 +33,8 @@ class DocumentFileMapperTest {
             uri = UriPath("content://com.android.externalstorage.documents/tree/primary%3A"),
             isFolder = true,
             numFiles = 3,
-            numFolders = 4
+            numFolders = 4,
+            canRead = true,
         )
         val result = mapper(documentFile, 3, 4)
         assertThat(result).isEqualTo(expect)

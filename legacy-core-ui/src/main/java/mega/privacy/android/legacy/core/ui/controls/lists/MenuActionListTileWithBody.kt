@@ -21,7 +21,9 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.unit.dp
-import mega.privacy.android.shared.original.core.ui.theme.OriginalTempTheme
+import mega.privacy.android.shared.original.core.ui.controls.dividers.DividerType
+import mega.privacy.android.shared.original.core.ui.controls.dividers.MegaDivider
+import mega.privacy.android.shared.original.core.ui.theme.OriginalTheme
 import mega.privacy.android.shared.original.core.ui.preview.CombinedThemePreviews
 import mega.privacy.android.shared.original.core.ui.theme.extensions.conditional
 import mega.privacy.android.shared.original.core.ui.theme.extensions.textColorPrimary
@@ -44,8 +46,7 @@ internal const val TILE_WITH_BODY_DIVIDER = "menu_action_list_tile_with_body:div
  * @param body The functionality Body
  * @param icon The functionality Icon
  * @param modifier The [Modifier] object
- * @param addSeparator If true, a Divider is added below the [title] and [body]. This is enabled by
- * default
+ * @param dividerType type for the divider below menu action. Hidden if NULL
  * @param iconTint The [Color] tint applied for [icon], which defaults to [textColorSecondary]
  * @param onActionClicked Lambda that executes a specific action when the Tile is clicked. No action
  * is configured by default
@@ -56,57 +57,57 @@ fun MenuActionListTileWithBody(
     body: String,
     @DrawableRes icon: Int,
     modifier: Modifier = Modifier,
-    addSeparator: Boolean = true,
+    dividerType: DividerType? = DividerType.BigStartPadding,
     iconTint: Color = MaterialTheme.colors.textColorSecondary,
     onActionClicked: (() -> Unit)? = null,
 ) {
-    Row(
-        modifier = modifier
-            .testTag(TILE_WITH_BODY_MAIN_CONTAINER)
-            .fillMaxWidth()
-            .height(IntrinsicSize.Min)
-            .conditional(onActionClicked != null) {
-                clickable { onActionClicked?.invoke() }
-            }
-            .padding(top = 16.dp, start = 16.dp),
-    ) {
-        Icon(
+    Column {
+        Row(
             modifier = modifier
-                .testTag(TILE_WITH_BODY_ICON)
-                .padding(end = 32.dp)
-                .size(24.dp),
-            painter = painterResource(icon),
-            contentDescription = "Tile Icon",
-            tint = iconTint,
-        )
-        Column(
-            modifier = modifier
+                .testTag(TILE_WITH_BODY_MAIN_CONTAINER)
                 .fillMaxWidth()
-                .padding(bottom = if (addSeparator) 0.dp else 16.dp),
+                .height(IntrinsicSize.Min)
+                .conditional(onActionClicked != null) {
+                    clickable { onActionClicked?.invoke() }
+                }
+                .padding(all = 16.dp),
         ) {
-            Text(
+            Icon(
                 modifier = modifier
-                    .testTag(TILE_WITH_BODY_TEXT_TITLE)
-                    .padding(end = 16.dp),
-                text = title,
-                style = MaterialTheme.typography.subtitle1,
-                color = MaterialTheme.colors.textColorPrimary,
+                    .testTag(TILE_WITH_BODY_ICON)
+                    .padding(end = 32.dp)
+                    .size(24.dp),
+                painter = painterResource(icon),
+                contentDescription = "Tile Icon",
+                tint = iconTint,
             )
-            Text(
-                modifier = modifier
-                    .testTag(TILE_WITH_BODY_TEXT_BODY)
-                    .padding(top = 1.dp, end = 16.dp),
-                text = body,
-                style = MaterialTheme.typography.subtitle2,
-                color = MaterialTheme.colors.textColorSecondary
-            )
-            if (addSeparator) {
-                Divider(
+            Column(
+                modifier = modifier.fillMaxWidth()
+            ) {
+                Text(
                     modifier = modifier
-                        .testTag(TILE_WITH_BODY_DIVIDER)
-                        .padding(top = 16.dp),
+                        .testTag(TILE_WITH_BODY_TEXT_TITLE)
+                        .padding(end = 16.dp),
+                    text = title,
+                    style = MaterialTheme.typography.subtitle1,
+                    color = MaterialTheme.colors.textColorPrimary,
+                )
+                Text(
+                    modifier = modifier
+                        .testTag(TILE_WITH_BODY_TEXT_BODY)
+                        .padding(top = 1.dp, end = 16.dp),
+                    text = body,
+                    style = MaterialTheme.typography.subtitle2,
+                    color = MaterialTheme.colors.textColorSecondary
                 )
             }
+        }
+
+        dividerType?.let {
+            MegaDivider(
+                dividerType = it,
+                modifier = Modifier.testTag(TILE_WITH_BODY_DIVIDER)
+            )
         }
     }
 }
@@ -117,7 +118,7 @@ fun MenuActionListTileWithBody(
 @CombinedThemePreviews
 @Composable
 private fun PreviewTile() {
-    OriginalTempTheme(isDark = isSystemInDarkTheme()) {
+    OriginalTheme(isDark = isSystemInDarkTheme()) {
         MenuActionListTileWithBody(
             title = "Tile Title",
             body = "Tile Body",
@@ -132,12 +133,12 @@ private fun PreviewTile() {
 @CombinedThemePreviews
 @Composable
 private fun PreviewTileWithoutDivider() {
-    OriginalTempTheme(isDark = isSystemInDarkTheme()) {
+    OriginalTheme(isDark = isSystemInDarkTheme()) {
         MenuActionListTileWithBody(
             title = "Tile Title",
             body = "Tile Body",
             icon = IconPackR.drawable.ic_folder_medium_solid,
-            addSeparator = false,
+            dividerType = null,
         )
     }
 }
@@ -150,7 +151,7 @@ private fun PreviewTileWithoutDivider() {
 @CombinedThemePreviews
 @Composable
 private fun PreviewTileWithVeryLongBody() {
-    OriginalTempTheme(isDark = isSystemInDarkTheme()) {
+    OriginalTheme(isDark = isSystemInDarkTheme()) {
         MenuActionListTileWithBody(
             title = "Tile Title",
             body = "This is a really long body text used to check if the container height dynamically expands or not",

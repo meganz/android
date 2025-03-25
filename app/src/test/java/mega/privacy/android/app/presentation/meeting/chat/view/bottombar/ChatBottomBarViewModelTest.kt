@@ -5,10 +5,10 @@ import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.test.UnconfinedTestDispatcher
 import kotlinx.coroutines.test.runTest
-import mega.privacy.android.app.presentation.meeting.chat.view.bottombar.ChatBottomBarViewModel
 import mega.privacy.android.app.utils.Constants
 import mega.privacy.android.core.test.extension.CoroutineMainDispatcherExtension
 import mega.privacy.android.domain.usecase.chat.SetChatDraftMessageUseCase
+import mega.privacy.android.domain.usecase.chat.SetUserTypingStatusUseCase
 import org.junit.jupiter.api.BeforeAll
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
@@ -22,9 +22,11 @@ import org.mockito.kotlin.verify
 @TestInstance(TestInstance.Lifecycle.PER_CLASS)
 internal class ChatBottomBarViewModelTest {
     private lateinit var underTest: ChatBottomBarViewModel
-    private val setChatDraftMessageUseCase: SetChatDraftMessageUseCase = mock()
+    private val setChatDraftMessageUseCase = mock<SetChatDraftMessageUseCase>()
+    private val setUserTypingStatusUseCase = mock<SetUserTypingStatusUseCase>()
     private val applicationScope: CoroutineScope = CoroutineScope(dispatcher)
     private val chatId = 123L
+
     private val savedStateHandle: SavedStateHandle = SavedStateHandle(
         mapOf(
             "chatId" to chatId.toString(),
@@ -37,10 +39,20 @@ internal class ChatBottomBarViewModelTest {
         initTestClass()
     }
 
+    private fun initTestClass() {
+        underTest = ChatBottomBarViewModel(
+            setChatDraftMessageUseCase = setChatDraftMessageUseCase,
+            setUserTypingStatusUseCase = setUserTypingStatusUseCase,
+            applicationScope = applicationScope,
+            savedStateHandle = savedStateHandle,
+        )
+    }
+
     @BeforeEach
     fun resetMocks() {
         reset(
             setChatDraftMessageUseCase,
+            setUserTypingStatusUseCase,
         )
     }
 
@@ -56,12 +68,16 @@ internal class ChatBottomBarViewModelTest {
         )
     }
 
-    private fun initTestClass() {
-        underTest = ChatBottomBarViewModel(
-            setChatDraftMessageUseCase,
-            applicationScope,
-            savedStateHandle,
-        )
+    @Test
+    fun `test that calls to onUserTyping calls the use case with true`() = runTest {
+        underTest.onUserTyping()
+        verify(setUserTypingStatusUseCase).invoke(true, chatId)
+    }
+
+    @Test
+    fun `test that calls to onExitTypingContext calls the typing use case with false`() = runTest {
+        underTest.onExitTypingContext()
+        verify(setUserTypingStatusUseCase).invoke(false, chatId)
     }
 
     companion object {

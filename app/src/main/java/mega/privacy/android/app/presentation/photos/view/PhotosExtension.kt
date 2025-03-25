@@ -16,7 +16,7 @@ internal fun Modifier.isSelected(isSelected: Boolean): Modifier = composed {
     if (isSelected) Modifier
         .border(BorderStroke(
             width = 2.dp,
-            color = colorResource(id = R.color.teal_300)),
+            color = colorResource(id = R.color.accent_900)),
             shape = RoundedCornerShape(4.dp)
         )
         .clip(RoundedCornerShape(4.dp)) else Modifier

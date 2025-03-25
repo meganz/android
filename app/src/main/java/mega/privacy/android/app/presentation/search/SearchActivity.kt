@@ -43,7 +43,6 @@ import mega.privacy.android.app.arch.extensions.collectFlow
 import mega.privacy.android.app.components.session.SessionContainer
 import mega.privacy.android.app.featuretoggle.AppFeatures
 import mega.privacy.android.app.fragments.homepage.SortByHeaderViewModel
-import mega.privacy.android.app.globalmanagement.TransfersManagement
 import mega.privacy.android.app.main.ManagerActivity
 import mega.privacy.android.app.modalbottomsheet.SortByBottomSheetDialogFragment
 import mega.privacy.android.app.presentation.clouddrive.FileBrowserViewModel
@@ -63,12 +62,14 @@ import mega.privacy.android.app.presentation.node.NodeActionHandler
 import mega.privacy.android.app.presentation.node.NodeActionsViewModel
 import mega.privacy.android.app.presentation.pdfviewer.PdfViewerActivity
 import mega.privacy.android.app.presentation.qrcode.findActivity
+import mega.privacy.android.app.presentation.requeststatus.RequestStatusProgressContainer
 import mega.privacy.android.app.presentation.search.mapper.NodeSourceTypeToViewTypeMapper
 import mega.privacy.android.app.presentation.search.navigation.contactArraySeparator
 import mega.privacy.android.app.presentation.search.navigation.searchForeignNodeDialog
 import mega.privacy.android.app.presentation.search.navigation.searchOverQuotaDialog
 import mega.privacy.android.app.presentation.search.navigation.shareFolderAccessDialog
 import mega.privacy.android.app.presentation.search.view.MiniAudioPlayerView
+import mega.privacy.android.app.presentation.settings.model.StorageTargetPreference
 import mega.privacy.android.app.presentation.snackbar.MegaSnackbarDuration
 import mega.privacy.android.app.presentation.snackbar.MegaSnackbarShower
 import mega.privacy.android.app.presentation.transfers.TransfersManagementViewModel
@@ -94,7 +95,7 @@ import mega.privacy.android.feature.sync.data.mapper.ListToStringWithDelimitersM
 import mega.privacy.android.navigation.MegaNavigator
 import mega.privacy.android.shared.original.core.ui.controls.layouts.MegaScaffold
 import mega.privacy.android.shared.original.core.ui.controls.widgets.TransfersWidgetViewAnimated
-import mega.privacy.android.shared.original.core.ui.theme.OriginalTempTheme
+import mega.privacy.android.shared.original.core.ui.theme.OriginalTheme
 import mega.privacy.android.shared.original.core.ui.utils.showAutoDurationSnackbar
 import timber.log.Timber
 import java.io.File
@@ -106,7 +107,7 @@ import javax.inject.Inject
 @OptIn(ExperimentalComposeUiApi::class)
 @AndroidEntryPoint
 class SearchActivity : AppCompatActivity(), MegaSnackbarShower {
-    private val viewModel: SearchActivityViewModel by viewModels()
+    private val viewModel: SearchViewModel by viewModels()
     private val nodeActionsViewModel: NodeActionsViewModel by viewModels()
     private val sortByHeaderViewModel: SortByHeaderViewModel by viewModels()
     private val transfersManagementViewModel: TransfersManagementViewModel by viewModels()
@@ -116,12 +117,6 @@ class SearchActivity : AppCompatActivity(), MegaSnackbarShower {
      */
     @Inject
     lateinit var getThemeMode: GetThemeMode
-
-    /**
-     * Transfers management
-     */
-    @Inject
-    lateinit var transfersManagement: TransfersManagement
 
     /**
      * Mapper to convert node source type to Int
@@ -237,7 +232,7 @@ class SearchActivity : AppCompatActivity(), MegaSnackbarShower {
             val navHostController = rememberNavController(bottomSheetNavigator)
             val coroutineScope = rememberCoroutineScope()
             SessionContainer {
-                OriginalTempTheme(isDark = themeMode.isDarkMode()) {
+                OriginalTheme(isDark = themeMode.isDarkMode()) {
                     MegaScaffold(
                         modifier = Modifier
                             .fillMaxSize()
@@ -262,7 +257,7 @@ class SearchActivity : AppCompatActivity(), MegaSnackbarShower {
                                 .padding(padding)
                                 .fillMaxSize()
                         ) {
-                            val (audioPlayer, searchContainer) = createRefs()
+                            val (audioPlayer, searchContainer, requestStatusProgressBar) = createRefs()
                             MiniAudioPlayerView(
                                 modifier = Modifier
                                     .constrainAs(audioPlayer) {
@@ -313,6 +308,13 @@ class SearchActivity : AppCompatActivity(), MegaSnackbarShower {
                                     }
                                 }
                             )
+
+                            RequestStatusProgressContainer(
+                                modifier = Modifier
+                                    .constrainAs(requestStatusProgressBar) {
+                                        bottom.linkTo(parent.bottom)
+                                    }
+                            )
                         }
                     }
 
@@ -320,6 +322,12 @@ class SearchActivity : AppCompatActivity(), MegaSnackbarShower {
                         event = nodeActionState.downloadEvent,
                         onConsumeEvent = nodeActionsViewModel::markDownloadEventConsumed,
                         snackBarHostState = snackbarHostState,
+                        navigateToStorageSettings = {
+                            megaNavigator.openSettings(
+                                this,
+                                StorageTargetPreference
+                            )
+                        },
                     )
                 }
 
@@ -632,19 +640,6 @@ class SearchActivity : AppCompatActivity(), MegaSnackbarShower {
         }
     }
 
-    private fun safeLaunchActivity(intent: Intent) {
-        runCatching {
-            startActivity(intent)
-        }.onFailure {
-            Timber.e(it)
-            showMegaSnackbar(
-                message = getString(R.string.intent_not_available),
-                actionLabel = null,
-                duration = MegaSnackbarDuration.Short
-            )
-        }
-    }
-
     private fun showSortOrderBottomSheet() {
         val bottomSheetDialogFragment =
             SortByBottomSheetDialogFragment.newInstance(Constants.ORDER_CLOUD)
@@ -687,7 +682,6 @@ class SearchActivity : AppCompatActivity(), MegaSnackbarShower {
     }
 
     private fun transfersWidgetClicked() {
-        transfersManagement.setAreFailedTransfers(false)
         lifecycleScope.launch {
             if (getFeatureFlagValueUseCase(AppFeatures.TransfersSection)) {
                 megaNavigator.openTransfers(this@SearchActivity, IN_PROGRESS_TAB_INDEX)
@@ -700,9 +694,6 @@ class SearchActivity : AppCompatActivity(), MegaSnackbarShower {
                 )
             }
             finish()
-        }
-        if (transfersManagement.isOnTransferOverQuota()) {
-            transfersManagement.setHasNotToBeShowDueToTransferOverQuota(true)
         }
     }
 }

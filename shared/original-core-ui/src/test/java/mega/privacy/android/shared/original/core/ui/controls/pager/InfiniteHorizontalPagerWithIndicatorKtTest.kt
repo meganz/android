@@ -14,7 +14,7 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import mega.privacy.android.shared.original.core.ui.controls.pager.indicator.HORIZONTAL_PAGER_INDICATOR_TAG
 import mega.privacy.android.shared.original.core.ui.controls.text.MegaText
-import mega.privacy.android.shared.original.core.ui.theme.values.TextColor
+import mega.android.core.ui.theme.values.TextColor
 import org.junit.Rule
 import org.junit.Test
 import org.junit.runner.RunWith

@@ -4,13 +4,16 @@ import com.google.common.truth.Truth.assertThat
 import de.palm.composestateevents.StateEventWithContentConsumed
 import de.palm.composestateevents.StateEventWithContentTriggered
 import kotlinx.coroutines.test.runTest
-import mega.privacy.android.app.uploadFolder.UploadFolderViewModel
+import mega.privacy.android.app.presentation.transfers.starttransfer.model.TransferTriggerEvent
 import mega.privacy.android.core.test.extension.CoroutineMainDispatcherExtension
 import mega.privacy.android.domain.usecase.file.CheckFileNameCollisionsUseCase
 import org.junit.jupiter.api.BeforeAll
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.TestInstance
 import org.junit.jupiter.api.extension.ExtendWith
+import org.mockito.kotlin.any
+import org.mockito.kotlin.anyValueClass
+import org.mockito.kotlin.eq
 import org.mockito.kotlin.mock
 import org.mockito.kotlin.reset
 import kotlin.test.Test
@@ -44,10 +47,11 @@ class UploadFolderViewModelTest {
             underTest.consumeTransferTriggerEvent()
             underTest.proceedWithUpload(null)
 
-            val actual = underTest.uiState.value.transferTriggerEvent
+            val actual =
+                (underTest.uiState.value.transferTriggerEvent as? StateEventWithContentTriggered)?.content
 
-            // Just check the class, not the content for now, it can be updated when the view model is refactored to be more testable
-            assertThat(actual).isInstanceOf(StateEventWithContentTriggered::class.java)
+            assertThat(actual).isInstanceOf(TransferTriggerEvent.StartUpload.Files::class.java)
+            assertThat(actual?.waitNotificationPermissionResponseToStart).isTrue()
         }
 
     @Test

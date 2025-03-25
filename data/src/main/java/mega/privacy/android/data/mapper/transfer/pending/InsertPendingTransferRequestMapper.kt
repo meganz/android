@@ -14,13 +14,14 @@ internal class InsertPendingTransferRequestMapper @Inject constructor(
             transferType = transferType,
             nodeIdentifier = nodeIdentifier,
             transferTag = null,
-            path = path,
+            path = uriPath.value,
             appData = transferAppDataStringMapper(appData),
             isHighPriority = isHighPriority,
             scanningFoldersData = PendingTransferEntity.ScanningFoldersDataEntity(),
             startedFiles = 0,
             alreadyTransferred = 0,
             state = PendingTransferState.NotSentToSdk,
+            fileName = pendingTransfer.fileName,
         )
     }
 }

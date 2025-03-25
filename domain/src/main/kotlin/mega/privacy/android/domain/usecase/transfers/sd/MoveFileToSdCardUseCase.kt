@@ -18,9 +18,15 @@ class MoveFileToSdCardUseCase @Inject constructor(
     suspend operator fun invoke(file: File, destinationUri: String, subFolders: List<String>) {
         val destination = destinationUri.takeUnless { it.startsWith(File.separator) }
             ?: settingsRepository.getDownloadToSdCardUri() ?: destinationUri
+
         if (destination.startsWith(File.separator)) {
             throw IllegalArgumentException("Invalid Sd destination for MoveFileToSdCardUseCase. Destination: $destination. OriginalFolder: ${file.parent}. DestinationUri: $destinationUri.")
         }
-        fileSystemRepository.moveFileToSd(file, destination, subFolders)
+
+        if (file.isDirectory) {
+            fileSystemRepository.moveDirectoryToSd(file, destination)
+        } else {
+            fileSystemRepository.moveFileToSd(file, destination, subFolders)
+        }
     }
 }

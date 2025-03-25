@@ -38,17 +38,6 @@ interface DatabaseHandler {
      * @param chatVideoQuality The new chat video quality.
      */
     var chatVideoQuality: Int
-
-    var isPasscodeLockEnabled: Boolean
-    var passcodeLockCode: String
-
-    /**
-     * Sets if the fingerprint lock setting is enabled or not.
-     *
-     * @param enabled True if the fingerprint is enabled, false otherwise.
-     */
-    var isFingerprintLockEnabled: Boolean
-
     /**
      * Sets the flag to indicate if should ask the user about set the current path as default download location.
      *
@@ -131,34 +120,6 @@ interface DatabaseHandler {
     fun clearChatItems()
     fun clearChatSettings()
 
-    /**
-     * Updates a pending message.
-     *
-     * @param idMessage   Identifier of the pending message.
-     * @param transferTag Identifier of the transfer.
-     */
-    fun updatePendingMessageOnTransferStart(idMessage: Long, transferTag: Int)
-
-    /**
-     * Updates a pending message.
-     *
-     * @param idMessage  Identifier of the pending message.
-     * @param nodeHandle Handle of the node already uploaded.
-     * @param state      State of the pending message.
-     */
-    fun updatePendingMessageOnTransferFinish(idMessage: Long, nodeHandle: String?, state: Int)
-
-    /**
-     * Updates a pending message.
-     *
-     * @param idMessage   Identifier of the pending message.
-     * @param transferTag Identifier of the transfer.
-     * @param nodeHandle  Handle of the node already uploaded.
-     * @param state       State of the pending message.
-     */
-    fun updatePendingMessage(idMessage: Long, transferTag: Int, nodeHandle: String?, state: Int)
-    fun removeSentPendingMessages()
-    fun removePendingMessageByChatId(idChat: Long)
     fun setAutoPlayEnabled(enabled: String)
     fun findNonContactByHandle(handle: String): NonContactInfo?
     fun findContactByHandle(handleParam: Long): Contact?

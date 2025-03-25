@@ -7,6 +7,7 @@ import mega.privacy.android.domain.entity.search.SearchCategory
 import mega.privacy.android.domain.entity.search.SearchTarget
 import mega.privacy.android.domain.entity.search.SensitivityFilterOption
 import nz.mega.sdk.MegaSearchFilter
+import nz.mega.sdk.MegaSearchFilter.BOOL_FILTER_ONLY_TRUE
 import javax.inject.Inject
 
 /**
@@ -63,11 +64,20 @@ class MegaSearchFilterMapper @Inject constructor(
 
         // Set the search category
         searchCategory?.let {
-            if (it == SearchCategory.FOLDER) {
-                byNodeType(megaNodeTypeMapper(NodeType.FOLDER))
-                byCategory(searchCategoryIntMapper(SearchCategory.ALL))
-            } else {
-                byCategory(searchCategoryIntMapper(it))
+            when {
+                it == SearchCategory.FOLDER -> {
+                    byNodeType(megaNodeTypeMapper(NodeType.FOLDER))
+                    byCategory(searchCategoryIntMapper(SearchCategory.ALL))
+                }
+
+                it == SearchCategory.FAVOURITES && (parentHandle == null || parentHandle.longValue == -1L) -> {
+                    // Filter by favorite only for parent, else regular search for child folders
+                    byFavourite(BOOL_FILTER_ONLY_TRUE)
+                }
+
+                else -> {
+                    byCategory(searchCategoryIntMapper(it))
+                }
             }
         }
 

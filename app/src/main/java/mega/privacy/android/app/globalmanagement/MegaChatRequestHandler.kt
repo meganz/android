@@ -8,7 +8,6 @@ import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 import mega.privacy.android.app.MegaApplication
 import mega.privacy.android.app.components.ChatManagement
-import mega.privacy.android.app.objects.PasscodeManagement
 import mega.privacy.android.app.presentation.login.LoginActivity
 import mega.privacy.android.app.utils.Constants
 import mega.privacy.android.data.qualifier.MegaApi
@@ -35,8 +34,6 @@ import javax.inject.Singleton
  * @property sharingScope
  * @property chatManagement
  * @property myAccountInfo
- * @property passcodeManagement
- * @property transfersManagement
  */
 @Singleton
 class MegaChatRequestHandler @Inject constructor(
@@ -50,8 +47,6 @@ class MegaChatRequestHandler @Inject constructor(
     private val mainDispatcher: CoroutineDispatcher,
     private val chatManagement: ChatManagement,
     private val myAccountInfo: MyAccountInfo,
-    private val passcodeManagement: PasscodeManagement,
-    private val transfersManagement: TransfersManagement,
     private val broadcastFinishActivityUseCase: BroadcastFinishActivityUseCase,
     private val localLogoutAppUseCase: LocalLogoutAppUseCase,
     private val resetSdkLoggerUseCase: ResetSdkLoggerUseCase,
@@ -182,8 +177,6 @@ class MegaChatRequestHandler @Inject constructor(
      * Resets all SingleObjects to their default values.
      */
     private fun resetDefaults() {
-        passcodeManagement.resetDefaults()
         myAccountInfo.resetDefaults()
-        transfersManagement.resetDefaults()
     }
 }

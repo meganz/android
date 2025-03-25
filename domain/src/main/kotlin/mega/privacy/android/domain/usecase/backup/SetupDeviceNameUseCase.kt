@@ -1,5 +1,6 @@
 package mega.privacy.android.domain.usecase.backup
 
+import mega.privacy.android.domain.exception.ResourceAlreadyExistsMegaException
 import mega.privacy.android.domain.repository.EnvironmentRepository
 import javax.inject.Inject
 
@@ -20,7 +21,30 @@ class SetupDeviceNameUseCase @Inject constructor(
         getDeviceIdUseCase()?.let { deviceId ->
             runCatching { getDeviceNameUseCase(deviceId) }.getOrNull().let {
                 if (it.isNullOrEmpty()) {
-                    setDeviceNameUseCase(deviceId, environmentRepository.getDeviceInfo().device)
+                    var retry = false
+                    var duplicateCounter = 0
+                    do {
+                        val deviceNameToSet = if (duplicateCounter == 0) {
+                            environmentRepository.getDeviceInfo().device.trim()
+                        } else {
+                            "${environmentRepository.getDeviceInfo().device.trim()} ($duplicateCounter)"
+                        }
+                        runCatching {
+                            setDeviceNameUseCase(
+                                deviceId = deviceId,
+                                deviceName = deviceNameToSet,
+                            )
+                        }.onSuccess {
+                            retry = false
+                        }.onFailure { exception ->
+                            if (exception is ResourceAlreadyExistsMegaException) {
+                                retry = true
+                                duplicateCounter++
+                            } else {
+                                retry = false
+                            }
+                        }
+                    } while (retry)
                 }
             }
         }

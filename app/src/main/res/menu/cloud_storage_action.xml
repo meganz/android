@@ -128,6 +128,24 @@
         tools:visible="true" />
 
     <item
+        android:id="@+id/cab_menu_add_to_album"
+        android:icon="@drawable/ic_add_to_album"
+        android:orderInCategory="195"
+        android:title="@string/album_add_to_image"
+        android:visible="false"
+        app:showAsAction="never"
+        tools:visible="true" />
+
+    <item
+        android:id="@+id/cab_menu_add_to"
+        android:icon="@drawable/ic_add_to_album"
+        android:orderInCategory="195"
+        android:title="@string/album_add_to_media"
+        android:visible="false"
+        app:showAsAction="never"
+        tools:visible="true" />
+
+    <item
         android:id="@+id/cab_menu_move"
         android:icon="@drawable/ic_move_medium_regular_outline"
         android:orderInCategory="200"

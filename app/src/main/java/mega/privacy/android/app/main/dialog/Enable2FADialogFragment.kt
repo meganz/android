@@ -37,7 +37,7 @@ import mega.privacy.android.app.R
 import mega.privacy.android.app.constants.IntentConstants
 import mega.privacy.android.app.presentation.extensions.isDarkMode
 import mega.privacy.android.app.presentation.twofactorauthentication.TwoFactorAuthenticationActivity
-import mega.privacy.android.shared.original.core.ui.theme.OriginalTempTheme
+import mega.privacy.android.shared.original.core.ui.theme.OriginalTheme
 import mega.privacy.android.shared.original.core.ui.controls.buttons.RaisedDefaultMegaButton
 import mega.privacy.android.shared.original.core.ui.controls.buttons.TextMegaButton
 import mega.privacy.android.domain.entity.ThemeMode
@@ -61,7 +61,7 @@ internal class Enable2FADialogFragment : DialogFragment() {
             setContent {
                 val themeMode by getThemeMode()
                     .collectAsStateWithLifecycle(initialValue = ThemeMode.System)
-                OriginalTempTheme(isDark = themeMode.isDarkMode()) {
+                OriginalTheme(isDark = themeMode.isDarkMode()) {
                     Enable2FADialogView(onDismissRequest = {
                         dismissAllowingStateLoss()
                     }, onEnable2FA = {
@@ -148,7 +148,7 @@ private fun Enable2FADialogView(
 @Preview(uiMode = Configuration.UI_MODE_NIGHT_YES, name = "HorizontalButtonDialog")
 @Composable
 private fun Enable2FADialogViewPreview() {
-    OriginalTempTheme(isDark = isSystemInDarkTheme()) {
+    OriginalTheme(isDark = isSystemInDarkTheme()) {
         Enable2FADialogView(
             onDismissRequest = { },
             onEnable2FA = {},

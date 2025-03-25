@@ -3,16 +3,16 @@ package mega.privacy.android.app.presentation.folderlink.view
 import mega.privacy.android.icon.pack.R as iconPackR
 import android.annotation.SuppressLint
 import android.content.Intent
-import android.content.res.Configuration
-import android.net.Uri
 import androidx.activity.compose.BackHandler
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.isSystemInDarkTheme
 import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxHeight
+import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
@@ -45,23 +45,27 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.ColorFilter
-import androidx.compose.ui.platform.LocalConfiguration
 import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
+import androidx.constraintlayout.compose.ConstraintLayout
+import androidx.constraintlayout.compose.Dimension
+import androidx.lifecycle.compose.LocalLifecycleOwner
+import com.google.android.gms.ads.admanager.AdManagerAdRequest
 import de.palm.composestateevents.EventEffect
 import kotlinx.coroutines.launch
 import mega.privacy.android.app.R
+import mega.privacy.android.app.main.ads.AdsContainer
 import mega.privacy.android.app.main.dialog.storagestatus.StorageStatusDialogView
-import mega.privacy.android.app.presentation.advertisements.model.AdsUIState
-import mega.privacy.android.app.presentation.advertisements.view.AdsBannerView
 import mega.privacy.android.app.presentation.data.NodeUIItem
 import mega.privacy.android.app.presentation.folderlink.model.FolderLinkState
 import mega.privacy.android.app.presentation.folderlink.view.Constants.APPBAR_MORE_OPTION_TAG
 import mega.privacy.android.app.presentation.folderlink.view.Constants.IMPORT_BUTTON_TAG
 import mega.privacy.android.app.presentation.folderlink.view.Constants.SAVE_BUTTON_TAG
+import mega.privacy.android.app.presentation.search.SEARCH_SCREEN_MINI_AUDIO_PLAYER_TEST_TAG
+import mega.privacy.android.app.presentation.search.view.MiniAudioPlayerView
 import mega.privacy.android.app.presentation.transfers.TransferManagementUiState
 import mega.privacy.android.app.presentation.view.NodesView
 import mega.privacy.android.core.ui.mapper.FileTypeIconMapper
@@ -71,9 +75,9 @@ import mega.privacy.android.shared.original.core.ui.controls.buttons.TextMegaBut
 import mega.privacy.android.shared.original.core.ui.controls.layouts.MegaScaffold
 import mega.privacy.android.shared.original.core.ui.controls.widgets.TransfersWidgetViewAnimated
 import mega.privacy.android.shared.original.core.ui.preview.CombinedThemePreviews
-import mega.privacy.android.shared.original.core.ui.theme.OriginalTempTheme
+import mega.privacy.android.shared.original.core.ui.theme.OriginalTheme
+import mega.privacy.android.shared.original.core.ui.theme.extensions.accent_900_accent_050
 import mega.privacy.android.shared.original.core.ui.theme.extensions.grey_020_grey_700
-import mega.privacy.android.shared.original.core.ui.theme.extensions.teal_300_teal_200
 import mega.privacy.android.shared.original.core.ui.utils.showAutoDurationSnackbar
 
 internal object Constants {
@@ -141,11 +145,9 @@ internal fun FolderLinkView(
     onLinkClicked: (String) -> Unit,
     onDisputeTakeDownClicked: (String) -> Unit,
     onEnterMediaDiscoveryClick: () -> Unit,
-    adsUiState: AdsUIState,
-    onAdClicked: (uri: Uri?) -> Unit,
-    onAdDismissed: () -> Unit,
     onTransferWidgetClick: () -> Unit,
     fileTypeIconMapper: FileTypeIconMapper,
+    request: AdManagerAdRequest?,
 ) {
     val listState = rememberLazyListState()
     val gridState = rememberLazyGridState()
@@ -245,60 +247,84 @@ internal fun FolderLinkView(
                         onImportClicked = onImportClicked,
                         onSaveToDeviceClicked = { onSaveToDeviceClicked(null) }
                     )
-                    if (adsUiState.showAdsView) {
-                        AdsBannerView(
-                            uiState = adsUiState,
-                            onAdClicked = onAdClicked,
-                            onAdsWebpageLoaded = {},
-                            onAdDismissed = onAdDismissed
+                    request?.let {
+                        AdsContainer(
+                            request = request,
+                            modifier = Modifier.fillMaxWidth(),
+                            isLoggedInUser = state.hasDbCredentials,
                         )
                     }
                 }
             },
         ) { paddingValues ->
-            if (state.nodesList.isEmpty()) {
-                EmptyFolderLinkView(
+            ConstraintLayout(
+                modifier = Modifier
+                    .padding(paddingValues)
+                    .fillMaxSize()
+            ) {
+                val (audioPlayer, folderLinkView) = createRefs()
+                MiniAudioPlayerView(
                     modifier = Modifier
+                        .constrainAs(audioPlayer) {
+                            bottom.linkTo(parent.bottom)
+                        }
                         .fillMaxWidth()
-                        .fillMaxHeight()
-                        .padding(paddingValues)
-                        .padding(horizontal = 8.dp),
-                    emptyViewString = emptyViewString,
-                    state.isNodesFetched
+                        .testTag(SEARCH_SCREEN_MINI_AUDIO_PLAYER_TEST_TAG),
+                    lifecycle = LocalLifecycleOwner.current.lifecycle,
                 )
-            } else {
-                NodesView(
-                    modifier = Modifier
-                        .padding(paddingValues)
-                        .padding(horizontal = 2.dp),
-                    nodeUIItems = state.nodesList,
-                    onMenuClick = { onMoreOptionClick(it) },
-                    onItemClicked = onItemClicked,
-                    onLongClick = onLongClick,
-                    sortOrder = "",
-                    isListView = state.currentViewType == ViewType.LIST,
-                    onSortOrderClick = onSortOrderClick,
-                    onChangeViewTypeClick = onChangeViewTypeClick,
-                    showSortOrder = false,
-                    listState = listState,
-                    gridState = gridState,
-                    onLinkClicked = onLinkClicked,
-                    onDisputeTakeDownClicked = onDisputeTakeDownClicked,
-                    showMediaDiscoveryButton = state.hasMediaItem,
-                    onEnterMediaDiscoveryClick = onEnterMediaDiscoveryClick,
-                    isPublicNode = true,
-                    fileTypeIconMapper = fileTypeIconMapper,
-                    inSelectionMode = state.selectedNodeCount > 0
-                )
-            }
 
-            if (state.storageStatusDialogState != null) {
-                StorageStatusDialogView(
-                    state = state.storageStatusDialogState,
-                    dismissClickListener = onStorageStatusDialogDismiss,
-                    actionButtonClickListener = onStorageDialogActionButtonClick,
-                    achievementButtonClickListener = onStorageDialogAchievementButtonClick,
-                )
+                Box(
+                    modifier = Modifier
+                        .constrainAs(folderLinkView) {
+                            top.linkTo(parent.top)
+                            bottom.linkTo(audioPlayer.top)
+                            height = Dimension.fillToConstraints
+                        }
+                        .fillMaxWidth()
+                ) {
+                    if (state.nodesList.isEmpty()) {
+                        EmptyFolderLinkView(
+                            modifier = Modifier
+                                .fillMaxWidth()
+                                .fillMaxHeight()
+                                .padding(horizontal = 8.dp),
+                            emptyViewString = emptyViewString,
+                            state.isNodesFetched
+                        )
+                    } else {
+                        NodesView(
+                            modifier = Modifier
+                                .padding(horizontal = 2.dp),
+                            nodeUIItems = state.nodesList,
+                            onMenuClick = { onMoreOptionClick(it) },
+                            onItemClicked = onItemClicked,
+                            onLongClick = onLongClick,
+                            sortOrder = "",
+                            isListView = state.currentViewType == ViewType.LIST,
+                            onSortOrderClick = onSortOrderClick,
+                            onChangeViewTypeClick = onChangeViewTypeClick,
+                            showSortOrder = false,
+                            listState = listState,
+                            gridState = gridState,
+                            onLinkClicked = onLinkClicked,
+                            onDisputeTakeDownClicked = onDisputeTakeDownClicked,
+                            showMediaDiscoveryButton = state.hasMediaItem,
+                            onEnterMediaDiscoveryClick = onEnterMediaDiscoveryClick,
+                            isPublicNode = true,
+                            fileTypeIconMapper = fileTypeIconMapper,
+                            inSelectionMode = state.selectedNodeCount > 0
+                        )
+                    }
+
+                    if (state.storageStatusDialogState != null) {
+                        StorageStatusDialogView(
+                            state = state.storageStatusDialogState,
+                            dismissClickListener = onStorageStatusDialogDismiss,
+                            actionButtonClickListener = onStorageDialogActionButtonClick,
+                            achievementButtonClickListener = onStorageDialogAchievementButtonClick,
+                        )
+                    }
+                }
             }
         }
     }
@@ -372,7 +398,7 @@ internal fun FolderLinkSelectedTopAppBar(
                 text = title,
                 style = MaterialTheme.typography.subtitle1,
                 fontWeight = FontWeight.Medium,
-                color = MaterialTheme.colors.teal_300_teal_200
+                color = MaterialTheme.colors.accent_900_accent_050
             )
         },
         navigationIcon = {
@@ -380,7 +406,7 @@ internal fun FolderLinkSelectedTopAppBar(
                 Icon(
                     imageVector = Icons.Filled.ArrowBack,
                     contentDescription = stringResource(id = R.string.general_back_button),
-                    tint = MaterialTheme.colors.teal_300_teal_200
+                    tint = MaterialTheme.colors.accent_900_accent_050
                 )
             }
         },
@@ -389,7 +415,7 @@ internal fun FolderLinkSelectedTopAppBar(
                 Icon(
                     Icons.Default.MoreVert,
                     contentDescription = stringResource(id = R.string.label_more),
-                    tint = MaterialTheme.colors.teal_300_teal_200
+                    tint = MaterialTheme.colors.accent_900_accent_050
                 )
             }
 
@@ -440,11 +466,7 @@ internal fun EmptyFolderLinkView(
     emptyViewString: String,
     isNodesFetched: Boolean,
 ) {
-    val orientation = LocalConfiguration.current.orientation
-    val imageResource = if (orientation == Configuration.ORIENTATION_LANDSCAPE)
-        R.drawable.ic_zero_landscape_empty_folder
-    else
-        R.drawable.ic_zero_portrait_empty_folder
+    val imageResource = iconPackR.drawable.ic_empty_folder_glass
     if (isNodesFetched) {
         Column(
             modifier = modifier,
@@ -464,7 +486,7 @@ internal fun EmptyFolderLinkView(
 @CombinedThemePreviews
 @Composable
 private fun FolderLinkTopAppBarPreview() {
-    OriginalTempTheme(isDark = isSystemInDarkTheme()) {
+    OriginalTheme(isDark = isSystemInDarkTheme()) {
         FolderLinkTopAppBar(
             title = "Folder Name",
             elevation = false,
@@ -478,7 +500,7 @@ private fun FolderLinkTopAppBarPreview() {
 @CombinedThemePreviews
 @Composable
 private fun EmptyFolderLinkViewPreview() {
-    OriginalTempTheme(isDark = isSystemInDarkTheme()) {
+    OriginalTheme(isDark = isSystemInDarkTheme()) {
         MegaScaffold(
             bottomBar = {
                 ImportDownloadView(
@@ -507,7 +529,7 @@ private fun EmptyFolderLinkViewPreview() {
 @CombinedThemePreviews
 @Composable
 private fun FolderLinkSelectedTopAppBarPreview() {
-    OriginalTempTheme(isDark = isSystemInDarkTheme()) {
+    OriginalTheme(isDark = isSystemInDarkTheme()) {
         FolderLinkSelectedTopAppBar(
             title = "Folder Name",
             elevation = false,
@@ -522,7 +544,7 @@ private fun FolderLinkSelectedTopAppBarPreview() {
 @CombinedThemePreviews
 @Composable
 private fun ImportDownloadViewPreview() {
-    OriginalTempTheme(isDark = isSystemInDarkTheme()) {
+    OriginalTheme(isDark = isSystemInDarkTheme()) {
         ImportDownloadView(
             modifier = Modifier
                 .fillMaxWidth()

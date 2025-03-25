@@ -15,7 +15,7 @@ import mega.privacy.android.app.presentation.meeting.chat.view.dialog.AllContact
 import mega.privacy.android.domain.entity.ThemeMode
 import mega.privacy.android.domain.usecase.GetThemeMode
 import mega.privacy.android.navigation.MegaNavigator
-import mega.privacy.android.shared.original.core.ui.theme.OriginalTempTheme
+import mega.privacy.android.shared.original.core.ui.theme.OriginalTheme
 import javax.inject.Inject
 
 /**
@@ -45,7 +45,7 @@ class AddParticipantsNoContactsLeftToAddDialogFragment : DialogFragment() {
             setContent {
                 val themeMode by getThemeMode()
                     .collectAsStateWithLifecycle(initialValue = ThemeMode.System)
-                OriginalTempTheme(isDark = themeMode.isDarkMode()) {
+                OriginalTheme(isDark = themeMode.isDarkMode()) {
                     AllContactsAddedDialog(
                         onNavigateToInviteContact = {
                             navigator.openInviteContactActivity(

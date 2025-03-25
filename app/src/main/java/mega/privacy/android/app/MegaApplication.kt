@@ -4,6 +4,8 @@ import android.app.Activity
 import android.content.Intent
 import android.os.Build
 import android.os.Build.VERSION.SDK_INT
+import android.os.Handler
+import android.os.Looper
 import android.os.StrictMode
 import androidx.lifecycle.DefaultLifecycleObserver
 import androidx.lifecycle.LifecycleOwner
@@ -36,27 +38,24 @@ import mega.privacy.android.app.globalmanagement.CallChangesObserver
 import mega.privacy.android.app.globalmanagement.MegaChatNotificationHandler
 import mega.privacy.android.app.globalmanagement.MegaChatRequestHandler
 import mega.privacy.android.app.globalmanagement.MyAccountInfo
-import mega.privacy.android.app.globalmanagement.TransfersManagement
 import mega.privacy.android.app.listeners.GlobalChatListener
 import mega.privacy.android.app.meeting.CallService
 import mega.privacy.android.app.meeting.CallSoundType
 import mega.privacy.android.app.meeting.CallSoundsController
 import mega.privacy.android.app.meeting.gateway.RTCAudioManagerGateway
 import mega.privacy.android.app.meeting.listeners.MeetingListener
-import mega.privacy.android.app.objects.PasscodeManagement
 import mega.privacy.android.app.presentation.theme.ThemeModeState
 import mega.privacy.android.app.receivers.GlobalNetworkStateHandler
 import mega.privacy.android.app.usecase.call.MonitorCallSoundsUseCase
-import mega.privacy.android.app.utils.CacheFolderManager.clearPublicCache
 import mega.privacy.android.app.utils.Constants
 import mega.privacy.android.app.utils.greeter.Greeter
 import mega.privacy.android.data.qualifier.MegaApi
 import mega.privacy.android.data.qualifier.MegaApiFolder
 import mega.privacy.android.domain.monitoring.CrashReporter
 import mega.privacy.android.domain.qualifier.ApplicationScope
-import mega.privacy.android.domain.usecase.IsUserLoggedIn
 import mega.privacy.android.domain.usecase.apiserver.UpdateApiServerUseCase
 import mega.privacy.android.domain.usecase.featureflag.GetFeatureFlagValueUseCase
+import mega.privacy.android.domain.usecase.login.IsUserLoggedInUseCase
 import mega.privacy.android.domain.usecase.setting.GetMiscFlagsUseCase
 import mega.privacy.android.domain.usecase.setting.UpdateCrashAndPerformanceReportersUseCase
 import nz.mega.sdk.MegaApiAndroid
@@ -76,14 +75,12 @@ import javax.inject.Provider
  * @property megaChatApi
  * @property _dbH
  * @property getMiscFlagsUseCase
- * @property isUserLoggedIn
+ * @property isUserLoggedInUseCase
  * @property myAccountInfo
- * @property passcodeManagement
  * @property crashReporter
  * @property updateCrashAndPerformanceReportersUseCase
  * @property monitorCallSoundsUseCase
  * @property themeModeState
- * @property transfersManagement
  * @property activityLifecycleHandler
  * @property megaChatNotificationHandler
  * @property pushNotificationSettingManagement
@@ -95,6 +92,7 @@ import javax.inject.Provider
  * @property localIpAddress
  * @property isEsid
  * @property globalNetworkStateHandler
+ * @property deleteCompletedTransfersInCacheUseCase
  */
 @HiltAndroidApp
 class MegaApplication : MultiDexApplication(), DefaultLifecycleObserver,
@@ -126,13 +124,10 @@ class MegaApplication : MultiDexApplication(), DefaultLifecycleObserver,
     lateinit var getMiscFlagsUseCase: GetMiscFlagsUseCase
 
     @Inject
-    lateinit var isUserLoggedIn: IsUserLoggedIn
+    lateinit var isUserLoggedInUseCase: IsUserLoggedInUseCase
 
     @Inject
     lateinit var myAccountInfo: MyAccountInfo
-
-    @Inject
-    lateinit var passcodeManagement: PasscodeManagement
 
     @Inject
     lateinit var crashReporter: CrashReporter
@@ -150,9 +145,6 @@ class MegaApplication : MultiDexApplication(), DefaultLifecycleObserver,
 
     @Inject
     lateinit var themeModeState: ThemeModeState
-
-    @Inject
-    lateinit var transfersManagement: TransfersManagement
 
     @Inject
     lateinit var activityLifecycleHandler: ActivityLifecycleHandler
@@ -242,8 +234,6 @@ class MegaApplication : MultiDexApplication(), DefaultLifecycleObserver,
         initialiseAdsIfNeeded()
         applicationScope.launch {
             runCatching { updateApiServerUseCase() }
-            // clear the cache files stored in the external cache folder.
-            clearPublicCache()
         }
 
         myAccountInfo.resetDefaults()
@@ -398,7 +388,7 @@ class MegaApplication : MultiDexApplication(), DefaultLifecycleObserver,
     private fun getMiscFlagsIfNeeded() {
         applicationScope.launch {
             runCatching {
-                val isUserLoggedOut = isUserLoggedIn().not()
+                val isUserLoggedOut = isUserLoggedInUseCase().not()
                 if (isUserLoggedOut) {
                     getMiscFlagsUseCase()
                 }
@@ -456,7 +446,9 @@ class MegaApplication : MultiDexApplication(), DefaultLifecycleObserver,
     fun createOrUpdateAudioManager(isSpeakerOn: Boolean, type: Int) {
         Timber.d("Create or update audio manager, type is %s", type)
         chatManagement.registerScreenReceiver()
-        rtcAudioManagerGateway.createOrUpdateAudioManager(isSpeakerOn, type)
+        Handler(Looper.getMainLooper()).post {
+            rtcAudioManagerGateway.createOrUpdateAudioManager(isSpeakerOn, type)
+        }
     }
 
     /**

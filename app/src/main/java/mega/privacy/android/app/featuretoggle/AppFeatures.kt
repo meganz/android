@@ -1,6 +1,7 @@
 package mega.privacy.android.app.featuretoggle
 
 import mega.privacy.android.domain.entity.Feature
+import mega.privacy.android.domain.featuretoggle.FeatureFlagValuePriority
 import mega.privacy.android.domain.featuretoggle.FeatureFlagValueProvider
 
 
@@ -14,6 +15,54 @@ import mega.privacy.android.domain.featuretoggle.FeatureFlagValueProvider
  */
 enum class AppFeatures(override val description: String, private val defaultValue: Boolean) :
     Feature {
+
+    /**
+     * Contacts compose u i
+     */
+    ContactsComposeUI(
+        "Enable compose version of the contacts ui",
+        false,
+    ),
+
+    /**
+     * New psa state
+     */
+    NewPsaState(
+        "Use new psa state in stead of legacy psa state singleton. Legacy psa state exists to unify behaviour while legacy screens still exist",
+        false,
+    ),
+
+    /**
+     * Enable the menu of Favourites playlist
+     */
+    FavouritesPlaylistMenuEnabled(
+        "Enable Favourites playlist menu",
+        true
+    ),
+
+    /**
+     * Enable compose implementation of the main settings screen
+     */
+    SettingsComposeUI(
+        "Enable compose implementation of the main settings screen",
+        false,
+    ),
+
+    /**
+     * Enable the video player zoom in feature
+     */
+    VideoPlayerZoomInEnable(
+        "Enable add video player zoom in",
+        true
+    ),
+
+    /**
+     * Add video to playlist from video section
+     */
+    AddVideoToPlaylistFromVideoSection(
+        "Enable add video to playlist from video section",
+        true
+    ),
 
     /**
      * New contact request screen
@@ -31,29 +80,6 @@ enum class AppFeatures(override val description: String, private val defaultValu
         true
     ),
 
-    /**
-     * Enable video recently watched feature
-     */
-    VideoRecentlyWatched(
-        "Enable video recently watched feature",
-        true
-    ),
-
-    /**
-     * Compose passcode settings
-     */
-    ComposePasscodeSettings(
-        "Use the new compose version of the passcode settings screens",
-        true
-    ),
-
-    /**
-     * Enables document scanner
-     */
-    DocumentScanner(
-        "Enable new document scanner implementation",
-        false
-    ),
 
     /**
      * Enables Map location
@@ -114,11 +140,6 @@ enum class AppFeatures(override val description: String, private val defaultValu
     AppTest("This is a test toggle. It does nothing", false),
 
     /**
-     * Meeting notification settings
-     */
-    MeetingNotificationSettings("Enable Meeting notification settings", false),
-
-    /**
      * To enable search by node description
      */
     SearchWithDescription(
@@ -132,14 +153,6 @@ enum class AppFeatures(override val description: String, private val defaultValu
     SearchWithTags(
         "Enable search with tags",
         false
-    ),
-
-    /**
-     * To enable the new cancel subscription feature
-     */
-    CancelSubscription(
-        "Enable cancel subscription feature",
-        true
     ),
 
     /**
@@ -172,22 +185,6 @@ enum class AppFeatures(override val description: String, private val defaultValu
     ),
 
     /**
-     * Enables full storage over quota banner
-     */
-    FullStorageOverQuotaBanner(
-        "Enable full storage over quota banner",
-        true
-    ),
-
-    /**
-     * Enables almost full storage quota banner
-     */
-    AlmostFullStorageOverQuotaBanner(
-        "Enable almost full storage quota banner",
-        false
-    ),
-
-    /**
      * New import section
      */
     NewUploadDestinationActivity(
@@ -196,16 +193,42 @@ enum class AppFeatures(override val description: String, private val defaultValu
     ),
 
     /**
-     * Start downloads in the worker instead of in the view model
+     * Call settings implemented with the new components library
      */
-    StartDownloadsInWorker(
-        "Start downloads in the worker instead of in the view model",
+    CallSettingsNewComponents(
+        "Call settings implemented with the new components library",
+        false,
+    ),
+
+    /**
+     *  Cloud Drive and Sync in a single screen with the Two Tabs (Cloud Drive and Syncs)
+     */
+    CloudDriveAndSyncs(
+        "Implement Cloud Drive and Sync in a single screen with the Two Tabs (Cloud Drive and Syncs)",
         true,
+    ),
+
+    /**
+     *  Login Revamp with new components
+     */
+    LoginRevamp(
+        "Login Revamp with new components",
+        false,
+    ),
+
+    /**
+     *  Registration Revamp with new components
+     */
+    RegistrationRevamp(
+        "Registration Revamp with new components",
+        false,
     ),
     ;
 
     companion object : FeatureFlagValueProvider {
         override suspend fun isEnabled(feature: Feature) =
             entries.firstOrNull { it == feature }?.defaultValue
+
+        override val priority: FeatureFlagValuePriority = FeatureFlagValuePriority.Default
     }
 }

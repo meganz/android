@@ -150,20 +150,6 @@ interface MegaLocalStorageGateway {
     suspend fun setAskBeforeLargeDownloads(askForConfirmation: Boolean)
 
     /**
-     * Set passcode l ock enabled
-     *
-     * @param isPasscodeLockEnabled
-     */
-    fun setPasscodeLockEnabled(isPasscodeLockEnabled: Boolean)
-
-    /**
-     * Set the passcode lock code
-     *
-     * @param passcodeLockCode
-     */
-    suspend fun setPasscodeLockCode(passcodeLockCode: String)
-
-    /**
      * Set show copyright
      *
      * @param showCopyrights
@@ -264,13 +250,6 @@ interface MegaLocalStorageGateway {
      * @return true if is paused, false otherwise
      */
     suspend fun getTransferQueueStatus(): Boolean
-
-    /**
-     * Remove pending message by chat id
-     *
-     * @param chatId Chat id.
-     */
-    fun removePendingMessageByChatId(chatId: Long)
 
     /**
      * Should show copyright

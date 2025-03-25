@@ -22,14 +22,13 @@ import kotlinx.coroutines.launch
 import mega.privacy.android.analytics.Analytics
 import mega.privacy.android.app.main.legacycontact.AddContactActivity
 import mega.privacy.android.app.presentation.contact.invite.InviteContactActivity
-import mega.privacy.android.app.presentation.extensions.isDarkMode
-import mega.privacy.android.app.presentation.security.PasscodeCheck
+import mega.privacy.android.app.presentation.container.MegaAppContainer
+import mega.privacy.android.app.presentation.passcode.model.PasscodeCryptObjectFactory
 import mega.privacy.android.app.presentation.startconversation.model.StartConversationAction
 import mega.privacy.android.app.presentation.startconversation.view.StartConversationView
 import mega.privacy.android.app.utils.Constants
 import mega.privacy.android.domain.entity.ThemeMode
 import mega.privacy.android.domain.usecase.GetThemeMode
-import mega.privacy.android.shared.original.core.ui.theme.OriginalTempTheme
 import mega.privacy.mobile.analytics.event.GroupChatPressedEvent
 import mega.privacy.mobile.analytics.event.InviteContactsPressedEvent
 import javax.inject.Inject
@@ -37,7 +36,6 @@ import javax.inject.Inject
 /**
  * Activity which allows to start a new chat conversation.
  *
- * @property passCodeFacade [PasscodeCheck]
  * @property getThemeMode   [GetThemeMode]
  * @property resultLauncher [ActivityResultLauncher]
  */
@@ -45,7 +43,7 @@ import javax.inject.Inject
 class StartConversationActivity : ComponentActivity() {
 
     @Inject
-    lateinit var passCodeFacade: PasscodeCheck
+    lateinit var passcodeCryptObjectFactory: PasscodeCryptObjectFactory
 
     @Inject
     lateinit var getThemeMode: GetThemeMode
@@ -118,7 +116,11 @@ class StartConversationActivity : ComponentActivity() {
         val themeMode by getThemeMode().collectAsState(initial = ThemeMode.System)
         val uiState by viewModel.state.collectAsState()
 
-        OriginalTempTheme(isDark = themeMode.isDarkMode()) {
+
+        MegaAppContainer(
+            themeMode = themeMode,
+            passcodeCryptObjectFactory = passcodeCryptObjectFactory,
+        ) {
             StartConversationView(
                 state = uiState,
                 onButtonClicked = ::onActionTap,
@@ -127,10 +129,12 @@ class StartConversationActivity : ComponentActivity() {
                 onCloseSearchClicked = viewModel::onCloseSearchTap,
                 onBackPressed = { finish() },
                 onSearchClicked = viewModel::onSearchTap,
-                onInviteContactsClicked = { onInviteContacts() }
+                onInviteContactsClicked = { onInviteContacts() },
+                onNoteToSelfClicked = viewModel::onNoteToSelfTap
             )
         }
     }
+
 
     private fun onActionTap(action: StartConversationAction) {
         when (action) {

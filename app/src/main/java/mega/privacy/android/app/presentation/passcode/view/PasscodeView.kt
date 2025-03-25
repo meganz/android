@@ -57,7 +57,7 @@ import mega.privacy.android.shared.original.core.ui.controls.buttons.TextMegaBut
 import mega.privacy.android.shared.original.core.ui.controls.textfields.PasscodeField
 import mega.privacy.android.shared.original.core.ui.controls.textfields.PasswordTextField
 import mega.privacy.android.shared.original.core.ui.preview.CombinedThemePreviews
-import mega.privacy.android.shared.original.core.ui.theme.OriginalTempTheme
+import mega.privacy.android.shared.original.core.ui.theme.OriginalTheme
 import mega.privacy.android.shared.original.core.ui.theme.extensions.grey_100_alpha_060_dark_grey
 import mega.privacy.mobile.analytics.event.ForgotPasscodeButtonPressedEvent
 import mega.privacy.mobile.analytics.event.PasscodeBiometricUnlockDialogEvent
@@ -323,7 +323,7 @@ internal const val FORGOT_PASSCODE_BUTTON_TAG = "passcode_dialog:button:forgot_p
 private fun PasscodeDialogPreview(
     @PreviewParameter(PasscodeDialogParameterProvider::class) previewParameters: PreviewParameters,
 ) {
-    OriginalTempTheme(isDark = isSystemInDarkTheme()) {
+    OriginalTheme(isDark = isSystemInDarkTheme()) {
         PasscodeContent(
             onPasscodeEntered = {},
             onPasswordEntered = {},

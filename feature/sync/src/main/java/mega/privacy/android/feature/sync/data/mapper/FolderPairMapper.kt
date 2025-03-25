@@ -2,6 +2,7 @@ package mega.privacy.android.feature.sync.data.mapper
 
 import mega.privacy.android.data.mapper.backup.SyncErrorMapper
 import mega.privacy.android.data.mapper.sync.SyncTypeMapper
+import mega.privacy.android.domain.entity.node.NodeId
 import mega.privacy.android.feature.sync.domain.entity.FolderPair
 import mega.privacy.android.feature.sync.domain.entity.RemoteFolder
 import nz.mega.sdk.MegaSync
@@ -27,7 +28,7 @@ internal class FolderPairMapper @Inject constructor(
             syncType = syncTypeMapper(MegaSync.SyncType.swigToEnum(model.type)),
             pairName = model.name,
             localFolderPath = model.localFolder,
-            remoteFolder = RemoteFolder(model.megaHandle, megaFolderName),
+            remoteFolder = RemoteFolder(NodeId(model.megaHandle), megaFolderName),
             syncStatus = mapSyncStatus(syncStats, model.runState),
             syncError = syncErrorMapper(model.error)
         )

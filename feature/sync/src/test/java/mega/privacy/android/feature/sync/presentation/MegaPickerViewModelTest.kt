@@ -231,7 +231,7 @@ internal class MegaPickerViewModelTest {
 
         verify(setSelectedMegaFolderUseCase).invoke(
             RemoteFolder(
-                currentFolderId.longValue, currentFolderName
+                NodeId(currentFolderId.longValue), currentFolderName
             )
         )
     }

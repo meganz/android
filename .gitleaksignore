@@ -248,3 +248,15 @@ src/com/mega/android/Preferences.java:hashicorp-tf-password:35
 src/com/mega/android/Preferences.java:hashicorp-tf-password:18
 jni/mega/sqlite3.c:generic-api-key:94219
 jni/mega/sqlite3.c:generic-api-key:94374
+domain/src/test/kotlin/mega/privacy/android/domain/usecase/account/CreateAccountUseCaseTest.kt:hashicorp-tf-password:46
+domain/src/test/kotlin/mega/privacy/android/domain/usecase/account/CreateAccountUseCaseTest.kt:hashicorp-tf-password:100
+domain/src/test/kotlin/mega/privacy/android/domain/usecase/account/CreateAccountUseCaseTest.kt:hashicorp-tf-password:149
+domain/src/test/kotlin/mega/privacy/android/domain/usecase/account/CreateAccountUseCaseTest.kt:hashicorp-tf-password:186
+app/src/main/java/mega/privacy/android/app/presentation/login/createaccount/CreateAccountViewModel.kt:hashicorp-tf-password:287
+app/src/main/java/mega/privacy/android/app/presentation/login/createaccount/CreateAccountViewModel.kt:hashicorp-tf-password:292
+app/src/test/java/mega/privacy/android/app/presentation/login/createaccount/CreateAccountViewModelTest.kt:hashicorp-tf-password:188
+app/src/test/java/mega/privacy/android/app/presentation/login/createaccount/CreateAccountViewModelTest.kt:hashicorp-tf-password:200
+app/src/test/java/mega/privacy/android/app/presentation/login/createaccount/CreateAccountViewModelTest.kt:hashicorp-tf-password:214
+app/src/test/java/mega/privacy/android/app/presentation/login/createaccount/CreateAccountViewModelTest.kt:hashicorp-tf-password:215
+app/src/test/java/mega/privacy/android/app/presentation/login/createaccount/CreateAccountViewModelTest.kt:hashicorp-tf-password:230
+app/src/test/java/mega/privacy/android/app/presentation/login/createaccount/CreateAccountViewModelTest.kt:hashicorp-tf-password:271

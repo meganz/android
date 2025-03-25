@@ -25,7 +25,7 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import mega.privacy.android.app.R
-import mega.privacy.android.shared.original.core.ui.theme.OriginalTempTheme
+import mega.privacy.android.shared.original.core.ui.theme.OriginalTheme
 import mega.privacy.android.shared.original.core.ui.theme.extensions.yellow_100_yellow_700
 
 /**
@@ -97,7 +97,7 @@ internal const val CLOSE_DIALOG_TAG = "waiting_room_warning_dialog:close_dialog"
 @Preview(uiMode = Configuration.UI_MODE_NIGHT_YES, name = "DarkPreviewWaitingRoomWarningDialog")
 @Composable
 fun PreviewWaitingRoomWarningDialog() {
-    OriginalTempTheme(isDark = isSystemInDarkTheme()) {
+    OriginalTheme(isDark = isSystemInDarkTheme()) {
         WaitingRoomWarningDialog(
             onCloseClicked = {}
         )

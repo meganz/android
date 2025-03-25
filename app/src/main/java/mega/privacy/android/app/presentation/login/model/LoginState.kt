@@ -7,6 +7,8 @@ import de.palm.composestateevents.consumed
 import mega.privacy.android.app.R
 import mega.privacy.android.app.presentation.extensions.messageId
 import mega.privacy.android.domain.entity.Feature
+import mega.privacy.android.domain.entity.Progress
+import mega.privacy.android.domain.entity.ThemeMode
 import mega.privacy.android.domain.entity.account.AccountSession
 import mega.privacy.android.domain.entity.login.FetchNodesUpdate
 import mega.privacy.android.domain.entity.login.TemporaryWaitingError
@@ -51,6 +53,9 @@ import mega.privacy.android.domain.exception.LoginException
  * @property isFastLoginInProgress      True if a fast login is in progress, false otherwise.
  * @property loginTemporaryError        [TemporaryWaitingError] during login
  * @property requestStatusProgress      Progress of the request status, 0 to 1000, hide progress bar if -1
+ * @property isFirstTimeLaunch          True if it is the first time the app is launched.
+ * @property themeMode                 [ThemeMode] of the app.
+ * @property isLoginNewDesignEnabled    True if the new login design is enabled, false otherwise.
  */
 data class LoginState(
     val intentState: LoginIntentState? = null,
@@ -87,13 +92,16 @@ data class LoginState(
     val isCheckingSignupLink: Boolean = false,
     val snackbarMessage: StateEventWithContent<Int> = consumed(),
     val loginTemporaryError: TemporaryWaitingError? = null,
-    val requestStatusProgress: Long = -1L,
+    val requestStatusProgress: Progress? = null,
+    val isFirstTimeLaunch: Boolean = false,
+    val themeMode: ThemeMode = ThemeMode.System,
+    val isLoginNewDesignEnabled: Boolean = false
 ) {
 
     /**
      * True if the request status progress event is being processed
      */
-    val isRequestStatusInProgress = requestStatusProgress > -1L
+    val isRequestStatusInProgress = requestStatusProgress != null
 
     /**
      * Temporary error during login or fetch nodes

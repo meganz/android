@@ -17,6 +17,7 @@ import mega.privacy.android.app.R
 import mega.privacy.android.app.data.extensions.findItemByHandle
 import mega.privacy.android.app.data.extensions.replaceIfExists
 import mega.privacy.android.app.data.extensions.sortList
+import mega.privacy.android.app.featuretoggle.ApiFeatures
 import mega.privacy.android.app.presentation.extensions.getStateFlow
 import mega.privacy.android.app.presentation.startconversation.model.StartConversationState
 import mega.privacy.android.domain.entity.contacts.ContactItem
@@ -100,6 +101,7 @@ class StartConversationViewModel @Inject constructor(
     )
 
     init {
+        getApiFeatureFlag()
         observeStateChanges()
         getContacts()
         observeContactUpdates()
@@ -174,6 +176,25 @@ class StartConversationViewModel @Inject constructor(
                 )
             }
             getContactsData(contactList)
+        }
+    }
+
+    /**
+     * Get note to yourself api feature flag
+     */
+    private fun getApiFeatureFlag() {
+        viewModelScope.launch {
+            runCatching {
+                getFeatureFlagValueUseCase(ApiFeatures.NoteToYourselfFlag)
+            }.onFailure { exception ->
+                Timber.e(exception)
+            }.onSuccess { flag ->
+                _state.update { state ->
+                    state.copy(
+                        isNoteToYourselfFeatureFlagEnabled = flag,
+                    )
+                }
+            }
         }
     }
 
@@ -323,6 +344,13 @@ class StartConversationViewModel @Inject constructor(
     fun onCloseSearchTap() {
         updateSearchWidgetState(SearchWidgetState.COLLAPSED)
         setTypedSearch("")
+    }
+
+    /**
+     * Create or open note to self chat
+     */
+    fun onNoteToSelfTap() {
+        Timber.e("Create or open note to self chat")
     }
 
     /**

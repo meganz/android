@@ -855,11 +855,6 @@ internal class NodeRepositoryImpl @Inject constructor(
         }
     }
 
-    override suspend fun getBannerQuotaTime() =
-        withContext(ioDispatcher) {
-            megaApiGateway.getBannerQuotaTime()
-        }
-
     override suspend fun disableExport(nodeToDisable: NodeId) = withContext(ioDispatcher) {
         val node = getMegaNodeByHandle(nodeToDisable, true)
         requireNotNull(node) { "Node to disable export with handle ${nodeToDisable.longValue} not found" }
@@ -1203,6 +1198,25 @@ internal class NodeRepositoryImpl @Inject constructor(
         return@withContext when {
             result.second.errorCode == MegaError.API_OK -> NodeId(result.first.nodeHandle)
             else -> throw result.second.toException("moveOrRemoveDeconfiguredBackupNodes")
+        }
+    }
+
+    override suspend fun isNodeSynced(nodeId: NodeId): Boolean = withContext(ioDispatcher) {
+        val syncs = megaApiGateway.getSyncs()
+        for (i in 0..syncs.size()) {
+            syncs.get(i)?.let { syncNode ->
+                if (syncNode.megaHandle == nodeId.longValue) {
+                    return@withContext true
+                }
+            }
+        }
+        return@withContext false
+    }
+
+    override suspend fun removeAllVersions() = withContext(ioDispatcher) {
+        suspendCancellableCoroutine { continuation ->
+            val listener = continuation.getRequestListener("removeAllVersions") {}
+            megaApiGateway.removeVersions(listener)
         }
     }
 }

@@ -13,7 +13,6 @@ import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
-import kotlinx.coroutines.flow.catch
 import kotlinx.coroutines.flow.filter
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
@@ -23,6 +22,7 @@ import kotlinx.coroutines.sync.withLock
 import kotlinx.coroutines.withContext
 import mega.privacy.android.app.domain.usecase.GetNodeLocationInfo
 import mega.privacy.android.app.featuretoggle.AppFeatures
+import mega.privacy.android.app.presentation.account.model.AccountDeactivatedStatus
 import mega.privacy.android.app.presentation.extensions.getState
 import mega.privacy.android.app.presentation.fileinfo.model.FileInfoExtraAction
 import mega.privacy.android.app.presentation.fileinfo.model.FileInfoJobInProgressState
@@ -65,13 +65,14 @@ import mega.privacy.android.domain.qualifier.IoDispatcher
 import mega.privacy.android.domain.usecase.GetFolderTreeInfo
 import mega.privacy.android.domain.usecase.GetImageNodeByIdUseCase
 import mega.privacy.android.domain.usecase.GetNodeByIdUseCase
-import mega.privacy.android.domain.usecase.IsBusinessAccountActive
+import mega.privacy.android.domain.usecase.IsMasterBusinessAccountUseCase
 import mega.privacy.android.domain.usecase.MonitorChildrenUpdates
 import mega.privacy.android.domain.usecase.MonitorContactUpdates
 import mega.privacy.android.domain.usecase.MonitorNodeUpdatesById
 import mega.privacy.android.domain.usecase.MonitorOfflineFileAvailabilityUseCase
 import mega.privacy.android.domain.usecase.account.MonitorAccountDetailUseCase
 import mega.privacy.android.domain.usecase.account.MonitorStorageStateEventUseCase
+import mega.privacy.android.domain.usecase.business.IsBusinessAccountActiveUseCase
 import mega.privacy.android.domain.usecase.camerauploads.GetPrimarySyncHandleUseCase
 import mega.privacy.android.domain.usecase.camerauploads.GetSecondarySyncHandleUseCase
 import mega.privacy.android.domain.usecase.camerauploads.IsCameraUploadsEnabledUseCase
@@ -147,9 +148,10 @@ class FileInfoViewModel @Inject constructor(
     private val monitorOfflineFileAvailabilityUseCase: MonitorOfflineFileAvailabilityUseCase,
     private val getContactVerificationWarningUseCase: GetContactVerificationWarningUseCase,
     private val fileTypeIconMapper: FileTypeIconMapper,
-    private val monitorAccountDetailUseCase: MonitorAccountDetailUseCase,
-    private val isBusinessAccountActive: IsBusinessAccountActive,
     private val getImageNodeByNodeId: GetImageNodeByIdUseCase,
+    private val isBusinessAccountActiveUseCase: IsBusinessAccountActiveUseCase,
+    private val isMasterBusinessAccountUseCase: IsMasterBusinessAccountUseCase,
+    private val monitorAccountDetailUseCase: MonitorAccountDetailUseCase,
     @IoDispatcher private val iODispatcher: CoroutineDispatcher,
 ) : ViewModel() {
 
@@ -184,7 +186,7 @@ class FileInfoViewModel @Inject constructor(
     init {
         checkMapLocationFeatureFlag()
         checkTagsFeatureFlag()
-        checkAccountStatus()
+        monitorBusinessAccountExpiry()
         viewModelScope.launch {
             val isRemindersForContactVerificationEnabled =
                 getContactVerificationWarningUseCase()
@@ -192,25 +194,34 @@ class FileInfoViewModel @Inject constructor(
         }
     }
 
-    private fun checkAccountStatus() = viewModelScope.launch {
-        monitorAccountDetailUseCase()
-            .catch {
-                Timber.e("Monitor account detail failed $it")
-            }.collect { accountDetail ->
-                val accountType = accountDetail.levelDetail?.accountType
-                if (accountType == AccountType.PRO_FLEXI || accountType == AccountType.BUSINESS) {
+    private fun monitorBusinessAccountExpiry() {
+        viewModelScope.launch {
+            monitorAccountDetailUseCase().filter { it.levelDetail?.accountType?.isBusinessAccount == true }
+                .collect { accountDetail ->
                     runCatching {
-                        isBusinessAccountActive()
-                    }.onSuccess { isBusinessAccountActive ->
-                        _uiState.update { it.copy(isBusinessAccountActive = isBusinessAccountActive) }
-                    }.onFailure {
-                        Timber.e("Get isBusinessAccountActive failed with error: $it")
-                    }
-                } else {
-                    _uiState.update { it.copy(isProAccount = accountType != AccountType.FREE) }
-                }
-            }
+                        val isBusinessAccountActive = isBusinessAccountActiveUseCase()
+                        if (!isBusinessAccountActive) {
+                            val isMasterBusinessAccount = isMasterBusinessAccountUseCase()
+                            val status = when {
+                                isMasterBusinessAccount -> AccountDeactivatedStatus.MASTER_BUSINESS_ACCOUNT_DEACTIVATED
+                                accountDetail.levelDetail?.accountType == AccountType.PRO_FLEXI -> AccountDeactivatedStatus.PRO_FLEXI_ACCOUNT_DEACTIVATED
+                                else -> AccountDeactivatedStatus.BUSINESS_ACCOUNT_DEACTIVATED
+                            }
+                            _uiState.update {
+                                it.copy(accountDeactivatedStatus = status)
+                            }
 
+                        } else {
+                            _uiState.update {
+                                it.copy(accountDeactivatedStatus = null)
+                            }
+                        }
+
+                    }.onFailure {
+                        Timber.e("Monitor business account expiry failed $it")
+                    }
+                }
+        }
     }
 
     private fun checkTagsFeatureFlag() = viewModelScope.launch {
@@ -957,12 +968,18 @@ class FileInfoViewModel @Inject constructor(
         }
     }
 
-    private fun updateTypedNode() {
-        updateState {
+    private fun updateTypedNode() = viewModelScope.launch {
+        runCatching {
+            tempMegaNodeRepository.getNodeByHandle(typedNode.id.longValue)?.let {
+                node = it
+            }
             getNodeByIdUseCase(typedNode.id)?.let { updateTypedNode ->
                 typedNode = updateTypedNode
             }
-            it.copyWithTypedNode(typedNode = typedNode)
+        }.onSuccess {
+            updateState {
+                it.copyWithTypedNode(typedNode = typedNode)
+            }
         }
     }
 

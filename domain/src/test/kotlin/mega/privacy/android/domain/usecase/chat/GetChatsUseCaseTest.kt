@@ -22,9 +22,9 @@ import mega.privacy.android.domain.repository.ContactsRepository
 import mega.privacy.android.domain.repository.NotificationsRepository
 import mega.privacy.android.domain.repository.PushesRepository
 import mega.privacy.android.domain.usecase.ChatRoomItemStatusMapper
+import mega.privacy.android.domain.usecase.call.GetChatCallUseCase
 import mega.privacy.android.domain.usecase.contact.GetContactEmail
 import mega.privacy.android.domain.usecase.contact.GetUserOnlineStatusByHandleUseCase
-import mega.privacy.android.domain.usecase.call.GetChatCallUseCase
 import mega.privacy.android.domain.usecase.meeting.GetScheduleMeetingDataUseCase
 import mega.privacy.android.domain.usecase.meeting.MonitorChatCallUpdatesUseCase
 import mega.privacy.android.domain.usecase.meeting.MonitorScheduledMeetingOccurrencesUpdatesUseCase
@@ -72,22 +72,22 @@ internal class GetChatsUseCaseTest {
     private val chatRooms = listOf(
         CombinedChatRoom(
             chatId = 1L,
-            lastTimestamp = Random.nextLong(),
+            lastTimestamp = -1L,
             isActive = true
         ),
         CombinedChatRoom(
             chatId = 2L,
-            lastTimestamp = Random.nextLong(),
+            lastTimestamp = -2L,
             isActive = true
         ),
         CombinedChatRoom(
             chatId = 3L,
-            lastTimestamp = Random.nextLong(),
+            lastTimestamp = -3L,
             isActive = true
         ),
         CombinedChatRoom(
             chatId = 4L,
-            lastTimestamp = Random.nextLong(),
+            lastTimestamp = -4L,
             isActive = true
         ),
     )
@@ -142,7 +142,11 @@ internal class GetChatsUseCaseTest {
     fun `test that meetings are retrieved based chat room type parameter`() =
         runTest {
             val chatRoomType = GetChatsUseCase.ChatRoomType.MEETINGS
-
+            val chatRoomItem = ChatRoomItem.GroupChatRoomItem(
+                chatId = chatRooms.first().chatId,
+                title = chatRooms.first().title
+            )
+            whenever(chatRoomItemMapper.invoke(any())).thenReturn(chatRoomItem)
             underTest.invoke(
                 chatRoomType = chatRoomType,
                 lastMessage = lastMessage,
@@ -158,7 +162,11 @@ internal class GetChatsUseCaseTest {
     fun `test that non meetings are retrieved based chat room type parameter`() =
         runTest {
             val chatRoomType = GetChatsUseCase.ChatRoomType.NON_MEETINGS
-
+            val chatRoomItem = ChatRoomItem.GroupChatRoomItem(
+                chatId = chatRooms.first().chatId,
+                title = chatRooms.first().title
+            )
+            whenever(chatRoomItemMapper.invoke(any())).thenReturn(chatRoomItem)
             underTest.invoke(
                 chatRoomType = chatRoomType,
                 lastMessage = lastMessage,
@@ -174,6 +182,11 @@ internal class GetChatsUseCaseTest {
     fun `test that archived are retrieved based chat room type parameter`() =
         runTest {
             val chatRoomType = GetChatsUseCase.ChatRoomType.ARCHIVED_CHATS
+            val chatRoomItem = ChatRoomItem.GroupChatRoomItem(
+                chatId = chatRooms.first().chatId,
+                title = chatRooms.first().title
+            )
+            whenever(chatRoomItemMapper.invoke(any())).thenReturn(chatRoomItem)
 
             underTest.invoke(
                 chatRoomType = chatRoomType,
@@ -209,7 +222,7 @@ internal class GetChatsUseCaseTest {
     }
 
     @Test
-    fun `test that isChatEnabled is called accordingly`() = runTest {
+    fun `test that isChatDndEnabled is called accordingly`() = runTest {
         val chatRoomType = GetChatsUseCase.ChatRoomType.NON_MEETINGS
 
         whenever(chatRoomItemMapper(any())).thenAnswer {
@@ -225,7 +238,7 @@ internal class GetChatsUseCaseTest {
             headerTimeMapper = headerTimeMapper,
         ).take(2).last()
 
-        verify(notificationsRepository, times(chatRooms.size)).isChatEnabled(anyLong())
+        verify(notificationsRepository, times(chatRooms.size)).isChatDndEnabled(anyLong())
     }
 
     @Test

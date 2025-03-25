@@ -26,7 +26,7 @@ import androidx.compose.ui.window.PopupProperties
 import mega.privacy.android.analytics.Analytics
 import mega.privacy.android.app.R
 import mega.privacy.android.app.mediaplayer.model.SpeedPlaybackItem
-import mega.privacy.android.shared.original.core.ui.theme.OriginalTempTheme
+import mega.privacy.android.shared.original.core.ui.theme.OriginalTheme
 import mega.privacy.mobile.analytics.event.SpeedOption0_5XPressedEvent
 import mega.privacy.mobile.analytics.event.SpeedOption1_5XPressedEvent
 import mega.privacy.mobile.analytics.event.SpeedOption2XPressedEvent
@@ -93,7 +93,7 @@ fun SpeedSelectedPopup(
                                 .padding(25.dp, 10.dp),
                             colorFilter = ColorFilter.tint(
                                 if (item == currentPlaybackSpeed) {
-                                    colorResource(id = R.color.teal_300)
+                                    colorResource(id = R.color.accent_900)
                                 } else {
                                     Color.White
                                 }
@@ -110,9 +110,9 @@ fun SpeedSelectedPopup(
 @Preview
 @Composable
 private fun PreviewSpeedSelectedPopup() {
-    OriginalTempTheme(isDark = isSystemInDarkTheme()) {
+    OriginalTheme(isDark = isSystemInDarkTheme()) {
         SpeedSelectedPopup(
-            items = VideoPlayerFragment.speedPlaybackList,
+            items = SpeedPlaybackItem.entries,
             isShown = true,
             currentPlaybackSpeed = SpeedPlaybackItem.PLAYBACK_SPEED_1_X,
             onDismissRequest = {},

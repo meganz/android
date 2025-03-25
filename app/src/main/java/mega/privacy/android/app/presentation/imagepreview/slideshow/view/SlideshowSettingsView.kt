@@ -42,14 +42,14 @@ import mega.privacy.android.domain.entity.slideshow.SlideshowOrder
 import mega.privacy.android.domain.entity.slideshow.SlideshowSpeed
 import mega.privacy.android.legacy.core.ui.controls.controlssliders.LabelledSwitch
 import mega.privacy.android.legacy.core.ui.controls.dialogs.MegaDialog
-import mega.privacy.android.shared.original.core.ui.theme.OriginalTempTheme
+import mega.privacy.android.shared.original.core.ui.theme.OriginalTheme
 import mega.privacy.android.shared.original.core.ui.theme.black
 import mega.privacy.android.shared.original.core.ui.theme.button
 import mega.privacy.android.shared.original.core.ui.theme.grey_alpha_012
 import mega.privacy.android.shared.original.core.ui.theme.grey_alpha_054
 import mega.privacy.android.shared.original.core.ui.theme.grey_alpha_087
-import mega.privacy.android.shared.original.core.ui.theme.teal_200
-import mega.privacy.android.shared.original.core.ui.theme.teal_300
+import mega.privacy.android.shared.original.core.ui.theme.accent_050
+import mega.privacy.android.shared.original.core.ui.theme.accent_900
 import mega.privacy.android.shared.original.core.ui.theme.white
 import mega.privacy.android.shared.original.core.ui.theme.white_alpha_012
 import mega.privacy.android.shared.original.core.ui.theme.white_alpha_054
@@ -193,7 +193,7 @@ private fun SlideshowSpeedDialog(
                 Text(
                     text = stringResource(id = sharedR.string.general_dialog_cancel_button),
                     style = button,
-                    color = teal_300.takeIf { isLight } ?: teal_200
+                    color = accent_900.takeIf { isLight } ?: accent_050
                 )
             }
         },
@@ -254,7 +254,7 @@ private fun SlideshowOrderDialog(
                 Text(
                     text = stringResource(id = sharedR.string.general_dialog_cancel_button),
                     style = button,
-                    color = teal_300.takeIf { isLight } ?: teal_200
+                    color = accent_900.takeIf { isLight } ?: accent_050
                 )
             }
         },
@@ -319,7 +319,7 @@ fun PreviewSlideshowSettingsView() {
     var selectedSpeed by remember { mutableStateOf("Normal (4s)") }
     var selectedOrder by remember { mutableStateOf("Shuffle") }
     var repeat by remember { mutableStateOf(false) }
-    OriginalTempTheme(isSystemInDarkTheme()) {
+    OriginalTheme(isSystemInDarkTheme()) {
         Scaffold {
             SlideshowSettingsView(viewModel())
         }

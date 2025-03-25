@@ -6,17 +6,11 @@ import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.awaitCancellation
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.flow
-import kotlinx.coroutines.flow.flowOf
-import kotlinx.coroutines.runBlocking
 import kotlinx.coroutines.test.runTest
 import mega.privacy.android.core.test.extension.CoroutineMainDispatcherExtension
-import mega.privacy.android.domain.entity.AccountType
-import mega.privacy.android.domain.entity.account.AccountDetail
-import mega.privacy.android.domain.entity.account.AccountLevelDetail
 import mega.privacy.android.domain.entity.node.NodeId
-import mega.privacy.android.domain.usecase.account.GetAccountTypeUseCase
-import mega.privacy.android.domain.usecase.account.MonitorAccountDetailUseCase
-import mega.privacy.android.domain.usecase.featureflag.GetFeatureFlagValueUseCase
+import mega.privacy.android.domain.usecase.backup.GetDeviceIdUseCase
+import mega.privacy.android.domain.usecase.backup.GetDeviceNameUseCase
 import mega.privacy.android.feature.sync.R
 import mega.privacy.android.feature.sync.domain.entity.SolvedIssue
 import mega.privacy.android.feature.sync.domain.entity.StallIssueType
@@ -33,13 +27,10 @@ import mega.privacy.android.feature.sync.ui.mapper.stalledissue.StalledIssueItem
 import mega.privacy.android.feature.sync.ui.model.StalledIssueUiItem
 import mega.privacy.android.feature.sync.ui.synclist.SyncListAction
 import mega.privacy.android.feature.sync.ui.synclist.SyncListViewModel
-import mega.privacy.android.shared.sync.featuretoggles.SyncFeatures
 import org.junit.jupiter.api.AfterEach
-import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.TestInstance
 import org.junit.jupiter.api.extension.ExtendWith
-import org.mockito.kotlin.doReturn
 import org.mockito.kotlin.mock
 import org.mockito.kotlin.reset
 import org.mockito.kotlin.verify
@@ -58,9 +49,8 @@ class SyncListViewModelTest {
     private val monitorSyncSolvedIssuesUseCase: MonitorSyncSolvedIssuesUseCase = mock()
     private val clearSyncSolvedIssuesUseCase: ClearSyncSolvedIssuesUseCase = mock()
     private val monitorSyncByWiFiUseCase: MonitorSyncByWiFiUseCase = mock()
-    private val getAccountTypeUseCase: GetAccountTypeUseCase = mock()
-    private val monitorAccountDetailUseCase: MonitorAccountDetailUseCase = mock()
-    private val getFeatureFlagValueUseCase: GetFeatureFlagValueUseCase = mock()
+    private val getDeviceIdUseCase: GetDeviceIdUseCase = mock()
+    private val getDeviceNameUseCase: GetDeviceNameUseCase = mock()
 
     private val stalledIssues = listOf(
         StalledIssue(
@@ -79,19 +69,6 @@ class SyncListViewModelTest {
         )
     )
 
-    @BeforeEach
-    fun setupMock(): Unit = runBlocking {
-        val accountLevelDetail = mock<AccountLevelDetail> {
-            on { accountType } doReturn AccountType.PRO_I
-        }
-        val accountDetail = mock<AccountDetail> {
-            on { levelDetail } doReturn accountLevelDetail
-        }
-        whenever(monitorAccountDetailUseCase()).thenReturn(
-            flowOf(accountDetail)
-        )
-    }
-
     @AfterEach
     fun resetAndTearDown() {
         reset(
@@ -100,8 +77,8 @@ class SyncListViewModelTest {
             resolveStalledIssueUseCase,
             stalledIssueItemMapper,
             monitorSyncSolvedIssuesUseCase,
-            getAccountTypeUseCase,
-            monitorAccountDetailUseCase
+            getDeviceIdUseCase,
+            getDeviceNameUseCase,
         )
     }
 
@@ -180,13 +157,6 @@ class SyncListViewModelTest {
             }
         }
 
-    @Test
-    fun `test that check feature flags method updates the state properly`() = runTest {
-        whenever(getFeatureFlagValueUseCase(SyncFeatures.BackupForAndroid)).thenReturn(true)
-        initViewModel()
-        assertThat(underTest.state.value.enabledFlags.contains(SyncFeatures.BackupForAndroid))
-    }
-
     private fun initViewModel() {
         underTest = SyncListViewModel(
             setOnboardingShownUseCase = setOnboardingShownUseCase,
@@ -196,9 +166,8 @@ class SyncListViewModelTest {
             monitorSyncSolvedIssuesUseCase = monitorSyncSolvedIssuesUseCase,
             clearSyncSolvedIssuesUseCase = clearSyncSolvedIssuesUseCase,
             monitorSyncByWiFiUseCase = monitorSyncByWiFiUseCase,
-            getAccountTypeUseCase = getAccountTypeUseCase,
-            monitorAccountDetailUseCase = monitorAccountDetailUseCase,
-            getFeatureFlagValueUseCase = getFeatureFlagValueUseCase,
+            getDeviceIdUseCase = getDeviceIdUseCase,
+            getDeviceNameUseCase = getDeviceNameUseCase,
         )
     }
 }

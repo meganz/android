@@ -30,7 +30,6 @@ import mega.privacy.android.app.main.megachat.MapsActivity
 import mega.privacy.android.app.meeting.gateway.RTCAudioManagerGateway
 import mega.privacy.android.app.middlelayer.scanner.ScannerHandler
 import mega.privacy.android.app.objects.GifData
-import mega.privacy.android.app.objects.PasscodeManagement
 import mega.privacy.android.app.presentation.documentscanner.model.DocumentScanningError
 import mega.privacy.android.app.presentation.extensions.getErrorStringId
 import mega.privacy.android.app.presentation.extensions.isPast
@@ -200,7 +199,6 @@ class ChatViewModel @Inject constructor(
     private val getMyUserHandleUseCase: GetMyUserHandleUseCase,
     private val getScheduledMeetingByChatUseCase: GetScheduledMeetingByChatUseCase,
     private val monitorHasAnyContactUseCase: MonitorHasAnyContactUseCase,
-    private val passcodeManagement: PasscodeManagement,
     private val getCustomSubtitleListUseCase: GetCustomSubtitleListUseCase,
     private val monitorAllContactParticipantsInChatUseCase: MonitorAllContactParticipantsInChatUseCase,
     private val inviteToChatUseCase: InviteToChatUseCase,
@@ -608,7 +606,7 @@ class ChatViewModel @Inject constructor(
 
                                 ChatRoomChange.OwnPrivilege,
                                 ChatRoomChange.Closed,
-                                -> {
+                                    -> {
                                     _state.update { state ->
                                         state.copy(
                                             participantsCount = getNumberParticipants()
@@ -794,15 +792,6 @@ class ChatViewModel @Inject constructor(
                 }
         }
     }
-
-    /**
-     * Get another call participating
-     *
-     */
-    fun enablePasscodeCheck() {
-        passcodeManagement.showPasscodeScreen = true
-    }
-
 
     /**
      * Handle action press
@@ -1005,7 +994,6 @@ class ChatViewModel @Inject constructor(
         call?.let {
             chatManagement.setSpeakerStatus(call.chatId, call.hasLocalVideo)
             chatManagement.setRequestSentCall(call.callId, call.isOutgoing)
-            passcodeManagement.showPasscodeScreen = true
             _state.update { state ->
                 state.copy(callInThisChat = call, isStartingCall = true)
             }
@@ -1533,9 +1521,16 @@ class ChatViewModel @Inject constructor(
      *
      * @param file [ChatFile]
      */
-    fun onDownloadForPreviewChatNode(file: ChatFile) {
+    fun onDownloadForPreviewChatNode(file: ChatFile, isOpenWith: Boolean) {
         _state.update {
-            it.copy(downloadEvent = triggered(TransferTriggerEvent.StartDownloadForPreview(file)))
+            it.copy(
+                downloadEvent = triggered(
+                    TransferTriggerEvent.StartDownloadForPreview(
+                        node = file,
+                        isOpenWith = isOpenWith
+                    )
+                )
+            )
         }
     }
 
@@ -1776,15 +1771,15 @@ class ChatViewModel @Inject constructor(
     }
 
     /**
-     * Checks whether the legacy or modern Document Scanner should be used
+     * Prepares the ML Kit Document Scanner from Google Play Services
      */
     fun onAttachScan() {
         viewModelScope.launch {
             runCatching {
-                scannerHandler.handleScanDocument()
-            }.onSuccess { handleScanDocumentResult ->
+                scannerHandler.prepareDocumentScanner()
+            }.onSuccess { gmsDocumentScanner ->
                 _state.update {
-                    it.copy(handleScanDocumentResult = triggered(handleScanDocumentResult))
+                    it.copy(gmsDocumentScanner = triggered(gmsDocumentScanner))
                 }
             }.onFailure { exception ->
                 _state.update {
@@ -1801,17 +1796,17 @@ class ChatViewModel @Inject constructor(
     }
 
     /**
-     * When the system fails to open the ML Document Kit Scanner, display a generic error message
+     * When the system fails to open the ML Kit Document Scanner, display a generic error message
      */
-    fun onNewDocumentScannerFailedToOpen() {
+    fun onDocumentScannerFailedToOpen() {
         _state.update { it.copy(documentScanningError = DocumentScanningError.GenericError) }
     }
 
     /**
-     * Resets the value of [ChatUiState.handleScanDocumentResult]
+     * Resets the value of [ChatUiState.gmsDocumentScanner]
      */
-    fun onHandleScanDocumentResultConsumed() {
-        _state.update { it.copy(handleScanDocumentResult = consumed()) }
+    fun onGmsDocumentScannerConsumed() {
+        _state.update { it.copy(gmsDocumentScanner = consumed()) }
     }
 
     /**

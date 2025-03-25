@@ -3,6 +3,7 @@ package mega.privacy.android.app.presentation.notification.model.extensions
 import android.content.Context
 import androidx.annotation.StringRes
 import mega.privacy.android.app.R
+import mega.privacy.android.shared.resources.R as sharedR
 import mega.privacy.android.domain.entity.ContactAlert
 import mega.privacy.android.domain.entity.ContactChangeAccountDeletedAlert
 import mega.privacy.android.domain.entity.ContactChangeBlockedYouAlert
@@ -23,6 +24,8 @@ import mega.privacy.android.domain.entity.UpdatedScheduledMeetingCancelAlert
 import mega.privacy.android.domain.entity.UpdatedScheduledMeetingDateTimeAlert
 import mega.privacy.android.domain.entity.UpdatedScheduledMeetingDescriptionAlert
 import mega.privacy.android.domain.entity.UpdatedScheduledMeetingFieldsAlert
+import mega.privacy.android.domain.entity.UpdatedScheduledMeetingRulesAlert
+import mega.privacy.android.domain.entity.UpdatedScheduledMeetingTimezoneAlert
 import mega.privacy.android.domain.entity.UpdatedScheduledMeetingTitleAlert
 import mega.privacy.android.domain.entity.UserAlert
 
@@ -87,9 +90,9 @@ private fun ScheduledMeetingAlert.getDescriptionFunction(): (Context) -> String?
 
             is UpdatedScheduledMeetingCancelAlert, is DeletedScheduledMeetingAlert -> {
                 val stringRes = when {
-                    isOccurrence -> R.string.notification_subtitle_scheduled_recurring_meeting_occurrence_canceled
+                    isOccurrence -> sharedR.string.meetings_notification_subtitle_scheduled_recurring_meeting_occurrence_canceled
                     isRecurring -> R.string.notification_subtitle_scheduled_recurring_meeting_canceled
-                    else -> R.string.notification_subtitle_scheduled_meeting_canceled
+                    else -> sharedR.string.meetings_notification_subtitle_scheduled_meeting_canceled
                 }
                 context.getString(stringRes, user)
             }
@@ -114,23 +117,61 @@ private fun ScheduledMeetingAlert.getDescriptionFunction(): (Context) -> String?
 
             is UpdatedScheduledMeetingDateTimeAlert -> {
                 val stringRes = when {
-                    isOccurrence -> R.string.notification_subtitle_scheduled_recurring_meeting_updated_occurrence
-                    hasDateChanged -> R.string.notification_subtitle_scheduled_meeting_updated_date
-                    else -> if (isRecurring) {
-                        R.string.notification_subtitle_scheduled_recurring_meeting_updated_time
+                    isOccurrence -> sharedR.string.meetings_notification_subtitle_scheduled_recurring_meeting_updated_occurrence
+                    hasDateChanged -> if (isRecurring) {
+                        sharedR.string.meetings_notification_subtitle_scheduled_recurring_meeting_scheduled_changes
                     } else {
-                        R.string.notification_subtitle_scheduled_meeting_updated_time
+                        sharedR.string.meetings_notification_subtitle_scheduled_meeting_updated_date
+                    }
+
+                    hasDayOfWeekChanged -> if (isRecurring) {
+                        sharedR.string.meetings_notification_subtitle_scheduled_recurring_meeting_date_of_the_week_changed
+                    } else {
+                        sharedR.string.meetings_notification_subtitle_scheduled_meeting_updated_date
+
+                    }
+
+                    hasTimeChanged -> if (isRecurring) {
+                        sharedR.string.meetings_notification_subtitle_scheduled_recurring_meeting_hour_changed
+                    } else {
+                        sharedR.string.meetings_notification_subtitle_scheduled_meeting_updated_time
+                    }
+
+                    else -> if (isRecurring) {
+                        sharedR.string.meetings_notification_subtitle_scheduled_recurring_meeting_scheduled_changes
+                    } else {
+                        sharedR.string.meetings_notification_subtitle_scheduled_meeting_updated_date
+                    }
+                }
+                context.getString(stringRes, user)
+            }
+
+            is UpdatedScheduledMeetingTimezoneAlert -> context.getString(
+                sharedR.string.meetings_notification_subtitle_scheduled_recurring_meeting_scheduled_changes,
+                user
+            )
+
+            is UpdatedScheduledMeetingRulesAlert -> {
+                val stringRes = when {
+                    !hasDateChanged && !hasDayOfWeekChanged -> sharedR.string.meetings_notification_subtitle_scheduled_recurring_meeting_multiple_fields_changed
+                    hasDateChanged && hasDayOfWeekChanged -> if (isRecurring) {
+                        sharedR.string.meetings_notification_subtitle_scheduled_recurring_meeting_scheduled_changes
+                    } else {
+                        sharedR.string.meetings_notification_subtitle_scheduled_meeting_updated_date
+                    }
+
+                    else -> if (isRecurring) {
+                        sharedR.string.meetings_notification_subtitle_scheduled_recurring_meeting_date_of_the_week_changed
+                    } else {
+                        sharedR.string.meetings_notification_subtitle_scheduled_meeting_updated_date
                     }
                 }
                 context.getString(stringRes, user)
             }
 
             is UpdatedScheduledMeetingFieldsAlert -> {
-                val stringRes = if (isRecurring) {
-                    R.string.notification_subtitle_scheduled_recurring_meeting_updated_multiple
-                } else {
-                    R.string.notification_subtitle_scheduled_meeting_updated_multiple
-                }
+                val stringRes =
+                    sharedR.string.meetings_notification_subtitle_scheduled_recurring_meeting_multiple_fields_changed
                 context.getString(stringRes, user)
             }
 

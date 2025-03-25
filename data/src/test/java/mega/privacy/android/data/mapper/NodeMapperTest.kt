@@ -18,6 +18,8 @@ import mega.privacy.android.domain.entity.SortOrder
 import mega.privacy.android.domain.entity.node.NodeId
 import mega.privacy.android.domain.entity.node.UnTypedNode
 import nz.mega.sdk.MegaNode
+import nz.mega.sdk.MegaSync
+import nz.mega.sdk.MegaSyncList
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.DisplayName
 import org.junit.jupiter.api.Nested
@@ -71,6 +73,10 @@ class NodeMapperTest {
         val fetChildrenMapperResult = mock<suspend (SortOrder) -> List<UnTypedNode>>()
         whenever(fileTypeInfoMapper(anyOrNull(), anyOrNull())).thenReturn(PdfFileTypeInfo)
         whenever(fetChildrenMapper(any(), any())).thenReturn(fetChildrenMapperResult)
+        val syncList = mock<MegaSyncList> {
+            on { size() }.thenReturn(0)
+        }
+        whenever(megaApiGateway.getSyncs()).thenReturn(syncList)
         underTest = NodeMapper(
             fileNodeMapper = FileNodeMapper(
                 cacheGateway = mock(),
@@ -144,6 +150,7 @@ class NodeMapperTest {
         val actualAsFolder = actual as DefaultFolderNode
         assertThat(actualAsFolder.isInRubbishBin).isTrue()
         assertThat(actualAsFolder.isPendingShare).isTrue()
+        assertThat(actualAsFolder.isSynced).isFalse()
     }
 
     @Test
@@ -213,6 +220,26 @@ class NodeMapperTest {
             isExported = exported,
             isFile = false
         )
+    }
+
+    @Test
+    fun `test that synced folder is mapped correctly`() = runTest {
+        val megaNode = getMockNode(id = 1234L, isFile = false)
+        val sync = mock<MegaSync> {
+            on { megaHandle }.thenReturn(1234L)
+        }
+        val syncList = mock<MegaSyncList> {
+            on { size() }.thenReturn(0)
+            on { get(0) }.thenReturn(sync)
+        }
+        whenever(megaApiGateway.getSyncs()).thenReturn(syncList)
+        val actual =
+            underTest(
+                megaNode = megaNode,
+            )
+        assertThat(actual).isInstanceOf(DefaultFolderNode::class.java)
+        val actualAsFolder = actual as DefaultFolderNode
+        assertThat(actualAsFolder.isSynced).isTrue()
     }
 
     private fun getMockNode(

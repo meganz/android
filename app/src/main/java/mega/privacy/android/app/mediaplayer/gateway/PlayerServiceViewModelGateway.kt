@@ -113,60 +113,17 @@ interface PlayerServiceViewModelGateway {
     fun playlistTitleUpdate(): Flow<String>
 
     /**
-     * Update when item select count is changed
-     *
-     * @return Flow<Int>
-     */
-    fun itemsSelectedCountUpdate(): Flow<Int>
-
-    /**
-     * Update when action mode is changed
-     *
-     * @return Flow<Boolean>
-     */
-    fun actionModeUpdate(): Flow<Boolean>
-
-    /**
      * Remove the selected items
-     */
-    fun removeAllSelectedItems()
-
-    /**
-     * Clear the all selections
-     */
-    fun clearSelections()
-
-    /**
-     * Scroll to the position of playing item
-     */
-    fun scrollToPlayingPosition()
-
-
-    /**
-     * Judge the action mode whether is enabled
      *
-     * @return true is action mode, otherwise is false.
+     * @param removedHandles the list of removed item handles
      */
-    fun isActionMode(): Boolean?
-
-    /**
-     * Set the action mode
-     * @param isActionMode whether the action mode is activated
-     */
-    fun setActionMode(isActionMode: Boolean)
+    fun removeSelectedItems(removedHandles: List<Long>)
 
     /**
      * Saved or remove the selected items
-     * @param handle node handle of selected item
+     * @param handles node handle of selected item
      */
-    fun itemSelected(handle: Long)
-
-    /**
-     * Get the index from playlistItems to keep the play order is correct after reordered
-     * @param item clicked item
-     * @return the index of clicked item in playlistItems or null
-     */
-    fun getIndexFromPlaylistItems(item: PlaylistItem): Int?
+    fun itemsSelected(handles: List<Long>)
 
     /**
      * Get the index from playlistItems to keep the play order is correct after reordered
@@ -174,13 +131,6 @@ interface PlayerServiceViewModelGateway {
      * @return the index of clicked item in playlistItems or null
      */
     fun getIndexFromPlaylistItems(handle: Long): Int?
-
-    /**
-     * Get the position of playing item
-     *
-     * @return the position of playing item
-     */
-    fun getPlayingPosition(): Int
 
     /**
      * Swap the items

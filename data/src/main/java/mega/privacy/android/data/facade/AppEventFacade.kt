@@ -16,6 +16,7 @@ import mega.privacy.android.domain.entity.backup.BackupInfoType
 import mega.privacy.android.domain.entity.call.AudioDevice
 import mega.privacy.android.domain.entity.camerauploads.CameraUploadsSettingsAction
 import mega.privacy.android.domain.entity.settings.cookie.CookieType
+import mega.privacy.android.domain.entity.transfer.CompletedTransferState
 import mega.privacy.android.domain.qualifier.ApplicationScope
 import javax.inject.Inject
 
@@ -34,7 +35,6 @@ internal class AppEventFacade @Inject constructor(
     private val _cookieSettings = MutableSharedFlow<Set<CookieType>>()
     private val logout = MutableSharedFlow<Boolean>()
     private val fetchNodesFinish = MutableSharedFlow<Boolean>()
-    private val _transferFailed = MutableSharedFlow<Boolean>()
     private val pushNotificationSettingsUpdate = MutableSharedFlow<Boolean>()
     private val myAccountUpdate = MutableSharedFlow<MyAccountUpdate>()
     private val chatArchived = MutableSharedFlow<String>()
@@ -50,7 +50,7 @@ internal class AppEventFacade @Inject constructor(
     private val _finishActivity = MutableSharedFlow<Boolean>()
 
     private val updateUpgradeSecurityState = MutableStateFlow(false)
-    private val _monitorCompletedTransfer = MutableSharedFlow<Unit>()
+    private val _monitorCompletedTransfer = MutableSharedFlow<CompletedTransferState>()
     private val _monitorRefreshSession = MutableSharedFlow<Unit>()
     private val _monitorBackupInfoType = MutableSharedFlow<BackupInfoType>()
     private val _monitorUpgradeDialogShown = MutableSharedFlow<Unit>()
@@ -71,6 +71,8 @@ internal class AppEventFacade @Inject constructor(
     private val localVideoChangedDueToProximitySensor = MutableSharedFlow<Boolean>()
 
     private val updateUserData = MutableSharedFlow<Unit>()
+
+    private val miscLoaded = MutableSharedFlow<Unit>()
 
     override suspend fun broadcastCookieSettings(enabledCookieSettings: Set<CookieType>) {
         _cookieSettings.emit(enabledCookieSettings)
@@ -105,17 +107,11 @@ internal class AppEventFacade @Inject constructor(
 
     override suspend fun broadcastLogout() = logout.emit(true)
 
-    override fun monitorFailedTransfer(): Flow<Boolean> = _transferFailed.asSharedFlow()
-
     override fun monitorSecurityUpgrade(): Flow<Boolean> =
         updateUpgradeSecurityState.asStateFlow()
 
     override suspend fun setUpgradeSecurity(isSecurityUpgrade: Boolean) {
         updateUpgradeSecurityState.value = isSecurityUpgrade
-    }
-
-    override suspend fun broadcastFailedTransfer(isFailed: Boolean) {
-        _transferFailed.emit(isFailed)
     }
 
     override fun monitorFinishActivity() = _finishActivity.toSharedFlow(appScope)
@@ -132,8 +128,8 @@ internal class AppEventFacade @Inject constructor(
     override fun monitorPushNotificationSettings() =
         pushNotificationSettingsUpdate.toSharedFlow(appScope)
 
-    override suspend fun broadcastCompletedTransfer() =
-        _monitorCompletedTransfer.emit(Unit)
+    override suspend fun broadcastCompletedTransfer(completedTransferState: CompletedTransferState) =
+        _monitorCompletedTransfer.emit(completedTransferState)
 
     override fun monitorMyAccountUpdate(): Flow<MyAccountUpdate> =
         myAccountUpdate.toSharedFlow(appScope)
@@ -249,7 +245,13 @@ internal class AppEventFacade @Inject constructor(
         _monitorUpgradeDialogShown.emit(Unit)
     }
 
+    override suspend fun broadcastMiscLoaded() {
+        miscLoaded.emit(Unit)
+    }
 
+    override fun monitorMiscLoaded(): Flow<Unit> {
+        return miscLoaded.asSharedFlow()
+    }
 }
 
 private fun <T> Flow<T>.toSharedFlow(

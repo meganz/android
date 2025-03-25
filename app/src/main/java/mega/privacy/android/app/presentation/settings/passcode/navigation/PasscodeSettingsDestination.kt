@@ -43,6 +43,8 @@ internal fun NavGraphBuilder.passCodeSettings(
         ) { isSuccess ->
             if (!isSuccess) {
                 Timber.w("Set passcode pin failed when enabling passcode")
+            } else {
+                viewModel.onPasscodeEnabled()
             }
         }
 

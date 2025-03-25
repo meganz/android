@@ -3,7 +3,7 @@ package mega.privacy.android.domain.repository
 import kotlinx.coroutines.flow.Flow
 import mega.privacy.android.domain.entity.CallsMeetingInvitations
 import mega.privacy.android.domain.entity.CallsMeetingReminders
-import mega.privacy.android.domain.entity.CallsSoundNotifications
+import mega.privacy.android.domain.entity.CallsSoundEnabledState
 import mega.privacy.android.domain.entity.ChatImageQuality
 import mega.privacy.android.domain.entity.VideoQuality
 import mega.privacy.android.domain.entity.meeting.UsersCallLimitReminders
@@ -16,26 +16,6 @@ import java.io.File
  *
  */
 interface SettingsRepository {
-
-    /**
-     * Is passcode lock preference enabled
-     *
-     * @return true if enabled
-     */
-    suspend fun isPasscodeLockPreferenceEnabled(): Boolean?
-
-    /**
-     * Set passcode lock enabled/disabled
-     *
-     * @param enabled
-     */
-    suspend fun setPasscodeLockEnabled(enabled: Boolean)
-
-    /**
-     * Set the passcode lock code
-     */
-    suspend fun setPasscodeLockCode(passcodeLockCode: String)
-
     /**
      * Fetch contact links option
      *
@@ -203,7 +183,7 @@ interface SettingsRepository {
      *
      * @return Sound notifications status.
      */
-    fun getCallsSoundNotifications(): Flow<CallsSoundNotifications>
+    fun getCallsSoundNotifications(): Flow<CallsSoundEnabledState>
 
     /**
      * Enabling or disabling call notification sounds.
@@ -211,7 +191,7 @@ interface SettingsRepository {
      * @param soundNotifications New Sound notifications status.
      * @return Sound notifications status.
      */
-    suspend fun setCallsSoundNotifications(soundNotifications: CallsSoundNotifications)
+    suspend fun setCallsSoundNotifications(soundNotifications: CallsSoundEnabledState)
 
     /**
      * Get calls meeting invitations
@@ -486,4 +466,26 @@ interface SettingsRepository {
      * set raise to hand feature tooltip shown
      */
     suspend fun setRaiseToHandSuggestionShown()
+
+    /**
+     * Get file versions option
+     *
+     * @param forceRefresh
+     * @return
+     */
+    suspend fun getFileVersionsOption(forceRefresh: Boolean): Boolean
+
+    /**
+     * Monitor geo tagging status
+     *
+     * @return true if geo tagging is enabled, false or null otherwise
+     */
+    fun monitorGeoTaggingStatus(): Flow<Boolean?>
+
+    /**
+     * Enable geo tagging
+     *
+     * @param enabled
+     */
+    suspend fun enableGeoTagging(enabled: Boolean)
 }

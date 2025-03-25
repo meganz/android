@@ -82,9 +82,26 @@ class VideoUIEntityMapperTest {
             )
         }
 
+    @Test
+    fun `test that VideoUIEntity can be mapped correctly when when elementId is null`() =
+        runTest {
+            val testNode = initTypedVideoNode(
+                exportData = null,
+                expectedIsOutShared = false,
+                elementIDParam = null
+            )
+            val videoUIEntity = underTest(testNode)
+            assertMappedVideoUIEntity(
+                videoUIEntity = videoUIEntity,
+                expectedIsShared = false,
+                elementID = testNode.id.longValue
+            )
+        }
+
     private fun initTypedVideoNode(
         exportData: ExportedData?,
         expectedIsOutShared: Boolean,
+        elementIDParam: Long? = expectedElementID,
     ) = mock<TypedVideoNode> {
         on { id }.thenReturn(expectedId)
         on { parentId }.thenReturn(expectedParentId)
@@ -94,7 +111,7 @@ class VideoUIEntityMapperTest {
         on { isAvailableOffline }.thenReturn(expectedAvailableOffline)
         on { duration }.thenReturn(expectedDurationTime)
         on { exportedData }.thenReturn(exportData)
-        on { elementID }.thenReturn(expectedElementID)
+        on { elementID }.thenReturn(elementIDParam)
         on { label }.thenReturn(expectedLabel)
         on { type }.thenReturn(expectedType)
         on { isOutShared }.thenReturn(expectedIsOutShared)
@@ -105,6 +122,7 @@ class VideoUIEntityMapperTest {
     private fun assertMappedVideoUIEntity(
         videoUIEntity: VideoUIEntity,
         expectedIsShared: Boolean,
+        elementID: Long = expectedElementID
     ) {
         videoUIEntity.let {
             Assertions.assertAll(
@@ -117,7 +135,7 @@ class VideoUIEntityMapperTest {
                 { assertThat(it.nodeAvailableOffline).isEqualTo(expectedAvailableOffline) },
                 { assertThat(it.isFavourite).isEqualTo(expectedIsFavourite) },
                 { assertThat(it.isSharedItems).isEqualTo(expectedIsShared) },
-                { assertThat(it.elementID).isEqualTo(expectedElementID) },
+                { assertThat(it.elementID).isEqualTo(elementID) },
                 { assertThat(it.label).isEqualTo(expectedLabel) },
                 { assertThat(it.fileTypeInfo).isEqualTo(expectedType) },
                 { assertThat(it.watchedDate).isEqualTo(expectedWatchedTimestamp) },

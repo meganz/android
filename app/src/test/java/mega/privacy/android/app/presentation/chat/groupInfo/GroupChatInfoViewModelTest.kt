@@ -10,7 +10,6 @@ import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.test.UnconfinedTestDispatcher
 import kotlinx.coroutines.test.runTest
 import mega.privacy.android.app.components.ChatManagement
-import mega.privacy.android.app.objects.PasscodeManagement
 import mega.privacy.android.app.usecase.chat.SetChatVideoInDeviceUseCase
 import mega.privacy.android.core.test.extension.CoroutineMainDispatcherExtension
 import mega.privacy.android.data.gateway.api.MegaChatApiGateway
@@ -53,7 +52,6 @@ class GroupChatInfoViewModelTest {
     private val monitorConnectivityUseCase: MonitorConnectivityUseCase = mock()
     private val startCallUseCase: StartCallUseCase = mock()
     private val get1On1ChatIdUseCase: Get1On1ChatIdUseCase = mock()
-    private val passcodeManagement: PasscodeManagement = mock()
     private val chatApiGateway: MegaChatApiGateway = mock()
     private val setChatVideoInDeviceUseCase: SetChatVideoInDeviceUseCase = mock()
     private val chatManagement: ChatManagement = mock()
@@ -83,7 +81,6 @@ class GroupChatInfoViewModelTest {
             monitorConnectivityUseCase,
             startCallUseCase,
             get1On1ChatIdUseCase,
-            passcodeManagement,
             chatApiGateway,
             setChatVideoInDeviceUseCase,
             chatManagement,
@@ -113,7 +110,6 @@ class GroupChatInfoViewModelTest {
             monitorConnectivityUseCase = monitorConnectivityUseCase,
             startCallUseCase = startCallUseCase,
             get1On1ChatIdUseCase = get1On1ChatIdUseCase,
-            passcodeManagement = passcodeManagement,
             chatApiGateway = chatApiGateway,
             setChatVideoInDeviceUseCase = setChatVideoInDeviceUseCase,
             chatManagement = chatManagement,

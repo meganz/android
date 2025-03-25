@@ -20,12 +20,19 @@ class TransfersInfoMapper @Inject constructor() {
         totalSizeTransferred: Long,
         areTransfersPaused: Boolean,
         isTransferError: Boolean,
+        isOnline: Boolean,
         isTransferOverQuota: Boolean,
         isStorageOverQuota: Boolean,
         lastTransfersCancelled: Boolean,
     ): TransfersInfo {
         if (numPendingUploads + numPendingDownloadsNonBackground <= 0) {
-            return TransfersInfo(if (lastTransfersCancelled) TransfersStatus.Cancelled else TransfersStatus.Completed)
+            return TransfersInfo(
+                when {
+                    isTransferError -> TransfersStatus.TransferError
+                    lastTransfersCancelled -> TransfersStatus.Cancelled
+                    else -> TransfersStatus.Completed
+                }
+            )
         }
         val pendingDownloads = numPendingDownloadsNonBackground > 0
         val pendingUploads = numPendingUploads > 0
@@ -37,7 +44,7 @@ class TransfersInfoMapper @Inject constructor() {
             (isTransferOverQuota && (!pendingUploads || isStorageOverQuota))
                     || (isStorageOverQuota && !pendingDownloads) -> TransfersStatus.OverQuota
 
-            isTransferError -> TransfersStatus.TransferError
+            isTransferError || !isOnline -> TransfersStatus.TransferError
             else -> TransfersStatus.Transferring
         }
         return TransfersInfo(

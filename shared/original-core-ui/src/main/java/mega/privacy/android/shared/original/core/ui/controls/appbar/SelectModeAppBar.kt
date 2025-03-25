@@ -13,7 +13,7 @@ import mega.privacy.android.shared.original.core.ui.model.MenuActionWithClick
 import mega.privacy.android.shared.original.core.ui.model.MenuActionWithoutIcon
 import mega.privacy.android.shared.original.core.ui.preview.CombinedThemePreviews
 import mega.privacy.android.shared.original.core.ui.theme.MegaOriginalTheme
-import mega.privacy.android.shared.original.core.ui.theme.OriginalTempTheme
+import mega.privacy.android.shared.original.core.ui.theme.OriginalTheme
 
 @Composable
 fun SelectModeAppBar(
@@ -68,7 +68,7 @@ fun SelectModeAppBar(
 @CombinedThemePreviews
 @Composable
 private fun SelectModeAppBarPreview() {
-    OriginalTempTheme(isDark = isSystemInDarkTheme()) {
+    OriginalTheme(isDark = isSystemInDarkTheme()) {
         SelectModeAppBar(
             title = "App bar title",
             actions = getSampleToolbarActions()
@@ -77,16 +77,16 @@ private fun SelectModeAppBarPreview() {
 }
 
 private fun getSampleToolbarActions(): List<MenuAction> {
-    val item1 = object : MenuActionString(R.drawable.ic_down, R.string.password_text, "cancel") {}
-    val item2 = object : MenuActionString(R.drawable.ic_menu, R.string.password_text, "menu") {}
+    val item1 = object : MenuActionString(R.drawable.ic_down, mega.privacy.android.shared.resources.R.string.password_text, "cancel") {}
+    val item2 = object : MenuActionString(R.drawable.ic_menu, mega.privacy.android.shared.resources.R.string.password_text, "menu") {}
     val item3 =
-        object : MenuActionString(R.drawable.ic_chevron_up, R.string.password_text, "chevron up") {}
+        object : MenuActionString(R.drawable.ic_chevron_up, mega.privacy.android.shared.resources.R.string.password_text, "chevron up") {}
     val item4 =
         object : MenuActionString(
             iconPackR.drawable.ic_alert_circle_regular_medium_outline,
-            R.string.password_text,
+            mega.privacy.android.shared.resources.R.string.password_text,
             "circle"
         ) {}
-    val item5 = object : MenuActionWithoutIcon(R.string.password_text, "password") {}
+    val item5 = object : MenuActionWithoutIcon(mega.privacy.android.shared.resources.R.string.password_text, "password") {}
     return listOf(item1, item2, item3, item4, item5)
 }

@@ -18,6 +18,7 @@ import org.junit.runner.RunWith
 import org.mockito.Mockito
 import org.mockito.kotlin.doReturn
 import org.mockito.kotlin.mock
+import org.mockito.kotlin.verify
 import org.robolectric.util.ReflectionHelpers
 
 
@@ -26,6 +27,71 @@ class TourScreenKtTest {
 
     @get:Rule
     val composeRule = createComposeRule()
+
+    @Test
+    fun `test that join a meeting as guest button is displayed`() {
+        with(composeRule) {
+            setScreen()
+            onNodeWithTag(JOIN_A_MEETING_AS_GUEST_TAG).assertIsDisplayed()
+        }
+    }
+
+    @Test
+    fun `test that login button is displayed`() {
+        with(composeRule) {
+            setScreen()
+            onNodeWithTag(BUTTON_LOGIN_TAG).assertIsDisplayed()
+        }
+    }
+
+    @Test
+    fun `test that create account button is displayed`() {
+        with(composeRule) {
+            setScreen()
+            onNodeWithTag(BUTTON_CREATE_ACCOUNT_TAG).assertIsDisplayed()
+        }
+    }
+
+    @Test
+    fun `test that tour title text for all pages exists`() {
+        with(composeRule) {
+            setScreen()
+            for (index in 0 until 5) {
+                onNodeWithTag("${TEXT_TOUR_TITLE_TAG}_$index").assertExists()
+            }
+        }
+    }
+
+    @Test
+    fun `test that tour description text for all pages exists`() {
+        with(composeRule) {
+            setScreen()
+            for (index in 0 until 5) {
+                onNodeWithTag("${TEXT_TOUR_DESCRIPTION_TAG}_$index").assertExists()
+            }
+        }
+    }
+
+
+    @Test
+    fun `test that tour image resource for all pages exists`() {
+        with(composeRule) {
+            setScreen()
+            for (index in 0 until 5) {
+                onNodeWithTag("${IMAGE_RESOURCE_TOUR_TAG}_$index").assertExists()
+            }
+        }
+    }
+
+    @Test
+    fun `test that tour image background for all pages exists`() {
+        with(composeRule) {
+            setScreen()
+            for (index in 0 until 5) {
+                onNodeWithTag("${IMAGE_BACKGROUND_TOUR_TAG}_$index").assertExists()
+            }
+        }
+    }
 
     @Test
     fun `test that the correct meeting link is returned when opening the link`() {
@@ -86,6 +152,26 @@ class TourScreenKtTest {
 
             onNodeWithTag(PASTE_MEETING_LINK_DIALOG_TAG).assertIsDisplayed()
         }
+    }
+
+    @Test
+    fun `test that login button click action is triggered`() {
+        val loginClick: () -> Unit = mock {}
+        with(composeRule) {
+            setScreen(onLoginClick = loginClick)
+            onNodeWithTag(BUTTON_LOGIN_TAG).performClick()
+        }
+        verify(loginClick).invoke()
+    }
+
+    @Test
+    fun `test that create account button click action is triggered`() {
+        val createAccountClick: () -> Unit = mock {}
+        with(composeRule) {
+            setScreen(onCreateAccountClick = createAccountClick)
+            onNodeWithTag(BUTTON_CREATE_ACCOUNT_TAG).performClick()
+        }
+        verify(createAccountClick).invoke()
     }
 
     private fun ComposeContentTestRule.setScreen(

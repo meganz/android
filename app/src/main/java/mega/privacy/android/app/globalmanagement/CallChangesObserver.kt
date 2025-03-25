@@ -1,36 +1,47 @@
 package mega.privacy.android.app.globalmanagement
 
+import android.Manifest
 import android.app.Application
 import android.content.Context
+import android.content.pm.PackageManager
 import android.os.PowerManager
 import android.provider.Settings
+import androidx.core.app.ActivityCompat
 import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.flow.catch
+import kotlinx.coroutines.flow.collectLatest
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 import mega.privacy.android.app.MegaApplication
 import mega.privacy.android.app.components.ChatManagement
 import mega.privacy.android.app.fcm.ChatAdvancedNotificationBuilder
 import mega.privacy.android.app.meeting.gateway.RTCAudioManagerGateway
-import mega.privacy.android.app.objects.PasscodeManagement
+import mega.privacy.android.app.notifications.CallPushMessageNotificationManager
 import mega.privacy.android.app.utils.CallUtil
 import mega.privacy.android.app.utils.Constants
 import mega.privacy.android.app.utils.Util
-import mega.privacy.android.domain.entity.call.ChatCall
 import mega.privacy.android.domain.entity.call.CallCompositionChanges
+import mega.privacy.android.domain.entity.call.ChatCall
 import mega.privacy.android.domain.entity.call.ChatCallChanges
 import mega.privacy.android.domain.entity.call.ChatCallStatus
 import mega.privacy.android.domain.entity.call.ChatSessionStatus
 import mega.privacy.android.domain.entity.call.ChatSessionUpdatesResult
 import mega.privacy.android.domain.entity.call.EndCallReason
+import mega.privacy.android.domain.entity.meeting.CallPushMessageNotificationActionType
 import mega.privacy.android.domain.qualifier.ApplicationScope
 import mega.privacy.android.domain.qualifier.MainImmediateDispatcher
-import mega.privacy.android.domain.usecase.chat.IsChatNotifiableUseCase
-import mega.privacy.android.domain.usecase.contact.GetMyUserHandleUseCase
+import mega.privacy.android.domain.usecase.GetChatRoomUseCase
 import mega.privacy.android.domain.usecase.call.GetCallHandleListUseCase
+import mega.privacy.android.domain.usecase.chat.IsChatNotifiableUseCase
+import mega.privacy.android.domain.usecase.chat.RemoveChatOpeningWithLinkUseCase
+import mega.privacy.android.domain.usecase.contact.GetMyUserHandleUseCase
+import mega.privacy.android.domain.usecase.meeting.GetFakeIncomingCallStateUseCase
+import mega.privacy.android.domain.usecase.meeting.IsPendingToHangUpUseCase
+import mega.privacy.android.domain.usecase.meeting.MonitorCallPushNotificationUseCase
 import mega.privacy.android.domain.usecase.meeting.MonitorChatCallUpdatesUseCase
 import mega.privacy.android.domain.usecase.meeting.MonitorChatSessionUpdatesUseCase
+import mega.privacy.android.domain.usecase.meeting.SetFakeIncomingCallStateUseCase
 import nz.mega.sdk.MegaChatApiAndroid
 import nz.mega.sdk.MegaChatApiJava
 import nz.mega.sdk.MegaChatCall
@@ -54,38 +65,44 @@ class CallChangesObserver @Inject constructor(
     private val application: Application,
     private val chatManagement: ChatManagement,
     private val activityLifecycleHandler: ActivityLifecycleHandler,
-    private val passcodeManagement: PasscodeManagement,
     private val monitorChatCallUpdatesUseCase: MonitorChatCallUpdatesUseCase,
     private val monitorChatSessionUpdatesUseCase: MonitorChatSessionUpdatesUseCase,
     private val getCallHandleListUseCase: GetCallHandleListUseCase,
+    private val getChatRoomUseCase: GetChatRoomUseCase,
     private val isChatNotifiableUseCase: IsChatNotifiableUseCase,
     private val getMyUserHandleUseCase: GetMyUserHandleUseCase,
+    private val removeChatOpeningWithLinkUseCase: RemoveChatOpeningWithLinkUseCase,
+    private val callPushMessageNotificationManager: CallPushMessageNotificationManager,
+    private val monitorCallPushNotificationUseCase: MonitorCallPushNotificationUseCase,
+    private val getFakeIncomingCallStateUseCase: GetFakeIncomingCallStateUseCase,
+    private val setFakeIncomingCallUseCase: SetFakeIncomingCallStateUseCase,
+    private val isPendingToHangUpUseCase: IsPendingToHangUpUseCase,
     @ApplicationScope private val applicationScope: CoroutineScope,
     @MainImmediateDispatcher private val mainImmediateDispatcher: CoroutineDispatcher,
 ) {
     private var wakeLock: PowerManager.WakeLock? = null
     private var openCallChatId: Long = -1
 
-    /**
-     * listen all call status observer
-     */
     fun init() {
         applicationScope.launch {
+            Timber.d("Monitor chat call updates")
             monitorChatCallUpdatesUseCase()
                 .catch { e -> Timber.e(e, "Error listening call updates") }
                 .collect { call ->
                     runCatching {
                         withContext(mainImmediateDispatcher) {
                             val changes = call.changes.orEmpty()
-                            when {
-                                changes.contains(ChatCallChanges.Status)
-                                -> onHandleCallStatusChange(call)
 
-                                changes.contains(ChatCallChanges.RingingStatus)
-                                -> handleCallRinging(call)
+                            if (changes.contains(ChatCallChanges.Status)) {
+                                onHandleCallStatusChange(call)
+                            }
 
-                                changes.contains(ChatCallChanges.CallComposition)
-                                -> handleCallComposition(call)
+                            if (changes.contains(ChatCallChanges.RingingStatus)) {
+                                handleCallRinging(call)
+                            }
+
+                            if (changes.contains(ChatCallChanges.CallComposition)) {
+                                handleCallComposition(call)
                             }
                         }
                     }.onFailure {
@@ -101,6 +118,70 @@ class CallChangesObserver @Inject constructor(
                         handleSessionStatusChange(callAndSession)
                     }.onFailure {
                         Timber.e(it, "Error handling session status change")
+                    }
+                }
+        }
+
+        applicationScope.launch {
+            monitorCallPushNotificationUseCase()
+                .collectLatest { map ->
+                    map.entries.forEach {
+                        val chatId = it.key
+                        val type = it.value
+
+                        when (type) {
+                            CallPushMessageNotificationActionType.Show -> {
+                                if (!chatManagement.isNotificationShown(chatId)) {
+                                    callPushMessageNotificationManager.show(
+                                        application, chatId
+                                    )
+                                } else {
+                                    setFakeIncomingCallUseCase(chatId = chatId, type = null)
+                                }
+                            }
+
+                            CallPushMessageNotificationActionType.Update -> {
+                                if (ActivityCompat.checkSelfPermission(
+                                        application,
+                                        Manifest.permission.POST_NOTIFICATIONS
+                                    ) == PackageManager.PERMISSION_GRANTED
+                                ) {
+                                    applicationScope.launch {
+                                        runCatching {
+                                            getChatRoomUseCase(chatId)
+                                        }.onFailure { exception ->
+                                            Timber.e(exception)
+                                        }.onSuccess { chat ->
+                                            chat?.let {
+                                                callPushMessageNotificationManager.update(
+                                                    application,
+                                                    chat
+                                                )
+                                            }
+                                        }
+                                    }
+                                }
+                            }
+
+                            CallPushMessageNotificationActionType.Hide -> callPushMessageNotificationManager.hide(
+                                chatId
+                            )
+
+                            CallPushMessageNotificationActionType.Remove -> callPushMessageNotificationManager.remove(
+                                chatId
+                            )
+
+                            CallPushMessageNotificationActionType.Missed -> {
+                                callPushMessageNotificationManager.remove(chatId)
+                                try {
+                                    Timber.d("Show missed call notification")
+                                    ChatAdvancedNotificationBuilder.newInstance(application)
+                                        .showMissedCallNotification(chatId, -1L)
+                                } catch (e: Exception) {
+                                    Timber.e(e, "EXCEPTION when showing missed call notification")
+                                }
+                            }
+                        }
                     }
                 }
         }
@@ -127,7 +208,8 @@ class CallChangesObserver @Inject constructor(
             Timber.e("Error in chatId or callId")
             return
         }
-        Timber.d("Call status is ${callStatus}, chat id is $chatId, call id is $callId")
+
+        Timber.d("Handle call status change: chatId ${call.chatId}, callStatus ${call.status}, isRinging ${call.isRinging}")
         when (call.status) {
             ChatCallStatus.Connecting -> {
                 if (isOutgoing && chatManagement.isRequestSent(callId)) {
@@ -138,14 +220,27 @@ class CallChangesObserver @Inject constructor(
             ChatCallStatus.UserNoPresent -> {
                 val listAllCalls =
                     megaChatApi.chatCalls?.takeIf { it.size() > 0 } ?: return
-                if (isRinging) {
-                    Timber.d("Is incoming call")
-                    incomingCall(listAllCalls, chatId, callStatus)
-                } else {
-                    val chatRoom = megaChatApi.getChatRoom(chatId)
-                    if (chatRoom != null && chatRoom.isGroup && !chatRoom.isMeeting) {
-                        Timber.d("Check if the incoming group call notification should be displayed")
-                        chatManagement.checkActiveGroupChat(chatId)
+                val isNotificationShown = chatManagement.isNotificationShown(call.chatId)
+                val isFakeIncomingCall = getFakeIncomingCallStateUseCase(call.chatId)
+                val isPendingHangUpCall = isPendingToHangUpUseCase(call.chatId)
+
+                if (!isNotificationShown &&
+                    isFakeIncomingCall == null &&
+                    !isPendingHangUpCall
+                ) {
+                    if (isRinging) {
+                        Timber.d("Handle call status change: is incoming call")
+                        incomingCall(
+                            listAllCalls = listAllCalls,
+                            incomingCallChatId = chatId,
+                            callStatus = callStatus,
+                        )
+                    } else {
+                        val chatRoom = megaChatApi.getChatRoom(chatId)
+                        if (chatRoom != null && chatRoom.isGroup && !chatRoom.isMeeting) {
+                            Timber.d("Check if the incoming group call notification should be displayed")
+                            chatManagement.checkActiveGroupChat(chatId)
+                        }
                     }
                 }
             }
@@ -178,7 +273,8 @@ class CallChangesObserver @Inject constructor(
                     chatId = chatId,
                     callId = callId,
                     endCallReason = call.endCallReason,
-                    isIgnored = call.isIgnored
+                    isIgnored = call.isIgnored,
+                    isOutgoing = isOutgoing
                 )
             }
 
@@ -189,17 +285,28 @@ class CallChangesObserver @Inject constructor(
     private suspend fun handleCallRinging(call: ChatCall) {
         val callStatus = call.status
         val isRinging = call.isRinging
+
         val listAllCalls = megaChatApi.chatCalls
         if (listAllCalls == null || listAllCalls.size() == 0L) {
             Timber.e("Calls not found")
             return
         }
-        if (isRinging) {
-            Timber.d("Is incoming call")
-            incomingCall(listAllCalls, call.chatId, callStatus)
-        } else {
-            CallUtil.clearIncomingCallNotification(call.callId)
-            chatManagement.removeValues(call.chatId)
+
+        val isNotificationShown = chatManagement.isNotificationShown(call.chatId)
+        val isFakeIncomingCall = getFakeIncomingCallStateUseCase(call.chatId)
+        val isPendingHangUpCall = isPendingToHangUpUseCase(call.chatId)
+
+        if (!isNotificationShown &&
+            isFakeIncomingCall == null &&
+            !isPendingHangUpCall
+        ) {
+            if (isRinging) {
+                Timber.d("Handle call ringing change: is incoming call")
+                incomingCall(listAllCalls, call.chatId, callStatus)
+            } else {
+                CallUtil.clearIncomingCallNotification(call.callId)
+                chatManagement.removeValues(call.chatId)
+            }
         }
     }
 
@@ -286,7 +393,9 @@ class CallChangesObserver @Inject constructor(
                     if (CallUtil.isOneToOneCall(chatRoom) && openCallChatId != chatRoom.chatId) {
                         Timber.d("Show incoming one to one call screen")
                         val callToLaunch = megaChatApi.getChatCall(chatRoom.chatId)
-                        checkOneToOneIncomingCall(callToLaunch)
+                        checkOneToOneIncomingCall(
+                            callToLaunch = callToLaunch,
+                        )
                         return
                     }
                 }
@@ -304,7 +413,11 @@ class CallChangesObserver @Inject constructor(
                 Timber.d("The call is already opened")
             }
         }
-        callToLaunch?.let { checkOneToOneIncomingCall(it) }
+        callToLaunch?.let {
+            checkOneToOneIncomingCall(
+                callToLaunch = it,
+            )
+        }
     }
 
     /**
@@ -312,7 +425,9 @@ class CallChangesObserver @Inject constructor(
      *
      * @param incomingCallChatId
      */
-    fun checkOneCall(incomingCallChatId: Long) {
+    private fun checkOneCall(incomingCallChatId: Long
+
+    ) {
         Timber.d("One call : Chat ID is $incomingCallChatId, openCall Chat ID is $openCallChatId")
         if (openCallChatId == incomingCallChatId) {
             Timber.d("The call is already opened")
@@ -332,6 +447,13 @@ class CallChangesObserver @Inject constructor(
             Timber.w("Chat room is null")
             return
         }
+        if (!CallUtil.isOneToOneCall(chatRoom) && chatManagement.isOpeningMeetingLink(
+                incomingCallChatId
+            )
+        ) {
+            removeChatOpeningWithLinkUseCase(incomingCallChatId)
+            return
+        }
         if (!CallUtil.isOneToOneCall(chatRoom) && callToLaunch.status == MegaChatCall.CALL_STATUS_USER_NO_PRESENT && callToLaunch.isRinging
             && !chatManagement.isOpeningMeetingLink(incomingCallChatId)
         ) {
@@ -339,7 +461,9 @@ class CallChangesObserver @Inject constructor(
             showOneCallNotification(callToLaunch)
             return
         }
-        checkOneToOneIncomingCall(callToLaunch)
+
+        Timber.d("Check the one-to-one call")
+        checkOneToOneIncomingCall(callToLaunch = callToLaunch)
     }
 
     private fun checkQueuedCalls(incomingCallChatId: Long) {
@@ -356,7 +480,9 @@ class CallChangesObserver @Inject constructor(
      *
      * @param callToLaunch The incoming call
      */
-    private fun checkOneToOneIncomingCall(callToLaunch: MegaChatCall) {
+    private fun checkOneToOneIncomingCall(
+        callToLaunch: MegaChatCall,
+    ) {
         if (shouldNotify(application) && !activityLifecycleHandler.isActivityVisible) {
             initWakeLock()
             Timber.d("The notification should be displayed. Chat ID of incoming call ${callToLaunch.chatid}")
@@ -371,7 +497,7 @@ class CallChangesObserver @Inject constructor(
 
     private fun launchCallActivity(call: MegaChatCall) {
         Timber.d("Show the call screen: ${CallUtil.callStatusToString(call.status)}, callId = ${call.callId}")
-        CallUtil.openMeetingRinging(application, call.chatid, passcodeManagement)
+        CallUtil.openMeetingRinging(application, call.chatid)
     }
 
     /**
@@ -393,6 +519,7 @@ class CallChangesObserver @Inject constructor(
         callId: Long,
         endCallReason: EndCallReason?,
         isIgnored: Boolean,
+        isOutgoing: Boolean,
     ) {
         chatManagement.setOpeningMeetingLink(chatId, false)
         wakeLock?.takeIf { it.isHeld }?.release()
@@ -402,7 +529,7 @@ class CallChangesObserver @Inject constructor(
         chatManagement.setRequestSentCall(callId, false)
 
         try {
-            if (endCallReason == EndCallReason.NoAnswer && !isIgnored && !isRequestSent) {
+            if (endCallReason == EndCallReason.NoAnswer && !isIgnored && !isRequestSent && !isOutgoing) {
                 val chatRoom = megaChatApi.getChatRoom(chatId)
                 if (chatRoom != null
                     && !chatRoom.isGroup
@@ -444,6 +571,8 @@ class CallChangesObserver @Inject constructor(
             return
         }
 
+        chatManagement.addNotificationShown(incomingCallChatId)
+
         val chatRoom = megaChatApi.getChatRoom(incomingCallChatId)
         if (chatRoom == null) {
             Timber.e("The chat does not exist")
@@ -453,7 +582,11 @@ class CallChangesObserver @Inject constructor(
         if (!chatRoom.isMeeting || !chatManagement.isOpeningMeetingLink(incomingCallChatId)) {
             Timber.d("It is necessary to check the number of current calls")
             withContext(mainImmediateDispatcher) {
-                controlNumberOfCalls(listAllCalls, callStatus, incomingCallChatId)
+                controlNumberOfCalls(
+                    listAllCalls = listAllCalls,
+                    callStatus = callStatus,
+                    incomingCallChatId = incomingCallChatId,
+                )
             }
         }
     }
@@ -464,9 +597,14 @@ class CallChangesObserver @Inject constructor(
         incomingCallChatId: Long,
     ) {
         if (listAllCalls.size() == 1L) {
-            checkOneCall(incomingCallChatId)
+            checkOneCall(incomingCallChatId = incomingCallChatId)
         } else {
-            checkSeveralCall(listAllCalls, callStatus, true, incomingCallChatId)
+            checkSeveralCall(
+                listAllCalls = listAllCalls,
+                callStatus = callStatus,
+                isRinging = true,
+                incomingCallChatId = incomingCallChatId,
+            )
         }
     }
 

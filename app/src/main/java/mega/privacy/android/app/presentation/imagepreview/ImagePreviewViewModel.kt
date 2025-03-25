@@ -15,6 +15,7 @@ import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.catch
+import kotlinx.coroutines.flow.collectLatest
 import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.flow.flow
 import kotlinx.coroutines.flow.flowOf
@@ -25,7 +26,6 @@ import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 import mega.privacy.android.app.R
 import mega.privacy.android.app.featuretoggle.ApiFeatures
-import mega.privacy.android.app.featuretoggle.AppFeatures
 import mega.privacy.android.app.main.dialog.removelink.RemovePublicLinkResultMapper
 import mega.privacy.android.app.presentation.imagepreview.fetcher.AlbumContentImageNodeFetcher
 import mega.privacy.android.app.presentation.imagepreview.fetcher.ImageNodeFetcher
@@ -37,6 +37,7 @@ import mega.privacy.android.app.presentation.movenode.mapper.MoveRequestMessageM
 import mega.privacy.android.app.presentation.transfers.starttransfer.model.TransferTriggerEvent
 import mega.privacy.android.domain.entity.GifFileTypeInfo
 import mega.privacy.android.domain.entity.ImageFileTypeInfo
+import mega.privacy.android.domain.entity.VideoFileTypeInfo
 import mega.privacy.android.domain.entity.account.business.BusinessAccountStatus
 import mega.privacy.android.domain.entity.imageviewer.ImageResult
 import mega.privacy.android.domain.entity.node.ImageNode
@@ -59,6 +60,7 @@ import mega.privacy.android.domain.usecase.folderlink.GetPublicChildNodeFromIdUs
 import mega.privacy.android.domain.usecase.imagepreview.ClearImageResultUseCase
 import mega.privacy.android.domain.usecase.imagepreview.GetImageFromFileUseCase
 import mega.privacy.android.domain.usecase.imagepreview.GetImageUseCase
+import mega.privacy.android.domain.usecase.network.MonitorConnectivityUseCase
 import mega.privacy.android.domain.usecase.node.AddImageTypeUseCase
 import mega.privacy.android.domain.usecase.node.CheckChatNodesNameCollisionAndCopyUseCase
 import mega.privacy.android.domain.usecase.node.CheckNodesNameCollisionWithActionUseCase
@@ -107,6 +109,7 @@ class ImagePreviewViewModel @Inject constructor(
     private val monitorShowHiddenItemsUseCase: MonitorShowHiddenItemsUseCase,
     private val clearImageResultUseCase: ClearImageResultUseCase,
     private val getBusinessStatusUseCase: GetBusinessStatusUseCase,
+    private val monitorConnectivityUseCase: MonitorConnectivityUseCase,
     @DefaultDispatcher private val defaultDispatcher: CoroutineDispatcher,
 ) : ViewModel() {
     private val imagePreviewFetcherSource: ImagePreviewFetcherSource
@@ -127,12 +130,13 @@ class ImagePreviewViewModel @Inject constructor(
 
     private val _state = MutableStateFlow(ImagePreviewState())
 
-    val state: StateFlow<ImagePreviewState> = _state
+    internal val state: StateFlow<ImagePreviewState> = _state
 
     private val menu: ImagePreviewMenu?
         get() = imagePreviewMenuMap[imagePreviewMenuSource]
 
     init {
+        monitorConnectivity()
         viewModelScope.launch {
             if (isHiddenNodesActive()) {
                 handleInitFlow()
@@ -140,6 +144,14 @@ class ImagePreviewViewModel @Inject constructor(
                 monitorImageNodes()
             }
             monitorOfflineNodeUpdates()
+        }
+    }
+
+    private fun monitorConnectivity() {
+        viewModelScope.launch {
+            monitorConnectivityUseCase()
+                .catch { Timber.e(it) }
+                .collectLatest { isOnline -> _state.update { it.copy(isOnline = isOnline) } }
         }
     }
 
@@ -328,7 +340,7 @@ class ImagePreviewViewModel @Inject constructor(
     }
 
     suspend fun isSendToChatMenuVisible(imageNode: ImageNode): Boolean {
-        return menu?.isSendToChatMenuVisible(imageNode) ?: false
+        return menu?.isSendToChatMenuVisible(imageNode) ?: false && state.value.isOnline
     }
 
     suspend fun isShareMenuVisible(imageNode: ImageNode): Boolean {
@@ -385,6 +397,11 @@ class ImagePreviewViewModel @Inject constructor(
         return menu?.isMoveToRubbishBinMenuVisible(imageNode) ?: false
     }
 
+    suspend fun isAddToAlbumMenuVisible(imageNode: ImageNode): Boolean {
+        return (savedStateHandle[IMAGE_PREVIEW_ADD_TO_ALBUM] ?: false) &&
+                (imageNode.type is ImageFileTypeInfo || imageNode.type is VideoFileTypeInfo)
+    }
+
     suspend fun isMagnifierMenuVisible(imageNode: ImageNode): Boolean {
         return Build.VERSION.SDK_INT >= 28
                 && imageNode.type is ImageFileTypeInfo
@@ -413,6 +430,16 @@ class ImagePreviewViewModel @Inject constructor(
         _state.update {
             it.copy(
                 inFullScreenMode = !inFullScreenMode,
+            )
+        }
+    }
+
+    fun setFullScreenMode(
+        isFullScreenMode: Boolean
+    ) {
+        _state.update {
+            it.copy(
+                inFullScreenMode = isFullScreenMode,
             )
         }
     }
@@ -451,13 +478,27 @@ class ImagePreviewViewModel @Inject constructor(
      */
     fun executeTransfer(downloadForPreview: Boolean = false) {
         viewModelScope.launch {
-            triggerDownloadEvent(
-                imageNode = _state.value.currentImageNode,
-            ) {
-                if (downloadForPreview) {
-                    TransferTriggerEvent.StartDownloadForPreview(it)
-                } else {
-                    TransferTriggerEvent.StartDownloadNode(listOf(it))
+            if (isInOfflineMode()) {
+                _state.value.currentImageNode?.let { node ->
+                    _state.update {
+                        it.copy(
+                            downloadEvent = triggered(
+                                TransferTriggerEvent.CopyOfflineNode(listOf(node.id))
+                            )
+                        )
+                    }
+                } ?: run {
+                    Timber.e("Current Image node not found")
+                }
+            } else {
+                triggerDownloadEvent(
+                    imageNode = _state.value.currentImageNode,
+                ) {
+                    if (downloadForPreview) {
+                        TransferTriggerEvent.StartDownloadForPreview(node = it, isOpenWith = false)
+                    } else {
+                        TransferTriggerEvent.StartDownloadNode(listOf(it))
+                    }
                 }
             }
         }
@@ -831,11 +872,18 @@ class ImagePreviewViewModel @Inject constructor(
 
     fun clearImageResultCache() = clearImageResultUseCase(false)
 
+    /**
+     * Check if the current image is in offline mode when opened from offline source
+     */
+    fun isInOfflineMode() =
+        imagePreviewFetcherSource == ImagePreviewFetcherSource.OFFLINE && !state.value.isOnline
+
     companion object {
         const val IMAGE_NODE_FETCHER_SOURCE = "image_node_fetcher_source"
         const val IMAGE_PREVIEW_MENU_OPTIONS = "image_preview_menu_options"
         const val FETCHER_PARAMS = "fetcher_params"
         const val PARAMS_CURRENT_IMAGE_NODE_ID_VALUE = "currentImageNodeIdValue"
         const val IMAGE_PREVIEW_IS_FOREIGN = "image_preview_is_foreign"
+        const val IMAGE_PREVIEW_ADD_TO_ALBUM = "image_preview_add_to_album"
     }
 }

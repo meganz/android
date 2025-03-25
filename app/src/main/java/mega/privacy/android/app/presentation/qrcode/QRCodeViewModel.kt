@@ -1,11 +1,13 @@
 package mega.privacy.android.app.presentation.qrcode
 
+import mega.privacy.android.shared.resources.R as sharedR
 import android.content.Context
 import androidx.compose.ui.unit.sp
 import androidx.core.net.toUri
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import dagger.hilt.android.lifecycle.HiltViewModel
+import dagger.hilt.android.qualifiers.ApplicationContext
 import de.palm.composestateevents.consumed
 import de.palm.composestateevents.triggered
 import kotlinx.coroutines.Dispatchers
@@ -19,8 +21,8 @@ import mega.privacy.android.app.middlelayer.scanner.ScannerHandler
 import mega.privacy.android.app.presentation.avatar.mapper.AvatarContentMapper
 import mega.privacy.android.app.presentation.extensions.getState
 import mega.privacy.android.app.presentation.qrcode.mapper.MyQRCodeTextErrorMapper
-import mega.privacy.android.app.presentation.qrcode.model.QRCodeUIState
 import mega.privacy.android.app.presentation.qrcode.model.BarcodeScanResult
+import mega.privacy.android.app.presentation.qrcode.model.QRCodeUIState
 import mega.privacy.android.app.presentation.qrcode.mycode.model.MyCodeUIState
 import mega.privacy.android.app.presentation.transfers.starttransfer.model.TransferTriggerEvent
 import mega.privacy.android.app.service.scanner.BarcodeScannerModuleIsNotInstalled
@@ -79,6 +81,7 @@ class QRCodeViewModel @Inject constructor(
     private val getRootNodeUseCase: GetRootNodeUseCase,
     private val monitorStorageStateEventUseCase: MonitorStorageStateEventUseCase,
     private val checkFileNameCollisionsUseCase: CheckFileNameCollisionsUseCase,
+    @ApplicationContext private val context: Context,
 ) : ViewModel() {
 
     private val _uiState = MutableStateFlow(QRCodeUIState())
@@ -451,7 +454,11 @@ class QRCodeViewModel @Inject constructor(
                 uploadEvent = triggered(
                     TransferTriggerEvent.StartUpload.Files(
                         mapOf(qrFile.absolutePath to null),
-                        NodeId(parentHandle)
+                        NodeId(parentHandle),
+                        specificStartMessage = context.getString(
+                            sharedR.string.transfers_start_upload_profile_qr_code_message,
+                            qrFile.name,
+                        )
                     )
                 )
             )

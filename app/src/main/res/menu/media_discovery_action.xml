@@ -76,6 +76,24 @@
         app:showAsAction="never" />
 
     <item
+        android:id="@+id/cab_menu_add_to_album"
+        android:icon="@drawable/ic_add_to_album"
+        android:orderInCategory="215"
+        android:title="@string/album_add_to_image"
+        android:visible="false"
+        app:iconTint="?attr/colorSecondary"
+        app:showAsAction="never" />
+
+    <item
+        android:id="@+id/cab_menu_add_to"
+        android:icon="@drawable/ic_add_to_album"
+        android:orderInCategory="220"
+        android:title="@string/album_add_to_media"
+        android:visible="false"
+        app:iconTint="?attr/colorSecondary"
+        app:showAsAction="never" />
+
+    <item
         android:id="@+id/cab_menu_trash"
         android:icon="@drawable/ic_x_medium_regular_outline"
         android:orderInCategory="230"

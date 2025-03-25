@@ -8,7 +8,7 @@ import mega.privacy.android.core.R
 import mega.privacy.android.shared.original.core.ui.controls.chip.ChipBar
 import mega.privacy.android.shared.original.core.ui.controls.chip.MegaChip
 import mega.privacy.android.shared.original.core.ui.preview.CombinedThemePreviews
-import mega.privacy.android.shared.original.core.ui.theme.OriginalTempTheme
+import mega.privacy.android.shared.original.core.ui.theme.OriginalTheme
 
 @Composable
 internal fun DropdownChipToolbar(
@@ -79,7 +79,7 @@ data class ChipItem(
 @CombinedThemePreviews
 @Composable
 private fun DropdownChipToolbarPreview() {
-    OriginalTempTheme(isDark = isSystemInDarkTheme()) {
+    OriginalTheme(isDark = isSystemInDarkTheme()) {
         DropdownChipToolbar(
             listOf(
                 ChipItem(

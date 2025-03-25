@@ -1,8 +1,8 @@
 package mega.privacy.android.domain.usecase.transfers.downloads
 
 import kotlinx.coroutines.test.runTest
-import mega.privacy.android.domain.entity.node.NodeId
 import mega.privacy.android.domain.entity.transfer.Transfer
+import mega.privacy.android.domain.entity.transfer.TransferAppData
 import mega.privacy.android.domain.entity.transfer.TransferEvent
 import mega.privacy.android.domain.entity.transfer.TransferType
 import mega.privacy.android.domain.exception.MegaException
@@ -51,7 +51,20 @@ class HandleAvailableOfflineEventUseCaseTest {
     }
 
     @Test
-    fun `test that offline node information is saved when a finish event for an offline download transfer is received`() =
+    fun `test that offline node information is saved when a finish event for an offline download root transfer is received`() =
+        runTest {
+            val transfer = mockTransfer(TransferAppData.OfflineDownload)
+            val event = mock<TransferEvent.TransferFinishEvent> {
+                on { it.transfer } doReturn transfer
+            }
+
+            underTest(event)
+
+            verify(saveOfflineNodeInformationUseCase).invoke(event)
+        }
+
+    @Test
+    fun `test that offline node information is saved when a finish event for an offline download not root transfer is received`() =
         runTest {
             val transfer = mockTransfer()
             val event = mock<TransferEvent.TransferFinishEvent> {
@@ -78,22 +91,24 @@ class HandleAvailableOfflineEventUseCaseTest {
             verifyNoInteractions(saveOfflineNodeInformationUseCase)
         }
 
-    private fun mockTransfer() = mock<Transfer> {
-        on { it.nodeHandle } doReturn nodeId
-        on { it.transferType } doReturn TransferType.DOWNLOAD
-        on { it.fileName } doReturn name
-    }
+    private fun mockTransfer(appData: TransferAppData? = null, isRoot: Boolean = false) =
+        mock<Transfer> {
+            on { it.nodeHandle } doReturn nodeId
+            on { it.transferType } doReturn TransferType.DOWNLOAD
+            on { it.fileName } doReturn name
+            on { it.appData } doReturn listOfNotNull(appData)
+            on { it.isRootTransfer } doReturn isRoot
+        }
 
     @Test
     fun `test that offline node information is not invoked when a finish event with error is received`() =
         runTest {
-            val transfer = mockTransfer()
+            val transfer = mockTransfer(TransferAppData.OfflineDownload)
             val error = mock<MegaException>()
             val event = mock<TransferEvent.TransferFinishEvent> {
                 on { it.transfer } doReturn transfer
                 on { it.error } doReturn error
             }
-            whenever(isOfflineTransferUseCase(transfer)) doReturn true
 
             underTest(event)
 
@@ -101,7 +116,7 @@ class HandleAvailableOfflineEventUseCaseTest {
         }
 
     @ParameterizedTest
-    @MethodSource("provideNotFinishEvents")
+    @MethodSource("provideNotFinishOfflineEvents")
     fun `test that offline node information is not invoked when is not a finish event`(
         event: TransferEvent,
     ) =
@@ -117,20 +132,19 @@ class HandleAvailableOfflineEventUseCaseTest {
     @Test
     fun `test that broadcastOfflineFileAvailabilityUseCase is invoked when a finish event for an offline download transfer is received`() =
         runTest {
-            val transfer = mockTransfer()
+            val transfer = mockTransfer(TransferAppData.OfflineDownload)
             val event = mock<TransferEvent.TransferFinishEvent> {
                 on { it.transfer } doReturn transfer
             }
-            whenever(isOfflineTransferUseCase(transfer)) doReturn true
 
             underTest(event)
 
             verify(broadcastOfflineFileAvailabilityUseCase).invoke(nodeId)
         }
 
-    private fun provideNotFinishEvents(): List<TransferEvent> {
+    private fun provideNotFinishOfflineEvents(): List<TransferEvent> {
 
-        val transfer = mockTransfer()
+        val transfer = mockTransfer(TransferAppData.OfflineDownload)
         return listOf(
             mock<TransferEvent.TransferStartEvent> {
                 on { it.transfer } doReturn transfer

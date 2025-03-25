@@ -197,7 +197,7 @@ public class ChatExplorerFragment extends Fragment implements CheckScrollInterfa
         emptyTextView.setLayoutParams(emptyTextViewParams2);
 
         emptyImageView = v.findViewById(R.id.empty_image_view_recent);
-        emptyImageView.setImageResource(R.drawable.empty_chat_message_portrait);
+        emptyImageView.setImageResource(mega.privacy.android.icon.pack.R.drawable.ic_message_chat_glass);
 
         megaChatApi.signalPresenceActivity();
 
@@ -634,6 +634,10 @@ public class ChatExplorerFragment extends Fragment implements CheckScrollInterfa
         adapterAdded = null;
 
         viewModel.clearSelections();
+    }
+
+    public boolean isSelectMode() {
+        return !viewModel.getUiState().getValue().getSelectedItems().isEmpty();
     }
 
     public void search(String s) {

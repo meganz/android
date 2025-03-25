@@ -38,6 +38,7 @@ import mega.privacy.android.domain.exception.QuotaExceededMegaException
 import mega.privacy.android.domain.exception.node.ForeignNodeException
 import mega.privacy.android.domain.usecase.HasCredentialsUseCase
 import mega.privacy.android.domain.usecase.RootNodeExistsUseCase
+import mega.privacy.android.domain.usecase.advertisements.QueryAdsUseCase
 import mega.privacy.android.domain.usecase.filelink.GetFileUrlByPublicLinkUseCase
 import mega.privacy.android.domain.usecase.filelink.GetPublicNodeUseCase
 import mega.privacy.android.domain.usecase.mediaplayer.MegaApiHttpServerIsRunningUseCase
@@ -48,6 +49,7 @@ import mega.privacy.android.domain.usecase.node.GetNodePreviewFileUseCase
 import mega.privacy.android.domain.usecase.node.publiclink.CheckPublicNodesNameCollisionUseCase
 import mega.privacy.android.domain.usecase.node.publiclink.CopyPublicNodeUseCase
 import mega.privacy.android.domain.usecase.node.publiclink.MapNodeToPublicLinkUseCase
+import mega.privacy.android.domain.usecase.setting.MonitorMiscLoadedUseCase
 import mega.privacy.android.navigation.MegaNavigator
 import timber.log.Timber
 import java.io.File
@@ -55,6 +57,8 @@ import javax.inject.Inject
 
 /**
  * View Model class for [mega.privacy.android.app.presentation.filelink.FileLinkComposeActivity]
+ *
+ * @param monitorMiscLoadedUseCase Use case to monitor when misc data is loaded
  */
 @HiltViewModel
 class FileLinkViewModel @Inject constructor(
@@ -73,6 +77,8 @@ class FileLinkViewModel @Inject constructor(
     private val megaNavigator: MegaNavigator,
     private val nodeContentUriIntentMapper: NodeContentUriIntentMapper,
     private val getNodePreviewFileUseCase: GetNodePreviewFileUseCase,
+    val monitorMiscLoadedUseCase: MonitorMiscLoadedUseCase,
+    private val queryAdsUseCase: QueryAdsUseCase,
 ) : ViewModel() {
 
     private val _state = MutableStateFlow(FileLinkState())
@@ -137,6 +143,7 @@ class FileLinkViewModel @Inject constructor(
                 _state.update {
                     it.copyWithTypedNode(node, iconResource)
                 }
+                queryAds(node.id.longValue)
                 resetJobInProgressState()
             }
             .onFailure { exception ->
@@ -145,7 +152,7 @@ class FileLinkViewModel @Inject constructor(
                     is PublicNodeException.InvalidDecryptionKey -> {
                         if (decryptionIntroduced) {
                             Timber.w("Incorrect key, ask again!")
-                            _state.update { it.copy(askForDecryptionDialog = true) }
+                            _state.update { it.copy(askForDecryptionKeyDialogEvent = triggered) }
                         } else {
                             _state.update {
                                 it.copy(fetchPublicNodeError = exception)
@@ -154,7 +161,7 @@ class FileLinkViewModel @Inject constructor(
                     }
 
                     is PublicNodeException.DecryptionKeyRequired -> {
-                        _state.update { it.copy(askForDecryptionDialog = true) }
+                        _state.update { it.copy(askForDecryptionKeyDialogEvent = triggered) }
                     }
 
                     else -> {
@@ -164,6 +171,18 @@ class FileLinkViewModel @Inject constructor(
                     }
                 }
             }
+    }
+
+    private fun queryAds(handle: Long) {
+        viewModelScope.launch {
+            runCatching {
+                queryAdsUseCase(handle)
+            }.onSuccess { value ->
+                _state.update { it.copy(shouldShowAdsForLink = value) }
+            }.onFailure {
+                Timber.e(it)
+            }
+        }
     }
 
     /**
@@ -243,7 +262,10 @@ class FileLinkViewModel @Inject constructor(
                 copy(targetHandle)
             } else if (result.conflictNodes.isNotEmpty()) {
                 _state.update {
-                    it.copy(collision = result.conflictNodes.first(), jobInProgressState = null)
+                    it.copy(
+                        collisionsEvent = triggered(result.conflictNodes.first()),
+                        jobInProgressState = null
+                    )
                 }
             }
         }.onFailure { throwable ->
@@ -260,7 +282,14 @@ class FileLinkViewModel @Inject constructor(
             return@launch
         }
         runCatching { copyPublicNodeUseCase(fileNode, NodeId(targetHandle), null) }
-            .onSuccess { _state.update { it.copy(copySuccess = true, jobInProgressState = null) } }
+            .onSuccess {
+                _state.update {
+                    it.copy(
+                        copySuccessEvent = triggered,
+                        jobInProgressState = null
+                    )
+                }
+            }
             .onFailure { copyThrowable ->
                 resetJobInProgressState()
                 handleCopyError(copyThrowable)
@@ -313,14 +342,21 @@ class FileLinkViewModel @Inject constructor(
      * Reset collision
      */
     fun resetCollision() {
-        _state.update { it.copy(collision = null) }
+        _state.update { it.copy(collisionsEvent = consumed()) }
     }
 
     /**
      * Reset the askForDecryptionKeyDialog boolean
      */
     fun resetAskForDecryptionKeyDialog() {
-        _state.update { it.copy(askForDecryptionDialog = false) }
+        _state.update { it.copy(askForDecryptionKeyDialogEvent = consumed) }
+    }
+
+    /**
+     * Reset the copySuccessEvent when consumed
+     */
+    fun resetCopySuccessEvent() {
+        _state.update { it.copy(copySuccessEvent = consumed) }
     }
 
     /**
@@ -345,7 +381,7 @@ class FileLinkViewModel @Inject constructor(
             runCatching {
                 with(state.value) {
                     pdfIntent.apply {
-                        flags = Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_CLEAR_TASK
+                        flags = Intent.FLAG_ACTIVITY_NEW_TASK
 
                         putExtra(Constants.INTENT_EXTRA_KEY_HANDLE, handle)
                         putExtra(Constants.INTENT_EXTRA_KEY_FILE_NAME, title)
@@ -529,7 +565,12 @@ class FileLinkViewModel @Inject constructor(
         }.onSuccess { linkNode ->
             _state.update {
                 it.copy(
-                    downloadEvent = triggered(TransferTriggerEvent.StartDownloadForPreview(linkNode))
+                    downloadEvent = triggered(
+                        TransferTriggerEvent.StartDownloadForPreview(
+                            node = linkNode,
+                            isOpenWith = false
+                        )
+                    )
                 )
             }
         }.onFailure {

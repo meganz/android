@@ -1,5 +1,4 @@
 import mega.privacy.android.build.preBuiltSdkDependency
-import mega.privacy.android.build.shouldApplyDefaultConfiguration
 
 plugins {
     alias(convention.plugins.mega.android.library)
@@ -10,6 +9,7 @@ plugins {
     alias(convention.plugins.mega.android.hilt)
     alias(plugin.plugins.de.mannodermaus.android.junit5)
     id("kotlin-android")
+    id("kotlin-kapt")
     kotlin("plugin.serialization") version "1.9.21"
 }
 
@@ -60,11 +60,6 @@ dependencies {
     implementation(androidx.paging)
     implementation(androidx.documentfile)
 
-    if (shouldApplyDefaultConfiguration(project)) {
-        kapt(google.autovalue)
-    }
-    implementation(google.autovalue.annotations)
-
     implementation(lib.billing.client.ktx)
 
     implementation(platform(google.firebase.bom))
@@ -72,8 +67,9 @@ dependencies {
 
     // Logging
     implementation(lib.bundles.logging)
+    // sqlcipherlib
+    api(project(":android-database-sqlcipher"))
 
-    implementation(lib.sqlcipher)
     implementation(androidx.security.crypto)
     implementation(google.tink)
 

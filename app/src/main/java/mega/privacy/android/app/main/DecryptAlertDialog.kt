@@ -194,7 +194,7 @@ class DecryptAlertDialog : DialogFragment() {
         }
         binding.errorText.setText(errorStringId)
         if (key.isNullOrEmpty()) {
-            editor.hint = getString(R.string.password_text)
+            editor.hint = getString(mega.privacy.android.shared.resources.R.string.password_text)
             editor.setTextColor(
                 getThemeColor(
                     requireContext(),

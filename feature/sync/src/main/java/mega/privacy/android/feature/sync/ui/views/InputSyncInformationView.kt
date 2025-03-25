@@ -24,7 +24,7 @@ import androidx.compose.ui.tooling.preview.PreviewParameterProvider
 import androidx.compose.ui.unit.dp
 import mega.privacy.android.domain.entity.sync.SyncType
 import mega.privacy.android.icon.pack.R as iconPackR
-import mega.privacy.android.shared.original.core.ui.theme.values.TextColor
+import mega.android.core.ui.theme.values.TextColor
 import mega.privacy.android.feature.sync.R
 import mega.privacy.android.feature.sync.ui.newfolderpair.SyncNewFolderScreen
 import mega.privacy.android.shared.original.core.ui.controls.cards.MegaCardWithHeader
@@ -32,9 +32,10 @@ import mega.privacy.android.shared.original.core.ui.controls.dividers.DividerTyp
 import mega.privacy.android.shared.original.core.ui.controls.dividers.MegaDivider
 import mega.privacy.android.shared.original.core.ui.controls.text.MegaText
 import mega.privacy.android.shared.original.core.ui.preview.CombinedThemePreviews
-import mega.privacy.android.shared.original.core.ui.theme.OriginalTempTheme
+import mega.privacy.android.shared.original.core.ui.theme.OriginalTheme
 import mega.privacy.android.shared.original.core.ui.theme.extensions.textColorSecondary
 import mega.privacy.android.shared.resources.R as sharedResR
+import androidx.compose.ui.platform.testTag
 
 @Composable
 internal fun InputSyncInformationView(
@@ -45,7 +46,7 @@ internal fun InputSyncInformationView(
     selectedDeviceFolder: String = "",
     selectedMegaFolder: String = "",
 ) {
-    Column(modifier = Modifier.padding(top = 16.dp, start = 16.dp, end = 16.dp, bottom = 48.dp)) {
+    Column(modifier = Modifier.padding(top = 8.dp, start = 16.dp, end = 16.dp, bottom = 16.dp)) {
         MegaCardWithHeader(
             header = {
                 Header(
@@ -68,7 +69,9 @@ internal fun InputSyncInformationView(
                     },
                     bottomText = selectedDeviceFolder.substring(selectedDeviceFolder.lastIndexOf('/') + 1),
                     bottomDefaultText = stringResource(R.string.sync_general_select),
-                    modifier = Modifier.clickable { selectDeviceFolderClicked() }
+                    modifier = Modifier
+                        .clickable { selectDeviceFolderClicked() }
+                        .testTag(SELECT_DEVICE_FOLDER_OPTION_TEST_TAG)
                 )
 
                 MegaDivider(dividerType = DividerType.Centered)
@@ -178,7 +181,7 @@ private fun TwoLinesItem(
 private fun EmptyInputSyncInformationViewPreview(
     @PreviewParameter(SyncTypePreviewProvider::class) syncType: SyncType
 ) {
-    OriginalTempTheme(isDark = isSystemInDarkTheme()) {
+    OriginalTheme(isDark = isSystemInDarkTheme()) {
         InputSyncInformationView(
             syncType = syncType,
             deviceName = "Device Name",
@@ -193,7 +196,7 @@ private fun EmptyInputSyncInformationViewPreview(
 private fun InputSyncInformationViewPreview(
     @PreviewParameter(SyncTypePreviewProvider::class) syncType: SyncType
 ) {
-    OriginalTempTheme(isDark = isSystemInDarkTheme()) {
+    OriginalTheme(isDark = isSystemInDarkTheme()) {
         InputSyncInformationView(
             syncType = syncType,
             deviceName = "Device Name",
@@ -211,3 +214,8 @@ private fun InputSyncInformationViewPreview(
 internal class SyncTypePreviewProvider : PreviewParameterProvider<SyncType> {
     override val values = sequenceOf(SyncType.TYPE_TWOWAY, SyncType.TYPE_BACKUP)
 }
+
+/**
+ * Multi FAB main button's test tag
+ */
+const val SELECT_DEVICE_FOLDER_OPTION_TEST_TAG = "input_sync_info_view:select_device_folder_option"

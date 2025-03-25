@@ -26,7 +26,7 @@ import coil.request.ImageRequest
 import mega.privacy.android.core.R
 import mega.privacy.android.shared.original.core.ui.controls.lists.GenericTwoLineListItem
 import mega.privacy.android.shared.original.core.ui.preview.CombinedThemePreviews
-import mega.privacy.android.shared.original.core.ui.theme.OriginalTempTheme
+import mega.privacy.android.shared.original.core.ui.theme.OriginalTheme
 
 /**
  * The media queue item view
@@ -56,6 +56,7 @@ fun MediaQueueItemView(
     isItemPlaying: Boolean = false,
     isReorderEnabled: Boolean = true,
     isSelected: Boolean = false,
+    isAudio: Boolean = false,
 ) {
     GenericTwoLineListItem(
         title = name,
@@ -79,7 +80,7 @@ fun MediaQueueItemView(
             )
         },
         trailingIcons = {
-            if (!isItemPlaying && isReorderEnabled) {
+            if (!isItemPlaying && isReorderEnabled && !isAudio) {
                 Image(
                     modifier = Modifier
                         .padding(end = 12.dp)
@@ -154,7 +155,7 @@ private fun QueueThumbnailView(
 @CombinedThemePreviews
 @Composable
 private fun MediaQueueItemInfoViewWithPausedPreview() {
-    OriginalTempTheme(isDark = isSystemInDarkTheme()) {
+    OriginalTheme(isDark = isSystemInDarkTheme()) {
         MediaQueueItemView(
             icon = iconPackR.drawable.ic_audio_medium_solid,
             onClick = {},
@@ -172,7 +173,7 @@ private fun MediaQueueItemInfoViewWithPausedPreview() {
 @CombinedThemePreviews
 @Composable
 private fun MediaQueueItemInfoViewWithSelectedPreview() {
-    OriginalTempTheme(isDark = isSystemInDarkTheme()) {
+    OriginalTheme(isDark = isSystemInDarkTheme()) {
         MediaQueueItemView(
             icon = iconPackR.drawable.ic_video_medium_solid,
             onClick = {},
@@ -188,16 +189,34 @@ private fun MediaQueueItemInfoViewWithSelectedPreview() {
 
 @CombinedThemePreviews
 @Composable
-private fun MediaQueueItemInfoViewPreview() {
-    OriginalTempTheme(isDark = isSystemInDarkTheme()) {
+private fun VideoQueueItemInfoViewPreview() {
+    OriginalTheme(isDark = isSystemInDarkTheme()) {
         MediaQueueItemView(
-            icon = iconPackR.drawable.ic_audio_medium_solid,
+            icon = iconPackR.drawable.ic_video_medium_solid,
             onClick = {},
             thumbnailData = null,
             modifier = Modifier,
             name = "Video name",
             currentPlayingPosition = "",
             duration = "14:00",
+            isReorderEnabled = true
+        )
+    }
+}
+
+@CombinedThemePreviews
+@Composable
+private fun AudioQueueItemInfoViewPreview() {
+    OriginalTheme(isDark = isSystemInDarkTheme()) {
+        MediaQueueItemView(
+            icon = iconPackR.drawable.ic_audio_medium_solid,
+            onClick = {},
+            thumbnailData = null,
+            modifier = Modifier,
+            name = "Audio name",
+            currentPlayingPosition = "",
+            duration = "14:00",
+            isAudio = true,
         )
     }
 }

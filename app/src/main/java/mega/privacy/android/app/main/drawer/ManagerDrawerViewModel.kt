@@ -9,9 +9,9 @@ import kotlinx.coroutines.flow.catch
 import kotlinx.coroutines.flow.onEach
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
-import mega.privacy.android.app.domain.usecase.GetBackupsNode
 import mega.privacy.android.app.presentation.extensions.getState
 import mega.privacy.android.domain.entity.StorageState
+import mega.privacy.android.domain.entity.node.NodeId
 import mega.privacy.android.domain.entity.verification.UnVerified
 import mega.privacy.android.domain.usecase.HasBackupsChildren
 import mega.privacy.android.domain.usecase.RootNodeExistsUseCase
@@ -19,9 +19,11 @@ import mega.privacy.android.domain.usecase.account.MonitorMyAccountUpdateUseCase
 import mega.privacy.android.domain.usecase.account.MonitorStorageStateEventUseCase
 import mega.privacy.android.domain.usecase.chat.GetCurrentUserStatusUseCase
 import mega.privacy.android.domain.usecase.contact.MonitorMyChatOnlineStatusUseCase
+import mega.privacy.android.domain.usecase.login.MonitorFetchNodesFinishUseCase
 import mega.privacy.android.domain.usecase.network.IsConnectedToInternetUseCase
 import mega.privacy.android.domain.usecase.network.MonitorConnectivityUseCase
 import mega.privacy.android.domain.usecase.node.MonitorNodeUpdatesUseCase
+import mega.privacy.android.domain.usecase.node.backup.GetBackupsNodeUseCase
 import mega.privacy.android.domain.usecase.notifications.GetEnabledNotificationsUseCase
 import mega.privacy.android.domain.usecase.verification.MonitorVerificationStatus
 import timber.log.Timber
@@ -33,13 +35,14 @@ internal class ManagerDrawerViewModel @Inject constructor(
     private val monitorStorageStateEventUseCase: MonitorStorageStateEventUseCase,
     private val getCurrentUserStatusUseCase: GetCurrentUserStatusUseCase,
     private val hasBackupsChildren: HasBackupsChildren,
-    private val getBackupsNode: GetBackupsNode,
+    private val getBackupsNodeUseCase: GetBackupsNodeUseCase,
     private val monitorNodeUpdatesUseCase: MonitorNodeUpdatesUseCase,
     private val monitorMyChatOnlineStatusUseCase: MonitorMyChatOnlineStatusUseCase,
     private val monitorVerificationStatus: MonitorVerificationStatus,
     private val rootNodeExistsUseCase: RootNodeExistsUseCase,
     private val monitorConnectivityUseCase: MonitorConnectivityUseCase,
     private val getEnabledNotificationsUseCase: GetEnabledNotificationsUseCase,
+    private val monitorFetchNodesFinishUseCase: MonitorFetchNodesFinishUseCase,
     monitorMyAccountUpdateUseCase: MonitorMyAccountUpdateUseCase,
 ) : ViewModel() {
     private val _state = MutableStateFlow(ManagerDrawerUiState())
@@ -71,6 +74,7 @@ internal class ManagerDrawerViewModel @Inject constructor(
         observerVerificationStatus()
         observerConnectivityEvent()
         shouldShowPromoTag()
+        monitorFetchNodesFinish()
     }
 
     private fun observerConnectivityEvent() {
@@ -111,10 +115,10 @@ internal class ManagerDrawerViewModel @Inject constructor(
     private fun monitorNodeUpdatesEvent() {
         viewModelScope.launch {
             monitorNodeUpdatesUseCase().collect { updatedNodes ->
-                val backupsNode = state.value.backUpNodeHandle
-                if (backupsNode != -1L) {
-                    // Check if the back up node is updated
-                    updatedNodes.changes.keys.find { backupsNode == it.parentId.longValue }
+                val backupsNodeHandle = state.value.backupsNodeHandle
+                if (backupsNodeHandle != NodeId(-1L)) {
+                    // Check if the backups node is updated
+                    updatedNodes.changes.keys.find { backupsNodeHandle == it.parentId }
                         ?.run { checkBackupChildren() }
                 }
             }
@@ -136,9 +140,9 @@ internal class ManagerDrawerViewModel @Inject constructor(
     private fun loadBackupNode() {
         viewModelScope.launch {
             runCatching {
-                getBackupsNode()
-            }.onSuccess { node ->
-                _state.update { it.copy(backUpNodeHandle = node?.handle ?: -1L) }
+                getBackupsNodeUseCase()
+            }.onSuccess { backupsNode ->
+                _state.update { it.copy(backupsNodeHandle = backupsNode?.id ?: NodeId(-1L)) }
             }.onFailure {
                 Timber.e(it)
             }
@@ -171,6 +175,14 @@ internal class ManagerDrawerViewModel @Inject constructor(
                 val promoNotificationCount = getEnabledNotificationsUseCase().size
                 _state.update { it.copy(showPromoTag = promoNotificationCount > 0) }
             }
+        }
+    }
+
+    private fun monitorFetchNodesFinish() {
+        viewModelScope.launch {
+            monitorFetchNodesFinishUseCase()
+                .catch { Timber.e(it) }
+                .collect { checkRootNode() }
         }
     }
 }

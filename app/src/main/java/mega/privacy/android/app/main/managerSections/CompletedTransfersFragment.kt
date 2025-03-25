@@ -38,11 +38,6 @@ class CompletedTransfersFragment : TransfersBaseFragment() {
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
-        binding.transfersEmptyImage.setImageResource(
-            if (Util.isScreenInPortrait(requireContext())) {
-                R.drawable.empty_transfer_portrait
-            } else R.drawable.empty_transfer_landscape
-        )
 
         binding.transfersEmptyText.text = TextUtil.formatEmptyScreenText(
             requireContext(),
@@ -54,10 +49,8 @@ class CompletedTransfersFragment : TransfersBaseFragment() {
     }
 
     private fun setupFlow() {
-        viewLifecycleOwner.collectFlow(viewModel.failedTransfer) { isFailed ->
-            if (isFailed) {
-                requireActivity().invalidateOptionsMenu()
-            }
+        viewLifecycleOwner.collectFlow(viewModel.failedTransfer) {
+            requireActivity().invalidateOptionsMenu()
         }
         viewLifecycleOwner.collectFlow(viewModel.completedTransfers) { completedTransfers ->
             adapter.submitList(completedTransfers) {

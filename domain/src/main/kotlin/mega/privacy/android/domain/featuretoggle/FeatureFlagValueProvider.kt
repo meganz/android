@@ -14,4 +14,9 @@ interface FeatureFlagValueProvider {
      * @return Whether the feature is enabled or null if not set or found
      */
     suspend fun isEnabled(feature: Feature): Boolean?
+
+    /**
+     * Priority
+     */
+    val priority: FeatureFlagValuePriority
 }

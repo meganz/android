@@ -1,18 +1,20 @@
 package mega.privacy.android.feature.devicecenter.ui
 
+import mega.privacy.android.icon.pack.R as IconPackR
+import mega.privacy.android.shared.resources.R as sharedR
 import androidx.annotation.DrawableRes
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.isSystemInDarkTheme
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.WindowInsets
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.MaterialTheme
-import androidx.compose.material.Scaffold
 import androidx.compose.material.rememberScaffoldState
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
@@ -26,18 +28,17 @@ import androidx.compose.ui.res.pluralStringResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.intl.Locale
 import androidx.compose.ui.unit.dp
+import mega.android.core.ui.theme.values.TextColor
 import mega.privacy.android.core.formatter.formatFileSize
 import mega.privacy.android.core.formatter.formatModifiedDate
+import mega.privacy.android.feature.devicecenter.ui.model.DeviceCenterInfoUiState
 import mega.privacy.android.shared.original.core.ui.controls.appbar.AppBarType
 import mega.privacy.android.shared.original.core.ui.controls.appbar.MegaAppBar
+import mega.privacy.android.shared.original.core.ui.controls.layouts.MegaScaffold
 import mega.privacy.android.shared.original.core.ui.controls.text.MegaText
 import mega.privacy.android.shared.original.core.ui.preview.CombinedThemePreviews
+import mega.privacy.android.shared.original.core.ui.theme.OriginalTheme
 import mega.privacy.android.shared.original.core.ui.theme.extensions.textColorSecondary
-import mega.privacy.android.shared.original.core.ui.theme.values.TextColor
-import mega.privacy.android.icon.pack.R as IconPackR
-import mega.privacy.android.shared.resources.R as sharedR
-import mega.privacy.android.feature.devicecenter.ui.model.DeviceCenterInfoUiState
-import mega.privacy.android.shared.original.core.ui.theme.OriginalTempTheme
 
 /**
  * Test tags for the Device Center Info View
@@ -58,7 +59,7 @@ internal fun DeviceCenterInfoScreen(
 ) {
     val scaffoldState = rememberScaffoldState()
 
-    Scaffold(
+    MegaScaffold(
         scaffoldState = scaffoldState,
         topBar = {
             MegaAppBar(
@@ -66,6 +67,7 @@ internal fun DeviceCenterInfoScreen(
                 appBarType = AppBarType.BACK_NAVIGATION,
                 title = String(),
                 elevation = 0.dp,
+                windowInsets = WindowInsets(0.dp),
                 onNavigationPressed = { onBackPressHandled() },
             )
         },
@@ -206,7 +208,7 @@ private fun InfoRow(
 @CombinedThemePreviews
 @Composable
 private fun DeviceCenterInfoScreenDevicePreview() {
-    OriginalTempTheme(isDark = isSystemInDarkTheme()) {
+    OriginalTheme(isDark = isSystemInDarkTheme()) {
         DeviceCenterInfoScreen(
             uiState = DeviceCenterInfoUiState(
                 icon = IconPackR.drawable.ic_pc_medium_solid,
@@ -224,7 +226,7 @@ private fun DeviceCenterInfoScreenDevicePreview() {
 @CombinedThemePreviews
 @Composable
 private fun DeviceCenterInfoScreenFolderPreview() {
-    OriginalTempTheme(isDark = isSystemInDarkTheme()) {
+    OriginalTheme(isDark = isSystemInDarkTheme()) {
         DeviceCenterInfoScreen(
             uiState = DeviceCenterInfoUiState(
                 icon = IconPackR.drawable.ic_folder_medium_solid,

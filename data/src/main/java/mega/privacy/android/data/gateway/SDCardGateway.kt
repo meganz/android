@@ -61,4 +61,9 @@ interface SDCardGateway {
      *         Return null if the folder cannot be created
      */
     suspend fun getOrCreateCacheFolder(folderName: String): File?
+
+    /**
+     * Check if the given [uriString] is a SD card URI
+     */
+    suspend fun isSDCardUri(uriString: String): Boolean
 }

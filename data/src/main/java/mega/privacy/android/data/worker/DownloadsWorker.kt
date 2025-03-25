@@ -1,5 +1,6 @@
 package mega.privacy.android.data.worker
 
+import android.app.Notification
 import android.content.Context
 import androidx.core.app.NotificationManagerCompat
 import androidx.hilt.work.HiltWorker
@@ -10,29 +11,31 @@ import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.catch
-import kotlinx.coroutines.flow.combine
-import kotlinx.coroutines.flow.distinctUntilChanged
-import kotlinx.coroutines.flow.onCompletion
-import kotlinx.coroutines.flow.transformWhile
 import kotlinx.coroutines.launch
+import mega.privacy.android.data.featuretoggle.DataFeatures
 import mega.privacy.android.data.mapper.transfer.OverQuotaNotificationBuilder
+import mega.privacy.android.data.mapper.transfer.TransfersActionGroupFinishNotificationBuilder
+import mega.privacy.android.data.mapper.transfer.TransfersActionGroupProgressNotificationBuilder
+import mega.privacy.android.data.mapper.transfer.TransfersFinishNotificationSummaryBuilder
 import mega.privacy.android.data.mapper.transfer.TransfersFinishedNotificationMapper
 import mega.privacy.android.data.mapper.transfer.TransfersNotificationMapper
+import mega.privacy.android.data.mapper.transfer.TransfersProgressNotificationSummaryBuilder
 import mega.privacy.android.domain.entity.transfer.ActiveTransferTotals
-import mega.privacy.android.domain.entity.transfer.MonitorOngoingActiveTransfersResult
 import mega.privacy.android.domain.entity.transfer.TransferEvent
+import mega.privacy.android.domain.entity.transfer.TransferProgressResult
 import mega.privacy.android.domain.entity.transfer.TransferType
+import mega.privacy.android.domain.entity.transfer.isPreviewDownload
 import mega.privacy.android.domain.monitoring.CrashReporter
 import mega.privacy.android.domain.qualifier.IoDispatcher
+import mega.privacy.android.domain.usecase.featureflag.GetFeatureFlagValueUseCase
 import mega.privacy.android.domain.usecase.qrcode.ScanMediaFileUseCase
+import mega.privacy.android.domain.usecase.transfers.MonitorActiveAndPendingTransfersUseCase
 import mega.privacy.android.domain.usecase.transfers.MonitorTransferEventsUseCase
 import mega.privacy.android.domain.usecase.transfers.active.ClearActiveTransfersIfFinishedUseCase
 import mega.privacy.android.domain.usecase.transfers.active.CorrectActiveTransfersUseCase
 import mega.privacy.android.domain.usecase.transfers.active.GetActiveTransferTotalsUseCase
 import mega.privacy.android.domain.usecase.transfers.active.HandleTransferEventUseCase
-import mega.privacy.android.domain.usecase.transfers.active.MonitorOngoingActiveTransfersUseCase
 import mega.privacy.android.domain.usecase.transfers.paused.AreTransfersPausedUseCase
-import mega.privacy.android.domain.usecase.transfers.pending.GetPendingTransfersByTypeUseCase
 import mega.privacy.android.domain.usecase.transfers.pending.StartAllPendingDownloadsUseCase
 import timber.log.Timber
 
@@ -56,13 +59,17 @@ class DownloadsWorker @AssistedInject constructor(
     clearActiveTransfersIfFinishedUseCase: ClearActiveTransfersIfFinishedUseCase,
     private val transfersNotificationMapper: TransfersNotificationMapper,
     private val transfersFinishedNotificationMapper: TransfersFinishedNotificationMapper,
+    private val transfersFinishNotificationSummaryBuilder: TransfersFinishNotificationSummaryBuilder,
+    private val transfersActionGroupFinishNotificationBuilder: TransfersActionGroupFinishNotificationBuilder,
+    private val transfersActionGroupProgressNotificationBuilder: TransfersActionGroupProgressNotificationBuilder,
+    private val transfersProgressNotificationSummaryBuilder: TransfersProgressNotificationSummaryBuilder,
     private val scanMediaFileUseCase: ScanMediaFileUseCase,
-    private val crashReporter: CrashReporter,
+    crashReporter: CrashReporter,
     foregroundSetter: ForegroundSetter? = null,
     notificationSamplePeriod: Long? = null,
-    private val monitorOngoingActiveTransfersUseCase: MonitorOngoingActiveTransfersUseCase,
-    private val getPendingTransfersByTypeUseCase: GetPendingTransfersByTypeUseCase,
+    private val monitorActiveAndPendingTransfersUseCase: MonitorActiveAndPendingTransfersUseCase,
     private val startAllPendingDownloadsUseCase: StartAllPendingDownloadsUseCase,
+    private val getFeatureFlagValueUseCase: GetFeatureFlagValueUseCase,
 ) : AbstractTransfersWorker(
     context = context,
     workerParams = workerParams,
@@ -85,27 +92,8 @@ class DownloadsWorker @AssistedInject constructor(
     override val finalNotificationId = DOWNLOAD_FINAL_NOTIFICATION_ID
     override val updateNotificationId = DOWNLOAD_UPDATE_NOTIFICATION_ID
 
-    override fun monitorProgress(): Flow<MonitorOngoingActiveTransfersResult> =
-        combine(
-            monitorOngoingActiveTransfersUseCase(type),
-            getPendingTransfersByTypeUseCase(type),
-        ) { monitorOngoingActiveTransfersResult, pendingTransfersNotSend ->
-            monitorOngoingActiveTransfersResult to pendingTransfersNotSend.size
-        }
-            .distinctUntilChanged()
-            .transformWhile { (ongoingActiveTransfersResult, notSendPendingTransfers) ->
-                emit(ongoingActiveTransfersResult)
-                Timber.d("Download progress emitted: $notSendPendingTransfers ${ongoingActiveTransfersResult.activeTransferTotals.hasOngoingTransfers()}")
-                //keep monitoring if and only if there are pending transfers or transfers in progress
-                return@transformWhile notSendPendingTransfers > 0 || (ongoingActiveTransfersResult.activeTransferTotals.hasOngoingTransfers() && !ongoingActiveTransfersResult.transfersOverQuota)
-            }
-            .catch {
-                crashReporter.report(it)
-                Timber.e("Error monitoring Downloads", it)
-            }
-            .onCompletion {
-                Timber.d("DownloadWorker monitor progress finished $it")
-            }
+    override fun monitorProgress(): Flow<TransferProgressResult> =
+        monitorActiveAndPendingTransfersUseCase(type)
 
 
     override suspend fun doWorkInternal(scope: CoroutineScope) {
@@ -115,7 +103,7 @@ class DownloadsWorker @AssistedInject constructor(
         scope.launch {
             startAllPendingDownloadsUseCase()
                 .catch {
-                    Timber.e("Error on start downloading nodes", it)
+                    Timber.e(it, "Error on start downloading nodes")
                     crashReporter.report(it)
                 }
                 .collect { Timber.d("Start downloading $it nodes") }
@@ -139,6 +127,27 @@ class DownloadsWorker @AssistedInject constructor(
             }
         }
     }
+
+    override suspend fun showGroupedNotifications() =
+        getFeatureFlagValueUseCase(DataFeatures.ShowGroupedDownloadNotifications)
+
+    override suspend fun createFinishSummaryNotification(): Notification =
+        transfersFinishNotificationSummaryBuilder(type)
+
+    override suspend fun createActionGroupFinishNotification(group: ActiveTransferTotals.Group): Notification? =
+        if (group.isPreviewDownload() && group.completedFiles == 0) {
+            null
+        } else {
+            transfersActionGroupFinishNotificationBuilder(group, type)
+        }
+
+    override suspend fun createProgressSummaryNotification(): Notification =
+        transfersProgressNotificationSummaryBuilder(type)
+
+    override suspend fun createActionGroupProgressNotification(
+        group: ActiveTransferTotals.Group,
+        paused: Boolean,
+    ): Notification = transfersActionGroupProgressNotificationBuilder(group, type, paused)
 
     companion object {
         /**

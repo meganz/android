@@ -39,7 +39,7 @@ import mega.privacy.android.domain.entity.contacts.UserChatStatus
 import mega.privacy.android.shared.original.core.ui.controls.appbar.AppBarType
 import mega.privacy.android.shared.original.core.ui.controls.appbar.MegaAppBar
 import mega.privacy.android.shared.original.core.ui.preview.CombinedThemePreviews
-import mega.privacy.android.shared.original.core.ui.theme.OriginalTempTheme
+import mega.privacy.android.shared.original.core.ui.theme.OriginalTheme
 import mega.privacy.android.shared.original.core.ui.utils.showAutoDurationSnackbar
 import mega.privacy.mobile.analytics.event.ChatConversationAddParticipantsMenuToolbarEvent
 import mega.privacy.mobile.analytics.event.ChatConversationArchiveMenuToolbarEvent
@@ -358,7 +358,7 @@ private fun getCustomSubtitle(uiState: ChatUiState): String = with(uiState) {
 @CombinedThemePreviews
 @Composable
 private fun ChatAppBarPreview() {
-    OriginalTempTheme(isDark = isSystemInDarkTheme()) {
+    OriginalTheme(isDark = isSystemInDarkTheme()) {
         ChatAppBar(
             uiState = ChatUiState(
                 chat = ChatRoom(
@@ -385,6 +385,7 @@ private fun ChatAppBarPreview() {
                     isMeeting = false,
                     isWaitingRoom = false,
                     isOpenInvite = false,
+                    isNoteToSelf = false,
                     isSpeakRequest = false,
                 ),
                 userChatStatus = UserChatStatus.Away,

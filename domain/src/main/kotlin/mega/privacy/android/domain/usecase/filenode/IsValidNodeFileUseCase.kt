@@ -1,15 +1,14 @@
 package mega.privacy.android.domain.usecase.filenode
 
 import mega.privacy.android.domain.entity.node.FileNode
-import mega.privacy.android.domain.entity.node.TypedFileNode
-import mega.privacy.android.domain.repository.FileSystemRepository
+import mega.privacy.android.domain.repository.files.FingerprintRepository
 import java.io.File
 import javax.inject.Inject
 
 /**
  * The use case to check if Node file is valid
  */
-class IsValidNodeFileUseCase @Inject constructor(private val fileSystemRepository: FileSystemRepository) {
+class IsValidNodeFileUseCase @Inject constructor(private val fingerprintRepository: FingerprintRepository) {
 
     /**
      * check if Node file is valid
@@ -23,7 +22,7 @@ class IsValidNodeFileUseCase @Inject constructor(private val fileSystemRepositor
         node: FileNode,
         file: File,
     ): Boolean =
-        file.canRead() && file.length() == node.size && node.fingerprint == fileSystemRepository.getFingerprint(
+        file.canRead() && file.length() == node.size && node.fingerprint == fingerprintRepository.getFingerprint(
             file.absolutePath
         )
 }

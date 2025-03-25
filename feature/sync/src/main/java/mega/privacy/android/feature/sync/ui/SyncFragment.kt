@@ -6,6 +6,8 @@ import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import androidx.compose.animation.EnterTransition
+import androidx.compose.animation.ExitTransition
 import androidx.compose.material.rememberScaffoldState
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
@@ -28,14 +30,16 @@ import mega.privacy.android.domain.usecase.GetThemeMode
 import mega.privacy.android.feature.sync.R
 import mega.privacy.android.feature.sync.navigation.getSyncRoute
 import mega.privacy.android.feature.sync.navigation.syncNavGraph
+import mega.privacy.android.feature.sync.navigation.syncStopBackupNavGraph
 import mega.privacy.android.feature.sync.ui.newfolderpair.TAG_SYNC_NEW_FOLDER_SCREEN_TOOLBAR
 import mega.privacy.android.feature.sync.ui.permissions.SyncPermissionsManager
 import mega.privacy.android.navigation.MegaNavigator
 import mega.privacy.android.shared.original.core.ui.controls.appbar.AppBarType
 import mega.privacy.android.shared.original.core.ui.controls.appbar.MegaAppBar
 import mega.privacy.android.shared.original.core.ui.controls.layouts.MegaScaffold
-import mega.privacy.android.shared.original.core.ui.theme.OriginalTempTheme
+import mega.privacy.android.shared.original.core.ui.theme.OriginalTheme
 import mega.privacy.android.shared.sync.ui.SyncEmptyState
+import timber.log.Timber
 import javax.inject.Inject
 
 /**
@@ -81,9 +85,17 @@ class SyncFragment : Fragment() {
                 val themeMode by getThemeMode().collectAsStateWithLifecycle(initialValue = ThemeMode.System)
                 val state by viewModel.state.collectAsStateWithLifecycle()
 
-                OriginalTempTheme(isDark = themeMode.isDarkMode()) {
+                OriginalTheme(isDark = themeMode.isDarkMode()) {
                     if (state.isNetworkConnected) {
-                        AndroidSyncFeatureNavigation(animatedNavController)
+                        AndroidSyncFeatureNavigation(
+                            animatedNavController,
+                            shouldNavigateToSyncList = activity?.intent?.getBooleanExtra(
+                                SyncHostActivity.EXTRA_IS_FROM_CLOUD_DRIVE, false
+                            ) == false,
+                            shouldOpenStopBackup = activity?.intent?.getBooleanExtra(
+                                SyncHostActivity.EXTRA_OPEN_SELECT_STOP_BACKUP_DESTINATION, false
+                            ) == true,
+                        )
                     } else {
                         SyncNoNetworkState()
                     }
@@ -95,20 +107,37 @@ class SyncFragment : Fragment() {
     @Composable
     private fun AndroidSyncFeatureNavigation(
         animatedNavController: NavHostController,
+        shouldNavigateToSyncList: Boolean,
+        shouldOpenStopBackup: Boolean = false,
     ) {
         val context = LocalContext.current
         NavHost(
             navController = animatedNavController,
             startDestination = getSyncRoute(),
+            enterTransition = { EnterTransition.None },
+            exitTransition = { ExitTransition.None },
+            popEnterTransition = { EnterTransition.None },
+            popExitTransition = { ExitTransition.None },
         ) {
-            syncNavGraph(
-                navController = animatedNavController,
-                fileTypeIconMapper = fileTypeIconMapper,
-                syncPermissionsManager = syncPermissionsManager,
-                openUpgradeAccountPage = {
-                    megaNavigator.openUpgradeAccount(context)
-                },
-            )
+            Timber.d("shouldOpenStopBackup: $shouldOpenStopBackup")
+            if (shouldOpenStopBackup) {
+                syncStopBackupNavGraph(
+                    navController = animatedNavController,
+                    fileTypeIconMapper = fileTypeIconMapper,
+                    syncPermissionsManager = syncPermissionsManager,
+                )
+            } else {
+                syncNavGraph(
+                    navController = animatedNavController,
+                    megaNavigator = megaNavigator,
+                    fileTypeIconMapper = fileTypeIconMapper,
+                    syncPermissionsManager = syncPermissionsManager,
+                    openUpgradeAccountPage = {
+                        megaNavigator.openUpgradeAccount(context)
+                    },
+                    shouldNavigateToSyncList = shouldNavigateToSyncList,
+                )
+            }
         }
     }
 

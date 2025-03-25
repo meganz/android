@@ -1,5 +1,6 @@
 package mega.privacy.android.app.mediaplayer.queue.audio
 
+import mega.privacy.android.icon.pack.R as iconPackR
 import android.content.ComponentName
 import android.content.Context
 import android.content.Intent
@@ -14,6 +15,7 @@ import android.view.MenuInflater
 import android.view.MenuItem
 import android.view.View
 import android.view.ViewGroup
+import androidx.annotation.DrawableRes
 import androidx.appcompat.app.AppCompatActivity
 import androidx.appcompat.view.ActionMode
 import androidx.appcompat.widget.SearchView
@@ -21,6 +23,7 @@ import androidx.compose.runtime.getValue
 import androidx.compose.ui.platform.ComposeView
 import androidx.compose.ui.platform.ViewCompositionStrategy
 import androidx.core.view.MenuProvider
+import androidx.core.view.isVisible
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.viewModels
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
@@ -30,12 +33,15 @@ import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.flow.distinctUntilChanged
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.launch
+import mega.privacy.android.analytics.Analytics
 import mega.privacy.android.app.R
 import mega.privacy.android.app.arch.extensions.collectFlow
+import mega.privacy.android.app.mediaplayer.AudioPlayerActivity
 import mega.privacy.android.app.mediaplayer.MediaPlayerActivity
 import mega.privacy.android.app.mediaplayer.gateway.MediaPlayerServiceGateway
 import mega.privacy.android.app.mediaplayer.gateway.PlayerServiceViewModelGateway
 import mega.privacy.android.app.mediaplayer.playlist.PlaylistActionModeCallback
+import mega.privacy.android.app.mediaplayer.queue.model.MediaQueueItemType
 import mega.privacy.android.app.mediaplayer.queue.model.MediaQueueItemUiEntity
 import mega.privacy.android.app.mediaplayer.queue.view.AudioQueueView
 import mega.privacy.android.app.mediaplayer.service.AudioPlayerService
@@ -45,7 +51,8 @@ import mega.privacy.android.app.utils.Constants
 import mega.privacy.android.app.utils.MenuUtils.toggleAllMenuItemsVisibility
 import mega.privacy.android.domain.entity.ThemeMode
 import mega.privacy.android.domain.usecase.GetThemeMode
-import mega.privacy.android.shared.original.core.ui.theme.OriginalTempTheme
+import mega.privacy.android.shared.original.core.ui.theme.OriginalTheme
+import mega.privacy.mobile.analytics.event.AudioPlayerQueueReorderedEvent
 import javax.inject.Inject
 
 /**
@@ -120,6 +127,7 @@ class AudioQueueFragment : Fragment() {
         override fun onMenuItemSelected(menuItem: MenuItem): Boolean {
             when (menuItem.itemId) {
                 R.id.select -> {
+                    audioQueueViewModel.enableSelectMode(true)
                     activateActionMode()
                 }
             }
@@ -146,7 +154,6 @@ class AudioQueueFragment : Fragment() {
                     audioQueueViewModel.updatePlaybackState(isPaused())
                     simpleAudioPlayerView?.let { setupPlayerView(it) }
                     tryObservePlaylist()
-                    scrollToPlayingPosition()
                 }
             }
         }
@@ -208,6 +215,18 @@ class AudioQueueFragment : Fragment() {
                 }
             }
         }
+
+        viewLifecycleOwner.collectFlow(audioQueueViewModel.uiState.map { it.isSelectMode }
+            .distinctUntilChanged()) {
+            simpleAudioPlayerView?.isVisible = !it
+        }
+
+        viewLifecycleOwner.collectFlow(audioQueueViewModel.uiState.map { it.removedItems }
+            .distinctUntilChanged()) { removeItems ->
+            if (removeItems.isNotEmpty()) {
+                playerServiceViewModelGateway?.removeSelectedItems(removeItems.map { it.id.longValue })
+            }
+        }
     }
 
     /**
@@ -223,7 +242,7 @@ class AudioQueueFragment : Fragment() {
             setContent {
                 val themeMode by getThemeMode()
                     .collectAsStateWithLifecycle(initialValue = ThemeMode.System)
-                OriginalTempTheme(isDark = themeMode.isDarkMode()) {
+                OriginalTheme(isDark = themeMode.isDarkMode()) {
                     AudioQueueView(
                         viewModel = audioQueueViewModel,
                         setupAudioPlayer = { playerView ->
@@ -231,7 +250,10 @@ class AudioQueueFragment : Fragment() {
                             setupPlayerView(playerView)
                         },
                         onClick = { index, item -> itemClicked(index, item) },
-                        onDragFinished = { playerServiceViewModelGateway?.updatePlaySource() },
+                        onDragFinished = {
+                            Analytics.tracker.trackEvent(AudioPlayerQueueReorderedEvent)
+                            playerServiceViewModelGateway?.updatePlaySource()
+                        },
                         onMove = { from, to ->
                             audioQueueViewModel.updateMediaQueueAfterReorder(from, to)
                             playerServiceViewModelGateway?.swapItems(from, to)
@@ -243,16 +265,16 @@ class AudioQueueFragment : Fragment() {
 
     private fun itemClicked(index: Int, item: MediaQueueItemUiEntity) =
         viewLifecycleOwner.lifecycleScope.launch {
-            if (actionMode != null) {
+            if (audioQueueViewModel.uiState.value.isSelectMode) {
+                if (item.type != MediaQueueItemType.Next) return@launch
                 audioQueueViewModel.onItemClicked(index, item)
-                playerServiceViewModelGateway?.itemSelected(item.id.longValue)
                 return@launch
             }
 
             if (!audioQueueViewModel.isParticipatingInChatCall()) {
                 playerServiceViewModelGateway?.getIndexFromPlaylistItems(item.id.longValue)
                     ?.let { index ->
-                        serviceGateway?.seekTo(index)
+                        serviceGateway?.seekTo(index, item.id.longValue)
                     }
             }
             (requireActivity() as MediaPlayerActivity).closeSearch()
@@ -285,23 +307,28 @@ class AudioQueueFragment : Fragment() {
         if (playlistActionModeCallback == null) {
             playlistActionModeCallback = PlaylistActionModeCallback(
                 removeSelections = {
-                    playerServiceViewModelGateway?.removeAllSelectedItems()
                     audioQueueViewModel.removeSelectedItems()
                     actionMode?.finish()
                 },
                 clearSelections = {
                     audioQueueViewModel.clearAllSelectedItems()
-                    playerServiceViewModelGateway?.clearSelections()
-                    actionMode = null
+                    audioQueueViewModel.enableSelectMode(false)
+                    updateToolbarIcon(iconPackR.drawable.ic_back_audio_queue)
+                },
+                selectAll = {
+                    audioQueueViewModel.selectAllNextTypeItems()
+                    playerServiceViewModelGateway?.itemsSelected(
+                        audioQueueViewModel.uiState.value.selectedItemHandles
+                    )
                 }
             )
         }
         playlistActionModeCallback?.let {
             actionMode = (activity as? AppCompatActivity)?.startSupportActionMode(it)
             actionMode?.title = resources.getString(R.string.title_select_tracks)
+            actionMode?.menu?.findItem(R.id.select_all)?.isVisible = true
         }
     }
-
 
     /**
      * onDestroyView
@@ -318,6 +345,10 @@ class AudioQueueFragment : Fragment() {
         serviceGateway = null
         playerServiceViewModelGateway = null
         context?.unbindService(connection)
+    }
+
+    private fun updateToolbarIcon(@DrawableRes icon: Int) {
+        (activity as? AudioPlayerActivity)?.updateToolbarHomeAsUp(icon)
     }
 
     companion object {

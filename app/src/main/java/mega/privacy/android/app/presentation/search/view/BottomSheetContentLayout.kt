@@ -21,13 +21,13 @@ import androidx.compose.ui.res.colorResource
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
-import mega.privacy.android.shared.original.core.ui.theme.values.TextColor
+import mega.android.core.ui.theme.values.TextColor
 import mega.privacy.android.app.R
 import mega.privacy.android.app.presentation.search.model.FilterOptionEntity
 import mega.privacy.android.domain.entity.search.TypeFilterOption
 import mega.privacy.android.shared.original.core.ui.controls.text.MegaText
 import mega.privacy.android.shared.original.core.ui.preview.CombinedThemePreviews
-import mega.privacy.android.shared.original.core.ui.theme.OriginalTempTheme
+import mega.privacy.android.shared.original.core.ui.theme.OriginalTheme
 
 @Composable
 internal fun BottomSheetContentLayout(
@@ -64,7 +64,7 @@ internal fun BottomSheetContentLayout(
                     if (option.isSelected) {
                         Icon(
                             painter = painterResource(id = iconPackR.drawable.ic_check_medium_regular_outline),
-                            tint = colorResource(id = R.color.teal_300),
+                            tint = colorResource(id = R.color.accent_900),
                             contentDescription = null,
                             modifier = Modifier.size(24.dp)
                         )
@@ -78,7 +78,7 @@ internal fun BottomSheetContentLayout(
 @CombinedThemePreviews
 @Composable
 private fun SearchFilterBottomSheetPreview() {
-    OriginalTempTheme(isDark = isSystemInDarkTheme()) {
+    OriginalTheme(isDark = isSystemInDarkTheme()) {
         BottomSheetContentLayout(
             title = "Type",
             options = TypeFilterOption.entries.map { option ->

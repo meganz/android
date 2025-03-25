@@ -16,7 +16,7 @@ import mega.privacy.android.app.presentation.apiserver.view.navigation.openLogin
 import mega.privacy.android.domain.entity.apiserver.ApiServer
 import mega.privacy.android.shared.original.core.ui.controls.dialogs.ConfirmationDialogWithRadioButtons
 import mega.privacy.android.shared.original.core.ui.preview.CombinedThemePreviews
-import mega.privacy.android.shared.original.core.ui.theme.OriginalTempTheme
+import mega.privacy.android.shared.original.core.ui.theme.OriginalTheme
 
 /**
  * Change api server dialog wit radio buttons for each available api server.
@@ -67,7 +67,7 @@ internal fun ChangeApiServerDialog(
 @CombinedThemePreviews
 @Composable
 private fun ChangeApiServerDialogPreview() {
-    OriginalTempTheme(isDark = isSystemInDarkTheme()) {
+    OriginalTheme(isDark = isSystemInDarkTheme()) {
         ChangeApiServerDialog(onDismissRequest = {})
     }
 }

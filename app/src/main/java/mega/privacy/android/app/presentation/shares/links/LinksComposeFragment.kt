@@ -1,9 +1,9 @@
 package mega.privacy.android.app.presentation.shares.links
 
+import mega.privacy.android.icon.pack.R as iconPackR
 import mega.privacy.android.shared.resources.R as sharedR
 import android.content.Context
 import android.content.Intent
-import android.content.res.Configuration
 import android.net.Uri
 import android.os.Bundle
 import android.view.LayoutInflater
@@ -53,6 +53,7 @@ import mega.privacy.android.app.presentation.mapper.GetOptionsForToolbarMapper
 import mega.privacy.android.app.presentation.mapper.OptionsItemInfo
 import mega.privacy.android.app.presentation.node.NodeActionsViewModel
 import mega.privacy.android.app.presentation.node.action.HandleNodeAction
+import mega.privacy.android.app.presentation.settings.model.StorageTargetPreference
 import mega.privacy.android.app.presentation.shares.SharesActionListener
 import mega.privacy.android.app.presentation.shares.links.view.LinksView
 import mega.privacy.android.app.presentation.snackbar.LegacySnackBarWrapper
@@ -70,7 +71,8 @@ import mega.privacy.android.domain.entity.node.TypedFolderNode
 import mega.privacy.android.domain.entity.node.publiclink.PublicLinkFile
 import mega.privacy.android.domain.entity.node.publiclink.PublicLinkNode
 import mega.privacy.android.domain.usecase.GetThemeMode
-import mega.privacy.android.shared.original.core.ui.theme.OriginalTempTheme
+import mega.privacy.android.navigation.MegaNavigator
+import mega.privacy.android.shared.original.core.ui.theme.OriginalTheme
 import mega.privacy.android.shared.original.core.ui.utils.showAutoDurationSnackbar
 import timber.log.Timber
 import javax.inject.Inject
@@ -104,6 +106,12 @@ class LinksComposeFragment : Fragment() {
     lateinit var fileTypeIconMapper: FileTypeIconMapper
 
     /**
+     * Mega navigator
+     */
+    @Inject
+    lateinit var megaNavigator: MegaNavigator
+
+    /**
      * Interface that notifies the attached Activity to execute specific functions
      */
     private var linksActionListener: SharesActionListener? = null
@@ -111,10 +119,9 @@ class LinksComposeFragment : Fragment() {
     private var actionMode: ActionMode? = null
 
     /**
-     * Flag to restore elevation when checkScroll() is called
-     * This should be removed when the Links tabs page is refactored to Compose
+     * Toggle the elevation of the app bar
      */
-    private var appBarElevationEnabled = false
+    var toggleAppBarElevation: (Boolean) -> Unit = {}
 
     override fun onCreateView(
         inflater: LayoutInflater,
@@ -135,7 +142,7 @@ class LinksComposeFragment : Fragment() {
                     mutableStateOf(null)
                 }
 
-                OriginalTempTheme(isDark = isDarkMode) {
+                OriginalTheme(isDark = isDarkMode) {
                     LinksView(
                         uiState = uiState,
                         emptyState = getEmptyFolderDrawable(uiState.isLinksEmpty),
@@ -186,7 +193,7 @@ class LinksComposeFragment : Fragment() {
                                 ?: R.string.sortby_name
                         ),
                         onSortOrderClick = ::showSortByPanel,
-                        onToggleAppBarElevation = ::toggleAppBarElevation,
+                        onToggleAppBarElevation = toggleAppBarElevation,
                         fileTypeIconMapper = fileTypeIconMapper,
                     )
                     LegacySnackBarWrapper(snackbarHostState = snackbarHostState, activity)
@@ -197,6 +204,12 @@ class LinksComposeFragment : Fragment() {
                             disableSelectMode()
                         },
                         snackBarHostState = snackbarHostState,
+                        navigateToStorageSettings = {
+                            megaNavigator.openSettings(
+                                requireActivity(),
+                                StorageTargetPreference
+                            )
+                        },
                     )
                     EventEffect(
                         event = nodeActionState.downloadEvent,
@@ -244,21 +257,9 @@ class LinksComposeFragment : Fragment() {
      */
     private fun getEmptyFolderDrawable(isLinksEmpty: Boolean): Pair<Int, Int> {
         return if (isLinksEmpty) {
-            Pair(
-                if (requireActivity().resources.configuration.orientation == Configuration.ORIENTATION_LANDSCAPE) {
-                    R.drawable.ic_zero_data_public_links
-                } else {
-                    R.drawable.ic_zero_data_public_links
-                }, R.string.context_empty_links
-            )
+            Pair(iconPackR.drawable.ic_link_glass, R.string.context_empty_links)
         } else {
-            Pair(
-                if (requireActivity().resources.configuration.orientation == Configuration.ORIENTATION_LANDSCAPE) {
-                    R.drawable.ic_zero_landscape_empty_folder
-                } else {
-                    R.drawable.ic_zero_portrait_empty_folder
-                }, R.string.file_browser_empty_folder_new
-            )
+            Pair(iconPackR.drawable.ic_empty_folder_glass, R.string.file_browser_empty_folder_new)
         }
     }
 
@@ -301,14 +302,6 @@ class LinksComposeFragment : Fragment() {
     }
 
     /**
-     * Display the elevation of the app bar or not
-     */
-    private fun toggleAppBarElevation(withElevation: Boolean) {
-        appBarElevationEnabled = withElevation
-        (activity as? ManagerActivity)?.changeAppBarElevation(withElevation)
-    }
-
-    /**
      * Shows Options menu for item clicked
      */
     private fun showOptionsMenuForItem(nodeUIItem: NodeUIItem<PublicLinkNode>) {
@@ -336,7 +329,6 @@ class LinksComposeFragment : Fragment() {
             .map { it.parentNode != null }
             .distinctUntilChanged()) {
             toggleAppBarElevation(false)
-            hideTabs(it)
         }
     }
 
@@ -372,15 +364,6 @@ class LinksComposeFragment : Fragment() {
     }
 
     /**
-     * Hide/Show shares tab
-     *
-     * @param hide true if needs to hide shares tabs
-     */
-    private fun hideTabs(hide: Boolean) {
-        (activity as ManagerActivity?)?.hideTabs(hide, SharesTab.LINKS_TAB)
-    }
-
-    /**
      *
      */
     override fun onAttach(context: Context) {
@@ -399,21 +382,6 @@ class LinksComposeFragment : Fragment() {
                 }
             }
         )
-    }
-
-    /**
-     * Check elevation
-     *
-     * @param allowDisable true if allowed to disable elevation
-     */
-    fun checkScroll(allowDisable: Boolean = false) {
-        if (appBarElevationEnabled) {
-            toggleAppBarElevation(true)
-        } else {
-            if (allowDisable) {
-                toggleAppBarElevation(false)
-            }
-        }
     }
 
     private fun performItemOptionsClick(optionsItemInfo: OptionsItemInfo?) {
@@ -526,6 +494,10 @@ class LinksComposeFragment : Fragment() {
 
                 // This option is only available in the Incoming Shares page
                 OptionItems.LEAVE_SHARE_CLICKED -> Unit
+
+                OptionItems.ADD_TO_ALBUM -> {}
+
+                OptionItems.ADD_TO -> {}
             }
         }
     }
@@ -544,7 +516,6 @@ class LinksComposeFragment : Fragment() {
             val inflater = mode.menuInflater
             inflater.inflate(R.menu.cloud_storage_action, menu)
             (requireActivity() as ManagerActivity).let {
-                it.hideTabs(true, currentTab)
                 it.hideFabButton()
                 it.showHideBottomNavigationView(true)
             }
@@ -594,7 +565,6 @@ class LinksComposeFragment : Fragment() {
         override fun onDestroyActionMode(mode: ActionMode) {
             viewModel.clearAllNodesSelection()
             (activity as? ManagerActivity)?.let {
-                it.hideTabs(false, currentTab)
                 it.showFabButton()
                 it.showHideBottomNavigationView(false)
                 actionMode = null

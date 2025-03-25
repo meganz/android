@@ -24,9 +24,11 @@ class GetCheapestSubscriptionUseCase @Inject constructor(
      * @return [Subscription]
      */
     suspend operator fun invoke(): Subscription {
-        val cheapestPlan = getAppSubscriptionOptionsUseCase(1).minBy { plan ->
-            plan.amount.value
-        }
+        val cheapestPlan = getAppSubscriptionOptionsUseCase(1)
+            .filter { it.accountType != AccountType.FREE }
+            .minBy { plan ->
+                plan.amount.value
+            }
         val sku = getSku(cheapestPlan.accountType)
         val localPricing = sku?.let { getLocalPricingUseCase(it) }
 

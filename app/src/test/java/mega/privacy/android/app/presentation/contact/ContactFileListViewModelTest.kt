@@ -3,15 +3,13 @@ package mega.privacy.android.app.presentation.contact
 import android.net.Uri
 import app.cash.turbine.test
 import com.google.common.truth.Truth.assertThat
+import com.google.mlkit.vision.documentscanner.GmsDocumentScanner
 import de.palm.composestateevents.triggered
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.test.runTest
-import mega.privacy.android.app.ShareInfo
 import mega.privacy.android.app.middlelayer.scanner.ScannerHandler
-import mega.privacy.android.app.presentation.contact.ContactFileListViewModel
 import mega.privacy.android.app.presentation.documentscanner.model.DocumentScanningError
-import mega.privacy.android.app.presentation.documentscanner.model.HandleScanDocumentResult
 import mega.privacy.android.app.presentation.transfers.starttransfer.model.TransferTriggerEvent
 import mega.privacy.android.app.service.scanner.InsufficientRAMToLaunchDocumentScanner
 import mega.privacy.android.core.test.extension.CoroutineMainDispatcherExtension
@@ -23,9 +21,8 @@ import mega.privacy.android.domain.entity.node.MoveRequestResult
 import mega.privacy.android.domain.entity.node.NodeContentUri
 import mega.privacy.android.domain.entity.node.NodeId
 import mega.privacy.android.domain.entity.node.NodeNameCollision
-import mega.privacy.android.domain.entity.node.NodeNameCollisionsResult
 import mega.privacy.android.domain.entity.node.NodeNameCollisionType
-import mega.privacy.android.domain.entity.node.TypedFileNode
+import mega.privacy.android.domain.entity.node.NodeNameCollisionsResult
 import mega.privacy.android.domain.entity.uri.UriPath
 import mega.privacy.android.domain.usecase.account.MonitorStorageStateEventUseCase
 import mega.privacy.android.domain.usecase.file.FilePrepareUseCase
@@ -43,7 +40,6 @@ import org.junit.jupiter.api.assertDoesNotThrow
 import org.junit.jupiter.api.extension.ExtendWith
 import org.junit.jupiter.params.ParameterizedTest
 import org.junit.jupiter.params.provider.EnumSource
-import org.mockito.kotlin.any
 import org.mockito.kotlin.doReturn
 import org.mockito.kotlin.mock
 import org.mockito.kotlin.reset
@@ -357,27 +353,6 @@ internal class ContactFileListViewModelTest {
     }
 
     @Test
-    fun `test that state is updated correctly if a ShareInfo is uploaded`() = runTest {
-        val file = File("path")
-        val path = file.absolutePath
-        val shareInfo = mock<ShareInfo> {
-            on { fileAbsolutePath } doReturn path
-        }
-        val parentHandle = 123L
-        val expected = triggered(
-            TransferTriggerEvent.StartUpload.Files(
-                mapOf(path to null),
-                NodeId(parentHandle)
-            )
-        )
-
-        underTest.uploadShareInfo(listOf(shareInfo), parentHandle)
-        underTest.state.map { it.uploadEvent }.test {
-            assertThat(awaitItem()).isEqualTo(expected)
-        }
-    }
-
-    @Test
     fun `test that getNodeContentUriByHandleUseCase is invoked and returns as expected`() =
         runTest {
             val paramHandle = 1L
@@ -390,7 +365,7 @@ internal class ContactFileListViewModelTest {
 
     @Test
     fun `test that prepare file is invoked and returns as expected`() = runTest {
-        val uri = mock<Uri>() {
+        val uri = mock<Uri> {
             on { toString() } doReturn "uri"
         }
         val entity = mock<DocumentEntity>()
@@ -401,68 +376,60 @@ internal class ContactFileListViewModelTest {
     }
 
     @Test
-    fun `test that the old document scanner is used for scanning documents`() = runTest {
-        val handleScanDocumentResult = HandleScanDocumentResult.UseLegacyImplementation
-        whenever(scannerHandler.handleScanDocument()).thenReturn(handleScanDocumentResult)
+    fun `test that the ML Kit Document Scanner is initialized and ready to scan documents`() =
+        runTest {
+            val gmsDocumentScanner = mock<GmsDocumentScanner>()
+            whenever(scannerHandler.prepareDocumentScanner()).thenReturn(gmsDocumentScanner)
 
-        underTest.handleScanDocument()
+            underTest.prepareDocumentScanner()
 
-        underTest.state.test {
-            assertThat(awaitItem().handleScanDocumentResult).isEqualTo(handleScanDocumentResult)
+            underTest.state.test {
+                assertThat(awaitItem().gmsDocumentScanner).isEqualTo(gmsDocumentScanner)
+            }
         }
-    }
 
     @Test
-    fun `test that the new ML document kit scanner is initialized and used for scanning documents`() = runTest {
-        val handleScanDocumentResult = HandleScanDocumentResult.UseNewImplementation(mock())
-        whenever(scannerHandler.handleScanDocument()).thenReturn(handleScanDocumentResult)
+    fun `test that an insufficient RAM to launch error is returned when initializing the ML Kit Document Scanner with low device RAM`() =
+        runTest {
+            whenever(scannerHandler.prepareDocumentScanner()).thenAnswer {
+                throw InsufficientRAMToLaunchDocumentScanner()
+            }
 
-        underTest.handleScanDocument()
+            assertDoesNotThrow { underTest.prepareDocumentScanner() }
 
-        underTest.state.test {
-            assertThat(awaitItem().handleScanDocumentResult).isEqualTo(handleScanDocumentResult)
+            underTest.state.test {
+                assertThat(awaitItem().documentScanningError).isEqualTo(DocumentScanningError.InsufficientRAM)
+            }
         }
-    }
 
     @Test
-    fun `test that an insufficient RAM to launch error is returned when initializing the ML document kit scanner with low device RAM`() = runTest {
-        whenever(scannerHandler.handleScanDocument()).thenAnswer {
-            throw InsufficientRAMToLaunchDocumentScanner()
-        }
+    fun `test that a generic error is returned when initializing the ML Kit Document Scanner results in an error`() =
+        runTest {
+            whenever(scannerHandler.prepareDocumentScanner()).thenThrow(RuntimeException())
 
-        assertDoesNotThrow { underTest.handleScanDocument() }
+            assertDoesNotThrow { underTest.prepareDocumentScanner() }
 
-        underTest.state.test {
-            assertThat(awaitItem().documentScanningError).isEqualTo(DocumentScanningError.InsufficientRAM)
+            underTest.state.test {
+                assertThat(awaitItem().documentScanningError).isEqualTo(DocumentScanningError.GenericError)
+            }
         }
-    }
 
     @Test
-    fun `test that a generic error is returned when initializing the ML document kit scanner results in an error`() = runTest {
-        whenever(scannerHandler.handleScanDocument()).thenThrow(RuntimeException())
+    fun `test that a generic error is returned when opening the ML Kit Document Scanner results in an error`() =
+        runTest {
+            underTest.onDocumentScannerFailedToOpen()
 
-        assertDoesNotThrow { underTest.handleScanDocument() }
-
-        underTest.state.test {
-            assertThat(awaitItem().documentScanningError).isEqualTo(DocumentScanningError.GenericError)
+            underTest.state.test {
+                assertThat(awaitItem().documentScanningError).isEqualTo(DocumentScanningError.GenericError)
+            }
         }
-    }
 
     @Test
-    fun `test that a generic error is returned when opening the ML document kit scanner results in an error`() = runTest {
-        underTest.onNewDocumentScannerFailedToOpen()
+    fun `test that the gms document scanner is reset`() = runTest {
+        underTest.onGmsDocumentScannerConsumed()
 
         underTest.state.test {
-            assertThat(awaitItem().documentScanningError).isEqualTo(DocumentScanningError.GenericError)
-        }
-    }
-
-    @Test
-    fun `test that the handle scan document result is reset`() = runTest {
-        underTest.onHandleScanDocumentResultConsumed()
-
-        underTest.state.test {
-            assertThat(awaitItem().handleScanDocumentResult).isNull()
+            assertThat(awaitItem().gmsDocumentScanner).isNull()
         }
     }
 

@@ -2,6 +2,7 @@ package mega.privacy.android.app.featuretoggle
 
 import mega.privacy.android.domain.entity.Feature
 import mega.privacy.android.domain.entity.featureflag.ABTestFeature
+import mega.privacy.android.domain.featuretoggle.FeatureFlagValuePriority
 import mega.privacy.android.domain.featuretoggle.FeatureFlagValueProvider
 
 /**
@@ -28,28 +29,6 @@ enum class ABTestFeatures(
     devtest(
         experimentName = "devtest",
         description = "Remote feature flag from API for any tests related to A/B testing",
-        defaultValue = false
-    ),
-
-    /**
-     * To use remote feature flag 'ab_ads' from API
-     * this flag is part of real experiment related to Ads
-     * DO NOT USE this flag anywhere else, except the Ads related files
-     */
-    ads(
-        experimentName = "ads",
-        description = "Real experiment flag to show ads",
-        defaultValue = false
-    ),
-
-    /**
-     * To use remote feature flag 'ab_adse' from API
-     * this flag is part of real experiment related to Ads
-     * DO NOT USE this flag anywhere else, except the Ads related files
-     */
-    adse(
-        experimentName = "adse",
-        description = "Real experiment flag to show external ads",
         defaultValue = false
     ),
 
@@ -88,6 +67,8 @@ enum class ABTestFeatures(
     companion object : FeatureFlagValueProvider {
         override suspend fun isEnabled(feature: Feature) =
             entries.firstOrNull { it == feature }?.defaultValue
+
+        override val priority: FeatureFlagValuePriority = FeatureFlagValuePriority.Default
     }
 }
 

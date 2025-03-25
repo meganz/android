@@ -5,9 +5,9 @@ import androidx.compose.runtime.Composable
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import de.palm.composestateevents.EventEffect
 import mega.privacy.android.analytics.Analytics
-import mega.privacy.android.feature.sync.ui.newfolderpair.SyncNewFolderAction.LocalFolderSelected
 import mega.privacy.android.feature.sync.ui.newfolderpair.SyncNewFolderAction.NextClicked
 import mega.privacy.android.feature.sync.ui.permissions.SyncPermissionsManager
+import mega.privacy.mobile.analytics.event.AndroidSyncLocalFolderSelectedEvent
 import mega.privacy.mobile.analytics.event.AndroidSyncStartSyncButtonEvent
 import mega.privacy.mobile.analytics.event.SyncNewFolderScreenBackNavigationEvent
 
@@ -19,13 +19,17 @@ internal fun SyncNewFolderScreenRoute(
     openNextScreen: (SyncNewFolderState) -> Unit,
     openUpgradeAccount: () -> Unit,
     onBackClicked: () -> Unit,
+    onSelectFolder: () -> Unit = {},
 ) {
     val state = viewModel.state.collectAsStateWithLifecycle()
 
     SyncNewFolderScreen(
         selectedLocalFolder = state.value.selectedLocalFolder,
         selectedMegaFolder = state.value.selectedMegaFolder,
-        localFolderSelected = { viewModel.handleAction(LocalFolderSelected(it)) },
+        onSelectFolder = {
+            Analytics.tracker.trackEvent(AndroidSyncLocalFolderSelectedEvent)
+            onSelectFolder()
+        },
         selectMegaFolderClicked = openSelectMegaFolderScreen,
         syncClicked = {
             Analytics.tracker.trackEvent(AndroidSyncStartSyncButtonEvent)

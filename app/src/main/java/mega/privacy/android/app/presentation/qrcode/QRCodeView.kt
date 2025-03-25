@@ -91,10 +91,10 @@ import mega.privacy.android.shared.original.core.ui.controls.buttons.RaisedDefau
 import mega.privacy.android.shared.original.core.ui.controls.dialogs.ConfirmationDialog
 import mega.privacy.android.shared.original.core.ui.controls.snackbars.MegaSnackbar
 import mega.privacy.android.shared.original.core.ui.preview.CombinedThemePreviews
-import mega.privacy.android.shared.original.core.ui.theme.OriginalTempTheme
+import mega.privacy.android.shared.original.core.ui.theme.OriginalTheme
 import mega.privacy.android.shared.original.core.ui.theme.extensions.grey_alpha_038_white_alpha_038
 import mega.privacy.android.shared.original.core.ui.theme.extensions.grey_alpha_087_white_alpha_087
-import mega.privacy.android.shared.original.core.ui.theme.extensions.teal_300_teal_200
+import mega.privacy.android.shared.original.core.ui.theme.extensions.accent_900_accent_050
 import mega.privacy.android.shared.original.core.ui.utils.showAutoDurationSnackbar
 import timber.log.Timber
 import java.io.File
@@ -132,6 +132,8 @@ internal fun QRCodeView(
     onUploadFileConsumed: () -> Unit,
     onScanCancelConsumed: () -> Unit,
     onUploadEventConsumed: () -> Unit,
+    navigateToStorageSettings: () -> Unit,
+    navigateToQrSettings: () -> Unit,
     qrCodeMapper: QRCodeMapper,
 ) {
     val view: View = LocalView.current
@@ -198,6 +200,7 @@ internal fun QRCodeView(
         event = viewState.uploadEvent,
         onConsumeEvent = onUploadEventConsumed,
         snackBarHostState = snackBarHostState,
+        navigateToStorageSettings = navigateToStorageSettings,
     )
 
     Scaffold(
@@ -247,7 +250,8 @@ internal fun QRCodeView(
                             )
                         }
                     }
-                }
+                },
+                navigateToQrSettings = navigateToQrSettings
             )
         }
     ) {
@@ -321,7 +325,7 @@ internal fun QRCodeView(
                         Icon(
                             painter = painterResource(id = R.drawable.copy),
                             contentDescription = stringResource(id = R.string.context_copy),
-                            tint = MaterialTheme.colors.teal_300_teal_200
+                            tint = MaterialTheme.colors.accent_900_accent_050
                         )
                     }
                 }
@@ -668,7 +672,7 @@ private fun finishActivity(activity: Activity?) {
 @CombinedThemePreviews
 @Composable
 private fun PreviewQRCodeView() {
-    OriginalTempTheme(isDark = isSystemInDarkTheme()) {
+    OriginalTheme(isDark = isSystemInDarkTheme()) {
         val avatarContent = TextAvatarContent(
             avatarText = "A",
             backgroundColor = colorResource(id = R.color.red_300_red_200).toArgb(),
@@ -684,8 +688,8 @@ private fun PreviewQRCodeView() {
         )
         QRCodeView(
             viewState = viewState,
-            onCreateQRCode = { },
             onBackPressed = { },
+            onCreateQRCode = { },
             onDeleteQRCode = { },
             onResetQRCode = { },
             onScanQrCodeClicked = { },
@@ -705,6 +709,8 @@ private fun PreviewQRCodeView() {
             onUploadFileConsumed = { },
             onScanCancelConsumed = { },
             onUploadEventConsumed = { },
+            navigateToStorageSettings = {},
+            navigateToQrSettings = {},
         ) { _, _, _, _, _ ->
             Bitmap.createBitmap(500, 500, Bitmap.Config.ARGB_8888)
         }
@@ -714,7 +720,7 @@ private fun PreviewQRCodeView() {
 @CombinedThemePreviews
 @Composable
 private fun PreviewInviteContactDialog() {
-    OriginalTempTheme(isDark = isSystemInDarkTheme()) {
+    OriginalTheme(isDark = isSystemInDarkTheme()) {
         val result = ScannedContactLinkResult(
             contactName = "Abc",
             email = "abc@gmail.com",
@@ -741,7 +747,7 @@ private fun PreviewInviteContactDialog() {
 @CombinedThemePreviews
 @Composable
 private fun PreviewInviteResultDialog() {
-    OriginalTempTheme(isDark = isSystemInDarkTheme()) {
+    OriginalTheme(isDark = isSystemInDarkTheme()) {
         InviteResultDialog(
             title = "Title",
             text = "Message content text",

@@ -28,6 +28,10 @@ class GetPathForUploadUseCase @Inject constructor(
      */
     suspend operator fun invoke(originalUriPath: UriPath, isChatUpload: Boolean): String? {
         return when {
+            !isChatUpload && fileSystemRepository.isContentUri(originalUriPath.value) -> {
+                originalUriPath.value
+            }
+
             fileSystemRepository.isFilePath(originalUriPath.value) -> {
                 originalUriPath.value
             }

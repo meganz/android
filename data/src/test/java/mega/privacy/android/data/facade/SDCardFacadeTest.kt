@@ -151,6 +151,25 @@ class SDCardFacadeTest {
         assertThat(underTest.isSDCardCachePath(path)).isEqualTo(isSdPath)
     }
 
+    @ParameterizedTest
+    @ValueSource(booleans = [true, false])
+    fun `test that is SD Card Uri returns true if corresponds`(
+        isSDCardUri: Boolean,
+    ) = runTest {
+        mockStatic(Uri::class.java).use { mockedUri ->
+            val uriString = "test/path"
+            val testUri = mock<Uri>()
+            val documentFile = mock<DocumentFile>()
+            val documentId = if (isSDCardUri) "secondary" else "primary"
+
+            mockedUri.`when`<Uri> { Uri.parse(uriString) }.thenReturn(testUri)
+            whenever(documentFileWrapper.fromTreeUri(testUri)).thenReturn(documentFile)
+            whenever(documentFileWrapper.getDocumentId(documentFile)).thenReturn(documentId)
+
+            assertThat(underTest.isSDCardUri(uriString)).isEqualTo(isSDCardUri)
+        }
+    }
+
     private fun provideRootSDCardPathTestParameters() =
         Stream.of(
             Arguments.of("/storage/sdcard0/DCIM/DCIM2/DCIM3", 17),

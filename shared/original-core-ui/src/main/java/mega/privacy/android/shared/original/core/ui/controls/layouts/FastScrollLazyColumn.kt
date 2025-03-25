@@ -29,8 +29,8 @@ import mega.privacy.android.shared.original.core.ui.controls.buttons.OutlinedMeg
 import mega.privacy.android.shared.original.core.ui.controls.text.MegaText
 import mega.privacy.android.shared.original.core.ui.preview.CombinedThemePreviews
 import mega.privacy.android.shared.original.core.ui.theme.MegaOriginalTheme
-import mega.privacy.android.shared.original.core.ui.theme.OriginalTempThemeForPreviews
-import mega.privacy.android.shared.original.core.ui.theme.values.TextColor
+import mega.privacy.android.shared.original.core.ui.theme.OriginalThemeForPreviews
+import mega.android.core.ui.theme.values.TextColor
 
 /**
  * A LazyColumn that shows a vertical scrollbar with a thumb that allows fast scrolling of the list.
@@ -91,7 +91,7 @@ internal const val LAZY_COLUMN_TAG = "fast_scroll_lazy_column:lazy_column_conten
 @CombinedThemePreviews
 @Composable
 private fun FastScrollLazyColumnPreview() {
-    OriginalTempThemeForPreviews {
+    OriginalThemeForPreviews {
         val items = (0..1000).map { it }
         FastScrollLazyColumn(
             tooltipText = {
@@ -120,7 +120,7 @@ private fun FastScrollLazyColumnPreview() {
 @CombinedThemePreviews
 @Composable
 private fun FastScrollLazyColumnReversePreview() {
-    OriginalTempThemeForPreviews {
+    OriginalThemeForPreviews {
         val items = (0..1000).map { it }
         FastScrollLazyColumn(
             horizontalAlignment = Alignment.End,

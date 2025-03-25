@@ -16,7 +16,7 @@ import mega.privacy.android.shared.original.core.ui.controls.progressindicator.M
 import mega.privacy.android.shared.original.core.ui.preview.BooleanProvider
 import mega.privacy.android.shared.original.core.ui.preview.CombinedThemePreviews
 import mega.privacy.android.shared.original.core.ui.theme.MegaOriginalTheme
-import mega.privacy.android.shared.original.core.ui.theme.OriginalTempTheme
+import mega.privacy.android.shared.original.core.ui.theme.OriginalTheme
 import mega.privacy.android.shared.original.core.ui.theme.extensions.body3
 
 /**
@@ -101,7 +101,7 @@ internal const val PROGRESS_SUBTITLE_TAG = "progress_dialog:text_subtitle"
 private fun ProgressDialogPreview(
     @PreviewParameter(BooleanProvider::class) hasSubtitleAndButton: Boolean,
 ) {
-    OriginalTempTheme(isDark = isSystemInDarkTheme()) {
+    OriginalTheme(isDark = isSystemInDarkTheme()) {
         ProgressDialog(
             title = "Title goes here",
             subTitle = "Subtitle goes here".takeIf { hasSubtitleAndButton },

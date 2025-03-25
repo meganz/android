@@ -168,7 +168,7 @@ class VideoSectionRepositoryImplTest {
         whenever(megaApiGateway.isInBackups(node)).thenReturn(false)
         whenever(typedVideoNodeMapper(fileNode, node.duration, null)).thenReturn(typedVideoNode)
         initUnderTest()
-        val actual = underTest.getAllVideos(SortOrder.ORDER_MODIFICATION_DESC)
+        val actual = underTest.getAllVideos("", null, null, SortOrder.ORDER_MODIFICATION_DESC)
         assertThat(actual).isNotEmpty()
         assertThat(actual.size).isEqualTo(1)
         assertThat(actual[0]).isEqualTo(typedVideoNode)
@@ -616,41 +616,60 @@ class VideoSectionRepositoryImplTest {
     }
 
     @Test
-    fun `test that monitorVideoPlaylistSetsUpdate emits correct result`() = runTest {
-        val expectedUserSets = (1..3L).map {
-            createUserSet(
-                id = it,
-                name = "Playlist $it",
-                type = MegaSet.SET_TYPE_PLAYLIST,
-                cover = -1L,
-                creationTime = it,
-                modificationTime = it,
-                isExported = false,
-            )
-        }
+    fun `test that monitorVideoPlaylistSetsUpdate emits correct result when OnSetsUpdate is emitted`() =
+        runTest {
+            val expectedUserSets = (1..3L).map {
+                createUserSet(
+                    id = it,
+                    name = "Playlist $it",
+                    type = MegaSet.SET_TYPE_PLAYLIST,
+                    cover = -1L,
+                    creationTime = it,
+                    modificationTime = it,
+                    isExported = false,
+                )
+            }
 
-        val megaSets = expectedUserSets.map { set ->
-            mock<MegaSet> {
-                on { id() }.thenReturn(set.id)
-                on { name() }.thenReturn(set.name)
-                on { ts() }.thenReturn(set.modificationTime)
-                on { type() }.thenReturn(MegaSet.SET_TYPE_PLAYLIST)
+            val megaSets = expectedUserSets.map { set ->
+                mock<MegaSet> {
+                    on { id() }.thenReturn(set.id)
+                    on { name() }.thenReturn(set.name)
+                    on { ts() }.thenReturn(set.modificationTime)
+                    on { type() }.thenReturn(MegaSet.SET_TYPE_PLAYLIST)
+                }
+            }
+
+            whenever(megaApiGateway.globalUpdates)
+                .thenReturn(flowOf(GlobalUpdate.OnSetsUpdate(ArrayList(megaSets))))
+
+            initUnderTest()
+            underTest.monitorSetsUpdates().test {
+                val actual = awaitItem()
+                assertThat(actual).isNotEmpty()
+                assertThat(actual[0]).isEqualTo(1L)
+                assertThat(actual[1]).isEqualTo(2L)
+                assertThat(actual[2]).isEqualTo(3L)
+                cancelAndIgnoreRemainingEvents()
             }
         }
 
-        whenever(megaApiGateway.globalUpdates)
-            .thenReturn(flowOf(GlobalUpdate.OnSetsUpdate(ArrayList(megaSets))))
-
-        initUnderTest()
-        underTest.monitorSetsUpdates().test {
-            val actual = awaitItem()
-            assertThat(actual).isNotEmpty()
-            assertThat(actual[0]).isEqualTo(1L)
-            assertThat(actual[1]).isEqualTo(2L)
-            assertThat(actual[2]).isEqualTo(3L)
-            cancelAndIgnoreRemainingEvents()
+    @Test
+    fun `test that monitorVideoPlaylistSetsUpdate emits correct result when OnSetElementsUpdate is emitted`() =
+        runTest {
+            val testElement = mock<MegaSetElement> {
+                on { setId() }.thenReturn(1L)
+            }
+            getUserSetAndInitReturnValues()
+            underTest.getVideoPlaylistSets()
+            whenever(megaApiGateway.globalUpdates)
+                .thenReturn(flowOf(GlobalUpdate.OnSetElementsUpdate(arrayListOf(testElement))))
+            underTest.monitorSetsUpdates().test {
+                val actual = awaitItem()
+                assertThat(actual).isNotEmpty()
+                assertThat(actual[0]).isEqualTo(1L)
+                cancelAndIgnoreRemainingEvents()
+            }
         }
-    }
 
     @Test
     fun `test that getVideoPlaylistSets function returns the correct result`() = runTest {

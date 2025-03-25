@@ -8,6 +8,7 @@ import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.systemBarsPadding
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.runtime.Composable
@@ -34,8 +35,8 @@ import mega.privacy.android.shared.original.core.ui.controls.layouts.MegaScaffol
 import mega.privacy.android.shared.original.core.ui.controls.lists.GenericTwoLineListItem
 import mega.privacy.android.shared.original.core.ui.controls.text.MegaText
 import mega.privacy.android.shared.original.core.ui.preview.CombinedThemePreviews
-import mega.privacy.android.shared.original.core.ui.theme.OriginalTempTheme
-import mega.privacy.android.shared.original.core.ui.theme.values.TextColor
+import mega.privacy.android.shared.original.core.ui.theme.OriginalTheme
+import mega.android.core.ui.theme.values.TextColor
 
 @OptIn(ExperimentalComposeUiApi::class)
 @Composable
@@ -64,7 +65,9 @@ internal fun VideoToPlaylistView(
     val lazyListState = rememberLazyListState()
 
     MegaScaffold(
-        modifier = modifier.semantics { testTagsAsResourceId = true },
+        modifier = modifier
+            .systemBarsPadding()
+            .semantics { testTagsAsResourceId = true },
         topBar = {
             LegacySearchAppBar(
                 modifier = Modifier.testTag(VIDEO_TO_PLAYLIST_SEARCH_BAR_TEST_TAG),
@@ -121,7 +124,7 @@ internal fun VideoToPlaylistView(
                 items.isEmpty() -> LegacyMegaEmptyViewWithImage(
                     modifier = Modifier.testTag(VIDEO_TO_PLAYLIST_EMPTY_VIEW_TEST_TAG),
                     text = stringResource(id = sharedR.string.video_section_playlists_empty_hint_playlist),
-                    imagePainter = painterResource(id = iconPackR.drawable.ic_homepage_empty_playlists)
+                    imagePainter = painterResource(id = iconPackR.drawable.ic_playlist_glass)
                 )
 
                 else -> LazyColumn(
@@ -162,7 +165,7 @@ internal fun VideoToPlaylistView(
                     .padding(horizontal = 16.dp, vertical = 8.dp)
                     .testTag(VIDEO_TO_PLAYLIST_DONE_BUTTON_TEST_TAG),
                 enabled = hasSelectedItems,
-                textId = sharedR.string.video_to_playlist_done_button,
+                textId = sharedR.string.video_to_playlist_add_button,
                 onClick = onDoneButtonClicked
             )
         }
@@ -173,7 +176,7 @@ internal fun VideoToPlaylistView(
 @CombinedThemePreviews
 @Composable
 private fun VideoToPlaylistViewPreview() {
-    OriginalTempTheme(isDark = isSystemInDarkTheme()) {
+    OriginalTheme(isDark = isSystemInDarkTheme()) {
         VideoToPlaylistView(
             items = provideTestItems(),
             searchState = SearchWidgetState.COLLAPSED,
@@ -197,6 +200,27 @@ private fun provideTestItems() = (0..20).map {
         title = "Video Playlist Set $it",
         isSelected = it % 2 == 0
     )
+}
+
+@CombinedThemePreviews
+@Composable
+private fun VideoToPlaylistViewPreviewWithEmptyItems() {
+    OriginalTheme(isDark = isSystemInDarkTheme()) {
+        VideoToPlaylistView(
+            items = emptyList(),
+            searchState = SearchWidgetState.COLLAPSED,
+            query = "",
+            hasSelectedItems = true,
+            isLoading = false,
+            isInputTitleValid = true,
+            showCreateVideoPlaylistDialog = false,
+            inputPlaceHolderText = "",
+            setShouldCreateVideoPlaylist = {},
+            onCreateDialogPositiveButtonClicked = {},
+            setInputValidity = {},
+            setDialogInputPlaceholder = {}
+        )
+    }
 }
 
 /**

@@ -171,7 +171,11 @@ const val CONFIRM_TAG = "mega_alert_dialog:button_confirm"
  */
 const val CANCEL_TAG = "mega_alert_dialog:button_cancel"
 
-internal const val TITLE_TAG = "mega_alert_dialog:text_title"
+/**
+ * Title's test tag
+ */
+const val TITLE_TAG = "mega_alert_dialog:text_title"
+
 internal const val CONTENT_TAG = "mega_alert_dialog:text_content"
 internal const val OPTION1_TAG = "mega_alert_dialog:button_option1"
 internal const val OPTION2_TAG = "mega_alert_dialog:button_option2"

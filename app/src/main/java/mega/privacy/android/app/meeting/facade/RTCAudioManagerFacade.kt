@@ -103,7 +103,7 @@ class RTCAudioManagerFacade @Inject constructor(
                 applicationScope,
                 broadcastAudioOutputUseCase
             )
-            if (type != Constants.AUDIO_MANAGER_CREATING_JOINING_MEETING) {
+            if (type != Constants.AUDIO_MANAGER_CREATING_JOINING_MEETING && type != Constants.AUDIO_MANAGER_PLAY_VOICE_CLIP) {
                 MegaApplication.getInstance().startProximitySensor()
             }
         }
@@ -163,6 +163,10 @@ class RTCAudioManagerFacade @Inject constructor(
 
     override fun stopSounds() {
         rtcAudioManager?.stopAudioSignals()
+        rtcAudioManagerRingInCall?.stopAudioSignals()
+    }
+
+    override fun stopIncomingCallSounds() {
         rtcAudioManagerRingInCall?.stopAudioSignals()
     }
 

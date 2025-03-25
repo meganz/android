@@ -8,21 +8,19 @@ import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.collectLatest
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
-import mega.privacy.android.app.featuretoggle.AppFeatures
 import mega.privacy.android.app.presentation.settings.calls.model.SettingsCallsState
 import mega.privacy.android.domain.entity.CallsMeetingInvitations
 import mega.privacy.android.domain.entity.CallsMeetingReminders
-import mega.privacy.android.domain.entity.CallsSoundNotifications
+import mega.privacy.android.domain.entity.CallsSoundEnabledState
 import mega.privacy.android.domain.entity.statistics.DisableSoundNotification
 import mega.privacy.android.domain.entity.statistics.EnableSoundNotification
-import mega.privacy.android.domain.usecase.featureflag.GetFeatureFlagValueUseCase
+import mega.privacy.android.domain.usecase.call.MonitorCallSoundEnabledUseCase
+import mega.privacy.android.domain.usecase.call.SetCallsSoundEnabledStateUseCase
 import mega.privacy.android.domain.usecase.meeting.GetCallsMeetingInvitationsUseCase
 import mega.privacy.android.domain.usecase.meeting.GetCallsMeetingRemindersUseCase
-import mega.privacy.android.domain.usecase.call.GetCallsSoundNotifications
 import mega.privacy.android.domain.usecase.meeting.SendStatisticsMeetingsUseCase
 import mega.privacy.android.domain.usecase.meeting.SetCallsMeetingInvitationsUseCase
 import mega.privacy.android.domain.usecase.meeting.SetCallsMeetingRemindersUseCase
-import mega.privacy.android.domain.usecase.call.SetCallsSoundNotifications
 import javax.inject.Inject
 
 /**
@@ -30,14 +28,13 @@ import javax.inject.Inject
  */
 @HiltViewModel
 class SettingsCallsViewModel @Inject constructor(
-    private val getCallsSoundNotifications: GetCallsSoundNotifications,
-    private val setCallsSoundNotifications: SetCallsSoundNotifications,
+    private val monitorCallSoundEnabledUseCase: MonitorCallSoundEnabledUseCase,
+    private val setCallsSoundEnabledStateUseCase: SetCallsSoundEnabledStateUseCase,
     private val getCallsMeetingInvitations: GetCallsMeetingInvitationsUseCase,
     private val setCallsMeetingInvitations: SetCallsMeetingInvitationsUseCase,
     private val getCallsMeetingReminders: GetCallsMeetingRemindersUseCase,
     private val setCallsMeetingReminders: SetCallsMeetingRemindersUseCase,
     private val sendStatisticsMeetingsUseCase: SendStatisticsMeetingsUseCase,
-    private val getFeatureFlagValue: GetFeatureFlagValueUseCase,
 ) : ViewModel() {
 
     private val _uiState = MutableStateFlow(SettingsCallsState())
@@ -51,12 +48,7 @@ class SettingsCallsViewModel @Inject constructor(
 
     init {
         viewModelScope.launch {
-            getFeatureFlagValue(AppFeatures.MeetingNotificationSettings).let { flag ->
-                _uiState.update { it.copy(meetingNotificationEnabled = flag) }
-            }
-        }
-        viewModelScope.launch {
-            getCallsSoundNotifications().collectLatest { result ->
+            monitorCallSoundEnabledUseCase().collectLatest { result ->
                 _uiState.update { it.copy(soundNotifications = result) }
             }
         }
@@ -82,10 +74,10 @@ class SettingsCallsViewModel @Inject constructor(
             runCatching {
                 if (enable) {
                     sendStatisticsMeetingsUseCase(EnableSoundNotification())
-                    setCallsSoundNotifications(CallsSoundNotifications.Enabled)
+                    setCallsSoundEnabledStateUseCase(CallsSoundEnabledState.Enabled)
                 } else {
                     sendStatisticsMeetingsUseCase(DisableSoundNotification())
-                    setCallsSoundNotifications(CallsSoundNotifications.Disabled)
+                    setCallsSoundEnabledStateUseCase(CallsSoundEnabledState.Disabled)
                 }
             }
         }

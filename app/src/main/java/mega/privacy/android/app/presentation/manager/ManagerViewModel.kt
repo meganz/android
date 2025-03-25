@@ -7,6 +7,7 @@ import androidx.lifecycle.viewModelScope
 import dagger.hilt.android.lifecycle.HiltViewModel
 import de.palm.composestateevents.consumed
 import de.palm.composestateevents.triggered
+import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
@@ -28,12 +29,12 @@ import mega.privacy.android.app.main.dialog.removelink.RemovePublicLinkResultMap
 import mega.privacy.android.app.main.dialog.shares.RemoveShareResultMapper
 import mega.privacy.android.app.meeting.gateway.RTCAudioManagerGateway
 import mega.privacy.android.app.middlelayer.scanner.ScannerHandler
-import mega.privacy.android.app.objects.PasscodeManagement
 import mega.privacy.android.app.presentation.documentscanner.model.DocumentScanningError
 import mega.privacy.android.app.presentation.extensions.getState
 import mega.privacy.android.app.presentation.manager.model.ManagerState
 import mega.privacy.android.app.presentation.manager.model.SharesTab
 import mega.privacy.android.app.presentation.meeting.chat.model.InfoToShow
+import mega.privacy.android.app.presentation.psa.legacy.LegacyPsaGlobalState
 import mega.privacy.android.app.presentation.transfers.starttransfer.model.TransferTriggerEvent
 import mega.privacy.android.app.presentation.versions.mapper.VersionHistoryRemoveMessageMapper
 import mega.privacy.android.app.service.scanner.InsufficientRAMToLaunchDocumentScanner
@@ -58,6 +59,8 @@ import mega.privacy.android.domain.entity.node.NodeNameCollisionType
 import mega.privacy.android.domain.entity.node.NodeSourceType
 import mega.privacy.android.domain.entity.uri.UriPath
 import mega.privacy.android.domain.entity.user.UserChanges
+import mega.privacy.android.domain.extension.mapAsync
+import mega.privacy.android.domain.qualifier.ApplicationScope
 import mega.privacy.android.domain.usecase.GetCloudSortOrder
 import mega.privacy.android.domain.usecase.GetExtendedAccountDetail
 import mega.privacy.android.domain.usecase.GetNodeByIdUseCase
@@ -71,7 +74,7 @@ import mega.privacy.android.domain.usecase.MonitorUserAlertUpdates
 import mega.privacy.android.domain.usecase.MonitorUserUpdates
 import mega.privacy.android.domain.usecase.account.GetFullAccountInfoUseCase
 import mega.privacy.android.domain.usecase.account.MonitorMyAccountUpdateUseCase
-import mega.privacy.android.domain.usecase.account.MonitorSecurityUpgradeInApp
+import mega.privacy.android.domain.usecase.account.MonitorSecurityUpgradeInAppUseCase
 import mega.privacy.android.domain.usecase.account.MonitorStorageStateEventUseCase
 import mega.privacy.android.domain.usecase.account.RenameRecoveryKeyFileUseCase
 import mega.privacy.android.domain.usecase.account.RequireTwoFactorAuthenticationUseCase
@@ -92,6 +95,7 @@ import mega.privacy.android.domain.usecase.environment.MonitorDevicePowerConnect
 import mega.privacy.android.domain.usecase.featureflag.GetFeatureFlagValueUseCase
 import mega.privacy.android.domain.usecase.file.FilePrepareUseCase
 import mega.privacy.android.domain.usecase.filenode.DeleteNodeVersionsUseCase
+import mega.privacy.android.domain.usecase.login.BackgroundFastLoginUseCase
 import mega.privacy.android.domain.usecase.login.MonitorFinishActivityUseCase
 import mega.privacy.android.domain.usecase.meeting.GetScheduledMeetingByChatUseCase
 import mega.privacy.android.domain.usecase.meeting.GetUsersCallLimitRemindersUseCase
@@ -152,7 +156,7 @@ import javax.inject.Inject
  * @property requireTwoFactorAuthenticationUseCase Use case for requiring two factor authentication.
  * @property setCopyLatestTargetPathUseCase Use case for setting the latest target path for copy operations.
  * @property setMoveLatestTargetPathUseCase Use case for setting the latest target path for move operations.
- * @property monitorSecurityUpgradeInApp Use case for monitoring security upgrade in app.
+ * @property monitorSecurityUpgradeInAppUseCase Use case for monitoring security upgrade in app.
  * @property monitorUserUpdates Use case for monitoring user updates.
  * @property establishCameraUploadsSyncHandlesUseCase Use case for establishing camera uploads sync handles.
  * @property startCameraUploadUseCase Use case for starting camera uploads.
@@ -185,7 +189,6 @@ import javax.inject.Inject
  * @property setChatVideoInDeviceUseCase Use case for setting chat video in device.
  * @property rtcAudioManagerGateway Gateway for RTC audio manager.
  * @property chatManagement Management for chat.
- * @property passcodeManagement Management for passcode.
  * @property monitorSyncStalledIssuesUseCase Use case for monitoring sync stalled issues.
  * @property monitorSyncsUseCase Use case for monitoring syncs.
  * @property monitorChatSessionUpdatesUseCase Use case for monitoring chat session updates.
@@ -218,7 +221,7 @@ class ManagerViewModel @Inject constructor(
     private val requireTwoFactorAuthenticationUseCase: RequireTwoFactorAuthenticationUseCase,
     private val setCopyLatestTargetPathUseCase: SetCopyLatestTargetPathUseCase,
     private val setMoveLatestTargetPathUseCase: SetMoveLatestTargetPathUseCase,
-    private val monitorSecurityUpgradeInApp: MonitorSecurityUpgradeInApp,
+    private val monitorSecurityUpgradeInAppUseCase: MonitorSecurityUpgradeInAppUseCase,
     private val monitorUserUpdates: MonitorUserUpdates,
     private val establishCameraUploadsSyncHandlesUseCase: EstablishCameraUploadsSyncHandlesUseCase,
     private val startCameraUploadUseCase: StartCameraUploadUseCase,
@@ -256,7 +259,6 @@ class ManagerViewModel @Inject constructor(
     private val setChatVideoInDeviceUseCase: SetChatVideoInDeviceUseCase,
     private val rtcAudioManagerGateway: RTCAudioManagerGateway,
     private val chatManagement: ChatManagement,
-    private val passcodeManagement: PasscodeManagement,
     private val monitorSyncStalledIssuesUseCase: MonitorSyncStalledIssuesUseCase,
     private val monitorSyncsUseCase: MonitorSyncsUseCase,
     private val monitorChatSessionUpdatesUseCase: MonitorChatSessionUpdatesUseCase,
@@ -274,6 +276,9 @@ class ManagerViewModel @Inject constructor(
     private val monitorChatListItemUpdates: MonitorChatListItemUpdates,
     private val deleteNodeVersionsUseCase: DeleteNodeVersionsUseCase,
     private val versionHistoryRemoveMessageMapper: VersionHistoryRemoveMessageMapper,
+    private val backgroundFastLoginUseCase: BackgroundFastLoginUseCase,
+    private val legacyState: LegacyPsaGlobalState,
+    @ApplicationScope private val appScope: CoroutineScope,
 ) : ViewModel() {
 
     /**
@@ -388,7 +393,7 @@ class ManagerViewModel @Inject constructor(
             }
         }
         viewModelScope.launch {
-            monitorSecurityUpgradeInApp().collect {
+            monitorSecurityUpgradeInAppUseCase().collect {
                 if (it) {
                     setShouldAlertUserAboutSecurityUpgrade(true)
                 }
@@ -544,7 +549,6 @@ class ManagerViewModel @Inject constructor(
             monitorChatListItemUpdates().catch {
                 Timber.e("An error occurred while monitoring the Chat List Item Updates $it")
             }.collect {
-                Timber.d("The Chat List Item Updates is $it")
                 if (it.isPreview) {
                     return@collect
                 }
@@ -870,6 +874,23 @@ class ManagerViewModel @Inject constructor(
         Timber.e(it)
     }
 
+
+    /**
+     * Init share key for sharing folders
+     *
+     * @param nodeHandles
+     */
+    suspend fun initShareKeys(nodeHandles: LongArray?) = runCatching {
+        require(nodeHandles != null) { "Cannot create a share key for a null node" }
+        nodeHandles.toList().mapAsync { nodeId ->
+            val typedNode = getNodeByIdUseCase(NodeId(nodeId))
+            require(typedNode is FolderNode) { "Cannot create a share key for a non-folder node" }
+            createShareKeyUseCase(typedNode)
+        }
+    }.onFailure {
+        Timber.e(it)
+    }
+
     /**
      * Consume chat archive event
      */
@@ -1139,7 +1160,10 @@ class ManagerViewModel @Inject constructor(
      *
      * @param psaId
      */
-    fun dismissPsa(psaId: Int) = viewModelScope.launch { dismissPsaUseCase(psaId) }
+    fun dismissPsa(psaId: Int) = appScope.launch {
+        dismissPsaUseCase(psaId)
+        legacyState.clearPsa()
+    }
 
     /**
      * Get the parent handle from where the search is performed
@@ -1160,6 +1184,7 @@ class ManagerViewModel @Inject constructor(
         incomingParentHandle: Long,
         outgoingParentHandle: Long,
         linksParentHandle: Long,
+        favouritesParentHandle: Long,
         nodeSourceType: NodeSourceType,
     ): Long = when (nodeSourceType) {
         NodeSourceType.CLOUD_DRIVE -> browserParentHandle
@@ -1168,6 +1193,9 @@ class ManagerViewModel @Inject constructor(
         NodeSourceType.LINKS -> linksParentHandle
         NodeSourceType.RUBBISH_BIN -> rubbishBinParentHandle
         NodeSourceType.BACKUPS -> backupsParentHandle
+        NodeSourceType.FAVOURITES -> favouritesParentHandle
+        NodeSourceType.DOCUMENTS -> MegaApiJava.INVALID_HANDLE
+        NodeSourceType.AUDIO -> MegaApiJava.INVALID_HANDLE
         NodeSourceType.HOME, NodeSourceType.OTHER -> getRootNodeUseCase()?.id?.longValue
             ?: MegaApiJava.INVALID_HANDLE
     }
@@ -1209,7 +1237,7 @@ class ManagerViewModel @Inject constructor(
                     ChatCallStatus.Connecting,
                     ChatCallStatus.Joining,
                     ChatCallStatus.InProgress,
-                    -> ScheduledMeetingStatus.Joined(call.duration)
+                        -> ScheduledMeetingStatus.Joined(call.duration)
 
                     else -> ScheduledMeetingStatus.NotStarted
                 }
@@ -1300,7 +1328,6 @@ class ManagerViewModel @Inject constructor(
             MegaApplication.getInstance().applicationContext,
             call.chatId,
             true,
-            passcodeManagement,
         )
     }
 
@@ -1388,14 +1415,14 @@ class ManagerViewModel @Inject constructor(
         filePrepareUseCase(uris.map { UriPath(it.toString()) })
 
     /**
-     * Checks whether the legacy or modern Document Scanner should be used
+     * Prepares the ML Kit Document Scanner from Google Play Services
      */
-    fun handleScanDocument() {
+    fun prepareDocumentScanner() {
         viewModelScope.launch {
             runCatching {
-                scannerHandler.handleScanDocument()
-            }.onSuccess { handleScanDocumentResult ->
-                _state.update { it.copy(handleScanDocumentResult = handleScanDocumentResult) }
+                scannerHandler.prepareDocumentScanner()
+            }.onSuccess { gmsDocumentScanner ->
+                _state.update { it.copy(gmsDocumentScanner = gmsDocumentScanner) }
             }.onFailure { exception ->
                 _state.update {
                     it.copy(
@@ -1411,17 +1438,17 @@ class ManagerViewModel @Inject constructor(
     }
 
     /**
-     * When the system fails to open the ML Document Kit Scanner, display a generic error message
+     * When the system fails to open the ML Kit Document Scanner, display a generic error message
      */
-    fun onNewDocumentScannerFailedToOpen() {
+    fun onDocumentScannerFailedToOpen() {
         _state.update { it.copy(documentScanningError = DocumentScanningError.GenericError) }
     }
 
     /**
-     * Resets the value of [ManagerState.handleScanDocumentResult]
+     * Resets the value of [ManagerState.gmsDocumentScanner]
      */
-    fun onHandleScanDocumentResultConsumed() {
-        _state.update { it.copy(handleScanDocumentResult = null) }
+    fun onGmsDocumentScannerConsumed() {
+        _state.update { it.copy(gmsDocumentScanner = null) }
     }
 
     /**
@@ -1448,6 +1475,25 @@ class ManagerViewModel @Inject constructor(
         }
         return versionHistoryRemoveMessageMapper(result.exceptionOrNull())
     }
+
+    /**
+     * Perform fast login in background
+     */
+    suspend fun performFastLoginInBackground() = runCatching {
+        backgroundFastLoginUseCase()
+    }.isSuccess
+
+    /**
+     * Set the value of [ManagerState.showHomeFabOptionsBottomSheet] in order to display the bottom sheet
+     */
+    fun showHomeFabOptionsBottomSheet() =
+        _state.update { it.copy(showHomeFabOptionsBottomSheet = true) }
+
+    /**
+     * Consume [ManagerState.showHomeFabOptionsBottomSheet]
+     */
+    fun onConsumeShowHomeFabOptionsBottomSheet() =
+        _state.update { it.copy(showHomeFabOptionsBottomSheet = false) }
 
     internal companion object {
         internal const val IS_FIRST_LOGIN_KEY = "EXTRA_FIRST_LOGIN"

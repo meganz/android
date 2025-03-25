@@ -36,10 +36,11 @@ import mega.privacy.android.app.globalmanagement.MegaChatRequestHandler
 import mega.privacy.android.app.listeners.InviteToChatRoomListener
 import mega.privacy.android.app.listeners.OptionalMegaRequestListenerInterface
 import mega.privacy.android.app.main.legacycontact.AddContactActivity
+import mega.privacy.android.app.meeting.activity.MeetingActivity.Companion.MEETING_ACTION_RINGING_VIDEO_OFF
+import mega.privacy.android.app.meeting.activity.MeetingActivity.Companion.MEETING_ACTION_RINGING_VIDEO_ON
 import mega.privacy.android.app.meeting.adapter.Participant
 import mega.privacy.android.app.meeting.gateway.RTCAudioManagerGateway
 import mega.privacy.android.app.meeting.listeners.IndividualCallVideoListener
-import mega.privacy.android.app.objects.PasscodeManagement
 import mega.privacy.android.app.presentation.chat.model.AnswerCallResult
 import mega.privacy.android.app.presentation.contactinfo.model.ContactInfoUiState
 import mega.privacy.android.app.presentation.extensions.getState
@@ -166,7 +167,7 @@ import javax.inject.Inject
  * @property muteAllPeersUseCase                            [MuteAllPeersUseCase]
  * @property getStringFromStringResMapper                   [GetStringFromStringResMapper]
  * @property getCurrentSubscriptionPlanUseCase              [GetCurrentSubscriptionPlanUseCase]
- * @property monitorAudioOutputUseCase                      [MonitoraAudioOutputUseCase]
+ * @property monitorAudioOutputUseCase                      [MonitorAudioOutputUseCase]
  * @property state                                          Current view state as [MeetingState]
  */
 @HiltViewModel
@@ -219,7 +220,6 @@ class MeetingActivityViewModel @Inject constructor(
     private val monitorCallEndedUseCase: MonitorCallEndedUseCase,
     private val createMeetingUseCase: CreateMeetingUseCase,
     private val startCallUseCase: StartCallUseCase,
-    private val passcodeManagement: PasscodeManagement,
     private val monitorAudioOutputUseCase: MonitorAudioOutputUseCase,
     private val monitorChatConnectionStateUseCase: MonitorChatConnectionStateUseCase,
     savedStateHandle: SavedStateHandle,
@@ -590,7 +590,7 @@ class MeetingActivityViewModel @Inject constructor(
 
                         ChatCallStatus.TerminatingUserParticipation,
                         ChatCallStatus.Destroyed,
-                        -> finishMeetingActivity()
+                            -> finishMeetingActivity()
 
                         else -> {
                             checkIfPresenting(it)
@@ -699,7 +699,7 @@ class MeetingActivityViewModel @Inject constructor(
                             }
 
                             ScheduledMeetingChanges.EndDate,
-                            -> _state.update { state ->
+                                -> _state.update { state ->
                                 state.copy(
                                     chatScheduledMeeting = state.chatScheduledMeeting?.copy(
                                         startDateTime = scheduledMeetReceived.endDateTime,
@@ -946,7 +946,7 @@ class MeetingActivityViewModel @Inject constructor(
 
                                             ChatCallTermCodeType.TooManyParticipants,
                                             ChatCallTermCodeType.TooManyClients,
-                                            -> _state.update { state ->
+                                                -> _state.update { state ->
                                                 state.copy(
                                                     callEndedDueToTooManyParticipants = true
                                                 )
@@ -1106,6 +1106,13 @@ class MeetingActivityViewModel @Inject constructor(
             monitorChatSessionUpdatesUseCase()
                 .filter { it.call?.chatId == _state.value.chatId }
                 .collectLatest { result ->
+                    result.call?.let { call ->
+                        _state.update { state ->
+                            state.copy(
+                                currentCall = call
+                            )
+                        }
+                    }
                     result.session?.let { session ->
                         session.changes?.apply {
                             if (contains(ChatSessionChanges.RemoteAvFlags)) {
@@ -1236,7 +1243,6 @@ class MeetingActivityViewModel @Inject constructor(
                                     MegaApplication.getInstance().applicationContext,
                                     call.chatId,
                                     true,
-                                    passcodeManagement
                                 )
                                 _state.update {
                                     it.copy(
@@ -1761,57 +1767,79 @@ class MeetingActivityViewModel @Inject constructor(
     }
 
     /**
-     * Answer chat call
+     * Answer call
      *
-     * @param enableVideo The video should be enabled
-     * @param enableAudio The audio should be enabled
-     * @param speakerAudio The speaker should be enabled
-     * @return Result of the call
+     * @param chatId Chat id
+     * @param enableAudio If audio is on
+     * @param enableVideo if video is on
+     * @param speakerAudio if speaker is on
      */
     fun answerCall(
+        chatId: Long,
         enableVideo: Boolean,
         enableAudio: Boolean,
         speakerAudio: Boolean,
-    ): LiveData<AnswerCallResult> {
+    ) {
+        viewModelScope.launch {
+            val call = getChatCallUseCase(chatId)
 
-        val result = MutableLiveData<AnswerCallResult>()
-        _state.value.chatId.let { chatId ->
-            if (CallUtil.amIParticipatingInThisMeeting(chatId)) {
-                Timber.d("Already participating in this call")
-                return result
-            }
+            when {
+                call == null -> {
+                    return@launch
+                }
 
-            if (MegaApplication.getChatManagement().isAlreadyJoiningCall(chatId)) {
-                Timber.d("The call has been answered")
-                return result
-            }
+                CallUtil.amIParticipatingInThisMeeting(chatId) -> {
+                    Timber.d("Already participating in this call")
+                    return@launch
+                }
 
-            chatManagement.addJoiningCallChatId(chatId)
+                MegaApplication.getChatManagement().isAlreadyJoiningCall(chatId) -> {
+                    Timber.d("The call has been answered")
+                    return@launch
+                }
 
-            viewModelScope.launch {
-                runCatching {
+                else -> {
+                    chatManagement.addJoiningCallChatId(chatId)
                     setChatVideoInDeviceUseCase()
-                    answerChatCallUseCase(chatId = chatId, video = enableVideo, audio = enableAudio)
-                }.onSuccess { call ->
-                    chatManagement.removeJoiningCallChatId(chatId)
-                    rtcAudioManagerGateway.removeRTCAudioManagerRingIn()
-                    if (call == null) {
-                        finishMeetingActivity()
-                    } else {
-                        chatManagement.setSpeakerStatus(call.chatId, speakerAudio)
-                        chatManagement.setRequestSentCall(call.callId, false)
-                        CallUtil.clearIncomingCallNotification(call.callId)
+                    runCatching {
+                        answerChatCallUseCase(
+                            chatId = call.chatId,
+                            video = enableVideo,
+                            audio = enableAudio
+                        )
+                    }.onSuccess { chatCall ->
+                        chatManagement.removeJoiningCallChatId(chatId)
+                        rtcAudioManagerGateway.removeRTCAudioManagerRingIn()
+                        if (chatCall == null) {
+                            finishMeetingActivity()
+                        } else {
+                            chatManagement.setSpeakerStatus(chatCall.chatId, speakerAudio)
+                            chatManagement.setRequestSentCall(chatCall.callId, false)
+                            CallUtil.clearIncomingCallNotification(chatCall.callId)
 
-                        result.value =
-                            AnswerCallResult(chatId, call.hasLocalVideo, call.hasLocalAudio)
+                            val actionString = if (enableVideo) {
+                                Timber.d("Call answered with video ON and audio ON")
+                                MEETING_ACTION_RINGING_VIDEO_ON
+                            } else {
+                                Timber.d("Call answered with video OFF and audio ON")
+                                MEETING_ACTION_RINGING_VIDEO_OFF
+                            }
+
+                            _state.update { state ->
+                                state.copy(
+                                    answerResult = AnswerCallResult(
+                                        chatHandle = chatCall.chatId,
+                                        actionString = actionString
+                                    )
+                                )
+                            }
+                        }
+                    }.onFailure {
+                        Timber.w("Exception answering call: $it")
                     }
-                }.onFailure {
-                    Timber.w("Exception answering call: $it")
                 }
             }
         }
-
-        return result
     }
 
     /**

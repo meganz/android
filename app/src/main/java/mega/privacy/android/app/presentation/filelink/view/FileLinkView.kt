@@ -1,7 +1,6 @@
 package mega.privacy.android.app.presentation.filelink.view
 
 import android.content.Intent
-import android.net.Uri
 import androidx.compose.foundation.background
 import androidx.compose.foundation.isSystemInDarkTheme
 import androidx.compose.foundation.layout.Arrangement
@@ -21,13 +20,13 @@ import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
+import com.google.android.gms.ads.admanager.AdManagerAdRequest
 import de.palm.composestateevents.EventEffect
 import mega.privacy.android.app.R
 import mega.privacy.android.app.constants.IntentConstants
+import mega.privacy.android.app.main.ads.AdsContainer
 import mega.privacy.android.app.main.dialog.storagestatus.StorageStatusDialogView
 import mega.privacy.android.app.myAccount.MyAccountActivity
-import mega.privacy.android.app.presentation.advertisements.model.AdsUIState
-import mega.privacy.android.app.presentation.advertisements.view.AdsBannerView
 import mega.privacy.android.app.presentation.extensions.errorDialogContentId
 import mega.privacy.android.app.presentation.extensions.errorDialogTitleId
 import mega.privacy.android.app.presentation.fileinfo.view.FileInfoHeader
@@ -45,7 +44,7 @@ import mega.privacy.android.shared.original.core.ui.controls.layouts.ScaffoldWit
 import mega.privacy.android.shared.original.core.ui.controls.snackbars.MegaSnackbar
 import mega.privacy.android.shared.original.core.ui.controls.widgets.TransfersWidgetViewAnimated
 import mega.privacy.android.shared.original.core.ui.preview.CombinedThemePreviews
-import mega.privacy.android.shared.original.core.ui.theme.OriginalTempTheme
+import mega.privacy.android.shared.original.core.ui.theme.OriginalTheme
 import mega.privacy.android.shared.original.core.ui.theme.extensions.grey_020_grey_700
 import mega.privacy.android.shared.original.core.ui.utils.showAutoDurationSnackbar
 
@@ -71,9 +70,7 @@ internal fun FileLinkView(
     onErrorMessageConsumed: () -> Unit,
     onOverQuotaErrorConsumed: () -> Unit,
     onForeignNodeErrorConsumed: () -> Unit,
-    adsUiState: AdsUIState,
-    onAdClicked: (uri: Uri?) -> Unit,
-    onAdDismissed: () -> Unit,
+    request: AdManagerAdRequest?,
     modifier: Modifier = Modifier,
 ) {
     val context = LocalContext.current
@@ -134,12 +131,11 @@ internal fun FileLinkView(
                     onImportClicked = onImportClicked,
                     onSaveToDeviceClicked = onSaveToDeviceClicked
                 )
-                if (adsUiState.showAdsView) {
-                    AdsBannerView(
-                        uiState = adsUiState,
-                        onAdClicked = onAdClicked,
-                        onAdsWebpageLoaded = {},
-                        onAdDismissed = onAdDismissed
+                request?.let { request ->
+                    AdsContainer(
+                        request = request,
+                        isLoggedInUser = viewState.hasDbCredentials,
+                        modifier = Modifier.fillMaxWidth(),
                     )
                 }
             }
@@ -243,7 +239,7 @@ internal fun ImportDownloadView(
 @CombinedThemePreviews
 @Composable
 private fun PreviewImportDownloadView() {
-    OriginalTempTheme(isDark = isSystemInDarkTheme()) {
+    OriginalTheme(isDark = isSystemInDarkTheme()) {
         ImportDownloadView(
             modifier = Modifier
                 .fillMaxWidth()
@@ -259,7 +255,7 @@ private fun PreviewImportDownloadView() {
 @CombinedThemePreviews
 @Composable
 private fun PreviewFileLinkView() {
-    OriginalTempTheme(isDark = isSystemInDarkTheme()) {
+    OriginalTheme(isDark = isSystemInDarkTheme()) {
         val viewState =
             FileLinkState(hasDbCredentials = true, title = "Title", sizeInBytes = 10000L)
         FileLinkView(
@@ -276,9 +272,7 @@ private fun PreviewFileLinkView() {
             onErrorMessageConsumed = {},
             onOverQuotaErrorConsumed = {},
             onForeignNodeErrorConsumed = {},
-            adsUiState = AdsUIState(),
-            onAdClicked = {},
-            onAdDismissed = {}
+            request = null
         )
     }
 }

@@ -10,6 +10,7 @@ import mega.privacy.android.domain.entity.transfer.TransferAppData
 import mega.privacy.android.domain.entity.transfer.TransferType
 import mega.privacy.android.domain.entity.transfer.pending.PendingTransfer
 import mega.privacy.android.domain.entity.transfer.pending.PendingTransferNodeIdentifier
+import mega.privacy.android.domain.entity.uri.UriPath
 import nz.mega.sdk.MegaTransfer
 import org.junit.jupiter.api.BeforeAll
 import org.junit.jupiter.api.BeforeEach
@@ -72,11 +73,12 @@ class CompletedTransferPendingTransferMapperTest {
         val exceptionMessage = "Some Exception"
         val exception = RuntimeException(exceptionMessage)
         val pendingTransfer = mock<PendingTransfer> {
-            on { this.path } doReturn fullPath
+            on { this.uriPath } doReturn UriPath(fullPath)
             on { this.nodeIdentifier } doReturn
                     PendingTransferNodeIdentifier.CloudDriveNode(NodeId(nodeHandle))
             on { this.transferType } doReturn TransferType.DOWNLOAD
             on { this.appData } doReturn appData
+            on { this.fileName } doReturn fileName
         }
         whenever(deviceGateway.now) doReturn (now)
         whenever(stringWrapper.getSizeString(size)) doReturn (sizeString)

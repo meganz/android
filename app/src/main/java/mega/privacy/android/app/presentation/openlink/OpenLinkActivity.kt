@@ -42,9 +42,11 @@ import mega.privacy.android.app.utils.Constants.ACTION_EXPORT_MASTER_KEY
 import mega.privacy.android.app.utils.Constants.ACTION_IPC
 import mega.privacy.android.app.utils.Constants.ACTION_OPEN_CHAT_LINK
 import mega.privacy.android.app.utils.Constants.ACTION_OPEN_CONTACTS_SECTION
+import mega.privacy.android.app.utils.Constants.ACTION_OPEN_DEVICE_CENTER
 import mega.privacy.android.app.utils.Constants.ACTION_OPEN_HANDLE_NODE
 import mega.privacy.android.app.utils.Constants.ACTION_OPEN_MEGA_FOLDER_LINK
 import mega.privacy.android.app.utils.Constants.ACTION_OPEN_MEGA_LINK
+import mega.privacy.android.app.utils.Constants.ACTION_OPEN_SYNC_MEGA_FOLDER
 import mega.privacy.android.app.utils.Constants.ACTION_RESET_PASS
 import mega.privacy.android.app.utils.Constants.ALBUM_LINK_REGEXS
 import mega.privacy.android.app.utils.Constants.BUSINESS_INVITE_LINK_REGEXS
@@ -158,26 +160,31 @@ class OpenLinkActivity : PasscodeActivity(), MegaRequestListenerInterface,
             finish()
         }
 
-        collectFlow(viewModel.state) { openLinkState: OpenLinkState ->
-            with(openLinkState) {
+        collectFlow(viewModel.uiState) {
+            with(it) {
                 url = decodedUrl
-                isLoggedIn?.let {
-                    handleUrlRedirection(isLoggedIn, needsRefreshSession = needsRefreshSession)
+                if (urlRedirectionEvent && isLoggedIn != null) {
+                    handleUrlRedirection(
+                        isLoggedIn = isLoggedIn,
+                        needsRefreshSession = needsRefreshSession
+                    )
+                    viewModel.onUrlRedirectionEventConsumed()
                 }
-                if (isLogoutCompleted) {
+
+                if (logoutCompletedEvent) {
                     handleLoggedOutState()
                     handleAccountInvitationEmailState(accountInvitationEmail)
+                    viewModel.onLogoutCompletedEventConsumed()
                 }
             }
         }
-        url?.let {
-            viewModel.decodeUrl(it)
-        }
+
+        url?.let { viewModel.decodeUrl(it) }
     }
 
     private fun handleUrlRedirection(isLoggedIn: Boolean, needsRefreshSession: Boolean) {
         when {
-            // If is not a MEGA link, is not a supported link
+            // Check if it is a supported link
             !url.isURLSanitized() -> {
                 Timber.d("OpenLinkActivity: URL doesn't match regex pattern or whitelisted $url")
                 setError(getString(R.string.open_link_not_valid_link))
@@ -445,6 +452,23 @@ class OpenLinkActivity : PasscodeActivity(), MegaRequestListenerInterface,
                 openWebLink(url)
             }
 
+            // Open Sync folder link
+            getUrlRegexPatternTypeUseCase(url?.lowercase()) == RegexPatternType.OPEN_SYNC_MEGA_FOLDER_LINK -> {
+                if (isLoggedIn) {
+                    Timber.d("Open sync folder link")
+                    startActivity(
+                        Intent(this, ManagerActivity::class.java)
+                            .setAction(ACTION_OPEN_SYNC_MEGA_FOLDER)
+                            .setFlags(FLAG_ACTIVITY_CLEAR_TOP)
+                            .setData(Uri.parse(url))
+                    )
+                    finish()
+                } else {
+                    Timber.w("Not logged in")
+                    setError(getString(R.string.alert_not_logged_in))
+                }
+            }
+
             matchRegexs(url, HANDLE_LINK_REGEXS) -> {
                 Timber.d("Handle link url")
                 startActivity(
@@ -476,6 +500,17 @@ class OpenLinkActivity : PasscodeActivity(), MegaRequestListenerInterface,
                     setError(getString(R.string.alert_not_logged_in))
                 }
             }
+
+            getUrlRegexPatternTypeUseCase(url) == RegexPatternType.INSTALLER_DOWNLOAD_LINK -> {
+                Timber.d("INSTALLER_DOWNLOAD_LINK $url")
+                openWebLinkInBrowser(url)
+            }
+
+            getUrlRegexPatternTypeUseCase(url?.lowercase()) == RegexPatternType.PURCHASE_LINK -> {
+                Timber.d("PURCHASE_LINK $url")
+                openWebLinkInBrowser(url)
+            }
+
             //Upgrade Account link
             getUrlRegexPatternTypeUseCase(url?.lowercase()) == RegexPatternType.UPGRADE_PAGE_LINK
                     || getUrlRegexPatternTypeUseCase(url?.lowercase()) == RegexPatternType.UPGRADE_LINK -> {
@@ -491,14 +526,28 @@ class OpenLinkActivity : PasscodeActivity(), MegaRequestListenerInterface,
             }
             //Enable camera uploads link
             getUrlRegexPatternTypeUseCase(url?.lowercase()) == RegexPatternType.ENABLE_CAMERA_UPLOADS_LINK -> {
-                lifecycleScope.launch {
-                    if (isLoggedIn) {
-                        navigator.openSettingsCameraUploads(this@OpenLinkActivity)
-                        finish()
-                    } else {
-                        Timber.w("Not logged in")
-                        setError(getString(R.string.alert_not_logged_in))
-                    }
+                if (isLoggedIn) {
+                    navigator.openSettingsCameraUploads(this)
+                    finish()
+                } else {
+                    Timber.w("Not logged in")
+                    setError(getString(R.string.alert_not_logged_in))
+                }
+            }
+
+            // Open Device Center Link
+            getUrlRegexPatternTypeUseCase(url?.lowercase()) == RegexPatternType.OPEN_DEVICE_CENTER_LINK -> {
+                if (isLoggedIn) {
+                    Timber.d("Open device center link")
+                    startActivity(
+                        Intent(this, ManagerActivity::class.java)
+                            .setAction(ACTION_OPEN_DEVICE_CENTER)
+                            .setFlags(FLAG_ACTIVITY_CLEAR_TOP)
+                    )
+                    finish()
+                } else {
+                    Timber.w("Not logged in")
+                    setError(getString(R.string.alert_not_logged_in))
                 }
             }
 
@@ -523,7 +572,7 @@ class OpenLinkActivity : PasscodeActivity(), MegaRequestListenerInterface,
     }
 
     /**
-     * Handle the isLoggedOut state from [OpenLinkState]
+     * Handle the isLoggedOut state from [OpenLinkUiState]
      *
      * Navigates to [LoginActivity] if the user logged out
      */
@@ -542,7 +591,7 @@ class OpenLinkActivity : PasscodeActivity(), MegaRequestListenerInterface,
      * Navigates to [LoginActivity] if the user navigated from the new signup link
      *
      * Need to check if the email is NULL as the base case which indicates that the user
-     * is not from the new signup link, because NULL is the default state in [OpenLinkState]
+     * is not from the new signup link, because NULL is the default state in [OpenLinkUiState]
      */
     private fun handleAccountInvitationEmailState(email: String?) {
         email?.let {
@@ -598,7 +647,6 @@ class OpenLinkActivity : PasscodeActivity(), MegaRequestListenerInterface,
             meetingName,
             chatId,
             url,
-            passcodeManagement,
             chatRequestHandler,
             isWaitingRoom
         )
@@ -745,7 +793,6 @@ class OpenLinkActivity : PasscodeActivity(), MegaRequestListenerInterface,
                 showConfirmationInACall(
                     this,
                     getString(R.string.text_join_call),
-                    passcodeManagement
                 )
             } else {
                 when {

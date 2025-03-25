@@ -53,7 +53,6 @@ class VideoSectionTopBarTest {
         isHideMenuActionVisible: Boolean = false,
         isUnhideMenuActionVisible: Boolean = false,
         isRemoveLinkMenuActionVisible: Boolean = false,
-        isRecentlyWatchedEnabled: Boolean = false
     ) {
         composeTestRule.setContent {
             VideoSectionTopBar(
@@ -70,8 +69,7 @@ class VideoSectionTopBarTest {
                 onBackPressed = onBackPressed,
                 isHideMenuActionVisible = isHideMenuActionVisible,
                 isUnhideMenuActionVisible = isUnhideMenuActionVisible,
-                isRemoveLinkMenuActionVisible = isRemoveLinkMenuActionVisible,
-                isRecentlyWatchedEnabled = isRecentlyWatchedEnabled
+                isRemoveLinkMenuActionVisible = isRemoveLinkMenuActionVisible
             )
         }
     }
@@ -352,10 +350,7 @@ class VideoSectionTopBarTest {
 
     @Test
     fun `test that recently watched action is pressed`() {
-        setComposeContent(
-            onMenuActionClick = onMenuActionClick,
-            isRecentlyWatchedEnabled = true
-        )
+        setComposeContent(onMenuActionClick = onMenuActionClick)
         composeTestRule.onNodeWithTag(
             testTag = TEST_TAG_VIDEO_SECTION_RECENTLY_WATCHED_ACTION,
             useUnmergedTree = true

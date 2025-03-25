@@ -28,9 +28,9 @@ import kotlinx.coroutines.launch
 import mega.privacy.android.shared.original.core.ui.controls.text.MegaText
 import mega.privacy.android.shared.original.core.ui.model.DragDropListState
 import mega.privacy.android.shared.original.core.ui.preview.CombinedThemePreviews
-import mega.privacy.android.shared.original.core.ui.theme.OriginalTempTheme
+import mega.privacy.android.shared.original.core.ui.theme.OriginalTheme
 import mega.privacy.android.shared.original.core.ui.theme.MegaOriginalTheme
-import mega.privacy.android.shared.original.core.ui.theme.values.TextColor
+import mega.android.core.ui.theme.values.TextColor
 
 /**
  * A list view that supports drag and drop reordering of items.
@@ -143,7 +143,7 @@ private fun handleOverscrollJob(
 @CombinedThemePreviews
 @Composable
 private fun DragDropListViewPreview() {
-    OriginalTempTheme(isDark = isSystemInDarkTheme()) {
+    OriginalTheme(isDark = isSystemInDarkTheme()) {
         DragDropListView(
             items = listOf("test1", "test2", "test3", "test4", "test5"),
             lazyListState = LazyListState(),

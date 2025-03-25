@@ -5,6 +5,7 @@ import de.palm.composestateevents.StateEventWithContent
 import de.palm.composestateevents.consumed
 import mega.privacy.android.app.meeting.activity.MeetingActivityViewModel
 import mega.privacy.android.app.meeting.adapter.Participant
+import mega.privacy.android.app.presentation.chat.model.AnswerCallResult
 import mega.privacy.android.domain.entity.AccountType
 import mega.privacy.android.domain.entity.ChatRoomPermission
 import mega.privacy.android.domain.entity.call.AudioDevice
@@ -74,6 +75,7 @@ import mega.privacy.android.domain.entity.meeting.ParticipantsSection
  * @property isPictureInPictureFeatureFlagEnabled       True, if Picture in Picture feature flag enabled. False, otherwise.
  * @property isInPipMode                                True, if is in Picture in Picture mode. False, otherwise.
  * @property startedMeetingChatId                       Chat id of the meeting started
+ * @property answerResult                               [AnswerCallResult]
  */
 data class MeetingState(
     val chatId: Long = -1L,
@@ -137,7 +139,8 @@ data class MeetingState(
     val userAvatarUpdateId: Long? = null,
     val micEnabled: Boolean = false,
     val camEnabled: Boolean = false,
-    val speakerType: AudioDevice = AudioDevice.None
+    val speakerType: AudioDevice = AudioDevice.None,
+    val answerResult: AnswerCallResult? = null,
 ) {
 
     /**

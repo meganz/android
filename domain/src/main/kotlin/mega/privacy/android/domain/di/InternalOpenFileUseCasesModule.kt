@@ -29,7 +29,7 @@ internal abstract class InternalOpenFileUseCasesModule {
             StopStreamingServer(repository::stopServer)
 
         @Provides
-        fun provideGetStreamingUriStringForNode(repository: FileSystemRepository): GetStreamingUriStringForNode =
+        fun provideGetStreamingUriStringForNode(repository: StreamingServerRepository): GetStreamingUriStringForNode =
             GetStreamingUriStringForNode(repository::getFileStreamingUri)
     }
 }

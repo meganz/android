@@ -17,6 +17,7 @@ import mega.privacy.android.app.presentation.audiosection.model.AudioUiEntity
 import mega.privacy.android.app.presentation.search.view.LoadingStateView
 import mega.privacy.android.domain.entity.preference.ViewType
 import mega.privacy.android.legacy.core.ui.controls.LegacyMegaEmptyView
+import mega.privacy.android.icon.pack.R as iconPackR
 
 /**
  * The compose view for audio section
@@ -53,7 +54,7 @@ fun AudioSectionComposeView(
             items.isEmpty() -> LegacyMegaEmptyView(
                 modifier = Modifier,
                 text = stringResource(id = R.string.homepage_empty_hint_audio),
-                imagePainter = painterResource(id = R.drawable.ic_homepage_empty_audio)
+                imagePainter = painterResource(id = iconPackR.drawable.ic_audio_glass)
             )
 
             else -> {

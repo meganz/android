@@ -12,7 +12,6 @@ import dagger.multibindings.IntoSet
 import mega.privacy.android.app.utils.Constants
 import mega.privacy.android.domain.repository.CallRepository
 import mega.privacy.android.domain.repository.ChatRepository
-import mega.privacy.android.domain.repository.FileSystemRepository
 import mega.privacy.android.domain.usecase.DefaultGetChatParticipants
 import mega.privacy.android.domain.usecase.GetChatParticipants
 import mega.privacy.android.domain.usecase.InviteToChat
@@ -88,8 +87,8 @@ abstract class ChatModule {
          * Provides the Use Case [SetMyChatFilesFolder]
          */
         @Provides
-        fun provideSetMyChatFilesFolder(fileSystemRepository: FileSystemRepository): SetMyChatFilesFolder =
-            SetMyChatFilesFolder(fileSystemRepository::setMyChatFilesFolder)
+        fun provideSetMyChatFilesFolder(chatRepository: ChatRepository): SetMyChatFilesFolder =
+            SetMyChatFilesFolder(chatRepository::setMyChatFilesFolder)
 
         /**
          * Provides the Use case [SignalChatPresenceActivity]

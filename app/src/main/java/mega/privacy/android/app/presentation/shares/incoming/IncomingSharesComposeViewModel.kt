@@ -6,6 +6,7 @@ import androidx.lifecycle.viewModelScope
 import dagger.hilt.android.lifecycle.HiltViewModel
 import de.palm.composestateevents.consumed
 import de.palm.composestateevents.triggered
+import kotlinx.coroutines.Job
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.catch
@@ -104,6 +105,8 @@ class IncomingSharesComposeViewModel @Inject constructor(
      * Immutable State flow
      */
     val state = _state.asStateFlow()
+
+    private var refreshNodesJob: Job? = null
 
     init {
         checkContactVerification()
@@ -314,7 +317,8 @@ class IncomingSharesComposeViewModel @Inject constructor(
      * Refreshes the nodes
      */
     fun refreshNodes() {
-        viewModelScope.launch {
+        refreshNodesJob?.cancel()
+        refreshNodesJob = viewModelScope.launch {
             runCatching {
                 refreshNodesState()
             }.onFailure {

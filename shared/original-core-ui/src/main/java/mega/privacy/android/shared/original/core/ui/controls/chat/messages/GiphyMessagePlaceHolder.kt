@@ -17,7 +17,7 @@ import androidx.compose.ui.unit.dp
 import mega.privacy.android.core.R
 import mega.privacy.android.shared.original.core.ui.controls.progressindicator.MegaCircularProgressIndicator
 import mega.privacy.android.shared.original.core.ui.preview.CombinedThemePreviews
-import mega.privacy.android.shared.original.core.ui.theme.OriginalTempTheme
+import mega.privacy.android.shared.original.core.ui.theme.OriginalTheme
 import mega.privacy.android.shared.original.core.ui.theme.MegaOriginalTheme
 
 
@@ -49,7 +49,7 @@ fun GiphyMessagePlaceHolder(width: Int, height: Int, content: @Composable () -> 
 @CombinedThemePreviews
 @Composable
 private fun GiphyMessageLoadingPlaceHolderPreview() {
-    OriginalTempTheme(isDark = isSystemInDarkTheme()) {
+    OriginalTheme(isDark = isSystemInDarkTheme()) {
         GiphyMessagePlaceHolder(width = 256, height = 200) {
             MegaCircularProgressIndicator(modifier = Modifier.size(48.dp))
         }
@@ -59,7 +59,7 @@ private fun GiphyMessageLoadingPlaceHolderPreview() {
 @CombinedThemePreviews
 @Composable
 private fun GiphyMessageStaticPlaceHolderPreview() {
-    OriginalTempTheme(isDark = isSystemInDarkTheme()) {
+    OriginalTheme(isDark = isSystemInDarkTheme()) {
         GiphyMessagePlaceHolder(width = 256, height = 200) {
             Image(
                 imageVector = ImageVector.vectorResource(R.drawable.ic_check_circle),

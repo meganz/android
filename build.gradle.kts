@@ -33,7 +33,7 @@ buildscript {
         classpath(plugin.junit5)
         classpath(plugin.kotlin.gradle)
         classpath(lib.kotlin.serialisation)
-        classpath("androidx.benchmark:benchmark-baseline-profile-gradle-plugin:1.2.4")
+        classpath("androidx.benchmark:benchmark-baseline-profile-gradle-plugin:1.3.3")
         classpath("org.jfrog.buildinfo:build-info-extractor-gradle:${plugin.versions.jfrog.artifactory.get()}")
     }
 }
@@ -65,6 +65,11 @@ allprojects {
             url =
                 uri("${System.getenv("ARTIFACTORY_BASE_URL")}/artifactory/mega-gradle/karma")
         }
+
+        maven {
+            url =
+                uri("${System.getenv("ARTIFACTORY_BASE_URL")}/artifactory/mega-gradle/mega-telephoto")
+        }
     }
     configurations.all {
         resolutionStrategy.cacheDynamicVersionsFor(5, "minutes")
@@ -78,7 +83,7 @@ tasks.register("clean", Delete::class) {
 
 // Define versions in a single place
 // App
-extra["appVersion"] = "14.8"
+extra["appVersion"] = "15.4.1"
 
 // Sdk and tools
 extra["compileSdkVersion"] = 35
@@ -88,7 +93,8 @@ extra["targetSdkVersion"] = 35
 extra["buildTools"] = "35.0.0"
 
 // Prebuilt MEGA SDK version
-extra["megaSdkVersion"] = "20241121.091619-rel"
+extra["megaSdkVersion"] = "20250321.150201-rel"
+
 
 //JDK and Java Version
 extra["jdk"] = "17"

@@ -1,17 +1,18 @@
 package mega.privacy.android.feature.sync.ui.synclist
 
-import mega.privacy.android.core.R as CoreUiR
 import mega.privacy.android.icon.pack.R as iconPackR
 import mega.privacy.android.shared.resources.R as sharedR
 import mega.privacy.android.shared.resources.R as sharedResR
 import androidx.activity.compose.LocalOnBackPressedDispatcherOwner
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.WindowInsets
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
+import androidx.compose.material.AppBarDefaults
 import androidx.compose.material.ExperimentalMaterialApi
-import androidx.compose.material.Icon
 import androidx.compose.material.ModalBottomSheetValue
+import androidx.compose.material.ScaffoldDefaults
 import androidx.compose.material.SnackbarHostState
 import androidx.compose.material.pullrefresh.PullRefreshIndicator
 import androidx.compose.material.pullrefresh.pullRefresh
@@ -19,6 +20,7 @@ import androidx.compose.material.pullrefresh.rememberPullRefreshState
 import androidx.compose.material.rememberModalBottomSheetState
 import androidx.compose.material.rememberScaffoldState
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.DisposableEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -31,6 +33,7 @@ import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
+import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import kotlinx.coroutines.launch
 import mega.privacy.android.analytics.Analytics
@@ -43,7 +46,7 @@ import mega.privacy.android.feature.sync.ui.synclist.SyncChip.SOLVED_ISSUES
 import mega.privacy.android.feature.sync.ui.synclist.SyncChip.STALLED_ISSUES
 import mega.privacy.android.feature.sync.ui.synclist.SyncChip.SYNC_FOLDERS
 import mega.privacy.android.feature.sync.ui.synclist.folders.SyncFoldersRoute
-import mega.privacy.android.feature.sync.ui.synclist.folders.SyncFoldersState
+import mega.privacy.android.feature.sync.ui.synclist.folders.SyncFoldersUiState
 import mega.privacy.android.feature.sync.ui.synclist.folders.SyncFoldersViewModel
 import mega.privacy.android.feature.sync.ui.synclist.folders.TEST_TAG_SYNC_LIST_SCREEN_FAB
 import mega.privacy.android.feature.sync.ui.synclist.solvedissues.SyncSolvedIssuesRoute
@@ -57,7 +60,6 @@ import mega.privacy.android.shared.original.core.ui.controls.appbar.AppBarType
 import mega.privacy.android.shared.original.core.ui.controls.appbar.MegaAppBar
 import mega.privacy.android.shared.original.core.ui.controls.banners.ActionBanner
 import mega.privacy.android.shared.original.core.ui.controls.banners.WarningBanner
-import mega.privacy.android.shared.original.core.ui.controls.buttons.MegaFloatingActionButton
 import mega.privacy.android.shared.original.core.ui.controls.buttons.MegaMultiFloatingActionButton
 import mega.privacy.android.shared.original.core.ui.controls.buttons.MultiFloatingActionButtonItem
 import mega.privacy.android.shared.original.core.ui.controls.buttons.MultiFloatingActionButtonState
@@ -69,26 +71,31 @@ import mega.privacy.android.shared.original.core.ui.controls.dividers.MegaDivide
 import mega.privacy.android.shared.original.core.ui.controls.layouts.MegaScaffold
 import mega.privacy.android.shared.original.core.ui.controls.sheets.BottomSheet
 import mega.privacy.android.shared.original.core.ui.model.MenuAction
-import mega.privacy.android.shared.sync.featuretoggles.SyncFeatures
-import mega.privacy.mobile.analytics.event.SyncListBannerUpgradeButtonPressedEvent
+import mega.privacy.android.shared.original.core.ui.utils.ComposableLifecycle
+import mega.privacy.mobile.analytics.event.AndroidBackupFABButtonPressedEvent
+import mega.privacy.mobile.analytics.event.AndroidSyncMultiFABButtonPressedEvent
 
 @Composable
 internal fun SyncListScreen(
     stalledIssuesCount: Int,
     onSyncFolderClicked: () -> Unit,
     onBackupFolderClicked: () -> Unit,
-    onAddFolderClicked: () -> Unit,
+    onOpenMegaFolderClicked: (handle: Long) -> Unit,
+    onCameraUploadsSettingsClicked: () -> Unit,
     actionSelected: (item: StalledIssueUiItem, selectedAction: StalledIssueResolutionAction) -> Unit,
     snackBarHostState: SnackbarHostState,
     syncPermissionsManager: SyncPermissionsManager,
     actions: List<MenuAction>,
     onActionPressed: (MenuAction) -> Unit,
+    onSelectStopBackupDestinationClicked: () -> Unit,
     onOpenUpgradeAccountClicked: () -> Unit,
     syncFoldersViewModel: SyncFoldersViewModel,
     syncStalledIssuesViewModel: SyncStalledIssuesViewModel,
     syncSolvedIssuesViewModel: SyncSolvedIssuesViewModel,
-    title: String? = null,
+    title: String,
+    isInCloudDrive: Boolean = false,
     selectedChip: SyncChip = SYNC_FOLDERS,
+    onFabExpanded: (Boolean) -> Unit = {},
 ) {
     val onBackPressedDispatcher =
         LocalOnBackPressedDispatcherOwner.current?.onBackPressedDispatcher
@@ -104,8 +111,6 @@ internal fun SyncListScreen(
     val scaffoldState = rememberScaffoldState(snackbarHostState = snackBarHostState)
 
     val syncFoldersState by syncFoldersViewModel.uiState.collectAsStateWithLifecycle()
-    val isBackupForAndroidEnabled =
-        syncFoldersState.enabledFlags.contains(SyncFeatures.BackupForAndroid)
 
     BottomSheet(
         modalSheetState = modalSheetState,
@@ -140,71 +145,79 @@ internal fun SyncListScreen(
             }
         }
     ) {
+        var isWarningBannerDisplayed by rememberSaveable { mutableStateOf(false) }
+        ComposableLifecycle { event ->
+            if (event == Lifecycle.Event.ON_RESUME) {
+                isWarningBannerDisplayed =
+                    syncPermissionsManager.isManageExternalStoragePermissionGranted().not()
+                            || syncPermissionsManager.isDisableBatteryOptimizationGranted().not()
+            }
+        }
+
         val multiFabState = rememberMultiFloatingActionButtonState()
+
+        DisposableEffect(multiFabState.value) {
+            onFabExpanded(multiFabState.value == MultiFloatingActionButtonState.EXPANDED)
+            onDispose { }
+        }
+
         MegaScaffold(
             scaffoldState = scaffoldState,
+            contentWindowInsets = if (isInCloudDrive) WindowInsets(0.dp) else ScaffoldDefaults.contentWindowInsets,
             topBar = {
-                MegaAppBar(
-                    title = title ?: stringResource(R.string.sync_toolbar_title),
-                    appBarType = AppBarType.BACK_NAVIGATION,
-                    elevation = 0.dp,
-                    onNavigationPressed = {
-                        onBackPressedDispatcher?.onBackPressed()
-                    },
-                    actions = actions,
-                    onActionPressed = onActionPressed
-                )
-            },
-            floatingActionButton = {
-                if (isBackupForAndroidEnabled) {
-                    when {
-                        syncFoldersState.isFreeAccount && syncFoldersState.syncUiItems.isNotEmpty() -> {
-                            MegaFloatingActionButton(
-                                onClick = onAddFolderClicked,
-                                modifier = Modifier.testTag(TEST_TAG_SYNC_LIST_SCREEN_FAB)
-                            ) {
-                                Icon(
-                                    painter = painterResource(CoreUiR.drawable.ic_plus),
-                                    contentDescription = null,
-                                )
-                            }
-                        }
-
-                        syncFoldersState.isFreeAccount.not() -> {
-                            MegaMultiFloatingActionButton(
-                                items = listOf(
-                                    MultiFloatingActionButtonItem(
-                                        icon = painterResource(id = iconPackR.drawable.ic_sync_01),
-                                        label = stringResource(id = R.string.sync_toolbar_title),
-                                        onClicked = onSyncFolderClicked,
-                                    ),
-                                    MultiFloatingActionButtonItem(
-                                        icon = painterResource(id = iconPackR.drawable.ic_database),
-                                        label = stringResource(id = sharedResR.string.sync_add_new_backup_toolbar_title),
-                                        onClicked = onBackupFolderClicked,
-                                    ),
-                                ),
-                                modifier = Modifier.testTag(TEST_TAG_SYNC_LIST_SCREEN_FAB),
-                                multiFabState = multiFabState,
-                                onStateChanged = { state -> multiFabState.value = state }
-                            )
-                        }
-                    }
-                } else {
-                    if (syncFoldersState.syncUiItems.isNotEmpty() || syncFoldersState.isLoading) {
-                        MegaFloatingActionButton(
-                            onClick = onSyncFolderClicked,
-                            modifier = Modifier.testTag(TEST_TAG_SYNC_LIST_SCREEN_FAB)
-                        ) {
-                            Icon(
-                                painter = painterResource(CoreUiR.drawable.ic_plus),
-                                contentDescription = stringResource(id = sharedResR.string.device_center_sync_add_new_syn_button_option),
-                            )
-                        }
-                    }
+                if (!isInCloudDrive) {
+                    MegaAppBar(
+                        title = title.ifEmpty { stringResource(R.string.sync_toolbar_title) },
+                        appBarType = AppBarType.BACK_NAVIGATION,
+                        onNavigationPressed = {
+                            onBackPressedDispatcher?.onBackPressed()
+                        },
+                        actions = actions,
+                        onActionPressed = onActionPressed,
+                        elevation = if (isWarningBannerDisplayed) AppBarDefaults.TopAppBarElevation else 0.dp,
+                        windowInsets = WindowInsets(0.dp),
+                    )
                 }
             },
-            blurContent = if (isBackupForAndroidEnabled && multiFabState.value == MultiFloatingActionButtonState.EXPANDED) { ->
+            floatingActionButton = {
+                if (syncFoldersState.syncUiItems.isNotEmpty() || syncFoldersState.isLoading) {
+                    MegaMultiFloatingActionButton(
+                        items = listOf(
+                            MultiFloatingActionButtonItem(
+                                icon = painterResource(id = iconPackR.drawable.ic_sync_01),
+                                label = stringResource(id = R.string.sync_toolbar_title),
+                                onClicked = {
+                                    onSyncFolderClicked()
+                                    multiFabState.value = MultiFloatingActionButtonState.COLLAPSED
+                                },
+                            ),
+                            MultiFloatingActionButtonItem(
+                                icon = painterResource(id = iconPackR.drawable.ic_database),
+                                label = stringResource(id = sharedResR.string.sync_add_new_backup_toolbar_title),
+                                onClicked = {
+                                    Analytics.tracker.trackEvent(
+                                        AndroidBackupFABButtonPressedEvent
+                                    )
+                                    onBackupFolderClicked()
+                                    multiFabState.value = MultiFloatingActionButtonState.COLLAPSED
+                                },
+                            ),
+                        ),
+                        modifier = Modifier.testTag(TEST_TAG_SYNC_LIST_SCREEN_FAB),
+                        multiFabState = multiFabState,
+                        onStateChanged = { state ->
+                            if (state == MultiFloatingActionButtonState.EXPANDED) {
+                                Analytics.tracker.trackEvent(
+                                    AndroidSyncMultiFABButtonPressedEvent
+                                )
+                            }
+                            onFabExpanded(state == MultiFloatingActionButtonState.EXPANDED)
+                            multiFabState.value = state
+                        }
+                    )
+                }
+            },
+            blurContent = if (multiFabState.value == MultiFloatingActionButtonState.EXPANDED) { ->
                 multiFabState.value = MultiFloatingActionButtonState.COLLAPSED
             } else {
                 null
@@ -226,13 +239,17 @@ internal fun SyncListScreen(
                             modalSheetState.show()
                         }
                     },
-                    addFolderClicked = onSyncFolderClicked,
+                    onAddNewSyncClicked = onSyncFolderClicked,
+                    onAddNewBackupClicked = onBackupFolderClicked,
+                    onOpenMegaFolderClicked = onOpenMegaFolderClicked,
                     syncPermissionsManager = syncPermissionsManager,
+                    onSelectStopBackupDestinationClicked = onSelectStopBackupDestinationClicked,
                     onOpenUpgradeAccountClicked = onOpenUpgradeAccountClicked,
+                    onCameraUploadsSettingsClicked = onCameraUploadsSettingsClicked,
                     syncFoldersViewModel = syncFoldersViewModel,
                     syncStalledIssuesViewModel = syncStalledIssuesViewModel,
                     syncSolvedIssuesViewModel = syncSolvedIssuesViewModel,
-                    deviceName = title ?: "",
+                    deviceName = title,
                     selectedChip = selectedChip,
                     snackBarHostState = scaffoldState.snackbarHostState,
                 )
@@ -249,8 +266,12 @@ private fun SyncListScreenContent(
     stalledIssuesCount: Int,
     stalledIssuesDetailsClicked: (StalledIssueUiItem) -> Unit,
     moreClicked: (StalledIssueUiItem) -> Unit,
-    addFolderClicked: () -> Unit,
+    onAddNewSyncClicked: () -> Unit,
+    onAddNewBackupClicked: () -> Unit,
+    onOpenMegaFolderClicked: (handle: Long) -> Unit,
+    onCameraUploadsSettingsClicked: () -> Unit,
     syncPermissionsManager: SyncPermissionsManager,
+    onSelectStopBackupDestinationClicked: () -> Unit,
     onOpenUpgradeAccountClicked: () -> Unit,
     syncFoldersViewModel: SyncFoldersViewModel,
     syncStalledIssuesViewModel: SyncStalledIssuesViewModel,
@@ -260,12 +281,12 @@ private fun SyncListScreenContent(
 ) {
     var checkedChip by rememberSaveable { mutableStateOf(selectedChip) }
 
-    val syncFoldersState by syncFoldersViewModel.uiState.collectAsStateWithLifecycle()
+    val syncFoldersUiState by syncFoldersViewModel.uiState.collectAsStateWithLifecycle()
     val syncStalledIssuesState by syncStalledIssuesViewModel.state.collectAsStateWithLifecycle()
     val syncSolvedIssuesState by syncSolvedIssuesViewModel.state.collectAsStateWithLifecycle()
 
     val pullToRefreshState = rememberPullRefreshState(
-        refreshing = syncFoldersState.isRefreshing,
+        refreshing = syncFoldersUiState.isRefreshing,
         onRefresh = {
             syncFoldersViewModel.onSyncRefresh()
         })
@@ -274,21 +295,7 @@ private fun SyncListScreenContent(
         SyncPermissionWarningBanner(
             syncPermissionsManager = syncPermissionsManager
         )
-        if (syncFoldersState.isFreeAccount && syncFoldersState.syncUiItems.isNotEmpty()) {
-            ActionBanner(
-                mainText = stringResource(id = sharedR.string.sync_error_banner_free_user),
-                leftActionText = stringResource(sharedR.string.general_upgrade_button),
-                leftActionClicked = {
-                    Analytics.tracker.trackEvent(SyncListBannerUpgradeButtonPressedEvent)
-                    onOpenUpgradeAccountClicked()
-                },
-                modifier = Modifier.padding(top = 20.dp)
-            )
-            MegaDivider(
-                dividerType = DividerType.FullSize,
-                modifier = Modifier.padding(bottom = 8.dp)
-            )
-        } else if (syncFoldersState.isStorageOverQuota) {
+        if (syncFoldersUiState.isStorageOverQuota) {
             ActionBanner(
                 mainText = stringResource(sharedR.string.sync_error_storage_over_quota_banner_title),
                 leftActionText = stringResource(sharedR.string.general_upgrade_button),
@@ -299,9 +306,9 @@ private fun SyncListScreenContent(
                 dividerType = DividerType.FullSize,
                 modifier = Modifier.padding(bottom = 8.dp)
             )
-        } else if (syncFoldersState.syncUiItems.isNotEmpty() && syncFoldersState.isLowBatteryLevel) {
+        } else if (syncFoldersUiState.syncUiItems.isNotEmpty() && syncFoldersUiState.isLowBatteryLevel) {
             WarningBanner(
-                textString = stringResource(id = mega.privacy.android.shared.resources.R.string.general_message_sync_paused_low_battery_level),
+                textString = stringResource(id = sharedResR.string.general_message_sync_paused_low_battery_level),
                 onCloseClick = null
             )
         }
@@ -319,9 +326,12 @@ private fun SyncListScreenContent(
                 .pullRefresh(pullToRefreshState)
         ) {
             SelectedChipScreen(
-                addFolderClicked = addFolderClicked,
-                upgradeAccountClicked = onOpenUpgradeAccountClicked,
+                onAddNewSyncClicked = onAddNewSyncClicked,
+                onAddNewBackupClicked = onAddNewBackupClicked,
+                onSelectStopBackupDestinationClicked = onSelectStopBackupDestinationClicked,
                 stalledIssueDetailsClicked = stalledIssuesDetailsClicked,
+                onOpenMegaFolderClicked = onOpenMegaFolderClicked,
+                onCameraUploadsSettingsClicked = onCameraUploadsSettingsClicked,
                 moreClicked = moreClicked,
                 issuesInfoClicked = {
                     checkedChip = STALLED_ISSUES
@@ -330,14 +340,13 @@ private fun SyncListScreenContent(
                 syncStalledIssuesViewModel = syncStalledIssuesViewModel,
                 syncFoldersViewModel = syncFoldersViewModel,
                 syncSolvedIssuesViewModel = syncSolvedIssuesViewModel,
-                syncFoldersState = syncFoldersState,
+                syncFoldersUiState = syncFoldersUiState,
                 snackBarHostState = snackBarHostState,
                 deviceName = deviceName,
-                isBackupForAndroidEnabled = syncFoldersState.enabledFlags.contains(SyncFeatures.BackupForAndroid),
             )
             PullRefreshIndicator(
                 modifier = Modifier.align(Alignment.TopCenter),
-                refreshing = syncFoldersState.isRefreshing,
+                refreshing = syncFoldersUiState.isRefreshing,
                 state = pullToRefreshState
             )
         }
@@ -373,8 +382,11 @@ private fun HeaderChips(
 
 @Composable
 private fun SelectedChipScreen(
-    addFolderClicked: () -> Unit,
-    upgradeAccountClicked: () -> Unit,
+    onAddNewSyncClicked: () -> Unit,
+    onAddNewBackupClicked: () -> Unit,
+    onSelectStopBackupDestinationClicked: () -> Unit,
+    onOpenMegaFolderClicked: (handle: Long) -> Unit,
+    onCameraUploadsSettingsClicked: () -> Unit,
     stalledIssueDetailsClicked: (StalledIssueUiItem) -> Unit,
     moreClicked: (StalledIssueUiItem) -> Unit,
     issuesInfoClicked: () -> Unit,
@@ -382,22 +394,23 @@ private fun SelectedChipScreen(
     syncFoldersViewModel: SyncFoldersViewModel,
     syncStalledIssuesViewModel: SyncStalledIssuesViewModel,
     syncSolvedIssuesViewModel: SyncSolvedIssuesViewModel,
-    syncFoldersState: SyncFoldersState,
+    syncFoldersUiState: SyncFoldersUiState,
     snackBarHostState: SnackbarHostState,
     deviceName: String,
-    isBackupForAndroidEnabled: Boolean,
 ) {
     when (checkedChip) {
         SYNC_FOLDERS -> {
             SyncFoldersRoute(
-                addFolderClicked = addFolderClicked,
-                upgradeAccountClicked = upgradeAccountClicked,
+                onAddNewSyncClicked = onAddNewSyncClicked,
+                onAddNewBackupClicked = onAddNewBackupClicked,
+                onSelectStopBackupDestinationClicked = onSelectStopBackupDestinationClicked,
                 issuesInfoClicked = issuesInfoClicked,
                 viewModel = syncFoldersViewModel,
-                state = syncFoldersState,
+                uiState = syncFoldersUiState,
                 snackBarHostState = snackBarHostState,
                 deviceName = deviceName,
-                isBackupForAndroidEnabled = isBackupForAndroidEnabled,
+                onOpenMegaFolderClicked = onOpenMegaFolderClicked,
+                onCameraUploadsSettingsClicked = onCameraUploadsSettingsClicked,
             )
         }
 

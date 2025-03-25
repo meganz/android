@@ -34,7 +34,6 @@ import com.google.mlkit.vision.documentscanner.GmsDocumentScanningResult
 import de.palm.composestateevents.EventEffect
 import kotlinx.coroutines.launch
 import mega.privacy.android.analytics.Analytics
-import mega.privacy.android.app.DocumentScannerEdgeToEdgeActivity
 import mega.privacy.android.app.R
 import mega.privacy.android.app.activities.GiphyPickerActivity
 import mega.privacy.android.app.activities.GiphyPickerActivity.Companion.GIF_DATA
@@ -43,7 +42,6 @@ import mega.privacy.android.app.camera.InAppCameraLauncher
 import mega.privacy.android.app.main.legacycontact.AddContactActivity
 import mega.privacy.android.app.objects.GifData
 import mega.privacy.android.app.presentation.documentscanner.SaveScannedDocumentsActivity
-import mega.privacy.android.app.presentation.documentscanner.model.HandleScanDocumentResult
 import mega.privacy.android.app.presentation.meeting.chat.model.ChatUiState
 import mega.privacy.android.app.presentation.meeting.chat.view.navigation.openAttachContactActivity
 import mega.privacy.android.app.presentation.qrcode.findActivity
@@ -51,7 +49,7 @@ import mega.privacy.android.app.utils.permission.PermissionUtils
 import mega.privacy.android.shared.original.core.ui.controls.chat.attachpanel.CellButton
 import mega.privacy.android.shared.original.core.ui.controls.chat.attachpanel.CellButtonPlaceHolder
 import mega.privacy.android.shared.original.core.ui.preview.CombinedThemePreviews
-import mega.privacy.android.shared.original.core.ui.theme.OriginalTempTheme
+import mega.privacy.android.shared.original.core.ui.theme.OriginalTheme
 import mega.privacy.android.shared.original.core.ui.utils.showAutoDurationSnackbar
 import mega.privacy.mobile.analytics.event.ChatConversationContactMenuItemEvent
 import mega.privacy.mobile.analytics.event.ChatConversationFileMenuItemEvent
@@ -62,7 +60,7 @@ import mega.privacy.mobile.analytics.event.ChatConversationScanMenuItemEvent
 import mega.privacy.mobile.analytics.event.ChatConversationTakePictureMenuItemEvent
 import mega.privacy.mobile.analytics.event.ChatImageAttachmentItemSelected
 import mega.privacy.mobile.analytics.event.ChatImageAttachmentItemSelectedEvent
-import nz.mega.documentscanner.DocumentScannerActivity
+import mega.privacy.mobile.analytics.event.DocumentScanInitiatedEvent
 import timber.log.Timber
 
 /**
@@ -85,9 +83,9 @@ fun ChatToolbarBottomSheet(
     onAttachFiles: (List<Uri>) -> Unit = {},
     onCameraPermissionDenied: () -> Unit = {},
     onAttachScan: () -> Unit = {},
-    onNewDocumentScannerInitializationFailed: () -> Unit = {},
-    onNewDocumentScannerFailedToOpen: () -> Unit = {},
-    onHandleScanDocumentResultConsumed: () -> Unit = {},
+    onDocumentScannerInitializationFailed: () -> Unit = {},
+    onDocumentScannerFailedToOpen: () -> Unit = {},
+    onGmsDocumentScannerConsumed: () -> Unit = {},
 ) {
     val context = LocalContext.current
 
@@ -116,16 +114,6 @@ fun ChatToolbarBottomSheet(
             hideSheet()
         }
 
-    val legacyScanDocumentLauncher =
-        rememberLauncherForActivityResult(
-            contract = ActivityResultContracts.StartActivityForResult()
-        ) {
-            it.data?.data?.let { uri ->
-                onAttachFiles(listOf(uri))
-            }
-            hideSheet()
-        }
-
     val saveScannedDocumentsActivityLauncher = rememberLauncherForActivityResult(
         contract = ActivityResultContracts.StartActivityForResult()
     ) {
@@ -135,7 +123,7 @@ fun ChatToolbarBottomSheet(
         hideSheet()
     }
 
-    val newScanDocumentLauncher = rememberLauncherForActivityResult(
+    val scanDocumentLauncher = rememberLauncherForActivityResult(
         contract = ActivityResultContracts.StartIntentSenderForResult()
     ) { result ->
         if (result.resultCode == Activity.RESULT_OK) {
@@ -167,7 +155,7 @@ fun ChatToolbarBottomSheet(
                 }
             }
         } else {
-            Timber.e("The ML Document Kit Scan result could not be retrieved from Chat")
+            Timber.e("The ML Kit Document Scan result could not be retrieved from Chat")
         }
     }
 
@@ -223,30 +211,19 @@ fun ChatToolbarBottomSheet(
     }
 
     uiState.documentScanningError?.let {
-        onNewDocumentScannerInitializationFailed()
+        onDocumentScannerInitializationFailed()
     }
 
     EventEffect(
-        event = uiState.handleScanDocumentResult,
-        onConsumed = onHandleScanDocumentResultConsumed,
-        action = { result ->
-            when (result) {
-                is HandleScanDocumentResult.UseLegacyImplementation -> {
-                    openLegacyDocumentScanner(
-                        context = context,
-                        scanDocumentLauncher = legacyScanDocumentLauncher,
-                    )
-                }
-
-                is HandleScanDocumentResult.UseNewImplementation -> {
-                    openNewDocumentScanner(
-                        context = context,
-                        documentScanner = result.documentScanner,
-                        documentScannerLauncher = newScanDocumentLauncher,
-                        onNewDocumentScannerFailedToOpen = onNewDocumentScannerFailedToOpen,
-                    )
-                }
-            }
+        event = uiState.gmsDocumentScanner,
+        onConsumed = onGmsDocumentScannerConsumed,
+        action = { gmsDocumentScanner ->
+            openDocumentScanner(
+                context = context,
+                documentScanner = gmsDocumentScanner,
+                documentScannerLauncher = scanDocumentLauncher,
+                onDocumentScannerFailedToOpen = onDocumentScannerFailedToOpen,
+            )
         },
     )
 
@@ -357,29 +334,16 @@ private fun openGifPicker(
     }
 }
 
-private fun openLegacyDocumentScanner(
-    context: Context,
-    scanDocumentLauncher: ManagedActivityResultLauncher<Intent, ActivityResult>,
-) {
-    DocumentScannerActivity.getIntent(
-        context = context,
-        targetClass = DocumentScannerEdgeToEdgeActivity::class.java,
-        saveDestinations = arrayOf(context.getString(R.string.section_chat))
-    )
-        .also {
-            scanDocumentLauncher.launch(it)
-        }
-}
-
-private fun openNewDocumentScanner(
+private fun openDocumentScanner(
     context: Context,
     documentScanner: GmsDocumentScanner,
     documentScannerLauncher: ManagedActivityResultLauncher<IntentSenderRequest, ActivityResult>,
-    onNewDocumentScannerFailedToOpen: () -> Unit,
+    onDocumentScannerFailedToOpen: () -> Unit,
 ) {
     context.findActivity()?.let { activity ->
         documentScanner.getStartScanIntent(activity)
             .addOnSuccessListener { intentSender ->
+                Analytics.tracker.trackEvent(DocumentScanInitiatedEvent)
                 documentScannerLauncher.launch(
                     IntentSenderRequest.Builder(intentSender).build()
                 )
@@ -388,17 +352,17 @@ private fun openNewDocumentScanner(
                     exception,
                     "An error occurred when attempting to run the ML Kit Document Scanner from Chat",
                 )
-                onNewDocumentScannerFailedToOpen()
+                onDocumentScannerFailedToOpen()
             }
     } ?: run {
-        Timber.e("Unable to run the ML Document Kit Scanner in Chat as no Activity can be found")
+        Timber.e("Unable to run the ML Kit Document Scanner in Chat as no Activity can be found")
     }
 }
 
 @CombinedThemePreviews
 @Composable
 private fun ChatToolbarBottomSheetPreview() {
-    OriginalTempTheme(isDark = isSystemInDarkTheme()) {
+    OriginalTheme(isDark = isSystemInDarkTheme()) {
         ChatToolbarBottomSheet(
             onAttachContacts = {},
             uiState = ChatUiState(),

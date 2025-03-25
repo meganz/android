@@ -64,7 +64,6 @@ import timber.log.Timber
  * @property changesInLowResInSession               [ChatSession] with changes in low resolution video
  * @property changesInStatusInSession               [ChatSession] with changes in status
  * @property shouldCheckChildFragments              True, if should update fragments. False, if not.
- * @property callAnsweredInAnotherClient            True, if the call was answered in another client.
  * @property isVideoEnabledDueToProximitySensor     True, video on, false, video off.
  */
 data class InMeetingUiState(
@@ -116,7 +115,6 @@ data class InMeetingUiState(
     val changesInLowResInSession: ChatSession? = null,
     val changesInStatusInSession: ChatSession? = null,
     val shouldCheckChildFragments: Boolean = false,
-    val callAnsweredInAnotherClient: Boolean = false,
     val snackbarMsg: String? = null,
     val isVideoEnabledDueToProximitySensor: Boolean? = null,
     val userAvatarUpdateId: Long? = null,
@@ -214,6 +212,14 @@ data class InMeetingUiState(
 
         return null
     }
+
+    /**
+     * Check if it's me as participant
+     *
+     * @param peerId User handle of a participant
+     * @return True, if it's me. False, otherwise
+     */
+    fun isMeAsParticipant(peerId: Long): Boolean = peerId == myUserHandle
 
     /**
      * Get the button to be displayed depending on the type of call on hold you have

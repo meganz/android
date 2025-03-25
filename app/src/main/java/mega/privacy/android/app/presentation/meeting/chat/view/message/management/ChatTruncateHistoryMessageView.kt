@@ -18,9 +18,9 @@ import mega.privacy.android.app.R
 import mega.privacy.android.shared.original.core.ui.model.MegaSpanStyle
 import mega.privacy.android.shared.original.core.ui.model.SpanIndicator
 import mega.privacy.android.shared.original.core.ui.preview.CombinedThemePreviews
-import mega.privacy.android.shared.original.core.ui.theme.values.TextColor
+import mega.android.core.ui.theme.values.TextColor
 import mega.privacy.android.domain.entity.chat.messages.management.TruncateHistoryMessage
-import mega.privacy.android.shared.original.core.ui.theme.OriginalTempTheme
+import mega.privacy.android.shared.original.core.ui.theme.OriginalTheme
 
 /**
  * Truncate history message view.
@@ -80,7 +80,7 @@ internal fun ChatTruncateHistoryMessageView(
 @CombinedThemePreviews
 @Composable
 private fun ChatTruncateHistoryMessagePreview() {
-    OriginalTempTheme(isDark = isSystemInDarkTheme()) {
+    OriginalTheme(isDark = isSystemInDarkTheme()) {
         ChatTruncateHistoryMessageView(
             ownerActionFullName = "Name"
         )

@@ -10,7 +10,6 @@ import androidx.compose.foundation.text.BasicTextField
 import androidx.compose.foundation.text.KeyboardActions
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.foundation.text.selection.LocalTextSelectionColors
-import androidx.compose.foundation.text.selection.TextSelectionColors
 import androidx.compose.material.ExperimentalMaterialApi
 import androidx.compose.material.Icon
 import androidx.compose.material.MaterialTheme
@@ -37,10 +36,11 @@ import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.tooling.preview.PreviewParameter
 import androidx.compose.ui.unit.dp
 import mega.privacy.android.core.R
+import mega.privacy.android.shared.original.core.ui.controls.textfields.customTextSelectionColors
 import mega.privacy.android.shared.original.core.ui.preview.BooleanProvider
 import mega.privacy.android.shared.original.core.ui.preview.CombinedThemePreviews
-import mega.privacy.android.shared.original.core.ui.theme.OriginalTempTheme
 import mega.privacy.android.shared.original.core.ui.theme.MegaOriginalTheme
+import mega.privacy.android.shared.original.core.ui.theme.OriginalTheme
 
 internal const val CHAT_TEXT_FIELD_TEXT_TAG = "chat_text_field"
 internal const val CHAT_TEXT_FIELD_EMOJI_ICON = "chat_text_field:emoji_icon"
@@ -83,10 +83,7 @@ fun ChatTextField(
         focusedIndicatorColor = Color.Transparent,
         unfocusedIndicatorColor = Color.Transparent,
     )
-    val customTextSelectionColors = TextSelectionColors(
-        handleColor = MegaOriginalTheme.colors.border.strongSelected,
-        backgroundColor = MegaOriginalTheme.colors.border.strongSelected
-    )
+    val customTextSelectionColors = customTextSelectionColors()
 
     CompositionLocalProvider(LocalTextSelectionColors provides customTextSelectionColors) {
         BasicTextField(
@@ -162,7 +159,7 @@ fun ChatTextField(
 private fun ChatTextFieldPreview(
     @PreviewParameter(BooleanProvider::class) isEmojiPickerShown: Boolean,
 ) {
-    OriginalTempTheme(isDark = isSystemInDarkTheme()) {
+    OriginalTheme(isDark = isSystemInDarkTheme()) {
         ChatTextField(
             textFieldValue = TextFieldValue("how it looks like when the text is too long"),
             placeholder = "Message",

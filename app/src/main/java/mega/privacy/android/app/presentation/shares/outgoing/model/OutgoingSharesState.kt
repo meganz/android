@@ -7,7 +7,6 @@ import mega.privacy.android.app.presentation.data.NodeUIItem
 import mega.privacy.android.app.presentation.mapper.OptionsItemInfo
 import mega.privacy.android.app.presentation.transfers.starttransfer.model.TransferTriggerEvent
 import mega.privacy.android.domain.entity.SortOrder
-import mega.privacy.android.domain.entity.node.FileNode
 import mega.privacy.android.domain.entity.node.shares.ShareNode
 import mega.privacy.android.domain.entity.preference.ViewType
 
@@ -25,7 +24,7 @@ import mega.privacy.android.domain.entity.preference.ViewType
  * @property nodesList list of [NodeUIItem]
  * @property isInSelection if list is in selection mode or not
  * @property itemIndex index of item clicked
- * @property currentFileNode [FileNode]
+ * @property currentNodeName current node name
  * @property selectedNodes Set of selected node
  * @property totalSelectedFileNodes List of selected node handles
  * @property selectedNodeHandles number of selected file [NodeUIItem] on Compose
@@ -46,6 +45,7 @@ data class OutgoingSharesState(
     val currentViewType: ViewType = ViewType.LIST,
     val isLoading: Boolean = true,
     val currentHandle: Long = -1L,
+    val currentNodeName: String? = null,
     val accessedFolderHandle: Long? = null,
     val isAccessedFolderExited: Boolean = false,
     val isPendingRefresh: Boolean = false,

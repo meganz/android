@@ -19,6 +19,7 @@ import mega.privacy.android.app.domain.usecase.GetNodeListByIds
 import mega.privacy.android.app.featuretoggle.ApiFeatures
 import mega.privacy.android.app.featuretoggle.AppFeatures
 import mega.privacy.android.app.presentation.mapper.TimelinePreferencesMapper
+import mega.privacy.android.app.presentation.photos.PhotosCache.updatePhotos
 import mega.privacy.android.app.presentation.photos.model.DateCard
 import mega.privacy.android.app.presentation.photos.model.LocationPreference
 import mega.privacy.android.app.presentation.photos.model.MediaTypePreference
@@ -40,6 +41,7 @@ import mega.privacy.android.domain.entity.account.EnableCameraUploadsStatus.CAN_
 import mega.privacy.android.domain.entity.account.EnableCameraUploadsStatus.SHOW_REGULAR_BUSINESS_ACCOUNT_PROMPT
 import mega.privacy.android.domain.entity.account.EnableCameraUploadsStatus.SHOW_SUSPENDED_BUSINESS_ACCOUNT_PROMPT
 import mega.privacy.android.domain.entity.account.EnableCameraUploadsStatus.SHOW_SUSPENDED_MASTER_BUSINESS_ACCOUNT_PROMPT
+import mega.privacy.android.domain.entity.account.EnableCameraUploadsStatus.SHOW_SUSPENDED_PRO_FLEXI_BUSINESS_ACCOUNT_PROMPT
 import mega.privacy.android.domain.entity.account.business.BusinessAccountStatus
 import mega.privacy.android.domain.entity.camerauploads.CameraUploadsFinishedReason
 import mega.privacy.android.domain.entity.camerauploads.CameraUploadsRestartMode
@@ -148,6 +150,13 @@ class TimelineViewModel @Inject constructor(
                 monitorShowHiddenItems()
                 monitorAccountDetail()
                 monitorIsHiddenNodesOnboarded()
+            }
+        }
+
+        updatePhotos(listOf())
+        viewModelScope.launch {
+            _state.collectLatest {
+                updatePhotos(it.photos)
             }
         }
     }
@@ -386,7 +395,8 @@ class TimelineViewModel @Inject constructor(
 
                 SHOW_SUSPENDED_BUSINESS_ACCOUNT_PROMPT,
                 SHOW_SUSPENDED_MASTER_BUSINESS_ACCOUNT_PROMPT,
-                -> {
+                SHOW_SUSPENDED_PRO_FLEXI_BUSINESS_ACCOUNT_PROMPT,
+                    -> {
                     broadcastBusinessAccountExpiredUseCase()
                 }
             }

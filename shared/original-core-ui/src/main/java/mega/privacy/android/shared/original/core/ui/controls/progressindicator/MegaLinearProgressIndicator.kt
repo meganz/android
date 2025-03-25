@@ -13,7 +13,7 @@ import androidx.compose.ui.tooling.preview.PreviewParameter
 import androidx.compose.ui.unit.dp
 import mega.privacy.android.shared.original.core.ui.preview.BooleanProvider
 import mega.privacy.android.shared.original.core.ui.preview.CombinedThemePreviews
-import mega.privacy.android.shared.original.core.ui.theme.OriginalTempTheme
+import mega.privacy.android.shared.original.core.ui.theme.OriginalTheme
 import mega.privacy.android.shared.original.core.ui.theme.MegaOriginalTheme
 
 /**
@@ -48,7 +48,7 @@ fun MegaLinearProgressIndicator(
 private fun MegaLinearProgressIndicatorPreview(
     @PreviewParameter(BooleanProvider::class) indeterminate: Boolean,
 ) {
-    OriginalTempTheme(isDark = isSystemInDarkTheme()) {
+    OriginalTheme(isDark = isSystemInDarkTheme()) {
         Box(modifier = Modifier.padding(16.dp)) {
             MegaLinearProgressIndicator(
                 progress = 0.3f.takeIf { !indeterminate }

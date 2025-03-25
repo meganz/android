@@ -397,15 +397,28 @@ class CallService : LifecycleService() {
                                     Manifest.permission.FOREGROUND_SERVICE_MICROPHONE,
                                     Manifest.permission.RECORD_AUDIO
                                 )
-                            )
-                                ServiceInfo.FOREGROUND_SERVICE_TYPE_MICROPHONE else 0
+                            ) {
+                                ServiceInfo.FOREGROUND_SERVICE_TYPE_MICROPHONE
+                            } else 0
+
+                            val cameraServiceType = if (pm.hasPermissions(
+                                    Manifest.permission.FOREGROUND_SERVICE_CAMERA
+                                )
+                            ) {
+                                ServiceInfo.FOREGROUND_SERVICE_TYPE_CAMERA
+                            } else 0
+
                             val callServiceType =
-                                if (pm.hasPermission(Manifest.permission.FOREGROUND_SERVICE_PHONE_CALL))
-                                    ServiceInfo.FOREGROUND_SERVICE_TYPE_PHONE_CALL else 0
+                                if (pm.hasPermissions(Manifest.permission.FOREGROUND_SERVICE_PHONE_CALL)) {
+                                    ServiceInfo.FOREGROUND_SERVICE_TYPE_PHONE_CALL
+                                    ServiceInfo.FOREGROUND_SERVICE_TYPE_CAMERA
+                                    ServiceInfo.FOREGROUND_SERVICE_TYPE_MICROPHONE
+                                } else 0
+
                             startForeground(
                                 notificationId,
                                 newNotification,
-                                callServiceType
+                                cameraServiceType or callServiceType
                                         or microphoneServiceType
                             )
                             // Since API 30, microphone and camera should be specified for app to use them.
@@ -422,10 +435,10 @@ class CallService : LifecycleService() {
                                 notificationId,
                                 newNotification,
                                 ServiceInfo.FOREGROUND_SERVICE_TYPE_PHONE_CALL
-                                        or ServiceInfo.FOREGROUND_SERVICE_TYPE_MEDIA_PROJECTION
                             )
                         else // Before API 29, just start foreground service.
                             startForeground(notificationId, newNotification)
+
                     } catch (e: Exception) {
                         Timber.e(e)
                     }

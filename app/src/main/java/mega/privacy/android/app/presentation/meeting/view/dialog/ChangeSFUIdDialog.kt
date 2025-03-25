@@ -25,8 +25,8 @@ import mega.privacy.android.shared.original.core.ui.controls.dialogs.MegaAlertDi
 import mega.privacy.android.shared.original.core.ui.controls.text.MegaText
 import mega.privacy.android.shared.original.core.ui.controls.textfields.GenericTextField
 import mega.privacy.android.shared.original.core.ui.preview.CombinedThemePreviews
-import mega.privacy.android.shared.original.core.ui.theme.OriginalTempTheme
-import mega.privacy.android.shared.original.core.ui.theme.values.TextColor
+import mega.privacy.android.shared.original.core.ui.theme.OriginalTheme
+import mega.android.core.ui.theme.values.TextColor
 
 internal const val SFU_TITLE_TAG = "change_sfu_id_dialog:title"
 internal const val SFU_SUBTITLE_TAG = "change_sfu_id_dialog:subtitle"
@@ -111,7 +111,7 @@ internal fun ChangeSFUIdDialog(
 @CombinedThemePreviews
 @Composable
 private fun ChangeSFUIdDialogPreview() {
-    OriginalTempTheme(isDark = isSystemInDarkTheme()) {
+    OriginalTheme(isDark = isSystemInDarkTheme()) {
         ChangeSFUIdDialog(onChange = {}, onDismiss = {})
     }
 }

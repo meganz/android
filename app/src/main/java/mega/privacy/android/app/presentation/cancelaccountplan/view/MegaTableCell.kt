@@ -16,9 +16,9 @@ import androidx.compose.ui.text.style.TextAlign
 import mega.privacy.android.app.presentation.twofactorauthentication.extensions.drawableId
 import mega.privacy.android.shared.original.core.ui.controls.text.MegaText
 import mega.privacy.android.shared.original.core.ui.preview.CombinedThemePreviews
-import mega.privacy.android.shared.original.core.ui.theme.OriginalTempTheme
+import mega.privacy.android.shared.original.core.ui.theme.OriginalTheme
 import mega.privacy.android.shared.original.core.ui.theme.extensions.body2medium
-import mega.privacy.android.shared.original.core.ui.theme.values.TextColor
+import mega.android.core.ui.theme.values.TextColor
 
 @Composable
 private fun getTextAlignment(cellAlignment: TableCell.CellAlignment): TextAlign {
@@ -107,7 +107,7 @@ internal fun MegaTableCell(
 @Composable
 @CombinedThemePreviews
 private fun CellPreview() {
-    OriginalTempTheme(isDark = isSystemInDarkTheme()) {
+    OriginalTheme(isDark = isSystemInDarkTheme()) {
         MegaTableCell(
             cell = TableCell.TextCell(
                 "Hello there",

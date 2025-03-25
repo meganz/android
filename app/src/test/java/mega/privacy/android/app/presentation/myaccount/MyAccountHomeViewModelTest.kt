@@ -9,14 +9,16 @@ import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.test.StandardTestDispatcher
 import kotlinx.coroutines.test.advanceUntilIdle
 import kotlinx.coroutines.test.runTest
-import mega.privacy.android.app.presentation.myaccount.MyAccountHomeViewModel
+import mega.privacy.android.app.TEST_USER_ACCOUNT
 import mega.privacy.android.app.presentation.myaccount.mapper.AccountNameMapper
 import mega.privacy.android.core.test.extension.CoroutineMainDispatcherExtension
 import mega.privacy.android.domain.entity.AccountType
 import mega.privacy.android.domain.entity.SubscriptionStatus
 import mega.privacy.android.domain.entity.UserAccount
 import mega.privacy.android.domain.entity.account.AccountDetail
+import mega.privacy.android.domain.entity.account.AccountTransferDetail
 import mega.privacy.android.domain.entity.account.business.BusinessAccountStatus
+import mega.privacy.android.domain.entity.transfer.UsedTransferStatus
 import mega.privacy.android.domain.entity.user.UserChanges
 import mega.privacy.android.domain.entity.user.UserId
 import mega.privacy.android.domain.entity.verification.Verified
@@ -33,6 +35,7 @@ import mega.privacy.android.domain.usecase.avatar.GetMyAvatarFileUseCase
 import mega.privacy.android.domain.usecase.contact.GetCurrentUserEmail
 import mega.privacy.android.domain.usecase.network.MonitorConnectivityUseCase
 import mega.privacy.android.domain.usecase.shares.GetInSharesUseCase
+import mega.privacy.android.domain.usecase.transfers.GetUsedTransferStatusUseCase
 import mega.privacy.android.domain.usecase.verification.MonitorVerificationStatus
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
@@ -45,7 +48,6 @@ import org.mockito.kotlin.any
 import org.mockito.kotlin.mock
 import org.mockito.kotlin.stub
 import org.mockito.kotlin.whenever
-import mega.privacy.android.app.TEST_USER_ACCOUNT
 import java.io.File
 import java.util.stream.Stream
 import kotlin.random.Random
@@ -68,6 +70,7 @@ class MyAccountHomeViewModelTest {
     private val connectivityFlow = MutableStateFlow(false)
     private val userUpdatesFlow = MutableStateFlow<UserChanges>(UserChanges.Firstname)
     private val getAccountDetailsUseCase: GetAccountDetailsUseCase = mock()
+    private val getUsedTransferStatusUseCase: GetUsedTransferStatusUseCase = mock()
     private val monitorAccountDetailUseCase: MonitorAccountDetailUseCase = mock {
         onBlocking { invoke() }.thenReturn(accountDetailFlow)
     }
@@ -117,6 +120,7 @@ class MyAccountHomeViewModelTest {
             getCurrentUserEmail,
             getUserFullNameUseCase,
             getMyAvatarFileUseCase,
+            getUsedTransferStatusUseCase,
             accountNameMapper = AccountNameMapper(),
         )
     }
@@ -248,6 +252,34 @@ class MyAccountHomeViewModelTest {
             }
         }
 
+    @ParameterizedTest(name = " with usedTransfer as {0} and totalTransfer as {1} and UsedTransferStatus is {2}")
+    @MethodSource("provideTransferDetails")
+    fun `test that account details state should be updated when monitorAccountDetail emits data related to transfers`(
+        usedTransfer: Long,
+        totalTransfer: Long,
+        usedTransferStatus: UsedTransferStatus,
+    ) =
+        runTest {
+            val accountDetail =
+                AccountDetail(transferDetail = AccountTransferDetail(totalTransfer, usedTransfer))
+            whenever(accountDetail.transferDetail?.usedTransferPercentage?.let {
+                getUsedTransferStatusUseCase(
+                    it
+                )
+            }).thenReturn(
+                usedTransferStatus
+            )
+            accountDetailFlow.emit(accountDetail)
+
+            advanceUntilIdle()
+
+            underTest.uiState.test {
+                val state = awaitItem()
+                assertThat(state.usedTransferPercentage).isEqualTo(accountDetail.transferDetail?.usedTransferPercentage)
+                assertThat(state.usedTransferStatus).isEqualTo(usedTransferStatus)
+            }
+        }
+
     @Test
     fun `test that account type should be business when refreshAccountInfo calls returns business type account`() =
         runTest {
@@ -329,6 +361,16 @@ class MyAccountHomeViewModelTest {
                 Arguments.of(BusinessAccountStatus.GracePeriod),
             )
         }
+
+        @JvmStatic
+        private fun provideTransferDetails(): Stream<Arguments?>? {
+            return Stream.of(
+                Arguments.of(50L, 100L, UsedTransferStatus.NoTransferProblems),
+                Arguments.of(90L, 100L, UsedTransferStatus.AlmostFull),
+                Arguments.of(100L, 100L, UsedTransferStatus.Full),
+            )
+        }
+
 
         @JvmField
         @RegisterExtension

@@ -44,7 +44,7 @@ internal fun NavGraphBuilder.chatToolbarModal(
             isVisible = true,
             onCameraPermissionDenied = onCameraPermissionDenied,
             onAttachScan = viewModel::onAttachScan,
-            onNewDocumentScannerInitializationFailed = {
+            onDocumentScannerInitializationFailed = {
                 navController.navigateToDocumentScanningErrorDialog(
                     navOptions {
                         popUpTo("toolbarModal") {
@@ -53,8 +53,8 @@ internal fun NavGraphBuilder.chatToolbarModal(
                     }
                 )
             },
-            onNewDocumentScannerFailedToOpen = viewModel::onNewDocumentScannerFailedToOpen,
-            onHandleScanDocumentResultConsumed = viewModel::onHandleScanDocumentResultConsumed,
+            onDocumentScannerFailedToOpen = viewModel::onDocumentScannerFailedToOpen,
+            onGmsDocumentScannerConsumed = viewModel::onGmsDocumentScannerConsumed,
         )
     }
 }

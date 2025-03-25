@@ -25,9 +25,9 @@ import mega.privacy.android.shared.original.core.ui.model.MegaSpanStyle
 import mega.privacy.android.shared.original.core.ui.model.MegaSpanStyleWithAnnotation
 import mega.privacy.android.shared.original.core.ui.model.SpanIndicator
 import mega.privacy.android.shared.original.core.ui.preview.CombinedThemePreviews
-import mega.privacy.android.shared.original.core.ui.theme.values.TextColor
+import mega.android.core.ui.theme.values.TextColor
 import mega.privacy.android.domain.entity.call.CallRecordingEvent
-import mega.privacy.android.shared.original.core.ui.theme.OriginalTempTheme
+import mega.privacy.android.shared.original.core.ui.theme.OriginalTheme
 
 /**
  * Show call recording consent dialog
@@ -135,7 +135,7 @@ private fun CallRecordingConsentDialog(
 @CombinedThemePreviews
 @Composable
 fun CallRecordingConsentDialogPreview() {
-    OriginalTempTheme(isDark = isSystemInDarkTheme()) {
+    OriginalTheme(isDark = isSystemInDarkTheme()) {
         CallRecordingConsentDialog(
             uiState = CallRecordingUIState(
                 callRecordingEvent = CallRecordingEvent(isSessionOnRecording = true),

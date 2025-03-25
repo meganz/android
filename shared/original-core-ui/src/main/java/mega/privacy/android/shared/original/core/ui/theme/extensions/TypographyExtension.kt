@@ -54,3 +54,15 @@ val Typography.badge: TextStyle
  */
 val Typography.h6Medium: TextStyle
     get() = h6.copy(fontWeight = FontWeight(500))
+
+/**
+ * Button normal weight
+ */
+val Typography.buttonNormal: TextStyle
+    get() = button.copy(fontWeight = FontWeight.Normal)
+
+/**
+ * Button normal weight
+ */
+val Typography.buttonThin: TextStyle
+    get() = button.copy(fontSize = 8.sp)

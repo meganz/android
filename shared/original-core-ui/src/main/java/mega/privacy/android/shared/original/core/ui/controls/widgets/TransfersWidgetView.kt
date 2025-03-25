@@ -47,7 +47,7 @@ import mega.privacy.android.shared.original.core.ui.model.TransfersInfo
 import mega.privacy.android.shared.original.core.ui.model.TransfersStatus
 import mega.privacy.android.shared.original.core.ui.preview.CombinedThemePreviews
 import mega.privacy.android.shared.original.core.ui.theme.MegaOriginalTheme
-import mega.privacy.android.shared.original.core.ui.theme.OriginalTempTheme
+import mega.privacy.android.shared.original.core.ui.theme.OriginalTheme
 import kotlin.time.Duration.Companion.milliseconds
 import kotlin.time.Duration.Companion.seconds
 
@@ -71,7 +71,7 @@ fun ComposeView.setTransfersWidgetContent(
         val widgetHide by hideFlow.collectAsStateWithLifecycle(
             true
         )
-        OriginalTempTheme(isDark = isSystemInDarkTheme()) {
+        OriginalTheme(isDark = isSystemInDarkTheme()) {
             if (!widgetHide) {
                 TransfersWidgetViewAnimated(
                     transfersInfo = transfersInfo,
@@ -253,7 +253,7 @@ internal const val TAG_TRANSFERS_WIDGET = "transfers_widget_view:button:floating
 private fun TransfersWidgetPreview(
     @PreviewParameter(TransfersWidgetPreviewProvider::class) parameter: Pair<TransfersInfo, Boolean>,
 ) {
-    OriginalTempTheme(isDark = isSystemInDarkTheme()) {
+    OriginalTheme(isDark = isSystemInDarkTheme()) {
         TransfersWidgetView(parameter.first, completed = parameter.second) {}
     }
 }

@@ -29,7 +29,7 @@ import mega.privacy.android.app.upgradeAccount.view.components.FeatureRow
 import mega.privacy.android.app.upgradeAccount.view.components.GetProPlanColumn
 import mega.privacy.android.shared.original.core.ui.preview.CombinedThemePreviews
 import mega.privacy.android.shared.resources.R.string.dialog_onboarding_feature_storage_description
-import mega.privacy.android.shared.original.core.ui.theme.OriginalTempTheme
+import mega.privacy.android.shared.original.core.ui.theme.OriginalTheme
 
 /**
  *  Compose UI for new Onboarding dialog (Choose account screen), this is Variant A
@@ -129,7 +129,7 @@ fun VariantAOnboardingDialogView(
 private fun PreviewVariantAOnboardingDialogView(
     @PreviewParameter(VariantAOnboardingDialogPreviewProvider::class) state: ChooseAccountState,
 ) {
-    OriginalTempTheme(isDark = isSystemInDarkTheme()) {
+    OriginalTheme(isDark = isSystemInDarkTheme()) {
         VariantAOnboardingDialogView(
             onSkipPressed = {},
             onViewPlansPressed = {},

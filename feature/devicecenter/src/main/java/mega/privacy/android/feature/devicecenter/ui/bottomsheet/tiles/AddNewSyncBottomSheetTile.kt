@@ -10,12 +10,10 @@ import androidx.compose.ui.res.stringResource
 import mega.privacy.android.shared.original.core.ui.controls.dividers.DividerType
 import mega.privacy.android.shared.original.core.ui.controls.lists.MenuActionListTile
 import mega.privacy.android.shared.original.core.ui.preview.CombinedThemePreviews
-import mega.privacy.android.shared.original.core.ui.theme.OriginalTempTheme
+import mega.privacy.android.shared.original.core.ui.theme.OriginalTheme
 import mega.privacy.android.shared.resources.R as sharedResR
-import androidx.compose.ui.tooling.preview.PreviewParameter
 import mega.privacy.android.shared.original.core.ui.controls.text.MegaText
-import mega.privacy.android.shared.original.core.ui.preview.BooleanProvider
-import mega.privacy.android.shared.original.core.ui.theme.values.TextColor
+import mega.android.core.ui.theme.values.TextColor
 
 /**
  * A [Composable] Bottom Sheet Tile that displays "Add new sync"
@@ -25,7 +23,6 @@ import mega.privacy.android.shared.original.core.ui.theme.values.TextColor
  */
 @Composable
 internal fun AddNewSyncBottomSheetTile(
-    isFreeAccount: Boolean,
     onActionClicked: () -> Unit,
     dividerType: DividerType? = DividerType.BigStartPadding,
 ) {
@@ -36,15 +33,13 @@ internal fun AddNewSyncBottomSheetTile(
         dividerType = dividerType,
         onActionClicked = onActionClicked,
         trailingItem = {
-            if (isFreeAccount) {
-                MegaText(
-                    text = stringResource(id = sharedResR.string.general_pro_only_label),
-                    textColor = TextColor.Accent,
-                    modifier = Modifier.testTag(
-                        TEST_TAG_BOTTOM_SHEET_TILE_ADD_NEW_SYNC_PRO_ONLY_LABEL
-                    )
+            MegaText(
+                text = stringResource(id = sharedResR.string.notifications_notification_item_new_tag),
+                textColor = TextColor.Accent,
+                modifier = Modifier.testTag(
+                    TEST_TAG_BOTTOM_SHEET_TILE_ADD_NEW_SYNC_PRO_ONLY_LABEL
                 )
-            }
+            )
         }
     )
 }
@@ -54,11 +49,9 @@ internal fun AddNewSyncBottomSheetTile(
  */
 @CombinedThemePreviews
 @Composable
-private fun AddNewSyncBottomSheetTilePreview(
-    @PreviewParameter(BooleanProvider::class) isFreeAccount: Boolean,
-) {
-    OriginalTempTheme(isDark = isSystemInDarkTheme()) {
-        AddNewSyncBottomSheetTile(isFreeAccount = isFreeAccount, onActionClicked = {})
+private fun AddNewSyncBottomSheetTilePreview() {
+    OriginalTheme(isDark = isSystemInDarkTheme()) {
+        AddNewSyncBottomSheetTile(onActionClicked = {})
     }
 }
 

@@ -33,7 +33,9 @@ plugins {
     alias(convention.plugins.mega.lint)
     alias(convention.plugins.mega.android.hilt)
     alias(plugin.plugins.de.mannodermaus.android.junit5)
+    alias(plugin.plugins.kotlin.serialisation)
     id("kotlin-parcelize")
+    id("kotlin-kapt")
     id("androidx.navigation.safeargs.kotlin")
     id("com.google.firebase.appdistribution")
     id("androidx.baselineprofile")
@@ -64,6 +66,13 @@ android {
         buildConfigField("long", "NOCTURN_TIMEOUT", "${getNocturnTimeout(project)}")
         buildConfigField("int", "KARMA_PLUGIN_PORT", "${getKarmaPluginPort(project)}")
         resValue("string", "app_version", "\"${versionName}${versionNameSuffix}\"")
+        val offlineDocumentProviderAuthority = "$applicationId.offline.documents"
+        manifestPlaceholders["offlineDocumentProviderAuthority"] = offlineDocumentProviderAuthority
+        buildConfigField(
+            "String",
+            "OFFLINE_DOCUMENT_PROVIDER_AUTHORITY",
+            "\"${offlineDocumentProviderAuthority}\""
+        )
 
         val megaSdkVersion: String by rootProject.extra
         resValue("string", "sdk_version", "\"${getSdkGitHash(megaSdkVersion, project)}\"")
@@ -120,6 +129,15 @@ android {
             applicationIdSuffix = ".qa"
             buildConfigField("String", "ENVIRONMENT", "\"MEGAEnv/QA\"")
             buildConfigField("String", "AD_UNIT_ID", "\"ca-app-pub-3940256099942544/9214589741\"")
+            val offlineDocumentProviderAuthority =
+                "${defaultConfig.applicationId}$applicationIdSuffix.offline.documents"
+            manifestPlaceholders["offlineDocumentProviderAuthority"] =
+                offlineDocumentProviderAuthority
+            buildConfigField(
+                "String",
+                "OFFLINE_DOCUMENT_PROVIDER_AUTHORITY",
+                "\"${offlineDocumentProviderAuthority}\""
+            )
             firebaseAppDistribution {
                 releaseNotes = readReleaseNotes()
                 groups = readTesterGroupList()
@@ -187,6 +205,7 @@ dependencies {
     implementation(project(":feature:sync"))
     implementation(project(":feature:devicecenter"))
     implementation(project(":shared:resources"))
+    implementation(project(":feature:chat"))
     preBuiltSdkDependency(rootProject.extra)
 
     //Test Modules
@@ -216,6 +235,7 @@ dependencies {
     implementation(androidx.emojiPicker)
     implementation(androidx.exifinterface)
     implementation(androidx.fragment)
+    implementation(androidx.fragment.compose)
     implementation(androidx.legacy.support)
     implementation(androidx.multidex)
     implementation(androidx.palette)
@@ -239,6 +259,11 @@ dependencies {
     implementation(lib.coil.compose)
     implementation(androidx.paging.compose)
     implementation(lib.kotlinx.collections.immutable)
+    implementation(lib.mega.core.ui)
+    implementation(androidx.material3)
+    implementation(androidx.material3.adaptive)
+    implementation(androidx.material3.adaptive.layout)
+    implementation(androidx.material3.adaptive.navigation)
 
     // Google
     implementation(google.gson)
@@ -280,7 +305,7 @@ dependencies {
     implementation(androidx.hilt.navigation)
 
     if (shouldApplyDefaultConfiguration(project)) {
-        kaptTest(google.hilt.android.compiler)
+        kspTest(google.hilt.android.compiler)
     }
 
     // Fresco
@@ -301,13 +326,18 @@ dependencies {
     implementation(lib.shimmerlayout)
     implementation(lib.namedregexp)
     implementation(lib.blurry)
-    implementation(lib.documentscanner)
     implementation(lib.simplestorage)
     implementation(lib.compose.state.events)
     implementation(testlib.hamcrest)
     implementation(lib.mega.analytics)
     implementation(lib.kotlin.serialisation)
+    implementation(lib.zoomable.telephoto)
     implementation(lib.zoomable.image.coil)
+    implementation(lib.zoomable.image.core)
+    implementation(lib.zoomable.image.subsampling.image)
+    implementation(lib.telephoto.flick)
+    implementation(lib.commonmark.java)
+    implementation(google.ump)
 
     // Debug
     debugImplementation(lib.nocturn)
@@ -353,7 +383,7 @@ dependencies {
     androidTestImplementation(testlib.espresso.intents)
     androidTestImplementation(testlib.compose.junit)
 
-    kaptAndroidTest(google.hilt.android.compiler)
+    kspAndroidTest(google.hilt.android.compiler)
     debugImplementation(androidx.fragment.test)
     debugImplementation(testlib.compose.manifest)
     debugImplementation(testlib.test.monitor)
@@ -371,7 +401,7 @@ dependencies {
 
 /**
  * Gradle task for getting the app git hash
- * Run ./gradlew -q printAppGitHash
+ * Run ./gradlew --no-daemon -q printAppGitHash
  */
 tasks.register("printAppGitHash") {
     doLast {
@@ -381,7 +411,7 @@ tasks.register("printAppGitHash") {
 
 /**
  * Gradle task for getting the app version name
- * Run ./gradlew -q printAppVersionName
+ * Run ./gradlew --no-daemon -q printAppVersionName
  */
 tasks.register("printAppVersionName") {
     doLast {
@@ -391,7 +421,7 @@ tasks.register("printAppVersionName") {
 
 /**
  * Gradle task for getting the pre-build SDK version
- * Run ./gradlew -q printPrebuildSdkVersion
+ * Run ./gradlew --no-daemon -q printPrebuildSdkVersion
  */
 tasks.register("printPrebuildSdkVersion") {
     doLast {
@@ -402,7 +432,7 @@ tasks.register("printPrebuildSdkVersion") {
 
 /**
  * Gradle task for getting the app version name channel
- * Run ./gradlew -q printAppVersionNameChannel
+ * Run ./gradlew --no-daemon -q printAppVersionNameChannel
  */
 tasks.register("printAppVersionNameChannel") {
     doLast {

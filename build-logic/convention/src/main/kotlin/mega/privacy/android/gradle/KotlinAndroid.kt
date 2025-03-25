@@ -54,6 +54,7 @@ fun Project.configureKotlin() {
             val shouldSuppressWarnings: Boolean by rootProject.extra
             suppressWarnings = shouldSuppressWarnings
             freeCompilerArgs.add("-opt-in=kotlin.RequiresOptIn")
+            freeCompilerArgs.add("-XXLanguage:+ExplicitBackingFields")
         }
     }
 }

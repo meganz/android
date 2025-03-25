@@ -20,7 +20,6 @@ import mega.privacy.android.app.MegaApplication.Companion.getPushNotificationSet
 import mega.privacy.android.app.R
 import mega.privacy.android.app.components.ChatManagement
 import mega.privacy.android.app.getLink.BaseLinkViewModel
-import mega.privacy.android.app.objects.PasscodeManagement
 import mega.privacy.android.app.presentation.mapper.GetStringFromStringResMapper
 import mega.privacy.android.app.presentation.meeting.model.MeetingState
 import mega.privacy.android.app.presentation.meeting.model.ScheduledMeetingInfoUiState
@@ -87,7 +86,6 @@ import javax.inject.Inject
  * @property setOpenInviteWithChatIdUseCase                 [SetOpenInviteWithChatIdUseCase]
  * @property updateChatPermissionsUseCase                   [UpdateChatPermissionsUseCase]
  * @property getPublicChatToPrivate                         [SetPublicChatToPrivate]
- * @property passcodeManagement                             [PasscodeManagement]
  * @property chatManagement                                 [ChatManagement]
  * @property startConversationUseCase                       [StartConversationUseCase]
  * @property openOrStartCallUseCase                         [OpenOrStartCallUseCase]
@@ -119,7 +117,6 @@ class ScheduledMeetingInfoViewModel @Inject constructor(
     private val setOpenInviteWithChatIdUseCase: SetOpenInviteWithChatIdUseCase,
     private val updateChatPermissionsUseCase: UpdateChatPermissionsUseCase,
     private val getPublicChatToPrivate: SetPublicChatToPrivate,
-    private val passcodeManagement: PasscodeManagement,
     private val chatManagement: ChatManagement,
     private val startConversationUseCase: StartConversationUseCase,
     private val openOrStartCallUseCase: OpenOrStartCallUseCase,
@@ -772,7 +769,6 @@ class ScheduledMeetingInfoViewModel @Inject constructor(
                         if (call.isOutgoing) {
                             chatManagement.setRequestSentCall(call.callId, true)
                         }
-                        passcodeManagement.showPasscodeScreen = true
                         getInstance().openCallService(chatCallId)
                         openChatCall(call.chatId)
                     }

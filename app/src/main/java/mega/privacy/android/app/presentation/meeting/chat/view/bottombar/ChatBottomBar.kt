@@ -31,7 +31,7 @@ import mega.privacy.android.app.presentation.meeting.chat.view.UserTypingView
 import mega.privacy.android.shared.original.core.ui.controls.chat.ChatInputTextToolbar
 import mega.privacy.android.shared.original.core.ui.controls.chat.VoiceClipRecordEvent
 import mega.privacy.android.shared.original.core.ui.preview.CombinedThemePreviews
-import mega.privacy.android.shared.original.core.ui.theme.OriginalTempTheme
+import mega.privacy.android.shared.original.core.ui.theme.OriginalTheme
 import mega.privacy.android.shared.original.core.ui.utils.ComposableLifecycle
 
 
@@ -104,12 +104,21 @@ internal fun ChatBottomBar(
         uiState = uiState,
         textFieldValue = textFieldValue,
         showEmojiPicker = showEmojiPicker,
-        onSendClick = onSendClick,
+        onSendClick = {
+            onSendClick(it)
+            viewModel.onExitTypingContext()
+        },
         onAttachmentClick = onAttachmentClick,
         onEmojiClick = onEmojiClick,
         interactionSourceTextInput = interactionSourceTextInput,
-        onTextChange = { textFieldValue = it },
-        onCloseEditing = onCloseEditing,
+        onTextChange = {
+            textFieldValue = it
+            if (it.text.isNotEmpty()) viewModel.onUserTyping()
+        },
+        onCloseEditing = {
+            onCloseEditing()
+            viewModel.onExitTypingContext()
+        },
         onVoiceClipEvent = onVoiceClipEvent,
         focusRequester = focusRequester,
     )
@@ -176,7 +185,7 @@ fun ChatBottomBarContent(
 @CombinedThemePreviews
 @Composable
 private fun ChatBottomBarPreview() {
-    OriginalTempTheme(isDark = isSystemInDarkTheme()) {
+    OriginalTheme(isDark = isSystemInDarkTheme()) {
         ChatBottomBarContent(
             uiState = ChatUiState(
                 sendingText = "Sending text",

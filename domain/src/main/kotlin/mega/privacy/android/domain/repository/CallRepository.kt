@@ -12,6 +12,7 @@ import mega.privacy.android.domain.entity.chat.ChatScheduledMeeting
 import mega.privacy.android.domain.entity.chat.ChatScheduledMeetingOccurr
 import mega.privacy.android.domain.entity.chat.ChatScheduledRules
 import mega.privacy.android.domain.entity.chat.ChatVideoUpdate
+import mega.privacy.android.domain.entity.meeting.FakeIncomingCallState
 import mega.privacy.android.domain.entity.meeting.ResultOccurrenceUpdate
 
 /**
@@ -640,4 +641,62 @@ interface CallRepository {
         waitingRoom: Boolean,
         openInvite: Boolean,
     ): ChatRequest
+
+    /**
+     * Monitor fake incoming call
+     *
+     * @return Flow of Map.
+     */
+    fun monitorFakeIncomingCall(): Flow<MutableMap<Long, FakeIncomingCallState>>
+
+    /**
+     * Add fake incoming call
+     *
+     * @param chatId    Chat id
+     * @param type      [FakeIncomingCallState]
+     */
+    suspend fun addFakeIncomingCall(chatId: Long, type: FakeIncomingCallState)
+
+    /**
+     * Remove fake incoming call
+     *
+     * @param chatId    Chat id
+     */
+    suspend fun removeFakeIncomingCall(chatId: Long)
+
+    /**
+     * Get fake incoming call
+     *
+     * @param chatId    Chat id
+     * @return  [FakeIncomingCallState]
+     */
+    suspend fun getFakeIncomingCall(chatId: Long): FakeIncomingCallState?
+
+    /**
+     * Check if call is fake incoming call
+     *
+     * @param chatId    Chat id
+     */
+    suspend fun isFakeIncomingCall(chatId: Long): Boolean
+
+    /**
+     * Check if call is pending to hang up
+     *
+     * @param chatId    Chat id
+     */
+    suspend fun isPendingToHangUp(chatId: Long): Boolean
+
+    /**
+     * Add call pending to hang up
+     *
+     * @param chatId    Chat id
+     */
+    suspend fun addCallPendingToHangUp(chatId: Long)
+
+    /**
+     * Remove call pending to hang up
+     *
+     * @param chatId    Chat id
+     */
+    suspend fun removeCallPendingToHangUp(chatId: Long)
 }

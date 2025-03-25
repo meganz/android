@@ -2,6 +2,7 @@ package mega.privacy.android.app.myAccount
 
 import androidx.annotation.StringRes
 import mega.privacy.android.domain.entity.AccountType
+import mega.privacy.android.domain.entity.StorageState
 import mega.privacy.android.domain.entity.account.AccountLevelDetail
 import mega.privacy.android.domain.entity.account.business.BusinessAccountStatus
 
@@ -32,6 +33,9 @@ import mega.privacy.android.domain.entity.account.business.BusinessAccountStatus
  * @property isProSubscription true if user has active Pro subscription and the account level of subscription is the highest
  * @property subscriptionDetails  subscription details, including the subscription type, subscription cycle and expiration date
  * @property accountType The type of the account
+ * @property storageState The current state of the storage
+ * @property showLogoutConfirmationDialog true if the logout confirmation dialog should be shown
+ * @property openTestPasswordScreenEvent true if the Test Password screen should be opened
  */
 data class MyAccountUiState(
     val isFileVersioningEnabled: Boolean = true,
@@ -52,8 +56,10 @@ data class MyAccountUiState(
     val shouldNavigateToSmsVerification: Boolean = false,
     val showInvalidChangeEmailLinkPrompt: Boolean = false,
     val showChangeEmailConfirmation: Boolean = false,
-    val showNewCancelSubscriptionFeature: Boolean = false,
     val isProSubscription: Boolean = false,
     val subscriptionDetails: AccountLevelDetail? = null,
     val accountType: AccountType = AccountType.FREE,
+    val storageState: StorageState = StorageState.Unknown,
+    val showLogoutConfirmationDialog: Boolean = false,
+    val openTestPasswordScreenEvent: Boolean = false,
 )

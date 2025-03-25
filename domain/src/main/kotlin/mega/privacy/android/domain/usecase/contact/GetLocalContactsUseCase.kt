@@ -6,6 +6,7 @@ import kotlinx.coroutines.withContext
 import mega.privacy.android.domain.entity.contacts.LocalContact
 import mega.privacy.android.domain.qualifier.DefaultDispatcher
 import mega.privacy.android.domain.repository.ContactsRepository
+import mega.privacy.android.domain.usecase.IsEmailValidUseCase
 import mega.privacy.android.domain.usecase.environment.IsConnectivityInRoamingStateUseCase
 import javax.inject.Inject
 

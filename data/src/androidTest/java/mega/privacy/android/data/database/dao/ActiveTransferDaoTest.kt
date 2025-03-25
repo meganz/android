@@ -9,6 +9,7 @@ import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.test.runTest
 import mega.privacy.android.data.database.MegaDatabase
 import mega.privacy.android.data.database.entity.ActiveTransferEntity
+import mega.privacy.android.domain.entity.transfer.TransferAppData
 import mega.privacy.android.domain.entity.transfer.TransferType
 import org.junit.After
 import org.junit.Before
@@ -32,6 +33,7 @@ class ActiveTransferDaoTest {
                 isFolderTransfer = false,
                 isAlreadyTransferred = false,
                 isCancelled = true,
+                appData = emptyList(),
             )
         }
     }
@@ -53,6 +55,7 @@ class ActiveTransferDaoTest {
         db.close()
     }
 
+    @Test
     fun test_that_insert_a_new_entity_actually_inserts_the_entity() = runTest {
         val newEntity = ActiveTransferEntity(
             tag = 100,
@@ -63,12 +66,16 @@ class ActiveTransferDaoTest {
             isPaused = false,
             isAlreadyTransferred = false,
             isCancelled = true,
+            appData = listOf(
+                TransferAppData.CameraUpload, TransferAppData.OriginalContentUri("content://uri"),
+            ),
         )
         activeTransferDao.insertOrUpdateActiveTransfer(newEntity)
         val actual = activeTransferDao.getActiveTransferByTag(newEntity.tag)
         assertThat(actual).isEqualTo(newEntity)
     }
 
+    @Test
     fun test_that_insert_a_duplicated_transfer_replaces_original_one() = runTest {
         val firstEntity = entities.first()
         val modified = firstEntity.copy(isFinished = !firstEntity.isFinished)
@@ -77,6 +84,22 @@ class ActiveTransferDaoTest {
         assertThat(result).contains(modified)
         assertThat(result).doesNotContain(firstEntity)
     }
+
+    @Test
+    fun test_that_insert_a_duplicated_transfer_replaces_original_one_only_if_not_finished() =
+        runTest {
+            val entitiesToModified = entities.associateBy { it.copy(isPaused = !it.isPaused) }
+            activeTransferDao.insertOrUpdateActiveTransfers(entitiesToModified.values.toList(), 5)
+
+            entitiesToModified.forEach { (original, modified) ->
+                val result = activeTransferDao.getActiveTransferByTag(original.tag)
+                if (original.isFinished) {
+                    assertThat(result).isEqualTo(original)
+                } else {
+                    assertThat(result?.isPaused).isEqualTo(modified.isPaused)
+                }
+            }
+        }
 
     @Test
     fun test_that_getActiveTransferByTag_returns_the_correct_active_transfer() = runTest {

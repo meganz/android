@@ -9,6 +9,7 @@ import kotlinx.coroutines.test.UnconfinedTestDispatcher
 import kotlinx.coroutines.test.runTest
 import mega.privacy.android.data.gateway.AppEventGateway
 import mega.privacy.android.domain.entity.call.AudioDevice
+import mega.privacy.android.domain.entity.transfer.CompletedTransferState
 import org.junit.jupiter.api.BeforeAll
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.TestInstance
@@ -43,11 +44,12 @@ class AppEventFacadeTest {
 
     @Test
     fun `test that broadcast completed transfer fires an event`() = runTest {
+        val expected = CompletedTransferState.Completed
         underTest.monitorCompletedTransfer.test {
-            underTest.broadcastCompletedTransfer()
+            underTest.broadcastCompletedTransfer(expected)
 
             val actual = awaitItem()
-            assertThat(actual).isEqualTo(Unit)
+            assertThat(actual).isEqualTo(expected)
         }
     }
 

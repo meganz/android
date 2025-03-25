@@ -1,117 +1,110 @@
 package mega.privacy.android.app.meeting.fragments
 
 import android.Manifest
-import android.annotation.SuppressLint
 import android.content.Context
 import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import android.widget.TextView
+import androidx.compose.runtime.Composable
+import androidx.compose.ui.platform.ComposeView
+import androidx.compose.ui.platform.ViewCompositionStrategy
+import androidx.core.view.isVisible
 import androidx.fragment.app.viewModels
 import androidx.navigation.fragment.findNavController
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.flow.distinctUntilChanged
 import kotlinx.coroutines.flow.map
-import mega.privacy.android.app.BaseActivity
-import mega.privacy.android.app.R
 import mega.privacy.android.app.arch.extensions.collectFlow
-import mega.privacy.android.app.components.twemoji.EmojiTextView
-import mega.privacy.android.app.databinding.MeetingRingingFragmentBinding
-import mega.privacy.android.app.meeting.activity.MeetingActivity
-import mega.privacy.android.app.meeting.activity.MeetingActivity.Companion.MEETING_ACTION_RINGING_VIDEO_OFF
-import mega.privacy.android.app.meeting.activity.MeetingActivity.Companion.MEETING_ACTION_RINGING_VIDEO_ON
-import mega.privacy.android.app.meeting.activity.MeetingActivity.Companion.MEETING_CHAT_ID
-import mega.privacy.android.app.utils.AvatarUtil.getDefaultAvatar
-import mega.privacy.android.app.utils.AvatarUtil.getSpecificAvatarColor
-import mega.privacy.android.app.utils.CallUtil.getDefaultAvatarCall
-import mega.privacy.android.app.utils.CallUtil.getImageAvatarCall
-import mega.privacy.android.app.utils.Constants.AVATAR_GROUP_CHAT_COLOR
-import mega.privacy.android.app.utils.Constants.AVATAR_SIZE
+import mega.privacy.android.app.fcm.ChatAdvancedNotificationBuilder
+import mega.privacy.android.app.presentation.meeting.RingingViewModel
+import mega.privacy.android.app.presentation.meeting.view.RingingScreen
 import mega.privacy.android.app.utils.RunOnUIThreadUtils
 import mega.privacy.android.app.utils.permission.PermissionUtils
 import mega.privacy.android.app.utils.permission.permissionsBuilder
-import mega.privacy.android.domain.entity.call.ChatCallStatus
+import mega.privacy.android.domain.entity.chat.ChatConnectionStatus
+import mega.privacy.android.shared.original.core.ui.theme.OriginalTheme
 import nz.mega.sdk.MegaChatApiJava.MEGACHAT_INVALID_HANDLE
 import timber.log.Timber
 
+/**
+ * Fragment to show the incoming call
+ */
 @AndroidEntryPoint
 class RingingMeetingFragment : MeetingBaseFragment() {
 
     private val inMeetingViewModel by viewModels<InMeetingViewModel>()
+    private val ringingViewModel by viewModels<RingingViewModel>()
 
-    private lateinit var binding: MeetingRingingFragmentBinding
-
-    private lateinit var toolbarTitle: EmojiTextView
-    private lateinit var toolbarSubtitle: TextView
-
-    private var chatId: Long = MEGACHAT_INVALID_HANDLE
-
-    override fun onCreate(savedInstanceState: Bundle?) {
-        super.onCreate(savedInstanceState)
-
-        arguments?.let {
-            chatId = it.getLong(MEETING_CHAT_ID)
-        }
-    }
-
+    /**
+     * On create view
+     */
     override fun onCreateView(
         inflater: LayoutInflater,
         container: ViewGroup?,
         savedInstanceState: Bundle?,
-    ): View {
-        (requireActivity() as MeetingActivity).let {
-            toolbarTitle = it.binding.titleToolbar
-            toolbarSubtitle = it.binding.subtitleToolbar
+    ) = ComposeView(requireContext()).apply {
+        setViewCompositionStrategy(ViewCompositionStrategy.DisposeOnViewTreeLifecycleDestroyed)
+        setContent {
+            MainComposeView()
         }
-
-        binding = MeetingRingingFragmentBinding.inflate(inflater, container, false)
-        return binding.root
     }
 
+    /**
+     * On view created
+     */
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
+        meetingActivity.binding.toolbar.apply {
+            isVisible = false
+        }
         initViewModel()
         permissionsRequester.launch(true)
-        initComponent()
+    }
+
+    @Composable
+    private fun MainComposeView() {
+        OriginalTheme(isDark = true) {
+            RingingScreen(
+                viewModel = ringingViewModel,
+                onAudioClicked = {
+                    if (ringingViewModel.state.value.call != null &&
+                        ringingViewModel.state.value.chatConnectionStatus == ChatConnectionStatus.Online
+                    ) {
+                        checkAndAnswerCall(enableVideo = false)
+                    } else {
+                        ringingViewModel.onAudioClicked(isClicked = true)
+                    }
+                },
+                onVideoClicked = {
+                    if (ringingViewModel.state.value.call != null &&
+                        ringingViewModel.state.value.chatConnectionStatus == ChatConnectionStatus.Online
+                    ) {
+                        checkAndAnswerCall(enableVideo = true)
+                    } else {
+                        ringingViewModel.onVideoClicked(isClicked = true)
+                    }
+                },
+                onBackPressed = {
+                    requireActivity().finish()
+                },
+            )
+        }
     }
 
     /**
-     * Initialize components of UI
-     */
-    @SuppressLint("ClickableViewAccessibility")
-    private fun initComponent() {
-
-        // Always be 'calling'.
-        toolbarSubtitle.text = getString(R.string.outgoing_call_starting)
-
-        binding.answerVideoFab.setOnClickListener {
-            inMeetingViewModel.checkAnotherCallsInProgress(inMeetingViewModel.getChatId())
-            answerCall(enableVideo = true)
-        }
-
-        binding.answerAudioFab.setOnClickListener {
-            inMeetingViewModel.checkAnotherCallsInProgress(inMeetingViewModel.getChatId())
-            answerCall(enableVideo = false)
-        }
-
-        binding.rejectFab.setOnClickListener {
-            inMeetingViewModel.onRejectBottomTap(chatId)
-            requireActivity().finish()
-        }
-    }
-
-    /**
-     * Method to answer the call with audio enabled
+     * Method to answer the call with audio enabled or start the meeting
      *
      * @param enableVideo True, if it should be answered with video on. False, if it should be answered with video off
      */
-    private fun answerCall(enableVideo: Boolean) {
+    private fun checkAndAnswerCall(enableVideo: Boolean) {
+        inMeetingViewModel.checkAnotherCallsInProgress(ringingViewModel.state.value.chatId)
+
         val audio =
             PermissionUtils.hasPermissions(requireContext(), Manifest.permission.RECORD_AUDIO)
 
         if (!audio) {
-            showSnackBar(getString(R.string.meeting_required_permissions_warning))
+            ringingViewModel.showSnackbar()
             return
         }
         var video = enableVideo
@@ -119,32 +112,19 @@ class RingingMeetingFragment : MeetingBaseFragment() {
             video = PermissionUtils.hasPermissions(requireContext(), Manifest.permission.CAMERA)
         }
 
-        sharedModel.answerCall(enableVideo = enableVideo, enableAudio = true, speakerAudio = video)
-            .observe(viewLifecycleOwner) { (chatHandle, enableVideo, _) ->
-                val actionString = if (enableVideo) {
-                    Timber.d("Call answered with video ON and audio ON")
-                    MEETING_ACTION_RINGING_VIDEO_ON
-                } else {
-                    Timber.d("Call answered with video OFF and audio ON")
-                    MEETING_ACTION_RINGING_VIDEO_OFF
-                }
-
-                val action = RingingMeetingFragmentDirections.actionGlobalInMeeting(
-                    actionString,
-                    chatHandle
-                )
-                findNavController().navigate(action)
-            }
+        sharedModel.answerCall(
+            chatId = ringingViewModel.state.value.chatId,
+            enableVideo = enableVideo,
+            enableAudio = true,
+            speakerAudio = video
+        )
     }
 
     /**
      * Initialize ViewModel
      */
     private fun initViewModel() {
-        if (chatId != MEGACHAT_INVALID_HANDLE) {
-            sharedModel.updateChatRoomId(chatId)
-            inMeetingViewModel.setChatId(chatId)
-        }
+
         collectFlows()
 
         sharedModel.cameraPermissionCheck.observe(viewLifecycleOwner) { allowed ->
@@ -187,55 +167,79 @@ class RingingMeetingFragment : MeetingBaseFragment() {
     }
 
     private fun collectFlows() {
+        viewLifecycleOwner.collectFlow(ringingViewModel.state.map { it.chatId }
+            .distinctUntilChanged()) {
+            if (it != MEGACHAT_INVALID_HANDLE) {
+                sharedModel.updateChatRoomId(it)
+            }
+        }
 
-        viewLifecycleOwner.collectFlow(inMeetingViewModel.state.map { it.chat }
+        viewLifecycleOwner.collectFlow(ringingViewModel.state.map { it.call }
             .distinctUntilChanged()) {
             it?.run {
-                if (inMeetingViewModel.isOneToOneCall() == true) {
-                    val callerId = it.peerHandlesList[0]
-                    getImageAvatarCall(callerId)?.let { bitmap ->
-                        binding.avatar.setImageBitmap(bitmap)
-                    } ?: run {
-                        binding.avatar.setImageBitmap(getDefaultAvatarCall(context, callerId))
+                if (ringingViewModel.state.value.chatConnectionStatus == ChatConnectionStatus.Online) {
+                    if (ringingViewModel.state.value.isAnswerWithAudioClicked) {
+                        ringingViewModel.onAudioClicked(isClicked = false)
+                        checkAndAnswerCall(enableVideo = false)
                     }
-                } else {
-                    binding.avatar.setImageBitmap(
-                        getDefaultAvatar(
-                            getSpecificAvatarColor(AVATAR_GROUP_CHAT_COLOR),
-                            it.title,
-                            AVATAR_SIZE,
-                            true,
-                            true
-                        )
-                    )
+
+                    if (ringingViewModel.state.value.isAnswerWithVideoClicked) {
+                        ringingViewModel.onVideoClicked(isClicked = false)
+                        checkAndAnswerCall(enableVideo = true)
+                    }
                 }
             }
         }
 
-        viewLifecycleOwner.collectFlow(inMeetingViewModel.state.map { it.chatTitle }
+        viewLifecycleOwner.collectFlow(ringingViewModel.state.map { it.chatConnectionStatus }
             .distinctUntilChanged()) {
-            if (it.isNotBlank()) {
-                toolbarTitle.text = it
+            if (it == ChatConnectionStatus.Online) {
+                ringingViewModel.state.value.call?.let {
+                    if (ringingViewModel.state.value.isAnswerWithAudioClicked) {
+                        ringingViewModel.onAudioClicked(isClicked = false)
+                        checkAndAnswerCall(enableVideo = false)
+                    }
+
+                    if (ringingViewModel.state.value.isAnswerWithVideoClicked) {
+                        ringingViewModel.onVideoClicked(isClicked = false)
+                        checkAndAnswerCall(enableVideo = true)
+                    }
+                }
             }
         }
 
-        viewLifecycleOwner.collectFlow(inMeetingViewModel.state.map { it.callAnsweredInAnotherClient }
+        viewLifecycleOwner.collectFlow(ringingViewModel.state.map { it.showMissedCallNotification }
+            .distinctUntilChanged()) {
+            if (it) {
+                Timber.d("Show missed call notification")
+                ChatAdvancedNotificationBuilder.newInstance(requireContext())
+                    .showMissedCallNotification(ringingViewModel.state.value.chatId, -1L)
+                requireActivity().finish()
+            }
+        }
+
+        viewLifecycleOwner.collectFlow(ringingViewModel.state.map { it.shouldFinish }
             .distinctUntilChanged()) {
             if (it) {
                 requireActivity().finish()
             }
         }
 
-        viewLifecycleOwner.collectFlow(inMeetingViewModel.state.map { it.call?.status }
+        viewLifecycleOwner.collectFlow(sharedModel.state.map { it.answerResult }
             .distinctUntilChanged()) {
-            it?.let { callStatus ->
-                if (callStatus == ChatCallStatus.Destroyed) {
-                    requireActivity().finish()
-                }
+            it?.apply {
+                val action = RingingMeetingFragmentDirections.actionGlobalInMeeting(
+                    actionString,
+                    chatHandle
+                )
+                findNavController().navigate(action)
             }
         }
     }
 
+    /**
+     * On attach
+     */
     override fun onAttach(context: Context) {
         super.onAttach(context)
         permissionsRequester = permissionsBuilder(permissions)
@@ -247,9 +251,6 @@ class RingingMeetingFragment : MeetingBaseFragment() {
             .build()
     }
 
-    private fun showSnackBar(message: String) =
-        (activity as BaseActivity).showSnackbar(binding.root, message)
-
     /**
      * user denies the RECORD_AUDIO or CAMERA permission
      *
@@ -260,10 +261,13 @@ class RingingMeetingFragment : MeetingBaseFragment() {
             || permissions.contains(Manifest.permission.CAMERA)
         ) {
             Timber.d("user denies the permission")
-            showSnackBar(getString(R.string.meeting_required_permissions_warning))
+            ringingViewModel.showSnackbar()
         }
     }
 
+    /**
+     * On destroy
+     */
     override fun onDestroy() {
         RunOnUIThreadUtils.stop()
         super.onDestroy()

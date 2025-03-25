@@ -2,6 +2,11 @@ package mega.privacy.android.app.presentation.videosection.view
 
 import androidx.activity.compose.LocalOnBackPressedDispatcherOwner
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.saveable.rememberSaveable
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
@@ -9,8 +14,10 @@ import androidx.navigation.NavHostController
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
-import mega.privacy.android.app.presentation.bottomsheet.NodeOptionsBottomSheetDialogFragment.Companion.CLOUD_DRIVE_MODE
+import mega.privacy.android.analytics.Analytics
+import mega.privacy.android.app.presentation.bottomsheet.NodeOptionsBottomSheetDialogFragment.Companion.VIDEO_PLAYLIST_DETAIL
 import mega.privacy.android.app.presentation.bottomsheet.NodeOptionsBottomSheetDialogFragment.Companion.VIDEO_RECENTLY_WATCHED_MODE
+import mega.privacy.android.app.presentation.bottomsheet.NodeOptionsBottomSheetDialogFragment.Companion.VIDEO_SECTION_MODE
 import mega.privacy.android.app.presentation.videosection.VideoSectionViewModel
 import mega.privacy.android.app.presentation.videosection.model.VideoPlaylistUIEntity
 import mega.privacy.android.app.presentation.videosection.model.VideoSectionMenuAction
@@ -19,6 +26,7 @@ import mega.privacy.android.app.presentation.videosection.view.playlist.VideoPla
 import mega.privacy.android.app.presentation.videosection.view.playlist.videoPlaylistDetailRoute
 import mega.privacy.android.app.presentation.videosection.view.recentlywatched.VideoRecentlyWatchedView
 import mega.privacy.android.app.presentation.videosection.view.recentlywatched.videoRecentlyWatchedRoute
+import mega.privacy.mobile.analytics.event.RecentlyWatchedOpenedButtonPressedEvent
 
 @Composable
 internal fun VideoSectionFeatureScreen(
@@ -28,6 +36,7 @@ internal fun VideoSectionFeatureScreen(
     onSortOrderClick: () -> Unit,
     onMenuClick: (VideoUIEntity, index: Int) -> Unit,
     onMenuAction: (VideoSectionMenuAction?) -> Unit,
+    retryActionCallback: () -> Unit,
 ) {
     val navHostController = rememberNavController()
 
@@ -39,6 +48,7 @@ internal fun VideoSectionFeatureScreen(
         onMenuClick = onMenuClick,
         onAddElementsClicked = onAddElementsClicked,
         onMenuAction = onMenuAction,
+        retryActionCallback = retryActionCallback
     )
 }
 
@@ -50,9 +60,15 @@ internal fun VideoSectionNavHost(
     onAddElementsClicked: () -> Unit,
     modifier: Modifier,
     onMenuAction: (VideoSectionMenuAction?) -> Unit,
+    retryActionCallback: () -> Unit,
     viewModel: VideoSectionViewModel = hiltViewModel(),
 ) {
     val state = viewModel.state.collectAsStateWithLifecycle().value
+
+    var enableFavouritesPlaylistMenu by rememberSaveable { mutableStateOf(false) }
+    LaunchedEffect(enableFavouritesPlaylistMenu) {
+        enableFavouritesPlaylistMenu = viewModel.enableFavouritesPlaylistMenu()
+    }
 
     val onDeleteVideosDialogPositiveButtonClicked: (VideoPlaylistUIEntity) -> Unit = { playlist ->
         val removedVideoIDs = state.selectedVideoElementIDs
@@ -98,7 +114,7 @@ internal fun VideoSectionNavHost(
                 videoSectionViewModel = viewModel,
                 onClick = viewModel::onItemClicked,
                 onSortOrderClick = onSortOrderClick,
-                onMenuClick = { onMenuClick(it, CLOUD_DRIVE_MODE) },
+                onMenuClick = { onMenuClick(it, VIDEO_SECTION_MODE) },
                 onLongClick = viewModel::onItemLongClicked,
                 onPlaylistItemClick = { playlist, index ->
                     if (state.isInSelection) {
@@ -112,17 +128,18 @@ internal fun VideoSectionNavHost(
                 onDeleteDialogButtonClicked = viewModel::clearAllSelectedVideoPlaylists,
                 onMenuAction = { action ->
                     if (action is VideoSectionMenuAction.VideoRecentlyWatchedAction) {
+                        Analytics.tracker.trackEvent(RecentlyWatchedOpenedButtonPressedEvent)
                         navHostController.navigate(route = videoRecentlyWatchedRoute)
                     } else {
                         onMenuAction(action)
                     }
-                }
+                },
+                retryActionCallback = retryActionCallback
             )
         }
         composable(
             route = videoPlaylistDetailRoute
         ) {
-
             VideoPlaylistDetailView(
                 playlist = state.currentVideoPlaylist,
                 selectedSize = state.selectedVideoElementIDs.size,
@@ -147,7 +164,7 @@ internal fun VideoSectionNavHost(
                         viewModel.onVideoItemOfPlaylistClicked(item, index)
                     }
                 },
-                onMenuClick = { onMenuClick(it, CLOUD_DRIVE_MODE) },
+                onMenuClick = { onMenuClick(it, VIDEO_PLAYLIST_DETAIL) },
                 onLongClick = viewModel::onVideoItemOfPlaylistLongClicked,
                 onDeleteVideosDialogPositiveButtonClicked = onDeleteVideosDialogPositiveButtonClicked,
                 onPlayAllClicked = viewModel::playAllButtonClicked,
@@ -170,6 +187,11 @@ internal fun VideoSectionNavHost(
                             onMenuAction(action)
                         }
                     }
+                },
+                enableFavouritesPlaylistMenu = enableFavouritesPlaylistMenu,
+                onRemoveFavouriteOptionClicked = {
+                    viewModel.removeFavourites()
+                    viewModel.clearAllSelectedVideosOfPlaylist()
                 }
             )
         }

@@ -37,7 +37,7 @@ class RetryPendingMessageUseCase @Inject constructor(
             PendingMessageState.ERROR_ATTACHING -> {
 
                 message.nodeId?.let { nodeId ->
-                    attachNodeWithPendingMessageUseCase(message.msgId, nodeId)
+                    attachNodeWithPendingMessageUseCase(message.msgId, nodeId, null)
                 }
                     ?: throw IllegalArgumentException("Only messages with nodeId can be retried when the state is ERROR_ATTACHING")
 

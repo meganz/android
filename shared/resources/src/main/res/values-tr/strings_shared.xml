@@ -1,0 +1,965 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources xmlns:tools="http://schemas.android.com/tools" tools:ignore="ImpliedQuantity, ExtraTranslation, MissingTranslation">
+    <!-- The name of the Device or Folder Sub State when its code is UNSUPPORTED_FILE_SYSTEM -->
+    <string name="general_sync_unsupported_file_system">MEGA can’t sync or backup this folder because the file system on your device is not supported</string>
+    <!-- The name of the Device or Folder Sub State when its code is INVALID_REMOTE_TYPE -->
+    <string name="general_sync_invalid_remote_type">The folder you chose can’t be synced</string>
+    <!-- The name of the Device or Folder Sub State when its code is INVALID_LOCAL_TYPE -->
+    <string name="general_sync_invalid_local_type">A file cannot be synced individually. You need to set up the sync from a folder.</string>
+    <!-- The name of the Device or Folder Sub State when its code is INITIAL_SCAN_FAILED -->
+    <string name="general_sync_initial_scan_failed">Initial scan failed. You will need to re-enable your sync or backup from the desktop app.</string>
+    <!-- The name of the Device or Folder Sub State when its code is REMOTE_NODE_NOT_FOUND -->
+    <string name="general_sync_remote_node_not_found">Folder in MEGA can’t be located as it’s been moved or deleted, or you might not have access</string>
+    <!-- The name of the Device or Folder Sub State when its code is STORAGE_OVERQUOTA -->
+    <string name="general_sync_storage_overquota">Unable to sync or back up this folder as your storage is full</string>
+    <!-- The name of the Device or Folder Sub State when its code is ACCOUNT_EXPIRED -->
+    <string name="general_sync_account_expired">Unable to sync or back up this folder as your plan has expired</string>
+    <!-- The name of the Device or Folder Sub State when its code is FOREIGN_TARGET_OVERSTORAGE -->
+    <string name="general_sync_foreign_target_overshare">Folder can’t be synced as the user who shared this folder has reached their storage limit</string>
+    <!-- The name of the Device or Folder Sub State when its code is SHARE_NON_FULL_ACCESS -->
+    <string name="general_sync_share_non_full_access">Folder can’t be synced as it’s a shared folder that you don’t have full access to</string>
+    <!-- The name of the Device or Folder Sub State when its code is PUT_NODES_ERROR -->
+    <string name="general_sync_put_nodes_error">Files in this folder can’t be synced or backed up. You’ll need to re-enable the sync or backup from the desktop app.</string>
+    <!-- The name of the Device or Folder Sub State when its code is ACTIVE_SYNC_BELOW_PATH -->
+    <string name="general_sync_active_sync_below_path">Folder can’t be synced as it already contains synced folders</string>
+    <!-- The name of the Device or Folder Sub State when its code is VBOXSHAREDFOLDER_UNSUPPORTED -->
+    <string name="general_sync_vboxsharedfolder_unsupported">MEGA can’t sync or back up VirtualBox folders</string>
+    <!-- The name of the Device or Folder Sub State when its code is ACCOUNT_BLOCKED -->
+    <string name="general_sync_account_blocked">Unable to sync or back up this folder as the account has been blocked</string>
+    <!-- The name of the Device or Folder Sub State when its code is UNKNOWN_TEMPORARY_ERROR -->
+    <string name="general_sync_unknown_temporary_error">Problem syncing or backing up this folder. Try again later. If the issue continues, contact Support.</string>
+    <!-- The name of the Device or Folder Sub State when its code is TOO_MANY_ACTION_PACKETS -->
+    <string name="general_sync_too_many_action_packets">Account reloaded. Any missed updates to your backups or syncs haven’t been applied.</string>
+    <!-- The name of the Device or Folder Sub State when its code is LOGGED_OUT -->
+    <string name="general_sync_logged_out">Sync or backup has been stopped as you appear to have logged out of the desktop app. Log back in via the desktop app, and resume the sync or backup.</string>
+    <!-- The name of the Device or Folder Sub State when its code is BACKUP_SOURCE_NOT_BELOW_DRIVE -->
+    <string name="general_sync_backup_source_not_below_drive">Folder in external drive can’t be located.</string>
+    <!-- The name of the Device or Folder Sub State when its code is ACTIVE_SYNC_SAME_PATH -->
+    <string name="general_sync_active_sync_same_path">There’s already a synced folder at the same location</string>
+    <!-- The name of the Device or Folder Sub State when its code is COULD_NOT_MOVE_CLOUD_NODES -->
+    <string name="general_sync_could_not_move_cloud_nodes">Renaming failed</string>
+    <!-- The name of the Device or Folder Sub State when its code is COULD_NOT_CREATE_IGNORE_FILE -->
+    <string name="general_sync_could_not_create_ignore_file">Couldn’t create a .megaignore file for this sync</string>
+    <!-- The name of the Device or Folder Sub State when its code is SYNC_CONFIG_READ_FAILURE -->
+    <string name="general_sync_config_read_failure">Couldn’t read sync configuration. Try again later or check folder permissions.</string>
+    <!-- The name of the Device or Folder Sub State when its code is UNKNOWN_DRIVE_PATH -->
+    <string name="general_sync_unknown_drive_path">Sync location is unknown</string>
+    <!-- The name of the Device or Folder Sub State when its code is INVALID_SCAN_INTERVAL -->
+    <string name="general_sync_invalid_scan_interval">Invalid scan interval. Check the scan interval setup and try again.</string>
+    <!-- The name of the Device or Folder Sub State when its code is NOTIFICATION_SYSTEM_UNAVAILABLE -->
+    <string name="general_sync_notification_system_unavailable">Couldn’t communicate with the folder location. Check the location is accessible and permissions for the folder location are granted.</string>
+    <!-- The name of the Device or Folder Sub State when its code is UNABLE_TO_ADD_WATCH -->
+    <string name="general_sync_unable_to_add_watch">Unable to add a file system watch. Ensure there is sufficient free space and memory, and that you have granted permissions for the folder location.</string>
+    <!-- The name of the Device or Folder Sub State when its code is UNABLE_TO_RETRIEVE_ROOT_FSID -->
+    <string name="general_sync_unable_to_retrieve_root_fsid">Couldn’t read sync location. Check the location is accessible and permissions for the folder location are granted.</string>
+    <!-- The name of the Device or Folder Sub State when its code is INSUFFICIENT_DISK_SPACE -->
+    <string name="general_sync_insufficient_disk_space">Insufficient storage space on your device</string>
+    <!-- The name for specific Sub States to indicate that an unknown error occurred -->
+    <string name="general_sync_message_unknown_error">An unknown error occurred. Contact support@mega.nz.</string>
+    <!-- The name for specific Sub States to indicate that the Node is in the Rubbish Bin -->
+    <string name="general_sync_message_node_in_rubbish_bin">Folder can’t be synced or backed up as the MEGA folder is in the Rubbish bin</string>
+    <!-- The name for specific Sub States to indicate that the local drive cannot be located at this time -->
+    <string name="general_sync_message_cannot_locate_local_drive_now">Folder in your device can’t be located right now. Try again later.</string>
+    <!-- The name for specific Sub States to indicate that the local drive cannot be located -->
+    <string name="general_sync_message_cannot_locate_local_drive">Folder in your device can’t be located</string>
+    <!-- The name for specific Sub States to indicate that a problem occurred when syncing or backing up the MEGA Folder due to some changes -->
+    <string name="general_sync_message_folder_backup_issue_due_to_recent_changes">Problem syncing or backing up this folder because of changes to the MEGA folder. Stop the sync or backup and try setting it up again in the desktop app, or contact Support.</string>
+    <!-- The name for specific Sub States to indicate that a problem occurred when syncing or backing up the MEGA Folder -->
+    <string name="general_sync_message_folder_backup_issue">Problem syncing or backing up this folder. Stop the sync or backup and try setting it up again in the desktop app, or contact Support.</string>
+    <!-- The name for specific Sub States to indicate that the MEGA Folder cannot be synced or backed up as it is inside another synced MEGA Folder -->
+    <string name="general_sync_message_folder_backup_issue_due_to_being_inside_another_backed_up_folder">Folder can’t be synced as it’s already inside a synced folder</string>
+    <!-- The name of the Device or Folder Sub State when its code is LOCAL_FILESYSTEM_MISMATCH -->
+    <string name="general_sync_local_filesystem_mismatch">Files in this folder can’t be synced or backed up. You will need to re-enable the sync or backup from the desktop app.</string>
+    <!-- Warning message to display when sync has been paused due a low battery level -->
+    <string name="general_message_sync_paused_low_battery_level">Syncing paused, battery level too low. Charge battery to resume syncing.</string>
+    <!-- Title for File sharing feature on Onboarding dialog (for user to choose account - Free or Pro).  -->
+    <string name="dialog_onboarding_feature_title_file_sharing">Easy, secure file sharing</string>
+    <!-- Description about File sharing feature on Onboarding dialog (for user to choose account - Free or Pro).  -->
+    <string name="dialog_onboarding_feature_description_file_sharing">Share large files thanks to a generous transfer quota and ensure security with password-protected links.</string>
+    <!-- Title for Backup and Rewind features on Onboarding dialog (for user to choose account - Free or Pro).  -->
+    <string name="dialog_onboarding_feature_title_backup_rewind">Never lose data again</string>
+    <!-- Description about Backup and Rewind features on Onboarding dialog (for user to choose account - Free or Pro).  -->
+    <string name="dialog_onboarding_feature_description_backup_rewind">Rewind to restore files and folders back to any date up to 180 days, so your data is accident and tamper-proof.</string>
+    <!-- Search drop down chips filter type file type -->
+    <string name="search_dropdown_chip_filter_type_file_type">Type</string>
+    <!-- Search drop down chips filter type file type images -->
+    <string name="search_dropdown_chip_filter_type_file_type_images">Images</string>
+    <!-- Search drop down chips filter type file type videos -->
+    <string name="search_dropdown_chip_filter_type_file_type_video">Video</string>
+    <!-- Search drop down chips filter type file type audio -->
+    <string name="search_dropdown_chip_filter_type_file_type_audio">Audio</string>
+    <!-- Search drop down chips filter type file type documents -->
+    <string name="search_dropdown_chip_filter_type_file_type_documents">Documents</string>
+    <!-- Search drop down chips filter type file type pdf -->
+    <string name="search_dropdown_chip_filter_type_file_type_pdf">PDFs</string>
+    <!-- Search drop down chips filter type file type spreadsheets -->
+    <string name="search_dropdown_chip_filter_type_file_type_spreadsheets">Spreadsheets</string>
+    <!-- Search drop down chips filter type file type presentations -->
+    <string name="search_dropdown_chip_filter_type_file_type_presentations">Presentations</string>
+    <!-- Search drop down chips filter type file type folders -->
+    <string name="search_dropdown_chip_filter_type_file_type_folders">Folders</string>
+    <!-- Search drop down chips filter type file type others -->
+    <string name="search_dropdown_chip_filter_type_file_type_others">Other</string>
+    <!-- Search drop down chips filter type date added -->
+    <string name="search_dropdown_chip_filter_type_date_added">Date added</string>
+    <!-- Search drop down chips filter type last modified -->
+    <string name="search_dropdown_chip_filter_type_last_modified">Last modified</string>
+    <!-- Search drop down chips filter type date modified today -->
+    <string name="search_dropdown_chip_filter_type_date_today">Today</string>
+    <!-- Search drop down chips filter type date modified last 7 days -->
+    <string name="search_dropdown_chip_filter_type_date_last_seven_days">Last 7 days</string>
+    <!-- Search drop down chips filter type date modified last 30 days -->
+    <string name="search_dropdown_chip_filter_type_date_last_thirty_days">Last 30 days</string>
+    <!-- Search drop down chips filter type date modified this year -->
+    <string name="search_dropdown_chip_filter_type_date_this_year">This year</string>
+    <!-- Search drop down chips filter type date modified last year -->
+    <string name="search_dropdown_chip_filter_type_date_last_year">Last year</string>
+    <!-- Search drop down chips filter type date modified older -->
+    <string name="search_dropdown_chip_filter_type_date_older">Older</string>
+    <!-- All videos tab title of the video section  -->
+    <string name="video_section_tab_title_all_videos">All videos</string>
+    <!-- Playlists tab title of the video section  -->
+    <string name="video_section_tab_title_playlists">Playlists</string>
+    <!-- Location filter title of the video section  -->
+    <string name="video_section_videos_location_filter_title">Location</string>
+    <!-- All locations option of the video section location filter  -->
+    <string name="video_section_videos_location_option_all_locations">All locations</string>
+    <!-- Cloud drive option of the video section location filter  -->
+    <string name="video_section_videos_location_option_cloud_drive">Cloud drive</string>
+    <!-- Camera uploads option of the video section location filter  -->
+    <string name="video_section_videos_location_option_camera_uploads">Camera uploads</string>
+    <!-- Shared items option of the video section location filter  -->
+    <string name="video_section_videos_location_option_shared_items">Shared items</string>
+    <!-- Duration filter title of the video section  -->
+    <string name="video_section_videos_duration_filter_title">Duration</string>
+    <!-- All Duration option of the video section duration filter  -->
+    <string name="video_section_videos_duration_option_all_duration">All durations</string>
+    <!-- Less than 10 seconds option of the video section duration filter  -->
+    <string name="video_section_videos_duration_option_less_than_10_seconds">Less than 10 seconds</string>
+    <!-- Between 10 and 60 seconds option of the video section duration filter  -->
+    <string name="video_section_videos_duration_option_between_10_and_60_seconds">Between 10 and 60 seconds</string>
+    <!-- Between 1 and 4 minutes option of the video section duration filter  -->
+    <string name="video_section_videos_duration_option_between_1_and_4_minutes">Between 1 and 4 minutes</string>
+    <!-- Between 4 and 20 minutes option of the video section duration filter  -->
+    <string name="video_section_videos_duration_option_between_4_and_20_minutes">Between 4 and 20 minutes</string>
+    <!-- More than 20 minutes option of the video section duration filter  -->
+    <string name="video_section_videos_duration_option_more_than_20_minutes">More than 20 minutes</string>
+    <!-- Create playlist dialog title of the video section playlists tab -->
+    <string name="video_section_playlists_create_playlist_dialog_title">Enter playlist name</string>
+    <!-- Rename playlist dialog title of the video section playlists tab -->
+    <string name="video_section_playlists_rename_playlist_dialog_title">Rename</string>
+    <!-- Error message when the playlist name already exists -->
+    <string name="video_section_playlists_error_message_playlist_name_exists">A playlist with this name already exists. Enter a different name.</string>
+    <!-- Delete playlist dialog title of the video section playlists tab -->
+    <string name="video_section_playlists_delete_playlist_dialog_title">Delete playlist?</string>
+    <!-- Delete button title of the video section playlists tab delete playlist dialog -->
+    <string name="video_section_playlists_delete_playlist_dialog_delete_button">Delete</string>
+    <!-- Text that indicates that there’s no playlist to show. -->
+    <string name="video_section_playlists_empty_hint_playlist">No playlists found</string>
+    <!-- Delete option title of the video section playlist bottom sheet -->
+    <string name="video_section_playlist_bottom_sheet_option_title_delete">Delete playlist</string>
+    <!-- Remove videos dialog title of the video section playlist detail -->
+    <string name="video_section_playlist_detail_remove_videos_dialog_title">Remove from playlist?</string>
+    <!-- Remove button title of the video section playlist detail remove videos dialog -->
+    <string name="video_section_playlist_detail_remove_videos_dialog_remove_button">Remove</string>
+    <!-- Play all button title of the video section playlist detail -->
+    <string name="video_section_playlist_detail_play_all_button">Play all</string>
+    <!-- Text that indicates that there’s no videos in the video playlist detail to show. -->
+    <string name="video_section_playlist_detail_empty_hint_videos">No videos</string>
+    <!-- Top bar title of the video section video selected page -->
+    <string name="video_section_video_selected_top_bar_title">Choose files</string>
+    <!-- Message when deleting the playlists of the video section playlists tab. %1$d will be replaced the number of deleted playlists -->
+    <plurals name="video_section_playlists_delete_playlists_message">
+        <item quantity="one">Deleted %1$d playlist</item>
+        <item quantity="other">Deleted %1$d playlists</item>
+    </plurals>
+    <!-- Message when adding the videos to the video section playlist -->
+    <plurals name="video_section_playlist_detail_add_videos_message">
+        <item quantity="one">Added %1$d item to “%2$s”</item>
+        <item quantity="other">Added %1$d items to “%2$s”</item>
+    </plurals>
+    <!-- Message when removing the videos to the video section playlist -->
+    <plurals name="video_section_playlist_detail_remove_videos_message">
+        <item quantity="one">Removed %1$d item from “%2$s”</item>
+        <item quantity="other">Removed %1$d items from “%2$s”</item>
+    </plurals>
+    <!-- Text of the video section playlist detail video number -->
+    <plurals name="video_section_playlist_detail_video_number">
+        <item quantity="one">%1$d video</item>
+        <item quantity="other">%1$d videos</item>
+    </plurals>
+    <!-- Warning shown when the user clicks on a web link and there is no app available at the moment for opening it. -->
+    <string name="chat_click_link_in_message_intent_not_available">You may not have any apps installed which can open this website</string>
+    <!-- Message when deleting a singular playlist of the video section playlists tab. %1$s will be replaced the name of deleted playlist -->
+    <string name="video_section_playlists_delete_playlists_message_singular">“%1$s” deleted</string>
+    <!-- The name of the Settings Camera Uploads Option, which decides whether or not the Device must be charged for Camera Uploads to start uploading content -->
+    <string name="settings_camera_uploads_upload_only_while_charging_option_name">Upload only while charging</string>
+    <!-- Text for the header of the screen to add a new sync folder -->
+    <string name="sync_add_new_sync_folder_header_text">Add synchronised folder:</string>
+    <!-- Size in gigabytes. It can be used for file/folder size or storage/transfer quota. The placeholder %1$s is for the size value, please adjust the position based on linguistics. -->
+    <string name="general_size_giga_byte">%1$s</string>
+    <!-- Name for Free account. DO NOT TRANSLATE! It'll only be used for Free account name. -->
+    <string name="general_free_plan_name">Free</string>
+    <!-- Description of Transfer quota for Free users. The string will be part of another string "[B]Transfer:[/B] [A]%1$s[/A]" (key: account_upgrade_account_pro_plan_info_transfer). Combined string will look like this "[B]Transfer:[/B] [A]Limited[/A]". -->
+    <string name="dialog_onboarding_transfer_quota_free_limited">Limited</string>
+    <!-- Description of the price for Free account. The meaning: this type of account is for free. This string won't be used for name of Free account. -->
+    <string name="dialog_onboarding_free_account_price">Free</string>
+    <!-- Continue button on Onboarding dialog, the user will proceed with payment for chosen account. -->
+    <string name="dialog_onboarding_button_continue">Continue</string>
+    <!-- Title of navigation bar on Onboarding dialog. -->
+    <string name="dialog_onboarding_app_bar_title">Choose your MEGA plan</string>
+    <!-- Header of the Info view field for what is the content of a device/folder -->
+    <string name="info_content">Contains</string>
+    <!-- Header of the Info view field for what is the total size of the content of a device/folder -->
+    <string name="info_total_size">Total size</string>
+    <!-- Header of the Info view field for the date and time a folder was added -->
+    <string name="info_added">Added</string>
+    <!-- String which indicates the number of files contained into a device/folder -->
+    <plurals name="info_num_files">
+        <item quantity="one">%1$d file</item>
+        <item quantity="other">%1$d files</item>
+    </plurals>
+    <!-- String which indicates the number of folders contained into a device/folder -->
+    <plurals name="info_num_folders">
+        <item quantity="one">%1$d folder</item>
+        <item quantity="other">%1$d folders</item>
+    </plurals>
+    <!-- First part of string, which indicates the content of a device/folder is some folders and some files. The full string is '%1$d folders · %2$d files'. The string was split in 2 for pluralization. Middle height point is to separate two fragments of text and it was not to be considered a punctuation mark. Please keep the spaces around middle height point. -->
+    <plurals name="info_num_folders_and_files">
+        <item quantity="one">%1$d folder&#160;·&#160;</item>
+        <item quantity="other">%1$d folders&#160;·&#160;</item>
+    </plurals>
+    <!-- Text of button label or title of the screen to share only one or several links -->
+    <plurals name="label_share_links">
+        <item quantity="one">Share link</item>
+        <item quantity="other">Share links</item>
+    </plurals>
+    <!-- Title of the dialog to ask the user to use the selected location as default location for next downloads. Please do not modify the %s placeholder as it will be replaced by the name of the folder where the files will be downloaded-->
+    <string name="transfers_dialog_save_download_location_title">Save all your downloaded files to “%1$s”?</string>
+    <!-- Option to use the selected location as default location for next downloads-->
+    <string name="transfers_dialog_save_download_location_always_here_option">Always download here</string>
+    <!-- Option to don't use the selected location as default location for next downloads and don't ask again-->
+    <string name="transfers_dialog_save_download_location_always_ask_option">Always ask for destination</string>
+    <!-- Size unit in gigabytes. It can be used for file/folder size or storage/transfer quota as a standalone size unit to be added to the size number-->
+    <string name="general_giga_byte_standalone">GB</string>
+    <!-- Size unit in terabytes. It can be used for file/folder size or storage/transfer quota as a standalone size unit to be added to the size number-->
+    <string name="general_tera_byte_standalone">TB</string>
+    <!-- Description about Storage feature on Onboarding dialog (for user to choose account - Free or Pro). %1$s placeholder will be replaced with correct localised storage size (e.g. 400 or 2), and the %2$s placeholder will be replaced with correct localised storage unit (e.g. GB or TB), so combining both placeholders will show storage size+storage unit (e.g. 400 GB or 2 TB)-->
+    <string name="dialog_onboarding_feature_storage_description">Starting from %1$s&#160;%2$s, find the perfect fit for your storage needs.</string>
+    <!-- Title of the insufficient storage error dialog -->
+    <string name="sync_error_dialog_insufficient_storage_title">Insufficient storage space</string>
+    <!-- Body text of the insufficient storage error dialog -->
+    <string name="sync_error_dialog_insufficient_storage_body">The size of this folder will take your MEGA account over its storage limit. To be able to sync it, you will need to either free up some space or upgrade your MEGA account.</string>
+    <!-- Confirm button text of the insufficient storage error dialog -->
+    <string name="sync_error_dialog_insufficient_storage_confirm_button">See plans</string>
+    <!-- Cancel button text of the insufficient storage error dialog -->
+    <string name="sync_error_dialog_insufficient_storage_cancel_button">Not now</string>
+    <!-- Hint text explaining that you can change the email and resend the create account link to the new email address. This appears on the confirmation email screen under the email address text input field. -->
+    <string name="account_confirm_email_misspelled_email_description">If you have misspelt your email address, correct it and tap [A]Resend[/A].</string>
+    <!-- Title of the insufficient storage error banner -->
+    <string name="sync_error_storage_over_quota_banner_title">Syncing paused, your MEGA plan has run out of storage</string>
+    <!-- The warning message shown when the User enables the Device Charging requirement in Settings Camera Uploads, enables Camera Uploads, begins uploading content and the Device is not charged -->
+    <string name="camera_uploads_phone_not_charging_message">Upload paused, device is not charging</string>
+    <!-- Label of the Device Status informing the user that Nothing is set up for the Current Device -->
+    <string name="device_center_list_view_item_status_nothing_setup">No syncs set up</string>
+    <!-- The title of the warning dialog shown to a suspended Pro Flexi Account User -->
+    <string name="account_pro_flexi_account_deactivated_dialog_title">Account deactivated</string>
+    <!-- The body of the warning dialog shown to a suspended Pro Flexi Account User -->
+    <string name="account_pro_flexi_account_deactivated_dialog_body">Your Pro&#160;Flexi account has been deactivated due to payment failure or you’ve cancelled your subscription. You won’t be able to access the data stored in your account. \nTo make a payment and reactivate your subscription, log in to MEGA through a browser.</string>
+    <!-- Label for new low-tier plan Starter. Do not translate. Can be shown on My account screen to indicate current user's plan. -->
+    <string name="general_low_tier_plan_starter_label">MEGA&#160;Starter</string>
+    <!-- Label for new low-tier plan Basic. Do not translate. Can be shown on My account screen to indicate current user's plan. -->
+    <string name="general_low_tier_plan_basic_label">MEGA&#160;Basic</string>
+    <!-- Label for new low-tier plan Essential. Do not translate. Can be shown on My account screen to indicate current user's plan. -->
+    <string name="general_low_tier_plan_essential_label">MEGA&#160;Essential</string>
+    <!-- The Body Text of a Settings Camera Uploads Option that decides whether or not the Device must be charged for Camera Uploads to start uploading content -->
+    <string name="settings_camera_uploads_upload_only_while_charging_option_body">Uploads will be paused until you start charging your device. Uploads will still remain paused if your battery is below 20%.</string>
+    <!-- Label for the button or menu option to add a new sync -->
+    <string name="device_center_sync_add_new_syn_button_option">Add new sync</string>
+    <!-- Text for the Sync solved issues chip -->
+    <string name="device_center_sync_solved_issues_chip_text">Solved issues</string>
+    <!-- Warning message to indicate that cannot select a currently synced folder -->
+    <string name="device_center_new_sync_select_local_device_folder_currently_synced_message">This folder can’t be synced. Set it up to sync to MEGA using Camera uploads.</string>
+    <!-- Label for the file info information screen description field -->
+    <string name="file_info_information_description_label">Description</string>
+    <!-- Placeholder for the file info information screen description field -->
+    <string name="file_info_information_description_placeholder">Add description</string>
+    <!-- Description added snack bar for the file info information screen-->
+    <string name="file_info_information_snackbar_description_added">Description added</string>
+    <!-- Description updated snack bar for the file info information screen-->
+    <string name="file_info_information_snackbar_description_updated">Description updated</string>
+    <!-- Title to mention other features of Pro plans on Onboarding dialog (for user to choose account - Free or Pro). -->
+    <string name="dialog_onboarding_feature_title_additional_features">Plus access to these great benefits:</string>
+    <!-- Description to mention other features of Pro plans (e.g. Mega VPN, chats and meetings, Android Sync and no ads) on Onboarding dialog (for user to choose account - Free or Pro). -->
+    <string name="dialog_onboarding_feature_description_additional_features_with_ads">&#8226;&#160;MEGA&#160;VPN \n&#8226;&#160;Unrestricted calls and meetings \n&#8226;&#160;Automatically sync the folders on your mobile device \n&#8226;&#160;No advertisements</string>
+    <!-- Description to mention other features of Pro plans (e.g. Mega VPN, chats and meetings, Android Sync and no ads) on Onboarding dialog (for user to choose account - Free or Pro). -->
+    <string name="dialog_onboarding_feature_description_additional_features_without_ads">&#8226;&#160;MEGA&#160;VPN \n&#8226;&#160;Unrestricted calls and meetings \n&#8226;&#160;Automatically sync the folders on your mobile device</string>
+    <!-- Text for the Sync solved issues list empty state -->
+    <string name="device_center_sync_solved_issues_empty_state_text">No solved issues</string>
+    <!-- Title of first tour screen -->
+    <string name="cloud_drive_tour_first_title">You hold the keys</string>
+    <!-- Title of second tour screen -->
+    <string name="cloud_drive_tour_second_title">Encrypted chat</string>
+    <!-- Title of third tour screen -->
+    <string name="cloud_drive_tour_third_title">Create your network</string>
+    <!-- Title of fourth tour screen -->
+    <string name="cloud_drive_tour_fourth_title">Your photos in the cloud</string>
+    <!-- Title of fifth tour screen -->
+    <string name="cloud_drive_tour_fifth_title">MEGA meeting</string>
+    <!-- First subtitle of the tour screen -->
+    <string name="cloud_drive_tour_first_subtitle">Security is why we exist, your files are safe with us behind a well oiled encryption machine where only you can access your files.</string>
+    <!-- Second subtitle of the tour screen -->
+    <string name="cloud_drive_tour_second_subtitle">Fully encrypted chat with voice and video calls, group messaging and file sharing integration with your Cloud Drive.</string>
+    <!-- Third subtitle of the tour screen -->
+    <string name="cloud_drive_tour_third_subtitle">Add contacts, create a network, collaborate, and make voice and video calls without ever leaving MEGA.</string>
+    <!-- Fourth subtitle of the tour screen -->
+    <string name="cloud_drive_tour_fourth_subtitle">Camera uploads is an essential feature for any mobile device and we have got you covered. Sign up for an account now.</string>
+    <!-- Fifth subtitle of the tour screen -->
+    <string name="cloud_drive_tour_fifth_subtitle">Zero-knowledge encrypted video meeting.</string>
+    <!-- Title of the Raise to Hand Feature Introduction Tooltip -->
+    <string name="meetings_raised_hand_tooltip_title">[A]New feature: Raise hand[/A]</string>
+    <!-- Title of the Warning Dialog shown when the new Local Primary or Secondary Folder is same as, a parent folder or sub-folder of the opposite Local Folder -->
+    <string name="settings_camera_uploads_related_new_local_folder_warning_dialog_title">Uploads folder conflict</string>
+    <!-- Body of the Warning Dialog shown when the new Local Primary or Secondary Folder is same as, a parent folder or sub-folder of the opposite Local Folder -->
+    <string name="settings_camera_uploads_related_new_local_folder_warning_dialog_body">Your Camera uploads folder and secondary media uploads folder cannot be related to each other. Choose a different folder.</string>
+    <!-- The confirmation Button text of the Warning Dialog shown when the new Local Primary or Secondary Folder is same as, a parent folder or sub-folder of the opposite Local Folder -->
+    <string name="settings_camera_uploads_related_new_local_folder_warning_dialog_confirm_button">Okay, got it</string>
+    <!-- Warning message shown when trying to select a local folder but there isn’t any app to do that. -->
+    <string name="general_no_picker_warning">This device doesn’t have an app to select folders</string>
+    <!-- Description of feature, which will be available for user, if they buy plan. This feature means user will be able to sync folders. Keep the bullet point, as this string is part of the bullet point list. -->
+    <string name="account_upgrade_account_description_feature_sync">&#8226;&#160;Automatically sync the folders on your mobile device</string>
+    <!-- Hidden items -->
+    <string name="hidden_items">Hidden items</string>
+    <!-- Label to indicate that is a Pro only feature -->
+    <string name="general_pro_only_label">Pro only</string>
+    <!-- Label for the file info information screen tags field -->
+    <string name="file_info_information_tags_label">Tags</string>
+    <!-- label for tags page tag description -->
+    <string name="add_tags_label_tag_description">Use tags to help you find and organise your data. Try tagging by year, location, project, or subject.</string>
+    <!-- label for tag text field in add tags page -->
+    <string name="add_tags_text_label_tag">Tag</string>
+    <!-- label for add tags page add button -->
+    <string name="add_tags_button_label_add">Add “#%1$s” tag</string>
+    <!-- label for add tags page existing tags label -->
+    <string name="add_tags_label_existing_tags">Existing tags</string>
+    <!-- error label for add tags page when special characters added -->
+    <string name="add_tags_error_special_characters">Tags can’t contain spaces or non-alphanumeric symbols. Tags written with capital letters will be displayed in lowercase.</string>
+    <!-- error label for add tags page when tag count is maximum -->
+    <string name="add_tags_error_max_tags">The maximum number of tags is %1$d</string>
+    <!-- title label for tags page -->
+    <string name="add_tags_page_title_label">Tags</string>
+    <!-- The placeholder for read only files/folders with no description in info screen-->
+    <string name="file_info_information_no_description_placeholder">No description</string>
+    <!-- Top bar title of the page that adds the video to the video playlist -->
+    <string name="video_to_playlist_top_bar_title">Add to playlist</string>
+    <!-- Text of the create new playlist in the page that adds the video to the video playlist -->
+    <string name="video_to_playlist_new_playlist_text">New playlist</string>
+    <!-- Title shown when cancelling the current plan, informing the user of features they'll miss out on -->
+    <string name="account_cancel_account_screen_plan_miss_out_on_features">You’ll miss out on these features</string>
+    <!-- Message shown when cancelling the plan, indicating that access to features will continue until the plan expires -->
+    <string name="account_cancel_account_screen_plan_access_until_expiration">You’ll still have access to these features until your MEGA plan expires, then you’ll be moved to a free account.</string>
+    <!-- Warning message about current storage usage when cancelling the plan -->
+    <string name="account_cancel_account_screen_plan_current_storage_warning">You are currently using %1s of storage, which you will risk losing.</string>
+    <!-- Column header in the feature comparison table -->
+    <string name="account_cancel_account_screen_plan_feature">Feature</string>
+    <!-- Column header indicating features available with the free plan -->
+    <string name="account_cancel_account_screen_plan_free_plan">Free</string>
+    <!-- Row label for storage feature in the comparison table -->
+    <string name="account_cancel_account_screen_plan_storage">Storage</string>
+    <!-- Row label for transfer feature in the comparison table -->
+    <string name="account_cancel_account_screen_plan_transfer">Transfer</string>
+    <!-- Transfer limit in the free plan -->
+    <string name="account_cancel_account_screen_plan_free_limited_transfer">Limited</string>
+    <!-- Feature indicating password protection for links, available in the pro plan -->
+    <string name="account_cancel_account_screen_plan_password_protected_links">Password-protected links</string>
+    <!-- Feature indicating expiry dates for links, available in the pro plan -->
+    <string name="account_cancel_account_screen_plan_links_with_expiry_dates">Links with expiry dates</string>
+    <!-- Feature indicating transfer sharing, available in the pro plan -->
+    <string name="account_cancel_account_screen_plan_transfer_sharing">Transfer sharing</string>
+    <!-- Row label for rewind feature in the comparison table -->
+    <string name="account_cancel_account_screen_plan_rewind">Rewind</string>
+    <!-- Rewind duration available in the free plan -->
+    <string name="account_cancel_account_screen_plan_rewind_free">Up to 30 days (view only)</string>
+    <!-- Rewind duration available in the current plan. %1s represents the number of days. -->
+    <string name="account_cancel_account_screen_plan_rewind_current">Up to %1s days</string>
+    <!-- Feature indicating MEGA VPN availability, available in the pro plan -->
+    <string name="account_cancel_account_screen_plan_mega_vpn">MEGA&#160;VPN</string>
+    <!-- Row label for call and meeting duration in the comparison table -->
+    <string name="account_cancel_account_screen_plan_call_meeting_duration">Call and meeting duration</string>
+    <!-- Call and meeting duration limit in the free plan -->
+    <string name="account_cancel_account_screen_plan_call_meeting_duration_free">Up to 1 hour</string>
+    <!-- Unlimited call and meeting duration available in the pro plan -->
+    <string name="cancel_account_plan_call_meeting_duration_pro">Unlimited</string>
+    <!-- Row label for call and meeting participants in the comparison table -->
+    <string name="account_cancel_account_plan_call_meeting_participants">Call and meeting participants</string>
+    <!-- Limit on call and meeting participants in the free plan -->
+    <string name="account_cancel_account_free_plan_call_meeting_participants">Up to 100</string>
+    <!-- Unlimited call and meeting participants available in the pro plan -->
+    <string name="account_cancel_account_pro_plan_call_meeting_participants">Unlimited</string>
+    <!-- Button label to keep the current pro plan -->
+    <string name="account_cancel_account_plan_keep_pro_plan">Keep %1s</string>
+    <!-- Button label to continue with the cancellation -->
+    <string name="account_cancel_account_plan_continue_cancellation">Continue cancellation</string>
+    <!-- error label for add tags page when tag character limit reached -->
+    <string name="add_tags_error_maximum_characters">Maximum 32 characters</string>
+    <!-- Hidden item -->
+    <string name="hidden_item">Hidden item</string>
+    <!-- Share hidden item link description -->
+    <string name="share_hidden_item_link_description">This item is set to hidden. Once you share the item, anyone with the link will be able to see it. It will still be hidden in your Cloud drive.</string>
+    <!-- Share hidden item links description -->
+    <string name="share_hidden_item_links_description">One or more of these items is set to hidden. Once you share the hidden items, anyone with the link will be able to see them. The items will still be hidden in your Cloud drive.</string>
+    <!-- Title shown when cancelling the subscription -->
+    <string name="account_cancellation_instructions_cancel_subscription_title">Cancel subscription</string>
+    <!-- Title shown when reactivating the subscription -->
+    <string name="account_cancellation_instructions_reactivate_subscription_title">Reactivate subscription</string>
+    <!-- Title shown when cancelling the current plan in the instructions screen, informing the user about the account is not managed by google -->
+    <string name="account_cancellation_instructions_not_managed_by_google">Your subscription is not managed by Google</string>
+    <!-- Message shown when cancelling the current plan in the instructions screen, informing the user about how to cancel subscription -->
+    <string name="account_cancellation_instructions_message_apple_description">This is because you subscribed to MEGA via Apple. To cancel your subscription, you will need to:</string>
+    <!-- Label for the subscription managed by App Store on Cancellation instructions screen-->
+    <string name="account_cancellation_instructions_ios_device">On an iOS Device</string>
+    <!-- Step 1: instruction step no.1 to Open the settings App to cancel the subscription from iOS device-->
+    <string name="account_cancellation_instructions_open_settings">1. Open the [A]Settings[/A] app.</string>
+    <!-- Step 2: instruction step no.2 to Tap on the name in the iOS device-->
+    <string name="account_cancellation_instructions_tap_on_name">2. Tap on your name.</string>
+    <!-- Step 3: instruction step no.3 to Select subscriptions section in the iOS device-->
+    <string name="account_cancellation_instructions_select_subscriptions">3. Tap [A]Subscriptions[/A].</string>
+    <!-- Step 4: instruction step no.4 to Select MEGA subscription in the iOS device -->
+    <string name="account_cancellation_instructions_select_mega_subscription">4. Tap your MEGA subscription.</string>
+    <!-- Step 5: instruction step no.5 to Select Cancel subscription of the App inside subscription section in the iOS device-->
+    <string name="account_cancellation_instructions_open_select_cancel_subscription">5. Tap [A]Cancel subscription[/A].</string>
+    <!-- Message description to provide the user with more details on how to cancel your subscription on a computer or other device. -->
+    <string name="account_cancellation_instructions_detailed_instructions">[A]Tap here[/A] for detailed instructions on how to cancel your subscription on a computer or other device.</string>
+    <!-- Title shown when needing to cancel the subscription using a web browser -->
+    <string name="account_cancellation_instructions_cancellation_web_browser_needed">You need to cancel your subscription using a web browser</string>
+    <!-- Title shown when needing to reactivate the subscription using a web browser -->
+    <string name="account_cancellation_instructions_reactivation_web_browser_needed">You need to reactivate your subscription using a web browser</string>
+    <!-- Message shown when reactivating the current plan in the instructions screen, informing the user about how to reactivate the subscription -->
+    <string name="account_cancellation_instructions_reactivation_web_browser_description">This is because you subscribed to MEGA in your web browser. To reactivate your subscription, you will need to:</string>
+    <!-- Description explaining why the subscription needs to be canceled using a web browser -->
+    <string name="account_cancellation_instructions_web_browser_description">This is because you subscribed to MEGA in your web browser. To cancel your subscription, you will need to:</string>
+    <!-- Label for cancellation instructions on a computer -->
+    <string name="account_cancellation_instructions_on_computer">On a computer</string>
+    <!-- Step 1: instruction step no.1 to Visit the MEGA website -->
+    <string name="account_cancellation_instructions_visit_website">1. Visit [A]www.mega.nz[/A] in your web browser.</string>
+    <!-- Step 2: instruction step no.2 to Log in to the MEGA account -->
+    <string name="account_cancellation_instructions_login_account">2. Log in to your MEGA account.</string>
+    <!-- Step 3: instruction step no.3 to Click the main menu of the MEGA account on MEGA website-->
+    <string name="account_cancellation_instructions_click_main_menu">3. Click the main menu.</string>
+    <!-- Step 4: instruction step no.4 to Click Settings of the MEGA account on MEGA website -->
+    <string name="account_cancellation_instructions_click_settings">4. Click [A]Settings.[/A]</string>
+    <!-- Step 5: instruction step no.5 to Click on Plan section of the MEGA account on MEGA website-->
+    <string name="account_cancellation_instructions_click_plan">5. Click [A]Plan[/A].</string>
+    <!-- Step 6: instruction step no.6 Click Cancel subscription of the MEGA account on MEGA website -->
+    <string name="account_cancellation_instructions_click_cancel_subscription">6. Click [A]Cancel subscription[/A].</string>
+    <!-- Alternative Step 6: instruction step no.5 Click Reactivate subscription when user's subscription has expired of the MEGA account on MEGA website-->
+    <string name="account_cancellation_instructions_click_reactivate_subscription">6. Click [A]Reactivate subscription[/A].</string>
+    <!-- Label for cancellation instructions on a mobile device -->
+    <string name="account_cancellation_instructions_on_mobile_device">On a mobile device</string>
+    <!-- Step 3: instruction step no.3 Tap on the user avatar on the MEGA website from the mobile device-->
+    <string name="account_cancellation_instructions_tap_avatar">3. Tap on your avatar.</string>
+    <!-- Step 4: instruction step no.4 Tap Cancel subscription on the account from the MEGA website from the mobile device-->
+    <string name="account_cancellation_instructions_tap_cancel_subscription">4. Tap [A]Cancel subscription[/A].</string>
+    <!-- Text to show in the Android Sync feature for a No Network State when there is no network connectivity -->
+    <string name="sync_no_network_state">No internet connection</string>
+    <!-- Menu option to create a new folder in the file manager -->
+    <string name="general_menu_create_new_folder">Create new folder</string>
+    <!-- Create new folder dialog title -->
+    <string name="create_new_folder_dialog_title">New folder</string>
+    <!-- Create new folder dialog hint text (input field description) -->
+    <string name="create_new_folder_dialog_hint_text">Folder name</string>
+    <!-- Create new folder dialog confirm button -->
+    <string name="create_new_folder_dialog_confirm_button">Create</string>
+    <!-- Dialog cancel option -->
+    <string name="general_dialog_cancel_button">Cancel</string>
+    <!-- Create new folder dialog error message shown when the user tries to an empty folder name -->
+    <string name="create_new_folder_dialog_error_message_empty_folder_name">Enter a folder name</string>
+    <!-- Create new folder dialog error message shown when folder cannot be created because there is already one with the same name -->
+    <string name="create_new_folder_dialog_error_existing_folder">There is already a folder with the same name</string>
+    <!-- Error message when the user writes a character not allowed for naming a file or folder -->
+    <string name="general_invalid_characters_defined">The following characters are not allowed: %1$s</string>
+    <!-- Sync settings section title-->
+    <string name="settings_section_sync">Sync</string>
+    <!-- Transfers scanning folders dialog title when the app is creating the needed folders -->
+    <string name="transfers_scanning_folders_dialog_creating_folders_title">Creating folders&#8230;</string>
+    <!-- Transfers scanning folders dialog title when the app is starting transfers but some files still needs to be added to the queue  -->
+    <string name="transfers_scanning_folders_dialog_starting_transfers_title">Starting transfers&#8230;</string>
+    <!-- Transfers scanning folders dialog info to explain why the app shouldn't be closed -->
+    <string name="transfers_scanning_folders_dialog_cancel_info_subtitle">Don’t close the app. If you close, transfers not yet queued will be lost.</string>
+    <!-- Transfers scanning folders dialog sub-title when the app is scanning multiple folders. This is the folders pluralization part to implement double pluralization in transfers_scanning_folders_dialog_scanning_files_and_folders_subtitle. Example: "134 folders". Example with double pluralization in transfers_scanning_folders_dialog_scanning_files_and_folders_subtitle: "Found 134 folders and 5689 files."-->
+    <plurals name="transfers_scanning_folders_dialog_scanning_folders_subtitle">
+        <item quantity="one">%1$d folder</item>
+        <item quantity="other">%1$d folders</item>
+    </plurals>
+    <!-- Transfers scanning folders dialog sub-title when the app is creating the folders. This message will inform how many folders are already created together with the total amount of folders that will be created. Example: "1/134 folder" or "48/134 folders" -->
+    <plurals name="transfers_scanning_folders_dialog_creating_folders_subtitle">
+        <item quantity="one">%1$d/%2$d folder</item>
+        <item quantity="other">%1$d/%2$d folders</item>
+    </plurals>
+    <!-- Title of the clear debris item displayed in the sync settings menu -->
+    <string name="settings_sync_clear_debris_item_title">Clear .debris (local cache)</string>
+    <!-- Title of the dialog shown when user clicks to clear debris from settings menu -->
+    <string name="settings_sync_clear_debris_dialog_title">Clear debris?</string>
+    <!-- Body of the dialog shown when user clicks to clear debris from settings menu -->
+    <string name="settings_sync_clear_debris_dialog_body">Backups of the previous versions of your synced files will be permanently deleted from your device. \n\nCheck the .debris folder in your local device to see if you need to restore anything.</string>
+    <!-- Continue button of the dialog shown when user clicks to clear debris from settings menu -->
+    <string name="settings_sync_clear_debris_dialog_continue">Continue</string>
+    <!-- Snackbar message shown when user clears debris from settings menu -->
+    <string name="settings_sync_debris_cleared_message">.debris folder successfully cleared</string>
+    <!-- Transfers scanning folders dialog sub-title when the app is scanning multiple folders. This message will inform how many files and folders were found. Example: "Found 134 folders and 5689 files." As it has double pluralization, folders will be pluralized in another string resource: transfers_scanning_folders_dialog_scanning_folders_subtitle -->
+    <plurals name="transfers_scanning_folders_dialog_scanning_files_and_folders_subtitle">
+        <item quantity="one">Found %1$s and %2$d file.</item>
+        <item quantity="other">Found %1$s and %2$d files.</item>
+    </plurals>
+    <!-- Transfers scanning folders dialog title to inform that the transfers are being cancelled -->
+    <string name="transfers_scanning_folders_dialog_cancel_cancelling_title">Cancelling transfers&#8230;</string>
+    <!-- error warning message for report issue when not enough characters are typed and user tries to send report-->
+    <string name="report_issue_error_minimum_characters">Enquiries must be at least 10 characters</string>
+    <!-- placeholder message for report issue-->
+    <string name="report_issue_description_placeholder_message">Describe the issue with at least 10 characters</string>
+    <!--Title text to start a conversation from Recent Chat screen empty view-->
+    <string name="chat_recent_list_empty_title">Keep conversations private</string>
+    <!--Subtitle text from Recent Chat screen empty view-->
+    <string name="chat_recent_list_empty_subtitle">All your messages, group chats, and calls are protected by our zero-knowledge encryption. [A]Learn more[/A]</string>
+    <!-- Label of the action button of inviting a friend from contact screen -->
+    <string name="chat_recent_invite_friend">Invite a friend</string>
+    <!-- Title Text shown when an account doesn’t have any contact added and it’s trying to start a new chat conversation -->
+    <string name="invite_contacts_to_start_chat_title">Invite friends with confidence</string>
+    <!-- Subtitle Text shown when an account doesn’t have any contact added and it’s trying to start a new chat conversation -->
+    <string name="invite_contacts_to_start_chat_subtitle">With top-notch security and verification codes, reach out without fear of scams, data mining, or information theft</string>
+    <!-- Label shown when the user wants to add contacts into his MEGA account -->
+    <string name="invite_contacts_action_label">Invite</string>
+    <!-- Share hidden folder description -->
+    <string name="share_hidden_folder_description">There are hidden items in this folder. Sharing the folder will mean that the hidden items are visible to those you share with. The items will still be hidden in your Cloud drive.</string>
+    <!-- Share hidden folders description -->
+    <string name="share_hidden_folders_description">There are hidden items in one or more of these folders. Sharing the folders will mean that the hidden items are visible to those you share with. The items will still be hidden in your Cloud drive.</string>
+    <!-- Title shown at the top of the survey screen when cancelling the subscription -->
+    <string name="account_cancel_subscription_survey_title">We’re sorry to see you leave! Can you tell us why you’re cancelling your subscription?</string>
+    <!-- Message explaining the immediate effect of subscription cancellation -->
+    <string name="account_cancel_subscription_survey_cancellation_message">Your subscription will be cancelled immediately and you will be moved to a free MEGA account when your current plan expires. Note: Cancelling your subscription won’t delete your account.</string>
+    <!-- Warning message shown in a red box when no reason is selected -->
+    <string name="account_cancel_subscription_survey_no_reason_selected">Select a reason to cancel your subscription</string>
+    <!-- Option in the survey indicating that the plan is too expensive -->
+    <string name="account_cancel_subscription_survey_option_expensive">I found my plan too expensive</string>
+    <!-- Option in the survey indicating that the user can no longer afford the plan -->
+    <string name="account_cancel_subscription_survey_option_cannot_afford">I can no longer afford it</string>
+    <!-- Option in the survey indicating that the user doesn't want a subscription or auto-billing -->
+    <string name="account_cancel_subscription_survey_option_no_subscription">I don’t want a subscription or auto-billing</string>
+    <!-- Option in the survey indicating that the user doesn't need all the storage in their plan -->
+    <string name="account_cancel_subscription_survey_option_no_storage_need">I don’t need all the storage in my plan</string>
+    <!-- Option in the survey indicating that the user needs features MEGA doesn't have -->
+    <string name="account_cancel_subscription_survey_option_missing_features">I need features MEGA doesn’t have</string>
+    <!-- Option in the survey indicating that the user is switching to a different provider -->
+    <string name="account_cancel_subscription_survey_option_switch_provider">I’m switching to a provider I like better</string>
+    <!-- Option in the survey indicating that the user finds MEGA confusing and difficult to use -->
+    <string name="account_cancel_subscription_survey_option_confusing">I find MEGA confusing and difficult to use</string>
+    <!-- Option in the survey indicating dissatisfaction with support and customer service -->
+    <string name="account_cancel_subscription_survey_option_dissatisfied_support">I’m not happy with the support and customer service</string>
+    <!-- Option in the survey indicating that the plan was needed temporarily -->
+    <string name="account_cancel_subscription_survey_option_temporary_use">I needed this plan temporarily and no longer use it</string>
+    <!-- Option in the survey for other reasons, with a prompt to provide details -->
+    <string name="account_cancel_subscription_survey_option_other">Other (please provide details)</string>
+    <!-- Checkbox allowing MEGA to contact the user for further discussion -->
+    <string name="account_cancel_subscription_survey_allow_contact">I allow MEGA to contact me to talk about this topic further</string>
+    <!-- Button label to cancel the subscription -->
+    <string name="account_cancel_subscription_survey_cancel_button">Cancel subscription</string>
+    <!-- Button label to not cancel the subscription -->
+    <string name="account_cancel_subscription_survey_do_not_cancel_button">Don’t cancel</string>
+    <!-- Video recently watched title of the video section  -->
+    <string name="video_section_title_video_recently_watched">Recently watched</string>
+    <!-- Text that there is no recent activity of the video recently watched page  -->
+    <string name="video_section_empty_hint_no_recently_activity">No recent activity</string>
+    <!-- Bottom sheet option that remove recently watched item from the video recently watched page  -->
+    <string name="video_section_bottom_sheet_option_remove_recently_watched_item">Remove from recently watched</string>
+    <!-- Message that remove recently watched item from the video recently watched page  -->
+    <string name="video_section_message_remove_recently_watched_item">Removed from recently watched</string>
+    <!-- Message that clear recently watched in the video recently watched page  -->
+    <string name="video_section_message_clear_recently_watched">Recently watched has been cleared</string>
+    <!-- Title of the Document Scanning Error Dialog -->
+    <string name="document_scanning_error_dialog_title">Scan incomplete</string>
+    <!-- The Document Scanning Error Type when the Device has insufficient memory (less than 1.7 GB total RAM) -->
+    <string name="document_scanning_error_type_insufficient_ram">Your phone doesn’t meet the minimum memory requirements to complete the scan</string>
+    <!-- The Document Scanning Error Type for generic errors during Document Scanning -->
+    <string name="document_scanning_error_type_generic_error">We’re having trouble opening the document scanner. Close and re-open the app, and try again.</string>
+    <!-- The confirmation Button text of the Document Scanning Error Dialog -->
+    <string name="document_scanning_error_dialog_confirm_button">OK, got it</string>
+    <!--Title text to start a meeting from Meeting screen empty view-->
+    <string name="meeting_recent_list_empty_title">Protect your calls</string>
+    <!--Subtitle text from Meeting screen empty view-->
+    <string name="meeting_recent_list_empty_subtitle">Your meetings, family calls, and private conversations are protected by our zero-knowledge encryption. [A]Learn more[/A]</string>
+    <!--Warning message to inform the user the minimum number of characters to enter into the edit text field for the survey-->
+    <string name="account_cancel_subscription_survey_minimum_character_limit">Message must be at least 10 characters</string>
+    <!--Warning message to inform the user that the edit text field for the survey is empty and needs to be filled with details-->
+    <string name="account_cancel_subscription_survey_enter_details">Enter details</string>
+    <!-- the bonus title of join without account on left meeting page-->
+    <string name="meeting_guest_left_meeting_bonus_title">Get free cloud storage</string>
+    <!-- Label "What’s new" of the bottom sheet to promote Sync feature -->
+    <string name="sync_promotion_bottom_sheet_whats_new_label">What’s new</string>
+    <!-- Title of the bottom sheet to promote Sync feature -->
+    <string name="sync_promotion_bottom_sheet_title">Easy, automated sync</string>
+    <!-- Text of the primary button of the bottom sheet to promote Sync feature for Pro users ("Sync folders") -->
+    <string name="sync_promotion_bottom_sheet_primary_button_text_pro">Sync folders</string>
+    <!-- Text of the secondary button of the bottom sheet to promote Sync feature ("Back up folders") -->
+    <string name="sync_promotion_bottom_sheet_secondary_button_text">Back up folders</string>
+    <!-- Snackbar message displayed when sync option is selected -->
+    <string name="settings_sync_option_updated_message">Sync options updated</string>
+    <!-- Title of the Contact Permission Explanation -->
+    <string name="title_enable_access_contact">Enable access to invite friends</string>
+    <!-- Sub title of the Contact Permission Explanation -->
+    <string name="subtitle_enable_access_contact">You can also add contacts from your phone’s contact list, if you allow MEGA access to the list.</string>
+    <!-- Button text of Contact Permission Explanation -->
+    <string name="grant_permission">Allow access</string>
+    <!-- One of the Options in the Scan Confirmation page where the scanned Documents are uploaded as one PDF file -->
+    <string name="document_scanning_confirmation_file_type_pdf">PDF</string>
+    <!-- One of the Options in the Scan Confirmation page where the scanned Document is uploaded as a JPEG file. This option can only be selected when there is only one scanned document-->
+    <string name="document_scanning_confirmation_file_type_jpg">JPG</string>
+    <!-- One of the Options in the Scan Confirmation page where the scanned Documents are saved to Chat -->
+    <string name="document_scanning_confirmation_destination_chat">Chat</string>
+    <!-- Label for the button or menu option to add a sync -->
+    <string name="device_center_add_sync_button_option">Add sync</string>
+    <!-- Label for the button or menu option to add a backup -->
+    <string name="device_center_add_backup_button_option">Add backup</string>
+    <!-- Title of the share meeting link bottom panel -->
+    <string name="meetings_share_link_bottom_sheet_title">Meeting confirmed: Invite others to join</string>
+    <!-- Button text of the send meeting link to chat -->
+    <string name="meetings_share_link_bottom_sheet_button_send_link_chat">Send link to chat</string>
+    <!-- Button text of the share meeting link -->
+    <string name="meetings_share_link_bottom_sheet_button_share_link">Share link</string>
+    <!-- Title for the inline warning banner when storage is almost full -->
+    <string name="account_storage_over_quota_inline_warning_banner_title">Your storage is almost full</string>
+    <!-- Title for the inline error banner when storage is full -->
+    <string name="account_storage_over_quota_inline_error_banner_title">Your storage is full</string>
+    <!-- Error Message indicating the user needs to upgrade now to get more storage -->
+    <string name="account_storage_over_quota_inline_error_banner_message">To keep uploading data, upgrade now to get more storage.</string>
+    <!-- Warning Message indicating the user needs to upgrade to get more storage -->
+    <string name="account_storage_over_quota_inline_warning_banner_message">To keep uploading data, upgrade to get more storage.</string>
+    <!-- Label for the upgrade action link -->
+    <string name="account_storage_over_quota_inline_error_banner_upgrade_link">Upgrade now</string>
+    <!-- Hidden nodes sharing albums -->
+    <string name="hidden_nodes_sharing_albums">There are hidden items in one or more of these albums. Sharing the albums will mean that the hidden items are visible to those you share with. The items will still be hidden in your Cloud drive.</string>
+    <!-- Backup title for toolbar when inside new backup screen -->
+    <string name="sync_add_new_backup_toolbar_title">Backup</string>
+    <!-- Text for the header of the screen to add a new backup folder -->
+    <string name="sync_add_new_backup_header_text">Add backup folder:</string>
+    <!-- Text to indicate the type of sync in the card header when adding a new backup folder -->
+    <string name="sync_add_new_backup_card_sync_type_text">Backup</string>
+    <!-- Text for the label to select the device folder or source for a new backup folder -->
+    <string name="sync_add_new_backup_choose_device_folder_title">Back up from</string>
+    <!-- Text for the label to indicate the destiny of a new backup folder -->
+    <string name="sync_add_new_backup_choose_mega_folder_title">Back up to</string>
+    <!-- Backup text for the the button to begin backup -->
+    <string name="sync_add_new_backup_proceed_button_label">Back up</string>
+    <!-- Title of the dialog to notify the requirement of access storage permission for Sync/Backup feature -->
+    <string name="sync_backup_access_storage_permission_dialog_title">Allow MEGA to access all files?</string>
+    <!-- Message of the dialog to notify the requirement of access storage permission for Sync/Backup feature -->
+    <string name="sync_backup_access_storage_permission_dialog_message">To back up your files, MEGA needs access to the files and folders on your device. Your data is always safe with us.</string>
+    <!-- Text for the warning banner displayed if try to create a new backup but storage permission has not been granted. The placeholders are to underline text -->
+    <string name="sync_add_new_backup_storage_permission_banner">MEGA needs access to your device storage in order to back up your local folder. [U]Tap to grant access[/U]</string>
+    <!-- Title in the files permission screen -->
+    <string name="files_permission_screen_title">Allow MEGA to access your device’s files</string>
+    <!-- Context message in the files permission screen -->
+    <string name="files_permission_screen_message">By allowing MEGA access to your files, you can upload to MEGA without creating temporary copies, saving space on your device and enabling faster uploads.</string>
+    <!-- Title in the files permission screen -->
+    <string name="files_permission_screen_do_not_show_again_button">Don’t show this again</string>
+    <!-- Title of the dialog to confirm stop a sync -->
+    <string name="sync_stop_sync_confirm_dialog_title">Stop syncing?</string>
+    <!-- Message of the dialog to confirm stop a sync -->
+    <string name="sync_stop_sync_confirm_dialog_message">This will stop the sync process between the two folders but won’t remove the folders.</string>
+    <!-- Label for the button to stop a sync -->
+    <string name="sync_stop_sync_button">Stop sync</string>
+    <!-- Snackbar message to indicate that sync has been stopped -->
+    <string name="sync_snackbar_message_confirm_sync_stopped">Sync stopped</string>
+    <!-- Title of the dialog to confirm stop a backup -->
+    <string name="sync_stop_backup_confirm_dialog_title">Stop backup</string>
+    <!-- Label for the button to stop a backup -->
+    <string name="sync_stop_backup_button">Stop backup</string>
+    <!-- Snackbar message to indicate that backup has been stopped -->
+    <string name="sync_snackbar_message_confirm_backup_stopped">Backup stopped</string>
+    <!-- Sync state updating -->
+    <string name="sync_list_sync_state_updating">Updating&#8230;</string>
+    <!-- Sync state up to date -->
+    <string name="sync_list_sync_state_up_to_date">Up to date</string>
+    <!-- Title of Favourites video playlist in the video section -->
+    <string name="video_section_title_favourite_playlist">Favourites</string>
+    <!-- Title of the synced folder list empty state -->
+    <string name="device_center_sync_backup_list_empty_state_title">No connections are set up</string>
+    <!-- Message of the synced folder list empty state -->
+    <string name="device_center_sync_backup_list_empty_state_message">Sync or back up a folder on your device with a folder on MEGA</string>
+    <!-- subtitle of meeting title in schedule meeting for title disclaimer -->
+    <string name="meetings_schedule_meeting_meeting_title_disclaimer">MEGA can see your meeting name and description, but we keep them private</string>
+    <!-- Capital letters. Text of the label of a new historic notifications-->
+    <string name="notifications_notification_item_new_tag">New</string>
+    <!-- Title in the display over other apps permission screen -->
+    <string name="display_over_other_apps_permission_screen_title">Allow MEGA to display over other apps</string>
+    <!-- Context message in the display over other apps permission screen -->
+    <string name="display_over_other_apps_permission_screen_message">MEGA needs your permission to display over apps. This means that you’ll never miss another incoming call notification.</string>
+    <!-- Positive action button when permission is not granted and it's required for some feature. Clicking it will redirect to settings screen of device -->
+    <string name="general_allow_permission_positive_button">Allow permission</string>
+    <!-- Title for a warning dialog informing the account is in storage over quota and cannot upload anything unless it is upgraded -->
+    <string name="dialog_not_enough_space_to_upload_title">Not enough space to upload new files</string>
+    <!-- Message for a warning dialog informing the account is in storage over quota and cannot upload anything unless it is upgraded. Please do not remove the placeholders, it is for highlighting the text as a link. -->
+    <string name="dialog_not_enough_space_to_upload_message">You’re over your storage quota. Upgrade to a higher plan, or free up some space, to upload new files. [A]Learn more[/A].</string>
+    <!-- Name for a general button which action is navigate to the "Upgrade" account -->
+    <string name="general_upgrade_button">Upgrade</string>
+    <!-- Photos search welcome title -->
+    <string name="photos_search_welcome_title">Find what you’re looking for</string>
+    <!-- Photos search welcome description -->
+    <string name="photos_search_welcome_description">Search for photos, videos, and albums</string>
+    <!-- Photos search empty state title -->
+    <string name="photos_search_empty_state_title">No matching results</string>
+    <!-- Photos search empty state description -->
+    <string name="photos_search_empty_state_description">Try a different search term</string>
+    <!-- Photos search recent search -->
+    <string name="photos_search_recent_search">Recently searched</string>
+    <!-- Add to album by image -->
+    <string name="album_add_to_image">Add to album</string>
+    <!-- Add to album by media -->
+    <string name="album_add_to_media">Add to</string>
+    <!-- Add to album success message -->
+    <plurals name="album_add_to_message">
+        <item quantity="one">Added to “%1$s”</item>
+        <item quantity="other">Added %2$d items to “%1$s”</item>
+    </plurals>
+    <!-- Name for a general button which action is "Open" something -->
+    <string name="general_open_button">Open</string>
+    <!-- Bottom sheet option title for add the video to playlist from video section -->
+    <string name="video_section_bottom_sheet_option_title_add_to_playlist">Add to playlist</string>
+    <!-- Message of the dialog to confirm stop a backup -->
+    <string name="sync_stop_backup_confirm_dialog_text">To stop backing up this folder, you need to either move it or delete it.</string>
+    <!-- Move option of the dialog to confirm stop a backup -->
+    <string name="sync_stop_backup_confirm_dialog_move_option">Move folder</string>
+    <!-- Explanatory text for the move option of the dialog to confirm stop a backup -->
+    <string name="sync_stop_backup_confirm_dialog_move_option_text">Move this folder to another location to get full access to your data.</string>
+    <!-- Delete option of the dialog to confirm stop a backup -->
+    <string name="sync_stop_backup_confirm_dialog_delete_option">Delete folder permanently</string>
+    <!-- Explanatory text for the delete option of the dialog to confirm stop a backup -->
+    <string name="sync_stop_backup_confirm_dialog_delete_option_text">Folder will be deleted from MEGA. It won’t be deleted from your device.</string>
+    <!-- Name for a general button which action is "Confirm" something -->
+    <string name="general_confirm_button">Confirm</string>
+    <!-- The failed Message when adding the video to the playlists from the video section. -->
+    <string name="video_section_playlists_add_to_playlists_failed_message">Unable to add item</string>
+    <!-- Text of the add button in the page that adds the video to the video playlist -->
+    <string name="video_to_playlist_add_button">Add</string>
+    <!-- The success Message when adding the video to the playlists from the video section. -->
+    <plurals name="video_section_playlists_add_to_playlists_successfully_message">
+        <item quantity="one">Added 1 item to “%1$s”</item>
+        <item quantity="other">Added 1 item to %1$d playlists</item>
+    </plurals>
+    <!-- Name for a general label which action is "Select" something -->
+    <string name="general_select">Select</string>
+    <!-- Name for a general label which action is "Select folder" -->
+    <string name="general_select_folder">Select folder</string>
+    <!-- Clickable label text to select the destination for the move option of the dialog to confirm stop a backup. Keep the placeholders because "[B][/B]" are in order to make the text clickable and "%1s" in order to display the selected folder name. -->
+    <string name="sync_stop_backup_confirm_dialog_move_option_select_destination">Move to: [B]%1s[/B]</string>
+    <!-- Message shown to user when app is connected to the MEGA server -->
+    <string name="login_connected_to_server">Connected to the server</string>
+    <!-- User Alert notification for scheduled recurring meeting changes -->
+    <string name="meetings_notification_subtitle_scheduled_recurring_meeting_scheduled_changes">[A]%s[/A] [B]updated the recurring meeting details to[/B]</string>
+    <!-- User Alert notification for scheduled recurring meeting hour change -->
+    <string name="meetings_notification_subtitle_scheduled_recurring_meeting_hour_changed">[A]%s[/A] [B]updated the recurring meeting time to[/B]</string>
+    <!-- User Alert notification for scheduled recurring meeting date of the week change -->
+    <string name="meetings_notification_subtitle_scheduled_recurring_meeting_date_of_the_week_changed">[A]%s[/A] [B]updated the recurring meeting date to[/B]</string>
+    <!-- User Alert notification for scheduled recurring meeting multiple fields change -->
+    <string name="meetings_notification_subtitle_scheduled_recurring_meeting_multiple_fields_changed">[A]%s[/A] [B]updated the meeting to[/B]</string>
+    <!-- User Alert notification for canceled occurrences of a scheduled recurring meeting -->
+    <string name="meetings_notification_subtitle_scheduled_recurring_meeting_occurrence_canceled">[A]%s[/A] [B]cancelled the occurrence scheduled for[/B]</string>
+    <!-- User Alert notification for scheduled recurring meeting occurrence change -->
+    <string name="meetings_notification_subtitle_scheduled_recurring_meeting_updated_occurrence">[A]%s[/A] [B]updated an occurrence to[/B]</string>
+    <!-- User Alert notification for scheduled meeting date change -->
+    <string name="meetings_notification_subtitle_scheduled_meeting_updated_date">[A]%s[/A] [B]updated the meeting date to[/B]</string>
+    <!-- User Alert notification for scheduled meeting time change -->
+    <string name="meetings_notification_subtitle_scheduled_meeting_updated_time">[A]%s[/A] [B]updated the meeting time to[/B]</string>
+    <!-- User Alert notification for canceled scheduled meeting -->
+    <string name="meetings_notification_subtitle_scheduled_meeting_canceled">[A]%s[/A] [B]cancelled the meeting scheduled for[/B]</string>
+    <!-- Title of the ads free introduction screen -->
+    <string name="payment_ads_free_intro_title">Want MEGA without the ads?</string>
+    <!-- Description of the ads free introduction screen -->
+    <string name="payment_ads_free_intro_description">Upgrade to a Pro plan with plenty of storage and more. Our Pro plans start at just %1$s a month.</string>
+    <!-- The Generous storage label in the ads free introduction screen -->
+    <string name="payment_ads_free_intro_generous_storage_label">Generous storage</string>
+    <!-- The Generous storage description in the ads free introduction screen -->
+    <string name="payment_ads_free_intro_generous_storage_description">Store unlimited data, starting from %1$s.</string>
+    <!-- The Transfer sharing label in the ads free introduction screen -->
+    <string name="payment_ads_free_intro_transfer_sharing_label">Transfer sharing</string>
+    <!-- The Transfer sharing description in the ads free introduction screen -->
+    <string name="payment_ads_free_intro_transfer_sharing_description">The people you share data with can use your transfer quota to download the items you shared.</string>
+    <!-- The additional security label in the ads free introduction screen -->
+    <string name="payment_ads_free_intro_additional_security_label">MEGA&#160;Pass and MEGA&#160;VPN</string>
+    <!-- The additional security description in the ads free introduction screen -->
+    <string name="payment_ads_free_intro_additional_security_description">Make your online life safer, faster, and easier with our password manager and high speed VPN</string>
+    <!-- The button text view pro plan in the ads free introduction screen -->
+    <string name="payment_ads_free_intro_button_view_pro_plan">View Pro plans</string>
+    <!-- Label for call option on settings -->
+    <string name="settings_calls_title">Calls</string>
+    <!-- Label for the sound notifications option on calls settings -->
+    <string name="settings_calls_sound_notifications_title">Sound notifications</string>
+    <!-- Text for the sound notifications option on calls settings -->
+    <string name="settings_calls_sound_notifications_body">Hear a sound when someone joins or leaves a call.</string>
+    <!-- Text of the remove favourite option of the Favourites playlist bottom sheet  -->
+    <string name="favourites_playlist_bottom_sheet_option_remove_favourite">Remove favourite</string>
+    <!-- The empty hint of the Favourites playlist -->
+    <string name="favourites_playlist_empty_hint">No favourites</string>
+    <!-- Message to enter confirm password -->
+    <string name="general_confirm_your_password">Confirm your password</string>
+    <!-- The Screen Toolbar Title for configuring the scan settings -->
+    <string name="document_scanning_settings_toolbar_title">Scan settings</string>
+    <!-- Title of the camera setting screen -->
+    <string name="camera_settings_title">Camera settings</string>
+    <!-- Title of the save location in the camera setting screen -->
+    <string name="camera_settings_save_location_title">Save location</string>
+    <!-- Description of the save location in the camera setting screen -->
+    <string name="camera_settings_save_location_description">Enable geotagging for photos and videos</string>
+    <!-- Message when user denies location permission in the camera setting screen -->
+    <string name="camera_settings_save_location_permission_denied">Allow MEGA to access this device’s location to continue</string>
+    <!-- Warning message to indicate that cannot select a currently synced folder -->
+    <string name="sync_local_device_folder_currently_synced_message">This folder is already synced</string>
+    <!-- Warning message to indicate that cannot select a currently backed up folder -->
+    <string name="sync_local_device_folder_currently_backed_up_message">This folder is already backed up</string>
+    <!-- The name of every users root drive in the cloud of MEGA. -->
+    <string name="general_section_cloud_drive">Cloud drive</string>
+    <!-- App Bar Title in of Cloud Drive Bottom Menu -->
+    <string name="general_drive">Drive</string>
+    <!-- Tab bar title of Syncs tab -->
+    <string name="general_syncs">Syncs</string>
+    <!-- Text under the syncs list -->
+    <string name="syncs_tab_view_other_devices">View other devices in Device centre</string>
+    <!-- The snackbar message of you and others raised your hands -->
+    <plurals name="transfers_completed_read_error_retrying">
+        <item quantity="one"></item>
+        <item quantity="other"></item>
+    </plurals>
+    <!-- Warning shown to the user when tries to retry a cancelled or failed transfer but it cannot be retried because app does not have read permission over the file anymore -->
+    <string name="transfers_completed_one_read_error_retrying">Your upload can’t be completed or retried, because MEGA can no longer access the file</string>
+    <!-- Warning shown to the user when tries to retry some or all of cancelled or failed transfer but they cannot be retried because app does not have read permission over the files anymore -->
+    <string name="transfers_completed_some_read_error_retrying">Some or all of your uploads can’t be completed or retried, because MEGA can no longer access the files</string>
+    <!-- Title for Offline Folder exposed via SAF -->
+    <string name="general_mega_offline">MEGA Offline files</string>
+    <!-- Notification content for download final notification. It will inform the user about the location where file/s were downloaded -->
+    <string name="transfers_notification_location_content">Location: %1$s</string>
+    <!-- Notification action for download final notification. It will open the file explorer activity to show the destination folder -->
+    <string name="transfers_notification_location_action">Locate</string>
+    <!-- Notification content for download final notification in case of a single file downloaded. -->
+    <string name="transfers_notification_title_single_download">Downloaded “%1$s”</string>
+    <!-- Label for the button or menu option to add a new backup -->
+    <string name="device_center_sync_add_new_backup_button_option">Add new backup</string>
+    <!-- Notification content for download final notification in case of a single file downloaded to preview. -->
+    <string name="transfers_notification_title_preview_download">“%1$s” is ready to preview</string>
+    <!-- Notification action for download final notification. It will open a dialog with installed apps which can open the file -->
+    <string name="transfers_notification_preview_action">Preview</string>
+    <!-- Title for the OS dialog shown with available apps to open a file -->
+    <string name="open_with_os_dialog_title">Open “%1$s” with</string>
+    <!-- The Scan Confirmation screen error message shown when the new filename does not contain the file extension that was selected -->
+    <string name="document_scanning_settings_missing_file_extension_error_message">Missing file extension (%s)</string>
+    <!-- The Scan Confirmation screen error message shown when the filename does not end with the expected file extension -->
+    <string name="document_scanning_settings_non_matching_file_extension_error_message">File extension doesn’t match file type</string>
+    <!-- The Scan Confirmation screen error message shown when the filename has no file extension -->
+    <string name="document_scanning_settings_file_extension_required_error_message">File extension is needed</string>
+    <!-- Alert text before download a file for preview. Please do not modify the %s placeholder as it will be replaced by the size to be donwloaded -->
+    <string name="alert_larger_file_preview">In order to preview this file, MEGA needs to download it. %1$s will be downloaded.</string>
+    <!-- Message displayed with progress percentage while the app is doing some background operation -->
+    <string name="login_completing_operation">Completing operation: %1$d%%</string>
+    <!-- Add to album files existed message -->
+    <plurals name="album_add_to_files_existed">
+        <item quantity="one">This file already exists in “%1$s” and cannot be added again</item>
+        <item quantity="other">These files already exist in “%1$s” and cannot be added again</item>
+    </plurals>
+    <!-- Add to album partial added message -->
+    <plurals name="album_add_to_partial_added_message">
+        <item quantity="one">1 file added to “%1$s”. Some files already exist, and can’t be added again.</item>
+        <item quantity="other">%2$d files added to “%1$s”. Some files already exist, and can’t be added again.</item>
+    </plurals>
+    <!--Content on the Multi-Factor Authentication Login page -->
+    <string name="multi_factor_auth_login_verification_content">Enter the 6-digit code from your authenticator app.</string>
+    <!--Message to be shown to the user when they entered an incorrect verification code-->
+    <string name="multi_factor_auth_login_verification_input_error_text">Incorrect verification code</string>
+    <!-- Snackbar text to inform the user that preview may take some time because it needs to be downloaded -->
+    <string name="transfers_preview_slow_snackbar">Preparing file for preview. See notification for details.</string>
+    <!-- Notification text for preview downloads.  Please do not modify the %s placeholder as it will be replaced by the name of the file to be donwloaded -->
+    <string name="transfers_notification_downloading_preview">Preparing %1$s for preview</string>
+    <!-- Notification text for preview downloads, paused state.  Please do not modify the %s placeholder as it will be replaced by the name of the file to be donwloaded -->
+    <string name="transfers_notification_downloading_preview_paused">Preparing %1$s for preview (paused)</string>
+    <!-- Message when successfully deleting single item from the audio queue. %1$s will be replaced with the item name -->
+    <string name="audio_queue_single_item_removed_message">‟%1$s” was removed</string>
+    <!-- Message when successfully deleting items from the audio queue. %1$d will be replaced with the removal count when multiple items are removed. -->
+    <string name="audio_queue_multiple_items_removed_message">Removed %1$d items from queue</string>
+    <!-- Message when successfully deleting items from the audio queue. %1$s will be replaced with the item name %2$d will be replaced with the removal count. -->
+    <plurals name="audio_queue_items_removal_success_message">
+        <item quantity="one">“%1$s” was removed from the queue</item>
+        <item quantity="other">Removed %2$d items from the queue</item>
+    </plurals>
+    <!-- Title for the dialog to inform that a transfer is needed to preview a file and transfers are paused-->
+    <string name="transfers_preview_paused_dialog_title">Transfers are paused</string>
+    <!-- Message for the dialog to inform that a transfer is needed to preview a file and transfers are paused-->
+    <string name="transfers_preview_paused_dialog_text">To preview “%1$s” you will need to resume paused transfers</string>
+    <!--SD Card text shown as title in FileStorage screen -->
+    <string name="general_sd_card">SD card</string>
+    <!--The title of the Login page-->
+    <string name="login_page_title">Log in to your MEGA account</string>
+    <!--Message to be shown to the user when they entered an invalid email-->
+    <string name="login_invalid_email_error_message">Enter a valid email address</string>
+    <!--Message to be shown to the user when they entered an invalid format password-->
+    <string name="login_invalid_password_error_message">Enter your password</string>
+    <!--Message to be shown to the user when they entered the wrong credential-->
+    <string name="login_wrong_credential_error_message">Invalid email address or password</string>
+    <!--Message to be shown to he user when the account is not validated -->
+    <string name="login_account_not_validated">Your account signup is incomplete or has been cancelled. Check your email inbox.</string>
+    <!--Message to be shown to the user when login fails due to multiple failed attempts-->
+    <string name="login_too_many_attempts_error_message">You have attempted to log in too many times. Wait and try again.</string>
+    <!--The footer text to be shown where a user can sign up if they do not have a MEGA account-->
+    <string name="login_page_sign_up_action_footer_text">Don’t have a MEGA account? [A]Sign up[/A]</string>
+    <!-- Title of setting Two-Factor Authentication -->
+    <string name="settings_2fa">Two-factor authentication</string>
+    <!-- email label -->
+    <string name="email_text">Email address</string>
+    <!-- password label -->
+    <string name="password_text">Password</string>
+    <!-- Login button -->
+    <string name="login_text">Log&#160;in</string>
+    <!--The text where user forgot their password and will navigate to reset it-->
+    <string name="login_page_forgot_password_text">Forgot password?</string>
+    <!-- Sync state up to date -->
+    <string name="sync_list_sync_state_disabled">Disabled</string>
+    <!-- Name of the Camera uploads feature -->
+    <string name="general_camera_uploads">Camera uploads</string>
+    <!-- Name of the Camera uploads feature -->
+    <string name="general_media_uploads">Media uploads</string>
+    <!-- Generic settings label text -->
+    <string name="general_settings">Settings</string>
+    <!-- Ad settings label in the cookie settings page -->
+    <string name="settings_cookie_settings_label_ad_settings">Ad settings</string>
+    <!-- Ads personalization label in the cookie settings page -->
+    <string name="settings_cookie_settings_label_ads_personalization">Ads personalisation</string>
+    <!-- Cookie settings title in the cookie settings page -->
+    <string name="settings_cookie_setting_title_cookie_and_ad_settings">Cookie and ad settings</string>
+    <!-- Body text of the bottom sheet to promote Sync feature. The placeholders are to underline text -->
+    <string name="sync_promotion_bottom_sheet_body_text">Sync or back up a folder on your device with a folder on MEGA. [U]Learn more[/U]</string>
+    <!-- This is the final button when creating a folder in the dialog where the user inserts the folder name -->
+    <string name="transfers_cancel_download_warning_title">Cancel download?</string>
+    <!-- Confirmation message informing a download was successfully cancelled -->
+    <string name="transfers_cancel_download_success_message">Download cancelled</string>
+    <!-- Title of note to self chat -->
+    <string name="chat_note_to_self_chat_title">Note to self</string>
+    <!-- First message header in note to self chat -->
+    <string name="chat_note_to_self_chat_first_message_header">Keep it to yourself</string>
+    <!-- First message description in note to self chat -->
+    <string name="chat_note_to_self_chat_first_message_description">Send yourself sensitive information, pics and videos, or ideas for your next big venture. Synced across all your devices, and protected with zero-knowledge encryption.</string>
+    <!-- Add to album some files exist message -->
+    <plurals name="album_add_to_files_exist_message">
+        <item quantity="one">1 file added to “%1$s”. Duplicate files cannot be added again.</item>
+        <item quantity="other">%2$d files added to “%1$s”. Duplicate files cannot be added again.</item>
+    </plurals>
+    <!-- Snack bar message informing that profile's QR code is uploaded to the Cloud Drive-->
+    <string name="transfers_start_upload_profile_qr_code_message">Saving %1$s to Cloud drive&#8230;</string>
+    <!-- Warning shown after trying to cancel a download, but the request failed -->
+    <string name="transfers_error_cancelling_download">Something went wrong. Download was not cancelled.</string>
+    <!-- Body for the subscription details section, which is shown to the Indian user to provide details about subscription. This string is shown if user selects yearly subscription and the amount is more than Rs.15,000. Please keep these placeholders [A], [/A], [B], [/B], [C], [/C]. They will be used to format the string. -->
+    <string name="account_upgrade_account_subscription_details_body_yearly_with_price_for_indian">You will be charged %1$s immediately but your subscription will not automatically renew after 12 months due to government regulations. It will be your responsibility to renew your subscription after it has expired. You can manage or cancel your subscription anytime via Subscriptions in [A]Google&#160;Play[/A]. By upgrading your account, you agree to MEGA’s [B]Terms of Service[/B] and [C]Privacy and Data Policy[/C].</string>
+    <!-- The name of the Device or Folder Status which signifies that it is currently uploading -->
+    <string name="device_center_list_view_item_status_uploading">Uploading&#8230;</string>
+    <!-- The name of the Device or Folder Status which signifies that it is currently uploading with a percentage completion -->
+    <string name="device_center_list_view_item_status_uploading_with_progress">%1$d%% uploading&#8230;</string>
+    <!-- The name of the Device or Folder Status which signifies that it is inactive -->
+    <string name="device_center_list_view_item_status_inactive">Inactive</string>
+    <!-- The name of the Device or Folder Status which signifies that some action is needed -->
+    <string name="device_center_list_view_item_status_attention_needed">Attention needed</string>
+</resources>

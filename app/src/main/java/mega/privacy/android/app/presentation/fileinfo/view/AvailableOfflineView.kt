@@ -21,7 +21,7 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.tooling.preview.PreviewParameter
 import androidx.compose.ui.unit.dp
 import mega.privacy.android.app.R
-import mega.privacy.android.shared.original.core.ui.theme.OriginalTempTheme
+import mega.privacy.android.shared.original.core.ui.theme.OriginalTheme
 import mega.privacy.android.shared.original.core.ui.preview.BooleanProvider
 import mega.privacy.android.shared.original.core.ui.preview.CombinedTextAndThemePreviews
 import mega.privacy.android.shared.original.core.ui.theme.extensions.textColorPrimary
@@ -63,7 +63,7 @@ internal fun AvailableOfflineView(
 @Composable
 private fun AvailableOfflinePreview(
     @PreviewParameter(BooleanProvider::class) initialValue: Boolean,
-) = OriginalTempTheme(isDark = isSystemInDarkTheme()) {
+) = OriginalTheme(isDark = isSystemInDarkTheme()) {
     var available by remember { mutableStateOf(initialValue) }
     AvailableOfflineView(
         modifier = Modifier.padding(horizontal = 16.dp),

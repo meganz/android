@@ -167,7 +167,6 @@ class DocumentSectionViewModelTest {
             assertThat(initial.currentViewType).isEqualTo(ViewType.LIST)
             assertThat(initial.actionMode).isFalse()
             assertThat(initial.selectedDocumentHandles).isEmpty()
-            assertThat(initial.searchMode).isFalse()
             cancelAndIgnoreRemainingEvents()
         }
     }
@@ -238,49 +237,6 @@ class DocumentSectionViewModelTest {
                 cancelAndIgnoreRemainingEvents()
             }
         }
-
-    @Test
-    fun `test that the result returned correctly when search query is not empty`() = runTest {
-        val expectedDocumentNode = mock<TypedFileNode> { on { name }.thenReturn("document name") }
-        val documentNode = mock<TypedFileNode> { on { name }.thenReturn("name") }
-        val expectedDocument = mock<DocumentUiEntity> { on { name }.thenReturn("document name") }
-        val document = mock<DocumentUiEntity> { on { name }.thenReturn("name") }
-
-        whenever(getCloudSortOrder()).thenReturn(SortOrder.ORDER_MODIFICATION_DESC)
-        whenever(getAllDocumentsUseCase()).thenReturn(listOf(expectedDocumentNode, documentNode))
-        whenever(documentUiEntityMapper(documentNode)).thenReturn(document)
-        whenever(documentUiEntityMapper(expectedDocumentNode)).thenReturn(expectedDocument)
-
-        initUnderTest()
-
-        underTest.refreshDocumentNodes()
-
-        underTest.uiState.test {
-            assertThat(awaitItem().allDocuments.size).isEqualTo(2)
-            underTest.searchQuery("document")
-            val actual = awaitItem()
-            assertThat(actual.allDocuments.size).isEqualTo(1)
-            assertThat(actual.scrollToTop).isTrue()
-            cancelAndIgnoreRemainingEvents()
-        }
-    }
-
-    @Test
-    fun `test that the searchMode is correctly updated`() = runTest {
-        whenever(getCloudSortOrder()).thenReturn(SortOrder.ORDER_MODIFICATION_DESC)
-        whenever(getAllDocumentsUseCase()).thenReturn(emptyList())
-
-        initUnderTest()
-
-        underTest.uiState.drop(1).test {
-            underTest.searchReady()
-            assertThat(awaitItem().searchMode).isTrue()
-
-            underTest.exitSearch()
-            assertThat(awaitItem().searchMode).isFalse()
-            cancelAndIgnoreRemainingEvents()
-        }
-    }
 
     @Test
     fun `test that the setViewType is invoked when onChangeViewTypeClicked is triggered and currentViewType is List`() =

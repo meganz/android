@@ -29,6 +29,7 @@ class MonitorRequestStatusProgressEventUseCaseTest {
     fun `test that RequestStatusProgress events are filtered when invoked`() = runTest {
         val event1 = mock<NormalEvent> {
             on { type } doReturn EventType.RequestStatusProgress
+            on { number } doReturn 500L
         }
         val event2 = mock<NormalEvent> {
             on { type } doReturn EventType.AccountConfirmation
@@ -39,6 +40,21 @@ class MonitorRequestStatusProgressEventUseCaseTest {
         val result = underTest().toList()
 
         assertThat(result.size).isEqualTo(1)
-        assertThat(result[0].type).isEqualTo(EventType.RequestStatusProgress)
+        assertThat(result[0]?.floatValue).isEqualTo(0.5f)
+    }
+
+    @Test
+    fun `test that progress is set to null when number is -1L`() = runTest {
+        val event = mock<NormalEvent> {
+            on { type } doReturn EventType.RequestStatusProgress
+            on { number } doReturn -1L
+        }
+        val eventsFlow: Flow<Event> = flowOf(event)
+        whenever(notificationsRepository.monitorEvent()) doReturn (eventsFlow)
+
+        val result = underTest().toList()
+
+        assertThat(result.size).isEqualTo(1)
+        assertThat(result[0]).isNull()
     }
 }

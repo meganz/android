@@ -17,8 +17,10 @@ import mega.privacy.android.app.presentation.meeting.model.CallRecordingUIState
 import mega.privacy.android.domain.entity.achievement.AchievementType
 import mega.privacy.android.domain.usecase.GetAccountAchievements
 import mega.privacy.android.domain.usecase.account.MonitorAccountDetailUseCase
+import mega.privacy.android.domain.usecase.advertisements.MonitorAdsClosingTimestampUseCase
 import timber.log.Timber
 import javax.inject.Inject
+import kotlin.time.Duration.Companion.days
 
 /**
  * ViewModel for account storage
@@ -30,6 +32,7 @@ class AccountStorageViewModel @Inject constructor(
     private val monitorAccountDetailUseCase: MonitorAccountDetailUseCase,
     private val getStringFromStringResMapper: GetStringFromStringResMapper,
     private val getAccountAchievements: GetAccountAchievements,
+    private val monitorAdsClosingTimestampUseCase: MonitorAdsClosingTimestampUseCase,
 ) : ViewModel() {
 
     private val _state = MutableStateFlow(AccountStorageUIState())
@@ -40,6 +43,21 @@ class AccountStorageViewModel @Inject constructor(
     init {
         getBaseStorage()
         monitorAccountDetail()
+        monitorAdsClosingTimestamp()
+    }
+
+    private fun monitorAdsClosingTimestamp() {
+        viewModelScope.launch {
+            monitorAdsClosingTimestampUseCase()
+                .catch {
+                    Timber.e(it)
+                }
+                .collect { timestamp ->
+                    _state.update { state ->
+                        state.copy(lastAdsClosingTimestamp = timestamp ?: 0)
+                    }
+                }
+        }
     }
 
     /**
@@ -90,7 +108,9 @@ class AccountStorageViewModel @Inject constructor(
                             totalStorageFormatted = getStorageFormatted(
                                 accountDetail.storageDetail?.totalStorage,
                                 DecimalFormat("#.##")
-                            )
+                            ),
+                            storageUsedPercentage = accountDetail.storageDetail?.usedPercentage
+                                ?: 0,
                         )
                     }
                 }
@@ -149,6 +169,17 @@ class AccountStorageViewModel @Inject constructor(
                 )
             }
         }
+
+    /**
+     * Check if the account should be upgraded due to ads.
+     */
+    fun isUpgradeAccountDueToAds(): Boolean {
+        val state = _state.value
+        Timber.d("Storage: ${state.storageUsedPercentage}")
+        val within2Days =
+            System.currentTimeMillis() - state.lastAdsClosingTimestamp <= 2.days.inWholeMicroseconds
+        return state.storageUsedPercentage < 50 && within2Days
+    }
 
     private companion object {
         const val KB: Long = 1024

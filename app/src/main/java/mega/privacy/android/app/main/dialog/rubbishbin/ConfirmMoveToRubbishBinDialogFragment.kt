@@ -20,7 +20,7 @@ import mega.privacy.android.app.presentation.manager.ManagerViewModel
 import mega.privacy.android.domain.entity.ThemeMode
 import mega.privacy.android.domain.usecase.GetThemeMode
 import mega.privacy.android.shared.original.core.ui.controls.dialogs.MegaAlertDialog
-import mega.privacy.android.shared.original.core.ui.theme.OriginalTempTheme
+import mega.privacy.android.shared.original.core.ui.theme.OriginalTheme
 import timber.log.Timber
 import javax.inject.Inject
 
@@ -56,7 +56,7 @@ internal class ConfirmMoveToRubbishBinDialogFragment : DialogFragment() {
                 } else {
                     stringResource(id = R.string.general_move)
                 }
-                OriginalTempTheme(isDark = themeMode.isDarkMode()) {
+                OriginalTheme(isDark = themeMode.isDarkMode()) {
                     MegaAlertDialog(
                         text = message,
                         confirmButtonText = positiveText,

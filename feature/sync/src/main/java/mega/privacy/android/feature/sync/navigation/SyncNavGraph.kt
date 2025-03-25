@@ -1,12 +1,16 @@
 package mega.privacy.android.feature.sync.navigation
 
+import android.app.Activity
 import android.content.Intent
+import android.net.Uri
+import android.os.Environment
+import androidx.activity.compose.rememberLauncherForActivityResult
+import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.ui.platform.LocalContext
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.viewmodel.compose.LocalViewModelStoreOwner
 import androidx.navigation.NavController
 import androidx.navigation.NavGraphBuilder
-import androidx.navigation.NavType
 import androidx.navigation.compose.composable
 import androidx.navigation.navArgument
 import androidx.navigation.navDeepLink
@@ -17,11 +21,13 @@ import mega.privacy.android.core.ui.mapper.FileTypeIconMapper
 import mega.privacy.android.domain.entity.sync.SyncType
 import mega.privacy.android.feature.sync.ui.SyncEmptyScreen
 import mega.privacy.android.feature.sync.ui.megapicker.MegaPickerRoute
+import mega.privacy.android.feature.sync.ui.newfolderpair.SyncNewFolderAction
 import mega.privacy.android.feature.sync.ui.newfolderpair.SyncNewFolderScreenRoute
 import mega.privacy.android.feature.sync.ui.newfolderpair.SyncNewFolderViewModel
 import mega.privacy.android.feature.sync.ui.permissions.SyncPermissionsManager
 import mega.privacy.android.feature.sync.ui.synclist.SyncChip
 import mega.privacy.android.feature.sync.ui.synclist.SyncListRoute
+import mega.privacy.android.navigation.MegaNavigator
 import mega.privacy.android.shared.original.core.ui.utils.findFragmentActivity
 import mega.privacy.mobile.analytics.event.AddSyncScreenEvent
 import mega.privacy.mobile.analytics.event.AndroidSyncFABButtonEvent
@@ -42,29 +48,17 @@ fun getSyncRoute() = syncRoute
  * Route to the Sync list
  */
 private const val syncListRoute =
-    "$syncRoute/list?deviceName={deviceName}&selectedChip={selectedChip}"
+    "$syncRoute/list?selectedChip={selectedChip}"
 
 /**
  * Gets the route to the Sync list and allow set some allowed possible parameters through it
  *
- * @param deviceName Name of the device
  * @param selectedChip [SyncChip] to set as selected in the Sync list
  * @return The route to the Sync list with the allowed possible parameters
  */
-fun getSyncListRoute(
-    deviceName: String? = null,
-    selectedChip: SyncChip = SyncChip.SYNC_FOLDERS,
-): String {
-    var finalRoute = syncListRoute
-    finalRoute = finalRoute.replace(
-        oldValue = "{deviceName}",
-        newValue = deviceName?.let { deviceNameValue ->
-            encodeDeviceName(deviceNameValue)
-        } ?: ""
-    )
+fun getSyncListRoute(selectedChip: SyncChip = SyncChip.SYNC_FOLDERS): String {
     val selectedChipJson = GsonBuilder().create().toJson(selectedChip)
-    finalRoute = finalRoute.replace(oldValue = "{selectedChip}", newValue = selectedChipJson)
-    return finalRoute
+    return syncListRoute.replace(oldValue = "{selectedChip}", newValue = selectedChipJson)
 }
 
 /**
@@ -75,42 +69,47 @@ private const val syncEmptyRoute = "$syncRoute/empty"
 /**
  * Route to the add new sync screen
  */
-private const val syncNewFolderRoute = "$syncRoute/new-folder/{syncType}?deviceName={deviceName}"
+private const val syncNewFolderRoute =
+    "$syncRoute/new-folder/{syncType}/{remoteFolderHandle}/{remoteFolderName}"
 
 /**
  * Gets the route to the add new sync screen and allow set some allowed possible parameters through it
  *
  * @param syncType The [SyncType] for the new sync
- * @param deviceName Name of the device
  * @return The route to the the add new sync screen with the allowed possible parameters
  */
-fun getSyncNewFolderRoute(syncType: SyncType, deviceName: String? = null): String {
+fun getSyncNewFolderRoute(
+    syncType: SyncType,
+    remoteFolderHandle: Long? = null,
+    remoteFolderName: String? = null,
+): String {
     val syncTypeJson = GsonBuilder().create().toJson(syncType)
-    var finalRoute = syncNewFolderRoute.replace(oldValue = "{syncType}", newValue = syncTypeJson)
-    finalRoute = finalRoute.replace(
-        oldValue = "{deviceName}",
-        newValue = deviceName?.let { deviceNameValue ->
-            encodeDeviceName(deviceNameValue)
-        } ?: ""
-    )
-    return finalRoute
+    return syncNewFolderRoute.replace(oldValue = "{syncType}", newValue = syncTypeJson).replace(
+        oldValue = "{remoteFolderHandle}",
+        newValue = remoteFolderHandle.toString()
+    ).replace(oldValue = "{remoteFolderName}", newValue = remoteFolderName.toString())
 }
 
-/**
+/**-
  * Route to the MEGA folder picker screen
  */
 private const val syncMegaPicker = "$syncRoute/mega-picker"
 
+/**
+ * Route to the Stop Backup MEGA folder picker screen
+ */
+private const val stopBackupMegaPicker = "$syncRoute/stop-backup-mega-picker"
+
 internal fun NavGraphBuilder.syncNavGraph(
     navController: NavController,
+    megaNavigator: MegaNavigator,
     fileTypeIconMapper: FileTypeIconMapper,
     syncPermissionsManager: SyncPermissionsManager,
     openUpgradeAccountPage: () -> Unit,
+    shouldNavigateToSyncList: Boolean = true,
 ) {
-    var deviceName: String? = null
-
     navigation(
-        startDestination = syncListRoute,
+        startDestination = if (shouldNavigateToSyncList) syncListRoute else syncNewFolderRoute,
         route = syncRoute,
     ) {
 
@@ -120,7 +119,7 @@ internal fun NavGraphBuilder.syncNavGraph(
          */
         fun navFromNewFolderRouteToListRoute() {
             navController.navigate(
-                getSyncListRoute(deviceName = deviceName)
+                getSyncListRoute()
             ) {
                 popUpTo(syncNewFolderRoute) {
                     inclusive = true
@@ -146,35 +145,83 @@ internal fun NavGraphBuilder.syncNavGraph(
                 action = Intent.ACTION_VIEW
             }),
             arguments = listOf(
-                navArgument("deviceName") {
-                    type = NavType.StringType
+                navArgument("syncType") {
+                    nullable = false
+                },
+                navArgument("remoteFolderHandle") {
                     nullable = true
                 },
+                navArgument("remoteFolderName") {
+                    nullable = true
+                }
             )
         ) { navBackStackEntry ->
+            val context = LocalContext.current
             val syncType = GsonBuilder().create()
                 .fromJson(navBackStackEntry.arguments?.getString("syncType"), SyncType::class.java)
                 ?: SyncType.TYPE_TWOWAY
-            Timber.d("Sync Type = $syncType")
-            deviceName = navBackStackEntry.arguments?.getString("deviceName", null)
-                ?.let { if (it.isNotEmpty()) decodeDeviceName(it) else null }
+
+            val remoteFolderHandle =
+                navBackStackEntry.arguments?.getString("remoteFolderHandle")?.toLongOrNull()
+            val remoteFolderName = navBackStackEntry.arguments?.getString("remoteFolderName")
+
+            Timber.d(
+                "Sync Type = $syncType | Remote Folder Handle = $remoteFolderHandle | Remote Folder Name = $remoteFolderName"
+            )
+
+
+            val viewModel =
+                hiltViewModel<SyncNewFolderViewModel, SyncNewFolderViewModel.SyncNewFolderViewModelFactory> { factory ->
+                    factory.create(
+                        syncType = syncType,
+                        remoteFolderHandle = remoteFolderHandle,
+                        remoteFolderName = remoteFolderName
+                    )
+                }
+
+            val launcher =
+                rememberLauncherForActivityResult(ActivityResultContracts.StartActivityForResult()) {
+                    if (it.resultCode == Activity.RESULT_OK) {
+                        val uri = it.data?.data
+                        if (uri != null) {
+                            viewModel.handleAction(SyncNewFolderAction.LocalFolderSelected(uri))
+                        }
+                    }
+                }
 
             SyncNewFolderScreenRoute(
-                hiltViewModel<SyncNewFolderViewModel, SyncNewFolderViewModel.SyncNewFolderViewModelFactory> { factory ->
-                    factory.create(syncType = syncType, deviceName = deviceName.toString())
-                },
-                syncPermissionsManager,
+                viewModel = viewModel,
+                syncPermissionsManager = syncPermissionsManager,
                 openSelectMegaFolderScreen = {
                     navController.navigate(syncMegaPicker)
                 },
                 openNextScreen = {
-                    navFromNewFolderRouteToListRoute()
+                    if (shouldNavigateToSyncList) {
+                        navFromNewFolderRouteToListRoute()
+                    } else {
+                        if (!navController.popBackStack()) {
+                            context.findFragmentActivity()?.finish()
+                        }
+                    }
                 },
                 openUpgradeAccount = {
                     openUpgradeAccountPage()
                 },
                 onBackClicked = {
-                    navFromNewFolderRouteToListRoute()
+                    if (shouldNavigateToSyncList) {
+                        navFromNewFolderRouteToListRoute()
+                    } else {
+                        if (!navController.popBackStack()) {
+                            context.findFragmentActivity()?.finish()
+                        }
+                    }
+                },
+                onSelectFolder = {
+                    megaNavigator.openInternalFolderPicker(
+                        context = context,
+                        launcher,
+                        Uri.fromFile(Environment.getExternalStorageDirectory())
+                    )
                 },
             )
         }
@@ -184,10 +231,25 @@ internal fun NavGraphBuilder.syncNavGraph(
                 syncPermissionsManager,
                 folderSelected = {
                     navController.popBackStack()
-                }, backClicked = {
+                },
+                backClicked = {
                     navController.popBackStack()
                 },
-                fileTypeIconMapper = fileTypeIconMapper
+                fileTypeIconMapper = fileTypeIconMapper,
+            )
+        }
+        composable(route = stopBackupMegaPicker) {
+            MegaPickerRoute(
+                hiltViewModel(),
+                syncPermissionsManager,
+                folderSelected = {
+                    navController.popBackStack()
+                },
+                backClicked = {
+                    navController.popBackStack()
+                },
+                fileTypeIconMapper = fileTypeIconMapper,
+                isStopBackupMegaPicker = true,
             )
         }
         composable(
@@ -197,59 +259,77 @@ internal fun NavGraphBuilder.syncNavGraph(
                 action = Intent.ACTION_VIEW
             }),
             arguments = listOf(
-                navArgument("deviceName") {
-                    type = NavType.StringType
-                    nullable = true
-                },
                 navArgument("selectedChip") {
                     nullable = true
                 }
             )
         ) { navBackStackEntry ->
-            deviceName = navBackStackEntry.arguments?.getString("deviceName", null)
-                ?.let { if (it.isNotEmpty()) decodeDeviceName(it) else null }
             val selectedChip = GsonBuilder().create().fromJson(
                 navBackStackEntry.arguments?.getString("selectedChip"),
                 SyncChip::class.java
             ) ?: SyncChip.SYNC_FOLDERS
-            Timber.d("Selected Chip = $selectedChip")
 
             val fragmentActivity = LocalContext.current.findFragmentActivity()
+            val context = LocalContext.current
             val viewModelStoreOwner =
                 fragmentActivity ?: checkNotNull(LocalViewModelStoreOwner.current)
 
             SyncListRoute(
-                hiltViewModel(),
-                syncPermissionsManager,
+                viewModel = hiltViewModel(),
+                syncPermissionsManager = syncPermissionsManager,
                 onSyncFolderClicked = {
                     Analytics.tracker.trackEvent(AndroidSyncFABButtonEvent)
                     navController.navigate(
-                        getSyncNewFolderRoute(
-                            syncType = SyncType.TYPE_TWOWAY,
-                            deviceName = deviceName
-                        )
+                        getSyncNewFolderRoute(syncType = SyncType.TYPE_TWOWAY)
                     )
                 },
                 onBackupFolderClicked = {
                     navController.navigate(
-                        getSyncNewFolderRoute(
-                            syncType = SyncType.TYPE_BACKUP,
-                            deviceName = deviceName
-                        )
+                        getSyncNewFolderRoute(syncType = SyncType.TYPE_BACKUP)
                     )
                 },
+                onSelectStopBackupDestinationClicked = { navController.navigate(stopBackupMegaPicker) },
                 onOpenUpgradeAccountClicked = { openUpgradeAccountPage() },
-                title = deviceName,
                 syncFoldersViewModel = hiltViewModel(viewModelStoreOwner = viewModelStoreOwner),
                 syncStalledIssuesViewModel = hiltViewModel(viewModelStoreOwner = viewModelStoreOwner),
                 syncSolvedIssuesViewModel = hiltViewModel(viewModelStoreOwner = viewModelStoreOwner),
                 selectedChip = selectedChip,
+                onOpenMegaFolderClicked = { handle ->
+                    megaNavigator.openSyncMegaFolder(context, handle)
+                },
+                onCameraUploadsSettingsClicked = { megaNavigator.openSettingsCameraUploads(context) },
             )
         }
     }
 }
 
-private fun encodeDeviceName(deviceName: String): String = deviceName.replace(".", "[dot]")
-
-private fun decodeDeviceName(deviceName: String): String =
-    deviceName.replace("+", " ").replace("[dot]", ".")
+internal fun NavGraphBuilder.syncStopBackupNavGraph(
+    navController: NavController,
+    fileTypeIconMapper: FileTypeIconMapper,
+    syncPermissionsManager: SyncPermissionsManager,
+) {
+    navigation(
+        startDestination = stopBackupMegaPicker,
+        route = syncRoute,
+    ) {
+        composable(route = stopBackupMegaPicker) {
+            val context = LocalContext.current
+            MegaPickerRoute(
+                hiltViewModel(),
+                syncPermissionsManager,
+                folderSelected = {
+                    if (!navController.popBackStack()) {
+                        context.findFragmentActivity()?.finish()
+                    }
+                },
+                backClicked = {
+                    if (!navController.popBackStack()) {
+                        context.findFragmentActivity()?.finish()
+                    }
+                },
+                fileTypeIconMapper = fileTypeIconMapper,
+                isStopBackupMegaPicker = true,
+            )
+        }
+    }
+}

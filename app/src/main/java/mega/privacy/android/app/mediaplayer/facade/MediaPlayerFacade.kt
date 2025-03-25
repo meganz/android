@@ -6,6 +6,7 @@ import android.content.Context
 import android.graphics.Bitmap
 import android.graphics.BitmapFactory
 import android.net.Uri
+import android.view.Surface
 import androidx.annotation.OptIn
 import androidx.core.content.ContextCompat
 import androidx.core.graphics.drawable.toBitmap
@@ -32,18 +33,19 @@ import androidx.media3.ui.PlayerView
 import com.google.common.collect.ImmutableList
 import dagger.hilt.android.qualifiers.ApplicationContext
 import kotlinx.coroutines.flow.flowOf
-import mega.privacy.android.app.R
 import mega.privacy.android.app.mediaplayer.MediaMegaPlayer
 import mega.privacy.android.app.mediaplayer.gateway.MediaPlayerGateway
 import mega.privacy.android.app.mediaplayer.mapper.ExoPlayerRepeatModeMapper
 import mega.privacy.android.app.mediaplayer.mapper.RepeatToggleModeByExoPlayerMapper
 import mega.privacy.android.app.mediaplayer.model.MediaPlaySources
 import mega.privacy.android.app.mediaplayer.model.PlayerNotificationCreatedParams
+import mega.privacy.android.app.mediaplayer.model.SpeedPlaybackItem
 import mega.privacy.android.app.mediaplayer.service.MediaPlayerCallback
 import mega.privacy.android.app.mediaplayer.service.MetadataExtractor
 import mega.privacy.android.app.utils.Constants.INVALID_VALUE
 import mega.privacy.android.domain.entity.mediaplayer.RepeatToggleMode
 import mega.privacy.android.domain.monitoring.CrashReporter
+import mega.privacy.android.icon.pack.R
 import timber.log.Timber
 import javax.inject.Inject
 
@@ -64,13 +66,19 @@ class MediaPlayerFacade @Inject constructor(
     private var playerNotificationManager: PlayerNotificationManager? = null
     private var notificationDismissed = false
 
+    @Volatile
+    private var isSubtitleHidden = false
+
+    @Volatile
+    private var hasSwitchTrackOnInit = false
+
     override fun createPlayer(
         shuffleEnabled: Boolean?,
         shuffleOrder: ShuffleOrder?,
         repeatToggleMode: RepeatToggleMode,
         nameChangeCallback: (title: String?, artist: String?, album: String?) -> Unit,
         mediaPlayerCallback: MediaPlayerCallback,
-    ) {
+    ): ExoPlayer {
         trackSelector = DefaultTrackSelector(context)
         val renderersFactory = DefaultRenderersFactory(context).setExtensionRendererMode(
             DefaultRenderersFactory.EXTENSION_RENDERER_MODE_ON
@@ -89,6 +97,7 @@ class MediaPlayerFacade @Inject constructor(
                             handle = mediaItem?.mediaId,
                             isUpdateName = reason != Player.MEDIA_ITEM_TRANSITION_REASON_PLAYLIST_CHANGED
                         )
+                        hasSwitchTrackOnInit = false
                     }
 
                     override fun onShuffleModeEnabledChanged(shuffleModeEnabled: Boolean) {
@@ -157,9 +166,11 @@ class MediaPlayerFacade @Inject constructor(
         }
         player = MediaMegaPlayer(exoPlayer)
         playerNotificationManager?.setPlayer(player)
+        return exoPlayer
     }
 
     private fun switchRendererToTextTrackType() {
+        if (hasSwitchTrackOnInit && isSubtitleHidden) return
         val mappedTrackInfo = trackSelector.currentMappedTrackInfo
         val mediaUri = exoPlayer.currentMediaItem?.localConfiguration?.uri
         if (mappedTrackInfo != null) {
@@ -178,6 +189,9 @@ class MediaPlayerFacade @Inject constructor(
                 ?: Timber.d("SwitchTrackInfo: There is no text track type found, the media uri: $mediaUri")
         } else {
             Timber.d("SwitchTrackInfo: There is no mapped track info found, the media uri: $mediaUri")
+        }
+        if (!hasSwitchTrackOnInit) {
+            hasSwitchTrackOnInit = true
         }
     }
 
@@ -315,6 +329,7 @@ class MediaPlayerFacade @Inject constructor(
         if (::exoPlayer.isInitialized) {
             exoPlayer.release()
         }
+        hasSwitchTrackOnInit = false
     }
 
     override fun playerSeekTo(index: Int) {
@@ -442,17 +457,20 @@ class MediaPlayerFacade @Inject constructor(
 
 
     override fun showSubtitle() {
+        isSubtitleHidden = false
+        if (!hasSwitchTrackOnInit) hasSwitchTrackOnInit = true
         trackSelector.parameters = DefaultTrackSelector.Parameters.Builder(context)
             .setTrackTypeDisabled(C.TRACK_TYPE_TEXT, false).build()
     }
 
     override fun hideSubtitle() {
+        isSubtitleHidden = true
         trackSelector.parameters = DefaultTrackSelector.Parameters.Builder(context)
             .setTrackTypeDisabled(C.TRACK_TYPE_TEXT, true).build()
     }
 
-    override fun updatePlaybackSpeed(speed: Float) {
-        player?.playbackParameters = PlaybackParameters(speed)
+    override fun updatePlaybackSpeed(item: SpeedPlaybackItem) {
+        player?.playbackParameters = PlaybackParameters(item.speed)
     }
 
     override fun updateMediaNotAllowPlayState(value: Boolean) {
@@ -461,6 +479,22 @@ class MediaPlayerFacade @Inject constructor(
 
     override fun monitorMediaNotAllowPlayState() =
         player?.monitorMediaNotAllowPlayState() ?: flowOf(false)
+
+    override fun setSurface(surface: Surface) {
+        exoPlayer.setVideoSurface(surface)
+    }
+
+    override fun getCurrentSpeedPlaybackItem(): SpeedPlaybackItem =
+        SpeedPlaybackItem.entries.find { it.speed == player?.playbackParameters?.speed }
+            ?: SpeedPlaybackItem.PLAYBACK_SPEED_1_X
+
+    override fun playNext() {
+        player?.seekToNext()
+    }
+
+    override fun playPrev() {
+        player?.seekToPrevious()
+    }
 
     companion object {
         private const val INCREMENT_TIME_IN_MS = 15000L

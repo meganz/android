@@ -1,7 +1,7 @@
 package mega.privacy.android.app.presentation.startconversation
 
-import mega.privacy.android.shared.resources.R as sharedR
 import androidx.compose.ui.test.junit4.createComposeRule
+import androidx.compose.ui.test.onNodeWithTag
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import mega.privacy.android.app.R
 import mega.privacy.android.app.presentation.startconversation.model.StartConversationState
@@ -10,6 +10,7 @@ import org.junit.Rule
 import org.junit.Test
 import org.junit.runner.RunWith
 import mega.privacy.android.app.onNodeWithText
+import mega.privacy.android.app.presentation.startconversation.view.TEST_TAG_RAISED_DEFAULT_MEGA_BUTTON
 
 @RunWith(AndroidJUnit4::class)
 
@@ -21,7 +22,7 @@ class StartConversationViewTest {
     @Test
     fun test_that_invite_contacts_button_is_shown() {
         initComposeRuleContent()
-        composeRule.onNodeWithText(sharedR.string.invite_contacts_action_label).assertExists()
+        composeRule.onNodeWithTag(TEST_TAG_RAISED_DEFAULT_MEGA_BUTTON).assertExists()
     }
 
     @Test
@@ -59,7 +60,8 @@ class StartConversationViewTest {
                 onSearchClicked = {},
                 onBackPressed = {},
                 onContactClicked = {},
-                onInviteContactsClicked = {}
+                onInviteContactsClicked = {},
+                onNoteToSelfClicked = {}
             )
         }
     }

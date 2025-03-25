@@ -10,7 +10,7 @@ import androidx.compose.ui.unit.dp
 import mega.privacy.android.shared.original.core.ui.controls.chip.ChipBar
 import mega.privacy.android.shared.original.core.ui.controls.chip.MegaChip
 import mega.privacy.android.shared.original.core.ui.preview.CombinedThemePreviews
-import mega.privacy.android.shared.original.core.ui.theme.OriginalTempTheme
+import mega.privacy.android.shared.original.core.ui.theme.OriginalTheme
 
 @Composable
 internal fun VideosFilterButtonView(
@@ -48,7 +48,7 @@ internal fun VideosFilterButtonView(
 @CombinedThemePreviews
 @Composable
 private fun VideosFilterButtonViewPreview() {
-    OriginalTempTheme(isDark = isSystemInDarkTheme()) {
+    OriginalTheme(isDark = isSystemInDarkTheme()) {
         VideosFilterButtonView(
             isLocationFilterSelected = false,
             isDurationFilterSelected = false,
@@ -66,7 +66,7 @@ private fun VideosFilterButtonViewPreview() {
 @CombinedThemePreviews
 @Composable
 private fun VideosFilterButtonViewSelectedPreview() {
-    OriginalTempTheme(isDark = isSystemInDarkTheme()) {
+    OriginalTheme(isDark = isSystemInDarkTheme()) {
         VideosFilterButtonView(
             isLocationFilterSelected = true,
             isDurationFilterSelected = true,

@@ -11,7 +11,6 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.text.selection.LocalTextSelectionColors
-import androidx.compose.foundation.text.selection.TextSelectionColors
 import androidx.compose.material.ButtonDefaults
 import androidx.compose.material.Icon
 import androidx.compose.material.MaterialTheme
@@ -25,10 +24,11 @@ import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.res.vectorResource
 import androidx.compose.ui.tooling.preview.PreviewParameter
 import androidx.compose.ui.unit.dp
-import mega.privacy.android.shared.original.core.ui.theme.OriginalTempTheme
+import mega.privacy.android.legacy.core.ui.customTextSelectionColors
 import mega.privacy.android.shared.original.core.ui.preview.CombinedThemePreviews
 import mega.privacy.android.shared.original.core.ui.preview.TextFieldProvider
 import mega.privacy.android.shared.original.core.ui.preview.TextFieldState
+import mega.privacy.android.shared.original.core.ui.theme.OriginalTheme
 import mega.privacy.android.shared.original.core.ui.theme.extensions.grey_alpha_038_white_alpha_038
 import mega.privacy.android.shared.original.core.ui.theme.extensions.textColorSecondary
 
@@ -50,10 +50,7 @@ fun TextButtonWithIconChip(
     @DrawableRes iconId: Int? = null,
 ) = Box {
 
-    val customTextSelectionColors = TextSelectionColors(
-        handleColor = MaterialTheme.colors.secondary,
-        backgroundColor = MaterialTheme.colors.secondary
-    )
+    val customTextSelectionColors = customTextSelectionColors()
     CompositionLocalProvider(LocalTextSelectionColors provides customTextSelectionColors) {
 
         TextButton(
@@ -128,7 +125,7 @@ private fun colorsUnChecked() = ButtonDefaults.buttonColors(
 private fun PreviewTextButtonWithIconChip(
     @PreviewParameter(TextFieldProvider::class) state: TextFieldState,
 ) {
-    OriginalTempTheme(isDark = isSystemInDarkTheme()) {
+    OriginalTheme(isDark = isSystemInDarkTheme()) {
         TextButtonWithIconChip(
             onClick = { },
             text = "weekdays",

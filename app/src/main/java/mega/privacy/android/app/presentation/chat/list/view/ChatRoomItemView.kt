@@ -28,7 +28,8 @@ import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.res.vectorResource
 import androidx.compose.ui.text.style.TextOverflow
-import androidx.compose.ui.tooling.preview.Preview
+import androidx.compose.ui.tooling.preview.PreviewParameter
+import androidx.compose.ui.tooling.preview.PreviewParameterProvider
 import androidx.compose.ui.unit.dp
 import androidx.constraintlayout.compose.ChainStyle
 import androidx.constraintlayout.compose.ConstraintLayout
@@ -41,15 +42,22 @@ import mega.privacy.android.domain.entity.chat.ChatRoomItem
 import mega.privacy.android.domain.entity.chat.ChatRoomItem.GroupChatRoomItem
 import mega.privacy.android.domain.entity.chat.ChatRoomItem.IndividualChatRoomItem
 import mega.privacy.android.domain.entity.chat.ChatRoomItem.MeetingChatRoomItem
+import mega.privacy.android.domain.entity.meeting.ChatRoomItemStatus
 import mega.privacy.android.shared.original.core.ui.controls.chat.messages.MessageText
+import mega.privacy.android.shared.original.core.ui.controls.chip.IconBadge
+import mega.privacy.android.shared.original.core.ui.controls.chip.CounterBadge
+import mega.privacy.android.shared.original.core.ui.controls.chip.BadgeSize
 import mega.privacy.android.shared.original.core.ui.controls.meetings.CallChronometer
-import mega.privacy.android.shared.original.core.ui.theme.OriginalTempTheme
+import mega.privacy.android.shared.original.core.ui.controls.text.LongTextBehaviour
+import mega.privacy.android.shared.original.core.ui.controls.text.MegaText
+import mega.privacy.android.shared.original.core.ui.preview.CombinedThemeComponentPreviews
+import mega.privacy.android.shared.original.core.ui.theme.OriginalTheme
 import mega.privacy.android.shared.original.core.ui.theme.extensions.grey_alpha_054_white_alpha_054
-import mega.privacy.android.shared.original.core.ui.theme.extensions.red_600_red_300
 import mega.privacy.android.shared.original.core.ui.theme.extensions.textColorPrimary
 import mega.privacy.android.shared.original.core.ui.theme.extensions.textColorSecondary
+import mega.android.core.ui.theme.values.TextColor
 import mega.privacy.android.shared.original.core.ui.utils.shimmerEffect
-import kotlin.random.Random
+import mega.privacy.android.icon.pack.R as iconR
 
 /**
  * Chat room item view
@@ -76,7 +84,7 @@ internal fun ChatRoomItemView(
     val hapticFeedback = LocalHapticFeedback.current
     val hasOngoingCall = item.hasOngoingCall()
     val isLoading = item.lastTimestampFormatted.isNullOrBlank()
-    val isPending = item is MeetingChatRoomItem && item.isPending
+    val isPending = item is MeetingChatRoomItem && item.isPendingMeeting()
     val callDurationFromInitialTimestamp = item.getDurationFromInitialTimestamp()
     val shouldShownCallDuration =
         item.hasCallInProgress() && callDurationFromInitialTimestamp != null
@@ -229,13 +237,12 @@ internal fun ChatRoomItemView(
                     },
             )
 
-            Icon(
-                imageVector = ImageVector.vectorResource(id = R.drawable.ic_ongoing_call),
+            IconBadge(
+                imageVector = ImageVector.vectorResource(id = iconR.drawable.ic_phone_01_medium_thin_solid),
                 contentDescription = "Ongoing call icon",
-                tint = MaterialTheme.colors.secondary,
+                size = BadgeSize.Small,
                 modifier = Modifier
                     .testTag("chat_room_item:call_icon")
-                    .size(14.dp)
                     .constrainAs(callIcon) {
                         start.linkTo(recurringIcon.end, 2.dp, 4.dp)
                         top.linkTo(titleText.top)
@@ -298,21 +305,19 @@ internal fun ChatRoomItemView(
         )
 
         if (shouldShownCallDuration) {
-            callDurationFromInitialTimestamp?.let { duration ->
-                CallChronometer(
-                    modifier = Modifier
-                        .testTag(if (isPending) TEST_TAG_BOTTOM_TEXT_CALL_CHRONOMETER else TEST_TAG_MIDDLE_TEXT_CALL_CHRONOMETER)
-                        .constrainAs(durationChrono) {
-                            start.linkTo(if (isPending) bottomText.end else middleText.end)
-                            top.linkTo(if (isPending) bottomText.top else middleText.top)
-                            bottom.linkTo(if (isPending) bottomText.bottom else middleText.bottom)
-                            width = Dimension.preferredWrapContent
-                        }
-                        .shimmerEffect(isLoading, CircleShape),
-                    duration = duration,
-                    textStyle = MaterialTheme.typography.body2.copy(color = MaterialTheme.colors.secondary)
-                )
-            }
+            CallChronometer(
+                modifier = Modifier
+                    .testTag(if (isPending) TEST_TAG_BOTTOM_TEXT_CALL_CHRONOMETER else TEST_TAG_MIDDLE_TEXT_CALL_CHRONOMETER)
+                    .constrainAs(durationChrono) {
+                        start.linkTo(if (isPending) bottomText.end else middleText.end)
+                        top.linkTo(if (isPending) bottomText.top else middleText.top)
+                        bottom.linkTo(if (isPending) bottomText.bottom else middleText.bottom)
+                        width = Dimension.preferredWrapContent
+                    }
+                    .shimmerEffect(isLoading, CircleShape),
+                duration = callDurationFromInitialTimestamp,
+                textStyle = MaterialTheme.typography.body2.copy(color = MaterialTheme.colors.secondary)
+            )
         }
 
         BottomTextView(
@@ -370,8 +375,9 @@ internal fun ChatRoomItemView(
             )
         }
 
-        ChatUnreadCountText(
+        CounterBadge(
             count = item.unreadCount,
+            size = BadgeSize.Normal,
             modifier = Modifier
                 .testTag("chat_room_item:unread_count_icon")
                 .constrainAs(unreadCountIcon) {
@@ -436,26 +442,24 @@ private fun MiddleTextView(
     }
 
     val textColor = when {
-        isPending -> MaterialTheme.colors.red_600_red_300
-        highlight -> MaterialTheme.colors.secondary
-        else -> MaterialTheme.colors.textColorSecondary
+        isPending -> TextColor.Secondary
+        highlight -> TextColor.Accent
+        else -> TextColor.Primary
     }
 
     if (textMessage.isNullOrBlank() || !isNormalMessage) {
-        Text(
+        MegaText(
             text = textMessage ?: stringResource(R.string.error_message_unrecognizable),
-            color = textColor,
+            textColor = textColor,
             style = MaterialTheme.typography.subtitle2,
-            maxLines = 1,
-            overflow = TextOverflow.Ellipsis,
+            overflow = LongTextBehaviour.Ellipsis(maxLines = 1),
             modifier = modifier
         )
     } else {
         MessageText(
             message = textMessage,
-            style = MaterialTheme.typography.subtitle2.copy(
-                color = textColor,
-            ),
+            style = MaterialTheme.typography.subtitle2,
+            color = textColor,
             maxLines = 1,
             overflow = TextOverflow.Ellipsis,
             modifier = modifier
@@ -509,132 +513,78 @@ private fun BottomTextView(
     )
 }
 
-@Preview
+@CombinedThemeComponentPreviews
 @Composable
-private fun PreviewIndividualChatRoomItem() {
-    val unreadCount = Random.nextInt(5)
-    val item = IndividualChatRoomItem(
-        chatId = 1L,
-        title = "Mieko Kawakami",
-        peerEmail = "mieko@miekokawakami.jp",
-        lastMessage = "Call ended",
-        lastTimestampFormatted = "Monday 14:25",
-        unreadCount = unreadCount,
-        highlight = unreadCount > 0,
-        avatar = ChatAvatarItem("M", color = "#FEBC00".toColorInt()),
-        isMuted = Random.nextBoolean(),
-    )
-    ChatRoomItemView(
-        item = item,
-        isSelected = false,
-        isSelectionEnabled = false,
-        onItemClick = {},
-        onItemMoreClick = {},
-        onItemSelected = {},
-    )
-}
-
-@Preview
-@Composable
-private fun PreviewGroupChatRoomItem() {
-    val unreadCount = Random.nextInt(110)
-    val meeting = GroupChatRoomItem(
-        chatId = 1L,
-        title = "Recipe test #14",
-        lastMessage = "Anna: Seeya all soon!",
-        avatars = listOf(
-            ChatAvatarItem("A", color = "#FEBC00".toColorInt()),
-            ChatAvatarItem("J", color = "#B965C1".toColorInt())
-        ),
-        lastTimestampFormatted = "1 May 2022 17:53",
-        unreadCount = Random.nextInt(150),
-        highlight = unreadCount > 0,
-        isMuted = Random.nextBoolean(),
-        isPublic = Random.nextBoolean(),
-    )
-    ChatRoomItemView(
-        item = meeting,
-        isSelected = false,
-        isSelectionEnabled = false,
-        onItemClick = {},
-        onItemMoreClick = {},
-        onItemSelected = {},
-    )
-}
-
-@Preview
-@Composable
-private fun PreviewMeetingChatRoomItem() {
-    val meeting = MeetingChatRoomItem(
-        chatId = 1L,
-        schedId = 1L,
-        title = "Photos Meeting #1325",
-        lastMessage = "Anna: Seeya all soon!",
-        avatars = listOf(
-            ChatAvatarItem("C", color = "#009372".toColorInt()),
-            ChatAvatarItem("L", color = "#FF8F00".toColorInt())
-        ),
-        lastTimestampFormatted = "1 May 2022 17:53",
-        scheduledStartTimestamp = 100L,
-        scheduledEndTimestamp = 200L,
-        scheduledTimestampFormatted = "10:00pm - 11:00pm",
-        unreadCount = 0,
-        isPending = true,
-        isRecurringWeekly = true,
-        isMuted = Random.nextBoolean(),
-        isPublic = Random.nextBoolean(),
-        header = "Monday, 23 May"
-    )
-    ChatRoomItemView(
-        item = meeting,
-        isSelected = false,
-        isSelectionEnabled = false,
-        onItemClick = {},
-        onItemMoreClick = {},
-        onItemSelected = {},
-    )
-}
-
-@Preview
-@Composable
-private fun PreviewSelectedState() {
-    val item = IndividualChatRoomItem(
-        chatId = 1L,
-        title = "Lise MeitnerHubertWolf...",
-        peerEmail = "lise@meitnerHubertwolf.com",
-        lastMessage = "Great to have you in our team!",
-        lastTimestampFormatted = "Today 08:15",
-        avatar = ChatAvatarItem("M", color = "#FEBC00".toColorInt()),
-        isMuted = Random.nextBoolean(),
-    )
-    ChatRoomItemView(
-        item = item,
-        isSelected = true,
-        isSelectionEnabled = true,
-        onItemClick = {},
-        onItemMoreClick = {},
-        onItemSelected = {},
-    )
-}
-
-@Preview
-@Composable
-private fun PreviewLoadingState() {
-    val item = GroupChatRoomItem(
-        chatId = 1L,
-        title = "Photos Meeting #1325",
-        isPublic = true,
-    )
-    OriginalTempTheme(isDark = isSystemInDarkTheme()) {
+private fun PreviewIndividualChatRoomItem(
+    @PreviewParameter(ChatRoomItemProvider::class) itemToSelected: Pair<ChatRoomItem, Boolean>,
+) {
+    OriginalTheme(isDark = isSystemInDarkTheme()) {
         ChatRoomItemView(
-            item = item,
-            isSelected = false,
-            isSelectionEnabled = false,
+            item = itemToSelected.first,
+            isSelected = itemToSelected.second,
+            isSelectionEnabled = itemToSelected.second,
             onItemClick = {},
             onItemMoreClick = {},
             onItemSelected = {},
         )
     }
+}
+
+
+class ChatRoomItemProvider : PreviewParameterProvider<Pair<ChatRoomItem, Boolean>> {
+    override val values = sequenceOf(
+        IndividualChatRoomItem(
+            chatId = 1L,
+            title = "Mieko Kawakami",
+            peerEmail = "mieko@miekokawakami.jp",
+            lastMessage = "Call ended",
+            lastTimestampFormatted = "Monday 14:25",
+            unreadCount = 5,
+            highlight = false,
+            avatar = ChatAvatarItem("M", color = "#FEBC00".toColorInt()),
+            isMuted = false,
+        ) to false,
+        GroupChatRoomItem(
+            chatId = 2L,
+            title = "Recipe test #14",
+            lastMessage = "Anna: Seeya all soon!",
+            avatars = listOf(
+                ChatAvatarItem("A", color = "#FEBC00".toColorInt()),
+                ChatAvatarItem("J", color = "#B965C1".toColorInt())
+            ),
+            lastTimestampFormatted = "1 May 2022 17:53",
+            unreadCount = 150,
+            currentCallStatus = ChatRoomItemStatus.NotJoined,
+            highlight = true,
+            isMuted = true,
+            isPublic = false,
+        ) to false,
+        MeetingChatRoomItem(
+            chatId = 3L,
+            schedId = 1L,
+            title = "Photos Meeting #1325",
+            lastMessage = "Anna: Seeya all soon!",
+            avatars = listOf(
+                ChatAvatarItem("C", color = "#009372".toColorInt()),
+                ChatAvatarItem("L", color = "#FF8F00".toColorInt())
+            ),
+            lastTimestampFormatted = "1 May 2022 17:53",
+            scheduledStartTimestamp = 100L,
+            scheduledEndTimestamp = 200L,
+            scheduledTimestampFormatted = "10:00pm - 11:00pm",
+            unreadCount = 0,
+            isPending = true,
+            isRecurringWeekly = true,
+            isMuted = true,
+            isPublic = true,
+            header = "Monday, 23 May"
+        ) to true,
+        GroupChatRoomItem(
+            chatId = 1L,
+            title = "Photos Meeting #1325",
+            isPublic = true,
+        ) to false
+    )
 }
 
 /**
@@ -656,6 +606,3 @@ const val TEST_TAG_MIDDLE_TEXT = "chat_room_item:middle_text"
  * Test tag for bottom text
  */
 const val TEST_TAG_BOTTOM_TEXT = "chat_room_item:bottom_text"
-
-
-

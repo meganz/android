@@ -52,7 +52,7 @@
 
 		<androidx.preference.Preference
 			android:key="settings_features_calls"
-			android:title="@string/settings_calls_preferences"
+			android:title="@string/settings_calls_title"
 			app:allowDividerAbove="true"
 			app:allowDividerBelow="false"
 			app:iconSpaceReserved="false" />

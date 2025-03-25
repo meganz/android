@@ -19,7 +19,6 @@ import org.mockito.kotlin.eq
 import org.mockito.kotlin.mock
 import org.mockito.kotlin.reset
 import org.mockito.kotlin.verify
-import org.mockito.kotlin.verifyNoInteractions
 import org.mockito.kotlin.whenever
 
 @ExperimentalCoroutinesApi
@@ -27,8 +26,6 @@ import org.mockito.kotlin.whenever
 class HandleSDCardEventUseCaseTest {
     private lateinit var underTest: HandleSDCardEventUseCase
 
-    private val insertSdTransferUseCase = mock<InsertSdTransferUseCase>()
-    private val deleteSdTransferByTagUseCase = mock<DeleteSdTransferByTagUseCase>()
     private val moveFileToSdCardUseCase = mock<MoveFileToSdCardUseCase>()
     private val fileSystemRepository = mock<FileSystemRepository>()
 
@@ -38,31 +35,18 @@ class HandleSDCardEventUseCaseTest {
     fun setUp() {
 
         underTest = HandleSDCardEventUseCase(
-            insertSdTransferUseCase,
-            deleteSdTransferByTagUseCase,
-            moveFileToSdCardUseCase,
-            fileSystemRepository,
-            scope,
+            moveFileToSdCardUseCase = moveFileToSdCardUseCase,
+            fileSystemRepository = fileSystemRepository,
+            scope = scope,
         )
     }
 
     @BeforeEach
     fun resetMocks() {
         reset(
-            insertSdTransferUseCase,
-            deleteSdTransferByTagUseCase,
             moveFileToSdCardUseCase,
             fileSystemRepository,
         )
-    }
-
-    @Test
-    fun `test that insertSdTransferUseCase is invoked for sd transfers start event`() = runTest {
-        val transfer = mockTransfer()
-        val transferEvent = TransferEvent.TransferStartEvent(transfer)
-        whenever(fileSystemRepository.isSDCardCachePath(any())).thenReturn(false)
-        underTest(transferEvent, null)
-        verify(insertSdTransferUseCase)(any())
     }
 
     @Test
@@ -76,43 +60,24 @@ class HandleSDCardEventUseCaseTest {
             verify(moveFileToSdCardUseCase).invoke(any(), eq(TARGET_PATH), eq(subFolders))
         }
 
-    @Test
-    fun `test that deleteSdTransferByTagUseCase is invoked when root sd transfers finish event is received`() =
-        runTest {
-            val transfer = mockTransfer()
-            whenever(transfer.isRootTransfer).thenReturn(true)
-            whenever(transfer.isFolderTransfer).thenReturn(true)
-            val transferEvent = TransferEvent.TransferFinishEvent(transfer, null)
-            underTest(transferEvent, null)
-            verify(deleteSdTransferByTagUseCase)(any())
-        }
-
-    @Test
-    fun `test that deleteSdTransferByTagUseCase is not invoked when the received finish event is not a sd transfer`() =
-        runTest {
-            val transfer = mockTransfer()
-            whenever(transfer.isRootTransfer).thenReturn(true)
-            whenever(transfer.isFolderTransfer).thenReturn(true)
-            whenever(transfer.appData).thenReturn(emptyList())
-            whenever(fileSystemRepository.isSDCardCachePath(any())).thenReturn(false)
-            val transferEvent = TransferEvent.TransferFinishEvent(transfer, null)
-            underTest(transferEvent, null)
-            verifyNoInteractions(deleteSdTransferByTagUseCase)
-        }
-
     private fun mockTransfer() =
         mock<Transfer> {
             on { nodeHandle }.thenReturn(1L)
             on { appData }.thenReturn(
-                listOf(TransferAppData.SdCardDownload(TARGET_PATH, TARGET_PATH))
+                listOf(
+                    TransferAppData.SdCardDownload(
+                        targetPathForSDK = TARGET_PATH,
+                        finalTargetUri = TARGET_PATH
+                    )
+                )
             )
             on { tag }.thenReturn(1)
             on { fileName }.thenReturn("name")
             on { totalBytes }.thenReturn(11L)
             on { nodeHandle }.thenReturn(1L)
             on { localPath }.thenReturn("localPath")
-            on { isFolderTransfer }.thenReturn(false)
             on { transferType }.thenReturn(TransferType.DOWNLOAD)
+            on { parentPath }.thenReturn("parentPath")
         }
 
     private companion object {

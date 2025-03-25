@@ -23,19 +23,14 @@ import androidx.compose.ui.res.vectorResource
 import androidx.compose.ui.tooling.preview.PreviewParameter
 import androidx.compose.ui.unit.dp
 import mega.privacy.android.analytics.Analytics
-import mega.privacy.android.app.R
 import mega.privacy.android.shared.original.core.ui.controls.chip.MegaChip
 import mega.privacy.android.shared.original.core.ui.controls.chip.TransparentChipStyle
 import mega.privacy.android.shared.original.core.ui.controls.lists.MenuActionListTile
-import mega.privacy.android.shared.original.core.ui.controls.text.MegaText
 import mega.privacy.android.shared.original.core.ui.preview.BooleanProvider
 import mega.privacy.android.shared.original.core.ui.preview.CombinedThemePreviews
-import mega.privacy.android.shared.original.core.ui.theme.OriginalTempTheme
-import mega.privacy.android.shared.original.core.ui.theme.extensions.conditional
+import mega.privacy.android.shared.original.core.ui.theme.OriginalTheme
 import mega.privacy.android.shared.original.core.ui.theme.extensions.grey_alpha_038_white_alpha_038
-import mega.privacy.android.shared.original.core.ui.theme.values.TextColor
 import mega.privacy.mobile.analytics.event.NodeInfoTagsEnteredEvent
-import mega.privacy.mobile.analytics.event.NodeInfoTagsProOnlyEnteredEvent
 
 /**
  * Composable that represents the tags view in the file info screen.
@@ -48,81 +43,52 @@ import mega.privacy.mobile.analytics.event.NodeInfoTagsProOnlyEnteredEvent
 @Composable
 fun FileInfoTagsView(
     tags: List<String>,
+    canEditTags: Boolean,
     onAddTagClick: () -> Unit,
     modifier: Modifier,
-    isProAccount: Boolean,
-    onUpgradeAccountClick: () -> Unit,
-    isBusinessAccountActive: Boolean?,
 ) {
     Column(
         modifier = modifier
             .fillMaxWidth()
-            .conditional(isBusinessAccountActive != false) {
-                clickable {
-                    if (isProAccount || isBusinessAccountActive == true) {
-                        onAddTagClick()
-                        Analytics.tracker.trackEvent(NodeInfoTagsEnteredEvent)
-                    } else {
-                        onUpgradeAccountClick()
-                        Analytics.tracker.trackEvent(NodeInfoTagsProOnlyEnteredEvent)
-                    }
+            .clickable {
+                if (canEditTags) {
+                    onAddTagClick()
+                    Analytics.tracker.trackEvent(NodeInfoTagsEnteredEvent)
                 }
             }
     ) {
-        if (tags.isEmpty() && isBusinessAccountActive == false) {
-            MegaText(
-                modifier = Modifier.padding(horizontal = 16.dp),
-                text = stringResource(id = sharedR.string.file_info_information_tags_label),
-                textColor = TextColor.Primary,
-                style = MaterialTheme.typography.subtitle1,
-            )
-            MegaText(
-                modifier = Modifier.padding(horizontal = 16.dp),
-                text = stringResource(id = sharedR.string.file_info_information_no_tags_label),
-                textColor = TextColor.Secondary,
-                style = MaterialTheme.typography.subtitle2,
-            )
-        } else {
-            MenuActionListTile(
-                text = stringResource(id = sharedR.string.file_info_information_tags_label),
-                dividerType = null,
-                addIconPadding = false,
-                trailingItem = {
-                    if (isProAccount || isBusinessAccountActive == true) {
-                        Icon(
-                            imageVector = ImageVector.vectorResource(id = iconPackR.drawable.ic_chevron_right_medium_regular_outline),
-                            contentDescription = "Add Tag",
-                            modifier = Modifier.size(24.dp),
-                            tint = MaterialTheme.colors.grey_alpha_038_white_alpha_038,
-                        )
-                    } else if (isBusinessAccountActive == false) {
-                        Spacer(modifier = Modifier.size(24.dp))
-                    } else {
-                        MegaText(
-                            text = stringResource(id = R.string.general_pro_only),
-                            textColor = TextColor.Accent,
-                        )
-                    }
-                },
-            )
-
-            FlowRow(
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .padding(horizontal = 16.dp),
-                horizontalArrangement = Arrangement.spacedBy(8.dp),
-            ) {
-                repeat(tags.size) { tag ->
-                    MegaChip(
-                        selected = false,
-                        text = "#${tags[tag]}",
-                        enabled = true,
-                        style = TransparentChipStyle,
+        MenuActionListTile(
+            text = stringResource(id = sharedR.string.file_info_information_tags_label),
+            dividerType = null,
+            addIconPadding = false,
+            trailingItem = if (canEditTags) {
+                {
+                    Icon(
+                        imageVector = ImageVector.vectorResource(id = iconPackR.drawable.ic_chevron_right_medium_regular_outline),
+                        contentDescription = "Add Tag",
+                        modifier = Modifier.size(24.dp),
+                        tint = MaterialTheme.colors.grey_alpha_038_white_alpha_038,
                     )
                 }
+            } else null,
+        )
+
+        FlowRow(
+            modifier = Modifier
+                .fillMaxWidth()
+                .padding(horizontal = 16.dp),
+            horizontalArrangement = Arrangement.spacedBy(8.dp),
+        ) {
+            repeat(tags.size) { tag ->
+                MegaChip(
+                    selected = false,
+                    text = "#${tags[tag]}",
+                    enabled = true,
+                    style = TransparentChipStyle,
+                )
             }
-            Spacer(modifier = Modifier.height(8.dp))
         }
+        Spacer(modifier = Modifier.height(8.dp))
     }
 }
 
@@ -131,14 +97,12 @@ fun FileInfoTagsView(
 private fun FileInfoTagsViewPreview(
     @PreviewParameter(BooleanProvider::class) isProAccount: Boolean,
 ) {
-    OriginalTempTheme(isDark = isSystemInDarkTheme()) {
+    OriginalTheme(isDark = isSystemInDarkTheme()) {
         FileInfoTagsView(
             tags = listOf("Tag", "SampleTag", "Tag1", "Tag2", "Tag3", "Tag4", "Tag5"),
             onAddTagClick = {},
             modifier = Modifier,
-            isProAccount = isProAccount,
-            onUpgradeAccountClick = {},
-            isBusinessAccountActive = isProAccount,
+            canEditTags = true,
         )
     }
 }
@@ -148,14 +112,12 @@ private fun FileInfoTagsViewPreview(
 private fun FileInfoTagsViewDeactivatedBusinessAccountPreview(
     @PreviewParameter(BooleanProvider::class) isBusinessAccountActive: Boolean,
 ) {
-    OriginalTempTheme(isDark = isSystemInDarkTheme()) {
+    OriginalTheme(isDark = isSystemInDarkTheme()) {
         FileInfoTagsView(
             tags = listOf("Tag", "SampleTag", "Tag1", "Tag2", "Tag3", "Tag4", "Tag5"),
             onAddTagClick = {},
             modifier = Modifier,
-            isProAccount = false,
-            onUpgradeAccountClick = {},
-            isBusinessAccountActive = isBusinessAccountActive,
+            canEditTags = true,
         )
     }
 }

@@ -13,7 +13,7 @@ import androidx.compose.ui.text.SpanStyle
 import androidx.compose.ui.text.style.TextDecoration
 import mega.privacy.android.app.R
 import mega.privacy.android.app.utils.Constants.TAKEDOWN_URL
-import mega.privacy.android.shared.original.core.ui.theme.OriginalTempTheme
+import mega.privacy.android.shared.original.core.ui.theme.OriginalTheme
 import mega.privacy.android.shared.original.core.ui.controls.banners.WarningBanner
 import mega.privacy.android.shared.original.core.ui.model.SpanIndicator
 import mega.privacy.android.shared.original.core.ui.preview.CombinedTextAndThemePreviews
@@ -59,7 +59,7 @@ internal fun TakeDownWarningView(
 @CombinedTextAndThemePreviews
 @Composable
 private fun TakeDownWarningPreview() {
-    OriginalTempTheme(isDark = isSystemInDarkTheme()) {
+    OriginalTheme(isDark = isSystemInDarkTheme()) {
         var file by remember { mutableStateOf(true) }
         TakeDownWarningView(isFile = file, onLinkClick = {
             file = !file

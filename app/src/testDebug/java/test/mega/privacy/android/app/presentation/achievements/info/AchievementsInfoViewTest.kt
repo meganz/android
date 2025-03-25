@@ -19,7 +19,7 @@ import mega.privacy.android.app.presentation.achievements.info.util.toAchievemen
 import mega.privacy.android.app.presentation.achievements.info.view.AchievementsInfoView
 import mega.privacy.android.app.presentation.achievements.info.view.AchievementsInfoViewTestTags
 import mega.privacy.android.domain.entity.achievement.AchievementType
-import mega.privacy.android.shared.original.core.ui.theme.OriginalTempTheme
+import mega.privacy.android.shared.original.core.ui.theme.OriginalTheme
 import mega.privacy.android.shared.original.core.ui.theme.red_300
 import mega.privacy.android.shared.original.core.ui.theme.red_600
 import org.junit.Rule
@@ -182,7 +182,7 @@ class AchievementsInfoViewTest {
         val expectedType = achievementType.random()
 
         composeTestRule.setContent {
-            OriginalTempTheme(isDark = false) {
+            OriginalTheme(isDark = false) {
                 AchievementsInfoView(
                     modifier = Modifier,
                     uiState = AchievementsInfoUIState(
@@ -205,7 +205,7 @@ class AchievementsInfoViewTest {
         val expectedType = achievementType.random()
 
         composeTestRule.setContent {
-            OriginalTempTheme(isDark = true) {
+            OriginalTheme(isDark = true) {
                 AchievementsInfoView(
                     modifier = Modifier,
                     uiState = AchievementsInfoUIState(
@@ -233,7 +233,7 @@ class AchievementsInfoViewTest {
 
         composeTestRule.setContent {
             context = LocalContext.current
-            OriginalTempTheme(isDark = true) {
+            OriginalTheme(isDark = true) {
                 AchievementsInfoView(
                     modifier = Modifier,
                     uiState = AchievementsInfoUIState(

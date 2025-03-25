@@ -8,7 +8,6 @@ import androidx.compose.ui.test.assertIsDisplayed
 import androidx.compose.ui.test.assertIsNotDisplayed
 import androidx.compose.ui.test.assertTextEquals
 import androidx.compose.ui.test.junit4.createAndroidComposeRule
-import androidx.compose.ui.test.onAllNodesWithText
 import androidx.compose.ui.test.onNodeWithTag
 import androidx.compose.ui.test.onNodeWithText
 import androidx.compose.ui.test.performClick
@@ -21,19 +20,29 @@ import mega.privacy.android.domain.entity.node.NodeId
 import mega.privacy.android.domain.entity.sync.SyncType
 import mega.privacy.android.feature.sync.domain.entity.SyncStatus
 import mega.privacy.android.feature.sync.ui.model.SyncUiItem
-import mega.privacy.android.feature.sync.ui.synclist.folders.REMOVE_BACKUP_FOLDER_CONFIRM_DIALOG_TEST_TAG
-import mega.privacy.android.feature.sync.ui.synclist.folders.REMOVE_SYNC_FOLDER_CONFIRM_DIALOG_TEST_TAG
-import mega.privacy.android.feature.sync.ui.synclist.folders.RemoveSyncFolderConfirmDialog
+import mega.privacy.android.feature.sync.ui.stopbackup.STOP_BACKUP_CONFIRMATION_DIALOG_BODY_TEST_TAG
+import mega.privacy.android.feature.sync.ui.stopbackup.STOP_BACKUP_CONFIRMATION_DIALOG_DELETE_OPTION_ROW_TEST_TAG
+import mega.privacy.android.feature.sync.ui.stopbackup.STOP_BACKUP_CONFIRMATION_DIALOG_MOVE_OPTION_ROW_TEST_TAG
+import mega.privacy.android.feature.sync.ui.stopbackup.StopBackupConfirmationDialogBody
+import mega.privacy.android.feature.sync.ui.stopbackup.model.StopBackupState
+import mega.privacy.android.feature.sync.ui.synclist.folders.STOP_SYNC_CONFIRM_DIALOG_TEST_TAG
+
+import mega.privacy.android.feature.sync.ui.synclist.folders.StopSyncConfirmDialog
 import mega.privacy.android.feature.sync.ui.synclist.folders.SyncFoldersRoute
 import mega.privacy.android.feature.sync.ui.synclist.folders.SyncFoldersScreen
-import mega.privacy.android.feature.sync.ui.synclist.folders.SyncFoldersState
+import mega.privacy.android.feature.sync.ui.synclist.folders.SyncFoldersUiState
 import mega.privacy.android.feature.sync.ui.synclist.folders.SyncFoldersViewModel
-import mega.privacy.android.feature.sync.ui.synclist.folders.TEST_TAG_SYNC_LIST_SCREEN_EMPTY_STATUS_BUTTON
-import mega.privacy.android.feature.sync.ui.synclist.folders.TEST_TAG_SYNC_LIST_SCREEN_EMPTY_STATUS_TEXT_FOR_FREE_ACCOUNTS
+import mega.privacy.android.feature.sync.ui.synclist.folders.TEST_TAG_SYNC_LIST_SCREEN_EMPTY_STATUS_BACKUP_BUTTON
+import mega.privacy.android.feature.sync.ui.synclist.folders.TEST_TAG_SYNC_LIST_SCREEN_EMPTY_STATUS_SYNC_BUTTON
+import mega.privacy.android.feature.sync.ui.synclist.folders.TEST_TAG_SYNC_LIST_SCREEN_FAB
 import mega.privacy.android.feature.sync.ui.synclist.folders.TEST_TAG_SYNC_LIST_SCREEN_LOADING_STATE
 import mega.privacy.android.feature.sync.ui.views.TAG_SYNC_LIST_SCREEN_NO_ITEMS
 import mega.privacy.android.feature.sync.ui.views.TEST_TAG_SYNC_ITEM_VIEW
-import mega.privacy.mobile.analytics.event.SyncListEmptyStateUpgradeButtonPressedEvent
+import mega.privacy.android.shared.original.core.ui.controls.dialogs.internal.CANCEL_TAG
+import mega.privacy.android.shared.original.core.ui.controls.dialogs.internal.CONFIRM_TAG
+import mega.privacy.android.shared.original.core.ui.controls.dialogs.internal.TITLE_TAG
+import mega.privacy.mobile.analytics.event.SyncCardExpandedEvent
+import mega.privacy.mobile.analytics.event.SyncFoldersListDisplayedEvent
 import org.junit.Rule
 import org.junit.Test
 import org.junit.rules.RuleChain
@@ -54,12 +63,12 @@ class SyncFoldersScreenTest {
 
     private val context: Context = InstrumentationRegistry.getInstrumentation().targetContext
     private val viewModel: SyncFoldersViewModel = Mockito.mock()
-    private val state: StateFlow<SyncFoldersState> = Mockito.mock()
+    private val state: StateFlow<SyncFoldersUiState> = Mockito.mock()
 
     @Test
     fun `test that folders list is displayed when there are folders`() {
         val folderName = "Folder name"
-        val syncFoldersState = SyncFoldersState(
+        val syncFoldersUiState = SyncFoldersUiState(
             listOf(
                 SyncUiItem(
                     id = 1L,
@@ -75,19 +84,21 @@ class SyncFoldersScreenTest {
             )
         )
         whenever(state.value).thenReturn(
-            syncFoldersState
+            syncFoldersUiState
         )
         whenever(viewModel.uiState).thenReturn(state)
         composeTestRule.setContent {
             SyncFoldersRoute(
                 viewModel = viewModel,
-                addFolderClicked = {},
-                upgradeAccountClicked = {},
+                onSelectStopBackupDestinationClicked = {},
+                onAddNewSyncClicked = {},
+                onAddNewBackupClicked = {},
                 issuesInfoClicked = {},
-                state = syncFoldersState,
+                onOpenMegaFolderClicked = {},
+                onCameraUploadsSettingsClicked = {},
+                uiState = syncFoldersUiState,
                 snackBarHostState = SnackbarHostState(),
                 deviceName = "Device Name",
-                isBackupForAndroidEnabled = false,
             )
         }
 
@@ -96,169 +107,64 @@ class SyncFoldersScreenTest {
     }
 
     @Test
-    fun `test that folders list empty state is properly displayed when there are no synced folders (free account)`() {
-        whenever(state.value).thenReturn(SyncFoldersState(emptyList()))
-        whenever(viewModel.uiState).thenReturn(state)
-        composeTestRule.setContent {
-            SyncFoldersRoute(
-                viewModel = viewModel,
-                addFolderClicked = {},
-                upgradeAccountClicked = {},
-                issuesInfoClicked = {},
-                state = SyncFoldersState(emptyList()),
-                snackBarHostState = SnackbarHostState(),
-                deviceName = "Device Name",
-                isBackupForAndroidEnabled = false,
-            )
-        }
-
-        composeTestRule.onNodeWithTag(TEST_TAG_SYNC_ITEM_VIEW)
-            .assertDoesNotExist()
-        composeTestRule.onNodeWithTag(TAG_SYNC_LIST_SCREEN_NO_ITEMS)
-            .assertIsDisplayed()
-        composeTestRule.onNodeWithTag(TEST_TAG_SYNC_LIST_SCREEN_EMPTY_STATUS_TEXT_FOR_FREE_ACCOUNTS)
-            .assertIsDisplayed()
-        composeTestRule.onNodeWithTag(TEST_TAG_SYNC_LIST_SCREEN_EMPTY_STATUS_BUTTON)
-            .assertIsDisplayed()
-            .assertTextEquals(context.getString(sharedResR.string.general_upgrade_now_label))
-    }
-
-    @Test
-    fun `test that folders list empty state is properly displayed when backup feature is enabled (free account)`() {
-        whenever(state.value).thenReturn(SyncFoldersState(emptyList()))
-        whenever(viewModel.uiState).thenReturn(state)
-        composeTestRule.setContent {
-            SyncFoldersRoute(
-                viewModel = viewModel,
-                addFolderClicked = {},
-                upgradeAccountClicked = {},
-                issuesInfoClicked = {},
-                state = SyncFoldersState(emptyList()),
-                snackBarHostState = SnackbarHostState(),
-                deviceName = "Device Name",
-                isBackupForAndroidEnabled = true,
-            )
-        }
-
-        composeTestRule.onNodeWithTag(TEST_TAG_SYNC_ITEM_VIEW)
-            .assertDoesNotExist()
-        composeTestRule.onNodeWithTag(TAG_SYNC_LIST_SCREEN_NO_ITEMS)
-            .assertIsDisplayed()
-        composeTestRule.onNodeWithTag(TEST_TAG_SYNC_LIST_SCREEN_EMPTY_STATUS_TEXT_FOR_FREE_ACCOUNTS)
-            .assertIsNotDisplayed()
-        composeTestRule.onNodeWithTag(TEST_TAG_SYNC_LIST_SCREEN_EMPTY_STATUS_BUTTON)
-            .assertIsDisplayed()
-            .assertTextEquals(context.getString(sharedResR.string.device_center_sync_backup_see_upgrade_options_button_label))
-    }
-
-    @Test
-    fun `test that folders list empty state is properly displayed when there are no synced folders (non free account)`() {
-        whenever(state.value).thenReturn(
-            SyncFoldersState(
-                syncUiItems = emptyList(), isFreeAccount = false
-            )
+    fun `test that folders list empty state is properly displayed when there are no synced folders`() {
+        val syncFoldersUiState = SyncFoldersUiState(
+            syncUiItems = emptyList(),
         )
+        whenever(state.value).thenReturn(syncFoldersUiState)
         whenever(viewModel.uiState).thenReturn(state)
         composeTestRule.setContent {
             SyncFoldersRoute(
                 viewModel = viewModel,
-                addFolderClicked = {},
-                upgradeAccountClicked = {},
+                onAddNewSyncClicked = {},
+                onAddNewBackupClicked = {},
+                onSelectStopBackupDestinationClicked = {},
                 issuesInfoClicked = {},
-                state = SyncFoldersState(
-                    syncUiItems = emptyList(), isFreeAccount = false
-                ),
+                uiState = syncFoldersUiState,
                 snackBarHostState = SnackbarHostState(),
                 deviceName = "Device Name",
-                isBackupForAndroidEnabled = false,
+                onOpenMegaFolderClicked = {},
+                onCameraUploadsSettingsClicked = {},
             )
         }
 
         composeTestRule.onNodeWithTag(TEST_TAG_SYNC_ITEM_VIEW).assertDoesNotExist()
         composeTestRule.onNodeWithTag(TAG_SYNC_LIST_SCREEN_NO_ITEMS).assertIsDisplayed()
-        composeTestRule.onNodeWithTag(TEST_TAG_SYNC_LIST_SCREEN_EMPTY_STATUS_TEXT_FOR_FREE_ACCOUNTS)
-            .assertIsNotDisplayed()
-        composeTestRule.onNodeWithTag(TEST_TAG_SYNC_LIST_SCREEN_EMPTY_STATUS_BUTTON)
+        composeTestRule.onNodeWithTag(TEST_TAG_SYNC_LIST_SCREEN_EMPTY_STATUS_SYNC_BUTTON)
             .assertIsDisplayed()
             .assertTextEquals(context.getString(sharedResR.string.device_center_sync_add_new_syn_button_option))
+        composeTestRule.onNodeWithTag(TEST_TAG_SYNC_LIST_SCREEN_EMPTY_STATUS_BACKUP_BUTTON)
+            .assertIsDisplayed()
+            .assertTextEquals(context.getString(sharedResR.string.device_center_sync_add_new_backup_button_option))
+        composeTestRule.onNodeWithTag(TEST_TAG_SYNC_LIST_SCREEN_FAB).assertIsNotDisplayed()
     }
 
     @Test
-    fun `test that folders list empty state is properly displayed when backup feature is enabled (non free account)`() {
-        whenever(state.value).thenReturn(
-            SyncFoldersState(
-                syncUiItems = emptyList(), isFreeAccount = false
-            )
+    fun `test that click the empty state buttons don't send any analytics tracker event`() {
+        val syncFoldersUiState = SyncFoldersUiState(
+            syncUiItems = emptyList(),
         )
+        whenever(state.value).thenReturn(syncFoldersUiState)
         whenever(viewModel.uiState).thenReturn(state)
         composeTestRule.setContent {
             SyncFoldersRoute(
                 viewModel = viewModel,
-                addFolderClicked = {},
-                upgradeAccountClicked = {},
+                onAddNewSyncClicked = {},
+                onAddNewBackupClicked = {},
+                onSelectStopBackupDestinationClicked = {},
                 issuesInfoClicked = {},
-                state = SyncFoldersState(
-                    syncUiItems = emptyList(), isFreeAccount = false
-                ),
+                uiState = syncFoldersUiState,
                 snackBarHostState = SnackbarHostState(),
                 deviceName = "Device Name",
-                isBackupForAndroidEnabled = true,
+                onOpenMegaFolderClicked = {},
+                onCameraUploadsSettingsClicked = {},
             )
         }
 
-        composeTestRule.onNodeWithTag(TEST_TAG_SYNC_ITEM_VIEW).assertDoesNotExist()
-        composeTestRule.onNodeWithTag(TAG_SYNC_LIST_SCREEN_NO_ITEMS).assertIsDisplayed()
-        composeTestRule.onNodeWithTag(TEST_TAG_SYNC_LIST_SCREEN_EMPTY_STATUS_TEXT_FOR_FREE_ACCOUNTS)
-            .assertIsNotDisplayed()
-        composeTestRule.onNodeWithTag(TEST_TAG_SYNC_LIST_SCREEN_EMPTY_STATUS_BUTTON)
-            .assertDoesNotExist()
-    }
-
-    @Test
-    fun `test that click the empty state button on a free account sends the right analytics tracker event`() {
-        whenever(state.value).thenReturn(SyncFoldersState(emptyList()))
-        whenever(viewModel.uiState).thenReturn(state)
-        composeTestRule.setContent {
-            SyncFoldersRoute(
-                viewModel = viewModel,
-                addFolderClicked = {},
-                upgradeAccountClicked = {},
-                issuesInfoClicked = {},
-                state = SyncFoldersState(emptyList()),
-                snackBarHostState = SnackbarHostState(),
-                deviceName = "Device Name",
-                isBackupForAndroidEnabled = false,
-            )
-        }
-
-        composeTestRule.onNodeWithTag(TEST_TAG_SYNC_LIST_SCREEN_EMPTY_STATUS_BUTTON).performClick()
-        assertThat(analyticsRule.events).contains(SyncListEmptyStateUpgradeButtonPressedEvent)
-    }
-
-    @Test
-    fun `test that click the empty state button on a non free account doesn't send any analytics tracker event`() {
-        whenever(state.value).thenReturn(
-            SyncFoldersState(
-                syncUiItems = emptyList(), isFreeAccount = false
-            )
-        )
-        whenever(viewModel.uiState).thenReturn(state)
-        composeTestRule.setContent {
-            SyncFoldersRoute(
-                viewModel = viewModel,
-                addFolderClicked = {},
-                upgradeAccountClicked = {},
-                issuesInfoClicked = {},
-                state = SyncFoldersState(
-                    syncUiItems = emptyList(), isFreeAccount = false
-                ),
-                snackBarHostState = SnackbarHostState(),
-                deviceName = "Device Name",
-                isBackupForAndroidEnabled = false,
-            )
-        }
-
-        composeTestRule.onNodeWithTag(TEST_TAG_SYNC_LIST_SCREEN_EMPTY_STATUS_BUTTON).performClick()
+        composeTestRule.onNodeWithTag(TEST_TAG_SYNC_LIST_SCREEN_EMPTY_STATUS_SYNC_BUTTON)
+            .performClick()
+        composeTestRule.onNodeWithTag(TEST_TAG_SYNC_LIST_SCREEN_EMPTY_STATUS_BACKUP_BUTTON)
+            .performClick()
         assertThat(analyticsRule.events).isEmpty()
     }
 
@@ -270,33 +176,30 @@ class SyncFoldersScreenTest {
                 cardExpanded = {},
                 pauseRunClicked = {},
                 removeFolderClicked = {},
-                addFolderClicked = {},
-                upgradeAccountClicked = {},
+                onAddNewSyncClicked = {},
+                onAddNewBackupClicked = {},
                 issuesInfoClicked = {},
                 onOpenDeviceFolderClicked = {},
+                onOpenMegaFolderClicked = {},
+                onCameraUploadsSettingsClicked = {},
                 isLowBatteryLevel = false,
-                isFreeAccount = false,
                 isLoading = true,
-                showSyncsPausedErrorDialog = false,
-                onShowSyncsPausedErrorDialogDismissed = {},
                 deviceName = "Device Name",
-                isBackupForAndroidEnabled = false,
             )
         }
         composeTestRule.onNodeWithTag(TEST_TAG_SYNC_LIST_SCREEN_LOADING_STATE).assertIsDisplayed()
     }
 
     @Test
-    fun `test that remove sync folder confirm dialog is properly displayed `() {
+    fun `test that stop sync confirm dialog is properly displayed `() {
         composeTestRule.setContent {
-            RemoveSyncFolderConfirmDialog(
-                syncType = SyncType.TYPE_TWOWAY,
+            StopSyncConfirmDialog(
                 onConfirm = {},
-                onDismiss = {}
+                onDismiss = {},
             )
         }
 
-        composeTestRule.onNodeWithTag(REMOVE_SYNC_FOLDER_CONFIRM_DIALOG_TEST_TAG)
+        composeTestRule.onNodeWithTag(STOP_SYNC_CONFIRM_DIALOG_TEST_TAG)
             .assertIsDisplayed()
         composeTestRule.onNodeWithText(composeTestRule.activity.getString(sharedResR.string.sync_stop_sync_confirm_dialog_title))
             .assertIsDisplayed()
@@ -309,36 +212,139 @@ class SyncFoldersScreenTest {
     }
 
     @Test
-    fun `test that remove backup folder confirm dialog is properly displayed `() {
+    fun `test that stop backup confirm dialog is properly displayed `() {
         composeTestRule.setContent {
-            RemoveSyncFolderConfirmDialog(
-                syncType = SyncType.TYPE_BACKUP,
-                onConfirm = {},
-                onDismiss = {}
+            StopBackupConfirmationDialogBody(
+                state = StopBackupState(),
+                onConfirm = { _, _ -> },
+                onDismiss = {},
+                onSelectStopBackupDestinationClicked = {},
             )
         }
-        val syncStopBackupConfirmDialogTitle =
-            composeTestRule.activity.getString(sharedResR.string.sync_stop_backup_confirm_dialog_title)
-        val syncStopBackupButton =
-            composeTestRule.activity.getString(sharedResR.string.sync_stop_backup_button)
-        if (syncStopBackupConfirmDialogTitle == syncStopBackupButton) {
-            composeTestRule.onAllNodesWithText(syncStopBackupConfirmDialogTitle).let { nodes ->
-                nodes[0].assertIsDisplayed()
-                nodes[1].assertIsDisplayed()
-            }
-        } else {
-            composeTestRule.onNodeWithText(composeTestRule.activity.getString(sharedResR.string.sync_stop_backup_confirm_dialog_title))
-                .assertIsDisplayed()
-            composeTestRule.onNodeWithText(composeTestRule.activity.getString(sharedResR.string.sync_stop_backup_button))
-                .assertIsDisplayed()
-        }
+        composeTestRule.onNodeWithTag(TITLE_TAG).assertIsDisplayed()
+        composeTestRule.onNodeWithTag(STOP_BACKUP_CONFIRMATION_DIALOG_BODY_TEST_TAG)
+            .assertIsDisplayed()
+        composeTestRule.onNodeWithTag(STOP_BACKUP_CONFIRMATION_DIALOG_MOVE_OPTION_ROW_TEST_TAG)
+            .assertIsDisplayed()
+        composeTestRule.onNodeWithTag(STOP_BACKUP_CONFIRMATION_DIALOG_DELETE_OPTION_ROW_TEST_TAG)
+            .assertIsDisplayed()
+        composeTestRule.onNodeWithTag(CANCEL_TAG).assertIsDisplayed()
+        composeTestRule.onNodeWithTag(CONFIRM_TAG).assertIsDisplayed()
+    }
 
-        composeTestRule.onNodeWithTag(REMOVE_BACKUP_FOLDER_CONFIRM_DIALOG_TEST_TAG)
-            .assertIsDisplayed()
-        composeTestRule.onNodeWithText(composeTestRule.activity.getString(sharedResR.string.sync_stop_backup_confirm_dialog_message))
-            .assertIsDisplayed()
-            .assertIsDisplayed()
-        composeTestRule.onNodeWithText(composeTestRule.activity.getString(sharedResR.string.general_dialog_cancel_button))
-            .assertIsDisplayed()
+    @Test
+    fun `test that display the list of Sync Folders send the right analytics tracker event`() {
+        composeTestRule.setContent {
+            SyncFoldersScreen(
+                syncUiItems = listOf(
+                    SyncUiItem(
+                        id = 1L,
+                        syncType = SyncType.TYPE_TWOWAY,
+                        folderPairName = "Sync Name",
+                        status = SyncStatus.SYNCING,
+                        deviceStoragePath = "Device Path",
+                        hasStalledIssues = false,
+                        megaStoragePath = "MEGA Path",
+                        megaStorageNodeId = NodeId(1111L),
+                        expanded = false,
+                    ),
+                    SyncUiItem(
+                        id = 2L,
+                        syncType = SyncType.TYPE_BACKUP,
+                        folderPairName = "Backup Name",
+                        status = SyncStatus.SYNCING,
+                        deviceStoragePath = "Device Path",
+                        hasStalledIssues = false,
+                        megaStoragePath = "MEGA Path",
+                        megaStorageNodeId = NodeId(2222L),
+                        expanded = false,
+                    )
+                ),
+                cardExpanded = {},
+                pauseRunClicked = {},
+                removeFolderClicked = {},
+                onAddNewSyncClicked = {},
+                onAddNewBackupClicked = {},
+                issuesInfoClicked = {},
+                onOpenDeviceFolderClicked = {},
+                onOpenMegaFolderClicked = {},
+                onCameraUploadsSettingsClicked = {},
+                isLowBatteryLevel = false,
+                isLoading = false,
+                deviceName = "Device Name",
+            )
+        }
+        assertThat(analyticsRule.events).contains(SyncFoldersListDisplayedEvent)
+    }
+
+    @Test
+    fun `test that expand a Sync card sends the right analytics tracker event`() {
+        composeTestRule.setContent {
+            SyncFoldersScreen(
+                syncUiItems = listOf(
+                    SyncUiItem(
+                        id = 1L,
+                        syncType = SyncType.TYPE_TWOWAY,
+                        folderPairName = "Sync Name",
+                        status = SyncStatus.SYNCING,
+                        deviceStoragePath = "Device Path",
+                        hasStalledIssues = false,
+                        megaStoragePath = "MEGA Path",
+                        megaStorageNodeId = NodeId(1111L),
+                        expanded = false,
+                    ),
+                ),
+                cardExpanded = {},
+                pauseRunClicked = {},
+                removeFolderClicked = {},
+                onAddNewSyncClicked = {},
+                onAddNewBackupClicked = {},
+                issuesInfoClicked = {},
+                onOpenDeviceFolderClicked = {},
+                onOpenMegaFolderClicked = {},
+                onCameraUploadsSettingsClicked = {},
+                isLowBatteryLevel = false,
+                isLoading = false,
+                deviceName = "Device Name",
+            )
+        }
+        composeTestRule.onNodeWithTag(TEST_TAG_SYNC_ITEM_VIEW).assertIsDisplayed().performClick()
+        assertThat(analyticsRule.events).contains(SyncCardExpandedEvent)
+    }
+
+    @Test
+    fun `test that collapse a Sync card does not send any analytics tracker event `() {
+        composeTestRule.setContent {
+            SyncFoldersScreen(
+                syncUiItems = listOf(
+                    SyncUiItem(
+                        id = 1L,
+                        syncType = SyncType.TYPE_TWOWAY,
+                        folderPairName = "Sync Name",
+                        status = SyncStatus.SYNCING,
+                        deviceStoragePath = "Device Path",
+                        hasStalledIssues = false,
+                        megaStoragePath = "MEGA Path",
+                        megaStorageNodeId = NodeId(1111L),
+                        expanded = true,
+                    ),
+                ),
+                cardExpanded = {},
+                pauseRunClicked = {},
+                removeFolderClicked = {},
+                onAddNewSyncClicked = {},
+                onAddNewBackupClicked = {},
+                issuesInfoClicked = {},
+                onOpenDeviceFolderClicked = {},
+                onOpenMegaFolderClicked = {},
+                onCameraUploadsSettingsClicked = {},
+                isLowBatteryLevel = false,
+                isLoading = false,
+                deviceName = "Device Name",
+            )
+        }
+        analyticsRule.events.clear()
+        composeTestRule.onNodeWithTag(TEST_TAG_SYNC_ITEM_VIEW).assertIsDisplayed().performClick()
+        assertThat(analyticsRule.events).isEmpty()
     }
 }

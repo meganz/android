@@ -124,6 +124,7 @@ interface PhotosRepository {
         nodeId: NodeId,
         filterSvg: Boolean = true,
         includeRubbishBin: Boolean = false,
+        includeThumbnail: Boolean = true,
     ): ImageNode?
 
     /**
@@ -201,4 +202,14 @@ interface PhotosRepository {
      * Clear all image result from cache
      */
     fun clearImageResult(uncompletedOnly: Boolean)
+
+    /**
+     * Retrieve recent queries
+     */
+    suspend fun retrieveRecentQueries(): List<String>
+
+    /**
+     * Save search queries
+     */
+    suspend fun saveRecentQueries(queries: List<String>)
 }

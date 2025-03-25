@@ -26,6 +26,7 @@ import nz.mega.sdk.MegaSetList
 import nz.mega.sdk.MegaShare
 import nz.mega.sdk.MegaStringList
 import nz.mega.sdk.MegaStringMap
+import nz.mega.sdk.MegaSyncList
 import nz.mega.sdk.MegaTransfer
 import nz.mega.sdk.MegaTransferData
 import nz.mega.sdk.MegaTransferListenerInterface
@@ -49,6 +50,11 @@ interface MegaApiGateway {
      * Get Invalid Handle
      */
     fun getInvalidHandle(): Long
+
+    /**
+     * Get Invalid Affiliate type
+     */
+    fun getInvalidAffiliateType(): Int
 
     /**
      * Get Invalid Backup type
@@ -1892,39 +1898,6 @@ interface MegaApiGateway {
     )
 
     /**
-     * Submit a purchase receipt for verification
-     * <p>
-     * The associated request type with this request is MegaRequest::TYPE_SUBMIT_PURCHASE_RECEIPT
-     * Valid data in the MegaRequest object received on callbacks:
-     * - MegaRequest::getNumber - Returns the payment gateway
-     * - MegaRequest::getText - Returns the purchase receipt
-     * - MegaRequest::getNodeHandle - Returns the last public node handle accessed
-     * - MegaRequest::getParamType - Returns the type of lastPublicHandle
-     * - MegaRequest::getTransferredBytes - Returns the timestamp of the last access
-     *
-     * @param gateway              Payment gateway
-     *                             Currently supported payment gateways are:
-     *                             - MegaApi::PAYMENT_METHOD_ITUNES = 2
-     *                             - MegaApi::PAYMENT_METHOD_GOOGLE_WALLET = 3
-     *                             - MegaApi::PAYMENT_METHOD_WINDOWS_STORE = 13
-     * @param receipt              Purchase receipt
-     * @param lastPublicHandle     Last public node handle accessed by the user in the last 24h
-     * @param lastPublicHandleType Indicates the type of lastPublicHandle, valid values are:
-     *                             - MegaApi::AFFILIATE_TYPE_ID = 1
-     *                             - MegaApi::AFFILIATE_TYPE_CONTACT = 4
-     * @param lastAccessTimestamp  Timestamp of the last access
-     * @param listener             MegaRequestListener to track this request
-     */
-    fun submitPurchaseReceipt(
-        gateway: Int,
-        receipt: String?,
-        lastPublicHandle: Long,
-        lastPublicHandleType: Int,
-        lastAccessTimestamp: Long,
-        listener: MegaRequestListenerInterface,
-    )
-
-    /**
      * Set My Chat Files target folder.
      *
      *
@@ -1975,17 +1948,6 @@ interface MegaApiGateway {
      * @param listener MegaRequestListener to track this request
      */
     fun getFileVersionsOption(listener: MegaRequestListenerInterface)
-
-    /**
-     * Number of pending uploads
-     */
-    val numberOfPendingUploads: Int
-
-    /**
-     *
-     * Number of pending downloads.
-     */
-    val numberOfPendingDownloads: Int
 
     /**
      * Enable or disable file versioning
@@ -2057,16 +2019,6 @@ interface MegaApiGateway {
      * @param listener MegaRequestListener to track this request
      */
     fun changeEmail(email: String, listener: MegaRequestListenerInterface)
-
-    /**
-     * Reset the number of total uploads
-     * This function resets the number returned by MegaApi::getTotalUploads
-     */
-    @Deprecated(
-        "Function related to statistics will be reviewed in future updates to\n" +
-                "provide more data and avoid race conditions. They could change or be removed in the current form."
-    )
-    fun resetTotalUploads()
 
     /**
      * @brief Check if the logged in account is considered new
@@ -2741,10 +2693,28 @@ interface MegaApiGateway {
 
 
     /**
-     * Export a MegaNode
+     * Generate a public link of a file/folder in MEGA
      *
-     * @param node the MegaNode to export
-     * @param expireTime the time in seconds since epoch to set as expiry date
+     * The associated request type with this request is MegaRequest::TYPE_EXPORT
+     * Valid data in the MegaRequest object received on callbacks:
+     * - MegaRequest::getNodeHandle - Returns the handle of the node
+     * - MegaRequest::getAccess - Returns true
+     * - MegaRequest::getNumber - Returns expire time
+     * - MegaRequest::getFlag - Returns true if writable
+     * - MegaRequest::getTransferTag - Returns if share key is shared with mega
+     *
+     * Valid data in the MegaRequest object received in onRequestFinish when the error code
+     * is MegaError::API_OK:
+     * - MegaRequest::getLink - Public link
+     * - MegaRequest::getPrivateKey - Authentication token (only if writable=true)
+     * - MegaRequest::getPassword - Returns base64 encryption key used for share-key (only if
+     * writable=true and megaHosted=true)
+     *
+     * If the MEGA account is a business account and it's status is expired, onRequestFinish
+     * will be called with the error code MegaError::API_EBUSINESSPASTDUE.
+     *
+     * @param node MegaNode to get the public link
+     * @param expireTime Unix timestamp until the public link will be valid
      * @param listener MegaRequestListener to track this request
      */
     fun exportNode(
@@ -2806,9 +2776,11 @@ interface MegaApiGateway {
     fun getABTestValue(flag: String): Long
 
     /**
-     * Get banner quota time
+     * Get the time (in seconds) during which transfers will be stopped due to a bandwidth over quota
+     *
+     * @return Time (in seconds) during which transfers will be stopped, otherwise 0
      */
-    suspend fun getBannerQuotaTime(): Long
+    suspend fun getBandwidthOverQuotaDelay(): Long
 
     /**
      * Launches a request to stop sharing a file/folder
@@ -3607,4 +3579,84 @@ interface MegaApiGateway {
      * Enable request status monitor to receive EVENT_REQSTAT_PROGRESS events
      */
     fun enableRequestStatusMonitor()
+
+    /**
+     * Initialize the creation of a new MEGA account, with firstname and lastname
+     * <p>
+     * The associated request type with this request is MegaRequest::TYPE_CREATE_ACCOUNT.
+     * Valid data in the MegaRequest object received on callbacks:
+     * - MegaRequest::getEmail - Returns the email for the account
+     * - MegaRequest::getPassword - Returns the password for the account
+     * - MegaRequest::getName - Returns the firstname of the user
+     * - MegaRequest::getText - Returns the lastname of the user
+     * - MegaRequest::getParamType - Returns the value MegaApi::CREATE_ACCOUNT
+     * <p>
+     * Valid data in the MegaRequest object received in onRequestFinish when the error code
+     * is MegaError::API_OK:
+     * - MegaRequest::getSessionKey - Returns the session id to resume the process
+     * <p>
+     * If this request succeeds, a new ephemeral account will be created for the new user
+     * and a confirmation email will be sent to the specified email address. The app may
+     * resume the create-account process by using MegaApi::resumeCreateAccount.
+     * <p>
+     * If an account with the same email already exists, you will get the error code
+     * MegaError::API_EEXIST in onRequestFinish
+     *
+     * @param email     Email for the account
+     * @param password  Password for the account
+     * @param firstName Firstname of the user
+     * @param lastName  Lastname of the user
+     * @param listener  MegaRequestListener to track this request
+     */
+    fun createAccount(
+        email: String,
+        password: String,
+        firstName: String,
+        lastName: String,
+        listener: MegaRequestListenerInterface,
+    )
+
+    /**
+     * Creates the special folder for backups ("My backups")
+     *
+     * It creates a new folder inside the Vault rootnode and later stores the node's
+     * handle in a user's attribute, MegaApi::USER_ATTR_MY_BACKUPS_FOLDER.
+     *
+     * Apps should first check if this folder exists already, by calling
+     * MegaApi::getUserAttribute for the corresponding attribute.
+     *
+     * The associated request type with this request is MegaRequest::TYPE_SET_MY_BACKUPS
+     * Valid data in the MegaRequest object received on callbacks:
+     * - MegaRequest::getText - Returns the name provided as parameter
+     *
+     * Valid data in the MegaRequest object received in onRequestFinish when the error code
+     * is MegaError::API_OK:
+     * - MegaRequest::getNodehandle - Returns the node handle of the folder created
+     *
+     * If no user was logged in, the request will fail with the error API_EACCESS.
+     * If the folder for backups already existed, the request will fail with the error API_EEXIST.
+     *
+     * @param localizedName Localized name for "My backups" folder
+     * @param listener MegaRequestListener to track this request
+     */
+    fun setMyBackupsFolder(localizedName: String, listener: MegaRequestListenerInterface?)
+
+    /**
+     * Get all configured syncs
+     *
+     * @return List of MegaSync objects with all syncs
+     */
+    fun getSyncs(): MegaSyncList
+
+    /**
+     * Remove all versions from the MEGA account
+     * <p>
+     * The associated request type with this request is MegaRequest::TYPE_REMOVE_VERSIONS
+     * <p>
+     * When the request finishes, file versions might not be deleted yet.
+     * Deletions are notified using onNodesUpdate callbacks.
+     *
+     * @param listener MegaRequestListener to track this request
+     */
+    fun removeVersions(listener: MegaRequestListenerInterface)
 }

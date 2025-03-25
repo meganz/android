@@ -16,7 +16,7 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.viewinterop.AndroidView
 import mega.privacy.android.app.R
 import mega.privacy.android.shared.original.core.ui.preview.CombinedThemePreviews
-import mega.privacy.android.shared.original.core.ui.theme.OriginalTempTheme
+import mega.privacy.android.shared.original.core.ui.theme.OriginalTheme
 
 @Composable
 internal fun NumberPicker(
@@ -97,7 +97,7 @@ internal sealed interface NumberPickerScrollState {
 @CombinedThemePreviews
 @Composable
 private fun NumberPickerPreview() {
-    OriginalTempTheme(isDark = isSystemInDarkTheme()) {
+    OriginalTheme(isDark = isSystemInDarkTheme()) {
         NumberPicker(
             modifier = Modifier.size(500.dp)
         )

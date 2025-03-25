@@ -41,7 +41,7 @@ import mega.privacy.android.shared.original.core.ui.controls.dividers.MegaDivide
 import mega.privacy.android.shared.original.core.ui.controls.lists.NodeGridViewItem
 import mega.privacy.android.shared.original.core.ui.controls.lists.NodeListViewItem
 import mega.privacy.android.shared.original.core.ui.preview.CombinedThemePreviews
-import mega.privacy.android.shared.original.core.ui.theme.OriginalTempTheme
+import mega.privacy.android.shared.original.core.ui.theme.OriginalTheme
 
 /**
  * Scaffold for the Offline Flow Screen
@@ -249,7 +249,7 @@ internal fun getOfflineNodeDescription(offlineFileInformation: OfflineFileInform
 @CombinedThemePreviews
 @Composable
 private fun OfflineFeatureScreenPreview() {
-    OriginalTempTheme(isDark = isSystemInDarkTheme()) {
+    OriginalTheme(isDark = isSystemInDarkTheme()) {
         OfflineFeatureScreen(
             uiState = OfflineUiState(
                 isLoading = false,
@@ -298,7 +298,7 @@ private fun OfflineFeatureScreenPreview() {
 @CombinedThemePreviews
 @Composable
 private fun OfflineFeatureEmptyScreenPreview() {
-    OriginalTempTheme(isDark = isSystemInDarkTheme()) {
+    OriginalTheme(isDark = isSystemInDarkTheme()) {
         OfflineFeatureScreen(
             uiState = OfflineUiState(
                 isLoading = false,
@@ -317,7 +317,7 @@ private fun OfflineFeatureEmptyScreenPreview() {
 @CombinedThemePreviews
 @Composable
 private fun OfflineFeatureLoadingScreenPreview() {
-    OriginalTempTheme(isDark = isSystemInDarkTheme()) {
+    OriginalTheme(isDark = isSystemInDarkTheme()) {
         OfflineFeatureScreen(
             uiState = OfflineUiState(
                 isLoading = true,

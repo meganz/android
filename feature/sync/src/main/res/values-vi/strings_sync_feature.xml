@@ -26,8 +26,6 @@
     <plurals name="num_folders_num_files_2">
         <item quantity="other">%1$d tệp tin</item>
     </plurals>
-    <!-- Sync options -->
-    <string name="sync_menu_sync_options">Tùy&#160;chọn đồng&#160;bộ hóa</string>
     <!-- Sync text when need to solved stalled issues-->
     <string name="sync_menu_clear_issues">Dọn các vấn&#160;đề đã giải&#160;quyết</string>
     <!-- Sync message for two way sync-->
@@ -44,14 +42,10 @@
     <string name="sync_stalled_issue_choose_latest_modified_time">Chọn tệp&#160;tin được sửa&#160;đổi lần cuối&#160;cùng</string>
     <!-- Sync message when conflict resolved -->
     <string name="sync_stalled_issue_conflict_resolved">Mâu&#160;thuẫn được giải&#160;quyết</string>
-    <!-- Sync message to access storage permission on device -->
-    <string name="sync_access_storage_permission_message">Để sao lưu các tệp&#160;tin của bạn, MEGA cần truy&#160;cập vào các tệp&#160;tin và thư&#160;mục trong thiết&#160;bị này. Dữ&#160;liệu của bạn luôn an&#160;toàn với chúng&#160;tôi.</string>
     <!-- Sync dialog continue button -->
     <string name="sync_dialog_file_permission_positive_button">Tiếp tục</string>
     <!-- Sync dialog not now button -->
     <string name="sync_dialog_file_permission_negative_button">Không Phải Lúc Này</string>
-    <!-- Sync dialog title for storage access -->
-    <string name="sync_dialog_storage_access_title">Truy&#160;cập vào tất&#160;cả tệp&#160;tin</string>
     <!-- Sync dialog title for battery optimization -->
     <string name="sync_dialog_battery_optimization_title">Tối&#160;ưu hóa pin</string>
     <!-- Sync dialog cancel button text -->
@@ -70,8 +64,6 @@
     <string name="sync_list_sync_state_syncing">Đang đồng&#160;bộ&#8230;</string>
     <!-- Sync state failed -->
     <string name="sync_folders_sync_state_failed">Đã dừng</string>
-    <!-- Sync state synced -->
-    <string name="sync_list_sync_state_synced">Đã đồng&#160;bộ</string>
     <!-- Sync permission title for device storage -->
     <string name="sync_folders_device_storage">Thư&#160;mục thiết&#160;bị</string>
     <!-- Sync permission title for mega storage -->
@@ -82,22 +74,12 @@
     <string name="sync_card_pause_sync">Tạm dừng</string>
     <!-- Sync Run -->
     <string name="sync_card_run_sync">Tiếp tục phát</string>
-    <!-- Sync Remove -->
-    <string name="sync_card_remove_sync">Loại bỏ</string>
     <!-- Sync dialog for sync over Wi-Fi or mobile data -->
     <string name="sync_dialog_message_wifi_or_mobile_data">Dùng WiFi và mạng di động</string>
     <!-- Sync dialog for sync only over Wi-Fi -->
     <string name="sync_dialog_message_wifi_only">Chỉ lúc dùng Wi-Fi</string>
     <!-- Sync empty state message -->
     <string name="sync_empty_state_message">Bạn sẽ cần thiết&#160;lập một thư&#160;mục cục&#160;bộ trên thiết&#160;bị của mình sẽ đồng&#160;bộ hóa với một thư&#160;mục chọn ra trên Ổ&#160;Mây của bạn</string>
-    <!-- Sync notification title description sync monitoring-->
-    <string name="sync_notification_monitoring_description">Đang giám sát các đồng bộ</string>
-    <!-- Snackbar message shown when Wi-Fi only sync option is selected -->
-    <string name="sync_options_changed_to_wifi_only">Lựa chọn đồng bộ hóa đã thay đổi thành: Chỉ dùng Wi-Fi</string>
-    <!-- Snackbar message shown when Wi-Fi or mobile data sync option is selected -->
-    <string name="sync_options_changed_to_wifi_and_mobile_data">Lựa chọn đồng bộ hóa đã thay đổi thành: Dùng Wi-Fi hoặc dữ liệu di động</string>
-    <!-- Sync stalled issue reason is no reason-->
-    <string name="sync_stalled_issue_no_reason">No reason</string>
     <!-- Sync stalled issue reason is no file issue-->
     <string name="sync_stalled_issue_file_issue">Vấn&#160;đề tệp&#160;tin hoặc thư&#160;mục</string>
     <!-- Sync stalled issue reason is move or rename-->
@@ -124,8 +106,6 @@
     <string name="sync_stalled_issue_local_and_remote_not_synced">Xung đột tệp tin hoặc thư mục</string>
     <!-- Sync stalled issue reason is Name clash-->
     <string name="sync_stalled_issue_name_clash">Xung đột tên tệp tin hoặc thư mục</string>
-    <!-- Sync stalled issue reason is Last PlusOne-->
-    <string name="sync_stalled_issue_last_plus_one">Last plus one</string>
     <!-- Sync chip folder chip title-->
     <string name="sync_folders">Thư mục</string>
     <!-- Sync stalled issue count chip title for 1 or more stalled issues-->
@@ -137,11 +117,9 @@
     <!-- Text that indicates that a folder is currently empty -->
     <string name="sync_file_browser_empty_folder">Thư&#160;mục rỗng</string>
     <!-- Selecting a specific location in MEGA. This is the text of the button -->
-    <string name="sync_general_select_to_download">Chọn thư mục</string>
-    <!-- Selecting a specific location in MEGA. This is the text of the button -->
     <string name="sync_general_select">Chọn</string>
     <!-- Sync stalled issue reason is no file issue detailed description-->
-    <string name="sync_stalled_issue_file_issue_detail">Một mục gặp phải vấn&#160;đề và cần quyết&#160;định giải&#160;quyết của bạn</string>
+    <string name="sync_stalled_issue_file_issue_detail">Một mục có một vấn đề cần bạn quyết định để giải quyết</string>
     <!-- Sync stalled issue reason is delete or move detailed description-->
     <string name="sync_stalled_issue_delete_or_move_detail">Đang chờ các quy trình khác được hoàn&#160;thành</string>
     <!-- Sync stalled issue reason is upload issue detailed description-->
@@ -157,7 +135,7 @@
     <!-- Sync stalled issue reason is Folder Matched Against File detailed description-->
     <string name="sync_stalled_issue_folder_matched_against_file_detail">Tệp&#160;tin bạn đang cố đồng&#160;bộ hóa không có phần mở rộng dịnh&#160;dạng tệp và có cùng tên với một thư&#160;mục hiện có sẵn</string>
     <!-- Sync stalled issue reason is Local and remote changed since last sync detailed description-->
-    <string name="sync_stalled_issue_local_and_remote_change_last_sync_detail">Tệp&#160;tin này đã được thay&#160;đổi cả trên MEGA và cục&#160;bộ kể từ khi nó được đồng&#160;bộ hóa lần cuối.</string>
+    <string name="sync_stalled_issue_local_and_remote_change_last_sync_detail">Tệp này đã được thay đổi cả trong MEGA và cục bộ kể từ khi nó được đồng bộ hóa lần cuối.</string>
     <!-- Sync stalled issue reason is Local and remote not synced detailed description-->
     <string name="sync_stalled_issue_local_and_remote_not_synced_detail">Tệp tin này có các bản&#160;sao mâu&#160;thuẫn nhau</string>
     <!-- Sync stalled issue reason is Name clash detailed description-->

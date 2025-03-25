@@ -1,8 +1,9 @@
 package mega.privacy.android.app.nav
 
-import android.app.Activity
 import android.content.Context
 import android.content.Intent
+import android.net.Uri
+import androidx.activity.result.ActivityResultLauncher
 import androidx.core.net.toUri
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.launch
@@ -17,11 +18,15 @@ import mega.privacy.android.app.presentation.meeting.chat.model.EXTRA_ACTION
 import mega.privacy.android.app.presentation.meeting.chat.model.EXTRA_LINK
 import mega.privacy.android.app.presentation.meeting.chat.view.message.attachment.NodeContentUriIntentMapper
 import mega.privacy.android.app.presentation.meeting.managechathistory.view.screen.ManageChatHistoryActivity
+import mega.privacy.android.app.presentation.openlink.OpenLinkActivity
 import mega.privacy.android.app.presentation.settings.camerauploads.SettingsCameraUploadsActivity
+import mega.privacy.android.app.presentation.settings.compose.navigation.SettingsNavigatorImpl
 import mega.privacy.android.app.presentation.transfers.EXTRA_TAB
 import mega.privacy.android.app.presentation.transfers.TransfersActivity
 import mega.privacy.android.app.presentation.zipbrowser.ZipBrowserComposeActivity
 import mega.privacy.android.app.upgradeAccount.UpgradeAccountActivity
+import mega.privacy.android.app.uploadFolder.UploadFolderActivity
+import mega.privacy.android.app.uploadFolder.UploadFolderType
 import mega.privacy.android.app.utils.Constants
 import mega.privacy.android.app.utils.Constants.EXTRA_HANDLE_ZIP
 import mega.privacy.android.app.utils.Constants.EXTRA_PATH_ZIP
@@ -41,6 +46,7 @@ import mega.privacy.android.app.utils.Constants.INTENT_EXTRA_KEY_PARENT_ID
 import mega.privacy.android.app.utils.Constants.INTENT_EXTRA_KEY_PARENT_NODE_HANDLE
 import mega.privacy.android.app.utils.Constants.INTENT_EXTRA_KEY_PATH
 import mega.privacy.android.app.utils.Constants.INTENT_EXTRA_KEY_PLACEHOLDER
+import mega.privacy.android.app.utils.Constants.INTENT_EXTRA_KEY_VIDEO_ADD_TO_ALBUM
 import mega.privacy.android.app.utils.Constants.INTENT_EXTRA_KEY_VIDEO_COLLECTION_ID
 import mega.privacy.android.app.utils.Constants.INTENT_EXTRA_KEY_VIDEO_COLLECTION_TITLE
 import mega.privacy.android.app.utils.Constants.NODE_HANDLES
@@ -59,7 +65,9 @@ import mega.privacy.android.domain.usecase.featureflag.GetFeatureFlagValueUseCas
 import mega.privacy.android.domain.usecase.file.GetFileTypeInfoUseCase
 import mega.privacy.android.feature.sync.navigation.getSyncListRoute
 import mega.privacy.android.feature.sync.navigation.getSyncNewFolderRoute
+import mega.privacy.android.feature.sync.ui.SyncHostActivity
 import mega.privacy.android.navigation.MegaNavigator
+import mega.privacy.android.navigation.settings.SettingsNavigator
 import java.io.File
 import javax.inject.Inject
 
@@ -74,17 +82,12 @@ internal class MegaNavigatorImpl @Inject constructor(
     private val nodeContentUriIntentMapper: NodeContentUriIntentMapper,
     private val getFileTypeInfoUseCase: GetFileTypeInfoUseCase,
     private val getFileTypeInfoByNameUseCase: GetFileTypeInfoByNameUseCase,
+    private val settingsNavigator: SettingsNavigatorImpl,
 ) : MegaNavigator,
-    AppNavigatorImpl {
-    override fun openSettingsCameraUploads(activity: Activity) {
-        applicationScope.launch {
-            activity.startActivity(
-                Intent(
-                    activity,
-                    SettingsCameraUploadsActivity::class.java,
-                )
-            )
-        }
+    AppNavigatorImpl, SettingsNavigator by settingsNavigator {
+
+    override fun openSettingsCameraUploads(context: Context) {
+        context.startActivity(Intent(context, SettingsCameraUploadsActivity::class.java))
     }
 
     override fun openChat(
@@ -201,6 +204,7 @@ internal class MegaNavigatorImpl @Inject constructor(
         mediaQueueTitle: String?,
         collectionTitle: String?,
         collectionId: Long?,
+        enableAddToAlbum: Boolean,
     ) {
         manageMediaIntent(
             context = context,
@@ -216,7 +220,8 @@ internal class MegaNavigatorImpl @Inject constructor(
             searchedItems = searchedItems,
             mediaQueueTitle = mediaQueueTitle,
             collectionTitle = collectionTitle,
-            collectionId = collectionId
+            collectionId = collectionId,
+            enableAddToAlbum = enableAddToAlbum,
         )
     }
 
@@ -239,6 +244,7 @@ internal class MegaNavigatorImpl @Inject constructor(
         nodeHandles: List<Long>? = null,
         collectionTitle: String? = null,
         collectionId: Long? = null,
+        enableAddToAlbum: Boolean = false,
     ) {
         val intent = getIntent(context, fileTypeInfo).apply {
             putExtra(INTENT_EXTRA_KEY_ORDER_GET_CHILDREN, sortOrder)
@@ -278,6 +284,7 @@ internal class MegaNavigatorImpl @Inject constructor(
                 putExtra(INTENT_EXTRA_KEY_VIDEO_COLLECTION_ID, it)
             }
             addFlags(Intent.FLAG_ACTIVITY_SINGLE_TOP)
+            putExtra(INTENT_EXTRA_KEY_VIDEO_ADD_TO_ALBUM, enableAddToAlbum)
         }
         val mimeType =
             if (fileTypeInfo.extension == "opus") "audio/*" else fileTypeInfo.mimeType
@@ -398,6 +405,7 @@ internal class MegaNavigatorImpl @Inject constructor(
         searchedItems: List<Long>?,
         mediaQueueTitle: String?,
         nodeHandles: List<Long>?,
+        enableAddToAlbum: Boolean,
     ) {
         val info = fileTypeInfo ?: getFileTypeInfoByNameUseCase(name)
         manageMediaIntent(
@@ -413,23 +421,56 @@ internal class MegaNavigatorImpl @Inject constructor(
             isMediaQueueAvailable = isMediaQueueAvailable,
             searchedItems = searchedItems,
             mediaQueueTitle = mediaQueueTitle,
-            nodeHandles = nodeHandles
+            nodeHandles = nodeHandles,
+            enableAddToAlbum = enableAddToAlbum,
         )
     }
 
-    override fun openSyncs(context: Context, deviceName: String?) {
-        context.startActivity(Intent(Intent.ACTION_VIEW).apply {
-            data = "https://mega.nz/${getSyncListRoute(deviceName = deviceName)}".toUri()
+    override fun openSyncs(context: Context) {
+        context.startActivity(Intent(context, SyncHostActivity::class.java).apply {
+            data = "https://mega.nz/${getSyncListRoute()}".toUri()
         })
     }
 
-    override fun openNewSync(context: Context, syncType: SyncType, deviceName: String?) {
-        context.startActivity(Intent(Intent.ACTION_VIEW).apply {
+    override fun openNewSync(
+        context: Context, syncType: SyncType, isFromCloudDrive: Boolean, remoteFolderHandle: Long?,
+        remoteFolderName: String?,
+    ) {
+        context.startActivity(Intent(context, SyncHostActivity::class.java).apply {
             data = "https://mega.nz/${
                 getSyncNewFolderRoute(
-                    syncType = syncType, deviceName = deviceName
+                    syncType = syncType,
+                    remoteFolderHandle = remoteFolderHandle,
+                    remoteFolderName = remoteFolderName
                 )
             }".toUri()
+            putExtra(SyncHostActivity.EXTRA_IS_FROM_CLOUD_DRIVE, isFromCloudDrive)
+        })
+    }
+
+    override fun openInternalFolderPicker(
+        context: Context,
+        launcher: ActivityResultLauncher<Intent>,
+        initialUri: Uri?,
+    ) {
+        launcher.launch(
+            Intent(context, UploadFolderActivity::class.java).apply {
+                data = initialUri
+                putExtra(UploadFolderActivity.UPLOAD_FOLDER_TYPE, UploadFolderType.SINGLE_SELECT)
+            }
+        )
+    }
+
+    override fun openSyncMegaFolder(context: Context, handle: Long) {
+        context.startActivity(Intent(context, OpenLinkActivity::class.java).apply {
+            data = "https://mega.nz/opensync#${handle}".toUri()
+        })
+    }
+
+    override fun openSelectStopBackupDestinationFromSyncsTab(context: Context) {
+        context.startActivity(Intent(context, SyncHostActivity::class.java).apply {
+            putExtra(SyncHostActivity.EXTRA_IS_FROM_CLOUD_DRIVE, true)
+            putExtra(SyncHostActivity.EXTRA_OPEN_SELECT_STOP_BACKUP_DESTINATION, true)
         })
     }
 }

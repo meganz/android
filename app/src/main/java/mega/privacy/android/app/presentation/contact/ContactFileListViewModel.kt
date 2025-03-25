@@ -11,7 +11,6 @@ import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import mega.privacy.android.app.R
-import mega.privacy.android.app.ShareInfo
 import mega.privacy.android.app.middlelayer.scanner.ScannerHandler
 import mega.privacy.android.app.presentation.documentscanner.model.DocumentScanningError
 import mega.privacy.android.app.presentation.extensions.getState
@@ -199,21 +198,6 @@ class ContactFileListViewModel @Inject constructor(
 
     /**
      * Uploads a list of files to the specified destination.
-     *
-     * @param shareInfo The files as [ShareInfo] to upload.
-     * @param destination The destination where the files will be uploaded.
-     */
-    fun uploadShareInfo(
-        shareInfo: List<ShareInfo>,
-        destination: Long,
-    ) {
-        val pathsAndNames = shareInfo.map { it.fileAbsolutePath }.associateWith { null }
-
-        uploadFiles(pathsAndNames, NodeId(destination))
-    }
-
-    /**
-     * Uploads a list of files to the specified destination.
      */
     fun uploadFiles(
         pathsAndNames: Map<String, String?>,
@@ -247,14 +231,14 @@ class ContactFileListViewModel @Inject constructor(
     }
 
     /**
-     * Checks whether the legacy or modern Document Scanner should be used
+     * Prepares the ML Kit Document Scanner from Google Play Services
      */
-    fun handleScanDocument() {
+    fun prepareDocumentScanner() {
         viewModelScope.launch {
             runCatching {
-                scannerHandler.handleScanDocument()
-            }.onSuccess { handleScanDocumentResult ->
-                _state.update { it.copy(handleScanDocumentResult = handleScanDocumentResult) }
+                scannerHandler.prepareDocumentScanner()
+            }.onSuccess { gmsDocumentScanner ->
+                _state.update { it.copy(gmsDocumentScanner = gmsDocumentScanner) }
             }.onFailure { exception ->
                 _state.update {
                     it.copy(
@@ -270,17 +254,17 @@ class ContactFileListViewModel @Inject constructor(
     }
 
     /**
-     * When the system fails to open the ML Document Kit Scanner, display a generic error message
+     * When the system fails to open the ML Kit Document Scanner, display a generic error message
      */
-    fun onNewDocumentScannerFailedToOpen() {
+    fun onDocumentScannerFailedToOpen() {
         _state.update { it.copy(documentScanningError = DocumentScanningError.GenericError) }
     }
 
     /**
-     * Resets the value of [ContactFileListUiState.handleScanDocumentResult]
+     * Resets the value of [ContactFileListUiState.gmsDocumentScanner]
      */
-    fun onHandleScanDocumentResultConsumed() {
-        _state.update { it.copy(handleScanDocumentResult = null) }
+    fun onGmsDocumentScannerConsumed() {
+        _state.update { it.copy(gmsDocumentScanner = null) }
     }
 
     /**

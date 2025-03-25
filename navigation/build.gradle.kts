@@ -1,6 +1,7 @@
 plugins {
     alias(convention.plugins.mega.android.library)
     alias(convention.plugins.mega.android.test)
+    id("kotlin-parcelize")
 }
 
 android {
@@ -10,6 +11,7 @@ android {
 dependencies {
     implementation(project(":domain"))
     implementation(androidx.appcompat)
+    implementation(androidx.navigation.compose)
 
     testImplementation(testlib.bundles.ui.test)
     testImplementation(testlib.bundles.unit.test)

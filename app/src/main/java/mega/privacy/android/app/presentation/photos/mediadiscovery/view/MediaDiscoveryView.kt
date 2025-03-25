@@ -132,6 +132,12 @@ fun MediaDiscoveryView(
         }
     }
 
+    LaunchedEffect(hasUIPhoto) {
+        if (mediaDiscoveryViewState.loadPhotosDone && !hasUIPhoto) {
+            onSwitchListView()
+        }
+    }
+
     HandleSortByDialog(
         mediaDiscoveryViewState = mediaDiscoveryViewState,
         mediaDiscoveryViewModel = mediaDiscoveryViewModel,
@@ -220,14 +226,6 @@ fun MediaDiscoveryView(
                                 }
                             }
                         )
-                    }
-                    Column(
-                        horizontalAlignment = Alignment.End
-                    ) {
-                        ListViewIconButton(
-                            onSwitchListView = onSwitchListView
-                        )
-                        EmptyView(mediaDiscoveryViewState.currentMediaType)
                     }
                 }
             }

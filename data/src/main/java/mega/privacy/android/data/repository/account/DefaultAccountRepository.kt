@@ -85,6 +85,7 @@ import mega.privacy.android.domain.exception.QuerySignupLinkException
 import mega.privacy.android.domain.exception.ResetPasswordLinkException
 import mega.privacy.android.domain.exception.account.ConfirmCancelAccountException
 import mega.privacy.android.domain.exception.account.ConfirmChangeEmailException
+import mega.privacy.android.domain.exception.account.CreateAccountException
 import mega.privacy.android.domain.exception.account.QueryCancelLinkException
 import mega.privacy.android.domain.exception.account.QueryChangeEmailLinkException
 import mega.privacy.android.domain.qualifier.IoDispatcher
@@ -668,12 +669,6 @@ internal class DefaultAccountRepository @Inject constructor(
 
             //Remove UI preferences
             getSharedPreferences(USER_INTERFACE_PREFERENCES, Context.MODE_PRIVATE).edit { clear() }
-
-            //Remove emoji preferences
-            getSharedPreferences(PREFERENCE_EMOJI, Context.MODE_PRIVATE).edit { clear() }
-            getSharedPreferences(PREFERENCE_REACTION, Context.MODE_PRIVATE).edit { clear() }
-            getSharedPreferences(PREFERENCE_VARIANT_EMOJI, Context.MODE_PRIVATE).edit { clear() }
-            getSharedPreferences(PREFERENCE_VARIANT_REACTION, Context.MODE_PRIVATE).edit { clear() }
 
             //Remove sms dialog time checker preference
             getSharedPreferences(LAST_SHOW_SMS_FILE, Context.MODE_PRIVATE).edit { clear() }
@@ -1360,16 +1355,67 @@ internal class DefaultAccountRepository @Inject constructor(
     override fun monitorAlmostFullStorageBannerClosingTimestamp(): Flow<Long?> =
         uiPreferencesGateway.monitorAlmostFullStorageBannerClosingTimestamp().flowOn(ioDispatcher)
 
+    override suspend fun createAccount(
+        email: String, password: String, firstName: String, lastName: String,
+    ): EphemeralCredentials = withContext(ioDispatcher) {
+        suspendCancellableCoroutine { continuation ->
+            val listener = OptionalMegaRequestListenerInterface(
+                onRequestFinish = { request, error ->
+                    when (error.errorCode) {
+                        MegaError.API_OK -> {
+                            continuation.resumeWith(
+                                Result.success(
+                                    EphemeralCredentials(
+                                        request.email,
+                                        request.password,
+                                        request.sessionKey,
+                                        request.name,
+                                        request.text
+                                    )
+                                )
+                            )
+                        }
+
+                        MegaError.API_EEXIST -> {
+                            continuation.resumeWith(
+                                Result.failure(CreateAccountException.AccountAlreadyExists)
+                            )
+                        }
+
+                        else -> {
+                            continuation.resumeWith(
+                                Result.failure(
+                                    CreateAccountException.Unknown(error.toException("createAccount"))
+                                )
+                            )
+                        }
+                    }
+                }
+            )
+            megaApiGateway.createAccount(
+                email = email,
+                password = password,
+                firstName = firstName,
+                lastName = lastName,
+                listener = listener
+            )
+        }
+    }
+
+    override fun getInvalidHandle(): Long = megaApiGateway.getInvalidHandle()
+
+    override fun getInvalidAffiliateType(): Int = megaApiGateway.getInvalidAffiliateType()
+
+    override fun monitorMiscLoaded() = appEventGateway.monitorMiscLoaded()
+
+    override suspend fun broadcastMiscLoaded() = appEventGateway.broadcastMiscLoaded()
+
     companion object {
         private const val LAST_SYNC_TIMESTAMP_FILE = "last_sync_timestamp"
         private const val USER_INTERFACE_PREFERENCES = "USER_INTERFACE_PREFERENCES"
         private const val SHOW_LINE_NUMBERS = "SHOW_LINE_NUMBERS"
         private const val SHOW_OFFLINE_WARNING = "SHOW_OFFLINE_WARNING"
         private const val KEY_MOBILE_DATA_HIGH_RESOLUTION = "setting_mobile_data_high_resolution"
-        private const val PREFERENCE_EMOJI = "emoji-recent-manager"
-        private const val PREFERENCE_REACTION = "reaction-recent-manager"
-        private const val PREFERENCE_VARIANT_EMOJI = "variant-emoji-manager"
-        private const val PREFERENCE_VARIANT_REACTION = "variant-reaction-manager"
         private const val LAST_SHOW_SMS_FILE = "last_show_sms_timestamp_sp"
         private const val KEY_AUDIO_BACKGROUND_PLAY_ENABLED =
             "settings_audio_background_play_enabled"

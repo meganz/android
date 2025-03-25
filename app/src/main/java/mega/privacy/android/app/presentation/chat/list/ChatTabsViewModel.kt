@@ -22,7 +22,6 @@ import mega.privacy.android.app.MegaApplication
 import mega.privacy.android.app.R
 import mega.privacy.android.app.components.ChatManagement
 import mega.privacy.android.app.meeting.gateway.RTCAudioManagerGateway
-import mega.privacy.android.app.objects.PasscodeManagement
 import mega.privacy.android.app.presentation.chat.list.model.ChatsTabState
 import mega.privacy.android.app.presentation.chat.mapper.ChatRoomTimestampMapper
 import mega.privacy.android.app.presentation.data.SnackBarItem
@@ -77,7 +76,6 @@ import javax.inject.Inject
  * @property openOrStartCallUseCase                     [OpenOrStartCallUseCase]
  * @property answerChatCallUseCase                      [AnswerChatCallUseCase]
  * @property chatManagement                             [ChatManagement]
- * @property passcodeManagement                         [PasscodeManagement]
  * @property megaChatApiGateway                         [MegaChatApiGateway]
  * @property rtcAudioManagerGateway                     [RTCAudioManagerGateway]
  * @property getCurrentChatStatusUseCase                [GetCurrentChatStatusUseCase]
@@ -102,7 +100,6 @@ class ChatTabsViewModel @Inject constructor(
     private val openOrStartCallUseCase: OpenOrStartCallUseCase,
     private val answerChatCallUseCase: AnswerChatCallUseCase,
     private val chatManagement: ChatManagement,
-    private val passcodeManagement: PasscodeManagement,
     private val megaChatApiGateway: MegaChatApiGateway,
     private val rtcAudioManagerGateway: RTCAudioManagerGateway,
     private val getCurrentChatStatusUseCase: GetCurrentChatStatusUseCase,
@@ -272,7 +269,7 @@ class ChatTabsViewModel @Inject constructor(
      *
      * @param chatId
      */
-    fun startMeetingCall(chatId: Long) {
+    fun startMeetingCall(chatId: Long, enablePasscode: () -> Unit) {
         viewModelScope.launch {
             runCatching {
                 state.value.findChatItem(chatId)
@@ -293,7 +290,7 @@ class ChatTabsViewModel @Inject constructor(
                                             chatManagement.removeJoiningCallChatId(chatId)
                                             rtcAudioManagerGateway.removeRTCAudioManagerRingIn()
                                             CallUtil.clearIncomingCallNotification(call.callId)
-                                            openCurrentCall(call)
+                                            openCurrentCall(call, enablePasscode)
                                         }
                                 }
                             }
@@ -310,7 +307,7 @@ class ChatTabsViewModel @Inject constructor(
                                                 enabledVideo = false,
                                                 enabledAudio = true
                                             )?.takeIf { it.chatId != megaChatApiGateway.getChatInvalidHandle() }
-                                                ?.let(::openCurrentCall)
+                                                ?.let { openCurrentCall(it, enablePasscode) }
                                         } else {
                                             startChatCallNoRingingUseCase(
                                                 chatId = chatId,
@@ -318,7 +315,7 @@ class ChatTabsViewModel @Inject constructor(
                                                 enabledVideo = false,
                                                 enabledAudio = true
                                             )?.takeIf { it.chatId != megaChatApiGateway.getChatInvalidHandle() }
-                                                ?.let(::openCurrentCall)
+                                                ?.let { openCurrentCall(it, enablePasscode) }
                                         }
                                     } else {
                                         runCatching {
@@ -328,7 +325,7 @@ class ChatTabsViewModel @Inject constructor(
                                                 video = false
                                             )
                                         }.onSuccess { call ->
-                                            call?.let { openCurrentCall(it) }
+                                            call?.let { openCurrentCall(it, enablePasscode) }
                                         }.onFailure {
                                             Timber.e("Exception opening or starting call: $it")
                                         }
@@ -398,10 +395,10 @@ class ChatTabsViewModel @Inject constructor(
      *
      * @param call  [ChatCall]
      */
-    private fun openCurrentCall(call: ChatCall) {
+    private fun openCurrentCall(call: ChatCall, enablePasscode: () -> Unit) {
         chatManagement.setSpeakerStatus(call.chatId, false)
         chatManagement.setRequestSentCall(call.callId, call.isOutgoing)
-        passcodeManagement.showPasscodeScreen = true
+        enablePasscode()
         MegaApplication.getInstance().openCallService(call.chatId)
         getChatCallUpdates(call.chatId)
         state.update { it.copy(currentCallChatId = call.chatId) }

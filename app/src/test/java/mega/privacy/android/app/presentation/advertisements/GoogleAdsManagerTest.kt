@@ -1,5 +1,6 @@
 package mega.privacy.android.app.presentation.advertisements
 
+import app.cash.turbine.test
 import com.google.android.ump.ConsentInformation
 import com.google.common.truth.Truth.assertThat
 import kotlinx.coroutines.test.runTest
@@ -33,7 +34,7 @@ class GoogleAdsManagerTest {
             getFeatureFlagValueUseCase,
             consentInformation,
             getCookieSettingsUseCase,
-            shouldShowGenericCookieDialogUseCase
+            shouldShowGenericCookieDialogUseCase,
         )
     }
 
@@ -42,7 +43,7 @@ class GoogleAdsManagerTest {
             consentInformation,
             getFeatureFlagValueUseCase,
             getCookieSettingsUseCase,
-            shouldShowGenericCookieDialogUseCase
+            shouldShowGenericCookieDialogUseCase,
         )
     }
 
@@ -65,11 +66,9 @@ class GoogleAdsManagerTest {
         whenever(consentInformation.canRequestAds()).thenReturn(canRequestAds)
         init()
         underTest.checkForAdsAvailability()
-        val request = underTest.fetchAdRequest()
-        if (expectedResult) {
-            assertThat(request).isNotNull()
-        } else {
-            assertThat(request).isNull()
+        underTest.fetchAdRequest()
+        underTest.request.test {
+            assertThat(awaitItem() != null).isEqualTo(expectedResult)
         }
     }
 }

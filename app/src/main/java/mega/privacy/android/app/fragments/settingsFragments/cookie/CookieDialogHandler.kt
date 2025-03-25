@@ -14,7 +14,7 @@ import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 import mega.privacy.android.app.R
 import mega.privacy.android.app.activities.settingsActivities.CookiePreferencesActivity
-import mega.privacy.android.app.featuretoggle.ABTestFeatures
+import mega.privacy.android.app.featuretoggle.ApiFeatures
 import mega.privacy.android.app.presentation.advertisements.GoogleAdsManager
 import mega.privacy.android.app.utils.ContextUtils.isValid
 import mega.privacy.android.app.utils.StringUtils.toSpannedHtmlText
@@ -87,9 +87,9 @@ class CookieDialogHandler @Inject constructor(
         getCookieDialogJob = applicationScope.launch(ioDispatcher) {
             runCatching {
                 val cookieDialog = getCookieDialogUseCase(
-                    ABTestFeatures.ads,
-                    ABTestFeatures.adse
+                    ApiFeatures.GoogleAdsFeatureFlag
                 )
+                Timber.d("cookieDialog: $cookieDialog")
                 withContext(mainDispatcher) {
                     action(cookieDialog)
                 }

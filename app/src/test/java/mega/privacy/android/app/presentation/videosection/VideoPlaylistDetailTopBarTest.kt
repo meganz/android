@@ -8,9 +8,15 @@ import androidx.compose.ui.test.performClick
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import mega.privacy.android.app.presentation.videosection.model.VideoSectionMenuAction
 import mega.privacy.android.app.presentation.videosection.model.VideoSectionMenuAction.Companion.TEST_TAG_VIDEO_SECTION_CLEAR_SELECTION_ACTION
+import mega.privacy.android.app.presentation.videosection.model.VideoSectionMenuAction.Companion.TEST_TAG_VIDEO_SECTION_DOWNLOAD_ACTION
+import mega.privacy.android.app.presentation.videosection.model.VideoSectionMenuAction.Companion.TEST_TAG_VIDEO_SECTION_HIDE_ACTION
 import mega.privacy.android.app.presentation.videosection.model.VideoSectionMenuAction.Companion.TEST_TAG_VIDEO_SECTION_MORE_ACTION
 import mega.privacy.android.app.presentation.videosection.model.VideoSectionMenuAction.Companion.TEST_TAG_VIDEO_SECTION_REMOVE_ACTION
 import mega.privacy.android.app.presentation.videosection.model.VideoSectionMenuAction.Companion.TEST_TAG_VIDEO_SECTION_SELECT_ALL_ACTION
+import mega.privacy.android.app.presentation.videosection.model.VideoSectionMenuAction.Companion.TEST_TAG_VIDEO_SECTION_SEND_TO_CHAT_ACTION
+import mega.privacy.android.app.presentation.videosection.model.VideoSectionMenuAction.Companion.TEST_TAG_VIDEO_SECTION_SHARE_ACTION
+import mega.privacy.android.app.presentation.videosection.model.VideoSectionMenuAction.Companion.TEST_TAG_VIDEO_SECTION_SORT_BY_ACTION
+import mega.privacy.android.app.presentation.videosection.model.VideoSectionMenuAction.Companion.TEST_TAG_VIDEO_SECTION_UNHIDE_ACTION
 import mega.privacy.android.app.presentation.videosection.view.playlist.VIDEO_PLAYLIST_DETAIL_SELECTED_MODE_TOP_BAR_TEST_TAG
 import mega.privacy.android.app.presentation.videosection.view.playlist.VIDEO_PLAYLIST_DETAIL_TOP_BAR_TEST_TAG
 import mega.privacy.android.app.presentation.videosection.view.playlist.VideoPlaylistDetailTopBar
@@ -19,6 +25,7 @@ import org.junit.Rule
 import org.junit.Test
 import org.junit.runner.RunWith
 import org.mockito.Mockito.mock
+import org.mockito.kotlin.verify
 
 @RunWith(AndroidJUnit4::class)
 class VideoPlaylistDetailTopBarTest {
@@ -32,17 +39,21 @@ class VideoPlaylistDetailTopBarTest {
         selectedSize: Int = 0,
         onMenuActionClick: (VideoSectionMenuAction?) -> Unit = {},
         onBackPressed: () -> Unit = {},
+        enableFavouritesPlaylistMenu: Boolean = false,
+        isHideMenuActionVisible: Boolean = false,
+        isUnhideMenuActionVisible: Boolean = false,
     ) {
         composeTestRule.setContent {
             VideoPlaylistDetailTopBar(
                 title = title,
                 isActionMode = isActionMode,
                 selectedSize = selectedSize,
-                isUnhideMenuActionVisible = false,
-                isHideMenuActionVisible = false,
+                isUnhideMenuActionVisible = isUnhideMenuActionVisible,
+                isHideMenuActionVisible = isHideMenuActionVisible,
                 onMenuActionClick = onMenuActionClick,
                 onBackPressed = onBackPressed,
-                isSystemVideoPlaylist = isSystemVideoPlaylist
+                isSystemVideoPlaylist = isSystemVideoPlaylist,
+                enableFavouritesPlaylistMenu = enableFavouritesPlaylistMenu
             )
         }
     }
@@ -53,61 +64,63 @@ class VideoPlaylistDetailTopBarTest {
     fun `test that the top bar is displayed`() {
         setComposeContent()
 
-        composeTestRule.onNodeWithTag(
-            testTag = VIDEO_PLAYLIST_DETAIL_TOP_BAR_TEST_TAG,
-            useUnmergedTree = true
-        ).assertIsDisplayed()
-        composeTestRule.onNodeWithTag(
-            testTag = VIDEO_PLAYLIST_DETAIL_SELECTED_MODE_TOP_BAR_TEST_TAG,
-            useUnmergedTree = true
-        ).assertIsNotDisplayed()
+        VIDEO_PLAYLIST_DETAIL_TOP_BAR_TEST_TAG.assertIsDisplayed()
+        VIDEO_PLAYLIST_DETAIL_SELECTED_MODE_TOP_BAR_TEST_TAG.assertIsNotDisplayed()
     }
+
+    private fun String.assertIsDisplayed() =
+        composeTestRule.onNodeWithTag(testTag = this, useUnmergedTree = true).assertIsDisplayed()
+
+    private fun String.assertIsNotDisplayed() =
+        composeTestRule.onNodeWithTag(testTag = this, useUnmergedTree = true).assertIsNotDisplayed()
+
 
     @Test
     fun `test that the select mode top bar is displayed`() {
         setComposeContent(isActionMode = true)
 
-        composeTestRule.onNodeWithTag(
-            testTag = VIDEO_PLAYLIST_DETAIL_TOP_BAR_TEST_TAG,
-            useUnmergedTree = true
-        ).assertIsNotDisplayed()
-        composeTestRule.onNodeWithTag(
-            testTag = VIDEO_PLAYLIST_DETAIL_SELECTED_MODE_TOP_BAR_TEST_TAG,
-            useUnmergedTree = true
-        ).assertIsDisplayed()
+        VIDEO_PLAYLIST_DETAIL_TOP_BAR_TEST_TAG.assertIsNotDisplayed()
+        VIDEO_PLAYLIST_DETAIL_SELECTED_MODE_TOP_BAR_TEST_TAG.assertIsDisplayed()
     }
 
     @Test
     fun `test that more action is pressed`() {
         setComposeContent(onMenuActionClick = onMenuActionClick)
-        composeTestRule.onNodeWithTag(
-            testTag = TEST_TAG_VIDEO_SECTION_MORE_ACTION,
-            useUnmergedTree = true
-        ).performClick()
-        onMenuActionClick.invoke(VideoSectionMenuAction.VideoSectionMoreAction)
+        TEST_TAG_VIDEO_SECTION_MORE_ACTION.performClick()
+        verify(onMenuActionClick).invoke(VideoSectionMenuAction.VideoSectionMoreAction)
     }
+
+    private fun String.performClick() =
+        composeTestRule.onNodeWithTag(testTag = this, useUnmergedTree = true).performClick()
 
     @Test
     fun `test that select all action is pressed`() {
-        initMenuActionWithoutIcon(TEST_TAG_VIDEO_SECTION_SELECT_ALL_ACTION)
-        onMenuActionClick.invoke(VideoSectionMenuAction.VideoSectionSelectAllAction)
+        initMenuActionUnderSelectionMode(TEST_TAG_VIDEO_SECTION_SELECT_ALL_ACTION)
+        verify(onMenuActionClick).invoke(VideoSectionMenuAction.VideoSectionSelectAllAction)
     }
 
-    private fun initMenuActionWithoutIcon(testTag: String) {
+    private fun initMenuActionUnderSelectionMode(
+        testTag: String,
+        isWithoutIcon: Boolean = true,
+        isSystemVideoPlaylist: Boolean = false,
+        isHideMenuActionVisible: Boolean = false,
+        isUnhideMenuActionVisible: Boolean = false,
+    ) {
         setComposeContent(
             isActionMode = true,
             selectedSize = 1,
+            isSystemVideoPlaylist = isSystemVideoPlaylist,
+            isHideMenuActionVisible = isHideMenuActionVisible,
+            isUnhideMenuActionVisible = isUnhideMenuActionVisible,
             onMenuActionClick = onMenuActionClick
         )
-        composeTestRule.onNodeWithTag(testTag = TAG_MENU_ACTIONS_SHOW_MORE, useUnmergedTree = true)
-            .apply {
+        if (isWithoutIcon) {
+            TAG_MENU_ACTIONS_SHOW_MORE.apply {
                 assertIsDisplayed()
                 performClick()
             }
-        composeTestRule.onNodeWithTag(
-            testTag = testTag,
-            useUnmergedTree = true
-        ).apply {
+        }
+        testTag.apply {
             assertIsDisplayed()
             performClick()
         }
@@ -115,8 +128,8 @@ class VideoPlaylistDetailTopBarTest {
 
     @Test
     fun `test that clear selection action is pressed`() {
-        initMenuActionWithoutIcon(TEST_TAG_VIDEO_SECTION_CLEAR_SELECTION_ACTION)
-        onMenuActionClick.invoke(VideoSectionMenuAction.VideoSectionClearSelectionAction)
+        initMenuActionUnderSelectionMode(TEST_TAG_VIDEO_SECTION_CLEAR_SELECTION_ACTION)
+        verify(onMenuActionClick).invoke(VideoSectionMenuAction.VideoSectionClearSelectionAction)
     }
 
     @Test
@@ -126,34 +139,87 @@ class VideoPlaylistDetailTopBarTest {
             selectedSize = 1,
             onMenuActionClick = onMenuActionClick
         )
-        composeTestRule.onNodeWithTag(
-            testTag = TEST_TAG_VIDEO_SECTION_REMOVE_ACTION,
-            useUnmergedTree = true
-        ).performClick()
-        onMenuActionClick.invoke(VideoSectionMenuAction.VideoSectionRemoveAction)
+        TEST_TAG_VIDEO_SECTION_REMOVE_ACTION.performClick()
+        verify(onMenuActionClick).invoke(VideoSectionMenuAction.VideoSectionRemoveAction)
     }
 
     @Test
     fun `test that more action is not displayed when isSystemVideoPlaylist is true`() {
         setComposeContent(isSystemVideoPlaylist = true)
-        composeTestRule.onNodeWithTag(
-            testTag = TEST_TAG_VIDEO_SECTION_MORE_ACTION,
-            useUnmergedTree = true
-        )
-            .apply {
-                assertIsNotDisplayed()
-            }
+        TEST_TAG_VIDEO_SECTION_MORE_ACTION.assertIsNotDisplayed()
     }
 
     @Test
     fun `test that more action is displayed when isSystemVideoPlaylist is false`() {
-        setComposeContent(isSystemVideoPlaylist = false)
-        composeTestRule.onNodeWithTag(
-            testTag = TEST_TAG_VIDEO_SECTION_MORE_ACTION,
-            useUnmergedTree = true
+        setComposeContent(isSystemVideoPlaylist = false, enableFavouritesPlaylistMenu = true)
+        TEST_TAG_VIDEO_SECTION_MORE_ACTION.assertIsDisplayed()
+    }
+
+    @Test
+    fun `test that sort by action is displayed and VideoSectionSortByAction is invoked after is pressed`() {
+        setComposeContent(
+            isSystemVideoPlaylist = true,
+            enableFavouritesPlaylistMenu = true,
+            onMenuActionClick = onMenuActionClick
         )
-            .apply {
-                assertIsDisplayed()
-            }
+        TEST_TAG_VIDEO_SECTION_SORT_BY_ACTION.apply {
+            assertIsDisplayed()
+            performClick()
+        }
+        verify(onMenuActionClick).invoke(VideoSectionMenuAction.VideoSectionSortByAction)
+    }
+
+    @Test
+    fun `test that more action is displayed under selection mode`() {
+        setComposeContent(isActionMode = true, selectedSize = 1, isSystemVideoPlaylist = true)
+        TEST_TAG_VIDEO_SECTION_MORE_ACTION.assertIsDisplayed()
+    }
+
+    @Test
+    fun `test that download action is displayed and VideoSectionDownloadAction is invoked`() {
+        initMenuActionUnderSelectionMode(
+            testTag = TEST_TAG_VIDEO_SECTION_DOWNLOAD_ACTION,
+            isWithoutIcon = false,
+            isSystemVideoPlaylist = true
+        )
+        verify(onMenuActionClick).invoke(VideoSectionMenuAction.VideoSectionDownloadAction)
+    }
+
+    @Test
+    fun `test that send to chat action is displayed and VideoSectionSendToChatAction is invoked`() {
+        initMenuActionUnderSelectionMode(
+            testTag = TEST_TAG_VIDEO_SECTION_SEND_TO_CHAT_ACTION,
+            isWithoutIcon = false,
+            isSystemVideoPlaylist = true
+        )
+        verify(onMenuActionClick).invoke(VideoSectionMenuAction.VideoSectionSendToChatAction)
+    }
+
+    @Test
+    fun `test that share action is displayed and VideoSectionShareAction is invoked`() {
+        initMenuActionUnderSelectionMode(
+            testTag = TEST_TAG_VIDEO_SECTION_SHARE_ACTION,
+            isWithoutIcon = false,
+            isSystemVideoPlaylist = true
+        )
+        verify(onMenuActionClick).invoke(VideoSectionMenuAction.VideoSectionShareAction)
+    }
+
+    @Test
+    fun `test that hide action is displayed and VideoSectionHideAction is invoked`() {
+        initMenuActionUnderSelectionMode(
+            testTag = TEST_TAG_VIDEO_SECTION_HIDE_ACTION,
+            isHideMenuActionVisible = true,
+        )
+        verify(onMenuActionClick).invoke(VideoSectionMenuAction.VideoSectionHideAction)
+    }
+
+    @Test
+    fun `test that unhide action is displayed and VideoSectionUnhideAction is invoked`() {
+        initMenuActionUnderSelectionMode(
+            testTag = TEST_TAG_VIDEO_SECTION_UNHIDE_ACTION,
+            isUnhideMenuActionVisible = true,
+        )
+        verify(onMenuActionClick).invoke(VideoSectionMenuAction.VideoSectionUnhideAction)
     }
 }

@@ -1,5 +1,6 @@
 package mega.privacy.android.data.mapper.backup
 
+import android.util.Base64
 import mega.privacy.android.data.wrapper.StringWrapper
 import nz.mega.sdk.MegaStringMap
 import javax.inject.Inject
@@ -30,7 +31,7 @@ internal class BackupDeviceNamesMapper @Inject constructor(
                 for (i in 0 until keySize) {
                     val deviceId = keys[i]
                     val deviceName = megaStringMap.get(deviceId).orEmpty()
-                    this[deviceId] = stringWrapper.decodeBase64(deviceName)
+                    this[deviceId] = stringWrapper.decodeBase64(deviceName, Base64.URL_SAFE)
                 }
             }
         } ?: emptyMap()

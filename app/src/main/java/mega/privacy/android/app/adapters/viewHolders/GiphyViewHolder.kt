@@ -1,18 +1,17 @@
 package mega.privacy.android.app.adapters.viewHolders
 
-import android.net.Uri
 import android.view.View
+import androidx.appcompat.widget.AppCompatImageView
 import androidx.recyclerview.widget.RecyclerView
-import com.facebook.drawee.view.SimpleDraweeView
+import coil.load
 import mega.privacy.android.app.R
 import mega.privacy.android.app.interfaces.GiphyInterface
 import mega.privacy.android.app.objects.Data
 import mega.privacy.android.app.objects.GifData
-import mega.privacy.android.app.utils.FrescoUtils
 
 class GiphyViewHolder(val view: View, private val giphyInterface: GiphyInterface) :
     RecyclerView.ViewHolder(view) {
-    private var gifImage: SimpleDraweeView = view.findViewById(R.id.gif_image)
+    private val gifImage: AppCompatImageView = view.findViewById(R.id.gif_image)
     var gifData: GifData? = null
 
     fun bind(gif: Data?) {
@@ -34,7 +33,12 @@ class GiphyViewHolder(val view: View, private val giphyInterface: GiphyInterface
         view.tag = this@GiphyViewHolder
 
         val webpUri = imageAttributes.webp ?: return
-        FrescoUtils.loadGif(gifImage, Uri.parse(webpUri))
+        gifImage.load(webpUri) {
+            size(
+                giphyInterface.getScreenGifWidth(),
+                giphyInterface.getScreenGifHeight(gifWidth, gifHeight)
+            )
+        }
     }
 
     /**

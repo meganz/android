@@ -140,6 +140,7 @@ internal class FolderLinkRepositoryImpl @Inject constructor(
             suspendCancellableCoroutine { continuation ->
                 val listener = continuation.getRequestListener("getPublicLinkInformation") {
                     folderInfoMapper(
+                        handle = it.nodeHandle,
                         megaFolderInfo = it.megaFolderInfo,
                         folderName = it.text
                     )

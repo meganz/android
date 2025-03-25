@@ -25,8 +25,8 @@ import mega.privacy.android.app.R
 import mega.privacy.android.shared.original.core.ui.controls.text.MegaText
 import mega.privacy.android.shared.original.core.ui.controls.textfields.GenericDescriptionTextField
 import mega.privacy.android.shared.original.core.ui.preview.CombinedTextAndThemePreviews
-import mega.privacy.android.shared.original.core.ui.theme.OriginalTempTheme
-import mega.privacy.android.shared.original.core.ui.theme.values.TextColor
+import mega.privacy.android.shared.original.core.ui.theme.OriginalTheme
+import mega.android.core.ui.theme.values.TextColor
 import mega.privacy.mobile.analytics.event.NodeInfoDescriptionCharacterLimitEvent
 import mega.privacy.mobile.analytics.event.NodeInfoDescriptionConfirmedEvent
 import mega.privacy.mobile.analytics.event.NodeInfoDescriptionEnteredEvent
@@ -131,7 +131,7 @@ private const val DESCRIPTION_LIMIT = 300
 @CombinedTextAndThemePreviews
 @Composable
 private fun FileInfoDescriptionFieldPreview() {
-    OriginalTempTheme(isDark = isSystemInDarkTheme()) {
+    OriginalTheme(isDark = isSystemInDarkTheme()) {
         FileInfoDescriptionField(
             descriptionText = "This is a description",
             labelId = sharedR.string.file_info_information_description_label,

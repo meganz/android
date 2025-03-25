@@ -3,7 +3,6 @@ package mega.privacy.android.app.presentation.qrcode
 import mega.privacy.android.icon.pack.R as iconPackR
 import android.app.Activity
 import android.content.Context
-import android.content.Intent
 import androidx.compose.foundation.isSystemInDarkTheme
 import androidx.compose.material.DropdownMenu
 import androidx.compose.material.DropdownMenuItem
@@ -22,11 +21,9 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.tooling.preview.PreviewParameter
 import androidx.compose.ui.unit.dp
 import mega.privacy.android.app.R
-import mega.privacy.android.app.presentation.settings.SettingsActivity
-import mega.privacy.android.app.presentation.settings.model.TargetPreference
-import mega.privacy.android.shared.original.core.ui.theme.OriginalTempTheme
 import mega.privacy.android.shared.original.core.ui.preview.BooleanProvider
 import mega.privacy.android.shared.original.core.ui.preview.CombinedThemePreviews
+import mega.privacy.android.shared.original.core.ui.theme.OriginalTheme
 import mega.privacy.android.shared.original.core.ui.theme.extensions.black_white
 
 /**
@@ -44,6 +41,7 @@ internal fun QRCodeTopBar(
     onDeleteQRCode: () -> Unit,
     onBackPressed: () -> Unit,
     onShare: () -> Unit,
+    navigateToQrSettings: () -> Unit,
 ) {
     TopAppBar(
         title = {
@@ -99,7 +97,7 @@ internal fun QRCodeTopBar(
                     }
                     DropdownMenuItem(onClick = {
                         onMenuDismissed()
-                        onGotoSettings(context)
+                        onGotoSettings(context, navigateToQrSettings)
                     }) {
                         Text(text = stringResource(id = R.string.action_settings))
                     }
@@ -123,12 +121,8 @@ internal fun QRCodeTopBar(
     )
 }
 
-private fun onGotoSettings(context: Context) {
-    val settingsIntent =
-        SettingsActivity.getIntent(context, TargetPreference.QR).apply {
-            addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP)
-        }
-    context.startActivity(settingsIntent)
+private fun onGotoSettings(context: Context, navigateToQrSettings: () -> Unit) {
+    navigateToQrSettings()
     (context as? Activity)?.finish()
 }
 
@@ -137,7 +131,7 @@ private fun onGotoSettings(context: Context) {
 private fun PreviewQRCodeTopBar(
     @PreviewParameter(BooleanProvider::class) qrCodeAvailable: Boolean
 ) {
-    OriginalTempTheme(isDark = isSystemInDarkTheme()) {
+    OriginalTheme(isDark = isSystemInDarkTheme()) {
         QRCodeTopBar(
             context = LocalContext.current,
             isQRCodeAvailable = qrCodeAvailable,
@@ -148,7 +142,8 @@ private fun PreviewQRCodeTopBar(
             onResetQRCode = { },
             onDeleteQRCode = { },
             onBackPressed = { },
-            onShare = { }
+            onShare = { },
+            navigateToQrSettings = {},
         )
     }
 }

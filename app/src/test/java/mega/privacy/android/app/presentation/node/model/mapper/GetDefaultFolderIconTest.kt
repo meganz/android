@@ -2,8 +2,6 @@ package mega.privacy.android.app.presentation.node.model.mapper
 
 import com.google.common.truth.Truth.assertThat
 import mega.privacy.android.icon.pack.R as IconPackR
-import mega.privacy.android.app.R
-import mega.privacy.android.app.presentation.node.model.mapper.getDefaultFolderIcon
 import mega.privacy.android.domain.entity.DeviceType
 import mega.privacy.android.domain.entity.FolderType
 import mega.privacy.android.domain.entity.node.TypedFolderNode
@@ -171,6 +169,19 @@ class GetDefaultFolderIconTest {
                 folderNode = folderNode,
             )
         ).isEqualTo(IconPackR.drawable.ic_folder_backup_medium_solid)
+    }
+
+    @Test
+    fun `test that synced folder returns sync icon`() {
+        val folderNode = mock<TypedFolderNode> {
+            on { type }.thenReturn(FolderType.Sync)
+        }
+
+        assertThat(
+            getDefaultFolderIcon(
+                folderNode = folderNode,
+            )
+        ).isEqualTo(IconPackR.drawable.ic_folder_sync_medium_solid)
     }
 
     @Test

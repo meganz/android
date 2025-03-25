@@ -1,7 +1,6 @@
 package mega.privacy.android.app.presentation.photos.timeline.view
 
 import mega.privacy.android.core.R as CoreUiR
-import mega.privacy.android.icon.pack.R as IconPackR
 import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.Image
@@ -17,16 +16,22 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.wrapContentSize
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.Icon
+import androidx.compose.material.MaterialTheme
 import androidx.compose.material.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.produceState
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.alpha
 import androidx.compose.ui.draw.blur
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.DefaultAlpha
+import androidx.compose.ui.graphics.painter.ColorPainter
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalConfiguration
 import androidx.compose.ui.platform.LocalContext
@@ -43,6 +48,7 @@ import mega.privacy.android.app.presentation.photos.model.ZoomLevel
 import mega.privacy.android.app.presentation.photos.view.isDownloadPreview
 import mega.privacy.android.app.utils.TimeUtils
 import mega.privacy.android.domain.entity.photos.Photo
+import mega.privacy.android.shared.original.core.ui.theme.extensions.grey_050_grey_700
 
 @OptIn(ExperimentalFoundationApi::class)
 @Composable
@@ -77,7 +83,7 @@ fun PhotoView(
             .border(
                 BorderStroke(
                     width = 2.dp,
-                    color = colorResource(id = R.color.teal_300)
+                    color = colorResource(id = R.color.accent_900)
                 ),
                 shape = RoundedCornerShape(4.dp)
             )
@@ -154,6 +160,7 @@ private fun PhotoCoverView(
                     isPreview = isDownloadPreview,
                     downloadPhoto = downloadPhoto,
                     shouldApplySensitiveMode = shouldApplySensitiveMode,
+                    showOverlayOnSuccess = false
                 )
                 if (photo.isFavourite) {
                     Image(
@@ -171,14 +178,8 @@ private fun PhotoCoverView(
                     photo = photo,
                     shouldApplySensitiveMode = shouldApplySensitiveMode,
                     isPreview = isDownloadPreview,
-                    downloadPhoto = downloadPhoto
-                )
-                Spacer(
-                    modifier = Modifier
-                        .matchParentSize()
-                        .background(
-                            color = colorResource(id = R.color.grey_alpha_032)
-                        )
+                    downloadPhoto = downloadPhoto,
+                    showOverlayOnSuccess = true
                 )
 
                 Text(
@@ -204,13 +205,21 @@ private fun PhotoCoverView(
 }
 
 
+/**
+ * Photo image view for grid layout
+ */
 @Composable
-private fun PhotoImageView(
+fun PhotoImageView(
     photo: Photo,
     shouldApplySensitiveMode: Boolean,
     isPreview: Boolean,
+    showOverlayOnSuccess: Boolean = false,
     downloadPhoto: PhotoDownload,
+    alpha: Float = DefaultAlpha,
 ) {
+
+    var showOverlayState by remember { mutableStateOf(false) }
+
     val imageState = produceState<String?>(initialValue = null) {
         downloadPhoto(isPreview, photo) { downloadSuccess ->
             if (downloadSuccess) {
@@ -223,23 +232,40 @@ private fun PhotoImageView(
         }
     }
 
-    AsyncImage(
-        model = ImageRequest.Builder(LocalContext.current)
-            .data(imageState.value)
-            .crossfade(true)
-            .build(),
-        contentDescription = null,
-        placeholder = painterResource(id = IconPackR.drawable.ic_image_medium_solid),
-        error = painterResource(id = IconPackR.drawable.ic_image_medium_solid),
-        contentScale = ContentScale.Crop,
-        modifier = Modifier
-            .fillMaxWidth()
-            .aspectRatio(1f)
-            .alpha(0.5f.takeIf {
-                shouldApplySensitiveMode && (photo.isSensitive || photo.isSensitiveInherited)
-            } ?: 1f)
-            .blur(16.dp.takeIf {
-                shouldApplySensitiveMode && (photo.isSensitive || photo.isSensitiveInherited)
-            } ?: 0.dp)
-    )
+    Box {
+        AsyncImage(
+            model = ImageRequest.Builder(LocalContext.current)
+                .data(imageState.value)
+                .crossfade(true)
+                .build(),
+            contentDescription = null,
+            placeholder = ColorPainter(MaterialTheme.colors.grey_050_grey_700),
+            error = ColorPainter(MaterialTheme.colors.grey_050_grey_700),
+            contentScale = ContentScale.Crop,
+            onSuccess = {
+                if (showOverlayOnSuccess && imageState.value != null) {
+                    showOverlayState = true
+                }
+            },
+            alpha = alpha,
+            modifier = Modifier
+                .fillMaxWidth()
+                .aspectRatio(1f)
+                .alpha(0.5f.takeIf {
+                    shouldApplySensitiveMode && (photo.isSensitive || photo.isSensitiveInherited)
+                } ?: 1f)
+                .blur(16.dp.takeIf {
+                    shouldApplySensitiveMode && (photo.isSensitive || photo.isSensitiveInherited)
+                } ?: 0.dp)
+        )
+        if (showOverlayState)
+            Spacer(
+                modifier = Modifier
+                    .matchParentSize()
+                    .background(
+                        color = colorResource(id = R.color.grey_alpha_032)
+                    )
+            )
+    }
+
 }

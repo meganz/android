@@ -1230,7 +1230,6 @@ class GroupChatInfoActivity : PasscodeActivity(), MegaChatRequestListenerInterfa
                     chatRoom
                 ) && CallUtil.canCallBeStartedFromContactOption(
                     this,
-                    passcodeManagement
                 )
             ) {
                 startCall()
@@ -1323,7 +1322,11 @@ class GroupChatInfoActivity : PasscodeActivity(), MegaChatRequestListenerInterfa
      */
     fun startCall() {
         val audio = PermissionUtils.hasPermissions(this, Manifest.permission.RECORD_AUDIO)
-        viewModel.onCallTap(userHandle = userWaitingForCall, video = false, audio = audio)
+        viewModel.onCallTap(
+            userHandle = userWaitingForCall,
+            video = false,
+            audio = audio,
+        )
     }
 
     private fun onChatPresenceLastGreen(userHandle: Long, lastGreen: Int) {

@@ -23,7 +23,7 @@ import androidx.compose.ui.unit.dp
 import mega.privacy.android.shared.original.core.ui.controls.controlssliders.MegaRadioButton
 import mega.privacy.android.shared.original.core.ui.preview.BooleanProvider
 import mega.privacy.android.shared.original.core.ui.preview.CombinedThemePreviews
-import mega.privacy.android.shared.original.core.ui.theme.OriginalTempTheme
+import mega.privacy.android.shared.original.core.ui.theme.OriginalTheme
 import mega.privacy.android.shared.original.core.ui.theme.MegaOriginalTheme
 
 /**
@@ -63,7 +63,7 @@ private fun SettingsItemPreview(
     @PreviewParameter(BooleanProvider::class) initialValue: Boolean,
 ) {
     var selected by remember { mutableStateOf(initialValue) }
-    OriginalTempTheme(isDark = isSystemInDarkTheme()) {
+    OriginalTheme(isDark = isSystemInDarkTheme()) {
         SettingsItemWithRadioButton(
             title = "Settings name",
             selected = selected,

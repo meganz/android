@@ -1,22 +1,17 @@
 package mega.privacy.android.app.uploadFolder.list.adapter
 
-import android.graphics.drawable.Animatable
-import android.net.Uri
 import android.view.View.INVISIBLE
 import android.view.View.VISIBLE
 import androidx.core.view.isVisible
 import androidx.recyclerview.widget.RecyclerView
-import com.facebook.drawee.backends.pipeline.Fresco.*
-import com.facebook.drawee.controller.BaseControllerListener
-import com.facebook.imagepipeline.image.ImageInfo
-import com.facebook.imagepipeline.request.ImageRequest
-import com.facebook.imagepipeline.request.ImageRequestBuilder
+import coil.load
+import coil.util.CoilUtils
 import mega.privacy.android.app.MimeTypeList
 import mega.privacy.android.app.MimeTypeThumbnail
 import mega.privacy.android.app.R
 import mega.privacy.android.app.databinding.ItemFolderContentGridBinding
-import mega.privacy.android.app.listeners.OptionalRequestListener
 import mega.privacy.android.app.uploadFolder.list.data.FolderContent
+import mega.privacy.android.app.utils.Util.dp2px
 
 /**
  * RecyclerView's ViewHolder to show FolderContent Data info in a grid view.
@@ -24,8 +19,9 @@ import mega.privacy.android.app.uploadFolder.list.data.FolderContent
  * @property binding    Item's view binding
  */
 class FolderContentGridHolder(
-    private val binding: ItemFolderContentGridBinding
+    private val binding: ItemFolderContentGridBinding,
 ) : RecyclerView.ViewHolder(binding.root) {
+    private val screenWidth = binding.root.resources.displayMetrics.widthPixels
 
     fun bind(item: FolderContent.Data) {
         binding.apply {
@@ -35,6 +31,7 @@ class FolderContentGridHolder(
             root.setBackgroundResource(if (item.isSelected) R.drawable.background_item_grid_selected else R.drawable.background_item_grid)
             selectedIcon.isVisible = item.isSelected
 
+            CoilUtils.dispose(fileThumbnail)
             if (item.isFolder) {
                 folderThumbnail.visibility = if (item.isSelected) INVISIBLE else VISIBLE
 
@@ -55,40 +52,17 @@ class FolderContentGridHolder(
                     setImageResource(MimeTypeThumbnail.typeForName(item.name).iconResourceId)
                 }
                 fileThumbnail.apply {
-                    setImageURI(null as Uri?)
                     isVisible = true
 
                     val type = MimeTypeList.typeForName(item.name)
                     if (type.isVideo || type.isImage) {
-                        controller = newDraweeControllerBuilder()
-                            .setImageRequest(
-                                ImageRequestBuilder.fromRequest(ImageRequest.fromUri(item.uri))
-                                    .setLocalThumbnailPreviewsEnabled(true)
-                                    .setRequestListener(OptionalRequestListener(
-                                        onProducerFinishWithSuccess = { _, _, _ ->
-                                            showVideo(type)
-                                        },
-                                        onRequestSuccess = { _, _, _ -> showVideo(type) }
-                                    ))
-                                    .build()
+                        load(item.uri) {
+                            size(screenWidth / 2, height = dp2px(172f))
+                            listener(
+                                onSuccess = { _, _ -> showVideo(type) },
+                                onError = { _, _ -> showVideo(type) }
                             )
-                            .setControllerListener(object : BaseControllerListener<ImageInfo?>() {
-                                override fun onIntermediateImageSet(
-                                    id: String?,
-                                    imageInfo: ImageInfo?
-                                ) {
-                                    showVideo(type)
-                                }
-
-                                override fun onFinalImageSet(
-                                    id: String,
-                                    imageInfo: ImageInfo?,
-                                    animatable: Animatable?
-                                ) {
-                                    showVideo(type)
-                                }
-                            })
-                            .build()
+                        }
                     }
                 }
 

@@ -5,15 +5,12 @@ import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.viewModelScope
 import dagger.hilt.android.lifecycle.HiltViewModel
-import kotlinx.coroutines.async
-import kotlinx.coroutines.awaitAll
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.launch
 import mega.privacy.android.app.MegaApplication
 import mega.privacy.android.app.R
 import mega.privacy.android.app.getLink.data.LinkItem
-import mega.privacy.android.app.utils.FileUtil
 import mega.privacy.android.app.utils.MegaApiUtils.getMegaNodeFolderInfo
 import mega.privacy.android.app.utils.ThumbnailUtils.getThumbFolder
 import mega.privacy.android.app.utils.Util.getSizeString
@@ -24,11 +21,9 @@ import mega.privacy.android.domain.usecase.HasSensitiveInheritedUseCase
 import mega.privacy.android.domain.usecase.chat.Get1On1ChatIdUseCase
 import mega.privacy.android.domain.usecase.chat.message.SendTextMessageUseCase
 import mega.privacy.android.domain.usecase.node.ExportNodesUseCase
-import mega.privacy.android.domain.usecase.thumbnailpreview.GetThumbnailUseCase
 import nz.mega.sdk.MegaApiAndroid
 import nz.mega.sdk.MegaNode
 import timber.log.Timber
-import java.io.File
 import javax.inject.Inject
 
 /**
@@ -43,7 +38,6 @@ import javax.inject.Inject
 class GetSeveralLinksViewModel @Inject constructor(
     @MegaApi private val megaApi: MegaApiAndroid,
     private val exportNodesUseCase: ExportNodesUseCase,
-    private val getThumbnailUseCase: GetThumbnailUseCase,
     private val hasSensitiveDescendantUseCase: HasSensitiveDescendantUseCase,
     private val hasSensitiveInheritedUseCase: HasSensitiveInheritedUseCase,
     get1On1ChatIdUseCase: Get1On1ChatIdUseCase,
@@ -77,7 +71,6 @@ class GetSeveralLinksViewModel @Inject constructor(
         linksNumber = handlesList.size
         val links = ArrayList<LinkItem>()
         val pendingExports = ArrayList<MegaNode>()
-        val pendingThumbnails = ArrayList<MegaNode>()
 
         links.add(LinkItem.Header(context.getString(R.string.tab_links_shares)))
 
@@ -91,18 +84,10 @@ class GetSeveralLinksViewModel @Inject constructor(
                 }
 
                 val link = if (isExported) node.publicLink else null
-                val thumbnail = if (node.isFile && node.hasThumbnail()) {
-                    File(thumbFolder, node.base64Handle + FileUtil.JPG_EXTENSION)
-                } else null
-
-                if (thumbnail != null && !thumbnail.exists()) {
-                    pendingThumbnails.add(node)
-                }
 
                 links.add(
                     LinkItem.Data(
                         node,
-                        if (thumbnail?.exists() == true) thumbnail else null,
                         node.name,
                         link,
                         if (node.isFolder) getMegaNodeFolderInfo(node, context) else getSizeString(
@@ -115,7 +100,6 @@ class GetSeveralLinksViewModel @Inject constructor(
         }
 
         exportNodes(pendingExports)
-        requestThumbnails(pendingThumbnails)
         linkItemsList.value = links
         isInitialized = true
     }
@@ -160,7 +144,6 @@ class GetSeveralLinksViewModel @Inject constructor(
                 if (link != null) {
                     links[item] = LinkItem.Data(
                         linkItem.node,
-                        linkItem.thumbnail,
                         linkItem.name,
                         link,
                         linkItem.info
@@ -170,53 +153,6 @@ class GetSeveralLinksViewModel @Inject constructor(
         }
 
         exportingNodes.value = false
-        linkItemsList.value = links
-    }
-
-    /**
-     * Request a list of thumbnails which have not been get yet.
-     *
-     * @param pendingThumbnails List of nodes to get their thumbnails.
-     */
-    private fun requestThumbnails(pendingThumbnails: List<MegaNode>) {
-        viewModelScope.launch {
-            pendingThumbnails.map {
-                async {
-                    runCatching {
-                        getThumbnailUseCase(it.handle, true)
-                        notifyThumbnailUpdate(it.handle)
-                    }.onFailure {
-                        Timber.e(it, "Exception getting thumbnail for $this")
-                    }
-                }
-            }.awaitAll()
-        }
-    }
-
-    /**
-     * Updates the list of [LinkItem]s with the thumbnail already get.
-     *
-     * @param handle Node identifier from which the thumbnail has been get.
-     */
-    private fun notifyThumbnailUpdate(handle: Long) {
-        val links = (linkItemsList.value ?: return).toMutableList()
-
-        for (item in links.indices) {
-            val linkItem = links[item]
-
-            if (linkItem is LinkItem.Data && linkItem.id == handle) {
-                links[item] = LinkItem.Data(
-                    linkItem.node,
-                    File(thumbFolder, linkItem.node.base64Handle + FileUtil.JPG_EXTENSION),
-                    linkItem.name,
-                    linkItem.link,
-                    linkItem.info
-                )
-
-                break
-            }
-        }
-
         linkItemsList.value = links
     }
 

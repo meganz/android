@@ -39,7 +39,7 @@
     <color name="grey_700_grey_050_038">@color/grey_050_alpha_038</color>
 
     <!-- Track of activated switch in settings -->
-    <color name="teal_100_teal_200_038">@color/teal_200_alpha_038</color>
+    <color name="teal_100_teal_200_038">@color/accent_050_alpha_038</color>
 
     <!-- chat room voice clip SeekBar progressBackgroundTint -->
     <color name="white_018_white_038">@color/white_alpha_038</color>
@@ -144,7 +144,7 @@
     <!-- icon tint for FAB above images or scrim -->
     <color name="teal_300_black">@color/black</color>
     <!-- background tint for FAB above images or scrim -->
-    <color name="white_teal_200">@color/teal_200</color>
+    <color name="white_teal_200">@color/accent_050</color>
 
     <!-- Primary red -->
     <color name="red_600_red_300">@color/red_300</color>
@@ -225,7 +225,7 @@
     <color name="blue_400_blue_200">@color/dark_blue_200</color>
 
     <!-- Same to colorSecondary -->
-    <color name="teal_300_teal_200">@color/teal_200</color>
+    <color name="teal_300_teal_200">@color/accent_050</color>
 
     <!-- Error text highlight color (selection background) -->
     <color name="teal_100_teal_050">@color/teal_050</color>
@@ -257,7 +257,7 @@
     <color name="white_grey_900">@color/grey_900</color>
 
     <!--    For disabled alert dialog borderless button-->
-    <color name="teal_300_038_teal_200_038">@color/teal_200_alpha_038</color>
+    <color name="teal_300_038_teal_200_038">@color/accent_050_alpha_038</color>
 
     <!-- Label red -->
     <color name="salmon_400_salmon_300">@color/salmon_300</color>
@@ -304,7 +304,7 @@
     <color name="white_alpha_087_grey_alpha_087">@color/grey_alpha_087</color>
 
     <!--  SnackBar Button text  -->
-    <color name="teal_200_teal_300">@color/teal_300</color>
+    <color name="accent_900_accent_050">@color/accent_900</color>
 
     <!--  ExoPlayer Time Bar Unplayed  -->
     <color name="grey_alpha_012_white_alpha_023">@color/white_alpha_023</color>
@@ -340,7 +340,7 @@
     <!-- Storage usage on MyAccountUsage view -->
     <color name="blue_700_blue_200">@color/blue_200</color>
     <!-- Transfer usage on MyAccountUsage view -->
-    <color name="teal_600_teal_200">@color/teal_200</color>
+    <color name="teal_600_teal_200">@color/accent_050</color>
 
     <!-- Expiration/Renew time on MyAccountUsage view -->
     <color name="grey_087_white_054">@color/white_alpha_054</color>
@@ -356,16 +356,27 @@
 
     <color name="color_button_brand">#F23433</color>
     <color name="color_border_interactive">#F23433</color>
+    <color name="color_icon_primary">#F3F4F4</color>
     <color name="color_icon_secondary">#A9ABAD</color>
+    <color name="color_icon_inverse">#303233</color>
     <color name="color_text_primary">#F3F4F4</color>
     <color name="color_text_error">#FD6F90</color>
+    <color name="color_text_on_color_disabled">#A9ABAD</color>
     <color name="color_support_error">#FD6F90</color>
+    <color name="color_support_info">#96C9FF</color>
     <color name="color_primary_400">#FB6361</color>
     <color name="color_icon_fill">#303233</color>
+    <color name="color_icon_accent">@color/accent_050</color>
     <color name="color_icon_disabled">#797C80</color>
+    <color name="color_button_primary">#F4F4F5</color>
     <color name="color_button_secondary">#494A4D</color>
     <color name="color_component_toastBackground">#FFC1C2C4</color>
     <color name="color_text_inverse">#FF303233</color>
     <color name="color_background_surface_1">#FF303233</color>
+    <color name="color_background_surface_2">#494A4D</color>
     <color name="color_background_pageBackground">#FF18191A</color>
+    <color name="color_link_primary">#69A3FB</color>
+    <color name="color_support_success">#09BF5B</color>
+    <color name="color_components_interactive">#FB6361</color>
+    <color name="color_border_brand">#F23433</color>
 </resources>

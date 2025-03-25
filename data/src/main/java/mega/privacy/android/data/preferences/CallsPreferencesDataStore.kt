@@ -19,7 +19,7 @@ import mega.privacy.android.data.extensions.monitor
 import mega.privacy.android.data.gateway.preferences.CallsPreferencesGateway
 import mega.privacy.android.domain.entity.CallsMeetingInvitations
 import mega.privacy.android.domain.entity.CallsMeetingReminders
-import mega.privacy.android.domain.entity.CallsSoundNotifications
+import mega.privacy.android.domain.entity.CallsSoundEnabledState
 import mega.privacy.android.domain.entity.meeting.UsersCallLimitReminders
 import mega.privacy.android.domain.entity.meeting.WaitingRoomReminders
 import mega.privacy.android.domain.qualifier.IoDispatcher
@@ -54,7 +54,7 @@ internal class CallsPreferencesDataStore @Inject constructor(
     private val raiseToHandSuggestionPreferenceKey =
         booleanPreferencesKey("RAISE_TO_HAND_SUGGESTION")
 
-    override fun getCallsSoundNotificationsPreference(): Flow<CallsSoundNotifications> =
+    override fun getCallsSoundNotificationsPreference(): Flow<CallsSoundEnabledState> =
         context.callsDataStore.data
             .catch { exception ->
                 if (exception is IOException) {
@@ -63,9 +63,9 @@ internal class CallsPreferencesDataStore @Inject constructor(
                     throw exception
                 }
             }.map { preferences ->
-                CallsSoundNotifications.valueOf(
+                CallsSoundEnabledState.valueOf(
                     preferences[callsSoundNotificationsPreferenceKey]
-                        ?: CallsSoundNotifications.DEFAULT.name
+                        ?: CallsSoundEnabledState.DEFAULT.name
                 )
             }
 
@@ -142,7 +142,7 @@ internal class CallsPreferencesDataStore @Inject constructor(
         }
     }
 
-    override suspend fun setCallsSoundNotificationsPreference(soundNotifications: CallsSoundNotifications) {
+    override suspend fun setCallsSoundNotificationsPreference(soundNotifications: CallsSoundEnabledState) {
         withContext(ioDispatcher) {
             context.callsDataStore.edit {
                 it[callsSoundNotificationsPreferenceKey] = soundNotifications.name

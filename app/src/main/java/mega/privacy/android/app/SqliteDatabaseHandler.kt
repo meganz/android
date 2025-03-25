@@ -17,7 +17,6 @@ import mega.privacy.android.app.utils.TextUtil
 import mega.privacy.android.app.utils.Util
 import mega.privacy.android.data.database.LegacyDatabaseMigration
 import mega.privacy.android.data.database.MegaDatabaseConstant.TABLE_OFFLINE
-import mega.privacy.android.data.database.MegaDatabaseConstant.TABLE_SD_TRANSFERS
 import mega.privacy.android.data.gateway.MegaLocalRoomGateway
 import mega.privacy.android.data.mapper.StorageStateIntMapper
 import mega.privacy.android.data.mapper.StorageStateMapper
@@ -27,7 +26,6 @@ import mega.privacy.android.data.model.chat.NonContactInfo
 import mega.privacy.android.domain.entity.Contact
 import mega.privacy.android.domain.entity.StorageState
 import mega.privacy.android.domain.entity.VideoQuality
-import mega.privacy.android.domain.entity.chat.PendingMessageState
 import mega.privacy.android.domain.entity.login.EphemeralCredentials
 import mega.privacy.android.domain.entity.settings.ChatSettings
 import mega.privacy.android.domain.entity.settings.ChatSettings.Companion.VIBRATION_ON
@@ -1115,81 +1113,6 @@ class SqliteDatabaseHandler @Inject constructor(
         getStringValue(tableName, columnName, defaultValue.toString())?.toBooleanStrictOrNull()
             ?: defaultValue
 
-    override var isPasscodeLockEnabled: Boolean
-        get() = getBooleanValue(TABLE_PREFERENCES, KEY_PASSCODE_LOCK_ENABLED, false)
-        set(passcodeLockEnabled) {
-            val selectQuery = "SELECT * FROM $TABLE_PREFERENCES"
-            val values = ContentValues()
-            try {
-                readableDatabase.query(selectQuery).use { cursor ->
-                    if (cursor.moveToFirst()) {
-                        val UPDATE_PREFERENCES_TABLE =
-                            "UPDATE $TABLE_PREFERENCES SET $KEY_PASSCODE_LOCK_ENABLED= '${
-                                encrypt(passcodeLockEnabled.toString())
-                            }' WHERE $KEY_ID = '1'"
-                        writableDatabase.execSQL(UPDATE_PREFERENCES_TABLE)
-                    } else {
-                        values.put(
-                            KEY_PASSCODE_LOCK_ENABLED,
-                            encrypt(passcodeLockEnabled.toString())
-                        )
-                        writableDatabase.insert(
-                            TABLE_PREFERENCES,
-                            SQLiteDatabase.CONFLICT_NONE,
-                            values
-                        )
-                    }
-                }
-            } catch (e: Exception) {
-                Timber.e(e, "Exception opening or managing DB cursor")
-            }
-        }
-
-    override var passcodeLockCode: String
-        get() = getStringValue(TABLE_PREFERENCES, KEY_PASSCODE_LOCK_CODE, "")!!
-        set(passcodeLockCode: String) {
-            val selectQuery = "SELECT * FROM $TABLE_PREFERENCES"
-            val values = ContentValues()
-            try {
-                readableDatabase.query(selectQuery).use { cursor ->
-                    if (cursor.moveToFirst()) {
-                        val UPDATE_PREFERENCES_TABLE =
-                            "UPDATE $TABLE_PREFERENCES SET $KEY_PASSCODE_LOCK_CODE= '${
-                                encrypt(
-                                    passcodeLockCode
-                                )
-                            }' WHERE $KEY_ID = '1'"
-                        writableDatabase.execSQL(UPDATE_PREFERENCES_TABLE)
-                    } else {
-                        values.put(KEY_PASSCODE_LOCK_CODE, encrypt(passcodeLockCode))
-                        writableDatabase.insert(
-                            TABLE_PREFERENCES,
-                            SQLiteDatabase.CONFLICT_NONE,
-                            values
-                        )
-                    }
-                }
-            } catch (e: Exception) {
-                Timber.e(e, "Exception opening or managing DB cursor")
-            }
-        }
-
-    /**
-     * Checks if the fingerprint lock setting is enabled.
-     *
-     * @return True if the fingerprint is enabled, false otherwise.
-     */
-    /**
-     * Sets if the fingerprint lock setting is enabled or not.
-     *
-     * @param enabled True if the fingerprint is enabled, false otherwise.
-     */
-    override var isFingerprintLockEnabled: Boolean
-        get() = getBooleanValue(TABLE_PREFERENCES, KEY_FINGERPRINT_LOCK, false)
-        set(enabled) {
-            setStringValue(TABLE_PREFERENCES, KEY_FINGERPRINT_LOCK, "" + enabled)
-        }
-
     override fun setStorageAskAlways(storageAskAlways: Boolean) {
         setStringValue(TABLE_PREFERENCES, KEY_STORAGE_ASK_ALWAYS, storageAskAlways.toString())
     }
@@ -1570,84 +1493,6 @@ class SqliteDatabaseHandler @Inject constructor(
         legacyDatabaseMigration.onCreate(writableDatabase)
     }
 
-    /**
-     * Updates a pending message.
-     *
-     * @param idMessage   Identifier of the pending message.
-     * @param transferTag Identifier of the transfer.
-     */
-    override fun updatePendingMessageOnTransferStart(idMessage: Long, transferTag: Int) {
-        updatePendingMessage(
-            idMessage,
-            transferTag,
-            Constants.INVALID_OPTION,
-            PendingMessageState.UPLOADING.value
-        )
-    }
-
-    /**
-     * Updates a pending message.
-     *
-     * @param idMessage  Identifier of the pending message.
-     * @param nodeHandle Handle of the node already uploaded.
-     * @param state      State of the pending message.
-     */
-    override fun updatePendingMessageOnTransferFinish(
-        idMessage: Long,
-        nodeHandle: String?,
-        state: Int,
-    ) {
-        updatePendingMessage(idMessage, Constants.INVALID_ID, nodeHandle, state)
-    }
-
-    /**
-     * Updates a pending message.
-     *
-     * @param idMessage   Identifier of the pending message.
-     * @param transferTag Identifier of the transfer.
-     * @param nodeHandle  Handle of the node already uploaded.
-     * @param state       State of the pending message.
-     */
-    override fun updatePendingMessage(
-        idMessage: Long,
-        transferTag: Int,
-        nodeHandle: String?,
-        state: Int,
-    ) {
-        val values = ContentValues()
-        if (transferTag != Constants.INVALID_ID) {
-            values.put(KEY_PENDING_MSG_TRANSFER_TAG, transferTag)
-        }
-        values.put(KEY_PENDING_MSG_NODE_HANDLE, encrypt(nodeHandle))
-        values.put(KEY_PENDING_MSG_STATE, state)
-        val where = "$KEY_ID=$idMessage"
-        writableDatabase.update(
-            TABLE_PENDING_MSG_SINGLE,
-            SQLiteDatabase.CONFLICT_REPLACE,
-            values,
-            where,
-            emptyArray()
-        )
-    }
-
-    override fun removeSentPendingMessages() {
-        Timber.d("removeSentPendingMessages")
-        writableDatabase.delete(
-            TABLE_PENDING_MSG_SINGLE,
-            KEY_PENDING_MSG_STATE + "=" + PendingMessageState.SENT.value,
-            emptyArray()
-        )
-    }
-
-    override fun removePendingMessageByChatId(idChat: Long) {
-        Timber.d("removePendingMessageByChatId")
-        writableDatabase.delete(
-            TABLE_PENDING_MSG_SINGLE,
-            "$KEY_PENDING_MSG_ID_CHAT = '${encrypt(idChat.toString())}'",
-            emptyArray()
-        )
-    }
-
     override val autoPlayEnabled: String?
         get() {
             val selectQuery =
@@ -1710,7 +1555,6 @@ class SqliteDatabaseHandler @Inject constructor(
         const val TABLE_CHAT_SETTINGS = "chatsettings"
         const val TABLE_COMPLETED_TRANSFERS = "completedtransfers"
         const val TABLE_EPHEMERAL = "ephemeral"
-        const val TABLE_PENDING_MSG_SINGLE = "pendingmsgsingle"
         const val KEY_ID = "id"
         const val KEY_EMAIL = "email"
         const val KEY_PASSWORD = "password"
@@ -1817,7 +1661,6 @@ class SqliteDatabaseHandler @Inject constructor(
         const val KEY_TRANSFER_PARENT_HANDLE = "transferparenthandle"
         const val KEY_FIRST_LOGIN_CHAT = "firstloginchat"
         const val KEY_AUTO_PLAY = "autoplay"
-        const val KEY_ID_CHAT = "idchat"
 
         const val KEY_LAST_PUBLIC_HANDLE = "lastpublichandle"
         const val KEY_LAST_PUBLIC_HANDLE_TIMESTAMP = "lastpublichandletimestamp"
@@ -1825,31 +1668,7 @@ class SqliteDatabaseHandler @Inject constructor(
         const val KEY_STORAGE_STATE = "storagestate"
         const val KEY_MY_CHAT_FILES_FOLDER_HANDLE = "mychatfilesfolderhandle"
         const val KEY_TRANSFER_QUEUE_STATUS = "transferqueuestatus"
-        const val KEY_PENDING_MSG_ID_CHAT = "idchat"
-        const val KEY_PENDING_MSG_TIMESTAMP = "timestamp"
-        const val KEY_PENDING_MSG_TEMP_KARERE = "idtempkarere"
-        const val KEY_PENDING_MSG_FILE_PATH = "filePath"
-        const val KEY_PENDING_MSG_NAME = "filename"
-        const val KEY_PENDING_MSG_NODE_HANDLE = "nodehandle"
-        const val KEY_PENDING_MSG_FINGERPRINT = "filefingerprint"
-        const val KEY_PENDING_MSG_TRANSFER_TAG = "transfertag"
-        const val KEY_PENDING_MSG_STATE = "state"
 
-        const val KEY_SD_TRANSFERS_TAG = "sdtransfertag"
-        const val KEY_SD_TRANSFERS_NAME = "sdtransfername"
-        const val KEY_SD_TRANSFERS_SIZE = "sdtransfersize"
-        const val KEY_SD_TRANSFERS_HANDLE = "sdtransferhandle"
-        const val KEY_SD_TRANSFERS_APP_DATA = "sdtransferappdata"
-        const val KEY_SD_TRANSFERS_PATH = "sdtransferpath"
-        const val CREATE_SD_TRANSFERS_TABLE =
-            "CREATE TABLE IF NOT EXISTS $TABLE_SD_TRANSFERS(" +
-                    "$KEY_ID INTEGER PRIMARY KEY, " +                     // 0
-                    "$KEY_SD_TRANSFERS_TAG INTEGER, " +                   // 1
-                    "$KEY_SD_TRANSFERS_NAME TEXT, " +                     // 2
-                    "$KEY_SD_TRANSFERS_SIZE TEXT, " +                     // 3
-                    "$KEY_SD_TRANSFERS_HANDLE TEXT, " +                   // 4
-                    "$KEY_SD_TRANSFERS_PATH TEXT, " +                     // 5
-                    "$KEY_SD_TRANSFERS_APP_DATA TEXT)"                    // 6
         const val OLD_VIDEO_QUALITY_ORIGINAL = 0
 
         fun encrypt(original: String?): String? =

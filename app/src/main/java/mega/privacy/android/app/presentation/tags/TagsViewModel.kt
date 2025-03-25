@@ -96,7 +96,7 @@ class TagsViewModel @Inject constructor(
     fun validateTagName(tag: String = uiState.value.searchText) {
         viewModelScope.launch {
             runCatching {
-                getAllNodeTagsUseCase(searchString = tag)
+                getAllNodeTagsUseCase(searchString = tag.trim())
             }.onSuccess { userTags ->
                 val sortedTags = userTags.orEmpty()
                     .sortedByDescending { it in uiState.value.nodeTags }

@@ -19,7 +19,7 @@ import mega.privacy.android.legacy.core.ui.controls.text.MegaSpannedClickableTex
 import mega.privacy.android.shared.original.core.ui.model.SpanIndicator
 import mega.privacy.android.legacy.core.ui.model.SpanStyleWithAnnotation
 import mega.privacy.android.shared.original.core.ui.preview.CombinedTextAndThemePreviews
-import mega.privacy.android.shared.original.core.ui.theme.extensions.teal_300_teal_200
+import mega.privacy.android.shared.original.core.ui.theme.extensions.accent_900_accent_050
 import mega.privacy.android.shared.original.core.ui.theme.extensions.textColorSecondary
 
 /**
@@ -64,7 +64,7 @@ fun TakeDownDialog(
                     SpanIndicator('A') to SpanStyleWithAnnotation(
                         SpanStyle(
                             textDecoration = TextDecoration.Underline,
-                            color = MaterialTheme.colors.teal_300_teal_200
+                            color = MaterialTheme.colors.accent_900_accent_050
                         ),
                         Constants.TAKEDOWN_URL
                     )
@@ -77,7 +77,7 @@ fun TakeDownDialog(
             TextButton(onClick = onConfirm) {
                 Text(
                     text = stringResource(R.string.general_ok),
-                    color = MaterialTheme.colors.teal_300_teal_200
+                    color = MaterialTheme.colors.accent_900_accent_050
                 )
             }
         },
@@ -85,7 +85,7 @@ fun TakeDownDialog(
             TextButton(onClick = onDeny) {
                 Text(
                     text = stringResource(R.string.dispute_takendown_file),
-                    color = MaterialTheme.colors.teal_300_teal_200,
+                    color = MaterialTheme.colors.accent_900_accent_050,
                 )
             }
         },

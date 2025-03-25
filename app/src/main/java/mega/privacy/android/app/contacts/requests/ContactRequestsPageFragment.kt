@@ -57,7 +57,7 @@ import mega.privacy.android.shared.original.core.ui.controls.dividers.DividerTyp
 import mega.privacy.android.shared.original.core.ui.controls.dividers.MegaDivider
 import mega.privacy.android.shared.original.core.ui.controls.lists.MenuActionListTile
 import mega.privacy.android.shared.original.core.ui.controls.sheets.BottomSheet
-import mega.privacy.android.shared.original.core.ui.theme.OriginalTempTheme
+import mega.privacy.android.shared.original.core.ui.theme.OriginalTheme
 import javax.inject.Inject
 
 /**
@@ -191,7 +191,7 @@ class ContactRequestsPageFragment : Fragment() {
                 }
                 val coroutineScope = rememberCoroutineScope()
 
-                OriginalTempTheme(isDark = themeMode.isDarkMode()) {
+                OriginalTheme(isDark = themeMode.isDarkMode()) {
                     (state as? ContactRequestsState.Data)?.selectedItem?.takeIf { it.isOutgoing == isOutgoing }
                         ?.let { item ->
                             coroutineScope.launch { sheetState.show() }
@@ -278,16 +278,16 @@ class ContactRequestsPageFragment : Fragment() {
 
             if (isOutgoing) {
                 textRes = R.string.sent_requests_empty
-                drawableRes = R.drawable.ic_zero_data_sent_requests
+                drawableRes = IconPack.ic_user_arrow_out_glass
             } else {
                 textRes = R.string.received_requests_empty
-                drawableRes = R.drawable.ic_zero_data_received_requests
+                drawableRes = IconPack.ic_user_arrow_in_glass
             }
 
             binding.viewEmpty.setCompoundDrawablesWithIntrinsicBounds(0, drawableRes, 0, 0)
             binding.viewEmpty.text = getString(textRes)
                 .formatColorTag(requireContext(), 'A', R.color.grey_900_grey_100)
-                .formatColorTag(requireContext(), 'B', R.color.grey_300_grey_600)
+                .formatColorTag(requireContext(), 'B', R.color.grey_900_grey_100)
                 .toSpannedHtmlText()
             binding.viewEmpty.isVisible = true
         }

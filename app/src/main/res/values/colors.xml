@@ -82,17 +82,17 @@
 
     <color name="teal_050">#DCF4F0</color>
     <color name="teal_100">#A9E3D8</color>
-    <color name="teal_200">#6DD2BF</color>
-    <color name="teal_300">#008262</color>
+    <color name="accent_050">#f4f4f5</color>
+    <color name="accent_900">#04101e</color>
     <color name="teal_400">#00B092</color>
     <color name="teal_500">#00A07F</color>
     <color name="teal_600">#009372</color>
 
-    <color name="teal_200_alpha_038">#616DD2BF</color>
+    <color name="accent_050_alpha_038">#6104101E</color>
 
 
     <color name="teal_300_alpha_020">#3300BFA5</color>
-    <color name="teal_300_alpha_038">#6100BFA5</color>
+    <color name="accent_900_alpha_038">#6104101E</color>
     <color name="teal_300_alpha_050">#8000BFA5</color>
     <color name="teal_300_alpha_090">#E600BFA5</color>
 
@@ -119,7 +119,7 @@
     <color name="yellow_300">#FFEF67</color>
     <color name="yellow_600">#FFD300</color>
     <color name="yellow_700">#FEBC00</color>
-    
+
     <color name="yellow_700_alpha_015">#26FEBC00</color>
 
     <color name="orange_300">#FFB640</color>
@@ -198,10 +198,10 @@
     <color name="white_dark_grey">@color/white</color>
 
     <!-- Turn on camera uploads button text, action mode bar color -->
-    <color name="teal_300_dark_grey">@color/teal_300</color>
+    <color name="teal_300_dark_grey">@color/accent_900</color>
 
     <!-- icon tint for FAB above images or scrim -->
-    <color name="teal_300_black">@color/teal_300</color>
+    <color name="teal_300_black">@color/accent_900</color>
     <!-- background tint for FAB above images or scrim -->
     <color name="white_teal_200">@color/white</color>
 
@@ -245,7 +245,7 @@
     <color name="teal_300_006_teal_400_050">@color/teal_400_alpha_006</color>
 
     <!-- chat reaction contact emoji background border -->
-    <color name="teal_300_teal_600">@color/teal_300</color>
+    <color name="teal_300_teal_600">@color/accent_900</color>
 
     <!-- chat unread message background -->
     <color name="grey_020_grey_700">@color/grey_020</color>
@@ -362,7 +362,7 @@
 
     <!-- app drawer related related colors -->
     <color name="grey_010_white_087">@color/grey_010</color>
-    <color name="teal_300_grey_087">@color/teal_300</color>
+    <color name="teal_300_grey_087">@color/accent_900</color>
 
     <!-- transfer over quota progress -->
     <color name="amber_700_amber_300">@color/amber_700</color>
@@ -407,7 +407,7 @@
     <color name="grey_054_white">@color/grey_alpha_054</color>
 
     <!-- Chat contact reaction emoji count text color -->
-    <color name="teal_300_white">@color/teal_300</color>
+    <color name="teal_300_white">@color/accent_900</color>
 
     <!-- Chat reaction add icon tint color -->
     <color name="grey_026_white_038">@color/grey_alpha_026</color>
@@ -424,7 +424,7 @@
     <color name="white_transparent">@color/white</color>
 
     <!-- Same to colorSecondary -->
-    <color name="teal_300_teal_200">@color/teal_300</color>
+    <color name="teal_300_teal_200">@color/accent_900</color>
 
     <!-- Error text highlight color (selection background) -->
     <color name="teal_100_teal_050">@color/teal_100</color>
@@ -448,10 +448,10 @@
     <color name="grey_020_grey_800">@color/grey_020</color>
 
     <!-- For disabled borderless button-->
-    <color name="teal_300_038_teal_200_038">@color/teal_300_alpha_038</color>
+    <color name="teal_300_038_teal_200_038">@color/accent_900_alpha_038</color>
 
     <!-- local camera background-->
-    <color name="black_87_opacity">@color/teal_300_alpha_038</color>
+    <color name="black_87_opacity">@color/accent_900_alpha_038</color>
 
     <!-- Label red -->
     <color name="salmon_400_salmon_300">@color/salmon_400</color>
@@ -498,7 +498,7 @@
     <color name="white_alpha_087_grey_alpha_087">@color/white_alpha_087</color>
 
     <!--  SnackBar Button text  -->
-    <color name="teal_200_teal_300">@color/teal_200</color>
+    <color name="accent_900_accent_050">@color/accent_050</color>
 
     <!--  ExoPlayer Time Bar Unplayed  -->
     <color name="grey_alpha_012_white_alpha_023">@color/grey_alpha_012</color>
@@ -545,19 +545,32 @@
     <color name="grey_700_white_alpha_075">@color/grey_700</color>
     <color name="light_grey">#EAEFEF</color>
     <color name="app_background">@color/white</color>
-    
+
     <color name="color_button_brand">#DD1405</color>
     <color name="color_border_interactive">#DD1405</color>
+    <color name="color_icon_primary">#303233</color>
     <color name="color_icon_secondary">#616366</color>
+    <color name="color_icon_inverse">#FAFAFA</color>
     <color name="color_text_primary">#303233</color>
     <color name="color_text_error">#E31B57</color>
+    <color name="color_text_on_color_disabled">#919397</color>
     <color name="color_support_error">#E31B57</color>
+    <color name="color_support_info">#05BAF1</color>
     <color name="color_primary_400">#FB6361</color>
     <color name="color_icon_fill">#303233</color>
+    <color name="color_icon_accent">@color/accent_900</color>
     <color name="color_icon_disabled">#C1C2C4</color>
+    <color name="color_button_primary">#04101E</color>
     <color name="color_button_secondary">#494A4D</color>
     <color name="color_component_toastBackground">#FF494A4D</color>
     <color name="color_text_inverse">#FFFAFAFA</color>
     <color name="color_background_surface_1">#FFFAFAFA</color>
+    <color name="color_background_surface_2">#F3F4F4</color>
     <color name="color_background_pageBackground">#FFFFFFFF</color>
+    <color name="color_support_warning">#FFF7A308</color>
+    <color name="color_link_primary">#2C5BEB</color>
+    <color name="color_text_on_color">#FFFAFAFF</color>
+    <color name="color_support_success">#009B48</color>
+    <color name="color_components_interactive">#DD1405</color>
+    <color name="color_border_brand">#DD1405</color>
 </resources>

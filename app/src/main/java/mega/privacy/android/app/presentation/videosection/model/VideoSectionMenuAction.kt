@@ -192,6 +192,18 @@ sealed interface VideoSectionMenuAction : MenuAction {
         override val orderInCategory = 180
     }
 
+    /**
+     * Video section sort by action
+     */
+    object VideoSectionSortByAction : MenuActionString(
+        iconRes = iconPackR.drawable.ic_menu_option_sort_by,
+        descriptionRes = R.string.action_sort_by,
+        testTag = TEST_TAG_VIDEO_SECTION_SORT_BY_ACTION
+    ), VideoSectionMenuAction {
+        override val orderInCategory = 185
+    }
+
+
     companion object {
         /**
          * Test tag for video section download action
@@ -280,5 +292,10 @@ sealed interface VideoSectionMenuAction : MenuAction {
          */
         const val TEST_TAG_VIDEO_SECTION_RECENTLY_WATCHED_CLEAR_ACTION =
             "video_section:action_recently_watched_clear"
+
+        /**
+         * Test tag for video section video sort by action
+         */
+        const val TEST_TAG_VIDEO_SECTION_SORT_BY_ACTION = "video_section:action_sort_by"
     }
 }

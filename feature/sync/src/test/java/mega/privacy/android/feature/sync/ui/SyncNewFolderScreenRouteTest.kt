@@ -1,5 +1,6 @@
 package mega.privacy.android.feature.sync.ui
 
+import mega.privacy.android.shared.resources.R as sharedResR
 import androidx.activity.ComponentActivity
 import androidx.compose.ui.test.assertIsDisplayed
 import androidx.compose.ui.test.junit4.createAndroidComposeRule
@@ -10,6 +11,7 @@ import androidx.test.ext.junit.runners.AndroidJUnit4
 import com.google.common.truth.Truth.assertThat
 import kotlinx.coroutines.flow.StateFlow
 import mega.privacy.android.core.test.AnalyticsTestRule
+import mega.privacy.android.domain.entity.node.NodeId
 import mega.privacy.android.domain.entity.sync.SyncType
 import mega.privacy.android.feature.sync.R
 import mega.privacy.android.feature.sync.domain.entity.RemoteFolder
@@ -19,8 +21,9 @@ import mega.privacy.android.feature.sync.ui.newfolderpair.SyncNewFolderViewModel
 import mega.privacy.android.feature.sync.ui.newfolderpair.TAG_SYNC_NEW_FOLDER_SCREEN_SYNC_BUTTON
 import mega.privacy.android.feature.sync.ui.newfolderpair.TAG_SYNC_NEW_FOLDER_SCREEN_TOOLBAR
 import mega.privacy.android.feature.sync.ui.permissions.SyncPermissionsManager
+import mega.privacy.android.feature.sync.ui.views.SELECT_DEVICE_FOLDER_OPTION_TEST_TAG
 import mega.privacy.android.shared.original.core.ui.controls.appbar.APP_BAR_BACK_BUTTON_TAG
-import mega.privacy.android.shared.resources.R as sharedResR
+import mega.privacy.mobile.analytics.event.AndroidSyncSelectDeviceFolderButtonPressedEvent
 import mega.privacy.mobile.analytics.event.SyncNewFolderScreenBackNavigationEvent
 import org.junit.Rule
 import org.junit.Test
@@ -172,7 +175,7 @@ class SyncNewFolderScreenRouteTest {
                 syncType = SyncType.TYPE_TWOWAY,
                 deviceName = "Device Name",
                 selectedMegaFolder = RemoteFolder(
-                    id = 0, megaFolderName
+                    id = NodeId(0L), megaFolderName
                 ),
             )
         )
@@ -318,5 +321,32 @@ class SyncNewFolderScreenRouteTest {
         composeTestRule.onNodeWithTag(APP_BAR_BACK_BUTTON_TAG).assertExists().assertIsDisplayed()
             .performClick()
         assertThat(analyticsTestRule.events).contains(SyncNewFolderScreenBackNavigationEvent)
+    }
+
+    @Test
+    fun `test that click on select device folder option send the right analytics tracker event`() {
+        whenever(state.value).thenReturn(
+            SyncNewFolderState(
+                syncType = SyncType.TYPE_BACKUP,
+                deviceName = "Device Name",
+            )
+        )
+        whenever(viewModel.state).thenReturn(state)
+        composeTestRule.setContent {
+            SyncNewFolderScreenRoute(
+                viewModel,
+                syncPermissionsManager = syncPermissionsManager,
+                openNextScreen = {},
+                openSelectMegaFolderScreen = {},
+                openUpgradeAccount = {},
+                onBackClicked = {}
+            )
+        }
+
+        composeTestRule.onNodeWithTag(SELECT_DEVICE_FOLDER_OPTION_TEST_TAG).assertExists()
+            .assertIsDisplayed().performClick()
+        assertThat(analyticsTestRule.events).contains(
+            AndroidSyncSelectDeviceFolderButtonPressedEvent
+        )
     }
 }

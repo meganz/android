@@ -13,7 +13,7 @@ import mega.privacy.android.shared.original.core.ui.controls.appbar.MegaAppBar
 import mega.privacy.android.shared.original.core.ui.controls.layouts.MegaScaffold
 import mega.privacy.android.shared.original.core.ui.preview.BooleanProvider
 import mega.privacy.android.shared.original.core.ui.preview.CombinedThemePreviews
-import mega.privacy.android.shared.original.core.ui.theme.OriginalTempTheme
+import mega.privacy.android.shared.original.core.ui.theme.OriginalTheme
 import mega.privacy.android.shared.resources.R
 
 /**
@@ -65,7 +65,7 @@ internal fun CancellationInstructionsView(
 @Composable
 private fun CancelSubscriptionViewViaAppStore(
 ) {
-    OriginalTempTheme(isDark = isSystemInDarkTheme()) {
+    OriginalTheme(isDark = isSystemInDarkTheme()) {
         CancellationInstructionsView(
             instructionsType = CancellationInstructionsType.AppStore,
             onMegaUrlClicked = {},
@@ -81,7 +81,7 @@ private fun CancelSubscriptionViewViaAppStore(
 private fun CancelSubscriptionViewViaWebclientPreview(
     @PreviewParameter(BooleanProvider::class) isAccountExpired: Boolean,
 ) {
-    OriginalTempTheme(isDark = isSystemInDarkTheme()) {
+    OriginalTheme(isDark = isSystemInDarkTheme()) {
         CancellationInstructionsView(
             instructionsType = CancellationInstructionsType.WebClient,
             onMegaUrlClicked = {},

@@ -37,7 +37,6 @@ import mega.privacy.android.app.presentation.manager.ManagerViewModel
 import mega.privacy.android.app.presentation.manager.UnreadUserAlertsCheckType
 import mega.privacy.android.app.presentation.manager.UserInfoViewModel
 import mega.privacy.android.app.presentation.manager.model.UserInfoUiState
-import mega.privacy.android.app.presentation.settings.SettingsActivity
 import mega.privacy.android.app.presentation.testpassword.TestPasswordActivity
 import mega.privacy.android.app.presentation.verification.SMSVerificationActivity
 import mega.privacy.android.app.upgradeAccount.UpgradeAccountActivity
@@ -47,6 +46,7 @@ import mega.privacy.android.app.utils.Util
 import mega.privacy.android.data.qualifier.MegaApi
 import mega.privacy.android.domain.entity.StorageState
 import mega.privacy.android.domain.entity.contacts.UserChatStatus
+import mega.privacy.android.navigation.MegaNavigator
 import mega.privacy.mobile.analytics.event.DeviceCenterEntrypointButtonEvent
 import nz.mega.sdk.MegaApiAndroid
 import timber.log.Timber
@@ -67,6 +67,9 @@ internal class ManagerDrawerFragment : Fragment() {
     @Inject
     @MegaApi
     lateinit var megaApi: MegaApiAndroid
+
+    @Inject
+    lateinit var megaNavigator: MegaNavigator
 
     private val outMetrics: DisplayMetrics by lazy { resources.displayMetrics }
     private lateinit var drawerManager: NavigationDrawerManager
@@ -156,8 +159,6 @@ internal class ManagerDrawerFragment : Fragment() {
         }
         viewLifecycleOwner.collectFlow(viewModel.state) { uiState ->
             setContactStatus(uiState.userChatStatus)
-            // For QA Builds, show Backups when the Device Center Feature Flag is also disabled
-            binding.backupsSection.isVisible = false
             setDrawerLayout(uiState.isRootNodeExist && uiState.isConnected)
             binding.navigationDrawerAddPhoneNumberContainer.isVisible = uiState.canVerifyPhoneNumber
             binding.deviceCenterSection.isVisible = true
@@ -184,8 +185,7 @@ internal class ManagerDrawerFragment : Fragment() {
         }
         binding.settingsSection.setOnClickListener {
             drawerManager.closeDrawer()
-            val settingsIntent = SettingsActivity.getIntent(requireActivity())
-            startActivity(settingsIntent)
+            megaNavigator.openSettings(requireActivity())
         }
         binding.upgradeNavigationView.setOnClickListener {
             drawerManager.closeDrawer()
@@ -196,7 +196,6 @@ internal class ManagerDrawerFragment : Fragment() {
             drawerManager.closeDrawer()
             startActivity(ContactsActivity.getListIntent(requireActivity()))
         }
-        binding.backupsSection.setOnClickListener { drawerManager.drawerItemClicked(DrawerItem.BACKUPS) }
         binding.notificationsSection.setOnClickListener { drawerManager.drawerItemClicked(DrawerItem.NOTIFICATIONS) }
         binding.deviceCenterSection.setOnClickListener {
             Analytics.tracker.trackEvent(DeviceCenterEntrypointButtonEvent)
@@ -249,10 +248,10 @@ internal class ManagerDrawerFragment : Fragment() {
             when (storageState) {
                 StorageState.Green -> {}
                 StorageState.Orange -> colorString =
-                    ColorUtils.getColorHexString(requireContext(), R.color.amber_600_amber_300)
+                    ColorUtils.getColorHexString(requireContext(), R.color.color_support_warning)
 
                 StorageState.Red, StorageState.PayWall -> colorString =
-                    ColorUtils.getColorHexString(requireContext(), R.color.color_button_brand)
+                    ColorUtils.getColorHexString(requireContext(), R.color.color_support_error)
 
                 else -> {}
             }
@@ -326,6 +325,7 @@ internal class ManagerDrawerFragment : Fragment() {
         binding.upgradeNavigationView.isEnabled = isEnable
         binding.notificationsSection.isEnabled = isEnable
         binding.settingsSection.isEnabled = isEnable
+        binding.deviceCenterSection.isEnabled = isEnable
         val alpha = if (isEnable) 1f else 0.38f
         with(alpha) {
             binding.myAccountSectionText.alpha = this
@@ -333,6 +333,7 @@ internal class ManagerDrawerFragment : Fragment() {
             binding.notificationSectionText.alpha = this
             binding.rubbishBinSectionText.alpha = this
             binding.settingsSectionText.alpha = this
+            binding.deviceCenterSection.alpha = this
         }
     }
 

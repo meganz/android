@@ -12,7 +12,6 @@ import androidx.recyclerview.widget.RecyclerView;
 import java.io.File;
 
 import mega.privacy.android.app.main.megachat.chatAdapters.MegaChipChatExplorerAdapter;
-import mega.privacy.android.app.main.megachat.chatAdapters.MegaListChatAdapter;
 import mega.privacy.android.app.main.megachat.chatAdapters.MegaListChatExplorerAdapter;
 import nz.mega.sdk.MegaApiJava;
 import nz.mega.sdk.MegaError;
@@ -42,20 +41,7 @@ public class ChatUserAvatarListener implements MegaRequestListenerInterface {
         if (e.getErrorCode() == MegaError.API_OK) {
             Bitmap bitmap;
             String email;
-            if (holder instanceof MegaListChatAdapter.ViewHolderChatList) {
-                MegaListChatAdapter.ViewHolderNormalChatList viewHolder = (MegaListChatAdapter.ViewHolderNormalChatList) holder;
-                if (viewHolder != null && viewHolder.getContactMail() != null && request.getEmail() != null) {
-                    email = viewHolder.getContactMail();
-                    if (email.compareTo(request.getEmail()) == 0) {
-                        bitmap = getBitmap(email);
-                        if (bitmap != null) {
-                            viewHolder.setImageView(bitmap);
-                        }
-                    }
-                } else {
-                    Timber.w("Adapter cannot be updated - null");
-                }
-            } else if (holder instanceof MegaListChatExplorerAdapter.ViewHolderChatExplorerList) {
+            if (holder instanceof MegaListChatExplorerAdapter.ViewHolderChatExplorerList) {
                 MegaListChatExplorerAdapter.ViewHolderChatExplorerList viewHolder = (MegaListChatExplorerAdapter.ViewHolderChatExplorerList) holder;
                 if (viewHolder != null && viewHolder.getEmail() != null && request.getEmail() != null) {
                     email = viewHolder.getEmail();

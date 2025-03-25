@@ -1,6 +1,8 @@
 package mega.privacy.android.app.presentation.documentscanner
 
+import mega.privacy.android.shared.resources.R as SharedR
 import android.net.Uri
+import androidx.activity.compose.BackHandler
 import androidx.activity.compose.LocalOnBackPressedDispatcherOwner
 import androidx.compose.foundation.isSystemInDarkTheme
 import androidx.compose.foundation.layout.Column
@@ -11,6 +13,10 @@ import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.rememberScaffoldState
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.saveable.rememberSaveable
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.ExperimentalComposeUiApi
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
@@ -23,12 +29,14 @@ import androidx.compose.ui.tooling.preview.PreviewParameterProvider
 import androidx.compose.ui.unit.dp
 import de.palm.composestateevents.EventEffect
 import mega.privacy.android.app.R
+import mega.privacy.android.app.presentation.documentscanner.dialogs.DiscardScanUploadingWarningDialog
 import mega.privacy.android.app.presentation.documentscanner.groups.SaveScannedDocumentsDestinationGroup
 import mega.privacy.android.app.presentation.documentscanner.groups.SaveScannedDocumentsFileTypeGroup
 import mega.privacy.android.app.presentation.documentscanner.groups.SaveScannedDocumentsFilenameGroup
 import mega.privacy.android.app.presentation.documentscanner.model.SaveScannedDocumentsUiState
 import mega.privacy.android.app.presentation.documentscanner.model.ScanDestination
 import mega.privacy.android.app.presentation.documentscanner.model.ScanFileType
+import mega.privacy.android.domain.entity.documentscanner.ScanFilenameValidationStatus
 import mega.privacy.android.shared.original.core.ui.controls.appbar.AppBarType
 import mega.privacy.android.shared.original.core.ui.controls.appbar.MegaAppBar
 import mega.privacy.android.shared.original.core.ui.controls.buttons.RaisedDefaultMegaButton
@@ -36,7 +44,7 @@ import mega.privacy.android.shared.original.core.ui.controls.dividers.DividerTyp
 import mega.privacy.android.shared.original.core.ui.controls.dividers.MegaDivider
 import mega.privacy.android.shared.original.core.ui.controls.layouts.MegaScaffold
 import mega.privacy.android.shared.original.core.ui.preview.CombinedThemePreviews
-import mega.privacy.android.shared.original.core.ui.theme.OriginalTempTheme
+import mega.privacy.android.shared.original.core.ui.theme.OriginalTheme
 import mega.privacy.android.shared.original.core.ui.utils.showAutoDurationSnackbar
 
 /**
@@ -72,20 +80,31 @@ internal fun SaveScannedDocumentsView(
     val scaffoldState = rememberScaffoldState()
     val onBackPressedDispatcher = LocalOnBackPressedDispatcherOwner.current?.onBackPressedDispatcher
 
+    var showWarningDialog by rememberSaveable { mutableStateOf(false) }
+
     EventEffect(
         event = uiState.snackbarMessage,
         onConsumed = { onSnackbarMessageConsumed() },
-        action = { snackbarMessage ->
-            scaffoldState.snackbarHostState.showAutoDurationSnackbar(
-                message = if (snackbarMessage.formatArgsText != null) {
-                    context.resources.getString(
-                        snackbarMessage.textRes,
-                        snackbarMessage.formatArgsText,
-                    )
-                } else {
-                    context.resources.getString(snackbarMessage.textRes)
+        action = { filenameValidationStatus ->
+            val message = when (filenameValidationStatus) {
+                ScanFilenameValidationStatus.EmptyFilename -> {
+                    context.resources.getString(R.string.scan_snackbar_incorrect_name)
                 }
-            )
+
+                ScanFilenameValidationStatus.IncorrectFilenameExtension -> context.resources.getString(
+                    SharedR.string.document_scanning_settings_non_matching_file_extension_error_message
+                )
+
+                ScanFilenameValidationStatus.MissingFilenameExtension -> context.resources.getString(
+                    SharedR.string.document_scanning_settings_file_extension_required_error_message
+                )
+
+                else -> null
+            }
+
+            message?.let {
+                scaffoldState.snackbarHostState.showAutoDurationSnackbar(it)
+            }
         }
     )
     EventEffect(
@@ -96,17 +115,42 @@ internal fun SaveScannedDocumentsView(
         },
     )
 
+    BackHandler(enabled = !showWarningDialog) {
+        showWarningDialog = true
+    }
+
+    if (showWarningDialog) {
+        DiscardScanUploadingWarningDialog(
+            hasMultipleScans = !uiState.canSelectScanFileType,
+            onWarningAcknowledged = {
+                showWarningDialog = false
+                onBackPressedDispatcher?.onBackPressed()
+            },
+            onWarningDismissed = { showWarningDialog = false },
+        )
+    }
+
     MegaScaffold(
         modifier = Modifier.semantics { testTagsAsResourceId = true },
         scaffoldState = scaffoldState,
         topBar = {
             MegaAppBar(
                 modifier = Modifier.testTag(SAVE_SCANNED_DOCUMENTS_TOOLBAR),
-                title = stringResource(R.string.scan_title_save_scan),
-                appBarType = AppBarType.BACK_NAVIGATION,
+                title = stringResource(SharedR.string.document_scanning_settings_toolbar_title),
+                appBarType = AppBarType.CLOSE,
                 onNavigationPressed = { onBackPressedDispatcher?.onBackPressed() },
             )
-        }
+        },
+        bottomBar = {
+            RaisedDefaultMegaButton(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .padding(bottom = 16.dp, start = 16.dp, end = 16.dp)
+                    .testTag(SAVE_SCANNED_DOCUMENTS_SAVE_BUTTON),
+                textId = R.string.general_next,
+                onClick = onSaveButtonClicked,
+            )
+        },
     ) { padding ->
         Column(
             modifier = Modifier
@@ -120,15 +164,13 @@ internal fun SaveScannedDocumentsView(
             ) {
                 SaveScannedDocumentsFilenameGroup(
                     filename = uiState.filename,
-                    filenameErrorMessage = uiState.filenameErrorMessage,
+                    filenameValidationStatus = uiState.filenameValidationStatus,
                     scanFileType = uiState.scanFileType,
                     onFilenameChanged = onFilenameChanged,
                     onFilenameConfirmed = onFilenameConfirmed,
                 )
                 MegaDivider(
-                    modifier = Modifier
-                        .padding(horizontal = 16.dp)
-                        .testTag(SAVE_SCANNED_DOCUMENTS_FILE_NAME_DIVIDER),
+                    modifier = Modifier.testTag(SAVE_SCANNED_DOCUMENTS_FILE_NAME_DIVIDER),
                     dividerType = DividerType.FullSize,
                 )
                 if (uiState.canSelectScanFileType) {
@@ -137,9 +179,7 @@ internal fun SaveScannedDocumentsView(
                         onScanFileTypeSelected = onScanFileTypeSelected,
                     )
                     MegaDivider(
-                        modifier = Modifier
-                            .padding(horizontal = 16.dp)
-                            .testTag(SAVE_SCANNED_DOCUMENTS_FILE_TYPE_DIVIDER),
+                        modifier = Modifier.testTag(SAVE_SCANNED_DOCUMENTS_FILE_TYPE_DIVIDER),
                         dividerType = DividerType.FullSize,
                     )
                 }
@@ -149,20 +189,10 @@ internal fun SaveScannedDocumentsView(
                     onScanDestinationSelected = onScanDestinationSelected,
                 )
                 MegaDivider(
-                    modifier = Modifier
-                        .padding(horizontal = 16.dp)
-                        .testTag(SAVE_SCANNED_DOCUMENTS_DESTINATION_DIVIDER),
+                    modifier = Modifier.testTag(SAVE_SCANNED_DOCUMENTS_DESTINATION_DIVIDER),
                     dividerType = DividerType.FullSize,
                 )
             }
-            RaisedDefaultMegaButton(
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .padding(16.dp)
-                    .testTag(SAVE_SCANNED_DOCUMENTS_SAVE_BUTTON),
-                textId = R.string.scan_action_save,
-                onClick = onSaveButtonClicked,
-            )
         }
     }
 }
@@ -175,7 +205,7 @@ internal fun SaveScannedDocumentsView(
 private fun SaveScannedDocumentsViewPreview(
     @PreviewParameter(SaveScannedDocumentsViewPreviewParameterProvider::class) saveScannedDocumentsViewPreviewParameter: SaveScannedDocumentsViewPreviewParameter,
 ) {
-    OriginalTempTheme(isDark = isSystemInDarkTheme()) {
+    OriginalTheme(isDark = isSystemInDarkTheme()) {
         SaveScannedDocumentsView(
             uiState = SaveScannedDocumentsUiState(
                 originatedFromChat = saveScannedDocumentsViewPreviewParameter.originatedFromChat,

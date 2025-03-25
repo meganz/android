@@ -8,48 +8,50 @@ import androidx.lifecycle.viewModelScope
 import dagger.hilt.android.lifecycle.HiltViewModel
 import de.palm.composestateevents.consumed
 import de.palm.composestateevents.triggered
-import kotlinx.coroutines.CancellationException
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.catch
+import kotlinx.coroutines.flow.collect
 import kotlinx.coroutines.flow.conflate
-import kotlinx.coroutines.flow.filter
-import kotlinx.coroutines.flow.last
-import kotlinx.coroutines.flow.lastOrNull
-import kotlinx.coroutines.flow.onCompletion
 import kotlinx.coroutines.flow.onEach
 import kotlinx.coroutines.flow.takeWhile
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
-import mega.privacy.android.app.featuretoggle.AppFeatures
 import mega.privacy.android.app.middlelayer.iar.OnCompleteListener
 import mega.privacy.android.app.presentation.mapper.file.FileSizeStringMapper
 import mega.privacy.android.app.presentation.transfers.TransfersConstants
+import mega.privacy.android.app.presentation.transfers.starttransfer.model.CancelTransferResult
 import mega.privacy.android.app.presentation.transfers.starttransfer.model.ConfirmLargeDownloadInfo
+import mega.privacy.android.app.presentation.transfers.starttransfer.model.SaveDestinationInfo
 import mega.privacy.android.app.presentation.transfers.starttransfer.model.StartTransferEvent
+import mega.privacy.android.app.presentation.transfers.starttransfer.model.StartTransferEvent.Message.SlowDownloadPreviewFinished
+import mega.privacy.android.app.presentation.transfers.starttransfer.model.StartTransferEvent.Message.SlowDownloadPreviewInProgress
 import mega.privacy.android.app.presentation.transfers.starttransfer.model.StartTransferJobInProgress
 import mega.privacy.android.app.presentation.transfers.starttransfer.model.StartTransferViewState
 import mega.privacy.android.app.presentation.transfers.starttransfer.model.TransferTriggerEvent
 import mega.privacy.android.app.service.iar.RatingHandlerImpl
 import mega.privacy.android.domain.entity.node.NodeId
 import mega.privacy.android.domain.entity.node.TypedNode
-import mega.privacy.android.domain.entity.transfer.MultiTransferEvent
-import mega.privacy.android.domain.entity.transfer.TransferEvent
+import mega.privacy.android.domain.entity.transfer.ActiveTransferTotals
 import mega.privacy.android.domain.entity.transfer.TransferStage
 import mega.privacy.android.domain.entity.transfer.TransferType
+import mega.privacy.android.domain.entity.transfer.isPreviewDownload
 import mega.privacy.android.domain.entity.uri.UriPath
 import mega.privacy.android.domain.exception.NotEnoughStorageException
 import mega.privacy.android.domain.usecase.SetStorageDownloadAskAlwaysUseCase
 import mega.privacy.android.domain.usecase.SetStorageDownloadLocationUseCase
 import mega.privacy.android.domain.usecase.canceltoken.CancelCancelTokenUseCase
+import mega.privacy.android.domain.usecase.canceltoken.InvalidateCancelTokenUseCase
 import mega.privacy.android.domain.usecase.chat.message.SendChatAttachmentsUseCase
-import mega.privacy.android.domain.usecase.featureflag.GetFeatureFlagValueUseCase
+import mega.privacy.android.domain.usecase.environment.GetCurrentTimeInMillisUseCase
 import mega.privacy.android.domain.usecase.file.TotalFileSizeOfNodesUseCase
 import mega.privacy.android.domain.usecase.network.IsConnectedToInternetUseCase
 import mega.privacy.android.domain.usecase.node.GetFilePreviewDownloadPathUseCase
 import mega.privacy.android.domain.usecase.offline.GetOfflinePathForNodeUseCase
 import mega.privacy.android.domain.usecase.setting.IsAskBeforeLargeDownloadsSettingUseCase
 import mega.privacy.android.domain.usecase.setting.SetAskBeforeLargeDownloadsSettingUseCase
+import mega.privacy.android.domain.usecase.transfers.CancelTransferByTagUseCase
+import mega.privacy.android.domain.usecase.transfers.GetFileNameFromStringUriUseCase
 import mega.privacy.android.domain.usecase.transfers.active.ClearActiveTransfersIfFinishedUseCase
 import mega.privacy.android.domain.usecase.transfers.active.MonitorOngoingActiveTransfersUseCase
 import mega.privacy.android.domain.usecase.transfers.chatuploads.SetAskedResumeTransfersUseCase
@@ -59,22 +61,24 @@ import mega.privacy.android.domain.usecase.transfers.downloads.GetOrCreateStorag
 import mega.privacy.android.domain.usecase.transfers.downloads.SaveDoNotPromptToSaveDestinationUseCase
 import mega.privacy.android.domain.usecase.transfers.downloads.ShouldAskDownloadDestinationUseCase
 import mega.privacy.android.domain.usecase.transfers.downloads.ShouldPromptToSaveDestinationUseCase
-import mega.privacy.android.domain.usecase.transfers.downloads.StartDownloadsWithWorkerUseCase
 import mega.privacy.android.domain.usecase.transfers.downloads.StartDownloadsWorkerAndWaitUntilIsStartedUseCase
 import mega.privacy.android.domain.usecase.transfers.filespermission.MonitorRequestFilesPermissionDeniedUseCase
 import mega.privacy.android.domain.usecase.transfers.filespermission.SetRequestFilesPermissionDeniedUseCase
 import mega.privacy.android.domain.usecase.transfers.offline.SaveOfflineNodesToDevice
 import mega.privacy.android.domain.usecase.transfers.offline.SaveUriToDeviceUseCase
+import mega.privacy.android.domain.usecase.transfers.overquota.MonitorStorageOverQuotaUseCase
+import mega.privacy.android.domain.usecase.transfers.paused.AreTransfersPausedUseCase
 import mega.privacy.android.domain.usecase.transfers.paused.PauseTransfersQueueUseCase
 import mega.privacy.android.domain.usecase.transfers.pending.DeleteAllPendingTransfersUseCase
 import mega.privacy.android.domain.usecase.transfers.pending.InsertPendingDownloadsForNodesUseCase
+import mega.privacy.android.domain.usecase.transfers.pending.InsertPendingUploadsForFilesUseCase
 import mega.privacy.android.domain.usecase.transfers.pending.MonitorPendingTransfersUntilResolvedUseCase
 import mega.privacy.android.domain.usecase.transfers.uploads.GetCurrentUploadSpeedUseCase
-import mega.privacy.android.domain.usecase.transfers.uploads.StartUploadsWithWorkerUseCase
+import mega.privacy.android.domain.usecase.transfers.uploads.StartUploadsWorkerAndWaitUntilIsStartedUseCase
 import timber.log.Timber
 import java.io.File
-import java.io.IOException
 import javax.inject.Inject
+import kotlin.time.Duration.Companion.seconds
 
 /**
  * View model to handle start transfers component
@@ -84,7 +88,6 @@ internal class StartTransfersComponentViewModel @Inject constructor(
     private val getOfflinePathForNodeUseCase: GetOfflinePathForNodeUseCase,
     private val getOrCreateStorageDownloadLocationUseCase: GetOrCreateStorageDownloadLocationUseCase,
     private val getFilePreviewDownloadPathUseCase: GetFilePreviewDownloadPathUseCase,
-    private val startDownloadsWithWorkerUseCase: StartDownloadsWithWorkerUseCase,
     private val clearActiveTransfersIfFinishedUseCase: ClearActiveTransfersIfFinishedUseCase,
     private val isConnectedToInternetUseCase: IsConnectedToInternetUseCase,
     private val totalFileSizeOfNodesUseCase: TotalFileSizeOfNodesUseCase,
@@ -102,7 +105,6 @@ internal class StartTransfersComponentViewModel @Inject constructor(
     private val shouldAskForResumeTransfersUseCase: ShouldAskForResumeTransfersUseCase,
     private val setAskedResumeTransfersUseCase: SetAskedResumeTransfersUseCase,
     private val pauseTransfersQueueUseCase: PauseTransfersQueueUseCase,
-    private val startUploadWithWorkerUseCase: StartUploadsWithWorkerUseCase,
     private val saveOfflineNodesToDevice: SaveOfflineNodesToDevice,
     private val saveUriToDeviceUseCase: SaveUriToDeviceUseCase,
     private val getCurrentUploadSpeedUseCase: GetCurrentUploadSpeedUseCase,
@@ -110,10 +112,17 @@ internal class StartTransfersComponentViewModel @Inject constructor(
     private val monitorRequestFilesPermissionDeniedUseCase: MonitorRequestFilesPermissionDeniedUseCase,
     private val setRequestFilesPermissionDeniedUseCase: SetRequestFilesPermissionDeniedUseCase,
     private val startDownloadsWorkerAndWaitUntilIsStartedUseCase: StartDownloadsWorkerAndWaitUntilIsStartedUseCase,
+    private val startUploadsWorkerAndWaitUntilIsStartedUseCase: StartUploadsWorkerAndWaitUntilIsStartedUseCase,
     private val deleteAllPendingTransfersUseCase: DeleteAllPendingTransfersUseCase,
     private val monitorPendingTransfersUntilResolvedUseCase: MonitorPendingTransfersUntilResolvedUseCase,
-    private val getFeatureFlagValueUseCase: GetFeatureFlagValueUseCase,
     private val insertPendingDownloadsForNodesUseCase: InsertPendingDownloadsForNodesUseCase,
+    private val insertPendingUploadsForFilesUseCase: InsertPendingUploadsForFilesUseCase,
+    private val monitorStorageOverQuotaUseCase: MonitorStorageOverQuotaUseCase,
+    private val invalidateCancelTokenUseCase: InvalidateCancelTokenUseCase,
+    private val getCurrentTimeInMillisUseCase: GetCurrentTimeInMillisUseCase,
+    private val areTransfersPausedUseCase: AreTransfersPausedUseCase,
+    private val getFileNameFromStringUriUseCase: GetFileNameFromStringUriUseCase,
+    private val cancelTransferByTagUseCase: CancelTransferByTagUseCase,
 ) : ViewModel(), DefaultLifecycleObserver {
 
     private val _uiState = MutableStateFlow(StartTransferViewState())
@@ -127,6 +136,8 @@ internal class StartTransfersComponentViewModel @Inject constructor(
         checkDownloadRating()
         checkUploadRating()
         monitorRequestFilesPermissionDenied()
+        monitorStorageOverQuota()
+        monitorPreviews()
     }
 
     /**
@@ -157,7 +168,6 @@ internal class StartTransfersComponentViewModel @Inject constructor(
                         uris = transferTriggerEvent.uris,
                         isVoiceClip = transferTriggerEvent.isVoiceClip
                     )
-                    checkAndHandleTransfersPaused()
                 }
 
                 is TransferTriggerEvent.StartUpload -> {
@@ -170,7 +180,12 @@ internal class StartTransfersComponentViewModel @Inject constructor(
                         transferTriggerEvent = transferTriggerEvent,
                     )
                 }
+
+                is TransferTriggerEvent.CancelPreviewDownload -> {
+                    setTransferTagToCancel(transferTriggerEvent.transferTag)
+                }
             }
+            checkAndHandleTransfersPaused(transferTriggerEvent)
         }
     }
 
@@ -187,7 +202,6 @@ internal class StartTransfersComponentViewModel @Inject constructor(
             Timber.e("Node in $transferTriggerEvent must exist")
             _uiState.updateEventAndClearProgress(StartTransferEvent.Message.TransferCancelled)
         } else {
-            lastTransferStartedHere = true
             when (transferTriggerEvent) {
                 is TransferTriggerEvent.StartDownloadForOffline -> {
                     startDownloadForOffline(transferTriggerEvent)
@@ -213,6 +227,7 @@ internal class StartTransfersComponentViewModel @Inject constructor(
                 }
 
                 is TransferTriggerEvent.StartDownloadForPreview -> {
+                    _uiState.update { it.copy(isOpenWithAction = transferTriggerEvent.isOpenWith) }
                     startDownloadNodeForPreview(transferTriggerEvent)
                 }
             }
@@ -231,10 +246,23 @@ internal class StartTransfersComponentViewModel @Inject constructor(
         consumeAskDestination()
         if (destinationUri != null && originalEvent != null) {
             viewModelScope.launch {
-                startDownloadNodes(originalEvent, destinationUri.toString())
+                val destination = destinationUri.toString()
+                startDownloadNodes(originalEvent, destination)
                 if (runCatching { shouldPromptToSaveDestinationUseCase() }.getOrDefault(false)) {
+                    val destinationName =
+                        runCatching { getFileNameFromStringUriUseCase(destination) }
+                            .onFailure { Timber.e(it) }
+                            .getOrNull()
+
                     _uiState.update {
-                        it.copy(promptSaveDestination = triggered(destinationUri.toString()))
+                        it.copy(
+                            promptSaveDestination = triggered(
+                                SaveDestinationInfo(
+                                    destination = destination,
+                                    destinationName = destinationName ?: destination
+                                )
+                            )
+                        )
                     }
                 }
             }
@@ -310,6 +338,8 @@ internal class StartTransfersComponentViewModel @Inject constructor(
     ) {
         runCatching {
             saveOfflineNodesToDevice(startDownloadNode.nodeIds, UriPath(destination))
+        }.onSuccess {
+            _uiState.updateEventAndClearProgress(StartTransferEvent.FinishCopyOffline(it))
         }.onFailure {
             Timber.e(it)
         }
@@ -371,160 +401,79 @@ internal class StartTransfersComponentViewModel @Inject constructor(
         runCatching { clearActiveTransfersIfFinishedUseCase() }
             .onFailure { Timber.e(it) }
         _uiState.updateJobInProgress(StartTransferJobInProgress.ScanningTransfers(TransferStage.STAGE_NONE))
-        if (getFeatureFlagValueUseCase(AppFeatures.StartDownloadsInWorker)) {
-            startDownloadNodesInWorker(nodes, isHighPriority, getUri, transferTriggerEvent)
-        } else {
-            startDownloadNodesInViewModel(nodes, isHighPriority, getUri, transferTriggerEvent)
-        }
-        checkDownloadRating()
-    }
-
-    private suspend fun startDownloadNodesInWorker(
-        nodes: List<TypedNode>,
-        isHighPriority: Boolean,
-        getUri: suspend () -> String?,
-        transferTriggerEvent: TransferTriggerEvent.DownloadTriggerEvent,
-    ) {
         runCatching {
             val uri = getUri()
             if (uri.isNullOrBlank()) {
                 throw NullPointerException("path not found!")
             }
-            insertPendingDownloadsForNodesUseCase(nodes, UriPath(uri), isHighPriority)
-            monitorPendingDownloadsUntilProcessed(transferTriggerEvent)
+            insertPendingDownloadsForNodesUseCase(
+                nodes,
+                UriPath(uri),
+                isHighPriority,
+                transferTriggerEvent.appData
+            )
+            monitorPendingTransfersUntilProcessed(transferTriggerEvent)
             startDownloadsWorkerAndWaitUntilIsStartedUseCase()
         }.onFailure {
-            Timber.e("Error on startDownloadNodes", it)
+            Timber.e(it, "Error on startDownloadNodes")
             _uiState.updateEventAndClearProgressWithException(it)
         }
+        checkDownloadRating()
     }
 
-    private suspend fun startDownloadNodesInViewModel(
-        nodes: List<TypedNode>,
-        isHighPriority: Boolean,
-        getUri: suspend () -> String?,
-        transferTriggerEvent: TransferTriggerEvent.DownloadTriggerEvent,
+    private fun monitorPendingTransfersUntilProcessed(
+        transferTriggerEvent: TransferTriggerEvent.CloudTransfer,
     ) {
-        var lastError: Throwable? = null
-        var startMessageShown = false
-        val terminalEvent = runCatching {
-            getUri().also {
-                if (it.isNullOrBlank()) {
-                    throw NullPointerException("path not found!")
-                }
-            }
-        }.onFailure { lastError = it }
-            .getOrNull()?.let { uri ->
-                startDownloadsWithWorkerUseCase(
-                    destinationPathOrUri = uri,
-                    nodes = nodes,
-                    isHighPriority = isHighPriority,
-                ).onEach { event ->
-                    val singleTransferEvent = (event as? MultiTransferEvent.SingleTransferEvent)
-                    // update scanning transfers state
-                    updateScanningFoldersProgress(singleTransferEvent)
-                    //show start message as soon as an event with all transfers updated is received
-                    if (!startMessageShown && singleTransferEvent?.allTransfersUpdated == true) {
-                        startMessageShown = true
-                        updateWithDownloadFinishProcessing(
-                            singleTransferEvent,
-                            transferTriggerEvent,
-                            nodes.size,
-                        )
-                    }
-                }.catch {
-                    lastError = it
-                    Timber.e(it)
-                }.onCompletion {
-                    if (it is CancellationException) {
-                        _uiState.updateEventAndClearProgress(StartTransferEvent.Message.TransferCancelled)
-                    }
-                }.last()
-            }
-        when {
-            terminalEvent == MultiTransferEvent.InsufficientSpace ->
-                _uiState.updateEventAndClearProgress(StartTransferEvent.Message.NotSufficientSpace)
-
-            !startMessageShown -> updateWithDownloadFinishProcessing(
-                terminalEvent as? MultiTransferEvent.SingleTransferEvent,
-                transferTriggerEvent,
-                nodes.size,
-                lastError?.takeIf { terminalEvent == null },
-            )
-        }
-    }
-
-    private fun monitorPendingDownloadsUntilProcessed(transferTriggerEvent: TransferTriggerEvent.DownloadTriggerEvent) {
         viewModelScope.launch {
             var error: Throwable? = null
-            val lastPendingTransfers =
-                monitorPendingTransfersUntilResolvedUseCase(TransferType.DOWNLOAD).onEach { pendingTransfers ->
-                    Timber.d("Pending transfers to process: ${pendingTransfers.size}")
-                    if (pendingTransfers.isNotEmpty()) {
-                        _uiState.updateJobInProgress(
-                            StartTransferJobInProgress.ScanningTransfers(
-                                stage = pendingTransfers.minOf { it.scanningFoldersData.stage },
-                                fileCount = pendingTransfers.sumOf { it.scanningFoldersData.fileCount },
-                                folderCount = pendingTransfers.sumOf { it.scanningFoldersData.folderCount },
-                                createdFolderCount = pendingTransfers.sumOf { it.scanningFoldersData.createdFolderCount },
-                            )
+            val transferType: TransferType = when (transferTriggerEvent) {
+                is TransferTriggerEvent.DownloadTriggerEvent -> TransferType.DOWNLOAD
+                is TransferTriggerEvent.StartUpload -> TransferType.GENERAL_UPLOAD
+            }
+            monitorPendingTransfersUntilResolvedUseCase(transferType).onEach { pendingTransfers ->
+                Timber.d("Pending transfers to process: ${pendingTransfers.size}")
+                if (pendingTransfers.isNotEmpty()) {
+                    _uiState.updateJobInProgress(
+                        StartTransferJobInProgress.ScanningTransfers(
+                            stage = pendingTransfers.minOf { it.scanningFoldersData.stage },
+                            fileCount = pendingTransfers.sumOf { it.scanningFoldersData.fileCount },
+                            folderCount = pendingTransfers.sumOf { it.scanningFoldersData.folderCount },
+                            createdFolderCount = pendingTransfers.sumOf { it.scanningFoldersData.createdFolderCount },
+                        )
+                    )
+                }
+            }
+                .catch { error = it }
+                .collect() //just wait until finishes
+
+            Timber.d("Scanning finished")
+            invalidateCancelTokenUseCase()
+            deleteAllPendingTransfersUseCase()
+            _uiState.updateEventAndClearProgress(
+                when (transferTriggerEvent) {
+                    is TransferTriggerEvent.DownloadTriggerEvent -> {
+                        StartTransferEvent.FinishDownloadProcessing(
+                            exception = error,
+                            triggerEvent = transferTriggerEvent,
+                        )
+                    }
+
+                    is TransferTriggerEvent.StartUpload.TextFile -> {
+                        StartTransferEvent.Message.FailedTextFileUpload(
+                            isEditMode = transferTriggerEvent.isEditMode,
+                            isCloudFile = transferTriggerEvent.fromHomePage
+                        )
+                    }
+
+                    is TransferTriggerEvent.StartUpload -> {
+                        StartTransferEvent.FinishUploadProcessing(
+                            totalFiles = transferTriggerEvent.pathsAndNames.size,
+                            triggerEvent = transferTriggerEvent,
                         )
                     }
                 }
-                    .catch { error = it }
-                    .filter { it.isNotEmpty() }
-                    .lastOrNull()
-
-            Timber.d("Scanning finished")
-            deleteAllPendingTransfersUseCase()
-            _uiState.updateEventAndClearProgress(
-                StartTransferEvent.FinishDownloadProcessing(
-                    exception = error,
-                    totalNodes = transferTriggerEvent.nodes.size,
-                    totalFiles = lastPendingTransfers?.sumOf { it.startedFiles } ?: 0,
-                    totalAlreadyDownloaded = lastPendingTransfers?.sumOf { it.alreadyTransferred }
-                        ?: 0,
-                    triggerEvent = transferTriggerEvent,
-                )
             )
         }
-    }
-
-    private fun updateScanningFoldersProgress(
-        event: MultiTransferEvent.SingleTransferEvent?,
-    ) {
-        if (event != null && _uiState.value.jobInProgressState is StartTransferJobInProgress.ScanningTransfers) {
-            val folderTransferEvent = event.transferEvent
-            if (event.scanningFinished) {
-                _uiState.updateJobInProgress(null)
-            } else if (folderTransferEvent is TransferEvent.FolderTransferUpdateEvent) {
-                _uiState.updateJobInProgress(
-                    StartTransferJobInProgress.ScanningTransfers(
-                        stage = folderTransferEvent.stage,
-                        fileCount = folderTransferEvent.fileCount.toInt(),
-                        folderCount = folderTransferEvent.folderCount.toInt(),
-                        createdFolderCount = folderTransferEvent.createdFolderCount.toInt()
-                    )
-                )
-            }
-        }
-    }
-
-    private fun updateWithDownloadFinishProcessing(
-        event: MultiTransferEvent.SingleTransferEvent?,
-        transferTriggerEvent: TransferTriggerEvent,
-        totalNodes: Int,
-        error: Throwable? = null,
-    ) {
-        _uiState.updateEventAndClearProgress(
-            StartTransferEvent.FinishDownloadProcessing(
-                exception = error,
-                totalNodes = totalNodes,
-                totalFiles = event?.startedFiles ?: 0,
-                totalAlreadyDownloaded = event?.alreadyTransferred ?: 0,
-                triggerEvent = transferTriggerEvent,
-            )
-        )
     }
 
     private suspend fun startChatUploads(
@@ -637,6 +586,21 @@ internal class StartTransfersComponentViewModel @Inject constructor(
         }
     }
 
+    fun previewFile(file: File) {
+        _uiState.update {
+            it.copy(previewFileToOpen = file)
+        }
+    }
+
+    /**
+     * Consume preview file opened
+     */
+    fun consumePreviewFileOpened() {
+        _uiState.update {
+            it.copy(previewFileToOpen = null, isOpenWithAction = false)
+        }
+    }
+
     private fun checkAndHandleDeviceIsNotConnected() =
         if (runCatching { isConnectedToInternetUseCase() }.getOrDefault(true)) {
             false
@@ -702,6 +666,61 @@ internal class StartTransfersComponentViewModel @Inject constructor(
         }
     }
 
+    private fun monitorPreviews() {
+        viewModelScope.launch {
+            monitorOngoingActiveTransfersUseCase(TransferType.DOWNLOAD).conflate()
+                .catch {
+                    Timber.e(it)
+                }.collect { (transferTotals, _) ->
+                    transferTotals.groups
+                        .filter { it.isPreviewDownload() }
+                        .takeIf { it.isNotEmpty() }?.let { previewGroups ->
+                            if (active) {
+                                checkFinishedPreviews(previewGroups)
+                                checkSlowPreviews(previewGroups)
+                            }
+                        }
+                }
+        }
+    }
+
+    private fun checkFinishedPreviews(groups: List<ActiveTransferTotals.Group>) {
+        groups.filter { it.finished() && !alreadyFinishedPreviewGroups.contains(it.groupId) }
+            .let { finishedGroups ->
+                alreadyFinishedPreviewGroups.addAll(finishedGroups.map { it.groupId })
+                finishedGroups.forEach { group ->
+                    if (group.completedFiles == 1) {
+                        val file = File(group.destination + group.singleFileName)
+                        val duration = group.durationFromStart(getCurrentTimeInMillisUseCase())
+                        if (duration < 6.seconds) {
+                            previewFile(file)
+                        } else {
+                            _uiState.updateEventAndClearProgress(
+                                SlowDownloadPreviewFinished(file)
+                            )
+                        }
+                    }
+                    if (group.singleTransferTag == uiState.value.transferTagToCancel) {
+                        setTransferTagToCancel(null)
+                    }
+                }
+            }
+    }
+
+    private fun checkSlowPreviews(groups: List<ActiveTransferTotals.Group>) {
+        groups.filter {
+            !it.finished()
+                    && !alreadySlowNotifiedGroups.contains(it.groupId)
+                    && it.durationFromStart(getCurrentTimeInMillisUseCase()) > 2.seconds
+        }
+            .takeIf { it.isNotEmpty() }
+            ?.let { notFinishedSlowGroups ->
+                //as this is responding an user action, usually only one group at a time, but
+                alreadySlowNotifiedGroups.addAll(notFinishedSlowGroups.map { it.groupId })
+                _uiState.updateEventAndClearProgress(SlowDownloadPreviewInProgress)
+            }
+    }
+
     private fun MutableStateFlow<StartTransferViewState>.updateEventAndClearProgress(
         event: StartTransferEvent?,
     ) = this.update {
@@ -732,8 +751,8 @@ internal class StartTransfersComponentViewModel @Inject constructor(
     private fun String.ensureSuffix(suffix: String) =
         if (this.endsWith(suffix)) this else this.plus(suffix)
 
+
     private var active = false
-    private var lastTransferStartedHere = false
 
     override fun onResume(owner: LifecycleOwner) {
         super.onResume(owner)
@@ -764,9 +783,16 @@ internal class StartTransfersComponentViewModel @Inject constructor(
         }
     }
 
-    private fun checkAndHandleTransfersPaused() {
-        if (runCatching { shouldAskForResumeTransfersUseCase() }.getOrDefault(false)) {
-            _uiState.updateEventAndClearProgress(StartTransferEvent.PausedTransfers)
+    private fun checkAndHandleTransfersPaused(triggerEvent: TransferTriggerEvent) {
+        if (runCatching {
+                when (triggerEvent.checkPausedTransfers) {
+                    TransferTriggerEvent.CheckPausedTransfersType.Never -> false
+                    TransferTriggerEvent.CheckPausedTransfersType.OncePerPausedState -> shouldAskForResumeTransfersUseCase()
+                    TransferTriggerEvent.CheckPausedTransfersType.Always -> areTransfersPausedUseCase()
+                }
+            }.getOrDefault(false)
+        ) {
+            _uiState.updateEventAndClearProgress(StartTransferEvent.PausedTransfers(triggerEvent))
         }
     }
 
@@ -784,14 +810,16 @@ internal class StartTransfersComponentViewModel @Inject constructor(
             return
         }
 
-        lastTransferStartedHere = true
-        _uiState.updateJobInProgress(StartTransferJobInProgress.ScanningTransfers(TransferStage.STAGE_NONE))
-        var startMessageShown = false
-        startUploadWithWorkerUseCase(
-            pathsAndNames,
-            destinationId,
-            transferTriggerEvent.isHighPriority,
-        ).catch {
+        runCatching {
+            insertPendingUploadsForFilesUseCase(
+                pathsAndNames = pathsAndNames,
+                parentFolderId = destinationId,
+                isHighPriority = transferTriggerEvent.isHighPriority
+            )
+            monitorPendingTransfersUntilProcessed(transferTriggerEvent)
+            startUploadsWorkerAndWaitUntilIsStartedUseCase()
+        }.onFailure {
+            Timber.e(it, "Error on startUploadFilesInWorker")
             if (transferTriggerEvent is TransferTriggerEvent.StartUpload.TextFile) {
                 _uiState.updateEventAndClearProgress(
                     StartTransferEvent.Message.FailedTextFileUpload(
@@ -799,40 +827,8 @@ internal class StartTransfersComponentViewModel @Inject constructor(
                         isCloudFile = transferTriggerEvent.fromHomePage
                     )
                 )
-            }
-            Timber.e(it)
-        }.onCompletion {
-            if (it is CancellationException) {
-                _uiState.updateEventAndClearProgress(StartTransferEvent.Message.TransferCancelled)
-            }
-        }.collect { event ->
-            when (event) {
-                is MultiTransferEvent.TransferNotStarted<*> -> {
-                    Timber.e(event.exception, "Error starting upload")
-                    if (event.exception is IOException) {
-                        StartTransferEvent.Message.NotSufficientSpace
-                    } else {
-                        StartTransferEvent.Message.TransferCancelled
-                    }
-                }
-
-                MultiTransferEvent.InsufficientSpace -> StartTransferEvent.Message.NotSufficientSpace
-                is MultiTransferEvent.SingleTransferEvent -> {
-                    //show start message as soon as an event with all transfers updated is received
-                    if (!startMessageShown && event.scanningFinished) {
-                        startMessageShown = true
-                        StartTransferEvent.FinishUploadProcessing(
-                            totalFiles = pathsAndNames.size,
-                            triggerEvent = transferTriggerEvent,
-                        )
-                    } else {
-                        // update scanning transfers state
-                        updateScanningFoldersProgress(event)
-                        null
-                    }
-                }
-            }?.let {
-                _uiState.updateEventAndClearProgress(it)
+            } else {
+                _uiState.updateEventAndClearProgressWithException(it)
             }
         }
         checkUploadRating()
@@ -902,5 +898,64 @@ internal class StartTransfersComponentViewModel @Inject constructor(
         viewModelScope.launch {
             _uiState.update { state -> state.copy(triggerEventWithoutPermission = null) }
         }
+    }
+
+    private fun monitorStorageOverQuota() {
+        viewModelScope.launch {
+            monitorStorageOverQuotaUseCase().collect { isStorageOverQuota ->
+                _uiState.update { state -> state.copy(isStorageOverQuota = isStorageOverQuota) }
+            }
+        }
+    }
+
+    /**
+     * Set the transfer tag to cancel.
+     *
+     * @param transferTagToCancel The transfer tag to cancel, null if no transfer to cancel.
+     */
+    private fun setTransferTagToCancel(transferTagToCancel: Int?) {
+        _uiState.update { state -> state.copy(transferTagToCancel = transferTagToCancel) }
+    }
+
+    /**
+     * Confirms the cancellation of a transfer and proceeds with the action.
+     */
+    fun cancelTransferConfirmed() {
+        uiState.value.transferTagToCancel?.let {
+            viewModelScope.launch {
+                runCatching { cancelTransferByTagUseCase(it) }
+                    .onSuccess { setCancelTransferResult(true) }
+                    .onFailure {
+                        Timber.e(it)
+                        setCancelTransferResult(false)
+                    }
+            }
+            setTransferTagToCancel(null)
+        }
+    }
+
+    private fun setCancelTransferResult(success: Boolean) {
+        _uiState.update { state ->
+            state.copy(
+                cancelTransferResult = triggered(CancelTransferResult(success))
+            )
+        }
+    }
+
+    fun onConsumeCancelTransferResult() {
+        _uiState.update { state -> state.copy(cancelTransferResult = consumed()) }
+    }
+
+    /**
+     * Cancels the cancellation of a transfer.
+     */
+    fun cancelTransferCancelled() {
+        setTransferTagToCancel(null)
+    }
+
+    companion object {
+        // preview snackbar notifications can be shown in a different screen than the one that started it, that's why we need to store it in the companion object
+        private val alreadyFinishedPreviewGroups = mutableListOf<Int>()
+        private val alreadySlowNotifiedGroups = mutableListOf<Int>()
     }
 }

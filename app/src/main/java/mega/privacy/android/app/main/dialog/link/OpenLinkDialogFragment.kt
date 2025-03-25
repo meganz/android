@@ -22,7 +22,6 @@ import mega.privacy.android.app.R
 import mega.privacy.android.app.arch.extensions.collectFlow
 import mega.privacy.android.app.main.dialog.contactlink.ContactLinkDialogFragment
 import mega.privacy.android.app.meeting.fragments.MeetingHasEndedDialogFragment
-import mega.privacy.android.app.objects.PasscodeManagement
 import mega.privacy.android.app.presentation.extensions.isDarkMode
 import mega.privacy.android.app.presentation.filelink.FileLinkComposeActivity
 import mega.privacy.android.app.presentation.folderlink.FolderLinkComposeActivity
@@ -42,7 +41,7 @@ import mega.privacy.android.domain.usecase.GetThemeMode
 import mega.privacy.android.domain.usecase.featureflag.GetFeatureFlagValueUseCase
 import mega.privacy.android.legacy.core.ui.controls.dialogs.InputDialog
 import mega.privacy.android.navigation.MegaNavigator
-import mega.privacy.android.shared.original.core.ui.theme.OriginalTempTheme
+import mega.privacy.android.shared.original.core.ui.theme.OriginalTheme
 import timber.log.Timber
 import javax.inject.Inject
 
@@ -50,9 +49,6 @@ import javax.inject.Inject
 internal class OpenLinkDialogFragment : DialogFragment() {
     @Inject
     lateinit var getThemeMode: GetThemeMode
-
-    @Inject
-    lateinit var passcodeManagement: PasscodeManagement
 
     @Inject
     lateinit var getFeatureFlagValueUseCase: GetFeatureFlagValueUseCase
@@ -101,7 +97,7 @@ internal class OpenLinkDialogFragment : DialogFragment() {
             setContent {
                 val themeMode by getThemeMode().collectAsStateWithLifecycle(initialValue = ThemeMode.System)
                 val state by viewModel.state.collectAsStateWithLifecycle()
-                OriginalTempTheme(isDark = themeMode.isDarkMode()) {
+                OriginalTheme(isDark = themeMode.isDarkMode()) {
                     InputDialog(
                         title = title,
                         message = message,
@@ -139,7 +135,9 @@ internal class OpenLinkDialogFragment : DialogFragment() {
             }
             handleContactLink(uiState.openContactLinkHandle)
             uiState.checkLinkResult?.let {
-                handleCheckLinkResult(it)
+                handleCheckLinkResult(
+                    result = it,
+                )
             }
         }
     }
@@ -195,21 +193,24 @@ internal class OpenLinkDialogFragment : DialogFragment() {
         dismissAllowingStateLoss()
     }
 
-    private fun handleCheckLinkResult(result: Result<ChatLinkContent>) {
+    private fun handleCheckLinkResult(
+        result: Result<ChatLinkContent>,
+    ) {
         if (result.isSuccess) {
-            handleChatOrMeetingLinkResult(result)
+            handleChatOrMeetingLinkResult(result = result)
         } else if (result.exceptionOrNull() != null) {
-            handleCheckLinkException(result)
+            handleCheckLinkException(result = result)
         }
     }
 
-    private fun handleCheckLinkException(result: Result<ChatLinkContent>) {
+    private fun handleCheckLinkException(
+        result: Result<ChatLinkContent>,
+    ) {
         when (val e = result.exceptionOrNull()) {
             is IAmOnAnotherCallException -> {
                 CallUtil.showConfirmationInACall(
                     requireActivity(),
                     getString(R.string.text_join_call),
-                    passcodeManagement
                 )
                 dismissAllowingStateLoss()
             }
@@ -231,7 +232,9 @@ internal class OpenLinkDialogFragment : DialogFragment() {
         }
     }
 
-    private fun handleChatOrMeetingLinkResult(result: Result<ChatLinkContent>) {
+    private fun handleChatOrMeetingLinkResult(
+        result: Result<ChatLinkContent>,
+    ) {
         val chatLinkContent = result.getOrNull()
         when {
             chatLinkContent?.link.isNullOrEmpty() -> {
@@ -246,7 +249,9 @@ internal class OpenLinkDialogFragment : DialogFragment() {
                     }.onSuccess { chatRoom ->
                         chatRoom?.let {
                             if (chatRoom.isMeeting && chatRoom.isWaitingRoom && chatRoom.ownPrivilege == ChatRoomPermission.Moderator) {
-                                viewModel.startOrAnswerMeetingWithWaitingRoomAsHost(chatId = chatLinkContent.chatHandle)
+                                viewModel.startOrAnswerMeetingWithWaitingRoomAsHost(
+                                    chatId = chatLinkContent.chatHandle,
+                                )
                             } else {
                                 CallUtil.joinMeetingOrReturnCall(
                                     requireContext(),
@@ -255,7 +260,6 @@ internal class OpenLinkDialogFragment : DialogFragment() {
                                     chatLinkContent.text,
                                     chatLinkContent.exist,
                                     chatLinkContent.userHandle,
-                                    passcodeManagement,
                                     chatLinkContent.isWaitingRoom,
                                 )
                             }

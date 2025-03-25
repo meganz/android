@@ -5,8 +5,10 @@ import androidx.lifecycle.SavedStateHandle
 import app.cash.turbine.Event
 import app.cash.turbine.test
 import com.google.common.truth.Truth.assertThat
+import com.google.mlkit.vision.documentscanner.GmsDocumentScanner
 import com.jraska.livedata.test
 import de.palm.composestateevents.triggered
+import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -18,6 +20,7 @@ import kotlinx.coroutines.flow.filterNot
 import kotlinx.coroutines.flow.flowOf
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.test.StandardTestDispatcher
+import kotlinx.coroutines.test.UnconfinedTestDispatcher
 import kotlinx.coroutines.test.advanceUntilIdle
 import kotlinx.coroutines.test.runTest
 import mega.privacy.android.app.InstantExecutorExtension
@@ -29,11 +32,10 @@ import mega.privacy.android.app.main.dialog.removelink.RemovePublicLinkResultMap
 import mega.privacy.android.app.main.dialog.shares.RemoveShareResultMapper
 import mega.privacy.android.app.meeting.gateway.RTCAudioManagerGateway
 import mega.privacy.android.app.middlelayer.scanner.ScannerHandler
-import mega.privacy.android.app.objects.PasscodeManagement
 import mega.privacy.android.app.presentation.documentscanner.model.DocumentScanningError
-import mega.privacy.android.app.presentation.documentscanner.model.HandleScanDocumentResult
 import mega.privacy.android.app.presentation.manager.model.SharesTab
 import mega.privacy.android.app.presentation.meeting.chat.model.InfoToShow
+import mega.privacy.android.app.presentation.psa.legacy.LegacyPsaGlobalState
 import mega.privacy.android.app.presentation.transfers.starttransfer.model.TransferTriggerEvent
 import mega.privacy.android.app.presentation.versions.mapper.VersionHistoryRemoveMessageMapper
 import mega.privacy.android.app.service.scanner.InsufficientRAMToLaunchDocumentScanner
@@ -68,6 +70,7 @@ import mega.privacy.android.domain.entity.node.NodeNameCollisionsResult
 import mega.privacy.android.domain.entity.node.NodeSourceType
 import mega.privacy.android.domain.entity.node.NodeUpdate
 import mega.privacy.android.domain.entity.node.SingleNodeRestoreResult
+import mega.privacy.android.domain.entity.node.TypedFolderNode
 import mega.privacy.android.domain.entity.shares.AccessPermission
 import mega.privacy.android.domain.entity.sync.SyncType
 import mega.privacy.android.domain.entity.uri.UriPath
@@ -82,6 +85,7 @@ import mega.privacy.android.domain.usecase.GetRootNodeUseCase
 import mega.privacy.android.domain.usecase.MonitorOfflineFileAvailabilityUseCase
 import mega.privacy.android.domain.usecase.MonitorUserUpdates
 import mega.privacy.android.domain.usecase.account.GetFullAccountInfoUseCase
+import mega.privacy.android.domain.usecase.account.MonitorSecurityUpgradeInAppUseCase
 import mega.privacy.android.domain.usecase.account.MonitorStorageStateEventUseCase
 import mega.privacy.android.domain.usecase.account.RenameRecoveryKeyFileUseCase
 import mega.privacy.android.domain.usecase.account.RequireTwoFactorAuthenticationUseCase
@@ -103,6 +107,7 @@ import mega.privacy.android.domain.usecase.contact.SaveContactByEmailUseCase
 import mega.privacy.android.domain.usecase.featureflag.GetFeatureFlagValueUseCase
 import mega.privacy.android.domain.usecase.file.FilePrepareUseCase
 import mega.privacy.android.domain.usecase.filenode.DeleteNodeVersionsUseCase
+import mega.privacy.android.domain.usecase.login.BackgroundFastLoginUseCase
 import mega.privacy.android.domain.usecase.login.MonitorFinishActivityUseCase
 import mega.privacy.android.domain.usecase.meeting.GetScheduledMeetingByChatUseCase
 import mega.privacy.android.domain.usecase.meeting.GetUsersCallLimitRemindersUseCase
@@ -174,7 +179,9 @@ class ManagerViewModelTest {
     private val monitorUserAlertUpdates = mutableMonitorUserAlertUpdates.asSharedFlow()
     private lateinit var monitorNodeUpdatesFakeFlow: MutableSharedFlow<NodeUpdate>
     private val monitorContactUpdates = MutableSharedFlow<UserUpdate>()
-    private val monitorSecurityUpgradeInApp = MutableStateFlow(false)
+    private val monitorSecurityUpgradeInAppUseCase = mock<MonitorSecurityUpgradeInAppUseCase> {
+        onBlocking { invoke() }.thenReturn(flowOf(false))
+    }
     private val getNumUnreadUserAlertsUseCase =
         mock<GetNumUnreadUserAlertsUseCase> { onBlocking { invoke() }.thenReturn(0) }
     private val getNumUnreadPromoNotificationsUseCase =
@@ -323,7 +330,6 @@ class ManagerViewModelTest {
     private val getUsersCallLimitRemindersUseCase: GetUsersCallLimitRemindersUseCase = mock()
     private val rtcAudioManagerGateway: RTCAudioManagerGateway = mock()
     private val chatManagement: ChatManagement = mock()
-    private val passcodeManagement: PasscodeManagement = mock()
     private lateinit var monitorSyncsUseCaseFakeFlow: MutableSharedFlow<List<FolderPair>>
     private val monitorChatSessionUpdatesUseCase: MonitorChatSessionUpdatesUseCase = mock()
     private val hangChatCallUseCase: HangChatCallUseCase = mock()
@@ -350,7 +356,9 @@ class ManagerViewModelTest {
 
     private val deleteNodeVersionsUseCase: DeleteNodeVersionsUseCase = mock()
     private val versionHistoryRemoveMessageMapper: VersionHistoryRemoveMessageMapper = mock()
-
+    private val backgroundFastLoginUseCase: BackgroundFastLoginUseCase = mock()
+    private val legacyState = mock<LegacyPsaGlobalState>()
+    private val appScope: CoroutineScope = CoroutineScope(UnconfinedTestDispatcher())
 
     private fun initViewModel() {
         underTest = ManagerViewModel(
@@ -378,7 +386,7 @@ class ManagerViewModelTest {
             requireTwoFactorAuthenticationUseCase = requireTwoFactorAuthenticationUseCase,
             setCopyLatestTargetPathUseCase = setCopyLatestTargetPathUseCase,
             setMoveLatestTargetPathUseCase = setMoveLatestTargetPathUseCase,
-            monitorSecurityUpgradeInApp = { monitorSecurityUpgradeInApp },
+            monitorSecurityUpgradeInAppUseCase = monitorSecurityUpgradeInAppUseCase,
             monitorUserUpdates = monitorUserUpdates,
             establishCameraUploadsSyncHandlesUseCase = establishCameraUploadsSyncHandlesUseCase,
             startCameraUploadUseCase = startCameraUploadUseCase,
@@ -418,7 +426,6 @@ class ManagerViewModelTest {
             setChatVideoInDeviceUseCase = setChatVideoInDeviceUseCase,
             rtcAudioManagerGateway = rtcAudioManagerGateway,
             chatManagement = chatManagement,
-            passcodeManagement = passcodeManagement,
             monitorSyncStalledIssuesUseCase = monitorSyncStalledIssuesUseCase,
             monitorSyncsUseCase = mock {
                 on { invoke() }.thenReturn(monitorSyncsUseCaseFakeFlow)
@@ -439,7 +446,10 @@ class ManagerViewModelTest {
             createFolderNodeUseCase = createFolderNodeUseCase,
             monitorChatListItemUpdates = { monitorChatListItemUpdates },
             deleteNodeVersionsUseCase = deleteNodeVersionsUseCase,
-            versionHistoryRemoveMessageMapper = versionHistoryRemoveMessageMapper
+            versionHistoryRemoveMessageMapper = versionHistoryRemoveMessageMapper,
+            backgroundFastLoginUseCase = backgroundFastLoginUseCase,
+            legacyState = legacyState,
+            appScope = appScope,
         )
     }
 
@@ -480,7 +490,6 @@ class ManagerViewModelTest {
             setChatVideoInDeviceUseCase,
             rtcAudioManagerGateway,
             chatManagement,
-            passcodeManagement,
             hangChatCallUseCase,
             monitorChatArchivedUseCase,
             monitorPushNotificationSettingsUpdate,
@@ -494,7 +503,8 @@ class ManagerViewModelTest {
             scannerHandler,
             createFolderNodeUseCase,
             deleteNodeVersionsUseCase,
-            versionHistoryRemoveMessageMapper
+            versionHistoryRemoveMessageMapper,
+            legacyState
         )
         wheneverBlocking { getCloudSortOrder() }.thenReturn(SortOrder.ORDER_DEFAULT_ASC)
         whenever(getUsersCallLimitRemindersUseCase()).thenReturn(emptyFlow())
@@ -1298,11 +1308,14 @@ class ManagerViewModelTest {
     }
 
     @Test
-    internal fun `test that dismiss calls the use case`() = runTest {
+    internal fun `test that dismissPsa invokes use case and clears legacyState`() = runTest {
         val expected = 123
+
         underTest.dismissPsa(expected)
         testScheduler.advanceUntilIdle()
+
         verify(dismissPsaUseCase).invoke(expected)
+        verify(legacyState).clearPsa()
     }
 
     @Test
@@ -1316,6 +1329,7 @@ class ManagerViewModelTest {
                 incomingParentHandle = 456789,
                 outgoingParentHandle = 567890,
                 linksParentHandle = 678901,
+                favouritesParentHandle = 43434,
                 nodeSourceType = NodeSourceType.LINKS
             )
             assertThat(actual).isEqualTo(expectedParentHandle)
@@ -1359,7 +1373,7 @@ class ManagerViewModelTest {
                 syncType = SyncType.TYPE_TWOWAY,
                 pairName = "folder name",
                 localFolderPath = "folder name",
-                remoteFolder = RemoteFolder(id = 1L, name = "folder name"),
+                remoteFolder = RemoteFolder(id = NodeId(1L), name = "folder name"),
                 syncStatus = SyncStatus.SYNCING,
             )
             testScheduler.advanceUntilIdle()
@@ -1541,74 +1555,65 @@ class ManagerViewModelTest {
     }
 
     @Test
-    fun `test that the old document scanner is used for scanning documents`() = runTest {
-        val handleScanDocumentResult = HandleScanDocumentResult.UseLegacyImplementation
-        whenever(scannerHandler.handleScanDocument()).thenReturn(handleScanDocumentResult)
+    fun `test that the ML Kit Document Scanner is initialized and ready to scan documents`() =
+        runTest {
+            val gmsDocumentScanner = mock<GmsDocumentScanner>()
+            whenever(scannerHandler.prepareDocumentScanner()).thenReturn(gmsDocumentScanner)
 
-        underTest.handleScanDocument()
-        testScheduler.advanceUntilIdle()
+            underTest.prepareDocumentScanner()
+            testScheduler.advanceUntilIdle()
 
-        underTest.state.test {
-            assertThat(awaitItem().handleScanDocumentResult).isEqualTo(handleScanDocumentResult)
+            underTest.state.test {
+                assertThat(awaitItem().gmsDocumentScanner).isEqualTo(gmsDocumentScanner)
+            }
         }
-    }
 
     @Test
-    fun `test that the new ML document kit scanner is initialized and used for scanning documents`() = runTest {
-        val handleScanDocumentResult = HandleScanDocumentResult.UseNewImplementation(mock())
-        whenever(scannerHandler.handleScanDocument()).thenReturn(handleScanDocumentResult)
+    fun `test that an insufficient RAM to launch error is returned when initializing the ML Kit Document Scanner with low device RAM`() =
+        runTest {
+            whenever(scannerHandler.prepareDocumentScanner()).thenAnswer {
+                throw InsufficientRAMToLaunchDocumentScanner()
+            }
 
-        underTest.handleScanDocument()
-        testScheduler.advanceUntilIdle()
+            assertDoesNotThrow { underTest.prepareDocumentScanner() }
+            testScheduler.advanceUntilIdle()
 
-        underTest.state.test {
-            assertThat(awaitItem().handleScanDocumentResult).isEqualTo(handleScanDocumentResult)
+            underTest.state.test {
+                assertThat(awaitItem().documentScanningError).isEqualTo(DocumentScanningError.InsufficientRAM)
+            }
         }
-    }
 
     @Test
-    fun `test that an insufficient RAM to launch error is returned when initializing the ML document kit scanner with low device RAM`() = runTest {
-        whenever(scannerHandler.handleScanDocument()).thenAnswer {
-            throw InsufficientRAMToLaunchDocumentScanner()
-        }
+    fun `test that a generic error is returned when initializing the ML Kit Document Scanner results in an error`() =
+        runTest {
+            whenever(scannerHandler.prepareDocumentScanner()).thenThrow(RuntimeException())
 
-        assertDoesNotThrow { underTest.handleScanDocument() }
-        testScheduler.advanceUntilIdle()
+            assertDoesNotThrow { underTest.prepareDocumentScanner() }
+            testScheduler.advanceUntilIdle()
 
-        underTest.state.test {
-            assertThat(awaitItem().documentScanningError).isEqualTo(DocumentScanningError.InsufficientRAM)
+            underTest.state.test {
+                assertThat(awaitItem().documentScanningError).isEqualTo(DocumentScanningError.GenericError)
+            }
         }
-    }
 
     @Test
-    fun `test that a generic error is returned when initializing the ML document kit scanner results in an error`() = runTest {
-        whenever(scannerHandler.handleScanDocument()).thenThrow(RuntimeException())
+    fun `test that a generic error is returned when opening the ML Kit Document Scanner results in an error`() =
+        runTest {
+            underTest.onDocumentScannerFailedToOpen()
+            testScheduler.advanceUntilIdle()
 
-        assertDoesNotThrow { underTest.handleScanDocument() }
-        testScheduler.advanceUntilIdle()
-
-        underTest.state.test {
-            assertThat(awaitItem().documentScanningError).isEqualTo(DocumentScanningError.GenericError)
+            underTest.state.test {
+                assertThat(awaitItem().documentScanningError).isEqualTo(DocumentScanningError.GenericError)
+            }
         }
-    }
 
     @Test
-    fun `test that a generic error is returned when opening the ML document kit scanner results in an error`() = runTest {
-        underTest.onNewDocumentScannerFailedToOpen()
+    fun `test that the gms document scanner is reset`() = runTest {
+        underTest.onGmsDocumentScannerConsumed()
         testScheduler.advanceUntilIdle()
 
         underTest.state.test {
-            assertThat(awaitItem().documentScanningError).isEqualTo(DocumentScanningError.GenericError)
-        }
-    }
-
-    @Test
-    fun `test that the handle scan document result is reset`() = runTest {
-        underTest.onHandleScanDocumentResultConsumed()
-        testScheduler.advanceUntilIdle()
-
-        underTest.state.test {
-            assertThat(awaitItem().handleScanDocumentResult).isNull()
+            assertThat(awaitItem().gmsDocumentScanner).isNull()
         }
     }
 
@@ -1638,6 +1643,40 @@ class ManagerViewModelTest {
         verify(deleteNodeVersionsUseCase).invoke(NodeId(nodeHandle))
         verify(versionHistoryRemoveMessageMapper).invoke(anyOrNull())
     }
+
+    @Test
+    fun `test that initShareKeys invokes the use case`() = runTest {
+        val nodeHandle = 123L
+        val megaNode = mock<TypedFolderNode> {
+            on { id } doReturn NodeId(nodeHandle)
+        }
+        whenever(getNodeByIdUseCase.invoke(NodeId(nodeHandle))).thenReturn(megaNode)
+        underTest.initShareKeys(longArrayOf(nodeHandle))
+        verify(createShareKeyUseCase).invoke(megaNode)
+    }
+
+    @Test
+    fun `test that create share key use case is not triggered when null is passed to initShareKeys`() =
+        runTest {
+            underTest.initShareKeys(null)
+            verifyNoInteractions(createShareKeyUseCase)
+        }
+
+    @Test
+    fun `test that background fast login is invoked when performFastLoginInBackground is called`() =
+        runTest {
+            underTest.performFastLoginInBackground()
+            verify(backgroundFastLoginUseCase).invoke()
+        }
+
+    @Test
+    fun `test that performFastLoginInBackground returns true when background fast login is successful`() =
+        runTest {
+            val sessionId = "session123"
+            whenever(backgroundFastLoginUseCase.invoke()).thenReturn(sessionId)
+            val result = underTest.performFastLoginInBackground()
+            assertThat(result).isEqualTo(true)
+        }
 
     companion object {
         @JvmField

@@ -52,6 +52,7 @@ CPP_SOURCES= sdk/src/attrmap.cpp \
     sdk/src/posix/net.cpp  \
     sdk/src/posix/fs.cpp  \
     sdk/src/posix/waiter.cpp \
+    sdk/src/android/androidFileSystem.cpp \
     sdk/src/mega_utf8proc.cpp \
     sdk/src/gfx.cpp \
     sdk/src/gfx/external.cpp \
@@ -61,7 +62,6 @@ CPP_SOURCES= sdk/src/attrmap.cpp \
     sdk/src/mega_zxcvbn.cpp \
     sdk/src/mediafileattribute.cpp \
     sdk/src/mega_evt_tls.cpp \
-    sdk/src/mega_ccronexpr.cpp\
     sdk/src/raid.cpp \
     sdk/src/raidproxy.cpp \
     sdk/src/testhooks.cpp \
@@ -73,7 +73,16 @@ CPP_SOURCES= sdk/src/attrmap.cpp \
     sdk/src/user_attribute.cpp \
     sdk/src/user_attribute_definition.cpp \
     sdk/src/user_attribute_manager.cpp \
-    sdk/src/transferstats.cpp
+    sdk/src/transferstats.cpp \
+    sdk/src/tlv.cpp \
+    sdk/src/syncinternals/syncinternals.cpp \
+    sdk/src/syncinternals/syncuploadthrottlingfile.cpp \
+    sdk/src/syncinternals/syncuploadthrottlingmanager.cpp \
+    sdk/src/totp.cpp \
+    sdk/src/dns_lookup_pseudomessage.cpp \
+    sdk/src/network_connectivity_test.cpp \
+    sdk/src/udp_socket_tester.cpp \
+    sdk/src/udp_socket.cpp
 
 C_SOURCES = sdk/src/mega_glob.c
 
@@ -120,6 +129,7 @@ HEADERS= sdk/include/mega.h \
 		sdk/include/mega/posix/megasys.h  \
 		sdk/include/mega/posix/megafs.h  \
 		sdk/include/mega/posix/megawaiter.h \
+		sdk/include/mega/android/androidFileSystem.h \
 		sdk/include/mega/config-android.h \
 		sdk/include/mega/mega_glob.h \
 		sdk/include/mega/gfx/external.h \
@@ -143,7 +153,35 @@ HEADERS= sdk/include/mega.h \
         sdk/include/mega/user_attribute_definition.h \
         sdk/include/mega/user_attribute_manager.h \
         sdk/include/mega/user_attribute_types.h \
-        sdk/include/mega/transferstats.h
+        sdk/include/mega/transferstats.h \
+        sdk/include/mega/tlv.h \
+        sdk/include/mega/syncinternals/syncinternals.h \
+        sdk/include/mega/syncinternals/syncinternals_logging.h \
+        sdk/include/mega/syncinternals/synciuploadthrottlingmanager.h \
+        sdk/include/mega/syncinternals/syncuploadthrottlingfile.h \
+        sdk/include/mega/syncinternals/syncuploadthrottlingmanager.h \
+        sdk/include/mega/totp.h \
+        sdk/include/mega/dns_lookup_pseudomessage.h \
+        sdk/include/mega/network_connectivity_test_helpers.h \
+        sdk/include/mega/network_connectivity_test.h \
+        sdk/include/mega/udp_socket_tester.h \
+        sdk/include/mega/udp_socket.h
+
+# impl layer headers
+HEADERS += \
+    sdk/include/impl/share.h
+
+# impl layer sources
+CPP_SOURCES += \
+    sdk/src/impl/share.cpp
+
+# third party layer headers
+HEADERS += \
+    sdk/third_party/ccronexpr/ccronexpr.h
+
+# third party layer sources
+CPP_SOURCES += \
+    sdk/third_party/ccronexpr/ccronexpr.cpp
 
 # FUSE (Common headers.)
 HEADERS += \

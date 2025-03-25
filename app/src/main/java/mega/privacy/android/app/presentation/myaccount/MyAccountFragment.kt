@@ -15,6 +15,7 @@ import androidx.navigation.fragment.findNavController
 import com.google.firebase.crashlytics.ktx.crashlytics
 import com.google.firebase.ktx.Firebase
 import dagger.hilt.android.AndroidEntryPoint
+import kotlinx.coroutines.flow.map
 import mega.privacy.android.analytics.Analytics
 import mega.privacy.android.app.R
 import mega.privacy.android.app.contacts.ContactsActivity
@@ -27,9 +28,10 @@ import mega.privacy.android.app.presentation.myaccount.view.MyAccountHomeView
 import mega.privacy.android.app.presentation.qrcode.QRCodeComposeActivity
 import mega.privacy.android.app.utils.CallUtil
 import mega.privacy.android.app.utils.Constants
+import mega.privacy.android.domain.entity.StorageState
 import mega.privacy.android.domain.entity.ThemeMode
 import mega.privacy.android.domain.usecase.GetThemeMode
-import mega.privacy.android.shared.original.core.ui.theme.OriginalTempTheme
+import mega.privacy.android.shared.original.core.ui.theme.OriginalTheme
 import mega.privacy.mobile.analytics.event.AccountScreenEvent
 import mega.privacy.mobile.analytics.event.UpgradeMyAccountEvent
 import javax.inject.Inject
@@ -74,9 +76,12 @@ class MyAccountFragment : Fragment(), MyAccountHomeViewActions {
                 val themeMode by getThemeMode()
                     .collectAsStateWithLifecycle(initialValue = ThemeMode.System)
                 val uiState by viewModel.uiState.collectAsStateWithLifecycle()
+                val storageState by activityViewModel.state.map { it.storageState }
+                    .collectAsStateWithLifecycle(StorageState.Unknown)
 
-                OriginalTempTheme(isDark = themeMode.isDarkMode()) {
+                OriginalTheme(isDark = themeMode.isDarkMode()) {
                     MyAccountHomeView(
+                        storageState = storageState,
                         uiState = uiState,
                         uiActions = this@MyAccountFragment,
                         navController = findNavController()
@@ -128,7 +133,9 @@ class MyAccountFragment : Fragment(), MyAccountHomeViewActions {
         findNavController().navigate(R.id.action_my_account_to_edit_profile)
 
     override fun onClickUsageMeter() =
-        findNavController().navigate(R.id.action_my_account_to_my_account_usage)
+        findNavController().navigate(
+            MyAccountFragmentDirections.actionMyAccountToMyAccountUsage()
+        )
 
     override fun onUpgradeAccount() {
         Analytics.tracker.trackEvent(UpgradeMyAccountEvent)

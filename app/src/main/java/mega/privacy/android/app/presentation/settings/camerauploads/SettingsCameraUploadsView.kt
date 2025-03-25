@@ -35,7 +35,7 @@ import de.palm.composestateevents.EventEffect
 import de.palm.composestateevents.StateEvent
 import mega.privacy.android.app.R
 import mega.privacy.android.app.main.FileExplorerActivity
-import mega.privacy.android.app.main.FileStorageActivity
+import mega.privacy.android.app.presentation.filestorage.FileStorageActivity
 import mega.privacy.android.app.presentation.settings.camerauploads.business.BusinessAccountPromptHandler
 import mega.privacy.android.app.presentation.settings.camerauploads.dialogs.FileUploadDialog
 import mega.privacy.android.app.presentation.settings.camerauploads.dialogs.HowToUploadDialog
@@ -68,7 +68,7 @@ import mega.privacy.android.shared.original.core.ui.controls.appbar.AppBarType
 import mega.privacy.android.shared.original.core.ui.controls.appbar.MegaAppBar
 import mega.privacy.android.shared.original.core.ui.controls.layouts.MegaScaffold
 import mega.privacy.android.shared.original.core.ui.preview.CombinedThemePreviews
-import mega.privacy.android.shared.original.core.ui.theme.OriginalTempTheme
+import mega.privacy.android.shared.original.core.ui.theme.OriginalTheme
 import mega.privacy.android.shared.original.core.ui.utils.showAutoDurationSnackbar
 
 /**
@@ -404,7 +404,7 @@ internal fun SettingsCameraUploadsView(
 private fun SettingsCameraUploadsViewPreview(
     @PreviewParameter(SettingsCameraUploadsViewParameterProvider::class) uiState: SettingsCameraUploadsUiState,
 ) {
-    OriginalTempTheme(isDark = isSystemInDarkTheme()) {
+    OriginalTheme(isDark = isSystemInDarkTheme()) {
         SettingsCameraUploadsView(
             uiState = uiState,
             onBusinessAccountPromptDismissed = {},

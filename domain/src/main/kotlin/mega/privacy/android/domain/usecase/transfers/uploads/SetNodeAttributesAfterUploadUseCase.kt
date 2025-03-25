@@ -1,5 +1,7 @@
 package mega.privacy.android.domain.usecase.transfers.uploads
 
+import mega.privacy.android.domain.entity.transfer.TransferAppData
+import mega.privacy.android.domain.entity.uri.UriPath
 import mega.privacy.android.domain.usecase.file.IsImageFileUseCase
 import mega.privacy.android.domain.usecase.file.IsPdfFileUseCase
 import mega.privacy.android.domain.usecase.file.IsVideoFileUseCase
@@ -40,20 +42,29 @@ class SetNodeAttributesAfterUploadUseCase @Inject constructor(
      * Invoke
      *
      * @param nodeHandle Node handle of the file already in the Cloud.
-     * @param localFile Local file.
+     * @param uriPath Uri path.
      */
-    suspend operator fun invoke(nodeHandle: Long, localFile: File) {
-        val localPath = localFile.absolutePath
-        val isVideoOrImage = isVideoFileUseCase(localPath) || isImageFileUseCase(localPath)
-        val isPdf = isPdfFileUseCase(localPath)
+    suspend operator fun invoke(
+        nodeHandle: Long,
+        uriPath: UriPath,
+        appData: List<TransferAppData>?,
+        ) {
+        val localPath = uriPath.value
+        val localFile = File(localPath)
+        val isVideoOrImage = isVideoFileUseCase(uriPath) || isImageFileUseCase(uriPath)
+        val isPdf = isPdfFileUseCase(uriPath)
 
         if (isVideoOrImage) {
             createImageOrVideoThumbnailUseCase(nodeHandle = nodeHandle, localFile = localFile)
             createImageOrVideoPreviewUseCase(nodeHandle = nodeHandle, localFile = localFile)
-            setNodeCoordinatesUseCase(localPath = localPath, nodeHandle = nodeHandle)
+            setNodeCoordinatesUseCase(
+                nodeHandle = nodeHandle,
+                uriPath = uriPath,
+                geolocation = appData?.filterIsInstance<TransferAppData.Geolocation>()?.firstOrNull(),
+            )
         } else if (isPdf) {
-            createPdfThumbnailUseCase(nodeHandle = nodeHandle, localFile = localFile)
-            createPdfPreviewUseCase(nodeHandle = nodeHandle, localFile = localFile)
+            createPdfThumbnailUseCase(nodeHandle = nodeHandle, uriPath = uriPath)
+            createPdfPreviewUseCase(nodeHandle = nodeHandle, uriPath = uriPath)
         }
     }
 }

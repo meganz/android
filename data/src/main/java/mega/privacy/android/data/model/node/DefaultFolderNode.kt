@@ -24,6 +24,7 @@ internal data class DefaultFolderNode(
     override val isIncomingShare: Boolean,
     override val isShared: Boolean,
     override val isPendingShare: Boolean,
+    override val isSynced: Boolean,
     override val device: String?,
     override val isNodeKeyDecrypted: Boolean,
     override val creationTime: Long,

@@ -1,7 +1,6 @@
 package mega.privacy.android.domain.usecase
 
 import com.google.common.truth.Truth.assertThat
-import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.awaitCancellation
 import kotlinx.coroutines.flow.flow
 import kotlinx.coroutines.test.runTest
@@ -11,13 +10,13 @@ import mega.privacy.android.domain.entity.node.FolderNode
 import mega.privacy.android.domain.entity.node.NodeId
 import mega.privacy.android.domain.repository.CameraUploadsRepository
 import mega.privacy.android.domain.repository.ChatRepository
+import mega.privacy.android.domain.repository.NodeRepository
 import org.junit.Before
 import org.junit.Test
 import org.mockito.kotlin.any
 import org.mockito.kotlin.mock
 import org.mockito.kotlin.stub
 
-@OptIn(ExperimentalCoroutinesApi::class)
 class DefaultGetFolderTypeTest {
     private lateinit var underTest: GetFolderType
 
@@ -45,6 +44,7 @@ class DefaultGetFolderTypeTest {
     }
     private val getDeviceType =
         mock<GetDeviceType> { onBlocking { invoke(any()) }.thenReturn(DeviceType.Unknown) }
+    private val nodeRepository = mock<NodeRepository>()
 
     @Before
     fun setUp() {
@@ -54,11 +54,15 @@ class DefaultGetFolderTypeTest {
             monitorBackupFolder = monitorBackupFolder,
             hasAncestor = hasAncestor,
             getDeviceType = getDeviceType,
+            nodeRepository = nodeRepository,
         )
     }
 
     @Test
     fun `test that normal folders are marked as default`() = runTest {
+        nodeRepository.stub {
+            onBlocking { isNodeSynced(testFolder.id) }.thenReturn(false)
+        }
         val actual = underTest(testFolder)
 
         assertThat(actual).isEqualTo(FolderType.Default)
@@ -149,6 +153,9 @@ class DefaultGetFolderTypeTest {
     @Test
     fun `test that default folder with failed backup folder result still returns default folder result`() =
         runTest {
+            nodeRepository.stub {
+                onBlocking { isNodeSynced(testFolder.id) }.thenReturn(false)
+            }
             monitorBackupFolder.stub {
                 onBlocking { invoke() }.thenReturn(flow {
                     emit(Result.failure(Throwable()))
@@ -162,4 +169,13 @@ class DefaultGetFolderTypeTest {
             assertThat(actual).isEqualTo(FolderType.Default)
         }
 
+    @Test
+    fun `test that synced folder is marked as a Sync folder`() = runTest {
+        nodeRepository.stub {
+            onBlocking { isNodeSynced(testFolder.id) }.thenReturn(true)
+        }
+        val actual = underTest(testFolder)
+
+        assertThat(actual).isEqualTo(FolderType.Sync)
+    }
 }

@@ -54,4 +54,15 @@ class SDCardFacade @Inject constructor(
     override suspend fun isSDCardCachePath(localPath: String): Boolean {
         return localPath.startsWith(context.externalCacheDir?.path ?: return false)
     }
+
+    override suspend fun isSDCardUri(uriString: String) =
+        Uri.parse(uriString).let { uri ->
+            runCatching {
+                documentFileWrapper.fromTreeUri(uri)
+            }.getOrNull()?.let { documentFile ->
+                runCatching {
+                    documentFileWrapper.getDocumentId(documentFile)
+                }.getOrNull()?.contains("primary")?.not()
+            } ?: false
+        }
 }

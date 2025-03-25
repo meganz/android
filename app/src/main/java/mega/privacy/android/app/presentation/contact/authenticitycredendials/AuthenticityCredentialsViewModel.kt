@@ -14,7 +14,7 @@ import mega.privacy.android.app.presentation.contact.authenticitycredendials.mod
 import mega.privacy.android.app.presentation.extensions.getErrorStringId
 import mega.privacy.android.domain.exception.MegaException
 import mega.privacy.android.domain.usecase.GetContactCredentials
-import mega.privacy.android.domain.usecase.GetMyCredentials
+import mega.privacy.android.domain.usecase.account.GetMyCredentialsUseCase
 import mega.privacy.android.domain.usecase.ResetCredentials
 import mega.privacy.android.domain.usecase.VerifyCredentials
 import mega.privacy.android.domain.usecase.contact.AreCredentialsVerifiedUseCase
@@ -27,7 +27,7 @@ import javax.inject.Inject
  *
  * @property getContactCredentials  [GetContactCredentials]
  * @property areCredentialsVerifiedUseCase [AreCredentialsVerifiedUseCase]
- * @property getMyCredentials       [GetMyCredentials]
+ * @property getMyCredentialsUseCase       [GetMyCredentialsUseCase]
  * @property verifyCredentials      [VerifyCredentials]
  * @property resetCredentials       [ResetCredentials]
  * @property state                  Current view state as [AuthenticityCredentialsState]
@@ -36,7 +36,7 @@ import javax.inject.Inject
 class AuthenticityCredentialsViewModel @Inject constructor(
     private val getContactCredentials: GetContactCredentials,
     private val areCredentialsVerifiedUseCase: AreCredentialsVerifiedUseCase,
-    private val getMyCredentials: GetMyCredentials,
+    private val getMyCredentialsUseCase: GetMyCredentialsUseCase,
     private val verifyCredentials: VerifyCredentials,
     private val resetCredentials: ResetCredentials,
     monitorConnectivityUseCase: MonitorConnectivityUseCase,
@@ -50,7 +50,7 @@ class AuthenticityCredentialsViewModel @Inject constructor(
 
     init {
         viewModelScope.launch {
-            _state.update { it.copy(myAccountCredentials = getMyCredentials()) }
+            _state.update { it.copy(myAccountCredentials = getMyCredentialsUseCase()) }
         }
     }
 

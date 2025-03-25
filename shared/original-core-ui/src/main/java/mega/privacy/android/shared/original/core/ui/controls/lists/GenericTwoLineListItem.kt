@@ -27,9 +27,9 @@ import androidx.compose.ui.unit.dp
 import mega.privacy.android.shared.original.core.ui.preview.BooleanProvider
 import mega.privacy.android.shared.original.core.ui.preview.CombinedThemePreviews
 import mega.privacy.android.shared.original.core.ui.theme.MegaOriginalTheme
-import mega.privacy.android.shared.original.core.ui.theme.OriginalTempTheme
+import mega.privacy.android.shared.original.core.ui.theme.OriginalTheme
 import mega.privacy.android.shared.original.core.ui.theme.extensions.conditional
-import mega.privacy.android.shared.original.core.ui.theme.values.TextColor
+import mega.android.core.ui.theme.values.TextColor
 
 /**
  * Generic two line list item
@@ -239,7 +239,7 @@ internal fun SubTitleRow(
 @CombinedThemePreviews
 @Composable
 private fun GenericTwoLineListItemPreview() {
-    OriginalTempTheme(isDark = isSystemInDarkTheme()) {
+    OriginalTheme(isDark = isSystemInDarkTheme()) {
         GenericTwoLineListItem(
             title = "Generic Two Line List Item Title",
             subtitle = "Generic Two Line List Item Subtitle",
@@ -258,7 +258,7 @@ private fun GenericTwoLineListItemPreview() {
 private fun GenericTwoLineListItemWithLongContentPreview(
     @PreviewParameter(BooleanProvider::class) showEntireSubtitle: Boolean,
 ) {
-    OriginalTempTheme(isDark = isSystemInDarkTheme()) {
+    OriginalTheme(isDark = isSystemInDarkTheme()) {
         GenericTwoLineListItem(
             title = "Very Long Generic Two Line List Item Title to Simulate Ellipsis",
             subtitle = "Very Long Generic Two Line List Item Subtitle to Simulate Ellipsis",
@@ -276,7 +276,7 @@ private fun GenericTwoLineListItemWithLongContentPreview(
 @CombinedThemePreviews
 @Composable
 private fun GenericTwoLineListItemWithOnlyTitlePreview() {
-    OriginalTempTheme(isDark = isSystemInDarkTheme()) {
+    OriginalTheme(isDark = isSystemInDarkTheme()) {
         GenericTwoLineListItem(title = "Generic Two Line List Item Title")
     }
 }

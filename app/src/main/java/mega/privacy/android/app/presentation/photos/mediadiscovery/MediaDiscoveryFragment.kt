@@ -35,7 +35,6 @@ import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.launch
 import mega.privacy.android.app.R
 import mega.privacy.android.app.main.ManagerActivity
-import mega.privacy.android.app.presentation.advertisements.model.AdsSlotIDs.TAB_CLOUD_SLOT_ID
 import mega.privacy.android.app.presentation.extensions.isDarkMode
 import mega.privacy.android.app.presentation.hidenode.HiddenNodesOnboardingActivity
 import mega.privacy.android.app.presentation.photos.albums.importlink.ImagePreviewProvider
@@ -51,7 +50,7 @@ import mega.privacy.android.domain.entity.photos.Photo
 import mega.privacy.android.domain.usecase.GetThemeMode
 import mega.privacy.android.domain.usecase.featureflag.GetFeatureFlagValueUseCase
 import mega.privacy.android.navigation.MegaNavigator
-import mega.privacy.android.shared.original.core.ui.theme.OriginalTempTheme
+import mega.privacy.android.shared.original.core.ui.theme.OriginalTheme
 import javax.inject.Inject
 
 /**
@@ -84,6 +83,12 @@ class MediaDiscoveryFragment : Fragment() {
     @Inject
     lateinit var megaNavigator: MegaNavigator
 
+    internal val addToAlbumLauncher: ActivityResultLauncher<Intent> =
+        registerForActivityResult(
+            ActivityResultContracts.StartActivityForResult(),
+            ::handleAddToAlbumResult,
+        )
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         managerActivity = activity as? ManagerActivity
@@ -103,7 +108,7 @@ class MediaDiscoveryFragment : Fragment() {
                     .collectAsStateWithLifecycle(initialValue = ThemeMode.System)
                 val uiState by mediaDiscoveryViewModel.state.collectAsStateWithLifecycle()
 
-                OriginalTempTheme(isDark = mode.isDarkMode()) {
+                OriginalTheme(isDark = mode.isDarkMode()) {
                     Box(
                         modifier = Modifier
                             .background(MaterialTheme.colors.background)
@@ -154,7 +159,7 @@ class MediaDiscoveryFragment : Fragment() {
         if (isVisible) {
             managerActivity?.hideAdsView()
         } else {
-            managerActivity?.handleShowingAds(TAB_CLOUD_SLOT_ID)
+            managerActivity?.handleShowingAds()
         }
     }
 
@@ -286,7 +291,7 @@ class MediaDiscoveryFragment : Fragment() {
         actionMode?.finish()
         actionMode = null
         managerActivity?.showHideBottomNavigationView(false)
-        managerActivity?.handleShowingAds(TAB_CLOUD_SLOT_ID)
+        managerActivity?.handleShowingAds()
     }
 
     private fun handleActionMode(photo: Photo) {
@@ -406,6 +411,13 @@ class MediaDiscoveryFragment : Fragment() {
                 selectedSize,
                 selectedSize,
             )
+        Util.showSnackbar(requireActivity(), message)
+    }
+
+    private fun handleAddToAlbumResult(result: ActivityResult) {
+        if (result.resultCode != Activity.RESULT_OK) return
+        val message = result.data?.getStringExtra("message") ?: return
+
         Util.showSnackbar(requireActivity(), message)
     }
 

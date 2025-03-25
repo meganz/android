@@ -5,11 +5,13 @@ import android.content.Intent
 import android.net.Uri
 import android.os.Environment
 import android.text.TextUtils
+import androidx.annotation.VisibleForTesting
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import dagger.hilt.android.lifecycle.HiltViewModel
 import de.palm.composestateevents.consumed
 import de.palm.composestateevents.triggered
+import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.update
@@ -50,6 +52,7 @@ import mega.privacy.android.domain.entity.node.TypedNode
 import mega.privacy.android.domain.entity.node.UnTypedNode
 import mega.privacy.android.domain.entity.preference.ViewType
 import mega.privacy.android.domain.exception.FetchFolderNodesException
+import mega.privacy.android.domain.qualifier.ApplicationScope
 import mega.privacy.android.domain.usecase.AddNodeType
 import mega.privacy.android.domain.usecase.GetLocalFileForNodeUseCase
 import mega.privacy.android.domain.usecase.GetLocalFolderLinkFromMegaApiFolderUseCase
@@ -57,15 +60,19 @@ import mega.privacy.android.domain.usecase.GetLocalFolderLinkFromMegaApiUseCase
 import mega.privacy.android.domain.usecase.GetPricing
 import mega.privacy.android.domain.usecase.HasCredentialsUseCase
 import mega.privacy.android.domain.usecase.RootNodeExistsUseCase
+import mega.privacy.android.domain.usecase.StopAudioService
 import mega.privacy.android.domain.usecase.account.GetAccountTypeUseCase
 import mega.privacy.android.domain.usecase.achievements.AreAchievementsEnabledUseCase
+import mega.privacy.android.domain.usecase.advertisements.QueryAdsUseCase
 import mega.privacy.android.domain.usecase.contact.GetCurrentUserEmail
 import mega.privacy.android.domain.usecase.file.GetFileUriUseCase
+import mega.privacy.android.domain.usecase.filelink.GetPublicLinkInformationUseCase
 import mega.privacy.android.domain.usecase.folderlink.ContainsMediaItemUseCase
 import mega.privacy.android.domain.usecase.folderlink.FetchFolderNodesUseCase
 import mega.privacy.android.domain.usecase.folderlink.GetFolderLinkChildrenNodesUseCase
 import mega.privacy.android.domain.usecase.folderlink.GetFolderParentNodeUseCase
 import mega.privacy.android.domain.usecase.folderlink.LoginToFolderUseCase
+import mega.privacy.android.domain.usecase.login.IsUserLoggedInUseCase
 import mega.privacy.android.domain.usecase.mediaplayer.MegaApiFolderHttpServerIsRunningUseCase
 import mega.privacy.android.domain.usecase.mediaplayer.MegaApiFolderHttpServerStartUseCase
 import mega.privacy.android.domain.usecase.mediaplayer.MegaApiHttpServerIsRunningUseCase
@@ -76,6 +83,8 @@ import mega.privacy.android.domain.usecase.node.CopyNodesUseCase
 import mega.privacy.android.domain.usecase.node.GetFolderLinkNodeContentUriUseCase
 import mega.privacy.android.domain.usecase.node.GetNodePreviewFileUseCase
 import mega.privacy.android.domain.usecase.node.publiclink.MapNodeToPublicLinkUseCase
+import mega.privacy.android.domain.usecase.setting.MonitorMiscLoadedUseCase
+import mega.privacy.android.domain.usecase.setting.UpdateCrashAndPerformanceReportersUseCase
 import mega.privacy.android.domain.usecase.viewtype.MonitorViewType
 import mega.privacy.android.domain.usecase.viewtype.SetViewType
 import mega.privacy.android.navigation.MegaNavigator
@@ -85,6 +94,8 @@ import javax.inject.Inject
 
 /**
  * View Model class for [FolderLinkComposeActivity]
+ *
+ * @param monitorMiscLoadedUseCase Use case to monitor when misc data is loaded
  */
 @HiltViewModel
 class FolderLinkViewModel @Inject constructor(
@@ -120,6 +131,13 @@ class FolderLinkViewModel @Inject constructor(
     private val megaNavigator: MegaNavigator,
     private val nodeContentUriIntentMapper: NodeContentUriIntentMapper,
     private val getNodePreviewFileUseCase: GetNodePreviewFileUseCase,
+    private val updateCrashAndPerformanceReportersUseCase: UpdateCrashAndPerformanceReportersUseCase,
+    private val isUserLoggedInUseCase: IsUserLoggedInUseCase,
+    private val stopAudioService: StopAudioService,
+    @ApplicationScope private val applicationScope: CoroutineScope,
+    val monitorMiscLoadedUseCase: MonitorMiscLoadedUseCase,
+    private val getPublicLinkInformationUseCase: GetPublicLinkInformationUseCase,
+    private val queryAdsUseCase: QueryAdsUseCase,
 ) : ViewModel() {
 
     /**
@@ -166,10 +184,16 @@ class FolderLinkViewModel @Inject constructor(
                         it.copy(
                             isInitialState = false,
                             isLoginComplete = true,
-                            errorDialogTitle = -1,
-                            errorDialogContent = -1
+                            showErrorDialogEvent = consumed(),
                         )
                     }
+                    with(state.value) {
+                        queryAds(folderLink)
+                        if (!isNodesFetched) {
+                            fetchNodes(folderSubHandle)
+                        }
+                    }
+                    checkCookiesSettings()
                 }
 
                 FolderLoginStatus.API_INCOMPLETE -> {
@@ -177,9 +201,8 @@ class FolderLinkViewModel @Inject constructor(
                         it.copy(
                             isInitialState = false,
                             isLoginComplete = false,
-                            askForDecryptionKeyDialog = true,
-                            errorDialogTitle = -1,
-                            errorDialogContent = -1
+                            askForDecryptionKeyDialogEvent = triggered,
+                            showErrorDialogEvent = consumed()
                         )
                     }
                 }
@@ -189,9 +212,10 @@ class FolderLinkViewModel @Inject constructor(
                         it.copy(
                             isInitialState = false,
                             isLoginComplete = false,
-                            askForDecryptionKeyDialog = decryptionIntroduced,
-                            errorDialogTitle = if (decryptionIntroduced) -1 else result.errorDialogTitleId,
-                            errorDialogContent = if (decryptionIntroduced) -1 else result.errorDialogContentId,
+                            askForDecryptionKeyDialogEvent = if (decryptionIntroduced) triggered else consumed,
+                            showErrorDialogEvent = if (decryptionIntroduced) consumed() else triggered(
+                                result.errorDialogTitleId to result.errorDialogContentId
+                            ),
                             snackBarMessage = if (decryptionIntroduced) -1 else result.snackBarMessageId
                         )
                     }
@@ -202,13 +226,24 @@ class FolderLinkViewModel @Inject constructor(
                         it.copy(
                             isInitialState = false,
                             isLoginComplete = false,
-                            askForDecryptionKeyDialog = false,
-                            errorDialogTitle = result.errorDialogTitleId,
-                            errorDialogContent = result.errorDialogContentId,
+                            askForDecryptionKeyDialogEvent = consumed,
+                            showErrorDialogEvent = triggered(
+                                result.errorDialogTitleId to result.errorDialogContentId
+                            ),
                             snackBarMessage = result.snackBarMessageId
                         )
                     }
                 }
+            }
+        }
+    }
+
+    private fun checkCookiesSettings() {
+        viewModelScope.launch {
+            runCatching {
+                updateCrashAndPerformanceReportersUseCase()
+            }.onFailure {
+                Timber.e(it)
             }
         }
     }
@@ -252,7 +287,7 @@ class FolderLinkViewModel @Inject constructor(
      */
     fun resetAskForDecryptionKeyDialog() {
         _state.update {
-            it.copy(askForDecryptionKeyDialog = false)
+            it.copy(askForDecryptionKeyDialogEvent = consumed)
         }
     }
 
@@ -292,7 +327,7 @@ class FolderLinkViewModel @Inject constructor(
         }.onSuccess { result ->
             if (result.conflictNodes.isNotEmpty()) {
                 _state.update {
-                    it.copy(collisions = result.conflictNodes.values.toList())
+                    it.copy(collisionsEvent = triggered(result.conflictNodes.values.toList()))
                 }
             }
             if (result.noConflictNodes.isNotEmpty()) {
@@ -301,12 +336,14 @@ class FolderLinkViewModel @Inject constructor(
                 }.onSuccess { copyResult ->
                     _state.update {
                         it.copy(
-                            copyResultText = copyRequestMessageMapper(copyResult.toCopyRequestResult())
+                            copyResultEvent = triggered(copyRequestMessageMapper(copyResult.toCopyRequestResult()) to null)
                         )
                     }
                 }.onFailure { throwable ->
                     _state.update {
-                        it.copy(copyThrowable = throwable)
+                        it.copy(
+                            copyResultEvent = triggered(null to throwable)
+                        )
                     }
                 }
             }
@@ -369,7 +406,7 @@ class FolderLinkViewModel @Inject constructor(
      */
     fun resetLaunchCollisionActivity() {
         _state.update {
-            it.copy(collisions = null)
+            it.copy(collisionsEvent = consumed())
         }
     }
 
@@ -378,7 +415,7 @@ class FolderLinkViewModel @Inject constructor(
      */
     fun resetShowCopyResult() {
         _state.update {
-            it.copy(copyResultText = null, copyThrowable = null)
+            it.copy(copyResultEvent = consumed())
         }
     }
 
@@ -388,11 +425,17 @@ class FolderLinkViewModel @Inject constructor(
     fun checkLoginRequired() {
         viewModelScope.launch {
             val hasCredentials = hasCredentialsUseCase()
+            val showLogin = hasCredentials && !rootNodeExistsUseCase()
             _state.update {
                 it.copy(
-                    shouldLogin = (hasCredentials && !rootNodeExistsUseCase()),
+                    showLoginEvent = if (showLogin) triggered else consumed,
                     hasDbCredentials = hasCredentials
                 )
+            }
+            with(state.value) {
+                if (isInitialState && !showLogin) {
+                    url?.let { folderLogin(it) }
+                }
             }
         }
     }
@@ -436,8 +479,7 @@ class FolderLinkViewModel @Inject constructor(
                     _state.update {
                         it.copy(
                             isNodesFetched = true,
-                            errorDialogTitle = errorTitle,
-                            errorDialogContent = errorContent,
+                            showErrorDialogEvent = triggered(errorTitle to errorContent),
                             snackBarMessage = snackBarContent
                         )
                     }
@@ -542,9 +584,7 @@ class FolderLinkViewModel @Inject constructor(
                                 FetchFolderNodesException.GenericError().let {
                                     _state.update {
                                         it.copy(
-                                            errorDialogTitle = it.errorDialogTitle,
-                                            errorDialogContent = it.errorDialogContent,
-                                            snackBarMessage = it.snackBarMessage
+                                            snackBarMessage = it.snackBarMessage,
                                         )
                                     }
                                 }
@@ -552,12 +592,12 @@ class FolderLinkViewModel @Inject constructor(
                     }
                     .onFailure {
                         Timber.w("parentNode == NULL")
-                        _state.update { it.copy(finishActivity = true) }
+                        _state.update { it.copy(finishActivityEvent = triggered) }
                     }
                 ""
             } ?: run {
                 Timber.w("parentNode == NULL")
-                _state.update { it.copy(finishActivity = true) }
+                _state.update { it.copy(finishActivityEvent = triggered) }
             }
         }
     }
@@ -592,6 +632,20 @@ class FolderLinkViewModel @Inject constructor(
                 }
                 _state.update { it.copy(url = folderUrl, folderSubHandle = folderSubHandle) }
             } ?: Timber.w("url NULL")
+        }
+    }
+
+    private fun queryAds(url: String) {
+        viewModelScope.launch {
+            runCatching {
+                val info = getPublicLinkInformationUseCase(url)
+                Timber.d("Public link info: $info")
+                queryAdsUseCase(info.id.longValue)
+            }.onSuccess { value ->
+                _state.update { it.copy(shouldShowAdsForLink = value) }
+            }.onFailure {
+                Timber.e(it)
+            }
         }
     }
 
@@ -695,7 +749,7 @@ class FolderLinkViewModel @Inject constructor(
         viewModelScope.launch {
             runCatching {
                 pdfIntent.apply {
-                    flags = Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_CLEAR_TASK
+                    flags = Intent.FLAG_ACTIVITY_NEW_TASK
 
                     putExtra(Constants.INTENT_EXTRA_KEY_IS_FOLDER_LINK, true)
                     putExtra(Constants.INTENT_EXTRA_KEY_HANDLE, fileNode.id.longValue)
@@ -819,7 +873,12 @@ class FolderLinkViewModel @Inject constructor(
         }.onSuccess { linkNode ->
             _state.update {
                 it.copy(
-                    downloadEvent = triggered(TransferTriggerEvent.StartDownloadForPreview(linkNode))
+                    downloadEvent = triggered(
+                        TransferTriggerEvent.StartDownloadForPreview(
+                            node = linkNode,
+                            isOpenWith = false
+                        )
+                    )
                 )
             }
         }.onFailure {
@@ -956,6 +1015,40 @@ class FolderLinkViewModel @Inject constructor(
         }
     }
 
+    /**
+     * Reset finishActivityEvent when consumed
+     */
+    fun onShowLoginEventConsumed() {
+        _state.update { it.copy(showLoginEvent = consumed) }
+    }
+
+    /**
+     * Reset finishActivityEvent when consumed
+     */
+    fun onFinishActivityEventConsumed() {
+        _state.update { it.copy(finishActivityEvent = consumed) }
+    }
+
+    /**
+     * Reset showErrorDialogEvent when consumed
+     */
+    fun onShowErrorDialogEventConsumed() {
+        _state.update { it.copy(showErrorDialogEvent = consumed()) }
+    }
+
     internal suspend fun getNodeContentUri(fileNode: TypedFileNode) =
         getFolderLinkNodeContentUriUseCase(fileNode)
+
+    /**
+     * onCleared
+     */
+    override fun onCleared() {
+        super.onCleared()
+        stopAudioPlayerServiceWithoutLogin()
+    }
+
+    @VisibleForTesting(otherwise = VisibleForTesting.PRIVATE)
+    internal fun stopAudioPlayerServiceWithoutLogin() = applicationScope.launch {
+        if (!isUserLoggedInUseCase()) stopAudioService()
+    }
 }

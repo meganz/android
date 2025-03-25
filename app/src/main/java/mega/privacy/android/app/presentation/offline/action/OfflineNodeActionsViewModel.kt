@@ -28,6 +28,7 @@ import mega.privacy.android.domain.entity.offline.OfflineFileInformation
 import mega.privacy.android.domain.usecase.GetPathFromNodeContentUseCase
 import mega.privacy.android.domain.usecase.favourites.GetOfflineFileUseCase
 import mega.privacy.android.domain.usecase.node.ExportNodesUseCase
+import mega.privacy.android.domain.usecase.offline.GetOfflineFileInformationByIdUseCase
 import mega.privacy.android.domain.usecase.offline.GetOfflineFilesUseCase
 import timber.log.Timber
 import java.io.File
@@ -42,6 +43,7 @@ class OfflineNodeActionsViewModel @Inject constructor(
     private val getOfflineFilesUseCase: GetOfflineFilesUseCase,
     private val exportNodesUseCase: ExportNodesUseCase,
     private val getPathFromNodeContentUseCase: GetPathFromNodeContentUseCase,
+    private val getOfflineFileInformationByIdUseCase: GetOfflineFileInformationByIdUseCase,
     private val snackBarHandler: SnackBarHandler,
     private val nodeContentUriIntentMapper: NodeContentUriIntentMapper,
 ) : ViewModel() {
@@ -67,6 +69,21 @@ class OfflineNodeActionsViewModel @Inject constructor(
                 } else {
                     snackBarHandler.postSnackbarMessage(R.string.error_server_connection_problem)
                 }
+            }
+        }
+    }
+
+    /**
+     * Handle share action of offline node by id
+     */
+    fun handleShareOfflineNodeById(nodeId: NodeId, isOnline: Boolean) {
+        viewModelScope.launch {
+            runCatching {
+                requireNotNull(getOfflineFileInformationByIdUseCase(nodeId))
+            }.onSuccess {
+                handleShareOfflineNodes(listOf(it), isOnline)
+            }.onFailure {
+                Timber.e(it)
             }
         }
     }
@@ -209,6 +226,21 @@ class OfflineNodeActionsViewModel @Inject constructor(
                 _uiState.update { state ->
                     state.copy(openFileEvent = triggered(it))
                 }
+            }.onFailure {
+                Timber.e(it)
+            }
+        }
+    }
+
+    /**
+     * Handle Open With intent by node id
+     */
+    fun handleOpenWithIntentById(nodeId: NodeId) {
+        viewModelScope.launch {
+            runCatching {
+                requireNotNull(getOfflineFileInformationByIdUseCase(nodeId))
+            }.onSuccess {
+                handleOpenWithIntent(it)
             }.onFailure {
                 Timber.e(it)
             }

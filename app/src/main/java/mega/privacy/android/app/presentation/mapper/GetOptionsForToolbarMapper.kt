@@ -2,19 +2,17 @@ package mega.privacy.android.app.presentation.mapper
 
 import android.view.MenuItem
 import mega.privacy.android.app.MimeTypeList
-import mega.privacy.android.app.domain.usecase.CheckAccessErrorExtended
 import mega.privacy.android.app.domain.usecase.GetNodeByHandle
 import mega.privacy.android.app.utils.CloudStorageOptionControlUtil
 import mega.privacy.android.domain.entity.node.FileNode
 import mega.privacy.android.domain.entity.node.FolderNode
 import mega.privacy.android.domain.entity.node.NodeId
 import mega.privacy.android.domain.entity.node.TypedNode
+import mega.privacy.android.domain.entity.shares.AccessPermission
 import mega.privacy.android.domain.usecase.CheckNodeCanBeMovedToTargetNode
 import mega.privacy.android.domain.usecase.GetNodeByIdUseCase
-import mega.privacy.android.domain.usecase.featureflag.GetFeatureFlagValueUseCase
+import mega.privacy.android.domain.usecase.node.NodeAccessPermissionCheckUseCase
 import mega.privacy.android.domain.usecase.rubbishbin.GetRubbishBinFolderUseCase
-import nz.mega.sdk.MegaError
-import nz.mega.sdk.MegaShare
 import javax.inject.Inject
 
 /**
@@ -23,10 +21,9 @@ import javax.inject.Inject
 class GetOptionsForToolbarMapper @Inject constructor(
     private val getNodeByHandle: GetNodeByHandle,
     private val getNodeByIdUseCase: GetNodeByIdUseCase,
-    private val checkAccessErrorExtended: CheckAccessErrorExtended,
+    private val nodeAccessPermissionCheckUseCase: NodeAccessPermissionCheckUseCase,
     private val checkNodeCanBeMovedToTargetNode: CheckNodeCanBeMovedToTargetNode,
     private val getRubbishBinFolderUseCase: GetRubbishBinFolderUseCase,
-    private val getFeatureFlagValueUseCase: GetFeatureFlagValueUseCase,
 ) {
 
     /**
@@ -44,11 +41,12 @@ class GetOptionsForToolbarMapper @Inject constructor(
             val megaNode = getNodeByHandle(selectedNodeHandleList[0])
             getNodeByIdUseCase(NodeId(selectedNodeHandleList[0]))?.let { node ->
                 megaNode?.let {
+                    val megaNodeId = NodeId(it.handle)
                     if (node.isTakenDown.not()) {
-                        if (checkAccessErrorExtended(
-                                it,
-                                MegaShare.ACCESS_OWNER
-                            ).errorCode == MegaError.API_OK
+                        if (nodeAccessPermissionCheckUseCase(
+                                nodeId = megaNodeId,
+                                level = AccessPermission.OWNER,
+                            )
                         ) {
                             if (it.isExported) {
                                 control.manageLink().setVisible(true).showAsAction =
@@ -60,10 +58,10 @@ class GetOptionsForToolbarMapper @Inject constructor(
                             }
                         }
                     }
-                    if (checkAccessErrorExtended(
-                            it,
-                            MegaShare.ACCESS_FULL
-                        ).errorCode == MegaError.API_OK
+                    if (nodeAccessPermissionCheckUseCase(
+                            nodeId = megaNodeId,
+                            level = AccessPermission.FULL,
+                        )
                     ) {
                         control.rename().isVisible = true
                     }
@@ -190,10 +188,10 @@ class GetOptionsForToolbarMapper @Inject constructor(
     private suspend fun allHaveOwnerAccessAndNotTakenDown(selectedNodeHandleList: List<Long>): Boolean {
         selectedNodeHandleList.forEach {
             getNodeByHandle(it)?.let { megaNode ->
-                if ((checkAccessErrorExtended(
-                        megaNode,
-                        MegaShare.ACCESS_OWNER
-                    ).errorCode != MegaError.API_OK) || megaNode.isTakenDown
+                if (!nodeAccessPermissionCheckUseCase(
+                        nodeId = NodeId(megaNode.handle),
+                        level = AccessPermission.OWNER,
+                    ) || megaNode.isTakenDown
                 ) {
                     return false
                 }

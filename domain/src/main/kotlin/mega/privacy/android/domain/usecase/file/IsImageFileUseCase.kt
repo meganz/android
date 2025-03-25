@@ -1,5 +1,6 @@
 package mega.privacy.android.domain.usecase.file
 
+import mega.privacy.android.domain.entity.uri.UriPath
 import mega.privacy.android.domain.repository.FileSystemRepository
 import javax.inject.Inject
 
@@ -19,6 +20,9 @@ class IsImageFileUseCase @Inject constructor(
      * @param localPath
      * @return True if the file is an image, false otherwise.
      */
-    suspend operator fun invoke(localPath: String) =
-        fileSystemRepository.getGuessContentTypeFromName(localPath)?.startsWith("image") == true
+    suspend operator fun invoke(uriPath: UriPath) =
+        listOf(
+            fileSystemRepository.getGuessContentTypeFromName(uriPath.value),
+            fileSystemRepository.getContentTypeFromContentUri(uriPath)
+        ).any { it?.startsWith("image") == true }
 }

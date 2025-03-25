@@ -12,7 +12,7 @@ import androidx.compose.ui.res.stringResource
 import mega.privacy.android.app.R
 import mega.privacy.android.shared.original.core.ui.controls.lists.MenuActionListTile
 import mega.privacy.android.shared.original.core.ui.preview.CombinedThemePreviews
-import mega.privacy.android.shared.original.core.ui.theme.OriginalTempTheme
+import mega.privacy.android.shared.original.core.ui.theme.OriginalTheme
 
 /**
  * Bottom sheet for in progress transfers actions.
@@ -38,7 +38,7 @@ fun InProgressActionsBottomSheet(
 @CombinedThemePreviews
 @Composable
 private fun InProgressActionsBottomSheetPreview() {
-    OriginalTempTheme(isDark = isSystemInDarkTheme()) {
+    OriginalTheme(isDark = isSystemInDarkTheme()) {
         InProgressActionsBottomSheet(
             onCancelAllTransfers = {},
         )

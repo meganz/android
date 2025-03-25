@@ -19,7 +19,7 @@ import androidx.compose.ui.unit.dp
 import mega.privacy.android.app.R
 import mega.privacy.android.app.presentation.filelink.model.FileLinkState
 import mega.privacy.android.core.formatter.formatFileSize
-import mega.privacy.android.shared.original.core.ui.theme.OriginalTempTheme
+import mega.privacy.android.shared.original.core.ui.theme.OriginalTheme
 import mega.privacy.android.shared.original.core.ui.controls.buttons.RaisedDefaultMegaButton
 import mega.privacy.android.shared.original.core.ui.preview.CombinedThemePreviews
 import mega.privacy.android.shared.original.core.ui.theme.extensions.subtitle1medium
@@ -79,7 +79,7 @@ internal fun FileLinkContent(
 @CombinedThemePreviews
 @Composable
 private fun FileLinkContentPreview() {
-    OriginalTempTheme(isDark = isSystemInDarkTheme()) {
+    OriginalTheme(isDark = isSystemInDarkTheme()) {
         val viewState = FileLinkState(title = "File", sizeInBytes = 10000)
         FileLinkContent(viewState = viewState, onPreviewClick = { })
     }

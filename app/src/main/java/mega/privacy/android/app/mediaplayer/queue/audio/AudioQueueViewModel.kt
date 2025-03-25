@@ -2,6 +2,8 @@ package mega.privacy.android.app.mediaplayer.queue.audio
 
 import androidx.lifecycle.ViewModel
 import dagger.hilt.android.lifecycle.HiltViewModel
+import de.palm.composestateevents.consumed
+import de.palm.composestateevents.triggered
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.update
@@ -179,19 +181,46 @@ class AudioQueueViewModel @Inject constructor(
         it.copy(isSelected = false)
     }
 
-    internal fun removeSelectedItems() {
-        val updatedItems = _uiState.value.items.filterNot { item ->
-            _uiState.value.selectedItemHandles.any { it == item.id.longValue }
-        }.updateOriginalData()
-        val playingIndex = updatedItems.indexOfFirst { it.type == MediaQueueItemType.Playing }
+    internal fun selectAllNextTypeItems() {
+        val updatedItems = allItemsSelected().updateOriginalData().filterItemBySearchQuery()
+        val selectedHandles = updatedItems.filter { it.isSelected }.map { it.id.longValue }
+        _uiState.update {
+            it.copy(
+                items = updatedItems,
+                selectedItemHandles = selectedHandles
+            )
+        }
+    }
+
+    private fun allItemsSelected() =
+        _uiState.value.items.map { item ->
+            item.takeIf { it.type == MediaQueueItemType.Next }?.copy(isSelected = true) ?: item
+        }
+
+    internal fun removeSelectedItems(
+        handles: List<Long> = _uiState.value.selectedItemHandles.toList(),
+    ) {
+        val currentItems = _uiState.value.items
+        val updatedItems = currentItems
+            .filterNot { it.id.longValue in handles }
+            .updateOriginalData()
+
+        val removedItems = handles.mapNotNull { handle ->
+            currentItems.firstOrNull { it.id.longValue == handle }
+        }
+
         _uiState.update {
             it.copy(
                 items = updatedItems,
                 selectedItemHandles = emptyList(),
-                indexOfCurrentPlayingItem = playingIndex
+                removedItems = removedItems,
+                itemsRemovedEvent = triggered
             )
         }
     }
+
+    internal fun clearRemovedItemHandles() =
+        _uiState.update { it.copy(removedItems = emptyList()) }
 
     internal fun updateSearchMode(isSearchMode: Boolean) {
         if (isSearchMode.not()) {
@@ -216,6 +245,17 @@ class AudioQueueViewModel @Inject constructor(
             it.copy(
                 items = items
             )
+        }
+    }
+
+    internal fun enableSelectMode(isSelectMode: Boolean) =
+        _uiState.update {
+            it.copy(isSelectMode = isSelectMode)
+        }
+
+    internal fun onItemsRemovedEventConsumed() {
+        _uiState.update {
+            it.copy(itemsRemovedEvent = consumed)
         }
     }
 }

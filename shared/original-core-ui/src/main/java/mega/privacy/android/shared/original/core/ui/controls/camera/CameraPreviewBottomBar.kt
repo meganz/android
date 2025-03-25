@@ -13,7 +13,7 @@ import androidx.compose.ui.unit.dp
 import mega.privacy.android.core.R
 import mega.privacy.android.shared.original.core.ui.controls.buttons.RaisedDefaultMegaButton
 import mega.privacy.android.shared.original.core.ui.preview.CombinedThemePreviews
-import mega.privacy.android.shared.original.core.ui.theme.OriginalTempThemeForPreviews
+import mega.privacy.android.shared.original.core.ui.theme.OriginalThemeForPreviews
 import mega.privacy.android.shared.original.core.ui.theme.MegaOriginalTheme
 
 /**
@@ -48,7 +48,7 @@ fun CameraPreviewBottomBar(
 @CombinedThemePreviews
 @Composable
 private fun VideoPreviewBottomBarPreview() {
-    OriginalTempThemeForPreviews {
+    OriginalThemeForPreviews {
         CameraPreviewBottomBar(onSendVideo = {})
     }
 }

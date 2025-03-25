@@ -15,6 +15,7 @@
 
     <com.google.android.material.textfield.TextInputLayout
         android:id="@+id/text_file_layout"
+        style="@style/Widget.Mega.TextInputLayout"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_marginStart="16dp"
@@ -22,6 +23,7 @@
         android:layout_marginEnd="16dp"
         android:layout_toStartOf="@+id/edit_icon_layout"
         android:layout_toEndOf="@+id/thumbnail_file"
+        android:theme="@style/Widget.Mega.TextInputLayout"
         app:errorTextAppearance="@style/TextAppearance.InputHint.Error">
 
         <mega.privacy.android.app.components.twemoji.EmojiEditText
@@ -31,7 +33,6 @@
             android:inputType="textNoSuggestions"
             android:singleLine="true"
             android:textAppearance="@style/TextAppearance.Mega.Subtitle1"
-            android:textColorHighlight="@color/teal_100_teal_500"
             android:theme="@style/TransparentEditText"
             app:emojiSize="18sp" />
 

@@ -1,10 +1,10 @@
 package mega.privacy.android.data.mapper.transfer.active
 
 import com.google.common.truth.Truth
-import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.test.runTest
 import mega.privacy.android.data.database.entity.ActiveTransferEntity
 import mega.privacy.android.domain.entity.transfer.ActiveTransfer
+import mega.privacy.android.domain.entity.transfer.TransferAppData
 import mega.privacy.android.domain.entity.transfer.TransferType
 import org.junit.jupiter.api.BeforeAll
 import org.junit.jupiter.api.TestInstance
@@ -48,6 +48,10 @@ class ActiveTransferEntityMapperTest {
                                         isPaused = isPaused,
                                         isAlreadyTransferred = isAlreadyDownloaded,
                                         isCancelled = isCancelled,
+                                        appData = listOf(
+                                            TransferAppData.CameraUpload,
+                                            TransferAppData.OriginalContentUri("content://uri")
+                                        ),
                                     ),
                                     ActiveTransferEntity(
                                         tag = TAG,
@@ -57,7 +61,11 @@ class ActiveTransferEntityMapperTest {
                                         isFolderTransfer = isFolder,
                                         isPaused = isPaused,
                                         isAlreadyTransferred = isAlreadyDownloaded,
-                                        isCancelled = isCancelled
+                                        isCancelled = isCancelled,
+                                        appData = listOf(
+                                            TransferAppData.CameraUpload,
+                                            TransferAppData.OriginalContentUri("content://uri")
+                                        ),
                                     )
                                 )
                             }
@@ -87,5 +95,6 @@ class ActiveTransferEntityMapperTest {
         override val isPaused: Boolean,
         override val isAlreadyTransferred: Boolean,
         override val isCancelled: Boolean,
+        override val appData: List<TransferAppData>,
     ) : ActiveTransfer
 }

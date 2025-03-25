@@ -17,6 +17,8 @@ import mega.privacy.android.app.LegacyDatabaseMigrationImpl
 import mega.privacy.android.app.MegaApplication
 import mega.privacy.android.app.nav.MegaNavigatorImpl
 import mega.privacy.android.data.database.LegacyDatabaseMigration
+import mega.privacy.android.data.filewrapper.FileWrapper
+import mega.privacy.android.data.gateway.FileGateway
 import mega.privacy.android.data.qualifier.MegaApi
 import mega.privacy.android.data.qualifier.MegaApiFolder
 import mega.privacy.android.domain.usecase.DefaultGetThemeMode
@@ -32,7 +34,11 @@ class AppModule {
     @MegaApi
     @Singleton
     @Provides
-    fun provideMegaApi(@ApplicationContext context: Context): MegaApiAndroid {
+    fun provideMegaApi(
+        @ApplicationContext context: Context,
+        fileGateway: FileGateway,
+    ): MegaApiAndroid {
+        FileWrapper.initializeFactory(fileGateway)
         val packageInfo: PackageInfo
         var path: String? = null
         try {
@@ -107,5 +113,6 @@ class AppModule {
 
     @Singleton
     @Provides
-    internal fun provideLegacyDatabaseMigration(databaseMigration: LegacyDatabaseMigrationImpl): LegacyDatabaseMigration = databaseMigration
+    internal fun provideLegacyDatabaseMigration(databaseMigration: LegacyDatabaseMigrationImpl): LegacyDatabaseMigration =
+        databaseMigration
 }

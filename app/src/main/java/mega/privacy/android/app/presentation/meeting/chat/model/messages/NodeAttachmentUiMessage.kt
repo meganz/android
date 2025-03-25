@@ -248,7 +248,7 @@ data class NodeAttachmentUiMessage(
                 }
             }
         } else {
-            chatViewModel.onDownloadForPreviewChatNode(fileNode)
+            chatViewModel.onDownloadForPreviewChatNode(file = fileNode, isOpenWith = false)
         }
     }
 

@@ -1,13 +1,13 @@
 package mega.privacy.android.app.main
 
-import android.annotation.SuppressLint
 import android.content.Context
 import android.content.Intent
 import android.net.Uri
-import android.os.Build
+import android.os.Parcelable
 import android.webkit.URLUtil
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
+import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import dagger.hilt.android.lifecycle.HiltViewModel
@@ -17,14 +17,15 @@ import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
+import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.flow.firstOrNull
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
-import kotlinx.coroutines.withContext
 import mega.privacy.android.app.R
-import mega.privacy.android.app.ShareInfo
 import mega.privacy.android.app.featuretoggle.ApiFeatures
 import mega.privacy.android.app.presentation.extensions.getState
+import mega.privacy.android.app.presentation.extensions.parcelable
+import mega.privacy.android.app.presentation.extensions.parcelableArrayList
 import mega.privacy.android.app.presentation.extensions.serializable
 import mega.privacy.android.app.presentation.fileexplorer.model.FileExplorerUiState
 import mega.privacy.android.app.presentation.transfers.starttransfer.model.TransferTriggerEvent
@@ -33,10 +34,12 @@ import mega.privacy.android.app.utils.Constants
 import mega.privacy.android.domain.entity.ShareTextInfo
 import mega.privacy.android.domain.entity.StorageState
 import mega.privacy.android.domain.entity.account.AccountDetail
+import mega.privacy.android.domain.entity.document.DocumentEntity
 import mega.privacy.android.domain.entity.node.FileNode
 import mega.privacy.android.domain.entity.node.NodeId
 import mega.privacy.android.domain.entity.node.TypedFileNode
 import mega.privacy.android.domain.entity.shares.AccessPermission
+import mega.privacy.android.domain.entity.uri.UriPath
 import mega.privacy.android.domain.qualifier.IoDispatcher
 import mega.privacy.android.domain.usecase.GetNodeByIdUseCase
 import mega.privacy.android.domain.usecase.account.GetCopyLatestTargetPathUseCase
@@ -46,6 +49,7 @@ import mega.privacy.android.domain.usecase.account.MonitorStorageStateEventUseCa
 import mega.privacy.android.domain.usecase.chat.message.AttachNodeUseCase
 import mega.privacy.android.domain.usecase.chat.message.SendChatAttachmentsUseCase
 import mega.privacy.android.domain.usecase.featureflag.GetFeatureFlagValueUseCase
+import mega.privacy.android.domain.usecase.file.GetDocumentsFromSharedUrisUseCase
 import mega.privacy.android.domain.usecase.setting.MonitorShowHiddenItemsUseCase
 import mega.privacy.android.domain.usecase.shares.GetNodeAccessPermission
 import timber.log.Timber
@@ -54,10 +58,6 @@ import javax.inject.Inject
 
 /**
  * ViewModel class responsible for preparing and managing the data for FileExplorerActivity.
- *
- * @property storageState    [StorageState]
- * @property isImportingText True if it is importing text, false if it is importing files.
- * @property uiState     [FileExplorerUiState]
  */
 @HiltViewModel
 class FileExplorerViewModel @Inject constructor(
@@ -72,6 +72,8 @@ class FileExplorerViewModel @Inject constructor(
     private val sendChatAttachmentsUseCase: SendChatAttachmentsUseCase,
     private val monitorAccountDetailUseCase: MonitorAccountDetailUseCase,
     private val monitorShowHiddenItemsUseCase: MonitorShowHiddenItemsUseCase,
+    private val getDocumentsFromSharedUrisUseCase: GetDocumentsFromSharedUrisUseCase,
+    private val savedStateHandle: SavedStateHandle,
 ) : ViewModel() {
 
     private val _uiState = MutableStateFlow(FileExplorerUiState())
@@ -83,7 +85,6 @@ class FileExplorerViewModel @Inject constructor(
     var latestCopyTargetPathTab: Int = 0
     var latestMoveTargetPath: Long? = null
     var latestMoveTargetPathTab: Int = 0
-    private val _filesInfo = MutableLiveData<List<ShareInfo>>()
     private val _textInfo = MutableLiveData<ShareTextInfo>()
 
     /**
@@ -91,11 +92,6 @@ class FileExplorerViewModel @Inject constructor(
      */
     val storageState: StorageState
         get() = monitorStorageStateEventUseCase.getState()
-
-    /**
-     * Notifies observers about filesInfo changes.
-     */
-    val filesInfo: LiveData<List<ShareInfo>> = _filesInfo
 
     /**
      * Notifies observers about textInfo updates.
@@ -129,7 +125,33 @@ class FileExplorerViewModel @Inject constructor(
 
     val showHiddenItems: Boolean get() = _showHiddenItems
 
-    fun init() = viewModelScope.launch {
+
+    init {
+        viewModelScope.launch {
+            combine(
+                savedStateHandle.getStateFlow(
+                    key = FileExplorerActivity.EXTRA_HAS_MULTIPLE_SCANS,
+                    initialValue = false,
+                ),
+                savedStateHandle.getStateFlow(
+                    key = FileExplorerActivity.EXTRA_SCAN_FILE_TYPE,
+                    initialValue = -1,
+                ),
+            ) { hasMultipleScans: Boolean, scanFileTypeInt: Int ->
+                { state: FileExplorerUiState ->
+                    state.copy(
+                        hasMultipleScans = hasMultipleScans,
+                        isUploadingScans = scanFileTypeInt != -1,
+                    )
+                }
+            }.collect { _uiState.update(it) }
+        }
+    }
+
+    /**
+     * Sets up the Cloud Drive Explorer content
+     */
+    fun initCloudDriveExplorerContent() = viewModelScope.launch {
         if (isHiddenNodesActive()) {
             _accountDetail = monitorAccountDetailUseCase().firstOrNull()
             _showHiddenItems = monitorShowHiddenItemsUseCase().firstOrNull() ?: true
@@ -149,7 +171,15 @@ class FileExplorerViewModel @Inject constructor(
      * @param fileNames
      */
     fun setFileNames(fileNames: Map<String, String>) {
-        _uiState.update { uiState -> uiState.copy(fileNames = fileNames) }
+        _uiState.update { uiState ->
+            val documents = uiState.documents.map { doc ->
+                fileNames[doc.originalName]?.let { doc.copy(name = it) } ?: doc
+            }
+            uiState.copy(documents = documents)
+        }
+        textInfoContent?.let {
+            _textInfo.postValue(it.copy(subject = fileNames.values.firstOrNull() ?: ""))
+        }
     }
 
     /**
@@ -166,7 +196,7 @@ class FileExplorerViewModel @Inject constructor(
             if (isImportingText(intent)) {
                 updateTextInfoFromIntent(intent, context)
             } else {
-                updateFilesInfoFromIntent(intent, context)
+                updateFilesFromIntent(intent, context)
             }
         }
     }
@@ -177,7 +207,7 @@ class FileExplorerViewModel @Inject constructor(
      * @param intent
      */
     private fun updateTextInfoFromIntent(intent: Intent, context: Context) {
-        val sharedText = intent.getStringExtra(Intent.EXTRA_TEXT)
+        val sharedText = intent.getClipboardText()
         val isUrl = URLUtil.isHttpUrl(sharedText) || URLUtil.isHttpsUrl(sharedText)
         val sharedSubject = intent.getStringExtra(Intent.EXTRA_SUBJECT)
         val sharedEmail = intent.getStringExtra(Intent.EXTRA_EMAIL)
@@ -203,89 +233,45 @@ class FileExplorerViewModel @Inject constructor(
         _textInfo.postValue(ShareTextInfo(isUrl, subject, fileContent, messageContent))
     }
 
+    private fun Intent.getClipboardText(): String? =
+        this.getStringExtra(Intent.EXTRA_TEXT)
+            ?: getClipboardItem()?.text?.toString()
+
+
+    private fun Intent.getClipboardItem() = this.clipData?.takeIf { it.itemCount > 0 }?.getItemAt(0)
+
     /**
      * Update files info from intent
      *
      * @param intent
      * @param context
      */
-    private fun updateFilesInfoFromIntent(
+    private fun updateFilesFromIntent(
         intent: Intent,
-        context: Context?,
+        context: Context,
     ) {
-        context?.let { getPathsAndNames(intent, it) }
-        val shareInfo: List<ShareInfo> =
-            getShareInfoList(intent, context) ?: emptyList()
-        val nameMap =
-            intent.serializable<HashMap<String, String>>(UploadDestinationActivity.EXTRA_NAME_MAP)
-                ?: getShareInfoFileNamesMap(shareInfo)
-        setFileNames(nameMap)
-        _filesInfo.postValue(shareInfo)
-    }
-
-    @SuppressLint("Recycle")
-    @Suppress("DEPRECATION")
-    private fun getPathsAndNames(intent: Intent, context: Context) {
         viewModelScope.launch {
-            with(intent) {
-                (if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
-                    getParcelableArrayListExtra(Intent.EXTRA_STREAM, Uri::class.java)
-                } else {
-                    getParcelableArrayListExtra(Intent.EXTRA_STREAM)
-                })?.let { uris ->
-                    Timber.d("Multiple files")
-                    grantUriPermission(context, uris)
-                    setUrisAndNames(uris.associateWith { uri -> getFileName(uri, context) })
-                    uris
-                } ?: (if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
-                    getParcelableExtra(Intent.EXTRA_STREAM, Uri::class.java)
-                } else {
-                    getParcelableExtra(Intent.EXTRA_STREAM)
-                })?.let { uri ->
-                    Timber.d("Single file")
-                    grantUriPermission(context, listOf(uri))
-                    setUrisAndNames(mapOf(uri to getFileName(uri, context)))
-                }
-            }
+            setDocuments(getDocuments(intent, context))
         }
     }
 
     private fun grantUriPermission(context: Context, uris: List<Uri>) {
-        uris.forEach {
-            context.grantUriPermission(
-                context.packageName,
-                it,
-                Intent.FLAG_GRANT_READ_URI_PERMISSION
-            )
-        }
-    }
-
-    internal fun setUrisAndNames(urisAndNames: Map<Uri, String?>) {
-        _uiState.update { uiState -> uiState.copy(urisAndNames = urisAndNames) }
-    }
-
-    private suspend fun getFileName(uri: Uri, context: Context): String? =
-        withContext(ioDispatcher) {
+        uris.forEach { uri ->
             runCatching {
-                context.contentResolver?.acquireContentProviderClient(uri)
-                    ?.let { client ->
-                        client.query(uri, null, null, null, null)?.let { cursor ->
-                            if (cursor.count == 0) {
-                                cursor.close()
-                                client.close()
-                                null
-                            } else {
-                                cursor.moveToFirst()
-                                val columnIndex = cursor.getColumnIndex("_display_name")
-                                cursor.getString(columnIndex)
-                            }
-                        } ?: run {
-                            client.close()
-                            null
-                        }
-                    }
-            }.getOrNull()
+                context.grantUriPermission(
+                    context.packageName,
+                    uri,
+                    Intent.FLAG_GRANT_READ_URI_PERMISSION
+                )
+            }.onFailure {
+                Timber.e(it, "Error granting uri permission")
+            }
         }
+    }
+
+    internal fun setDocuments(documents: List<DocumentEntity>?) {
+        _uiState.update { uiState -> uiState.copy(documents = documents ?: emptyList()) }
+    }
 
     /**
      * Get share info list
@@ -293,18 +279,29 @@ class FileExplorerViewModel @Inject constructor(
      * @param intent
      * @param context
      */
-    private fun getShareInfoList(
+    private suspend fun getDocuments(
         intent: Intent,
-        context: Context?,
-    ): List<ShareInfo>? = (intent.serializable(FileExplorerActivity.EXTRA_SHARE_INFOS)
-        ?: ShareInfo.processIntent(intent, context))
+        context: Context,
+    ): List<DocumentEntity>? =
+        getSharedUrisFromIntent(intent, context)?.let { uriPaths ->
+            return getDocumentsFromSharedUrisUseCase(intent.action, uriPaths)
+        }
 
-    private fun getShareInfoFileNamesMap(shareInfo: List<ShareInfo>?) =
-        shareInfo?.map { info ->
-            info.getTitle().takeUnless {
-                it.isNullOrBlank()
-            } ?: info.originalFileName ?: ""
-        }?.associateWith { it } ?: emptyMap()
+    private fun getSharedUrisFromIntent(intent: Intent, context: Context): List<UriPath>? =
+        with(intent) {
+            parcelableArrayList<Parcelable>(Intent.EXTRA_STREAM)?.let {
+                it.mapNotNull { item -> item as? Uri }.let { uris ->
+                    Timber.d("Multiple files")
+                    grantUriPermission(context, uris)
+                    uris.map { uri -> UriPath(uri.toString()) }.ifEmpty { null }
+                }
+            } ?: (intent.parcelable<Parcelable>(Intent.EXTRA_STREAM) as? Uri)
+                ?.let { uri ->
+                    Timber.d("Single file")
+                    grantUriPermission(context, listOf(uri))
+                    listOf(UriPath(uri.toString()))
+                }
+        }
 
     /**
      * Builds file content from the shared text.
@@ -385,11 +382,11 @@ class FileExplorerViewModel @Inject constructor(
      */
     val messageToShare: String?
         get() {
-            return _textInfo.value?.let {
+            return _textInfo.value?.let { shareText ->
                 """
-                ${uiState.value.fileNames[it.subject] ?: it.subject}
+                ${uiState.value.documentsByUriPathValue[shareText.subject] ?: shareText.subject}
                 
-                ${it.messageContent}
+                ${shareText.messageContent}
                 """.trimIndent()
             }
         }
@@ -458,12 +455,12 @@ class FileExplorerViewModel @Inject constructor(
     }
 
     /**
-     * Upload files and nodes to the specified chats if the NewChatActivity feature flag is true, otherwise it invokes [toDoIfFalse]
-     * In both cases, it will call [toDoAfter] after starting the upload
+     * Upload files and nodes to the specified chats
+     * It will call [toDoAfter] after starting the upload
      */
-    fun uploadFilesToChatIfFeatureFlagIsTrue(
+    fun uploadFilesToChat(
         chatIds: List<Long>,
-        filePaths: List<String>,
+        documents: List<DocumentEntity>,
         nodeIds: List<NodeId>,
         toDoAfter: () -> Unit,
     ) {
@@ -471,14 +468,13 @@ class FileExplorerViewModel @Inject constructor(
             chatIds.forEach {
                 attachNodes(it, nodeIds)
             }
-            attachFiles(chatIds, filePaths)
+            attachFiles(chatIds, documents)
             toDoAfter()
         }
     }
 
-    private suspend fun attachFiles(chatIds: List<Long>, filePaths: List<String>) {
-        val filePathsWithNames =
-            filePaths.associateWith { uiState.value.fileNames[it.split(File.separator).last()] }
+    private suspend fun attachFiles(chatIds: List<Long>, documents: List<DocumentEntity>) {
+        val filePathsWithNames = documents.associate { it.uri.value to it.name }
         runCatching {
             sendChatAttachmentsUseCase(
                 filePathsWithNames, chatIds = chatIds.toLongArray()
@@ -510,7 +506,7 @@ class FileExplorerViewModel @Inject constructor(
         destination: Long,
     ) {
         uploadFiles(
-            mapOf(file.absolutePath to uiState.value.fileNames[file.name]),
+            mapOf(file.absolutePath to uiState.value.documentsByUriPathValue[file.name]?.name),
             NodeId(destination)
         )
     }
@@ -522,11 +518,7 @@ class FileExplorerViewModel @Inject constructor(
      */
     fun uploadFiles(destination: Long) {
         with(uiState.value) {
-            val pathsAndNames = urisAndNames.map { it.key }.associateWith {
-                runCatching { uiState.value.fileNames[urisAndNames.getValue(it)] }
-                    .getOrNull()
-            }.mapKeys { it.key.toString() }
-            uploadFiles(pathsAndNames, NodeId(destination))
+            uploadFiles(namesByUriPathValues, NodeId(destination))
         }
     }
 
@@ -540,6 +532,7 @@ class FileExplorerViewModel @Inject constructor(
                     TransferTriggerEvent.StartUpload.Files(
                         pathsAndNames = pathsAndNames,
                         destinationId = destinationId,
+                        waitNotificationPermissionResponseToStart = true,
                     )
                 )
             )
@@ -553,5 +546,41 @@ class FileExplorerViewModel @Inject constructor(
         _uiState.update {
             it.copy(uploadEvent = consumed())
         }
+    }
+
+    /**
+     * Get the documents
+     */
+    fun getDocuments() = uiState.value.documents
+
+    /**
+     * Handles Back Navigation logic by checking if the there are scans to be uploaded or not
+     */
+    fun handleBackNavigation() {
+        if (_uiState.value.isUploadingScans) {
+            setIsScanUploadingAborted(true)
+        } else {
+            setShouldFinishScreen(true)
+        }
+    }
+
+
+    /**
+     * Sets the value of [FileExplorerUiState.isScanUploadingAborted]
+     *
+     * @param isAborting true if the User is in the process of uploading the scans, but decides to
+     * back out of the process
+     */
+    fun setIsScanUploadingAborted(isAborting: Boolean) {
+        _uiState.update { it.copy(isScanUploadingAborted = isAborting) }
+    }
+
+    /**
+     * Sets the value of [FileExplorerUiState.shouldFinishScreen]
+     *
+     * @param shouldFinishScreen true if the File Explorer should be finished
+     */
+    fun setShouldFinishScreen(shouldFinishScreen: Boolean) {
+        _uiState.update { it.copy(shouldFinishScreen = shouldFinishScreen) }
     }
 }

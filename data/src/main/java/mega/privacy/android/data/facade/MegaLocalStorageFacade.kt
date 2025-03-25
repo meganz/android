@@ -114,14 +114,6 @@ internal class MegaLocalStorageFacade @Inject constructor(
         dbHandler.get().setAttrAskSizeDownload(askForConfirmation.toString())
     }
 
-    override fun setPasscodeLockEnabled(isPasscodeLockEnabled: Boolean) {
-        dbHandler.get().isPasscodeLockEnabled = isPasscodeLockEnabled
-    }
-
-    override suspend fun setPasscodeLockCode(passcodeLockCode: String) {
-        dbHandler.get().passcodeLockCode = passcodeLockCode
-    }
-
     override suspend fun setShowCopyright(showCopyrights: Boolean) {
         dbHandler.get().setShowCopyright(showCopyrights)
     }
@@ -131,9 +123,11 @@ internal class MegaLocalStorageFacade @Inject constructor(
 
     override suspend fun getChatFilesFolderHandle() = dbHandler.get().myChatFilesFolderHandle
 
-    override suspend fun setLastPublicHandle(handle: Long) = dbHandler.get().setLastPublicHandle(handle)
+    override suspend fun setLastPublicHandle(handle: Long) =
+        dbHandler.get().setLastPublicHandle(handle)
 
-    override suspend fun setLastPublicHandleTimeStamp() = dbHandler.get().setLastPublicHandleTimeStamp()
+    override suspend fun setLastPublicHandleTimeStamp() =
+        dbHandler.get().setLastPublicHandleTimeStamp()
 
     override suspend fun setLastPublicHandleType(type: Int) {
         dbHandler.get().lastPublicHandleType = type
@@ -167,9 +161,6 @@ internal class MegaLocalStorageFacade @Inject constructor(
     }
 
     override suspend fun getTransferQueueStatus() = dbHandler.get().transferQueueStatus
-
-    override fun removePendingMessageByChatId(chatId: Long) =
-        dbHandler.get().removePendingMessageByChatId(chatId)
 
     override fun shouldShowCopyright(): Boolean = dbHandler.get().shouldShowCopyright
 }

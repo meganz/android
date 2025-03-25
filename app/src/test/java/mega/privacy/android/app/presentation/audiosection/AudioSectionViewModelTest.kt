@@ -11,8 +11,8 @@ import kotlinx.coroutines.flow.flowOf
 import kotlinx.coroutines.test.StandardTestDispatcher
 import kotlinx.coroutines.test.UnconfinedTestDispatcher
 import kotlinx.coroutines.test.runTest
+import mega.privacy.android.app.TimberJUnit5Extension
 import mega.privacy.android.app.domain.usecase.GetNodeByHandle
-import mega.privacy.android.app.presentation.audiosection.AudioSectionViewModel
 import mega.privacy.android.app.presentation.audiosection.mapper.AudioUiEntityMapper
 import mega.privacy.android.app.presentation.audiosection.model.AudioUiEntity
 import mega.privacy.android.core.test.extension.CoroutineMainDispatcherExtension
@@ -23,6 +23,7 @@ import mega.privacy.android.domain.entity.node.NodeId
 import mega.privacy.android.domain.entity.node.NodeUpdate
 import mega.privacy.android.domain.entity.node.TypedAudioNode
 import mega.privacy.android.domain.entity.preference.ViewType
+import mega.privacy.android.domain.usecase.GetBusinessStatusUseCase
 import mega.privacy.android.domain.usecase.GetCloudSortOrder
 import mega.privacy.android.domain.usecase.GetNodeByIdUseCase
 import mega.privacy.android.domain.usecase.IsHiddenNodesOnboardedUseCase
@@ -48,8 +49,6 @@ import org.mockito.kotlin.mock
 import org.mockito.kotlin.reset
 import org.mockito.kotlin.whenever
 import org.mockito.kotlin.wheneverBlocking
-import mega.privacy.android.app.TimberJUnit5Extension
-import mega.privacy.android.domain.usecase.GetBusinessStatusUseCase
 
 @ExperimentalCoroutinesApi
 @TestInstance(TestInstance.Lifecycle.PER_CLASS)
@@ -148,7 +147,6 @@ class AudioSectionViewModelTest {
             assertThat(initial.isPendingRefresh).isFalse()
             assertThat(initial.sortOrder).isEqualTo(SortOrder.ORDER_NONE)
             assertThat(initial.progressBarShowing).isTrue()
-            assertThat(initial.searchMode).isFalse()
             assertThat(initial.scrollToTop).isFalse()
             assertThat(initial.selectedAudioHandles).isEmpty()
             assertThat(initial.isInSelection).isFalse()
@@ -213,44 +211,6 @@ class AudioSectionViewModelTest {
 
         underTest.state.drop(1).test {
             assertThat(awaitItem().sortOrder).isEqualTo(SortOrder.ORDER_MODIFICATION_DESC)
-            cancelAndIgnoreRemainingEvents()
-        }
-    }
-
-    @Test
-    fun `test that the result returned correctly when search query is not empty`() = runTest {
-        val expectedTypedAudioNode = mock<TypedAudioNode> { on { name }.thenReturn("audio name") }
-        val audioNode = mock<TypedAudioNode> { on { name }.thenReturn("name") }
-        val expectedAudio = mock<AudioUiEntity> { on { name }.thenReturn("audio name") }
-        val audio = mock<AudioUiEntity> { on { name }.thenReturn("name") }
-
-        whenever(getCloudSortOrder()).thenReturn(SortOrder.ORDER_MODIFICATION_DESC)
-        whenever(getAllAudioUseCase()).thenReturn(listOf(expectedTypedAudioNode, audioNode))
-        whenever(audioUIEntityMapper(audioNode)).thenReturn(audio)
-        whenever(audioUIEntityMapper(expectedTypedAudioNode)).thenReturn(expectedAudio)
-
-        underTest.refreshNodes()
-
-        underTest.state.drop(1).test {
-            assertThat(awaitItem().allAudios.size).isEqualTo(2)
-
-            underTest.searchQuery("audio")
-            assertThat(awaitItem().allAudios.size).isEqualTo(1)
-            cancelAndIgnoreRemainingEvents()
-        }
-    }
-
-    @Test
-    fun `test that the searchMode is correctly updated`() = runTest {
-        whenever(getCloudSortOrder()).thenReturn(SortOrder.ORDER_MODIFICATION_DESC)
-        whenever(getAllAudioUseCase()).thenReturn(emptyList())
-
-        underTest.state.drop(1).test {
-            underTest.searchReady()
-            assertThat(awaitItem().searchMode).isTrue()
-
-            underTest.exitSearch()
-            assertThat(awaitItem().searchMode).isFalse()
             cancelAndIgnoreRemainingEvents()
         }
     }

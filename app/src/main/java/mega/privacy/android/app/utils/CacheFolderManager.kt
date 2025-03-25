@@ -79,15 +79,6 @@ object CacheFolderManager {
     }
 
     /**
-     * Clear External Cache Dir
-     */
-    @JvmStatic
-    fun clearPublicCache() {
-        cacheFolderGateway.clearPublicCache()
-    }
-
-
-    /**
      * Get QR Cache File Instance
      */
     @JvmStatic

@@ -12,4 +12,15 @@ data class MonitorOngoingActiveTransfersResult(
     val paused: Boolean,
     val transfersOverQuota: Boolean,
     val storageOverQuota: Boolean,
-)
+) {
+    /**
+     * @return true if there are ongoing transfers and there's no over quota for this transfer type
+     */
+    fun hasPendingWork(transferType: TransferType) =
+        activeTransferTotals.hasOngoingTransfers() &&
+                when {
+                    transferType.isDownloadType() -> !transfersOverQuota
+                    transferType.isUploadType() -> !storageOverQuota
+                    else -> true
+                }
+}

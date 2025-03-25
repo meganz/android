@@ -9,6 +9,7 @@ import mega.privacy.android.app.contacts.group.data.ContactGroupItem
 import mega.privacy.android.app.contacts.group.data.ContactGroupUser
 import mega.privacy.android.domain.qualifier.IoDispatcher
 import mega.privacy.android.domain.repository.AvatarRepository
+import mega.privacy.android.domain.repository.ChatParticipantsRepository
 import mega.privacy.android.domain.repository.ChatRepository
 import mega.privacy.android.domain.repository.ContactsRepository
 import javax.inject.Inject
@@ -20,6 +21,7 @@ class GetContactGroupsUseCase @Inject constructor(
     private val chatRepository: ChatRepository,
     private val avatarRepository: AvatarRepository,
     private val contactsRepository: ContactsRepository,
+    private val chatParticipantsRepository: ChatParticipantsRepository,
     @IoDispatcher private val coroutineDispatcher: CoroutineDispatcher,
 ) {
     /**
@@ -30,8 +32,16 @@ class GetContactGroupsUseCase @Inject constructor(
         chatRepository.getChatRooms()
             .filter { it.isGroup && it.peerCount > 0 }
             .mapNotNull { chatRoom ->
-                chatRoom.peerHandlesList.firstOrNull()?.let { firstHandle ->
-                    chatRoom.peerHandlesList.lastOrNull()?.let { lastHandle ->
+                // align logic with GetChatGroupAvatarUseCase
+                val participants =
+                    chatParticipantsRepository.getChatParticipantsHandles(chatRoom.chatId, 2)
+                        .toMutableList()
+                val myUserHandle = chatRepository.getMyUserHandle()
+                if (participants.size == 1) {
+                    participants.add(0, myUserHandle)
+                }
+                participants.firstOrNull()?.let { firstHandle ->
+                    participants.lastOrNull()?.let { lastHandle ->
                         async(coroutineDispatcher) {
                             val firstUserDeferred = async { getGroupUserFromHandle(firstHandle) }
                             val lastUserDeferred = async { getGroupUserFromHandle(lastHandle) }

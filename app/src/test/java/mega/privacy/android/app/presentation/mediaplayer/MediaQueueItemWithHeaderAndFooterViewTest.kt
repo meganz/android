@@ -9,12 +9,15 @@ import androidx.compose.ui.test.junit4.createComposeRule
 import androidx.compose.ui.test.onNodeWithTag
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import mega.privacy.android.app.mediaplayer.queue.model.MediaQueueItemType
-import mega.privacy.android.app.mediaplayer.queue.view.MEDIA_QUEUE_ITEM_DIVIDER_LAYOUT_TEST_TAG
-import mega.privacy.android.app.mediaplayer.queue.view.MEDIA_QUEUE_ITEM_DIVIDER_TEST_TAG
+import mega.privacy.android.app.mediaplayer.queue.view.AUDIO_QUEUE_ITEM_DIVIDER_LAYOUT_TEST_TAG
+import mega.privacy.android.app.mediaplayer.queue.view.AUDIO_QUEUE_ITEM_DIVIDER_TEST_TAG
 import mega.privacy.android.app.mediaplayer.queue.view.MEDIA_QUEUE_ITEM_FOOTER_LAYOUT_VIEW_TEST_TAG
 import mega.privacy.android.app.mediaplayer.queue.view.MEDIA_QUEUE_ITEM_FOOTER_TEXT_VIEW_TEST_TAG
 import mega.privacy.android.app.mediaplayer.queue.view.MEDIA_QUEUE_ITEM_HEADER_TEXT_VIEW_TEST_TAG
+import mega.privacy.android.app.mediaplayer.queue.view.MEDIA_QUEUE_ITEM_PREFIX_RECORDER_ICON_TEST_TAG
 import mega.privacy.android.app.mediaplayer.queue.view.MediaQueueItemWithHeaderAndFooterView
+import mega.privacy.android.app.mediaplayer.queue.view.VIDEO_QUEUE_ITEM_DIVIDER_LAYOUT_TEST_TAG
+import mega.privacy.android.app.mediaplayer.queue.view.VIDEO_QUEUE_ITEM_DIVIDER_TEST_TAG
 import mega.privacy.android.icon.pack.R
 import org.junit.Rule
 import org.junit.Test
@@ -43,6 +46,7 @@ class MediaQueueItemWithHeaderAndFooterViewTest {
         isPaused: Boolean = false,
         isSelected: Boolean = false,
         isSearchMode: Boolean = false,
+        isSelectMode: Boolean = false,
         onClick: () -> Unit = {},
         modifier: Modifier = Modifier,
     ) {
@@ -61,7 +65,8 @@ class MediaQueueItemWithHeaderAndFooterViewTest {
                 onClick = onClick,
                 isSelected = isSelected,
                 modifier = modifier,
-                isSearchMode = isSearchMode
+                isSearchMode = isSearchMode,
+                isSelectMode = isSelectMode
             )
         }
     }
@@ -73,8 +78,8 @@ class MediaQueueItemWithHeaderAndFooterViewTest {
         MEDIA_QUEUE_ITEM_HEADER_TEXT_VIEW_TEST_TAG.isDisplayed()
         MEDIA_QUEUE_ITEM_FOOTER_TEXT_VIEW_TEST_TAG.isDisplayed()
         MEDIA_QUEUE_ITEM_FOOTER_LAYOUT_VIEW_TEST_TAG.isDisplayed()
-        MEDIA_QUEUE_ITEM_DIVIDER_LAYOUT_TEST_TAG.isNotDisplayed()
-        MEDIA_QUEUE_ITEM_DIVIDER_TEST_TAG.isNotDisplayed()
+        AUDIO_QUEUE_ITEM_DIVIDER_LAYOUT_TEST_TAG.isDisplayed()
+        AUDIO_QUEUE_ITEM_DIVIDER_TEST_TAG.isDisplayed()
 
         MEDIA_QUEUE_ITEM_HEADER_TEXT_VIEW_TEST_TAG.textEquals(testHeaderTextPlaying)
         MEDIA_QUEUE_ITEM_FOOTER_TEXT_VIEW_TEST_TAG.textEquals(testTextFooter)
@@ -97,8 +102,10 @@ class MediaQueueItemWithHeaderAndFooterViewTest {
         MEDIA_QUEUE_ITEM_HEADER_TEXT_VIEW_TEST_TAG.isDisplayed()
         MEDIA_QUEUE_ITEM_FOOTER_TEXT_VIEW_TEST_TAG.isDisplayed()
         MEDIA_QUEUE_ITEM_FOOTER_LAYOUT_VIEW_TEST_TAG.isDisplayed()
-        MEDIA_QUEUE_ITEM_DIVIDER_LAYOUT_TEST_TAG.isNotDisplayed()
-        MEDIA_QUEUE_ITEM_DIVIDER_TEST_TAG.isNotDisplayed()
+        AUDIO_QUEUE_ITEM_DIVIDER_LAYOUT_TEST_TAG.isDisplayed()
+        AUDIO_QUEUE_ITEM_DIVIDER_TEST_TAG.isDisplayed()
+        VIDEO_QUEUE_ITEM_DIVIDER_LAYOUT_TEST_TAG.isNotDisplayed()
+        VIDEO_QUEUE_ITEM_DIVIDER_TEST_TAG.isNotDisplayed()
 
         MEDIA_QUEUE_ITEM_HEADER_TEXT_VIEW_TEST_TAG.textEquals(testHeaderTextPlayingWithPaused)
         MEDIA_QUEUE_ITEM_FOOTER_TEXT_VIEW_TEST_TAG.textEquals(testTextFooter)
@@ -111,8 +118,10 @@ class MediaQueueItemWithHeaderAndFooterViewTest {
         MEDIA_QUEUE_ITEM_HEADER_TEXT_VIEW_TEST_TAG.isDisplayed()
         MEDIA_QUEUE_ITEM_FOOTER_TEXT_VIEW_TEST_TAG.isNotDisplayed()
         MEDIA_QUEUE_ITEM_FOOTER_LAYOUT_VIEW_TEST_TAG.isNotDisplayed()
-        MEDIA_QUEUE_ITEM_DIVIDER_LAYOUT_TEST_TAG.isNotDisplayed()
-        MEDIA_QUEUE_ITEM_DIVIDER_TEST_TAG.isNotDisplayed()
+        AUDIO_QUEUE_ITEM_DIVIDER_LAYOUT_TEST_TAG.isDisplayed()
+        AUDIO_QUEUE_ITEM_DIVIDER_TEST_TAG.isDisplayed()
+        VIDEO_QUEUE_ITEM_DIVIDER_LAYOUT_TEST_TAG.isNotDisplayed()
+        VIDEO_QUEUE_ITEM_DIVIDER_TEST_TAG.isNotDisplayed()
 
         MEDIA_QUEUE_ITEM_HEADER_TEXT_VIEW_TEST_TAG.textEquals(testHeaderTextPlayingWithPaused)
     }
@@ -122,10 +131,12 @@ class MediaQueueItemWithHeaderAndFooterViewTest {
         setComposeContent(isHeaderVisible = true, queueItemType = MediaQueueItemType.Previous)
 
         MEDIA_QUEUE_ITEM_HEADER_TEXT_VIEW_TEST_TAG.isDisplayed()
-        MEDIA_QUEUE_ITEM_DIVIDER_LAYOUT_TEST_TAG.isDisplayed()
-        MEDIA_QUEUE_ITEM_DIVIDER_TEST_TAG.isDisplayed()
+        AUDIO_QUEUE_ITEM_DIVIDER_LAYOUT_TEST_TAG.isDisplayed()
+        AUDIO_QUEUE_ITEM_DIVIDER_TEST_TAG.isDisplayed()
         MEDIA_QUEUE_ITEM_FOOTER_TEXT_VIEW_TEST_TAG.isNotDisplayed()
         MEDIA_QUEUE_ITEM_FOOTER_LAYOUT_VIEW_TEST_TAG.isNotDisplayed()
+        VIDEO_QUEUE_ITEM_DIVIDER_LAYOUT_TEST_TAG.isNotDisplayed()
+        VIDEO_QUEUE_ITEM_DIVIDER_TEST_TAG.isNotDisplayed()
 
         MEDIA_QUEUE_ITEM_HEADER_TEXT_VIEW_TEST_TAG.textEquals(testHeaderTextPrevious)
     }
@@ -133,22 +144,39 @@ class MediaQueueItemWithHeaderAndFooterViewTest {
     @Test
     fun `test that the UIs are displayed correctly when queueItemType is Next`() {
         setComposeContent(queueItemType = MediaQueueItemType.Next)
-        MEDIA_QUEUE_ITEM_DIVIDER_LAYOUT_TEST_TAG.isDisplayed()
-        MEDIA_QUEUE_ITEM_DIVIDER_TEST_TAG.isDisplayed()
+        AUDIO_QUEUE_ITEM_DIVIDER_LAYOUT_TEST_TAG.isDisplayed()
+        AUDIO_QUEUE_ITEM_DIVIDER_TEST_TAG.isDisplayed()
 
         MEDIA_QUEUE_ITEM_HEADER_TEXT_VIEW_TEST_TAG.isNotDisplayed()
         MEDIA_QUEUE_ITEM_FOOTER_TEXT_VIEW_TEST_TAG.isNotDisplayed()
         MEDIA_QUEUE_ITEM_FOOTER_LAYOUT_VIEW_TEST_TAG.isNotDisplayed()
+        VIDEO_QUEUE_ITEM_DIVIDER_LAYOUT_TEST_TAG.isNotDisplayed()
+        VIDEO_QUEUE_ITEM_DIVIDER_TEST_TAG.isNotDisplayed()
     }
 
     @Test
     fun `test that the UIs are displayed correctly when search mode is enabled`() {
         setComposeContent(queueItemType = MediaQueueItemType.Playing, isSearchMode = true)
-        MEDIA_QUEUE_ITEM_DIVIDER_LAYOUT_TEST_TAG.isDisplayed()
-        MEDIA_QUEUE_ITEM_DIVIDER_TEST_TAG.isDisplayed()
+        AUDIO_QUEUE_ITEM_DIVIDER_LAYOUT_TEST_TAG.isDisplayed()
+        AUDIO_QUEUE_ITEM_DIVIDER_TEST_TAG.isDisplayed()
 
         MEDIA_QUEUE_ITEM_HEADER_TEXT_VIEW_TEST_TAG.isNotDisplayed()
         MEDIA_QUEUE_ITEM_FOOTER_TEXT_VIEW_TEST_TAG.isNotDisplayed()
         MEDIA_QUEUE_ITEM_FOOTER_LAYOUT_VIEW_TEST_TAG.isNotDisplayed()
+        VIDEO_QUEUE_ITEM_DIVIDER_LAYOUT_TEST_TAG.isNotDisplayed()
+        VIDEO_QUEUE_ITEM_DIVIDER_TEST_TAG.isNotDisplayed()
+    }
+
+    @Test
+    fun `test that prefix reorder icon is displayed as expected`() {
+        setComposeContent(queueItemType = MediaQueueItemType.Next, isAudio = true)
+        MEDIA_QUEUE_ITEM_PREFIX_RECORDER_ICON_TEST_TAG.isDisplayed()
+    }
+
+    @Test
+    fun `test that video divider UIs are displayed as expected`() {
+        setComposeContent(queueItemType = MediaQueueItemType.Next, isAudio = false)
+        VIDEO_QUEUE_ITEM_DIVIDER_LAYOUT_TEST_TAG.isDisplayed()
+        VIDEO_QUEUE_ITEM_DIVIDER_TEST_TAG.isDisplayed()
     }
 }

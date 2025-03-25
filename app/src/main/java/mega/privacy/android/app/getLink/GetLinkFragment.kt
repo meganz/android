@@ -4,7 +4,6 @@ import mega.privacy.android.icon.pack.R as IconPackR
 import mega.privacy.android.shared.resources.R as sharedR
 import android.annotation.SuppressLint
 import android.app.DatePickerDialog
-import android.graphics.Bitmap
 import android.graphics.PorterDuff
 import android.os.Bundle
 import android.text.method.PasswordTransformationMethod
@@ -24,6 +23,8 @@ import androidx.fragment.app.Fragment
 import androidx.fragment.app.activityViewModels
 import androidx.lifecycle.lifecycleScope
 import androidx.navigation.fragment.findNavController
+import coil.load
+import coil.transform.RoundedCornersTransformation
 import com.google.android.material.datepicker.MaterialStyledDatePickerDialog
 import com.google.android.material.dialog.MaterialAlertDialogBuilder
 import dagger.hilt.android.AndroidEntryPoint
@@ -52,12 +53,12 @@ import mega.privacy.android.app.utils.Constants.THUMB_CORNER_RADIUS_DP
 import mega.privacy.android.app.utils.MegaApiUtils.getMegaNodeFolderInfo
 import mega.privacy.android.app.utils.TextUtil
 import mega.privacy.android.app.utils.TextUtil.isTextEmpty
-import mega.privacy.android.app.utils.ThumbnailUtils
-import mega.privacy.android.app.utils.ThumbnailUtils.getRoundedBitmap
 import mega.privacy.android.app.utils.Util.calculateDateFromTimestamp
 import mega.privacy.android.app.utils.Util.calculateTimestamp
 import mega.privacy.android.app.utils.Util.dp2px
 import mega.privacy.android.app.utils.Util.getSizeString
+import mega.privacy.android.domain.entity.node.NodeId
+import mega.privacy.android.domain.entity.node.thumbnail.ThumbnailRequest
 import mega.privacy.android.domain.usecase.featureflag.GetFeatureFlagValueUseCase
 import nz.mega.sdk.MegaApiJava.INVALID_HANDLE
 import java.text.SimpleDateFormat
@@ -425,9 +426,7 @@ class GetLinkFragment : Fragment(), DatePickerDialog.OnDateSetListener, Scrollab
      * Sets the thumbnail of the node to which is getting or managing the link.
      */
     private fun setThumbnail() {
-        var thumb: Bitmap? = null
         val node = viewModel.getNode()
-
         if (node?.isFolder == true) {
             binding.nodeThumbnail.setImageDrawable(
                 ResourcesCompat.getDrawable(
@@ -439,20 +438,15 @@ class GetLinkFragment : Fragment(), DatePickerDialog.OnDateSetListener, Scrollab
 
             return
         } else if (node?.hasThumbnail() == true) {
-            thumb = ThumbnailUtils.getThumbnailFromCache(node)
-            if (thumb == null) {
-                thumb = ThumbnailUtils.getThumbnailFromFolder(node, context)
-            }
-        }
-
-        if (thumb != null) {
-            binding.nodeThumbnail.setImageBitmap(
-                getRoundedBitmap(
-                    context,
-                    thumb,
-                    dp2px(THUMB_CORNER_RADIUS_DP)
+            binding.nodeThumbnail.load(ThumbnailRequest(NodeId(node.handle))) {
+                placeholder(typeForName(node.name).iconResourceId)
+                crossfade(true)
+                transformations(
+                    RoundedCornersTransformation(
+                        dp2px(THUMB_CORNER_RADIUS_DP).toFloat()
+                    )
                 )
-            )
+            }
         } else {
             binding.nodeThumbnail.setImageResource(typeForName(node?.name).iconResourceId)
         }

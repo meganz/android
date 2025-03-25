@@ -244,6 +244,11 @@ class VideoToPlaylistViewModel @Inject constructor(
                 }
             }.onFailure { exception ->
                 Timber.e(exception)
+                _uiState.update {
+                    it.copy(
+                        addedPlaylistTitles = emptyList()
+                    )
+                }
             }
         }
     }

@@ -8,7 +8,6 @@ import kotlinx.coroutines.flow.flowOf
 import kotlinx.coroutines.test.runTest
 import mega.privacy.android.app.components.ChatManagement
 import mega.privacy.android.app.meeting.gateway.RTCAudioManagerGateway
-import mega.privacy.android.app.objects.PasscodeManagement
 import mega.privacy.android.app.presentation.chat.mapper.ChatRoomTimestampMapper
 import mega.privacy.android.app.usecase.chat.GetLastMessageUseCase
 import mega.privacy.android.core.test.extension.CoroutineMainDispatcherExtension
@@ -61,7 +60,6 @@ internal class ChatTabsViewModelTest {
     private val openOrStartCallUseCase: OpenOrStartCallUseCase = mock()
     private val answerChatCallUseCase: AnswerChatCallUseCase = mock()
     private val chatManagement: ChatManagement = mock()
-    private val passcodeManagement: PasscodeManagement = mock()
     private val megaChatApiGateway: MegaChatApiGateway = mock()
     private val rtcAudioManagerGateway: RTCAudioManagerGateway = mock()
     private val getCurrentChatStatusUseCase: GetCurrentChatStatusUseCase = mock()
@@ -96,7 +94,6 @@ internal class ChatTabsViewModelTest {
             openOrStartCallUseCase,
             answerChatCallUseCase,
             chatManagement,
-            passcodeManagement,
             megaChatApiGateway,
             rtcAudioManagerGateway,
             getCurrentChatStatusUseCase,
@@ -123,7 +120,6 @@ internal class ChatTabsViewModelTest {
             openOrStartCallUseCase,
             answerChatCallUseCase,
             chatManagement,
-            passcodeManagement,
             megaChatApiGateway,
             rtcAudioManagerGateway,
             getCurrentChatStatusUseCase,

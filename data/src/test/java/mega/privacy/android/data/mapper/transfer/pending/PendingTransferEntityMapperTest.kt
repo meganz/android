@@ -11,6 +11,7 @@ import mega.privacy.android.domain.entity.transfer.TransferType
 import mega.privacy.android.domain.entity.transfer.pending.PendingTransfer
 import mega.privacy.android.domain.entity.transfer.pending.PendingTransferNodeIdentifier
 import mega.privacy.android.domain.entity.transfer.pending.PendingTransferState
+import mega.privacy.android.domain.entity.uri.UriPath
 import org.junit.jupiter.api.BeforeAll
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.TestInstance
@@ -31,7 +32,7 @@ internal class PendingTransferEntityMapperTest {
         transferTag = 789012,
         transferType = TransferType.DOWNLOAD,
         nodeIdentifier = PendingTransferNodeIdentifier.CloudDriveNode(NodeId(11111L)),
-        path = "file/path",
+        uriPath = UriPath("file/path"),
         appData = listOf(TransferAppData.ChatUpload(454L)),
         isHighPriority = true,
         scanningFoldersData = PendingTransfer.ScanningFoldersData(
@@ -43,6 +44,7 @@ internal class PendingTransferEntityMapperTest {
         startedFiles = 0,
         alreadyTransferred = 0,
         state = PendingTransferState.NotSentToSdk,
+        fileName = "renamed.txt",
     )
 
     @BeforeAll
@@ -66,7 +68,7 @@ internal class PendingTransferEntityMapperTest {
             { assertThat(pendingTransferEntity.transferTag).isEqualTo(pendingTransfer.transferTag) },
             { assertThat(pendingTransferEntity.transferType).isEqualTo(pendingTransfer.transferType) },
             { assertThat(pendingTransferEntity.nodeIdentifier).isEqualTo(pendingTransfer.nodeIdentifier) },
-            { assertThat(pendingTransferEntity.path).isEqualTo(pendingTransfer.path) },
+            { assertThat(pendingTransferEntity.path).isEqualTo(pendingTransfer.uriPath.value) },
             { assertThat(pendingTransferEntity.appData).isEqualTo(appDataString) },
             { assertThat(pendingTransferEntity.isHighPriority).isEqualTo(pendingTransfer.isHighPriority) },
             { assertThat(pendingTransfer.scanningFoldersData.stage).isEqualTo(pendingTransferEntity.scanningFoldersData.stage) },
@@ -85,6 +87,7 @@ internal class PendingTransferEntityMapperTest {
             { assertThat(pendingTransferEntity.startedFiles).isEqualTo(pendingTransfer.startedFiles) },
             { assertThat(pendingTransferEntity.alreadyTransferred).isEqualTo(pendingTransfer.alreadyTransferred) },
             { assertThat(pendingTransferEntity.state).isEqualTo(pendingTransfer.state) },
+            { assertThat(pendingTransferEntity.fileName).isEqualTo(pendingTransfer.fileName) }
         )
     }
 }

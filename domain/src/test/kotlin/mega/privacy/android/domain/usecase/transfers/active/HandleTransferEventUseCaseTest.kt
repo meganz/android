@@ -28,9 +28,11 @@ import org.mockito.kotlin.any
 import org.mockito.kotlin.doReturn
 import org.mockito.kotlin.eq
 import org.mockito.kotlin.mock
+import org.mockito.kotlin.never
 import org.mockito.kotlin.reset
 import org.mockito.kotlin.verify
 import org.mockito.kotlin.verifyNoInteractions
+import org.mockito.kotlin.verifyNoMoreInteractions
 import org.mockito.kotlin.whenever
 
 @ExperimentalCoroutinesApi
@@ -74,70 +76,6 @@ class HandleTransferEventUseCaseTest {
         )
     }
 
-    @Test
-    fun `test that voice clip transfer does not invoke repository nor GetTransferDestinationUriUseCase when event is TransferFinishEvent`() =
-        runTest {
-            val transfer = mock<Transfer> {
-                on { this.transferType } doReturn TransferType.CHAT_UPLOAD
-                on { this.appData } doReturn listOf(TransferAppData.VoiceClip)
-            }
-            val transferEvent = mock<TransferEvent.TransferFinishEvent> {
-                on { this.transfer }.thenReturn(transfer)
-            }
-
-            underTest.invoke(transferEvent)
-            verifyNoInteractions(getTransferDestinationUriUseCase)
-            verifyNoInteractions(transferRepository)
-        }
-
-    @Test
-    fun `test that background transfer does not invoke repository nor GetTransferDestinationUriUseCase when event is TransferFinishEvent`() =
-        runTest {
-            val transfer = mock<Transfer> {
-                on { this.transferType } doReturn TransferType.DOWNLOAD
-                on { this.appData } doReturn listOf(TransferAppData.BackgroundTransfer)
-            }
-            val transferEvent = mock<TransferEvent.TransferFinishEvent> {
-                on { this.transfer }.thenReturn(transfer)
-            }
-
-            underTest.invoke(transferEvent)
-            verifyNoInteractions(getTransferDestinationUriUseCase)
-            verifyNoInteractions(transferRepository)
-        }
-
-    @Test
-    fun `test that streaming transfer does not invoke repository nor GetTransferDestinationUriUseCase when event is TransferFinishEvent`() =
-        runTest {
-            val transfer = mock<Transfer> {
-                on { this.transferType } doReturn TransferType.DOWNLOAD
-                on { this.isStreamingTransfer } doReturn true
-            }
-            val transferEvent = mock<TransferEvent.TransferFinishEvent> {
-                on { this.transfer }.thenReturn(transfer)
-            }
-
-            underTest.invoke(transferEvent)
-            verifyNoInteractions(getTransferDestinationUriUseCase)
-            verifyNoInteractions(transferRepository)
-        }
-
-    @Test
-    fun `test that backups transfer does not invoke repository nor GetTransferDestinationUriUseCase when event is TransferFinishEvent`() =
-        runTest {
-            val transfer = mock<Transfer> {
-                on { this.transferType } doReturn TransferType.GENERAL_UPLOAD
-                on { this.isBackupTransfer } doReturn true
-            }
-            val transferEvent = mock<TransferEvent.TransferFinishEvent> {
-                on { this.transfer }.thenReturn(transfer)
-            }
-
-            underTest.invoke(transferEvent)
-            verifyNoInteractions(getTransferDestinationUriUseCase)
-            verifyNoInteractions(transferRepository)
-        }
-
     @ParameterizedTest
     @MethodSource("provideStartPauseFinishEvents")
     fun `test that invoke call insertOrUpdateActiveTransfers with the related transfer when the event is a start, pause, or finish event`(
@@ -146,6 +84,27 @@ class HandleTransferEventUseCaseTest {
         underTest.invoke(transferEvent)
         verify(transferRepository).insertOrUpdateActiveTransfers(eq(listOf(transferEvent.transfer)))
     }
+
+    @ParameterizedTest
+    @MethodSource("provideRecursiveTransferAppData")
+    fun `test that parent group app data is added when child transfer start event is received`(
+        appData: TransferAppData,
+    ) =
+        runTest {
+            val parentTag = 2
+            val transferEvent = mockTransferEvent<TransferEvent.TransferStartEvent>(
+                TransferType.DOWNLOAD,
+                1,
+                folderTransferTag = parentTag
+            )
+            val parentTransfer = mock<Transfer> {
+                on { it.appData } doReturn listOf(appData)
+            }
+            whenever(transferRepository.getTransferByTag(parentTag)) doReturn parentTransfer
+            val expected = transferEvent.transfer.copy(appData = listOf(appData))
+            underTest.invoke(transferEvent)
+            verify(transferRepository).insertOrUpdateActiveTransfers(eq(listOf(expected)))
+        }
 
     @Test
     fun `test that invoke call insertOrUpdateActiveTransfers with the last event of each transfer when multiple events are send`() =
@@ -214,12 +173,13 @@ class HandleTransferEventUseCaseTest {
 
     @ParameterizedTest
     @EnumSource(value = TransferType::class, names = ["GENERAL_UPLOAD", "CHAT_UPLOAD", "CU_UPLOAD"])
-    fun `test that broadcastStorageOverQuotaUseCase is invoked when a QuotaExceededMegaException is received as a temporal error for upload Event`(
+    fun `test that broadcastStorageOverQuotaUseCase is invoked when a QuotaExceededMegaException is received as a temporal error for upload Event and the transfer isForeignOverQuota value is false`(
         type: TransferType,
     ) = runTest {
         reset(broadcastStorageOverQuotaUseCase)
         val transfer = mock<Transfer> {
             on { this.transferType }.thenReturn(type)
+            on { this.isForeignOverQuota }.thenReturn(false)
         }
         val transferEvent = mock<TransferEvent.TransferTemporaryErrorEvent> {
             on { this.transfer }.thenReturn(transfer)
@@ -227,6 +187,24 @@ class HandleTransferEventUseCaseTest {
         }
         underTest.invoke(transferEvent)
         verify(broadcastStorageOverQuotaUseCase).invoke(true)
+        verifyNoMoreInteractions(broadcastTransferOverQuotaUseCase)
+    }
+
+    @ParameterizedTest
+    @EnumSource(value = TransferType::class, names = ["GENERAL_UPLOAD", "CHAT_UPLOAD", "CU_UPLOAD"])
+    fun `test that broadcastStorageOverQuotaUseCase is not invoked when a QuotaExceededMegaException is received as a temporal error for upload Event and the transfer isForeignOverQuota value is true`(
+        type: TransferType,
+    ) = runTest {
+        reset(broadcastStorageOverQuotaUseCase)
+        val transfer = mock<Transfer> {
+            on { this.transferType }.thenReturn(type)
+            on { this.isForeignOverQuota }.thenReturn(true)
+        }
+        val transferEvent = mock<TransferEvent.TransferTemporaryErrorEvent> {
+            on { this.transfer }.thenReturn(transfer)
+            on { this.error }.thenReturn(QuotaExceededMegaException(1, value = 1))
+        }
+        underTest.invoke(transferEvent)
         verifyNoInteractions(broadcastTransferOverQuotaUseCase)
     }
 
@@ -319,6 +297,55 @@ class HandleTransferEventUseCaseTest {
             verify(transferRepository).addCompletedTransfers(eq(expected))
         }
 
+    @Test
+    fun `test that does not invoke call addCompletedTransfers when the event is a finish event and transfer is a preview`() =
+        runTest {
+            val transfer = mock<Transfer> {
+                on { this.transferType } doReturn TransferType.DOWNLOAD
+                on { this.tag } doReturn 1
+                on { this.appData }.thenReturn(listOf(TransferAppData.PreviewDownload))
+            }
+            val transferEvent = mock<TransferEvent.TransferFinishEvent> {
+                on { this.transfer }.thenReturn(transfer)
+            }
+            val destinationUriAndSubFolders = DestinationUriAndSubFolders("folder/file")
+
+            whenever(getTransferDestinationUriUseCase(transferEvent.transfer)) doReturn destinationUriAndSubFolders
+
+            underTest.invoke(transferEvent)
+
+            verify(transferRepository, never()).addCompletedTransferFromFailedPendingTransfer(
+                any(),
+                any(),
+                any()
+            )
+        }
+
+    @Test
+    fun `test that does not invoke call addCompletedTransfers when the event is a finish event and transfer is a folder`() =
+        runTest {
+            val transfer = mock<Transfer> {
+                on { this.transferType } doReturn TransferType.DOWNLOAD
+                on { this.tag } doReturn 1
+                on { isFolderTransfer } doReturn true
+                on { this.appData }.thenReturn(emptyList())
+            }
+            val transferEvent = mock<TransferEvent.TransferFinishEvent> {
+                on { this.transfer }.thenReturn(transfer)
+            }
+            val destinationUriAndSubFolders = DestinationUriAndSubFolders("folder/file")
+
+            whenever(getTransferDestinationUriUseCase(transferEvent.transfer)) doReturn destinationUriAndSubFolders
+
+            underTest.invoke(transferEvent)
+
+            verify(transferRepository, never()).addCompletedTransferFromFailedPendingTransfer(
+                any(),
+                any(),
+                any()
+            )
+        }
+
     @ParameterizedTest
     @MethodSource("provideStartFinishEvents")
     fun `test that handleSDCardEventUseCase with correct destination is invoked when start and update event is received`(
@@ -409,23 +436,31 @@ class HandleTransferEventUseCaseTest {
                 provideTransferEvents<TransferEvent.TransferPaused>() +
                 provideTransferEvents<TransferEvent.TransferUpdateEvent>()
 
+    private fun provideRecursiveTransferAppData() = listOf(
+        TransferAppData.TransferGroup(245),
+        TransferAppData.OfflineDownload
+    )
+
 
     private inline fun <reified T : TransferEvent> provideTransferEvents(
         transferTag: Int = 0,
         stubbing: KStubbing<T>.(T) -> Unit = {},
     ) =
         TransferType.entries.map { transferType ->
-            mockTransferEvent(transferType, transferTag, stubbing)
+            mockTransferEvent(transferType, transferTag, stubbing = stubbing)
         }
 
     private inline fun <reified T : TransferEvent> mockTransferEvent(
         transferType: TransferType,
         transferTag: Int = 0,
+        folderTransferTag: Int? = null,
         stubbing: KStubbing<T>.(T) -> Unit = {},
     ): T {
         val transfer = mock<Transfer> {
             on { this.transferType }.thenReturn(transferType)
             on { this.tag }.thenReturn(transferTag)
+            on { this.folderTransferTag }.thenReturn(folderTransferTag)
+            on { this.appData }.thenReturn(emptyList())
         }
         return mock<T> {
             on { this.transfer }.thenReturn(transfer)

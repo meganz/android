@@ -24,7 +24,7 @@ import coil.compose.AsyncImagePainter
 import coil.compose.rememberAsyncImagePainter
 import coil.request.ImageRequest
 import mega.privacy.android.icon.pack.R
-import mega.privacy.android.shared.original.core.ui.theme.OriginalTempTheme
+import mega.privacy.android.shared.original.core.ui.theme.OriginalTheme
 import java.io.File
 
 /**
@@ -171,7 +171,7 @@ fun ThumbnailView(
 @Preview(uiMode = UI_MODE_NIGHT_YES)
 @Composable
 private fun ThumbnailViewPreview() {
-    OriginalTempTheme(isDark = isSystemInDarkTheme()) {
+    OriginalTheme(isDark = isSystemInDarkTheme()) {
         ThumbnailView(
             contentDescription = "image",
             imageFile = null as File?,

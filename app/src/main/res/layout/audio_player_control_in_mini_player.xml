@@ -11,45 +11,57 @@
         style="@style/Widget.Mega.TimeBar"
         android:layout_width="0dp"
         android:layout_height="2dp"
+        app:buffered_color="@color/grey_200_grey_600"
+        app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintLeft_toLeftOf="parent"
         app:layout_constraintRight_toRightOf="parent"
-        app:layout_constraintTop_toTopOf="parent"
+        app:played_color="@color/color_button_brand"
         app:scrubber_disabled_size="0dp"
         app:scrubber_dragged_size="0dp"
         app:scrubber_enabled_size="0dp"
-        app:buffered_color="@color/grey_200_grey_600"
         app:unplayed_color="@color/grey_200_grey_600" />
 
-    <View
+    <FrameLayout
         android:id="@+id/play_pause_placeholder"
-        android:layout_width="64dp"
-        android:layout_height="64dp"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent" />
-
-    <ImageButton
-        android:id="@id/exo_play_pause"
         android:layout_width="35dp"
         android:layout_height="35dp"
-        android:background="@null"
-        app:layout_constraintEnd_toEndOf="@id/play_pause_placeholder"
-        app:layout_constraintBottom_toBottomOf="@id/play_pause_placeholder"
+        android:layout_marginHorizontal="14dp"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintBottom_toBottomOf="parent"
+        android:visibility="visible">
+
+        <ImageButton
+            android:id="@id/exo_play_pause"
+            style="@style/ExoStyledControls.Button.Center.PlayPause"
+            android:layout_width="35dp"
+            android:layout_height="35dp"
+            android:layout_gravity="center"
+            android:background="@null"
+            app:tint="@color/black_white" />
+    </FrameLayout>
+
+    <ProgressBar
+        android:id="@+id/loading_mini_audio_player"
+        android:layout_width="35dp"
+        android:layout_height="35dp"
         app:layout_constraintStart_toStartOf="@id/play_pause_placeholder"
         app:layout_constraintTop_toTopOf="@id/play_pause_placeholder"
-        app:tint="@color/grey_060_white_060" />
+        app:layout_constraintBottom_toBottomOf="@id/play_pause_placeholder"
+        app:layout_constraintEnd_toEndOf="@id/play_pause_placeholder"
+        android:indeterminateDrawable="@drawable/video_player_progress_indeterminate_anim_large_material"/>
 
     <TextView
         android:id="@+id/track_name"
         android:layout_width="0dp"
         android:layout_height="wrap_content"
-        android:layout_marginHorizontal="64dp"
+        android:layout_marginStart="14dp"
         android:ellipsize="marquee"
-        android:gravity="center"
         android:singleLine="true"
         android:textAppearance="?attr/textAppearanceSubtitle1"
         app:layout_constraintBottom_toTopOf="@id/artist_name"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintEnd_toStartOf="@id/close"
+        app:layout_constraintStart_toEndOf="@id/play_pause_placeholder"
         app:layout_constraintTop_toTopOf="parent"
         app:layout_constraintVertical_chainStyle="packed"
         tools:text="Cashew Rhythm" />
@@ -58,14 +70,12 @@
         android:id="@+id/artist_name"
         android:layout_width="0dp"
         android:layout_height="wrap_content"
-        android:layout_marginHorizontal="64dp"
         android:ellipsize="marquee"
-        android:gravity="center"
         android:singleLine="true"
         android:textAppearance="@style/TextAppearance.Mega.Subtitle2.Normal.Variant"
         app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintEnd_toEndOf="@id/track_name"
+        app:layout_constraintStart_toStartOf="@id/track_name"
         app:layout_constraintTop_toBottomOf="@id/track_name"
         app:layout_constraintVertical_chainStyle="packed"
         tools:text="Two Fingers"
@@ -80,5 +90,4 @@
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
         app:tint="@color/grey_060_white_060" />
-
 </androidx.constraintlayout.widget.ConstraintLayout>

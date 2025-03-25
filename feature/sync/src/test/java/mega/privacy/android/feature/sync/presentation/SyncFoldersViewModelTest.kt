@@ -8,6 +8,7 @@ import kotlinx.coroutines.flow.flowOf
 import kotlinx.coroutines.runBlocking
 import kotlinx.coroutines.test.runTest
 import mega.privacy.android.core.test.extension.CoroutineMainDispatcherExtension
+import mega.privacy.android.data.mapper.backup.BackupInfoTypeIntMapper
 import mega.privacy.android.domain.entity.AccountType
 import mega.privacy.android.domain.entity.BatteryInfo
 import mega.privacy.android.domain.entity.account.AccountDetail
@@ -17,13 +18,21 @@ import mega.privacy.android.domain.entity.node.NodeId
 import mega.privacy.android.domain.entity.sync.SyncType
 import mega.privacy.android.domain.usecase.GetFolderTreeInfo
 import mega.privacy.android.domain.usecase.GetNodeByIdUseCase
+import mega.privacy.android.domain.usecase.GetNodePathByIdUseCase
 import mega.privacy.android.domain.usecase.GetRootNodeUseCase
-import mega.privacy.android.domain.usecase.account.IsProAccountUseCase
 import mega.privacy.android.domain.usecase.account.IsStorageOverQuotaUseCase
 import mega.privacy.android.domain.usecase.account.MonitorAccountDetailUseCase
+import mega.privacy.android.domain.usecase.camerauploads.GetCameraUploadsBackupUseCase
+import mega.privacy.android.domain.usecase.camerauploads.GetMediaUploadsBackupUseCase
+import mega.privacy.android.domain.usecase.camerauploads.GetPrimaryFolderNodeUseCase
+import mega.privacy.android.domain.usecase.camerauploads.GetPrimaryFolderPathUseCase
+import mega.privacy.android.domain.usecase.camerauploads.GetSecondaryFolderNodeUseCase
+import mega.privacy.android.domain.usecase.camerauploads.GetSecondaryFolderPathUseCase
+import mega.privacy.android.domain.usecase.camerauploads.MonitorCameraUploadsSettingsActionsUseCase
+import mega.privacy.android.domain.usecase.camerauploads.MonitorCameraUploadsStatusInfoUseCase
 import mega.privacy.android.domain.usecase.environment.MonitorBatteryInfoUseCase
-import mega.privacy.android.domain.usecase.featureflag.GetFeatureFlagValueUseCase
 import mega.privacy.android.domain.usecase.node.MoveDeconfiguredBackupNodesUseCase
+import mega.privacy.android.domain.usecase.node.RemoveDeconfiguredBackupNodesUseCase
 import mega.privacy.android.feature.sync.domain.entity.FolderPair
 import mega.privacy.android.feature.sync.domain.entity.RemoteFolder
 import mega.privacy.android.feature.sync.domain.entity.StallIssueType
@@ -37,11 +46,11 @@ import mega.privacy.android.feature.sync.domain.usecase.sync.RemoveFolderPairUse
 import mega.privacy.android.feature.sync.domain.usecase.sync.ResumeSyncUseCase
 import mega.privacy.android.feature.sync.domain.usecase.sync.option.SetUserPausedSyncUseCase
 import mega.privacy.android.feature.sync.ui.mapper.sync.SyncUiItemMapper
+import mega.privacy.android.feature.sync.ui.model.StopBackupOption
 import mega.privacy.android.feature.sync.ui.model.SyncUiItem
 import mega.privacy.android.feature.sync.ui.synclist.folders.SyncFoldersAction
-import mega.privacy.android.feature.sync.ui.synclist.folders.SyncFoldersState
+import mega.privacy.android.feature.sync.ui.synclist.folders.SyncFoldersUiState
 import mega.privacy.android.feature.sync.ui.synclist.folders.SyncFoldersViewModel
-import mega.privacy.android.shared.sync.featuretoggles.SyncFeatures
 import org.junit.jupiter.api.AfterEach
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
@@ -67,13 +76,24 @@ class SyncFoldersViewModelTest {
     private val refreshSyncUseCase: RefreshSyncUseCase = mock()
     private val monitorBatteryInfoUseCase: MonitorBatteryInfoUseCase = mock()
     private val getNodeByIdUseCase: GetNodeByIdUseCase = mock()
+    private val getNodePathByIdUseCase: GetNodePathByIdUseCase = mock()
     private val getFolderTreeInfo: GetFolderTreeInfo = mock()
     private val isStorageOverQuotaUseCase: IsStorageOverQuotaUseCase = mock()
     private val monitorAccountDetailUseCase: MonitorAccountDetailUseCase = mock()
-    private val isProAccountUseCase: IsProAccountUseCase = mock()
     private val getRootNodeUseCase: GetRootNodeUseCase = mock()
     private val moveDeconfiguredBackupNodesUseCase: MoveDeconfiguredBackupNodesUseCase = mock()
-    private val getFeatureFlagValueUseCase: GetFeatureFlagValueUseCase = mock()
+    private val removeDeconfiguredBackupNodesUseCase: RemoveDeconfiguredBackupNodesUseCase = mock()
+    private val getCameraUploadsBackupUseCase: GetCameraUploadsBackupUseCase = mock()
+    private val getMediaUploadsBackupUseCase: GetMediaUploadsBackupUseCase = mock()
+    private val monitorCameraUploadsSettingsActionsUseCase: MonitorCameraUploadsSettingsActionsUseCase =
+        mock()
+    private val monitorCameraUploadsStatusInfoUseCase: MonitorCameraUploadsStatusInfoUseCase =
+        mock()
+    private val backupInfoTypeIntMapper: BackupInfoTypeIntMapper = mock()
+    private val getPrimaryFolderNodeUseCase: GetPrimaryFolderNodeUseCase = mock()
+    private val getPrimaryFolderPathUseCase: GetPrimaryFolderPathUseCase = mock()
+    private val getSecondaryFolderNodeUseCase: GetSecondaryFolderNodeUseCase = mock()
+    private val getSecondaryFolderPathUseCase: GetSecondaryFolderPathUseCase = mock()
     private lateinit var underTest: SyncFoldersViewModel
 
     private val folderPairs = listOf(
@@ -82,7 +102,15 @@ class SyncFoldersViewModelTest {
             syncType = SyncType.TYPE_TWOWAY,
             pairName = "folderPair",
             localFolderPath = "DCIM",
-            remoteFolder = RemoteFolder(id = 233L, name = "photos"),
+            remoteFolder = RemoteFolder(id = NodeId(1234L), name = "photos"),
+            syncStatus = SyncStatus.SYNCING
+        ),
+        FolderPair(
+            id = 4L,
+            syncType = SyncType.TYPE_BACKUP,
+            pairName = "folderPair",
+            localFolderPath = "Backup",
+            remoteFolder = RemoteFolder(id = NodeId(5678L), name = "Backup"),
             syncStatus = SyncStatus.SYNCING
         )
     )
@@ -94,7 +122,7 @@ class SyncFoldersViewModelTest {
             folderPairName = "folderPair",
             status = SyncStatus.SYNCING,
             deviceStoragePath = "DCIM",
-            hasStalledIssues = false,
+            hasStalledIssues = true,
             megaStoragePath = "photos",
             megaStorageNodeId = NodeId(1234L),
             expanded = false
@@ -114,7 +142,7 @@ class SyncFoldersViewModelTest {
 
     private val stalledIssues = listOf(
         StalledIssue(
-            syncId = 1L,
+            syncId = 3L,
             nodeIds = listOf(NodeId(3L)),
             localPaths = listOf("DCIM/photo.jpg"),
             issueType = StallIssueType.DownloadIssue,
@@ -141,8 +169,7 @@ class SyncFoldersViewModelTest {
             flowOf(accountDetail)
         )
 
-        whenever(isProAccountUseCase()).thenReturn(true)
-        whenever(monitorStalledIssuesUseCase()).thenReturn(flowOf(emptyList()))
+        whenever(monitorStalledIssuesUseCase()).thenReturn(flowOf(stalledIssues))
     }
 
     @AfterEach
@@ -157,10 +184,16 @@ class SyncFoldersViewModelTest {
             setUserPausedSyncsUseCase,
             isStorageOverQuotaUseCase,
             monitorAccountDetailUseCase,
-            isProAccountUseCase,
             getRootNodeUseCase,
             moveDeconfiguredBackupNodesUseCase,
-            getFeatureFlagValueUseCase,
+            getNodePathByIdUseCase,
+            getCameraUploadsBackupUseCase,
+            monitorCameraUploadsStatusInfoUseCase,
+            backupInfoTypeIntMapper,
+            getPrimaryFolderNodeUseCase,
+            getPrimaryFolderPathUseCase,
+            getSecondaryFolderNodeUseCase,
+            getSecondaryFolderPathUseCase,
         )
     }
 
@@ -168,7 +201,7 @@ class SyncFoldersViewModelTest {
     fun `test that viewmodel fetches all folder pairs upon initialization`() = runTest {
         whenever(isStorageOverQuotaUseCase()).thenReturn(false)
         whenever(syncUiItemMapper(folderPairs)).thenReturn(syncUiItems)
-        val expectedState = SyncFoldersState(syncUiItems, isFreeAccount = false)
+        val expectedState = SyncFoldersUiState(syncUiItems)
 
         initViewModel()
 
@@ -180,11 +213,9 @@ class SyncFoldersViewModelTest {
     @Test
     fun `test that card click change the state to expanded`() = runTest {
         whenever(isStorageOverQuotaUseCase()).thenReturn(false)
-        whenever(monitorStalledIssuesUseCase()).thenReturn(flowOf(emptyList()))
         whenever(syncUiItemMapper(folderPairs)).thenReturn(syncUiItems)
-        val expectedState = SyncFoldersState(
+        val expectedState = SyncFoldersUiState(
             syncUiItems.map { if (it == syncUiItems.first()) it.copy(expanded = true) else it },
-            isFreeAccount = false
         )
 
         initViewModel()
@@ -202,9 +233,8 @@ class SyncFoldersViewModelTest {
         whenever(syncUiItemMapper(folderPairs)).thenReturn(syncUiItems)
         val syncUiItem = syncUiItems.first()
         val expectedState =
-            SyncFoldersState(
+            SyncFoldersUiState(
                 syncUiItems = syncUiItems,
-                isFreeAccount = false,
                 showConfirmRemoveSyncFolderDialog = true,
                 syncUiItemToRemove = syncUiItem,
             )
@@ -226,14 +256,14 @@ class SyncFoldersViewModelTest {
         initViewModel()
         underTest.handleAction(SyncFoldersAction.RemoveFolderClicked(syncUiItem))
         underTest.handleAction(
-            SyncFoldersAction.OnRemoveFolderDialogConfirmed
+            SyncFoldersAction.OnRemoveSyncFolderDialogConfirmed
         )
 
         verify(removeFolderPairUseCase).invoke(folderPairId = syncUiItem.id)
     }
 
     @Test
-    fun `test that confirm the remove action for a Backup removes folder pair and moves folder to Cloud Drive`() =
+    fun `test that confirm the remove action for a Backup with move option removes folder pair and moves remote folder to Cloud Drive`() =
         runTest {
             val rootFolder: FolderNode = mock {
                 on { id } doReturn NodeId(123456L)
@@ -245,7 +275,10 @@ class SyncFoldersViewModelTest {
             initViewModel()
             underTest.handleAction(SyncFoldersAction.RemoveFolderClicked(syncUiItem))
             underTest.handleAction(
-                SyncFoldersAction.OnRemoveFolderDialogConfirmed
+                SyncFoldersAction.OnRemoveBackupFolderDialogConfirmed(
+                    stopBackupOption = StopBackupOption.MOVE,
+                    selectedFolder = null,
+                )
             )
 
             verify(removeFolderPairUseCase).invoke(folderPairId = syncUiItem.id)
@@ -256,13 +289,56 @@ class SyncFoldersViewModelTest {
         }
 
     @Test
+    fun `test that confirm the remove action for a Backup with move option removes folder pair and moves remote folder to selected folder`() =
+        runTest {
+            val remoteFolder = RemoteFolder(NodeId(123L), "Selected Folder")
+            whenever(syncUiItemMapper(folderPairs)).thenReturn(syncUiItems)
+            val syncUiItem = syncUiItems.first { it.syncType == SyncType.TYPE_BACKUP }
+            whenever(removeFolderPairUseCase(syncUiItem.id)).thenReturn(Unit)
+            initViewModel()
+            underTest.handleAction(SyncFoldersAction.RemoveFolderClicked(syncUiItem))
+            underTest.handleAction(
+                SyncFoldersAction.OnRemoveBackupFolderDialogConfirmed(
+                    stopBackupOption = StopBackupOption.MOVE,
+                    selectedFolder = remoteFolder,
+                )
+            )
+
+            verify(removeFolderPairUseCase).invoke(folderPairId = syncUiItem.id)
+            verify(moveDeconfiguredBackupNodesUseCase).invoke(
+                deconfiguredBackupRoot = syncUiItem.megaStorageNodeId,
+                backupDestination = remoteFolder.id
+            )
+        }
+
+    @Test
+    fun `test that confirm the remove action for a Backup with delete option removes folder pair and delete remote folder`() =
+        runTest {
+            whenever(syncUiItemMapper(folderPairs)).thenReturn(syncUiItems)
+            val syncUiItem = syncUiItems.first { it.syncType == SyncType.TYPE_BACKUP }
+            whenever(removeFolderPairUseCase(syncUiItem.id)).thenReturn(Unit)
+            initViewModel()
+            underTest.handleAction(SyncFoldersAction.RemoveFolderClicked(syncUiItem))
+            underTest.handleAction(
+                SyncFoldersAction.OnRemoveBackupFolderDialogConfirmed(
+                    stopBackupOption = StopBackupOption.DELETE,
+                    selectedFolder = null,
+                )
+            )
+
+            verify(removeFolderPairUseCase).invoke(folderPairId = syncUiItem.id)
+            verify(removeDeconfiguredBackupNodesUseCase).invoke(
+                deconfiguredBackupRoot = syncUiItem.megaStorageNodeId,
+            )
+        }
+
+    @Test
     fun `test that cancel the remove action resets the state to do not display the confirm dialog`() =
         runTest {
             whenever(syncUiItemMapper(folderPairs)).thenReturn(syncUiItems)
             val expectedState =
-                SyncFoldersState(
+                SyncFoldersUiState(
                     syncUiItems = syncUiItems,
-                    isFreeAccount = false,
                     showConfirmRemoveSyncFolderDialog = false,
                     syncUiItemToRemove = null,
                 )
@@ -302,10 +378,8 @@ class SyncFoldersViewModelTest {
     fun `test that the folder is in error status when the stalled issues are not empty`() =
         runTest {
             whenever(syncUiItemMapper(folderPairs)).thenReturn(syncUiItems)
-            whenever(monitorStalledIssuesUseCase()).thenReturn(flowOf(stalledIssues))
-            val expectedState = SyncFoldersState(
+            val expectedState = SyncFoldersUiState(
                 syncUiItems.map { if (it == syncUiItems.first()) it.copy(hasStalledIssues = true) else it },
-                isFreeAccount = false
             )
 
             initViewModel()
@@ -331,26 +405,6 @@ class SyncFoldersViewModelTest {
             assertThat(underTest.uiState.value.isStorageOverQuota).isFalse()
         }
 
-    @Test
-    fun `test that if user is a free user and has syncs need to show dialog`() = runTest {
-        whenever(isStorageOverQuotaUseCase()).thenReturn(false)
-        whenever(syncUiItemMapper(folderPairs)).thenReturn(syncUiItems)
-        whenever(isProAccountUseCase()).thenReturn(false)
-        whenever(monitorAccountDetailUseCase()).thenReturn(flowOf())
-
-        initViewModel()
-
-        assertThat(underTest.uiState.value.showSyncsPausedErrorDialog).isTrue()
-        assertThat(underTest.uiState.value.isFreeAccount).isTrue()
-    }
-
-    @Test
-    fun `test that check feature flags method updates the state properly`() = runTest {
-        whenever(getFeatureFlagValueUseCase(SyncFeatures.BackupForAndroid)).thenReturn(true)
-        initViewModel()
-        assertThat(underTest.uiState.value.enabledFlags.contains(SyncFeatures.BackupForAndroid))
-    }
-
     private fun getSyncUiItem(status: SyncStatus): SyncUiItem = SyncUiItem(
         id = 3L,
         syncType = SyncType.TYPE_TWOWAY,
@@ -375,13 +429,22 @@ class SyncFoldersViewModelTest {
             refreshSyncUseCase = refreshSyncUseCase,
             monitorBatteryInfoUseCase = monitorBatteryInfoUseCase,
             getNodeByIdUseCase = getNodeByIdUseCase,
+            getNodePathByIdUseCase = getNodePathByIdUseCase,
             getFolderTreeInfo = getFolderTreeInfo,
             isStorageOverQuotaUseCase = isStorageOverQuotaUseCase,
-            isProAccountUseCase = isProAccountUseCase,
             monitorAccountDetailUseCase = monitorAccountDetailUseCase,
             getRootNodeUseCase = getRootNodeUseCase,
             moveDeconfiguredBackupNodesUseCase = moveDeconfiguredBackupNodesUseCase,
-            getFeatureFlagValueUseCase = getFeatureFlagValueUseCase,
+            removeDeconfiguredBackupNodesUseCase = removeDeconfiguredBackupNodesUseCase,
+            getCameraUploadsBackupUseCase = getCameraUploadsBackupUseCase,
+            getMediaUploadsBackupUseCase = getMediaUploadsBackupUseCase,
+            monitorCameraUploadsSettingsActionsUseCase = monitorCameraUploadsSettingsActionsUseCase,
+            monitorCameraUploadsStatusInfoUseCase = monitorCameraUploadsStatusInfoUseCase,
+            backupInfoTypeIntMapper = backupInfoTypeIntMapper,
+            getPrimaryFolderNodeUseCase = getPrimaryFolderNodeUseCase,
+            getPrimaryFolderPathUseCase = getPrimaryFolderPathUseCase,
+            getSecondaryFolderNodeUseCase = getSecondaryFolderNodeUseCase,
+            getSecondaryFolderPathUseCase = getSecondaryFolderPathUseCase,
         )
     }
 }

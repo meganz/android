@@ -1,5 +1,6 @@
 package mega.privacy.android.app.presentation.documentscanner.groups
 
+import mega.privacy.android.core.R as CoreR
 import mega.privacy.android.shared.resources.R as SharedR
 import androidx.compose.foundation.isSystemInDarkTheme
 import androidx.compose.foundation.layout.Arrangement
@@ -7,8 +8,8 @@ import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
-import androidx.compose.material.MaterialTheme
 import androidx.compose.runtime.Composable
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.res.stringResource
@@ -17,12 +18,13 @@ import androidx.compose.ui.tooling.preview.PreviewParameterProvider
 import androidx.compose.ui.unit.dp
 import mega.privacy.android.app.R
 import mega.privacy.android.app.presentation.documentscanner.model.ScanDestination
+import mega.privacy.android.shared.original.core.ui.controls.chip.DefaultChipStyle
 import mega.privacy.android.shared.original.core.ui.controls.chip.MegaChip
-import mega.privacy.android.shared.original.core.ui.controls.chip.RoundedChipStyle
+import mega.privacy.android.shared.original.core.ui.controls.chip.TransparentChipStyle
 import mega.privacy.android.shared.original.core.ui.controls.text.MegaText
 import mega.privacy.android.shared.original.core.ui.preview.CombinedThemePreviews
-import mega.privacy.android.shared.original.core.ui.theme.OriginalTempTheme
-import mega.privacy.android.shared.original.core.ui.theme.values.TextColor
+import mega.privacy.android.shared.original.core.ui.theme.OriginalTheme
+import mega.android.core.ui.theme.values.TextColor
 
 /**
  * A Composable Group allowing Users to select where to save the Scanned Document/s
@@ -42,41 +44,36 @@ internal fun SaveScannedDocumentsDestinationGroup(
     Column(modifier = modifier) {
         MegaText(
             modifier = Modifier
-                .padding(
-                    horizontal = 16.dp,
-                    vertical = 8.dp,
-                )
+                .padding(top = 16.dp, bottom = 8.dp, start = 16.dp, end = 16.dp)
                 .testTag(SAVE_SCANNED_DOCUMENTS_DESTINATION_GROUP_HEADER),
             text = stringResource(R.string.scan_destination),
-            textColor = TextColor.Primary,
-            style = MaterialTheme.typography.body2,
+            textColor = TextColor.Secondary,
         )
         Row(
             modifier = Modifier
                 .fillMaxWidth()
-                .padding(
-                    top = 16.dp,
-                    bottom = 16.dp,
-                    start = 72.dp,
-                    end = 16.dp,
-                ),
-            horizontalArrangement = Arrangement.spacedBy(8.dp),
+                .padding(top = 8.dp, bottom = 16.dp, start = 16.dp, end = 16.dp),
+            horizontalArrangement = Arrangement.spacedBy(8.dp, Alignment.End),
         ) {
             if (!originatedFromChat) {
+                val isCloudDriveSelected = selectedScanDestination == ScanDestination.CloudDrive
                 MegaChip(
-                    selected = selectedScanDestination == ScanDestination.CloudDrive,
+                    selected = isCloudDriveSelected,
                     text = stringResource(SharedR.string.video_section_videos_location_option_cloud_drive),
                     modifier = Modifier.testTag(
                         SAVE_SCANNED_DOCUMENTS_DESTINATION_GROUP_CHIP_CLOUD_DRIVE
                     ),
-                    style = RoundedChipStyle,
+                    style = if (isCloudDriveSelected) DefaultChipStyle else TransparentChipStyle,
+                    leadingIcon = if (isCloudDriveSelected) CoreR.drawable.ic_filter_selected else null
                 ) { onScanDestinationSelected(ScanDestination.CloudDrive) }
             }
+            val isChatSelected = selectedScanDestination == ScanDestination.Chat
             MegaChip(
-                selected = selectedScanDestination == ScanDestination.Chat,
+                selected = isChatSelected,
                 text = stringResource(SharedR.string.document_scanning_confirmation_destination_chat),
                 modifier = Modifier.testTag(SAVE_SCANNED_DOCUMENTS_DESTINATION_GROUP_CHIP_CHAT),
-                style = RoundedChipStyle,
+                style = if (isChatSelected) DefaultChipStyle else TransparentChipStyle,
+                leadingIcon = if (isChatSelected) CoreR.drawable.ic_filter_selected else null
             ) { onScanDestinationSelected(ScanDestination.Chat) }
         }
     }
@@ -90,7 +87,7 @@ internal fun SaveScannedDocumentsDestinationGroup(
 private fun SaveScannedDocumentsDestinationGroupPreview(
     @PreviewParameter(ScanDestinationPreviewParameterProvider::class) scanDestinationPreviewParameter: ScanDestinationPreviewParameter,
 ) {
-    OriginalTempTheme(isDark = isSystemInDarkTheme()) {
+    OriginalTheme(isDark = isSystemInDarkTheme()) {
         SaveScannedDocumentsDestinationGroup(
             originatedFromChat = scanDestinationPreviewParameter.originatedFromChat,
             selectedScanDestination = scanDestinationPreviewParameter.selectedScanDestination,

@@ -15,6 +15,11 @@ import mega.privacy.android.feature.sync.R
 import mega.privacy.android.shared.resources.R as sharedR
 import androidx.compose.ui.test.performClick
 import com.google.common.truth.Truth.assertThat
+import mega.privacy.mobile.analytics.event.SyncCardIssuesInfoButtonPressedEvent
+import mega.privacy.mobile.analytics.event.SyncCardOpenDeviceFolderButtonPressedEvent
+import mega.privacy.mobile.analytics.event.SyncCardOpenMegaFolderButtonPressedEvent
+import mega.privacy.mobile.analytics.event.SyncCardPauseRunButtonPressedEvent
+import mega.privacy.mobile.analytics.event.SyncCardStopButtonPressedEvent
 import org.junit.Rule
 import org.junit.Test
 import org.junit.rules.RuleChain
@@ -51,8 +56,9 @@ class SyncCardTest {
                 removeFolderClicked = {},
                 issuesInfoClicked = {},
                 onOpenDeviceFolderClicked = {},
+                onOpenMegaFolderClicked = {},
+                onCameraUploadsSettingsClicked = {},
                 isLowBatteryLevel = false,
-                isFreeAccount = false,
                 errorRes = null,
                 deviceName = "Device Name",
             )
@@ -72,10 +78,14 @@ class SyncCardTest {
             .assertIsNotDisplayed()
         composeTestRule.onNodeWithText(composeTestRule.activity.getString(R.string.sync_card_sync_issues_info))
             .assertIsNotDisplayed()
+        composeTestRule.onNodeWithText(composeTestRule.activity.getString(sharedR.string.general_open_button))
+            .assertIsDisplayed()
         composeTestRule.onNodeWithText(composeTestRule.activity.getString(R.string.sync_card_pause_sync))
             .assertIsDisplayed()
         composeTestRule.onNodeWithText(composeTestRule.activity.getString(sharedR.string.sync_stop_sync_button))
             .assertIsDisplayed()
+        composeTestRule.onNodeWithText(composeTestRule.activity.getString(sharedR.string.general_settings))
+            .assertIsNotDisplayed()
     }
 
     @Test
@@ -98,8 +108,9 @@ class SyncCardTest {
                 removeFolderClicked = {},
                 issuesInfoClicked = {},
                 onOpenDeviceFolderClicked = {},
+                onOpenMegaFolderClicked = {},
+                onCameraUploadsSettingsClicked = {},
                 isLowBatteryLevel = false,
-                isFreeAccount = false,
                 errorRes = null,
                 deviceName = "Device Name",
             )
@@ -119,10 +130,106 @@ class SyncCardTest {
             .assertIsDisplayed()
         composeTestRule.onNodeWithText(composeTestRule.activity.getString(R.string.sync_card_sync_issues_info))
             .assertIsNotDisplayed()
+        composeTestRule.onNodeWithText(composeTestRule.activity.getString(sharedR.string.general_open_button))
+            .assertIsDisplayed()
         composeTestRule.onNodeWithText(composeTestRule.activity.getString(R.string.sync_card_pause_sync))
             .assertIsDisplayed()
         composeTestRule.onNodeWithText(composeTestRule.activity.getString(sharedR.string.sync_stop_sync_button))
             .assertIsDisplayed()
+        composeTestRule.onNodeWithText(composeTestRule.activity.getString(sharedR.string.general_settings))
+            .assertIsNotDisplayed()
+    }
+
+    @Test
+    fun `test that Sync card buttons are clickable`() {
+        var clicked = false
+        composeTestRule.setContent {
+            SyncCard(
+                sync = SyncUiItem(
+                    id = 1L,
+                    syncType = SyncType.TYPE_TWOWAY,
+                    folderPairName = "Sync Name",
+                    status = SyncStatus.SYNCING,
+                    deviceStoragePath = "Device Path",
+                    hasStalledIssues = true,
+                    megaStoragePath = "MEGA Path",
+                    megaStorageNodeId = NodeId(1111L),
+                    expanded = false,
+                ),
+                expandClicked = {},
+                pauseRunClicked = { clicked = true },
+                removeFolderClicked = { clicked = true },
+                issuesInfoClicked = { clicked = true },
+                onOpenDeviceFolderClicked = {},
+                onOpenMegaFolderClicked = { clicked = true },
+                onCameraUploadsSettingsClicked = {},
+                isLowBatteryLevel = false,
+                errorRes = null,
+                deviceName = "Device Name",
+            )
+        }
+
+        composeTestRule.onNodeWithText(composeTestRule.activity.getString(R.string.sync_card_sync_issues_info))
+            .assertIsDisplayed().performClick()
+        assertThat(clicked).isTrue()
+        clicked = false
+        composeTestRule.onNodeWithText(composeTestRule.activity.getString(sharedR.string.general_open_button))
+            .assertIsDisplayed().performClick()
+        assertThat(clicked).isTrue()
+        clicked = false
+        composeTestRule.onNodeWithText(composeTestRule.activity.getString(R.string.sync_card_pause_sync))
+            .assertIsDisplayed().performClick()
+        assertThat(clicked).isTrue()
+        clicked = false
+        composeTestRule.onNodeWithText(composeTestRule.activity.getString(sharedR.string.sync_stop_sync_button))
+            .assertIsDisplayed().performClick()
+        assertThat(clicked).isTrue()
+        clicked = false
+    }
+
+    @Test
+    fun `test that tap Sync card buttons send the right analytics tracker event`() {
+        val deviceStoragePath = "Device Path"
+        composeTestRule.setContent {
+            SyncCard(
+                sync = SyncUiItem(
+                    id = 1L,
+                    syncType = SyncType.TYPE_TWOWAY,
+                    folderPairName = "Sync Name",
+                    status = SyncStatus.SYNCING,
+                    deviceStoragePath = deviceStoragePath,
+                    hasStalledIssues = true,
+                    megaStoragePath = "MEGA Path",
+                    megaStorageNodeId = NodeId(1111L),
+                    expanded = true,
+                ),
+                expandClicked = {},
+                pauseRunClicked = {},
+                removeFolderClicked = {},
+                issuesInfoClicked = {},
+                onOpenDeviceFolderClicked = {},
+                onOpenMegaFolderClicked = {},
+                onCameraUploadsSettingsClicked = {},
+                isLowBatteryLevel = false,
+                errorRes = null,
+                deviceName = "Device Name",
+            )
+        }
+
+        composeTestRule.onNodeWithText(deviceStoragePath).performClick()
+        assertThat(analyticsRule.events).contains(SyncCardOpenDeviceFolderButtonPressedEvent)
+        composeTestRule.onNodeWithText(composeTestRule.activity.getString(R.string.sync_card_sync_issues_info))
+            .assertIsDisplayed().performClick()
+        assertThat(analyticsRule.events).contains(SyncCardIssuesInfoButtonPressedEvent)
+        composeTestRule.onNodeWithText(composeTestRule.activity.getString(sharedR.string.general_open_button))
+            .assertIsDisplayed().performClick()
+        assertThat(analyticsRule.events).contains(SyncCardOpenMegaFolderButtonPressedEvent)
+        composeTestRule.onNodeWithText(composeTestRule.activity.getString(R.string.sync_card_pause_sync))
+            .assertIsDisplayed().performClick()
+        assertThat(analyticsRule.events).contains(SyncCardPauseRunButtonPressedEvent)
+        composeTestRule.onNodeWithText(composeTestRule.activity.getString(sharedR.string.sync_stop_sync_button))
+            .assertIsDisplayed().performClick()
+        assertThat(analyticsRule.events).contains(SyncCardStopButtonPressedEvent)
     }
 
     @Test
@@ -147,8 +254,9 @@ class SyncCardTest {
                 removeFolderClicked = {},
                 issuesInfoClicked = {},
                 onOpenDeviceFolderClicked = { clicked = true },
+                onOpenMegaFolderClicked = {},
+                onCameraUploadsSettingsClicked = {},
                 isLowBatteryLevel = false,
-                isFreeAccount = false,
                 errorRes = null,
                 deviceName = "Device Name",
             )
@@ -177,8 +285,9 @@ class SyncCardTest {
                 removeFolderClicked = {},
                 issuesInfoClicked = {},
                 onOpenDeviceFolderClicked = {},
+                onOpenMegaFolderClicked = {},
+                onCameraUploadsSettingsClicked = {},
                 isLowBatteryLevel = false,
-                isFreeAccount = false,
                 errorRes = null,
                 deviceName = "Device Name",
             )
@@ -198,10 +307,14 @@ class SyncCardTest {
             .assertIsNotDisplayed()
         composeTestRule.onNodeWithText(composeTestRule.activity.getString(R.string.sync_card_sync_issues_info))
             .assertIsNotDisplayed()
+        composeTestRule.onNodeWithText(composeTestRule.activity.getString(sharedR.string.general_open_button))
+            .assertIsDisplayed()
         composeTestRule.onNodeWithText(composeTestRule.activity.getString(R.string.sync_card_pause_sync))
             .assertIsDisplayed()
-        composeTestRule.onNodeWithText(composeTestRule.activity.getString(mega.privacy.android.shared.resources.R.string.sync_stop_backup_button))
+        composeTestRule.onNodeWithText(composeTestRule.activity.getString(sharedR.string.sync_stop_backup_button))
             .assertIsDisplayed()
+        composeTestRule.onNodeWithText(composeTestRule.activity.getString(sharedR.string.general_settings))
+            .assertIsNotDisplayed()
     }
 
     @Test
@@ -224,8 +337,9 @@ class SyncCardTest {
                 removeFolderClicked = {},
                 issuesInfoClicked = {},
                 onOpenDeviceFolderClicked = {},
+                onOpenMegaFolderClicked = {},
+                onCameraUploadsSettingsClicked = {},
                 isLowBatteryLevel = false,
-                isFreeAccount = false,
                 errorRes = null,
                 deviceName = "Device Name",
             )
@@ -245,10 +359,106 @@ class SyncCardTest {
             .assertIsDisplayed()
         composeTestRule.onNodeWithText(composeTestRule.activity.getString(R.string.sync_card_sync_issues_info))
             .assertIsNotDisplayed()
+        composeTestRule.onNodeWithText(composeTestRule.activity.getString(sharedR.string.general_open_button))
+            .assertIsDisplayed()
         composeTestRule.onNodeWithText(composeTestRule.activity.getString(R.string.sync_card_pause_sync))
             .assertIsDisplayed()
-        composeTestRule.onNodeWithText(composeTestRule.activity.getString(mega.privacy.android.shared.resources.R.string.sync_stop_backup_button))
+        composeTestRule.onNodeWithText(composeTestRule.activity.getString(sharedR.string.sync_stop_backup_button))
             .assertIsDisplayed()
+        composeTestRule.onNodeWithText(composeTestRule.activity.getString(sharedR.string.general_settings))
+            .assertIsNotDisplayed()
+    }
+
+    @Test
+    fun `test that Backup card buttons are clickable`() {
+        var clicked = false
+        composeTestRule.setContent {
+            SyncCard(
+                sync = SyncUiItem(
+                    id = 1L,
+                    syncType = SyncType.TYPE_BACKUP,
+                    folderPairName = "Sync Name",
+                    status = SyncStatus.SYNCING,
+                    deviceStoragePath = "Device Path",
+                    hasStalledIssues = true,
+                    megaStoragePath = "MEGA Path",
+                    megaStorageNodeId = NodeId(1111L),
+                    expanded = false,
+                ),
+                expandClicked = {},
+                pauseRunClicked = { clicked = true },
+                removeFolderClicked = { clicked = true },
+                issuesInfoClicked = { clicked = true },
+                onOpenDeviceFolderClicked = {},
+                onOpenMegaFolderClicked = { clicked = true },
+                onCameraUploadsSettingsClicked = {},
+                isLowBatteryLevel = false,
+                errorRes = null,
+                deviceName = "Device Name",
+            )
+        }
+
+        composeTestRule.onNodeWithText(composeTestRule.activity.getString(R.string.sync_card_sync_issues_info))
+            .assertIsDisplayed().performClick()
+        assertThat(clicked).isTrue()
+        clicked = false
+        composeTestRule.onNodeWithText(composeTestRule.activity.getString(sharedR.string.general_open_button))
+            .assertIsDisplayed().performClick()
+        assertThat(clicked).isTrue()
+        clicked = false
+        composeTestRule.onNodeWithText(composeTestRule.activity.getString(R.string.sync_card_pause_sync))
+            .assertIsDisplayed().performClick()
+        assertThat(clicked).isTrue()
+        clicked = false
+        composeTestRule.onNodeWithText(composeTestRule.activity.getString(sharedR.string.sync_stop_backup_button))
+            .assertIsDisplayed().performClick()
+        assertThat(clicked).isTrue()
+        clicked = false
+    }
+
+    @Test
+    fun `test that tap Backup card buttons send the right analytics tracker event`() {
+        val deviceStoragePath = "Device Path"
+        composeTestRule.setContent {
+            SyncCard(
+                sync = SyncUiItem(
+                    id = 1L,
+                    syncType = SyncType.TYPE_BACKUP,
+                    folderPairName = "Sync Name",
+                    status = SyncStatus.SYNCING,
+                    deviceStoragePath = deviceStoragePath,
+                    hasStalledIssues = true,
+                    megaStoragePath = "MEGA Path",
+                    megaStorageNodeId = NodeId(1111L),
+                    expanded = true,
+                ),
+                expandClicked = {},
+                pauseRunClicked = {},
+                removeFolderClicked = {},
+                issuesInfoClicked = {},
+                onOpenDeviceFolderClicked = {},
+                onOpenMegaFolderClicked = {},
+                onCameraUploadsSettingsClicked = {},
+                isLowBatteryLevel = false,
+                errorRes = null,
+                deviceName = "Device Name",
+            )
+        }
+
+        composeTestRule.onNodeWithText(deviceStoragePath).performClick()
+        assertThat(analyticsRule.events).contains(SyncCardOpenDeviceFolderButtonPressedEvent)
+        composeTestRule.onNodeWithText(composeTestRule.activity.getString(R.string.sync_card_sync_issues_info))
+            .assertIsDisplayed().performClick()
+        assertThat(analyticsRule.events).contains(SyncCardIssuesInfoButtonPressedEvent)
+        composeTestRule.onNodeWithText(composeTestRule.activity.getString(sharedR.string.general_open_button))
+            .assertIsDisplayed().performClick()
+        assertThat(analyticsRule.events).contains(SyncCardOpenMegaFolderButtonPressedEvent)
+        composeTestRule.onNodeWithText(composeTestRule.activity.getString(R.string.sync_card_pause_sync))
+            .assertIsDisplayed().performClick()
+        assertThat(analyticsRule.events).contains(SyncCardPauseRunButtonPressedEvent)
+        composeTestRule.onNodeWithText(composeTestRule.activity.getString(sharedR.string.sync_stop_backup_button))
+            .assertIsDisplayed().performClick()
+        assertThat(analyticsRule.events).contains(SyncCardStopButtonPressedEvent)
     }
 
     @Test
@@ -273,8 +483,361 @@ class SyncCardTest {
                 removeFolderClicked = {},
                 issuesInfoClicked = {},
                 onOpenDeviceFolderClicked = { clicked = true },
+                onOpenMegaFolderClicked = {},
+                onCameraUploadsSettingsClicked = {},
                 isLowBatteryLevel = false,
-                isFreeAccount = false,
+                errorRes = null,
+                deviceName = "Device Name",
+            )
+        }
+        composeTestRule.onNodeWithText(deviceStoragePath).performClick()
+        assertThat(clicked).isTrue()
+    }
+
+    @Test
+    fun `test that required components are visible for a collapsed CU card`() {
+        composeTestRule.setContent {
+            SyncCard(
+                sync = SyncUiItem(
+                    id = 1L,
+                    syncType = SyncType.TYPE_CAMERA_UPLOADS,
+                    folderPairName = "Camera Uploads",
+                    status = SyncStatus.SYNCED,
+                    deviceStoragePath = "Device Path",
+                    hasStalledIssues = false,
+                    megaStoragePath = "MEGA Path",
+                    megaStorageNodeId = NodeId(1111L),
+                    expanded = false,
+                ),
+                expandClicked = {},
+                pauseRunClicked = {},
+                removeFolderClicked = {},
+                issuesInfoClicked = {},
+                onOpenDeviceFolderClicked = {},
+                onOpenMegaFolderClicked = {},
+                onCameraUploadsSettingsClicked = {},
+                isLowBatteryLevel = false,
+                errorRes = null,
+                deviceName = "Device Name",
+            )
+        }
+
+        composeTestRule.onNodeWithText(composeTestRule.activity.getString(sharedR.string.general_camera_uploads))
+            .assertIsDisplayed()
+        composeTestRule.onNodeWithText(composeTestRule.activity.getString(R.string.sync_folders_device_storage))
+            .assertIsNotDisplayed()
+        composeTestRule.onNodeWithText(composeTestRule.activity.getString(R.string.sync_folders_mega_storage))
+            .assertIsNotDisplayed()
+        composeTestRule.onNodeWithText(composeTestRule.activity.getString(sharedR.string.info_added))
+            .assertIsNotDisplayed()
+        composeTestRule.onNodeWithText(composeTestRule.activity.getString(sharedR.string.info_content))
+            .assertIsNotDisplayed()
+        composeTestRule.onNodeWithText(composeTestRule.activity.getString(sharedR.string.info_total_size))
+            .assertIsNotDisplayed()
+        composeTestRule.onNodeWithText(composeTestRule.activity.getString(R.string.sync_card_sync_issues_info))
+            .assertIsNotDisplayed()
+        composeTestRule.onNodeWithText(composeTestRule.activity.getString(sharedR.string.general_open_button))
+            .assertIsDisplayed()
+        composeTestRule.onNodeWithText(composeTestRule.activity.getString(R.string.sync_card_pause_sync))
+            .assertIsNotDisplayed()
+        composeTestRule.onNodeWithText(composeTestRule.activity.getString(sharedR.string.sync_stop_sync_button))
+            .assertIsNotDisplayed()
+        composeTestRule.onNodeWithText(composeTestRule.activity.getString(sharedR.string.general_settings))
+            .assertIsDisplayed()
+    }
+
+    @Test
+    fun `test that required components are visible for an expanded CU card`() {
+        composeTestRule.setContent {
+            SyncCard(
+                sync = SyncUiItem(
+                    id = 1L,
+                    syncType = SyncType.TYPE_CAMERA_UPLOADS,
+                    folderPairName = "Camera Uploads",
+                    status = SyncStatus.SYNCED,
+                    deviceStoragePath = "Device Path",
+                    hasStalledIssues = false,
+                    megaStoragePath = "MEGA Path",
+                    megaStorageNodeId = NodeId(1111L),
+                    expanded = true,
+                ),
+                expandClicked = {},
+                pauseRunClicked = {},
+                removeFolderClicked = {},
+                issuesInfoClicked = {},
+                onOpenDeviceFolderClicked = {},
+                onOpenMegaFolderClicked = {},
+                onCameraUploadsSettingsClicked = {},
+                isLowBatteryLevel = false,
+                errorRes = null,
+                deviceName = "Device Name",
+            )
+        }
+
+        composeTestRule.onNodeWithText(composeTestRule.activity.getString(sharedR.string.general_camera_uploads))
+            .assertIsDisplayed()
+        composeTestRule.onNodeWithText(composeTestRule.activity.getString(R.string.sync_folders_device_storage))
+            .assertIsDisplayed()
+        composeTestRule.onNodeWithText(composeTestRule.activity.getString(R.string.sync_folders_mega_storage))
+            .assertIsDisplayed()
+        composeTestRule.onNodeWithText(composeTestRule.activity.getString(sharedR.string.info_added))
+            .assertIsDisplayed()
+        composeTestRule.onNodeWithText(composeTestRule.activity.getString(sharedR.string.info_content))
+            .assertIsDisplayed()
+        composeTestRule.onNodeWithText(composeTestRule.activity.getString(sharedR.string.info_total_size))
+            .assertIsDisplayed()
+        composeTestRule.onNodeWithText(composeTestRule.activity.getString(R.string.sync_card_sync_issues_info))
+            .assertIsNotDisplayed()
+        composeTestRule.onNodeWithText(composeTestRule.activity.getString(sharedR.string.general_open_button))
+            .assertIsDisplayed()
+        composeTestRule.onNodeWithText(composeTestRule.activity.getString(R.string.sync_card_pause_sync))
+            .assertIsNotDisplayed()
+        composeTestRule.onNodeWithText(composeTestRule.activity.getString(sharedR.string.sync_stop_sync_button))
+            .assertIsNotDisplayed()
+        composeTestRule.onNodeWithText(composeTestRule.activity.getString(sharedR.string.general_settings))
+            .assertIsDisplayed()
+    }
+
+    @Test
+    fun `test that CU card buttons are clickable`() {
+        var clicked = false
+        composeTestRule.setContent {
+            SyncCard(
+                sync = SyncUiItem(
+                    id = 1L,
+                    syncType = SyncType.TYPE_CAMERA_UPLOADS,
+                    folderPairName = "Camera Uploads",
+                    status = SyncStatus.SYNCED,
+                    deviceStoragePath = "Device Path",
+                    hasStalledIssues = true,
+                    megaStoragePath = "MEGA Path",
+                    megaStorageNodeId = NodeId(1111L),
+                    expanded = false,
+                ),
+                expandClicked = {},
+                pauseRunClicked = {},
+                removeFolderClicked = {},
+                issuesInfoClicked = {},
+                onOpenDeviceFolderClicked = {},
+                onOpenMegaFolderClicked = { clicked = true },
+                onCameraUploadsSettingsClicked = { clicked = true },
+                isLowBatteryLevel = false,
+                errorRes = null,
+                deviceName = "Device Name",
+            )
+        }
+
+        composeTestRule.onNodeWithText(composeTestRule.activity.getString(sharedR.string.general_open_button))
+            .assertIsDisplayed().performClick()
+        assertThat(clicked).isTrue()
+        clicked = false
+        composeTestRule.onNodeWithText(composeTestRule.activity.getString(sharedR.string.general_settings))
+            .assertIsDisplayed().performClick()
+        assertThat(clicked).isTrue()
+        clicked = false
+    }
+
+    @Test
+    fun `test that device folder path is clickable for an expanded CU card`() {
+        var clicked = false
+        val deviceStoragePath = "Device Path"
+        composeTestRule.setContent {
+            SyncCard(
+                sync = SyncUiItem(
+                    id = 1L,
+                    syncType = SyncType.TYPE_CAMERA_UPLOADS,
+                    folderPairName = "Camera Uploads",
+                    status = SyncStatus.SYNCED,
+                    deviceStoragePath = deviceStoragePath,
+                    hasStalledIssues = false,
+                    megaStoragePath = "MEGA Path",
+                    megaStorageNodeId = NodeId(1111L),
+                    expanded = true,
+                ),
+                expandClicked = {},
+                pauseRunClicked = {},
+                removeFolderClicked = {},
+                issuesInfoClicked = {},
+                onOpenDeviceFolderClicked = { clicked = true },
+                onOpenMegaFolderClicked = {},
+                onCameraUploadsSettingsClicked = {},
+                isLowBatteryLevel = false,
+                errorRes = null,
+                deviceName = "Device Name",
+            )
+        }
+        composeTestRule.onNodeWithText(deviceStoragePath).performClick()
+        assertThat(clicked).isTrue()
+    }
+
+    @Test
+    fun `test that required components are visible for a collapsed MU card`() {
+        composeTestRule.setContent {
+            SyncCard(
+                sync = SyncUiItem(
+                    id = 1L,
+                    syncType = SyncType.TYPE_MEDIA_UPLOADS,
+                    folderPairName = "Media Uploads",
+                    status = SyncStatus.SYNCED,
+                    deviceStoragePath = "Device Path",
+                    hasStalledIssues = false,
+                    megaStoragePath = "MEGA Path",
+                    megaStorageNodeId = NodeId(1111L),
+                    expanded = false,
+                ),
+                expandClicked = {},
+                pauseRunClicked = {},
+                removeFolderClicked = {},
+                issuesInfoClicked = {},
+                onOpenDeviceFolderClicked = {},
+                onOpenMegaFolderClicked = {},
+                onCameraUploadsSettingsClicked = {},
+                isLowBatteryLevel = false,
+                errorRes = null,
+                deviceName = "Device Name",
+            )
+        }
+
+        composeTestRule.onNodeWithText(composeTestRule.activity.getString(sharedR.string.general_media_uploads))
+            .assertIsDisplayed()
+        composeTestRule.onNodeWithText(composeTestRule.activity.getString(R.string.sync_folders_device_storage))
+            .assertIsNotDisplayed()
+        composeTestRule.onNodeWithText(composeTestRule.activity.getString(R.string.sync_folders_mega_storage))
+            .assertIsNotDisplayed()
+        composeTestRule.onNodeWithText(composeTestRule.activity.getString(sharedR.string.info_added))
+            .assertIsNotDisplayed()
+        composeTestRule.onNodeWithText(composeTestRule.activity.getString(sharedR.string.info_content))
+            .assertIsNotDisplayed()
+        composeTestRule.onNodeWithText(composeTestRule.activity.getString(sharedR.string.info_total_size))
+            .assertIsNotDisplayed()
+        composeTestRule.onNodeWithText(composeTestRule.activity.getString(R.string.sync_card_sync_issues_info))
+            .assertIsNotDisplayed()
+        composeTestRule.onNodeWithText(composeTestRule.activity.getString(sharedR.string.general_open_button))
+            .assertIsDisplayed()
+        composeTestRule.onNodeWithText(composeTestRule.activity.getString(R.string.sync_card_pause_sync))
+            .assertIsNotDisplayed()
+        composeTestRule.onNodeWithText(composeTestRule.activity.getString(sharedR.string.sync_stop_sync_button))
+            .assertIsNotDisplayed()
+        composeTestRule.onNodeWithText(composeTestRule.activity.getString(sharedR.string.general_settings))
+            .assertIsDisplayed()
+    }
+
+    @Test
+    fun `test that required components are visible for an expanded MU card`() {
+        composeTestRule.setContent {
+            SyncCard(
+                sync = SyncUiItem(
+                    id = 1L,
+                    syncType = SyncType.TYPE_MEDIA_UPLOADS,
+                    folderPairName = "Media Uploads",
+                    status = SyncStatus.SYNCED,
+                    deviceStoragePath = "Device Path",
+                    hasStalledIssues = false,
+                    megaStoragePath = "MEGA Path",
+                    megaStorageNodeId = NodeId(1111L),
+                    expanded = true,
+                ),
+                expandClicked = {},
+                pauseRunClicked = {},
+                removeFolderClicked = {},
+                issuesInfoClicked = {},
+                onOpenDeviceFolderClicked = {},
+                onOpenMegaFolderClicked = {},
+                onCameraUploadsSettingsClicked = {},
+                isLowBatteryLevel = false,
+                errorRes = null,
+                deviceName = "Device Name",
+            )
+        }
+
+        composeTestRule.onNodeWithText(composeTestRule.activity.getString(sharedR.string.general_media_uploads))
+            .assertIsDisplayed()
+        composeTestRule.onNodeWithText(composeTestRule.activity.getString(R.string.sync_folders_device_storage))
+            .assertIsDisplayed()
+        composeTestRule.onNodeWithText(composeTestRule.activity.getString(R.string.sync_folders_mega_storage))
+            .assertIsDisplayed()
+        composeTestRule.onNodeWithText(composeTestRule.activity.getString(sharedR.string.info_added))
+            .assertIsDisplayed()
+        composeTestRule.onNodeWithText(composeTestRule.activity.getString(sharedR.string.info_content))
+            .assertIsDisplayed()
+        composeTestRule.onNodeWithText(composeTestRule.activity.getString(sharedR.string.info_total_size))
+            .assertIsDisplayed()
+        composeTestRule.onNodeWithText(composeTestRule.activity.getString(R.string.sync_card_sync_issues_info))
+            .assertIsNotDisplayed()
+        composeTestRule.onNodeWithText(composeTestRule.activity.getString(sharedR.string.general_open_button))
+            .assertIsDisplayed()
+        composeTestRule.onNodeWithText(composeTestRule.activity.getString(R.string.sync_card_pause_sync))
+            .assertIsNotDisplayed()
+        composeTestRule.onNodeWithText(composeTestRule.activity.getString(sharedR.string.sync_stop_sync_button))
+            .assertIsNotDisplayed()
+        composeTestRule.onNodeWithText(composeTestRule.activity.getString(sharedR.string.general_settings))
+            .assertIsDisplayed()
+    }
+
+    @Test
+    fun `test that MU card buttons are clickable`() {
+        var clicked = false
+        composeTestRule.setContent {
+            SyncCard(
+                sync = SyncUiItem(
+                    id = 1L,
+                    syncType = SyncType.TYPE_MEDIA_UPLOADS,
+                    folderPairName = "Media Uploads",
+                    status = SyncStatus.SYNCED,
+                    deviceStoragePath = "Device Path",
+                    hasStalledIssues = true,
+                    megaStoragePath = "MEGA Path",
+                    megaStorageNodeId = NodeId(1111L),
+                    expanded = false,
+                ),
+                expandClicked = {},
+                pauseRunClicked = {},
+                removeFolderClicked = {},
+                issuesInfoClicked = {},
+                onOpenDeviceFolderClicked = {},
+                onOpenMegaFolderClicked = { clicked = true },
+                onCameraUploadsSettingsClicked = { clicked = true },
+                isLowBatteryLevel = false,
+                errorRes = null,
+                deviceName = "Device Name",
+            )
+        }
+
+        composeTestRule.onNodeWithText(composeTestRule.activity.getString(sharedR.string.general_open_button))
+            .assertIsDisplayed().performClick()
+        assertThat(clicked).isTrue()
+        clicked = false
+        composeTestRule.onNodeWithText(composeTestRule.activity.getString(sharedR.string.general_settings))
+            .assertIsDisplayed().performClick()
+        assertThat(clicked).isTrue()
+        clicked = false
+    }
+
+    @Test
+    fun `test that device folder path is clickable for an expanded MU card`() {
+        var clicked = false
+        val deviceStoragePath = "Device Path"
+        composeTestRule.setContent {
+            SyncCard(
+                sync = SyncUiItem(
+                    id = 1L,
+                    syncType = SyncType.TYPE_MEDIA_UPLOADS,
+                    folderPairName = "Media Uploads",
+                    status = SyncStatus.SYNCED,
+                    deviceStoragePath = deviceStoragePath,
+                    hasStalledIssues = false,
+                    megaStoragePath = "MEGA Path",
+                    megaStorageNodeId = NodeId(1111L),
+                    expanded = true,
+                ),
+                expandClicked = {},
+                pauseRunClicked = {},
+                removeFolderClicked = {},
+                issuesInfoClicked = {},
+                onOpenDeviceFolderClicked = { clicked = true },
+                onOpenMegaFolderClicked = {},
+                onCameraUploadsSettingsClicked = {},
+                isLowBatteryLevel = false,
                 errorRes = null,
                 deviceName = "Device Name",
             )

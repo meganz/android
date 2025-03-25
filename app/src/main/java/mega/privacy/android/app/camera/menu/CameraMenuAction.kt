@@ -36,4 +36,14 @@ internal sealed interface CameraMenuAction : MenuActionWithIcon {
         override val testTag = "flash_auto"
         override val orderInCategory = 3
     }
+
+    class Setting : CameraMenuAction {
+        @Composable
+        override fun getDescription(): String = stringResource(id = R.string.action_settings)
+
+        @Composable
+        override fun getIconPainter() = painterResource(R.drawable.ic_settings)
+        override val testTag = "setting"
+        override val orderInCategory = 4
+    }
 }

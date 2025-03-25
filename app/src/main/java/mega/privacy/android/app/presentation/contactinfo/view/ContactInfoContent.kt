@@ -28,7 +28,7 @@ import mega.privacy.android.domain.entity.user.UserVisibility
 import mega.privacy.android.shared.original.core.ui.controls.controlssliders.MegaSwitch
 import mega.privacy.android.shared.original.core.ui.controls.lists.MenuActionListTile
 import mega.privacy.android.shared.original.core.ui.preview.CombinedThemePreviews
-import mega.privacy.android.shared.original.core.ui.theme.OriginalTempTheme
+import mega.privacy.android.shared.original.core.ui.theme.OriginalTheme
 import mega.privacy.android.shared.original.core.ui.theme.extensions.grey_alpha_012_white_alpha_012
 
 @OptIn(ExperimentalMaterialApi::class)
@@ -112,7 +112,7 @@ private fun PreviewContactInfoContent() {
         avatarUri = "https://avatar.uri.com",
         fullName = "Tony Stark",
     )
-    OriginalTempTheme(isDark = isSystemInDarkTheme()) {
+    OriginalTheme(isDark = isSystemInDarkTheme()) {
         ContactInfoContent(
             uiState = ContactInfoUiState(
                 contactItem = ContactItem(
@@ -173,9 +173,10 @@ private fun PreviewContactInfoContentWithChatRoom() {
         isWaitingRoom = true,
         isOpenInvite = true,
         isSpeakRequest = true,
+        isNoteToSelf = false,
         peerPrivilegesList = emptyList()
     )
-    OriginalTempTheme(isDark = isSystemInDarkTheme()) {
+    OriginalTheme(isDark = isSystemInDarkTheme()) {
         ContactInfoContent(
             uiState = ContactInfoUiState(
                 contactItem = ContactItem(

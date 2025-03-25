@@ -171,13 +171,14 @@ internal class MegaPickerViewModel @Inject constructor(
         val id = state.value.currentFolder?.id?.longValue
         val name = state.value.currentFolder?.name
         if (id != null && name != null) {
-            setSelectedMegaFolderUseCase(RemoteFolder(id, name))
+            setSelectedMegaFolderUseCase(RemoteFolder(NodeId(id), name))
         }
     }
 
     private fun fetchFolders(currentFolder: Node) {
         getNodesFromFolderJob?.cancel()
         getNodesFromFolderJob = viewModelScope.launch {
+            _state.update { state -> state.copy(isLoading = true) }
             val excludeFolders = if (currentFolder.id == rootFolder?.id) {
                 runCatching {
                     val cameraUploadsFolderHandle = getCameraUploadsFolderHandleUseCase()
@@ -214,7 +215,8 @@ internal class MegaPickerViewModel @Inject constructor(
                             } else {
                                 childFolders.map { TypedNodeUiModel(it, false) }
                             },
-                            isSelectEnabled = isRootFolder(currentFolder).not()
+                            isSelectEnabled = isRootFolder(currentFolder).not(),
+                            isLoading = false,
                         )
                     }
                 }

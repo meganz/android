@@ -26,6 +26,8 @@ import mega.privacy.android.app.presentation.videosection.view.allvideos.VIDEO_I
 import mega.privacy.android.app.presentation.videosection.view.allvideos.VIDEO_ITEM_LINK_ICON_CONTENT_DESCRIPTION
 import mega.privacy.android.app.presentation.videosection.view.allvideos.VIDEO_ITEM_MENU_ICON_CONTENT_DESCRIPTION
 import mega.privacy.android.app.presentation.videosection.view.allvideos.VIDEO_ITEM_NAME_VIEW_TEST_TAG
+import mega.privacy.android.app.presentation.videosection.view.allvideos.VIDEO_ITEM_NODE_DESCRIPTION
+import mega.privacy.android.app.presentation.videosection.view.allvideos.VIDEO_ITEM_NODE_TAGS
 import mega.privacy.android.app.presentation.videosection.view.allvideos.VIDEO_ITEM_OFFLINE_ICON_CONTENT_DESCRIPTION
 import mega.privacy.android.app.presentation.videosection.view.allvideos.VIDEO_ITEM_PLAY_ICON_CONTENT_DESCRIPTION
 import mega.privacy.android.app.presentation.videosection.view.allvideos.VIDEO_ITEM_SIZE_VIEW_TEST_TAG
@@ -72,6 +74,9 @@ class VideoItemViewTest {
         nodeAvailableOffline: Boolean = false,
         onLongClick: (() -> Unit)? = null,
         onMenuClick: () -> Unit = {},
+        description: String = "",
+        tags: List<String> = emptyList(),
+        highlightText: String = "",
     ) {
         composeTestRule.setContent {
             VideoItemView(
@@ -79,7 +84,6 @@ class VideoItemViewTest {
                 name = name,
                 fileSize = fileSize,
                 duration = duration,
-                collectionTitle = collectionTitle,
                 isFavourite = isFavourite,
                 isSelected = isSelected,
                 isSharedWithPublicLink = isSharedWithPublicLink,
@@ -87,10 +91,14 @@ class VideoItemViewTest {
                 onClick = onClick,
                 thumbnailData = thumbnailData,
                 modifier = modifier,
+                collectionTitle = collectionTitle,
                 showMenuButton = showMenuButton,
                 nodeAvailableOffline = nodeAvailableOffline,
                 onLongClick = onLongClick,
-                onMenuClick = onMenuClick
+                onMenuClick = onMenuClick,
+                description = description,
+                tags = tags,
+                highlightText = highlightText
             )
         }
     }
@@ -129,10 +137,30 @@ class VideoItemViewTest {
             VIDEO_ITEM_FAVOURITE_ICON_CONTENT_DESCRIPTION,
             VIDEO_ITEM_OFFLINE_ICON_CONTENT_DESCRIPTION,
             VIDEO_ITEM_LINK_ICON_CONTENT_DESCRIPTION,
-            VIDEO_ITEM_COLLECTION_TITLE_ICON_CONTENT_DESCRIPTION
+            VIDEO_ITEM_COLLECTION_TITLE_ICON_CONTENT_DESCRIPTION,
+            VIDEO_ITEM_NODE_TAGS,
+            VIDEO_ITEM_NODE_DESCRIPTION
         ).forEach {
             it.assertIsNotDisplayedWithDescription()
         }
+    }
+
+    @Test
+    fun `test that that description is visible when matches with highlight text`() {
+        setComposeContent(
+            description = "This is a description with highlight text",
+            highlightText = "highlight"
+        )
+        composeTestRule.onNodeWithTag(VIDEO_ITEM_NODE_DESCRIPTION, true).assertIsDisplayed()
+    }
+
+    @Test
+    fun `test that that tags are visible when matches with highlight text`() {
+        setComposeContent(
+            tags = listOf("tag1", "tag2", "highlight", "tag3"),
+            highlightText = "highlight"
+        )
+        composeTestRule.onNodeWithTag(VIDEO_ITEM_NODE_TAGS, true).assertIsDisplayed()
     }
 
     private fun String.assertIsNotDisplayedWithTag() =

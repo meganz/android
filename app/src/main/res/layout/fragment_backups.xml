@@ -33,7 +33,7 @@
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent"
         app:layout_constraintVertical_chainStyle="packed"
-        tools:src="@drawable/ic_zero_portrait_empty_folder" />
+        tools:src="@drawable/ic_empty_folder_glass" />
 
     <TextView
         android:id="@+id/backups_no_items_title_text_view"

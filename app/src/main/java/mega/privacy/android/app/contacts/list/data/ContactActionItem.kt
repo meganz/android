@@ -13,7 +13,8 @@ import androidx.recyclerview.widget.DiffUtil
 data class ContactActionItem(
     val id: Type,
     val title: String,
-    val counter: Int = 0
+    val leadingIcon: Int,
+    val counter: Int = 0,
 ) {
 
     enum class Type { REQUESTS, GROUPS }

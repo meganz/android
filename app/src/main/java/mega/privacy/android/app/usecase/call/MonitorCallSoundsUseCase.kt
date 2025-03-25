@@ -17,7 +17,7 @@ import mega.privacy.android.app.meeting.gateway.RTCAudioManagerGateway
 import mega.privacy.android.app.utils.Constants.SECONDS_TO_WAIT_FOR_OTHERS_TO_JOIN_THE_CALL
 import mega.privacy.android.app.utils.Constants.TYPE_JOIN
 import mega.privacy.android.app.utils.Constants.TYPE_LEFT
-import mega.privacy.android.domain.entity.CallsSoundNotifications
+import mega.privacy.android.domain.entity.CallsSoundEnabledState
 import mega.privacy.android.domain.entity.call.ChatCallChanges
 import mega.privacy.android.domain.entity.call.ChatCallStatus
 import mega.privacy.android.domain.entity.call.ChatSessionStatus
@@ -25,8 +25,8 @@ import mega.privacy.android.domain.entity.call.ChatSessionTermCode
 import mega.privacy.android.domain.qualifier.MainImmediateDispatcher
 import mega.privacy.android.domain.usecase.GetChatRoomUseCase
 import mega.privacy.android.domain.usecase.call.AmIAloneOnAnyCallUseCase
-import mega.privacy.android.domain.usecase.call.GetCallsSoundNotifications
 import mega.privacy.android.domain.usecase.call.HangChatCallUseCase
+import mega.privacy.android.domain.usecase.call.MonitorCallSoundEnabledUseCase
 import mega.privacy.android.domain.usecase.chat.MonitorCallsReconnectingStatusUseCase
 import mega.privacy.android.domain.usecase.meeting.BroadcastWaitingForOtherParticipantsHasEndedUseCase
 import mega.privacy.android.domain.usecase.meeting.GetParticipantsChangesUseCase
@@ -51,7 +51,7 @@ class MonitorCallSoundsUseCase @Inject constructor(
     private val getChatRoomUseCase: GetChatRoomUseCase,
     private val monitorCallsReconnectingStatusUseCase: MonitorCallsReconnectingStatusUseCase,
     private val rtcAudioManagerGateway: RTCAudioManagerGateway,
-    private val getCallsSoundNotifications: GetCallsSoundNotifications,
+    private val monitorCallSoundEnabledUseCase: MonitorCallSoundEnabledUseCase,
     private val monitorChatCallUpdatesUseCase: MonitorChatCallUpdatesUseCase,
     private val hangChatCallUseCase: HangChatCallUseCase,
     private val amIAloneOnAnyCallUseCase: AmIAloneOnAnyCallUseCase,
@@ -236,8 +236,8 @@ class MonitorCallSoundsUseCase @Inject constructor(
         launch {
             getParticipantsChangesUseCase()
                 .collectLatest { result ->
-                    val isEnabled = getCallsSoundNotifications()
-                        .firstOrNull() == CallsSoundNotifications.Enabled
+                    val isEnabled = monitorCallSoundEnabledUseCase()
+                        .firstOrNull() == CallsSoundEnabledState.Enabled
 
                     if (isEnabled) {
                         when (result.typeChange) {

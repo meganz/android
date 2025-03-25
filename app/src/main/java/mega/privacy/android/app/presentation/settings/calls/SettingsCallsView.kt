@@ -18,11 +18,12 @@ import mega.privacy.android.app.R
 import mega.privacy.android.app.presentation.settings.calls.model.SettingsCallsState
 import mega.privacy.android.domain.entity.CallsMeetingInvitations
 import mega.privacy.android.domain.entity.CallsMeetingReminders
-import mega.privacy.android.domain.entity.CallsSoundNotifications
+import mega.privacy.android.domain.entity.CallsSoundEnabledState
 import mega.privacy.android.shared.original.core.ui.controls.controlssliders.MegaSwitch
 import mega.privacy.android.shared.original.core.ui.preview.CombinedThemePreviews
-import mega.privacy.android.shared.original.core.ui.theme.OriginalTempTheme
+import mega.privacy.android.shared.original.core.ui.theme.OriginalTheme
 import mega.privacy.android.shared.original.core.ui.theme.Typography
+import mega.privacy.android.shared.resources.R as sharedR
 
 @Composable
 fun SettingsCallsView(
@@ -33,25 +34,11 @@ fun SettingsCallsView(
 ) {
     Column {
         CallSettingItem(
-            R.string.settings_calls_preferences_sound_notifications,
-            R.string.settings_calls_preferences_sound_notifications_text,
-            settingsCallsState.soundNotifications == CallsSoundNotifications.Enabled,
+            sharedR.string.settings_calls_sound_notifications_title,
+            sharedR.string.settings_calls_sound_notifications_body,
+            settingsCallsState.soundNotifications == CallsSoundEnabledState.Enabled,
             onCheckedChange = onSoundNotificationsChanged
         )
-        if (settingsCallsState.meetingNotificationEnabled) {
-            CallSettingItem(
-                R.string.settings_calls_preferences_meeting_invitations,
-                R.string.settings_calls_preferences_meeting_invitations_text,
-                settingsCallsState.callsMeetingInvitations == CallsMeetingInvitations.Enabled,
-                onCheckedChange = onMeetingInvitationsChanged
-            )
-            CallSettingItem(
-                R.string.settings_calls_preferences_meeting_reminders,
-                R.string.settings_calls_preferences_meeting_reminders_text,
-                settingsCallsState.callsMeetingReminders == CallsMeetingReminders.Enabled,
-                onCheckedChange = onMeetingRemindersChanged
-            )
-        }
     }
 }
 
@@ -99,10 +86,10 @@ fun CallSettingItem(
 @CombinedThemePreviews
 @Composable
 private fun PreviewSettingsCallsView() {
-    OriginalTempTheme(isDark = isSystemInDarkTheme()) {
+    OriginalTheme(isDark = isSystemInDarkTheme()) {
         SettingsCallsView(
             settingsCallsState = SettingsCallsState(
-                soundNotifications = CallsSoundNotifications.Enabled,
+                soundNotifications = CallsSoundEnabledState.Enabled,
                 callsMeetingInvitations = CallsMeetingInvitations.Enabled,
                 callsMeetingReminders = CallsMeetingReminders.Enabled,
             )

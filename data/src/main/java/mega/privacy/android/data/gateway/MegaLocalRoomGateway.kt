@@ -5,13 +5,13 @@ import mega.privacy.android.data.model.VideoRecentlyWatchedItem
 import mega.privacy.android.domain.entity.CameraUploadsRecordType
 import mega.privacy.android.domain.entity.Contact
 import mega.privacy.android.domain.entity.Offline
-import mega.privacy.android.domain.entity.SdTransfer
 import mega.privacy.android.domain.entity.backup.Backup
 import mega.privacy.android.domain.entity.camerauploads.CameraUploadFolderType
 import mega.privacy.android.domain.entity.camerauploads.CameraUploadsRecord
 import mega.privacy.android.domain.entity.camerauploads.CameraUploadsRecordUploadStatus
 import mega.privacy.android.domain.entity.chat.ChatPendingChanges
 import mega.privacy.android.domain.entity.transfer.ActiveTransfer
+import mega.privacy.android.domain.entity.transfer.ActiveTransferGroup
 import mega.privacy.android.domain.entity.transfer.CompletedTransfer
 import mega.privacy.android.domain.entity.transfer.TransferType
 import mega.privacy.android.domain.entity.transfer.pending.InsertPendingTransferRequest
@@ -203,12 +203,12 @@ interface MegaLocalRoomGateway {
     suspend fun getCurrentActiveTransfers(): List<ActiveTransfer>
 
     /**
-     * Insert a new active transfer or replace it if there's already an active transfer with the same tag
+     * Insert a new active transfer or update it if there's already an active transfer with the same tag
      */
     suspend fun insertOrUpdateActiveTransfer(activeTransfer: ActiveTransfer)
 
     /**
-     * Insert (or replace  if there's already an active transfer with the same tag) a list of active transfers
+     * Insert (or update if there's already an active transfer with the same tag) a list of active transfers
      */
     suspend fun insertOrUpdateActiveTransfers(activeTransfers: List<ActiveTransfer>)
 
@@ -228,30 +228,19 @@ interface MegaLocalRoomGateway {
     suspend fun setActiveTransferAsCancelledByTag(tags: List<Int>)
 
     /**
-     * Get all sd transfers
-     *
-     * @return the list of sd transfers
+     * Insert a new active transfer group and returns it's id
      */
-    suspend fun getAllSdTransfers(): List<SdTransfer>
+    suspend fun insertActiveTransferGroup(activeTransferGroup: ActiveTransferGroup): Long
 
     /**
-     * Get sd transfers by tag
-     *
-     * @return the sd transfer with this tag or null if not found
+     * Get the [ActiveTransferGroup] by [groupId]
      */
-    suspend fun getSdTransferByTag(tag: Int): SdTransfer?
+    suspend fun getActiveTransferGroup(groupId: Int): ActiveTransferGroup?
 
     /**
-     * Insert sd transfer
-     *
+     * Delete the [ActiveTransferGroup] by [groupId]
      */
-    suspend fun insertSdTransfer(transfer: SdTransfer)
-
-    /**
-     * Delete sd transfer by tag
-     *
-     */
-    suspend fun deleteSdTransferByTag(tag: Int)
+    suspend fun deleteActiveTransferGroup(groupId: Int)
 
     /**
      * Get completed transfer by id
@@ -561,4 +550,10 @@ interface MegaLocalRoomGateway {
      * Delete all pending transfers
      */
     suspend fun deleteAllPendingTransfers()
+
+    /**
+     * Delete completed transfers which path contains the given path
+     * @param path to search for
+     */
+    suspend fun deleteCompletedTransfersByPath(path: String)
 }

@@ -10,9 +10,11 @@ import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.TestInstance
 import org.junit.jupiter.api.assertThrows
 import org.mockito.kotlin.any
+import org.mockito.kotlin.doReturn
 import org.mockito.kotlin.mock
 import org.mockito.kotlin.reset
 import org.mockito.kotlin.verify
+import org.mockito.kotlin.verifyNoInteractions
 import org.mockito.kotlin.whenever
 import java.io.File
 
@@ -42,12 +44,26 @@ class MoveFileToSdCardUseCaseTest {
 
     @Test
     fun `test that file is moved to destination `() = runTest {
-        val file = mock<File>()
+        val file = mock<File> {
+            on { isDirectory } doReturn false
+        }
         val destination = "content:destination/root/"
         val subFolders = listOf("subfolder1", "subfolder2")
         whenever(fileSystemRepository.moveFileToSd(any(), any(), any())).thenReturn(true)
         underTest(file, destination, subFolders)
         verify(fileSystemRepository).moveFileToSd(file, destination, subFolders)
+    }
+
+    @Test
+    fun `test that directory is moved to destination `() = runTest {
+        val file = mock<File> {
+            on { isDirectory } doReturn true
+        }
+        val destination = "content:destination/root/"
+        val subFolders = listOf("subfolder1", "subfolder2")
+        whenever(fileSystemRepository.moveDirectoryToSd(any(), any())).thenReturn(true)
+        underTest(file, destination, subFolders)
+        verify(fileSystemRepository).moveDirectoryToSd(file, destination)
     }
 
     @Test

@@ -13,7 +13,7 @@ import mega.privacy.android.shared.original.core.ui.controls.chat.messages.react
 import mega.privacy.android.shared.original.core.ui.controls.dividers.DividerType
 import mega.privacy.android.shared.original.core.ui.controls.dividers.MegaDivider
 import mega.privacy.android.shared.original.core.ui.preview.CombinedThemePreviews
-import mega.privacy.android.shared.original.core.ui.theme.OriginalTempTheme
+import mega.privacy.android.shared.original.core.ui.theme.OriginalTheme
 
 /**
  * Bottom sheet for chat message options.
@@ -53,7 +53,7 @@ fun MessageOptionsBottomSheet(
 @CombinedThemePreviews
 @Composable
 private fun MessageOptionsBottomSheetPreview() {
-    OriginalTempTheme(isDark = isSystemInDarkTheme()) {
+    OriginalTheme(isDark = isSystemInDarkTheme()) {
         MessageOptionsBottomSheet(
             onReactionClicked = {},
             onMoreReactionsClicked = {},

@@ -13,7 +13,7 @@ package mega.privacy.android.domain.entity.meeting
  * @property scheduledEndTimestamp
  * @property scheduledTimestampFormatted
  */
-data class ScheduledMeetingData constructor(
+data class ScheduledMeetingData(
     val schedId: Long,
     val title: String?,
     val isRecurringDaily: Boolean = false,
@@ -23,4 +23,5 @@ data class ScheduledMeetingData constructor(
     val scheduledStartTimestamp: Long? = null,
     val scheduledEndTimestamp: Long? = null,
     val scheduledTimestampFormatted: String? = null,
+    val isCancelled: Boolean = false
 )

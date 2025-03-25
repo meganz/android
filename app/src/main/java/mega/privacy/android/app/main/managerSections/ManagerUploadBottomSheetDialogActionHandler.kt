@@ -18,12 +18,10 @@ import androidx.lifecycle.LifecycleOwner
 import com.google.mlkit.vision.documentscanner.GmsDocumentScanner
 import com.google.mlkit.vision.documentscanner.GmsDocumentScanningResult
 import dagger.hilt.android.scopes.ActivityScoped
-import mega.privacy.android.app.DocumentScannerEdgeToEdgeActivity
-import mega.privacy.android.app.R
+import mega.privacy.android.analytics.Analytics
 import mega.privacy.android.app.interfaces.ActionNodeCallback
 import mega.privacy.android.app.main.CameraPermissionManager
 import mega.privacy.android.app.main.DrawerItem
-import mega.privacy.android.app.main.FileExplorerActivity
 import mega.privacy.android.app.main.ManagerActivity
 import mega.privacy.android.app.main.NavigationDrawerManager
 import mega.privacy.android.app.main.ParentNodeManager
@@ -45,7 +43,7 @@ import mega.privacy.android.app.utils.MegaNodeDialogUtil.showNewFolderDialog
 import mega.privacy.android.app.utils.MegaNodeDialogUtil.showNewTxtFileDialog
 import mega.privacy.android.app.utils.Util.checkTakePicture
 import mega.privacy.android.app.utils.permission.PermissionUtilWrapper
-import nz.mega.documentscanner.DocumentScannerActivity
+import mega.privacy.mobile.analytics.event.DocumentScanInitiatedEvent
 import timber.log.Timber
 import javax.inject.Inject
 
@@ -146,38 +144,10 @@ internal class ManagerUploadBottomSheetDialogActionHandler @Inject constructor(
         ) { activity.uploadFolderManually() }
 
     /**
-     * The launcher to scan documents using the for the old Document Scanner
+     * Launcher to scan documents using the ML Kit Document Scanner. After scanning, a different
+     * screen is opened to configure where to save the scanned documents.
      */
-    private val legacyScanDocumentLauncher =
-        managerActivity.registerForActivityResult(ActivityResultContracts.StartActivityForResult()) {
-            if (it.resultCode == RESULT_OK) {
-                it.data?.let { intent ->
-                    val savedDestination: String? =
-                        intent.getStringExtra(DocumentScannerActivity.EXTRA_PICKED_SAVE_DESTINATION)
-                    val fileIntent =
-                        Intent(managerActivity, FileExplorerActivity::class.java).apply {
-                            if (activity.getString(R.string.section_chat) == savedDestination) {
-                                action = FileExplorerActivity.ACTION_UPLOAD_TO_CHAT
-                            } else {
-                                action = FileExplorerActivity.ACTION_SAVE_TO_CLOUD
-                                putExtra(
-                                    FileExplorerActivity.EXTRA_PARENT_HANDLE,
-                                    parentNodeManager.currentParentHandle
-                                )
-                            }
-                            putExtra(Intent.EXTRA_STREAM, intent.data)
-                            type = intent.type
-                        }
-                    managerActivity.startActivity(fileIntent)
-                }
-            }
-        }
-
-    /**
-     * The launcher to scan documents using the new ML Document Kit Scanner. After scanning, a
-     * different screen is opened to configure where to save the scanned documents.
-     */
-    private val newScanDocumentLauncher = managerActivity.registerForActivityResult(
+    private val scanDocumentLauncher = managerActivity.registerForActivityResult(
         ActivityResultContracts.StartIntentSenderForResult()
     ) { result ->
         if (result.resultCode == RESULT_OK) {
@@ -210,7 +180,7 @@ internal class ManagerUploadBottomSheetDialogActionHandler @Inject constructor(
                 }
             }
         } else {
-            Timber.e("The ML Document Kit Scan result could not be retrieved from Cloud Drive")
+            Timber.e("The ML Kit Document Scan result could not be retrieved from Cloud Drive")
         }
     }
 
@@ -256,40 +226,23 @@ internal class ManagerUploadBottomSheetDialogActionHandler @Inject constructor(
     }
 
     /**
-     * Begin scanning Documents using the old Document Scanner
-     */
-    fun scanDocumentUsingLegacyScanner() {
-        val saveDestinations = arrayOf(
-            managerActivity.getString(R.string.section_cloud_drive),
-            managerActivity.getString(R.string.section_chat)
-        )
-        val intent = DocumentScannerActivity.getIntent(
-            context = managerActivity,
-            targetClass = DocumentScannerEdgeToEdgeActivity::class.java,
-            saveDestinations = saveDestinations
-        )
-        legacyScanDocumentLauncher.launch(intent)
-    }
-
-    /**
-     * Begin scanning Documents using the new ML Kit Document Scanner
+     * Begin scanning Documents using the ML Kit Document Scanner
      *
-     * @param documentScanner the new ML Kit Document Scanner
+     * @param documentScanner the ML Kit Document Scanner
      */
-    fun scanDocumentUsingNewScanner(documentScanner: GmsDocumentScanner) {
+    fun scanDocument(documentScanner: GmsDocumentScanner) {
         documentScanner.apply {
             getStartScanIntent(managerActivity)
                 .addOnSuccessListener {
-                    newScanDocumentLauncher.launch(
-                        IntentSenderRequest.Builder(it).build()
-                    )
+                    Analytics.tracker.trackEvent(DocumentScanInitiatedEvent)
+                    scanDocumentLauncher.launch(IntentSenderRequest.Builder(it).build())
                 }
                 .addOnFailureListener { exception ->
                     Timber.e(
                         exception,
                         "An error occurred when attempting to run the ML Kit Document Scanner from Cloud Drive",
                     )
-                    managerActivity.onNewDocumentScannerFailedToOpen()
+                    managerActivity.onDocumentScannerFailedToOpen()
                 }
         }
     }

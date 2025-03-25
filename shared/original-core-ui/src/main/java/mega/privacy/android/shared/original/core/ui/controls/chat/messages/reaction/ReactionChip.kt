@@ -26,7 +26,7 @@ import androidx.compose.ui.unit.sp
 import mega.privacy.android.shared.original.core.ui.controls.chat.messages.reaction.model.UIReaction
 import mega.privacy.android.shared.original.core.ui.preview.BooleanProvider
 import mega.privacy.android.shared.original.core.ui.preview.CombinedThemePreviews
-import mega.privacy.android.shared.original.core.ui.theme.OriginalTempTheme
+import mega.privacy.android.shared.original.core.ui.theme.OriginalTheme
 import mega.privacy.android.shared.original.core.ui.theme.MegaOriginalTheme
 import mega.privacy.android.shared.original.core.ui.theme.extensions.conditional
 
@@ -55,7 +55,7 @@ fun ReactionChip(
             verticalAlignment = Alignment.CenterVertically,
             horizontalArrangement = Arrangement.Center,
             modifier = Modifier
-                .size(44.dp, 24.dp)
+                .size(reactionsChipWidth, reactionsChipHeight)
                 .clip(RoundedCornerShape(12.dp))
                 .conditional(interactionEnabled) {
                     combinedClickable(
@@ -88,13 +88,22 @@ fun ReactionChip(
 
 }
 
+/**
+ * Width of the reaction chip
+ */
+internal val reactionsChipWidth = 44.dp
+
+/**
+ * Height of the reaction chip
+ */
+internal val reactionsChipHeight = 24.dp
 
 @CombinedThemePreviews
 @Composable
 private fun ReactionChipWithRtlCountPreview(
     @PreviewParameter(BooleanProvider::class) hasMe: Boolean,
 ) {
-    OriginalTempTheme(isDark = isSystemInDarkTheme()) {
+    OriginalTheme(isDark = isSystemInDarkTheme()) {
         ReactionChip(
             reaction = UIReaction(
                 reaction = "\uD83C\uDF77",
@@ -116,7 +125,7 @@ private fun ReactionChipWithRtlCountPreview(
 private fun ReactionChipWithCountPreview(
     @PreviewParameter(BooleanProvider::class) hasMe: Boolean,
 ) {
-    OriginalTempTheme(isDark = isSystemInDarkTheme()) {
+    OriginalTheme(isDark = isSystemInDarkTheme()) {
         ReactionChip(
             reaction = UIReaction(
                 reaction = "\uD83C\uDF77",

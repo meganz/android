@@ -15,8 +15,12 @@ import mega.privacy.android.feature.sync.ui.megapicker.MegaPickerAction.FolderCl
 import mega.privacy.android.feature.sync.ui.permissions.SyncPermissionsManager
 import mega.privacy.android.shared.resources.R as sharedResR
 import androidx.compose.foundation.isSystemInDarkTheme
+import mega.privacy.android.analytics.Analytics
 import mega.privacy.android.shared.original.core.ui.preview.CombinedThemePreviews
-import mega.privacy.android.shared.original.core.ui.theme.OriginalTempTheme
+import mega.privacy.android.shared.original.core.ui.theme.OriginalTheme
+import mega.privacy.mobile.analytics.event.AndroidSyncAllFilesAccessDialogConfirmButtonPressedEvent
+import mega.privacy.mobile.analytics.event.AndroidSyncAllFilesAccessDialogDismissButtonPressedEvent
+import mega.privacy.mobile.analytics.event.AndroidSyncAllFilesAccessDialogDisplayedEvent
 import nz.mega.sdk.MegaApiJava
 
 @Composable
@@ -25,7 +29,8 @@ internal fun MegaPickerRoute(
     syncPermissionsManager: SyncPermissionsManager,
     folderSelected: () -> Unit,
     backClicked: () -> Unit,
-    fileTypeIconMapper: FileTypeIconMapper
+    fileTypeIconMapper: FileTypeIconMapper,
+    isStopBackupMegaPicker: Boolean = false,
 ) {
     val state = viewModel.state.collectAsStateWithLifecycle()
 
@@ -35,28 +40,27 @@ internal fun MegaPickerRoute(
         selectCurrentFolder(viewModel, syncPermissionsManager)
     }
 
-    state.value.nodes?.let { nodes ->
-        MegaPickerScreen(
-            currentFolder = state.value.currentFolder,
-            nodes = nodes,
-            folderClicked = { viewModel.handleAction(FolderClicked(it)) },
-            currentFolderSelected = {
-                selectCurrentFolder(viewModel, syncPermissionsManager)
-            },
-            fileTypeIconMapper = fileTypeIconMapper,
-            errorMessageId = state.value.errorMessageId,
-            errorMessageShown = {
-                viewModel.handleAction(MegaPickerAction.ErrorMessageShown)
-            },
-            onCreateNewFolderDialogSuccess = { newFolderName ->
-                viewModel.createFolder(
-                    newFolderName = newFolderName,
-                    parentNode = state.value.currentFolder
-                )
-            },
-            isSelectEnabled = state.value.isSelectEnabled,
-        )
-    }
+    MegaPickerScreen(
+        currentFolder = state.value.currentFolder,
+        nodes = state.value.nodes,
+        folderClicked = { viewModel.handleAction(FolderClicked(it)) },
+        currentFolderSelected = {
+            selectCurrentFolder(viewModel, syncPermissionsManager)
+        },
+        fileTypeIconMapper = fileTypeIconMapper,
+        errorMessageId = state.value.errorMessageId,
+        errorMessageShown = {
+            viewModel.handleAction(MegaPickerAction.ErrorMessageShown)
+        },
+        onCreateNewFolderDialogSuccess = { newFolderName ->
+            viewModel.createFolder(
+                newFolderName = newFolderName, parentNode = state.value.currentFolder
+            )
+        },
+        isLoading = state.value.isLoading,
+        isSelectEnabled = isStopBackupMegaPicker || state.value.isSelectEnabled,
+        isStopBackupMegaPicker = isStopBackupMegaPicker,
+    )
 
     val onBack = {
         if (state.value.currentFolder?.parentId?.longValue != MegaApiJava.INVALID_HANDLE) {
@@ -67,6 +71,7 @@ internal fun MegaPickerRoute(
     }
 
     if (state.value.showAllFilesAccessDialog) {
+        Analytics.tracker.trackEvent(AndroidSyncAllFilesAccessDialogDisplayedEvent)
         AllFilesAccessDialog(
             onConfirm = {
                 viewModel.handleAction(MegaPickerAction.AllFilesAccessPermissionDialogShown)
@@ -129,8 +134,14 @@ fun AllFilesAccessDialog(
         text = stringResource(id = sharedResR.string.sync_backup_access_storage_permission_dialog_message),
         confirmButtonText = stringResource(id = R.string.sync_dialog_file_permission_positive_button),
         cancelButtonText = stringResource(id = R.string.sync_dialog_file_permission_negative_button),
-        onConfirm = onConfirm,
-        onDismiss = onDismiss,
+        onConfirm = {
+            Analytics.tracker.trackEvent(AndroidSyncAllFilesAccessDialogConfirmButtonPressedEvent)
+            onConfirm()
+        },
+        onDismiss = {
+            Analytics.tracker.trackEvent(AndroidSyncAllFilesAccessDialogDismissButtonPressedEvent)
+            onDismiss()
+        },
     )
 }
 
@@ -152,7 +163,7 @@ private fun DisableBatteryOptimizationDialog(
 @CombinedThemePreviews
 @Composable
 private fun AllFilesAccessDialogPreview() {
-    OriginalTempTheme(isDark = isSystemInDarkTheme()) {
+    OriginalTheme(isDark = isSystemInDarkTheme()) {
         AllFilesAccessDialog(
             onConfirm = {},
             onDismiss = {},
@@ -163,7 +174,7 @@ private fun AllFilesAccessDialogPreview() {
 @CombinedThemePreviews
 @Composable
 private fun DisableBatteryOptimizationDialogPreview() {
-    OriginalTempTheme(isDark = isSystemInDarkTheme()) {
+    OriginalTheme(isDark = isSystemInDarkTheme()) {
         DisableBatteryOptimizationDialog(
             onConfirm = {},
             onDismiss = {},

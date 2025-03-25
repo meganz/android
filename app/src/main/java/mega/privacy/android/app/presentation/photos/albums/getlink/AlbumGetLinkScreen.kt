@@ -81,7 +81,7 @@ import mega.privacy.android.shared.original.core.ui.controls.dialogs.Confirmatio
 import mega.privacy.android.shared.original.core.ui.theme.grey_alpha_012
 import mega.privacy.android.shared.original.core.ui.theme.grey_alpha_054
 import mega.privacy.android.shared.original.core.ui.theme.grey_alpha_087
-import mega.privacy.android.shared.original.core.ui.theme.teal_300
+import mega.privacy.android.shared.original.core.ui.theme.accent_900
 import mega.privacy.android.shared.original.core.ui.theme.white
 import mega.privacy.android.shared.original.core.ui.theme.white_alpha_012
 import mega.privacy.android.shared.original.core.ui.theme.white_alpha_054
@@ -536,7 +536,7 @@ private fun ExportSeparateKeySection(
                                 enabled = link.isNotBlank(),
                                 onClick = onLearnMore,
                             ),
-                        color = teal_300,
+                        color = accent_900,
                         fontSize = 14.sp,
                         fontWeight = FontWeight.W500,
                         style = MaterialTheme.typography.body2,
@@ -642,11 +642,11 @@ private fun ActionsSection(
                 OutlinedButton(
                     onClick = { onCopyLink(processedLink) },
                     shape = RoundedCornerShape(4.dp),
-                    border = BorderStroke(1.dp, teal_300),
+                    border = BorderStroke(1.dp, accent_900),
                     content = {
                         Text(
                             text = stringResource(id = R.string.button_copy_link),
-                            color = teal_300,
+                            color = accent_900,
                             fontSize = 14.sp,
                             fontWeight = FontWeight.W500,
                             style = MaterialTheme.typography.button,
@@ -660,11 +660,11 @@ private fun ActionsSection(
                     OutlinedButton(
                         onClick = { onCopyKey(key) },
                         shape = RoundedCornerShape(4.dp),
-                        border = BorderStroke(1.dp, teal_300),
+                        border = BorderStroke(1.dp, accent_900),
                         content = {
                             Text(
                                 text = stringResource(id = R.string.button_copy_key),
-                                color = teal_300,
+                                color = accent_900,
                                 fontSize = 14.sp,
                                 fontWeight = FontWeight.W500,
                                 style = MaterialTheme.typography.button,

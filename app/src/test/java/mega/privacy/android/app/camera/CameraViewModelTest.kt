@@ -6,6 +6,7 @@ import mega.privacy.android.app.camera.state.CameraState
 import mega.privacy.android.core.test.extension.CoroutineMainDispatcherExtension
 import mega.privacy.android.domain.usecase.file.CreateNewImageUriUseCase
 import mega.privacy.android.domain.usecase.file.CreateNewVideoUriUseCase
+import mega.privacy.android.domain.usecase.setting.MonitorGeoTaggingStatusUseCase
 import org.junit.jupiter.api.BeforeAll
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
@@ -22,6 +23,7 @@ internal class CameraViewModelTest {
     private val createNewImageUriUseCase: CreateNewImageUriUseCase = mock()
     private val createNewVideoUriUseCase: CreateNewVideoUriUseCase = mock()
     private val application: Application = mock()
+    private val monitorGeoTaggingStatusUseCase = mock<MonitorGeoTaggingStatusUseCase>()
 
     @BeforeAll
     fun setup() {
@@ -75,7 +77,8 @@ internal class CameraViewModelTest {
             createNewImageUriUseCase,
             createNewVideoUriUseCase,
             application,
-            extension.testDispatcher
+            extension.testDispatcher,
+            monitorGeoTaggingStatusUseCase
         )
     }
 

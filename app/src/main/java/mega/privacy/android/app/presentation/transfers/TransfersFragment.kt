@@ -19,16 +19,18 @@ import androidx.navigation.navOptions
 import com.google.accompanist.navigation.material.ExperimentalMaterialNavigationApi
 import com.google.accompanist.navigation.material.rememberBottomSheetNavigator
 import dagger.hilt.android.AndroidEntryPoint
+import mega.privacy.android.app.components.chatsession.ChatSessionContainer
 import mega.privacy.android.app.components.session.SessionContainer
 import mega.privacy.android.app.presentation.extensions.isDarkMode
 import mega.privacy.android.app.presentation.passcode.model.PasscodeCryptObjectFactory
+import mega.privacy.android.app.presentation.psa.PsaContainer
 import mega.privacy.android.app.presentation.security.check.PasscodeContainer
 import mega.privacy.android.app.presentation.transfers.view.IN_PROGRESS_TAB_INDEX
 import mega.privacy.android.app.presentation.transfers.view.navigation.compose.navigateToTransfersViewGraph
 import mega.privacy.android.app.presentation.transfers.view.navigation.compose.transfersViewNavigationGraph
 import mega.privacy.android.domain.entity.ThemeMode
 import mega.privacy.android.domain.usecase.GetThemeMode
-import mega.privacy.android.shared.original.core.ui.theme.OriginalTempTheme
+import mega.privacy.android.shared.original.core.ui.theme.OriginalTheme
 import javax.inject.Inject
 
 /**
@@ -54,40 +56,46 @@ internal class TransfersFragment : Fragment() {
         setViewCompositionStrategy(ViewCompositionStrategy.DisposeOnViewTreeLifecycleDestroyed)
         setContent {
             val mode by getThemeMode().collectAsStateWithLifecycle(initialValue = ThemeMode.System)
-            SessionContainer(shouldCheckChatSession = true) {
-                OriginalTempTheme(isDark = mode.isDarkMode()) {
-                    PasscodeContainer(
-                        passcodeCryptObjectFactory = passcodeCryptObjectFactory,
-                        content = {
-                            val bottomSheetNavigator = rememberBottomSheetNavigator()
-                            val navHostController = rememberNavController(bottomSheetNavigator)
-                            val scaffoldState = rememberScaffoldState()
-                            val tabIndex = arguments?.getInt(EXTRA_TAB) ?: IN_PROGRESS_TAB_INDEX
+            SessionContainer {
+                ChatSessionContainer {
+                    OriginalTheme(isDark = mode.isDarkMode()) {
+                        PasscodeContainer(
+                            passcodeCryptObjectFactory = passcodeCryptObjectFactory,
+                            content = {
+                                PsaContainer {
+                                    val bottomSheetNavigator = rememberBottomSheetNavigator()
+                                    val navHostController =
+                                        rememberNavController(bottomSheetNavigator)
+                                    val scaffoldState = rememberScaffoldState()
+                                    val tabIndex =
+                                        arguments?.getInt(EXTRA_TAB) ?: IN_PROGRESS_TAB_INDEX
 
-                            NavHost(
-                                navController = navHostController,
-                                startDestination = "start",
-                                modifier = Modifier.navigationBarsPadding()
-                            ) {
-                                composable("start") {
-                                    navHostController.navigateToTransfersViewGraph(
-                                        tabIndex = tabIndex,
-                                        navOptions = navOptions {
-                                            popUpTo("start") {
-                                                inclusive = true
-                                            }
-                                        })
+                                    NavHost(
+                                        navController = navHostController,
+                                        startDestination = "start",
+                                        modifier = Modifier.navigationBarsPadding()
+                                    ) {
+                                        composable("start") {
+                                            navHostController.navigateToTransfersViewGraph(
+                                                tabIndex = tabIndex,
+                                                navOptions = navOptions {
+                                                    popUpTo("start") {
+                                                        inclusive = true
+                                                    }
+                                                })
+                                        }
+
+                                        transfersViewNavigationGraph(
+                                            bottomSheetNavigator = bottomSheetNavigator,
+                                            navHostController = navHostController,
+                                            scaffoldState = scaffoldState,
+                                            onBackPress = { requireActivity().supportFinishAfterTransition() }
+                                        )
+                                    }
                                 }
-
-                                transfersViewNavigationGraph(
-                                    bottomSheetNavigator = bottomSheetNavigator,
-                                    navHostController = navHostController,
-                                    scaffoldState = scaffoldState,
-                                    onBackPress = { requireActivity().supportFinishAfterTransition() }
-                                )
                             }
-                        }
-                    )
+                        )
+                    }
                 }
             }
         }

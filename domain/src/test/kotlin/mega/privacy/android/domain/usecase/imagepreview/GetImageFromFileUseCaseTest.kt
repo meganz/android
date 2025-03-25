@@ -3,6 +3,7 @@ package mega.privacy.android.domain.usecase.imagepreview
 import com.google.common.truth.Truth.assertThat
 import kotlinx.coroutines.test.runTest
 import mega.privacy.android.domain.entity.imageviewer.ImageResult
+import mega.privacy.android.domain.entity.uri.UriPath
 import mega.privacy.android.domain.repository.FileSystemRepository
 import mega.privacy.android.domain.repository.thumbnailpreview.ThumbnailPreviewRepository
 import mega.privacy.android.domain.usecase.file.IsVideoFileUseCase
@@ -93,7 +94,7 @@ class GetImageFromFileUseCaseTest {
         whenever(file.absolutePath).thenReturn(filePath)
         whenever(file.name).thenReturn(fileName)
         whenever(file.length()).thenReturn(fileLength)
-        whenever(isVideoFileUseCase(filePath)).thenReturn(isVideo)
+        whenever(isVideoFileUseCase(UriPath(filePath))).thenReturn(isVideo)
         whenever(thumbnailPreviewRepository.getThumbnailOrPreviewFileName(fileName + fileLength)).thenReturn(
             thumbPreviewFileName
         )
@@ -102,7 +103,7 @@ class GetImageFromFileUseCaseTest {
 
         underTest.invoke(file)
 
-        verify(isVideoFileUseCase).invoke(filePath)
+        verify(isVideoFileUseCase).invoke(UriPath(filePath))
         verify(thumbnailPreviewRepository).getThumbnailOrPreviewFileName(fileName + fileLength)
         verify(thumbnailPreviewRepository).getPreviewCacheFolderPath()
         verify(fileSystemRepository, times(2)).doesFileExist(previewPath)
@@ -127,7 +128,7 @@ class GetImageFromFileUseCaseTest {
         whenever(file.absolutePath).thenReturn(filePath)
         whenever(file.name).thenReturn(fileName)
         whenever(file.length()).thenReturn(fileLength)
-        whenever(isVideoFileUseCase(filePath)).thenReturn(isVideo)
+        whenever(isVideoFileUseCase(UriPath(filePath))).thenReturn(isVideo)
         whenever(thumbnailPreviewRepository.getThumbnailOrPreviewFileName(fileName + fileLength)).thenReturn(
             thumbPreviewFileName
         )

@@ -25,11 +25,15 @@ import mega.privacy.android.domain.usecase.GetNodeByIdUseCase
 import mega.privacy.android.domain.usecase.IsHiddenNodesOnboardedUseCase
 import mega.privacy.android.domain.usecase.UpdateNodeSensitiveUseCase
 import mega.privacy.android.domain.usecase.account.MonitorAccountDetailUseCase
+import mega.privacy.android.domain.usecase.camerauploads.GetPrimarySyncHandleUseCase
+import mega.privacy.android.domain.usecase.camerauploads.GetSecondaryFolderNodeUseCase
+import mega.privacy.android.domain.usecase.chat.GetMyChatsFilesFolderIdUseCase
 import mega.privacy.android.domain.usecase.contact.GetContactUserNameFromDatabaseUseCase
 import mega.privacy.android.domain.usecase.favourites.IsAvailableOfflineUseCase
 import mega.privacy.android.domain.usecase.network.MonitorConnectivityUseCase
 import mega.privacy.android.domain.usecase.node.IsHidingActionAllowedUseCase
 import mega.privacy.android.domain.usecase.node.IsNodeDeletedFromBackupsUseCase
+import mega.privacy.android.domain.usecase.node.IsNodeSyncedUseCase
 import mega.privacy.android.domain.usecase.offline.RemoveOfflineNodeUseCase
 import mega.privacy.android.domain.usecase.shares.CreateShareKeyUseCase
 import nz.mega.sdk.MegaNode
@@ -113,6 +117,10 @@ class NodeOptionsViewModelTest {
         }.thenReturn(nodeDeviceCenterInformationFlow)
     }
     private val getBusinessStatusUseCase = mock<GetBusinessStatusUseCase>()
+    private val getCameraUploadsFolderHandleUseCase = mock<GetPrimarySyncHandleUseCase>()
+    private val getMediaUploadsFolderHandleUseCase = mock<GetSecondaryFolderNodeUseCase>()
+    private val getMyChatsFilesFolderIdUseCase = mock<GetMyChatsFilesFolderIdUseCase>()
+    private val isNodeSyncedUseCase = mock<IsNodeSyncedUseCase>()
 
     @BeforeEach
     fun setUp() {
@@ -130,6 +138,10 @@ class NodeOptionsViewModelTest {
             isHidingActionAllowedUseCase = isHidingActionAllowedUseCase,
             isAvailableOfflineUseCase = isAvailableOfflineUseCase,
             getBusinessStatusUseCase = getBusinessStatusUseCase,
+            getCameraUploadsFolderHandleUseCase = getCameraUploadsFolderHandleUseCase,
+            getMediaUploadsFolderHandleUseCase = getMediaUploadsFolderHandleUseCase,
+            getMyChatsFilesFolderIdUseCase = getMyChatsFilesFolderIdUseCase,
+            isNodeSyncedUseCase = isNodeSyncedUseCase,
             savedStateHandle = savedStateHandle,
         )
     }
@@ -146,6 +158,9 @@ class NodeOptionsViewModelTest {
             assertThat(initial.nodeDeviceCenterInformation).isNull()
             assertThat(initial.shareKeyCreated).isNull()
             assertThat(initial.isAvailableOffline).isFalse()
+            assertThat(initial.isUserAttributeFolder).isFalse()
+            assertThat(initial.isSyncedFolder).isFalse()
+            assertThat(initial.isSyncActionAllowed).isFalse()
         }
     }
 

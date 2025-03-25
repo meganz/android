@@ -17,6 +17,7 @@ import mega.privacy.android.domain.usecase.passcode.DisablePasscodeUseCase
 import mega.privacy.android.domain.usecase.passcode.EnableBiometricsUseCase
 import mega.privacy.android.domain.usecase.passcode.MonitorPasscodeTimeOutUseCase
 import mega.privacy.android.domain.usecase.passcode.MonitorPasscodeTypeUseCase
+import mega.privacy.android.domain.usecase.passcode.SetPasscodeTimeoutUseCase
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.extension.RegisterExtension
@@ -37,13 +38,14 @@ class PasscodeSettingsViewModelTest {
     private val disablePasscodeUseCase = mock<DisablePasscodeUseCase>()
     private val disableBiometricPasscodeUseCase = mock<DisableBiometricPasscodeUseCase>()
     private val enableBiometricsUseCase = mock<EnableBiometricsUseCase>()
-
+    private val setPasscodeTimeoutUseCase = mock<SetPasscodeTimeoutUseCase>()
 
     @BeforeEach
     internal fun setUp() {
         reset(
             monitorPasscodeLockPreferenceUseCase,
             monitorPasscodeTypeUseCase,
+            setPasscodeTimeoutUseCase,
         )
 
         stubFlows()
@@ -58,12 +60,13 @@ class PasscodeSettingsViewModelTest {
             disablePasscodeUseCase = disablePasscodeUseCase,
             disableBiometricPasscodeUseCase = disableBiometricPasscodeUseCase,
             enableBiometricsUseCase = enableBiometricsUseCase,
+            setPasscodeTimeoutUseCase = setPasscodeTimeoutUseCase
         )
     }
 
     @Test
     fun `test that enabled state is returned`() = runTest {
-        stubFlows(isEnabled = true)
+        stubFlows(timeOut = PasscodeTimeout.Immediate)
 
         initUnderTest()
 
@@ -75,7 +78,8 @@ class PasscodeSettingsViewModelTest {
     @Test
     fun `test that biometric state is returned as true if type is biometric`() = runTest {
         stubFlows(
-            passcodeType = PasscodeType.Biometric(PasscodeType.Password)
+            passcodeType = PasscodeType.Biometric(PasscodeType.Password),
+            timeOut = PasscodeTimeout.Immediate
         )
 
         initUnderTest()
@@ -88,7 +92,7 @@ class PasscodeSettingsViewModelTest {
     @Test
     fun `test that biometric state is returned as false if type is not biometric`() = runTest {
         stubFlows(
-            passcodeType = PasscodeType.Password
+            timeOut = PasscodeTimeout.Immediate
         )
 
         initUnderTest()
@@ -125,7 +129,8 @@ class PasscodeSettingsViewModelTest {
     fun `test that disable biometrics calls the correct use case`() =
         runTest {
             stubFlows(
-                passcodeType = PasscodeType.Biometric(PasscodeType.Pin(4))
+                passcodeType = PasscodeType.Biometric(PasscodeType.Pin(4)),
+                timeOut = PasscodeTimeout.Immediate
             )
             initUnderTest()
 
@@ -137,7 +142,8 @@ class PasscodeSettingsViewModelTest {
     @Test
     fun `test that enable biometrics calls the correct use case`() = runTest {
         stubFlows(
-            passcodeType = PasscodeType.Pin(4)
+            passcodeType = PasscodeType.Pin(4),
+            timeOut = PasscodeTimeout.Immediate
         )
         initUnderTest()
 
@@ -146,9 +152,21 @@ class PasscodeSettingsViewModelTest {
         verify(enableBiometricsUseCase).invoke()
     }
 
+    @Test
+    fun `test that default timeout is set if not found`() = runTest {
+        stubFlows(timeOut = null)
+
+        initUnderTest()
+
+        underTest.onPasscodeEnabled()
+
+        verify(setPasscodeTimeoutUseCase).invoke(PasscodeTimeout.DEFAULT)
+    }
+
     private fun stubFlows(
         isEnabled: Boolean = true,
         passcodeType: PasscodeType = PasscodeType.Password,
+        timeOut: PasscodeTimeout? = PasscodeTimeout.Immediate,
     ) {
         monitorPasscodeLockPreferenceUseCase.stub {
             on { invoke() } doReturn isEnabled.asHotFlow()
@@ -157,7 +175,7 @@ class PasscodeSettingsViewModelTest {
             on { invoke() } doReturn passcodeType.asHotFlow()
         }
         monitorPasscodeTimeOutUseCase.stub {
-            on { invoke() } doReturn PasscodeTimeout.Immediate.asHotFlow()
+            on { invoke() } doReturn timeOut.asHotFlow()
         }
     }
 

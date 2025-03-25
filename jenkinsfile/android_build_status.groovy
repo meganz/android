@@ -5,7 +5,7 @@ BUILD_STEP = ""
 GMS_APK_BUILD_LOG = "gms_build.log"
 QA_APK_BUILD_LOG = "qa_build.log"
 
-MODULE_LIST = ['app', 'domain', 'shared/original-core-ui', 'data', 'feature/sync', 'feature/devicecenter', 'legacy-core-ui']
+MODULE_LIST = ['app', 'domain', 'data', 'analytics', 'feature/chat', 'feature/devicecenter', 'feature/sync', 'shared/original-core-ui', 'shared/sync', 'core/formatter', 'legacy-core-ui']
 
 LINT_REPORT_FOLDER = "lint_reports"
 LINT_REPORT_ARCHIVE = "lint_reports.zip"
@@ -83,7 +83,7 @@ pipeline {
         LC_ALL = "en_US.UTF-8"
         LANG = "en_US.UTF-8"
 
-        NDK_ROOT = "/opt/buildtools/android-sdk/ndk/21.3.6528147"
+        NDK_ROOT = "/opt/buildtools/android-sdk/ndk/27.1.12297006"
         JAVA_HOME = "/opt/buildtools/zulu17.42.19-ca-jdk17.0.7-macosx"
         ANDROID_HOME = "/opt/buildtools/android-sdk"
 
@@ -264,50 +264,50 @@ pipeline {
                                 util.useArtifactory() {
                                     String buildReportPath = "build/unittest/html"
                                     try {
-                                        sh "./gradlew domain:jacocoTestReport"
+                                        sh "./gradlew --no-daemon domain:jacocoTestReport"
                                     } finally {
                                         // if gradle command fails, we collect the test report. And the build will discontinue.
                                         UNIT_TEST_RESULT_LINK_MAP.put("domain", unitTestArchiveLink("domain/$buildReportPath", "unit_test_result_domain.zip"))
                                     }
 
                                     try {
-                                        sh "./gradlew data:testDebugUnitTestCoverage"
+                                        sh "./gradlew --no-daemon data:testDebugUnitTestCoverage"
                                     } finally {
                                         UNIT_TEST_RESULT_LINK_MAP.put("data", unitTestArchiveLink("data/$buildReportPath", "unit_test_result_data.zip"))
                                     }
 
                                     try {
-                                        sh "./gradlew app:createUnitTestCoverageReport"
+                                        sh "./gradlew --no-daemon app:createUnitTestCoverageReport"
                                     } finally {
                                         UNIT_TEST_RESULT_LINK_MAP.put("app", unitTestArchiveLink("app/$buildReportPath", "unit_test_result_app.zip"))
                                     }
 
                                     try {
-                                        sh "./gradlew feature:devicecenter:testDebugUnitTestCoverage"
+                                        sh "./gradlew --no-daemon feature:devicecenter:testDebugUnitTestCoverage"
                                     } finally {
                                         UNIT_TEST_RESULT_LINK_MAP.put("feature/devicecenter", unitTestArchiveLink("feature/devicecenter/$buildReportPath", "unit_test_result_feature_devicecenter.zip"))
                                     }
 
                                     try {
-                                        sh "./gradlew feature:sync:testDebugUnitTestCoverage"
+                                        sh "./gradlew --no-daemon feature:sync:testDebugUnitTestCoverage"
                                     } finally {
                                         UNIT_TEST_RESULT_LINK_MAP.put("feature/sync", unitTestArchiveLink("feature/sync/$buildReportPath", "unit_test_result_feature_sync.zip"))
                                     }
 
                                     try {
-                                        sh "./gradlew shared:original-core-ui:testDebugUnitTestCoverage"
+                                        sh "./gradlew --no-daemon shared:original-core-ui:testDebugUnitTestCoverage"
                                     } finally {
                                         UNIT_TEST_RESULT_LINK_MAP.put("shared/original-core-ui", unitTestArchiveLink("shared/original-core-ui/$buildReportPath", "unit_test_result_shared_original_core_ui.zip"))
                                     }
 
                                     try {
-                                        sh "./gradlew legacy-core-ui:testDebugUnitTestCoverage"
+                                        sh "./gradlew --no-daemon legacy-core-ui:testDebugUnitTestCoverage"
                                     } finally {
                                         UNIT_TEST_RESULT_LINK_MAP.put("legacy-core-ui", unitTestArchiveLink("legacy-core-ui/$buildReportPath", "unit_test_result_legacy_core_ui.zip"))
                                     }
 
                                     String htmlOutput = "coverage.html"
-                                    sh "./gradlew collectCoverage --modules \"${MODULE_LIST.join(",")}\" --html-output ${htmlOutput}"
+                                    sh "./gradlew --no-daemon collectCoverage --modules \"${MODULE_LIST.join(",")}\" --html-output ${htmlOutput}"
                                     COVERAGE_SUMMARY = getHtmlReport(htmlOutput, "No coverage report found")
                                 }
                             }
@@ -337,7 +337,7 @@ pipeline {
 
                                 util.useArtifactory() {
                                     sh "mv custom_lint.xml lint.xml"
-                                    sh "./gradlew lint"
+                                    sh "./gradlew --no-daemon lint"
                                 }
 
                                 MODULE_LIST.each { module ->
@@ -469,7 +469,7 @@ static String wrapBuildWarnings(String rawWarning) {
  */
 def generateLintSummary(String module) {
     def targetFile = "${module}_processed-lint-results.json"
-    sh "./gradlew generateLintReport --lint-results $WORKSPACE/${module}/build/reports/lint-results.xml --target-file ${targetFile}"
+    sh "./gradlew --no-daemon generateLintReport --lint-results $WORKSPACE/${module}/build/reports/lint-results.xml --target-file ${targetFile}"
     def lintJsonFile = readFile(targetFile)
     def lintJsonContent = new HashMap(new groovy.json.JsonSlurper().parseText(lintJsonFile))
     print("lintSummary($module) = ${lintJsonContent}")

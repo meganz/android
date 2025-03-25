@@ -33,6 +33,7 @@ import androidx.activity.enableEdgeToEdge
 import androidx.activity.viewModels
 import androidx.appcompat.app.ActionBar
 import androidx.appcompat.app.AlertDialog
+import androidx.appcompat.app.AppCompatActivity
 import androidx.appcompat.widget.AppCompatEditText
 import androidx.appcompat.widget.SearchView
 import androidx.core.content.ContextCompat
@@ -59,7 +60,10 @@ import mega.privacy.android.app.extensions.consumeInsetsWithToolbar
 import mega.privacy.android.app.main.providers.CloudDriveProviderFragment
 import mega.privacy.android.app.main.providers.IncomingSharesProviderFragment
 import mega.privacy.android.app.main.providers.ProviderPageAdapter
+import mega.privacy.android.app.presentation.container.AppContainerWrapper
 import mega.privacy.android.app.presentation.provider.FileProviderViewModel
+import mega.privacy.android.app.presentation.security.PasscodeCheck
+import mega.privacy.android.app.presentation.settings.model.StorageTargetPreference
 import mega.privacy.android.app.presentation.transfers.starttransfer.view.createStartTransferView
 import mega.privacy.android.app.utils.AlertDialogUtil.dismissAlertDialogIfExists
 import mega.privacy.android.app.utils.AlertsAndWarnings.showOverDiskQuotaPaywallWarning
@@ -84,6 +88,7 @@ import mega.privacy.android.domain.entity.user.UserCredentials
 import mega.privacy.android.domain.qualifier.LoginMutex
 import mega.privacy.android.domain.usecase.account.SetUserCredentialsUseCase
 import mega.privacy.android.domain.usecase.login.GetAccountCredentialsUseCase
+import mega.privacy.android.navigation.MegaNavigator
 import nz.mega.sdk.MegaApiAndroid
 import nz.mega.sdk.MegaApiJava
 import nz.mega.sdk.MegaApiJava.INVALID_HANDLE
@@ -121,7 +126,7 @@ import javax.inject.Inject
  */
 @SuppressLint("NewApi")
 @AndroidEntryPoint
-class FileProviderActivity : PasscodeFileProviderActivity(), MegaRequestListenerInterface,
+class FileProviderActivity : AppCompatActivity(), MegaRequestListenerInterface,
     MegaGlobalListenerInterface, MegaTransferListenerInterface {
 
     @Inject
@@ -147,6 +152,18 @@ class FileProviderActivity : PasscodeFileProviderActivity(), MegaRequestListener
 
     @Inject
     lateinit var setUserCredentialsUseCase: SetUserCredentialsUseCase
+
+    /**
+     * Mega navigator
+     */
+    @Inject
+    lateinit var megaNavigator: MegaNavigator
+
+    @Inject
+    lateinit var appContainerWrapper: AppContainerWrapper
+
+    @Inject
+    lateinit var passcodeCheck: PasscodeCheck
 
     private val viewModel by viewModels<FileProviderViewModel>()
 
@@ -269,6 +286,7 @@ class FileProviderActivity : PasscodeFileProviderActivity(), MegaRequestListener
         requestWindowFeature(Window.FEATURE_NO_TITLE)
         enableEdgeToEdge()
         super.onCreate(savedInstanceState)
+        appContainerWrapper.setPasscodeCheck(passcodeCheck)
         onBackPressedDispatcher.addCallback(this, onBackPressedCallback)
         setStatusBarTextColor(this@FileProviderActivity)
         fileProviderActivity = this@FileProviderActivity
@@ -461,9 +479,15 @@ class FileProviderActivity : PasscodeFileProviderActivity(), MegaRequestListener
     private fun addStartTransfersView(root: ViewGroup) {
         root.addView(
             createStartTransferView(
-                this,
-                viewModel.uiState.map { it.startDownloadEvent },
-                viewModel::consumeTransferTriggerEvent
+                activity = this,
+                transferEventState = viewModel.uiState.map { it.startDownloadEvent },
+                onConsumeEvent = viewModel::consumeTransferTriggerEvent,
+                navigateToStorageSettings = {
+                    megaNavigator.openSettings(
+                        this,
+                        StorageTargetPreference
+                    )
+                }
             )
         )
     }
@@ -533,7 +557,7 @@ class FileProviderActivity : PasscodeFileProviderActivity(), MegaRequestListener
             }
         }
         bLoginLol = findViewById<Button?>(R.id.button_login).apply {
-            text = getString(R.string.login_text)
+            text = getString(sharedR.string.login_text)
             setOnClickListener { submitForm() }
         }
         loginCreateAccount = findViewById<LinearLayout?>(R.id.login_create_account_layout).apply {
@@ -1555,7 +1579,6 @@ class FileProviderActivity : PasscodeFileProviderActivity(), MegaRequestListener
         }
     }
 
-    override fun onReloadNeeded(api: MegaApiJava) {}
     public override fun onDestroy() {
         megaApi.removeRequestListener(this@FileProviderActivity)
         megaApi.removeTransferListener(this@FileProviderActivity)

@@ -19,4 +19,9 @@ interface PermissionRepository {
      * Has manage external storage permission
      */
     fun hasManageExternalStoragePermission(): Boolean
+
+    /**
+     * Has location permission
+     */
+    fun isLocationPermissionGranted(): Boolean
 }

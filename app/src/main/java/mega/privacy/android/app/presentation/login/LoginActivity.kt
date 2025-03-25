@@ -3,13 +3,8 @@ package mega.privacy.android.app.presentation.login
 import android.annotation.SuppressLint
 import android.content.Intent
 import android.content.pm.ActivityInfo
-import android.graphics.Rect
 import android.net.Uri
 import android.os.Bundle
-import android.util.TypedValue
-import android.view.View
-import android.view.ViewGroup
-import android.view.ViewTreeObserver
 import android.view.WindowManager
 import androidx.activity.OnBackPressedCallback
 import androidx.activity.enableEdgeToEdge
@@ -27,13 +22,11 @@ import mega.privacy.android.app.MegaApplication
 import mega.privacy.android.app.R
 import mega.privacy.android.app.arch.extensions.collectFlow
 import mega.privacy.android.app.databinding.ActivityLoginBinding
-import mega.privacy.android.app.extensions.isTablet
 import mega.privacy.android.app.globalmanagement.MegaChatRequestHandler
-import mega.privacy.android.app.interfaces.OnKeyboardVisibilityListener
-import mega.privacy.android.app.main.CreateAccountFragment
 import mega.privacy.android.app.main.ManagerActivity
 import mega.privacy.android.app.presentation.extensions.toConstant
 import mega.privacy.android.app.presentation.login.confirmemail.ConfirmEmailFragment
+import mega.privacy.android.app.presentation.login.createaccount.CreateAccountComposeFragment
 import mega.privacy.android.app.presentation.login.model.LoginFragmentType
 import mega.privacy.android.app.presentation.login.onboarding.TourFragment
 import mega.privacy.android.app.presentation.login.reportissue.ReportIssueViaEmailFragment
@@ -68,7 +61,6 @@ class LoginActivity : BaseActivity(), MegaRequestListenerInterface {
 
     //Fragments
     private var loginFragment: LoginFragment? = null
-    private var createAccountFragment: CreateAccountFragment? = null
 
     private var visibleFragment = 0
     private var sessionTemp: String? = null
@@ -264,16 +256,20 @@ class LoginActivity : BaseActivity(), MegaRequestListenerInterface {
 
             Constants.CREATE_ACCOUNT_FRAGMENT -> {
                 Timber.d("Show CREATE_ACCOUNT_FRAGMENT")
-                if (createAccountFragment == null || cancelledConfirmationProcess) {
-                    createAccountFragment = CreateAccountFragment()
-                    cancelledConfirmationProcess = false
+                lifecycleScope.launch {
+                    val createActFragment =
+                        CreateAccountComposeFragment()
+
+                    if (cancelledConfirmationProcess) {
+                        cancelledConfirmationProcess = false
+                    }
+
+                    supportFragmentManager.beginTransaction()
+                        .replace(R.id.fragment_container_login, createActFragment)
+                        .commitNowAllowingStateLoss()
+
+                    window.clearFlags(WindowManager.LayoutParams.FLAG_LAYOUT_NO_LIMITS)
                 }
-
-                supportFragmentManager.beginTransaction()
-                    .replace(R.id.fragment_container_login, createAccountFragment ?: return)
-                    .commitNowAllowingStateLoss()
-
-                window.clearFlags(WindowManager.LayoutParams.FLAG_LAYOUT_NO_LIMITS)
             }
 
             Constants.TOUR_FRAGMENT -> {
@@ -336,16 +332,14 @@ class LoginActivity : BaseActivity(), MegaRequestListenerInterface {
      */
     @SuppressLint("SourceLockedOrientationActivity")
     private fun restrictOrientation() {
-        if (isTablet()) {
-            requestedOrientation =
-                if (visibleFragment == Constants.TOUR_FRAGMENT) {
-                    Timber.d("Tablet landscape mode allowed")
-                    ActivityInfo.SCREEN_ORIENTATION_FULL_USER
-                } else {
-                    Timber.d("Tablet landscape mode restricted")
-                    ActivityInfo.SCREEN_ORIENTATION_PORTRAIT
-                }
-        }
+        requestedOrientation =
+            if (visibleFragment == Constants.TOUR_FRAGMENT || visibleFragment == Constants.CREATE_ACCOUNT_FRAGMENT) {
+                Timber.d("Tour/create account screen landscape mode allowed")
+                ActivityInfo.SCREEN_ORIENTATION_FULL_USER
+            } else {
+                Timber.d("Other screens landscape mode restricted")
+                ActivityInfo.SCREEN_ORIENTATION_PORTRAIT
+            }
     }
 
     override fun shouldSetStatusBarTextColor() = false
@@ -456,45 +450,6 @@ class LoginActivity : BaseActivity(), MegaRequestListenerInterface {
         Timber.d("onSaveInstanceState")
         super.onSaveInstanceState(outState)
         outState.putInt(Constants.VISIBLE_FRAGMENT, visibleFragment)
-    }
-
-    /**
-     * Sets [OnKeyboardVisibilityListener].
-     *
-     * @param onKeyboardVisibilityListener The listener.
-     */
-    fun setKeyboardVisibilityListener(onKeyboardVisibilityListener: OnKeyboardVisibilityListener) {
-        val parentView = (findViewById<View>(android.R.id.content) as ViewGroup).getChildAt(0)
-        if (parentView == null) {
-            Timber.w("Cannot set the keyboard visibility listener. Parent view is NULL.")
-            return
-        }
-
-        parentView.viewTreeObserver.addOnGlobalLayoutListener(object :
-            ViewTreeObserver.OnGlobalLayoutListener {
-            private var alreadyOpen = false
-            private val defaultKeyboardHeightDP = 100
-            private val EstimatedKeyboardDP = defaultKeyboardHeightDP + 48
-            private val rect = Rect()
-
-            override fun onGlobalLayout() {
-                val estimatedKeyboardHeight = TypedValue.applyDimension(
-                    TypedValue.COMPLEX_UNIT_DIP,
-                    EstimatedKeyboardDP.toFloat(),
-                    parentView.resources.displayMetrics
-                ).toInt()
-                parentView.getWindowVisibleDisplayFrame(rect)
-
-                val heightDiff = parentView.rootView.height - (rect.bottom - rect.top)
-                val isShown = heightDiff >= estimatedKeyboardHeight
-
-                if (isShown == alreadyOpen) {
-                    return
-                }
-                alreadyOpen = isShown
-                onKeyboardVisibilityListener.onVisibilityChanged(isShown)
-            }
-        })
     }
 
     /**

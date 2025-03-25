@@ -15,6 +15,7 @@ import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.callbackFlow
 import kotlinx.coroutines.flow.catch
 import kotlinx.coroutines.flow.distinctUntilChanged
+import kotlinx.coroutines.flow.filter
 import kotlinx.coroutines.flow.filterIsInstance
 import kotlinx.coroutines.flow.filterNotNull
 import kotlinx.coroutines.flow.firstOrNull
@@ -23,6 +24,7 @@ import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.mapNotNull
 import kotlinx.coroutines.flow.shareIn
 import kotlinx.coroutines.flow.update
+import kotlinx.coroutines.launch
 import kotlinx.coroutines.suspendCancellableCoroutine
 import kotlinx.coroutines.withContext
 import mega.privacy.android.data.R
@@ -38,6 +40,7 @@ import mega.privacy.android.data.gateway.api.MegaChatApiGateway
 import mega.privacy.android.data.gateway.chat.ChatStorageGateway
 import mega.privacy.android.data.listener.OptionalMegaChatRequestListenerInterface
 import mega.privacy.android.data.listener.OptionalMegaRequestListenerInterface
+import mega.privacy.android.data.mapper.ChatFilesFolderUserAttributeMapper
 import mega.privacy.android.data.mapper.chat.ChatConnectionStatusMapper
 import mega.privacy.android.data.mapper.chat.ChatHistoryLoadStatusMapper
 import mega.privacy.android.data.mapper.chat.ChatInitStateMapper
@@ -79,6 +82,7 @@ import mega.privacy.android.domain.entity.chat.room.update.ChatRoomMessageUpdate
 import mega.privacy.android.domain.entity.contacts.InviteContactRequest
 import mega.privacy.android.domain.entity.node.NodeId
 import mega.privacy.android.domain.entity.settings.ChatSettings
+import mega.privacy.android.domain.exception.MegaException
 import mega.privacy.android.domain.exception.chat.ParticipantAlreadyExistsException
 import mega.privacy.android.domain.exception.chat.ResourceDoesNotExistChatException
 import mega.privacy.android.domain.qualifier.ApplicationScope
@@ -92,6 +96,7 @@ import nz.mega.sdk.MegaChatNotificationListenerInterface
 import nz.mega.sdk.MegaChatRequest
 import nz.mega.sdk.MegaChatRoom
 import nz.mega.sdk.MegaError
+import nz.mega.sdk.MegaError.API_ENOENT
 import nz.mega.sdk.MegaRequest
 import nz.mega.sdk.MegaUser
 import timber.log.Timber
@@ -167,6 +172,7 @@ internal class ChatRepositoryImpl @Inject constructor(
     private val chatRoomMessageUpdateMapper: ChatRoomMessageUpdateMapper,
     private val chatPresenceConfigMapper: ChatPresenceConfigMapper,
     @ApplicationContext private val context: Context,
+    private val chatFilesFolderUserAttributeMapper: ChatFilesFolderUserAttributeMapper,
 ) : ChatRepository {
     private val richLinkConfig = MutableStateFlow(RichLinkConfig())
     private var chatRoomUpdates: HashMap<Long, Flow<ChatRoomUpdate>> = hashMapOf()
@@ -174,6 +180,13 @@ internal class ChatRepositoryImpl @Inject constructor(
     private val joiningIdsFlow = MutableSharedFlow<MutableSet<Long>>()
     private val leavingIds = mutableSetOf<Long>()
     private val leavingIdsFlow = MutableSharedFlow<MutableSet<Long>>()
+    private val openingChatWithLinkIds = mutableSetOf<Long>()
+
+    private var myChatsFilesFolderIdFlow: MutableStateFlow<NodeId?> = MutableStateFlow(null)
+
+    init {
+        monitorChatsFilesFolderIdChanges()
+    }
 
     override suspend fun getChatInitState(): ChatInitState = withContext(ioDispatcher) {
         chatInitStateMapper(megaChatApiGateway.initState)
@@ -337,6 +350,13 @@ internal class ChatRepositoryImpl @Inject constructor(
         withContext(ioDispatcher) {
             megaChatApiGateway.getChatRooms()
                 .map { chatRoomMapper(it) }
+        }
+
+    override suspend fun getNoteToSelfChat(): ChatRoom? =
+        withContext(ioDispatcher) {
+            megaChatApiGateway.getNoteToSelfChat()?.let {
+                chatRoomMapper(it)
+            }
         }
 
     override suspend fun getAllChatRooms(): List<CombinedChatRoom> =
@@ -737,7 +757,6 @@ internal class ChatRepositoryImpl @Inject constructor(
                 val listener = OptionalMegaChatRequestListenerInterface(
                     onRequestFinish = { _: MegaChatRequest, error: MegaChatError ->
                         if (error.errorCode == MegaChatError.ERROR_OK) {
-                            localStorageGateway.removePendingMessageByChatId(chatId)
                             continuation.resume(Unit)
                         } else {
                             continuation.failWithError(error, "clearChatHistory")
@@ -746,6 +765,7 @@ internal class ChatRepositoryImpl @Inject constructor(
                 )
                 megaChatApiGateway.clearChatHistory(chatId = chatId, listener = listener)
             }
+            chatStorageGateway.clearChatPendingMessages(chatId)
         }
 
     override suspend fun archiveChat(chatId: Long, archive: Boolean) =
@@ -773,7 +793,7 @@ internal class ChatRepositoryImpl @Inject constructor(
             chatRoom?.getPeerHandle(peerNo)
         }
 
-    override suspend fun createChat(isGroup: Boolean, userHandles: List<Long>) =
+    override suspend fun createChat(isGroup: Boolean, userHandles: List<Long>?) =
         withContext(ioDispatcher) {
             suspendCancellableCoroutine { continuation ->
                 val listener = continuation.getChatRequestListener("onRequestCreateChatCompleted") {
@@ -781,7 +801,7 @@ internal class ChatRepositoryImpl @Inject constructor(
                 }
                 megaChatApiGateway.createChat(
                     isGroup = isGroup,
-                    peers = megaChatPeerListMapper(userHandles),
+                    peers = if(userHandles == null) null else megaChatPeerListMapper(userHandles),
                     listener = listener
                 )
             }
@@ -1258,4 +1278,78 @@ internal class ChatRepositoryImpl @Inject constructor(
                 MegaChatApi.CHAT_GET_ARCHIVED
             )?.map(chatListItemMapper::invoke) ?: emptyList()
         }
+
+    override fun setChatOpeningWithLink(chatId: Long) {
+        openingChatWithLinkIds.add(chatId)
+    }
+
+    override fun removeChatOpeningWithLink(chatId: Long) {
+        openingChatWithLinkIds.remove(chatId)
+    }
+
+    override fun isChatOpeningWithLink(chatId: Long) = openingChatWithLinkIds.contains(chatId)
+
+    override suspend fun setMyChatFilesFolder(nodeHandle: Long) = withContext(ioDispatcher) {
+        suspendCancellableCoroutine { continuation ->
+            val listener = continuation.getRequestListener("setMyChatFilesFolder") {
+                myChatsFilesFolderIdFlow.value = NodeId(nodeHandle)
+                chatFilesFolderUserAttributeMapper(it.megaStringMap)?.let { value ->
+                    megaApiGateway.base64ToHandle(value)
+                        .takeIf { handle -> handle != megaApiGateway.getInvalidHandle() }
+                }
+            }
+            megaApiGateway.setMyChatFilesFolder(nodeHandle, listener)
+        }
+    }
+
+    override suspend fun getMyChatsFilesFolderId(): NodeId? =
+        myChatsFilesFolderIdFlow.value ?: run {
+            getMyChatsFilesFolderIdFromGateway()
+        }
+
+    private suspend fun getMyChatsFilesFolderIdFromGateway(): NodeId? = withContext(ioDispatcher) {
+        runCatching {
+            suspendCancellableCoroutine { continuation ->
+                val listener = continuation.getRequestListener("getMyChatFilesFolder") {
+                    NodeId(it.nodeHandle)
+                }
+                megaApiGateway.getMyChatFilesFolder(listener)
+
+            }
+        }.getOrElse {
+            //if error is API_ENOENT it means folder is not set, not an actual error. Otherwise re-throw the error
+            if ((it as? MegaException)?.errorCode != API_ENOENT) {
+                throw (it)
+            } else {
+                null
+            }
+        }?.also {
+            myChatsFilesFolderIdFlow.value = it
+        }
+    }
+
+    private fun monitorChatsFilesFolderIdChanges() {
+        sharingScope.launch {
+            megaApiGateway.globalUpdates
+                .filterIsInstance<GlobalUpdate.OnUsersUpdate>()
+                .filter {
+                    println("filter") //TODO remove
+                    val currentUserHandle = megaApiGateway.myUser?.handle
+                    it.users?.any { user ->
+                        user.isOwnChange == 0
+                                && user.hasChanged(MegaUser.CHANGE_TYPE_MY_CHAT_FILES_FOLDER.toLong())
+                                && user.handle == currentUserHandle
+                    } == true
+                }
+                .catch { Timber.e(it) }
+                .flowOn(ioDispatcher)
+                .collect {
+                    runCatching {
+                        getMyChatsFilesFolderIdFromGateway()
+                    }.onFailure {
+                        Timber.e(it)
+                    }
+                }
+        }
+    }
 }

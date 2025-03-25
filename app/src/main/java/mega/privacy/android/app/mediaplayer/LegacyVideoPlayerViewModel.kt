@@ -12,7 +12,8 @@ import android.os.Handler
 import android.os.Looper
 import android.provider.MediaStore
 import android.view.PixelCopy
-import android.view.SurfaceView
+import android.view.Surface
+import android.view.TextureView
 import android.view.View
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableIntStateOf
@@ -102,6 +103,7 @@ import mega.privacy.android.app.utils.Constants.ZIP_ADAPTER
 import mega.privacy.android.app.utils.FileUtil
 import mega.privacy.android.app.utils.MegaNodeUtil
 import mega.privacy.android.app.utils.ThumbnailUtils
+import mega.privacy.android.data.gateway.api.MegaApiGateway
 import mega.privacy.android.data.model.MimeTypeList
 import mega.privacy.android.domain.entity.SortOrder
 import mega.privacy.android.domain.entity.VideoFileTypeInfo
@@ -116,7 +118,6 @@ import mega.privacy.android.domain.exception.MegaException
 import mega.privacy.android.domain.exception.QuotaExceededMegaException
 import mega.privacy.android.domain.qualifier.ApplicationScope
 import mega.privacy.android.domain.qualifier.IoDispatcher
-import mega.privacy.android.domain.usecase.GetBackupsNodeUseCase
 import mega.privacy.android.domain.usecase.GetLocalFilePathUseCase
 import mega.privacy.android.domain.usecase.GetLocalFolderLinkFromMegaApiFolderUseCase
 import mega.privacy.android.domain.usecase.GetLocalFolderLinkFromMegaApiUseCase
@@ -154,6 +155,7 @@ import mega.privacy.android.domain.usecase.mediaplayer.videoplayer.MonitorVideoR
 import mega.privacy.android.domain.usecase.mediaplayer.videoplayer.SavePlaybackTimesUseCase
 import mega.privacy.android.domain.usecase.mediaplayer.videoplayer.SetVideoRepeatModeUseCase
 import mega.privacy.android.domain.usecase.mediaplayer.videoplayer.TrackPlaybackPositionUseCase
+import mega.privacy.android.domain.usecase.node.backup.GetBackupsNodeUseCase
 import mega.privacy.android.domain.usecase.offline.GetOfflineNodeInformationByIdUseCase
 import mega.privacy.android.domain.usecase.setting.MonitorSubFolderMediaDiscoverySettingsUseCase
 import mega.privacy.android.domain.usecase.thumbnailpreview.GetThumbnailUseCase
@@ -182,6 +184,7 @@ class LegacyVideoPlayerViewModel @Inject constructor(
     @VideoPlayer private val mediaPlayerGateway: MediaPlayerGateway,
     @IoDispatcher private val ioDispatcher: CoroutineDispatcher,
     @ApplicationScope private val applicationScope: CoroutineScope,
+    private val megaApiGateway: MegaApiGateway,
     private val monitorTransferEventsUseCase: MonitorTransferEventsUseCase,
     private val playlistItemMapper: PlaylistItemMapper,
     private val trackPlaybackPositionUseCase: TrackPlaybackPositionUseCase,
@@ -320,6 +323,8 @@ class LegacyVideoPlayerViewModel @Inject constructor(
 
     private var currentPlayingVideoSize: Pair<Int, Int>? = null
 
+    private var isZoomInEnabled = false
+
     private val _isSubtitleDialogShown = savedStateHandle.getStateFlow(
         viewModelScope,
         subtitleDialogShowKey,
@@ -354,6 +359,9 @@ class LegacyVideoPlayerViewModel @Inject constructor(
     }
 
     init {
+        viewModelScope.launch {
+            isZoomInEnabled = getFeatureFlagValueUseCase(AppFeatures.VideoPlayerZoomInEnable)
+        }
         viewModelScope.launch {
             combine(
                 _isSubtitleShown,
@@ -598,6 +606,11 @@ class LegacyVideoPlayerViewModel @Inject constructor(
         captureView: View,
         successCallback: (bitmap: Bitmap) -> Unit,
     ) {
+        val textureView = captureView as? TextureView
+        if (textureView == null || !textureView.isAvailable) {
+            Timber.d("Capture screenshot error: TextureView is not available")
+            return
+        }
         // Using video size for the capture size to ensure the screenshot is complete.
         val (captureWidth, captureHeight) = currentPlayingVideoSize?.let { (width, height) ->
             width to height
@@ -608,8 +621,9 @@ class LegacyVideoPlayerViewModel @Inject constructor(
                 captureHeight,
                 Bitmap.Config.ARGB_8888
             )
+            val surfaceView = Surface(textureView.surfaceTexture)
             PixelCopy.request(
-                captureView as SurfaceView,
+                surfaceView,
                 Rect(0, 0, captureWidth, captureHeight),
                 screenshotBitmap,
                 { copyResult ->
@@ -778,7 +792,7 @@ class LegacyVideoPlayerViewModel @Inject constructor(
                     FROM_IMAGE_VIEWER,
                     FROM_ALBUM_SHARING,
                     FAVOURITES_ADAPTER,
-                    -> {
+                        -> {
                         val parentHandle =
                             intent.getLongExtra(INTENT_EXTRA_KEY_PARENT_NODE_HANDLE, INVALID_HANDLE)
                         val order = getSortOrderFromIntent(intent)
@@ -1211,15 +1225,13 @@ class LegacyVideoPlayerViewModel @Inject constructor(
     }
 
     internal fun saveVideoWatchedTime() = viewModelScope.launch {
-        if (getFeatureFlagValueUseCase(AppFeatures.VideoRecentlyWatched)) {
-            mediaPlayerGateway.getCurrentMediaItem()?.mediaId?.toLong()?.let {
-                saveVideoRecentlyWatchedUseCase(
-                    it,
-                    Instant.now().toEpochMilli() / 1000,
-                    collectionId ?: 0L,
-                    collectionTitle
-                )
-            }
+        mediaPlayerGateway.getCurrentMediaItem()?.mediaId?.toLong()?.let {
+            saveVideoRecentlyWatchedUseCase(
+                it,
+                Instant.now().toEpochMilli() / 1000,
+                collectionId ?: 0L,
+                collectionTitle
+            )
         }
     }
 
@@ -1307,7 +1319,7 @@ class LegacyVideoPlayerViewModel @Inject constructor(
             FROM_CHAT,
             FILE_LINK_ADAPTER,
             PHOTO_SYNC_ADAPTER,
-            -> {
+                -> {
                 return oldType == type
             }
 
@@ -1319,7 +1331,7 @@ class LegacyVideoPlayerViewModel @Inject constructor(
             OUTGOING_SHARES_ADAPTER,
             CONTACT_FILE_ADAPTER,
             FOLDER_LINK_ADAPTER,
-            -> {
+                -> {
                 val oldParentHandle =
                     oldIntent.getLongExtra(INTENT_EXTRA_KEY_PARENT_NODE_HANDLE, INVALID_HANDLE)
                 val newParentHandle =
@@ -1943,6 +1955,12 @@ class LegacyVideoPlayerViewModel @Inject constructor(
         cancelSearch()
         clear()
     }
+
+    internal suspend fun getCurrentPlayingNode() = withContext(ioDispatcher) {
+        megaApiGateway.getMegaNodeByHandle(playingHandle)
+    }
+
+    internal fun isPlayerZoomInEnabled() = isZoomInEnabled
 
     companion object {
         private const val MEGA_SCREENSHOTS_FOLDER_NAME = "MEGA Screenshots/"

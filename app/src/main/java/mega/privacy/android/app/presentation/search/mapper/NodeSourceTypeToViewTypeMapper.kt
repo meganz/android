@@ -21,6 +21,9 @@ class NodeSourceTypeToViewTypeMapper @Inject constructor() {
         NodeSourceType.INCOMING_SHARES -> Constants.INCOMING_SHARES_ADAPTER
         NodeSourceType.OUTGOING_SHARES -> Constants.OUTGOING_SHARES_ADAPTER
         NodeSourceType.BACKUPS -> Constants.BACKUPS_ADAPTER
+        NodeSourceType.FAVOURITES -> Constants.FAVOURITES_ADAPTER
+        NodeSourceType.DOCUMENTS -> Constants.DOCUMENTS_BROWSE_ADAPTER
+        NodeSourceType.AUDIO -> Constants.AUDIO_BROWSE_ADAPTER
         NodeSourceType.OTHER -> null
     }
 }

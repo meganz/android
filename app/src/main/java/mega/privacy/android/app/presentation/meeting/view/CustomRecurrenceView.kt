@@ -73,7 +73,7 @@ import mega.privacy.android.legacy.core.ui.controls.chips.TextButtonWithIconChip
 import mega.privacy.android.legacy.core.ui.controls.chips.TextFieldChip
 import mega.privacy.android.legacy.core.ui.controls.divider.CustomDivider
 import mega.privacy.android.shared.original.core.ui.preview.CombinedThemePreviews
-import mega.privacy.android.shared.original.core.ui.theme.OriginalTempTheme
+import mega.privacy.android.shared.original.core.ui.theme.OriginalTheme
 import mega.privacy.android.shared.original.core.ui.theme.extensions.grey_alpha_038_white_alpha_038
 import mega.privacy.android.shared.original.core.ui.theme.extensions.textColorSecondary
 import java.time.ZonedDateTime
@@ -763,7 +763,7 @@ private fun EndsSection(
 @CombinedThemePreviews
 @Composable
 private fun PreviewCustomRecurrenceView() {
-    OriginalTempTheme(isDark = isSystemInDarkTheme()) {
+    OriginalTheme(isDark = isSystemInDarkTheme()) {
         CustomRecurrenceView(
             state = CreateScheduledMeetingState(
                 meetingTitle = "Title meeting",

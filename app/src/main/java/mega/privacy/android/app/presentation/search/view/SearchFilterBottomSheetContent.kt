@@ -6,7 +6,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalSoftwareKeyboardController
 import androidx.compose.ui.res.stringResource
 import mega.privacy.android.shared.resources.R
-import mega.privacy.android.app.presentation.search.SearchActivityViewModel
+import mega.privacy.android.app.presentation.search.SearchViewModel
 import mega.privacy.android.app.presentation.search.navigation.DATE_ADDED
 import mega.privacy.android.app.presentation.search.navigation.DATE_MODIFIED
 import mega.privacy.android.app.presentation.search.navigation.TYPE
@@ -18,7 +18,7 @@ import mega.privacy.android.app.presentation.search.navigation.TYPE
 internal fun SearchFilterBottomSheetContent(
     filter: String,
     onDismiss: () -> Unit,
-    viewModel: SearchActivityViewModel,
+    viewModel: SearchViewModel,
 ) {
     val keyboardController = LocalSoftwareKeyboardController.current
     LaunchedEffect(Unit) {

@@ -11,7 +11,6 @@ import kotlinx.coroutines.flow.conflate
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import mega.privacy.android.app.featuretoggle.ApiFeatures
-import mega.privacy.android.app.featuretoggle.AppFeatures
 import mega.privacy.android.app.presentation.recentactions.mapper.RecentActionBucketUiEntityMapper
 import mega.privacy.android.app.presentation.recentactions.model.RecentActionsUiState
 import mega.privacy.android.domain.entity.RecentActionBucket
@@ -19,6 +18,7 @@ import mega.privacy.android.domain.entity.account.business.BusinessAccountStatus
 import mega.privacy.android.domain.usecase.GetBusinessStatusUseCase
 import mega.privacy.android.domain.usecase.account.MonitorAccountDetailUseCase
 import mega.privacy.android.domain.usecase.featureflag.GetFeatureFlagValueUseCase
+import mega.privacy.android.domain.usecase.login.MonitorFetchNodesFinishUseCase
 import mega.privacy.android.domain.usecase.network.MonitorConnectivityUseCase
 import mega.privacy.android.domain.usecase.node.MonitorNodeUpdatesUseCase
 import mega.privacy.android.domain.usecase.recentactions.GetRecentActionsUseCase
@@ -43,6 +43,7 @@ class RecentActionsComposeViewModel @Inject constructor(
     monitorAccountDetailUseCase: MonitorAccountDetailUseCase,
     monitorShowHiddenItemsUseCase: MonitorShowHiddenItemsUseCase,
     getBusinessStatusUseCase: GetBusinessStatusUseCase,
+    monitorFetchNodesFinishUseCase: MonitorFetchNodesFinishUseCase,
 ) : ViewModel() {
 
     /** private mutable UI state */
@@ -57,12 +58,7 @@ class RecentActionsComposeViewModel @Inject constructor(
     var selectedBucket: RecentActionBucket? = null
 
     init {
-        viewModelScope.launch {
-            val showHiddenItems = _uiState.value.showHiddenItems
-            updateRecentActions(
-                excludeSensitives = !showHiddenItems,
-            )
-        }
+        loadRecentActions()
 
         viewModelScope.launch {
             monitorNodeUpdatesUseCase()
@@ -127,6 +123,21 @@ class RecentActionsComposeViewModel @Inject constructor(
                         excludeSensitives = !showHiddenItems,
                     )
                 }
+        }
+
+        viewModelScope.launch {
+            monitorFetchNodesFinishUseCase()
+                .catch { Timber.e(it) }
+                .collect { loadRecentActions() }
+        }
+    }
+
+    private fun loadRecentActions() {
+        viewModelScope.launch {
+            val showHiddenItems = _uiState.value.showHiddenItems
+            updateRecentActions(
+                excludeSensitives = !showHiddenItems,
+            )
         }
     }
 

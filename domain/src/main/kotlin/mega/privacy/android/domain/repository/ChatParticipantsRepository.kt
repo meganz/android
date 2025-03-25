@@ -143,4 +143,18 @@ interface ChatParticipantsRepository {
      * @param status
      */
     suspend fun setOnlineStatus(status: UserChatStatus)
+
+    /**
+     * Set user start typing
+     *
+     * @param chatId
+     */
+    suspend fun setUserStartTyping(chatId: Long)
+
+    /**
+     * Set user stop typing
+     *
+     * @param chatId
+     */
+    suspend fun setUserStopTyping(chatId: Long)
 }

@@ -399,7 +399,8 @@ class UploadFolderViewModel @Inject constructor(
                 transferTriggerEvent = triggered(
                     TransferTriggerEvent.StartUpload.Files(
                         pathsAndNames,
-                        NodeId(parentHandle)
+                        NodeId(parentHandle),
+                        waitNotificationPermissionResponseToStart = true
                     )
                 )
             )
@@ -411,4 +412,9 @@ class UploadFolderViewModel @Inject constructor(
             it.copy(transferTriggerEvent = consumed())
         }
     }
+
+    /**
+     * Cancels the name collision job.
+     */
+    fun isInList() = isList
 }

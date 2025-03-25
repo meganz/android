@@ -36,4 +36,9 @@ interface GiphyInterface {
      * @return The height to display on screen.
      */
     fun getScreenGifHeight(gifWidth: Int, gifHeight: Int): Int
+
+    /**
+     * Get screen gif width
+     */
+    fun getScreenGifWidth(): Int
 }

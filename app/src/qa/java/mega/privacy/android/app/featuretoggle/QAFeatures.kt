@@ -1,6 +1,7 @@
 package mega.privacy.android.app.featuretoggle
 
 import mega.privacy.android.domain.entity.Feature
+import mega.privacy.android.domain.featuretoggle.FeatureFlagValuePriority
 import mega.privacy.android.domain.featuretoggle.FeatureFlagValueProvider
 
 /**
@@ -18,6 +19,8 @@ enum class QAFeatures(override val description: String, private val defaultValue
 
     companion object : FeatureFlagValueProvider {
         override suspend fun isEnabled(feature: Feature) =
-            values().firstOrNull { it == feature }?.defaultValue
+            entries.firstOrNull { it == feature }?.defaultValue
+
+        override val priority = FeatureFlagValuePriority.Default
     }
 }

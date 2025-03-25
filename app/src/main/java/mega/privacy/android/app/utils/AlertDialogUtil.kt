@@ -39,7 +39,7 @@ object AlertDialogUtil {
             if (enable) ColorUtils.getThemeColor(
                 context,
                 MaterialR.attr.colorSecondary
-            ) else ContextCompat.getColor(context, R.color.teal_300_alpha_038)
+            ) else ContextCompat.getColor(context, R.color.accent_900_alpha_038)
         )
     }
 

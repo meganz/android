@@ -161,7 +161,7 @@ internal class SyncNotificationRepositoryImplTest {
                     syncType = SyncType.TYPE_TWOWAY,
                     pairName = "someName",
                     localFolderPath = "somePath",
-                    remoteFolder = RemoteFolder(id = 1, name = "someName"),
+                    remoteFolder = RemoteFolder(id = NodeId(1L), name = "someName"),
                     syncStatus = SyncStatus.SYNCED,
                     syncError = SyncError.UNKNOWN_ERROR
                 )

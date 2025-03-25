@@ -13,7 +13,7 @@ import mega.privacy.android.app.R
 import mega.privacy.android.domain.entity.node.NodeId
 import mega.privacy.android.shared.original.core.ui.controls.dialogs.MegaAlertDialog
 import mega.privacy.android.shared.original.core.ui.preview.CombinedThemePreviews
-import mega.privacy.android.shared.original.core.ui.theme.OriginalTempTheme
+import mega.privacy.android.shared.original.core.ui.theme.OriginalTheme
 
 /**
  * Dialog to remove folder share
@@ -47,7 +47,7 @@ private fun RemoveShareFolderDialogBody(
     onConfirm: () -> Unit,
     onDismiss: () -> Unit,
 ) {
-    OriginalTempTheme(isDark = isSystemInDarkTheme()) {
+    OriginalTheme(isDark = isSystemInDarkTheme()) {
         val text = if (state.numberOfShareFolder == 1) {
             pluralStringResource(
                 R.plurals.confirmation_remove_outgoing_shares,

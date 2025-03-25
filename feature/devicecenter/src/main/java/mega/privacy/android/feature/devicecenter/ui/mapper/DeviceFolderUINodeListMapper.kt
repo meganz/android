@@ -28,26 +28,24 @@ internal class DeviceFolderUINodeListMapper @Inject constructor(
      */
     operator fun invoke(
         folders: List<DeviceFolderNode>,
-    ): List<DeviceFolderUINode> =
-        folders.filter { it.type != BackupInfoType.CAMERA_UPLOADS && it.type != BackupInfoType.MEDIA_UPLOADS }
-            .map { folder ->
-                if (folder.type == BackupInfoType.BACKUP_UPLOAD) {
-                    BackupDeviceFolderUINode(
-                        id = folder.id,
-                        name = folder.name,
-                        icon = deviceFolderUINodeIconMapper(folder.type),
-                        status = deviceCenterUINodeStatusMapper(folder.status),
-                        rootHandle = folder.rootHandle,
-                    )
-                } else {
-                    NonBackupDeviceFolderUINode(
-                        id = folder.id,
-                        name = folder.name,
-                        icon = deviceFolderUINodeIconMapper(folder.type),
-                        status = deviceCenterUINodeStatusMapper(folder.status),
-                        rootHandle = folder.rootHandle,
-                        localFolderPath = folder.localFolderPath
-                    )
-                }
-            }
+    ): List<DeviceFolderUINode> = folders.map { folder ->
+        if (folder.type == BackupInfoType.BACKUP_UPLOAD) {
+            BackupDeviceFolderUINode(
+                id = folder.id,
+                name = folder.name,
+                icon = deviceFolderUINodeIconMapper(folder.type),
+                status = deviceCenterUINodeStatusMapper(folder.status),
+                rootHandle = folder.rootHandle.longValue,
+            )
+        } else {
+            NonBackupDeviceFolderUINode(
+                id = folder.id,
+                name = folder.name,
+                icon = deviceFolderUINodeIconMapper(folder.type),
+                status = deviceCenterUINodeStatusMapper(folder.status),
+                rootHandle = folder.rootHandle.longValue,
+                localFolderPath = folder.localFolderPath
+            )
+        }
+    }
 }

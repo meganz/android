@@ -31,7 +31,6 @@ import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.launch
 import mega.privacy.android.app.R
 import mega.privacy.android.app.arch.extensions.collectFlow
-import mega.privacy.android.app.fragments.homepage.HomepageSearchable
 import mega.privacy.android.app.fragments.homepage.SortByHeaderViewModel
 import mega.privacy.android.app.main.ManagerActivity
 import mega.privacy.android.app.modalbottomsheet.UploadBottomSheetDialogFragment.Companion.DOCUMENTS_UPLOAD
@@ -48,7 +47,6 @@ import mega.privacy.android.app.textEditor.TextEditorViewModel
 import mega.privacy.android.app.textEditor.TextEditorViewModel.Companion.VIEW_MODE
 import mega.privacy.android.app.utils.Constants
 import mega.privacy.android.app.utils.Constants.DOCUMENTS_BROWSE_ADAPTER
-import mega.privacy.android.app.utils.Constants.DOCUMENTS_SEARCH_ADAPTER
 import mega.privacy.android.app.utils.Constants.INTENT_EXTRA_KEY_ADAPTER_TYPE
 import mega.privacy.android.app.utils.MegaNodeUtil
 import mega.privacy.android.app.utils.Util
@@ -58,7 +56,7 @@ import mega.privacy.android.domain.entity.TextFileTypeInfo
 import mega.privacy.android.domain.entity.ThemeMode
 import mega.privacy.android.domain.entity.node.NodeId
 import mega.privacy.android.domain.usecase.GetThemeMode
-import mega.privacy.android.shared.original.core.ui.theme.OriginalTempTheme
+import mega.privacy.android.shared.original.core.ui.theme.OriginalTheme
 import nz.mega.sdk.MegaChatApiJava
 import timber.log.Timber
 import java.io.File
@@ -68,7 +66,7 @@ import javax.inject.Inject
  * The fragment for document section
  */
 @AndroidEntryPoint
-class DocumentSectionFragment : Fragment(), HomepageSearchable {
+class DocumentSectionFragment : Fragment() {
     private val documentSectionViewModel by viewModels<DocumentSectionViewModel>()
     private val sortByHeaderViewModel: SortByHeaderViewModel by activityViewModels()
 
@@ -101,7 +99,7 @@ class DocumentSectionFragment : Fragment(), HomepageSearchable {
             val themeMode by getThemeMode()
                 .collectAsStateWithLifecycle(initialValue = ThemeMode.System)
             val uiState by documentSectionViewModel.uiState.collectAsStateWithLifecycle()
-            OriginalTempTheme(isDark = themeMode.isDarkMode()) {
+            OriginalTheme(isDark = themeMode.isDarkMode()) {
                 ConstraintLayout(
                     modifier = Modifier.fillMaxSize()
                 ) {
@@ -154,17 +152,13 @@ class DocumentSectionFragment : Fragment(), HomepageSearchable {
         viewLifecycleOwner.lifecycleScope.launch {
             val nodeHandle = document.id.longValue
             val nodeFileType = document.fileTypeInfo.mimeType
-            val searchMode = documentSectionViewModel.uiState.value.searchMode
             when {
                 document.fileTypeInfo is PdfFileTypeInfo -> {
                     val intent = Intent(context, PdfViewerActivity::class.java).apply {
                         putExtra(Constants.INTENT_EXTRA_KEY_INSIDE, true)
                         putExtra(
                             INTENT_EXTRA_KEY_ADAPTER_TYPE,
-                            if (searchMode)
-                                DOCUMENTS_SEARCH_ADAPTER
-                            else
-                                DOCUMENTS_BROWSE_ADAPTER
+                            DOCUMENTS_BROWSE_ADAPTER
                         )
                         putExtra(Constants.INTENT_EXTRA_KEY_HANDLE, nodeHandle)
                     }
@@ -200,10 +194,7 @@ class DocumentSectionFragment : Fragment(), HomepageSearchable {
                         putExtra(Constants.INTENT_EXTRA_KEY_HANDLE, nodeHandle)
                         putExtra(
                             INTENT_EXTRA_KEY_ADAPTER_TYPE,
-                            if (searchMode)
-                                DOCUMENTS_SEARCH_ADAPTER
-                            else
-                                DOCUMENTS_BROWSE_ADAPTER
+                            DOCUMENTS_BROWSE_ADAPTER
                         )
                         putExtra(TextEditorViewModel.MODE, VIEW_MODE)
                     }.let {
@@ -235,10 +226,7 @@ class DocumentSectionFragment : Fragment(), HomepageSearchable {
             callManager { manager ->
                 manager.showNodeOptionsPanel(
                     nodeId = id,
-                    mode = if (documentSectionViewModel.uiState.value.searchMode)
-                        NodeOptionsBottomSheetDialogFragment.SEARCH_MODE
-                    else
-                        NodeOptionsBottomSheetDialogFragment.CLOUD_DRIVE_MODE
+                    mode = NodeOptionsBottomSheetDialogFragment.CLOUD_DRIVE_MODE
                 )
             }
         }
@@ -310,42 +298,12 @@ class DocumentSectionFragment : Fragment(), HomepageSearchable {
         viewLifecycleOwner.collectFlow(
             documentSectionViewModel.uiState.map { it.allDocuments }.distinctUntilChanged()
         ) { list ->
-            if (!documentSectionViewModel.uiState.value.searchMode && list.isNotEmpty()) {
+            if (list.isNotEmpty()) {
                 callManager {
                     it.invalidateOptionsMenu()
                 }
             }
         }
-    }
-
-    /**
-     * Should show search menu
-     *
-     * @return true if should show search menu, false otherwise
-     */
-    override fun shouldShowSearchMenu(): Boolean = documentSectionViewModel.shouldShowSearchMenu()
-
-    /**
-     * Search ready
-     */
-    override fun searchReady() {
-        documentSectionViewModel.searchReady()
-    }
-
-    /**
-     * Search query
-     *
-     * @param query query string
-     */
-    override fun searchQuery(query: String) {
-        documentSectionViewModel.searchQuery(query)
-    }
-
-    /**
-     * Exit search
-     */
-    override fun exitSearch() {
-        documentSectionViewModel.exitSearch()
     }
 
     suspend fun handleHideNodeClick() {

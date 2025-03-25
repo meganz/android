@@ -3,7 +3,6 @@ package mega.privacy.android.domain.usecase.transfers.pending
 import app.cash.turbine.test
 import com.google.common.truth.Truth.assertThat
 import kotlinx.coroutines.awaitCancellation
-import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.flow
 import kotlinx.coroutines.flow.flowOf
 import kotlinx.coroutines.test.runTest
@@ -14,7 +13,7 @@ import mega.privacy.android.domain.entity.transfer.pending.PendingTransferState
 import mega.privacy.android.domain.entity.transfer.pending.PendingTransferState.AlreadyStarted
 import mega.privacy.android.domain.entity.transfer.pending.PendingTransferState.ErrorStarting
 import mega.privacy.android.domain.entity.transfer.pending.PendingTransferState.NotSentToSdk
-import mega.privacy.android.domain.entity.transfer.pending.PendingTransferState.SdkScanned
+import mega.privacy.android.domain.entity.uri.UriPath
 import org.junit.jupiter.api.BeforeAll
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.TestInstance
@@ -65,31 +64,6 @@ class MonitorPendingTransfersUntilResolvedUseCaseTest {
 
     @ParameterizedTest
     @EnumSource(value = TransferType::class)
-    fun `test that flow completes after a delay when all pending transfers are resolved but not already started`(
-        type: TransferType,
-    ) =
-        runTest {
-            whenever(getPendingTransfersByTypeUseCase(type)) doReturn
-                    flow {
-                        emit(listOf(createPendingTransfer(type)))
-                        emit(listOf(createPendingTransfer(type, SdkScanned)))
-                        delay(100)
-                        emit(listOf(createPendingTransfer(type, SdkScanned)))
-                        delay(500)
-                        //should not be received
-                        emit(listOf(createPendingTransfer(type, AlreadyStarted)))
-                        awaitCancellation()
-                    }
-            underTest(type).test {
-                assertThat(awaitItem()).hasSize(1)
-                assertThat(awaitItem()).hasSize(1)
-                assertThat(awaitItem()).hasSize(1)
-                awaitComplete()
-            }
-        }
-
-    @ParameterizedTest
-    @EnumSource(value = TransferType::class)
     fun `test that flow completes immediately when all pending transfers are resolved and already started`(
         type: TransferType,
     ) =
@@ -114,11 +88,12 @@ class MonitorPendingTransfersUntilResolvedUseCaseTest {
         pendingTransferState: PendingTransferState = NotSentToSdk,
     ) = PendingTransfer(
         354L,
-        appData = null,
+        appData = emptyList(),
         isHighPriority = false,
         nodeIdentifier = mock<PendingTransferNodeIdentifier.CloudDriveNode>(),
-        path = "",
+        uriPath = UriPath(""),
         transferType = type,
         state = pendingTransferState,
+        fileName = null
     )
 }

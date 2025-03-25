@@ -94,12 +94,12 @@ abstract class UtilWrapperModule {
                 override fun getProgressSize(progress: Long, size: Long): String =
                     Util.getProgressSize(context, progress, size)
 
-                override fun encodeBase64(string: String): String =
-                    Base64.encodeToString(string.toByteArray(Charsets.UTF_8), Base64.NO_WRAP)
+                override fun encodeBase64(string: String, flags: Int): String =
+                    Base64.encodeToString(string.toByteArray(Charsets.UTF_8), flags)
 
-                override fun decodeBase64(base64: String): String =
+                override fun decodeBase64(base64: String, flags: Int): String =
                     try {
-                        Base64.decode(base64.trim(), Base64.DEFAULT).toString(Charsets.UTF_8)
+                        Base64.decode(base64.trim(), flags).toString(Charsets.UTF_8)
                     } catch (ignore: IllegalArgumentException) {
                         Base64.decode(base64.trim(), Base64.URL_SAFE).toString(Charsets.UTF_8)
                     }

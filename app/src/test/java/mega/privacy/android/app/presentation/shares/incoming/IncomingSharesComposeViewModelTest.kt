@@ -501,7 +501,7 @@ class IncomingSharesComposeViewModelTest {
     @Test
     fun `test that download event is updated when on download for preview option click is invoked`() =
         runTest {
-            val triggered = TransferTriggerEvent.StartDownloadForPreview(node = mock())
+            val triggered = TransferTriggerEvent.StartDownloadForPreview(node = mock(), isOpenWith = false)
             underTest.onDownloadFileTriggered(triggered)
             underTest.state.test {
                 val state = awaitItem()

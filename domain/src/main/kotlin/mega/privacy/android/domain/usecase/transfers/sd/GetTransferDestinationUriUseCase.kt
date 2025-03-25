@@ -3,7 +3,8 @@ package mega.privacy.android.domain.usecase.transfers.sd
 import mega.privacy.android.domain.entity.transfer.DestinationUriAndSubFolders
 import mega.privacy.android.domain.entity.transfer.Transfer
 import mega.privacy.android.domain.entity.transfer.TransferType
-import mega.privacy.android.domain.entity.transfer.getSDCardTransferUri
+import mega.privacy.android.domain.entity.transfer.getSDCardFinalTransferUri
+import mega.privacy.android.domain.entity.transfer.getSDCardTransferPathForSDK
 import mega.privacy.android.domain.repository.TransferRepository
 import java.io.File
 import javax.inject.Inject
@@ -27,22 +28,21 @@ class GetTransferDestinationUriUseCase @Inject constructor(
             transfer.isSyncTransfer -> null
 
             transfer.isRootTransfer -> {
-                transfer.getSDCardTransferUri()?.let {
+                transfer.getSDCardFinalTransferUri()?.let {
                     DestinationUriAndSubFolders(it)
                 }
             }
 
             else -> {
                 transfer.folderTransferTag?.let { rootTag ->
-                    transferRepository.getSdTransferByTag(rootTag)?.let { rootSdTransfer ->
-                        rootSdTransfer.path.let { rootPath ->
-                            val missingFolders = transfer.parentPath
-                                .removePrefix(rootPath)
-                                .split(File.separator)
-                                .filter { it.isNotBlank() }
-                            rootSdTransfer.getSDCardTransferUri()?.let {
-                                DestinationUriAndSubFolders(it, missingFolders)
-                            }
+                    transferRepository.getTransferByTag(rootTag)?.let { rootSdTransfer ->
+                        val downloadPath = rootSdTransfer.getSDCardTransferPathForSDK() ?: ""
+                        val missingFolders = transfer.parentPath
+                            .removePrefix(downloadPath)
+                            .split(File.separator)
+                            .filter { it.isNotBlank() }
+                        rootSdTransfer.getSDCardFinalTransferUri()?.let {
+                            DestinationUriAndSubFolders(it, missingFolders)
                         }
                     }
                 }

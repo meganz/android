@@ -13,6 +13,7 @@ import mega.privacy.android.domain.repository.SettingsRepository
 import mega.privacy.android.domain.repository.TransferRepository
 import mega.privacy.android.domain.repository.security.LoginRepository
 import mega.privacy.android.domain.usecase.StopAudioService
+import mega.privacy.android.domain.usecase.account.SetSecurityUpgradeInAppUseCase
 import mega.privacy.android.domain.usecase.camerauploads.ClearCameraUploadsRecordUseCase
 import mega.privacy.android.domain.usecase.psa.ClearPsaUseCase
 import mega.privacy.android.domain.usecase.transfers.filespermission.ClearTransfersPreferencesUseCase
@@ -44,6 +45,7 @@ class LocalLogoutAppUseCaseTest {
     private val settingsRepository = mock<SettingsRepository>()
     private val clearCameraUploadsRecordUseCase = mock<ClearCameraUploadsRecordUseCase>()
     private val clearTransfersPreferencesUseCase = mock<ClearTransfersPreferencesUseCase>()
+    private val setSecurityUpgradeInAppUseCase = mock<SetSecurityUpgradeInAppUseCase>()
 
     @BeforeAll
     fun setUp() {
@@ -61,6 +63,7 @@ class LocalLogoutAppUseCaseTest {
             settingsRepository = settingsRepository,
             clearCameraUploadsRecordUseCase = clearCameraUploadsRecordUseCase,
             clearTransfersPreferencesUseCase = clearTransfersPreferencesUseCase,
+            setSecurityUpgradeInAppUseCase = setSecurityUpgradeInAppUseCase,
         )
     }
 
@@ -77,6 +80,7 @@ class LocalLogoutAppUseCaseTest {
             clearPsaUseCase,
             clearCameraUploadsRecordUseCase,
             clearTransfersPreferencesUseCase,
+            setSecurityUpgradeInAppUseCase,
         )
     }
 
@@ -103,5 +107,6 @@ class LocalLogoutAppUseCaseTest {
         verify(settingsRepository).resetSetting()
         verify(clearCameraUploadsRecordUseCase)
             .invoke(listOf(CameraUploadFolderType.Primary, CameraUploadFolderType.Secondary))
+        verify(setSecurityUpgradeInAppUseCase).invoke(false)
     }
 }

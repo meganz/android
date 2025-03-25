@@ -6,6 +6,7 @@ import android.net.Uri
 import android.text.TextUtils
 import android.view.View
 import androidx.core.view.isVisible
+import coil.load
 import mega.privacy.android.app.R
 import mega.privacy.android.app.activities.WebViewActivity
 import mega.privacy.android.app.databinding.PsaLayoutBinding
@@ -42,7 +43,7 @@ class PsaViewHolder(
 
         if (!TextUtils.isEmpty(psa.imageUrl)) {
             binding.image.visibility = View.VISIBLE
-            binding.image.setImageURI(Uri.parse(psa.imageUrl))
+            binding.image.load(Uri.parse(psa.imageUrl))
         }
 
         binding.title.text = psa.title

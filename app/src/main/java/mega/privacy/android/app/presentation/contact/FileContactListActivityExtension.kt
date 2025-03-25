@@ -12,7 +12,11 @@ import nz.mega.sdk.MegaNode
  * @param emails
  * @param item
  */
-fun FileContactListActivity.shareFolder(node: MegaNode, emails: ArrayList<String>, item: Int) {
+internal fun FileContactListActivity.shareFolder(
+    node: MegaNode,
+    emails: ArrayList<String>,
+    item: Int,
+) {
     lifecycleScope.launch {
         viewModel.initShareKey(node)
         nodeController.shareFolder(node, emails, item)

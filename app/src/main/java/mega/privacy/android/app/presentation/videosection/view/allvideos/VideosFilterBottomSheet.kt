@@ -22,8 +22,8 @@ import mega.privacy.android.shared.original.core.ui.controls.lists.SettingsItemW
 import mega.privacy.android.shared.original.core.ui.controls.sheets.BottomSheet
 import mega.privacy.android.shared.original.core.ui.controls.text.MegaText
 import mega.privacy.android.shared.original.core.ui.preview.CombinedThemePreviews
-import mega.privacy.android.shared.original.core.ui.theme.OriginalTempTheme
-import mega.privacy.android.shared.original.core.ui.theme.values.TextColor
+import mega.privacy.android.shared.original.core.ui.theme.OriginalTheme
+import mega.android.core.ui.theme.values.TextColor
 
 @OptIn(ExperimentalMaterialApi::class)
 @Composable
@@ -63,7 +63,7 @@ internal fun VideosFilterBottomSheet(
 @CombinedThemePreviews
 @Composable
 private fun VideosLocationFilterBottomSheetPreview() {
-    OriginalTempTheme(isDark = isSystemInDarkTheme()) {
+    OriginalTheme(isDark = isSystemInDarkTheme()) {
         VideosFilterBottomSheet(
             modifier = Modifier,
             title = "Location",
@@ -88,7 +88,7 @@ private fun VideosLocationFilterBottomSheetPreview() {
 @CombinedThemePreviews
 @Composable
 private fun VideosDurationFilterBottomSheetPreview() {
-    OriginalTempTheme(isDark = isSystemInDarkTheme()) {
+    OriginalTheme(isDark = isSystemInDarkTheme()) {
         VideosFilterBottomSheet(
             modifier = Modifier,
             title = "Duration",

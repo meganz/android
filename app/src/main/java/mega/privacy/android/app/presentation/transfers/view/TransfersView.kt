@@ -20,7 +20,6 @@ import androidx.compose.ui.unit.dp
 import com.google.accompanist.navigation.material.BottomSheetNavigator
 import com.google.accompanist.navigation.material.ExperimentalMaterialNavigationApi
 import com.google.accompanist.navigation.material.rememberBottomSheetNavigator
-import kotlinx.collections.immutable.persistentListOf
 import mega.privacy.android.app.R
 import mega.privacy.android.app.presentation.transfers.model.TransferMenuAction
 import mega.privacy.android.app.presentation.transfers.model.TransfersUiState
@@ -30,8 +29,7 @@ import mega.privacy.android.shared.original.core.ui.controls.appbar.MegaAppBar
 import mega.privacy.android.shared.original.core.ui.controls.layouts.MegaScaffold
 import mega.privacy.android.shared.original.core.ui.controls.sheets.MegaBottomSheetLayout
 import mega.privacy.android.shared.original.core.ui.controls.tab.Tabs
-import mega.privacy.android.shared.original.core.ui.controls.tab.TextCell
-import mega.privacy.android.shared.original.core.ui.theme.OriginalTempTheme
+import mega.privacy.android.shared.original.core.ui.theme.OriginalTheme
 
 @OptIn(ExperimentalComposeUiApi::class, ExperimentalMaterialNavigationApi::class)
 @Composable
@@ -82,8 +80,8 @@ internal fun TransfersView(
                     .fillMaxSize(),
             ) {
                 Tabs(
-                    cells = persistentListOf(
-                        TextCell(
+                    cells = {
+                        addTextTab(
                             text = stringResource(id = R.string.title_tab_in_progress_transfers),
                             tag = TEST_TAG_IN_PROGRESS_TAB,
                         ) {
@@ -93,14 +91,18 @@ internal fun TransfersView(
                                 areTransfersPaused = areTransfersPaused,
                                 onPlayPauseClicked = onPlayPauseTransfer,
                             )
-                        },
-                        TextCell(
+                        }
+                        addTextTab(
                             text = stringResource(id = R.string.title_tab_completed_transfers),
                             tag = TEST_TAG_COMPLETED_TAB,
                         ) { CompletedTransfersView() }
-                    ),
-                    selectedIndex = selectedTab,
-                    onTabSelected = onTabSelected,
+                    },
+                    selectedTabIndex = selectedTab,
+                    onTabSelected = {
+                        onTabSelected(it)
+                        true
+                    },
+                    pagerEnabled = true,
                 )
             }
         }
@@ -132,7 +134,7 @@ internal fun CompletedTransfersView() {
 @Preview(uiMode = Configuration.UI_MODE_NIGHT_YES, name = "DarkTransfersViewPreview")
 @Composable
 private fun TransfersViewPreview() {
-    OriginalTempTheme(isDark = isSystemInDarkTheme()) {
+    OriginalTheme(isDark = isSystemInDarkTheme()) {
         TransfersView(
             bottomSheetNavigator = rememberBottomSheetNavigator(),
             scaffoldState = rememberScaffoldState(),

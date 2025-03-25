@@ -125,7 +125,7 @@ interface MegaChatApiGateway {
      */
     fun createChat(
         isGroup: Boolean,
-        peers: MegaChatPeerList,
+        peers: MegaChatPeerList?,
         listener: MegaChatRequestListenerInterface,
     )
 
@@ -229,6 +229,13 @@ interface MegaChatApiGateway {
      * @return  The list of chat rooms
      */
     fun getChatRooms(): List<MegaChatRoom>
+
+    /**
+     * Get note to self chat
+     *
+     * @return  [MegaChatRoom]
+     */
+    fun getNoteToSelfChat(): MegaChatRoom?
 
     /**
      * Get meeting chat rooms
@@ -2027,4 +2034,18 @@ interface MegaChatApiGateway {
         openInvite: Boolean,
         listener: MegaChatRequestListenerInterface,
     )
+
+    /**
+     * Set user typing
+     *
+     * @param chatId
+     */
+    suspend fun setUserTyping(chatId: Long)
+
+    /**
+     * Set user stopped typing
+     *
+     * @param chatId
+     */
+    suspend fun setUserStoppedTyping(chatId: Long)
 }

@@ -35,6 +35,7 @@ LOCAL_SRC_FILES := $(addprefix ZenLib/Source/ZenLib/, \
                        Format/Http/Http_Handler.cpp \
                        Format/Http/Http_Request.cpp \
                        Format/Http/Http_Utils.cpp)
+LOCAL_LDFLAGS += "-Wl,-z,max-page-size=16384"
 include $(BUILD_STATIC_LIBRARY)
 
 
@@ -282,6 +283,8 @@ LOCAL_SRC_FILES := $(addprefix mediainfo/Source/, \
 	ThirdParty/sha2-gladman/sha2.c \
 	ThirdParty/hmac-gladman/hmac.c \
 	ThirdParty/tinyxml2/tinyxml2.cpp)
+
+LOCAL_LDFLAGS += "-Wl,-z,max-page-size=16384"
 
 LOCAL_EXPORT_CFLAGS := -DUSE_MEDIAINFO -DUNICODE
 LOCAL_STATIC_LIBRARIES := zenlib

@@ -16,7 +16,6 @@ import mega.privacy.android.app.MegaApplication
 import mega.privacy.android.app.R
 import mega.privacy.android.app.components.ChatManagement
 import mega.privacy.android.app.featuretoggle.ApiFeatures
-import mega.privacy.android.app.objects.PasscodeManagement
 import mega.privacy.android.app.presentation.chat.groupInfo.model.GroupInfoState
 import mega.privacy.android.app.presentation.meeting.model.MeetingState.Companion.FREE_PLAN_PARTICIPANTS_LIMIT
 import mega.privacy.android.app.usecase.chat.SetChatVideoInDeviceUseCase
@@ -50,7 +49,6 @@ import javax.inject.Inject
  *
  * @property setOpenInviteWithChatIdUseCase                 [SetOpenInviteWithChatIdUseCase]
  * @property startCallUseCase                               [StartCallUseCase]
- * @property passcodeManagement                             [PasscodeManagement]
  * @property chatApiGateway                                 [MegaChatApiGateway]
  * @property setChatVideoInDeviceUseCase                    [SetChatVideoInDeviceUseCase]
  * @property chatManagement                                 [ChatManagement]
@@ -67,7 +65,6 @@ class GroupChatInfoViewModel @Inject constructor(
     private val setOpenInviteWithChatIdUseCase: SetOpenInviteWithChatIdUseCase,
     monitorConnectivityUseCase: MonitorConnectivityUseCase,
     private val startCallUseCase: StartCallUseCase,
-    private val passcodeManagement: PasscodeManagement,
     private val chatApiGateway: MegaChatApiGateway,
     private val setChatVideoInDeviceUseCase: SetChatVideoInDeviceUseCase,
     private val chatManagement: ChatManagement,
@@ -208,15 +205,16 @@ class GroupChatInfoViewModel @Inject constructor(
      * @param video Start call with video on or off
      * @param audio Start call with audio on or off
      */
-    fun onCallTap(userHandle: Long, video: Boolean, audio: Boolean) = viewModelScope.launch {
-        runCatching {
-            get1On1ChatIdUseCase(userHandle)
-        }.onSuccess { chatId ->
-            startCall(chatId, video, audio)
-        }.onFailure {
-            Timber.e(it)
+    fun onCallTap(userHandle: Long, video: Boolean, audio: Boolean) =
+        viewModelScope.launch {
+            runCatching {
+                get1On1ChatIdUseCase(userHandle)
+            }.onSuccess { chatId ->
+                startCall(chatId, video, audio)
+            }.onFailure {
+                Timber.e(it)
+            }
         }
-    }
 
     /**
      * Starts a call
@@ -225,14 +223,17 @@ class GroupChatInfoViewModel @Inject constructor(
      * @param video Start call with video on or off
      * @param audio Start call with audio on or off
      */
-    private fun startCall(chatId: Long, video: Boolean, audio: Boolean) {
+    private fun startCall(
+        chatId: Long,
+        video: Boolean,
+        audio: Boolean,
+    ) {
         if (chatApiGateway.getChatCall(chatId) != null) {
             Timber.d("There is a call, open it")
             CallUtil.openMeetingInProgress(
                 MegaApplication.getInstance().applicationContext,
                 chatId,
                 true,
-                passcodeManagement
             )
             return
         }
@@ -255,7 +256,6 @@ class GroupChatInfoViewModel @Inject constructor(
                         chatId,
                         hasLocalAudio,
                         hasLocalVideo,
-                        passcodeManagement
                     )
                 }
             }

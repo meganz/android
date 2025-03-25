@@ -4,7 +4,7 @@ import mega.privacy.android.shared.resources.R as SharedR
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.res.stringResource
 import mega.privacy.android.analytics.Analytics
-import mega.privacy.android.app.presentation.search.model.SearchActivityState
+import mega.privacy.android.app.presentation.search.model.SearchViewState
 import mega.privacy.android.app.presentation.search.navigation.DATE_ADDED
 import mega.privacy.android.app.presentation.search.navigation.DATE_MODIFIED
 import mega.privacy.android.app.presentation.search.navigation.TYPE
@@ -20,7 +20,7 @@ import mega.privacy.mobile.analytics.event.SearchLastModifiedDropdownChipPressed
  */
 @Composable
 fun FilterChipsView(
-    state: SearchActivityState,
+    state: SearchViewState,
     onFilterClicked: (String) -> Unit,
 ) {
     DropdownChipToolbar(

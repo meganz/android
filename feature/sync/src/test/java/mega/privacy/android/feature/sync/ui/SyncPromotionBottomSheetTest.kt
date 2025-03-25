@@ -22,6 +22,7 @@ import mega.privacy.android.feature.sync.ui.views.SYNC_PROMOTION_BOTTOM_SHEET_IM
 import mega.privacy.android.feature.sync.ui.views.SyncPromotionBottomSheet
 import mega.privacy.android.shared.original.core.ui.controls.sheets.BottomSheet
 import mega.privacy.android.shared.resources.R
+import mega.privacy.mobile.analytics.event.SyncPromotionBottomSheetBackUpFoldersButtonPressedEvent
 import mega.privacy.mobile.analytics.event.SyncPromotionBottomSheetLearnMoreButtonPressedEvent
 import mega.privacy.mobile.analytics.event.SyncPromotionBottomSheetSyncFoldersButtonPressedEvent
 import org.junit.Before
@@ -29,7 +30,6 @@ import org.junit.Rule
 import org.junit.Test
 import org.junit.rules.RuleChain
 import org.junit.runner.RunWith
-import org.mockito.kotlin.mock
 
 @RunWith(AndroidJUnit4::class)
 class SyncPromotionBottomSheetTest {
@@ -43,8 +43,6 @@ class SyncPromotionBottomSheetTest {
 
     @get:Rule
     val ruleChain: RuleChain = RuleChain.outerRule(analyticsRule).around(composeRule)
-
-    private val onUpgrade = mock<() -> Unit>()
 
     @Before
     fun setUp() {
@@ -75,19 +73,14 @@ class SyncPromotionBottomSheetTest {
     @Test
     fun `test that body is shown`() = runTest {
         initComposeRule()
-        composeRule.onNodeWithText(context.getString(R.string.sync_promotion_bottom_sheet_body_message))
-            .assertExists().assertIsDisplayed()
+        composeRule.onNodeWithText(
+            context.getString(R.string.sync_promotion_bottom_sheet_body_text)
+                .replace("[U]", "").replace("[/U]", "")
+        ).assertExists().assertIsDisplayed()
     }
 
     @Test
-    fun `test that primary button is shown (free account)`() = runTest {
-        initComposeRule(isFreeAccount = true)
-        composeRule.onNodeWithText(context.getString(R.string.sync_promotion_bottom_sheet_primary_button_text_free))
-            .assertExists().assertIsDisplayed()
-    }
-
-    @Test
-    fun `test that primary button is shown (non free account)`() = runTest {
+    fun `test that primary button is shown`() = runTest {
         initComposeRule()
         composeRule.onNodeWithText(context.getString(R.string.sync_promotion_bottom_sheet_primary_button_text_pro))
             .assertExists().assertIsDisplayed()
@@ -105,7 +98,7 @@ class SyncPromotionBottomSheetTest {
     }
 
     @Test
-    fun `test that click the primary button on a non free account sends the right analytics tracker event`() {
+    fun `test that click the primary button sends the right analytics tracker event`() {
         initComposeRule()
         coroutineScope.launch {
             modalSheetState.show()
@@ -126,14 +119,26 @@ class SyncPromotionBottomSheetTest {
             composeRule.onNodeWithText(context.getString(R.string.sync_promotion_bottom_sheet_secondary_button_text))
                 .assertExists().assertIsDisplayed().performClick()
             assertThat(analyticsRule.events).contains(
+                SyncPromotionBottomSheetBackUpFoldersButtonPressedEvent
+            )
+        }
+    }
+
+    @Test
+    fun `test that click the Learn more button sends the right analytics tracker event`() {
+        initComposeRule()
+        coroutineScope.launch {
+            modalSheetState.show()
+
+            composeRule.onNodeWithText(context.getString(R.string.sync_promotion_bottom_sheet_body_text))
+                .assertExists().assertIsDisplayed().performClick()
+            assertThat(analyticsRule.events).contains(
                 SyncPromotionBottomSheetLearnMoreButtonPressedEvent
             )
         }
     }
 
-    private fun initComposeRule(
-        isFreeAccount: Boolean = false,
-    ) {
+    private fun initComposeRule() {
         composeRule.setContent {
             modalSheetState = rememberModalBottomSheetState(
                 initialValue = ModalBottomSheetValue.Expanded,
@@ -149,8 +154,9 @@ class SyncPromotionBottomSheetTest {
                 modalSheetState = modalSheetState,
                 sheetBody = {
                     SyncPromotionBottomSheet(
-                        upgradeAccountClicked = onUpgrade,
-                        isFreeAccount = isFreeAccount,
+                        onSyncFoldersClicked = {},
+                        onBackUpFoldersClicked = {},
+                        onLearnMoreClicked = {},
                     )
                 },
                 expandedRoundedCorners = true,

@@ -6,6 +6,7 @@ import android.view.ViewGroup
 import androidx.activity.OnBackPressedCallback
 import androidx.activity.enableEdgeToEdge
 import androidx.appcompat.app.AppCompatActivity
+import androidx.core.net.toUri
 import androidx.core.view.ViewCompat
 import androidx.core.view.WindowCompat
 import androidx.core.view.WindowInsetsCompat
@@ -65,7 +66,17 @@ class SyncHostActivity : AppCompatActivity() {
 
     private val onBackPressedCallback = object : OnBackPressedCallback(true) {
         override fun handleOnBackPressed() {
+            if (!intent.getBooleanExtra(EXTRA_IS_FROM_CLOUD_DRIVE, false)) {
+                startActivity(Intent(Intent.ACTION_VIEW).apply {
+                    data = "https://mega.nz/devicecenter".toUri()
+                })
+            }
             finish()
         }
+    }
+
+    companion object {
+        const val EXTRA_IS_FROM_CLOUD_DRIVE = "IS_FROM_CLOUD_DRIVE"
+        const val EXTRA_OPEN_SELECT_STOP_BACKUP_DESTINATION = "OPEN_SELECT_STOP_BACKUP_DESTINATION"
     }
 }

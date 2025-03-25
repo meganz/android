@@ -1,6 +1,7 @@
 package mega.privacy.android.shared.original.core.ui.controls.appbar
 
 import mega.privacy.android.icon.pack.R as iconPackR
+import mega.privacy.android.shared.resources.R as sharedR
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material.Scaffold
 import androidx.compose.material.Text
@@ -90,7 +91,7 @@ class SelectModeAppBarTest {
                 testTag = menuButtonAlert
             ) {}
         val item5 = object : MenuActionWithoutIcon(
-            descriptionRes = R.string.password_text,
+            descriptionRes = sharedR.string.password_text,
             testTag = menuButtonPwd
         ) {}
         return listOf(item1, item2, item3, item4, item5)

@@ -138,10 +138,6 @@ internal class DeviceCenterUINodeStatusMapperTest {
             DeviceCenterNodeStatus.Syncing(0),
             DeviceCenterUINodeStatus.Syncing,
         ),
-        Arguments.of(
-            DeviceCenterNodeStatus.NoCameraUploads,
-            DeviceCenterUINodeStatus.CameraUploadsDisabled,
-        ),
         Arguments.of(DeviceCenterNodeStatus.NothingSetUp, DeviceCenterUINodeStatus.NothingSetUp),
     )
 

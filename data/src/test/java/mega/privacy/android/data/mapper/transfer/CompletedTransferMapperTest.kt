@@ -179,7 +179,7 @@ class CompletedTransferMapperTest {
     }
 
     @Test
-    fun `test that getSDCardTransferPath is assigned to completed transfer path when transferPath is not set`() =
+    fun `test that getSDCardTransferPathForSDK is assigned to completed transfer path when transferPath is not set`() =
         runTest {
             val expected = "content://com.android.providers.downloads.documents/tree/msd%·A109"
             val directoryPath = "/storage/emulated/0/Download/Mega Downloads"
@@ -188,7 +188,13 @@ class CompletedTransferMapperTest {
             val transfer = mockTransfer(
                 transferType = TransferType.DOWNLOAD,
                 parentPath = directoryPath,
-                appData = listOf(TransferAppData.SdCardDownload(expected, expected))
+                appData = listOf(
+                    TransferAppData.SdCardDownload(
+                        targetPathForSDK = expected,
+                        finalTargetUri = expected,
+                        parentPath = "parentPath"
+                    )
+                )
             )
             whenever(stringWrapper.getSizeString(any())).thenReturn("10MB")
             whenever(fileGateway.getOfflineFilesRootPath()).thenReturn("$offlineDirectoryPath/$offlineDirectory")

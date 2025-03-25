@@ -4,10 +4,8 @@ import kotlinx.coroutines.flow.Flow
 import mega.privacy.android.domain.entity.FileTypeInfo
 import mega.privacy.android.domain.entity.document.DocumentEntity
 import mega.privacy.android.domain.entity.document.DocumentFolder
+import mega.privacy.android.domain.entity.file.FileStorageType
 import mega.privacy.android.domain.entity.node.FileNode
-import mega.privacy.android.domain.entity.node.Node
-import mega.privacy.android.domain.entity.node.NodeId
-import mega.privacy.android.domain.entity.node.ViewerNode
 import mega.privacy.android.domain.entity.uri.UriPath
 import java.io.File
 import java.io.IOException
@@ -38,38 +36,6 @@ interface FileSystemRepository {
     suspend fun getOfflineBackupsPath(): String
 
     /**
-     * Downloads a file node in background.
-     *
-     * @param viewerNode File node to download.
-     * @return The local path of the downloaded file.
-     */
-    @Deprecated(
-        message = "ViewerNode should be replaced by [TypedNode], there's a similar use-case to download any type of [TypedNode] and receive a flow of the progress: StartDownloadUseCase. Please add [TransferAppData.BackgroundTransfer] to avoid this transfers to be added in the counters of the DownloadService notification",
-        replaceWith = ReplaceWith("StartDownloadUseCase"),
-    )
-    suspend fun downloadBackgroundFile(viewerNode: ViewerNode): String
-
-    /**
-     * setMyChatFilesFolder
-     * @param nodeHandle
-     * @return node handle [Long]
-     */
-    suspend fun setMyChatFilesFolder(nodeHandle: Long): Long?
-
-    /**
-     * @return the [NodeId] of the folder for saving chat files in user attributes, null if it's not configured yet
-     */
-    suspend fun getMyChatsFilesFolderId(): NodeId?
-
-    /**
-     * Get file versions option
-     *
-     * @param forceRefresh
-     * @return
-     */
-    suspend fun getFileVersionsOption(forceRefresh: Boolean): Boolean
-
-    /**
      * Get local file
      *
      * @param fileNode
@@ -81,14 +47,6 @@ interface FileSystemRepository {
      * Get file by path if it exists
      */
     suspend fun getFileByPath(path: String): File?
-
-    /**
-     * Get file streaming uri for a node
-     *
-     * @param node
-     * @return local url string if found
-     */
-    suspend fun getFileStreamingUri(node: Node): String?
 
     /**
      * create temp file in file system
@@ -145,14 +103,6 @@ interface FileSystemRepository {
     suspend fun deleteCameraUploadsTemporaryRootDirectory(): Boolean
 
     /**
-     * Get the fingerprint of a file by path
-     *
-     * @param filePath file path
-     * @return fingerprint
-     */
-    suspend fun getFingerprint(filePath: String): String?
-
-    /**
      * Checks whether the Folder exists
      *
      * @param folderPath The Folder path
@@ -201,6 +151,11 @@ interface FileSystemRepository {
     suspend fun getExternalPathByContentUri(uri: String): String?
 
     /**
+     * Returns an absolute path based on document content Uri
+     */
+    suspend fun getAbsolutePathByContentUri(uri: String): String?
+
+    /**
      * Tries to determine the content type of an object,
      * based on the specified "file" component of a URL.
      *
@@ -210,13 +165,21 @@ interface FileSystemRepository {
     suspend fun getGuessContentTypeFromName(localPath: String): String?
 
     /**
+     * Return the MIME type of the given content Uri.
+     *
+     * @param uriPath UriPath of the file
+     * @return The content type of the Uri if any.
+     */
+    suspend fun getContentTypeFromContentUri(uriPath: UriPath): String?
+
+    /**
      * Get GPS coordinates from video file
      *
      * @param filePath
      *
      * @return a pair with latitude and longitude coordinates
      */
-    suspend fun getVideoGPSCoordinates(filePath: String): Pair<Double, Double>?
+    suspend fun getVideoGPSCoordinates(uriPath: UriPath): Pair<Double, Double>?
 
     /**
      * Get GPS coordinates from photo file
@@ -225,27 +188,7 @@ interface FileSystemRepository {
      *
      * @return a pair with latitude and longitude coordinates
      */
-    suspend fun getPhotoGPSCoordinates(filePath: String): Pair<Double, Double>?
-
-    /**
-     * Make a name suitable for a file name in the local filesystem
-     *
-     * This function escapes (%xx) forbidden characters in the local filesystem if needed.
-     * You can revert this operation using MegaApi::unescapeFsIncompatible
-     *
-     * If no dstPath is provided or filesystem type it's not supported this method will
-     * escape characters contained in the following list: \/:?\"<>|*
-     * Otherwise it will check forbidden characters for local filesystem type
-     *
-     * The input string must be UTF8 encoded. The returned value will be UTF8 too.
-     *
-     * You take the ownership of the returned value
-     *
-     * @param fileName Name to convert (UTF8)
-     * @param dstPath  Destination path
-     * @return Converted name (UTF8)
-     */
-    suspend fun escapeFsIncompatible(fileName: String, dstPath: String): String?
+    suspend fun getPhotoGPSCoordinates(uriPath: UriPath): Pair<Double, Double>?
 
     /**
      * Sets the last-modified time of the file or directory named by this abstract pathname
@@ -292,7 +235,7 @@ interface FileSystemRepository {
     /**
      * @return true if the [localPath] points to a SD card
      */
-    suspend fun isSDCardPath(localPath: String): Boolean
+    suspend fun isSDCardPathOrUri(localPath: String): Boolean
 
     /**
      * @return true if the [localPath] points to a SD card cache
@@ -306,6 +249,14 @@ interface FileSystemRepository {
      * @param destinationUri the target uri where the file will be moved (excluding the name of the file itself)
      */
     suspend fun moveFileToSd(file: File, destinationUri: String, subFolders: List<String>): Boolean
+
+    /**
+     * Moves a [directory] to a [destinationUri] on the sd. It first copies the file to the [destinationUri] and then deletes the original one
+     *
+     * @param directory the directory to be moved
+     * @param destinationUri the target uri where the file will be moved (excluding the name of the file itself)
+     */
+    suspend fun moveDirectoryToSd(directory: File, destinationUri: String): Boolean
 
     /**
      * Create new image uri
@@ -499,9 +450,14 @@ interface FileSystemRepository {
     suspend fun getDocumentFileName(uri: UriPath): String
 
     /**
-     * Get document entities
+     * Get a list of [DocumentEntity]s from a list of [UriPath]s, non-existing documents are filtered out
      */
     suspend fun getDocumentEntities(uris: List<UriPath>): List<DocumentEntity>
+
+    /**
+     * Get a [DocumentEntity] from an [UriPath], or null if it doesn't exist
+     */
+    suspend fun getDocumentEntity(uri: UriPath): DocumentEntity?
 
     /**
      * Get file from uri
@@ -524,4 +480,32 @@ interface FileSystemRepository {
         originalUriPath: UriPath,
         newFilename: String,
     ): File
+
+    /**
+     * Gets the length of the file given the content URI.
+     */
+    suspend fun getFileLengthFromSdCardContentUri(fileContentUri: String): Long
+
+    /**
+     * Deletes the file given the content URI.
+     */
+    suspend fun deleteFileFromSdCardContentUri(fileContentUri: String): Boolean
+
+    /**
+     * Checks if an uri can be read
+     *
+     * @param stringUri the uri to check
+     * @return true if the uri can be read, false otherwise
+     */
+    suspend fun canReadUri(stringUri: String): Boolean
+
+    /**
+     * Returns Offline Files Root Folder
+     */
+    suspend fun getOfflineFilesRootFolder(): File
+
+    /**
+     * Returns device model or SD Card based on file location
+     */
+    suspend fun getFileStorageTypeName(path: String?): FileStorageType
 }

@@ -12,7 +12,7 @@ internal val StartConversationAction.title: Int
 
 internal val StartConversationAction.icon: Int
     get() = when (this) {
-        StartConversationAction.NewGroup -> R.drawable.ic_new_group
+        StartConversationAction.NewGroup -> R.drawable.message_chat_circle
         StartConversationAction.NewMeeting -> R.drawable.ic_new_meeting
         StartConversationAction.JoinMeeting -> R.drawable.ic_join_meeting
     }

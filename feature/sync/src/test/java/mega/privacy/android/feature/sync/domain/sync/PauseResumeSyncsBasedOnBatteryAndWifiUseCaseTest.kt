@@ -3,6 +3,7 @@ package mega.privacy.android.feature.sync.domain.sync
 import kotlinx.coroutines.flow.flowOf
 import kotlinx.coroutines.test.runTest
 import mega.privacy.android.domain.entity.BatteryInfo
+import mega.privacy.android.domain.entity.node.NodeId
 import mega.privacy.android.domain.entity.sync.SyncType
 import mega.privacy.android.domain.usecase.IsOnWifiNetworkUseCase
 import mega.privacy.android.feature.sync.domain.entity.FolderPair
@@ -44,14 +45,14 @@ class PauseResumeSyncsBasedOnBatteryAndWifiUseCaseTest {
             syncType = SyncType.TYPE_TWOWAY,
             pairName = "name",
             localFolderPath = "localPath",
-            remoteFolder = RemoteFolder(123L, "remotePath"),
+            remoteFolder = RemoteFolder(NodeId(123L), "remotePath"),
             syncStatus = SyncStatus.SYNCING
         ), FolderPair(
             id = secondSyncId,
             syncType = SyncType.TYPE_TWOWAY,
             pairName = "name2",
             localFolderPath = "localPath2",
-            remoteFolder = RemoteFolder(234L, "remotePath2"),
+            remoteFolder = RemoteFolder(NodeId(234L), "remotePath2"),
             syncStatus = SyncStatus.SYNCING
         )
     )
@@ -88,7 +89,6 @@ class PauseResumeSyncsBasedOnBatteryAndWifiUseCaseTest {
             connectedToInternet = false,
             syncOnlyByWifi = true,
             batteryInfo = BatteryInfo(100, true),
-            isFreeAccount = false
         )
 
         verify(pauseSyncUseCase).invoke(firstSyncId)
@@ -105,7 +105,6 @@ class PauseResumeSyncsBasedOnBatteryAndWifiUseCaseTest {
             connectedToInternet = true,
             syncOnlyByWifi = false,
             batteryInfo = BatteryInfo(100, true),
-            isFreeAccount = false
         )
 
         verify(resumeSyncUseCase).invoke(firstSyncId)
@@ -122,7 +121,6 @@ class PauseResumeSyncsBasedOnBatteryAndWifiUseCaseTest {
             connectedToInternet = true,
             syncOnlyByWifi = true,
             batteryInfo = BatteryInfo(LOW_BATTERY_LEVEL - 1, false),
-            isFreeAccount = false
         )
 
         verify(pauseSyncUseCase).invoke(firstSyncId)
@@ -140,7 +138,6 @@ class PauseResumeSyncsBasedOnBatteryAndWifiUseCaseTest {
                 connectedToInternet = true,
                 syncOnlyByWifi = false,
                 batteryInfo = BatteryInfo(LOW_BATTERY_LEVEL - 1, true),
-                isFreeAccount = false
             )
 
             verify(resumeSyncUseCase).invoke(firstSyncId)
@@ -157,7 +154,6 @@ class PauseResumeSyncsBasedOnBatteryAndWifiUseCaseTest {
             connectedToInternet = true,
             syncOnlyByWifi = true,
             batteryInfo = BatteryInfo(100, true),
-            isFreeAccount = true
         )
 
         verify(pauseSyncUseCase).invoke(firstSyncId)
@@ -174,7 +170,6 @@ class PauseResumeSyncsBasedOnBatteryAndWifiUseCaseTest {
             connectedToInternet = true,
             syncOnlyByWifi = true,
             batteryInfo = BatteryInfo(100, true),
-            isFreeAccount = false
         )
 
         verify(pauseSyncUseCase).invoke(firstSyncId)

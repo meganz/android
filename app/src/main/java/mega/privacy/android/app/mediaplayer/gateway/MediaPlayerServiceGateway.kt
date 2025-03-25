@@ -40,8 +40,9 @@ interface MediaPlayerServiceGateway {
      * Seek to the index
      *
      * @param index the index that is sought to
+     * @param handle the handle that is sought to
      */
-    fun seekTo(index: Int)
+    fun seekTo(index: Int, handle: Long)
 
     /**
      * Set playWhenReady
@@ -108,4 +109,11 @@ interface MediaPlayerServiceGateway {
      * Check the user if logged in when the audio player is closed, if not, stop the audio service
      */
     fun stopAudioServiceWhenAudioPlayerClosedWithUserNotLogin()
+
+    /**
+     * Get the current adapter type
+     *
+     * @return the current adapter type
+     */
+    fun getCurrentAdapterType(): Int
 }

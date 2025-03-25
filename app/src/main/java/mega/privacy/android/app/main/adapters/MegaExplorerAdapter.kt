@@ -37,9 +37,9 @@ import mega.privacy.android.app.fragments.homepage.SortByHeaderViewModel
 import mega.privacy.android.app.main.CloudDriveExplorerFragment
 import mega.privacy.android.app.main.DrawerItem
 import mega.privacy.android.app.main.IncomingSharesExplorerFragment
-import mega.privacy.android.app.main.adapters.MegaNodeAdapter.ITEM_VIEW_TYPE_GRID
-import mega.privacy.android.app.main.adapters.MegaNodeAdapter.ITEM_VIEW_TYPE_HEADER
-import mega.privacy.android.app.main.adapters.MegaNodeAdapter.ITEM_VIEW_TYPE_LIST
+import mega.privacy.android.app.main.adapters.MegaNodeAdapter.Companion.ITEM_VIEW_TYPE_GRID
+import mega.privacy.android.app.main.adapters.MegaNodeAdapter.Companion.ITEM_VIEW_TYPE_HEADER
+import mega.privacy.android.app.main.adapters.MegaNodeAdapter.Companion.ITEM_VIEW_TYPE_LIST
 import mega.privacy.android.app.utils.Constants.ICON_MARGIN_DP
 import mega.privacy.android.app.utils.Constants.ICON_SIZE_DP
 import mega.privacy.android.app.utils.Constants.MIN_ITEMS_SCROLLBAR

@@ -47,6 +47,7 @@ import nz.mega.sdk.MegaSetList
 import nz.mega.sdk.MegaShare
 import nz.mega.sdk.MegaStringList
 import nz.mega.sdk.MegaStringMap
+import nz.mega.sdk.MegaSyncList
 import nz.mega.sdk.MegaTransfer
 import nz.mega.sdk.MegaTransferData
 import nz.mega.sdk.MegaTransferListenerInterface
@@ -72,6 +73,8 @@ internal class MegaApiFacade @Inject constructor(
     override fun getWaitingReason() = megaApi.isWaiting
 
     override fun getInvalidHandle(): Long = MegaApiAndroid.INVALID_HANDLE
+
+    override fun getInvalidAffiliateType(): Int = MegaApiAndroid.AFFILIATE_TYPE_INVALID
 
     override fun getInvalidBackupType() = MegaApiAndroid.BACKUP_TYPE_INVALID
 
@@ -241,10 +244,6 @@ internal class MegaApiFacade @Inject constructor(
                 trySend(GlobalUpdate.OnNodesUpdate(nodeList))
             }
 
-            override fun onReloadNeeded(api: MegaApiJava) {
-                trySend(GlobalUpdate.OnReloadNeeded)
-            }
-
             override fun onAccountUpdate(api: MegaApiJava) {
                 trySend(GlobalUpdate.OnAccountUpdate)
             }
@@ -257,6 +256,9 @@ internal class MegaApiFacade @Inject constructor(
             }
 
             override fun onEvent(api: MegaApiJava, event: MegaEvent?) {
+                if (event?.type == MegaEvent.EVENT_RELOADING) {
+                    trySend(GlobalUpdate.OnReloadNeeded)
+                }
                 trySend(GlobalUpdate.OnEvent(event))
             }
 
@@ -485,7 +487,7 @@ internal class MegaApiFacade @Inject constructor(
 
     override suspend fun getNumUnreadUserAlerts(): Int = megaApi.numUnreadUserAlerts
 
-    override suspend fun getBackupsNode(): MegaNode? = megaApi.inboxNode
+    override suspend fun getBackupsNode(): MegaNode? = megaApi.vaultNode
 
     override suspend fun hasChildren(node: MegaNode): Boolean = megaApi.hasChildren(node)
 
@@ -616,7 +618,7 @@ internal class MegaApiFacade @Inject constructor(
 
     override suspend fun isInRubbish(node: MegaNode): Boolean = megaApi.isInRubbish(node)
 
-    override suspend fun isInBackups(node: MegaNode): Boolean = megaApi.isInInbox(node)
+    override suspend fun isInBackups(node: MegaNode): Boolean = megaApi.isInVault(node)
 
     override suspend fun isInCloudDrive(node: MegaNode): Boolean = megaApi.isInCloud(node)
 
@@ -1039,22 +1041,6 @@ internal class MegaApiFacade @Inject constructor(
         listener: MegaRequestListenerInterface,
     ) = megaApi.submitPurchaseReceipt(gateway, receipt, listener)
 
-    override fun submitPurchaseReceipt(
-        gateway: Int,
-        receipt: String?,
-        lastPublicHandle: Long,
-        lastPublicHandleType: Int,
-        lastAccessTimestamp: Long,
-        listener: MegaRequestListenerInterface,
-    ) = megaApi.submitPurchaseReceipt(
-        gateway,
-        receipt,
-        lastPublicHandle,
-        lastPublicHandleType,
-        lastAccessTimestamp,
-        listener,
-    )
-
     override fun setMyChatFilesFolder(nodeHandle: Long, listener: MegaRequestListenerInterface) =
         megaApi.setMyChatFilesFolder(
             nodeHandle,
@@ -1067,20 +1053,6 @@ internal class MegaApiFacade @Inject constructor(
     override fun getFileVersionsOption(listener: MegaRequestListenerInterface) {
         megaApi.getFileVersionsOption(listener)
     }
-
-    @Deprecated(
-        "Function related to statistics will be reviewed in future updates to provide more " +
-                "data and avoid race conditions. They could change or be removed in the current form."
-    )
-    override val numberOfPendingUploads: Int
-        get() = megaApi.numPendingUploads
-
-    @Deprecated(
-        "Function related to statistics will be reviewed in future updates to provide more" +
-                "data and avoid race conditions. They could change or be removed in the current form."
-    )
-    override val numberOfPendingDownloads: Int
-        get() = megaApi.numPendingDownloads
 
     override fun setFileVersionsOption(disable: Boolean, listener: MegaRequestListenerInterface) {
         megaApi.setFileVersionsOption(disable, listener)
@@ -1101,15 +1073,6 @@ internal class MegaApiFacade @Inject constructor(
 
     override fun changeEmail(email: String, listener: MegaRequestListenerInterface) =
         megaApi.changeEmail(email, listener)
-
-    @Suppress("DEPRECATION")
-    @Deprecated(
-        "Function related to statistics will be reviewed in future updates to\n" +
-                " * provide more data and avoid race conditions. They could change or be removed in the current form."
-    )
-    override fun resetTotalUploads() {
-        megaApi.resetTotalUploads()
-    }
 
     override suspend fun isAccountNew(): Boolean = megaApi.accountIsNew()
 
@@ -1317,13 +1280,7 @@ internal class MegaApiFacade @Inject constructor(
         node: MegaNode,
         expireTime: Long?,
         listener: MegaRequestListenerInterface,
-    ) {
-        if (expireTime != null && expireTime > 0) {
-            megaApi.exportNode(node, expireTime.toInt(), listener)
-        } else {
-            megaApi.exportNode(node, listener)
-        }
-    }
+    ) = megaApi.exportNode(node, expireTime?.toInt() ?: 0, listener)
 
     override fun getDeviceName(deviceId: String, listener: MegaRequestListenerInterface?) =
         megaApi.getDeviceName(deviceId, listener)
@@ -1338,7 +1295,7 @@ internal class MegaApiFacade @Inject constructor(
 
     override fun getABTestValue(flag: String): Long = megaApi.getABTestValue(flag)
 
-    override suspend fun getBannerQuotaTime() = megaApi.bandwidthOverquotaDelay
+    override suspend fun getBandwidthOverQuotaDelay() = megaApi.bandwidthOverquotaDelay
 
     override fun disableExport(node: MegaNode, listener: MegaRequestListenerInterface) =
         megaApi.disableExport(node, listener)
@@ -1566,4 +1523,27 @@ internal class MegaApiFacade @Inject constructor(
     }
 
     override fun enableRequestStatusMonitor() = megaApi.enableRequestStatusMonitor()
+
+    override fun createAccount(
+        email: String,
+        password: String,
+        firstName: String,
+        lastName: String,
+        listener: MegaRequestListenerInterface,
+    ) {
+        megaApi.createAccount(email, password, firstName, lastName, listener)
+    }
+
+    override fun setMyBackupsFolder(
+        localizedName: String,
+        listener: MegaRequestListenerInterface?,
+    ) {
+        megaApi.setMyBackupsFolder(localizedName, listener)
+    }
+
+    override fun getSyncs(): MegaSyncList = megaApi.syncs
+
+    override fun removeVersions(listener: MegaRequestListenerInterface) {
+        megaApi.removeVersions(listener)
+    }
 }

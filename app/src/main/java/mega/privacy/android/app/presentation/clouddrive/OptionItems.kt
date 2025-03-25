@@ -88,5 +88,15 @@ enum class OptionItems {
     /**
      * Option item Dispute clicked
      */
-    DISPUTE_CLICKED;
+    DISPUTE_CLICKED,
+
+    /**
+     * Option item add to album
+     */
+    ADD_TO_ALBUM,
+
+    /**
+     * Option item add to
+     */
+    ADD_TO;
 }

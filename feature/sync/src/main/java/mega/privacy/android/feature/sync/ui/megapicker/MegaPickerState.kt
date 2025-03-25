@@ -12,4 +12,5 @@ internal data class MegaPickerState(
     val errorMessageId: Int? = null,
     val navigateNextEvent: StateEvent = consumed,
     val isSelectEnabled: Boolean = false,
+    val isLoading: Boolean = false,
 )

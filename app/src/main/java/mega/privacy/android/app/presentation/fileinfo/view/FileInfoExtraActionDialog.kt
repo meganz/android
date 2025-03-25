@@ -12,7 +12,7 @@ import mega.privacy.android.domain.entity.shares.AccessPermission
 import mega.privacy.android.shared.original.core.ui.controls.dialogs.ConfirmationDialogWithRadioButtons
 import mega.privacy.android.shared.original.core.ui.controls.dialogs.MegaAlertDialog
 import mega.privacy.android.shared.original.core.ui.preview.CombinedThemeRtlPreviews
-import mega.privacy.android.shared.original.core.ui.theme.OriginalTempTheme
+import mega.privacy.android.shared.original.core.ui.theme.OriginalTheme
 
 @Composable
 internal fun ExtraActionDialog(
@@ -61,7 +61,7 @@ internal fun ExtraActionDialog(
 private fun ExtraActionDialogPreview(
     @PreviewParameter(ExtraActionDialogPreviewProvider::class) action: FileInfoExtraAction,
 ) {
-    OriginalTempTheme(isDark = isSystemInDarkTheme()) {
+    OriginalTheme(isDark = isSystemInDarkTheme()) {
         ExtraActionDialog(
             action = action,
             onRemoveConfirmed = { },

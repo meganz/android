@@ -68,6 +68,11 @@ interface RTCAudioManagerGateway {
     fun stopSounds()
 
     /**
+     * Method for stopping the sound of incoming calls.
+     */
+    fun stopIncomingCallSounds()
+
+    /**
      * Method for updating the call status of the Audio Manger.
      *
      * @param callStatus Call status.

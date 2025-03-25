@@ -2,7 +2,9 @@ package mega.privacy.android.app.presentation.documentscanner
 
 import android.net.Uri
 import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.imePadding
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.systemBarsPadding
 import androidx.compose.material.rememberScaffoldState
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
@@ -25,7 +27,10 @@ internal fun SaveScannedDocumentsScreen(
     val navHostController = rememberNavController()
 
     MegaScaffold(
-        modifier = Modifier.fillMaxSize(),
+        modifier = Modifier
+            .fillMaxSize()
+            .systemBarsPadding()
+            .imePadding(),
         scaffoldState = rememberScaffoldState(),
     ) { padding ->
         SaveScannedDocumentsNavHostController(

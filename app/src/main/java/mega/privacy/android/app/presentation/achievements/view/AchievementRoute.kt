@@ -30,7 +30,7 @@ import mega.privacy.android.app.R
 import mega.privacy.android.app.data.extensions.toStorageString
 import mega.privacy.android.app.data.extensions.toUnitString
 import mega.privacy.android.app.presentation.achievements.AchievementsOverviewViewModel
-import mega.privacy.android.shared.original.core.ui.theme.OriginalTempTheme
+import mega.privacy.android.shared.original.core.ui.theme.OriginalTheme
 import mega.privacy.android.shared.original.core.ui.theme.extensions.grey_020_dark_grey
 import mega.privacy.android.shared.original.core.ui.theme.extensions.grey_alpha_012_white_alpha_012
 import mega.privacy.android.domain.entity.achievement.AchievementType
@@ -269,7 +269,7 @@ internal fun AchievementView(
 @Preview(showBackground = true)
 @Composable
 fun AchievementPreview() {
-    OriginalTempTheme(false) {
+    OriginalTheme(false) {
         AchievementView(
             currentStorage = 1337000000000,
             hasReferrals = true,
@@ -295,7 +295,7 @@ fun AchievementPreview() {
 @Preview(showBackground = true)
 @Composable
 fun AchievementPreviewDark() {
-    OriginalTempTheme(true) {
+    OriginalTheme(true) {
         AchievementView(
             currentStorage = 13376969,
             hasReferrals = false,

@@ -13,21 +13,26 @@ import androidx.activity.viewModels
 import androidx.appcompat.app.AlertDialog
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.saveable.rememberSaveable
+import androidx.compose.runtime.setValue
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.lifecycle.lifecycleScope
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.launch
 import mega.privacy.android.app.R
 import mega.privacy.android.app.activities.PasscodeActivity
-import mega.privacy.android.app.main.FileStorageActivity
+import mega.privacy.android.app.presentation.filestorage.FileStorageActivity
 import mega.privacy.android.app.presentation.changepassword.ChangePasswordActivity
 import mega.privacy.android.app.presentation.extensions.isDarkMode
+import mega.privacy.android.app.presentation.logout.LogoutConfirmationDialog
+import mega.privacy.android.app.presentation.logout.LogoutViewModel
 import mega.privacy.android.app.presentation.testpassword.view.TestPasswordComposeView
 import mega.privacy.android.app.utils.TextUtil
 import mega.privacy.android.app.utils.permission.PermissionUtils
 import mega.privacy.android.domain.entity.ThemeMode
 import mega.privacy.android.domain.usecase.GetThemeMode
-import mega.privacy.android.shared.original.core.ui.theme.OriginalTempTheme
+import mega.privacy.android.shared.original.core.ui.theme.OriginalTheme
 import timber.log.Timber
 import javax.inject.Inject
 
@@ -45,9 +50,9 @@ class TestPasswordActivity : PasscodeActivity() {
 
     private val activity = this@TestPasswordActivity
     private val viewModel: TestPasswordViewModel by viewModels()
+    private val logoutViewModel by viewModels<LogoutViewModel>()
     private val onBackPressedCallback = object : OnBackPressedCallback(true) {
         override fun handleOnBackPressed() {
-            if (psaWebBrowser != null && psaWebBrowser?.consumeBack() == true) return
             viewModel.dismissPasswordReminder(false)
         }
     }
@@ -111,15 +116,22 @@ class TestPasswordActivity : PasscodeActivity() {
         val themeMode by getThemeMode()
             .collectAsStateWithLifecycle(initialValue = ThemeMode.System)
         val uiState by viewModel.uiState.collectAsStateWithLifecycle()
+        var logoutDialog by rememberSaveable { mutableStateOf(false) }
 
-        OriginalTempTheme(isDark = themeMode.isDarkMode()) {
+        OriginalTheme(isDark = themeMode.isDarkMode()) {
             TestPasswordComposeView(
                 uiState = uiState,
                 onResetUserMessage = viewModel::resetUserMessage,
                 onCheckCurrentPassword = viewModel::checkForCurrentPassword,
                 onTestPasswordClick = viewModel::switchToTestPasswordLayout,
                 onCheckboxValueChanged = viewModel::setPasswordReminderBlocked,
-                onDismiss = viewModel::dismissPasswordReminder,
+                onDismiss = { logout ->
+                    if (logout) {
+                        logoutDialog = true
+                    } else {
+                        viewModel.dismissPasswordReminder(false)
+                    }
+                },
                 onResetPasswordVerificationState = viewModel::resetCurrentPasswordState,
                 onUserLogout = ::logoutOrFinish,
                 onResetUserLogout = viewModel::resetUserLogout,
@@ -136,6 +148,12 @@ class TestPasswordActivity : PasscodeActivity() {
                     viewModel.notifyPasswordReminderSucceeded()
                 },
             )
+            if (logoutDialog) {
+                LogoutConfirmationDialog(
+                    logoutViewModel = logoutViewModel,
+                    onDismissed = { logoutDialog = false }
+                )
+            }
         }
     }
 
@@ -156,7 +174,7 @@ class TestPasswordActivity : PasscodeActivity() {
 
     private fun logoutOrFinish(isLogout: Boolean) {
         if (isLogout) {
-            viewModel.logout()
+            logoutViewModel.logout()
         } else {
             finish()
         }

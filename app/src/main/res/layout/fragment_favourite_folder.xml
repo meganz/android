@@ -41,7 +41,7 @@
             android:layout_width="144dp"
             android:layout_height="144dp"
             android:layout_centerHorizontal="true"
-            android:src="@drawable/ic_zero_landscape_empty_folder"
+            android:src="@drawable/ic_empty_folder_glass"
             tools:ignore="ContentDescription" />
 
         <TextView
@@ -56,5 +56,19 @@
             android:textAllCaps="true"
             android:textAppearance="@style/TextAppearance.Mega.Body2.Secondary.Variant.AllCaps" />
     </RelativeLayout>
+
+    <com.google.android.material.floatingactionbutton.FloatingActionButton
+        android:id="@+id/add_fab_button"
+        android:layout_width="@dimen/fab_button_diameter"
+        android:layout_height="@dimen/fab_button_diameter"
+        android:layout_marginEnd="16dp"
+        android:layout_marginBottom="16dp"
+        android:elevation="@dimen/elevation_low"
+        android:src="@drawable/ic_add_white"
+        android:stateListAnimator="@anim/button_elevation"
+        android:tint="@android:color/white"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        tools:ignore="ContentDescription" />
 
 </androidx.constraintlayout.widget.ConstraintLayout>

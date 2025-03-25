@@ -4,8 +4,11 @@ import androidx.room.ColumnInfo
 import androidx.room.Entity
 import androidx.room.Index
 import androidx.room.PrimaryKey
+import androidx.room.TypeConverters
 import mega.privacy.android.data.database.MegaDatabaseConstant
+import mega.privacy.android.data.database.converter.ActiveTransferAppDataConverter
 import mega.privacy.android.domain.entity.transfer.ActiveTransfer
+import mega.privacy.android.domain.entity.transfer.TransferAppData
 import mega.privacy.android.domain.entity.transfer.TransferType
 
 /**
@@ -20,11 +23,13 @@ import mega.privacy.android.domain.entity.transfer.TransferType
  * @param isPaused True if the transfer is paused, false otherwise
  * @param isAlreadyTransferred True if the transfer finished without actually transferring bytes because it was already transferred
  * @param isCancelled True if the transfer finished because it was cancelled before ending
+ * @param appData The app data associated with this transfer
  */
 @Entity(
     MegaDatabaseConstant.TABLE_ACTIVE_TRANSFERS,
     indices = [Index(value = ["transfer_type"])]
 )
+@TypeConverters(ActiveTransferAppDataConverter::class)
 internal data class ActiveTransferEntity(
     @PrimaryKey
     @ColumnInfo(name = "tag")
@@ -43,4 +48,6 @@ internal data class ActiveTransferEntity(
     override val isAlreadyTransferred: Boolean,
     @ColumnInfo(name = "is_cancelled", defaultValue = "0")
     override val isCancelled: Boolean,
+    @ColumnInfo(name = "transferappdata", defaultValue = "")
+    override val appData: List<TransferAppData>,
 ) : ActiveTransfer

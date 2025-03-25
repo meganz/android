@@ -30,8 +30,8 @@ import androidx.compose.ui.platform.LocalConfiguration
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import mega.privacy.android.shared.original.core.ui.preview.CombinedThemePreviews
+import mega.privacy.android.shared.original.core.ui.theme.OriginalTheme
 import mega.privacy.android.shared.original.core.ui.utils.shimmerEffect
-import mega.privacy.android.shared.original.core.ui.theme.OriginalTempTheme
 
 @Composable
 internal fun PhotosSkeletonView() {
@@ -67,7 +67,7 @@ internal fun PhotosSkeletonView() {
                         modifier = Modifier
                             .wrapContentSize()
                             .padding(start = 16.dp, top = 14.dp, bottom = 14.dp)
-                            .shimmerEffectSquare(),
+                            .shimmerEffectSemiRounded(),
                         color = Color.Transparent
                     )
                 }
@@ -114,21 +114,21 @@ internal fun AlbumListSkeletonView() {
                         .padding(all = 1.5.dp)
                         .fillMaxWidth()
                         .aspectRatio(1f)
-                        .shimmerEffectSquare(),
+                        .shimmerEffectSemiRounded(),
                 )
                 Text(
                     text = "Album names",
                     modifier = Modifier
                         .wrapContentSize()
                         .padding(top = 10.dp, bottom = 3.dp)
-                        .shimmerEffectSquare(),
+                        .shimmerEffectSemiRounded(),
                     color = Color.Transparent
                 )
                 Text(
                     text = "number",
                     modifier = Modifier
                         .wrapContentSize()
-                        .shimmerEffectSquare(),
+                        .shimmerEffectSemiRounded(),
                     color = Color.Transparent
                 )
             }
@@ -170,7 +170,7 @@ private fun AlbumBig2SmallSkeletonView(
                 .width(smallWidth * 2)
                 .height(smallWidth * 2 + 1.dp)
                 .aspectRatio(1f)
-                .shimmerEffectSquare(),
+                .shimmerEffectSemiRounded(),
         )
         Column(
             verticalArrangement = Arrangement.SpaceBetween,
@@ -180,7 +180,7 @@ private fun AlbumBig2SmallSkeletonView(
                     .width(smallWidth)
                     .height(smallWidth)
                     .aspectRatio(1f)
-                    .shimmerEffectSquare(),
+                    .shimmerEffectSemiRounded(),
             )
             Spacer(
                 modifier = Modifier.height(1.dp)
@@ -190,7 +190,7 @@ private fun AlbumBig2SmallSkeletonView(
                     .width(smallWidth)
                     .height(smallWidth)
                     .aspectRatio(1f)
-                    .shimmerEffectSquare(),
+                    .shimmerEffectSemiRounded(),
             )
         }
     }
@@ -209,21 +209,21 @@ private fun AlbumSmall3ItemSkeletonView(
                 .width(smallWidth)
                 .height(smallWidth)
                 .aspectRatio(1f)
-                .shimmerEffectSquare(),
+                .shimmerEffectSemiRounded(),
         )
         Spacer(
             modifier = Modifier
                 .width(smallWidth)
                 .height(smallWidth)
                 .aspectRatio(1f)
-                .shimmerEffectSquare(),
+                .shimmerEffectSemiRounded(),
         )
         Spacer(
             modifier = Modifier
                 .width(smallWidth)
                 .height(smallWidth)
                 .aspectRatio(1f)
-                .shimmerEffectSquare(),
+                .shimmerEffectSemiRounded(),
         )
     }
 }
@@ -244,7 +244,7 @@ private fun AlbumSmall2BigSkeletonView(
                     .width(smallWidth)
                     .height(smallWidth)
                     .aspectRatio(1f)
-                    .shimmerEffectSquare(),
+                    .shimmerEffectSemiRounded(),
             )
             Spacer(
                 modifier = Modifier.height(1.dp)
@@ -254,7 +254,7 @@ private fun AlbumSmall2BigSkeletonView(
                     .width(smallWidth)
                     .height(smallWidth)
                     .aspectRatio(1f)
-                    .shimmerEffectSquare(),
+                    .shimmerEffectSemiRounded(),
             )
         }
         Spacer(
@@ -262,21 +262,27 @@ private fun AlbumSmall2BigSkeletonView(
                 .width(smallWidth * 2)
                 .height(smallWidth * 2 + 1.dp)
                 .aspectRatio(1f)
-                .shimmerEffectSquare(),
+                .shimmerEffectSemiRounded(),
         )
     }
 }
 
-private fun Modifier.shimmerEffectSquare(): Modifier {
+private fun Modifier.shimmerEffectSemiRounded(): Modifier {
     return this.shimmerEffect(
         shape = RoundedCornerShape(4.dp)
+    )
+}
+
+private fun Modifier.shimmerEffectSquare(): Modifier {
+    return this.shimmerEffect(
+        shape = RoundedCornerShape(0.dp)
     )
 }
 
 @CombinedThemePreviews
 @Composable
 private fun PhotosSkeletonViewPreview() {
-    OriginalTempTheme(isDark = isSystemInDarkTheme()) {
+    OriginalTheme(isDark = isSystemInDarkTheme()) {
         PhotosSkeletonView()
     }
 }
@@ -284,7 +290,7 @@ private fun PhotosSkeletonViewPreview() {
 @CombinedThemePreviews
 @Composable
 private fun AlbumListSkeletonViewPreview() {
-    OriginalTempTheme(isDark = isSystemInDarkTheme()) {
+    OriginalTheme(isDark = isSystemInDarkTheme()) {
         AlbumListSkeletonView()
     }
 }
@@ -292,7 +298,7 @@ private fun AlbumListSkeletonViewPreview() {
 @CombinedThemePreviews
 @Composable
 private fun AlbumContentSkeletonViewPreview() {
-    OriginalTempTheme(isDark = isSystemInDarkTheme()) {
+    OriginalTheme(isDark = isSystemInDarkTheme()) {
         val configuration = LocalConfiguration.current
         val smallWidth = remember(configuration) {
             (configuration.screenWidthDp.dp - 1.dp) / 3
@@ -304,7 +310,7 @@ private fun AlbumContentSkeletonViewPreview() {
 @CombinedThemePreviews
 @Composable
 private fun AlbumBig2SmallSkeletonViewPreview() {
-    OriginalTempTheme(isDark = isSystemInDarkTheme()) {
+    OriginalTheme(isDark = isSystemInDarkTheme()) {
         val configuration = LocalConfiguration.current
         val smallWidth = remember(configuration) {
             (configuration.screenWidthDp.dp - 1.dp) / 3
@@ -316,7 +322,7 @@ private fun AlbumBig2SmallSkeletonViewPreview() {
 @CombinedThemePreviews
 @Composable
 private fun AlbumSmall3ItemSkeletonViewPreview() {
-    OriginalTempTheme(isDark = isSystemInDarkTheme()) {
+    OriginalTheme(isDark = isSystemInDarkTheme()) {
         val configuration = LocalConfiguration.current
         val smallWidth = remember(configuration) {
             (configuration.screenWidthDp.dp - 1.dp) / 3
@@ -329,7 +335,7 @@ private fun AlbumSmall3ItemSkeletonViewPreview() {
 @CombinedThemePreviews
 @Composable
 private fun AlbumSmall2BigSkeletonViewPreview() {
-    OriginalTempTheme(isDark = isSystemInDarkTheme()) {
+    OriginalTheme(isDark = isSystemInDarkTheme()) {
         val configuration = LocalConfiguration.current
         val smallWidth = remember(configuration) {
             (configuration.screenWidthDp.dp - 1.dp) / 3

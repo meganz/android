@@ -38,4 +38,9 @@ internal class PermissionRepositoryImpl @Inject constructor(
         } else {
             permissionGateway.hasPermissions(permissionGateway.getReadExternalStoragePermission())
         }
+
+    override fun isLocationPermissionGranted(): Boolean {
+        return permissionGateway.hasPermissions(android.Manifest.permission.ACCESS_FINE_LOCATION)
+                || permissionGateway.hasPermissions(android.Manifest.permission.ACCESS_COARSE_LOCATION)
+    }
 }

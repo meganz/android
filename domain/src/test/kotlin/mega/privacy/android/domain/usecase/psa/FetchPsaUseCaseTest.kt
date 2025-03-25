@@ -4,7 +4,7 @@ import com.google.common.truth.Truth.assertThat
 import kotlinx.coroutines.test.runTest
 import mega.privacy.android.domain.entity.psa.Psa
 import mega.privacy.android.domain.repository.psa.PsaRepository
-import mega.privacy.android.domain.usecase.IsUserLoggedIn
+import mega.privacy.android.domain.usecase.login.IsUserLoggedInUseCase
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
 import org.mockito.kotlin.any
@@ -17,17 +17,20 @@ class FetchPsaUseCaseTest {
     private lateinit var underTest: FetchPsaUseCase
 
     private val psaRepository = mock<PsaRepository>()
-    private val isUserLoggedIn = mock<IsUserLoggedIn>()
+    private val isUserLoggedInUseCase = mock<IsUserLoggedInUseCase>()
 
     @BeforeEach
     internal fun setUp() {
-        underTest = FetchPsaUseCase(psaRepository = psaRepository, isUserLoggedIn = isUserLoggedIn)
+        underTest = FetchPsaUseCase(
+            psaRepository = psaRepository,
+            isUserLoggedInUseCase = isUserLoggedInUseCase,
+        )
     }
 
     @Test
     internal fun `test that psa is returned if present`() = runTest {
         val expected = createPsaTestData()
-        whenever(isUserLoggedIn()).thenReturn(true)
+        whenever(isUserLoggedInUseCase()).thenReturn(true)
         psaRepository.stub {
             onBlocking { fetchPsa(any()) }.thenReturn(expected)
         }
@@ -37,7 +40,7 @@ class FetchPsaUseCaseTest {
 
     @Test
     internal fun `test that null is returned if no psa is found`() = runTest {
-        whenever(isUserLoggedIn()).thenReturn(true)
+        whenever(isUserLoggedInUseCase()).thenReturn(true)
         psaRepository.stub {
             onBlocking { fetchPsa(true) }.thenReturn(null)
         }
@@ -51,7 +54,7 @@ class FetchPsaUseCaseTest {
             val currentTime = 10_000_000L
             val lastFetchedTime = currentTime - (underTest.psaRequestTimeout / 2)
             val notExpected = createPsaTestData()
-            whenever(isUserLoggedIn()).thenReturn(true)
+            whenever(isUserLoggedInUseCase()).thenReturn(true)
             psaRepository.stub {
                 onBlocking { getLastPsaFetchedTime() }.thenReturn(lastFetchedTime)
                 onBlocking { fetchPsa(true) }.thenReturn(notExpected)
@@ -68,7 +71,7 @@ class FetchPsaUseCaseTest {
             val lastFetchedTime = currentTime - (underTest.psaRequestTimeout + 1)
 
             val expected = createPsaTestData()
-            whenever(isUserLoggedIn()).thenReturn(true)
+            whenever(isUserLoggedInUseCase()).thenReturn(true)
             psaRepository.stub {
                 onBlocking { getLastPsaFetchedTime() }.thenReturn(lastFetchedTime)
                 onBlocking { fetchPsa(true) }.thenReturn(expected)
@@ -82,7 +85,7 @@ class FetchPsaUseCaseTest {
     internal fun `test that last fetched time is updated if fetched`() = runTest {
         val currentTime = 10_000_000L
         val lastFetchedTime = currentTime - (underTest.psaRequestTimeout + 1)
-        whenever(isUserLoggedIn()).thenReturn(true)
+        whenever(isUserLoggedInUseCase()).thenReturn(true)
         psaRepository.stub {
             onBlocking { getLastPsaFetchedTime() }.thenReturn(lastFetchedTime)
             onBlocking { fetchPsa(true) }.thenReturn(null)
@@ -96,7 +99,7 @@ class FetchPsaUseCaseTest {
 
     @Test
     fun `test that user is not logged in then use case returns null`() = runTest {
-        whenever(isUserLoggedIn()).thenReturn(false)
+        whenever(isUserLoggedInUseCase()).thenReturn(false)
 
         assertThat(underTest.invoke(10L)).isNull()
     }

@@ -18,7 +18,7 @@ import mega.privacy.android.shared.original.core.ui.controls.appbar.AppBarType
 import mega.privacy.android.shared.original.core.ui.controls.appbar.MegaAppBar
 import mega.privacy.android.shared.original.core.ui.controls.appbar.SelectModeAppBar
 import mega.privacy.android.shared.original.core.ui.preview.CombinedThemePreviews
-import mega.privacy.android.shared.original.core.ui.theme.OriginalTempTheme
+import mega.privacy.android.shared.original.core.ui.theme.OriginalTheme
 
 @Composable
 internal fun VideoSelectedTopBar(
@@ -78,7 +78,7 @@ internal fun VideoSelectedTopBar(
 private fun VideoSelectedTopBarWithEmptyPreview(
     @PreviewParameter(SampleFolderNodeDataProvider::class) items: List<NodeUIItem<TypedFolderNode>>,
 ) {
-    OriginalTempTheme(isDark = isSystemInDarkTheme()) {
+    OriginalTheme(isDark = isSystemInDarkTheme()) {
         VideoSelectedTopBar(
             title = "Choose files",
             selectedSize = 0,
@@ -99,7 +99,7 @@ private fun VideoSelectedTopBarWithEmptyPreview(
 private fun VideoSelectedTopBarWithSelectedPreview(
     @PreviewParameter(SampleFolderNodeDataProvider::class) items: List<NodeUIItem<TypedFolderNode>>,
 ) {
-    OriginalTempTheme(isDark = isSystemInDarkTheme()) {
+    OriginalTheme(isDark = isSystemInDarkTheme()) {
         VideoSelectedTopBar(
             title = "Choose files",
             selectedSize = 3,
@@ -120,7 +120,7 @@ private fun VideoSelectedTopBarWithSelectedPreview(
 private fun VideoSelectedTopBarWithQueryPreview(
     @PreviewParameter(SampleFolderNodeDataProvider::class) items: List<NodeUIItem<TypedFolderNode>>,
 ) {
-    OriginalTempTheme(isDark = isSystemInDarkTheme()) {
+    OriginalTheme(isDark = isSystemInDarkTheme()) {
         VideoSelectedTopBar(
             title = "Choose files",
             selectedSize = 0,

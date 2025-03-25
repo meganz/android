@@ -5,6 +5,7 @@ import kotlinx.coroutines.flow.conflate
 import kotlinx.coroutines.flow.map
 import mega.privacy.android.domain.entity.chat.PendingMessageState
 import mega.privacy.android.domain.entity.chat.messages.pending.UpdatePendingMessageStateRequest
+import mega.privacy.android.domain.entity.uri.UriPath
 import mega.privacy.android.domain.repository.FileSystemRepository
 import mega.privacy.android.domain.usecase.chat.message.MonitorPendingMessagesByStateUseCase
 import mega.privacy.android.domain.usecase.chat.message.UpdatePendingMessageUseCase
@@ -37,8 +38,9 @@ class StartUploadingAllPendingMessagesUseCase @Inject constructor(
                         // - Wait until scanning finished as required by the sdk
                         filesAndNames.first?.let { file ->
                             startChatUploadAndWaitScanningFinishedUseCase(
-                                mapOf(file to filesAndNames.second),
-                                pendingMessages.map { it.id }
+                                uriPath = UriPath(file.absolutePath),
+                                fileName = filesAndNames.second,
+                                pendingMessageIds = pendingMessages.map { it.id }
                             )
                             updatePendingMessageUseCase(
                                 updatePendingMessageRequests = pendingMessages.map { pendingMessage ->

@@ -31,6 +31,7 @@ import androidx.core.widget.doAfterTextChanged
 import androidx.lifecycle.lifecycleScope
 import com.google.android.material.dialog.MaterialAlertDialogBuilder
 import dagger.hilt.android.AndroidEntryPoint
+import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.launch
 import mega.privacy.android.analytics.Analytics
 import mega.privacy.android.app.BaseActivity
@@ -40,15 +41,15 @@ import mega.privacy.android.app.databinding.ActivityPasscodeBinding
 import mega.privacy.android.app.extensions.enableEdgeToEdgeAndConsumeInsets
 import mega.privacy.android.app.modalbottomsheet.ModalBottomSheetUtil.isBottomSheetDialogShown
 import mega.privacy.android.app.modalbottomsheet.PasscodeOptionsBottomSheetDialogFragment
-import mega.privacy.android.app.objects.PasscodeManagement
 import mega.privacy.android.app.presentation.logout.LogoutViewModel
+import mega.privacy.android.app.presentation.passcode.PasscodeUnlockViewModel
 import mega.privacy.android.app.utils.Constants.PIN_4
 import mega.privacy.android.app.utils.Constants.PIN_6
 import mega.privacy.android.app.utils.Constants.PIN_ALPHANUMERIC
-import mega.privacy.android.app.utils.PasscodeUtil
 import mega.privacy.android.app.utils.Util.dp2px
 import mega.privacy.android.app.utils.Util.hideKeyboardView
 import mega.privacy.android.app.utils.wrapper.PasscodePreferenceWrapper
+import mega.privacy.android.domain.qualifier.ApplicationScope
 import mega.privacy.mobile.analytics.event.ForgotPasscodeButtonPressedEvent
 import mega.privacy.mobile.analytics.event.PasscodeBiometricUnlockDialogEvent
 import mega.privacy.mobile.analytics.event.PasscodeLogoutButtonPressedEvent
@@ -90,13 +91,13 @@ class PasscodeLockActivity : BaseActivity() {
     private var setOrUnlockMode = true
 
     @Inject
-    lateinit var passcodeUtil: PasscodeUtil
-
-    @Inject
-    lateinit var passcodeManagement: PasscodeManagement
-
-    @Inject
     lateinit var passcodePreferenceWrapper: PasscodePreferenceWrapper
+
+    private val unlockViewModel by viewModels<PasscodeUnlockViewModel>()
+
+    @Inject
+    @ApplicationScope
+    lateinit var scope: CoroutineScope
 
     private lateinit var binding: ActivityPasscodeBinding
     private var passcodeType = PIN_4
@@ -140,7 +141,7 @@ class PasscodeLockActivity : BaseActivity() {
                         }
                     }
 
-                    RESET_MODE -> passcodeManagement.showPasscodeScreen = false
+                    RESET_MODE -> {}//passcodeManagement.showPasscodeScreen = false
                     else -> finishActivity()
                 }
             }
@@ -156,8 +157,6 @@ class PasscodeLockActivity : BaseActivity() {
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-
-        passcodeManagement.needsOpenAgain = false
 
         mode = when (intent.action) {
             ACTION_SET_PASSCODE_LOCK -> SET_MODE
@@ -241,11 +240,6 @@ class PasscodeLockActivity : BaseActivity() {
         }
     }
 
-    override fun onResume() {
-        super.onResume()
-        passcodeUtil.resetLastPauseUpdate()
-    }
-
     /**
      * Increments the number of failed attempts.
      */
@@ -280,15 +274,15 @@ class PasscodeLockActivity : BaseActivity() {
         }
 
         val messageId = when {
-            existOfflineFiles && existOutgoingTransfers -> R.string.logout_warning_offline_and_transfers
-            existOfflineFiles -> R.string.logout_warning_offline
-            else -> R.string.logout_warning_transfers
+            existOfflineFiles && existOutgoingTransfers -> R.string.logout_warning_dialog_offline_and_transfers_message
+            existOfflineFiles -> R.string.logout_warning_dialog_offline_message
+            else -> R.string.logout_warning_dialog_transfers_message
         }
 
         MaterialAlertDialogBuilder(this, R.style.ThemeOverlay_Mega_MaterialAlertDialog)
-            .setTitle(getString(R.string.proceed_to_logout))
+            .setTitle(getString(R.string.logout_warning_dialog_title))
             .setMessage(getString(messageId))
-            .setPositiveButton(getString(R.string.action_logout)) { _, _ ->
+            .setPositiveButton(getString(R.string.logout_warning_dialog_positive_button)) { _, _ ->
                 isConfirmLogoutDialogShown = false
                 logout()
             }
@@ -381,26 +375,26 @@ class PasscodeLockActivity : BaseActivity() {
                     isVisible = true
                     requestFocus()
 
-                    doAfterTextChanged {
-                        isEnabled = if (this.text.toString().isNotEmpty()) {
+                    doAfterTextChanged { text ->
+                        val isValid = text.isNullOrEmpty().not()
+                        if (isValid) {
                             binding.passSecondInput.requestFocus()
-                            false
-                        } else {
-                            true
                         }
+                        isFocusable = !isValid
+                        isFocusableInTouchMode = !isValid
                     }
                 }
 
                 binding.passSecondInput.apply {
                     isVisible = true
 
-                    doAfterTextChanged {
-                        isEnabled = if (this.text.toString().isNotEmpty()) {
+                    doAfterTextChanged { text ->
+                        val isValid = text.isNullOrEmpty().not()
+                        if (isValid) {
                             binding.passThirdInput.requestFocus()
-                            false
-                        } else {
-                            true
                         }
+                        isFocusable = !isValid
+                        isFocusableInTouchMode = !isValid
                     }
 
                     previousDigitEditText = binding.passFirstInput
@@ -410,13 +404,13 @@ class PasscodeLockActivity : BaseActivity() {
                 binding.passThirdInput.apply {
                     isVisible = true
 
-                    doAfterTextChanged {
-                        isEnabled = if (this.text.toString().isNotEmpty()) {
+                    doAfterTextChanged { text ->
+                        val isValid = text.isNullOrEmpty().not()
+                        if (isValid) {
                             binding.passFourthInput.requestFocus()
-                            false
-                        } else {
-                            true
                         }
+                        isFocusable = !isValid
+                        isFocusableInTouchMode = !isValid
                     }
 
                     previousDigitEditText = binding.passSecondInput
@@ -425,7 +419,7 @@ class PasscodeLockActivity : BaseActivity() {
                 binding.passFourthInput.apply {
                     isVisible = true
 
-                    doAfterTextChanged {
+                    doAfterTextChanged { text ->
                         if (passcodeType == PIN_4) {
                             if (this.text.toString().isNotEmpty()) {
                                 binding.passFirstInput.apply {
@@ -436,12 +430,12 @@ class PasscodeLockActivity : BaseActivity() {
                                 checkPasscode()
                             }
                         } else {
-                            isEnabled = if (this.text.toString().isNotEmpty()) {
+                            val isValid = text.isNullOrEmpty().not()
+                            if (isValid) {
                                 binding.passFifthInput.requestFocus()
-                                false
-                            } else {
-                                true
                             }
+                            isFocusable = !isValid
+                            isFocusableInTouchMode = !isValid
                         }
                     }
 
@@ -465,13 +459,13 @@ class PasscodeLockActivity : BaseActivity() {
                     binding.passFifthInput.apply {
                         isVisible = true
 
-                        doAfterTextChanged {
-                            isEnabled = if (this.text.toString().isNotEmpty()) {
+                        doAfterTextChanged { text ->
+                            val isValid = text.isNullOrEmpty().not()
+                            if (isValid) {
                                 binding.passSixthInput.requestFocus()
-                                false
-                            } else {
-                                true
                             }
+                            isFocusable = !isValid
+                            isFocusableInTouchMode = !isValid
                         }
 
                         previousDigitEditText = binding.passFourthInput
@@ -634,9 +628,14 @@ class PasscodeLockActivity : BaseActivity() {
      */
     private fun confirmPasscode() {
         if (sbFirst.toString() == sbSecond.toString()) {
-            passcodeUtil.enablePasscode(passcodeType, sbFirst.toString())
-            setResult(RESULT_OK)
-            finish()
+            scope.launch {
+                passcodePreferenceWrapper.setPasscodeEnabled(true)
+                passcodePreferenceWrapper.setPasscodeLockType(passcodeType)
+                passcodePreferenceWrapper.setPasscode(sbFirst.toString())
+
+                setResult(RESULT_OK)
+                finish()
+            }
         } else {
             clearTypedPasscode()
             sbSecond.clear()
@@ -665,7 +664,6 @@ class PasscodeLockActivity : BaseActivity() {
      * was correctly introduced.
      */
     private fun skipPasscode() {
-        passcodeUtil.pauseUpdate()
         resetAttempts()
         clearFocus()
         finish()
@@ -830,11 +828,6 @@ class PasscodeLockActivity : BaseActivity() {
         }
     }
 
-    override fun onDestroy() {
-        passcodeManagement.showPasscodeScreen = passcodeManagement.needsOpenAgain || isFinishing
-        super.onDestroy()
-    }
-
     override fun onUserLeaveHint() {
         if (mode != UNLOCK_MODE) {
             finish()
@@ -856,8 +849,6 @@ class PasscodeLockActivity : BaseActivity() {
         outState.putBoolean(FORGET_PASSCODE, forgetPasscode)
         outState.putBoolean(PASSWORD_ALREADY_TYPED, passwordAlreadyTyped)
 
-        passcodeManagement.needsOpenAgain = true
-
         super.onSaveInstanceState(outState)
     }
 
@@ -878,7 +869,6 @@ class PasscodeLockActivity : BaseActivity() {
 
                     when (errorCode) {
                         ERROR_USER_CANCELED -> {
-                            passcodeManagement.needsOpenAgain = true
                             finish()
                         }
 
@@ -894,7 +884,7 @@ class PasscodeLockActivity : BaseActivity() {
                 ) {
                     super.onAuthenticationSucceeded(result)
                     Timber.d("Fingerprint unlocked")
-                    passcodeUtil.pauseUpdate()
+                    unlockViewModel.unlockWithBiometrics()
                     finish()
                 }
 

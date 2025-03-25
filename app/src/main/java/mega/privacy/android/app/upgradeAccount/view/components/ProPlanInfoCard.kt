@@ -1,5 +1,6 @@
 package mega.privacy.android.app.upgradeAccount.view.components
 
+import mega.privacy.android.shared.resources.R as sharedR
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
@@ -27,24 +28,23 @@ import mega.privacy.android.app.upgradeAccount.model.extensions.toUIAccountType
 import mega.privacy.android.app.upgradeAccount.model.mapper.FormattedSizeMapper
 import mega.privacy.android.app.upgradeAccount.model.mapper.LocalisedPriceCurrencyCodeStringMapper
 import mega.privacy.android.app.upgradeAccount.model.mapper.LocalisedPriceStringMapper
+import mega.privacy.android.domain.entity.AccountType
+import mega.privacy.android.domain.entity.Currency
+import mega.privacy.android.domain.entity.account.CurrencyAmount
 import mega.privacy.android.shared.original.core.ui.controls.text.MegaSpannedText
 import mega.privacy.android.shared.original.core.ui.controls.text.MegaText
 import mega.privacy.android.shared.original.core.ui.model.MegaSpanStyle
-import mega.privacy.android.shared.original.core.ui.theme.OriginalTempTheme
 import mega.privacy.android.shared.original.core.ui.model.SpanIndicator
 import mega.privacy.android.shared.original.core.ui.preview.CombinedThemePreviews
+import mega.privacy.android.shared.original.core.ui.theme.OriginalTheme
 import mega.privacy.android.shared.original.core.ui.theme.body2
 import mega.privacy.android.shared.original.core.ui.theme.caption
+import mega.privacy.android.shared.original.core.ui.theme.extensions.accent_900_accent_050
 import mega.privacy.android.shared.original.core.ui.theme.extensions.grey_050_grey_800
 import mega.privacy.android.shared.original.core.ui.theme.extensions.grey_alpha_012_white_alpha_012
 import mega.privacy.android.shared.original.core.ui.theme.extensions.h6Medium
 import mega.privacy.android.shared.original.core.ui.theme.extensions.subtitle1medium
-import mega.privacy.android.shared.original.core.ui.theme.extensions.teal_300_teal_200
-import mega.privacy.android.shared.original.core.ui.theme.values.TextColor
-import mega.privacy.android.domain.entity.AccountType
-import mega.privacy.android.domain.entity.Currency
-import mega.privacy.android.domain.entity.account.CurrencyAmount
-import mega.privacy.android.shared.resources.R as sharedR
+import mega.android.core.ui.theme.values.TextColor
 import java.util.Locale
 
 
@@ -121,7 +121,7 @@ internal fun ProPlanInfoCard(
             .border(
                 width = 1.dp,
                 color =
-                if (isClicked) MaterialTheme.colors.teal_300_teal_200
+                if (isClicked) MaterialTheme.colors.accent_900_accent_050
                 else MaterialTheme.colors.grey_alpha_012_white_alpha_012,
                 shape = RoundedCornerShape(12.dp),
             )
@@ -160,11 +160,11 @@ internal fun ProPlanInfoCard(
                 if (isRecommended) {
                     MegaText(
                         text = stringResource(id = R.string.account_upgrade_account_pro_plan_info_recommended_label),
-                        textColor = TextColor.OnColor,
+                        textColor = TextColor.Inverse,
                         style = MaterialTheme.typography.caption.copy(fontWeight = FontWeight(600)),
                         modifier = Modifier
                             .background(
-                                color = MaterialTheme.colors.teal_300_teal_200,
+                                color = MaterialTheme.colors.accent_900_accent_050,
                                 shape = RoundedCornerShape(8.dp)
                             )
                             .align(Alignment.CenterVertically)
@@ -278,7 +278,7 @@ fun ProPlanInfoCardPreview() {
         localisedPriceCurrencyCode = localisedPriceCurrencyCodeStringMapper,
         formattedSize = formattedSizeMapper,
     )
-    OriginalTempTheme(isDark = isSystemInDarkTheme()) {
+    OriginalTheme(isDark = isSystemInDarkTheme()) {
         ProPlanInfoCard(
             proPlan = AccountType.PRO_I,
             subscription = subscriptionProI,
@@ -313,7 +313,7 @@ fun FreePlanInfoCardPreview() {
         localisedPriceCurrencyCode = localisedPriceCurrencyCodeStringMapper,
         formattedSize = formattedSizeMapper,
     )
-    OriginalTempTheme(isDark = isSystemInDarkTheme()) {
+    OriginalTheme(isDark = isSystemInDarkTheme()) {
         ProPlanInfoCard(
             proPlan = AccountType.FREE,
             subscription = subscriptionProI,

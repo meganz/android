@@ -18,7 +18,7 @@ import androidx.compose.ui.res.vectorResource
 import androidx.compose.ui.unit.dp
 import mega.privacy.android.core.R
 import mega.privacy.android.shared.original.core.ui.preview.CombinedThemePreviews
-import mega.privacy.android.shared.original.core.ui.theme.OriginalTempTheme
+import mega.privacy.android.shared.original.core.ui.theme.OriginalTheme
 import mega.privacy.android.shared.original.core.ui.theme.MegaOriginalTheme
 import mega.privacy.android.shared.original.core.ui.theme.extensions.conditional
 
@@ -38,7 +38,7 @@ internal fun AddReactionChip(
 ) {
     Box(
         modifier = Modifier
-            .size(32.dp, 24.dp)
+            .size(addReactionChipWidth, 24.dp)
             .clip(RoundedCornerShape(12.dp))
             .background(color = MegaOriginalTheme.colors.background.surface2)
             .border(
@@ -58,10 +58,15 @@ internal fun AddReactionChip(
     }
 }
 
+/**
+ * Width of the add reaction chip
+ */
+internal val addReactionChipWidth = 32.dp
+
 @CombinedThemePreviews
 @Composable
 private fun AddReactionChipPreview() {
-    OriginalTempTheme(isDark = isSystemInDarkTheme()) {
+    OriginalTheme(isDark = isSystemInDarkTheme()) {
         AddReactionChip(
             onAddClicked = {},
             interactionEnabled = true

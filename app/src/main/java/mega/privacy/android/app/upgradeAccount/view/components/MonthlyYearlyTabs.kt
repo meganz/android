@@ -1,7 +1,6 @@
 package mega.privacy.android.app.upgradeAccount.view.components
 
 import androidx.compose.foundation.BorderStroke
-import androidx.compose.foundation.Image
 import androidx.compose.foundation.isSystemInDarkTheme
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
@@ -10,22 +9,27 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.Button
 import androidx.compose.material.ButtonDefaults
+import androidx.compose.material.Icon
 import androidx.compose.material.MaterialTheme
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.tooling.preview.PreviewParameter
 import androidx.compose.ui.unit.dp
 import mega.privacy.android.app.R
 import mega.privacy.android.shared.original.core.ui.controls.text.MegaText
-import mega.privacy.android.shared.original.core.ui.theme.OriginalTempTheme
+import mega.privacy.android.shared.original.core.ui.preview.BooleanProvider
 import mega.privacy.android.shared.original.core.ui.preview.CombinedThemePreviews
+import mega.privacy.android.shared.original.core.ui.theme.OriginalTheme
+import mega.privacy.android.shared.original.core.ui.theme.extensions.accent_900_accent_050
 import mega.privacy.android.shared.original.core.ui.theme.extensions.body2medium
-import mega.privacy.android.shared.original.core.ui.theme.extensions.teal_300_teal_200
 import mega.privacy.android.shared.original.core.ui.theme.extensions.textColorSecondary
-import mega.privacy.android.shared.original.core.ui.theme.values.TextColor
 import mega.privacy.android.shared.original.core.ui.theme.transparent
+import mega.android.core.ui.theme.values.TextColor
 
 
 /**
@@ -54,7 +58,7 @@ internal fun MonthlyYearlyTabs(
             ),
             colors = ButtonDefaults.buttonColors(
                 backgroundColor =
-                if (isMonthly) MaterialTheme.colors.teal_300_teal_200
+                if (isMonthly) MaterialTheme.colors.accent_900_accent_050
                 else transparent,
             ),
             elevation = ButtonDefaults.elevation(
@@ -76,7 +80,8 @@ internal fun MonthlyYearlyTabs(
             )
         ) {
             if (isMonthly) {
-                Image(
+                Icon(
+                    tint = MaterialTheme.colors.onSecondary,
                     painter = painterResource(R.drawable.ic_plans_montly_yearly_check),
                     contentDescription = "Check icon for monthly/yearly tabs, when selected",
                     modifier = Modifier
@@ -86,7 +91,7 @@ internal fun MonthlyYearlyTabs(
             }
             MegaText(
                 text = stringResource(id = R.string.account_upgrade_account_tab_monthly),
-                textColor = if (isMonthly) TextColor.OnColor else TextColor.OnColorDisabled,
+                textColor = if (isMonthly) TextColor.Inverse else TextColor.Primary,
                 style = MaterialTheme.typography.body2medium,
             )
         }
@@ -102,7 +107,7 @@ internal fun MonthlyYearlyTabs(
             colors = ButtonDefaults.buttonColors(
                 backgroundColor =
                 if (isMonthly) transparent
-                else MaterialTheme.colors.teal_300_teal_200
+                else MaterialTheme.colors.accent_900_accent_050
             ),
             elevation = ButtonDefaults.elevation(
                 defaultElevation = 0.dp,
@@ -124,7 +129,8 @@ internal fun MonthlyYearlyTabs(
             )
         ) {
             if (!isMonthly) {
-                Image(
+                Icon(
+                    tint = MaterialTheme.colors.onSecondary,
                     painter = painterResource(R.drawable.ic_plans_montly_yearly_check),
                     contentDescription = "Check icon for monthly/yearly tabs, when selected",
                     modifier = Modifier
@@ -134,7 +140,7 @@ internal fun MonthlyYearlyTabs(
             }
             MegaText(
                 text = stringResource(id = R.string.account_upgrade_account_tab_yearly),
-                textColor = if (isMonthly) TextColor.OnColorDisabled else TextColor.OnColor,
+                textColor = if (isMonthly) TextColor.Primary else TextColor.Inverse,
                 style = MaterialTheme.typography.body2medium,
             )
         }
@@ -143,11 +149,14 @@ internal fun MonthlyYearlyTabs(
 
 @CombinedThemePreviews
 @Composable
-private fun MonthlyYearlyTabsPreview() {
-    OriginalTempTheme(isDark = isSystemInDarkTheme()) {
+private fun MonthlyYearlyTabsPreview(
+    @PreviewParameter(BooleanProvider::class) initialValue: Boolean,
+) {
+    val isMonthly = remember { mutableStateOf(initialValue) }
+    OriginalTheme(isDark = isSystemInDarkTheme()) {
         MonthlyYearlyTabs(
-            isMonthly = false,
-            onTabClicked = {},
+            isMonthly = isMonthly.value,
+            onTabClicked = { isMonthly.value = it },
             testTag = "test",
         )
     }

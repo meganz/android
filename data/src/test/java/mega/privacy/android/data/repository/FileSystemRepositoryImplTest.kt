@@ -2,38 +2,24 @@ package mega.privacy.android.data.repository
 
 import android.content.Context
 import android.net.Uri
+import androidx.documentfile.provider.DocumentFile
 import com.google.common.truth.Truth.assertThat
 import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.ExperimentalCoroutinesApi
-import kotlinx.coroutines.flow.MutableSharedFlow
-import kotlinx.coroutines.flow.emptyFlow
 import kotlinx.coroutines.test.StandardTestDispatcher
-import kotlinx.coroutines.test.TestScope
 import kotlinx.coroutines.test.UnconfinedTestDispatcher
 import kotlinx.coroutines.test.resetMain
 import kotlinx.coroutines.test.runTest
 import kotlinx.coroutines.test.setMain
-import kotlinx.coroutines.yield
-import mega.privacy.android.data.cache.Cache
 import mega.privacy.android.data.gateway.CacheGateway
 import mega.privacy.android.data.gateway.DeviceGateway
 import mega.privacy.android.data.gateway.FileAttributeGateway
 import mega.privacy.android.data.gateway.FileGateway
-import mega.privacy.android.data.gateway.MegaLocalStorageGateway
 import mega.privacy.android.data.gateway.SDCardGateway
-import mega.privacy.android.data.gateway.api.MegaApiFolderGateway
-import mega.privacy.android.data.gateway.api.MegaApiGateway
-import mega.privacy.android.data.gateway.api.MegaChatApiGateway
-import mega.privacy.android.data.gateway.api.StreamingGateway
-import mega.privacy.android.data.mapper.ChatFilesFolderUserAttributeMapper
 import mega.privacy.android.data.mapper.FileTypeInfoMapper
-import mega.privacy.android.data.mapper.MegaExceptionMapper
 import mega.privacy.android.data.mapper.MimeTypeMapper
-import mega.privacy.android.data.mapper.SortOrderIntMapper
-import mega.privacy.android.data.mapper.node.NodeMapper
-import mega.privacy.android.data.mapper.shares.ShareDataMapper
-import mega.privacy.android.data.model.GlobalUpdate
+import mega.privacy.android.data.wrapper.DocumentFileWrapper
 import mega.privacy.android.domain.entity.UnMappedFileTypeInfo
 import mega.privacy.android.domain.entity.document.DocumentEntity
 import mega.privacy.android.domain.entity.document.DocumentFolder
@@ -43,11 +29,6 @@ import mega.privacy.android.domain.entity.uri.UriPath
 import mega.privacy.android.domain.exception.FileNotCreatedException
 import mega.privacy.android.domain.exception.NotEnoughStorageException
 import mega.privacy.android.domain.repository.FileSystemRepository
-import nz.mega.sdk.MegaApiJava
-import nz.mega.sdk.MegaError
-import nz.mega.sdk.MegaRequest
-import nz.mega.sdk.MegaRequestListenerInterface
-import nz.mega.sdk.MegaUser
 import org.junit.jupiter.api.AfterAll
 import org.junit.jupiter.api.BeforeAll
 import org.junit.jupiter.api.BeforeEach
@@ -56,20 +37,19 @@ import org.junit.jupiter.api.Nested
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.TestInstance
 import org.junit.jupiter.params.ParameterizedTest
-import org.junit.jupiter.params.provider.NullAndEmptySource
 import org.junit.jupiter.params.provider.ValueSource
-import org.mockito.Mockito
+import org.mockito.Mockito.mockStatic
 import org.mockito.kotlin.any
 import org.mockito.kotlin.argumentCaptor
-import org.mockito.kotlin.clearInvocations
 import org.mockito.kotlin.doReturn
 import org.mockito.kotlin.mock
-import org.mockito.kotlin.never
 import org.mockito.kotlin.reset
 import org.mockito.kotlin.times
 import org.mockito.kotlin.verify
+import org.mockito.kotlin.verifyNoInteractions
 import org.mockito.kotlin.whenever
 import java.io.File
+import java.io.InputStream
 import kotlin.test.assertFailsWith
 import kotlin.time.Duration.Companion.milliseconds
 
@@ -80,32 +60,20 @@ import kotlin.time.Duration.Companion.milliseconds
 @TestInstance(TestInstance.Lifecycle.PER_CLASS)
 internal class FileSystemRepositoryImplTest {
     private lateinit var underTest: FileSystemRepository
-
     private val context: Context = mock()
-    private val megaApiGateway: MegaApiGateway = mock()
-    private val megaApiFolderGateway: MegaApiFolderGateway = mock()
-    private val megaChatApiGateway: MegaChatApiGateway = mock()
     private val ioDispatcher: CoroutineDispatcher = UnconfinedTestDispatcher()
-    private val megaLocalStorageGateway: MegaLocalStorageGateway = mock()
-    private val shareDataMapper: ShareDataMapper = mock()
-    private val megaExceptionMapper: MegaExceptionMapper = mock()
-    private val sortOrderIntMapper: SortOrderIntMapper = mock()
     private val cacheGateway: CacheGateway = mock()
-    private val nodeMapper: NodeMapper = mock()
     private val fileTypeInfoMapper: FileTypeInfoMapper = mock()
     private val fileGateway: FileGateway = mock()
-    private val chatFilesFolderUserAttributeMapper: ChatFilesFolderUserAttributeMapper = mock()
-    private val fileVersionsOptionCache: Cache<Boolean> = mock()
-    private val streamingGateway = mock<StreamingGateway>()
     private val deviceGateway = mock<DeviceGateway>()
     private val sdCardGateway = mock<SDCardGateway>()
     private val fileAttributeGateway = mock<FileAttributeGateway>()
     private val mimeTypeMapper = mock<MimeTypeMapper>()
+    private val documentFileWrapper = mock<DocumentFileWrapper>()
 
     @BeforeAll
     fun setUp() {
         Dispatchers.setMain(StandardTestDispatcher())
-        whenever(megaApiGateway.globalUpdates).thenReturn(emptyFlow())
         initUnderTest()
     }
 
@@ -117,25 +85,14 @@ internal class FileSystemRepositoryImplTest {
     private fun initUnderTest() {
         underTest = FileSystemRepositoryImpl(
             context = context,
-            megaApiGateway = megaApiGateway,
-            megaApiFolderGateway = megaApiFolderGateway,
-            megaChatApiGateway = megaChatApiGateway,
             ioDispatcher = ioDispatcher,
-            megaLocalStorageGateway = megaLocalStorageGateway,
-            shareDataMapper = shareDataMapper,
-            megaExceptionMapper = megaExceptionMapper,
-            sortOrderIntMapper = sortOrderIntMapper,
             cacheGateway = cacheGateway,
-            nodeMapper = nodeMapper,
             fileTypeInfoMapper = fileTypeInfoMapper,
             fileGateway = fileGateway,
-            chatFilesFolderUserAttributeMapper = chatFilesFolderUserAttributeMapper,
-            fileVersionsOptionCache = fileVersionsOptionCache,
-            streamingGateway = streamingGateway,
             deviceGateway = deviceGateway,
             sdCardGateway = sdCardGateway,
             fileAttributeGateway = fileAttributeGateway,
-            sharingScope = TestScope()
+            documentFileWrapper = documentFileWrapper,
         )
     }
 
@@ -143,24 +100,14 @@ internal class FileSystemRepositoryImplTest {
     fun resetMocks() {
         reset(
             context,
-            megaApiGateway,
-            megaApiFolderGateway,
-            megaChatApiGateway,
-            megaLocalStorageGateway,
-            shareDataMapper,
-            megaExceptionMapper,
-            sortOrderIntMapper,
             cacheGateway,
-            nodeMapper,
             fileTypeInfoMapper,
             fileGateway,
-            chatFilesFolderUserAttributeMapper,
-            fileVersionsOptionCache,
-            streamingGateway,
             deviceGateway,
             sdCardGateway,
             fileAttributeGateway,
             mimeTypeMapper,
+            documentFileWrapper,
         )
     }
 
@@ -170,78 +117,6 @@ internal class FileSystemRepositoryImplTest {
 
         whenever(fileGateway.localDCIMFolderPath).thenReturn(testPath)
         assertThat(underTest.localDCIMFolderPath).isEqualTo(testPath)
-    }
-
-    @Test
-    fun `test that data return from cache when fileVersionsOptionCache is not null and call getFileVersionsOption with forceRefresh false`() =
-        runTest {
-            val expectedFileVersionsOption = true
-            whenever(fileVersionsOptionCache.get()).thenReturn(expectedFileVersionsOption)
-            val actual = underTest.getFileVersionsOption(false)
-            verify(fileVersionsOptionCache, times(0)).set(any())
-            verify(megaApiGateway, times(0)).getFileVersionsOption(any())
-            assertThat(expectedFileVersionsOption).isEqualTo(actual)
-        }
-
-    @Test
-    fun `test that data return from sdk when fileVersionsOptionCache is not null and call getFileVersionsOption with forceRefresh true`() =
-        runTest {
-            val expectedFileVersionsOption = true
-            val api = mock<MegaApiJava>()
-            val request = mock<MegaRequest> {
-                on { flag }.thenReturn(expectedFileVersionsOption)
-            }
-            val error = mock<MegaError> {
-                on { errorCode }.thenReturn(MegaError.API_OK)
-            }
-            whenever(fileVersionsOptionCache.get()).thenReturn(expectedFileVersionsOption.not())
-            whenever(megaApiGateway.getFileVersionsOption(any())).thenAnswer {
-                (it.arguments[0] as MegaRequestListenerInterface).onRequestFinish(
-                    api,
-                    request,
-                    error
-                )
-            }
-            val actual = underTest.getFileVersionsOption(true)
-            verify(fileVersionsOptionCache, times(1)).set(expectedFileVersionsOption)
-            verify(megaApiGateway, times(1)).getFileVersionsOption(any())
-            assertThat(expectedFileVersionsOption).isEqualTo(actual)
-        }
-
-    @Test
-    fun `test that data return from sdk when fileVersionsOptionCache is null and call getFileVersionsOption with forceRefresh false`() =
-        runTest {
-            val expectedFileVersionsOption = true
-            val api = mock<MegaApiJava>()
-            val request = mock<MegaRequest> {
-                on { flag }.thenReturn(expectedFileVersionsOption)
-            }
-            val error = mock<MegaError> {
-                on { errorCode }.thenReturn(MegaError.API_OK)
-            }
-            whenever(fileVersionsOptionCache.get()).thenReturn(null)
-            whenever(megaApiGateway.getFileVersionsOption(any())).thenAnswer {
-                (it.arguments[0] as MegaRequestListenerInterface).onRequestFinish(
-                    api,
-                    request,
-                    error
-                )
-            }
-            val actual = underTest.getFileVersionsOption(false)
-            verify(fileVersionsOptionCache, times(1)).set(expectedFileVersionsOption)
-            verify(megaApiGateway, times(1)).getFileVersionsOption(any())
-            assertThat(expectedFileVersionsOption).isEqualTo(actual)
-        }
-
-    @Test
-    fun `test that local file url string is returned if node exists`() = runTest {
-        whenever(megaApiGateway.getMegaNodeByHandle(any())).thenReturn(mock())
-        val expected = "expectedUrl"
-        whenever(streamingGateway.getLocalLink(any())).thenReturn(expected)
-
-        val actual = underTest.getFileStreamingUri(mock { on { id }.thenReturn(NodeId(1L)) })
-
-        assertThat(actual).isEqualTo(expected)
     }
 
     @Test
@@ -319,62 +194,78 @@ internal class FileSystemRepositoryImplTest {
             )
         }
 
-    @Test
-    fun `test that data return from sdk when fileVersionsOptionCache is API_ENOENT and call getFileVersionsOption with forceRefresh true`() =
-        runTest {
-            val expectedFileVersionsOption = false
-            val api = mock<MegaApiJava>()
-            val request = mock<MegaRequest> {
-                on { flag }.thenReturn(expectedFileVersionsOption)
-            }
-            val error = mock<MegaError> {
-                on { errorCode }.thenReturn(MegaError.API_ENOENT)
-            }
-            whenever(fileVersionsOptionCache.get()).thenReturn(null)
-            whenever(megaApiGateway.getFileVersionsOption(any())).thenAnswer {
-                (it.arguments[0] as MegaRequestListenerInterface).onRequestFinish(
-                    api,
-                    request,
-                    error
-                )
-            }
-            val actual = underTest.getFileVersionsOption(true)
-            verify(fileVersionsOptionCache, times(1)).set(expectedFileVersionsOption)
-            verify(megaApiGateway, times(1)).getFileVersionsOption(any())
-            assertThat(expectedFileVersionsOption).isEqualTo(actual)
-        }
-
-    @ParameterizedTest(name = " megaApi call returns {0}")
-    @NullAndEmptySource
-    @ValueSource(strings = ["testName"])
-    fun `test that escapeFsIncompatible returns correctly if`(
-        fileName: String?,
-    ) = runTest {
-        whenever(megaApiGateway.escapeFsIncompatible(any(), any())).thenReturn(fileName)
-        assertThat(underTest.escapeFsIncompatible("file name", "dest/path")).isEqualTo(fileName)
-    }
-
-
     @Nested
     @DisplayName("GPS Coordinates")
     inner class GPSCoordinatesTest {
         @Test
         fun `test that the video GPS coordinates are retrieved`() = runTest {
-            val testCoordinates = Pair(6.0, 9.0)
+            mockStatic(Uri::class.java).use {
+                val testCoordinates = Pair(6.0, 9.0)
+                val uri = mock<Uri> {
+                    on { this.scheme } doReturn "file"
+                }
+                val uriPath = UriPath("/folder/foo.mp4")
+                whenever(Uri.fromFile(File(uriPath.value))) doReturn uri
+                whenever(fileAttributeGateway.getVideoGPSCoordinates(any()))
+                    .thenReturn(testCoordinates)
 
-            whenever(fileAttributeGateway.getVideoGPSCoordinates(any())).thenReturn(testCoordinates)
-            assertThat(underTest.getVideoGPSCoordinates("")).isEqualTo(testCoordinates)
+                assertThat(underTest.getVideoGPSCoordinates(uriPath)).isEqualTo(
+                    testCoordinates
+                )
+            }
         }
 
         @Test
-        fun `test that the photo GPS coordinates are retrieved`() {
-            runTest {
-                val testCoordinates = Pair(6.0, 9.0)
+        fun `test that the photo GPS coordinates are retrieved`() = runTest {
+            mockStatic(Uri::class.java).use {
+                val testCoordinates = Pair(6.0, 9.1)
+                val uri = mock<Uri> {
+                    on { this.scheme } doReturn "file"
+                }
+                val uriPath = UriPath("/folder/foo.jpg")
+                whenever(Uri.fromFile(File(uriPath.value))) doReturn uri
+                whenever(fileAttributeGateway.getPhotoGPSCoordinates(any<String>()))
+                    .thenReturn(testCoordinates)
 
-                whenever(fileAttributeGateway.getPhotoGPSCoordinates(any())).thenReturn(
+                assertThat(underTest.getPhotoGPSCoordinates(uriPath)).isEqualTo(
                     testCoordinates
                 )
-                assertThat(underTest.getPhotoGPSCoordinates("")).isEqualTo(testCoordinates)
+            }
+        }
+
+        @Test
+        fun `test that the video GPS coordinates are retrieved from an Uri`() = runTest {
+            mockStatic(Uri::class.java).use {
+                val testCoordinates = Pair(6.1, 8.0)
+                val uri = mock<Uri> {
+                    on { this.scheme } doReturn "content"
+                }
+                val uriPath = UriPath("content:://foo.mp4")
+                whenever(Uri.parse(uriPath.value)) doReturn uri
+                whenever(fileAttributeGateway.getVideoGPSCoordinates(uri, context))
+                    .thenReturn(testCoordinates)
+
+                assertThat(underTest.getVideoGPSCoordinates(uriPath)).isEqualTo(testCoordinates)
+            }
+        }
+
+        @Test
+        fun `test that the photo GPS coordinates are retrieved from an Input Stream`() {
+            mockStatic(Uri::class.java).use {
+                runTest {
+                    val testCoordinates = Pair(6.0, 8.1)
+                    val inputStream = mock<InputStream>()
+                    val uri = mock<Uri> {
+                        on { this.scheme } doReturn "content"
+                    }
+                    val uriPath = UriPath("content:://foo.jpg")
+                    whenever(Uri.parse(uriPath.value)) doReturn uri
+                    whenever(fileGateway.getInputStream(uriPath)) doReturn inputStream
+                    whenever(fileAttributeGateway.getPhotoGPSCoordinates(inputStream))
+                        .thenReturn(testCoordinates)
+
+                    assertThat(underTest.getPhotoGPSCoordinates(uriPath)).isEqualTo(testCoordinates)
+                }
             }
         }
     }
@@ -438,9 +329,22 @@ internal class FileSystemRepositoryImplTest {
     inner class SDCard {
         @ParameterizedTest
         @ValueSource(booleans = [true, false])
-        fun `test that isSDCardPath returns gateway value`(expected: Boolean) = runTest {
+        fun `test that isSDCardPath returns correctly as per doesFolderExists gateway value`(
+            expected: Boolean,
+        ) = runTest {
             whenever(sdCardGateway.doesFolderExists(any())).thenReturn(expected)
-            assertThat(underTest.isSDCardPath("something")).isEqualTo(expected)
+            whenever(sdCardGateway.isSDCardUri(any())).thenReturn(false)
+            assertThat(underTest.isSDCardPathOrUri("something")).isEqualTo(expected)
+        }
+
+        @ParameterizedTest
+        @ValueSource(booleans = [true, false])
+        fun `test that isSDCardPath returns correctly as per isSDCardUri gateway value`(
+            expected: Boolean,
+        ) = runTest {
+            whenever(sdCardGateway.doesFolderExists(any())).thenReturn(false)
+            whenever(sdCardGateway.isSDCardUri(any())).thenReturn(expected)
+            assertThat(underTest.isSDCardPathOrUri("something")).isEqualTo(expected)
         }
 
         @ParameterizedTest
@@ -449,81 +353,65 @@ internal class FileSystemRepositoryImplTest {
             whenever(sdCardGateway.isSDCardCachePath(any())).thenReturn(expected)
             assertThat(underTest.isSDCardCachePath("something")).isEqualTo(expected)
         }
-    }
 
-    @Nested
-    @DisplayName("My chats files folder")
-    inner class MyChatsFilesFolder {
-
-        private val globalUpdatesFlow = MutableSharedFlow<GlobalUpdate>()
-
-        @BeforeEach
-        fun resetCache() {
-            whenever(megaApiGateway.globalUpdates).thenReturn(globalUpdatesFlow)
-            initUnderTest()
-        }
-
-        @Test
-        fun `test that my chats files folder id is retrieved from the gateway if not set`() =
+        @ParameterizedTest(name = "when file exists is: {0}")
+        @ValueSource(booleans = [true, false])
+        fun `test that getFileLengthFromSdCardContentUri returns correctly`(fileExists: Boolean) =
             runTest {
-                val handle = 11L
-                stubGetMyChatFilesFolder(handle)
-                val actual = underTest.getMyChatsFilesFolderId()
-                assertThat(actual?.longValue).isEqualTo(handle)
+                mockStatic(Uri::class.java).use { mockedUri ->
+                    val fileContentUri = "test/path"
+                    val uri = mock<Uri>()
+                    val length = if (fileExists) 123L else 0L
+                    val documentFile = if (fileExists) mock<DocumentFile> {
+                        on { length() } doReturn 123L
+                    } else null
+
+
+                    mockedUri.`when`<Uri> { Uri.parse(fileContentUri) }.thenReturn(uri)
+                    whenever(documentFileWrapper.fromSingleUri(uri)).thenReturn(documentFile)
+                    assertThat(underTest.getFileLengthFromSdCardContentUri(fileContentUri))
+                        .isEqualTo(length)
+                }
             }
 
         @Test
-        fun `test that my chats files folder id is cached`() = runTest {
-            stubGetMyChatFilesFolder()
-            underTest.getMyChatsFilesFolderId()
-            verify(megaApiGateway).getMyChatFilesFolder(any())
-            clearInvocations(megaApiGateway)
-            underTest.getMyChatsFilesFolderId()
-            verify(megaApiGateway, never()).getMyChatFilesFolder(any())
+        fun `test that getFileLengthFromSdCardContentUri returns 0L if uri is null`() = runTest {
+            mockStatic(Uri::class.java).use { mockedUri ->
+                val fileContentUri = "test/path"
+
+                mockedUri.`when`<Uri> { Uri.parse(fileContentUri) }.thenReturn(null)
+                verifyNoInteractions(documentFileWrapper)
+                assertThat(underTest.getFileLengthFromSdCardContentUri(fileContentUri))
+                    .isEqualTo(0L)
+            }
         }
+
+        @ParameterizedTest(name = "when file exists is: {0}")
+        @ValueSource(booleans = [true, false])
+        fun `test that deleteFileFromSdCardContentUri returns correctly`(fileExists: Boolean) =
+            runTest {
+                mockStatic(Uri::class.java).use { mockedUri ->
+                    val fileContentUri = "test/path"
+                    val uri = mock<Uri>()
+                    val documentFile = if (fileExists) mock<DocumentFile> {
+                        on { delete() } doReturn true
+                    } else null
+
+                    mockedUri.`when`<Uri> { Uri.parse(fileContentUri) }.thenReturn(uri)
+                    whenever(documentFileWrapper.fromSingleUri(uri)).thenReturn(documentFile)
+                    assertThat(underTest.deleteFileFromSdCardContentUri(fileContentUri))
+                        .isEqualTo(fileExists)
+                }
+            }
 
         @Test
-        fun `test that updates are monitored after my chats files folder id is set`() = runTest {
-            val handle = 11L
-            stubGetMyChatFilesFolder(handle + 1)
-            val initial = underTest.getMyChatsFilesFolderId()
-            assertThat(initial?.longValue).isNotEqualTo(handle)
+        fun `test that deleteFileFromSdCardContentUri returns false if uri is null`() = runTest {
+            mockStatic(Uri::class.java).use { mockedUri ->
+                val fileContentUri = "test/path"
 
-            stubGetMyChatFilesFolder(handle)
-            globalUpdatesFlow.emit(stubGlobalMyChatsFilesFolderUpdate())
-
-            yield() // listening to global updates is in another scope, we need to yield to get the update
-            val expected = underTest.getMyChatsFilesFolderId()
-            assertThat(expected?.longValue).isEqualTo(handle)
-        }
-
-        private fun stubGetMyChatFilesFolder(folderHandle: Long = 1L) {
-            val megaError = mock<MegaError> {
-                on { errorCode } doReturn MegaError.API_OK
-                on { errorString } doReturn ""
-            }
-            val megaRequest = mock<MegaRequest> {
-                on { nodeHandle } doReturn folderHandle
-            }
-            whenever(megaApiGateway.getMyChatFilesFolder(any())).thenAnswer {
-                (it.arguments[0] as MegaRequestListenerInterface).onRequestFinish(
-                    mock(),
-                    megaRequest,
-                    megaError,
-                )
-            }
-        }
-
-        private fun stubGlobalMyChatsFilesFolderUpdate(): GlobalUpdate.OnUsersUpdate {
-            val userHandle = 77L
-            val megaUser = mock<MegaUser> {
-                on { this.handle } doReturn userHandle
-                on { isOwnChange } doReturn 0
-                on { this.hasChanged(MegaUser.CHANGE_TYPE_MY_CHAT_FILES_FOLDER.toLong()) } doReturn true
-            }
-            whenever(megaApiGateway.myUser).thenReturn(megaUser)
-            return mock<GlobalUpdate.OnUsersUpdate> {
-                on { users } doReturn arrayListOf(megaUser)
+                mockedUri.`when`<Uri> { Uri.parse(fileContentUri) }.thenReturn(null)
+                verifyNoInteractions(documentFileWrapper)
+                assertThat(underTest.deleteFileFromSdCardContentUri(fileContentUri)).isFalse()
             }
         }
     }
@@ -583,7 +471,7 @@ internal class FileSystemRepositoryImplTest {
     @ParameterizedTest
     @ValueSource(booleans = [true, false])
     fun `test that deleteFileByUri deletes the file correctly`(expected: Boolean) = runTest {
-        Mockito.mockStatic(Uri::class.java).use { _ ->
+        mockStatic(Uri::class.java).use { _ ->
             val testUri = "file://test/file/path"
             val uri = mock<Uri>()
             whenever(Uri.parse(testUri)).thenReturn(uri)
@@ -685,5 +573,15 @@ internal class FileSystemRepositoryImplTest {
         )
 
         assertThat(result).isEqualTo(newFile)
+    }
+
+    @ParameterizedTest(name = "pauseTransfers: {0}")
+    @ValueSource(booleans = [true, false])
+    fun `test that canReadUri returns correctly`(canRead: Boolean) = runTest {
+        val uri = "content://com.android.externalstorage.documents/tree/"
+
+        whenever(fileGateway.canReadUri(uri)).thenReturn(canRead)
+
+        assertThat(underTest.canReadUri(uri)).isEqualTo(canRead)
     }
 }

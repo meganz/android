@@ -2,6 +2,9 @@ package mega.privacy.android.navigation
 
 import android.app.Activity
 import android.content.Context
+import android.content.Intent
+import android.net.Uri
+import androidx.activity.result.ActivityResultLauncher
 import androidx.annotation.StringRes
 import mega.privacy.android.domain.entity.FileTypeInfo
 import mega.privacy.android.domain.entity.SortOrder
@@ -20,9 +23,9 @@ interface AppNavigator {
     /**
      * Navigates to the Settings Camera Uploads page
      *
-     * @param activity The Activity
+     * @param context The Context
      */
-    fun openSettingsCameraUploads(activity: Activity)
+    fun openSettingsCameraUploads(context: Context)
 
     /**
      * Navigates to the Backups page to load the contents of the Backup Folder
@@ -40,11 +43,13 @@ interface AppNavigator {
      * @param nodeHandle The Node Handle to view the selected Node. The Root Node will be accessed
      * if no Node Handle is specified
      * @param errorMessage The [StringRes] of the message to display in the error banner
+     * @param isFromSyncFolders Indicates if the node is from Sync Folders. False by default.
      */
     fun openNodeInCloudDrive(
         activity: Activity,
         nodeHandle: Long = -1L,
         @StringRes errorMessage: Int?,
+        isFromSyncFolders: Boolean = false,
     )
 
     /**
@@ -92,18 +97,25 @@ interface AppNavigator {
      * Navigates to the Syncs page
      *
      * @param context       Context
-     * @param deviceName    The device name
      */
-    fun openSyncs(context: Context, deviceName: String? = null)
+    fun openSyncs(context: Context)
 
     /**
      * Navigates to the Add New Sync page
      *
      * @param context       Context
      * @param syncType      The sync type from [SyncType]
-     * @param deviceName    The device name
+     * @param isFromCloudDrive Indicates if the sync is from Cloud Drive. False by default.
+     * @param remoteFolderHandle The remote folder handle
+     * @param remoteFolderName The remote folder name
      */
-    fun openNewSync(context: Context, syncType: SyncType, deviceName: String? = null)
+    fun openNewSync(
+        context: Context,
+        syncType: SyncType,
+        isFromCloudDrive: Boolean = false,
+        remoteFolderHandle: Long? = null,
+        remoteFolderName: String? = null,
+    )
 
     /**
      * Open zip browser
@@ -146,6 +158,7 @@ interface AppNavigator {
      * @param searchedItems the list of searched items, this is only used under the search mode
      * @param mediaQueueTitle the title of the media queue
      * @param collectionTitle the title of the video collection
+     * @param enableAddToAlbum the flag to show add to album in context menu
      */
     suspend fun openMediaPlayerActivityByFileNode(
         context: Context,
@@ -159,6 +172,7 @@ interface AppNavigator {
         mediaQueueTitle: String? = null,
         collectionTitle: String? = null,
         collectionId: Long? = null,
+        enableAddToAlbum: Boolean = false,
     )
 
     /**
@@ -256,5 +270,28 @@ interface AppNavigator {
         searchedItems: List<Long>? = null,
         mediaQueueTitle: String? = null,
         nodeHandles: List<Long>? = null,
+        enableAddToAlbum: Boolean = false,
     )
+
+    /**
+     * Open internal folder picker
+     */
+    fun openInternalFolderPicker(
+        context: Context,
+        launcher: ActivityResultLauncher<Intent>,
+        initialUri: Uri? = null,
+    )
+
+    /**
+     * Open Sync Mega folder
+     * @param handle the handle of the remote folder
+     */
+    fun openSyncMegaFolder(context: Context, handle: Long)
+
+
+    /**
+     * Open Stop Backup Destination in SyncHost Activity
+     * //stop-backup-mega-picker
+     */
+    fun openSelectStopBackupDestinationFromSyncsTab(context: Context)
 }

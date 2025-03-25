@@ -1,6 +1,7 @@
 package mega.privacy.android.app.presentation.recentactions.recentactionbucket
 
 import mega.privacy.android.shared.resources.R as sharedR
+import android.content.Intent
 import android.view.Menu
 import android.view.MenuItem
 import androidx.appcompat.view.ActionMode
@@ -12,8 +13,12 @@ import mega.privacy.android.app.featuretoggle.AppFeatures
 import mega.privacy.android.app.main.ManagerActivity
 import mega.privacy.android.app.main.controllers.NodeController
 import mega.privacy.android.app.main.dialog.rubbishbin.ConfirmMoveToRubbishBinDialogFragment
+import mega.privacy.android.app.presentation.photos.albums.add.AddToAlbumActivity
 import mega.privacy.android.app.utils.LinksUtil
 import mega.privacy.android.app.utils.MegaNodeUtil
+import mega.privacy.android.app.utils.MegaNodeUtil.isGif
+import mega.privacy.android.app.utils.MegaNodeUtil.isImage
+import mega.privacy.android.app.utils.MegaNodeUtil.isVideo
 import mega.privacy.android.domain.entity.node.NodeId
 import timber.log.Timber
 
@@ -65,6 +70,7 @@ class RecentActionBucketActionModeCallback constructor(
             }
 
             handleHiddenNodes(it)
+            handleAddToAlbums(it)
         }
 
         return true
@@ -87,6 +93,26 @@ class RecentActionBucketActionModeCallback constructor(
                 menu.findItem(R.id.cab_menu_unhide)?.isVisible =
                     isPaid && !isBusinessAccountExpired && !hasNonSensitiveNode && !includeSensitiveInheritedNode
             }
+        }
+    }
+
+    private fun handleAddToAlbums(menu: Menu) {
+        val selectedNodes = viewModel.getSelectedNodes()
+        val mediaNodes = selectedNodes
+            .mapNotNull { it.node }
+            .filter { it.isImage() || it.isGif() || it.isVideo() }
+
+        if (mediaNodes.size == selectedNodes.size) {
+            if (mediaNodes.all { it.isVideo() }) {
+                menu.findItem(R.id.cab_menu_add_to_album)?.isVisible = false
+                menu.findItem(R.id.cab_menu_add_to)?.isVisible = true
+            } else {
+                menu.findItem(R.id.cab_menu_add_to_album)?.isVisible = true
+                menu.findItem(R.id.cab_menu_add_to)?.isVisible = false
+            }
+        } else {
+            menu.findItem(R.id.cab_menu_add_to_album)?.isVisible = false
+            menu.findItem(R.id.cab_menu_add_to)?.isVisible = false
         }
     }
 
@@ -158,6 +184,26 @@ class RecentActionBucketActionModeCallback constructor(
 
             R.id.cab_menu_copy -> {
                 NodeController(managerActivity).chooseLocationToCopyNodes(nodesHandles)
+                viewModel.clearSelection()
+            }
+
+            R.id.cab_menu_add_to_album -> {
+                val intent = Intent(managerActivity, AddToAlbumActivity::class.java).apply {
+                    val ids = nodeIds.map { it.longValue }.toTypedArray()
+                    putExtra("ids", ids)
+                    putExtra("type", 0)
+                }
+                recentActionBucketFragment.addToAlbumLauncher.launch(intent)
+                viewModel.clearSelection()
+            }
+
+            R.id.cab_menu_add_to -> {
+                val intent = Intent(managerActivity, AddToAlbumActivity::class.java).apply {
+                    val ids = nodeIds.map { it.longValue }.toTypedArray()
+                    putExtra("ids", ids)
+                    putExtra("type", 1)
+                }
+                recentActionBucketFragment.addToAlbumLauncher.launch(intent)
                 viewModel.clearSelection()
             }
 

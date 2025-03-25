@@ -5,17 +5,19 @@ import kotlinx.coroutines.flow.flow
 import kotlinx.coroutines.flow.flowOf
 import kotlinx.coroutines.test.runTest
 import mega.privacy.android.domain.entity.node.NodeId
-import mega.privacy.android.domain.entity.transfer.MultiTransferEvent
+import mega.privacy.android.domain.entity.transfer.Transfer
 import mega.privacy.android.domain.entity.transfer.TransferAppData
 import mega.privacy.android.domain.entity.transfer.TransferEvent
-import mega.privacy.android.domain.entity.transfer.UploadFileInfo
-import mega.privacy.android.domain.usecase.transfers.uploads.UploadFilesUseCase
+import mega.privacy.android.domain.entity.uri.UriPath
+import mega.privacy.android.domain.usecase.transfers.uploads.UploadFileUseCase
 import org.junit.jupiter.api.BeforeAll
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.TestInstance
 import org.junit.jupiter.api.assertDoesNotThrow
 import org.mockito.kotlin.any
+import org.mockito.kotlin.anyOrNull
+import org.mockito.kotlin.anyValueClass
 import org.mockito.kotlin.doReturn
 import org.mockito.kotlin.mock
 import org.mockito.kotlin.reset
@@ -27,7 +29,7 @@ import java.io.File
 class StartChatUploadAndWaitScanningFinishedUseCaseTest {
     private lateinit var underTest: StartChatUploadAndWaitScanningFinishedUseCase
 
-    private val uploadFilesUseCase = mock<UploadFilesUseCase>()
+    private val uploadFileUseCase = mock<UploadFileUseCase>()
     private val getOrCreateMyChatsFilesFolderIdUseCase =
         mock<GetOrCreateMyChatsFilesFolderIdUseCase>()
     private val handleChatUploadTransferEventUseCase = mock<HandleChatUploadTransferEventUseCase>()
@@ -35,7 +37,7 @@ class StartChatUploadAndWaitScanningFinishedUseCaseTest {
     @BeforeAll
     fun setup() {
         underTest = StartChatUploadAndWaitScanningFinishedUseCase(
-            uploadFilesUseCase,
+            uploadFileUseCase,
             getOrCreateMyChatsFilesFolderIdUseCase,
             handleChatUploadTransferEventUseCase,
         )
@@ -44,7 +46,7 @@ class StartChatUploadAndWaitScanningFinishedUseCaseTest {
     @BeforeEach
     fun resetMocks() = runTest {
         reset(
-            uploadFilesUseCase,
+            uploadFileUseCase,
             getOrCreateMyChatsFilesFolderIdUseCase,
             handleChatUploadTransferEventUseCase,
         )
@@ -53,44 +55,62 @@ class StartChatUploadAndWaitScanningFinishedUseCaseTest {
 
     @Test
     fun `test that upload files use case is invoked when the use case is invoked`() = runTest {
-        val filesAndNames = mapOf(file to "name")
+        val file = file
+        val fileName = "name"
         val pendingMessageIds = listOf(1L, 2L, 3L)
-        whenever(uploadFilesUseCase(any(), NodeId(any()), any())) doReturn emptyFlow()
+        whenever(
+            uploadFileUseCase(
+                uriPath = anyValueClass(),
+                fileName = any(),
+                appData = any(),
+                parentFolderId = anyValueClass(),
+                isHighPriority = any(),
+            )
+        ) doReturn emptyFlow()
         val appData = pendingMessageIds.map {
             TransferAppData.ChatUpload(it)
         }
 
-        underTest(filesAndNames, pendingMessageIds)
+        underTest.invoke(
+            uriPath = UriPath(file.absolutePath),
+            fileName = fileName,
+            pendingMessageIds = pendingMessageIds
+        )
 
         // Then
-        verify(uploadFilesUseCase).invoke(
-            filesAndNames.map {
-                UploadFileInfo(it.key, it.value, appData)
-            },
-            myChatsFolderId,
-            false
+        verify(uploadFileUseCase).invoke(
+            uriPath = UriPath(file.absolutePath),
+            fileName = fileName,
+            appData = appData,
+            parentFolderId = myChatsFolderId,
+            isHighPriority = false,
         )
     }
 
     @Test
     fun `test that handle chat upload transfer event use case is invoked when an event is received`() =
         runTest {
-            val expected = MultiTransferEvent.SingleTransferEvent(
-                mock<TransferEvent.TransferStartEvent>(),
-                0L,
-                0L
-            )
-            val filesAndNames = mapOf(file to "name")
+            val expected = mock<TransferEvent.TransferStartEvent> {
+                on { transfer } doReturn fileTransfer
+            }
+            val file = file
+            val fileName = "name"
             val pendingMessageIds = listOf(1L, 2L, 3L)
             whenever(
-                uploadFilesUseCase(
-                    any(),
-                    NodeId(any()),
-                    any(),
+                uploadFileUseCase(
+                    uriPath = anyValueClass(),
+                    fileName = any(),
+                    appData = any(),
+                    parentFolderId = anyValueClass(),
+                    isHighPriority = any(),
                 )
             ) doReturn flowOf(expected)
 
-            underTest(filesAndNames, pendingMessageIds)
+            underTest(
+                uriPath = UriPath(file.absolutePath),
+                fileName = fileName,
+                pendingMessageIds = pendingMessageIds
+            )
 
             verify(handleChatUploadTransferEventUseCase).invoke(
                 expected,
@@ -102,26 +122,30 @@ class StartChatUploadAndWaitScanningFinishedUseCaseTest {
     fun `test that the scanning finished event is awaited when the use case is invoked`() {
         runTest {
             assertDoesNotThrow {
-                val finishEvent = MultiTransferEvent.SingleTransferEvent(
-                    mock<TransferEvent.TransferStartEvent>(),
-                    0L,
-                    0L,
-                    scanningFinished = true,
-                )
-                val filesAndNames = mapOf(file to "name")
+                val finishEvent = mock<TransferEvent.TransferStartEvent> {
+                    on { this.transfer } doReturn fileTransfer
+                }
+                val file = file
+                val fileName = "name"
                 val pendingMessageIds = listOf(1L, 2L, 3L)
                 whenever(
-                    uploadFilesUseCase(
-                        any(),
-                        NodeId(any()),
-                        any(),
+                    uploadFileUseCase(
+                        uriPath = anyValueClass(),
+                        fileName = any(),
+                        appData = anyOrNull(),
+                        parentFolderId = anyValueClass(),
+                        isHighPriority = any(),
                     )
                 ) doReturn flow {
                     emit(finishEvent)
                     throw RuntimeException()
                 }
 
-                underTest(filesAndNames, pendingMessageIds)
+                underTest(
+                    uriPath = UriPath(file.absolutePath),
+                    fileName = fileName,
+                    pendingMessageIds = pendingMessageIds
+                )
 
                 verify(handleChatUploadTransferEventUseCase).invoke(
                     finishEvent,
@@ -133,4 +157,7 @@ class StartChatUploadAndWaitScanningFinishedUseCaseTest {
 
     private val myChatsFolderId = NodeId(45L)
     private val file = File("/root/file.txt")
+    private val fileTransfer = mock<Transfer> {
+        on { isFolderTransfer } doReturn false
+    }
 }

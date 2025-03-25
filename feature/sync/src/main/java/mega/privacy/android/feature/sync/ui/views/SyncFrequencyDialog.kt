@@ -8,7 +8,7 @@ import androidx.compose.ui.res.stringResource
 import mega.privacy.android.feature.sync.ui.model.SyncFrequency
 import mega.privacy.android.shared.original.core.ui.controls.dialogs.ConfirmationDialogWithRadioButtons
 import mega.privacy.android.shared.original.core.ui.preview.CombinedThemePreviews
-import mega.privacy.android.shared.original.core.ui.theme.OriginalTempTheme
+import mega.privacy.android.shared.original.core.ui.theme.OriginalTheme
 
 @Composable
 internal fun SyncFrequencyDialog(
@@ -45,7 +45,7 @@ private fun frequencyToString(syncFrequency: SyncFrequency): String {
 @CombinedThemePreviews
 @Composable
 private fun SyncOptionsDialogPreview() {
-    OriginalTempTheme(isDark = isSystemInDarkTheme()) {
+    OriginalTheme(isDark = isSystemInDarkTheme()) {
         SyncFrequencyDialog(
             onDismiss = {},
             onSyncFrequencyClicked = {},

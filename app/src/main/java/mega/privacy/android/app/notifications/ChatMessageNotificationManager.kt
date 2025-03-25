@@ -1,6 +1,5 @@
 package mega.privacy.android.app.notifications
 
-import mega.privacy.android.icon.pack.R as iconPackR
 import android.Manifest
 import android.app.NotificationManager
 import android.app.PendingIntent
@@ -13,6 +12,7 @@ import androidx.core.app.NotificationManagerCompat
 import androidx.core.app.Person
 import androidx.core.content.ContextCompat
 import androidx.core.net.toUri
+import mega.privacy.android.app.MegaApplication
 import mega.privacy.android.app.MimeTypeList.Companion.typeForName
 import mega.privacy.android.app.R
 import mega.privacy.android.app.components.twemoji.EmojiUtilsShortcodes
@@ -23,12 +23,12 @@ import mega.privacy.android.app.utils.Constants
 import mega.privacy.android.app.utils.Util
 import mega.privacy.android.data.mapper.FileDurationMapper
 import mega.privacy.android.domain.entity.chat.ChatMessage
-import mega.privacy.android.domain.entity.chat.ChatMessageStatus
 import mega.privacy.android.domain.entity.chat.ChatMessageType
 import mega.privacy.android.domain.entity.chat.ChatRoom
 import mega.privacy.android.domain.entity.chat.ContainsMetaType
 import mega.privacy.android.domain.entity.node.FileNode
 import mega.privacy.android.domain.entity.notifications.ChatMessageNotificationData
+import mega.privacy.android.icon.pack.R as iconPackR
 import mega.privacy.android.shared.original.core.ui.controls.chat.messages.toFormattedText
 import nz.mega.sdk.MegaApiJava
 import timber.log.Timber
@@ -60,17 +60,39 @@ class ChatMessageNotificationManager @Inject constructor(
         chatMessageNotificationData: ChatMessageNotificationData,
         fileDurationMapper: FileDurationMapper,
     ) = with(chatMessageNotificationData) {
-        val notificationId = MegaApiJava.userHandleToBase64(msg.messageId).hashCode()
+        val messageNotificationId = MegaApiJava.userHandleToBase64(msg.messageId).hashCode()
+        val summaryNotificationId = MegaApiJava.userHandleToBase64(chat.chatId).hashCode()
+        val unreadCount = chat.unreadCount
 
-        if (msg.isDeleted || msg.status == ChatMessageStatus.SEEN) {
-            notificationManagerCompat.cancel(notificationId)
-            return@with
+        when (this) {
+            is ChatMessageNotificationData.DeletedMessage -> {
+                Timber.d("Message deleted. Removing notification")
+                notificationManagerCompat.cancel(messageNotificationId)
+                checkIfShouldCancelSummaryNotification(unreadCount, summaryNotificationId)
+                return@with
+            }
+
+            is ChatMessageNotificationData.SeenMessage -> {
+                Timber.d("Message seen. Removing notification")
+                notificationManagerCompat.cancel(messageNotificationId)
+                checkIfShouldCancelSummaryNotification(unreadCount, summaryNotificationId)
+                return@with
+            }
+
+            is ChatMessageNotificationData.Message -> {
+                if (chat.chatId == MegaApplication.openChatId) {
+                    Timber.d("Chat opened. Removing notification")
+                    notificationManagerCompat.cancel(messageNotificationId)
+                    checkIfShouldCancelSummaryNotification(unreadCount, summaryNotificationId)
+                    return@with
+                }
+            }
         }
 
         val intent = Intent(context, ManagerActivity::class.java).apply {
             flags = Intent.FLAG_ACTIVITY_CLEAR_TOP
             action = Constants.ACTION_CHAT_NOTIFICATION_MESSAGE
-            putExtra(Constants.CHAT_ID, chat?.chatId)
+            putExtra(Constants.CHAT_ID, chat.chatId)
         }
 
         val pendingIntent = PendingIntent.getActivity(
@@ -81,7 +103,7 @@ class ChatMessageNotificationManager @Inject constructor(
         )
 
         val notificationColor = ContextCompat.getColor(context, R.color.red_600_red_300)
-        val title = EmojiUtilsShortcodes.emojify(chat?.title)
+        val title = EmojiUtilsShortcodes.emojify(chat.title)
 
         val msgContent = EmojiUtilsShortcodes.emojify(
             getMsgContent(
@@ -92,12 +114,7 @@ class ChatMessageNotificationManager @Inject constructor(
         )
 
         val largeIcon =
-            getAvatar(
-                context,
-                senderAvatar,
-                chat ?: return@with,
-                senderAvatarColor ?: return@with
-            )?.let {
+            getAvatar(context, senderAvatar, chat, senderAvatarColor)?.let {
                 Util.getCircleBitmap(it)
             }
 
@@ -114,26 +131,48 @@ class ChatMessageNotificationManager @Inject constructor(
             it.conversationTitle = title
         }
 
-        val builder =
+        val groupKey = GROUP_KEY + chat.chatId
+
+        val summaryNotification =
             NotificationCompat.Builder(context, Constants.NOTIFICATION_CHANNEL_CHAT_ID)
+                .setSmallIcon(iconPackR.drawable.ic_stat_notify)
+                .setColor(ContextCompat.getColor(context, R.color.red_600_red_300))
+                .setContentIntent(pendingIntent)
+                .setGroup(groupKey)
+                .setGroupSummary(true)
+                .build()
+
+        val messageNotification =
+            NotificationCompat.Builder(context, Constants.NOTIFICATION_CHANNEL_CHAT_ID)
+                .setSmallIcon(iconPackR.drawable.ic_stat_notify)
+                .setAutoCancel(true)
+                .setColor(notificationColor)
+                .setStyle(messagingStyleContent)
+                .setContentIntent(pendingIntent)
+                .setWhen(msg.timestamp * 1000)
+                .setOnlyAlertOnce(true)
+                .setPriority(NotificationManager.IMPORTANCE_HIGH)
                 .apply {
-                    setSmallIcon(iconPackR.drawable.ic_stat_notify)
-                    setAutoCancel(true)
-                    setShowWhen(true)
-                    setGroup(GROUP_KEY)
-                    color = notificationColor
-                    setStyle(messagingStyleContent)
-                    setContentIntent(pendingIntent)
-                    setWhen(msg.timestamp * 1000)
-                    setOnlyAlertOnce(true)
-                    notificationBehaviour?.sound?.let { setSound(it.toUri()) }
+                    notificationBehaviour.sound?.let { setSound(it.toUri()) }
                         ?: setSilent(true)
-                    setChannelId(Constants.NOTIFICATION_CHANNEL_CHAT_SUMMARY_ID_V2)
-                    priority = NotificationManager.IMPORTANCE_HIGH
                     largeIcon?.let { setLargeIcon(it) }
                 }
+                .setGroup(groupKey)
+                .build()
 
-        notificationManagerCompat.notify(notificationId, builder.build())
+        Timber.d("Showing notification for chat groupKey: $groupKey, notificationId: $messageNotificationId")
+        notificationManagerCompat.notify(summaryNotificationId, summaryNotification)
+        notificationManagerCompat.notify(messageNotificationId, messageNotification)
+    }
+
+    private fun checkIfShouldCancelSummaryNotification(
+        unreadCount: Int,
+        summaryNotificationId: Int,
+    ) {
+        if (unreadCount == 0) {
+            Timber.d("No unread messages in chat. Removing summary notification $summaryNotificationId")
+            notificationManagerCompat.cancel(summaryNotificationId)
+        }
     }
 
     private fun getMsgContent(

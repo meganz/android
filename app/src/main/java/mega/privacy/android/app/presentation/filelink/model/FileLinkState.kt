@@ -23,17 +23,17 @@ import mega.privacy.android.domain.exception.PublicNodeException
  * @property previewPath            Path of the preview image
  * @property serializedData         Serialized data of the file node
  * @property iconResource           the icon resource that represents this node
- * @property askForDecryptionDialog Whether to show AskForDecryptionDialog
- * @property collision              Node with existing names
- * @property copySuccess            Whether copy was success or not
+ * @property askForDecryptionKeyDialogEvent Event to show AskForDecryptionDialog
+ * @property collisionsEvent        Event to check with existing names
+ * @property copySuccessEvent       Event to show copy was success or not
  * @property fetchPublicNodeError   Exception while fetching current public node
  * @property jobInProgressState     indicates if there are any job in progress that needs to be notified
  * @property openFile               State to handle file opening
- * @property downloadFile           State to download file
  * @property downloadEvent          Event to download file with DownloadsWorker
  * @property errorMessage           State to show error message
  * @property overQuotaError         State to show over quota error
  * @property foreignNodeError       State to show foreign node error
+ * @property shouldShowAdsForLink          Whether should show ads
  */
 data class FileLinkState(
     val showLoginScreenEvent: StateEvent = consumed,
@@ -46,16 +46,17 @@ data class FileLinkState(
     val previewPath: String? = null,
     val serializedData: String? = null,
     val iconResource: Int? = null,
-    val askForDecryptionDialog: Boolean = false,
-    val collision: NameCollision? = null,
-    val copySuccess: Boolean = false,
     val fetchPublicNodeError: PublicNodeException? = null,
     val jobInProgressState: FileLinkJobInProgressState? = FileLinkJobInProgressState.InitialLoading,
+    val askForDecryptionKeyDialogEvent: StateEvent = consumed,
+    val collisionsEvent: StateEventWithContent<NameCollision> = consumed(),
+    val copySuccessEvent: StateEvent = consumed,
     val openFile: StateEventWithContent<Intent> = consumed(),
     val downloadEvent: StateEventWithContent<TransferTriggerEvent.DownloadTriggerEvent> = consumed(),
     val errorMessage: StateEventWithContent<Int> = consumed(),
     val overQuotaError: StateEventWithContent<StorageState> = consumed(),
     val foreignNodeError: StateEvent = consumed,
+    val shouldShowAdsForLink: Boolean = false
 ) {
     /**
      * Creates a copy of this view state with the info that can be extracted directly from typedNode

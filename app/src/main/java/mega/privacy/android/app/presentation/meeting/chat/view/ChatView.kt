@@ -24,7 +24,6 @@ import androidx.compose.foundation.layout.navigationBarsPadding
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.LazyListState
 import androidx.compose.foundation.lazy.rememberLazyListState
-import androidx.compose.material.ScaffoldState
 import androidx.compose.material.SnackbarHostState
 import androidx.compose.material.SnackbarResult
 import androidx.compose.material.rememberScaffoldState
@@ -46,7 +45,6 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.semantics.semantics
 import androidx.compose.ui.semantics.testTagsAsResourceId
 import androidx.compose.ui.tooling.preview.Preview
-import androidx.navigation.NavHostController
 import androidx.navigation.compose.rememberNavController
 import com.google.accompanist.navigation.material.BottomSheetNavigator
 import com.google.accompanist.navigation.material.ExperimentalMaterialNavigationApi
@@ -94,7 +92,7 @@ import mega.privacy.android.shared.original.core.ui.controls.chat.VoiceClipRecor
 import mega.privacy.android.shared.original.core.ui.controls.chat.messages.reaction.model.UIReaction
 import mega.privacy.android.shared.original.core.ui.controls.layouts.MegaScaffold
 import mega.privacy.android.shared.original.core.ui.controls.sheets.MegaBottomSheetLayout
-import mega.privacy.android.shared.original.core.ui.theme.OriginalTempTheme
+import mega.privacy.android.shared.original.core.ui.theme.OriginalTheme
 import mega.privacy.android.shared.original.core.ui.utils.showAutoDurationSnackbar
 import mega.privacy.mobile.analytics.event.ChatConversationAddAttachmentButtonPressedEvent
 import mega.privacy.mobile.analytics.event.ChatMessageLongPressedEvent
@@ -102,41 +100,61 @@ import mega.privacy.mobile.analytics.event.ChatMessageLongPressedEvent
 /**
  * Chat view
  *
+ * @param bottomSheetNavigator
  * @param uiState
  * @param onBackPressed
  * @param onMenuActionPressed
+ * @param scaffoldState
+ * @param setSelectedMessages
+ * @param setSelectMode
+ * @param setSelectedReaction
+ * @param setReactionList
+ * @param setPendingAction
+ * @param setAddingReactionTo
+ * @param getApplicableActions
  * @param inviteContactsToChat
- * @param onClearChatHistory
  * @param onInfoToShowConsumed
  * @param enablePasscodeCheck
  * @param archiveChat
  * @param unarchiveChat
- * @param endCallForAll
  * @param startCall
  * @param onCallStarted
  * @param onWaitingRoomOpened
- * @param onMutePushNotificationSelected
- * @param onShowMutePushNotificationDialog
- * @param onShowMutePushNotificationDialogConsumed
  * @param onStartOrJoinMeeting
  * @param onAnswerCall
- * @param onEnableGeolocation
  * @param onSendClick
- * @param onHoldAndAnswerCall
- * @param onEndAndAnswerCall
  * @param onJoinChat
  * @param onSetPendingJoinLink
- * @param createNewImage
- * @param onSendLocationMessage
- * @param onAttachFiles
  * @param onCloseEditing
  * @param onAddReaction
  * @param onDeleteReaction
- * @param onSendGiphyMessage
- * @param onAttachContacts
- * @param getUserInfoIntoReactionList
  * @param onForwardMessages
- * @param getApplicableActions
+ * @param consumeDownloadEvent
+ * @param onActionToManageEventConsumed
+ * @param onVoiceClipRecordEvent
+ * @param onConsumeShouldUpgradeToProPlan
+ * @param navigateToFreePlanLimitParticipants
+ * @param showOptionsModal
+ * @param showEmojiModal
+ * @param showNoContactToAddDialog
+ * @param showParticipatingInACallDialog
+ * @param showAllContactsParticipateInChat
+ * @param showGroupOrContactInfoActivity
+ * @param showClearChatConfirmationDialog
+ * @param showMutePushNotificationDialog
+ * @param showEndCallForAllDialog
+ * @param showToolbarModal
+ * @param showJoinCallDialog
+ * @param showUpgradeToProDialog
+ * @param navigateToChat
+ * @param navigateToContactInfo
+ * @param navigateToMeeting
+ * @param navigateToWaitingRoom
+ * @param navigateToReactionInfo
+ * @param navigateToNotSentModal
+ * @param navigateToConversation
+ * @param navHostController
+ * @param navigateToStorageSettings
  */
 @OptIn(
     ExperimentalPermissionsApi::class,
@@ -149,12 +167,12 @@ internal fun ChatView(
     uiState: ChatUiState,
     onBackPressed: () -> Unit,
     onMenuActionPressed: (ChatRoomMenuAction) -> Unit,
-    scaffoldState: ScaffoldState,
+    scaffoldState: androidx.compose.material.ScaffoldState,
     setSelectedMessages: (Set<TypedMessage>) -> Unit,
     setSelectMode: (Boolean) -> Unit,
     setSelectedReaction: (String) -> Unit,
     setReactionList: (List<UIReaction>) -> Unit,
-    setPendingAction: ((@Composable () -> Unit)?) -> Unit,
+    setPendingAction: (@Composable() (() -> Unit)?) -> Unit,
     setAddingReactionTo: (Long?) -> Unit,
     getApplicableActions: () -> List<MessageAction>,
     inviteContactsToChat: (Long, List<String>) -> Unit = { _, _ -> },
@@ -198,7 +216,8 @@ internal fun ChatView(
     navigateToReactionInfo: () -> Unit,
     navigateToNotSentModal: () -> Unit,
     navigateToConversation: (Long) -> Unit,
-    navHostController: NavHostController,
+    navHostController: androidx.navigation.NavHostController,
+    navigateToStorageSettings: () -> Unit,
 ) {
     val context = LocalContext.current
     val focusManager = LocalFocusManager.current
@@ -448,7 +467,7 @@ internal fun ChatView(
                             onAttachmentClick = onAttachmentClick,
                             onCloseEditing = onCloseEditing,
                             onVoiceClipEvent = onVoiceClipEvent,
-                            )
+                        )
 
                     }
                     JoinChatButton(isPreviewMode = isPreviewMode, isJoining = isJoining) {
@@ -541,10 +560,11 @@ internal fun ChatView(
                         when {
                             info is InfoToShow.ForwardMessagesResult -> {
                                 info.result.getOpenChatId(chatId)?.let { openChatId ->
-                                    val result = scaffoldState.snackbarHostState.showAutoDurationSnackbar(
-                                        text,
-                                        context.getString(R.string.general_confirmation_open)
-                                    )
+                                    val result =
+                                        scaffoldState.snackbarHostState.showAutoDurationSnackbar(
+                                            text,
+                                            context.getString(R.string.general_confirmation_open)
+                                        )
                                     if (result == SnackbarResult.ActionPerformed) {
                                         navigateToConversation(openChatId)
                                     }
@@ -581,6 +601,7 @@ internal fun ChatView(
             event = uiState.downloadEvent,
             onConsumeEvent = consumeDownloadEvent,
             snackBarHostState = scaffoldState.snackbarHostState,
+            navigateToStorageSettings = navigateToStorageSettings,
         )
 
         if (isStartingCall && callInThisChat != null) {
@@ -625,17 +646,16 @@ fun showPermissionNotAllowedSnackbar(
 @Preview(uiMode = Configuration.UI_MODE_NIGHT_YES, name = "ChatView")
 @Composable
 private fun ChatViewPreview() {
-    OriginalTempTheme(isDark = isSystemInDarkTheme()) {
+    OriginalTheme(isDark = isSystemInDarkTheme()) {
         val uiState = ChatUiState(
             userChatStatus = UserChatStatus.Away,
             isChatNotificationMute = true,
         )
         ChatView(
+            bottomSheetNavigator = rememberBottomSheetNavigator(),
             uiState = uiState,
             onBackPressed = {},
             onMenuActionPressed = {},
-            inviteContactsToChat = { _, _ -> },
-            bottomSheetNavigator = rememberBottomSheetNavigator(),
             scaffoldState = rememberScaffoldState(),
             setSelectedMessages = {},
             setSelectMode = {},
@@ -644,6 +664,7 @@ private fun ChatViewPreview() {
             setPendingAction = {},
             setAddingReactionTo = {},
             getApplicableActions = { listOf() },
+            inviteContactsToChat = { _, _ -> },
             navigateToFreePlanLimitParticipants = {},
             showOptionsModal = {},
             showEmojiModal = {},
@@ -665,6 +686,7 @@ private fun ChatViewPreview() {
             navigateToNotSentModal = {},
             navigateToConversation = {},
             navHostController = rememberNavController(),
+            navigateToStorageSettings = {},
         )
     }
 }

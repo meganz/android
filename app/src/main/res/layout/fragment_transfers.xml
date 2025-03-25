@@ -20,6 +20,7 @@
 		android:visibility="gone"/>
 
 	<ImageView
+		android:src="@drawable/ic_arrow_up_down_glass"
 	    android:id="@+id/transfers_empty_image"
 	    android:layout_width="wrap_content"
 	    android:layout_height="wrap_content"

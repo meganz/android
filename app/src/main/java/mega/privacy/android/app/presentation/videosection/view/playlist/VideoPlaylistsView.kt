@@ -12,7 +12,6 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.LazyListState
-import androidx.compose.material.ExperimentalMaterialApi
 import androidx.compose.material.FloatingActionButton
 import androidx.compose.material.Icon
 import androidx.compose.material.MaterialTheme
@@ -42,6 +41,7 @@ import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import kotlinx.coroutines.launch
+import mega.privacy.android.analytics.Analytics
 import mega.privacy.android.app.R
 import mega.privacy.android.app.presentation.videosection.model.VideoPlaylistUIEntity
 import mega.privacy.android.app.presentation.videosection.view.VideoSectionLoadingView
@@ -51,13 +51,13 @@ import mega.privacy.android.legacy.core.ui.controls.LegacyMegaEmptyViewWithImage
 import mega.privacy.android.legacy.core.ui.controls.lists.HeaderViewItem
 import mega.privacy.android.shared.original.core.ui.controls.dialogs.MegaAlertDialog
 import mega.privacy.android.shared.original.core.ui.preview.CombinedThemePreviews
-import mega.privacy.android.shared.original.core.ui.theme.OriginalTempTheme
+import mega.privacy.android.shared.original.core.ui.theme.OriginalTheme
 import mega.privacy.android.shared.original.core.ui.theme.black
 import mega.privacy.android.shared.original.core.ui.theme.extensions.white_black
 import mega.privacy.android.shared.original.core.ui.theme.white
 import mega.privacy.android.shared.original.core.ui.utils.showAutoDurationSnackbar
+import mega.privacy.mobile.analytics.event.VideoPlaylistCreationButtonPressedEvent
 
-@OptIn(ExperimentalMaterialApi::class)
 @Composable
 internal fun VideoPlaylistsView(
     items: List<VideoPlaylistUIEntity>,
@@ -185,6 +185,7 @@ internal fun VideoPlaylistsView(
                         setInputValidity(true)
                     },
                     onDialogPositiveButtonClicked = { titleOfNewVideoPlaylist ->
+                        Analytics.tracker.trackEvent(VideoPlaylistCreationButtonPressedEvent)
                         onCreateDialogPositiveButtonClicked(titleOfNewVideoPlaylist)
                     },
                 ) {
@@ -249,30 +250,28 @@ internal fun VideoPlaylistsView(
                 items.isEmpty() -> LegacyMegaEmptyViewWithImage(
                     modifier = Modifier.testTag(VIDEO_PLAYLISTS_EMPTY_VIEW_TEST_TAG),
                     text = stringResource(id = sharedR.string.video_section_playlists_empty_hint_playlist),
-                    imagePainter = painterResource(id = iconPackR.drawable.ic_homepage_empty_playlists)
+                    imagePainter = painterResource(id = iconPackR.drawable.ic_playlist_glass)
                 )
 
                 else -> {
                     LazyColumn(state = lazyListState, modifier = modifier) {
-                        if (!searchMode) {
-                            item(
-                                key = "header"
-                            ) {
-                                HeaderViewItem(
-                                    modifier = Modifier.padding(
-                                        vertical = 10.dp,
-                                        horizontal = 8.dp
-                                    ),
-                                    onSortOrderClick = onSortOrderClick,
-                                    onChangeViewTypeClick = {},
-                                    onEnterMediaDiscoveryClick = {},
-                                    sortOrder = sortOrder,
-                                    isListView = true,
-                                    showSortOrder = true,
-                                    showChangeViewType = false,
-                                    showMediaDiscoveryButton = false,
-                                )
-                            }
+                        item(
+                            key = "header"
+                        ) {
+                            HeaderViewItem(
+                                modifier = Modifier.padding(
+                                    vertical = 10.dp,
+                                    horizontal = 8.dp
+                                ),
+                                onSortOrderClick = onSortOrderClick,
+                                onChangeViewTypeClick = {},
+                                onEnterMediaDiscoveryClick = {},
+                                sortOrder = sortOrder,
+                                isListView = true,
+                                showSortOrder = true,
+                                showChangeViewType = false,
+                                showMediaDiscoveryButton = false,
+                            )
                         }
 
                         items(count = items.size, key = { items[it].id.longValue }) {
@@ -361,7 +360,7 @@ internal fun DeleteItemsDialog(
 @CombinedThemePreviews
 @Composable
 private fun DeleteVideoPlaylistDialogPreview() {
-    OriginalTempTheme(isDark = isSystemInDarkTheme()) {
+    OriginalTheme(isDark = isSystemInDarkTheme()) {
         DeleteItemsDialog(
             title = "Delete playlist?",
             text = "Do we need additional explanation to delete playlists?",
@@ -375,7 +374,7 @@ private fun DeleteVideoPlaylistDialogPreview() {
 @CombinedThemePreviews
 @Composable
 private fun DeleteVideosDialogPreview() {
-    OriginalTempTheme(isDark = isSystemInDarkTheme()) {
+    OriginalTheme(isDark = isSystemInDarkTheme()) {
         DeleteItemsDialog(
             title = "Remove from playlist?",
             text = null,
@@ -389,7 +388,7 @@ private fun DeleteVideosDialogPreview() {
 @CombinedThemePreviews
 @Composable
 private fun VideoPlaylistsViewPreview() {
-    OriginalTempTheme(isDark = isSystemInDarkTheme()) {
+    OriginalTheme(isDark = isSystemInDarkTheme()) {
         VideoPlaylistsView(
             items = emptyList(),
             progressBarShowing = false,
@@ -419,7 +418,7 @@ private fun VideoPlaylistsViewPreview() {
 @CombinedThemePreviews
 @Composable
 private fun VideoPlaylistsViewCreateDialogShownPreview() {
-    OriginalTempTheme(isDark = isSystemInDarkTheme()) {
+    OriginalTheme(isDark = isSystemInDarkTheme()) {
         VideoPlaylistsView(
             items = emptyList(),
             progressBarShowing = false,
@@ -449,7 +448,7 @@ private fun VideoPlaylistsViewCreateDialogShownPreview() {
 @CombinedThemePreviews
 @Composable
 private fun FabButtonPreview() {
-    OriginalTempTheme(isDark = isSystemInDarkTheme()) {
+    OriginalTheme(isDark = isSystemInDarkTheme()) {
         CreateVideoPlaylistFabButton(onCreateVideoPlaylistClick = {})
     }
 }

@@ -3,11 +3,10 @@ package mega.privacy.android.app.presentation.folderlink
 import mega.privacy.android.shared.resources.R as sharedR
 import android.annotation.SuppressLint
 import android.content.Intent
-import android.content.res.Configuration
 import android.net.Uri
 import android.os.Bundle
 import android.widget.Toast
-import androidx.activity.OnBackPressedCallback
+import androidx.activity.compose.setContent
 import androidx.activity.result.ActivityResult
 import androidx.activity.result.ActivityResultCallback
 import androidx.activity.result.contract.ActivityResultContracts
@@ -18,12 +17,15 @@ import androidx.compose.material.rememberScaffoldState
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.core.text.HtmlCompat
-import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.lifecycle.lifecycleScope
-import androidx.lifecycle.repeatOnLifecycle
 import com.google.android.material.dialog.MaterialAlertDialogBuilder
 import dagger.hilt.android.AndroidEntryPoint
+import de.palm.composestateevents.EventEffect
+import kotlinx.coroutines.flow.combine
+import kotlinx.coroutines.flow.distinctUntilChanged
+import kotlinx.coroutines.flow.launchIn
+import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.launch
 import mega.privacy.android.app.MegaApplication
 import mega.privacy.android.app.MimeTypeList
@@ -31,19 +33,16 @@ import mega.privacy.android.app.R
 import mega.privacy.android.app.activities.PasscodeActivity
 import mega.privacy.android.app.activities.WebViewActivity
 import mega.privacy.android.app.activities.contract.NameCollisionActivityContract
+import mega.privacy.android.app.arch.extensions.collectFlow
 import mega.privacy.android.app.constants.IntentConstants
-import mega.privacy.android.app.databinding.ActivityFolderLinkComposeBinding
 import mega.privacy.android.app.extensions.enableEdgeToEdgeAndConsumeInsets
-import mega.privacy.android.app.extensions.isPortrait
-import mega.privacy.android.app.featuretoggle.ABTestFeatures
 import mega.privacy.android.app.featuretoggle.AppFeatures
 import mega.privacy.android.app.main.DecryptAlertDialog
 import mega.privacy.android.app.main.FileExplorerActivity
 import mega.privacy.android.app.main.ManagerActivity
 import mega.privacy.android.app.main.ManagerActivity.Companion.TRANSFERS_TAB
-import mega.privacy.android.app.mediaplayer.miniplayer.MiniAudioPlayerController
 import mega.privacy.android.app.myAccount.MyAccountActivity
-import mega.privacy.android.app.presentation.advertisements.model.AdsSlotIDs
+import mega.privacy.android.app.presentation.advertisements.GoogleAdsManager
 import mega.privacy.android.app.presentation.data.NodeUIItem
 import mega.privacy.android.app.presentation.extensions.isDarkMode
 import mega.privacy.android.app.presentation.folderlink.view.FolderLinkView
@@ -55,7 +54,7 @@ import mega.privacy.android.app.presentation.login.LoginActivity
 import mega.privacy.android.app.presentation.manager.model.TransfersTab
 import mega.privacy.android.app.presentation.pdfviewer.PdfViewerActivity
 import mega.privacy.android.app.presentation.photos.mediadiscovery.MediaDiscoveryActivity
-import mega.privacy.android.app.presentation.transfers.TransfersManagementViewModel
+import mega.privacy.android.app.presentation.settings.model.StorageTargetPreference
 import mega.privacy.android.app.presentation.transfers.starttransfer.view.StartTransferComponent
 import mega.privacy.android.app.presentation.transfers.view.IN_PROGRESS_TAB_INDEX
 import mega.privacy.android.app.textEditor.TextEditorActivity
@@ -78,7 +77,7 @@ import mega.privacy.android.domain.entity.node.TypedNode
 import mega.privacy.android.domain.usecase.GetThemeMode
 import mega.privacy.android.domain.usecase.featureflag.GetFeatureFlagValueUseCase
 import mega.privacy.android.navigation.MegaNavigator
-import mega.privacy.android.shared.original.core.ui.theme.OriginalTempTheme
+import mega.privacy.android.shared.original.core.ui.theme.OriginalTheme
 import nz.mega.sdk.MegaApiJava.INVALID_HANDLE
 import timber.log.Timber
 import javax.inject.Inject
@@ -114,19 +113,16 @@ class FolderLinkComposeActivity : PasscodeActivity(),
     @Inject
     lateinit var megaNavigator: MegaNavigator
 
-    private lateinit var binding: ActivityFolderLinkComposeBinding
+    /**
+     * [GoogleAdsManager]
+     */
+    @Inject
+    lateinit var googleAdsManager: GoogleAdsManager
 
     private val viewModel: FolderLinkViewModel by viewModels()
-    private val transfersManagementViewModel: TransfersManagementViewModel by viewModels()
 
     private var mKey: String? = null
     private var statusDialog: AlertDialog? = null
-
-    private val onBackPressedCallback = object : OnBackPressedCallback(true) {
-        override fun handleOnBackPressed() {
-            viewModel.handleBackPress()
-        }
-    }
 
     private val nameCollisionActivityLauncher = registerForActivityResult(
         NameCollisionActivityContract()
@@ -178,63 +174,49 @@ class FolderLinkComposeActivity : PasscodeActivity(),
     override fun onCreate(savedInstanceState: Bundle?) {
         enableEdgeToEdgeAndConsumeInsets()
         super.onCreate(savedInstanceState)
-        binding = ActivityFolderLinkComposeBinding.inflate(layoutInflater)
-        setContentView(binding.root)
 
-        onBackPressedDispatcher.addCallback(this, onBackPressedCallback)
+        viewModel.state.map { it.shouldShowAdsForLink }
+            .distinctUntilChanged()
+            .combine(googleAdsManager.isAdsFeatureEnabled) { shouldShowAdsForLink, isAdsFeatureEnabled ->
+                if (shouldShowAdsForLink && isAdsFeatureEnabled) {
+                    googleAdsManager.checkLatestConsentInformation(
+                        activity = this,
+                        onConsentInformationUpdated = { googleAdsManager.fetchAdRequest() }
+                    )
+                }
+            }.launchIn(lifecycleScope)
 
-        binding.folderLinkView.apply {
-            setContent {
-                StartFolderLinkView()
-            }
+        setContent {
+            StartFolderLinkView()
         }
 
         intent?.let { viewModel.handleIntent(it) }
-        setupObservers()
         viewModel.checkLoginRequired()
         checkForInAppAdvertisement()
-        setupMiniAudioPlayer()
-    }
-
-    private fun setupMiniAudioPlayer() {
-        val audioPlayerController = MiniAudioPlayerController(binding.miniAudioPlayer).apply {
-            shouldVisible = true
+        collectFlow(viewModel.monitorMiscLoadedUseCase()) {
+            checkForInAppAdvertisement()
         }
-        lifecycle.addObserver(audioPlayerController)
     }
 
     private fun checkForInAppAdvertisement() {
         lifecycleScope.launch {
             runCatching {
-                val isInAppAdvertisementEnabled = true
-                val isAdsEnabled = getFeatureFlagValueUseCase(ABTestFeatures.ads)
-
-                if (isInAppAdvertisementEnabled && isAdsEnabled) {
-                    if (this@FolderLinkComposeActivity.isPortrait()) {
-                        adsViewModel.enableAdsFeature()
-                        adsViewModel.fetchNewAd(AdsSlotIDs.SHARED_LINK_SLOT_ID)
-                    }
-                }
+                googleAdsManager.checkForAdsAvailability()
             }.onFailure {
-                Timber.e("Failed to fetch feature flags or ab_ads test flag with error: ${it.message}")
+                Timber.e("Failed to check for ads availability: $it")
             }
         }
-    }
-
-    override fun onConfigurationChanged(newConfig: Configuration) {
-        super.onConfigurationChanged(newConfig)
-        adsViewModel.onScreenOrientationChanged(isPortrait())
     }
 
     @Composable
     private fun StartFolderLinkView() {
         val themeMode by getThemeMode().collectAsStateWithLifecycle(initialValue = ThemeMode.System)
         val uiState by viewModel.state.collectAsStateWithLifecycle()
-        val adsUiState by adsViewModel.uiState.collectAsStateWithLifecycle()
+        val request by googleAdsManager.request.collectAsStateWithLifecycle()
         val transferState by transfersManagementViewModel.state.collectAsStateWithLifecycle()
 
         val scaffoldState = rememberScaffoldState()
-        OriginalTempTheme(isDark = themeMode.isDarkMode()) {
+        OriginalTheme(isDark = themeMode.isDarkMode()) {
             FolderLinkView(
                 state = uiState,
                 transferState = transferState,
@@ -264,29 +246,67 @@ class FolderLinkComposeActivity : PasscodeActivity(),
                 onDisputeTakeDownClicked = ::navigateToLink,
                 onLinkClicked = ::navigateToLink,
                 onEnterMediaDiscoveryClick = ::onEnterMediaDiscoveryClick,
-                adsUiState = adsUiState,
-                onAdClicked = { uri ->
-                    uri?.let {
-                        val intent = Intent(Intent.ACTION_VIEW, it)
-                        if (intent.resolveActivity(packageManager) != null) {
-                            startActivity(intent)
-                            adsViewModel.onAdConsumed()
-                        } else {
-                            Timber.d("No Application found to can handle Ads intent")
-                            adsViewModel.fetchNewAd()
-                        }
-                    }
-                    adsViewModel.fetchNewAd(AdsSlotIDs.SHARED_LINK_SLOT_ID)
-                },
-                onAdDismissed = adsViewModel::onAdConsumed,
                 onTransferWidgetClick = ::onTransfersWidgetClick,
-                fileTypeIconMapper = fileTypeIconMapper
+                fileTypeIconMapper = fileTypeIconMapper,
+                request = request
             )
             StartTransferComponent(
                 event = uiState.downloadEvent,
                 onConsumeEvent = viewModel::resetDownloadNode,
-                snackBarHostState = scaffoldState.snackbarHostState
+                snackBarHostState = scaffoldState.snackbarHostState,
+                navigateToStorageSettings = {
+                    megaNavigator.openSettings(
+                        this,
+                        StorageTargetPreference
+                    )
+                }
             )
+
+            EventEffect(
+                event = uiState.showLoginEvent,
+                onConsumed = viewModel::onShowLoginEventConsumed
+            ) {
+                showLoginScreen()
+            }
+
+            EventEffect(
+                event = uiState.finishActivityEvent,
+                onConsumed = viewModel::onFinishActivityEventConsumed
+            ) {
+                finish()
+            }
+
+            EventEffect(
+                event = uiState.askForDecryptionKeyDialogEvent,
+                onConsumed = viewModel::resetAskForDecryptionKeyDialog
+            ) {
+                showAskForDecryptionKeyDialog()
+            }
+
+            EventEffect(
+                event = uiState.collisionsEvent,
+                onConsumed = {
+                    viewModel.resetLaunchCollisionActivity()
+                    viewModel.clearAllSelection()
+                }
+            ) {
+                AlertDialogUtil.dismissAlertDialogIfExists(statusDialog)
+                nameCollisionActivityLauncher.launch(ArrayList(it))
+            }
+
+            EventEffect(
+                event = uiState.copyResultEvent,
+                onConsumed = viewModel::resetShowCopyResult
+            ) { (resultText, throwable) ->
+                showCopyResult(copyResultText = resultText, throwable = throwable)
+            }
+
+            EventEffect(
+                event = uiState.showErrorDialogEvent,
+                onConsumed = viewModel::onShowErrorDialogEventConsumed
+            ) { (errorDialogTitle, errorDialogContent) ->
+                showErrorDialog(title = errorDialogTitle, message = errorDialogContent)
+            }
         }
     }
 
@@ -383,10 +403,6 @@ class FolderLinkComposeActivity : PasscodeActivity(),
      * Handle widget click
      */
     private fun onTransfersWidgetClick() {
-        transfersManagement.setAreFailedTransfers(false)
-        if (transfersManagement.isOnTransferOverQuota()) {
-            transfersManagement.setHasNotToBeShowDueToTransferOverQuota(true)
-        }
         lifecycleScope.launch {
             val credentials = runCatching { getAccountCredentialsUseCase() }.getOrNull()
             if (megaApi.isLoggedIn == 0 || credentials == null) {
@@ -435,60 +451,6 @@ class FolderLinkComposeActivity : PasscodeActivity(),
         MegaNodeUtil.shareLink(this, viewModel.state.value.url, viewModel.state.value.title)
     }
 
-    private fun setupObservers() {
-        lifecycleScope.launch {
-            repeatOnLifecycle(Lifecycle.State.RESUMED) {
-                viewModel.state.collect {
-                    when {
-                        it.finishActivity -> {
-                            finish()
-                        }
-
-                        it.isInitialState -> {
-                            it.shouldLogin?.let { showLogin ->
-                                if (showLogin) {
-                                    showLoginScreen()
-                                } else {
-                                    it.url?.let { url -> viewModel.folderLogin(url) }
-                                }
-                            }
-                            return@collect
-                        }
-
-                        it.isLoginComplete && !it.isNodesFetched -> {
-                            viewModel.fetchNodes(it.folderSubHandle)
-                            // Get cookies settings after login.
-                            MegaApplication.getInstance().checkEnabledCookies()
-                        }
-
-                        it.collisions != null -> {
-                            AlertDialogUtil.dismissAlertDialogIfExists(statusDialog)
-                            nameCollisionActivityLauncher.launch(ArrayList(it.collisions))
-                            viewModel.resetLaunchCollisionActivity()
-                            viewModel.clearAllSelection()
-                        }
-
-                        it.copyResultText != null || it.copyThrowable != null -> {
-                            showCopyResult(it.copyResultText, it.copyThrowable)
-                            viewModel.resetShowCopyResult()
-                        }
-
-                        it.askForDecryptionKeyDialog -> {
-                            askForDecryptionKeyDialog()
-                        }
-
-                        it.errorDialogTitle != -1 && it.errorDialogContent != -1 -> {
-                            Timber.w("Show error dialog")
-                            showErrorDialog(it.errorDialogTitle, it.errorDialogContent)
-                        }
-
-                        else -> {}
-                    }
-                }
-            }
-        }
-    }
-
     private fun showLoginScreen() {
         Timber.d("Refresh session - sdk or karere")
         val intent = Intent(this, LoginActivity::class.java)
@@ -500,19 +462,19 @@ class FolderLinkComposeActivity : PasscodeActivity(),
         finish()
     }
 
-    private fun askForDecryptionKeyDialog() {
+    private fun showAskForDecryptionKeyDialog() {
         Timber.d("askForDecryptionKeyDialog")
         val builder = DecryptAlertDialog.Builder()
         val decryptAlertDialog = builder
             .setTitle(getString(R.string.alert_decryption_key))
-            .setPosText(R.string.general_decryp).setNegText(sharedR.string.general_dialog_cancel_button)
+            .setPosText(R.string.general_decryp)
+            .setNegText(sharedR.string.general_dialog_cancel_button)
             .setMessage(getString(R.string.message_decryption_key))
             .setErrorMessage(R.string.invalid_decryption_key)
             .setKey(mKey)
             .build()
 
         decryptAlertDialog.show(supportFragmentManager, TAG_DECRYPT)
-        viewModel.resetAskForDecryptionKeyDialog()
     }
 
     /**

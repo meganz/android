@@ -36,13 +36,12 @@ internal class DeviceBottomSheetBodyTest {
             DeviceBottomSheetBody(
                 device = ownDeviceUINode,
                 isCameraUploadsEnabled = true,
+                onCameraUploadsClicked = {},
                 onRenameDeviceClicked = {},
                 onInfoClicked = {},
                 onAddNewSyncClicked = {},
                 onAddBackupClicked = {},
                 onBottomSheetDismissed = {},
-                isFreeAccount = false,
-                isBackupForAndroidEnabled = true,
             )
         }
         composeTestRule.onNodeWithTag(BOTTOM_SHEET_CONTAINER)
@@ -63,13 +62,12 @@ internal class DeviceBottomSheetBodyTest {
             DeviceBottomSheetBody(
                 device = otherDeviceUINode,
                 isCameraUploadsEnabled = true,
+                onCameraUploadsClicked = {},
                 onRenameDeviceClicked = {},
                 onInfoClicked = {},
                 onAddNewSyncClicked = {},
                 onAddBackupClicked = {},
                 onBottomSheetDismissed = {},
-                isFreeAccount = false,
-                isBackupForAndroidEnabled = true,
             )
         }
         composeTestRule.onNodeWithTag(BOTTOM_SHEET_CONTAINER)

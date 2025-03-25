@@ -29,17 +29,21 @@ import mega.privacy.android.domain.entity.Progress
 import mega.privacy.android.domain.entity.transfer.ActiveTransferTotals
 import mega.privacy.android.domain.entity.transfer.MonitorOngoingActiveTransfersResult
 import mega.privacy.android.domain.entity.transfer.Transfer
+import mega.privacy.android.domain.entity.transfer.TransferAppData
 import mega.privacy.android.domain.entity.transfer.TransferEvent
+import mega.privacy.android.domain.entity.transfer.TransferProgressResult
 import mega.privacy.android.domain.entity.transfer.TransferState
 import mega.privacy.android.domain.entity.transfer.TransferType
+import mega.privacy.android.domain.entity.uri.UriPath
 import mega.privacy.android.domain.monitoring.CrashReporter
+import mega.privacy.android.domain.usecase.transfers.MonitorActiveAndPendingTransfersUseCase
 import mega.privacy.android.domain.usecase.transfers.MonitorTransferEventsUseCase
 import mega.privacy.android.domain.usecase.transfers.active.ClearActiveTransfersIfFinishedUseCase
 import mega.privacy.android.domain.usecase.transfers.active.CorrectActiveTransfersUseCase
 import mega.privacy.android.domain.usecase.transfers.active.GetActiveTransferTotalsUseCase
 import mega.privacy.android.domain.usecase.transfers.active.HandleTransferEventUseCase
-import mega.privacy.android.domain.usecase.transfers.active.MonitorOngoingActiveTransfersUntilFinishedUseCase
 import mega.privacy.android.domain.usecase.transfers.paused.AreTransfersPausedUseCase
+import mega.privacy.android.domain.usecase.transfers.pending.StartAllPendingUploadsUseCase
 import mega.privacy.android.domain.usecase.transfers.uploads.SetNodeAttributesAfterUploadUseCase
 import org.junit.jupiter.api.AfterAll
 import org.junit.jupiter.api.BeforeAll
@@ -56,7 +60,6 @@ import org.mockito.kotlin.times
 import org.mockito.kotlin.verify
 import org.mockito.kotlin.verifyNoInteractions
 import org.mockito.kotlin.whenever
-import java.io.File
 import java.util.UUID
 import java.util.concurrent.Executor
 import java.util.concurrent.Executors
@@ -74,8 +77,8 @@ class UploadsWorkerTest {
 
     private val monitorTransferEventsUseCase = mock<MonitorTransferEventsUseCase>()
     private val handleTransferEventUseCase = mock<HandleTransferEventUseCase>()
-    private val monitorOngoingActiveTransfersUntilFinishedUseCase =
-        mock<MonitorOngoingActiveTransfersUntilFinishedUseCase>()
+    private val monitorActiveAndPendingTransfersUseCase =
+        mock<MonitorActiveAndPendingTransfersUseCase>()
     private val areTransfersPausedUseCase = mock<AreTransfersPausedUseCase>()
     private val getActiveTransferTotalsUseCase = mock<GetActiveTransferTotalsUseCase>()
     private val transfersNotificationMapper = mock<TransfersNotificationMapper>()
@@ -90,6 +93,7 @@ class UploadsWorkerTest {
     private val setForeground = mock<ForegroundSetter>()
     private val crashReporter = mock<CrashReporter>()
     private val notificationManager = mock<NotificationManagerCompat>()
+    private val startAllPendingUploadsUseCase = mock<StartAllPendingUploadsUseCase>()
 
     private val nodeId = 1L
     private val localPath = "localPath"
@@ -125,7 +129,7 @@ class UploadsWorkerTest {
             monitorTransferEventsUseCase = monitorTransferEventsUseCase,
             handleTransferEventUseCase = handleTransferEventUseCase,
             areTransfersPausedUseCase = areTransfersPausedUseCase,
-            monitorOngoingActiveTransfersUntilFinishedUseCase = monitorOngoingActiveTransfersUntilFinishedUseCase,
+            monitorActiveAndPendingTransfersUseCase = monitorActiveAndPendingTransfersUseCase,
             getActiveTransferTotalsUseCase = getActiveTransferTotalsUseCase,
             transfersNotificationMapper = transfersNotificationMapper,
             overQuotaNotificationBuilder = overQuotaNotificationBuilder,
@@ -138,6 +142,7 @@ class UploadsWorkerTest {
             crashReporter = crashReporter,
             foregroundSetter = setForeground,
             notificationSamplePeriod = 0L,
+            startAllPendingUploadsUseCase = startAllPendingUploadsUseCase
         )
     }
 
@@ -159,6 +164,7 @@ class UploadsWorkerTest {
             setNodeAttributesAfterUploadUseCase,
             crashReporter,
             setForeground,
+            startAllPendingUploadsUseCase
         )
     }
 
@@ -196,7 +202,7 @@ class UploadsWorkerTest {
         runTest {
             commonStub()
             underTest.doWork()
-            verify(monitorOngoingActiveTransfersUntilFinishedUseCase).invoke(TransferType.GENERAL_UPLOAD)
+            verify(monitorActiveAndPendingTransfersUseCase).invoke(TransferType.GENERAL_UPLOAD)
         }
 
     @Test
@@ -207,11 +213,11 @@ class UploadsWorkerTest {
                 inOrder(
                     monitorTransferEventsUseCase,
                     correctActiveTransfersUseCase,
-                    monitorOngoingActiveTransfersUntilFinishedUseCase
+                    monitorActiveAndPendingTransfersUseCase
                 )
             underTest.doWork()
             inOrder.verify(correctActiveTransfersUseCase).invoke(TransferType.GENERAL_UPLOAD)
-            inOrder.verify(monitorOngoingActiveTransfersUntilFinishedUseCase)
+            inOrder.verify(monitorActiveAndPendingTransfersUseCase)
                 .invoke(TransferType.GENERAL_UPLOAD)
         }
 
@@ -340,11 +346,12 @@ class UploadsWorkerTest {
 
     @Test
     fun `test that node attributes are set once upload is finished`() = runTest {
-        val finishEvent = commonStub()
+        val appData = listOf(TransferAppData.Geolocation(345.4, 45.34))
+        val finishEvent = commonStub(appData = appData)
 
         underTest.onTransferEventReceived(finishEvent)
 
-        verify(setNodeAttributesAfterUploadUseCase).invoke(nodeId, File(localPath))
+        verify(setNodeAttributesAfterUploadUseCase).invoke(nodeId, UriPath(localPath), appData)
     }
 
     @Test
@@ -354,46 +361,61 @@ class UploadsWorkerTest {
             on { this.localPath }.thenReturn(localPath)
             on { this.state }.thenReturn(TransferState.STATE_FAILED)
         }
-        val transferEvent = TransferEvent.TransferFinishEvent(transfer, null)
+        val transferEvent = TransferEvent.TransferFinishEvent(transfer, mock())
         commonStub()
 
         underTest.onTransferEventReceived(transferEvent)
 
-        verify(setNodeAttributesAfterUploadUseCase).invoke(nodeId, File(localPath))
+        verifyNoInteractions(setNodeAttributesAfterUploadUseCase)
+    }
+
+    @Test
+    fun `test that startAllPendingDownloadsUseCase is invoked when work is started`() = runTest {
+        commonStub()
+        underTest.doWork()
+        verify(startAllPendingUploadsUseCase).invoke()
     }
 
     private suspend fun commonStub(
         initialTransferTotals: ActiveTransferTotals = mockActiveTransferTotals(false),
         transferTotals: List<ActiveTransferTotals> = listOf(mockActiveTransferTotals(true)),
         storageOverQuota: Boolean = false,
+        appData: List<TransferAppData>? = emptyList(),
     ): TransferEvent.TransferFinishEvent {
         val transfer: Transfer = mock {
             on { this.nodeHandle }.thenReturn(nodeId)
             on { this.localPath }.thenReturn(localPath)
+            on { this.appData }.thenReturn(appData)
         }
         val transferEvent = TransferEvent.TransferFinishEvent(transfer, null)
         whenever(areTransfersPausedUseCase())
             .thenReturn(false)
         whenever(monitorTransferEventsUseCase())
             .thenReturn(flowOf(transferEvent))
-        whenever(monitorOngoingActiveTransfersUntilFinishedUseCase(TransferType.GENERAL_UPLOAD))
+        whenever(monitorActiveAndPendingTransfersUseCase(TransferType.GENERAL_UPLOAD))
             .thenReturn(flow {
                 emit(
-                    MonitorOngoingActiveTransfersResult(
-                        activeTransferTotals = initialTransferTotals,
-                        paused = false,
-                        transfersOverQuota = false,
-                        storageOverQuota = false
+                    TransferProgressResult(
+                        MonitorOngoingActiveTransfersResult(
+                            activeTransferTotals = initialTransferTotals,
+                            paused = false,
+                            transfersOverQuota = false,
+                            storageOverQuota = false
+                        ),
+                        !initialTransferTotals.hasCompleted(),
                     )
                 )
                 transferTotals.forEach {
                     delay(AbstractTransfersWorker.ON_TRANSFER_UPDATE_REFRESH_MILLIS) // events are sampled in the worker
                     emit(
-                        MonitorOngoingActiveTransfersResult(
-                            activeTransferTotals = it,
-                            paused = false,
-                            transfersOverQuota = false,
-                            storageOverQuota = storageOverQuota
+                        TransferProgressResult(
+                            MonitorOngoingActiveTransfersResult(
+                                activeTransferTotals = it,
+                                paused = false,
+                                transfersOverQuota = false,
+                                storageOverQuota = storageOverQuota
+                            ),
+                            !it.hasCompleted(),
                         )
                     )
                 }

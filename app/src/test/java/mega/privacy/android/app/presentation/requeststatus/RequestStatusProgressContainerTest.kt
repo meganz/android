@@ -4,6 +4,7 @@ import androidx.compose.ui.test.assertIsDisplayed
 import androidx.compose.ui.test.junit4.createComposeRule
 import androidx.compose.ui.test.onNodeWithTag
 import androidx.test.ext.junit.runners.AndroidJUnit4
+import mega.privacy.android.domain.entity.Progress
 import org.junit.Rule
 import org.junit.Test
 import org.junit.runner.RunWith
@@ -17,16 +18,16 @@ class RequestStatusProgressContainerTest {
     @Test
     fun `test that progress dialog is displayed correctly`() {
         composeRule.setContent {
-            RequestStatusProgressBarContent(showProgressBar = true, progress = 500)
+            RequestStatusProgressBarContent(progress = Progress(0.5f))
         }
 
         composeRule.onNodeWithTag(PROGRESS_BAR_TEST_TAG).assertIsDisplayed()
     }
 
     @Test
-    fun `test that dialog is not displayed when showProgressBar is false`() {
+    fun `test that dialog is not displayed when progress is null`() {
         composeRule.setContent {
-            RequestStatusProgressBarContent(showProgressBar = false, progress = -1)
+            RequestStatusProgressBarContent(progress = null)
         }
 
         composeRule.onNodeWithTag(PROGRESS_BAR_TEST_TAG).assertDoesNotExist()

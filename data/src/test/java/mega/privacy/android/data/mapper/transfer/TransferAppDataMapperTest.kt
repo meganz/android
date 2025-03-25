@@ -1,7 +1,17 @@
 package mega.privacy.android.data.mapper.transfer
 
 import com.google.common.truth.Truth
-import mega.privacy.android.data.mapper.transfer.AppDataTypeConstants.*
+import mega.privacy.android.data.mapper.transfer.AppDataTypeConstants.BackgroundTransfer
+import mega.privacy.android.data.mapper.transfer.AppDataTypeConstants.CameraUpload
+import mega.privacy.android.data.mapper.transfer.AppDataTypeConstants.ChatDownload
+import mega.privacy.android.data.mapper.transfer.AppDataTypeConstants.ChatUpload
+import mega.privacy.android.data.mapper.transfer.AppDataTypeConstants.GeoLocation
+import mega.privacy.android.data.mapper.transfer.AppDataTypeConstants.OriginalContentUri
+import mega.privacy.android.data.mapper.transfer.AppDataTypeConstants.PreviewDownload
+import mega.privacy.android.data.mapper.transfer.AppDataTypeConstants.OfflineDownload
+import mega.privacy.android.data.mapper.transfer.AppDataTypeConstants.SDCardDownload
+import mega.privacy.android.data.mapper.transfer.AppDataTypeConstants.TransferGroup
+import mega.privacy.android.data.mapper.transfer.AppDataTypeConstants.VoiceClip
 import mega.privacy.android.data.mapper.transfer.TransferAppDataMapper.Companion.APP_DATA_INDICATOR
 import mega.privacy.android.data.mapper.transfer.TransferAppDataMapper.Companion.APP_DATA_REPEATED_TRANSFER_SEPARATOR
 import mega.privacy.android.data.mapper.transfer.TransferAppDataMapper.Companion.APP_DATA_SEPARATOR
@@ -72,10 +82,24 @@ class TransferAppDataMapperTest {
             val raw =
                 "SD_CARD_DOWNLOAD>/storage/48F8-4FB7/Download mega>content://com.android.externalstorage.documents/tree/48F8-4FB7%3ADownload%20mega"
             val expected = TransferAppData.SdCardDownload(
-                "/storage/48F8-4FB7/Download mega",
-                "content://com.android.externalstorage.documents/tree/48F8-4FB7%3ADownload%20mega"
+                targetPathForSDK = "/storage/48F8-4FB7/Download mega",
+                finalTargetUri = "content://com.android.externalstorage.documents/tree/48F8-4FB7%3ADownload%20mega"
             )
             Truth.assertThat(underTest(raw)).containsExactly(expected)
+        }
+
+        @Test
+        fun `test that the sd card paths are mapped correctly when parentPath is received as param`() {
+            val raw =
+                "SD_CARD_DOWNLOAD>/storage/48F8-4FB7/Download mega>content://com.android.externalstorage.documents/tree/48F8-4FB7%3ADownload%20mega"
+            val parentPath = "path/parentPath"
+            val expected = TransferAppData.SdCardDownload(
+                targetPathForSDK = "/storage/48F8-4FB7/Download mega",
+                finalTargetUri = "content://com.android.externalstorage.documents/tree/48F8-4FB7%3ADownload%20mega",
+                parentPath = parentPath
+            )
+            Truth.assertThat(underTest(appDataRaw = raw, parentPath = parentPath))
+                .containsExactly(expected)
         }
 
         @Test
@@ -109,6 +133,21 @@ class TransferAppDataMapperTest {
             val expected = TransferAppData.ChatDownload(chatId, msgId, msgIndex)
             Truth.assertThat(underTest(raw)).containsExactly(expected)
         }
+
+        @Test
+        fun `test that a Geolocation is mapped correctly`() {
+            val raw = "GEO_LOCATION>$LAT>$LON"
+            val expected = TransferAppData.Geolocation(LAT, LON)
+            Truth.assertThat(underTest(raw)).containsExactly(expected)
+        }
+
+
+        @Test
+        fun `test that a TransferGroup is mapped correctly`() {
+            val raw = "TRANSFER_GROUP>$GROUP_ID"
+            val expected = TransferAppData.TransferGroup(GROUP_ID)
+            Truth.assertThat(underTest(raw)).containsExactly(expected)
+        }
     }
 
     private fun provideWrongParameters() = wrongParameters
@@ -132,8 +171,12 @@ class TransferAppDataMapperTest {
         private const val FAKE_ID = 12345L
         private const val FAKE_ID_2 = 23456L
         private const val FAKE_INDEX = 1
+        private const val PARENT_PATH = "parentPath"
         private const val TARGET_PATH = "target"
         private const val TARGET_URI = "targetUri"
+        private const val LAT = 41.60
+        private const val LON = 2.28
+        private const val GROUP_ID = 4567L
         private val wrongParameters = listOf(
             "",
             "something wrong",
@@ -148,12 +191,23 @@ class TransferAppDataMapperTest {
                     to listOf(TransferAppData.VoiceClip),
             generateAppDataString(CameraUpload)
                     to listOf(TransferAppData.CameraUpload),
-            generateAppDataString(SDCardDownload, TARGET_PATH)
-                    to listOf(TransferAppData.SdCardDownload(TARGET_PATH, null)),
+            generateAppDataString(SDCardDownload, TARGET_PATH, TARGET_URI)
+                    to listOf(
+                TransferAppData.SdCardDownload(
+                    targetPathForSDK = TARGET_PATH,
+                    finalTargetUri = TARGET_URI
+                )
+            ),
             generateAppDataString(BackgroundTransfer)
                     to listOf(TransferAppData.BackgroundTransfer),
-            generateAppDataString(SDCardDownload, TARGET_PATH, TARGET_URI)
-                    to listOf(TransferAppData.SdCardDownload(TARGET_PATH, TARGET_URI)),
+            generateAppDataString(SDCardDownload, TARGET_PATH, TARGET_URI, PARENT_PATH)
+                    to listOf(
+                TransferAppData.SdCardDownload(
+                    targetPathForSDK = TARGET_PATH,
+                    finalTargetUri = TARGET_URI,
+                    parentPath = PARENT_PATH
+                )
+            ),
             generateAppDataString(OriginalContentUri, TARGET_URI)
                     to listOf(TransferAppData.OriginalContentUri(TARGET_URI)),
             generateAppDataString(
@@ -162,6 +216,18 @@ class TransferAppDataMapperTest {
                 FAKE_ID_2.toString(),
                 FAKE_INDEX.toString()
             ) to listOf(TransferAppData.ChatDownload(FAKE_ID, FAKE_ID_2, FAKE_INDEX)),
+            generateAppDataString(
+                GeoLocation,
+                LAT.toString(), LON.toString()
+            ) to listOf(TransferAppData.Geolocation(LAT, LON)),
+            generateAppDataString(
+                TransferGroup,
+                GROUP_ID.toString()
+            ) to listOf(TransferAppData.TransferGroup(GROUP_ID)),
+            generateAppDataString(PreviewDownload)
+                    to listOf(TransferAppData.PreviewDownload),
+            generateAppDataString(OfflineDownload)
+                    to listOf(TransferAppData.OfflineDownload),
         )
 
         private fun generateAppDataString(

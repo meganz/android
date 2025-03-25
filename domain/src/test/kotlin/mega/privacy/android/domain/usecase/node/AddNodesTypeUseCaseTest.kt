@@ -7,8 +7,7 @@ import mega.privacy.android.domain.entity.FolderType
 import mega.privacy.android.domain.entity.node.DefaultTypedFolderNode
 import mega.privacy.android.domain.entity.node.FolderNode
 import mega.privacy.android.domain.entity.node.NodeId
-import mega.privacy.android.domain.usecase.GetDeviceType
-import mega.privacy.android.domain.usecase.HasAncestor
+import mega.privacy.android.domain.usecase.GetFolderType
 import org.junit.jupiter.api.BeforeAll
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
@@ -20,20 +19,18 @@ import org.mockito.kotlin.whenever
 @TestInstance(TestInstance.Lifecycle.PER_CLASS)
 class AddNodesTypeUseCaseTest {
 
-    private val getGroupFolderTypeUseCase: GetGroupFolderTypeUseCase = mock()
-    private val getDeviceType: GetDeviceType = mock()
-    private val hasAncestor: HasAncestor = mock()
+    private val getFolderType: GetFolderType = mock()
     private lateinit var addNodesTypeUseCase: AddNodesTypeUseCase
 
     @BeforeAll
     fun setUp() {
         addNodesTypeUseCase =
-            AddNodesTypeUseCase(getGroupFolderTypeUseCase, getDeviceType, hasAncestor)
+            AddNodesTypeUseCase(getFolderType = getFolderType)
     }
 
     @BeforeEach
     fun resetMocks() {
-        reset(getGroupFolderTypeUseCase, getDeviceType, hasAncestor)
+        reset(getFolderType)
     }
 
     @Test
@@ -43,7 +40,6 @@ class AddNodesTypeUseCaseTest {
         }
         val nodes = listOf(typedNode)
 
-        whenever(getGroupFolderTypeUseCase()).thenReturn(emptyMap())
         val result = addNodesTypeUseCase(nodes)
 
         assertThat(result).isEqualTo(nodes)
@@ -57,10 +53,8 @@ class AddNodesTypeUseCaseTest {
             on { device }.thenReturn("device")
         }
         val nodes = listOf(folderNode)
-        val groupFolderTypes = mapOf(NodeId(3) to FolderType.MediaSyncFolder)
 
-        whenever(getGroupFolderTypeUseCase()).thenReturn(groupFolderTypes)
-        whenever(getDeviceType(folderNode)).thenReturn(DeviceType.Mac)
+        whenever(getFolderType(folderNode)).thenReturn(FolderType.DeviceBackup(DeviceType.Unknown))
 
         val result = addNodesTypeUseCase(nodes)
 
@@ -75,13 +69,8 @@ class AddNodesTypeUseCaseTest {
             on { parentId }.thenReturn(NodeId(2))
         }
         val nodes = listOf(folderNode)
-        val groupFolderTypes = mapOf(
-            NodeId(3) to FolderType.MediaSyncFolder,
-            NodeId(4) to FolderType.RootBackup
-        )
 
-        whenever(getGroupFolderTypeUseCase()).thenReturn(groupFolderTypes)
-        whenever(hasAncestor(NodeId(2), NodeId(4))).thenReturn(true)
+        whenever(getFolderType(folderNode)).thenReturn(FolderType.ChildBackup)
 
         val result = addNodesTypeUseCase(nodes)
 
@@ -96,10 +85,8 @@ class AddNodesTypeUseCaseTest {
             on { parentId }.thenReturn(NodeId(2))
         }
         val nodes = listOf(folderNode)
-        val groupFolderTypes = mapOf(NodeId(1) to FolderType.MediaSyncFolder)
 
-        whenever(getGroupFolderTypeUseCase()).thenReturn(groupFolderTypes)
-        whenever(hasAncestor(NodeId(1), NodeId(2))).thenReturn(false)
+        whenever(getFolderType(folderNode)).thenReturn(FolderType.MediaSyncFolder)
 
         val result = addNodesTypeUseCase(nodes)
 
@@ -114,10 +101,8 @@ class AddNodesTypeUseCaseTest {
             on { parentId }.thenReturn(NodeId(2))
         }
         val nodes = listOf(folderNode)
-        val groupFolderTypes = mapOf(NodeId(1) to FolderType.ChatFilesFolder)
 
-        whenever(getGroupFolderTypeUseCase()).thenReturn(groupFolderTypes)
-        whenever(hasAncestor(NodeId(1), NodeId(2))).thenReturn(false)
+        whenever(getFolderType(folderNode)).thenReturn(FolderType.ChatFilesFolder)
 
         val result = addNodesTypeUseCase(nodes)
 
@@ -132,10 +117,8 @@ class AddNodesTypeUseCaseTest {
             on { parentId }.thenReturn(NodeId(2))
         }
         val nodes = listOf(folderNode)
-        val groupFolderTypes = mapOf(NodeId(1) to FolderType.RootBackup)
 
-        whenever(getGroupFolderTypeUseCase()).thenReturn(groupFolderTypes)
-        whenever(hasAncestor(NodeId(2), NodeId(1))).thenReturn(false)
+        whenever(getFolderType(folderNode)).thenReturn(FolderType.RootBackup)
 
         val result = addNodesTypeUseCase(nodes)
 
@@ -150,10 +133,8 @@ class AddNodesTypeUseCaseTest {
             on { parentId }.thenReturn(NodeId(2))
         }
         val nodes = listOf(folderNode)
-        val groupFolderTypes = emptyMap<NodeId, FolderType>()
 
-        whenever(getGroupFolderTypeUseCase()).thenReturn(groupFolderTypes)
-        whenever(hasAncestor(NodeId(1), NodeId(2))).thenReturn(false)
+        whenever(getFolderType(folderNode)).thenReturn(FolderType.Default)
 
         val result = addNodesTypeUseCase(nodes)
 

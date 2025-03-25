@@ -36,7 +36,7 @@ import coil.compose.AsyncImage
 import coil.request.ImageRequest
 import mega.privacy.android.app.R
 import mega.privacy.android.shared.original.core.ui.preview.CombinedThemePreviews
-import mega.privacy.android.shared.original.core.ui.theme.OriginalTempTheme
+import mega.privacy.android.shared.original.core.ui.theme.OriginalTheme
 import mega.privacy.android.shared.original.core.ui.theme.extensions.grey_050_grey_800
 import mega.privacy.android.shared.original.core.ui.theme.extensions.textColorSecondary
 
@@ -89,7 +89,7 @@ internal fun VideoPlaylistItemView(
             Image(
                 painter = painterResource(
                     id = if (isSelected)
-                        R.drawable.ic_select_thumbnail
+                        R.drawable.ic_video_section_select_thumbnail
                     else
                         mega.privacy.android.core.R.drawable.ic_dots_vertical_grey
                 ),
@@ -279,7 +279,7 @@ internal fun VideoPlaylistInfoView(
 @CombinedThemePreviews
 @Composable
 private fun VideoPlaylistItemViewWithoutVideosPreview() {
-    OriginalTempTheme(isDark = isSystemInDarkTheme()) {
+    OriginalTheme(isDark = isSystemInDarkTheme()) {
         VideoPlaylistItemView(
             emptyPlaylistIcon = iconPackR.drawable.ic_video_playlist_default_thumbnail,
             noThumbnailIcon = iconPackR.drawable.ic_video_playlist_no_thumbnail,
@@ -297,7 +297,7 @@ private fun VideoPlaylistItemViewWithoutVideosPreview() {
 @CombinedThemePreviews
 @Composable
 private fun VideoPlaylistItemViewWith1VideoPreview() {
-    OriginalTempTheme(isDark = isSystemInDarkTheme()) {
+    OriginalTheme(isDark = isSystemInDarkTheme()) {
         VideoPlaylistItemView(
             emptyPlaylistIcon = iconPackR.drawable.ic_video_playlist_default_thumbnail,
             noThumbnailIcon = iconPackR.drawable.ic_video_playlist_no_thumbnail,
@@ -315,7 +315,7 @@ private fun VideoPlaylistItemViewWith1VideoPreview() {
 @CombinedThemePreviews
 @Composable
 private fun VideoPlaylistItemViewMultipleVideosPreview() {
-    OriginalTempTheme(isDark = isSystemInDarkTheme()) {
+    OriginalTheme(isDark = isSystemInDarkTheme()) {
         VideoPlaylistItemView(
             emptyPlaylistIcon = iconPackR.drawable.ic_video_playlist_default_thumbnail,
             noThumbnailIcon = iconPackR.drawable.ic_video_playlist_no_thumbnail,
@@ -333,7 +333,7 @@ private fun VideoPlaylistItemViewMultipleVideosPreview() {
 @CombinedThemePreviews
 @Composable
 private fun ThumbnailListViewWith4ThumbnailsPreview() {
-    OriginalTempTheme(isDark = isSystemInDarkTheme()) {
+    OriginalTheme(isDark = isSystemInDarkTheme()) {
         VideoPlaylistThumbnailView(
             emptyPlaylistIcon = iconPackR.drawable.ic_video_playlist_default_thumbnail,
             noThumbnailIcon = iconPackR.drawable.ic_video_playlist_no_thumbnail,
@@ -349,7 +349,7 @@ private fun ThumbnailListViewWith4ThumbnailsPreview() {
 @CombinedThemePreviews
 @Composable
 private fun ThumbnailListViewWith1NullThumbnailPreview() {
-    OriginalTempTheme(isDark = isSystemInDarkTheme()) {
+    OriginalTheme(isDark = isSystemInDarkTheme()) {
         VideoPlaylistThumbnailView(
             emptyPlaylistIcon = iconPackR.drawable.ic_video_playlist_default_thumbnail,
             noThumbnailIcon = iconPackR.drawable.ic_video_playlist_no_thumbnail,
@@ -362,7 +362,7 @@ private fun ThumbnailListViewWith1NullThumbnailPreview() {
 @CombinedThemePreviews
 @Composable
 private fun ThumbnailListViewWith1ThumbnailsPreview() {
-    OriginalTempTheme(isDark = isSystemInDarkTheme()) {
+    OriginalTheme(isDark = isSystemInDarkTheme()) {
         VideoPlaylistThumbnailView(
             emptyPlaylistIcon = iconPackR.drawable.ic_video_playlist_default_thumbnail,
             noThumbnailIcon = iconPackR.drawable.ic_video_playlist_no_thumbnail,
@@ -375,7 +375,7 @@ private fun ThumbnailListViewWith1ThumbnailsPreview() {
 @CombinedThemePreviews
 @Composable
 private fun ThumbnailListViewWhenThumbnailListIsNullPreview() {
-    OriginalTempTheme(isDark = isSystemInDarkTheme()) {
+    OriginalTheme(isDark = isSystemInDarkTheme()) {
         VideoPlaylistThumbnailView(
             emptyPlaylistIcon = iconPackR.drawable.ic_video_playlist_default_thumbnail,
             noThumbnailIcon = iconPackR.drawable.ic_video_playlist_no_thumbnail,

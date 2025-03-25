@@ -2,6 +2,7 @@ package mega.privacy.android.app.mediaplayer.queue.view
 
 import mega.privacy.android.icon.pack.R as iconPackR
 import androidx.annotation.DrawableRes
+import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.isSystemInDarkTheme
 import androidx.compose.foundation.layout.Box
@@ -11,8 +12,11 @@ import androidx.compose.material.Divider
 import androidx.compose.material.MaterialTheme
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.alpha
+import androidx.compose.ui.graphics.ColorFilter
 import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.res.colorResource
+import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import androidx.constraintlayout.compose.ConstraintLayout
@@ -22,8 +26,8 @@ import mega.privacy.android.app.mediaplayer.queue.model.MediaQueueItemType
 import mega.privacy.android.legacy.core.ui.controls.lists.MediaQueueItemView
 import mega.privacy.android.shared.original.core.ui.controls.text.MegaText
 import mega.privacy.android.shared.original.core.ui.preview.CombinedThemePreviews
-import mega.privacy.android.shared.original.core.ui.theme.values.TextColor
-import mega.privacy.android.shared.original.core.ui.theme.OriginalTempTheme
+import mega.privacy.android.shared.original.core.ui.theme.OriginalTheme
+import mega.android.core.ui.theme.values.TextColor
 
 @Composable
 internal fun MediaQueueItemWithHeaderAndFooterView(
@@ -41,7 +45,9 @@ internal fun MediaQueueItemWithHeaderAndFooterView(
     isSelected: Boolean,
     onClick: () -> Unit,
     modifier: Modifier = Modifier,
+    isSelectMode: Boolean = false,
 ) {
+    val isReorderEnabled = !isSearchMode && queueItemType == MediaQueueItemType.Next
     ConstraintLayout(
         modifier = modifier
             .fillMaxWidth()
@@ -49,7 +55,7 @@ internal fun MediaQueueItemWithHeaderAndFooterView(
                 colorResource(
                     id = if (!isSearchMode && queueItemType == MediaQueueItemType.Next) {
                         if (isAudio) {
-                            R.color.grey_020_grey_800
+                            R.color.white_dark_grey
                         } else {
                             R.color.grey_800
                         }
@@ -63,7 +69,7 @@ internal fun MediaQueueItemWithHeaderAndFooterView(
                 )
             )
     ) {
-        val (header, item, footer, divider) = createRefs()
+        val (header, reorderIcon, item, audioDivider, footer, videoDivider) = createRefs()
         MegaText(
             modifier = Modifier
                 .padding(start = 72.dp, top = 20.dp)
@@ -97,10 +103,38 @@ internal fun MediaQueueItemWithHeaderAndFooterView(
             style = MaterialTheme.typography.body2
         )
 
+        Image(
+            modifier = Modifier
+                .constrainAs(reorderIcon) {
+                    start.linkTo(parent.start)
+                    top.linkTo(parent.top)
+                    bottom.linkTo(parent.bottom)
+                    visibility = if (isReorderEnabled && isAudio && !isSelectMode) {
+                        Visibility.Visible
+                    } else {
+                        Visibility.Gone
+                    }
+                }
+                .padding(start = 12.dp)
+                .testTag(MEDIA_QUEUE_ITEM_PREFIX_RECORDER_ICON_TEST_TAG),
+            painter = painterResource(iconPackR.drawable.ic_reorder_audio_player),
+            contentDescription = "Reorder",
+            colorFilter = ColorFilter.tint(MaterialTheme.colors.onPrimary)
+        )
+
         MediaQueueItemView(
-            modifier = Modifier.constrainAs(item) {
-                top.linkTo(header.bottom)
-            },
+            modifier = Modifier
+                .constrainAs(item) {
+                    top.linkTo(header.bottom)
+                    start.linkTo(reorderIcon.end)
+                    end.linkTo(parent.end)
+                }
+                .alpha(
+                    if (!isSearchMode && isSelectMode && queueItemType != MediaQueueItemType.Next)
+                        0.5f
+                    else
+                        1f
+                ),
             icon = icon,
             name = name,
             currentPlayingPosition = currentPlayingPosition,
@@ -108,14 +142,31 @@ internal fun MediaQueueItemWithHeaderAndFooterView(
             thumbnailData = thumbnailData,
             isPaused = isPaused,
             isItemPlaying = queueItemType == MediaQueueItemType.Playing,
-            isReorderEnabled = !isSearchMode && queueItemType == MediaQueueItemType.Next,
+            isReorderEnabled = isReorderEnabled,
             isSelected = isSelected,
-            onClick = onClick
+            onClick = onClick,
+            isAudio = isAudio,
+        )
+
+        MediaQueueItemDivider(
+            modifier = Modifier.constrainAs(audioDivider) {
+                top.linkTo(item.bottom)
+                start.linkTo(parent.start)
+                visibility = if (isAudio) {
+                    Visibility.Visible
+                } else {
+                    Visibility.Invisible
+                }
+            },
+            isAudio = true,
+            isLightColor = queueItemType == MediaQueueItemType.Previous || isSearchMode,
+            layoutTag = AUDIO_QUEUE_ITEM_DIVIDER_LAYOUT_TEST_TAG,
+            dividerTag = AUDIO_QUEUE_ITEM_DIVIDER_TEST_TAG
         )
 
         MediaQueueFooter(
             modifier = Modifier.constrainAs(footer) {
-                top.linkTo(item.bottom)
+                top.linkTo(audioDivider.bottom)
                 start.linkTo(parent.start)
                 visibility = if (isFooterVisible) {
                     Visibility.Visible
@@ -127,17 +178,19 @@ internal fun MediaQueueItemWithHeaderAndFooterView(
         )
 
         MediaQueueItemDivider(
-            modifier = Modifier.constrainAs(divider) {
+            modifier = Modifier.constrainAs(videoDivider) {
                 top.linkTo(footer.bottom)
                 start.linkTo(parent.start)
-                visibility = if (isSearchMode || queueItemType != MediaQueueItemType.Playing) {
+                visibility = if (!isAudio) {
                     Visibility.Visible
                 } else {
                     Visibility.Gone
                 }
             },
-            isAudio = isAudio,
-            isLightColor = queueItemType == MediaQueueItemType.Previous || isSearchMode
+            isAudio = false,
+            isLightColor = queueItemType == MediaQueueItemType.Previous || isSearchMode,
+            layoutTag = VIDEO_QUEUE_ITEM_DIVIDER_LAYOUT_TEST_TAG,
+            dividerTag = VIDEO_QUEUE_ITEM_DIVIDER_TEST_TAG
         )
     }
 }
@@ -153,7 +206,7 @@ private fun MediaQueueFooter(
             .background(
                 colorResource(
                     id = if (isAudio) {
-                        R.color.grey_020_grey_800
+                        R.color.white_dark_grey
                     } else {
                         R.color.grey_800
                     }
@@ -176,6 +229,8 @@ private fun MediaQueueFooter(
 private fun MediaQueueItemDivider(
     modifier: Modifier,
     isLightColor: Boolean,
+    layoutTag: String,
+    dividerTag: String,
     isAudio: Boolean = true,
 ) {
     Box(
@@ -185,7 +240,7 @@ private fun MediaQueueItemDivider(
                 if (isLightColor)
                     colorResource(
                         id = if (isAudio) {
-                            R.color.white_dark_grey
+                            R.color.grey_020_grey_800
                         } else {
                             R.color.dark_grey
                         }
@@ -199,16 +254,16 @@ private fun MediaQueueItemDivider(
                         }
                     )
             )
-            .testTag(MEDIA_QUEUE_ITEM_DIVIDER_LAYOUT_TEST_TAG)
+            .testTag(layoutTag)
     ) {
         Divider(
             modifier = Modifier
                 .fillMaxWidth()
                 .padding(start = 72.dp)
-                .testTag(MEDIA_QUEUE_ITEM_DIVIDER_TEST_TAG),
+                .testTag(dividerTag),
             color = colorResource(
                 id = if (isAudio) {
-                    R.color.grey_012_white_012
+                    R.color.grey_020_grey_800
                 } else {
                     R.color.white_alpha_012
                 }
@@ -221,7 +276,7 @@ private fun MediaQueueItemDivider(
 @CombinedThemePreviews
 @Composable
 private fun PlayingMediaQueueItemPreview() {
-    OriginalTempTheme(isDark = isSystemInDarkTheme()) {
+    OriginalTheme(isDark = isSystemInDarkTheme()) {
         MediaQueueItemWithHeaderAndFooterView(
             icon = iconPackR.drawable.ic_audio_medium_solid,
             name = "Media Name",
@@ -243,7 +298,7 @@ private fun PlayingMediaQueueItemPreview() {
 @CombinedThemePreviews
 @Composable
 private fun PausedPlayingMediaQueueItemPreview() {
-    OriginalTempTheme(isDark = isSystemInDarkTheme()) {
+    OriginalTheme(isDark = isSystemInDarkTheme()) {
         MediaQueueItemWithHeaderAndFooterView(
             icon = iconPackR.drawable.ic_audio_medium_solid,
             name = "Media Name",
@@ -265,7 +320,7 @@ private fun PausedPlayingMediaQueueItemPreview() {
 @CombinedThemePreviews
 @Composable
 private fun FirstMediaQueueItemPreview() {
-    OriginalTempTheme(isDark = isSystemInDarkTheme()) {
+    OriginalTheme(isDark = isSystemInDarkTheme()) {
         MediaQueueItemWithHeaderAndFooterView(
             icon = iconPackR.drawable.ic_audio_medium_solid,
             name = "Media Name",
@@ -287,7 +342,7 @@ private fun FirstMediaQueueItemPreview() {
 @CombinedThemePreviews
 @Composable
 private fun NextMediaQueueItemPreview() {
-    OriginalTempTheme(isDark = isSystemInDarkTheme()) {
+    OriginalTheme(isDark = isSystemInDarkTheme()) {
         MediaQueueItemWithHeaderAndFooterView(
             icon = iconPackR.drawable.ic_audio_medium_solid,
             name = "Media Name",
@@ -322,11 +377,26 @@ const val MEDIA_QUEUE_ITEM_FOOTER_TEXT_VIEW_TEST_TAG = "media_queue_item:text_fo
 const val MEDIA_QUEUE_ITEM_FOOTER_LAYOUT_VIEW_TEST_TAG = "media_queue_item:box_footer"
 
 /**
- * Test tag for the divider layout of media queue item
+ * Test tag for the divider layout of audio queue item
  */
-const val MEDIA_QUEUE_ITEM_DIVIDER_LAYOUT_TEST_TAG = "media_queue_item:box_divider"
+const val AUDIO_QUEUE_ITEM_DIVIDER_LAYOUT_TEST_TAG = "audio_queue_item:box_divider"
 
 /**
- * Test tag for the divider of media queue item
+ * Test tag for the divider layout of video queue item
  */
-const val MEDIA_QUEUE_ITEM_DIVIDER_TEST_TAG = "media_queue_item:divider"
+const val VIDEO_QUEUE_ITEM_DIVIDER_LAYOUT_TEST_TAG = "video_queue_item:box_divider"
+
+/**
+ * Test tag for the divider of audio queue item
+ */
+const val AUDIO_QUEUE_ITEM_DIVIDER_TEST_TAG = "audio_queue_item:divider"
+
+/**
+ * Test tag for the divider of video queue item
+ */
+const val VIDEO_QUEUE_ITEM_DIVIDER_TEST_TAG = "video_queue_item:divider"
+
+/**
+ * Test tag for the prefix reorder icon of media queue item
+ */
+const val MEDIA_QUEUE_ITEM_PREFIX_RECORDER_ICON_TEST_TAG = "media_queue_item:prefix_recorder_icon"

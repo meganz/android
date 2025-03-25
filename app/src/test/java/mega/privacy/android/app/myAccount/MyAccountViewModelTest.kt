@@ -9,6 +9,7 @@ import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.test.UnconfinedTestDispatcher
+import kotlinx.coroutines.test.advanceUntilIdle
 import kotlinx.coroutines.test.resetMain
 import kotlinx.coroutines.test.runTest
 import kotlinx.coroutines.test.setMain
@@ -21,6 +22,7 @@ import mega.privacy.android.app.utils.Constants.SNACKBAR_TYPE
 import mega.privacy.android.domain.entity.AccountSubscriptionCycle
 import mega.privacy.android.domain.entity.AccountType
 import mega.privacy.android.domain.entity.PaymentMethodType
+import mega.privacy.android.domain.entity.StorageState
 import mega.privacy.android.domain.entity.SubscriptionStatus
 import mega.privacy.android.domain.entity.UserAccount
 import mega.privacy.android.domain.entity.account.AccountDetail
@@ -30,6 +32,7 @@ import mega.privacy.android.domain.entity.account.AccountSubscriptionDetail
 import mega.privacy.android.domain.entity.account.business.BusinessAccountStatus
 import mega.privacy.android.domain.entity.billing.PaymentMethodFlags
 import mega.privacy.android.domain.entity.node.NodeId
+import mega.privacy.android.domain.entity.transfer.UsedTransferStatus
 import mega.privacy.android.domain.entity.user.UserChanges
 import mega.privacy.android.domain.entity.user.UserId
 import mega.privacy.android.domain.entity.verification.VerificationStatus
@@ -47,15 +50,16 @@ import mega.privacy.android.domain.usecase.IsUrlMatchesRegexUseCase
 import mega.privacy.android.domain.usecase.MonitorBackupFolder
 import mega.privacy.android.domain.usecase.MonitorUserUpdates
 import mega.privacy.android.domain.usecase.account.BroadcastRefreshSessionUseCase
-import mega.privacy.android.domain.usecase.account.LegacyCancelSubscriptionsUseCase
-import mega.privacy.android.domain.usecase.account.ChangeEmail
+import mega.privacy.android.domain.usecase.account.ChangeEmailUseCase
 import mega.privacy.android.domain.usecase.account.CheckVersionsUseCase
 import mega.privacy.android.domain.usecase.account.ConfirmCancelAccountUseCase
 import mega.privacy.android.domain.usecase.account.ConfirmChangeEmailUseCase
 import mega.privacy.android.domain.usecase.account.GetUserDataUseCase
 import mega.privacy.android.domain.usecase.account.IsMultiFactorAuthEnabledUseCase
 import mega.privacy.android.domain.usecase.account.KillOtherSessionsUseCase
+import mega.privacy.android.domain.usecase.account.LegacyCancelSubscriptionsUseCase
 import mega.privacy.android.domain.usecase.account.MonitorAccountDetailUseCase
+import mega.privacy.android.domain.usecase.account.MonitorStorageStateUseCase
 import mega.privacy.android.domain.usecase.account.QueryCancelLinkUseCase
 import mega.privacy.android.domain.usecase.account.QueryChangeEmailLinkUseCase
 import mega.privacy.android.domain.usecase.account.UpdateCurrentUserName
@@ -63,10 +67,10 @@ import mega.privacy.android.domain.usecase.avatar.GetMyAvatarFileUseCase
 import mega.privacy.android.domain.usecase.avatar.SetAvatarUseCase
 import mega.privacy.android.domain.usecase.billing.GetPaymentMethodUseCase
 import mega.privacy.android.domain.usecase.contact.GetCurrentUserEmail
-import mega.privacy.android.domain.usecase.featureflag.GetFeatureFlagValueUseCase
 import mega.privacy.android.domain.usecase.file.GetFileVersionsOption
 import mega.privacy.android.domain.usecase.login.CheckPasswordReminderUseCase
 import mega.privacy.android.domain.usecase.login.LogoutUseCase
+import mega.privacy.android.domain.usecase.transfers.GetUsedTransferStatusUseCase
 import mega.privacy.android.domain.usecase.verification.MonitorVerificationStatus
 import mega.privacy.android.domain.usecase.verification.ResetSMSVerifiedPhoneNumberUseCase
 import nz.mega.sdk.MegaApiAndroid
@@ -77,6 +81,7 @@ import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.TestInstance
 import org.junit.jupiter.params.ParameterizedTest
 import org.junit.jupiter.params.provider.Arguments
+import org.junit.jupiter.params.provider.EnumSource
 import org.junit.jupiter.params.provider.MethodSource
 import org.mockito.ArgumentMatchers.anyBoolean
 import org.mockito.kotlin.any
@@ -121,7 +126,7 @@ internal class MyAccountViewModelTest {
     private val getPaymentMethodUseCase: GetPaymentMethodUseCase = mock()
     private val getCurrentUserFullName: GetCurrentUserFullName = mock()
     private val monitorUserUpdates: MonitorUserUpdates = mock()
-    private val changeEmail: ChangeEmail = mock()
+    private val changeEmailUseCase: ChangeEmailUseCase = mock()
     private val updateCurrentUserName: UpdateCurrentUserName = mock()
     private val getCurrentUserEmail: GetCurrentUserEmail = mock()
     private val monitorVerificationStatus: MonitorVerificationStatus = mock()
@@ -131,16 +136,20 @@ internal class MyAccountViewModelTest {
     private val monitorBackupFolder: MonitorBackupFolder = mock()
     private val getFolderTreeInfo: GetFolderTreeInfo = mock()
     private val getNodeByIdUseCase: GetNodeByIdUseCase = mock()
-    private val getFeatureFlagValueUseCase: GetFeatureFlagValueUseCase = mock()
     private val testDispatcher = UnconfinedTestDispatcher()
     private val snackBarHandler: SnackBarHandler = mock()
     private val getBusinessStatusUseCase: GetBusinessStatusUseCase = mock()
+    private val getUsedTransferStatusUseCase: GetUsedTransferStatusUseCase = mock()
     private val accountDetailFlow = MutableStateFlow(AccountDetail())
     private val monitorAccountDetailUseCase: MonitorAccountDetailUseCase = mock()
 
     private val userUpdatesFlow = MutableSharedFlow<UserChanges>()
     private val verificationStatusFlow = MutableSharedFlow<VerificationStatus>()
     private val backupFolderFlow = MutableSharedFlow<Result<NodeId>>()
+    private val storageStateFlow = MutableStateFlow(StorageState.Unknown)
+    private val monitorStorageStateUseCase = mock<MonitorStorageStateUseCase> {
+        on { invoke() }.thenReturn(storageStateFlow)
+    }
 
     @BeforeEach
     fun setup() = runTest {
@@ -175,7 +184,7 @@ internal class MyAccountViewModelTest {
         whenever(getBusinessStatusUseCase()).thenReturn(BusinessAccountStatus.Active)
         whenever(myAccountInfo.usedFormatted).thenReturn("")
         whenever(monitorAccountDetailUseCase()).thenReturn(accountDetailFlow)
-
+        storageStateFlow.value = StorageState.Unknown
     }
 
     private fun initializeViewModel() {
@@ -204,7 +213,7 @@ internal class MyAccountViewModelTest {
             getPaymentMethodUseCase = getPaymentMethodUseCase,
             getCurrentUserFullName = getCurrentUserFullName,
             monitorUserUpdates = monitorUserUpdates,
-            changeEmail = changeEmail,
+            changeEmailUseCase = changeEmailUseCase,
             updateCurrentUserName = updateCurrentUserName,
             getCurrentUserEmail = getCurrentUserEmail,
             monitorVerificationStatus = monitorVerificationStatus,
@@ -214,11 +223,12 @@ internal class MyAccountViewModelTest {
             monitorBackupFolder = monitorBackupFolder,
             getFolderTreeInfo = getFolderTreeInfo,
             getNodeByIdUseCase = getNodeByIdUseCase,
-            getFeatureFlagValueUseCase = getFeatureFlagValueUseCase,
             ioDispatcher = testDispatcher,
             snackBarHandler = snackBarHandler,
             getBusinessStatusUseCase = getBusinessStatusUseCase,
             monitorAccountDetailUseCase = monitorAccountDetailUseCase,
+            monitorStorageStateUseCase = monitorStorageStateUseCase,
+            getUsedTransferStatusUseCase = getUsedTransferStatusUseCase,
         )
     }
 
@@ -538,19 +548,6 @@ internal class MyAccountViewModelTest {
         }
     }
 
-    @ParameterizedTest(name = "when CancelSubscription flag is {0}, showNewCancelSubscriptionFeature is {1}")
-    @MethodSource("provideShowNewCancelSubscriptionFeatureParameters")
-    fun `test that showNewCancelSubscriptionFeature is correct when CancelSubscription flag is provided`(
-        flag: Boolean,
-        expected: Boolean,
-    ) = runTest {
-        whenever(getFeatureFlagValueUseCase(any())).thenReturn(flag)
-        initializeViewModel()
-        underTest.state.test {
-            assertThat(awaitItem().showNewCancelSubscriptionFeature).isEqualTo(expected)
-        }
-    }
-
     private fun provideShowNewCancelSubscriptionFeatureParameters() = Stream.of(
         Arguments.of(true, true),
         Arguments.of(false, false)
@@ -699,6 +696,26 @@ internal class MyAccountViewModelTest {
             }
         }
 
+    @Test
+    fun `test that openTestPasswordScreenEvent is updated when logout is invoked and password reminder is true`() =
+        runTest {
+            whenever(checkPasswordReminderUseCase(true)).thenReturn(true)
+            underTest.logout()
+            underTest.state.test {
+                assertThat(awaitItem().openTestPasswordScreenEvent).isTrue()
+            }
+        }
+
+    @Test
+    fun `test that showLogoutConfirmationDialog is updated when logout is invoked and password reminder is false`() =
+        runTest {
+            whenever(checkPasswordReminderUseCase(true)).thenReturn(false)
+            underTest.logout()
+            underTest.state.test {
+                assertThat(awaitItem().showLogoutConfirmationDialog).isTrue()
+            }
+        }
+
     private fun provideAccountTypeParameters() = Stream.of(
         Arguments.of(accountDetailsWithValidSubscription(AccountType.PRO_I), AccountType.PRO_I),
         Arguments.of(accountDetailsWithValidSubscription(AccountType.PRO_II), AccountType.PRO_II),
@@ -739,6 +756,41 @@ internal class MyAccountViewModelTest {
             assertThat(awaitItem().accountType).isEqualTo(expected)
         }
     }
+
+    @ParameterizedTest(name = " when usedTransferPercentage is {0} and usedTransferStatus is {1}")
+    @MethodSource("provideTransferDetails")
+    fun `test that used transfer status and percentage is returned correctly`(
+        usedTransferPercentage: Int,
+        usedTransferStatus: UsedTransferStatus,
+    ) = runTest {
+        whenever(myAccountInfo.usedTransferPercentage).thenReturn(usedTransferPercentage)
+        whenever(getUsedTransferStatusUseCase(usedTransferPercentage)).thenReturn(usedTransferStatus)
+
+        initializeViewModel()
+        assertThat(underTest.getUsedTransferPercentage()).isEqualTo(usedTransferPercentage)
+        assertThat(underTest.getUsedTransferStatus()).isEqualTo(usedTransferStatus)
+    }
+
+    private fun provideTransferDetails(): Stream<Arguments> {
+        return Stream.of(
+            Arguments.of(50, UsedTransferStatus.NoTransferProblems),
+            Arguments.of(90, UsedTransferStatus.AlmostFull),
+            Arguments.of(100, UsedTransferStatus.Full),
+        )
+    }
+
+    @ParameterizedTest(name = "{0}")
+    @EnumSource(StorageState::class)
+    fun `test that storage state should be updated when monitorStorageState emits`(state: StorageState) =
+        runTest {
+            storageStateFlow.emit(state)
+
+            advanceUntilIdle()
+
+            underTest.state.test {
+                assertThat(awaitItem().storageState).isEqualTo(state)
+            }
+        }
 
     private val expectedSubscriptionRenewTime = 1873874783274L
     private val expectedProExpirationTime = 378672463728467L
@@ -862,7 +914,7 @@ internal class MyAccountViewModelTest {
             getPaymentMethodUseCase,
             getCurrentUserFullName,
             monitorUserUpdates,
-            changeEmail,
+            changeEmailUseCase,
             updateCurrentUserName,
             getCurrentUserEmail,
             monitorVerificationStatus,
@@ -872,10 +924,10 @@ internal class MyAccountViewModelTest {
             monitorBackupFolder,
             getFolderTreeInfo,
             getNodeByIdUseCase,
-            getFeatureFlagValueUseCase,
             snackBarHandler,
             getBusinessStatusUseCase,
             monitorAccountDetailUseCase,
+            getUsedTransferStatusUseCase,
         )
     }
 }

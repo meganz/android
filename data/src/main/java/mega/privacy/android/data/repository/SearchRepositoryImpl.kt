@@ -1,11 +1,18 @@
 package mega.privacy.android.data.repository
 
 import kotlinx.coroutines.CoroutineDispatcher
+import kotlinx.coroutines.async
+import kotlinx.coroutines.awaitAll
+import kotlinx.coroutines.coroutineScope
+import kotlinx.coroutines.sync.Semaphore
+import kotlinx.coroutines.sync.withPermit
 import kotlinx.coroutines.withContext
+import mega.privacy.android.data.gateway.MegaLocalRoomGateway
 import mega.privacy.android.data.gateway.api.MegaApiGateway
 import mega.privacy.android.data.mapper.SortOrderIntMapper
 import mega.privacy.android.data.mapper.node.NodeMapper
 import mega.privacy.android.data.mapper.search.MegaSearchFilterMapper
+import mega.privacy.android.domain.entity.Offline
 import mega.privacy.android.domain.entity.SortOrder
 import mega.privacy.android.domain.entity.node.NodeId
 import mega.privacy.android.domain.entity.node.UnTypedNode
@@ -14,9 +21,7 @@ import mega.privacy.android.domain.qualifier.IoDispatcher
 import mega.privacy.android.domain.repository.SearchRepository
 import mega.privacy.android.domain.usecase.GetCloudSortOrder
 import mega.privacy.android.domain.usecase.GetLinksSortOrder
-import nz.mega.sdk.MegaCancelToken
 import nz.mega.sdk.MegaNode
-import nz.mega.sdk.MegaSearchFilter
 import javax.inject.Inject
 
 /**
@@ -32,6 +37,7 @@ internal class SearchRepositoryImpl @Inject constructor(
     private val megaApiGateway: MegaApiGateway,
     private val megaSearchFilterMapper: MegaSearchFilterMapper,
     private val getCloudSortOrder: GetCloudSortOrder,
+    private val megaLocalRoomGateway: MegaLocalRoomGateway,
     @IoDispatcher private val ioDispatcher: CoroutineDispatcher,
 ) : SearchRepository {
     override suspend fun search(
@@ -52,21 +58,17 @@ internal class SearchRepositoryImpl @Inject constructor(
             tag = tag,
             useAndForTextQuery = description == null && tag == null,
         )
-        searchAndMap(queryFilter, order, megaCancelToken)
+        val offlineItems = async { getAllOfflineNodeHandle() }
+        val searchList = async {
+            megaApiGateway.searchWithFilter(
+                filter = queryFilter,
+                order = sortOrderIntMapper(order),
+                megaCancelToken = megaCancelToken,
+            )
+        }
+        mapMegaNodesToUnTypedNodes(searchList.await(), offlineItems.await())
     }
 
-    private suspend fun searchAndMap(
-        queryFilter: MegaSearchFilter,
-        order: SortOrder,
-        megaCancelToken: MegaCancelToken,
-    ): List<UnTypedNode> {
-        val searchList = megaApiGateway.searchWithFilter(
-            filter = queryFilter,
-            order = sortOrderIntMapper(order),
-            megaCancelToken = megaCancelToken,
-        )
-        return searchList.map { item -> nodeMapper(item) }
-    }
 
     override suspend fun getChildren(
         nodeId: NodeId?,
@@ -85,12 +87,35 @@ internal class SearchRepositoryImpl @Inject constructor(
             description = description,
             tag = tag,
         )
-        val searchList = megaApiGateway.getChildren(
-            filter = filter,
-            order = sortOrderIntMapper(order),
-            megaCancelToken = megaCancelToken,
-        )
-        searchList.map { item -> nodeMapper(item) }
+        val offlineItems = async { getAllOfflineNodeHandle() }
+        val searchList = async {
+            megaApiGateway.getChildren(
+                filter = filter,
+                order = sortOrderIntMapper(order),
+                megaCancelToken = megaCancelToken,
+            )
+        }
+        mapMegaNodesToUnTypedNodes(searchList.await(), offlineItems.await())
+    }
+
+    private suspend fun getAllOfflineNodeHandle() =
+        megaLocalRoomGateway.getAllOfflineInfo().associateBy { it.handle }
+
+    private suspend fun mapMegaNodesToUnTypedNodes(
+        childList: List<MegaNode>,
+        offlineItems: Map<String, Offline>?,
+    ): List<UnTypedNode> = coroutineScope {
+        val semaphore = Semaphore(10)
+        childList.map { megaNode ->
+            async {
+                semaphore.withPermit {
+                    nodeMapper(
+                        megaNode = megaNode,
+                        offline = offlineItems?.get(megaNode.handle.toString())
+                    )
+                }
+            }
+        }.awaitAll()
     }
 
     override suspend fun getInShares() = withContext(ioDispatcher) {

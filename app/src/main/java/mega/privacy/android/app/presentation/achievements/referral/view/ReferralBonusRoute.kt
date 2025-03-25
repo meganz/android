@@ -42,7 +42,7 @@ import mega.privacy.android.domain.entity.contacts.UserChatStatus
 import mega.privacy.android.domain.entity.user.UserVisibility
 import mega.privacy.android.legacy.core.ui.controls.appbar.SimpleTopAppBar
 import mega.privacy.android.shared.original.core.ui.preview.CombinedThemePreviews
-import mega.privacy.android.shared.original.core.ui.theme.OriginalTempTheme
+import mega.privacy.android.shared.original.core.ui.theme.OriginalTheme
 import mega.privacy.android.shared.original.core.ui.theme.extensions.black_white
 import mega.privacy.android.shared.original.core.ui.theme.extensions.dark_blue_500_dark_blue_200
 import mega.privacy.android.shared.original.core.ui.theme.extensions.green_500_green_300
@@ -238,7 +238,7 @@ internal fun ReferralListItem(
 @CombinedThemePreviews
 @Composable
 private fun ReferralBonusViewPreview() {
-    OriginalTempTheme(isDark = isSystemInDarkTheme()) {
+    OriginalTheme(isDark = isSystemInDarkTheme()) {
         ReferralBonusView(
             modifier = Modifier,
             uiState = ReferralBonusesUIState(

@@ -17,6 +17,7 @@ internal class DocumentFileMapper @Inject constructor() {
         uri = UriPath(file.uri.toString()),
         isFolder = file.isDirectory,
         numFiles = numFiles,
-        numFolders = numFolders
+        numFolders = numFolders,
+        canRead = file.canRead(),
     )
 }

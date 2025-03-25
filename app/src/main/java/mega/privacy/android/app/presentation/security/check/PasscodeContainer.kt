@@ -1,5 +1,6 @@
 package mega.privacy.android.app.presentation.security.check
 
+import androidx.compose.foundation.layout.Box
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
@@ -13,14 +14,21 @@ internal fun PasscodeContainer(
     passcodeCryptObjectFactory: PasscodeCryptObjectFactory,
     passcodeUI: @Composable () -> Unit = { PasscodeView(cryptObjectFactory = passcodeCryptObjectFactory) },
     viewModel: PasscodeCheckViewModel = viewModel(),
-    content: @Composable () -> Unit = {},
+    canLock: () -> Boolean = { true },
     loading: @Composable (() -> Unit)? = null,
+    content: @Composable () -> Unit = {},
 ) {
     val state by viewModel.state.collectAsStateWithLifecycle()
 
-    when (state) {
-        PasscodeCheckState.Loading -> (loading ?: content).invoke()
-        PasscodeCheckState.UnLocked -> content()
-        PasscodeCheckState.Locked -> passcodeUI()
+    Box {
+        if (state is PasscodeCheckState.Loading) {
+            (loading ?: content).invoke()
+        } else {
+            content()
+        }
+
+        if (state is PasscodeCheckState.Locked && canLock()) {
+            passcodeUI()
+        }
     }
 }

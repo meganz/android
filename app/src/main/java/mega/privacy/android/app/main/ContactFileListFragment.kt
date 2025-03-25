@@ -1,7 +1,7 @@
 package mega.privacy.android.app.main
 
+import mega.privacy.android.icon.pack.R as iconPackR
 import android.content.Intent
-import android.content.res.Configuration
 import android.net.Uri
 import android.os.Bundle
 import android.os.Environment
@@ -45,6 +45,7 @@ import mega.privacy.android.app.presentation.imagepreview.fetcher.SharedItemsIma
 import mega.privacy.android.app.presentation.imagepreview.model.ImagePreviewFetcherSource
 import mega.privacy.android.app.presentation.imagepreview.model.ImagePreviewMenuSource
 import mega.privacy.android.app.presentation.pdfviewer.PdfViewerActivity
+import mega.privacy.android.app.presentation.settings.model.StorageTargetPreference
 import mega.privacy.android.app.presentation.transfers.starttransfer.StartDownloadViewModel
 import mega.privacy.android.app.presentation.transfers.starttransfer.model.StartTransferEvent
 import mega.privacy.android.app.presentation.transfers.starttransfer.model.TransferTriggerEvent
@@ -58,7 +59,6 @@ import mega.privacy.android.app.utils.MegaApiUtils
 import mega.privacy.android.app.utils.MegaNodeDialogUtil.showRenameNodeDialog
 import mega.privacy.android.app.utils.Util
 import mega.privacy.android.app.utils.wrapper.MegaNodeUtilWrapper
-import mega.privacy.android.domain.usecase.featureflag.GetFeatureFlagValueUseCase
 import mega.privacy.android.navigation.MegaNavigator
 import nz.mega.sdk.MegaError
 import nz.mega.sdk.MegaNode
@@ -79,9 +79,6 @@ class ContactFileListFragment : ContactFileBaseFragment() {
     var fab: FloatingActionButton? = null
     var parentHandleStack: Stack<Long>? = Stack()
     var currNodePosition: Int = -1
-
-    @Inject
-    lateinit var getFeatureFlagUseCase: GetFeatureFlagValueUseCase
 
     @Inject
     lateinit var megaNodeUtilWrapper: MegaNodeUtilWrapper
@@ -109,7 +106,7 @@ class ContactFileListFragment : ContactFileBaseFragment() {
 
     private inner class ActionBarCallBack : ActionMode.Callback {
         override fun onActionItemClicked(mode: ActionMode, item: MenuItem): Boolean {
-            val documents = adapter.selectedNodes
+            val documents = adapter.selectedNodes.filterNotNull()
 
             val itemId = item.itemId
             if (itemId == R.id.cab_menu_download) {
@@ -171,13 +168,10 @@ class ContactFileListFragment : ContactFileBaseFragment() {
         override fun onPrepareActionMode(mode: ActionMode, menu: Menu): Boolean {
             val selected = adapter.selectedNodes
 
-            menu.findItem(R.id.cab_menu_share_link)
-                .setTitle(
-                    resources.getQuantityString(
-                        mega.privacy.android.shared.resources.R.plurals.label_share_links,
-                        selected.size
-                    )
-                )
+            menu.findItem(R.id.cab_menu_share_link).title = resources.getQuantityString(
+                mega.privacy.android.shared.resources.R.plurals.label_share_links,
+                selected.size
+            )
 
             val areAllNotTakenDown = selected.areAllNotTakenDown()
             var showRename = false
@@ -388,12 +382,7 @@ class ContactFileListFragment : ContactFileBaseFragment() {
                 emptyImageView!!.visibility = View.VISIBLE
                 emptyTextView!!.visibility = View.VISIBLE
                 listView!!.visibility = View.GONE
-
-                if (context.resources.configuration.orientation == Configuration.ORIENTATION_LANDSCAPE) {
-                    emptyImageView!!.setImageResource(R.drawable.incoming_empty_landscape)
-                } else {
-                    emptyImageView!!.setImageResource(R.drawable.incoming_shares_empty)
-                }
+                emptyImageView!!.setImageResource(iconPackR.drawable.ic_folder_arrow_up_glass)
                 var textToShow = String.format(context.getString(R.string.context_empty_incoming))
                 try {
                     textToShow = textToShow.replace(
@@ -413,8 +402,13 @@ class ContactFileListFragment : ContactFileBaseFragment() {
 
             if (adapter == null) {
                 adapter = MegaNodeAdapter(
-                    context, this, contactNodes, _parentHandle,
-                    listView, Constants.CONTACT_FILE_ADAPTER, MegaNodeAdapter.ITEM_VIEW_TYPE_LIST
+                    context,
+                    this,
+                    contactNodes,
+                    _parentHandle,
+                    listView as RecyclerView,
+                    Constants.CONTACT_FILE_ADAPTER,
+                    MegaNodeAdapter.ITEM_VIEW_TYPE_LIST
                 )
             } else {
                 adapter.setNodes(contactNodes)
@@ -443,16 +437,22 @@ class ContactFileListFragment : ContactFileBaseFragment() {
             )
             root.addView(
                 createStartTransferView(
-                    requireActivity(),
-                    startDownloadViewModel!!.state,
-                    {
+                    activity = requireActivity(),
+                    transferEventState = startDownloadViewModel!!.state,
+                    onConsumeEvent = {
                         if ((startDownloadViewModel!!.state.value as StateEventWithContentTriggered<TransferTriggerEvent?>).content is StartUpload) {
                             viewModel!!.consumeUploadEvent()
                         }
                         startDownloadViewModel!!.consumeDownloadEvent()
                         Unit
                     },
-                    { StartTransferEvent: StartTransferEvent? -> Unit }
+                    onScanningFinished = { StartTransferEvent: StartTransferEvent? -> Unit },
+                    navigateToStorageSettings = {
+                        megaNavigator.openSettings(
+                            requireActivity(),
+                            StorageTargetPreference
+                        )
+                    }
                 )
             )
         }
@@ -503,14 +503,10 @@ class ContactFileListFragment : ContactFileBaseFragment() {
                 emptyImageView!!.visibility = View.VISIBLE
                 emptyTextView!!.visibility = View.VISIBLE
                 if (megaApi.rootNode!!.handle == _parentHandle) {
-                    emptyImageView!!.setImageResource(R.drawable.ic_empty_cloud_drive)
+                    emptyImageView!!.setImageResource(iconPackR.drawable.ic_empty_cloud_glass)
                     emptyTextView!!.setText(R.string.file_browser_empty_cloud_drive)
                 } else {
-                    if (context.resources.configuration.orientation == Configuration.ORIENTATION_LANDSCAPE) {
-                        emptyImageView!!.setImageResource(R.drawable.incoming_empty_landscape)
-                    } else {
-                        emptyImageView!!.setImageResource(R.drawable.incoming_shares_empty)
-                    }
+                    emptyImageView!!.setImageResource(iconPackR.drawable.ic_empty_folder_glass)
                     var textToShow =
                         String.format(context.getString(R.string.context_empty_incoming))
                     try {
@@ -727,11 +723,7 @@ class ContactFileListFragment : ContactFileBaseFragment() {
             emptyImageView!!.visibility = View.VISIBLE
             emptyTextView!!.visibility = View.VISIBLE
 
-            if (context.resources.configuration.orientation == Configuration.ORIENTATION_LANDSCAPE) {
-                emptyImageView!!.setImageResource(R.drawable.incoming_empty_landscape)
-            } else {
-                emptyImageView!!.setImageResource(R.drawable.incoming_shares_empty)
-            }
+            emptyImageView!!.setImageResource(iconPackR.drawable.ic_folder_arrow_up_glass)
             var textToShow = String.format(context.getString(R.string.context_empty_incoming))
             try {
                 textToShow = textToShow.replace(
@@ -847,7 +839,7 @@ class ContactFileListFragment : ContactFileBaseFragment() {
         if (actionMode == null) {
             return
         }
-        val documents = adapter.selectedNodes
+        val documents = adapter.selectedNodes.filterNotNull()
         var files = 0
         var folders = 0
         for (document in documents) {

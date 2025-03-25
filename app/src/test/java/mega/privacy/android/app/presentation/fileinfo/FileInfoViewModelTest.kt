@@ -27,18 +27,11 @@ import mega.privacy.android.core.test.extension.CoroutineMainDispatcherExtension
 import mega.privacy.android.core.ui.mapper.FileTypeIconMapper
 import mega.privacy.android.data.gateway.ClipboardGateway
 import mega.privacy.android.data.repository.MegaNodeRepository
-import mega.privacy.android.domain.entity.AccountSubscriptionCycle
-import mega.privacy.android.domain.entity.AccountType
 import mega.privacy.android.domain.entity.EventType
 import mega.privacy.android.domain.entity.FolderTreeInfo
 import mega.privacy.android.domain.entity.StaticImageFileTypeInfo
 import mega.privacy.android.domain.entity.StorageState
 import mega.privacy.android.domain.entity.StorageStateEvent
-import mega.privacy.android.domain.entity.SubscriptionStatus
-import mega.privacy.android.domain.entity.account.AccountDetail
-import mega.privacy.android.domain.entity.account.AccountLevelDetail
-import mega.privacy.android.domain.entity.account.AccountSessionDetail
-import mega.privacy.android.domain.entity.account.AccountTransferDetail
 import mega.privacy.android.domain.entity.contacts.ContactPermission
 import mega.privacy.android.domain.entity.node.ExportedData
 import mega.privacy.android.domain.entity.node.MoveRequestResult
@@ -59,13 +52,14 @@ import mega.privacy.android.domain.exception.VersionsNotDeletedException
 import mega.privacy.android.domain.usecase.GetFolderTreeInfo
 import mega.privacy.android.domain.usecase.GetImageNodeByIdUseCase
 import mega.privacy.android.domain.usecase.GetNodeByIdUseCase
-import mega.privacy.android.domain.usecase.IsBusinessAccountActive
+import mega.privacy.android.domain.usecase.IsMasterBusinessAccountUseCase
 import mega.privacy.android.domain.usecase.MonitorChildrenUpdates
 import mega.privacy.android.domain.usecase.MonitorContactUpdates
 import mega.privacy.android.domain.usecase.MonitorNodeUpdatesById
 import mega.privacy.android.domain.usecase.MonitorOfflineFileAvailabilityUseCase
 import mega.privacy.android.domain.usecase.account.MonitorAccountDetailUseCase
 import mega.privacy.android.domain.usecase.account.MonitorStorageStateEventUseCase
+import mega.privacy.android.domain.usecase.business.IsBusinessAccountActiveUseCase
 import mega.privacy.android.domain.usecase.camerauploads.GetPrimarySyncHandleUseCase
 import mega.privacy.android.domain.usecase.camerauploads.GetSecondarySyncHandleUseCase
 import mega.privacy.android.domain.usecase.camerauploads.IsCameraUploadsEnabledUseCase
@@ -152,14 +146,15 @@ internal class FileInfoViewModelTest {
     private val getSecondarySyncHandleUseCase = mock<GetSecondarySyncHandleUseCase>()
     private val isCameraUploadsEnabledUseCase = mock<IsCameraUploadsEnabledUseCase>()
     private val isMediaUploadsEnabledUseCase = mock<IsMediaUploadsEnabledUseCase>()
-    private val isBusinessAccountActive = mock<IsBusinessAccountActive>()
     private val monitorOfflineFileAvailabilityUseCase =
         mock<MonitorOfflineFileAvailabilityUseCase>()
-    private val monitorAccountDetailUseCase = mock<MonitorAccountDetailUseCase>()
     private val getContactVerificationWarningUseCase = mock<GetContactVerificationWarningUseCase>()
     private val checkNodesNameCollisionWithActionUseCase =
         mock<CheckNodesNameCollisionWithActionUseCase>()
     private val fileTypeIconMapper = FileTypeIconMapper()
+    private val monitorAccountDetailsUseCase = mock<MonitorAccountDetailUseCase>()
+    private val isMasterBusinessAccountUseCase = mock<IsMasterBusinessAccountUseCase>()
+    private val isBusinessAccountActiveUseCase = mock<IsBusinessAccountActiveUseCase>()
 
     private val typedFileNode: TypedFileNode = mock()
 
@@ -215,8 +210,9 @@ internal class FileInfoViewModelTest {
             getContactVerificationWarningUseCase,
             typedFileNode,
             previewFile,
-            isBusinessAccountActive,
-            monitorAccountDetailUseCase,
+            isMasterBusinessAccountUseCase,
+            isBusinessAccountActiveUseCase,
+            monitorAccountDetailsUseCase
         )
     }
 
@@ -259,10 +255,11 @@ internal class FileInfoViewModelTest {
             isMediaUploadsEnabledUseCase = isMediaUploadsEnabledUseCase,
             monitorOfflineFileAvailabilityUseCase = monitorOfflineFileAvailabilityUseCase,
             getContactVerificationWarningUseCase = getContactVerificationWarningUseCase,
-            monitorAccountDetailUseCase = monitorAccountDetailUseCase,
             fileTypeIconMapper = fileTypeIconMapper,
             getImageNodeByNodeId = getImageNodeByIdUseCase,
-            isBusinessAccountActive = isBusinessAccountActive,
+            monitorAccountDetailUseCase = monitorAccountDetailsUseCase,
+            isMasterBusinessAccountUseCase = isMasterBusinessAccountUseCase,
+            isBusinessAccountActiveUseCase = isBusinessAccountActiveUseCase,
             iODispatcher = UnconfinedTestDispatcher()
         )
     }
@@ -303,6 +300,7 @@ internal class FileInfoViewModelTest {
                 extension = "jpg"
             )
         )
+        whenever(monitorAccountDetailsUseCase()).thenReturn(emptyFlow())
     }
 
     @Test
@@ -1050,33 +1048,6 @@ internal class FileInfoViewModelTest {
 
             verify(removeOfflineNodeUseCase).invoke(nodeId)
         }
-
-    @Test
-    fun `test that isProAccount is invoked when view model is initialized`() = runTest {
-        whenever(monitorAccountDetailUseCase()).thenReturn(
-            flowOf(
-                AccountDetail(
-                    sessionDetail = AccountSessionDetail(123456L, 54657L),
-                    storageDetail = null,
-                    levelDetail = AccountLevelDetail(
-                        subscriptionStatus = SubscriptionStatus.VALID,
-                        subscriptionRenewTime = 123456L,
-                        accountSubscriptionCycle = AccountSubscriptionCycle.MONTHLY,
-                        accountType = AccountType.PRO_II,
-                        accountPlanDetail = null,
-                        proExpirationTime = 123456,
-                        accountSubscriptionDetailList = emptyList()
-                    ),
-                    transferDetail = AccountTransferDetail(
-                        usedTransfer = 1000L,
-                        totalTransfer = 2000L
-                    )
-                )
-            )
-        )
-        underTest.setNode(node.handle, true)
-        verify(monitorAccountDetailUseCase).invoke()
-    }
 
     private fun mockMonitorStorageStateEvent(state: StorageState) {
         val storageStateEvent = StorageStateEvent(

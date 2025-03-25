@@ -13,6 +13,7 @@ import org.junit.Rule
 import org.junit.Test
 import org.junit.runner.RunWith
 import org.mockito.Mockito.mock
+import mega.privacy.android.icon.pack.R as iconPackR
 
 @RunWith(AndroidJUnit4::class)
 class RubbishBinComposeFragmentTest {
@@ -31,7 +32,7 @@ class RubbishBinComposeFragmentTest {
                 onSortOrderClick = {},
                 onChangeViewTypeClick = {},
                 sortOrder = "Name",
-                emptyState = Pair(R.drawable.rubbish_bin_empty, R.string.context_empty_rubbish_bin),
+                emptyState = Pair(iconPackR.drawable.ic_empty_trash_glass, R.string.context_empty_rubbish_bin),
                 onLinkClicked = {},
                 onDisputeTakeDownClicked = {},
                 fileTypeIconMapper = fileTypeIconMapper

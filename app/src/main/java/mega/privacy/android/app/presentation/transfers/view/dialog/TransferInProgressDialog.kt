@@ -14,7 +14,7 @@ import mega.privacy.android.app.presentation.transfers.starttransfer.model.Start
 import mega.privacy.android.domain.entity.transfer.TransferStage
 import mega.privacy.android.shared.original.core.ui.controls.dialogs.ProgressDialog
 import mega.privacy.android.shared.original.core.ui.preview.CombinedThemePreviews
-import mega.privacy.android.shared.original.core.ui.theme.OriginalTempTheme
+import mega.privacy.android.shared.original.core.ui.theme.OriginalTheme
 import mega.privacy.android.shared.original.core.ui.utils.MinimumTimeVisibility
 
 /**
@@ -106,7 +106,7 @@ internal fun TransferInProgressScanningDialog(
 @CombinedThemePreviews
 @Composable
 private fun TransferInProgressDialogPreview(@PreviewParameter(DeviceBottomSheetBodyPreviewProvider::class) scanningTransfersProgress: StartTransferJobInProgress.ScanningTransfers) {
-    OriginalTempTheme(isDark = isSystemInDarkTheme()) {
+    OriginalTheme(isDark = isSystemInDarkTheme()) {
         TransferInProgressDialog(scanningTransfersProgress) {}
     }
 }

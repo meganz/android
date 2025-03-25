@@ -46,9 +46,9 @@ import mega.privacy.android.shared.original.core.ui.controls.dialogs.drawableId
 import mega.privacy.android.shared.original.core.ui.controls.text.MegaText
 import mega.privacy.android.shared.original.core.ui.preview.CombinedThemePreviews
 import mega.privacy.android.shared.original.core.ui.theme.MegaOriginalTheme
-import mega.privacy.android.shared.original.core.ui.theme.OriginalTempTheme
+import mega.privacy.android.shared.original.core.ui.theme.OriginalTheme
 import mega.privacy.android.shared.original.core.ui.theme.extensions.body3
-import mega.privacy.android.shared.original.core.ui.theme.values.TextColor
+import mega.android.core.ui.theme.values.TextColor
 
 /**
  * TextField Generic Description with Character Limit
@@ -181,7 +181,7 @@ fun GenericDescriptionWithCharacterLimitTextField(
 @Composable
 @CombinedThemePreviews
 private fun TextFieldWithCharacterLimitEmptyPreview() {
-    OriginalTempTheme(isDark = isSystemInDarkTheme()) {
+    OriginalTheme(isDark = isSystemInDarkTheme()) {
         GenericDescriptionWithCharacterLimitTextField(
             maxCharacterLimit = 120,
             errorMessage = "This field is required",
@@ -193,7 +193,7 @@ private fun TextFieldWithCharacterLimitEmptyPreview() {
 @Composable
 @CombinedThemePreviews
 private fun TextFieldWithCharacterLimitDefaultPreview() {
-    OriginalTempTheme(isDark = isSystemInDarkTheme()) {
+    OriginalTheme(isDark = isSystemInDarkTheme()) {
         GenericDescriptionWithCharacterLimitTextField(
             maxCharacterLimit = 120,
             value = "This is a description with a character limit",
@@ -206,7 +206,7 @@ private fun TextFieldWithCharacterLimitDefaultPreview() {
 @Composable
 @CombinedThemePreviews
 private fun TextFieldWithMaxCharacterLimitErrorPreview() {
-    OriginalTempTheme(isDark = isSystemInDarkTheme()) {
+    OriginalTheme(isDark = isSystemInDarkTheme()) {
         GenericDescriptionWithCharacterLimitTextField(
             maxCharacterLimit = 120,
             value = "This is a description with a character limit, but it's too long and takes times to fully read it because the number of characters of it exceeds the allowed limit",
@@ -218,7 +218,7 @@ private fun TextFieldWithMaxCharacterLimitErrorPreview() {
 @Composable
 @CombinedThemePreviews
 private fun TextFieldWithMinCharacterLimitErrorPreview() {
-    OriginalTempTheme(isDark = isSystemInDarkTheme()) {
+    OriginalTheme(isDark = isSystemInDarkTheme()) {
         GenericDescriptionWithCharacterLimitTextField(
             maxCharacterLimit = 120,
             errorMessage = "Message must be at least 10 characters",

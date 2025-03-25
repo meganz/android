@@ -17,7 +17,7 @@ import mega.privacy.android.shared.original.core.ui.controls.chat.messages.ChatB
 import mega.privacy.android.shared.original.core.ui.controls.chat.messages.MessageText
 import mega.privacy.android.shared.original.core.ui.preview.CombinedThemePreviews
 import mega.privacy.android.domain.entity.chat.messages.normal.TextMessage
-import mega.privacy.android.shared.original.core.ui.theme.OriginalTempTheme
+import mega.privacy.android.shared.original.core.ui.theme.OriginalTheme
 
 /**
  * Text view for chat message
@@ -129,7 +129,7 @@ fun ChatMessageTextView(
 @CombinedThemePreviews
 @Composable
 private fun MeChatMessageTextPreview() {
-    OriginalTempTheme(isDark = isSystemInDarkTheme()) {
+    OriginalTheme(isDark = isSystemInDarkTheme()) {
         ChatMessageTextView(
             text = "Hello World",
             isMe = true,
@@ -143,7 +143,7 @@ private fun MeChatMessageTextPreview() {
 @CombinedThemePreviews
 @Composable
 private fun OtherChatMessageTextPreview() {
-    OriginalTempTheme(isDark = isSystemInDarkTheme()) {
+    OriginalTheme(isDark = isSystemInDarkTheme()) {
         ChatMessageTextView(
             text = "Hello World",
             isMe = true,
@@ -157,7 +157,7 @@ private fun OtherChatMessageTextPreview() {
 @CombinedThemePreviews
 @Composable
 private fun EditedChatMessageTextPreview() {
-    OriginalTempTheme(isDark = isSystemInDarkTheme()) {
+    OriginalTheme(isDark = isSystemInDarkTheme()) {
         ChatMessageTextView(
             text = "Hello World",
             isMe = true,

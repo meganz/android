@@ -1,9 +1,9 @@
 package mega.privacy.android.app.presentation.manager.model
 
+import com.google.mlkit.vision.documentscanner.GmsDocumentScanner
 import de.palm.composestateevents.StateEventWithContent
 import de.palm.composestateevents.consumed
 import mega.privacy.android.app.presentation.documentscanner.model.DocumentScanningError
-import mega.privacy.android.app.presentation.documentscanner.model.HandleScanDocumentResult
 import mega.privacy.android.app.presentation.meeting.chat.model.InfoToShow
 import mega.privacy.android.app.presentation.transfers.starttransfer.model.TransferTriggerEvent
 import mega.privacy.android.domain.entity.chat.ChatLinkContent
@@ -12,7 +12,6 @@ import mega.privacy.android.domain.entity.node.MoveRequestResult
 import mega.privacy.android.domain.entity.node.NodeId
 import mega.privacy.android.domain.entity.node.NodeNameCollisionsResult
 import mega.privacy.android.domain.entity.node.RestoreNodeResult
-
 
 /**
  * Manager state
@@ -42,8 +41,9 @@ import mega.privacy.android.domain.entity.node.RestoreNodeResult
  * @property usersCallLimitReminders                    [UsersCallLimitReminders]
  * @property searchQuery                                Search query
  * @property uploadEvent                                Event to trigger upload actions
- * @property handleScanDocumentResult                   Decides if the legacy or modern Document Scanner should be used
+ * @property gmsDocumentScanner                         The prepared ML Kit Document Scanner
  * @property documentScanningError                      The specific Error returned when using the modern Document Scanner
+ * @property showHomeFabOptionsBottomSheet              True to show the Home Fab options bottom sheet or False otherwise
  */
 data class ManagerState(
     val isFirstNavigationLevel: Boolean = true,
@@ -71,6 +71,7 @@ data class ManagerState(
     val usersCallLimitReminders: UsersCallLimitReminders = UsersCallLimitReminders.Enabled,
     val searchQuery: String = "",
     val uploadEvent: StateEventWithContent<TransferTriggerEvent.StartUpload> = consumed(),
-    val handleScanDocumentResult: HandleScanDocumentResult? = null,
+    val gmsDocumentScanner: GmsDocumentScanner? = null,
     val documentScanningError: DocumentScanningError? = null,
+    val showHomeFabOptionsBottomSheet: Boolean = false
 )

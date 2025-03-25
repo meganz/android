@@ -43,13 +43,13 @@ import mega.privacy.android.app.presentation.fileinfo.model.FileInfoViewState
 import mega.privacy.android.app.presentation.fileinfo.view.ExtraActionDialog
 import mega.privacy.android.app.presentation.fileinfo.view.FileInfoScreen
 import mega.privacy.android.app.presentation.security.PasscodeCheck
+import mega.privacy.android.app.presentation.settings.model.StorageTargetPreference
 import mega.privacy.android.app.presentation.tags.TagsActivity
 import mega.privacy.android.app.presentation.tags.TagsActivity.Companion.NODE_ID
 import mega.privacy.android.app.presentation.transfers.attach.NodeAttachmentView
 import mega.privacy.android.app.presentation.transfers.attach.NodeAttachmentViewModel
 import mega.privacy.android.app.presentation.transfers.starttransfer.view.StartTransferComponent
 import mega.privacy.android.app.sync.fileBackups.FileBackupManager
-import mega.privacy.android.app.upgradeAccount.UpgradeAccountActivity
 import mega.privacy.android.app.utils.AlertsAndWarnings
 import mega.privacy.android.app.utils.Constants
 import mega.privacy.android.app.utils.Constants.SNACKBAR_TYPE
@@ -69,7 +69,8 @@ import mega.privacy.android.domain.entity.contacts.ContactItem
 import mega.privacy.android.domain.entity.node.MoveRequestResult
 import mega.privacy.android.domain.entity.node.NodeId
 import mega.privacy.android.domain.usecase.GetThemeMode
-import mega.privacy.android.shared.original.core.ui.theme.OriginalTempTheme
+import mega.privacy.android.navigation.MegaNavigator
+import mega.privacy.android.shared.original.core.ui.theme.OriginalTheme
 import mega.privacy.android.shared.original.core.ui.utils.showAutoDurationSnackbar
 import mega.privacy.mobile.analytics.event.NodeInfoDescriptionAddedMessageDisplayedEvent
 import mega.privacy.mobile.analytics.event.NodeInfoDescriptionUpdatedMessageDisplayedEvent
@@ -92,6 +93,12 @@ class FileInfoActivity : BaseActivity() {
 
     @Inject
     lateinit var getThemeMode: GetThemeMode
+
+    /**
+     * Mega navigator
+     */
+    @Inject
+    lateinit var megaNavigator: MegaNavigator
 
     private lateinit var selectContactForShareFolderLauncher: ActivityResultLauncher<NodeId>
     private lateinit var versionHistoryLauncher: ActivityResultLauncher<Long>
@@ -130,6 +137,7 @@ class FileInfoActivity : BaseActivity() {
     @OptIn(ExperimentalComposeUiApi::class)
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
+        appContainerWrapper.setPasscodeCheck(passCodeFacade)
         enableEdgeToEdge()
         viewModel.setNode(readExtrasAndGetHandle() ?: run {
             finish()
@@ -145,7 +153,7 @@ class FileInfoActivity : BaseActivity() {
             val uiState by viewModel.uiState.collectAsStateWithLifecycle()
             val snackBarHostState = remember { SnackbarHostState() }
             val coroutineScope = rememberCoroutineScope()
-            OriginalTempTheme(isDark = themeMode.isDarkMode()) {
+            OriginalTheme(isDark = themeMode.isDarkMode()) {
                 EventEffect(
                     event = uiState.oneOffViewEvent,
                     onConsumed = viewModel::consumeOneOffEvent,
@@ -172,7 +180,6 @@ class FileInfoActivity : BaseActivity() {
                     onMenuActionClick = { handleAction(it, uiState) },
                     onVerifyContactClick = this::navigateToVerifyContacts,
                     onAddTagClick = this::navigateToTags,
-                    onUpgradeAccountClick = this::navigateToUpgradeAccountScreen,
                     modifier = Modifier.semantics {
                         testTagsAsResourceId = true
                     },
@@ -198,6 +205,12 @@ class FileInfoActivity : BaseActivity() {
                     uiState.downloadEvent,
                     { viewModel.consumeDownloadEvent() },
                     snackBarHostState = snackBarHostState,
+                    navigateToStorageSettings = {
+                        megaNavigator.openSettings(
+                            this,
+                            StorageTargetPreference
+                        )
+                    },
                 )
                 NodeAttachmentView(
                     nodeAttachmentViewModel
@@ -222,10 +235,6 @@ class FileInfoActivity : BaseActivity() {
                 }
             }
         }
-    }
-
-    private fun navigateToUpgradeAccountScreen() {
-        startActivity(Intent(this, UpgradeAccountActivity::class.java))
     }
 
     private fun navigateToTags() {

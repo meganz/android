@@ -14,7 +14,7 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.window.DialogProperties
 import mega.privacy.android.app.R
 import mega.privacy.android.legacy.core.ui.controls.dialogs.MegaDialog
-import mega.privacy.android.shared.original.core.ui.theme.OriginalTempTheme
+import mega.privacy.android.shared.original.core.ui.theme.OriginalTheme
 
 @Composable
 fun DiscardReportDialog(
@@ -32,8 +32,8 @@ fun DiscardReportDialog(
                 Text(
                     text = stringResource(id = R.string.settings_help_report_issue_discard_button),
                     style = MaterialTheme.typography.button,
-                    color = if (!MaterialTheme.colors.isLight) colorResource(id = R.color.teal_200) else colorResource(
-                        id = R.color.teal_300
+                    color = if (!MaterialTheme.colors.isLight) colorResource(id = R.color.accent_050) else colorResource(
+                        id = R.color.accent_900
                     )
                 )
             }
@@ -46,8 +46,8 @@ fun DiscardReportDialog(
                 Text(
                     text = stringResource(id = sharedR.string.general_dialog_cancel_button),
                     style = MaterialTheme.typography.button,
-                    color = if (!MaterialTheme.colors.isLight) colorResource(id = R.color.teal_200) else colorResource(
-                        id = R.color.teal_300
+                    color = if (!MaterialTheme.colors.isLight) colorResource(id = R.color.accent_050) else colorResource(
+                        id = R.color.accent_900
                     )
                 )
             }
@@ -65,7 +65,7 @@ fun DiscardReportDialog(
 )
 @Composable
 fun PreviewDiscardReportDialog() {
-    OriginalTempTheme(isDark = isSystemInDarkTheme()) {
+    OriginalTheme(isDark = isSystemInDarkTheme()) {
         DiscardReportDialog(onDiscardCancelled = {},
             onDiscard = {})
     }

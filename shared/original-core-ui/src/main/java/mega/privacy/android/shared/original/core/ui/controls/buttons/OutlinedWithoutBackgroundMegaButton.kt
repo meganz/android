@@ -32,7 +32,7 @@ import mega.privacy.android.core.R
 import mega.privacy.android.shared.original.core.ui.preview.BooleanProvider
 import mega.privacy.android.shared.original.core.ui.preview.CombinedTextAndThemePreviews
 import mega.privacy.android.shared.original.core.ui.theme.MegaOriginalTheme
-import mega.privacy.android.shared.original.core.ui.theme.OriginalTempTheme
+import mega.privacy.android.shared.original.core.ui.theme.OriginalTheme
 
 /**
  * Plain button with an outlined border
@@ -94,7 +94,7 @@ fun OutlinedWithoutBackgroundMegaButton(
 private fun OutlinedWithoutBackgroundMegaButtonPreview(
     @PreviewParameter(BooleanProvider::class) withIcon: Boolean,
 ) {
-    OriginalTempTheme(isDark = isSystemInDarkTheme()) {
+    OriginalTheme(isDark = isSystemInDarkTheme()) {
         Column(
             modifier = Modifier.padding(24.dp),
             verticalArrangement = Arrangement.spacedBy(12.dp)
@@ -122,7 +122,7 @@ private fun OutlinedWithoutBackgroundMegaButtonPreview(
 private fun OutlinedWithoutBackgroundMegaButtonPreview(
     @PreviewParameter(OutlinedWithoutBackgroundMegaButtonPreviewProvider::class) state: OutlinedWithoutBackgroundMegaButtonState,
 ) {
-    OriginalTempTheme(isDark = isSystemInDarkTheme()) {
+    OriginalTheme(isDark = isSystemInDarkTheme()) {
         Column(
             modifier = Modifier.padding(24.dp),
             verticalArrangement = Arrangement.spacedBy(12.dp)

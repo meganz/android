@@ -26,7 +26,7 @@ import mega.privacy.android.feature.devicecenter.ui.model.icon.DeviceCenterUINod
 import mega.privacy.android.feature.devicecenter.ui.model.icon.DeviceIconType
 import mega.privacy.android.feature.devicecenter.ui.model.status.DeviceCenterUINodeStatus
 import mega.privacy.android.legacy.core.ui.controls.lists.MenuActionNodeHeaderWithBody
-import mega.privacy.android.shared.original.core.ui.theme.OriginalTempTheme
+import mega.privacy.android.shared.original.core.ui.theme.OriginalTheme
 
 /**
  * Test Tags for the Device Bottom Sheet
@@ -42,24 +42,23 @@ internal const val BOTTOM_SHEET_HEADER =
  *
  * @param device The selected [DeviceUINode]
  * @param isCameraUploadsEnabled true if Camera Uploads is Enabled, and false if otherwise
+ * @param onCameraUploadsClicked Lambda that is executed when the "Camera uploads" Tile is selected
  * @param onRenameDeviceClicked Lambda that is executed when the "Rename" Tile is selected
  * @param onInfoClicked Lambda that is executed when the "Info" Tile is selected
  * @param onAddNewSyncClicked Lambda that is executed when the "Add new sync" Tile is selected
  * @param onAddBackupClicked Lambda that is executed when the "Add backup" Tile is selected
  * @param onBottomSheetDismissed Lambda that is executed when the bottom sheet is dismissed
- * @param isFreeAccount True if is a Free account or False otherwise
  */
 @Composable
 internal fun DeviceBottomSheetBody(
     device: DeviceUINode,
     isCameraUploadsEnabled: Boolean,
+    onCameraUploadsClicked: () -> Unit,
     onRenameDeviceClicked: (DeviceUINode) -> Unit,
     onInfoClicked: (DeviceUINode) -> Unit,
     onAddNewSyncClicked: (DeviceUINode) -> Unit,
     onAddBackupClicked: (DeviceUINode) -> Unit,
     onBottomSheetDismissed: () -> Unit,
-    isFreeAccount: Boolean,
-    isBackupForAndroidEnabled: Boolean,
 ) {
     Column(Modifier.testTag(BOTTOM_SHEET_CONTAINER)) {
         MenuActionNodeHeaderWithBody(
@@ -79,6 +78,10 @@ internal fun DeviceBottomSheetBody(
                 OwnDeviceBottomSheetBody(
                     isCameraUploadsEnabled = isCameraUploadsEnabled,
                     hasSyncedFolders = device.folders.isNotEmpty(),
+                    onCameraUploadsClicked = {
+                        onBottomSheetDismissed()
+                        onCameraUploadsClicked()
+                    },
                     onRenameDeviceClicked = {
                         onBottomSheetDismissed()
                         onRenameDeviceClicked(device)
@@ -95,8 +98,6 @@ internal fun DeviceBottomSheetBody(
                         onBottomSheetDismissed()
                         onAddBackupClicked(device)
                     },
-                    isFreeAccount = isFreeAccount,
-                    isBackupForAndroidEnabled = isBackupForAndroidEnabled,
                 )
             }
 
@@ -164,17 +165,16 @@ private fun getNodeIconColor(uiNodeIcon: DeviceCenterUINodeIcon) =
 private fun DeviceBottomSheetBodyPreview(
     @PreviewParameter(DeviceBottomSheetBodyPreviewProvider::class) device: DeviceUINode,
 ) {
-    OriginalTempTheme(isDark = isSystemInDarkTheme()) {
+    OriginalTheme(isDark = isSystemInDarkTheme()) {
         DeviceBottomSheetBody(
             device = device,
             isCameraUploadsEnabled = true,
+            onCameraUploadsClicked = {},
             onRenameDeviceClicked = {},
             onInfoClicked = {},
             onAddNewSyncClicked = {},
             onAddBackupClicked = {},
             onBottomSheetDismissed = {},
-            isFreeAccount = true,
-            isBackupForAndroidEnabled = true,
         )
     }
 }

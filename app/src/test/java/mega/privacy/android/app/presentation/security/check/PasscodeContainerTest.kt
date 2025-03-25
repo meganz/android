@@ -8,8 +8,6 @@ import androidx.compose.ui.test.onNodeWithText
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import kotlinx.coroutines.flow.MutableStateFlow
 import mega.privacy.android.app.presentation.passcode.model.PasscodeCryptObjectFactory
-import mega.privacy.android.app.presentation.security.check.PasscodeCheckViewModel
-import mega.privacy.android.app.presentation.security.check.PasscodeContainer
 import mega.privacy.android.app.presentation.security.check.model.PasscodeCheckState
 import org.junit.Rule
 import org.junit.Test
@@ -44,25 +42,6 @@ class PasscodeContainerTest {
         composeTestRule.onNodeWithText(expected).assertIsDisplayed()
     }
 
-    @Test
-    fun `test that content is not shown if passcode is locked`() {
-        passcodeCheckViewModel.stub {
-            on { state }.thenReturn(MutableStateFlow(PasscodeCheckState.Locked))
-        }
-
-        val notExpected = "Not Expected"
-        composeTestRule.setContent {
-            PasscodeContainer(
-                passcodeUI = {},
-                viewModel = passcodeCheckViewModel,
-                passcodeCryptObjectFactory = passcodeCryptObjectFactory,
-            ) {
-                Text(notExpected)
-            }
-        }
-
-        composeTestRule.onNodeWithText(notExpected).assertDoesNotExist()
-    }
 
     @Test
     fun `test that passcode dialog is displayed when locked`() {

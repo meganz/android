@@ -25,9 +25,9 @@ import mega.privacy.android.core.R
 import mega.privacy.android.shared.original.core.ui.controls.text.MegaText
 import mega.privacy.android.shared.original.core.ui.preview.CombinedThemePreviews
 import mega.privacy.android.shared.original.core.ui.theme.MegaOriginalTheme
-import mega.privacy.android.shared.original.core.ui.theme.OriginalTempTheme
+import mega.privacy.android.shared.original.core.ui.theme.OriginalTheme
 import mega.privacy.android.shared.original.core.ui.theme.extensions.subtitle1medium
-import mega.privacy.android.shared.original.core.ui.theme.values.TextColor
+import mega.android.core.ui.theme.values.TextColor
 
 
 @Composable
@@ -62,6 +62,7 @@ private fun InlineBaseBanner(
                 modifier = Modifier
                     .padding(
                         start = 8.dp,
+                        top = 3.dp,
                         end = 16.dp
                     )
                     .weight(1f),
@@ -168,7 +169,7 @@ fun InlineErrorBanner(
 @CombinedThemePreviews
 @Composable
 internal fun InlineErrorPreview() {
-    OriginalTempTheme(isDark = isSystemInDarkTheme()) {
+    OriginalTheme(isDark = isSystemInDarkTheme()) {
         InlineErrorBanner(
             title = "This is title",
             message = "This is message for the banner",
@@ -182,7 +183,7 @@ internal fun InlineErrorPreview() {
 @CombinedThemePreviews
 @Composable
 internal fun InlineWarningPreview() {
-    OriginalTempTheme(isDark = isSystemInDarkTheme()) {
+    OriginalTheme(isDark = isSystemInDarkTheme()) {
         InlineWarningBanner(
             title = "Your storage is almost full",
             message = "To keep uploading data, upgrade to get more storage.",

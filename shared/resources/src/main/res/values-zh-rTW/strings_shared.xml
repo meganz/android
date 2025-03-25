@@ -1,9 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources xmlns:tools="http://schemas.android.com/tools" tools:ignore="ImpliedQuantity, ExtraTranslation, MissingTranslation">
-    <!-- The name of the Device or Folder Sub State when its code is NO_SYNC_ERROR -->
-    <string name="general_sync_no_error">No sync error</string>
     <!-- The name of the Device or Folder Sub State when its code is UNSUPPORTED_FILE_SYSTEM -->
-    <string name="general_sync_unsupported_file_system">MEGA無法同步或備份此資料夾，因為尚不支援您裝置上的檔案系統</string>
+    <string name="general_sync_unsupported_file_system">由於尚不支援您裝置上的檔案系統，MEGA無法同步或備份此資料夾</string>
     <!-- The name of the Device or Folder Sub State when its code is INVALID_REMOTE_TYPE -->
     <string name="general_sync_invalid_remote_type">您選擇的資料夾無法同步</string>
     <!-- The name of the Device or Folder Sub State when its code is INVALID_LOCAL_TYPE -->
@@ -11,21 +9,19 @@
     <!-- The name of the Device or Folder Sub State when its code is INITIAL_SCAN_FAILED -->
     <string name="general_sync_initial_scan_failed">初始掃描失敗。您需要從桌面應用程式重新啟用同步或備份。</string>
     <!-- The name of the Device or Folder Sub State when its code is REMOTE_NODE_NOT_FOUND -->
-    <string name="general_sync_remote_node_not_found">MEGA無法找到MEGA中的資料夾，因為它已被移動或刪除，或者您可能沒有存取權限。</string>
+    <string name="general_sync_remote_node_not_found">由於資料夾已被移動或刪除，或者您可能沒有存取權限，因此無法找到MEGA中的資料夾</string>
     <!-- The name of the Device or Folder Sub State when its code is STORAGE_OVERQUOTA -->
     <string name="general_sync_storage_overquota">由於您的儲存空間已滿，因此無法同步或備份此資料夾。</string>
     <!-- The name of the Device or Folder Sub State when its code is ACCOUNT_EXPIRED -->
     <string name="general_sync_account_expired">由於您的方案已過期，因此無法同步或備份此資料夾。</string>
     <!-- The name of the Device or Folder Sub State when its code is FOREIGN_TARGET_OVERSTORAGE -->
-    <string name="general_sync_foreign_target_overshare">無法同步資料夾，因為共享此資料夾的使用者已達到其儲存上限。</string>
-    <!-- The name of the Device or Folder Sub State when its code is REMOTE_PATH_HAS_CHANGED -->
-    <string name="general_sync_remote_path_has_changed">MEGA無法找到MEGA中的資料夾，因為它已被移動或刪除，或者您可能沒有存取權限。</string>
+    <string name="general_sync_foreign_target_overshare">由於共享此資料夾的使用者已達到其儲存上限，因此無法同步資料夾。</string>
     <!-- The name of the Device or Folder Sub State when its code is SHARE_NON_FULL_ACCESS -->
-    <string name="general_sync_share_non_full_access">資料夾無法同步，因為它是一個您沒有完全存取權限的共用資料夾</string>
+    <string name="general_sync_share_non_full_access">由於資料夾是一個您沒有完全存取權限的共用資料夾，因此無法同步，</string>
     <!-- The name of the Device or Folder Sub State when its code is PUT_NODES_ERROR -->
     <string name="general_sync_put_nodes_error">無法同步或備份此資料夾中的檔案。您需要從桌面應用程式重新啟用同步或備份。</string>
     <!-- The name of the Device or Folder Sub State when its code is ACTIVE_SYNC_BELOW_PATH -->
-    <string name="general_sync_active_sync_below_path">資料夾無法同步，因為它已經包含同步的資料夾</string>
+    <string name="general_sync_active_sync_below_path">由於資料夾已包含同步資料夾，因此無法同步</string>
     <!-- The name of the Device or Folder Sub State when its code is VBOXSHAREDFOLDER_UNSUPPORTED -->
     <string name="general_sync_vboxsharedfolder_unsupported">MEGA無法同步或備份VirtualBox資料夾</string>
     <!-- The name of the Device or Folder Sub State when its code is ACCOUNT_BLOCKED -->
@@ -36,8 +32,6 @@
     <string name="general_sync_too_many_action_packets">帳戶已重新載入。您的備份或同步的任何遺失的更新尚未套用。</string>
     <!-- The name of the Device or Folder Sub State when its code is LOGGED_OUT -->
     <string name="general_sync_logged_out">由於您似乎已登出桌面應用程式，因此同步或備份已停止。使用桌面應用程式重新登入，然後恢復同步或備份。</string>
-    <!-- The name of the Device or Folder Sub State when its code is MISSING_PARENT_NODE -->
-    <string name="general_sync_missing_parent_node">N/A</string>
     <!-- The name of the Device or Folder Sub State when its code is BACKUP_SOURCE_NOT_BELOW_DRIVE -->
     <string name="general_sync_backup_source_not_below_drive">無法找到外部磁碟的資料夾。</string>
     <!-- The name of the Device or Folder Sub State when its code is ACTIVE_SYNC_SAME_PATH -->
@@ -58,16 +52,10 @@
     <string name="general_sync_unable_to_add_watch">無法新增檔案系統偵聽。確保有足夠的可用空間和記憶體，並且您已授予資料夾位置的權限。</string>
     <!-- The name of the Device or Folder Sub State when its code is UNABLE_TO_RETRIEVE_ROOT_FSID -->
     <string name="general_sync_unable_to_retrieve_root_fsid">無法讀取同步位置。檢查該位置是否可用，而且是否已授予該資料夾位置的權限。</string>
-    <!-- The name of the Device or Folder Sub State when its code is UNABLE_TO_OPEN_DATABASE -->
-    <string name="general_sync_unable_to_open_database">Unable to open state cache database</string>
     <!-- The name of the Device or Folder Sub State when its code is INSUFFICIENT_DISK_SPACE -->
     <string name="general_sync_insufficient_disk_space">您裝置上的儲存空間不足</string>
-    <!-- The name of the Device or Folder Sub State when its code is FAILURE_ACCESSING_PERSISTENT_STORAGE -->
-    <string name="general_sync_failure_accessing_persistent_storage">無法讀取同步位置。檢查該位置是否可用，而且是否已授予該資料夾位置的權限。</string>
     <!-- The name for specific Sub States to indicate that an unknown error occurred -->
     <string name="general_sync_message_unknown_error">發生未知錯誤。請聯繫support@mega.nz。</string>
-    <!-- The name for specific Sub States to indicate that something went wrong -->
-    <string name="general_sync_message_something_went_wrong">Something went wrong.</string>
     <!-- The name for specific Sub States to indicate that the Node is in the Rubbish Bin -->
     <string name="general_sync_message_node_in_rubbish_bin">由於MEGA資料夾位於垃圾筒中，因此資料夾無法同步或備份</string>
     <!-- The name for specific Sub States to indicate that the local drive cannot be located at this time -->
@@ -79,7 +67,7 @@
     <!-- The name for specific Sub States to indicate that a problem occurred when syncing or backing up the MEGA Folder -->
     <string name="general_sync_message_folder_backup_issue">同步或備份此資料夾時出現問題。停止同步或備份，然後嘗試在桌面應用程式中重新設定，或聯繫客服。</string>
     <!-- The name for specific Sub States to indicate that the MEGA Folder cannot be synced or backed up as it is inside another synced MEGA Folder -->
-    <string name="general_sync_message_folder_backup_issue_due_to_being_inside_another_backed_up_folder">資料夾無法同步，因為它已經在同步資料夾中</string>
+    <string name="general_sync_message_folder_backup_issue_due_to_being_inside_another_backed_up_folder">由於資料夾已在同步資料夾中，因此無法同步</string>
     <!-- The name of the Device or Folder Sub State when its code is LOCAL_FILESYSTEM_MISMATCH -->
     <string name="general_sync_local_filesystem_mismatch">此資料夾中的檔案無法同步或備份。您需要從桌面應用程式重新啟用同步或備份。</string>
     <!-- Warning message to display when sync has been paused due a low battery level -->
@@ -92,14 +80,6 @@
     <string name="dialog_onboarding_feature_title_backup_rewind">再也不會遺失資料</string>
     <!-- Description about Backup and Rewind features on Onboarding dialog (for user to choose account - Free or Pro).  -->
     <string name="dialog_onboarding_feature_description_backup_rewind">回溯可將檔案和資料夾還原到最多180天的任何日期，因此您的資料不會發生意外且不會被竄改。</string>
-    <!-- Title for MEGA VPN feature on Onboarding dialog (for user to choose account - Free or Pro).  -->
-    <string name="dialog_onboarding_feature_title_vpn">MEGA&#160;VPN</string>
-    <!-- Description about MEGA VPN feature on Onboarding dialog (for user to choose account - Free or Pro).  -->
-    <string name="dialog_onboarding_feature_description_vpn">使用我們的高速VPN保持線上隱私。</string>
-    <!-- Title for chats and meetings feature on Onboarding dialog (for user to choose account - Free or Pro).  -->
-    <string name="dialog_onboarding_feature_title_chat">無限制的通話和會議</string>
-    <!-- Description about chats and meetings feature on Onboarding dialog (for user to choose account - Free or Pro).  -->
-    <string name="dialog_onboarding_feature_description_chat">訊息、視訊通話，以及無限制與會人數的完全私密會議。</string>
     <!-- Search drop down chips filter type file type -->
     <string name="search_dropdown_chip_filter_type_file_type">類型</string>
     <!-- Search drop down chips filter type file type images -->
@@ -137,7 +117,7 @@
     <!-- Search drop down chips filter type date modified older -->
     <string name="search_dropdown_chip_filter_type_date_older">較舊的</string>
     <!-- All videos tab title of the video section  -->
-    <string name="video_section_tab_title_all_videos">影片</string>
+    <string name="video_section_tab_title_all_videos">所有影片</string>
     <!-- Playlists tab title of the video section  -->
     <string name="video_section_tab_title_playlists">播放列表</string>
     <!-- Location filter title of the video section  -->
@@ -246,10 +226,8 @@
     <plurals name="label_share_links">
         <item quantity="other">共享連結</item>
     </plurals>
-    <!-- Title of the dialog to ask the user to use the selected location as default location for next downloads-->
-    <string name="transfers_dialog_save_download_location_title">下載到此位置？</string>
-    <!-- Option to don't use the selected location as default location for next downloads-->
-    <string name="transfers_dialog_save_download_location_only_this_time_option">只有這一次</string>
+    <!-- Title of the dialog to ask the user to use the selected location as default location for next downloads. Please do not modify the %s placeholder as it will be replaced by the name of the folder where the files will be downloaded-->
+    <string name="transfers_dialog_save_download_location_title">將所有下載的檔案儲存到「%1$s」？</string>
     <!-- Option to use the selected location as default location for next downloads-->
     <string name="transfers_dialog_save_download_location_always_here_option">總是下載到此</string>
     <!-- Option to don't use the selected location as default location for next downloads and don't ask again-->
@@ -272,8 +250,6 @@
     <string name="account_confirm_email_misspelled_email_description">如果您拼錯您的電子郵件地址，請更正並點選[A]重新發送[/A]。</string>
     <!-- Title of the insufficient storage error banner -->
     <string name="sync_error_storage_over_quota_banner_title">同步已暫停，您的MEGA方案的儲存空間已用完</string>
-    <!-- Title of the insufficient storage error action -->
-    <string name="sync_error_storage_over_quota_banner_action">升級</string>
     <!-- The warning message shown when the User enables the Device Charging requirement in Settings Camera Uploads, enables Camera Uploads, begins uploading content and the Device is not charged -->
     <string name="camera_uploads_phone_not_charging_message">上傳暫停，裝置未在充電</string>
     <!-- Label of the Device Status informing the user that Nothing is set up for the Current Device -->
@@ -290,10 +266,6 @@
     <string name="general_low_tier_plan_essential_label">MEGA&#160;Essential</string>
     <!-- The Body Text of a Settings Camera Uploads Option that decides whether or not the Device must be charged for Camera Uploads to start uploading content -->
     <string name="settings_camera_uploads_upload_only_while_charging_option_body">上傳將暫停，直到您開始為裝置充電。如果您的電池電量低於20%，上傳仍將保持暫停狀態。</string>
-    <!-- Title of the synced folder list empty state -->
-    <string name="device_center_sync_list_empty_state_title">未設定同步</string>
-    <!-- Message of the synced folder list empty state -->
-    <string name="device_center_sync_list_empty_state_message">將裝置上的資料夾與MEGA上的資料夾同步。</string>
     <!-- Label for the button or menu option to add a new sync -->
     <string name="device_center_sync_add_new_syn_button_option">加入新的同步</string>
     <!-- Text for the Sync solved issues chip -->
@@ -336,36 +308,8 @@
     <string name="cloud_drive_tour_fourth_subtitle">相機上傳是任何行動裝置的基本功能，我們已經為您提供這項服務。立即註冊一個帳戶。</string>
     <!-- Fifth subtitle of the tour screen -->
     <string name="cloud_drive_tour_fifth_subtitle">零知識加密的視訊會議</string>
-    <!-- Titles of the tour screen to onboard users with the MEGA application -->
-    <string-array name="cloud_drive_tour_titles">
-        <item>@string/cloud_drive_tour_first_title</item>
-        <item>@string/cloud_drive_tour_second_title</item>
-        <item>@string/cloud_drive_tour_third_title</item>
-        <item>@string/cloud_drive_tour_fourth_title</item>
-        <item>@string/cloud_drive_tour_fifth_title</item>
-    </string-array>
-    <!-- Subtitles of the tour screen to onboard users with the MEGA application -->
-    <string-array name="cloud_drive_tour_subtitles">
-        <item>@string/cloud_drive_tour_first_subtitle</item>
-        <item>@string/cloud_drive_tour_second_subtitle</item>
-        <item>@string/cloud_drive_tour_third_subtitle</item>
-        <item>@string/cloud_drive_tour_fourth_subtitle</item>
-        <item>@string/cloud_drive_tour_fifth_subtitle</item>
-    </string-array>
     <!-- Title of the Raise to Hand Feature Introduction Tooltip -->
     <string name="meetings_raised_hand_tooltip_title">[A]新功能：舉手[/A]</string>
-    <!-- Message of the synced folder list empty state for free accounts -->
-    <string name="device_center_sync_list_empty_state_message_free_account">升級到我們當中一項Pro方案，讓您的資訊同步並保持最新狀態。</string>
-    <!-- "Upgrade now" label for a button, menu entry, etc -->
-    <string name="general_upgrade_now_label">立即升級</string>
-    <!-- Title of the upgrade dialog displayed for free accounts when try to add a new sync -->
-    <string name="device_center_sync_upgrade_dialog_title">升級為Pro會員</string>
-    <!-- Message of the upgrade dialog displayed for free accounts when try to add a new sync -->
-    <string name="device_center_sync_upgrade_dialog_message">透過我們的Pro方案將您行動裝置同步到雲端的功能解鎖。</string>
-    <!-- Confirm button text of the upgrade dialog displayed for free accounts when try to add a new sync -->
-    <string name="device_center_sync_upgrade_dialog_confirm_button">升級</string>
-    <!-- Cancel button text of the upgrade dialog displayed for free accounts when try to add a new sync -->
-    <string name="device_center_sync_upgrade_dialog_cancel_button">稍後再說</string>
     <!-- Title of the Warning Dialog shown when the new Local Primary or Secondary Folder is same as, a parent folder or sub-folder of the opposite Local Folder -->
     <string name="settings_camera_uploads_related_new_local_folder_warning_dialog_title">上傳資料夾衝突</string>
     <!-- Body of the Warning Dialog shown when the new Local Primary or Secondary Folder is same as, a parent folder or sub-folder of the opposite Local Folder -->
@@ -376,12 +320,6 @@
     <string name="general_no_picker_warning">此裝置沒有可用於選擇資料夾的應用程式</string>
     <!-- Description of feature, which will be available for user, if they buy plan. This feature means user will be able to sync folders. Keep the bullet point, as this string is part of the bullet point list. -->
     <string name="account_upgrade_account_description_feature_sync">&#8226;&#160;自動同步行動裝置上的資料夾</string>
-    <!-- The error dialog text displayed when user opens Android Sync while having previously established syncs -->
-    <string name="sync_error_dialog_free_user">您的同步已暫停。同步是Pro方案的功能。</string>
-    <!-- The error dialog confirm action text -->
-    <string name="sync_error_dialog_free_user_confirm_action">確認</string>
-    <!-- The error banner text displayed when user opens Android Sync while having previously established syncs -->
-    <string name="sync_error_banner_free_user">由於您的MEGA Pro方案已取消，因此同步暫停。升級以繼續同步。</string>
     <!-- Hidden items -->
     <string name="hidden_items">隱藏的項目</string>
     <!-- Label to indicate that is a Pro only feature -->
@@ -400,8 +338,6 @@
     <string name="add_tags_error_special_characters">標籤不能包含空格或非字母數字的符號。使用大寫字母的標籤將以小寫字母顯示。</string>
     <!-- error label for add tags page when tag count is maximum -->
     <string name="add_tags_error_max_tags">標籤最大數量為%1$d</string>
-    <!-- error label for add tags page when tag character limit reached -->
-    <string name="add_tags_error_max_characters">標籤不得超過%1$d個字元</string>
     <!-- title label for tags page -->
     <string name="add_tags_page_title_label">標籤</string>
     <!-- The placeholder for read only files/folders with no description in info screen-->
@@ -410,8 +346,6 @@
     <string name="video_to_playlist_top_bar_title">新增到播放列表</string>
     <!-- Text of the create new playlist in the page that adds the video to the video playlist -->
     <string name="video_to_playlist_new_playlist_text">新的播放列表</string>
-    <!-- Text of the done button in the page that adds the video to the video playlist -->
-    <string name="video_to_playlist_done_button">完成</string>
     <!-- Title shown when cancelling the current plan, informing the user of features they'll miss out on -->
     <string name="account_cancel_account_screen_plan_miss_out_on_features">你將錯過這些功能</string>
     <!-- Message shown when cancelling the plan, indicating that access to features will continue until the plan expires -->
@@ -424,8 +358,6 @@
     <string name="account_cancel_account_screen_plan_free_plan">免費</string>
     <!-- Row label for storage feature in the comparison table -->
     <string name="account_cancel_account_screen_plan_storage">儲存空間</string>
-    <!-- Storage amount available in the free plan. %1s represents the amount of storage and the unit -->
-    <string name="account_cancel_account_screen_plan_free_storage">%1秒</string>
     <!-- Row label for transfer feature in the comparison table -->
     <string name="account_cancel_account_screen_plan_transfer">傳輸</string>
     <!-- Transfer limit in the free plan -->
@@ -445,13 +377,13 @@
     <!-- Feature indicating MEGA VPN availability, available in the pro plan -->
     <string name="account_cancel_account_screen_plan_mega_vpn">MEGA&#160;VPN</string>
     <!-- Row label for call and meeting duration in the comparison table -->
-    <string name="account_cancel_account_screen_plan_call_meeting_duration">通話和會議長度</string>
+    <string name="account_cancel_account_screen_plan_call_meeting_duration">通話和會議時間</string>
     <!-- Call and meeting duration limit in the free plan -->
     <string name="account_cancel_account_screen_plan_call_meeting_duration_free">長達1小時</string>
     <!-- Unlimited call and meeting duration available in the pro plan -->
     <string name="cancel_account_plan_call_meeting_duration_pro">無限制</string>
     <!-- Row label for call and meeting participants in the comparison table -->
-    <string name="account_cancel_account_plan_call_meeting_participants">通話和會議人數</string>
+    <string name="account_cancel_account_plan_call_meeting_participants">通話和會議與會者</string>
     <!-- Limit on call and meeting participants in the free plan -->
     <string name="account_cancel_account_free_plan_call_meeting_participants">最多100人</string>
     <!-- Unlimited call and meeting participants available in the pro plan -->
@@ -516,10 +448,6 @@
     <string name="account_cancellation_instructions_click_reactivate_subscription">6. 點擊[A]重新啟用訂閱[/A]。</string>
     <!-- Label for cancellation instructions on a mobile device -->
     <string name="account_cancellation_instructions_on_mobile_device">在行動裝置上</string>
-    <!-- Step 1: instruction step no.1 to visit the MEGA website on the mobile device-->
-    <string name="account_cancellation_instructions_mobile_visit_website">1. 在網頁瀏覽器中造訪[A]www.mega.nz[/A]。</string>
-    <!-- Step 2: instruction step no.2 to Log in to MEGA account on the mobile device from the browser-->
-    <string name="account_cancellation_instructions_mobile_login_account">2. 登入您的MEGA帳戶。</string>
     <!-- Step 3: instruction step no.3 Tap on the user avatar on the MEGA website from the mobile device-->
     <string name="account_cancellation_instructions_tap_avatar">3. 點選您的大頭貼。</string>
     <!-- Step 4: instruction step no.4 Tap Cancel subscription on the account from the MEGA website from the mobile device-->
@@ -550,10 +478,6 @@
     <string name="transfers_scanning_folders_dialog_starting_transfers_title">開始傳輸⋯</string>
     <!-- Transfers scanning folders dialog info to explain why the app shouldn't be closed -->
     <string name="transfers_scanning_folders_dialog_cancel_info_subtitle">請不要關閉應用程式。如果關閉，未在佇列中的傳輸將遺失。</string>
-    <!-- Transfers scanning folders dialog sub-title when the app is scanning a single folder-->
-    <plurals name="transfers_scanning_folders_dialog_scanning_folder_subtitle">
-        <item quantity="other">找到1個資料夾和%1$d個檔案。</item>
-    </plurals>
     <!-- Transfers scanning folders dialog sub-title when the app is scanning multiple folders. This is the folders pluralization part to implement double pluralization in transfers_scanning_folders_dialog_scanning_files_and_folders_subtitle. Example: "134 folders". Example with double pluralization in transfers_scanning_folders_dialog_scanning_files_and_folders_subtitle: "Found 134 folders and 5689 files."-->
     <plurals name="transfers_scanning_folders_dialog_scanning_folders_subtitle">
         <item quantity="other">%1$d個資料夾</item>
@@ -568,8 +492,6 @@
     <string name="settings_sync_clear_debris_dialog_title">要清除同步碎片嗎？</string>
     <!-- Body of the dialog shown when user clicks to clear debris from settings menu -->
     <string name="settings_sync_clear_debris_dialog_body">同步檔案的先前版本的備份將從您的裝置中永久刪除。\n\n檢查本地裝置中的.debris資料夾，看看是否需要恢復任何內容。</string>
-    <!-- Cancel button of the dialog shown when user clicks to clear debris from settings menu -->
-    <string name="settings_sync_clear_debris_dialog_cancel">取消</string>
     <!-- Continue button of the dialog shown when user clicks to clear debris from settings menu -->
     <string name="settings_sync_clear_debris_dialog_continue">繼續</string>
     <!-- Snackbar message shown when user clears debris from settings menu -->
@@ -578,8 +500,6 @@
     <plurals name="transfers_scanning_folders_dialog_scanning_files_and_folders_subtitle">
         <item quantity="other">找到%1$s個和%2$d檔案。</item>
     </plurals>
-    <!-- Label for the file info information screen no tags label -->
-    <string name="file_info_information_no_tags_label">沒有標籤</string>
     <!-- Transfers scanning folders dialog title to inform that the transfers are being cancelled -->
     <string name="transfers_scanning_folders_dialog_cancel_cancelling_title">正在取消傳輸⋯</string>
     <!-- error warning message for report issue when not enough characters are typed and user tries to send report-->
@@ -666,16 +586,10 @@
     <string name="sync_promotion_bottom_sheet_whats_new_label">有什麼新功能</string>
     <!-- Title of the bottom sheet to promote Sync feature -->
     <string name="sync_promotion_bottom_sheet_title">輕鬆，自動的同步</string>
-    <!-- Body message of the bottom sheet to promote Sync feature -->
-    <string name="sync_promotion_bottom_sheet_body_message">將您裝置上的資料夾與MEGA同步，以便在任何地方存取您檔案的最新版本</string>
     <!-- Text of the primary button of the bottom sheet to promote Sync feature for Pro users ("Sync folders") -->
     <string name="sync_promotion_bottom_sheet_primary_button_text_pro">同步資料夾</string>
-    <!-- Text of the primary button of the bottom sheet to promote Sync feature for Free users ("Upgrade") -->
-    <string name="sync_promotion_bottom_sheet_primary_button_text_free">升級以使用同步</string>
-    <!-- Text of the secondary button of the bottom sheet to promote Sync feature ("Learn more") -->
-    <string name="sync_promotion_bottom_sheet_secondary_button_text">瞭解更多</string>
-    <!-- Sync option dialog cancel button -->
-    <string name="settings_sync_option_cancel">取消</string>
+    <!-- Text of the secondary button of the bottom sheet to promote Sync feature ("Back up folders") -->
+    <string name="sync_promotion_bottom_sheet_secondary_button_text">備份資料夾</string>
     <!-- Snackbar message displayed when sync option is selected -->
     <string name="settings_sync_option_updated_message">同步選項已更新</string>
     <!-- Title of the Contact Permission Explanation -->
@@ -694,10 +608,6 @@
     <string name="device_center_add_sync_button_option">新增同步</string>
     <!-- Label for the button or menu option to add a backup -->
     <string name="device_center_add_backup_button_option">新增備份</string>
-    <!-- Title of the upgrade dialog displayed for free accounts when try to add a new sync or backup -->
-    <string name="device_center_sync_backup_upgrade_dialog_title">升級您的帳戶</string>
-    <!-- Message of the upgrade dialog displayed for free accounts when try to add a new sync or backup -->
-    <string name="device_center_sync_backup_upgrade_dialog_message">透過我們優質的方案，釋放您行動裝置的能力，將其同步和備份到雲端儲存</string>
     <!-- Title of the share meeting link bottom panel -->
     <string name="meetings_share_link_bottom_sheet_title">會議確認：邀請其他人加入</string>
     <!-- Button text of the send meeting link to chat -->
@@ -734,8 +644,6 @@
     <string name="sync_backup_access_storage_permission_dialog_message">要備份您的檔案，MEGA需要存取您裝置上的檔案和資料夾。您的資料在我們這裡始終是安全的。</string>
     <!-- Text for the warning banner displayed if try to create a new backup but storage permission has not been granted. The placeholders are to underline text -->
     <string name="sync_add_new_backup_storage_permission_banner">MEGA需要存取您的裝置儲存空間，以便備份您的本地資料夾。 [U]點選授予存取權限[/U]</string>
-    <!--Success message displayed in the Login screen after the account has been activated-->
-    <string name="login_screen_account_confirmed_success_message">您的帳戶已通過認證。請登入帳戶以開始使用。</string>
     <!-- Title in the files permission screen -->
     <string name="files_permission_screen_title">允許MEGA存取您裝置的檔案</string>
     <!-- Context message in the files permission screen -->
@@ -752,8 +660,6 @@
     <string name="sync_snackbar_message_confirm_sync_stopped">同步已停止</string>
     <!-- Title of the dialog to confirm stop a backup -->
     <string name="sync_stop_backup_confirm_dialog_title">停止備份</string>
-    <!-- Message of the dialog to confirm stop a backup -->
-    <string name="sync_stop_backup_confirm_dialog_message">這將停止兩個資料夾之間的同步進程。將建立一個副本並將其儲存到您的雲端硬碟。</string>
     <!-- Label for the button to stop a backup -->
     <string name="sync_stop_backup_button">停止備份</string>
     <!-- Snackbar message to indicate that backup has been stopped -->
@@ -768,10 +674,6 @@
     <string name="device_center_sync_backup_list_empty_state_title">沒有設定連線</string>
     <!-- Message of the synced folder list empty state -->
     <string name="device_center_sync_backup_list_empty_state_message">將裝置上的資料夾與MEGA上的資料夾同步或備份</string>
-    <!-- Message of the synced folder list empty state for free accounts -->
-    <string name="device_center_sync_backup_list_empty_state_message_free_account">升級為高級帳戶，透過同步和備份來保護您的重要資訊並維持在最新狀態</string>
-    <!-- Synced folder list empty state "See upgrade options" button label -->
-    <string name="device_center_sync_backup_see_upgrade_options_button_label">檢視升級選項</string>
     <!-- subtitle of meeting title in schedule meeting for title disclaimer -->
     <string name="meetings_schedule_meeting_meeting_title_disclaimer">MEGA可以看到您的會議名稱和描述，但我們會將其保密</string>
     <!-- Capital letters. Text of the label of a new historic notifications-->
@@ -782,12 +684,10 @@
     <string name="display_over_other_apps_permission_screen_message">MEGA需要您的許可才能顯示在其它應用程式的上方。這意味著您將永遠不會錯過另一個來電通知。</string>
     <!-- Positive action button when permission is not granted and it's required for some feature. Clicking it will redirect to settings screen of device -->
     <string name="general_allow_permission_positive_button">允許權限</string>
-    <!-- Message displayed with progress percentage while the app is doing some background operation -->
-    <string name="login_completing_operation">完成進度：%1$d%%</string>
     <!-- Title for a warning dialog informing the account is in storage over quota and cannot upload anything unless it is upgraded -->
     <string name="dialog_not_enough_space_to_upload_title">空間不足，無法上傳新檔案</string>
     <!-- Message for a warning dialog informing the account is in storage over quota and cannot upload anything unless it is upgraded. Please do not remove the placeholders, it is for highlighting the text as a link. -->
-    <string name="dialog_not_enough_space_to_upload_message">您已超出儲存配額。升級到更大空間的方案，或清理一些空間來上傳新檔案。瞭解更多。</string>
+    <string name="dialog_not_enough_space_to_upload_message">您已超出儲存配額。升級到更高的方案，或釋放一些空間來上傳新的檔案。[A]瞭解更多[/A]。</string>
     <!-- Name for a general button which action is navigate to the "Upgrade" account -->
     <string name="general_upgrade_button">升級</string>
     <!-- Photos search welcome title -->
@@ -808,4 +708,240 @@
     <plurals name="album_add_to_message">
         <item quantity="other">已新增%2$d個項目到「%1$s」</item>
     </plurals>
+    <!-- Name for a general button which action is "Open" something -->
+    <string name="general_open_button">開啟</string>
+    <!-- Bottom sheet option title for add the video to playlist from video section -->
+    <string name="video_section_bottom_sheet_option_title_add_to_playlist">新增到播放列表</string>
+    <!-- Message of the dialog to confirm stop a backup -->
+    <string name="sync_stop_backup_confirm_dialog_text">要停止備份此資料夾，您需要移動或刪除它。</string>
+    <!-- Move option of the dialog to confirm stop a backup -->
+    <string name="sync_stop_backup_confirm_dialog_move_option">移動資料夾</string>
+    <!-- Explanatory text for the move option of the dialog to confirm stop a backup -->
+    <string name="sync_stop_backup_confirm_dialog_move_option_text">將此資料夾移到另一個位置以獲得對您的資料的完全存取權限。</string>
+    <!-- Delete option of the dialog to confirm stop a backup -->
+    <string name="sync_stop_backup_confirm_dialog_delete_option">永久刪除資料夾</string>
+    <!-- Explanatory text for the delete option of the dialog to confirm stop a backup -->
+    <string name="sync_stop_backup_confirm_dialog_delete_option_text">資料夾將從MEGA中刪除。它不會從您的裝置中刪除。</string>
+    <!-- Name for a general button which action is "Confirm" something -->
+    <string name="general_confirm_button">確認</string>
+    <!-- The failed Message when adding the video to the playlists from the video section. -->
+    <string name="video_section_playlists_add_to_playlists_failed_message">無法新增項目</string>
+    <!-- Text of the add button in the page that adds the video to the video playlist -->
+    <string name="video_to_playlist_add_button">新增</string>
+    <!-- The success Message when adding the video to the playlists from the video section. -->
+    <plurals name="video_section_playlists_add_to_playlists_successfully_message">
+        <item quantity="other">已新增1個項目到「%1$d」播放列表</item>
+    </plurals>
+    <!-- Name for a general label which action is "Select" something -->
+    <string name="general_select">選擇</string>
+    <!-- Name for a general label which action is "Select folder" -->
+    <string name="general_select_folder">選擇資料夾</string>
+    <!-- Clickable label text to select the destination for the move option of the dialog to confirm stop a backup. Keep the placeholders because "[B][/B]" are in order to make the text clickable and "%1s" in order to display the selected folder name. -->
+    <string name="sync_stop_backup_confirm_dialog_move_option_select_destination">移至：[B]%1s[/B]</string>
+    <!-- Message shown to user when app is connected to the MEGA server -->
+    <string name="login_connected_to_server">已連線到伺服器</string>
+    <!-- User Alert notification for scheduled recurring meeting changes -->
+    <string name="meetings_notification_subtitle_scheduled_recurring_meeting_scheduled_changes">[A]%s[/A][B]已將週期性會議詳細資訊更新為[/B]</string>
+    <!-- User Alert notification for scheduled recurring meeting hour change -->
+    <string name="meetings_notification_subtitle_scheduled_recurring_meeting_hour_changed">[A]%s[/A][B]已將週期性會議的時間更新為[/B]</string>
+    <!-- User Alert notification for scheduled recurring meeting date of the week change -->
+    <string name="meetings_notification_subtitle_scheduled_recurring_meeting_date_of_the_week_changed">[A]%s[/A][B]已將週期性會議的日期更新為[/B]</string>
+    <!-- User Alert notification for scheduled recurring meeting multiple fields change -->
+    <string name="meetings_notification_subtitle_scheduled_recurring_meeting_multiple_fields_changed">[A]%s[/A][B]已將會議更新為[/B]</string>
+    <!-- User Alert notification for canceled occurrences of a scheduled recurring meeting -->
+    <string name="meetings_notification_subtitle_scheduled_recurring_meeting_occurrence_canceled">[A]%s[/A][B]已取消排定以下時間的事件[/B]</string>
+    <!-- User Alert notification for scheduled recurring meeting occurrence change -->
+    <string name="meetings_notification_subtitle_scheduled_recurring_meeting_updated_occurrence">[A]%s[/A][B]已更新一個事件為[/B]</string>
+    <!-- User Alert notification for scheduled meeting date change -->
+    <string name="meetings_notification_subtitle_scheduled_meeting_updated_date">[A]%s[/A][B]已將會議日期更新為[/B]</string>
+    <!-- User Alert notification for scheduled meeting time change -->
+    <string name="meetings_notification_subtitle_scheduled_meeting_updated_time">[A]%s[/A][B]已將會議時間更新為[/B]</string>
+    <!-- User Alert notification for canceled scheduled meeting -->
+    <string name="meetings_notification_subtitle_scheduled_meeting_canceled">[A]%s[/A][B]已取消排定以下時間的會議[/B]</string>
+    <!-- Title of the ads free introduction screen -->
+    <string name="payment_ads_free_intro_title">Want MEGA without the ads?</string>
+    <!-- Description of the ads free introduction screen -->
+    <string name="payment_ads_free_intro_description">Upgrade to a Pro plan with plenty of storage and more. Our Pro plans start at just %1$s a month.</string>
+    <!-- The Generous storage label in the ads free introduction screen -->
+    <string name="payment_ads_free_intro_generous_storage_label">大容量儲存空間</string>
+    <!-- The Generous storage description in the ads free introduction screen -->
+    <string name="payment_ads_free_intro_generous_storage_description">儲存無限資料，從%1$s起。</string>
+    <!-- The Transfer sharing label in the ads free introduction screen -->
+    <string name="payment_ads_free_intro_transfer_sharing_label">傳輸流量共享</string>
+    <!-- The Transfer sharing description in the ads free introduction screen -->
+    <string name="payment_ads_free_intro_transfer_sharing_description">與您共享資料的人可以使用您的傳輸配額來下載您共享的項目。</string>
+    <!-- The additional security label in the ads free introduction screen -->
+    <string name="payment_ads_free_intro_additional_security_label">MEGA&#160;Pass和MEGA&#160;VPN</string>
+    <!-- The additional security description in the ads free introduction screen -->
+    <string name="payment_ads_free_intro_additional_security_description">為檔案和資料夾連結設定密碼和到期日期。</string>
+    <!-- The button text view pro plan in the ads free introduction screen -->
+    <string name="payment_ads_free_intro_button_view_pro_plan">查看Pro方案</string>
+    <!-- Label for call option on settings -->
+    <string name="settings_calls_title">通話</string>
+    <!-- Label for the sound notifications option on calls settings -->
+    <string name="settings_calls_sound_notifications_title">提示音通知</string>
+    <!-- Text for the sound notifications option on calls settings -->
+    <string name="settings_calls_sound_notifications_body">當有人加入或離開通話時播放提示音。</string>
+    <!-- Text of the remove favourite option of the Favourites playlist bottom sheet  -->
+    <string name="favourites_playlist_bottom_sheet_option_remove_favourite">移除收藏</string>
+    <!-- The empty hint of the Favourites playlist -->
+    <string name="favourites_playlist_empty_hint">沒有收藏</string>
+    <!-- Message to enter confirm password -->
+    <string name="general_confirm_your_password">確認您的密碼</string>
+    <!-- The Screen Toolbar Title for configuring the scan settings -->
+    <string name="document_scanning_settings_toolbar_title">掃描設定</string>
+    <!-- Title of the camera setting screen -->
+    <string name="camera_settings_title">相機設定</string>
+    <!-- Title of the save location in the camera setting screen -->
+    <string name="camera_settings_save_location_title">儲存位置</string>
+    <!-- Description of the save location in the camera setting screen -->
+    <string name="camera_settings_save_location_description">為照片和影片啟用地理標記功能</string>
+    <!-- Message when user denies location permission in the camera setting screen -->
+    <string name="camera_settings_save_location_permission_denied">允許MEGA存取此裝置的位置以繼續</string>
+    <!-- Warning message to indicate that cannot select a currently synced folder -->
+    <string name="sync_local_device_folder_currently_synced_message">此資料夾已同步</string>
+    <!-- Warning message to indicate that cannot select a currently backed up folder -->
+    <string name="sync_local_device_folder_currently_backed_up_message">此資料夾已備份</string>
+    <!-- The name of every users root drive in the cloud of MEGA. -->
+    <string name="general_section_cloud_drive">雲端硬碟</string>
+    <!-- App Bar Title in of Cloud Drive Bottom Menu -->
+    <string name="general_drive">硬碟</string>
+    <!-- Tab bar title of Syncs tab -->
+    <string name="general_syncs">同步</string>
+    <!-- Text under the syncs list -->
+    <string name="syncs_tab_view_other_devices">在裝置中心查看其它裝置</string>
+    <!-- The snackbar message of you and others raised your hands -->
+    <plurals name="transfers_completed_read_error_retrying">
+        <item quantity="other"></item>
+    </plurals>
+    <!-- Warning shown to the user when tries to retry a cancelled or failed transfer but it cannot be retried because app does not have read permission over the file anymore -->
+    <string name="transfers_completed_one_read_error_retrying">由於MEGA無法再存取該檔案，您的上傳無法完成或重試。</string>
+    <!-- Warning shown to the user when tries to retry some or all of cancelled or failed transfer but they cannot be retried because app does not have read permission over the files anymore -->
+    <string name="transfers_completed_some_read_error_retrying">由於MEGA無法再存取這些檔案，您的部分或全部的上傳無法完成或重試</string>
+    <!-- Title for Offline Folder exposed via SAF -->
+    <string name="general_mega_offline">MEGA離線檔案</string>
+    <!-- Notification content for download final notification. It will inform the user about the location where file/s were downloaded -->
+    <string name="transfers_notification_location_content">位置：%1$s</string>
+    <!-- Notification action for download final notification. It will open the file explorer activity to show the destination folder -->
+    <string name="transfers_notification_location_action">前往下載位置</string>
+    <!-- Notification content for download final notification in case of a single file downloaded. -->
+    <string name="transfers_notification_title_single_download">已下載「%1$s」</string>
+    <!-- Label for the button or menu option to add a new backup -->
+    <string name="device_center_sync_add_new_backup_button_option">加入新的備份</string>
+    <!-- Notification content for download final notification in case of a single file downloaded to preview. -->
+    <string name="transfers_notification_title_preview_download">「%1$s」預覽已就緒</string>
+    <!-- Notification action for download final notification. It will open a dialog with installed apps which can open the file -->
+    <string name="transfers_notification_preview_action">預覽</string>
+    <!-- Title for the OS dialog shown with available apps to open a file -->
+    <string name="open_with_os_dialog_title">使用以下方式開啟「%1$s」</string>
+    <!-- The Scan Confirmation screen error message shown when the new filename does not contain the file extension that was selected -->
+    <string name="document_scanning_settings_missing_file_extension_error_message">缺少副檔名（%s）</string>
+    <!-- The Scan Confirmation screen error message shown when the filename does not end with the expected file extension -->
+    <string name="document_scanning_settings_non_matching_file_extension_error_message">副檔名與檔案類型不匹配</string>
+    <!-- The Scan Confirmation screen error message shown when the filename has no file extension -->
+    <string name="document_scanning_settings_file_extension_required_error_message">需要副檔名</string>
+    <!-- Alert text before download a file for preview. Please do not modify the %s placeholder as it will be replaced by the size to be donwloaded -->
+    <string name="alert_larger_file_preview">為了預覽此檔案，MEGA需要下載它。將下載%1$s。</string>
+    <!-- Message displayed with progress percentage while the app is doing some background operation -->
+    <string name="login_completing_operation">完成進度：%1$d%%</string>
+    <!-- Add to album files existed message -->
+    <plurals name="album_add_to_files_existed">
+        <item quantity="other">這些檔案已存在於「%1$s」中，無法再次新增</item>
+    </plurals>
+    <!-- Add to album partial added message -->
+    <plurals name="album_add_to_partial_added_message">
+        <item quantity="other">已新增%2$d個檔案到「%1$s」中。有些檔案已經存在，無法再次新增。</item>
+    </plurals>
+    <!--Content on the Multi-Factor Authentication Login page -->
+    <string name="multi_factor_auth_login_verification_content">輸入您身份驗證器應用程式中的6位數字代碼。</string>
+    <!--Message to be shown to the user when they entered an incorrect verification code-->
+    <string name="multi_factor_auth_login_verification_input_error_text">驗證碼不正確</string>
+    <!-- Snackbar text to inform the user that preview may take some time because it needs to be downloaded -->
+    <string name="transfers_preview_slow_snackbar">正在準備檔案預覽。詳情請參考通知。</string>
+    <!-- Notification text for preview downloads.  Please do not modify the %s placeholder as it will be replaced by the name of the file to be donwloaded -->
+    <string name="transfers_notification_downloading_preview">正在準備預覽%1$s</string>
+    <!-- Notification text for preview downloads, paused state.  Please do not modify the %s placeholder as it will be replaced by the name of the file to be donwloaded -->
+    <string name="transfers_notification_downloading_preview_paused">正在準備預覽%1$s（暫停）</string>
+    <!-- Message when successfully deleting single item from the audio queue. %1$s will be replaced with the item name -->
+    <string name="audio_queue_single_item_removed_message">已移除「%1$s」</string>
+    <!-- Message when successfully deleting items from the audio queue. %1$d will be replaced with the removal count when multiple items are removed. -->
+    <string name="audio_queue_multiple_items_removed_message">Removed %1$d items from queue</string>
+    <!-- Message when successfully deleting items from the audio queue. %1$s will be replaced with the item name %2$d will be replaced with the removal count. -->
+    <plurals name="audio_queue_items_removal_success_message">
+        <item quantity="other">已從佇列中移除%2$d個項目</item>
+    </plurals>
+    <!-- Title for the dialog to inform that a transfer is needed to preview a file and transfers are paused-->
+    <string name="transfers_preview_paused_dialog_title">傳輸暫停</string>
+    <!-- Message for the dialog to inform that a transfer is needed to preview a file and transfers are paused-->
+    <string name="transfers_preview_paused_dialog_text">若要預覽「%1$s」，您需要恢復暫停的傳輸</string>
+    <!--SD Card text shown as title in FileStorage screen -->
+    <string name="general_sd_card">SD記憶卡</string>
+    <!--The title of the Login page-->
+    <string name="login_page_title">登入您的MEGA帳戶</string>
+    <!--Message to be shown to the user when they entered an invalid email-->
+    <string name="login_invalid_email_error_message">請輸入有效的電子郵件地址</string>
+    <!--Message to be shown to the user when they entered an invalid format password-->
+    <string name="login_invalid_password_error_message">請輸入您的密碼</string>
+    <!--Message to be shown to the user when they entered the wrong credential-->
+    <string name="login_wrong_credential_error_message">無效的電子郵件地址或密碼</string>
+    <!--Message to be shown to he user when the account is not validated -->
+    <string name="login_account_not_validated">您未完成帳戶註冊或已取消。檢查您的電子郵件收件匣。</string>
+    <!--Message to be shown to the user when login fails due to multiple failed attempts-->
+    <string name="login_too_many_attempts_error_message">您嘗試登入的次數過多。請稍候再試。</string>
+    <!--The footer text to be shown where a user can sign up if they do not have a MEGA account-->
+    <string name="login_page_sign_up_action_footer_text">沒有MEGA帳戶？[A]註冊[/A]</string>
+    <!-- Title of setting Two-Factor Authentication -->
+    <string name="settings_2fa">雙重驗證</string>
+    <!-- email label -->
+    <string name="email_text">電子郵件地址</string>
+    <!-- password label -->
+    <string name="password_text">密碼</string>
+    <!-- Login button -->
+    <string name="login_text">登&#160;入</string>
+    <!--The text where user forgot their password and will navigate to reset it-->
+    <string name="login_page_forgot_password_text">忘記密碼？</string>
+    <!-- Sync state up to date -->
+    <string name="sync_list_sync_state_disabled">停用</string>
+    <!-- Name of the Camera uploads feature -->
+    <string name="general_camera_uploads">相機上傳</string>
+    <!-- Name of the Camera uploads feature -->
+    <string name="general_media_uploads">媒體上傳</string>
+    <!-- Generic settings label text -->
+    <string name="general_settings">設定</string>
+    <!-- Ad settings label in the cookie settings page -->
+    <string name="settings_cookie_settings_label_ad_settings">廣告設定</string>
+    <!-- Ads personalization label in the cookie settings page -->
+    <string name="settings_cookie_settings_label_ads_personalization">廣告個人化</string>
+    <!-- Cookie settings title in the cookie settings page -->
+    <string name="settings_cookie_setting_title_cookie_and_ad_settings">Cookie和廣告設定</string>
+    <!-- Body text of the bottom sheet to promote Sync feature. The placeholders are to underline text -->
+    <string name="sync_promotion_bottom_sheet_body_text">將您裝置上的資料夾與MEGA上的資料夾同步或備份。[U]瞭解更多[/U]</string>
+    <!-- This is the final button when creating a folder in the dialog where the user inserts the folder name -->
+    <string name="transfers_cancel_download_warning_title">取消上傳？</string>
+    <!-- Confirmation message informing a download was successfully cancelled -->
+    <string name="transfers_cancel_download_success_message">Download cancelled</string>
+    <!-- Title of note to self chat -->
+    <string name="chat_note_to_self_chat_title">隱私記事</string>
+    <!-- First message header in note to self chat -->
+    <string name="chat_note_to_self_chat_first_message_header">自我保存的私隱</string>
+    <!-- First message description in note to self chat -->
+    <string name="chat_note_to_self_chat_first_message_description">將敏感資訊、圖片、影片或下一個天馬行空的想法發送給自己。它們會在您的所有裝置上同步，並受到零知識加密的保護。</string>
+    <!-- Add to album some files exist message -->
+    <plurals name="album_add_to_files_exist_message">
+        <item quantity="other">已新增%2$d個檔案到「%1$s」。重複的檔案無法再次新增。</item>
+    </plurals>
+    <!-- Snack bar message informing that profile's QR code is uploaded to the Cloud Drive-->
+    <string name="transfers_start_upload_profile_qr_code_message">正在將%1$s保存到雲端硬碟⋯</string>
+    <!-- Warning shown after trying to cancel a download, but the request failed -->
+    <string name="transfers_error_cancelling_download">出了點問題。下載未被取消。</string>
+    <!-- Body for the subscription details section, which is shown to the Indian user to provide details about subscription. This string is shown if user selects yearly subscription and the amount is more than Rs.15,000. Please keep these placeholders [A], [/A], [B], [/B], [C], [/C]. They will be used to format the string. -->
+    <string name="account_upgrade_account_subscription_details_body_yearly_with_price_for_indian">You will be charged %1$s immediately but your subscription will not automatically renew after 12 months due to government regulations. It will be your responsibility to renew your subscription after it has expired. You can manage or cancel your subscription anytime via Subscriptions in [A]Google&#160;Play[/A]. By upgrading your account, you agree to MEGA’s [B]Terms of Service[/B] and [C]Privacy and Data Policy[/C].</string>
+    <!-- The name of the Device or Folder Status which signifies that it is currently uploading -->
+    <string name="device_center_list_view_item_status_uploading">正在上傳⋯</string>
+    <!-- The name of the Device or Folder Status which signifies that it is currently uploading with a percentage completion -->
+    <string name="device_center_list_view_item_status_uploading_with_progress">%1$d%%正在上傳⋯</string>
+    <!-- The name of the Device or Folder Status which signifies that it is inactive -->
+    <string name="device_center_list_view_item_status_inactive">非活躍</string>
+    <!-- The name of the Device or Folder Status which signifies that some action is needed -->
+    <string name="device_center_list_view_item_status_attention_needed">需要注意</string>
 </resources>

@@ -2,71 +2,32 @@ package mega.privacy.android.data.repository
 
 import android.content.Context
 import android.net.Uri
-import android.provider.DocumentsContract
 import android.webkit.MimeTypeMap
 import androidx.core.net.toFile
 import androidx.core.net.toUri
-import androidx.documentfile.provider.DocumentFile
 import dagger.hilt.android.qualifiers.ApplicationContext
 import kotlinx.coroutines.CoroutineDispatcher
-import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.NonCancellable
 import kotlinx.coroutines.flow.Flow
-import kotlinx.coroutines.flow.MutableStateFlow
-import kotlinx.coroutines.flow.catch
-import kotlinx.coroutines.flow.filter
-import kotlinx.coroutines.flow.filterIsInstance
 import kotlinx.coroutines.flow.flowOn
-import kotlinx.coroutines.launch
-import kotlinx.coroutines.suspendCancellableCoroutine
+import kotlinx.coroutines.sync.Mutex
+import kotlinx.coroutines.sync.withLock
 import kotlinx.coroutines.withContext
-import mega.privacy.android.data.cache.Cache
-import mega.privacy.android.data.constant.CacheFolderConstant
-import mega.privacy.android.data.extensions.failWithError
-import mega.privacy.android.data.extensions.getFileName
-import mega.privacy.android.data.extensions.getRequestListener
+import mega.privacy.android.data.extensions.toUri
 import mega.privacy.android.data.gateway.CacheGateway
 import mega.privacy.android.data.gateway.DeviceGateway
 import mega.privacy.android.data.gateway.FileAttributeGateway
 import mega.privacy.android.data.gateway.FileGateway
-import mega.privacy.android.data.gateway.MegaLocalStorageGateway
 import mega.privacy.android.data.gateway.SDCardGateway
-import mega.privacy.android.data.gateway.api.MegaApiFolderGateway
-import mega.privacy.android.data.gateway.api.MegaApiGateway
-import mega.privacy.android.data.gateway.api.MegaChatApiGateway
-import mega.privacy.android.data.gateway.api.StreamingGateway
-import mega.privacy.android.data.listener.OptionalMegaRequestListenerInterface
-import mega.privacy.android.data.listener.OptionalMegaTransferListenerInterface
-import mega.privacy.android.data.mapper.ChatFilesFolderUserAttributeMapper
 import mega.privacy.android.data.mapper.FileTypeInfoMapper
-import mega.privacy.android.data.mapper.MegaExceptionMapper
-import mega.privacy.android.data.mapper.SortOrderIntMapper
-import mega.privacy.android.data.mapper.node.NodeMapper
-import mega.privacy.android.data.mapper.shares.ShareDataMapper
-import mega.privacy.android.data.mapper.transfer.AppDataTypeConstants
-import mega.privacy.android.data.model.GlobalUpdate
-import mega.privacy.android.data.qualifier.FileVersionsOption
+import mega.privacy.android.data.wrapper.DocumentFileWrapper
 import mega.privacy.android.domain.entity.FileTypeInfo
 import mega.privacy.android.domain.entity.document.DocumentEntity
 import mega.privacy.android.domain.entity.document.DocumentFolder
 import mega.privacy.android.domain.entity.node.FileNode
-import mega.privacy.android.domain.entity.node.Node
-import mega.privacy.android.domain.entity.node.NodeId
-import mega.privacy.android.domain.entity.node.ViewerNode
 import mega.privacy.android.domain.entity.uri.UriPath
-import mega.privacy.android.domain.exception.MegaException
-import mega.privacy.android.domain.exception.NullFileException
-import mega.privacy.android.domain.qualifier.ApplicationScope
 import mega.privacy.android.domain.qualifier.IoDispatcher
 import mega.privacy.android.domain.repository.FileSystemRepository
-import nz.mega.sdk.MegaError
-import nz.mega.sdk.MegaError.API_ENOENT
-import nz.mega.sdk.MegaError.API_OK
-import nz.mega.sdk.MegaNode
-import nz.mega.sdk.MegaRequest
-import nz.mega.sdk.MegaTransfer.COLLISION_CHECK_FINGERPRINT
-import nz.mega.sdk.MegaTransfer.COLLISION_RESOLUTION_NEW_WITH_N
-import nz.mega.sdk.MegaUser
 import timber.log.Timber
 import java.io.File
 import java.io.FileNotFoundException
@@ -74,227 +35,43 @@ import java.io.IOException
 import java.net.URI
 import java.net.URLConnection
 import javax.inject.Inject
+import javax.inject.Singleton
 
 /**
+
  * Default implementation of [FileSystemRepository]
  *
  * @property context
- * @property megaApiGateway
- * @property megaApiFolderGateway
- * @property megaChatApiGateway
  * @property ioDispatcher
- * @property megaLocalStorageGateway
- * @property shareDataMapper
- * @property megaExceptionMapper
- * @property sortOrderIntMapper
  * @property cacheGateway
- * @property nodeMapper
  * @property fileTypeInfoMapper
  * @property fileGateway
- * @property chatFilesFolderUserAttributeMapper
- * @property streamingGateway
  * @property sdCardGateway
  * @property fileAttributeGateway
  */
+@Singleton
 internal class FileSystemRepositoryImpl @Inject constructor(
     @ApplicationContext private val context: Context,
-    private val megaApiGateway: MegaApiGateway,
-    private val megaApiFolderGateway: MegaApiFolderGateway,
-    private val megaChatApiGateway: MegaChatApiGateway,
     @IoDispatcher private val ioDispatcher: CoroutineDispatcher,
-    private val megaLocalStorageGateway: MegaLocalStorageGateway,
-    private val shareDataMapper: ShareDataMapper,
-    private val megaExceptionMapper: MegaExceptionMapper,
-    private val sortOrderIntMapper: SortOrderIntMapper,
     private val cacheGateway: CacheGateway,
-    private val nodeMapper: NodeMapper,
     private val fileTypeInfoMapper: FileTypeInfoMapper,
     private val fileGateway: FileGateway,
-    private val chatFilesFolderUserAttributeMapper: ChatFilesFolderUserAttributeMapper,
-    @FileVersionsOption private val fileVersionsOptionCache: Cache<Boolean>,
-    private val streamingGateway: StreamingGateway,
     private val deviceGateway: DeviceGateway,
     private val sdCardGateway: SDCardGateway,
     private val fileAttributeGateway: FileAttributeGateway,
-    @ApplicationScope private val sharingScope: CoroutineScope,
+    private val documentFileWrapper: DocumentFileWrapper,
 ) : FileSystemRepository {
 
-    init {
-        monitorChatsFilesFolderIdChanges()
-    }
-
-    private var myChatsFilesFolderIdFlow: MutableStateFlow<NodeId?> = MutableStateFlow(null)
-
+    private val moveSdDocumentMutex = Mutex()
 
     override val localDCIMFolderPath: String
         get() = fileGateway.localDCIMFolderPath
-
-
-    @Deprecated(
-        "ViewerNode should be replaced by [TypedNode], there's a similar use-case to download any type of [TypedNode] and receive a flow of the progress: StartDownloadUseCase. Please add [TransferAppData.BackgroundTransfer] to avoid this transfers to be added in the counters of the DownloadService notification",
-        replaceWith = ReplaceWith("StartDownloadUseCase")
-    )
-    override suspend fun downloadBackgroundFile(viewerNode: ViewerNode): String =
-        withContext(ioDispatcher) {
-            getMegaNode(viewerNode)?.let { node ->
-                val file = cacheGateway.getCacheFile(
-                    CacheFolderConstant.TEMPORARY_FOLDER,
-                    node.getFileName()
-                ) ?: throw NullFileException()
-                suspendCancellableCoroutine { continuation ->
-                    val listener = OptionalMegaTransferListenerInterface(
-                        onTransferFinish = { _, error ->
-                            if (error.errorCode == API_OK) {
-                                continuation.resumeWith(Result.success(file.absolutePath))
-                            } else {
-                                continuation.failWithError(error, "downloadBackgroundFile")
-                            }
-                        }
-                    )
-                    megaApiGateway.startDownload(
-                        node = node,
-                        localPath = file.absolutePath,
-                        fileName = file.name,
-                        appData = AppDataTypeConstants.BackgroundTransfer.sdkTypeValue,
-                        startFirst = true,
-                        cancelToken = null,
-                        collisionCheck = COLLISION_CHECK_FINGERPRINT,
-                        collisionResolution = COLLISION_RESOLUTION_NEW_WITH_N,
-                        listener = listener
-                    )
-                }
-            } ?: throw NullPointerException()
-        }
-
-    @Deprecated(
-        message = "ViewerNode should be replaced by [TypedNode], there's a mapper to get the corresponding [MegaNode] from any [TypedNode]: MegaNodeMapper",
-        replaceWith = ReplaceWith("MegaNodeMapper"),
-    )
-    private suspend fun getMegaNode(viewerNode: ViewerNode): MegaNode? = withContext(ioDispatcher) {
-        when (viewerNode) {
-            is ViewerNode.ChatNode -> getMegaNodeFromChat(viewerNode)
-            is ViewerNode.FileLinkNode -> MegaNode.unserialize(viewerNode.serializedNode)
-            is ViewerNode.FolderLinkNode -> getMegaNodeFromFolderLink(viewerNode)
-            is ViewerNode.GeneralNode -> megaApiGateway.getMegaNodeByHandle(viewerNode.id)
-        }
-    }
-
-    private suspend fun getMegaNodeFromChat(chatNode: ViewerNode.ChatNode) =
-        withContext(ioDispatcher) {
-            with(chatNode) {
-                val messageChat = megaChatApiGateway.getMessage(chatId, messageId)
-                    ?: megaChatApiGateway.getMessageFromNodeHistory(chatId, messageId)
-
-                if (messageChat != null) {
-                    val node = messageChat.megaNodeList.get(0)
-                    val chat = megaChatApiGateway.getChatRoom(chatId)
-
-                    if (chat?.isPreview == true) {
-                        megaApiGateway.authorizeChatNode(node, chat.authorizationToken)
-                    } else {
-                        node
-                    }
-                } else null
-            }
-        }
-
-    private suspend fun getMegaNodeFromFolderLink(folderLinkNode: ViewerNode.FolderLinkNode) =
-        withContext(ioDispatcher) {
-            megaApiFolderGateway.getMegaNodeByHandle(folderLinkNode.id)?.let {
-                megaApiFolderGateway.authorizeNode(it)
-            }
-        }
 
     override suspend fun getOfflinePath() =
         withContext(ioDispatcher) { fileGateway.getOfflineFilesRootPath() }
 
     override suspend fun getOfflineBackupsPath() =
         withContext(ioDispatcher) { fileGateway.getOfflineFilesBackupsRootPath() }
-
-    override suspend fun setMyChatFilesFolder(nodeHandle: Long) = withContext(ioDispatcher) {
-        suspendCancellableCoroutine { continuation ->
-            val listener = continuation.getRequestListener("setMyChatFilesFolder") {
-                myChatsFilesFolderIdFlow.value = NodeId(nodeHandle)
-                chatFilesFolderUserAttributeMapper(it.megaStringMap)?.let { value ->
-                    megaApiGateway.base64ToHandle(value)
-                        .takeIf { handle -> handle != megaApiGateway.getInvalidHandle() }
-                }
-            }
-            megaApiGateway.setMyChatFilesFolder(nodeHandle, listener)
-        }
-    }
-
-    override suspend fun getMyChatsFilesFolderId(): NodeId? =
-        myChatsFilesFolderIdFlow.value ?: run {
-            getMyChatsFilesFolderIdFromGateway()
-        }
-
-    private suspend fun getMyChatsFilesFolderIdFromGateway(): NodeId? = withContext(ioDispatcher) {
-        runCatching {
-            suspendCancellableCoroutine { continuation ->
-                val listener = continuation.getRequestListener("getMyChatFilesFolder") {
-                    NodeId(it.nodeHandle)
-                }
-                megaApiGateway.getMyChatFilesFolder(listener)
-
-            }
-        }.getOrElse {
-            //if error is API_ENOENT it means folder is not set, not an actual error. Otherwise re-throw the error
-            if ((it as? MegaException)?.errorCode != API_ENOENT) {
-                throw (it)
-            } else {
-                null
-            }
-        }?.also {
-            myChatsFilesFolderIdFlow.value = it
-        }
-    }
-
-    private fun monitorChatsFilesFolderIdChanges() {
-        sharingScope.launch {
-            megaApiGateway.globalUpdates
-                .filterIsInstance<GlobalUpdate.OnUsersUpdate>()
-                .filter {
-                    val currentUserHandle = megaApiGateway.myUser?.handle
-                    it.users?.any { user ->
-                        user.isOwnChange == 0
-                                && user.hasChanged(MegaUser.CHANGE_TYPE_MY_CHAT_FILES_FOLDER.toLong())
-                                && user.handle == currentUserHandle
-                    } == true
-                }
-                .catch { Timber.e(it) }
-                .flowOn(ioDispatcher)
-                .collect {
-                    runCatching {
-                        getMyChatsFilesFolderIdFromGateway()
-                    }.onFailure {
-                        Timber.e(it)
-                    }
-                }
-        }
-    }
-
-
-    override suspend fun getFileVersionsOption(forceRefresh: Boolean): Boolean =
-        fileVersionsOptionCache.get()?.takeUnless { forceRefresh }
-            ?: fetchFileVersionsOption().also {
-                fileVersionsOptionCache.set(it)
-            }
-
-    private suspend fun fetchFileVersionsOption(): Boolean = withContext(ioDispatcher) {
-        return@withContext suspendCancellableCoroutine { continuation ->
-            val listener = OptionalMegaRequestListenerInterface(
-                onRequestFinish = { request: MegaRequest, error: MegaError ->
-                    when (error.errorCode) {
-                        API_OK -> continuation.resumeWith(Result.success(request.flag))
-                        API_ENOENT -> continuation.resumeWith(Result.success(false))
-                        else -> continuation.failWithError(error, "fetchFileVersionsOption")
-                    }
-                }
-            )
-            megaApiGateway.getFileVersionsOption(listener)
-        }
-    }
 
     override suspend fun getLocalFile(fileNode: FileNode) = withContext(ioDispatcher) {
         fileGateway.getLocalFile(
@@ -306,12 +83,6 @@ internal class FileSystemRepositoryImpl @Inject constructor(
 
     override suspend fun getFileByPath(path: String): File? = withContext(ioDispatcher) {
         fileGateway.getFileByPath(path)
-    }
-
-    override suspend fun getFileStreamingUri(node: Node) = withContext(ioDispatcher) {
-        megaApiGateway.getMegaNodeByHandle(node.id.longValue)?.let {
-            streamingGateway.getLocalLink(it)
-        }
     }
 
     override suspend fun createTempFile(
@@ -351,10 +122,6 @@ internal class FileSystemRepositoryImpl @Inject constructor(
             cacheGateway.getCameraUploadsCacheFolder()
         }
 
-    override suspend fun getFingerprint(filePath: String) = withContext(ioDispatcher) {
-        megaApiGateway.getFingerprint(filePath)
-    }
-
     override suspend fun doesFolderExists(folderPath: String) = withContext(ioDispatcher) {
         fileGateway.isFileAvailable(folderPath)
     }
@@ -385,23 +152,40 @@ internal class FileSystemRepositoryImpl @Inject constructor(
             fileGateway.getExternalPathByContentUri(uri)
         }
 
+    override suspend fun getAbsolutePathByContentUri(uri: String): String? =
+        withContext(ioDispatcher) {
+            documentFileWrapper.getAbsolutePathFromContentUri(uri.toUri())
+        }
+
     override suspend fun getGuessContentTypeFromName(localPath: String): String? =
         withContext(ioDispatcher) {
             URLConnection.guessContentTypeFromName(localPath)
         }
 
-    override suspend fun getVideoGPSCoordinates(filePath: String): Pair<Double, Double>? =
+    override suspend fun getContentTypeFromContentUri(uriPath: UriPath): String? =
         withContext(ioDispatcher) {
-            fileAttributeGateway.getVideoGPSCoordinates(filePath)
+            context.contentResolver.getType(uriPath.toUri())
         }
 
-    override suspend fun getPhotoGPSCoordinates(filePath: String): Pair<Double, Double>? =
+    override suspend fun getVideoGPSCoordinates(uriPath: UriPath): Pair<Double, Double>? =
         withContext(ioDispatcher) {
-            fileAttributeGateway.getPhotoGPSCoordinates(filePath)
+            if (uriPath.isPath()) {
+                fileAttributeGateway.getVideoGPSCoordinates(uriPath.value)
+            } else {
+                fileAttributeGateway.getVideoGPSCoordinates(uriPath.toUri(), context)
+            }
         }
 
-    override suspend fun escapeFsIncompatible(fileName: String, dstPath: String): String? =
-        withContext(ioDispatcher) { megaApiGateway.escapeFsIncompatible(fileName, dstPath) }
+    override suspend fun getPhotoGPSCoordinates(uriPath: UriPath): Pair<Double, Double>? =
+        withContext(ioDispatcher) {
+            if (uriPath.isPath()) {
+                fileAttributeGateway.getPhotoGPSCoordinates(uriPath.value)
+            } else {
+                fileGateway.getInputStream(uriPath)?.let { inputStream ->
+                    fileAttributeGateway.getPhotoGPSCoordinates(inputStream)
+                }
+            }
+        }
 
     override suspend fun setLastModified(path: String, timestamp: Long) =
         withContext(ioDispatcher) {
@@ -448,8 +232,8 @@ internal class FileSystemRepositoryImpl @Inject constructor(
             }
         }
 
-    override suspend fun isSDCardPath(localPath: String) = withContext(ioDispatcher) {
-        sdCardGateway.doesFolderExists(localPath)
+    override suspend fun isSDCardPathOrUri(localPath: String) = withContext(ioDispatcher) {
+        sdCardGateway.doesFolderExists(localPath) || sdCardGateway.isSDCardUri(localPath)
     }
 
     override suspend fun isSDCardCachePath(localPath: String) = withContext(ioDispatcher) {
@@ -461,12 +245,9 @@ internal class FileSystemRepositoryImpl @Inject constructor(
         destinationUri: UriPath,
     ) = withContext(ioDispatcher) {
         val uri = destinationUri.value.toUri()
-        val isTreeUri = DocumentsContract.isTreeUri(uri)
-        val destination = if (isTreeUri) {
-            DocumentFile.fromTreeUri(context, uri)
-        } else {
-            DocumentFile.fromSingleUri(context, uri)
-        } ?: throw FileNotFoundException("Content uri doesn't exist: $destinationUri")
+        val destination = documentFileWrapper.fromUri(uri)
+            ?: throw FileNotFoundException("Content uri doesn't exist: $destinationUri")
+
         fileGateway.copyFilesToDocumentFolder(source, destination)
     }
 
@@ -481,54 +262,66 @@ internal class FileSystemRepositoryImpl @Inject constructor(
         file: File,
         destinationUri: String,
         subFolders: List<String>,
-    ) =
-        withContext(ioDispatcher) {
-            val sourceDocument = DocumentFile.fromFile(file)
-            val sdCardUri = Uri.parse(destinationUri)
+    ) = withContext(ioDispatcher) {
+        val sourceDocument = documentFileWrapper.fromFile(file)
+        val sdCardUri = Uri.parse(destinationUri)
 
-            val destDocument = getSdDocumentFile(
+        val destDocument = moveSdDocumentMutex.withLock {
+            documentFileWrapper.getSdDocumentFile(
                 sdCardUri,
                 subFolders,
                 file.name,
                 MimeTypeMap.getSingleton().getMimeTypeFromExtension(file.extension)
                     ?: "application/octet-stream"
             )
+        }
 
-            try {
-                if (destDocument != null) {
-                    val inputStream =
-                        context.contentResolver.openInputStream(sourceDocument.uri)
-                    val outputStream =
-                        context.contentResolver.openOutputStream(destDocument.uri)
+        try {
+            if (destDocument != null) {
+                val inputStream =
+                    context.contentResolver.openInputStream(sourceDocument.uri)
+                val outputStream =
+                    context.contentResolver.openOutputStream(destDocument.uri)
 
-                    inputStream?.use { input ->
-                        outputStream?.use { output ->
-                            input.copyTo(output)
-                        }
+                inputStream?.use { input ->
+                    outputStream?.use { output ->
+                        input.copyTo(output)
                     }
-                    file.delete()
-                    return@withContext true
                 }
-            } catch (e: IOException) {
-                e.printStackTrace()
+                file.delete()
+                return@withContext true
             }
-            return@withContext false
+        } catch (e: IOException) {
+            e.printStackTrace()
+        }
+        return@withContext false
+    }
+
+    override suspend fun moveDirectoryToSd(
+        directory: File,
+        destinationUri: String,
+    ): Boolean = withContext(ioDispatcher) {
+        val directorySdCardStringUri = Uri.parse(destinationUri)?.let { sdCardUri ->
+            moveSdDocumentMutex.withLock {
+                documentFileWrapper.fromUri(sdCardUri)?.let {
+                    it.findFile(directory.name) ?: it.createDirectory(directory.name)
+                }?.uri?.toString()
+            }
+        } ?: run {
+            Timber.w("Error getting SD card uri")
+            null
         }
 
-    private fun getSdDocumentFile(
-        folderUri: Uri,
-        subFolders: List<String>,
-        fileName: String,
-        mimeType: String,
-    ): DocumentFile? {
-        var folderDocument = DocumentFile.fromTreeUri(context, folderUri)
-
-        subFolders.forEach { folder ->
-            folderDocument =
-                folderDocument?.findFile(folder) ?: folderDocument?.createDirectory(folder)
+        directory.listFiles()?.forEach { childFile ->
+            if (childFile.isDirectory) {
+                directorySdCardStringUri?.let { moveDirectoryToSd(childFile, it) }
+                    ?: Timber.w("Error moving directory to SD card")
+            } else {
+                moveFileToSd(childFile, destinationUri, listOf(directory.name))
+            }
         }
-        folderDocument?.findFile(fileName)?.delete()
-        return folderDocument?.createFile(mimeType, fileName)
+
+        return@withContext directory.delete()
     }
 
     override suspend fun createNewImageUri(fileName: String): String? = withContext(ioDispatcher) {
@@ -623,19 +416,16 @@ internal class FileSystemRepositoryImpl @Inject constructor(
             fileGateway.copyUriToDocumentFolder(
                 name = name,
                 source = source.value.toUri(),
-                destination = DocumentFile.fromFile(destination)
+                destination = documentFileWrapper.fromFile(destination)
             )
         }
 
     override suspend fun copyUri(name: String, source: UriPath, destination: UriPath) =
         withContext(ioDispatcher) {
             val uri = destination.value.toUri()
-            val isTreeUri = DocumentsContract.isTreeUri(uri)
-            val destinationUri = if (isTreeUri) {
-                DocumentFile.fromTreeUri(context, uri)
-            } else {
-                DocumentFile.fromSingleUri(context, uri)
-            } ?: throw FileNotFoundException("Content uri doesn't exist: $destination")
+            val destinationUri = documentFileWrapper.fromUri(uri)
+                ?: throw FileNotFoundException("Content uri doesn't exist: $destination")
+
             fileGateway.copyUriToDocumentFolder(
                 name = name,
                 source = source.value.toUri(),
@@ -651,12 +441,9 @@ internal class FileSystemRepositoryImpl @Inject constructor(
 
     override suspend fun getDocumentFileName(uri: UriPath): String = withContext(ioDispatcher) {
         val rawUri = uri.value.toUri()
-        val isTreeUri = DocumentsContract.isTreeUri(rawUri)
-        val document = if (isTreeUri) {
-            DocumentFile.fromTreeUri(context, rawUri)
-        } else {
-            DocumentFile.fromSingleUri(context, rawUri)
-        } ?: throw FileNotFoundException("Content uri doesn't exist: $rawUri")
+        val document = documentFileWrapper.fromUri(rawUri)
+            ?: throw FileNotFoundException("Content uri doesn't exist: $rawUri")
+
         document.name.orEmpty()
     }
 
@@ -664,6 +451,9 @@ internal class FileSystemRepositoryImpl @Inject constructor(
         withContext(ioDispatcher) {
             fileGateway.getDocumentEntities(uris.map { Uri.parse(it.value) })
         }
+
+    override suspend fun getDocumentEntity(uri: UriPath): DocumentEntity? =
+        getDocumentEntities(listOf(uri)).firstOrNull()
 
     override suspend fun getFileFromUri(uri: UriPath): File? = withContext(ioDispatcher) {
         fileGateway.getFileFromUri(Uri.parse(uri.value))?.also {
@@ -683,5 +473,26 @@ internal class FileSystemRepositoryImpl @Inject constructor(
         if (fileGateway.renameFile(oldFile, newFilename)) fileGateway.deleteFile(oldFile)
 
         newFile
+    }
+
+    override suspend fun getFileLengthFromSdCardContentUri(
+        fileContentUri: String,
+    ) = Uri.parse(fileContentUri)?.let { uri ->
+        documentFileWrapper.fromSingleUri(uri)?.length() ?: 0L
+    } ?: 0L
+
+    override suspend fun deleteFileFromSdCardContentUri(fileContentUri: String) =
+        Uri.parse(fileContentUri)?.let { uri ->
+            documentFileWrapper.fromSingleUri(uri)?.delete() ?: false
+        } ?: false
+
+    override suspend fun canReadUri(stringUri: String) =
+        fileGateway.canReadUri(stringUri)
+
+    override suspend fun getOfflineFilesRootFolder(): File =
+        File(fileGateway.getOfflineFilesRootPath())
+
+    override suspend fun getFileStorageTypeName(path: String?) = withContext(ioDispatcher) {
+        fileGateway.getFileStorageTypeName(path)
     }
 }

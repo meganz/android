@@ -4,22 +4,14 @@
 	<item
 		android:id="@android:id/background">
 		<shape>
-			<gradient
-				android:startColor="@color/grey_012_white_023"
-				android:centerColor="@color/grey_012_white_023"
-				android:centerY="0.50"
-				android:endColor="@color/grey_012_white_023"
-				android:angle="270" />
+			<gradient android:color="@color/grey_012_white_023" />
 		</shape>
 	</item>
 	<item
 		android:id="@android:id/progress">
 		<clip>
 			<shape>
-				<gradient
-					android:startColor="@color/amber_600_amber_300"
-					android:endColor="@color/amber_600_amber_300"
-					android:angle="90" />
+				<solid android:color="@color/color_support_warning" />
 			</shape>
 		</clip>
 	</item>

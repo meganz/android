@@ -1,6 +1,7 @@
 package mega.privacy.android.shared.sync.featuretoggles
 
 import mega.privacy.android.domain.entity.Feature
+import mega.privacy.android.domain.featuretoggle.FeatureFlagValuePriority
 import mega.privacy.android.domain.featuretoggle.FeatureFlagValueProvider
 
 
@@ -18,16 +19,6 @@ enum class SyncFeatures(
 ) : Feature {
 
     /**
-     * Backup for Android feature flag
-     *
-     * Activate this flag if you want to enable the Backup for Android feature
-     */
-    BackupForAndroid(
-        "Enable the Backup for Android feature",
-        false
-    ),
-
-    /**
      * Sync Frequency feature flag
      *
      * Activate this flag if you want to set a custom sync frequency in settings
@@ -40,5 +31,7 @@ enum class SyncFeatures(
     companion object : FeatureFlagValueProvider {
         override suspend fun isEnabled(feature: Feature) =
             entries.firstOrNull { it == feature }?.defaultValue
+
+        override val priority = FeatureFlagValuePriority.Default
     }
 }

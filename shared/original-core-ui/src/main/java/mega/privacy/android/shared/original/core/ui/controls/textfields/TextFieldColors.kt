@@ -24,5 +24,5 @@ internal fun textFieldColors(showIndicatorLine: Boolean = true) = TextFieldDefau
 @Composable
 internal fun customTextSelectionColors() = TextSelectionColors(
     handleColor = MegaOriginalTheme.colors.border.strongSelected,
-    backgroundColor = MegaOriginalTheme.colors.border.strongSelected
+    backgroundColor = MegaOriginalTheme.colors.button.secondaryPressed
 )

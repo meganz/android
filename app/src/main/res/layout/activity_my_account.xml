@@ -21,4 +21,9 @@
         app:navGraph="@navigation/my_account"
         android:layout_below="@+id/toolbar"/>
 
+    <androidx.compose.ui.platform.ComposeView
+        android:id="@+id/logout_confirmation_dialog_compose_view"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent" />
+
 </RelativeLayout>

@@ -1,14 +1,17 @@
 package mega.privacy.android.app.presentation.meeting.chat.model
 
 import androidx.compose.runtime.Composable
+import com.google.mlkit.vision.documentscanner.GmsDocumentScanner
 import de.palm.composestateevents.StateEventWithContent
 import de.palm.composestateevents.consumed
 import mega.privacy.android.app.presentation.documentscanner.model.DocumentScanningError
-import mega.privacy.android.app.presentation.documentscanner.model.HandleScanDocumentResult
 import mega.privacy.android.app.presentation.transfers.starttransfer.model.TransferTriggerEvent
 import mega.privacy.android.domain.entity.ChatRoomPermission
 import mega.privacy.android.domain.entity.StorageState
+import mega.privacy.android.domain.entity.call.CallCompositionChanges
 import mega.privacy.android.domain.entity.call.ChatCall
+import mega.privacy.android.domain.entity.call.ChatCallChanges
+import mega.privacy.android.domain.entity.call.ChatCallStatus
 import mega.privacy.android.domain.entity.chat.ChatHistoryLoadStatus
 import mega.privacy.android.domain.entity.chat.ChatRoom
 import mega.privacy.android.domain.entity.chat.ChatScheduledMeeting
@@ -58,8 +61,7 @@ import mega.privacy.android.shared.original.core.ui.controls.chat.messages.react
  * @property reactionList List of reactions.
  * @property pendingAction The pending action.
  * @property addingReactionTo The id of the message to which a reaction is being added.
- * @property handleScanDocumentResult State Event which decides if the legacy or modern Document
- * Scanner should be used
+ * @property gmsDocumentScanner The prepared ML Kit Document Scanner
  * @property documentScanningError The specific Error returned when using the modern Document Scanner
  */
 data class ChatUiState(
@@ -103,7 +105,7 @@ data class ChatUiState(
     val reactionList: List<UIReaction> = emptyList(),
     val pendingAction: (@Composable () -> Unit)? = null,
     val addingReactionTo: Long? = null,
-    val handleScanDocumentResult: StateEventWithContent<HandleScanDocumentResult> = consumed(),
+    val gmsDocumentScanner: StateEventWithContent<GmsDocumentScanner> = consumed(),
     val documentScanningError: DocumentScanningError? = null,
 ) {
 
@@ -182,4 +184,19 @@ data class ChatUiState(
      * True if the chat is a waiting room, false otherwise.
      */
     val isWaitingRoom = chat?.isWaitingRoom == true
+
+    /**
+     * Check if I'm participating in the call with another client
+     */
+    val isParticipatingWithAnotherClient = myUserHandle?.let {
+        callInThisChat?.peerIdParticipants?.contains(it) == true && callInThisChat.status == ChatCallStatus.UserNoPresent
+    }
+
+    /**
+     * Check if the one-to-one call is ending
+     */
+    val isOneToOneCallBeingEnded = chat?.isOneToOneChat == true &&
+            callInThisChat?.changes?.contains(ChatCallChanges.CallComposition) == true &&
+            callInThisChat.callCompositionChange == CallCompositionChanges.Removed &&
+            (callInThisChat.peerIdCallCompositionChange == myUserHandle || callInThisChat.numParticipants == 0)
 }

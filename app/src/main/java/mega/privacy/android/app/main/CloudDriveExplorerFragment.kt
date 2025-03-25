@@ -1,5 +1,6 @@
 package mega.privacy.android.app.main
 
+import mega.privacy.android.icon.pack.R as iconPackR
 import mega.privacy.android.shared.resources.R as sharedR
 import android.os.Bundle
 import android.text.Spanned
@@ -32,18 +33,17 @@ import mega.privacy.android.app.databinding.FragmentFileexplorerlistBinding
 import mega.privacy.android.app.domain.usecase.search.LegacySearchUseCase
 import mega.privacy.android.app.fragments.homepage.EventObserver
 import mega.privacy.android.app.fragments.homepage.SortByHeaderViewModel
+import mega.privacy.android.app.main.FileExplorerActivity.Companion.ACTION_SAVE_TO_CLOUD
 import mega.privacy.android.app.main.FileExplorerActivity.Companion.CLOUD_FRAGMENT
+import mega.privacy.android.app.main.adapters.FileExplorerPagerAdapter.Companion.TAB_POSITION_INCOMING
 import mega.privacy.android.app.main.adapters.MegaExplorerAdapter
 import mega.privacy.android.app.main.adapters.RotatableAdapter
 import mega.privacy.android.app.main.managerSections.RotatableFragment
 import mega.privacy.android.app.search.callback.SearchCallback
-import mega.privacy.android.app.utils.ColorUtils
-import mega.privacy.android.app.utils.ColorUtils.DARK_IMAGE_ALPHA
 import mega.privacy.android.app.utils.Constants.INVALID_VALUE
 import mega.privacy.android.app.utils.Constants.SCROLLING_UP_DIRECTION
 import mega.privacy.android.app.utils.TextUtil.formatEmptyScreenText
 import mega.privacy.android.app.utils.Util.getPreferences
-import mega.privacy.android.app.utils.Util.isScreenInPortrait
 import mega.privacy.android.data.database.DatabaseHandler
 import mega.privacy.android.data.mapper.SortOrderIntMapper
 import mega.privacy.android.data.qualifier.MegaApi
@@ -257,7 +257,7 @@ class CloudDriveExplorerFragment : RotatableFragment(), CheckScrollInterface, Se
 
         binding.actionText.setOnClickListener { buttonClicked() }
         binding.cancelText.setOnClickListener {
-            (requireActivity() as FileExplorerActivity).finishAndRemoveTask()
+            (requireActivity() as? FileExplorerActivity)?.handleBackNavigation()
         }
         binding.cancelText.text = getString(sharedR.string.general_dialog_cancel_button)
         binding.fabSelect.setOnClickListener { buttonClicked() }
@@ -347,12 +347,12 @@ class CloudDriveExplorerFragment : RotatableFragment(), CheckScrollInterface, Se
         }
 
         initOriginalData()
-        fileExplorerViewModel.init()
+        fileExplorerViewModel.initCloudDriveExplorerContent()
 
         when (modeCloud) {
             FileExplorerActivity.MOVE,
             FileExplorerActivity.COPY,
-            -> {
+                -> {
                 binding.actionText.text = getString(
                     if (modeCloud == FileExplorerActivity.MOVE)
                         R.string.context_move
@@ -450,7 +450,23 @@ class CloudDriveExplorerFragment : RotatableFragment(), CheckScrollInterface, Se
      */
     private fun initOriginalData() =
         lifecycleScope.launch {
-            val chosenNode = withContext(ioDispatcher) { megaApi.getNodeByHandle(parentHandle) }
+            val chosenNode = withContext(ioDispatcher) {
+                when (fileExplorerActivity.mode) {
+                    FileExplorerActivity.COPY -> {
+                        megaApi.getNodeByHandle(parentHandle)
+                            .takeIf { fileExplorerViewModel.latestCopyTargetPathTab == FileExplorerActivity.CLOUD_TAB }
+                    }
+
+                    FileExplorerActivity.MOVE -> {
+                        megaApi.getNodeByHandle(parentHandle)
+                            .takeIf { fileExplorerViewModel.latestMoveTargetPathTab == FileExplorerActivity.CLOUD_TAB }
+                    }
+
+                    else -> {
+                        megaApi.getNodeByHandle(parentHandle)
+                    }
+                }
+            }
             ensureActive()
             if (chosenNode != null && chosenNode.type != MegaNode.TYPE_ROOT) {
                 updateChildNodes(chosenNode)
@@ -491,17 +507,9 @@ class CloudDriveExplorerFragment : RotatableFragment(), CheckScrollInterface, Se
         megaApi.rootNode?.handle.let { rootHandle ->
             binding.fileListEmptyImage.setImageResource(
                 if (rootHandle == parentHandle) {
-                    if (isScreenInPortrait(requireContext())) {
-                        R.drawable.ic_empty_cloud_drive
-                    } else {
-                        R.drawable.cloud_empty_landscape
-                    }
+                    iconPackR.drawable.ic_empty_cloud_glass
                 } else {
-                    if (isScreenInPortrait(requireContext())) {
-                        R.drawable.ic_zero_portrait_empty_folder
-                    } else {
-                        R.drawable.ic_zero_landscape_empty_folder
-                    }
+                    iconPackR.drawable.ic_empty_folder_glass
                 }
             )
             binding.fileListEmptyTextFirst.text = if (rootHandle == parentHandle) {
@@ -509,11 +517,6 @@ class CloudDriveExplorerFragment : RotatableFragment(), CheckScrollInterface, Se
             } else {
                 emptyGeneralText
             }
-            ColorUtils.setImageViewAlphaIfDark(
-                requireContext(),
-                binding.fileListEmptyImage,
-                DARK_IMAGE_ALPHA
-            )
         }
     }
 
@@ -677,45 +680,54 @@ class CloudDriveExplorerFragment : RotatableFragment(), CheckScrollInterface, Se
             Timber.d("onBackPressed")
             if (selectFile && activity.isMultiselect && adapter.multipleSelected)
                 hideMultipleSelect()
+            val parentNode = megaApi.getParentNode(megaApi.getNodeByHandle(parentHandle))
+                ?: when {
+                    activity.intent.action == ACTION_SAVE_TO_CLOUD -> {
+                        megaApi.rootNode?.takeIf { parentHandle != it.handle }?.also {
+                            fileExplorerActivity.setCurrentTab(TAB_POSITION_INCOMING)
+                        }
+                    }
 
-            megaApi.getParentNode(megaApi.getNodeByHandle(parentHandle))?.let { parentNode ->
-                if (modeCloud == FileExplorerActivity.SELECT)
-                    activateButton(shouldShowOptionsBar(parentNode))
-
-                setParentHandle(parentNode.handle)
-                if (parentNode.type == MegaNode.TYPE_ROOT)
-                    activity.hideTabs(false, CLOUD_FRAGMENT)
-
-                activity.changeTitle()
-
-                if (modeCloud == FileExplorerActivity.MOVE || modeCloud == FileExplorerActivity.COPY) {
-                    activity.parentMoveCopy()?.let {
-                        activateButton(it.handle != parentNode.handle)
-                    } ?: activateButton(true)
+                    else -> null
                 }
 
-                recyclerView.isVisible = true
-                binding.fileListEmptyImage.isVisible = false
-                binding.fileListEmptyText.isVisible = false
+            if (parentNode == null) return 0
 
-                updateNodesByAdapter(megaApi.getChildren(parentNode, order))
-                var lastVisiblePosition = 0
-                if (lastPositionStack.isNotEmpty()) {
-                    lastVisiblePosition = lastPositionStack.pop()
-                    Timber.d("Pop of the stack $lastVisiblePosition position")
-                }
-                Timber.d("Scroll to $lastVisiblePosition position")
+            if (modeCloud == FileExplorerActivity.SELECT)
+                activateButton(shouldShowOptionsBar(parentNode))
 
-                if (lastVisiblePosition >= 0) {
-                    if (sortByHeaderViewModel.isListView()) {
-                        listLayoutManager
-                    } else {
-                        gridLayoutManager
-                    }?.scrollToPositionWithOffset(lastVisiblePosition, 0)
-                }
+            setParentHandle(parentNode.handle)
+            if (parentNode.type == MegaNode.TYPE_ROOT)
+                activity.hideTabs(false, CLOUD_FRAGMENT)
 
-                2
-            } ?: 0
+            activity.changeTitle()
+
+            if (modeCloud == FileExplorerActivity.MOVE || modeCloud == FileExplorerActivity.COPY) {
+                activity.parentMoveCopy()?.let {
+                    activateButton(modeCloud == FileExplorerActivity.COPY || it.handle != parentNode.handle)
+                } ?: activateButton(true)
+            }
+
+            recyclerView.isVisible = true
+            binding.fileListEmptyImage.isVisible = false
+            binding.fileListEmptyText.isVisible = false
+
+            updateNodesByAdapter(megaApi.getChildren(parentNode, order))
+            var lastVisiblePosition = 0
+            if (lastPositionStack.isNotEmpty()) {
+                lastVisiblePosition = lastPositionStack.pop()
+                Timber.d("Pop of the stack $lastVisiblePosition position")
+            }
+            Timber.d("Scroll to $lastVisiblePosition position")
+
+            if (lastVisiblePosition >= 0) {
+                if (sortByHeaderViewModel.isListView()) {
+                    listLayoutManager
+                } else {
+                    gridLayoutManager
+                }?.scrollToPositionWithOffset(lastVisiblePosition, 0)
+            }
+            2
         }
 
     private fun setParentHandle(handle: Long) {
@@ -731,7 +743,7 @@ class CloudDriveExplorerFragment : RotatableFragment(), CheckScrollInterface, Se
     /**
      * Update nodes by adapter
      *
-     * @param data original nodes
+     * @param sourceData original nodes
      */
     fun updateNodesByAdapter(sourceData: List<MegaNode?>) {
         val data = if (fileExplorerViewModel.showHiddenItems) {

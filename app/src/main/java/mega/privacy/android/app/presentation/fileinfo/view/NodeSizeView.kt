@@ -5,7 +5,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.stringResource
 import mega.privacy.android.app.R
-import mega.privacy.android.shared.original.core.ui.theme.OriginalTempTheme
+import mega.privacy.android.shared.original.core.ui.theme.OriginalTheme
 import mega.privacy.android.shared.original.core.ui.preview.CombinedTextAndThemePreviews
 
 /**
@@ -28,7 +28,7 @@ internal fun NodeSizeView(
 @CombinedTextAndThemePreviews
 @Composable
 private fun NodeSizePreview() {
-    OriginalTempTheme(isDark = isSystemInDarkTheme()) {
+    OriginalTheme(isDark = isSystemInDarkTheme()) {
         NodeSizeView(forFolder = true, sizeString = "1024 Bytes")
     }
 }

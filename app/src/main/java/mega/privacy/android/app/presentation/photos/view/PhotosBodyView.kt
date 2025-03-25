@@ -117,7 +117,7 @@ fun PhotosTabs(
             indicator = { tabPositions: List<TabPosition> ->
                 TabRowDefaults.Indicator(
                     modifier = Modifier.tabIndicatorOffset(tabPositions[selectedTabIndex]),
-                    color = colorResource(id = R.color.red_600_red_300)
+                    color = colorResource(id = R.color.color_border_brand)
                 )
             },
             backgroundColor = Color.Transparent,
@@ -136,7 +136,7 @@ fun PhotosTabs(
                             fontWeight = FontWeight.Medium
                         )
                     },
-                    selectedContentColor = colorResource(id = R.color.red_600_red_300),
+                    selectedContentColor = colorResource(id = R.color.color_border_brand),
                     unselectedContentColor = colorResource(id = R.color.grey_054_white_054)
                 )
             }
@@ -195,4 +195,3 @@ fun LazyGridState.isScrolledToEnd() = remember(this) {
         layoutInfo.visibleItemsInfo.lastOrNull()?.index == layoutInfo.totalItemsCount - 1
     }
 }
-

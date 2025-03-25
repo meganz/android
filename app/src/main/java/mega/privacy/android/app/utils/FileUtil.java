@@ -24,7 +24,6 @@ import android.provider.MediaStore;
 import android.text.TextUtils;
 import android.webkit.MimeTypeMap;
 
-import androidx.annotation.Nullable;
 import androidx.core.content.FileProvider;
 
 import java.io.File;
@@ -544,46 +543,6 @@ public class FileUtil {
         shareIntent.putExtra(Intent.EXTRA_STREAM, uri);
         shareIntent.addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION);
         context.startActivity(Intent.createChooser(shareIntent, context.getString(R.string.context_share)));
-    }
-
-    /**
-     * The full path of a SD card URI has two parts:
-     * 1. SD card root path, can get it from SDCardOperator. For example: /storage/2BA3-12F1.
-     * 2. User selected specific folder path on the SD card, can get it from getDocumentPathFromTreeUri.
-     *
-     * @param treeUri The URI of the selected SD card location.
-     * @param con     Context object.
-     * @return Path of the selected SD card location.
-     */
-    @Nullable
-    public static String getFullPathFromTreeUri(@Nullable final Uri treeUri, Context con) {
-        if (treeUri == null) return null;
-
-        String volumePath;
-        SDCardOperator operator;
-        try {
-            operator = new SDCardOperator(con);
-        } catch (SDCardOperator.SDCardException e) {
-            Timber.e(e);
-            return null;
-        }
-
-        volumePath = operator.getSDCardRoot();
-
-        if (volumePath == null) return File.separator;
-        if (volumePath.endsWith(File.separator))
-            volumePath = volumePath.substring(0, volumePath.length() - 1);
-
-        String documentPath = getDocumentPathFromTreeUri(treeUri);
-        if (documentPath.endsWith(File.separator))
-            documentPath = documentPath.substring(0, documentPath.length() - 1);
-
-        if (documentPath.length() > 0) {
-            if (documentPath.startsWith(File.separator))
-                return volumePath + documentPath;
-            else
-                return volumePath + File.separator + documentPath;
-        } else return volumePath;
     }
 
     private static String getDocumentPathFromTreeUri(final Uri treeUri) {

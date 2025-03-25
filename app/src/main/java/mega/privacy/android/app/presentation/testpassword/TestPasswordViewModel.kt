@@ -12,7 +12,6 @@ import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import mega.privacy.android.app.R
-import mega.privacy.android.app.globalmanagement.MegaChatRequestHandler
 import mega.privacy.android.app.presentation.testpassword.TestPasswordActivity.Companion.KEY_IS_LOGOUT
 import mega.privacy.android.app.presentation.testpassword.TestPasswordActivity.Companion.KEY_TEST_PASSWORD_MODE
 import mega.privacy.android.app.presentation.testpassword.TestPasswordActivity.Companion.WRONG_PASSWORD_COUNTER
@@ -262,20 +261,6 @@ class TestPasswordViewModel @Inject constructor(
     fun resetPasswordAttemptsState() {
         viewModelScope.launch {
             _uiState.update { it.copy(isUserExhaustedPasswordAttempts = consumed) }
-        }
-    }
-
-    /**
-     * Logout
-     *
-     * logs out the user from mega application and navigates to login activity
-     * logic is handled at [MegaChatRequestHandler] onRequestFinished callback
-     */
-    fun logout() = viewModelScope.launch {
-        runCatching {
-            logoutUseCase()
-        }.onFailure {
-            Timber.d("Error on logout $it")
         }
     }
 

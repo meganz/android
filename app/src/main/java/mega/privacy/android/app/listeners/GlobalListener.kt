@@ -46,13 +46,14 @@ import mega.privacy.android.domain.usecase.GetPricing
 import mega.privacy.android.domain.usecase.account.BroadcastAccountBlockedUseCase
 import mega.privacy.android.domain.usecase.account.BroadcastMyAccountUpdateUseCase
 import mega.privacy.android.domain.usecase.account.GetNotificationCountUseCase
-import mega.privacy.android.domain.usecase.account.SetSecurityUpgradeInApp
+import mega.privacy.android.domain.usecase.account.SetSecurityUpgradeInAppUseCase
 import mega.privacy.android.domain.usecase.billing.GetPaymentMethodUseCase
 import mega.privacy.android.domain.usecase.chat.UpdatePushNotificationSettingsUseCase
 import mega.privacy.android.domain.usecase.chat.link.IsRichPreviewsEnabledUseCase
 import mega.privacy.android.domain.usecase.chat.link.ShouldShowRichLinkWarningUseCase
 import mega.privacy.android.domain.usecase.contact.GetIncomingContactRequestsNotificationListUseCase
 import mega.privacy.android.domain.usecase.notifications.BroadcastHomeBadgeCountUseCase
+import mega.privacy.android.domain.usecase.setting.BroadcastMiscLoadedUseCase
 import nz.mega.sdk.MegaApiAndroid
 import nz.mega.sdk.MegaApiJava
 import nz.mega.sdk.MegaContactRequest
@@ -80,7 +81,7 @@ class GlobalListener @Inject constructor(
     private val getPaymentMethodUseCase: GetPaymentMethodUseCase,
     private val getPricing: GetPricing,
     private val getNumberOfSubscription: GetNumberOfSubscription,
-    private val setSecurityUpgradeInApp: SetSecurityUpgradeInApp,
+    private val setSecurityUpgradeInAppUseCase: SetSecurityUpgradeInAppUseCase,
     private val broadcastMyAccountUpdateUseCase: BroadcastMyAccountUpdateUseCase,
     private val getNotificationCountUseCase: GetNotificationCountUseCase,
     private val broadcastHomeBadgeCountUseCase: BroadcastHomeBadgeCountUseCase,
@@ -89,6 +90,7 @@ class GlobalListener @Inject constructor(
     private val updatePushNotificationSettingsUseCase: UpdatePushNotificationSettingsUseCase,
     private val shouldShowRichLinkWarningUseCase: ShouldShowRichLinkWarningUseCase,
     private val isRichPreviewsEnabledUseCase: IsRichPreviewsEnabledUseCase,
+    private val broadcastMiscLoadedUseCase: BroadcastMiscLoadedUseCase,
 ) : MegaGlobalListenerInterface {
 
     private val globalSyncUpdates = MutableSharedFlow<Unit>()
@@ -177,11 +179,6 @@ class GlobalListener @Inject constructor(
             }
         }
     }
-
-    /**
-     * onReloadNeeded
-     */
-    override fun onReloadNeeded(api: MegaApiJava) {}
 
     /**
      * onAccountUpdate
@@ -282,10 +279,16 @@ class GlobalListener @Inject constructor(
             }
 
             MegaEvent.EVENT_BUSINESS_STATUS -> sendBroadcastUpdateAccountDetails()
-            MegaEvent.EVENT_MISC_FLAGS_READY -> getInstance().checkEnabledCookies()
+            MegaEvent.EVENT_MISC_FLAGS_READY -> {
+                applicationScope.launch {
+                    broadcastMiscLoadedUseCase()
+                }
+                getInstance().checkEnabledCookies()
+            }
+
             MegaEvent.EVENT_RELOADING -> showLoginFetchingNodes()
             MegaEvent.EVENT_UPGRADE_SECURITY -> applicationScope.launch {
-                setSecurityUpgradeInApp(true)
+                setSecurityUpgradeInAppUseCase(true)
             }
         }
     }

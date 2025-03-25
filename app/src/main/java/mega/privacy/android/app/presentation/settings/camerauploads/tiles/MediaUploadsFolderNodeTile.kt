@@ -9,7 +9,7 @@ import androidx.compose.ui.res.stringResource
 import mega.privacy.android.app.R
 import mega.privacy.android.shared.original.core.ui.controls.lists.GenericTwoLineListItem
 import mega.privacy.android.shared.original.core.ui.preview.CombinedThemePreviews
-import mega.privacy.android.shared.original.core.ui.theme.OriginalTempTheme
+import mega.privacy.android.shared.original.core.ui.theme.OriginalTheme
 
 /**
  * A [Composable] that displays the Media Uploads (Secondary Folder) Folder Name from Cloud Drive.
@@ -42,7 +42,7 @@ internal fun MediaUploadsFolderNodeTile(
 @CombinedThemePreviews
 @Composable
 private fun MediaUploadsFolderNodeTileTest() {
-    OriginalTempTheme(isDark = isSystemInDarkTheme()) {
+    OriginalTheme(isDark = isSystemInDarkTheme()) {
         MediaUploadsFolderNodeTile(
             secondaryFolderName = "Media Uploads",
             onItemClicked = {},

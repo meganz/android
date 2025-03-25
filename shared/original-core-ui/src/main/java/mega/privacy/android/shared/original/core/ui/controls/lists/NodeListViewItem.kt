@@ -35,8 +35,8 @@ import mega.privacy.android.shared.original.core.ui.controls.text.LongTextBehavi
 import mega.privacy.android.shared.original.core.ui.controls.text.MegaText
 import mega.privacy.android.shared.original.core.ui.preview.CombinedThemePreviews
 import mega.privacy.android.shared.original.core.ui.theme.MegaOriginalTheme
-import mega.privacy.android.shared.original.core.ui.theme.OriginalTempTheme
-import mega.privacy.android.shared.original.core.ui.theme.values.TextColor
+import mega.privacy.android.shared.original.core.ui.theme.OriginalTheme
+import mega.android.core.ui.theme.values.TextColor
 
 /**
  * Generic two line list item
@@ -174,6 +174,14 @@ fun NodeListViewItem(
                     modifier = Modifier.testTag(LINK_ICON_TAG)
                 )
             }
+            if (isTakenDown) {
+                Icon(
+                    painter = painterResource(id = R.drawable.ic_alert_triangle),
+                    contentDescription = "Dispute taken down",
+                    modifier = Modifier.testTag(TAKEN_DOWN_ICON_TAG),
+                    tint = MegaOriginalTheme.colors.support.error
+                )
+            }
         },
         subTitlePrefixIcons = {
             if (showVersion) {
@@ -226,8 +234,9 @@ fun NodeListViewItem(
         },
         description = {
             description?.let {
-                if (highlightText.isNotBlank()) {
+                if (highlightText.isNotBlank() && it.contains(highlightText, ignoreCase = true)) {
                     HighlightedText(
+                        modifier = Modifier.testTag(DESCRIPTION_TAG),
                         text = description,
                         highlightText = highlightText,
                         highlightFontWeight = FontWeight.Bold,
@@ -240,15 +249,17 @@ fun NodeListViewItem(
             tags?.let {
                 if (highlightText.isNotBlank()) {
                     val tagHighlightText = highlightText.removePrefix("#")
-                    Row(
-                        modifier = Modifier.horizontalScroll(rememberScrollState()),
-                        horizontalArrangement = Arrangement.spacedBy(8.dp)
-                    ) {
-                        tags.forEach { tag ->
-                            HighlightChip(
-                                text = "#$tag",
-                                highlightText = tagHighlightText,
-                            )
+                    if (it.any { tag -> tag.contains(tagHighlightText, ignoreCase = true) }) {
+                        Row(
+                            modifier = Modifier.horizontalScroll(rememberScrollState()).testTag(TAGS_TAG),
+                            horizontalArrangement = Arrangement.spacedBy(8.dp)
+                        ) {
+                            tags.forEach { tag ->
+                                HighlightChip(
+                                    text = "#$tag",
+                                    highlightText = tagHighlightText,
+                                )
+                            }
                         }
                     }
                 }
@@ -303,7 +314,7 @@ private fun Circle(color: Color, modifier: Modifier = Modifier) {
 @CombinedThemePreviews
 @Composable
 private fun GenericNodeListViewItemSimplePreview() {
-    OriginalTempTheme(isDark = isSystemInDarkTheme()) {
+    OriginalTheme(isDark = isSystemInDarkTheme()) {
         NodeListViewItem(
             title = "Simple title",
             subtitle = "Simple sub title",
@@ -315,7 +326,7 @@ private fun GenericNodeListViewItemSimplePreview() {
 @CombinedThemePreviews
 @Composable
 private fun GenericNodeListViewItemHighlightPreview() {
-    OriginalTempTheme(isDark = isSystemInDarkTheme()) {
+    OriginalTheme(isDark = isSystemInDarkTheme()) {
         NodeListViewItem(
             title = "Simple title highlight",
             highlightText = "TITLE",
@@ -328,7 +339,7 @@ private fun GenericNodeListViewItemHighlightPreview() {
 @CombinedThemePreviews
 @Composable
 private fun GenericNodeListItemWithLongTitlePreview() {
-    OriginalTempTheme(isDark = isSystemInDarkTheme()) {
+    OriginalTheme(isDark = isSystemInDarkTheme()) {
         NodeListViewItem(
             title = "Title very big for testing the middle ellipsis",
             subtitle = "Subtitle very big for testing the middle ellipsis",
@@ -347,7 +358,7 @@ private fun GenericNodeListItemWithLongTitlePreview() {
 @CombinedThemePreviews
 @Composable
 private fun GenericNodeListItemPreview() {
-    OriginalTempTheme(isDark = isSystemInDarkTheme()) {
+    OriginalTheme(isDark = isSystemInDarkTheme()) {
         NodeListViewItem(
             title = "Title",
             subtitle = "Subtitle",
@@ -367,7 +378,7 @@ private fun GenericNodeListItemPreview() {
 @CombinedThemePreviews
 @Composable
 private fun GenericNodeListItemWithoutMoreOptionPreview() {
-    OriginalTempTheme(isDark = isSystemInDarkTheme()) {
+    OriginalTheme(isDark = isSystemInDarkTheme()) {
         NodeListViewItem(
             title = "Title",
             subtitle = "Subtitle",
@@ -391,10 +402,14 @@ internal const val SUBTITLE_TAG = "node_list_view_item:subtitle"
 internal const val ICON_TAG = "node_list_view_item:icon"
 internal const val FAVOURITE_ICON_TAG = "node_list_view_item:favourite_icon"
 internal const val LINK_ICON_TAG = "node_list_view_item:link_icon"
+internal const val TAKEN_DOWN_ICON_TAG = "node_list_view_item:taken_down_icon"
 internal const val OFFLINE_ICON_TAG = "node_list_view_item:offline_icon"
 internal const val VERSION_ICON_TAG = "node_list_view_item:version_icon"
 internal const val PERMISSION_ICON_TAG = "node_list_view_item:permission_icon"
 internal const val LABEL_TAG = "node_list_view_item:label"
 internal const val MORE_ICON_TAG = "node_list_view_item:more_icon"
 internal const val SELECTED_TEST_TAG = "node_list_view_item:image_selected"
+internal const val TAGS_TAG = "node_list_view_item:tags"
+internal const val DESCRIPTION_TAG = "node_list_view_item:description"
+
 

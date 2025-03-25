@@ -3,10 +3,7 @@ package mega.privacy.android.app.modalbottomsheet
 import mega.privacy.android.shared.resources.R as sharedR
 import android.content.Context
 import android.content.Intent
-import android.graphics.Bitmap
 import android.net.Uri
-import android.widget.ImageView
-import android.widget.RelativeLayout
 import androidx.appcompat.app.AlertDialog
 import androidx.core.content.FileProvider
 import com.google.android.material.bottomsheet.BottomSheetDialogFragment
@@ -17,7 +14,6 @@ import mega.privacy.android.app.R
 import mega.privacy.android.app.utils.Constants
 import mega.privacy.android.app.utils.FileUtil
 import mega.privacy.android.app.utils.MegaApiUtils
-import mega.privacy.android.app.utils.ThumbnailUtils
 import mega.privacy.android.app.utils.Util
 import mega.privacy.android.app.utils.wrapper.MegaNodeUtilWrapper
 import nz.mega.sdk.MegaNode
@@ -127,66 +123,4 @@ object ModalBottomSheetUtil {
     @JvmStatic
     fun BottomSheetDialogFragment?.isBottomSheetDialogShown(): Boolean =
         this?.isAdded == true
-
-    /**
-     * Gets a node thumbnail if available and sets it in the UI.
-     *
-     * @param node      MegaNode from which the thumbnail has to be set.
-     * @param nodeThumb ImageView in which the thumbnail has to be set.
-     */
-    @JvmStatic
-    fun setNodeThumbnail(context: Context?, node: MegaNode, nodeThumb: ImageView) {
-        var thumb: Bitmap? = null
-
-        if (node.hasThumbnail()) {
-            thumb = ThumbnailUtils.getThumbnailFromCache(node)
-            if (thumb == null) {
-                thumb = ThumbnailUtils.getThumbnailFromFolder(node, context)
-            }
-        }
-
-        setThumbnail(context, thumb, nodeThumb, node.name)
-    }
-
-    /**
-     * Sets a thumbnail in the UI if available or the default file icon if not.
-     *
-     * @param thumb     Bitmap thumbnail if available, null otherwise.
-     * @param nodeThumb ImageView in which the thumbnail has to be set.
-     * @param fileName  Name of the file.
-     * @return True if thumbnail is available, false otherwise.
-     */
-    @JvmStatic
-    fun setThumbnail(
-        context: Context?,
-        thumb: Bitmap?,
-        nodeThumb: ImageView,
-        fileName: String?,
-    ): Boolean {
-        val params = nodeThumb.layoutParams as RelativeLayout.LayoutParams
-
-        if (thumb != null) {
-            params.width = Util.dp2px(Constants.THUMB_SIZE_DP.toFloat())
-            params.height = params.width
-            val margin = Util.dp2px(Constants.THUMB_MARGIN_DP.toFloat())
-            params.setMargins(margin, margin, margin, margin)
-            nodeThumb.setImageBitmap(
-                ThumbnailUtils.getRoundedBitmap(
-                    context, thumb, Util.dp2px(
-                        Constants.THUMB_CORNER_RADIUS_DP
-                    )
-                )
-            )
-        } else {
-            params.width = Util.dp2px(Constants.ICON_SIZE_DP.toFloat())
-            params.height = params.width
-            val margin = Util.dp2px(Constants.ICON_MARGIN_DP.toFloat())
-            params.setMargins(margin, margin, margin, margin)
-            nodeThumb.setImageResource(MimeTypeList.typeForName(fileName).iconResourceId)
-        }
-
-        nodeThumb.layoutParams = params
-
-        return thumb != null
-    }
 }

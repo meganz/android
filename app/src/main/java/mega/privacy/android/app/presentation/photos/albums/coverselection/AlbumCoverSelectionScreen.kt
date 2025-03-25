@@ -41,9 +41,9 @@ import mega.privacy.android.domain.entity.photos.Photo
 import mega.privacy.android.shared.original.core.ui.controls.layouts.MegaScaffold
 import mega.privacy.android.shared.original.core.ui.theme.black
 import mega.privacy.android.shared.original.core.ui.theme.dark_grey
-import mega.privacy.android.shared.original.core.ui.theme.teal_200
+import mega.privacy.android.shared.original.core.ui.theme.accent_050
 import mega.privacy.android.shared.original.core.ui.theme.teal_200_alpha_038
-import mega.privacy.android.shared.original.core.ui.theme.teal_300
+import mega.privacy.android.shared.original.core.ui.theme.accent_900
 import mega.privacy.android.shared.original.core.ui.theme.teal_300_alpha_038
 import mega.privacy.android.shared.original.core.ui.theme.white
 
@@ -175,7 +175,7 @@ private fun AlbumCoverSelectionFooter(
             text = stringResource(id = sharedR.string.general_dialog_cancel_button),
             modifier = Modifier
                 .clickable { onBackClicked() },
-            color = teal_200,
+            color = accent_050,
             fontWeight = FontWeight.W500,
             style = MaterialTheme.typography.button,
         )
@@ -187,7 +187,7 @@ private fun AlbumCoverSelectionFooter(
             enabled = hasSelectedPhoto,
             shape = RoundedCornerShape(4.dp),
             colors = ButtonDefaults.buttonColors(
-                backgroundColor = teal_300.takeIf { isLight } ?: teal_200,
+                backgroundColor = accent_900.takeIf { isLight } ?: accent_050,
                 disabledBackgroundColor = teal_300_alpha_038.takeIf { isLight }
                     ?: teal_200_alpha_038,
             ),

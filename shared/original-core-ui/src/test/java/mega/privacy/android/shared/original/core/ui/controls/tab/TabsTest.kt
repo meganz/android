@@ -9,7 +9,6 @@ import androidx.compose.ui.test.junit4.createComposeRule
 import androidx.compose.ui.test.onNodeWithTag
 import androidx.compose.ui.test.onNodeWithText
 import androidx.test.ext.junit.runners.AndroidJUnit4
-import kotlinx.collections.immutable.persistentListOf
 import org.junit.Rule
 import org.junit.Test
 import org.junit.runner.RunWith
@@ -32,16 +31,16 @@ class TabsTest {
         with(composeTestRule) {
             setContent {
                 Tabs(
-                    cells = persistentListOf(
-                        TextCell(
+                    cells = {
+                        addTextTab(
                             text = title1,
                             tag = tag1,
-                        ) { Tab1() },
-                        TextCell(
+                        ) { Tab1() }
+                        addTextTab(
                             text = title2,
                             tag = tag2,
                         ) { Tab2() }
-                    )
+                    }
                 )
             }
 

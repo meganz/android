@@ -1,11 +1,12 @@
 package mega.privacy.android.data.repository
 
 import kotlinx.coroutines.CoroutineDispatcher
+import kotlinx.coroutines.flow.flowOn
 import kotlinx.coroutines.suspendCancellableCoroutine
 import kotlinx.coroutines.withContext
 import mega.privacy.android.data.extensions.getRequestListener
 import mega.privacy.android.data.gateway.AdsGateway
-import mega.privacy.android.data.gateway.api.MegaApiGateway
+import mega.privacy.android.data.gateway.preferences.UIPreferencesGateway
 import mega.privacy.android.data.mapper.MegaStringListMapper
 import mega.privacy.android.data.mapper.advertisements.AdDetailsMapper
 import mega.privacy.android.domain.entity.advertisements.AdDetails
@@ -20,9 +21,9 @@ import javax.inject.Inject
 internal class AdsRepositoryImpl @Inject constructor(
     @IoDispatcher private val ioDispatcher: CoroutineDispatcher,
     private val adsGateway: AdsGateway,
-    private val megaApiGateway: MegaApiGateway,
     private val adDetailsMapper: AdDetailsMapper,
     private val megaStringListMapper: MegaStringListMapper,
+    private val uiPreferencesGateway: UIPreferencesGateway,
 ) : AdsRepository {
 
     override suspend fun fetchAdDetails(
@@ -43,5 +44,26 @@ internal class AdsRepositoryImpl @Inject constructor(
                 listener = listener
             )
         }
+    }
+
+    override suspend fun queryAds(linkHandle: Long): Boolean = withContext(ioDispatcher) {
+        suspendCancellableCoroutine { continuation ->
+            val listener = continuation.getRequestListener("queryAds") { request ->
+                request.numDetails == 0
+            }
+
+            adsGateway.queryAds(
+                adFlags = MegaApiJava.ADS_DEFAULT,
+                publicHandle = linkHandle,
+                listener = listener
+            )
+        }
+    }
+
+    override fun monitorAdsClosingTimestamp() = uiPreferencesGateway.monitorAdsClosingTimestamp()
+        .flowOn(ioDispatcher)
+
+    override suspend fun setAdsClosingTimestamp(timestamp: Long) = withContext(ioDispatcher) {
+        uiPreferencesGateway.setAdsClosingTimestamp(timestamp)
     }
 }

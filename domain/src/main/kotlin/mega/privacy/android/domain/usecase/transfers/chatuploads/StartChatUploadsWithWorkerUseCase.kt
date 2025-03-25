@@ -8,28 +8,28 @@ import kotlinx.coroutines.flow.onEach
 import mega.privacy.android.domain.entity.chat.PendingMessageState
 import mega.privacy.android.domain.entity.chat.messages.pending.UpdatePendingMessageStateRequest
 import mega.privacy.android.domain.entity.node.NodeId
-import mega.privacy.android.domain.entity.transfer.MultiTransferEvent
 import mega.privacy.android.domain.entity.transfer.TransferAppData
+import mega.privacy.android.domain.entity.transfer.TransferEvent
+import mega.privacy.android.domain.entity.uri.UriPath
 import mega.privacy.android.domain.exception.chat.FoldersNotAllowedAsChatUploadException
 import mega.privacy.android.domain.repository.FileSystemRepository
 import mega.privacy.android.domain.usecase.canceltoken.CancelCancelTokenUseCase
 import mega.privacy.android.domain.usecase.chat.message.UpdatePendingMessageUseCase
 import mega.privacy.android.domain.usecase.chat.message.pendingmessages.GetPendingMessageUseCase
 import mega.privacy.android.domain.usecase.transfers.shared.AbstractStartTransfersWithWorkerUseCase
-import mega.privacy.android.domain.entity.transfer.UploadFileInfo
-import mega.privacy.android.domain.usecase.transfers.uploads.UploadFilesUseCase
+import mega.privacy.android.domain.usecase.transfers.uploads.UploadFileUseCase
 import java.io.File
 import javax.inject.Inject
 
 /**
- * Start uploading a list of files and folders to the chat uploads folder with the corresponding pending message id in their app data
+ * Start uploading a file to the chat uploads folder with the corresponding pending message id in their app data
  * and returns a Flow to monitor the progress until the nodes are scanned.
  * While the returned flow is not completed the app should be blocked to avoid other interaction with the sdk to avoid issues
  * Once the flow is completed the sdk will keep uploading and a ChatUploadsWorker will monitor updates globally.
  * If cancelled before completion the processing of the nodes will be cancelled
  */
 class StartChatUploadsWithWorkerUseCase @Inject constructor(
-    private val uploadFilesUseCase: UploadFilesUseCase,
+    private val uploadFileUseCase: UploadFileUseCase,
     private val startChatUploadsWorkerAndWaitUntilIsStartedUseCase: StartChatUploadsWorkerAndWaitUntilIsStartedUseCase,
     private val chatAttachmentNeedsCompressionUseCase: ChatAttachmentNeedsCompressionUseCase,
     private val fileSystemRepository: FileSystemRepository,
@@ -50,26 +50,14 @@ class StartChatUploadsWithWorkerUseCase @Inject constructor(
         file: File,
         chatFilesFolderId: NodeId,
         vararg pendingMessageIds: Long,
-    ): Flow<MultiTransferEvent> = flow {
+    ): Flow<TransferEvent> = flow {
         if (!fileSystemRepository.isFilePath(file.path)) {
-            emit(
-                MultiTransferEvent.TransferNotStarted(
-                    file,
-                    FoldersNotAllowedAsChatUploadException()
-                )
-            )
+            throw FoldersNotAllowedAsChatUploadException()
             return@flow
         }
-        val name = runCatching {
-            getPendingMessageUseCase(pendingMessageIds.first())?.name
-        }.getOrElse {
-            emit(
-                MultiTransferEvent.TransferNotStarted(file, it)
-            )
-            return@flow
-        }
+        val name = getPendingMessageUseCase(pendingMessageIds.first())?.name
+
         val appData = pendingMessageIds.map { TransferAppData.ChatUpload(it) }
-        val uploadFileInfo = listOf(UploadFileInfo(file, name, appData))
         emitAll(startTransfersAndThenWorkerFlow(
             doTransfers = {
                 if (chatAttachmentNeedsCompressionUseCase(file)) {
@@ -84,8 +72,12 @@ class StartChatUploadsWithWorkerUseCase @Inject constructor(
                     )
                     emptyFlow()
                 } else {
-                    uploadFilesUseCase(
-                        uploadFileInfo, chatFilesFolderId, true
+                    uploadFileUseCase(
+                        uriPath = UriPath(file.absolutePath),
+                        fileName = name,
+                        appData = appData,
+                        parentFolderId = chatFilesFolderId,
+                        isHighPriority = true,
                     ).onEach { event ->
                         handleChatUploadTransferEventUseCase(event, *pendingMessageIds)
                     }

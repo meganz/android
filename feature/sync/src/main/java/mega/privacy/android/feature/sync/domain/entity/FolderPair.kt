@@ -1,5 +1,6 @@
 package mega.privacy.android.feature.sync.domain.entity
 
+import mega.privacy.android.domain.entity.node.NodeId
 import mega.privacy.android.domain.entity.sync.SyncError
 import mega.privacy.android.domain.entity.sync.SyncType
 
@@ -33,7 +34,7 @@ data class FolderPair(
                 syncType = SyncType.TYPE_UNKNOWN,
                 pairName = "",
                 localFolderPath = "",
-                remoteFolder = RemoteFolder(-1, ""),
+                remoteFolder = RemoteFolder(NodeId(-1L), ""),
                 syncStatus = SyncStatus.SYNCED,
             )
     }

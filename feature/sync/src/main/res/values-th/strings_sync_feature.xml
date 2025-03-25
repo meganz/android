@@ -26,8 +26,6 @@
     <plurals name="num_folders_num_files_2">
         <item quantity="other">%1$d ไฟล์</item>
     </plurals>
-    <!-- Sync options -->
-    <string name="sync_menu_sync_options">ตัวเลือกการซิงค์</string>
     <!-- Sync text when need to solved stalled issues-->
     <string name="sync_menu_clear_issues">ล้างรายการที่แก้ไขปัญหาเสร็จแล้ว</string>
     <!-- Sync message for two way sync-->
@@ -44,14 +42,10 @@
     <string name="sync_stalled_issue_choose_latest_modified_time">เลือกไฟล์ที่แก้ไขล่าสุด</string>
     <!-- Sync message when conflict resolved -->
     <string name="sync_stalled_issue_conflict_resolved">แก้ไขปัญหาไฟล์ขัดแย้งกันแล้ว</string>
-    <!-- Sync message to access storage permission on device -->
-    <string name="sync_access_storage_permission_message">เพื่อสำรองไฟล์ของคุณ MEGA จำเป็นต้องเข้าถึงไฟล์และโฟลเดอร์ในอุปกรณ์นี้ ข้อมูลของคุณปลอดภัยเสมอเมื่ออยู่กับเรา</string>
     <!-- Sync dialog continue button -->
     <string name="sync_dialog_file_permission_positive_button">ดำเนินการต่อ</string>
     <!-- Sync dialog not now button -->
     <string name="sync_dialog_file_permission_negative_button">ไม่ใช่ตอนนี้</string>
-    <!-- Sync dialog title for storage access -->
-    <string name="sync_dialog_storage_access_title">เข้าถึงไฟล์ทั้งหมด</string>
     <!-- Sync dialog title for battery optimization -->
     <string name="sync_dialog_battery_optimization_title">การยืดอายุการใช้งานแบตเตอรี่</string>
     <!-- Sync dialog cancel button text -->
@@ -70,8 +64,6 @@
     <string name="sync_list_sync_state_syncing">กำลังซิงค์&#8230;</string>
     <!-- Sync state failed -->
     <string name="sync_folders_sync_state_failed">หยุดแล้ว</string>
-    <!-- Sync state synced -->
-    <string name="sync_list_sync_state_synced">ซิงค์แล้ว</string>
     <!-- Sync permission title for device storage -->
     <string name="sync_folders_device_storage">โฟลเดอร์อุปกรณ์</string>
     <!-- Sync permission title for mega storage -->
@@ -82,22 +74,12 @@
     <string name="sync_card_pause_sync">พัก</string>
     <!-- Sync Run -->
     <string name="sync_card_run_sync">ดำเนินการต่อ</string>
-    <!-- Sync Remove -->
-    <string name="sync_card_remove_sync">ลบออก</string>
     <!-- Sync dialog for sync over Wi-Fi or mobile data -->
     <string name="sync_dialog_message_wifi_or_mobile_data">WiFi หรือข้อมูลมือถือ</string>
     <!-- Sync dialog for sync only over Wi-Fi -->
     <string name="sync_dialog_message_wifi_only">Wi-Fi เท่านั้น</string>
     <!-- Sync empty state message -->
     <string name="sync_empty_state_message">คุณต้องตั้งค่าโฟลเดอร์ภายในเครื่องบนอุปกรณ์ของคุณ โฟลเดอร์นี้จะซิงค์กับโฟลเดอร์ที่เลือกไว้บนคลาวด์ไดรฟ์ของคุณ</string>
-    <!-- Sync notification title description sync monitoring-->
-    <string name="sync_notification_monitoring_description">กำลังติดตามสถานะการซิงค์</string>
-    <!-- Snackbar message shown when Wi-Fi only sync option is selected -->
-    <string name="sync_options_changed_to_wifi_only">ตัวเลือกการซิงค์ถูกเปลี่ยนเป็น: เฉพาะ Wi-Fi เท่านั้น</string>
-    <!-- Snackbar message shown when Wi-Fi or mobile data sync option is selected -->
-    <string name="sync_options_changed_to_wifi_and_mobile_data">ตัวเลือกการซิงค์ถูกเปลี่ยนเป็น: Wi-Fi หรือข้อมูลมือถือ</string>
-    <!-- Sync stalled issue reason is no reason-->
-    <string name="sync_stalled_issue_no_reason">No reason</string>
     <!-- Sync stalled issue reason is no file issue-->
     <string name="sync_stalled_issue_file_issue">ไฟล์หรือโฟลเดอร์พบปัญหาบางประการ</string>
     <!-- Sync stalled issue reason is move or rename-->
@@ -124,8 +106,6 @@
     <string name="sync_stalled_issue_local_and_remote_not_synced">ไฟล์หรือโฟลเดอร์ขัดแย้งกัน</string>
     <!-- Sync stalled issue reason is Name clash-->
     <string name="sync_stalled_issue_name_clash">ชื่อไฟล์หรือโฟลเดอร์ขัดแย้งกัน</string>
-    <!-- Sync stalled issue reason is Last PlusOne-->
-    <string name="sync_stalled_issue_last_plus_one">Last plus one</string>
     <!-- Sync chip folder chip title-->
     <string name="sync_folders">โฟลเดอร์</string>
     <!-- Sync stalled issue count chip title for 1 or more stalled issues-->
@@ -136,8 +116,6 @@
     <string name="sync_start_sync">ตั้งค่าการซิงค์</string>
     <!-- Text that indicates that a folder is currently empty -->
     <string name="sync_file_browser_empty_folder">โฟลเดอร์ว่าง</string>
-    <!-- Selecting a specific location in MEGA. This is the text of the button -->
-    <string name="sync_general_select_to_download">เลือกโฟลเดอร์</string>
     <!-- Selecting a specific location in MEGA. This is the text of the button -->
     <string name="sync_general_select">เลือก</string>
     <!-- Sync stalled issue reason is no file issue detailed description-->

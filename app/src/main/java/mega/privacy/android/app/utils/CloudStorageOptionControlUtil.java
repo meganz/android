@@ -64,6 +64,8 @@ public class CloudStorageOptionControlUtil {
     private final Option removeFavourites;
 
     private final Option disputeTakedown;
+    private final Option addToAlbum;
+    private final Option addTo;
 
     private final List<Option> options;
 
@@ -87,10 +89,12 @@ public class CloudStorageOptionControlUtil {
       trash = new Option(true);
       removeFavourites = new Option(false);
       disputeTakedown = new Option(false);
+      addToAlbum = new Option(false);
+      addTo = new Option(false);
 
       options = Arrays.asList(
               selectAll, clearSelection, hide, unhide, removeLink, removeShare, rename, saveToDevice, getLink, disputeTakedown,
-              manageLink, shareFolder, sendToChat, shareOut, move, copy, leaveShare, trash, removeFavourites);
+              manageLink, shareFolder, sendToChat, shareOut, move, copy, leaveShare, trash, removeFavourites, addToAlbum, addTo);
     }
 
     public Option selectAll() {
@@ -169,6 +173,14 @@ public class CloudStorageOptionControlUtil {
       return disputeTakedown;
     }
 
+    public Option addToAlbum() {
+      return addToAlbum;
+    }
+
+    public Option addTo() {
+      return addTo;
+    }
+
     public int alwaysActionCount() {
       int count = 0;
       for (Option option : options) {
@@ -238,5 +250,8 @@ public class CloudStorageOptionControlUtil {
 
     menu.findItem(R.id.cab_menu_dispute).setVisible(control.disputeTakedown.visible);
     menu.findItem(R.id.cab_menu_dispute).setShowAsAction(control.disputeTakedown.showAsAction);
+
+    menu.findItem(R.id.cab_menu_add_to_album).setVisible(control.addToAlbum.visible);
+    menu.findItem(R.id.cab_menu_add_to).setVisible(control.addTo.visible);
   }
 }

@@ -17,8 +17,8 @@ import mega.privacy.android.shared.original.core.ui.controls.text.LongTextBehavi
 import mega.privacy.android.shared.original.core.ui.controls.text.MegaText
 import mega.privacy.android.shared.original.core.ui.preview.BooleanProvider
 import mega.privacy.android.shared.original.core.ui.theme.extensions.body4
-import mega.privacy.android.shared.original.core.ui.theme.values.TextColor
-import mega.privacy.android.shared.original.core.ui.theme.OriginalTempTheme
+import mega.android.core.ui.theme.values.TextColor
+import mega.privacy.android.shared.original.core.ui.theme.OriginalTheme
 
 @Composable
 internal fun GreenIconView(
@@ -52,7 +52,7 @@ internal const val GREEN_ICON_VIEW_TEST_TAG = "green_icon_view:text_label"
 private fun GreenIconViewPreview(
     @PreviewParameter(BooleanProvider::class) booleanParameter: Boolean,
 ) {
-    OriginalTempTheme(isDark = booleanParameter) {
+    OriginalTheme(isDark = booleanParameter) {
         GreenIconView(greenIconLabelRes = R.string.notifications_screen_notification_label_promo)
     }
 }

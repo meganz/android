@@ -8,6 +8,8 @@ import mega.privacy.android.domain.entity.chat.messages.pending.UpdatePendingMes
 import mega.privacy.android.domain.entity.chat.messages.pending.UpdatePendingMessageStateRequest
 import mega.privacy.android.domain.entity.chat.messages.request.CreateTypedMessageRequest
 import mega.privacy.android.domain.entity.node.NodeId
+import mega.privacy.android.domain.entity.transfer.TransferAppData
+import mega.privacy.android.domain.entity.uri.UriPath
 import mega.privacy.android.domain.repository.ChatRepository
 import mega.privacy.android.domain.repository.chat.ChatMessageRepository
 import mega.privacy.android.domain.usecase.chat.GetChatMessageUseCase
@@ -23,7 +25,6 @@ import org.mockito.kotlin.mock
 import org.mockito.kotlin.reset
 import org.mockito.kotlin.verify
 import org.mockito.kotlin.whenever
-import java.io.File
 
 @TestInstance(TestInstance.Lifecycle.PER_CLASS)
 class AttachNodeWithPendingMessageUseCaseTest {
@@ -126,6 +127,7 @@ class AttachNodeWithPendingMessageUseCaseTest {
             whenever(getPendingMessageUseCase(pendingMsgId)).thenReturn(
                 pendingMessage
             )
+            val appData = mock<List<TransferAppData>>()
 
             val nodeId = NodeId(nodeHandle)
             val inOrder = inOrder(
@@ -133,11 +135,12 @@ class AttachNodeWithPendingMessageUseCaseTest {
                 chatMessageRepository
             )
 
-            underTest(pendingMsgId, nodeId)
+            underTest(pendingMsgId, nodeId, appData)
             inOrder.verify(setNodeAttributesAfterUploadUseCase)
                 .invoke(
                     nodeId.longValue,
-                    File(filePath),
+                    UriPath(filePath),
+                    appData,
                 )
             inOrder.verify(chatMessageRepository).attachNode(chatId, nodeId)
         }

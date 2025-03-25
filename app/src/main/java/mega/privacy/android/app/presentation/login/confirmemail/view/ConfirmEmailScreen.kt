@@ -55,8 +55,8 @@ import mega.privacy.android.shared.original.core.ui.controls.textfields.LabelTex
 import mega.privacy.android.shared.original.core.ui.model.MegaSpanStyle
 import mega.privacy.android.shared.original.core.ui.model.SpanIndicator
 import mega.privacy.android.shared.original.core.ui.preview.CombinedThemePreviews
-import mega.privacy.android.shared.original.core.ui.theme.OriginalTempTheme
-import mega.privacy.android.shared.original.core.ui.theme.values.TextColor
+import mega.privacy.android.shared.original.core.ui.theme.OriginalTheme
+import mega.android.core.ui.theme.values.TextColor
 import mega.privacy.android.shared.original.core.ui.utils.showAutoDurationSnackbar
 
 @OptIn(ExperimentalComposeUiApi::class)
@@ -199,7 +199,7 @@ internal fun ConfirmEmailScreen(
                     )
                     errorTextId = null
                 },
-                label = stringResource(id = R.string.email_text),
+                label = stringResource(id = mega.privacy.android.shared.resources.R.string.email_text),
                 imeAction = ImeAction.Done,
                 keyboardActions = KeyboardActions(),
                 value = emailValueState,
@@ -277,7 +277,7 @@ internal fun ConfirmEmailScreen(
 @CombinedThemePreviews
 @Composable
 private fun ConfirmEmailScreenPreview() {
-    OriginalTempTheme(isDark = isSystemInDarkTheme()) {
+    OriginalTheme(isDark = isSystemInDarkTheme()) {
         ConfirmEmailScreen(
             modifier = Modifier.fillMaxSize(),
             email = "email@email.com",

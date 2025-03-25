@@ -9,20 +9,27 @@ import mega.privacy.android.domain.entity.slideshow.SlideshowSpeed
  *
  * @property isInitialized
  * @property imageNodes Slideshow imageNodes
+ * @property currentImageNode Current imageNode
+ * @property currentImageNodeIndex Current imageNode index
  * @property order Slideshow play order
  * @property speed Slideshow speed
  * @property repeat Loop play
  * @property isPlaying play or pause
- * @property shouldPlayFromFirst Should play slideshow from the first item
- * @property isFirstInSlideshow Is first time in slideshow
  */
 data class SlideshowState(
     val isInitialized: Boolean = false,
     val imageNodes: List<ImageNode> = emptyList(),
+    val currentImageNode: ImageNode? = null,
+    val currentImageNodeIndex: Int = 0,
     val order: SlideshowOrder? = null,
     val speed: SlideshowSpeed? = null,
     val repeat: Boolean = false,
     val isPlaying: Boolean = false,
-    val shouldPlayFromFirst: Boolean = false,
-    val isFirstInSlideshow: Boolean = true,
+)
+
+internal data class ImageResultStatus(
+    val progress: Int,
+    val isFullyLoaded: Boolean,
+    val imagePath: String?,
+    val errorImagePath: String?,
 )

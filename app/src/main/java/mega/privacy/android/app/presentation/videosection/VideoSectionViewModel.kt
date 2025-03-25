@@ -24,6 +24,7 @@ import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
+import mega.privacy.android.analytics.Analytics
 import mega.privacy.android.app.R
 import mega.privacy.android.app.domain.usecase.GetNodeByHandle
 import mega.privacy.android.app.featuretoggle.ApiFeatures
@@ -58,6 +59,7 @@ import mega.privacy.android.domain.usecase.GetNodeByIdUseCase
 import mega.privacy.android.domain.usecase.IsHiddenNodesOnboardedUseCase
 import mega.privacy.android.domain.usecase.UpdateNodeSensitiveUseCase
 import mega.privacy.android.domain.usecase.account.MonitorAccountDetailUseCase
+import mega.privacy.android.domain.usecase.favourites.RemoveFavouritesUseCase
 import mega.privacy.android.domain.usecase.featureflag.GetFeatureFlagValueUseCase
 import mega.privacy.android.domain.usecase.node.GetNodeContentUriUseCase
 import mega.privacy.android.domain.usecase.node.MonitorNodeUpdatesUseCase
@@ -77,6 +79,7 @@ import mega.privacy.android.domain.usecase.videosection.RemoveVideoPlaylistsUseC
 import mega.privacy.android.domain.usecase.videosection.RemoveVideosFromPlaylistUseCase
 import mega.privacy.android.domain.usecase.videosection.UpdateVideoPlaylistTitleUseCase
 import mega.privacy.android.legacy.core.ui.model.SearchWidgetState
+import mega.privacy.mobile.analytics.event.PlaylistCreatedSuccessfullyEvent
 import nz.mega.sdk.MegaNode
 import timber.log.Timber
 import java.util.concurrent.TimeUnit
@@ -115,6 +118,7 @@ class VideoSectionViewModel @Inject constructor(
     private val clearRecentlyWatchedVideosUseCase: ClearRecentlyWatchedVideosUseCase,
     private val removeRecentlyWatchedItemUseCase: RemoveRecentlyWatchedItemUseCase,
     private val getBusinessStatusUseCase: GetBusinessStatusUseCase,
+    private val removeFavouritesUseCase: RemoveFavouritesUseCase,
 ) : ViewModel() {
     private val _state = MutableStateFlow(VideoSectionState())
 
@@ -142,6 +146,7 @@ class VideoSectionViewModel @Inject constructor(
     private var searchQueryJob: Job? = null
 
     init {
+        checkSearchFlags()
         refreshNodesIfAnyUpdates()
         viewModelScope.launch {
             monitorVideoPlaylistSetsUpdateUseCase().conflate()
@@ -191,6 +196,35 @@ class VideoSectionViewModel @Inject constructor(
             }
         }
     }
+
+    /**
+     * Check if the search by tags and description flags are enabled
+     */
+    fun checkSearchFlags() {
+        viewModelScope.launch {
+            runCatching {
+                val description = getFeatureFlagValueUseCase(AppFeatures.SearchWithDescription)
+                val tags = getFeatureFlagValueUseCase(AppFeatures.SearchWithTags)
+                description to tags
+            }.onSuccess { (description, tags) ->
+                _state.update {
+                    it.copy(searchDescriptionEnabled = description, searchTagsEnabled = tags)
+                }
+            }.onFailure {
+                Timber.e("Get feature flag failed $it")
+            }
+        }
+    }
+
+    // Get current query adjusted by search by tags
+    private fun getCurrentQueryWithSearchByTags() =
+        getCurrentSearchQuery().takeUnless {
+            state.value.searchTagsEnabled == true && getCurrentSearchQuery().startsWith(
+                "#"
+            )
+        }.orEmpty()
+
+    private fun getCurrentSearchQuery() = state.value.query.orEmpty()
 
     private suspend fun isHiddenNodesActive(): Boolean {
         val result = runCatching {
@@ -328,7 +362,6 @@ class VideoSectionViewModel @Inject constructor(
             .filterVideosByDuration()
             .filterVideosByLocation()
             .updateOriginalEntities()
-            .filterVideosBySearchQuery()
 
         val sortOrder = getCloudSortOrder()
         _state.update {
@@ -342,7 +375,11 @@ class VideoSectionViewModel @Inject constructor(
     }
 
     private suspend fun getVideoUIEntityList() =
-        getAllVideosUseCase().filterNonSensitiveItems(
+        getAllVideosUseCase(
+            searchQuery = getCurrentSearchQuery(),
+            tag = if (state.value.searchTagsEnabled == true) getCurrentSearchQuery().removePrefix("#") else null,
+            description = if (state.value.searchDescriptionEnabled == true) getCurrentQueryWithSearchByTags() else null
+        ).filterNonSensitiveItems(
             showHiddenItems = this@VideoSectionViewModel.showHiddenItems,
             isPaid = _state.value.accountType?.isPaid,
             isBusinessAccountExpired = _state.value.isBusinessAccountExpired
@@ -354,11 +391,6 @@ class VideoSectionViewModel @Inject constructor(
         }
         originalData.addAll(data)
     }
-
-    private fun List<VideoUIEntity>.filterVideosBySearchQuery() =
-        filter { video ->
-            video.name.contains(_state.value.query ?: "", true)
-        }
 
     private fun List<VideoUIEntity>.updateOriginalEntities() = also { data ->
         if (originalEntities.isNotEmpty()) {
@@ -383,7 +415,6 @@ class VideoSectionViewModel @Inject constructor(
             }
         }
     }
-
 
     private fun List<VideoUIEntity>.filterVideosByDuration() =
         filter {
@@ -433,6 +464,9 @@ class VideoSectionViewModel @Inject constructor(
             }
             setPendingRefreshNodes()
             loadVideoPlaylists()
+            if (_state.value.currentVideoPlaylist?.isSystemVideoPlayer == true) {
+                refreshVideoPlaylistsWithUpdateCurrentVideoPlaylist()
+            }
         }
 
     internal fun searchQuery(queryString: String) {
@@ -446,22 +480,13 @@ class VideoSectionViewModel @Inject constructor(
             }
 
             if (_tabState.value.selectedTab == VideoSectionTab.All) {
-                searchNodeByQueryString()
+                refreshNodes()
+                _state.update {
+                    it.copy(scrollToTop = true)
+                }
             } else {
                 searchPlaylistByQueryString()
             }
-        }
-    }
-
-    private fun searchNodeByQueryString() {
-        val videos = originalEntities.filter { video ->
-            video.name.contains(_state.value.query ?: "", true)
-        }
-        _state.update {
-            it.copy(
-                allVideos = videos,
-                scrollToTop = true
-            )
         }
     }
 
@@ -696,12 +721,12 @@ class VideoSectionViewModel @Inject constructor(
 
     private fun updateVideoItemOfPlaylistInSelectionState(item: VideoUIEntity, index: Int) =
         _state.value.currentVideoPlaylist?.let { playlist ->
-            if (playlist.videos == null || item.elementID == null) return@let
+            if (playlist.videos == null) return@let
             val isSelected = !item.isSelected
             val updatedVideos =
                 playlist.videos.updateItemSelectedState(index, isSelected)
             val selectedHandles = updateSelectedHandles(
-                videoID = item.elementID,
+                videoID = item.elementID ?: item.id.longValue,
                 isSelected = isSelected,
                 selectedHandles = _state.value.selectedVideoElementIDs
             )
@@ -747,7 +772,11 @@ class VideoSectionViewModel @Inject constructor(
     }
 
     internal suspend fun getSelectedMegaNode(): List<MegaNode> =
-        _state.value.selectedVideoHandles.mapNotNull {
+        if (_state.value.currentVideoPlaylist?.isSystemVideoPlayer == true) {
+            _state.value.selectedVideoElementIDs
+        } else {
+            _state.value.selectedVideoHandles
+        }.mapNotNull {
             runCatching {
                 getNodeByHandle(it)
             }.getOrNull()
@@ -778,6 +807,7 @@ class VideoSectionViewModel @Inject constructor(
                             )
                         }
                         loadVideoPlaylists()
+                        Analytics.tracker.trackEvent(PlaylistCreatedSuccessfullyEvent)
                         Timber.d("Current video playlist: ${(videoPlaylist as? UserVideoPlaylist)?.title}")
                     }.onFailure { exception ->
                         Timber.e(exception)
@@ -1191,9 +1221,6 @@ class VideoSectionViewModel @Inject constructor(
         }
     }
 
-    internal suspend fun isRecentlyWatchedEnabled() =
-        getFeatureFlagValueUseCase(AppFeatures.VideoRecentlyWatched)
-
     internal fun clearRecentlyWatchedVideos() {
         viewModelScope.launch {
             runCatching {
@@ -1233,6 +1260,40 @@ class VideoSectionViewModel @Inject constructor(
         _state.update {
             it.copy(removeRecentlyWatchedItemSuccess = consumed)
         }
+
+    internal fun launchVideoToPlaylistActivity(videoHandle: Long) = _state.update {
+        it.copy(
+            isLaunchVideoToPlaylistActivity = true,
+            addToPlaylistHandle = videoHandle
+        )
+    }
+
+    internal fun resetIsLaunchVideoToPlaylistActivity() = _state.update {
+        it.copy(isLaunchVideoToPlaylistActivity = false)
+    }
+
+    internal fun updateAddToPlaylistHandle(value: Long?) = _state.update {
+        it.copy(addToPlaylistHandle = value)
+    }
+
+    internal fun updateAddToPlaylistTitles(titles: List<String>?) = _state.update {
+        it.copy(addToPlaylistTitles = titles)
+    }
+
+    internal suspend fun enableFavouritesPlaylistMenu() =
+        getFeatureFlagValueUseCase(AppFeatures.FavouritesPlaylistMenuEnabled)
+
+    internal fun removeFavourites() = viewModelScope.launch {
+        runCatching {
+            _state.value.selectedVideoElementIDs.let { handles ->
+                if (handles.isNotEmpty()) {
+                    removeFavouritesUseCase(handles.map { NodeId(it) })
+                }
+            }
+        }.onFailure {
+            Timber.e(it)
+        }
+    }
 
     companion object {
         private const val ERROR_MESSAGE_REPEATED_TITLE = 0

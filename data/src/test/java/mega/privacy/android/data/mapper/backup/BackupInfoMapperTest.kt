@@ -143,7 +143,7 @@ internal class BackupInfoMapperTest {
             "Grouped Assertions of ${BackupInfo::class.simpleName}",
             { assertThat(it.id).isEqualTo(id) },
             { assertThat(it.type).isEqualTo(expectedType) },
-            { assertThat(it.rootHandle).isEqualTo(rootHandle) },
+            { assertThat(it.rootHandle.longValue).isEqualTo(rootHandle) },
             { assertThat(it.localFolderPath).isEqualTo(localFolderPath) },
             { assertThat(it.deviceId).isEqualTo(deviceId) },
             { assertThat(it.userAgent).isEqualTo(expectedUserAgent) },

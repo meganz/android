@@ -17,6 +17,7 @@ import androidx.activity.result.ActivityResult
 import androidx.activity.result.ActivityResultLauncher
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.annotation.ColorRes
+import androidx.annotation.DrawableRes
 import androidx.appcompat.app.AlertDialog
 import androidx.appcompat.widget.SearchView
 import androidx.core.content.ContextCompat
@@ -40,7 +41,6 @@ import mega.privacy.android.app.components.dragger.DragToExitSupport
 import mega.privacy.android.app.databinding.ActivityAudioPlayerBinding
 import mega.privacy.android.app.extensions.enableEdgeToEdgeAndConsumeInsets
 import mega.privacy.android.app.featuretoggle.ApiFeatures
-import mega.privacy.android.app.featuretoggle.AppFeatures
 import mega.privacy.android.app.interfaces.ActionNodeCallback
 import mega.privacy.android.app.interfaces.showSnackbar
 import mega.privacy.android.app.listeners.OptionalMegaRequestListenerInterface
@@ -553,18 +553,21 @@ class AudioPlayerActivity : MediaPlayerActivity() {
         navController.addOnDestinationChangedListener { _, dest, args ->
             setupToolbarColors()
             when (dest.id) {
-                R.id.audio_main_player,
-                    -> {
-                    if (dest.id == R.id.audio_main_player) {
-                        supportActionBar?.title = ""
+                R.id.audio_main_player -> {
+                    supportActionBar?.apply {
+                        setHomeAsUpIndicator(null)
+                        title = ""
                     }
                     viewingTrackInfo = null
                 }
 
                 R.id.track_info -> {
-                    supportActionBar?.title = getString(R.string.audio_track_info)
-                    if (args != null) {
-                        viewingTrackInfo = TrackInfoFragmentArgs.fromBundle(args)
+                    supportActionBar?.apply {
+                        setHomeAsUpIndicator(null)
+                        title = getString(R.string.audio_track_info)
+                    }
+                    args?.let {
+                        viewingTrackInfo = TrackInfoFragmentArgs.fromBundle(it)
                     }
                 }
             }
@@ -581,7 +584,8 @@ class AudioPlayerActivity : MediaPlayerActivity() {
         if (isFinishing) {
             dragToExit.showPreviousHiddenThumbnail()
         }
-        serviceGateway?.stopAudioServiceWhenAudioPlayerClosedWithUserNotLogin()
+        if (serviceGateway?.getCurrentAdapterType() != FOLDER_LINK_ADAPTER)
+            serviceGateway?.stopAudioServiceWhenAudioPlayerClosedWithUserNotLogin()
 
         serviceGateway = null
         playerServiceGateway = null
@@ -936,6 +940,7 @@ class AudioPlayerActivity : MediaPlayerActivity() {
                                     // Hide the select, select all, and clear options
                                     menu.findItem(R.id.select).isVisible = false
                                     menu.findItem(R.id.remove).isVisible = false
+                                    menu.findItem(R.id.select_all).isVisible = false
 
                                     menu.findItem(R.id.properties).isVisible =
                                         currentFragmentId == R.id.audio_main_player
@@ -969,7 +974,7 @@ class AudioPlayerActivity : MediaPlayerActivity() {
                                     val isPaidAccount = accountType?.isPaid == true
                                     val isBusinessAccountExpired =
                                         viewModel.state.value.isBusinessAccountExpired
-                                    val isNodeInBackup = megaApi.isInInbox(node)
+                                    val isNodeInBackup = megaApi.isInVault(node)
 
 
                                     val shouldShowHideNode = when {
@@ -1039,7 +1044,7 @@ class AudioPlayerActivity : MediaPlayerActivity() {
     private fun checkIfShouldApplyReadOnlyState(menu: Menu) {
         playerServiceGateway?.getCurrentPlayingHandle()?.let { playingHandle ->
             megaApi.getNodeByHandle(playingHandle)?.let { node ->
-                if (megaApi.isInInbox(node)) {
+                if (megaApi.isInVault(node)) {
                     with(menu) {
                         findItem(R.id.move_to_trash).isVisible = false
                         findItem(R.id.move).isVisible = false
@@ -1128,4 +1133,8 @@ class AudioPlayerActivity : MediaPlayerActivity() {
                 })
             )
         }
+
+    internal fun updateToolbarHomeAsUp(@DrawableRes icon: Int) {
+        supportActionBar?.setHomeAsUpIndicator(icon)
+    }
 }

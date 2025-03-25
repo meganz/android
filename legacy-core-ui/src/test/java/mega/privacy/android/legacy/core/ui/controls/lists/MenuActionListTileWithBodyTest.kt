@@ -41,7 +41,7 @@ internal class MenuActionListTileWithBodyTest {
                 title = "Tile Title",
                 body = "Tile Body",
                 icon = R.drawable.ic_icon_mic_medium_regular_solid,
-                addSeparator = false,
+                dividerType = null,
             )
         }
         composeTestRule.onNodeWithTag(TILE_WITH_BODY_DIVIDER).assertDoesNotExist()

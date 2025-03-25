@@ -65,6 +65,7 @@ import mega.privacy.android.app.presentation.extensions.getStorageState
 import mega.privacy.android.app.presentation.fileinfo.FileInfoActivity
 import mega.privacy.android.app.presentation.hidenode.HiddenNodesOnboardingActivity
 import mega.privacy.android.app.presentation.security.PasscodeCheck
+import mega.privacy.android.app.presentation.settings.model.StorageTargetPreference
 import mega.privacy.android.app.presentation.transfers.attach.NodeAttachmentViewModel
 import mega.privacy.android.app.presentation.transfers.attach.createNodeAttachmentView
 import mega.privacy.android.app.presentation.transfers.starttransfer.StartDownloadViewModel
@@ -92,6 +93,7 @@ import mega.privacy.android.domain.entity.StorageState
 import mega.privacy.android.domain.entity.node.NodeId
 import mega.privacy.android.domain.qualifier.ApplicationScope
 import mega.privacy.android.domain.usecase.featureflag.GetFeatureFlagValueUseCase
+import mega.privacy.android.navigation.MegaNavigator
 import mega.privacy.mobile.analytics.event.DocumentPreviewHideNodeMenuItemEvent
 import nz.mega.sdk.MegaApiAndroid
 import nz.mega.sdk.MegaApiJava
@@ -141,6 +143,12 @@ class PdfViewerActivity : BaseActivity(), MegaGlobalListenerInterface, OnPageCha
     @ApplicationScope
     @Inject
     lateinit var applicationScope: CoroutineScope
+
+    /**
+     * Mega navigator
+     */
+    @Inject
+    lateinit var megaNavigator: MegaNavigator
 
     private lateinit var binding: ActivityPdfviewerBinding
 
@@ -229,6 +237,7 @@ class PdfViewerActivity : BaseActivity(), MegaGlobalListenerInterface, OnPageCha
         Timber.d("onCreate")
         enableEdgeToEdgeAndConsumeInsets()
         super.onCreate(savedInstanceState)
+        appContainerWrapper.setPasscodeCheck(passCodeFacade)
         if (intent == null) {
             Timber.w("Intent null")
             finish()
@@ -361,7 +370,7 @@ class PdfViewerActivity : BaseActivity(), MegaGlobalListenerInterface, OnPageCha
                     }
                 }
             }
-            if (transfersManagement.isOnTransferOverQuota()) {
+            if (viewModel.isInTransferOverQuota()) {
                 showGeneralTransferOverQuotaWarning()
             }
         }
@@ -433,7 +442,7 @@ class PdfViewerActivity : BaseActivity(), MegaGlobalListenerInterface, OnPageCha
                         Timber.w("Exception loading PDF as stream", e)
                     }
                     viewModel.resetPdfStreamData()
-                    if (loading && !transfersManagement.isOnTransferOverQuota()) {
+                    if (loading && viewModel.isInTransferOverQuota().not()) {
                         binding.pdfViewerProgressBar.isVisible = true
                     }
                 }
@@ -506,9 +515,15 @@ class PdfViewerActivity : BaseActivity(), MegaGlobalListenerInterface, OnPageCha
     private fun addStartDownloadTransferView() {
         binding.root.addView(
             createStartTransferView(
-                this,
-                startDownloadViewModel.state,
-                startDownloadViewModel::consumeDownloadEvent
+                activity = this,
+                transferEventState = startDownloadViewModel.state,
+                onConsumeEvent = startDownloadViewModel::consumeDownloadEvent,
+                navigateToStorageSettings = {
+                    megaNavigator.openSettings(
+                        this,
+                        StorageTargetPreference
+                    )
+                }
             )
         )
     }
@@ -602,7 +617,7 @@ class PdfViewerActivity : BaseActivity(), MegaGlobalListenerInterface, OnPageCha
                 Timber.d("Add transfer listener")
                 megaApi.addTransferListener(this)
                 megaApi.addGlobalListener(this)
-                if (transfersManagement.isOnTransferOverQuota()) {
+                if (viewModel.isInTransferOverQuota()) {
                     showGeneralTransferOverQuotaWarning()
                 }
             }
@@ -681,8 +696,6 @@ class PdfViewerActivity : BaseActivity(), MegaGlobalListenerInterface, OnPageCha
         }
         invalidateOptionsMenu()
     }
-
-    override fun onReloadNeeded(api: MegaApiJava) {}
 
     override fun onAccountUpdate(api: MegaApiJava) {}
 
@@ -1098,7 +1111,7 @@ class PdfViewerActivity : BaseActivity(), MegaGlobalListenerInterface, OnPageCha
      */
     private fun checkIfShouldApplyReadOnlyState(menu: Menu) {
         val node = megaApi.getNodeByHandle(handle)
-        if (node != null && megaApi.isInInbox(node)) {
+        if (node != null && megaApi.isInVault(node)) {
             menu.findItem(R.id.pdf_viewer_rename).isVisible = false
             menu.findItem(R.id.pdf_viewer_move).isVisible = false
             menu.findItem(R.id.pdf_viewer_move_to_trash).isVisible = false
@@ -1715,9 +1728,9 @@ class PdfViewerActivity : BaseActivity(), MegaGlobalListenerInterface, OnPageCha
         binding.pdfView.recycle()
         val needStopHttpServer =
             intent.getBooleanExtra(Constants.INTENT_EXTRA_KEY_NEED_STOP_HTTP_SERVER, false)
-        megaApi.removeTransferListener(this)
-        megaApi.removeGlobalListener(this)
         applicationScope.launch {
+            megaApi.removeTransferListener(this@PdfViewerActivity)
+            megaApi.removeGlobalListener(this@PdfViewerActivity)
             if (needStopHttpServer) {
                 megaApi.httpServerStop()
             }

@@ -61,6 +61,7 @@ class GetParticipantsChangesUseCaseTest {
         isMeeting = false,
         isWaitingRoom = false,
         isOpenInvite = false,
+        isNoteToSelf = false,
         isSpeakRequest = false
     )
 

@@ -1,13 +1,17 @@
 package mega.privacy.android.data.gateway
 
 import android.net.Uri
+import android.os.ParcelFileDescriptor
 import androidx.documentfile.provider.DocumentFile
 import kotlinx.coroutines.flow.Flow
 import mega.privacy.android.domain.entity.document.DocumentEntity
 import mega.privacy.android.domain.entity.document.DocumentFolder
+import mega.privacy.android.domain.entity.document.DocumentMetadata
+import mega.privacy.android.domain.entity.file.FileStorageType
 import mega.privacy.android.domain.entity.uri.UriPath
 import java.io.File
 import java.io.IOException
+import java.io.InputStream
 
 /**
  * File gateway
@@ -193,6 +197,18 @@ interface FileGateway {
      * @param contentUri The content Uri to be converted
      */
     suspend fun getExternalPathByContentUri(contentUri: String): String?
+
+    /**
+     * Takes a content Uri and creates an external storage path from it
+     *
+     * e.g. the following Uri:
+     * "content://com.android.externalstorage.documents/tree/primary%3ASync%2FsomeFolder"
+     * will be converted to
+     * "/storage/emulated/0/Sync/someFolder"
+     *
+     * @param contentUri The content Uri to be converted
+     */
+    fun getExternalPathByContentUriSync(contentUri: String): String?
 
     /**
      * delete files in a directory
@@ -400,9 +416,27 @@ interface FileGateway {
     fun isPathInsecure(path: String): Boolean
 
     /**
-     * Get document entities
+     * Get a list of [DocumentEntity]s from a list of [Uri]s, non-existing documents are filtered out
      */
     suspend fun getDocumentEntities(uris: List<Uri>): List<DocumentEntity>
+
+    /**
+     * Get a [DocumentEntity] from an [Uri] or null if the document doesn't exist
+     *
+     * Note that this fun is synchronous and must only be used in contexts where there is really
+     * no other option. For all other cases, create an asynchronous version.
+     */
+    fun getDocumentMetadataSync(uri: Uri): DocumentMetadata?
+
+    /**
+     * Get the list of [Uri]s that are direct children of the given [Uri]
+     *
+     * Note that this fun is synchronous and must only be used in contexts where there is really
+     * no other option. For all other cases, create an asynchronous version.
+     *
+     * @return the list of [Uri]s that are direct children of the [uri] or an empty list if [uri] doesn't represent a folder or it's empty
+     */
+    fun getFolderChildUrisSync(uri: Uri): List<Uri>
 
     /**
      * Get file from uri
@@ -413,4 +447,83 @@ interface FileGateway {
      * or selected a file inside downloads folder sometimes it returns null
      */
     suspend fun getFileFromUri(uri: Uri): File?
+
+    /**
+     * Get [ParcelFileDescriptor] from uriPath
+     *
+     * Note that this fun is synchronous and must only be used in contexts where there is really
+     * no other option. For all other cases, use the asynchronous version [getFileDescriptor].
+     *
+     * @param writePermission true if write permission is needed, false if only read permission is needed
+     */
+    fun getFileDescriptorSync(uriPath: UriPath, writePermission: Boolean): ParcelFileDescriptor?
+
+    /**
+     * Get [ParcelFileDescriptor] from uriPath
+     * @param writePermission true if write permission is needed, false if only read permission is needed
+     */
+    suspend fun getFileDescriptor(uriPath: UriPath, writePermission: Boolean): ParcelFileDescriptor?
+
+    /**
+     * Get [InputStream] from an uriPath
+     * @param uriPath the file represented by an Uri or a path
+     */
+    suspend fun getInputStream(uriPath: UriPath): InputStream?
+
+    /**
+     * Checks if an uri can be read
+     *
+     * @param stringUri the uri to check
+     * @return true if the uri can be read, false otherwise
+     */
+    suspend fun canReadUri(stringUri: String): Boolean
+
+    /**
+     * Checks if a specific folder has a child with a specific name
+     */
+    fun childFileExistsSync(parentFolder: UriPath, childName: String): Boolean
+
+    /**
+     * Creates a file as a child of a specific folder
+     * @param parentFolder the folder where the child will be created
+     * @param childName the name of the created child
+     * @param asFolder if true, the child will be a folder, otherwise it will be a file
+     * @return true if the child was created, false otherwise
+     */
+    fun createChildFileSync(parentFolder: UriPath, childName: String, asFolder: Boolean): UriPath?
+
+    /**
+     * Get the parent of a file or folder
+     * @return the [UriPath] of the parent if it's accessible and permissions are granted, null otherwise
+     */
+    fun getParentSync(childUriPath: UriPath): UriPath?
+
+    /**
+     * Deletes a file if it's a regular file
+     * @return true if the file was deleted, false otherwise
+     */
+    fun deleteIfItIsAFileSync(uriPath: UriPath): Boolean
+
+    /**
+     * Deletes a folder if it's a folder and it's empty
+     * @return true if the folder was deleted, false otherwise
+     */
+    fun deleteIfItIsAnEmptyFolder(uriPath: UriPath): Boolean
+
+    /**
+     * Set the last modified time of a file or folder
+     * @return true if the time was updated, false otherwise
+     */
+    fun setLastModifiedSync(uriPath: UriPath, newTime: Long): Boolean
+
+    /**
+     * Renames a file or folder
+     * @return the new [UriPath] of the renamed file, null if the file wasn't renamed
+     */
+    fun renameFileSync(uriPath: UriPath, newName: String): UriPath?
+
+    /**
+     * Returns device model or SD Card based on file location
+     */
+    suspend fun getFileStorageTypeName(path: String?): FileStorageType
 }

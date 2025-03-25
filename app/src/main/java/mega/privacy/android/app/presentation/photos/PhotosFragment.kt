@@ -44,8 +44,8 @@ import mega.privacy.android.analytics.Analytics
 import mega.privacy.android.app.MegaApplication
 import mega.privacy.android.app.R
 import mega.privacy.android.app.extensions.navigateToAppSettings
+import mega.privacy.android.app.main.DrawerItem
 import mega.privacy.android.app.main.ManagerActivity
-import mega.privacy.android.app.presentation.advertisements.model.AdsSlotIDs.TAB_PHOTOS_SLOT_ID
 import mega.privacy.android.app.presentation.extensions.isDarkMode
 import mega.privacy.android.app.presentation.hidenode.HiddenNodesOnboardingActivity
 import mega.privacy.android.app.presentation.imagepreview.ImagePreviewActivity
@@ -55,6 +55,7 @@ import mega.privacy.android.app.presentation.imagepreview.model.ImagePreviewMenu
 import mega.privacy.android.app.presentation.photos.albums.AlbumScreenWrapperActivity
 import mega.privacy.android.app.presentation.photos.albums.AlbumsViewModel
 import mega.privacy.android.app.presentation.photos.albums.actionMode.AlbumsActionModeCallback
+import mega.privacy.android.app.presentation.photos.albums.add.AddToAlbumActivity
 import mega.privacy.android.app.presentation.photos.albums.albumcontent.AlbumContentFragment
 import mega.privacy.android.app.presentation.photos.albums.model.AlbumsViewState
 import mega.privacy.android.app.presentation.photos.albums.model.UIAlbum
@@ -63,6 +64,7 @@ import mega.privacy.android.app.presentation.photos.compose.main.PhotosScreen
 import mega.privacy.android.app.presentation.photos.model.PhotosTab
 import mega.privacy.android.app.presentation.photos.model.Sort
 import mega.privacy.android.app.presentation.photos.model.TimeBarTab
+import mega.privacy.android.app.presentation.photos.search.PhotosSearchActivity
 import mega.privacy.android.app.presentation.photos.timeline.actionMode.TimelineActionModeCallback
 import mega.privacy.android.app.presentation.photos.timeline.model.ApplyFilterMediaType
 import mega.privacy.android.app.presentation.photos.timeline.model.TimelinePhotosSource
@@ -94,7 +96,7 @@ import mega.privacy.android.domain.entity.photos.AlbumId
 import mega.privacy.android.domain.entity.photos.Photo
 import mega.privacy.android.domain.usecase.GetThemeMode
 import mega.privacy.android.domain.usecase.featureflag.GetFeatureFlagValueUseCase
-import mega.privacy.android.shared.original.core.ui.theme.OriginalTempTheme
+import mega.privacy.android.shared.original.core.ui.theme.OriginalTheme
 import mega.privacy.mobile.analytics.event.PhotoScreenEvent
 import javax.inject.Inject
 
@@ -131,6 +133,12 @@ class PhotosFragment : Fragment() {
         registerForActivityResult(ActivityResultContracts.RequestMultiplePermissions()) {
             timelineViewModel.handleCameraUploadsPermissionsResult()
         }
+
+    private val photosSearchLauncher: ActivityResultLauncher<Intent> =
+        registerForActivityResult(
+            ActivityResultContracts.StartActivityForResult(),
+            ::handlePhotosSearchResult,
+        )
 
     /**
      * Retrieves the App Theme
@@ -202,7 +210,7 @@ class PhotosFragment : Fragment() {
             setContent {
                 val mode by getThemeMode()
                     .collectAsStateWithLifecycle(initialValue = ThemeMode.System)
-                OriginalTempTheme(isDark = mode.isDarkMode()) {
+                OriginalTheme(isDark = mode.isDarkMode()) {
                     PhotosScreen(
                         viewComposeCoordinator = viewComposeCoordinator,
                         photosViewModel = photosViewModel,
@@ -381,7 +389,7 @@ class PhotosFragment : Fragment() {
             timelineActionMode?.finish()
             timelineActionMode = null
             managerActivity.showHideBottomNavigationView(false)
-            managerActivity.handleShowingAds(TAB_PHOTOS_SLOT_ID)
+            managerActivity.handleShowingAds()
         }
     }
 
@@ -409,13 +417,17 @@ class PhotosFragment : Fragment() {
                 enterAlbumsActionMode()
             }
             albumsActionMode?.title = state.selectedAlbumIds.size.toString()
-            managerActivity.hideAdsView()
-            managerActivity.showHideBottomNavigationView(true)
+            if (managerActivity.drawerItem == DrawerItem.PHOTOS) {
+                managerActivity.hideAdsView()
+                managerActivity.showHideBottomNavigationView(true)
+            }
         } else {
             albumsActionMode?.finish()
             albumsActionMode = null
-            managerActivity.showHideBottomNavigationView(false)
-            managerActivity.handleShowingAds(TAB_PHOTOS_SLOT_ID)
+            if (managerActivity.drawerItem == DrawerItem.PHOTOS) {
+                managerActivity.showHideBottomNavigationView(false)
+                managerActivity.handleShowingAds()
+            }
         }
     }
 
@@ -555,6 +567,11 @@ class PhotosFragment : Fragment() {
      */
     override fun onOptionsItemSelected(item: MenuItem): Boolean {
         return when (item.itemId) {
+            R.id.action_photos_search -> {
+                searchPhotos()
+                true
+            }
+
             R.id.action_zoom_in -> { // +
                 handleZoomIn()
                 true
@@ -654,6 +671,12 @@ class PhotosFragment : Fragment() {
         managerActivity.skipToFilterFragment(PhotosFilterFragment())
     }
 
+    private fun searchPhotos() {
+        val intent = Intent(requireActivity(), PhotosSearchActivity::class.java)
+        photosSearchLauncher.launch(intent)
+        activity?.overridePendingTransition(0, 0)
+    }
+
     private val albumPhotosSelectionLauncher: ActivityResultLauncher<Intent> =
         registerForActivityResult(
             ActivityResultContracts.StartActivityForResult(),
@@ -706,6 +729,7 @@ class PhotosFragment : Fragment() {
                     TimelineImageNodeFetcher.TIMELINE_FILTER_TYPE to timelineViewModel.getFilterType(),
                     TimelineImageNodeFetcher.TIMELINE_MEDIA_SOURCE to timelineViewModel.getMediaSource(),
                 ),
+                enableAddToAlbum = true,
             )
             startActivity(intent)
         }
@@ -894,6 +918,12 @@ class PhotosFragment : Fragment() {
             ::handleHiddenNodesOnboardingResult,
         )
 
+    private val addToAlbumLauncher: ActivityResultLauncher<Intent> =
+        registerForActivityResult(
+            ActivityResultContracts.StartActivityForResult(),
+            ::handleAddToAlbumResult,
+        )
+
     private fun handleHiddenNodesOnboardingResult(result: ActivityResult) {
         if (result.resultCode != Activity.RESULT_OK) return
 
@@ -911,6 +941,40 @@ class PhotosFragment : Fragment() {
             )
         Util.showSnackbar(requireActivity(), message)
         tempSelectedNodeHandles = listOf()
+    }
+
+    private fun handlePhotosSearchResult(result: ActivityResult) {
+        if (result.resultCode != Activity.RESULT_OK) return
+
+        val type = result.data?.getStringExtra("type") ?: return
+        val id = result.data?.getLongExtra("id", -1L)
+
+        val uiAlbum = if (type != "custom") {
+            albumsViewModel.state.value.findSystemAlbum(type)
+        } else if (id != null && id != -1L) {
+            albumsViewModel.state.value.findUIAlbum(AlbumId(id))
+        } else {
+            null
+        }
+        openAlbum(uiAlbum ?: return)
+
+        photosViewModel.onTabSelected(PhotosTab.Albums)
+    }
+
+    fun openAddToAlbum(nodeIds: List<NodeId>, viewType: Int) {
+        val intent = Intent(requireContext(), AddToAlbumActivity::class.java).apply {
+            val ids = nodeIds.map { it.longValue }.toTypedArray()
+            putExtra("ids", ids)
+            putExtra("type", viewType)
+        }
+        addToAlbumLauncher.launch(intent)
+    }
+
+    private fun handleAddToAlbumResult(result: ActivityResult) {
+        if (result.resultCode != Activity.RESULT_OK) return
+        val message = result.data?.getStringExtra("message") ?: return
+
+        Util.showSnackbar(requireActivity(), message)
     }
 
     /**

@@ -1,7 +1,6 @@
 package mega.privacy.android.app.presentation.search
 
 import androidx.activity.compose.BackHandler
-import androidx.compose.material.ExperimentalMaterialApi
 import androidx.compose.material.ModalBottomSheetValue
 import androidx.compose.material.rememberModalBottomSheetState
 import androidx.compose.runtime.Composable
@@ -32,20 +31,20 @@ import mega.privacy.android.domain.entity.node.TypedNode
 /**
  * Search activity to search Nodes and display
  */
-@OptIn(ExperimentalMaterialApi::class, ExperimentalComposeUiApi::class)
+@OptIn(ExperimentalComposeUiApi::class)
 @Composable
 fun SearchScreen(
     showSortOrderBottomSheet: () -> Unit,
     navigateToLink: (String) -> Unit,
     navHostController: NavHostController,
     onBackPressed: () -> Unit,
-    searchActivityViewModel: SearchActivityViewModel,
+    searchViewModel: SearchViewModel,
     nodeActionHandler: NodeActionHandler,
     handleClick: (TypedNode?) -> Unit,
     fileTypeIconMapper: FileTypeIconMapper,
     modifier: Modifier = Modifier,
 ) {
-    val uiState by searchActivityViewModel.state.collectAsStateWithLifecycle()
+    val uiState by searchViewModel.state.collectAsStateWithLifecycle()
     val modalSheetState = rememberModalBottomSheetState(
         initialValue = ModalBottomSheetValue.Hidden,
     )
@@ -68,14 +67,14 @@ fun SearchScreen(
                 ?: R.string.sortby_name
         ),
         onItemClick = {
-            if (searchActivityViewModel.state.value.selectedNodes.isEmpty()) {
+            if (searchViewModel.state.value.selectedNodes.isEmpty()) {
                 handleClick(it.node)
             } else {
-                searchActivityViewModel.onItemClicked(it)
+                searchViewModel.onItemClicked(it)
             }
         },
-        onLongClick = searchActivityViewModel::onLongItemClicked,
-        onChangeViewTypeClick = searchActivityViewModel::onChangeViewTypeClicked,
+        onLongClick = searchViewModel::onLongItemClicked,
+        onChangeViewTypeClick = searchViewModel::onChangeViewTypeClicked,
         onSortOrderClick = {
             showSortOrderBottomSheet()
         },
@@ -83,20 +82,20 @@ fun SearchScreen(
             keyboardController?.hide()
             navHostController.navigate(
                 route = nodeBottomSheetRoute.plus("/${it.node.id.longValue}")
-                    .plus("/${searchActivityViewModel.state.value.nodeSourceType.name}")
+                    .plus("/${searchViewModel.state.value.nodeSourceType.name}")
             )
         },
         onDisputeTakeDownClicked = navigateToLink,
         onLinkClicked = navigateToLink,
-        onErrorShown = searchActivityViewModel::errorMessageShown,
-        updateSearchQuery = searchActivityViewModel::updateSearchQuery,
+        onErrorShown = searchViewModel::errorMessageShown,
+        updateSearchQuery = searchViewModel::updateSearchQuery,
         onFilterClicked = {
             keyboardController?.hide()
             navHostController.navigate(
                 route = searchFilterBottomSheetRoute.plus("/${it}")
             )
         },
-        clearSelection = searchActivityViewModel::clearSelection,
+        clearSelection = searchViewModel::clearSelection,
         onBackPressed = onBackPressed,
         navHostController = navHostController,
         nodeActionHandler = nodeActionHandler,

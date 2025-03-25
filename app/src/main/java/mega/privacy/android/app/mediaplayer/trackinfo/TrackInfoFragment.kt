@@ -19,6 +19,7 @@ import mega.privacy.android.app.R
 import mega.privacy.android.app.mediaplayer.MediaPlayerActivity
 import mega.privacy.android.app.mediaplayer.MediaPlayerViewModel
 import mega.privacy.android.app.presentation.extensions.isDarkMode
+import mega.privacy.android.app.presentation.settings.model.StorageTargetPreference
 import mega.privacy.android.app.presentation.snackbar.LegacySnackBarWrapper
 import mega.privacy.android.app.presentation.transfers.starttransfer.view.StartTransferComponent
 import mega.privacy.android.app.utils.AlertsAndWarnings.showOverDiskQuotaPaywallWarning
@@ -26,7 +27,8 @@ import mega.privacy.android.app.utils.MegaNodeUtil.handleLocationClick
 import mega.privacy.android.domain.entity.StorageState
 import mega.privacy.android.domain.entity.ThemeMode
 import mega.privacy.android.domain.usecase.GetThemeMode
-import mega.privacy.android.shared.original.core.ui.theme.OriginalTempTheme
+import mega.privacy.android.navigation.MegaNavigator
+import mega.privacy.android.shared.original.core.ui.theme.OriginalTheme
 import mega.privacy.android.shared.original.core.ui.utils.showAutoDurationSnackbar
 import javax.inject.Inject
 
@@ -46,6 +48,12 @@ class TrackInfoFragment : Fragment() {
     lateinit var getThemeMode: GetThemeMode
 
     /**
+     * Mega navigator
+     */
+    @Inject
+    lateinit var megaNavigator: MegaNavigator
+
+    /**
      * onCreateView
      */
     override fun onCreateView(
@@ -61,7 +69,7 @@ class TrackInfoFragment : Fragment() {
                 val mode by getThemeMode()
                     .collectAsStateWithLifecycle(initialValue = ThemeMode.System)
                 val snackbarHostState = remember { SnackbarHostState() }
-                OriginalTempTheme(isDark = mode.isDarkMode()) {
+                OriginalTheme(isDark = mode.isDarkMode()) {
                     AudioTrackInfoView(
                         uiState = uiState,
                         metadata = metadata,
@@ -83,6 +91,12 @@ class TrackInfoFragment : Fragment() {
                         event = uiState.transferTriggerEvent,
                         onConsumeEvent = viewModel::consumeTransferEvent,
                         snackBarHostState = snackbarHostState,
+                        navigateToStorageSettings = {
+                            megaNavigator.openSettings(
+                                requireActivity(),
+                                StorageTargetPreference
+                            )
+                        },
                     )
                     EventEffect(
                         event = uiState.offlineRemovedEvent,

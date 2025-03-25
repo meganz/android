@@ -9,6 +9,7 @@ import androidx.room.migration.Migration
 import androidx.sqlite.db.SupportSQLiteDatabase
 import androidx.sqlite.db.SupportSQLiteOpenHelper
 import mega.privacy.android.data.database.dao.ActiveTransferDao
+import mega.privacy.android.data.database.dao.ActiveTransferGroupDao
 import mega.privacy.android.data.database.dao.BackupDao
 import mega.privacy.android.data.database.dao.CameraUploadsRecordDao
 import mega.privacy.android.data.database.dao.ChatPendingChangesDao
@@ -16,12 +17,12 @@ import mega.privacy.android.data.database.dao.CompletedTransferDao
 import mega.privacy.android.data.database.dao.ContactDao
 import mega.privacy.android.data.database.dao.OfflineDao
 import mega.privacy.android.data.database.dao.PendingTransferDao
-import mega.privacy.android.data.database.dao.SdTransferDao
 import mega.privacy.android.data.database.dao.SyncShownNotificationDao
 import mega.privacy.android.data.database.dao.SyncSolvedIssuesDao
 import mega.privacy.android.data.database.dao.UserPausedSyncsDao
 import mega.privacy.android.data.database.dao.VideoRecentlyWatchedDao
 import mega.privacy.android.data.database.entity.ActiveTransferEntity
+import mega.privacy.android.data.database.entity.ActiveTransferGroupEntity
 import mega.privacy.android.data.database.entity.BackupEntity
 import mega.privacy.android.data.database.entity.CameraUploadsRecordEntity
 import mega.privacy.android.data.database.entity.ChatPendingChangesEntity
@@ -30,13 +31,13 @@ import mega.privacy.android.data.database.entity.CompletedTransferEntityLegacy
 import mega.privacy.android.data.database.entity.ContactEntity
 import mega.privacy.android.data.database.entity.OfflineEntity
 import mega.privacy.android.data.database.entity.PendingTransferEntity
-import mega.privacy.android.data.database.entity.SdTransferEntity
 import mega.privacy.android.data.database.entity.SyncShownNotificationEntity
 import mega.privacy.android.data.database.entity.SyncSolvedIssueEntity
 import mega.privacy.android.data.database.entity.UserPausedSyncEntity
 import mega.privacy.android.data.database.entity.VideoRecentlyWatchedEntity
 import mega.privacy.android.data.database.spec.AutoMigrationSpec73to74
 import mega.privacy.android.data.database.spec.AutoMigrationSpec81to82
+import mega.privacy.android.data.database.spec.AutoMigrationSpec95to96
 import timber.log.Timber
 
 @Database(
@@ -45,7 +46,7 @@ import timber.log.Timber
         CompletedTransferEntity::class,
         CompletedTransferEntityLegacy::class,
         ActiveTransferEntity::class,
-        SdTransferEntity::class,
+        ActiveTransferGroupEntity::class,
         BackupEntity::class,
         OfflineEntity::class,
         SyncSolvedIssueEntity::class,
@@ -77,6 +78,12 @@ import timber.log.Timber
         AutoMigration(91, 92),
         AutoMigration(92, 93),
         AutoMigration(93, 94),
+        AutoMigration(94, 95),
+        AutoMigration(95, 96, spec = AutoMigrationSpec95to96::class),
+        AutoMigration(96, 97),
+        AutoMigration(97, 98),
+        AutoMigration(98, 99),
+        AutoMigration(99, 100),
     ],
 )
 internal abstract class MegaDatabase : RoomDatabase() {
@@ -86,7 +93,7 @@ internal abstract class MegaDatabase : RoomDatabase() {
 
     abstract fun activeTransfersDao(): ActiveTransferDao
 
-    abstract fun sdTransferDao(): SdTransferDao
+    abstract fun activeTransferGroupsDao(): ActiveTransferGroupDao
 
     abstract fun backupDao(): BackupDao
 

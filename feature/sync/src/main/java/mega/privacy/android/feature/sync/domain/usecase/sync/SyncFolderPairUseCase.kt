@@ -29,6 +29,6 @@ internal class SyncFolderPairUseCase @Inject constructor(private val syncReposit
             syncType = syncType,
             name = name,
             localPath = localPath,
-            remoteFolderId = remotePath.id
+            remoteFolderId = remotePath.id.longValue
         )
 }

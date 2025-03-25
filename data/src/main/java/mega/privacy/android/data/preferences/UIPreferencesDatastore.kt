@@ -8,9 +8,11 @@ import androidx.datastore.preferences.core.booleanPreferencesKey
 import androidx.datastore.preferences.core.edit
 import androidx.datastore.preferences.core.intPreferencesKey
 import androidx.datastore.preferences.core.longPreferencesKey
+import androidx.datastore.preferences.core.stringPreferencesKey
 import androidx.datastore.preferences.preferencesDataStore
 import dagger.hilt.android.qualifiers.ApplicationContext
 import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.map
 import mega.privacy.android.data.extensions.monitor
 import mega.privacy.android.data.gateway.preferences.UIPreferencesGateway
 import javax.inject.Inject
@@ -21,9 +23,12 @@ private const val HIDE_RECENT_ACTIVITY = "HIDE_RECENT_ACTIVITY"
 private const val MEDIA_DISCOVERY_VIEW = "MEDIA_DISCOVERY_VIEW"
 private const val SUBFOLDER_MEDIA_DISCOVERY = "SUBFOLDER_MEDIA_DISCOVERY"
 private const val SHOW_OFFLINE_WARNING_VIEW = "SHOW_OFFLINE_WARNING_VIEW"
+private const val PHOTOS_RECENT_QUERIES = "PHOTOS_RECENT_QUERIES"
 private const val VIEW_TYPE = "VIEW_TYPE"
 private const val ALMOST_FULL_STORAGE_BANNER_CLOSING_TIMESTAMP =
     "ALMOST_FULL_STORAGE_BANNER_CLOSING_TIMESTAMP"
+private const val ADS_CLOSING_TIMESTAMP = "ADS_CLOSING_TIMESTAMP"
+private const val GEO_TAGGING = "GEO_TAGGING"
 private val Context.uiPreferenceDataStore: DataStore<Preferences> by preferencesDataStore(
     name = USER_INTERFACE_PREFERENCES,
     produceMigrations = {
@@ -50,6 +55,7 @@ internal class UIPreferencesDatastore @Inject constructor(
     private val offlineWarningViewKey = booleanPreferencesKey(SHOW_OFFLINE_WARNING_VIEW)
     private val almostFullStorageBannerClosingTimestampKey =
         longPreferencesKey(ALMOST_FULL_STORAGE_BANNER_CLOSING_TIMESTAMP)
+    private val photosRecentQueriesKey = stringPreferencesKey(PHOTOS_RECENT_QUERIES)
 
     override fun monitorPreferredStartScreen() =
         context.uiPreferenceDataStore.monitor(preferredStartScreenKey)
@@ -115,4 +121,37 @@ internal class UIPreferencesDatastore @Inject constructor(
         }
     }
 
+    override suspend fun setPhotosRecentQueries(queries: List<String>) {
+        context.uiPreferenceDataStore.edit {
+            it[photosRecentQueriesKey] = queries.joinToString("[SEP]")
+        }
+    }
+
+    override fun monitorPhotosRecentQueries(): Flow<List<String>> {
+        return context.uiPreferenceDataStore
+            .monitor(photosRecentQueriesKey)
+            .map { text ->
+                if (text.isNullOrBlank()) listOf()
+                else text.split("[SEP]")
+            }
+    }
+
+    override suspend fun setAdsClosingTimestamp(timestamp: Long) {
+        context.uiPreferenceDataStore.edit {
+            it[longPreferencesKey(ADS_CLOSING_TIMESTAMP)] = timestamp
+        }
+    }
+
+    override fun monitorAdsClosingTimestamp(): Flow<Long?> {
+        return context.uiPreferenceDataStore.monitor(longPreferencesKey(ADS_CLOSING_TIMESTAMP))
+    }
+
+    override fun monitorGeoTaggingStatus(): Flow<Boolean?> =
+        context.uiPreferenceDataStore.monitor(booleanPreferencesKey(GEO_TAGGING))
+
+    override suspend fun enableGeoTagging(value: Boolean) {
+        context.uiPreferenceDataStore.edit {
+            it[booleanPreferencesKey(GEO_TAGGING)] = value
+        }
+    }
 }

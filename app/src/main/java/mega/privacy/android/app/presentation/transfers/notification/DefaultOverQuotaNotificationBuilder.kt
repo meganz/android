@@ -6,7 +6,6 @@ import android.app.Notification
 import android.app.PendingIntent
 import android.content.Context
 import android.content.Intent
-import android.widget.RemoteViews
 import androidx.core.app.NotificationCompat
 import androidx.core.content.ContextCompat
 import dagger.hilt.android.qualifiers.ApplicationContext
@@ -14,7 +13,6 @@ import mega.privacy.android.app.R
 import mega.privacy.android.app.data.facade.AccountInfoFacade
 import mega.privacy.android.app.featuretoggle.AppFeatures
 import mega.privacy.android.app.main.ManagerActivity
-import mega.privacy.android.app.notifications.DismissNotificationBroadcastReceiver
 import mega.privacy.android.app.presentation.login.LoginActivity
 import mega.privacy.android.app.presentation.manager.model.TransfersTab
 import mega.privacy.android.app.presentation.transfers.EXTRA_TAB
@@ -26,10 +24,10 @@ import mega.privacy.android.app.utils.Constants.VISIBLE_FRAGMENT
 import mega.privacy.android.app.utils.TimeUtils
 import mega.privacy.android.data.mapper.transfer.OverQuotaNotificationBuilder
 import mega.privacy.android.domain.usecase.HasCredentialsUseCase
-import mega.privacy.android.domain.usecase.IsUserLoggedIn
 import mega.privacy.android.domain.usecase.featureflag.GetFeatureFlagValueUseCase
 import mega.privacy.android.domain.usecase.login.ClearEphemeralCredentialsUseCase
-import mega.privacy.android.domain.usecase.quota.GetBandwidthOverQuotaDelayUseCase
+import mega.privacy.android.domain.usecase.login.IsUserLoggedInUseCase
+import mega.privacy.android.domain.usecase.transfers.overquota.GetBandwidthOverQuotaDelayUseCase
 import nz.mega.sdk.MegaAccountDetails
 import javax.inject.Inject
 
@@ -38,12 +36,12 @@ import javax.inject.Inject
  */
 class DefaultOverQuotaNotificationBuilder @Inject constructor(
     @ApplicationContext private val context: Context,
-    private val isUserLoggedIn: IsUserLoggedIn,
+    private val isUserLoggedInUseCase: IsUserLoggedInUseCase,
     private val clearEphemeralCredentialsUseCase: ClearEphemeralCredentialsUseCase,
-    private val getBandwidthOverQuotaDelayUseCase: GetBandwidthOverQuotaDelayUseCase,
     private val hasCredentialsUseCase: HasCredentialsUseCase,
     private val accountInfoFacade: AccountInfoFacade,
     private val getFeatureFlagValueUseCase: GetFeatureFlagValueUseCase,
+    private val getBandwidthOverQuotaDelayUseCase: GetBandwidthOverQuotaDelayUseCase,
 ) : OverQuotaNotificationBuilder {
 
     override suspend operator fun invoke(storageOverQuota: Boolean) = if (storageOverQuota) {
@@ -54,7 +52,7 @@ class DefaultOverQuotaNotificationBuilder @Inject constructor(
 
     private suspend fun transferOverQuotaNotification(): Notification {
         val isLoggedIn =
-            isUserLoggedIn() && hasCredentialsUseCase()
+            isUserLoggedInUseCase() && hasCredentialsUseCase()
         var isFreeAccount = false
         val intent = if (isLoggedIn) {
             isFreeAccount = accountInfoFacade.accountTypeId == MegaAccountDetails.ACCOUNT_TYPE_FREE
@@ -68,19 +66,10 @@ class DefaultOverQuotaNotificationBuilder @Inject constructor(
                 putExtra(VISIBLE_FRAGMENT, LOGIN_FRAGMENT)
             }
         }
-        val pendingIntent = PendingIntent.getService(
+        val pendingIntent = PendingIntent.getActivity(
             context,
             0,
             intent,
-            PendingIntent.FLAG_CANCEL_CURRENT or PendingIntent.FLAG_IMMUTABLE
-        )
-        val dismissIntent = PendingIntent.getBroadcast(
-            context,
-            0,
-            Intent(
-                context.applicationContext,
-                DismissNotificationBroadcastReceiver::class.java
-            ),
             PendingIntent.FLAG_CANCEL_CURRENT or PendingIntent.FLAG_IMMUTABLE
         )
         val clickIntent = if (getFeatureFlagValueUseCase(AppFeatures.TransfersSection)) {
@@ -99,26 +88,8 @@ class DefaultOverQuotaNotificationBuilder @Inject constructor(
             clickIntent,
             PendingIntent.FLAG_CANCEL_CURRENT or PendingIntent.FLAG_IMMUTABLE
         )
-        val customView =
-            RemoteViews(
-                context.packageName,
-                R.layout.notification_transfer_over_quota
-            )
-        customView.setTextViewText(
-            R.id.content_text,
-            context.getString(
-                R.string.current_text_depleted_transfer_overquota,
-                TimeUtils.getHumanizedTime(getBandwidthOverQuotaDelayUseCase())
-            )
-        )
-        val dismissButtonText =
-            context.getString(if (isLoggedIn) R.string.general_dismiss else R.string.login_text)
-        customView.setTextViewText(R.id.dismiss_button, dismissButtonText)
-        customView.setOnClickPendingIntent(R.id.dismiss_button, dismissIntent)
         val upgradeButtonText =
-            context.getString(if (!isLoggedIn) R.string.continue_without_account_transfer_overquota else if (isFreeAccount) sharedR.string.general_upgrade_button else R.string.plans_depleted_transfer_overquota)
-        customView.setTextViewText(R.id.upgrade_button, upgradeButtonText)
-        customView.setOnClickPendingIntent(R.id.upgrade_button, pendingIntent)
+            context.getString(if (!isLoggedIn) sharedR.string.login_text else if (isFreeAccount) sharedR.string.general_upgrade_button else R.string.plans_depleted_transfer_overquota)
 
         val builder = NotificationCompat.Builder(
             context,
@@ -126,8 +97,13 @@ class DefaultOverQuotaNotificationBuilder @Inject constructor(
         ).apply {
             setSmallIcon(iconPackR.drawable.ic_stat_notify)
             color = ContextCompat.getColor(context, R.color.red_600_red_300)
-            setStyle(NotificationCompat.DecoratedCustomViewStyle())
-            setContent(customView)
+            setStyle(NotificationCompat.BigTextStyle())
+            addAction(iconPackR.drawable.ic_stat_notify, upgradeButtonText, pendingIntent)
+            setContentTitle(context.getString(R.string.label_transfer_over_quota))
+            setContentText(context.getString(
+                R.string.current_text_depleted_transfer_overquota,
+                TimeUtils.getHumanizedTime(getBandwidthOverQuotaDelayUseCase().inWholeSeconds))
+            )
             setContentIntent(clickPendingIntent)
             setOngoing(false)
             setAutoCancel(true)

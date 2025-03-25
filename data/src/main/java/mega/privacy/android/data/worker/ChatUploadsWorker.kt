@@ -12,8 +12,6 @@ import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.catch
 import kotlinx.coroutines.flow.combine
-import kotlinx.coroutines.flow.onCompletion
-import kotlinx.coroutines.flow.transformWhile
 import kotlinx.coroutines.launch
 import mega.privacy.android.data.mapper.transfer.ChatUploadNotificationMapper
 import mega.privacy.android.data.mapper.transfer.OverQuotaNotificationBuilder
@@ -25,7 +23,7 @@ import mega.privacy.android.domain.entity.transfer.ActiveTransferTotals
 import mega.privacy.android.domain.entity.transfer.ChatCompressionFinished
 import mega.privacy.android.domain.entity.transfer.ChatCompressionProgress
 import mega.privacy.android.domain.entity.transfer.ChatCompressionState
-import mega.privacy.android.domain.entity.transfer.MonitorOngoingActiveTransfersResult
+import mega.privacy.android.domain.entity.transfer.TransferProgressResult
 import mega.privacy.android.domain.entity.transfer.TransferEvent
 import mega.privacy.android.domain.entity.transfer.TransferType
 import mega.privacy.android.domain.entity.transfer.pendingMessageIds
@@ -112,7 +110,7 @@ class ChatUploadsWorker @AssistedInject constructor(
         paused
     )
 
-    override fun monitorProgress(): Flow<MonitorOngoingActiveTransfersResult> =
+    override fun monitorProgress(): Flow<TransferProgressResult> =
         combine(
             monitorOngoingActiveTransfersUseCase(type),
             monitorPendingMessagesByStateUseCase(
@@ -124,23 +122,15 @@ class ChatUploadsWorker @AssistedInject constructor(
             ),
             chatCompressionProgress,
         ) { monitorOngoingActiveTransfersResult, pendingMessages, _ ->
-            monitorOngoingActiveTransfersResult to pendingMessages.size
-        }.transformWhile { (ongoingActiveTransfersResult, pendingMessagesCount) ->
-            emit(ongoingActiveTransfersResult)
-            Timber.d("Chat upload progress emitted: $pendingMessagesCount ${ongoingActiveTransfersResult.activeTransferTotals.hasOngoingTransfers()}")
-            //keep monitoring if and only if there are work to do or transfers in progress
-            val keepMonitoring =
-                pendingMessagesCount > 0 || (ongoingActiveTransfersResult.activeTransferTotals.hasOngoingTransfers() && !ongoingActiveTransfersResult.transfersOverQuota && !ongoingActiveTransfersResult.storageOverQuota)
-            if (!keepMonitoring) {
-                Timber.d("ChatUploadsWorker keep monitoring false due to no more work or transfers: $pendingMessagesCount, ${ongoingActiveTransfersResult.activeTransferTotals.hasOngoingTransfers()}")
-            }
-            return@transformWhile keepMonitoring
+            val pendingWork = pendingMessages.isNotEmpty()
+                    || monitorOngoingActiveTransfersResult.hasPendingWork(type)
+            TransferProgressResult(monitorOngoingActiveTransfersResult, pendingWork)
         }
-            .catch { Timber.e(it) }
-            .onCompletion {
-                Timber.d("ChatUploadsWorker monitor progress finished $it")
-                clearPendingMessagesCompressionProgressUseCase()
-            }
+
+    override suspend fun onComplete() {
+        super.onComplete()
+        clearPendingMessagesCompressionProgressUseCase()
+    }
 
     override suspend fun doWorkInternal(scope: CoroutineScope) {
         scope.launch {
@@ -183,7 +173,8 @@ class ChatUploadsWorker @AssistedInject constructor(
                             //once uploaded, it can be attached to the chat
                             attachNodeWithPendingMessageUseCase(
                                 pendingMessageId,
-                                NodeId(event.transfer.nodeHandle)
+                                NodeId(event.transfer.nodeHandle),
+                                finishEvent.transfer.appData,
                             )
                         }.onFailure {
                             updateState(pendingMessageId, PendingMessageState.ERROR_ATTACHING)

@@ -1,5 +1,6 @@
 package mega.privacy.android.app.modalbottomsheet
 
+import android.content.Intent
 import android.graphics.PorterDuff
 import android.os.Bundle
 import android.view.LayoutInflater
@@ -7,27 +8,34 @@ import android.view.View
 import android.view.ViewGroup
 import android.widget.FrameLayout
 import android.widget.ImageView
-import android.widget.LinearLayout
 import android.widget.TextView
 import androidx.core.content.ContextCompat
+import androidx.core.content.FileProvider
 import androidx.core.view.isVisible
 import androidx.fragment.app.viewModels
 import coil.load
 import coil.transform.RoundedCornersTransformation
 import mega.privacy.android.app.MimeTypeList
+import mega.privacy.android.app.MimeTypeList.Companion.typeForName
 import mega.privacy.android.app.R
 import mega.privacy.android.app.arch.extensions.collectFlow
 import mega.privacy.android.app.databinding.BottomSheetManageTransferBinding
-import mega.privacy.android.domain.entity.node.thumbnail.ThumbnailRequest
 import mega.privacy.android.app.main.ManagerActivity
 import mega.privacy.android.app.main.managerSections.CompletedTransfersFragment
 import mega.privacy.android.app.utils.ColorUtils
 import mega.privacy.android.app.utils.Constants
+import mega.privacy.android.app.utils.FileUtil
+import mega.privacy.android.app.utils.MegaApiUtils
+import mega.privacy.android.app.utils.MegaNodeUtil
 import mega.privacy.android.app.utils.Util
+import mega.privacy.android.app.utils.Util.showSnackbar
 import mega.privacy.android.domain.entity.node.NodeId
+import mega.privacy.android.domain.entity.node.thumbnail.ThumbnailRequest
 import mega.privacy.android.domain.entity.transfer.CompletedTransfer
 import nz.mega.sdk.MegaChatApiJava
 import nz.mega.sdk.MegaTransfer
+import timber.log.Timber
+import java.io.File
 
 /**
  * Manage transfer bottom sheet dialog fragment
@@ -68,16 +76,38 @@ internal class ManageTransferBottomSheetDialogFragment : BaseBottomSheetDialogFr
         val location = contentView.findViewById<TextView>(R.id.manage_transfer_location)
         val viewInFolderOption = contentView.findViewById<TextView>(R.id.option_view)
         viewInFolderOption.setOnClickListener(this)
+
+        val openWith = contentView.findViewById<TextView>(R.id.option_open_with)
+        openWith.setOnClickListener(this)
+        val openWithSeparator = contentView.findViewById<View>(R.id.separator_open_with)
+        if (transfer.type == MegaTransfer.TYPE_DOWNLOAD) {
+            openWith.visibility = View.VISIBLE
+            openWithSeparator.visibility = View.VISIBLE
+        } else {
+            openWith.visibility = View.GONE
+            openWithSeparator.visibility = View.GONE
+        }
+
         val getLinkOption = contentView.findViewById<TextView>(R.id.option_get_link)
+        val getLinkOptionSeparator = contentView.findViewById<View>(R.id.separator_get_link)
         getLinkOption.setOnClickListener(this)
+
+        if (MegaNodeUtil.showShareOption(-1, false, transfer.handle)) {
+            getLinkOption.visibility = View.VISIBLE
+            getLinkOptionSeparator.visibility = View.VISIBLE
+        } else {
+            getLinkOption.visibility = View.GONE
+            getLinkOptionSeparator.visibility = View.GONE
+        }
+
         val clearOption = contentView.findViewById<TextView>(R.id.option_clear)
         clearOption.setOnClickListener(this)
         val retryOption = contentView.findViewById<TextView>(R.id.option_retry)
+        val retryOptionSeparator = contentView.findViewById<View>(R.id.separator_retry)
         retryOption.setOnClickListener(this)
         name.text = transfer.fileName
         if (transfer.type == MegaTransfer.TYPE_DOWNLOAD) {
             type.setImageResource(R.drawable.ic_download_transfers)
-            getLinkOption.visibility = View.GONE
         } else if (transfer.type == MegaTransfer.TYPE_UPLOAD) {
             type.setImageResource(R.drawable.ic_upload_transfers)
         }
@@ -93,6 +123,7 @@ internal class ManageTransferBottomSheetDialogFragment : BaseBottomSheetDialogFr
                 )
                 stateIcon.setImageResource(R.drawable.ic_transfers_completed)
                 retryOption.visibility = View.GONE
+                retryOptionSeparator.visibility = View.GONE
                 stateIcon.isVisible = true
             }
 
@@ -128,8 +159,7 @@ internal class ManageTransferBottomSheetDialogFragment : BaseBottomSheetDialogFr
             }
         }
         if (getLinkOption.visibility == View.GONE && retryOption.visibility == View.GONE || viewInFolderOption.visibility == View.GONE) {
-            contentView.findViewById<View>(R.id.separator_get_link).visibility =
-                View.GONE
+            getLinkOptionSeparator.visibility = View.GONE
         }
         handle = transfer.handle
         val thumbParams = thumbnail.layoutParams as FrameLayout.LayoutParams
@@ -191,8 +221,36 @@ internal class ManageTransferBottomSheetDialogFragment : BaseBottomSheetDialogFr
             } else {
                 (parentFragment as? CompletedTransfersFragment)?.retrySingleTransfer(transfer)
             }
+        } else if (id == R.id.option_open_with) {
+            openFileWith()
         }
         setStateBottomSheetBehaviorHidden()
+    }
+
+    private fun openFileWith() {
+        val localFile = File(transfer?.originalPath ?: return)
+        if (FileUtil.isFileAvailable(localFile)) {
+            val intent = Intent(Intent.ACTION_VIEW)
+            intent.addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION)
+            try {
+                FileProvider.getUriForFile(
+                    requireActivity(),
+                    Constants.AUTHORITY_STRING_FILE_PROVIDER,
+                    localFile
+                )?.let { uri ->
+                    intent.setDataAndType(uri, typeForName(localFile.name).type)
+                    if (MegaApiUtils.isIntentAvailable(requireActivity(), intent)) {
+                        startActivity(intent)
+                        return
+                    }
+                }
+            } catch (e: Exception) {
+                Timber.e(e)
+            }
+            showSnackbar(requireContext(), getString(R.string.intent_not_available))
+        } else {
+            showSnackbar(requireContext(), getString(R.string.corrupt_video_dialog_text))
+        }
     }
 
     companion object {

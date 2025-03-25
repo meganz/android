@@ -2,6 +2,7 @@ package mega.privacy.android.feature.sync.domain.sync
 
 import com.google.common.truth.Truth.assertThat
 import kotlinx.coroutines.test.runTest
+import mega.privacy.android.domain.entity.node.NodeId
 import mega.privacy.android.domain.entity.sync.SyncError
 import mega.privacy.android.domain.entity.sync.SyncType
 import mega.privacy.android.feature.sync.domain.entity.FolderPair
@@ -189,7 +190,7 @@ internal class GetSyncNotificationUseCaseTest {
                     syncType = SyncType.TYPE_TWOWAY,
                     pairName = "pairName",
                     localFolderPath = "localPath",
-                    remoteFolder = RemoteFolder(123L, "remotePath"),
+                    remoteFolder = RemoteFolder(NodeId(123L), "remotePath"),
                     syncStatus = SyncStatus.SYNCED,
                     syncError = SyncError.ACTIVE_SYNC_SAME_PATH
                 )

@@ -66,23 +66,26 @@ import androidx.lifecycle.viewmodel.compose.viewModel
 import kotlinx.coroutines.launch
 import mega.privacy.android.analytics.Analytics
 import mega.privacy.android.app.R
+import mega.privacy.android.app.presentation.extensions.getStorageState
 import mega.privacy.android.app.presentation.photos.albums.view.DynamicView
 import mega.privacy.android.app.presentation.transfers.starttransfer.view.StartTransferComponent
-import mega.privacy.android.app.utils.StringUtils.formatColorTag
-import mega.privacy.android.app.utils.StringUtils.toSpannedHtmlText
+import mega.privacy.android.app.utils.AlertsAndWarnings.showOverDiskQuotaPaywallWarning
+import mega.privacy.android.domain.entity.StorageState
 import mega.privacy.android.domain.entity.photos.Album
 import mega.privacy.android.domain.entity.photos.Photo
 import mega.privacy.android.legacy.core.ui.controls.LegacyMegaEmptyView
 import mega.privacy.android.legacy.core.ui.controls.dialogs.MegaDialog
+import mega.privacy.android.shared.original.core.ui.controls.buttons.TextMegaButton
 import mega.privacy.android.shared.original.core.ui.controls.progressindicator.MegaCircularProgressIndicator
 import mega.privacy.android.shared.original.core.ui.controls.textfields.GenericTextField
 import mega.privacy.android.shared.original.core.ui.theme.dark_grey
+import mega.privacy.android.shared.original.core.ui.theme.extensions.grey_020_grey_700
 import mega.privacy.android.shared.original.core.ui.theme.grey_020
 import mega.privacy.android.shared.original.core.ui.theme.grey_alpha_012
 import mega.privacy.android.shared.original.core.ui.theme.grey_alpha_038
 import mega.privacy.android.shared.original.core.ui.theme.grey_alpha_054
 import mega.privacy.android.shared.original.core.ui.theme.grey_alpha_087
-import mega.privacy.android.shared.original.core.ui.theme.teal_300
+import mega.privacy.android.shared.original.core.ui.theme.accent_900
 import mega.privacy.android.shared.original.core.ui.theme.white
 import mega.privacy.android.shared.original.core.ui.theme.white_alpha_012
 import mega.privacy.android.shared.original.core.ui.theme.white_alpha_038
@@ -113,6 +116,7 @@ internal fun AlbumImportScreen(
     onNavigateFileExplorer: () -> Unit,
     onUpgradeAccount: () -> Unit,
     onBack: (isBackToHome: Boolean) -> Unit,
+    navigateToStorageSettings: () -> Unit,
 ) {
     val isLight = MaterialTheme.colors.isLight
     val state by albumImportViewModel.stateFlow.collectAsStateWithLifecycle()
@@ -126,8 +130,6 @@ internal fun AlbumImportScreen(
         val observer = LifecycleEventObserver { _, event ->
             if (event == Lifecycle.Event.ON_RESUME) {
                 Analytics.tracker.trackEvent(AlbumImportScreenEvent)
-            } else if (event == Lifecycle.Event.ON_DESTROY) {
-                albumImportViewModel.stopPreview()
             }
         }
 
@@ -135,12 +137,6 @@ internal fun AlbumImportScreen(
 
         onDispose {
             lifecycleOwner.lifecycle.removeObserver(observer)
-        }
-    }
-
-    LaunchedEffect(state.isInitialized) {
-        if (!state.isInitialized) {
-            albumImportViewModel.initialize()
         }
     }
 
@@ -235,12 +231,16 @@ internal fun AlbumImportScreen(
                     isLogin = state.isLogin,
                     onImport = {
                         if (state.isNetworkConnected) {
-                            val photos = state.selectedPhotos.ifEmpty { state.photos }
-                            albumImportViewModel.validateImportConstraint(
-                                album = state.album,
-                                photos = photos,
-                            )
-                            albumImportViewModel.clearSelection()
+                            if (getStorageState() == StorageState.PayWall) {
+                                showOverDiskQuotaPaywallWarning()
+                            } else {
+                                val photos = state.selectedPhotos.ifEmpty { state.photos }
+                                albumImportViewModel.validateImportConstraint(
+                                    album = state.album,
+                                    photos = photos,
+                                )
+                                albumImportViewModel.clearSelection()
+                            }
                         } else {
                             coroutineScope.launch {
                                 scaffoldState.snackbarHostState.showAutoDurationSnackbar(
@@ -315,7 +315,8 @@ internal fun AlbumImportScreen(
             StartTransferComponent(
                 event = state.downloadEvent,
                 onConsumeEvent = albumImportViewModel::consumeDownloadEvent,
-                snackBarHostState = scaffoldState.snackbarHostState
+                snackBarHostState = scaffoldState.snackbarHostState,
+                navigateToStorageSettings = navigateToStorageSettings,
             )
         },
     )
@@ -345,7 +346,7 @@ private fun AlbumImportTopBar(
                     if (hasSelectedPhotos) {
                         Text(
                             text = "${selectedPhotos.size}",
-                            color = teal_300,
+                            color = accent_900,
                             fontSize = 16.sp,
                             fontWeight = FontWeight.W500,
                             style = MaterialTheme.typography.subtitle1,
@@ -383,7 +384,7 @@ private fun AlbumImportTopBar(
                     Icon(
                         painter = painterResource(id = R.drawable.ic_arrow_back_white),
                         contentDescription = null,
-                        tint = teal_300.takeIf { hasSelectedPhotos }
+                        tint = accent_900.takeIf { hasSelectedPhotos }
                             ?: grey_alpha_087.takeIf { isLight } ?: white_alpha_087,
                     )
                 },
@@ -397,7 +398,7 @@ private fun AlbumImportTopBar(
                         Icon(
                             painter = painterResource(id = R.drawable.ic_dots_vertical_white),
                             contentDescription = null,
-                            tint = teal_300,
+                            tint = accent_900,
                         )
                     },
                 )
@@ -470,44 +471,28 @@ private fun AlbumImportBottomBar(
             Row(
                 modifier = Modifier
                     .fillMaxWidth()
-                    .background(grey_020.takeIf { isLight } ?: dark_grey)
+                    .background(MaterialTheme.colors.grey_020_grey_700)
                     .padding(horizontal = 8.dp, vertical = 4.dp),
                 horizontalArrangement = Arrangement.End,
                 verticalAlignment = Alignment.CenterVertically,
                 content = {
                     if (isLogin) {
-                        TextButton(
+                        TextMegaButton(
+                            textId = R.string.general_save_to_cloud_drive,
                             onClick = {
                                 Analytics.tracker.trackEvent(AlbumImportSaveToCloudDriveButtonEvent)
                                 onImport()
-                            },
-                            content = {
-                                Text(
-                                    text = stringResource(id = R.string.general_save_to_cloud_drive),
-                                    color = teal_300,
-                                    fontSize = 14.sp,
-                                    fontWeight = FontWeight.W500,
-                                    style = MaterialTheme.typography.button,
-                                )
                             },
                         )
                     }
 
                     Spacer(modifier = Modifier.width(8.dp))
 
-                    TextButton(
+                    TextMegaButton(
+                        textId = R.string.general_save_to_device,
                         onClick = {
                             Analytics.tracker.trackEvent(AlbumImportSaveToDeviceButtonEvent)
                             onSaveToDevice()
-                        },
-                        content = {
-                            Text(
-                                text = stringResource(id = R.string.general_save_to_device),
-                                color = teal_300,
-                                fontSize = 14.sp,
-                                fontWeight = FontWeight.W500,
-                                style = MaterialTheme.typography.button,
-                            )
                         },
                     )
                 },
@@ -541,10 +526,7 @@ private fun AlbumImportContent(
         LegacyMegaEmptyView(
             modifier = modifier,
             imageVector = ImageVector.vectorResource(id = R.drawable.ic_photos_user_album_empty),
-            text = stringResource(id = R.string.photos_user_album_empty_album)
-                .formatColorTag(context, 'A', R.color.grey_900_grey_100)
-                .formatColorTag(context, 'B', R.color.grey_300_grey_600)
-                .toSpannedHtmlText(),
+            text = stringResource(id = R.string.photos_user_album_empty_album),
         )
     } else if (isLocalAlbumsLoaded && isAvailableStorageCollected && album != null) {
         AlbumImportList(
@@ -640,7 +622,7 @@ private fun InputDecryptionKeyDialog(
                 content = {
                     Text(
                         text = stringResource(id = R.string.general_decryp),
-                        color = teal_300,
+                        color = accent_900,
                         fontSize = 14.sp,
                         fontWeight = FontWeight.W500,
                         style = MaterialTheme.typography.button,
@@ -654,7 +636,7 @@ private fun InputDecryptionKeyDialog(
                 content = {
                     Text(
                         text = stringResource(id = sharedR.string.general_dialog_cancel_button),
-                        color = teal_300,
+                        color = accent_900,
                         fontSize = 14.sp,
                         fontWeight = FontWeight.W500,
                         style = MaterialTheme.typography.button,
@@ -696,7 +678,7 @@ private fun ErrorAccessDialog(
                 content = {
                     Text(
                         text = stringResource(id = R.string.general_ok),
-                        color = teal_300,
+                        color = accent_900,
                         fontSize = 14.sp,
                         fontWeight = FontWeight.W500,
                         style = MaterialTheme.typography.button,
@@ -766,7 +748,7 @@ private fun RenameAlbumDialog(
                 content = {
                     Text(
                         text = stringResource(id = sharedR.string.general_dialog_cancel_button),
-                        color = teal_300,
+                        color = accent_900,
                         fontSize = 14.sp,
                         fontWeight = FontWeight.W500,
                         style = MaterialTheme.typography.button,
@@ -780,7 +762,7 @@ private fun RenameAlbumDialog(
                 content = {
                     Text(
                         text = stringResource(id = R.string.context_rename),
-                        color = teal_300,
+                        color = accent_900,
                         fontSize = 14.sp,
                         fontWeight = FontWeight.W500,
                         style = MaterialTheme.typography.button,
@@ -882,7 +864,7 @@ private fun StorageExceededDialog(
                 content = {
                     Text(
                         text = stringResource(id = sharedR.string.general_dialog_cancel_button),
-                        color = teal_300,
+                        color = accent_900,
                         fontSize = 14.sp,
                         fontWeight = FontWeight.W500,
                         style = MaterialTheme.typography.button,
@@ -899,7 +881,7 @@ private fun StorageExceededDialog(
                 content = {
                     Text(
                         text = stringResource(id = sharedR.string.general_upgrade_button),
-                        color = teal_300,
+                        color = accent_900,
                         fontSize = 14.sp,
                         fontWeight = FontWeight.W500,
                         style = MaterialTheme.typography.button,

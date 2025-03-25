@@ -154,7 +154,7 @@ class ContactGroupsFragment : Fragment() {
 
         binding.viewEmpty.text = binding.viewEmpty.text.toString()
             .formatColorTag(requireContext(), 'A', R.color.grey_900_grey_100)
-            .formatColorTag(requireContext(), 'B', R.color.grey_300_grey_600)
+            .formatColorTag(requireContext(), 'B', R.color.grey_900_grey_100)
             .toSpannedHtmlText()
     }
 

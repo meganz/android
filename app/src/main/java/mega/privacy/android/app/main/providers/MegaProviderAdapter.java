@@ -3,13 +3,11 @@ package mega.privacy.android.app.main.providers;
 import static mega.privacy.android.app.utils.Constants.ICON_MARGIN_DP;
 import static mega.privacy.android.app.utils.Constants.ICON_SIZE_DP;
 import static mega.privacy.android.app.utils.Constants.INCOMING_SHARES_PROVIDER_ADAPTER;
-import static mega.privacy.android.app.utils.Constants.THUMB_CORNER_RADIUS_DP;
 import static mega.privacy.android.app.utils.Constants.THUMB_MARGIN_DP;
 import static mega.privacy.android.app.utils.Constants.THUMB_SIZE_DP;
 import static mega.privacy.android.app.utils.ContactUtil.getMegaUserNameDB;
 import static mega.privacy.android.app.utils.MegaApiUtils.getMegaNodeFolderInfo;
 import static mega.privacy.android.app.utils.MegaNodeUtil.getFileInfo;
-import static mega.privacy.android.app.utils.ThumbnailUtils.getRoundedBitmap;
 import static mega.privacy.android.app.utils.Util.dp2px;
 import static mega.privacy.android.app.utils.Util.scaleWidthPx;
 import static mega.privacy.android.app.utils.Util.setViewAlpha;
@@ -17,7 +15,6 @@ import static mega.privacy.android.app.utils.Util.setViewAlpha;
 import android.app.Activity;
 import android.content.Context;
 import android.content.res.Configuration;
-import android.graphics.Bitmap;
 import android.util.DisplayMetrics;
 import android.util.SparseBooleanArray;
 import android.view.Display;
@@ -36,10 +33,14 @@ import androidx.recyclerview.widget.RecyclerView;
 import java.util.ArrayList;
 import java.util.List;
 
+import coil.Coil;
+import coil.request.ImageRequest;
+import coil.transform.RoundedCornersTransformation;
+import coil.util.CoilUtils;
 import mega.privacy.android.app.MegaApplication;
 import mega.privacy.android.app.MimeTypeList;
 import mega.privacy.android.app.R;
-import mega.privacy.android.app.utils.ThumbnailUtils;
+import mega.privacy.android.domain.entity.node.thumbnail.ThumbnailRequest;
 import nz.mega.sdk.MegaApiAndroid;
 import nz.mega.sdk.MegaNode;
 import nz.mega.sdk.MegaShare;
@@ -47,9 +48,6 @@ import nz.mega.sdk.MegaUser;
 import timber.log.Timber;
 
 public class MegaProviderAdapter extends RecyclerView.Adapter<MegaProviderAdapter.ViewHolderProvider> implements OnClickListener, View.OnLongClickListener {
-
-    final public static int CLOUD_EXPLORER = 0;
-    final public static int INCOMING_SHARES_EXPLORER = 1;
 
     Context context;
     MegaApiAndroid megaApi;
@@ -167,6 +165,7 @@ public class MegaProviderAdapter extends RecyclerView.Adapter<MegaProviderAdapte
 
         RelativeLayout.LayoutParams params = (RelativeLayout.LayoutParams) holder.imageView.getLayoutParams();
 
+        CoilUtils.dispose(holder.imageView);
         if (node.isFolder()) {
             params.height = params.width = dp2px(ICON_SIZE_DP);
             int margin = dp2px(ICON_MARGIN_DP);
@@ -221,25 +220,19 @@ public class MegaProviderAdapter extends RecyclerView.Adapter<MegaProviderAdapte
                 params.setMargins(dp2px(ICON_MARGIN_DP), 0, 0, 0);
                 holder.imageView.setImageResource(mega.privacy.android.core.R.drawable.ic_select_folder);
             } else {
-                Bitmap thumb = ThumbnailUtils.getThumbnailFromCache(node);
-
-                if (thumb == null) {
-                    thumb = ThumbnailUtils.getThumbnailFromFolder(node, context);
-
-                    if (thumb == null) {
-                        try {
-                            thumb = ThumbnailUtils.getThumbnailFromMegaProvider(node, context, holder, megaApi, this);
-                        } catch (Exception e) {
-                            Timber.w(e, "Exception getting thumbnail.");
-                        } //Too many AsyncTasks
-                    }
-                }
                 int margin;
-
-                if (thumb != null) {
+                if (node.hasThumbnail()) {
                     params.height = params.width = dp2px(THUMB_SIZE_DP);
                     margin = dp2px(THUMB_MARGIN_DP);
-                    holder.imageView.setImageBitmap(getRoundedBitmap(context, thumb, dp2px(THUMB_CORNER_RADIUS_DP)));
+                    Coil.imageLoader(context).enqueue(
+                            new ImageRequest.Builder(context)
+                                    .data(ThumbnailRequest.fromHandle(node.getHandle()))
+                                    .crossfade(true)
+                                    .placeholder(MimeTypeList.typeForName(node.getName()).getIconResourceId())
+                                    .transformations(new RoundedCornersTransformation(context.getResources().getDimensionPixelSize(R.dimen.thumbnail_corner_radius)))
+                                    .target(holder.imageView)
+                                    .build()
+                    );
                 } else {
                     params.height = params.width = dp2px(ICON_SIZE_DP);
                     margin = dp2px(ICON_MARGIN_DP);

@@ -36,14 +36,13 @@ class OpenLinkViewModel @Inject constructor(
     @ApplicationScope private val applicationScope: CoroutineScope,
 ) : ViewModel() {
 
-
-    private val _state = MutableStateFlow(OpenLinkState())
+    private val _uiState = MutableStateFlow(OpenLinkUiState())
 
     /**
      * UI State OpenLinkActivity
-     * Flow of [OpenLinkState]
+     * Flow of [OpenLinkUiState]
      */
-    val state = _state.asStateFlow()
+    val uiState = _uiState.asStateFlow()
 
     /**
      * decodes the url and updates the state
@@ -55,11 +54,12 @@ class OpenLinkViewModel @Inject constructor(
                 val accountCredentials = getAccountCredentials()
                 val needToRefresh = getRootNodeUseCase() == null
                 val decodedUrl = decodeLinkUseCase(url)
-                _state.update {
+                _uiState.update {
                     it.copy(
                         decodedUrl = decodedUrl,
                         isLoggedIn = accountCredentials != null,
-                        needsRefreshSession = needToRefresh
+                        needsRefreshSession = needToRefresh,
+                        urlRedirectionEvent = true
                     )
                 }
             }.onFailure { error ->
@@ -82,7 +82,7 @@ class OpenLinkViewModel @Inject constructor(
                     localLogoutAppUseCase()
                 }.onSuccess {
                     MegaApplication.urlConfirmationLink = null
-                    _state.update { it.copy(isLogoutCompleted = true) }
+                    _uiState.update { it.copy(logoutCompletedEvent = true) }
                 }.onFailure {
                     Timber.d("Logout confirmation failed : ${it.message}")
                 }
@@ -114,11 +114,29 @@ class OpenLinkViewModel @Inject constructor(
             querySignupLinkUseCase(link)
         }.onSuccess { email ->
             Timber.d("Valid signup link")
-            _state.update {
+            _uiState.update {
                 it.copy(accountInvitationEmail = email)
             }
         }.onFailure {
             Timber.e(it)
+        }
+    }
+
+    /**
+     * Reset url redirection event when consumed
+     */
+    fun onUrlRedirectionEventConsumed() {
+        _uiState.update {
+            it.copy(urlRedirectionEvent = false)
+        }
+    }
+
+    /**
+     * Reset logout completed event when consumed
+     */
+    fun onLogoutCompletedEventConsumed() {
+        _uiState.update {
+            it.copy(logoutCompletedEvent = false)
         }
     }
 }

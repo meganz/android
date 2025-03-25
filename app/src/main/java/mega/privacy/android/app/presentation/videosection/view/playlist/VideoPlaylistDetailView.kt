@@ -20,7 +20,6 @@ import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.foundation.shape.RoundedCornerShape
-import androidx.compose.material.ExperimentalMaterialApi
 import androidx.compose.material.MaterialTheme
 import androidx.compose.material.ModalBottomSheetValue
 import androidx.compose.material.rememberModalBottomSheetState
@@ -49,6 +48,7 @@ import androidx.compose.ui.semantics.semantics
 import androidx.compose.ui.semantics.testTagsAsResourceId
 import androidx.compose.ui.unit.dp
 import kotlinx.coroutines.launch
+import mega.privacy.android.app.presentation.videosection.model.FavouritesPlaylistBottomSheetOption
 import mega.privacy.android.app.presentation.videosection.model.VideoPlaylistUIEntity
 import mega.privacy.android.app.presentation.videosection.model.VideoSectionMenuAction
 import mega.privacy.android.app.presentation.videosection.model.VideoUIEntity
@@ -64,16 +64,16 @@ import mega.privacy.android.shared.original.core.ui.controls.layouts.MegaScaffol
 import mega.privacy.android.shared.original.core.ui.controls.text.LongTextBehaviour
 import mega.privacy.android.shared.original.core.ui.controls.text.MegaText
 import mega.privacy.android.shared.original.core.ui.preview.CombinedThemePreviews
-import mega.privacy.android.shared.original.core.ui.theme.OriginalTempTheme
+import mega.privacy.android.shared.original.core.ui.theme.OriginalTheme
 import mega.privacy.android.shared.original.core.ui.theme.extensions.grey_050_grey_800
-import mega.privacy.android.shared.original.core.ui.theme.values.TextColor
+import mega.android.core.ui.theme.values.TextColor
 import mega.privacy.android.shared.original.core.ui.utils.showAutoDurationSnackbar
 import nz.mega.sdk.MegaNode
 
 /**
  * Video playlist detail view
  */
-@OptIn(ExperimentalMaterialApi::class, ExperimentalComposeUiApi::class)
+@OptIn(ExperimentalComposeUiApi::class)
 @Composable
 fun VideoPlaylistDetailView(
     playlist: VideoPlaylistUIEntity?,
@@ -98,11 +98,14 @@ fun VideoPlaylistDetailView(
     onLongClick: ((item: VideoUIEntity, index: Int) -> Unit),
     onBackPressed: () -> Unit,
     onMenuActionClick: (VideoSectionMenuAction?) -> Unit,
+    enableFavouritesPlaylistMenu: Boolean,
+    onRemoveFavouriteOptionClicked: () -> Unit,
     modifier: Modifier = Modifier,
     errorMessage: Int? = null,
 ) {
     val items = playlist?.videos ?: emptyList()
     val lazyListState = rememberLazyListState()
+    val isSystemVideoPlaylist = playlist?.isSystemVideoPlayer == true
 
     val isNotInFirstItem by remember {
         derivedStateOf {
@@ -122,6 +125,11 @@ fun VideoPlaylistDetailView(
         initialValue = ModalBottomSheetValue.Hidden,
         skipHalfExpanded = false
     )
+    val favouritesPlaylistModalSheetState = rememberModalBottomSheetState(
+        initialValue = ModalBottomSheetValue.Hidden,
+        skipHalfExpanded = true
+    )
+
     val scrollNotInProgress by remember {
         derivedStateOf { !lazyListState.isScrollInProgress }
     }
@@ -175,9 +183,17 @@ fun VideoPlaylistDetailView(
         }
     }
 
-    BackHandler(selectedSize > 0) {
-        if (selectedSize > 0) {
-            onBackPressed()
+    BackHandler(enabled = favouritesPlaylistModalSheetState.isVisible || selectedSize > 0) {
+        when {
+            favouritesPlaylistModalSheetState.isVisible -> {
+                coroutineScope.launch {
+                    favouritesPlaylistModalSheetState.hide()
+                }
+            }
+
+            selectedSize > 0 -> {
+                onBackPressed()
+            }
         }
     }
 
@@ -196,7 +212,11 @@ fun VideoPlaylistDetailView(
                     when (action) {
                         is VideoSectionMenuAction.VideoSectionMoreAction -> {
                             coroutineScope.launch {
-                                modalSheetState.show()
+                                if (isSystemVideoPlaylist) {
+                                    favouritesPlaylistModalSheetState.show()
+                                } else {
+                                    modalSheetState.show()
+                                }
                             }
                         }
 
@@ -207,7 +227,8 @@ fun VideoPlaylistDetailView(
                     }
                 },
                 onBackPressed = onBackPressed,
-                isSystemVideoPlaylist = playlist?.isSystemVideoPlayer == true
+                isSystemVideoPlaylist = isSystemVideoPlaylist,
+                enableFavouritesPlaylistMenu = enableFavouritesPlaylistMenu
             )
         },
         floatingActionButton = {
@@ -281,6 +302,7 @@ fun VideoPlaylistDetailView(
                 title = playlist?.title,
                 totalDuration = playlist?.totalDuration,
                 numberOfVideos = playlist?.numberOfVideos,
+                isFavouritePlaylist = isSystemVideoPlaylist,
                 onPlayAllClicked = {},
                 modifier = Modifier.testTag(
                     VIDEO_PLAYLIST_DETAIL_EMPTY_VIEW_TEST_TAG
@@ -329,7 +351,11 @@ fun VideoPlaylistDetailView(
                                     nodeAvailableOffline = videoItem.nodeAvailableOffline,
                                     onClick = { onClick(videoItem, it) },
                                     onMenuClick = { onMenuClick(videoItem) },
-                                    onLongClick = { onLongClick(videoItem, it) },
+                                    onLongClick = {
+                                        if (!isSystemVideoPlaylist || enableFavouritesPlaylistMenu) {
+                                            onLongClick(videoItem, it)
+                                        }
+                                    },
                                     modifier = Modifier
                                         .alpha(0.5f.takeIf {
                                             shouldApplySensitiveMode && (videoItem.isMarkedSensitive || videoItem.isSensitiveInherited)
@@ -342,18 +368,45 @@ fun VideoPlaylistDetailView(
                 }
             }
         }
-
-        VideoPlaylistBottomSheet(
-            modalSheetState = modalSheetState,
-            coroutineScope = coroutineScope,
-            onRenameVideoPlaylistClicked = {
-                showRenameVideoPlaylistDialog = true
-            },
-            onDeleteVideoPlaylistClicked = {
-                showDeleteVideoPlaylistDialog = true
-            }
-        )
     }
+    VideoPlaylistBottomSheet(
+        modalSheetState = modalSheetState,
+        coroutineScope = coroutineScope,
+        onRenameVideoPlaylistClicked = {
+            showRenameVideoPlaylistDialog = true
+        },
+        onDeleteVideoPlaylistClicked = {
+            showDeleteVideoPlaylistDialog = true
+        }
+    )
+
+    FavouritesPlaylistBottomSheet(
+        modalSheetState = favouritesPlaylistModalSheetState,
+        coroutineScope = coroutineScope,
+        isHideMenuActionVisible = isHideMenuActionVisible,
+        isUnhideMenuActionVisible = isUnhideMenuActionVisible,
+        onBottomSheetOptionClicked = { option ->
+            when (option) {
+                FavouritesPlaylistBottomSheetOption.Download ->
+                    onMenuActionClick(VideoSectionMenuAction.VideoSectionDownloadAction)
+
+                FavouritesPlaylistBottomSheetOption.SendToChat ->
+                    onMenuActionClick(VideoSectionMenuAction.VideoSectionSendToChatAction)
+
+                FavouritesPlaylistBottomSheetOption.Share ->
+                    onMenuActionClick(VideoSectionMenuAction.VideoSectionShareAction)
+
+                FavouritesPlaylistBottomSheetOption.Hide ->
+                    onMenuActionClick(VideoSectionMenuAction.VideoSectionHideAction)
+
+                FavouritesPlaylistBottomSheetOption.Unhide ->
+                    onMenuActionClick(VideoSectionMenuAction.VideoSectionUnhideAction)
+
+                FavouritesPlaylistBottomSheetOption.RemoveFavourite ->
+                    onRemoveFavouriteOptionClicked()
+            }
+        }
+    )
 }
 
 @Composable
@@ -362,6 +415,7 @@ internal fun VideoPlaylistEmptyView(
     title: String?,
     totalDuration: String?,
     numberOfVideos: Int?,
+    isFavouritePlaylist: Boolean,
     onPlayAllClicked: () -> Unit,
     modifier: Modifier = Modifier,
 ) {
@@ -382,8 +436,21 @@ internal fun VideoPlaylistEmptyView(
         }
         LegacyMegaEmptyViewWithImage(
             modifier = Modifier.fillMaxSize(),
-            text = stringResource(id = sharedR.string.video_section_playlist_detail_empty_hint_videos),
-            imagePainter = painterResource(id = iconPackR.drawable.ic_video_section_empty_video)
+            text = stringResource(
+                id = if (isFavouritePlaylist) {
+                    sharedR.string.favourites_playlist_empty_hint
+                } else {
+                    sharedR.string.video_section_playlist_detail_empty_hint_videos
+                }
+            ),
+            imagePainter = painterResource(
+                id = if (isFavouritePlaylist) {
+                    iconPackR.drawable.ic_hearts_glass
+                } else {
+                    iconPackR.drawable.ic_video_glass
+                }
+
+            )
         )
     }
 }
@@ -528,9 +595,20 @@ internal fun PlayAllButtonView(
 @CombinedThemePreviews
 @Composable
 private fun VideoPlaylistDetailViewPreview() {
-    OriginalTempTheme(isDark = isSystemInDarkTheme()) {
+    OriginalTheme(isDark = isSystemInDarkTheme()) {
         VideoPlaylistDetailView(
-            playlist = null,
+            playlist = VideoPlaylistUIEntity(
+                id = NodeId(0),
+                thumbnailList = null,
+                title = "New Playlist",
+                totalDuration = "00:00:00",
+                numberOfVideos = 0,
+                videos = emptyList(),
+                isSystemVideoPlayer = true,
+                cover = null,
+                creationTime = 0L,
+                modificationTime = 0L
+            ),
             selectedSize = 0,
             shouldApplySensitiveMode = false,
             isHideMenuActionVisible = true,
@@ -551,7 +629,9 @@ private fun VideoPlaylistDetailViewPreview() {
             onClick = { _, _ -> },
             onLongClick = { _, _ -> },
             onMenuClick = {},
-            onMenuActionClick = {}
+            onMenuActionClick = {},
+            enableFavouritesPlaylistMenu = false,
+            onRemoveFavouriteOptionClicked = {}
         )
     }
 }
@@ -559,7 +639,7 @@ private fun VideoPlaylistDetailViewPreview() {
 @CombinedThemePreviews
 @Composable
 private fun VideoPlaylistDetailViewUnderActionModePreview() {
-    OriginalTempTheme(isDark = isSystemInDarkTheme()) {
+    OriginalTheme(isDark = isSystemInDarkTheme()) {
         VideoPlaylistDetailView(
             playlist = null,
             selectedSize = 2,
@@ -582,7 +662,9 @@ private fun VideoPlaylistDetailViewUnderActionModePreview() {
             onClick = { _, _ -> },
             onLongClick = { _, _ -> },
             onMenuClick = {},
-            onMenuActionClick = {}
+            onMenuActionClick = {},
+            enableFavouritesPlaylistMenu = false,
+            onRemoveFavouriteOptionClicked = {}
         )
     }
 }
@@ -590,7 +672,7 @@ private fun VideoPlaylistDetailViewUnderActionModePreview() {
 @CombinedThemePreviews
 @Composable
 private fun VideoPlaylistHeaderViewPreview() {
-    OriginalTempTheme(isDark = isSystemInDarkTheme()) {
+    OriginalTheme(isDark = isSystemInDarkTheme()) {
         VideoPlaylistHeaderView(
             modifier = Modifier,
             thumbnailList = listOf(null),
@@ -605,7 +687,7 @@ private fun VideoPlaylistHeaderViewPreview() {
 @CombinedThemePreviews
 @Composable
 private fun PlayAllButtonViewPreview() {
-    OriginalTempTheme(isDark = isSystemInDarkTheme()) {
+    OriginalTheme(isDark = isSystemInDarkTheme()) {
         PlayAllButtonView()
     }
 }

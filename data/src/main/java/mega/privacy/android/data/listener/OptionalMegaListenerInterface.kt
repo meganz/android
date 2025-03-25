@@ -55,10 +55,6 @@ class OptionalMegaListenerInterface(
 
     }
 
-    override fun onReloadNeeded(api: MegaApiJava) {
-
-    }
-
     override fun onAccountUpdate(api: MegaApiJava) {
 
     }

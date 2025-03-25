@@ -11,11 +11,13 @@ plugins {
 
 android {
     namespace = "mega.privacy.android.app.baselineprofile"
-    compileSdk = 34
+    val compileSdkVersion: Int by rootProject.extra
+    compileSdk = compileSdkVersion
 
     compileOptions {
-        sourceCompatibility = JavaVersion.VERSION_17
-        targetCompatibility = JavaVersion.VERSION_17
+        val javaVersion: JavaVersion by rootProject.extra
+        sourceCompatibility = javaVersion
+        targetCompatibility = javaVersion
     }
 
     buildFeatures {
@@ -33,8 +35,9 @@ android {
     }
 
     defaultConfig {
+        val targetSdkVersion: Int by rootProject.extra
         minSdk = 28
-        targetSdk = 34
+        targetSdk = targetSdkVersion
 
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
         buildConfigField(
@@ -76,5 +79,5 @@ dependencies {
     implementation("androidx.test.ext:junit:1.2.1")
     implementation("androidx.test.espresso:espresso-core:3.6.1")
     implementation("androidx.test.uiautomator:uiautomator:2.3.0")
-    implementation("androidx.benchmark:benchmark-macro-junit4:1.2.4")
+    implementation("androidx.benchmark:benchmark-macro-junit4:1.3.3")
 }

@@ -1,6 +1,5 @@
 package mega.privacy.android.feature.sync.ui.synclist.folders
 
-import mega.privacy.android.icon.pack.R as iconPackR
 import mega.privacy.android.shared.resources.R as sharedResR
 import android.content.res.Configuration
 import androidx.compose.foundation.Image
@@ -17,6 +16,7 @@ import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.MaterialTheme
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalConfiguration
@@ -38,16 +38,14 @@ import mega.privacy.android.feature.sync.ui.views.SyncItemView
 import mega.privacy.android.feature.sync.ui.views.SyncTypePreviewProvider
 import mega.privacy.android.feature.sync.ui.views.TAG_SYNC_LIST_SCREEN_NO_ITEMS
 import mega.privacy.android.shared.original.core.ui.controls.buttons.RaisedDefaultMegaButton
-import mega.privacy.android.shared.original.core.ui.controls.dialogs.MegaAlertDialog
 import mega.privacy.android.shared.original.core.ui.controls.skeleton.CardItemLoadingSkeleton
 import mega.privacy.android.shared.original.core.ui.controls.text.MegaText
-import mega.privacy.android.shared.original.core.ui.preview.BooleanProvider
 import mega.privacy.android.shared.original.core.ui.preview.CombinedThemePreviews
-import mega.privacy.android.shared.original.core.ui.theme.OriginalTempTheme
+import mega.privacy.android.shared.original.core.ui.theme.OriginalTheme
 import mega.privacy.android.shared.original.core.ui.theme.extensions.h6Medium
-import mega.privacy.android.shared.original.core.ui.theme.extensions.subtitle2medium
-import mega.privacy.android.shared.original.core.ui.theme.values.TextColor
-import mega.privacy.mobile.analytics.event.SyncListEmptyStateUpgradeButtonPressedEvent
+import mega.android.core.ui.theme.values.TextColor
+import mega.privacy.mobile.analytics.event.SyncCardExpandedEvent
+import mega.privacy.mobile.analytics.event.SyncFoldersListDisplayedEvent
 
 @Composable
 internal fun SyncFoldersScreen(
@@ -55,17 +53,15 @@ internal fun SyncFoldersScreen(
     cardExpanded: (CardExpanded) -> Unit,
     pauseRunClicked: (SyncUiItem) -> Unit,
     removeFolderClicked: (SyncUiItem) -> Unit,
-    addFolderClicked: () -> Unit,
-    upgradeAccountClicked: () -> Unit,
+    onAddNewSyncClicked: () -> Unit,
+    onAddNewBackupClicked: () -> Unit,
     issuesInfoClicked: () -> Unit,
     onOpenDeviceFolderClicked: (String) -> Unit,
+    onOpenMegaFolderClicked: (SyncUiItem) -> Unit,
+    onCameraUploadsSettingsClicked: () -> Unit,
     isLowBatteryLevel: Boolean,
-    isFreeAccount: Boolean,
     isLoading: Boolean,
-    showSyncsPausedErrorDialog: Boolean,
-    onShowSyncsPausedErrorDialogDismissed: () -> Unit,
     deviceName: String,
-    isBackupForAndroidEnabled: Boolean,
     modifier: Modifier = Modifier,
 ) {
     Box(
@@ -82,10 +78,8 @@ internal fun SyncFoldersScreen(
             } else if (syncUiItems.isEmpty()) {
                 item {
                     SyncFoldersScreenEmptyState(
-                        isFreeAccount = isFreeAccount,
-                        addFolderClicked = addFolderClicked,
-                        upgradeNowClicked = upgradeAccountClicked,
-                        isBackupForAndroidEnabled = isBackupForAndroidEnabled,
+                        onAddNewSyncClicked = onAddNewSyncClicked,
+                        onAddNewBackupClicked = onAddNewBackupClicked,
                         modifier = Modifier
                             .fillParentMaxHeight()
                             .fillParentMaxWidth()
@@ -101,140 +95,83 @@ internal fun SyncFoldersScreen(
                         syncUiItems = syncUiItems,
                         itemIndex = itemIndex,
                         cardExpanded = { syncUiItem, expanded ->
+                            if (expanded) {
+                                Analytics.tracker.trackEvent(SyncCardExpandedEvent)
+                            }
                             cardExpanded(CardExpanded(syncUiItem, expanded))
                         },
                         pauseRunClicked = pauseRunClicked,
                         removeFolderClicked = removeFolderClicked,
                         issuesInfoClicked = issuesInfoClicked,
                         onOpenDeviceFolderClicked = onOpenDeviceFolderClicked,
+                        onOpenMegaFolderClicked = onOpenMegaFolderClicked,
+                        onCameraUploadsSettingsClicked = onCameraUploadsSettingsClicked,
                         isLowBatteryLevel = isLowBatteryLevel,
-                        isFreeAccount = isFreeAccount,
                         errorRes = syncUiItems[itemIndex].error,
                         deviceName = deviceName,
                     )
                 }
             }
         }
-        if (showSyncsPausedErrorDialog) {
-            MegaAlertDialog(
-                title = "",
-                body = stringResource(sharedResR.string.sync_error_dialog_free_user),
-                icon = iconPackR.drawable.ic_alert_triangle_color,
-                confirmButtonText = stringResource(sharedResR.string.sync_error_dialog_free_user_confirm_action),
-                cancelButtonText = null,
-                onConfirm = onShowSyncsPausedErrorDialogDismissed,
-                onDismiss = onShowSyncsPausedErrorDialogDismissed,
-                bodyTextColor = TextColor.Primary,
-            )
+    }
+
+    LaunchedEffect(syncUiItems) {
+        if (syncUiItems.isNotEmpty()) {
+            Analytics.tracker.trackEvent(SyncFoldersListDisplayedEvent)
         }
     }
 }
 
 @Composable
 private fun SyncFoldersScreenEmptyState(
-    isFreeAccount: Boolean,
-    addFolderClicked: () -> Unit,
-    upgradeNowClicked: () -> Unit,
-    isBackupForAndroidEnabled: Boolean,
+    onAddNewSyncClicked: () -> Unit,
+    onAddNewBackupClicked: () -> Unit,
     modifier: Modifier = Modifier,
 ) {
+    val isLandscape =
+        LocalConfiguration.current.orientation == Configuration.ORIENTATION_LANDSCAPE
+
     Column(
-        modifier = if (isBackupForAndroidEnabled) {
-            modifier
-                .verticalScroll(rememberScrollState())
-                .padding(all = 48.dp)
-        } else {
-            modifier
-                .verticalScroll(rememberScrollState())
-                .padding(horizontal = 32.dp)
-        },
+        modifier = modifier
+            .verticalScroll(rememberScrollState())
+            .padding(all = if (isLandscape) 0.dp else 48.dp),
         horizontalAlignment = Alignment.CenterHorizontally,
-        verticalArrangement = if (isBackupForAndroidEnabled) {
-            Arrangement.Top
-        } else {
-            Arrangement.Center
-        }
+        verticalArrangement = Arrangement.Center,
     ) {
         Image(
             painterResource(R.drawable.no_syncs_placeholder),
             contentDescription = "Sync folders empty state image",
         )
         MegaText(
-            text = if (isBackupForAndroidEnabled) {
-                stringResource(id = sharedResR.string.device_center_sync_backup_list_empty_state_title)
-            } else {
-                stringResource(id = sharedResR.string.device_center_sync_list_empty_state_title)
-            },
+            text = stringResource(id = sharedResR.string.device_center_sync_backup_list_empty_state_title),
             textColor = TextColor.Primary,
             modifier = Modifier.padding(top = 32.dp),
             style = MaterialTheme.typography.h6Medium
         )
-        if (isBackupForAndroidEnabled) {
-            MegaText(
-                text = if (isFreeAccount) {
-                    stringResource(id = sharedResR.string.device_center_sync_backup_list_empty_state_message_free_account)
-                } else {
-                    stringResource(id = sharedResR.string.device_center_sync_backup_list_empty_state_message)
-                },
-                textColor = TextColor.Secondary,
-                modifier = Modifier
-                    .padding(top = 16.dp)
-                    .testTag(TEST_TAG_SYNC_LIST_SCREEN_EMPTY_STATUS_TEXT),
-                style = MaterialTheme.typography.subtitle2.copy(textAlign = TextAlign.Center),
-            )
-        } else {
-            val messageTypography =
-                if (isFreeAccount) MaterialTheme.typography.subtitle2medium else MaterialTheme.typography.subtitle2
-            MegaText(
-                text = stringResource(id = sharedResR.string.device_center_sync_list_empty_state_message),
-                textColor = if (isFreeAccount) TextColor.Primary else TextColor.Secondary,
-                modifier = Modifier.padding(top = 16.dp),
-                style = messageTypography.copy(textAlign = TextAlign.Center),
-            )
-            if (isFreeAccount) {
-                MegaText(
-                    text = stringResource(id = sharedResR.string.device_center_sync_list_empty_state_message_free_account),
-                    textColor = TextColor.Secondary,
-                    modifier = Modifier
-                        .padding(top = 16.dp)
-                        .testTag(TEST_TAG_SYNC_LIST_SCREEN_EMPTY_STATUS_TEXT_FOR_FREE_ACCOUNTS),
-                    style = MaterialTheme.typography.subtitle2.copy(textAlign = TextAlign.Center),
-                )
-            }
-        }
-
-        val isLandscape =
-            LocalConfiguration.current.orientation == Configuration.ORIENTATION_LANDSCAPE
-
-        if (isBackupForAndroidEnabled) {
-            if (isFreeAccount) {
-                RaisedDefaultMegaButton(
-                    textId = sharedResR.string.device_center_sync_backup_see_upgrade_options_button_label,
-                    onClick = {
-                        Analytics.tracker.trackEvent(SyncListEmptyStateUpgradeButtonPressedEvent)
-                        upgradeNowClicked()
-                    },
-                    modifier = Modifier
-                        .padding(top = if (isLandscape) 32.dp else 144.dp)
-                        .defaultMinSize(minWidth = 232.dp)
-                        .testTag(TEST_TAG_SYNC_LIST_SCREEN_EMPTY_STATUS_BUTTON),
-                )
-            }
-        } else {
-            RaisedDefaultMegaButton(
-                textId = if (isFreeAccount) sharedResR.string.general_upgrade_now_label else sharedResR.string.device_center_sync_add_new_syn_button_option,
-                onClick = if (isFreeAccount) {
-                    Analytics.tracker.trackEvent(SyncListEmptyStateUpgradeButtonPressedEvent)
-                    upgradeNowClicked
-                } else {
-                    addFolderClicked
-                },
-                modifier = Modifier
-                    .padding(top = if (isLandscape) 32.dp else if (isFreeAccount) 108.dp else 162.dp)
-                    .defaultMinSize(minWidth = 232.dp)
-                    .testTag(TEST_TAG_SYNC_LIST_SCREEN_EMPTY_STATUS_BUTTON),
-            )
-        }
+        MegaText(
+            text = stringResource(id = sharedResR.string.device_center_sync_backup_list_empty_state_message),
+            textColor = TextColor.Secondary,
+            modifier = Modifier
+                .padding(top = 16.dp)
+                .testTag(TEST_TAG_SYNC_LIST_SCREEN_EMPTY_STATUS_TEXT),
+            style = MaterialTheme.typography.subtitle2.copy(textAlign = TextAlign.Center),
+        )
+        RaisedDefaultMegaButton(
+            textId = sharedResR.string.device_center_sync_add_new_syn_button_option,
+            onClick = onAddNewSyncClicked,
+            modifier = Modifier
+                .padding(top = if (isLandscape) 32.dp else 48.dp)
+                .defaultMinSize(minWidth = 232.dp)
+                .testTag(TEST_TAG_SYNC_LIST_SCREEN_EMPTY_STATUS_SYNC_BUTTON),
+        )
+        RaisedDefaultMegaButton(
+            textId = sharedResR.string.device_center_sync_add_new_backup_button_option,
+            onClick = onAddNewBackupClicked,
+            modifier = Modifier
+                .padding(top = 24.dp)
+                .defaultMinSize(minWidth = 232.dp)
+                .testTag(TEST_TAG_SYNC_LIST_SCREEN_EMPTY_STATUS_BACKUP_BUTTON),
+        )
     }
 }
 
@@ -262,26 +199,22 @@ private fun SyncFoldersScreenLoadingState() {
 @Composable
 @Preview(name = "5-inch Device Portrait", widthDp = 360, heightDp = 640)
 @Preview(name = "5-inch Device Portrait", widthDp = 640, heightDp = 360)
-private fun SyncFoldersScreenEmptyStatePreview(
-    @PreviewParameter(BooleanProvider::class) isFreeAccount: Boolean,
-) {
-    OriginalTempTheme(isDark = isSystemInDarkTheme()) {
+private fun SyncFoldersScreenEmptyStatePreview() {
+    OriginalTheme(isDark = isSystemInDarkTheme()) {
         SyncFoldersScreen(
             syncUiItems = emptyList(),
             cardExpanded = {},
             pauseRunClicked = {},
             removeFolderClicked = {},
-            addFolderClicked = {},
-            upgradeAccountClicked = {},
+            onAddNewSyncClicked = {},
+            onAddNewBackupClicked = {},
             issuesInfoClicked = {},
             onOpenDeviceFolderClicked = {},
+            onOpenMegaFolderClicked = {},
+            onCameraUploadsSettingsClicked = {},
             isLowBatteryLevel = false,
-            isFreeAccount = isFreeAccount,
             isLoading = false,
-            showSyncsPausedErrorDialog = false,
-            onShowSyncsPausedErrorDialogDismissed = {},
             deviceName = "Device Name",
-            isBackupForAndroidEnabled = true,
         )
     }
 }
@@ -292,23 +225,21 @@ private fun SyncFoldersScreenEmptyStatePreview(
 @CombinedThemePreviews
 @Composable
 private fun SyncFoldersScreenLoadingStatePreview() {
-    OriginalTempTheme(isDark = isSystemInDarkTheme()) {
+    OriginalTheme(isDark = isSystemInDarkTheme()) {
         SyncFoldersScreen(
             syncUiItems = emptyList(),
             cardExpanded = {},
             pauseRunClicked = {},
             removeFolderClicked = {},
-            addFolderClicked = {},
-            upgradeAccountClicked = {},
+            onAddNewSyncClicked = {},
+            onAddNewBackupClicked = {},
             issuesInfoClicked = {},
             onOpenDeviceFolderClicked = {},
+            onOpenMegaFolderClicked = {},
+            onCameraUploadsSettingsClicked = {},
             isLowBatteryLevel = false,
-            isFreeAccount = false,
             isLoading = true,
-            showSyncsPausedErrorDialog = false,
-            onShowSyncsPausedErrorDialogDismissed = {},
             deviceName = "Device Name",
-            isBackupForAndroidEnabled = true,
         )
     }
 }
@@ -316,9 +247,9 @@ private fun SyncFoldersScreenLoadingStatePreview() {
 @CombinedThemePreviews
 @Composable
 private fun SyncFoldersScreenSyncingPreview(
-    @PreviewParameter(SyncTypePreviewProvider::class) syncType: SyncType
+    @PreviewParameter(SyncTypePreviewProvider::class) syncType: SyncType,
 ) {
-    OriginalTempTheme(isDark = isSystemInDarkTheme()) {
+    OriginalTheme(isDark = isSystemInDarkTheme()) {
         SyncFoldersScreen(
             listOf(
                 SyncUiItem(
@@ -336,17 +267,15 @@ private fun SyncFoldersScreenSyncingPreview(
             cardExpanded = {},
             pauseRunClicked = {},
             removeFolderClicked = {},
-            addFolderClicked = {},
-            upgradeAccountClicked = {},
+            onAddNewSyncClicked = {},
+            onAddNewBackupClicked = {},
             issuesInfoClicked = {},
             onOpenDeviceFolderClicked = {},
+            onOpenMegaFolderClicked = {},
+            onCameraUploadsSettingsClicked = {},
             isLowBatteryLevel = false,
-            isFreeAccount = false,
             isLoading = false,
-            showSyncsPausedErrorDialog = false,
-            onShowSyncsPausedErrorDialogDismissed = {},
             deviceName = "Device Name",
-            isBackupForAndroidEnabled = true,
         )
     }
 }
@@ -354,9 +283,9 @@ private fun SyncFoldersScreenSyncingPreview(
 @CombinedThemePreviews
 @Composable
 private fun SyncFoldersScreenSyncingWithStalledIssuesPreview(
-    @PreviewParameter(SyncTypePreviewProvider::class) syncType: SyncType
+    @PreviewParameter(SyncTypePreviewProvider::class) syncType: SyncType,
 ) {
-    OriginalTempTheme(isDark = isSystemInDarkTheme()) {
+    OriginalTheme(isDark = isSystemInDarkTheme()) {
         SyncFoldersScreen(
             listOf(
                 SyncUiItem(
@@ -374,26 +303,24 @@ private fun SyncFoldersScreenSyncingWithStalledIssuesPreview(
             cardExpanded = {},
             pauseRunClicked = {},
             removeFolderClicked = {},
-            addFolderClicked = {},
-            upgradeAccountClicked = {},
+            onAddNewSyncClicked = {},
+            onAddNewBackupClicked = {},
             issuesInfoClicked = {},
             onOpenDeviceFolderClicked = {},
+            onOpenMegaFolderClicked = {},
+            onCameraUploadsSettingsClicked = {},
             isLowBatteryLevel = false,
-            isFreeAccount = false,
             isLoading = false,
-            showSyncsPausedErrorDialog = false,
-            onShowSyncsPausedErrorDialogDismissed = {},
             deviceName = "Device Name",
-            isBackupForAndroidEnabled = true,
         )
     }
 }
 
 internal const val TEST_TAG_SYNC_LIST_SCREEN_EMPTY_STATUS_TEXT =
     "sync_list_screen_empty_status_text"
-internal const val TEST_TAG_SYNC_LIST_SCREEN_EMPTY_STATUS_TEXT_FOR_FREE_ACCOUNTS =
-    "sync_list_screen_empty_status_text_for_free_accounts"
-internal const val TEST_TAG_SYNC_LIST_SCREEN_EMPTY_STATUS_BUTTON =
-    "sync_list_screen_empty_status_button"
+internal const val TEST_TAG_SYNC_LIST_SCREEN_EMPTY_STATUS_SYNC_BUTTON =
+    "sync_list_screen:empty_status:sync_button"
+internal const val TEST_TAG_SYNC_LIST_SCREEN_EMPTY_STATUS_BACKUP_BUTTON =
+    "sync_list_screen:empty_status:backup_button"
 internal const val TEST_TAG_SYNC_LIST_SCREEN_FAB = "sync_list_screen:fab"
 internal const val TEST_TAG_SYNC_LIST_SCREEN_LOADING_STATE = "sync_list_screen:loading_state"

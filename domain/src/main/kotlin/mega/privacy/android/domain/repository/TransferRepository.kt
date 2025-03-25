@@ -2,12 +2,14 @@ package mega.privacy.android.domain.repository
 
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.StateFlow
-import mega.privacy.android.domain.entity.SdTransfer
 import mega.privacy.android.domain.entity.node.NodeId
 import mega.privacy.android.domain.entity.node.TypedNode
+import mega.privacy.android.domain.entity.node.ViewerNode
 import mega.privacy.android.domain.entity.transfer.ActiveTransfer
+import mega.privacy.android.domain.entity.transfer.ActiveTransferGroup
 import mega.privacy.android.domain.entity.transfer.ActiveTransferTotals
 import mega.privacy.android.domain.entity.transfer.CompletedTransfer
+import mega.privacy.android.domain.entity.transfer.CompletedTransferState
 import mega.privacy.android.domain.entity.transfer.InProgressTransfer
 import mega.privacy.android.domain.entity.transfer.Transfer
 import mega.privacy.android.domain.entity.transfer.TransferAppData
@@ -18,6 +20,7 @@ import mega.privacy.android.domain.entity.transfer.pending.PendingTransfer
 import mega.privacy.android.domain.entity.transfer.pending.PendingTransferState
 import mega.privacy.android.domain.entity.transfer.pending.UpdatePendingTransferRequest
 import java.io.File
+import kotlin.time.Duration
 
 /**
  * Transfer repository of Domain Module
@@ -128,18 +131,6 @@ interface TransferRepository {
     suspend fun cancelTransfers()
 
     /**
-     * Monitor transfer failed
-     *
-     */
-    fun monitorFailedTransfer(): Flow<Boolean>
-
-    /**
-     * Broadcast transfer failed
-     *
-     */
-    suspend fun broadcastFailedTransfer(isFailed: Boolean)
-
-    /**
      * Checks if exist ongoing transfers.
      */
     suspend fun ongoingTransfersExist(): Boolean
@@ -187,9 +178,9 @@ interface TransferRepository {
     /**
      * Monitor completed transfers
      *
-     * @return a flow of completed transfer
+     * @return a flow of [CompletedTransferState]
      */
-    fun monitorCompletedTransfer(): Flow<Unit>
+    fun monitorCompletedTransfer(): Flow<CompletedTransferState>
 
     /**
      * Monitors list of completed transfers
@@ -221,16 +212,33 @@ interface TransferRepository {
     )
 
     /**
+     * Add failed completed transfers from a failed pending transfer list
+     *
+     * @param pendingTransfer
+     * @param error The error that caused this pending transfer to fail
+     */
+    suspend fun addCompletedTransferFromFailedPendingTransfers(
+        pendingTransfer: List<PendingTransfer>,
+        error: Throwable,
+    )
+
+    /**
      * Add completed transfers if not exist
      *
      * @param transfers
      */
-    suspend fun addCompletedTransfersIfNotExist(transfers: List<CompletedTransfer>)
+    suspend fun addCompletedTransfersIfNotExist(transfers: List<Transfer>)
 
     /**
      * Delete oldest completed transfers
      */
     suspend fun deleteOldestCompletedTransfers()
+
+    /**
+     * Delete completed transfers which path contains the given path
+     * @param path to search for
+     */
+    suspend fun deleteCompletedTransfersByPath(path: String)
 
     /**
      * Starts the download worker to monitor the download transfers as a foreground service
@@ -241,11 +249,6 @@ interface TransferRepository {
      * Starts the chat uploads worker to monitor the chat uploads transfers as a foreground service
      */
     suspend fun startChatUploadsWorker()
-
-    /**
-     * Reset total uploads
-     */
-    suspend fun resetTotalUploads()
 
     /**
      * Start downloading a node to desired destination and returns a flow to expose download progress
@@ -296,7 +299,7 @@ interface TransferRepository {
      * @param parentNodeId The parent node id for the file or folder
      * @param fileName The custom file name for the file or folder. Leave the parameter as "null"
      * if there are no changes
-     * @param appData The custom app data to save chat upload related information
+     * @param appData The custom app data to save chat upload related information, at least one should be a
      * @param isSourceTemporary Whether the temporary file or folder that is created for upload
      * should be deleted or not
      * queue or not
@@ -307,7 +310,7 @@ interface TransferRepository {
         localPath: String,
         parentNodeId: NodeId,
         fileName: String?,
-        appData: List<TransferAppData.ChatUploadAppData>,
+        appData: List<TransferAppData>,
         isSourceTemporary: Boolean,
     ): Flow<TransferEvent>
 
@@ -429,34 +432,6 @@ interface TransferRepository {
      * @param isPause
      */
     suspend fun pauseTransferByTag(transferTag: Int, isPause: Boolean): Boolean
-
-    /**
-     * Get all sd transfers
-     *
-     * @return the list of sd transfers
-     */
-    suspend fun getAllSdTransfers(): List<SdTransfer>
-
-    /**
-     * Get sd transfers by tag
-     *
-     * @return the sd transfer with this tag or null if not found
-     */
-    suspend fun getSdTransferByTag(tag: Int): SdTransfer?
-
-    /**
-     * Insert sd transfer
-     *
-     * @param transfer sd Transfer
-     */
-    suspend fun insertSdTransfer(transfer: SdTransfer)
-
-    /**
-     * Delete sd transfer by tag
-     *
-     * @param tag tag of transfer
-     */
-    suspend fun deleteSdTransferByTag(tag: Int)
 
     /**
      * Get completed transfer by id
@@ -620,4 +595,36 @@ interface TransferRepository {
      * Clear all preferences
      */
     suspend fun clearPreferences()
+
+    /**
+     * Get the time during which transfers will be stopped due to a bandwidth over quota
+     *
+     * @return Time during which transfers will be stopped, otherwise 0
+     */
+    suspend fun getBandwidthOverQuotaDelay(): Duration
+
+    /**
+     * Insert a new [ActiveTransferGroup].
+     * If there's an existing [ActiveTransferGroup] with the same id, it will be ignored
+     */
+    suspend fun insertActiveTransferGroup(activeTransferGroup: ActiveTransferGroup): Long
+
+    /**
+     * Get the [ActiveTransferGroup] by id
+     *
+     * @return [ActiveTransferGroup] with this [id] or null if it's not found
+     */
+    suspend fun getActiveTransferGroupById(id: Int): ActiveTransferGroup?
+
+    /**
+     * Downloads a file node in background.
+     *
+     * @param viewerNode File node to download.
+     * @return The local path of the downloaded file.
+     */
+    @Deprecated(
+        message = "ViewerNode should be replaced by [TypedNode], there's a similar use-case to download any type of [TypedNode] and receive a flow of the progress: StartDownloadUseCase. Please add [TransferAppData.BackgroundTransfer] to avoid this transfers to be added in the counters of the DownloadService notification",
+        replaceWith = ReplaceWith("StartDownloadUseCase"),
+    )
+    suspend fun downloadBackgroundFile(viewerNode: ViewerNode): String
 }

@@ -16,6 +16,7 @@ import mega.privacy.android.domain.entity.BackupState
 import mega.privacy.android.domain.entity.backup.Backup
 import mega.privacy.android.domain.entity.backup.BackupInfo
 import mega.privacy.android.domain.entity.backup.BackupInfoType
+import mega.privacy.android.domain.entity.node.NodeId
 import mega.privacy.android.domain.exception.MegaException
 import nz.mega.sdk.MegaApiJava
 import nz.mega.sdk.MegaBackupInfoList
@@ -32,6 +33,7 @@ import org.junit.jupiter.api.assertThrows
 import org.junit.jupiter.params.ParameterizedTest
 import org.junit.jupiter.params.provider.NullAndEmptySource
 import org.junit.jupiter.params.provider.ValueSource
+import org.mockito.ArgumentMatchers.eq
 import org.mockito.Mockito
 import org.mockito.kotlin.any
 import org.mockito.kotlin.mock
@@ -336,4 +338,81 @@ internal class BackupRepositoryImplTest {
             )
         }
     }
+
+    @Test
+    fun `test that check if backups folder exists returns true if it exists`() =
+        runTest {
+            val testMegaStringMap = mock<MegaStringMap>()
+            val megaRequest = mock<MegaRequest> {
+                on { megaStringMap }.thenReturn(testMegaStringMap)
+            }
+            val megaResponse = mock<MegaError> {
+                on { errorCode }.thenReturn(MegaError.API_OK)
+                on { errorString }.thenReturn("")
+            }
+            whenever(
+                megaApiGateway.getUserAttribute(
+                    eq(MegaApiJava.USER_ATTR_MY_BACKUPS_FOLDER),
+                    any(),
+                )
+            ).thenAnswer {
+                ((it.arguments[1] as MegaRequestListenerInterface)).onRequestFinish(
+                    api = mock(),
+                    request = megaRequest,
+                    e = megaResponse,
+                )
+            }
+            assertThat(underTest.myBackupsFolderExists()).isTrue()
+        }
+
+    @Test
+    fun `test that check if backups folder exists returns true if does not exists`() =
+        runTest {
+            val megaRequest = mock<MegaRequest> {
+                on { megaStringMap }.thenReturn(null)
+            }
+            val megaResponse = mock<MegaError> {
+                on { errorCode }.thenReturn(MegaError.API_OK)
+                on { errorString }.thenReturn("")
+            }
+            whenever(
+                megaApiGateway.getUserAttribute(
+                    eq(MegaApiJava.USER_ATTR_MY_BACKUPS_FOLDER),
+                    any(),
+                )
+            ).thenAnswer {
+                ((it.arguments[1] as MegaRequestListenerInterface)).onRequestFinish(
+                    api = mock(),
+                    request = megaRequest,
+                    e = megaResponse,
+                )
+            }
+            assertThat(underTest.myBackupsFolderExists()).isFalse()
+        }
+
+    @ParameterizedTest(name = "returns {0}")
+    @ValueSource(ints = [MegaError.API_OK, MegaError.API_EEXIST])
+    fun `test that set backups folder returns the node id`(errorCodeReturned: Int) =
+        runTest {
+            val megaRequest = mock<MegaRequest> {
+                on { nodeHandle }.thenReturn(1234L)
+            }
+            val megaResponse = mock<MegaError> {
+                on { errorCode }.thenReturn(errorCodeReturned)
+                on { errorString }.thenReturn("")
+            }
+            whenever(
+                megaApiGateway.setMyBackupsFolder(
+                    any(),
+                    any(),
+                )
+            ).thenAnswer {
+                ((it.arguments[1] as MegaRequestListenerInterface)).onRequestFinish(
+                    api = mock(),
+                    request = megaRequest,
+                    e = megaResponse,
+                )
+            }
+            assertThat(underTest.setMyBackupsFolder("Backups")).isEqualTo(NodeId(1234L))
+        }
 }

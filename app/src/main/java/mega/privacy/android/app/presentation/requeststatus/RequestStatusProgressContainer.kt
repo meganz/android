@@ -14,9 +14,10 @@ import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
+import mega.privacy.android.domain.entity.Progress
 import mega.privacy.android.shared.original.core.ui.controls.progressindicator.MegaAnimatedLinearProgressIndicator
 import mega.privacy.android.shared.original.core.ui.preview.CombinedThemePreviews
-import mega.privacy.android.shared.original.core.ui.theme.OriginalTempTheme
+import mega.privacy.android.shared.original.core.ui.theme.OriginalTheme
 
 /**
  * Composable for request status progress bar container
@@ -25,12 +26,13 @@ import mega.privacy.android.shared.original.core.ui.theme.OriginalTempTheme
 @Composable
 fun RequestStatusProgressContainer(
     viewModel: RequestStatusProgressViewModel = hiltViewModel(),
+    modifier: Modifier = Modifier
 ) {
     val uiState by viewModel.uiState.collectAsStateWithLifecycle()
 
     RequestStatusProgressBarContent(
-        showProgressBar = uiState.showProgressBar,
-        progress = uiState.progress
+        progress = uiState.progress,
+        modifier = modifier
     )
 }
 
@@ -39,23 +41,25 @@ fun RequestStatusProgressContainer(
  */
 @Composable
 fun RequestStatusProgressBarContent(
-    showProgressBar: Boolean,
-    progress: Long,
+    progress: Progress?,
+    modifier: Modifier = Modifier
 ) {
     AnimatedVisibility(
-        visible = showProgressBar,
+        visible = progress != null,
         enter = slideInVertically(
             initialOffsetY = { fullHeight -> fullHeight },
             animationSpec = tween(durationMillis = 400)
         ),
         exit = fadeOut(
             animationSpec = tween(durationMillis = 100)
-        )
+        ),
+        modifier = modifier
     ) {
+        val progressValue = progress?.floatValue ?: 0f
         MegaAnimatedLinearProgressIndicator(
-            indicatorProgress = progress / 1000f,
+            indicatorProgress = progressValue,
             height = 4.dp,
-            progressAnimDuration = 500,
+            progressAnimDuration = if (progressValue > 0.9f) 200 else 500,
             modifier = Modifier.testTag(PROGRESS_BAR_TEST_TAG),
             clip = RoundedCornerShape(0.dp),
             strokeCap = StrokeCap.Square
@@ -68,7 +72,7 @@ internal const val PROGRESS_BAR_TEST_TAG = "request_status_progress_bar_content:
 @CombinedThemePreviews
 @Composable
 private fun RequestStatusProgressBarContentPreview() {
-    OriginalTempTheme(isDark = isSystemInDarkTheme()) {
-        RequestStatusProgressBarContent(true, progress = 500)
+    OriginalTheme(isDark = isSystemInDarkTheme()) {
+        RequestStatusProgressBarContent(progress = Progress(0.5f))
     }
 }

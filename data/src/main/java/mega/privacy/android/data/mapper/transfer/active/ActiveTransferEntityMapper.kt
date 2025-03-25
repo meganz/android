@@ -15,6 +15,7 @@ internal class ActiveTransferEntityMapper @Inject constructor() {
             isPaused = isPaused,
             isAlreadyTransferred = isAlreadyTransferred,
             isCancelled = isCancelled,
+            appData = appData,
         )
     }
 }

@@ -15,3 +15,10 @@ internal val LoginException.error: Int
         is LoginUnknownStatus -> megaException.getErrorStringId()
         else -> R.string.general_error
     }
+
+internal val LoginException.newError: Int
+    get() = when (this) {
+        is LoginRequireValidation -> mega.privacy.android.shared.resources.R.string.login_account_not_validated
+        is LoginUnknownStatus -> megaException.getErrorStringId()
+        else -> R.string.general_error
+    }

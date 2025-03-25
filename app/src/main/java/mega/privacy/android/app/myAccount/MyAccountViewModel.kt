@@ -29,8 +29,6 @@ import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 import mega.privacy.android.app.R
-import mega.privacy.android.app.featuretoggle.AppFeatures
-import mega.privacy.android.app.globalmanagement.MegaChatRequestHandler
 import mega.privacy.android.app.globalmanagement.MyAccountInfo
 import mega.privacy.android.app.interfaces.SnackbarShower
 import mega.privacy.android.app.interfaces.showSnackbar
@@ -42,7 +40,6 @@ import mega.privacy.android.app.middlelayer.iab.BillingConstant
 import mega.privacy.android.app.presentation.login.LoginActivity
 import mega.privacy.android.app.presentation.snackbar.MegaSnackbarDuration
 import mega.privacy.android.app.presentation.snackbar.SnackBarHandler
-import mega.privacy.android.app.presentation.testpassword.TestPasswordActivity
 import mega.privacy.android.app.presentation.verifytwofactor.VerifyTwoFactorActivity
 import mega.privacy.android.app.utils.CacheFolderManager
 import mega.privacy.android.app.utils.Constants
@@ -64,7 +61,9 @@ import mega.privacy.android.app.utils.permission.PermissionUtils.hasPermissions
 import mega.privacy.android.app.utils.permission.PermissionUtils.requestPermission
 import mega.privacy.android.data.qualifier.MegaApi
 import mega.privacy.android.domain.entity.AccountType
+import mega.privacy.android.domain.entity.StorageState
 import mega.privacy.android.domain.entity.node.TypedFolderNode
+import mega.privacy.android.domain.entity.transfer.UsedTransferStatus
 import mega.privacy.android.domain.entity.user.UserChanges
 import mega.privacy.android.domain.entity.verification.VerifiedPhoneNumber
 import mega.privacy.android.domain.exception.account.ConfirmCancelAccountException
@@ -84,15 +83,16 @@ import mega.privacy.android.domain.usecase.IsUrlMatchesRegexUseCase
 import mega.privacy.android.domain.usecase.MonitorBackupFolder
 import mega.privacy.android.domain.usecase.MonitorUserUpdates
 import mega.privacy.android.domain.usecase.account.BroadcastRefreshSessionUseCase
-import mega.privacy.android.domain.usecase.account.LegacyCancelSubscriptionsUseCase
-import mega.privacy.android.domain.usecase.account.ChangeEmail
+import mega.privacy.android.domain.usecase.account.ChangeEmailUseCase
 import mega.privacy.android.domain.usecase.account.CheckVersionsUseCase
 import mega.privacy.android.domain.usecase.account.ConfirmCancelAccountUseCase
 import mega.privacy.android.domain.usecase.account.ConfirmChangeEmailUseCase
 import mega.privacy.android.domain.usecase.account.GetUserDataUseCase
 import mega.privacy.android.domain.usecase.account.IsMultiFactorAuthEnabledUseCase
 import mega.privacy.android.domain.usecase.account.KillOtherSessionsUseCase
+import mega.privacy.android.domain.usecase.account.LegacyCancelSubscriptionsUseCase
 import mega.privacy.android.domain.usecase.account.MonitorAccountDetailUseCase
+import mega.privacy.android.domain.usecase.account.MonitorStorageStateUseCase
 import mega.privacy.android.domain.usecase.account.QueryCancelLinkUseCase
 import mega.privacy.android.domain.usecase.account.QueryChangeEmailLinkUseCase
 import mega.privacy.android.domain.usecase.account.UpdateCurrentUserName
@@ -100,10 +100,10 @@ import mega.privacy.android.domain.usecase.avatar.GetMyAvatarFileUseCase
 import mega.privacy.android.domain.usecase.avatar.SetAvatarUseCase
 import mega.privacy.android.domain.usecase.billing.GetPaymentMethodUseCase
 import mega.privacy.android.domain.usecase.contact.GetCurrentUserEmail
-import mega.privacy.android.domain.usecase.featureflag.GetFeatureFlagValueUseCase
 import mega.privacy.android.domain.usecase.file.GetFileVersionsOption
 import mega.privacy.android.domain.usecase.login.CheckPasswordReminderUseCase
 import mega.privacy.android.domain.usecase.login.LogoutUseCase
+import mega.privacy.android.domain.usecase.transfers.GetUsedTransferStatusUseCase
 import mega.privacy.android.domain.usecase.verification.MonitorVerificationStatus
 import mega.privacy.android.domain.usecase.verification.ResetSMSVerifiedPhoneNumberUseCase
 import nz.mega.sdk.MegaAccountDetails
@@ -143,7 +143,7 @@ import javax.inject.Inject
  * @property getPaymentMethodUseCase
  * @property getCurrentUserFullName
  * @property monitorUserUpdates
- * @property changeEmail
+ * @property changeEmailUseCase
  * @property updateCurrentUserName
  * @property getCurrentUserEmail
  * @property monitorVerificationStatus
@@ -178,7 +178,7 @@ class MyAccountViewModel @Inject constructor(
     private val getPaymentMethodUseCase: GetPaymentMethodUseCase,
     private val getCurrentUserFullName: GetCurrentUserFullName,
     private val monitorUserUpdates: MonitorUserUpdates,
-    private val changeEmail: ChangeEmail,
+    private val changeEmailUseCase: ChangeEmailUseCase,
     private val updateCurrentUserName: UpdateCurrentUserName,
     private val getCurrentUserEmail: GetCurrentUserEmail,
     private val monitorVerificationStatus: MonitorVerificationStatus,
@@ -188,11 +188,12 @@ class MyAccountViewModel @Inject constructor(
     private val monitorBackupFolder: MonitorBackupFolder,
     private val getFolderTreeInfo: GetFolderTreeInfo,
     private val getNodeByIdUseCase: GetNodeByIdUseCase,
-    private val getFeatureFlagValueUseCase: GetFeatureFlagValueUseCase,
     @IoDispatcher private val ioDispatcher: CoroutineDispatcher,
     private val snackBarHandler: SnackBarHandler,
     private val getBusinessStatusUseCase: GetBusinessStatusUseCase,
     private val monitorAccountDetailUseCase: MonitorAccountDetailUseCase,
+    private val monitorStorageStateUseCase: MonitorStorageStateUseCase,
+    private val getUsedTransferStatusUseCase: GetUsedTransferStatusUseCase,
 ) : ViewModel() {
 
     companion object {
@@ -289,40 +290,21 @@ class MyAccountViewModel @Inject constructor(
                     }
                 }
         }
-        checkNewCancelSubscriptionFeature()
+        viewModelScope.launch {
+            monitorStorageStateUseCase()
+                .catch { Timber.e(it) }
+                .collectLatest { storageState ->
+                    _state.update {
+                        it.copy(storageState = storageState)
+                    }
+                }
+        }
     }
 
     override fun onCleared() {
         super.onCleared()
         resetJob?.cancel()
     }
-
-
-    /**
-     * Checks if the new cancel subscription feature is enabled.
-     */
-    fun isNewCancelSubscriptionFeatureEnabled(): Boolean =
-        state.value.showNewCancelSubscriptionFeature
-
-    /**
-     * Checks if the cancel subscription feature is enabled
-     */
-    private fun checkNewCancelSubscriptionFeature() {
-        viewModelScope.launch {
-            runCatching {
-                val isEnabled = getFeatureFlagValueUseCase(AppFeatures.CancelSubscription)
-                _state.update {
-                    it.copy(showNewCancelSubscriptionFeature = isEnabled)
-                }
-            }.onFailure {
-                Timber.e(
-                    it,
-                    "Failed to check for new cancel subscription feature"
-                )
-            }
-        }
-    }
-
 
     private fun refreshUserName(forceRefresh: Boolean) {
         viewModelScope.launch {
@@ -499,6 +481,11 @@ class MyAccountViewModel @Inject constructor(
     fun getAccountType(): AccountType = state.value.accountType
 
     /**
+     * Get storage state
+     */
+    fun getStorageState(): StorageState = state.value.storageState
+
+    /**
      * Is free account
      *
      * @return
@@ -539,6 +526,15 @@ class MyAccountViewModel @Inject constructor(
      * @return
      */
     fun getUsedTransferPercentage(): Int = myAccountInfo.usedTransferPercentage
+
+
+    /**
+     * Get used transfer status
+     *
+     * @return
+     */
+    fun getUsedTransferStatus(): UsedTransferStatus =
+        getUsedTransferStatusUseCase(myAccountInfo.usedTransferPercentage)
 
     /**
      * Get total transfer
@@ -782,19 +778,20 @@ class MyAccountViewModel @Inject constructor(
 
     /**
      * Logout
-     *
-     * @param context
      */
-    fun logout(context: Context) {
+    fun logout() {
         viewModelScope.launch {
             runCatching { checkPasswordReminderUseCase(true) }
                 .onSuccess { show ->
                     if (show) {
-                        context.startActivity(
-                            Intent(context, TestPasswordActivity::class.java)
-                                .putExtra("logout", true)
-                        )
-                    } else logout()
+                        _state.update {
+                            it.copy(openTestPasswordScreenEvent = true)
+                        }
+                    } else {
+                        _state.update {
+                            it.copy(showLogoutConfirmationDialog = true)
+                        }
+                    }
                 }.onFailure { error ->
                     Timber.e(error, "Error when killing sessions")
                 }
@@ -975,7 +972,7 @@ class MyAccountViewModel @Inject constructor(
 
             else -> {
                 viewModelScope.launch {
-                    val changeEmailResult = runCatching { changeEmail(newEmail) }
+                    val changeEmailResult = runCatching { changeEmailUseCase(newEmail) }
                     _state.update { it.copy(changeEmailResult = changeEmailResult) }
                 }
                 null
@@ -1352,20 +1349,6 @@ class MyAccountViewModel @Inject constructor(
     }
 
     /**
-     * Logout
-     *
-     * logs out the user from mega application and navigates to login activity
-     * logic is handled at [MegaChatRequestHandler] onRequestFinished callback
-     */
-    private fun logout() = viewModelScope.launch {
-        runCatching {
-            logoutUseCase()
-        }.onFailure {
-            Timber.d("Error on logout $it")
-        }
-    }
-
-    /**
      * Reset shouldNavigateToSmsVerification state
      */
     fun onNavigatedToSmsVerification() {
@@ -1386,7 +1369,7 @@ class MyAccountViewModel @Inject constructor(
             AccountType.PRO_I,
             AccountType.PRO_II,
             AccountType.PRO_III,
-            -> {
+                -> {
                 if (subscriptionList?.size == 1) {
                     planDetail.accountType == subscriptionList.firstOrNull()?.subscriptionLevel
                 } else {
@@ -1404,4 +1387,22 @@ class MyAccountViewModel @Inject constructor(
      */
     fun isProSubscription(): Boolean =
         state.value.isProSubscription
+
+    /**
+     * Dismiss logout confirmation dialog
+     */
+    fun dismissLogoutConfirmationDialog() {
+        _state.update {
+            it.copy(showLogoutConfirmationDialog = false)
+        }
+    }
+
+    /**
+     * Reset open test password screen event
+     */
+    fun resetOpenTestPasswordScreenEvent() {
+        _state.update {
+            it.copy(openTestPasswordScreenEvent = false)
+        }
+    }
 }

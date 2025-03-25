@@ -1,26 +1,43 @@
 package mega.privacy.android.feature.sync.ui.synclist.folders
 
+import mega.privacy.android.shared.resources.R as sharedResR
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import dagger.hilt.android.lifecycle.HiltViewModel
+import kotlinx.coroutines.Job
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.catch
+import kotlinx.coroutines.flow.combine
+import kotlinx.coroutines.flow.distinctUntilChanged
 import kotlinx.coroutines.flow.first
-import kotlinx.coroutines.flow.launchIn
 import kotlinx.coroutines.flow.map
-import kotlinx.coroutines.flow.onEach
+import kotlinx.coroutines.flow.onStart
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
-import mega.privacy.android.domain.entity.AccountType
+import mega.privacy.android.data.mapper.backup.BackupInfoTypeIntMapper
+import mega.privacy.android.domain.entity.backup.Backup
+import mega.privacy.android.domain.entity.backup.BackupInfoType
+import mega.privacy.android.domain.entity.camerauploads.CameraUploadsStatusInfo
 import mega.privacy.android.domain.entity.node.TypedFolderNode
 import mega.privacy.android.domain.usecase.GetFolderTreeInfo
 import mega.privacy.android.domain.usecase.GetNodeByIdUseCase
-import mega.privacy.android.domain.usecase.account.IsProAccountUseCase
+import mega.privacy.android.domain.usecase.GetNodePathByIdUseCase
+import mega.privacy.android.domain.usecase.GetRootNodeUseCase
 import mega.privacy.android.domain.usecase.account.IsStorageOverQuotaUseCase
 import mega.privacy.android.domain.usecase.account.MonitorAccountDetailUseCase
+import mega.privacy.android.domain.usecase.camerauploads.GetCameraUploadsBackupUseCase
+import mega.privacy.android.domain.usecase.camerauploads.GetMediaUploadsBackupUseCase
+import mega.privacy.android.domain.usecase.camerauploads.GetPrimaryFolderNodeUseCase
+import mega.privacy.android.domain.usecase.camerauploads.GetPrimaryFolderPathUseCase
+import mega.privacy.android.domain.usecase.camerauploads.GetSecondaryFolderNodeUseCase
+import mega.privacy.android.domain.usecase.camerauploads.GetSecondaryFolderPathUseCase
+import mega.privacy.android.domain.usecase.camerauploads.MonitorCameraUploadsSettingsActionsUseCase
+import mega.privacy.android.domain.usecase.camerauploads.MonitorCameraUploadsStatusInfoUseCase
 import mega.privacy.android.domain.usecase.environment.MonitorBatteryInfoUseCase
+import mega.privacy.android.domain.usecase.node.MoveDeconfiguredBackupNodesUseCase
+import mega.privacy.android.domain.usecase.node.RemoveDeconfiguredBackupNodesUseCase
 import mega.privacy.android.feature.sync.domain.entity.SyncStatus
 import mega.privacy.android.feature.sync.domain.usecase.sync.MonitorSyncStalledIssuesUseCase
 import mega.privacy.android.feature.sync.domain.usecase.sync.MonitorSyncsUseCase
@@ -31,13 +48,8 @@ import mega.privacy.android.feature.sync.domain.usecase.sync.RemoveFolderPairUse
 import mega.privacy.android.feature.sync.domain.usecase.sync.ResumeSyncUseCase
 import mega.privacy.android.feature.sync.domain.usecase.sync.option.SetUserPausedSyncUseCase
 import mega.privacy.android.feature.sync.ui.mapper.sync.SyncUiItemMapper
+import mega.privacy.android.feature.sync.ui.model.StopBackupOption
 import mega.privacy.android.feature.sync.ui.model.SyncUiItem
-import mega.privacy.android.shared.resources.R as sharedResR
-import mega.privacy.android.domain.entity.sync.SyncType
-import mega.privacy.android.domain.usecase.GetRootNodeUseCase
-import mega.privacy.android.domain.usecase.featureflag.GetFeatureFlagValueUseCase
-import mega.privacy.android.domain.usecase.node.MoveDeconfiguredBackupNodesUseCase
-import mega.privacy.android.shared.sync.featuretoggles.SyncFeatures
 import timber.log.Timber
 import javax.inject.Inject
 
@@ -53,22 +65,30 @@ internal class SyncFoldersViewModel @Inject constructor(
     private val refreshSyncUseCase: RefreshSyncUseCase,
     private val monitorBatteryInfoUseCase: MonitorBatteryInfoUseCase,
     private val getNodeByIdUseCase: GetNodeByIdUseCase,
+    private val getNodePathByIdUseCase: GetNodePathByIdUseCase,
     private val getFolderTreeInfo: GetFolderTreeInfo,
     private val isStorageOverQuotaUseCase: IsStorageOverQuotaUseCase,
-    private val isProAccountUseCase: IsProAccountUseCase,
     private val monitorAccountDetailUseCase: MonitorAccountDetailUseCase,
     private val getRootNodeUseCase: GetRootNodeUseCase,
     private val moveDeconfiguredBackupNodesUseCase: MoveDeconfiguredBackupNodesUseCase,
-    private val getFeatureFlagValueUseCase: GetFeatureFlagValueUseCase,
+    private val removeDeconfiguredBackupNodesUseCase: RemoveDeconfiguredBackupNodesUseCase,
+    private val getCameraUploadsBackupUseCase: GetCameraUploadsBackupUseCase,
+    private val getMediaUploadsBackupUseCase: GetMediaUploadsBackupUseCase,
+    private val monitorCameraUploadsSettingsActionsUseCase: MonitorCameraUploadsSettingsActionsUseCase,
+    private val monitorCameraUploadsStatusInfoUseCase: MonitorCameraUploadsStatusInfoUseCase,
+    private val backupInfoTypeIntMapper: BackupInfoTypeIntMapper,
+    private val getPrimaryFolderNodeUseCase: GetPrimaryFolderNodeUseCase,
+    private val getPrimaryFolderPathUseCase: GetPrimaryFolderPathUseCase,
+    private val getSecondaryFolderNodeUseCase: GetSecondaryFolderNodeUseCase,
+    private val getSecondaryFolderPathUseCase: GetSecondaryFolderPathUseCase,
 ) : ViewModel() {
 
-    private val _uiState = MutableStateFlow(SyncFoldersState(emptyList()))
-    val uiState: StateFlow<SyncFoldersState> = _uiState.asStateFlow()
+    private val _uiState = MutableStateFlow(SyncFoldersUiState(emptyList()))
+    val uiState: StateFlow<SyncFoldersUiState> = _uiState.asStateFlow()
 
-    private var showSyncsPausedErrorDialogShown = false
+    private var loadSyncsJob: Job? = null
 
     init {
-        checkFeatureFlags()
         viewModelScope.launch {
             runCatching {
                 _uiState.update { state -> state.copy(isLoading = true) }
@@ -92,108 +112,149 @@ internal class SyncFoldersViewModel @Inject constructor(
         }
 
         viewModelScope.launch {
-            monitorAccountDetailUseCase().collect { accountDetail ->
-                _uiState.update {
-                    it.copy(isFreeAccount = accountDetail.levelDetail?.accountType == AccountType.FREE)
-                }
+            monitorAccountDetailUseCase().collect {
                 checkOverQuotaStatus()
             }
         }
-    }
 
-    private fun checkFeatureFlags() {
         viewModelScope.launch {
-            runCatching {
-                getFeatureFlagValueUseCase(SyncFeatures.BackupForAndroid)
-            }.onSuccess { isBackupForAndroidEnabled ->
-                if (isBackupForAndroidEnabled) {
-                    _uiState.update {
-                        it.copy(enabledFlags = uiState.value.enabledFlags.plus(SyncFeatures.BackupForAndroid))
-                    }
-                }
-            }.onFailure(Timber::e)
+            monitorCameraUploadsSettingsActionsUseCase()
+                .catch { Timber.e(it) }
+                .collect { loadSyncs() }
         }
     }
 
     private fun loadSyncs() {
-        monitorSyncsUseCase().catch { Timber.e(it) }.map(syncUiItemMapper::invoke).map { syncs ->
-            val stalledIssues = monitorStalledIssuesUseCase().first()
-            var numOfFiles = 0
-            var numOfFolders = 0
-            var totalSizeInBytes = 0L
-            var creationTime = 0L
-            syncs.map { sync ->
+        loadSyncsJob?.cancel()
+        loadSyncsJob = viewModelScope.launch {
+            combine(
+                monitorSyncsUseCase().map(syncUiItemMapper::invoke),
+                monitorCameraUploadsStatusInfoUseCase.invoke()
+                    .onStart { emit(CameraUploadsStatusInfo.Unknown) },
+            ) { syncs: List<SyncUiItem>, cuStatusInfo: CameraUploadsStatusInfo ->
+                Pair(syncs, cuStatusInfo)
+            }.catch { Timber.e(it) }
+                .distinctUntilChanged()
+                .collect { (syncs, cuStatusInfo) ->
+                    val stalledIssues = monitorStalledIssuesUseCase().first()
+                    var numOfFiles = 0
+                    var numOfFolders = 0
+                    var totalSizeInBytes = 0L
+                    var creationTime = 0L
+                    val syncsWithUpdatedDetails = syncs.map { sync ->
 
-                runCatching {
-                    getNodeByIdUseCase(sync.megaStorageNodeId)
-                }.onSuccess { node ->
-                    node?.let { folder ->
-                        creationTime = folder.creationTime
                         runCatching {
-                            getFolderTreeInfo(folder as TypedFolderNode)
-                        }.onSuccess { folderTreeInfo ->
-                            with(folderTreeInfo) {
-                                numOfFiles = numberOfFiles
-                                numOfFolders =
-                                    numberOfFolders - 1 //we don't want to count itself
-                                totalSizeInBytes = totalCurrentSizeInBytes
+                            getNodeByIdUseCase(sync.megaStorageNodeId)
+                        }.onSuccess { node ->
+                            node?.let { folder ->
+                                creationTime = folder.creationTime
+                                runCatching {
+                                    getFolderTreeInfo(folder as TypedFolderNode)
+                                }.onSuccess { folderTreeInfo ->
+                                    with(folderTreeInfo) {
+                                        numOfFiles = numberOfFiles
+                                        numOfFolders =
+                                            numberOfFolders - 1 //we don't want to count itself
+                                        totalSizeInBytes = totalCurrentSizeInBytes
+                                    }
+                                }.onFailure {
+                                    Timber.e(it)
+                                }
                             }
                         }.onFailure {
                             Timber.e(it)
                         }
-                    }
-                }.onFailure {
-                    Timber.e(it)
-                }
 
-                sync.copy(
-                    hasStalledIssues = stalledIssues.any {
-                        it.localPaths.firstOrNull()?.contains(sync.deviceStoragePath)
-                            ?: (it.nodeNames.first().contains(sync.megaStoragePath))
-                    },
-                    numberOfFiles = numOfFiles,
-                    numberOfFolders = numOfFolders,
-                    totalSizeInBytes = totalSizeInBytes,
-                    creationTime = creationTime,
-                )
-            }
+                        sync.copy(
+                            hasStalledIssues = stalledIssues.any {
+                                it.localPaths.firstOrNull()?.contains(sync.deviceStoragePath)
+                                    ?: (it.nodeNames.first().contains(sync.megaStoragePath))
+                            },
+                            expanded = _uiState.value.syncUiItems.firstOrNull { it.id == sync.id }?.expanded == true,
+                            numberOfFiles = numOfFiles,
+                            numberOfFolders = numOfFolders,
+                            totalSizeInBytes = totalSizeInBytes,
+                            creationTime = creationTime,
+                        )
+                    }
+
+                    val syncsList: MutableList<SyncUiItem> = emptyList<SyncUiItem>().toMutableList()
+                    getCameraUploadsOrMediaUploadsSyncUiItem(
+                        cameraUploadsOrMediaUploadsBackup = getCameraUploadsBackupUseCase(),
+                        cuStatusInfo = cuStatusInfo,
+                    )?.let { syncsList.add(it) }
+                    getCameraUploadsOrMediaUploadsSyncUiItem(
+                        cameraUploadsOrMediaUploadsBackup = getMediaUploadsBackupUseCase(),
+                        cuStatusInfo = cuStatusInfo,
+                    )?.let { syncsList.add(it) }
+                    syncsList.addAll(syncsWithUpdatedDetails)
+                    _uiState.update {
+                        it.copy(
+                            syncUiItems = syncsList,
+                            isRefreshing = false,
+                            isLoading = false,
+                        )
+                    }
+                }
         }
-            .onEach {
-                updateSyncsState(it)
-            }
-            .launchIn(viewModelScope)
     }
 
-    private suspend fun updateSyncsState(
-        syncs: List<SyncUiItem>,
-    ) {
-        val isProAccount = runCatching { isProAccountUseCase() }.getOrNull() ?: false
-        when {
-            syncs.isNotEmpty() && !showSyncsPausedErrorDialogShown && isProAccount.not() -> {
-                _uiState.update {
-                    it.copy(
-                        syncUiItems = syncs,
-                        isRefreshing = false,
-                        isFreeAccount = isProAccount.not(),
-                        isLoading = false,
-                        showSyncsPausedErrorDialog = true
-                    )
+    private suspend fun getCameraUploadsOrMediaUploadsSyncUiItem(
+        cameraUploadsOrMediaUploadsBackup: Backup?,
+        cuStatusInfo: CameraUploadsStatusInfo,
+    ): SyncUiItem? {
+        var localPath = ""
+        var megaStoragePath = ""
+        var numOfFiles = 0
+        var numOfFolders = 0
+        var totalSizeInBytes = 0L
+        var creationTime = 0L
+
+        cameraUploadsOrMediaUploadsBackup?.let { backup ->
+            runCatching {
+                when (backupInfoTypeIntMapper(backup.backupType)) {
+                    BackupInfoType.CAMERA_UPLOADS -> getPrimaryFolderNodeUseCase()
+                    BackupInfoType.MEDIA_UPLOADS -> getSecondaryFolderNodeUseCase()
+                    else -> getNodeByIdUseCase(backup.targetNode)
                 }
-                showSyncsPausedErrorDialogShown = true
+            }.onSuccess { node ->
+                node?.let { folder ->
+                    localPath = when (backupInfoTypeIntMapper(backup.backupType)) {
+                        BackupInfoType.CAMERA_UPLOADS -> getPrimaryFolderPathUseCase()
+                        BackupInfoType.MEDIA_UPLOADS -> getSecondaryFolderPathUseCase()
+                        else -> backup.localFolder
+                    }
+                    megaStoragePath = getNodePathByIdUseCase(folder.id)
+                    creationTime = folder.creationTime
+                    runCatching {
+                        getFolderTreeInfo(folder as TypedFolderNode)
+                    }.onSuccess { folderTreeInfo ->
+                        with(folderTreeInfo) {
+                            numOfFiles = numberOfFiles
+                            numOfFolders =
+                                numberOfFolders - 1 //we don't want to count itself
+                            totalSizeInBytes = totalCurrentSizeInBytes
+                        }
+                    }.onFailure {
+                        Timber.e(it)
+                    }
+                }
+            }.onFailure {
+                Timber.e(it)
             }
 
-            else -> {
-                _uiState.update {
-                    it.copy(
-                        syncUiItems = syncs,
-                        isRefreshing = false,
-                        isFreeAccount = isProAccount.not(),
-                        isLoading = false,
-                        showSyncsPausedErrorDialog = false
-                    )
-                }
-            }
+            return syncUiItemMapper(cuBackup = backup, cuStatusInfo = cuStatusInfo).copy(
+                hasStalledIssues = false,
+                expanded = _uiState.value.syncUiItems.firstOrNull { it.id == backup.backupId }?.expanded == true,
+                numberOfFiles = numOfFiles,
+                numberOfFolders = numOfFolders,
+                totalSizeInBytes = totalSizeInBytes,
+                creationTime = creationTime,
+                deviceStoragePath = localPath,
+                megaStoragePath = megaStoragePath,
+            )
         }
+        return null
     }
 
     private fun checkOverQuotaStatus() {
@@ -238,34 +299,65 @@ internal class SyncFoldersViewModel @Inject constructor(
                 }
             }
 
-            is SyncFoldersAction.OnRemoveFolderDialogConfirmed -> {
+            is SyncFoldersAction.OnRemoveSyncFolderDialogConfirmed -> {
+                viewModelScope.launch {
+                    uiState.value.syncUiItemToRemove?.let { syncUiItemToRemove ->
+                        runCatching {
+                            removeFolderPairUseCase(syncUiItemToRemove.id)
+                        }.onSuccess {
+                            _uiState.update { state -> state.copy(snackbarMessage = sharedResR.string.sync_snackbar_message_confirm_sync_stopped) }
+                        }.onFailure {
+                            Timber.e(it)
+                        }
+                    }
+                }
+                dismissConfirmRemoveSyncFolderDialog()
+            }
+
+            is SyncFoldersAction.OnRemoveBackupFolderDialogConfirmed -> {
                 viewModelScope.launch {
                     uiState.value.syncUiItemToRemove?.let { syncUiItemToRemove ->
                         runCatching {
                             removeFolderPairUseCase(syncUiItemToRemove.id)
                         }.onSuccess {
                             syncUiItemToRemove.apply {
-                                if (syncType == SyncType.TYPE_BACKUP) {
-                                    getRootNodeUseCase()?.let { rootNode ->
+                                when (action.stopBackupOption) {
+                                    StopBackupOption.MOVE -> {
+                                        action.selectedFolder?.let { selectedFolder ->
+                                            runCatching {
+                                                moveDeconfiguredBackupNodesUseCase(
+                                                    deconfiguredBackupRoot = megaStorageNodeId,
+                                                    backupDestination = selectedFolder.id,
+                                                )
+                                            }.onFailure {
+                                                Timber.e(it)
+                                            }
+                                        } ?: run {
+                                            getRootNodeUseCase()?.let { rootNode ->
+                                                runCatching {
+                                                    moveDeconfiguredBackupNodesUseCase(
+                                                        deconfiguredBackupRoot = megaStorageNodeId,
+                                                        backupDestination = rootNode.id,
+                                                    )
+                                                }.onFailure {
+                                                    Timber.e(it)
+                                                }
+                                            }
+                                        }
+                                    }
+
+                                    StopBackupOption.DELETE -> {
                                         runCatching {
-                                            moveDeconfiguredBackupNodesUseCase(
+                                            removeDeconfiguredBackupNodesUseCase(
                                                 deconfiguredBackupRoot = megaStorageNodeId,
-                                                backupDestination = rootNode.id,
                                             )
                                         }.onFailure {
                                             Timber.e(it)
                                         }
                                     }
                                 }
-                                _uiState.update { state ->
-                                    state.copy(
-                                        snackbarMessage = when (syncType) {
-                                            SyncType.TYPE_BACKUP -> sharedResR.string.sync_snackbar_message_confirm_backup_stopped
-                                            else -> sharedResR.string.sync_snackbar_message_confirm_sync_stopped
-                                        }
-                                    )
-                                }
                             }
+                            _uiState.update { state -> state.copy(snackbarMessage = sharedResR.string.sync_snackbar_message_confirm_backup_stopped) }
                         }.onFailure {
                             Timber.e(it)
                         }
@@ -280,19 +372,17 @@ internal class SyncFoldersViewModel @Inject constructor(
 
             is SyncFoldersAction.PauseRunClicked -> {
                 viewModelScope.launch {
-                    if (action.syncUiItem.status != SyncStatus.PAUSED) {
-                        pauseSyncUseCase(action.syncUiItem.id)
-                        setUserPausedSyncsUseCase(action.syncUiItem.id, true)
-                    } else {
-                        resumeSyncUseCase(action.syncUiItem.id)
-                        setUserPausedSyncsUseCase(action.syncUiItem.id, false)
+                    runCatching {
+                        if (action.syncUiItem.status != SyncStatus.PAUSED) {
+                            pauseSyncUseCase(action.syncUiItem.id)
+                            setUserPausedSyncsUseCase(action.syncUiItem.id, true)
+                        } else {
+                            resumeSyncUseCase(action.syncUiItem.id)
+                            setUserPausedSyncsUseCase(action.syncUiItem.id, false)
+                        }
+                    }.onFailure {
+                        Timber.e(it)
                     }
-                }
-            }
-
-            is SyncFoldersAction.OnSyncsPausedErrorDialogDismissed -> {
-                _uiState.update {
-                    it.copy(showSyncsPausedErrorDialog = false)
                 }
             }
 

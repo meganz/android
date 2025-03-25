@@ -1,5 +1,6 @@
 package mega.privacy.android.app.mediaplayer.trackinfo
 
+import mega.privacy.android.icon.pack.R as iconPackR
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
@@ -46,7 +47,7 @@ import mega.privacy.android.app.utils.LocationInfo
 import mega.privacy.android.app.utils.TimeUtils.formatLongDateTime
 import mega.privacy.android.shared.original.core.ui.controls.controlssliders.MegaSwitch
 import mega.privacy.android.shared.original.core.ui.preview.CombinedThemePreviews
-import mega.privacy.android.shared.original.core.ui.theme.OriginalTempTheme
+import mega.privacy.android.shared.original.core.ui.theme.OriginalTheme
 import java.io.File
 
 /**
@@ -118,7 +119,7 @@ fun AudioInfoView(
                 if (thumbnail != null && thumbnail.exists()) {
                     thumbnail
                 } else {
-                    R.drawable.ic_default_audio_cover
+                    iconPackR.drawable.ic_default_audio_cover
                 }
             ),
             contentDescription = null,
@@ -169,7 +170,7 @@ fun AudioInfoView(
             text = duration ?: "00:00",
             textAlign = TextAlign.Center,
             fontSize = 14.sp,
-            color = colorResource(id = R.color.teal_300),
+            color = colorResource(id = R.color.accent_900),
             modifier = Modifier
                 .padding(top = 8.dp, bottom = 24.dp)
                 .testTag(AUDIO_DURATION_TEST_TAG)
@@ -261,7 +262,7 @@ fun AudioNodeInfoView(
         Text(
             text = (locationValue?.location ?: ""),
             fontSize = 14.sp,
-            color = colorResource(R.color.teal_300),
+            color = colorResource(R.color.accent_900),
             modifier = Modifier
                 .padding(top = 4.dp, start = 72.dp)
                 .clickable {
@@ -309,7 +310,7 @@ fun AudioNodeInfoView(
 @CombinedThemePreviews
 @Composable
 private fun AudioTrackInfoViewPreview() {
-    OriginalTempTheme(isDark = isSystemInDarkTheme()) {
+    OriginalTheme(isDark = isSystemInDarkTheme()) {
         AudioTrackInfoView(
             uiState = TrackInfoState(
                 durationString = "00:35"
@@ -329,7 +330,7 @@ private fun AudioTrackInfoViewPreview() {
 @CombinedThemePreviews
 @Composable
 private fun AudioInfoViewPreview() {
-    OriginalTempTheme(isDark = isSystemInDarkTheme()) {
+    OriginalTheme(isDark = isSystemInDarkTheme()) {
         AudioInfoView(
             thumbnail = null,
             titleString = "Vengeance Rhythm",
@@ -343,7 +344,7 @@ private fun AudioInfoViewPreview() {
 @CombinedThemePreviews
 @Composable
 private fun AudioNodeInfoViewPreview() {
-    OriginalTempTheme(isDark = isSystemInDarkTheme()) {
+    OriginalTheme(isDark = isSystemInDarkTheme()) {
         AudioNodeInfoView(
             onCheckedChange = {},
             isEnabled = false,

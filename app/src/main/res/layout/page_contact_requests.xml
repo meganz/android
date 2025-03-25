@@ -20,7 +20,7 @@
         android:layout_gravity="center"
         android:text="@string/received_requests_empty"
         android:visibility="gone"
-        app:drawableTopCompat="@drawable/ic_zero_data_sent_requests"
+        app:drawableTopCompat="@drawable/ic_user_arrow_out_glass"
         tools:visibility="visible" />
 
     <androidx.compose.ui.platform.ComposeView

@@ -1,9 +1,10 @@
 package mega.privacy.android.app.presentation.shares.outgoing
 
+import mega.privacy.android.icon.pack.R as iconPackR
 import mega.privacy.android.shared.resources.R as sharedR
+import android.app.Activity.RESULT_OK
 import android.content.Context
 import android.content.Intent
-import android.content.res.Configuration
 import android.net.Uri
 import android.os.Bundle
 import android.view.LayoutInflater
@@ -11,6 +12,9 @@ import android.view.Menu
 import android.view.MenuItem
 import android.view.View
 import android.view.ViewGroup
+import androidx.activity.result.ActivityResult
+import androidx.activity.result.ActivityResultLauncher
+import androidx.activity.result.contract.ActivityResultContracts
 import androidx.appcompat.app.AppCompatActivity
 import androidx.appcompat.view.ActionMode
 import androidx.compose.material.SnackbarHostState
@@ -50,11 +54,12 @@ import mega.privacy.android.app.presentation.clouddrive.OptionItems
 import mega.privacy.android.app.presentation.contact.authenticitycredendials.AuthenticityCredentialsActivity
 import mega.privacy.android.app.presentation.data.NodeUIItem
 import mega.privacy.android.app.presentation.extensions.isDarkMode
-import mega.privacy.android.app.presentation.manager.model.SharesTab
 import mega.privacy.android.app.presentation.mapper.GetOptionsForToolbarMapper
 import mega.privacy.android.app.presentation.mapper.OptionsItemInfo
 import mega.privacy.android.app.presentation.node.NodeActionsViewModel
 import mega.privacy.android.app.presentation.node.action.HandleNodeAction
+import mega.privacy.android.app.presentation.photos.albums.add.AddToAlbumActivity
+import mega.privacy.android.app.presentation.settings.model.StorageTargetPreference
 import mega.privacy.android.app.presentation.shares.SharesActionListener
 import mega.privacy.android.app.presentation.shares.outgoing.ui.OutgoingSharesView
 import mega.privacy.android.app.presentation.snackbar.LegacySnackBarWrapper
@@ -63,15 +68,20 @@ import mega.privacy.android.app.sync.fileBackups.FileBackupManager
 import mega.privacy.android.app.utils.CloudStorageOptionControlUtil
 import mega.privacy.android.app.utils.Constants
 import mega.privacy.android.app.utils.MegaNodeUtil
+import mega.privacy.android.app.utils.Util
 import mega.privacy.android.core.ui.mapper.FileTypeIconMapper
+import mega.privacy.android.domain.entity.ImageFileTypeInfo
 import mega.privacy.android.domain.entity.ThemeMode
+import mega.privacy.android.domain.entity.VideoFileTypeInfo
+import mega.privacy.android.domain.entity.node.FileNode
 import mega.privacy.android.domain.entity.node.FolderNode
 import mega.privacy.android.domain.entity.node.MoveRequestResult
 import mega.privacy.android.domain.entity.node.TypedFileNode
 import mega.privacy.android.domain.entity.node.TypedFolderNode
 import mega.privacy.android.domain.entity.node.shares.ShareNode
 import mega.privacy.android.domain.usecase.GetThemeMode
-import mega.privacy.android.shared.original.core.ui.theme.OriginalTempTheme
+import mega.privacy.android.navigation.MegaNavigator
+import mega.privacy.android.shared.original.core.ui.theme.OriginalTheme
 import mega.privacy.android.shared.original.core.ui.utils.showAutoDurationSnackbar
 import timber.log.Timber
 import javax.inject.Inject
@@ -117,15 +127,26 @@ class OutgoingSharesComposeFragment : Fragment() {
     @Inject
     lateinit var fileTypeIconMapper: FileTypeIconMapper
 
+    /**
+     * Mega navigator
+     */
+    @Inject
+    lateinit var megaNavigator: MegaNavigator
+
     private val viewModel: OutgoingSharesComposeViewModel by activityViewModels()
     private val nodeActionsViewModel: NodeActionsViewModel by viewModels()
     private val sortByHeaderViewModel: SortByHeaderViewModel by activityViewModels()
 
     /**
-     * Flag to restore elevation when checkScroll() is called
-     * This should be removed when the Links tabs page is refactored to Compose
+     * Toggle the elevation of the app bar
      */
-    private var appBarElevationEnabled = false
+    var toggleAppBarElevation: (Boolean) -> Unit = {}
+
+    private val addToAlbumLauncher: ActivityResultLauncher<Intent> =
+        registerForActivityResult(
+            ActivityResultContracts.StartActivityForResult(),
+            ::handleAddToAlbumResult,
+        )
 
     /**
      * onAttach
@@ -170,7 +191,7 @@ class OutgoingSharesComposeFragment : Fragment() {
                 var clickedFile: TypedFileNode? by remember {
                     mutableStateOf(null)
                 }
-                OriginalTempTheme(isDark = themeMode.isDarkMode()) {
+                OriginalTheme(isDark = themeMode.isDarkMode()) {
                     OutgoingSharesView(
                         uiState = uiState,
                         emptyState = getEmptyFolderDrawable(uiState.isOutgoingSharesEmpty),
@@ -217,7 +238,7 @@ class OutgoingSharesComposeFragment : Fragment() {
                         onChangeViewTypeClick = viewModel::onChangeViewTypeClicked,
                         onLinkClicked = ::navigateToLink,
                         onVerifyContactDialogDismissed = viewModel::dismissVerifyContactDialog,
-                        onToggleAppBarElevation = ::toggleAppBarElevation,
+                        onToggleAppBarElevation = toggleAppBarElevation,
                         fileTypeIconMapper = fileTypeIconMapper,
                     )
 
@@ -229,6 +250,12 @@ class OutgoingSharesComposeFragment : Fragment() {
                             disableSelectMode()
                         },
                         snackBarHostState = snackbarHostState,
+                        navigateToStorageSettings = {
+                            megaNavigator.openSettings(
+                                requireActivity(),
+                                StorageTargetPreference
+                            )
+                        },
                     )
                     EventEffect(
                         event = nodeActionState.downloadEvent,
@@ -241,7 +268,6 @@ class OutgoingSharesComposeFragment : Fragment() {
                     if (!uiState.isInRootLevel) {
                         toggleAppBarElevation(false)
                     }
-                    hideTabs(!uiState.isInRootLevel)
                 }
                 LaunchedEffect(uiState.nodesList.isEmpty()) {
                     outgoingSharesActionListener?.updateSharesPageToolbarTitleAndFAB(
@@ -281,38 +307,6 @@ class OutgoingSharesComposeFragment : Fragment() {
                     onConsumed = viewModel::consumeOpenAuthenticityCredentials,
                     action = { email -> openAuthenticityCredentials(email) },
                 )
-            }
-        }
-    }
-
-    /**
-     * Display the elevation of the app bar or not
-     */
-    private fun toggleAppBarElevation(withElevation: Boolean) {
-        appBarElevationEnabled = withElevation
-        (activity as? ManagerActivity)?.changeAppBarElevation(withElevation)
-    }
-
-    /**
-     * Hide/Show shares tab
-     *
-     * @param hide true if needs to hide shares tabs
-     */
-    private fun hideTabs(hide: Boolean) {
-        (activity as ManagerActivity?)?.hideTabs(hide, SharesTab.OUTGOING_TAB)
-    }
-
-    /**
-     * Check elevation
-     *
-     * @param allowDisable true if allowed to disable elevation
-     */
-    fun checkScroll(allowDisable: Boolean = false) {
-        if (appBarElevationEnabled) {
-            toggleAppBarElevation(true)
-        } else {
-            if (allowDisable) {
-                toggleAppBarElevation(false)
             }
         }
     }
@@ -408,21 +402,9 @@ class OutgoingSharesComposeFragment : Fragment() {
      */
     private fun getEmptyFolderDrawable(isPageEmpty: Boolean): Pair<Int, Int> {
         return if (isPageEmpty) {
-            Pair(
-                if (requireActivity().resources.configuration.orientation == Configuration.ORIENTATION_LANDSCAPE) {
-                    R.drawable.outgoing_shares_empty
-                } else {
-                    R.drawable.outgoing_empty_landscape
-                }, R.string.context_empty_outgoing
-            )
+            Pair(iconPackR.drawable.ic_folder_arrow_down_glass, R.string.context_empty_outgoing)
         } else {
-            Pair(
-                if (requireActivity().resources.configuration.orientation == Configuration.ORIENTATION_LANDSCAPE) {
-                    R.drawable.ic_zero_landscape_empty_folder
-                } else {
-                    R.drawable.ic_zero_portrait_empty_folder
-                }, R.string.file_browser_empty_folder_new
-            )
+            Pair(iconPackR.drawable.ic_empty_folder_glass, R.string.file_browser_empty_folder_new)
         }
     }
 
@@ -459,7 +441,6 @@ class OutgoingSharesComposeFragment : Fragment() {
             (requireActivity() as ManagerActivity).let {
                 it.hideFabButton()
                 it.showHideBottomNavigationView(true)
-                it.hideTabs(true, SharesTab.OUTGOING_TAB)
             }
             return true
         }
@@ -501,6 +482,24 @@ class OutgoingSharesComposeFragment : Fragment() {
                     }
                 }
 
+                val mediaNodes = selected
+                    .filter {
+                        val type = (it as? FileNode)?.type
+                        type is ImageFileTypeInfo || type is VideoFileTypeInfo
+                    }
+                if (mediaNodes.size == selected.size) {
+                    if (mediaNodes.all { (it as? FileNode)?.type is VideoFileTypeInfo }) {
+                        control.addToAlbum().isVisible = false
+                        control.addTo().isVisible = true
+                    } else {
+                        control.addToAlbum().isVisible = true
+                        control.addTo().isVisible = false
+                    }
+                } else {
+                    control.addToAlbum().isVisible = false
+                    control.addTo().isVisible = false
+                }
+
                 CloudStorageOptionControlUtil.applyControl(menu, control)
             }
             return true
@@ -517,7 +516,6 @@ class OutgoingSharesComposeFragment : Fragment() {
             (activity as? ManagerActivity)?.let {
                 it.showFabButton()
                 it.showHideBottomNavigationView(false)
-                it.hideTabs(false, SharesTab.OUTGOING_TAB)
                 actionMode = null
             }
         }
@@ -633,6 +631,26 @@ class OutgoingSharesComposeFragment : Fragment() {
 
                 // This option is only available in the Incoming Shares page
                 OptionItems.LEAVE_SHARE_CLICKED -> Unit
+
+                OptionItems.ADD_TO_ALBUM -> {
+                    val intent = Intent(requireContext(), AddToAlbumActivity::class.java).apply {
+                        val ids = viewModel.state.value.selectedNodeHandles.toTypedArray()
+                        putExtra("ids", ids)
+                        putExtra("type", 0)
+                    }
+                    addToAlbumLauncher.launch(intent)
+                    disableSelectMode()
+                }
+
+                OptionItems.ADD_TO -> {
+                    val intent = Intent(requireContext(), AddToAlbumActivity::class.java).apply {
+                        val ids = viewModel.state.value.selectedNodeHandles.toTypedArray()
+                        putExtra("ids", ids)
+                        putExtra("type", 1)
+                    }
+                    addToAlbumLauncher.launch(intent)
+                    disableSelectMode()
+                }
             }
         }
     }
@@ -669,5 +687,12 @@ class OutgoingSharesComposeFragment : Fragment() {
             putExtra(Constants.EMAIL, email)
             requireActivity().startActivity(this)
         }
+    }
+
+    private fun handleAddToAlbumResult(result: ActivityResult) {
+        if (result.resultCode != RESULT_OK) return
+        val message = result.data?.getStringExtra("message") ?: return
+
+        Util.showSnackbar(requireActivity(), message)
     }
 }

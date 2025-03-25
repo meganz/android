@@ -15,7 +15,7 @@ import mega.privacy.android.app.featuretoggle.AppFeatures
 import mega.privacy.android.app.utils.Constants
 import mega.privacy.android.core.ui.mapper.FileTypeIconMapper
 import mega.privacy.android.domain.usecase.featureflag.GetFeatureFlagValueUseCase
-import mega.privacy.android.domain.usecase.transfers.GetFileNameFromContentUri
+import mega.privacy.android.domain.usecase.transfers.GetFileNameFromStringUriUseCase
 import mega.privacy.android.icon.pack.R
 import timber.log.Timber
 import javax.inject.Inject
@@ -26,7 +26,7 @@ import javax.inject.Inject
 @HiltViewModel
 class UploadDestinationViewModel @Inject constructor(
     private val getFeatureFlagValueUseCase: GetFeatureFlagValueUseCase,
-    private val getFileNameFromContentUri: GetFileNameFromContentUri,
+    private val getFileNameFromStringUriUseCase: GetFileNameFromStringUriUseCase,
     private val fileTypeIconMapper: FileTypeIconMapper,
     private val importFilesErrorMessageMapper: ImportFilesErrorMessageMapper,
     private val importFileErrorMessageMapper: ImportFileErrorMessageMapper,
@@ -57,7 +57,8 @@ class UploadDestinationViewModel @Inject constructor(
      */
     fun updateUri(fileUriList: List<Uri>) = viewModelScope.launch {
         val importableItems = fileUriList.map { uri ->
-            val fileName = runCatching { getFileNameFromContentUri(uri.toString()) }.getOrNull().orEmpty()
+            val fileName =
+                runCatching { getFileNameFromStringUriUseCase(uri.toString()) }.getOrNull().orEmpty()
             ImportUiItem(
                 filePath = uri.toString(),
                 originalFileName = fileName,
@@ -89,7 +90,7 @@ class UploadDestinationViewModel @Inject constructor(
     /**
      * Confirm the import
      */
-    fun isValidNameForUpload() : Boolean {
+    fun isValidNameForUpload(): Boolean {
         Timber.d("Import confirmed")
         val emptyNames = uiState.value.importUiItems.count { it.fileName.isBlank() }
         val hasWrongNames = uiState.value.importUiItems.any {

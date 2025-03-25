@@ -2,11 +2,10 @@ package mega.privacy.android.domain.usecase.transfers.chatuploads
 
 import kotlinx.coroutines.flow.firstOrNull
 import kotlinx.coroutines.flow.onEach
-import mega.privacy.android.domain.entity.transfer.MultiTransferEvent
 import mega.privacy.android.domain.entity.transfer.TransferAppData
-import mega.privacy.android.domain.entity.transfer.UploadFileInfo
-import mega.privacy.android.domain.usecase.transfers.uploads.UploadFilesUseCase
-import java.io.File
+import mega.privacy.android.domain.entity.transfer.isFinishScanningEvent
+import mega.privacy.android.domain.entity.uri.UriPath
+import mega.privacy.android.domain.usecase.transfers.uploads.UploadFileUseCase
 import javax.inject.Inject
 
 /**
@@ -15,7 +14,7 @@ import javax.inject.Inject
  * The use case also handles the transfer events to update the pending messages
  */
 class StartChatUploadAndWaitScanningFinishedUseCase @Inject constructor(
-    private val uploadFilesUseCase: UploadFilesUseCase,
+    private val uploadFileUseCase: UploadFileUseCase,
     private val getOrCreateMyChatsFilesFolderIdUseCase: GetOrCreateMyChatsFilesFolderIdUseCase,
     private val handleChatUploadTransferEventUseCase: HandleChatUploadTransferEventUseCase,
 ) {
@@ -23,14 +22,17 @@ class StartChatUploadAndWaitScanningFinishedUseCase @Inject constructor(
      * Invoke
      */
     suspend operator fun invoke(
-        filesAndNames: Map<File, String?>,
+        uriPath: UriPath,
+        fileName: String?,
         pendingMessageIds: List<Long>,
     ) {
         val appData = pendingMessageIds.map {
             TransferAppData.ChatUpload(it)
         }
-        uploadFilesUseCase(
-            filesAndNames.map { UploadFileInfo(it.key, it.value, appData) },
+        uploadFileUseCase(
+            uriPath = uriPath,
+            fileName = fileName,
+            appData = appData,
             getOrCreateMyChatsFilesFolderIdUseCase(),
             false
         ).onEach { event ->
@@ -39,7 +41,7 @@ class StartChatUploadAndWaitScanningFinishedUseCase @Inject constructor(
                 pendingMessageIds = pendingMessageIds.toLongArray()
             )
         }.firstOrNull { event ->
-            (event as? MultiTransferEvent.SingleTransferEvent)?.scanningFinished == true
+            event.isFinishScanningEvent == true
         }
     }
 }

@@ -16,8 +16,6 @@ import kotlinx.coroutines.test.advanceUntilIdle
 import kotlinx.coroutines.test.runTest
 import mega.privacy.android.app.extensions.asHotFlow
 import mega.privacy.android.app.featuretoggle.ApiFeatures
-import mega.privacy.android.app.featuretoggle.AppFeatures
-import mega.privacy.android.app.globalmanagement.TransfersManagement
 import mega.privacy.android.app.presentation.clouddrive.mapper.StorageCapacityMapper
 import mega.privacy.android.app.presentation.clouddrive.model.StorageOverQuotaCapacity
 import mega.privacy.android.app.presentation.data.NodeUIItem
@@ -62,8 +60,9 @@ import mega.privacy.android.domain.usecase.node.IsNodeInRubbishBinUseCase
 import mega.privacy.android.domain.usecase.node.MonitorNodeUpdatesUseCase
 import mega.privacy.android.domain.usecase.offline.MonitorOfflineNodeUpdatesUseCase
 import mega.privacy.android.domain.usecase.photos.mediadiscovery.ShouldEnterMediaDiscoveryModeUseCase
-import mega.privacy.android.domain.usecase.quota.GetBandwidthOverQuotaDelayUseCase
 import mega.privacy.android.domain.usecase.setting.MonitorShowHiddenItemsUseCase
+import mega.privacy.android.domain.usecase.transfers.overquota.GetBandwidthOverQuotaDelayUseCase
+import mega.privacy.android.domain.usecase.transfers.overquota.IsInTransferOverQuotaUseCase
 import mega.privacy.android.domain.usecase.viewtype.MonitorViewType
 import mega.privacy.android.domain.usecase.viewtype.SetViewType
 import nz.mega.sdk.MegaApiJava
@@ -79,7 +78,6 @@ import org.mockito.kotlin.any
 import org.mockito.kotlin.eq
 import org.mockito.kotlin.mock
 import org.mockito.kotlin.reset
-import org.mockito.kotlin.stub
 import org.mockito.kotlin.times
 import org.mockito.kotlin.verify
 import org.mockito.kotlin.whenever
@@ -107,7 +105,6 @@ class FileBrowserViewModelTest {
     private val setViewType = mock<SetViewType>()
     private val monitorRefreshSessionUseCase = mock<MonitorRefreshSessionUseCase>()
     private val getBandwidthOverQuotaDelayUseCase = mock<GetBandwidthOverQuotaDelayUseCase>()
-    private val transfersManagement = mock<TransfersManagement>()
     private val containsMediaItemUseCase = mock<ContainsMediaItemUseCase>()
     private val fileDurationMapper = mock<FileDurationMapper>()
     private val monitorOfflineNodeUpdatesUseCase = mock<MonitorOfflineNodeUpdatesUseCase>()
@@ -136,6 +133,7 @@ class FileBrowserViewModelTest {
         mock<SetAlmostFullStorageBannerClosingTimestampUseCase>()
     private val monitorAlmostFullStorageBannerClosingTimestampUseCase =
         mock<MonitorAlmostFullStorageBannerVisibilityUseCase>()
+    private val isInTransferOverQuotaUseCase = mock<IsInTransferOverQuotaUseCase>()
 
     @BeforeEach
     fun setUp() {
@@ -159,7 +157,6 @@ class FileBrowserViewModelTest {
             handleOptionClickMapper = handleOptionClickMapper,
             monitorRefreshSessionUseCase = monitorRefreshSessionUseCase,
             getBandwidthOverQuotaDelayUseCase = getBandwidthOverQuotaDelayUseCase,
-            transfersManagement = transfersManagement,
             containsMediaItemUseCase = containsMediaItemUseCase,
             fileDurationMapper = fileDurationMapper,
             monitorOfflineNodeUpdatesUseCase = monitorOfflineNodeUpdatesUseCase,
@@ -176,7 +173,8 @@ class FileBrowserViewModelTest {
             getBusinessStatusUseCase = getBusinessStatusUseCase,
             setAlmostFullStorageBannerClosingTimestampUseCase = setAlmostFullStorageBannerClosingTimestampUseCase,
             monitorAlmostFullStorageBannerClosingTimestampUseCase = monitorAlmostFullStorageBannerClosingTimestampUseCase,
-            storageCapacityMapper = storageCapacityMapper
+            storageCapacityMapper = storageCapacityMapper,
+            isInTransferOverQuotaUseCase = isInTransferOverQuotaUseCase,
         )
     }
 
@@ -224,10 +222,6 @@ class FileBrowserViewModelTest {
     ) = runTest {
         runBlocking {
             stubCommon()
-            getFeatureFlagValueUseCase.stub {
-                onBlocking { invoke(AppFeatures.FullStorageOverQuotaBanner) }.thenReturn(true)
-                onBlocking { invoke(AppFeatures.AlmostFullStorageOverQuotaBanner) }.thenReturn(true)
-            }
             whenever(monitorStorageStateUseCase()).thenReturn(
                 storageState.asHotFlow()
             )
@@ -239,9 +233,7 @@ class FileBrowserViewModelTest {
             whenever(
                 storageCapacityMapper(
                     storageState = storageState,
-                    isFullStorageOverQuotaBannerEnabled = true,
-                    isAlmostFullStorageQuotaBannerEnabled = true,
-                    isDismissiblePeriodOver = isDismissiblePeriodOver
+                    shouldShow = isDismissiblePeriodOver
                 )
             ).thenReturn(
                 storageOverQuotaCapacity
@@ -581,8 +573,8 @@ class FileBrowserViewModelTest {
     @Test
     fun `test that the transfer overquota banner is hidden when transfers management detects a non overquota state`() =
         runTest {
-            whenever(transfersManagement.isTransferOverQuotaBannerShown).thenReturn(false)
-            whenever(getBandwidthOverQuotaDelayUseCase()).thenReturn(10000)
+            whenever(isInTransferOverQuotaUseCase()).thenReturn(false)
+            whenever(getBandwidthOverQuotaDelayUseCase()).thenReturn(10000.seconds)
             underTest.changeTransferOverQuotaBannerVisibility()
             underTest.state.test {
                 assertThat(awaitItem().shouldShowBannerVisibility).isFalse()
@@ -630,7 +622,7 @@ class FileBrowserViewModelTest {
     @Test
     fun `test that download event is updated when on download for preview option click is invoked`() =
         runTest {
-            val triggered = TransferTriggerEvent.StartDownloadForPreview(node = mock())
+            val triggered = TransferTriggerEvent.StartDownloadForPreview(node = mock(), isOpenWith = false)
             underTest.onDownloadFileTriggered(triggered)
             underTest.state.test {
                 val state = awaitItem()
@@ -711,6 +703,32 @@ class FileBrowserViewModelTest {
         }
     }
 
+    @Test
+    fun `test openFileBrowserWithSpecificNode updates state and refreshes nodes`() = runTest {
+        val folderHandle = 123456789L
+
+        // Mock the necessary dependencies
+        whenever(shouldEnterMediaDiscoveryModeUseCase(folderHandle)).thenReturn(false)
+
+        // Call the function
+        underTest.openFileBrowserWithSpecificNode(folderHandle, null)
+
+        // Verify the state updates
+        underTest.state.test {
+            val state = awaitItem()
+            assertThat(state.isLoading).isFalse()
+            assertThat(state.fileBrowserHandle).isEqualTo(folderHandle)
+            assertThat(state.accessedFolderHandle).isEqualTo(folderHandle)
+            assertThat(state.openedFolderNodeHandles).isEmpty()
+            assertThat(state.errorMessage).isEqualTo(null)
+            assertThat(state.selectedTab).isEqualTo(CloudDriveTab.CLOUD)
+            cancelAndIgnoreRemainingEvents()
+        }
+
+        // Verify that refreshNodesState is called
+        verify(getFileBrowserNodeChildrenUseCase).invoke(folderHandle)
+    }
+
     private suspend fun stubCommon() {
         whenever(monitorNodeUpdatesUseCase()).thenReturn(monitorNodeUpdatesFakeFlow)
         whenever(monitorViewType()).thenReturn(emptyFlow())
@@ -718,18 +736,14 @@ class FileBrowserViewModelTest {
         whenever(getParentNodeUseCase(NodeId(any()))).thenReturn(null)
         whenever(getCloudSortOrder()).thenReturn(SortOrder.ORDER_NONE)
         whenever(monitorRefreshSessionUseCase()).thenReturn(emptyFlow())
-        whenever(getBandwidthOverQuotaDelayUseCase()).thenReturn(1L)
+        whenever(getBandwidthOverQuotaDelayUseCase()).thenReturn(1.seconds)
         whenever(fileDurationMapper(any())).thenReturn(1.seconds)
         whenever(monitorOfflineNodeUpdatesUseCase()).thenReturn(emptyFlow())
         whenever(monitorConnectivityUseCase()).thenReturn(emptyFlow())
         whenever(monitorShowHiddenItemsUseCase()).thenReturn(flowOf(false))
         whenever(monitorAccountDetailUseCase()).thenReturn(accountDetailFakeFlow)
         whenever(shouldEnterMediaDiscoveryModeUseCase(any())).thenReturn(false)
-        whenever(getFeatureFlagValueUseCase(AppFeatures.FullStorageOverQuotaBanner)).thenReturn(true)
         whenever(getFeatureFlagValueUseCase(ApiFeatures.HiddenNodesInternalRelease)).thenReturn(true)
-        whenever(getFeatureFlagValueUseCase(AppFeatures.AlmostFullStorageOverQuotaBanner)).thenReturn(
-            true
-        )
         whenever(monitorStorageStateUseCase()).thenReturn(
             StorageState.Green.asHotFlow()
         )
@@ -738,13 +752,12 @@ class FileBrowserViewModelTest {
         whenever(
             storageCapacityMapper(
                 storageState = any(),
-                isFullStorageOverQuotaBannerEnabled = any(),
-                isAlmostFullStorageQuotaBannerEnabled = any(),
-                isDismissiblePeriodOver = any()
+                shouldShow = any()
             )
         ).thenReturn(
             StorageOverQuotaCapacity.DEFAULT
         )
+        whenever(isInTransferOverQuotaUseCase()).thenReturn(false)
     }
 
     @AfterEach
@@ -759,7 +772,6 @@ class FileBrowserViewModelTest {
             setViewType,
             monitorRefreshSessionUseCase,
             getBandwidthOverQuotaDelayUseCase,
-            transfersManagement,
             containsMediaItemUseCase,
             fileDurationMapper,
             monitorOfflineNodeUpdatesUseCase,

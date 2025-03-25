@@ -9,27 +9,27 @@ sealed interface FolderType {
     /**
      * Default
      */
-    object Default : FolderType
+    data object Default : FolderType
 
     /**
      * MediaSyncFolder
      */
-    object MediaSyncFolder : FolderType
+    data object MediaSyncFolder : FolderType
 
     /**
      * ChatFilesFolder
      */
-    object ChatFilesFolder : FolderType
+    data object ChatFilesFolder : FolderType
 
     /**
      * Root backup folder
      */
-    object RootBackup : FolderType
+    data object RootBackup : FolderType
 
     /**
      * Non-Root backup folder
      */
-    object ChildBackup : FolderType
+    data object ChildBackup : FolderType
 
     /**
      * Device Backup folder
@@ -37,4 +37,9 @@ sealed interface FolderType {
      * @property deviceType
      */
     data class DeviceBackup(val deviceType: DeviceType) : FolderType
+
+    /**
+     * Synced folder
+     */
+    data object Sync : FolderType
 }

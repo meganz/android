@@ -31,7 +31,7 @@ import mega.privacy.android.shared.original.core.ui.controls.appbar.AppBarType
 import mega.privacy.android.shared.original.core.ui.controls.dialogs.MegaAlertDialog
 import mega.privacy.android.shared.original.core.ui.controls.layouts.ScaffoldWithCollapsibleHeader
 import mega.privacy.android.shared.original.core.ui.preview.CombinedThemePreviews
-import mega.privacy.android.shared.original.core.ui.theme.OriginalTempTheme
+import mega.privacy.android.shared.original.core.ui.theme.OriginalTheme
 import java.time.Instant
 import kotlin.time.Duration.Companion.days
 import kotlin.time.Duration.Companion.seconds
@@ -109,7 +109,7 @@ private fun OfflineFileInfoScreenPreview(
     @PreviewParameter(OfflineFileInfoViewStatePreviewsProvider::class) state: OfflineFileInfoUiState,
 ) {
     val uiState by mutableStateOf(state) // Not remembered to allow multiple states in the device, don't do that in real code, just in previews
-    OriginalTempTheme(isDark = isSystemInDarkTheme()) {
+    OriginalTheme(isDark = isSystemInDarkTheme()) {
         OfflineFileInfoScreen(
             uiState = uiState,
             modifier = Modifier.background(color = MaterialTheme.colors.background),

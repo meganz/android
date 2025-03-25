@@ -10,6 +10,7 @@ import mega.privacy.android.domain.entity.transfer.TransferType
 import mega.privacy.android.domain.entity.transfer.pending.InsertPendingTransferRequest
 import mega.privacy.android.domain.entity.transfer.pending.PendingTransferNodeIdentifier
 import mega.privacy.android.domain.entity.transfer.pending.PendingTransferState
+import mega.privacy.android.domain.entity.uri.UriPath
 import org.junit.jupiter.api.BeforeAll
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.TestInstance
@@ -28,9 +29,10 @@ internal class InsertPendingTransferRequestMapperTest {
     private val insertRequest = InsertPendingTransferRequest(
         transferType = TransferType.DOWNLOAD,
         nodeIdentifier = PendingTransferNodeIdentifier.CloudDriveNode(NodeId(11111L)),
-        path = "file/path",
+        uriPath = UriPath("file/path"),
         appData = listOf(TransferAppData.ChatUpload(454L)),
         isHighPriority = true,
+        fileName = "renamed.txt"
     )
 
     @BeforeAll
@@ -54,13 +56,14 @@ internal class InsertPendingTransferRequestMapperTest {
             { assertThat(pendingTransferEntity.transferTag).isNull() },
             { assertThat(pendingTransferEntity.transferType).isEqualTo(insertRequest.transferType) },
             { assertThat(pendingTransferEntity.nodeIdentifier).isEqualTo(insertRequest.nodeIdentifier) },
-            { assertThat(pendingTransferEntity.path).isEqualTo(insertRequest.path) },
+            { assertThat(pendingTransferEntity.path).isEqualTo(insertRequest.uriPath.value) },
             { assertThat(pendingTransferEntity.appData).isEqualTo(appDataString) },
             { assertThat(pendingTransferEntity.isHighPriority).isEqualTo(insertRequest.isHighPriority) },
             { assertThat(pendingTransferEntity.scanningFoldersData).isEqualTo(PendingTransferEntity.ScanningFoldersDataEntity()) },
             { assertThat(pendingTransferEntity.startedFiles).isEqualTo(0) },
             { assertThat(pendingTransferEntity.alreadyTransferred).isEqualTo(0) },
             { assertThat(pendingTransferEntity.state).isEqualTo(PendingTransferState.NotSentToSdk) },
+            { assertThat(pendingTransferEntity.fileName).isEqualTo(insertRequest.fileName) }
         )
     }
 }

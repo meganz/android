@@ -21,11 +21,9 @@ import androidx.work.WorkerParameters
 import dagger.assisted.Assisted
 import dagger.assisted.AssistedInject
 import kotlinx.coroutines.CoroutineDispatcher
-import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Job
-import kotlinx.coroutines.cancelAndJoin
+import kotlinx.coroutines.cancel
 import kotlinx.coroutines.flow.collectLatest
-import kotlinx.coroutines.flow.distinctUntilChanged
 import kotlinx.coroutines.flow.filter
 import kotlinx.coroutines.flow.firstOrNull
 import kotlinx.coroutines.launch
@@ -39,6 +37,9 @@ import mega.privacy.android.data.gateway.preferences.CallsPreferencesGateway
 import mega.privacy.android.data.mapper.FileDurationMapper
 import mega.privacy.android.data.mapper.pushmessage.PushMessageMapper
 import mega.privacy.android.domain.entity.CallsMeetingReminders
+import mega.privacy.android.domain.entity.call.ChatCallChanges
+import mega.privacy.android.domain.entity.call.ChatCallStatus
+import mega.privacy.android.domain.entity.meeting.FakeIncomingCallState
 import mega.privacy.android.domain.entity.pushes.PushMessage
 import mega.privacy.android.domain.entity.pushes.PushMessage.CallPushMessage
 import mega.privacy.android.domain.entity.pushes.PushMessage.ChatPushMessage
@@ -49,10 +50,15 @@ import mega.privacy.android.domain.qualifier.IoDispatcher
 import mega.privacy.android.domain.qualifier.LoginMutex
 import mega.privacy.android.domain.usecase.GetChatRoomUseCase
 import mega.privacy.android.domain.usecase.RetryPendingConnectionsUseCase
+import mega.privacy.android.domain.usecase.call.GetChatCallUseCase
+import mega.privacy.android.domain.usecase.call.IsChatStatusConnectedForCallUseCase
 import mega.privacy.android.domain.usecase.chat.IsChatNotifiableUseCase
+import mega.privacy.android.domain.usecase.chat.MonitorChatConnectionStateUseCase
+import mega.privacy.android.domain.usecase.contact.GetMyUserHandleUseCase
 import mega.privacy.android.domain.usecase.login.BackgroundFastLoginUseCase
 import mega.privacy.android.domain.usecase.login.InitialiseMegaChatUseCase
 import mega.privacy.android.domain.usecase.meeting.MonitorChatCallUpdatesUseCase
+import mega.privacy.android.domain.usecase.meeting.SetFakeIncomingCallStateUseCase
 import mega.privacy.android.domain.usecase.notifications.GetChatMessageNotificationDataUseCase
 import mega.privacy.android.domain.usecase.notifications.PushReceivedUseCase
 import timber.log.Timber
@@ -71,7 +77,6 @@ import timber.log.Timber
  *  @property notificationManager      Notification manager
  *  @property isChatNotifiableUseCase  Use case to check if a chat is notifiable
  *  @property getChatRoomUseCase       Use case to get a chat room
- *  @property monitorChatCallUpdatesUseCase   Use case to monitor call updates
  *  @property fileDurationMapper      Mapper to convert file duration
  *  @property getChatMessageNotificationDataUseCase Use case to get chat message notification data
  *  @property chatMessageNotificationManager Use case to show a device Notification given a [ChatMessageNotificationData]
@@ -87,7 +92,6 @@ class PushMessageWorker @AssistedInject constructor(
     private val retryPendingConnectionsUseCase: RetryPendingConnectionsUseCase,
     private val pushMessageMapper: PushMessageMapper,
     private val initialiseMegaChatUseCase: InitialiseMegaChatUseCase,
-    private val monitorChatCallUpdatesUseCase: MonitorChatCallUpdatesUseCase,
     private val scheduledMeetingPushMessageNotificationManager: ScheduledMeetingPushMessageNotificationManager,
     private val promoPushNotificationManager: PromoPushNotificationManager,
     private val callsPreferencesGateway: CallsPreferencesGateway,
@@ -97,17 +101,21 @@ class PushMessageWorker @AssistedInject constructor(
     private val fileDurationMapper: FileDurationMapper,
     private val getChatMessageNotificationDataUseCase: GetChatMessageNotificationDataUseCase,
     private val chatMessageNotificationManager: ChatMessageNotificationManager,
+    private val setFakeIncomingCallStateUseCase: SetFakeIncomingCallStateUseCase,
+    private val isChatStatusConnectedForCallUseCase: IsChatStatusConnectedForCallUseCase,
+    private val monitorChatConnectionStateUseCase: MonitorChatConnectionStateUseCase,
+    private val monitorChatCallUpdatesUseCase: MonitorChatCallUpdatesUseCase,
+    private val getMyUserHandleUseCase: GetMyUserHandleUseCase,
+    private val getChatCallUseCase: GetChatCallUseCase,
     @IoDispatcher private val ioDispatcher: CoroutineDispatcher,
     @LoginMutex private val loginMutex: Mutex,
 ) : CoroutineWorker(context, workerParams) {
 
-    /**
-     * Job to monitor chat call updates flow
-     */
-    private var monitorChatCallUpdatesJob: Job? = null
+    var monitorChatConnectionStateUseCaseJob: Job? = null
 
     @SuppressLint("MissingPermission")
     override suspend fun doWork(): Result = withContext(ioDispatcher) {
+        Timber.d("Push message worker - do work")
         // legacy support, other places need to know logging in happen
         if (loginMutex.isLocked) {
             Timber.w("Logging already running.")
@@ -117,7 +125,13 @@ class PushMessageWorker @AssistedInject constructor(
         getPushMessageFromWorkerData(inputData)?.let {
             if (it is CallPushMessage) {
                 runCatching {
-                    monitorChatCallUpdatesJob = monitorChatCallUpdates(it.chatId)
+                    Timber.d("CallPushMessage received, show fake notification")
+                    setFakeIncomingCallStateUseCase(
+                        chatId = it.chatId,
+                        type = FakeIncomingCallState.Notification
+                    )
+                }.onFailure { exception ->
+                    Timber.e(exception.message)
                 }
             }
         }
@@ -125,36 +139,89 @@ class PushMessageWorker @AssistedInject constructor(
         val loginResult = runCatching {
             backgroundFastLoginUseCase()
         }
-
+        Timber.d("Login result $loginResult")
         if (loginResult.isSuccess) {
             Timber.d("Fast login success.")
             runCatching { retryPendingConnectionsUseCase(disconnect = false) }
                 .recoverCatching { error ->
                     if (error is ChatNotInitializedErrorStatus) {
-                        Timber.d("chat engine not ready. try to initialise megachat.")
+                        Timber.d("chat engine not ready. try to initialise MEGAChat")
                         initialiseMegaChatUseCase(loginResult.getOrDefault(""))
                     } else {
                         Timber.w(error)
                     }
                 }.onFailure { error ->
                     Timber.e("Initialise MEGAChat failed: $error")
-                    cancelJobs()
                     return@withContext Result.failure()
                 }
         } else {
             Timber.e("Fast login error: ${loginResult.exceptionOrNull()}")
-            cancelJobs()
             return@withContext Result.failure()
         }
 
         when (val pushMessage = getPushMessageFromWorkerData(inputData)) {
+            is CallPushMessage -> {
+                Timber.d("Call push message with chatId ${pushMessage.chatId} ")
+                if (isChatStatusConnectedForCallUseCase(pushMessage.chatId)) {
+                    Timber.d("Chat status is connected for call")
+                } else {
+                    Timber.d("Chat status is NOT connected for call. Monitor updates.")
+                    monitorChatConnectionStateUseCaseJob = launch {
+                        monitorChatConnectionStateUseCase()
+                            .filter { update -> update.chatId == pushMessage.chatId }
+                            .collectLatest {
+                                if (isChatStatusConnectedForCallUseCase(pushMessage.chatId)) {
+                                    Timber.d("Chat status is connected for call")
+                                    val chatCall = getChatCallUseCase(pushMessage.chatId)
+                                    if (chatCall == null || chatCall.status != ChatCallStatus.UserNoPresent || chatCall.peerIdParticipants?.contains(
+                                            getMyUserHandleUseCase()
+                                        ) == true
+                                    ) {
+                                        Timber.d("No call found or participating from another client")
+                                        cancel()
+                                    } else {
+
+                                        Timber.d("Monitor call updates")
+                                        monitorChatCallUpdatesUseCase()
+                                            .filter { update -> update.chatId == pushMessage.chatId }
+                                            .collectLatest { call ->
+                                                if (call.changes?.contains(ChatCallChanges.RingingStatus) == true) {
+                                                    if (call.isRinging.not()) {
+                                                        Timber.d("Call stopped ringing")
+                                                        cancel()
+                                                        monitorChatConnectionStateUseCaseJob?.cancel()
+                                                    }
+                                                }
+                                                if (call.changes?.contains(ChatCallChanges.Status) == true) {
+                                                    if (call.status == ChatCallStatus.Destroyed) {
+                                                        Timber.d("Call destroyed")
+                                                        cancel()
+                                                        monitorChatConnectionStateUseCaseJob?.cancel()
+                                                    }
+                                                }
+
+                                                if (call.changes?.contains(ChatCallChanges.CallComposition) == true && chatCall.peerIdParticipants?.contains(
+                                                        getMyUserHandleUseCase()
+                                                    ) == true
+                                                ) {
+                                                    Timber.d("Participating from another client")
+                                                    cancel()
+                                                    monitorChatConnectionStateUseCaseJob?.cancel()
+                                                }
+                                            }
+                                    }
+                                }
+                            }
+                    }
+                }
+            }
+
             is ChatPushMessage -> {
                 with(pushMessage) {
                     Timber.d("Should beep: $shouldBeep, Chat: $chatId, message: $msgId")
 
                     if (chatId == -1L || msgId == -1L) {
                         Timber.d("Message should be managed in onChatNotification")
-                        cancelJobs()
                         return@withContext Result.success()
                     }
 
@@ -163,9 +230,7 @@ class PushMessageWorker @AssistedInject constructor(
                     }.onSuccess {
                         Timber.d("Push received success chatID: $chatId msgId:$msgId")
                         if (!isChatNotifiableUseCase(chatId) || !areNotificationsEnabled()) {
-                            cancelJobs()
                             return@with
-
                         }
 
                         val data = getChatMessageNotificationDataUseCase(
@@ -175,7 +240,6 @@ class PushMessageWorker @AssistedInject constructor(
                             runCatching { DEFAULT_NOTIFICATION_URI.toString() }.getOrNull()
                         ) ?: return@withContext Result.failure()
 
-
                         chatMessageNotificationManager.show(
                             applicationContext,
                             data,
@@ -183,7 +247,6 @@ class PushMessageWorker @AssistedInject constructor(
                         )
                     }.onFailure { error ->
                         Timber.e(error)
-                        cancelJobs()
                         return@withContext Result.failure()
                     }
                 }
@@ -198,7 +261,6 @@ class PushMessageWorker @AssistedInject constructor(
                         )
                     }.onFailure { error ->
                         Timber.e(error)
-                        cancelJobs()
                         return@withContext Result.failure()
                     }
                 }
@@ -208,7 +270,6 @@ class PushMessageWorker @AssistedInject constructor(
                 runCatching { promoPushNotificationManager.show(applicationContext, pushMessage) }
                     .onFailure { error ->
                         Timber.e(error)
-                        cancelJobs()
                         return@withContext Result.failure()
                     }
             }
@@ -218,7 +279,6 @@ class PushMessageWorker @AssistedInject constructor(
             }
         }
 
-        cancelJobs()
         return@withContext Result.success()
     }
 
@@ -295,21 +355,6 @@ class PushMessageWorker @AssistedInject constructor(
             ?.let { chatRoomTitle ->
                 copy(title = chatRoomTitle)
             } ?: this
-
-    /**
-     * Monitors and processes only the Camera Uploads Transfers
-     */
-    private fun CoroutineScope.monitorChatCallUpdates(chatIdPushMessage: Long) = launch {
-        monitorChatCallUpdatesUseCase()
-            .filter { it.chatId == chatIdPushMessage }
-            .distinctUntilChanged().collectLatest {
-                Timber.d("Call updated")
-            }
-    }
-
-    private suspend fun cancelJobs() {
-        monitorChatCallUpdatesJob?.cancelAndJoin()
-    }
 
     companion object {
         const val NOTIFICATION_CHANNEL_ID = 1086

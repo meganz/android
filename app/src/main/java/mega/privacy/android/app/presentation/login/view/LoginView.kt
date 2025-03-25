@@ -1,5 +1,6 @@
 package mega.privacy.android.app.presentation.login.view
 
+import mega.privacy.android.shared.resources.R as sharedR
 import android.content.res.Configuration
 import androidx.activity.compose.BackHandler
 import androidx.annotation.StringRes
@@ -70,12 +71,12 @@ import androidx.compose.ui.semantics.testTagsAsResourceId
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.text.style.TextAlign
-import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.tooling.preview.PreviewParameter
 import androidx.compose.ui.tooling.preview.PreviewParameterProvider
 import androidx.compose.ui.unit.dp
 import de.palm.composestateevents.EventEffect
 import kotlinx.coroutines.delay
+import mega.android.core.ui.theme.values.TextColor
 import mega.privacy.android.app.R
 import mega.privacy.android.app.featuretoggle.AppFeatures
 import mega.privacy.android.app.presentation.apiserver.view.ChangeApiServerDialog
@@ -83,7 +84,6 @@ import mega.privacy.android.app.presentation.extensions.login.error
 import mega.privacy.android.app.presentation.login.model.LoginError
 import mega.privacy.android.app.presentation.login.model.LoginState
 import mega.privacy.android.app.presentation.login.model.MultiFactorAuthState
-import mega.privacy.android.app.presentation.twofactorauthentication.view.TwoFactorAuthenticationField
 import mega.privacy.android.domain.entity.Progress
 import mega.privacy.android.domain.entity.account.AccountSession
 import mega.privacy.android.domain.entity.login.FetchNodesUpdate
@@ -98,10 +98,9 @@ import mega.privacy.android.shared.original.core.ui.controls.progressindicator.M
 import mega.privacy.android.shared.original.core.ui.controls.text.MegaText
 import mega.privacy.android.shared.original.core.ui.controls.textfields.LabelTextField
 import mega.privacy.android.shared.original.core.ui.controls.textfields.PasswordTextField
+import mega.privacy.android.shared.original.core.ui.preview.CombinedThemePhoneLandscapePreviews
 import mega.privacy.android.shared.original.core.ui.preview.CombinedThemePreviews
-import mega.privacy.android.shared.original.core.ui.theme.OriginalTempTheme
-import mega.privacy.android.shared.original.core.ui.theme.values.TextColor
-import mega.privacy.android.shared.resources.R as SharedRes
+import mega.privacy.android.shared.original.core.ui.theme.OriginalTheme
 
 /**
  * Login fragment view.
@@ -176,7 +175,7 @@ fun LoginView(
                     modifier = Modifier.padding(paddingValues),
                 )
 
-                is2FARequired || multiFactorAuthState != null -> TwoFactorAuthentication(
+                is2FARequired || multiFactorAuthState != null -> LegacyTwoFactorAuthentication(
                     state = this,
                     on2FAPinChanged = on2FAPinChanged,
                     on2FAChanged = on2FAChanged,
@@ -251,7 +250,7 @@ private fun RequireLogin(
         )
         LabelTextField(
             onTextChange = onEmailChanged,
-            label = stringResource(id = R.string.email_text),
+            label = stringResource(id = sharedR.string.email_text),
             imeAction = ImeAction.Next,
             keyboardActions = KeyboardActions(onNext = { passwordFocusRequester.requestFocus() }),
             modifier = Modifier
@@ -309,7 +308,7 @@ private fun RequireLogin(
                 )
                 .fillMaxWidth()
                 .testTag(LOGIN_BUTTON_TAG),
-            textId = R.string.login_text,
+            textId = sharedR.string.login_text,
             onClick = { clickLogin(onLoginClicked, focusManager) },
             enabled = !state.isLocalLogoutInProgress
         )
@@ -488,7 +487,7 @@ private fun LoginInProgress(
 @Composable
 private fun LoginInProgressText(
     @StringRes stringId: Int,
-    progress: Long = -1L,
+    progress: Progress? = null,
     textChangeDuration: Long = 200,
     modifier: Modifier,
 ) {
@@ -502,8 +501,8 @@ private fun LoginInProgressText(
         exit = fadeOut(),
     ) {
         MegaText(
-            text = if (progress > -1L) {
-                stringResource(SharedRes.string.login_completing_operation, (progress / 10).toInt())
+            text = if (progress != null) {
+                stringResource(sharedR.string.login_completing_operation, progress.intValue)
             } else {
                 stringResource(id = currentTextId)
             },
@@ -523,77 +522,11 @@ private fun LoginInProgressText(
     }
 }
 
-@Composable
-private fun TwoFactorAuthentication(
-    state: LoginState,
-    on2FAPinChanged: (String, Int) -> Unit,
-    on2FAChanged: (String) -> Unit,
-    onLostAuthenticatorDevice: () -> Unit,
-    onFirstTime2FAConsumed: () -> Unit,
-    modifier: Modifier = Modifier,
-) = Box(
-    modifier = modifier
-        .fillMaxWidth()
-) {
-    val scrollState = rememberScrollState()
-    val isChecking2FA = state.multiFactorAuthState == MultiFactorAuthState.Checking
-    Column(
-        modifier = Modifier
-            .fillMaxWidth()
-            .verticalScroll(scrollState),
-        horizontalAlignment = Alignment.CenterHorizontally
-    ) {
-        val isError = state.multiFactorAuthState == MultiFactorAuthState.Failed
-        MegaText(
-            text = stringResource(id = R.string.explain_confirm_2fa),
-            modifier = Modifier
-                .padding(horizontal = 16.dp, vertical = 40.dp)
-                .testTag(ENTER_AUTHENTICATION_CODE_TAG),
-            style = MaterialTheme.typography.subtitle1,
-            textAlign = TextAlign.Center,
-            textColor = TextColor.Secondary,
-        )
-        TwoFactorAuthenticationField(
-            twoFAPin = state.twoFAPin,
-            isError = isError,
-            on2FAPinChanged = on2FAPinChanged,
-            on2FAChanged = on2FAChanged,
-            requestFocus = state.isFirstTime2FA,
-            onRequestFocusConsumed = onFirstTime2FAConsumed
-        )
-        if (isError) {
-            MegaText(
-                text = stringResource(id = R.string.pin_error_2fa),
-                modifier = Modifier
-                    .padding(start = 10.dp, top = 18.dp, end = 10.dp)
-                    .testTag(INVALID_CODE_TAG),
-                style = MaterialTheme.typography.caption,
-                textColor = TextColor.Error,
-            )
-        }
-        TextMegaButton(
-            textId = R.string.lost_your_authenticator_device,
-            onClick = onLostAuthenticatorDevice,
-            modifier = Modifier
-                .padding(top = if (isError) 0.dp else 29.dp, bottom = 40.dp)
-                .testTag(LOST_AUTHENTICATION_CODE_TAG)
-        )
-    }
-
-    if (isChecking2FA) {
-        MegaCircularProgressIndicator(
-            modifier = Modifier
-                .align(Alignment.Center)
-                .testTag(TWO_FA_PROGRESS_TEST_TAG)
-        )
-    }
-}
-
 
 @CombinedThemePreviews
 @Composable
 private fun EmptyLoginViewPreview() {
-    OriginalTempTheme(isDark = isSystemInDarkTheme()) {
+    OriginalTheme(isDark = isSystemInDarkTheme()) {
         var state by remember { mutableStateOf(LoginState(isLoginRequired = true)) }
 
         RequireLogin(
@@ -616,7 +549,7 @@ private fun EmptyLoginViewPreview() {
 private fun LoginViewPreview(
     @PreviewParameter(LoginStateProvider::class) state: LoginState,
 ) {
-    OriginalTempTheme(isDark = isSystemInDarkTheme()) {
+    OriginalTheme(isDark = isSystemInDarkTheme()) {
         LoginView(
             state = state,
             onEmailChanged = {},
@@ -635,17 +568,12 @@ private fun LoginViewPreview(
     }
 }
 
-@Preview(
-    uiMode = Configuration.ORIENTATION_LANDSCAPE,
-    heightDp = 360,
-    widthDp = 800,
-    name = "LandscapeLoginViewPreview"
-)
+@CombinedThemePhoneLandscapePreviews
 @Composable
 private fun LandscapeLoginViewPreview(
     @PreviewParameter(LoginStateProvider::class) state: LoginState,
 ) {
-    OriginalTempTheme(isDark = isSystemInDarkTheme()) {
+    OriginalTheme(isDark = isSystemInDarkTheme()) {
         LoginView(
             state = state,
             onEmailChanged = {},
@@ -687,11 +615,11 @@ internal class LoginStateProvider : PreviewParameterProvider<LoginState> {
         ),
         LoginState(
             isLoginInProgress = true,
-            requestStatusProgress = 200
+            requestStatusProgress = Progress(0.2f)
         ),
         LoginState(
             isLoginInProgress = true,
-            requestStatusProgress = 700
+            requestStatusProgress = Progress(0.7f)
         ),
         LoginState(
             fetchNodesUpdate = FetchNodesUpdate(

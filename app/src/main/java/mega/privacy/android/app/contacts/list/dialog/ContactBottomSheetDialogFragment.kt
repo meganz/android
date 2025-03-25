@@ -30,7 +30,6 @@ import mega.privacy.android.app.databinding.BottomSheetContactDetailBinding
 import mega.privacy.android.app.main.FileExplorerActivity.Companion.EXTRA_SELECTED_FOLDER
 import mega.privacy.android.app.main.controllers.NodeController
 import mega.privacy.android.app.modalbottomsheet.BaseBottomSheetDialogFragment
-import mega.privacy.android.app.objects.PasscodeManagement
 import mega.privacy.android.app.presentation.transfers.attach.NodeAttachmentViewModel
 import mega.privacy.android.app.utils.CallUtil
 import mega.privacy.android.app.utils.Constants.NODE_HANDLES
@@ -73,9 +72,6 @@ class ContactBottomSheetDialogFragment : BaseBottomSheetDialogFragment() {
                 }
             }
     }
-
-    @Inject
-    lateinit var passcodeManagement: PasscodeManagement
 
     @Inject
     lateinit var navigator: MegaNavigator
@@ -237,7 +233,7 @@ class ContactBottomSheetDialogFragment : BaseBottomSheetDialogFragment() {
 
         binding.optionCall.setOnClickListener {
             MegaApplication.userWaitingForCall = contactHandle
-            if (CallUtil.canCallBeStartedFromContactOption(requireActivity(), passcodeManagement)) {
+            if (CallUtil.canCallBeStartedFromContactOption(requireActivity())) {
                 val audio = PermissionUtils.hasPermissions(
                     requireContext(),
                     Manifest.permission.RECORD_AUDIO

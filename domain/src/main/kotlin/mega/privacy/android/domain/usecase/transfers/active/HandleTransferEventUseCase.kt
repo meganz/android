@@ -1,8 +1,8 @@
 package mega.privacy.android.domain.usecase.transfers.active
 
+import mega.privacy.android.domain.entity.transfer.TransferAppData.RecursiveTransferAppData
 import mega.privacy.android.domain.entity.transfer.TransferEvent
-import mega.privacy.android.domain.entity.transfer.isBackgroundTransfer
-import mega.privacy.android.domain.entity.transfer.isVoiceClip
+import mega.privacy.android.domain.entity.transfer.isPreviewDownload
 import mega.privacy.android.domain.exception.BusinessAccountExpiredMegaException
 import mega.privacy.android.domain.exception.QuotaExceededMegaException
 import mega.privacy.android.domain.repository.TransferRepository
@@ -34,12 +34,8 @@ class HandleTransferEventUseCase @Inject internal constructor(
      * @param events the [TransferEvent] that has been received.
      */
     suspend operator fun invoke(vararg events: TransferEvent) {
-        val transferEvents = events.filterNot { event ->
-            event.transfer.isVoiceClip() || event.transfer.isBackgroundTransfer()
-                    || event.transfer.isStreamingTransfer
-                    || event.transfer.isBackupTransfer
-        }
-        if (transferEvents.isEmpty()) return
+        val transferEvents = events.asList().takeIf { it.isNotEmpty() } ?: return
+
         val eventsWithDestinationMap = transferEvents.associateWith { event ->
             if (event is TransferEvent.TransferStartEvent || event is TransferEvent.TransferFinishEvent) {
                 getTransferDestinationUriUseCase(event.transfer)
@@ -59,7 +55,7 @@ class HandleTransferEventUseCase @Inject internal constructor(
         updateActiveTransfers(transferEvents)
 
         val completedEventsMap = transferEvents
-            .filterNot { it.transfer.isFolderTransfer }
+            .filterNot { it.transfer.isFolderTransfer || it.transfer.isPreviewDownload() }
             .filterIsInstance<TransferEvent.TransferFinishEvent>()
             .associateWith { eventsWithDestinationMap[it]?.toString() }
         if (completedEventsMap.isNotEmpty()) {
@@ -85,7 +81,9 @@ class HandleTransferEventUseCase @Inject internal constructor(
             when {
                 !it.transfer.transferType.isUploadType() -> previous
                 it is TransferEvent.TransferStartEvent || it is TransferEvent.TransferUpdateEvent -> false
-                (it as? TransferEvent.TransferTemporaryErrorEvent)?.error is QuotaExceededMegaException -> true
+                (it as? TransferEvent.TransferTemporaryErrorEvent)?.error is QuotaExceededMegaException
+                        && it.transfer.isForeignOverQuota.not() -> true
+
                 else -> previous
             }
         }.lastOrNull()?.let { transferOverQuota ->
@@ -125,7 +123,21 @@ class HandleTransferEventUseCase @Inject internal constructor(
             start = true,
             pause = true,
             finish = true
-        )?.map { it.transfer }?.let {
+        )?.map { transferEvent ->
+            val appDataToAdd = if (transferEvent is TransferEvent.TransferStartEvent) {
+                transferEvent.transfer.folderTransferTag?.let { folderTransferTag ->
+                    transferRepository.getTransferByTag(folderTransferTag)?.appData?.filterIsInstance<RecursiveTransferAppData>()
+                }
+            } else null
+
+            if (appDataToAdd == null) {
+                transferEvent.transfer
+            } else {
+                transferEvent.transfer.copy(
+                    appData = transferEvent.transfer.appData.plus(appDataToAdd)
+                )
+            }
+        }?.let {
             transferRepository.insertOrUpdateActiveTransfers(it)
         }
     }

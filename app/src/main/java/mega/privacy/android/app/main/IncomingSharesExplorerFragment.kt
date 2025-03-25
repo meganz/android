@@ -36,7 +36,6 @@ import mega.privacy.android.app.utils.ColorUtils
 import mega.privacy.android.app.utils.Constants.SCROLLING_UP_DIRECTION
 import mega.privacy.android.app.utils.TextUtil
 import mega.privacy.android.app.utils.Util.getPreferences
-import mega.privacy.android.app.utils.Util.isScreenInPortrait
 import mega.privacy.android.data.mapper.SortOrderIntMapper
 import mega.privacy.android.data.qualifier.MegaApi
 import mega.privacy.android.domain.entity.node.NodeId
@@ -50,6 +49,7 @@ import nz.mega.sdk.MegaShare
 import timber.log.Timber
 import java.util.Stack
 import javax.inject.Inject
+import mega.privacy.android.icon.pack.R as iconPackR
 
 /**
  * The fragment for incoming shares explorer
@@ -223,7 +223,7 @@ class IncomingSharesExplorerFragment : RotatableFragment(), CheckScrollInterface
             buttonClicked()
         }
         binding.cancelText.setOnClickListener {
-            fileExplorerActivity.finishAndRemoveTask()
+            fileExplorerActivity.handleBackNavigation()
         }
         binding.cancelText.text = getString(sharedR.string.general_dialog_cancel_button)
         binding.fabSelect.setOnClickListener {
@@ -322,6 +322,14 @@ class IncomingSharesExplorerFragment : RotatableFragment(), CheckScrollInterface
             isMultiselect() -> {
                 binding.actionText.text = getString(R.string.context_send)
                 activateButton(adapter.getSelectedItemCount() > 0)
+            }
+
+            modeCloud == MOVE -> {
+                binding.actionText.text = getString(R.string.context_move)
+            }
+
+            modeCloud == COPY -> {
+                binding.actionText.text = getString(R.string.context_copy)
             }
 
             modeCloud == FileExplorerActivity.SELECT ->
@@ -443,17 +451,9 @@ class IncomingSharesExplorerFragment : RotatableFragment(), CheckScrollInterface
     private fun updateEmptyScreen() {
         binding.fileListEmptyImage.setImageResource(
             if (parentHandle == INVALID_HANDLE) {
-                if (isScreenInPortrait(requireContext())) {
-                    R.drawable.incoming_shares_empty
-                } else {
-                    R.drawable.incoming_empty_landscape
-                }
+                iconPackR.drawable.ic_folder_arrow_up_glass
             } else {
-                if (isScreenInPortrait(requireContext())) {
-                    R.drawable.ic_zero_portrait_empty_folder
-                } else {
-                    R.drawable.ic_zero_landscape_empty_folder
-                }
+                iconPackR.drawable.ic_empty_folder_glass
             }
         )
         binding.fileListEmptyTextFirst.text =

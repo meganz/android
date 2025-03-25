@@ -2,7 +2,6 @@ package mega.privacy.android.app.presentation.audiosection.model
 
 import mega.privacy.android.domain.entity.AccountType
 import mega.privacy.android.domain.entity.SortOrder
-import mega.privacy.android.domain.entity.account.AccountDetail
 import mega.privacy.android.domain.entity.node.TypedAudioNode
 import mega.privacy.android.domain.entity.preference.ViewType
 
@@ -14,7 +13,6 @@ import mega.privacy.android.domain.entity.preference.ViewType
  * @property sortOrder the sort order of audio items
  * @property isPendingRefresh
  * @property progressBarShowing the progress bar showing state
- * @property searchMode the search mode state
  * @property scrollToTop the scroll to top state
  * @property selectedAudioHandles the selected audio handles
  * @property isInSelection if list is in selection mode or not
@@ -30,7 +28,6 @@ data class AudioSectionState(
     val sortOrder: SortOrder = SortOrder.ORDER_NONE,
     val isPendingRefresh: Boolean = false,
     val progressBarShowing: Boolean = true,
-    val searchMode: Boolean = false,
     val scrollToTop: Boolean = false,
     val selectedAudioHandles: List<Long> = emptyList(),
     val isInSelection: Boolean = false,

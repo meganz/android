@@ -1,28 +1,24 @@
 package mega.privacy.android.feature.sync.ui.synclist
 
-import mega.privacy.android.shared.resources.R as sharedR
 import androidx.compose.material.SnackbarHostState
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
-import androidx.compose.runtime.saveable.rememberSaveable
-import androidx.compose.runtime.setValue
-import androidx.compose.ui.Modifier
-import androidx.compose.ui.platform.testTag
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
+import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
+import androidx.lifecycle.viewmodel.compose.LocalViewModelStoreOwner
 import mega.privacy.android.analytics.Analytics
 import mega.privacy.android.feature.sync.domain.entity.StalledIssueResolutionActionType
 import mega.privacy.android.feature.sync.ui.permissions.SyncPermissionsManager
 import mega.privacy.android.feature.sync.ui.synclist.folders.SyncFoldersViewModel
 import mega.privacy.android.feature.sync.ui.synclist.solvedissues.SyncSolvedIssuesViewModel
 import mega.privacy.android.feature.sync.ui.synclist.stalledissues.SyncStalledIssuesViewModel
-import mega.privacy.android.shared.original.core.ui.controls.dialogs.MegaAlertDialog
 import mega.privacy.android.shared.original.core.ui.model.MenuAction
+import mega.privacy.android.shared.original.core.ui.utils.findFragmentActivity
 import mega.privacy.android.shared.original.core.ui.utils.showAutoDurationSnackbar
-import mega.privacy.android.shared.sync.featuretoggles.SyncFeatures
 import mega.privacy.mobile.analytics.event.AndroidSyncChooseLatestModifiedTimeEvent
 import mega.privacy.mobile.analytics.event.AndroidSyncChooseLocalFileEvent
 import mega.privacy.mobile.analytics.event.AndroidSyncChooseRemoteFileEvent
@@ -31,54 +27,90 @@ import mega.privacy.mobile.analytics.event.AndroidSyncMergeFoldersEvent
 import mega.privacy.mobile.analytics.event.AndroidSyncRemoveDuplicatesAndRemoveRestEvent
 import mega.privacy.mobile.analytics.event.AndroidSyncRemoveDuplicatesEvent
 import mega.privacy.mobile.analytics.event.AndroidSyncRenameAllItemsEvent
-import mega.privacy.mobile.analytics.event.SyncFeatureUpgradeDialogCancelButtonPressedEvent
-import mega.privacy.mobile.analytics.event.SyncFeatureUpgradeDialogDisplayedEvent
-import mega.privacy.mobile.analytics.event.SyncFeatureUpgradeDialogUpgradeButtonPressedEvent
 
+/**
+ * Composable function that represents the route for the sync list screen.
+ *
+ * This function serves as an entry point to the sync list feature, handling
+ * navigation and data presentation related to syncing folders and backups.
+ *
+ * @param syncPermissionsManager Manages the permissions required for syncing.
+ * @param onSyncFolderClicked Callback invoked when the user clicks to manage sync folders.
+ * @param onBackupFolderClicked Callback invoked when the user clicks to manage backup folders.
+ * @param onSelectStopBackupDestinationClicked Callback invoked when the user clicks to stop a backup destination.
+ * @param onOpenUpgradeAccountClicked Callback invoked when the user clicks to upgrade their account.
+ * @param onCameraUploadsSettingsClicked Callback invoked when the user clicks to see the Camera Uploads settings.
+ * @param isInCloudDrive Indicates whether the user is currently within the cloud drive context. Defaults to false.
+ * @param selectedChip The currently selected chip in the sync list UI. Defaults to [SyncChip.SYNC_FOLDERS].
+ * @param onOpenMegaFolderClicked Callback invoked when the user clicks to open a specific Mega folder.
+ */
 @Composable
-internal fun SyncListRoute(
-    viewModel: SyncListViewModel,
+fun SyncListRoute(
     syncPermissionsManager: SyncPermissionsManager,
     onSyncFolderClicked: () -> Unit,
     onBackupFolderClicked: () -> Unit,
+    onSelectStopBackupDestinationClicked: () -> Unit,
+    onOpenUpgradeAccountClicked: () -> Unit,
+    onCameraUploadsSettingsClicked: () -> Unit,
+    isInCloudDrive: Boolean = false,
+    selectedChip: SyncChip = SyncChip.SYNC_FOLDERS,
+    onFabExpanded: (Boolean) -> Unit = {},
+    onOpenMegaFolderClicked: (Long) -> Unit,
+) {
+    val fragmentActivity = LocalContext.current.findFragmentActivity()
+    val viewModelStoreOwner =
+        fragmentActivity ?: checkNotNull(LocalViewModelStoreOwner.current)
+
+    SyncListRoute(
+        syncPermissionsManager = syncPermissionsManager,
+        onSyncFolderClicked = onSyncFolderClicked,
+        onBackupFolderClicked = onBackupFolderClicked,
+        onSelectStopBackupDestinationClicked = onSelectStopBackupDestinationClicked,
+        onOpenUpgradeAccountClicked = onOpenUpgradeAccountClicked,
+        syncFoldersViewModel = hiltViewModel(viewModelStoreOwner = viewModelStoreOwner),
+        syncStalledIssuesViewModel = hiltViewModel(viewModelStoreOwner = viewModelStoreOwner),
+        syncSolvedIssuesViewModel = hiltViewModel(viewModelStoreOwner = viewModelStoreOwner),
+        isInCloudDrive = isInCloudDrive,
+        viewModel = hiltViewModel(),
+        selectedChip = selectedChip,
+        onOpenMegaFolderClicked = onOpenMegaFolderClicked,
+        onCameraUploadsSettingsClicked = onCameraUploadsSettingsClicked,
+        onFabExpanded = onFabExpanded,
+    )
+}
+
+@Composable
+internal fun SyncListRoute(
+    syncPermissionsManager: SyncPermissionsManager,
+    onSyncFolderClicked: () -> Unit,
+    onBackupFolderClicked: () -> Unit,
+    onOpenMegaFolderClicked: (handle: Long) -> Unit,
+    onCameraUploadsSettingsClicked: () -> Unit,
+    onSelectStopBackupDestinationClicked: () -> Unit,
     onOpenUpgradeAccountClicked: () -> Unit,
     syncFoldersViewModel: SyncFoldersViewModel,
     syncStalledIssuesViewModel: SyncStalledIssuesViewModel,
     syncSolvedIssuesViewModel: SyncSolvedIssuesViewModel,
-    title: String? = null,
+    isInCloudDrive: Boolean = false,
+    viewModel: SyncListViewModel = hiltViewModel(),
     selectedChip: SyncChip = SyncChip.SYNC_FOLDERS,
+    onFabExpanded: (Boolean) -> Unit = {},
 ) {
     val state by viewModel.state.collectAsStateWithLifecycle()
 
     val snackBarHostState = remember { SnackbarHostState() }
-
-    var showUpgradeDialog by rememberSaveable { mutableStateOf(false) }
 
     val message = state.snackbarMessage?.let {
         stringResource(id = it)
     }
 
     SyncListScreen(
+        isInCloudDrive = isInCloudDrive,
         stalledIssuesCount = state.stalledIssuesCount,
-        onSyncFolderClicked = {
-            if (state.isFreeAccount) {
-                showUpgradeDialog = true
-            } else {
-                onSyncFolderClicked()
-            }
-        },
-        onBackupFolderClicked = {
-            if (state.isFreeAccount) {
-                showUpgradeDialog = true
-            } else {
-                onBackupFolderClicked()
-            }
-        },
-        onAddFolderClicked = {
-            if (state.isFreeAccount) {
-                showUpgradeDialog = true
-            }
-        },
+        onOpenMegaFolderClicked = onOpenMegaFolderClicked,
+        onCameraUploadsSettingsClicked = onCameraUploadsSettingsClicked,
+        onSyncFolderClicked = { onSyncFolderClicked() },
+        onBackupFolderClicked = { onBackupFolderClicked() },
         actionSelected = { item, selectedAction ->
             when (selectedAction.resolutionActionType) {
                 StalledIssueResolutionActionType.RENAME_ALL_ITEMS -> {
@@ -122,56 +154,21 @@ internal fun SyncListRoute(
         actions = prepareMenuActions(state),
         onActionPressed = {
             when (it) {
-                is SyncListMenuAction.AddNewSync -> {
-                    if (state.isFreeAccount) {
-                        showUpgradeDialog = true
-                    } else {
-                        onSyncFolderClicked()
-                    }
-                }
-
                 is SyncListMenuAction.ClearSyncOptions -> {
                     Analytics.tracker.trackEvent(AndroidSyncClearResolvedIssuesEvent)
                     viewModel.onClearSyncOptionsPressed()
                 }
             }
         },
+        onSelectStopBackupDestinationClicked = onSelectStopBackupDestinationClicked,
         onOpenUpgradeAccountClicked = onOpenUpgradeAccountClicked,
-        title = title,
+        title = state.deviceName,
         syncFoldersViewModel = syncFoldersViewModel,
         syncStalledIssuesViewModel = syncStalledIssuesViewModel,
         syncSolvedIssuesViewModel = syncSolvedIssuesViewModel,
         selectedChip = selectedChip,
+        onFabExpanded = onFabExpanded,
     )
-
-    if (showUpgradeDialog) {
-        Analytics.tracker.trackEvent(SyncFeatureUpgradeDialogDisplayedEvent)
-        val isBackupForAndroidEnabled = state.enabledFlags.contains(SyncFeatures.BackupForAndroid)
-        MegaAlertDialog(
-            title = if (isBackupForAndroidEnabled) {
-                stringResource(id = sharedR.string.device_center_sync_backup_upgrade_dialog_title)
-            } else {
-                stringResource(id = sharedR.string.device_center_sync_upgrade_dialog_title)
-            },
-            body = if (isBackupForAndroidEnabled) {
-                stringResource(id = sharedR.string.device_center_sync_backup_upgrade_dialog_message)
-            } else {
-                stringResource(id = sharedR.string.device_center_sync_upgrade_dialog_message)
-            },
-            confirmButtonText = stringResource(id = sharedR.string.general_upgrade_button),
-            cancelButtonText = stringResource(id = sharedR.string.device_center_sync_upgrade_dialog_cancel_button),
-            onConfirm = {
-                Analytics.tracker.trackEvent(SyncFeatureUpgradeDialogUpgradeButtonPressedEvent)
-                onOpenUpgradeAccountClicked()
-                showUpgradeDialog = false
-            },
-            onDismiss = {
-                Analytics.tracker.trackEvent(SyncFeatureUpgradeDialogCancelButtonPressedEvent)
-                showUpgradeDialog = false
-            },
-            modifier = Modifier.testTag(TEST_TAG_SYNC_LIST_SCREEN_UPGRADE_DIALOG)
-        )
-    }
 
     LaunchedEffect(key1 = state.snackbarMessage) {
         message?.let {
@@ -184,12 +181,8 @@ internal fun SyncListRoute(
 
 private fun prepareMenuActions(state: SyncListState): List<MenuAction> {
     val menuActionList = mutableListOf<MenuAction>()
-    menuActionList.add(SyncListMenuAction.AddNewSync)
     if (state.shouldShowCleanSolvedIssueMenuItem) {
         menuActionList.add(SyncListMenuAction.ClearSyncOptions)
     }
     return menuActionList
 }
-
-internal const val TEST_TAG_SYNC_LIST_SCREEN_UPGRADE_DIALOG =
-    "sync_list_screen:upgrade_dialog"

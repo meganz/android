@@ -32,6 +32,7 @@ import mega.privacy.android.domain.entity.node.NodeId
 import mega.privacy.android.domain.qualifier.ApplicationScope
 import mega.privacy.android.domain.usecase.camerauploads.AreLocationTagsEnabledUseCase
 import mega.privacy.android.domain.usecase.camerauploads.AreUploadFileNamesKeptUseCase
+import mega.privacy.android.domain.usecase.camerauploads.BroadcastCameraUploadsSettingsActionUseCase
 import mega.privacy.android.domain.usecase.camerauploads.CheckEnableCameraUploadsStatusUseCase
 import mega.privacy.android.domain.usecase.camerauploads.ClearCameraUploadsRecordUseCase
 import mega.privacy.android.domain.usecase.camerauploads.DeleteCameraUploadsTemporaryRootDirectoryUseCase
@@ -151,6 +152,7 @@ import javax.inject.Inject
  * @property stopCameraUploadsUseCase Stops the Camera Uploads operation
  * @property uploadOptionUiItemMapper UI Mapper that maps the Upload Option into [UploadOptionUiItem]
  * @property videoQualityUiItemMapper UI Mapper that maps the Video Quality into [VideoQualityUiItem]
+ * @property broadcastCameraUploadsSettingsActionUseCase Broadcasts camera uploads settings action
  */
 @HiltViewModel
 internal class SettingsCameraUploadsViewModel @Inject constructor(
@@ -203,6 +205,7 @@ internal class SettingsCameraUploadsViewModel @Inject constructor(
     private val stopCameraUploadsUseCase: StopCameraUploadsUseCase,
     private val uploadOptionUiItemMapper: UploadOptionUiItemMapper,
     private val videoQualityUiItemMapper: VideoQualityUiItemMapper,
+    private val broadcastCameraUploadsSettingsActionUseCase: BroadcastCameraUploadsSettingsActionUseCase,
 ) : ViewModel() {
 
     private val _uiState = MutableStateFlow(SettingsCameraUploadsUiState())
@@ -264,7 +267,7 @@ internal class SettingsCameraUploadsViewModel @Inject constructor(
                     )
                 }
             }.onFailure { exception ->
-                Timber.e("An error occurred when initializing Settings Camera Uploads", exception)
+                Timber.e(exception, "An error occurred when initializing Settings Camera Uploads")
             }
         }
     }
@@ -277,8 +280,8 @@ internal class SettingsCameraUploadsViewModel @Inject constructor(
             monitorCameraUploadsFolderDestinationUseCase()
                 .catch { exception ->
                     Timber.e(
-                        "An exception occurred when listening for the new Camera / Media Uploads Folder Node destinations",
                         exception,
+                        "An exception occurred when listening for the new Camera / Media Uploads Folder Node destinations",
                     )
                 }.collect { cameraUploadsFolderDestinationUpdate ->
                     when (cameraUploadsFolderDestinationUpdate.cameraUploadFolderType) {
@@ -302,8 +305,8 @@ internal class SettingsCameraUploadsViewModel @Inject constructor(
             monitorCameraUploadsSettingsActionsUseCase()
                 .catch { exception ->
                     Timber.e(
-                        "An exception occurred when listening for Settings Camera Uploads changes",
                         exception,
+                        "An exception occurred when listening for Settings Camera Uploads changes",
                     )
                 }.collect { cameraUploadsSettingsAction ->
                     when (cameraUploadsSettingsAction) {
@@ -314,6 +317,8 @@ internal class SettingsCameraUploadsViewModel @Inject constructor(
                         CameraUploadsSettingsAction.DisableMediaUploads -> {
                             onMediaUploadsStateChanged(enabled = false)
                         }
+
+                        else -> Unit
                     }
                 }
         }
@@ -327,8 +332,8 @@ internal class SettingsCameraUploadsViewModel @Inject constructor(
             monitorCameraUploadsStatusInfoUseCase()
                 .catch { exception ->
                     Timber.e(
-                        "An exception occurred when listening for Camera Uploads status changes",
                         exception,
+                        "An exception occurred when listening for Camera Uploads status changes",
                     )
                 }.collect { cameraUploadsStatusInfo ->
                     if (cameraUploadsStatusInfo is CameraUploadsStatusInfo.Finished &&
@@ -354,8 +359,8 @@ internal class SettingsCameraUploadsViewModel @Inject constructor(
                 _uiState.update { it.copy(primaryFolderName = primaryFolderNode?.name) }
             }.onFailure { exception ->
                 Timber.e(
-                    "An exception occurred when updating the Camera Uploads Folder Node Name",
                     exception,
+                    "An exception occurred when updating the Camera Uploads Folder Node Name",
                 )
             }
         }
@@ -375,8 +380,8 @@ internal class SettingsCameraUploadsViewModel @Inject constructor(
                 _uiState.update { it.copy(secondaryFolderName = secondaryFolderNode?.name) }
             }.onFailure { exception ->
                 Timber.e(
-                    "An exception occurred when updating the Media Uploads Folder Node Name",
                     exception,
+                    "An exception occurred when updating the Media Uploads Folder Node Name",
                 )
             }
         }
@@ -409,13 +414,14 @@ internal class SettingsCameraUploadsViewModel @Inject constructor(
                         // Disable Camera Uploads
                         setCameraUploadsEnabled(false)
                         stopCameraUploadsUseCase(CameraUploadsRestartMode.StopAndDisable)
+                        broadcastCameraUploadsSettingsActionUseCase(CameraUploadsSettingsAction.CameraUploadsDisabled)
                     }
                 } else {
                     Timber.d("User must be connected to the Internet to update the Camera Uploads state")
                     showGenericErrorSnackbar()
                 }
             }.onFailure { exception ->
-                Timber.e("An error occurred when changing the Camera Uploads state", exception)
+                Timber.e(exception, "An error occurred when changing the Camera Uploads state")
                 showGenericErrorSnackbar()
             }
         }
@@ -467,7 +473,7 @@ internal class SettingsCameraUploadsViewModel @Inject constructor(
                     _uiState.update { it.copy(businessAccountPromptType = cameraUploadsStatus) }
                 }
             }.onFailure { exception ->
-                Timber.e("An error occurred when checking the Camera Uploads status", exception)
+                Timber.e(exception, "An error occurred when checking the Camera Uploads status")
                 showGenericErrorSnackbar()
             }
         }
@@ -482,10 +488,11 @@ internal class SettingsCameraUploadsViewModel @Inject constructor(
             runCatching {
                 setupCameraUploadsSettingUseCase(isEnabled = true)
                 setCameraUploadsEnabled(true)
+                broadcastCameraUploadsSettingsActionUseCase(CameraUploadsSettingsAction.CameraUploadsEnabled)
             }.onSuccess {
                 showSnackbar(R.string.settings_camera_notif_initializing_title)
             }.onFailure { exception ->
-                Timber.e("An error occurred when enabling Camera Uploads", exception)
+                Timber.e(exception, "An error occurred when enabling Camera Uploads")
                 showGenericErrorSnackbar()
             }
         }
@@ -501,7 +508,7 @@ internal class SettingsCameraUploadsViewModel @Inject constructor(
                 startCameraUploadUseCase()
                 listenToNewMediaUseCase(forceEnqueue = false)
             }.onFailure { exception ->
-                Timber.e("An error occurred when starting Camera Uploads", exception)
+                Timber.e(exception, "An error occurred when starting Camera Uploads")
             }
         }
     }
@@ -541,7 +548,7 @@ internal class SettingsCameraUploadsViewModel @Inject constructor(
                     it.copy(uploadConnectionType = uploadConnectionType)
                 }
             }.onFailure { exception ->
-                Timber.e("An error occurred when changing the Upload Connection Type", exception)
+                Timber.e(exception, "An error occurred when changing the Upload Connection Type")
                 showGenericErrorSnackbar()
             }
         }
@@ -560,8 +567,8 @@ internal class SettingsCameraUploadsViewModel @Inject constructor(
                 _uiState.update { it.copy(requireChargingWhenUploadingContent = newState) }
             }.onFailure { exception ->
                 Timber.e(
-                    "An error occurred when changing the Device charging state to upload content",
                     exception,
+                    "An error occurred when changing the Device charging state to upload content",
                 )
                 showGenericErrorSnackbar()
             }
@@ -582,7 +589,7 @@ internal class SettingsCameraUploadsViewModel @Inject constructor(
                 stopCameraUploadsUseCase(CameraUploadsRestartMode.Stop)
                 _uiState.update { it.copy(uploadOptionUiItem = uploadOptionUiItem) }
             }.onFailure { exception ->
-                Timber.e("An error occurred when changing the Upload Option", exception)
+                Timber.e(exception, "An error occurred when changing the Upload Option")
                 showGenericErrorSnackbar()
             }
         }
@@ -601,7 +608,7 @@ internal class SettingsCameraUploadsViewModel @Inject constructor(
                 stopCameraUploadsUseCase(CameraUploadsRestartMode.Stop)
                 _uiState.update { it.copy(videoQualityUiItem = videoQualityUiItem) }
             }.onFailure { exception ->
-                Timber.e("An error occurred when changing the Video Quality", exception)
+                Timber.e(exception, "An error occurred when changing the Video Quality")
                 showGenericErrorSnackbar()
             }
         }
@@ -620,7 +627,7 @@ internal class SettingsCameraUploadsViewModel @Inject constructor(
                 stopCameraUploadsUseCase(CameraUploadsRestartMode.Stop)
                 _uiState.update { it.copy(shouldKeepUploadFileNames = newState) }
             }.onFailure { exception ->
-                Timber.e("An error occurred when changing the Keep File Names state", exception)
+                Timber.e(exception, "An error occurred when changing the Keep File Names state")
                 showGenericErrorSnackbar()
             }
         }
@@ -681,8 +688,8 @@ internal class SettingsCameraUploadsViewModel @Inject constructor(
                 _uiState.update { it.copy(requireChargingDuringVideoCompression = newState) }
             }.onFailure { exception ->
                 Timber.e(
-                    "An error occurred when changing the Video Compression Charging State",
                     exception,
+                    "An error occurred when changing the Video Compression Charging State",
                 )
                 showGenericErrorSnackbar()
             }
@@ -703,8 +710,8 @@ internal class SettingsCameraUploadsViewModel @Inject constructor(
                 _uiState.update { it.copy(maximumNonChargingVideoCompressionSize = newVideoCompressionSize) }
             }.onFailure { exception ->
                 Timber.e(
-                    "An error occurred when changing the new maximum Video Compression Size Limit",
                     exception,
+                    "An error occurred when changing the new maximum Video Compression Size Limit",
                 )
                 showGenericErrorSnackbar()
             }
@@ -739,18 +746,20 @@ internal class SettingsCameraUploadsViewModel @Inject constructor(
                                 secondaryFolderPath = if (!isCurrentSecondaryFolderPathValid) "" else it.secondaryFolderPath,
                             )
                         }
+                        broadcastCameraUploadsSettingsActionUseCase(CameraUploadsSettingsAction.MediaUploadsEnabled)
                     } else {
                         // Disable Media Uploads
                         disableMediaUploadsSettingsUseCase()
                         stopCameraUploadsUseCase(CameraUploadsRestartMode.Stop)
                         _uiState.update { it.copy(isMediaUploadsEnabled = false) }
+                        broadcastCameraUploadsSettingsActionUseCase(CameraUploadsSettingsAction.MediaUploadsDisabled)
                     }
                 } else {
                     Timber.d("User must be connected to the Internet to update the Media Uploads state")
                     showGenericErrorSnackbar()
                 }
             }.onFailure { exception ->
-                Timber.e("An error occurred when changing the Media Uploads state", exception)
+                Timber.e(exception, "An error occurred when changing the Media Uploads state")
                 showGenericErrorSnackbar()
             }
         }
@@ -775,6 +784,7 @@ internal class SettingsCameraUploadsViewModel @Inject constructor(
                             stopCameraUploadsUseCase(CameraUploadsRestartMode.Stop)
 
                             _uiState.update { it.copy(primaryFolderPath = primaryFolderPath) }
+                            broadcastCameraUploadsSettingsActionUseCase(CameraUploadsSettingsAction.CameraUploadsLocalFolderChanged)
                         } else {
                             Timber.d("The new Camera Uploads Local Folder is related to the Media Uploads Folder")
                             _uiState.update { it.copy(showRelatedNewLocalFolderWarning = true) }
@@ -789,8 +799,8 @@ internal class SettingsCameraUploadsViewModel @Inject constructor(
                 }
             }.onFailure { exception ->
                 Timber.e(
-                    "An error occurred when changing the Camera Uploads Local Folder",
                     exception,
+                    "An error occurred when changing the Camera Uploads Local Folder",
                 )
                 showGenericErrorSnackbar()
             }
@@ -809,14 +819,15 @@ internal class SettingsCameraUploadsViewModel @Inject constructor(
                 if (isNewFolderNodeValidUseCase(newPrimaryFolderNodeId.longValue)) {
                     setupPrimaryFolderUseCase(newPrimaryFolderNodeId.longValue)
                     stopCameraUploadsUseCase(CameraUploadsRestartMode.Stop)
+                    broadcastCameraUploadsSettingsActionUseCase(CameraUploadsSettingsAction.CameraUploadsMegaNodeChanged)
                 } else {
                     Timber.d("The new Camera Uploads Folder Node is invalid")
                     showInvalidFolderSnackbar()
                 }
             }.onFailure { exception ->
                 Timber.e(
-                    "An error occurred when changing the Camera Uploads Folder Node",
                     exception,
+                    "An error occurred when changing the Camera Uploads Folder Node",
                 )
                 showGenericErrorSnackbar()
             }
@@ -840,6 +851,7 @@ internal class SettingsCameraUploadsViewModel @Inject constructor(
                             stopCameraUploadsUseCase(CameraUploadsRestartMode.Stop)
 
                             _uiState.update { it.copy(secondaryFolderPath = secondaryFolderPath) }
+                            broadcastCameraUploadsSettingsActionUseCase(CameraUploadsSettingsAction.MediaUploadsLocalFolderChanged)
                         } else {
                             Timber.d("The new Media Uploads Local Folder is related to the Camera Uploads Folder")
                             _uiState.update { it.copy(showRelatedNewLocalFolderWarning = true) }
@@ -854,8 +866,8 @@ internal class SettingsCameraUploadsViewModel @Inject constructor(
                 }
             }.onFailure { exception ->
                 Timber.e(
-                    "An error occurred when changing the Media Uploads Local Folder",
                     exception,
+                    "An error occurred when changing the Media Uploads Local Folder",
                 )
                 showGenericErrorSnackbar()
             }
@@ -874,14 +886,15 @@ internal class SettingsCameraUploadsViewModel @Inject constructor(
                 if (isNewFolderNodeValidUseCase(newSecondaryFolderNodeId.longValue)) {
                     setupSecondaryFolderUseCase(newSecondaryFolderNodeId.longValue)
                     stopCameraUploadsUseCase(CameraUploadsRestartMode.Stop)
+                    broadcastCameraUploadsSettingsActionUseCase(CameraUploadsSettingsAction.MediaUploadsMegaNodeChanged)
                 } else {
                     Timber.d("The new Media Uploads Folder Node is invalid")
                     showInvalidFolderSnackbar()
                 }
             }.onFailure { exception ->
                 Timber.e(
-                    "An error occurred when changing the Media Uploads Folder Node",
                     exception,
+                    "An error occurred when changing the Media Uploads Folder Node",
                 )
                 showGenericErrorSnackbar()
             }

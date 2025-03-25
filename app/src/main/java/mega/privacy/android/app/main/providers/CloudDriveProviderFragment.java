@@ -8,7 +8,6 @@ import static nz.mega.sdk.MegaApiJava.INVALID_HANDLE;
 
 import android.app.Activity;
 import android.content.Context;
-import android.content.res.Configuration;
 import android.content.res.Resources;
 import android.os.Bundle;
 import android.os.Handler;
@@ -442,11 +441,7 @@ public class CloudDriveProviderFragment extends Fragment implements CheckScrollI
                 emptyImageView.setVisibility(View.VISIBLE);
                 emptyTextViewFirst.setVisibility(View.VISIBLE);
                 if (megaApi.getRootNode().getHandle() == parentHandle) {
-                    if (context.getResources().getConfiguration().orientation == Configuration.ORIENTATION_LANDSCAPE) {
-                        emptyImageView.setImageResource(R.drawable.cloud_empty_landscape);
-                    } else {
-                        emptyImageView.setImageResource(R.drawable.ic_empty_cloud_drive);
-                    }
+                    emptyImageView.setImageResource(mega.privacy.android.icon.pack.R.drawable.ic_empty_cloud_glass);
                     String textToShow = String.format(context.getString(R.string.context_empty_cloud_drive));
                     try {
                         textToShow = textToShow.replace(
@@ -464,11 +459,7 @@ public class CloudDriveProviderFragment extends Fragment implements CheckScrollI
                     emptyTextViewFirst.setText(result);
 
                 } else {
-                    if (context.getResources().getConfiguration().orientation == Configuration.ORIENTATION_LANDSCAPE) {
-                        emptyImageView.setImageResource(R.drawable.empty_folder_landscape);
-                    } else {
-                        emptyImageView.setImageResource(R.drawable.empty_folder_portrait);
-                    }
+                    emptyImageView.setImageResource(mega.privacy.android.icon.pack.R.drawable.ic_empty_folder_glass);
                     String textToShow = String.format(context.getString(R.string.file_browser_empty_folder_new));
                     try {
                         textToShow = textToShow.replace(

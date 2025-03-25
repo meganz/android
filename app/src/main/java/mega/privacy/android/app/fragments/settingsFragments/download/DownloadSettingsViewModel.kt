@@ -13,6 +13,8 @@ import mega.privacy.android.domain.usecase.GetStorageDownloadLocationUseCase
 import mega.privacy.android.domain.usecase.IsStorageDownloadAskAlwaysUseCase
 import mega.privacy.android.domain.usecase.SetStorageDownloadAskAlwaysUseCase
 import mega.privacy.android.domain.usecase.SetStorageDownloadLocationUseCase
+import mega.privacy.android.domain.usecase.file.GetExternalPathByContentUriUseCase
+import mega.privacy.android.domain.usecase.file.IsExternalStorageContentUriUseCase
 import timber.log.Timber
 import javax.inject.Inject
 
@@ -26,6 +28,8 @@ class DownloadSettingsViewModel @Inject constructor(
     private val isStorageDownloadAskAlwaysUseCase: IsStorageDownloadAskAlwaysUseCase,
     private val getStorageDownloadLocationUseCase: GetStorageDownloadLocationUseCase,
     private val getStorageDownloadDefaultPathUseCase: GetStorageDownloadDefaultPathUseCase,
+    private val isExternalStorageContentUriUseCase: IsExternalStorageContentUriUseCase,
+    private val getExternalPathByContentUriUseCase: GetExternalPathByContentUriUseCase,
 ) : ViewModel() {
     private val _uiState = MutableStateFlow(DownloadSettingsState())
 
@@ -52,7 +56,10 @@ class DownloadSettingsViewModel @Inject constructor(
             val downloadLocation =
                 if (location.isNullOrEmpty()) getStorageDownloadDefaultPathUseCase() else location
             setStorageDownloadLocationUseCase(downloadLocation)
-            _uiState.update { it.copy(downloadLocationPath = downloadLocation) }
+            val path = takeIf { isExternalStorageContentUriUseCase(downloadLocation) }?.let {
+                getExternalPathByContentUriUseCase(downloadLocation)
+            } ?: downloadLocation
+            _uiState.update { it.copy(downloadLocationPath = path) }
         } catch (e: Exception) {
             Timber.e(e)
         }

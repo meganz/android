@@ -5,6 +5,7 @@ import mega.privacy.android.domain.entity.BackupState
 import mega.privacy.android.domain.entity.backup.Backup
 import mega.privacy.android.domain.entity.backup.BackupInfo
 import mega.privacy.android.domain.entity.backup.BackupInfoType
+import mega.privacy.android.domain.entity.node.NodeId
 
 /**
  * Repository class that provides several functions for Backup-related operations
@@ -98,4 +99,23 @@ interface BackupRepository {
      * @param backup [Backup]
      */
     suspend fun saveBackup(backup: Backup)
+
+    /**
+     * Check if the special folder for backups ("My backups") exists
+     */
+    suspend fun myBackupsFolderExists(): Boolean
+
+    /**
+     * Creates the special folder for backups ("My backups")
+     *
+     * @param localizedName Localized name for "My backups" folder
+     */
+    suspend fun setMyBackupsFolder(localizedName: String?): NodeId
+
+    companion object {
+        /**
+         * Default name for the Backups base folder
+         */
+        const val BACKUPS_FOLDER_DEFAULT_NAME = "Backups"
+    }
 }

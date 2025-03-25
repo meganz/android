@@ -1,16 +1,12 @@
 package mega.privacy.android.app.presentation.requeststatus.model
 
+import mega.privacy.android.domain.entity.Progress
+
 /**
  * UI state for request status progress bar
  *
- * @property progress Progress of the request status, 0 to 1000
+ * @property progress [Progress] of the request status
  */
 data class RequestStatusProgressUiState(
-    val progress: Long = -1L,
-) {
-    /**
-     * Whether to show the progress bar, hide when -1L
-     */
-    val showProgressBar: Boolean
-        get() = progress > -1
-}
+    val progress: Progress? = null,
+)

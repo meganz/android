@@ -9,7 +9,7 @@ import mega.privacy.android.feature.sync.R
 import mega.privacy.android.feature.sync.ui.model.SyncOption
 import mega.privacy.android.shared.original.core.ui.controls.dialogs.ConfirmationDialogWithRadioButtons
 import mega.privacy.android.shared.original.core.ui.preview.CombinedThemePreviews
-import mega.privacy.android.shared.original.core.ui.theme.OriginalTempTheme
+import mega.privacy.android.shared.original.core.ui.theme.OriginalTheme
 
 @Composable
 internal fun SyncOptionsDialog(
@@ -48,7 +48,7 @@ internal fun SyncOptionsDialog(
 @CombinedThemePreviews
 @Composable
 private fun SyncOptionsDialogPreview() {
-    OriginalTempTheme(isDark = isSystemInDarkTheme()) {
+    OriginalTheme(isDark = isSystemInDarkTheme()) {
         SyncOptionsDialog(
             onDismiss = {},
             onSyncOptionsClicked = {},

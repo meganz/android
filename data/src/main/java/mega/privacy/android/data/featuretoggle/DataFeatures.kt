@@ -1,6 +1,7 @@
 package mega.privacy.android.data.featuretoggle
 
 import mega.privacy.android.domain.entity.Feature
+import mega.privacy.android.domain.featuretoggle.FeatureFlagValuePriority
 import mega.privacy.android.domain.featuretoggle.FeatureFlagValueProvider
 
 /**
@@ -22,10 +23,21 @@ enum class DataFeatures(
     UseCameraUploadsRecords(
         "Use Camera Uploads Records",
         true
-    );
+    ),
+
+    /**
+     * Show a single download finish notifications for each user action
+     */
+    ShowGroupedDownloadNotifications(
+        "Show a single download finish notifications for each user action",
+        true,
+    ),
+    ;
 
     companion object : FeatureFlagValueProvider {
         override suspend fun isEnabled(feature: Feature) =
             entries.firstOrNull { it == feature }?.defaultValue
+
+        override val priority = FeatureFlagValuePriority.Default
     }
 }

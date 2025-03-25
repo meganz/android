@@ -18,6 +18,7 @@ import mega.privacy.android.data.database.SQLCipherManager
 import mega.privacy.android.data.database.chat.CHAT_DATABASE_NAME
 import mega.privacy.android.data.database.chat.ChatDatabase
 import mega.privacy.android.data.database.dao.ActiveTransferDao
+import mega.privacy.android.data.database.dao.ActiveTransferGroupDao
 import mega.privacy.android.data.database.dao.BackupDao
 import mega.privacy.android.data.database.dao.CameraUploadsRecordDao
 import mega.privacy.android.data.database.dao.ChatPendingChangesDao
@@ -25,7 +26,6 @@ import mega.privacy.android.data.database.dao.CompletedTransferDao
 import mega.privacy.android.data.database.dao.ContactDao
 import mega.privacy.android.data.database.dao.OfflineDao
 import mega.privacy.android.data.database.dao.PendingTransferDao
-import mega.privacy.android.data.database.dao.SdTransferDao
 import mega.privacy.android.data.database.dao.SyncShownNotificationDao
 import mega.privacy.android.data.database.dao.SyncSolvedIssuesDao
 import mega.privacy.android.data.database.dao.TypedMessageDao
@@ -125,8 +125,8 @@ internal object RoomDatabaseModule {
 
     @Provides
     @Singleton
-    internal fun provideSdTransferDao(database: MegaDatabase): SdTransferDao =
-        database.sdTransferDao()
+    internal fun provideActiveTransferGroupDao(database: MegaDatabase): ActiveTransferGroupDao =
+        database.activeTransferGroupsDao()
 
     @Provides
     @Singleton

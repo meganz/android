@@ -11,16 +11,15 @@ import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.SpanStyle
-import androidx.compose.ui.text.font.FontWeight
-import androidx.compose.ui.unit.dp
 import androidx.constraintlayout.compose.ConstraintLayout
 import mega.privacy.android.app.R
 import mega.privacy.android.shared.original.core.ui.controls.text.MegaSpannedText
 import mega.privacy.android.shared.original.core.ui.model.MegaSpanStyle
 import mega.privacy.android.shared.original.core.ui.model.SpanIndicator
 import mega.privacy.android.shared.original.core.ui.preview.CombinedThemePreviews
-import mega.privacy.android.shared.original.core.ui.theme.values.TextColor
-import mega.privacy.android.shared.original.core.ui.theme.OriginalTempTheme
+import mega.privacy.android.shared.original.core.ui.theme.OriginalTheme
+import mega.android.core.ui.theme.values.TextColor
+import mega.privacy.android.icon.pack.R as iconPackR
 
 /**
  * Composable for when Recent Actions is empty
@@ -37,11 +36,11 @@ fun RecentActionsEmptyView(
         val (image, text) = createRefs()
 
         Image(
-            painter = painterResource(R.drawable.ic_recents),
+            painter = painterResource(iconPackR.drawable.ic_clock_glass),
             contentDescription = "Recent Actions Icon",
             modifier = Modifier
                 .constrainAs(image) {
-                    bottom.linkTo(text.top, 20.dp)
+                    bottom.linkTo(text.top)
                     start.linkTo(parent.start)
                     end.linkTo(parent.end)
                 }
@@ -49,19 +48,13 @@ fun RecentActionsEmptyView(
         )
         MegaSpannedText(
             value = stringResource(id = R.string.context_empty_recents),
-            baseStyle = MaterialTheme.typography.body2,
+            baseStyle = MaterialTheme.typography.subtitle2,
             styles = mapOf(
                 SpanIndicator('A') to MegaSpanStyle(
-                    spanStyle = SpanStyle(
-                        fontWeight = FontWeight.Normal
-                    ),
-                    color = TextColor.Primary
+                    spanStyle = SpanStyle(),
                 ),
                 SpanIndicator('B') to MegaSpanStyle(
-                    spanStyle = SpanStyle(
-                        fontWeight = FontWeight.Normal
-                    ),
-                    color = TextColor.Secondary
+                    spanStyle = SpanStyle(),
                 ),
             ),
             color = TextColor.Primary,
@@ -83,7 +76,7 @@ internal const val RECENT_EMPTY_TEXT_TEST_TAG = "recent_actions_empty_view:text"
 @CombinedThemePreviews
 @Composable
 private fun RecentActionsEmptyViewPreview() {
-    OriginalTempTheme(isDark = isSystemInDarkTheme()) {
+    OriginalTheme(isDark = isSystemInDarkTheme()) {
         RecentActionsEmptyView()
     }
 }

@@ -6,14 +6,12 @@ import dagger.Provides
 import dagger.hilt.InstallIn
 import dagger.hilt.components.SingletonComponent
 import dagger.multibindings.ElementsIntoSet
-import dagger.multibindings.IntoMap
+import dagger.multibindings.IntoSet
 import mega.privacy.android.app.featuretoggle.ABTestFeatures
 import mega.privacy.android.app.featuretoggle.ApiFeatures
 import mega.privacy.android.app.featuretoggle.AppFeatures
 import mega.privacy.android.data.featuretoggle.file.FileFeatureFlagValueProvider
-import mega.privacy.android.data.qualifier.FeatureFlagPriorityKey
 import mega.privacy.android.domain.entity.Feature
-import mega.privacy.android.domain.featuretoggle.FeatureFlagValuePriority
 import mega.privacy.android.domain.featuretoggle.FeatureFlagValueProvider
 
 /**
@@ -29,11 +27,7 @@ abstract class FeatureFlagModule {
      *
      */
     @Binds
-    @IntoMap
-    @FeatureFlagPriorityKey(
-        implementingClass = FileFeatureFlagValueProvider::class,
-        priority = FeatureFlagValuePriority.ConfigurationFile
-    )
+    @IntoSet
     abstract fun provideFileFeatureFlagValueProvider(fileFeatureFlagValueProvider: FileFeatureFlagValueProvider): @JvmSuppressWildcards FeatureFlagValueProvider
 
     companion object {
@@ -72,11 +66,7 @@ abstract class FeatureFlagModule {
          *
          */
         @Provides
-        @IntoMap
-        @FeatureFlagPriorityKey(
-            implementingClass = AppFeatures.Companion::class,
-            priority = FeatureFlagValuePriority.Default
-        )
+        @IntoSet
         fun provideFeatureFlagValueProvider(): @JvmSuppressWildcards FeatureFlagValueProvider =
             AppFeatures.Companion
 
@@ -85,11 +75,7 @@ abstract class FeatureFlagModule {
          *
          */
         @Provides
-        @IntoMap
-        @FeatureFlagPriorityKey(
-            implementingClass = ABTestFeatures.Companion::class,
-            priority = FeatureFlagValuePriority.Default
-        )
+        @IntoSet
         fun provideRemoteFeatureFlagDefaultValueProvider(): @JvmSuppressWildcards FeatureFlagValueProvider =
             ABTestFeatures.Companion
 
@@ -98,11 +84,7 @@ abstract class FeatureFlagModule {
          *
          */
         @Provides
-        @IntoMap
-        @FeatureFlagPriorityKey(
-            implementingClass = ApiFeatures.Companion::class,
-            priority = FeatureFlagValuePriority.RemoteToggled
-        )
+        @IntoSet
         fun provideApiFeaturesFlagDefaultValueProvider(): @JvmSuppressWildcards FeatureFlagValueProvider =
             ApiFeatures.Companion
     }

@@ -4,6 +4,7 @@ import mega.privacy.android.feature.devicecenter.domain.entity.DeviceNode
 import mega.privacy.android.feature.devicecenter.domain.entity.OwnDeviceNode
 import mega.privacy.android.feature.devicecenter.ui.model.OtherDeviceUINode
 import mega.privacy.android.feature.devicecenter.ui.model.OwnDeviceUINode
+import mega.privacy.android.feature.devicecenter.ui.model.icon.DeviceIconType
 import javax.inject.Inject
 
 /**
@@ -33,7 +34,7 @@ internal class DeviceUINodeListMapper @Inject constructor(
             OwnDeviceUINode(
                 id = deviceNode.id,
                 name = deviceNode.name,
-                icon = deviceUINodeIconMapper(deviceNode.folders),
+                icon = DeviceIconType.Android,
                 status = deviceCenterUINodeStatusMapper(deviceNode.status),
                 folders = deviceFolderUINodeListMapper(
                     folders = deviceNode.folders,

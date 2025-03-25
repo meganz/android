@@ -3,6 +3,7 @@ package mega.privacy.android.legacy.core.ui.controls.lists
 import androidx.annotation.DrawableRes
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.test.assertIsDisplayed
+import androidx.compose.ui.test.isNotDisplayed
 import androidx.compose.ui.test.junit4.createComposeRule
 import androidx.compose.ui.test.onNodeWithTag
 import androidx.compose.ui.test.onNodeWithText
@@ -37,6 +38,7 @@ class MediaQueueItemViewTest {
         isItemPlaying: Boolean = false,
         isSelected: Boolean = false,
         isReorderEnabled: Boolean = true,
+        isAudio: Boolean = false,
     ) {
         composeTestRule.setContent {
             MediaQueueItemView(
@@ -50,7 +52,8 @@ class MediaQueueItemViewTest {
                 isPaused = isPaused,
                 isItemPlaying = isItemPlaying,
                 isSelected = isSelected,
-                isReorderEnabled = isReorderEnabled
+                isReorderEnabled = isReorderEnabled,
+                isAudio = isAudio
             )
         }
     }
@@ -191,5 +194,12 @@ class MediaQueueItemViewTest {
 
         composeTestRule.onNodeWithTag(MEDIA_QUEUE_ITEM_VIEW_TEST_TAG, true).performClick()
         verify(onClick).invoke()
+    }
+
+    @Test
+    fun `test that the reorder icon is not displayed when the isAudio is true`() {
+        setComposeContent(isAudio = true)
+
+        composeTestRule.onNodeWithTag(MEDIA_QUEUE_ITEM_REORDER_ICON_TEST_TAG, true).isNotDisplayed()
     }
 }

@@ -1,22 +1,24 @@
 package mega.privacy.android.app.fragments.settingsFragments.cookie
 
 import androidx.lifecycle.LiveData
-import androidx.lifecycle.MediatorLiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import dagger.hilt.android.lifecycle.HiltViewModel
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Job
 import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
-import mega.privacy.android.app.featuretoggle.ABTestFeatures
+import mega.privacy.android.app.featuretoggle.ApiFeatures
 import mega.privacy.android.app.fragments.settingsFragments.cookie.model.CookieSettingsUIState
 import mega.privacy.android.app.utils.notifyObserver
 import mega.privacy.android.domain.entity.settings.cookie.CookieType
+import mega.privacy.android.domain.qualifier.ApplicationScope
 import mega.privacy.android.domain.usecase.featureflag.GetFeatureFlagValueUseCase
 import mega.privacy.android.domain.usecase.login.GetSessionTransferURLUseCase
-import mega.privacy.android.domain.usecase.setting.BroadcastCookieSettingsSavedUseCase
 import mega.privacy.android.domain.usecase.setting.GetCookieSettingsUseCase
 import mega.privacy.android.domain.usecase.setting.UpdateCookieSettingsUseCase
 import mega.privacy.android.domain.usecase.setting.UpdateCrashAndPerformanceReportersUseCase
@@ -27,10 +29,10 @@ import javax.inject.Inject
 class CookieSettingsViewModel @Inject constructor(
     private val getCookieSettingsUseCase: GetCookieSettingsUseCase,
     private val updateCookieSettingsUseCase: UpdateCookieSettingsUseCase,
-    private val broadcastCookieSettingsSavedUseCase: BroadcastCookieSettingsSavedUseCase,
     private val getFeatureFlagValueUseCase: GetFeatureFlagValueUseCase,
     private val updateCrashAndPerformanceReportersUseCase: UpdateCrashAndPerformanceReportersUseCase,
     private val getSessionTransferURLUseCase: GetSessionTransferURLUseCase,
+    @ApplicationScope private val applicationScope: CoroutineScope,
 ) : ViewModel() {
 
     private val _uiState = MutableStateFlow(CookieSettingsUIState())
@@ -41,17 +43,8 @@ class CookieSettingsViewModel @Inject constructor(
     val uiState = _uiState.asStateFlow()
 
     private val enabledCookies = MutableLiveData(mutableSetOf(CookieType.ESSENTIAL))
-    private val updateResult = MutableLiveData<Boolean>()
+    private val updateResult = MutableStateFlow<Boolean?>(null)
     private val savedCookiesSize = MutableLiveData(1)
-
-    private val enableBackPressedHandler = MediatorLiveData<Boolean>().also { mediator ->
-        mediator.addSource(enabledCookies) { enabledCookies ->
-            mediator.value = enabledCookies.size != savedCookiesSize.value
-        }
-        mediator.addSource(savedCookiesSize) { savedCookiesSize ->
-            mediator.value = savedCookiesSize != enabledCookies.value?.size
-        }
-    }
 
     init {
         loadCookieSettings()
@@ -60,14 +53,7 @@ class CookieSettingsViewModel @Inject constructor(
     }
 
     fun onEnabledCookies(): LiveData<MutableSet<CookieType>> = enabledCookies
-    fun onUpdateResult(): LiveData<Boolean> = updateResult
-
-    /**
-     * On enable back pressed handler
-     *
-     * @return livedata to enable/disable back pressed handler
-     */
-    fun onEnableBackPressedHandler(): LiveData<Boolean> = enableBackPressedHandler
+    fun onUpdateResult(): StateFlow<Boolean?> = updateResult.asStateFlow()
 
     /**
      * Change cookie state
@@ -82,6 +68,7 @@ class CookieSettingsViewModel @Inject constructor(
             enabledCookies.value?.remove(cookie)
         }
         enabledCookies.notifyObserver()
+        saveCookieSettings()
     }
 
     /**
@@ -96,6 +83,7 @@ class CookieSettingsViewModel @Inject constructor(
         } else {
             resetCookies()
         }
+        saveCookieSettings()
     }
 
     /**
@@ -123,8 +111,7 @@ class CookieSettingsViewModel @Inject constructor(
         viewModelScope.launch {
             runCatching {
                 val showAdsCookiePreference =
-                    getFeatureFlagValueUseCase(ABTestFeatures.ads) &&
-                            getFeatureFlagValueUseCase(ABTestFeatures.adse)
+                    getFeatureFlagValueUseCase(ApiFeatures.GoogleAdsFeatureFlag)
                 _uiState.update { state ->
                     state.copy(showAdsCookiePreference = showAdsCookiePreference)
                 }
@@ -144,18 +131,21 @@ class CookieSettingsViewModel @Inject constructor(
         }
     }
 
+    private var saveCookieJob: Job? = null
+
     /**
      * Save cookie settings to SDK
      */
     fun saveCookieSettings() {
-        if (uiState.value.showAdsCookiePreference) {
-            addAdsCheckCookieIfNeeded()
-        }
-        viewModelScope.launch {
+        saveCookieJob?.cancel()
+        saveCookieJob = applicationScope.launch {
+            updateResult.value = null
+            if (uiState.value.showAdsCookiePreference) {
+                addAdsCheckCookieIfNeeded()
+            }
             enabledCookies.value?.let {
                 runCatching {
                     updateCookieSettingsUseCase(it.toSet())
-                    broadcastCookieSettingsSavedUseCase((it.toSet()))
                     updateCrashAndPerformanceReportersUseCase()
                     updateResult.value = true
                 }.onFailure {

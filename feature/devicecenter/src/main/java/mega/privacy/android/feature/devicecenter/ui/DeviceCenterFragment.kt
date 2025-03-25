@@ -38,7 +38,7 @@ import mega.privacy.android.feature.devicecenter.navigation.deviceCenterRoute
 import mega.privacy.android.feature.devicecenter.ui.model.DeviceCenterUINode
 import mega.privacy.android.feature.devicecenter.ui.model.DeviceMenuAction
 import mega.privacy.android.navigation.MegaNavigator
-import mega.privacy.android.shared.original.core.ui.theme.OriginalTempTheme
+import mega.privacy.android.shared.original.core.ui.theme.OriginalTheme
 import mega.privacy.mobile.analytics.event.AndroidSyncNavigationItemEvent
 import mega.privacy.mobile.analytics.event.DeviceCenterDeviceOptionsButtonEvent
 import mega.privacy.mobile.analytics.event.DeviceCenterItemClicked
@@ -101,7 +101,7 @@ class DeviceCenterFragment : Fragment() {
                     }
                 }
 
-                OriginalTempTheme(isDark = themeMode.isDarkMode()) {
+                OriginalTheme(isDark = themeMode.isDarkMode()) {
                     DeviceCenterScreen(
                         uiState = uiState,
                         snackbarHostState = snackbarHostState,
@@ -116,7 +116,6 @@ class DeviceCenterFragment : Fragment() {
                                 megaNavigator.openSyncs(
                                     context = this@DeviceCenterFragment.activity
                                         ?: return@DeviceCenterScreen,
-                                    deviceName = device.name,
                                 )
                             } else {
                                 viewModel.showDeviceFolders(device)
@@ -157,21 +156,22 @@ class DeviceCenterFragment : Fragment() {
                             )
                         },
                         onInfoOptionClicked = viewModel::onInfoClicked,
-                        onAddNewSyncOptionClicked = { device ->
+                        onAddNewSyncOptionClicked = {
                             megaNavigator.openNewSync(
                                 context = this@DeviceCenterFragment.activity
                                     ?: return@DeviceCenterScreen,
-                                deviceName = device.name,
                                 syncType = SyncType.TYPE_TWOWAY,
                             )
                         },
-                        onAddBackupOptionClicked = { device ->
+                        onAddBackupOptionClicked = {
                             megaNavigator.openNewSync(
                                 context = this@DeviceCenterFragment.activity
                                     ?: return@DeviceCenterScreen,
-                                deviceName = device.name,
                                 syncType = SyncType.TYPE_BACKUP,
                             )
+                        },
+                        onCameraUploadsClicked = {
+                            megaNavigator.openSettingsCameraUploads(requireActivity())
                         },
                         onRenameDeviceOptionClicked = viewModel::setDeviceToRename,
                         onRenameDeviceCancelled = viewModel::resetDeviceToRename,
@@ -200,12 +200,9 @@ class DeviceCenterFragment : Fragment() {
                                 }
 
                                 is DeviceMenuAction.CameraUploads -> {
-                                    megaNavigator.openSettingsCameraUploads(requireActivity())
+                                    megaNavigator.openSettingsCameraUploads(requireContext())
                                 }
                             }
-                        },
-                        onOpenUpgradeAccountClicked = {
-                            megaNavigator.openUpgradeAccount(requireContext())
                         },
                     )
                     if (showBlankOverlay) {

@@ -1,7 +1,5 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources xmlns:tools="http://schemas.android.com/tools" tools:ignore="ImpliedQuantity, ExtraTranslation, MissingTranslation">
-    <!-- The name of the Device or Folder Sub State when its code is NO_SYNC_ERROR -->
-    <string name="general_sync_no_error">No sync error</string>
     <!-- The name of the Device or Folder Sub State when its code is UNSUPPORTED_FILE_SYSTEM -->
     <string name="general_sync_unsupported_file_system">MEGA nu poate sincroniza sau backup pentru acest folder deoarece sistemul de fișiere de pe dispozitiv nu este acceptat</string>
     <!-- The name of the Device or Folder Sub State when its code is INVALID_REMOTE_TYPE -->
@@ -18,8 +16,6 @@
     <string name="general_sync_account_expired">Nu se poate sincroniza sau backup pentru acest folder, deoarece abonamentul dvs. a expirat</string>
     <!-- The name of the Device or Folder Sub State when its code is FOREIGN_TARGET_OVERSTORAGE -->
     <string name="general_sync_foreign_target_overshare">Folderul nu poate fi sincronizat deoarece utilizatorul care a partajat acest folder a atins cotă de spațiu de stocare</string>
-    <!-- The name of the Device or Folder Sub State when its code is REMOTE_PATH_HAS_CHANGED -->
-    <string name="general_sync_remote_path_has_changed">Folderul din MEGA nu poate fi localizat deoarece a fost mutat sau șters sau este posibil să nu aveți acces</string>
     <!-- The name of the Device or Folder Sub State when its code is SHARE_NON_FULL_ACCESS -->
     <string name="general_sync_share_non_full_access">Folderul nu poate fi sincronizat deoarece este un folder partajat la care nu aveți acces complet</string>
     <!-- The name of the Device or Folder Sub State when its code is PUT_NODES_ERROR -->
@@ -36,8 +32,6 @@
     <string name="general_sync_too_many_action_packets">Contul a fost reîncărcat. Toate actualizările ratate ale backupurilor sau ale sincronizărilor nu au fost aplicate.</string>
     <!-- The name of the Device or Folder Sub State when its code is LOGGED_OUT -->
     <string name="general_sync_logged_out">Sincronizarea sau backupul au fost oprite pe măsură ce parcă v-ați deconectat de la aplicația desktop. Conectați-vă din nou prin aplicația desktop și reluați sincronizarea sau backup-ul.</string>
-    <!-- The name of the Device or Folder Sub State when its code is MISSING_PARENT_NODE -->
-    <string name="general_sync_missing_parent_node">N/A</string>
     <!-- The name of the Device or Folder Sub State when its code is BACKUP_SOURCE_NOT_BELOW_DRIVE -->
     <string name="general_sync_backup_source_not_below_drive">Folderul din unitatea externă nu poate fi localizat.</string>
     <!-- The name of the Device or Folder Sub State when its code is ACTIVE_SYNC_SAME_PATH -->
@@ -58,16 +52,10 @@
     <string name="general_sync_unable_to_add_watch">Imposibil de adăugat un ceas de sistem de fișiere. Asigurați-vă că există suficient spațiu liber și memorie și că ați acordat permisiuni pentru locația folderului.</string>
     <!-- The name of the Device or Folder Sub State when its code is UNABLE_TO_RETRIEVE_ROOT_FSID -->
     <string name="general_sync_unable_to_retrieve_root_fsid">Nu am putut citi locația de sincronizare. Verificați dacă locația este accesibilă și permisiunile pentru locația folderului sunt acordate.</string>
-    <!-- The name of the Device or Folder Sub State when its code is UNABLE_TO_OPEN_DATABASE -->
-    <string name="general_sync_unable_to_open_database">Unable to open state cache database</string>
     <!-- The name of the Device or Folder Sub State when its code is INSUFFICIENT_DISK_SPACE -->
     <string name="general_sync_insufficient_disk_space">Spațiu de stocare insuficient pe dispozitiv</string>
-    <!-- The name of the Device or Folder Sub State when its code is FAILURE_ACCESSING_PERSISTENT_STORAGE -->
-    <string name="general_sync_failure_accessing_persistent_storage">Nu am putut citi locația de sincronizare. Verificați dacă locația este accesibilă și permisiunile pentru locația folderului sunt acordate.</string>
     <!-- The name for specific Sub States to indicate that an unknown error occurred -->
     <string name="general_sync_message_unknown_error">A apărut o eroare necunoscută. Contactați support@mega.nz.</string>
-    <!-- The name for specific Sub States to indicate that something went wrong -->
-    <string name="general_sync_message_something_went_wrong">Something went wrong.</string>
     <!-- The name for specific Sub States to indicate that the Node is in the Rubbish Bin -->
     <string name="general_sync_message_node_in_rubbish_bin">Folderul nu poate fi sincronizat sau backup-uite, deoarece folderul MEGA se află în Coșul de gunoi</string>
     <!-- The name for specific Sub States to indicate that the local drive cannot be located at this time -->
@@ -92,14 +80,6 @@
     <string name="dialog_onboarding_feature_title_backup_rewind">Nu pierdeți niciodată datele</string>
     <!-- Description about Backup and Rewind features on Onboarding dialog (for user to choose account - Free or Pro).  -->
     <string name="dialog_onboarding_feature_description_backup_rewind">Derulați înapoi pentru a restabili fișierele și folderele la orice dată de până la 180 de zile, astfel încât datele dvs. să fie protejate împotriva accidentelor și a manipulării.</string>
-    <!-- Title for MEGA VPN feature on Onboarding dialog (for user to choose account - Free or Pro).  -->
-    <string name="dialog_onboarding_feature_title_vpn">MEGA&#160;VPN</string>
-    <!-- Description about MEGA VPN feature on Onboarding dialog (for user to choose account - Free or Pro).  -->
-    <string name="dialog_onboarding_feature_description_vpn">Rămâneți privat online cu VPN-ul nostru de mare viteză.</string>
-    <!-- Title for chats and meetings feature on Onboarding dialog (for user to choose account - Free or Pro).  -->
-    <string name="dialog_onboarding_feature_title_chat">Apeluri și întâlniri nerestricționate</string>
-    <!-- Description about chats and meetings feature on Onboarding dialog (for user to choose account - Free or Pro).  -->
-    <string name="dialog_onboarding_feature_description_chat">Întâlnirile, mesajele și apelurile video sunt complet private și protejate, cu un număr nelimitat de participanți.</string>
     <!-- Search drop down chips filter type file type -->
     <string name="search_dropdown_chip_filter_type_file_type">Tip</string>
     <!-- Search drop down chips filter type file type images -->
@@ -137,7 +117,7 @@
     <!-- Search drop down chips filter type date modified older -->
     <string name="search_dropdown_chip_filter_type_date_older">Mai vechi</string>
     <!-- All videos tab title of the video section  -->
-    <string name="video_section_tab_title_all_videos">Videoclipuri</string>
+    <string name="video_section_tab_title_all_videos">Toate videoclipurile</string>
     <!-- Playlists tab title of the video section  -->
     <string name="video_section_tab_title_playlists">Listuri de redare</string>
     <!-- Location filter title of the video section  -->
@@ -262,10 +242,8 @@
         <item quantity="few">Partajați link-uri</item>
         <item quantity="other">Partajați link-uri</item>
     </plurals>
-    <!-- Title of the dialog to ask the user to use the selected location as default location for next downloads-->
-    <string name="transfers_dialog_save_download_location_title">Descărcați în această locație?</string>
-    <!-- Option to don't use the selected location as default location for next downloads-->
-    <string name="transfers_dialog_save_download_location_only_this_time_option">Doar de data aceasta</string>
+    <!-- Title of the dialog to ask the user to use the selected location as default location for next downloads. Please do not modify the %s placeholder as it will be replaced by the name of the folder where the files will be downloaded-->
+    <string name="transfers_dialog_save_download_location_title">Save all your downloaded files to “%1$s”?</string>
     <!-- Option to use the selected location as default location for next downloads-->
     <string name="transfers_dialog_save_download_location_always_here_option">Întotdeauna descărcați aici</string>
     <!-- Option to don't use the selected location as default location for next downloads and don't ask again-->
@@ -288,8 +266,6 @@
     <string name="account_confirm_email_misspelled_email_description">Dacă ați scris greșit adresa dvs. de e-mail, corectați-o și atingeți [A]Retrimite[/A].</string>
     <!-- Title of the insufficient storage error banner -->
     <string name="sync_error_storage_over_quota_banner_title">Sincronizarea a fost întreruptă. Planul dvs. MEGA a rămas fără spațiu de stocare.</string>
-    <!-- Title of the insufficient storage error action -->
-    <string name="sync_error_storage_over_quota_banner_action">Upgradează</string>
     <!-- The warning message shown when the User enables the Device Charging requirement in Settings Camera Uploads, enables Camera Uploads, begins uploading content and the Device is not charged -->
     <string name="camera_uploads_phone_not_charging_message">Încărcarea este întreruptă, deoarece dispozitivul nu se încarcă</string>
     <!-- Label of the Device Status informing the user that Nothing is set up for the Current Device -->
@@ -306,10 +282,6 @@
     <string name="general_low_tier_plan_essential_label">MEGA&#160;Essential</string>
     <!-- The Body Text of a Settings Camera Uploads Option that decides whether or not the Device must be charged for Camera Uploads to start uploading content -->
     <string name="settings_camera_uploads_upload_only_while_charging_option_body">Încărcările vor fi întrerupte până când începeți să încărcați dispozitivul. Încărcările vor rămâne în continuare întrerupte dacă bateria este sub 20&#160;%.</string>
-    <!-- Title of the synced folder list empty state -->
-    <string name="device_center_sync_list_empty_state_title">Nu este configurată nicio sincronizare</string>
-    <!-- Message of the synced folder list empty state -->
-    <string name="device_center_sync_list_empty_state_message">Sincronizați un folder de pe dispozitiv cu un folder de pe MEGA.</string>
     <!-- Label for the button or menu option to add a new sync -->
     <string name="device_center_sync_add_new_syn_button_option">Adăugați o nouă sincronizare</string>
     <!-- Text for the Sync solved issues chip -->
@@ -352,36 +324,8 @@
     <string name="cloud_drive_tour_fourth_subtitle">Încărcări cameră sunt o funcție esențială pentru orice dispozitiv mobil și vă asigurăm. Înscrieți-vă acum pentru un cont.</string>
     <!-- Fifth subtitle of the tour screen -->
     <string name="cloud_drive_tour_fifth_subtitle">Întâlnire video criptată cu zero cunoștințe.</string>
-    <!-- Titles of the tour screen to onboard users with the MEGA application -->
-    <string-array name="cloud_drive_tour_titles">
-        <item>@string/cloud_drive_tour_first_title</item>
-        <item>@string/cloud_drive_tour_second_title</item>
-        <item>@string/cloud_drive_tour_third_title</item>
-        <item>@string/cloud_drive_tour_fourth_title</item>
-        <item>@string/cloud_drive_tour_fifth_title</item>
-    </string-array>
-    <!-- Subtitles of the tour screen to onboard users with the MEGA application -->
-    <string-array name="cloud_drive_tour_subtitles">
-        <item>@string/cloud_drive_tour_first_subtitle</item>
-        <item>@string/cloud_drive_tour_second_subtitle</item>
-        <item>@string/cloud_drive_tour_third_subtitle</item>
-        <item>@string/cloud_drive_tour_fourth_subtitle</item>
-        <item>@string/cloud_drive_tour_fifth_subtitle</item>
-    </string-array>
     <!-- Title of the Raise to Hand Feature Introduction Tooltip -->
     <string name="meetings_raised_hand_tooltip_title">[A]Funcție nouă: ridicați mâna[/A]</string>
-    <!-- Message of the synced folder list empty state for free accounts -->
-    <string name="device_center_sync_list_empty_state_message_free_account">Păstrați-vă informațiile sincronizate și upgradate trecând la unul dintre abonamentele noastre Pro.</string>
-    <!-- "Upgrade now" label for a button, menu entry, etc -->
-    <string name="general_upgrade_now_label">Upgradați acum</string>
-    <!-- Title of the upgrade dialog displayed for free accounts when try to add a new sync -->
-    <string name="device_center_sync_upgrade_dialog_title">Upgradează la Pro</string>
-    <!-- Message of the upgrade dialog displayed for free accounts when try to add a new sync -->
-    <string name="device_center_sync_upgrade_dialog_message">Abonamentele noastre Pro dezlănțuie puterea de sincronizare a dispozitivului dvs. mobil cu MEGA.</string>
-    <!-- Confirm button text of the upgrade dialog displayed for free accounts when try to add a new sync -->
-    <string name="device_center_sync_upgrade_dialog_confirm_button">Upgradează</string>
-    <!-- Cancel button text of the upgrade dialog displayed for free accounts when try to add a new sync -->
-    <string name="device_center_sync_upgrade_dialog_cancel_button">Nu acum</string>
     <!-- Title of the Warning Dialog shown when the new Local Primary or Secondary Folder is same as, a parent folder or sub-folder of the opposite Local Folder -->
     <string name="settings_camera_uploads_related_new_local_folder_warning_dialog_title">Conflictul folderului încarcă</string>
     <!-- Body of the Warning Dialog shown when the new Local Primary or Secondary Folder is same as, a parent folder or sub-folder of the opposite Local Folder -->
@@ -392,12 +336,6 @@
     <string name="general_no_picker_warning">Acest dispozitiv nu are o aplicație care să selecteze foldere</string>
     <!-- Description of feature, which will be available for user, if they buy plan. This feature means user will be able to sync folders. Keep the bullet point, as this string is part of the bullet point list. -->
     <string name="account_upgrade_account_description_feature_sync">&#8226;&#160;Sincronizați automat folderele de pe dispozitivul mobil</string>
-    <!-- The error dialog text displayed when user opens Android Sync while having previously established syncs -->
-    <string name="sync_error_dialog_free_user">Sincronizările dvs. au fost întrerupte. Sincronizarea este o funcție a abonamentelor Pro.</string>
-    <!-- The error dialog confirm action text -->
-    <string name="sync_error_dialog_free_user_confirm_action">Bine</string>
-    <!-- The error banner text displayed when user opens Android Sync while having previously established syncs -->
-    <string name="sync_error_banner_free_user">Sincronizarea este întreruptă deoarece abonamentul MEGA Pro a fost anulat. Upgradați pentru a continua sincronizarea.</string>
     <!-- Hidden items -->
     <string name="hidden_items">Elemente ascunse</string>
     <!-- Label to indicate that is a Pro only feature -->
@@ -416,8 +354,6 @@
     <string name="add_tags_error_special_characters">Etichetele nu pot conține spații sau simboluri non-alfanumerice. Etichetele scrise cu majuscule vor fi afișate cu litere mici.</string>
     <!-- error label for add tags page when tag count is maximum -->
     <string name="add_tags_error_max_tags">Numărul maximal de etichete este %1$d</string>
-    <!-- error label for add tags page when tag character limit reached -->
-    <string name="add_tags_error_max_characters">Etichetele trebuie să fie %1$d&#160;caractere sau mai puțin</string>
     <!-- title label for tags page -->
     <string name="add_tags_page_title_label">Etichete</string>
     <!-- The placeholder for read only files/folders with no description in info screen-->
@@ -426,8 +362,6 @@
     <string name="video_to_playlist_top_bar_title">Adăugați la lista de redare</string>
     <!-- Text of the create new playlist in the page that adds the video to the video playlist -->
     <string name="video_to_playlist_new_playlist_text">Listă de redare nouă</string>
-    <!-- Text of the done button in the page that adds the video to the video playlist -->
-    <string name="video_to_playlist_done_button">Terminat</string>
     <!-- Title shown when cancelling the current plan, informing the user of features they'll miss out on -->
     <string name="account_cancel_account_screen_plan_miss_out_on_features">Nu veți beneficia de următoarele funcții</string>
     <!-- Message shown when cancelling the plan, indicating that access to features will continue until the plan expires -->
@@ -440,8 +374,6 @@
     <string name="account_cancel_account_screen_plan_free_plan">Gratuit</string>
     <!-- Row label for storage feature in the comparison table -->
     <string name="account_cancel_account_screen_plan_storage">Spațiu de stocare</string>
-    <!-- Storage amount available in the free plan. %1s represents the amount of storage and the unit -->
-    <string name="account_cancel_account_screen_plan_free_storage">%1&#160;s</string>
     <!-- Row label for transfer feature in the comparison table -->
     <string name="account_cancel_account_screen_plan_transfer">Transferuri</string>
     <!-- Transfer limit in the free plan -->
@@ -532,10 +464,6 @@
     <string name="account_cancellation_instructions_click_reactivate_subscription">6. Dați clic pe [A]Reactivați abonamentul[/A].</string>
     <!-- Label for cancellation instructions on a mobile device -->
     <string name="account_cancellation_instructions_on_mobile_device">Pe un dispozitiv mobil</string>
-    <!-- Step 1: instruction step no.1 to visit the MEGA website on the mobile device-->
-    <string name="account_cancellation_instructions_mobile_visit_website">1. Accesați [A]www.mega.nz[/A] în browserul web.</string>
-    <!-- Step 2: instruction step no.2 to Log in to MEGA account on the mobile device from the browser-->
-    <string name="account_cancellation_instructions_mobile_login_account">2. Conectați-vă la contul MEGA.</string>
     <!-- Step 3: instruction step no.3 Tap on the user avatar on the MEGA website from the mobile device-->
     <string name="account_cancellation_instructions_tap_avatar">3. Atingeți avatarul dvs.</string>
     <!-- Step 4: instruction step no.4 Tap Cancel subscription on the account from the MEGA website from the mobile device-->
@@ -566,12 +494,6 @@
     <string name="transfers_scanning_folders_dialog_starting_transfers_title">Începerea transferurilor&#8230;</string>
     <!-- Transfers scanning folders dialog info to explain why the app shouldn't be closed -->
     <string name="transfers_scanning_folders_dialog_cancel_info_subtitle">Nu închide aplicația. Dacă o închizi, transferurile care nu sunt încă în coadă vor fi pierdute.</string>
-    <!-- Transfers scanning folders dialog sub-title when the app is scanning a single folder-->
-    <plurals name="transfers_scanning_folders_dialog_scanning_folder_subtitle">
-        <item quantity="one">Au fost găsite 1 folder și %1$d&#160;fișier.</item>
-        <item quantity="few">Au fost găsite 1 folder și %1$d&#160;fișiere.</item>
-        <item quantity="other">Au fost găsite 1 folder și %1$d de fișiere.</item>
-    </plurals>
     <!-- Transfers scanning folders dialog sub-title when the app is scanning multiple folders. This is the folders pluralization part to implement double pluralization in transfers_scanning_folders_dialog_scanning_files_and_folders_subtitle. Example: "134 folders". Example with double pluralization in transfers_scanning_folders_dialog_scanning_files_and_folders_subtitle: "Found 134 folders and 5689 files."-->
     <plurals name="transfers_scanning_folders_dialog_scanning_folders_subtitle">
         <item quantity="one">%1$d&#160;folder</item>
@@ -590,8 +512,6 @@
     <string name="settings_sync_clear_debris_dialog_title">Ștergeți resturile?</string>
     <!-- Body of the dialog shown when user clicks to clear debris from settings menu -->
     <string name="settings_sync_clear_debris_dialog_body">Backup-uri ale versiunilor anterioare ale fișierelor sincronizate vor fi șterse definitiv de pe dispozitiv.\n\nVerificați folderul .debris în dispozitivul local pentru a vedea dacă trebuie să restaurați ceva.</string>
-    <!-- Cancel button of the dialog shown when user clicks to clear debris from settings menu -->
-    <string name="settings_sync_clear_debris_dialog_cancel">Anulați</string>
     <!-- Continue button of the dialog shown when user clicks to clear debris from settings menu -->
     <string name="settings_sync_clear_debris_dialog_continue">Continuați</string>
     <!-- Snackbar message shown when user clears debris from settings menu -->
@@ -602,8 +522,6 @@
         <item quantity="few">Au fost găsite %1$s și %2$d&#160;fișiere.</item>
         <item quantity="other">Au fost găsite %1$s și %2$d de fișiere.</item>
     </plurals>
-    <!-- Label for the file info information screen no tags label -->
-    <string name="file_info_information_no_tags_label">Nicio etichetă</string>
     <!-- Transfers scanning folders dialog title to inform that the transfers are being cancelled -->
     <string name="transfers_scanning_folders_dialog_cancel_cancelling_title">Se anulează transferurile&#8230;</string>
     <!-- error warning message for report issue when not enough characters are typed and user tries to send report-->
@@ -675,7 +593,7 @@
     <!-- The Document Scanning Error Type for generic errors during Document Scanning -->
     <string name="document_scanning_error_type_generic_error">Avem probleme la deschiderea scanerului de documente. Închideți și redeschideți aplicația și încercați din nou.</string>
     <!-- The confirmation Button text of the Document Scanning Error Dialog -->
-    <string name="document_scanning_error_dialog_confirm_button">Închide</string>
+    <string name="document_scanning_error_dialog_confirm_button">Bine, am înțeles</string>
     <!--Title text to start a meeting from Meeting screen empty view-->
     <string name="meeting_recent_list_empty_title">Protejați-vă apelurile</string>
     <!--Subtitle text from Meeting screen empty view-->
@@ -690,16 +608,10 @@
     <string name="sync_promotion_bottom_sheet_whats_new_label">Ce este nou</string>
     <!-- Title of the bottom sheet to promote Sync feature -->
     <string name="sync_promotion_bottom_sheet_title">Sincronizare ușoară și automată</string>
-    <!-- Body message of the bottom sheet to promote Sync feature -->
-    <string name="sync_promotion_bottom_sheet_body_message">Sincronizați un folder de pe dispozitiv cu MEGA pentru a accesa cea mai recentă versiune a fișierelor dvs. oriunde</string>
     <!-- Text of the primary button of the bottom sheet to promote Sync feature for Pro users ("Sync folders") -->
     <string name="sync_promotion_bottom_sheet_primary_button_text_pro">Sincronizați folderele</string>
-    <!-- Text of the primary button of the bottom sheet to promote Sync feature for Free users ("Upgrade") -->
-    <string name="sync_promotion_bottom_sheet_primary_button_text_free">Faceți upgrade pentru a folosi sincronizarea</string>
-    <!-- Text of the secondary button of the bottom sheet to promote Sync feature ("Learn more") -->
-    <string name="sync_promotion_bottom_sheet_secondary_button_text">Aflați mai multe</string>
-    <!-- Sync option dialog cancel button -->
-    <string name="settings_sync_option_cancel">Anulați</string>
+    <!-- Text of the secondary button of the bottom sheet to promote Sync feature ("Back up folders") -->
+    <string name="sync_promotion_bottom_sheet_secondary_button_text">Back up folders</string>
     <!-- Snackbar message displayed when sync option is selected -->
     <string name="settings_sync_option_updated_message">Opțiuni de sincronizare actualizate</string>
     <!-- Title of the Contact Permission Explanation -->
@@ -718,10 +630,6 @@
     <string name="device_center_add_sync_button_option">Adăugați o sincronizare</string>
     <!-- Label for the button or menu option to add a backup -->
     <string name="device_center_add_backup_button_option">Adăugați un backup</string>
-    <!-- Title of the upgrade dialog displayed for free accounts when try to add a new sync or backup -->
-    <string name="device_center_sync_backup_upgrade_dialog_title">Upgradează-ți contul</string>
-    <!-- Message of the upgrade dialog displayed for free accounts when try to add a new sync or backup -->
-    <string name="device_center_sync_backup_upgrade_dialog_message">Deblocați puterea de a sincroniza și de a face backup pentru dispozitivul mobil în spațiu de stocare în cloud cu unul dintre abonamentele noastre premium</string>
     <!-- Title of the share meeting link bottom panel -->
     <string name="meetings_share_link_bottom_sheet_title">Întâlnire confirmată: Invitați alții să se alăture</string>
     <!-- Button text of the send meeting link to chat -->
@@ -758,8 +666,6 @@
     <string name="sync_backup_access_storage_permission_dialog_message">Pentru a face copii de rezervă ale fișierelor, MEGA are nevoie de acces la fișierele și folderele de pe dispozitiv. Datele dvs. sunt întotdeauna în siguranță la noi.</string>
     <!-- Text for the warning banner displayed if try to create a new backup but storage permission has not been granted. The placeholders are to underline text -->
     <string name="sync_add_new_backup_storage_permission_banner">MEGA are nevoie de acces la spațiul de stocare al dispozitivului dvs. pentru a face o copie de rezervă a folderului local. [U]Atingeți pentru a acorda acces[/U]</string>
-    <!--Success message displayed in the Login screen after the account has been activated-->
-    <string name="login_screen_account_confirmed_success_message">Contul tău a fost activat. Te rugăm să te autentifici.</string>
     <!-- Title in the files permission screen -->
     <string name="files_permission_screen_title">Permiteți MEGA să acceseze fișierele dispozitivului</string>
     <!-- Context message in the files permission screen -->
@@ -776,8 +682,6 @@
     <string name="sync_snackbar_message_confirm_sync_stopped">Sincronizarea sa oprit</string>
     <!-- Title of the dialog to confirm stop a backup -->
     <string name="sync_stop_backup_confirm_dialog_title">Oprește backupul</string>
-    <!-- Message of the dialog to confirm stop a backup -->
-    <string name="sync_stop_backup_confirm_dialog_message">Aceasta va opri procesul de sincronizare între cele două foldere. O copie va fi creată și salvată pe Unitatea cloud.</string>
     <!-- Label for the button to stop a backup -->
     <string name="sync_stop_backup_button">Oprește backupul</string>
     <!-- Snackbar message to indicate that backup has been stopped -->
@@ -792,10 +696,6 @@
     <string name="device_center_sync_backup_list_empty_state_title">Nu sunt configurate conexiuni</string>
     <!-- Message of the synced folder list empty state -->
     <string name="device_center_sync_backup_list_empty_state_message">Sincronizați sau faceți o copie de rezervă a unui folder de pe dispozitiv cu un folder de pe MEGA</string>
-    <!-- Message of the synced folder list empty state for free accounts -->
-    <string name="device_center_sync_backup_list_empty_state_message_free_account">Treceți la un cont premium pentru a vă menține informațiile importante în siguranță și actualizate cu sincronizare și backup</string>
-    <!-- Synced folder list empty state "See upgrade options" button label -->
-    <string name="device_center_sync_backup_see_upgrade_options_button_label">Consultați opțiunile de upgrade</string>
     <!-- subtitle of meeting title in schedule meeting for title disclaimer -->
     <string name="meetings_schedule_meeting_meeting_title_disclaimer">MEGA poate vedea numele și descrierea întâlnirii dvs., dar le păstrăm private</string>
     <!-- Capital letters. Text of the label of a new historic notifications-->
@@ -806,12 +706,10 @@
     <string name="display_over_other_apps_permission_screen_message">MEGA are nevoie de permisiunea dvs. pentru a afișa peste aplicații. Aceasta înseamnă că nu veți pierde niciodată o altă notificare de apel primit.</string>
     <!-- Positive action button when permission is not granted and it's required for some feature. Clicking it will redirect to settings screen of device -->
     <string name="general_allow_permission_positive_button">Acordă permisiunea</string>
-    <!-- Message displayed with progress percentage while the app is doing some background operation -->
-    <string name="login_completing_operation">Finalizarea operațiunii: %1$d%%</string>
     <!-- Title for a warning dialog informing the account is in storage over quota and cannot upload anything unless it is upgraded -->
     <string name="dialog_not_enough_space_to_upload_title">Nu este suficient spațiu pentru a încărca fișiere noi</string>
     <!-- Message for a warning dialog informing the account is in storage over quota and cannot upload anything unless it is upgraded. Please do not remove the placeholders, it is for highlighting the text as a link. -->
-    <string name="dialog_not_enough_space_to_upload_message">Te-ai depășit cotă de stocare. Actualizați la un abonament mai mare sau goliți puțin spațiu pentru a încărca fișiere noi. [A]Aflați mai multe[/A].</string>
+    <string name="dialog_not_enough_space_to_upload_message">Te-ai depășit cotă de stocare. Actualizați la un abonament superior sau eliberați spațiu pentru a încărca fișiere noi. [A]Aflați mai multe[/A].</string>
     <!-- Name for a general button which action is navigate to the "Upgrade" account -->
     <string name="general_upgrade_button">Upgradează</string>
     <!-- Photos search welcome title -->
@@ -830,7 +728,253 @@
     <string name="album_add_to_media">Adaugă la</string>
     <!-- Add to album success message -->
     <plurals name="album_add_to_message">
-        <item quantity="one">Added to “%1$s”</item>
-        <item quantity="other">Added %2$d items to “%1$s”</item>
+        <item quantity="one">Adăugat la”%1$s”</item>
+        <item quantity="few">Adăugat %2$d elemente pentru”%1$s”</item>
+        <item quantity="other">Adăugat %2$d elemente pentru”%1$s”</item>
     </plurals>
+    <!-- Name for a general button which action is "Open" something -->
+    <string name="general_open_button">Deschide</string>
+    <!-- Bottom sheet option title for add the video to playlist from video section -->
+    <string name="video_section_bottom_sheet_option_title_add_to_playlist">Adăugați la lista de redare</string>
+    <!-- Message of the dialog to confirm stop a backup -->
+    <string name="sync_stop_backup_confirm_dialog_text">Pentru a opri realizarea de backupuri a acestui folder, trebuie fie să-l muți, fie să-l ștergi.</string>
+    <!-- Move option of the dialog to confirm stop a backup -->
+    <string name="sync_stop_backup_confirm_dialog_move_option">Mută folderul</string>
+    <!-- Explanatory text for the move option of the dialog to confirm stop a backup -->
+    <string name="sync_stop_backup_confirm_dialog_move_option_text">Mutați acest folder într-o altă locație pentru a obține acces complet la datele dvs.</string>
+    <!-- Delete option of the dialog to confirm stop a backup -->
+    <string name="sync_stop_backup_confirm_dialog_delete_option">Șterge folderul definitiv</string>
+    <!-- Explanatory text for the delete option of the dialog to confirm stop a backup -->
+    <string name="sync_stop_backup_confirm_dialog_delete_option_text">Folderul va fi șters de pe MEGA. Nu va fi șters de pe calculator.</string>
+    <!-- Name for a general button which action is "Confirm" something -->
+    <string name="general_confirm_button">Confirmă</string>
+    <!-- The failed Message when adding the video to the playlists from the video section. -->
+    <string name="video_section_playlists_add_to_playlists_failed_message">Imposibil de adăugat element</string>
+    <!-- Text of the add button in the page that adds the video to the video playlist -->
+    <string name="video_to_playlist_add_button">Adăugați</string>
+    <!-- The success Message when adding the video to the playlists from the video section. -->
+    <plurals name="video_section_playlists_add_to_playlists_successfully_message">
+        <item quantity="one">Adăugat 1 element la”%1$s”</item>
+        <item quantity="few">Adăugat 1 element la %1$d liste de redare</item>
+        <item quantity="other">Adăugat 1 element la %1$d liste de redare</item>
+    </plurals>
+    <!-- Name for a general label which action is "Select" something -->
+    <string name="general_select">Selectează</string>
+    <!-- Name for a general label which action is "Select folder" -->
+    <string name="general_select_folder">Selectează un folder</string>
+    <!-- Clickable label text to select the destination for the move option of the dialog to confirm stop a backup. Keep the placeholders because "[B][/B]" are in order to make the text clickable and "%1s" in order to display the selected folder name. -->
+    <string name="sync_stop_backup_confirm_dialog_move_option_select_destination">Mutați la: [B]%1s[/B]</string>
+    <!-- Message shown to user when app is connected to the MEGA server -->
+    <string name="login_connected_to_server">Conectat la server</string>
+    <!-- User Alert notification for scheduled recurring meeting changes -->
+    <string name="meetings_notification_subtitle_scheduled_recurring_meeting_scheduled_changes">[A]%s[/A] [B]a actualizat detaliile întâlnirii recurente la[/B]</string>
+    <!-- User Alert notification for scheduled recurring meeting hour change -->
+    <string name="meetings_notification_subtitle_scheduled_recurring_meeting_hour_changed">[A]%s[/A] [B]a actualizat ora întâlnirii recurente la[/B]</string>
+    <!-- User Alert notification for scheduled recurring meeting date of the week change -->
+    <string name="meetings_notification_subtitle_scheduled_recurring_meeting_date_of_the_week_changed">[A]%s[/A] [B]a actualizat data întâlnirii recurente la[/B]</string>
+    <!-- User Alert notification for scheduled recurring meeting multiple fields change -->
+    <string name="meetings_notification_subtitle_scheduled_recurring_meeting_multiple_fields_changed">[A]%s[/A] [B]a actualizat întâlnirea la[/B]</string>
+    <!-- User Alert notification for canceled occurrences of a scheduled recurring meeting -->
+    <string name="meetings_notification_subtitle_scheduled_recurring_meeting_occurrence_canceled">[A]%s[/A] [B]a anulat evenimentul programat pentru[/B]</string>
+    <!-- User Alert notification for scheduled recurring meeting occurrence change -->
+    <string name="meetings_notification_subtitle_scheduled_recurring_meeting_updated_occurrence">[A]%s[/A] [B]a actualizat o apariție la[/B]</string>
+    <!-- User Alert notification for scheduled meeting date change -->
+    <string name="meetings_notification_subtitle_scheduled_meeting_updated_date">[A]%s[/A] [B]a actualizat data întâlnirii la[/B]</string>
+    <!-- User Alert notification for scheduled meeting time change -->
+    <string name="meetings_notification_subtitle_scheduled_meeting_updated_time">[A]%s[/A] [B]a actualizat ora întâlnirii la[/B]</string>
+    <!-- User Alert notification for canceled scheduled meeting -->
+    <string name="meetings_notification_subtitle_scheduled_meeting_canceled">[A]%s[/A] [B]a anulat întâlnirea programată pentru[/B]</string>
+    <!-- Title of the ads free introduction screen -->
+    <string name="payment_ads_free_intro_title">Want MEGA without the ads?</string>
+    <!-- Description of the ads free introduction screen -->
+    <string name="payment_ads_free_intro_description">Upgrade to a Pro plan with plenty of storage and more. Our Pro plans start at just %1$s a month.</string>
+    <!-- The Generous storage label in the ads free introduction screen -->
+    <string name="payment_ads_free_intro_generous_storage_label">Spațiu de stocare generos</string>
+    <!-- The Generous storage description in the ads free introduction screen -->
+    <string name="payment_ads_free_intro_generous_storage_description">Stocați date nelimitate, începând de la %1$s.</string>
+    <!-- The Transfer sharing label in the ads free introduction screen -->
+    <string name="payment_ads_free_intro_transfer_sharing_label">Partajarea transferurilor</string>
+    <!-- The Transfer sharing description in the ads free introduction screen -->
+    <string name="payment_ads_free_intro_transfer_sharing_description">Persoanele cu care partajați date pot folosi cota de transfer pentru a descărca elementele pe care le-ați partajat.</string>
+    <!-- The additional security label in the ads free introduction screen -->
+    <string name="payment_ads_free_intro_additional_security_label">MEGA&#160;Pass și MEGA&#160;VPN</string>
+    <!-- The additional security description in the ads free introduction screen -->
+    <string name="payment_ads_free_intro_additional_security_description">Setați parolele și datele de expirare pentru linkurile de fișiere și folder.</string>
+    <!-- The button text view pro plan in the ads free introduction screen -->
+    <string name="payment_ads_free_intro_button_view_pro_plan">Vezi abonamentele Pro</string>
+    <!-- Label for call option on settings -->
+    <string name="settings_calls_title">Apeluri</string>
+    <!-- Label for the sound notifications option on calls settings -->
+    <string name="settings_calls_sound_notifications_title">Notificări sonore</string>
+    <!-- Text for the sound notifications option on calls settings -->
+    <string name="settings_calls_sound_notifications_body">Auzi un sunet când cineva se alătură sau părăsește un apel.</string>
+    <!-- Text of the remove favourite option of the Favourites playlist bottom sheet  -->
+    <string name="favourites_playlist_bottom_sheet_option_remove_favourite">Elimină de la favorite</string>
+    <!-- The empty hint of the Favourites playlist -->
+    <string name="favourites_playlist_empty_hint">Niciun favorit</string>
+    <!-- Message to enter confirm password -->
+    <string name="general_confirm_your_password">Confirmați parola dvs.</string>
+    <!-- The Screen Toolbar Title for configuring the scan settings -->
+    <string name="document_scanning_settings_toolbar_title">Setări de scanare</string>
+    <!-- Title of the camera setting screen -->
+    <string name="camera_settings_title">Setările aparatului foto</string>
+    <!-- Title of the save location in the camera setting screen -->
+    <string name="camera_settings_save_location_title">Salvați locația</string>
+    <!-- Description of the save location in the camera setting screen -->
+    <string name="camera_settings_save_location_description">Activați etichetarea geografică pentru fotografii și videoclipuri</string>
+    <!-- Message when user denies location permission in the camera setting screen -->
+    <string name="camera_settings_save_location_permission_denied">Permiteți MEGA să acceseze locația acestui dispozitiv pentru a continua</string>
+    <!-- Warning message to indicate that cannot select a currently synced folder -->
+    <string name="sync_local_device_folder_currently_synced_message">Acest folder este deja sincronizat</string>
+    <!-- Warning message to indicate that cannot select a currently backed up folder -->
+    <string name="sync_local_device_folder_currently_backed_up_message">Acest folder este deja copii de rezervă</string>
+    <!-- The name of every users root drive in the cloud of MEGA. -->
+    <string name="general_section_cloud_drive">Unitate cloud</string>
+    <!-- App Bar Title in of Cloud Drive Bottom Menu -->
+    <string name="general_drive">Unitate</string>
+    <!-- Tab bar title of Syncs tab -->
+    <string name="general_syncs">Sincronizări</string>
+    <!-- Text under the syncs list -->
+    <string name="syncs_tab_view_other_devices">Vizualizarea altor dispozitive în Centrul de aparate</string>
+    <!-- The snackbar message of you and others raised your hands -->
+    <plurals name="transfers_completed_read_error_retrying">
+        <item quantity="one"></item>
+        <item quantity="few"></item>
+        <item quantity="other"></item>
+    </plurals>
+    <!-- Warning shown to the user when tries to retry a cancelled or failed transfer but it cannot be retried because app does not have read permission over the file anymore -->
+    <string name="transfers_completed_one_read_error_retrying">Încărcarea dvs. nu poate fi finalizată sau reîncercată, deoarece MEGA nu mai poate accesa fișierul</string>
+    <!-- Warning shown to the user when tries to retry some or all of cancelled or failed transfer but they cannot be retried because app does not have read permission over the files anymore -->
+    <string name="transfers_completed_some_read_error_retrying">Unele sau toate încărcările dvs. nu pot fi finalizate sau reîncercate, deoarece MEGA nu mai poate accesa fișierele</string>
+    <!-- Title for Offline Folder exposed via SAF -->
+    <string name="general_mega_offline">MEGA Fișiere Offline</string>
+    <!-- Notification content for download final notification. It will inform the user about the location where file/s were downloaded -->
+    <string name="transfers_notification_location_content">Locatie: %1$s</string>
+    <!-- Notification action for download final notification. It will open the file explorer activity to show the destination folder -->
+    <string name="transfers_notification_location_action">Localiza</string>
+    <!-- Notification content for download final notification in case of a single file downloaded. -->
+    <string name="transfers_notification_title_single_download">Descărcat „%1$s”</string>
+    <!-- Label for the button or menu option to add a new backup -->
+    <string name="device_center_sync_add_new_backup_button_option">Adăugați o nouă copie de rezervă</string>
+    <!-- Notification content for download final notification in case of a single file downloaded to preview. -->
+    <string name="transfers_notification_title_preview_download">„%1$s” este gata de previzualizare</string>
+    <!-- Notification action for download final notification. It will open a dialog with installed apps which can open the file -->
+    <string name="transfers_notification_preview_action">Previzualizează</string>
+    <!-- Title for the OS dialog shown with available apps to open a file -->
+    <string name="open_with_os_dialog_title">Deschide „%1$s” cu</string>
+    <!-- The Scan Confirmation screen error message shown when the new filename does not contain the file extension that was selected -->
+    <string name="document_scanning_settings_missing_file_extension_error_message">Extensia de fișier lipsă (%s)</string>
+    <!-- The Scan Confirmation screen error message shown when the filename does not end with the expected file extension -->
+    <string name="document_scanning_settings_non_matching_file_extension_error_message">Extensia de fişier nu corespunde tipului de fişier</string>
+    <!-- The Scan Confirmation screen error message shown when the filename has no file extension -->
+    <string name="document_scanning_settings_file_extension_required_error_message">Extensia de fișier este necesară</string>
+    <!-- Alert text before download a file for preview. Please do not modify the %s placeholder as it will be replaced by the size to be donwloaded -->
+    <string name="alert_larger_file_preview">Pentru a previzualiza acest fișier, MEGA trebuie să îl descarce. %1$s va fi descărcat.</string>
+    <!-- Message displayed with progress percentage while the app is doing some background operation -->
+    <string name="login_completing_operation">Finalizarea operațiunii: %1$d%%</string>
+    <!-- Add to album files existed message -->
+    <plurals name="album_add_to_files_existed">
+        <item quantity="one">Acest fișier există deja în „%1$s” și nu poate fi adăugat din nou</item>
+        <item quantity="few">Aceste fișiere există deja în „%1$s” și nu poate fi adăugat din nou</item>
+        <item quantity="other">Aceste fișiere există deja în „%1$s” și nu poate fi adăugat din nou</item>
+    </plurals>
+    <!-- Add to album partial added message -->
+    <plurals name="album_add_to_partial_added_message">
+        <item quantity="one">1 file added to “%1$s”. Some files already exist, and can’t be added again.</item>
+        <item quantity="other">%2$d files added to “%1$s”. Some files already exist, and can’t be added again.</item>
+    </plurals>
+    <!--Content on the Multi-Factor Authentication Login page -->
+    <string name="multi_factor_auth_login_verification_content">Introduceți codul din șase cifre din aplicația dvs. de autentificare.</string>
+    <!--Message to be shown to the user when they entered an incorrect verification code-->
+    <string name="multi_factor_auth_login_verification_input_error_text">Cod de verificare incorect</string>
+    <!-- Snackbar text to inform the user that preview may take some time because it needs to be downloaded -->
+    <string name="transfers_preview_slow_snackbar">Preparing file for preview. See notification for details.</string>
+    <!-- Notification text for preview downloads.  Please do not modify the %s placeholder as it will be replaced by the name of the file to be donwloaded -->
+    <string name="transfers_notification_downloading_preview">Preparing %1$s for preview</string>
+    <!-- Notification text for preview downloads, paused state.  Please do not modify the %s placeholder as it will be replaced by the name of the file to be donwloaded -->
+    <string name="transfers_notification_downloading_preview_paused">Preparing %1$s for preview (paused)</string>
+    <!-- Message when successfully deleting single item from the audio queue. %1$s will be replaced with the item name -->
+    <string name="audio_queue_single_item_removed_message">‟%1$s” was removed</string>
+    <!-- Message when successfully deleting items from the audio queue. %1$d will be replaced with the removal count when multiple items are removed. -->
+    <string name="audio_queue_multiple_items_removed_message">Removed %1$d items from queue</string>
+    <!-- Message when successfully deleting items from the audio queue. %1$s will be replaced with the item name %2$d will be replaced with the removal count. -->
+    <plurals name="audio_queue_items_removal_success_message">
+        <item quantity="one">“%1$s” was removed from the queue</item>
+        <item quantity="other">Removed %2$d items from the queue</item>
+    </plurals>
+    <!-- Title for the dialog to inform that a transfer is needed to preview a file and transfers are paused-->
+    <string name="transfers_preview_paused_dialog_title">Transfers are paused</string>
+    <!-- Message for the dialog to inform that a transfer is needed to preview a file and transfers are paused-->
+    <string name="transfers_preview_paused_dialog_text">To preview “%1$s” you will need to resume paused transfers</string>
+    <!--SD Card text shown as title in FileStorage screen -->
+    <string name="general_sd_card">SD card</string>
+    <!--The title of the Login page-->
+    <string name="login_page_title">Conectați-vă la contul MEGA</string>
+    <!--Message to be shown to the user when they entered an invalid email-->
+    <string name="login_invalid_email_error_message">Vă rugăm să introduceți o adresă de e-mail validă</string>
+    <!--Message to be shown to the user when they entered an invalid format password-->
+    <string name="login_invalid_password_error_message">Introduceți parola dvs.</string>
+    <!--Message to be shown to the user when they entered the wrong credential-->
+    <string name="login_wrong_credential_error_message">Adresa de e-mail sau parola invalidă</string>
+    <!--Message to be shown to he user when the account is not validated -->
+    <string name="login_account_not_validated">Înregistrarea contului dvs. este incompletă sau a fost anulată. Verificați căsuța de e-mail.</string>
+    <!--Message to be shown to the user when login fails due to multiple failed attempts-->
+    <string name="login_too_many_attempts_error_message">Ați încercat să vă conectați de prea multe ori. Așteptați și încercați din nou.</string>
+    <!--The footer text to be shown where a user can sign up if they do not have a MEGA account-->
+    <string name="login_page_sign_up_action_footer_text">Nu aveți un cont MEGA? [A]Înscrieți-vă[/A]</string>
+    <!-- Title of setting Two-Factor Authentication -->
+    <string name="settings_2fa">Autentificare cu doi factori</string>
+    <!-- email label -->
+    <string name="email_text">Adresa de e-mail</string>
+    <!-- password label -->
+    <string name="password_text">Parolă</string>
+    <!-- Login button -->
+    <string name="login_text">Conectați-vă</string>
+    <!--The text where user forgot their password and will navigate to reset it-->
+    <string name="login_page_forgot_password_text">Ați uitat parola?</string>
+    <!-- Sync state up to date -->
+    <string name="sync_list_sync_state_disabled">Dezactivat</string>
+    <!-- Name of the Camera uploads feature -->
+    <string name="general_camera_uploads">Încărcări cameră</string>
+    <!-- Name of the Camera uploads feature -->
+    <string name="general_media_uploads">Încărcări media</string>
+    <!-- Generic settings label text -->
+    <string name="general_settings">Setări</string>
+    <!-- Ad settings label in the cookie settings page -->
+    <string name="settings_cookie_settings_label_ad_settings">Ad settings</string>
+    <!-- Ads personalization label in the cookie settings page -->
+    <string name="settings_cookie_settings_label_ads_personalization">Ads personalisation</string>
+    <!-- Cookie settings title in the cookie settings page -->
+    <string name="settings_cookie_setting_title_cookie_and_ad_settings">Cookie and ad settings</string>
+    <!-- Body text of the bottom sheet to promote Sync feature. The placeholders are to underline text -->
+    <string name="sync_promotion_bottom_sheet_body_text">Sync or back up a folder on your device with a folder on MEGA. [U]Learn more[/U]</string>
+    <!-- This is the final button when creating a folder in the dialog where the user inserts the folder name -->
+    <string name="transfers_cancel_download_warning_title">Cancel download?</string>
+    <!-- Confirmation message informing a download was successfully cancelled -->
+    <string name="transfers_cancel_download_success_message">Download cancelled</string>
+    <!-- Title of note to self chat -->
+    <string name="chat_note_to_self_chat_title">Note to self</string>
+    <!-- First message header in note to self chat -->
+    <string name="chat_note_to_self_chat_first_message_header">Keep it to yourself</string>
+    <!-- First message description in note to self chat -->
+    <string name="chat_note_to_self_chat_first_message_description">Send yourself sensitive information, pics and videos, or ideas for your next big venture. Synced across all your devices, and protected with zero-knowledge encryption.</string>
+    <!-- Add to album some files exist message -->
+    <plurals name="album_add_to_files_exist_message">
+        <item quantity="one">1 file added to “%1$s”. Duplicate files cannot be added again.</item>
+        <item quantity="other">%2$d files added to “%1$s”. Duplicate files cannot be added again.</item>
+    </plurals>
+    <!-- Snack bar message informing that profile's QR code is uploaded to the Cloud Drive-->
+    <string name="transfers_start_upload_profile_qr_code_message">Saving %1$s to Cloud drive&#8230;</string>
+    <!-- Warning shown after trying to cancel a download, but the request failed -->
+    <string name="transfers_error_cancelling_download">Something went wrong. Download was not cancelled.</string>
+    <!-- Body for the subscription details section, which is shown to the Indian user to provide details about subscription. This string is shown if user selects yearly subscription and the amount is more than Rs.15,000. Please keep these placeholders [A], [/A], [B], [/B], [C], [/C]. They will be used to format the string. -->
+    <string name="account_upgrade_account_subscription_details_body_yearly_with_price_for_indian">You will be charged %1$s immediately but your subscription will not automatically renew after 12 months due to government regulations. It will be your responsibility to renew your subscription after it has expired. You can manage or cancel your subscription anytime via Subscriptions in [A]Google&#160;Play[/A]. By upgrading your account, you agree to MEGA’s [B]Terms of Service[/B] and [C]Privacy and Data Policy[/C].</string>
+    <!-- The name of the Device or Folder Status which signifies that it is currently uploading -->
+    <string name="device_center_list_view_item_status_uploading">Se încarcă...</string>
+    <!-- The name of the Device or Folder Status which signifies that it is currently uploading with a percentage completion -->
+    <string name="device_center_list_view_item_status_uploading_with_progress">%1$d%% uploading&#8230;</string>
+    <!-- The name of the Device or Folder Status which signifies that it is inactive -->
+    <string name="device_center_list_view_item_status_inactive">Inactiv</string>
+    <!-- The name of the Device or Folder Status which signifies that some action is needed -->
+    <string name="device_center_list_view_item_status_attention_needed">Attention needed</string>
 </resources>

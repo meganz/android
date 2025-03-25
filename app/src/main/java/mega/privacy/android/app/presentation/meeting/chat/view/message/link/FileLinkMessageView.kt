@@ -20,7 +20,7 @@ import mega.privacy.android.core.ui.mapper.FileTypeIconMapper
 import mega.privacy.android.core.ui.mapper.IconType
 import mega.privacy.android.shared.original.core.ui.preview.BooleanProvider
 import mega.privacy.android.shared.original.core.ui.preview.CombinedThemePreviews
-import mega.privacy.android.shared.original.core.ui.theme.OriginalTempTheme
+import mega.privacy.android.shared.original.core.ui.theme.OriginalTheme
 
 /**
  * Folder link message view
@@ -84,7 +84,7 @@ fun FileLinkMessageView(
 private fun FolderLinkMessageViewPreview(
     @PreviewParameter(BooleanProvider::class) isMe: Boolean,
 ) {
-    OriginalTempTheme(isDark = isSystemInDarkTheme()) {
+    OriginalTheme(isDark = isSystemInDarkTheme()) {
         ChatBubble(isMe = isMe, subContent = {
             FileLinkMessageView(
                 fileIcon = painterResource(IconPackR.drawable.ic_3d_thumbnail_outline),

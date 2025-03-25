@@ -5,8 +5,8 @@ import mega.privacy.android.domain.entity.chat.PendingMessageState
 import mega.privacy.android.domain.entity.chat.messages.pending.UpdatePendingMessageStateRequest
 import mega.privacy.android.domain.entity.chat.messages.pending.UpdatePendingMessageTransferTagRequest
 import mega.privacy.android.domain.entity.node.NodeId
-import mega.privacy.android.domain.entity.transfer.MultiTransferEvent
 import mega.privacy.android.domain.entity.transfer.Transfer
+import mega.privacy.android.domain.entity.transfer.TransferAppData
 import mega.privacy.android.domain.entity.transfer.TransferEvent
 import mega.privacy.android.domain.usecase.chat.message.AttachNodeWithPendingMessageUseCase
 import mega.privacy.android.domain.usecase.chat.message.UpdatePendingMessageUseCase
@@ -41,9 +41,7 @@ class HandleChatUploadTransferEventUseCaseTest {
         val transfer = mock<Transfer> {
             on { it.tag } doReturn transferTag
         }
-        val event = MultiTransferEvent.SingleTransferEvent(
-            TransferEvent.TransferStartEvent(transfer), 0, 0
-        )
+        val event = TransferEvent.TransferStartEvent(transfer)
 
         underTest(event, pendingMessageId)
 
@@ -61,16 +59,23 @@ class HandleChatUploadTransferEventUseCaseTest {
         runTest {
             val pendingMessageId = 15L
             val nodeHandle = 12L
-            val event = MultiTransferEvent.SingleTransferEvent(
-                mock<TransferEvent.TransferFinishEvent>(),
-                1L, 1L,
-                alreadyTransferredIds = setOf(NodeId(nodeHandle))
-            )
+            val appData = listOf(TransferAppData.Geolocation(345.4, 45.34))
+            val transfer = mock<Transfer> {
+                on { it.isFinished } doReturn true
+                on { it.appData } doReturn appData
+                on { it.isAlreadyTransferred } doReturn true
+                on { it.nodeHandle } doReturn nodeHandle
+            }
+            val transferEvent = mock<TransferEvent.TransferFinishEvent> {
+                on { it.transfer } doReturn transfer
+            }
+            val event = transferEvent
 
             underTest(event, pendingMessageId)
             verify(attachNodeWithPendingMessageUseCase).invoke(
                 pendingMessageId,
-                NodeId(nodeHandle)
+                NodeId(nodeHandle),
+                appData,
             )
         }
 
@@ -78,10 +83,9 @@ class HandleChatUploadTransferEventUseCaseTest {
     fun `test that pending message is updated to error uploading when a temporary error is received`() =
         runTest {
             val pendingMessageId = 15L
-            val event = MultiTransferEvent.SingleTransferEvent(
-                mock<TransferEvent.TransferTemporaryErrorEvent>(),
-                1L, 1L,
-            )
+            val event = mock<TransferEvent.TransferTemporaryErrorEvent> {
+                on { transfer } doReturn folderTransfer //to avoid checking isAlreadyTransferredEvent
+            }
 
             underTest(event, pendingMessageId)
             verify(updatePendingMessageUseCase).invoke(
@@ -91,4 +95,8 @@ class HandleChatUploadTransferEventUseCaseTest {
                 )
             )
         }
+
+    private val folderTransfer = mock<Transfer> {
+        on { isFolderTransfer } doReturn true
+    }
 }

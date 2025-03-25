@@ -13,11 +13,7 @@ import mega.privacy.android.data.gateway.NotificationsGateway
 import mega.privacy.android.data.gateway.api.MegaApiGateway
 import mega.privacy.android.data.gateway.preferences.CallsPreferencesGateway
 import mega.privacy.android.data.mapper.EventMapper
-import mega.privacy.android.data.mapper.NodeProvider
-import mega.privacy.android.data.mapper.UserAlertContactProvider
 import mega.privacy.android.data.mapper.UserAlertMapper
-import mega.privacy.android.data.mapper.UserAlertScheduledMeetingOccurrProvider
-import mega.privacy.android.data.mapper.UserAlertScheduledMeetingProvider
 import mega.privacy.android.data.mapper.meeting.IntegerListMapper
 import mega.privacy.android.data.mapper.notification.PromoNotificationListMapper
 import mega.privacy.android.data.model.GlobalUpdate
@@ -25,7 +21,6 @@ import mega.privacy.android.data.model.chat.NonContactInfo
 import mega.privacy.android.domain.entity.CallsMeetingInvitations
 import mega.privacy.android.domain.entity.Contact
 import mega.privacy.android.domain.entity.ContactAlert
-import mega.privacy.android.domain.entity.ContactChangeContactEstablishedAlert
 import mega.privacy.android.domain.entity.EventType
 import mega.privacy.android.domain.entity.NormalEvent
 import mega.privacy.android.domain.entity.notifications.PromoNotification
@@ -68,17 +63,7 @@ class DefaultNotificationsRepositoryTest {
     private val userHandle = 12L
     private val email = "email"
 
-    private val userAlertsMapper: UserAlertMapper =
-        { alert: MegaUserAlert, contactProvider: UserAlertContactProvider, _: UserAlertScheduledMeetingProvider, _: UserAlertScheduledMeetingOccurrProvider, _: NodeProvider ->
-            val contact = contactProvider(userHandle, alert.email)
-            ContactChangeContactEstablishedAlert(
-                id = 12L,
-                seen = false,
-                createdTime = 1L,
-                isOwnChange = false,
-                contact = contact,
-            )
-        }
+    private val userAlertsMapper: UserAlertMapper = UserAlertMapper()
     private val megaLocalStorageGateway = mock<MegaLocalStorageGateway>()
     private val fetchSchedOccurrencesByChatUseCase =
         mock<FetchNumberOfScheduledMeetingOccurrencesByChat>()
@@ -130,7 +115,12 @@ class DefaultNotificationsRepositoryTest {
 
     @Test
     fun `test that user alert email is fetched locally`() = runTest {
-        val globalUpdate = GlobalUpdate.OnUserAlertsUpdate(arrayListOf(mock()))
+        val globalUpdate = GlobalUpdate.OnUserAlertsUpdate(
+            arrayListOf(
+                mock<MegaUserAlert> {
+                    on { this.userHandle }.thenReturn(userHandle)
+                })
+        )
         whenever(megaApiGateway.globalUpdates).thenReturn(flowOf(globalUpdate))
         val contactInfo = mock<NonContactInfo> { on { email }.thenReturn("Email") }
         whenever(megaLocalStorageGateway.getNonContactByHandle(any())).thenReturn(contactInfo)
@@ -144,7 +134,11 @@ class DefaultNotificationsRepositoryTest {
 
     @Test
     fun `test that email is fetched if not found locally`() = runTest {
-        val globalUpdate = GlobalUpdate.OnUserAlertsUpdate(arrayListOf(mock()))
+        val globalUpdate = GlobalUpdate.OnUserAlertsUpdate(
+            arrayListOf(mock<MegaUserAlert> {
+                on { this.userHandle }.thenReturn(userHandle)
+            })
+        )
         whenever(megaApiGateway.globalUpdates).thenReturn(flowOf(globalUpdate))
         whenever(megaLocalStorageGateway.getNonContactByHandle(any())).thenReturn(null)
         val megaApiJava = mock<MegaApiJava>()
@@ -167,7 +161,12 @@ class DefaultNotificationsRepositoryTest {
 
     @Test
     fun `test that fetched email is cached`() = runTest {
-        val globalUpdate = GlobalUpdate.OnUserAlertsUpdate(arrayListOf(mock()))
+        val globalUpdate = GlobalUpdate.OnUserAlertsUpdate(
+            arrayListOf(
+                mock<MegaUserAlert> {
+                    on { this.userHandle }.thenReturn(userHandle)
+                })
+        )
         whenever(megaApiGateway.globalUpdates).thenReturn(flowOf(globalUpdate))
         whenever(megaLocalStorageGateway.getNonContactByHandle(any())).thenReturn(null)
         val megaApiJava = mock<MegaApiJava>()
@@ -474,11 +473,11 @@ class DefaultNotificationsRepositoryTest {
         }
 
         @Test
-        fun `test that isChatEnabled returns correct value`() = runTest {
+        fun `test that isChatDndEnabled returns correct value`() = runTest {
             val chatId = 123L
-            val enabled = true
+            val enabled = false
             val settings = mock<MegaPushNotificationSettings> {
-                on { isChatEnabled(chatId) }.thenReturn(enabled)
+                on { isChatDndEnabled(chatId) }.thenReturn(enabled)
             }
 
             whenever(megaApiGateway.getPushNotificationSettings(any())).thenAnswer {
@@ -492,7 +491,7 @@ class DefaultNotificationsRepositoryTest {
 
             underTest.updatePushNotificationSettings()
 
-            val result = underTest.isChatEnabled(chatId)
+            val result = underTest.isChatDndEnabled(chatId)
 
             assertThat(result).isEqualTo(enabled)
         }

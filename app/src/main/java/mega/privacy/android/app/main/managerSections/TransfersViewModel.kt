@@ -13,10 +13,11 @@ import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.catch
+import kotlinx.coroutines.flow.collectLatest
+import kotlinx.coroutines.flow.distinctUntilChanged
 import kotlinx.coroutines.flow.shareIn
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
-import mega.privacy.android.app.globalmanagement.TransfersManagement
 import mega.privacy.android.app.presentation.manager.model.TransfersTab
 import mega.privacy.android.app.presentation.transfers.starttransfer.model.TransferTriggerEvent
 import mega.privacy.android.app.utils.Constants.INVALID_POSITION
@@ -28,26 +29,28 @@ import mega.privacy.android.domain.entity.transfer.TransferAppData
 import mega.privacy.android.domain.entity.transfer.TransferEvent
 import mega.privacy.android.domain.entity.transfer.TransferState
 import mega.privacy.android.domain.entity.transfer.isBackgroundTransfer
+import mega.privacy.android.domain.entity.transfer.isPreviewDownload
 import mega.privacy.android.domain.qualifier.IoDispatcher
 import mega.privacy.android.domain.usecase.GetNodeByIdUseCase
 import mega.privacy.android.domain.usecase.chat.message.pendingmessages.RetryChatUploadUseCase
+import mega.privacy.android.domain.usecase.file.CanReadUriUseCase
 import mega.privacy.android.domain.usecase.transfers.CancelTransferByTagUseCase
 import mega.privacy.android.domain.usecase.transfers.GetFailedOrCanceledTransfersUseCase
 import mega.privacy.android.domain.usecase.transfers.GetInProgressTransfersUseCase
 import mega.privacy.android.domain.usecase.transfers.GetTransferByTagUseCase
-import mega.privacy.android.domain.usecase.transfers.MonitorFailedTransferUseCase
 import mega.privacy.android.domain.usecase.transfers.MonitorTransferEventsUseCase
 import mega.privacy.android.domain.usecase.transfers.MoveTransferBeforeByTagUseCase
 import mega.privacy.android.domain.usecase.transfers.MoveTransferToFirstByTagUseCase
 import mega.privacy.android.domain.usecase.transfers.MoveTransferToLastByTagUseCase
 import mega.privacy.android.domain.usecase.transfers.completed.DeleteCompletedTransferUseCase
+import mega.privacy.android.domain.usecase.transfers.completed.DeleteFailedOrCancelledTransferCacheFilesUseCase
 import mega.privacy.android.domain.usecase.transfers.completed.MonitorCompletedTransferEventUseCase
 import mega.privacy.android.domain.usecase.transfers.completed.MonitorCompletedTransfersUseCase
+import mega.privacy.android.domain.usecase.transfers.overquota.MonitorTransferOverQuotaUseCase
 import mega.privacy.android.domain.usecase.transfers.paused.MonitorPausedTransfersUseCase
 import mega.privacy.android.domain.usecase.transfers.paused.PauseTransferByTagUseCase
 import nz.mega.sdk.MegaTransfer
 import timber.log.Timber
-import java.io.File
 import java.util.Collections
 import javax.inject.Inject
 
@@ -56,9 +59,7 @@ import javax.inject.Inject
  */
 @HiltViewModel
 class TransfersViewModel @Inject constructor(
-    private val transfersManagement: TransfersManagement,
     @IoDispatcher private val ioDispatcher: CoroutineDispatcher,
-    monitorFailedTransferUseCase: MonitorFailedTransferUseCase,
     private val moveTransferBeforeByTagUseCase: MoveTransferBeforeByTagUseCase,
     private val moveTransferToFirstByTagUseCase: MoveTransferToFirstByTagUseCase,
     private val moveTransferToLastByTagUseCase: MoveTransferToLastByTagUseCase,
@@ -75,6 +76,9 @@ class TransfersViewModel @Inject constructor(
     private val getNodeByIdUseCase: GetNodeByIdUseCase,
     private val transferAppDataMapper: TransferAppDataMapper,
     private val retryChatUploadUseCase: RetryChatUploadUseCase,
+    private val monitorTransferOverQuotaUseCase: MonitorTransferOverQuotaUseCase,
+    private val deleteFailedOrCancelledTransferCacheFilesUseCase: DeleteFailedOrCancelledTransferCacheFilesUseCase,
+    private val canReadUriUseCase: CanReadUriUseCase,
 ) : ViewModel() {
     private val _uiState = MutableStateFlow(TransfersUiState())
 
@@ -93,7 +97,7 @@ class TransfersViewModel @Inject constructor(
     /**
      * Failed transfer
      */
-    val failedTransfer = monitorFailedTransferUseCase()
+    val failedTransfer = monitorCompletedTransferEventUseCase().distinctUntilChanged()
         .shareIn(viewModelScope, SharingStarted.WhileSubscribed())
 
     private val _activeTransfers = MutableStateFlow(emptyList<Transfer>())
@@ -128,6 +132,7 @@ class TransfersViewModel @Inject constructor(
                     if (it.transfer.isStreamingTransfer
                         || it.transfer.isBackgroundTransfer()
                         || it.transfer.isFolderTransfer
+                        || it.transfer.isPreviewDownload()
                         || transferCallback > it.transfer.notificationNumber
                     ) return@collect
                     transferCallback = it.transfer.notificationNumber
@@ -139,17 +144,11 @@ class TransfersViewModel @Inject constructor(
                         is TransferEvent.TransferDataEvent,
                         is TransferEvent.TransferPaused,
                         is TransferEvent.FolderTransferUpdateEvent,
-                        -> Unit
+                            -> Unit
                     }
                 }
         }
-        viewModelScope.launch {
-            monitorCompletedTransferEventUseCase()
-                .catch { Timber.e(it) }
-                .collect {
-                    completedTransferFinished()
-                }
-        }
+
         viewModelScope.launch {
             monitorCompletedTransfersUseCase(MAX_TRANSFERS)
                 .catch {
@@ -157,6 +156,16 @@ class TransfersViewModel @Inject constructor(
                 }.collect { completedTransfers ->
                     _completedTransfers.update { completedTransfers }
                 }
+        }
+
+        monitorTransferOverQuota()
+    }
+
+    private fun monitorTransferOverQuota() {
+        viewModelScope.launch {
+            monitorTransferOverQuotaUseCase().collectLatest { isInTransferOverQuota ->
+                _uiState.update { state -> state.copy(isInTransferOverQuota = isInTransferOverQuota) }
+            }
         }
     }
 
@@ -167,7 +176,7 @@ class TransfersViewModel @Inject constructor(
         viewModelScope.launch {
             _activeState.update {
                 ActiveTransfersState.GetMoreQuotaViewVisibility(
-                    transfersManagement.isOnTransferOverQuota()
+                    uiState.value.isInTransferOverQuota
                 )
             }
         }
@@ -178,7 +187,7 @@ class TransfersViewModel @Inject constructor(
      *
      * @return True if it is on transfer over quota, false otherwise.
      */
-    fun isOnTransferOverQuota() = transfersManagement.isOnTransferOverQuota()
+    fun isOnTransferOverQuota() = uiState.value.isInTransferOverQuota
 
     /**
      * Set active transfers
@@ -187,6 +196,7 @@ class TransfersViewModel @Inject constructor(
         viewModelScope.launch {
             runCatching {
                 val transfers = getInProgressTransfersUseCase()
+                    .filterNot { it.isPreviewDownload() }
                 _activeTransfers.update { transfers }
             }.onFailure { exception ->
                 Timber.e(exception)
@@ -216,13 +226,15 @@ class TransfersViewModel @Inject constructor(
      * @param transfer updated item
      */
     private fun updateTransfer(transfer: Transfer) {
-        val current = activeTransfer.value.toMutableList()
-        current.indexOfFirst { it.tag == transfer.tag }
-            .takeIf { pos -> pos in current.indices }
-            ?.let { pos ->
-                current[pos] = transfer
-                _activeTransfers.update { current }
-            }
+        viewModelScope.launch(ioDispatcher) {
+            val current = activeTransfer.value.toMutableList()
+            current.indexOfFirst { it.tag == transfer.tag }
+                .takeIf { pos -> pos in current.indices }
+                ?.let { pos ->
+                    current[pos] = transfer
+                    _activeTransfers.update { current }
+                }
+        }
     }
 
     /**
@@ -251,9 +263,6 @@ class TransfersViewModel @Inject constructor(
             previousTab = currentTab
         }
         currentTab = tab
-        if (currentTab == TransfersTab.COMPLETED_TAB) {
-            transfersManagement.setAreFailedTransfers(false)
-        }
     }
 
     /**
@@ -309,10 +318,12 @@ class TransfersViewModel @Inject constructor(
      * @param transfer transfer to add
      */
     private fun startTransfer(transfer: Transfer) {
-        val current = activeTransfer.value.toMutableList()
-        current.add(transfer)
-        current.sortBy { it.priority }
-        _activeTransfers.update { current }
+        viewModelScope.launch(ioDispatcher) {
+            val current = activeTransfer.value.toMutableList()
+            current.add(transfer)
+            current.sortBy { it.priority }
+            _activeTransfers.update { current }
+        }
     }
 
     /**
@@ -321,17 +332,19 @@ class TransfersViewModel @Inject constructor(
      * @param transfer
      */
     private fun transferFinished(transfer: Transfer) {
-        val current = activeTransfer.value.toMutableList()
-        current.indexOfFirst {
-            it.tag == transfer.tag
-        }.takeIf { pos -> pos in current.indices }
-            ?.let { pos ->
-                current.removeAt(pos)
-                _activeTransfers.update { current }
-                _activeState.update {
-                    ActiveTransfersState.TransferFinishedUpdated(pos, current)
+        viewModelScope.launch(ioDispatcher) {
+            val current = activeTransfer.value.toMutableList()
+            current.indexOfFirst {
+                it.tag == transfer.tag
+            }.takeIf { pos -> pos in current.indices }
+                ?.let { pos ->
+                    current.removeAt(pos)
+                    _activeTransfers.update { current }
+                    _activeState.update {
+                        ActiveTransfersState.TransferFinishedUpdated(pos, current)
+                    }
                 }
-            }
+        }
     }
 
     /**
@@ -342,17 +355,6 @@ class TransfersViewModel @Inject constructor(
         getTransferByTagUseCase(tag)?.let { transfer ->
             Timber.d("The transfer with tag : $tag has been paused/resumed, left: ${_activeTransfers.value.size}")
             updateTransfer(transfer)
-        }
-    }
-
-    /**
-     * Adds new completed transfer.
-     *
-     * @param transfer the transfer to add
-     */
-    private fun completedTransferFinished() {
-        if (currentTab == TransfersTab.COMPLETED_TAB) {
-            transfersManagement.setAreFailedTransfers(false)
         }
     }
 
@@ -368,15 +370,10 @@ class TransfersViewModel @Inject constructor(
         }
 
     /**
-     * Removes all completed transfers.
+     * Removes all the cache files which were cancelled or failed while uploading.
      */
-    fun deleteFailedOrCancelledTransferFiles() = viewModelScope.launch(ioDispatcher) {
-        runCatching { getFailedOrCanceledTransfersUseCase() }
-            .onSuccess { transfers ->
-                transfers.forEach { transfer ->
-                    File(transfer.originalPath).takeIf { it.exists() }?.delete()
-                }
-            }
+    fun deleteFailedOrCancelledTransferCacheFiles() = viewModelScope.launch(ioDispatcher) {
+        runCatching { deleteFailedOrCancelledTransferCacheFilesUseCase() }
     }
 
     /**
@@ -476,17 +473,54 @@ class TransfersViewModel @Inject constructor(
     fun retryAllTransfers() = viewModelScope.launch(ioDispatcher) {
         runCatching { getFailedOrCanceledTransfersUseCase() }
             .onSuccess { transfers ->
+                var cannotReadCount = 0
+
                 transfers.forEach { transfer ->
-                    retryTransfer(transfer)
-                    deleteCompletedTransferUseCase(transfer, false)
+                    if (canReadTransferUri(transfer)) {
+                        retryCompletedTransfer(transfer)
+                    } else {
+                        cannotReadCount++
+                    }
+                }
+
+                if (cannotReadCount > 0) {
+                    _uiState.update { state -> state.copy(readRetryError = cannotReadCount) }
                 }
             }
     }
+
+    private suspend fun canReadTransferUri(transfer: CompletedTransfer) =
+        if (transfer.type == MegaTransfer.TYPE_UPLOAD) {
+            val appData = transfer.appData?.let { transferAppDataMapper(it) }
+            val path = appData?.getOriginalContentUri() ?: transfer.originalPath
+
+            canReadUriUseCase(path)
+        } else {
+            true
+        }
 
     /**
      * trigger retry transfer event
      */
     suspend fun retryTransfer(transfer: CompletedTransfer) {
+        if (canReadTransferUri(transfer)) {
+            retryCompletedTransfer(transfer)
+        } else {
+            _uiState.update { state -> state.copy(readRetryError = 1) }
+        }
+    }
+
+    /**
+     * Consume retry read error
+     */
+    fun onConsumeRetryReadError() {
+        _uiState.update { state -> state.copy(readRetryError = null) }
+    }
+
+    /**
+     * trigger retry transfer event
+     */
+    private suspend fun retryCompletedTransfer(transfer: CompletedTransfer) {
         with(transfer) {
             when (type) {
                 MegaTransfer.TYPE_DOWNLOAD -> {
@@ -508,19 +542,17 @@ class TransfersViewModel @Inject constructor(
                     val path = appData?.getOriginalContentUri() ?: originalPath
 
                     if (isChatUpload) {
-                        viewModelScope.launch {
-                            runCatching {
-                                retryChatUploadUseCase(appData?.mapNotNull { it as? TransferAppData.ChatUpload }
-                                    ?: emptyList())
-                            }.onFailure {
-                                //No uploads were retried, try general upload only.
-                                _uiState.update { state ->
-                                    state.copy(
-                                        startEvent = triggered(
-                                            getUploadTriggerEvent(path, parentHandle)
-                                        )
+                        runCatching {
+                            retryChatUploadUseCase(appData?.mapNotNull { it as? TransferAppData.ChatUpload }
+                                ?: emptyList())
+                        }.onFailure {
+                            //No uploads were retried, try general upload only.
+                            _uiState.update { state ->
+                                state.copy(
+                                    startEvent = triggered(
+                                        getUploadTriggerEvent(path, parentHandle)
                                     )
-                                }
+                                )
                             }
                         }
                     } else {
@@ -531,6 +563,7 @@ class TransfersViewModel @Inject constructor(
                 else -> throw IllegalArgumentException("This transfer type cannot be retried here for now")
             }.let { event ->
                 if (event is TransferTriggerEvent) {
+                    deleteCompletedTransferUseCase(transfer, false)
                     _uiState.update { state -> state.copy(startEvent = triggered(event)) }
                 }
             }

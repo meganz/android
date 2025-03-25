@@ -161,11 +161,15 @@ class IndividualCallFragment : MeetingBaseFragment() {
             raisedHandIcon?.isVisible = it
         }
 
-        viewLifecycleOwner.collectFlow(inMeetingViewModel.state.map { it.shouldUpdateLocalAVFlags }
-            .distinctUntilChanged()) { shouldUpdateLocalAVFlags ->
-            if (shouldUpdateLocalAVFlags) {
-                inMeetingViewModel.checkUpdatesInLocalAVFlags(update = false)
+        viewLifecycleOwner.collectFlow(inMeetingViewModel.state.map { it.hasLocalVideo }
+            .distinctUntilChanged()) {
+            if (inMeetingViewModel.state.value.isMeAsParticipant(peerId)) {
                 checkItIsOnlyAudio()
+                if (it) {
+                    videoOnUI(peerId, clientId)
+                } else {
+                    videoOffUI(peerId, clientId)
+                }
             }
         }
 

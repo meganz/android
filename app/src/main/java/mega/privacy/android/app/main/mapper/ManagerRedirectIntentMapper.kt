@@ -7,11 +7,10 @@ import dagger.hilt.android.scopes.ActivityScoped
 import mega.privacy.android.app.main.ManagerActivity
 import mega.privacy.android.app.presentation.extensions.serializable
 import mega.privacy.android.app.presentation.filelink.FileLinkComposeActivity
+import mega.privacy.android.app.presentation.filestorage.FileStorageActivity
 import mega.privacy.android.app.presentation.login.LoginActivity
 import mega.privacy.android.app.presentation.manager.model.TransfersTab
-import mega.privacy.android.app.upgradeAccount.UpgradeAccountActivity
 import mega.privacy.android.app.utils.Constants
-import mega.privacy.android.domain.entity.Feature
 import timber.log.Timber
 import javax.inject.Inject
 
@@ -79,6 +78,54 @@ class ManagerRedirectIntentMapper @Inject constructor(private val activity: Acti
                         ManagerActivity.TRANSFERS_TAB,
                         intent.serializable<TransfersTab>(ManagerActivity.TRANSFERS_TAB)
                             ?: TransfersTab.NONE
+                    )
+                }
+
+            Constants.ACTION_LOCATE_DOWNLOADED_FILE -> Intent(activity, LoginActivity::class.java)
+                .apply {
+                    putExtra(Constants.VISIBLE_FRAGMENT, Constants.LOGIN_FRAGMENT)
+                    flags = Intent.FLAG_ACTIVITY_CLEAR_TOP
+                    action = Constants.ACTION_LOCATE_DOWNLOADED_FILE
+                    putExtra(
+                        Constants.INTENT_EXTRA_IS_OFFLINE_PATH,
+                        intent.getBooleanExtra(Constants.INTENT_EXTRA_IS_OFFLINE_PATH, false)
+                    )
+                    intent.getStringExtra(FileStorageActivity.EXTRA_PATH)?.let {
+                        putExtra(FileStorageActivity.EXTRA_PATH, it)
+                    }
+                    intent.getStringExtra(FileStorageActivity.EXTRA_FILE_NAME)?.let {
+                        putExtra(FileStorageActivity.EXTRA_FILE_NAME, it)
+                    }
+                }
+
+            Constants.ACTION_SHOW_WARNING -> Intent(activity, LoginActivity::class.java)
+                .apply {
+                    putExtra(Constants.VISIBLE_FRAGMENT, Constants.LOGIN_FRAGMENT)
+                    flags = Intent.FLAG_ACTIVITY_CLEAR_TOP
+                    action = Constants.ACTION_SHOW_WARNING
+                    intent.getStringExtra(Constants.INTENT_EXTRA_WARNING_MESSAGE)?.let {
+                        putExtra(Constants.INTENT_EXTRA_WARNING_MESSAGE, it)
+                    }
+                }
+
+            Constants.ACTION_EXPLORE_ZIP -> Intent(activity, LoginActivity::class.java)
+                .apply {
+                    putExtra(Constants.VISIBLE_FRAGMENT, Constants.LOGIN_FRAGMENT)
+                    flags = Intent.FLAG_ACTIVITY_CLEAR_TOP
+                    action = Constants.ACTION_EXPLORE_ZIP
+                    intent.getStringExtra(Constants.EXTRA_PATH_ZIP)?.let {
+                        putExtra(Constants.EXTRA_PATH_ZIP, it)
+                    }
+                }
+
+            Constants.ACTION_CANCEL_TRANSFER -> Intent(activity, LoginActivity::class.java)
+                .apply {
+                    putExtra(Constants.VISIBLE_FRAGMENT, Constants.LOGIN_FRAGMENT)
+                    flags = Intent.FLAG_ACTIVITY_CLEAR_TOP
+                    action = Constants.ACTION_CANCEL_TRANSFER
+                    putExtra(
+                        Constants.INTENT_EXTRA_TAG,
+                        intent.getIntExtra(Constants.INTENT_EXTRA_TAG, -1)
                     )
                 }
 

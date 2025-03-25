@@ -6,29 +6,40 @@ import android.os.Bundle
 import android.view.View
 import android.widget.Toast
 import androidx.core.net.toUri
-import androidx.fragment.app.activityViewModels
+import androidx.fragment.app.viewModels
+import androidx.lifecycle.lifecycleScope
 import androidx.preference.Preference
+import androidx.preference.PreferenceCategory
 import androidx.preference.SwitchPreferenceCompat
 import dagger.hilt.android.AndroidEntryPoint
+import kotlinx.coroutines.launch
 import mega.privacy.android.app.MegaApplication
 import mega.privacy.android.app.R
 import mega.privacy.android.app.activities.WebViewActivity
 import mega.privacy.android.app.arch.extensions.collectFlow
 import mega.privacy.android.app.components.TwoButtonsPreference
+import mega.privacy.android.app.constants.SettingsConstants.KEY_ADS_PERSONALIZATION
+import mega.privacy.android.app.constants.SettingsConstants.KEY_ADS_SETTING
 import mega.privacy.android.app.constants.SettingsConstants.KEY_COOKIE_ACCEPT
 import mega.privacy.android.app.constants.SettingsConstants.KEY_COOKIE_ADS
 import mega.privacy.android.app.constants.SettingsConstants.KEY_COOKIE_ANALYTICS
 import mega.privacy.android.app.constants.SettingsConstants.KEY_COOKIE_POLICIES
+import mega.privacy.android.app.constants.SettingsConstants.KEY_COOKIE_SETTINGS
 import mega.privacy.android.app.fragments.settingsFragments.SettingsBaseFragment
+import mega.privacy.android.app.presentation.advertisements.GoogleAdsManager
 import mega.privacy.android.domain.entity.settings.cookie.CookieType
 import mega.privacy.android.domain.entity.settings.cookie.CookieType.ADVERTISEMENT
 import mega.privacy.android.domain.entity.settings.cookie.CookieType.ANALYTICS
+import javax.inject.Inject
 
 @AndroidEntryPoint
 class CookieSettingsFragment : SettingsBaseFragment(),
-    Preference.OnPreferenceChangeListener {
+    Preference.OnPreferenceChangeListener, Preference.OnPreferenceClickListener {
 
-    private val viewModel by activityViewModels<CookieSettingsViewModel>()
+    @Inject
+    lateinit var googleAdsManager: GoogleAdsManager
+
+    private val viewModel by viewModels<CookieSettingsViewModel>()
 
     private var acceptCookiesPreference: SwitchPreferenceCompat? = null
     private var analyticsCookiesPreference: SwitchPreferenceCompat? = null
@@ -36,6 +47,9 @@ class CookieSettingsFragment : SettingsBaseFragment(),
     private var policiesPreference: TwoButtonsPreference? = null
     private var showAdsCookiePreference = false
     private var cookiePolicyLink: String? = null
+    private var adsSettings: PreferenceCategory? = null
+    private var adsPersonalization: Preference? = null
+    private var settingsCookie: PreferenceCategory? = null
 
     override fun onCreatePreferences(bundle: Bundle?, rootKey: String?) {
         addPreferencesFromResource(R.xml.preferences_cookie)
@@ -44,6 +58,9 @@ class CookieSettingsFragment : SettingsBaseFragment(),
         analyticsCookiesPreference = findPreference(KEY_COOKIE_ANALYTICS)
         adsCookiesPreference = findPreference(KEY_COOKIE_ADS)
         policiesPreference = findPreference(KEY_COOKIE_POLICIES)
+        adsSettings = findPreference(KEY_ADS_SETTING) as? PreferenceCategory
+        adsPersonalization = findPreference(KEY_ADS_PERSONALIZATION)
+        settingsCookie = findPreference(KEY_COOKIE_SETTINGS) as? PreferenceCategory
     }
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
@@ -62,16 +79,24 @@ class CookieSettingsFragment : SettingsBaseFragment(),
                 if (showAdsCookiePreference) uiState.cookiePolicyWithAdsLink else COOKIE_URL
         }
         viewModel.onEnabledCookies().observe(viewLifecycleOwner, ::showCookies)
-        viewModel.onUpdateResult().observe(viewLifecycleOwner) { success ->
-            if (success) {
+        viewLifecycleOwner.collectFlow(viewModel.onUpdateResult()) { value ->
+            if (value == true) {
                 (context?.applicationContext as MegaApplication?)?.checkEnabledCookies()
-            } else if (isVisible) {
+            } else if (value == false) {
                 Toast.makeText(requireContext(), R.string.error_unknown, Toast.LENGTH_LONG).show()
             }
         }
     }
 
     private fun setupView() {
+        viewLifecycleOwner.lifecycleScope.launch {
+            googleAdsManager.checkLatestConsentInformation(requireActivity()) {
+                with(googleAdsManager.isPrivacyOptionsRequired) {
+                    adsSettings?.isVisible = this
+                    settingsCookie?.isVisible = this
+                }
+            }
+        }
         acceptCookiesPreference?.onPreferenceChangeListener = this
         analyticsCookiesPreference?.onPreferenceChangeListener = this
         adsCookiesPreference?.onPreferenceChangeListener = this
@@ -89,6 +114,7 @@ class CookieSettingsFragment : SettingsBaseFragment(),
                 openBrowser(PRIVACY_URL.toUri())
             }
         }
+        adsPersonalization?.onPreferenceClickListener = this
     }
 
     /**
@@ -137,6 +163,17 @@ class CookieSettingsFragment : SettingsBaseFragment(),
         }
 
         return false
+    }
+
+    /**
+     * Called when a preference has been clicked.
+     */
+    override fun onPreferenceClick(preference: Preference): Boolean {
+        when (preference.key) {
+            adsPersonalization?.key -> googleAdsManager.showPrivacyOptionsForm(requireActivity())
+        }
+
+        return true
     }
 
     /**

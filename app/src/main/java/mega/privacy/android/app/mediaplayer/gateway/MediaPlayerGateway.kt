@@ -1,13 +1,16 @@
 package mega.privacy.android.app.mediaplayer.gateway
 
+import android.view.Surface
 import androidx.annotation.OptIn
 import androidx.media3.common.MediaItem
 import androidx.media3.common.Player
+import androidx.media3.exoplayer.ExoPlayer
 import androidx.media3.exoplayer.source.ShuffleOrder
 import androidx.media3.ui.PlayerView
 import kotlinx.coroutines.flow.Flow
 import mega.privacy.android.app.mediaplayer.model.MediaPlaySources
 import mega.privacy.android.app.mediaplayer.model.PlayerNotificationCreatedParams
+import mega.privacy.android.app.mediaplayer.model.SpeedPlaybackItem
 import mega.privacy.android.app.mediaplayer.service.MediaPlayerCallback
 import mega.privacy.android.domain.entity.mediaplayer.RepeatToggleMode
 
@@ -32,7 +35,7 @@ interface MediaPlayerGateway {
         repeatToggleMode: RepeatToggleMode,
         nameChangeCallback: (title: String?, artist: String?, album: String?) -> Unit,
         mediaPlayerCallback: MediaPlayerCallback,
-    )
+    ): ExoPlayer
 
     /**
      * create player control notification
@@ -223,11 +226,11 @@ interface MediaPlayerGateway {
     fun hideSubtitle()
 
     /**
-     * Update the playback speed
+     * Update SpeedPlaybackItem
      *
-     * @param speed playback speed
+     * @param item [SpeedPlaybackItem]
      */
-    fun updatePlaybackSpeed(speed: Float)
+    fun updatePlaybackSpeed(item: SpeedPlaybackItem)
 
     /**
      * Update the mediaNotAllowPlayState
@@ -242,4 +245,28 @@ interface MediaPlayerGateway {
      * @return mediaNotAllowPlayState
      */
     fun monitorMediaNotAllowPlayState(): Flow<Boolean>
+
+    /**
+     * Set surface to ExoPlayer
+     *
+     * @param surface Surface
+     */
+    fun setSurface(surface: Surface)
+
+    /**
+     * Get current SpeedPlaybackItem
+     *
+     * @return current [SpeedPlaybackItem]
+     */
+    fun getCurrentSpeedPlaybackItem(): SpeedPlaybackItem
+
+    /**
+     * Media player plays next item
+     */
+    fun playNext()
+
+    /**
+     * Media player plays previous item
+     */
+    fun playPrev()
 }

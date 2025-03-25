@@ -24,7 +24,7 @@ import androidx.compose.ui.unit.dp
 import mega.privacy.android.core.R
 import mega.privacy.android.shared.original.core.ui.preview.BooleanProvider
 import mega.privacy.android.shared.original.core.ui.preview.CombinedThemePreviews
-import mega.privacy.android.shared.original.core.ui.theme.OriginalTempTheme
+import mega.privacy.android.shared.original.core.ui.theme.OriginalTheme
 import mega.privacy.android.shared.original.core.ui.theme.MegaOriginalTheme
 import mega.privacy.android.shared.original.core.ui.theme.extensions.conditional
 
@@ -102,7 +102,7 @@ private fun PreviewMegaCheckboxSquare(
 
 @Composable
 private fun Preview(checked: Boolean, rounded: Boolean) {
-    OriginalTempTheme(isDark = isSystemInDarkTheme()) {
+    OriginalTheme(isDark = isSystemInDarkTheme()) {
         var interactiveChecked by remember { mutableStateOf(checked) }
         MegaCheckbox(
             modifier = Modifier,

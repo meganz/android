@@ -49,7 +49,7 @@ pipeline {
         LC_ALL = 'en_US.UTF-8'
         LANG = 'en_US.UTF-8'
 
-        NDK_ROOT = '/opt/buildtools/android-sdk/ndk/21.3.6528147'
+        NDK_ROOT = '/opt/buildtools/android-sdk/ndk/27.1.12297006'
         JAVA_HOME = '/opt/buildtools/zulu17.42.19-ca-jdk17.0.7-macosx'
         ANDROID_HOME = '/opt/buildtools/android-sdk'
 
@@ -115,6 +115,7 @@ pipeline {
                         def appVersionInfo = common.readAppVersion()
                         def version = appVersionInfo[0]
                         def versionCode = appVersionInfo[2]
+                        def appGitHash = appVersionInfo[3]
                         def (slackChannelId, qaSlackChannelId) = common.fetchSlackChannelIdsByReleaseVersion(version)
 
                         if (slackChannelId == "") {
@@ -146,7 +147,7 @@ pipeline {
 
                         sh """
                             cd ${WORKSPACE}
-                            echo ${versionCode} > ${releaseInfo}
+                            echo ${versionCode},${appGitHash} > ${releaseInfo}
                         """
 
                         common.uploadToArtifactory(releaseInfo, releaseInfoPath)
@@ -272,7 +273,7 @@ pipeline {
             steps {
                 script {
                     BUILD_STEP = 'Build GMS APK'
-                    sh './gradlew clean app:assembleGmsRelease'
+                    sh './gradlew --no-daemon clean app:assembleGmsRelease'
                 }
             }
         }
@@ -315,7 +316,7 @@ pipeline {
                     BUILD_STEP = 'Upload Firebase Crashlytics symbol files'
                     sh """
                     cd $WORKSPACE
-                    ./gradlew app:uploadCrashlyticsSymbolFileGmsRelease
+                    ./gradlew --no-daemon app:uploadCrashlyticsSymbolFileGmsRelease
                     """
                 }
             }
@@ -327,7 +328,7 @@ pipeline {
             steps {
                 script {
                     BUILD_STEP = 'Build GMS AAB'
-                    sh './gradlew clean app:bundleGmsRelease'
+                    sh './gradlew --no-daemon clean app:bundleGmsRelease'
                 }
             }
         }
@@ -398,9 +399,12 @@ pipeline {
                                 for FILE in *.txt; do
                                     curl -u${ARTIFACTORY_USER}:${ARTIFACTORY_ACCESS_TOKEN} -T ${FILE} \"${TARGET_PATH}\"
                                 done
+                                
+                                echo Uploading mapping.txt
+                                zip -j mapping.txt.zip ${WORKSPACE}/app/build/outputs/mapping/gmsRelease/mapping.txt
+                                curl -u${ARTIFACTORY_USER}:${ARTIFACTORY_ACCESS_TOKEN} -T mapping.txt.zip \"${TARGET_PATH}\"
                             '''
                         }
-
                     }
                 }
             }
@@ -425,7 +429,7 @@ pipeline {
                         ]) {
                             sh 'echo $TRANSIFEX_BOT_TOKEN'
                             sh 'echo $TRANSIFEX_BOT_URL'
-                            sh './gradlew deleteOldStrings'
+                            sh './gradlew --no-daemon deleteOldStrings'
                         }
                     }
                 }
@@ -446,7 +450,7 @@ pipeline {
                             gitUsernamePassword(credentialsId: 'Gitlab-Access-Token', gitToolName: 'Default')
                     ]) {
                         if (isMajorRelease(common)) {
-                            sh './gradlew readReleaseNotes'
+                            sh './gradlew --no-daemon readReleaseNotes'
                             RELEASE_NOTES_CONTENT = common.releaseNotes(MAJOR_RELEASE_NOTES)
                             println("Major release notes: ${RELEASE_NOTES_CONTENT}")
                         } else {
@@ -454,11 +458,14 @@ pipeline {
                         }
                     }
 
+                    def parameters = parseDeliverAppStoreParameters(env.gitlabTriggerPhrase)
+                    def rolloutPercentage = parameters[0]
+
                     // Upload the AAB to Google Play
                     androidApkUpload googleCredentialsId: 'GOOGLE_PLAY_SERVICE_ACCOUNT_CREDENTIAL',
                             filesPattern: 'archive/*-gms-release.aab',
                             trackName: 'alpha',
-                            rolloutPercentage: '100',
+                            rolloutPercentage: rolloutPercentage,
                             additionalVersionCodes: '233140859',
                             nativeDebugSymbolFilesPattern: "archive/${NATIVE_SYMBOLS_FILE}",
                             recentChangeList: common.getRecentChangeList(RELEASE_NOTES_CONTENT),
@@ -482,7 +489,7 @@ pipeline {
                             string(credentialsId: 'JIRA_API_URL', variable: 'JIRA_API_URL'),
                             string(credentialsId: 'JIRA_PROJECT_NAME_AND_ID_TABLE', variable: 'JIRA_PROJECTS'),
                     ]) {
-                        sh("./gradlew createJiraVersion --rv ${releaseVersion} --rd ${releaseDate}")
+                        sh("./gradlew --no-daemon createJiraVersion --rv ${releaseVersion} --rd ${releaseDate}")
                     }
                 }
             }
@@ -503,7 +510,7 @@ pipeline {
                             string(credentialsId: 'MOBILE_DEV_TEAM_SLACK_CHANNEL_ID', variable: 'MOBILE_DEV_TEAM_SLACK_CHANNEL_ID'),
                             string(credentialsId: 'RELEASE_ANNOUNCEMENT_SLACK_TOKEN', variable: 'RELEASE_ANNOUNCEMENT_SLACK_TOKEN'),
                     ]) {
-                        sh("./gradlew sendCodeFreezeReminder --current-version ${currentVersion} --next-version ${nextVersion} --app MEGA")
+                        sh("./gradlew --no-daemon sendCodeFreezeReminder --current-version ${currentVersion} --next-version ${nextVersion} --app MEGA")
                     }
                 }
             }
@@ -520,7 +527,7 @@ pipeline {
                             gitUsernamePassword(credentialsId: 'Gitlab-Access-Token', gitToolName: 'Default'),
                     ]) {
                         util.useGpg() {
-                            sh './gradlew fetchAnalyticDependency'
+                            sh './gradlew --no-daemon fetchAnalyticDependency'
                         }
                     }
                 }
@@ -540,8 +547,9 @@ pipeline {
                     def releaseInfoPath = "${env.ARTIFACTORY_BASE_URL}/artifactory/android-mega/release/v${releaseVersion}/${releaseInfo}"
 
                     common.downloadFromArtifactory(releaseInfoPath, releaseInfo)
-                    def content = readFile(WORKSPACE + "/" + releaseInfo)
-                    def versionCode = content.trim()
+                    def content = readFile(WORKSPACE + "/" + releaseInfo).trim().split(",")
+                    def versionCode = content[0]
+                    def appGitHash = content[1]
 
                     withCredentials([
                             string(credentialsId: 'ANDROID_TRANSIFIX_AUTHORIZATION_TOKEN', variable: 'TRANSIFEX_TOKEN'),
@@ -558,10 +566,10 @@ pipeline {
                             usernamePassword(credentialsId: 'GitHub-Access-Token', usernameVariable: 'USERNAME', passwordVariable: 'TOKEN')
                     ]) {
                         util.useGpg() {
-                            sh("./gradlew postRelease --rv ${releaseVersion}")
-                            sh("./gradlew setReleaseStatus --rv ${releaseVersion}")
-                            sh("./gradlew createGitlabRelease --rv ${releaseVersion} --vc ${versionCode}")
-                            sh("./gradlew createGithubRelease --rv ${releaseVersion} --vc ${versionCode}")
+                            sh("./gradlew --no-daemon postRelease --rv ${releaseVersion}")
+                            sh("./gradlew --no-daemon setReleaseStatus --rv ${releaseVersion}")
+                            sh("./gradlew --no-daemon createGitlabRelease --rv ${releaseVersion} --vc ${versionCode} --hash ${appGitHash}")
+                            sh("./gradlew --no-daemon createGithubRelease --rv ${releaseVersion} --vc ${versionCode} --hash ${appGitHash}")
                         }
                     }
                 }
@@ -749,6 +757,40 @@ private def parseCreateJiraVersionParameters(String fullCommand) {
     return [releaseVersion, releaseDate]
 }
 
+/**
+ * parse the parameters of 'deliver_appStore' command
+ * If `--rollout` is not provided, default to 100% rollout. Otherwise, use the provided value.
+ * @param fullCommand
+ * @return
+ */
+private def parseDeliverAppStoreParameters(String fullCommand) {
+    println("Parsing deliver_appStore parameters")
+    String[] parameters = fullCommand.split("\\s+(?=([^\"]*\"[^\"]*\")*[^\"]*\$)")
+
+    String paramRollout = "rollout"
+    Options options = new Options()
+    Option releaseVersionOption = Option
+            .builder(paramRollout)
+            .longOpt(paramRollout)
+            .argName("Rollout Percentage")
+            .hasArg()
+            .required(false)
+            .desc("Rollout percentage of the release")
+            .build()
+    options.addOption(releaseVersionOption)
+
+    CommandLineParser commandLineParser = new DefaultParserWrapper()
+    CommandLine commandLine = commandLineParser.parse(options, parameters)
+
+    String rolloutPercentage = "100"  //default to 100% rollout
+    if (commandLine.hasOption(paramRollout)) {
+        rolloutPercentage = commandLine.getOptionValue(paramRollout)
+    }
+    println("rolloutPercentage: $rolloutPercentage")
+
+    return [rolloutPercentage]
+}
+
 private def parseSendCodeFreezeReminderParameters(String fullCommand) {
     println("Parsing createJiraVersion parameters")
     String[] parameters = fullCommand.split("\\s+(?=([^\"]*\"[^\"]*\")*[^\"]*\$)")
@@ -810,7 +852,7 @@ private boolean isMajorRelease(Object common) {
 private boolean triggeredByDeliverAppStore() {
     return isOnReleaseBranch() &&
             env.gitlabTriggerPhrase != null &&
-            env.gitlabTriggerPhrase == "deliver_appStore"
+            env.gitlabTriggerPhrase.trim().startsWith("deliver_appStore")
 }
 
 /**

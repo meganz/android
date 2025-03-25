@@ -1,6 +1,7 @@
 package mega.privacy.android.domain.entity
 
 import mega.privacy.android.domain.entity.chat.ChatScheduledMeeting
+import mega.privacy.android.domain.entity.chat.ChatScheduledMeetingOccurr
 
 /**
  * User alert
@@ -74,6 +75,7 @@ sealed interface ScheduledMeetingAlert {
  * @property seen
  * @property createdTime
  * @property isOwnChange
+ * @property title
  */
 data class UnknownAlert(
     override val id: Long,
@@ -636,6 +638,7 @@ data class UpdatedScheduledMeetingDescriptionAlert(
  * @property startDate
  * @property endDate
  * @property hasDateChanged
+ * @property hasDayOfWeekChanged
  * @property hasTimeChanged
  * @property isRecurring
  * @property isOccurrence
@@ -655,6 +658,7 @@ data class UpdatedScheduledMeetingDateTimeAlert(
     override val isOccurrence: Boolean,
     override val scheduledMeeting: ChatScheduledMeeting?,
     val hasDateChanged: Boolean,
+    val hasDayOfWeekChanged: Boolean,
     val hasTimeChanged: Boolean,
 ) : UserAlert, ScheduledMeetingAlert
 
@@ -672,6 +676,7 @@ data class UpdatedScheduledMeetingDateTimeAlert(
  * @property endDate
  * @property isRecurring
  * @property isOccurrence
+ * @property occurrenceChanged
  * @property scheduledMeeting
  */
 data class UpdatedScheduledMeetingCancelAlert(
@@ -684,6 +689,75 @@ data class UpdatedScheduledMeetingCancelAlert(
     override val email: String?,
     override val startDate: Long?,
     override val endDate: Long?,
+    override val isRecurring: Boolean,
+    override val isOccurrence: Boolean,
+    val occurrenceChanged: ChatScheduledMeetingOccurr?,
+    override val scheduledMeeting: ChatScheduledMeeting?,
+) : UserAlert, ScheduledMeetingAlert
+
+/**
+ * Updated scheduled meeting timezone alert
+ *
+ * @property id
+ * @property seen
+ * @property createdTime
+ * @property isOwnChange
+ * @property chatId
+ * @property title
+ * @property email
+ * @property startDate
+ * @property endDate
+ * @property isRecurring
+ * @property isOccurrence
+ * @property timezone
+ * @property scheduledMeeting
+ */
+data class UpdatedScheduledMeetingTimezoneAlert(
+    override val id: Long,
+    override val seen: Boolean,
+    override val createdTime: Long,
+    override val isOwnChange: Boolean,
+    override val chatId: Long,
+    override val title: String,
+    override val email: String?,
+    override val startDate: Long?,
+    override val endDate: Long?,
+    val timezone: String?,
+    override val isRecurring: Boolean,
+    override val isOccurrence: Boolean,
+    override val scheduledMeeting: ChatScheduledMeeting?,
+) : UserAlert, ScheduledMeetingAlert
+
+/**
+ * Updated scheduled meeting rules alert
+ *
+ * @property id
+ * @property seen
+ * @property createdTime
+ * @property isOwnChange
+ * @property chatId
+ * @property title
+ * @property email
+ * @property startDate
+ * @property endDate
+ * @property hasDateChanged
+ * @property hasDayOfWeekChanged
+ * @property isRecurring
+ * @property isOccurrence
+ * @property scheduledMeeting
+ */
+data class UpdatedScheduledMeetingRulesAlert(
+    override val id: Long,
+    override val seen: Boolean,
+    override val createdTime: Long,
+    override val isOwnChange: Boolean,
+    override val chatId: Long,
+    override val title: String,
+    override val email: String?,
+    override val startDate: Long?,
+    override val endDate: Long?,
+    val hasDateChanged: Boolean,
+    val hasDayOfWeekChanged: Boolean,
     override val isRecurring: Boolean,
     override val isOccurrence: Boolean,
     override val scheduledMeeting: ChatScheduledMeeting?,

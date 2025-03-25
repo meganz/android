@@ -20,6 +20,7 @@ internal enum class FragmentTag {
     PHOTOS_FILTER,
     RUBBISH_BIN_COMPOSE,
     CLOUD_DRIVE_COMPOSE,
+    CLOUD_DRIVE_SYNCS,
     DEVICE_CENTER;
 
     val tag: String
@@ -43,6 +44,7 @@ internal enum class FragmentTag {
             PHOTOS_FILTER -> "fragmentPhotosFilter"
             RUBBISH_BIN_COMPOSE -> "rubbishBinComposeFragment"
             CLOUD_DRIVE_COMPOSE -> "cloudDriveComposeFragment"
+            CLOUD_DRIVE_SYNCS -> "cloudDriveSyncsFragment"
             DEVICE_CENTER -> "deviceCenterFragment"
         }
 }

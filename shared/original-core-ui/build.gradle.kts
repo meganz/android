@@ -48,6 +48,7 @@ dependencies {
     implementation(lib.coil.compose)
     implementation(lib.balloon)
     implementation(google.accompanist.placeholder)
+    api(lib.mega.core.ui)
     implementation(lib.mega.core.ui.tokens)
     implementation(lib.kotlinx.collections.immutable)
 

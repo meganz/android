@@ -40,8 +40,8 @@ import mega.privacy.android.shared.original.core.ui.controls.layouts.MegaScaffol
 import mega.privacy.android.shared.original.core.ui.controls.text.MegaText
 import mega.privacy.android.shared.original.core.ui.preview.CombinedThemePreviews
 import mega.privacy.android.shared.original.core.ui.theme.MegaOriginalTheme
-import mega.privacy.android.shared.original.core.ui.theme.OriginalTempTheme
-import mega.privacy.android.shared.original.core.ui.theme.values.TextColor
+import mega.privacy.android.shared.original.core.ui.theme.OriginalTheme
+import mega.android.core.ui.theme.values.TextColor
 
 /**
  * BottomSheet
@@ -86,6 +86,7 @@ fun BottomSheet(
 fun BottomSheet(
     modalSheetState: ModalBottomSheetState,
     sheetBody: @Composable ColumnScope.() -> Unit,
+    bottomInsetPadding: Boolean = true,
     modifier: Modifier = Modifier,
     sheetElevation: Dp = ModalBottomSheetDefaults.Elevation,
     sheetGesturesEnabled: Boolean = true,
@@ -110,11 +111,13 @@ fun BottomSheet(
         sheetBackgroundColor = MegaOriginalTheme.colors.background.surface1,
         sheetContent = {
             sheetBody()
-            Spacer(
-                Modifier.windowInsetsBottomHeight(
-                    WindowInsets.systemBars
+            if (bottomInsetPadding) {
+                Spacer(
+                    Modifier.windowInsetsBottomHeight(
+                        WindowInsets.systemBars
+                    )
                 )
-            )
+            }
         },
     ) {
         content?.invoke()
@@ -130,7 +133,7 @@ private fun BottomSheetPreview() {
         initialValue = ModalBottomSheetValue.HalfExpanded,
         skipHalfExpanded = false,
     )
-    OriginalTempTheme(isDark = isSystemInDarkTheme()) {
+    OriginalTheme(isDark = isSystemInDarkTheme()) {
         BottomSheet(
             modalSheetState = modalSheetState,
             sheetHeader = {

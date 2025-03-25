@@ -75,7 +75,6 @@ import mega.privacy.android.app.meeting.adapter.Participant
 import mega.privacy.android.app.meeting.gateway.RTCAudioManagerGateway
 import mega.privacy.android.app.meeting.listeners.BottomFloatingPanelListener
 import mega.privacy.android.app.meeting.pip.PictureInPictureCallFragment
-import mega.privacy.android.app.objects.PasscodeManagement
 import mega.privacy.android.app.presentation.chat.dialog.AddParticipantsNoContactsDialogFragment
 import mega.privacy.android.app.presentation.chat.dialog.AddParticipantsNoContactsLeftToAddDialogFragment
 import mega.privacy.android.app.presentation.meeting.CallRecordingViewModel
@@ -121,7 +120,7 @@ import mega.privacy.android.domain.entity.meeting.ParticipantsSection
 import mega.privacy.android.domain.entity.meeting.SubtitleCallType
 import mega.privacy.android.domain.entity.meeting.TypeRemoteAVFlagChange
 import mega.privacy.android.shared.original.core.ui.controls.dialogs.MegaAlertDialog
-import mega.privacy.android.shared.original.core.ui.theme.OriginalTempTheme
+import mega.privacy.android.shared.original.core.ui.theme.OriginalTheme
 import nz.mega.sdk.MegaApiAndroid
 import nz.mega.sdk.MegaChatApiJava.MEGACHAT_INVALID_HANDLE
 import nz.mega.sdk.MegaUser.VISIBILITY_VISIBLE
@@ -136,9 +135,6 @@ class InMeetingFragment : MeetingBaseFragment(), BottomFloatingPanelListener, Sn
     @Inject
     @MegaApi
     lateinit var megaApi: MegaApiAndroid
-
-    @Inject
-    lateinit var passcodeManagement: PasscodeManagement
 
     @Inject
     lateinit var rtcAudioManagerGateway: RTCAudioManagerGateway
@@ -195,7 +191,6 @@ class InMeetingFragment : MeetingBaseFragment(), BottomFloatingPanelListener, Sn
     private lateinit var dragTouchListener: OnDragTouchListener
     private var bannerShouldBeShown = false
 
-    private var callStatus: ChatCallStatus? = null
     private var isParticipantSharingScreen: Boolean = false
 
     private lateinit var binding: InMeetingFragmentBinding
@@ -323,9 +318,7 @@ class InMeetingFragment : MeetingBaseFragment(), BottomFloatingPanelListener, Sn
             val speaker: Participant? =
                 if (participant.isSpeaker && !participant.hasHiRes) inMeetingViewModel.getSpeaker(
                     participant.peerId, participant.clientId
-                )?.let {
-                    it
-                } ?: run { null } else null
+                ) ?: run { null } else null
 
             val existSpeaker: Boolean = speaker != null
 
@@ -446,6 +439,7 @@ class InMeetingFragment : MeetingBaseFragment(), BottomFloatingPanelListener, Sn
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
         Timber.d("In the meeting fragment")
+        meetingActivity.consumeInsetsWithToolbar()
         updateCurrentOrientation()
         blink = AnimationUtils.loadAnimation(requireContext(), R.anim.blink)
 
@@ -460,7 +454,7 @@ class InMeetingFragment : MeetingBaseFragment(), BottomFloatingPanelListener, Sn
             setViewCompositionStrategy(ViewCompositionStrategy.DisposeOnViewTreeLifecycleDestroyed)
             setViewTreeViewModelStoreOwner(requireActivity())
             setContent {
-                OriginalTempTheme(isDark = true) {
+                OriginalTheme(isDark = true) {
                     SnackbarInMeetingView(
                         meetingActivityViewModel = sharedModel,
                         inMeetingViewModel = inMeetingViewModel
@@ -477,7 +471,7 @@ class InMeetingFragment : MeetingBaseFragment(), BottomFloatingPanelListener, Sn
                 val sharedState by sharedModel.state.collectAsStateWithLifecycle()
                 val state by inMeetingViewModel.state.collectAsStateWithLifecycle()
 
-                OriginalTempTheme(isDark = true) {
+                OriginalTheme(isDark = true) {
                     LeaveMeetingBottomSheetView(
                         state = state,
                         onAssignAndLeaveClick = {
@@ -520,7 +514,7 @@ class InMeetingFragment : MeetingBaseFragment(), BottomFloatingPanelListener, Sn
             setViewCompositionStrategy(ViewCompositionStrategy.DisposeOnViewTreeLifecycleDestroyed)
             setViewTreeViewModelStoreOwner(requireActivity())
             setContent {
-                OriginalTempTheme(isDark = true) {
+                OriginalTheme(isDark = true) {
                     MoreCallOptionsBottomSheetView()
                 }
             }
@@ -662,6 +656,7 @@ class InMeetingFragment : MeetingBaseFragment(), BottomFloatingPanelListener, Sn
         Timber.d("Update toolbar elements")
         val root = meetingActivity.binding.root
         toolbar = meetingActivity.binding.toolbar
+        toolbar.isVisible = true
         toolbarTitle = meetingActivity.binding.titleToolbar
         toolbarSubtitle = meetingActivity.binding.subtitleToolbar
 
@@ -722,7 +717,7 @@ class InMeetingFragment : MeetingBaseFragment(), BottomFloatingPanelListener, Sn
             isVisible = true
             setViewCompositionStrategy(ViewCompositionStrategy.DisposeOnViewTreeLifecycleDestroyed)
             setContent {
-                OriginalTempTheme(isDark = false) {
+                OriginalTheme(isDark = false) {
                     MeetingBanner(inMeetingViewModel)
                 }
             }
@@ -769,9 +764,16 @@ class InMeetingFragment : MeetingBaseFragment(), BottomFloatingPanelListener, Sn
             updateLocalAudio(it)
         }
 
+        viewLifecycleOwner.collectFlow(sharedModel.state.map { it.answerResult }
+            .distinctUntilChanged()) {
+            it?.apply {
+                checkCallStarted(chatHandle)
+            }
+        }
+
         viewLifecycleOwner.collectFlow(sharedModel.state.map { it.handRaisedSnackbarMsg }
             .distinctUntilChanged()) {
-            if(it == consumed()) {
+            if (it == consumed()) {
                 binding.snackbarComposeView.apply {
                     isVisible = false
                 }
@@ -846,13 +848,6 @@ class InMeetingFragment : MeetingBaseFragment(), BottomFloatingPanelListener, Sn
             if (state.chatTitle.isNotEmpty()) {
                 toolbarTitle?.apply {
                     text = state.chatTitle
-                }
-            }
-
-            state.call?.let {
-                if (callStatus != it.status) {
-                    callStatus = it.status
-                    checkChildFragments()
                 }
             }
 
@@ -1051,6 +1046,7 @@ class InMeetingFragment : MeetingBaseFragment(), BottomFloatingPanelListener, Sn
                     ChatCallStatus.Initial -> {}
 
                     ChatCallStatus.Connecting -> {
+                        checkChildFragments()
                         checkMenuItemsVisibility()
                     }
 
@@ -1288,8 +1284,10 @@ class InMeetingFragment : MeetingBaseFragment(), BottomFloatingPanelListener, Sn
         }
 
         viewLifecycleOwner.collectFlow(inMeetingViewModel.state.map { it.isInPipMode }) {
-            checkChildFragments()
-            Timber.d("Currently Picture in Picture Mode is $it")
+            if (it) {
+                checkChildFragments()
+                Timber.d("Currently Picture in Picture Mode is $it")
+            }
         }
 
         viewLifecycleOwner.collectFlow(
@@ -2337,6 +2335,22 @@ class InMeetingFragment : MeetingBaseFragment(), BottomFloatingPanelListener, Sn
         )
     }
 
+    override fun showSnackbar(type: Int, content: String, action: () -> Unit) {
+        val anchor =
+            if (BottomSheetBehavior.STATE_COLLAPSED == bottomFloatingPanelViewHolder?.getState() && floatingBottomSheet.isVisible) {
+                binding.snackbarPosition
+            } else null
+
+        meetingActivity.showSnackbar(
+            type = type,
+            view = binding.root,
+            anchor = anchor,
+            s = content,
+            forceDarkMode = true,
+            action = action,
+        )
+    }
+
     private fun showRequestPermissionSnackBar() {
         val warningText =
             getString(R.string.meeting_required_permissions_warning)
@@ -2976,10 +2990,13 @@ class InMeetingFragment : MeetingBaseFragment(), BottomFloatingPanelListener, Sn
             video = PermissionUtils.hasPermissions(requireContext(), Manifest.permission.CAMERA)
         }
 
-        sharedModel.answerCall(video, audio, speakerIsEnable)
-            .observe(viewLifecycleOwner) { (chatHandle) ->
-                checkCallStarted(chatHandle)
-            }
+        sharedModel.answerCall(
+            chatId = inMeetingViewModel.getChatId(),
+            enableVideo = video,
+            enableAudio = audio,
+            speakerAudio = speakerIsEnable
+        )
+
     }
 
     /**
@@ -3000,7 +3017,7 @@ class InMeetingFragment : MeetingBaseFragment(), BottomFloatingPanelListener, Sn
         sharedModel.startOrCreateMeeting(
             title = inMeetingViewModel.state.value.chatTitle,
             video = video,
-            audio = audio
+            audio = audio,
         )
     }
 

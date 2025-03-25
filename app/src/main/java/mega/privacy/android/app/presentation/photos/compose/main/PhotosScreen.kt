@@ -14,6 +14,7 @@ import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import kotlinx.coroutines.launch
 import mega.privacy.android.analytics.Analytics
 import mega.privacy.android.app.R
+import mega.privacy.android.app.presentation.extensions.getStorageState
 import mega.privacy.android.app.presentation.photos.PhotoDownloaderViewModel
 import mega.privacy.android.app.presentation.photos.PhotosViewComposeCoordinator
 import mega.privacy.android.app.presentation.photos.PhotosViewModel
@@ -30,6 +31,7 @@ import mega.privacy.android.app.presentation.photos.timeline.viewmodel.shouldEna
 import mega.privacy.android.app.presentation.photos.view.PhotosBodyView
 import mega.privacy.android.app.presentation.photos.view.photosZoomGestureDetector
 import mega.privacy.android.app.presentation.settings.camerauploads.dialogs.CameraUploadsBusinessAccountDialog
+import mega.privacy.android.domain.entity.StorageState
 import mega.privacy.android.domain.entity.photos.Album
 import mega.privacy.android.domain.entity.photos.AlbumId
 import mega.privacy.mobile.analytics.event.AlbumSelected
@@ -231,6 +233,7 @@ fun PhotosScreen(
                 onRemoveLinkDialogConfirmClick = albumsViewModel::removeAlbumsLinks,
                 onRemoveLinkDialogCancelClick = albumsViewModel::hideRemoveLinkDialog,
                 resetRemovedLinksCount = albumsViewModel::resetRemovedLinksCount,
+                isStorageExceeded = { getStorageState() == StorageState.PayWall },
             )
         },
         timelineViewState = timelineViewState,

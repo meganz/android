@@ -11,6 +11,7 @@ import android.widget.RelativeLayout
 import androidx.core.view.isVisible
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
+import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import androidx.preference.PreferenceManager
@@ -39,10 +40,10 @@ import mega.privacy.android.app.components.twemoji.EmojiTextView
 import mega.privacy.android.app.featuretoggle.AppFeatures
 import mega.privacy.android.app.fragments.homepage.Event
 import mega.privacy.android.app.listeners.GetUserEmailListener
+import mega.privacy.android.app.meeting.activity.MeetingActivity.Companion.MEETING_CHAT_ID
 import mega.privacy.android.app.meeting.adapter.Participant
 import mega.privacy.android.app.meeting.gateway.RTCAudioManagerGateway
 import mega.privacy.android.app.meeting.listeners.GroupVideoListener
-import mega.privacy.android.app.objects.PasscodeManagement
 import mega.privacy.android.app.presentation.mapper.GetStringFromStringResMapper
 import mega.privacy.android.app.presentation.meeting.model.InMeetingUiState
 import mega.privacy.android.app.presentation.meeting.model.ParticipantsChange
@@ -147,7 +148,6 @@ import kotlin.time.DurationUnit
  * @property rtcAudioManagerGateway             [RTCAudioManagerGateway]
  * @property setChatVideoInDeviceUseCase        [SetChatVideoInDeviceUseCase]
  * @property megaChatApiGateway                 [MegaChatApiGateway]
- * @property passcodeManagement                 [PasscodeManagement]
  * @property chatManagement                     [ChatManagement]
  * @property sendStatisticsMeetingsUseCase      [SendStatisticsMeetingsUseCase]
  * @property enableAudioLevelMonitorUseCase     [EnableAudioLevelMonitorUseCase]
@@ -185,7 +185,6 @@ class InMeetingViewModel @Inject constructor(
     private val rtcAudioManagerGateway: RTCAudioManagerGateway,
     private val setChatVideoInDeviceUseCase: SetChatVideoInDeviceUseCase,
     private val megaChatApiGateway: MegaChatApiGateway,
-    private val passcodeManagement: PasscodeManagement,
     private val chatManagement: ChatManagement,
     private val sendStatisticsMeetingsUseCase: SendStatisticsMeetingsUseCase,
     private val enableAudioLevelMonitorUseCase: EnableAudioLevelMonitorUseCase,
@@ -228,15 +227,16 @@ class InMeetingViewModel @Inject constructor(
     private val monitorChatConnectionStateUseCase: MonitorChatConnectionStateUseCase,
     monitorContactCacheUpdates: MonitorContactCacheUpdates,
     monitorUserUpdates: MonitorUserUpdates,
+    savedStateHandle: SavedStateHandle,
 ) : ViewModel(), GetUserEmailListener.OnUserEmailUpdateCallback {
-    /**
-     * private UI state
-     */
-    private val _state = MutableStateFlow(InMeetingUiState())
 
-    /**
-     * public UI State
-     */
+    private val _state = MutableStateFlow(
+        InMeetingUiState(
+            currentChatId = savedStateHandle[MEETING_CHAT_ID]
+                ?: -1L
+        )
+    )
+
     val state = _state.asStateFlow()
 
     private var reconnectingJob: Job? = null
@@ -347,6 +347,10 @@ class InMeetingViewModel @Inject constructor(
     val getParticipantsChanges: StateFlow<Pair<Int, ((Context) -> String)?>> get() = _getParticipantsChanges
 
     init {
+        if (state.value.currentChatId != -1L) {
+            getChatRoom()
+            getChatCall()
+        }
         startMonitorChatCallUpdates()
         startMonitorChatSessionUpdates()
         startMonitorChatListItemUpdates()
@@ -770,23 +774,8 @@ class InMeetingViewModel @Inject constructor(
                                 updateParticipantsWithRaisedHand(call)
                             }
 
-                            contains(ChatCallChanges.LocalAVFlags) -> checkUpdatesInLocalAVFlags(
-                                update = true
-                            )
-
                             contains(ChatCallChanges.CallComposition) -> {
                                 if (call.callCompositionChange == CallCompositionChanges.Added || call.callCompositionChange == CallCompositionChanges.Removed) {
-                                    val numParticipants = call.numParticipants ?: 0
-                                    if (call.callCompositionChange == CallCompositionChanges.Added && numParticipants > 1 &&
-                                        state.value.myUserHandle == call.peerIdCallCompositionChange && call.status == ChatCallStatus.UserNoPresent
-                                    ) {
-                                        _state.update { state ->
-                                            state.copy(
-                                                callAnsweredInAnotherClient = true,
-                                            )
-                                        }
-                                    }
-
                                     if (showReconnectingBanner.value || !isOnline()) {
                                         Timber.d("Back from reconnecting")
                                     } else {
@@ -807,17 +796,6 @@ class InMeetingViewModel @Inject constructor(
                     }
                 }
         }
-    }
-
-    /**
-     * Check update Local AVFlags
-     *
-     * @param update    True, is updated. False, if not.
-     */
-    fun checkUpdatesInLocalAVFlags(update: Boolean) = _state.update { state ->
-        state.copy(
-            shouldUpdateLocalAVFlags = update,
-        )
     }
 
     /**

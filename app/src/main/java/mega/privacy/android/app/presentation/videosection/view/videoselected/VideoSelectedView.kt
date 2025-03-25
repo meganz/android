@@ -45,7 +45,7 @@ import mega.privacy.android.domain.entity.node.TypedNode
 import mega.privacy.android.domain.entity.preference.ViewType
 import mega.privacy.android.legacy.core.ui.controls.LegacyMegaEmptyViewWithImage
 import mega.privacy.android.shared.original.core.ui.preview.CombinedThemePreviews
-import mega.privacy.android.shared.original.core.ui.theme.OriginalTempTheme
+import mega.privacy.android.shared.original.core.ui.theme.OriginalTheme
 import mega.privacy.android.shared.original.core.ui.theme.extensions.white_black
 import mega.privacy.android.shared.original.core.ui.utils.ListGridStateMap
 import mega.privacy.android.shared.original.core.ui.utils.getState
@@ -131,7 +131,7 @@ internal fun VideoSelectedView(
             uiState.nodesList.isEmpty() -> LegacyMegaEmptyViewWithImage(
                 modifier = Modifier.testTag(VIDEO_SELECTED_EMPTY_VIEW_TEST_TAG),
                 text = stringResource(id = R.string.homepage_empty_hint_video),
-                imagePainter = painterResource(id = iconPackR.drawable.ic_video_section_empty_video)
+                imagePainter = painterResource(id = iconPackR.drawable.ic_video_glass)
             )
 
             else -> {
@@ -231,7 +231,7 @@ private fun <T : TypedNode> rememberNodeListForGrid(
 @CombinedThemePreviews
 @Composable
 private fun VideoSelectedViewWithProgressBarPreview() {
-    OriginalTempTheme(isDark = isSystemInDarkTheme()) {
+    OriginalTheme(isDark = isSystemInDarkTheme()) {
         VideoSelectedView(
             uiState = VideoSelectedState(
                 isLoading = true,
@@ -254,7 +254,7 @@ private fun VideoSelectedViewWithProgressBarPreview() {
 @CombinedThemePreviews
 @Composable
 private fun VideoSelectedViewWithEmptyViewPreview() {
-    OriginalTempTheme(isDark = isSystemInDarkTheme()) {
+    OriginalTheme(isDark = isSystemInDarkTheme()) {
         VideoSelectedView(
             uiState = VideoSelectedState(
                 isLoading = false,

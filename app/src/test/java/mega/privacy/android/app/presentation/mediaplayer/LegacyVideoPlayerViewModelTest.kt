@@ -12,6 +12,7 @@ import kotlinx.coroutines.test.UnconfinedTestDispatcher
 import kotlinx.coroutines.test.advanceUntilIdle
 import kotlinx.coroutines.test.runTest
 import mega.privacy.android.app.TimberJUnit5Extension
+import mega.privacy.android.app.featuretoggle.AppFeatures
 import mega.privacy.android.app.mediaplayer.LegacyVideoPlayerViewModel
 import mega.privacy.android.app.mediaplayer.LegacyVideoPlayerViewModel.Companion.SUBTITLE_SELECTED_STATE_ADD_SUBTITLE_ITEM
 import mega.privacy.android.app.mediaplayer.LegacyVideoPlayerViewModel.Companion.SUBTITLE_SELECTED_STATE_MATCHED_ITEM
@@ -22,6 +23,7 @@ import mega.privacy.android.app.presentation.myaccount.InstantTaskExecutorExtens
 import mega.privacy.android.app.utils.Constants.INTENT_EXTRA_KEY_VIDEO_COLLECTION_ID
 import mega.privacy.android.app.utils.Constants.INTENT_EXTRA_KEY_VIDEO_COLLECTION_TITLE
 import mega.privacy.android.core.test.extension.CoroutineMainDispatcherExtension
+import mega.privacy.android.data.gateway.api.MegaApiGateway
 import mega.privacy.android.domain.entity.account.AccountDetail
 import mega.privacy.android.domain.entity.mediaplayer.SubtitleFileInfo
 import mega.privacy.android.domain.entity.transfer.Transfer
@@ -75,6 +77,7 @@ internal class LegacyVideoPlayerViewModelTest {
     private val getThumbnailUseCase = mock<GetThumbnailUseCase>()
     private val saveVideoRecentlyWatchedUseCase = mock<SaveVideoRecentlyWatchedUseCase>()
     private val getFileUriUseCase = mock<GetFileUriUseCase>()
+    private val megaApiGateway = mock<MegaApiGateway>()
     private val monitorAccountDetailUseCase = mock<MonitorAccountDetailUseCase> {
         on {
             invoke()
@@ -106,6 +109,9 @@ internal class LegacyVideoPlayerViewModelTest {
 
     private fun initViewModel() {
         wheneverBlocking { monitorVideoRepeatModeUseCase() }.thenReturn(emptyFlow())
+        wheneverBlocking {
+            getFeatureFlagValueUseCase(AppFeatures.VideoPlayerZoomInEnable)
+        }.thenReturn(true)
         underTest = LegacyVideoPlayerViewModel(
             context = mock(),
             mediaPlayerGateway = mediaPlayerGateway,
@@ -156,6 +162,7 @@ internal class LegacyVideoPlayerViewModelTest {
             saveVideoRecentlyWatchedUseCase = saveVideoRecentlyWatchedUseCase,
             getFileUriUseCase = getFileUriUseCase,
             applicationScope = CoroutineScope(UnconfinedTestDispatcher()),
+            megaApiGateway = megaApiGateway,
         )
         savedStateHandle[underTest.subtitleDialogShowKey] = false
         savedStateHandle[underTest.subtitleShowKey] = false
@@ -410,5 +417,11 @@ internal class LegacyVideoPlayerViewModelTest {
         whenever(getFileUriUseCase(anyOrNull(), anyOrNull())).thenReturn(expectedUri)
         initViewModel()
         assertThat(underTest.getContentUri(testFile)).isEqualTo(expectedUri)
+    }
+
+    @Test
+    fun `test that the isPlayerZoomInEnabled function return as expected`() = runTest {
+        initViewModel()
+        assertThat(underTest.isPlayerZoomInEnabled()).isTrue()
     }
 }

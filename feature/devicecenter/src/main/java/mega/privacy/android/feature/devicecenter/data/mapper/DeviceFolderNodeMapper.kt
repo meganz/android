@@ -166,7 +166,7 @@ internal class DeviceFolderNodeMapper @Inject constructor() {
             // How much time has passed since the Backup was created
             val createdBackupTimeDifference = currentTimeInSeconds - timestamp
             val isBackupOld = createdBackupTimeDifference > maxCreatedBackupTime
-            val isCurrentBackupFolderExisting = rootHandle != MegaApiJava.INVALID_HANDLE
+            val isCurrentBackupFolderExisting = rootHandle.longValue != MegaApiJava.INVALID_HANDLE
 
             isCurrentBackupFolderExisting || isBackupOld
         } else {

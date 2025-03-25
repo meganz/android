@@ -194,7 +194,7 @@ class RecentActionBucketViewModel @Inject constructor(
      * @return True if at least one [MegaNode] belongs in Backups, and False if otherwise
      */
     fun isAnyNodeInBackups(): Boolean =
-        getSelectedMegaNodes().any { node -> megaApi.isInInbox(node) }
+        getSelectedMegaNodes().any { node -> megaApi.isInVault(node) }
 
     /**
      * Get the count of selected nodes

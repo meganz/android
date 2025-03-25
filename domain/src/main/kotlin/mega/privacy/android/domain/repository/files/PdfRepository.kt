@@ -1,6 +1,6 @@
 package mega.privacy.android.domain.repository.files
 
-import java.io.File
+import mega.privacy.android.domain.entity.uri.UriPath
 
 /**
  * Pdf repository
@@ -16,7 +16,7 @@ interface PdfRepository {
      * @param localFile Local file.
      * @return Path of the thumbnail file if created successfully, null otherwise.
      */
-    suspend fun createThumbnail(nodeHandle: Long, localFile: File): String?
+    suspend fun createThumbnail(nodeHandle: Long, uriPath: UriPath): String?
 
     /**
      * Create PDF preview.
@@ -25,5 +25,5 @@ interface PdfRepository {
      * @param localFile Local file.
      * @return Path of the thumbnail file if created successfully, null otherwise.
      */
-    suspend fun createPreview(nodeHandle: Long, localFile: File): String?
+    suspend fun createPreview(nodeHandle: Long, uriPath: UriPath): String?
 }

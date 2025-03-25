@@ -34,9 +34,9 @@ import mega.privacy.android.shared.original.core.ui.model.MenuActionWithIcon
 import mega.privacy.android.shared.original.core.ui.preview.BooleanProvider
 import mega.privacy.android.shared.original.core.ui.preview.CombinedThemePreviews
 import mega.privacy.android.shared.original.core.ui.theme.MegaOriginalTheme
-import mega.privacy.android.shared.original.core.ui.theme.OriginalTempTheme
+import mega.privacy.android.shared.original.core.ui.theme.OriginalTheme
 import mega.privacy.android.shared.original.core.ui.theme.extensions.conditional
-import mega.privacy.android.shared.original.core.ui.theme.values.TextColor
+import mega.android.core.ui.theme.values.TextColor
 
 /**
  * Menu action list tile
@@ -151,7 +151,7 @@ internal const val MENU_ITEM_SWITCH_TAG = "menu_action:button_switch"
 private fun PreviewPreviewMegaMenuAction(
     @PreviewParameter(BooleanProvider::class) isDestructive: Boolean,
 ) {
-    OriginalTempTheme(isDark = isSystemInDarkTheme()) {
+    OriginalTheme(isDark = isSystemInDarkTheme()) {
         MenuActionListTile(
             text = "Menu Item",
             icon = painterResource(id = IconPackR.drawable.ic_folder_medium_solid),
@@ -165,7 +165,7 @@ private fun PreviewPreviewMegaMenuAction(
 private fun PreviewMegaMenuActionWithSwitch(
     @PreviewParameter(BooleanProvider::class) hasSwitch: Boolean,
 ) {
-    OriginalTempTheme(isDark = isSystemInDarkTheme()) {
+    OriginalTheme(isDark = isSystemInDarkTheme()) {
         MenuActionListTile(
             text = "Menu Item",
             icon = painterResource(id = IconPackR.drawable.ic_folder_medium_solid),
@@ -182,7 +182,7 @@ private fun PreviewMegaMenuActionWithSwitch(
 @CombinedThemePreviews
 @Composable
 private fun PreviewMegaMenuActionWithoutIcon() {
-    OriginalTempTheme(isDark = isSystemInDarkTheme()) {
+    OriginalTheme(isDark = isSystemInDarkTheme()) {
         MenuActionListTile(
             text = "Menu Item",
         )
@@ -192,7 +192,7 @@ private fun PreviewMegaMenuActionWithoutIcon() {
 @CombinedThemePreviews
 @Composable
 private fun PreviewMegaMenuActionWithTextButton() {
-    OriginalTempTheme(isDark = isSystemInDarkTheme()) {
+    OriginalTheme(isDark = isSystemInDarkTheme()) {
         MenuActionListTile(
             text = "Menu Item",
             icon = painterResource(id = IconPackR.drawable.ic_folder_medium_solid),

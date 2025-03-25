@@ -12,6 +12,7 @@ import androidx.compose.animation.core.tween
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.systemBarsPadding
+import androidx.compose.material.ScaffoldState
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.DisposableEffect
 import androidx.compose.runtime.LaunchedEffect
@@ -24,11 +25,16 @@ import androidx.compose.runtime.rememberUpdatedState
 import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
+import androidx.compose.ui.ExperimentalComposeUiApi
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.semantics.semantics
+import androidx.compose.ui.semantics.testTagsAsResourceId
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
+import com.google.accompanist.navigation.material.BottomSheetNavigator
+import com.google.accompanist.navigation.material.ExperimentalMaterialNavigationApi
 import com.google.accompanist.permissions.ExperimentalPermissionsApi
 import com.google.accompanist.permissions.isGranted
 import de.palm.composestateevents.EventEffect
@@ -46,16 +52,24 @@ import mega.privacy.android.shared.original.core.ui.controls.appbar.MegaAppBar
 import mega.privacy.android.shared.original.core.ui.controls.camera.CameraBottomAppBar
 import mega.privacy.android.shared.original.core.ui.controls.camera.CameraTimer
 import mega.privacy.android.shared.original.core.ui.controls.layouts.MegaScaffold
+import mega.privacy.android.shared.original.core.ui.controls.sheets.MegaBottomSheetLayout
 import mega.privacy.android.shared.original.core.ui.utils.rememberPermissionState
 import kotlin.time.Duration.Companion.milliseconds
 import kotlin.time.Duration.Companion.seconds
 
-@OptIn(ExperimentalPermissionsApi::class)
+@OptIn(
+    ExperimentalPermissionsApi::class,
+    ExperimentalMaterialNavigationApi::class,
+    ExperimentalComposeUiApi::class
+)
 @Composable
 internal fun CameraCaptureScreen(
+    bottomSheetNavigator: BottomSheetNavigator,
+    scaffoldState: ScaffoldState,
     onOpenVideoPreview: (Uri) -> Unit,
     onOpenPhotoPreview: (Uri) -> Unit,
     onFinish: (uri: Uri?) -> Unit = {},
+    onOpenCameraSetting: () -> Unit = {},
     viewModel: CameraViewModel = hiltViewModel(),
 ) {
     val context = LocalContext.current
@@ -92,7 +106,10 @@ internal fun CameraCaptureScreen(
             contract = ActivityResultContracts.PickVisualMedia()
         ) {
             it?.let {
-                context.contentResolver.takePersistableUriPermission(it, Intent.FLAG_GRANT_READ_URI_PERMISSION)
+                context.contentResolver.takePersistableUriPermission(
+                    it,
+                    Intent.FLAG_GRANT_READ_URI_PERMISSION
+                )
                 onFinish(it)
             }
         }
@@ -145,75 +162,90 @@ internal fun CameraCaptureScreen(
         }
     }
 
-    // force dark mode
-    MegaScaffold(
-        modifier = Modifier.systemBarsPadding(),
-        topBar = {
-            MegaAppBar(
-                appBarType = AppBarType.BACK_NAVIGATION,
-                title = "",
-                onNavigationPressed = {
-                    onFinish(null)
-                },
-                actions = if (selectFlashMode) {
-                    flashOptions.values.toList()
-                } else {
-                    flashOptions[flashMode]?.let { listOf(it) }.orEmpty()
-                }.takeIf { !isRecording && camSelector == CamSelector.Back }, // hide flash options when recording and front camera is selected
-                onActionPressed = {
-                    if (selectFlashMode) {
-                        flashMode = when (it) {
-                            is CameraMenuAction.FlashAuto -> FlashMode.Auto
-                            is CameraMenuAction.FlashOn -> FlashMode.On
-                            is CameraMenuAction.FlashOff -> FlashMode.Off
-                            else -> flashMode
+    MegaBottomSheetLayout(
+        modifier = Modifier.semantics {
+            testTagsAsResourceId = true
+        },
+        bottomSheetNavigator = bottomSheetNavigator,
+    ) {
+        MegaScaffold(
+            scaffoldState = scaffoldState,
+            modifier = Modifier.systemBarsPadding(),
+            topBar = {
+                MegaAppBar(
+                    appBarType = AppBarType.BACK_NAVIGATION,
+                    title = "",
+                    onNavigationPressed = {
+                        onFinish(null)
+                    },
+                    actions = if (selectFlashMode) {
+                        flashOptions.values.toList()
+                    } else {
+                        flashOptions[flashMode]?.let { listOf(it) }
+                    }.takeIf { !isRecording && camSelector == CamSelector.Back }
+                        .orEmpty() + CameraMenuAction.Setting(), // hide flash options when recording and front camera is selected
+                    onActionPressed = {
+                        if (it is CameraMenuAction.Setting) {
+                            onOpenCameraSetting()
+                        } else {
+                            if (selectFlashMode) {
+                                flashMode = when (it) {
+                                    is CameraMenuAction.FlashAuto -> FlashMode.Auto
+                                    is CameraMenuAction.FlashOn -> FlashMode.On
+                                    is CameraMenuAction.FlashOff -> FlashMode.Off
+                                    else -> flashMode
+                                }
+                            }
+                            selectFlashMode = !selectFlashMode
                         }
                     }
-                    selectFlashMode = !selectFlashMode
-                }
-            )
-        },
-        bottomBar = {
-            CameraBottomAppBar(
-                rotationDegree = animatedRotation,
-                isCaptureVideo = cameraOption == CameraOption.Video,
-                isRecording = isRecording,
-                onToggleCamera = {
-                    camSelector = camSelector.inverse
-                },
-                onToggleCaptureMode = {
-                    cameraOption =
-                        if (cameraOption == CameraOption.Photo) CameraOption.Video else CameraOption.Photo
-                },
-                onCameraAction = {
-                    if (cameraOption == CameraOption.Photo) {
-                        viewModel.takePicture(cameraState)
-                    } else {
-                        viewModel.captureVideo(cameraState, audioPermissionState.status.isGranted)
-                    }
-                },
-                onOpenGallery = {
-                    galleryPicker.launch(PickVisualMediaRequest())
-                },
-            )
-        },
-    ) { innerPadding ->
-        Box(
-            modifier = Modifier.padding(innerPadding),
-        ) {
-            CameraPreview(
-                cameraState = cameraState,
-                camSelector = camSelector,
-                captureMode = cameraOption.mode,
-                flashMode = flashMode,
-            )
-            if (isRecording) {
-                CameraTimer(
-                    modifier = Modifier
-                        .align(Alignment.TopCenter)
-                        .padding(top = 16.dp),
-                    formattedTime = durationInSecondsTextMapper(countTimerInMillis.milliseconds),
                 )
+            },
+            bottomBar = {
+                CameraBottomAppBar(
+                    rotationDegree = animatedRotation,
+                    isCaptureVideo = cameraOption == CameraOption.Video,
+                    isRecording = isRecording,
+                    onToggleCamera = {
+                        camSelector = camSelector.inverse
+                    },
+                    onToggleCaptureMode = {
+                        cameraOption =
+                            if (cameraOption == CameraOption.Photo) CameraOption.Video else CameraOption.Photo
+                    },
+                    onCameraAction = {
+                        if (cameraOption == CameraOption.Photo) {
+                            viewModel.takePicture(cameraState)
+                        } else {
+                            viewModel.captureVideo(
+                                cameraState,
+                                audioPermissionState.status.isGranted
+                            )
+                        }
+                    },
+                    onOpenGallery = {
+                        galleryPicker.launch(PickVisualMediaRequest())
+                    },
+                )
+            },
+        ) { innerPadding ->
+            Box(
+                modifier = Modifier.padding(innerPadding),
+            ) {
+                CameraPreview(
+                    cameraState = cameraState,
+                    camSelector = camSelector,
+                    captureMode = cameraOption.mode,
+                    flashMode = flashMode,
+                )
+                if (isRecording) {
+                    CameraTimer(
+                        modifier = Modifier
+                            .align(Alignment.TopCenter)
+                            .padding(top = 16.dp),
+                        formattedTime = durationInSecondsTextMapper(countTimerInMillis.milliseconds),
+                    )
+                }
             }
         }
     }

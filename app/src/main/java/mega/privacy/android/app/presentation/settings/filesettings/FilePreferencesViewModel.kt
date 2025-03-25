@@ -3,6 +3,8 @@ package mega.privacy.android.app.presentation.settings.filesettings
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import dagger.hilt.android.lifecycle.HiltViewModel
+import de.palm.composestateevents.consumed
+import de.palm.composestateevents.triggered
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.catch
@@ -16,6 +18,7 @@ import mega.privacy.android.domain.usecase.MonitorUserUpdates
 import mega.privacy.android.domain.usecase.cache.ClearCacheUseCase
 import mega.privacy.android.domain.usecase.cache.GetCacheSizeUseCase
 import mega.privacy.android.domain.usecase.file.GetFileVersionsOption
+import mega.privacy.android.domain.usecase.filenode.RemoveAllVersionsUseCase
 import mega.privacy.android.domain.usecase.network.IsConnectedToInternetUseCase
 import mega.privacy.android.domain.usecase.network.MonitorConnectivityUseCase
 import mega.privacy.android.domain.usecase.offline.ClearOfflineUseCase
@@ -38,7 +41,8 @@ class FilePreferencesViewModel @Inject constructor(
     private val clearCacheUseCase: ClearCacheUseCase,
     private val getCacheSizeUseCase: GetCacheSizeUseCase,
     private val getOfflineFolderSizeUseCase: GetOfflineFolderSizeUseCase,
-    private val clearOfflineUseCase: ClearOfflineUseCase
+    private val clearOfflineUseCase: ClearOfflineUseCase,
+    private val removeAllVersionsUseCase: RemoveAllVersionsUseCase,
 ) : ViewModel() {
     private val _state = MutableStateFlow(FilePreferencesState())
 
@@ -162,5 +166,27 @@ class FilePreferencesViewModel @Inject constructor(
      */
     fun resetUpdateOfflineSize() {
         _state.update { it.copy(updateOfflineSize = null) }
+    }
+
+    /**
+     * Clear all versions
+     */
+    fun clearAllVersions() {
+        viewModelScope.launch {
+            runCatching {
+                removeAllVersionsUseCase()
+            }.onSuccess {
+                _state.update { it.copy(deleteAllVersionsEvent = triggered<Throwable?>(null)) }
+            }.onFailure { e ->
+                _state.update { it.copy(deleteAllVersionsEvent = triggered<Throwable?>(e)) }
+            }
+        }
+    }
+
+    /**
+     * Reset delete all versions event
+     */
+    fun resetDeleteAllVersionsEvent() {
+        _state.update { it.copy(deleteAllVersionsEvent = consumed()) }
     }
 }

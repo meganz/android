@@ -117,7 +117,7 @@ class DefaultAlbumRepositoryTest {
             }
 
             underTest = createUnderTest(this)
-            underTest.addPhotosToAlbum(albumID = testAlbumId, photoIDs = testPhotos)
+            underTest.addPhotosToAlbum(albumID = testAlbumId, photoIDs = testPhotos, false)
             advanceUntilIdle()
 
             underTest.observeAlbumPhotosAddingProgress(testAlbumId).test {

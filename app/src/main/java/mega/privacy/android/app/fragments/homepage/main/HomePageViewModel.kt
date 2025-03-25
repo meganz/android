@@ -6,26 +6,32 @@ import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import dagger.hilt.android.lifecycle.HiltViewModel
+import kotlinx.coroutines.FlowPreview
 import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.catch
 import kotlinx.coroutines.flow.conflate
+import kotlinx.coroutines.flow.debounce
+import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import mega.privacy.android.domain.usecase.contact.MonitorMyChatOnlineStatusUseCase
+import mega.privacy.android.domain.usecase.login.MonitorFetchNodesFinishUseCase
 import mega.privacy.android.domain.usecase.login.MonitorLogoutUseCase
 import mega.privacy.android.domain.usecase.network.IsConnectedToInternetUseCase
 import mega.privacy.android.domain.usecase.network.MonitorConnectivityUseCase
 import mega.privacy.android.domain.usecase.notifications.MonitorHomeBadgeCountUseCase
 import nz.mega.sdk.MegaBanner
 import timber.log.Timber
+import java.util.concurrent.TimeUnit
 import javax.inject.Inject
 
 @HiltViewModel
 class HomePageViewModel @Inject constructor(
     private val repository: HomepageRepository,
-    isConnectedToInternetUseCase: IsConnectedToInternetUseCase,
     monitorConnectivityUseCase: MonitorConnectivityUseCase,
+    monitorFetchNodesFinishUseCase: MonitorFetchNodesFinishUseCase,
     private val monitorLogoutUseCase: MonitorLogoutUseCase,
     private val monitorHomeBadgeCountUseCase: MonitorHomeBadgeCountUseCase,
     private val monitorMyChatOnlineStatusUseCase: MonitorMyChatOnlineStatusUseCase,
@@ -49,12 +55,19 @@ class HomePageViewModel @Inject constructor(
     /**
      * Is network connected state
      */
-    val isConnected = isConnectedToInternetUseCase()
+    val isConnected =
+        monitorConnectivityUseCase().stateIn(viewModelScope, SharingStarted.Eagerly, false)
 
     /**
      * Monitor Internet Connectivity
      */
-    val monitorConnectivity = monitorConnectivityUseCase()
+    @OptIn(FlowPreview::class)
+    val monitorConnectivity = monitorConnectivityUseCase().debounce(TimeUnit.SECONDS.toMillis(1))
+
+    /**
+     * Monitor Fetch Nodes finish
+     */
+    val monitorFetchNodesFinish = monitorFetchNodesFinishUseCase()
 
     init {
         viewModelScope.launch {

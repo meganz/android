@@ -2,11 +2,14 @@ package mega.privacy.android.app.presentation.settings.filesettings
 
 import app.cash.turbine.test
 import com.google.common.truth.Truth.assertThat
+import de.palm.composestateevents.StateEventWithContentTriggered
+import de.palm.composestateevents.consumed
+import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.test.StandardTestDispatcher
+import kotlinx.coroutines.test.advanceUntilIdle
 import kotlinx.coroutines.test.runTest
-import mega.privacy.android.app.presentation.settings.filesettings.FilePreferencesViewModel
 import mega.privacy.android.core.test.extension.CoroutineMainDispatcherExtension
 import mega.privacy.android.domain.entity.user.UserChanges
 import mega.privacy.android.domain.exception.MegaException
@@ -15,6 +18,7 @@ import mega.privacy.android.domain.usecase.MonitorUserUpdates
 import mega.privacy.android.domain.usecase.cache.ClearCacheUseCase
 import mega.privacy.android.domain.usecase.cache.GetCacheSizeUseCase
 import mega.privacy.android.domain.usecase.file.GetFileVersionsOption
+import mega.privacy.android.domain.usecase.filenode.RemoveAllVersionsUseCase
 import mega.privacy.android.domain.usecase.network.IsConnectedToInternetUseCase
 import mega.privacy.android.domain.usecase.network.MonitorConnectivityUseCase
 import mega.privacy.android.domain.usecase.offline.ClearOfflineUseCase
@@ -29,6 +33,7 @@ import org.mockito.kotlin.whenever
 import kotlin.test.assertFalse
 import kotlin.test.assertTrue
 
+@OptIn(ExperimentalCoroutinesApi::class)
 internal class FilePreferencesViewModelTest {
     private lateinit var underTest: FilePreferencesViewModel
 
@@ -47,6 +52,7 @@ internal class FilePreferencesViewModelTest {
     private val getCacheSizeUseCase: GetCacheSizeUseCase = mock()
     private val getOfflineFolderSizeUseCase: GetOfflineFolderSizeUseCase = mock()
     private val clearOfflineUseCase: ClearOfflineUseCase = mock()
+    private val removeAllVersionsUseCase: RemoveAllVersionsUseCase = mock()
 
     @BeforeEach
     fun setUp() {
@@ -64,7 +70,8 @@ internal class FilePreferencesViewModelTest {
             clearCacheUseCase,
             getCacheSizeUseCase,
             getOfflineFolderSizeUseCase,
-            clearOfflineUseCase
+            clearOfflineUseCase,
+            removeAllVersionsUseCase
         )
     }
 
@@ -172,6 +179,45 @@ internal class FilePreferencesViewModelTest {
             underTest.state.test {
                 val result = awaitItem()
                 assertThat(result.updateOfflineSize).isNull()
+            }
+        }
+
+    @Test
+    fun `test that clearAllVersions triggers deleteAllVersionsEvent on success`() = runTest {
+        whenever(removeAllVersionsUseCase()).thenReturn(Unit)
+        underTest.clearAllVersions()
+        advanceUntilIdle()
+        underTest.state.test {
+            val state = awaitItem()
+            assertThat(state.deleteAllVersionsEvent).isNotNull()
+            assertThat((state.deleteAllVersionsEvent as StateEventWithContentTriggered<Throwable?>).content).isNull()
+        }
+    }
+
+    @Test
+    fun `test that clearAllVersions triggers deleteAllVersionsEvent with error on failure`() =
+        runTest {
+            val exception = RuntimeException()
+            whenever(removeAllVersionsUseCase()).thenThrow(exception)
+
+            underTest.clearAllVersions()
+            advanceUntilIdle()
+            underTest.state.test {
+                val state = awaitItem()
+                assertThat(state.deleteAllVersionsEvent).isNotNull()
+                assertThat((state.deleteAllVersionsEvent as StateEventWithContentTriggered<Throwable?>).content).isEqualTo(
+                    exception
+                )
+            }
+        }
+
+    @Test
+    fun `test that resetDeleteAllVersionsEvent sets deleteAllVersionsEvent to consumed`() =
+        runTest {
+            underTest.resetDeleteAllVersionsEvent()
+            underTest.state.test {
+                val state = awaitItem()
+                assertThat(state.deleteAllVersionsEvent).isEqualTo(consumed())
             }
         }
 

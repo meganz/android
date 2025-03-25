@@ -16,7 +16,7 @@ import androidx.compose.ui.layout.onGloballyPositioned
 import androidx.compose.ui.platform.LocalAutofill
 import androidx.compose.ui.platform.LocalAutofillTree
 import mega.privacy.android.shared.original.core.ui.theme.MegaOriginalTheme
-import mega.privacy.android.shared.original.core.ui.theme.values.BackgroundColor
+import mega.android.core.ui.theme.values.BackgroundColor
 
 /**
  * Conditional execution wrapper for the Modifier class

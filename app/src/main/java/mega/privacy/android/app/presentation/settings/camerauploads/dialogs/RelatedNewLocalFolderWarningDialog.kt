@@ -8,7 +8,7 @@ import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.res.stringResource
 import mega.privacy.android.shared.original.core.ui.controls.dialogs.MegaAlertDialog
 import mega.privacy.android.shared.original.core.ui.preview.CombinedThemePreviews
-import mega.privacy.android.shared.original.core.ui.theme.OriginalTempTheme
+import mega.privacy.android.shared.original.core.ui.theme.OriginalTheme
 
 /**
  * A Composable Dialog shown when the newly selected Local Primary / Secondary Dark is related to the
@@ -39,7 +39,7 @@ internal fun RelatedNewLocalFolderWarningDialog(
 @CombinedThemePreviews
 @Composable
 private fun RelatedNewLocalFolderWarningDialogPreview() {
-    OriginalTempTheme(isDark = isSystemInDarkTheme()) {
+    OriginalTheme(isDark = isSystemInDarkTheme()) {
         RelatedNewLocalFolderWarningDialog(
             onWarningAcknowledged = {},
             onWarningDismissed = {},

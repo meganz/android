@@ -63,6 +63,7 @@ import mega.privacy.android.domain.exception.ChatNotInitializedException
 import mega.privacy.android.domain.exception.MegaException
 import mega.privacy.android.domain.exception.account.ConfirmCancelAccountException
 import mega.privacy.android.domain.exception.account.ConfirmChangeEmailException
+import mega.privacy.android.domain.exception.account.CreateAccountException
 import mega.privacy.android.domain.exception.account.QueryCancelLinkException
 import mega.privacy.android.domain.exception.account.QueryChangeEmailLinkException
 import mega.privacy.android.domain.repository.AccountRepository
@@ -2023,5 +2024,152 @@ class DefaultAccountRepositoryTest {
                 assertThat(awaitItem()).isEqualTo(timestamp)
                 cancelAndIgnoreRemainingEvents()
             }
+        }
+
+    @Test
+    fun `test that create account is successful when SDK returns success`() =
+        runTest {
+            val userEmail = "email"
+            val userPassword = "password"
+            val userSessionKey = "sessionKey"
+            val userFirstName = "firstName"
+            val userLastName = "lastName"
+
+            val expectedResult = EphemeralCredentials(
+                email = userEmail,
+                password = userPassword,
+                session = userSessionKey,
+                firstName = userFirstName,
+                lastName = userLastName
+            )
+            val megaError = mock<MegaError> {
+                on { errorCode }.thenReturn(MegaError.API_OK)
+            }
+            val megaRequest = mock<MegaRequest> {
+                on { email }.thenReturn(userEmail)
+                on { password }.thenReturn(userPassword)
+                on { sessionKey }.thenReturn(userSessionKey)
+                on { name }.thenReturn(userFirstName)
+                on { text }.thenReturn(userLastName)
+            }
+            whenever(
+                megaApiGateway.createAccount(
+                    email = any(),
+                    password = any(),
+                    firstName = any(),
+                    lastName = any(),
+                    listener = any(),
+                )
+            ).thenAnswer {
+                ((it.arguments[4]) as OptionalMegaRequestListenerInterface).onRequestFinish(
+                    api = mock(),
+                    request = megaRequest,
+                    error = megaError,
+                )
+            }
+            val actualResult = underTest.createAccount(
+                email = userEmail,
+                password = userPassword,
+                firstName = userFirstName,
+                lastName = userLastName
+            )
+            assertThat(actualResult).isEqualTo(expectedResult)
+        }
+
+    @Test
+    fun `test that create account throws AccountAlreadyExists Exception when SDK returns account exists error`() =
+        runTest {
+            val userEmail = "email"
+            val userPassword = "password"
+            val userFirstName = "firstName"
+            val userLastName = "lastName"
+
+            val megaError = mock<MegaError> {
+                on { errorCode }.thenReturn(MegaError.API_EEXIST)
+            }
+            val megaRequest = mock<MegaRequest>()
+
+            whenever(
+                megaApiGateway.createAccount(
+                    email = any(),
+                    password = any(),
+                    firstName = any(),
+                    lastName = any(),
+                    listener = any(),
+                )
+            ).thenAnswer {
+                ((it.arguments[4]) as OptionalMegaRequestListenerInterface).onRequestFinish(
+                    api = mock(),
+                    request = megaRequest,
+                    error = megaError,
+                )
+            }
+
+            assertThrows<CreateAccountException.AccountAlreadyExists> {
+                underTest.createAccount(
+                    email = userEmail,
+                    password = userPassword,
+                    firstName = userFirstName,
+                    lastName = userLastName
+                )
+            }
+        }
+
+    @Test
+    fun `test that create account throws Unknown Exception when SDK returns generic error`() =
+        runTest {
+            val userEmail = "email"
+            val userPassword = "password"
+            val userFirstName = "firstName"
+            val userLastName = "lastName"
+
+            val megaError = mock<MegaError> {
+                on { errorCode }.thenReturn(MegaError.API_EINTERNAL)
+            }
+            val megaRequest = mock<MegaRequest>()
+
+            whenever(
+                megaApiGateway.createAccount(
+                    email = any(),
+                    password = any(),
+                    firstName = any(),
+                    lastName = any(),
+                    listener = any(),
+                )
+            ).thenAnswer {
+                ((it.arguments[4]) as OptionalMegaRequestListenerInterface).onRequestFinish(
+                    api = mock(),
+                    request = megaRequest,
+                    error = megaError,
+                )
+            }
+
+            assertThrows<CreateAccountException.Unknown> {
+                underTest.createAccount(
+                    email = userEmail,
+                    password = userPassword,
+                    firstName = userFirstName,
+                    lastName = userLastName
+                )
+            }
+        }
+
+    @Test
+    fun `test that monitorMiscLoaded is invoked when monitorMiscLoaded called`() =
+        runTest {
+            whenever(appEventGateway.monitorMiscLoaded()).thenReturn(
+                flowOf(Unit)
+            )
+            underTest.monitorMiscLoaded().test {
+                assertThat(awaitItem()).isEqualTo(Unit)
+                cancelAndIgnoreRemainingEvents()
+            }
+        }
+
+    @Test
+    fun `test that appEventGateway invokes broadcastMiscLoaded when calling broadcastMiscLoaded`() =
+        runTest {
+            underTest.broadcastMiscLoaded()
+            verify(appEventGateway).broadcastMiscLoaded()
         }
 }

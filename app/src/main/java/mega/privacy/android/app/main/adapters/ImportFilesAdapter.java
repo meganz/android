@@ -39,10 +39,10 @@ import coil.request.ImageRequest;
 import coil.transform.RoundedCornersTransformation;
 import mega.privacy.android.app.MegaApplication;
 import mega.privacy.android.app.R;
-import mega.privacy.android.app.ShareInfo;
 import mega.privacy.android.app.components.twemoji.EmojiEditText;
 import mega.privacy.android.app.main.FileExplorerActivity;
 import mega.privacy.android.domain.entity.ShareTextInfo;
+import mega.privacy.android.domain.entity.document.DocumentEntity;
 import nz.mega.sdk.MegaApiAndroid;
 
 public class ImportFilesAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> implements View.OnClickListener {
@@ -56,9 +56,9 @@ public class ImportFilesAdapter extends RecyclerView.Adapter<RecyclerView.ViewHo
 
     MegaApiAndroid megaApi;
 
-    List<ShareInfo> files;
-    List<ShareInfo> filesAll;
-    List<ShareInfo> filesPartial = new ArrayList<>();
+    List<DocumentEntity> files;
+    List<DocumentEntity> filesAll;
+    List<DocumentEntity> filesPartial = new ArrayList<>();
     HashMap<String, String> names;
     private ShareTextInfo textInfo;
 
@@ -84,7 +84,7 @@ public class ImportFilesAdapter extends RecyclerView.Adapter<RecyclerView.ViewHo
      * @param files   List of ShareInfo containing all the info to show the files list.
      * @param names   Map containing the original name of the files and the edited one.
      */
-    public ImportFilesAdapter(Context context, List<ShareInfo> files, HashMap<String, String> names) {
+    public ImportFilesAdapter(Context context, List<DocumentEntity> files, HashMap<String, String> names) {
         this.context = context;
         this.filesAll = files;
         this.names = names;
@@ -218,22 +218,22 @@ public class ImportFilesAdapter extends RecyclerView.Adapter<RecyclerView.ViewHo
                 int icon = textInfo.isUrl() ? mega.privacy.android.icon.pack.R.drawable.ic_url_medium_solid : typeForName(fileName).getIconResourceId();
                 ((ViewHolderImportFiles) holder).thumbnail.setImageResource(icon);
             } else {
-                ShareInfo file = (ShareInfo) getItem(position);
-                fileName = file.getTitle();
+                DocumentEntity file = (DocumentEntity) getItem(position);
+                fileName = file.getName();
 
-                if (typeForName(file.getTitle()).isImage()
-                        || typeForName(file.getTitle()).isVideo()
-                        || typeForName(file.getTitle()).isVideoMimeType()) {
+                if (typeForName(file.getName()).isImage()
+                        || typeForName(file.getName()).isVideo()
+                        || typeForName(file.getName()).isVideoMimeType()) {
                     Coil.imageLoader(context).enqueue(
                             new ImageRequest.Builder(context)
-                                    .placeholder(typeForName(file.getTitle()).getIconResourceId())
-                                    .data(file.getFileAbsolutePath())
+                                    .placeholder(typeForName(file.getName()).getIconResourceId())
+                                    .data(file.getUriString())
                                     .target(((ViewHolderImportFiles) holder).thumbnail)
                                     .transformations(new RoundedCornersTransformation(context.getResources().getDimensionPixelSize(R.dimen.thumbnail_corner_radius)))
                                     .build()
                     );
                 } else {
-                    ((ViewHolderImportFiles) holder).thumbnail.setImageResource(typeForName(file.getTitle()).getIconResourceId());
+                    ((ViewHolderImportFiles) holder).thumbnail.setImageResource(typeForName(file.getName()).getIconResourceId());
                 }
 
                 if (files.size() > MAX_VISIBLE_ITEMS_AT_BEGINNING) {

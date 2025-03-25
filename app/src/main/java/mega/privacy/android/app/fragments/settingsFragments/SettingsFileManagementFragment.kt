@@ -1,7 +1,6 @@
 package mega.privacy.android.app.fragments.settingsFragments
 
 import mega.privacy.android.shared.resources.R as sharedR
-import android.content.Intent
 import android.os.Bundle
 import android.text.format.Formatter
 import android.view.LayoutInflater
@@ -14,12 +13,10 @@ import androidx.preference.Preference
 import androidx.preference.SwitchPreferenceCompat
 import com.google.android.material.dialog.MaterialAlertDialogBuilder
 import dagger.hilt.android.AndroidEntryPoint
+import de.palm.composestateevents.StateEventWithContentTriggered
 import mega.privacy.android.app.R
 import mega.privacy.android.app.activities.settingsActivities.FileManagementPreferencesActivity
 import mega.privacy.android.app.arch.extensions.collectFlow
-import mega.privacy.android.app.constants.BroadcastConstants
-import mega.privacy.android.app.constants.BroadcastConstants.ACTION_UPDATE_CACHE_SIZE_SETTING
-import mega.privacy.android.app.constants.BroadcastConstants.CACHE_SIZE
 import mega.privacy.android.app.constants.SettingsConstants.KEY_AUTO_PLAY_SWITCH
 import mega.privacy.android.app.constants.SettingsConstants.KEY_CACHE
 import mega.privacy.android.app.constants.SettingsConstants.KEY_CLEAR_VERSIONS
@@ -163,22 +160,30 @@ class SettingsFileManagementFragment : SettingsBaseFragment(),
         }
 
         if (filePreferencesState.updateCacheSizeSetting != null) {
-            Intent(ACTION_UPDATE_CACHE_SIZE_SETTING).apply {
-                putExtra(CACHE_SIZE, filePreferencesState.updateCacheSizeSetting)
-                setPackage(requireContext().packageName)
-                requireContext().sendBroadcast(this)
-            }
+            setCacheSize(
+                Util.getSizeString(
+                    filePreferencesState.updateCacheSizeSetting,
+                    requireContext()
+                )
+            )
             viewModel.resetUpdateCacheSizeSetting()
         }
 
         filePreferencesState.updateOfflineSize?.let { size ->
             val offlineSize = Util.getSizeString(size, requireContext())
-            Intent(BroadcastConstants.ACTION_UPDATE_OFFLINE_SIZE_SETTING).apply {
-                putExtra(BroadcastConstants.OFFLINE_SIZE, offlineSize)
-                setPackage(requireContext().packageName)
-                requireContext().sendBroadcast(this)
-            }
+            setOfflineSize(offlineSize)
             viewModel.resetUpdateOfflineSize()
+        }
+
+        if (filePreferencesState.deleteAllVersionsEvent is StateEventWithContentTriggered) {
+            val exception = filePreferencesState.deleteAllVersionsEvent.content
+            if (exception == null) {
+                Util.showSnackbar(requireActivity(), getString(R.string.success_delete_versions))
+                resetVersionsInfo()
+            } else {
+                Util.showSnackbar(requireActivity(), getString(R.string.error_delete_versions))
+            }
+            viewModel.resetDeleteAllVersionsEvent()
         }
     }
 
@@ -258,7 +263,7 @@ class SettingsFileManagementFragment : SettingsBaseFragment(),
     /**
      * Method for reset the version information.
      */
-    fun resetVersionsInfo() {
+    private fun resetVersionsInfo() {
         viewModel.resetVersionsInfo()
         clearVersionsFileManagement?.let {
             preferenceScreen.removePreference(it)
@@ -357,11 +362,9 @@ class SettingsFileManagementFragment : SettingsBaseFragment(),
      *
      * @param size cache size
      */
-    fun setCacheSize(size: String?) {
-        if (isAdded) {
-            cacheAdvancedOptions?.summary =
-                getString(R.string.settings_advanced_features_size, size)
-        }
+    private fun setCacheSize(size: String?) {
+        cacheAdvancedOptions?.summary =
+            getString(R.string.settings_advanced_features_size, size)
     }
 
     /**
@@ -369,7 +372,7 @@ class SettingsFileManagementFragment : SettingsBaseFragment(),
      *
      * @param size offline size
      */
-    fun setOfflineSize(size: String?) {
+    private fun setOfflineSize(size: String?) {
         if (isAdded) {
             offlineFileManagement?.summary =
                 getString(R.string.settings_advanced_features_size, size)

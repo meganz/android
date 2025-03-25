@@ -39,8 +39,8 @@ import mega.privacy.android.shared.original.core.ui.controls.lists.NodeListViewI
 import mega.privacy.android.shared.original.core.ui.controls.progressindicator.MegaCircularProgressIndicator
 import mega.privacy.android.shared.original.core.ui.controls.text.MegaText
 import mega.privacy.android.shared.original.core.ui.preview.CombinedThemePreviews
-import mega.privacy.android.shared.original.core.ui.theme.OriginalTempTheme
-import mega.privacy.android.shared.original.core.ui.theme.values.TextColor
+import mega.privacy.android.shared.original.core.ui.theme.OriginalTheme
+import mega.android.core.ui.theme.values.TextColor
 import mega.privacy.android.shared.original.core.ui.utils.showAutoDurationSnackbar
 
 @OptIn(ExperimentalComposeUiApi::class)
@@ -170,7 +170,7 @@ private fun UnzipProgressBarView(
 @CombinedThemePreviews
 @Composable
 private fun ZipBrowserViewPreview() {
-    OriginalTempTheme(isDark = isSystemInDarkTheme()) {
+    OriginalTheme(isDark = isSystemInDarkTheme()) {
         ZipBrowserView(
             items = initPreviewData(),
             parentFolderName = "Folder name",
@@ -185,7 +185,7 @@ private fun ZipBrowserViewPreview() {
 @CombinedThemePreviews
 @Composable
 private fun ZipBrowserViewWithProgressBarPreview() {
-    OriginalTempTheme(isDark = isSystemInDarkTheme()) {
+    OriginalTheme(isDark = isSystemInDarkTheme()) {
         ZipBrowserView(
             items = initPreviewData(),
             parentFolderName = "Folder name",
@@ -200,7 +200,7 @@ private fun ZipBrowserViewWithProgressBarPreview() {
 @CombinedThemePreviews
 @Composable
 private fun ZipBrowserViewWithAlertDialogPreview() {
-    OriginalTempTheme(isDark = isSystemInDarkTheme()) {
+    OriginalTheme(isDark = isSystemInDarkTheme()) {
         ZipBrowserView(
             items = initPreviewData(),
             parentFolderName = "Folder name",
@@ -259,7 +259,7 @@ private fun initZipInfoUiEntity(
 @CombinedThemePreviews
 @Composable
 private fun UnzipProgressBarViewPreview() {
-    OriginalTempTheme(isDark = isSystemInDarkTheme()) {
+    OriginalTheme(isDark = isSystemInDarkTheme()) {
         UnzipProgressBarView()
     }
 }

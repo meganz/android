@@ -15,7 +15,6 @@ import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.defaultMinSize
-import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.material.ButtonDefaults
@@ -45,7 +44,7 @@ import mega.privacy.android.shared.original.core.ui.controls.layouts.MegaScaffol
 import mega.privacy.android.shared.original.core.ui.preview.BooleanProvider
 import mega.privacy.android.shared.original.core.ui.preview.CombinedThemePreviews
 import mega.privacy.android.shared.original.core.ui.theme.MegaOriginalTheme
-import mega.privacy.android.shared.original.core.ui.theme.OriginalTempTheme
+import mega.privacy.android.shared.original.core.ui.theme.OriginalTheme
 
 /**
  * MegaMultiFloatingActionButton
@@ -101,39 +100,37 @@ fun MegaMultiFloatingActionButton(
         onStateChanged?.invoke(currentState)
     }
 
-    Box(modifier = modifier.fillMaxSize(), contentAlignment = Alignment.BottomEnd) {
-        Column(
-            horizontalAlignment = Alignment.End,
-            verticalArrangement = Arrangement.Bottom,
-        ) {
-            items.forEach { item ->
-                AnimatedVisibility(visible = isExpanded) {
-                    MultiFloatingActionButtonItem(
-                        item = item,
-                        showLabel = showLabels,
-                    )
-                }
+    Column(
+        horizontalAlignment = Alignment.End,
+        verticalArrangement = Arrangement.Bottom,
+    ) {
+        items.forEach { item ->
+            AnimatedVisibility(visible = isExpanded) {
+                MultiFloatingActionButtonItem(
+                    item = item,
+                    showLabel = showLabels,
+                )
             }
-            Box(
-                modifier = Modifier
-                    .padding(top = 16.dp)
-                    .size(max(mainButtonCollapsedStyle.size, mainButtonExpandedStyle.size)),
-                contentAlignment = Alignment.Center
+        }
+        Box(
+            modifier = modifier
+                .padding(top = 16.dp)
+                .size(max(mainButtonCollapsedStyle.size, mainButtonExpandedStyle.size)),
+            contentAlignment = Alignment.Center
+        ) {
+            MegaFloatingActionButton(
+                onClick = { stateChange() },
+                modifier = Modifier.testTag(tag = MULTI_FAB_MAIN_FAB_TEST_TAG),
+                style = if (isExpanded) mainButtonExpandedStyle else mainButtonCollapsedStyle,
+                enabled = enabled,
+                backgroundColor = if (isExpanded) MegaOriginalTheme.colors.button.secondary else MegaOriginalTheme.colors.button.primary
             ) {
-                MegaFloatingActionButton(
-                    onClick = { stateChange() },
-                    modifier = Modifier.testTag(tag = MULTI_FAB_MAIN_FAB_TEST_TAG),
-                    style = if (isExpanded) mainButtonExpandedStyle else mainButtonCollapsedStyle,
-                    enabled = enabled,
-                    backgroundColor = if (isExpanded) MegaOriginalTheme.colors.button.secondary else MegaOriginalTheme.colors.button.primary
-                ) {
-                    Icon(
-                        painter = icon,
-                        contentDescription = null,
-                        tint = if (isExpanded) MegaOriginalTheme.colors.icon.primary else MegaOriginalTheme.colors.icon.inverse,
-                        modifier = Modifier.rotate(rotation)
-                    )
-                }
+                Icon(
+                    painter = icon,
+                    contentDescription = null,
+                    tint = if (isExpanded) MegaOriginalTheme.colors.icon.primary else MegaOriginalTheme.colors.icon.inverse,
+                    modifier = Modifier.rotate(rotation)
+                )
             }
         }
     }
@@ -229,7 +226,7 @@ class MultiFloatingActionButtonItem(
 private fun MegaMultiFloatingActionButtonCollapsedPreview(
     @PreviewParameter(BooleanProvider::class) enabled: Boolean,
 ) {
-    OriginalTempTheme(isDark = isSystemInDarkTheme()) {
+    OriginalTheme(isDark = isSystemInDarkTheme()) {
         val multiFabState = rememberMultiFloatingActionButtonState()
         MegaScaffold(
             topBar = { MegaAppBar(appBarType = AppBarType.NONE, title = "Top bar title") },
@@ -266,7 +263,7 @@ private fun MegaMultiFloatingActionButtonCollapsedPreview(
 private fun MegaMultiFloatingActionButtonExpandedPreview(
     @PreviewParameter(BooleanProvider::class) enabled: Boolean,
 ) {
-    OriginalTempTheme(isDark = isSystemInDarkTheme()) {
+    OriginalTheme(isDark = isSystemInDarkTheme()) {
         val multiFabState =
             rememberMultiFloatingActionButtonState(MultiFloatingActionButtonState.EXPANDED)
         MegaScaffold(
@@ -299,7 +296,15 @@ private fun MegaMultiFloatingActionButtonExpandedPreview(
     }
 }
 
-internal const val MULTI_FAB_MAIN_FAB_TEST_TAG = "multi_fab:main_fab"
-internal const val MULTI_FAB_OPTION_ROW_TEST_TAG = "multi_fab:option_row"
+/**
+ * Multi FAB main button's test tag
+ */
+const val MULTI_FAB_MAIN_FAB_TEST_TAG = "multi_fab:main_fab"
+
+/**
+ * Multi FAB option row's test tag
+ */
+const val MULTI_FAB_OPTION_ROW_TEST_TAG = "multi_fab:option_row"
+
 internal const val MULTI_FAB_OPTION_LABEL_TEST_TAG = "multi_fab:option_label"
 internal const val MULTI_FAB_OPTION_FAB_TEST_TAG = "multi_fab:option_fab"

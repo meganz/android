@@ -1,5 +1,6 @@
 package mega.privacy.android.domain.entity.transfer
 
+import mega.privacy.android.domain.entity.Progress
 import mega.privacy.android.domain.exception.MegaException
 
 
@@ -11,6 +12,10 @@ import mega.privacy.android.domain.exception.MegaException
 sealed interface TransferEvent {
     val transfer: Transfer
 
+    /**
+     * @return true if this event represents a finished with error event
+     */
+    fun isFinishedWithErrorEvent() = this is TransferFinishEvent && error != null
 
     /**
      * Transfer start event
@@ -86,3 +91,39 @@ sealed interface TransferEvent {
         val currentFileLeafName: String?,
     ) : TransferEvent
 }
+
+/**
+ * return true if this event represents a finish processing event (or already finished)
+ */
+val TransferEvent.isFinishScanningEvent: Boolean
+    get() = when {
+        (this as? TransferEvent.FolderTransferUpdateEvent)?.stage == TransferStage.STAGE_TRANSFERRING_FILES -> true
+        this is TransferEvent.TransferFinishEvent -> true
+        this is TransferEvent.TransferStartEvent && isFileTransfer -> true
+        this is TransferEvent.TransferUpdateEvent && isFileTransfer -> true
+        else -> false
+    }
+
+val TransferEvent.isTransferUpdated: Boolean
+    get() = when {
+        isFileTransfer && this !is TransferEvent.TransferStartEvent -> true
+        isFolderTransfer && isFinishScanningEvent -> true
+        else -> false
+    }
+
+/**
+ * This event indicates that the transfer was not done due to being already transferred.
+ */
+val TransferEvent.isAlreadyTransferredEvent: Boolean
+    get() = with(this.transfer) {
+        !isFolderTransfer && isAlreadyTransferred
+    }
+
+/**
+ * This event is related to a file transfer, not a folder.
+ */
+val TransferEvent.isFileTransfer: Boolean
+    get() = !this.transfer.isFolderTransfer
+
+val TransferEvent.isFolderTransfer: Boolean
+    get() = this.transfer.isFolderTransfer

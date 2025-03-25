@@ -29,12 +29,13 @@ import androidx.compose.ui.tooling.preview.PreviewParameter
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import mega.privacy.android.app.R
+import mega.privacy.android.app.presentation.account.business.AccountSuspendedDialog
 import mega.privacy.android.app.presentation.fileinfo.model.FileInfoViewState
 import mega.privacy.android.app.presentation.fileinfo.view.sharedinfo.SharedInfoView
 import mega.privacy.android.app.utils.Util
 import mega.privacy.android.domain.entity.contacts.ContactPermission
 import mega.privacy.android.shared.original.core.ui.preview.CombinedThemePreviews
-import mega.privacy.android.shared.original.core.ui.theme.OriginalTempTheme
+import mega.privacy.android.shared.original.core.ui.theme.OriginalTheme
 import mega.privacy.android.shared.original.core.ui.theme.extensions.grey_alpha_012_white_alpha_012
 
 /**
@@ -57,11 +58,11 @@ internal fun FileInfoContent(
     onVerifyContactClick: (String) -> Unit,
     onSetDescriptionClick: (String) -> Unit,
     onAddTagClick: () -> Unit,
-    modifier: Modifier = Modifier,
-    onUpgradeAccountClick: () -> Unit,
     getAddress: suspend (Context, Double, Double) -> Address?,
+    modifier: Modifier = Modifier,
 ) {
     var isShareContactExpanded by remember { mutableStateOf(false) }
+    var showExpiredBusinessDialog by remember { mutableStateOf(false) }
     Column(
         modifier = modifier
     ) {
@@ -76,6 +77,15 @@ internal fun FileInfoContent(
                     onLinkClick = onTakeDownLinkClick,
                     onCloseClick = { showTakeDownWarning = false }
                 )
+            }
+            if (showExpiredBusinessDialog) {
+                accountDeactivatedStatus?.let {
+                    AccountSuspendedDialog(
+                        accountDeactivatedStatus = it,
+                        onAlertAcknowledged = { showExpiredBusinessDialog = false },
+                        onAlertDismissed = { showExpiredBusinessDialog = false },
+                    )
+                }
             }
 
             //owner (incoming share)
@@ -216,27 +226,38 @@ internal fun FileInfoContent(
             FileInfoDescriptionField(
                 modifier = Modifier
                     .fillMaxWidth()
-                    .padding(horizontal = 16.dp, vertical = 8.dp),
+                    .padding(horizontal = 16.dp, vertical = 8.dp)
+                    .clickable {
+                        if (viewState.accountDeactivatedStatus != null) {
+                            showExpiredBusinessDialog = true
+                        } else {
+                            onSetDescriptionClick(descriptionText)
+                        }
+                    },
                 descriptionText = descriptionText,
                 labelId = sharedR.string.file_info_information_description_label,
                 placeholder = if (isDescriptionEnabled()) stringResource(id = sharedR.string.file_info_information_description_placeholder) else stringResource(
                     id = sharedR.string.file_info_information_no_description_placeholder
                 ),
-                isEditable = isDescriptionEnabled(),
+                isEditable = isDescriptionEnabled() && viewState.accountDeactivatedStatus == null,
                 onConfirmDescription = onSetDescriptionClick,
             )
 
             //tags
-            if (canEnableTags()) {
+            if (canEditTags() || canViewTags()) {
                 FileInfoTagsView(
                     modifier = Modifier
                         .fillMaxWidth()
                         .padding(vertical = 8.dp),
                     tags = tags,
-                    isProAccount = isProAccount,
-                    isBusinessAccountActive = isBusinessAccountActive,
-                    onAddTagClick = onAddTagClick,
-                    onUpgradeAccountClick = onUpgradeAccountClick
+                    canEditTags = canEditTags(),
+                    onAddTagClick = {
+                        if (viewState.accountDeactivatedStatus != null) {
+                            showExpiredBusinessDialog = true
+                        } else {
+                            onAddTagClick()
+                        }
+                    },
                 )
             }
 
@@ -280,7 +301,7 @@ private fun FileInfoContentPreview(
 ) {
     val scrollState = rememberScrollState()
     var state by mutableStateOf(viewState) //not remembered to allow multiple states in device, don't do that in real code, just in previews
-    OriginalTempTheme(isDark = isSystemInDarkTheme()) {
+    OriginalTheme(isDark = isSystemInDarkTheme()) {
         FileInfoContent(
             viewState = state,
             onTakeDownLinkClick = {},
@@ -299,7 +320,6 @@ private fun FileInfoContentPreview(
             onVerifyContactClick = {},
             onSetDescriptionClick = {},
             onAddTagClick = {},
-            onUpgradeAccountClick = {},
             modifier = Modifier.verticalScroll(scrollState),
             getAddress = { _, _, _ -> null }
         )

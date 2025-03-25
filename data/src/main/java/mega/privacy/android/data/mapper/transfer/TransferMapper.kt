@@ -19,7 +19,7 @@ internal class TransferMapper @Inject constructor(
      * @param transfer [MegaTransfer]
      */
     operator fun invoke(transfer: MegaTransfer): Transfer {
-        val appData = transferAppDataMapper(transfer.appData.orEmpty())
+        val appData = transferAppDataMapper(transfer.appData.orEmpty(), transfer.parentPath)
         return Transfer(
             transferType = transferTypeMapper(transfer.type, appData),
             transferredBytes = transfer.transferredBytes,

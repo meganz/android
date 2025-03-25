@@ -19,7 +19,7 @@ import mega.privacy.android.app.arch.extensions.collectFlow
 import mega.privacy.android.app.meeting.activity.MeetingActivity
 import mega.privacy.android.app.presentation.meeting.view.WaitingRoomView
 import mega.privacy.android.app.presentation.security.PasscodeCheck
-import mega.privacy.android.shared.original.core.ui.theme.OriginalTempTheme
+import mega.privacy.android.shared.original.core.ui.theme.OriginalTheme
 import nz.mega.sdk.MegaChatApiJava
 import timber.log.Timber
 import javax.inject.Inject
@@ -106,7 +106,7 @@ class WaitingRoomActivity : AppCompatActivity() {
     @Composable
     fun MainComposeView() {
         val uiState by viewModel.state.collectAsStateWithLifecycle()
-        OriginalTempTheme(isDark = true) {
+        OriginalTheme(isDark = true) {
             WaitingRoomView(
                 state = uiState,
                 onInfoClicked = ::launchInfoScreen,

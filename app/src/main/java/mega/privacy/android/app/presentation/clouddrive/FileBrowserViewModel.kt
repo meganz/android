@@ -15,8 +15,6 @@ import kotlinx.coroutines.flow.collectLatest
 import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.flow.conflate
 import kotlinx.coroutines.flow.drop
-import kotlinx.coroutines.flow.firstOrNull
-import kotlinx.coroutines.flow.flow
 import kotlinx.coroutines.flow.launchIn
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.merge
@@ -26,8 +24,6 @@ import kotlinx.coroutines.launch
 import kotlinx.coroutines.runBlocking
 import mega.privacy.android.app.extensions.updateItemAt
 import mega.privacy.android.app.featuretoggle.ApiFeatures
-import mega.privacy.android.app.featuretoggle.AppFeatures
-import mega.privacy.android.app.globalmanagement.TransfersManagement
 import mega.privacy.android.app.presentation.clouddrive.mapper.StorageCapacityMapper
 import mega.privacy.android.app.presentation.clouddrive.model.FileBrowserState
 import mega.privacy.android.app.presentation.clouddrive.model.StorageOverQuotaCapacity
@@ -67,8 +63,9 @@ import mega.privacy.android.domain.usecase.node.IsNodeInRubbishBinUseCase
 import mega.privacy.android.domain.usecase.node.MonitorNodeUpdatesUseCase
 import mega.privacy.android.domain.usecase.offline.MonitorOfflineNodeUpdatesUseCase
 import mega.privacy.android.domain.usecase.photos.mediadiscovery.ShouldEnterMediaDiscoveryModeUseCase
-import mega.privacy.android.domain.usecase.quota.GetBandwidthOverQuotaDelayUseCase
 import mega.privacy.android.domain.usecase.setting.MonitorShowHiddenItemsUseCase
+import mega.privacy.android.domain.usecase.transfers.overquota.GetBandwidthOverQuotaDelayUseCase
+import mega.privacy.android.domain.usecase.transfers.overquota.IsInTransferOverQuotaUseCase
 import mega.privacy.android.domain.usecase.viewtype.MonitorViewType
 import mega.privacy.android.domain.usecase.viewtype.SetViewType
 import nz.mega.sdk.MegaApiJava
@@ -91,7 +88,6 @@ import javax.inject.Inject
  * @param handleOptionClickMapper [HandleOptionClickMapper] handle option click click mapper
  * @param monitorRefreshSessionUseCase [MonitorRefreshSessionUseCase]
  * @param getBandwidthOverQuotaDelayUseCase [GetBandwidthOverQuotaDelayUseCase]
- * @param transfersManagement [TransfersManagement]
  * @param containsMediaItemUseCase [ContainsMediaItemUseCase]
  * @param fileDurationMapper [FileDurationMapper]
  */
@@ -109,7 +105,6 @@ class FileBrowserViewModel @Inject constructor(
     private val handleOptionClickMapper: HandleOptionClickMapper,
     private val monitorRefreshSessionUseCase: MonitorRefreshSessionUseCase,
     private val getBandwidthOverQuotaDelayUseCase: GetBandwidthOverQuotaDelayUseCase,
-    private val transfersManagement: TransfersManagement,
     private val containsMediaItemUseCase: ContainsMediaItemUseCase,
     private val fileDurationMapper: FileDurationMapper,
     private val monitorOfflineNodeUpdatesUseCase: MonitorOfflineNodeUpdatesUseCase,
@@ -127,6 +122,7 @@ class FileBrowserViewModel @Inject constructor(
     private val setAlmostFullStorageBannerClosingTimestampUseCase: SetAlmostFullStorageBannerClosingTimestampUseCase,
     private val monitorAlmostFullStorageBannerClosingTimestampUseCase: MonitorAlmostFullStorageBannerVisibilityUseCase,
     private val storageCapacityMapper: StorageCapacityMapper,
+    private val isInTransferOverQuotaUseCase: IsInTransferOverQuotaUseCase,
 ) : ViewModel() {
 
     private val _state = MutableStateFlow(FileBrowserState())
@@ -174,17 +170,14 @@ class FileBrowserViewModel @Inject constructor(
     private fun monitorStorageOverQuotaCapacity() {
         viewModelScope.launch {
             combine(
-                flow { emit(getFeatureFlagValueUseCase(AppFeatures.FullStorageOverQuotaBanner)) },
-                flow { emit(getFeatureFlagValueUseCase(AppFeatures.AlmostFullStorageOverQuotaBanner)) },
-                monitorStorageStateUseCase()
+                monitorStorageStateUseCase(),
+                monitorAlmostFullStorageBannerClosingTimestampUseCase()
             )
-            { isFullStorageOverQuotaBannerEnabled: Boolean, isAlmostFullStorageQuotaBannerEnabled: Boolean, storageState: StorageState ->
+            { storageState: StorageState, shouldShow: Boolean ->
                 cachedStorageState = storageState
                 storageCapacityMapper(
-                    storageState,
-                    isFullStorageOverQuotaBannerEnabled,
-                    isAlmostFullStorageQuotaBannerEnabled,
-                    isDismissiblePeriodOver = checkForDismissiblePeriodForAlmostFullStorage()
+                    storageState = storageState,
+                    shouldShow = shouldShow
                 )
             }.catch { Timber.e(it) }
                 .collectLatest { storageCapacity ->
@@ -193,36 +186,6 @@ class FileBrowserViewModel @Inject constructor(
                     }
                 }
         }
-    }
-
-    /**
-     * Update storage capacity if needed
-     */
-    fun updateStorageCapacityIfNeeded() {
-        viewModelScope.launch {
-            val isDismissiblePeriodOver = checkForDismissiblePeriodForAlmostFullStorage()
-            val currentStorageCapacity = _state.value.storageCapacity
-            if (currentStorageCapacity == StorageOverQuotaCapacity.DEFAULT
-                && isDismissiblePeriodOver
-                && cachedStorageState == StorageState.Orange
-            ) {
-                _state.update { it.copy(storageCapacity = StorageOverQuotaCapacity.ALMOST_FULL) }
-            } else if (currentStorageCapacity == StorageOverQuotaCapacity.ALMOST_FULL && !isDismissiblePeriodOver) {
-                _state.update { it.copy(storageCapacity = StorageOverQuotaCapacity.DEFAULT) }
-            }
-        }
-    }
-
-    /**
-     * Check if dismissible period for almost full storage banner is over
-     * @return true if dismissible period is over
-     */
-    private suspend fun checkForDismissiblePeriodForAlmostFullStorage(): Boolean {
-        return runCatching {
-            monitorAlmostFullStorageBannerClosingTimestampUseCase().firstOrNull()
-        }.onFailure {
-            Timber.e(it)
-        }.getOrNull() ?: false
     }
 
     private fun monitorConnectivity() {
@@ -355,6 +318,7 @@ class FileBrowserViewModel @Inject constructor(
                 accessedFolderHandle = folderHandle,
                 openedFolderNodeHandles = emptySet(),
                 errorMessage = errorMessage,
+                selectedTab = CloudDriveTab.CLOUD
             )
         }
         if (shouldEnterMediaDiscoveryMode(
@@ -440,6 +404,7 @@ class FileBrowserViewModel @Inject constructor(
                 isLoading = false,
                 sortOrder = sortOrder,
                 isFileBrowserEmpty = isFileBrowserEmpty,
+                isRootNode = isRootNode
             )
         }
     }
@@ -490,6 +455,42 @@ class FileBrowserViewModel @Inject constructor(
     }
 
     /**
+     * Checks if file browser is to open a Sync Folder or not
+     *
+     * @return True if file browser is to open a Sync Folder or False otherwise
+     */
+    fun isSyncFolderOpen() = _state.value.isSyncFolderOpen
+
+
+    /**
+     * Checks if file browser is opened from Sync Tab
+     */
+    fun isFromSyncTab() = _state.value.isFromSyncTab
+
+
+    /**
+     * Sets the Sync Folder Visibility
+     *
+     * @param isSyncFolderOpen True if file browser is to open a Sync Folder or False otherwise
+     */
+    fun setSyncFolderVisibility(isSyncFolderOpen: Boolean) =
+        _state.update { it.copy(isSyncFolderOpen = isSyncFolderOpen) }
+
+    /**
+     * Sets is file browser is opened from Sync Tab
+     *
+     * @param isFromSyncTab True if file browser is opened from sync tab
+     */
+    fun setIsFromSyncTab(isFromSyncTab: Boolean) =
+        _state.update { it.copy(isFromSyncTab = isFromSyncTab, selectedTab = CloudDriveTab.CLOUD) }
+
+    /**
+     * Resets the Sync Folder Visibility
+     */
+    fun resetSyncFolderVisibility() =
+        _state.update { it.copy(isSyncFolderOpen = false, isFromSyncTab = false) }
+
+    /**
      * Navigate back to the Cloud Drive Root Level hierarchy
      */
     suspend fun goBackToRootLevel() {
@@ -498,6 +499,10 @@ class FileBrowserViewModel @Inject constructor(
                 accessedFolderHandle = null,
                 isMediaDiscoveryOpen = false,
                 isMediaDiscoveryOpenedByIconClick = false,
+                isSyncFolderOpen = false,
+                selectedTab = if (it.isFromSyncTab) CloudDriveTab.SYNC else CloudDriveTab.CLOUD,
+                isFromSyncTab = false,
+                updateToolbarTitleEvent = triggered
             )
         }
         getRootNodeUseCase()?.id?.longValue?.let { rootHandle ->
@@ -562,7 +567,7 @@ class FileBrowserViewModel @Inject constructor(
             _state.update {
                 it.copy(
                     openedFolderNodeHandles = emptySet(),
-                    exitFileBrowserEvent = triggered
+                    exitFileBrowserEvent = triggered,
                 )
             }
         }
@@ -676,10 +681,11 @@ class FileBrowserViewModel @Inject constructor(
     fun changeTransferOverQuotaBannerVisibility() {
         viewModelScope.launch {
             val overQuotaBannerTimeDelay = getBandwidthOverQuotaDelayUseCase()
+            val isTransferOverQuota = isInTransferOverQuotaUseCase()
             _state.update {
                 it.copy(
-                    shouldShowBannerVisibility = transfersManagement.isTransferOverQuotaBannerShown,
-                    bannerTime = overQuotaBannerTimeDelay
+                    shouldShowBannerVisibility = isTransferOverQuota,
+                    bannerTime = overQuotaBannerTimeDelay.inWholeSeconds
                 )
             }
         }
@@ -866,6 +872,13 @@ class FileBrowserViewModel @Inject constructor(
         _state.update { it.copy(isAccessedFolderExited = false) }
 
     /**
+     * Checks if the User is in the Folder that was immediately accessed
+     *
+     * @return true if the User is at the accessed Folder
+     */
+    fun isAtAccessedFolder() = _state.value.fileBrowserHandle == _state.value.accessedFolderHandle
+
+    /**
      * Hide or unhide the node
      */
     fun hideOrUnhideNodes(nodeIds: List<NodeId>, hide: Boolean) = viewModelScope.launch {
@@ -971,5 +984,12 @@ class FileBrowserViewModel @Inject constructor(
                 setAlmostFullStorageBannerClosingTimestampUseCase()
             }.onFailure { Timber.e(it) }
         }
+    }
+
+    /**
+     * set the selected tab
+     */
+    fun onTabChanged(tab: CloudDriveTab) {
+        _state.update { it.copy(selectedTab = tab) }
     }
 }

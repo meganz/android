@@ -11,7 +11,7 @@ import mega.privacy.android.shared.original.core.ui.controls.dividers.DividerTyp
 import mega.privacy.android.shared.original.core.ui.controls.dividers.MegaDivider
 import mega.privacy.android.shared.original.core.ui.controls.lists.GenericTwoLineListItem
 import mega.privacy.android.shared.original.core.ui.preview.CombinedThemePreviews
-import mega.privacy.android.shared.original.core.ui.theme.OriginalTempTheme
+import mega.privacy.android.shared.original.core.ui.theme.OriginalTheme
 
 /**
  * A [Composable] that displays the maximum aggregate Video Size that must be exceeded in order to
@@ -51,7 +51,7 @@ internal fun VideoCompressionTile(
 @CombinedThemePreviews
 @Composable
 private fun VideoCompressionTilePreview() {
-    OriginalTempTheme(isDark = isSystemInDarkTheme()) {
+    OriginalTheme(isDark = isSystemInDarkTheme()) {
         VideoCompressionTile(
             maximumNonChargingVideoCompressionSize = 500,
             onItemClicked = {},

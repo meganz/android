@@ -19,8 +19,12 @@ import mega.privacy.android.domain.entity.statistics.EndedEmptyCallTimeout
 import mega.privacy.android.domain.qualifier.ApplicationScope
 import mega.privacy.android.domain.usecase.call.HangChatCallUseCase
 import mega.privacy.android.domain.usecase.chat.BroadcastJoinedSuccessfullyUseCase
-import mega.privacy.android.domain.usecase.meeting.BroadcastWaitingForOtherParticipantsHasEndedUseCase
+import mega.privacy.android.domain.usecase.chat.IsChatOpeningWithLinkUseCase
+import mega.privacy.android.domain.usecase.chat.RemoveChatOpeningWithLinkUseCase
+import mega.privacy.android.domain.usecase.chat.SetChatOpeningWithLinkUseCase
 import mega.privacy.android.domain.usecase.meeting.BroadcastLocalVideoChangedDueToProximitySensorUseCase
+import mega.privacy.android.domain.usecase.meeting.BroadcastWaitingForOtherParticipantsHasEndedUseCase
+import mega.privacy.android.domain.usecase.meeting.EnableOrDisableVideoUseCase
 import mega.privacy.android.domain.usecase.meeting.SendStatisticsMeetingsUseCase
 import nz.mega.sdk.MegaChatApiAndroid
 import nz.mega.sdk.MegaChatApiJava
@@ -48,10 +52,14 @@ class ChatManagement @Inject constructor(
     private val rtcAudioManagerGateway: RTCAudioManagerGateway,
     private val megaChatApi: MegaChatApiAndroid,
     private val broadcastJoinedSuccessfullyUseCase: BroadcastJoinedSuccessfullyUseCase,
+    private val enableOrDisableVideoUseCase: EnableOrDisableVideoUseCase,
     private val broadcastWaitingForOtherParticipantsHasEndedUseCase: BroadcastWaitingForOtherParticipantsHasEndedUseCase,
-    private val broadcastLocalVideoChangedDueToProximitySensorUseCase: BroadcastLocalVideoChangedDueToProximitySensorUseCase
+    private val broadcastLocalVideoChangedDueToProximitySensorUseCase: BroadcastLocalVideoChangedDueToProximitySensorUseCase,
+    private val setChatOpeningWithLinkUseCase: SetChatOpeningWithLinkUseCase,
+    private val removeChatOpeningWithLinkUseCase: RemoveChatOpeningWithLinkUseCase,
+    private val isChatOpeningWithLinkUseCase: IsChatOpeningWithLinkUseCase,
 
-) {
+    ) {
     private val app: MegaApplication = getInstance()
     private var countDownTimerToEndCall: CountDownTimer? = null
 
@@ -329,15 +337,16 @@ class ChatManagement @Inject constructor(
      * @param chatId The chat ID to check
      * @return True if is opening a meeting link of the chat or false otherwise
      */
-    fun isOpeningMeetingLink(chatId: Long) =
-        if (chatId != MegaChatApiJava.MEGACHAT_INVALID_HANDLE && hashOpeningMeetingLink.containsKey(
-                chatId
-            ) && hashOpeningMeetingLink[chatId] != null
+    fun isOpeningMeetingLink(chatId: Long): Boolean {
+        if (chatId != MegaChatApiJava.MEGACHAT_INVALID_HANDLE &&
+            (hashOpeningMeetingLink.containsKey(chatId) || isChatOpeningWithLinkUseCase(chatId))
         ) {
-            hashOpeningMeetingLink[chatId]!!
+            if (isChatOpeningWithLinkUseCase(chatId)) return true
+            return hashOpeningMeetingLink[chatId] == true
         } else {
-            false
+            return false
         }
+    }
 
     /**
      * Set if is opening a meeting link of a chat
@@ -348,6 +357,27 @@ class ChatManagement @Inject constructor(
     fun setOpeningMeetingLink(chatId: Long, isOpeningMeetingLink: Boolean) {
         if (chatId != MegaChatApiJava.MEGACHAT_INVALID_HANDLE) {
             hashOpeningMeetingLink[chatId] = isOpeningMeetingLink
+            if (isOpeningMeetingLink) {
+                setChatOpeningWithLinkUseCase(chatId)
+            } else {
+                removeChatOpeningWithLinkUseCase(chatId)
+            }
+        }
+    }
+
+    /**
+     * Enable or disable local video
+     *
+     * @param chatId
+     * @param enable
+     */
+    private fun enableDisableVideo(chatId: Long, enable: Boolean) {
+        applicationScope.launch {
+            runCatching {
+                enableOrDisableVideoUseCase(chatId, enable)
+            }.onFailure { exception ->
+                Timber.e(exception.message)
+            }
         }
     }
 
@@ -550,6 +580,13 @@ class ChatManagement @Inject constructor(
             Timber.d("Opening meeting link, don't show notification")
             return
         }
+
+        val hasScheduledMeeting = megaChatApi.getScheduledMeetingsByChat(chatId)
+        if(hasScheduledMeeting != null) {
+            Timber.d("Scheduled meeting, don't show notification")
+            return
+        }
+
         Timber.d("Show incoming call notification")
         app.showOneCallNotification(call)
     }
@@ -598,11 +635,7 @@ class ChatManagement @Inject constructor(
                     if (callInProgress.hasLocalVideo() && !isDisablingLocalVideo) {
                         Timber.d("Screen locked, local video is going to be disabled")
                         isScreenOn = false
-                        CallUtil.enableOrDisableLocalVideo(
-                            false, callInProgress.chatid, DisableAudioVideoCallListener(
-                                getInstance()
-                            )
-                        )
+                        enableDisableVideo(callInProgress.chatid, enable = false)
                     }
                 }
 
@@ -612,11 +645,7 @@ class ChatManagement @Inject constructor(
                     if (!callInProgress.hasLocalVideo() && !isDisablingLocalVideo) {
                         Timber.d("Screen unlocked, local video is going to be enabled")
                         isScreenOn = true
-                        CallUtil.enableOrDisableLocalVideo(
-                            true, callInProgress.chatid, DisableAudioVideoCallListener(
-                                getInstance()
-                            )
-                        )
+                        enableDisableVideo(callInProgress.chatid, enable = true)
                     }
                 }
             }
@@ -654,11 +683,7 @@ class ChatManagement @Inject constructor(
                 isInTemporaryState = true
                 broadcastChangesInLocalVideoDueToProximitySensor(false)
                 if (call.hasLocalVideo() && !isDisablingLocalVideo) {
-                    CallUtil.enableOrDisableLocalVideo(
-                        false, call.chatid, DisableAudioVideoCallListener(
-                            getInstance()
-                        )
-                    )
+                    enableDisableVideo(chatId = call.chatid, enable = false)
                 }
             }
 
@@ -668,11 +693,7 @@ class ChatManagement @Inject constructor(
                 isInTemporaryState = false
                 broadcastChangesInLocalVideoDueToProximitySensor(true)
                 if (!call.hasLocalVideo() && !isDisablingLocalVideo) {
-                    CallUtil.enableOrDisableLocalVideo(
-                        true, call.chatid, DisableAudioVideoCallListener(
-                            getInstance()
-                        )
-                    )
+                    enableDisableVideo(chatId = call.chatid, enable = true)
                 }
             }
         }

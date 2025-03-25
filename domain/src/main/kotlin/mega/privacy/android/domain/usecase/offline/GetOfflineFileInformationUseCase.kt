@@ -2,6 +2,7 @@ package mega.privacy.android.domain.usecase.offline
 
 import mega.privacy.android.domain.entity.offline.OfflineFileInformation
 import mega.privacy.android.domain.entity.offline.OfflineNodeInformation
+import mega.privacy.android.domain.entity.uri.UriPath
 import mega.privacy.android.domain.usecase.favourites.GetOfflineFileUseCase
 import mega.privacy.android.domain.usecase.file.GetFileTypeInfoUseCase
 import mega.privacy.android.domain.usecase.file.IsImageFileUseCase
@@ -67,7 +68,7 @@ class GetOfflineFileInformationUseCase @Inject constructor(
         handle: Long,
     ): String? = when {
         isFolder -> null
-        useOriginalImageAsThumbnail && isImageFileUseCase(offlineFile.absolutePath) -> offlineFile
+        useOriginalImageAsThumbnail && isImageFileUseCase(UriPath.fromFile(offlineFile)) -> offlineFile
         else -> getThumbnailUseCase(handle)
     }?.takeIf { it.exists() }?.toURI()?.toString()
 
