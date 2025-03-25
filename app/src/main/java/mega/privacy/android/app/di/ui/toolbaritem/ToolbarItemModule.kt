@@ -36,6 +36,7 @@ import mega.privacy.android.app.presentation.node.model.toolbarmenuitems.ShareFo
 import mega.privacy.android.app.presentation.node.model.toolbarmenuitems.ShareToolBarMenuItem
 import mega.privacy.android.app.presentation.node.model.toolbarmenuitems.TrashToolbarMenuItem
 import mega.privacy.android.app.presentation.node.model.toolbarmenuitems.UnhideDropdownMenuItem
+import javax.inject.Singleton
 
 /**
  * Toolbar module
@@ -54,6 +55,7 @@ abstract class ToolbarItemModule {
         @Provides
         @ElementsIntoSet
         @OutgoingShares
+        @Singleton
         fun provideOutgoingSharesToolbarItems(
             selectAllToolbarMenuItem: SelectAllToolbarMenuItem,
             clearSelectionToolbarMenuItem: ClearSelectionToolbarMenuItem,
@@ -92,6 +94,7 @@ abstract class ToolbarItemModule {
         @Provides
         @ElementsIntoSet
         @IncomingShares
+        @Singleton
         fun provideIncomingSharesToolbarItems(
             selectAll: SelectAllToolbarMenuItem,
             clearSelection: ClearSelectionToolbarMenuItem,
@@ -122,6 +125,7 @@ abstract class ToolbarItemModule {
         @Provides
         @ElementsIntoSet
         @Links
+        @Singleton
         fun provideSharedLinksToolbarItems(
             selectAll: SelectAllToolbarMenuItem,
             clearSelection: ClearSelectionToolbarMenuItem,
@@ -158,6 +162,7 @@ abstract class ToolbarItemModule {
         @Provides
         @ElementsIntoSet
         @CloudDrive
+        @Singleton
         fun provideCloudDriveToolbarItems(
             selectAllToolbarMenuItem: SelectAllToolbarMenuItem,
             clearSelectionToolbarMenuItem: ClearSelectionToolbarMenuItem,
@@ -204,6 +209,7 @@ abstract class ToolbarItemModule {
         @Provides
         @ElementsIntoSet
         @Backups
+        @Singleton
         fun provideBackupsToolbarItems(
             selectAllToolbarMenuItem: SelectAllToolbarMenuItem,
             clearSelectionToolbarMenuItem: ClearSelectionToolbarMenuItem,
@@ -224,6 +230,7 @@ abstract class ToolbarItemModule {
         @Provides
         @ElementsIntoSet
         @RubbishBin
+        @Singleton
         fun provideRubbishBinToolbarItems(
             selectAllToolbarMenuItem: SelectAllToolbarMenuItem,
             clearSelectionToolbarMenuItem: ClearSelectionToolbarMenuItem,

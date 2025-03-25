@@ -3,9 +3,11 @@ package mega.privacy.android.app.presentation.node.model
 import de.palm.composestateevents.StateEvent
 import de.palm.composestateevents.StateEventWithContent
 import de.palm.composestateevents.consumed
+import kotlinx.collections.immutable.ImmutableList
+import kotlinx.collections.immutable.persistentListOf
 import mega.privacy.android.app.presentation.node.view.BottomSheetMenuItem
-import mega.privacy.android.domain.entity.ShareData
 import mega.privacy.android.app.presentation.transfers.starttransfer.model.TransferTriggerEvent
+import mega.privacy.android.domain.entity.ShareData
 import mega.privacy.android.domain.entity.node.NodeNameCollisionsResult
 import mega.privacy.android.domain.entity.node.TypedNode
 
@@ -30,7 +32,7 @@ data class NodeBottomSheetState(
     val name: String = "",
     val isOnline: Boolean = false,
     val node: TypedNode? = null,
-    val actions: List<BottomSheetMenuItem> = emptyList(),
+    val actions: ImmutableList<ImmutableList<BottomSheetMenuItem>> = persistentListOf(),
     val error: StateEventWithContent<Throwable> = consumed(),
     val nodeNameCollisionsResult: StateEventWithContent<NodeNameCollisionsResult> = consumed(),
     val showForeignNodeDialog: StateEvent = consumed,

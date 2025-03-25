@@ -1,5 +1,6 @@
 package mega.privacy.android.app.presentation.search.navigation
 
+import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.NavGraphBuilder
 import androidx.navigation.NavHostController
 import androidx.navigation.NavType
@@ -47,8 +48,8 @@ internal fun NavGraphBuilder.nodeBottomSheetNavigation(
             onDismiss = {
                 navHostController.navigateUp()
             },
-            fileTypeIconMapper = fileTypeIconMapper
+            fileTypeIconMapper = fileTypeIconMapper,
+            viewModel = hiltViewModel()
         )
-
     }
 }

@@ -5,6 +5,8 @@ import androidx.lifecycle.viewModelScope
 import dagger.hilt.android.lifecycle.HiltViewModel
 import de.palm.composestateevents.consumed
 import de.palm.composestateevents.triggered
+import kotlinx.collections.immutable.persistentListOf
+import kotlinx.collections.immutable.toImmutableList
 import kotlinx.coroutines.async
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
@@ -42,7 +44,6 @@ import javax.inject.Inject
  * Node options bottom sheet view model
  *
  * @property nodeBottomSheetActionMapper
- * @property bottomSheetOptions
  * @property getNodeAccessPermission
  * @property isNodeInRubbishBinUseCase
  * @property isNodeInBackupsUseCase
@@ -92,13 +93,13 @@ class NodeOptionsBottomSheetViewModel @Inject constructor(
      * @param nodeId [TypedNode]
      * @return state
      */
-    fun getBottomSheetOptions(nodeId: Long, nodeSourceType: NodeSourceType) =
+    fun getBottomSheetOptions(nodeId: Long, nodeSourceType: NodeSourceType) {
         viewModelScope.launch {
             val bottomSheetOptions = getOptionsForSourceType(nodeSourceType)
 
             _state.update {
                 it.copy(
-                    actions = emptyList(),
+                    actions = persistentListOf(),
                     node = null
                 )
             }
@@ -118,8 +119,13 @@ class NodeOptionsBottomSheetViewModel @Inject constructor(
                     isNodeInRubbish = isNodeInRubbish.await(),
                     accessPermission = permission,
                     isInBackUps = isInBackUps.await(),
-                    isConnected = state.value.isOnline,
-                )
+                    isConnected = state.value.isOnline
+                ).groupBy { it.group }
+                    .toSortedMap()
+                    .mapValues { (_, list) ->
+                        list.sortedBy { it.orderInGroup }.toImmutableList()
+                    }
+                    .values.toImmutableList()
                 val accessPermissionIcon =
                     getAccessPermissionIcon(permission ?: AccessPermission.UNKNOWN, typedNode)
                 _state.update {
@@ -138,6 +144,7 @@ class NodeOptionsBottomSheetViewModel @Inject constructor(
                 }
             }
         }
+    }
 
     private fun getShareInfo(typedNode: TypedNode) {
         if (typedNode.isIncomingShare && typedNode is TypedFolderNode) {

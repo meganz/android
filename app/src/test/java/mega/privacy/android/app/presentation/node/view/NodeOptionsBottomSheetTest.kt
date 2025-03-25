@@ -5,6 +5,7 @@ import androidx.compose.ui.test.onNodeWithTag
 import androidx.compose.ui.test.onNodeWithText
 import androidx.navigation.NavHostController
 import androidx.test.ext.junit.runners.AndroidJUnit4
+import kotlinx.collections.immutable.persistentListOf
 import kotlinx.coroutines.flow.MutableStateFlow
 import mega.privacy.android.app.presentation.node.NodeActionHandler
 import mega.privacy.android.app.presentation.node.NodeOptionsBottomSheetViewModel
@@ -42,16 +43,15 @@ class NodeOptionsBottomSheetTest {
                     name = "",
                     isOnline = true,
                     node = node,
-                    actions = listOf(
+                    actions = persistentListOf(persistentListOf(
                         BottomSheetMenuItem(
                             group = 1,
                             orderInGroup = 1,
                             control = { _, _, _, _ -> }
                         )
-                    ),
+                    )),
                 ),
-            )
-            )
+            ))
         }
 
         composeTestRule.setContent {
@@ -78,21 +78,23 @@ class NodeOptionsBottomSheetTest {
                     name = "",
                     isOnline = true,
                     node = node,
-                    actions = listOf(
-                        BottomSheetMenuItem(
-                            group = 1,
-                            orderInGroup = 1,
-                            control = { _, _, _, _ -> }
-                        ),
-                        BottomSheetMenuItem(
-                            group = 2,
-                            orderInGroup = 1,
-                            control = { _, _, _, _ -> }
+                    actions = persistentListOf(
+                        persistentListOf(
+                            BottomSheetMenuItem(
+                                group = 1,
+                                orderInGroup = 1,
+                                control = { _, _, _, _ -> }
+                            )),
+                        persistentListOf(
+                            BottomSheetMenuItem(
+                                group = 2,
+                                orderInGroup = 1,
+                                control = { _, _, _, _ -> }
+                            )
                         )
                     ),
                 ),
-            )
-            )
+            ))
         }
 
         composeTestRule.setContent {
