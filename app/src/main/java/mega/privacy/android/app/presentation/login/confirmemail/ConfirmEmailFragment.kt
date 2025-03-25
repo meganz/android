@@ -19,7 +19,6 @@ import kotlinx.coroutines.launch
 import mega.android.core.ui.theme.AndroidTheme
 import mega.privacy.android.app.presentation.extensions.isDarkMode
 import mega.privacy.android.app.presentation.login.confirmemail.view.ConfirmEmailRoute
-import mega.privacy.android.app.presentation.login.confirmemail.view.NewConfirmEmailRoute
 import mega.privacy.android.app.presentation.login.model.LoginFragmentType
 import mega.privacy.android.domain.entity.ThemeMode
 import mega.privacy.android.domain.usecase.GetThemeMode
@@ -71,12 +70,10 @@ class ConfirmEmailFragment : Fragment() {
 
             if (uiState.isNewRegistrationUiEnabled == true) {
                 AndroidTheme(isDark = themeMode.isDarkMode()) {
-                    NewConfirmEmailRoute(
-                        modifier = Modifier
-                            .systemBarsPadding()
-                            .fillMaxSize(),
-                        email = emailTemp.orEmpty(),
-                        fullName = firstNameTemp,
+                    NewConfirmEmailGraph(
+                        fullName = firstNameTemp.orEmpty(),
+                        viewModel = viewModel,
+                        uiState = uiState,
                         onShowPendingFragment = {
                             onShowPendingFragment?.invoke(it)
                         },
@@ -86,11 +83,7 @@ class ConfirmEmailFragment : Fragment() {
                         onCancelConfirmationAccount = {
                             onCancelConfirmationAccount?.invoke()
                         },
-                        viewModel = viewModel,
-                        sendFeedbackEmail = ::sendFeedbackEmail,
-                        onNavigateToChangeEmailAddress = {
-
-                        }
+                        sendFeedbackEmail = ::sendFeedbackEmail
                     )
                 }
             } else if (uiState.isNewRegistrationUiEnabled == false) {

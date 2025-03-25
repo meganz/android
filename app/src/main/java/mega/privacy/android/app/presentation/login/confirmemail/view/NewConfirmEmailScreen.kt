@@ -1,6 +1,5 @@
 package mega.privacy.android.app.presentation.login.confirmemail.view
 
-import mega.privacy.android.shared.resources.R as sharedR
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.isSystemInDarkTheme
 import androidx.compose.foundation.layout.Arrangement
@@ -12,6 +11,7 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.layout.systemBarsPadding
 import androidx.compose.foundation.layout.width
 import androidx.compose.material3.SnackbarHostState
 import androidx.compose.runtime.Composable
@@ -32,6 +32,8 @@ import androidx.compose.ui.text.SpanStyle
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
+import androidx.navigation.NavGraphBuilder
+import androidx.navigation.compose.composable
 import mega.android.core.ui.components.LinkSpannedText
 import mega.android.core.ui.components.MegaScaffold
 import mega.android.core.ui.components.MegaSnackbar
@@ -64,18 +66,47 @@ import mega.privacy.android.app.presentation.login.confirmemail.model.ConfirmEma
 import mega.privacy.android.app.presentation.login.model.LoginFragmentType
 import mega.privacy.android.app.presentation.login.view.tabletScreenWidth
 import mega.privacy.android.app.utils.Constants.MAIL_SUPPORT
+import mega.privacy.android.shared.resources.R as sharedR
 import mega.privacy.mobile.analytics.event.ResendEmailConfirmationButtonPressedEvent
 
-@Composable
-internal fun NewConfirmEmailRoute(
-    email: String,
+/**
+ * Route for the Confirm Email composable.
+ */
+const val confirmEmailRoute = "confirmEmailRoute"
+
+/**
+ * Add the Confirm Email composable to the navigation graph.
+ */
+fun NavGraphBuilder.confirmEmail(
     fullName: String?,
     onShowPendingFragment: (loginFragmentType: LoginFragmentType) -> Unit,
     onSetTemporalEmail: (email: String) -> Unit,
     onCancelConfirmationAccount: () -> Unit,
     onNavigateToChangeEmailAddress: () -> Unit,
     sendFeedbackEmail: (String) -> Unit,
-    modifier: Modifier = Modifier,
+    viewModel: ConfirmEmailViewModel,
+) {
+    composable(confirmEmailRoute) {
+        NewConfirmEmailRoute(
+            fullName = fullName,
+            onShowPendingFragment = onShowPendingFragment,
+            onSetTemporalEmail = onSetTemporalEmail,
+            onCancelConfirmationAccount = onCancelConfirmationAccount,
+            onNavigateToChangeEmailAddress = onNavigateToChangeEmailAddress,
+            sendFeedbackEmail = sendFeedbackEmail,
+            viewModel = viewModel
+        )
+    }
+}
+
+@Composable
+private fun NewConfirmEmailRoute(
+    fullName: String?,
+    onShowPendingFragment: (loginFragmentType: LoginFragmentType) -> Unit,
+    onSetTemporalEmail: (email: String) -> Unit,
+    onCancelConfirmationAccount: () -> Unit,
+    onNavigateToChangeEmailAddress: () -> Unit,
+    sendFeedbackEmail: (String) -> Unit,
     viewModel: ConfirmEmailViewModel = hiltViewModel(),
 ) {
     val snackBarHostState = remember { SnackbarHostState() }
@@ -105,8 +136,8 @@ internal fun NewConfirmEmailRoute(
         }
     }
 
-    LaunchedEffect(uiState.errorMessage) {
-        uiState.errorMessage?.let {
+    LaunchedEffect(uiState.message) {
+        uiState.message?.let {
             snackBarHostState.showSnackbar(
                 message = it
             )
@@ -115,8 +146,10 @@ internal fun NewConfirmEmailRoute(
     }
 
     NewConfirmEmailScreen(
-        modifier = modifier.fillMaxSize(),
-        email = email,
+        modifier = Modifier
+            .systemBarsPadding()
+            .fillMaxSize(),
+        email = uiState.registeredEmail.orEmpty(),
         uiState = uiState,
         onCancelClick = {
             viewModel.cancelCreateAccount()

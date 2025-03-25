@@ -98,8 +98,8 @@ internal fun ConfirmEmailRoute(
         }
     }
 
-    LaunchedEffect(uiState.errorMessage) {
-        uiState.errorMessage?.let {
+    LaunchedEffect(uiState.message) {
+        uiState.message?.let {
             snackBarHostState.showAutoDurationSnackbar(
                 message = it
             )

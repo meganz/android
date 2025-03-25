@@ -973,7 +973,7 @@
     <!-- Message displayed when email is successfully resent -->
     <string name="general_email_resend_success_message">Email sent</string>
     <!--General Request Network Failed text-->
-    <string name="general_request_failed_message">Something went wrong</string>
+    <string name="general_request_failed_message">An error occurred, try again</string>
     <!-- Message error shown when trying to log in on an account that has been suspended due to breaches of copyright -->
     <string name="dialog_account_suspended_ToS_copyright_message">Your MEGA account has been suspended due to repeated allegations of copyright infringements. This means you cannot access your account or data within it.\nCheck your email inbox for more information on how to file a counter-notice.</string>
     <!-- Message error shown when trying to log in on an account that has been terminated due to breaches of all reasons of breaching Terms of Service, except copyright. -->
@@ -1020,4 +1020,14 @@
     <string name="device_center_list_view_item_status_error">Error</string>
     <!-- Hint shown in the field to write a message in the note to self chat screen -->
     <string name="chat_note_to_self_chat_message_hint">Write a message to yourself</string>
+    <!--The title of the Change Email Address page-->
+    <string name="change_email_address_title">Change email address</string>
+    <!--Change Email Address page content text to ask user to enter a new email address -->
+    <string name="change_email_address_content">Enter your new email address, we’ll send the email confirmation to this new email address.</string>
+    <!--Error message to be shown when account already existed-->
+    <string name="sign_up_account_existed_error_message">This email address has already signed up for an account with MEGA</string>
+    <!--General update text-->
+    <string name="general_update">Update</string>
+    <!-- Message displayed when email address is successfully updated -->
+    <string name="email_confirmation_email_address_update_message">Email address updated</string>
 </resources>

@@ -1,5 +1,6 @@
 package mega.privacy.android.app.presentation.login.confirmemail
 
+import androidx.lifecycle.SavedStateHandle
 import app.cash.turbine.test
 import com.google.common.truth.Truth.assertThat
 import kotlinx.coroutines.flow.flowOf
@@ -38,6 +39,7 @@ class ConfirmEmailViewModelTest {
     private val monitorConnectivityUseCase: MonitorConnectivityUseCase = mock()
     private val generateSupportEmailBodyUseCase: GenerateSupportEmailBodyUseCase = mock()
     private val getFeatureFlagValueUseCase: GetFeatureFlagValueUseCase = mock()
+    private val savedStateHandle = SavedStateHandle()
 
     private lateinit var underTest: ConfirmEmailViewModel
 
@@ -59,7 +61,8 @@ class ConfirmEmailViewModelTest {
             saveLastRegisteredEmailUseCase = saveLastRegisteredEmailUseCase,
             monitorConnectivityUseCase = monitorConnectivityUseCase,
             generateSupportEmailBodyUseCase = generateSupportEmailBodyUseCase,
-            getFeatureFlagValueUseCase = getFeatureFlagValueUseCase
+            getFeatureFlagValueUseCase = getFeatureFlagValueUseCase,
+            savedStateHandle = savedStateHandle
         )
     }
 
@@ -131,7 +134,7 @@ class ConfirmEmailViewModelTest {
             underTest.resendSignUpLink(email = email, fullName = fullName)
 
             underTest.uiState.test {
-                assertThat(expectMostRecentItem().errorMessage).isEqualTo(errorMessage)
+                assertThat(expectMostRecentItem().message).isEqualTo(errorMessage)
             }
         }
 
@@ -172,7 +175,7 @@ class ConfirmEmailViewModelTest {
             underTest.cancelCreateAccount()
 
             underTest.uiState.test {
-                assertThat(expectMostRecentItem().errorMessage).isEqualTo(errorMessage)
+                assertThat(expectMostRecentItem().message).isEqualTo(errorMessage)
             }
         }
 
@@ -200,7 +203,7 @@ class ConfirmEmailViewModelTest {
         underTest.onErrorMessageDisplayed()
 
         underTest.uiState.test {
-            assertThat(expectMostRecentItem().errorMessage).isNull()
+            assertThat(expectMostRecentItem().message).isNull()
         }
     }
 

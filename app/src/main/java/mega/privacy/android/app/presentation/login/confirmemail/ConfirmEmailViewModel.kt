@@ -1,5 +1,6 @@
 package mega.privacy.android.app.presentation.login.confirmemail
 
+import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import dagger.hilt.android.lifecycle.HiltViewModel
@@ -10,6 +11,7 @@ import kotlinx.coroutines.flow.collectLatest
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import mega.privacy.android.app.featuretoggle.AppFeatures
+import mega.privacy.android.app.presentation.login.confirmemail.ConfirmEmailFragment.Companion.TEMPORARY_EMAIL_ARG
 import mega.privacy.android.app.presentation.login.confirmemail.model.ConfirmEmailUiState
 import mega.privacy.android.app.presentation.login.model.LoginFragmentType
 import mega.privacy.android.domain.exception.MegaException
@@ -37,9 +39,14 @@ class ConfirmEmailViewModel @Inject constructor(
     private val monitorConnectivityUseCase: MonitorConnectivityUseCase,
     private val getFeatureFlagValueUseCase: GetFeatureFlagValueUseCase,
     private val generateSupportEmailBodyUseCase: GenerateSupportEmailBodyUseCase,
+    savedStateHandle: SavedStateHandle,
 ) : ViewModel() {
 
-    private val _uiState = MutableStateFlow(ConfirmEmailUiState())
+    private val _uiState = MutableStateFlow(
+        ConfirmEmailUiState(
+            registeredEmail = savedStateHandle[TEMPORARY_EMAIL_ARG]
+        )
+    )
     val uiState: StateFlow<ConfirmEmailUiState> = _uiState
 
     init {
@@ -98,7 +105,7 @@ class ConfirmEmailViewModel @Inject constructor(
                     Timber.e("Failed to re-sent the sign up link", error)
                     if (error is MegaException) {
                         error.errorString?.let {
-                            showErrorSnackBar(it)
+                            showSnackBar(it)
                         }
                     }
                 }
@@ -119,7 +126,7 @@ class ConfirmEmailViewModel @Inject constructor(
                     Timber.e("Failed to cancel the registration process", error)
                     if (error is MegaException) {
                         error.errorString?.let {
-                            showErrorSnackBar(it)
+                            showSnackBar(it)
                         }
                     }
                 }
@@ -127,7 +134,10 @@ class ConfirmEmailViewModel @Inject constructor(
         }
     }
 
-    private fun updateRegisteredEmail(email: String) {
+    /**
+     * Update the registered email
+     */
+    fun updateRegisteredEmail(email: String) {
         _uiState.update { it.copy(registeredEmail = email) }
         saveLastRegisteredEmail(email)
     }
@@ -143,15 +153,18 @@ class ConfirmEmailViewModel @Inject constructor(
         _uiState.update { it.copy(shouldShowSuccessMessage = false) }
     }
 
-    private fun showErrorSnackBar(message: String) {
-        _uiState.update { it.copy(errorMessage = message) }
+    /**
+     * Show an message in a snackbar
+     */
+    fun showSnackBar(message: String) {
+        _uiState.update { it.copy(message = message) }
     }
 
     /**
      * Reset the error message
      */
     internal fun onErrorMessageDisplayed() {
-        _uiState.update { it.copy(errorMessage = null) }
+        _uiState.update { it.copy(message = null) }
     }
 
     /**

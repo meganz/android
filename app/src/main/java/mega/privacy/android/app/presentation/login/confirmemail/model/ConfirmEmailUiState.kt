@@ -10,7 +10,7 @@ import mega.privacy.android.app.presentation.login.model.LoginFragmentType
  * @property registeredEmail The new registered email.
  * @property isOnline Is connected to the network.
  * @property shouldShowSuccessMessage True if we should show a success message, false otherwise.
- * @property errorMessage The error message that should be displayed to the user.
+ * @property message The message that should be displayed to the user.
  * @property isNewRegistrationUiEnabled True if the new registration UI is enabled, false otherwise.
  */
 data class ConfirmEmailUiState(
@@ -19,6 +19,6 @@ data class ConfirmEmailUiState(
     val registeredEmail: String? = null,
     val isOnline: Boolean = false,
     val shouldShowSuccessMessage: Boolean = false,
-    val errorMessage: String? = null,
+    val message: String? = null,
     val isNewRegistrationUiEnabled: Boolean? = null,
 )

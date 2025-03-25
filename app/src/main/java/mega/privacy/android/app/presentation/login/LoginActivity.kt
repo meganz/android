@@ -396,8 +396,6 @@ class LoginActivity : BaseActivity() {
             runCatching {
                 Timber.d("resume create account")
                 viewModel.resumeCreateAccount(session)
-            }.onSuccess {
-                viewModel.setIsWaitingForConfirmAccount()
             }.onFailure {
                 Timber.e(it)
                 cancelConfirmationAccount()
