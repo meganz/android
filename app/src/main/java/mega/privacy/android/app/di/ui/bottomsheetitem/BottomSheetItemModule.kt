@@ -44,6 +44,7 @@ import mega.privacy.android.app.presentation.node.view.bottomsheetmenuitems.Veri
 import mega.privacy.android.app.presentation.node.view.bottomsheetmenuitems.VersionsBottomSheetMenuItem
 import mega.privacy.android.app.presentation.node.view.bottomsheetmenuitems.ViewInFolderBottomSheetMenuItem
 import mega.privacy.android.shared.original.core.ui.model.MenuActionWithIcon
+import javax.inject.Singleton
 
 /**
  * Toolbar module
@@ -62,6 +63,7 @@ abstract class BottomSheetItemModule {
         @Provides
         @ElementsIntoSet
         @CloudDrive
+        @Singleton
         fun provideCloudDriveBottomSheetOptions(
             availableOfflineMenuAction: AvailableOfflineBottomSheetMenuItem,
             copyMenuAction: CopyBottomSheetMenuItem,
@@ -137,6 +139,7 @@ abstract class BottomSheetItemModule {
         @Provides
         @ElementsIntoSet
         @OutgoingShares
+        @Singleton
         fun provideOutgoingSharesBottomSheetOptions(
             availableOfflineMenuAction: AvailableOfflineBottomSheetMenuItem,
             copyMenuAction: CopyBottomSheetMenuItem,
@@ -207,6 +210,7 @@ abstract class BottomSheetItemModule {
         @Provides
         @ElementsIntoSet
         @IncomingShares
+        @Singleton
         fun provideIncomingSharesBottomSheetOptions(
             availableOfflineMenuAction: AvailableOfflineBottomSheetMenuItem,
             copyMenuAction: CopyBottomSheetMenuItem,
@@ -277,6 +281,7 @@ abstract class BottomSheetItemModule {
         @Provides
         @ElementsIntoSet
         @Links
+        @Singleton
         fun provideLinkSharesBottomSheetOptions(
             availableOfflineMenuAction: AvailableOfflineBottomSheetMenuItem,
             copyMenuAction: CopyBottomSheetMenuItem,
@@ -347,6 +352,7 @@ abstract class BottomSheetItemModule {
         @Provides
         @ElementsIntoSet
         @RubbishBin
+        @Singleton
         fun provideRubbishBinsBottomSheetOptions(
             availableOfflineMenuAction: AvailableOfflineBottomSheetMenuItem,
             copyMenuAction: CopyBottomSheetMenuItem,
@@ -421,6 +427,7 @@ abstract class BottomSheetItemModule {
         @Provides
         @ElementsIntoSet
         @Backups
+        @Singleton
         fun provideBackupsBottomSheetOptions(
             availableOfflineMenuAction: AvailableOfflineBottomSheetMenuItem,
             copyMenuAction: CopyBottomSheetMenuItem,

@@ -83,7 +83,10 @@ fun SearchScreen(
             navHostController.navigate(
                 route = nodeBottomSheetRoute.plus("/${it.node.id.longValue}")
                     .plus("/${searchViewModel.state.value.nodeSourceType.name}")
-            )
+            ) {
+                popUpTo(nodeBottomSheetRoute) { inclusive = true }
+                launchSingleTop = true
+            }
         },
         onDisputeTakeDownClicked = navigateToLink,
         onLinkClicked = navigateToLink,

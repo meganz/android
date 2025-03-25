@@ -6,8 +6,6 @@ import androidx.compose.foundation.lazy.items
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.ExperimentalComposeUiApi
 import androidx.compose.ui.Modifier
@@ -20,6 +18,7 @@ import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.navigation.NavHostController
 import de.palm.composestateevents.EventEffect
+import mega.android.core.ui.theme.values.TextColor
 import mega.privacy.android.app.R
 import mega.privacy.android.app.presentation.node.NodeActionHandler
 import mega.privacy.android.app.presentation.node.NodeOptionsBottomSheetViewModel
@@ -36,7 +35,6 @@ import mega.privacy.android.shared.original.core.ui.controls.dividers.DividerTyp
 import mega.privacy.android.shared.original.core.ui.controls.dividers.MegaDivider
 import mega.privacy.android.shared.original.core.ui.controls.lists.NodeListViewItem
 import mega.privacy.android.shared.original.core.ui.controls.text.LongTextBehaviour
-import mega.android.core.ui.theme.values.TextColor
 import timber.log.Timber
 
 
@@ -63,16 +61,6 @@ internal fun NodeOptionsBottomSheetContent(
         viewModel.getBottomSheetOptions(nodeId, nodeSourceType)
     }
 
-    val sortedMap = remember(uiState.actions) {
-        mutableStateOf(
-            uiState.actions
-                .groupBy { it.group }
-                .toSortedMap()
-                .mapValues { (_, list) ->
-                    list.sortedBy { it.orderInGroup }
-                }.values
-        )
-    }
     EventEffect(
         event = uiState.error,
         onConsumed = viewModel::onConsumeErrorState,
@@ -113,7 +101,7 @@ internal fun NodeOptionsBottomSheetContent(
     }
     MegaDivider(dividerType = DividerType.SmallStartPadding)
     LazyColumn(modifier = Modifier.semantics { testTagsAsResourceId = true }) {
-        sortedMap.value
+        uiState.actions
             .forEachIndexed { index, actions ->
                 items(actions) { item: BottomSheetMenuItem ->
                     item.control(
@@ -124,7 +112,7 @@ internal fun NodeOptionsBottomSheetContent(
                     )
                 }
 
-                if (index < uiState.actions.size - 1 && index != sortedMap.value.size - 1) {
+                if (index < uiState.actions.size - 1) {
                     item {
                         MegaDivider(
                             dividerType = DividerType.BigStartPadding,
