@@ -167,10 +167,16 @@ class SyncMonitorViewModel @Inject constructor(
     /**
      * Notify that the notification has been shown
      */
-    fun onNotificationShown(syncNotificationMessage: SyncNotificationMessage) {
+    fun onNotificationShown(
+        syncNotificationMessage: SyncNotificationMessage,
+        notificationId: Int?,
+    ) {
         _state.update { it.copy(displayNotification = null) }
         viewModelScope.launch {
-            setSyncNotificationShownUseCase(syncNotificationMessage)
+            setSyncNotificationShownUseCase(
+                syncNotificationMessage = syncNotificationMessage,
+                notificationId = notificationId,
+            )
         }
     }
 }

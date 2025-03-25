@@ -121,13 +121,14 @@ internal class SyncNotificationRepositoryImplTest {
                 syncNotificationType = notificationType,
                 notificationDetails = NotificationDetails(path = "Path", errorCode = null)
             )
+            val notificationId = 1234
             val notificationEntity =
                 SyncShownNotificationEntity(notificationType = notificationMessage.syncNotificationType.name)
-            whenever(dbEntityToDomainMapper(notificationMessage)).thenReturn(
+            whenever(dbEntityToDomainMapper(notificationMessage, notificationId)).thenReturn(
                 notificationEntity
             )
 
-            underTest.setDisplayedNotification(notificationMessage)
+            underTest.setDisplayedNotification(notificationMessage, notificationId)
 
             verify(syncNotificationGateway).setNotificationShown(notificationEntity)
         }

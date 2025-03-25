@@ -19,8 +19,14 @@ interface SyncNotificationRepository {
 
     /**
      * Set the displayed notification [SyncNotificationMessage]
+     *
+     * @param notification [SyncNotificationMessage]
+     * @param notificationId notification ID
      */
-    suspend fun setDisplayedNotification(notification: SyncNotificationMessage)
+    suspend fun setDisplayedNotification(
+        notification: SyncNotificationMessage,
+        notificationId: Int?,
+    )
 
     /**
      * Delete the displayed notification by [SyncNotificationType]

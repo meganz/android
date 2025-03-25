@@ -142,6 +142,7 @@ class SyncShownNotificationEntityToSyncNotificationMessageMapperTest {
 
     @Test
     fun `test that mapper converts from domain to battery low notification`() {
+        val notificationId = 1234
         val notificationMessage = SyncNotificationMessage(
             title = sharedResR.string.general_sync_notification_low_battery_title,
             text = sharedResR.string.general_sync_notification_low_battery_text,
@@ -149,18 +150,20 @@ class SyncShownNotificationEntityToSyncNotificationMessageMapperTest {
             notificationDetails = NotificationDetails(path = "", errorCode = null)
         )
         val dbEntity = SyncShownNotificationEntity(
+            notificationId = notificationId,
             notificationType = SyncNotificationType.BATTERY_LOW.name,
             otherIdentifiers = null
         )
         whenever(json.encodeToString(notificationMessage.notificationDetails)).thenReturn(null)
 
-        val result = underTest(notificationMessage)
+        val result = underTest(notificationMessage, notificationId)
 
         assertThat(result).isEqualTo(dbEntity)
     }
 
     @Test
     fun `test that mapper converts from domain to not connect to wifi notification`() {
+        val notificationId = 1234
         val notificationMessage = SyncNotificationMessage(
             title = sharedResR.string.general_sync_notification_lost_wifi_title,
             text = sharedResR.string.general_sync_notification_lost_wifi_text,
@@ -168,18 +171,20 @@ class SyncShownNotificationEntityToSyncNotificationMessageMapperTest {
             notificationDetails = NotificationDetails(path = "", errorCode = null)
         )
         val dbEntity = SyncShownNotificationEntity(
+            notificationId = notificationId,
             notificationType = SyncNotificationType.NOT_CONNECTED_TO_WIFI.name,
             otherIdentifiers = null
         )
         whenever(json.encodeToString(notificationMessage.notificationDetails)).thenReturn(null)
 
-        val result = underTest(notificationMessage)
+        val result = underTest(notificationMessage, notificationId)
 
         assertThat(result).isEqualTo(dbEntity)
     }
 
     @Test
     fun `test that mapper converts from domain to error notification`() {
+        val notificationId = 1234
         val notificationMessage = SyncNotificationMessage(
             title = sharedResR.string.general_sync_notification_generic_error_title,
             text = sharedResR.string.general_sync_notification_generic_error_text,
@@ -187,6 +192,7 @@ class SyncShownNotificationEntityToSyncNotificationMessageMapperTest {
             notificationDetails = NotificationDetails(path = "/example/path", errorCode = 3)
         )
         val dbEntity = SyncShownNotificationEntity(
+            notificationId = notificationId,
             notificationType = SyncNotificationType.ERROR.name,
             otherIdentifiers = """
                 {
@@ -197,13 +203,14 @@ class SyncShownNotificationEntityToSyncNotificationMessageMapperTest {
         )
         whenever(json.encodeToString(notificationMessage.notificationDetails)).thenReturn(dbEntity.otherIdentifiers)
 
-        val result = underTest(notificationMessage)
+        val result = underTest(notificationMessage, notificationId)
 
         assertThat(result).isEqualTo(dbEntity)
     }
 
     @Test
     fun `test that mapper converts from domain to stalled issue notification`() {
+        val notificationId = 1234
         val notificationMessage = SyncNotificationMessage(
             title = sharedResR.string.general_sync_notification_stalled_issues_title,
             text = sharedResR.string.general_sync_notification_stalled_issues_text,
@@ -211,6 +218,7 @@ class SyncShownNotificationEntityToSyncNotificationMessageMapperTest {
             notificationDetails = NotificationDetails(path = "/example/path", errorCode = null)
         )
         val dbEntity = SyncShownNotificationEntity(
+            notificationId = notificationId,
             notificationType = SyncNotificationType.STALLED_ISSUE.name,
             otherIdentifiers = """
                 {
@@ -220,7 +228,7 @@ class SyncShownNotificationEntityToSyncNotificationMessageMapperTest {
         )
         whenever(json.encodeToString(notificationMessage.notificationDetails)).thenReturn(dbEntity.otherIdentifiers)
 
-        val result = underTest(notificationMessage)
+        val result = underTest(notificationMessage, notificationId)
 
         assertThat(result).isEqualTo(dbEntity)
     }

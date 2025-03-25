@@ -2078,10 +2078,15 @@ class ManagerActivity : PasscodeActivity(), NavigationView.OnNavigationItemSelec
                         Manifest.permission.POST_NOTIFICATIONS
                     ) == PackageManager.PERMISSION_GRANTED
                 ) {
-                    syncMonitorViewModel.onNotificationShown(notification)
+                    var notificationId: Int? = null
                     if (!syncNotificationManager.isSyncNotificationDisplayed()) {
-                        syncNotificationManager.show(this@ManagerActivity, notification)
+                        notificationId =
+                            syncNotificationManager.show(this@ManagerActivity, notification)
                     }
+                    syncMonitorViewModel.onNotificationShown(
+                        syncNotificationMessage = notification,
+                        notificationId = notificationId,
+                    )
                 }
             }
         }

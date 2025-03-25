@@ -20,9 +20,16 @@ internal class SetSyncNotificationShownUseCaseTest {
     fun `test that set notification shown invokes repository set notification shown method`() =
         runTest {
             val syncNotificationMessage: SyncNotificationMessage = mock()
+            val notificationId = 1234
 
-            underTest(syncNotificationMessage)
+            underTest(
+                syncNotificationMessage = syncNotificationMessage,
+                notificationId = notificationId,
+            )
 
-            verify(syncNotificationRepository).setDisplayedNotification(syncNotificationMessage)
+            verify(syncNotificationRepository).setDisplayedNotification(
+                notification = syncNotificationMessage,
+                notificationId = notificationId,
+            )
         }
 }

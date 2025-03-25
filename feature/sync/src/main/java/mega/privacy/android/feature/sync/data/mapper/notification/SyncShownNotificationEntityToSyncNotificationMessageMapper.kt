@@ -36,8 +36,12 @@ internal class SyncShownNotificationEntityToSyncNotificationMessageMapper @Injec
         }
     }
 
-    operator fun invoke(domainModel: SyncNotificationMessage): SyncShownNotificationEntity {
+    operator fun invoke(
+        domainModel: SyncNotificationMessage,
+        id: Int?,
+    ): SyncShownNotificationEntity {
         return SyncShownNotificationEntity(
+            notificationId = id,
             notificationType = domainModel.syncNotificationType.name,
             otherIdentifiers = getOtherIdentifiers(domainModel),
         )
@@ -47,7 +51,7 @@ internal class SyncShownNotificationEntityToSyncNotificationMessageMapper @Injec
         return when (domainModel.syncNotificationType) {
             SyncNotificationType.STALLED_ISSUE,
             SyncNotificationType.ERROR,
-            -> {
+                -> {
                 json.encodeToString(domainModel.notificationDetails)
             }
 

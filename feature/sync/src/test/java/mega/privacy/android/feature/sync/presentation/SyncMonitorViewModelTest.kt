@@ -185,6 +185,7 @@ class SyncMonitorViewModelTest {
 
     @Test
     fun `test that onNotificationShown removes notification`() = runTest {
+        val notificationId = 1234
         val notificationMessage = SyncNotificationMessage(
             title = sharedResR.string.general_sync_notification_low_battery_title,
             text = sharedResR.string.general_sync_notification_low_battery_text,
@@ -193,7 +194,7 @@ class SyncMonitorViewModelTest {
         )
 
         initViewModel()
-        underTest.onNotificationShown(notificationMessage)
+        underTest.onNotificationShown(notificationMessage, notificationId)
 
         assertThat(underTest.state.value.displayNotification).isNull()
     }

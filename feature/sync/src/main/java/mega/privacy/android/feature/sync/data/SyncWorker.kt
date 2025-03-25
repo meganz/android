@@ -111,10 +111,14 @@ class SyncWorker @AssistedInject constructor(
     private suspend fun displayNotification(notification: SyncNotificationMessage?) {
         notification?.let {
             if (syncPermissionManager.isNotificationsPermissionGranted()) {
-                setSyncNotificationShownUseCase(notification)
+                var notificationId: Int? = null
                 if (!syncNotificationManager.isSyncNotificationDisplayed()) {
-                    syncNotificationManager.show(context, notification)
+                    notificationId = syncNotificationManager.show(context, notification)
                 }
+                setSyncNotificationShownUseCase(
+                    syncNotificationMessage = notification,
+                    notificationId = notificationId,
+                )
             }
         }
     }

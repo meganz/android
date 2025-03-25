@@ -19,12 +19,15 @@ class SyncNotificationManager @Inject constructor(
 
     /**
      * Show a notification with the given [SyncNotificationMessage]
+     *
+     * @return the notification ID
      */
     @RequiresPermission(Manifest.permission.POST_NOTIFICATIONS)
-    fun show(context: Context, notificationMessage: SyncNotificationMessage) {
+    fun show(context: Context, notificationMessage: SyncNotificationMessage): Int {
         val notificationId = createSyncNotificationIdUseCase()
         val notification = syncNotificationMapper(context, notificationMessage)
         notificationManagerCompat.notify(notificationId, notification)
+        return notificationId
     }
 
     /**

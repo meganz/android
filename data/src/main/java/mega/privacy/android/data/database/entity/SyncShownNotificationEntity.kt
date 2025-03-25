@@ -9,6 +9,7 @@ import mega.privacy.android.data.database.MegaDatabaseConstant
  * Sync shown notification entity for Room database
  *
  * @property id - Room database entity id
+ * @property notificationId - the id of the displayed notification
  * @property notificationType - the type of notification (batteryLow, userNotOnWifi, syncErrors, syncStalledIssues)
  * @property otherIdentifiers - other identifiers for the notification such as stalled issue path, sync id, etc (optional)
  */
@@ -18,6 +19,8 @@ import mega.privacy.android.data.database.MegaDatabaseConstant
 data class SyncShownNotificationEntity(
     @PrimaryKey(autoGenerate = true)
     val id: Int = 0,
+    @ColumnInfo(name = "notificationId")
+    val notificationId: Int? = null,
     @ColumnInfo(name = "notificationType")
     val notificationType: String,
     @ColumnInfo(name = "otherIdentifiers")

@@ -28,10 +28,16 @@ internal class SyncNotificationRepositoryImpl @Inject constructor(
                 .map { syncShownNotificationEntityToSyncNotificationMessageMapper(it) }
         }
 
-    override suspend fun setDisplayedNotification(notification: SyncNotificationMessage) {
+    override suspend fun setDisplayedNotification(
+        notification: SyncNotificationMessage,
+        notificationId: Int?,
+    ) {
         withContext(ioDispatcher) {
             syncNotificationGateway.setNotificationShown(
-                syncShownNotificationEntityToSyncNotificationMessageMapper(notification)
+                syncShownNotificationEntityToSyncNotificationMessageMapper(
+                    domainModel = notification,
+                    id = notificationId,
+                )
             )
         }
     }
@@ -56,6 +62,7 @@ internal class SyncNotificationRepositoryImpl @Inject constructor(
         )
 
     override suspend fun getSyncStalledIssuesNotification(syncsWithStalledIssues: List<StalledIssue>): SyncNotificationMessage =
-        stalledIssuesToNotificationMessageMapper(issuePath = syncsWithStalledIssues.first()
-            .let { it.localPaths.firstOrNull() ?: it.nodeNames.first() })
+        stalledIssuesToNotificationMessageMapper(
+            issuePath = syncsWithStalledIssues.first()
+                .let { it.localPaths.firstOrNull() ?: it.nodeNames.first() })
 }

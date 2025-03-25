@@ -11,7 +11,13 @@ class SetSyncNotificationShownUseCase @Inject constructor(
     private val syncNotificationRepository: SyncNotificationRepository,
 ) {
 
-    suspend operator fun invoke(syncNotificationMessage: SyncNotificationMessage) {
-        syncNotificationRepository.setDisplayedNotification(syncNotificationMessage)
+    suspend operator fun invoke(
+        syncNotificationMessage: SyncNotificationMessage,
+        notificationId: Int?
+    ) {
+        syncNotificationRepository.setDisplayedNotification(
+            notification = syncNotificationMessage,
+            notificationId = notificationId,
+        )
     }
 }
