@@ -14,9 +14,11 @@ import mega.privacy.android.app.featuretoggle.ApiFeatures
 import mega.privacy.android.app.main.model.chat.explorer.ChatExplorerSearchUiState
 import mega.privacy.android.app.main.model.chat.explorer.ChatExplorerUiState
 import mega.privacy.android.app.presentation.contact.mapper.UserContactMapper
+import mega.privacy.android.app.presentation.mapper.GetStringFromStringResMapper
 import mega.privacy.android.domain.entity.ChatRoomPermission
-import mega.privacy.android.domain.entity.chat.ChatListItem
-import mega.privacy.android.domain.entity.chat.ChatRoomItem
+import mega.privacy.android.shared.resources.R as sharedR
+import androidx.lifecycle.SavedStateHandle
+import mega.privacy.android.app.utils.Constants
 import mega.privacy.android.domain.entity.contacts.User
 import mega.privacy.android.domain.entity.contacts.UserChatStatus.Busy
 import mega.privacy.android.domain.entity.contacts.UserChatStatus.Invalid
@@ -63,6 +65,8 @@ class ChatExplorerViewModel @Inject constructor(
     private val isAnEmptyChatUseCase: IsAnEmptyChatUseCase,
     private val getFeatureFlagValueUseCase: GetFeatureFlagValueUseCase,
     private val getNoteToSelfChatUseCase: GetNoteToSelfChatUseCase,
+    private val getStringFromStringResMapper: GetStringFromStringResMapper,
+    savedStateHandle: SavedStateHandle,
     @DefaultDispatcher private val defaultDispatcher: CoroutineDispatcher,
 ) : ViewModel() {
 
@@ -72,6 +76,9 @@ class ChatExplorerViewModel @Inject constructor(
      * The public property of [ChatExplorerUiState].
      */
     val uiState = _uiState.asStateFlow()
+
+    private val chatIdFrom = savedStateHandle[Constants.ID_CHAT_FROM] ?: -1L
+
 
     private val _searchUiState = MutableStateFlow(ChatExplorerSearchUiState())
 
@@ -91,8 +98,8 @@ class ChatExplorerViewModel @Inject constructor(
         viewModelScope.launch {
             runCatching {
                 if (getFeatureFlagValueUseCase(ApiFeatures.NoteToYourselfFlag)) {
-                    getNoteToSelfChatUseCase()?.let { noteToSelfChatRoom ->
-                        Timber.d("Note to self chat created")
+                    getNoteToSelfChatUseCase()?.let { chatRoom ->
+                        Timber.d("Note to self chat created: ${chatRoom.chatId}")
                     }
                 }
             }.onFailure {
@@ -149,6 +156,7 @@ class ChatExplorerViewModel @Inject constructor(
                 isItemUpdated = false
             )
         }
+
         viewModelScope.launch(defaultDispatcher) {
             val items = buildList {
                 // Add the active/recent chat rooms
@@ -162,47 +170,59 @@ class ChatExplorerViewModel @Inject constructor(
         }
     }
 
+    /**
+     * Check if the chat is from is same chat
+     */
+    private fun isSameChat(chatId: Long) = chatIdFrom == chatId
+
     private suspend fun getActiveChatRooms(): List<ChatExplorerListItem> = buildList {
         Timber.d("Retrieving the active chat list items")
         runCatching { getActiveChatListItemsUseCase() }
             .onSuccess { activeChats ->
                 activeChats.sortedByDescending { it.lastTimestamp }
                     .forEachIndexed { index, chat ->
-                        if (index == 0) {
-                            add(
-                                ChatExplorerListItem(
-                                    isRecent = true,
-                                    isHeader = true
+                        val isSameChat = isSameChat(chat.chatId)
+                        if (isSameChat && chat.isNoteToSelf) {
+                            Timber.d("Do not show note to self chat")
+                        } else {
+                            if (index == 0) {
+                                add(
+                                    ChatExplorerListItem(
+                                        isRecent = true,
+                                        isHeader = true
+                                    )
                                 )
-                            )
-                        }
-
-                        if (chat.isNoteToSelf || chat.ownPrivilege >= ChatRoomPermission.Standard) {
-                            val contact = if (chat.isGroup) {
-                                null
-                            } else {
-                                getContact(chat.peerHandle)
-                            }
-                            val isEmptyNoteToSelf = if (chat.isNoteToSelf) {
-                                isAnEmptyChatUseCase(chat.chatId)
-                            } else {
-                                false
                             }
 
-                            add(
-                                ChatExplorerListItem(
-                                    contactItem = contact,
-                                    chat = chat,
-                                    title = chat.title,
-                                    id = chat.chatId.toString(),
-                                    isRecent = index < RECENT_CHATS_MAX_SIZE,
-                                    isNoteToSelf = chat.isNoteToSelf,
-                                    isSelected = _uiState.value.selectedItems.any {
-                                        chat.chatId.toString() == it.id
-                                    },
-                                    isEmptyNoteToSelf = isEmptyNoteToSelf
+                            if (chat.isNoteToSelf || chat.ownPrivilege >= ChatRoomPermission.Standard) {
+                                val contact = if (chat.isGroup) {
+                                    null
+                                } else {
+                                    getContact(chat.peerHandle)
+                                }
+                                val isEmptyNoteToSelf = if (chat.isNoteToSelf) {
+                                    isAnEmptyChatUseCase(chat.chatId)
+                                } else {
+                                    false
+                                }
+
+                                add(
+                                    ChatExplorerListItem(
+                                        contactItem = contact,
+                                        chat = chat,
+                                        title = if (chat.isNoteToSelf) getStringFromStringResMapper(
+                                            sharedR.string.chat_note_to_self_chat_title
+                                        ) else chat.title,
+                                        id = chat.chatId.toString(),
+                                        isRecent = index < RECENT_CHATS_MAX_SIZE,
+                                        isNoteToSelf = chat.isNoteToSelf,
+                                        isSelected = _uiState.value.selectedItems.any {
+                                            chat.chatId.toString() == it.id
+                                        },
+                                        isEmptyNoteToSelf = isEmptyNoteToSelf
+                                    )
                                 )
-                            )
+                            }
                         }
                     }
 
@@ -229,13 +249,18 @@ class ChatExplorerViewModel @Inject constructor(
         runCatching { getArchivedChatListItemsUseCase() }
             .onSuccess { archivedChats ->
                 archivedChats.forEach { chat ->
-                    if (chat.ownPrivilege >= ChatRoomPermission.Standard) {
-                        val contact = if (chat.isGroup) null else getContact(chat.peerHandle)
+                    val isSameChat = isSameChat(chat.chatId)
+                    if (isSameChat && chat.isNoteToSelf) {
+                        Timber.d("Do not show note to self chat")
+                    } else if (chat.isNoteToSelf || chat.ownPrivilege >= ChatRoomPermission.Standard) {
+                        val contact =
+                            if (chat.isGroup || chat.isNoteToSelf) null else getContact(chat.peerHandle)
+
                         add(
                             ChatExplorerListItem(
                                 contactItem = contact,
                                 chat = chat,
-                                title = chat.title,
+                                title = if (chat.isNoteToSelf) getStringFromStringResMapper(sharedR.string.chat_note_to_self_chat_title) else chat.title,
                                 id = chat.chatId.toString(),
                                 isSelected = _uiState.value.selectedItems.any {
                                     chat.chatId.toString() == it.id

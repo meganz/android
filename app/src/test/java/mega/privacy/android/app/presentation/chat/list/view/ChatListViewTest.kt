@@ -5,7 +5,6 @@ import androidx.compose.ui.test.assertIsNotDisplayed
 import androidx.compose.ui.test.junit4.createComposeRule
 import androidx.compose.ui.test.onNodeWithTag
 import androidx.test.ext.junit.runners.AndroidJUnit4
-import mega.privacy.android.app.presentation.chat.list.view.ChatListView
 import mega.privacy.android.domain.entity.chat.ChatRoomItem
 import org.junit.Rule
 import org.junit.Test
@@ -69,6 +68,23 @@ class ChatListViewTest {
         composeTestRule.setContent {
             ChatListView(
                 items = emptyList(),
+                selectedIds = emptyList(),
+                scrollToTop = false,
+                isMeetingView = false,
+                isLoading = false
+            )
+        }
+
+        composeTestRule.onNodeWithTag("chat_room_list:empty").assertIsDisplayed()
+    }
+
+    @Test
+    fun `test that EmptyView is displayed when item is Note to self chat`() {
+        val list = mutableListOf<ChatRoomItem>()
+        list.add(ChatRoomItem.NoteToSelfChatRoomItem(chatId = 123L, title = "Note to self"))
+        composeTestRule.setContent {
+            ChatListView(
+                items = list,
                 selectedIds = emptyList(),
                 scrollToTop = false,
                 isMeetingView = false,

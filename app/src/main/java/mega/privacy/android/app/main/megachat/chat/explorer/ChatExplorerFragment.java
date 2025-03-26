@@ -201,7 +201,11 @@ public class ChatExplorerFragment extends Fragment implements CheckScrollInterfa
 
         megaChatApi.signalPresenceActivity();
 
-        viewModel = new ViewModelProvider(this).get(ChatExplorerViewModel.class);
+        if (context instanceof ChatExplorerActivity) {
+            viewModel = new ViewModelProvider(((ChatExplorerActivity) context)).get(ChatExplorerViewModel.class);
+        } else {
+            viewModel = new ViewModelProvider(this).get(ChatExplorerViewModel.class);
+        }
 
         resetSearch();
 

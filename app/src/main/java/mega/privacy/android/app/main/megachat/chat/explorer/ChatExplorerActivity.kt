@@ -8,6 +8,7 @@ import android.view.View
 import android.view.Window
 import android.widget.FrameLayout
 import androidx.activity.enableEdgeToEdge
+import androidx.activity.viewModels
 import androidx.appcompat.widget.SearchView
 import androidx.core.content.ContextCompat
 import androidx.lifecycle.Lifecycle
@@ -33,6 +34,7 @@ import nz.mega.sdk.MegaChatRequestListenerInterface
 import nz.mega.sdk.MegaUser
 import timber.log.Timber
 import javax.inject.Inject
+import kotlin.getValue
 
 
 private const val CHAT_EXPLORER_FRAGMENT = "chatExplorerFragment"
@@ -50,11 +52,12 @@ internal class ChatExplorerActivity : PasscodeActivity(), View.OnClickListener,
     private var fragmentContainer: FrameLayout? = null
     var chatExplorerFragment: ChatExplorerFragment? = null
     var fab: FloatingActionButton? = null
-    private var chatIdFrom: Long = -1
 
     private var nodeHandles: LongArray? = null
     private var messagesIds: LongArray? = null
     private var userHandles: LongArray? = null
+
+    val chatExplorerViewModel: ChatExplorerViewModel by viewModels()
 
     var searchMenuItem: MenuItem? = null
 
@@ -99,7 +102,6 @@ internal class ChatExplorerActivity : PasscodeActivity(), View.OnClickListener,
                     if (messagesIds != null) {
                         messagesIds?.size?.let { Timber.d("Number of messages to forward: $it") }
                     }
-                    chatIdFrom = intent.getLongExtra(Constants.ID_CHAT_FROM, -1)
                 }
             } else {
                 nodeHandles = intent.getLongArrayExtra(Constants.NODE_HANDLES)

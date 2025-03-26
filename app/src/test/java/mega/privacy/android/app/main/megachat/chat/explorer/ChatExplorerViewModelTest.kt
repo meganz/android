@@ -1,11 +1,13 @@
 package mega.privacy.android.app.main.megachat.chat.explorer
 
+import androidx.lifecycle.SavedStateHandle
 import app.cash.turbine.test
 import com.google.common.truth.Truth.assertThat
 import kotlinx.coroutines.flow.emptyFlow
 import kotlinx.coroutines.flow.flow
 import kotlinx.coroutines.test.runTest
 import mega.privacy.android.app.presentation.contact.mapper.UserContactMapper
+import mega.privacy.android.app.presentation.mapper.GetStringFromStringResMapper
 import mega.privacy.android.core.test.extension.CoroutineMainDispatcherExtension
 import mega.privacy.android.domain.entity.ChatRoomLastMessage
 import mega.privacy.android.domain.entity.ChatRoomPermission
@@ -47,13 +49,14 @@ import org.robolectric.RobolectricTestRunner
 class ChatExplorerViewModelTest {
 
     private lateinit var underTest: ChatExplorerViewModel
-
+    private val savedStateHandle: SavedStateHandle = mock()
     private val getActiveChatListItemsUseCase: GetActiveChatListItemsUseCase = mock()
     private val getArchivedChatListItemsUseCase: GetArchivedChatListItemsUseCase = mock()
     private val getUserUseCase: GetUserUseCase = mock()
     private val isAnEmptyChatUseCase: IsAnEmptyChatUseCase = mock()
     private val getFeatureFlagValueUseCase: GetFeatureFlagValueUseCase = mock()
     private val getNoteToSelfChatUseCase: GetNoteToSelfChatUseCase = mock()
+    private val getStringFromStringResMapper: GetStringFromStringResMapper = mock()
 
     private val monitorContactByHandleUseCase: MonitorContactByHandleUseCase = mock()
     private val getUserOnlineStatusByHandleUseCase: GetUserOnlineStatusByHandleUseCase = mock()
@@ -79,7 +82,9 @@ class ChatExplorerViewModelTest {
             isAnEmptyChatUseCase = isAnEmptyChatUseCase,
             getFeatureFlagValueUseCase = getFeatureFlagValueUseCase,
             getNoteToSelfChatUseCase = getNoteToSelfChatUseCase,
-            defaultDispatcher = extension.testDispatcher
+            defaultDispatcher = extension.testDispatcher,
+            getStringFromStringResMapper = getStringFromStringResMapper,
+            savedStateHandle = savedStateHandle,
         )
     }
 
@@ -102,7 +107,9 @@ class ChatExplorerViewModelTest {
             getVisibleContactsWithoutChatRoomUseCase,
             isAnEmptyChatUseCase,
             getFeatureFlagValueUseCase,
-            getNoteToSelfChatUseCase
+            getNoteToSelfChatUseCase,
+            getStringFromStringResMapper,
+            savedStateHandle
         )
     }
 

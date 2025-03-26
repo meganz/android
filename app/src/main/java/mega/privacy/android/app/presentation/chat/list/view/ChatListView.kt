@@ -9,7 +9,6 @@ import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.isSystemInDarkTheme
 import androidx.compose.foundation.layout.Arrangement
-import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
@@ -100,7 +99,8 @@ fun ChatListView(
     onScheduleMeeting: () -> Unit = {},
     onShowNextTooltip: (MeetingTooltipItem) -> Unit = {},
 ) {
-    Box(
+
+    Column(
         modifier = modifier
             .fillMaxSize()
             .background(MaterialTheme.colors.surface)
@@ -108,14 +108,6 @@ fun ChatListView(
         val showEmptyStateAndNoteToSelfChat =
             !isMeetingView && (items.size == 1 && items.first() is ChatRoomItem.NoteToSelfChatRoomItem)
         val isEmptyStateShowed = !isLoading && (items.isEmpty() || showEmptyStateAndNoteToSelfChat)
-        if (isEmptyStateShowed) {
-            EmptyView(
-                isMeetingView = isMeetingView,
-                onEmptyButtonClick = onEmptyButtonClick,
-                hasAnyContact = hasAnyContact,
-                onScheduleMeeting = onScheduleMeeting,
-            )
-        }
 
         if (items.isNotEmpty()) {
             ListView(
@@ -131,6 +123,15 @@ fun ChatListView(
                 onFirstItemVisible = onFirstItemVisible,
                 onScrollInProgress = onScrollInProgress,
                 onShowNextTooltip = onShowNextTooltip,
+            )
+        }
+
+        if (isEmptyStateShowed) {
+            EmptyView(
+                isMeetingView = isMeetingView,
+                onEmptyButtonClick = onEmptyButtonClick,
+                hasAnyContact = hasAnyContact,
+                onScheduleMeeting = onScheduleMeeting,
             )
         }
     }
@@ -411,6 +412,22 @@ private fun PreviewMeetingEmptyView(
             items = emptyList(),
             selectedIds = emptyList(),
             isMeetingView = isMeeting,
+            scrollToTop = false,
+        )
+    }
+}
+
+@CombinedThemePreviews
+@CombinedThemeTabletLandscapePreviews
+@Composable
+private fun PreviewEmptyView() {
+    OriginalTheme(isDark = isSystemInDarkTheme()) {
+        val list = mutableListOf<ChatRoomItem>()
+        list.add(ChatRoomItem.NoteToSelfChatRoomItem(chatId = 123L, title = "Note to self"))
+        ChatListView(
+            items = list,
+            selectedIds = emptyList(),
+            isMeetingView = false,
             scrollToTop = false,
         )
     }
