@@ -1028,7 +1028,8 @@ public class ChatUtil {
                     new ChatController(activity).deleteMessage(message, chatId);
                     activity.finish();
                 })
-                .setNegativeButton(activity.getString(mega.privacy.android.shared.resources.R.string.general_dialog_cancel_button), null);
+                .setNegativeButton(activity.getString(mega.privacy.android.shared.resources.R.string.general_dialog_cancel_button), null)
+                .show();
     }
 
     /**
