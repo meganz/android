@@ -73,6 +73,7 @@ import mega.privacy.mobile.analytics.event.SendMeetingLinkToChatScheduledMeeting
 import timber.log.Timber
 import javax.inject.Inject
 import mega.privacy.android.shared.resources.R as sharedR
+import mega.privacy.android.domain.usecase.chat.BroadcastChatArchivedUseCase
 
 /**
  * ChatInfoActivity view model.
@@ -104,6 +105,7 @@ import mega.privacy.android.shared.resources.R as sharedR
  * @property monitorUserUpdates                             [MonitorUserUpdates]
  * @property getChatCallUseCase                             [GetChatCallUseCase]
  * @property monitorChatCallUpdatesUseCase                  [MonitorChatCallUpdatesUseCase]
+ * @property broadcastChatArchivedUseCase                   [BroadcastChatArchivedUseCase]
  * @property uiState                    Current view state as [ChatInfoUiState]
  */
 @HiltViewModel
@@ -139,6 +141,7 @@ class ChatInfoViewModel @Inject constructor(
     private val getChatCallUseCase: GetChatCallUseCase,
     private val monitorChatCallUpdatesUseCase: MonitorChatCallUpdatesUseCase,
     private val archiveChatUseCase: ArchiveChatUseCase,
+    private val broadcastChatArchivedUseCase: BroadcastChatArchivedUseCase,
     get1On1ChatIdUseCase: Get1On1ChatIdUseCase,
     sendTextMessageUseCase: SendTextMessageUseCase,
 ) : BaseLinkViewModel(get1On1ChatIdUseCase, sendTextMessageUseCase) {
@@ -432,16 +435,8 @@ class ChatInfoViewModel @Inject constructor(
                             isOpenInvite
                         }
 
-                        val archiveValue = if (chat.hasChanged(ChatRoomChange.Archive)) {
-                            Timber.d("Changes in Archive")
-                            chat.isArchived
-                        } else {
-                            isArchived
-                        }
-
                         copy(
                             isHost = hostValue,
-                            isArchived = archiveValue,
                             chatTitle = titleValue,
                             isPublic = publicValue,
                             retentionTimeSeconds = retentionTimeValue,
@@ -987,12 +982,10 @@ class ChatInfoViewModel @Inject constructor(
                     )
                 )
             }.onSuccess {
-                triggerSnackbarMessage(
-                    getStringFromStringResMapper(
-                        if (shouldArchive) R.string.success_archive_chat else R.string.success_unarchive_chat,
-                        title
-                    )
-                )
+                if (shouldArchive) {
+                    broadcastChatArchivedUseCase(title)
+                }
+                finishActivity()
             }
         }
     }

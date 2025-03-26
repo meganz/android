@@ -203,26 +203,42 @@ class ChatInfoActivity : PasscodeActivity(), SnackbarShower {
             }
         }
 
-        collectFlow(scheduledMeetingManagementViewModel.state) { scheduledMeetingManagementState ->
-            if (scheduledMeetingManagementState.finish) {
+        collectFlow(scheduledMeetingManagementViewModel.state.map { it.finish }
+            .distinctUntilChanged()) {
+            if (it) {
                 Timber.d("Finish activity")
                 finish()
             }
+        }
 
-            if (scheduledMeetingManagementState.meetingLink != link) {
-                link = scheduledMeetingManagementState.meetingLink
+        collectFlow(scheduledMeetingManagementViewModel.state.map { it.meetingLink }
+            .distinctUntilChanged()) {
+            if (it != link) {
+                link = it
             }
         }
 
-        collectFlow(waitingRoomManagementViewModel.state) { waitingRoomManagementState ->
-            waitingRoomManagementState.snackbarString?.let {
+        collectFlow(waitingRoomManagementViewModel.state.map { it.snackbarString }
+            .distinctUntilChanged()) {
+            it?.let {
                 viewModel.triggerSnackbarMessage(it)
                 waitingRoomManagementViewModel.onConsumeSnackBarMessageEvent()
             }
+        }
 
-            if (waitingRoomManagementState.shouldWaitingRoomBeShown) {
+        collectFlow(waitingRoomManagementViewModel.state.map { it.shouldWaitingRoomBeShown }
+            .distinctUntilChanged()) {
+            if (it) {
                 waitingRoomManagementViewModel.onConsumeShouldWaitingRoomBeShownEvent()
                 launchCallScreen()
+            }
+        }
+
+        collectFlow(viewModel.uiState.map { it.finish }
+            .distinctUntilChanged()) {
+            if (it) {
+                Timber.d("Finish activity")
+                finish()
             }
         }
 
@@ -240,11 +256,6 @@ class ChatInfoActivity : PasscodeActivity(), SnackbarShower {
         }
 
         collectFlow(viewModel.uiState) { state ->
-            if (state.finish) {
-                Timber.d("Finish activity")
-                finish()
-            }
-
             if (chatRoomId != state.chatId) {
                 chatRoomId = state.chatId
             }

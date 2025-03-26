@@ -134,7 +134,7 @@ class StartConversationActivity : ComponentActivity() {
                 onBackPressed = { finish() },
                 onSearchClicked = viewModel::onSearchTap,
                 onInviteContactsClicked = { onInviteContacts() },
-                onNoteToSelfClicked = viewModel::onNoteToSelfTap
+                onNoteToSelfClicked = viewModel::openNoteToSelf
             )
         }
     }

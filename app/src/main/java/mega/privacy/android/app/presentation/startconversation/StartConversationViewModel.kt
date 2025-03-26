@@ -27,6 +27,7 @@ import mega.privacy.android.domain.usecase.GetVisibleContactsUseCase
 import mega.privacy.android.domain.usecase.MonitorContactUpdates
 import mega.privacy.android.domain.usecase.account.contactrequest.MonitorContactRequestUpdatesUseCase
 import mega.privacy.android.domain.usecase.chat.CreateGroupChatRoomUseCase
+import mega.privacy.android.domain.usecase.chat.GetNoteToSelfChatUseCase
 import mega.privacy.android.domain.usecase.chat.StartConversationUseCase
 import mega.privacy.android.domain.usecase.contact.AddNewContactsUseCase
 import mega.privacy.android.domain.usecase.contact.MonitorChatOnlineStatusUseCase
@@ -47,9 +48,10 @@ import javax.inject.Inject
  * @property applyContactUpdates                            [ApplyContactUpdates]
  * @property monitorChatPresenceLastGreenUpdatesUseCase     [MonitorChatPresenceLastGreenUpdatesUseCase]
  * @property monitorChatOnlineStatusUseCase                 [MonitorChatOnlineStatusUseCase]
- * @property monitorContactRequestUpdatesUseCase                   [MonitorContactRequestUpdatesUseCase]
+ * @property monitorContactRequestUpdatesUseCase            [MonitorContactRequestUpdatesUseCase]
  * @property addNewContactsUseCase                          [AddNewContactsUseCase]
  * @property requestUserLastGreenUseCase                    [RequestUserLastGreenUseCase]
+ * @property getNoteToSelfChatUseCase                       [GetNoteToSelfChatUseCase]
  * @property state                    Current view state as [StartConversationState]
  */
 @HiltViewModel
@@ -65,6 +67,7 @@ class StartConversationViewModel @Inject constructor(
     private val monitorContactRequestUpdatesUseCase: MonitorContactRequestUpdatesUseCase,
     private val addNewContactsUseCase: AddNewContactsUseCase,
     private val requestUserLastGreenUseCase: RequestUserLastGreenUseCase,
+    private val getNoteToSelfChatUseCase: GetNoteToSelfChatUseCase,
     monitorConnectivityUseCase: MonitorConnectivityUseCase,
     savedStateHandle: SavedStateHandle,
 ) : ViewModel() {
@@ -281,6 +284,30 @@ class StartConversationViewModel @Inject constructor(
     }
 
     /**
+     * Create or open note to self chat
+     */
+    fun openNoteToSelf() {
+        Timber.d("Open note to self chat")
+        if (isConnected.value) {
+            viewModelScope.launch {
+                runCatching {
+                    getNoteToSelfChatUseCase()
+                }.onFailure { exception ->
+                    Timber.e(exception)
+                    _state.update { it.copy(error = R.string.general_text_error) }
+                }.onSuccess { noteToSelfChatRoom ->
+                    noteToSelfChatRoom?.let {
+                        Timber.d("Note to self chat found: ${noteToSelfChatRoom.chatId}")
+                        _state.update { it.copy(result = noteToSelfChatRoom.chatId) }
+                    }
+                }
+            }
+        } else {
+            _state.update { it.copy(error = R.string.check_internet_connection_error) }
+        }
+    }
+
+    /**
      * On Start group conversation tap
      *
      * @param emails
@@ -321,13 +348,6 @@ class StartConversationViewModel @Inject constructor(
     fun onCloseSearchTap() {
         updateSearchWidgetState(SearchWidgetState.COLLAPSED)
         setTypedSearch("")
-    }
-
-    /**
-     * Create or open note to self chat
-     */
-    fun onNoteToSelfTap() {
-        Timber.e("Create or open note to self chat")
     }
 
     /**

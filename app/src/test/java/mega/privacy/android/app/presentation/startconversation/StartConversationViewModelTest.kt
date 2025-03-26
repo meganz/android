@@ -14,6 +14,9 @@ import mega.privacy.android.app.InstantExecutorExtension
 import mega.privacy.android.app.R
 import mega.privacy.android.app.presentation.startconversation.model.StartConversationAction
 import mega.privacy.android.core.test.extension.CoroutineMainDispatcherExtension
+import mega.privacy.android.domain.entity.ChatRoomPermission
+import mega.privacy.android.domain.entity.chat.ChatRoom
+import mega.privacy.android.domain.entity.chat.ChatRoomChange
 import mega.privacy.android.domain.entity.contacts.ContactData
 import mega.privacy.android.domain.entity.contacts.ContactItem
 import mega.privacy.android.domain.entity.contacts.UserChatStatus
@@ -24,6 +27,7 @@ import mega.privacy.android.domain.usecase.GetVisibleContactsUseCase
 import mega.privacy.android.domain.usecase.MonitorContactUpdates
 import mega.privacy.android.domain.usecase.account.contactrequest.MonitorContactRequestUpdatesUseCase
 import mega.privacy.android.domain.usecase.chat.CreateGroupChatRoomUseCase
+import mega.privacy.android.domain.usecase.chat.GetNoteToSelfChatUseCase
 import mega.privacy.android.domain.usecase.chat.StartConversationUseCase
 import mega.privacy.android.domain.usecase.contact.AddNewContactsUseCase
 import mega.privacy.android.domain.usecase.contact.MonitorChatOnlineStatusUseCase
@@ -39,9 +43,11 @@ import org.junit.jupiter.api.extension.RegisterExtension
 import org.mockito.Mockito.reset
 import org.mockito.kotlin.any
 import org.mockito.kotlin.anyOrNull
+import org.mockito.kotlin.doReturn
 import org.mockito.kotlin.mock
 import org.mockito.kotlin.whenever
 import org.mockito.kotlin.wheneverBlocking
+import kotlin.Long
 
 @ExtendWith(InstantExecutorExtension::class)
 @TestInstance(TestInstance.Lifecycle.PER_CLASS)
@@ -65,6 +71,7 @@ class StartConversationViewModelTest {
         status = UserChatStatus.Online,
         chatroomId = null,
     )
+
     private val testContactList = buildList {
         for (i in 0 until 10) {
             add(getContact(i.toLong()))
@@ -86,6 +93,11 @@ class StartConversationViewModelTest {
     private val invalidHandle = -1L
     private val chatHandle = 123L
 
+    private val noteToSelfChat = mock<ChatRoom> {
+        on { chatId } doReturn chatHandle
+        on { isNoteToSelf } doReturn true
+    }
+
     private val getVisibleContactsUseCase = mock<GetVisibleContactsUseCase>()
     private val getContactDataUseCase = mock<GetContactDataUseCase>()
     private var connectivityFlow = MutableSharedFlow<Boolean>()
@@ -100,6 +112,7 @@ class StartConversationViewModelTest {
     private val addNewContactsUseCase = mock<AddNewContactsUseCase>()
     private val requestUserLastGreenUseCase = mock<RequestUserLastGreenUseCase>()
     private val createGroupChatRoomUseCase = mock<CreateGroupChatRoomUseCase>()
+    private val getNoteToSelfChatUseCase = mock<GetNoteToSelfChatUseCase>()
 
     @BeforeEach
     fun resetMocks() {
@@ -110,10 +123,12 @@ class StartConversationViewModelTest {
             applyContactUpdates,
             addNewContactsUseCase,
             requestUserLastGreenUseCase,
-            createGroupChatRoomUseCase
+            createGroupChatRoomUseCase,
+            getNoteToSelfChatUseCase
         )
         savedStateHandle = SavedStateHandle(mapOf())
         wheneverBlocking { getVisibleContactsUseCase() }.thenReturn(emptyList())
+        wheneverBlocking { getNoteToSelfChatUseCase() }.thenReturn(mock())
         wheneverBlocking { getContactDataUseCase(any()) }.thenReturn(mock())
         wheneverBlocking { monitorConnectivityUseCase() }.thenReturn(connectivityFlow)
         wheneverBlocking { monitorContactUpdates() }.thenReturn(emptyFlow())
@@ -137,6 +152,7 @@ class StartConversationViewModelTest {
             addNewContactsUseCase = addNewContactsUseCase,
             requestUserLastGreenUseCase = requestUserLastGreenUseCase,
             monitorConnectivityUseCase = monitorConnectivityUseCase,
+            getNoteToSelfChatUseCase = getNoteToSelfChatUseCase,
             savedStateHandle = savedStateHandle,
         )
     }
@@ -267,6 +283,17 @@ class StartConversationViewModelTest {
         }
 
     @Test
+    fun `test that connection error is returned if attempting to get note to self and no internet available`() =
+        runTest {
+            testScheduler.advanceUntilIdle()
+            underTest.state.map { it.error }.drop(1).test {
+                connectivityFlow.emit(false)
+                underTest.openNoteToSelf()
+                assertThat(awaitItem()).isEqualTo(R.string.check_internet_connection_error)
+            }
+        }
+
+    @Test
     fun `test that an invalid handle is returned if start conversation finish with an error`() =
         runTest {
             whenever(startConversationUseCase(isGroup = anyOrNull(), userHandles = anyOrNull()))
@@ -277,6 +304,20 @@ class StartConversationViewModelTest {
                 connectivityFlow.emit(true)
                 underTest.onContactTap(testContact)
                 assertThat(awaitItem()).isEqualTo(invalidHandle)
+            }
+        }
+
+    @Test
+    fun `test that an invalid handle is returned if get note to self finish with an error`() =
+        runTest {
+            whenever(getNoteToSelfChatUseCase())
+                .thenAnswer { throw Throwable("Complete with error") }
+
+            testScheduler.advanceUntilIdle()
+            underTest.state.map { it.error }.drop(1).test {
+                connectivityFlow.emit(true)
+                underTest.openNoteToSelf()
+                assertThat(awaitItem()).isEqualTo(R.string.general_text_error)
             }
         }
 
@@ -304,6 +345,20 @@ class StartConversationViewModelTest {
             underTest.state.map { it.result }.drop(1).test {
                 connectivityFlow.emit(true)
                 underTest.onContactTap(testContact)
+                assertThat(awaitItem()).isEqualTo(chatHandle)
+            }
+        }
+
+    @Test
+    fun `test that note to self chat is returned if get note to self finishes without an error`() =
+        runTest {
+            whenever(getNoteToSelfChatUseCase())
+                .thenReturn(noteToSelfChat)
+
+            testScheduler.advanceUntilIdle()
+            underTest.state.map { it.result }.drop(1).test {
+                connectivityFlow.emit(true)
+                underTest.openNoteToSelf()
                 assertThat(awaitItem()).isEqualTo(chatHandle)
             }
         }
