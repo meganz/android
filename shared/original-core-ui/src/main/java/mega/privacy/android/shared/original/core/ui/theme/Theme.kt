@@ -18,6 +18,7 @@ import mega.android.core.ui.tokens.theme.tokens.AndroidNewSemanticTokensDark
 import mega.android.core.ui.tokens.theme.tokens.AndroidNewSemanticTokensLight
 import mega.android.core.ui.tokens.theme.tokens.Background
 import mega.android.core.ui.tokens.theme.tokens.Border
+import mega.android.core.ui.tokens.theme.tokens.Brand
 import mega.android.core.ui.tokens.theme.tokens.Button
 import mega.android.core.ui.tokens.theme.tokens.Components
 import mega.android.core.ui.tokens.theme.tokens.Focus
@@ -128,6 +129,7 @@ private val testColorPalette = MegaColors(
         override val link = Link()
         override val notifications = Notifications()
         override val border = Border()
+        override val brand = Brand()
     },
     false,
 )
