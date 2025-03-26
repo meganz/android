@@ -60,6 +60,7 @@ internal fun SyncFoldersScreen(
     onOpenMegaFolderClicked: (SyncUiItem) -> Unit,
     onCameraUploadsSettingsClicked: () -> Unit,
     isLowBatteryLevel: Boolean,
+    isStorageOverQuota: Boolean,
     isLoading: Boolean,
     deviceName: String,
     modifier: Modifier = Modifier,
@@ -107,6 +108,7 @@ internal fun SyncFoldersScreen(
                         onOpenMegaFolderClicked = onOpenMegaFolderClicked,
                         onCameraUploadsSettingsClicked = onCameraUploadsSettingsClicked,
                         isLowBatteryLevel = isLowBatteryLevel,
+                        isStorageOverQuota = isStorageOverQuota,
                         errorRes = syncUiItems[itemIndex].error,
                         deviceName = deviceName,
                     )
@@ -213,6 +215,7 @@ private fun SyncFoldersScreenEmptyStatePreview() {
             onOpenMegaFolderClicked = {},
             onCameraUploadsSettingsClicked = {},
             isLowBatteryLevel = false,
+            isStorageOverQuota = false,
             isLoading = false,
             deviceName = "Device Name",
         )
@@ -238,6 +241,7 @@ private fun SyncFoldersScreenLoadingStatePreview() {
             onOpenMegaFolderClicked = {},
             onCameraUploadsSettingsClicked = {},
             isLowBatteryLevel = false,
+            isStorageOverQuota = false,
             isLoading = true,
             deviceName = "Device Name",
         )
@@ -274,6 +278,7 @@ private fun SyncFoldersScreenSyncingPreview(
             onOpenMegaFolderClicked = {},
             onCameraUploadsSettingsClicked = {},
             isLowBatteryLevel = false,
+            isStorageOverQuota = false,
             isLoading = false,
             deviceName = "Device Name",
         )
@@ -310,6 +315,7 @@ private fun SyncFoldersScreenSyncingWithStalledIssuesPreview(
             onOpenMegaFolderClicked = {},
             onCameraUploadsSettingsClicked = {},
             isLowBatteryLevel = false,
+            isStorageOverQuota = false,
             isLoading = false,
             deviceName = "Device Name",
         )

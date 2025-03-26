@@ -68,6 +68,7 @@ internal fun SyncCard(
     onOpenMegaFolderClicked: () -> Unit,
     onCameraUploadsSettingsClicked: () -> Unit,
     isLowBatteryLevel: Boolean,
+    isStorageOverQuota: Boolean,
     @StringRes errorRes: Int?,
     deviceName: String,
     modifier: Modifier = Modifier,
@@ -119,7 +120,8 @@ internal fun SyncCard(
                 onOpenMegaFolderClicked = onOpenMegaFolderClicked,
                 onCameraUploadsSettingsClicked = onCameraUploadsSettingsClicked,
                 isLowBatteryLevel = isLowBatteryLevel,
-                isError = errorRes != null,
+                isStorageOverQuota = isStorageOverQuota,
+                isError = errorRes != null && errorRes != sharedR.string.general_sync_storage_overquota,
                 expanded = sync.expanded,
             )
         },
@@ -335,6 +337,7 @@ private fun SyncCardFooter(
     onOpenMegaFolderClicked: () -> Unit,
     onCameraUploadsSettingsClicked: () -> Unit,
     isLowBatteryLevel: Boolean,
+    isStorageOverQuota: Boolean,
     isError: Boolean,
     expanded: Boolean,
 ) {
@@ -406,7 +409,7 @@ private fun SyncCardFooter(
                     } else {
                         stringResource(id = R.string.sync_card_run_sync)
                     },
-                    enabled = !isLowBatteryLevel && !isError
+                    enabled = !isLowBatteryLevel && !isStorageOverQuota && !isError
                 )
                 MegaButtonWithIconAndText(
                     modifier = Modifier
@@ -456,6 +459,7 @@ private fun SyncCardExpandedPreview(
             onOpenMegaFolderClicked = {},
             onCameraUploadsSettingsClicked = {},
             isLowBatteryLevel = false,
+            isStorageOverQuota = false,
             errorRes = null,
             deviceName = "Device Name",
         )
@@ -491,6 +495,7 @@ private fun SyncCardExpandedWithBannerPreview(
             onOpenMegaFolderClicked = {},
             onCameraUploadsSettingsClicked = {},
             isLowBatteryLevel = false,
+            isStorageOverQuota = false,
             errorRes = sharedR.string.general_sync_active_sync_below_path,
             deviceName = "Device Name",
         )
@@ -526,6 +531,7 @@ private fun SyncCardCollapsedPreview(
             onOpenMegaFolderClicked = {},
             onCameraUploadsSettingsClicked = {},
             isLowBatteryLevel = false,
+            isStorageOverQuota = false,
             errorRes = null,
             deviceName = "Device Name",
         )
@@ -561,6 +567,7 @@ private fun SyncCardCollapsedWithBannerPreview(
             onOpenMegaFolderClicked = {},
             onCameraUploadsSettingsClicked = {},
             isLowBatteryLevel = false,
+            isStorageOverQuota = false,
             errorRes = sharedR.string.general_sync_active_sync_below_path,
             deviceName = "Device Name",
         )

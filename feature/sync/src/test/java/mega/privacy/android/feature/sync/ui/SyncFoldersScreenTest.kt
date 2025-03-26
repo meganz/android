@@ -183,6 +183,7 @@ class SyncFoldersScreenTest {
                 onOpenMegaFolderClicked = {},
                 onCameraUploadsSettingsClicked = {},
                 isLowBatteryLevel = false,
+                isStorageOverQuota = false,
                 isLoading = true,
                 deviceName = "Device Name",
             )
@@ -270,6 +271,7 @@ class SyncFoldersScreenTest {
                 onOpenMegaFolderClicked = {},
                 onCameraUploadsSettingsClicked = {},
                 isLowBatteryLevel = false,
+                isStorageOverQuota = false,
                 isLoading = false,
                 deviceName = "Device Name",
             )
@@ -304,6 +306,7 @@ class SyncFoldersScreenTest {
                 onOpenMegaFolderClicked = {},
                 onCameraUploadsSettingsClicked = {},
                 isLowBatteryLevel = false,
+                isStorageOverQuota = false,
                 isLoading = false,
                 deviceName = "Device Name",
             )
@@ -339,6 +342,7 @@ class SyncFoldersScreenTest {
                 onOpenMegaFolderClicked = {},
                 onCameraUploadsSettingsClicked = {},
                 isLowBatteryLevel = false,
+                isStorageOverQuota = false,
                 isLoading = false,
                 deviceName = "Device Name",
             )

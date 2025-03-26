@@ -113,9 +113,12 @@ internal class SyncFoldersViewModel @Inject constructor(
         getAndMonitorBatteryInfo()
 
         viewModelScope.launch {
-            monitorAccountDetailUseCase().collect {
-                checkOverQuotaStatus()
-            }
+            monitorAccountDetailUseCase()
+                .catch { Timber.e(it) }
+                .collect {
+                    checkOverQuotaStatus()
+                    onSyncRefresh()
+                }
         }
 
         viewModelScope.launch {

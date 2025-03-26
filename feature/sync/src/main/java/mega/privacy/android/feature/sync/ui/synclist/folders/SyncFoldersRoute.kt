@@ -66,6 +66,7 @@ internal fun SyncFoldersRoute(
         },
         onCameraUploadsSettingsClicked = onCameraUploadsSettingsClicked,
         isLowBatteryLevel = uiState.isLowBatteryLevel,
+        isStorageOverQuota = uiState.isStorageOverQuota,
         isLoading = uiState.isLoading,
         deviceName = deviceName,
     )

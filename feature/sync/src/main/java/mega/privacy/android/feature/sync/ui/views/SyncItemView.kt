@@ -19,6 +19,7 @@ internal fun SyncItemView(
     onOpenMegaFolderClicked: (SyncUiItem) -> Unit,
     onCameraUploadsSettingsClicked: () -> Unit,
     isLowBatteryLevel: Boolean,
+    isStorageOverQuota: Boolean,
     deviceName: String,
     @StringRes errorRes: Int? = null
 ) {
@@ -42,6 +43,7 @@ internal fun SyncItemView(
         },
         onCameraUploadsSettingsClicked = onCameraUploadsSettingsClicked,
         isLowBatteryLevel = isLowBatteryLevel,
+        isStorageOverQuota = isStorageOverQuota,
         errorRes = errorRes,
         deviceName = deviceName,
     )

@@ -59,6 +59,7 @@ class SyncCardTest {
                 onOpenMegaFolderClicked = {},
                 onCameraUploadsSettingsClicked = {},
                 isLowBatteryLevel = false,
+                isStorageOverQuota = false,
                 errorRes = null,
                 deviceName = "Device Name",
             )
@@ -111,6 +112,7 @@ class SyncCardTest {
                 onOpenMegaFolderClicked = {},
                 onCameraUploadsSettingsClicked = {},
                 isLowBatteryLevel = false,
+                isStorageOverQuota = false,
                 errorRes = null,
                 deviceName = "Device Name",
             )
@@ -164,6 +166,7 @@ class SyncCardTest {
                 onOpenMegaFolderClicked = { clicked = true },
                 onCameraUploadsSettingsClicked = {},
                 isLowBatteryLevel = false,
+                isStorageOverQuota = false,
                 errorRes = null,
                 deviceName = "Device Name",
             )
@@ -185,6 +188,41 @@ class SyncCardTest {
             .assertIsDisplayed().performClick()
         assertThat(clicked).isTrue()
         clicked = false
+    }
+
+    @Test
+    fun `test that Sync card resume button is not clickable if the account is over quota`() {
+        var clicked = false
+        composeTestRule.setContent {
+            SyncCard(
+                sync = SyncUiItem(
+                    id = 1L,
+                    syncType = SyncType.TYPE_TWOWAY,
+                    folderPairName = "Sync Name",
+                    status = SyncStatus.ERROR,
+                    deviceStoragePath = "Device Path",
+                    hasStalledIssues = true,
+                    megaStoragePath = "MEGA Path",
+                    megaStorageNodeId = NodeId(1111L),
+                    expanded = false,
+                ),
+                expandClicked = {},
+                pauseRunClicked = { clicked = true },
+                removeFolderClicked = {},
+                issuesInfoClicked = {},
+                onOpenDeviceFolderClicked = {},
+                onOpenMegaFolderClicked = {},
+                onCameraUploadsSettingsClicked = {},
+                isLowBatteryLevel = false,
+                isStorageOverQuota = true,
+                errorRes = null,
+                deviceName = "Device Name",
+            )
+        }
+
+        composeTestRule.onNodeWithText(composeTestRule.activity.getString(R.string.sync_card_run_sync))
+            .assertIsDisplayed().performClick()
+        assertThat(clicked).isFalse()
     }
 
     @Test
@@ -211,6 +249,7 @@ class SyncCardTest {
                 onOpenMegaFolderClicked = {},
                 onCameraUploadsSettingsClicked = {},
                 isLowBatteryLevel = false,
+                isStorageOverQuota = false,
                 errorRes = null,
                 deviceName = "Device Name",
             )
@@ -257,6 +296,7 @@ class SyncCardTest {
                 onOpenMegaFolderClicked = {},
                 onCameraUploadsSettingsClicked = {},
                 isLowBatteryLevel = false,
+                isStorageOverQuota = false,
                 errorRes = null,
                 deviceName = "Device Name",
             )
@@ -288,6 +328,7 @@ class SyncCardTest {
                 onOpenMegaFolderClicked = {},
                 onCameraUploadsSettingsClicked = {},
                 isLowBatteryLevel = false,
+                isStorageOverQuota = false,
                 errorRes = null,
                 deviceName = "Device Name",
             )
@@ -340,6 +381,7 @@ class SyncCardTest {
                 onOpenMegaFolderClicked = {},
                 onCameraUploadsSettingsClicked = {},
                 isLowBatteryLevel = false,
+                isStorageOverQuota = false,
                 errorRes = null,
                 deviceName = "Device Name",
             )
@@ -393,6 +435,7 @@ class SyncCardTest {
                 onOpenMegaFolderClicked = { clicked = true },
                 onCameraUploadsSettingsClicked = {},
                 isLowBatteryLevel = false,
+                isStorageOverQuota = false,
                 errorRes = null,
                 deviceName = "Device Name",
             )
@@ -414,6 +457,41 @@ class SyncCardTest {
             .assertIsDisplayed().performClick()
         assertThat(clicked).isTrue()
         clicked = false
+    }
+
+    @Test
+    fun `test that Backup card resume button is not clickable if the account is over quota`() {
+        var clicked = false
+        composeTestRule.setContent {
+            SyncCard(
+                sync = SyncUiItem(
+                    id = 1L,
+                    syncType = SyncType.TYPE_BACKUP,
+                    folderPairName = "Sync Name",
+                    status = SyncStatus.ERROR,
+                    deviceStoragePath = "Device Path",
+                    hasStalledIssues = true,
+                    megaStoragePath = "MEGA Path",
+                    megaStorageNodeId = NodeId(1111L),
+                    expanded = false,
+                ),
+                expandClicked = {},
+                pauseRunClicked = { clicked = true },
+                removeFolderClicked = {},
+                issuesInfoClicked = {},
+                onOpenDeviceFolderClicked = {},
+                onOpenMegaFolderClicked = {},
+                onCameraUploadsSettingsClicked = {},
+                isLowBatteryLevel = false,
+                isStorageOverQuota = true,
+                errorRes = null,
+                deviceName = "Device Name",
+            )
+        }
+
+        composeTestRule.onNodeWithText(composeTestRule.activity.getString(R.string.sync_card_run_sync))
+            .assertIsDisplayed().performClick()
+        assertThat(clicked).isFalse()
     }
 
     @Test
@@ -440,6 +518,7 @@ class SyncCardTest {
                 onOpenMegaFolderClicked = {},
                 onCameraUploadsSettingsClicked = {},
                 isLowBatteryLevel = false,
+                isStorageOverQuota = false,
                 errorRes = null,
                 deviceName = "Device Name",
             )
@@ -486,6 +565,7 @@ class SyncCardTest {
                 onOpenMegaFolderClicked = {},
                 onCameraUploadsSettingsClicked = {},
                 isLowBatteryLevel = false,
+                isStorageOverQuota = false,
                 errorRes = null,
                 deviceName = "Device Name",
             )
@@ -517,6 +597,7 @@ class SyncCardTest {
                 onOpenMegaFolderClicked = {},
                 onCameraUploadsSettingsClicked = {},
                 isLowBatteryLevel = false,
+                isStorageOverQuota = false,
                 errorRes = null,
                 deviceName = "Device Name",
             )
@@ -569,6 +650,7 @@ class SyncCardTest {
                 onOpenMegaFolderClicked = {},
                 onCameraUploadsSettingsClicked = {},
                 isLowBatteryLevel = false,
+                isStorageOverQuota = false,
                 errorRes = null,
                 deviceName = "Device Name",
             )
@@ -622,6 +704,7 @@ class SyncCardTest {
                 onOpenMegaFolderClicked = { clicked = true },
                 onCameraUploadsSettingsClicked = { clicked = true },
                 isLowBatteryLevel = false,
+                isStorageOverQuota = false,
                 errorRes = null,
                 deviceName = "Device Name",
             )
@@ -662,6 +745,7 @@ class SyncCardTest {
                 onOpenMegaFolderClicked = {},
                 onCameraUploadsSettingsClicked = {},
                 isLowBatteryLevel = false,
+                isStorageOverQuota = false,
                 errorRes = null,
                 deviceName = "Device Name",
             )
@@ -693,6 +777,7 @@ class SyncCardTest {
                 onOpenMegaFolderClicked = {},
                 onCameraUploadsSettingsClicked = {},
                 isLowBatteryLevel = false,
+                isStorageOverQuota = false,
                 errorRes = null,
                 deviceName = "Device Name",
             )
@@ -745,6 +830,7 @@ class SyncCardTest {
                 onOpenMegaFolderClicked = {},
                 onCameraUploadsSettingsClicked = {},
                 isLowBatteryLevel = false,
+                isStorageOverQuota = false,
                 errorRes = null,
                 deviceName = "Device Name",
             )
@@ -798,6 +884,7 @@ class SyncCardTest {
                 onOpenMegaFolderClicked = { clicked = true },
                 onCameraUploadsSettingsClicked = { clicked = true },
                 isLowBatteryLevel = false,
+                isStorageOverQuota = false,
                 errorRes = null,
                 deviceName = "Device Name",
             )
@@ -838,6 +925,7 @@ class SyncCardTest {
                 onOpenMegaFolderClicked = {},
                 onCameraUploadsSettingsClicked = {},
                 isLowBatteryLevel = false,
+                isStorageOverQuota = false,
                 errorRes = null,
                 deviceName = "Device Name",
             )
