@@ -86,8 +86,8 @@ fun ChatListView(
     selectedIds: List<Long>,
     scrollToTop: Boolean,
     isMeetingView: Boolean,
-    isNew: Boolean = false,
     modifier: Modifier = Modifier,
+    isNew: Boolean = false,
     hasAnyContact: Boolean = false,
     isLoading: Boolean = false,
     tooltip: MeetingTooltipItem = MeetingTooltipItem.NONE,
@@ -107,8 +107,8 @@ fun ChatListView(
     ) {
         val showEmptyStateAndNoteToSelfChat =
             !isMeetingView && (items.size == 1 && items.first() is ChatRoomItem.NoteToSelfChatRoomItem)
-
-        if (!isLoading && (items.isEmpty() || showEmptyStateAndNoteToSelfChat)) {
+        val isEmptyStateShowed = !isLoading && (items.isEmpty() || showEmptyStateAndNoteToSelfChat)
+        if (isEmptyStateShowed) {
             EmptyView(
                 isMeetingView = isMeetingView,
                 onEmptyButtonClick = onEmptyButtonClick,
@@ -121,6 +121,7 @@ fun ChatListView(
             ListView(
                 items = items,
                 selectedIds = selectedIds,
+                isEmptyStateShowed = isEmptyStateShowed,
                 scrollToTop = scrollToTop,
                 isNew = isNew,
                 tooltip = tooltip,
@@ -138,7 +139,6 @@ fun ChatListView(
 @Composable
 private fun ListView(
     items: List<ChatRoomItem>,
-    isNew: Boolean = false,
     selectedIds: List<Long>,
     scrollToTop: Boolean,
     tooltip: MeetingTooltipItem,
@@ -148,6 +148,8 @@ private fun ListView(
     onFirstItemVisible: (Boolean) -> Unit,
     onScrollInProgress: (Boolean) -> Unit,
     modifier: Modifier = Modifier,
+    isNew: Boolean = false,
+    isEmptyStateShowed: Boolean = false,
     onShowNextTooltip: (MeetingTooltipItem) -> Unit = {},
 ) {
     val listState = rememberLazyListState()
@@ -187,6 +189,7 @@ private fun ListView(
                     item = item,
                     isSelected = selectionEnabled && selectedIds.contains(item.chatId),
                     isNew = isNew,
+                    isEmptyStateShowed = isEmptyStateShowed,
                     isSelectionEnabled = selectionEnabled,
                     onItemClick = onItemClick,
                     onItemMoreClick = onItemMoreClick,

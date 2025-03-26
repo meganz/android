@@ -74,6 +74,7 @@ import mega.privacy.android.shared.original.core.ui.theme.extensions.subtitle1me
  * @param isSelected
  * @param isNew
  * @param isSelectionEnabled
+ * @param isEmptyStateShowed
  * @param onItemClick
  * @param onItemMoreClick
  * @param onItemSelected
@@ -84,12 +85,13 @@ import mega.privacy.android.shared.original.core.ui.theme.extensions.subtitle1me
 internal fun ChatRoomItemView(
     item: ChatRoomItem,
     isSelected: Boolean,
-    isNew: Boolean = false,
     isSelectionEnabled: Boolean,
     onItemClick: (Long) -> Unit,
     onItemMoreClick: (ChatRoomItem) -> Unit,
     onItemSelected: (Long) -> Unit,
     modifier: Modifier = Modifier,
+    isNew: Boolean = false,
+    isEmptyStateShowed: Boolean = false,
 ) {
     val hapticFeedback = LocalHapticFeedback.current
     val hasOngoingCall = item.hasOngoingCall()
@@ -108,7 +110,7 @@ internal fun ChatRoomItemView(
             .background(MaterialTheme.colors.surface)
             .combinedClickable(
                 onClick = {
-                    if (isSelectionEnabled && !isEmptyNoteToSelfChat) {
+                    if (isSelectionEnabled) {
                         hapticFeedback.performHapticFeedback(LongPress)
                         onItemSelected(item.chatId)
                     } else {
@@ -116,7 +118,7 @@ internal fun ChatRoomItemView(
                     }
                 },
                 onLongClick = {
-                    if (!isEmptyNoteToSelfChat) {
+                    if (!isEmptyStateShowed) {
                         hapticFeedback.performHapticFeedback(LongPress)
                         onItemSelected(item.chatId)
                     }
@@ -387,14 +389,11 @@ internal fun ChatRoomItemView(
             )
         }
 
-
         IconButton(
             onClick = {
                 if (isSelectionEnabled) {
-                    if (!isEmptyNoteToSelfChat) {
-                        hapticFeedback.performHapticFeedback(LongPress)
-                        onItemSelected(item.chatId)
-                    }
+                    hapticFeedback.performHapticFeedback(LongPress)
+                    onItemSelected(item.chatId)
                 } else {
                     onItemMoreClick(item)
                 }
