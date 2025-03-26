@@ -3,26 +3,19 @@ package mega.privacy.android.app.presentation.photos.view
 import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.animation.slideInVertically
 import androidx.compose.animation.slideOutVertically
-import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxWidth
-import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.requiredWidthIn
-import androidx.compose.foundation.shape.RoundedCornerShape
-import androidx.compose.material.Button
-import androidx.compose.material.ButtonDefaults
-import androidx.compose.material.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.res.colorResource
 import androidx.compose.ui.res.stringResource
-import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
-import androidx.compose.ui.unit.sp
 import mega.privacy.android.app.R
 import mega.privacy.android.app.presentation.photos.model.TimeBarTab
+import mega.privacy.android.shared.original.core.ui.controls.chip.MegaChip
+import mega.privacy.android.shared.original.core.ui.controls.chip.RoundedChipStyle
 
 /**
  * A row of buttons to switch time view
@@ -60,38 +53,17 @@ fun TimeSwitchBar(
                     TimeBarTab.Days -> R.string.days_view_button
                     TimeBarTab.All -> R.string.all_view_button
                 }
-                Button(
+                MegaChip(
                     onClick = {
                         onTimeBarTabSelected(timeBarTab)
                     },
-                    colors = ButtonDefaults.buttonColors(
-                        backgroundColor = if (selectedIndex == index)
-                            colorResource(id = R.color.black_white)
-                        else
-                            colorResource(id = R.color.white_black),
-                        contentColor = if (selectedIndex == index)
-                            colorResource(id = R.color.white_black)
-                        else
-                            colorResource(id = R.color.black_white),
-                    ),
-                    border = BorderStroke(width = 1.dp,
-                        color = if (selectedIndex == index)
-                            colorResource(id = R.color.black_grey_alpha_012)
-                        else
-                            colorResource(id = R.color.grey_alpha_012_black)),
+                    selected = selectedIndex == index,
+                    text = stringResource(id = timeBarTabTextResId),
+                    style = RoundedChipStyle,
                     modifier = Modifier
-                        .height(36.dp)
                         .fillMaxWidth()
                         .weight(1f),
-                    shape = RoundedCornerShape(18.dp)
-                ) {
-                    Text(
-                        text = stringResource(id = timeBarTabTextResId),
-                        fontSize = 12.sp,
-                        fontWeight = FontWeight.Medium,
-                        letterSpacing = 0.15.sp
-                    )
-                }
+                )
             }
         }
     }

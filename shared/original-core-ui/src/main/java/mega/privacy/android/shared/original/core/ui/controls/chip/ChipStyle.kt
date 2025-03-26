@@ -51,13 +51,16 @@ sealed interface ChipStyle {
      */
     fun shape(): Shape = RoundedCornerShape(8.dp)
 
+    /**
+     * Height of chip
+     */
     fun height(): Dp? = null
 }
 
 /**
  * Default style for chips
  */
-object DefaultChipStyle : ChipStyle {
+data object DefaultChipStyle : ChipStyle {
 
     @OptIn(ExperimentalMaterialApi::class)
     @Composable
@@ -83,7 +86,7 @@ object DefaultChipStyle : ChipStyle {
 /**
  * Transparent style for chips
  */
-object TransparentChipStyle : ChipStyle {
+data object TransparentChipStyle : ChipStyle {
 
     @OptIn(ExperimentalMaterialApi::class)
     @Composable
@@ -109,7 +112,7 @@ object TransparentChipStyle : ChipStyle {
 /**
  * Rounded style for chips
  */
-object RoundedChipStyle : ChipStyle {
+data object RoundedChipStyle : ChipStyle {
 
     @OptIn(ExperimentalMaterialApi::class)
     @Composable
@@ -118,20 +121,27 @@ object RoundedChipStyle : ChipStyle {
         selectedContentColor = MegaOriginalTheme.colors.text.inverse,
         selectedLeadingIconColor = MegaOriginalTheme.colors.icon.inverse,
         backgroundColor = MegaOriginalTheme.colors.button.secondary,
-        contentColor = MegaOriginalTheme.colors.text.secondary,
-        leadingIconColor = MegaOriginalTheme.colors.icon.inverse,
+        contentColor = MegaOriginalTheme.colors.text.primary,
+        leadingIconColor = MegaOriginalTheme.colors.icon.primary,
         disabledBackgroundColor = MegaOriginalTheme.colors.button.secondary,
         disabledContentColor = MegaOriginalTheme.colors.text.secondary,
         disabledLeadingIconColor = MegaOriginalTheme.colors.icon.secondary,
     )
 
     @Composable
+    override fun borderStyle() = BorderStroke(1.dp, MegaOriginalTheme.colors.border.strong)
+
+    @Composable
     override fun typography(): TextStyle = MaterialTheme.typography.subtitle2medium
 
     override fun shape(): Shape = RoundedCornerShape(18.dp)
+    override fun height() = 36.dp
 }
 
-object TagChipStyle : ChipStyle {
+/**
+ * Tag chip style
+ */
+data object TagChipStyle : ChipStyle {
     @OptIn(ExperimentalMaterialApi::class)
     @Composable
     override fun selectableChipColors(): SelectableChipColors = ChipDefaults.filterChipColors(

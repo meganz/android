@@ -35,7 +35,7 @@ import androidx.compose.ui.unit.dp
 import androidx.core.content.withStyledAttributes
 import mega.privacy.android.core.R
 import mega.privacy.android.shared.original.core.ui.preview.BooleanProvider
-import mega.privacy.android.shared.original.core.ui.preview.CombinedThemePreviews
+import mega.privacy.android.shared.original.core.ui.preview.CombinedThemeComponentPreviews
 import mega.privacy.android.shared.original.core.ui.theme.OriginalTheme
 
 /**
@@ -136,6 +136,9 @@ class MegaChip : AbstractComposeView {
         }
     }
 
+    /**
+     * Content
+     */
     @Composable
     override fun Content() {
         OriginalTheme(isDark = isSystemInDarkTheme()) {
@@ -236,19 +239,19 @@ fun MegaChip(
         ) {
             CompositionLocalProvider(
                 LocalContentColor provides style.selectableChipColors()
-                    .contentColor(selected, enabled).value,
+                    .contentColor(enabled = enabled, selected = selected).value,
             ) {
                 Text(
                     modifier = Modifier.fillMaxWidth(),
                     text = text,
-                    textAlign = TextAlign.Center
+                    textAlign = TextAlign.Center,
                 )
             }
         }
     }
 }
 
-@CombinedThemePreviews
+@CombinedThemeComponentPreviews
 @Composable
 private fun ChipPreview(
     @PreviewParameter(BooleanProvider::class) selected: Boolean,
@@ -261,7 +264,7 @@ private fun ChipPreview(
     }
 }
 
-@CombinedThemePreviews
+@CombinedThemeComponentPreviews
 @Composable
 private fun ChipPreviewWithLeadAndTrail(
     @PreviewParameter(BooleanProvider::class) selected: Boolean,
@@ -285,19 +288,19 @@ private class ChipStyleProvider : PreviewParameterProvider<Pair<ChipStyle, Strin
     ).asSequence()
 }
 
-@CombinedThemePreviews
+@CombinedThemeComponentPreviews
 @Composable
 private fun ChipPreviewWithStyles(
     @PreviewParameter(ChipStyleProvider::class) chipStyleAndName: Pair<ChipStyle, String>,
 ) {
     OriginalTheme(isDark = isSystemInDarkTheme()) {
-        var selected = remember { mutableStateOf(true) }
+        var selected by remember { mutableStateOf(true) }
         MegaChip(
-            selected = selected.value,
+            selected = selected,
             text = chipStyleAndName.second,
             style = chipStyleAndName.first,
         ) {
-            selected.value = selected.value.not()
+            selected = selected.not()
         }
     }
 }
