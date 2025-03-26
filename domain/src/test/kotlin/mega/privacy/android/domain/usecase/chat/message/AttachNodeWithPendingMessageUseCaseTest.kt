@@ -201,7 +201,6 @@ class AttachNodeWithPendingMessageUseCaseTest {
         on { nodeHandle } doReturn nodeHandle
         on { fingerprint } doReturn null
         on { name } doReturn null
-        on { transferTag } doReturn transferTag
     }
 
     private val pendingMsgId = 43L
@@ -212,5 +211,4 @@ class AttachNodeWithPendingMessageUseCaseTest {
     private val tempId = 15L
     private val filePath = "file path"
     private val nodeHandle = 1L
-    private val transferTag = 78
 }

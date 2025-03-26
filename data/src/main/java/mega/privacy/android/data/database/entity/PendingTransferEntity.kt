@@ -17,7 +17,7 @@ import mega.privacy.android.domain.entity.transfer.pending.PendingTransferState
 /**
  * Pending transfer database entity for [PendingTransfer]
  * @property pendingTransferId
- * @property transferTag
+ * @property transferUniqueId
  * @property transferType
  * @property nodeIdentifier
  * @property path
@@ -30,12 +30,12 @@ import mega.privacy.android.domain.entity.transfer.pending.PendingTransferState
  */
 @Entity(
     tableName = TABLE_PENDING_TRANSFER,
-    indices = [Index(value = ["state", "transferTag", "transferType"])]
+    indices = [Index(value = ["state", "transferUniqueId", "transferType"])]
 )
 @TypeConverters(PendingTransferNodeIdentifierConverter::class)
 data class PendingTransferEntity(
     @PrimaryKey(autoGenerate = true) @ColumnInfo("pendingTransferId") val pendingTransferId: Long? = null,
-    @ColumnInfo("transferTag") val transferTag: Int?,
+    @ColumnInfo("transferUniqueId") val transferUniqueId: Long?,
     @ColumnInfo("transferType") val transferType: TransferType,
     @ColumnInfo("nodeIdentifier") val nodeIdentifier: PendingTransferNodeIdentifier,
     @ColumnInfo("path") val path: String,

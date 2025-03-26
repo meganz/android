@@ -49,17 +49,17 @@ class CheckFinishedChatUploadsUseCaseTest {
     )
 
     @Test
-    fun `test that pending messages in uploading state are set to error uploading state when there is no current transfer with its tag`() =
+    fun `test that pending messages in uploading state are set to error uploading state when there is no current transfer with its id`() =
         runTest {
             val pendingMessageIds = (1..10).map { it * 100L }
             val uploadingPendingMessage = pendingMessageIds.mapIndexed { index, id ->
                 mock<PendingMessage> {
-                    on { it.transferTag } doReturn index
+                    on { it.transferUniqueId } doReturn index.toLong()
                     on { it.id } doReturn id
                 }
             }
             whenever(chatMessageRepository.getPendingMessagesByState(PendingMessageState.UPLOADING)) doReturn uploadingPendingMessage
-            whenever(transferRepository.getTransferByTag(any())) doReturn null
+            whenever(transferRepository.getTransferByUniqueId(any())) doReturn null
 
             underTest()
 
@@ -81,7 +81,7 @@ class CheckFinishedChatUploadsUseCaseTest {
             val appData = listOf(TransferAppData.Geolocation(345.4, 45.34))
             val uploadingPendingMessage = pendingMessageIds.mapIndexed { index, id ->
                 mock<PendingMessage> {
-                    on { it.transferTag } doReturn index
+                    on { it.transferUniqueId } doReturn index.toLong()
                     on { it.id } doReturn id
                 }
             }
@@ -92,7 +92,7 @@ class CheckFinishedChatUploadsUseCaseTest {
                     on { it.isFinished } doReturn true
                     on { it.appData } doReturn appData
                 }
-                whenever(transferRepository.getTransferByTag(index)) doReturn transfer
+                whenever(transferRepository.getTransferByUniqueId(index.toLong())) doReturn transfer
             }
 
             underTest()
@@ -112,7 +112,7 @@ class CheckFinishedChatUploadsUseCaseTest {
             val pendingMessageIds = (1..10).map { it * 100L }
             val uploadingPendingMessage = pendingMessageIds.mapIndexed { index, id ->
                 mock<PendingMessage> {
-                    on { it.transferTag } doReturn index
+                    on { it.transferUniqueId } doReturn index.toLong()
                     on { it.id } doReturn id
                 }
             }
@@ -122,7 +122,7 @@ class CheckFinishedChatUploadsUseCaseTest {
                     on { it.nodeHandle } doReturn -1
                     on { it.isFinished } doReturn true
                 }
-                whenever(transferRepository.getTransferByTag(index)) doReturn transfer
+                whenever(transferRepository.getTransferByUniqueId(index.toLong())) doReturn transfer
             }
 
             underTest()

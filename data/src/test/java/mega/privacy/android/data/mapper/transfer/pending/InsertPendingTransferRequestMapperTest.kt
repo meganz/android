@@ -53,7 +53,7 @@ internal class InsertPendingTransferRequestMapperTest {
         assertAll(
             "Grouped Assertions of ${PendingTransferEntity::class.simpleName}",
             { assertThat(pendingTransferEntity.pendingTransferId).isNull() },
-            { assertThat(pendingTransferEntity.transferTag).isNull() },
+            { assertThat(pendingTransferEntity.transferUniqueId).isNull() },
             { assertThat(pendingTransferEntity.transferType).isEqualTo(insertRequest.transferType) },
             { assertThat(pendingTransferEntity.nodeIdentifier).isEqualTo(insertRequest.nodeIdentifier) },
             { assertThat(pendingTransferEntity.path).isEqualTo(insertRequest.uriPath.value) },

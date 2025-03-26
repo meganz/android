@@ -35,8 +35,8 @@ internal interface PendingTransferDao {
         }
     }
 
-    @Query("SELECT * FROM $TABLE_PENDING_TRANSFER WHERE transferTag = :tag")
-    suspend fun getPendingTransferByTag(tag: Int): PendingTransferEntity?
+    @Query("SELECT * FROM $TABLE_PENDING_TRANSFER WHERE transferUniqueId = :uniqueId")
+    suspend fun getPendingTransferByUniqueId(uniqueId: Long): PendingTransferEntity?
 
     @Query("SELECT * FROM $TABLE_PENDING_TRANSFER WHERE transferType = :transferType")
     fun monitorPendingTransfersByType(transferType: TransferType): Flow<List<PendingTransferEntity>>
@@ -99,8 +99,8 @@ internal interface PendingTransferDao {
         }
     }
 
-    @Query("DELETE FROM $TABLE_PENDING_TRANSFER WHERE transferTag = :transferTag")
-    suspend fun deletePendingTransferByTag(transferTag: Int)
+    @Query("DELETE FROM $TABLE_PENDING_TRANSFER WHERE transferUniqueId = :transferUniqueId")
+    suspend fun deletePendingTransferByUniqueId(transferUniqueId: Long)
 
     @Query("DELETE FROM $TABLE_PENDING_TRANSFER")
     suspend fun deleteAllPendingTransfers()

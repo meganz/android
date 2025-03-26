@@ -138,6 +138,7 @@ internal class ChatMessageRepositoryImpl @Inject constructor(
             PendingMessage(
                 id = id,
                 chatId = savePendingMessageRequest.chatId,
+                transferUniqueId = savePendingMessageRequest.transferUniqueId,
                 type = savePendingMessageRequest.type,
                 uploadTimestamp = savePendingMessageRequest.uploadTimestamp,
                 state = savePendingMessageRequest.state.value,
@@ -147,7 +148,6 @@ internal class ChatMessageRepositoryImpl @Inject constructor(
                 nodeHandle = savePendingMessageRequest.nodeHandle,
                 fingerprint = savePendingMessageRequest.fingerprint,
                 name = savePendingMessageRequest.name,
-                transferTag = savePendingMessageRequest.transferTag,
             )
         }
     }

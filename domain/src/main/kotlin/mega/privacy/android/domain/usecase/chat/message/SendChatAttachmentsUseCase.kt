@@ -38,6 +38,7 @@ class SendChatAttachmentsUseCase @Inject constructor(
             chatMessageRepository.savePendingMessages(
                 SavePendingMessageRequest(
                     chatId = chatIds.first(),
+                    transferUniqueId = -1,
                     type = if (isVoiceClip) PendingMessage.TYPE_VOICE_CLIP else -1,
                     uploadTimestamp = deviceCurrentTimeUseCase() / 1000,
                     state = PendingMessageState.PREPARING,
@@ -47,7 +48,6 @@ class SendChatAttachmentsUseCase @Inject constructor(
                     nodeHandle = -1,
                     fingerprint = null,
                     name = name,
-                    transferTag = -1,
                 ),
                 chatIds.asList()
             ).forEach { pendingMessageId ->

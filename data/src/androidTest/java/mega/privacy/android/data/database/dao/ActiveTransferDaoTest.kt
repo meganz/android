@@ -24,7 +24,9 @@ class ActiveTransferDaoTest {
     private val entities = TransferType.entries.flatMap { transferType: TransferType ->
         (1..4).map { index ->
             val tag = index + (10 * transferType.ordinal)
+            val uniqueId = index + (20L * transferType.ordinal)
             ActiveTransferEntity(
+                uniqueId = uniqueId,
                 tag = tag,
                 transferType = transferType,
                 totalBytes = 1024 * (tag.toLong() % 5 + 1),
@@ -59,6 +61,7 @@ class ActiveTransferDaoTest {
     @Test
     fun test_that_insert_a_new_entity_actually_inserts_the_entity() = runTest {
         val newEntity = ActiveTransferEntity(
+            uniqueId = 200L,
             tag = 100,
             transferType = TransferType.GENERAL_UPLOAD,
             totalBytes = 1024,
@@ -73,7 +76,7 @@ class ActiveTransferDaoTest {
             fileName = "fileName"
         )
         activeTransferDao.insertOrUpdateActiveTransfer(newEntity)
-        val actual = activeTransferDao.getActiveTransferByTag(newEntity.tag)
+        val actual = activeTransferDao.getActiveTransferByUniqueId(newEntity.uniqueId)
         assertThat(actual).isEqualTo(newEntity)
     }
 
@@ -95,7 +98,7 @@ class ActiveTransferDaoTest {
             activeTransferDao.insertOrUpdateActiveTransfers(entitiesToModified.values.toList())
 
             entitiesToModified.forEach { (original, modified) ->
-                val result = activeTransferDao.getActiveTransferByTag(original.tag)
+                val result = activeTransferDao.getActiveTransferByUniqueId(original.uniqueId)
                 if (original.isFinished) {
                     assertThat(result).isEqualTo(original)
                 } else {
@@ -107,7 +110,7 @@ class ActiveTransferDaoTest {
     @Test
     fun test_that_getActiveTransferByTag_returns_the_correct_active_transfer() = runTest {
         entities.forEach { entity ->
-            val actual = activeTransferDao.getActiveTransferByTag(entity.tag)
+            val actual = activeTransferDao.getActiveTransferByUniqueId(entity.uniqueId)
             assertThat(actual).isEqualTo(entity)
         }
     }
@@ -165,7 +168,7 @@ class ActiveTransferDaoTest {
                 val toFinish = initial.take(initial.size / 2).filter { !it.isFinished }
                 assertThat(initial).isNotEmpty()
                 assertThat(toFinish).isNotEmpty()
-                activeTransferDao.setActiveTransferAsCancelledByTag(toFinish.map { it.tag })
+                activeTransferDao.setActiveTransferAsCancelledByUniqueId(toFinish.map { it.uniqueId })
                 val actual = activeTransferDao.getCurrentActiveTransfersByType(type)
                 toFinish.forEach { finished ->
                     assertThat(actual.first { it.tag == finished.tag }.isFinished).isTrue()

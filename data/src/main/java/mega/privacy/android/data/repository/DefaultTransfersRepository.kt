@@ -131,12 +131,13 @@ internal class DefaultTransfersRepository @Inject constructor(
     /**
      * To store in progress transfers in memory instead of in database
      */
-    private val inProgressTransfersFlow = MutableStateFlow<Map<Int, InProgressTransfer>>(emptyMap())
+    private val inProgressTransfersFlow =
+        MutableStateFlow<Map<Long, InProgressTransfer>>(emptyMap())
 
     /**
      * to store current transferred bytes in memory instead of in database
      */
-    private val transferredBytesFlows: Map<TransferType, MutableStateFlow<Map<Int, Long>>> =
+    private val transferredBytesFlows: Map<TransferType, MutableStateFlow<Map<Long, Long>>> =
         TransferType.entries.associateWith { MutableStateFlow(mapOf()) }
 
     init {
@@ -422,7 +423,11 @@ internal class DefaultTransfersRepository @Inject constructor(
         }
 
     override suspend fun getTransferByTag(transferTag: Int) = withContext(ioDispatcher) {
-        megaApiGateway.getTransfersByTag(transferTag)?.let { transferMapper(it) }
+        megaApiGateway.getTransferByTag(transferTag)?.let { transferMapper(it) }
+    }
+
+    override suspend fun getTransferByUniqueId(id: Long) = withContext(ioDispatcher) {
+        megaApiGateway.getTransferByUniqueId(id)?.let { transferMapper(it) }
     }
 
     override fun monitorPausedTransfers() = monitorPausedTransfers.asStateFlow()
@@ -457,7 +462,8 @@ internal class DefaultTransfersRepository @Inject constructor(
                 completedTransferMapper(event.transfer, event.error, transferPath)
             }
             megaLocalRoomGateway.addCompletedTransfers(completedTransfers)
-            removeInProgressTransfers(finishEventsAndPaths.keys.map { it.transfer.tag }.toSet())
+            removeInProgressTransfers(finishEventsAndPaths.keys.map { it.transfer.uniqueId }
+                .toSet())
             appEventGateway.broadcastCompletedTransfer(completedTransferState)
         }
     }
@@ -470,7 +476,7 @@ internal class DefaultTransfersRepository @Inject constructor(
         val completedTransfer =
             completedTransferPendingTransferMapper(pendingTransfer, sizeInBytes, error)
         megaLocalRoomGateway.addCompletedTransfer(completedTransfer)
-        removeInProgressTransfers(setOfNotNull(pendingTransfer.transferTag))
+        removeInProgressTransfers(setOfNotNull(pendingTransfer.transferUniqueId))
         appEventGateway.broadcastCompletedTransfer(CompletedTransferState.Error)
     }
 
@@ -482,7 +488,7 @@ internal class DefaultTransfersRepository @Inject constructor(
             completedTransferPendingTransferMapper(it, 0L, error)
         }
         megaLocalRoomGateway.addCompletedTransfers(completedTransfers)
-        removeInProgressTransfers(pendingTransfers.mapNotNull { it.transferTag }.toSet())
+        removeInProgressTransfers(pendingTransfers.mapNotNull { it.transferUniqueId }.toSet())
         appEventGateway.broadcastCompletedTransfer(CompletedTransferState.Error)
     }
 
@@ -551,9 +557,10 @@ internal class DefaultTransfersRepository @Inject constructor(
             workInfos.any { it.state.isFinished }
         }
 
-    override suspend fun getActiveTransferByTag(tag: Int) = withContext(ioDispatcher) {
-        megaLocalRoomGateway.getActiveTransferByTag(tag)
-    }
+    override suspend fun getActiveTransferByTagUniqueId(uniqueId: Long) =
+        withContext(ioDispatcher) {
+            megaLocalRoomGateway.getActiveTransferByUniqueId(uniqueId)
+        }
 
     override fun getActiveTransfersByType(transferType: TransferType) =
         megaLocalRoomGateway
@@ -586,7 +593,7 @@ internal class DefaultTransfersRepository @Inject constructor(
             val grouped = transfers.groupBy { it.transferType }
             grouped.forEach { (transferType, transfersOfThisType) ->
                 val tagToBytes =
-                    transfersOfThisType.mapNotNull { if (it.transferredBytes == 0L) null else it.tag to it.transferredBytes }
+                    transfersOfThisType.mapNotNull { if (it.transferredBytes == 0L) null else it.uniqueId to it.transferredBytes }
                 transferredBytesFlow(transferType).update { map ->
                     map + tagToBytes
                 }
@@ -607,9 +614,9 @@ internal class DefaultTransfersRepository @Inject constructor(
             }
         }
 
-    override suspend fun setActiveTransferAsCancelledByTag(tags: List<Int>) =
+    override suspend fun setActiveTransferAsCancelledByUniqueId(uniqueIds: List<Long>) =
         withContext(ioDispatcher) {
-            megaLocalRoomGateway.setActiveTransferAsCancelledByTag(tags)
+            megaLocalRoomGateway.setActiveTransferAsCancelledByTag(uniqueIds)
         }
 
     override fun getActiveTransferTotalsByType(transferType: TransferType): Flow<ActiveTransferTotals> =
@@ -725,9 +732,8 @@ internal class DefaultTransfersRepository @Inject constructor(
             )
         }
 
-    private fun transferredBytesFlow(transferType: TransferType): MutableStateFlow<Map<Int, Long>> {
-        return transferredBytesFlows[transferType] ?: error("Unknown transfer type: $transferType")
-    }
+    private fun transferredBytesFlow(transferType: TransferType): MutableStateFlow<Map<Long, Long>> =
+        transferredBytesFlows[transferType] ?: error("Unknown transfer type: $transferType")
 
     companion object {
         internal const val TRANSFERS_SD_TEMPORARY_FOLDER = "transfersSdTempMEGA"
@@ -757,14 +763,14 @@ internal class DefaultTransfersRepository @Inject constructor(
         val inProgressTransfer = inProgressTransferMapper(transfer)
         inProgressTransfersFlow.update { inProgressTransfers ->
             inProgressTransfers.toMutableMap().also {
-                it[transfer.tag] = inProgressTransfer
+                it[transfer.uniqueId] = inProgressTransfer
             }
         }
     }
 
     override suspend fun updateInProgressTransfers(transfers: List<Transfer>) {
         val newInProgressTransfers =
-            transfers.map { inProgressTransferMapper(it) }.associateBy { it.tag }
+            transfers.map { inProgressTransferMapper(it) }.associateBy { it.uniqueId }
         inProgressTransfersFlow.update { inProgressTransfers ->
             inProgressTransfers.toMutableMap().also {
                 it.putAll(newInProgressTransfers)
@@ -774,19 +780,19 @@ internal class DefaultTransfersRepository @Inject constructor(
 
     override fun monitorInProgressTransfers() = inProgressTransfersFlow
 
-    override suspend fun removeInProgressTransfer(tag: Int) {
-        if (!inProgressTransfersFlow.value.containsKey(tag)) return
+    override suspend fun removeInProgressTransfer(uniqueId: Long) {
+        if (!inProgressTransfersFlow.value.containsKey(uniqueId)) return
         inProgressTransfersFlow.update { inProgressTransfers ->
             inProgressTransfers.toMutableMap().also {
-                it.remove(tag)
+                it.remove(uniqueId)
             }
         }
     }
 
-    override suspend fun removeInProgressTransfers(tags: Set<Int>) {
-        if (tags.isEmpty()) return
+    override suspend fun removeInProgressTransfers(uniqueIds: Set<Long>) {
+        if (uniqueIds.isEmpty()) return
         inProgressTransfersFlow.update { inProgressTransfers ->
-            inProgressTransfers.filterKeys { it !in tags }
+            inProgressTransfers.filterKeys { it !in uniqueIds }
         }
     }
 
@@ -822,11 +828,11 @@ internal class DefaultTransfersRepository @Inject constructor(
         megaLocalRoomGateway.insertPendingTransfers(pendingTransfer)
     }
 
-    override suspend fun getPendingTransfersByTag(tag: Int) =
-        megaLocalRoomGateway.getPendingTransfersByTag(tag)
+    override suspend fun getPendingTransfersByUniqueId(uniqueId: Long) =
+        megaLocalRoomGateway.getPendingTransfersByUniqueId(uniqueId)
 
-    override suspend fun deletePendingTransferByTag(tag: Int) {
-        megaLocalRoomGateway.deletePendingTransferByTag(tag)
+    override suspend fun deletePendingTransferByUniqueId(uniqueId: Long) {
+        megaLocalRoomGateway.deletePendingTransferByUniqueId(uniqueId)
     }
 
     override suspend fun deleteAllPendingTransfers() {

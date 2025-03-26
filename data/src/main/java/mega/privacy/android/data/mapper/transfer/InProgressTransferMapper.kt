@@ -18,6 +18,7 @@ internal class InProgressTransferMapper @Inject constructor() {
     operator fun invoke(transfer: Transfer) = with(transfer) {
         if (transferType.isDownloadType()) {
             InProgressTransfer.Download(
+                uniqueId = uniqueId,
                 tag = tag,
                 totalBytes = totalBytes,
                 fileName = fileName,
@@ -30,6 +31,7 @@ internal class InProgressTransferMapper @Inject constructor() {
             )
         } else {
             InProgressTransfer.Upload(
+                uniqueId = uniqueId,
                 tag = tag,
                 totalBytes = totalBytes,
                 fileName = fileName,

@@ -26,7 +26,7 @@ internal class ActiveTransferTotalsMapper @Inject constructor(
     suspend operator fun invoke(
         type: TransferType,
         list: List<ActiveTransfer>,
-        transferredBytes: Map<Int, Long>,
+        transferredBytes: Map<Long, Long>,
         previousActionGroups: List<ActiveTransferTotals.ActionGroup>? = null,
     ): ActiveTransferTotals {
         val onlyFiles = list.filter { !it.isFolderTransfer }
@@ -45,7 +45,7 @@ internal class ActiveTransferTotalsMapper @Inject constructor(
                             groupId = groupId,
                             totalFiles = activeTransfersFiles.size,
                             finishedFiles = activeTransfersFiles.count { it.isFinished },
-                            completedFiles = activeTransfersFiles.count { it.isFinished && transferredBytes[it.tag] == it.totalBytes },
+                            completedFiles = activeTransfersFiles.count { it.isFinished && transferredBytes[it.uniqueId] == it.totalBytes },
                             alreadyTransferred = activeTransfersFiles.count { it.isAlreadyTransferred },
                             destination = dest,
                             singleFileName = activeTransfersFiles.singleOrNull()?.fileName,
@@ -55,7 +55,8 @@ internal class ActiveTransferTotalsMapper @Inject constructor(
                             totalBytes = activeTransfersFiles.sumOf { it.totalBytes },
                             transferredBytes = activeTransfersFiles.sumOf {
                                 //if it's finished always totalBytes as it can be cancelled or failed
-                                if (it.isFinished) it.totalBytes else transferredBytes[it.tag] ?: 0L
+                                if (it.isFinished) it.totalBytes else transferredBytes[it.uniqueId]
+                                    ?: 0L
                             },
                             appData = activeTransfersFiles
                                 .flatMap { it.appData }
@@ -72,11 +73,11 @@ internal class ActiveTransferTotalsMapper @Inject constructor(
             pausedFileTransfers = onlyFiles.count { it.isPaused },
             totalFinishedTransfers = list.count { it.isFinished },
             totalFinishedFileTransfers = onlyFiles.count { it.isFinished },
-            totalCompletedFileTransfers = onlyFiles.count { it.isFinished && transferredBytes[it.tag] == it.totalBytes },
+            totalCompletedFileTransfers = onlyFiles.count { it.isFinished && transferredBytes[it.uniqueId] == it.totalBytes },
             totalBytes = onlyFiles.sumOf { it.totalBytes },
             transferredBytes = onlyFiles.sumOf {
                 //if it's finished always totalBytes as it can be cancelled or failed
-                if (it.isFinished) it.totalBytes else transferredBytes[it.tag] ?: 0L
+                if (it.isFinished) it.totalBytes else transferredBytes[it.uniqueId] ?: 0L
             },
             totalAlreadyTransferredFiles = onlyFiles.count { it.isAlreadyTransferred },
             totalCancelled = list.count { it.isCancelled },

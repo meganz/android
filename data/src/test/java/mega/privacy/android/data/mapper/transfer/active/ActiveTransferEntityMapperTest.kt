@@ -40,6 +40,7 @@ class ActiveTransferEntityMapperTest {
                             listOf(true, false).map { isCancelled ->
                                 Arguments.of(
                                     ActiveTransferTestImpl(
+                                        uniqueId = ID,
                                         tag = TAG,
                                         transferType = transferType,
                                         totalBytes = TOTAL,
@@ -55,6 +56,7 @@ class ActiveTransferEntityMapperTest {
                                         fileName = FILE_NAME,
                                     ),
                                     ActiveTransferEntity(
+                                        uniqueId = ID,
                                         tag = TAG,
                                         transferType = transferType,
                                         totalBytes = TOTAL,
@@ -78,6 +80,7 @@ class ActiveTransferEntityMapperTest {
         }
 
     companion object {
+        private const val ID = 3L
         private const val TAG = 2
         private const val TOTAL = 1024L
         private const val FILE_NAME = "foo.txt"
@@ -90,6 +93,7 @@ class ActiveTransferEntityMapperTest {
      * @constructor Create empty Active transfer impl
      */
     private data class ActiveTransferTestImpl(
+        override val uniqueId: Long,
         override val tag: Int,
         override val transferType: TransferType,
         override val totalBytes: Long,

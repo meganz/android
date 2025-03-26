@@ -508,7 +508,10 @@ internal class MegaApiFacade @Inject constructor(
     override suspend fun getTransfers(type: Int): List<MegaTransfer> =
         megaApi.getTransfers(type) ?: emptyList()
 
-    override suspend fun getTransfersByTag(tag: Int): MegaTransfer? = megaApi.getTransferByTag(tag)
+    override suspend fun getTransferByTag(tag: Int): MegaTransfer? = megaApi.getTransferByTag(tag)
+
+    override suspend fun getTransferByUniqueId(id: Long): MegaTransfer? =
+        megaApi.getTransferByUniqueId(id)
 
     override fun startDownload(
         node: MegaNode,

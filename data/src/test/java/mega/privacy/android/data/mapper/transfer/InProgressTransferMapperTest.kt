@@ -18,6 +18,7 @@ internal class InProgressTransferMapperTest {
     @Test
     fun `test that mapper returns correctly`() {
         val transfer = mock<Transfer> {
+            on { uniqueId } doReturn Random.nextLong()
             on { transferType } doReturn TransferType.DOWNLOAD
             on { transferredBytes } doReturn Random.nextLong()
             on { totalBytes } doReturn Random.nextLong()
@@ -32,6 +33,7 @@ internal class InProgressTransferMapperTest {
         val expected = with(transfer) {
             if (transferType.isDownloadType()) {
                 InProgressTransfer.Download(
+                    uniqueId = uniqueId,
                     tag = tag,
                     totalBytes = totalBytes,
                     fileName = fileName,
@@ -44,6 +46,7 @@ internal class InProgressTransferMapperTest {
                 )
             } else {
                 InProgressTransfer.Upload(
+                    uniqueId = uniqueId,
                     tag = tag,
                     totalBytes = totalBytes,
                     fileName = fileName,

@@ -17,8 +17,8 @@ import mega.privacy.android.data.database.dao.ContactDao
 import mega.privacy.android.data.database.dao.OfflineDao
 import mega.privacy.android.data.database.dao.PendingTransferDao
 import mega.privacy.android.data.database.dao.VideoRecentlyWatchedDao
-import mega.privacy.android.data.database.entity.ActiveTransferEntity
 import mega.privacy.android.data.database.entity.ActiveTransferActionGroupEntity
+import mega.privacy.android.data.database.entity.ActiveTransferEntity
 import mega.privacy.android.data.database.entity.BackupEntity
 import mega.privacy.android.data.database.entity.CameraUploadsRecordEntity
 import mega.privacy.android.data.database.entity.ChatPendingChangesEntity
@@ -881,13 +881,13 @@ internal class MegaLocalRoomFacadeTest {
 
     @Test
     fun `test that getPendingTransferByTag return mapped dao result`() = runTest {
-        val tag = 343
+        val uniqueId = 343L
         val pendingTransferEntity = mock<PendingTransferEntity>()
         val expected = mock<PendingTransfer>()
 
         whenever(pendingTransferModelMapper(pendingTransferEntity)) doReturn expected
-        whenever(pendingTransferDao.getPendingTransferByTag(tag)) doReturn pendingTransferEntity
-        val actual = underTest.getPendingTransfersByTag(tag)
+        whenever(pendingTransferDao.getPendingTransferByUniqueId(uniqueId)) doReturn pendingTransferEntity
+        val actual = underTest.getPendingTransfersByUniqueId(uniqueId)
 
         assertThat(actual).isEqualTo(expected)
     }
@@ -925,11 +925,11 @@ internal class MegaLocalRoomFacadeTest {
     @Test
     fun `test that deletePendingTransferByTag invokes dao method with correct parameter`() =
         runTest {
-            val tag = 6456
+            val uniqueId = 6456L
 
-            underTest.deletePendingTransferByTag(tag)
+            underTest.deletePendingTransferByUniqueId(uniqueId)
 
-            verify(pendingTransferDao).deletePendingTransferByTag(tag)
+            verify(pendingTransferDao).deletePendingTransferByUniqueId(uniqueId)
         }
 
     @Test

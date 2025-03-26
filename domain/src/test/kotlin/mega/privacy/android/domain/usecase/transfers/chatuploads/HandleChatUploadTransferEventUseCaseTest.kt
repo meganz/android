@@ -35,24 +35,25 @@ class HandleChatUploadTransferEventUseCaseTest {
 
 
     @Test
-    fun `test that pending message tag is updated when start event is received`() = runTest {
-        val pendingMessageId = 15L
-        val transferTag = 12
-        val transfer = mock<Transfer> {
-            on { it.tag } doReturn transferTag
-        }
-        val event = TransferEvent.TransferStartEvent(transfer)
+    fun `test that pending message tag and uniqueId are updated when start event is received`() =
+        runTest {
+            val pendingMessageId = 15L
+            val uniqueId = 3438L
+            val transfer = mock<Transfer> {
+                on { it.uniqueId } doReturn uniqueId
+            }
+            val event = TransferEvent.TransferStartEvent(transfer)
 
-        underTest(event, pendingMessageId)
+            underTest(event, pendingMessageId)
 
-        verify(updatePendingMessageUseCase).invoke(
-            UpdatePendingMessageTransferTagRequest(
-                pendingMessageId,
-                transferTag,
-                PendingMessageState.UPLOADING
+            verify(updatePendingMessageUseCase).invoke(
+                UpdatePendingMessageTransferTagRequest(
+                    pendingMessageId,
+                    uniqueId,
+                    PendingMessageState.UPLOADING
+                )
             )
-        )
-    }
+        }
 
     @Test
     fun `test that pending message node is attached if already uploaded event is received`() =

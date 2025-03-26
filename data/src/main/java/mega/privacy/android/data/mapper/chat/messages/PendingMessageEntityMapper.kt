@@ -19,6 +19,7 @@ class PendingMessageEntityMapper @Inject constructor() {
     ): PendingMessageEntity {
         return PendingMessageEntity(
             chatId = savePendingMessageRequest.chatId,
+            transferUniqueId = savePendingMessageRequest.transferUniqueId,
             type = savePendingMessageRequest.type,
             uploadTimestamp = savePendingMessageRequest.uploadTimestamp,
             state = savePendingMessageRequest.state,
@@ -28,7 +29,6 @@ class PendingMessageEntityMapper @Inject constructor() {
             nodeHandle = savePendingMessageRequest.nodeHandle,
             fingerprint = savePendingMessageRequest.fingerprint,
             name = savePendingMessageRequest.name,
-            transferTag = savePendingMessageRequest.transferTag
         )
     }
 

@@ -48,13 +48,13 @@ class PendingTransferDaoTest {
         val newEntity = createEntity()
         underTest.insertOrUpdatePendingTransfers(listOf(newEntity), 10)
 
-        val actual = underTest.getPendingTransferByTag(newEntity.transferTag ?: -1)
+        val actual = underTest.getPendingTransferByUniqueId(newEntity.transferUniqueId ?: -1L)
         assertThat(actual?.copy(pendingTransferId = null)).isEqualTo(newEntity)
     }
 
     @Test
     fun test_that_insertOrUpdatePendingTransfers_actually_inserts_the_entities() = runTest {
-        val newEntities = (1..50).map { createEntity(it) }
+        val newEntities = (1L..50L).map { createEntity(it) }
         underTest.insertOrUpdatePendingTransfers(newEntities, 10)
 
         val actual = underTest.getPendingTransfersByType(TransferType.DOWNLOAD)
@@ -66,7 +66,7 @@ class PendingTransferDaoTest {
     @Test
     fun test_that_getPendingTransfersByType_returns_the_correct_entities() = runTest {
         val transferType = TransferType.GENERAL_UPLOAD
-        val newEntities = (1..50).map {
+        val newEntities = (1L..50L).map {
             createEntity(it, if (it < 5) TransferType.DOWNLOAD else TransferType.GENERAL_UPLOAD)
         }
         underTest.insertOrUpdatePendingTransfers(newEntities, 10)
@@ -80,7 +80,7 @@ class PendingTransferDaoTest {
     @Test
     fun test_that_getPendingTransfersByState_returns_the_correct_entities() = runTest {
         val state = PendingTransferState.NotSentToSdk
-        val newEntities = (1..50).map {
+        val newEntities = (1L..50L).map {
             createEntity(
                 it,
                 state = if (it < 5) PendingTransferState.NotSentToSdk else PendingTransferState.SdkScanning
@@ -98,7 +98,7 @@ class PendingTransferDaoTest {
     fun test_that_monitorPendingTransfersByTypeAndState_returns_the_correct_entities() = runTest {
         val state = PendingTransferState.SdkScanning
         val transferType = TransferType.GENERAL_UPLOAD
-        val newEntities = (1..50).map {
+        val newEntities = (1L..50L).map {
             createEntity(
                 it, if (it < 5) TransferType.DOWNLOAD else TransferType.GENERAL_UPLOAD,
                 if (it > 10) PendingTransferState.SdkScanning else PendingTransferState.NotSentToSdk
@@ -123,7 +123,7 @@ class PendingTransferDaoTest {
     fun test_that_getPendingTransfersByTypeAndState_returns_the_correct_entities() = runTest {
         val state = PendingTransferState.SdkScanning
         val transferType = TransferType.GENERAL_UPLOAD
-        val newEntities = (1..50).map {
+        val newEntities = (1L..50L).map {
             createEntity(
                 it, if (it < 5) TransferType.DOWNLOAD else TransferType.GENERAL_UPLOAD,
                 if (it > 10) PendingTransferState.SdkScanning else PendingTransferState.NotSentToSdk
@@ -152,7 +152,7 @@ class PendingTransferDaoTest {
         val update = UpdatePendingTransferState(id, PendingTransferState.SdkScanning)
         underTest.update(update)
 
-        val actual = underTest.getPendingTransferByTag(newEntity.transferTag ?: -1)
+        val actual = underTest.getPendingTransferByUniqueId(newEntity.transferUniqueId ?: -1L)
         assertThat(actual).isEqualTo(newEntity.copy(pendingTransferId = id, state = update.state))
     }
 
@@ -164,7 +164,7 @@ class PendingTransferDaoTest {
         val update = UpdateAlreadyTransferredFilesCount(id, 10, 5)
         underTest.update(update)
 
-        val actual = underTest.getPendingTransferByTag(newEntity.transferTag ?: -1)
+        val actual = underTest.getPendingTransferByUniqueId(newEntity.transferUniqueId ?: -1L)
         assertThat(actual).isEqualTo(
             newEntity.copy(
                 pendingTransferId = id,
@@ -183,7 +183,7 @@ class PendingTransferDaoTest {
         val update = UpdateScanningFoldersData(id, TransferStage.STAGE_CREATING_TREE, 50, 2, 1)
         underTest.update(update)
 
-        val actual = underTest.getPendingTransferByTag(newEntity.transferTag ?: -1)
+        val actual = underTest.getPendingTransferByUniqueId(newEntity.transferUniqueId ?: -1L)
         assertThat(actual).isEqualTo(
             newEntity.copy(
                 pendingTransferId = id,
@@ -199,13 +199,13 @@ class PendingTransferDaoTest {
 
     @Test
     fun test_that_delete_by_tag_actually_deletes_the_entity() = runTest {
-        val newEntities = (1..50).map { createEntity(it) }
+        val newEntities = (1L..50L).map { createEntity(it) }
         underTest.insertOrUpdatePendingTransfers(newEntities, 10)
 
         underTest.monitorPendingTransfersByType(TransferType.DOWNLOAD).test {
             assertThat(awaitItem()).hasSize(newEntities.size)
 
-            underTest.deletePendingTransferByTag(newEntities.first().transferTag ?: -1)
+            underTest.deletePendingTransferByUniqueId(newEntities.first().transferUniqueId ?: -1L)
 
             val actual = awaitItem()
             assertThat(actual)
@@ -216,7 +216,7 @@ class PendingTransferDaoTest {
 
     @Test
     fun test_that_delete_all_actually_deletes_the_entities() = runTest {
-        val newEntities = (1..50).map { createEntity(it) }
+        val newEntities = (1L..50L).map { createEntity(it) }
         underTest.insertOrUpdatePendingTransfers(newEntities, 10)
 
         underTest.monitorPendingTransfersByType(TransferType.DOWNLOAD).test {
@@ -235,11 +235,11 @@ class PendingTransferDaoTest {
         }, "equalsExceptId")
 
     private fun createEntity(
-        transferTag: Int = 100,
+        transferUniqueId: Long = 100,
         transferType: TransferType = TransferType.DOWNLOAD,
         state: PendingTransferState = PendingTransferState.NotSentToSdk,
     ) = PendingTransferEntity(
-        transferTag = transferTag,
+        transferUniqueId = transferUniqueId,
         transferType = transferType,
         path = "path",
         appData = "appData",

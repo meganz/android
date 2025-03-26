@@ -5,6 +5,11 @@ package mega.privacy.android.domain.entity.transfer
  */
 interface TypedTransfer {
     /**
+     * The unique identifier of the transfer
+     */
+    val uniqueId: Long
+
+    /**
      * An integer that identifies this transfer.
      */
     val tag: Int

@@ -44,8 +44,8 @@ internal class CorrectActiveTransfersUseCaseTest {
     private val handleNotInProgressSDCardActiveTransfersUseCase =
         mock<HandleNotInProgressSDCardActiveTransfersUseCase>()
 
-    private val mockedActiveTransfers = (0..10).map { mock<ActiveTransfer>() }
-    private val mockedTransfers = (0..10).map { mock<Transfer>() }
+    private val mockedActiveTransfers = (0L..10L).map { mock<ActiveTransfer>() }
+    private val mockedTransfers = (0L..10L).map { mock<Transfer>() }
 
     @BeforeAll
     fun setUp() {
@@ -84,7 +84,7 @@ internal class CorrectActiveTransfersUseCaseTest {
 
     private fun stubActiveTransfers(areFinished: Boolean, isSdCardDownload: Boolean = false) {
         mockedActiveTransfers.forEachIndexed { index, activeTransfer ->
-            whenever(activeTransfer.tag).thenReturn(index)
+            whenever(activeTransfer.uniqueId).thenReturn(index.toLong())
             whenever(activeTransfer.isFinished).thenReturn(areFinished)
             if (isSdCardDownload) {
                 val data = mock<TransferAppData.SdCardDownload>()
@@ -95,7 +95,7 @@ internal class CorrectActiveTransfersUseCaseTest {
 
     private fun stubTransfers(isSdCardDownload: Boolean = false) {
         mockedTransfers.forEachIndexed { index, transfer ->
-            whenever(transfer.tag).thenReturn(index)
+            whenever(transfer.uniqueId).thenReturn(index.toLong())
             if (isSdCardDownload) {
                 val data = mock<TransferAppData.SdCardDownload>()
                 whenever(transfer.appData).thenReturn(listOf(data))
@@ -103,8 +103,8 @@ internal class CorrectActiveTransfersUseCaseTest {
         }
     }
 
-    private fun subSetTransfers() = mockedTransfers.filter { it.tag.mod(2) == 0 }
-    private fun subSetActiveTransfers() = mockedActiveTransfers.filter { it.tag.mod(3) == 0 }
+    private fun subSetTransfers() = mockedTransfers.filter { it.uniqueId.mod(2) == 0 }
+    private fun subSetActiveTransfers() = mockedActiveTransfers.filter { it.uniqueId.mod(3) == 0 }
 
     @Test
     fun `test that active transfers not finished and not in progress are set as cancelled`() =
@@ -116,10 +116,10 @@ internal class CorrectActiveTransfersUseCaseTest {
             val inProgress = subSetTransfers()
             whenever(getInProgressTransfersUseCase()).thenReturn(inProgress)
             val expected =
-                mockedActiveTransfers.map { it.tag } - inProgress.map { it.tag }.toSet()
+                mockedActiveTransfers.map { it.uniqueId } - inProgress.map { it.uniqueId }.toSet()
             Truth.assertThat(expected).isNotEmpty()
             underTest(TransferType.GENERAL_UPLOAD)
-            verify(transferRepository).setActiveTransferAsCancelledByTag(expected)
+            verify(transferRepository).setActiveTransferAsCancelledByUniqueId(expected)
         }
 
     @Test
@@ -128,7 +128,8 @@ internal class CorrectActiveTransfersUseCaseTest {
             stubActiveTransfers(areFinished = false, isSdCardDownload = true)
             stubTransfers(isSdCardDownload = true)
             val inProgress = subSetTransfers()
-            val expected = mockedActiveTransfers.filter { it.tag !in inProgress.map { it.tag } }
+            val expected = mockedActiveTransfers
+                .filter { it.uniqueId !in inProgress.map { it.uniqueId } }
 
             whenever(transferRepository.getCurrentActiveTransfersByType(any()))
                 .thenReturn(mockedActiveTransfers)
@@ -136,7 +137,7 @@ internal class CorrectActiveTransfersUseCaseTest {
 
             underTest(TransferType.DOWNLOAD)
 
-            verify(handleNotInProgressSDCardActiveTransfersUseCase).invoke(expected.associate { it.tag to it.appData })
+            verify(handleNotInProgressSDCardActiveTransfersUseCase).invoke(expected.associate { it.uniqueId to it.appData })
         }
 
     @Test
@@ -149,7 +150,7 @@ internal class CorrectActiveTransfersUseCaseTest {
                 .thenReturn(mockedActiveTransfers)
             whenever(getInProgressTransfersUseCase()).thenReturn(inProgress)
             underTest(TransferType.GENERAL_UPLOAD)
-            verify(transferRepository, never()).setActiveTransferAsCancelledByTag(anyOrNull())
+            verify(transferRepository, never()).setActiveTransferAsCancelledByUniqueId(anyOrNull())
         }
 
     @Test
@@ -178,12 +179,13 @@ internal class CorrectActiveTransfersUseCaseTest {
             val inProgress = subSetTransfers()
             whenever(getInProgressTransfersUseCase()).thenReturn(inProgress)
             val expected = mockedActiveTransfers.filter { transfer ->
-                !inProgress.map { it.tag }.contains(transfer.tag)
+                !inProgress.map { it.uniqueId }.contains(transfer.uniqueId)
             }
             Truth.assertThat(expected).isNotEmpty()
             underTest(TransferType.GENERAL_UPLOAD)
 
-            verify(transferRepository).removeInProgressTransfers(expected.map { it.tag }.toSet())
+            verify(transferRepository).removeInProgressTransfers(expected.map { it.uniqueId }
+                .toSet())
         }
 
     @Test
@@ -209,11 +211,11 @@ internal class CorrectActiveTransfersUseCaseTest {
     fun `test that pending transfers waiting for sdk scanning not known by sdk are set as errors`(
         transferType: TransferType?,
     ) = runTest {
-        val pendingTransfer1 = mock<PendingTransfer> { on { this.transferTag } doReturn 1 }
-        val pendingTransfer2 = mock<PendingTransfer> { on { this.transferTag } doReturn 2 }
-        val pendingTransfer3 = mock<PendingTransfer> { on { this.transferTag } doReturn 3 }
+        val pendingTransfer1 = mock<PendingTransfer> { on { this.transferUniqueId } doReturn 1L }
+        val pendingTransfer2 = mock<PendingTransfer> { on { this.transferUniqueId } doReturn 2L }
+        val pendingTransfer3 = mock<PendingTransfer> { on { this.transferUniqueId } doReturn 3L }
         val pendingTransfers = listOf(pendingTransfer1, pendingTransfer2, pendingTransfer3)
-        val transfer2 = mock<Transfer> { on { this.tag } doReturn 2 }
+        val transfer2 = mock<Transfer> { on { this.uniqueId } doReturn 2L }
         val expected = listOf(pendingTransfer1, pendingTransfer3)
         if (transferType == null) {
             whenever(
@@ -244,7 +246,7 @@ internal class CorrectActiveTransfersUseCaseTest {
     fun `test no unnecessary calls are done when there are no pending transfers waiting for sdk scanning not known by sdk`(
     ) = runTest {
         val transferType = TransferType.DOWNLOAD
-        val pendingTransfer = mock<PendingTransfer> { on { this.transferTag } doReturn 1 }
+        val pendingTransfer = mock<PendingTransfer> { on { this.transferUniqueId } doReturn 1 }
         val pendingTransfers = listOf(pendingTransfer)
         val transfer = mock<Transfer> { on { this.tag } doReturn 1 }
         whenever(
@@ -269,7 +271,7 @@ internal class CorrectActiveTransfersUseCaseTest {
     fun `test that pending preview transfers waiting for sdk scanning not known by sdk are not set as completed`() =
         runTest {
             val pendingTransfer = mock<PendingTransfer> {
-                on { this.transferTag } doReturn 1
+                on { this.transferUniqueId } doReturn 1
                 on { appData } doReturn listOf(TransferAppData.PreviewDownload)
             }
             val pendingTransfers = listOf(pendingTransfer)

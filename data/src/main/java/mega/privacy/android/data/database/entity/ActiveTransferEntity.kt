@@ -31,7 +31,11 @@ import mega.privacy.android.domain.entity.transfer.TransferType
 )
 @TypeConverters(ActiveTransferAppDataConverter::class)
 internal data class ActiveTransferEntity(
-    @PrimaryKey
+    @PrimaryKey(autoGenerate = true)
+    @ColumnInfo("id")
+    val id: Long? = null,
+    @ColumnInfo(name = "uniqueId", defaultValue = "0")
+    override val uniqueId: Long,
     @ColumnInfo(name = "tag")
     override val tag: Int,
     @ColumnInfo(name = "file_name", defaultValue = "")

@@ -8,7 +8,7 @@ import mega.privacy.android.domain.entity.transfer.Transfer
 import mega.privacy.android.domain.entity.transfer.TransferAppData
 import mega.privacy.android.domain.repository.FileSystemRepository
 import mega.privacy.android.domain.repository.TransferRepository
-import mega.privacy.android.domain.usecase.transfers.GetTransferByTagUseCase
+import mega.privacy.android.domain.usecase.transfers.GetTransferByUniqueIdUseCase
 import mega.privacy.android.domain.usecase.transfers.completed.AddCompletedTransferIfNotExistUseCase
 import org.junit.jupiter.api.BeforeAll
 import org.junit.jupiter.api.BeforeEach
@@ -29,7 +29,7 @@ class HandleNotInProgressSDCardActiveTransfersUseCaseTest {
 
     private val addCompletedTransferIfNotExistUseCase =
         mock<AddCompletedTransferIfNotExistUseCase>()
-    private val getTransferByTagUseCase = mock<GetTransferByTagUseCase>()
+    private val getTransferByUniqueIdUseCase = mock<GetTransferByUniqueIdUseCase>()
     private val moveFileToSdCardUseCase = mock<MoveFileToSdCardUseCase>()
     private val transferRepository = mock<TransferRepository>()
     private val fileSystemRepository = mock<FileSystemRepository>()
@@ -41,9 +41,9 @@ class HandleNotInProgressSDCardActiveTransfersUseCaseTest {
     private val parentPath = "$targetPathForSDK/$subFolders"
     private val downloadedFileSize = 100L
     private val notInProgressSdCardAppDataMap =
-        (0..10).associateWith { listOf(mock<TransferAppData.SdCardDownload>()) }
+        (0L..10L).associateWith { listOf(mock<TransferAppData.SdCardDownload>()) }
     private val singleNotInProgressSdCardAppDataMap = mapOf(
-        1 to listOf(
+        1L to listOf(
             TransferAppData.SdCardDownload(
                 targetPathForSDK = targetPathForSDK,
                 finalTargetUri = finalTargetUri,
@@ -60,7 +60,7 @@ class HandleNotInProgressSDCardActiveTransfersUseCaseTest {
     fun setUp() {
         underTest = HandleNotInProgressSDCardActiveTransfersUseCase(
             addCompletedTransferIfNotExistUseCase = addCompletedTransferIfNotExistUseCase,
-            getTransferByTagUseCase = getTransferByTagUseCase,
+            getTransferByUniqueIdUseCase = getTransferByUniqueIdUseCase,
             moveFileToSdCardUseCase = moveFileToSdCardUseCase,
             transferRepository = transferRepository,
             fileSystemRepository = fileSystemRepository,
@@ -72,7 +72,7 @@ class HandleNotInProgressSDCardActiveTransfersUseCaseTest {
     fun resetMocks() {
         reset(
             addCompletedTransferIfNotExistUseCase,
-            getTransferByTagUseCase,
+            getTransferByUniqueIdUseCase,
             moveFileToSdCardUseCase,
             transferRepository,
             fileSystemRepository,
@@ -85,14 +85,14 @@ class HandleNotInProgressSDCardActiveTransfersUseCaseTest {
             val nullTransfers = notInProgressSdCardAppDataMap.filter { it.key.mod(2) == 0 }
 
             val transfers = buildList {
-                notInProgressSdCardAppDataMap.forEach { (tag, _) ->
-                    if (tag in nullTransfers.keys) {
-                        whenever(getTransferByTagUseCase(tag)).thenReturn(null)
+                notInProgressSdCardAppDataMap.forEach { (uniqueId, _) ->
+                    if (uniqueId in nullTransfers.keys) {
+                        whenever(getTransferByUniqueIdUseCase(uniqueId)).thenReturn(null)
                     } else {
                         val transfer = mock<Transfer> {
-                            on { this.tag }.thenReturn(tag)
+                            on { this.uniqueId }.thenReturn(uniqueId)
                         }
-                        whenever(getTransferByTagUseCase(tag)).thenReturn(transfer)
+                        whenever(getTransferByUniqueIdUseCase(uniqueId)).thenReturn(transfer)
                         add(transfer)
                     }
                 }
@@ -107,7 +107,7 @@ class HandleNotInProgressSDCardActiveTransfersUseCaseTest {
     fun `test that FileSystemRepository is not invoked if the appData does not have a valid parentPath`() =
         runTest {
             val singleNotInProgressSdCardAppDataMap = mapOf(
-                1 to listOf(
+                1L to listOf(
                     TransferAppData.SdCardDownload(
                         targetPathForSDK = targetPathForSDK,
                         finalTargetUri = finalTargetUri,

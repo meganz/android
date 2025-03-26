@@ -293,6 +293,7 @@ class ChatMessageRepositoryImplTest {
         val expected = chatIds.map { it * 2 }
         val savePendingMessageRequest = SavePendingMessageRequest(
             chatId = 19L,
+            transferUniqueId = 45876L,
             type = 1,
             uploadTimestamp = 123L,
             state = PendingMessageState.UPLOADING,
@@ -302,7 +303,6 @@ class ChatMessageRepositoryImplTest {
             nodeHandle = 123L,
             fingerprint = "fingerprint",
             name = "name",
-            transferTag = 123
         )
         val savePendingMessageRequests = chatIds.associateWith {
             savePendingMessageRequest.copy(chatId = it)

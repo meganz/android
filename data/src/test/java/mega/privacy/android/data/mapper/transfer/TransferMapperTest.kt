@@ -41,6 +41,7 @@ internal class TransferMapperTest {
         val megaTransfer = mockMegaTransfer()
 
         val expected = Transfer(
+            uniqueId = megaTransfer.uniqueId,
             transferType = TransferType.DOWNLOAD,
             transferredBytes = megaTransfer.transferredBytes,
             totalBytes = megaTransfer.totalBytes,

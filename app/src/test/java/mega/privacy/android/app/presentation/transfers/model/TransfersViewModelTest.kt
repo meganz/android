@@ -11,7 +11,6 @@ import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.test.UnconfinedTestDispatcher
 import kotlinx.coroutines.test.advanceUntilIdle
 import kotlinx.coroutines.test.runTest
-import mega.privacy.android.app.presentation.transfers.model.TransfersViewModel
 import mega.privacy.android.app.presentation.transfers.view.navigation.compose.tabIndexArg
 import mega.privacy.android.core.test.extension.CoroutineMainDispatcherExtension
 import mega.privacy.android.domain.entity.EventType
@@ -86,14 +85,14 @@ class TransfersViewModelTest {
     @Test
     fun `test that MonitorInProgressTransfersUseCase updates state with in progress transfers`() =
         runTest {
-            val flow = MutableSharedFlow<Map<Int, InProgressTransfer>>()
+            val flow = MutableSharedFlow<Map<Long, InProgressTransfer>>()
             val transfer1 = mock<InProgressTransfer.Upload> {
                 on { priority } doReturn BigInteger.ONE
             }
             val transfer2 = mock<InProgressTransfer.Download> {
                 on { priority } doReturn BigInteger.TWO
             }
-            val map = mapOf(1 to transfer1, 2 to transfer2)
+            val map = mapOf(1L to transfer1, 2L to transfer2)
 
             whenever(monitorInProgressTransfersUseCase()).thenReturn(flow)
 
@@ -188,7 +187,7 @@ class TransfersViewModelTest {
     fun `test that playOrPauseTransfer invokes correctly`(
         isPaused: Boolean,
     ) = runTest {
-        val flow = MutableSharedFlow<Map<Int, InProgressTransfer>>()
+        val flow = MutableSharedFlow<Map<Long, InProgressTransfer>>()
         val tag = 1
         val transfer1 = mock<InProgressTransfer.Upload> {
             on { this.tag } doReturn tag
@@ -199,7 +198,7 @@ class TransfersViewModelTest {
             on { this.tag } doReturn 2
             on { priority } doReturn BigInteger.TWO
         }
-        val map = mapOf(1 to transfer1, 2 to transfer2)
+        val map = mapOf(1L to transfer1, 2L to transfer2)
 
         whenever(monitorInProgressTransfersUseCase()).thenReturn(flow)
 

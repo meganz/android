@@ -13,7 +13,7 @@ internal class InsertPendingTransferRequestMapper @Inject constructor(
         PendingTransferEntity(
             transferType = transferType,
             nodeIdentifier = nodeIdentifier,
-            transferTag = null,
+            transferUniqueId = null,
             path = uriPath.value,
             appData = transferAppDataStringMapper(appData),
             isHighPriority = isHighPriority,

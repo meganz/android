@@ -29,7 +29,7 @@ internal class PendingTransferEntityMapperTest {
 
     private val pendingTransfer = PendingTransfer(
         pendingTransferId = 123456L,
-        transferTag = 789012,
+        transferUniqueId = 789012L,
         transferType = TransferType.DOWNLOAD,
         nodeIdentifier = PendingTransferNodeIdentifier.CloudDriveNode(NodeId(11111L)),
         uriPath = UriPath("file/path"),
@@ -65,7 +65,7 @@ internal class PendingTransferEntityMapperTest {
         assertAll(
             "Grouped Assertions of ${PendingTransferEntity::class.simpleName}",
             { assertThat(pendingTransferEntity.pendingTransferId).isEqualTo(pendingTransfer.pendingTransferId) },
-            { assertThat(pendingTransferEntity.transferTag).isEqualTo(pendingTransfer.transferTag) },
+            { assertThat(pendingTransferEntity.transferUniqueId).isEqualTo(pendingTransfer.transferUniqueId) },
             { assertThat(pendingTransferEntity.transferType).isEqualTo(pendingTransfer.transferType) },
             { assertThat(pendingTransferEntity.nodeIdentifier).isEqualTo(pendingTransfer.nodeIdentifier) },
             { assertThat(pendingTransferEntity.path).isEqualTo(pendingTransfer.uriPath.value) },

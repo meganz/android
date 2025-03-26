@@ -5,6 +5,7 @@ import mega.privacy.android.domain.entity.chat.PendingMessageState
 /**
  * Update pending message request interface
  * @property pendingMessageId
+ * @property state
  */
 sealed interface UpdatePendingMessageRequest {
     val pendingMessageId: Long
@@ -37,12 +38,13 @@ data class UpdatePendingMessageStateAndNodeHandleRequest(
 /**
  * Entity to update the tag and state of a pending message
  * @property pendingMessageId
- * @property transferTag
+ * @property transferUniqueId
+ * @property transferUniqueId
  * @property state
  */
 data class UpdatePendingMessageTransferTagRequest(
     override val pendingMessageId: Long,
-    val transferTag: Int,
+    val transferUniqueId: Long,
     override val state: PendingMessageState,
 ) : UpdatePendingMessageRequest
 

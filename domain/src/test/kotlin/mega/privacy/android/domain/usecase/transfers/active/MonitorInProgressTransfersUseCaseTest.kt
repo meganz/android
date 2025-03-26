@@ -35,7 +35,7 @@ class MonitorInProgressTransfersUseCaseTest {
 
     @Test
     fun `test that invoke returns transferRepository in progress transfers`() {
-        val expected = mock<Flow<Map<Int, InProgressTransfer>>>()
+        val expected = mock<Flow<Map<Long, InProgressTransfer>>>()
         whenever(transferRepository.monitorInProgressTransfers()).thenReturn(expected)
         Truth.assertThat(underTest.invoke()).isEqualTo(expected)
     }

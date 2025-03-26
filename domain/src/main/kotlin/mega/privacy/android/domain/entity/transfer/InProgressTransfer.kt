@@ -15,6 +15,7 @@ sealed interface InProgressTransfer : TypedTransfer, InProgressTransferData {
      * @property nodeId The node id of the node being downloaded.
      */
     data class Download(
+        override val uniqueId: Long,
         override val tag: Int,
         override val totalBytes: Long,
         override val isPaused: Boolean,
@@ -32,6 +33,7 @@ sealed interface InProgressTransfer : TypedTransfer, InProgressTransferData {
      * @property localPath The local path of the file being uploaded.
      */
     data class Upload(
+        override val uniqueId: Long,
         override val tag: Int,
         override val totalBytes: Long,
         override val isPaused: Boolean,

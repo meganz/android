@@ -6,6 +6,7 @@ import mega.privacy.android.domain.entity.chat.PendingMessageState
  * Save pending message request
  *
  * @property chatId
+ * @property transferUniqueId
  * @property type
  * @property uploadTimestamp
  * @property state
@@ -15,10 +16,10 @@ import mega.privacy.android.domain.entity.chat.PendingMessageState
  * @property nodeHandle
  * @property fingerprint
  * @property name
- * @property transferTag
  */
 data class SavePendingMessageRequest(
     val chatId: Long,
+    val transferUniqueId: Long,
     val type: Int,
     val uploadTimestamp: Long,
     val state: PendingMessageState,
@@ -28,5 +29,4 @@ data class SavePendingMessageRequest(
     val nodeHandle: Long,
     val fingerprint: String?,
     val name: String?,
-    val transferTag: Int,
 )

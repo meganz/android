@@ -237,8 +237,8 @@ internal class MegaLocalRoomFacade @Inject constructor(
             }
     }
 
-    override suspend fun getActiveTransferByTag(tag: Int) =
-        activeTransferDao.get().getActiveTransferByTag(tag)
+    override suspend fun getActiveTransferByUniqueId(uniqueId: Long) =
+        activeTransferDao.get().getActiveTransferByUniqueId(uniqueId)
 
     override fun getActiveTransfersByType(transferType: TransferType) =
         activeTransferDao.get().getActiveTransfersByType(transferType)
@@ -265,8 +265,8 @@ internal class MegaLocalRoomFacade @Inject constructor(
     override suspend fun deleteAllActiveTransfers() =
         activeTransferDao.get().deleteAllActiveTransfers()
 
-    override suspend fun setActiveTransferAsCancelledByTag(tags: List<Int>) =
-        activeTransferDao.get().setActiveTransferAsCancelledByTag(tags)
+    override suspend fun setActiveTransferAsCancelledByTag(uniqueIds: List<Long>) =
+        activeTransferDao.get().setActiveTransferAsCancelledByUniqueId(uniqueIds)
 
     override suspend fun insertActiveTransferGroup(activeTransferActionGroup: ActiveTransferActionGroup) =
         activeTransferGroupDao.get()
@@ -538,8 +538,8 @@ internal class MegaLocalRoomFacade @Inject constructor(
         .getPendingTransfersByTypeAndState(transferType, pendingTransferState)
         .map { pendingTransferModelMapper(it) }
 
-    override suspend fun getPendingTransfersByTag(tag: Int): PendingTransfer? =
-        pendingTransferDao.get().getPendingTransferByTag(tag)
+    override suspend fun getPendingTransfersByUniqueId(uniqueId: Long): PendingTransfer? =
+        pendingTransferDao.get().getPendingTransferByUniqueId(uniqueId)
             ?.let { pendingTransferModelMapper(it) }
 
     override suspend fun updatePendingTransfers(vararg updatePendingTransferRequests: UpdatePendingTransferRequest) {
@@ -554,8 +554,8 @@ internal class MegaLocalRoomFacade @Inject constructor(
         }
     }
 
-    override suspend fun deletePendingTransferByTag(tag: Int) {
-        pendingTransferDao.get().deletePendingTransferByTag(tag)
+    override suspend fun deletePendingTransferByUniqueId(uniqueId: Long) {
+        pendingTransferDao.get().deletePendingTransferByUniqueId(uniqueId)
     }
 
     override suspend fun deleteAllPendingTransfers() {

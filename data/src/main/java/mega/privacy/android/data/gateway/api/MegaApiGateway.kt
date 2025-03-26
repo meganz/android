@@ -675,7 +675,14 @@ interface MegaApiGateway {
      * @return MegaTransfer object with that tag, or NULL if there isn't any
      * active transfer with it
      */
-    suspend fun getTransfersByTag(tag: Int): MegaTransfer?
+    suspend fun getTransferByTag(tag: Int): MegaTransfer?
+
+    /**
+     * You take the ownership of the returned value.
+     *
+     * @return found transfer, nullptr otherwise
+     */
+    suspend fun getTransferByUniqueId(id: Long): MegaTransfer?
 
     /**
      * Starts a download.

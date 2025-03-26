@@ -5,6 +5,7 @@ package mega.privacy.android.domain.entity.chat
  *
  * @property id
  * @property chatId
+ * @property transferUniqueId
  * @property type
  * @property uploadTimestamp
  * @property state
@@ -20,6 +21,7 @@ package mega.privacy.android.domain.entity.chat
 data class PendingMessage(
     var id: Long = -1,
     var chatId: Long = -1,
+    val transferUniqueId: Long = UNKNOWN_TRANSFER_ID,
     var type: Int = -1,
     var uploadTimestamp: Long = -1,
     var state: Int = PendingMessageState.PREPARING.value,
@@ -29,7 +31,6 @@ data class PendingMessage(
     var nodeHandle: Long = -1,
     var fingerprint: String? = null,
     var name: String? = null,
-    var transferTag: Int = UNKNOWN_TRANSFER_TAG,
 ) {
     /**
      * True if it's a voice clip, false otherwise
@@ -59,7 +60,6 @@ data class PendingMessage(
         fingerprint: String?,
         name: String?,
         nodeHandle: Long,
-        transferTag: Int,
         state: Int,
     ) : this() {
         this.id = id
@@ -70,7 +70,6 @@ data class PendingMessage(
         this.fingerprint = fingerprint
         this.name = name
         this.nodeHandle = nodeHandle
-        this.transferTag = transferTag
         this.state = state
     }
 
@@ -81,8 +80,8 @@ data class PendingMessage(
         const val TYPE_VOICE_CLIP = 3
 
         /**
-         * Tag for pending messages where transfer is still unknown or not started
+         * Id for pending messages where transfer is still unknown or not started
          */
-        const val UNKNOWN_TRANSFER_TAG = -1
+        const val UNKNOWN_TRANSFER_ID = -1L
     }
 }

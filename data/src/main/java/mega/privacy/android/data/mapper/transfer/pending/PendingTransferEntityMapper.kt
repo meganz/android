@@ -14,7 +14,7 @@ internal class PendingTransferEntityMapper @Inject constructor(
     operator fun invoke(pendingTransfer: PendingTransfer) = with(pendingTransfer) {
         PendingTransferEntity(
             pendingTransferId = pendingTransferId,
-            transferTag = transferTag,
+            transferUniqueId = transferUniqueId,
             transferType = transferType,
             nodeIdentifier = nodeIdentifier,
             path = uriPath.value,

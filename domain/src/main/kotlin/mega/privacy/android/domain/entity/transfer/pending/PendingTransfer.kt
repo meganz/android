@@ -10,7 +10,7 @@ import mega.privacy.android.domain.entity.uri.UriPath
 /**
  * Pending transfer. The user has selected this transfer but it's still not sent to the SDK or it's waiting for SDK folder scanning process
  * @property pendingTransferId
- * @property transferTag Sdk transfer tag
+ * @property transferUniqueId Sdk transfer uniqueId
  * @property transferType
  * @property nodeIdentifier the identifier to fetch the related node. The node to download or the folder node to upload to.
  * @property uriPath the [UriPath] where this node will be downloaded to or uploaded from
@@ -24,7 +24,7 @@ import mega.privacy.android.domain.entity.uri.UriPath
  */
 data class PendingTransfer(
     val pendingTransferId: Long,
-    val transferTag: Int? = null,
+    val transferUniqueId: Long? = null,
     val transferType: TransferType,
     val nodeIdentifier: PendingTransferNodeIdentifier,
     val uriPath: UriPath,

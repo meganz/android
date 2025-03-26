@@ -32,7 +32,7 @@ import mega.privacy.android.domain.usecase.file.CanReadUriUseCase
 import mega.privacy.android.domain.usecase.transfers.CancelTransferByTagUseCase
 import mega.privacy.android.domain.usecase.transfers.GetFailedOrCanceledTransfersUseCase
 import mega.privacy.android.domain.usecase.transfers.GetInProgressTransfersUseCase
-import mega.privacy.android.domain.usecase.transfers.GetTransferByTagUseCase
+import mega.privacy.android.domain.usecase.transfers.GetTransferByUniqueIdUseCase
 import mega.privacy.android.domain.usecase.transfers.MonitorTransferEventsUseCase
 import mega.privacy.android.domain.usecase.transfers.MoveTransferBeforeByTagUseCase
 import mega.privacy.android.domain.usecase.transfers.MoveTransferToFirstByTagUseCase
@@ -64,7 +64,7 @@ internal class TransfersViewModelTest {
     private val moveTransferBeforeByTagUseCase: MoveTransferBeforeByTagUseCase = mock()
     private val moveTransferToFirstByTagUseCase: MoveTransferToFirstByTagUseCase = mock()
     private val moveTransferToLastByTagUseCase: MoveTransferToLastByTagUseCase = mock()
-    private val getTransferByTagUseCase: GetTransferByTagUseCase = mock()
+    private val getTransferByUniqueIdUseCase: GetTransferByUniqueIdUseCase = mock()
     private val getInProgressTransfersUseCase: GetInProgressTransfersUseCase = mock()
     private val monitorTransferEventsUseCase: MonitorTransferEventsUseCase = mock()
     private val monitorCompletedTransferEventUseCase: MonitorCompletedTransferEventUseCase = mock()
@@ -95,7 +95,7 @@ internal class TransfersViewModelTest {
             moveTransferBeforeByTagUseCase = moveTransferBeforeByTagUseCase,
             moveTransferToFirstByTagUseCase = moveTransferToFirstByTagUseCase,
             moveTransferToLastByTagUseCase = moveTransferToLastByTagUseCase,
-            getTransferByTagUseCase = getTransferByTagUseCase,
+            getTransferByUniqueIdUseCase = getTransferByUniqueIdUseCase,
             getInProgressTransfersUseCase = getInProgressTransfersUseCase,
             monitorCompletedTransfersUseCase = monitorCompletedTransfersUseCase,
             monitorTransferEventsUseCase = monitorTransferEventsUseCase,
@@ -118,15 +118,17 @@ internal class TransfersViewModelTest {
     fun `test that moveTransfer invoke moveTransferToFirstByTagUseCase success when pass newPosition as 0`() =
         runTest {
             val transferTag = 1
+            val uniqueId = 2L
             val transfer = mock<Transfer> {
                 on { tag }.thenReturn(transferTag)
+                on { this.uniqueId } doReturn uniqueId
             }
             whenever(getInProgressTransfersUseCase.invoke()).thenReturn(emptyList())
             whenever(moveTransferToFirstByTagUseCase.invoke(transferTag)).thenReturn(Unit)
             underTest.getAllActiveTransfers()
             underTest.moveTransfer(transfer, 0)
             advanceUntilIdle()
-            verify(getTransferByTagUseCase, times(1)).invoke(transferTag)
+            verify(getTransferByUniqueIdUseCase, times(1)).invoke(uniqueId)
         }
 
     @Test
@@ -136,13 +138,14 @@ internal class TransfersViewModelTest {
             for (i in 1..5) {
                 val transfer = mock<Transfer> {
                     on { tag }.thenReturn(i)
+                    on { uniqueId }.thenReturn(i.toLong())
                     on { isStreamingTransfer }.thenReturn(false)
                     on { appData }.thenReturn(emptyList())
                     on { priority }.thenReturn(BigInteger.valueOf(i.toLong()))
                     on { state }.thenReturn(TransferState.STATE_COMPLETED)
                 }
                 transfers.add(transfer)
-                whenever(getTransferByTagUseCase(i)).thenReturn(transfer)
+                whenever(getTransferByUniqueIdUseCase(i.toLong())).thenReturn(transfer)
             }
             whenever(getInProgressTransfersUseCase.invoke()).thenReturn(transfers)
             whenever(moveTransferToLastByTagUseCase.invoke(any())).thenReturn(Unit)
@@ -150,7 +153,7 @@ internal class TransfersViewModelTest {
             underTest.moveTransfer(transfers.first(), transfers.lastIndex)
             advanceUntilIdle()
             verify(moveTransferToLastByTagUseCase, times(1)).invoke(any())
-            verify(getTransferByTagUseCase, times(1)).invoke(transfers.first().tag)
+            verify(getTransferByUniqueIdUseCase, times(1)).invoke(transfers.first().uniqueId)
             underTest.activeState.test {
                 assertThat(awaitItem())
                     .isInstanceOf(ActiveTransfersState.TransferMovementFinishedUpdated::class.java)
@@ -164,13 +167,14 @@ internal class TransfersViewModelTest {
             for (i in 1..5) {
                 val transfer = mock<Transfer> {
                     on { tag }.thenReturn(i)
+                    on { uniqueId }.thenReturn(i.toLong())
                     on { isStreamingTransfer }.thenReturn(false)
                     on { appData }.thenReturn(emptyList())
                     on { priority }.thenReturn(BigInteger.valueOf(i.toLong()))
                     on { state }.thenReturn(TransferState.STATE_COMPLETED)
                 }
                 transfers.add(transfer)
-                whenever(getTransferByTagUseCase(i)).thenReturn(transfer)
+                whenever(getTransferByUniqueIdUseCase(i.toLong())).thenReturn(transfer)
             }
             whenever(getInProgressTransfersUseCase.invoke()).thenReturn(transfers)
             whenever(moveTransferBeforeByTagUseCase.invoke(any(), any())).thenReturn(Unit)
@@ -178,7 +182,7 @@ internal class TransfersViewModelTest {
             underTest.moveTransfer(transfers.first(), 2)
             advanceUntilIdle()
             verify(moveTransferBeforeByTagUseCase, times(1)).invoke(any(), any())
-            verify(getTransferByTagUseCase, times(1)).invoke(transfers.first().tag)
+            verify(getTransferByUniqueIdUseCase, times(1)).invoke(transfers.first().uniqueId)
             underTest.activeState.test {
                 assertThat(awaitItem())
                     .isInstanceOf(ActiveTransfersState.TransferMovementFinishedUpdated::class.java)

@@ -188,9 +188,9 @@ interface MegaLocalRoomGateway {
     suspend fun migrateLegacyCompletedTransfers()
 
     /**
-     * Get active transfer by tag
+     * Get active transfer by uniqueId
      */
-    suspend fun getActiveTransferByTag(tag: Int): ActiveTransfer?
+    suspend fun getActiveTransferByUniqueId(uniqueId: Long): ActiveTransfer?
 
     /**
      * Get active transfers by type
@@ -231,9 +231,9 @@ interface MegaLocalRoomGateway {
     suspend fun deleteAllActiveTransfers()
 
     /**
-     * Set an active transfer as finished cancelled by its tag
+     * Set an active transfer as finished cancelled by its uniqueId
      */
-    suspend fun setActiveTransferAsCancelledByTag(tags: List<Int>)
+    suspend fun setActiveTransferAsCancelledByTag(uniqueIds: List<Long>)
 
     /**
      * Insert a new active transfer group and returns it's id
@@ -539,10 +539,10 @@ interface MegaLocalRoomGateway {
     ): List<PendingTransfer>
 
     /**
-     * Get pending transfers by tag
-     * @return The pending transfer with this tag or null if not found
+     * Get pending transfers by uniqueId
+     * @return The pending transfer with this uniqueId or null if not found
      */
-    suspend fun getPendingTransfersByTag(tag: Int): PendingTransfer?
+    suspend fun getPendingTransfersByUniqueId(uniqueId: Long): PendingTransfer?
 
     /**
      * Update pending transfers
@@ -550,9 +550,9 @@ interface MegaLocalRoomGateway {
     suspend fun updatePendingTransfers(vararg updatePendingTransferRequests: UpdatePendingTransferRequest)
 
     /**
-     * Delete pending transfer by tag
+     * Delete pending transfer by uniqueId
      */
-    suspend fun deletePendingTransferByTag(tag: Int)
+    suspend fun deletePendingTransferByUniqueId(uniqueId: Long)
 
     /**
      * Delete all pending transfers

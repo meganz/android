@@ -23,19 +23,20 @@ class CheckFinishedChatUploadsUseCase @Inject constructor(
     suspend operator fun invoke() {
         chatMessageRepository.getPendingMessagesByState(PendingMessageState.UPLOADING)
             .forEach { pendingMessage ->
-                transferRepository.getTransferByTag(pendingMessage.transferTag)?.let { transfer ->
-                    if (transfer.isFinished) {
-                        if (transfer.nodeHandle != -1L) {
-                            attachNodeWithPendingMessageUseCase(
-                                pendingMessage.id,
-                                NodeId(transfer.nodeHandle),
-                                transfer.appData,
-                            )
-                        } else {
-                            pendingMessage.updateToErrorUploading()
+                transferRepository.getTransferByUniqueId(pendingMessage.transferUniqueId)
+                    ?.let { transfer ->
+                        if (transfer.isFinished) {
+                            if (transfer.nodeHandle != -1L) {
+                                attachNodeWithPendingMessageUseCase(
+                                    pendingMessage.id,
+                                    NodeId(transfer.nodeHandle),
+                                    transfer.appData,
+                                )
+                            } else {
+                                pendingMessage.updateToErrorUploading()
+                            }
                         }
-                    }
-                } ?: run {
+                    } ?: run {
                     pendingMessage.updateToErrorUploading()
                 }
             }

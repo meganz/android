@@ -13,8 +13,6 @@ import kotlinx.collections.immutable.toImmutableList
 import kotlinx.coroutines.flow.MutableStateFlow
 import mega.privacy.android.app.presentation.transfers.model.image.InProgressTransferImageViewModel
 import mega.privacy.android.app.presentation.transfers.model.image.TransferImageUiState
-import mega.privacy.android.app.presentation.transfers.view.inprogress.InProgressTransfersView
-import mega.privacy.android.app.presentation.transfers.view.inprogress.TEST_TAG_IN_PROGRESS_TRANSFERS_VIEW
 import mega.privacy.android.domain.entity.Progress
 import mega.privacy.android.domain.entity.node.NodeId
 import mega.privacy.android.domain.entity.transfer.InProgressTransfer
@@ -106,6 +104,7 @@ class InProgressTransfersViewTest {
     }
 
     private fun getTransfer(tag: Int) = InProgressTransfer.Download(
+        uniqueId = tag.toLong(),
         tag = tag,
         totalBytes = 100,
         isPaused = false,

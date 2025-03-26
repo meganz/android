@@ -21,8 +21,8 @@ import mega.privacy.android.data.database.dao.SyncShownNotificationDao
 import mega.privacy.android.data.database.dao.SyncSolvedIssuesDao
 import mega.privacy.android.data.database.dao.UserPausedSyncsDao
 import mega.privacy.android.data.database.dao.VideoRecentlyWatchedDao
-import mega.privacy.android.data.database.entity.ActiveTransferEntity
 import mega.privacy.android.data.database.entity.ActiveTransferActionGroupEntity
+import mega.privacy.android.data.database.entity.ActiveTransferEntity
 import mega.privacy.android.data.database.entity.BackupEntity
 import mega.privacy.android.data.database.entity.CameraUploadsRecordEntity
 import mega.privacy.android.data.database.entity.ChatPendingChangesEntity
@@ -36,6 +36,7 @@ import mega.privacy.android.data.database.entity.SyncSolvedIssueEntity
 import mega.privacy.android.data.database.entity.UserPausedSyncEntity
 import mega.privacy.android.data.database.entity.VideoRecentlyWatchedEntity
 import mega.privacy.android.data.database.spec.AutoMigrationSpec100to101
+import mega.privacy.android.data.database.spec.AutoMigrationSpec102to103
 import mega.privacy.android.data.database.spec.AutoMigrationSpec73to74
 import mega.privacy.android.data.database.spec.AutoMigrationSpec81to82
 import mega.privacy.android.data.database.spec.AutoMigrationSpec95to96
@@ -87,6 +88,7 @@ import timber.log.Timber
         AutoMigration(99, 100),
         AutoMigration(100, 101, spec = AutoMigrationSpec100to101::class),
         AutoMigration(101, 102),
+        AutoMigration(102, 103, spec = AutoMigrationSpec102to103::class),
     ],
 )
 internal abstract class MegaDatabase : RoomDatabase() {

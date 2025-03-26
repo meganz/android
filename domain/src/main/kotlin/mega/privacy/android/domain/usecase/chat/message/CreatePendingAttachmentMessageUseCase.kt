@@ -2,7 +2,7 @@ package mega.privacy.android.domain.usecase.chat.message
 
 import mega.privacy.android.domain.entity.chat.ChatMessageStatus
 import mega.privacy.android.domain.entity.chat.PendingMessage
-import mega.privacy.android.domain.entity.chat.PendingMessage.Companion.UNKNOWN_TRANSFER_TAG
+import mega.privacy.android.domain.entity.chat.PendingMessage.Companion.UNKNOWN_TRANSFER_ID
 import mega.privacy.android.domain.entity.chat.PendingMessageState
 import mega.privacy.android.domain.entity.chat.messages.PendingFileAttachmentMessage
 import mega.privacy.android.domain.entity.chat.messages.PendingVoiceClipMessage
@@ -39,7 +39,7 @@ class CreatePendingAttachmentMessageUseCase @Inject constructor(
                 content = null,
                 filePath = filePath,
                 fileType = fileSystemRepository.getFileTypeInfo(file),
-                transferTag = transferTag.takeIf { it != UNKNOWN_TRANSFER_TAG },
+                transferUniqueId = transferUniqueId.takeIf { it != UNKNOWN_TRANSFER_ID },
                 state = PendingMessageState.entries.firstOrNull { it.value == state }
                     ?: PendingMessageState.PREPARING,
                 nodeId = nodeHandle.takeIf { it != -1L }?.let { NodeId(it) },
@@ -58,7 +58,7 @@ class CreatePendingAttachmentMessageUseCase @Inject constructor(
                 content = null,
                 filePath = filePath,
                 fileType = fileSystemRepository.getFileTypeInfo(file),
-                transferTag = transferTag.takeIf { it != UNKNOWN_TRANSFER_TAG },
+                transferUniqueId = transferUniqueId.takeIf { it != UNKNOWN_TRANSFER_ID },
                 state = PendingMessageState.entries.firstOrNull { it.value == state }
                     ?: PendingMessageState.PREPARING,
                 nodeId = nodeHandle.takeIf { it != -1L }?.let { NodeId(it) },

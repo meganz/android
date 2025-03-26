@@ -61,6 +61,7 @@ class SendChatAttachmentsUseCaseTest {
         verify(chatMessageRepository).savePendingMessages(
             SavePendingMessageRequest(
                 chatId = chatId,
+                transferUniqueId = -1,
                 type = -1,
                 uploadTimestamp = deviceCurrentTimeUseCase() / 1000,
                 state = PendingMessageState.PREPARING,
@@ -70,7 +71,6 @@ class SendChatAttachmentsUseCaseTest {
                 nodeHandle = -1,
                 fingerprint = null,
                 name = uris[uri],
-                transferTag = -1,
             ),
             listOf(chatId)
         )

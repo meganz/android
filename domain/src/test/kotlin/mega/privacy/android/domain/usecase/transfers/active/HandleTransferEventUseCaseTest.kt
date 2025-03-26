@@ -443,22 +443,22 @@ class HandleTransferEventUseCaseTest {
 
 
     private inline fun <reified T : TransferEvent> provideTransferEvents(
-        transferTag: Int = 0,
+        transferUniqueId: Long = 0,
         stubbing: KStubbing<T>.(T) -> Unit = {},
     ) =
         TransferType.entries.map { transferType ->
-            mockTransferEvent(transferType, transferTag, stubbing = stubbing)
+            mockTransferEvent(transferType, transferUniqueId, stubbing = stubbing)
         }
 
     private inline fun <reified T : TransferEvent> mockTransferEvent(
         transferType: TransferType,
-        transferTag: Int = 0,
+        transferUniqueId: Long = 0,
         folderTransferTag: Int? = null,
         stubbing: KStubbing<T>.(T) -> Unit = {},
     ): T {
         val transfer = mock<Transfer> {
             on { this.transferType }.thenReturn(transferType)
-            on { this.tag }.thenReturn(transferTag)
+            on { this.uniqueId }.thenReturn(transferUniqueId)
             on { this.folderTransferTag }.thenReturn(folderTransferTag)
             on { this.appData }.thenReturn(emptyList())
         }

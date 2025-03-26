@@ -4,6 +4,7 @@ import mega.privacy.android.domain.entity.chat.messages.PendingAttachmentMessage
 import mega.privacy.android.domain.entity.chat.messages.TypedMessage
 import mega.privacy.android.domain.repository.chat.ChatMessageRepository
 import mega.privacy.android.domain.usecase.transfers.CancelTransferByTagUseCase
+import mega.privacy.android.domain.usecase.transfers.GetTransferByUniqueIdUseCase
 import javax.inject.Inject
 
 /**
@@ -12,13 +13,16 @@ import javax.inject.Inject
 class DeletePendingMessageUseCase @Inject constructor(
     private val chatMessageRepository: ChatMessageRepository,
     private val cancelTransferByTagUseCase: CancelTransferByTagUseCase,
+    private val getTransferByUniqueIdUseCase: GetTransferByUniqueIdUseCase,
 ) : DeleteMessageUseCase() {
 
     override suspend fun deleteMessage(message: TypedMessage) {
         (message as? PendingAttachmentMessage)?.let {
             chatMessageRepository.deletePendingMessageById(it.msgId)
-            it.transferTag?.let { transferTag ->
-                cancelTransferByTagUseCase(transferTag)
+            it.transferUniqueId?.let { uniqueId ->
+                getTransferByUniqueIdUseCase(uniqueId)?.let { transfer ->
+                    cancelTransferByTagUseCase(transfer.tag)
+                }
             }
         }
     }

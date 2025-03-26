@@ -707,7 +707,7 @@ class DefaultTransfersRepositoryTest {
         val transferTag = 1
         val megaTransfer = mock<MegaTransfer>()
         val transfer = mock<Transfer>()
-        whenever(megaApiGateway.getTransfersByTag(transferTag)).thenReturn(megaTransfer)
+        whenever(megaApiGateway.getTransferByTag(transferTag)).thenReturn(megaTransfer)
         whenever(transferMapper(megaTransfer)).thenReturn(transfer)
         assertThat(underTest.getTransferByTag(transferTag)).isEqualTo(transfer)
     }
@@ -715,7 +715,7 @@ class DefaultTransfersRepositoryTest {
     @Test
     fun `test that getTransferByTag return null when call api returns null`() = runTest {
         val transferTag = 1
-        whenever(megaApiGateway.getTransfersByTag(transferTag)).thenReturn(null)
+        whenever(megaApiGateway.getTransferByTag(transferTag)).thenReturn(null)
         assertThat(underTest.getTransferByTag(transferTag)).isNull()
     }
 
@@ -739,7 +739,7 @@ class DefaultTransfersRepositoryTest {
             }
             whenever(megaApiGateway.getTransferData()).thenReturn(data)
             whenever(transferMapper.invoke(any())).thenReturn(mock())
-            whenever(megaApiGateway.getTransfersByTag(any())).thenReturn(mock())
+            whenever(megaApiGateway.getTransferByTag(any())).thenReturn(mock())
             assertThat(underTest.getInProgressTransfers()).hasSize(data.numDownloads + data.numUploads)
         }
 
@@ -1150,8 +1150,8 @@ class DefaultTransfersRepositoryTest {
         fun `test that getActiveTransferByTag gateway result is returned when getActiveTransferByTag is called`() =
             runTest {
                 val expected = mock<ActiveTransfer>()
-                whenever(megaLocalRoomGateway.getActiveTransferByTag(1)).thenReturn(expected)
-                val actual = underTest.getActiveTransferByTag(1)
+                whenever(megaLocalRoomGateway.getActiveTransferByUniqueId(1)).thenReturn(expected)
+                val actual = underTest.getActiveTransferByTagUniqueId(1)
                 assertThat(actual).isEqualTo(expected)
             }
 
@@ -1227,9 +1227,9 @@ class DefaultTransfersRepositoryTest {
         @Test
         fun `test that setActiveTransferAsFinishedByTag gateway is called when setActiveTransferAsFinishedByTag is called`(
         ) = runTest {
-            val tags = mock<List<Int>>()
-            underTest.setActiveTransferAsCancelledByTag(tags)
-            verify(megaLocalRoomGateway).setActiveTransferAsCancelledByTag(tags)
+            val uniqueIds = mock<List<Long>>()
+            underTest.setActiveTransferAsCancelledByUniqueId(uniqueIds)
+            verify(megaLocalRoomGateway).setActiveTransferAsCancelledByTag(uniqueIds)
         }
 
         @ParameterizedTest
@@ -1309,7 +1309,7 @@ class DefaultTransfersRepositoryTest {
             testCurrentActiveTransferTotals(
                 transferType = transferType,
                 expectedMap = { transfer ->
-                    mapOf(transfer.tag to transfer.transferredBytes)
+                    mapOf(transfer.uniqueId to transfer.transferredBytes)
                 },
                 callToTest = {
                     underTest.updateTransferredBytes(listOf(transfer))
@@ -1325,7 +1325,7 @@ class DefaultTransfersRepositoryTest {
             testCurrentActiveTransferTotals(
                 transferType = transferType,
                 expectedMap = { transfer ->
-                    mapOf(transfer.tag to transfer.transferredBytes)
+                    mapOf(transfer.uniqueId to transfer.transferredBytes)
                 },
                 callToTest = {
                     val transferZero = mock<Transfer>()
@@ -1370,7 +1370,7 @@ class DefaultTransfersRepositoryTest {
          */
         private suspend fun testCurrentActiveTransferTotals(
             transferType: TransferType,
-            expectedMap: (Transfer) -> Map<Int, Long>,
+            expectedMap: (Transfer) -> Map<Long, Long>,
             callToTest: suspend () -> Unit,
         ) {
             stubActiveTransfer(transfer, transferType)
@@ -1579,12 +1579,12 @@ class DefaultTransfersRepositoryTest {
     @Test
     fun `test that monitorInProgressTransfers emits a map with a transfer after call updateInProgressTransfer`() =
         runTest {
-            val tag = 1
+            val uniqueId = 1L
             val transfer = mock<Transfer> {
-                on { this.tag } doReturn tag
+                on { this.uniqueId } doReturn uniqueId
             }
             val expected = mock<InProgressTransfer.Upload> {
-                on { this.tag } doReturn tag
+                on { this.uniqueId } doReturn uniqueId
             }
 
             setUp()
@@ -1593,19 +1593,19 @@ class DefaultTransfersRepositoryTest {
             underTest.monitorInProgressTransfers().test {
                 assertThat(awaitItem()).isEqualTo(emptyMap<Int, InProgressTransfer>())
                 underTest.updateInProgressTransfer(transfer)
-                assertThat(awaitItem()).isEqualTo(mapOf(Pair(tag, expected)))
+                assertThat(awaitItem()).isEqualTo(mapOf(Pair(uniqueId, expected)))
             }
         }
 
     @Test
     fun `test that in progress transfers flow is updated correctly when updateInProgressTransfers and removeInProgressTransfers are called`() =
         runTest {
-            val tag = 5
+            val uniqueId = 5L
             val transfer = mock<Transfer> {
-                on { it.tag } doReturn tag
+                on { it.uniqueId } doReturn uniqueId
             }
             val inProgressTransfer = mock<InProgressTransfer.Download> {
-                on { it.tag } doReturn tag
+                on { it.uniqueId } doReturn uniqueId
             }
             whenever(inProgressTransferMapper(transfer)).thenReturn(inProgressTransfer)
             setUp()
@@ -1613,8 +1613,8 @@ class DefaultTransfersRepositoryTest {
                 assertThat(awaitItem()).isEmpty()
                 underTest.updateInProgressTransfers(listOf(transfer))
 
-                assertThat(awaitItem()).containsExactly(tag, inProgressTransfer)
-                underTest.removeInProgressTransfers(setOf(tag))
+                assertThat(awaitItem()).containsExactly(uniqueId, inProgressTransfer)
+                underTest.removeInProgressTransfers(setOf(uniqueId))
 
                 assertThat(awaitItem()).isEmpty()
             }
@@ -1653,10 +1653,10 @@ class DefaultTransfersRepositoryTest {
     @Test
     fun `test that getPendingTransfersByTag gateway result is returned when getPendingTransfersByTag is called`() =
         runTest {
-            val tag = 15
+            val uniqueId = 15L
             val expected = mock<PendingTransfer>()
-            whenever(megaLocalRoomGateway.getPendingTransfersByTag(tag)).thenReturn(expected)
-            val actual = underTest.getPendingTransfersByTag(tag)
+            whenever(megaLocalRoomGateway.getPendingTransfersByUniqueId(uniqueId)).thenReturn(expected)
+            val actual = underTest.getPendingTransfersByUniqueId(uniqueId)
             assertThat(actual).isEqualTo(expected)
         }
 

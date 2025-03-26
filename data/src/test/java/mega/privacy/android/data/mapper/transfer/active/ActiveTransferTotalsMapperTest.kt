@@ -55,7 +55,7 @@ class ActiveTransferTotalsMapperTest {
     fun `test that mapper returns transferredBytes excluding folder transfers`(transferType: TransferType) =
         runTest {
             val entities = createEntities(transferType)
-            val transferredBytes = entities.associate { it.tag to it.totalBytes / 2 }
+            val transferredBytes = entities.associate { it.uniqueId to it.totalBytes / 2 }
             val expectedTransferredBytes =
                 entities.filter { !it.isFolderTransfer }.sumOf {
                     if (it.isFinished) it.totalBytes else it.totalBytes / 2
@@ -120,9 +120,9 @@ class ActiveTransferTotalsMapperTest {
         runTest {
             val entities = createEntities(transferType)
             val subSetWithErrors =
-                entities.filter { it.tag.rem(2) == 0 } //set 50% of the transfers as completed 50% as not completed
+                entities.filter { it.uniqueId.rem(2) == 0L } //set 50% of the transfers as completed 50% as not completed
             val transferredBytes =
-                entities.associate { it.tag to if (it in subSetWithErrors) it.totalBytes / 2 else it.totalBytes }
+                entities.associate { it.uniqueId to if (it in subSetWithErrors) it.totalBytes / 2 else it.totalBytes }
             val expected = entities.filter { !it.isFolderTransfer }
                 .count { it !in subSetWithErrors }
             val entitiesFinished = entities.map { it.copy(isFinished = true) }
@@ -172,7 +172,7 @@ class ActiveTransferTotalsMapperTest {
                 )
                 entity.copy(appData = listOf(TransferAppData.TransferGroup(groupId.toLong())))
             }
-            val transferredBytes = emptyMap<Int, Long>()
+            val transferredBytes = emptyMap<Long, Long>()
             val expected = entities
                 .groupBy { it.getTransferGroup()?.groupId }
                 .mapNotNull { (key, activeTransfers) ->
@@ -217,9 +217,9 @@ class ActiveTransferTotalsMapperTest {
                 entity.copy(appData = listOf(TransferAppData.TransferGroup(groupId.toLong())))
             }
             val subSetWithErrors =
-                entities.filter { it.tag.rem(2) == 0 } //set 50% of the transfers as completed 50% as not completed
+                entities.filter { it.uniqueId.rem(2) == 0L } //set 50% of the transfers as completed 50% as not completed
             val transferredBytes =
-                entities.associate { it.tag to if (it in subSetWithErrors) it.totalBytes / 2 else it.totalBytes }
+                entities.associate { it.uniqueId to if (it in subSetWithErrors) it.totalBytes / 2 else it.totalBytes }
             val entitiesFinished = entities.map { it.copy(isFinished = true) }
             val expected = entities
                 .groupBy { it.getTransferGroup()?.groupId }
@@ -263,9 +263,9 @@ class ActiveTransferTotalsMapperTest {
                 entity.copy(appData = listOf(TransferAppData.TransferGroup(groupId.toLong())))
             }
             val subSetWithErrors =
-                entities.filter { it.tag.rem(2) == 0 } //set 50% of the transfers as completed 50% as not completed
+                entities.filter { it.uniqueId.rem(2) == 0L } //set 50% of the transfers as completed 50% as not completed
             val transferredBytes =
-                entities.associate { it.tag to if (it in subSetWithErrors) it.totalBytes / 2 else it.totalBytes }
+                entities.associate { it.uniqueId to if (it in subSetWithErrors) it.totalBytes / 2 else it.totalBytes }
             val expected = entities
                 .groupBy { it.getTransferGroup()?.groupId }
                 .mapNotNull { (key, activeTransfers) ->
@@ -275,7 +275,7 @@ class ActiveTransferTotalsMapperTest {
                             groupId = groupId,
                             totalFiles = fileTransfers.size,
                             finishedFiles = fileTransfers.count { it.isFinished },
-                            completedFiles = fileTransfers.count { it.isFinished && transferredBytes[it.tag] == it.totalBytes },
+                            completedFiles = fileTransfers.count { it.isFinished && transferredBytes[it.uniqueId] == it.totalBytes },
                             alreadyTransferred = fileTransfers.count { it.isAlreadyTransferred },
                             destination = "destination$groupId",
                             singleFileName = null,
@@ -284,7 +284,8 @@ class ActiveTransferTotalsMapperTest {
                             pausedFiles = fileTransfers.count { it.isPaused },
                             totalBytes = fileTransfers.sumOf { it.totalBytes },
                             transferredBytes = fileTransfers.sumOf {
-                                if (it.isFinished) it.totalBytes else transferredBytes[it.tag] ?: 0L
+                                if (it.isFinished) it.totalBytes else transferredBytes[it.uniqueId]
+                                    ?: 0L
                             },
                         )
                     }
@@ -410,7 +411,7 @@ class ActiveTransferTotalsMapperTest {
             )
             entity.copy(appData = listOf(TransferAppData.TransferGroup(groupId.toLong())))
         }.filterNot { it.isFolderTransfer }
-        val transferredBytes = emptyMap<Int, Long>()
+        val transferredBytes = emptyMap<Long, Long>()
         val expected = entities
             .groupBy { it.getTransferGroup()?.groupId }
             .mapNotNull { (key, activeTransfer) ->
@@ -440,6 +441,7 @@ class ActiveTransferTotalsMapperTest {
 
     private fun createEntities(transferType: TransferType) = (0..20).map { tag ->
         ActiveTransferEntity(
+            uniqueId = tag.toLong(),
             tag = tag,
             transferType = transferType,
             totalBytes = 1024 * (tag.toLong() % 5 + 1),

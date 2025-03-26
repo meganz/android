@@ -8,8 +8,6 @@ import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.test.UnconfinedTestDispatcher
 import kotlinx.coroutines.test.advanceUntilIdle
 import kotlinx.coroutines.test.runTest
-import mega.privacy.android.app.presentation.transfers.model.image.InProgressTransferImageViewModel
-import mega.privacy.android.app.presentation.transfers.model.image.TransferImageUiState
 import mega.privacy.android.core.test.extension.CoroutineMainDispatcherExtension
 import mega.privacy.android.core.ui.mapper.FileTypeIconMapper
 import mega.privacy.android.domain.entity.Progress
@@ -41,6 +39,7 @@ class InProgressTransferImageViewModelTest {
     private val extension = "txt"
     private val name = "name.$extension"
     private val localPath = "localPath/$name"
+    private val uniqueId = 2L
     private val tag = 1
     private val nodeHandle = 1L
     private val fileTypeResId = R.drawable.ic_text_medium_solid
@@ -72,6 +71,7 @@ class InProgressTransferImageViewModelTest {
 
             underTest.addTransfer(
                 InProgressTransfer.Download(
+                    uniqueId = uniqueId,
                     tag = tag,
                     totalBytes = 100,
                     isPaused = false,
@@ -100,6 +100,7 @@ class InProgressTransferImageViewModelTest {
 
             underTest.addTransfer(
                 InProgressTransfer.Download(
+                    uniqueId = uniqueId,
                     tag = tag,
                     totalBytes = 100,
                     isPaused = false,
@@ -128,6 +129,7 @@ class InProgressTransferImageViewModelTest {
 
             underTest.addTransfer(
                 InProgressTransfer.Upload(
+                    uniqueId = uniqueId,
                     tag = tag,
                     totalBytes = 100,
                     isPaused = false,
@@ -153,6 +155,7 @@ class InProgressTransferImageViewModelTest {
 
             underTest.addTransfer(
                 InProgressTransfer.Upload(
+                    uniqueId = uniqueId,
                     tag = tag,
                     totalBytes = 100,
                     isPaused = false,

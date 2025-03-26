@@ -55,7 +55,7 @@ class CreatePendingAttachmentMessageUseCaseTest {
         val userHandle = 245L
         val filePath = "filepath"
         val fileName = "fileName"
-        val transferTag = 344
+        val transferUniqueId = 344L
         val fileTypeInfo = mock<UnknownFileTypeInfo>()
         val fileSize = 89475L
         whenever(getMyUserHandleUseCase()).thenReturn(userHandle)
@@ -64,15 +64,16 @@ class CreatePendingAttachmentMessageUseCaseTest {
         val pendingMessage = PendingMessage(
             id = msgId,
             chatId = chatId,
+            transferUniqueId = transferUniqueId,
             uploadTimestamp = time,
             state = state.value,
             filePath = filePath,
-            transferTag = transferTag,
             name = fileName,
         )
         val expected = PendingFileAttachmentMessage(
             chatId = chatId,
             msgId = msgId,
+            transferUniqueId = transferUniqueId,
             time = time,
             isDeletable = true,
             isEditable = false,
@@ -82,7 +83,6 @@ class CreatePendingAttachmentMessageUseCaseTest {
             content = null,
             filePath = filePath,
             fileType = fileTypeInfo,
-            transferTag = transferTag,
             nodeId = null,
             state = state,
             fileName = fileName,
@@ -102,7 +102,7 @@ class CreatePendingAttachmentMessageUseCaseTest {
         val time = 72834578L
         val userHandle = 245L
         val filePath = "filepath"
-        val transferTag = 344
+        val transferUniqueId = 344L
         val fileTypeInfo = mock<UnknownFileTypeInfo>()
         val fileName = "fileName"
         whenever(getMyUserHandleUseCase()).thenReturn(userHandle)
@@ -111,16 +111,17 @@ class CreatePendingAttachmentMessageUseCaseTest {
         val pendingMessage = PendingMessage(
             id = msgId,
             chatId = chatId,
+            transferUniqueId = transferUniqueId,
             uploadTimestamp = time,
             state = state.value,
             filePath = filePath,
             type = PendingMessage.TYPE_VOICE_CLIP,
-            transferTag = transferTag,
             name = fileName,
         )
         val expected = PendingVoiceClipMessage(
             chatId = chatId,
             msgId = msgId,
+            transferUniqueId = transferUniqueId,
             time = time,
             isDeletable = true,
             isEditable = false,
@@ -129,7 +130,6 @@ class CreatePendingAttachmentMessageUseCaseTest {
             status = getChatMessageStatus(state),
             content = null,
             fileType = fileTypeInfo,
-            transferTag = transferTag,
             nodeId = null,
             state = state,
             filePath = filePath,

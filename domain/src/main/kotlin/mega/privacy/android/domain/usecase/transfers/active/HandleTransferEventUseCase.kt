@@ -151,15 +151,15 @@ class HandleTransferEventUseCase @Inject internal constructor(
         pause: Boolean = false,
         finish: Boolean = false,
     ): List<TransferEvent>? {
-        val sortedMap = linkedMapOf<Int, TransferEvent>()
+        val sortedMap = linkedMapOf<Long, TransferEvent>()
         this.filter {
             (start && it is TransferEvent.TransferStartEvent) ||
                     (update && it is TransferEvent.TransferUpdateEvent) ||
                     (pause && it is TransferEvent.TransferPaused) ||
                     (finish && it is TransferEvent.TransferFinishEvent)
         }.forEach {
-            sortedMap.remove(it.transfer.tag) //remove and then add to be sure that in case of duplicated, the new one is the last one, instead of replacing the value for existing key
-            sortedMap[it.transfer.tag] = it
+            sortedMap.remove(it.transfer.uniqueId) //remove and then add to be sure that in case of duplicated, the new one is the last one, instead of replacing the value for existing key
+            sortedMap[it.transfer.uniqueId] = it
         }
 
         return sortedMap.values.toList().takeIf { it.isNotEmpty() }

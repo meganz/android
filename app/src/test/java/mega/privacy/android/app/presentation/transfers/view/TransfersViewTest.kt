@@ -20,7 +20,6 @@ import mega.privacy.android.app.presentation.transfers.model.TransferMenuAction.
 import mega.privacy.android.app.presentation.transfers.model.TransfersUiState
 import mega.privacy.android.app.presentation.transfers.model.image.InProgressTransferImageViewModel
 import mega.privacy.android.app.presentation.transfers.model.image.TransferImageUiState
-import mega.privacy.android.app.presentation.transfers.view.TransfersView
 import mega.privacy.android.domain.entity.Progress
 import mega.privacy.android.domain.entity.node.NodeId
 import mega.privacy.android.domain.entity.transfer.InProgressTransfer
@@ -129,6 +128,7 @@ class TransfersViewTest {
     }
 
     private fun getTransfer(tag: Int) = InProgressTransfer.Download(
+        uniqueId = tag.toLong(),
         tag = tag,
         totalBytes = 100,
         isPaused = false,

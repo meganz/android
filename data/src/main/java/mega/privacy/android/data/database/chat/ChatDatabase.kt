@@ -7,6 +7,7 @@ import androidx.room.Room
 import androidx.room.RoomDatabase
 import androidx.sqlite.db.SupportSQLiteOpenHelper
 import mega.privacy.android.data.database.chat.spec.AutoMigrationSpecChat2to3
+import mega.privacy.android.data.database.chat.spec.AutoMigrationSpecChat4to5
 import mega.privacy.android.data.database.dao.ChatMessageMetaDao
 import mega.privacy.android.data.database.dao.ChatNodeDao
 import mega.privacy.android.data.database.dao.PendingMessageDao
@@ -25,7 +26,7 @@ import mega.privacy.android.data.database.entity.chat.TypedMessageEntity
  */
 const val CHAT_DATABASE_NAME = "chat_database"
 
-private const val DATABASE_VERSION = 4
+private const val DATABASE_VERSION = 5
 
 /**
  * In memory chat database
@@ -47,6 +48,7 @@ private const val DATABASE_VERSION = 4
         AutoMigration(1, 2),
         AutoMigration(2, 3, spec = AutoMigrationSpecChat2to3::class),
         AutoMigration(3, 4),
+        AutoMigration(4, 5, spec = AutoMigrationSpecChat4to5::class),
     ],
 )
 abstract class ChatDatabase : RoomDatabase() {

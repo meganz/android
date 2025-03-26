@@ -37,7 +37,7 @@ import mega.privacy.android.domain.usecase.file.CanReadUriUseCase
 import mega.privacy.android.domain.usecase.transfers.CancelTransferByTagUseCase
 import mega.privacy.android.domain.usecase.transfers.GetFailedOrCanceledTransfersUseCase
 import mega.privacy.android.domain.usecase.transfers.GetInProgressTransfersUseCase
-import mega.privacy.android.domain.usecase.transfers.GetTransferByTagUseCase
+import mega.privacy.android.domain.usecase.transfers.GetTransferByUniqueIdUseCase
 import mega.privacy.android.domain.usecase.transfers.MonitorTransferEventsUseCase
 import mega.privacy.android.domain.usecase.transfers.MoveTransferBeforeByTagUseCase
 import mega.privacy.android.domain.usecase.transfers.MoveTransferToFirstByTagUseCase
@@ -63,7 +63,7 @@ class TransfersViewModel @Inject constructor(
     private val moveTransferBeforeByTagUseCase: MoveTransferBeforeByTagUseCase,
     private val moveTransferToFirstByTagUseCase: MoveTransferToFirstByTagUseCase,
     private val moveTransferToLastByTagUseCase: MoveTransferToLastByTagUseCase,
-    private val getTransferByTagUseCase: GetTransferByTagUseCase,
+    private val getTransferByUniqueIdUseCase: GetTransferByUniqueIdUseCase,
     private val getInProgressTransfersUseCase: GetInProgressTransfersUseCase,
     private val monitorCompletedTransfersUseCase: MonitorCompletedTransfersUseCase,
     monitorTransferEventsUseCase: MonitorTransferEventsUseCase,
@@ -228,7 +228,7 @@ class TransfersViewModel @Inject constructor(
     private fun updateTransfer(transfer: Transfer) {
         viewModelScope.launch(ioDispatcher) {
             val current = activeTransfer.value.toMutableList()
-            current.indexOfFirst { it.tag == transfer.tag }
+            current.indexOfFirst { it.uniqueId == transfer.uniqueId }
                 .takeIf { pos -> pos in current.indices }
                 ?.let { pos ->
                     current[pos] = transfer
@@ -281,15 +281,15 @@ class TransfersViewModel @Inject constructor(
      * If it finished with success, simply update the transfer in the transfers list and in adapter.
      * If not, reverts the movement, leaving the transfer in the same position it has before made the change.
      *
-     * @param success     True if the movement finished with success, false otherwise.
-     * @param transferTag Identifier of the transfer.
+     * @param success  True if the movement finished with success, false otherwise.
+     * @param uniqueId Identifier of the transfer.
      */
-    private fun activeTransferFinishMovement(success: Boolean, transferTag: Int) =
+    private fun activeTransferFinishMovement(success: Boolean, uniqueId: Long) =
         viewModelScope.launch(ioDispatcher) {
-            getTransferByTagUseCase(transferTag).let { transfer ->
+            getTransferByUniqueIdUseCase(uniqueId).let { transfer ->
                 if (transfer != null && transfer.state >= TransferState.STATE_COMPLETING) {
                     val current = activeTransfer.value.toMutableList()
-                    val transferPosition = current.indexOfFirst { it.tag == transferTag }
+                    val transferPosition = current.indexOfFirst { it.uniqueId == uniqueId }
                     if (transferPosition != INVALID_POSITION) {
                         current[transferPosition] = transfer
                         if (!success) {
@@ -318,11 +318,14 @@ class TransfersViewModel @Inject constructor(
      * @param transfer transfer to add
      */
     private fun startTransfer(transfer: Transfer) {
+        Timber.d("The transfer with uniqueId: ${transfer.uniqueId} has started, left: ${_activeTransfers.value.size}")
         viewModelScope.launch(ioDispatcher) {
             val current = activeTransfer.value.toMutableList()
-            current.add(transfer)
-            current.sortBy { it.priority }
-            _activeTransfers.update { current }
+            if (current.none { it.uniqueId == transfer.uniqueId }) {
+                current.add(transfer)
+                current.sortBy { it.priority }
+                _activeTransfers.update { current }
+            }
         }
     }
 
@@ -335,7 +338,7 @@ class TransfersViewModel @Inject constructor(
         viewModelScope.launch(ioDispatcher) {
             val current = activeTransfer.value.toMutableList()
             current.indexOfFirst {
-                it.tag == transfer.tag
+                it.uniqueId == transfer.uniqueId
             }.takeIf { pos -> pos in current.indices }
                 ?.let { pos ->
                     current.removeAt(pos)
@@ -350,10 +353,10 @@ class TransfersViewModel @Inject constructor(
     /**
      * Active transfer status is changed
      */
-    fun activeTransferChangeStatus(tag: Int) = viewModelScope.launch {
-        Timber.d("tag: $tag")
-        getTransferByTagUseCase(tag)?.let { transfer ->
-            Timber.d("The transfer with tag : $tag has been paused/resumed, left: ${_activeTransfers.value.size}")
+    fun activeTransferChangeStatus(uniqueId: Long) = viewModelScope.launch {
+        Timber.d("uniqueId: $uniqueId")
+        getTransferByUniqueIdUseCase(uniqueId)?.let { transfer ->
+            Timber.d("The transfer with uniqueId : $uniqueId has been paused/resumed, left: ${_activeTransfers.value.size}")
             updateTransfer(transfer)
         }
     }
@@ -404,7 +407,7 @@ class TransfersViewModel @Inject constructor(
                 )
             }
         }
-        activeTransferFinishMovement(result.isSuccess, transfer.tag)
+        activeTransferFinishMovement(result.isSuccess, transfer.uniqueId)
     }
 
     /**
@@ -543,8 +546,7 @@ class TransfersViewModel @Inject constructor(
 
                     if (isChatUpload) {
                         runCatching {
-                            retryChatUploadUseCase(appData?.mapNotNull { it as? TransferAppData.ChatUpload }
-                                ?: emptyList())
+                            retryChatUploadUseCase(appData.mapNotNull { it as? TransferAppData.ChatUpload })
                         }.onFailure {
                             //No uploads were retried, try general upload only.
                             _uiState.update { state ->

@@ -26,6 +26,7 @@ internal class PendingMessageEntityMapperTest {
         runTest {
             val savePendingMessageRequest = SavePendingMessageRequest(
                 chatId = 789012L,
+                transferUniqueId = 4758L,
                 type = 5,
                 uploadTimestamp = 11111L,
                 state = PendingMessageState.COMPRESSING,
@@ -35,10 +36,10 @@ internal class PendingMessageEntityMapperTest {
                 nodeHandle = 6543L,
                 fingerprint = "903456L",
                 name = "sample pending message",
-                transferTag = 9,
             )
             val expected = PendingMessageEntity(
                 chatId = savePendingMessageRequest.chatId,
+                transferUniqueId = savePendingMessageRequest.transferUniqueId,
                 type = savePendingMessageRequest.type,
                 uploadTimestamp = savePendingMessageRequest.uploadTimestamp,
                 state = savePendingMessageRequest.state,
@@ -48,7 +49,6 @@ internal class PendingMessageEntityMapperTest {
                 nodeHandle = savePendingMessageRequest.nodeHandle,
                 fingerprint = savePendingMessageRequest.fingerprint,
                 name = savePendingMessageRequest.name,
-                transferTag = savePendingMessageRequest.transferTag,
             )
 
             val actual = underTest(savePendingMessageRequest)

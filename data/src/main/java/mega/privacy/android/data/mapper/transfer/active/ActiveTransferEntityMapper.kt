@@ -7,6 +7,7 @@ import javax.inject.Inject
 internal class ActiveTransferEntityMapper @Inject constructor() {
     operator fun invoke(activeTransfer: ActiveTransfer) = with(activeTransfer) {
         ActiveTransferEntity(
+            uniqueId = uniqueId,
             tag = tag,
             transferType = transferType,
             totalBytes = totalBytes,

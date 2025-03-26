@@ -18,6 +18,7 @@ class PendingMessageMapper @Inject constructor() {
         return with(entity) {
             PendingMessage(
                 id = pendingMessageId ?: -1,
+                transferUniqueId = transferUniqueId ?: -1,
                 chatId = chatId,
                 type = type,
                 uploadTimestamp = uploadTimestamp,
@@ -28,7 +29,6 @@ class PendingMessageMapper @Inject constructor() {
                 nodeHandle = nodeHandle,
                 fingerprint = fingerprint,
                 name = name,
-                transferTag = transferTag,
             )
         }
     }

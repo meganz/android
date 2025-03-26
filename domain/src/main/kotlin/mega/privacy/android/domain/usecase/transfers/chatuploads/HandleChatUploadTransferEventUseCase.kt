@@ -26,14 +26,14 @@ class HandleChatUploadTransferEventUseCase @Inject constructor(
         event: TransferEvent,
         vararg pendingMessageIds: Long,
     ) {
-        //update transfer tag on Start event
-        (event as? TransferEvent.TransferStartEvent)?.transfer?.tag?.let { transferTag ->
+        //update transfer tag and uniqueId on Start event
+        (event as? TransferEvent.TransferStartEvent)?.transfer?.let { startEventTransfer ->
             pendingMessageIds.forEach { pendingMessageId ->
                 updatePendingMessageUseCase(
                     UpdatePendingMessageTransferTagRequest(
-                        pendingMessageId,
-                        transferTag,
-                        PendingMessageState.UPLOADING
+                        pendingMessageId = pendingMessageId,
+                        transferUniqueId = startEventTransfer.uniqueId,
+                        state = PendingMessageState.UPLOADING
                     )
                 )
             }

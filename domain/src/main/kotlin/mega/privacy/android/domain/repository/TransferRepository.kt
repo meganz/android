@@ -164,6 +164,13 @@ interface TransferRepository {
     suspend fun getTransferByTag(transferTag: Int): Transfer?
 
     /**
+     * Get transfer by id
+     *
+     * @param id Unique identifier of the transfer
+     */
+    suspend fun getTransferByUniqueId(id: Long): Transfer?
+
+    /**
      * Monitors paused transfers.
      */
     fun monitorPausedTransfers(): StateFlow<Boolean>
@@ -314,9 +321,9 @@ interface TransferRepository {
     ): Flow<TransferEvent>
 
     /**
-     * Get active transfer by tag
+     * Get active transfer by uniqueId
      */
-    suspend fun getActiveTransferByTag(tag: Int): ActiveTransfer?
+    suspend fun getActiveTransferByTagUniqueId(uniqueId: Long): ActiveTransfer?
 
     /**
      * Get active transfers by type
@@ -362,9 +369,9 @@ interface TransferRepository {
     suspend fun deleteAllActiveTransfers()
 
     /**
-     * Set an active transfer as finished cancelled by its tag
+     * Set an active transfer as finished cancelled by its uniqueId
      */
-    suspend fun setActiveTransferAsCancelledByTag(tags: List<Int>)
+    suspend fun setActiveTransferAsCancelledByUniqueId(uniqueIds: List<Long>)
 
     /**
      * Get active transfer totals by type
@@ -518,17 +525,17 @@ interface TransferRepository {
     /**
      * Monitor in progress transfers flow.
      */
-    fun monitorInProgressTransfers(): Flow<Map<Int, InProgressTransfer>>
+    fun monitorInProgressTransfers(): Flow<Map<Long, InProgressTransfer>>
 
     /**
-     * Remove in progress transfer by tag.
+     * Remove in progress transfer by uniqueId.
      */
-    suspend fun removeInProgressTransfer(tag: Int)
+    suspend fun removeInProgressTransfer(uniqueId: Long)
 
     /**
-     * Remove a list of in progress transfers by tag.
+     * Remove a list of in progress transfers by uniqueId.
      */
-    suspend fun removeInProgressTransfers(tags: Set<Int>)
+    suspend fun removeInProgressTransfers(uniqueIds: Set<Long>)
 
     /**
      * Gets a flow for pending transfers by type.
@@ -581,14 +588,14 @@ interface TransferRepository {
     )
 
     /**
-     * Gets a pending transfer by tag.
+     * Gets a pending transfer by uniqueId.
      */
-    suspend fun getPendingTransfersByTag(tag: Int): PendingTransfer?
+    suspend fun getPendingTransfersByUniqueId(uniqueId: Long): PendingTransfer?
 
     /**
-     * Deletes a pending transfer by tag.
+     * Deletes a pending transfer by uniqueId.
      */
-    suspend fun deletePendingTransferByTag(tag: Int)
+    suspend fun deletePendingTransferByUniqueId(uniqueId: Long)
 
     /**
      * Deletes all pending transfers.

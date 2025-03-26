@@ -20,6 +20,7 @@ internal class PendingMessageMapperTest {
 
     private val pendingMessageEntity = PendingMessageEntity(
         pendingMessageId = 123456L,
+        transferUniqueId = 8745L,
         chatId = 789012L,
         type = 5,
         uploadTimestamp = 11111L,
@@ -30,7 +31,6 @@ internal class PendingMessageMapperTest {
         nodeHandle = 6543L,
         fingerprint = "903456L",
         name = "sample pending message",
-        transferTag = 9,
     )
 
     @BeforeAll
@@ -45,6 +45,7 @@ internal class PendingMessageMapperTest {
         assertAll(
             "Grouped Assertions of ${PendingMessage::class.simpleName}",
             { assertThat(pendingMessage.id).isEqualTo(pendingMessageEntity.pendingMessageId) },
+            { assertThat(pendingMessage.transferUniqueId).isEqualTo(pendingMessageEntity.transferUniqueId) },
             { assertThat(pendingMessage.chatId).isEqualTo(pendingMessageEntity.chatId) },
             { assertThat(pendingMessage.type).isEqualTo(pendingMessageEntity.type) },
             { assertThat(pendingMessage.uploadTimestamp).isEqualTo(pendingMessageEntity.uploadTimestamp) },
@@ -55,7 +56,6 @@ internal class PendingMessageMapperTest {
             { assertThat(pendingMessage.nodeHandle).isEqualTo(pendingMessageEntity.nodeHandle) },
             { assertThat(pendingMessage.fingerprint).isEqualTo(pendingMessageEntity.fingerprint) },
             { assertThat(pendingMessage.name).isEqualTo(pendingMessageEntity.name) },
-            { assertThat(pendingMessage.transferTag).isEqualTo(pendingMessageEntity.transferTag) },
         )
     }
 

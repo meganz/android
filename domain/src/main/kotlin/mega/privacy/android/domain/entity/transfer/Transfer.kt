@@ -6,6 +6,7 @@ import java.math.BigInteger
 /**
  * Data class used as model for MegaTransfer.
  *
+ * @property uniqueId The unique identifier of the transfer.
  * @property transferType [TransferType]
  * @property transferredBytes Transferred bytes during this transfer.
  * @property totalBytes Total bytes to be transferred to complete the transfer.
@@ -44,6 +45,7 @@ import java.math.BigInteger
  * @property notificationNumber Returns the notification number of the SDK when this MEGATransfer was generated.
  */
 data class Transfer(
+    override val uniqueId: Long,
     override val transferType: TransferType,
     val transferredBytes: Long,
     override val totalBytes: Long,

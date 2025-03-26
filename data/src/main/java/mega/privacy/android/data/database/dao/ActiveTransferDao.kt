@@ -12,8 +12,8 @@ import mega.privacy.android.domain.entity.transfer.TransferType
 @Dao
 internal interface ActiveTransferDao {
 
-    @Query("SELECT * FROM active_transfers WHERE tag = :tag")
-    suspend fun getActiveTransferByTag(tag: Int): ActiveTransferEntity?
+    @Query("SELECT * FROM active_transfers WHERE uniqueId = :uniqueId")
+    suspend fun getActiveTransferByUniqueId(uniqueId: Long): ActiveTransferEntity?
 
     @Query("SELECT * FROM active_transfers WHERE transfer_type = :transferType")
     fun getActiveTransfersByType(transferType: TransferType): Flow<List<ActiveTransferEntity>>
@@ -29,11 +29,12 @@ internal interface ActiveTransferDao {
 
     @Query(
         "UPDATE active_transfers " +
-                "SET is_finished = :isFinished, is_paused = :isPaused, is_already_downloaded = :isAlreadyTransferred, total_bytes = :totalBytes, is_cancelled = :isCancelled, file_name = :fileName " +
-                "WHERE tag = :tag " +
+                "SET tag = :tag, is_finished = :isFinished, is_paused = :isPaused, is_already_downloaded = :isAlreadyTransferred, total_bytes = :totalBytes, is_cancelled = :isCancelled, file_name = :fileName " +
+                "WHERE uniqueId = :uniqueId " +
                 "AND is_finished = 0"
     )
     suspend fun updateActiveTransferIfNotFinished(
+        uniqueId: Long,
         tag: Int,
         isFinished: Boolean,
         isPaused: Boolean,
@@ -44,9 +45,9 @@ internal interface ActiveTransferDao {
     )
 
     suspend fun insertOrUpdateActiveTransfer(entity: ActiveTransferEntity) {
-        val id = insertActiveTransfer(entity)
-        if (id == -1L) {
+        getActiveTransferByUniqueId(entity.uniqueId)?.let {
             updateActiveTransferIfNotFinished(
+                uniqueId = entity.uniqueId,
                 tag = entity.tag,
                 isFinished = entity.isFinished,
                 isPaused = entity.isPaused,
@@ -55,7 +56,7 @@ internal interface ActiveTransferDao {
                 isCancelled = entity.isCancelled,
                 fileName = entity.fileName
             )
-        }
+        } ?: insertActiveTransfer(entity)
     }
 
     /**
@@ -76,6 +77,6 @@ internal interface ActiveTransferDao {
     @Query("DELETE FROM active_transfers")
     suspend fun deleteAllActiveTransfers()
 
-    @Query("UPDATE active_transfers SET is_finished = 1, is_cancelled = 1 WHERE tag IN (:tags)")
-    suspend fun setActiveTransferAsCancelledByTag(tags: List<Int>)
+    @Query("UPDATE active_transfers SET is_finished = 1, is_cancelled = 1 WHERE uniqueId IN (:uniqueIds)")
+    suspend fun setActiveTransferAsCancelledByUniqueId(uniqueIds: List<Long>)
 }

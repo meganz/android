@@ -6,7 +6,7 @@ import mega.privacy.android.domain.entity.transfer.TransferAppData
 import mega.privacy.android.domain.qualifier.ApplicationScope
 import mega.privacy.android.domain.repository.FileSystemRepository
 import mega.privacy.android.domain.repository.TransferRepository
-import mega.privacy.android.domain.usecase.transfers.GetTransferByTagUseCase
+import mega.privacy.android.domain.usecase.transfers.GetTransferByUniqueIdUseCase
 import mega.privacy.android.domain.usecase.transfers.completed.AddCompletedTransferIfNotExistUseCase
 import java.io.File
 import javax.inject.Inject
@@ -25,7 +25,7 @@ import javax.inject.Inject
  */
 class HandleNotInProgressSDCardActiveTransfersUseCase @Inject constructor(
     private val addCompletedTransferIfNotExistUseCase: AddCompletedTransferIfNotExistUseCase,
-    private val getTransferByTagUseCase: GetTransferByTagUseCase,
+    private val getTransferByUniqueIdUseCase: GetTransferByUniqueIdUseCase,
     private val moveFileToSdCardUseCase: MoveFileToSdCardUseCase,
     private val transferRepository: TransferRepository,
     private val fileSystemRepository: FileSystemRepository,
@@ -36,11 +36,11 @@ class HandleNotInProgressSDCardActiveTransfersUseCase @Inject constructor(
      * Invoke
      */
     suspend operator fun invoke(
-        notInProgressSdCardAppDataMap: Map<Int, List<TransferAppData>>,
+        notInProgressSdCardAppDataMap: Map<Long, List<TransferAppData>>,
     ) {
         buildList {
-            notInProgressSdCardAppDataMap.keys.forEach { tag ->
-                getTransferByTagUseCase(tag)?.let { add(it) }
+            notInProgressSdCardAppDataMap.keys.forEach { uniqueId ->
+                getTransferByUniqueIdUseCase(uniqueId)?.let { add(it) }
             }
         }.also { addCompletedTransferIfNotExistUseCase(it) }
 
@@ -65,9 +65,9 @@ class HandleNotInProgressSDCardActiveTransfersUseCase @Inject constructor(
                                             )
 
                                             val subFolders = sdCardAppData.parentPath
-                                                ?.removePrefix(sdCardAppData.targetPathForSDK)
-                                                ?.split(File.separator)
-                                                ?.filter { it.isNotBlank() } ?: emptyList()
+                                                .removePrefix(sdCardAppData.targetPathForSDK)
+                                                .split(File.separator)
+                                                .filter { it.isNotBlank() }
 
                                             moveFileToSdCardUseCase(
                                                 sdkDownloadedFile,

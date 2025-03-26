@@ -252,7 +252,7 @@ internal class LegacyTransfersFragment : TransfersBaseFragment(), SelectModeInte
         viewLifecycleOwner.collectFlow(viewModel.uiState) { uiState ->
             uiState.pauseOrResumeTransferResult?.let { result ->
                 if (result.isSuccess) {
-                    viewModel.activeTransferChangeStatus(result.getOrThrow().tag)
+                    viewModel.activeTransferChangeStatus(result.getOrThrow().uniqueId)
                 } else {
                     (activity as? ManagerActivity)?.showSnackbar(
                         Constants.SNACKBAR_TYPE,
