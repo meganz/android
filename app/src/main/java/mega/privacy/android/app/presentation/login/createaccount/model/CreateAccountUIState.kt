@@ -72,4 +72,18 @@ data class CreateAccountUIState(
      * Is New Design Revamp enabled
      */
     val isNewRegistrationUiEnabled: Boolean? = null,
+
+    val isEmailLengthExceeded: Boolean? = null,
+
+    val isLoading: Boolean = false,
+
+    val isPasswordLengthSufficient: Boolean? = null,
+
+    val doesPasswordContainMixedCase: Boolean = false,
+
+    val doesPasswordContainNumeric: Boolean = false,
+
+    val doesPasswordContainSpecialCharacter: Boolean = false,
+
+    val noNetworkConnectionEvent: StateEvent = consumed,
 )
