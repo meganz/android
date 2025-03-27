@@ -171,4 +171,11 @@ internal class DefaultNetworkRepository @Inject constructor(
 
     override suspend fun broadcastChatSignalPresence() =
         appEventGateway.broadcastChatSignalPresence()
+
+    override suspend fun broadcastSslVerificationFailed() {
+        appEventGateway.broadcastSslVerificationFailed()
+    }
+
+    override fun monitorSslVerificationFailed(): Flow<Unit> =
+        appEventGateway.monitorSslVerificationFailed()
 }

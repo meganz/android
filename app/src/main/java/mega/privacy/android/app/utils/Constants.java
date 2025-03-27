@@ -168,10 +168,8 @@ public class Constants {
     public static final String ACTION_REMOVE_LINK = "ACTION_REMOVE_LINK";
 
     public static final String BROADCAST_ACTION_INTENT_FILTER_UPDATE_FULL_SCREEN = "INTENT_FILTER_UPDATE_FULL_SCREEN";
-
     public static final String BROADCAST_ACTION_INTENT_UPDATE_ACCOUNT_DETAILS = "INTENT_UPDATE_ACCOUNT_DETAILS";
     public static final String BROADCAST_ACTION_INTENT_SETTINGS_UPDATED = "SETTINGS_UPDATED";
-    public static final String BROADCAST_ACTION_INTENT_SSL_VERIFICATION_FAILED = "INTENT_SSL_VERIFICATION_FAILED";
 
     public static final String INTENT_EXTRA_KEY_PLACEHOLDER = "placeholder";
     public static final String INTENT_EXTRA_KEY_HANDLE = "HANDLE";

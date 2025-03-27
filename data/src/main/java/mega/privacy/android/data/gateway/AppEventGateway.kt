@@ -398,4 +398,14 @@ internal interface AppEventGateway {
      * Broadcast misc loaded
      */
     suspend fun broadcastMiscLoaded()
+
+    /**
+     * Broadcast SSL verification failed
+     */
+    suspend fun broadcastSslVerificationFailed()
+
+    /**
+     * Monitor SSL verification failed
+     */
+    fun monitorSslVerificationFailed(): Flow<Unit>
 }

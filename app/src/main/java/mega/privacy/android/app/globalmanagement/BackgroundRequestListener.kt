@@ -1,7 +1,6 @@
 package mega.privacy.android.app.globalmanagement
 
 import android.app.Application
-import android.content.Intent
 import dagger.Lazy
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.launch
@@ -9,7 +8,6 @@ import kotlinx.coroutines.sync.Mutex
 import mega.privacy.android.app.MegaApplication
 import mega.privacy.android.app.listeners.GetAttrUserListener
 import mega.privacy.android.app.utils.AlertsAndWarnings.showOverDiskQuotaPaywallWarning
-import mega.privacy.android.app.utils.Constants.BROADCAST_ACTION_INTENT_SSL_VERIFICATION_FAILED
 import mega.privacy.android.data.database.DatabaseHandler
 import mega.privacy.android.data.qualifier.MegaApi
 import mega.privacy.android.domain.qualifier.ApplicationScope
@@ -25,6 +23,7 @@ import mega.privacy.android.domain.usecase.chat.link.IsRichPreviewsEnabledUseCas
 import mega.privacy.android.domain.usecase.chat.link.ShouldShowRichLinkWarningUseCase
 import mega.privacy.android.domain.usecase.login.BroadcastFetchNodesFinishUseCase
 import mega.privacy.android.domain.usecase.login.LocalLogoutAppUseCase
+import mega.privacy.android.domain.usecase.network.BroadcastSslVerificationFailedUseCase
 import nz.mega.sdk.MegaApiAndroid
 import nz.mega.sdk.MegaApiJava
 import nz.mega.sdk.MegaApiJava.INVALID_HANDLE
@@ -77,6 +76,7 @@ class BackgroundRequestListener @Inject constructor(
     private val isUseHttpsEnabledUseCase: IsUseHttpsEnabledUseCase,
     private val setUseHttpsUseCase: SetUseHttpsUseCase,
     private val resetAccountDetailsTimeStampUseCase: ResetAccountDetailsTimeStampUseCase,
+    private val broadcastSslVerificationFailedUseCase: BroadcastSslVerificationFailedUseCase
 ) : MegaRequestListenerInterface {
     /**
      * On request start
@@ -218,9 +218,9 @@ class BackgroundRequestListener @Inject constructor(
         } else if (e.errorCode == MegaError.API_EINCOMPLETE) {
             if (request.paramType == MegaError.API_ESSL) {
                 Timber.w("SSL verification failed")
-                application.sendBroadcast(
-                    Intent(BROADCAST_ACTION_INTENT_SSL_VERIFICATION_FAILED).setPackage(application.applicationContext.packageName)
-                )
+                applicationScope.launch {
+                    broadcastSslVerificationFailedUseCase()
+                }
             }
         } else if (e.errorCode == MegaError.API_ESID) {
             Timber.w("TYPE_LOGOUT:API_ESID")

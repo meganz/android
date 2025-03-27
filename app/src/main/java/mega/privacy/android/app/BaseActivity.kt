@@ -73,7 +73,6 @@ import mega.privacy.android.app.utils.Constants.ACTION_OVERQUOTA_STORAGE
 import mega.privacy.android.app.utils.Constants.ACTION_PRE_OVERQUOTA_STORAGE
 import mega.privacy.android.app.utils.Constants.ACTION_SHOW_UPGRADE_ACCOUNT
 import mega.privacy.android.app.utils.Constants.ACTION_SHOW_WARNING_ACCOUNT_BLOCKED
-import mega.privacy.android.app.utils.Constants.BROADCAST_ACTION_INTENT_SSL_VERIFICATION_FAILED
 import mega.privacy.android.app.utils.Constants.BUSINESS
 import mega.privacy.android.app.utils.Constants.DISMISS_ACTION_SNACKBAR
 import mega.privacy.android.app.utils.Constants.INVITE_CONTACT_TYPE
@@ -110,6 +109,7 @@ import mega.privacy.android.domain.usecase.MonitorChatSignalPresenceUseCase
 import mega.privacy.android.domain.usecase.ResetSdkLoggerUseCase
 import mega.privacy.android.domain.usecase.login.GetAccountCredentialsUseCase
 import mega.privacy.android.domain.usecase.login.SaveAccountCredentialsUseCase
+import mega.privacy.android.domain.usecase.network.MonitorSslVerificationFailedUseCase
 import mega.privacy.android.domain.usecase.setting.MonitorCookieSettingsSavedUseCase
 import mega.privacy.android.domain.usecase.transfers.overquota.MonitorTransferOverQuotaUseCase
 import mega.privacy.android.domain.usecase.transfers.paused.PauseTransfersQueueUseCase
@@ -172,6 +172,9 @@ abstract class BaseActivity : AppCompatActivity(), ActivityLauncher, PermissionR
 
     @Inject
     lateinit var monitorCookieSettingsSavedUseCase: MonitorCookieSettingsSavedUseCase
+
+    @Inject
+    lateinit var monitorSslVerificationFailedUseCase: MonitorSslVerificationFailedUseCase
 
     @Inject
     lateinit var getAccountCredentialsUseCase: GetAccountCredentialsUseCase
@@ -253,18 +256,6 @@ abstract class BaseActivity : AppCompatActivity(), ActivityLauncher, PermissionR
         get() = !isActivityInBackground
 
     /**
-     * Broadcast receiver to manage a possible SSL verification error.
-     */
-    private val sslErrorReceiver: BroadcastReceiver = object : BroadcastReceiver() {
-        override fun onReceive(context: Context?, intent: Intent?) {
-            Timber.d("BROADCAST TO MANAGE A SSL VERIFICATION ERROR")
-            if (!(sslErrorDialog ?: return).isShowing) {
-                showSSLErrorDialog()
-            }
-        }
-    }
-
-    /**
      * Broadcast to show taken down files info
      */
     private val takenDownFilesReceiver: BroadcastReceiver = object : BroadcastReceiver() {
@@ -328,11 +319,6 @@ abstract class BaseActivity : AppCompatActivity(), ActivityLauncher, PermissionR
             }
         }
 
-        registerReceiver(
-            sslErrorReceiver,
-            IntentFilter(BROADCAST_ACTION_INTENT_SSL_VERIFICATION_FAILED)
-        )
-
         collectFlow(monitorChatSignalPresenceUseCase(), Lifecycle.State.CREATED) {
             Timber.d("BROADCAST TO SEND SIGNAL PRESENCE")
             if (delaySignalPresence && megaChatApi.presenceConfig != null && !megaChatApi.presenceConfig.isPending) {
@@ -358,6 +344,13 @@ abstract class BaseActivity : AppCompatActivity(), ActivityLauncher, PermissionR
                     view,
                     getString(R.string.dialog_cookie_snackbar_saved)
                 )
+            }
+        }
+
+        collectFlow(monitorSslVerificationFailedUseCase()) {
+            Timber.d("BROADCAST TO MANAGE A SSL VERIFICATION ERROR")
+            if (sslErrorDialog?.isShowing != true) {
+                showSSLErrorDialog()
             }
         }
 
@@ -448,7 +441,6 @@ abstract class BaseActivity : AppCompatActivity(), ActivityLauncher, PermissionR
 
 
     override fun onDestroy() {
-        unregisterReceiver(sslErrorReceiver)
         unregisterReceiver(takenDownFilesReceiver)
         unregisterReceiver(showSnackbarReceiver)
         dismissAlertDialogIfExists(transferGeneralOverQuotaWarning)

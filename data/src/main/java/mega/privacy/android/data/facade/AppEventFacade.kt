@@ -69,10 +69,9 @@ internal class AppEventFacade @Inject constructor(
     private val callScreenOpened = MutableSharedFlow<Boolean>()
     private val audioOutput = MutableSharedFlow<AudioDevice>()
     private val localVideoChangedDueToProximitySensor = MutableSharedFlow<Boolean>()
-
     private val updateUserData = MutableSharedFlow<Unit>()
-
     private val miscLoaded = MutableSharedFlow<Unit>()
+    private val sslVerificationFailed = MutableSharedFlow<Unit>()
 
     override suspend fun broadcastCookieSettings(enabledCookieSettings: Set<CookieType>) {
         _cookieSettings.emit(enabledCookieSettings)
@@ -251,6 +250,14 @@ internal class AppEventFacade @Inject constructor(
 
     override fun monitorMiscLoaded(): Flow<Unit> {
         return miscLoaded.asSharedFlow()
+    }
+
+    override suspend fun broadcastSslVerificationFailed() {
+        sslVerificationFailed.emit(Unit)
+    }
+
+    override fun monitorSslVerificationFailed(): Flow<Unit> {
+        return sslVerificationFailed.asSharedFlow()
     }
 }
 

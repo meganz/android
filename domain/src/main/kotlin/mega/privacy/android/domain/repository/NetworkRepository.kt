@@ -60,4 +60,15 @@ interface NetworkRepository {
      * Broadcast chat signal presence if network signal is available
      */
     suspend fun broadcastChatSignalPresence()
+
+
+    /**
+     * Broadcast SSL verification failed
+     */
+    suspend fun broadcastSslVerificationFailed()
+
+    /**
+     * Monitor SSL verification failed
+     */
+    fun monitorSslVerificationFailed(): Flow<Unit>
 }
