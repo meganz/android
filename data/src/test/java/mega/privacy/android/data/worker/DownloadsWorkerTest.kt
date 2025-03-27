@@ -47,7 +47,6 @@ import mega.privacy.android.domain.usecase.transfers.MonitorTransferEventsUseCas
 import mega.privacy.android.domain.usecase.transfers.active.ClearActiveTransfersIfFinishedUseCase
 import mega.privacy.android.domain.usecase.transfers.active.CorrectActiveTransfersUseCase
 import mega.privacy.android.domain.usecase.transfers.active.GetActiveTransferTotalsUseCase
-import mega.privacy.android.domain.usecase.transfers.active.HandleTransferEventUseCase
 import mega.privacy.android.domain.usecase.transfers.paused.AreTransfersPausedUseCase
 import mega.privacy.android.domain.usecase.transfers.pending.StartAllPendingDownloadsUseCase
 import org.junit.jupiter.api.AfterAll
@@ -81,7 +80,6 @@ class DownloadsWorkerTest {
     private lateinit var workDatabase: WorkDatabase
 
     private val monitorTransferEventsUseCase = mock<MonitorTransferEventsUseCase>()
-    private val handleTransferEventUseCase = mock<HandleTransferEventUseCase>()
     private val areTransfersPausedUseCase = mock<AreTransfersPausedUseCase>()
     private val getActiveTransferTotalsUseCase = mock<GetActiveTransferTotalsUseCase>()
     private val transfersNotificationMapper = mock<TransfersNotificationMapper>()
@@ -138,7 +136,6 @@ class DownloadsWorkerTest {
             ),
             ioDispatcher = ioDispatcher,
             monitorTransferEventsUseCase = monitorTransferEventsUseCase,
-            handleTransferEventUseCase = handleTransferEventUseCase,
             areTransfersPausedUseCase = areTransfersPausedUseCase,
             getActiveTransferTotalsUseCase = getActiveTransferTotalsUseCase,
             transfersNotificationMapper = transfersNotificationMapper,
@@ -159,6 +156,7 @@ class DownloadsWorkerTest {
             transfersActionGroupProgressNotificationBuilder = transfersActionGroupProgressNotificationBuilder,
             transfersProgressNotificationSummaryBuilder = transfersProgressNotificationSummaryBuilder,
             getFeatureFlagValueUseCase = getFeatureFlagValueUseCase,
+            loginMutex = mock(),
         )
     }
 
@@ -168,7 +166,6 @@ class DownloadsWorkerTest {
         reset(
             context,
             workProgressUpdater,
-            handleTransferEventUseCase,
             areTransfersPausedUseCase,
             getActiveTransferTotalsUseCase,
             transfersNotificationMapper,

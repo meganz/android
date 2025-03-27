@@ -13,7 +13,6 @@ import androidx.work.workDataOf
 import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Job
-import kotlinx.coroutines.NonCancellable
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.catch
 import kotlinx.coroutines.flow.filter
@@ -22,11 +21,8 @@ import kotlinx.coroutines.flow.lastOrNull
 import kotlinx.coroutines.flow.onCompletion
 import kotlinx.coroutines.flow.transformWhile
 import kotlinx.coroutines.launch
+import kotlinx.coroutines.sync.Mutex
 import kotlinx.coroutines.withContext
-import mega.privacy.android.domain.extension.collectChunked
-import mega.privacy.android.domain.extension.onEachSampled
-import mega.privacy.android.domain.extension.onFirst
-import mega.privacy.android.domain.extension.skipUnstable
 import mega.privacy.android.data.mapper.transfer.OverQuotaNotificationBuilder
 import mega.privacy.android.domain.entity.transfer.ActiveTransferTotals
 import mega.privacy.android.domain.entity.transfer.MonitorOngoingActiveTransfersResult
@@ -35,12 +31,16 @@ import mega.privacy.android.domain.entity.transfer.TransferProgressResult
 import mega.privacy.android.domain.entity.transfer.TransferType
 import mega.privacy.android.domain.entity.transfer.isBackgroundTransfer
 import mega.privacy.android.domain.entity.transfer.isVoiceClip
+import mega.privacy.android.domain.extension.collectChunked
+import mega.privacy.android.domain.extension.onEachSampled
+import mega.privacy.android.domain.extension.onFirst
+import mega.privacy.android.domain.extension.skipUnstable
 import mega.privacy.android.domain.monitoring.CrashReporter
+import mega.privacy.android.domain.qualifier.LoginMutex
 import mega.privacy.android.domain.usecase.transfers.MonitorTransferEventsUseCase
 import mega.privacy.android.domain.usecase.transfers.active.ClearActiveTransfersIfFinishedUseCase
 import mega.privacy.android.domain.usecase.transfers.active.CorrectActiveTransfersUseCase
 import mega.privacy.android.domain.usecase.transfers.active.GetActiveTransferTotalsUseCase
-import mega.privacy.android.domain.usecase.transfers.active.HandleTransferEventUseCase
 import mega.privacy.android.domain.usecase.transfers.paused.AreTransfersPausedUseCase
 import timber.log.Timber
 import kotlin.time.Duration.Companion.milliseconds
@@ -57,7 +57,6 @@ abstract class AbstractTransfersWorker(
     protected val type: TransferType,
     private val ioDispatcher: CoroutineDispatcher,
     private val monitorTransferEventsUseCase: MonitorTransferEventsUseCase,
-    private val handleTransferEventUseCase: HandleTransferEventUseCase,
     private val areTransfersPausedUseCase: AreTransfersPausedUseCase,
     private val getActiveTransferTotalsUseCase: GetActiveTransferTotalsUseCase,
     private val overQuotaNotificationBuilder: OverQuotaNotificationBuilder,
@@ -68,6 +67,7 @@ abstract class AbstractTransfersWorker(
     protected val crashReporter: CrashReporter,
     private val foregroundSetter: ForegroundSetter?,
     private val notificationSamplePeriod: Long?,
+    @LoginMutex private val loginMutex: Mutex,
 ) : CoroutineWorker(context, workerParams) {
 
     /**
@@ -104,6 +104,9 @@ abstract class AbstractTransfersWorker(
      */
     open suspend fun onTransferEventReceived(event: TransferEvent) {}
 
+    /**
+     * Event to do extra work on complete
+     */
     open suspend fun onComplete() {}
 
     /**
@@ -196,6 +199,12 @@ abstract class AbstractTransfersWorker(
     override suspend fun doWork() = withContext(ioDispatcher) {
         Timber.d("${this@AbstractTransfersWorker::class.java.simpleName} Started")
         crashReporter.log("${this@AbstractTransfersWorker::class.java.simpleName} Started")
+
+        if (loginMutex.isLocked) {
+            Timber.d("${this@AbstractTransfersWorker::class.java.simpleName} Login in progress, skipping")
+            return@withContext Result.success()
+        }
+
         correctActiveTransfersUseCase(type) //to be sure we haven't missed any event before monitoring them
         val doWorkJob = this.launch(ioDispatcher) {
             doWorkInternal(this)
@@ -236,9 +245,9 @@ abstract class AbstractTransfersWorker(
         if (new.activeTransferTotals.allPaused() != new.activeTransferTotals.allPaused()) return true
 
         val previousMap = previous.activeTransferTotals.actionGroups.associateBy { it.groupId }
-        return new.activeTransferTotals.actionGroups.any { new ->
-            val old = previousMap[new.groupId]
-            old == null || new.allPaused() != old.allPaused()
+        return new.activeTransferTotals.actionGroups.any { newGroup ->
+            val old = previousMap[newGroup.groupId]
+            old == null || newGroup.allPaused() != old.allPaused()
         }
     }
 
@@ -282,17 +291,7 @@ abstract class AbstractTransfersWorker(
                         onTransferEventReceived(it)
                     }
                 }
-                handleTransferEvents(transferEvents)
             }
-    }
-
-    private suspend fun handleTransferEvents(transferEvents: List<TransferEvent>) {
-        withContext(NonCancellable) {
-            //handling events can update Active transfers and ends the monitorOngoingActiveTransfers flow that triggers the cancelling of this job, so we need to launch it in a non cancellable context
-            launch {
-                handleTransferEventUseCase(events = transferEvents.toTypedArray())
-            }
-        }
     }
 
     private suspend fun stopWork(performWorkJob: Job) {

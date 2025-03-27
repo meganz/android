@@ -41,7 +41,6 @@ import mega.privacy.android.domain.usecase.transfers.MonitorTransferEventsUseCas
 import mega.privacy.android.domain.usecase.transfers.active.ClearActiveTransfersIfFinishedUseCase
 import mega.privacy.android.domain.usecase.transfers.active.CorrectActiveTransfersUseCase
 import mega.privacy.android.domain.usecase.transfers.active.GetActiveTransferTotalsUseCase
-import mega.privacy.android.domain.usecase.transfers.active.HandleTransferEventUseCase
 import mega.privacy.android.domain.usecase.transfers.paused.AreTransfersPausedUseCase
 import mega.privacy.android.domain.usecase.transfers.pending.StartAllPendingUploadsUseCase
 import mega.privacy.android.domain.usecase.transfers.uploads.SetNodeAttributesAfterUploadUseCase
@@ -76,7 +75,6 @@ class UploadsWorkerTest {
     private lateinit var workDatabase: WorkDatabase
 
     private val monitorTransferEventsUseCase = mock<MonitorTransferEventsUseCase>()
-    private val handleTransferEventUseCase = mock<HandleTransferEventUseCase>()
     private val monitorActiveAndPendingTransfersUseCase =
         mock<MonitorActiveAndPendingTransfersUseCase>()
     private val areTransfersPausedUseCase = mock<AreTransfersPausedUseCase>()
@@ -127,7 +125,6 @@ class UploadsWorkerTest {
             ),
             ioDispatcher = ioDispatcher,
             monitorTransferEventsUseCase = monitorTransferEventsUseCase,
-            handleTransferEventUseCase = handleTransferEventUseCase,
             areTransfersPausedUseCase = areTransfersPausedUseCase,
             monitorActiveAndPendingTransfersUseCase = monitorActiveAndPendingTransfersUseCase,
             getActiveTransferTotalsUseCase = getActiveTransferTotalsUseCase,
@@ -142,7 +139,8 @@ class UploadsWorkerTest {
             crashReporter = crashReporter,
             foregroundSetter = setForeground,
             notificationSamplePeriod = 0L,
-            startAllPendingUploadsUseCase = startAllPendingUploadsUseCase
+            startAllPendingUploadsUseCase = startAllPendingUploadsUseCase,
+            loginMutex = mock(),
         )
     }
 
@@ -151,7 +149,6 @@ class UploadsWorkerTest {
         reset(
             context,
             workProgressUpdater,
-            handleTransferEventUseCase,
             areTransfersPausedUseCase,
             getActiveTransferTotalsUseCase,
             transfersNotificationMapper,

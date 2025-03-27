@@ -11,22 +11,23 @@ import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.catch
 import kotlinx.coroutines.launch
+import kotlinx.coroutines.sync.Mutex
 import mega.privacy.android.data.mapper.transfer.OverQuotaNotificationBuilder
 import mega.privacy.android.data.mapper.transfer.TransfersFinishedNotificationMapper
 import mega.privacy.android.data.mapper.transfer.TransfersNotificationMapper
 import mega.privacy.android.domain.entity.transfer.ActiveTransferTotals
-import mega.privacy.android.domain.entity.transfer.TransferProgressResult
 import mega.privacy.android.domain.entity.transfer.TransferEvent
+import mega.privacy.android.domain.entity.transfer.TransferProgressResult
 import mega.privacy.android.domain.entity.transfer.TransferType
 import mega.privacy.android.domain.entity.uri.UriPath
 import mega.privacy.android.domain.monitoring.CrashReporter
 import mega.privacy.android.domain.qualifier.IoDispatcher
+import mega.privacy.android.domain.qualifier.LoginMutex
 import mega.privacy.android.domain.usecase.transfers.MonitorActiveAndPendingTransfersUseCase
 import mega.privacy.android.domain.usecase.transfers.MonitorTransferEventsUseCase
 import mega.privacy.android.domain.usecase.transfers.active.ClearActiveTransfersIfFinishedUseCase
 import mega.privacy.android.domain.usecase.transfers.active.CorrectActiveTransfersUseCase
 import mega.privacy.android.domain.usecase.transfers.active.GetActiveTransferTotalsUseCase
-import mega.privacy.android.domain.usecase.transfers.active.HandleTransferEventUseCase
 import mega.privacy.android.domain.usecase.transfers.paused.AreTransfersPausedUseCase
 import mega.privacy.android.domain.usecase.transfers.pending.StartAllPendingUploadsUseCase
 import mega.privacy.android.domain.usecase.transfers.uploads.SetNodeAttributesAfterUploadUseCase
@@ -42,7 +43,6 @@ class UploadsWorker @AssistedInject constructor(
     @Assisted workerParams: WorkerParameters,
     @IoDispatcher private val ioDispatcher: CoroutineDispatcher,
     monitorTransferEventsUseCase: MonitorTransferEventsUseCase,
-    handleTransferEventUseCase: HandleTransferEventUseCase,
     private val monitorActiveAndPendingTransfersUseCase: MonitorActiveAndPendingTransfersUseCase,
     areTransfersPausedUseCase: AreTransfersPausedUseCase,
     getActiveTransferTotalsUseCase: GetActiveTransferTotalsUseCase,
@@ -58,13 +58,13 @@ class UploadsWorker @AssistedInject constructor(
     foregroundSetter: ForegroundSetter? = null,
     notificationSamplePeriod: Long? = null,
     private val startAllPendingUploadsUseCase: StartAllPendingUploadsUseCase,
+    @LoginMutex private val loginMutex: Mutex,
 ) : AbstractTransfersWorker(
     context = context,
     workerParams = workerParams,
     type = TransferType.GENERAL_UPLOAD,
     ioDispatcher = ioDispatcher,
     monitorTransferEventsUseCase = monitorTransferEventsUseCase,
-    handleTransferEventUseCase = handleTransferEventUseCase,
     areTransfersPausedUseCase = areTransfersPausedUseCase,
     getActiveTransferTotalsUseCase = getActiveTransferTotalsUseCase,
     overQuotaNotificationBuilder = overQuotaNotificationBuilder,
@@ -75,6 +75,7 @@ class UploadsWorker @AssistedInject constructor(
     crashReporter = crashReporter,
     foregroundSetter = foregroundSetter,
     notificationSamplePeriod = notificationSamplePeriod,
+    loginMutex = loginMutex,
 ) {
     override val finalNotificationId = NOTIFICATION_UPLOAD_FINAL
     override val updateNotificationId = UPLOAD_NOTIFICATION_ID
@@ -105,7 +106,8 @@ class UploadsWorker @AssistedInject constructor(
         transfersFinishedNotificationMapper(activeTransferTotals)
 
     override suspend fun onTransferEventReceived(event: TransferEvent) {
-        (event as? TransferEvent.TransferFinishEvent)?.let {if (it.error == null) {
+        (event as? TransferEvent.TransferFinishEvent)?.let {
+            if (it.error == null) {
                 runCatching {
                     setNodeAttributesAfterUploadUseCase(
                         nodeHandle = it.transfer.nodeHandle,

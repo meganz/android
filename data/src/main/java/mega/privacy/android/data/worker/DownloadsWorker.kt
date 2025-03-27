@@ -12,6 +12,7 @@ import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.catch
 import kotlinx.coroutines.launch
+import kotlinx.coroutines.sync.Mutex
 import mega.privacy.android.data.featuretoggle.DataFeatures
 import mega.privacy.android.data.mapper.transfer.OverQuotaNotificationBuilder
 import mega.privacy.android.data.mapper.transfer.TransfersActionGroupFinishNotificationBuilder
@@ -27,6 +28,7 @@ import mega.privacy.android.domain.entity.transfer.TransferType
 import mega.privacy.android.domain.entity.transfer.isPreviewDownload
 import mega.privacy.android.domain.monitoring.CrashReporter
 import mega.privacy.android.domain.qualifier.IoDispatcher
+import mega.privacy.android.domain.qualifier.LoginMutex
 import mega.privacy.android.domain.usecase.featureflag.GetFeatureFlagValueUseCase
 import mega.privacy.android.domain.usecase.qrcode.ScanMediaFileUseCase
 import mega.privacy.android.domain.usecase.transfers.MonitorActiveAndPendingTransfersUseCase
@@ -34,7 +36,6 @@ import mega.privacy.android.domain.usecase.transfers.MonitorTransferEventsUseCas
 import mega.privacy.android.domain.usecase.transfers.active.ClearActiveTransfersIfFinishedUseCase
 import mega.privacy.android.domain.usecase.transfers.active.CorrectActiveTransfersUseCase
 import mega.privacy.android.domain.usecase.transfers.active.GetActiveTransferTotalsUseCase
-import mega.privacy.android.domain.usecase.transfers.active.HandleTransferEventUseCase
 import mega.privacy.android.domain.usecase.transfers.paused.AreTransfersPausedUseCase
 import mega.privacy.android.domain.usecase.transfers.pending.StartAllPendingDownloadsUseCase
 import timber.log.Timber
@@ -49,7 +50,6 @@ class DownloadsWorker @AssistedInject constructor(
     @Assisted workerParams: WorkerParameters,
     @IoDispatcher private val ioDispatcher: CoroutineDispatcher,
     monitorTransferEventsUseCase: MonitorTransferEventsUseCase,
-    handleTransferEventUseCase: HandleTransferEventUseCase,
     areTransfersPausedUseCase: AreTransfersPausedUseCase,
     getActiveTransferTotalsUseCase: GetActiveTransferTotalsUseCase,
     overQuotaNotificationBuilder: OverQuotaNotificationBuilder,
@@ -70,13 +70,13 @@ class DownloadsWorker @AssistedInject constructor(
     private val monitorActiveAndPendingTransfersUseCase: MonitorActiveAndPendingTransfersUseCase,
     private val startAllPendingDownloadsUseCase: StartAllPendingDownloadsUseCase,
     private val getFeatureFlagValueUseCase: GetFeatureFlagValueUseCase,
+    @LoginMutex private val loginMutex: Mutex,
 ) : AbstractTransfersWorker(
     context = context,
     workerParams = workerParams,
     type = TransferType.DOWNLOAD,
     ioDispatcher = ioDispatcher,
     monitorTransferEventsUseCase = monitorTransferEventsUseCase,
-    handleTransferEventUseCase = handleTransferEventUseCase,
     areTransfersPausedUseCase = areTransfersPausedUseCase,
     getActiveTransferTotalsUseCase = getActiveTransferTotalsUseCase,
     overQuotaNotificationBuilder = overQuotaNotificationBuilder,
@@ -87,6 +87,7 @@ class DownloadsWorker @AssistedInject constructor(
     crashReporter = crashReporter,
     foregroundSetter = foregroundSetter,
     notificationSamplePeriod = notificationSamplePeriod,
+    loginMutex = loginMutex,
 ) {
 
     override val finalNotificationId = DOWNLOAD_FINAL_NOTIFICATION_ID

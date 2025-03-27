@@ -1,5 +1,6 @@
 package mega.privacy.android.domain.usecase.transfers.active
 
+import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.channelFlow
 import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.flow.filterNot

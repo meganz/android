@@ -92,10 +92,7 @@ import mega.privacy.android.domain.usecase.requeststatus.MonitorRequestStatusPro
 import mega.privacy.android.domain.usecase.setting.ResetChatSettingsUseCase
 import mega.privacy.android.domain.usecase.transfers.CancelTransfersUseCase
 import mega.privacy.android.domain.usecase.transfers.OngoingTransfersExistUseCase
-import mega.privacy.android.domain.usecase.transfers.chatuploads.StartChatUploadsWorkerUseCase
-import mega.privacy.android.domain.usecase.transfers.downloads.StartDownloadWorkerUseCase
 import mega.privacy.android.domain.usecase.transfers.paused.CheckIfTransfersShouldBePausedUseCase
-import mega.privacy.android.domain.usecase.transfers.uploads.StartUploadsWorkerUseCase
 import mega.privacy.android.domain.usecase.workers.StopCameraUploadsUseCase
 import mega.privacy.mobile.analytics.event.AccountRegistrationEvent
 import mega.privacy.mobile.analytics.event.MultiFactorAuthVerificationFailedEvent
@@ -136,14 +133,11 @@ class LoginViewModel @Inject constructor(
     private val clearEphemeralCredentialsUseCase: ClearEphemeralCredentialsUseCase,
     private val monitorAccountBlockedUseCase: MonitorAccountBlockedUseCase,
     private val getTimelinePhotosUseCase: GetTimelinePhotosUseCase,
-    private val startDownloadWorkerUseCase: StartDownloadWorkerUseCase,
-    private val startChatUploadsWorkerUseCase: StartChatUploadsWorkerUseCase,
     private val getLastRegisteredEmailUseCase: GetLastRegisteredEmailUseCase,
     private val clearLastRegisteredEmailUseCase: ClearLastRegisteredEmailUseCase,
     private val installReferrerHandler: InstallReferrerHandler,
     @LoginMutex private val loginMutex: Mutex,
     private val clearUserCredentialsUseCase: ClearUserCredentialsUseCase,
-    private val startUploadsWorkerUseCase: StartUploadsWorkerUseCase,
     private val getHistoricalProcessExitReasonsUseCase: GetHistoricalProcessExitReasonsUseCase,
     private val enableRequestStatusMonitorUseCase: EnableRequestStatusMonitorUseCase,
     private val monitorRequestStatusProgressEventUseCase: MonitorRequestStatusProgressEventUseCase,
@@ -883,21 +877,17 @@ class LoginViewModel @Inject constructor(
     }
 
     private suspend fun startWorkers() {
-        /* In case the app crash or restarts, we need to restart the worker in order to
-           monitor current transfers and update the related notification. */
-        val workers = listOf<suspend () -> Unit>(
+        /* In case the app crash or restarts, we need to sync some tasks */
+        val syncTasks = listOf<suspend () -> Unit>(
             { establishCameraUploadsSyncHandlesUseCase() },
-            { startDownloadWorkerUseCase() },
-            { startChatUploadsWorkerUseCase() },
-            { startUploadsWorkerUseCase() },
             { checkIfTransfersShouldBePausedUseCase() }
         )
 
-        workers.forEach { worker ->
+        syncTasks.forEach { task ->
             runCatching {
-                worker()
+                task()
             }.onFailure { error ->
-                Timber.e(error, "Worker failed to start")
+                Timber.e(error, "Task failed")
             }
         }
     }

@@ -13,6 +13,7 @@ import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.catch
 import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.launch
+import kotlinx.coroutines.sync.Mutex
 import mega.privacy.android.data.mapper.transfer.ChatUploadNotificationMapper
 import mega.privacy.android.data.mapper.transfer.OverQuotaNotificationBuilder
 import mega.privacy.android.domain.entity.Progress
@@ -23,12 +24,13 @@ import mega.privacy.android.domain.entity.transfer.ActiveTransferTotals
 import mega.privacy.android.domain.entity.transfer.ChatCompressionFinished
 import mega.privacy.android.domain.entity.transfer.ChatCompressionProgress
 import mega.privacy.android.domain.entity.transfer.ChatCompressionState
-import mega.privacy.android.domain.entity.transfer.TransferProgressResult
 import mega.privacy.android.domain.entity.transfer.TransferEvent
+import mega.privacy.android.domain.entity.transfer.TransferProgressResult
 import mega.privacy.android.domain.entity.transfer.TransferType
 import mega.privacy.android.domain.entity.transfer.pendingMessageIds
 import mega.privacy.android.domain.monitoring.CrashReporter
 import mega.privacy.android.domain.qualifier.IoDispatcher
+import mega.privacy.android.domain.qualifier.LoginMutex
 import mega.privacy.android.domain.usecase.chat.message.AttachNodeWithPendingMessageUseCase
 import mega.privacy.android.domain.usecase.chat.message.CheckFinishedChatUploadsUseCase
 import mega.privacy.android.domain.usecase.chat.message.MonitorPendingMessagesByStateUseCase
@@ -38,7 +40,6 @@ import mega.privacy.android.domain.usecase.transfers.MonitorTransferEventsUseCas
 import mega.privacy.android.domain.usecase.transfers.active.ClearActiveTransfersIfFinishedUseCase
 import mega.privacy.android.domain.usecase.transfers.active.CorrectActiveTransfersUseCase
 import mega.privacy.android.domain.usecase.transfers.active.GetActiveTransferTotalsUseCase
-import mega.privacy.android.domain.usecase.transfers.active.HandleTransferEventUseCase
 import mega.privacy.android.domain.usecase.transfers.active.MonitorOngoingActiveTransfersUseCase
 import mega.privacy.android.domain.usecase.transfers.chatuploads.ClearPendingMessagesCompressionProgressUseCase
 import mega.privacy.android.domain.usecase.transfers.chatuploads.PrepareAllPendingMessagesUseCase
@@ -56,7 +57,6 @@ class ChatUploadsWorker @AssistedInject constructor(
     @Assisted workerParams: WorkerParameters,
     @IoDispatcher private val ioDispatcher: CoroutineDispatcher,
     monitorTransferEventsUseCase: MonitorTransferEventsUseCase,
-    handleTransferEventUseCase: HandleTransferEventUseCase,
     areTransfersPausedUseCase: AreTransfersPausedUseCase,
     getActiveTransferTotalsUseCase: GetActiveTransferTotalsUseCase,
     overQuotaNotificationBuilder: OverQuotaNotificationBuilder,
@@ -77,13 +77,13 @@ class ChatUploadsWorker @AssistedInject constructor(
     crashReporter: CrashReporter,
     foregroundSetter: ForegroundSetter? = null,
     notificationSamplePeriod: Long? = null,
+    @LoginMutex private val loginMutex: Mutex,
 ) : AbstractTransfersWorker(
     context = context,
     workerParams = workerParams,
     type = TransferType.CHAT_UPLOAD,
     ioDispatcher = ioDispatcher,
     monitorTransferEventsUseCase = monitorTransferEventsUseCase,
-    handleTransferEventUseCase = handleTransferEventUseCase,
     areTransfersPausedUseCase = areTransfersPausedUseCase,
     getActiveTransferTotalsUseCase = getActiveTransferTotalsUseCase,
     overQuotaNotificationBuilder = overQuotaNotificationBuilder,
@@ -94,6 +94,7 @@ class ChatUploadsWorker @AssistedInject constructor(
     crashReporter = crashReporter,
     foregroundSetter = foregroundSetter,
     notificationSamplePeriod = notificationSamplePeriod,
+    loginMutex = loginMutex,
 ) {
     override val updateNotificationId = NOTIFICATION_CHAT_UPLOAD
 

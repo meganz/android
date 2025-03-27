@@ -116,13 +116,10 @@ internal class LoginViewModelTest {
     private val getTimelinePhotosUseCase = mock<GetTimelinePhotosUseCase>()
     private val establishCameraUploadsSyncHandlesUseCase =
         mock<EstablishCameraUploadsSyncHandlesUseCase>()
-    private val startDownloadWorkerUseCase = mock<StartDownloadWorkerUseCase>()
-    private val startChatUploadsWorkerUseCase = mock<StartChatUploadsWorkerUseCase>()
     private val getLastRegisteredEmailUseCase = mock<GetLastRegisteredEmailUseCase>()
     private val clearLastRegisteredEmailUseCase = mock<ClearLastRegisteredEmailUseCase>()
     private val installReferrerHandler = mock<InstallReferrerHandler>()
     private val clearUserCredentialsUseCase = mock<ClearUserCredentialsUseCase>()
-    private val startUploadsWorkerUseCase = mock<StartUploadsWorkerUseCase>()
     private val getHistoricalProcessExitReasonsUseCase =
         mock<GetHistoricalProcessExitReasonsUseCase>()
     private val enableRequestStatusMonitorUseCase = mock<EnableRequestStatusMonitorUseCase>()
@@ -168,14 +165,11 @@ internal class LoginViewModelTest {
             clearEphemeralCredentialsUseCase = clearEphemeralCredentialsUseCase,
             monitorAccountBlockedUseCase = monitorAccountBlockedUseCase,
             getTimelinePhotosUseCase = getTimelinePhotosUseCase,
-            startDownloadWorkerUseCase = startDownloadWorkerUseCase,
-            startChatUploadsWorkerUseCase = startChatUploadsWorkerUseCase,
             loginMutex = mock(),
             getLastRegisteredEmailUseCase = getLastRegisteredEmailUseCase,
             clearLastRegisteredEmailUseCase = clearLastRegisteredEmailUseCase,
             installReferrerHandler = installReferrerHandler,
             clearUserCredentialsUseCase = clearUserCredentialsUseCase,
-            startUploadsWorkerUseCase = startUploadsWorkerUseCase,
             getHistoricalProcessExitReasonsUseCase = getHistoricalProcessExitReasonsUseCase,
             enableRequestStatusMonitorUseCase = enableRequestStatusMonitorUseCase,
             monitorRequestStatusProgressEventUseCase = monitorRequestStatusProgressEventUseCase,

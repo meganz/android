@@ -24,7 +24,9 @@ import dagger.Lazy
 import dagger.hilt.android.HiltAndroidApp
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.collectLatest
+import kotlinx.coroutines.flow.retry
 import kotlinx.coroutines.launch
 import mega.privacy.android.app.components.ChatManagement
 import mega.privacy.android.app.components.PushNotificationSettingManagement
@@ -58,6 +60,7 @@ import mega.privacy.android.domain.usecase.featureflag.GetFeatureFlagValueUseCas
 import mega.privacy.android.domain.usecase.login.IsUserLoggedInUseCase
 import mega.privacy.android.domain.usecase.setting.GetMiscFlagsUseCase
 import mega.privacy.android.domain.usecase.setting.UpdateCrashAndPerformanceReportersUseCase
+import mega.privacy.android.domain.usecase.transfers.active.MonitorAndHandleTransferEventsUseCase
 import nz.mega.sdk.MegaApiAndroid
 import nz.mega.sdk.MegaChatApiAndroid
 import nz.mega.sdk.MegaChatApiJava
@@ -66,6 +69,8 @@ import org.webrtc.ContextUtils
 import timber.log.Timber
 import javax.inject.Inject
 import javax.inject.Provider
+import kotlin.time.Duration
+import kotlin.time.Duration.Companion.milliseconds
 
 /**
  * Mega application
@@ -92,7 +97,7 @@ import javax.inject.Provider
  * @property localIpAddress
  * @property isEsid
  * @property globalNetworkStateHandler
- * @property deleteCompletedTransfersInCacheUseCase
+ * @property monitorAndHandleTransferEventsUseCase
  */
 @HiltAndroidApp
 class MegaApplication : MultiDexApplication(), DefaultLifecycleObserver,
@@ -193,6 +198,9 @@ class MegaApplication : MultiDexApplication(), DefaultLifecycleObserver,
     @Inject
     lateinit var getFeatureFlagValueUseCase: GetFeatureFlagValueUseCase
 
+    @Inject
+    lateinit var monitorAndHandleTransferEventsUseCase: MonitorAndHandleTransferEventsUseCase
+
     var localIpAddress: String? = ""
 
     var isEsid = false
@@ -229,6 +237,7 @@ class MegaApplication : MultiDexApplication(), DefaultLifecycleObserver,
         registerActivityLifecycleCallbacks(activityLifecycleHandler)
         isVerifySMSShowed = false
 
+        monitorTransferEvents()
         setupMegaChatApi()
         getMiscFlagsIfNeeded()
         initialiseAdsIfNeeded()
@@ -361,6 +370,25 @@ class MegaApplication : MultiDexApplication(), DefaultLifecycleObserver,
             monitorCallSoundsUseCase()
                 .collectLatest { next: CallSoundType ->
                     soundsController.playSound(next)
+                }
+        }
+    }
+
+    private fun monitorTransferEvents() {
+        applicationScope.launch(Dispatchers.IO) {
+            var reconnectDelay = Duration.ZERO
+            monitorAndHandleTransferEventsUseCase()
+                .retry {
+                    // In case of an error we need to keep monitoring the events, but we add a exponential delay before retrying to avoid potential infinite sync loops in case of recurrent error
+                    Timber.e(it, "Error monitoring transfer events, retrying in $reconnectDelay")
+                    delay(reconnectDelay)
+                    reconnectDelay = (reconnectDelay * 2).coerceAtLeast(100.milliseconds)
+                    true
+                }
+                .collect {
+                    // reset the delay on each successful collect
+                    reconnectDelay = Duration.ZERO
+                    Timber.v("$it transfer events processed")
                 }
         }
     }

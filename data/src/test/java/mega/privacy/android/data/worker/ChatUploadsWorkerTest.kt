@@ -38,7 +38,6 @@ import mega.privacy.android.domain.entity.transfer.ChatCompressionProgress
 import mega.privacy.android.domain.entity.transfer.ChatCompressionState
 import mega.privacy.android.domain.entity.transfer.MonitorOngoingActiveTransfersResult
 import mega.privacy.android.domain.entity.transfer.Transfer
-import mega.privacy.android.domain.entity.transfer.TransferAppData
 import mega.privacy.android.domain.entity.transfer.TransferAppData.ChatUpload
 import mega.privacy.android.domain.entity.transfer.TransferEvent
 import mega.privacy.android.domain.entity.transfer.TransferType
@@ -53,7 +52,6 @@ import mega.privacy.android.domain.usecase.transfers.MonitorTransferEventsUseCas
 import mega.privacy.android.domain.usecase.transfers.active.ClearActiveTransfersIfFinishedUseCase
 import mega.privacy.android.domain.usecase.transfers.active.CorrectActiveTransfersUseCase
 import mega.privacy.android.domain.usecase.transfers.active.GetActiveTransferTotalsUseCase
-import mega.privacy.android.domain.usecase.transfers.active.HandleTransferEventUseCase
 import mega.privacy.android.domain.usecase.transfers.active.MonitorOngoingActiveTransfersUseCase
 import mega.privacy.android.domain.usecase.transfers.chatuploads.ClearPendingMessagesCompressionProgressUseCase
 import mega.privacy.android.domain.usecase.transfers.chatuploads.PrepareAllPendingMessagesUseCase
@@ -65,6 +63,7 @@ import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.TestInstance
 import org.mockito.kotlin.any
 import org.mockito.kotlin.anyOrNull
+import org.mockito.kotlin.anyValueClass
 import org.mockito.kotlin.anyVararg
 import org.mockito.kotlin.doReturn
 import org.mockito.kotlin.eq
@@ -74,7 +73,6 @@ import org.mockito.kotlin.times
 import org.mockito.kotlin.verify
 import org.mockito.kotlin.verifyNoMoreInteractions
 import org.mockito.kotlin.whenever
-import org.mockito.kotlin.anyValueClass
 import java.util.UUID
 import java.util.concurrent.Executor
 import java.util.concurrent.Executors
@@ -94,7 +92,6 @@ class ChatUploadsWorkerTest {
 
     private val attachNodeWithPendingMessageUseCase = mock<AttachNodeWithPendingMessageUseCase>()
     private val monitorTransferEventsUseCase = mock<MonitorTransferEventsUseCase>()
-    private val handleTransferEventUseCase = mock<HandleTransferEventUseCase>()
     private val monitorOngoingActiveTransfersUseCase = mock<MonitorOngoingActiveTransfersUseCase>()
     private val areTransfersPausedUseCase = mock<AreTransfersPausedUseCase>()
     private val getActiveTransferTotalsUseCase = mock<GetActiveTransferTotalsUseCase>()
@@ -147,28 +144,28 @@ class ChatUploadsWorkerTest {
                 )
             ),
             ioDispatcher = ioDispatcher,
-            monitorTransferEventsUseCase,
-            handleTransferEventUseCase,
-            areTransfersPausedUseCase,
-            getActiveTransferTotalsUseCase,
-            overQuotaNotificationBuilder,
-            notificationManager,
-            areNotificationsEnabledUseCase,
-            correctActiveTransfersUseCase,
-            clearActiveTransfersIfFinishedUseCase,
-            chatUploadNotificationMapper,
-            attachNodeWithPendingMessageUseCase,
-            updatePendingMessageUseCase,
-            checkFinishedChatUploadsUseCase,
-            compressPendingMessagesUseCase,
-            monitorOngoingActiveTransfersUseCase,
-            clearPendingMessagesCompressionProgressUseCase,
-            startUploadingAllPendingMessagesUseCase,
-            monitorPendingMessagesByStateUseCase,
-            prepareAllPendingMessagesUseCase,
-            crashReporter,
-            setForeground,
+            monitorTransferEventsUseCase = monitorTransferEventsUseCase,
+            areTransfersPausedUseCase = areTransfersPausedUseCase,
+            getActiveTransferTotalsUseCase = getActiveTransferTotalsUseCase,
+            overQuotaNotificationBuilder = overQuotaNotificationBuilder,
+            notificationManager = notificationManager,
+            areNotificationsEnabledUseCase = areNotificationsEnabledUseCase,
+            correctActiveTransfersUseCase = correctActiveTransfersUseCase,
+            clearActiveTransfersIfFinishedUseCase = clearActiveTransfersIfFinishedUseCase,
+            chatUploadNotificationMapper = chatUploadNotificationMapper,
+            attachNodeWithPendingMessageUseCase = attachNodeWithPendingMessageUseCase,
+            updatePendingMessageUseCase = updatePendingMessageUseCase,
+            checkFinishedChatUploadsUseCase = checkFinishedChatUploadsUseCase,
+            compressPendingMessagesUseCase = compressPendingMessagesUseCase,
+            monitorOngoingActiveTransfersUseCase = monitorOngoingActiveTransfersUseCase,
+            clearPendingMessagesCompressionProgressUseCase = clearPendingMessagesCompressionProgressUseCase,
+            startUploadingAllPendingMessagesUseCase = startUploadingAllPendingMessagesUseCase,
+            monitorPendingMessagesByStateUseCase = monitorPendingMessagesByStateUseCase,
+            prepareAllPendingMessagesUseCase = prepareAllPendingMessagesUseCase,
+            crashReporter = crashReporter,
+            foregroundSetter = setForeground,
             notificationSamplePeriod = 0L,
+            loginMutex = mock()
         )
     }
 
@@ -177,7 +174,6 @@ class ChatUploadsWorkerTest {
         reset(
             context,
             workProgressUpdater,
-            handleTransferEventUseCase,
             areTransfersPausedUseCase,
             getActiveTransferTotalsUseCase,
             overQuotaNotificationBuilder,
@@ -426,7 +422,7 @@ class ChatUploadsWorkerTest {
     }
 
     private suspend fun commonStub(withError: Boolean = false): TransferEvent.TransferFinishEvent {
-        val appData = TransferAppData.ChatUpload(PENDING_MSG_ID)
+        val appData = ChatUpload(PENDING_MSG_ID)
         val transfer = mock<Transfer> {
             on { this.appData } doReturn listOf(appData)
             on { this.nodeHandle } doReturn NODE_ID
@@ -463,5 +459,4 @@ class ChatUploadsWorkerTest {
 }
 
 private const val PENDING_MSG_ID = 16L
-private const val CHAT_ID = 124L
 private const val NODE_ID = 1353L
