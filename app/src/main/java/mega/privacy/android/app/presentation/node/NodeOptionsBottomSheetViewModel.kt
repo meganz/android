@@ -2,6 +2,7 @@ package mega.privacy.android.app.presentation.node
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import dagger.Lazy
 import dagger.hilt.android.lifecycle.HiltViewModel
 import de.palm.composestateevents.consumed
 import de.palm.composestateevents.triggered
@@ -62,12 +63,12 @@ class NodeOptionsBottomSheetViewModel @Inject constructor(
     private val getContactItemFromInShareFolder: DefaultGetContactItemFromInShareFolder,
     private val getOutShareByNodeIdUseCase: GetOutShareByNodeIdUseCase,
     private val getContactFromEmailUseCase: GetContactFromEmailUseCase,
-    @CloudDrive private val cloudDriveBottomSheetOptions: Set<@JvmSuppressWildcards NodeBottomSheetMenuItem<MenuActionWithIcon>>,
-    @RubbishBin private val rubbishBinBottomSheetOptions: Set<@JvmSuppressWildcards NodeBottomSheetMenuItem<MenuActionWithIcon>>,
-    @IncomingShares private val incomingSharesBottomSheetOptions: Set<@JvmSuppressWildcards NodeBottomSheetMenuItem<MenuActionWithIcon>>,
-    @OutgoingShares private val outgoingSharesBottomSheetOptions: Set<@JvmSuppressWildcards NodeBottomSheetMenuItem<MenuActionWithIcon>>,
-    @Links private val linksBottomSheetOptions: Set<@JvmSuppressWildcards NodeBottomSheetMenuItem<MenuActionWithIcon>>,
-    @Backups private val backupsBottomSheetOptions: Set<@JvmSuppressWildcards NodeBottomSheetMenuItem<MenuActionWithIcon>>,
+    @CloudDrive private val cloudDriveBottomSheetOptions: Lazy<Set<@JvmSuppressWildcards NodeBottomSheetMenuItem<MenuActionWithIcon>>>,
+    @RubbishBin private val rubbishBinBottomSheetOptions: Lazy<Set<@JvmSuppressWildcards NodeBottomSheetMenuItem<MenuActionWithIcon>>>,
+    @IncomingShares private val incomingSharesBottomSheetOptions: Lazy<Set<@JvmSuppressWildcards NodeBottomSheetMenuItem<MenuActionWithIcon>>>,
+    @OutgoingShares private val outgoingSharesBottomSheetOptions: Lazy<Set<@JvmSuppressWildcards NodeBottomSheetMenuItem<MenuActionWithIcon>>>,
+    @Links private val linksBottomSheetOptions: Lazy<Set<@JvmSuppressWildcards NodeBottomSheetMenuItem<MenuActionWithIcon>>>,
+    @Backups private val backupsBottomSheetOptions: Lazy<Set<@JvmSuppressWildcards NodeBottomSheetMenuItem<MenuActionWithIcon>>>,
 ) : ViewModel() {
 
     private val _state = MutableStateFlow(NodeBottomSheetState())
@@ -220,6 +221,6 @@ class NodeOptionsBottomSheetViewModel @Inject constructor(
             NodeSourceType.RUBBISH_BIN -> rubbishBinBottomSheetOptions
             NodeSourceType.BACKUPS -> backupsBottomSheetOptions
             else -> cloudDriveBottomSheetOptions
-        }
+        }.get()
 
 }

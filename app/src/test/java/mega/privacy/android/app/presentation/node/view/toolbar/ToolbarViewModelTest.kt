@@ -1,5 +1,6 @@
 package mega.privacy.android.app.presentation.node.view.toolbar
 
+import dagger.Lazy
 import kotlinx.coroutines.runBlocking
 import kotlinx.coroutines.test.runTest
 import mega.privacy.android.app.presentation.node.model.mapper.NodeToolbarActionMapper
@@ -31,21 +32,22 @@ import org.mockito.kotlin.verifyNoInteractions
 import org.mockito.kotlin.whenever
 import java.util.stream.Stream
 
+
 @ExtendWith(CoroutineMainDispatcherExtension::class)
 @TestInstance(TestInstance.Lifecycle.PER_CLASS)
 class ToolbarViewModelTest {
 
     private val nodeToolbarActionMapper = NodeToolbarActionMapper()
-    private val cloudDriveToolbarOptions: Set<@JvmSuppressWildcards NodeToolbarMenuItem<*>> =
-        setOf(DownloadToolbarMenuItem(DownloadMenuAction()))
-    private val incomingSharesToolbarOptions: Set<@JvmSuppressWildcards NodeToolbarMenuItem<*>> =
-        setOf(DownloadToolbarMenuItem(DownloadMenuAction()))
-    private val outgoingSharesToolbarOptions: Set<@JvmSuppressWildcards NodeToolbarMenuItem<*>> =
-        setOf(DownloadToolbarMenuItem(DownloadMenuAction()))
-    private val linksToolbarOptions: Set<@JvmSuppressWildcards NodeToolbarMenuItem<*>> =
-        setOf(DownloadToolbarMenuItem(DownloadMenuAction()))
-    private val rubbishBinToolbarOptions: Set<@JvmSuppressWildcards NodeToolbarMenuItem<*>> =
-        setOf(DownloadToolbarMenuItem(DownloadMenuAction()))
+    private val cloudDriveToolbarOptions: Lazy<Set<@JvmSuppressWildcards NodeToolbarMenuItem<*>>> =
+        Lazy { setOf(DownloadToolbarMenuItem(DownloadMenuAction())) }
+    private val incomingSharesToolbarOptions: Lazy<Set<@JvmSuppressWildcards NodeToolbarMenuItem<*>>> =
+        Lazy { setOf(DownloadToolbarMenuItem(DownloadMenuAction())) }
+    private val outgoingSharesToolbarOptions: Lazy<Set<@JvmSuppressWildcards NodeToolbarMenuItem<*>>> =
+        Lazy { setOf(DownloadToolbarMenuItem(DownloadMenuAction())) }
+    private val linksToolbarOptions: Lazy<Set<@JvmSuppressWildcards NodeToolbarMenuItem<*>>> =
+        Lazy { setOf(DownloadToolbarMenuItem(DownloadMenuAction())) }
+    private val rubbishBinToolbarOptions: Lazy<Set<@JvmSuppressWildcards NodeToolbarMenuItem<*>>> =
+        Lazy { setOf(DownloadToolbarMenuItem(DownloadMenuAction())) }
     private val checkNodeCanBeMovedToTargetNode: CheckNodeCanBeMovedToTargetNode = mock()
     private val getNodeAccessPermission: GetNodeAccessPermission = mock()
     private val getRubbishBinNodeUseCase: GetRubbishNodeUseCase = mock()

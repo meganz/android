@@ -48,12 +48,12 @@ class NodeOptionsBottomSheetViewModelTest {
         whenever(monitorConnectivityUseCase()).thenReturn(flowOf(true))
         viewModel = NodeOptionsBottomSheetViewModel(
             nodeBottomSheetActionMapper = NodeBottomSheetActionMapper(),
-            cloudDriveBottomSheetOptions = emptySet(),
-            rubbishBinBottomSheetOptions = emptySet(),
-            incomingSharesBottomSheetOptions = emptySet(),
-            outgoingSharesBottomSheetOptions = emptySet(),
-            linksBottomSheetOptions = emptySet(),
-            backupsBottomSheetOptions = emptySet(),
+            cloudDriveBottomSheetOptions = { emptySet() },
+            rubbishBinBottomSheetOptions = { emptySet() },
+            incomingSharesBottomSheetOptions = { emptySet() },
+            outgoingSharesBottomSheetOptions = { emptySet() },
+            linksBottomSheetOptions = { emptySet() },
+            backupsBottomSheetOptions = { emptySet() },
             getNodeAccessPermission = getNodeAccessPermission,
             isNodeInRubbishBinUseCase = isNodeInRubbishBinUseCase,
             isNodeInBackupsUseCase = isNodeInBackupsUseCase,

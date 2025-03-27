@@ -2,6 +2,7 @@ package mega.privacy.android.app.presentation.node.view.toolbar
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import dagger.Lazy
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
@@ -14,9 +15,9 @@ import mega.privacy.android.app.di.ui.toolbaritem.qualifier.OutgoingShares
 import mega.privacy.android.app.di.ui.toolbaritem.qualifier.RubbishBin
 import mega.privacy.android.app.presentation.node.model.mapper.NodeToolbarActionMapper
 import mega.privacy.android.app.presentation.node.model.toolbarmenuitems.NodeToolbarMenuItem
+import mega.privacy.android.domain.entity.node.NodeSourceType
 import mega.privacy.android.domain.entity.node.TypedNode
 import mega.privacy.android.domain.entity.node.UnTypedNode
-import mega.privacy.android.domain.entity.node.NodeSourceType
 import mega.privacy.android.domain.entity.shares.AccessPermission
 import mega.privacy.android.domain.usecase.CheckNodeCanBeMovedToTargetNode
 import mega.privacy.android.domain.usecase.GetRubbishNodeUseCase
@@ -40,11 +41,11 @@ import javax.inject.Inject
  */
 @HiltViewModel
 class NodeToolbarViewModel @Inject constructor(
-    @CloudDrive private val cloudDriveToolbarOptions: Set<@JvmSuppressWildcards NodeToolbarMenuItem<*>>,
-    @IncomingShares private val incomingSharesToolbarOptions: Set<@JvmSuppressWildcards NodeToolbarMenuItem<*>>,
-    @OutgoingShares private val outgoingSharesToolbarOptions: Set<@JvmSuppressWildcards NodeToolbarMenuItem<*>>,
-    @Links private val linksToolbarOptions: Set<@JvmSuppressWildcards NodeToolbarMenuItem<*>>,
-    @RubbishBin private val rubbishBinToolbarOptions: Set<@JvmSuppressWildcards NodeToolbarMenuItem<*>>,
+    @CloudDrive private val cloudDriveToolbarOptions: Lazy<Set<@JvmSuppressWildcards NodeToolbarMenuItem<*>>>,
+    @IncomingShares private val incomingSharesToolbarOptions: Lazy<Set<@JvmSuppressWildcards NodeToolbarMenuItem<*>>>,
+    @OutgoingShares private val outgoingSharesToolbarOptions: Lazy<Set<@JvmSuppressWildcards NodeToolbarMenuItem<*>>>,
+    @Links private val linksToolbarOptions: Lazy<Set<@JvmSuppressWildcards NodeToolbarMenuItem<*>>>,
+    @RubbishBin private val rubbishBinToolbarOptions: Lazy<Set<@JvmSuppressWildcards NodeToolbarMenuItem<*>>>,
     private val nodeToolbarActionMapper: NodeToolbarActionMapper,
     private val getRubbishNodeUseCase: GetRubbishNodeUseCase,
     private val isNodeInBackupsUseCase: IsNodeInBackupsUseCase,
@@ -126,7 +127,7 @@ class NodeToolbarViewModel @Inject constructor(
         NodeSourceType.LINKS -> linksToolbarOptions
         NodeSourceType.RUBBISH_BIN -> rubbishBinToolbarOptions
         else -> cloudDriveToolbarOptions
-    }
+    }.get()
 
     private suspend fun canNodeBeMovedToRubbishBin(
         selectedNodes: Set<TypedNode>,
