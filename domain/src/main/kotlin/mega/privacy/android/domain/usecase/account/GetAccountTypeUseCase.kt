@@ -13,5 +13,5 @@ class GetAccountTypeUseCase @Inject constructor(
     /**
      * Invoke
      */
-    suspend operator fun invoke(): AccountType = accountRepository.getAccountType()
+    operator fun invoke(): AccountType = accountRepository.getAccountType()
 }

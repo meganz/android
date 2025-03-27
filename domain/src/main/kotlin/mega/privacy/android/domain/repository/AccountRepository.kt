@@ -441,7 +441,7 @@ interface AccountRepository {
     /**
      * Get user account type
      */
-    suspend fun getAccountType(): AccountType
+    fun getAccountType(): AccountType
 
     /**
      * Reconnect and retry all transfers.

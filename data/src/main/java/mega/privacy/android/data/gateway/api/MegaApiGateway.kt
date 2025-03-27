@@ -3762,4 +3762,16 @@ interface MegaApiGateway {
      * @param listener MegaRequestListener to track this request
      */
     fun setRubbishBinAutopurgePeriod(days: Int, listener: MegaRequestListenerInterface)
+
+    /**
+     * Check if server-side Rubbish Bin autopurging is enabled for the current account
+     * <p>
+     * This function will NOT return a valid value until the callback onEvent with
+     * type MegaApi::EVENT_MISC_FLAGS_READY is received. You can also rely on the completion of
+     * a fetchNodes to check this value, but only when it follows a login with user and password,
+     * not when an existing session is resumed.
+     *
+     * @return True if this feature is enabled. Otherwise false.
+     */
+    suspend fun serverSideRubbishBinAutopurgeEnabled(): Boolean
 }

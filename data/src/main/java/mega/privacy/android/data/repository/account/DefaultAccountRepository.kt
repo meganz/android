@@ -886,8 +886,8 @@ internal class DefaultAccountRepository @Inject constructor(
 
     override suspend fun broadcastRefreshSession() = appEventGateway.broadcastRefreshSession()
 
-    override suspend fun getAccountType(): AccountType =
-        accountTypeMapper(myAccountInfoFacade.accountTypeId) ?: AccountType.UNKNOWN
+    override fun getAccountType(): AccountType =
+        accountTypeMapper(myAccountInfoFacade.accountTypeId)
 
     override suspend fun reconnect() = withContext(ioDispatcher) {
         Timber.d("Reconnect...")

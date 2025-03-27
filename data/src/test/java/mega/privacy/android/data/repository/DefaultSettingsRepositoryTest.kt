@@ -447,4 +447,13 @@ internal class DefaultSettingsRepositoryTest {
             underTest.getRubbishBinAutopurgePeriod()
         }
     }
+
+    @ParameterizedTest(name = "expected: {0}")
+    @ValueSource(booleans = [true, false])
+    fun `test that isRubbishBinAutopurgeEnabled returns the correct value from the gateway`(
+        expected: Boolean,
+    ) = runTest {
+        whenever(megaApiGateway.serverSideRubbishBinAutopurgeEnabled()).thenReturn(expected)
+        assertThat(underTest.isRubbishBinAutopurgeEnabled()).isEqualTo(expected)
+    }
 }

@@ -636,6 +636,10 @@ internal class DefaultSettingsRepository @Inject constructor(
         }
     }
 
+    override suspend fun isRubbishBinAutopurgeEnabled(): Boolean = withContext(ioDispatcher) {
+        megaApiGateway.serverSideRubbishBinAutopurgeEnabled()
+    }
+
     companion object {
         private const val DAYS_USER_FREE = 30
         private const val DAYS_USER_PRO = 90

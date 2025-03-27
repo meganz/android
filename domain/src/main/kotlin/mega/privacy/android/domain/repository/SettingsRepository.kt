@@ -502,4 +502,9 @@ interface SettingsRepository {
      * @param days
      */
     suspend fun setRubbishBinAutopurgePeriod(days: Int)
+
+    /**
+     * is rubbish bin auto purge enabled
+     */
+    suspend fun isRubbishBinAutopurgeEnabled(): Boolean
 }
