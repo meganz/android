@@ -3,12 +3,15 @@ package mega.privacy.android.app.fragments.homepage.banner
 import android.content.Context
 import android.content.Intent
 import android.net.Uri
+import mega.privacy.android.analytics.Analytics
 import mega.privacy.android.app.activities.WebViewActivity
 import mega.privacy.android.app.fragments.homepage.main.HomepageFragment
 import mega.privacy.android.app.main.ManagerActivity
 import mega.privacy.android.app.presentation.achievements.AchievementsFeatureActivity
 import mega.privacy.android.app.presentation.settings.SettingsActivity
 import mega.privacy.android.app.utils.LinksUtil
+import mega.privacy.mobile.analytics.event.PwmSmartBannerItemSelectedEvent
+import mega.privacy.mobile.analytics.event.VpnSmartBannerItemSelectedEvent
 
 /**
  * Take actions when the user clicking on a banner
@@ -39,10 +42,12 @@ class BannerClickHandler(private val fragment: HomepageFragment) :
             }
 
             link.startsWith(MEGA_VPN) -> {
+                Analytics.tracker.trackEvent(VpnSmartBannerItemSelectedEvent)
                 openInSpecificApp(context, link, MEGA_VPN_PACKAGE)
             }
 
             link.startsWith(MEGA_PASS) -> {
+                Analytics.tracker.trackEvent(PwmSmartBannerItemSelectedEvent)
                 openInSpecificApp(context, link, MEGA_PASS_PACKAGE)
             }
 

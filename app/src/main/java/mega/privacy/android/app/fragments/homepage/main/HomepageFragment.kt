@@ -63,6 +63,7 @@ import mega.privacy.mobile.analytics.event.HomeScreenSearchMenuToolbarEvent
 import mega.privacy.mobile.analytics.event.HomeScreenVideosTilePressedEvent
 import mega.privacy.mobile.analytics.event.OfflineTabEvent
 import mega.privacy.mobile.analytics.event.RecentsTabEvent
+import mega.privacy.mobile.analytics.event.SmartBannerSwipeEvent
 import nz.mega.sdk.MegaChatApiJava.MEGACHAT_INVALID_HANDLE
 import javax.inject.Inject
 
@@ -433,6 +434,14 @@ class HomepageFragment : Fragment() {
                 ContextCompat.getColor(requireContext(), R.color.white)
             )
             .setOnPageClickListener(null)
+            .registerOnPageChangeCallback(
+                object : ViewPager2.OnPageChangeCallback() {
+                    override fun onPageSelected(position: Int) {
+                        super.onPageSelected(position)
+                        Analytics.tracker.trackEvent(SmartBannerSwipeEvent)
+                    }
+                }
+            )
             .setAdapter(bannerAdapter)
             .create()
 
