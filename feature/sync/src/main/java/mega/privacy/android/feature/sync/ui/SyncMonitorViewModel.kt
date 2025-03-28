@@ -112,7 +112,6 @@ class SyncMonitorViewModel @Inject constructor(
                         )
                     )
                 }
-                    .distinctUntilChanged()
                     .collect { (batteryInfo, connectionDetails) ->
                         val (connectedToInternet, syncByWifi) = connectionDetails
                         updateSyncState(connectedToInternet, syncByWifi, batteryInfo)

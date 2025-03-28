@@ -39,6 +39,7 @@ import mega.privacy.android.domain.usecase.camerauploads.MonitorCameraUploadsSet
 import mega.privacy.android.domain.usecase.camerauploads.MonitorCameraUploadsStatusInfoUseCase
 import mega.privacy.android.domain.usecase.environment.GetBatteryInfoUseCase
 import mega.privacy.android.domain.usecase.environment.MonitorBatteryInfoUseCase
+import mega.privacy.android.domain.usecase.network.MonitorConnectivityUseCase
 import mega.privacy.android.domain.usecase.node.MonitorNodeUpdatesUseCase
 import mega.privacy.android.domain.usecase.node.MoveDeconfiguredBackupNodesUseCase
 import mega.privacy.android.domain.usecase.node.RemoveDeconfiguredBackupNodesUseCase
@@ -89,6 +90,7 @@ internal class SyncFoldersViewModel @Inject constructor(
     private val monitorNodeUpdatesUseCase: MonitorNodeUpdatesUseCase,
     private val getPrimarySyncHandleUseCase: GetPrimarySyncHandleUseCase,
     private val getSecondarySyncHandleUseCase: GetSecondarySyncHandleUseCase,
+    private val monitorConnectivityUseCase: MonitorConnectivityUseCase,
 ) : ViewModel() {
 
     private val _uiState = MutableStateFlow(SyncFoldersUiState(emptyList()))
@@ -136,6 +138,14 @@ internal class SyncFoldersViewModel @Inject constructor(
                     updatedNodes.changes.keys.find {
                         handles.contains(it.id.longValue)
                     }?.run { loadSyncs() }
+                }
+        }
+
+        viewModelScope.launch {
+            monitorConnectivityUseCase()
+                .catch { Timber.e(it) }
+                .collect {
+                    onSyncRefresh()
                 }
         }
     }

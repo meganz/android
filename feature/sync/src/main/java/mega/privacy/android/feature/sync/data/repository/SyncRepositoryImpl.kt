@@ -62,7 +62,7 @@ internal class SyncRepositoryImpl @Inject constructor(
         name: String?,
         localPath: String,
         remoteFolderId: Long,
-    ): Boolean = withContext(ioDispatcher) {
+    ): Long? = withContext(ioDispatcher) {
         syncGateway.syncFolderPair(
             syncType = syncTypeMapper(syncType),
             name = name,

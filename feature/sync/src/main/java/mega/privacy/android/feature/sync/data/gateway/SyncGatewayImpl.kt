@@ -63,14 +63,14 @@ internal class SyncGatewayImpl @Inject constructor(
         name: String?,
         localPath: String,
         remoteFolderId: Long,
-    ): Boolean =
+    ): Long? =
         suspendCancellableCoroutine { continuation ->
             val requestListener = OptionalMegaRequestListenerInterface(
-                onRequestFinish = { _: MegaRequest, error: MegaError ->
+                onRequestFinish = { request: MegaRequest, error: MegaError ->
                     if (error.errorCode == MegaError.API_OK) {
-                        continuation.resumeWith(Result.success(true))
+                        continuation.resumeWith(Result.success(request.parentHandle))
                     } else {
-                        continuation.resumeWith(Result.success(false))
+                        continuation.resumeWith(Result.success(null))
                     }
                 }
             )

@@ -17,18 +17,18 @@ interface SyncRepository {
     /**
      * Establishes a pair between local and remote directories and starts the syncing process
      *
-     * @param syncType - sync type of the folder pair
-     * @param name - name of the folder pair
-     * @param localPath - local path on the device
-     * @param remoteFolderId - MEGA folder handle
-     * @return Boolean - indicates whether the folder was set up successfully or not
+     * @param syncType Sync type of the folder pair
+     * @param name Name of the folder pair
+     * @param localPath Local path on the device
+     * @param remoteFolderId MEGA folder handle
+     * @return The backup ID in case of folder pair was set up successfully or null otherwise
      */
     suspend fun setupFolderPair(
         syncType: SyncType,
         name: String?,
         localPath: String,
         remoteFolderId: Long,
-    ): Boolean
+    ): Long?
 
     /**
      * Returns all setup folder pairs.

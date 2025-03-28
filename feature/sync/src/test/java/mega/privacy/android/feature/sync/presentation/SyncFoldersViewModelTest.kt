@@ -34,6 +34,7 @@ import mega.privacy.android.domain.usecase.camerauploads.MonitorCameraUploadsSet
 import mega.privacy.android.domain.usecase.camerauploads.MonitorCameraUploadsStatusInfoUseCase
 import mega.privacy.android.domain.usecase.environment.GetBatteryInfoUseCase
 import mega.privacy.android.domain.usecase.environment.MonitorBatteryInfoUseCase
+import mega.privacy.android.domain.usecase.network.MonitorConnectivityUseCase
 import mega.privacy.android.domain.usecase.node.MonitorNodeUpdatesUseCase
 import mega.privacy.android.domain.usecase.node.MoveDeconfiguredBackupNodesUseCase
 import mega.privacy.android.domain.usecase.node.RemoveDeconfiguredBackupNodesUseCase
@@ -102,6 +103,7 @@ class SyncFoldersViewModelTest {
     private val monitorNodeUpdatesUseCase: MonitorNodeUpdatesUseCase = mock()
     private val getPrimarySyncHandleUseCase: GetPrimarySyncHandleUseCase = mock()
     private val getSecondarySyncHandleUseCase: GetSecondarySyncHandleUseCase = mock()
+    private val monitorConnectivityUseCase: MonitorConnectivityUseCase = mock()
     private lateinit var underTest: SyncFoldersViewModel
 
     private val folderPairs = listOf(
@@ -208,6 +210,7 @@ class SyncFoldersViewModelTest {
             monitorNodeUpdatesUseCase,
             getPrimarySyncHandleUseCase,
             getSecondarySyncHandleUseCase,
+            monitorConnectivityUseCase,
         )
     }
 
@@ -463,6 +466,7 @@ class SyncFoldersViewModelTest {
             monitorNodeUpdatesUseCase = monitorNodeUpdatesUseCase,
             getPrimarySyncHandleUseCase = getPrimarySyncHandleUseCase,
             getSecondarySyncHandleUseCase = getSecondarySyncHandleUseCase,
+            monitorConnectivityUseCase = monitorConnectivityUseCase,
         )
     }
 }
