@@ -47,6 +47,7 @@ import mega.privacy.android.app.presentation.changepassword.ChangePasswordActivi
 import mega.privacy.android.app.presentation.extensions.canBeHandled
 import mega.privacy.android.app.presentation.extensions.isDarkMode
 import mega.privacy.android.app.presentation.extensions.parcelable
+import mega.privacy.android.app.presentation.extensions.serializable
 import mega.privacy.android.app.presentation.filelink.FileLinkComposeActivity
 import mega.privacy.android.app.presentation.folderlink.FolderLinkComposeActivity
 import mega.privacy.android.app.presentation.login.LoginViewModel.Companion.ACTION_FORCE_RELOAD_ACCOUNT
@@ -262,10 +263,7 @@ class LoginFragment : Fragment() {
                     val accountBlockedString =
                         intent.getStringExtra(Constants.ACCOUNT_BLOCKED_STRING)
                     val accountBlockedType: AccountBlockedType? =
-                        intent.getSerializableExtra(
-                            Constants.ACCOUNT_BLOCKED_TYPE,
-                            AccountBlockedType::class.java
-                        )
+                        intent.serializable(Constants.ACCOUNT_BLOCKED_TYPE)
 
                     if (accountBlockedString != null && accountBlockedType != null && !TextUtil.isTextEmpty(
                             accountBlockedString
