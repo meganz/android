@@ -1,169 +1,166 @@
 <?xml version="1.0" encoding="utf-8"?>
-<layout xmlns:android="http://schemas.android.com/apk/res/android"
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
-    xmlns:tools="http://schemas.android.com/tools">
+    xmlns:tools="http://schemas.android.com/tools"
+    android:id="@+id/manage_transfer_bottom_sheet"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:orientation="vertical">
 
-    <LinearLayout
-        android:id="@+id/manage_transfer_bottom_sheet"
+    <androidx.constraintlayout.widget.ConstraintLayout
+        android:id="@+id/manage_transfer_title_layout"
         android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:orientation="vertical">
+        android:layout_height="72dp"
+        android:layout_gravity="center_vertical">
 
-        <androidx.constraintlayout.widget.ConstraintLayout
-            android:id="@+id/manage_transfer_title_layout"
-            android:layout_width="match_parent"
-            android:layout_height="72dp"
-            android:layout_gravity="center_vertical">
+        <FrameLayout
+            android:id="@+id/manage_transfer_thumbnail_layout"
+            android:layout_width="48dp"
+            android:layout_height="48dp"
+            android:layout_marginStart="16dp"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="parent">
 
-            <FrameLayout
-                android:id="@+id/manage_transfer_thumbnail_layout"
-                android:layout_width="48dp"
-                android:layout_height="48dp"
-                android:layout_marginStart="16dp"
-                app:layout_constraintBottom_toBottomOf="parent"
-                app:layout_constraintStart_toStartOf="parent"
-                app:layout_constraintTop_toTopOf="parent">
+            <ImageView
+                android:id="@+id/manage_transfer_thumbnail"
+                android:layout_width="40dp"
+                android:layout_height="40dp"
+                android:layout_gravity="center"
+                android:scaleType="centerCrop" />
 
-                <ImageView
-                    android:id="@+id/manage_transfer_thumbnail"
-                    android:layout_width="40dp"
-                    android:layout_height="40dp"
-                    android:layout_gravity="center"
-                    android:scaleType="centerCrop" />
+            <ImageView
+                android:id="@+id/manage_transfer_small_icon"
+                android:layout_width="21dp"
+                android:layout_height="21dp"
+                android:layout_gravity="end"
+                android:src="@drawable/ic_download_transfers" />
+        </FrameLayout>
 
-                <ImageView
-                    android:id="@+id/manage_transfer_small_icon"
-                    android:layout_width="21dp"
-                    android:layout_height="21dp"
-                    android:layout_gravity="end"
-                    android:src="@drawable/ic_download_transfers" />
-            </FrameLayout>
+        <TextView
+            android:id="@+id/manage_transfer_filename"
+            style="@style/textAppearanceSubtitle1"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="12dp"
+            android:ellipsize="middle"
+            android:singleLine="true"
+            app:layout_constraintBottom_toTopOf="@+id/manage_transfer_completed_layout"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toEndOf="@+id/manage_transfer_thumbnail_layout"
+            app:layout_constraintTop_toTopOf="parent"
+            app:layout_constraintVertical_chainStyle="packed"
+            tools:text="File Name" />
+
+        <LinearLayout
+            android:id="@+id/manage_transfer_completed_layout"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:gravity="center_vertical"
+            android:orientation="horizontal"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="@+id/manage_transfer_filename"
+            app:layout_constraintTop_toBottomOf="@+id/manage_transfer_filename">
+
+            <ImageView
+                android:id="@+id/manage_transfer_completed_image"
+                android:layout_width="wrap_content"
+                android:layout_height="25dp"
+                android:layout_marginEnd="4dp"
+                android:src="@drawable/ic_transfers_completed" />
 
             <TextView
-                android:id="@+id/manage_transfer_filename"
-                style="@style/textAppearanceSubtitle1"
+                android:id="@+id/manage_transfer_location"
                 android:layout_width="0dp"
                 android:layout_height="wrap_content"
-                android:layout_marginStart="12dp"
+                android:layout_marginEnd="13dp"
+                android:layout_weight="1"
                 android:ellipsize="middle"
                 android:singleLine="true"
-                app:layout_constraintBottom_toTopOf="@+id/manage_transfer_completed_layout"
-                app:layout_constraintEnd_toEndOf="parent"
-                app:layout_constraintStart_toEndOf="@+id/manage_transfer_thumbnail_layout"
-                app:layout_constraintTop_toTopOf="parent"
-                app:layout_constraintVertical_chainStyle="packed"
-                tools:text="File Name" />
+                android:textAppearance="@style/TextAppearance.Mega.Body2.Secondary"
+                tools:text="Mega Download/file.txt" />
+        </LinearLayout>
+    </androidx.constraintlayout.widget.ConstraintLayout>
 
-            <LinearLayout
-                android:id="@+id/manage_transfer_completed_layout"
-                android:layout_width="0dp"
-                android:layout_height="wrap_content"
-                android:gravity="center_vertical"
-                android:orientation="horizontal"
-                app:layout_constraintBottom_toBottomOf="parent"
-                app:layout_constraintEnd_toEndOf="parent"
-                app:layout_constraintStart_toStartOf="@+id/manage_transfer_filename"
-                app:layout_constraintTop_toBottomOf="@+id/manage_transfer_filename">
+    <View
+        android:layout_width="match_parent"
+        android:layout_height="1dp"
+        android:layout_marginStart="16dp"
+        android:background="@color/grey_012_white_012" />
 
-                <ImageView
-                    android:id="@+id/manage_transfer_completed_image"
-                    android:layout_width="wrap_content"
-                    android:layout_height="25dp"
-                    android:layout_marginEnd="4dp"
-                    android:src="@drawable/ic_transfers_completed" />
+    <androidx.core.widget.NestedScrollView
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:scrollbars="vertical">
 
-                <TextView
-                    android:id="@+id/manage_transfer_location"
-                    android:layout_width="0dp"
-                    android:layout_height="wrap_content"
-                    android:layout_marginEnd="13dp"
-                    android:layout_weight="1"
-                    android:ellipsize="middle"
-                    android:singleLine="true"
-                    android:textAppearance="@style/TextAppearance.Mega.Body2.Secondary"
-                    tools:text="Mega Download/file.txt" />
-            </LinearLayout>
-        </androidx.constraintlayout.widget.ConstraintLayout>
-
-        <View
-            android:layout_width="match_parent"
-            android:layout_height="1dp"
-            android:layout_marginStart="16dp"
-            android:background="@color/grey_012_white_012" />
-
-        <androidx.core.widget.NestedScrollView
+        <LinearLayout
+            android:id="@+id/item_list_bottom_sheet_contact_file"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:scrollbars="vertical">
+            android:orientation="vertical">
 
-            <LinearLayout
-                android:id="@+id/item_list_bottom_sheet_contact_file"
+            <!-- Options -->
+            <TextView
+                android:id="@+id/option_view"
+                style="@style/BottomSheetOption"
+                android:text="@string/view_in_folder_label"
+                app:drawableStartCompat="@drawable/ic_search_large_medium_regular_outline" />
+
+            <View
+                android:id="@+id/separator_open_with"
                 android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:orientation="vertical">
+                android:layout_height="1dp"
+                android:layout_marginStart="72dp"
+                android:background="@color/grey_012_white_012" />
 
-                <!-- Options -->
-                <TextView
-                    android:id="@+id/option_view"
-                    style="@style/BottomSheetOption"
-                    android:text="@string/view_in_folder_label"
-                    app:drawableStartCompat="@drawable/ic_search_large_medium_regular_outline" />
+            <TextView
+                android:id="@+id/option_open_with"
+                style="@style/BottomSheetOption"
+                android:text="@string/external_play"
+                app:drawableStartCompat="@drawable/ic_external_link_medium_regular_outline" />
 
-                <View
-                    android:id="@+id/separator_open_with"
-                    android:layout_width="match_parent"
-                    android:layout_height="1dp"
-                    android:layout_marginStart="72dp"
-                    android:background="@color/grey_012_white_012" />
+            <View
+                android:id="@+id/separator_get_link"
+                android:layout_width="match_parent"
+                android:layout_height="1dp"
+                android:layout_marginStart="72dp"
+                android:background="@color/grey_012_white_012" />
 
-                <TextView
-                    android:id="@+id/option_open_with"
-                    style="@style/BottomSheetOption"
-                    android:text="@string/external_play"
-                    app:drawableStartCompat="@drawable/ic_external_link_medium_regular_outline" />
+            <TextView
+                android:id="@+id/option_get_link"
+                style="@style/BottomSheetOption"
+                android:text="@{@plurals/label_share_links(1)}"
+                app:drawableStartCompat="@drawable/ic_link01_medium_regular_outline" />
 
-                <View
-                    android:id="@+id/separator_get_link"
-                    android:layout_width="match_parent"
-                    android:layout_height="1dp"
-                    android:layout_marginStart="72dp"
-                    android:background="@color/grey_012_white_012" />
+            <View
+                android:id="@+id/separator_retry"
+                android:layout_width="match_parent"
+                android:layout_height="1dp"
+                android:layout_marginStart="72dp"
+                android:background="@color/grey_012_white_012" />
 
-                <TextView
-                    android:id="@+id/option_get_link"
-                    style="@style/BottomSheetOption"
-                    android:text="@{@plurals/label_share_links(1)}"
-                    app:drawableStartCompat="@drawable/ic_link01_medium_regular_outline" />
+            <TextView
+                android:id="@+id/option_retry"
+                style="@style/BottomSheetOption"
+                android:text="@string/general_retry"
+                app:drawableStartCompat="@drawable/ic_rotate_ccw_medium_regular_outline" />
 
-                <View
-                    android:id="@+id/separator_retry"
-                    android:layout_width="match_parent"
-                    android:layout_height="1dp"
-                    android:layout_marginStart="72dp"
-                    android:background="@color/grey_012_white_012" />
+            <View
+                android:id="@+id/separator_clear"
+                android:layout_width="match_parent"
+                android:layout_height="1dp"
+                android:layout_marginStart="72dp"
+                android:background="@color/grey_012_white_012" />
 
-                <TextView
-                    android:id="@+id/option_retry"
-                    style="@style/BottomSheetOption"
-                    android:text="@string/general_retry"
-                    app:drawableStartCompat="@drawable/ic_rotate_ccw_medium_regular_outline" />
+            <TextView
+                android:id="@+id/option_clear"
+                style="@style/BottomSheetOption.Red"
+                android:text="@string/general_clear"
+                app:drawableStartCompat="@drawable/ic_x_medium_regular_outline" />
+        </LinearLayout>
 
-                <View
-                    android:id="@+id/separator_clear"
-                    android:layout_width="match_parent"
-                    android:layout_height="1dp"
-                    android:layout_marginStart="72dp"
-                    android:background="@color/grey_012_white_012" />
+    </androidx.core.widget.NestedScrollView>
 
-                <TextView
-                    android:id="@+id/option_clear"
-                    style="@style/BottomSheetOption.Red"
-                    android:text="@string/general_clear"
-                    app:drawableStartCompat="@drawable/ic_x_medium_regular_outline" />
-            </LinearLayout>
+</LinearLayout>
 
-        </androidx.core.widget.NestedScrollView>
-
-    </LinearLayout>
-
-</layout>
