@@ -229,4 +229,26 @@ internal class SyncNotificationRepositoryImplTest {
 
             assertThat(result).isEqualTo(notificationMessage)
         }
+
+    @ParameterizedTest
+    @EnumSource(SyncNotificationType::class)
+    fun `test that getDisplayedNotificationsIdsByType returns notification ID`(
+        notificationType: SyncNotificationType,
+    ) =
+        runTest {
+            val notificationId = 1234
+            val notificationEntities = listOf(
+                SyncShownNotificationEntity(
+                    notificationId = notificationId,
+                    notificationType = notificationType.name,
+                )
+            )
+            whenever(syncNotificationGateway.getNotificationByType(notificationType.name)).thenReturn(
+                notificationEntities
+            )
+
+            val result = underTest.getDisplayedNotificationsIdsByType(notificationType)
+
+            assertThat(result.first()).isEqualTo(notificationId)
+        }
 }

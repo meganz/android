@@ -65,4 +65,10 @@ internal class SyncNotificationRepositoryImpl @Inject constructor(
         stalledIssuesToNotificationMessageMapper(
             issuePath = syncsWithStalledIssues.first()
                 .let { it.localPaths.firstOrNull() ?: it.nodeNames.first() })
+
+    override suspend fun getDisplayedNotificationsIdsByType(type: SyncNotificationType): List<Int> =
+        withContext(ioDispatcher) {
+            syncNotificationGateway.getNotificationByType(type.name)
+                .mapNotNull { it.notificationId }
+        }
 }

@@ -57,4 +57,10 @@ interface SyncNotificationRepository {
      * @return the sync stalled issues notification message
      */
     suspend fun getSyncStalledIssuesNotification(syncsWithStalledIssues: List<StalledIssue>): SyncNotificationMessage
+
+    /**
+     * Get the displayed notifications IDs by [SyncNotificationType]
+     * @return all the IDs of the displayed notifications of a specific type
+     */
+    suspend fun getDisplayedNotificationsIdsByType(type: SyncNotificationType): List<Int>
 }

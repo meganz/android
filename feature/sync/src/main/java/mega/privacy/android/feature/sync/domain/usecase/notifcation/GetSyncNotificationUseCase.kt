@@ -9,6 +9,7 @@ import mega.privacy.android.feature.sync.domain.entity.SyncNotificationType.BATT
 import mega.privacy.android.feature.sync.domain.entity.SyncNotificationType.STALLED_ISSUE
 import mega.privacy.android.feature.sync.domain.entity.SyncNotificationType.NOT_CONNECTED_TO_WIFI
 import mega.privacy.android.feature.sync.domain.repository.SyncNotificationRepository
+import mega.privacy.android.feature.sync.ui.notification.SyncNotificationManager
 import javax.inject.Inject
 
 /**
@@ -17,6 +18,7 @@ import javax.inject.Inject
  */
 class GetSyncNotificationUseCase @Inject constructor(
     private val syncNotificationRepository: SyncNotificationRepository,
+    private val syncNotificationManager: SyncNotificationManager,
 ) {
 
     /**
@@ -75,18 +77,34 @@ class GetSyncNotificationUseCase @Inject constructor(
     }
 
     private suspend fun resetBatteryLowNotification() {
+        syncNotificationRepository.getDisplayedNotificationsIdsByType(BATTERY_LOW)
+            .forEach { notificationId ->
+                syncNotificationManager.cancelNotification(notificationId = notificationId)
+            }
         syncNotificationRepository.deleteDisplayedNotificationByType(BATTERY_LOW)
     }
 
     private suspend fun resetNetworkConstraintNotification() {
+        syncNotificationRepository.getDisplayedNotificationsIdsByType(NOT_CONNECTED_TO_WIFI)
+            .forEach { notificationId ->
+                syncNotificationManager.cancelNotification(notificationId = notificationId)
+            }
         syncNotificationRepository.deleteDisplayedNotificationByType(NOT_CONNECTED_TO_WIFI)
     }
 
     private suspend fun resetSyncErrorsNotification() {
+        syncNotificationRepository.getDisplayedNotificationsIdsByType(ERROR)
+            .forEach { notificationId ->
+                syncNotificationManager.cancelNotification(notificationId = notificationId)
+            }
         syncNotificationRepository.deleteDisplayedNotificationByType(ERROR)
     }
 
     private suspend fun resetSyncStalledIssuesNotification() {
+        syncNotificationRepository.getDisplayedNotificationsIdsByType(STALLED_ISSUE)
+            .forEach { notificationId ->
+                syncNotificationManager.cancelNotification(notificationId = notificationId)
+            }
         syncNotificationRepository.deleteDisplayedNotificationByType(STALLED_ISSUE)
 
     }
