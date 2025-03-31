@@ -100,9 +100,15 @@ interface MegaLocalRoomGateway {
      * Find contact by email
      *
      * @param email
-     * @return
      */
     suspend fun getContactByEmail(email: String?): Contact?
+
+    /**
+     * Monitor contact by email
+     *
+     * @param email
+     */
+    fun monitorContactByEmail(email: String): Flow<Contact?>
 
     /**
      * Clear contacts

@@ -115,6 +115,13 @@ class ContactDaoTest {
     }
 
     @Test
+    fun test_that_null_is_returned_if_no_user_exists() = runTest {
+        contactDao.monitorContactByEmail("email.nonexists.com").test {
+            assertThat(awaitItem()).isNull()
+        }
+    }
+
+    @Test
     fun test_that_updates_to_a_contact_is_reflected_in_monitor_contact() = runTest {
         val handle = "handle"
         val contact = ContactEntity(
@@ -131,6 +138,27 @@ class ContactDaoTest {
             assertThat(awaitItem()).isEqualTo(contact)
             contactDao.insertOrUpdateContact(contact.copy(nickName = expectedNickname))
             assertThat(awaitItem().nickName).isEqualTo(expectedNickname)
+        }
+    }
+
+    @Test
+    fun test_that_updates_to_a_contact_is_reflected_in_monitor_contact_by_email() = runTest {
+        val handle = "handle"
+        val mail = "lh@mega.co.nz"
+        val contact = ContactEntity(
+            handle = handle,
+            mail = mail,
+            nickName = "Jayce",
+            firstName = "Hai",
+            lastName = "Luong"
+        )
+        contactDao.insertOrUpdateContact(contact)
+        val expectedNickname = "UberDevMeister"
+
+        contactDao.monitorContactByEmail(mail).test {
+            assertThat(awaitItem()).isEqualTo(contact)
+            contactDao.insertOrUpdateContact(contact.copy(nickName = expectedNickname))
+            assertThat(awaitItem()?.nickName).isEqualTo(expectedNickname)
         }
     }
 }

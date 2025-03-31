@@ -1026,4 +1026,8 @@ internal class DefaultContactsRepository @Inject constructor(
     override fun monitorContactByHandle(contactId: Long): Flow<Contact> =
         megaLocalRoomGateway.monitorContactByHandle(contactId)
             .flowOn(ioDispatcher)
+
+    override fun monitorContactByEmail(email: String): Flow<Contact?> =
+        megaLocalRoomGateway.monitorContactByEmail(email)
+            .flowOn(ioDispatcher)
 }

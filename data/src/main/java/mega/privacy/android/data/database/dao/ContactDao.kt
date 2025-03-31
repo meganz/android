@@ -24,6 +24,9 @@ internal interface ContactDao {
     @Query("SELECT * FROM contacts WHERE handle = :handle")
     fun monitorContactByHandle(handle: String?): Flow<ContactEntity>
 
+    @Query("SELECT * FROM contacts WHERE mail = :mail")
+    fun monitorContactByEmail(mail: String): Flow<ContactEntity?>
+
     @Query("DELETE FROM contacts")
     suspend fun deleteAllContact()
 

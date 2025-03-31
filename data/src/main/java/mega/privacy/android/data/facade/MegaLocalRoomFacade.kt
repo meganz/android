@@ -154,6 +154,17 @@ internal class MegaLocalRoomFacade @Inject constructor(
     override suspend fun getContactByEmail(email: String?): Contact? =
         contactDao.get().getContactByEmail(encryptData(email))?.let { contactModelMapper(it) }
 
+
+    override fun monitorContactByEmail(email: String): Flow<Contact?> =
+        flow {
+            val encryptedEmail = encryptData(email)
+            encryptedEmail?.let {
+                emitAll(
+                    contactDao.get().monitorContactByEmail(it)
+                )
+            }
+        }.map { it?.let { entity -> contactModelMapper(entity) } }
+
     override suspend fun deleteAllContacts() = contactDao.get().deleteAllContact()
 
     override suspend fun getContactCount() = contactDao.get().getContactCount()
