@@ -6,12 +6,15 @@ import dagger.Lazy
 import dagger.hilt.android.qualifiers.ApplicationContext
 import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.awaitCancellation
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.catch
+import kotlinx.coroutines.flow.emitAll
 import kotlinx.coroutines.flow.filter
 import kotlinx.coroutines.flow.filterIsInstance
 import kotlinx.coroutines.flow.firstOrNull
+import kotlinx.coroutines.flow.flow
 import kotlinx.coroutines.flow.flowOn
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.mapNotNull
@@ -59,6 +62,7 @@ import mega.privacy.android.domain.entity.contacts.ContactRequestAction
 import mega.privacy.android.domain.entity.contacts.InviteContactRequest
 import mega.privacy.android.domain.entity.contacts.LocalContact
 import mega.privacy.android.domain.entity.contacts.User
+import mega.privacy.android.domain.entity.contacts.UserChatStatus
 import mega.privacy.android.domain.entity.user.UserChanges
 import mega.privacy.android.domain.entity.user.UserId
 import mega.privacy.android.domain.entity.user.UserUpdate
@@ -138,6 +142,22 @@ internal class DefaultContactsRepository @Inject constructor(
         .filterIsInstance<ChatUpdate.OnChatOnlineStatusUpdate>()
         .map { onlineStatusMapper(it.userHandle, it.status, it.inProgress) }
         .flowOn(ioDispatcher)
+
+    override fun monitorOnlineStatusByHandle(handle: Long): Flow<UserChatStatus> =
+        flow {
+            val initial = userChatStatusMapper(megaChatApiGateway.getUserOnlineStatus(handle))
+            emit(initial)
+            emitAll(
+                getUpdatesByHandle(handle)
+            )
+            awaitCancellation()
+        }
+
+    private fun getUpdatesByHandle(handle: Long): Flow<UserChatStatus> =
+        megaChatApiGateway.chatUpdates
+            .filterIsInstance<ChatUpdate.OnChatOnlineStatusUpdate>()
+            .filter { it.userHandle == handle }
+            .map { userChatStatusMapper(it.status) }
 
     override fun monitorMyChatOnlineStatusUpdates() = monitorChatOnlineStatusUpdates()
         .filter { it.userHandle == megaChatApiGateway.getMyUserHandle() }

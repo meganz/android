@@ -10,6 +10,7 @@ import kotlinx.coroutines.awaitCancellation
 import kotlinx.coroutines.flow.flow
 import kotlinx.coroutines.flow.flowOf
 import kotlinx.coroutines.test.UnconfinedTestDispatcher
+import kotlinx.coroutines.test.resetMain
 import kotlinx.coroutines.test.runTest
 import kotlinx.coroutines.test.setMain
 import mega.privacy.android.data.database.DatabaseHandler
@@ -45,6 +46,7 @@ import mega.privacy.android.domain.entity.contacts.ContactRequest
 import mega.privacy.android.domain.entity.contacts.ContactRequestStatus
 import mega.privacy.android.domain.entity.contacts.InviteContactRequest
 import mega.privacy.android.domain.entity.contacts.User
+import mega.privacy.android.domain.entity.contacts.UserChatStatus
 import mega.privacy.android.domain.entity.user.UserChanges
 import mega.privacy.android.domain.entity.user.UserCredentials
 import mega.privacy.android.domain.entity.user.UserId
@@ -60,6 +62,7 @@ import nz.mega.sdk.MegaContactRequest
 import nz.mega.sdk.MegaError
 import nz.mega.sdk.MegaRequest
 import nz.mega.sdk.MegaUser
+import org.junit.After
 import org.junit.Before
 import org.junit.Test
 import org.mockito.ArgumentMatchers.anyInt
@@ -134,6 +137,11 @@ class DefaultContactsRepositoryTest {
         initRepository()
 
         whenever(megaApiGateway.userHandleToBase64(userHandle)).thenReturn("LTEyMzQ1Ng==")
+    }
+
+    @After
+    fun cleanUp() {
+        Dispatchers.resetMain()
     }
 
     private fun initRepository() {
@@ -1546,6 +1554,40 @@ class DefaultContactsRepositoryTest {
 
         underTest.monitorContactByHandle(contactId).test {
             assertThat(awaitItem()).isEqualTo(contact)
+            cancelAndIgnoreRemainingEvents()
+        }
+    }
+
+    @Test
+    fun `test that monitor online status by handle returns the initial status`() = runTest {
+        val initialStatus = MegaChatApi.STATUS_ONLINE
+        val mappedInitialStatus = UserChatStatus.Online
+        whenever(userChatStatusMapper(initialStatus)) doReturn mappedInitialStatus
+        whenever(megaChatApiGateway.getUserOnlineStatus(any())) doReturn initialStatus
+
+        underTest.monitorOnlineStatusByHandle(1L).test {
+            assertThat(awaitItem()).isEqualTo(mappedInitialStatus)
+            cancelAndIgnoreRemainingEvents()
+        }
+    }
+
+    @Test
+    fun `test that subsequent status changes are emitted`() = runTest {
+        val initialStatus = MegaChatApi.STATUS_ONLINE
+        val subsequentStatus = MegaChatApi.STATUS_BUSY
+        val mappedInitialStatus = UserChatStatus.Online
+        val mappedSubsequentStatus = UserChatStatus.Busy
+        whenever(userChatStatusMapper(initialStatus)) doReturn mappedInitialStatus
+        whenever(userChatStatusMapper(subsequentStatus)) doReturn mappedSubsequentStatus
+        whenever(megaChatApiGateway.getUserOnlineStatus(any())) doReturn initialStatus
+        whenever(megaChatApiGateway.chatUpdates) doReturn flow {
+            emit(ChatUpdate.OnChatOnlineStatusUpdate(1L, subsequentStatus, false))
+            awaitCancellation()
+        }
+
+        underTest.monitorOnlineStatusByHandle(1L).test {
+            assertThat(awaitItem()).isEqualTo(mappedInitialStatus)
+            assertThat(awaitItem()).isEqualTo(mappedSubsequentStatus)
             cancelAndIgnoreRemainingEvents()
         }
     }

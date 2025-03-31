@@ -59,6 +59,14 @@ interface ContactsRepository {
     fun monitorChatOnlineStatusUpdates(): Flow<OnlineStatus>
 
     /**
+     * Get online status by handle
+     *
+     * @param handle
+     * @return current status
+     */
+    fun monitorOnlineStatusByHandle(handle: Long): Flow<UserChatStatus>
+
+    /**
      * Monitor updates on my chat online status.
      *
      * @return A flow of [OnlineStatus].
