@@ -1,12 +1,10 @@
 package mega.privacy.android.app.listeners
 
 import android.content.Context
-import android.content.Intent
 import dagger.hilt.android.EntryPointAccessors
 import kotlinx.coroutines.launch
 import mega.privacy.android.app.MegaApplication
 import mega.privacy.android.app.R
-import mega.privacy.android.app.constants.BroadcastConstants
 import mega.privacy.android.app.di.DatabaseEntryPoint
 import mega.privacy.android.app.utils.ContactUtil
 import mega.privacy.android.app.utils.TextUtil
@@ -114,16 +112,6 @@ class SetAttrUserListener(private val context: Context) : MegaRequestListenerInt
                         else -> {
                             Timber.e("Error adding, updating or removing the alias%s", e.errorCode)
                         }
-                    }
-
-                    MegaApiJava.USER_ATTR_RUBBISH_TIME -> if (e.errorCode == MegaError.API_OK) {
-                        Intent(BroadcastConstants.ACTION_UPDATE_RB_SCHEDULER).run {
-                            putExtra(BroadcastConstants.DAYS_COUNT, number)
-                            setPackage(context.applicationContext.packageName)
-                            MegaApplication.getInstance().sendBroadcast(this)
-                        }
-                    } else {
-                        Util.showSnackbar(context, context?.getString(R.string.error_general_nodes))
                     }
                 }
             }

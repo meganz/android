@@ -24,11 +24,19 @@ import mega.privacy.android.domain.usecase.network.MonitorConnectivityUseCase
 import mega.privacy.android.domain.usecase.offline.ClearOfflineUseCase
 import mega.privacy.android.domain.usecase.offline.GetOfflineFolderSizeUseCase
 import mega.privacy.android.domain.usecase.setting.EnableFileVersionsOption
+import mega.privacy.android.domain.usecase.setting.GetRubbishBinAutopurgePeriodUseCase
+import mega.privacy.android.domain.usecase.setting.IsRubbishBinAutopurgeEnabledUseCase
+import mega.privacy.android.domain.usecase.setting.IsRubbishBinAutopurgePeriodValidUseCase
+import mega.privacy.android.domain.usecase.setting.SetRubbishBinAutopurgePeriodUseCase
+import org.junit.jupiter.api.AfterEach
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.extension.RegisterExtension
+import org.junit.jupiter.params.ParameterizedTest
+import org.junit.jupiter.params.provider.ValueSource
 import org.mockito.kotlin.any
 import org.mockito.kotlin.mock
+import org.mockito.kotlin.reset
 import org.mockito.kotlin.whenever
 import kotlin.test.assertFalse
 import kotlin.test.assertTrue
@@ -53,10 +61,36 @@ internal class FilePreferencesViewModelTest {
     private val getOfflineFolderSizeUseCase: GetOfflineFolderSizeUseCase = mock()
     private val clearOfflineUseCase: ClearOfflineUseCase = mock()
     private val removeAllVersionsUseCase: RemoveAllVersionsUseCase = mock()
+    private val isRubbishBinAutopurgeEnabledUseCase: IsRubbishBinAutopurgeEnabledUseCase = mock()
+    private val getRubbishBinAutopurgePeriodUseCase: GetRubbishBinAutopurgePeriodUseCase = mock()
+    private val setRubbishBinAutopurgePeriodUseCase: SetRubbishBinAutopurgePeriodUseCase = mock()
+    private val isRubbishBinAutopurgePeriodValidUseCase: IsRubbishBinAutopurgePeriodValidUseCase =
+        mock()
 
     @BeforeEach
     fun setUp() {
         initViewModel()
+    }
+
+    @AfterEach
+    fun reset() {
+        reset(
+            getFolderVersionInfo,
+            monitorConnectivityUseCase,
+            isConnectedToInternetUseCase,
+            getFileVersionsOption,
+            monitorUserUpdates,
+            enableFileVersionsOption,
+            clearCacheUseCase,
+            getCacheSizeUseCase,
+            getOfflineFolderSizeUseCase,
+            clearOfflineUseCase,
+            removeAllVersionsUseCase,
+            isRubbishBinAutopurgeEnabledUseCase,
+            getRubbishBinAutopurgePeriodUseCase,
+            setRubbishBinAutopurgePeriodUseCase,
+            isRubbishBinAutopurgePeriodValidUseCase
+        )
     }
 
     private fun initViewModel() {
@@ -71,7 +105,11 @@ internal class FilePreferencesViewModelTest {
             getCacheSizeUseCase,
             getOfflineFolderSizeUseCase,
             clearOfflineUseCase,
-            removeAllVersionsUseCase
+            removeAllVersionsUseCase,
+            isRubbishBinAutopurgeEnabledUseCase,
+            getRubbishBinAutopurgePeriodUseCase,
+            setRubbishBinAutopurgePeriodUseCase,
+            isRubbishBinAutopurgePeriodValidUseCase
         )
     }
 
@@ -218,6 +256,25 @@ internal class FilePreferencesViewModelTest {
             underTest.state.test {
                 val state = awaitItem()
                 assertThat(state.deleteAllVersionsEvent).isEqualTo(consumed())
+            }
+        }
+
+    @ParameterizedTest(name = "returns {0}")
+    @ValueSource(booleans = [true, false])
+    fun `test that isRubbishBinAutopurgePeriodValid`(isValid: Boolean) = runTest {
+        whenever(isRubbishBinAutopurgePeriodValidUseCase(7)).thenReturn(isValid)
+        assertThat(underTest.isRubbishBinAutopurgePeriodValid(7)).isEqualTo(isValid)
+    }
+
+    @Test
+    fun `test that setRubbishBinAutopurgePeriod triggers rubbishBinAutopurgePeriod on success`() =
+        runTest {
+            whenever(setRubbishBinAutopurgePeriodUseCase(7)).thenReturn(Unit)
+            underTest.setRubbishBinAutopurgePeriod(7)
+            advanceUntilIdle()
+            underTest.state.test {
+                val state = awaitItem()
+                assertThat(state.rubbishBinAutopurgePeriod).isEqualTo(7)
             }
         }
 

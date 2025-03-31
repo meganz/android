@@ -17,7 +17,6 @@ object BroadcastConstants {
     const val ACTION_UPDATE_LAST_NAME = "ACTION_UPDATE_LAST_NAME"
     const val ACTION_UPDATE_CREDENTIALS = "ACTION_UPDATE_CREDENTIALS"
     const val ACTION_REFRESH_CLEAR_OFFLINE_SETTING = "ACTION_REFRESH_CLEAR_OFFLINE_SETTING"
-    const val ACTION_UPDATE_RB_SCHEDULER = "ACTION_UPDATE_RB_SCHEDULER"
 
     //    Broadcasts' extras
     const val TYPE_SHARE = "TYPE_SHARE"
@@ -26,6 +25,5 @@ object BroadcastConstants {
     const val SNACKBAR_TEXT = "SNACKBAR_TEXT"
     const val ACTION_TYPE = "ACTION_TYPE"
     const val INVALID_ACTION = -1
-    const val DAYS_COUNT = "DAYS_COUNT"
     const val ERROR_MESSAGE_TEXT = "ERROR_MESSAGE_TEXT"
 }

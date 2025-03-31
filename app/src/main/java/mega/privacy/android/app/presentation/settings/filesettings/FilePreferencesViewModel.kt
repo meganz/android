@@ -11,6 +11,7 @@ import kotlinx.coroutines.flow.catch
 import kotlinx.coroutines.flow.filter
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
+import mega.privacy.android.app.R
 import mega.privacy.android.app.presentation.settings.filesettings.model.FilePreferencesState
 import mega.privacy.android.domain.entity.user.UserChanges
 import mega.privacy.android.domain.usecase.GetFolderVersionInfo
@@ -24,6 +25,10 @@ import mega.privacy.android.domain.usecase.network.MonitorConnectivityUseCase
 import mega.privacy.android.domain.usecase.offline.ClearOfflineUseCase
 import mega.privacy.android.domain.usecase.offline.GetOfflineFolderSizeUseCase
 import mega.privacy.android.domain.usecase.setting.EnableFileVersionsOption
+import mega.privacy.android.domain.usecase.setting.GetRubbishBinAutopurgePeriodUseCase
+import mega.privacy.android.domain.usecase.setting.IsRubbishBinAutopurgeEnabledUseCase
+import mega.privacy.android.domain.usecase.setting.IsRubbishBinAutopurgePeriodValidUseCase
+import mega.privacy.android.domain.usecase.setting.SetRubbishBinAutopurgePeriodUseCase
 import timber.log.Timber
 import javax.inject.Inject
 
@@ -43,6 +48,10 @@ class FilePreferencesViewModel @Inject constructor(
     private val getOfflineFolderSizeUseCase: GetOfflineFolderSizeUseCase,
     private val clearOfflineUseCase: ClearOfflineUseCase,
     private val removeAllVersionsUseCase: RemoveAllVersionsUseCase,
+    private val isRubbishBinAutopurgeEnabledUseCase: IsRubbishBinAutopurgeEnabledUseCase,
+    private val getRubbishBinAutopurgePeriodUseCase: GetRubbishBinAutopurgePeriodUseCase,
+    private val setRubbishBinAutopurgePeriodUseCase: SetRubbishBinAutopurgePeriodUseCase,
+    private val isRubbishBinAutopurgePeriodValidUseCase: IsRubbishBinAutopurgePeriodValidUseCase,
 ) : ViewModel() {
     private val _state = MutableStateFlow(FilePreferencesState())
 
@@ -79,6 +88,28 @@ class FilePreferencesViewModel @Inject constructor(
                 .collect { getFileVersionOption() }
         }
         getFileVersionOption()
+        getRubbishBinAutopurgeInfo()
+    }
+
+    private fun getRubbishBinAutopurgeInfo() {
+        viewModelScope.launch {
+            runCatching {
+                val isEnabled = isRubbishBinAutopurgeEnabledUseCase()
+                if (isEnabled) {
+                    val period = getRubbishBinAutopurgePeriodUseCase()
+                    _state.update {
+                        it.copy(
+                            isRubbishBinAutopurgeEnabled = true,
+                            rubbishBinAutopurgePeriod = period
+                        )
+                    }
+                } else {
+                    _state.update { it.copy(isRubbishBinAutopurgeEnabled = false) }
+                }
+            }.onFailure {
+                Timber.e(it, "Error getting rubbish bin autopurge info")
+            }
+        }
     }
 
     private fun getFileVersionOption() {
@@ -189,4 +220,32 @@ class FilePreferencesViewModel @Inject constructor(
     fun resetDeleteAllVersionsEvent() {
         _state.update { it.copy(deleteAllVersionsEvent = consumed()) }
     }
+
+    /**
+     * Set rubbish bin autopurge enabled
+     */
+    fun setRubbishBinAutopurgePeriod(days: Int) {
+        viewModelScope.launch {
+            runCatching {
+                setRubbishBinAutopurgePeriodUseCase(days)
+            }.onSuccess {
+                _state.update { it.copy(rubbishBinAutopurgePeriod = days) }
+            }.onFailure { e ->
+                _state.update { it.copy(errorMessageId = R.string.error_general_nodes) }
+                Timber.e(e, "Error setting rubbish bin autopurge period")
+            }
+        }
+    }
+
+    /**
+     * Reset error message
+     */
+    fun resetErrorMessage() {
+        _state.update { it.copy(errorMessageId = 0) }
+    }
+
+    /**
+     * Set rubbish bin autopurge enabled
+     */
+    fun isRubbishBinAutopurgePeriodValid(days: Int) = isRubbishBinAutopurgePeriodValidUseCase(days)
 }

@@ -1,11 +1,21 @@
 package mega.privacy.android.app.fragments.settingsFragments
 
-import mega.privacy.android.shared.resources.R as sharedR
+import android.content.DialogInterface
 import android.os.Bundle
+import android.text.InputType
 import android.text.format.Formatter
+import android.util.TypedValue
+import android.view.KeyEvent
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import android.view.ViewGroup.LayoutParams.MATCH_PARENT
+import android.view.ViewGroup.LayoutParams.WRAP_CONTENT
+import android.view.WindowManager.LayoutParams.SOFT_INPUT_STATE_ALWAYS_VISIBLE
+import android.view.inputmethod.EditorInfo
+import android.widget.EditText
+import android.widget.LinearLayout
+import android.widget.TextView
 import androidx.appcompat.app.AlertDialog
 import androidx.fragment.app.activityViewModels
 import androidx.lifecycle.Lifecycle
@@ -28,12 +38,14 @@ import mega.privacy.android.app.constants.SettingsConstants.KEY_MOBILE_DATA_HIGH
 import mega.privacy.android.app.constants.SettingsConstants.KEY_OFFLINE
 import mega.privacy.android.app.constants.SettingsConstants.KEY_RUBBISH
 import mega.privacy.android.app.globalmanagement.MyAccountInfo
-import mega.privacy.android.app.listeners.GetAttrUserListener
+import mega.privacy.android.app.presentation.extensions.getFormattedStringOrDefault
 import mega.privacy.android.app.presentation.settings.filesettings.FilePreferencesViewModel
 import mega.privacy.android.app.presentation.settings.filesettings.model.FilePreferencesState
 import mega.privacy.android.app.utils.AlertDialogUtil.dismissAlertDialogIfExists
 import mega.privacy.android.app.utils.AlertDialogUtil.isAlertDialogShown
+import mega.privacy.android.app.utils.ColorUtils.getThemeColor
 import mega.privacy.android.app.utils.Util
+import mega.privacy.android.shared.resources.R as sharedR
 import nz.mega.sdk.MegaAccountDetails
 import timber.log.Timber
 import javax.inject.Inject
@@ -64,6 +76,7 @@ class SettingsFileManagementFragment : SettingsBaseFragment(),
     private var autoPlaySwitch: SwitchPreferenceCompat? = null
     private var mobileDataHighResolution: SwitchPreferenceCompat? = null
     private var disableVersionsWarning: AlertDialog? = null
+    private var newFolderDialog: AlertDialog? = null
 
     override fun onCreatePreferences(savedInstanceState: Bundle?, rootKey: String?) {
         addPreferencesFromResource(R.xml.preferences_file_management)
@@ -86,23 +99,6 @@ class SettingsFileManagementFragment : SettingsBaseFragment(),
         autoPlaySwitch?.onPreferenceClickListener = this
         autoPlaySwitch?.isChecked = prefs?.isAutoPlayEnabled() == true
         mobileDataHighResolution?.onPreferenceClickListener = this
-        if (megaApi.serverSideRubbishBinAutopurgeEnabled()) {
-            megaApi.getRubbishBinAutopurgePeriod(GetAttrUserListener(requireContext()))
-            enableRbSchedulerSwitch?.let {
-                preferenceScreen.addPreference(it)
-            }
-            daysRbSchedulerPreference?.let {
-                preferenceScreen.addPreference(it)
-                it.onPreferenceClickListener = this
-            }
-        } else {
-            enableRbSchedulerSwitch?.let {
-                preferenceScreen.removePreference(it)
-            }
-            daysRbSchedulerPreference?.let {
-                preferenceScreen.removePreference(it)
-            }
-        }
         cacheAdvancedOptions?.summary = getString(R.string.settings_advanced_features_calculating)
         offlineFileManagement?.summary = getString(R.string.settings_advanced_features_calculating)
         rubbishFileManagement?.summary = getString(
@@ -185,6 +181,15 @@ class SettingsFileManagementFragment : SettingsBaseFragment(),
             }
             viewModel.resetDeleteAllVersionsEvent()
         }
+
+        enableRbSchedulerSwitch?.isVisible = filePreferencesState.isFileVersioningEnabled
+        daysRbSchedulerPreference?.isVisible = filePreferencesState.isFileVersioningEnabled
+        updateRBScheduler(filePreferencesState.rubbishBinAutopurgePeriod)
+
+        if (filePreferencesState.errorMessageId != 0) {
+            Util.showSnackbar(requireActivity(), getString(filePreferencesState.errorMessageId))
+            viewModel.resetErrorMessage()
+        }
     }
 
     override fun onSaveInstanceState(outState: Bundle) {
@@ -192,9 +197,10 @@ class SettingsFileManagementFragment : SettingsBaseFragment(),
         super.onSaveInstanceState(outState)
     }
 
-    override fun onDestroy() {
-        super.onDestroy()
+    override fun onDestroyView() {
+        super.onDestroyView()
         dismissAlertDialogIfExists(disableVersionsWarning)
+        dismissAlertDialogIfExists(newFolderDialog)
     }
 
 
@@ -210,18 +216,14 @@ class SettingsFileManagementFragment : SettingsBaseFragment(),
                 enableRbSchedulerSwitch?.let {
                     if (!viewModel.isConnected) return false
                     if (it.isChecked) {
-                        (activity as? FileManagementPreferencesActivity)?.showRbSchedulerValueDialog(
-                            true
-                        )
+                        showRbSchedulerValueDialog(true)
                     } else if (myAccountInfo.accountType == MegaAccountDetails.ACCOUNT_TYPE_FREE) {
                         (activity as? FileManagementPreferencesActivity)?.showRBNotDisabledDialog()
                         it.onPreferenceClickListener = null
                         it.isChecked = true
                         it.onPreferenceClickListener = this
                     } else {
-                        (activity as? FileManagementPreferencesActivity)?.setRBSchedulerValue(
-                            INITIAL_VALUE
-                        )
+                        viewModel.setRubbishBinAutopurgePeriod(INITIAL_VALUE.toInt())
                     }
                 }
 
@@ -229,7 +231,7 @@ class SettingsFileManagementFragment : SettingsBaseFragment(),
 
             KEY_DAYS_RB_SCHEDULER -> {
                 if (!viewModel.isConnected) return false
-                (activity as? FileManagementPreferencesActivity)?.showRbSchedulerValueDialog(false)
+                showRbSchedulerValueDialog(false)
             }
 
             KEY_ENABLE_VERSIONS -> {
@@ -302,7 +304,7 @@ class SettingsFileManagementFragment : SettingsBaseFragment(),
     /**
      * Method for updating rubbish bin Scheduler.
      */
-    fun updateRBScheduler(daysCount: Long) {
+    private fun updateRBScheduler(daysCount: Int) {
         Timber.d("updateRBScheduler: %s", daysCount)
         if (daysCount < 1) {
             enableRbSchedulerSwitch?.let {
@@ -311,11 +313,7 @@ class SettingsFileManagementFragment : SettingsBaseFragment(),
                 it.summary = null
                 it.onPreferenceClickListener = this
             }
-            daysRbSchedulerPreference?.let {
-                //Hide preference to show days
-                preferenceScreen.removePreference(it)
-                it.onPreferenceClickListener = null
-            }
+            daysRbSchedulerPreference?.isVisible = false
 
         } else {
             enableRbSchedulerSwitch?.let {
@@ -334,14 +332,13 @@ class SettingsFileManagementFragment : SettingsBaseFragment(),
             }
             daysRbSchedulerPreference?.let {
                 //Show and set preference to show days
-                preferenceScreen.addPreference(it)
+                it.isVisible = true
                 it.onPreferenceClickListener = this
-                it.summary =
-                    context?.resources?.getQuantityString(
-                        R.plurals.settings_file_management_remove_files_older_than_days,
-                        daysCount.toInt(),
-                        daysCount.toInt()
-                    )
+                it.summary = context?.resources?.getQuantityString(
+                    R.plurals.settings_file_management_remove_files_older_than_days,
+                    daysCount,
+                    daysCount
+                )
             }
         }
     }
@@ -421,6 +418,134 @@ class SettingsFileManagementFragment : SettingsBaseFragment(),
             }
             .setNegativeButton(getString(sharedR.string.general_dialog_cancel_button), null)
             .show()
+    }
+
+    /**
+     * Show Rubbish bin scheduler value dialog.
+     */
+    private fun showRbSchedulerValueDialog(isEnabling: Boolean) {
+        val activity = (activity as? FileManagementPreferencesActivity) ?: return
+        val outMetrics = resources.displayMetrics
+        val layout = LinearLayout(activity).apply {
+            layoutParams = LinearLayout.LayoutParams(
+                MATCH_PARENT,
+                WRAP_CONTENT
+            )
+            orientation = LinearLayout.VERTICAL
+            (layoutParams as LinearLayout.LayoutParams).setMargins(
+                Util.scaleWidthPx(20, outMetrics),
+                Util.scaleWidthPx(20, outMetrics),
+                Util.scaleWidthPx(17, outMetrics),
+                0
+            )
+        }
+        val input = EditText(activity).apply {
+            inputType = InputType.TYPE_CLASS_NUMBER
+            layout.addView(this, layout.layoutParams)
+            setSingleLine()
+            setTextColor(
+                getThemeColor(
+                    activity,
+                    com.google.android.material.R.attr.colorSecondary
+                )
+            )
+            hint = activity.getFormattedStringOrDefault(R.string.hint_days)
+            imeOptions = EditorInfo.IME_ACTION_DONE
+            setOnEditorActionListener { v: TextView, actionId: Int, _: KeyEvent? ->
+                if (actionId == EditorInfo.IME_ACTION_DONE) {
+                    controlOptionOfRbSchedulerValueDialog(
+                        v.text.toString().trim { it <= ' ' },
+                        this
+                    )
+                    return@setOnEditorActionListener true
+                }
+                false
+            }
+            setImeActionLabel(
+                activity.getFormattedStringOrDefault(R.string.general_create),
+                EditorInfo.IME_ACTION_DONE
+            )
+            requestFocus()
+        }
+        val text = TextView(activity)
+        if (myAccountInfo.accountType > MegaAccountDetails.ACCOUNT_TYPE_FREE) {
+            text.text =
+                activity.getFormattedStringOrDefault(R.string.settings_rb_scheduler_enable_period_PRO)
+        } else {
+            text.text =
+                activity.getFormattedStringOrDefault(R.string.settings_rb_scheduler_enable_period_FREE)
+        }
+        val density = resources.displayMetrics.density
+        val scaleW = Util.getScaleW(outMetrics, density)
+        text.setTextSize(TypedValue.COMPLEX_UNIT_SP, 11 * scaleW)
+        layout.addView(text)
+        val paramsTextError = text.layoutParams as LinearLayout.LayoutParams
+        paramsTextError.height = WRAP_CONTENT
+        paramsTextError.width = WRAP_CONTENT
+        paramsTextError.setMargins(
+            Util.scaleWidthPx(25, outMetrics),
+            0,
+            Util.scaleWidthPx(25, outMetrics),
+            0
+        )
+        text.layoutParams = paramsTextError
+        val builder = MaterialAlertDialogBuilder(activity)
+        builder.setTitle(activity.getFormattedStringOrDefault(R.string.settings_rb_scheduler_select_days_title))
+        builder.setPositiveButton(
+            activity.getFormattedStringOrDefault(R.string.general_ok)
+        ) { _: DialogInterface?, _: Int -> }
+        builder.setNegativeButton(
+            getString(sharedR.string.general_dialog_cancel_button)
+        ) { _: DialogInterface?, _: Int ->
+            if (isEnabling) {
+                updateRBScheduler(0)
+            }
+        }
+        builder.setView(layout)
+        newFolderDialog = builder.create()
+        newFolderDialog?.window?.setSoftInputMode(SOFT_INPUT_STATE_ALWAYS_VISIBLE)
+        newFolderDialog?.show()
+        newFolderDialog?.getButton(AlertDialog.BUTTON_POSITIVE)?.setOnClickListener {
+            controlOptionOfRbSchedulerValueDialog(
+                input.text.toString().trim { it <= ' ' },
+                input
+            )
+        }
+    }
+
+
+    /**
+     * Method for controlling the selected option on the RbSchedulerValueDialog.
+     *
+     * @param value The value.
+     * @param input The EditText.
+     */
+    private fun controlOptionOfRbSchedulerValueDialog(value: String, input: EditText) {
+        if (value.isEmpty()) {
+            return
+        }
+        try {
+            val daysCount = value.toInt()
+            if (viewModel.isRubbishBinAutopurgePeriodValid(daysCount)) {
+                viewModel.setRubbishBinAutopurgePeriod(daysCount)
+                newFolderDialog?.dismiss()
+            } else {
+                clearInputText(input)
+            }
+        } catch (e: Exception) {
+            clearInputText(input)
+        }
+    }
+
+
+    /**
+     * Method for resetting the EditText values
+     *
+     * @param input The EditText.
+     */
+    private fun clearInputText(input: EditText) {
+        input.text.clear()
+        input.requestFocus()
     }
 
     companion object {

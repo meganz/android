@@ -127,23 +127,6 @@ class GetAttrUserListener constructor(private val context: Context) : MegaReques
                         (context as? GroupChatInfoActivity)
                             ?.updateParticipantAvatar(holderPosition, email)
                     }
-                    MegaApiJava.USER_ATTR_RUBBISH_TIME -> {
-                        Intent(BroadcastConstants.ACTION_UPDATE_RB_SCHEDULER).run {
-                            if (e.errorCode == MegaError.API_ENOENT) {
-                                val daysCount =
-                                    if (MegaApplication.getInstance().myAccountInfo.accountType == MegaAccountDetails.ACCOUNT_TYPE_FREE) {
-                                        DAYS_USER_FREE
-                                    } else {
-                                        DAYS_USER_PRO
-                                    }
-                                putExtra(BroadcastConstants.DAYS_COUNT, daysCount)
-                            } else {
-                                putExtra(BroadcastConstants.DAYS_COUNT, number)
-                            }
-                            setPackage(context.applicationContext.packageName)
-                            MegaApplication.getInstance().sendBroadcast(this)
-                        }
-                    }
                 }
             }
         }
