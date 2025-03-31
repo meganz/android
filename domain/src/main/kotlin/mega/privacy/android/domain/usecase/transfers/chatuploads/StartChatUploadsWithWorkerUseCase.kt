@@ -60,7 +60,7 @@ class StartChatUploadsWithWorkerUseCase @Inject constructor(
         val appData = pendingMessageIds.map { TransferAppData.ChatUpload(it) }
         emitAll(startTransfersAndThenWorkerFlow(
             doTransfers = {
-                if (chatAttachmentNeedsCompressionUseCase(file)) {
+                if (chatAttachmentNeedsCompressionUseCase(UriPath.fromFile(file))) {
                     //if needs compression, skip the upload and update the state to COMPRESSING, it will be compressed and uploaded in the Worker
                     updatePendingMessageUseCase(
                         updatePendingMessageRequests = pendingMessageIds.map { pendingMessageId ->

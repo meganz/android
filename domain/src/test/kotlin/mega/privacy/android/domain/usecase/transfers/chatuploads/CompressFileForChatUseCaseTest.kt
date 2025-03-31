@@ -54,8 +54,11 @@ class CompressFileForChatUseCaseTest {
     @Test
     fun `test that NotCompressed is returned when chat attachment doesn't need compression`() =
         runTest {
-            val file = mock<File>()
-            whenever(chatAttachmentNeedsCompressionUseCase(file)) doReturn false
+            val path = "path"
+            val file = mock<File> {
+                on { absolutePath } doReturn path
+            }
+            whenever(chatAttachmentNeedsCompressionUseCase(UriPath(path))) doReturn false
 
             underTest(file).test {
                 assertThat(awaitItem()).isEqualTo(
@@ -76,7 +79,7 @@ class CompressFileForChatUseCaseTest {
             val original = mock<File> {
                 on { it.absolutePath } doReturn path
             }
-            whenever(chatAttachmentNeedsCompressionUseCase(original)) doReturn true
+            whenever(chatAttachmentNeedsCompressionUseCase(UriPath(path))) doReturn true
             val expected = ChatUploadCompressionState.Compressed(mock<File>())
             whenever(isImageFileUseCase(UriPath(original.absolutePath))) doReturn true
             whenever(downscaleImageForChatUseCase(original)) doReturn flowOf(expected)
@@ -95,7 +98,7 @@ class CompressFileForChatUseCaseTest {
                 on { it.absolutePath } doReturn path
             }
             val expected = ChatUploadCompressionState.Compressed(mock<File>())
-            whenever(chatAttachmentNeedsCompressionUseCase(original)) doReturn true
+            whenever(chatAttachmentNeedsCompressionUseCase(UriPath(path))) doReturn true
             whenever(isImageFileUseCase(UriPath(original.absolutePath))) doReturn false
             whenever(isVideoFileUseCase(UriPath(original.absolutePath))) doReturn true
             whenever(compressVideoForChatUseCase(original)) doReturn flowOf(expected)

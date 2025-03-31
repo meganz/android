@@ -63,7 +63,7 @@ class PrepareAllPendingMessagesUseCase @Inject constructor(
                                             )
                                         }
 
-                                        chatAttachmentNeedsCompressionUseCase(File(uriPathToUpload.value)) -> {
+                                        chatAttachmentNeedsCompressionUseCase(uriPathToUpload) -> {
                                             updatePendingMessageUseCase(
                                                 updatePendingMessageRequests = pendingMessageIds.map { pendingMessageId ->
                                                     UpdatePendingMessageStateAndPathRequest(

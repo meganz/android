@@ -19,6 +19,7 @@ import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.TestInstance
 import org.mockito.kotlin.any
+import org.mockito.kotlin.anyValueClass
 import org.mockito.kotlin.doReturn
 import org.mockito.kotlin.mock
 import org.mockito.kotlin.reset
@@ -154,7 +155,7 @@ class PrepareAllPendingMessagesUseCaseTest {
                     isChatUpload = true
                 )
             ) doReturn path
-            whenever(chatAttachmentNeedsCompressionUseCase(file)) doReturn true
+            whenever(chatAttachmentNeedsCompressionUseCase(anyValueClass())) doReturn true
 
             underTest().test { cancelAndConsumeRemainingEvents() }
 
@@ -182,7 +183,7 @@ class PrepareAllPendingMessagesUseCaseTest {
                     isChatUpload = true
                 )
             ) doReturn path
-            whenever(chatAttachmentNeedsCompressionUseCase(file)) doReturn false
+            whenever(chatAttachmentNeedsCompressionUseCase(anyValueClass())) doReturn false
 
             underTest().test { cancelAndConsumeRemainingEvents() }
 

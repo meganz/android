@@ -8,6 +8,7 @@ import mega.privacy.android.domain.entity.VideoQuality
 import mega.privacy.android.domain.entity.uri.UriPath
 import mega.privacy.android.domain.repository.NetworkRepository
 import mega.privacy.android.domain.repository.SettingsRepository
+import mega.privacy.android.domain.usecase.file.GetFileExtensionFromUriPath
 import mega.privacy.android.domain.usecase.file.IsImageFileUseCase
 import mega.privacy.android.domain.usecase.file.IsVideoFileUseCase
 import org.junit.jupiter.api.BeforeAll
@@ -25,7 +26,6 @@ import org.mockito.kotlin.mock
 import org.mockito.kotlin.reset
 import org.mockito.kotlin.whenever
 import org.mockito.kotlin.wheneverBlocking
-import java.io.File
 
 @TestInstance(TestInstance.Lifecycle.PER_CLASS)
 class ChatAttachmentNeedsCompressionUseCaseTest {
@@ -35,6 +35,7 @@ class ChatAttachmentNeedsCompressionUseCaseTest {
     private val isVideoFileUseCase = mock<IsVideoFileUseCase>()
     private val defaultSettingsRepository = mock<SettingsRepository>()
     private val networkRepository = mock<NetworkRepository>()
+    private val getFileExtensionFromUriPath = mock<GetFileExtensionFromUriPath>()
 
     @BeforeAll
     fun setup() {
@@ -43,29 +44,34 @@ class ChatAttachmentNeedsCompressionUseCaseTest {
             isVideoFileUseCase,
             defaultSettingsRepository,
             networkRepository,
+            getFileExtensionFromUriPath,
         )
     }
 
     @BeforeEach
-    fun resetMocks() =
+    fun resetMocks() = runTest {
         reset(
             isImageFileUseCase,
             isVideoFileUseCase,
             defaultSettingsRepository,
             networkRepository,
         )
+        whenever(getFileExtensionFromUriPath(any())).thenAnswer {
+            it.arguments[0].toString().substringAfterLast('.', "")
+        }
+    }
 
     @Nested
     @DisplayName("Test Image files")
     inner class Image {
-        private val jpg = File("img.jpg")
-        private val gif = File("img.gif")
+        private val jpg = UriPath("img.jpg")
+        private val gif = UriPath("img.gif")
 
         @BeforeEach
         fun setup() {
             wheneverBlocking { isVideoFileUseCase(anyValueClass()) } doReturn false
-            wheneverBlocking { isImageFileUseCase(UriPath(jpg.absolutePath)) } doReturn true
-            wheneverBlocking { isImageFileUseCase(UriPath(gif.absolutePath)) } doReturn true
+            wheneverBlocking { isImageFileUseCase(jpg) } doReturn true
+            wheneverBlocking { isImageFileUseCase(gif) } doReturn true
         }
 
         @Test
@@ -128,14 +134,14 @@ class ChatAttachmentNeedsCompressionUseCaseTest {
     @DisplayName("Test Video files")
     @TestInstance(TestInstance.Lifecycle.PER_CLASS)
     inner class Video {
-        private val mp4 = File("img.mp4")
-        private val mpg = File("img.mpg")
+        private val mp4 = UriPath("img.mp4")
+        private val mpg = UriPath("img.mpg")
 
         @BeforeEach
         fun setup() {
             wheneverBlocking { isImageFileUseCase(any()) } doReturn false
-            wheneverBlocking { isVideoFileUseCase(UriPath(mp4.absolutePath)) } doReturn true
-            wheneverBlocking { isVideoFileUseCase(UriPath(mpg.absolutePath)) } doReturn true
+            wheneverBlocking { isVideoFileUseCase(mp4) } doReturn true
+            wheneverBlocking { isVideoFileUseCase(mpg) } doReturn true
         }
 
         @Test

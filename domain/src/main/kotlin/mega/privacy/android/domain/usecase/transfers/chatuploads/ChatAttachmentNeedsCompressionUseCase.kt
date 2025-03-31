@@ -6,9 +6,9 @@ import mega.privacy.android.domain.entity.VideoQuality
 import mega.privacy.android.domain.entity.uri.UriPath
 import mega.privacy.android.domain.repository.NetworkRepository
 import mega.privacy.android.domain.repository.SettingsRepository
+import mega.privacy.android.domain.usecase.file.GetFileExtensionFromUriPath
 import mega.privacy.android.domain.usecase.file.IsImageFileUseCase
 import mega.privacy.android.domain.usecase.file.IsVideoFileUseCase
-import java.io.File
 import javax.inject.Inject
 
 /**
@@ -27,23 +27,24 @@ class ChatAttachmentNeedsCompressionUseCase @Inject constructor(
     private val isVideoFileUseCase: IsVideoFileUseCase,
     private val defaultSettingsRepository: SettingsRepository,
     private val networkRepository: NetworkRepository,
+    private val getFileExtensionFromUriPath: GetFileExtensionFromUriPath,
 ) {
 
     /**
      * Invoke
      */
-    suspend operator fun invoke(file: File): Boolean {
-        val path = file.absolutePath
+    suspend operator fun invoke(uriPath: UriPath): Boolean {
+        val extension = getFileExtensionFromUriPath(uriPath)
         when {
-            isImageFileUseCase(UriPath.fromFile(file)) -> {
-                if (file.isGif()) return false
+            isImageFileUseCase(uriPath) -> {
+                if (extension.isNotSupportedImage()) return false
                 val imageQuality = defaultSettingsRepository.getChatImageQuality().first()
                 return !(imageQuality == ChatImageQuality.Original
                         || (imageQuality == ChatImageQuality.Automatic && networkRepository.isOnWifi()))
             }
 
-            isVideoFileUseCase(UriPath.fromFile(file)) -> {
-                if (file.extension != "mp4") return false
+            isVideoFileUseCase(uriPath) -> {
+                if (extension != "mp4") return false
                 val videoQuality = defaultSettingsRepository.getChatVideoQualityPreference()
                 return videoQuality != VideoQuality.ORIGINAL
             }
@@ -51,5 +52,5 @@ class ChatAttachmentNeedsCompressionUseCase @Inject constructor(
         return false
     }
 
-    private fun File.isGif() = listOf("gif", "webp").contains(extension)
+    private fun String.isNotSupportedImage() = listOf("gif", "webp").contains(this)
 }

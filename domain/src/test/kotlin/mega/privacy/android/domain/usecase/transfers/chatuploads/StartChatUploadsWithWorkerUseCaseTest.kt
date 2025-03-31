@@ -229,7 +229,7 @@ class StartChatUploadsWithWorkerUseCaseTest {
         runTest {
             val file = mockFile()
             val pendingMessageId = 1L
-            whenever(chatAttachmentNeedsCompressionUseCase(file)) doReturn true
+            whenever(chatAttachmentNeedsCompressionUseCase(anyValueClass())) doReturn true
             underTest(file, NodeId(11L), pendingMessageId).test {
                 verify(updatePendingMessageUseCase)
                     .invoke(
