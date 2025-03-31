@@ -339,9 +339,11 @@ class GetChatsUseCase @Inject constructor(
         meetingTimeMapper: (Long, Long) -> String,
     ): Flow<List<ChatRoomItem>> =
         chatRepository.monitorChatListItemUpdates().mapNotNull { chatListItem ->
-            if (((chatRoomType == ChatRoomType.ARCHIVED_CHATS && !chatListItem.isArchived) ||
-                        chatListItem.isArchived) || chatListItem.isDeleted
-                || chatListItem.changes == ChatListItemChanges.Deleted ||
+            if (
+                (chatRoomType == ChatRoomType.ARCHIVED_CHATS && !chatListItem.isArchived) ||
+                (chatRoomType != ChatRoomType.ARCHIVED_CHATS && chatListItem.isArchived) ||
+                chatListItem.isDeleted ||
+                chatListItem.changes == ChatListItemChanges.Deleted ||
                 chatListItem.changes == ChatListItemChanges.Closed
             ) {
                 mutex.withLock { remove(chatListItem.chatId) }
@@ -352,8 +354,11 @@ class GetChatsUseCase @Inject constructor(
 
             chatRepository.getCombinedChatRoom(chatListItem.chatId)
                 ?.takeIf {
-                    (!it.isPreview && it.isMeeting && chatRoomType == ChatRoomType.MEETINGS)
-                            || (!it.isMeeting && chatRoomType == ChatRoomType.NON_MEETINGS)
+                    when (chatRoomType) {
+                        ChatRoomType.MEETINGS -> it.isMeeting && !it.isArchived && !it.isPreview
+                        ChatRoomType.NON_MEETINGS -> !it.isMeeting && !it.isArchived
+                        ChatRoomType.ARCHIVED_CHATS -> it.isArchived
+                    }
                 }
                 ?.let(chatRoomItemMapper::invoke)
                 ?.updateChatFields(getLastMessage, lastTimeMapper)
