@@ -29,6 +29,7 @@ import mega.privacy.android.app.presentation.changepassword.view.Constants
 import mega.privacy.android.app.presentation.chat.archived.model.ArchivedChatsState
 import mega.privacy.android.app.presentation.chat.dialog.view.ChatRoomItemBottomSheetView
 import mega.privacy.android.app.presentation.chat.list.view.ChatListView
+import mega.privacy.android.app.presentation.meeting.model.NoteToSelfChatUIState
 import mega.privacy.android.domain.entity.chat.ChatRoomItem
 import mega.privacy.android.legacy.core.ui.controls.appbar.LegacySearchAppBar
 import mega.privacy.android.legacy.core.ui.model.SearchWidgetState
@@ -40,6 +41,7 @@ import mega.privacy.android.shared.original.core.ui.utils.showAutoDurationSnackb
  * Archived chats view
  *
  * @param state                 [ArchivedChatsState]
+ * @param noteToSelfState       [NoteToSelfChatUIState]
  * @param onItemClick
  * @param onItemUnarchived
  * @param onBackPressed
@@ -48,6 +50,7 @@ import mega.privacy.android.shared.original.core.ui.utils.showAutoDurationSnackb
 @Composable
 fun ArchivedChatsView(
     state: ArchivedChatsState,
+    noteToSelfState: NoteToSelfChatUIState,
     onItemClick: (Long) -> Unit = {},
     onItemUnarchived: (Long) -> Unit = {},
     onBackPressed: () -> Unit = {},
@@ -112,6 +115,8 @@ fun ArchivedChatsView(
                 items = filteredChats ?: state.items,
                 selectedIds = emptyList(),
                 scrollToTop = false,
+                isNew = noteToSelfState.isNewFeature,
+                isHint = noteToSelfState.isNoteToSelfChatEmpty,
                 isMeetingView = false,
                 onItemClick = onItemClick,
                 onItemMoreClick = { chatItem ->
@@ -160,5 +165,6 @@ fun ArchivedChatsView(
 private fun PreviewEmptyView() {
     ArchivedChatsView(
         state = ArchivedChatsState(),
+        noteToSelfState = NoteToSelfChatUIState(),
     )
 }

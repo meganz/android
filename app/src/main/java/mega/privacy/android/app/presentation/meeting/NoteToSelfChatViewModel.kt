@@ -5,15 +5,16 @@ import androidx.lifecycle.viewModelScope
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
+import kotlinx.coroutines.flow.collectLatest
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import mega.privacy.android.app.featuretoggle.ApiFeatures
 import mega.privacy.android.app.presentation.meeting.model.NoteToSelfChatUIState
 import mega.privacy.android.domain.usecase.chat.GetNoteToSelfChatNewLabelPreferenceUseCase
 import mega.privacy.android.domain.usecase.chat.GetNoteToSelfChatUseCase
-import mega.privacy.android.domain.usecase.chat.IsAnEmptyChatUseCase
 import mega.privacy.android.domain.usecase.chat.SetNoteToSelfChatNewLabelPreferenceUseCase
 import mega.privacy.android.domain.usecase.featureflag.GetFeatureFlagValueUseCase
+import mega.privacy.android.domain.usecase.chat.MonitorNoteToSelfChatIsEmptyUseCase
 import timber.log.Timber
 import javax.inject.Inject
 
@@ -21,14 +22,19 @@ import javax.inject.Inject
  * ViewModel for note to self chat
  *
  * @property state [NoteToSelfChatUIState]
+ * @property getFeatureFlagValueUseCase [GetFeatureFlagValueUseCase]
+ * @property getNoteToSelfChatUseCase [GetNoteToSelfChatUseCase]
+ * @property getNoteToSelfChatPreferenceUseCase [GetNoteToSelfChatNewLabelPreferenceUseCase]
+ * @property setNoteToSelfChatPreferenceUseCase [SetNoteToSelfChatNewLabelPreferenceUseCase]
+ * @property monitorNoteToSelfChatIsEmptyUseCase [MonitorNoteToSelfChatIsEmptyUseCase]
  */
 @HiltViewModel
 class NoteToSelfChatViewModel @Inject constructor(
     private val getFeatureFlagValueUseCase: GetFeatureFlagValueUseCase,
     private val getNoteToSelfChatUseCase: GetNoteToSelfChatUseCase,
-    private val isAnEmptyChatUseCase: IsAnEmptyChatUseCase,
     private val getNoteToSelfChatPreferenceUseCase: GetNoteToSelfChatNewLabelPreferenceUseCase,
     private val setNoteToSelfChatPreferenceUseCase: SetNoteToSelfChatNewLabelPreferenceUseCase,
+    private val monitorNoteToSelfChatIsEmptyUseCase: MonitorNoteToSelfChatIsEmptyUseCase,
 ) : ViewModel() {
 
     private val _state = MutableStateFlow(NoteToSelfChatUIState())
@@ -71,16 +77,33 @@ class NoteToSelfChatViewModel @Inject constructor(
                     noteToSelfChatRoom = noteToSelfChatRoom,
                 )
             }
-            isAnEmptyChatUseCase(noteToSelfChatRoom.chatId).let { isChatEmpty ->
-                Timber.d("Check if note to self chat is empty: $isChatEmpty")
-                _state.update { it.copy(isNoteToSelfChatEmpty = isChatEmpty) }
-                if (!isChatEmpty) {
-                    setNoteToSelfPreference(0)
-                    _state.update { it.copy(newFeatureLabelCounter = 0) }
-                }
+            state.value.noteToSelfChatId?.let {
+                startMonitorNoteToSelfChatIsEmptyUseCase(noteToSelfChatId = it)
             }
         }
     }
+
+    /**
+     * Monitor if note to self chat is empty
+     *
+     * @param noteToSelfChatId
+     */
+    private fun startMonitorNoteToSelfChatIsEmptyUseCase(noteToSelfChatId: Long) =
+        viewModelScope.launch {
+            monitorNoteToSelfChatIsEmptyUseCase(noteToSelfChatId)
+                .collectLatest { isChatEmpty ->
+                    if (isChatEmpty) {
+                        Timber.d("Note to self chat is empty")
+                    } else {
+                        Timber.d("Note to self chat is not empty")
+                    }
+                    _state.update { it.copy(isNoteToSelfChatEmpty = isChatEmpty) }
+                    if (!isChatEmpty) {
+                        setNoteToSelfPreference(0)
+                        _state.update { it.copy(newFeatureLabelCounter = 0) }
+                    }
+                }
+        }
 
     /**
      * Get note to yourself api feature flag

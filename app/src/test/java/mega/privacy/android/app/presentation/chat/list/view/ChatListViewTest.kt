@@ -79,7 +79,7 @@ class ChatListViewTest {
     }
 
     @Test
-    fun `test that EmptyView is displayed when item is Note to self chat`() {
+    fun `test that EmptyView is displayed when item is Note to self chat and hint`() {
         val list = mutableListOf<ChatRoomItem>()
         list.add(ChatRoomItem.NoteToSelfChatRoomItem(chatId = 123L, title = "Note to self"))
         composeTestRule.setContent {
@@ -87,12 +87,31 @@ class ChatListViewTest {
                 items = list,
                 selectedIds = emptyList(),
                 scrollToTop = false,
+                isHint = true,
                 isMeetingView = false,
                 isLoading = false
             )
         }
 
         composeTestRule.onNodeWithTag("chat_room_list:empty").assertIsDisplayed()
+    }
+
+    @Test
+    fun `test that EmptyView is hidden when item is Note to self chat and not hint`() {
+        val list = mutableListOf<ChatRoomItem>()
+        list.add(ChatRoomItem.NoteToSelfChatRoomItem(chatId = 123L, title = "Note to self"))
+        composeTestRule.setContent {
+            ChatListView(
+                items = list,
+                selectedIds = emptyList(),
+                scrollToTop = false,
+                isHint = false,
+                isMeetingView = false,
+                isLoading = false
+            )
+        }
+
+        composeTestRule.onNodeWithTag("chat_room_list:empty").assertIsNotDisplayed()
     }
 
     @Test

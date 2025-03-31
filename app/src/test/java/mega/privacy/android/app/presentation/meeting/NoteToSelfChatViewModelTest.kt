@@ -2,6 +2,7 @@ package mega.privacy.android.app.presentation.meeting
 
 import app.cash.turbine.test
 import com.google.common.truth.Truth
+import kotlinx.coroutines.flow.flowOf
 import kotlinx.coroutines.runBlocking
 import kotlinx.coroutines.test.runTest
 import mega.privacy.android.app.featuretoggle.ApiFeatures
@@ -9,7 +10,7 @@ import mega.privacy.android.core.test.extension.CoroutineMainDispatcherExtension
 import mega.privacy.android.domain.entity.chat.ChatRoom
 import mega.privacy.android.domain.usecase.chat.GetNoteToSelfChatNewLabelPreferenceUseCase
 import mega.privacy.android.domain.usecase.chat.GetNoteToSelfChatUseCase
-import mega.privacy.android.domain.usecase.chat.IsAnEmptyChatUseCase
+import mega.privacy.android.domain.usecase.chat.MonitorNoteToSelfChatIsEmptyUseCase
 import mega.privacy.android.domain.usecase.chat.SetNoteToSelfChatNewLabelPreferenceUseCase
 import mega.privacy.android.domain.usecase.featureflag.GetFeatureFlagValueUseCase
 import org.junit.jupiter.api.BeforeEach
@@ -26,7 +27,7 @@ internal class NoteToSelfChatViewModelTest {
     private lateinit var underTest: NoteToSelfChatViewModel
     private val getFeatureFlagValueUseCase: GetFeatureFlagValueUseCase = mock()
     private val getNoteToSelfChatUseCase: GetNoteToSelfChatUseCase = mock()
-    private val isAnEmptyChatUseCase: IsAnEmptyChatUseCase = mock()
+    private val monitorNoteToSelfChatIsEmptyUseCase: MonitorNoteToSelfChatIsEmptyUseCase = mock()
     private val getNoteToSelfChatPreferenceUseCase: GetNoteToSelfChatNewLabelPreferenceUseCase =
         mock()
     private val setNoteToSelfChatPreferenceUseCase: SetNoteToSelfChatNewLabelPreferenceUseCase =
@@ -40,7 +41,7 @@ internal class NoteToSelfChatViewModelTest {
         reset(
             getFeatureFlagValueUseCase,
             getNoteToSelfChatUseCase,
-            isAnEmptyChatUseCase,
+            monitorNoteToSelfChatIsEmptyUseCase,
             getNoteToSelfChatPreferenceUseCase,
             setNoteToSelfChatPreferenceUseCase
         )
@@ -53,7 +54,7 @@ internal class NoteToSelfChatViewModelTest {
         underTest = NoteToSelfChatViewModel(
             getFeatureFlagValueUseCase = getFeatureFlagValueUseCase,
             getNoteToSelfChatUseCase = getNoteToSelfChatUseCase,
-            isAnEmptyChatUseCase = isAnEmptyChatUseCase,
+            monitorNoteToSelfChatIsEmptyUseCase = monitorNoteToSelfChatIsEmptyUseCase,
             getNoteToSelfChatPreferenceUseCase = getNoteToSelfChatPreferenceUseCase,
             setNoteToSelfChatPreferenceUseCase = setNoteToSelfChatPreferenceUseCase
         )
@@ -70,7 +71,9 @@ internal class NoteToSelfChatViewModelTest {
             on { isNoteToSelf }.thenReturn(true)
         }
         whenever(getNoteToSelfChatUseCase()).thenReturn(chatRoom)
-        whenever(isAnEmptyChatUseCase(123L)).thenReturn(true)
+        whenever(monitorNoteToSelfChatIsEmptyUseCase(123L)).thenReturn(
+            flowOf(true)
+        )
         initTestClass()
         underTest.state.test {
             val updatedState = awaitItem()
@@ -91,7 +94,9 @@ internal class NoteToSelfChatViewModelTest {
             val newValue = 2
 
             whenever(getNoteToSelfChatUseCase()).thenReturn(chatRoom)
-            whenever(isAnEmptyChatUseCase(123L)).thenReturn(true)
+            whenever(monitorNoteToSelfChatIsEmptyUseCase(123L)).thenReturn(
+                flowOf(true)
+            )
             whenever(getNoteToSelfChatPreferenceUseCase()).thenReturn(currentValue)
             initTestClass()
 
@@ -115,7 +120,9 @@ internal class NoteToSelfChatViewModelTest {
             val maxValue = 5
             val invalidValue = -1
             whenever(getNoteToSelfChatUseCase()).thenReturn(chatRoom)
-            whenever(isAnEmptyChatUseCase(123L)).thenReturn(true)
+            whenever(monitorNoteToSelfChatIsEmptyUseCase(123L)).thenReturn(
+                flowOf(true)
+            )
             whenever(getNoteToSelfChatPreferenceUseCase()).thenReturn(invalidValue)
             initTestClass()
 
@@ -138,7 +145,9 @@ internal class NoteToSelfChatViewModelTest {
             val invalidValue = -1
             val consumedValue = 0
             whenever(getNoteToSelfChatUseCase()).thenReturn(chatRoom)
-            whenever(isAnEmptyChatUseCase(123L)).thenReturn(true)
+            whenever(monitorNoteToSelfChatIsEmptyUseCase(123L)).thenReturn(
+                flowOf(true)
+            )
             whenever(getNoteToSelfChatPreferenceUseCase()).thenReturn(consumedValue)
             initTestClass()
 

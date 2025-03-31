@@ -184,6 +184,7 @@ fun ChatTabsView(
                     isMeetingView = isMeetingView,
                     tooltip = state.tooltip,
                     isNew = noteToSelfChatState.isNewFeature,
+                    isHint = noteToSelfChatState.isNoteToSelfChatEmpty,
                     onItemMoreClick = onItemMoreClick,
                     onItemSelected = onItemSelected,
                     onScrollInProgress = { showFabButton = !it },

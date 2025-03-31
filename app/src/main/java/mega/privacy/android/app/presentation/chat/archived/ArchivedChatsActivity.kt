@@ -54,9 +54,12 @@ class ArchivedChatsActivity : AppCompatActivity() {
         setContent {
             val mode by getThemeMode().collectAsStateWithLifecycle(initialValue = ThemeMode.System)
             val state by viewModel.getState().collectAsStateWithLifecycle()
+            val noteToSelfState by noteToSelfChatViewModel.state.collectAsStateWithLifecycle()
+
             OriginalTheme(isDark = mode.isDarkMode()) {
                 ArchivedChatsView(
                     state = state,
+                    noteToSelfState = noteToSelfState,
                     onItemClick = ::onItemClick,
                     onItemUnarchived = viewModel::unarchiveChat,
                     onBackPressed = { finish() },

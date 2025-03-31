@@ -87,6 +87,7 @@ fun ChatListView(
     isMeetingView: Boolean,
     modifier: Modifier = Modifier,
     isNew: Boolean = false,
+    isHint: Boolean = false,
     hasAnyContact: Boolean = false,
     isLoading: Boolean = false,
     tooltip: MeetingTooltipItem = MeetingTooltipItem.NONE,
@@ -106,8 +107,9 @@ fun ChatListView(
             .background(MaterialTheme.colors.surface)
     ) {
         val showEmptyStateAndNoteToSelfChat =
-            !isMeetingView && (items.size == 1 && items.first() is ChatRoomItem.NoteToSelfChatRoomItem)
-        val isEmptyStateShowed = !isLoading && (items.isEmpty() || showEmptyStateAndNoteToSelfChat)
+            !isMeetingView && (items.size == 1 && items.first() is ChatRoomItem.NoteToSelfChatRoomItem && isHint)
+        val isEmptyStateShowed =
+            !isLoading && (items.isEmpty() || (showEmptyStateAndNoteToSelfChat))
 
         if (items.isNotEmpty()) {
             ListView(
