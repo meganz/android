@@ -21,6 +21,14 @@ import mega.privacy.android.domain.exception.MegaException
  * @property currentPlayingVideoSize the current playing video size
  * @property mediaPlaybackState the playback state
  * @property snackBarMessage the snack bar message
+ * @property menuActions the list of video player menu actions
+ * @property accountType the account type
+ * @property isBusinessAccountExpired whether the business account is expired
+ * @property hiddenNodeEnabled whether the hidden node is enabled
+ * @property isHiddenNodesOnboarded whether the hidden nodes are onboarded
+ * @property showHiddenItems whether the hidden items are shown
+ * @property isFullScreen whether it is full screen
+ * @property isVideoOptionPopupShown whether the video option popup is shown
  */
 data class VideoPlayerUiState(
     val items: List<VideoPlayerItem> = emptyList(),
@@ -41,4 +49,6 @@ data class VideoPlayerUiState(
     val hiddenNodeEnabled: Boolean = false,
     val isHiddenNodesOnboarded: Boolean = false,
     val showHiddenItems: Boolean? = null,
+    val isFullScreen: Boolean = false,
+    val isVideoOptionPopupShown: Boolean = false,
 )

@@ -1,9 +1,20 @@
 package mega.privacy.android.app.presentation.videoplayer
 
+import android.annotation.SuppressLint
+import android.content.ContentValues
 import android.content.Context
 import android.content.Intent
+import android.graphics.Bitmap
+import android.graphics.Rect
 import android.net.Uri
 import android.os.Build
+import android.os.Handler
+import android.os.Looper
+import android.provider.MediaStore
+import android.view.PixelCopy
+import android.view.Surface
+import android.view.TextureView
+import android.view.View
 import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
@@ -132,7 +143,9 @@ import mega.privacy.android.domain.usecase.videosection.SaveVideoRecentlyWatched
 import nz.mega.sdk.MegaApiJava.INVALID_HANDLE
 import timber.log.Timber
 import java.io.File
+import java.text.SimpleDateFormat
 import java.time.Instant
+import java.util.Date
 import javax.inject.Inject
 import kotlin.Boolean
 import kotlin.time.Duration.Companion.seconds
@@ -936,8 +949,130 @@ class VideoPlayerViewModel @Inject constructor(
         }.getOrNull() == true
     }
 
+    internal fun updateIsVideoOptionPopupShown(value: Boolean) {
+        uiState.update { it.copy(isVideoOptionPopupShown = value) }
+    }
+
+    /**
+     * Capture the screenshot when video playing
+     *
+     * @param captureView the view that will be captured
+     * @param successCallback the callback after the screenshot is saved successfully
+     *
+     */
+    @SuppressLint("SimpleDateFormat")
+    internal fun screenshotWhenVideoPlaying(
+        rootPath: String,
+        captureView: View,
+        successCallback: (bitmap: Bitmap) -> Unit,
+    ) {
+        val textureView = captureView as? TextureView
+        if (textureView == null || !textureView.isAvailable) {
+            Timber.d("Capture screenshot error: TextureView is not available")
+            return
+        }
+        // Using video size for the capture size to ensure the screenshot is complete.
+        val (captureWidth, captureHeight) =
+            uiState.value.currentPlayingVideoSize?.let { (width, height) ->
+                width to height
+            } ?: (captureView.width to captureView.height)
+        try {
+            val screenshotBitmap = Bitmap.createBitmap(
+                captureWidth,
+                captureHeight,
+                Bitmap.Config.ARGB_8888
+            )
+            val surfaceView = Surface(textureView.surfaceTexture)
+            PixelCopy.request(
+                surfaceView,
+                Rect(0, 0, captureWidth, captureHeight),
+                screenshotBitmap,
+                { copyResult ->
+                    if (copyResult == PixelCopy.SUCCESS) {
+                        viewModelScope.launch {
+                            saveBitmapByMediaStore(
+                                rootPath = rootPath,
+                                bitmap = screenshotBitmap,
+                                successCallback = successCallback
+                            )
+                        }
+                    }
+                },
+                Handler(Looper.getMainLooper())
+            )
+        } catch (e: Exception) {
+            Timber.e("Capture screenshot error: ${e.message}")
+        }
+    }
+
+    @SuppressLint("SimpleDateFormat")
+    private suspend fun saveBitmapByMediaStore(
+        rootPath: String,
+        bitmap: Bitmap,
+        successCallback: (bitmap: Bitmap) -> Unit,
+    ) = withContext(ioDispatcher) {
+        val contentValues = organiseContentValues(rootPath)
+        insertAndCompressBitmap(contentValues, bitmap, successCallback)
+    }
+
+    @SuppressLint("SimpleDateFormat")
+    private fun organiseContentValues(rootPath: String): ContentValues {
+        val screenshotFileName =
+            SimpleDateFormat(DATE_FORMAT_PATTERN).format(Date(System.currentTimeMillis()))
+        val screenshotFileFullName =
+            "${SCREENSHOT_NAME_PREFIX}$screenshotFileName${SCREENSHOT_NAME_SUFFIX}"
+
+        return ContentValues().apply {
+            put(MediaStore.Images.Media.DISPLAY_NAME, screenshotFileFullName)
+            put(MediaStore.Images.Media.MIME_TYPE, MIME_TYPE_JPEG)
+            if (Build.VERSION.SDK_INT < Build.VERSION_CODES.Q) {
+                val screenshotsFolderPath =
+                    "${rootPath}${File.separator}${MEGA_SCREENSHOTS_FOLDER_NAME}${File.separator}"
+                val fileAbsolutePath = "$screenshotsFolderPath$screenshotFileFullName"
+
+                put(MediaStore.Images.Media.DATA, fileAbsolutePath)
+            } else {
+                put(
+                    MediaStore.Images.Media.RELATIVE_PATH,
+                    "${DCIM_FOLDER_NAME}$MEGA_SCREENSHOTS_FOLDER_NAME"
+                )
+            }
+        }
+    }
+
+    private fun insertAndCompressBitmap(
+        contentValues: ContentValues,
+        bitmap: Bitmap,
+        successCallback: (bitmap: Bitmap) -> Unit,
+    ) {
+        val contentResolver = context.contentResolver
+        contentResolver?.insert(MediaStore.Images.Media.EXTERNAL_CONTENT_URI, contentValues)
+            ?.let { uri ->
+                try {
+                    contentResolver.openOutputStream(uri)?.use { outputStream ->
+                        bitmap.compress(
+                            Bitmap.CompressFormat.JPEG,
+                            QUALITY_SCREENSHOT,
+                            outputStream
+                        )
+                        successCallback(bitmap)
+                    }
+                } catch (e: Exception) {
+                    Timber.e("Bitmap is saved error: ${e.message}")
+                }
+            }
+    }
+
     companion object {
         private const val MAX_RETRY = 6
+
+        private const val MEGA_SCREENSHOTS_FOLDER_NAME = "MEGA Screenshots/"
+        private const val DCIM_FOLDER_NAME = "DCIM/"
+        private const val MIME_TYPE_JPEG = "image/jpeg"
+        private const val QUALITY_SCREENSHOT = 100
+        private const val DATE_FORMAT_PATTERN = "yyyyMMdd-HHmmss"
+        private const val SCREENSHOT_NAME_PREFIX = "Screenshot_"
+        private const val SCREENSHOT_NAME_SUFFIX = ".jpg"
     }
 }
 

@@ -1,10 +1,14 @@
 package mega.privacy.android.app.mediaplayer.videoplayer.view
 
-import android.content.res.Configuration
+import android.content.res.Configuration.ORIENTATION_LANDSCAPE
 import android.content.res.Configuration.ORIENTATION_PORTRAIT
+import android.graphics.Bitmap
 import android.view.View
 import android.view.ViewGroup
 import android.widget.ProgressBar
+import androidx.compose.animation.core.Animatable
+import androidx.compose.animation.core.tween
+import androidx.compose.foundation.Image
 import androidx.compose.foundation.layout.WindowInsets
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.navigationBars
@@ -23,6 +27,9 @@ import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.ExperimentalComposeUiApi
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.TransformOrigin
+import androidx.compose.ui.graphics.asImageBitmap
+import androidx.compose.ui.graphics.graphicsLayer
 import androidx.compose.ui.platform.LocalConfiguration
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalDensity
@@ -57,6 +64,7 @@ import mega.privacy.android.app.presentation.videoplayer.view.VideoPlayerTopBar
 import mega.privacy.android.app.utils.Constants.AUDIO_PLAYER_TOOLBAR_INIT_HIDE_DELAY_MS
 import mega.privacy.android.shared.original.core.ui.controls.layouts.MegaScaffold
 import mega.privacy.android.shared.original.core.ui.controls.sheets.MegaBottomSheetLayout
+import mega.privacy.android.shared.original.core.ui.utils.showAutoDurationSnackbar
 
 @androidx.annotation.OptIn(UnstableApi::class)
 @OptIn(ExperimentalComposeUiApi::class, ExperimentalMaterialNavigationApi::class)
@@ -65,7 +73,7 @@ internal fun VideoPlayerScreen(
     bottomSheetNavigator: BottomSheetNavigator,
     scaffoldState: ScaffoldState,
     viewModel: VideoPlayerViewModel,
-    player: ExoPlayer?
+    player: ExoPlayer?,
 ) {
     val lifecycle = LocalLifecycleOwner.current.lifecycle
     val context = LocalContext.current
@@ -92,9 +100,30 @@ internal fun VideoPlayerScreen(
     val coroutineScope = rememberCoroutineScope()
     var autoHideJob by remember { mutableStateOf<Job?>(null) }
 
+    var resizedBitmap by remember { mutableStateOf<Bitmap?>(null) }
+    var isScreenshotVisible by remember { mutableStateOf(false) }
+    val scale = remember { Animatable(1f) }
+
+    val screenWidth = with(density) { LocalConfiguration.current.screenWidthDp.dp.toPx() }
+    val screenHeight = with(density) { LocalConfiguration.current.screenHeightDp.dp.toPx() }
+
+    LaunchedEffect(isScreenshotVisible) {
+        if (isScreenshotVisible) {
+            scale.snapTo(1f)
+            scale.animateTo(if (orientation == ORIENTATION_LANDSCAPE) 0.3f else 0.4f, tween(1000))
+            coroutineScope.launch {
+                scaffoldState.snackbarHostState.showAutoDurationSnackbar(context.getString(R.string.media_player_video_snackbar_screenshot_saved))
+            }
+            delay(1000)
+            resizedBitmap?.recycle()
+            resizedBitmap = null
+            isScreenshotVisible = false
+        }
+    }
+
     LaunchedEffect(uiState.snackBarMessage) {
         uiState.snackBarMessage?.let { message ->
-            scaffoldState.snackbarHostState.showSnackbar(message)
+            scaffoldState.snackbarHostState.showAutoDurationSnackbar(message)
             viewModel.updateSnackBarMessage(null)
         }
     }
@@ -124,7 +153,27 @@ internal fun VideoPlayerScreen(
                     factory = { inflater, parent, attachToParent ->
                         VideoPlayerPlayerViewBinding.inflate(inflater, parent, attachToParent)
                             .apply {
-                                VideoPlayerController(context, viewModel, root).let {
+                                VideoPlayerController(
+                                    context = context,
+                                    viewModel = viewModel,
+                                    container = root
+                                ) { bitmap ->
+                                    val (width, height) =
+                                        if (orientation == ORIENTATION_LANDSCAPE && bitmap.height > bitmap.width) {
+                                            (screenHeight * bitmap.width / bitmap.height) to screenHeight
+                                        } else {
+                                            screenWidth to (screenWidth * bitmap.height / bitmap.width)
+                                        }
+
+                                    resizedBitmap = Bitmap.createScaledBitmap(
+                                        bitmap,
+                                        width.toInt(),
+                                        height.toInt(),
+                                        false
+                                    )
+                                    isScreenshotVisible = true
+                                    bitmap.recycle()
+                                }.let {
                                     lifecycle.addObserver(it)
                                 }
 
@@ -214,6 +263,27 @@ internal fun VideoPlayerScreen(
                         onMenuActionClicked = { },
                     )
                 }
+
+                resizedBitmap?.let {
+                    if (isScreenshotVisible) {
+                        Image(
+                            bitmap = it.asImageBitmap(),
+                            contentDescription = "Screenshot Animation",
+                            modifier = Modifier
+                                .fillMaxSize()
+                                .graphicsLayer(
+                                    scaleX = scale.value,
+                                    scaleY = scale.value,
+                                    transformOrigin =
+                                    if (orientation == ORIENTATION_LANDSCAPE)
+                                        TransformOrigin(0.9f, 0.9f)
+                                    else {
+                                        TransformOrigin(0.9f, 0.8f)
+                                    }
+                                )
+                        )
+                    }
+                }
             }
         }
     }
@@ -224,7 +294,7 @@ private fun getNavigationBarHeight(
     orientation: Int,
     density: Density,
     layoutDirection: LayoutDirection,
-) = if (orientation == Configuration.ORIENTATION_LANDSCAPE) {
+) = if (orientation == ORIENTATION_LANDSCAPE) {
     with(density) { WindowInsets.navigationBars.getRight(density, layoutDirection).toDp() }
 } else {
     with(density) { WindowInsets.navigationBars.getBottom(density).toDp() }

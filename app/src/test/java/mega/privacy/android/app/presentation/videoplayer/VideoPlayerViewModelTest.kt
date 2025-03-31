@@ -1298,4 +1298,16 @@ class VideoPlayerViewModelTest {
                 cancelAndConsumeRemainingEvents()
             }
         }
+
+    @Test
+    fun `test that isVideoOptionPopupShown is updated correctly`() = runTest {
+        initViewModel()
+        underTest.updateIsVideoOptionPopupShown(true)
+        testScheduler.advanceUntilIdle()
+        underTest.uiState.test {
+            assertThat(awaitItem().isVideoOptionPopupShown).isTrue()
+            underTest.updateIsVideoOptionPopupShown(false)
+            assertThat(awaitItem().isVideoOptionPopupShown).isFalse()
+        }
+    }
 }
