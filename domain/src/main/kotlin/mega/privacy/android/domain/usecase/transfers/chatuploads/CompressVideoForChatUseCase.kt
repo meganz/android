@@ -7,6 +7,7 @@ import kotlinx.coroutines.flow.onCompletion
 import mega.privacy.android.domain.entity.Progress
 import mega.privacy.android.domain.entity.VideoCompressionState
 import mega.privacy.android.domain.entity.VideoQuality
+import mega.privacy.android.domain.entity.uri.UriPath
 import mega.privacy.android.domain.repository.SettingsRepository
 import mega.privacy.android.domain.usecase.chat.ChatUploadCompressionState
 import mega.privacy.android.domain.usecase.chat.ChatUploadNotCompressedReason
@@ -39,7 +40,7 @@ class CompressVideoForChatUseCase @Inject constructor(
         return getCacheFileForUploadUseCase(file, true)?.let { destination ->
             compressVideoUseCase(
                 rootPath = destination.parent,
-                filePath = file.absolutePath,
+                original = UriPath(file.absolutePath),
                 newFilePath = destination.absolutePath,
                 quality = videoQuality,
             ).mapNotNull { videoCompressionState ->

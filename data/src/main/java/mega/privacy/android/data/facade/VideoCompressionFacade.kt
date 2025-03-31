@@ -19,6 +19,7 @@ import mega.privacy.android.data.gateway.VideoCompressorGateway
 import mega.privacy.android.domain.entity.VideoAttachment
 import mega.privacy.android.domain.entity.VideoCompressionState
 import mega.privacy.android.domain.entity.VideoQuality
+import mega.privacy.android.domain.entity.uri.UriPath
 import timber.log.Timber
 import java.io.File
 import java.io.IOException
@@ -68,17 +69,20 @@ internal class VideoCompressionFacade @Inject constructor(private val fileGatewa
                     ensureActive()
                     val attachment = queue.poll()
                     currentFileIndex += 1
-                    totalSizeProcessed += attachment?.originalPath.takeIf {
-                        it.isNullOrEmpty().not()
-                    }?.let {
-                        File(it).length()
-                    } ?: 0
+                    val originalFileLength = attachment?.let {
+                        if (attachment.originalPath.isPath()) {
+                            fileGateway.getTotalSize(File(attachment.originalPath.value))
+                        } else {
+                            fileGateway.getFileSizeFromUri(attachment.originalPath.value)
+                        }
+                    } ?: 0L
+                    totalSizeProcessed += originalFileLength
                     runCatching {
                         attachment?.let {
                             outputRoot?.run {
                                 if (!fileGateway.hasEnoughStorage(
                                         rootPath = this,
-                                        File(it.originalPath)
+                                        originalFileLength
                                     )
                                 ) {
                                     send(VideoCompressionState.InsufficientStorage)
@@ -157,7 +161,7 @@ internal class VideoCompressionFacade @Inject constructor(private val fileGatewa
     ) = suspendCancellableCoroutine {
         Timber.d("prepareAndChangeResolution")
         var exception: Exception? = null
-        val inputFile = videoAttachment.originalPath
+        val inputUriPath = videoAttachment.originalPath
         val outputFile = videoAttachment.newPath
         val videoCodecInfo = selectCodec(OUTPUT_VIDEO_MIME_TYPE)
             ?: return@suspendCancellableCoroutine
@@ -196,11 +200,11 @@ internal class VideoCompressionFacade @Inject constructor(private val fileGatewa
             }
         }
         try {
-            videoExtractor = createExtractor(inputFile)
+            videoExtractor = createExtractor(inputUriPath)
             val videoInputTrack = getAndSelectVideoTrackIndex(videoExtractor)
             val inputFormat = videoExtractor.getTrackFormat(videoInputTrack)
             val metadataRetriever = MediaMetadataRetriever()
-            metadataRetriever.setDataSource(inputFile)
+            metadataRetriever.setDataSource(inputUriPath.value)
             getOriginalWidthAndHeight(metadataRetriever)
             val bitrate = getBitrate(
                 (metadataRetriever.extractMetadata(MediaMetadataRetriever.METADATA_KEY_BITRATE)
@@ -242,7 +246,7 @@ internal class VideoCompressionFacade @Inject constructor(private val fileGatewa
             inputSurface.makeCurrent()
             outputSurface = OutputSurface()
             videoDecoder = createVideoDecoder(inputFormat, outputSurface.surface)
-            audioExtractor = createExtractor(inputFile)
+            audioExtractor = createExtractor(inputUriPath)
             val audioInputTrack =
                 getAndSelectAudioTrackIndex(audioExtractor).takeIf { trackIndex -> trackIndex >= 0 }
                     ?: throw RuntimeException("Audio information not found")
@@ -689,9 +693,16 @@ internal class VideoCompressionFacade @Inject constructor(private val fileGatewa
      * @return [MediaExtractor]
      */
     @Throws(IOException::class)
-    private fun createExtractor(mInputFile: String): MediaExtractor {
+    private fun createExtractor(mInputFile: UriPath): MediaExtractor {
         MediaExtractor().also {
-            it.setDataSource(mInputFile)
+            if (mInputFile.isPath()) {
+                it.setDataSource(mInputFile.value)
+            } else {
+                fileGateway.getFileDescriptorSync(mInputFile, false)?.let { pfd ->
+                    it.setDataSource(pfd.fileDescriptor)
+                    pfd.close()
+                }
+            }
             return it
         }
     }

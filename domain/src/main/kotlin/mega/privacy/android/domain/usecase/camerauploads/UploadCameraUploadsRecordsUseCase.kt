@@ -460,7 +460,7 @@ class UploadCameraUploadsRecordsUseCase @Inject constructor(
     ): Flow<VideoCompressionState> =
         compressVideoUseCase(
             tempRoot,
-            record.filePath,
+            UriPath(record.filePath),
             record.tempFilePath,
             videoQuality,
         ).cancellable()

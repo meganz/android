@@ -1,5 +1,7 @@
 package mega.privacy.android.domain.entity
 
+import mega.privacy.android.domain.entity.uri.UriPath
+
 /**
  * Data class for videos that need to be uploaded
  * @property originalPath           The original video path
@@ -10,7 +12,7 @@ package mega.privacy.android.domain.entity
  * @property totalDuration          The video size
  */
 data class VideoAttachment(
-    val originalPath: String,
+    val originalPath: UriPath,
     val newPath: String,
     val pendingMessageId: Long?,
     val id: Long?,

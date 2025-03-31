@@ -8,6 +8,7 @@ import mega.privacy.android.data.gateway.FileGateway
 import mega.privacy.android.data.gateway.VideoCompressorGateway
 import mega.privacy.android.domain.entity.VideoAttachment
 import mega.privacy.android.domain.entity.VideoCompressionState
+import mega.privacy.android.domain.entity.uri.UriPath
 import org.junit.Before
 import org.junit.Test
 import org.mockito.kotlin.any
@@ -15,7 +16,6 @@ import org.mockito.kotlin.mock
 import org.mockito.kotlin.whenever
 import kotlin.contracts.ExperimentalContracts
 
-@OptIn(ExperimentalCoroutinesApi::class)
 @ExperimentalContracts
 class VideoCompressionFacadeTest {
 
@@ -26,14 +26,14 @@ class VideoCompressionFacadeTest {
     }
 
     private val compressPrimaryVideo = VideoAttachment(
-        originalPath = "/path/to/original/1",
+        originalPath = UriPath("/path/to/original/1"),
         newPath = "path/to/new/1",
         id = 1,
         pendingMessageId = null
     )
 
     private val secondaryVideo = VideoAttachment(
-        originalPath = "/path/to/original/2",
+        originalPath = UriPath("/path/to/original/2"),
         newPath = "path/to/new/2",
         id = 2,
         pendingMessageId = null
@@ -71,7 +71,7 @@ class VideoCompressionFacadeTest {
         runTest {
             underTest.setOutputRoot("/path/to/root")
             underTest.addItems(videoAttachments)
-            whenever(fileGateway.hasEnoughStorage(any(), any())).thenReturn(false)
+            whenever(fileGateway.hasEnoughStorage(any(), any<Long>())).thenReturn(false)
             underTest.start().test {
                 val event = awaitItem()
                 assertThat(event.javaClass)

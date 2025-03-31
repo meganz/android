@@ -8,6 +8,7 @@ import mega.privacy.android.data.gateway.VideoCompressorGateway
 import mega.privacy.android.domain.entity.VideoAttachment
 import mega.privacy.android.domain.entity.VideoCompressionState
 import mega.privacy.android.domain.entity.VideoQuality
+import mega.privacy.android.domain.entity.uri.UriPath
 import mega.privacy.android.domain.qualifier.IoDispatcher
 import mega.privacy.android.domain.repository.VideoRepository
 import javax.inject.Inject
@@ -19,7 +20,7 @@ internal class VideoRepositoryImpl @Inject constructor(
 
     override fun compressVideo(
         root: String,
-        filePath: String,
+        original: UriPath,
         newFilePath: String,
         quality: VideoQuality,
     ): Flow<VideoCompressionState> =
@@ -29,7 +30,7 @@ internal class VideoRepositoryImpl @Inject constructor(
             addItems(
                 listOf(
                     VideoAttachment(
-                        filePath,
+                        original,
                         newFilePath,
                         id = null,
                         pendingMessageId = null,

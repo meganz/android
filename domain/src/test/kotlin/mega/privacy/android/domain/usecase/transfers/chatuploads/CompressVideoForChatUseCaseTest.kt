@@ -7,6 +7,7 @@ import kotlinx.coroutines.test.runTest
 import mega.privacy.android.domain.entity.Progress
 import mega.privacy.android.domain.entity.VideoCompressionState
 import mega.privacy.android.domain.entity.VideoQuality
+import mega.privacy.android.domain.entity.uri.UriPath
 import mega.privacy.android.domain.repository.SettingsRepository
 import mega.privacy.android.domain.usecase.chat.ChatUploadCompressionState
 import mega.privacy.android.domain.usecase.transfers.GetCacheFileForUploadUseCase
@@ -64,7 +65,7 @@ class CompressVideoForChatUseCaseTest {
         whenever(
             compressVideoUseCase(
                 rootPath = expected.parent,
-                filePath = file.absolutePath,
+                original = UriPath(file.absolutePath),
                 newFilePath = expected.absolutePath,
                 quality = videoQuality,
             )
@@ -76,7 +77,7 @@ class CompressVideoForChatUseCaseTest {
         }
         verify(compressVideoUseCase).invoke(
             expected.parent,
-            file.absolutePath,
+            UriPath(file.absolutePath),
             expected.absolutePath,
             videoQuality,
         )
@@ -91,7 +92,7 @@ class CompressVideoForChatUseCaseTest {
         whenever(
             compressVideoUseCase(
                 rootPath = destination.parent,
-                filePath = file.absolutePath,
+                original = UriPath(file.absolutePath),
                 newFilePath = destination.absolutePath,
                 quality = VideoQuality.HIGH,
             )

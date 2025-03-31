@@ -260,7 +260,11 @@ internal class FileFacade @Inject constructor(
     }
 
     override suspend fun hasEnoughStorage(rootPath: String, file: File) =
-        runCatching { StatFs(rootPath).availableBytes >= file.length() }.onFailure { Timber.e(it) }
+        runCatching { hasEnoughStorage(rootPath, file.length()) }.onFailure { Timber.e(it) }
+            .getOrDefault(false)
+
+    override suspend fun hasEnoughStorage(rootPath: String, length: Long) =
+        runCatching { StatFs(rootPath).availableBytes >= length }.onFailure { Timber.e(it) }
             .getOrDefault(false)
 
     override suspend fun deleteFile(file: File): Boolean {

@@ -1089,7 +1089,14 @@ internal class UploadCameraUploadsRecordsUseCaseTest {
                     BatteryInfo(100, false)
                 )
             )
-            whenever(compressVideoUseCase(tempRoot, record.filePath, record.tempFilePath, quality))
+            whenever(
+                compressVideoUseCase(
+                    tempRoot,
+                    UriPath(record.filePath),
+                    record.tempFilePath,
+                    quality
+                )
+            )
                 .thenReturn(flow {
                     emit(compressionEvents.first())
                 })
@@ -1100,7 +1107,7 @@ internal class UploadCameraUploadsRecordsUseCaseTest {
                 assertThat(cancelItem).isInstanceOf(CameraUploadsTransferProgress.Compressing.Cancel::class.java)
                 verify(compressVideoUseCase).invoke(
                     tempRoot,
-                    record.filePath,
+                    UriPath(record.filePath),
                     record.tempFilePath,
                     quality
                 )
@@ -1128,7 +1135,7 @@ internal class UploadCameraUploadsRecordsUseCaseTest {
 
             verify(compressVideoUseCase, never()).invoke(
                 tempRoot,
-                record.filePath,
+                UriPath(record.filePath),
                 record.tempFilePath,
                 quality
             )
@@ -1146,14 +1153,21 @@ internal class UploadCameraUploadsRecordsUseCaseTest {
             whenever(fileSystemRepository.doesFileExist(record.tempFilePath)).thenReturn(true)
             whenever(fileSystemRepository.doesFileExist(record.filePath)).thenReturn(true)
             mockStartUploadUseCase(record.tempFilePath)
-            whenever(compressVideoUseCase(tempRoot, record.filePath, record.tempFilePath, quality))
+            whenever(
+                compressVideoUseCase(
+                    tempRoot,
+                    UriPath(record.filePath),
+                    record.tempFilePath,
+                    quality
+                )
+            )
                 .thenReturn(flowOf(VideoCompressionState.Finished))
 
             executeUnderTest().collect()
 
             verify(compressVideoUseCase).invoke(
                 tempRoot,
-                record.filePath,
+                UriPath(record.filePath),
                 record.tempFilePath,
                 quality
             )
@@ -1174,7 +1188,14 @@ internal class UploadCameraUploadsRecordsUseCaseTest {
             whenever(fileSystemRepository.doesFileExist(record.tempFilePath)).thenReturn(true)
             whenever(fileSystemRepository.doesFileExist(record.filePath)).thenReturn(true)
             mockStartUploadUseCase(record.tempFilePath)
-            whenever(compressVideoUseCase(tempRoot, record.filePath, record.tempFilePath, quality))
+            whenever(
+                compressVideoUseCase(
+                    tempRoot,
+                    UriPath(record.filePath),
+                    record.tempFilePath,
+                    quality
+                )
+            )
                 .thenReturn(compressionEvents.asFlow())
 
             executeUnderTest().test {
@@ -1225,7 +1246,14 @@ internal class UploadCameraUploadsRecordsUseCaseTest {
             whenever(fileSystemRepository.doesFileExist(record.tempFilePath)).thenReturn(false)
             whenever(fileSystemRepository.doesFileExist(record.filePath)).thenReturn(true)
             mockStartUploadUseCase(record.filePath)
-            whenever(compressVideoUseCase(tempRoot, record.filePath, record.tempFilePath, quality))
+            whenever(
+                compressVideoUseCase(
+                    tempRoot,
+                    UriPath(record.filePath),
+                    record.tempFilePath,
+                    quality
+                )
+            )
                 .thenReturn(
                     flowOf(VideoCompressionState.Failed(null), VideoCompressionState.Finished)
                 )

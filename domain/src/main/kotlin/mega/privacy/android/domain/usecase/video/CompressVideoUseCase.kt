@@ -1,6 +1,7 @@
 package mega.privacy.android.domain.usecase.video
 
 import mega.privacy.android.domain.entity.VideoQuality
+import mega.privacy.android.domain.entity.uri.UriPath
 import mega.privacy.android.domain.repository.VideoRepository
 import javax.inject.Inject
 
@@ -14,18 +15,18 @@ class CompressVideoUseCase @Inject constructor(
      * Compress a video
      *
      * @param rootPath
-     * @param filePath
+     * @param original
      * @param newFilePath
      * @param quality
      */
     operator fun invoke(
         rootPath: String,
-        filePath: String,
+        original: UriPath,
         newFilePath: String,
         quality: VideoQuality,
     ) = videoRepository.compressVideo(
         root = rootPath,
-        filePath = filePath,
+        original = original,
         newFilePath = newFilePath,
         quality = quality,
     )

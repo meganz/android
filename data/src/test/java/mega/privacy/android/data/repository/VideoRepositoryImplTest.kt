@@ -9,6 +9,7 @@ import kotlinx.coroutines.test.runTest
 import mega.privacy.android.data.gateway.VideoCompressorGateway
 import mega.privacy.android.domain.entity.VideoCompressionState
 import mega.privacy.android.domain.entity.VideoQuality
+import mega.privacy.android.domain.entity.uri.UriPath
 import mega.privacy.android.domain.repository.VideoRepository
 import org.junit.jupiter.api.BeforeAll
 import org.junit.jupiter.api.BeforeEach
@@ -70,7 +71,7 @@ class VideoRepositoryImplTest {
             underTest.compressVideo(
                 root = "",
                 quality = VideoQuality.MEDIUM,
-                filePath = "filePath",
+                original = UriPath("filePath"),
                 newFilePath = "newFilePath",
             ).test {
                 list.forEach {

@@ -156,6 +156,15 @@ interface FileGateway {
     suspend fun hasEnoughStorage(rootPath: String, file: File): Boolean
 
     /**
+     * check enough storage availability
+     *
+     * @param rootPath new Path of the file.
+     * @param length length of the file to be created.
+     * @return [Boolean] whether enough storage available or not
+     */
+    suspend fun hasEnoughStorage(rootPath: String, length: Long): Boolean
+
+    /**
      * Delete File
      *
      * @param file
