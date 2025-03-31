@@ -2,6 +2,7 @@ package mega.privacy.android.domain.usecase.transfers.chatuploads
 
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.flowOf
+import mega.privacy.android.domain.entity.uri.UriPath
 import mega.privacy.android.domain.repository.FileSystemRepository
 import mega.privacy.android.domain.usecase.chat.ChatUploadCompressionState
 import mega.privacy.android.domain.usecase.chat.ChatUploadNotCompressedReason
@@ -24,7 +25,7 @@ class DownscaleImageForChatUseCase @Inject constructor(
     suspend operator fun invoke(file: File): Flow<ChatUploadCompressionState> {
         return getCacheFileForUploadUseCase(file, true)?.let { destination ->
             fileSystemRepository.downscaleImage(
-                file = file,
+                original = UriPath.fromFile(file),
                 destination = destination,
                 maxPixels = DOWNSCALE_IMAGES_PX
             )

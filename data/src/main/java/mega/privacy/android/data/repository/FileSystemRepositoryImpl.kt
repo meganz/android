@@ -381,8 +381,8 @@ internal class FileSystemRepositoryImpl @Inject constructor(
             } ?: listOf(currentFile)
         }
 
-    override suspend fun downscaleImage(file: File, destination: File, maxPixels: Long) {
-        fileGateway.downscaleImage(file, destination, maxPixels)
+    override suspend fun downscaleImage(original: UriPath, destination: File, maxPixels: Long) {
+        fileGateway.downscaleImage(original, destination, maxPixels)
     }
 
     override suspend fun deleteVoiceClip(name: String): Boolean =

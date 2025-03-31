@@ -3,6 +3,7 @@ package mega.privacy.android.domain.usecase.transfers.chatuploads
 import app.cash.turbine.test
 import com.google.common.truth.Truth.assertThat
 import kotlinx.coroutines.test.runTest
+import mega.privacy.android.domain.entity.uri.UriPath
 import mega.privacy.android.domain.repository.FileSystemRepository
 import mega.privacy.android.domain.usecase.chat.ChatUploadCompressionState
 import mega.privacy.android.domain.usecase.chat.ChatUploadNotCompressedReason
@@ -54,7 +55,11 @@ class DownscaleImageForChatUseCaseTest {
                     .isEqualTo(ChatUploadCompressionState.Compressed(expected))
                 awaitComplete()
             }
-            verify(fileSystemRepository).downscaleImage(file, expected, DOWNSCALE_IMAGES_PX)
+            verify(fileSystemRepository).downscaleImage(
+                UriPath.fromFile(file),
+                expected,
+                DOWNSCALE_IMAGES_PX
+            )
         }
 
     @Test
@@ -71,14 +76,17 @@ class DownscaleImageForChatUseCaseTest {
                     )
                 awaitComplete()
             }
-            verify(fileSystemRepository).downscaleImage(file, expected, DOWNSCALE_IMAGES_PX)
+            verify(fileSystemRepository).downscaleImage(
+                UriPath.fromFile(file),
+                expected,
+                DOWNSCALE_IMAGES_PX
+            )
         }
 
     @Test
     fun `test that NoCacheFile is returned when the cache file is not created`() =
         runTest {
             val file = File("img.jpg")
-            val expected = stubDestination()
             whenever(getCacheFileForUploadUseCase(any(), any())) doReturn null
             underTest(file).test {
                 assertThat(awaitItem())
@@ -92,7 +100,7 @@ class DownscaleImageForChatUseCaseTest {
             verifyNoInteractions(fileSystemRepository)
         }
 
-    private suspend fun stubDestination(exists: Boolean = true): File {
+    private fun stubDestination(exists: Boolean = true): File {
         val destination = mock<File> {
             on { it.name } doReturn "destination"
             on { it.exists() } doReturn exists

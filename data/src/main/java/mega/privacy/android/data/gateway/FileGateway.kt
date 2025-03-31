@@ -345,9 +345,9 @@ interface FileGateway {
     suspend fun copyContentUriToFile(sourceUri: UriPath, targetFile: File)
 
     /**
-     * Creates a new image from [file] to [destination] with [maxPixels] pixels if the image has more than [maxPixels] pixels
+     * Creates a new image from [original] to [destination] with [maxPixels] pixels if the image has more than [maxPixels] pixels
      */
-    fun downscaleImage(file: File, destination: File, maxPixels: Long)
+    suspend fun downscaleImage(original: UriPath, destination: File, maxPixels: Long)
 
     /**
      * Delete file by uri

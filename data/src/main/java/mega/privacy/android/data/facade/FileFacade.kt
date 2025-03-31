@@ -520,11 +520,11 @@ internal class FileFacade @Inject constructor(
     private fun getCurrentTimeWithToleranceMultiplier(toleranceMultiplier: Int) =
         System.currentTimeMillis() * toleranceMultiplier
 
-    override fun downscaleImage(file: File, destination: File, maxPixels: Long) {
-        val orientation = AndroidGfxProcessor.getExifOrientation(file.absolutePath)
-        val fileRect = AndroidGfxProcessor.getImageDimensions(file.absolutePath, orientation)
+    override suspend fun downscaleImage(original: UriPath, destination: File, maxPixels: Long) {
+        val orientation = AndroidGfxProcessor.getExifOrientation(original.value)
+        val fileRect = AndroidGfxProcessor.getImageDimensions(original.value, orientation)
         val fileBitmap = AndroidGfxProcessor.getBitmap(
-            file.absolutePath,
+            original.value,
             fileRect,
             orientation,
             fileRect.right,
@@ -561,7 +561,7 @@ internal class FileFacade @Inject constructor(
             val fOut: FileOutputStream
             try {
                 fOut = FileOutputStream(destination)
-                scaleBitmap.compress(file.getCompressFormat(), 100, fOut)
+                scaleBitmap.compress(original.getCompressFormat(), 100, fOut)
                 fOut.flush()
                 fOut.close()
             } catch (e: java.lang.Exception) {
@@ -659,7 +659,8 @@ internal class FileFacade @Inject constructor(
     }
 
     @Suppress("Deprecation")
-    private fun File.getCompressFormat(): CompressFormat = when (extension) {
+    private suspend fun UriPath.getCompressFormat(): CompressFormat = when (
+        (if (this.isPath()) this.value else getFileNameFromUri(this.value))?.substringAfterLast(".")) {
         "jpeg", "jpg" -> CompressFormat.JPEG
         "png" -> CompressFormat.PNG
         // CompressFormat.WEBP is deprecated in API Level 30. Update function to handle both
