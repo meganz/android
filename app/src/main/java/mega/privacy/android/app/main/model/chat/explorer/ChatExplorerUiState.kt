@@ -11,7 +11,7 @@ import mega.privacy.android.app.main.megachat.chat.explorer.ChatExplorerListItem
  * @property isItemUpdated Indicating that the items are updated. Used to optimize the recycler view.
  */
 data class ChatExplorerUiState(
-    val items: List<ChatExplorerListItem> = emptyList(),
+    val items: List<ChatExplorerListItem>? = null,
     val selectedItems: List<ChatExplorerListItem> = emptyList(),
     val isItemUpdated: Boolean = false,
 )

@@ -10,22 +10,18 @@ import android.app.Activity;
 import android.content.Context;
 import android.os.Bundle;
 import android.os.Parcelable;
-import android.text.Spanned;
 import android.util.DisplayMetrics;
 import android.view.Display;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
-import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.ProgressBar;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
-
 import androidx.appcompat.app.ActionBar;
 import androidx.appcompat.app.AppCompatActivity;
-import androidx.core.text.HtmlCompat;
 import androidx.fragment.app.Fragment;
 import androidx.lifecycle.Lifecycle;
 import androidx.lifecycle.ViewModelProvider;
@@ -77,7 +73,6 @@ public class ChatExplorerFragment extends Fragment implements CheckScrollInterfa
     //Empty screen
     private TextView emptyTextView;
     private LinearLayout emptyLayout;
-    private ImageView emptyImageView;
     private RelativeLayout contentLayout;
     private ProgressBar progressBar;
 
@@ -176,28 +171,9 @@ public class ChatExplorerFragment extends Fragment implements CheckScrollInterfa
 
         emptyLayout = v.findViewById(R.id.linear_empty_layout_chat_recent);
         emptyTextView = v.findViewById(R.id.empty_text_chat_recent);
-
-        String textToShow = context.getString(R.string.recent_chat_empty);
-        try {
-            textToShow = textToShow.replace("[A]", "<font color=\'" +
-                    ColorUtils.getColorHexString(requireActivity(), R.color.grey_300_grey_600)
-                    + "\'>");
-            textToShow = textToShow.replace("[/A]", "</font>");
-            textToShow = textToShow.replace("[B]", "<font color=\'" +
-                    ColorUtils.getColorHexString(requireActivity(), R.color.grey_900_grey_100)
-                    + "\'>");
-            textToShow = textToShow.replace("[/B]", "</font>");
-        } catch (Exception e) {
-        }
-        Spanned resultB = HtmlCompat.fromHtml(textToShow, HtmlCompat.FROM_HTML_MODE_LEGACY);
-        emptyTextView.setText(resultB);
-
         LinearLayout.LayoutParams emptyTextViewParams2 = (LinearLayout.LayoutParams) emptyTextView.getLayoutParams();
         emptyTextViewParams2.setMargins(scaleWidthPx(20, outMetrics), scaleHeightPx(20, outMetrics), scaleWidthPx(20, outMetrics), scaleHeightPx(20, outMetrics));
         emptyTextView.setLayoutParams(emptyTextViewParams2);
-
-        emptyImageView = v.findViewById(R.id.empty_image_view_recent);
-        emptyImageView.setImageResource(mega.privacy.android.icon.pack.R.drawable.ic_message_chat_glass);
 
         megaChatApi.signalPresenceActivity();
 
@@ -255,12 +231,15 @@ public class ChatExplorerFragment extends Fragment implements CheckScrollInterfa
                 Lifecycle.State.STARTED,
                 uiState -> {
                     if (this.uiState != null && this.uiState.getItems() != uiState.getItems() && !uiState.isItemUpdated()) {
-                        ArrayList<ChatExplorerListItem> items = new ArrayList<>(uiState.getItems());
-                        if (adapterList == null) {
-                            Timber.w("AdapterList is NULL");
-                            adapterList = new MegaListChatExplorerAdapter(context, chatExplorerFragment, items, listView);
-                        } else {
-                            adapterList.setItems(items);
+                        List<ChatExplorerListItem> itemsList = uiState.getItems();
+                        if(itemsList != null) {
+                            ArrayList<ChatExplorerListItem> items = new ArrayList<>(itemsList);
+                            if (adapterList == null) {
+                                Timber.w("AdapterList is NULL");
+                                adapterList = new MegaListChatExplorerAdapter(context, chatExplorerFragment, items, listView);
+                            } else {
+                                adapterList.setItems(items);
+                            }
                         }
 
                         if (adapterAdded == null) {
@@ -275,9 +254,9 @@ public class ChatExplorerFragment extends Fragment implements CheckScrollInterfa
 
                         addedList.setAdapter(adapterAdded);
 
-                        if (!uiState.getSelectedItems().isEmpty()) {
+                        if (!uiState.getSelectedItems().isEmpty() && itemsList != null) {
                             int selectedItemCount = 0;
-                            for (ChatExplorerListItem item : uiState.getItems()) {
+                            for (ChatExplorerListItem item : itemsList) {
                                 if (item.isSelected()) {
                                     selectedItemCount++;
                                     int position = adapterList.getPosition(item);
@@ -318,7 +297,7 @@ public class ChatExplorerFragment extends Fragment implements CheckScrollInterfa
     public void setChats() {
         Timber.d("setChats");
 
-        emptyTextView.setVisibility(View.GONE);
+        emptyLayout.setVisibility(View.GONE);
         contentLayout.setVisibility(View.GONE);
         progressBar.setVisibility(View.VISIBLE);
 
@@ -348,8 +327,9 @@ public class ChatExplorerFragment extends Fragment implements CheckScrollInterfa
             } else if (context instanceof FileExplorerActivity) {
                 ((FileExplorerActivity) context).collapseSearchView();
             }
-            if (!adapterList.getItems().equals(uiState.getItems())) {
-                adapterList.setItems(new ArrayList<>(uiState.getItems()));
+            List<ChatExplorerListItem> itemsList = uiState.getItems();
+            if (itemsList != null && !adapterList.getItems().equals(itemsList)) {
+                adapterList.setItems(new ArrayList<>(itemsList));
             }
             int togglePosition = adapterList.getPosition(item);
             adapterList.toggleSelection(togglePosition);
@@ -517,7 +497,7 @@ public class ChatExplorerFragment extends Fragment implements CheckScrollInterfa
 
     private void setFinalViews(List<ChatExplorerListItem> items) {
         int position;
-        if (!items.isEmpty()) {
+        if (items != null && !items.isEmpty()) {
             position = (int) items.stream().filter(ChatExplorerListItem::isRecent).count();
         } else {
             position = -1;
@@ -586,8 +566,9 @@ public class ChatExplorerFragment extends Fragment implements CheckScrollInterfa
 
             if (adapterList != null && adapterList.isSearchEnabled()) {
                 adapterList.setSearchEnabled(enable);
-                if (!adapterList.getItems().equals(uiState.getItems())) {
-                    adapterList.setItems(new ArrayList<>(uiState.getItems()));
+                List<ChatExplorerListItem> items = uiState.getItems();
+                if (items != null && !adapterList.getItems().equals(items)) {
+                    adapterList.setItems(new ArrayList<>(items));
                 }
             }
 
@@ -615,7 +596,9 @@ public class ChatExplorerFragment extends Fragment implements CheckScrollInterfa
         if (adapterList.getItemCount() == 0) {
             Timber.d("adapterList.getItemCount() == 0");
             listView.setVisibility(View.GONE);
-            addLayout.setVisibility(View.GONE);
+            if (!adapterList.isSearchEnabled()) {
+                addLayout.setVisibility(View.VISIBLE);
+            }
             emptyLayout.setVisibility(View.VISIBLE);
         } else {
             Timber.d("adapterList.getItemCount() NOT = 0");

@@ -127,7 +127,7 @@ class ChatExplorerViewModel @Inject constructor(
         viewModelScope.launch(defaultDispatcher) {
             val searchItems = mutableListOf<ChatExplorerListItem>()
             val selectedSearchItems = SparseBooleanArray()
-            _uiState.value.items.forEach {
+            _uiState.value.items?.forEach {
                 if (!it.isHeader && it.title?.lowercase()?.contains(query.lowercase()) == true) {
                     searchItems.add(it)
                     val isItemSelected = _uiState.value.selectedItems.isNotEmpty() &&
@@ -150,13 +150,6 @@ class ChatExplorerViewModel @Inject constructor(
      * Get the list of chats both active and non-active.
      */
     fun getChats() {
-        _uiState.update {
-            it.copy(
-                items = emptyList(),
-                isItemUpdated = false
-            )
-        }
-
         viewModelScope.launch(defaultDispatcher) {
             val items = buildList {
                 // Add the active/recent chat rooms
@@ -356,7 +349,7 @@ class ChatExplorerViewModel @Inject constructor(
     fun clearSelections() {
         _uiState.update { uiState ->
             uiState.copy(
-                items = uiState.items.map {
+                items = uiState.items?.map {
                     if (it.isSelected) {
                         it.copy(isSelected = false)
                     } else {
@@ -378,7 +371,7 @@ class ChatExplorerViewModel @Inject constructor(
     fun updateItemLastGreenDateByContact(contactItem: ContactItemUiState, date: String) {
         _uiState.update {
             it.copy(
-                items = it.items.map { item ->
+                items = it.items?.map { item ->
                     if (contactItem == item.contactItem) {
                         item.copy(contactItem = item.contactItem.copy(lastGreen = date))
                     } else {
