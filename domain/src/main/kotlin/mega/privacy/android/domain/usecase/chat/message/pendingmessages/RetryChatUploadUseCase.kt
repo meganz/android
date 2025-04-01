@@ -35,9 +35,9 @@ class RetryChatUploadUseCase @Inject constructor(
         }
 
         createPendingAttachmentMessageUseCase(pendingMessages.first()).let { pendingMessage ->
-            (pendingMessage as PendingFileAttachmentMessage).file.let { file ->
+            (pendingMessage as PendingFileAttachmentMessage).uriPath.let { uriPath ->
                 startChatUploadsWithWorkerUseCase(
-                    file = file,
+                    uriPath = uriPath,
                     chatFilesFolderId = getOrCreateMyChatsFilesFolderIdUseCase(),
                     *chatUploadAppData.map { it.pendingMessageId }.toLongArray()
                 ).collect()

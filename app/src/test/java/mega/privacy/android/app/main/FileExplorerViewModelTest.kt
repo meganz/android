@@ -142,9 +142,9 @@ internal class FileExplorerViewModelTest {
 
     @Test
     fun `test that files are attached`() = runTest {
-        val filePaths = listOf("path1", "path2")
-        val documents = filePaths.map { DocumentEntity(it, 3L, 89L, UriPath(it)) }
-        val filesWithNames = filePaths.associateWith { it }
+        val filePaths = listOf(UriPath("path1"), UriPath("path2"))
+        val documents = filePaths.map { DocumentEntity(it.value, 3L, 89L, it) }
+        val filesWithNames = filePaths.associateWith { it.value }
 
         initViewModel()
 

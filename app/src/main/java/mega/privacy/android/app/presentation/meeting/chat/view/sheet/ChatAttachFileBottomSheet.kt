@@ -4,7 +4,6 @@ import mega.privacy.android.icon.pack.R as iconPackR
 import android.app.Activity
 import android.content.Context
 import android.content.Intent
-import android.net.Uri
 import androidx.activity.compose.ManagedActivityResultLauncher
 import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.result.ActivityResult
@@ -22,10 +21,11 @@ import androidx.compose.ui.res.stringResource
 import mega.privacy.android.app.R
 import mega.privacy.android.app.main.FileExplorerActivity
 import mega.privacy.android.app.utils.Constants
+import mega.privacy.android.domain.entity.node.NodeId
+import mega.privacy.android.domain.entity.uri.UriPath
+import mega.privacy.android.legacy.core.ui.controls.lists.MenuActionHeader
 import mega.privacy.android.shared.original.core.ui.controls.lists.MenuActionListTile
 import mega.privacy.android.shared.original.core.ui.preview.CombinedThemePreviews
-import mega.privacy.android.domain.entity.node.NodeId
-import mega.privacy.android.legacy.core.ui.controls.lists.MenuActionHeader
 import mega.privacy.android.shared.original.core.ui.theme.OriginalTheme
 
 /**
@@ -35,7 +35,7 @@ import mega.privacy.android.shared.original.core.ui.theme.OriginalTheme
 fun ChatAttachFileBottomSheet(
     modifier: Modifier = Modifier,
     hideSheet: () -> Unit,
-    onAttachFiles: (List<Uri>) -> Unit = {},
+    onAttachFiles: (List<UriPath>) -> Unit = {},
     onAttachNodes: (List<NodeId>) -> Unit = {},
 ) {
     val context = LocalContext.current
@@ -66,7 +66,7 @@ fun ChatAttachFileBottomSheet(
                             }
                         }
                     } ?: listOfNotNull(result.data?.data).takeIf { it.isNotEmpty() }
-                attachedFiles?.let(onAttachFiles)
+                attachedFiles?.map { UriPath(it.toString()) }?.let(onAttachFiles)
 
             }
             hideSheet()

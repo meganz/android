@@ -45,25 +45,25 @@ class CompressPendingMessagesUseCase @Inject constructor(
      * @return a flow to track the compression progress
      */
     operator fun invoke(): Flow<ChatCompressionState> {
-        val pathsToSizeAndProgress = mutableMapOf<String, SizeAndProgress>()
+        val pathsToSizeAndProgress = mutableMapOf<UriPath, SizeAndProgress>()
         return channelFlow {
             monitorPendingMessagesByStateUseCase(PendingMessageState.COMPRESSING)
                 .conflate()
                 .collect { pendingMessageList ->
                     val semaphore = Semaphore(5) // to limit the parallel compressions
                     pendingMessageList
-                        .groupBy { it.filePath }
-                        .map { (path, pendingMessages) ->
+                        .groupBy { it.uriPath }
+                        .map { (uriPath, pendingMessages) ->
                             //compress all received pending message's files in parallel, new pending messages will wait for this batch to be completed.
                             launch {
                                 //if this was already compressed don't compress it again.
-                                if (path !in pathsToSizeAndProgress) {
+                                if (uriPath !in pathsToSizeAndProgress) {
                                     semaphore.withPermit {
-                                        val original = UriPath(path)
+                                        val original = uriPath
                                         val size =
                                             (getFileSizeFromUriPathUseCase(original) as? FileResult)?.sizeInBytes
                                                 ?: 0
-                                        pathsToSizeAndProgress[path] = SizeAndProgress(
+                                        pathsToSizeAndProgress[uriPath] = SizeAndProgress(
                                             size.coerceAtLeast(1L),
                                             Progress(0f)
                                         )
@@ -85,10 +85,10 @@ class CompressPendingMessagesUseCase @Inject constructor(
                                                     newProgress,
                                                     pendingMessages
                                                 )
-                                                pathsToSizeAndProgress[path]?.copy(
+                                                pathsToSizeAndProgress[uriPath]?.copy(
                                                     progress = newProgress
                                                 )?.let { progressUpdated ->
-                                                    pathsToSizeAndProgress[path] = progressUpdated
+                                                    pathsToSizeAndProgress[uriPath] = progressUpdated
                                                 }
                                                 send(
                                                     ChatCompressionProgress(

@@ -71,6 +71,7 @@ import mega.privacy.android.domain.entity.meeting.UsersCallLimitReminders
 import mega.privacy.android.domain.entity.node.NodeId
 import mega.privacy.android.domain.entity.node.TypedFileNode
 import mega.privacy.android.domain.entity.node.chat.ChatDefaultFile
+import mega.privacy.android.domain.entity.uri.UriPath
 import mega.privacy.android.domain.entity.user.UserId
 import mega.privacy.android.domain.exception.MegaException
 import mega.privacy.android.domain.exception.chat.CreateChatException
@@ -2428,9 +2429,7 @@ internal class ChatViewModelTest {
         runTest {
             initTestClass()
             val files = List(5) { index ->
-                mock<Uri> {
-                    on { toString() } doReturn "file$index"
-                }
+                UriPath("file$index")
             }
             underTest.state.test {
                 awaitItem() // Initial state doesn't matter

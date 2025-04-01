@@ -124,7 +124,7 @@ class PrepareAllPendingMessagesUseCaseTest {
                 flowOf(listOf(pendingMessage))
         whenever(
             getPathForUploadUseCase(
-                originalUriPath = UriPath(pendingMessage.filePath),
+                originalUriPath = pendingMessage.uriPath,
             )
         ) doReturn null
         whenever(chatAttachmentNeedsCompressionUseCase(any())) doReturn false
@@ -150,7 +150,7 @@ class PrepareAllPendingMessagesUseCaseTest {
                     flowOf(listOf(pendingMessage))
             whenever(
                 getPathForUploadUseCase(
-                    originalUriPath = UriPath(pendingMessage.filePath),
+                    originalUriPath = pendingMessage.uriPath,
                 )
             ) doReturn path
             whenever(chatAttachmentNeedsCompressionUseCase(anyValueClass())) doReturn true
@@ -177,7 +177,7 @@ class PrepareAllPendingMessagesUseCaseTest {
                     flowOf(listOf(pendingMessage))
             whenever(
                 getPathForUploadUseCase(
-                    originalUriPath = UriPath(pendingMessage.filePath),
+                    originalUriPath = pendingMessage.uriPath,
                 )
             ) doReturn path
             whenever(chatAttachmentNeedsCompressionUseCase(anyValueClass())) doReturn false
@@ -205,7 +205,7 @@ class PrepareAllPendingMessagesUseCaseTest {
             pendingMessages.forEachIndexed { i, it ->
                 whenever(
                     getPathForUploadUseCase(
-                        originalUriPath = UriPath(it.filePath),
+                        originalUriPath = it.uriPath,
                     )
                 ) doReturn destinations[i]
             }
@@ -230,6 +230,6 @@ class PrepareAllPendingMessagesUseCaseTest {
     ) = mock<PendingMessage> {
         on { this.id } doReturn id
         on { this.name } doReturn "pendingMessage$id name"
-        on { this.filePath } doReturn "/path/$fileName"
+        on { this.uriPath } doReturn UriPath("/path/$fileName")
     }
 }

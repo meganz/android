@@ -16,6 +16,7 @@ import mega.privacy.android.domain.entity.StaticImageFileTypeInfo
 import mega.privacy.android.domain.entity.chat.messages.PendingFileAttachmentMessage
 import mega.privacy.android.domain.entity.transfer.Transfer
 import mega.privacy.android.domain.entity.transfer.TransferAppData
+import mega.privacy.android.domain.entity.uri.UriPath
 import mega.privacy.android.domain.usecase.transfers.chatuploads.MonitorPendingMessageTransferEventsUseCase
 import mega.privacy.android.domain.usecase.transfers.chatuploads.MonitorPendingMessagesCompressionProgressUseCase
 import mega.privacy.android.domain.usecase.transfers.paused.AreTransfersPausedUseCase
@@ -68,13 +69,13 @@ class PendingAttachmentMessageViewModelTest {
     @Test
     fun `test that first ui state adds file path`() {
         setup(emptyFlow())
-        val filePathOrUri = "root/file.jpg"
+        val uriPath = UriPath("root/file.jpg")
         val attachmentMessage = stubMessage()
 
-        whenever(attachmentMessage.filePath) doReturn filePathOrUri
+        whenever(attachmentMessage.uriPath) doReturn uriPath
 
         val actual = underTest.createFirstUiState(attachmentMessage)
-        assertThat(actual.previewUri).isEqualTo(filePathOrUri)
+        assertThat(actual.previewUri).isEqualTo(uriPath)
     }
 
     @ParameterizedTest
@@ -197,8 +198,7 @@ class PendingAttachmentMessageViewModelTest {
         on { fileType } doReturn StaticImageFileTypeInfo("image/jpg", "jpg")
         on { fileSize } doReturn 8435L
         on { msgId } doReturn pendingMsgId
-        on { filePath } doReturn filePath
-        on { file } doReturn File(filePath)
+        on { uriPath } doReturn UriPath(filePath)
         on { isSendError() } doReturn isError
     }
 

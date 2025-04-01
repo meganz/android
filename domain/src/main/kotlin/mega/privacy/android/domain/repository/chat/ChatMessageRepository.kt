@@ -13,6 +13,7 @@ import mega.privacy.android.domain.entity.chat.messages.pending.SavePendingMessa
 import mega.privacy.android.domain.entity.chat.messages.pending.UpdatePendingMessageRequest
 import mega.privacy.android.domain.entity.chat.messages.reactions.Reaction
 import mega.privacy.android.domain.entity.node.NodeId
+import mega.privacy.android.domain.entity.uri.UriPath
 
 /**
  * Chat message repository
@@ -494,15 +495,15 @@ interface ChatMessageRepository {
      * @param nodeId The [NodeId] of the node.
      * @return The cached original path, or null if not cached.
      */
-    fun getCachedOriginalPathForNode(nodeId: NodeId): String?
+    fun getCachedOriginalPathForNode(nodeId: NodeId): UriPath?
 
     /**
      * Caches the original path of this node once the original file is uploaded, just before attaching it to the chat.
      *
      * @param nodeId The [NodeId] of the node.
-     * @param path The original path to be cached.
+     * @param uriPath The original path to be cached.
      */
-    fun cacheOriginalPathForNode(nodeId: NodeId, path: String)
+    fun cacheOriginalPathForNode(nodeId: NodeId, uriPath: UriPath)
 
     /**
      * Gets the original path of this pending message if it has been cached during the creation of the pending message.
@@ -510,15 +511,15 @@ interface ChatMessageRepository {
      * @param pendingMessageId The id of the node.
      * @return The cached original path or uri, or null if not cached.
      */
-    fun getCachedOriginalPathForPendingMessage(pendingMessageId: Long): String?
+    fun getCachedOriginalPathForPendingMessage(pendingMessageId: Long): UriPath?
 
     /**
      * Caches the original path of the pending message once the pending message is created, before it is copied to cache folder and/or scaled/compressed.
      *
      * @param pendingMessageId The id of the pending message.
-     * @param path The original path or uri to be cached.
+     * @param uriPath The original path or uri to be cached.
      */
-    fun cacheOriginalPathForPendingMessage(pendingMessageId: Long, path: String)
+    fun cacheOriginalPathForPendingMessage(pendingMessageId: Long, uriPath: UriPath)
 
     /**
      * Get paged messages

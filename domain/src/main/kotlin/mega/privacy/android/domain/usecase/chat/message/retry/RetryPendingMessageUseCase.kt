@@ -24,9 +24,9 @@ class RetryPendingMessageUseCase @Inject constructor(
         if (message !is PendingAttachmentMessage) throw IllegalArgumentException("Only PendingAttachmentMessage can be resend by this use-case")
         when (message.state) {
             PendingMessageState.ERROR_UPLOADING -> {
-                message.file?.let {
+                message.uriPath?.let {
                     startChatUploadsWithWorkerUseCase(
-                        file = it,
+                        uriPath = it,
                         chatFilesFolderId = getOrCreateMyChatsFilesFolderIdUseCase(),
                         message.msgId
                     ).collect()

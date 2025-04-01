@@ -19,6 +19,7 @@ import mega.privacy.android.domain.entity.billing.PaymentMethodFlags
 import mega.privacy.android.domain.entity.billing.Pricing
 import mega.privacy.android.domain.entity.node.NodeId
 import mega.privacy.android.domain.entity.psa.Psa
+import mega.privacy.android.domain.entity.uri.UriPath
 import java.util.concurrent.TimeUnit
 import javax.inject.Singleton
 
@@ -71,12 +72,12 @@ internal object LocalCacheModule {
     @OriginalPathForNodeCache
     @Provides
     @Singleton
-    fun provideChatOriginalFileCache(): Cache<Map<NodeId, String>> = PermanentCache()
+    fun provideChatOriginalFileCache(): Cache<Map<NodeId, UriPath>> = PermanentCache()
 
     @OriginalPathForPendingMessageCache
     @Provides
     @Singleton
-    fun provideChatOriginalPathForPendingMessageCache(): Cache<Map<Long, String>> = PermanentCache()
+    fun provideChatOriginalPathForPendingMessageCache(): Cache<Map<Long, UriPath>> = PermanentCache()
 
     @Provides
     @Singleton

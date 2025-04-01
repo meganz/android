@@ -99,7 +99,7 @@ class CompressPendingMessagesUseCaseTest {
     fun `test that compression starts for a single pending message`() =
         runTest {
             val pendingMessage = stubPendingMessage()
-            val originalFile = UriPath(pendingMessage.filePath)
+            val originalFile = pendingMessage.uriPath
             whenever(monitorPendingMessagesByStateUseCase(PendingMessageState.COMPRESSING)) doReturn
                     flowOf(listOf(pendingMessage))
 
@@ -115,8 +115,8 @@ class CompressPendingMessagesUseCaseTest {
         runTest {
             val pendingMessage1 = stubPendingMessage(1L)
             val pendingMessage2 = stubPendingMessage(2L)
-            val originalFile1 = UriPath(pendingMessage1.filePath)
-            val originalFile2 = UriPath(pendingMessage2.filePath)
+            val originalFile1 = pendingMessage1.uriPath
+            val originalFile2 = pendingMessage2.uriPath
             whenever(monitorPendingMessagesByStateUseCase(PendingMessageState.COMPRESSING)) doReturn
                     flowOf(listOf(pendingMessage1, pendingMessage2))
 
@@ -133,7 +133,7 @@ class CompressPendingMessagesUseCaseTest {
         runTest {
             val pendingMessage1 = stubPendingMessage(1L, "name.mp4")
             val pendingMessage2 = stubPendingMessage(2L, "name.mp4")
-            val originalFile = UriPath(pendingMessage1.filePath)
+            val originalFile = pendingMessage1.uriPath
             whenever(monitorPendingMessagesByStateUseCase(PendingMessageState.COMPRESSING)) doReturn
                     flowOf(listOf(pendingMessage1, pendingMessage2))
 
@@ -202,7 +202,7 @@ class CompressPendingMessagesUseCaseTest {
     @Test
     fun `test that compressed file is set to ready to upload state`() = runTest {
         val pendingMessage = stubPendingMessage()
-        val originalFile = UriPath(pendingMessage.filePath)
+        val originalFile = pendingMessage.uriPath
         val compressed = File("/path/compressed.mp4")
 
         whenever(monitorPendingMessagesByStateUseCase(PendingMessageState.COMPRESSING)) doReturn
@@ -229,7 +229,7 @@ class CompressPendingMessagesUseCaseTest {
     ) = mock<PendingMessage> {
         on { this.id } doReturn id
         on { this.name } doReturn "pendingMessage$id name"
-        on { this.filePath } doReturn "/path/$fileName"
+        on { this.uriPath } doReturn UriPath("/path/$fileName")
     }
 
 }

@@ -8,6 +8,7 @@ import mega.privacy.android.domain.entity.chat.messages.AttachmentMessage
 import mega.privacy.android.domain.entity.chat.messages.PendingFileAttachmentMessage
 import mega.privacy.android.domain.entity.chat.messages.PendingVoiceClipMessage
 import mega.privacy.android.domain.entity.node.NodeId
+import mega.privacy.android.domain.entity.uri.UriPath
 import mega.privacy.android.domain.usecase.chat.message.AttachNodeWithPendingMessageUseCase
 import mega.privacy.android.domain.usecase.transfers.chatuploads.GetOrCreateMyChatsFilesFolderIdUseCase
 import mega.privacy.android.domain.usecase.transfers.chatuploads.StartChatUploadsWithWorkerUseCase
@@ -24,7 +25,6 @@ import org.mockito.kotlin.mock
 import org.mockito.kotlin.reset
 import org.mockito.kotlin.verify
 import org.mockito.kotlin.whenever
-import java.io.File
 
 @TestInstance(TestInstance.Lifecycle.PER_CLASS)
 class RetryPendingMessageUseCaseTest {
@@ -90,12 +90,12 @@ class RetryPendingMessageUseCaseTest {
     @Test
     fun `test that startChatUploadsWithWorkerUseCase is invoked when message is in error uploading state`() =
         runTest {
-            val file = mock<File>()
+            val uriPath = UriPath("foo")
             val msgId = 15L
             val myChatFilesFolderId = NodeId(11L)
             val message = mock<PendingFileAttachmentMessage> {
                 on { it.state } doReturn PendingMessageState.ERROR_UPLOADING
-                on { it.file } doReturn file
+                on { it.uriPath } doReturn uriPath
                 on { it.msgId } doReturn msgId
             }
             whenever(
@@ -109,7 +109,7 @@ class RetryPendingMessageUseCaseTest {
 
             underTest(message)
 
-            verify(startChatUploadsWithWorkerUseCase).invoke(file, myChatFilesFolderId, msgId)
+            verify(startChatUploadsWithWorkerUseCase).invoke(uriPath, myChatFilesFolderId, msgId)
         }
 
     @Test

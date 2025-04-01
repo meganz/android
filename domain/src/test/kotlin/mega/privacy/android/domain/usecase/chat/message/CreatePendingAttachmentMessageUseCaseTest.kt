@@ -74,7 +74,7 @@ class CreatePendingAttachmentMessageUseCaseTest {
             transferUniqueId = transferUniqueId,
             uploadTimestamp = time,
             state = state.value,
-            filePath = fileUri,
+            uriPath = uriPath,
             name = fileName,
         )
         val expected = PendingFileAttachmentMessage(
@@ -88,7 +88,7 @@ class CreatePendingAttachmentMessageUseCaseTest {
             reactions = emptyList(),
             status = getChatMessageStatus(state),
             content = null,
-            filePath = fileUri,
+            uriPath = uriPath,
             fileType = fileTypeInfo,
             nodeId = null,
             state = state,
@@ -110,9 +110,9 @@ class CreatePendingAttachmentMessageUseCaseTest {
         val userHandle = 245L
         val fileName = "fileName"
         val fileUri = "content://path/$fileName"
-        val uriPath = UriPath(fileUri)
         val transferUniqueId = 344L
         val fileTypeInfo = mock<UnknownFileTypeInfo>()
+        val uriPath = UriPath(fileUri)
         whenever(getMyUserHandleUseCase()).thenReturn(userHandle)
         whenever(fileSystemRepository.getFileNameFromUri(fileUri)) doReturn fileName
         whenever(fileSystemRepository.getFileTypeInfo(uriPath, fileName))
@@ -123,7 +123,7 @@ class CreatePendingAttachmentMessageUseCaseTest {
             transferUniqueId = transferUniqueId,
             uploadTimestamp = time,
             state = state.value,
-            filePath = fileUri,
+            uriPath = uriPath,
             type = PendingMessage.TYPE_VOICE_CLIP,
             name = fileName,
         )
@@ -141,7 +141,7 @@ class CreatePendingAttachmentMessageUseCaseTest {
             fileType = fileTypeInfo,
             nodeId = null,
             state = state,
-            filePath = fileUri,
+            uriPath = uriPath,
             fileName = fileName,
         )
         val actual = underTest(pendingMessage)

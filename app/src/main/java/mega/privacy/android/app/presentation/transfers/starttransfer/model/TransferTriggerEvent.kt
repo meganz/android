@@ -1,12 +1,12 @@
 package mega.privacy.android.app.presentation.transfers.starttransfer.model
 
 import android.net.Uri
-import androidx.core.net.toUri
 import mega.privacy.android.domain.entity.node.NodeId
 import mega.privacy.android.domain.entity.node.TypedNode
 import mega.privacy.android.domain.entity.node.namecollision.NameCollisionChoice
 import mega.privacy.android.domain.entity.transfer.TransferAppData
 import mega.privacy.android.domain.entity.transfer.TransferType
+import mega.privacy.android.domain.entity.uri.UriPath
 import java.io.File
 
 /**
@@ -48,7 +48,7 @@ sealed interface TransferTriggerEvent {
         /**
          * List of files to be uploaded
          */
-        val uris: List<Uri>
+        val uris: List<UriPath>
 
         /**
          * Whether this upload is a voice clip
@@ -60,7 +60,7 @@ sealed interface TransferTriggerEvent {
          */
         data class Files(
             override val chatId: Long,
-            override val uris: List<Uri>,
+            override val uris: List<UriPath>,
             override val waitNotificationPermissionResponseToStart: Boolean = false,
         ) : StartChatUpload {
             override val isVoiceClip = false
@@ -76,7 +76,7 @@ sealed interface TransferTriggerEvent {
             val file: File,
             override val waitNotificationPermissionResponseToStart: Boolean = false,
         ) : StartChatUpload {
-            override val uris get() = listOf(file.toUri())
+            override val uris get() = listOf(UriPath(file.absolutePath))
             override val isVoiceClip = true
         }
     }
@@ -216,6 +216,7 @@ sealed interface TransferTriggerEvent {
 
         /**
          * Upload files
+         * @param specificStartMessage
          */
         data class Files(
             override val pathsAndNames: Map<String, String?>,

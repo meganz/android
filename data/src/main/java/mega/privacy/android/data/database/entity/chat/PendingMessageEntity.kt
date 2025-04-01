@@ -20,7 +20,6 @@ import mega.privacy.android.domain.entity.chat.PendingMessageState
  * @property nodeHandle
  * @property fingerprint
  * @property name
- * @property transferTag
  */
 @Entity(tableName = "pending_messages")
 data class PendingMessageEntity(
@@ -32,6 +31,7 @@ data class PendingMessageEntity(
     val state: PendingMessageState,
     val tempIdKarere: Long,
     val videoDownSampled: String?,
+    @ColumnInfo(name = "filePath")
     val filePath: String,
     val nodeHandle: Long,
     val fingerprint: String?,

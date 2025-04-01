@@ -42,13 +42,13 @@ class PrepareAllPendingMessagesUseCase @Inject constructor(
                     send(pendingMessageList.size)
                     val semaphore = Semaphore(5) // to limit the parallel copy to cache
                     pendingMessageList
-                        .groupBy { it.filePath }
-                        .map { (uri, pendingMessages) ->
+                        .groupBy { it.uriPath }
+                        .map { (uriPath, pendingMessages) ->
                             launch {
                                 semaphore.withPermit {
                                     val pendingMessageIds = pendingMessages.map { it.id }
                                     val uriPathToUpload = getPathForUploadUseCase(
-                                        originalUriPath = UriPath(uri)
+                                        originalUriPath = uriPath,
                                     )?.let { UriPath(it) }
                                     when {
                                         uriPathToUpload == null -> {

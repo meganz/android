@@ -474,7 +474,7 @@ class FileExplorerViewModel @Inject constructor(
     }
 
     private suspend fun attachFiles(chatIds: List<Long>, documents: List<DocumentEntity>) {
-        val filePathsWithNames = documents.associate { it.uri.value to it.name }
+        val filePathsWithNames = documents.associate { it.uri to it.name }
         runCatching {
             sendChatAttachmentsUseCase(
                 filePathsWithNames, chatIds = chatIds.toLongArray()

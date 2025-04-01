@@ -33,7 +33,6 @@ class StartUploadingAllPendingMessagesUseCaseTest {
     private val updatePendingMessageUseCase = mock<UpdatePendingMessageUseCase>()
     private val startChatUploadAndWaitScanningFinishedUseCase =
         mock<StartChatUploadAndWaitScanningFinishedUseCase>()
-    private val fileSystemRepository = mock<FileSystemRepository>()
 
     @BeforeAll
     fun setup() {
@@ -42,7 +41,6 @@ class StartUploadingAllPendingMessagesUseCaseTest {
         underTest = StartUploadingAllPendingMessagesUseCase(
             startChatUploadAndWaitScanningFinishedUseCase,
             monitorPendingMessagesByStateUseCase,
-            fileSystemRepository,
             updatePendingMessageUseCase,
         )
     }
@@ -52,7 +50,6 @@ class StartUploadingAllPendingMessagesUseCaseTest {
         reset(
             startChatUploadAndWaitScanningFinishedUseCase,
             monitorPendingMessagesByStateUseCase,
-            fileSystemRepository,
             updatePendingMessageUseCase,
         )
     }
@@ -94,37 +91,18 @@ class StartUploadingAllPendingMessagesUseCaseTest {
         }
 
     @Test
-    fun `test that pending message is set to error state when file is not found`() = runTest {
-        val pendingMessage = stubPendingMessage()
-        whenever(monitorPendingMessagesByStateUseCase(PendingMessageState.READY_TO_UPLOAD)) doReturn
-                flowOf(listOf(pendingMessage))
-        whenever(fileSystemRepository.getFileByPath(pendingMessage.filePath)) doReturn null
-
-        underTest().test { cancelAndConsumeRemainingEvents() }
-
-        verify(updatePendingMessageUseCase)(
-            UpdatePendingMessageStateRequest(
-                pendingMessage.id,
-                PendingMessageState.ERROR_UPLOADING
-            )
-        )
-        verifyNoMoreInteractions(updatePendingMessageUseCase)
-    }
-
-    @Test
-    fun `test that pending message starts uploading when file is found`() =
+    fun `test that pending message starts uploading`() =
         runTest {
             val pendingMessage = stubPendingMessage()
-            val file = File("video.mp4")
+            val file = File("/video.mp4")
             val fileName = pendingMessage.name
             whenever(monitorPendingMessagesByStateUseCase(PendingMessageState.READY_TO_UPLOAD)) doReturn
                     flowOf(listOf(pendingMessage))
-            whenever(fileSystemRepository.getFileByPath(pendingMessage.filePath)) doReturn file
 
             underTest().test { cancelAndConsumeRemainingEvents() }
 
             verify(startChatUploadAndWaitScanningFinishedUseCase).invoke(
-                UriPath(file.absolutePath),
+                pendingMessage.uriPath,
                 fileName,
                 listOf(pendingMessage.id)
             )
@@ -134,10 +112,8 @@ class StartUploadingAllPendingMessagesUseCaseTest {
     fun `test that pending message state is updated after start uploading the file`() =
         runTest {
             val pendingMessage = stubPendingMessage()
-            val file = File("video.mp4")
             whenever(monitorPendingMessagesByStateUseCase(PendingMessageState.READY_TO_UPLOAD)) doReturn
                     flowOf(listOf(pendingMessage))
-            whenever(fileSystemRepository.getFileByPath(pendingMessage.filePath)) doReturn file
 
             underTest().test { cancelAndConsumeRemainingEvents() }
 
@@ -154,19 +130,15 @@ class StartUploadingAllPendingMessagesUseCaseTest {
     fun `test that multiple pending messages start uploading`() =
         runTest {
             val pendingMessages = (0L..3L).map { stubPendingMessage(it) }
-            val files = pendingMessages.map { File("video${it.id}.mp4") }
 
             whenever(monitorPendingMessagesByStateUseCase(PendingMessageState.READY_TO_UPLOAD)) doReturn
                     flowOf(pendingMessages)
-            pendingMessages.forEachIndexed { i, it ->
-                whenever(fileSystemRepository.getFileByPath(it.filePath)) doReturn files[i]
-            }
 
             underTest().test { cancelAndConsumeRemainingEvents() }
 
             pendingMessages.forEachIndexed { i, it ->
                 verify(startChatUploadAndWaitScanningFinishedUseCase)(
-                    UriPath(files[i].absolutePath),
+                    it.uriPath,
                     it.name,
                     listOf(it.id)
                 )
@@ -179,6 +151,6 @@ class StartUploadingAllPendingMessagesUseCaseTest {
     ) = mock<PendingMessage> {
         on { this.id } doReturn id
         on { this.name } doReturn "pendingMessage$id name"
-        on { this.filePath } doReturn "/path/$fileName"
+        on { this.uriPath } doReturn UriPath("/path/$fileName")
     }
 }

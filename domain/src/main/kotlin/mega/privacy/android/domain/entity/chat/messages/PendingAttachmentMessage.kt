@@ -1,26 +1,23 @@
 package mega.privacy.android.domain.entity.chat.messages
 
 import kotlinx.serialization.Serializable
-import kotlinx.serialization.Transient
 import mega.privacy.android.domain.entity.FileTypeInfo
 import mega.privacy.android.domain.entity.PlayableFileTypeInfo
 import mega.privacy.android.domain.entity.chat.ChatMessageStatus
 import mega.privacy.android.domain.entity.chat.PendingMessageState
 import mega.privacy.android.domain.entity.chat.messages.reactions.Reaction
 import mega.privacy.android.domain.entity.node.NodeId
-import java.io.File
+import mega.privacy.android.domain.entity.uri.UriPath
 
 /**
  * Pending attachment message
- * @property file
- * @property filePath path of the file or content uri string
+ * @property uriPath
  * @property transferUniqueId
  * @property state
  * @property nodeId
  */
 sealed interface PendingAttachmentMessage : AttachmentMessage {
-    val file: File?
-    val filePath: String
+    val uriPath: UriPath?
     val transferUniqueId: Long?
     val state: PendingMessageState
     val nodeId: NodeId?
@@ -32,7 +29,7 @@ sealed interface PendingAttachmentMessage : AttachmentMessage {
 
 /**
  * Pending attachment message for ordinary files
- * @property filePath
+ * @property uriPath
  */
 @Serializable
 data class PendingFileAttachmentMessage(
@@ -51,16 +48,13 @@ data class PendingFileAttachmentMessage(
     override val nodeId: NodeId?,
     override val fileName: String,
     override val fileSize: Long,
-    override val filePath: String,
-) : PendingAttachmentMessage {
-    @Transient
-    override val file = File(filePath)
-}
+    override val uriPath: UriPath,
+) : PendingAttachmentMessage
 
 
 /**
  * Pending voice clip message
- * @property filePath
+ * @property uriPath
  */
 @Serializable
 data class PendingVoiceClipMessage(
@@ -78,9 +72,7 @@ data class PendingVoiceClipMessage(
     override val state: PendingMessageState,
     override val nodeId: NodeId?,
     override val fileName: String,
-    override val filePath: String,
+    override val uriPath: UriPath,
 ) : PendingAttachmentMessage {
-    @Transient
-    override val file = File(filePath)
     override val fileSize = 0L //we don't need it in voice clips
 }

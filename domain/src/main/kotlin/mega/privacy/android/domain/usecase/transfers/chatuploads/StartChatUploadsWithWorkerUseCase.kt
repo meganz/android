@@ -47,20 +47,19 @@ class StartChatUploadsWithWorkerUseCase @Inject constructor(
      * @param chatFilesFolderId the id of the folder where the files will be uploaded
      */
     operator fun invoke(
-        file: File,
+        uriPath: UriPath,
         chatFilesFolderId: NodeId,
         vararg pendingMessageIds: Long,
     ): Flow<TransferEvent> = flow {
-        if (!fileSystemRepository.isFilePath(file.path)) {
+        if (!fileSystemRepository.isDocumentUri(uriPath) && !fileSystemRepository.isFilePath(uriPath.value)) {
             throw FoldersNotAllowedAsChatUploadException()
-            return@flow
         }
         val name = getPendingMessageUseCase(pendingMessageIds.first())?.name
 
         val appData = pendingMessageIds.map { TransferAppData.ChatUpload(it) }
         emitAll(startTransfersAndThenWorkerFlow(
             doTransfers = {
-                if (chatAttachmentNeedsCompressionUseCase(UriPath.fromFile(file))) {
+                if (chatAttachmentNeedsCompressionUseCase(uriPath)) {
                     //if needs compression, skip the upload and update the state to COMPRESSING, it will be compressed and uploaded in the Worker
                     updatePendingMessageUseCase(
                         updatePendingMessageRequests = pendingMessageIds.map { pendingMessageId ->
@@ -73,7 +72,7 @@ class StartChatUploadsWithWorkerUseCase @Inject constructor(
                     emptyFlow()
                 } else {
                     uploadFileUseCase(
-                        uriPath = UriPath(file.absolutePath),
+                        uriPath = uriPath,
                         fileName = name,
                         appData = appData,
                         parentFolderId = chatFilesFolderId,

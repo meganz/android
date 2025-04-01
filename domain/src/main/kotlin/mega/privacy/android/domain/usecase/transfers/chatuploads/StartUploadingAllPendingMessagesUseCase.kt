@@ -5,7 +5,6 @@ import kotlinx.coroutines.flow.conflate
 import kotlinx.coroutines.flow.map
 import mega.privacy.android.domain.entity.chat.PendingMessageState
 import mega.privacy.android.domain.entity.chat.messages.pending.UpdatePendingMessageStateRequest
-import mega.privacy.android.domain.entity.uri.UriPath
 import mega.privacy.android.domain.repository.FileSystemRepository
 import mega.privacy.android.domain.usecase.chat.message.MonitorPendingMessagesByStateUseCase
 import mega.privacy.android.domain.usecase.chat.message.UpdatePendingMessageUseCase
@@ -18,7 +17,6 @@ import javax.inject.Inject
 class StartUploadingAllPendingMessagesUseCase @Inject constructor(
     private val startChatUploadAndWaitScanningFinishedUseCase: StartChatUploadAndWaitScanningFinishedUseCase,
     private val monitorPendingMessagesByStateUseCase: MonitorPendingMessagesByStateUseCase,
-    private val fileSystemRepository: FileSystemRepository,
     private val updatePendingMessageUseCase: UpdatePendingMessageUseCase,
 ) {
     /**
@@ -31,36 +29,24 @@ class StartUploadingAllPendingMessagesUseCase @Inject constructor(
             .conflate()
             .map { pendingMessageList ->
                 pendingMessageList
-                    .groupBy { fileSystemRepository.getFileByPath(it.filePath) to it.name }
+                    .groupBy { it.uriPath to it.name }
                     .forEach { (filesAndNames, pendingMessages) ->
                         // Start the upload and wait until scanning has finished:
                         // - One by one because the pending messages are different
                         // - Wait until scanning finished as required by the sdk
-                        filesAndNames.first?.let { file ->
-                            startChatUploadAndWaitScanningFinishedUseCase(
-                                uriPath = UriPath(file.absolutePath),
-                                fileName = filesAndNames.second,
-                                pendingMessageIds = pendingMessages.map { it.id }
-                            )
-                            updatePendingMessageUseCase(
-                                updatePendingMessageRequests = pendingMessages.map { pendingMessage ->
-                                    UpdatePendingMessageStateRequest(
-                                        pendingMessage.id,
-                                        PendingMessageState.UPLOADING,
-                                    )
-                                }.toTypedArray()
-                            )
-                        } ?: run {
-
-                            updatePendingMessageUseCase(
-                                updatePendingMessageRequests = pendingMessages.map { pendingMessage ->
-                                    UpdatePendingMessageStateRequest(
-                                        pendingMessage.id,
-                                        PendingMessageState.ERROR_UPLOADING,
-                                    )
-                                }.toTypedArray()
-                            )
-                        }
+                        startChatUploadAndWaitScanningFinishedUseCase(
+                            uriPath = filesAndNames.first,
+                            fileName = filesAndNames.second,
+                            pendingMessageIds = pendingMessages.map { it.id }
+                        )
+                        updatePendingMessageUseCase(
+                            updatePendingMessageRequests = pendingMessages.map { pendingMessage ->
+                                UpdatePendingMessageStateRequest(
+                                    pendingMessage.id,
+                                    PendingMessageState.UPLOADING,
+                                )
+                            }.toTypedArray()
+                        )
                     }
                 pendingMessageList.size
             }

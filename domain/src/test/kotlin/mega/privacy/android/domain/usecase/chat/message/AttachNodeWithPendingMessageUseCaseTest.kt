@@ -139,7 +139,7 @@ class AttachNodeWithPendingMessageUseCaseTest {
             inOrder.verify(setNodeAttributesAfterUploadUseCase)
                 .invoke(
                     nodeId.longValue,
-                    UriPath(filePath),
+                    uriPath,
                     appData,
                 )
             inOrder.verify(chatMessageRepository).attachNode(chatId, nodeId)
@@ -158,14 +158,14 @@ class AttachNodeWithPendingMessageUseCaseTest {
 
             underTest(pendingMsgId, nodeId)
             verify(chatMessageRepository)
-                .cacheOriginalPathForNode(nodeId, filePath)
+                .cacheOriginalPathForNode(nodeId, uriPath)
         }
 
     @Test
     fun `test that original path from pending message is cached when exists`() = runTest {
         val pendingMessage = createPendingMessageMock()
         val nodeId = NodeId(1L)
-        val originalUri = "content://example.uri"
+        val originalUri = UriPath("content://example.uri")
         whenever(getPendingMessageUseCase(pendingMsgId)).thenReturn(pendingMessage)
         whenever(chatMessageRepository.getCachedOriginalPathForPendingMessage(pendingMsgId))
             .thenReturn(originalUri)
@@ -197,7 +197,7 @@ class AttachNodeWithPendingMessageUseCaseTest {
         on { state } doReturn PendingMessageState.UPLOADING.value
         on { tempIdKarere } doReturn tempId
         on { videoDownSampled } doReturn null
-        on { filePath } doReturn filePath
+        on { uriPath } doReturn uriPath
         on { nodeHandle } doReturn nodeHandle
         on { fingerprint } doReturn null
         on { name } doReturn null
@@ -209,6 +209,6 @@ class AttachNodeWithPendingMessageUseCaseTest {
     private val type = -1
     private val timestamp = 1573483L
     private val tempId = 15L
-    private val filePath = "file path"
+    private val uriPath = UriPath("file path")
     private val nodeHandle = 1L
 }

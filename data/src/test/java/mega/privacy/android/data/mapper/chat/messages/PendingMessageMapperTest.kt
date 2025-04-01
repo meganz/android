@@ -5,6 +5,7 @@ import kotlinx.coroutines.test.runTest
 import mega.privacy.android.data.database.entity.chat.PendingMessageEntity
 import mega.privacy.android.domain.entity.chat.PendingMessage
 import mega.privacy.android.domain.entity.chat.PendingMessageState
+import mega.privacy.android.domain.entity.uri.UriPath
 import org.junit.jupiter.api.BeforeAll
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.TestInstance
@@ -52,7 +53,7 @@ internal class PendingMessageMapperTest {
             { assertThat(pendingMessage.state).isEqualTo(pendingMessageEntity.state.value) },
             { assertThat(pendingMessage.tempIdKarere).isEqualTo(pendingMessageEntity.tempIdKarere) },
             { assertThat(pendingMessage.videoDownSampled).isEqualTo(pendingMessageEntity.videoDownSampled) },
-            { assertThat(pendingMessage.filePath).isEqualTo(pendingMessageEntity.filePath) },
+            { assertThat(pendingMessage.uriPath).isEqualTo(UriPath(pendingMessageEntity.filePath)) },
             { assertThat(pendingMessage.nodeHandle).isEqualTo(pendingMessageEntity.nodeHandle) },
             { assertThat(pendingMessage.fingerprint).isEqualTo(pendingMessageEntity.fingerprint) },
             { assertThat(pendingMessage.name).isEqualTo(pendingMessageEntity.name) },

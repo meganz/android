@@ -1,6 +1,7 @@
 package mega.privacy.android.domain.entity.chat.messages.pending
 
 import mega.privacy.android.domain.entity.chat.PendingMessageState
+import mega.privacy.android.domain.entity.uri.UriPath
 
 /**
  * Save pending message request
@@ -12,7 +13,7 @@ import mega.privacy.android.domain.entity.chat.PendingMessageState
  * @property state
  * @property tempIdKarere
  * @property videoDownSampled
- * @property filePath
+ * @property uriPath
  * @property nodeHandle
  * @property fingerprint
  * @property name
@@ -25,7 +26,7 @@ data class SavePendingMessageRequest(
     val state: PendingMessageState,
     val tempIdKarere: Long,
     val videoDownSampled: String?,
-    val filePath: String,
+    val uriPath: UriPath,
     val nodeHandle: Long,
     val fingerprint: String?,
     val name: String?,

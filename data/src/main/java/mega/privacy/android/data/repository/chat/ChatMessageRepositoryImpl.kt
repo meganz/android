@@ -33,6 +33,7 @@ import mega.privacy.android.domain.entity.chat.messages.pending.SavePendingMessa
 import mega.privacy.android.domain.entity.chat.messages.pending.UpdatePendingMessageRequest
 import mega.privacy.android.domain.entity.chat.messages.reactions.Reaction
 import mega.privacy.android.domain.entity.node.NodeId
+import mega.privacy.android.domain.entity.uri.UriPath
 import mega.privacy.android.domain.qualifier.IoDispatcher
 import mega.privacy.android.domain.repository.chat.ChatMessageRepository
 import timber.log.Timber
@@ -52,8 +53,8 @@ internal class ChatMessageRepositoryImpl @Inject constructor(
     private val pendingMessageEntityMapper: PendingMessageEntityMapper,
     private val pendingMessageMapper: PendingMessageMapper,
     private val typedMessageEntityConverters: TypedMessageEntityConverters,
-    @OriginalPathForNodeCache private val originalPathCache: Cache<Map<NodeId, String>>,
-    @OriginalPathForPendingMessageCache private val originalPathForPendingMessageCache: Cache<Map<Long, String>>,
+    @OriginalPathForNodeCache private val originalPathCache: Cache<Map<NodeId, UriPath>>,
+    @OriginalPathForPendingMessageCache private val originalPathForPendingMessageCache: Cache<Map<Long, UriPath>>,
     private val typedMessagePagingSourceMapper: TypedMessagePagingSourceMapper,
 ) : ChatMessageRepository {
 
@@ -144,7 +145,7 @@ internal class ChatMessageRepositoryImpl @Inject constructor(
                 state = savePendingMessageRequest.state.value,
                 tempIdKarere = savePendingMessageRequest.tempIdKarere,
                 videoDownSampled = savePendingMessageRequest.videoDownSampled,
-                filePath = savePendingMessageRequest.filePath,
+                uriPath = savePendingMessageRequest.uriPath,
                 nodeHandle = savePendingMessageRequest.nodeHandle,
                 fingerprint = savePendingMessageRequest.fingerprint,
                 name = savePendingMessageRequest.name,
@@ -291,12 +292,12 @@ internal class ChatMessageRepositoryImpl @Inject constructor(
 
     override fun getCachedOriginalPathForNode(nodeId: NodeId) = originalPathCache.get()?.get(nodeId)
 
-    override fun cacheOriginalPathForNode(nodeId: NodeId, path: String) {
+    override fun cacheOriginalPathForNode(nodeId: NodeId, uriPath: UriPath) {
         val updated = buildMap {
             originalPathCache.get()?.let {
                 putAll(it)
             }
-            put(nodeId, path)
+            put(nodeId, uriPath)
         }
         originalPathCache.set(updated)
     }
@@ -304,12 +305,12 @@ internal class ChatMessageRepositoryImpl @Inject constructor(
     override fun getCachedOriginalPathForPendingMessage(pendingMessageId: Long) =
         originalPathForPendingMessageCache.get()?.get(pendingMessageId)
 
-    override fun cacheOriginalPathForPendingMessage(pendingMessageId: Long, path: String) {
+    override fun cacheOriginalPathForPendingMessage(pendingMessageId: Long, uriPath: UriPath) {
         val updated = buildMap {
             originalPathForPendingMessageCache.get()?.let {
                 putAll(it)
             }
-            put(pendingMessageId, path)
+            put(pendingMessageId, uriPath)
         }
         originalPathForPendingMessageCache.set(updated)
     }

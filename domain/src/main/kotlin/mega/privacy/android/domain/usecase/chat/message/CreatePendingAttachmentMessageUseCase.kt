@@ -28,7 +28,6 @@ class CreatePendingAttachmentMessageUseCase @Inject constructor(
      * Invoke
      */
     suspend operator fun invoke(pendingMessage: PendingMessage) = with(pendingMessage) {
-        val uriPath = UriPath(filePath)
         val fileName = when {
             uriPath.isPath() -> fileSystemRepository.getFileByPath(uriPath.value)?.name
             else -> fileSystemRepository.getFileNameFromUri(uriPath.value)
@@ -45,7 +44,7 @@ class CreatePendingAttachmentMessageUseCase @Inject constructor(
                 reactions = emptyList(),
                 status = this.getChatMessageStatus(),
                 content = null,
-                filePath = filePath,
+                uriPath = uriPath,
                 fileType = fileTypeInfo,
                 transferUniqueId = transferUniqueId.takeIf { it != UNKNOWN_TRANSFER_ID },
                 state = PendingMessageState.entries.firstOrNull { it.value == state }
@@ -65,7 +64,7 @@ class CreatePendingAttachmentMessageUseCase @Inject constructor(
                 reactions = emptyList(),
                 status = this.getChatMessageStatus(),
                 content = null,
-                filePath = filePath,
+                uriPath = uriPath,
                 fileType = fileTypeInfo,
                 transferUniqueId = transferUniqueId.takeIf { it != UNKNOWN_TRANSFER_ID },
                 state = PendingMessageState.entries.firstOrNull { it.value == state }

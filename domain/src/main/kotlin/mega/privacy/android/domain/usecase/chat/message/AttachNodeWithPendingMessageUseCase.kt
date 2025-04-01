@@ -45,7 +45,7 @@ class AttachNodeWithPendingMessageUseCase @Inject constructor(
                     chatMessageRepository.getCachedOriginalPathForPendingMessage(pendingMessage.id)
                 chatMessageRepository.cacheOriginalPathForNode(
                     nodeId,
-                    originalPath ?: pendingMessage.filePath
+                    originalPath ?: pendingMessage.uriPath
                 )
                 updatePendingMessageUseCase(
                     UpdatePendingMessageStateAndNodeHandleRequest(
@@ -57,7 +57,7 @@ class AttachNodeWithPendingMessageUseCase @Inject constructor(
                 runCatching {
                     setNodeAttributesAfterUploadUseCase(
                         nodeId.longValue,
-                        UriPath(pendingMessage.filePath),
+                        pendingMessage.uriPath,
                         appData,
                     )
                 }

@@ -18,7 +18,6 @@ import mega.privacy.android.domain.entity.node.NodeId
 import mega.privacy.android.domain.entity.transfer.Transfer
 import mega.privacy.android.domain.entity.transfer.TransferAppData
 import mega.privacy.android.domain.entity.transfer.TransferEvent
-import mega.privacy.android.domain.entity.transfer.isFileTransfer
 import mega.privacy.android.domain.entity.uri.UriPath
 import mega.privacy.android.domain.exception.chat.FoldersNotAllowedAsChatUploadException
 import mega.privacy.android.domain.repository.FileSystemRepository
@@ -40,7 +39,6 @@ import org.mockito.kotlin.mock
 import org.mockito.kotlin.reset
 import org.mockito.kotlin.verify
 import org.mockito.kotlin.whenever
-import java.io.File
 
 @ExperimentalCoroutinesApi
 @TestInstance(TestInstance.Lifecycle.PER_CLASS)
@@ -90,15 +88,16 @@ class StartChatUploadsWithWorkerUseCaseTest {
     private suspend fun commonStub() {
         whenever(fileSystemRepository.isFilePath(any())) doReturn true
         whenever(chatAttachmentNeedsCompressionUseCase(any())) doReturn false
+        whenever(fileSystemRepository.isDocumentUri(anyValueClass())) doReturn false
         mockFlow(emptyFlow())
     }
 
     @Test
     fun `test that the file is send to upload files use case`() = runTest {
-        val file = mockFile()
+        val file = createFileUriPath()
         underTest(file, NodeId(11L), 1L).test {
             verify(uploadFileUseCase).invoke(
-                uriPath = UriPath(eq(file.absolutePath)),
+                uriPath = UriPath(eq(file.value)),
                 fileName = anyOrNull(),
                 appData = any(),
                 parentFolderId = anyValueClass(),
@@ -110,7 +109,7 @@ class StartChatUploadsWithWorkerUseCaseTest {
 
     @Test
     fun `test that the file is send as high priority`() = runTest {
-        val file = mockFile()
+        val file = createFileUriPath()
         underTest(file, NodeId(11L), 1L).test {
             verify(uploadFileUseCase).invoke(
                 uriPath = anyValueClass(),
@@ -125,8 +124,8 @@ class StartChatUploadsWithWorkerUseCaseTest {
 
     @Test
     fun `test that a folder throws FoldersNotAllowedAsChatUploadException`() = runTest {
-        val folder = mockFile()
-        whenever(fileSystemRepository.isFilePath(folder.path)) doReturn false
+        val folder = createFileUriPath()
+        whenever(fileSystemRepository.isFilePath(folder.value)) doReturn false
         underTest(folder, NodeId(11L), 1L).test {
             val notStartedEvents = cancelAndConsumeRemainingEvents()
                 .mapNotNull { (it as? Event.Error)?.throwable }
@@ -138,7 +137,7 @@ class StartChatUploadsWithWorkerUseCaseTest {
     @Test
     fun `test that chatFilesFolderId is used as destination`() = runTest {
         val chatFilesFolderId = NodeId(11L)
-        underTest(mockFile(), chatFilesFolderId, 1L).test {
+        underTest(createFileUriPath(), chatFilesFolderId, 1L).test {
             verify(uploadFileUseCase).invoke(
                 uriPath = anyValueClass(),
                 fileName = anyOrNull(),
@@ -153,7 +152,7 @@ class StartChatUploadsWithWorkerUseCaseTest {
     @Test
     fun `test that chat upload app data is set`() = runTest {
         val pendingMessageId = 1L
-        val file = mockFile()
+        val file = createFileUriPath()
         val expected = listOf(TransferAppData.ChatUpload(pendingMessageId))
         underTest(file, NodeId(11L), pendingMessageId).test {
             verify(uploadFileUseCase).invoke(
@@ -171,7 +170,7 @@ class StartChatUploadsWithWorkerUseCaseTest {
     fun `test that chat upload app data is set correctly when there are multiple pending messages ids`() =
         runTest {
             val pendingMessageIds = longArrayOf(1L, 2L, 3L)
-            val file = mockFile()
+            val file = createFileUriPath()
             val expected = pendingMessageIds.map { TransferAppData.ChatUpload(it) }
             underTest(file, NodeId(11L), *pendingMessageIds).test {
                 verify(uploadFileUseCase).invoke(
@@ -195,7 +194,7 @@ class StartChatUploadsWithWorkerUseCaseTest {
                 awaitCancellation()
             }
         )
-        underTest(mockFile(), NodeId(11L), 1L).collect()
+        underTest(createFileUriPath(), NodeId(11L), 1L).collect()
         verify(startChatUploadsWorkerAndWaitUntilIsStartedUseCase).invoke()
     }
 
@@ -216,7 +215,7 @@ class StartChatUploadsWithWorkerUseCaseTest {
             ) {
                 workerStarted = true
             })
-        underTest(mockFile(), NodeId(11L), 1L).test {
+        underTest(createFileUriPath(), NodeId(11L), 1L).test {
             awaitItem()
             awaitComplete()
             assertThat(workerStarted).isTrue()
@@ -227,7 +226,7 @@ class StartChatUploadsWithWorkerUseCaseTest {
     @Test
     fun `test that files returned by CompressFileForChatUseCase are send to upload files use case`() =
         runTest {
-            val file = mockFile()
+            val file = createFileUriPath()
             val pendingMessageId = 1L
             whenever(chatAttachmentNeedsCompressionUseCase(anyValueClass())) doReturn true
             underTest(file, NodeId(11L), pendingMessageId).test {
@@ -244,7 +243,7 @@ class StartChatUploadsWithWorkerUseCaseTest {
 
     @Test
     fun `test that pending message name is used when is not null`() = runTest {
-        val file = mockFile()
+        val file = createFileUriPath()
         val pendingMessageId = 1L
         val pendingMessageName = "Rename"
         val pendingMessage = mock<PendingMessage> {
@@ -266,7 +265,7 @@ class StartChatUploadsWithWorkerUseCaseTest {
     @Test
     fun `test that handle chat upload transfer event use case is called on each transfer event`() =
         runTest {
-            val file = mockFile()
+            val file = createFileUriPath()
             val pendingMessageId = 15L
             val transferTag = 12
             val transfer = mock<Transfer> {
@@ -289,11 +288,7 @@ class StartChatUploadsWithWorkerUseCaseTest {
             }
         }
 
-    private fun mockFile() = mock<File> {
-        on { isDirectory }.thenReturn(false)
-        on { path }.thenReturn("path")
-        on { absolutePath }.thenReturn("path")
-    }
+    private fun createFileUriPath() = UriPath("foo")
 
     private val fileTransfer = mock<Transfer> {
         on { isFolderTransfer } doReturn false

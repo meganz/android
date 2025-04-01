@@ -34,6 +34,7 @@ import mega.privacy.android.domain.entity.node.TypedNode
 import mega.privacy.android.domain.entity.node.chat.ChatDefaultFile
 import mega.privacy.android.domain.entity.node.chat.ChatFile
 import mega.privacy.android.domain.entity.node.chat.ChatImageFile
+import mega.privacy.android.domain.entity.uri.UriPath
 import mega.privacy.android.domain.usecase.chat.GetShareChatNodesUseCase
 import mega.privacy.android.domain.usecase.chat.message.GetCachedOriginalPathUseCase
 import mega.privacy.android.domain.usecase.chat.message.GetMessageIdsByTypeUseCase
@@ -137,9 +138,9 @@ class NodeAttachmentMessageViewModelTest {
             on { type } doReturn expectedType
         }
         whenever(fileSizeStringMapper(any())).thenReturn("size")
-        val expected = "file://image.jpg"
+        val expected = UriPath("/image.jpg")
         val previewFile = mock<File> {
-            on { toString() } doReturn expected
+            on { absolutePath } doReturn expected.value
         }
         whenever(getPreviewUseCase(fileNode)).thenReturn(previewFile)
         val msg = buildNodeAttachmentMessage(fileNode)
@@ -178,7 +179,7 @@ class NodeAttachmentMessageViewModelTest {
     fun `test that initial ui state uses cached original file when file type is image or video`(
         fileTypeInfo: FileTypeInfo,
     ) = runTest {
-        val expected = "cachedPreview"
+        val expected = UriPath("cachedPreview")
         val fileNode = mock<ChatDefaultFile> {
             on { name } doReturn "name"
             on { size } doReturn 123L

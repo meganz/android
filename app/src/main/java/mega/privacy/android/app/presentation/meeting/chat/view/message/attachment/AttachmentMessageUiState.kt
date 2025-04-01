@@ -1,6 +1,7 @@
 package mega.privacy.android.app.presentation.meeting.chat.view.message.attachment
 
 import mega.privacy.android.domain.entity.Progress
+import mega.privacy.android.domain.entity.uri.UriPath
 
 /**
  * Ui state for attachment messages
@@ -18,7 +19,7 @@ data class AttachmentMessageUiState(
     val fileTypeResId: Int? = null,
     val fileName: String = "",
     val fileSize: String = "",
-    val previewUri: String? = null,
+    val previewUri: UriPath? = null,
     val duration: String? = null,
     val loadProgress: Progress? = null,
     val compressionProgress: Progress? = null,

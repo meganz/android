@@ -5,6 +5,7 @@ import kotlinx.coroutines.test.runTest
 import mega.privacy.android.data.database.entity.chat.PendingMessageEntity
 import mega.privacy.android.domain.entity.chat.PendingMessageState
 import mega.privacy.android.domain.entity.chat.messages.pending.SavePendingMessageRequest
+import mega.privacy.android.domain.entity.uri.UriPath
 import org.junit.jupiter.api.BeforeAll
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.TestInstance
@@ -32,7 +33,7 @@ internal class PendingMessageEntityMapperTest {
                 state = PendingMessageState.COMPRESSING,
                 tempIdKarere = 567890L,
                 videoDownSampled = "videoDownSampled",
-                filePath = "file/path",
+                uriPath = UriPath("file/path"),
                 nodeHandle = 6543L,
                 fingerprint = "903456L",
                 name = "sample pending message",
@@ -45,7 +46,7 @@ internal class PendingMessageEntityMapperTest {
                 state = savePendingMessageRequest.state,
                 tempIdKarere = savePendingMessageRequest.tempIdKarere,
                 videoDownSampled = savePendingMessageRequest.videoDownSampled,
-                filePath = savePendingMessageRequest.filePath,
+                filePath = savePendingMessageRequest.uriPath.value,
                 nodeHandle = savePendingMessageRequest.nodeHandle,
                 fingerprint = savePendingMessageRequest.fingerprint,
                 name = savePendingMessageRequest.name,

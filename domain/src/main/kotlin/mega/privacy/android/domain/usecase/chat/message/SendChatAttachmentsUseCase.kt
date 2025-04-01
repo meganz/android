@@ -3,6 +3,7 @@ package mega.privacy.android.domain.usecase.chat.message
 import mega.privacy.android.domain.entity.chat.PendingMessage
 import mega.privacy.android.domain.entity.chat.PendingMessageState
 import mega.privacy.android.domain.entity.chat.messages.pending.SavePendingMessageRequest
+import mega.privacy.android.domain.entity.uri.UriPath
 import mega.privacy.android.domain.exception.NotEnoughStorageException
 import mega.privacy.android.domain.repository.chat.ChatMessageRepository
 import mega.privacy.android.domain.usecase.GetDeviceCurrentTimeUseCase
@@ -27,14 +28,11 @@ class SendChatAttachmentsUseCase @Inject constructor(
      * @param isVoiceClip
      */
     suspend operator fun invoke(
-        urisWithNames: Map<String, String?>,
+        urisWithNames: Map<UriPath, String?>,
         isVoiceClip: Boolean = false,
         vararg chatIds: Long,
     ) {
-        if (!doesCacheHaveSufficientSpaceForUrisUseCase(urisWithNames.keys.toList())) {
-            throw NotEnoughStorageException()
-        }
-        urisWithNames.forEach { (uri, name) ->
+        urisWithNames.forEach { (uriPath, name) ->
             chatMessageRepository.savePendingMessages(
                 SavePendingMessageRequest(
                     chatId = chatIds.first(),
@@ -44,14 +42,14 @@ class SendChatAttachmentsUseCase @Inject constructor(
                     state = PendingMessageState.PREPARING,
                     tempIdKarere = -1,
                     videoDownSampled = null,
-                    filePath = uri,
+                    uriPath = uriPath,
                     nodeHandle = -1,
                     fingerprint = null,
                     name = name,
                 ),
                 chatIds.asList()
             ).forEach { pendingMessageId ->
-                chatMessageRepository.cacheOriginalPathForPendingMessage(pendingMessageId, uri)
+                chatMessageRepository.cacheOriginalPathForPendingMessage(pendingMessageId, uriPath)
             }
         }
         startChatUploadsWorkerUseCase()

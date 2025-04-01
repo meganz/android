@@ -2,6 +2,7 @@ package mega.privacy.android.data.mapper.chat.messages
 
 import mega.privacy.android.data.database.entity.chat.PendingMessageEntity
 import mega.privacy.android.domain.entity.chat.PendingMessage
+import mega.privacy.android.domain.entity.uri.UriPath
 import javax.inject.Inject
 
 /**
@@ -25,7 +26,7 @@ class PendingMessageMapper @Inject constructor() {
                 state = state.value,
                 tempIdKarere = tempIdKarere,
                 videoDownSampled = videoDownSampled,
-                filePath = filePath,
+                uriPath = UriPath(filePath),
                 nodeHandle = nodeHandle,
                 fingerprint = fingerprint,
                 name = name,

@@ -4,7 +4,6 @@ import android.Manifest
 import android.app.Activity
 import android.content.Context
 import android.content.Intent
-import android.net.Uri
 import android.os.Build
 import androidx.activity.compose.ManagedActivityResultLauncher
 import androidx.activity.compose.rememberLauncherForActivityResult
@@ -46,6 +45,7 @@ import mega.privacy.android.app.presentation.meeting.chat.model.ChatUiState
 import mega.privacy.android.app.presentation.meeting.chat.view.navigation.openAttachContactActivity
 import mega.privacy.android.app.presentation.qrcode.findActivity
 import mega.privacy.android.app.utils.permission.PermissionUtils
+import mega.privacy.android.domain.entity.uri.UriPath
 import mega.privacy.android.shared.original.core.ui.controls.chat.attachpanel.CellButton
 import mega.privacy.android.shared.original.core.ui.controls.chat.attachpanel.CellButtonPlaceHolder
 import mega.privacy.android.shared.original.core.ui.preview.CombinedThemePreviews
@@ -80,7 +80,7 @@ fun ChatToolbarBottomSheet(
     onAttachContacts: (List<String>) -> Unit,
     modifier: Modifier = Modifier,
     navigateToFileModal: () -> Unit,
-    onAttachFiles: (List<Uri>) -> Unit = {},
+    onAttachFiles: (List<UriPath>) -> Unit = {},
     onCameraPermissionDenied: () -> Unit = {},
     onAttachScan: () -> Unit = {},
     onDocumentScannerInitializationFailed: () -> Unit = {},
@@ -94,7 +94,7 @@ fun ChatToolbarBottomSheet(
             contract = ActivityResultContracts.PickMultipleVisualMedia()
         ) {
             if (it.isNotEmpty()) {
-                onAttachFiles(it)
+                onAttachFiles(it.map { UriPath(it.toString()) })
             }
             hideSheet()
         }
@@ -118,7 +118,7 @@ fun ChatToolbarBottomSheet(
         contract = ActivityResultContracts.StartActivityForResult()
     ) {
         it.data?.data?.let { uri ->
-            onAttachFiles(listOf(uri))
+            onAttachFiles(listOf(UriPath(uri.toString())))
         }
         hideSheet()
     }
@@ -186,7 +186,7 @@ fun ChatToolbarBottomSheet(
             contract = InAppCameraLauncher()
         ) { uri ->
             uri?.let {
-                onAttachFiles(listOf(it))
+                onAttachFiles(listOf(UriPath(it.toString())))
             }
             closeModal()
         }
@@ -244,7 +244,7 @@ fun ChatToolbarBottomSheet(
                     )
                 )
                 it.fileUri?.toUri()?.let { uri ->
-                    onAttachFiles(listOf(uri))
+                    onAttachFiles(listOf(UriPath(uri.toString())))
                     hideSheet()
                 }
             },

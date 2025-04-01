@@ -312,7 +312,7 @@ class StartTransfersComponentViewModelTest {
         commonStub()
         underTest.startTransfer(startEvent)
         verify(sendChatAttachmentsUseCase).invoke(
-            listOf(uploadUri.toString()).associateWith { null },
+            listOf(uploadUri).associateWith { null },
             false,
             CHAT_ID,
         )
@@ -1237,7 +1237,7 @@ class StartTransfersComponentViewModelTest {
         private const val NODE_HANDLE = 10L
         private const val PARENT_NODE_HANDLE = 12L
         private const val CHAT_ID = 20L
-        private val uploadUri = mock<Uri>()
+        private val uploadUri = UriPath("foo")
         private val nodeId = NodeId(NODE_HANDLE)
         private val parentId = NodeId(PARENT_NODE_HANDLE)
         private const val DESTINATION = "/destination/"

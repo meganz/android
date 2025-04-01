@@ -1,5 +1,7 @@
 package mega.privacy.android.domain.entity.chat
 
+import mega.privacy.android.domain.entity.uri.UriPath
+
 /**
  * Pending message
  *
@@ -11,7 +13,7 @@ package mega.privacy.android.domain.entity.chat
  * @property state
  * @property tempIdKarere
  * @property videoDownSampled
- * @property filePath
+ * @property uriPath
  * @property nodeHandle
  * @property fingerprint
  * @property name
@@ -27,7 +29,7 @@ data class PendingMessage(
     var state: Int = PendingMessageState.PREPARING.value,
     var tempIdKarere: Long = -1,
     var videoDownSampled: String? = null,
-    var filePath: String = "",
+    var uriPath: UriPath = UriPath(""),
     var nodeHandle: Long = -1,
     var fingerprint: String? = null,
     var name: String? = null,
@@ -40,13 +42,13 @@ data class PendingMessage(
     constructor(
         chatId: Long,
         uploadTimestamp: Long,
-        filePath: String,
+        uriPath: UriPath,
         fingerprint: String?,
         name: String?,
     ) : this() {
         this.chatId = chatId
         this.uploadTimestamp = uploadTimestamp
-        this.filePath = filePath
+        this.uriPath = uriPath
         this.fingerprint = fingerprint
         this.name = name
     }
@@ -56,7 +58,7 @@ data class PendingMessage(
         chatId: Long,
         uploadTimestamp: Long,
         tempIdKarere: Long,
-        filePath: String,
+        uriPath: UriPath,
         fingerprint: String?,
         name: String?,
         nodeHandle: Long,
@@ -66,7 +68,7 @@ data class PendingMessage(
         this.chatId = chatId
         this.uploadTimestamp = uploadTimestamp
         this.tempIdKarere = tempIdKarere
-        this.filePath = filePath
+        this.uriPath = uriPath
         this.fingerprint = fingerprint
         this.name = name
         this.nodeHandle = nodeHandle

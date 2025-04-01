@@ -16,6 +16,7 @@ import com.google.common.truth.Truth.assertThat
 import kotlinx.coroutines.flow.MutableStateFlow
 import mega.privacy.android.app.presentation.meeting.chat.model.ChatUiState
 import mega.privacy.android.core.test.AnalyticsTestRule
+import mega.privacy.android.domain.entity.uri.UriPath
 import mega.privacy.mobile.analytics.event.ChatConversationContactMenuItemEvent
 import mega.privacy.mobile.analytics.event.ChatConversationFileMenuItemEvent
 import mega.privacy.mobile.analytics.event.ChatConversationGIFMenuItemEvent
@@ -42,7 +43,7 @@ internal class ChatToolbarBottomSheetTest {
     @get:Rule
     val ruleChain: RuleChain = RuleChain.outerRule(analyticsRule).around(composeTestRule)
 
-    private val onAttachFileClicked: (List<Uri>) -> Unit = mock()
+    private val onAttachFileClicked: (List<UriPath>) -> Unit = mock()
     private val onPickLocation: () -> Unit = mock()
     private val onAttachScan: () -> Unit = mock()
 

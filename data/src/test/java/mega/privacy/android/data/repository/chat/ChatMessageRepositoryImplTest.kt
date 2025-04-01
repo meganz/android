@@ -31,6 +31,7 @@ import mega.privacy.android.domain.entity.chat.messages.pending.SavePendingMessa
 import mega.privacy.android.domain.entity.chat.messages.pending.UpdatePendingMessageStateRequest
 import mega.privacy.android.domain.entity.chat.messages.reactions.Reaction
 import mega.privacy.android.domain.entity.node.NodeId
+import mega.privacy.android.domain.entity.uri.UriPath
 import nz.mega.sdk.MegaChatError
 import nz.mega.sdk.MegaChatMessage
 import nz.mega.sdk.MegaChatRequest
@@ -68,8 +69,8 @@ class ChatMessageRepositoryImplTest {
     private val pendingMessageEntityMapper = mock<PendingMessageEntityMapper>()
     private val pendingMessageMapper = mock<PendingMessageMapper>()
     private val typedMessageEntityConverters = mock<TypedMessageEntityConverters>()
-    private val originalPathCache = mock<Cache<Map<NodeId, String>>>()
-    private val originalPathForPendingMessageCache = mock<Cache<Map<Long, String>>>()
+    private val originalPathCache = mock<Cache<Map<NodeId, UriPath>>>()
+    private val originalPathForPendingMessageCache = mock<Cache<Map<Long, UriPath>>>()
     private val typedMessagePagingSourceMapper = mock<TypedMessagePagingSourceMapper>()
     private val megaChatErrorSuccess = mock<MegaChatError> {
         on { errorCode }.thenReturn(MegaChatError.ERROR_OK)
@@ -276,7 +277,7 @@ class ChatMessageRepositoryImplTest {
         val id = 19L
         val savePendingMessageRequest = mock<SavePendingMessageRequest> {
             on { state } doReturn mock()
-            on { filePath } doReturn "file"
+            on { uriPath } doReturn UriPath("file")
         }
         val pendingMessageEntity = mock<PendingMessageEntity>()
         whenever(pendingMessageEntityMapper(savePendingMessageRequest))
@@ -299,7 +300,7 @@ class ChatMessageRepositoryImplTest {
             state = PendingMessageState.UPLOADING,
             tempIdKarere = 123L,
             videoDownSampled = "video",
-            filePath = "file",
+            uriPath = UriPath("file"),
             nodeHandle = 123L,
             fingerprint = "fingerprint",
             name = "name",
@@ -496,7 +497,7 @@ class ChatMessageRepositoryImplTest {
     @Test
     fun `test that original path is added to the cache`() {
         val newId = NodeId(2L)
-        val newPath = "someInterestingPath/image.jpg"
+        val newPath = UriPath("someInterestingPath/image.jpg")
         whenever(originalPathCache.get()).thenReturn(emptyMap())
         underTest.cacheOriginalPathForNode(newId, newPath)
         verify(originalPathCache).set(eq(mapOf(newId to newPath)))
@@ -505,10 +506,10 @@ class ChatMessageRepositoryImplTest {
     @Test
     fun `test that original path is added to the cache when it's not empty`() {
         val originalId = NodeId(1L)
-        val originalPath = "originalPath/video.mp4"
+        val originalPath = UriPath("originalPath/video.mp4")
         val previousCache = mapOf(originalId to originalPath)
         val newId = NodeId(2L)
-        val newPath = "someInterestingPath/image.jpg"
+        val newPath = UriPath("someInterestingPath/image.jpg")
         whenever(originalPathCache.get()).thenReturn(previousCache)
         underTest.cacheOriginalPathForNode(newId, newPath)
         verify(originalPathCache).set(eq(previousCache + (newId to newPath)))
@@ -517,7 +518,7 @@ class ChatMessageRepositoryImplTest {
     @Test
     fun `test that original path for pending message is added to the cache`() {
         val newId = 2L
-        val newPath = "someInterestingPath/image.jpg"
+        val newPath = UriPath("someInterestingPath/image.jpg")
         whenever(originalPathForPendingMessageCache.get()).thenReturn(emptyMap())
         underTest.cacheOriginalPathForPendingMessage(newId, newPath)
         verify(originalPathForPendingMessageCache).set(eq(mapOf(newId to newPath)))
@@ -526,10 +527,10 @@ class ChatMessageRepositoryImplTest {
     @Test
     fun `test that original path for pending message is added to the cache when it's not empty`() {
         val originalId = 1L
-        val originalPath = "originalPath/video.mp4"
+        val originalPath = UriPath("originalPath/video.mp4")
         val previousCache = mapOf(originalId to originalPath)
         val newId = 2L
-        val newPath = "someInterestingPath/image.jpg"
+        val newPath = UriPath("someInterestingPath/image.jpg")
         whenever(originalPathForPendingMessageCache.get()).thenReturn(previousCache)
         underTest.cacheOriginalPathForPendingMessage(newId, newPath)
         verify(originalPathForPendingMessageCache).set(eq(previousCache + (newId to newPath)))

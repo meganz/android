@@ -4,6 +4,7 @@ import kotlinx.coroutines.test.runTest
 import mega.privacy.android.domain.entity.chat.PendingMessage
 import mega.privacy.android.domain.entity.chat.PendingMessageState
 import mega.privacy.android.domain.entity.chat.messages.pending.SavePendingMessageRequest
+import mega.privacy.android.domain.entity.uri.UriPath
 import mega.privacy.android.domain.repository.chat.ChatMessageRepository
 import mega.privacy.android.domain.usecase.GetDeviceCurrentTimeUseCase
 import mega.privacy.android.domain.usecase.file.DoesCacheHaveSufficientSpaceForUrisUseCase
@@ -54,8 +55,8 @@ class SendChatAttachmentsUseCaseTest {
     @Test
     fun `test that correct pending message is created`() = runTest {
         val chatId = 123L
-        val uri = "file"
-        val uris = mapOf<String, String?>(uri to null)
+        val uri = UriPath("file")
+        val uris = mapOf<UriPath, String?>(uri to null)
         commonStub()
         underTest(uris, false, chatId)
         verify(chatMessageRepository).savePendingMessages(
@@ -67,7 +68,7 @@ class SendChatAttachmentsUseCaseTest {
                 state = PendingMessageState.PREPARING,
                 tempIdKarere = -1,
                 videoDownSampled = null,
-                filePath = uri,
+                uriPath = uri,
                 nodeHandle = -1,
                 fingerprint = null,
                 name = uris[uri],
@@ -79,7 +80,7 @@ class SendChatAttachmentsUseCaseTest {
     @Test
     fun `test that a pending message is created for each file`() = runTest {
         val chatId = 123L
-        val uris = List(3) { "file$it" }.associateWith { null }
+        val uris = List(3) { UriPath("file$it") }.associateWith { null }
         commonStub()
         underTest(uris, false, chatId)
         verify(chatMessageRepository, times(uris.size))
@@ -91,7 +92,7 @@ class SendChatAttachmentsUseCaseTest {
         runTest {
             val chatId = 123L
             val pendingMsgId = 123L
-            val uris = mapOf<String, String?>("file" to null)
+            val uris = mapOf<UriPath, String?>(UriPath("file") to null)
             commonStub(pendingMsgId)
             underTest(uris, isVoiceClip = true, chatId)
             verify(chatMessageRepository).savePendingMessages(argThat {
@@ -105,7 +106,7 @@ class SendChatAttachmentsUseCaseTest {
             val chatId = 123L
             val pendingMsgId = 123L
             val name = "file renamed"
-            val uris = mapOf<String, String?>("file" to name)
+            val uris = mapOf<UriPath, String?>(UriPath("file") to name)
             commonStub(pendingMsgId)
             underTest(uris, isVoiceClip = true, chatId)
             verify(chatMessageRepository).savePendingMessages(argThat {
@@ -117,8 +118,8 @@ class SendChatAttachmentsUseCaseTest {
     fun `test that original path is cached`() = runTest {
         val chatId = 1263L
         val pendingMsgId = 22353L
-        val expected = "content://content.example"
-        val uris = mapOf<String, String?>(expected to null)
+        val expected = UriPath("content://content.example")
+        val uris = mapOf<UriPath, String?>(expected to null)
         commonStub(pendingMsgId)
 
         underTest(uris, isVoiceClip = false, chatId)

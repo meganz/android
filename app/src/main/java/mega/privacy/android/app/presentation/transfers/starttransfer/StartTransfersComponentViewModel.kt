@@ -478,14 +478,14 @@ internal class StartTransfersComponentViewModel @Inject constructor(
 
     private suspend fun startChatUploads(
         chatId: Long,
-        uris: List<Uri>,
+        uris: List<UriPath>,
         isVoiceClip: Boolean = false,
     ) {
         runCatching { clearActiveTransfersIfFinishedUseCase() }
             .onFailure { Timber.e(it) }
         runCatching {
             sendChatAttachmentsUseCase(
-                uris.map { it.toString() }.associateWith { null }, isVoiceClip, chatId
+                uris.map { it }.associateWith { null }, isVoiceClip, chatId
             )
         }.onSuccess {
             _uiState.updateEventAndClearProgress(null)

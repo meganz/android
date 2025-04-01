@@ -24,6 +24,7 @@ import mega.privacy.android.domain.entity.node.NodeContentUri
 import mega.privacy.android.domain.entity.node.NodeShareContentUri
 import mega.privacy.android.domain.entity.node.TypedNode
 import mega.privacy.android.domain.entity.node.chat.ChatFile
+import mega.privacy.android.domain.entity.uri.UriPath
 import mega.privacy.android.domain.usecase.chat.GetShareChatNodesUseCase
 import mega.privacy.android.domain.usecase.chat.message.GetCachedOriginalPathUseCase
 import mega.privacy.android.domain.usecase.chat.message.GetMessageIdsByTypeUseCase
@@ -85,7 +86,7 @@ class NodeAttachmentMessageViewModel @Inject constructor(
                 }.onSuccess { previewFile ->
                     mutableStateFlow.update {
                         it.copy(
-                            previewUri = previewFile?.toString(),
+                            previewUri = previewFile?.absolutePath?.let { UriPath(it) },
                             loadProgress = null,
                         )
                     }

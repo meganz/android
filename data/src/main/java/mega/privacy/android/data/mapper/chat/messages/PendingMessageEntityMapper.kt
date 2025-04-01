@@ -25,7 +25,7 @@ class PendingMessageEntityMapper @Inject constructor() {
             state = savePendingMessageRequest.state,
             tempIdKarere = savePendingMessageRequest.tempIdKarere,
             videoDownSampled = savePendingMessageRequest.videoDownSampled,
-            filePath = savePendingMessageRequest.filePath,
+            filePath = savePendingMessageRequest.uriPath.value,
             nodeHandle = savePendingMessageRequest.nodeHandle,
             fingerprint = savePendingMessageRequest.fingerprint,
             name = savePendingMessageRequest.name,

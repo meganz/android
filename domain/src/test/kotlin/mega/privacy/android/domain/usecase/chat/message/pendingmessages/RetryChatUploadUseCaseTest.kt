@@ -6,6 +6,7 @@ import mega.privacy.android.domain.entity.chat.PendingMessage
 import mega.privacy.android.domain.entity.chat.messages.PendingFileAttachmentMessage
 import mega.privacy.android.domain.entity.node.NodeId
 import mega.privacy.android.domain.entity.transfer.TransferAppData
+import mega.privacy.android.domain.entity.uri.UriPath
 import mega.privacy.android.domain.exception.chat.ChatUploadNotRetriedException
 import mega.privacy.android.domain.usecase.chat.message.CreatePendingAttachmentMessageUseCase
 import mega.privacy.android.domain.usecase.transfers.chatuploads.GetOrCreateMyChatsFilesFolderIdUseCase
@@ -21,7 +22,6 @@ import org.mockito.kotlin.mock
 import org.mockito.kotlin.verify
 import org.mockito.kotlin.verifyNoInteractions
 import org.mockito.kotlin.whenever
-import java.io.File
 
 @TestInstance(TestInstance.Lifecycle.PER_CLASS)
 class RetryChatUploadUseCaseTest {
@@ -37,11 +37,11 @@ class RetryChatUploadUseCaseTest {
 
     private val pendingMessageId = 1L
     private val id = NodeId(1)
-    private val file = mock<File>()
+    private val uriPath = UriPath("foo")
     private val chatUploadAppData = listOf(TransferAppData.ChatUpload(pendingMessageId))
     private val pendingMessage = mock<PendingMessage>()
     private val pendingAttachmentMessage = mock<PendingFileAttachmentMessage> {
-        on { this.file } doReturn file
+        on { this.uriPath } doReturn uriPath
     }
 
     @BeforeAll
@@ -87,11 +87,11 @@ class RetryChatUploadUseCaseTest {
             whenever(createPendingAttachmentMessageUseCase(pendingMessage))
                 .thenReturn(pendingAttachmentMessage)
             whenever(getOrCreateMyChatsFilesFolderIdUseCase()).thenReturn(id)
-            whenever(startChatUploadsWithWorkerUseCase(file, id, pendingMessageId))
+            whenever(startChatUploadsWithWorkerUseCase(uriPath, id, pendingMessageId))
                 .thenReturn(emptyFlow())
 
             underTest(chatUploadAppData)
 
-            verify(startChatUploadsWithWorkerUseCase).invoke(file, id, pendingMessageId)
+            verify(startChatUploadsWithWorkerUseCase).invoke(uriPath, id, pendingMessageId)
         }
 }
