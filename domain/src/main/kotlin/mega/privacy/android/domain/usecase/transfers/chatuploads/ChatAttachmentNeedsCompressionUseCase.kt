@@ -6,7 +6,7 @@ import mega.privacy.android.domain.entity.VideoQuality
 import mega.privacy.android.domain.entity.uri.UriPath
 import mega.privacy.android.domain.repository.NetworkRepository
 import mega.privacy.android.domain.repository.SettingsRepository
-import mega.privacy.android.domain.usecase.file.GetFileExtensionFromUriPath
+import mega.privacy.android.domain.usecase.file.GetFileExtensionFromUriPathUseCase
 import mega.privacy.android.domain.usecase.file.IsImageFileUseCase
 import mega.privacy.android.domain.usecase.file.IsVideoFileUseCase
 import javax.inject.Inject
@@ -27,14 +27,14 @@ class ChatAttachmentNeedsCompressionUseCase @Inject constructor(
     private val isVideoFileUseCase: IsVideoFileUseCase,
     private val defaultSettingsRepository: SettingsRepository,
     private val networkRepository: NetworkRepository,
-    private val getFileExtensionFromUriPath: GetFileExtensionFromUriPath,
+    private val getFileExtensionFromUriPathUseCase: GetFileExtensionFromUriPathUseCase,
 ) {
 
     /**
      * Invoke
      */
     suspend operator fun invoke(uriPath: UriPath): Boolean {
-        val extension = getFileExtensionFromUriPath(uriPath)
+        val extension = getFileExtensionFromUriPathUseCase(uriPath)
         when {
             isImageFileUseCase(uriPath) -> {
                 if (extension.isNotSupportedImage()) return false

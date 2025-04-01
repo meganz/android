@@ -48,8 +48,7 @@ class PrepareAllPendingMessagesUseCase @Inject constructor(
                                 semaphore.withPermit {
                                     val pendingMessageIds = pendingMessages.map { it.id }
                                     val uriPathToUpload = getPathForUploadUseCase(
-                                        originalUriPath = UriPath(uri),
-                                        isChatUpload = true
+                                        originalUriPath = UriPath(uri)
                                     )?.let { UriPath(it) }
                                     when {
                                         uriPathToUpload == null -> {

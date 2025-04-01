@@ -11,11 +11,13 @@ import mega.privacy.android.domain.entity.chat.PendingMessageState
 import mega.privacy.android.domain.entity.chat.messages.pending.UpdatePendingMessageStateAndPathRequest
 import mega.privacy.android.domain.entity.transfer.ChatCompressionFinished
 import mega.privacy.android.domain.entity.transfer.ChatCompressionProgress
+import mega.privacy.android.domain.entity.uri.UriPath
 import mega.privacy.android.domain.repository.chat.ChatMessageRepository
 import mega.privacy.android.domain.usecase.chat.ChatUploadCompressionState
 import mega.privacy.android.domain.usecase.chat.ChatUploadNotCompressedReason
 import mega.privacy.android.domain.usecase.chat.message.MonitorPendingMessagesByStateUseCase
 import mega.privacy.android.domain.usecase.chat.message.UpdatePendingMessageUseCase
+import mega.privacy.android.domain.usecase.file.GetFileSizeFromUriPathUseCase
 import mega.privacy.android.domain.usecase.transfers.chatuploads.CompressFileForChatUseCase
 import org.junit.jupiter.api.BeforeAll
 import org.junit.jupiter.api.BeforeEach
@@ -39,6 +41,7 @@ class CompressPendingMessagesUseCaseTest {
     private val monitorPendingMessagesByStateUseCase = mock<MonitorPendingMessagesByStateUseCase>()
     private val chatMessageRepository = mock<ChatMessageRepository>()
     private val updatePendingMessageUseCase = mock<UpdatePendingMessageUseCase>()
+    private val getFileSizeFromUriPathUseCase = mock<GetFileSizeFromUriPathUseCase>()
 
     @BeforeAll
     fun setup() {
@@ -47,6 +50,7 @@ class CompressPendingMessagesUseCaseTest {
             monitorPendingMessagesByStateUseCase,
             chatMessageRepository,
             updatePendingMessageUseCase,
+            getFileSizeFromUriPathUseCase
         )
     }
 
@@ -95,7 +99,7 @@ class CompressPendingMessagesUseCaseTest {
     fun `test that compression starts for a single pending message`() =
         runTest {
             val pendingMessage = stubPendingMessage()
-            val originalFile = File(pendingMessage.filePath)
+            val originalFile = UriPath(pendingMessage.filePath)
             whenever(monitorPendingMessagesByStateUseCase(PendingMessageState.COMPRESSING)) doReturn
                     flowOf(listOf(pendingMessage))
 
@@ -111,8 +115,8 @@ class CompressPendingMessagesUseCaseTest {
         runTest {
             val pendingMessage1 = stubPendingMessage(1L)
             val pendingMessage2 = stubPendingMessage(2L)
-            val originalFile1 = File(pendingMessage1.filePath)
-            val originalFile2 = File(pendingMessage2.filePath)
+            val originalFile1 = UriPath(pendingMessage1.filePath)
+            val originalFile2 = UriPath(pendingMessage2.filePath)
             whenever(monitorPendingMessagesByStateUseCase(PendingMessageState.COMPRESSING)) doReturn
                     flowOf(listOf(pendingMessage1, pendingMessage2))
 
@@ -129,7 +133,7 @@ class CompressPendingMessagesUseCaseTest {
         runTest {
             val pendingMessage1 = stubPendingMessage(1L, "name.mp4")
             val pendingMessage2 = stubPendingMessage(2L, "name.mp4")
-            val originalFile = File(pendingMessage1.filePath)
+            val originalFile = UriPath(pendingMessage1.filePath)
             whenever(monitorPendingMessagesByStateUseCase(PendingMessageState.COMPRESSING)) doReturn
                     flowOf(listOf(pendingMessage1, pendingMessage2))
 
@@ -198,8 +202,8 @@ class CompressPendingMessagesUseCaseTest {
     @Test
     fun `test that compressed file is set to ready to upload state`() = runTest {
         val pendingMessage = stubPendingMessage()
-        val originalFile = File(pendingMessage.filePath)
-        val compressed = File("path/compressed.mp4")
+        val originalFile = UriPath(pendingMessage.filePath)
+        val compressed = File("/path/compressed.mp4")
 
         whenever(monitorPendingMessagesByStateUseCase(PendingMessageState.COMPRESSING)) doReturn
                 flowOf(listOf(pendingMessage))

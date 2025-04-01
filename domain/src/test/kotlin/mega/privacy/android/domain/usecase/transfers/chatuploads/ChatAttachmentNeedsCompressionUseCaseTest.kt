@@ -8,7 +8,7 @@ import mega.privacy.android.domain.entity.VideoQuality
 import mega.privacy.android.domain.entity.uri.UriPath
 import mega.privacy.android.domain.repository.NetworkRepository
 import mega.privacy.android.domain.repository.SettingsRepository
-import mega.privacy.android.domain.usecase.file.GetFileExtensionFromUriPath
+import mega.privacy.android.domain.usecase.file.GetFileExtensionFromUriPathUseCase
 import mega.privacy.android.domain.usecase.file.IsImageFileUseCase
 import mega.privacy.android.domain.usecase.file.IsVideoFileUseCase
 import org.junit.jupiter.api.BeforeAll
@@ -35,7 +35,7 @@ class ChatAttachmentNeedsCompressionUseCaseTest {
     private val isVideoFileUseCase = mock<IsVideoFileUseCase>()
     private val defaultSettingsRepository = mock<SettingsRepository>()
     private val networkRepository = mock<NetworkRepository>()
-    private val getFileExtensionFromUriPath = mock<GetFileExtensionFromUriPath>()
+    private val getFileExtensionFromUriPathUseCase = mock<GetFileExtensionFromUriPathUseCase>()
 
     @BeforeAll
     fun setup() {
@@ -44,7 +44,7 @@ class ChatAttachmentNeedsCompressionUseCaseTest {
             isVideoFileUseCase,
             defaultSettingsRepository,
             networkRepository,
-            getFileExtensionFromUriPath,
+            getFileExtensionFromUriPathUseCase,
         )
     }
 
@@ -56,7 +56,7 @@ class ChatAttachmentNeedsCompressionUseCaseTest {
             defaultSettingsRepository,
             networkRepository,
         )
-        whenever(getFileExtensionFromUriPath(any())).thenAnswer {
+        whenever(getFileExtensionFromUriPathUseCase(any())).thenAnswer {
             it.arguments[0].toString().substringAfterLast('.', "")
         }
     }

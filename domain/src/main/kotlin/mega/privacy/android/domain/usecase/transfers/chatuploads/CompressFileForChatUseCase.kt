@@ -23,16 +23,15 @@ class CompressFileForChatUseCase @Inject constructor(
     /**
      * Invoke
      */
-    suspend operator fun invoke(original: File): Flow<ChatUploadCompressionState> {
-        val path = original.absolutePath
+    suspend operator fun invoke(uriPath: UriPath): Flow<ChatUploadCompressionState> {
         return when {
-            !chatAttachmentNeedsCompressionUseCase(UriPath(path)) -> null
-            isImageFileUseCase(UriPath.fromFile(original)) -> {
-                downscaleImageForChatUseCase(original)
+            !chatAttachmentNeedsCompressionUseCase(uriPath) -> null
+            isImageFileUseCase(uriPath) -> {
+                downscaleImageForChatUseCase(uriPath)
             }
 
-            isVideoFileUseCase(UriPath.fromFile(original)) -> {
-                compressVideoForChatUseCase(original)
+            isVideoFileUseCase(uriPath) -> {
+                compressVideoForChatUseCase(uriPath)
             }
 
             else -> null

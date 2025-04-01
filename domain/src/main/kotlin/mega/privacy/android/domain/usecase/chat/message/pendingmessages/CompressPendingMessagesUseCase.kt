@@ -17,12 +17,14 @@ import mega.privacy.android.domain.entity.chat.messages.pending.UpdatePendingMes
 import mega.privacy.android.domain.entity.transfer.ChatCompressionFinished
 import mega.privacy.android.domain.entity.transfer.ChatCompressionProgress
 import mega.privacy.android.domain.entity.transfer.ChatCompressionState
+import mega.privacy.android.domain.entity.uri.UriPath
 import mega.privacy.android.domain.repository.chat.ChatMessageRepository
 import mega.privacy.android.domain.usecase.chat.ChatUploadCompressionState
 import mega.privacy.android.domain.usecase.chat.message.MonitorPendingMessagesByStateUseCase
 import mega.privacy.android.domain.usecase.chat.message.UpdatePendingMessageUseCase
+import mega.privacy.android.domain.usecase.file.FileResult
+import mega.privacy.android.domain.usecase.file.GetFileSizeFromUriPathUseCase
 import mega.privacy.android.domain.usecase.transfers.chatuploads.CompressFileForChatUseCase
-import java.io.File
 import javax.inject.Inject
 
 /**
@@ -35,6 +37,7 @@ class CompressPendingMessagesUseCase @Inject constructor(
     private val monitorPendingMessagesByStateUseCase: MonitorPendingMessagesByStateUseCase,
     private val chatMessageRepository: ChatMessageRepository,
     private val updatePendingMessageUseCase: UpdatePendingMessageUseCase,
+    private val getFileSizeFromUriPathUseCase: GetFileSizeFromUriPathUseCase,
 ) {
 
     /**
@@ -53,12 +56,15 @@ class CompressPendingMessagesUseCase @Inject constructor(
                         .map { (path, pendingMessages) ->
                             //compress all received pending message's files in parallel, new pending messages will wait for this batch to be completed.
                             launch {
+                                //if this was already compressed don't compress it again.
                                 if (path !in pathsToSizeAndProgress) {
                                     semaphore.withPermit {
-                                        //if this was already compressed don't compress it again.
-                                        val original = File(path)
+                                        val original = UriPath(path)
+                                        val size =
+                                            (getFileSizeFromUriPathUseCase(original) as? FileResult)?.sizeInBytes
+                                                ?: 0
                                         pathsToSizeAndProgress[path] = SizeAndProgress(
-                                            original.length().coerceAtLeast(1L),
+                                            size.coerceAtLeast(1L),
                                             Progress(0f)
                                         )
                                         val totalSize =
@@ -104,7 +110,7 @@ class CompressPendingMessagesUseCase @Inject constructor(
                                                 UpdatePendingMessageStateAndPathRequest(
                                                     pendingMessage.id,
                                                     PendingMessageState.READY_TO_UPLOAD,
-                                                    (compressed ?: original).path,
+                                                    (compressed?.absolutePath ?: original.value),
                                                 )
                                             }.toTypedArray()
                                         )

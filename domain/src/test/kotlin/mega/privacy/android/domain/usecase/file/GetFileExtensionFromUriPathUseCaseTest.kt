@@ -13,15 +13,15 @@ import org.mockito.kotlin.whenever
 
 
 @TestInstance(TestInstance.Lifecycle.PER_CLASS)
-class GetFileExtensionFromUriPathTest {
+class GetFileExtensionFromUriPathUseCaseTest {
 
-    private lateinit var underTest: GetFileExtensionFromUriPath
+    private lateinit var underTest: GetFileExtensionFromUriPathUseCase
 
     private val fileSystemRepository = mock<FileSystemRepository>()
 
     @BeforeAll
     fun setup() {
-        underTest = GetFileExtensionFromUriPath(
+        underTest = GetFileExtensionFromUriPathUseCase(
             fileSystemRepository
         )
     }

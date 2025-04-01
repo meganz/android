@@ -7,7 +7,7 @@ import mega.privacy.android.domain.entity.uri.UriPath
 import mega.privacy.android.domain.repository.FileSystemRepository
 import mega.privacy.android.domain.usecase.chat.ChatUploadCompressionState
 import mega.privacy.android.domain.usecase.chat.ChatUploadNotCompressedReason
-import mega.privacy.android.domain.usecase.transfers.GetCacheFileForUploadUseCase
+import mega.privacy.android.domain.usecase.transfers.GetCacheFileForChatUploadUseCase
 import mega.privacy.android.domain.usecase.transfers.chatuploads.DownscaleImageForChatUseCase.Companion.DOWNSCALE_IMAGES_PX
 import org.junit.jupiter.api.BeforeAll
 import org.junit.jupiter.api.BeforeEach
@@ -27,14 +27,14 @@ class DownscaleImageForChatUseCaseTest {
     private lateinit var underTest: DownscaleImageForChatUseCase
 
     private val fileSystemRepository = mock<FileSystemRepository>()
-    private val getCacheFileForUploadUseCase =
-        mock<GetCacheFileForUploadUseCase>()
+    private val getCacheFileForChatUploadUseCase =
+        mock<GetCacheFileForChatUploadUseCase>()
 
     @BeforeAll
     fun setup() {
         underTest = DownscaleImageForChatUseCase(
             fileSystemRepository,
-            getCacheFileForUploadUseCase,
+            getCacheFileForChatUploadUseCase,
         )
     }
 
@@ -42,21 +42,21 @@ class DownscaleImageForChatUseCaseTest {
     fun resetMocks() =
         reset(
             fileSystemRepository,
-            getCacheFileForUploadUseCase,
+            getCacheFileForChatUploadUseCase,
         )
 
     @Test
     fun `test that scaled image from repository is returned when it needs to be scaled`() =
         runTest {
-            val file = File("img.jpg")
+            val uriPath = UriPath("img.jpg")
             val expected = stubDestination()
-            underTest(file).test {
+            underTest(uriPath).test {
                 assertThat(awaitItem())
                     .isEqualTo(ChatUploadCompressionState.Compressed(expected))
                 awaitComplete()
             }
             verify(fileSystemRepository).downscaleImage(
-                UriPath.fromFile(file),
+                uriPath,
                 expected,
                 DOWNSCALE_IMAGES_PX
             )
@@ -65,9 +65,9 @@ class DownscaleImageForChatUseCaseTest {
     @Test
     fun `test that FailedToCompress is returned when the file is not created`() =
         runTest {
-            val file = File("img.jpg")
+            val uriPath = UriPath("img.jpg")
             val expected = stubDestination(exists = false)
-            underTest(file).test {
+            underTest(uriPath).test {
                 assertThat(awaitItem())
                     .isEqualTo(
                         ChatUploadCompressionState.NotCompressed(
@@ -77,7 +77,7 @@ class DownscaleImageForChatUseCaseTest {
                 awaitComplete()
             }
             verify(fileSystemRepository).downscaleImage(
-                UriPath.fromFile(file),
+                uriPath,
                 expected,
                 DOWNSCALE_IMAGES_PX
             )
@@ -86,9 +86,9 @@ class DownscaleImageForChatUseCaseTest {
     @Test
     fun `test that NoCacheFile is returned when the cache file is not created`() =
         runTest {
-            val file = File("img.jpg")
-            whenever(getCacheFileForUploadUseCase(any(), any())) doReturn null
-            underTest(file).test {
+            val uriPath = UriPath("img.jpg")
+            whenever(getCacheFileForChatUploadUseCase(any())) doReturn null
+            underTest(uriPath).test {
                 assertThat(awaitItem())
                     .isEqualTo(
                         ChatUploadCompressionState.NotCompressed(
@@ -100,12 +100,12 @@ class DownscaleImageForChatUseCaseTest {
             verifyNoInteractions(fileSystemRepository)
         }
 
-    private fun stubDestination(exists: Boolean = true): File {
+    private suspend fun stubDestination(exists: Boolean = true): File {
         val destination = mock<File> {
             on { it.name } doReturn "destination"
             on { it.exists() } doReturn exists
         }
-        whenever(getCacheFileForUploadUseCase(any(), any())) doReturn destination
+        whenever(getCacheFileForChatUploadUseCase(any())) doReturn destination
         return destination
     }
 }

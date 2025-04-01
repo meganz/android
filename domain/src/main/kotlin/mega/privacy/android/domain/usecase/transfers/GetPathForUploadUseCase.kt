@@ -15,10 +15,7 @@ import javax.inject.Inject
  * - If the Uri is a content uri, it makes a copy in the chat cache folder and returns its path
  */
 class GetPathForUploadUseCase @Inject constructor(
-    private val getCacheFileForUploadUseCase: GetCacheFileForUploadUseCase,
-    private val doesUriPathHaveSufficientSpaceUseCase: DoesUriPathHaveSufficientSpaceUseCase,
     private val fileSystemRepository: FileSystemRepository,
-    private val permissionRepository: PermissionRepository,
 ) {
     /**
      * Invoke
@@ -26,9 +23,9 @@ class GetPathForUploadUseCase @Inject constructor(
      * @param originalUriPath a string representing the UriPath of the file or folder to be uploaded
      * @return the uriPath of the file or folder to be uploaded, as String for testing purposes
      */
-    suspend operator fun invoke(originalUriPath: UriPath, isChatUpload: Boolean): String? {
+    suspend operator fun invoke(originalUriPath: UriPath): String? {
         return when {
-            !isChatUpload && fileSystemRepository.isContentUri(originalUriPath.value) -> {
+            fileSystemRepository.isContentUri(originalUriPath.value) -> {
                 originalUriPath.value
             }
 
@@ -38,31 +35,6 @@ class GetPathForUploadUseCase @Inject constructor(
 
             fileSystemRepository.isFileUri(originalUriPath.value) -> {
                 fileSystemRepository.getFileFromFileUri(originalUriPath.value).absolutePath
-            }
-
-            fileSystemRepository.isContentUri(originalUriPath.value) -> {
-                val file = takeIf { permissionRepository.hasManageExternalStoragePermission() }
-                    ?.let { fileSystemRepository.getFileFromUri(originalUriPath) }
-                    ?: fileSystemRepository.getFileNameFromUri(originalUriPath.value)?.let {
-                        getCacheFileForUploadUseCase(
-                            file = File(it),
-                            isChatUpload = isChatUpload,
-                        )?.also { destination ->
-                            val size = fileSystemRepository.getFileSizeFromUri(it) ?: 0L
-                            if (!doesUriPathHaveSufficientSpaceUseCase(
-                                    UriPath(destination.parent),
-                                    size
-                                )
-                            ) {
-                                throw NotEnoughStorageException()
-                            }
-                            fileSystemRepository.copyContentUriToFile(
-                                originalUriPath,
-                                destination
-                            )
-                        }
-                    }
-                file?.absolutePath
             }
 
             else -> {

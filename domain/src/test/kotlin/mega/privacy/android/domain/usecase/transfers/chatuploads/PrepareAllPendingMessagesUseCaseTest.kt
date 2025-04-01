@@ -125,7 +125,6 @@ class PrepareAllPendingMessagesUseCaseTest {
         whenever(
             getPathForUploadUseCase(
                 originalUriPath = UriPath(pendingMessage.filePath),
-                isChatUpload = true
             )
         ) doReturn null
         whenever(chatAttachmentNeedsCompressionUseCase(any())) doReturn false
@@ -152,7 +151,6 @@ class PrepareAllPendingMessagesUseCaseTest {
             whenever(
                 getPathForUploadUseCase(
                     originalUriPath = UriPath(pendingMessage.filePath),
-                    isChatUpload = true
                 )
             ) doReturn path
             whenever(chatAttachmentNeedsCompressionUseCase(anyValueClass())) doReturn true
@@ -180,7 +178,6 @@ class PrepareAllPendingMessagesUseCaseTest {
             whenever(
                 getPathForUploadUseCase(
                     originalUriPath = UriPath(pendingMessage.filePath),
-                    isChatUpload = true
                 )
             ) doReturn path
             whenever(chatAttachmentNeedsCompressionUseCase(anyValueClass())) doReturn false
@@ -209,7 +206,6 @@ class PrepareAllPendingMessagesUseCaseTest {
                 whenever(
                     getPathForUploadUseCase(
                         originalUriPath = UriPath(it.filePath),
-                        isChatUpload = true
                     )
                 ) doReturn destinations[i]
             }

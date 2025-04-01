@@ -7,7 +7,7 @@ import javax.inject.Inject
 /**
  * Get file extension from an [UriPath].
  */
-class GetFileExtensionFromUriPath @Inject constructor(
+class GetFileExtensionFromUriPathUseCase @Inject constructor(
     private val fileSystemRepository: FileSystemRepository,
 ) {
 

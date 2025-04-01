@@ -10,7 +10,7 @@ import mega.privacy.android.domain.entity.VideoQuality
 import mega.privacy.android.domain.entity.uri.UriPath
 import mega.privacy.android.domain.repository.SettingsRepository
 import mega.privacy.android.domain.usecase.chat.ChatUploadCompressionState
-import mega.privacy.android.domain.usecase.transfers.GetCacheFileForUploadUseCase
+import mega.privacy.android.domain.usecase.transfers.GetCacheFileForChatUploadUseCase
 import mega.privacy.android.domain.usecase.video.CompressVideoUseCase
 import org.junit.jupiter.api.BeforeAll
 import org.junit.jupiter.api.BeforeEach
@@ -18,7 +18,7 @@ import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.TestInstance
 import org.junit.jupiter.params.ParameterizedTest
 import org.junit.jupiter.params.provider.MethodSource
-import org.mockito.kotlin.any
+import org.mockito.kotlin.anyValueClass
 import org.mockito.kotlin.doReturn
 import org.mockito.kotlin.mock
 import org.mockito.kotlin.reset
@@ -32,8 +32,8 @@ class CompressVideoForChatUseCaseTest {
     private lateinit var underTest: CompressVideoForChatUseCase
 
     private val defaultSettingsRepository = mock<SettingsRepository>()
-    private val getCacheFileForUploadUseCase =
-        mock<GetCacheFileForUploadUseCase>()
+    private val getCacheFileForChatUploadUseCase =
+        mock<GetCacheFileForChatUploadUseCase>()
     private val compressVideoUseCase = mock<CompressVideoUseCase>()
 
 
@@ -41,7 +41,7 @@ class CompressVideoForChatUseCaseTest {
     fun setup() {
         underTest = CompressVideoForChatUseCase(
             defaultSettingsRepository,
-            getCacheFileForUploadUseCase,
+            getCacheFileForChatUploadUseCase,
             compressVideoUseCase,
         )
     }
@@ -50,7 +50,7 @@ class CompressVideoForChatUseCaseTest {
     fun resetMocks() =
         reset(
             defaultSettingsRepository,
-            getCacheFileForUploadUseCase,
+            getCacheFileForChatUploadUseCase,
             compressVideoUseCase,
         )
 
@@ -59,25 +59,25 @@ class CompressVideoForChatUseCaseTest {
     fun `test that it returns compressed video in the chat cache folder`(
         videoQuality: VideoQuality,
     ) = runTest {
-        val file = stubFile()
+        val original = UriPath("foo")
         val expected = stubDestination()
         whenever(defaultSettingsRepository.getChatVideoQualityPreference()) doReturn videoQuality
         whenever(
             compressVideoUseCase(
                 rootPath = expected.parent,
-                original = UriPath(file.absolutePath),
+                original = original,
                 newFilePath = expected.absolutePath,
                 quality = videoQuality,
             )
         ) doReturn flowOf(VideoCompressionState.Finished)
 
-        underTest(file).test {
+        underTest(original).test {
             assertThat(awaitItem()).isEqualTo(ChatUploadCompressionState.Compressed(expected))
             awaitComplete()
         }
         verify(compressVideoUseCase).invoke(
             expected.parent,
-            UriPath(file.absolutePath),
+            original,
             expected.absolutePath,
             videoQuality,
         )
@@ -86,19 +86,19 @@ class CompressVideoForChatUseCaseTest {
     @Test
     fun `test that progress is returned`() = runTest {
         val expected = 0.5f
-        val file = stubFile()
+        val original = UriPath("foo")
         val destination = stubDestination()
         whenever(defaultSettingsRepository.getChatVideoQualityPreference()) doReturn VideoQuality.HIGH
         whenever(
             compressVideoUseCase(
                 rootPath = destination.parent,
-                original = UriPath(file.absolutePath),
+                original = original,
                 newFilePath = destination.absolutePath,
                 quality = VideoQuality.HIGH,
             )
         ) doReturn flowOf(VideoCompressionState.Progress(expected, 1, 1, ""))
 
-        underTest(file).test {
+        underTest(original).test {
             assertThat(awaitItem())
                 .isEqualTo(ChatUploadCompressionState.Compressing(Progress(expected)))
             cancelAndIgnoreRemainingEvents()
@@ -114,13 +114,7 @@ class CompressVideoForChatUseCaseTest {
             on { it.parent } doReturn "root"
             on { it.exists() } doReturn true
         }
-        whenever(getCacheFileForUploadUseCase(any(), any())) doReturn destination
+        whenever(getCacheFileForChatUploadUseCase(anyValueClass())) doReturn destination
         return destination
     }
-
-    private fun stubFile() =
-        mock<File> {
-            on { it.name } doReturn "file.mp4"
-            on { it.absolutePath } doReturn "path"
-        }
 }

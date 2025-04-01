@@ -11,9 +11,8 @@ import mega.privacy.android.domain.entity.uri.UriPath
 import mega.privacy.android.domain.repository.SettingsRepository
 import mega.privacy.android.domain.usecase.chat.ChatUploadCompressionState
 import mega.privacy.android.domain.usecase.chat.ChatUploadNotCompressedReason
-import mega.privacy.android.domain.usecase.transfers.GetCacheFileForUploadUseCase
+import mega.privacy.android.domain.usecase.transfers.GetCacheFileForChatUploadUseCase
 import mega.privacy.android.domain.usecase.video.CompressVideoUseCase
-import java.io.File
 import javax.inject.Inject
 
 /**
@@ -21,7 +20,7 @@ import javax.inject.Inject
  */
 class CompressVideoForChatUseCase @Inject constructor(
     private val defaultSettingsRepository: SettingsRepository,
-    private val getCacheFileForUploadUseCase: GetCacheFileForUploadUseCase,
+    private val getCacheFileForChatUploadUseCase: GetCacheFileForChatUploadUseCase,
     private val compressVideoUseCase: CompressVideoUseCase,
 ) {
 
@@ -30,17 +29,17 @@ class CompressVideoForChatUseCase @Inject constructor(
      *
      * @return the downscaled video or null if it's not scaled.
      */
-    suspend operator fun invoke(file: File): Flow<ChatUploadCompressionState> {
+    suspend operator fun invoke(uriPath: UriPath): Flow<ChatUploadCompressionState> {
         val videoQuality = defaultSettingsRepository.getChatVideoQualityPreference()
         if (videoQuality == VideoQuality.ORIGINAL) return flowOf(
             ChatUploadCompressionState.NotCompressed(
                 ChatUploadNotCompressedReason.CompressionNotNeeded
             )
         )
-        return getCacheFileForUploadUseCase(file, true)?.let { destination ->
+        return getCacheFileForChatUploadUseCase(uriPath)?.let { destination ->
             compressVideoUseCase(
                 rootPath = destination.parent,
-                original = UriPath(file.absolutePath),
+                original = uriPath,
                 newFilePath = destination.absolutePath,
                 quality = videoQuality,
             ).mapNotNull { videoCompressionState ->

@@ -6,8 +6,7 @@ import mega.privacy.android.domain.entity.uri.UriPath
 import mega.privacy.android.domain.repository.FileSystemRepository
 import mega.privacy.android.domain.usecase.chat.ChatUploadCompressionState
 import mega.privacy.android.domain.usecase.chat.ChatUploadNotCompressedReason
-import mega.privacy.android.domain.usecase.transfers.GetCacheFileForUploadUseCase
-import java.io.File
+import mega.privacy.android.domain.usecase.transfers.GetCacheFileForChatUploadUseCase
 import javax.inject.Inject
 
 /**
@@ -15,17 +14,17 @@ import javax.inject.Inject
  */
 class DownscaleImageForChatUseCase @Inject constructor(
     private val fileSystemRepository: FileSystemRepository,
-    private val getCacheFileForUploadUseCase: GetCacheFileForUploadUseCase,
+    private val getCacheFileForChatUploadUseCase: GetCacheFileForChatUploadUseCase,
 ) {
     /**
      * Invoke
      *
      * @return the state of the compression.
      */
-    suspend operator fun invoke(file: File): Flow<ChatUploadCompressionState> {
-        return getCacheFileForUploadUseCase(file, true)?.let { destination ->
+    suspend operator fun invoke(uriPath: UriPath): Flow<ChatUploadCompressionState> {
+        return getCacheFileForChatUploadUseCase(uriPath)?.let { destination ->
             fileSystemRepository.downscaleImage(
-                original = UriPath.fromFile(file),
+                original = uriPath,
                 destination = destination,
                 maxPixels = DOWNSCALE_IMAGES_PX
             )
