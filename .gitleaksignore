@@ -264,3 +264,9 @@ app/src/test/java/mega/privacy/android/app/presentation/login/createaccount/Crea
 app/src/test/java/mega/privacy/android/app/presentation/login/createaccount/CreateAccountViewModelTest.kt:hashicorp-tf-password:290
 app/src/test/java/mega/privacy/android/app/presentation/login/createaccount/CreateAccountViewModelTest.kt:hashicorp-tf-password:308
 app/src/test/java/mega/privacy/android/app/presentation/login/createaccount/CreateAccountViewModelTest.kt:hashicorp-tf-password:327
+app/src/test/java/mega/privacy/android/app/presentation/login/createaccount/CreateAccountViewModelTest.kt:hashicorp-tf-password:289
+app/src/test/java/mega/privacy/android/app/presentation/login/createaccount/CreateAccountViewModelTest.kt:hashicorp-tf-password:306
+app/src/test/java/mega/privacy/android/app/presentation/login/createaccount/CreateAccountViewModelTest.kt:hashicorp-tf-password:324
+app/src/test/java/mega/privacy/android/app/presentation/login/createaccount/CreateAccountViewModelTest.kt:hashicorp-tf-password:343
+app/src/test/java/mega/privacy/android/app/presentation/login/createaccount/CreateAccountViewModelTest.kt:hashicorp-tf-password:344
+app/src/test/java/mega/privacy/android/app/presentation/login/createaccount/CreateAccountViewModelTest.kt:hashicorp-tf-password:361
