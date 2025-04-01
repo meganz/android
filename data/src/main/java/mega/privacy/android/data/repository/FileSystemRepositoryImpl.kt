@@ -344,6 +344,10 @@ internal class FileSystemRepositoryImpl @Inject constructor(
         fileGateway.isFolderPath(path)
     }
 
+    override suspend fun isFolderContentUri(uri: String) = withContext(ioDispatcher) {
+        fileGateway.isFolderContentUri(uri)
+    }
+
     override suspend fun getFileFromFileUri(uriString: String) = withContext(ioDispatcher) {
         fileGateway.getFileFromUriFile(uriString)
     }

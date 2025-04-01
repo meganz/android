@@ -275,7 +275,7 @@ interface FileSystemRepository {
     suspend fun createNewVideoUri(fileName: String): String?
 
     /**
-     * @return true if the [uriString] represents a file Uri
+     * @return true if the [uriString] represents a file Uri (`file:///...`)
      */
     suspend fun isFileUri(uriString: String): Boolean
 
@@ -288,6 +288,11 @@ interface FileSystemRepository {
      * @return true if the [path] represents a folder
      */
     suspend fun isFolderPath(path: String): Boolean
+
+    /**
+     * @return true if the [uriString] represents a folder content uri (`content://com.android.externalstorage.documents/tree/...`)
+     */
+    suspend fun isFolderContentUri(uri: String): Boolean
 
     /**
      * Get the file represented by [uriString]

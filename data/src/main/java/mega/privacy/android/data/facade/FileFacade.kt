@@ -396,6 +396,9 @@ internal class FileFacade @Inject constructor(
 
     override suspend fun isFileUri(uriString: String) = isFileUri(uriString.toUri())
 
+    override suspend fun isFolderContentUri(uriString: String) =
+        getDocumentFileFromUri(uriString.toUri())?.isDirectory == true
+
     private fun isFileUri(uri: Uri) = uri.scheme == "file"
 
     override suspend fun isFilePath(path: String) = File(path).isFile
@@ -411,7 +414,7 @@ internal class FileFacade @Inject constructor(
         DocumentsContract.isDocumentUri(context, uri.value.toUri())
 
     override suspend fun isExternalStorageContentUri(uriString: String) =
-        with(Uri.parse(uriString)) {
+        with(uriString.toUri()) {
             scheme == "content" && authority?.startsWith("com.android.externalstorage") == true
         }
 
@@ -632,9 +635,9 @@ internal class FileFacade @Inject constructor(
     ): Flow<DocumentFolder> = flow {
         // using stack to avoid recursive call and optimize memory usage
         val stack = Stack<DocumentFile>()
-        val uri = Uri.parse(folder.value)
+        val uri = folder.value.toUri()
         val document = if (isFileUri(folder.value)) {
-            DocumentFile.fromFile(Uri.parse(folder.value).toFile())
+            DocumentFile.fromFile(uri.toFile())
         } else {
             DocumentFile.fromTreeUri(context, uri)
         } ?: throw FileNotFoundException()
@@ -830,7 +833,7 @@ internal class FileFacade @Inject constructor(
                             )
                         } else {
                             ContentUris.withAppendedId(
-                                Uri.parse("content://downloads/public_downloads"),
+                                "content://downloads/public_downloads".toUri(),
                                 id.toLong()
                             )
                         }
@@ -868,7 +871,7 @@ internal class FileFacade @Inject constructor(
         context.contentResolver.openInputStream(uriPath.toUri())
 
     override suspend fun canReadUri(stringUri: String) =
-        getDocumentFileFromUri(Uri.parse(stringUri))?.canRead() == true
+        getDocumentFileFromUri(stringUri.toUri())?.canRead() == true
 
     override fun childFileExistsSync(parentFolder: UriPath, childName: String): Boolean {
         val parentDocumentFile = getDocumentFileFromUri(parentFolder.toUri())

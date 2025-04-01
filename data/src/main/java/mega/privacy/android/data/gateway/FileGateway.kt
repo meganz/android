@@ -291,9 +291,14 @@ interface FileGateway {
     suspend fun createNewVideoUri(fileName: String): Uri?
 
     /**
-     * @return true if the [uriString] represents a file Uri
+     * @return true if the [uriString] represents a file Uri (`file:///...`)
      */
     suspend fun isFileUri(uriString: String): Boolean
+
+    /**
+     * @return true if the [uriString] represents a folder content uri (`content://com.android.externalstorage.documents/tree/...`)
+     */
+    suspend fun isFolderContentUri(uriString: String): Boolean
 
     /**
      * @return true if the [path] represents a file, not a folder

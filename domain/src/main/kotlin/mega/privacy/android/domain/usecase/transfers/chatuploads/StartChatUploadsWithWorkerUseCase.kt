@@ -18,7 +18,6 @@ import mega.privacy.android.domain.usecase.chat.message.UpdatePendingMessageUseC
 import mega.privacy.android.domain.usecase.chat.message.pendingmessages.GetPendingMessageUseCase
 import mega.privacy.android.domain.usecase.transfers.shared.AbstractStartTransfersWithWorkerUseCase
 import mega.privacy.android.domain.usecase.transfers.uploads.UploadFileUseCase
-import java.io.File
 import javax.inject.Inject
 
 /**
@@ -51,7 +50,9 @@ class StartChatUploadsWithWorkerUseCase @Inject constructor(
         chatFilesFolderId: NodeId,
         vararg pendingMessageIds: Long,
     ): Flow<TransferEvent> = flow {
-        if (!fileSystemRepository.isDocumentUri(uriPath) && !fileSystemRepository.isFilePath(uriPath.value)) {
+        if (fileSystemRepository.isFolderContentUri(uriPath.value)
+            || fileSystemRepository.isFolderPath(uriPath.value)
+        ) {
             throw FoldersNotAllowedAsChatUploadException()
         }
         val name = getPendingMessageUseCase(pendingMessageIds.first())?.name

@@ -88,7 +88,8 @@ class StartChatUploadsWithWorkerUseCaseTest {
     private suspend fun commonStub() {
         whenever(fileSystemRepository.isFilePath(any())) doReturn true
         whenever(chatAttachmentNeedsCompressionUseCase(any())) doReturn false
-        whenever(fileSystemRepository.isDocumentUri(anyValueClass())) doReturn false
+        whenever(fileSystemRepository.isFolderContentUri(any())) doReturn false
+        whenever(fileSystemRepository.isFolderPath(any())) doReturn false
         mockFlow(emptyFlow())
     }
 
@@ -123,9 +124,21 @@ class StartChatUploadsWithWorkerUseCaseTest {
     }
 
     @Test
-    fun `test that a folder throws FoldersNotAllowedAsChatUploadException`() = runTest {
+    fun `test that a folder path throws FoldersNotAllowedAsChatUploadException`() = runTest {
         val folder = createFileUriPath()
-        whenever(fileSystemRepository.isFilePath(folder.value)) doReturn false
+        whenever(fileSystemRepository.isFolderPath(folder.value)) doReturn true
+        underTest(folder, NodeId(11L), 1L).test {
+            val notStartedEvents = cancelAndConsumeRemainingEvents()
+                .mapNotNull { (it as? Event.Error)?.throwable }
+                .filterIsInstance<FoldersNotAllowedAsChatUploadException>()
+            assertThat(notStartedEvents.size).isEqualTo(1)
+        }
+    }
+
+    @Test
+    fun `test that a folder content uri throws FoldersNotAllowedAsChatUploadException`() = runTest {
+        val folder = createFileUriPath()
+        whenever(fileSystemRepository.isFolderContentUri(folder.value)) doReturn true
         underTest(folder, NodeId(11L), 1L).test {
             val notStartedEvents = cancelAndConsumeRemainingEvents()
                 .mapNotNull { (it as? Event.Error)?.throwable }
