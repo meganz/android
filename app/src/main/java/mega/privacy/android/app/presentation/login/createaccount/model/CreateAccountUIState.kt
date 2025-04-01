@@ -12,7 +12,7 @@ data class CreateAccountUIState(
     /**
      * Account creation in progress
      */
-    val isAccountCreationInProgress: Boolean = false,
+    val isLoading: Boolean = false,
     /**
      * The status after a user signs up
      */
@@ -75,8 +75,6 @@ data class CreateAccountUIState(
 
     val isEmailLengthExceeded: Boolean? = null,
 
-    val isLoading: Boolean = false,
-
     val isPasswordLengthSufficient: Boolean? = null,
 
     val doesPasswordContainMixedCase: Boolean = false,
@@ -84,6 +82,4 @@ data class CreateAccountUIState(
     val doesPasswordContainNumeric: Boolean = false,
 
     val doesPasswordContainSpecialCharacter: Boolean = false,
-
-    val noNetworkConnectionEvent: StateEvent = consumed,
 )

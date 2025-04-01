@@ -44,7 +44,7 @@ class CreateAccountScreenTest {
     @Test
     fun `test that screen title is not displayed when Create account is in progress`() {
         with(composeRule) {
-            setScreen(state = CreateAccountUIState(isAccountCreationInProgress = true))
+            setScreen(state = CreateAccountUIState(isLoading = true))
 
             onNodeWithTag(CREATE_ACCOUNT_TOOLBAR_TAG).assertDoesNotExist()
         }
@@ -53,7 +53,7 @@ class CreateAccountScreenTest {
     @Test
     fun `test that MEGA logo is displayed when Create account is in progress`() {
         with(composeRule) {
-            setScreen(state = CreateAccountUIState(isAccountCreationInProgress = true))
+            setScreen(state = CreateAccountUIState(isLoading = true))
 
             onNodeWithTag(CREATE_ACCOUNT_IN_PROGRESS_MEGA_LOGO_TAG).assertIsDisplayed()
         }
@@ -71,7 +71,7 @@ class CreateAccountScreenTest {
     @Test
     fun `test that progress bar is displayed when Create account is in progress`() {
         with(composeRule) {
-            setScreen(state = CreateAccountUIState(isAccountCreationInProgress = true))
+            setScreen(state = CreateAccountUIState(isLoading = true))
 
             onNodeWithTag(CREATE_ACCOUNT_IN_PROGRESS_PROGRESS_INDICATOR_TAG).assertIsDisplayed()
         }

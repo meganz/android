@@ -11,6 +11,9 @@ import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
+import mega.android.authentication.domain.usecase.regex.DoesTextContainMixedCaseUseCase
+import mega.android.authentication.domain.usecase.regex.DoesTextContainNumericUseCase
+import mega.android.authentication.domain.usecase.regex.DoesTextContainSpecialCharacterUseCase
 import mega.privacy.android.app.featuretoggle.AppFeatures
 import mega.privacy.android.app.presentation.login.createaccount.model.CreateAccountStatus
 import mega.privacy.android.app.presentation.login.createaccount.model.CreateAccountUIState
@@ -43,6 +46,9 @@ class CreateAccountViewModel @Inject constructor(
     private val clearEphemeralCredentialsUseCase: ClearEphemeralCredentialsUseCase,
     private val saveLastRegisteredEmailUseCase: SaveLastRegisteredEmailUseCase,
     private val getFeatureFlagValueUseCase: GetFeatureFlagValueUseCase,
+    private val doesTextContainNumericUseCase: DoesTextContainNumericUseCase,
+    private val doesTextContainMixedCaseUseCase: DoesTextContainMixedCaseUseCase,
+    private val doesTextContainSpecialCharacterUseCase: DoesTextContainSpecialCharacterUseCase,
     @ApplicationScope private val applicationScope: CoroutineScope,
 ) : ViewModel() {
     private val _uiState = MutableStateFlow(CreateAccountUIState())
@@ -117,29 +123,59 @@ class CreateAccountViewModel @Inject constructor(
         return isLastNameValid
     }
 
-    internal fun onPasswordInputChanged(password: String) {
+    internal fun onPasswordInputChanged(password: String) = viewModelScope.launch {
         savedStateHandle[KEY_PASSWORD] = password
         _uiState.update { it.copy(isPasswordValid = null) }
         validatePassword(password)
-    }
-
-    private fun validatePassword(password: String?): Boolean {
-        updatePasswordStrength(password)
         validatePasswordToConfirmPassword()
-        return _uiState.value.passwordStrength != PasswordStrength.INVALID && _uiState.value.passwordStrength != PasswordStrength.VERY_WEAK
     }
 
-    private fun isPasswordValid(): Boolean {
+    private suspend fun validatePassword(password: String?): Boolean {
+        val passwordStrength = getPasswordStrength(password)
+        _uiState.update { it.copy(passwordStrength = passwordStrength) }
+
+        val isNewRegistrationUiEnabled = _uiState.value.isNewRegistrationUiEnabled == true
+
+        if (!isNewRegistrationUiEnabled) {
+            return passwordStrength !in listOf(PasswordStrength.INVALID, PasswordStrength.VERY_WEAK)
+        }
+
+        val isPasswordLengthSufficient =
+            (password?.length ?: 0) >= MIN_PASSWORD_LENGTH_DESIGN_REVAMP
+        val doesPasswordContainNumeric = doesTextContainNumericUseCase(password)
+        val doesPasswordContainSpecialCharacter = doesTextContainSpecialCharacterUseCase(password)
+        val doesPasswordContainMixedCase = doesTextContainMixedCaseUseCase(password)
+
+        _uiState.update {
+            it.copy(
+                isPasswordLengthSufficient = isPasswordLengthSufficient,
+                doesPasswordContainNumeric = doesPasswordContainNumeric,
+                doesPasswordContainSpecialCharacter = doesPasswordContainSpecialCharacter,
+                doesPasswordContainMixedCase = doesPasswordContainMixedCase
+            )
+        }
+
+        return isPasswordLengthSufficient && passwordStrength !in listOf(
+            PasswordStrength.INVALID,
+            PasswordStrength.VERY_WEAK,
+            PasswordStrength.WEAK
+        )
+    }
+
+    private suspend fun getPasswordStrength(
+        password: String?,
+    ): PasswordStrength {
+        val passwordStrength = if (password.isNullOrBlank()) {
+            PasswordStrength.INVALID
+        } else getPasswordStrengthUseCase(password)
+
+        return passwordStrength
+    }
+
+    private suspend fun isPasswordValid(): Boolean {
         val isPasswordValid = validatePassword(savedStateHandle[KEY_PASSWORD])
         _uiState.update { it.copy(isPasswordValid = isPasswordValid) }
         return isPasswordValid
-    }
-
-    private fun updatePasswordStrength(password: String?) = viewModelScope.launch {
-        val passwordStrength = if (password.isNullOrBlank()) {
-            PasswordStrength.INVALID
-        } else if (password.length > MIN_PASSWORD_LENGTH) getPasswordStrengthUseCase(password = password) else PasswordStrength.VERY_WEAK
-        _uiState.update { it.copy(passwordStrength = passwordStrength) }
     }
 
     internal fun onConfirmPasswordInputChanged(confirmPassword: String?) {
@@ -182,21 +218,30 @@ class CreateAccountViewModel @Inject constructor(
      * Create account after validating all inputs and if terms are agreed and connected to network
      */
     internal fun createAccount() = viewModelScope.launch {
-        //Validate all inputs
-        if (areAllInputsValid().not()) return@launch
+        val isNewRegistrationUiEnabled = _uiState.value.isNewRegistrationUiEnabled
+        val areAllInputsValid = areAllInputsValid()
+        val areTermsAgreed = areTermsAgreed()
 
-        // Check if terms are agreed
-        if (areTermsAgreed().not()) {
-            _uiState.update { it.copy(showAgreeToTermsEvent = triggered) }
-            return@launch
+        if (isNewRegistrationUiEnabled == false) {
+            if (!areAllInputsValid) return@launch
+            if (!areTermsAgreed) {
+                _uiState.update { it.copy(showAgreeToTermsEvent = triggered) }
+                return@launch
+            }
+        } else if (isNewRegistrationUiEnabled == true) {
+            if (!areTermsAgreed) {
+                _uiState.update { it.copy(showAgreeToTermsEvent = triggered) }
+            }
+            if (!areAllInputsValid || !areTermsAgreed) return@launch
         }
+
         // Check if connected to network
         if (_uiState.value.isConnected.not()) {
             _uiState.update { it.copy(showNoNetworkWarning = true) }
             return@launch
         }
         // Show Create Account in progress
-        _uiState.update { it.copy(isAccountCreationInProgress = true) }
+        _uiState.update { it.copy(isLoading = true) }
 
         // Create account
         runCatching {
@@ -210,7 +255,7 @@ class CreateAccountViewModel @Inject constructor(
             when (e) {
                 is CreateAccountException.AccountAlreadyExists -> _uiState.update {
                     it.copy(
-                        isAccountCreationInProgress = false,
+                        isLoading = false,
                         createAccountStatusEvent = triggered(
                             CreateAccountStatus.AccountAlreadyExists
                         )
@@ -219,7 +264,7 @@ class CreateAccountViewModel @Inject constructor(
 
                 is CreateAccountException.Unknown -> _uiState.update {
                     it.copy(
-                        isAccountCreationInProgress = false,
+                        isLoading = false,
                         createAccountStatusEvent = triggered(
                             CreateAccountStatus.UnknownError(e.message ?: "Unknown error")
                         )
@@ -229,7 +274,7 @@ class CreateAccountViewModel @Inject constructor(
         }.onSuccess { credentials ->
             _uiState.update {
                 it.copy(
-                    isAccountCreationInProgress = false,
+                    isLoading = false,
                     createAccountStatusEvent = triggered(CreateAccountStatus.Success(credentials))
                 )
             }
@@ -237,15 +282,17 @@ class CreateAccountViewModel @Inject constructor(
 
     }
 
-    private fun areTermsAgreed() =
+    private fun areTermsAgreed() = if (_uiState.value.isNewRegistrationUiEnabled == false) {
         _uiState.value.isTermsOfServiceAgreed == true && _uiState.value.isE2EEAgreed == true
+    } else _uiState.value.isTermsOfServiceAgreed == true
+
 
     /**
      * Validate all input to create account
      *
      * @return validation state as [Boolean]
      */
-    private fun areAllInputsValid(): Boolean = listOf(
+    private suspend fun areAllInputsValid(): Boolean = listOf(
         isFirstNameValid(),
         isLastNameValid(),
         isEmailValid(),
@@ -257,7 +304,7 @@ class CreateAccountViewModel @Inject constructor(
         _uiState.update { it.copy(showAgreeToTermsEvent = consumed) }
     }
 
-    internal fun closeNetworkWarning() {
+    internal fun networkWarningShown() {
         _uiState.update { it.copy(showNoNetworkWarning = false) }
     }
 
@@ -324,9 +371,8 @@ class CreateAccountViewModel @Inject constructor(
          */
         const val KEY_E2EE = "e2ee"
 
-        /**
-         * Minimum password length
-         */
-        const val MIN_PASSWORD_LENGTH = 4
+        const val EMAIL_CHAR_LIMIT = 190
+
+        const val MIN_PASSWORD_LENGTH_DESIGN_REVAMP = 8
     }
 }

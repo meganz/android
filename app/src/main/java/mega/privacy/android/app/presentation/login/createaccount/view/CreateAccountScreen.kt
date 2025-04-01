@@ -54,9 +54,9 @@ import androidx.compose.ui.text.style.TextDecoration
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.hilt.navigation.compose.hiltViewModel
-import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import de.palm.composestateevents.EventEffect
 import kotlinx.coroutines.launch
+import mega.android.core.ui.theme.values.TextColor
 import mega.privacy.android.app.R
 import mega.privacy.android.app.presentation.login.createaccount.CreateAccountViewModel
 import mega.privacy.android.app.presentation.login.createaccount.model.CreateAccountStatus
@@ -80,7 +80,6 @@ import mega.privacy.android.shared.original.core.ui.model.MegaSpanStyle
 import mega.privacy.android.shared.original.core.ui.model.SpanIndicator
 import mega.privacy.android.shared.original.core.ui.preview.CombinedThemePreviews
 import mega.privacy.android.shared.original.core.ui.theme.OriginalTheme
-import mega.android.core.ui.theme.values.TextColor
 import mega.privacy.android.shared.original.core.ui.utils.showAutoDurationSnackbar
 import mega.privacy.android.shared.resources.R as sharedR
 
@@ -109,7 +108,7 @@ internal fun CreateAccountRoute(
         openTermsAndServiceLink = openTermsAndServiceLink,
         openEndToEndEncryptionLink = openEndToEndEncryptionLink,
         onResetShowAgreeToTermsEvent = viewModel::resetShowAgreeToTermsEvent,
-        onCloseNetworkWarningClick = viewModel::closeNetworkWarning,
+        onCloseNetworkWarningClick = viewModel::networkWarningShown,
         onResetCreateAccountStatusEvent = viewModel::resetCreateAccountStatusEvent,
         onCreateAccountSuccess = {
             setTemporalDataForAccountCreation(it)
@@ -149,7 +148,7 @@ internal fun CreateAccountScreen(
         scaffoldState = scaffoldState,
         scrollableContentState = scrollState,
         topBar = {
-            if (!uiState.isAccountCreationInProgress) {
+            if (!uiState.isLoading) {
                 MegaAppBar(
                     modifier = Modifier.testTag(CREATE_ACCOUNT_TOOLBAR_TAG),
                     appBarType = AppBarType.NONE,
@@ -268,7 +267,7 @@ private fun CreateAccountView(
         }
     }
 
-    if (uiState.isAccountCreationInProgress) {
+    if (uiState.isLoading) {
         CreateAccountInProgressView(
             modifier = modifier
         )
@@ -350,7 +349,6 @@ private fun CreateAccountView(
                     onTextChange = { passwordInput ->
                         password = passwordInput.trim()
                         onPasswordInputChanged(password.orEmpty())
-
                     },
                     hint = stringResource(id = sharedR.string.password_text),
                     imeAction = ImeAction.Next,
@@ -867,7 +865,7 @@ private fun CreateAccountScreenInProgressPreview() {
     OriginalTheme(isDark = isSystemInDarkTheme()) {
         CreateAccountScreen(
             uiState = CreateAccountUIState(
-                isAccountCreationInProgress = true
+                isLoading = true
             ),
             onFirstNameInputChanged = {},
             onLastNameInputChanged = {},
