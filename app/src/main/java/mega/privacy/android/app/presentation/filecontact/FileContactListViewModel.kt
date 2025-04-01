@@ -1,4 +1,4 @@
-package mega.privacy.android.app.presentation.contact
+package mega.privacy.android.app.presentation.filecontact
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
@@ -7,7 +7,6 @@ import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
-import mega.privacy.android.domain.usecase.contact.GetContactVerificationWarningUseCase
 import mega.privacy.android.app.domain.usecase.shares.GetOutShares
 import mega.privacy.android.app.presentation.extensions.getState
 import mega.privacy.android.domain.entity.StorageState
@@ -16,6 +15,7 @@ import mega.privacy.android.domain.entity.node.NodeId
 import mega.privacy.android.domain.usecase.GetNodeByIdUseCase
 import mega.privacy.android.domain.usecase.account.MonitorStorageStateEventUseCase
 import mega.privacy.android.domain.usecase.contact.AreCredentialsVerifiedUseCase
+import mega.privacy.android.domain.usecase.contact.GetContactVerificationWarningUseCase
 import mega.privacy.android.domain.usecase.shares.CreateShareKeyUseCase
 import nz.mega.sdk.MegaNode
 import nz.mega.sdk.MegaShare
@@ -23,7 +23,7 @@ import timber.log.Timber
 import javax.inject.Inject
 
 /**
- * View Model for [mega.privacy.android.app.main.FileContactListActivity]
+ * View Model for [FileContactListActivity]
  */
 @HiltViewModel
 class FileContactListViewModel @Inject constructor(
@@ -50,8 +50,8 @@ class FileContactListViewModel @Inject constructor(
     val showNotVerifiedContactBanner = _showNotVerifiedContactBanner.asStateFlow()
 
     /**
-     * Get latest [StorageState] from [MonitorStorageStateEventUseCase] use case.
-     * @return the latest [StorageState]
+     * Get latest [mega.privacy.android.domain.entity.StorageState] from [MonitorStorageStateEventUseCase] use case.
+     * @return the latest [mega.privacy.android.domain.entity.StorageState]
      */
     fun getStorageState(): StorageState = monitorStorageStateEventUseCase.getState()
 
@@ -65,7 +65,7 @@ class FileContactListViewModel @Inject constructor(
         require(typedNode is FolderNode) { "Cannot create a share key for a non-folder node" }
         createShareKeyUseCase(typedNode)
     }.onFailure {
-        Timber.e(it)
+        Timber.Forest.e(it)
     }
 
     /**
@@ -89,7 +89,7 @@ class FileContactListViewModel @Inject constructor(
                     _showNotVerifiedContactBanner.update { showUnVerifiedContactBanner }
                 }
             }.onFailure {
-                Timber.e("All contacts verified check failed $it")
+                Timber.Forest.e("All contacts verified check failed $it")
             }
         }
 
@@ -106,7 +106,7 @@ class FileContactListViewModel @Inject constructor(
             _megaShares.update { shares }
             checkIfContactNotVerifiedBannerShouldBeShown(shares)
         }.onFailure {
-            Timber.e("Get mega shares failed $it")
+            Timber.Forest.e("Get mega shares failed $it")
         }
     }
 }

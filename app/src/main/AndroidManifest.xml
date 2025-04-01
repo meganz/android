@@ -258,7 +258,7 @@
             android:label="@string/contact_properties_activity"
             android:launchMode="singleTop" />
         <activity
-            android:name=".main.FileContactListActivity"
+            android:name=".presentation.filecontact.FileContactListActivity"
             android:configChanges="orientation|screenSize"
             android:label="@string/file_properties_shared_folder_select_contact"
             android:launchMode="singleTop" />

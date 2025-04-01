@@ -7,8 +7,8 @@ import androidx.appcompat.app.AlertDialog
 import mega.privacy.android.app.MegaApplication
 import mega.privacy.android.app.interfaces.ActionBackupListener
 import mega.privacy.android.app.interfaces.ActionBackupNodeCallback
-import mega.privacy.android.app.main.FileContactListActivity
 import mega.privacy.android.app.main.controllers.NodeController
+import mega.privacy.android.app.presentation.filecontact.FileContactListActivity
 import mega.privacy.android.app.sync.fileBackups.FileBackupManager.BackupDialogState.BACKUP_DIALOG_SHOW_NONE
 import mega.privacy.android.app.sync.fileBackups.FileBackupManager.BackupDialogState.BACKUP_DIALOG_SHOW_WARNING
 import mega.privacy.android.app.sync.fileBackups.FileBackupManager.OperationType.OPERATION_CANCEL

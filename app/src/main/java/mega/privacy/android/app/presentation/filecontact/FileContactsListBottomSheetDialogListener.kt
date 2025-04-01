@@ -1,4 +1,4 @@
-package mega.privacy.android.app.modalbottomsheet
+package mega.privacy.android.app.presentation.filecontact
 
 /**
  * Listener to receive events from [FileContactsListBottomSheetDialogFragment]

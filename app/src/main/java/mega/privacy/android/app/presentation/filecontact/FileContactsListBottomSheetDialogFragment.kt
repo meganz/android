@@ -1,4 +1,4 @@
-package mega.privacy.android.app.modalbottomsheet
+package mega.privacy.android.app.presentation.filecontact
 
 import android.content.DialogInterface
 import android.os.Bundle
@@ -19,6 +19,7 @@ import androidx.compose.ui.platform.ViewCompositionStrategy
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import dagger.hilt.android.AndroidEntryPoint
+import mega.privacy.android.app.modalbottomsheet.BaseBottomSheetDialogFragment
 import mega.privacy.android.app.presentation.extensions.isDarkMode
 import mega.privacy.android.app.presentation.fileinfo.view.ShareContactOptionsContent
 import mega.privacy.android.app.utils.Constants
@@ -131,7 +132,7 @@ class FileContactsListBottomSheetDialogFragment : BaseBottomSheetDialogFragment 
                             accessPermission = getAccessPermission(share?.access),
                         )
                     } ?: run {
-                        Timber.e("Contact item not found ${contact?.handle}")
+                        Timber.Forest.e("Contact item not found ${contact?.handle}")
                         dismissAllowingStateLoss()
                     }
                 }
@@ -139,7 +140,7 @@ class FileContactsListBottomSheetDialogFragment : BaseBottomSheetDialogFragment 
                     .collectAsStateWithLifecycle(initialValue = ThemeMode.System)
                 OriginalTheme(isDark = themeMode.isDarkMode()) {
                     Column(
-                        modifier = Modifier
+                        modifier = Modifier.Companion
                             .fillMaxWidth()
                             .heightIn(min = 260.dp)
                     ) {

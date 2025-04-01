@@ -1,8 +1,7 @@
-package mega.privacy.android.app.presentation.contact
+package mega.privacy.android.app.presentation.filecontact
 
 import androidx.lifecycle.lifecycleScope
 import kotlinx.coroutines.launch
-import mega.privacy.android.app.main.FileContactListActivity
 import nz.mega.sdk.MegaNode
 
 /**

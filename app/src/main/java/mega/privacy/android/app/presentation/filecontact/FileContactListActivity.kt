@@ -1,4 +1,4 @@
-package mega.privacy.android.app.main
+package mega.privacy.android.app.presentation.filecontact
 
 import android.annotation.SuppressLint
 import android.content.BroadcastReceiver
@@ -32,32 +32,19 @@ import mega.privacy.android.app.R
 import mega.privacy.android.app.activities.PasscodeActivity
 import mega.privacy.android.app.arch.extensions.collectFlow
 import mega.privacy.android.app.components.SimpleDividerItemDecoration
-import mega.privacy.android.app.constants.BroadcastConstants.ACTION_UPDATE_CREDENTIALS
-import mega.privacy.android.app.constants.BroadcastConstants.ACTION_UPDATE_FIRST_NAME
-import mega.privacy.android.app.constants.BroadcastConstants.ACTION_UPDATE_LAST_NAME
-import mega.privacy.android.app.constants.BroadcastConstants.ACTION_UPDATE_NICKNAME
-import mega.privacy.android.app.constants.BroadcastConstants.BROADCAST_ACTION_INTENT_FILTER_CONTACT_UPDATE
-import mega.privacy.android.app.constants.BroadcastConstants.BROADCAST_ACTION_INTENT_MANAGE_SHARE
-import mega.privacy.android.app.constants.BroadcastConstants.EXTRA_USER_HANDLE
+import mega.privacy.android.app.constants.BroadcastConstants
 import mega.privacy.android.app.interfaces.ActionBackupListener
 import mega.privacy.android.app.listeners.ShareListener
-import mega.privacy.android.app.main.adapters.MegaSharedFolderAdapter
 import mega.privacy.android.app.main.controllers.ContactController
 import mega.privacy.android.app.main.controllers.NodeController
 import mega.privacy.android.app.main.legacycontact.AddContactActivity
-import mega.privacy.android.app.modalbottomsheet.FileContactsListBottomSheetDialogFragment
-import mega.privacy.android.app.modalbottomsheet.FileContactsListBottomSheetDialogListener
 import mega.privacy.android.app.modalbottomsheet.ModalBottomSheetUtil.isBottomSheetDialogShown
-import mega.privacy.android.app.presentation.contact.FileContactListViewModel
-import mega.privacy.android.app.presentation.contact.shareFolder
 import mega.privacy.android.app.sync.fileBackups.FileBackupManager
-import mega.privacy.android.app.sync.fileBackups.FileBackupManager.OperationType.OPERATION_EXECUTE
 import mega.privacy.android.app.utils.Constants
 import mega.privacy.android.app.utils.ContactUtil
-import mega.privacy.android.app.utils.MegaNodeDialogUtil.ACTION_BACKUP_SHARE_FOLDER
-import mega.privacy.android.app.utils.MegaNodeDialogUtil.BACKUP_NONE
-import mega.privacy.android.app.utils.MegaNodeUtil.checkBackupNodeTypeByHandle
-import mega.privacy.android.app.utils.MegaProgressDialogUtil.createProgressDialog
+import mega.privacy.android.app.utils.MegaNodeDialogUtil
+import mega.privacy.android.app.utils.MegaNodeUtil
+import mega.privacy.android.app.utils.MegaProgressDialogUtil
 import mega.privacy.android.app.utils.Util
 import mega.privacy.android.domain.entity.node.MoveRequestResult
 import nz.mega.sdk.MegaApiJava
@@ -136,14 +123,14 @@ internal class FileContactListActivity : PasscodeActivity(), View.OnClickListene
         override fun onReceive(context: Context, intent: Intent) {
             if (intent.action == null) return
 
-            if (intent.action == ACTION_UPDATE_NICKNAME || intent.action == ACTION_UPDATE_CREDENTIALS || intent.action == ACTION_UPDATE_FIRST_NAME || intent.action == ACTION_UPDATE_LAST_NAME) {
-                updateAdapter(intent.getLongExtra(EXTRA_USER_HANDLE, MegaApiJava.INVALID_HANDLE))
+            if (intent.action == BroadcastConstants.ACTION_UPDATE_NICKNAME || intent.action == BroadcastConstants.ACTION_UPDATE_CREDENTIALS || intent.action == BroadcastConstants.ACTION_UPDATE_FIRST_NAME || intent.action == BroadcastConstants.ACTION_UPDATE_LAST_NAME) {
+                updateAdapter(intent.getLongExtra(BroadcastConstants.EXTRA_USER_HANDLE, MegaApiJava.INVALID_HANDLE))
             }
         }
     }
 
     fun activateActionMode() {
-        Timber.d("activateActionMode")
+        Timber.Forest.d("activateActionMode")
         if (adapter?.isMultipleSelect == false) {
             adapter?.isMultipleSelect = true
             actionMode = startSupportActionMode(ActionBarCallBack())
@@ -154,7 +141,7 @@ internal class FileContactListActivity : PasscodeActivity(), View.OnClickListene
     private inner class ActionBarCallBack : ActionMode.Callback {
         @SuppressLint("NonConstantResourceId")
         override fun onActionItemClicked(mode: ActionMode, item: MenuItem): Boolean {
-            Timber.d("onActionItemClicked")
+            Timber.Forest.d("onActionItemClicked")
             val shares = adapter?.selectedShares
 
             val itemId = item.itemId
@@ -175,7 +162,7 @@ internal class FileContactListActivity : PasscodeActivity(), View.OnClickListene
                     ) { _: DialogInterface?, item1: Int ->
                         clearSelections()
                         permissionsDialog?.dismiss()
-                        statusDialog = createProgressDialog(
+                        statusDialog = MegaProgressDialogUtil.createProgressDialog(
                             this@FileContactListActivity,
                             getString(R.string.context_permissions_changing_folder)
                         )
@@ -193,10 +180,10 @@ internal class FileContactListActivity : PasscodeActivity(), View.OnClickListene
                 R.id.action_file_contact_list_delete -> {
                     shares?.takeUnless { it.isEmpty() }?.let {
                         if (it.size > 1) {
-                            Timber.d("Remove multiple contacts")
+                            Timber.Forest.d("Remove multiple contacts")
                             showConfirmationRemoveMultipleContactFromShare(shares)
                         } else {
-                            Timber.d("Remove one contact")
+                            Timber.Forest.d("Remove one contact")
                             showConfirmationRemoveContactFromShare(shares[0].user)
                         }
                     }
@@ -214,7 +201,7 @@ internal class FileContactListActivity : PasscodeActivity(), View.OnClickListene
         }
 
         override fun onCreateActionMode(mode: ActionMode, menu: Menu): Boolean {
-            Timber.d("onCreateActionMode")
+            Timber.Forest.d("onCreateActionMode")
             val inflater = mode.menuInflater
             inflater.inflate(R.menu.file_contact_shared_browser_action, menu)
             fab?.visibility = View.GONE
@@ -223,7 +210,7 @@ internal class FileContactListActivity : PasscodeActivity(), View.OnClickListene
         }
 
         override fun onDestroyActionMode(arg0: ActionMode) {
-            Timber.d("onDestroyActionMode")
+            Timber.Forest.d("onDestroyActionMode")
             adapter?.clearSelections()
             adapter?.isMultipleSelect = false
             fab?.visibility = View.VISIBLE
@@ -231,7 +218,7 @@ internal class FileContactListActivity : PasscodeActivity(), View.OnClickListene
         }
 
         override fun onPrepareActionMode(mode: ActionMode, menu: Menu): Boolean {
-            Timber.d("onPrepareActionMode")
+            Timber.Forest.d("onPrepareActionMode")
             val selected = adapter?.selectedShares
             var deleteShare = false
             var permissions = false
@@ -286,7 +273,7 @@ internal class FileContactListActivity : PasscodeActivity(), View.OnClickListene
 
     override fun onCreate(savedInstanceState: Bundle?) {
         this.enableEdgeToEdge()
-        Timber.d("onCreate")
+        Timber.Forest.d("onCreate")
         super.onCreate(savedInstanceState)
 
         initFileBackupManager()
@@ -352,14 +339,15 @@ internal class FileContactListActivity : PasscodeActivity(), View.OnClickListene
 
         registerSdkAppropriateReceiver(
             broadcastReceiver = manageShareReceiver,
-            filter = IntentFilter(BROADCAST_ACTION_INTENT_MANAGE_SHARE)
+            filter = IntentFilter(BroadcastConstants.BROADCAST_ACTION_INTENT_MANAGE_SHARE)
         )
 
-        val contactUpdateFilter = IntentFilter(BROADCAST_ACTION_INTENT_FILTER_CONTACT_UPDATE)
-        contactUpdateFilter.addAction(ACTION_UPDATE_NICKNAME)
-        contactUpdateFilter.addAction(ACTION_UPDATE_FIRST_NAME)
-        contactUpdateFilter.addAction(ACTION_UPDATE_LAST_NAME)
-        contactUpdateFilter.addAction(ACTION_UPDATE_CREDENTIALS)
+        val contactUpdateFilter =
+            IntentFilter(BroadcastConstants.BROADCAST_ACTION_INTENT_FILTER_CONTACT_UPDATE)
+        contactUpdateFilter.addAction(BroadcastConstants.ACTION_UPDATE_NICKNAME)
+        contactUpdateFilter.addAction(BroadcastConstants.ACTION_UPDATE_FIRST_NAME)
+        contactUpdateFilter.addAction(BroadcastConstants.ACTION_UPDATE_LAST_NAME)
+        contactUpdateFilter.addAction(BroadcastConstants.ACTION_UPDATE_CREDENTIALS)
         registerSdkAppropriateReceiver(
             broadcastReceiver = contactUpdateReceiver, filter = contactUpdateFilter
         )
@@ -380,7 +368,7 @@ internal class FileContactListActivity : PasscodeActivity(), View.OnClickListene
                 super.registerReceiver(broadcastReceiver, filter)
             }
         } catch (e: IllegalStateException) {
-            Timber.e(e, "IllegalStateException registering receiver")
+            Timber.Forest.e(e, "IllegalStateException registering receiver")
         }
     }
 
@@ -409,7 +397,7 @@ internal class FileContactListActivity : PasscodeActivity(), View.OnClickListene
                 result: MoveRequestResult?,
                 handle: Long,
             ) {
-                if (actionType == ACTION_BACKUP_SHARE_FOLDER && operationType == OPERATION_EXECUTE) {
+                if (actionType == MegaNodeDialogUtil.ACTION_BACKUP_SHARE_FOLDER && operationType == FileBackupManager.OperationType.OPERATION_EXECUTE) {
                     shareFolder()
                 }
             }
@@ -428,7 +416,7 @@ internal class FileContactListActivity : PasscodeActivity(), View.OnClickListene
 
 
     fun showOptionsPanel(sShare: MegaShare?) {
-        Timber.d("showNodeOptionsPanel")
+        Timber.Forest.d("showNodeOptionsPanel")
 
         if (node == null || sShare == null || bottomSheetDialogFragment.isBottomSheetDialogShown()) return
 
@@ -506,8 +494,8 @@ internal class FileContactListActivity : PasscodeActivity(), View.OnClickListene
      */
     private fun handleShareFolder() {
 
-        val nodeType = checkBackupNodeTypeByHandle(megaApi, node)
-        if (nodeType != BACKUP_NONE) {
+        val nodeType = MegaNodeUtil.checkBackupNodeTypeByHandle(megaApi, node)
+        if (nodeType != MegaNodeDialogUtil.BACKUP_NONE) {
             node?.let { megaNode ->
                 fileBackupManager?.let {
                     fileBackupManager?.shareBackupsFolder(
@@ -528,7 +516,7 @@ internal class FileContactListActivity : PasscodeActivity(), View.OnClickListene
         intent.setClass(this, AddContactActivity::class.java)
         intent.putExtra("contactType", Constants.CONTACT_TYPE_BOTH)
         intent.putExtra("MULTISELECT", 0)
-        intent.putExtra(AddContactActivity.EXTRA_NODE_HANDLE, node?.handle)
+        intent.putExtra(AddContactActivity.Companion.EXTRA_NODE_HANDLE, node?.handle)
         startActivityForResult(intent, Constants.REQUEST_CODE_SELECT_CONTACT)
     }
 
@@ -540,7 +528,7 @@ internal class FileContactListActivity : PasscodeActivity(), View.OnClickListene
     }
 
     fun selectAll() {
-        Timber.d("selectAll")
+        Timber.Forest.d("selectAll")
         if (adapter != null) {
             if (adapter?.isMultipleSelect == true) {
                 adapter?.selectAll()
@@ -555,7 +543,7 @@ internal class FileContactListActivity : PasscodeActivity(), View.OnClickListene
     }
 
     fun itemClick(position: Int) {
-        Timber.d("Position: %s", position)
+        Timber.Forest.d("Position: %s", position)
 
         if (adapter?.isMultipleSelect == true) {
             adapter?.toggleSelection(position)
@@ -572,7 +560,7 @@ internal class FileContactListActivity : PasscodeActivity(), View.OnClickListene
     @Deprecated("Deprecated in Java")
     @SuppressLint("NotifyDataSetChanged")
     override fun onBackPressed() {
-        Timber.d("onBackPressed")
+        Timber.Forest.d("onBackPressed")
         retryConnectionsAndSignalPresence()
 
         if (adapter?.positionClicked != -1) {
@@ -603,13 +591,13 @@ internal class FileContactListActivity : PasscodeActivity(), View.OnClickListene
     }
 
     private fun updateActionModeTitle() {
-        Timber.d("updateActionModeTitle")
+        Timber.Forest.d("updateActionModeTitle")
         if (actionMode == null) {
             return
         }
         val contacts = adapter?.selectedShares
         if (contacts != null) {
-            Timber.d("Contacts selected: %s", contacts.size)
+            Timber.Forest.d("Contacts selected: %s", contacts.size)
         }
 
         actionMode?.title = resources.getQuantityString(
@@ -618,7 +606,7 @@ internal class FileContactListActivity : PasscodeActivity(), View.OnClickListene
         try {
             actionMode?.invalidate()
         } catch (e: NullPointerException) {
-            Timber.e(e, "Invalidate error")
+            Timber.Forest.e(e, "Invalidate error")
         }
     }
 
@@ -646,10 +634,10 @@ internal class FileContactListActivity : PasscodeActivity(), View.OnClickListene
     }
 
     override fun changePermissions(userEmail: String) {
-        Timber.d("changePermissions")
+        Timber.Forest.d("changePermissions")
         notifyDataSetChanged()
-        val nodeType = checkBackupNodeTypeByHandle(megaApi, node)
-        if (nodeType != BACKUP_NONE) {
+        val nodeType = MegaNodeUtil.checkBackupNodeTypeByHandle(megaApi, node)
+        if (nodeType != MegaNodeDialogUtil.BACKUP_NONE) {
             showWarningDialog()
             return
         }
@@ -665,13 +653,13 @@ internal class FileContactListActivity : PasscodeActivity(), View.OnClickListene
         dialogBuilder.setSingleChoiceItems(
             items, selectedShare?.access ?: 0
         ) { _: DialogInterface?, item: Int ->
-            statusDialog = createProgressDialog(
+            statusDialog = MegaProgressDialogUtil.createProgressDialog(
                 this, getString(R.string.context_permissions_changing_folder)
             )
             permissionsDialog?.dismiss()
             contactController.changePermission(
                 selectedShare?.user, item, node, ShareListener(
-                    this, ShareListener.CHANGE_PERMISSIONS_LISTENER, 1
+                    this, ShareListener.Companion.CHANGE_PERMISSIONS_LISTENER, 1
                 )
             )
         }
@@ -729,8 +717,8 @@ internal class FileContactListActivity : PasscodeActivity(), View.OnClickListene
             }
 
             val emails =
-                intent.getStringArrayListExtra(AddContactActivity.EXTRA_CONTACTS) ?: arrayListOf()
-            val nodeHandle = intent.getLongExtra(AddContactActivity.EXTRA_NODE_HANDLE, -1)
+                intent.getStringArrayListExtra(AddContactActivity.Companion.EXTRA_CONTACTS) ?: arrayListOf()
+            val nodeHandle = intent.getLongExtra(AddContactActivity.Companion.EXTRA_NODE_HANDLE, -1)
 
             if (nodeHandle != -1L) {
                 node = megaApi.getNodeByHandle(nodeHandle)
@@ -758,7 +746,7 @@ internal class FileContactListActivity : PasscodeActivity(), View.OnClickListene
                         items, -1
                     ) { _: DialogInterface?, item: Int ->
                         permissionsDialog?.dismiss()
-                        statusDialog = createProgressDialog(
+                        statusDialog = MegaProgressDialogUtil.createProgressDialog(
                             this, getString(R.string.context_sharing_folder)
                         )
                         statusDialog?.show()
@@ -772,11 +760,11 @@ internal class FileContactListActivity : PasscodeActivity(), View.OnClickListene
     }
 
     override fun onUsersUpdate(api: MegaApiJava, users: ArrayList<MegaUser>?) {
-        Timber.d("onUserupdate")
+        Timber.Forest.d("onUserupdate")
     }
 
     override fun onUserAlertsUpdate(api: MegaApiJava, userAlerts: ArrayList<MegaUserAlert>?) {
-        Timber.d("onUserAlertsUpdate")
+        Timber.Forest.d("onUserAlertsUpdate")
     }
 
     override fun onEvent(api: MegaApiJava, event: MegaEvent?) {
@@ -789,12 +777,12 @@ internal class FileContactListActivity : PasscodeActivity(), View.OnClickListene
     }
 
     override fun onNodesUpdate(api: MegaApiJava, nodeList: ArrayList<MegaNode>?) {
-        Timber.d("onNodesUpdate")
+        Timber.Forest.d("onNodesUpdate")
 
         try {
             statusDialog?.dismiss()
         } catch (ex: Exception) {
-            Timber.e(ex, "Error dismiss status dialog")
+            Timber.Forest.e(ex, "Error dismiss status dialog")
         }
 
         if (node?.isFolder == true) {
@@ -836,12 +824,12 @@ internal class FileContactListActivity : PasscodeActivity(), View.OnClickListene
         val message = resources.getString(R.string.remove_contact_shared_folder, email)
         builder.setMessage(message)
             .setPositiveButton(R.string.general_remove) { _: DialogInterface?, _: Int ->
-                statusDialog = createProgressDialog(
+                statusDialog = MegaProgressDialogUtil.createProgressDialog(
                     this, getString(R.string.context_removing_contact_folder)
                 )
                 nodeController.removeShare(
                     ShareListener(
-                        this, ShareListener.REMOVE_SHARE_LISTENER, 1
+                        this, ShareListener.Companion.REMOVE_SHARE_LISTENER, 1
                     ), node, email
                 )
             }.setNegativeButton(
@@ -850,7 +838,7 @@ internal class FileContactListActivity : PasscodeActivity(), View.OnClickListene
     }
 
     fun showConfirmationRemoveMultipleContactFromShare(contacts: ArrayList<MegaShare>) {
-        Timber.d("showConfirmationRemoveMultipleContactFromShare")
+        Timber.Forest.d("showConfirmationRemoveMultipleContactFromShare")
 
         val dialogClickListener =
             DialogInterface.OnClickListener { _: DialogInterface?, which: Int ->
@@ -875,9 +863,9 @@ internal class FileContactListActivity : PasscodeActivity(), View.OnClickListene
     }
 
     private fun removeMultipleShares(shares: ArrayList<MegaShare>) {
-        Timber.d("Number of shared to remove: %s", shares.size)
+        Timber.Forest.d("Number of shared to remove: %s", shares.size)
 
-        statusDialog = createProgressDialog(
+        statusDialog = MegaProgressDialogUtil.createProgressDialog(
             this, getString(R.string.context_removing_contact_folder)
         )
         nodeController.removeShares(shares, node)
@@ -924,4 +912,3 @@ internal class FileContactListActivity : PasscodeActivity(), View.OnClickListene
         }
     }
 }
-
