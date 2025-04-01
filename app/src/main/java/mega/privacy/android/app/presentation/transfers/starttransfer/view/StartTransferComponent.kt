@@ -277,7 +277,7 @@ private fun StartTransferComponent(
         action = {
             when (it) {
                 is StartTransferEvent.FinishDownloadProcessing -> {
-                    consumeFinishProcessing(
+                    onFinishProcessing(
                         event = it,
                         snackBarHostState = snackBarHostState,
                         showQuotaExceededDialog = showQuotaExceededDialog,
@@ -498,7 +498,7 @@ private val storageStateSaver = Saver<StorageState?, Int>(
     restore = { StorageState.entries.getOrNull(it) }
 )
 
-private suspend fun consumeFinishProcessing(
+private suspend fun onFinishProcessing(
     event: StartTransferEvent.FinishDownloadProcessing,
     snackBarHostState: SnackbarHostState,
     showQuotaExceededDialog: MutableState<StorageState?>,
