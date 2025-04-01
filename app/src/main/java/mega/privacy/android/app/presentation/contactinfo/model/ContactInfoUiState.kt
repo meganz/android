@@ -43,6 +43,7 @@ import mega.privacy.android.domain.entity.node.UnTypedNode
  * @property moveRequestResult
  * @property showForceUpdateDialog                      True, shows force update dialog to the user
  * @property retentionTime                              The retention time.
+ * @property leaveFolderNodeIds                         The list of node ids to be left
  */
 data class ContactInfoUiState(
     val error: Int? = null,
@@ -75,6 +76,7 @@ data class ContactInfoUiState(
     val moveRequestResult: Result<MoveRequestResult>? = null,
     val showForceUpdateDialog: Boolean = false,
     val retentionTime: Long? = null,
+    val leaveFolderNodeIds: List<Long>? = null,
 ) {
 
     /**

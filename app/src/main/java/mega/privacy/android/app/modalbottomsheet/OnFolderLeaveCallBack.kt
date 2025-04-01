@@ -5,4 +5,5 @@ package mega.privacy.android.app.modalbottomsheet
  */
 interface OnFolderLeaveCallBack {
     fun onFolderLeave()
+    fun showLeaveFolderDialog(nodeIds: List<Long>)
 }

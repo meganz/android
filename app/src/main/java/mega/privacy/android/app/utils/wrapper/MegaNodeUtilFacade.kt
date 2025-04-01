@@ -110,22 +110,6 @@ class MegaNodeUtilFacade @Inject constructor(
     override fun allHaveOwnerAccessAndNotTakenDown(nodes: List<MegaNode?>) =
         MegaNodeUtil.allHaveOwnerAccessAndNotTakenDown(nodes)
 
-    override fun showConfirmationLeaveIncomingShare(
-        activity: Activity,
-        snackbarShower: SnackbarShower,
-        node: MegaNode,
-    ) {
-        MegaNodeUtil.showConfirmationLeaveIncomingShare(activity, snackbarShower, node)
-    }
-
-    override fun showConfirmationLeaveIncomingShares(
-        activity: Activity,
-        snackbarShower: SnackbarShower,
-        handleList: ArrayList<Long>,
-    ) {
-        MegaNodeUtil.showConfirmationLeaveIncomingShares(activity, snackbarShower, handleList)
-    }
-
     override fun isEmptyFolder(node: MegaNode?) = MegaNodeUtil.isEmptyFolder(node)
 
     override fun getDlList(

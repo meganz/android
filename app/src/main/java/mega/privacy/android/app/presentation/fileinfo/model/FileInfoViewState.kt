@@ -15,48 +15,49 @@ import mega.privacy.android.domain.entity.shares.AccessPermission
 
 /**
  * Represents the view state of the File info screen
- * @param title the title for this screen, node's name
- * @param isFile true if the node is a file false if it's a folder
- * @param origin from which origin the info screen was opened
- * @param oneOffViewEvent one-off events to be consumed by the view
- * @param downloadEvent one-off event to start downloading the node
- * @param jobInProgressState indicates if there are any job in progress that needs to be notified
- * @param historyVersions the num of history versions that this file contains, 0 if it's not a file or doesn't contain history versions
- * @param isNodeInBackups determines if the node is in Backups or not
- * @param isNodeInRubbish determines if the node is in the rubbish bin or not
- * @param previewUriString the uri of the file containing the preview
- * @param thumbnailUriString the uri of the file containing the thumbnail, just as a fallback in case there's no [previewUriString]
- * @param folderTreeInfo the folder info if the node is a folder
- * @param outShares shares in case of a node shared with others as outgoing share (To be used when the compose view is used)
- * @param nodeLocationInfo the location info of the node
- * @param isAvailableOffline true if the file is available offline
- * @param isAvailableOfflineEnabled true if offline availability can be changed, false if not
- * @param isAvailableOfflineAvailable true if the available offline should be available (should be visible)
- * @param inShareOwnerContactItem the [ContactItem] of the owner
- * @param accessPermission the [AccessPermission] the user has to this node
- * @param contactToShowOptions the contact selected to show related options in the bottom sheet dialog
- * @param outShareContactsSelected a list of contacts selected to batch modify
- * @param iconResource the icon resource that represents this node
- * @param sizeInBytes Size of this node, for folder it will be the total size of its content, including versions
- * @param isExported
- * @param isTakenDown Node is taken down
- * @param publicLink the share link of the node
- * @param publicLinkCreationTime the date on which it was shared
- * @param showLink Share link should be shown
- * @param creationTime creation time of the node
- * @param modificationTime modification time of the node in case of file node
- * @param descriptionText description for node
- * @param hasPreview this node has a preview (Images, pdf, videos, etc.)
- * @param actions a list of [FileInfoMenuAction] representing available actions for this node
- * @param requiredExtraAction an initiated action that needs to be confirmed by the user or more data needs to be specified (typically by an alert dialog)
- * @param isRemindersForContactVerificationEnabled checks if reminders for contact verification is enabled
- * @param tagsEnabled checks if tags are enabled
- * @param tags list of tags for the node
- * @param mapLocationEnabled checks if GIS location is enabled
- * @param longitude the longitude of the node
- * @param latitude the latitude of the node
- * @param isPhoto true if the node is a photo (Image or Video)
- * @param accountDeactivatedStatus the status of the account if it's deactivated
+ * @property title the title for this screen, node's name
+ * @property isFile true if the node is a file false if it's a folder
+ * @property origin from which origin the info screen was opened
+ * @property oneOffViewEvent one-off events to be consumed by the view
+ * @property downloadEvent one-off event to start downloading the node
+ * @property jobInProgressState indicates if there are any job in progress that needs to be notified
+ * @property historyVersions the num of history versions that this file contains, 0 if it's not a file or doesn't contain history versions
+ * @property isNodeInBackups determines if the node is in Backups or not
+ * @property isNodeInRubbish determines if the node is in the rubbish bin or not
+ * @property previewUriString the uri of the file containing the preview
+ * @property thumbnailUriString the uri of the file containing the thumbnail, just as a fallback in case there's no [previewUriString]
+ * @property folderTreeInfo the folder info if the node is a folder
+ * @property outShares shares in case of a node shared with others as outgoing share (To be used when the compose view is used)
+ * @property nodeLocationInfo the location info of the node
+ * @property isAvailableOffline true if the file is available offline
+ * @property isAvailableOfflineEnabled true if offline availability can be changed, false if not
+ * @property isAvailableOfflineAvailable true if the available offline should be available (should be visible)
+ * @property inShareOwnerContactItem the [ContactItem] of the owner
+ * @property accessPermission the [AccessPermission] the user has to this node
+ * @property contactToShowOptions the contact selected to show related options in the bottom sheet dialog
+ * @property outShareContactsSelected a list of contacts selected to batch modify
+ * @property iconResource the icon resource that represents this node
+ * @property sizeInBytes Size of this node, for folder it will be the total size of its content, including versions
+ * @property isExported
+ * @property isTakenDown Node is taken down
+ * @property publicLink the share link of the node
+ * @property publicLinkCreationTime the date on which it was shared
+ * @property showLink Share link should be shown
+ * @property creationTime creation time of the node
+ * @property modificationTime modification time of the node in case of file node
+ * @property descriptionText description for node
+ * @property hasPreview this node has a preview (Images, pdf, videos, etc.)
+ * @property actions a list of [FileInfoMenuAction] representing available actions for this node
+ * @property requiredExtraAction an initiated action that needs to be confirmed by the user or more data needs to be specified (typically by an alert dialog)
+ * @property isRemindersForContactVerificationEnabled checks if reminders for contact verification is enabled
+ * @property tagsEnabled checks if tags are enabled
+ * @property tags list of tags for the node
+ * @property mapLocationEnabled checks if GIS location is enabled
+ * @property longitude the longitude of the node
+ * @property latitude the latitude of the node
+ * @property isPhoto true if the node is a photo (Image or Video)
+ * @property accountDeactivatedStatus the status of the account if it's deactivated
+ * @property leaveFolderNodeIds the list of node ids to be left
  */
 internal data class FileInfoViewState(
     val title: String = "",
@@ -101,6 +102,7 @@ internal data class FileInfoViewState(
     val latitude: Double = 0.0,
     val isPhoto: Boolean = false,
     val accountDeactivatedStatus: AccountDeactivatedStatus? = null,
+    val leaveFolderNodeIds: List<Long>? = null,
 ) {
 
     /**

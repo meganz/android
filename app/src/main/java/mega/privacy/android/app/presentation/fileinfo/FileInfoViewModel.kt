@@ -1117,4 +1117,20 @@ class FileInfoViewModel @Inject constructor(
             null
         }
     }
+
+    /**
+     * set leave folder node ids
+     *
+     */
+    fun setLeaveFolderNodeIds(nodeIds: List<Long>) {
+        _uiState.update { it.copy(leaveFolderNodeIds = nodeIds) }
+    }
+
+    /**
+     * clear leave folder node ids
+     *
+     */
+    fun clearLeaveFolderNodeIds() {
+        _uiState.update { it.copy(leaveFolderNodeIds = null) }
+    }
 }

@@ -8,7 +8,6 @@ import static mega.privacy.android.app.utils.Constants.NAME;
 import static mega.privacy.android.app.utils.MegaApiUtils.getMegaNodeFolderInfo;
 import static mega.privacy.android.app.utils.MegaNodeDialogUtil.showRenameNodeDialog;
 import static mega.privacy.android.app.utils.MegaNodeUtil.manageEditTextFileIntent;
-import static mega.privacy.android.app.utils.MegaNodeUtil.showConfirmationLeaveIncomingShare;
 import static mega.privacy.android.app.utils.Util.getSizeString;
 import static mega.privacy.android.app.utils.Util.scaleWidthPx;
 import static nz.mega.sdk.MegaApiJava.INVALID_HANDLE;
@@ -28,6 +27,7 @@ import androidx.annotation.Nullable;
 
 import java.util.ArrayList;
 import java.util.Collections;
+import java.util.List;
 
 import coil.Coil;
 import coil.request.ImageRequest;
@@ -233,8 +233,11 @@ public class ContactFileListBottomSheetDialogFragment extends BaseBottomSheetDia
             i.putExtra(NAME, node.getName());
             startActivity(i);
         } else if (id == R.id.leave_option) {
-            showConfirmationLeaveIncomingShare(requireActivity(),
-                    (SnackbarShower) requireActivity(), node);
+            if (requireActivity() instanceof OnFolderLeaveCallBack) {
+                ((OnFolderLeaveCallBack) requireActivity()).showLeaveFolderDialog(List.of(node.getHandle()));
+            } else {
+                Timber.w("The activity is not an instance of OnFolderLeaveCallBack");
+            }
         } else if (id == R.id.rename_option) {
             showRenameNodeDialog(requireActivity(), node, (SnackbarShower) getActivity(),
                     (ActionNodeCallback) getActivity());

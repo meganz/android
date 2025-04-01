@@ -273,4 +273,20 @@ class ContactFileListViewModel @Inject constructor(
     fun onDocumentScanningErrorConsumed() {
         _state.update { it.copy(documentScanningError = null) }
     }
+
+    /**
+     * set leave folder node ids
+     *
+     */
+    fun setLeaveFolderNodeIds(nodeIds: List<Long>) {
+        _state.update { it.copy(leaveFolderNodeIds = nodeIds) }
+    }
+
+    /**
+     * clear leave folder node ids
+     *
+     */
+    fun clearLeaveFolderNodeIds() {
+        _state.update { it.copy(leaveFolderNodeIds = null) }
+    }
 }

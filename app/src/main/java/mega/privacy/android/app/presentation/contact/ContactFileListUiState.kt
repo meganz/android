@@ -19,6 +19,7 @@ import mega.privacy.android.domain.entity.node.NameCollision
  * @property uploadEvent Event to trigger upload actions
  * @property gmsDocumentScanner The prepared ML Kit Document Scanner
  * @property documentScanningError The specific Error returned when using the modern Document Scanner
+ * @property leaveFolderNodeIds The list of node ids to be left
  */
 data class ContactFileListUiState(
     val moveRequestResult: Result<MoveRequestResult>? = null,
@@ -29,4 +30,5 @@ data class ContactFileListUiState(
     val uploadEvent: StateEventWithContent<TransferTriggerEvent.StartUpload> = consumed(),
     val gmsDocumentScanner: GmsDocumentScanner? = null,
     val documentScanningError: DocumentScanningError? = null,
+    val leaveFolderNodeIds: List<Long>? = null,
 )

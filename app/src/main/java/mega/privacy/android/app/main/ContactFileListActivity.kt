@@ -24,6 +24,7 @@ import androidx.appcompat.app.AlertDialog
 import androidx.appcompat.widget.Toolbar
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.platform.ComposeView
+import androidx.compose.ui.platform.ViewCompositionStrategy
 import androidx.coordinatorlayout.widget.CoordinatorLayout
 import androidx.core.net.toUri
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
@@ -58,6 +59,7 @@ import mega.privacy.android.app.presentation.documentscanner.dialogs.DocumentSca
 import mega.privacy.android.app.presentation.extensions.isDarkMode
 import mega.privacy.android.app.presentation.extensions.uploadFolderManually
 import mega.privacy.android.app.presentation.movenode.mapper.MoveRequestMessageMapper
+import mega.privacy.android.app.presentation.node.dialogs.leaveshare.LeaveShareDialog
 import mega.privacy.android.app.presentation.transfers.starttransfer.StartDownloadViewModel
 import mega.privacy.android.app.utils.AlertDialogUtil.dismissAlertDialogIfExists
 import mega.privacy.android.app.utils.AlertsAndWarnings.showOverDiskQuotaPaywallWarning
@@ -176,6 +178,10 @@ internal class ContactFileListActivity : PasscodeActivity(), MegaGlobalListenerI
         }
     }
 
+    override fun showLeaveFolderDialog(nodeIds: List<Long>) {
+        viewModel.setLeaveFolderNodeIds(nodeIds)
+    }
+
     private val selectFolderToCopyLauncher: ActivityResultLauncher<LongArray> =
         registerForActivityResult(SelectFolderToCopyActivityContract()) { result ->
             val copyHandles = result?.first?.toList() ?: return@registerForActivityResult
@@ -238,7 +244,7 @@ internal class ContactFileListActivity : PasscodeActivity(), MegaGlobalListenerI
             }
         }
 
-    public override fun onSaveInstanceState(outState: Bundle) {
+    override fun onSaveInstanceState(outState: Bundle) {
         outState.putLong(PARENT_HANDLE, parentHandle)
         checkNewTextFileDialogState(newTextFileDialog, outState)
         newFolderDialog.checkNewFolderDialogState(outState)
@@ -439,8 +445,28 @@ internal class ContactFileListActivity : PasscodeActivity(), MegaGlobalListenerI
             documentScanningErrorDialogComposeView =
                 findViewById(R.id.contact_properties_error_dialog_compose_view)
             setComposeProperties()
+            setUpLeaveSharesDialog()
         }
         collectFlows()
+    }
+
+    private fun setUpLeaveSharesDialog() {
+        findViewById<ComposeView>(R.id.leave_shares_dialog)?.apply {
+            setViewCompositionStrategy(ViewCompositionStrategy.DisposeOnViewTreeLifecycleDestroyed)
+            setContent {
+                val themeMode by getThemeMode().collectAsStateWithLifecycle(initialValue = ThemeMode.System)
+                val isDark = themeMode.isDarkMode()
+                OriginalTheme(isDark = isDark) {
+                    val state by viewModel.state.collectAsStateWithLifecycle()
+                    state.leaveFolderNodeIds?.let {
+                        LeaveShareDialog(handles = it, onDismiss = {
+                            onFolderLeave()
+                            viewModel.clearLeaveFolderNodeIds()
+                        })
+                    }
+                }
+            }
+        }
     }
 
     /**

@@ -19,7 +19,7 @@
     </androidx.coordinatorlayout.widget.CoordinatorLayout>
 
     <androidx.compose.ui.platform.ComposeView
-        android:id="@+id/waiting_room_dialog_compose_view"
+        android:id="@+id/compose_container"
         android:layout_width="match_parent"
         android:layout_height="match_parent" />
 

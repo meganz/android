@@ -1,6 +1,5 @@
 package mega.privacy.android.app.main.contactSharedFolder
 
-import mega.privacy.android.shared.resources.R as sharedR
 import android.annotation.SuppressLint
 import android.content.Intent
 import android.os.Bundle
@@ -33,9 +32,9 @@ import mega.privacy.android.app.presentation.transfers.starttransfer.StartDownlo
 import mega.privacy.android.app.presentation.transfers.starttransfer.view.createStartTransferView
 import mega.privacy.android.app.utils.Constants
 import mega.privacy.android.app.utils.MegaNodeDialogUtil
-import mega.privacy.android.app.utils.MegaNodeUtil
 import mega.privacy.android.app.utils.Util
 import mega.privacy.android.navigation.MegaNavigator
+import mega.privacy.android.shared.resources.R as sharedR
 import nz.mega.sdk.MegaError
 import nz.mega.sdk.MegaNode
 import nz.mega.sdk.MegaShare
@@ -422,10 +421,8 @@ class ContactSharedFolderFragment : ContactFileBaseFragment() {
                     documents.forEach {
                         handleList.add(it.handle)
                     }
-                    MegaNodeUtil.showConfirmationLeaveIncomingShares(
-                        requireActivity(),
-                        (requireActivity() as SnackbarShower), handleList
-                    )
+                    viewModel.setLeaveFolderNodeIds(handleList)
+                    Timber.d("Leave folder node ids: $handleList")
                 }
 
                 R.id.cab_menu_rename -> {

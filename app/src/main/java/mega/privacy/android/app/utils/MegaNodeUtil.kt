@@ -802,22 +802,6 @@ object MegaNodeUtil {
     }
 
     /**
-     * Shows a confirmation warning before leave an incoming share.
-     *
-     * @param activity current Activity
-     * @param snackbarShower interface to show snackbar
-     * @param node incoming share to leave
-     */
-    @JvmStatic
-    fun showConfirmationLeaveIncomingShare(
-        activity: Activity,
-        snackbarShower: SnackbarShower,
-        node: MegaNode,
-    ) {
-        showConfirmationLeaveIncomingShares(activity, snackbarShower, node, null)
-    }
-
-    /**
      * Shows a confirmation warning before leave some incoming shares.
      *
      * @param activity current Activity

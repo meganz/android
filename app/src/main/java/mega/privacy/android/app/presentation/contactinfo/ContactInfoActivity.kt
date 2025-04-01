@@ -84,6 +84,7 @@ import mega.privacy.android.app.presentation.meeting.WaitingRoomManagementViewMo
 import mega.privacy.android.app.presentation.meeting.view.dialog.DenyEntryToCallDialog
 import mega.privacy.android.app.presentation.meeting.view.dialog.UsersInWaitingRoomDialog
 import mega.privacy.android.app.presentation.movenode.mapper.MoveRequestMessageMapper
+import mega.privacy.android.app.presentation.node.dialogs.leaveshare.LeaveShareDialog
 import mega.privacy.android.app.presentation.security.PasscodeCheck
 import mega.privacy.android.app.presentation.transfers.attach.NodeAttachmentViewModel
 import mega.privacy.android.app.presentation.transfers.attach.createNodeAttachmentView
@@ -216,6 +217,11 @@ class ContactInfoActivity : BaseActivity(), ActionNodeCallback, MegaRequestListe
             Timber.d("onFolderLeave")
             hideSelectMode()
         }
+    }
+
+    override fun showLeaveFolderDialog(nodeIds: List<Long>) {
+        onFolderLeave()
+        viewModel.setLeaveFolderNodeIds(nodeIds)
     }
 
     private fun navigateToChatActivity(handle: Long) {
@@ -544,15 +550,20 @@ class ContactInfoActivity : BaseActivity(), ActionNodeCallback, MegaRequestListe
             }
         }
 
-        activityChatContactBinding.waitingRoomDialogComposeView.apply {
-            isVisible = true
+        activityChatContactBinding.composeContainer.apply {
             setViewCompositionStrategy(ViewCompositionStrategy.DisposeOnViewTreeLifecycleDestroyed)
             setContent {
                 val themeMode by getThemeMode().collectAsStateWithLifecycle(initialValue = ThemeMode.System)
                 val isDark = themeMode.isDarkMode()
+                val state by viewModel.uiState.collectAsStateWithLifecycle()
                 OriginalTheme(isDark = isDark) {
                     UsersInWaitingRoomDialog()
                     DenyEntryToCallDialog()
+                    state.leaveFolderNodeIds?.let {
+                        LeaveShareDialog(handles = it, onDismiss = {
+                            viewModel.clearLeaveFolderNodeIds()
+                        })
+                    }
                 }
             }
         }

@@ -607,4 +607,27 @@ class ContactInfoViewModelTest {
             assertThat(awaitItem()).isEqualTo(retentionTime)
         }
     }
+
+    @Test
+    fun `test that the leave folder ids are set when setLeaveFolderNodeIds is called`() = runTest {
+        val ids = listOf(1L, 2L)
+        underTest.setLeaveFolderNodeIds(ids)
+
+        underTest.uiState.test {
+            assertThat(awaitItem().leaveFolderNodeIds).isEqualTo(ids)
+        }
+    }
+
+    @Test
+    fun `test that the leave folder ids are reset when clearLeaveFolderNodeIds is called`() =
+        runTest {
+            val ids = listOf(1L, 2L)
+            underTest.setLeaveFolderNodeIds(ids)
+
+            underTest.uiState.test {
+                assertThat(awaitItem().leaveFolderNodeIds).isEqualTo(ids)
+                underTest.clearLeaveFolderNodeIds()
+                assertThat(awaitItem().leaveFolderNodeIds).isNull()
+            }
+        }
 }

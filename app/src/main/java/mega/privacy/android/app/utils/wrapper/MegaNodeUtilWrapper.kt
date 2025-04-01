@@ -223,32 +223,6 @@ interface MegaNodeUtilWrapper {
     fun allHaveOwnerAccessAndNotTakenDown(nodes: List<MegaNode?>): Boolean
 
     /**
-     * Shows a confirmation warning before leave an incoming share.
-     *
-     * @param activity current Activity
-     * @param snackbarShower interface to show snackbar
-     * @param node incoming share to leave
-     */
-    fun showConfirmationLeaveIncomingShare(
-        activity: Activity,
-        snackbarShower: SnackbarShower,
-        node: MegaNode,
-    )
-
-    /**
-     * Shows a confirmation warning before leave some incoming shares.
-     *
-     * @param activity current Activity
-     * @param snackbarShower interface to show snackbar
-     * @param handleList    handles list of the incoming shares to leave
-     */
-    fun showConfirmationLeaveIncomingShares(
-        activity: Activity,
-        snackbarShower: SnackbarShower,
-        handleList: ArrayList<Long>,
-    )
-
-    /**
      * Checks if a folder node is empty.
      * If a folder is empty means although contains more folders inside,
      * all of them don't contain any file.

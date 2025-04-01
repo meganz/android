@@ -1,6 +1,5 @@
 package mega.privacy.android.app.main
 
-import mega.privacy.android.icon.pack.R as iconPackR
 import android.content.Intent
 import android.net.Uri
 import android.os.Bundle
@@ -59,6 +58,7 @@ import mega.privacy.android.app.utils.MegaApiUtils
 import mega.privacy.android.app.utils.MegaNodeDialogUtil.showRenameNodeDialog
 import mega.privacy.android.app.utils.Util
 import mega.privacy.android.app.utils.wrapper.MegaNodeUtilWrapper
+import mega.privacy.android.icon.pack.R as iconPackR
 import mega.privacy.android.navigation.MegaNavigator
 import nz.mega.sdk.MegaError
 import nz.mega.sdk.MegaNode
@@ -127,11 +127,8 @@ class ContactFileListFragment : ContactFileBaseFragment() {
                 for (i in documents.indices) {
                     handleList.add(documents[i].handle)
                 }
-
-                megaNodeUtilWrapper.showConfirmationLeaveIncomingShares(
-                    requireActivity(),
-                    (requireActivity() as SnackbarShower), handleList
-                )
+                viewModel?.setLeaveFolderNodeIds(handleList)
+                Timber.d("Leave folder node ids: $handleList")
             } else if (itemId == R.id.cab_menu_trash) {
                 val handleList = ArrayList<Long>()
                 for (i in documents.indices) {
@@ -444,7 +441,6 @@ class ContactFileListFragment : ContactFileBaseFragment() {
                             viewModel!!.consumeUploadEvent()
                         }
                         startDownloadViewModel!!.consumeDownloadEvent()
-                        Unit
                     },
                     onScanningFinished = { StartTransferEvent: StartTransferEvent? -> Unit },
                     navigateToStorageSettings = {
@@ -538,7 +534,7 @@ class ContactFileListFragment : ContactFileBaseFragment() {
             adapter.toggleSelection(position)
 
             val selectedNodes = adapter.selectedNodes
-            if (selectedNodes.size > 0) {
+            if (selectedNodes.isNotEmpty()) {
                 updateActionModeTitle()
             }
         } else {
@@ -680,7 +676,7 @@ class ContactFileListFragment : ContactFileBaseFragment() {
                     megaNodeUtilWrapper.manageTextFileIntent(
                         requireContext(),
                         contactNodes[position],
-                        Constants.CONTACT_FILE_ADAPTER
+                        CONTACT_FILE_ADAPTER
                     )
                 } else {
                     adapter.notifyDataSetChanged()

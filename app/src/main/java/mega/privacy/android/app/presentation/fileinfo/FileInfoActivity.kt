@@ -42,6 +42,7 @@ import mega.privacy.android.app.presentation.fileinfo.model.FileInfoOneOffViewEv
 import mega.privacy.android.app.presentation.fileinfo.model.FileInfoViewState
 import mega.privacy.android.app.presentation.fileinfo.view.ExtraActionDialog
 import mega.privacy.android.app.presentation.fileinfo.view.FileInfoScreen
+import mega.privacy.android.app.presentation.node.dialogs.leaveshare.LeaveShareDialog
 import mega.privacy.android.app.presentation.security.PasscodeCheck
 import mega.privacy.android.app.presentation.settings.model.StorageTargetPreference
 import mega.privacy.android.app.presentation.tags.TagsActivity
@@ -61,7 +62,6 @@ import mega.privacy.android.app.utils.MegaNodeDialogUtil.ACTION_BACKUP_SHARE_FOL
 import mega.privacy.android.app.utils.MegaNodeDialogUtil.showRenameNodeDialog
 import mega.privacy.android.app.utils.MegaNodeUtil
 import mega.privacy.android.app.utils.MegaNodeUtil.handleLocationClick
-import mega.privacy.android.app.utils.MegaNodeUtil.showConfirmationLeaveIncomingShare
 import mega.privacy.android.app.utils.MegaNodeUtil.showTakenDownNodeActionNotAvailableDialog
 import mega.privacy.android.app.utils.Util
 import mega.privacy.android.domain.entity.ThemeMode
@@ -193,6 +193,11 @@ class FileInfoActivity : BaseActivity() {
                         ContactUtil.openContactInfoActivity(this, it.contactItem.email)
                     }
                 )
+                uiState.leaveFolderNodeIds?.let { nodeIds ->
+                    LeaveShareDialog(handles = nodeIds) {
+                        viewModel.clearLeaveFolderNodeIds()
+                    }
+                }
                 uiState.requiredExtraAction?.let { action ->
                     ExtraActionDialog(
                         action = action,
@@ -443,10 +448,8 @@ class FileInfoActivity : BaseActivity() {
     }
 
     private fun showConfirmLeaveDialog() {
-        showConfirmationLeaveIncomingShare(
-            this,
-            this,
-            viewModel.node
+        viewModel.setLeaveFolderNodeIds(
+            listOf(viewModel.node.handle)
         )
     }
 
