@@ -437,7 +437,7 @@ class DefaultMediaPlayerRepositoryTest {
                 token
             )
         ).thenReturn(expectedNodes)
-        whenever(fileNodeMapper(megaNode, false, null)).thenReturn(fileNode)
+        whenever(fileNodeMapper(megaNode, true, null)).thenReturn(fileNode)
         whenever(typedVideoNodeMapper(fileNode, 100)).thenReturn(typedVideoNode)
         whenever(typedAudioNodeMapper(fileNode, 100)).thenReturn(typedAudioNode)
     }

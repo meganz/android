@@ -1,7 +1,10 @@
 package mega.privacy.android.app.presentation.videoplayer.model
 
+import de.palm.composestateevents.StateEventWithContent
+import de.palm.composestateevents.consumed
 import mega.privacy.android.app.mediaplayer.model.MediaPlaySources
 import mega.privacy.android.app.mediaplayer.service.Metadata
+import mega.privacy.android.app.presentation.transfers.starttransfer.model.TransferTriggerEvent.DownloadTriggerEvent
 import mega.privacy.android.domain.entity.AccountType
 import mega.privacy.android.domain.entity.mediaplayer.RepeatToggleMode
 import mega.privacy.android.domain.exception.MegaException
@@ -21,14 +24,17 @@ import mega.privacy.android.domain.exception.MegaException
  * @property currentPlayingVideoSize the current playing video size
  * @property mediaPlaybackState the playback state
  * @property snackBarMessage the snack bar message
+ * @property isFullScreen whether it is full screen
+ * @property isVideoOptionPopupShown whether the video option popup is shown
  * @property menuActions the list of video player menu actions
  * @property accountType the account type
  * @property isBusinessAccountExpired whether the business account is expired
  * @property hiddenNodeEnabled whether the hidden node is enabled
  * @property isHiddenNodesOnboarded whether the hidden nodes are onboarded
- * @property showHiddenItems whether the hidden items are shown
- * @property isFullScreen whether it is full screen
- * @property isVideoOptionPopupShown whether the video option popup is shown
+ * @property showHiddenItems whether to show hidden items
+ * @property clickedMenuAction the clicked menu action
+ * @property downloadEvent the download event
+ * @property menuOptionClickedContent menu option click content
  */
 data class VideoPlayerUiState(
     val items: List<VideoPlayerItem> = emptyList(),
@@ -43,12 +49,15 @@ data class VideoPlayerUiState(
     val currentPlayingVideoSize: VideoSize? = null,
     val mediaPlaybackState: MediaPlaybackState = MediaPlaybackState.Playing,
     val snackBarMessage: String? = null,
+    val isFullScreen: Boolean = false,
+    val isVideoOptionPopupShown: Boolean = false,
     val menuActions: List<VideoPlayerMenuAction> = emptyList(),
     val accountType: AccountType? = null,
     val isBusinessAccountExpired: Boolean = false,
     val hiddenNodeEnabled: Boolean = false,
     val isHiddenNodesOnboarded: Boolean = false,
     val showHiddenItems: Boolean? = null,
-    val isFullScreen: Boolean = false,
-    val isVideoOptionPopupShown: Boolean = false,
+    val clickedMenuAction: VideoPlayerMenuAction? = null,
+    val downloadEvent: StateEventWithContent<DownloadTriggerEvent> = consumed(),
+    val menuOptionClickedContent: MenuOptionClickedContent? = null
 )

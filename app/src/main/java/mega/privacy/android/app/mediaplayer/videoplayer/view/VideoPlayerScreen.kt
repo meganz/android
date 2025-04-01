@@ -6,6 +6,7 @@ import android.graphics.Bitmap
 import android.view.View
 import android.view.ViewGroup
 import android.widget.ProgressBar
+import androidx.activity.compose.LocalOnBackPressedDispatcherOwner
 import androidx.compose.animation.core.Animatable
 import androidx.compose.animation.core.tween
 import androidx.compose.foundation.Image
@@ -100,6 +101,7 @@ internal fun VideoPlayerScreen(
     val coroutineScope = rememberCoroutineScope()
     var autoHideJob by remember { mutableStateOf<Job?>(null) }
 
+    val backDispatcher = LocalOnBackPressedDispatcherOwner.current?.onBackPressedDispatcher
     var resizedBitmap by remember { mutableStateOf<Bitmap?>(null) }
     var isScreenshotVisible by remember { mutableStateOf(false) }
     val scale = remember { Animatable(1f) }
@@ -259,8 +261,8 @@ internal fun VideoPlayerScreen(
                             uiState.metadata.title ?: uiState.metadata.nodeName
                         },
                         menuActions = uiState.menuActions,
-                        onBackPressed = { },
-                        onMenuActionClicked = { },
+                        onBackPressed = { backDispatcher?.onBackPressed() },
+                        onMenuActionClicked = viewModel::updateClickedMenuAction,
                     )
                 }
 

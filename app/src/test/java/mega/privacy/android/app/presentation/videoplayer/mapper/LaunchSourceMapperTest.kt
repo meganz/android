@@ -51,7 +51,6 @@ import org.mockito.kotlin.any
 import org.mockito.kotlin.mock
 import org.mockito.kotlin.reset
 import org.mockito.kotlin.whenever
-import kotlin.math.exp
 
 @TestInstance(TestInstance.Lifecycle.PER_CLASS)
 class LaunchSourceMapperTest {
@@ -493,4 +492,21 @@ class LaunchSourceMapperTest {
 
             assertThat(actual).containsExactlyElementsIn(expected + VideoPlayerUnhideAction)
         }
+
+    @ParameterizedTest(name = "and launchSource is {0}")
+    @ValueSource(ints = [FILE_BROWSER_ADAPTER, RUBBISH_BIN_ADAPTER, FROM_CHAT, FROM_IMAGE_VIEWER])
+    fun `test that action is empty when node is null`(
+        launchSource: Int
+    ) = runTest {
+        val actual: List<VideoPlayerMenuAction> = underTest(
+            launchSource = launchSource,
+            videoNode = null,
+            shouldShowAddTo = false,
+            canRemoveFromChat = { false },
+            isPaidUser = false,
+            isExpiredBusinessUser = false,
+        )
+
+        assertThat(actual).isEmpty()
+    }
 }

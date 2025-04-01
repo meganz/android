@@ -69,7 +69,7 @@ class LaunchSourceMapper @Inject constructor(
      */
     suspend operator fun invoke(
         launchSource: Int,
-        videoNode: TypedVideoNode,
+        videoNode: TypedVideoNode?,
         shouldShowAddTo: Boolean,
         canRemoveFromChat: suspend () -> Boolean,
         isPaidUser: Boolean,
@@ -82,20 +82,24 @@ class LaunchSourceMapper @Inject constructor(
         }
 
 
-        launchSource == RUBBISH_BIN_ADAPTER || isInRubbishBin(videoNode) -> buildList {
-            add(VideoPlayerFileInfoAction)
-            if (shouldShowAddTo) add(VideoPlayerAddToAction)
-            if (!isNodeInBackup(videoNode)) add(VideoPlayerRemoveAction)
-        }
+        launchSource == RUBBISH_BIN_ADAPTER || isInRubbishBin(videoNode) ->
+            if (videoNode == null) emptyList()
+            else buildList {
+                add(VideoPlayerFileInfoAction)
+                if (shouldShowAddTo) add(VideoPlayerAddToAction)
+                if (!isNodeInBackup(videoNode)) add(VideoPlayerRemoveAction)
+            }
 
 
-        launchSource == FROM_CHAT -> buildList {
-            add(VideoPlayerDownloadAction)
-            add(VideoPlayerChatImportAction)
-            add(VideoPlayerSaveForOfflineAction)
-            if (canRemoveFromChat() && !isNodeInBackup(videoNode)) add(VideoPlayerRemoveAction)
-            if (shouldShowAddTo) add(VideoPlayerAddToAction)
-        }
+        launchSource == FROM_CHAT ->
+            if (videoNode == null) emptyList()
+            else buildList {
+                add(VideoPlayerDownloadAction)
+                add(VideoPlayerChatImportAction)
+                add(VideoPlayerSaveForOfflineAction)
+                if (canRemoveFromChat() && !isNodeInBackup(videoNode)) add(VideoPlayerRemoveAction)
+                if (shouldShowAddTo) add(VideoPlayerAddToAction)
+            }
 
 
         launchSource == FILE_LINK_ADAPTER || launchSource == ZIP_ADAPTER -> {
@@ -112,45 +116,50 @@ class LaunchSourceMapper @Inject constructor(
                 if (shouldShowAddTo) add(VideoPlayerAddToAction)
             }
 
-        launchSource == FROM_IMAGE_VIEWER -> buildList {
-            add(VideoPlayerDownloadAction)
-            getHiddenNodeItem(
-                videoNode = videoNode,
-                launchSource = launchSource,
-                isPaidUser = isPaidUser,
-                isExpiredBusinessUser = isExpiredBusinessUser
-            )?.let { add(it) }
-            if (shouldShowAddTo) add(VideoPlayerAddToAction)
-        }
-
-        else -> {
-            val nodeInBackup = isNodeInBackup(videoNode)
-            val permissionLevel = getPermissionLevel(videoNode)
-            buildList {
+        launchSource == FROM_IMAGE_VIEWER ->
+            if (videoNode == null) emptyList()
+            else buildList {
                 add(VideoPlayerDownloadAction)
-                add(VideoPlayerFileInfoAction)
-                add(VideoPlayerSendToChatAction)
-                add(VideoPlayerCopyAction)
-                if (isOwner(permissionLevel)) {
-                    add(VideoPlayerShareAction)
-                    if (videoNode.exportedData == null)
-                        add(VideoPlayerGetLinkAction)
-                    else
-                        add(VideoPlayerRemoveLinkAction)
-                }
                 getHiddenNodeItem(
                     videoNode = videoNode,
                     launchSource = launchSource,
                     isPaidUser = isPaidUser,
                     isExpiredBusinessUser = isExpiredBusinessUser
                 )?.let { add(it) }
-                if (isFullAccess(permissionLevel) && !nodeInBackup) {
-                    add(VideoPlayerRenameAction)
-                    add(VideoPlayerMoveAction)
-                }
-                if (isRubbishBinShown(videoNode, permissionLevel) && !nodeInBackup)
-                    add(VideoPlayerRubbishBinAction)
                 if (shouldShowAddTo) add(VideoPlayerAddToAction)
+            }
+
+        else -> {
+            if (videoNode == null) emptyList()
+            else {
+                val nodeInBackup = isNodeInBackup(videoNode)
+                val permissionLevel = getPermissionLevel(videoNode)
+                buildList {
+                    add(VideoPlayerDownloadAction)
+                    add(VideoPlayerFileInfoAction)
+                    add(VideoPlayerSendToChatAction)
+                    add(VideoPlayerCopyAction)
+                    if (isOwner(permissionLevel)) {
+                        add(VideoPlayerShareAction)
+                        if (videoNode.exportedData == null)
+                            add(VideoPlayerGetLinkAction)
+                        else
+                            add(VideoPlayerRemoveLinkAction)
+                    }
+                    getHiddenNodeItem(
+                        videoNode = videoNode,
+                        launchSource = launchSource,
+                        isPaidUser = isPaidUser,
+                        isExpiredBusinessUser = isExpiredBusinessUser
+                    )?.let { add(it) }
+                    if (isFullAccess(permissionLevel) && !nodeInBackup) {
+                        add(VideoPlayerRenameAction)
+                        add(VideoPlayerMoveAction)
+                    }
+                    if (isRubbishBinShown(videoNode, permissionLevel) && !nodeInBackup)
+                        add(VideoPlayerRubbishBinAction)
+                    if (shouldShowAddTo) add(VideoPlayerAddToAction)
+                }
             }
         }
     }
@@ -158,8 +167,9 @@ class LaunchSourceMapper @Inject constructor(
     private suspend fun isNodeInBackup(videoNode: TypedVideoNode) =
         runCatching { isNodeInBackupsUseCase(videoNode.id.longValue) }.getOrDefault(false)
 
-    private suspend fun isInRubbishBin(videoNode: TypedVideoNode) =
+    private suspend fun isInRubbishBin(videoNode: TypedVideoNode?) = videoNode?.let {
         runCatching { isNodeInRubbishBinUseCase(videoNode.id) }.getOrDefault(false)
+    } == true
 
     private suspend fun getPermissionLevel(videoNode: TypedVideoNode) = runCatching {
         getNodeAccessUseCase(videoNode.id)

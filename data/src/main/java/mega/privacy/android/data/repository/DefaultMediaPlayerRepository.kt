@@ -626,7 +626,7 @@ internal class DefaultMediaPlayerRepository @Inject constructor(
     )
 
     private suspend fun MegaNode.convertToFileNode(offline: Offline?) = fileNodeMapper(
-        megaNode = this, requireSerializedData = false, offline = offline
+        megaNode = this, requireSerializedData = true, offline = offline
     )
 
     companion object {

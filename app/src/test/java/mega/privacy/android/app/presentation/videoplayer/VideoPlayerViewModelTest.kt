@@ -7,6 +7,7 @@ import androidx.lifecycle.SavedStateHandle
 import androidx.media3.common.MediaItem
 import app.cash.turbine.test
 import com.google.common.truth.Truth.assertThat
+import com.jraska.livedata.test
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.flow.MutableSharedFlow
@@ -15,26 +16,49 @@ import kotlinx.coroutines.flow.flowOf
 import kotlinx.coroutines.test.UnconfinedTestDispatcher
 import kotlinx.coroutines.test.advanceUntilIdle
 import kotlinx.coroutines.test.runTest
+import mega.privacy.android.app.AnalyticsTestExtension
+import mega.privacy.android.app.R
 import mega.privacy.android.app.TimberJUnit5Extension
+import mega.privacy.android.app.data.extensions.observeOnce
 import mega.privacy.android.app.featuretoggle.ApiFeatures
 import mega.privacy.android.app.mediaplayer.gateway.MediaPlayerGateway
 import mega.privacy.android.app.mediaplayer.queue.model.MediaQueueItemType
 import mega.privacy.android.app.mediaplayer.service.Metadata
 import mega.privacy.android.app.presentation.myaccount.InstantTaskExecutorExtension
+import mega.privacy.android.app.presentation.transfers.starttransfer.model.TransferTriggerEvent.DownloadTriggerEvent
 import mega.privacy.android.app.presentation.videoplayer.mapper.LaunchSourceMapper
 import mega.privacy.android.app.presentation.videoplayer.mapper.VideoPlayerItemMapper
 import mega.privacy.android.app.presentation.videoplayer.model.MediaPlaybackState
+import mega.privacy.android.app.presentation.videoplayer.model.MenuOptionClickedContent
 import mega.privacy.android.app.presentation.videoplayer.model.VideoPlayerItem
 import mega.privacy.android.app.presentation.videoplayer.model.VideoPlayerMenuAction
+import mega.privacy.android.app.presentation.videoplayer.model.VideoPlayerMenuAction.VideoPlayerAddToAction
+import mega.privacy.android.app.presentation.videoplayer.model.VideoPlayerMenuAction.VideoPlayerChatImportAction
+import mega.privacy.android.app.presentation.videoplayer.model.VideoPlayerMenuAction.VideoPlayerCopyAction
 import mega.privacy.android.app.presentation.videoplayer.model.VideoPlayerMenuAction.VideoPlayerDownloadAction
 import mega.privacy.android.app.presentation.videoplayer.model.VideoPlayerMenuAction.VideoPlayerFileInfoAction
+import mega.privacy.android.app.presentation.videoplayer.model.VideoPlayerMenuAction.VideoPlayerGetLinkAction
+import mega.privacy.android.app.presentation.videoplayer.model.VideoPlayerMenuAction.VideoPlayerHideAction
+import mega.privacy.android.app.presentation.videoplayer.model.VideoPlayerMenuAction.VideoPlayerMoveAction
+import mega.privacy.android.app.presentation.videoplayer.model.VideoPlayerMenuAction.VideoPlayerRemoveAction
+import mega.privacy.android.app.presentation.videoplayer.model.VideoPlayerMenuAction.VideoPlayerRemoveLinkAction
+import mega.privacy.android.app.presentation.videoplayer.model.VideoPlayerMenuAction.VideoPlayerRenameAction
+import mega.privacy.android.app.presentation.videoplayer.model.VideoPlayerMenuAction.VideoPlayerRubbishBinAction
+import mega.privacy.android.app.presentation.videoplayer.model.VideoPlayerMenuAction.VideoPlayerSaveForOfflineAction
+import mega.privacy.android.app.presentation.videoplayer.model.VideoPlayerMenuAction.VideoPlayerSendToChatAction
+import mega.privacy.android.app.presentation.videoplayer.model.VideoPlayerMenuAction.VideoPlayerShareAction
+import mega.privacy.android.app.presentation.videoplayer.model.VideoPlayerMenuAction.VideoPlayerUnhideAction
 import mega.privacy.android.app.presentation.videoplayer.model.VideoSize
+import mega.privacy.android.app.triggeredContent
 import mega.privacy.android.app.utils.Constants.BACKUPS_ADAPTER
 import mega.privacy.android.app.utils.Constants.CONTACT_FILE_ADAPTER
+import mega.privacy.android.app.utils.Constants.EXTRA_SERIALIZE_STRING
 import mega.privacy.android.app.utils.Constants.FAVOURITES_ADAPTER
 import mega.privacy.android.app.utils.Constants.FILE_BROWSER_ADAPTER
+import mega.privacy.android.app.utils.Constants.FILE_LINK_ADAPTER
 import mega.privacy.android.app.utils.Constants.FOLDER_LINK_ADAPTER
 import mega.privacy.android.app.utils.Constants.FROM_ALBUM_SHARING
+import mega.privacy.android.app.utils.Constants.FROM_CHAT
 import mega.privacy.android.app.utils.Constants.FROM_IMAGE_VIEWER
 import mega.privacy.android.app.utils.Constants.FROM_MEDIA_DISCOVERY
 import mega.privacy.android.app.utils.Constants.INCOMING_SHARES_ADAPTER
@@ -61,6 +85,7 @@ import mega.privacy.android.app.utils.Constants.RECENTS_ADAPTER
 import mega.privacy.android.app.utils.Constants.RECENTS_BUCKET_ADAPTER
 import mega.privacy.android.app.utils.Constants.RUBBISH_BIN_ADAPTER
 import mega.privacy.android.app.utils.Constants.SEARCH_BY_ADAPTER
+import mega.privacy.android.app.utils.Constants.URL_FILE_LINK
 import mega.privacy.android.app.utils.Constants.VIDEO_BROWSE_ADAPTER
 import mega.privacy.android.app.utils.Constants.ZIP_ADAPTER
 import mega.privacy.android.app.utils.FileUtil
@@ -72,9 +97,15 @@ import mega.privacy.android.domain.entity.account.AccountLevelDetail
 import mega.privacy.android.domain.entity.account.business.BusinessAccountStatus
 import mega.privacy.android.domain.entity.mediaplayer.RepeatToggleMode
 import mega.privacy.android.domain.entity.node.FileNode
+import mega.privacy.android.domain.entity.node.MoveRequestResult
 import mega.privacy.android.domain.entity.node.Node
 import mega.privacy.android.domain.entity.node.NodeId
+import mega.privacy.android.domain.entity.node.NodeNameCollisionType
+import mega.privacy.android.domain.entity.node.NodeNameCollisionWithActionResult
+import mega.privacy.android.domain.entity.node.NodeUpdate
 import mega.privacy.android.domain.entity.node.TypedVideoNode
+import mega.privacy.android.domain.entity.node.chat.ChatDefaultFile
+import mega.privacy.android.domain.entity.node.publiclink.PublicLinkFile
 import mega.privacy.android.domain.entity.offline.OfflineFileInformation
 import mega.privacy.android.domain.entity.offline.OtherOfflineNodeInformation
 import mega.privacy.android.domain.entity.transfer.Transfer
@@ -92,10 +123,16 @@ import mega.privacy.android.domain.usecase.GetRootNodeUseCase
 import mega.privacy.android.domain.usecase.GetRubbishNodeUseCase
 import mega.privacy.android.domain.usecase.GetUserNameByEmailUseCase
 import mega.privacy.android.domain.usecase.IsHiddenNodesOnboardedUseCase
+import mega.privacy.android.domain.usecase.UpdateNodeSensitiveUseCase
 import mega.privacy.android.domain.usecase.account.MonitorAccountDetailUseCase
+import mega.privacy.android.domain.usecase.chat.message.delete.DeleteNodeAttachmentMessageByIdsUseCase
+import mega.privacy.android.domain.usecase.favourites.IsAvailableOfflineUseCase
 import mega.privacy.android.domain.usecase.featureflag.GetFeatureFlagValueUseCase
 import mega.privacy.android.domain.usecase.file.GetFileByPathUseCase
+import mega.privacy.android.domain.usecase.file.GetFileUriUseCase
 import mega.privacy.android.domain.usecase.file.GetFingerprintUseCase
+import mega.privacy.android.domain.usecase.filelink.GetPublicNodeFromSerializedDataUseCase
+import mega.privacy.android.domain.usecase.folderlink.GetPublicChildNodeFromIdUseCase
 import mega.privacy.android.domain.usecase.mediaplayer.GetLocalFolderLinkUseCase
 import mega.privacy.android.domain.usecase.mediaplayer.HttpServerIsRunningUseCase
 import mega.privacy.android.domain.usecase.mediaplayer.HttpServerStartUseCase
@@ -113,24 +150,40 @@ import mega.privacy.android.domain.usecase.mediaplayer.videoplayer.GetVideosByPa
 import mega.privacy.android.domain.usecase.mediaplayer.videoplayer.GetVideosBySearchTypeUseCase
 import mega.privacy.android.domain.usecase.mediaplayer.videoplayer.MonitorVideoRepeatModeUseCase
 import mega.privacy.android.domain.usecase.mediaplayer.videoplayer.SetVideoRepeatModeUseCase
+import mega.privacy.android.domain.usecase.node.CheckChatNodesNameCollisionAndCopyUseCase
+import mega.privacy.android.domain.usecase.node.CheckNodesNameCollisionWithActionUseCase
+import mega.privacy.android.domain.usecase.node.DisableExportUseCase
+import mega.privacy.android.domain.usecase.node.IsNodeInBackupsUseCase
+import mega.privacy.android.domain.usecase.node.IsNodeInCloudDriveUseCase
+import mega.privacy.android.domain.usecase.node.IsNodeInRubbishBinUseCase
+import mega.privacy.android.domain.usecase.node.MonitorNodeUpdatesUseCase
 import mega.privacy.android.domain.usecase.node.backup.GetBackupsNodeUseCase
+import mega.privacy.android.domain.usecase.node.chat.GetChatFileUseCase
 import mega.privacy.android.domain.usecase.offline.GetOfflineNodeInformationByIdUseCase
+import mega.privacy.android.domain.usecase.photos.GetPublicAlbumNodeDataUseCase
 import mega.privacy.android.domain.usecase.setting.MonitorShowHiddenItemsUseCase
 import mega.privacy.android.domain.usecase.setting.MonitorSubFolderMediaDiscoverySettingsUseCase
 import mega.privacy.android.domain.usecase.thumbnailpreview.GetThumbnailUseCase
 import mega.privacy.android.domain.usecase.transfers.MonitorTransferEventsUseCase
 import mega.privacy.android.domain.usecase.videosection.SaveVideoRecentlyWatchedUseCase
+import mega.privacy.mobile.analytics.event.VideoPlayerGetLinkMenuToolbarEvent
+import mega.privacy.mobile.analytics.event.VideoPlayerRemoveLinkMenuToolbarEvent
+import mega.privacy.mobile.analytics.event.VideoPlayerSaveToDeviceMenuToolbarEvent
+import mega.privacy.mobile.analytics.event.VideoPlayerShareMenuToolbarEvent
 import nz.mega.sdk.MegaApiJava.INVALID_HANDLE
 import org.junit.jupiter.api.AfterEach
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.TestInstance
 import org.junit.jupiter.api.extension.ExtendWith
+import org.junit.jupiter.api.extension.RegisterExtension
 import org.junit.jupiter.params.ParameterizedTest
+import org.junit.jupiter.params.provider.Arguments
 import org.junit.jupiter.params.provider.MethodSource
 import org.junit.jupiter.params.provider.ValueSource
 import org.mockito.Mockito.mockStatic
 import org.mockito.kotlin.any
+import org.mockito.kotlin.doReturn
 import org.mockito.kotlin.mock
 import org.mockito.kotlin.reset
 import org.mockito.kotlin.verify
@@ -203,6 +256,26 @@ class VideoPlayerViewModelTest {
     private val monitorShowHiddenItemsUseCase = mock<MonitorShowHiddenItemsUseCase>()
     private val getBusinessStatusUseCase = mock<GetBusinessStatusUseCase>()
     private val canRemoveFromChatUseCase = mock<CanRemoveFromChatUseCase>()
+    private val isNodeInRubbishBinUseCase = mock<IsNodeInRubbishBinUseCase>()
+    private val isNodeInBackupsNodeUseCase = mock<IsNodeInBackupsUseCase>()
+    private val isNodeInCloudDriveUseCase = mock<IsNodeInCloudDriveUseCase>()
+    private val checkChatNodesNameCollisionAndCopyUseCase =
+        mock<CheckChatNodesNameCollisionAndCopyUseCase>()
+    private val getPublicAlbumNodeDataUseCase = mock<GetPublicAlbumNodeDataUseCase>()
+    private val getChatFileUseCase = mock<GetChatFileUseCase>()
+    private val getPublicNodeFromSerializedDataUseCase =
+        mock<GetPublicNodeFromSerializedDataUseCase>()
+    private val getPublicChildNodeFromIdUseCase = mock<GetPublicChildNodeFromIdUseCase>()
+    private val getFileUriUseCase = mock<GetFileUriUseCase>()
+    private val disableExportUseCase = mock<DisableExportUseCase>()
+    private val isAvailableOfflineUseCase = mock<IsAvailableOfflineUseCase>()
+    private val updateNodeSensitiveUseCase = mock<UpdateNodeSensitiveUseCase>()
+    private val checkNodesNameCollisionWithActionUseCase =
+        mock<CheckNodesNameCollisionWithActionUseCase>()
+    private val deleteNodeAttachmentMessageByIdsUseCase =
+        mock<DeleteNodeAttachmentMessageByIdsUseCase>()
+    private val fakeMonitorNodeUpdatesFlow = MutableSharedFlow<NodeUpdate>()
+    private val monitorNodeUpdatesUseCase = mock<MonitorNodeUpdatesUseCase>()
     private val launchSourceMapper = mock<LaunchSourceMapper>()
     private val savedStateHandle = SavedStateHandle(mapOf())
 
@@ -214,8 +287,8 @@ class VideoPlayerViewModelTest {
     private val testTitle = "video queue title"
     private val expectedCollectionId = 123456L
     private val expectedCollectionTitle = "collection title"
-    private val expectedChatId = INVALID_HANDLE
-    private val expectedMessageId = INVALID_HANDLE
+    private val expectedChatId = 1000L
+    private val expectedMessageId = 2000L
 
     private fun initViewModel() {
         underTest = VideoPlayerViewModel(
@@ -264,6 +337,21 @@ class VideoPlayerViewModelTest {
             monitorShowHiddenItemsUseCase = monitorShowHiddenItemsUseCase,
             getBusinessStatusUseCase = getBusinessStatusUseCase,
             canRemoveFromChatUseCase = canRemoveFromChatUseCase,
+            isNodeInRubbishBinUseCase = isNodeInRubbishBinUseCase,
+            isNodeInBackupsNodeUseCase = isNodeInBackupsNodeUseCase,
+            isNodeInCloudDriveUseCase = isNodeInCloudDriveUseCase,
+            checkChatNodesNameCollisionAndCopyUseCase = checkChatNodesNameCollisionAndCopyUseCase,
+            getPublicAlbumNodeDataUseCase = getPublicAlbumNodeDataUseCase,
+            getChatFileUseCase = getChatFileUseCase,
+            getPublicNodeFromSerializedDataUseCase = getPublicNodeFromSerializedDataUseCase,
+            getPublicChildNodeFromIdUseCase = getPublicChildNodeFromIdUseCase,
+            getFileUriUseCase = getFileUriUseCase,
+            disableExportUseCase = disableExportUseCase,
+            isAvailableOfflineUseCase = isAvailableOfflineUseCase,
+            updateNodeSensitiveUseCase = updateNodeSensitiveUseCase,
+            checkNodesNameCollisionWithActionUseCase = checkNodesNameCollisionWithActionUseCase,
+            deleteNodeAttachmentMessageByIdsUseCase = deleteNodeAttachmentMessageByIdsUseCase,
+            monitorNodeUpdatesUseCase = monitorNodeUpdatesUseCase,
             launchSourceMapper = launchSourceMapper,
             savedStateHandle = savedStateHandle
         )
@@ -277,6 +365,7 @@ class VideoPlayerViewModelTest {
     fun setUp() {
         whenever(monitorTransferEventsUseCase()).thenReturn(fakeMonitorTransferEventsFlow)
         whenever(monitorSubFolderMediaDiscoverySettingsUseCase()).thenReturn(flowOf(true))
+        wheneverBlocking { monitorNodeUpdatesUseCase() }.thenReturn(fakeMonitorNodeUpdatesFlow)
         wheneverBlocking { monitorAccountDetailUseCase() }.thenReturn(fakeMonitorAccountDetailFlow)
         wheneverBlocking { monitorShowHiddenItemsUseCase() }.thenReturn(flowOf(true))
         wheneverBlocking { isHiddenNodesOnboardedUseCase() }.thenReturn(false)
@@ -336,6 +425,21 @@ class VideoPlayerViewModelTest {
             monitorShowHiddenItemsUseCase,
             getBusinessStatusUseCase,
             canRemoveFromChatUseCase,
+            isNodeInRubbishBinUseCase,
+            isNodeInBackupsNodeUseCase,
+            isNodeInCloudDriveUseCase,
+            checkChatNodesNameCollisionAndCopyUseCase,
+            getPublicAlbumNodeDataUseCase,
+            getChatFileUseCase,
+            getPublicNodeFromSerializedDataUseCase,
+            getPublicChildNodeFromIdUseCase,
+            getFileUriUseCase,
+            disableExportUseCase,
+            isAvailableOfflineUseCase,
+            updateNodeSensitiveUseCase,
+            checkNodesNameCollisionWithActionUseCase,
+            deleteNodeAttachmentMessageByIdsUseCase,
+            monitorNodeUpdatesUseCase,
             launchSourceMapper,
         )
     }
@@ -1119,6 +1223,10 @@ class VideoPlayerViewModelTest {
             val testItems = (1..3).map {
                 initVideoPlayerItem(it.toLong(), it.toString(), 200.seconds)
             }
+            whenever(launchSourceMapper(any(), any(), any(), any(), any(), any())).thenReturn(
+                emptyList()
+            )
+            whenever(getVideoNodeByHandleUseCase(any(), any())).thenReturn(mock())
             initViewModel()
             underTest.updateCurrentPlayingHandle(testHandle, testItems)
             testScheduler.advanceUntilIdle()
@@ -1299,7 +1407,6 @@ class VideoPlayerViewModelTest {
             }
         }
 
-    @Test
     fun `test that isVideoOptionPopupShown is updated correctly`() = runTest {
         initViewModel()
         underTest.updateIsVideoOptionPopupShown(true)
@@ -1309,5 +1416,418 @@ class VideoPlayerViewModelTest {
             underTest.updateIsVideoOptionPopupShown(false)
             assertThat(awaitItem().isVideoOptionPopupShown).isFalse()
         }
+    }
+
+    @Test
+    internal fun `test that copy complete snack bar message is shown when node is copied to different directory`() =
+        runTest {
+            val selectedNode = 73248538798194
+            val newParentNode = 158401030174851
+            whenever(
+                checkNodesNameCollisionWithActionUseCase(
+                    nodes = mapOf(selectedNode to newParentNode),
+                    type = NodeNameCollisionType.COPY,
+                )
+            ) doReturn NodeNameCollisionWithActionResult(
+                collisionResult = mock(),
+                moveRequestResult = MoveRequestResult.GeneralMovement(
+                    count = 1,
+                    errorCount = 0
+                )
+            )
+
+            underTest.copyNode(
+                nodeHandle = selectedNode,
+                newParentHandle = newParentNode,
+            )
+            testScheduler.advanceUntilIdle()
+
+            underTest.onSnackbarMessage().test().assertValue(R.string.context_correctly_copied)
+        }
+
+    @Test
+    internal fun `test that copy error snack bar message is shown when node is not copied to different directory`() =
+        runTest {
+            val selectedNode = 73248538798194
+            val newParentNode = 158401030174851
+            whenever(
+                checkNodesNameCollisionWithActionUseCase(
+                    nodes = mapOf(selectedNode to newParentNode),
+                    type = NodeNameCollisionType.COPY,
+                )
+            ) doReturn NodeNameCollisionWithActionResult(
+                collisionResult = mock(),
+                moveRequestResult = MoveRequestResult.GeneralMovement(
+                    count = 1,
+                    errorCount = 1
+                )
+            )
+
+            underTest.copyNode(
+                nodeHandle = selectedNode,
+                newParentHandle = newParentNode,
+            )
+            testScheduler.advanceUntilIdle()
+
+            underTest.onSnackbarMessage().test().assertValue(R.string.context_no_copied)
+        }
+
+    @Test
+    internal fun `test that onExceptionThrown is triggered when copy failed`() =
+        runTest {
+            val selectedNode = 73248538798194
+            val newParentNode = 158401030174851
+            val runtimeException = RuntimeException("Copy node failed")
+            whenever(
+                checkNodesNameCollisionWithActionUseCase(
+                    nodes = mapOf(selectedNode to newParentNode),
+                    type = NodeNameCollisionType.COPY,
+                )
+            ).thenThrow(runtimeException)
+            underTest.copyNode(
+                nodeHandle = selectedNode,
+                newParentHandle = newParentNode,
+            )
+            advanceUntilIdle()
+            underTest.onExceptionThrown().test().assertValue(runtimeException)
+        }
+
+    @Test
+    internal fun `test move complete snack bar message is shown when node is moved to different directory`() =
+        runTest {
+            val selectedNode = 73248538798194
+            val newParentNode = 158401030174851
+            whenever(
+                checkNodesNameCollisionWithActionUseCase(
+                    nodes = mapOf(selectedNode to newParentNode),
+                    type = NodeNameCollisionType.MOVE,
+                )
+            ) doReturn NodeNameCollisionWithActionResult(
+                collisionResult = mock(),
+                moveRequestResult = MoveRequestResult.GeneralMovement(
+                    count = 1,
+                    errorCount = 0
+                )
+            )
+            underTest.moveNode(
+                nodeHandle = selectedNode,
+                newParentHandle = newParentNode,
+            )
+            advanceUntilIdle()
+            underTest.onSnackbarMessage().observeOnce {
+                assertThat(it).isEqualTo(R.string.context_correctly_moved)
+            }
+        }
+
+    @Test
+    internal fun `test move error snack bar message is shown when node is not moved to different directory`() =
+        runTest {
+            val selectedNode = 73248538798194
+            val newParentNode = 158401030174851
+            whenever(
+                checkNodesNameCollisionWithActionUseCase(
+                    nodes = mapOf(selectedNode to newParentNode),
+                    type = NodeNameCollisionType.MOVE,
+                )
+            ) doReturn NodeNameCollisionWithActionResult(
+                collisionResult = mock(),
+                moveRequestResult = MoveRequestResult.GeneralMovement(
+                    count = 1,
+                    errorCount = 1
+                )
+            )
+            underTest.moveNode(
+                nodeHandle = selectedNode,
+                newParentHandle = newParentNode,
+            )
+            advanceUntilIdle()
+            underTest.onSnackbarMessage().observeOnce {
+                assertThat(it).isEqualTo(R.string.context_no_moved)
+            }
+        }
+
+    @Test
+    internal fun `test that onExceptionThrown is triggered when move failed`() =
+        runTest {
+            val selectedNode = 73248538798194
+            val newParentNode = 158401030174851
+            val runtimeException = RuntimeException("Move node failed")
+            whenever(
+                checkNodesNameCollisionWithActionUseCase(
+                    nodes = mapOf(selectedNode to newParentNode),
+                    type = NodeNameCollisionType.MOVE,
+                )
+            ).thenThrow(runtimeException)
+
+            underTest.moveNode(
+                nodeHandle = selectedNode,
+                newParentHandle = newParentNode,
+            )
+            advanceUntilIdle()
+
+            underTest.onExceptionThrown().test().assertValue(runtimeException)
+        }
+
+    @Test
+    internal fun `test that copy complete snack bar message is shown when chat node is imported to different directory`() =
+        runTest {
+            val newParentNode = NodeId(158401030174851)
+            whenever(
+                checkChatNodesNameCollisionAndCopyUseCase(
+                    chatId = expectedChatId,
+                    messageIds = listOf(expectedMessageId),
+                    newNodeParent = newParentNode,
+                )
+            ) doReturn NodeNameCollisionWithActionResult(
+                collisionResult = mock(),
+                moveRequestResult = MoveRequestResult.GeneralMovement(
+                    count = 1,
+                    errorCount = 0
+                )
+            )
+            underTest.importChatNode(newParentNode)
+            advanceUntilIdle()
+            underTest.onSnackbarMessage().observeOnce {
+                assertThat(it).isEqualTo(R.string.context_correctly_copied)
+            }
+        }
+
+    @Test
+    internal fun `test that copy error snack bar message is shown when chat node is not imported to different directory`() =
+        runTest {
+            val newParentNode = NodeId(158401030174851)
+            whenever(
+                checkChatNodesNameCollisionAndCopyUseCase(
+                    chatId = expectedChatId,
+                    messageIds = listOf(expectedMessageId),
+                    newNodeParent = newParentNode,
+                )
+            ) doReturn NodeNameCollisionWithActionResult(
+                collisionResult = mock(),
+                moveRequestResult = MoveRequestResult.GeneralMovement(
+                    count = 1,
+                    errorCount = 1
+                )
+            )
+            underTest.importChatNode(newParentNode)
+            advanceUntilIdle()
+            underTest.onSnackbarMessage().observeOnce {
+                assertThat(it).isEqualTo(R.string.context_no_copied)
+            }
+        }
+
+    @Test
+    internal fun `test that onExceptionThrown is triggered when import failed`() =
+        runTest {
+            val newParentNode = NodeId(158401030174851)
+
+            val runtimeException = RuntimeException("Import node failed")
+            whenever(
+                checkChatNodesNameCollisionAndCopyUseCase(
+                    chatId = expectedChatId,
+                    messageIds = listOf(expectedMessageId),
+                    newNodeParent = newParentNode,
+                )
+            ).thenThrow(runtimeException)
+
+            underTest.importChatNode(newParentNode)
+            advanceUntilIdle()
+
+            underTest.onExceptionThrown().observeOnce {
+                assertThat(it).isEqualTo(runtimeException)
+            }
+        }
+
+    @Test
+    internal fun `test that snackbar message is shown when chat file is already available offline`() =
+        runTest {
+            val chatFile = mock<ChatDefaultFile>()
+            whenever(getChatFileUseCase(expectedChatId, expectedMessageId)).thenReturn(chatFile)
+            whenever(isAvailableOfflineUseCase(chatFile)).thenReturn(true)
+
+            underTest.saveChatNodeToOffline()
+            advanceUntilIdle()
+
+            underTest.onSnackbarMessage().test().assertValue(R.string.file_already_exists)
+        }
+
+    @Test
+    internal fun `test that startChatFileOfflineDownload event is triggered when chat file is not available offline`() =
+        runTest {
+            val chatFile = mock<ChatDefaultFile>()
+            whenever(getChatFileUseCase(expectedChatId, expectedMessageId)).thenReturn(chatFile)
+            whenever(isAvailableOfflineUseCase(chatFile)).thenReturn(false)
+
+            underTest.saveChatNodeToOffline()
+            advanceUntilIdle()
+
+            underTest.onStartChatFileOfflineDownload().test().assertValue(chatFile)
+        }
+
+    @Test
+    internal fun `test that exception is handled correctly when chat file is not found`() =
+        runTest {
+            whenever(getChatFileUseCase(expectedChatId, expectedMessageId)).thenReturn(null)
+
+            underTest.saveChatNodeToOffline()
+            advanceUntilIdle()
+
+            underTest.onExceptionThrown().test().assertValue {
+                it is IllegalStateException
+            }
+        }
+
+    @ParameterizedTest(name = "action is {0}")
+    @MethodSource("provideMenuActions")
+    fun `test clickedMenuAction is updated correctly when action is not VideoPlayerDownloadAction`(
+        action: VideoPlayerMenuAction,
+    ) = runTest {
+        underTest.updateClickedMenuAction(action)
+        underTest.uiState.test {
+            val actual = awaitItem()
+            assertThat(actual.clickedMenuAction).isEqualTo(action)
+            cancelAndConsumeRemainingEvents()
+        }
+    }
+
+    private fun provideMenuActions() = listOf(
+        VideoPlayerFileInfoAction,
+        VideoPlayerChatImportAction,
+        VideoPlayerSendToChatAction,
+        VideoPlayerSaveForOfflineAction,
+        VideoPlayerHideAction,
+        VideoPlayerUnhideAction,
+        VideoPlayerMoveAction,
+        VideoPlayerCopyAction,
+        VideoPlayerRemoveAction,
+        VideoPlayerRubbishBinAction,
+        VideoPlayerAddToAction,
+    )
+
+    @Test
+    fun `test disableExportUseCase is invoked correctly`() = runTest {
+        underTest.removeLink()
+        verify(disableExportUseCase).invoke(any())
+    }
+
+    @Test
+    fun `test isNodeComesFromIncoming is return true`() = runTest {
+        whenever(isNodeInRubbishBinUseCase(any())).thenReturn(true)
+        whenever(isNodeInCloudDriveUseCase(any())).thenReturn(true)
+        whenever(isNodeInBackupsNodeUseCase(any())).thenReturn(true)
+        assertThat(underTest.isNodeComesFromIncoming()).isTrue()
+    }
+
+    @ParameterizedTest(name = "when hide is {0}")
+    @ValueSource(booleans = [true, false])
+    fun `test updateNodeSensitiveUseCase is invoked correctly`(hide: Boolean) = runTest {
+        val testNodeIds = listOf(NodeId(1L))
+        underTest.hideOrUnhideNodes(testNodeIds, hide)
+        verify(updateNodeSensitiveUseCase).invoke(testNodeIds.first(), hide)
+    }
+
+    @Test
+    fun `test deleteMessageFromChatUseCase is invoked correctly`() = runTest {
+        underTest.deleteMessageFromChat()
+        verify(deleteNodeAttachmentMessageByIdsUseCase).invoke(any(), any())
+    }
+
+    @ParameterizedTest(name = "when launchSources is {0}")
+    @ValueSource(ints = [FROM_CHAT, FILE_LINK_ADAPTER, FOLDER_LINK_ADAPTER, FROM_ALBUM_SHARING, FILE_BROWSER_ADAPTER])
+    fun `test downloadEvent is updated correctly`(
+        launchSource: Int,
+    ) = runTest {
+        savedStateHandle[INTENT_EXTRA_KEY_ADAPTER_TYPE] = launchSource
+        when (launchSource) {
+            FROM_CHAT -> whenever(
+                getChatFileUseCase(any(), any(), any())
+            ).thenReturn(mock<ChatDefaultFile>())
+
+
+            FILE_LINK_ADAPTER -> {
+                savedStateHandle[EXTRA_SERIALIZE_STRING] = "test"
+                whenever(getPublicNodeFromSerializedDataUseCase(any())).thenReturn(mock<PublicLinkFile>())
+            }
+
+            FOLDER_LINK_ADAPTER ->
+                whenever(getPublicChildNodeFromIdUseCase(any())).thenReturn(mock<PublicLinkFile>())
+
+            FROM_ALBUM_SHARING -> {
+                whenever(getPublicAlbumNodeDataUseCase(any())).thenReturn("test")
+                whenever(getPublicNodeFromSerializedDataUseCase(any())).thenReturn(mock<PublicLinkFile>())
+            }
+
+            else -> whenever(getVideoNodeByHandleUseCase(any(), any())).thenReturn(mock())
+        }
+
+        underTest.updateClickedMenuAction(VideoPlayerDownloadAction)
+        advanceUntilIdle()
+        underTest.uiState.test {
+            assertThat(analyticsExtension.events.first()).isInstanceOf(
+                VideoPlayerSaveToDeviceMenuToolbarEvent::class.java
+            )
+            val actual = awaitItem()
+            assertThat(actual.downloadEvent.triggeredContent()).isInstanceOf(
+                DownloadTriggerEvent::class.java
+            )
+        }
+    }
+
+    @ParameterizedTest(name = "when launchSources is {0} and ClickedMenuAction is {1}")
+    @MethodSource("provideMenuClickTestParams")
+    fun `test menuOptionClickedContent is updated correctly`(
+        launchSource: Int,
+        action: VideoPlayerMenuAction,
+    ) = runTest {
+        savedStateHandle[INTENT_EXTRA_KEY_ADAPTER_TYPE] = launchSource
+        val testFileLink = "testFileLink"
+        savedStateHandle[URL_FILE_LINK] = testFileLink
+        whenever(getVideoNodeByHandleUseCase(any(), any())).thenReturn(mock())
+        underTest.updateClickedMenuAction(action)
+        advanceUntilIdle()
+        underTest.uiState.test {
+            if (action != VideoPlayerRenameAction) {
+                assertThat(analyticsExtension.events.first()).isInstanceOf(
+                    when (action) {
+                        VideoPlayerShareAction -> VideoPlayerShareMenuToolbarEvent::class.java
+                        VideoPlayerGetLinkAction -> VideoPlayerGetLinkMenuToolbarEvent::class.java
+                        VideoPlayerRemoveLinkAction -> VideoPlayerRemoveLinkMenuToolbarEvent::class.java
+                        else -> null
+                    }
+                )
+            }
+            val actual = awaitItem()
+            assertThat(actual.menuOptionClickedContent).isInstanceOf(
+                when (action) {
+                    VideoPlayerShareAction -> {
+                        if (launchSource == FILE_LINK_ADAPTER) {
+                            MenuOptionClickedContent.ShareLink::class.java
+                        } else {
+                            MenuOptionClickedContent.ShareNode::class.java
+                        }
+                    }
+
+                    VideoPlayerGetLinkAction -> MenuOptionClickedContent.GetLink::class.java
+                    VideoPlayerRemoveLinkAction -> MenuOptionClickedContent.RemoveLink::class.java
+                    else -> MenuOptionClickedContent.Rename::class.java
+                }
+            )
+            underTest.clearMenuOptionClickedContent()
+            assertThat(awaitItem().menuOptionClickedContent).isNull()
+        }
+    }
+
+    private fun provideMenuClickTestParams() = listOf(
+        Arguments.of(FILE_LINK_ADAPTER, VideoPlayerShareAction),
+        Arguments.of(FILE_BROWSER_ADAPTER, VideoPlayerShareAction),
+        Arguments.of(FILE_BROWSER_ADAPTER, VideoPlayerGetLinkAction),
+        Arguments.of(FILE_BROWSER_ADAPTER, VideoPlayerRemoveLinkAction),
+        Arguments.of(FILE_BROWSER_ADAPTER, VideoPlayerRenameAction),
+    )
+
+    companion object {
+        @JvmField
+        @RegisterExtension
+        val analyticsExtension = AnalyticsTestExtension()
     }
 }
