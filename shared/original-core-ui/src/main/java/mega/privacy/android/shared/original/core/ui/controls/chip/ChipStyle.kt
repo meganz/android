@@ -13,6 +13,8 @@ import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import mega.privacy.android.shared.original.core.ui.theme.MegaOriginalTheme
+import mega.privacy.android.shared.original.core.ui.theme.extensions.body4
+import mega.privacy.android.shared.original.core.ui.theme.extensions.body4Bold
 import mega.privacy.android.shared.original.core.ui.theme.extensions.subtitle2medium
 
 
@@ -162,4 +164,80 @@ data object TagChipStyle : ChipStyle {
     override fun shape(): Shape = RoundedCornerShape(4.dp)
 
     override fun height() = 24.dp
+}
+
+/**
+ * Notification chip style
+ */
+sealed class NotificationChipStyle : ChipStyle {
+
+    override fun shape(): Shape = RoundedCornerShape(12.dp)
+
+    override fun height() = 24.dp
+
+    @Composable
+    internal abstract fun backgroundColor(): Color
+
+    @Composable
+    internal abstract fun foregroundColor(): Color
+
+    @OptIn(ExperimentalMaterialApi::class)
+    @Composable
+    override fun selectableChipColors(): SelectableChipColors {
+        val backgroundColor = backgroundColor()
+        val foregroundColor = foregroundColor()
+        return ChipDefaults.filterChipColors(
+            selectedBackgroundColor = backgroundColor,
+            backgroundColor = backgroundColor,
+            disabledBackgroundColor = backgroundColor,
+            selectedContentColor = foregroundColor,
+            selectedLeadingIconColor = foregroundColor,
+            contentColor = foregroundColor,
+            leadingIconColor = foregroundColor,
+            disabledContentColor = foregroundColor,
+            disabledLeadingIconColor = foregroundColor,
+        )
+    }
+
+    /**
+     * Success notification chip style
+     */
+    data object Success : NotificationChipStyle() {
+        @Composable
+        override fun backgroundColor() = MegaOriginalTheme.colors.notifications.notificationSuccess
+
+        @Composable
+        override fun foregroundColor() = MegaOriginalTheme.colors.text.success
+
+        @Composable
+        override fun typography(): TextStyle = MaterialTheme.typography.body4
+    }
+
+    /**
+     * Info notification chip style
+     */
+    data object Info : NotificationChipStyle() {
+        @Composable
+        override fun backgroundColor() = MegaOriginalTheme.colors.notifications.notificationInfo
+
+        @Composable
+        override fun foregroundColor() = MegaOriginalTheme.colors.text.info
+
+        @Composable
+        override fun typography(): TextStyle = MaterialTheme.typography.body4Bold
+    }
+
+    /**
+     * Info notification chip style
+     */
+    data object Warning : NotificationChipStyle() {
+        @Composable
+        override fun backgroundColor() = MegaOriginalTheme.colors.notifications.notificationWarning
+
+        @Composable
+        override fun foregroundColor() = MegaOriginalTheme.colors.text.warning
+
+        @Composable
+        override fun typography(): TextStyle = MaterialTheme.typography.body4Bold
+    }
 }

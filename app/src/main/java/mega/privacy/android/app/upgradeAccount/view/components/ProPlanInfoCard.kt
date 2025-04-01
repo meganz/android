@@ -45,6 +45,8 @@ import mega.privacy.android.shared.original.core.ui.theme.extensions.grey_alpha_
 import mega.privacy.android.shared.original.core.ui.theme.extensions.h6Medium
 import mega.privacy.android.shared.original.core.ui.theme.extensions.subtitle1medium
 import mega.android.core.ui.theme.values.TextColor
+import mega.privacy.android.shared.original.core.ui.controls.chip.MegaChip
+import mega.privacy.android.shared.original.core.ui.controls.chip.NotificationChipStyle
 import java.util.Locale
 
 
@@ -141,15 +143,11 @@ internal fun ProPlanInfoCard(
                     ),
                 )
                 if (showCurrentPlanLabel) {
-                    MegaText(
+                    MegaChip(
+                        selected = true,
                         text = stringResource(id = R.string.account_upgrade_account_pro_plan_info_current_plan_label),
-                        textColor = TextColor.Primary,
-                        style = MaterialTheme.typography.caption.copy(fontWeight = FontWeight(600)),
+                        style = NotificationChipStyle.Warning,
                         modifier = Modifier
-                            .background(
-                                color = MaterialTheme.colors.grey_050_grey_800,
-                                shape = RoundedCornerShape(8.dp)
-                            )
                             .align(Alignment.CenterVertically)
                             .padding(
                                 horizontal = 8.dp, vertical = 4.dp
@@ -158,15 +156,11 @@ internal fun ProPlanInfoCard(
                     )
                 }
                 if (isRecommended) {
-                    MegaText(
+                    MegaChip(
+                        selected = true,
                         text = stringResource(id = R.string.account_upgrade_account_pro_plan_info_recommended_label),
-                        textColor = TextColor.Inverse,
-                        style = MaterialTheme.typography.caption.copy(fontWeight = FontWeight(600)),
+                        style = NotificationChipStyle.Info,
                         modifier = Modifier
-                            .background(
-                                color = MaterialTheme.colors.accent_900_accent_050,
-                                shape = RoundedCornerShape(8.dp)
-                            )
                             .align(Alignment.CenterVertically)
                             .padding(
                                 horizontal = 8.dp, vertical = 4.dp
@@ -260,7 +254,7 @@ internal fun ProPlanInfoCard(
 
 @CombinedThemePreviews
 @Composable
-fun ProPlanInfoCardPreview() {
+private fun ProPlanInfoCardPreview() {
     val localisedPriceStringMapper = LocalisedPriceStringMapper()
     val localisedPriceCurrencyCodeStringMapper = LocalisedPriceCurrencyCodeStringMapper()
     val formattedSizeMapper = FormattedSizeMapper()
@@ -284,7 +278,7 @@ fun ProPlanInfoCardPreview() {
             subscription = subscriptionProI,
             baseStorageFormatted = "20 GB",
             isRecommended = true,
-            onPlanClicked = { /*TODO*/ },
+            onPlanClicked = { },
             isMonthly = true,
             isClicked = false,
             showCurrentPlanLabel = false,
@@ -295,7 +289,7 @@ fun ProPlanInfoCardPreview() {
 
 @CombinedThemePreviews
 @Composable
-fun FreePlanInfoCardPreview() {
+private fun FreePlanInfoCardPreview() {
     val localisedPriceStringMapper = LocalisedPriceStringMapper()
     val localisedPriceCurrencyCodeStringMapper = LocalisedPriceCurrencyCodeStringMapper()
     val formattedSizeMapper = FormattedSizeMapper()
@@ -319,10 +313,10 @@ fun FreePlanInfoCardPreview() {
             subscription = subscriptionProI,
             baseStorageFormatted = "20 GB",
             isRecommended = false,
-            onPlanClicked = { /*TODO*/ },
+            onPlanClicked = { },
             isMonthly = true,
             isClicked = false,
-            showCurrentPlanLabel = false,
+            showCurrentPlanLabel = true,
             testTag = "upgrade_account_screen:card_pro_plan_",
         )
     }

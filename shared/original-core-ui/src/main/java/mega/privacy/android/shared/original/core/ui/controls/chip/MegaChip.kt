@@ -284,7 +284,10 @@ private class ChipStyleProvider : PreviewParameterProvider<Pair<ChipStyle, Strin
         DefaultChipStyle to "Default",
         TransparentChipStyle to "Transparent",
         RoundedChipStyle to "Rounded",
-        TagChipStyle to "Tag"
+        TagChipStyle to "Tag",
+        NotificationChipStyle.Success to "Notification.Success",
+        NotificationChipStyle.Info to "Notification.Info",
+        NotificationChipStyle.Warning to "Notification.Warning",
     ).asSequence()
 }
 

@@ -29,7 +29,6 @@ import androidx.compose.material.FabPosition
 import androidx.compose.material.FloatingActionButton
 import androidx.compose.material.IconButton
 import androidx.compose.material.MaterialTheme
-import androidx.compose.material.Scaffold
 import androidx.compose.material.Text
 import androidx.compose.material.rememberScaffoldState
 import androidx.compose.runtime.Composable
@@ -94,6 +93,7 @@ import mega.privacy.android.shared.original.core.ui.theme.extensions.accent_900_
 import mega.privacy.android.shared.original.core.ui.theme.extensions.yellow_100_yellow_700_alpha_015
 import mega.privacy.android.shared.original.core.ui.theme.subtitle1
 import mega.android.core.ui.theme.values.TextColor
+import mega.privacy.android.shared.original.core.ui.controls.layouts.MegaScaffold
 import mega.privacy.android.shared.original.core.ui.utils.showAutoDurationSnackbar
 
 /**
@@ -127,7 +127,7 @@ fun UpgradeAccountView(
     var hideFloatButton by rememberSaveable { mutableStateOf(false) }
     val context = LocalContext.current
 
-    Scaffold(
+    MegaScaffold(
         modifier = Modifier.systemBarsPadding(),
         scaffoldState = scaffoldState,
         topBar = {
@@ -177,15 +177,15 @@ fun UpgradeAccountView(
                 WarningBanner(hideBillingWarning = hideBillingWarning)
             }
 
-            Text(
+            MegaText(
                 text = stringResource(id = R.string.account_upgrade_account_title_choose_right_plan),
-                style = subtitle1,
+                textColor = TextColor.Primary,
+                style = subtitle1.copy(fontWeight = FontWeight.Medium),
                 modifier = Modifier.padding(
                     start = 24.dp,
                     top = 8.dp,
                     bottom = 24.dp
                 ),
-                fontWeight = FontWeight.Medium,
             )
             MonthlyYearlyTabs(
                 isMonthly = isMonthly,
@@ -299,7 +299,7 @@ fun UpgradeAccountView(
 }
 
 @Composable
-fun WarningBanner(hideBillingWarning: () -> Unit, ) {
+fun WarningBanner(hideBillingWarning: () -> Unit) {
     Box(
         modifier = Modifier
             .fillMaxWidth()

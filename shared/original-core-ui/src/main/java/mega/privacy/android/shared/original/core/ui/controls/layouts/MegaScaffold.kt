@@ -29,6 +29,7 @@ import androidx.compose.foundation.lazy.grid.LazyGridState
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.AppBarDefaults
+import androidx.compose.material.FabPosition
 import androidx.compose.material.Scaffold
 import androidx.compose.material.ScaffoldDefaults
 import androidx.compose.material.ScaffoldState
@@ -73,6 +74,7 @@ import mega.privacy.android.shared.original.core.ui.utils.accumulateDirectionalS
  * @param topBar TopBar, the elevation will be updated if the content is scrolled and the content state is set as [scrollableContentState]
  * @param bottomBar BottomBar
  * @param floatingActionButton FloatingActionButton
+ * @param floatingActionButtonPosition FabPosition
  * @param scrollableContentState [ScrollableState] of the content. It will be used to set the [topBar] elevation and to hide the [floatingActionButton] in case [hideFloatingActionButtonOnScrollUp] is true
  * @param scrollableContentIsReversed set to true if the scrollable content associated to [scrollableContentState] is reversed to set the elevation for [topBar] correctly
  * @param shouldAddSnackBarPadding if true, the snackbar will have padding to avoid overlapping with the bottom bar
@@ -92,6 +94,7 @@ fun MegaScaffold(
     topBar: @Composable () -> Unit = {},
     bottomBar: @Composable () -> Unit = {},
     floatingActionButton: @Composable () -> Unit = {},
+    floatingActionButtonPosition: FabPosition = FabPosition.End,
     scrollableContentState: ScrollableState? = null,
     scrollableContentIsReversed: Boolean = false,
     shouldAddSnackBarPadding: Boolean = true,
@@ -152,6 +155,7 @@ fun MegaScaffold(
                         floatingActionButton()
                     }
                 },
+                floatingActionButtonPosition = floatingActionButtonPosition,
                 blurContent = blurContent,
                 content = content,
             )
@@ -165,6 +169,7 @@ fun MegaScaffold(
                 bottomBar = bottomBar,
                 shouldAddSnackBarPadding = shouldAddSnackBarPadding,
                 floatingActionButton = floatingActionButton,
+                floatingActionButtonPosition = floatingActionButtonPosition,
                 blurContent = blurContent,
                 content = content
             )
@@ -178,10 +183,11 @@ private fun MegaScaffold(
     modifier: Modifier = Modifier,
     scaffoldState: ScaffoldState = rememberScaffoldState(),
     contentWindowInsets: WindowInsets = ScaffoldDefaults.contentWindowInsets,
-    backgroundAlpha: Float,
+    backgroundAlpha: Float = DefaultAlpha,
     topBar: @Composable () -> Unit = {},
     bottomBar: @Composable () -> Unit = {},
     floatingActionButton: @Composable () -> Unit = {},
+    floatingActionButtonPosition: FabPosition = FabPosition.End,
     blurContent: (() -> Unit)? = null,
     shouldAddSnackBarPadding: Boolean = true,
     content: @Composable (PaddingValues) -> Unit,
@@ -213,6 +219,7 @@ private fun MegaScaffold(
                 }
             },
             floatingActionButton = floatingActionButton,
+            floatingActionButtonPosition = floatingActionButtonPosition,
             backgroundColor = MegaOriginalTheme.colors.background.pageBackground.copy(
                 alpha = backgroundAlpha
             ),
