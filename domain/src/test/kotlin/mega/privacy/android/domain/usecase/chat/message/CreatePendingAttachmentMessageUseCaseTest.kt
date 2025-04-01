@@ -8,8 +8,11 @@ import mega.privacy.android.domain.entity.chat.PendingMessage
 import mega.privacy.android.domain.entity.chat.PendingMessageState
 import mega.privacy.android.domain.entity.chat.messages.PendingFileAttachmentMessage
 import mega.privacy.android.domain.entity.chat.messages.PendingVoiceClipMessage
+import mega.privacy.android.domain.entity.uri.UriPath
 import mega.privacy.android.domain.repository.FileSystemRepository
 import mega.privacy.android.domain.usecase.contact.GetMyUserHandleUseCase
+import mega.privacy.android.domain.usecase.file.FileResult
+import mega.privacy.android.domain.usecase.file.GetFileSizeFromUriPathUseCase
 import org.junit.jupiter.api.AfterEach
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.TestInstance
@@ -19,7 +22,6 @@ import org.mockito.kotlin.doReturn
 import org.mockito.kotlin.mock
 import org.mockito.kotlin.reset
 import org.mockito.kotlin.whenever
-import java.io.File
 
 @TestInstance(TestInstance.Lifecycle.PER_CLASS)
 class CreatePendingAttachmentMessageUseCaseTest {
@@ -27,12 +29,14 @@ class CreatePendingAttachmentMessageUseCaseTest {
 
     private val getMyUserHandleUseCase = mock<GetMyUserHandleUseCase>()
     private val fileSystemRepository = mock<FileSystemRepository>()
+    private val getFileSizeFromUriPathUseCase = mock<GetFileSizeFromUriPathUseCase>()
 
     @BeforeEach
     internal fun setUp() {
         underTest = CreatePendingAttachmentMessageUseCase(
             getMyUserHandleUseCase,
             fileSystemRepository,
+            getFileSizeFromUriPathUseCase,
         )
     }
 
@@ -53,21 +57,24 @@ class CreatePendingAttachmentMessageUseCaseTest {
         val msgId = 87L
         val time = 72834578L
         val userHandle = 245L
-        val filePath = "filepath"
         val fileName = "fileName"
+        val fileUri = "content://path/$fileName"
+        val uriPath = UriPath(fileUri)
         val transferUniqueId = 344L
         val fileTypeInfo = mock<UnknownFileTypeInfo>()
         val fileSize = 89475L
+
+        whenever(getFileSizeFromUriPathUseCase(uriPath)) doReturn FileResult(fileSize)
         whenever(getMyUserHandleUseCase()).thenReturn(userHandle)
-        whenever(fileSystemRepository.getFileTypeInfo(File(filePath))) doReturn fileTypeInfo
-        whenever(fileSystemRepository.getTotalSize(File(filePath))) doReturn fileSize
+        whenever(fileSystemRepository.getFileNameFromUri(fileUri)) doReturn fileName
+        whenever(fileSystemRepository.getFileTypeInfo(uriPath, fileName)) doReturn fileTypeInfo
         val pendingMessage = PendingMessage(
             id = msgId,
             chatId = chatId,
             transferUniqueId = transferUniqueId,
             uploadTimestamp = time,
             state = state.value,
-            filePath = filePath,
+            filePath = fileUri,
             name = fileName,
         )
         val expected = PendingFileAttachmentMessage(
@@ -81,7 +88,7 @@ class CreatePendingAttachmentMessageUseCaseTest {
             reactions = emptyList(),
             status = getChatMessageStatus(state),
             content = null,
-            filePath = filePath,
+            filePath = fileUri,
             fileType = fileTypeInfo,
             nodeId = null,
             state = state,
@@ -101,12 +108,14 @@ class CreatePendingAttachmentMessageUseCaseTest {
         val msgId = 87L
         val time = 72834578L
         val userHandle = 245L
-        val filePath = "filepath"
+        val fileName = "fileName"
+        val fileUri = "content://path/$fileName"
+        val uriPath = UriPath(fileUri)
         val transferUniqueId = 344L
         val fileTypeInfo = mock<UnknownFileTypeInfo>()
-        val fileName = "fileName"
         whenever(getMyUserHandleUseCase()).thenReturn(userHandle)
-        whenever(fileSystemRepository.getFileTypeInfo(File(filePath)))
+        whenever(fileSystemRepository.getFileNameFromUri(fileUri)) doReturn fileName
+        whenever(fileSystemRepository.getFileTypeInfo(uriPath, fileName))
             .thenReturn(fileTypeInfo)
         val pendingMessage = PendingMessage(
             id = msgId,
@@ -114,7 +123,7 @@ class CreatePendingAttachmentMessageUseCaseTest {
             transferUniqueId = transferUniqueId,
             uploadTimestamp = time,
             state = state.value,
-            filePath = filePath,
+            filePath = fileUri,
             type = PendingMessage.TYPE_VOICE_CLIP,
             name = fileName,
         )
@@ -132,7 +141,7 @@ class CreatePendingAttachmentMessageUseCaseTest {
             fileType = fileTypeInfo,
             nodeId = null,
             state = state,
-            filePath = filePath,
+            filePath = fileUri,
             fileName = fileName,
         )
         val actual = underTest(pendingMessage)

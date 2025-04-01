@@ -7,9 +7,11 @@ import mega.privacy.android.domain.entity.chat.PendingMessageState
 import mega.privacy.android.domain.entity.chat.messages.PendingFileAttachmentMessage
 import mega.privacy.android.domain.entity.chat.messages.PendingVoiceClipMessage
 import mega.privacy.android.domain.entity.node.NodeId
+import mega.privacy.android.domain.entity.uri.UriPath
 import mega.privacy.android.domain.repository.FileSystemRepository
 import mega.privacy.android.domain.usecase.contact.GetMyUserHandleUseCase
-import java.io.File
+import mega.privacy.android.domain.usecase.file.FileResult
+import mega.privacy.android.domain.usecase.file.GetFileSizeFromUriPathUseCase
 import javax.inject.Inject
 
 
@@ -19,13 +21,19 @@ import javax.inject.Inject
 class CreatePendingAttachmentMessageUseCase @Inject constructor(
     private val getMyUserHandleUseCase: GetMyUserHandleUseCase,
     private val fileSystemRepository: FileSystemRepository,
+    private val getFileSizeFromUriPathUseCase: GetFileSizeFromUriPathUseCase,
 ) {
 
     /**
      * Invoke
      */
     suspend operator fun invoke(pendingMessage: PendingMessage) = with(pendingMessage) {
-        val file = File(filePath)
+        val uriPath = UriPath(filePath)
+        val fileName = when {
+            uriPath.isPath() -> fileSystemRepository.getFileByPath(uriPath.value)?.name
+            else -> fileSystemRepository.getFileNameFromUri(uriPath.value)
+        } ?: ""
+        val fileTypeInfo = fileSystemRepository.getFileTypeInfo(uriPath, fileName)
         if (isVoiceClip) {
             PendingVoiceClipMessage(
                 chatId = chatId,
@@ -38,14 +46,15 @@ class CreatePendingAttachmentMessageUseCase @Inject constructor(
                 status = this.getChatMessageStatus(),
                 content = null,
                 filePath = filePath,
-                fileType = fileSystemRepository.getFileTypeInfo(file),
+                fileType = fileTypeInfo,
                 transferUniqueId = transferUniqueId.takeIf { it != UNKNOWN_TRANSFER_ID },
                 state = PendingMessageState.entries.firstOrNull { it.value == state }
                     ?: PendingMessageState.PREPARING,
                 nodeId = nodeHandle.takeIf { it != -1L }?.let { NodeId(it) },
-                fileName = name ?: file.name,
+                fileName = name ?: fileName,
             )
         } else {
+            val size = (getFileSizeFromUriPathUseCase(uriPath) as? FileResult)?.sizeInBytes ?: 0L
             PendingFileAttachmentMessage(
                 chatId = chatId,
                 msgId = id,
@@ -57,13 +66,13 @@ class CreatePendingAttachmentMessageUseCase @Inject constructor(
                 status = this.getChatMessageStatus(),
                 content = null,
                 filePath = filePath,
-                fileType = fileSystemRepository.getFileTypeInfo(file),
+                fileType = fileTypeInfo,
                 transferUniqueId = transferUniqueId.takeIf { it != UNKNOWN_TRANSFER_ID },
                 state = PendingMessageState.entries.firstOrNull { it.value == state }
                     ?: PendingMessageState.PREPARING,
                 nodeId = nodeHandle.takeIf { it != -1L }?.let { NodeId(it) },
-                fileSize = fileSystemRepository.getTotalSize(file),
-                fileName = name ?: file.name,
+                fileSize = size,
+                fileName = name ?: fileName,
             )
         }
     }

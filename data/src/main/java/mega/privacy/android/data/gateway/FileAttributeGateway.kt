@@ -50,5 +50,5 @@ interface FileAttributeGateway {
     /**
      * Get the video duration of this file or null if it's not a Video or duration can be known
      */
-    suspend fun getVideoDuration(filePath: String): Duration?
+    suspend fun getVideoDuration(filePathOrUri: String): Duration?
 }

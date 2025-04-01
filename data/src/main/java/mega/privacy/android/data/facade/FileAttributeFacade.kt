@@ -76,10 +76,10 @@ internal class FileAttributeFacade @Inject constructor(
         }
     }
 
-    override suspend fun getVideoDuration(filePath: String): Duration? =
+    override suspend fun getVideoDuration(filePathOrUri: String): Duration? =
         runCatching {
             val retriever = MediaMetadataRetriever()
-            retriever.setDataSource(filePath)
+            retriever.setDataSource(filePathOrUri)
             val duration = retriever.extractMetadata(MediaMetadataRetriever.METADATA_KEY_DURATION)
                 ?.toLongOrNull()?.milliseconds
             retriever.release()

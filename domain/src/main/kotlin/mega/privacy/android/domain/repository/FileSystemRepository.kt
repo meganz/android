@@ -355,6 +355,11 @@ interface FileSystemRepository {
     suspend fun getFileTypeInfo(file: File): FileTypeInfo
 
     /**
+     * Get file type info for a given UriPath and file name
+     */
+    suspend fun getFileTypeInfo(uriPath: UriPath, fileName: String): FileTypeInfo
+
+    /**
      * Delete file by uri
      *
      * @param uri

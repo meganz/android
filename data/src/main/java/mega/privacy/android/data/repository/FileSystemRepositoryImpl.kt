@@ -400,6 +400,12 @@ internal class FileSystemRepositoryImpl @Inject constructor(
             fileTypeInfoMapper(file.name, duration?.inWholeSeconds?.toInt() ?: 0)
         }
 
+    override suspend fun getFileTypeInfo(uriPath: UriPath, fileName: String) =
+        withContext(ioDispatcher) {
+            val duration = fileAttributeGateway.getVideoDuration(uriPath.value)
+            fileTypeInfoMapper(fileName, duration?.inWholeSeconds?.toInt() ?: 0)
+        }
+
     override suspend fun deleteFileByUri(uri: String): Boolean = withContext(ioDispatcher) {
         fileGateway.deleteFileByUri(Uri.parse(uri))
     }

@@ -439,6 +439,21 @@ internal class FileSystemRepositoryImplTest {
     }
 
     @Test
+    fun `test that fileTypeInfo gets the duration from file attribute gateway when using an Uri path`() =
+        runTest {
+            val fileName = "video.mp4"
+            val fileUri = "content://$fileName"
+            val uriPath = UriPath(fileUri)
+            val duration = 4567.milliseconds
+            whenever(mimeTypeMapper(any())).thenReturn("mime")
+            whenever(fileAttributeGateway.getVideoDuration(uriPath.value)) doReturn duration
+            underTest.getFileTypeInfo(uriPath, fileName)
+            val argumentCaptor = argumentCaptor<String>()
+            verify(fileAttributeGateway).getVideoDuration(argumentCaptor.capture())
+            assertThat(argumentCaptor.firstValue).isEqualTo(fileUri)
+        }
+
+    @Test
     fun `test that getLocalFile invokes gateway method`() = runTest {
         val file = mock<File>()
         val fileNode = mock<TypedFileNode> {
