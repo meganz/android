@@ -301,6 +301,11 @@ interface FileGateway {
     suspend fun isFilePath(path: String): Boolean
 
     /**
+     * @return true if the [path] represents a folder
+     */
+    suspend fun isFolderPath(path: String): Boolean
+
+    /**
      * Get the file represented by [uriString]
      *
      * @param uriString must be a file uri (file://...)

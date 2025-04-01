@@ -584,4 +584,13 @@ internal class FileSystemRepositoryImplTest {
 
         assertThat(underTest.canReadUri(uri)).isEqualTo(canRead)
     }
+
+    @ParameterizedTest
+    @ValueSource(booleans = [true, false])
+    fun `test that isFolderPath returns the gateway value`(expected: Boolean) = runTest {
+        val path = "foo"
+        whenever(fileGateway.isFolderPath(path)) doReturn expected
+
+        assertThat(underTest.isFolderPath(path)).isEqualTo(expected)
+    }
 }

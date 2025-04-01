@@ -400,6 +400,8 @@ internal class FileFacade @Inject constructor(
 
     override suspend fun isFilePath(path: String) = File(path).isFile
 
+    override suspend fun isFolderPath(path: String) = File(path).isDirectory
+
     override suspend fun getFileFromUriFile(uriString: String): File =
         uriString.toUri().toFile()
 
