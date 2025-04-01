@@ -325,11 +325,21 @@ class NodeActionsViewModel @Inject constructor(
     /**
      * Download node
      * Triggers TransferTriggerEvent.StartDownloadNode with parameter [TypedNode]
+     *
+     * @param withStartMessage  Whether show start message or not.
+     *                          It should be true only if the widget is not visible.
      */
-    fun downloadNode() {
+    fun downloadNode(withStartMessage: Boolean) {
         state.value.selectedNodes.let { nodes ->
             _state.update {
-                it.copy(downloadEvent = triggered(TransferTriggerEvent.StartDownloadNode(nodes)))
+                it.copy(
+                    downloadEvent = triggered(
+                        TransferTriggerEvent.StartDownloadNode(
+                            nodes = nodes,
+                            withStartMessage = withStartMessage,
+                        )
+                    )
+                )
             }
         }
     }
@@ -354,11 +364,21 @@ class NodeActionsViewModel @Inject constructor(
     /**
      * Download node for offline
      * Triggers TransferTriggerEvent.StartDownloadNode with parameter [TypedNode]
+     *
+     * @param withStartMessage  Whether show start message or not.
+     *                          It should be true only if the widget is not visible.
      */
-    fun downloadNodeForOffline() {
+    fun downloadNodeForOffline(withStartMessage: Boolean) {
         state.value.selectedNodes.firstOrNull().let { node ->
             _state.update {
-                it.copy(downloadEvent = triggered(TransferTriggerEvent.StartDownloadForOffline(node)))
+                it.copy(
+                    downloadEvent = triggered(
+                        TransferTriggerEvent.StartDownloadForOffline(
+                            node = node,
+                            withStartMessage = withStartMessage,
+                        )
+                    )
+                )
             }
         }
     }

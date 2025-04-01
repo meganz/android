@@ -742,7 +742,14 @@ class MediaDiscoveryViewModel @Inject constructor(
                 }
             }
             _state.update {
-                it.copy(downloadEvent = triggered(TransferTriggerEvent.StartDownloadNode(nodes)))
+                it.copy(
+                    downloadEvent = triggered(
+                        TransferTriggerEvent.StartDownloadNode(
+                            nodes = nodes,
+                            withStartMessage = true,
+                        )
+                    )
+                )
             }
             clearSelectedPhotos()
         }

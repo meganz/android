@@ -350,7 +350,10 @@ internal class NodeAttachmentHistoryActivity : PasscodeActivity(), MegaChatReque
             viewModel.startChatFileOfflineDownloadEvent, Lifecycle.State.STARTED
         ) { chatFile: ChatFile? ->
             if (chatFile == null) return@collectFlow
-            startDownloadViewModel.onSaveOfflineClicked(chatFile)
+            startDownloadViewModel.onSaveOfflineClicked(
+                chatFile = chatFile,
+                withStartMessage = true,
+            )
             viewModel.onStartChatFileOfflineDownloadEventConsumed()
         }
 
@@ -798,8 +801,9 @@ internal class NodeAttachmentHistoryActivity : PasscodeActivity(), MegaChatReque
                     messageIds.add(megaNodeHandle)
                 }
                 startDownloadViewModel.onDownloadClicked(
-                    chatId,
-                    messageIds
+                    chatId = chatId,
+                    messageIds = messageIds,
+                    withStartMessage = true,
                 )
             } else if (itemId == R.id.chat_cab_menu_import) {
                 clearSelections()

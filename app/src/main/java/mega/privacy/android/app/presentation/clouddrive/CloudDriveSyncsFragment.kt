@@ -765,6 +765,7 @@ class CloudDriveSyncsFragment : Fragment() {
                         highPriority = false,
                         isFolderLink = false,
                         fromChat = false,
+                        withStartMessage = false,
                     )
                     disableSelectMode()
                 }

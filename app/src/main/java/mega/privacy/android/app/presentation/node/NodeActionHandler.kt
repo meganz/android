@@ -138,8 +138,11 @@ class NodeActionHandler(
             is RestoreMenuAction -> restoreFromRubbishLauncher?.launch(longArrayOf(node.id.longValue))
             is SendToChatMenuAction -> sendToChatLauncher?.launch(longArrayOf(node.id.longValue))
             is OpenWithMenuAction -> nodeActionsViewModel.downloadNodeForPreview(true)
-            is DownloadMenuAction -> nodeActionsViewModel.downloadNode()
-            is AvailableOfflineMenuAction -> nodeActionsViewModel.downloadNodeForOffline()
+            is DownloadMenuAction -> nodeActionsViewModel.downloadNode(withStartMessage = false)
+            is AvailableOfflineMenuAction -> nodeActionsViewModel.downloadNodeForOffline(
+                withStartMessage = false
+            )
+
             is HideMenuAction -> {
                 (activity as? AppCompatActivity)?.lifecycleScope?.launch {
                     hiddenNodesOnboardingLauncher?.launch(nodeActionsViewModel.isOnboarding())
@@ -160,8 +163,11 @@ class NodeActionHandler(
         nodeActionsViewModel.updateSelectedNodes(nodes)
         when (action) {
             is OpenWithMenuAction -> nodeActionsViewModel.downloadNodeForPreview(true)
-            is DownloadMenuAction -> nodeActionsViewModel.downloadNode()
-            is AvailableOfflineMenuAction -> nodeActionsViewModel.downloadNodeForOffline()
+            is DownloadMenuAction -> nodeActionsViewModel.downloadNode(withStartMessage = false)
+            is AvailableOfflineMenuAction -> nodeActionsViewModel.downloadNodeForOffline(
+                withStartMessage = false,
+            )
+
             is ShareFolderMenuAction -> {
                 val nodeHandleArray = nodes.map { it.id.longValue }.toLongArray()
                 shareFolderActivityLauncher?.launch(nodeHandleArray)

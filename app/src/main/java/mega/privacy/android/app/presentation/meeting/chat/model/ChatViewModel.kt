@@ -34,6 +34,7 @@ import mega.privacy.android.app.presentation.documentscanner.model.DocumentScann
 import mega.privacy.android.app.presentation.extensions.getErrorStringId
 import mega.privacy.android.app.presentation.extensions.isPast
 import mega.privacy.android.app.presentation.manager.model.ManagerState
+import mega.privacy.android.app.presentation.mapper.GetStringFromStringResMapper
 import mega.privacy.android.app.presentation.meeting.chat.extension.isJoined
 import mega.privacy.android.app.presentation.meeting.chat.mapper.ForwardMessagesResultMapper
 import mega.privacy.android.app.presentation.meeting.chat.mapper.InviteParticipantResultMapper
@@ -144,6 +145,7 @@ import mega.privacy.android.domain.usecase.transfers.paused.PauseTransfersQueueU
 import mega.privacy.android.shared.original.core.ui.controls.chat.VoiceClipRecordEvent
 import mega.privacy.android.shared.original.core.ui.controls.chat.messages.reaction.model.UIReaction
 import mega.privacy.android.shared.original.core.ui.controls.chat.messages.reaction.model.UIReactionUser
+import mega.privacy.android.shared.resources.R as sharedR
 import mega.privacy.mobile.analytics.event.ChatConversationUnmuteMenuToolbarEvent
 import timber.log.Timber
 import java.io.File
@@ -153,8 +155,6 @@ import java.util.Date
 import java.util.Locale
 import java.util.concurrent.TimeUnit
 import javax.inject.Inject
-import mega.privacy.android.shared.resources.R as sharedR
-import mega.privacy.android.app.presentation.mapper.GetStringFromStringResMapper
 
 /**
  * Extra Action
@@ -1552,7 +1552,14 @@ class ChatViewModel @Inject constructor(
      */
     fun onDownloadForOfflineChatNode(file: ChatFile) {
         _state.update {
-            it.copy(downloadEvent = triggered(TransferTriggerEvent.StartDownloadForOffline(file)))
+            it.copy(
+                downloadEvent = triggered(
+                    TransferTriggerEvent.StartDownloadForOffline(
+                        node = file,
+                        withStartMessage = true,
+                    )
+                )
+            )
         }
     }
 
@@ -1563,7 +1570,14 @@ class ChatViewModel @Inject constructor(
      */
     fun onDownloadNode(nodes: List<ChatFile>) {
         _state.update {
-            it.copy(downloadEvent = triggered(TransferTriggerEvent.StartDownloadNode(nodes)))
+            it.copy(
+                downloadEvent = triggered(
+                    TransferTriggerEvent.StartDownloadNode(
+                        nodes = nodes,
+                        withStartMessage = true,
+                    )
+                )
+            )
         }
     }
 

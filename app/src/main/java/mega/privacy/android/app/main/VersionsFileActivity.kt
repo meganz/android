@@ -1,6 +1,5 @@
 package mega.privacy.android.app.main
 
-import mega.privacy.android.shared.resources.R as sharedR
 import android.content.DialogInterface
 import android.content.Intent
 import android.net.Uri
@@ -54,6 +53,7 @@ import mega.privacy.android.data.facade.INTENT_EXTRA_NODE_HANDLE
 import mega.privacy.android.domain.entity.node.NodeId
 import mega.privacy.android.domain.usecase.featureflag.GetFeatureFlagValueUseCase
 import mega.privacy.android.navigation.MegaNavigator
+import mega.privacy.android.shared.resources.R as sharedR
 import nz.mega.sdk.MegaApiJava
 import nz.mega.sdk.MegaContactRequest
 import nz.mega.sdk.MegaError
@@ -386,7 +386,10 @@ class VersionsFileActivity : PasscodeActivity(), MegaRequestListenerInterface,
 
     private fun downloadNodes(nodes: List<MegaNode>?) {
         nodes?.map { NodeId(it.handle) }?.let {
-            startDownloadViewModel.onDownloadClicked(it)
+            startDownloadViewModel.onDownloadClicked(
+                nodeIds = it,
+                withStartMessage = true,
+            )
         }
     }
 

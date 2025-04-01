@@ -1,6 +1,5 @@
 package mega.privacy.android.app.mediaplayer
 
-import mega.privacy.android.shared.resources.R as sharedR
 import android.app.Activity
 import android.app.Dialog
 import android.content.BroadcastReceiver
@@ -137,6 +136,7 @@ import mega.privacy.android.domain.entity.node.NodeId
 import mega.privacy.android.domain.exception.BlockedMegaException
 import mega.privacy.android.domain.exception.QuotaExceededMegaException
 import mega.privacy.android.domain.usecase.featureflag.GetFeatureFlagValueUseCase
+import mega.privacy.android.shared.resources.R as sharedR
 import mega.privacy.mobile.analytics.event.VideoPlayerGetLinkMenuToolbarEvent
 import mega.privacy.mobile.analytics.event.VideoPlayerHideNodeMenuItemEvent
 import mega.privacy.mobile.analytics.event.VideoPlayerInfoMenuItemEvent
@@ -466,7 +466,10 @@ class LegacyVideoPlayerActivity : MediaPlayerActivity() {
     private fun setupObserver() {
         with(viewModel) {
             onStartChatFileOfflineDownload().observe(this@LegacyVideoPlayerActivity) {
-                startDownloadViewModel.onSaveOfflineClicked(it)
+                startDownloadViewModel.onSaveOfflineClicked(
+                    chatFile = it,
+                    withStartMessage = true,
+                )
             }
 
             getCollision().observe(this@LegacyVideoPlayerActivity) { collision ->

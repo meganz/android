@@ -511,7 +511,12 @@ internal class AlbumImportViewModel @Inject constructor(
             val nodes = photos
                 .mapNotNull { data[NodeId(it.id)] }
                 .mapNotNull { getPublicNodeFromSerializedDataUseCase(it) }
-            updateDownloadEvent(TransferTriggerEvent.StartDownloadNode(nodes))
+            updateDownloadEvent(
+                TransferTriggerEvent.StartDownloadNode(
+                    nodes = nodes,
+                    withStartMessage = true,
+                )
+            )
             clearSelection()
         }
     }

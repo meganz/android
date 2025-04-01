@@ -183,7 +183,14 @@ class TrackInfoViewModelTest {
 
             underTest.state.drop(1).test {
                 assertThat(awaitItem().transferTriggerEvent)
-                    .isEqualTo(triggered(TransferTriggerEvent.StartDownloadForOffline(testAudioNode)))
+                    .isEqualTo(
+                        triggered(
+                            TransferTriggerEvent.StartDownloadForOffline(
+                                node = testAudioNode,
+                                withStartMessage = true
+                            )
+                        )
+                    )
                 cancelAndIgnoreRemainingEvents()
             }
         }

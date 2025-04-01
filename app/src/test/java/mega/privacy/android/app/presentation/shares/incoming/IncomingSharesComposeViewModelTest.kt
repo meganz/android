@@ -475,26 +475,36 @@ class IncomingSharesComposeViewModelTest {
     @Test
     fun `test that download event is updated when on available offline option click is invoked`() =
         runTest {
-            val triggered = TransferTriggerEvent.StartDownloadForOffline(node = mock())
+            val triggered = TransferTriggerEvent.StartDownloadForOffline(
+                node = mock(),
+                withStartMessage = false
+            )
             underTest.onDownloadFileTriggered(triggered)
             underTest.state.test {
                 val state = awaitItem()
                 assertThat(state.downloadEvent).isInstanceOf(StateEventWithContentTriggered::class.java)
                 assertThat((state.downloadEvent as StateEventWithContentTriggered).content)
                     .isInstanceOf(TransferTriggerEvent.StartDownloadForOffline::class.java)
+                assertThat((state.downloadEvent.content as TransferTriggerEvent.StartDownloadForOffline).withStartMessage)
+                    .isFalse()
             }
         }
 
     @Test
     fun `test that download event is updated when on download option click is invoked`() =
         runTest {
-            val triggered = TransferTriggerEvent.StartDownloadNode(nodes = listOf(mock()))
+            val triggered = TransferTriggerEvent.StartDownloadNode(
+                nodes = listOf(mock()),
+                withStartMessage = false
+            )
             underTest.onDownloadFileTriggered(triggered)
             underTest.state.test {
                 val state = awaitItem()
                 assertThat(state.downloadEvent).isInstanceOf(StateEventWithContentTriggered::class.java)
                 assertThat((state.downloadEvent as StateEventWithContentTriggered).content)
                     .isInstanceOf(TransferTriggerEvent.StartDownloadNode::class.java)
+                assertThat((state.downloadEvent.content as TransferTriggerEvent.StartDownloadNode).withStartMessage)
+                    .isFalse()
             }
         }
 

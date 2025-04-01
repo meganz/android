@@ -661,7 +661,8 @@ internal class ContactFileListActivity : PasscodeActivity(), MegaGlobalListenerI
     fun downloadFile(nodes: List<MegaNode>) {
         startDownloadViewModel.onDownloadClicked(
             nodeIds = nodes.map { NodeId(it.handle) },
-            isHighPriority = true
+            isHighPriority = true,
+            withStartMessage = true,
         )
     }
 

@@ -23,6 +23,8 @@ import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.TestInstance
 import org.junit.jupiter.api.extension.ExtendWith
+import org.junit.jupiter.params.ParameterizedTest
+import org.junit.jupiter.params.provider.ValueSource
 import org.mockito.kotlin.mock
 import org.mockito.kotlin.reset
 import org.mockito.kotlin.whenever
@@ -64,68 +66,102 @@ class StartDownloadViewModelTest {
         )
     }
 
-    @Test
-    fun `test that onDownloadClicked launches the correct event`() = runTest {
+    @ParameterizedTest(name = " and withStartMessage set to {0}")
+    @ValueSource(booleans = [true, false])
+    fun `test that onDownloadClicked launches the correct event`(
+        withStartMessage: Boolean,
+    ) = runTest {
         val node = mock<TypedFileNode>()
-        underTest.onDownloadClicked(node)
-        assertStartDownloadNode(node)
+        underTest.onDownloadClicked(node = node, withStartMessage = withStartMessage)
+        assertStartDownloadNode(node, withStartMessage = withStartMessage)
     }
 
-    @Test
-    fun `test that onSaveOfflineClicked launches the correct event`() = runTest {
+    @ParameterizedTest(name = " and withStartMessage set to {0}")
+    @ValueSource(booleans = [true, false])
+    fun `test that onSaveOfflineClicked launches the correct event`(
+        withStartMessage: Boolean,
+    ) = runTest {
         val node = mock<TypedFileNode>()
-        underTest.onSaveOfflineClicked(node)
-        assertStartDownloadForOffline(node)
+        underTest.onSaveOfflineClicked(node = node, withStartMessage = withStartMessage)
+        assertStartDownloadForOffline(node, withStartMessage = withStartMessage)
     }
 
-    @Test
-    fun `test that onDownloadClicked with id launches the correct event`() = runTest {
+    @ParameterizedTest(name = " and withStartMessage set to {0}")
+    @ValueSource(booleans = [true, false])
+    fun `test that onDownloadClicked with id launches the correct event`(
+        withStartMessage: Boolean,
+    ) = runTest {
         val nodeId = NodeId(1L)
         val node = mock<TypedFileNode>()
         whenever(getNodeByIdUseCase(nodeId)).thenReturn(node)
-        underTest.onDownloadClicked(nodeId)
-        assertStartDownloadNode(node)
+        underTest.onDownloadClicked(nodeId = nodeId, withStartMessage = withStartMessage)
+        assertStartDownloadNode(node, withStartMessage = withStartMessage)
     }
 
-    @Test
-    fun `test that onDownloadClicked with serialized data launches the correct event`() = runTest {
+    @ParameterizedTest(name = " and withStartMessage set to {0}")
+    @ValueSource(booleans = [true, false])
+    fun `test that onDownloadClicked with serialized data launches the correct event`(
+        withStartMessage: Boolean,
+    ) = runTest {
         val node = mock<PublicLinkFile>()
         val serializedData = "serialized data"
         whenever(getPublicNodeFromSerializedDataUseCase(serializedData)).thenReturn(node)
-        underTest.onDownloadClicked(serializedData)
-        assertStartDownloadNode(node)
+        underTest.onDownloadClicked(
+            serializedData = serializedData,
+            withStartMessage = withStartMessage
+        )
+        assertStartDownloadNode(node, withStartMessage = withStartMessage)
     }
 
-    @Test
-    fun `test that onFolderLinkChildNodeDownloadClicked  launches the correct event`() = runTest {
+    @ParameterizedTest(name = " and withStartMessage set to {0}")
+    @ValueSource(booleans = [true, false])
+    fun `test that onFolderLinkChildNodeDownloadClicked  launches the correct event`(
+        withStartMessage: Boolean,
+    ) = runTest {
         val node = mock<PublicLinkFile>()
         val id = NodeId(1L)
         whenever(getPublicChildNodeFromIdUseCase(id)).thenReturn(node)
-        underTest.onFolderLinkChildNodeDownloadClicked(id)
-        assertStartDownloadNode(node)
+        underTest.onFolderLinkChildNodeDownloadClicked(
+            nodeId = id,
+            withStartMessage = withStartMessage
+        )
+        assertStartDownloadNode(node, withStartMessage = withStartMessage)
     }
 
-    @Test
-    fun `test that onSaveOfflineClicked with id launches the correct event`() = runTest {
+    @ParameterizedTest(name = " and withStartMessage set to {0}")
+    @ValueSource(booleans = [true, false])
+    fun `test that onSaveOfflineClicked with id launches the correct event`(
+        withStartMessage: Boolean,
+    ) = runTest {
         val nodeId = NodeId(1L)
         val node = mock<TypedFileNode>()
         whenever(getNodeByIdUseCase(nodeId)).thenReturn(node)
-        underTest.onSaveOfflineClicked(nodeId)
-        assertStartDownloadForOffline(node)
+        underTest.onSaveOfflineClicked(nodeId = nodeId, withStartMessage = withStartMessage)
+        assertStartDownloadForOffline(node, withStartMessage = withStartMessage)
     }
 
-    @Test
-    fun `test that onDownloadClicked for chat file launches the correct event`() = runTest {
+    @ParameterizedTest(name = " and withStartMessage set to {0}")
+    @ValueSource(booleans = [true, false])
+    fun `test that onDownloadClicked for chat file launches the correct event`(
+        withStartMessage: Boolean,
+    ) = runTest {
         val chatId = 11L
         val messageId = 22L
         val chatFile = mock<ChatDefaultFile>()
         whenever(getChatFileUseCase(chatId, messageId)).thenReturn(chatFile)
-        underTest.onDownloadClicked(chatId, messageId)
-        assertStartDownloadNode(chatFile)
+        underTest.onDownloadClicked(
+            chatId = chatId,
+            messageId = messageId,
+            withStartMessage = withStartMessage
+        )
+        assertStartDownloadNode(chatFile, withStartMessage = withStartMessage)
     }
 
-    @Test
-    fun `test that onDownloadClicked for chat files launches the correct event`() = runTest {
+    @ParameterizedTest(name = " and withStartMessage set to {0}")
+    @ValueSource(booleans = [true, false])
+    fun `test that onDownloadClicked for chat files launches the correct event`(
+        withStartMessage: Boolean,
+    ) = runTest {
         val chatId = 11L
         val messageId1 = 22L
         val messageId2 = 33L
@@ -133,29 +169,45 @@ class StartDownloadViewModelTest {
         val chatFile2 = mock<ChatDefaultFile>()
         whenever(getChatFileUseCase(chatId, messageId1)).thenReturn(chatFile1)
         whenever(getChatFileUseCase(chatId, messageId2)).thenReturn(chatFile2)
-        underTest.onDownloadClicked(chatId, listOf(messageId1, messageId2))
-        assertStartDownloadNode(chatFile1, chatFile2)
+        underTest.onDownloadClicked(
+            chatId = chatId,
+            messageIds = listOf(messageId1, messageId2),
+            withStartMessage = withStartMessage
+        )
+        assertStartDownloadNode(chatFile1, chatFile2, withStartMessage = withStartMessage)
     }
 
-    @Test
-    fun `test that onSaveOfflineClicked for chat file launches the correct event`() = runTest {
+    @ParameterizedTest(name = " and withStartMessage set to {0}")
+    @ValueSource(booleans = [true, false])
+    fun `test that onSaveOfflineClicked for chat file launches the correct event`(
+        withStartMessage: Boolean,
+    ) = runTest {
         val chatId = 11L
         val messageId = 22L
         val chatFile = mock<ChatDefaultFile>()
         whenever(getChatFileUseCase(chatId, messageId)).thenReturn(chatFile)
-        underTest.onSaveOfflineClicked(chatId, messageId)
-        assertStartDownloadForOffline(chatFile)
+        underTest.onSaveOfflineClicked(
+            chatId = chatId,
+            messageId = messageId,
+            withStartMessage = withStartMessage
+        )
+        assertStartDownloadForOffline(chatFile, withStartMessage = withStartMessage)
     }
 
-    @Test
-    fun `test that onSaveOfflineClicked with serialized data launches the correct event`() =
-        runTest {
-            val node = mock<PublicLinkFile>()
-            val serializedData = "serialized data"
-            whenever(getPublicNodeFromSerializedDataUseCase(serializedData)).thenReturn(node)
-            underTest.onSaveOfflineClicked(serializedData)
-            assertStartDownloadForOffline(node)
-        }
+    @ParameterizedTest(name = " and withStartMessage set to {0}")
+    @ValueSource(booleans = [true, false])
+    fun `test that onSaveOfflineClicked with serialized data launches the correct event`(
+        withStartMessage: Boolean,
+    ) = runTest {
+        val node = mock<PublicLinkFile>()
+        val serializedData = "serialized data"
+        whenever(getPublicNodeFromSerializedDataUseCase(serializedData)).thenReturn(node)
+        underTest.onSaveOfflineClicked(
+            serializedData = serializedData,
+            withStartMessage = withStartMessage
+        )
+        assertStartDownloadForOffline(node, withStartMessage = withStartMessage)
+    }
 
     @Test
     fun `test that onCopyUriClicked launches the correct event`() = runTest {
@@ -202,7 +254,7 @@ class StartDownloadViewModelTest {
         }
     }
 
-    private suspend fun assertStartDownloadNode(vararg node: TypedNode) {
+    private suspend fun assertStartDownloadNode(vararg node: TypedNode, withStartMessage: Boolean) {
         underTest.state.test {
             val event = awaitItem()
             assertThat(event).isInstanceOf(StateEventWithContentTriggered::class.java)
@@ -210,10 +262,11 @@ class StartDownloadViewModelTest {
             assertThat(content).isInstanceOf(TransferTriggerEvent.StartDownloadNode::class.java)
             assertThat((content as TransferTriggerEvent.StartDownloadNode).nodes)
                 .containsExactly(*node)
+            assertThat(content.withStartMessage).isEqualTo(withStartMessage)
         }
     }
 
-    private suspend fun assertStartDownloadForOffline(node: TypedNode) {
+    private suspend fun assertStartDownloadForOffline(node: TypedNode, withStartMessage: Boolean) {
         underTest.state.test {
             val event = awaitItem()
             assertThat(event).isInstanceOf(StateEventWithContentTriggered::class.java)
@@ -221,6 +274,7 @@ class StartDownloadViewModelTest {
             assertThat(content).isInstanceOf(TransferTriggerEvent.StartDownloadForOffline::class.java)
             assertThat((content as TransferTriggerEvent.StartDownloadForOffline).node)
                 .isEqualTo(node)
+            assertThat(content.withStartMessage).isEqualTo(withStartMessage)
         }
     }
 }

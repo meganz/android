@@ -102,6 +102,12 @@ sealed interface TransferTriggerEvent {
          * App data related to this type of download
          */
         val appData: TransferAppData? get() = null
+
+        /**
+         * True if a message should be shown when the transfer starts.
+         * It should be true only if the transfers widget is NOT visible.
+         */
+        val withStartMessage: Boolean
     }
 
     /**
@@ -127,6 +133,7 @@ sealed interface TransferTriggerEvent {
         val node: TypedNode?,
         override val isHighPriority: Boolean = false,
         override val waitNotificationPermissionResponseToStart: Boolean = false,
+        override val withStartMessage: Boolean,
     ) : DownloadTriggerEvent {
         override val nodes = node?.let { listOf(node) } ?: emptyList()
         override val appData = TransferAppData.OfflineDownload
@@ -141,6 +148,7 @@ sealed interface TransferTriggerEvent {
         override val nodes: List<TypedNode>,
         override val isHighPriority: Boolean = false,
         override val waitNotificationPermissionResponseToStart: Boolean = false,
+        override val withStartMessage: Boolean,
     ) : DownloadTriggerEvent
 
     /**
@@ -150,6 +158,7 @@ sealed interface TransferTriggerEvent {
      */
     data class CopyOfflineNode(
         val nodeIds: List<NodeId>,
+        override val withStartMessage: Boolean = false,
     ) : CopyTriggerEvent {
         override val waitNotificationPermissionResponseToStart = false
     }
@@ -164,6 +173,7 @@ sealed interface TransferTriggerEvent {
         val name: String,
         val uri: Uri,
         override val waitNotificationPermissionResponseToStart: Boolean = false,
+        override val withStartMessage: Boolean = false,
     ) : CopyTriggerEvent
 
     /**
@@ -176,6 +186,7 @@ sealed interface TransferTriggerEvent {
         val node: TypedNode?,
         val isOpenWith: Boolean,
         override val waitNotificationPermissionResponseToStart: Boolean = false,
+        override val withStartMessage: Boolean = false,
     ) : DownloadTriggerEvent {
         override val nodes = node?.let { listOf(node) } ?: emptyList()
         override val isHighPriority: Boolean = true

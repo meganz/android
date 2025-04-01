@@ -28,7 +28,6 @@ import kotlinx.coroutines.flow.launchIn
 import kotlinx.coroutines.flow.onEach
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
-import kotlinx.coroutines.runBlocking
 import kotlinx.coroutines.withContext
 import mega.privacy.android.app.R
 import mega.privacy.android.app.listeners.ExportListener
@@ -939,7 +938,10 @@ class TextEditorViewModel @Inject constructor(
                 viewModelScope.launch {
                     val typedNode = getTypedNode() ?: return@launch
                     updateTransferEvent(
-                        TransferTriggerEvent.StartDownloadNode(listOfNotNull(typedNode))
+                        TransferTriggerEvent.StartDownloadNode(
+                            nodes = listOfNotNull(typedNode),
+                            withStartMessage = true,
+                        )
                     )
                 }
             }
@@ -1057,7 +1059,8 @@ class TextEditorViewModel @Inject constructor(
                         it.copy(
                             transferEvent = triggered(
                                 TransferTriggerEvent.StartDownloadForOffline(
-                                    chatFile
+                                    node = chatFile,
+                                    withStartMessage = true,
                                 )
                             )
                         )

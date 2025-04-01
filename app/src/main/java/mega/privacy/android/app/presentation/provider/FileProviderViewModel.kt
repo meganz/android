@@ -63,7 +63,11 @@ class FileProviderViewModel @Inject constructor(
     fun startDownload(nodeIds: List<NodeId>) {
         viewModelScope.launch {
             val nodes = nodeIds.mapNotNull { getNodeByIdUseCase(it) }
-            val triggerEvent = TransferTriggerEvent.StartDownloadNode(nodes, true)
+            val triggerEvent = TransferTriggerEvent.StartDownloadNode(
+                nodes = nodes,
+                isHighPriority = true,
+                withStartMessage = false,
+            )
             _uiState.update {
                 it.copy(startDownloadEvent = triggered(triggerEvent))
             }

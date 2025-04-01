@@ -1,6 +1,5 @@
 package mega.privacy.android.app.presentation.transfers.starttransfer.view
 
-import mega.privacy.android.shared.resources.R as sharedR
 import android.Manifest
 import android.app.Activity
 import android.content.Context
@@ -69,6 +68,7 @@ import mega.privacy.android.shared.original.core.ui.controls.dialogs.MegaAlertDi
 import mega.privacy.android.shared.original.core.ui.navigation.launchFolderPicker
 import mega.privacy.android.shared.original.core.ui.theme.OriginalTheme
 import mega.privacy.android.shared.original.core.ui.utils.showAutoDurationSnackbar
+import mega.privacy.android.shared.resources.R as sharedR
 import timber.log.Timber
 import java.io.File
 
@@ -277,14 +277,12 @@ private fun StartTransferComponent(
         action = {
             when (it) {
                 is StartTransferEvent.FinishDownloadProcessing -> {
-                    it.exception?.let {
-                        downloadScanningFinishedWithError(
-                            exception = it,
-                            snackBarHostState = snackBarHostState,
-                            showQuotaExceededDialog = showQuotaExceededDialog,
-                            context = context,
-                        )
-                    }
+                    consumeFinishProcessing(
+                        event = it,
+                        snackBarHostState = snackBarHostState,
+                        showQuotaExceededDialog = showQuotaExceededDialog,
+                        context = context,
+                    )
                     onScanningFinished(it)
                 }
 
@@ -500,26 +498,35 @@ private val storageStateSaver = Saver<StorageState?, Int>(
     restore = { StorageState.entries.getOrNull(it) }
 )
 
-private suspend fun downloadScanningFinishedWithError(
-    exception: Throwable,
+private suspend fun consumeFinishProcessing(
+    event: StartTransferEvent.FinishDownloadProcessing,
     snackBarHostState: SnackbarHostState,
     showQuotaExceededDialog: MutableState<StorageState?>,
     context: Context,
 ) {
-    when (exception) {
-        is QuotaExceededMegaException -> {
-            showQuotaExceededDialog.value = StorageState.Red
-        }
+    event.exception?.let { exception ->
+        when (exception) {
+            is QuotaExceededMegaException -> {
+                showQuotaExceededDialog.value = StorageState.Red
+            }
 
-        is NotEnoughQuotaMegaException -> {
-            showQuotaExceededDialog.value = StorageState.Orange
-        }
+            is NotEnoughQuotaMegaException -> {
+                showQuotaExceededDialog.value = StorageState.Orange
+            }
 
-        else -> {
-            Timber.e(exception)
-            snackBarHostState.showAutoDurationSnackbar(context.getString(R.string.general_error))
+            else -> {
+                Timber.e(exception)
+                snackBarHostState.showAutoDurationSnackbar(context.getString(R.string.general_error))
+            }
+        }
+    } ?: run {
+        if (event.triggerEvent is TransferTriggerEvent.DownloadTriggerEvent && event.triggerEvent.withStartMessage) {
+            snackBarHostState.showAutoDurationSnackbar(
+                context.getString(sharedR.string.transfers_download_started_snackbar)
+            )
         }
     }
+
 }
 
 private suspend fun consumeMessage(

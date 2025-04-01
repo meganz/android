@@ -1375,7 +1375,10 @@ class NodeOptionsBottomSheetDialogFragment : BaseBottomSheetDialogFragment() {
         if (mode == VIDEO_PLAYLIST_DETAIL && getStorageState() == StorageState.PayWall) {
             showOverDiskQuotaPaywallWarning()
         } else {
-            startDownloadViewModel.onDownloadClicked(NodeId(node.handle))
+            startDownloadViewModel.onDownloadClicked(
+                nodeId = NodeId(node.handle),
+                withStartMessage = false,
+            )
         }
         setStateBottomSheetBehaviorHidden()
     }
@@ -1454,7 +1457,10 @@ class NodeOptionsBottomSheetDialogFragment : BaseBottomSheetDialogFragment() {
             if (mode == VIDEO_PLAYLIST_DETAIL && getStorageState() == StorageState.PayWall) {
                 showOverDiskQuotaPaywallWarning()
             } else {
-                startDownloadViewModel.onSaveOfflineClicked(nodeId)
+                startDownloadViewModel.onSaveOfflineClicked(
+                    nodeId,
+                    withStartMessage = false,
+                )
             }
         }
         setStateBottomSheetBehaviorHidden()

@@ -219,6 +219,7 @@ class VideoSectionFragment : Fragment() {
                             highPriority = false,
                             isFolderLink = false,
                             fromChat = false,
+                            withStartMessage = false,
                         )
 
                     is VideoSectionMenuAction.VideoSectionRenameAction ->

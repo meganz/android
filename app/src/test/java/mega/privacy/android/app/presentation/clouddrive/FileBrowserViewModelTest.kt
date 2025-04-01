@@ -74,6 +74,7 @@ import org.junit.jupiter.api.extension.ExtendWith
 import org.junit.jupiter.params.ParameterizedTest
 import org.junit.jupiter.params.provider.Arguments
 import org.junit.jupiter.params.provider.MethodSource
+import org.junit.jupiter.params.provider.ValueSource
 import org.mockito.kotlin.any
 import org.mockito.kotlin.eq
 import org.mockito.kotlin.mock
@@ -593,36 +594,51 @@ class FileBrowserViewModelTest {
             }
         }
 
-    @Test
-    fun `test that download event is updated when on available offline option click is invoked`() =
-        runTest {
-            val triggered = TransferTriggerEvent.StartDownloadForOffline(node = mock())
-            underTest.onDownloadFileTriggered(triggered)
-            underTest.state.test {
-                val state = awaitItem()
-                assertThat(state.downloadEvent).isInstanceOf(StateEventWithContentTriggered::class.java)
-                assertThat((state.downloadEvent as StateEventWithContentTriggered).content)
-                    .isInstanceOf(TransferTriggerEvent.StartDownloadForOffline::class.java)
-            }
+    @ParameterizedTest(name = " and withStartMessage set to {0}")
+    @ValueSource(booleans = [true, false])
+    fun `test that download event is updated when on available offline option click is invoked`(
+        withStartMessage: Boolean,
+    ) = runTest {
+        val triggered = TransferTriggerEvent.StartDownloadForOffline(
+            node = mock(),
+            withStartMessage = withStartMessage
+        )
+        underTest.onDownloadFileTriggered(triggered)
+        underTest.state.test {
+            val state = awaitItem()
+            assertThat(state.downloadEvent).isInstanceOf(StateEventWithContentTriggered::class.java)
+            assertThat((state.downloadEvent as StateEventWithContentTriggered).content)
+                .isInstanceOf(TransferTriggerEvent.StartDownloadForOffline::class.java)
+            assertThat((state.downloadEvent.content as TransferTriggerEvent.StartDownloadForOffline).withStartMessage)
+                .isEqualTo(withStartMessage)
         }
+    }
 
-    @Test
-    fun `test that download event is updated when on download option click is invoked`() =
-        runTest {
-            val triggered = TransferTriggerEvent.StartDownloadNode(nodes = listOf(mock()))
-            underTest.onDownloadFileTriggered(triggered)
-            underTest.state.test {
-                val state = awaitItem()
-                assertThat(state.downloadEvent).isInstanceOf(StateEventWithContentTriggered::class.java)
-                assertThat((state.downloadEvent as StateEventWithContentTriggered).content)
-                    .isInstanceOf(TransferTriggerEvent.StartDownloadNode::class.java)
-            }
+    @ParameterizedTest(name = " and withStartMessage set to {0}")
+    @ValueSource(booleans = [true, false])
+    fun `test that download event is updated when on download option click is invoked`(
+        withStartMessage: Boolean,
+    ) = runTest {
+        val triggered = TransferTriggerEvent.StartDownloadNode(
+            nodes = listOf(mock()),
+            withStartMessage = withStartMessage
+        )
+        underTest.onDownloadFileTriggered(triggered)
+        underTest.state.test {
+            val state = awaitItem()
+            assertThat(state.downloadEvent).isInstanceOf(StateEventWithContentTriggered::class.java)
+            assertThat((state.downloadEvent as StateEventWithContentTriggered).content)
+                .isInstanceOf(TransferTriggerEvent.StartDownloadNode::class.java)
+            assertThat((state.downloadEvent.content as TransferTriggerEvent.StartDownloadNode).withStartMessage)
+                .isEqualTo(withStartMessage)
         }
+    }
 
     @Test
     fun `test that download event is updated when on download for preview option click is invoked`() =
         runTest {
-            val triggered = TransferTriggerEvent.StartDownloadForPreview(node = mock(), isOpenWith = false)
+            val triggered =
+                TransferTriggerEvent.StartDownloadForPreview(node = mock(), isOpenWith = false)
             underTest.onDownloadFileTriggered(triggered)
             underTest.state.test {
                 val state = awaitItem()

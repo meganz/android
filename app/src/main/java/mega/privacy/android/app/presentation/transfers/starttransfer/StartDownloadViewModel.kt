@@ -45,12 +45,24 @@ class StartDownloadViewModel @Inject constructor(
     /**
      * Triggers the event related to download a node with [nodeId]
      * @param nodeId
+     * @param withStartMessage  Whether show start message or not.
+     *                          It should be true only if the widget is not visible.
      */
-    fun onDownloadClicked(nodeId: NodeId, isHighPriority: Boolean = false) {
+    fun onDownloadClicked(
+        nodeId: NodeId,
+        isHighPriority: Boolean = false,
+        withStartMessage: Boolean,
+    ) {
         viewModelScope.launch {
             val nodes = listOfNotNull(getNodeByIdUseCase(nodeId))
             _state.update {
-                triggered(TransferTriggerEvent.StartDownloadNode(nodes, isHighPriority))
+                triggered(
+                    TransferTriggerEvent.StartDownloadNode(
+                        nodes = nodes,
+                        isHighPriority = isHighPriority,
+                        withStartMessage = withStartMessage,
+                    )
+                )
             }
         }
     }
@@ -75,12 +87,24 @@ class StartDownloadViewModel @Inject constructor(
     /**
      * Triggers the event related to download nods with [nodeIds]
      * @param nodeIds
+     * @param withStartMessage  Whether show start message or not.
+     *                          It should be true only if the widget is not visible.
      */
-    fun onDownloadClicked(nodeIds: List<NodeId>, isHighPriority: Boolean = false) {
+    fun onDownloadClicked(
+        nodeIds: List<NodeId>,
+        isHighPriority: Boolean = false,
+        withStartMessage: Boolean,
+    ) {
         viewModelScope.launch {
             val nodes = nodeIds.mapNotNull { getNodeByIdUseCase(it) }
             _state.update {
-                triggered(TransferTriggerEvent.StartDownloadNode(nodes, isHighPriority))
+                triggered(
+                    TransferTriggerEvent.StartDownloadNode(
+                        nodes = nodes,
+                        isHighPriority = isHighPriority,
+                        withStartMessage = withStartMessage,
+                    )
+                )
             }
         }
     }
@@ -115,12 +139,22 @@ class StartDownloadViewModel @Inject constructor(
     /**
      * Triggers the event to download a folder link's child node with its [nodeId]
      * @param nodeId
+     * @param withStartMessage  Whether show start message or not.
+     *                          It should be true only if the widget is not visible.
      */
-    fun onFolderLinkChildNodeDownloadClicked(nodeId: NodeId) {
+    fun onFolderLinkChildNodeDownloadClicked(
+        nodeId: NodeId,
+        withStartMessage: Boolean,
+    ) {
         viewModelScope.launch {
             val nodes = listOfNotNull(getPublicChildNodeFromIdUseCase(nodeId))
             _state.update {
-                triggered(TransferTriggerEvent.StartDownloadNode(nodes))
+                triggered(
+                    TransferTriggerEvent.StartDownloadNode(
+                        nodes = nodes,
+                        withStartMessage = withStartMessage,
+                    )
+                )
             }
         }
     }
@@ -128,12 +162,22 @@ class StartDownloadViewModel @Inject constructor(
     /**
      * Triggers the event related to download a node with its serialized data
      * @param serializedData of the link node
+     * @param withStartMessage  Whether show start message or not.
+     *                          It should be true only if the widget is not visible.
      */
-    fun onDownloadClicked(serializedData: String) {
+    fun onDownloadClicked(
+        serializedData: String,
+        withStartMessage: Boolean,
+    ) {
         viewModelScope.launch {
             val nodes = listOfNotNull(getPublicNodeFromSerializedDataUseCase(serializedData))
             _state.update {
-                triggered(TransferTriggerEvent.StartDownloadNode(nodes))
+                triggered(
+                    TransferTriggerEvent.StartDownloadNode(
+                        nodes = nodes,
+                        withStartMessage = withStartMessage,
+                    )
+                )
             }
         }
     }
@@ -141,15 +185,24 @@ class StartDownloadViewModel @Inject constructor(
     /**
      * Triggers the event related to download multiple nodes with their serialized data
      * @param serializedData of the link node
+     * @param withStartMessage  Whether show start message or not.
+     *                          It should be true only if the widget is not visible.
      */
     fun onMultipleSerializedNodesDownloadClicked(
         serializedData: List<String>,
         isHighPriority: Boolean = false,
+        withStartMessage: Boolean,
     ) {
         viewModelScope.launch {
             val nodes = serializedData.mapNotNull { getPublicNodeFromSerializedDataUseCase(it) }
             _state.update {
-                triggered(TransferTriggerEvent.StartDownloadNode(nodes, isHighPriority))
+                triggered(
+                    TransferTriggerEvent.StartDownloadNode(
+                        nodes = nodes,
+                        isHighPriority = isHighPriority,
+                        withStartMessage = withStartMessage,
+                    )
+                )
             }
         }
     }
@@ -158,12 +211,23 @@ class StartDownloadViewModel @Inject constructor(
      * Triggers the event related to download a chat node
      * @param chatId
      * @param messageId
+     * @param withStartMessage  Whether show start message or not.
+     *                          It should be true only if the widget is not visible.
      */
-    fun onDownloadClicked(chatId: Long, messageId: Long) {
+    fun onDownloadClicked(
+        chatId: Long,
+        messageId: Long,
+        withStartMessage: Boolean,
+    ) {
         viewModelScope.launch {
             getChatFileUseCase(chatId, messageId)?.let { chatFile ->
                 _state.update {
-                    triggered(TransferTriggerEvent.StartDownloadNode(listOf(chatFile)))
+                    triggered(
+                        TransferTriggerEvent.StartDownloadNode(
+                            nodes = listOf(chatFile),
+                            withStartMessage = withStartMessage,
+                        )
+                    )
                 }
             }
         }
@@ -173,13 +237,23 @@ class StartDownloadViewModel @Inject constructor(
      * Triggers the event related to download a list of chat nodes (all from the same chat)
      * @param chatId
      * @param messageIds
+     * @param withStartMessage  Whether show start message or not.
+     *                          It should be true only if the widget is not visible.
      */
-    fun onDownloadClicked(chatId: Long, messageIds: List<Long>) {
+    fun onDownloadClicked(
+        chatId: Long, messageIds: List<Long>,
+        withStartMessage: Boolean,
+    ) {
         viewModelScope.launch {
             val chatFiles =
                 messageIds.mapNotNull { getChatFileUseCase(chatId, it) }
             _state.update {
-                triggered(TransferTriggerEvent.StartDownloadNode(chatFiles))
+                triggered(
+                    TransferTriggerEvent.StartDownloadNode(
+                        nodes = chatFiles,
+                        withStartMessage = withStartMessage,
+                    )
+                )
             }
         }
     }
@@ -187,22 +261,42 @@ class StartDownloadViewModel @Inject constructor(
     /**
      * Triggers the event related to download a node
      * @param node
+     * @param withStartMessage  Whether show start message or not.
+     *                          It should be true only if the widget is not visible.
      */
-    fun onDownloadClicked(node: TypedNode) {
+    fun onDownloadClicked(
+        node: TypedNode,
+        withStartMessage: Boolean,
+    ) {
         _state.update {
-            triggered(TransferTriggerEvent.StartDownloadNode(listOf(node)))
+            triggered(
+                TransferTriggerEvent.StartDownloadNode(
+                    nodes = listOf(node),
+                    withStartMessage = withStartMessage,
+                )
+            )
         }
     }
 
     /**
      * Triggers the event related to save offline a node with [nodeId]
      * @param nodeId
+     * @param withStartMessage  Whether show start message or not.
+     *                          It should be true only if the widget is not visible.
      */
-    fun onSaveOfflineClicked(nodeId: NodeId) {
+    fun onSaveOfflineClicked(
+        nodeId: NodeId,
+        withStartMessage: Boolean,
+    ) {
         viewModelScope.launch {
             val node = getNodeByIdUseCase(nodeId)
             _state.update {
-                triggered(TransferTriggerEvent.StartDownloadForOffline(node))
+                triggered(
+                    TransferTriggerEvent.StartDownloadForOffline(
+                        node = node,
+                        withStartMessage = withStartMessage,
+                    )
+                )
             }
         }
     }
@@ -211,12 +305,23 @@ class StartDownloadViewModel @Inject constructor(
      * Triggers the event related to save offline a chat node
      * @param chatId
      * @param messageId
+     * @param withStartMessage  Whether show start message or not.
+     *                          It should be true only if the widget is not visible.
      */
-    fun onSaveOfflineClicked(chatId: Long, messageId: Long) {
+    fun onSaveOfflineClicked(
+        chatId: Long,
+        messageId: Long,
+        withStartMessage: Boolean,
+    ) {
         viewModelScope.launch {
             getChatFileUseCase(chatId, messageId)?.let { chatFile ->
                 _state.update {
-                    triggered(TransferTriggerEvent.StartDownloadForOffline(chatFile))
+                    triggered(
+                        TransferTriggerEvent.StartDownloadForOffline(
+                            node = chatFile,
+                            withStartMessage = withStartMessage,
+                        )
+                    )
                 }
             }
         }
@@ -225,11 +330,21 @@ class StartDownloadViewModel @Inject constructor(
     /**
      * Triggers the event related to save offline a chat node
      * @param chatFile
+     * @param withStartMessage  Whether show start message or not.
+     *                          It should be true only if the widget is not visible.
      */
-    fun onSaveOfflineClicked(chatFile: ChatFile) {
+    fun onSaveOfflineClicked(
+        chatFile: ChatFile,
+        withStartMessage: Boolean,
+    ) {
         viewModelScope.launch {
             _state.update {
-                triggered(TransferTriggerEvent.StartDownloadForOffline(chatFile))
+                triggered(
+                    TransferTriggerEvent.StartDownloadForOffline(
+                        node = chatFile,
+                        withStartMessage = withStartMessage,
+                    )
+                )
             }
         }
     }
@@ -237,12 +352,22 @@ class StartDownloadViewModel @Inject constructor(
     /**
      * Triggers the event to save offline a node with its serialized data for link nodes
      * @param serializedData of the link node
+     * @param withStartMessage  Whether show start message or not.
+     *                          It should be true only if the widget is not visible.
      */
-    fun onSaveOfflineClicked(serializedData: String) {
+    fun onSaveOfflineClicked(
+        serializedData: String,
+        withStartMessage: Boolean,
+    ) {
         viewModelScope.launch {
             val node = getPublicNodeFromSerializedDataUseCase(serializedData)
             _state.update {
-                triggered(TransferTriggerEvent.StartDownloadForOffline(node))
+                triggered(
+                    TransferTriggerEvent.StartDownloadForOffline(
+                        node = node,
+                        withStartMessage = withStartMessage,
+                    )
+                )
             }
         }
     }
@@ -250,10 +375,20 @@ class StartDownloadViewModel @Inject constructor(
     /**
      * Triggers the event related to save offline a node
      * @param node
+     * @param withStartMessage  Whether show start message or not.
+     *                          It should be true only if the widget is not visible.
      */
-    fun onSaveOfflineClicked(node: TypedNode) {
+    fun onSaveOfflineClicked(
+        node: TypedNode,
+        withStartMessage: Boolean,
+    ) {
         _state.update {
-            triggered(TransferTriggerEvent.StartDownloadForOffline(node))
+            triggered(
+                TransferTriggerEvent.StartDownloadForOffline(
+                    node = node,
+                    withStartMessage = withStartMessage,
+                )
+            )
         }
     }
 

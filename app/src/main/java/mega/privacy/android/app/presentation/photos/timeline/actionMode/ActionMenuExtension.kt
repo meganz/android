@@ -15,10 +15,11 @@ fun PhotosFragment.actionSaveToDevice() {
     lifecycleScope.launch {
         val selectedNodes = timelineViewModel.getSelectedNodes()
         managerActivity.saveNodesToDevice(
-            selectedNodes,
-            false,
-            false,
-            false
+            nodes = selectedNodes,
+            highPriority = false,
+            isFolderLink = false,
+            fromChat = false,
+            withStartMessage = true,
         )
     }
 }

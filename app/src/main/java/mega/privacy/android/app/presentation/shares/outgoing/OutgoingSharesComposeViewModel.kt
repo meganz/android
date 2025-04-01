@@ -587,7 +587,10 @@ class OutgoingSharesComposeViewModel @Inject constructor(
                 _state.update {
                     it.copy(
                         downloadEvent = triggered(
-                            TransferTriggerEvent.StartDownloadNode(optionsItemInfo.selectedNode)
+                            TransferTriggerEvent.StartDownloadNode(
+                                nodes = optionsItemInfo.selectedNode,
+                                withStartMessage = false,
+                            )
                         )
                     )
                 }

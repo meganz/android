@@ -728,7 +728,10 @@ class FolderLinkViewModel @Inject constructor(
             _state.update {
                 it.copy(
                     downloadEvent = triggered(
-                        TransferTriggerEvent.StartDownloadNode(nodes)
+                        TransferTriggerEvent.StartDownloadNode(
+                            nodes = nodes,
+                            withStartMessage = false,
+                        )
                     )
                 )
             }

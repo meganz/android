@@ -1,6 +1,5 @@
 package mega.privacy.android.app.presentation.recentactions.recentactionbucket
 
-import mega.privacy.android.shared.resources.R as sharedR
 import android.content.Intent
 import android.view.Menu
 import android.view.MenuItem
@@ -9,7 +8,6 @@ import androidx.lifecycle.lifecycleScope
 import kotlinx.coroutines.launch
 import mega.privacy.android.app.R
 import mega.privacy.android.app.featuretoggle.ApiFeatures
-import mega.privacy.android.app.featuretoggle.AppFeatures
 import mega.privacy.android.app.main.ManagerActivity
 import mega.privacy.android.app.main.controllers.NodeController
 import mega.privacy.android.app.main.dialog.rubbishbin.ConfirmMoveToRubbishBinDialogFragment
@@ -20,6 +18,7 @@ import mega.privacy.android.app.utils.MegaNodeUtil.isGif
 import mega.privacy.android.app.utils.MegaNodeUtil.isImage
 import mega.privacy.android.app.utils.MegaNodeUtil.isVideo
 import mega.privacy.android.domain.entity.node.NodeId
+import mega.privacy.android.shared.resources.R as sharedR
 import timber.log.Timber
 
 /**
@@ -124,10 +123,11 @@ class RecentActionBucketActionModeCallback constructor(
         when (item!!.itemId) {
             R.id.cab_menu_download -> {
                 managerActivity.saveNodesToDevice(
-                    selectedMegaNodes,
-                    false,
-                    false,
-                    false
+                    nodes = selectedMegaNodes,
+                    highPriority = false,
+                    isFolderLink = false,
+                    fromChat = false,
+                    withStartMessage = false,
                 )
                 viewModel.clearSelection()
             }

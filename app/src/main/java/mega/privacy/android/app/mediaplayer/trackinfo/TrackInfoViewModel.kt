@@ -80,7 +80,10 @@ class TrackInfoViewModel @Inject constructor(
                 _state.update {
                     it.copy(
                         transferTriggerEvent = triggered(
-                            TransferTriggerEvent.StartDownloadForOffline(audioNode)
+                            TransferTriggerEvent.StartDownloadForOffline(
+                                node = audioNode,
+                                withStartMessage = true,
+                            )
                         ),
                         availableOffline = true,
                     )

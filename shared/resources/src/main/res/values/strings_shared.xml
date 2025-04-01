@@ -1030,4 +1030,6 @@
     <string name="general_update">Update</string>
     <!-- Message displayed when email address is successfully updated -->
     <string name="email_confirmation_email_address_update_message">Email address updated</string>
+    <!-- Snackbar text to inform the user that download started -->
+    <string name="transfers_download_started_snackbar">Download started. See notification for details.</string>
 </resources>

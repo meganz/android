@@ -138,25 +138,41 @@ abstract class MediaPlayerActivity : PasscodeActivity() {
 
     internal fun saveChatNode() {
         val (chatId, message) = getChatMessage()
-        startDownloadViewModel.onDownloadClicked(chatId, message?.msgId ?: INVALID_HANDLE)
+        startDownloadViewModel.onDownloadClicked(
+            chatId = chatId,
+            messageId = message?.msgId ?: INVALID_HANDLE,
+            withStartMessage = true,
+        )
     }
 
     internal fun saveFileLinkNode(serializedNode: String) {
-        startDownloadViewModel.onDownloadClicked(serializedNode)
+        startDownloadViewModel.onDownloadClicked(
+            serializedData = serializedNode,
+            withStartMessage = true,
+        )
     }
 
     internal fun saveNodeFromFolderLink(nodeId: NodeId) {
-        startDownloadViewModel.onFolderLinkChildNodeDownloadClicked(nodeId)
+        startDownloadViewModel.onFolderLinkChildNodeDownloadClicked(
+            nodeId = nodeId,
+            withStartMessage = true,
+        )
     }
 
     internal fun saveFromAlbumSharing(nodeId: NodeId) {
         viewModel.getNodeForAlbumSharing(nodeId.longValue)?.let { node ->
-            startDownloadViewModel.onDownloadClicked(node)
+            startDownloadViewModel.onDownloadClicked(
+                serializedData = node,
+                withStartMessage = true,
+            )
         }
     }
 
     internal fun saveNode(nodeId: NodeId) {
-        startDownloadViewModel.onDownloadClicked(nodeId)
+        startDownloadViewModel.onDownloadClicked(
+            nodeId = nodeId,
+            withStartMessage = true,
+        )
     }
 
     /**

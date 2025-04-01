@@ -446,7 +446,13 @@ class RecentActionBucketFragment : Fragment() {
     }
 
     private fun download(handle: Long) {
-        callManager { it.saveHandlesToDevice(listOf(handle), true) }
+        callManager {
+            it.saveHandlesToDevice(
+                handles = listOf(handle),
+                highPriority = true,
+                withStartMessage = false
+            )
+        }
     }
 
     private fun observeAnimatedItems() {

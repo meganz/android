@@ -442,7 +442,12 @@ class FileInfoViewModel @Inject constructor(
             if (availableOffline) {
                 updateState {
                     it.copy(
-                        downloadEvent = triggered(StartDownloadForOffline(typedNode)),
+                        downloadEvent = triggered(
+                            StartDownloadForOffline(
+                                node = typedNode,
+                                withStartMessage = true
+                            )
+                        ),
                         isAvailableOffline = true,
                     )
                 }
@@ -1080,7 +1085,10 @@ class FileInfoViewModel @Inject constructor(
     fun startDownloadNode() {
         viewModelScope.launch {
             _uiState.updateDownloadEvent(
-                TransferTriggerEvent.StartDownloadNode(listOf(typedNode))
+                TransferTriggerEvent.StartDownloadNode(
+                    listOf(typedNode),
+                    withStartMessage = true
+                )
             )
         }
     }

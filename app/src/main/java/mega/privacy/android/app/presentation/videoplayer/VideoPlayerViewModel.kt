@@ -8,7 +8,6 @@ import android.graphics.Bitmap
 import android.graphics.Rect
 import android.net.Uri
 import android.os.Build
-import androidx.lifecycle.LiveData
 import android.os.Handler
 import android.os.Looper
 import android.provider.MediaStore
@@ -16,6 +15,7 @@ import android.view.PixelCopy
 import android.view.Surface
 import android.view.TextureView
 import android.view.View
+import androidx.lifecycle.LiveData
 import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
@@ -194,7 +194,6 @@ import java.text.SimpleDateFormat
 import java.time.Instant
 import java.util.Date
 import javax.inject.Inject
-import kotlin.Boolean
 import kotlin.time.Duration.Companion.seconds
 
 /**
@@ -1072,32 +1071,47 @@ class VideoPlayerViewModel @Inject constructor(
 
                 FROM_CHAT -> {
                     getChatFileUseCase(chatId, messageId)?.let { chatFile ->
-                        TransferTriggerEvent.StartDownloadNode(listOf(chatFile))
+                        TransferTriggerEvent.StartDownloadNode(
+                            nodes = listOf(chatFile),
+                            withStartMessage = true,
+                        )
                     }
                 }
 
                 FILE_LINK_ADAPTER -> {
                     serialize?.let {
                         val nodes = listOfNotNull(getPublicNodeFromSerializedDataUseCase(it))
-                        TransferTriggerEvent.StartDownloadNode(nodes)
+                        TransferTriggerEvent.StartDownloadNode(
+                            nodes = nodes,
+                            withStartMessage = true,
+                        )
                     }
                 }
 
                 FOLDER_LINK_ADAPTER -> {
                     val nodes =
                         listOfNotNull(getPublicChildNodeFromIdUseCase(NodeId(playingHandle)))
-                    TransferTriggerEvent.StartDownloadNode(nodes)
+                    TransferTriggerEvent.StartDownloadNode(
+                        nodes = nodes,
+                        withStartMessage = true,
+                    )
                 }
 
                 FROM_ALBUM_SHARING -> {
                     val data = getPublicAlbumNodeDataUseCase(NodeId(playingHandle)) ?: return@launch
                     val nodes = listOfNotNull(getPublicNodeFromSerializedDataUseCase(data))
-                    TransferTriggerEvent.StartDownloadNode(nodes)
+                    TransferTriggerEvent.StartDownloadNode(
+                        nodes = nodes,
+                        withStartMessage = true,
+                    )
                 }
 
                 else -> {
                     val nodes = listOfNotNull(getVideoNodeByHandleUseCase(playingHandle))
-                    TransferTriggerEvent.StartDownloadNode(nodes)
+                    TransferTriggerEvent.StartDownloadNode(
+                        nodes = nodes,
+                        withStartMessage = true,
+                    )
                 }
             }
             if (downloadEvent != null)
@@ -1430,7 +1444,14 @@ class VideoPlayerViewModel @Inject constructor(
     internal fun onStartChatFileOfflineDownload(): LiveData<ChatFile> = startChatFileOfflineDownload
 
     internal fun startDownloadForOffline(chatFile: ChatFile) = uiState.update {
-        it.copy(downloadEvent = triggered(StartDownloadForOffline(chatFile)))
+        it.copy(
+            downloadEvent = triggered(
+                StartDownloadForOffline(
+                    node = chatFile,
+                    withStartMessage = true,
+                )
+            )
+        )
     }
 
     /**

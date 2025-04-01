@@ -1,6 +1,5 @@
 package mega.privacy.android.app.presentation.pdfviewer
 
-import mega.privacy.android.shared.resources.R as sharedR
 import android.animation.ObjectAnimator
 import android.annotation.SuppressLint
 import android.app.Activity
@@ -94,6 +93,7 @@ import mega.privacy.android.domain.entity.node.NodeId
 import mega.privacy.android.domain.qualifier.ApplicationScope
 import mega.privacy.android.domain.usecase.featureflag.GetFeatureFlagValueUseCase
 import mega.privacy.android.navigation.MegaNavigator
+import mega.privacy.android.shared.resources.R as sharedR
 import mega.privacy.mobile.analytics.event.DocumentPreviewHideNodeMenuItemEvent
 import nz.mega.sdk.MegaApiAndroid
 import nz.mega.sdk.MegaApiJava
@@ -398,7 +398,10 @@ class PdfViewerActivity : BaseActivity(), MegaGlobalListenerInterface, OnPageCha
         collectFlow(viewModel.uiState) { pdfViewerState ->
             with(pdfViewerState) {
                 (startChatOfflineDownloadEvent as? StateEventWithContentTriggered)?.let { event ->
-                    startDownloadViewModel.onSaveOfflineClicked(event.content)
+                    startDownloadViewModel.onSaveOfflineClicked(
+                        chatFile = event.content,
+                        withStartMessage = true,
+                    )
                     viewModel.onConsumeStartChatOfflineDownloadEvent()
                 }
 
@@ -769,18 +772,31 @@ class PdfViewerActivity : BaseActivity(), MegaGlobalListenerInterface, OnPageCha
 
     private fun download() {
         if (fromChat) {
-            startDownloadViewModel.onDownloadClicked(chatId, msgId)
+            startDownloadViewModel.onDownloadClicked(
+                chatId = chatId,
+                messageId = msgId,
+                withStartMessage = true,
+            )
         } else if (type == Constants.FILE_LINK_ADAPTER) {
             node?.serialize()?.let {
-                startDownloadViewModel.onDownloadClicked(it)
+                startDownloadViewModel.onDownloadClicked(
+                    serializedData = it,
+                    withStartMessage = true,
+                )
             }
         } else if (isFolderLink) {
             node?.handle?.let {
-                startDownloadViewModel.onFolderLinkChildNodeDownloadClicked(NodeId(it))
+                startDownloadViewModel.onFolderLinkChildNodeDownloadClicked(
+                    nodeId = NodeId(it),
+                    withStartMessage = true,
+                )
             }
         } else {
             node?.handle?.let {
-                startDownloadViewModel.onDownloadClicked(NodeId(it))
+                startDownloadViewModel.onDownloadClicked(
+                    nodeId = NodeId(it),
+                    withStartMessage = true,
+                )
             }
         }
     }

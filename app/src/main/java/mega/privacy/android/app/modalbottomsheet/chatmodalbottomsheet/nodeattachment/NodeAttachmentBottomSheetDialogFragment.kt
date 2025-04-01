@@ -62,7 +62,8 @@ internal class NodeAttachmentBottomSheetDialogFragment : BottomSheetDialogFragme
                             if (checked) {
                                 startDownloadViewModel.onSaveOfflineClicked(
                                     chatId = viewModel.chatId,
-                                    messageId = viewModel.messageId
+                                    messageId = viewModel.messageId,
+                                    withStartMessage = true,
                                 )
                             } else {
                                 nodeAttachmentHistoryViewModel.removeChatNodeFromOffline(nodeId)
@@ -72,7 +73,8 @@ internal class NodeAttachmentBottomSheetDialogFragment : BottomSheetDialogFragme
                         onSaveToDeviceClicked = {
                             startDownloadViewModel.onDownloadClicked(
                                 chatId = viewModel.chatId,
-                                messageId = viewModel.messageId
+                                messageId = viewModel.messageId,
+                                withStartMessage = true,
                             )
                             dismissAllowingStateLoss()
                         },

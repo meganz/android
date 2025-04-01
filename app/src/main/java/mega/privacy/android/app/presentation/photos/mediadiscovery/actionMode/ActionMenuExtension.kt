@@ -16,7 +16,8 @@ fun MediaDiscoveryFragment.actionSaveToDevice() {
             selectedNodes,
             highPriority = false,
             isFolderLink = false,
-            fromChat = false
+            fromChat = false,
+            withStartMessage = true,
         )
     }
 }

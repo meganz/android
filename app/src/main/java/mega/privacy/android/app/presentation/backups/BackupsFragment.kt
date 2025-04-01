@@ -1,6 +1,5 @@
 package mega.privacy.android.app.presentation.backups
 
-import mega.privacy.android.icon.pack.R as iconPackR
 import android.annotation.SuppressLint
 import android.content.Intent
 import android.net.Uri
@@ -68,6 +67,7 @@ import mega.privacy.android.data.qualifier.MegaApi
 import mega.privacy.android.domain.entity.node.NodeId
 import mega.privacy.android.domain.entity.preference.ViewType
 import mega.privacy.android.domain.usecase.featureflag.GetFeatureFlagValueUseCase
+import mega.privacy.android.icon.pack.R as iconPackR
 import mega.privacy.android.navigation.MegaNavigator
 import nz.mega.sdk.MegaApiAndroid
 import nz.mega.sdk.MegaNode
@@ -256,6 +256,7 @@ class BackupsFragment : RotatableFragment() {
                         highPriority = false,
                         isFolderLink = false,
                         fromChat = false,
+                        withStartMessage = false,
                     )
                     clearSelections()
                     hideMultipleSelect()
@@ -603,6 +604,7 @@ class BackupsFragment : RotatableFragment() {
                         highPriority = true,
                         isFolderLink = false,
                         fromChat = false,
+                        withStartMessage = false,
                     )
                 }
             }
@@ -662,6 +664,7 @@ class BackupsFragment : RotatableFragment() {
                     highPriority = true,
                     isFolderLink = false,
                     fromChat = false,
+                    withStartMessage = false,
                 )
             }
             (requireActivity() as ManagerActivity).overridePendingTransition(0, 0)

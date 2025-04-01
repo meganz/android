@@ -497,7 +497,10 @@ class ImagePreviewViewModel @Inject constructor(
                     if (downloadForPreview) {
                         TransferTriggerEvent.StartDownloadForPreview(node = it, isOpenWith = false)
                     } else {
-                        TransferTriggerEvent.StartDownloadNode(listOf(it))
+                        TransferTriggerEvent.StartDownloadNode(
+                            nodes = listOf(it),
+                            withStartMessage = true,
+                        )
                     }
                 }
             }
@@ -523,7 +526,10 @@ class ImagePreviewViewModel @Inject constructor(
                 triggerDownloadEvent(
                     imageNode,
                 ) {
-                    TransferTriggerEvent.StartDownloadForOffline(it)
+                    TransferTriggerEvent.StartDownloadForOffline(
+                        node = it,
+                        withStartMessage = true,
+                    )
                 }
             } else {
                 removeOfflineNodeUseCase(imageNode.id)

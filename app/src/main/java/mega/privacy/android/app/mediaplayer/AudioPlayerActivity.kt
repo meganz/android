@@ -1,6 +1,5 @@
 package mega.privacy.android.app.mediaplayer
 
-import mega.privacy.android.shared.resources.R as sharedR
 import android.app.Activity
 import android.content.ComponentName
 import android.content.Context
@@ -90,6 +89,7 @@ import mega.privacy.android.domain.entity.node.NodeId
 import mega.privacy.android.domain.exception.BlockedMegaException
 import mega.privacy.android.domain.exception.QuotaExceededMegaException
 import mega.privacy.android.domain.usecase.featureflag.GetFeatureFlagValueUseCase
+import mega.privacy.android.shared.resources.R as sharedR
 import mega.privacy.mobile.analytics.event.AudioPlayerHideNodeMenuItemEvent
 import nz.mega.sdk.MegaApiJava.INVALID_HANDLE
 import nz.mega.sdk.MegaError
@@ -277,7 +277,10 @@ class AudioPlayerActivity : MediaPlayerActivity() {
     private fun setupObserver() {
         with(viewModel) {
             onStartChatFileOfflineDownload().observe(this@AudioPlayerActivity) {
-                startDownloadViewModel.onSaveOfflineClicked(it)
+                startDownloadViewModel.onSaveOfflineClicked(
+                    chatFile = it,
+                    withStartMessage = true,
+                )
             }
 
             getCollision().observe(this@AudioPlayerActivity) { collision ->

@@ -1460,7 +1460,8 @@ class ContactInfoActivity : BaseActivity(), ActionNodeCallback, MegaRequestListe
     fun downloadFile(nodes: List<MegaNode>) {
         startDownloadViewModel.onDownloadClicked(
             nodeIds = nodes.map { NodeId(it.handle) },
-            isHighPriority = true
+            isHighPriority = true,
+            withStartMessage = true,
         )
         hideSelectMode()
     }

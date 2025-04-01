@@ -332,7 +332,12 @@ class FileLinkViewModel @Inject constructor(
                 })
             _state.update {
                 it.copy(
-                    downloadEvent = triggered(TransferTriggerEvent.StartDownloadNode(linkNodes))
+                    downloadEvent = triggered(
+                        TransferTriggerEvent.StartDownloadNode(
+                            nodes = linkNodes,
+                            withStartMessage = false
+                        )
+                    )
                 )
             }
         }

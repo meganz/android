@@ -5564,24 +5564,29 @@ class ManagerActivity : PasscodeActivity(), NavigationView.OnNavigationItemSelec
      * @param highPriority    whether this download is high priority or not
      * @param isFolderLink    whether this download is a folder link
      * @param fromChat        whether this download is from chat
+     * @param withStartMessage  Whether show start message or not.
+     *                          It should be true only if the widget is not visible.
      */
     fun saveNodesToDevice(
         nodes: List<MegaNode?>?, highPriority: Boolean, isFolderLink: Boolean,
         fromChat: Boolean,
+        withStartMessage: Boolean,
     ) {
         if (nodes == null) return
         when {
             isFolderLink || fromChat -> {
                 startDownloadViewModel.onMultipleSerializedNodesDownloadClicked(
-                    nodes.mapNotNull { it?.serialize() },
-                    highPriority,
+                    serializedData = nodes.mapNotNull { it?.serialize() },
+                    isHighPriority = highPriority,
+                    withStartMessage = withStartMessage,
                 )
             }
 
             else -> {
                 startDownloadViewModel.onDownloadClicked(
-                    nodes.mapNotNull { megaNode -> megaNode?.handle?.let { NodeId(it) } },
-                    highPriority,
+                    nodeIds = nodes.mapNotNull { megaNode -> megaNode?.handle?.let { NodeId(it) } },
+                    isHighPriority = highPriority,
+                    withStartMessage = withStartMessage,
                 )
             }
         }
@@ -5612,14 +5617,19 @@ class ManagerActivity : PasscodeActivity(), NavigationView.OnNavigationItemSelec
      *
      * @param handles         handles of nodes to save
      * @param highPriority    whether this download is high priority or not
+     * @param withStartMessage  Whether show start message or not.
+     *                          It should be true only if the widget is not visible.
      */
     fun saveHandlesToDevice(
-        handles: List<Long?>?, highPriority: Boolean,
+        handles: List<Long?>?,
+        highPriority: Boolean,
+        withStartMessage: Boolean,
     ) {
         if (handles == null) return
         startDownloadViewModel.onDownloadClicked(
-            handles.mapNotNull { it?.let { NodeId(it) } },
-            highPriority
+            nodeIds = handles.mapNotNull { it?.let { NodeId(it) } },
+            isHighPriority = highPriority,
+            withStartMessage = withStartMessage,
         )
     }
 

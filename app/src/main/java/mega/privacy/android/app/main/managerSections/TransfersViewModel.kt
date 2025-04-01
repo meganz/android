@@ -529,9 +529,15 @@ class TransfersViewModel @Inject constructor(
                 MegaTransfer.TYPE_DOWNLOAD -> {
                     getNodeByIdUseCase(NodeId(handle))?.let { typedNode ->
                         if (isOffline == true) {
-                            TransferTriggerEvent.StartDownloadForOffline(typedNode)
+                            TransferTriggerEvent.StartDownloadForOffline(
+                                node = typedNode,
+                                withStartMessage = false
+                            )
                         } else {
-                            TransferTriggerEvent.StartDownloadNode(listOf(typedNode))
+                            TransferTriggerEvent.StartDownloadNode(
+                                nodes = listOf(typedNode),
+                                withStartMessage = false
+                            )
                         }
                     } ?: run {
                         Timber.e("Node not found for this transfer")

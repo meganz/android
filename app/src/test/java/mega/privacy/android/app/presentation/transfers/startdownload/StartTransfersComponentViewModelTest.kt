@@ -5,7 +5,6 @@ import app.cash.turbine.test
 import com.google.common.truth.Truth.assertThat
 import de.palm.composestateevents.StateEventWithContentConsumed
 import de.palm.composestateevents.StateEventWithContentTriggered
-import de.palm.composestateevents.triggered
 import kotlinx.coroutines.awaitCancellation
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableSharedFlow
@@ -153,7 +152,10 @@ class StartTransfersComponentViewModelTest {
     private val node: TypedFileNode = mock()
     private val nodes = listOf(node)
     private val parentNode: TypedFolderNode = mock()
-    private val startDownloadEvent = TransferTriggerEvent.StartDownloadNode(nodes)
+    private val startDownloadEvent = TransferTriggerEvent.StartDownloadNode(
+        nodes = nodes,
+        withStartMessage = false,
+    )
     private val startUploadFilesEvent =
         TransferTriggerEvent.StartUpload.Files(mapOf(DESTINATION to null), parentId)
     private val startUploadTextFileEvent = TransferTriggerEvent.StartUpload.TextFile(
@@ -321,7 +323,12 @@ class StartTransfersComponentViewModelTest {
         runTest {
             commonStub()
             whenever(isConnectedToInternetUseCase()).thenReturn(false)
-            underTest.startTransfer(TransferTriggerEvent.StartDownloadNode(nodes))
+            underTest.startTransfer(
+                TransferTriggerEvent.StartDownloadNode(
+                    nodes = nodes,
+                    withStartMessage = false,
+                )
+            )
             assertCurrentEventIsEqualTo(StartTransferEvent.NotConnected)
         }
 
@@ -330,7 +337,10 @@ class StartTransfersComponentViewModelTest {
         runTest {
             commonStub()
             underTest.startTransfer(
-                TransferTriggerEvent.StartDownloadNode(listOf())
+                TransferTriggerEvent.StartDownloadNode(
+                    nodes = listOf(),
+                    withStartMessage = false,
+                )
             )
             assertCurrentEventIsEqualTo(StartTransferEvent.Message.TransferCancelled)
         }
@@ -340,7 +350,10 @@ class StartTransfersComponentViewModelTest {
         runTest {
             commonStub()
             underTest.startTransfer(
-                TransferTriggerEvent.StartDownloadForOffline(null)
+                TransferTriggerEvent.StartDownloadForOffline(
+                    node = null,
+                    withStartMessage = false,
+                )
             )
             assertCurrentEventIsEqualTo(StartTransferEvent.Message.TransferCancelled)
         }
@@ -386,7 +399,10 @@ class StartTransfersComponentViewModelTest {
         runTest {
             commonStub()
             whenever(shouldAskDownloadDestinationUseCase()).thenReturn(true)
-            val event = TransferTriggerEvent.StartDownloadNode(nodes)
+            val event = TransferTriggerEvent.StartDownloadNode(
+                nodes = nodes,
+                withStartMessage = false,
+            )
             underTest.startDownloadWithoutConfirmation(event)
             assertThat(underTest.uiState.value.askDestinationForDownload).isEqualTo(
                 event
@@ -402,7 +418,10 @@ class StartTransfersComponentViewModelTest {
             val destinationUri = mock<Uri> {
                 on { toString() } doReturn uriString
             }
-            val startDownloadNode = TransferTriggerEvent.StartDownloadNode(nodes)
+            val startDownloadNode = TransferTriggerEvent.StartDownloadNode(
+                nodes = nodes,
+                withStartMessage = false,
+            )
             val expected = SaveDestinationInfo(
                 destination = uriString,
                 destinationName = destinationName
@@ -431,7 +450,10 @@ class StartTransfersComponentViewModelTest {
             val destinationUri = mock<Uri> {
                 on { toString() } doReturn uriString
             }
-            val startDownloadNode = TransferTriggerEvent.StartDownloadNode(nodes)
+            val startDownloadNode = TransferTriggerEvent.StartDownloadNode(
+                nodes = nodes,
+                withStartMessage = false,
+            )
 
             whenever(shouldAskDownloadDestinationUseCase()).thenReturn(true)
             whenever(shouldPromptToSaveDestinationUseCase()).thenReturn(true)
@@ -795,7 +817,12 @@ class StartTransfersComponentViewModelTest {
 
                 underTest.uiState.test {
                     println(awaitItem())//ignore initial
-                    underTest.startTransfer(TransferTriggerEvent.StartDownloadNode(nodes))
+                    underTest.startTransfer(
+                        TransferTriggerEvent.StartDownloadNode(
+                            nodes = nodes,
+                            withStartMessage = false,
+                        )
+                    )
                     expectedList.forEach { expected ->
                         val actual =
                             (awaitItem().jobInProgressState as? StartTransferJobInProgress.ScanningTransfers)?.stage
@@ -819,7 +846,10 @@ class StartTransfersComponentViewModelTest {
                     on { this.scanningFoldersData } doReturn scanningFoldersData
                     on { this.startedFiles } doReturn 1
                 }
-                val triggerEvent = TransferTriggerEvent.StartDownloadNode(nodes)
+                val triggerEvent = TransferTriggerEvent.StartDownloadNode(
+                    nodes = nodes,
+                    withStartMessage = false,
+                )
                 whenever(monitorPendingTransfersUntilResolvedUseCase(TransferType.DOWNLOAD)) doReturn
                         flowOf(listOf(pendingTransfer))
 
@@ -841,7 +871,11 @@ class StartTransfersComponentViewModelTest {
                     )
                     on { this.scanningFoldersData } doReturn scanningFoldersData
                 }
-                val triggerEvent = TransferTriggerEvent.StartDownloadNode(nodes)
+                val triggerEvent = TransferTriggerEvent.StartDownloadNode(
+                    nodes = nodes,
+                    withStartMessage = false,
+                )
+
                 whenever(monitorPendingTransfersUntilResolvedUseCase(TransferType.DOWNLOAD)) doReturn
                         flowOf(listOf(pendingTransfer))
 
@@ -956,7 +990,10 @@ class StartTransfersComponentViewModelTest {
                 )
                 on { this.scanningFoldersData } doReturn scanningFoldersData
             }
-            val triggerEvent = TransferTriggerEvent.StartDownloadNode(nodes)
+            val triggerEvent = TransferTriggerEvent.StartDownloadNode(
+                nodes = nodes,
+                withStartMessage = false,
+            )
             whenever(monitorPendingTransfersUntilResolvedUseCase(TransferType.DOWNLOAD)) doReturn
                     flowOf(listOf(pendingTransfer))
 
@@ -1140,8 +1177,14 @@ class StartTransfersComponentViewModelTest {
     }
 
     private fun provideStartDownloadEvents() = listOf(
-        TransferTriggerEvent.StartDownloadNode(nodes),
-        TransferTriggerEvent.StartDownloadForOffline(node),
+        TransferTriggerEvent.StartDownloadNode(
+            nodes = nodes,
+            withStartMessage = false,
+        ),
+        TransferTriggerEvent.StartDownloadForOffline(
+            node = node,
+            withStartMessage = false,
+        ),
         TransferTriggerEvent.StartDownloadForPreview(node, false),
 
         )
