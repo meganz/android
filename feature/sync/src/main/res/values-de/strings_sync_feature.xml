@@ -66,8 +66,6 @@
     <string name="sync_list_sync_state_paused">Angehalten</string>
     <!-- Sync state syncing -->
     <string name="sync_list_sync_state_syncing">Synchronisierung läuft&#8230;</string>
-    <!-- Sync state failed -->
-    <string name="sync_folders_sync_state_failed">Angehalten</string>
     <!-- Sync permission title for device storage -->
     <string name="sync_folders_device_storage">Geräteordner</string>
     <!-- Sync permission title for mega storage -->

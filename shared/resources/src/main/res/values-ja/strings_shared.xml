@@ -671,7 +671,7 @@
     <!-- Title of Favourites video playlist in the video section -->
     <string name="video_section_title_favourite_playlist">お気に入り</string>
     <!-- Title of the synced folder list empty state -->
-    <string name="device_center_sync_backup_list_empty_state_title">デバイスが設定されていません</string>
+    <string name="device_center_sync_backup_list_empty_state_title">同期やバックアップはまだ設定されていません</string>
     <!-- Message of the synced folder list empty state -->
     <string name="device_center_sync_backup_list_empty_state_message">デバイス上のフォルダをMEGA上のフォルダと同期またはバックアップできます</string>
     <!-- subtitle of meeting title in schedule meeting for title disclaimer -->
@@ -955,7 +955,7 @@
     <!-- Message displayed when email is successfully resent -->
     <string name="general_email_resend_success_message">メールが送信されました</string>
     <!--General Request Network Failed text-->
-    <string name="general_request_failed_message">ちょと、うまく行かなかったようです</string>
+    <string name="general_request_failed_message">エラーが発生しました。もう一度やり直してください。</string>
     <!-- Message error shown when trying to log in on an account that has been suspended due to breaches of copyright -->
     <string name="dialog_account_suspended_ToS_copyright_message">度重なる著作権侵害の申し立てにより、あなたのMEGAアカウントは停止されました。これは、アカウントまたはアカウント内のデータにアクセスできないことを意味します。\n異議申し立て通知を提出する方法の詳細については、メール受信箱を確認してください。</string>
     <!-- Message error shown when trying to log in on an account that has been terminated due to breaches of all reasons of breaching Terms of Service, except copyright. -->
@@ -983,19 +983,35 @@
     <!-- First message header paragraph in note to self chat -->
     <string name="chat_note_to_self_chat_first_message_header_paragraph">写真、重要な情報、大きなアイデア用のプライベートスペースです。常に同期され、ゼロナレッジ暗号化で保護されています。</string>
     <!-- Title of the notification displayed when Syncs are paused due to low battery conditions -->
-    <string name="general_sync_notification_low_battery_title">Syncing paused due to low battery</string>
+    <string name="general_sync_notification_low_battery_title">バッテリー残量不足のため同期が一時停止しました</string>
     <!-- Text of the notification displayed when Syncs are paused due to low battery conditions -->
-    <string name="general_sync_notification_low_battery_text">Connect to power source to resume</string>
+    <string name="general_sync_notification_low_battery_text">電源に接続して再開</string>
     <!-- Title of the notification displayed when Syncs are paused due to lost Wi-Fi conditions -->
-    <string name="general_sync_notification_lost_wifi_title">Syncing paused due to lost connection</string>
+    <string name="general_sync_notification_lost_wifi_title">接続が切れて同期が一時停止しました</string>
     <!-- Text of the notification displayed when Syncs are paused due to lost Wi-Fi conditions -->
-    <string name="general_sync_notification_lost_wifi_text">Reconnect to Wi-Fi to resume</string>
+    <string name="general_sync_notification_lost_wifi_text">Wi-Fiに再接続して再開</string>
     <!-- Title of the notification displayed when Syncs are stopped due to some sync error -->
-    <string name="general_sync_notification_generic_error_title">Syncing has stopped</string>
+    <string name="general_sync_notification_generic_error_title">同期が停止しました</string>
     <!-- Text of the notification displayed when Syncs are stopped due to some sync error -->
-    <string name="general_sync_notification_generic_error_text">Go to the Help Centre to understand why</string>
+    <string name="general_sync_notification_generic_error_text">ヘルプセンターにアクセスして理由を確認</string>
     <!-- Title of the notification displayed when a Sync has stalled issues -->
-    <string name="general_sync_notification_stalled_issues_title">Sync issues detected</string>
+    <string name="general_sync_notification_stalled_issues_title">同期の問題が検出されました</string>
     <!-- Text of the notification displayed when a Sync has stalled issues -->
-    <string name="general_sync_notification_stalled_issues_text">View and resolve issues</string>
+    <string name="general_sync_notification_stalled_issues_text">問題を表示して解決</string>
+    <!-- The name of the Device or Folder Status which signifies that an error has occurred -->
+    <string name="device_center_list_view_item_status_error">エラー</string>
+    <!-- Hint shown in the field to write a message in the note to self chat screen -->
+    <string name="chat_note_to_self_chat_message_hint">自分へのメッセージを書いてください</string>
+    <!--The title of the Change Email Address page-->
+    <string name="change_email_address_title">メールを変更する</string>
+    <!--Change Email Address page content text to ask user to enter a new email address -->
+    <string name="change_email_address_content">新しいメールアドレスを入力してください。その新しいメールアドレスに確認メールを送信いたします。</string>
+    <!--Error message to be shown when account already existed-->
+    <string name="sign_up_account_existed_error_message">このメールアドレスはすでにMEGAのアカウントにサインアップしています</string>
+    <!--General update text-->
+    <string name="general_update">更新</string>
+    <!-- Message displayed when email address is successfully updated -->
+    <string name="email_confirmation_email_address_update_message">メールアドレスが更新されました</string>
+    <!-- Snackbar text to inform the user that download started -->
+    <string name="transfers_download_started_snackbar">ダウンロードを開始しました。 詳細は通知をご覧ください。</string>
 </resources>

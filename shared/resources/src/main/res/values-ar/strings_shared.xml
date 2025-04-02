@@ -726,7 +726,7 @@
     <!-- Title of Favourites video playlist in the video section -->
     <string name="video_section_title_favourite_playlist">المفضلة</string>
     <!-- Title of the synced folder list empty state -->
-    <string name="device_center_sync_backup_list_empty_state_title">لم يتم إعداد أي أجهزة</string>
+    <string name="device_center_sync_backup_list_empty_state_title">لم يتم إعداد أي عمليات مزامنة أو نسخ احتياطية حتى الآن</string>
     <!-- Message of the synced folder list empty state -->
     <string name="device_center_sync_backup_list_empty_state_message">قم بمزامنة مجلد أو نسخه احتياطيًا على جهازك باستخدام مجلد على ميغا MEGA</string>
     <!-- subtitle of meeting title in schedule meeting for title disclaimer -->
@@ -1045,7 +1045,7 @@
     <!-- Message displayed when email is successfully resent -->
     <string name="general_email_resend_success_message">تم إرسال البريد الالكتروني</string>
     <!--General Request Network Failed text-->
-    <string name="general_request_failed_message">حدث خطأ ما</string>
+    <string name="general_request_failed_message">حدث خطأ، حاول مرة أخرى</string>
     <!-- Message error shown when trying to log in on an account that has been suspended due to breaches of copyright -->
     <string name="dialog_account_suspended_ToS_copyright_message">تم تعليق حساب ميغا MEGA الخاص بك بسبب الادعاءات المتكررة بانتهاكات حقوق الطبع والنشر. هذا يعني أنه لا يمكنك الوصول إلى حسابك أو البيانات الموجودة فيه.\nتحقق من صندوق البريد الإلكتروني الخاص بك للحصول على مزيد من المعلومات حول كيفية تقديم إشعار مضاد.</string>
     <!-- Message error shown when trying to log in on an account that has been terminated due to breaches of all reasons of breaching Terms of Service, except copyright. -->
@@ -1073,19 +1073,35 @@
     <!-- First message header paragraph in note to self chat -->
     <string name="chat_note_to_self_chat_first_message_header_paragraph">مساحة خاصة للصور أو المعلومات المهمة أو الأفكار الكبيرة. تتم مزامنتها وحمايتها دائمًا باستخدام تشفير المعرفة الصفرية.</string>
     <!-- Title of the notification displayed when Syncs are paused due to low battery conditions -->
-    <string name="general_sync_notification_low_battery_title">Syncing paused due to low battery</string>
+    <string name="general_sync_notification_low_battery_title">تم إيقاف المزامنة مؤقتًا بسبب انخفاض طاقة البطارية</string>
     <!-- Text of the notification displayed when Syncs are paused due to low battery conditions -->
-    <string name="general_sync_notification_low_battery_text">Connect to power source to resume</string>
+    <string name="general_sync_notification_low_battery_text">الاتصال بمصدر الطاقة لاستئناف التشغيل</string>
     <!-- Title of the notification displayed when Syncs are paused due to lost Wi-Fi conditions -->
-    <string name="general_sync_notification_lost_wifi_title">Syncing paused due to lost connection</string>
+    <string name="general_sync_notification_lost_wifi_title">تم إيقاف المزامنة مؤقتًا بسبب فقدان الاتصال</string>
     <!-- Text of the notification displayed when Syncs are paused due to lost Wi-Fi conditions -->
-    <string name="general_sync_notification_lost_wifi_text">Reconnect to Wi-Fi to resume</string>
+    <string name="general_sync_notification_lost_wifi_text">أعد الاتصال بشبكة الواي فاي Wi-Fi للاستئناف</string>
     <!-- Title of the notification displayed when Syncs are stopped due to some sync error -->
-    <string name="general_sync_notification_generic_error_title">Syncing has stopped</string>
+    <string name="general_sync_notification_generic_error_title">تم إيقاف المزامنة</string>
     <!-- Text of the notification displayed when Syncs are stopped due to some sync error -->
-    <string name="general_sync_notification_generic_error_text">Go to the Help Centre to understand why</string>
+    <string name="general_sync_notification_generic_error_text">انتقل إلى مركز المساعدة لفهم السبب</string>
     <!-- Title of the notification displayed when a Sync has stalled issues -->
-    <string name="general_sync_notification_stalled_issues_title">Sync issues detected</string>
+    <string name="general_sync_notification_stalled_issues_title">تم اكتشاف مشاكل المزامنة</string>
     <!-- Text of the notification displayed when a Sync has stalled issues -->
-    <string name="general_sync_notification_stalled_issues_text">View and resolve issues</string>
+    <string name="general_sync_notification_stalled_issues_text">عرض المشاكل وحلها</string>
+    <!-- The name of the Device or Folder Status which signifies that an error has occurred -->
+    <string name="device_center_list_view_item_status_error">خطأ</string>
+    <!-- Hint shown in the field to write a message in the note to self chat screen -->
+    <string name="chat_note_to_self_chat_message_hint">اكتب رسالة لنفسك</string>
+    <!--The title of the Change Email Address page-->
+    <string name="change_email_address_title">تغيير البريد الإلكتروني</string>
+    <!--Change Email Address page content text to ask user to enter a new email address -->
+    <string name="change_email_address_content">أدخل عنوان بريدك الإلكتروني الجديد، وسنرسل تأكيدًا بالبريد الإلكتروني إلى عنوان البريد الإلكتروني الجديد هذا.</string>
+    <!--Error message to be shown when account already existed-->
+    <string name="sign_up_account_existed_error_message">تم تسجيل عنوان البريد الإلكتروني هذا بالفعل للحصول على حساب مع ميغا MEGA</string>
+    <!--General update text-->
+    <string name="general_update">تحديث</string>
+    <!-- Message displayed when email address is successfully updated -->
+    <string name="email_confirmation_email_address_update_message">تم تحديث عنوان البريد الإلكتروني</string>
+    <!-- Snackbar text to inform the user that download started -->
+    <string name="transfers_download_started_snackbar">Download started. See notification for details.</string>
 </resources>

@@ -62,8 +62,6 @@
     <string name="sync_list_sync_state_paused">พักแล้ว</string>
     <!-- Sync state syncing -->
     <string name="sync_list_sync_state_syncing">กำลังซิงค์&#8230;</string>
-    <!-- Sync state failed -->
-    <string name="sync_folders_sync_state_failed">หยุดแล้ว</string>
     <!-- Sync permission title for device storage -->
     <string name="sync_folders_device_storage">โฟลเดอร์อุปกรณ์</string>
     <!-- Sync permission title for mega storage -->

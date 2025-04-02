@@ -1130,11 +1130,11 @@
     <!-- Button to resend the create account email to a new email address in case the previous email address was misspelled -->
     <string name="confirm_email_misspelled_resend">Gửi lại</string>
     <!-- text_copyright_alert_title -->
-    <string name="copyright_alert_title">Thông báo mới về luật bản quyền</string>
+    <string name="copyright_alert_title">Cảnh&#160;báo bản&#160;quyền cho tất cả người dùng</string>
     <!-- text_copyright_alert_first_paragraph -->
-    <string name="copyright_alert_first_paragraph">MEGA tôn trọng luật bản quyền của người khác và yêu cầu người sử dụng dịch vụ Ổ Mây MEGA nên thực hiện theo quy định của pháp luật về quyền tác giả.</string>
+    <string name="copyright_alert_first_paragraph">MEGA tôn&#160;trọng luật bản&#160;quyền của tất cả đơn&#160;vị và yêu&#160;cầu người sử&#160;dụng dịch&#160;vụ MEGA Cloud nên tuân&#160;theo theo quy&#160;định của pháp&#160;luật về quyền tác&#160;giả.</string>
     <!-- text_copyright_alert_second_paragraph -->
-    <string name="copyright_alert_second_paragraph">Tất cả các người sử dụng đều bị giám sát chặt chẽ khi dùng dịch vụ Ổ Mây MEGA nhằm để tránh việc lưu trữ và phân phát nội dung vi phạm bản quyền. Bạn (khách hàng hay người sử dụng) không được phép đăng tải, tải xuống, lưu trữ, chia sẻ, cho xem, truyền nội dung, quản lý thư mục từ bạn bè, gửi e-mail, lấy liên kết từ các tệp tin, dữ liệu có chứa nội dung vi phạm bản quyền hoặc tài sản độc quyền của cá nhân hay tập thể khác trong tài khoản của mình.</string>
+    <string name="copyright_alert_second_paragraph">Quý&#160;vị bị nghiêm&#160;cấm sử&#160;dụng dịch&#160;vụ MEGA Cloud để vi&#160;phạm bản&#160;quyền. Quý&#160;vị không được tải lên, tải xuống, lưu&#160;trữ, chia&#160;sẻ, trình&#160;bày, phát trực&#160;tuyến, phân&#160;phối, gửi bằng email, tạo đường liên&#160;kết đến nội dung, truyền&#160;tải hoặc cung&#160;cấp bất&#160;kỳ tệp&#160;tin, dữ&#160;liệu hoặc nội&#160;dung nào có vi&#160;phạm bất&#160;kỳ bản&#160;quyền hoặc quyền sở&#160;hữu nào khác của bất&#160;kỳ cá&#160;nhân hoặc tổ&#160;chức nào.</string>
     <!-- text of the Agree button -->
     <string name="copyright_alert_agree_button">Đồng ý</string>
     <!-- text of the Disagree button -->
@@ -2003,7 +2003,7 @@
     <!-- Subtitle of folder takedown historic notification -->
     <string name="subtitle_folder_takedown_notification">[A]Thư mục chia sẻ công khai của bạn [/A][B]%s[/B] đã bị gỡ bỏ.</string>
     <!-- option to dispute taken down file or folder -->
-    <string name="dispute_takendown_file">Yêu cầu gỡ bỏ</string>
+    <string name="dispute_takendown_file">Phản cáo yêu cầu</string>
     <!-- Error shown when download a file that has violated ToS/AUP. -->
     <string name="error_download_takendown_node">Không truy cập được do vi phạm Điều Khoản Dịch Vụ</string>
     <!-- Alert shown when some files were not downloaded due to ToS/AUP violation, Plural of taken down files. 2 files -->
@@ -2111,7 +2111,7 @@
     <!-- Text of the empty screen for the notifications section -->
     <string name="context_empty_notifications">[B]Không có [/B][A]thông báo[/A]</string>
     <!-- Permissions screen title -->
-    <string name="general_setup_mega">Thiếp Lập MEGA</string>
+    <string name="general_setup_mega">Thiết lập MEGA</string>
     <!-- Permissions screen explanation -->
     <string name="setup_mega_explanation">MEGA cần sự cho phép của bạn để truy cập các tệp&#160;tin của bạn để tải lên hoặc chia&#160;sẻ với người khác. Các quyền truy&#160;cập tùy chọn khác có thể sẽ cần&#160;thiết để sử&#160;dụng các tính&#160;năng và dịch&#160;vụ mà ứng&#160;dụng này cung&#160;cấp.\n\nNếu bạn chọn không cấp các quyền này, bạn vẫn có thể sử&#160;dụng ứng&#160;dụng, ngoại trừ các chức&#160;năng có yêu&#160;cầu các quyền cụ&#160;thể.</string>
     <!-- Title of the screen asking permissions for files -->
@@ -3379,7 +3379,7 @@
     <!-- Description of the Backups feature when no Backup files or folders exist -->
     <string name="backups_empty_state_body">Đây là thư mục chứa các tệp tin và thư mục đã được sao lưu dự phòng. Các mục lưu dự phòng là dạng “chỉ-được-xem” để phòng tránh bị chỉnh sửa trong Ổ&#160;Mây của bạn.Bạn có thể lưu dự phòng dữ liệu của mình từ máy tính lên MEGA bằng cách sử dụng App MEGA cho Máy&#160;Tính.</string>
     <!-- Message error shown when trying to log in on an account that has been suspended due to breaches of copyright -->
-    <string name="dialog_account_suspended_ToS_copyright_message">Tài&#160;khoản MEGA của quý&#160;vị đã bị đình&#160;chỉ do đã nhiều lần bị cáo&#160;buộc vi&#160;phạm bản&#160;quyền. Điều này có nghĩa là quý&#160;vị không được phép truy&#160;cập tài&#160;khoản của mình hoặc bất cứ dữ&#160;liệu bên trong.\nKiểm&#160;tra hộp thư email của quý&#160;vị để biết thêm thông&#160;tin và về cách gửi đơn phản&#160;đối.</string>
+    <string name="dialog_account_suspended_ToS_copyright_message">Tài&#160;khoản MEGA của quý&#160;vị đã bị đình&#160;chỉ do đã nhiều lần bị cáo&#160;buộc vi&#160;phạm bản&#160;quyền. Điều này có nghĩa là quý&#160;vị không được phép truy&#160;cập tài&#160;khoản của mình hoặc bất cứ dữ&#160;liệu bên trong.\nKiểm&#160;tra hộp thư email của quý&#160;vị để biết thêm thông&#160;tin và về cách gửi đơn phản&#160;cáo.</string>
     <!-- Message error shown when trying to log in on an account that has been terminated due to breaches of all reasons of breaching Terms of Service, except copyright. -->
     <string name="dialog_account_suspended_ToS_non_copyright_message">Tài&#160;khoản của bạn đã bị chấm&#160;dứt do vi&#160;phạm Điều&#160;Khoản Dịch&#160;Vụ của MEGA. \nBạn sẽ không thể lấy lại quyền truy&#160;cập vào dữ&#160;liệu đã được lưu&#160;trữ của mình hoặc được phép đăng&#160;ký tài&#160;khoản MEGA mới.</string>
     <!-- Title of the Meetings tab for the chat section -->
@@ -4143,9 +4143,9 @@
     <!-- Title of the dialog, shown for disputed or taken down file. The dialog will be shown, when user will try to open file, which was taken down  -->
     <string name="dialog_taken_down_file_title">Không thể mở được tệp</string>
     <!-- Description of the dialog, shown for disputed or taken down folder. The dialog will be shown, when user will try to open folder, which was taken down  -->
-    <string name="dialog_taken_down_folder_description">This folder has been taken down in accordance with our [A]Takedown Guidance Policy[/A]. You can dispute this takedown if you believe we’ve made a mistake.</string>
+    <string name="dialog_taken_down_folder_description">Thư&#160;mục này đã bị gỡ xuống theo quy&#160;định có trong [A]Chính&#160;Sách Xử&#160;Lý Gỡ&#160;Bỏ Nội&#160;Dung[/A] của chúng&#160;tôi. Quý&#160;vị có thể phản&#160;cáo việc gỡ bỏ này nếu quý&#160;vị tin rằng chúng&#160;tôi đã phạm sai&#160;lầm.</string>
     <!-- Description of the dialog, shown for disputed or taken down file. The dialog will be shown, when user will try to open file, which was taken down  -->
-    <string name="dialog_taken_down_file_description">This file has been taken down in accordance with our [A]Takedown Guidance Policy[/A]. You can dispute this takedown if you believe we’ve made a mistake.</string>
+    <string name="dialog_taken_down_file_description">Tệp&#160;tin này đã bị gỡ xuống theo quy&#160;định có trong [A]Chính&#160;Sách Xử&#160;Lý Gỡ&#160;Bỏ Nội&#160;Dung[/A] của chúng&#160;tôi. Quý&#160;vị có thể phản&#160;cáo việc gỡ bỏ này nếu quý&#160;vị tin rằng chúng&#160;tôi đã phạm sai&#160;lầm.</string>
     <!-- Text of the button to show the dialog to update to pro -->
     <string name="general_pro_only">Chỉ cho hạng Pro</string>
     <!-- Title of the link access section where information is displayed to the user about link access-->
@@ -4590,8 +4590,6 @@
     <string name="meetings_call_recording_stopped_snackbar_message">%1$s đã chấm&#160;dứt ghi âm hình</string>
     <!-- Name of the Gallery item in the attachment panel, in chat, for attaching files from Gallery -->
     <string name="chat_attach_panel_gallery">Thư Viện Phim Ảnh</string>
-    <!-- Body for Cookie dialog, visible for users, who will see the advertisements, as we want users to accept Advertisement cookies as well. Please, keep the placeholders to format the string. -->
-    <string name="dialog_ads_cookie_alert_message">Chúng&#160;tôi sử dụng cookies và các công&#160;nghệ tương&#160;tự để giúp chúng&#160;tôi cải&#160;thiện dịch&#160;vụ của mình và cho mục&#160;đích quảng&#160;cáo. Với việc tiếp&#160;tục sử&#160;dụng MEGA là bạn đồng&#160;ý với các điều&#160;khoản được cập&#160;nhật nêu trong [A]Chính&#160;Sách Cookie[/A]</string>
     <!-- Description of feature, which will be available for user, if they buy plan. This means the user won't see Advertisements if they buy a Pro plan. -->
     <string name="account_upgrade_account_description_feature_advertisement">&#8226;&#160;Không&#160;có quảng&#160;cáo</string>
     <!-- Text when sharing a meeting link indicating the subject for the email -->

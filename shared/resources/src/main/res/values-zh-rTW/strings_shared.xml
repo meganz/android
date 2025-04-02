@@ -671,7 +671,7 @@
     <!-- Title of Favourites video playlist in the video section -->
     <string name="video_section_title_favourite_playlist">收藏</string>
     <!-- Title of the synced folder list empty state -->
-    <string name="device_center_sync_backup_list_empty_state_title">未設定任何裝置</string>
+    <string name="device_center_sync_backup_list_empty_state_title">尚未設定同步或備份</string>
     <!-- Message of the synced folder list empty state -->
     <string name="device_center_sync_backup_list_empty_state_message">將裝置上的資料夾與MEGA上的資料夾同步或備份</string>
     <!-- subtitle of meeting title in schedule meeting for title disclaimer -->
@@ -955,7 +955,7 @@
     <!-- Message displayed when email is successfully resent -->
     <string name="general_email_resend_success_message">已發送信件</string>
     <!--General Request Network Failed text-->
-    <string name="general_request_failed_message">出錯了</string>
+    <string name="general_request_failed_message">發生錯誤，請重試</string>
     <!-- Message error shown when trying to log in on an account that has been suspended due to breaches of copyright -->
     <string name="dialog_account_suspended_ToS_copyright_message">由於多次侵犯版權的指控，您的MEGA帳戶已被暫停。這意味著您無法存取您的帳戶或當中的資料。\n檢查您的電子郵件收件匣，瞭解有關如何提交反對通知的更多資訊。</string>
     <!-- Message error shown when trying to log in on an account that has been terminated due to breaches of all reasons of breaching Terms of Service, except copyright. -->
@@ -983,19 +983,35 @@
     <!-- First message header paragraph in note to self chat -->
     <string name="chat_note_to_self_chat_first_message_header_paragraph">存放圖片、重要資訊或重要創意的私人空間。始終保持同步，並受到零知識加密的保護。</string>
     <!-- Title of the notification displayed when Syncs are paused due to low battery conditions -->
-    <string name="general_sync_notification_low_battery_title">Syncing paused due to low battery</string>
+    <string name="general_sync_notification_low_battery_title">由於電池電量不足，同步已暫停</string>
     <!-- Text of the notification displayed when Syncs are paused due to low battery conditions -->
-    <string name="general_sync_notification_low_battery_text">Connect to power source to resume</string>
+    <string name="general_sync_notification_low_battery_text">連接電源以繼續</string>
     <!-- Title of the notification displayed when Syncs are paused due to lost Wi-Fi conditions -->
-    <string name="general_sync_notification_lost_wifi_title">Syncing paused due to lost connection</string>
+    <string name="general_sync_notification_lost_wifi_title">由於失去連線，同步已暫停</string>
     <!-- Text of the notification displayed when Syncs are paused due to lost Wi-Fi conditions -->
-    <string name="general_sync_notification_lost_wifi_text">Reconnect to Wi-Fi to resume</string>
+    <string name="general_sync_notification_lost_wifi_text">重新連線Wi-Fi以繼續</string>
     <!-- Title of the notification displayed when Syncs are stopped due to some sync error -->
-    <string name="general_sync_notification_generic_error_title">Syncing has stopped</string>
+    <string name="general_sync_notification_generic_error_title">同步已停止</string>
     <!-- Text of the notification displayed when Syncs are stopped due to some sync error -->
-    <string name="general_sync_notification_generic_error_text">Go to the Help Centre to understand why</string>
+    <string name="general_sync_notification_generic_error_text">前往幫助中心瞭解原因</string>
     <!-- Title of the notification displayed when a Sync has stalled issues -->
-    <string name="general_sync_notification_stalled_issues_title">Sync issues detected</string>
+    <string name="general_sync_notification_stalled_issues_title">偵測到同步問題</string>
     <!-- Text of the notification displayed when a Sync has stalled issues -->
-    <string name="general_sync_notification_stalled_issues_text">View and resolve issues</string>
+    <string name="general_sync_notification_stalled_issues_text">查看並解決問題</string>
+    <!-- The name of the Device or Folder Status which signifies that an error has occurred -->
+    <string name="device_center_list_view_item_status_error">錯誤</string>
+    <!-- Hint shown in the field to write a message in the note to self chat screen -->
+    <string name="chat_note_to_self_chat_message_hint">給自己寫一則訊息</string>
+    <!--The title of the Change Email Address page-->
+    <string name="change_email_address_title">更改電子郵件地址</string>
+    <!--Change Email Address page content text to ask user to enter a new email address -->
+    <string name="change_email_address_content">輸入您的新電子郵件地址，我們將向此新電子郵件地址發送確認信件。</string>
+    <!--Error message to be shown when account already existed-->
+    <string name="sign_up_account_existed_error_message">此電子郵件地址已註冊MEGA帳戶</string>
+    <!--General update text-->
+    <string name="general_update">更新</string>
+    <!-- Message displayed when email address is successfully updated -->
+    <string name="email_confirmation_email_address_update_message">電子郵件地址已更新</string>
+    <!-- Snackbar text to inform the user that download started -->
+    <string name="transfers_download_started_snackbar">下載已開始。詳細資訊請查看通知。</string>
 </resources>

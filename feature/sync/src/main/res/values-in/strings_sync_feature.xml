@@ -62,8 +62,6 @@
     <string name="sync_list_sync_state_paused">Berhenti sementara</string>
     <!-- Sync state syncing -->
     <string name="sync_list_sync_state_syncing">Menyinkronkan...</string>
-    <!-- Sync state failed -->
-    <string name="sync_folders_sync_state_failed">Berhenti</string>
     <!-- Sync permission title for device storage -->
     <string name="sync_folders_device_storage">Folder perangkat</string>
     <!-- Sync permission title for mega storage -->

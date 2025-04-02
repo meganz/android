@@ -385,7 +385,7 @@
     <!-- Feature indicating transfer sharing, available in the pro plan -->
     <string name="account_cancel_account_screen_plan_transfer_sharing">Condivisione della banda di trasferimento</string>
     <!-- Row label for rewind feature in the comparison table -->
-    <string name="account_cancel_account_screen_plan_rewind">Ripristina</string>
+    <string name="account_cancel_account_screen_plan_rewind">Riavvolgi</string>
     <!-- Rewind duration available in the free plan -->
     <string name="account_cancel_account_screen_plan_rewind_free">Fino a 30 giorni (solo visualizzazione)</string>
     <!-- Rewind duration available in the current plan. %1s represents the number of days. -->
@@ -693,7 +693,7 @@
     <!-- Title of Favourites video playlist in the video section -->
     <string name="video_section_title_favourite_playlist">Preferiti</string>
     <!-- Title of the synced folder list empty state -->
-    <string name="device_center_sync_backup_list_empty_state_title">No devices are set up</string>
+    <string name="device_center_sync_backup_list_empty_state_title">No syncs or backups have been set up yet</string>
     <!-- Message of the synced folder list empty state -->
     <string name="device_center_sync_backup_list_empty_state_message">Effettua la sincronizzazione o il backup di una cartella sul tuo dispositivo con una cartella su MEGA</string>
     <!-- subtitle of meeting title in schedule meeting for title disclaimer -->
@@ -989,7 +989,7 @@
     <!-- Message displayed when email is successfully resent -->
     <string name="general_email_resend_success_message">E-mail inviata</string>
     <!--General Request Network Failed text-->
-    <string name="general_request_failed_message">Qualcosa è andato storto</string>
+    <string name="general_request_failed_message">Si è verificato un errore, riprova</string>
     <!-- Message error shown when trying to log in on an account that has been suspended due to breaches of copyright -->
     <string name="dialog_account_suspended_ToS_copyright_message">Il tuo account MEGA è stato sospeso a causa di ripetute accuse di violazione di copyright. Questo significa che non puoi accedere al tuo account o ai dati al suo interno.\nControlla la tua casella di posta elettronica per maggiori informazioni su come puoi inviare una contro-notifica.</string>
     <!-- Message error shown when trying to log in on an account that has been terminated due to breaches of all reasons of breaching Terms of Service, except copyright. -->
@@ -1032,4 +1032,20 @@
     <string name="general_sync_notification_stalled_issues_title">Sync issues detected</string>
     <!-- Text of the notification displayed when a Sync has stalled issues -->
     <string name="general_sync_notification_stalled_issues_text">View and resolve issues</string>
+    <!-- The name of the Device or Folder Status which signifies that an error has occurred -->
+    <string name="device_center_list_view_item_status_error">Errore</string>
+    <!-- Hint shown in the field to write a message in the note to self chat screen -->
+    <string name="chat_note_to_self_chat_message_hint">Write a message to yourself</string>
+    <!--The title of the Change Email Address page-->
+    <string name="change_email_address_title">Cambia e-mail</string>
+    <!--Change Email Address page content text to ask user to enter a new email address -->
+    <string name="change_email_address_content">Inserisci il tuo nuovo indirizzo email, ti invieremo l\’email di conferma a questo nuovo indirizzo.</string>
+    <!--Error message to be shown when account already existed-->
+    <string name="sign_up_account_existed_error_message">Questo indirizzo e-mail è già utilizzato da un altro account MEGA</string>
+    <!--General update text-->
+    <string name="general_update">Aggiorna</string>
+    <!-- Message displayed when email address is successfully updated -->
+    <string name="email_confirmation_email_address_update_message">Indirizzo email aggiornato</string>
+    <!-- Snackbar text to inform the user that download started -->
+    <string name="transfers_download_started_snackbar">Download started. See notification for details.</string>
 </resources>

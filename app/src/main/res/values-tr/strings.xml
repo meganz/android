@@ -65,7 +65,7 @@
     <!-- Option which allows create a new text file -->
     <string name="action_create_txt">Create new text file</string>
     <!-- Menu item -->
-    <string name="action_settings">Settings</string>
+    <string name="action_settings">Ayarlar</string>
     <!-- Search button -->
     <string name="action_search">Search</string>
     <!-- Select country page title -->
@@ -1248,7 +1248,7 @@
     <!-- part of the string in incoming shared folder notification -->
     <string name="incoming_folder_notification">from</string>
     <!-- title of incoming shared folder notification -->
-    <string name="title_incoming_folder_notification">New shared folder</string>
+    <string name="title_incoming_folder_notification">Yeni paylaşılan klasör</string>
     <!-- title of the notification for a new incoming contact request -->
     <string name="title_contact_request_notification">New contact request</string>
     <!-- Title of the section to clear the chat content in the Manage chat history screen -->
@@ -3053,7 +3053,7 @@
     <!-- Subtitle of the settings page where the start screen can be chosen. -->
     <string name="configure_start_screen">Configure default start screen</string>
     <!-- Homepage section. -->
-    <string name="home_section">Home</string>
+    <string name="home_section">Ana sayfa</string>
     <!-- Action button which allows to show the recent activity. -->
     <string name="show_activity_action">Show activity</string>
     <!-- Text informing the recent activity is hidden. -->
@@ -3556,7 +3556,7 @@
     <!-- Context of banner for media discovery view. When user opens a folder, which can be viewed in Media discovery view, the banner will be shown with this text to let user know, where the setting can be changed. -->
     <string name="cloud_drive_media_discovery_banner_context">As this folder contains only images and videos, we’ve automatically opened it in media discovery view. You can enjoy your visual content with a more immersive layout. You can disable this in Settings.</string>
     <!-- Banner option for user to open settings, where he can disable the media discovery view setting. -->
-    <string name="cloud_drive_media_discovery_banner_settings">Settings</string>
+    <string name="cloud_drive_media_discovery_banner_settings">Ayarlar</string>
     <!-- Banner option for user that he understood the explanation and agrees with media discovery view setting being enabled. -->
     <string name="cloud_drive_media_discovery_banner_ok">OK, got it</string>
     <!-- Title of the share meeting link bottom panel in scheduled meeting info -->
@@ -4810,8 +4810,6 @@
     <string name="meetings_call_recording_stopped_snackbar_message">%1$s stopped recording</string>
     <!-- Name of the Gallery item in the attachment panel, in chat, for attaching files from Gallery -->
     <string name="chat_attach_panel_gallery">Gallery</string>
-    <!-- Body for Cookie dialog, visible for users, who will see the advertisements, as we want users to accept Advertisement cookies as well. Please, keep the placeholders to format the string. -->
-    <string name="dialog_ads_cookie_alert_message">We use cookies and similar technologies to help us improve our services and for advertising purposes. By continuing to use MEGA you agree with the terms of our updated [A]Cookie Policy[/A].</string>
     <!-- Description of feature, which will be available for user, if they buy plan. This means the user won't see Advertisements if they buy a Pro plan. -->
     <string name="account_upgrade_account_description_feature_advertisement">&#8226;&#160;Ad&#160;free</string>
     <!-- Text when sharing a meeting link indicating the subject for the email -->

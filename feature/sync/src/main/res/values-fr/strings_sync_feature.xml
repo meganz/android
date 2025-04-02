@@ -70,8 +70,6 @@
     <string name="sync_list_sync_state_paused">En pause</string>
     <!-- Sync state syncing -->
     <string name="sync_list_sync_state_syncing">Synchronisation&#8230;</string>
-    <!-- Sync state failed -->
-    <string name="sync_folders_sync_state_failed">Arrêtée</string>
     <!-- Sync permission title for device storage -->
     <string name="sync_folders_device_storage">Dossier sur l’appareil</string>
     <!-- Sync permission title for mega storage -->

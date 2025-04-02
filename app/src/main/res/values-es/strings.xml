@@ -5030,8 +5030,6 @@
     <string name="meetings_call_recording_stopped_snackbar_message">%1$s ha dejado de grabar</string>
     <!-- Name of the Gallery item in the attachment panel, in chat, for attaching files from Gallery -->
     <string name="chat_attach_panel_gallery">Galería</string>
-    <!-- Body for Cookie dialog, visible for users, who will see the advertisements, as we want users to accept Advertisement cookies as well. Please, keep the placeholders to format the string. -->
-    <string name="dialog_ads_cookie_alert_message">Usamos cookies y tecnologías similares para mejorar nuestros servicios y con fines publicitarios. Al continuar usando MEGA, aceptas los términos de nuestra [A]Política de cookies[/A] actualizada.</string>
     <!-- Description of feature, which will be available for user, if they buy plan. This means the user won't see Advertisements if they buy a Pro plan. -->
     <string name="account_upgrade_account_description_feature_advertisement">&#8226;&#160;Sin&#160;anuncios</string>
     <!-- Text when sharing a meeting link indicating the subject for the email -->

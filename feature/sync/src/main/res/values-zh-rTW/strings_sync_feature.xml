@@ -62,8 +62,6 @@
     <string name="sync_list_sync_state_paused">暫停</string>
     <!-- Sync state syncing -->
     <string name="sync_list_sync_state_syncing">正在同步⋯</string>
-    <!-- Sync state failed -->
-    <string name="sync_folders_sync_state_failed">已停止</string>
     <!-- Sync permission title for device storage -->
     <string name="sync_folders_device_storage">裝置資料夾</string>
     <!-- Sync permission title for mega storage -->

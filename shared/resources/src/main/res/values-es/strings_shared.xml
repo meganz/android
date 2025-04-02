@@ -693,7 +693,7 @@
     <!-- Title of Favourites video playlist in the video section -->
     <string name="video_section_title_favourite_playlist">Favoritos</string>
     <!-- Title of the synced folder list empty state -->
-    <string name="device_center_sync_backup_list_empty_state_title">No tienes nada configurado</string>
+    <string name="device_center_sync_backup_list_empty_state_title">No hay ni sincronizaciones ni backups</string>
     <!-- Message of the synced folder list empty state -->
     <string name="device_center_sync_backup_list_empty_state_message">Sincroniza o haz un backup de una carpeta en tu dispositivo con una carpeta de MEGA</string>
     <!-- subtitle of meeting title in schedule meeting for title disclaimer -->
@@ -957,7 +957,7 @@
     <!-- Title of note to self chat -->
     <string name="chat_note_to_self_chat_title">Mis notas</string>
     <!-- First message header in note to self chat -->
-    <string name="chat_note_to_self_chat_first_message_header">Solo para tus ojos</string>
+    <string name="chat_note_to_self_chat_first_message_header">Guárdalo para ti</string>
     <!-- First message description in note to self chat -->
     <string name="chat_note_to_self_chat_first_message_description">Envíate información confidencial, fotos y videos, o ideas para tu próximo gran proyecto. Estará todo sincronizado en tus dispositivos y protegido con cifrado de conocimiento cero.</string>
     <!-- Add to album some files exist message -->
@@ -991,7 +991,7 @@
     <!-- Message displayed when email is successfully resent -->
     <string name="general_email_resend_success_message">Correo enviado</string>
     <!--General Request Network Failed text-->
-    <string name="general_request_failed_message">Algo ha ido mal</string>
+    <string name="general_request_failed_message">Se ha producido un error, inténtalo de nuevo</string>
     <!-- Message error shown when trying to log in on an account that has been suspended due to breaches of copyright -->
     <string name="dialog_account_suspended_ToS_copyright_message">Tu cuenta de MEGA ha sido suspendida debido a repetidas notificaciones de presuntas infracciones de derechos de autor. Como consecuencia, no podrás acceder a tu cuenta ni a tus datos.\nRevisa el correo electrónico que enviamos a tu dirección de correo para obtener más información sobre cómo presentar una contranotificación.</string>
     <!-- Message error shown when trying to log in on an account that has been terminated due to breaches of all reasons of breaching Terms of Service, except copyright. -->
@@ -1019,19 +1019,35 @@
     <!-- First message header paragraph in note to self chat -->
     <string name="chat_note_to_self_chat_first_message_header_paragraph">Un espacio privado para fotografías, información importante o grandes ideas. Siempre sincronizado y protegido con cifrado de conocimiento cero.</string>
     <!-- Title of the notification displayed when Syncs are paused due to low battery conditions -->
-    <string name="general_sync_notification_low_battery_title">Syncing paused due to low battery</string>
+    <string name="general_sync_notification_low_battery_title">La sincronización se ha detenido debido a que la batería está baja</string>
     <!-- Text of the notification displayed when Syncs are paused due to low battery conditions -->
-    <string name="general_sync_notification_low_battery_text">Connect to power source to resume</string>
+    <string name="general_sync_notification_low_battery_text">Conéctate a la fuente de alimentación para reanudar</string>
     <!-- Title of the notification displayed when Syncs are paused due to lost Wi-Fi conditions -->
-    <string name="general_sync_notification_lost_wifi_title">Syncing paused due to lost connection</string>
+    <string name="general_sync_notification_lost_wifi_title">La sincronización se ha detenido debido a la pérdida de la conexión</string>
     <!-- Text of the notification displayed when Syncs are paused due to lost Wi-Fi conditions -->
-    <string name="general_sync_notification_lost_wifi_text">Reconnect to Wi-Fi to resume</string>
+    <string name="general_sync_notification_lost_wifi_text">Vuelve a conectarte al Wi-Fi para reanudar</string>
     <!-- Title of the notification displayed when Syncs are stopped due to some sync error -->
-    <string name="general_sync_notification_generic_error_title">Syncing has stopped</string>
+    <string name="general_sync_notification_generic_error_title">Se ha detenido la sincronización</string>
     <!-- Text of the notification displayed when Syncs are stopped due to some sync error -->
-    <string name="general_sync_notification_generic_error_text">Go to the Help Centre to understand why</string>
+    <string name="general_sync_notification_generic_error_text">Ve al centro de ayuda para saber por qué</string>
     <!-- Title of the notification displayed when a Sync has stalled issues -->
-    <string name="general_sync_notification_stalled_issues_title">Sync issues detected</string>
+    <string name="general_sync_notification_stalled_issues_title">Se han detectado problemas de sincronización</string>
     <!-- Text of the notification displayed when a Sync has stalled issues -->
-    <string name="general_sync_notification_stalled_issues_text">View and resolve issues</string>
+    <string name="general_sync_notification_stalled_issues_text">Ver y resolver problemas</string>
+    <!-- The name of the Device or Folder Status which signifies that an error has occurred -->
+    <string name="device_center_list_view_item_status_error">Error</string>
+    <!-- Hint shown in the field to write a message in the note to self chat screen -->
+    <string name="chat_note_to_self_chat_message_hint">Escribe aquí tus notas</string>
+    <!--The title of the Change Email Address page-->
+    <string name="change_email_address_title">Cambiar correo electrónico</string>
+    <!--Change Email Address page content text to ask user to enter a new email address -->
+    <string name="change_email_address_content">Introduce tu nueva dirección de correo electrónico y te enviaremos la confirmación por correo electrónico a la nueva dirección.</string>
+    <!--Error message to be shown when account already existed-->
+    <string name="sign_up_account_existed_error_message">Esta dirección de correo electrónico ya está asociada a una cuenta de MEGA</string>
+    <!--General update text-->
+    <string name="general_update">Actualizar</string>
+    <!-- Message displayed when email address is successfully updated -->
+    <string name="email_confirmation_email_address_update_message">Dirección de correo electrónico actualizada</string>
+    <!-- Snackbar text to inform the user that download started -->
+    <string name="transfers_download_started_snackbar">Download started. See notification for details.</string>
 </resources>

@@ -671,7 +671,7 @@
     <!-- Title of Favourites video playlist in the video section -->
     <string name="video_section_title_favourite_playlist">즐겨찾기</string>
     <!-- Title of the synced folder list empty state -->
-    <string name="device_center_sync_backup_list_empty_state_title">설정된 장치 없음</string>
+    <string name="device_center_sync_backup_list_empty_state_title">No syncs or backups have been set up yet</string>
     <!-- Message of the synced folder list empty state -->
     <string name="device_center_sync_backup_list_empty_state_message">장치의 폴더를 MEGA의 폴더와 동기화 또는 백업하세요.</string>
     <!-- subtitle of meeting title in schedule meeting for title disclaimer -->
@@ -955,7 +955,7 @@
     <!-- Message displayed when email is successfully resent -->
     <string name="general_email_resend_success_message">이메일 발송됨</string>
     <!--General Request Network Failed text-->
-    <string name="general_request_failed_message">뭔가 잘못됐습니다</string>
+    <string name="general_request_failed_message">오류가 발생했습니다, 다시 시도하세요</string>
     <!-- Message error shown when trying to log in on an account that has been suspended due to breaches of copyright -->
     <string name="dialog_account_suspended_ToS_copyright_message">당신의 MEGA 계정이 반복된 저작권 침해 혐의로 인해 정지 되었습니다. 이것은 당신의 계정이나 그 안의 데이터에 접근할 수 없다는 뜻입니다.\n이의 제기를 제출하는 방법에 대한 자세한 정보는 이메일 수신함을 확인하세요.</string>
     <!-- Message error shown when trying to log in on an account that has been terminated due to breaches of all reasons of breaching Terms of Service, except copyright. -->
@@ -998,4 +998,20 @@
     <string name="general_sync_notification_stalled_issues_title">Sync issues detected</string>
     <!-- Text of the notification displayed when a Sync has stalled issues -->
     <string name="general_sync_notification_stalled_issues_text">View and resolve issues</string>
+    <!-- The name of the Device or Folder Status which signifies that an error has occurred -->
+    <string name="device_center_list_view_item_status_error">오류</string>
+    <!-- Hint shown in the field to write a message in the note to self chat screen -->
+    <string name="chat_note_to_self_chat_message_hint">자신에게 메시지 작성</string>
+    <!--The title of the Change Email Address page-->
+    <string name="change_email_address_title">이메일 변경</string>
+    <!--Change Email Address page content text to ask user to enter a new email address -->
+    <string name="change_email_address_content">새 이메일 주소를 입력하세요. 이 새 이메일 주소로 이메일 확인을 보낼 것입니다.</string>
+    <!--Error message to be shown when account already existed-->
+    <string name="sign_up_account_existed_error_message">이 이메일 주소는 이미 MEGA에 가입되어 있습니다</string>
+    <!--General update text-->
+    <string name="general_update">업데이트</string>
+    <!-- Message displayed when email address is successfully updated -->
+    <string name="email_confirmation_email_address_update_message">이메일 주소가 변경되었습니다</string>
+    <!-- Snackbar text to inform the user that download started -->
+    <string name="transfers_download_started_snackbar">Download started. See notification for details.</string>
 </resources>

@@ -671,7 +671,7 @@
     <!-- Title of Favourites video playlist in the video section -->
     <string name="video_section_title_favourite_playlist">รายการโปรด</string>
     <!-- Title of the synced folder list empty state -->
-    <string name="device_center_sync_backup_list_empty_state_title">No devices are set up</string>
+    <string name="device_center_sync_backup_list_empty_state_title">ยังไม่ได้ตั้งค่าการซิงค์หรือการสำรองข้อมูล</string>
     <!-- Message of the synced folder list empty state -->
     <string name="device_center_sync_backup_list_empty_state_message">ซิงค์หรือสำรองข้อมูลในโฟลเดอร์ของอุปกรณ์คุณเข้ากับโฟลเดอร์ใน MEGA</string>
     <!-- subtitle of meeting title in schedule meeting for title disclaimer -->
@@ -897,7 +897,7 @@
     <!-- password label -->
     <string name="password_text">รหัสผ่าน</string>
     <!-- Login button -->
-    <string name="login_text">Log in with your MEGA account</string>
+    <string name="login_text">เข้าสู่ระบบด้วยบัญชี MEGA ของคุณ</string>
     <!--The text where user forgot their password and will navigate to reset it-->
     <string name="login_page_forgot_password_text">ลืมรหัสผ่านหรือไม่</string>
     <!-- Sync state up to date -->
@@ -931,15 +931,15 @@
         <item quantity="other">เพิ่มไฟล์ %2$d ไฟล์ไปยังอัลบั้ม “%1$s”. ไม่สามารถเพิ่มไฟล์ที่ซ้ำกันได้</item>
     </plurals>
     <!-- Snack bar message informing that profile's QR code is uploaded to the Cloud Drive-->
-    <string name="transfers_start_upload_profile_qr_code_message">Saving %1$s to Cloud drive&#8230;</string>
+    <string name="transfers_start_upload_profile_qr_code_message">กำลังบันทึก %1$s ไปยังคลาว์ไดร์ฟ&#8230;</string>
     <!-- Warning shown after trying to cancel a download, but the request failed -->
-    <string name="transfers_error_cancelling_download">Something went wrong. Download was not cancelled.</string>
+    <string name="transfers_error_cancelling_download">เกิดข้อผิดพลาด การดาวน์โหลดไม่ถูกยกเลิก</string>
     <!-- Body for the subscription details section, which is shown to the Indian user to provide details about subscription. This string is shown if user selects yearly subscription and the amount is more than Rs.15,000. Please keep these placeholders [A], [/A], [B], [/B], [C], [/C]. They will be used to format the string. -->
-    <string name="account_upgrade_account_subscription_details_body_yearly_with_price_for_indian">You will be charged %1$s immediately but your subscription will not automatically renew after 12 months due to government regulations. It will be your responsibility to renew your subscription after it has expired. You can manage or cancel your subscription anytime via Subscriptions in [A]Google&#160;Play[/A]. By upgrading your account, you agree to MEGA’s [B]Terms of Service[/B] and [C]Privacy and Data Policy[/C].</string>
+    <string name="account_upgrade_account_subscription_details_body_yearly_with_price_for_indian">ระบบจะเรียกเก็บค่าบริการ %1$s ทันที แต่การสมัครใช้งานของคุณจะไม่ได้รับการต่ออายุโดยอัตโนมัติหลังจาก 12 เดือน เนื่องจากข้อกำหนดของรัฐบาล ผู้ใช้จะต้องดำเนินการต่ออายุการสมัครใช้งานด้วยตนเองเมื่อหมดอายุ ผู้ใช้สามารถจัดการหรือยกเลิกการสมัครใช้งานได้ทุกเมื่อผ่านเมนูการสมัครใช้บริการใน [A]Google&#160;Play[/A] เมื่อผู้ใช้ทำการอัปเกรดบัญชี แสดงว่าผู้ใช้ยอมรับ[B]เงื่อนไขการให้บริการ[/B]และ[C]นโยบายความเป็นส่วนตัวและข้อมูลส่วนบุคคล[/C]ของ MEGA</string>
     <!-- The name of the Device or Folder Status which signifies that it is currently uploading -->
     <string name="device_center_list_view_item_status_uploading">กำลังอัปโหลด&#8230;</string>
     <!-- The name of the Device or Folder Status which signifies that it is currently uploading with a percentage completion -->
-    <string name="device_center_list_view_item_status_uploading_with_progress">%1$d%% uploading&#8230;</string>
+    <string name="device_center_list_view_item_status_uploading_with_progress">อัปโหลดไปแล้ว %1$d%%&#8230;</string>
     <!-- The name of the Device or Folder Status which signifies that it is inactive -->
     <string name="device_center_list_view_item_status_inactive">ไม่ได้ใช้งาน</string>
     <!-- The name of the Device or Folder Status which signifies that some action is needed -->
@@ -955,7 +955,7 @@
     <!-- Message displayed when email is successfully resent -->
     <string name="general_email_resend_success_message">ส่งอีเมลแล้ว</string>
     <!--General Request Network Failed text-->
-    <string name="general_request_failed_message">มีบางอย่างผิดพลาด</string>
+    <string name="general_request_failed_message">เกิดข้อผิดพลาด กรุณาลองใหม่อีกครั้ง</string>
     <!-- Message error shown when trying to log in on an account that has been suspended due to breaches of copyright -->
     <string name="dialog_account_suspended_ToS_copyright_message">บัญชี MEGA ของคุณถูกระงับชั่วคราว เนื่องจากมีการร้องเรียนเรื่องการละเมิดลิขสิทธิ์ซ้ำหลายครั้ง หมายความว่าคุณไม่สามารถเข้าถึงบัญชีหรือข้อมูลใด ๆ ภายในบัญชีของคุณได้\nตรวจสอบกล่องจดหมายอีเมลของคุณเพื่อดูข้อมูลเพิ่มเติมเกี่ยวกับวิธีการยื่นเรื่องโต้แย้ง</string>
     <!-- Message error shown when trying to log in on an account that has been terminated due to breaches of all reasons of breaching Terms of Service, except copyright. -->
@@ -981,21 +981,37 @@
     <!-- Text for the "Don’t cancel" button in the cancel registration dialog -->
     <string name="email_confirmation_dialog_cancel_registration_dismiss_button">ไม่ต้องยกเลิก</string>
     <!-- First message header paragraph in note to self chat -->
-    <string name="chat_note_to_self_chat_first_message_header_paragraph">A private space for pictures, important information, or big ideas. Always synced, and protected with zero-knowledge encryption.</string>
+    <string name="chat_note_to_self_chat_first_message_header_paragraph">พื้นที่ส่วนตัวสำหรับรูปภาพ ข้อมูลสำคัญ หรือไอเดียดี ๆ ซิงค์อยู่เสมอ และปกป้องด้วยการเข้ารหัสด้วยวิธีซีโร่-นอว์เลจ</string>
     <!-- Title of the notification displayed when Syncs are paused due to low battery conditions -->
-    <string name="general_sync_notification_low_battery_title">Syncing paused due to low battery</string>
+    <string name="general_sync_notification_low_battery_title">การซิงค์หยุดชั่วคราวเนื่องจากแบตเตอรี่เหลือน้อย</string>
     <!-- Text of the notification displayed when Syncs are paused due to low battery conditions -->
-    <string name="general_sync_notification_low_battery_text">Connect to power source to resume</string>
+    <string name="general_sync_notification_low_battery_text">เชื่อมต่อกับแหล่งพลังงานเพื่อดำเนินการต่อ</string>
     <!-- Title of the notification displayed when Syncs are paused due to lost Wi-Fi conditions -->
-    <string name="general_sync_notification_lost_wifi_title">Syncing paused due to lost connection</string>
+    <string name="general_sync_notification_lost_wifi_title">การซิงค์หยุดชั่วคราวเนื่องจากการเชื่อมต่อขาดหาย</string>
     <!-- Text of the notification displayed when Syncs are paused due to lost Wi-Fi conditions -->
-    <string name="general_sync_notification_lost_wifi_text">Reconnect to Wi-Fi to resume</string>
+    <string name="general_sync_notification_lost_wifi_text">เชื่อมต่อ Wi-Fi อีกครั้งเพื่อดำเนินการต่อ</string>
     <!-- Title of the notification displayed when Syncs are stopped due to some sync error -->
-    <string name="general_sync_notification_generic_error_title">Syncing has stopped</string>
+    <string name="general_sync_notification_generic_error_title">การซิงค์หยุดทำงาน</string>
     <!-- Text of the notification displayed when Syncs are stopped due to some sync error -->
-    <string name="general_sync_notification_generic_error_text">Go to the Help Centre to understand why</string>
+    <string name="general_sync_notification_generic_error_text">ไปที่ศูนย์ความช่วยเหลือเพื่อดูสาเหตุ</string>
     <!-- Title of the notification displayed when a Sync has stalled issues -->
-    <string name="general_sync_notification_stalled_issues_title">Sync issues detected</string>
+    <string name="general_sync_notification_stalled_issues_title">ตรวจพบปัญหาการซิงค์</string>
     <!-- Text of the notification displayed when a Sync has stalled issues -->
-    <string name="general_sync_notification_stalled_issues_text">View and resolve issues</string>
+    <string name="general_sync_notification_stalled_issues_text">ดูและแก้ไขปัญหา</string>
+    <!-- The name of the Device or Folder Status which signifies that an error has occurred -->
+    <string name="device_center_list_view_item_status_error">ผิดพลาด</string>
+    <!-- Hint shown in the field to write a message in the note to self chat screen -->
+    <string name="chat_note_to_self_chat_message_hint">เขียนข้อความถึงตัวเอง</string>
+    <!--The title of the Change Email Address page-->
+    <string name="change_email_address_title">เปลี่ยนอีเมล</string>
+    <!--Change Email Address page content text to ask user to enter a new email address -->
+    <string name="change_email_address_content">กรอกที่อยู่อีเมลของคุณใหม่ แล้วเราจะส่งอีเมลยืนยันไปที่อีเมลใหม่นี้</string>
+    <!--Error message to be shown when account already existed-->
+    <string name="sign_up_account_existed_error_message">ที่อยู่อีเมลนี้เคยลงทะเบียนกับ MEGA แล้ว</string>
+    <!--General update text-->
+    <string name="general_update">อัปเดต</string>
+    <!-- Message displayed when email address is successfully updated -->
+    <string name="email_confirmation_email_address_update_message">อัปเดตที่อยู่อีเมลแล้ว</string>
+    <!-- Snackbar text to inform the user that download started -->
+    <string name="transfers_download_started_snackbar">Download started. See notification for details.</string>
 </resources>

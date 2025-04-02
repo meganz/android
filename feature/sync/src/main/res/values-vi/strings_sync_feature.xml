@@ -62,8 +62,6 @@
     <string name="sync_list_sync_state_paused">Đã tạm dừng</string>
     <!-- Sync state syncing -->
     <string name="sync_list_sync_state_syncing">Đang đồng&#160;bộ&#8230;</string>
-    <!-- Sync state failed -->
-    <string name="sync_folders_sync_state_failed">Đã dừng</string>
     <!-- Sync permission title for device storage -->
     <string name="sync_folders_device_storage">Thư&#160;mục thiết&#160;bị</string>
     <!-- Sync permission title for mega storage -->

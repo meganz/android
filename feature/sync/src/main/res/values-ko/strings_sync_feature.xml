@@ -62,8 +62,6 @@
     <string name="sync_list_sync_state_paused">일시정지 중</string>
     <!-- Sync state syncing -->
     <string name="sync_list_sync_state_syncing">동기화 중&#8230;</string>
-    <!-- Sync state failed -->
-    <string name="sync_folders_sync_state_failed">정지됨</string>
     <!-- Sync permission title for device storage -->
     <string name="sync_folders_device_storage">장치 폴더</string>
     <!-- Sync permission title for mega storage -->

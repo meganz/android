@@ -62,8 +62,6 @@
     <string name="sync_list_sync_state_paused">一時停止中</string>
     <!-- Sync state syncing -->
     <string name="sync_list_sync_state_syncing">同期中&#8230;</string>
-    <!-- Sync state failed -->
-    <string name="sync_folders_sync_state_failed">停止しました</string>
     <!-- Sync permission title for device storage -->
     <string name="sync_folders_device_storage">デバイスフォルダ</string>
     <!-- Sync permission title for mega storage -->

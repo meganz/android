@@ -70,8 +70,6 @@
     <string name="sync_list_sync_state_paused">Pus pe pauză</string>
     <!-- Sync state syncing -->
     <string name="sync_list_sync_state_syncing">Sincronizarea&#8230;</string>
-    <!-- Sync state failed -->
-    <string name="sync_folders_sync_state_failed">Opriță</string>
     <!-- Sync permission title for device storage -->
     <string name="sync_folders_device_storage">Folderul dispozitivului</string>
     <!-- Sync permission title for mega storage -->

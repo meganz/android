@@ -82,8 +82,6 @@
     <string name="sync_list_sync_state_paused">متوقف مؤقتاً</string>
     <!-- Sync state syncing -->
     <string name="sync_list_sync_state_syncing">جارٍ المزامنة&#8230;</string>
-    <!-- Sync state failed -->
-    <string name="sync_folders_sync_state_failed">توقفت</string>
     <!-- Sync permission title for device storage -->
     <string name="sync_folders_device_storage">مجلد الأجهزة</string>
     <!-- Sync permission title for mega storage -->

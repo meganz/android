@@ -693,7 +693,7 @@
     <!-- Title of Favourites video playlist in the video section -->
     <string name="video_section_title_favourite_playlist">Favoritos</string>
     <!-- Title of the synced folder list empty state -->
-    <string name="device_center_sync_backup_list_empty_state_title">Não há dispositivos configurados</string>
+    <string name="device_center_sync_backup_list_empty_state_title">Ainda não foi configurada nenhuma sincronização ou backup</string>
     <!-- Message of the synced folder list empty state -->
     <string name="device_center_sync_backup_list_empty_state_message">Sincronize ou faça backup de uma pasta no seu dispositivo com uma pasta no MEGA.</string>
     <!-- subtitle of meeting title in schedule meeting for title disclaimer -->
@@ -991,7 +991,7 @@
     <!-- Message displayed when email is successfully resent -->
     <string name="general_email_resend_success_message">Email enviado</string>
     <!--General Request Network Failed text-->
-    <string name="general_request_failed_message">Algo deu errado</string>
+    <string name="general_request_failed_message">Ocorreu um erro, tente novamente</string>
     <!-- Message error shown when trying to log in on an account that has been suspended due to breaches of copyright -->
     <string name="dialog_account_suspended_ToS_copyright_message">A sua conta no MEGA foi suspensa devido a repetidas alegações de infrações de direitos autorais, e portanto você não poderá acessar a sua conta ou os dados armazenados. \nAcesse o seu email para obter mais informações sobre como enviar uma contranotificação.</string>
     <!-- Message error shown when trying to log in on an account that has been terminated due to breaches of all reasons of breaching Terms of Service, except copyright. -->
@@ -1019,19 +1019,35 @@
     <!-- First message header paragraph in note to self chat -->
     <string name="chat_note_to_self_chat_first_message_header_paragraph">Um espaço privado para fotos, informação importante ou grandes ideias. Sempre sincronizado e protegido com criptografia de conhecimento zero.</string>
     <!-- Title of the notification displayed when Syncs are paused due to low battery conditions -->
-    <string name="general_sync_notification_low_battery_title">Syncing paused due to low battery</string>
+    <string name="general_sync_notification_low_battery_title">A sincronização foi pausada porque a bateria está baixa</string>
     <!-- Text of the notification displayed when Syncs are paused due to low battery conditions -->
-    <string name="general_sync_notification_low_battery_text">Connect to power source to resume</string>
+    <string name="general_sync_notification_low_battery_text">Conecte o dispositivo a uma fonte de alimentação para continuar</string>
     <!-- Title of the notification displayed when Syncs are paused due to lost Wi-Fi conditions -->
-    <string name="general_sync_notification_lost_wifi_title">Syncing paused due to lost connection</string>
+    <string name="general_sync_notification_lost_wifi_title">A sincronização foi pausada porque a conexão foi perdida</string>
     <!-- Text of the notification displayed when Syncs are paused due to lost Wi-Fi conditions -->
-    <string name="general_sync_notification_lost_wifi_text">Reconnect to Wi-Fi to resume</string>
+    <string name="general_sync_notification_lost_wifi_text">Conecte-se ao Wi-Fi novamente para continuar</string>
     <!-- Title of the notification displayed when Syncs are stopped due to some sync error -->
-    <string name="general_sync_notification_generic_error_title">Syncing has stopped</string>
+    <string name="general_sync_notification_generic_error_title">A sincronização foi interrompida</string>
     <!-- Text of the notification displayed when Syncs are stopped due to some sync error -->
-    <string name="general_sync_notification_generic_error_text">Go to the Help Centre to understand why</string>
+    <string name="general_sync_notification_generic_error_text">Acesse a Central de ajuda para entender o motivo</string>
     <!-- Title of the notification displayed when a Sync has stalled issues -->
-    <string name="general_sync_notification_stalled_issues_title">Sync issues detected</string>
+    <string name="general_sync_notification_stalled_issues_title">Problemas de sincronização detectados</string>
     <!-- Text of the notification displayed when a Sync has stalled issues -->
-    <string name="general_sync_notification_stalled_issues_text">View and resolve issues</string>
+    <string name="general_sync_notification_stalled_issues_text">Ver e resolver os problemas</string>
+    <!-- The name of the Device or Folder Status which signifies that an error has occurred -->
+    <string name="device_center_list_view_item_status_error">Erro</string>
+    <!-- Hint shown in the field to write a message in the note to self chat screen -->
+    <string name="chat_note_to_self_chat_message_hint">Escreva uma mensagem para você mesmo</string>
+    <!--The title of the Change Email Address page-->
+    <string name="change_email_address_title">Alterar email</string>
+    <!--Change Email Address page content text to ask user to enter a new email address -->
+    <string name="change_email_address_content">Digite o seu novo email - enviaremos a confirmação para esse novo email.</string>
+    <!--Error message to be shown when account already existed-->
+    <string name="sign_up_account_existed_error_message">Já existe uma conta no MEGA com este email</string>
+    <!--General update text-->
+    <string name="general_update">Atualizar</string>
+    <!-- Message displayed when email address is successfully updated -->
+    <string name="email_confirmation_email_address_update_message">Email atualizado</string>
+    <!-- Snackbar text to inform the user that download started -->
+    <string name="transfers_download_started_snackbar">Download started. See notification for details.</string>
 </resources>
