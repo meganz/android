@@ -29,12 +29,9 @@ import mega.privacy.android.app.interfaces.ActivityLauncher
 import mega.privacy.android.app.interfaces.SnackbarShower
 import mega.privacy.android.app.interfaces.showSnackbar
 import mega.privacy.android.app.listeners.ExportListener
-import mega.privacy.android.app.listeners.RemoveListener
 import mega.privacy.android.app.main.DrawerItem
 import mega.privacy.android.app.main.FileExplorerActivity
 import mega.privacy.android.app.main.ManagerActivity
-import mega.privacy.android.app.main.listeners.MultipleRequestListener
-import mega.privacy.android.app.modalbottomsheet.OnFolderLeaveCallBack
 import mega.privacy.android.app.presentation.extensions.getStorageState
 import mega.privacy.android.app.textEditor.TextEditorActivity
 import mega.privacy.android.app.textEditor.TextEditorViewModel.Companion.EDIT_MODE
@@ -54,7 +51,6 @@ import mega.privacy.android.app.utils.Constants.INTENT_EXTRA_KEY_PARENT_HANDLE
 import mega.privacy.android.app.utils.Constants.INTENT_EXTRA_KEY_PATH_NAVIGATION
 import mega.privacy.android.app.utils.Constants.INVALID_VALUE
 import mega.privacy.android.app.utils.Constants.LINKS_ADAPTER
-import mega.privacy.android.app.utils.Constants.MULTIPLE_LEAVE_SHARE
 import mega.privacy.android.app.utils.Constants.OFFLINE_ADAPTER
 import mega.privacy.android.app.utils.Constants.REQUEST_CODE_SELECT_FOLDER_TO_COPY
 import mega.privacy.android.app.utils.Constants.REQUEST_CODE_SELECT_FOLDER_TO_MOVE
@@ -80,7 +76,6 @@ import mega.privacy.android.app.utils.Util.showSnackbar
 import mega.privacy.android.domain.entity.StorageState
 import mega.privacy.android.icon.pack.R as IconPackR
 import mega.privacy.android.navigation.MegaNavigator
-import mega.privacy.android.shared.resources.R as sharedR
 import nz.mega.sdk.MegaApiAndroid
 import nz.mega.sdk.MegaApiJava
 import nz.mega.sdk.MegaApiJava.INVALID_HANDLE
@@ -799,119 +794,6 @@ object MegaNodeUtil {
         }
 
         return true
-    }
-
-    /**
-     * Shows a confirmation warning before leave some incoming shares.
-     *
-     * @param activity current Activity
-     * @param snackbarShower interface to show snackbar
-     * @param handleList    handles list of the incoming shares to leave
-     */
-    @JvmStatic
-    fun showConfirmationLeaveIncomingShares(
-        activity: Activity,
-        snackbarShower: SnackbarShower,
-        handleList: ArrayList<Long>,
-    ) {
-        showConfirmationLeaveIncomingShares(activity, snackbarShower, null, handleList)
-    }
-
-    /**
-     * Shows a confirmation warning before leave one or more incoming shares.
-     *
-     * @param activity current Activity
-     * @param snackbarShower interface to show snackbar
-     * @param node if only one incoming share to leave, its node, null otherwise
-     * @param handles if mode than one incoming shares to leave, list of its handles, null otherwise
-     */
-    private fun showConfirmationLeaveIncomingShares(
-        activity: Activity,
-        snackbarShower: SnackbarShower,
-        node: MegaNode?,
-        handles: ArrayList<Long>?,
-    ) {
-        val onlyOneIncomingShare = node != null && handles == null
-        val numIncomingShares = if (onlyOneIncomingShare) 1 else handles!!.size
-        val builder = MaterialAlertDialogBuilder(activity)
-
-        builder.setMessage(
-            activity.resources.getQuantityString(
-                R.plurals.confirmation_leave_share_folder,
-                numIncomingShares
-            )
-        )
-            .setPositiveButton(activity.getString(R.string.general_leave)) { _, _ ->
-                if (onlyOneIncomingShare) {
-                    leaveIncomingShare(
-                        snackbarShower = snackbarShower,
-                        node = node!!,
-                        context = activity
-                    )
-                } else {
-                    leaveMultipleIncomingShares(activity, snackbarShower, handles!!)
-                }
-                (activity as? OnFolderLeaveCallBack)?.onFolderLeave()
-            }
-            .setNegativeButton(
-                activity.getString(sharedR.string.general_dialog_cancel_button),
-                null
-            )
-            .show()
-    }
-
-    /**
-     * Leave incoming share.
-     *
-     * @param snackbarShower interface to show snackbar
-     * @param node node to leave incoming share
-     */
-    private fun leaveIncomingShare(
-        snackbarShower: SnackbarShower,
-        node: MegaNode?,
-        context: Context,
-    ) {
-        Timber.d("Node handle: ${node?.handle}")
-        MegaApplication.getInstance().megaApi.remove(
-            node,
-            RemoveListener(
-                snackbarShower = snackbarShower,
-                isIncomingShare = true,
-                context = context
-            )
-        )
-    }
-
-    /**
-     * Leave multiple incoming shares.
-     *
-     * @param activity current Activity
-     * @param snackbarShower interface to show snackbar
-     * @param handles handles of nodes to leave incoming share
-     */
-    private fun leaveMultipleIncomingShares(
-        activity: Activity,
-        snackbarShower: SnackbarShower,
-        handles: List<Long>,
-    ) {
-        Timber.d("Leaving ${handles.size} incoming shares")
-
-        val megaApi = MegaApplication.getInstance().megaApi
-
-        if (handles.size == 1) {
-            leaveIncomingShare(
-                snackbarShower = snackbarShower,
-                node = megaApi.getNodeByHandle(handles[0]),
-                context = activity
-            )
-            return
-        }
-
-        val moveMultipleListener = MultipleRequestListener(MULTIPLE_LEAVE_SHARE, activity)
-        for (handle in handles) {
-            val node = megaApi.getNodeByHandle(handle)
-            megaApi.remove(node, moveMultipleListener)
-        }
     }
 
     /**

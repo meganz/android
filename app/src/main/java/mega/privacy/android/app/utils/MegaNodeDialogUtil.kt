@@ -1,6 +1,5 @@
 package mega.privacy.android.app.utils
 
-import mega.privacy.android.shared.resources.R as sharedR
 import android.annotation.SuppressLint
 import android.app.Activity
 import android.content.Context
@@ -52,6 +51,7 @@ import mega.privacy.android.app.utils.Util.isOffline
 import mega.privacy.android.app.utils.Util.isOnline
 import mega.privacy.android.app.utils.ViewUtils.hideKeyboard
 import mega.privacy.android.app.utils.ViewUtils.showSoftKeyboardDelayed
+import mega.privacy.android.shared.resources.R as sharedR
 import nz.mega.sdk.MegaChatApiJava.MEGACHAT_INVALID_HANDLE
 import nz.mega.sdk.MegaError
 import nz.mega.sdk.MegaNode
@@ -668,7 +668,7 @@ object MegaNodeDialogUtil {
                         activity.getString(R.string.context_delete_from_mega)
                     )
 
-                    megaApi.remove(node, RemoveListener(context = activity) {
+                    megaApi.remove(node, RemoveListener {
                         progress.dismiss()
                         if (it) {
                             snackbarShower.showSnackbar(activity.getString(R.string.context_correctly_removed))

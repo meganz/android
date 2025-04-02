@@ -1,13 +1,5 @@
 package mega.privacy.android.app.listeners
 
-import android.content.Context
-import android.content.Intent
-import mega.privacy.android.app.MegaApplication
-import mega.privacy.android.app.R
-import mega.privacy.android.app.constants.BroadcastConstants
-import mega.privacy.android.app.interfaces.SnackbarShower
-import mega.privacy.android.app.interfaces.showSnackbar
-import mega.privacy.android.app.utils.StringResourcesUtils.getTranslatedErrorString
 import nz.mega.sdk.MegaApiJava
 import nz.mega.sdk.MegaError
 import nz.mega.sdk.MegaRequest
@@ -15,14 +7,9 @@ import nz.mega.sdk.MegaRequestListenerInterface
 
 /**
  * RemoveListener
- * @property snackbarShower: SnackbarShower
- * @property isIncomingShare: Boolean
  * @property onFinish: Lambda
  */
 class RemoveListener(
-    private val snackbarShower: SnackbarShower? = null,
-    private val isIncomingShare: Boolean = false,
-    private val context: Context,
     private val onFinish: ((Boolean) -> Unit)? = null,
 ) : MegaRequestListenerInterface {
 
@@ -56,25 +43,6 @@ class RemoveListener(
      */
     override fun onRequestFinish(api: MegaApiJava, request: MegaRequest, e: MegaError) {
         if (request.type == MegaRequest.TYPE_REMOVE) {
-            if (isIncomingShare) {
-                if (e.errorCode == MegaError.API_OK) {
-                    Intent(BroadcastConstants.BROADCAST_ACTION_SHOW_SNACKBAR).run {
-                        putExtra(
-                            BroadcastConstants.SNACKBAR_TEXT,
-                            context.resources.getQuantityString(
-                                R.plurals.shared_items_incoming_shares_snackbar_leaving_shares_success,
-                                1, 1
-                            )
-                        )
-                        setPackage(context.applicationContext.packageName)
-                        MegaApplication.getInstance().sendBroadcast(this)
-                    }
-                } else {
-                    snackbarShower?.showSnackbar(getTranslatedErrorString(e))
-                }
-
-                return
-            }
             onFinish?.invoke(e.errorCode == MegaError.API_OK)
         }
     }

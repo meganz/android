@@ -1,6 +1,5 @@
 package mega.privacy.android.app
 
-import mega.privacy.android.shared.resources.R as sharedR
 import android.annotation.SuppressLint
 import android.content.BroadcastReceiver
 import android.content.Context
@@ -113,6 +112,7 @@ import mega.privacy.android.domain.usecase.network.MonitorSslVerificationFailedU
 import mega.privacy.android.domain.usecase.setting.MonitorCookieSettingsSavedUseCase
 import mega.privacy.android.domain.usecase.transfers.overquota.MonitorTransferOverQuotaUseCase
 import mega.privacy.android.domain.usecase.transfers.paused.PauseTransfersQueueUseCase
+import mega.privacy.android.shared.resources.R as sharedR
 import mega.privacy.mobile.analytics.event.TransferOverQuotaDialogEvent
 import mega.privacy.mobile.analytics.event.TransferOverQuotaUpgradeAccountButtonEvent
 import nz.mega.sdk.MegaAccountDetails
@@ -274,20 +274,6 @@ abstract class BaseActivity : AppCompatActivity(), ActivityLauncher, PermissionR
         }
     }
 
-    /**
-     * Broadcast to show a Snackbar with the received text.
-     */
-    private val showSnackbarReceiver: BroadcastReceiver = object : BroadcastReceiver() {
-        override fun onReceive(context: Context?, intent: Intent?) {
-            if (isActivityInBackground || intent == null || intent.action == null || intent.action != BroadcastConstants.BROADCAST_ACTION_SHOW_SNACKBAR
-            ) return
-            val message = intent.getStringExtra(BroadcastConstants.SNACKBAR_TEXT)
-            if (!TextUtil.isTextEmpty(message)) {
-                Util.showSnackbar(this@BaseActivity, message)
-            }
-        }
-    }
-
     private val onBackPressedCallback = object : OnBackPressedCallback(true) {
         override fun handleOnBackPressed() {
             handleGoBack()
@@ -330,11 +316,6 @@ abstract class BaseActivity : AppCompatActivity(), ActivityLauncher, PermissionR
         registerReceiver(
             takenDownFilesReceiver,
             IntentFilter(BroadcastConstants.BROADCAST_ACTION_INTENT_TAKEN_DOWN_FILES)
-        )
-
-        registerReceiver(
-            showSnackbarReceiver,
-            IntentFilter(BroadcastConstants.BROADCAST_ACTION_SHOW_SNACKBAR)
         )
 
         collectFlow(monitorCookieSettingsSavedUseCase()) {
@@ -442,7 +423,6 @@ abstract class BaseActivity : AppCompatActivity(), ActivityLauncher, PermissionR
 
     override fun onDestroy() {
         unregisterReceiver(takenDownFilesReceiver)
-        unregisterReceiver(showSnackbarReceiver)
         dismissAlertDialogIfExists(transferGeneralOverQuotaWarning)
         dismissAlertDialogIfExists(transferGeneralOverQuotaWarning)
         dismissAlertDialogIfExists(setDownloadLocationDialog)
