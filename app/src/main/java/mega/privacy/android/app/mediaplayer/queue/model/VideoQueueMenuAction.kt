@@ -9,7 +9,7 @@ import mega.privacy.android.shared.original.core.ui.model.MenuActionWithoutIcon
 /**
  * Video player menu action
  */
-sealed interface VideoPlayerMenuAction : MenuAction {
+sealed interface VideoQueueMenuAction : MenuAction {
 
     /**
      * Video queue select action
@@ -17,7 +17,7 @@ sealed interface VideoPlayerMenuAction : MenuAction {
     object VideoQueueSelectAction : MenuActionWithoutIcon(
         descriptionRes = R.string.general_select,
         testTag = TEST_TAG_VIDEO_QUEUE_SELECT_ACTION
-    ), VideoPlayerMenuAction {
+    ), VideoQueueMenuAction {
         override val orderInCategory = 140
     }
 
@@ -28,7 +28,7 @@ sealed interface VideoPlayerMenuAction : MenuAction {
         iconRes = iconPackR.drawable.ic_x_medium_regular_outline,
         descriptionRes = R.string.general_remove,
         testTag = TEST_TAG_VIDEO_QUEUE_REMOVE_ACTION
-    ), VideoPlayerMenuAction {
+    ), VideoQueueMenuAction {
         override val orderInCategory = 145
     }
 

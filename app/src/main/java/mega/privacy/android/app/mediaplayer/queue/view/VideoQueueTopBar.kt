@@ -7,7 +7,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.res.stringResource
 import mega.privacy.android.app.R
-import mega.privacy.android.app.mediaplayer.queue.model.VideoPlayerMenuAction
+import mega.privacy.android.app.mediaplayer.queue.model.VideoQueueMenuAction
 import mega.privacy.android.legacy.core.ui.controls.appbar.LegacySearchAppBar
 import mega.privacy.android.legacy.core.ui.model.SearchWidgetState
 import mega.privacy.android.shared.original.core.ui.controls.appbar.SelectModeAppBar
@@ -19,7 +19,7 @@ internal fun VideoQueueTopBar(
     selectedSize: Int,
     searchState: SearchWidgetState,
     query: String?,
-    onMenuActionClick: (VideoPlayerMenuAction?) -> Unit,
+    onMenuActionClick: (VideoQueueMenuAction?) -> Unit,
     onSearchTextChange: (String) -> Unit,
     onCloseClicked: () -> Unit,
     onSearchClicked: () -> Unit,
@@ -36,10 +36,10 @@ internal fun VideoQueueTopBar(
                 actions = if (selectedSize == 0) {
                     emptyList()
                 } else {
-                    listOf(VideoPlayerMenuAction.VideoQueueRemoveAction)
+                    listOf(VideoQueueMenuAction.VideoQueueRemoveAction)
                 },
                 onActionPressed = {
-                    onMenuActionClick(it as? VideoPlayerMenuAction)
+                    onMenuActionClick(it as? VideoQueueMenuAction)
                 },
                 modifier = Modifier
                     .fillMaxWidth()
@@ -61,8 +61,8 @@ internal fun VideoQueueTopBar(
             title = title,
             hintId = R.string.hint_action_search,
             isHideAfterSearch = true,
-            actions = listOf(VideoPlayerMenuAction.VideoQueueSelectAction),
-            onActionPressed = { onMenuActionClick(it as? VideoPlayerMenuAction) }
+            actions = listOf(VideoQueueMenuAction.VideoQueueSelectAction),
+            onActionPressed = { onMenuActionClick(it as? VideoQueueMenuAction) }
         )
     }
 }

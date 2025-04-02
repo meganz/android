@@ -16,13 +16,13 @@ import androidx.compose.ui.Modifier
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import kotlinx.coroutines.launch
 import mega.privacy.android.app.mediaplayer.LegacyVideoPlayerViewModel
-import mega.privacy.android.app.mediaplayer.queue.model.VideoPlayerMenuAction
+import mega.privacy.android.app.mediaplayer.queue.model.VideoQueueMenuAction
 import mega.privacy.android.app.mediaplayer.queue.video.VideoQueueViewModel
 import mega.privacy.android.legacy.core.ui.model.SearchWidgetState
 import mega.privacy.android.shared.original.core.ui.controls.layouts.MegaScaffold
 
 @Composable
-internal fun VideoQueueView(
+internal fun LegacyVideoQueueView(
     viewModel: VideoQueueViewModel,
     legacyVideoPlayerViewModel: LegacyVideoPlayerViewModel,
     onDragFinished: () -> Unit,
@@ -79,11 +79,11 @@ internal fun VideoQueueView(
                 onMenuActionClick = { action ->
                     action?.let {
                         when (it) {
-                            is VideoPlayerMenuAction.VideoQueueSelectAction -> {
+                            is VideoQueueMenuAction.VideoQueueSelectAction -> {
                                 viewModel.updateActionMode(true)
                             }
 
-                            is VideoPlayerMenuAction.VideoQueueRemoveAction -> {
+                            is VideoQueueMenuAction.VideoQueueRemoveAction -> {
                                 viewModel.removeSelectedItems()
                                 legacyVideoPlayerViewModel.removeAllSelectedItems()
                                 viewModel.updateActionMode(false)

@@ -14,7 +14,7 @@ import mega.privacy.android.app.arch.extensions.collectFlow
 import mega.privacy.android.app.mediaplayer.MediaPlayerActivity
 import mega.privacy.android.app.mediaplayer.LegacyVideoPlayerActivity
 import mega.privacy.android.app.mediaplayer.LegacyVideoPlayerViewModel
-import mega.privacy.android.app.mediaplayer.queue.view.VideoQueueView
+import mega.privacy.android.app.mediaplayer.queue.view.LegacyVideoQueueView
 import mega.privacy.android.shared.original.core.ui.theme.OriginalTheme
 
 /**
@@ -39,7 +39,7 @@ class VideoQueueFragment : Fragment() {
             setViewCompositionStrategy(ViewCompositionStrategy.DisposeOnViewTreeLifecycleDestroyed)
             setContent {
                 OriginalTheme(isDark = true) {
-                    VideoQueueView(
+                    LegacyVideoQueueView(
                         viewModel = videoQueueViewModel,
                         legacyVideoPlayerViewModel = legacyVideoPlayerViewModel,
                         onDragFinished = { legacyVideoPlayerViewModel.updatePlaySource(false) },

@@ -6,9 +6,9 @@ import androidx.compose.ui.test.junit4.createComposeRule
 import androidx.compose.ui.test.onNodeWithTag
 import androidx.compose.ui.test.performClick
 import androidx.test.ext.junit.runners.AndroidJUnit4
-import mega.privacy.android.app.mediaplayer.queue.model.VideoPlayerMenuAction
-import mega.privacy.android.app.mediaplayer.queue.model.VideoPlayerMenuAction.Companion.TEST_TAG_VIDEO_QUEUE_REMOVE_ACTION
-import mega.privacy.android.app.mediaplayer.queue.model.VideoPlayerMenuAction.Companion.TEST_TAG_VIDEO_QUEUE_SELECT_ACTION
+import mega.privacy.android.app.mediaplayer.queue.model.VideoQueueMenuAction
+import mega.privacy.android.app.mediaplayer.queue.model.VideoQueueMenuAction.Companion.TEST_TAG_VIDEO_QUEUE_REMOVE_ACTION
+import mega.privacy.android.app.mediaplayer.queue.model.VideoQueueMenuAction.Companion.TEST_TAG_VIDEO_QUEUE_SELECT_ACTION
 import mega.privacy.android.app.mediaplayer.queue.view.VIDEO_QUEUE_SEARCH_TOP_BAR_TEST_TAG
 import mega.privacy.android.app.mediaplayer.queue.view.VIDEO_QUEUE_SELECTED_MODE_TOP_BAR_TEST_TAG
 import mega.privacy.android.app.mediaplayer.queue.view.VideoQueueTopBar
@@ -30,7 +30,7 @@ class VideoQueueTopBarTest {
         selectedSize: Int = 0,
         searchState: SearchWidgetState = SearchWidgetState.COLLAPSED,
         query: String? = null,
-        onMenuActionClick: (VideoPlayerMenuAction?) -> Unit = {},
+        onMenuActionClick: (VideoQueueMenuAction?) -> Unit = {},
         onSearchTextChange: (String) -> Unit = {},
         onCloseClicked: () -> Unit = {},
         onSearchClicked: () -> Unit = {},
@@ -82,7 +82,7 @@ class VideoQueueTopBarTest {
 
     @Test
     fun `test that remove action is pressed`() {
-        val onMenuActionClick = mock<(VideoPlayerMenuAction?) -> Unit>()
+        val onMenuActionClick = mock<(VideoQueueMenuAction?) -> Unit>()
         setComposeContent(
             isActionMode = true,
             selectedSize = 1,
@@ -93,12 +93,12 @@ class VideoQueueTopBarTest {
             useUnmergedTree = true
         ).performClick()
 
-        onMenuActionClick.invoke(VideoPlayerMenuAction.VideoQueueRemoveAction)
+        onMenuActionClick.invoke(VideoQueueMenuAction.VideoQueueRemoveAction)
     }
 
     @Test
     fun `test that select action is pressed`() {
-        val onMenuActionClick = mock<(VideoPlayerMenuAction?) -> Unit>()
+        val onMenuActionClick = mock<(VideoQueueMenuAction?) -> Unit>()
         setComposeContent(onMenuActionClick = onMenuActionClick)
         composeTestRule.onNodeWithTag(TAG_MENU_ACTIONS_SHOW_MORE, true).apply {
             assertIsDisplayed()
@@ -109,6 +109,6 @@ class VideoQueueTopBarTest {
             performClick()
         }
 
-        onMenuActionClick.invoke(VideoPlayerMenuAction.VideoQueueSelectAction)
+        onMenuActionClick.invoke(VideoQueueMenuAction.VideoQueueSelectAction)
     }
 }
