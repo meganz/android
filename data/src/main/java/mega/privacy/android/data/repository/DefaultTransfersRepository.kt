@@ -1,6 +1,5 @@
 package mega.privacy.android.data.repository
 
-import android.os.Build
 import androidx.work.WorkInfo
 import dagger.Lazy
 import kotlinx.coroutines.CoroutineDispatcher
@@ -542,10 +541,6 @@ internal class DefaultTransfersRepository @Inject constructor(
         workerManagerGateway.monitorDownloadsStatusInfo().map { workInfos ->
             workInfos.any { it.state.isFinished }
         }
-
-    override suspend fun allowUserToSetDownloadDestination(): Boolean = withContext(ioDispatcher) {
-        deviceGateway.getSdkVersionInt() < Build.VERSION_CODES.R
-    }
 
     override fun monitorIsChatUploadsWorkerEnqueued() =
         workerManagerGateway.monitorChatUploadsStatusInfo().map { workInfos ->

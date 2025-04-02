@@ -1529,26 +1529,6 @@ class DefaultTransfersRepositoryTest {
         }
     }
 
-    @ParameterizedTest
-    @ValueSource(ints = [26, 27, 28, 29])
-    fun `test that allowUserToSetDownloadDestination returns true when sdk is lower than Android 11`(
-        sdk: Int,
-    ) =
-        runTest {
-            whenever(deviceGateway.getSdkVersionInt()).thenReturn(sdk)
-            assertThat(underTest.allowUserToSetDownloadDestination()).isTrue()
-        }
-
-    @ParameterizedTest
-    @ValueSource(ints = [30, 31, 32, 33, 34])
-    fun `test that allowUserToSetDownloadDestination returns false when sdk is equal or higher than Android 11`(
-        sdk: Int,
-    ) =
-        runTest {
-            whenever(deviceGateway.getSdkVersionInt()).thenReturn(sdk)
-            assertThat(underTest.allowUserToSetDownloadDestination()).isFalse()
-        }
-
     private fun stubPauseTransfers(isPause: Boolean) {
         val megaError = mock<MegaError> {
             on { errorCode }.thenReturn(MegaError.API_OK)

@@ -3,12 +3,8 @@ package mega.privacy.android.domain.usecase.transfers.downloads
 import mega.privacy.android.domain.entity.transfer.TransferAppData
 import mega.privacy.android.domain.entity.uri.UriPath
 import mega.privacy.android.domain.exception.NullFileException
-import mega.privacy.android.domain.featuretoggle.DomainFeatures
 import mega.privacy.android.domain.repository.CacheRepository
 import mega.privacy.android.domain.repository.FileSystemRepository
-import mega.privacy.android.domain.repository.TransferRepository
-import mega.privacy.android.domain.usecase.featureflag.GetFeatureFlagValueUseCase
-import mega.privacy.android.domain.usecase.file.GetExternalPathByContentUriUseCase
 import mega.privacy.android.domain.usecase.file.IsExternalStorageContentUriUseCase
 import javax.inject.Inject
 
@@ -18,11 +14,8 @@ import javax.inject.Inject
  */
 class GetFileDestinationAndAppDataForDownloadUseCase @Inject constructor(
     private val fileSystemRepository: FileSystemRepository,
-    private val transferRepository: TransferRepository,
     private val cacheRepository: CacheRepository,
     private val isExternalStorageContentUriUseCase: IsExternalStorageContentUriUseCase,
-    private val getExternalPathByContentUriUseCase: GetExternalPathByContentUriUseCase,
-    private val getFeatureFlagValueUseCase: GetFeatureFlagValueUseCase,
 ) {
 
     /**
@@ -35,31 +28,13 @@ class GetFileDestinationAndAppDataForDownloadUseCase @Inject constructor(
         val appData: TransferAppData?
         when {
             fileSystemRepository.isSDCardPathOrUri(uriPathFolderDestination.value) -> {
-                if (getFeatureFlagValueUseCase(DomainFeatures.AllowToChooseDownloadDestination)) {
-                    appData = null
-                    folderDestination = uriPathFolderDestination
-                } else {
-                    downloadDestination = transferRepository.getOrCreateSDCardTransfersCacheFolder()
-                        ?.path
-                    folderDestination = downloadDestination?.let { UriPath(it) }
-                    appData =
-                        TransferAppData.SdCardDownload(
-                            targetPathForSDK = downloadDestination ?: "",
-                            finalTargetUri = uriPathFolderDestination.value
-                        )
-                }
+                appData = null
+                folderDestination = uriPathFolderDestination
             }
 
             isExternalStorageContentUriUseCase(uriPathFolderDestination.value) -> {
                 appData = null
-                folderDestination =
-                    if (getFeatureFlagValueUseCase(DomainFeatures.AllowToChooseDownloadDestination)) {
-                        uriPathFolderDestination
-                    } else {
-                        getExternalPathByContentUriUseCase(uriPathFolderDestination.value)?.let {
-                            UriPath(it)
-                        }
-                    }
+                folderDestination = uriPathFolderDestination
             }
 
             fileSystemRepository.isContentUri(uriPathFolderDestination.value) -> {
