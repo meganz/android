@@ -21,6 +21,7 @@ import mega.privacy.android.app.presentation.snackbar.SnackBarHandler
 import mega.privacy.android.app.utils.Constants.SNACKBAR_TYPE
 import mega.privacy.android.domain.entity.AccountSubscriptionCycle
 import mega.privacy.android.domain.entity.AccountType
+import mega.privacy.android.domain.entity.MyAccountUpdate
 import mega.privacy.android.domain.entity.PaymentMethodType
 import mega.privacy.android.domain.entity.StorageState
 import mega.privacy.android.domain.entity.SubscriptionStatus
@@ -59,6 +60,7 @@ import mega.privacy.android.domain.usecase.account.IsMultiFactorAuthEnabledUseCa
 import mega.privacy.android.domain.usecase.account.KillOtherSessionsUseCase
 import mega.privacy.android.domain.usecase.account.LegacyCancelSubscriptionsUseCase
 import mega.privacy.android.domain.usecase.account.MonitorAccountDetailUseCase
+import mega.privacy.android.domain.usecase.account.MonitorMyAccountUpdateUseCase
 import mega.privacy.android.domain.usecase.account.MonitorStorageStateUseCase
 import mega.privacy.android.domain.usecase.account.QueryCancelLinkUseCase
 import mega.privacy.android.domain.usecase.account.QueryChangeEmailLinkUseCase
@@ -69,7 +71,6 @@ import mega.privacy.android.domain.usecase.billing.GetPaymentMethodUseCase
 import mega.privacy.android.domain.usecase.contact.GetCurrentUserEmail
 import mega.privacy.android.domain.usecase.file.GetFileVersionsOption
 import mega.privacy.android.domain.usecase.login.CheckPasswordReminderUseCase
-import mega.privacy.android.domain.usecase.login.LogoutUseCase
 import mega.privacy.android.domain.usecase.transfers.GetUsedTransferStatusUseCase
 import mega.privacy.android.domain.usecase.verification.MonitorVerificationStatus
 import mega.privacy.android.domain.usecase.verification.ResetSMSVerifiedPhoneNumberUseCase
@@ -132,7 +133,6 @@ internal class MyAccountViewModelTest {
     private val monitorVerificationStatus: MonitorVerificationStatus = mock()
     private val getExportMasterKeyUseCase: GetExportMasterKeyUseCase = mock()
     private val broadcastRefreshSessionUseCase: BroadcastRefreshSessionUseCase = mock()
-    private val logoutUseCase: LogoutUseCase = mock()
     private val monitorBackupFolder: MonitorBackupFolder = mock()
     private val getFolderTreeInfo: GetFolderTreeInfo = mock()
     private val getNodeByIdUseCase: GetNodeByIdUseCase = mock()
@@ -144,11 +144,16 @@ internal class MyAccountViewModelTest {
     private val monitorAccountDetailUseCase: MonitorAccountDetailUseCase = mock()
 
     private val userUpdatesFlow = MutableSharedFlow<UserChanges>()
+    private val myAccountUpdateFlow =
+        MutableStateFlow(MyAccountUpdate(MyAccountUpdate.Action.UPDATE_ACCOUNT_DETAILS))
     private val verificationStatusFlow = MutableSharedFlow<VerificationStatus>()
     private val backupFolderFlow = MutableSharedFlow<Result<NodeId>>()
     private val storageStateFlow = MutableStateFlow(StorageState.Unknown)
     private val monitorStorageStateUseCase = mock<MonitorStorageStateUseCase> {
         on { invoke() }.thenReturn(storageStateFlow)
+    }
+    private val monitorMyAccountUpdateUseCase: MonitorMyAccountUpdateUseCase = mock {
+        on { invoke() }.thenReturn(myAccountUpdateFlow)
     }
 
     @BeforeEach
@@ -219,7 +224,6 @@ internal class MyAccountViewModelTest {
             monitorVerificationStatus = monitorVerificationStatus,
             getExportMasterKeyUseCase = getExportMasterKeyUseCase,
             broadcastRefreshSessionUseCase = broadcastRefreshSessionUseCase,
-            logoutUseCase = logoutUseCase,
             monitorBackupFolder = monitorBackupFolder,
             getFolderTreeInfo = getFolderTreeInfo,
             getNodeByIdUseCase = getNodeByIdUseCase,
@@ -229,6 +233,7 @@ internal class MyAccountViewModelTest {
             monitorAccountDetailUseCase = monitorAccountDetailUseCase,
             monitorStorageStateUseCase = monitorStorageStateUseCase,
             getUsedTransferStatusUseCase = getUsedTransferStatusUseCase,
+            monitorMyAccountUpdateUseCase = monitorMyAccountUpdateUseCase
         )
     }
 
@@ -792,6 +797,17 @@ internal class MyAccountViewModelTest {
             }
         }
 
+    @Test
+    fun `test that monitor my account update emits the correct value`() = runTest {
+        val myAccountUpdate = MyAccountUpdate(MyAccountUpdate.Action.STORAGE_STATE_CHANGED)
+
+        myAccountUpdateFlow.emit(myAccountUpdate)
+        advanceUntilIdle()
+        underTest.monitorMyAccountUpdate.test {
+            assertThat(awaitItem()).isEqualTo(myAccountUpdate)
+        }
+    }
+
     private val expectedSubscriptionRenewTime = 1873874783274L
     private val expectedProExpirationTime = 378672463728467L
     private val expectedSubscriptionId = "subscriptionId"
@@ -920,7 +936,6 @@ internal class MyAccountViewModelTest {
             monitorVerificationStatus,
             getExportMasterKeyUseCase,
             broadcastRefreshSessionUseCase,
-            logoutUseCase,
             monitorBackupFolder,
             getFolderTreeInfo,
             getNodeByIdUseCase,

@@ -18,6 +18,7 @@ import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.flow.map
 import mega.privacy.android.analytics.Analytics
 import mega.privacy.android.app.R
+import mega.privacy.android.app.arch.extensions.collectFlow
 import mega.privacy.android.app.contacts.ContactsActivity
 import mega.privacy.android.app.databinding.FragmentMyAccountBinding
 import mega.privacy.android.app.modalbottomsheet.ModalBottomSheetUtil.isBottomSheetDialogShown
@@ -28,6 +29,7 @@ import mega.privacy.android.app.presentation.myaccount.view.MyAccountHomeView
 import mega.privacy.android.app.presentation.qrcode.QRCodeComposeActivity
 import mega.privacy.android.app.utils.CallUtil
 import mega.privacy.android.app.utils.Constants
+import mega.privacy.android.domain.entity.MyAccountUpdate
 import mega.privacy.android.domain.entity.StorageState
 import mega.privacy.android.domain.entity.ThemeMode
 import mega.privacy.android.domain.usecase.GetThemeMode
@@ -112,8 +114,11 @@ class MyAccountFragment : Fragment(), MyAccountHomeViewActions {
     }
 
     private fun setupObservers() {
-        activityViewModel.onUpdateAccountDetails()
-            .observe(viewLifecycleOwner) { viewModel.refreshAccountInfo() }
+        viewLifecycleOwner.collectFlow(activityViewModel.monitorMyAccountUpdate) {
+            if (it.action == MyAccountUpdate.Action.UPDATE_ACCOUNT_DETAILS) {
+                viewModel.refreshAccountInfo()
+            }
+        }
     }
 
     override val isPhoneNumberDialogShown: Boolean

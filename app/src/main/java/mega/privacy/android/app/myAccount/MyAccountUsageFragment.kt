@@ -27,6 +27,7 @@ import mega.privacy.android.app.presentation.mapper.file.FileSizeStringMapper
 import mega.privacy.android.app.upgradeAccount.UpgradeAccountActivity
 import mega.privacy.android.app.utils.Constants.SCROLLING_UP_DIRECTION
 import mega.privacy.android.data.qualifier.MegaApi
+import mega.privacy.android.domain.entity.MyAccountUpdate
 import nz.mega.sdk.MegaApiAndroid
 import javax.inject.Inject
 
@@ -118,7 +119,11 @@ class MyAccountUsageFragment : Fragment(), Scrollable {
             .distinctUntilChanged()) {
             setupAccountDetails()
         }
-        viewModel.onUpdateAccountDetails().observe(viewLifecycleOwner) { setupAccountDetails() }
+        viewLifecycleOwner.collectFlow(viewModel.monitorMyAccountUpdate) {
+            if (it.action == MyAccountUpdate.Action.UPDATE_ACCOUNT_DETAILS) {
+                setupAccountDetails()
+            }
+        }
     }
 
     /**

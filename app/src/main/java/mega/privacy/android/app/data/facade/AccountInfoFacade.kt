@@ -1,7 +1,6 @@
 package mega.privacy.android.app.data.facade
 
 import android.content.Context
-import android.content.Intent
 import dagger.Lazy
 import dagger.hilt.android.qualifiers.ApplicationContext
 import kotlinx.coroutines.flow.Flow
@@ -9,7 +8,6 @@ import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.update
 import mega.privacy.android.app.R
-import mega.privacy.android.app.constants.BroadcastConstants
 import mega.privacy.android.app.globalmanagement.MyAccountInfo
 import mega.privacy.android.app.listeners.OptionalMegaRequestListenerInterface
 import mega.privacy.android.app.middlelayer.iab.BillingConstant.PAYMENT_GATEWAY
@@ -73,7 +71,6 @@ class AccountInfoFacade @Inject constructor(
             myAccountInfo.createSessionTimeStamp = megaAccountSession.creationTimestamp
             Timber.d("onRequest TYPE_ACCOUNT_DETAILS: %s", myAccountInfo.usedPercentage)
         }
-        sendBroadcastUpdateAccountDetails()
     }
 
     override suspend fun handleAccountDetail(newDetail: AccountDetail) {
@@ -118,14 +115,6 @@ class AccountInfoFacade @Inject constructor(
             Timber.d("megaApi.submitPurchaseReceipt is invoked")
             megaApiGateway.submitPurchaseReceipt(PAYMENT_GATEWAY, json, listener)
         }
-    }
-
-    // we have to continue send broadcast receiver it will replace by accountDetail SharedFlow
-    private fun sendBroadcastUpdateAccountDetails() {
-        context.sendBroadcast(
-            Intent(Constants.BROADCAST_ACTION_INTENT_UPDATE_ACCOUNT_DETAILS)
-                .putExtra(BroadcastConstants.ACTION_TYPE, Constants.UPDATE_ACCOUNT_DETAILS).setPackage(context.packageName)
-        )
     }
 
     private fun getAccountTypeLabel(accountType: Int?) = with(context) {

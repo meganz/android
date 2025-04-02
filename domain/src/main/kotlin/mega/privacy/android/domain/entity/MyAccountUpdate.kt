@@ -7,7 +7,7 @@ package mega.privacy.android.domain.entity
  */
 data class MyAccountUpdate(
     val action: Action,
-    val storageState: StorageState?,
+    val storageState: StorageState? = null,
 ) {
     /**
      * My Account Action Type

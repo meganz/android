@@ -92,6 +92,7 @@ import mega.privacy.android.domain.usecase.account.IsMultiFactorAuthEnabledUseCa
 import mega.privacy.android.domain.usecase.account.KillOtherSessionsUseCase
 import mega.privacy.android.domain.usecase.account.LegacyCancelSubscriptionsUseCase
 import mega.privacy.android.domain.usecase.account.MonitorAccountDetailUseCase
+import mega.privacy.android.domain.usecase.account.MonitorMyAccountUpdateUseCase
 import mega.privacy.android.domain.usecase.account.MonitorStorageStateUseCase
 import mega.privacy.android.domain.usecase.account.QueryCancelLinkUseCase
 import mega.privacy.android.domain.usecase.account.QueryChangeEmailLinkUseCase
@@ -102,7 +103,6 @@ import mega.privacy.android.domain.usecase.billing.GetPaymentMethodUseCase
 import mega.privacy.android.domain.usecase.contact.GetCurrentUserEmail
 import mega.privacy.android.domain.usecase.file.GetFileVersionsOption
 import mega.privacy.android.domain.usecase.login.CheckPasswordReminderUseCase
-import mega.privacy.android.domain.usecase.login.LogoutUseCase
 import mega.privacy.android.domain.usecase.transfers.GetUsedTransferStatusUseCase
 import mega.privacy.android.domain.usecase.verification.MonitorVerificationStatus
 import mega.privacy.android.domain.usecase.verification.ResetSMSVerifiedPhoneNumberUseCase
@@ -184,7 +184,6 @@ class MyAccountViewModel @Inject constructor(
     private val monitorVerificationStatus: MonitorVerificationStatus,
     private val getExportMasterKeyUseCase: GetExportMasterKeyUseCase,
     private val broadcastRefreshSessionUseCase: BroadcastRefreshSessionUseCase,
-    private val logoutUseCase: LogoutUseCase,
     private val monitorBackupFolder: MonitorBackupFolder,
     private val getFolderTreeInfo: GetFolderTreeInfo,
     private val getNodeByIdUseCase: GetNodeByIdUseCase,
@@ -194,6 +193,7 @@ class MyAccountViewModel @Inject constructor(
     private val monitorAccountDetailUseCase: MonitorAccountDetailUseCase,
     private val monitorStorageStateUseCase: MonitorStorageStateUseCase,
     private val getUsedTransferStatusUseCase: GetUsedTransferStatusUseCase,
+    monitorMyAccountUpdateUseCase: MonitorMyAccountUpdateUseCase,
 ) : ViewModel() {
 
     companion object {
@@ -201,7 +201,6 @@ class MyAccountViewModel @Inject constructor(
     }
 
     private val withElevation: MutableLiveData<Boolean> = MutableLiveData()
-    private val updateAccountDetails: MutableLiveData<Boolean> = MutableLiveData()
 
     private val defaultSubscriptionDialogState = SubscriptionDialogState.Invisible
     private val defaultCancelAccountDialogState = CancelAccountDialogState.Invisible
@@ -224,6 +223,11 @@ class MyAccountViewModel @Inject constructor(
      * Number of subscription
      */
     val numberOfSubscription = _numberOfSubscription.asStateFlow()
+
+    /**
+     * Monitor My Account Update
+     */
+    val monitorMyAccountUpdate = monitorMyAccountUpdateUseCase()
 
     private val _state = MutableStateFlow(MyAccountUiState())
     val state = _state.asStateFlow()
@@ -431,13 +435,6 @@ class MyAccountViewModel @Inject constructor(
     fun checkElevation(): LiveData<Boolean> = withElevation
 
     /**
-     * On update account details
-     *
-     * @return
-     */
-    fun onUpdateAccountDetails(): LiveData<Boolean> = updateAccountDetails
-
-    /**
      * Set elevation
      *
      * @param withElevation
@@ -450,14 +447,6 @@ class MyAccountViewModel @Inject constructor(
         _state.update {
             it.copy(versionsInfo = myAccountInfo.getFormattedPreviousVersionsSize(context))
         }
-    }
-
-    /**
-     * Update account details
-     *
-     */
-    fun updateAccountDetails() {
-        updateAccountDetails.value = true
     }
 
     private var is2FaEnabled = false

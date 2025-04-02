@@ -1,6 +1,5 @@
 package mega.privacy.android.app.listeners
 
-import mega.privacy.android.icon.pack.R as IconPackR
 import android.app.NotificationChannel
 import android.app.NotificationManager
 import android.app.PendingIntent
@@ -23,7 +22,6 @@ import kotlinx.coroutines.flow.debounce
 import kotlinx.coroutines.launch
 import mega.privacy.android.app.MegaApplication.Companion.getInstance
 import mega.privacy.android.app.R
-import mega.privacy.android.app.constants.BroadcastConstants
 import mega.privacy.android.app.fcm.ContactsAdvancedNotificationBuilder
 import mega.privacy.android.app.main.ManagerActivity
 import mega.privacy.android.app.presentation.login.LoginActivity
@@ -54,6 +52,7 @@ import mega.privacy.android.domain.usecase.chat.link.ShouldShowRichLinkWarningUs
 import mega.privacy.android.domain.usecase.contact.GetIncomingContactRequestsNotificationListUseCase
 import mega.privacy.android.domain.usecase.notifications.BroadcastHomeBadgeCountUseCase
 import mega.privacy.android.domain.usecase.setting.BroadcastMiscLoadedUseCase
+import mega.privacy.android.icon.pack.R as IconPackR
 import nz.mega.sdk.MegaApiAndroid
 import nz.mega.sdk.MegaApiJava
 import nz.mega.sdk.MegaContactRequest
@@ -259,17 +258,7 @@ class GlobalListener @Inject constructor(
                     StorageState.Change -> refreshAccountDetail()
                     StorageState.PayWall -> showOverDiskQuotaPaywallWarning()
 
-                    else -> {
-                        val intent =
-                            Intent(Constants.BROADCAST_ACTION_INTENT_UPDATE_ACCOUNT_DETAILS).apply {
-                                action = Constants.ACTION_STORAGE_STATE_CHANGED
-                                putExtra(Constants.EXTRA_STORAGE_STATE, state)
-                                setPackage(appContext.packageName)
-                            }
-                        appContext.sendBroadcast(intent)
-
-                        sendMyAccountUpdateBroadcast(Action.STORAGE_STATE_CHANGED, state)
-                    }
+                    else -> sendMyAccountUpdateBroadcast(Action.STORAGE_STATE_CHANGED, state)
                 }
             }
 
@@ -318,12 +307,6 @@ class GlobalListener @Inject constructor(
     }
 
     private fun sendBroadcastUpdateAccountDetails() {
-        appContext.sendBroadcast(
-            Intent(Constants.BROADCAST_ACTION_INTENT_UPDATE_ACCOUNT_DETAILS)
-                .putExtra(BroadcastConstants.ACTION_TYPE, Constants.UPDATE_ACCOUNT_DETAILS)
-                .setPackage(appContext.packageName)
-        )
-
         sendMyAccountUpdateBroadcast(Action.UPDATE_ACCOUNT_DETAILS, null)
     }
 

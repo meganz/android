@@ -1,12 +1,8 @@
 package mega.privacy.android.app.myAccount
 
-import mega.privacy.android.shared.resources.R as sharedR
 import android.app.NotificationManager
-import android.content.BroadcastReceiver
-import android.content.Context
 import android.content.DialogInterface
 import android.content.Intent
-import android.content.IntentFilter
 import android.content.pm.PackageManager
 import android.net.Uri
 import android.os.Build
@@ -37,7 +33,6 @@ import mega.privacy.android.analytics.Analytics
 import mega.privacy.android.app.R
 import mega.privacy.android.app.activities.PasscodeActivity
 import mega.privacy.android.app.arch.extensions.collectFlow
-import mega.privacy.android.app.constants.BroadcastConstants
 import mega.privacy.android.app.constants.IntentConstants.Companion.ACTION_OPEN_ACHIEVEMENTS
 import mega.privacy.android.app.constants.IntentConstants.Companion.EXTRA_ACCOUNT_TYPE
 import mega.privacy.android.app.constants.IntentConstants.Companion.EXTRA_MASTER_KEY
@@ -65,11 +60,9 @@ import mega.privacy.android.app.utils.Constants.ACTION_CHANGE_MAIL
 import mega.privacy.android.app.utils.Constants.ACTION_PASS_CHANGED
 import mega.privacy.android.app.utils.Constants.ACTION_RESET_PASS
 import mega.privacy.android.app.utils.Constants.ACTION_RESET_PASS_FROM_LINK
-import mega.privacy.android.app.utils.Constants.BROADCAST_ACTION_INTENT_UPDATE_ACCOUNT_DETAILS
 import mega.privacy.android.app.utils.Constants.INVALID_VALUE
 import mega.privacy.android.app.utils.Constants.NOTIFICATION_STORAGE_OVERQUOTA
 import mega.privacy.android.app.utils.Constants.RESULT
-import mega.privacy.android.app.utils.Constants.UPDATE_ACCOUNT_DETAILS
 import mega.privacy.android.app.utils.MenuUtils.toggleAllMenuItemsVisibility
 import mega.privacy.android.app.utils.Util.isDarkMode
 import mega.privacy.android.app.utils.Util.isOnline
@@ -79,6 +72,7 @@ import mega.privacy.android.app.utils.ViewUtils.hideKeyboard
 import mega.privacy.android.domain.entity.ThemeMode
 import mega.privacy.android.domain.usecase.GetThemeMode
 import mega.privacy.android.shared.original.core.ui.theme.OriginalTheme
+import mega.privacy.android.shared.resources.R as sharedR
 import mega.privacy.mobile.analytics.event.CancelSubscriptionMenuToolbarEvent
 import mega.privacy.mobile.analytics.event.ToolbarOverflowMenuItemEvent
 import nz.mega.sdk.MegaApiJava
@@ -132,19 +126,6 @@ class MyAccountActivity : PasscodeActivity(),
         override fun handleOnBackPressed() {
             if (!navController.navigateUp()) {
                 finish()
-            }
-        }
-    }
-
-    private val updateMyAccountReceiver: BroadcastReceiver = object : BroadcastReceiver() {
-        override fun onReceive(context: Context, intent: Intent) {
-            val actionType = intent.getIntExtra(
-                BroadcastConstants.ACTION_TYPE,
-                BroadcastConstants.INVALID_ACTION
-            )
-
-            when (actionType) {
-                UPDATE_ACCOUNT_DETAILS -> viewModel.updateAccountDetails()
             }
         }
     }
@@ -313,8 +294,6 @@ class MyAccountActivity : PasscodeActivity(),
     }
 
     override fun onDestroy() {
-        unregisterReceiver(updateMyAccountReceiver)
-
         killSessionsConfirmationDialog?.dismiss()
         cancelSubscriptionsDialog?.dismiss()
         cancelSubscriptionsConfirmationDialog?.dismiss()
@@ -456,12 +435,6 @@ class MyAccountActivity : PasscodeActivity(),
     }
 
     private fun setupObservers() {
-        registerReceiver(
-            updateMyAccountReceiver, IntentFilter(
-                BROADCAST_ACTION_INTENT_UPDATE_ACCOUNT_DETAILS
-            )
-        )
-
         collectFlow(viewModel.numberOfSubscription) {
             refreshMenuOptionsVisibility()
         }
