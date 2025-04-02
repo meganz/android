@@ -32,6 +32,7 @@ import mega.privacy.android.app.utils.Util
 import mega.privacy.android.domain.entity.AccountType
 import mega.privacy.android.domain.entity.node.NodeId
 import mega.privacy.android.domain.entity.node.thumbnail.ThumbnailRequest
+import mega.privacy.android.icon.pack.R as IconPackR
 
 /**
  * The adapter regarding favourites
@@ -231,9 +232,22 @@ class FavouritesViewHolder(
                 }
 
                 is SortByHeaderBinding -> {
-                    orderNameStringId =
+                    sortByLayout.setOnClickListener {
+                        sortByHeaderViewModel?.showSortByDialog()
+                    }
+
+                    listModeSwitch.setOnClickListener {
+                        sortByHeaderViewModel?.switchViewType()
+                    }
+                    sortedBy.text = context.getString(
                         (item as FavouriteHeaderItem).orderStringId ?: R.string.sortby_name
-                    this.sortByHeaderViewModel = sortByHeaderViewModel
+                    )
+                    listModeSwitch.setImageResource(
+                        if (sortByHeaderViewModel?.isListView() == true)
+                            IconPackR.drawable.ic_grid_4_small_regular_outline
+                        else
+                            IconPackR.drawable.ic_list_small_small_regular_outline
+                    )
                 }
 
                 else -> {}

@@ -1,72 +1,51 @@
 <?xml version="1.0" encoding="utf-8"?>
-<layout xmlns:android="http://schemas.android.com/apk/res/android"
+<androidx.constraintlayout.widget.ConstraintLayout
+    android:layout_width="match_parent"
+    xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
-    xmlns:tools="http://schemas.android.com/tools">
-
-    <data>
-
-        <variable
-            name="orderNameStringId"
-            type="int" />
-
-        <variable
-            name="isFromFolderLink"
-            type="boolean" />
-
-        <variable
-            name="sortByHeaderViewModel"
-            type="mega.privacy.android.app.fragments.homepage.SortByHeaderViewModel" />
-    </data>
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_height="36dp"
+    android:layout_marginTop="8dp">
 
     <androidx.constraintlayout.widget.ConstraintLayout
-        android:layout_width="match_parent"
-        android:layout_height="36dp"
-        android:layout_marginTop="8dp">
+        android:id="@+id/sort_by_layout"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="16dp"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent">
 
-        <androidx.constraintlayout.widget.ConstraintLayout
-            android:id="@+id/sort_by_layout"
+        <TextView
+            android:id="@+id/sorted_by"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_marginStart="16dp"
-            android:onClick="@{()->sortByHeaderViewModel.showSortByDialog()}"
+            android:layout_marginEnd="6dp"
+            android:textAppearance="@style/TextAppearance.Mega.Body2.Variant"
             app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toTopOf="parent">
-
-            <TextView
-                android:id="@+id/sorted_by"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_marginEnd="6dp"
-                android:text="@{context.resources.getString(orderNameStringId)}"
-                android:textAppearance="@style/TextAppearance.Mega.Body2.Variant"
-                app:layout_constraintBottom_toBottomOf="parent"
-                app:layout_constraintStart_toStartOf="parent"
-                app:layout_constraintTop_toTopOf="parent"
-                tools:text="Name" />
-
-            <ImageView
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:background="@null"
-                android:src="@drawable/ic_down"
-                app:layout_constraintBottom_toBottomOf="parent"
-                app:layout_constraintStart_toEndOf="@id/sorted_by"
-                app:tint="?android:attr/textColorSecondary" />
-        </androidx.constraintlayout.widget.ConstraintLayout>
+            app:layout_constraintTop_toTopOf="parent"
+            tools:text="Name" />
 
         <ImageView
-            android:id="@+id/list_mode_switch"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_marginEnd="12dp"
-            android:onClick="@{() -> sortByHeaderViewModel.switchViewType()}"
-            android:padding="10dp"
-            android:src="@{sortByHeaderViewModel.isListView() ? @drawable/ic_grid_4_small_regular_outline : @drawable/ic_list_small_small_regular_outline}"
+            android:background="@null"
+            android:src="@drawable/ic_down"
             app:layout_constraintBottom_toBottomOf="parent"
-            app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintTop_toTopOf="parent"
+            app:layout_constraintStart_toEndOf="@id/sorted_by"
             app:tint="?android:attr/textColorSecondary" />
-
     </androidx.constraintlayout.widget.ConstraintLayout>
-</layout>
+
+    <ImageView
+        android:id="@+id/list_mode_switch"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginEnd="12dp"
+        android:padding="10dp"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintTop_toTopOf="parent"
+        app:tint="?android:attr/textColorSecondary" />
+
+</androidx.constraintlayout.widget.ConstraintLayout>

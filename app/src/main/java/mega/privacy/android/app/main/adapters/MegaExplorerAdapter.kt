@@ -1,6 +1,5 @@
 package mega.privacy.android.app.main.adapters
 
-import mega.privacy.android.core.R as CoreUiR
 import android.content.Context
 import android.content.res.Configuration.ORIENTATION_LANDSCAPE
 import android.graphics.Color
@@ -55,6 +54,7 @@ import mega.privacy.android.app.utils.MegaNodeUtil.getNumberOfFolders
 import mega.privacy.android.app.utils.TimeUtils.getVideoDuration
 import mega.privacy.android.app.utils.Util.dp2px
 import mega.privacy.android.app.utils.Util.scaleWidthPx
+import mega.privacy.android.core.R as CoreUiR
 import mega.privacy.android.domain.entity.account.AccountDetail
 import mega.privacy.android.domain.entity.node.NodeId
 import mega.privacy.android.domain.entity.node.thumbnail.ThumbnailRequest
@@ -818,15 +818,31 @@ class MegaExplorerAdapter(
     inner class ViewHolderSortBy(private val binding: SortByHeaderBinding) :
         ViewHolderExplorer(binding.root) {
 
+        init {
+            binding.sortByLayout.setOnClickListener {
+                sortByViewModel.showSortByDialog()
+            }
+
+            binding.listModeSwitch.setOnClickListener {
+                sortByViewModel.switchViewType()
+            }
+        }
+
         internal fun bind() {
-            binding.sortByHeaderViewModel = sortByViewModel
             SortByHeaderViewModel.orderNameMap[if (fragment is IncomingSharesExplorerFragment && parentHandle == INVALID_HANDLE) {
                 sortByViewModel.order.othersSortOrder
             } else {
                 sortByViewModel.order.cloudSortOrder
             }]?.let {
-                binding.orderNameStringId = it
+                binding.sortedBy.text = context.getString(it)
             }
+
+            binding.listModeSwitch.setImageResource(
+                if (sortByViewModel.isListView())
+                    mega.privacy.android.icon.pack.R.drawable.ic_grid_4_small_regular_outline
+                else
+                    mega.privacy.android.icon.pack.R.drawable.ic_list_small_small_regular_outline
+            )
         }
     }
 

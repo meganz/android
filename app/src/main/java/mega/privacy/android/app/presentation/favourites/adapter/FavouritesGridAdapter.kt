@@ -239,9 +239,22 @@ class FavouritesGridViewHolder(
                 }
 
                 is SortByHeaderBinding -> {
-                    orderNameStringId =
+                    sortByLayout.setOnClickListener {
+                        sortByHeaderViewModel?.showSortByDialog()
+                    }
+
+                    listModeSwitch.setOnClickListener {
+                        sortByHeaderViewModel?.switchViewType()
+                    }
+                    sortedBy.text = root.context.getString(
                         (item as FavouriteHeaderItem).orderStringId ?: R.string.sortby_name
-                    this.sortByHeaderViewModel = sortByHeaderViewModel
+                    )
+                    listModeSwitch.setImageResource(
+                        if (sortByHeaderViewModel?.isListView() == true)
+                            mega.privacy.android.icon.pack.R.drawable.ic_grid_4_small_regular_outline
+                        else
+                            mega.privacy.android.icon.pack.R.drawable.ic_list_small_small_regular_outline
+                    )
                 }
 
                 else -> {}

@@ -15,13 +15,29 @@ class FolderContentHeaderHolder(
     private val sortByViewModel: SortByHeaderViewModel,
     private val binding: SortByHeaderBinding,
 ) : RecyclerView.ViewHolder(binding.root) {
+    init {
+        binding.sortByLayout.setOnClickListener {
+            sortByViewModel.showSortByDialog()
+        }
+
+        binding.listModeSwitch.setOnClickListener {
+            sortByViewModel.switchViewType()
+        }
+    }
 
     fun bind() {
         binding.apply {
-            orderNameStringId =
+            sortedBy.text = root.context.getString(
                 SortByHeaderViewModel.orderNameMap[sortByViewModel.order.offlineSortOrder]
                     ?: R.string.sortby_name
-            sortByHeaderViewModel = sortByViewModel
+            )
         }
+
+        binding.listModeSwitch.setImageResource(
+            if (sortByViewModel.isListView())
+                mega.privacy.android.icon.pack.R.drawable.ic_grid_4_small_regular_outline
+            else
+                mega.privacy.android.icon.pack.R.drawable.ic_list_small_small_regular_outline
+        )
     }
 }

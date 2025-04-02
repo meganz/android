@@ -46,7 +46,6 @@ import mega.privacy.android.app.main.ContactFileListFragment
 import mega.privacy.android.app.main.DrawerItem
 import mega.privacy.android.app.main.ManagerActivity
 import mega.privacy.android.app.main.adapters.MegaNodeAdapter.ViewHolderBrowser
-import mega.privacy.android.app.main.adapters.MegaNodeAdapter.ViewHolderBrowserGrid
 import mega.privacy.android.app.main.contactSharedFolder.ContactSharedFolderFragment
 import mega.privacy.android.app.presentation.backups.BackupsFragment
 import mega.privacy.android.app.presentation.bottomsheet.NodeOptionsBottomSheetDialogFragment
@@ -67,13 +66,11 @@ import mega.privacy.android.app.utils.Util
 import mega.privacy.android.data.database.DatabaseHandler
 import mega.privacy.android.domain.entity.ShareData
 import mega.privacy.android.domain.entity.node.thumbnail.ThumbnailRequest.Companion.fromHandle
+import mega.privacy.android.icon.pack.R as IconPackR
 import nz.mega.sdk.MegaApiAndroid
 import nz.mega.sdk.MegaNode
 import nz.mega.sdk.MegaShare
 import timber.log.Timber
-import java.lang.Exception
-import java.lang.IndexOutOfBoundsException
-import java.util.ArrayList
 import java.util.stream.Collectors
 
 class MegaNodeAdapter : RecyclerView.Adapter<ViewHolderBrowser?>,
@@ -164,9 +161,17 @@ class MegaNodeAdapter : RecyclerView.Adapter<ViewHolderBrowser?>,
     inner class ViewHolderSortBy(private val binding: SortByHeaderBinding) :
         ViewHolderBrowser(binding.root) {
 
-        fun bind() {
-            binding.setSortByHeaderViewModel(sortByViewModel)
+        init {
+            binding.sortByLayout.setOnClickListener {
+                sortByViewModel?.showSortByDialog()
+            }
 
+            binding.listModeSwitch.setOnClickListener {
+                sortByViewModel?.switchViewType()
+            }
+        }
+
+        fun bind() {
             var orderType = sortByViewModel?.order?.cloudSortOrder
 
             // Root of incoming shares tab, display sort options OTHERS
@@ -180,8 +185,9 @@ class MegaNodeAdapter : RecyclerView.Adapter<ViewHolderBrowser?>,
                 orderType = sortByViewModel?.order?.othersSortOrder
             }
 
-            orderNameMap[orderType]?.let { binding.setOrderNameStringId(it) }
-            binding.setIsFromFolderLink(type == Constants.FOLDER_LINK_ADAPTER)
+            orderNameMap[orderType]?.let {
+                binding.sortedBy.text = binding.root.context.getString(it)
+            }
 
             if (type == Constants.FOLDER_LINK_ADAPTER) {
                 binding.sortByLayout.visibility = View.GONE
@@ -193,6 +199,13 @@ class MegaNodeAdapter : RecyclerView.Adapter<ViewHolderBrowser?>,
                 View.GONE
             else
                 View.VISIBLE
+
+            binding.listModeSwitch.setImageResource(
+                if (sortByViewModel?.isListView() == true)
+                    IconPackR.drawable.ic_grid_4_small_regular_outline
+                else
+                    IconPackR.drawable.ic_list_small_small_regular_outline
+            )
         }
     }
 
