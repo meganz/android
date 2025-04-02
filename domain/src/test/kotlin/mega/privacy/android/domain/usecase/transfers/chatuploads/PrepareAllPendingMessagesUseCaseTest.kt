@@ -9,11 +9,9 @@ import kotlinx.coroutines.test.runTest
 import mega.privacy.android.domain.entity.chat.PendingMessage
 import mega.privacy.android.domain.entity.chat.PendingMessageState
 import mega.privacy.android.domain.entity.chat.messages.pending.UpdatePendingMessageStateAndPathRequest
-import mega.privacy.android.domain.entity.chat.messages.pending.UpdatePendingMessageStateRequest
 import mega.privacy.android.domain.entity.uri.UriPath
 import mega.privacy.android.domain.usecase.chat.message.MonitorPendingMessagesByStateUseCase
 import mega.privacy.android.domain.usecase.chat.message.UpdatePendingMessageUseCase
-import mega.privacy.android.domain.usecase.transfers.GetPathForUploadUseCase
 import org.junit.jupiter.api.BeforeAll
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
@@ -26,14 +24,12 @@ import org.mockito.kotlin.reset
 import org.mockito.kotlin.verify
 import org.mockito.kotlin.verifyNoMoreInteractions
 import org.mockito.kotlin.whenever
-import java.io.File
 
 @TestInstance(TestInstance.Lifecycle.PER_CLASS)
 class PrepareAllPendingMessagesUseCaseTest {
     private lateinit var underTest: PrepareAllPendingMessagesUseCase
 
     private val monitorPendingMessagesByStateUseCase = mock<MonitorPendingMessagesByStateUseCase>()
-    private val getPathForUploadUseCase = mock<GetPathForUploadUseCase>()
     private val chatAttachmentNeedsCompressionUseCase =
         mock<ChatAttachmentNeedsCompressionUseCase>()
     private val updatePendingMessageUseCase = mock<UpdatePendingMessageUseCase>()
@@ -43,7 +39,6 @@ class PrepareAllPendingMessagesUseCaseTest {
 
         underTest = PrepareAllPendingMessagesUseCase(
             monitorPendingMessagesByStateUseCase,
-            getPathForUploadUseCase,
             chatAttachmentNeedsCompressionUseCase,
             updatePendingMessageUseCase,
         )
@@ -53,7 +48,6 @@ class PrepareAllPendingMessagesUseCaseTest {
     fun resetMocks() {
         reset(
             monitorPendingMessagesByStateUseCase,
-            getPathForUploadUseCase,
             chatAttachmentNeedsCompressionUseCase,
             updatePendingMessageUseCase,
         )
@@ -77,6 +71,8 @@ class PrepareAllPendingMessagesUseCaseTest {
         runTest {
             val firstList = (0L..3L).map { stubPendingMessage(it) }
             val secondList = (6L..23L).map { stubPendingMessage(it) }
+
+            whenever(chatAttachmentNeedsCompressionUseCase(anyValueClass())) doReturn true
             whenever(monitorPendingMessagesByStateUseCase(PendingMessageState.PREPARING)) doReturn
                     flow {
                         emit(firstList)
@@ -100,6 +96,7 @@ class PrepareAllPendingMessagesUseCaseTest {
         runTest {
             val firstList = (0L..3L).map { stubPendingMessage(it) }
             val secondList = (6L..23L).map { stubPendingMessage(it) }
+            whenever(chatAttachmentNeedsCompressionUseCase(anyValueClass())) doReturn true
             whenever(monitorPendingMessagesByStateUseCase(PendingMessageState.PREPARING)) doReturn
                     flow {
                         emit(firstList)
@@ -118,41 +115,12 @@ class PrepareAllPendingMessagesUseCaseTest {
         }
 
     @Test
-    fun `test that pending message is set to error state when file is not found`() = runTest {
-        val pendingMessage = stubPendingMessage()
-        whenever(monitorPendingMessagesByStateUseCase(PendingMessageState.PREPARING)) doReturn
-                flowOf(listOf(pendingMessage))
-        whenever(
-            getPathForUploadUseCase(
-                originalUriPath = pendingMessage.uriPath,
-            )
-        ) doReturn null
-        whenever(chatAttachmentNeedsCompressionUseCase(any())) doReturn false
-
-        underTest().test { cancelAndConsumeRemainingEvents() }
-
-        verify(updatePendingMessageUseCase)(
-            UpdatePendingMessageStateRequest(
-                pendingMessage.id,
-                PendingMessageState.ERROR_UPLOADING
-            )
-        )
-        verifyNoMoreInteractions(updatePendingMessageUseCase)
-    }
-
-    @Test
-    fun `test that pending message is set to compressing state with the new path when file needs compression`() =
+    fun `test that pending message is set to compressing state when file needs compression`() =
         runTest {
             val pendingMessage = stubPendingMessage()
-            val path = "video.mp4"
-            val file = File(path)
+
             whenever(monitorPendingMessagesByStateUseCase(PendingMessageState.PREPARING)) doReturn
                     flowOf(listOf(pendingMessage))
-            whenever(
-                getPathForUploadUseCase(
-                    originalUriPath = pendingMessage.uriPath,
-                )
-            ) doReturn path
             whenever(chatAttachmentNeedsCompressionUseCase(anyValueClass())) doReturn true
 
             underTest().test { cancelAndConsumeRemainingEvents() }
@@ -161,25 +129,18 @@ class PrepareAllPendingMessagesUseCaseTest {
                 UpdatePendingMessageStateAndPathRequest(
                     pendingMessage.id,
                     PendingMessageState.COMPRESSING,
-                    file.path,
+                    pendingMessage.uriPath.value,
                 )
             )
             verifyNoMoreInteractions(updatePendingMessageUseCase)
         }
 
     @Test
-    fun `test that pending message is set to ready to upload state with the new path when file does not needs compression`() =
+    fun `test that pending message is set to ready to upload state when file does not needs compression`() =
         runTest {
             val pendingMessage = stubPendingMessage()
-            val path = "file.txt"
-            val file = File(path)
             whenever(monitorPendingMessagesByStateUseCase(PendingMessageState.PREPARING)) doReturn
                     flowOf(listOf(pendingMessage))
-            whenever(
-                getPathForUploadUseCase(
-                    originalUriPath = pendingMessage.uriPath,
-                )
-            ) doReturn path
             whenever(chatAttachmentNeedsCompressionUseCase(anyValueClass())) doReturn false
 
             underTest().test { cancelAndConsumeRemainingEvents() }
@@ -188,7 +149,7 @@ class PrepareAllPendingMessagesUseCaseTest {
                 UpdatePendingMessageStateAndPathRequest(
                     pendingMessage.id,
                     PendingMessageState.READY_TO_UPLOAD,
-                    file.path,
+                    pendingMessage.uriPath.value,
                 )
             )
             verifyNoMoreInteractions(updatePendingMessageUseCase)
@@ -198,27 +159,20 @@ class PrepareAllPendingMessagesUseCaseTest {
     fun `test that multiple pending messages are updated`() =
         runTest {
             val pendingMessages = (0L..3L).map { stubPendingMessage(it) }
-            val destinations = pendingMessages.map { "/video${it.id}.mp4" }
 
+            whenever(chatAttachmentNeedsCompressionUseCase(anyValueClass())) doReturn true
             whenever(monitorPendingMessagesByStateUseCase(PendingMessageState.PREPARING)) doReturn
                     flowOf(pendingMessages)
-            pendingMessages.forEachIndexed { i, it ->
-                whenever(
-                    getPathForUploadUseCase(
-                        originalUriPath = it.uriPath,
-                    )
-                ) doReturn destinations[i]
-            }
             whenever(chatAttachmentNeedsCompressionUseCase(any())) doReturn false
 
             underTest().test { cancelAndConsumeRemainingEvents() }
 
-            pendingMessages.forEachIndexed { i, it ->
+            pendingMessages.forEach {
                 verify(updatePendingMessageUseCase)(
                     UpdatePendingMessageStateAndPathRequest(
                         it.id,
                         PendingMessageState.READY_TO_UPLOAD,
-                        destinations[i],
+                        it.uriPath.value,
                     )
                 )
             }

@@ -9,12 +9,8 @@ import kotlinx.coroutines.sync.Semaphore
 import kotlinx.coroutines.sync.withPermit
 import mega.privacy.android.domain.entity.chat.PendingMessageState
 import mega.privacy.android.domain.entity.chat.messages.pending.UpdatePendingMessageStateAndPathRequest
-import mega.privacy.android.domain.entity.chat.messages.pending.UpdatePendingMessageStateRequest
-import mega.privacy.android.domain.entity.uri.UriPath
 import mega.privacy.android.domain.usecase.chat.message.MonitorPendingMessagesByStateUseCase
 import mega.privacy.android.domain.usecase.chat.message.UpdatePendingMessageUseCase
-import mega.privacy.android.domain.usecase.transfers.GetPathForUploadUseCase
-import java.io.File
 import javax.inject.Inject
 
 /**
@@ -25,7 +21,6 @@ import javax.inject.Inject
  */
 class PrepareAllPendingMessagesUseCase @Inject constructor(
     private val monitorPendingMessagesByStateUseCase: MonitorPendingMessagesByStateUseCase,
-    private val getPathForUploadUseCase: GetPathForUploadUseCase,
     private val chatAttachmentNeedsCompressionUseCase: ChatAttachmentNeedsCompressionUseCase,
     private val updatePendingMessageUseCase: UpdatePendingMessageUseCase,
 ) {
@@ -47,28 +42,14 @@ class PrepareAllPendingMessagesUseCase @Inject constructor(
                             launch {
                                 semaphore.withPermit {
                                     val pendingMessageIds = pendingMessages.map { it.id }
-                                    val uriPathToUpload = getPathForUploadUseCase(
-                                        originalUriPath = uriPath,
-                                    )?.let { UriPath(it) }
                                     when {
-                                        uriPathToUpload == null -> {
-                                            updatePendingMessageUseCase(
-                                                updatePendingMessageRequests = pendingMessageIds.map { pendingMessageId ->
-                                                    UpdatePendingMessageStateRequest(
-                                                        pendingMessageId,
-                                                        PendingMessageState.ERROR_UPLOADING,
-                                                    )
-                                                }.toTypedArray()
-                                            )
-                                        }
-
-                                        chatAttachmentNeedsCompressionUseCase(uriPathToUpload) -> {
+                                        chatAttachmentNeedsCompressionUseCase(uriPath) -> {
                                             updatePendingMessageUseCase(
                                                 updatePendingMessageRequests = pendingMessageIds.map { pendingMessageId ->
                                                     UpdatePendingMessageStateAndPathRequest(
                                                         pendingMessageId,
                                                         PendingMessageState.COMPRESSING,
-                                                        uriPathToUpload.value,
+                                                        uriPath.value,
                                                     )
                                                 }.toTypedArray()
                                             )
@@ -81,7 +62,7 @@ class PrepareAllPendingMessagesUseCase @Inject constructor(
                                                     UpdatePendingMessageStateAndPathRequest(
                                                         pendingMessageId,
                                                         PendingMessageState.READY_TO_UPLOAD,
-                                                        uriPathToUpload.value,
+                                                        uriPath.value,
                                                     )
                                                 }.toTypedArray()
                                             )
