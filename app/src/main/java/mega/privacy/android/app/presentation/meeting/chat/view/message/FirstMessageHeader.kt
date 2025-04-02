@@ -36,7 +36,7 @@ internal fun FirstMessageHeader(
     ) {
         if (isNoteToSelfChat) {
             FirstMessageHeaderSubtitleWithIcon(
-                modifier = Modifier.padding(bottom = 5.dp),
+                modifier = Modifier,
                 subtitle = stringResource(id = sharedR.string.chat_note_to_self_chat_first_message_header),
                 iconRes = mega.privacy.android.core.R.drawable.file_icon
             )

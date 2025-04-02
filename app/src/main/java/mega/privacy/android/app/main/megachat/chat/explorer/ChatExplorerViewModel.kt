@@ -150,6 +150,13 @@ class ChatExplorerViewModel @Inject constructor(
      * Get the list of chats both active and non-active.
      */
     fun getChats() {
+        _uiState.update {
+            it.copy(
+                items = null,
+                isItemUpdated = false
+            )
+        }
+
         viewModelScope.launch(defaultDispatcher) {
             val items = buildList {
                 // Add the active/recent chat rooms

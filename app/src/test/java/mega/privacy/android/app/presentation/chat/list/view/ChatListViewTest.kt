@@ -41,6 +41,7 @@ class ChatListViewTest {
                 selectedIds = emptyList(),
                 scrollToTop = false,
                 isMeetingView = false,
+                isSearchMode = false,
                 isLoading = false,
             )
         }
@@ -57,6 +58,7 @@ class ChatListViewTest {
                 scrollToTop = false,
                 isMeetingView = false,
                 isLoading = true,
+                isSearchMode = false
             )
         }
 
@@ -71,7 +73,8 @@ class ChatListViewTest {
                 selectedIds = emptyList(),
                 scrollToTop = false,
                 isMeetingView = false,
-                isLoading = false
+                isLoading = false,
+                isSearchMode = false
             )
         }
 
@@ -79,7 +82,7 @@ class ChatListViewTest {
     }
 
     @Test
-    fun `test that EmptyView is displayed when item is Note to self chat and hint`() {
+    fun `test that EmptyView is displayed when item is Note to self chat`() {
         val list = mutableListOf<ChatRoomItem>()
         list.add(ChatRoomItem.NoteToSelfChatRoomItem(chatId = 123L, title = "Note to self"))
         composeTestRule.setContent {
@@ -87,7 +90,7 @@ class ChatListViewTest {
                 items = list,
                 selectedIds = emptyList(),
                 scrollToTop = false,
-                isHint = true,
+                isSearchMode = false,
                 isMeetingView = false,
                 isLoading = false
             )
@@ -97,7 +100,7 @@ class ChatListViewTest {
     }
 
     @Test
-    fun `test that EmptyView is hidden when item is Note to self chat and not hint`() {
+    fun `test that EmptyView is hidden when item is Note to self chat and is search mode`() {
         val list = mutableListOf<ChatRoomItem>()
         list.add(ChatRoomItem.NoteToSelfChatRoomItem(chatId = 123L, title = "Note to self"))
         composeTestRule.setContent {
@@ -105,7 +108,7 @@ class ChatListViewTest {
                 items = list,
                 selectedIds = emptyList(),
                 scrollToTop = false,
-                isHint = false,
+                isSearchMode = true,
                 isMeetingView = false,
                 isLoading = false
             )
@@ -123,6 +126,7 @@ class ChatListViewTest {
                 items = items,
                 selectedIds = emptyList(),
                 scrollToTop = false,
+                isSearchMode = false,
                 isMeetingView = false,
             )
         }

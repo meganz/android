@@ -110,13 +110,15 @@ fun ArchivedChatsView(
                 )
             }
         ) { padding ->
+            val isSearchMode = filteredChats != null
+
             ChatListView(
                 modifier = Modifier.padding(padding),
                 items = filteredChats ?: state.items,
                 selectedIds = emptyList(),
                 scrollToTop = false,
+                isSearchMode = isSearchMode,
                 isNew = noteToSelfState.isNewFeature,
-                isHint = noteToSelfState.isNoteToSelfChatEmpty,
                 isMeetingView = false,
                 onItemClick = onItemClick,
                 onItemMoreClick = { chatItem ->

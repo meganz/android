@@ -85,9 +85,9 @@ fun ChatListView(
     selectedIds: List<Long>,
     scrollToTop: Boolean,
     isMeetingView: Boolean,
+    isSearchMode: Boolean,
     modifier: Modifier = Modifier,
     isNew: Boolean = false,
-    isHint: Boolean = false,
     hasAnyContact: Boolean = false,
     isLoading: Boolean = false,
     tooltip: MeetingTooltipItem = MeetingTooltipItem.NONE,
@@ -107,9 +107,9 @@ fun ChatListView(
             .background(MaterialTheme.colors.surface)
     ) {
         val showEmptyStateAndNoteToSelfChat =
-            !isMeetingView && (items.size == 1 && items.first() is ChatRoomItem.NoteToSelfChatRoomItem && isHint)
+            !isMeetingView && (items.size == 1 && items.first() is ChatRoomItem.NoteToSelfChatRoomItem)
         val isEmptyStateShowed =
-            !isLoading && (items.isEmpty() || (showEmptyStateAndNoteToSelfChat))
+            !isLoading && (items.isEmpty() || showEmptyStateAndNoteToSelfChat) && !isSearchMode
 
         if (items.isNotEmpty()) {
             ListView(
@@ -415,6 +415,7 @@ private fun PreviewMeetingEmptyView(
             selectedIds = emptyList(),
             isMeetingView = isMeeting,
             scrollToTop = false,
+            isSearchMode = false
         )
     }
 }
@@ -431,6 +432,7 @@ private fun PreviewEmptyView() {
             selectedIds = emptyList(),
             isMeetingView = false,
             scrollToTop = false,
+            isSearchMode = false
         )
     }
 }

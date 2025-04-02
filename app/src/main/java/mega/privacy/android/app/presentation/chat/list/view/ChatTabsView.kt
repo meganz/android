@@ -175,6 +175,8 @@ fun ChatTabsView(
                 else
                     state.areChatsLoading
 
+                val isSearchMode = filteredMeetings != null || filteredChats != null
+
                 ChatListView(
                     items = items,
                     isLoading = isLoading,
@@ -183,8 +185,8 @@ fun ChatTabsView(
                     onItemClick = onItemClick,
                     isMeetingView = isMeetingView,
                     tooltip = state.tooltip,
+                    isSearchMode = isSearchMode,
                     isNew = noteToSelfChatState.isNewFeature,
-                    isHint = noteToSelfChatState.isNoteToSelfChatEmpty,
                     onItemMoreClick = onItemMoreClick,
                     onItemSelected = onItemSelected,
                     onScrollInProgress = { showFabButton = !it },
