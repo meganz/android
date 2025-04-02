@@ -15,26 +15,36 @@ import mega.privacy.android.domain.entity.node.NodeId
 import mega.privacy.android.domain.entity.shares.AccessPermission
 import mega.privacy.android.domain.entity.shares.ShareRecipient
 import mega.privacy.android.domain.entity.user.UserVisibility
+import mega.privacy.android.domain.repository.AvatarRepository
 import mega.privacy.android.domain.repository.ContactsRepository
 import mega.privacy.android.domain.repository.NodeRepository
+import org.junit.jupiter.api.AfterEach
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
 import org.mockito.kotlin.any
 import org.mockito.kotlin.mock
+import org.mockito.kotlin.reset
 import org.mockito.kotlin.stub
 
-class MonitorShareRecipientsTest {
-    lateinit var underTest: MonitorShareRecipients
+class MonitorShareRecipientsUseCaseTest {
+    lateinit var underTest: MonitorShareRecipientsUseCase
 
     private val nodeRepository = mock<NodeRepository>()
     private val contactsRepository = mock<ContactsRepository>()
+    private val avatarRepository = mock<AvatarRepository>()
 
     @BeforeEach
     fun setUp() {
-        underTest = MonitorShareRecipients(
+        underTest = MonitorShareRecipientsUseCase(
             nodeRepository = nodeRepository,
-            contactsRepository = contactsRepository
+            contactsRepository = contactsRepository,
+            avatarRepository = avatarRepository,
         )
+    }
+
+    @AfterEach
+    fun cleanUp() {
+        reset(nodeRepository, contactsRepository, avatarRepository)
     }
 
     @Test
@@ -97,6 +107,7 @@ class MonitorShareRecipientsTest {
         val access = AccessPermission.UNKNOWN
         val nickname = "nickname"
         val userId = 1L
+        val avatarColour = 42
 
         nodeRepository.stub {
             onBlocking { getNodeOutgoingShares(any()) }.thenReturn(
@@ -129,14 +140,15 @@ class MonitorShareRecipientsTest {
             })
             onBlocking { areCredentialsVerified(contactEmail) }.thenReturn(false)
         }
+        avatarRepository.stub {
+            onBlocking { getAvatarColor(userId) }.thenReturn(avatarColour)
+        }
 
         underTest(NodeId(1)).test {
             assertThat(awaitItem()).containsExactly(
                 ShareRecipient.Contact(
-                    email = contactEmail,
-                    permission = access,
-                    isPending = isPending,
                     handle = userId,
+                    email = contactEmail,
                     contactData = ContactData(
                         fullName = nickname,
                         alias = nickname,
@@ -144,7 +156,10 @@ class MonitorShareRecipientsTest {
                         userVisibility = UserVisibility.Visible
                     ),
                     isVerified = false,
-                    status = UserChatStatus.Invalid
+                    permission = access,
+                    isPending = isPending,
+                    status = UserChatStatus.Invalid,
+                    defaultAvatarColor = avatarColour,
                 )
             )
             cancelAndIgnoreRemainingEvents()
@@ -159,6 +174,7 @@ class MonitorShareRecipientsTest {
         val nickname = "nickname"
         val newNickName = "newNickname"
         val userId = 1L
+        val avatarColour = 42
 
         nodeRepository.stub {
             onBlocking { getNodeOutgoingShares(any()) }.thenReturn(
@@ -187,14 +203,15 @@ class MonitorShareRecipientsTest {
             })
             onBlocking { areCredentialsVerified(contactEmail) }.thenReturn(false)
         }
+        avatarRepository.stub {
+            onBlocking { getAvatarColor(userId) }.thenReturn(avatarColour)
+        }
 
         underTest(NodeId(1)).test {
             assertThat(awaitItem()).containsExactly(
                 ShareRecipient.Contact(
-                    email = contactEmail,
-                    permission = access,
-                    isPending = isPending,
                     handle = userId,
+                    email = contactEmail,
                     contactData = ContactData(
                         fullName = nickname,
                         alias = nickname,
@@ -202,16 +219,17 @@ class MonitorShareRecipientsTest {
                         userVisibility = UserVisibility.Visible
                     ),
                     isVerified = false,
-                    status = UserChatStatus.Invalid
+                    permission = access,
+                    isPending = isPending,
+                    status = UserChatStatus.Invalid,
+                    defaultAvatarColor = avatarColour,
                 )
             )
             contactFlow.emit(getContact(userId, contactEmail, newNickName))
             assertThat(awaitItem()).containsExactly(
                 ShareRecipient.Contact(
-                    email = contactEmail,
-                    permission = access,
-                    isPending = isPending,
                     handle = userId,
+                    email = contactEmail,
                     contactData = ContactData(
                         fullName = newNickName,
                         alias = newNickName,
@@ -219,7 +237,10 @@ class MonitorShareRecipientsTest {
                         userVisibility = UserVisibility.Visible
                     ),
                     isVerified = false,
-                    status = UserChatStatus.Invalid
+                    permission = access,
+                    isPending = isPending,
+                    status = UserChatStatus.Invalid,
+                    defaultAvatarColor = avatarColour,
                 )
             )
             cancelAndIgnoreRemainingEvents()
@@ -254,6 +275,7 @@ class MonitorShareRecipientsTest {
         val firstStatus = UserChatStatus.Away
         val secondStatus = UserChatStatus.Online
         val statusFlow = MutableStateFlow(firstStatus)
+
         contactsRepository.stub {
             on { monitorContactByEmail(contactEmail) }.thenReturn(flow {
                 emit(
@@ -264,6 +286,10 @@ class MonitorShareRecipientsTest {
             onBlocking { getAvatarUri(contactEmail) }.thenReturn(null)
             on { monitorOnlineStatusByHandle(userId) }.thenReturn(statusFlow)
             onBlocking { areCredentialsVerified(contactEmail) }.thenReturn(false)
+        }
+
+        avatarRepository.stub {
+            onBlocking { getAvatarColor(userId) }.thenReturn(42)
         }
 
         underTest(NodeId(1)).map { it.filterIsInstance<ShareRecipient.Contact>().first().status }
@@ -282,8 +308,10 @@ class MonitorShareRecipientsTest {
         val isPending = true
         val access = AccessPermission.UNKNOWN
         val nickname = "nickname"
+        val avatarColour = 42
 
         val range = 1..9
+
         nodeRepository.stub {
             onBlocking { getNodeOutgoingShares(any()) }.thenReturn(
                 range.map {
@@ -326,16 +354,17 @@ class MonitorShareRecipientsTest {
             })
             onBlocking { areCredentialsVerified(any()) }.thenReturn(false)
         }
+        avatarRepository.stub {
+            onBlocking { getAvatarColor(any()) }.thenReturn(avatarColour)
+        }
 
         underTest(NodeId(1)).test {
             assertThat(awaitItem()).containsExactlyElementsIn(
                 range.mapNotNull {
                     if (it.rem(2) == 0) {
                         ShareRecipient.Contact(
-                            email = "$it$contactEmail",
-                            permission = access,
-                            isPending = isPending,
                             handle = it.toLong(),
+                            email = "$it$contactEmail",
                             contactData = ContactData(
                                 fullName = "$it$nickname",
                                 alias = "$it$nickname",
@@ -343,7 +372,10 @@ class MonitorShareRecipientsTest {
                                 userVisibility = UserVisibility.Visible
                             ),
                             isVerified = false,
-                            status = UserChatStatus.Invalid
+                            permission = access,
+                            isPending = isPending,
+                            status = UserChatStatus.Invalid,
+                            defaultAvatarColor = avatarColour,
                         )
                     } else {
                         ShareRecipient.NonContact(

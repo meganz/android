@@ -14,13 +14,15 @@ import mega.privacy.android.domain.entity.contacts.ContactData
 import mega.privacy.android.domain.entity.node.NodeId
 import mega.privacy.android.domain.entity.shares.ShareRecipient
 import mega.privacy.android.domain.entity.user.UserVisibility
+import mega.privacy.android.domain.repository.AvatarRepository
 import mega.privacy.android.domain.repository.ContactsRepository
 import mega.privacy.android.domain.repository.NodeRepository
 import javax.inject.Inject
 
-class MonitorShareRecipients @Inject constructor(
+class MonitorShareRecipientsUseCase @Inject constructor(
     private val nodeRepository: NodeRepository,
     private val contactsRepository: ContactsRepository,
+    private val avatarRepository: AvatarRepository,
 ) {
 
     operator fun invoke(nodeId: NodeId): Flow<List<ShareRecipient>> =
@@ -52,6 +54,8 @@ class MonitorShareRecipients @Inject constructor(
         contactsRepository.monitorContactByEmail(email)
             .flatMapLatest<Contact?, ShareRecipient> { contact ->
                 contact?.let { contact: Contact ->
+                    val areCredentialsVerified = contactsRepository.areCredentialsVerified(email)
+                    val defaultAvatarColor = avatarRepository.getAvatarColor(contact.userId)
                     contactsRepository.monitorOnlineStatusByHandle(contact.userId)
                         .map { onlineStatus ->
                             ShareRecipient.Contact(
@@ -63,10 +67,11 @@ class MonitorShareRecipients @Inject constructor(
                                     avatarUri = contactsRepository.getAvatarUri(email),
                                     userVisibility = if (contact.isVisible) UserVisibility.Visible else UserVisibility.Hidden,
                                 ),
-                                isVerified = contactsRepository.areCredentialsVerified(email),
+                                isVerified = areCredentialsVerified,
                                 permission = data.access,
                                 isPending = data.isPending,
                                 status = onlineStatus,
+                                defaultAvatarColor = defaultAvatarColor,
                             )
                         }
                 } ?: flow {

@@ -34,6 +34,7 @@ sealed interface ShareRecipient {
      * @property permission
      * @property isPending
      * @property status
+     * @property defaultAvatarColor
      */
     data class Contact(
         val handle: Long,
@@ -43,5 +44,6 @@ sealed interface ShareRecipient {
         override val permission: AccessPermission,
         override val isPending: Boolean,
         val status: UserChatStatus,
+        val defaultAvatarColor: Int,
     ) : ShareRecipient
 }
