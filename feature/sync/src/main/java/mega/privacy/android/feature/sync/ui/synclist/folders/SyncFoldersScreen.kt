@@ -148,7 +148,8 @@ private fun SyncFoldersScreenEmptyState(
             text = stringResource(id = sharedResR.string.device_center_sync_backup_list_empty_state_title),
             textColor = TextColor.Primary,
             modifier = Modifier.padding(top = 32.dp),
-            style = MaterialTheme.typography.h6Medium
+            style = MaterialTheme.typography.h6Medium,
+            textAlign = TextAlign.Center,
         )
         MegaText(
             text = stringResource(id = sharedResR.string.device_center_sync_backup_list_empty_state_message),
@@ -156,7 +157,8 @@ private fun SyncFoldersScreenEmptyState(
             modifier = Modifier
                 .padding(top = 16.dp)
                 .testTag(TEST_TAG_SYNC_LIST_SCREEN_EMPTY_STATUS_TEXT),
-            style = MaterialTheme.typography.subtitle2.copy(textAlign = TextAlign.Center),
+            style = MaterialTheme.typography.subtitle2,
+            textAlign = TextAlign.Center,
         )
         RaisedDefaultMegaButton(
             textId = sharedResR.string.device_center_sync_add_new_syn_button_option,
