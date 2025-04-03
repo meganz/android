@@ -182,8 +182,8 @@ class SettingsFileManagementFragment : SettingsBaseFragment(),
             viewModel.resetDeleteAllVersionsEvent()
         }
 
-        enableRbSchedulerSwitch?.isVisible = filePreferencesState.isFileVersioningEnabled
-        daysRbSchedulerPreference?.isVisible = filePreferencesState.isFileVersioningEnabled
+        enableRbSchedulerSwitch?.isVisible = filePreferencesState.isRubbishBinAutopurgeEnabled
+        daysRbSchedulerPreference?.isVisible = filePreferencesState.isRubbishBinAutopurgeEnabled
         updateRBScheduler(filePreferencesState.rubbishBinAutopurgePeriod)
 
         if (filePreferencesState.errorMessageId != 0) {
