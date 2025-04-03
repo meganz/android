@@ -1431,8 +1431,6 @@
     <string name="context_empty_offline">[A]离线[/A][B]无文件[/B]</string>
     <!-- Text of the empty screen when there are not contacts. No dot at the end because is for an empty state. The format placeholders are to showing it in different colors. -->
     <string name="context_empty_contacts">[B]无[/B][A]联系人[/A]</string>
-    <!-- Message shown when the user has no chats -->
-    <string name="recent_chat_empty">[A]无[/A][B]对话[/B]</string>
     <!-- Text of the empty screen when there are not elements in Incoming -->
     <string name="context_empty_incoming">[B]无 [/B][A]传入的共享文件夹[/A]</string>
     <!-- Text of the empty screen when there are not elements in Outgoing -->
@@ -3156,8 +3154,6 @@
     <string name="settings_passcode_forgot_passcode_button">忘记密码？</string>
     <!-- Title in the Passcode screen to open the app with the password if it does not remember the passcode. -->
     <string name="settings_passcode_enter_password_title">输入您的密码</string>
-    <!-- Resume to paused transfers snack bar description text -->
-    <string name="resume_paused_transfers_text">传输已暂停。恢复以继续下载。</string>
     <!-- Stage of the scanning transfers dialog indicating transfers are scanning. -->
     <string name="scanning_transfers">正在扫描&#8230;</string>
     <!-- Label cancel transfers. -->

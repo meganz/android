@@ -1431,8 +1431,6 @@
     <string name="context_empty_offline">[B]ไม่มีไฟล์[/B]ที่[A]บันทึกไว้สำหรับออฟไลน์[/A]</string>
     <!-- Text of the empty screen when there are not contacts. No dot at the end because is for an empty state. The format placeholders are to showing it in different colors. -->
     <string name="context_empty_contacts">[B]ไม่มี[/B][A]ผู้ติดต่อ[/A]</string>
-    <!-- Message shown when the user has no chats -->
-    <string name="recent_chat_empty">[A]ไม่มี[/A][B]การสนทนา[/B]</string>
     <!-- Text of the empty screen when there are not elements in Incoming -->
     <string name="context_empty_incoming">[B]ไม่มี[/B][A]โฟลเดอร์ที่แชร์ขาเข้า[/A]</string>
     <!-- Text of the empty screen when there are not elements in Outgoing -->
@@ -3156,8 +3154,6 @@
     <string name="settings_passcode_forgot_passcode_button">คุณลืมรหัสหรือไม่</string>
     <!-- Title in the Passcode screen to open the app with the password if it does not remember the passcode. -->
     <string name="settings_passcode_enter_password_title">กรอกรหัสผ่านของคุณ</string>
-    <!-- Resume to paused transfers snack bar description text -->
-    <string name="resume_paused_transfers_text">การถ่ายโอนหยุดชั่วคราว แตะดำเนินการต่อเพื่อดาวน์โหลดต่อ</string>
     <!-- Stage of the scanning transfers dialog indicating transfers are scanning. -->
     <string name="scanning_transfers">กำลังสแกน&#8230;</string>
     <!-- Label cancel transfers. -->

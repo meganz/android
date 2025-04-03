@@ -289,7 +289,7 @@
     <!-- Delete a link label -->
     <string name="context_delete_link">Ștergeți linkul</string>
     <!-- Title alert before leaving a share. -->
-    <string name="alert_leave_share">Leave folder</string>
+    <string name="alert_leave_share">Lăsați folderul</string>
     <!-- Item menu option upon right click on one or multiple files. -->
     <string name="context_clean_shares_menu">Eliminați partajarea</string>
     <!-- Item menu option upon right click on one or multiple files. -->
@@ -1493,8 +1493,6 @@
     <string name="context_empty_offline">[B]Niciun fișier [/B][A]salvat pentru offline[/A]</string>
     <!-- Text of the empty screen when there are not contacts. No dot at the end because is for an empty state. The format placeholders are to showing it in different colors. -->
     <string name="context_empty_contacts">[B]Niciun [/B][A]contact[/A]</string>
-    <!-- Message shown when the user has no chats -->
-    <string name="recent_chat_empty">[A]Nicio[/A] [B]conversație[/B]</string>
     <!-- Text of the empty screen when there are not elements in Incoming -->
     <string name="context_empty_incoming">[B]Niciun [/B][A]folder partajat primit[/A]</string>
     <!-- Text of the empty screen when there are not elements in Outgoing -->
@@ -1705,7 +1703,7 @@
     <!-- label to indicate that a share is still pending on outgoing shares of a node -->
     <string name="pending_outshare_indicator">(În așteptare)</string>
     <!-- Title of the dialog to disable the rich links previews on chat -->
-    <string name="option_enable_chat_rich_preview">Enable sent link previews</string>
+    <string name="option_enable_chat_rich_preview">Activați previzualizările linkurilor trimise</string>
     <!-- Button to allow the rich links previews on chat -->
     <string name="button_always_rich_links">Permite întotdeauna</string>
     <!-- Button do not allow now the rich links previews on chat -->
@@ -1713,9 +1711,9 @@
     <!-- Button do not allow the rich links previews on chat -->
     <string name="button_never_rich_links">Niciodată</string>
     <!-- Title of the dialog to enable the rich links previews on chat -->
-    <string name="title_enable_rich_links">Enable sent link previews</string>
+    <string name="title_enable_rich_links">Activați previzualizările linkurilor trimise</string>
     <!-- Text of the dialog to enable the rich links previews on chat -->
-    <string name="text_enable_rich_links">Generates a preview of the links you send in chat. Note that retrieving these previews isn’t protected by zero-knowledge encryption.</string>
+    <string name="text_enable_rich_links">Generează o previzualizare a linkurilor pe care le trimiteți în chat. Rețineți că preluarea acestor previzualizări nu este protejată de criptarea tip zero cunoștințe.</string>
     <!-- when the user tries to creates a MEGA account or tries to change his password and the password strength is very weak -->
     <string name="error_password">Vă rugăm să introduceți o parolă mai puternică</string>
     <!-- title of the notification for an acceptance of a contact request -->
@@ -3324,8 +3322,6 @@
     <string name="settings_passcode_forgot_passcode_button">Ți-ai uitat codul de acces?</string>
     <!-- Title in the Passcode screen to open the app with the password if it does not remember the passcode. -->
     <string name="settings_passcode_enter_password_title">Introduceți parola dvs.</string>
-    <!-- Resume to paused transfers snack bar description text -->
-    <string name="resume_paused_transfers_text">Transferurile au fost puse pe pauză. Reia-le pentru a continua descărcarea.</string>
     <!-- Stage of the scanning transfers dialog indicating transfers are scanning. -->
     <string name="scanning_transfers">Se scanează&#8230;</string>
     <!-- Label cancel transfers. -->

@@ -1586,8 +1586,6 @@
     <string name="context_empty_offline">[B]لا توجد ملفات [/B][A]محفوظة في قسم الغير متصل بالانترنت[/A]</string>
     <!-- Text of the empty screen when there are not contacts. No dot at the end because is for an empty state. The format placeholders are to showing it in different colors. -->
     <string name="context_empty_contacts">[B]لا يوجد [/B][A]جهات اتصال[/A]</string>
-    <!-- Message shown when the user has no chats -->
-    <string name="recent_chat_empty">[A]لاتوجد[/A] [B]محادثات[/B]</string>
     <!-- Text of the empty screen when there are not elements in Incoming -->
     <string name="context_empty_incoming">[B]لا يوجد [/B][A]مجلدات مشاركة واردة[/A]</string>
     <!-- Text of the empty screen when there are not elements in Outgoing -->
@@ -3576,8 +3574,6 @@
     <string name="settings_passcode_forgot_passcode_button">نسيت رمز المرور الخاص بك؟</string>
     <!-- Title in the Passcode screen to open the app with the password if it does not remember the passcode. -->
     <string name="settings_passcode_enter_password_title">أدخل كلمة السر الخاصة بك</string>
-    <!-- Resume to paused transfers snack bar description text -->
-    <string name="resume_paused_transfers_text">تم إيقاف عمليات التحويل مؤقتاً. قم بالاستئناف لمتابعة التنزيل.</string>
     <!-- Stage of the scanning transfers dialog indicating transfers are scanning. -->
     <string name="scanning_transfers">جاري الفحص&#8230;</string>
     <!-- Label cancel transfers. -->

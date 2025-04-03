@@ -1462,8 +1462,6 @@
     <string name="context_empty_offline">[B]Geen bestanden[/B][A]opgeslagen voor Offline[/A]</string>
     <!-- Text of the empty screen when there are not contacts. No dot at the end because is for an empty state. The format placeholders are to showing it in different colors. -->
     <string name="context_empty_contacts">[B]Geen [/B][A]contacten[/A]</string>
-    <!-- Message shown when the user has no chats -->
-    <string name="recent_chat_empty">[A]Geen[/A] [B]gesprekken[/B]</string>
     <!-- Text of the empty screen when there are not elements in Incoming -->
     <string name="context_empty_incoming">[B]Geen [/B][A]binnenkomende gedeelde mappen[/A]</string>
     <!-- Text of the empty screen when there are not elements in Outgoing -->
@@ -3240,8 +3238,6 @@
     <string name="settings_passcode_forgot_passcode_button">Uw wachtwoord vergeten?</string>
     <!-- Title in the Passcode screen to open the app with the password if it does not remember the passcode. -->
     <string name="settings_passcode_enter_password_title">Voer uw wachtwoord in</string>
-    <!-- Resume to paused transfers snack bar description text -->
-    <string name="resume_paused_transfers_text">MEGA heeft beperkte toegang tot uw fotobibliotheek en kan geen back-up van al uw foto\’s maken. Tik om machtigingen te wijzigen.</string>
     <!-- Stage of the scanning transfers dialog indicating transfers are scanning. -->
     <string name="scanning_transfers">Scannen&#8230;</string>
     <!-- Label cancel transfers. -->

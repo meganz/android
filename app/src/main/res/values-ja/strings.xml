@@ -1431,8 +1431,6 @@
     <string name="context_empty_offline">[A]オフライン用に保存されたファイル[/A]は[B]ありません[/B]</string>
     <!-- Text of the empty screen when there are not contacts. No dot at the end because is for an empty state. The format placeholders are to showing it in different colors. -->
     <string name="context_empty_contacts">[B][/B][A]連絡先はありません[/A]</string>
-    <!-- Message shown when the user has no chats -->
-    <string name="recent_chat_empty">[B]会話[/B]が[A]ありません[/A]</string>
     <!-- Text of the empty screen when there are not elements in Incoming -->
     <string name="context_empty_incoming">[A]受信共有フォルダ[/A]は[B]ありません[/B]</string>
     <!-- Text of the empty screen when there are not elements in Outgoing -->
@@ -3156,8 +3154,6 @@
     <string name="settings_passcode_forgot_passcode_button">パスコードをお忘れですか？</string>
     <!-- Title in the Passcode screen to open the app with the password if it does not remember the passcode. -->
     <string name="settings_passcode_enter_password_title">パスワードを入力</string>
-    <!-- Resume to paused transfers snack bar description text -->
-    <string name="resume_paused_transfers_text">転送は一時停止しています。再開するとダウンロードが続行します。</string>
     <!-- Stage of the scanning transfers dialog indicating transfers are scanning. -->
     <string name="scanning_transfers">スキャン中&#8230;</string>
     <!-- Label cancel transfers. -->

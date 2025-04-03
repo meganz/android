@@ -1431,8 +1431,6 @@
     <string name="context_empty_offline">[B]Tidak ada file [/B][A]disimpan untuk Offline[/A]</string>
     <!-- Text of the empty screen when there are not contacts. No dot at the end because is for an empty state. The format placeholders are to showing it in different colors. -->
     <string name="context_empty_contacts">[B]Tidak ada [/B][A]kontak[/A]</string>
-    <!-- Message shown when the user has no chats -->
-    <string name="recent_chat_empty">[A]Tidak ada[/A] [B]percakapan[/B]</string>
     <!-- Text of the empty screen when there are not elements in Incoming -->
     <string name="context_empty_incoming">[B]Tidak ada [/B][A]folder bersama masuk[/A]</string>
     <!-- Text of the empty screen when there are not elements in Outgoing -->
@@ -3156,8 +3154,6 @@
     <string name="settings_passcode_forgot_passcode_button">Lupa kode sandi anda?</string>
     <!-- Title in the Passcode screen to open the app with the password if it does not remember the passcode. -->
     <string name="settings_passcode_enter_password_title">Masukkan password anda</string>
-    <!-- Resume to paused transfers snack bar description text -->
-    <string name="resume_paused_transfers_text">Transfer telah dijeda. Lanjutkan untuk melanjutkan pengunduhan.</string>
     <!-- Stage of the scanning transfers dialog indicating transfers are scanning. -->
     <string name="scanning_transfers">Memindai&#8230;</string>
     <!-- Label cancel transfers. -->

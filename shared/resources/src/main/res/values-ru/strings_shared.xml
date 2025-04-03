@@ -710,7 +710,7 @@
     <!-- subtitle of meeting title in schedule meeting for title disclaimer -->
     <string name="meetings_schedule_meeting_meeting_title_disclaimer">MEGA может видеть название и описание вашей встречи, но мы сохраняем их конфиденциальность</string>
     <!-- Capital letters. Text of the label of a new historic notifications-->
-    <string name="notifications_notification_item_new_tag">Новые</string>
+    <string name="notifications_notification_item_new_tag">Новое</string>
     <!-- Title in the display over other apps permission screen -->
     <string name="display_over_other_apps_permission_screen_title">Разрешите отображение MEGA поверх других приложений</string>
     <!-- Context message in the display over other apps permission screen -->
@@ -1068,4 +1068,28 @@
     <string name="email_confirmation_email_address_update_message">Адрес электронной почты изменён</string>
     <!-- Snackbar text to inform the user that download started -->
     <string name="transfers_download_started_snackbar">Download started. See notification for details.</string>
+    <!--Sign Up page text field input first name error message when empty-->
+    <string name="sign_up_first_name_text_field_error_message">Введите имя</string>
+    <!--Sign Up page text field input last name error message when empty-->
+    <string name="sign_up_last_name_text_field_error_message">Введите фамилию</string>
+    <!--Sign Up page text field input email error message when more than 190 characters-->
+    <string name="sign_up_email_text_field_char_limit_exceed_error">Должен быть не длиннее 190 символов</string>
+    <!--Sign Up page message to be shown when password is less than 8 characters-->
+    <string name="sign_up_password_min_character_error_message">Должно быть не менее 8 символов</string>
+    <!--Sign Up page message to be shown when confirm password is not same as password-->
+    <string name="sign_up_confirm_password_not_match_error_message">Пароли не совпадают. Проверьте и попробуйте ещё раз.</string>
+    <!--Sign Up page message to be shown when password is considered medium-->
+    <string name="sign_up_password_medium_password_warning_message">Ваш пароль слишком угадать. Попробуйте более сложную комбинацию символов.</string>
+    <!--Message to be shown when password is considered weak -->
+    <string name="sign_up_password_weak_password_error_message">Ваш пароль слишком легко угадать. Попробуйте более сложную комбинацию символов.</string>
+    <!--Sign Up page terms and condition content text-->
+    <string name="sign_up_terms_condition_content">Я прочитал и соглашаюсь с [A]Условиями использования MEGA[/A].</string>
+    <!--Sign Up page password hint and suggestion title-->
+    <string name="sign_up_password_hint_title_text">Лучше включить:</string>
+    <!--Sign Up page password hint to suggest a password with upper case and lower case letter-->
+    <string name="sign_up_password_hint_upper_lower_case">Буквы в верхнем и нижнем регистре</string>
+    <!--Sign Up page password hint to suggest a password with at least one number or special character-->
+    <string name="sign_up_password_hint_number_or_special_character">Хотя бы одну цифру или специальный символ</string>
+    <!--Sign up page text to ask the user to login if they already have a MEGA account-->
+    <string name="sign_up_already_have_account_login_link_text">Уже есть аккаунт MEGA? [A]Войти[/A]</string>
 </resources>

@@ -1431,8 +1431,6 @@
     <string name="context_empty_offline">[A]離線使用[/A]裡[B]沒有檔案[/B]</string>
     <!-- Text of the empty screen when there are not contacts. No dot at the end because is for an empty state. The format placeholders are to showing it in different colors. -->
     <string name="context_empty_contacts">[B]沒有[/B][A]聯絡人[/A]</string>
-    <!-- Message shown when the user has no chats -->
-    <string name="recent_chat_empty">[A]沒有[/A] [B]對話[/B]</string>
     <!-- Text of the empty screen when there are not elements in Incoming -->
     <string name="context_empty_incoming">[B]沒有人[/B][A]共享資料夾給你[/A]</string>
     <!-- Text of the empty screen when there are not elements in Outgoing -->
@@ -3156,8 +3154,6 @@
     <string name="settings_passcode_forgot_passcode_button">忘記密碼？</string>
     <!-- Title in the Passcode screen to open the app with the password if it does not remember the passcode. -->
     <string name="settings_passcode_enter_password_title">請輸入您的密碼</string>
-    <!-- Resume to paused transfers snack bar description text -->
-    <string name="resume_paused_transfers_text">傳輸已暫停。恢復以繼續下載。</string>
     <!-- Stage of the scanning transfers dialog indicating transfers are scanning. -->
     <string name="scanning_transfers">正在掃描⋯</string>
     <!-- Label cancel transfers. -->
