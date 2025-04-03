@@ -1014,4 +1014,28 @@
     <string name="email_confirmation_email_address_update_message">이메일 주소가 변경되었습니다</string>
     <!-- Snackbar text to inform the user that download started -->
     <string name="transfers_download_started_snackbar">Download started. See notification for details.</string>
+    <!--Sign Up page text field input first name error message when empty-->
+    <string name="sign_up_first_name_text_field_error_message">이름을 입력하세요</string>
+    <!--Sign Up page text field input last name error message when empty-->
+    <string name="sign_up_last_name_text_field_error_message">성을 입력하세요</string>
+    <!--Sign Up page text field input email error message when more than 190 characters-->
+    <string name="sign_up_email_text_field_char_limit_exceed_error">190자 이하여야 합니다</string>
+    <!--Sign Up page message to be shown when password is less than 8 characters-->
+    <string name="sign_up_password_min_character_error_message">최소 8자 이상이 필요합니다</string>
+    <!--Sign Up page message to be shown when confirm password is not same as password-->
+    <string name="sign_up_confirm_password_not_match_error_message">암호가 일치하지 않습니다. 확인하시고 나중에 다시 시도하세요.</string>
+    <!--Sign Up page message to be shown when password is considered medium-->
+    <string name="sign_up_password_medium_password_warning_message">당신의 암호는 추측하기 쉽습니다. 더 강력한 문자의 조합을 추천합니다.</string>
+    <!--Message to be shown when password is considered weak -->
+    <string name="sign_up_password_weak_password_error_message">당신의 암호는 너무 추측하기 쉽습니다. 더 강력한 문자의 조합을 이용하세요.</string>
+    <!--Sign Up page terms and condition content text-->
+    <string name="sign_up_terms_condition_content">나는 MEGA의 [A]이용 약관[/A]을 읽었고 이에 동의합니다</string>
+    <!--Sign Up page password hint and suggestion title-->
+    <string name="sign_up_password_hint_title_text">다음을 포함하는 것이 좋습니다:</string>
+    <!--Sign Up page password hint to suggest a password with upper case and lower case letter-->
+    <string name="sign_up_password_hint_upper_lower_case">영문 대소문자</string>
+    <!--Sign Up page password hint to suggest a password with at least one number or special character-->
+    <string name="sign_up_password_hint_number_or_special_character">최소 1개의 숫자 또는 특수문자</string>
+    <!--Sign up page text to ask the user to login if they already have a MEGA account-->
+    <string name="sign_up_already_have_account_login_link_text">이미 MEGA 계정이 있나요? [A]로그인[/A]</string>
 </resources>

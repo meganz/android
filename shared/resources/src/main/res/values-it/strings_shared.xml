@@ -1048,4 +1048,28 @@
     <string name="email_confirmation_email_address_update_message">Indirizzo email aggiornato</string>
     <!-- Snackbar text to inform the user that download started -->
     <string name="transfers_download_started_snackbar">Download started. See notification for details.</string>
+    <!--Sign Up page text field input first name error message when empty-->
+    <string name="sign_up_first_name_text_field_error_message">Inserisci un nome</string>
+    <!--Sign Up page text field input last name error message when empty-->
+    <string name="sign_up_last_name_text_field_error_message">Inserisci un cognome</string>
+    <!--Sign Up page text field input email error message when more than 190 characters-->
+    <string name="sign_up_email_text_field_char_limit_exceed_error">Deve avere 190 caratteri o meno</string>
+    <!--Sign Up page message to be shown when password is less than 8 characters-->
+    <string name="sign_up_password_min_character_error_message">Deve essere lunga almeno 8 caratteri</string>
+    <!--Sign Up page message to be shown when confirm password is not same as password-->
+    <string name="sign_up_confirm_password_not_match_error_message">Le password non combaciano. Controlla e riprova.</string>
+    <!--Sign Up page message to be shown when password is considered medium-->
+    <string name="sign_up_password_medium_password_warning_message">La tua password è facile da indovinare. Ti consigliamo di provare una combinazione più sicura.</string>
+    <!--Message to be shown when password is considered weak -->
+    <string name="sign_up_password_weak_password_error_message">La tua password è troppo facile da indovinare. Prova una combinazione più sicura.</string>
+    <!--Sign Up page terms and condition content text-->
+    <string name="sign_up_terms_condition_content">Ho letto e accettato i [A]Termini di servizio di MEGA.[/A]</string>
+    <!--Sign Up page password hint and suggestion title-->
+    <string name="sign_up_password_hint_title_text">È meglio avere:</string>
+    <!--Sign Up page password hint to suggest a password with upper case and lower case letter-->
+    <string name="sign_up_password_hint_upper_lower_case">Lettere maiuscole e minuscole</string>
+    <!--Sign Up page password hint to suggest a password with at least one number or special character-->
+    <string name="sign_up_password_hint_number_or_special_character">Almeno un numero o un carattere speciale</string>
+    <!--Sign up page text to ask the user to login if they already have a MEGA account-->
+    <string name="sign_up_already_have_account_login_link_text">Hai già un account MEGA? [A]Login[/A]</string>
 </resources>

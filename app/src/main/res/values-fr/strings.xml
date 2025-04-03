@@ -1493,8 +1493,6 @@
     <string name="context_empty_offline">[B]Aucun fichier [/B][A]enregistré Hors&#160;ligne[/A]</string>
     <!-- Text of the empty screen when there are not contacts. No dot at the end because is for an empty state. The format placeholders are to showing it in different colors. -->
     <string name="context_empty_contacts">[B]Aucun [/B][A]contact[/A]</string>
-    <!-- Message shown when the user has no chats -->
-    <string name="recent_chat_empty">[A]Aucune[/A] [B]conversation[/B]</string>
     <!-- Text of the empty screen when there are not elements in Incoming -->
     <string name="context_empty_incoming">[B]Aucun [/B][A]dossier partagé entrant[/A]</string>
     <!-- Text of the empty screen when there are not elements in Outgoing -->
@@ -3324,8 +3322,6 @@
     <string name="settings_passcode_forgot_passcode_button">Code d’accès oublié ?</string>
     <!-- Title in the Passcode screen to open the app with the password if it does not remember the passcode. -->
     <string name="settings_passcode_enter_password_title">Saisissez votre mot de passe</string>
-    <!-- Resume to paused transfers snack bar description text -->
-    <string name="resume_paused_transfers_text">Les transferts ont été mis en pause. Reprenez-les pour poursuivre le téléchargement.</string>
     <!-- Stage of the scanning transfers dialog indicating transfers are scanning. -->
     <string name="scanning_transfers">Analyse&#8230;</string>
     <!-- Label cancel transfers. -->

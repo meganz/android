@@ -1103,5 +1103,29 @@
     <!-- Message displayed when email address is successfully updated -->
     <string name="email_confirmation_email_address_update_message">تم تحديث عنوان البريد الإلكتروني</string>
     <!-- Snackbar text to inform the user that download started -->
-    <string name="transfers_download_started_snackbar">Download started. See notification for details.</string>
+    <string name="transfers_download_started_snackbar">بدأ التنزيل. راجع الإشعار للحصول على التفاصيل.</string>
+    <!--Sign Up page text field input first name error message when empty-->
+    <string name="sign_up_first_name_text_field_error_message">ادخل الاسم الأول</string>
+    <!--Sign Up page text field input last name error message when empty-->
+    <string name="sign_up_last_name_text_field_error_message">ادخل اسم العائلة</string>
+    <!--Sign Up page text field input email error message when more than 190 characters-->
+    <string name="sign_up_email_text_field_char_limit_exceed_error">يجب أن تحتوي على 190 محرفًا أو أقل</string>
+    <!--Sign Up page message to be shown when password is less than 8 characters-->
+    <string name="sign_up_password_min_character_error_message">يجب أن يحتوي على 8 محرف على الأقل</string>
+    <!--Sign Up page message to be shown when confirm password is not same as password-->
+    <string name="sign_up_confirm_password_not_match_error_message">كلمات المرور غير متطابقة. تحقق وحاول مرة أخرى.</string>
+    <!--Sign Up page message to be shown when password is considered medium-->
+    <string name="sign_up_password_medium_password_warning_message">من السهل تخمين كلمة المرور الخاصة بك. نقترح تجربة مزيج أقوى من المحارف.</string>
+    <!--Message to be shown when password is considered weak -->
+    <string name="sign_up_password_weak_password_error_message">من السهل جدًا تخمين كلمة المرور الخاصة بك. جرب مجموعة أقوى من المحارف.</string>
+    <!--Sign Up page terms and condition content text-->
+    <string name="sign_up_terms_condition_content">لقد قرأت ووافقت على [A]شروط خدمة ميغا MEGA[/A].</string>
+    <!--Sign Up page password hint and suggestion title-->
+    <string name="sign_up_password_hint_title_text">من الأفضل أن يكون لديك:</string>
+    <!--Sign Up page password hint to suggest a password with upper case and lower case letter-->
+    <string name="sign_up_password_hint_upper_lower_case">أحرف كبيرة وصغيرة</string>
+    <!--Sign Up page password hint to suggest a password with at least one number or special character-->
+    <string name="sign_up_password_hint_number_or_special_character">رقم أو محرف خاص واحد على الأقل</string>
+    <!--Sign up page text to ask the user to login if they already have a MEGA account-->
+    <string name="sign_up_already_have_account_login_link_text">هل لديك حساب ميغا MEGA بالفعل؟ [A]تسجيل الدخول[/A]</string>
 </resources>

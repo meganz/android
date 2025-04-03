@@ -1024,4 +1024,28 @@
     <string name="email_confirmation_email_address_update_message">Alamat email diperbarui</string>
     <!-- Snackbar text to inform the user that download started -->
     <string name="transfers_download_started_snackbar">Download started. See notification for details.</string>
+    <!--Sign Up page text field input first name error message when empty-->
+    <string name="sign_up_first_name_text_field_error_message">Masukkan nama depan</string>
+    <!--Sign Up page text field input last name error message when empty-->
+    <string name="sign_up_last_name_text_field_error_message">Masukkan nama belakang</string>
+    <!--Sign Up page text field input email error message when more than 190 characters-->
+    <string name="sign_up_email_text_field_char_limit_exceed_error">Harus memiliki 190 karakter atau kurang</string>
+    <!--Sign Up page message to be shown when password is less than 8 characters-->
+    <string name="sign_up_password_min_character_error_message">Harus memiliki minimal 8 karakter</string>
+    <!--Sign Up page message to be shown when confirm password is not same as password-->
+    <string name="sign_up_confirm_password_not_match_error_message">Kata sandi tidak cocok. Periksa dan coba lagi.</string>
+    <!--Sign Up page message to be shown when password is considered medium-->
+    <string name="sign_up_password_medium_password_warning_message">Kata sandi anda mudah ditebak. Kami menyarankan untuk mencoba kombinasi karakter yang lebih kuat.</string>
+    <!--Message to be shown when password is considered weak -->
+    <string name="sign_up_password_weak_password_error_message">Kata sandi anda terlalu mudah ditebak. Cobalah kombinasi karakter yang lebih kuat.</string>
+    <!--Sign Up page terms and condition content text-->
+    <string name="sign_up_terms_condition_content">Saya telah membaca dan setuju [A]Ketentuan Layanan MEGA.[/A]</string>
+    <!--Sign Up page password hint and suggestion title-->
+    <string name="sign_up_password_hint_title_text">Lebih baik memiliki:</string>
+    <!--Sign Up page password hint to suggest a password with upper case and lower case letter-->
+    <string name="sign_up_password_hint_upper_lower_case">Huruf besar dan kecil</string>
+    <!--Sign Up page password hint to suggest a password with at least one number or special character-->
+    <string name="sign_up_password_hint_number_or_special_character">Setidaknya satu angka atau karakter khusus</string>
+    <!--Sign up page text to ask the user to login if they already have a MEGA account-->
+    <string name="sign_up_already_have_account_login_link_text">Sudah punya akun MEGA? [A]Masuk[/A]</string>
 </resources>

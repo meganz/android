@@ -1014,4 +1014,28 @@
     <string name="email_confirmation_email_address_update_message">電子郵件地址已更新</string>
     <!-- Snackbar text to inform the user that download started -->
     <string name="transfers_download_started_snackbar">下載已開始。詳細資訊請查看通知。</string>
+    <!--Sign Up page text field input first name error message when empty-->
+    <string name="sign_up_first_name_text_field_error_message">輸入名字</string>
+    <!--Sign Up page text field input last name error message when empty-->
+    <string name="sign_up_last_name_text_field_error_message">輸入姓氏</string>
+    <!--Sign Up page text field input email error message when more than 190 characters-->
+    <string name="sign_up_email_text_field_char_limit_exceed_error">必須少於190個字元</string>
+    <!--Sign Up page message to be shown when password is less than 8 characters-->
+    <string name="sign_up_password_min_character_error_message">必須至少有8個字元</string>
+    <!--Sign Up page message to be shown when confirm password is not same as password-->
+    <string name="sign_up_confirm_password_not_match_error_message">密碼不匹配。請檢查並重試。</string>
+    <!--Sign Up page message to be shown when password is considered medium-->
+    <string name="sign_up_password_medium_password_warning_message">您的密碼很容易被猜到。我們建議嘗試更高強度的字元組合。</string>
+    <!--Message to be shown when password is considered weak -->
+    <string name="sign_up_password_weak_password_error_message">你的密碼太容易猜到了。嘗試更高強度的字元組合。</string>
+    <!--Sign Up page terms and condition content text-->
+    <string name="sign_up_terms_condition_content">我已閱讀並同意[A]MEGA的服務條款[/A]</string>
+    <!--Sign Up page password hint and suggestion title-->
+    <string name="sign_up_password_hint_title_text">最好包含：</string>
+    <!--Sign Up page password hint to suggest a password with upper case and lower case letter-->
+    <string name="sign_up_password_hint_upper_lower_case">大寫和小寫字母</string>
+    <!--Sign Up page password hint to suggest a password with at least one number or special character-->
+    <string name="sign_up_password_hint_number_or_special_character">至少一個數字或特殊字元</string>
+    <!--Sign up page text to ask the user to login if they already have a MEGA account-->
+    <string name="sign_up_already_have_account_login_link_text">已經有MEGA帳戶？[A]登入[/A]</string>
 </resources>

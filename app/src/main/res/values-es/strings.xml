@@ -791,7 +791,7 @@
     <!-- Error message when trying to login to an account not validated. -->
     <string name="account_not_validated_login">Ve a la bandeja de entrada de tu correo y pulsa en el enlace que te hemos envíado para confirmar tu cuenta.</string>
     <!-- Error message shown when opening a folder link which doesn’t exist -->
-    <string name="general_error_folder_not_found">Enlace de la carpeta no disponible</string>
+    <string name="general_error_folder_not_found">Enlace de carpeta no disponible</string>
     <!-- Error message shown when opening a folder link which has been removed due to ToS/AUP violation -->
     <string name="folder_link_unavaible_ToS_violation">El enlace de carpeta ha sido eliminado por infringir nuestros Términos de servicio.</string>
     <!-- Error message shown when opening a file link which doesn’t exist -->
@@ -1493,8 +1493,6 @@
     <string name="context_empty_offline">[B]No hay archivos [/B][A]sin conexión[/A]</string>
     <!-- Text of the empty screen when there are not contacts. No dot at the end because is for an empty state. The format placeholders are to showing it in different colors. -->
     <string name="context_empty_contacts">[B]No hay [/B][A]contactos[/A]</string>
-    <!-- Message shown when the user has no chats -->
-    <string name="recent_chat_empty">[A]No hay[/A] [B]conversaciones[/B]</string>
     <!-- Text of the empty screen when there are not elements in Incoming -->
     <string name="context_empty_incoming">[B]No hay [/B][A]carpetas compartidas entrantes[/A]</string>
     <!-- Text of the empty screen when there are not elements in Outgoing -->
@@ -3324,8 +3322,6 @@
     <string name="settings_passcode_forgot_passcode_button">¿Has olvidado tu código de acceso?</string>
     <!-- Title in the Passcode screen to open the app with the password if it does not remember the passcode. -->
     <string name="settings_passcode_enter_password_title">Introduce tu contraseña</string>
-    <!-- Resume to paused transfers snack bar description text -->
-    <string name="resume_paused_transfers_text">Las transferencias han sido pausadas. Reanúdalas para continuar con la descarga.</string>
     <!-- Stage of the scanning transfers dialog indicating transfers are scanning. -->
     <string name="scanning_transfers">Examinando&#8230;</string>
     <!-- Label cancel transfers. -->

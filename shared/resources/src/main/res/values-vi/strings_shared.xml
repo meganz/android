@@ -1014,4 +1014,28 @@
     <string name="email_confirmation_email_address_update_message">Địa chỉ email đã được cập&#160;nhật</string>
     <!-- Snackbar text to inform the user that download started -->
     <string name="transfers_download_started_snackbar">Download started. See notification for details.</string>
+    <!--Sign Up page text field input first name error message when empty-->
+    <string name="sign_up_first_name_text_field_error_message">Điền tên</string>
+    <!--Sign Up page text field input last name error message when empty-->
+    <string name="sign_up_last_name_text_field_error_message">Điền họ</string>
+    <!--Sign Up page text field input email error message when more than 190 characters-->
+    <string name="sign_up_email_text_field_char_limit_exceed_error">Tối đa 190 ký&#160;tự hoặc ít hơn</string>
+    <!--Sign Up page message to be shown when password is less than 8 characters-->
+    <string name="sign_up_password_min_character_error_message">Phải có ít nhất 8 ký&#160;tự</string>
+    <!--Sign Up page message to be shown when confirm password is not same as password-->
+    <string name="sign_up_confirm_password_not_match_error_message">Mật khẩu đã nhập không trùng khớp. Kiểm tra và thử lại.</string>
+    <!--Sign Up page message to be shown when password is considered medium-->
+    <string name="sign_up_password_medium_password_warning_message">Mật&#160;khẩu của bạn dễ đoán. Chúng tôi khuyên bạn thử kết&#160;hợp các ký&#160;tự khác nhau để có mật&#160;khẩu mạnh hơn.</string>
+    <!--Message to be shown when password is considered weak -->
+    <string name="sign_up_password_weak_password_error_message">Mật&#160;khẩu của bạn quá dễ đoán. Nên thử kết&#160;hợp các ký&#160;tự phức&#160;tạp khác nhau.</string>
+    <!--Sign Up page terms and condition content text-->
+    <string name="sign_up_terms_condition_content">Tôi đã đọc và đồng&#160;ý với [A]Điều&#160;Khoản Dịch&#160;Vụ[/A] của MEGA.</string>
+    <!--Sign Up page password hint and suggestion title-->
+    <string name="sign_up_password_hint_title_text">Tốt hơn là nên có:</string>
+    <!--Sign Up page password hint to suggest a password with upper case and lower case letter-->
+    <string name="sign_up_password_hint_upper_lower_case">Chữ hoa và chữ thường</string>
+    <!--Sign Up page password hint to suggest a password with at least one number or special character-->
+    <string name="sign_up_password_hint_number_or_special_character">Ít nhất có một con số hoặc ký&#160;tự đặc&#160;biệt</string>
+    <!--Sign up page text to ask the user to login if they already have a MEGA account-->
+    <string name="sign_up_already_have_account_login_link_text">Bạn đã có tài&#160;khoản MEGA rồi? [A]Đăng&#160;nhập[/A]</string>
 </resources>

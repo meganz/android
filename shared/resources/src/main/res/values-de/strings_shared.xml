@@ -1031,5 +1031,29 @@
     <!-- Message displayed when email address is successfully updated -->
     <string name="email_confirmation_email_address_update_message">E-Mail-Adresse aktualisiert</string>
     <!-- Snackbar text to inform the user that download started -->
-    <string name="transfers_download_started_snackbar">Download started. See notification for details.</string>
+    <string name="transfers_download_started_snackbar">Download gestartet. Details siehe Benachrichtigung.</string>
+    <!--Sign Up page text field input first name error message when empty-->
+    <string name="sign_up_first_name_text_field_error_message">Geben Sie einen Vornamen ein</string>
+    <!--Sign Up page text field input last name error message when empty-->
+    <string name="sign_up_last_name_text_field_error_message">Geben Sie einen Nachnamen ein</string>
+    <!--Sign Up page text field input email error message when more than 190 characters-->
+    <string name="sign_up_email_text_field_char_limit_exceed_error">Max. 190 Zeichen zulässig</string>
+    <!--Sign Up page message to be shown when password is less than 8 characters-->
+    <string name="sign_up_password_min_character_error_message">Mindestens 8 Zeichen erforderlich</string>
+    <!--Sign Up page message to be shown when confirm password is not same as password-->
+    <string name="sign_up_confirm_password_not_match_error_message">Passwörter stimmen nicht überein. Bitte überprüfen und erneut versuchen.</string>
+    <!--Sign Up page message to be shown when password is considered medium-->
+    <string name="sign_up_password_medium_password_warning_message">Ihr Passwort ist leicht zu erraten. Wir empfehlen, eine stärkere Kombination von Zeichen zu verwenden.</string>
+    <!--Message to be shown when password is considered weak -->
+    <string name="sign_up_password_weak_password_error_message">Ihr Passwort ist zu leicht zu erraten. Versuchen Sie es mit einer stärkeren Kombination von Zeichen.</string>
+    <!--Sign Up page terms and condition content text-->
+    <string name="sign_up_terms_condition_content">Ich habe die [A]Nutzungsbedingungen von MEGA[/A] gelesen und stimme ihnen zu.</string>
+    <!--Sign Up page password hint and suggestion title-->
+    <string name="sign_up_password_hint_title_text">Empfehlungen:</string>
+    <!--Sign Up page password hint to suggest a password with upper case and lower case letter-->
+    <string name="sign_up_password_hint_upper_lower_case">Groß- und Kleinbuchstaben</string>
+    <!--Sign Up page password hint to suggest a password with at least one number or special character-->
+    <string name="sign_up_password_hint_number_or_special_character">Mindestens eine Ziffer oder ein Sonderzeichen</string>
+    <!--Sign up page text to ask the user to login if they already have a MEGA account-->
+    <string name="sign_up_already_have_account_login_link_text">Sie haben bereits einen MEGA-Account? [A]Einloggen[/A]</string>
 </resources>

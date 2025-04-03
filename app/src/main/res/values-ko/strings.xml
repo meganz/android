@@ -1431,8 +1431,6 @@
     <string name="context_empty_offline">[A]오프라인용으로 저장[/A][B]에 파일 없음[/B]</string>
     <!-- Text of the empty screen when there are not contacts. No dot at the end because is for an empty state. The format placeholders are to showing it in different colors. -->
     <string name="context_empty_contacts">[A]연락처[/A] [B]없음[/B]</string>
-    <!-- Message shown when the user has no chats -->
-    <string name="recent_chat_empty">[B]대화[/B] [A]없음[/A]</string>
     <!-- Text of the empty screen when there are not elements in Incoming -->
     <string name="context_empty_incoming">[A]들어오는 공유 폴더[/A] [B]없음[/B]</string>
     <!-- Text of the empty screen when there are not elements in Outgoing -->
@@ -3156,8 +3154,6 @@
     <string name="settings_passcode_forgot_passcode_button">암호를 잊었나요?</string>
     <!-- Title in the Passcode screen to open the app with the password if it does not remember the passcode. -->
     <string name="settings_passcode_enter_password_title">암호를 입력하세요</string>
-    <!-- Resume to paused transfers snack bar description text -->
-    <string name="resume_paused_transfers_text">전송이 일시정지 되었습니다. 다운로드를 계속 하려면 다시 시작하세요.</string>
     <!-- Stage of the scanning transfers dialog indicating transfers are scanning. -->
     <string name="scanning_transfers">스캔 중&#8230;</string>
     <!-- Label cancel transfers. -->

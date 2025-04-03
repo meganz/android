@@ -1014,4 +1014,28 @@
     <string name="email_confirmation_email_address_update_message">メールアドレスが更新されました</string>
     <!-- Snackbar text to inform the user that download started -->
     <string name="transfers_download_started_snackbar">ダウンロードを開始しました。 詳細は通知をご覧ください。</string>
+    <!--Sign Up page text field input first name error message when empty-->
+    <string name="sign_up_first_name_text_field_error_message">名を入力してください</string>
+    <!--Sign Up page text field input last name error message when empty-->
+    <string name="sign_up_last_name_text_field_error_message">姓を入力してください</string>
+    <!--Sign Up page text field input email error message when more than 190 characters-->
+    <string name="sign_up_email_text_field_char_limit_exceed_error">190文字以下である必要があります</string>
+    <!--Sign Up page message to be shown when password is less than 8 characters-->
+    <string name="sign_up_password_min_character_error_message">少なくとも8文字が必要です</string>
+    <!--Sign Up page message to be shown when confirm password is not same as password-->
+    <string name="sign_up_confirm_password_not_match_error_message">パスワードが一致しません。確認して、再度お試しください。</string>
+    <!--Sign Up page message to be shown when password is considered medium-->
+    <string name="sign_up_password_medium_password_warning_message">あなたのパスワードはとても簡単に推測されてしまいます。より強力な文字の組み合わせをお試しいただくことをお勧めいたします。</string>
+    <!--Message to be shown when password is considered weak -->
+    <string name="sign_up_password_weak_password_error_message">あなたのパスワードはとても簡単に推測されてしまいます。より強力な文字の組み合わせを試してください。</string>
+    <!--Sign Up page terms and condition content text-->
+    <string name="sign_up_terms_condition_content">MEGAの[A]利用規約[/A]を読み、同意します。</string>
+    <!--Sign Up page password hint and suggestion title-->
+    <string name="sign_up_password_hint_title_text">以下を含めることをお勧めします：</string>
+    <!--Sign Up page password hint to suggest a password with upper case and lower case letter-->
+    <string name="sign_up_password_hint_upper_lower_case">大文字と小文字の使用</string>
+    <!--Sign Up page password hint to suggest a password with at least one number or special character-->
+    <string name="sign_up_password_hint_number_or_special_character">少なくとも数字または特殊文字が1つある</string>
+    <!--Sign up page text to ask the user to login if they already have a MEGA account-->
+    <string name="sign_up_already_have_account_login_link_text">すでにMEGAアカウントをお持ちですか？[A]ログイン[/A]</string>
 </resources>
