@@ -181,18 +181,19 @@ class ChatExplorerViewModel @Inject constructor(
             .onSuccess { activeChats ->
                 activeChats.sortedByDescending { it.lastTimestamp }
                     .forEachIndexed { index, chat ->
+                        if (index == 0) {
+                            add(
+                                ChatExplorerListItem(
+                                    isRecent = true,
+                                    isHeader = true
+                                )
+                            )
+                        }
+
                         val isSameChat = isSameChat(chat.chatId)
                         if (isSameChat && chat.isNoteToSelf) {
                             Timber.d("Do not show note to self chat")
                         } else {
-                            if (index == 0) {
-                                add(
-                                    ChatExplorerListItem(
-                                        isRecent = true,
-                                        isHeader = true
-                                    )
-                                )
-                            }
 
                             if (chat.isNoteToSelf || chat.ownPrivilege >= ChatRoomPermission.Standard) {
                                 val contact = if (chat.isGroup) {
