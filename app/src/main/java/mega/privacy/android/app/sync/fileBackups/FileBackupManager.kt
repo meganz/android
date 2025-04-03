@@ -1,10 +1,13 @@
 package mega.privacy.android.app.sync.fileBackups
 
-import android.app.Activity
 import android.content.DialogInterface
 import android.content.Intent
 import androidx.appcompat.app.AlertDialog
+import androidx.fragment.app.FragmentActivity
+import androidx.lifecycle.lifecycleScope
+import kotlinx.coroutines.launch
 import mega.privacy.android.app.MegaApplication
+import mega.privacy.android.app.featuretoggle.AppFeatures
 import mega.privacy.android.app.interfaces.ActionBackupListener
 import mega.privacy.android.app.interfaces.ActionBackupNodeCallback
 import mega.privacy.android.app.main.controllers.NodeController
@@ -21,6 +24,7 @@ import mega.privacy.android.app.utils.MegaNodeDialogUtil.createBackupsWarningDia
 import mega.privacy.android.app.utils.MegaNodeUtil
 import mega.privacy.android.app.utils.MegaNodeUtil.checkBackupNodeTypeInList
 import mega.privacy.android.app.utils.MegaNodeUtil.getBackupRootNodeByHandle
+import mega.privacy.android.domain.usecase.featureflag.GetFeatureFlagValueUseCase
 import nz.mega.sdk.MegaNode
 import timber.log.Timber
 
@@ -28,8 +32,9 @@ import timber.log.Timber
  * Manager class used to process actions related to Backup nodes.
  */
 class FileBackupManager(
-    val activity: Activity,
+    val activity: FragmentActivity,
     val actionBackupListener: ActionBackupListener?,
+    val getFeatureFlagValueUseCase: GetFeatureFlagValueUseCase,
 ) {
 
     object BackupDialogState {
@@ -108,12 +113,22 @@ class FileBackupManager(
             initBackupWarningState()
             when (actionType) {
                 ACTION_BACKUP_SHARE_FOLDER -> if (MegaNodeUtil.isOutShare(megaNode)) {
-                    val i = Intent(
-                        activity,
-                        FileContactListActivity::class.java
-                    )
-                    i.putExtra(Constants.NAME, megaNode?.handle)
-                    activity.startActivity(i)
+                    activity.lifecycleScope.launch {
+                        val intent =
+                            if (getFeatureFlagValueUseCase(AppFeatures.FileContactsComposeUI)) {
+                                Intent(
+                                    activity,
+                                    FileContactListActivity::class.java
+                                )
+                            } else {
+                                Intent(
+                                    activity,
+                                    FileContactListActivity::class.java
+                                )
+                            }
+                        intent.putExtra(Constants.NAME, megaNode?.handle)
+                        activity.startActivity(intent)
+                    }
                 } else {
                     nodeController?.selectContactToShareFolder(megaNode)
                 }

@@ -47,6 +47,7 @@ import mega.privacy.android.app.utils.MegaNodeUtil
 import mega.privacy.android.app.utils.MegaProgressDialogUtil
 import mega.privacy.android.app.utils.Util
 import mega.privacy.android.domain.entity.node.MoveRequestResult
+import mega.privacy.android.domain.usecase.featureflag.GetFeatureFlagValueUseCase
 import nz.mega.sdk.MegaApiJava
 import nz.mega.sdk.MegaContactRequest
 import nz.mega.sdk.MegaEvent
@@ -59,10 +60,14 @@ import nz.mega.sdk.MegaUser
 import nz.mega.sdk.MegaUserAlert
 import timber.log.Timber
 import java.util.Stack
+import javax.inject.Inject
 
 @AndroidEntryPoint
 internal class FileContactListActivity : PasscodeActivity(), View.OnClickListener,
     MegaGlobalListenerInterface, FileContactsListBottomSheetDialogListener {
+
+    @Inject
+    lateinit var getFeatureFlagValueUseCase: GetFeatureFlagValueUseCase
 
     internal val viewModel by viewModels<FileContactListViewModel>()
 
@@ -124,7 +129,12 @@ internal class FileContactListActivity : PasscodeActivity(), View.OnClickListene
             if (intent.action == null) return
 
             if (intent.action == BroadcastConstants.ACTION_UPDATE_NICKNAME || intent.action == BroadcastConstants.ACTION_UPDATE_CREDENTIALS || intent.action == BroadcastConstants.ACTION_UPDATE_FIRST_NAME || intent.action == BroadcastConstants.ACTION_UPDATE_LAST_NAME) {
-                updateAdapter(intent.getLongExtra(BroadcastConstants.EXTRA_USER_HANDLE, MegaApiJava.INVALID_HANDLE))
+                updateAdapter(
+                    intent.getLongExtra(
+                        BroadcastConstants.EXTRA_USER_HANDLE,
+                        MegaApiJava.INVALID_HANDLE
+                    )
+                )
             }
         }
     }
@@ -390,18 +400,22 @@ internal class FileContactListActivity : PasscodeActivity(), View.OnClickListene
      * Initializes the FileBackupManager
      */
     private fun initFileBackupManager() {
-        fileBackupManager = FileBackupManager(this, object : ActionBackupListener {
-            override fun actionBackupResult(
-                actionType: Int,
-                operationType: Int,
-                result: MoveRequestResult?,
-                handle: Long,
-            ) {
-                if (actionType == MegaNodeDialogUtil.ACTION_BACKUP_SHARE_FOLDER && operationType == FileBackupManager.OperationType.OPERATION_EXECUTE) {
-                    shareFolder()
+        fileBackupManager = FileBackupManager(
+            activity = this,
+            actionBackupListener = object : ActionBackupListener {
+                override fun actionBackupResult(
+                    actionType: Int,
+                    operationType: Int,
+                    result: MoveRequestResult?,
+                    handle: Long,
+                ) {
+                    if (actionType == MegaNodeDialogUtil.ACTION_BACKUP_SHARE_FOLDER && operationType == FileBackupManager.OperationType.OPERATION_EXECUTE) {
+                        shareFolder()
+                    }
                 }
-            }
-        })
+            },
+            getFeatureFlagValueUseCase = getFeatureFlagValueUseCase,
+        )
     }
 
     fun checkScroll() {
@@ -717,7 +731,8 @@ internal class FileContactListActivity : PasscodeActivity(), View.OnClickListene
             }
 
             val emails =
-                intent.getStringArrayListExtra(AddContactActivity.Companion.EXTRA_CONTACTS) ?: arrayListOf()
+                intent.getStringArrayListExtra(AddContactActivity.Companion.EXTRA_CONTACTS)
+                    ?: arrayListOf()
             val nodeHandle = intent.getLongExtra(AddContactActivity.Companion.EXTRA_NODE_HANDLE, -1)
 
             if (nodeHandle != -1L) {

@@ -624,7 +624,7 @@ class ManagerActivity : PasscodeActivity(), NavigationView.OnNavigationItemSelec
             }
         }
 
-    private val fileBackupManager: FileBackupManager = initFileBackupManager()
+    private val fileBackupManager: FileBackupManager by lazy { initFileBackupManager() }
 
     private val credentials by lazy {
         runBlocking {
@@ -7176,15 +7176,17 @@ class ManagerActivity : PasscodeActivity(), NavigationView.OnNavigationItemSelec
      * Create the instance of FileBackupManager
      */
     private fun initFileBackupManager() = FileBackupManager(
-        this,
-        object : ActionBackupListener {
+        activity = this,
+        actionBackupListener = object : ActionBackupListener {
             override fun actionBackupResult(
                 actionType: Int,
                 operationType: Int,
                 result: MoveRequestResult?,
                 handle: Long,
             ) = Unit
-        })
+        },
+        getFeatureFlagValueUseCase = getFeatureFlagValueUseCase,
+    )
 
     /**
      * Updates the UI related to unread user alerts as per the [UnreadUserAlertsCheckType] received.

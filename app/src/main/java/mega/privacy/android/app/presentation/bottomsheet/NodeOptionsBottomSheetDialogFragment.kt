@@ -36,6 +36,7 @@ import mega.privacy.android.app.R
 import mega.privacy.android.app.activities.WebViewActivity
 import mega.privacy.android.app.arch.extensions.collectFlow
 import mega.privacy.android.app.featuretoggle.ApiFeatures
+import mega.privacy.android.app.featuretoggle.AppFeatures
 import mega.privacy.android.app.main.DrawerItem
 import mega.privacy.android.app.main.ManagerActivity
 import mega.privacy.android.app.main.controllers.NodeController
@@ -56,6 +57,7 @@ import mega.privacy.android.app.presentation.bottomsheet.model.NodeShareInformat
 import mega.privacy.android.app.presentation.contact.authenticitycredendials.AuthenticityCredentialsActivity
 import mega.privacy.android.app.presentation.extensions.getStorageState
 import mega.privacy.android.app.presentation.filecontact.FileContactListActivity
+import mega.privacy.android.app.presentation.filecontact.FileContactListComposeActivity
 import mega.privacy.android.app.presentation.fileinfo.FileInfoActivity
 import mega.privacy.android.app.presentation.hidenode.HiddenNodesOnboardingActivity
 import mega.privacy.android.app.presentation.manager.model.SharesTab
@@ -1680,9 +1682,17 @@ class NodeOptionsBottomSheetDialogFragment : BaseBottomSheetDialogFragment() {
         node?.let {
             val nodeType = checkBackupNodeTypeByHandle(megaApi, node)
             if (isOutShare(it)) {
-                val intent = Intent(requireContext(), FileContactListActivity::class.java)
-                intent.putExtra(Constants.NAME, it.handle)
-                startActivity(intent)
+                viewLifecycleOwner.lifecycleScope .launch {
+                    val intent =
+                        if (getFeatureFlagValueUseCase(AppFeatures.FileContactsComposeUI)) {
+                            Intent(requireContext(), FileContactListComposeActivity::class.java)
+                        } else {
+                            Intent(requireContext(), FileContactListActivity::class.java)
+                        }
+                    intent.putExtra(Constants.NAME, it.handle)
+                    startActivity(intent)
+                    dismissAllowingStateLoss()
+                }
             } else {
                 if (nodeType != BACKUP_NONE) {
                     (requireActivity() as ManagerActivity).showShareBackupsFolderWarningDialog(
@@ -1692,8 +1702,8 @@ class NodeOptionsBottomSheetDialogFragment : BaseBottomSheetDialogFragment() {
                 } else {
                     nodeController.selectContactToShareFolder(node)
                 }
+                dismissAllowingStateLoss()
             }
-            dismissAllowingStateLoss()
         }
     }
 

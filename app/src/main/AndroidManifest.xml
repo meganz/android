@@ -739,6 +739,7 @@
             android:windowSoftInputMode="adjustResize" />
         <activity android:name=".presentation.photos.albums.add.AddToAlbumActivity" />
         <activity android:name="mega.privacy.android.app.presentation.settings.compose.SettingsHomeActivity" />
+        <activity android:name="mega.privacy.android.app.presentation.filecontact.FileContactListComposeActivity" />
 
         <meta-data
             android:name="com.google.android.gms.ads.APPLICATION_ID"

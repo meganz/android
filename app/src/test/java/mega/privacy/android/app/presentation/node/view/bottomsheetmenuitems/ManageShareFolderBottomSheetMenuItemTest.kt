@@ -5,7 +5,7 @@ import mega.privacy.android.app.presentation.node.model.menuaction.ManageShareFo
 import mega.privacy.android.domain.entity.node.TypedFolderNode
 import mega.privacy.android.domain.entity.node.TypedNode
 import mega.privacy.android.domain.entity.shares.AccessPermission
-import org.junit.jupiter.api.Assertions.*
+import org.junit.jupiter.api.Assertions.assertEquals
 import org.junit.jupiter.api.TestInstance
 import org.junit.jupiter.params.ParameterizedTest
 import org.junit.jupiter.params.provider.Arguments
@@ -17,7 +17,8 @@ import java.util.stream.Stream
 @TestInstance(TestInstance.Lifecycle.PER_CLASS)
 class ManageShareFolderBottomSheetMenuItemTest {
     private val manageShareFolderBottomSheetMenuItem = ManageShareFolderBottomSheetMenuItem(
-        ManageShareFolderMenuAction()
+        menuAction = ManageShareFolderMenuAction(),
+        getFeatureFlagValueUseCase = mock()
     )
 
     @ParameterizedTest(name = "isNodeInRubbish {0} - accessPermission {1} - isInBackups {2} - node {3} - isConnected {4} - expected {5}")

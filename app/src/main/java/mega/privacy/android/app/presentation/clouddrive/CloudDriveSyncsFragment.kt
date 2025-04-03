@@ -212,7 +212,8 @@ class CloudDriveSyncsFragment : Fragment() {
                 ) {
                     Timber.d("Nothing to do for actionType = $actionType")
                 }
-            }
+            },
+            getFeatureFlagValueUseCase = getFeatureFlagValueUseCase,
         )
     }
 

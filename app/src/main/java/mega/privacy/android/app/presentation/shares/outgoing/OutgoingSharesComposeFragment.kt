@@ -78,6 +78,7 @@ import mega.privacy.android.domain.entity.node.TypedFileNode
 import mega.privacy.android.domain.entity.node.TypedFolderNode
 import mega.privacy.android.domain.entity.node.shares.ShareNode
 import mega.privacy.android.domain.usecase.GetThemeMode
+import mega.privacy.android.domain.usecase.featureflag.GetFeatureFlagValueUseCase
 import mega.privacy.android.icon.pack.R as iconPackR
 import mega.privacy.android.navigation.MegaNavigator
 import mega.privacy.android.shared.original.core.ui.theme.OriginalTheme
@@ -133,6 +134,9 @@ class OutgoingSharesComposeFragment : Fragment() {
     @Inject
     lateinit var megaNavigator: MegaNavigator
 
+    @Inject
+    lateinit var getFeatureFlagValueUseCase: GetFeatureFlagValueUseCase
+
     private val viewModel: OutgoingSharesComposeViewModel by activityViewModels()
     private val nodeActionsViewModel: NodeActionsViewModel by viewModels()
     private val sortByHeaderViewModel: SortByHeaderViewModel by activityViewModels()
@@ -167,7 +171,8 @@ class OutgoingSharesComposeFragment : Fragment() {
                 ) {
                     Timber.d("Nothing to do for actionType = $actionType")
                 }
-            }
+            },
+            getFeatureFlagValueUseCase = getFeatureFlagValueUseCase,
         )
     }
 

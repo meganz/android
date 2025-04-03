@@ -19,6 +19,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.semantics.semantics
 import androidx.compose.ui.semantics.testTagsAsResourceId
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
+import androidx.lifecycle.lifecycleScope
 import dagger.hilt.android.AndroidEntryPoint
 import de.palm.composestateevents.EventEffect
 import kotlinx.coroutines.launch
@@ -31,12 +32,14 @@ import mega.privacy.android.app.activities.contract.NameCollisionActivityContrac
 import mega.privacy.android.app.activities.contract.SelectFolderToCopyActivityContract
 import mega.privacy.android.app.activities.contract.SelectFolderToMoveActivityContract
 import mega.privacy.android.app.activities.contract.SelectUsersToShareActivityContract
+import mega.privacy.android.app.featuretoggle.AppFeatures
 import mega.privacy.android.app.interfaces.ActionBackupListener
 import mega.privacy.android.app.main.ManagerActivity
 import mega.privacy.android.app.main.controllers.NodeController
 import mega.privacy.android.app.presentation.contact.authenticitycredendials.AuthenticityCredentialsActivity
 import mega.privacy.android.app.presentation.extensions.isDarkMode
 import mega.privacy.android.app.presentation.filecontact.FileContactListActivity
+import mega.privacy.android.app.presentation.filecontact.FileContactListComposeActivity
 import mega.privacy.android.app.presentation.fileinfo.model.FileInfoMenuAction
 import mega.privacy.android.app.presentation.fileinfo.model.FileInfoOneOffViewEvent
 import mega.privacy.android.app.presentation.fileinfo.model.FileInfoViewState
@@ -69,6 +72,7 @@ import mega.privacy.android.domain.entity.contacts.ContactItem
 import mega.privacy.android.domain.entity.node.MoveRequestResult
 import mega.privacy.android.domain.entity.node.NodeId
 import mega.privacy.android.domain.usecase.GetThemeMode
+import mega.privacy.android.domain.usecase.featureflag.GetFeatureFlagValueUseCase
 import mega.privacy.android.navigation.MegaNavigator
 import mega.privacy.android.shared.original.core.ui.theme.OriginalTheme
 import mega.privacy.android.shared.original.core.ui.utils.showAutoDurationSnackbar
@@ -99,6 +103,9 @@ class FileInfoActivity : BaseActivity() {
      */
     @Inject
     lateinit var megaNavigator: MegaNavigator
+
+    @Inject
+    lateinit var getFeatureFlagValueUseCase: GetFeatureFlagValueUseCase
 
     private lateinit var selectContactForShareFolderLauncher: ActivityResultLauncher<NodeId>
     private lateinit var versionHistoryLauncher: ActivityResultLauncher<Long>
@@ -285,8 +292,8 @@ class FileInfoActivity : BaseActivity() {
      */
     private fun initFileBackupManager() {
         fileBackupManager = FileBackupManager(
-            this,
-            object : ActionBackupListener {
+            activity = this,
+            actionBackupListener = object : ActionBackupListener {
                 override fun actionBackupResult(
                     actionType: Int,
                     operationType: Int,
@@ -297,7 +304,8 @@ class FileInfoActivity : BaseActivity() {
                         navigateToShare(NodeId(handle))
                     }
                 }
-            })
+            },
+            getFeatureFlagValueUseCase = getFeatureFlagValueUseCase,)
     }
 
     private fun configureActivityResultLaunchers() {
@@ -415,11 +423,19 @@ class FileInfoActivity : BaseActivity() {
     }
 
     private fun navigateToSharedContacts() {
-        startActivity(
-            Intent(this, FileContactListActivity::class.java).apply {
-                putExtra(Constants.NAME, viewModel.nodeId.longValue)
+        lifecycleScope.launch {
+            val intent = if (getFeatureFlagValueUseCase(AppFeatures.FileContactsComposeUI)) {
+                Intent(this@FileInfoActivity, FileContactListComposeActivity::class.java)
+            } else {
+                Intent(this@FileInfoActivity, FileContactListActivity::class.java)
             }
-        )
+            startActivity(
+                intent.apply {
+                    putExtra(Constants.NAME, viewModel.nodeId.longValue)
+                }
+            )
+        }
+
     }
 
     private fun navigateToUserDetails(contactItem: ContactItem) {

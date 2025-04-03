@@ -69,6 +69,7 @@ import mega.privacy.android.domain.entity.node.TypedFolderNode
 import mega.privacy.android.domain.entity.node.publiclink.PublicLinkFile
 import mega.privacy.android.domain.entity.node.publiclink.PublicLinkNode
 import mega.privacy.android.domain.usecase.GetThemeMode
+import mega.privacy.android.domain.usecase.featureflag.GetFeatureFlagValueUseCase
 import mega.privacy.android.icon.pack.R as iconPackR
 import mega.privacy.android.navigation.MegaNavigator
 import mega.privacy.android.shared.original.core.ui.theme.OriginalTheme
@@ -110,6 +111,9 @@ class LinksComposeFragment : Fragment() {
      */
     @Inject
     lateinit var megaNavigator: MegaNavigator
+
+    @Inject
+    lateinit var getFeatureFlagValueUseCase: GetFeatureFlagValueUseCase
 
     /**
      * Interface that notifies the attached Activity to execute specific functions
@@ -319,13 +323,15 @@ class LinksComposeFragment : Fragment() {
             viewModel.refreshLinkNodes(false)
         }
 
-        viewLifecycleOwner.collectFlow(viewModel.state
+        viewLifecycleOwner.collectFlow(
+            viewModel.state
             .map { it.nodesList.isEmpty() }
             .distinctUntilChanged()) {
             linksActionListener?.updateSharesPageToolbarTitleAndFAB(invalidateOptionsMenu = true)
         }
 
-        viewLifecycleOwner.collectFlow(viewModel.state
+        viewLifecycleOwner.collectFlow(
+            viewModel.state
             .map { it.parentNode != null }
             .distinctUntilChanged()) {
             toggleAppBarElevation(false)
@@ -380,7 +386,8 @@ class LinksComposeFragment : Fragment() {
                 ) {
                     Timber.d("Nothing to do for actionType = $actionType")
                 }
-            }
+            },
+            getFeatureFlagValueUseCase = getFeatureFlagValueUseCase,
         )
     }
 
