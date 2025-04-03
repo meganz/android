@@ -1,12 +1,15 @@
 package mega.privacy.android.app.extensions
 
+import android.app.Application
 import android.content.Context
 import android.content.Intent
 import android.content.res.Configuration
 import android.net.Uri
 import android.provider.Settings
 import androidx.annotation.NonNull
+import androidx.browser.customtabs.CustomTabsIntent
 import mega.privacy.android.app.R
+import mega.privacy.android.app.activities.WebViewActivity
 import mega.privacy.android.app.main.ManagerActivity
 import mega.privacy.android.app.utils.Util
 import timber.log.Timber
@@ -50,3 +53,58 @@ fun Context.isTablet() =
     ((resources.configuration.screenLayout
             and Configuration.SCREENLAYOUT_SIZE_MASK)
             >= Configuration.SCREENLAYOUT_SIZE_LARGE)
+
+/**
+ * Extension to launch a URL with multiple fallback strategies from context
+ *
+ * The method first attempts to launch the URL using Chrome Custom Tabs. If that fails,
+ * it falls back to launching in WebViewActivity, and finally the default browser.
+ */
+fun Context?.launchUrl(url: String?) {
+    if (url.isNullOrEmpty()) {
+        Timber.w("URL is null or empty")
+        return
+    }
+    if (this == null) {
+        Timber.w("Context is null")
+        return
+    }
+
+    fun Intent.applyNewTaskFlag() = apply {
+        if (this@launchUrl is Application) addFlags(Intent.FLAG_ACTIVITY_NEW_TASK)
+    }
+
+    val uri = Uri.parse(url)
+    runCatching {
+        CustomTabsIntent.Builder()
+            .apply {
+                setTheme(R.style.Theme_Mega)
+                setShowTitle(true)
+                setShareState(CustomTabsIntent.SHARE_STATE_OFF)
+                setDownloadButtonEnabled(false)
+                setBookmarksButtonEnabled(false)
+            }
+            .build()
+            .also {
+                it.intent.putExtra(
+                    Intent.EXTRA_REFERRER,
+                    Uri.parse("android-app://$packageName")
+                )
+                it.intent.applyNewTaskFlag()
+            }.launchUrl(this, uri)
+    }.recoverCatching { e ->
+        Timber.e(e, "Chrome Custom Tabs launch failed, falling back to WebViewActivity")
+        startActivity(
+            Intent(this, WebViewActivity::class.java).apply {
+                addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP)
+                applyNewTaskFlag()
+                data = uri
+            }
+        )
+    }.recoverCatching { e ->
+        Timber.e(e, "WebViewActivity launch failed, falling back to browser")
+        startActivity(Intent(Intent.ACTION_VIEW, uri).applyNewTaskFlag())
+    }.onFailure {
+        Timber.e(it, "Failed to launch URL")
+    }
+}
