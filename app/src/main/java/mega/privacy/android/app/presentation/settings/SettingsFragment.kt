@@ -3,7 +3,6 @@ package mega.privacy.android.app.presentation.settings
 import android.annotation.SuppressLint
 import android.app.Activity
 import android.content.Intent
-import android.net.Uri
 import android.os.Bundle
 import android.view.View
 import android.widget.TextView
@@ -23,7 +22,6 @@ import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.launch
 import mega.privacy.android.app.MegaApplication
 import mega.privacy.android.app.R
-import mega.privacy.android.app.activities.WebViewActivity
 import mega.privacy.android.app.activities.settingsActivities.ChatPreferencesActivity
 import mega.privacy.android.app.activities.settingsActivities.CookiePreferencesActivity
 import mega.privacy.android.app.activities.settingsActivities.DownloadPreferencesActivity
@@ -57,6 +55,7 @@ import mega.privacy.android.app.constants.SettingsConstants.KEY_STORAGE_FILE_MAN
 import mega.privacy.android.app.constants.SettingsConstants.KEY_SUB_FOLDER_MEDIA_DISCOVERY
 import mega.privacy.android.app.constants.SettingsConstants.REPORT_ISSUE
 import mega.privacy.android.app.di.settings.ViewModelPreferenceDataStoreFactory
+import mega.privacy.android.app.extensions.launchUrl
 import mega.privacy.android.app.presentation.changepassword.ChangePasswordActivity
 import mega.privacy.android.app.presentation.extensions.hideKeyboard
 import mega.privacy.android.app.presentation.settings.calls.SettingsCallsActivity
@@ -306,20 +305,20 @@ class SettingsFragment :
             }
 
             KEY_HELP_CENTRE -> {
-                launchWebPage(HELP_CENTRE_URL)
+                context.launchUrl(HELP_CENTRE_URL)
             }
 
             KEY_HELP_SEND_FEEDBACK -> showEvaluatedAppDialog()
             KEY_ABOUT_PRIVACY_POLICY -> {
-                launchWebPage(PRIVACY_POLICY_URL)
+                context.launchUrl(PRIVACY_POLICY_URL)
             }
 
             KEY_ABOUT_TOS -> {
-                launchWebPage(TERMS_OF_SERVICE_URL)
+                context.launchUrl(TERMS_OF_SERVICE_URL)
             }
 
             KEY_ABOUT_CODE_LINK -> {
-                launchWebPage(GITHUB_URL)
+                context.launchUrl(GITHUB_URL)
             }
 
             KEY_ABOUT_APP_VERSION -> {
@@ -358,9 +357,7 @@ class SettingsFragment :
                         ).show()
                     }
                 } else {
-                    val intent = Intent(context, WebViewActivity::class.java)
-                    intent.data = Uri.parse(cookiePolicyLink)
-                    startActivity(intent)
+                    context.launchUrl(cookiePolicyLink)
                 }
             }
 
@@ -478,12 +475,6 @@ class SettingsFragment :
             .setTitle(title)
             .setMessage(message)
             .show()
-    }
-
-    private fun launchWebPage(url: String) {
-        val viewIntent = Intent(Intent.ACTION_VIEW)
-        viewIntent.data = Uri.parse(url)
-        startActivity(viewIntent)
     }
 
     private fun resetCounters(key: String?) {
