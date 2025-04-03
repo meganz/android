@@ -4,7 +4,18 @@ import com.vdurmont.emoji.EmojiParser
 import mega.privacy.android.app.components.twemoji.EmojiUtils
 import mega.privacy.android.app.components.twemoji.EmojiUtilsShortcodes
 import mega.privacy.android.domain.entity.contacts.ContactItem
+import mega.privacy.android.domain.entity.shares.ShareRecipient
 import java.util.Locale
+
+fun ShareRecipient.getAvatarFirstLetter(): String = when (this) {
+    is ShareRecipient.NonContact -> {
+        getAvatarFirstLetter(email)
+    }
+
+    is ShareRecipient.Contact -> {
+        getAvatarFirstLetter(contactData.alias ?: contactData.fullName ?: email)
+    }
+}
 
 /**
  * Retrieve the avatar first letter of a [ContactItem].
