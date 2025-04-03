@@ -13,10 +13,12 @@ import androidx.fragment.app.viewModels
 import androidx.fragment.compose.content
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import dagger.hilt.android.AndroidEntryPoint
+import mega.android.core.ui.theme.AndroidTheme
 import mega.privacy.android.app.activities.WebViewActivity
 import mega.privacy.android.app.presentation.extensions.isDarkMode
 import mega.privacy.android.app.presentation.login.LoginActivity
 import mega.privacy.android.app.presentation.login.createaccount.view.CreateAccountRoute
+import mega.privacy.android.app.presentation.login.createaccount.view.NewCreateAccountRoute
 import mega.privacy.android.app.presentation.login.model.LoginFragmentType
 import mega.privacy.android.app.utils.Constants
 import mega.privacy.android.app.utils.Constants.TERMS_OF_SERVICE_URL
@@ -53,13 +55,11 @@ class CreateAccountComposeFragment : Fragment() {
         val themeMode by getThemeMode().collectAsStateWithLifecycle(initialValue = ThemeMode.System)
         val uiState by viewModel.uiState.collectAsStateWithLifecycle()
         if (uiState.isNewRegistrationUiEnabled == true) {
-            //Replace with New Design for create account screen
-            OriginalTheme(isDark = themeMode.isDarkMode()) {
-                CreateAccountRoute(
+            AndroidTheme(isDark = themeMode.isDarkMode()) {
+                NewCreateAccountRoute(
                     uiState = uiState,
                     onNavigateToLogin = ::navigateToLogin,
-                    openTermsAndServiceLink = { openLink(TERMS_OF_SERVICE_URL) },
-                    openEndToEndEncryptionLink = { openLink(Constants.URL_E2EE) },
+                    openLink = ::openLink,
                     setTemporalDataForAccountCreation = ::setTemporalDataForAccountCreation,
                     modifier = Modifier.fillMaxSize(),
                 )

@@ -103,22 +103,29 @@ class CreateAccountViewModel @Inject constructor(
     }
 
     private fun isEmailValid(): Boolean {
-        val email: String? = savedStateHandle[KEY_EMAIL]
-        val isEmailValid = isEmailValidUseCase(email ?: "")
-        _uiState.update { it.copy(isEmailValid = isEmailValid) }
-        return isEmailValid
+        val email: String = savedStateHandle[KEY_EMAIL] ?: ""
+        val isNewRegistrationUiEnabled = _uiState.value.isNewRegistrationUiEnabled == true
+        val isEmailLengthExceeded = email.length > EMAIL_CHAR_LIMIT
+        return if (isEmailLengthExceeded && isNewRegistrationUiEnabled) {
+            _uiState.update { it.copy(isEmailLengthExceeded = true) }
+            false
+        } else {
+            val isEmailValid = isEmailValidUseCase(email)
+            _uiState.update { it.copy(isEmailValid = isEmailValid, isEmailLengthExceeded = false) }
+            isEmailValid
+        }
     }
 
     private fun isFirstNameValid(): Boolean {
-        val firstName: String? = savedStateHandle[KEY_FIRST_NAME]
-        val isFirstNameValid = firstName.isNullOrBlank().not()
+        val firstName: String = savedStateHandle[KEY_FIRST_NAME] ?: ""
+        val isFirstNameValid = firstName.isBlank().not()
         _uiState.update { it.copy(isFirstNameValid = isFirstNameValid) }
         return isFirstNameValid
     }
 
     private fun isLastNameValid(): Boolean {
-        val lastName: String? = savedStateHandle[KEY_LAST_NAME]
-        val isLastNameValid = lastName.isNullOrBlank().not()
+        val lastName: String = savedStateHandle[KEY_LAST_NAME] ?: ""
+        val isLastNameValid = lastName.isBlank().not()
         _uiState.update { it.copy(isLastNameValid = isLastNameValid) }
         return isLastNameValid
     }
@@ -222,13 +229,13 @@ class CreateAccountViewModel @Inject constructor(
         val areAllInputsValid = areAllInputsValid()
         val areTermsAgreed = areTermsAgreed()
 
-        if (isNewRegistrationUiEnabled == false) {
+        if (isNewRegistrationUiEnabled != true) {
             if (!areAllInputsValid) return@launch
             if (!areTermsAgreed) {
                 _uiState.update { it.copy(showAgreeToTermsEvent = triggered) }
                 return@launch
             }
-        } else if (isNewRegistrationUiEnabled == true) {
+        } else {
             if (!areTermsAgreed) {
                 _uiState.update { it.copy(showAgreeToTermsEvent = triggered) }
             }
@@ -282,7 +289,7 @@ class CreateAccountViewModel @Inject constructor(
 
     }
 
-    private fun areTermsAgreed() = if (_uiState.value.isNewRegistrationUiEnabled == false) {
+    private fun areTermsAgreed() = if (_uiState.value.isNewRegistrationUiEnabled != true) {
         _uiState.value.isTermsOfServiceAgreed == true && _uiState.value.isE2EEAgreed == true
     } else _uiState.value.isTermsOfServiceAgreed == true
 
