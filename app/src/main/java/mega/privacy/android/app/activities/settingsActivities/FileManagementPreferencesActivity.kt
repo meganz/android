@@ -14,7 +14,6 @@ import com.google.android.material.dialog.MaterialAlertDialogBuilder
 import dagger.hilt.android.AndroidEntryPoint
 import mega.privacy.android.app.R
 import mega.privacy.android.app.constants.BroadcastConstants.ACTION_REFRESH_CLEAR_OFFLINE_SETTING
-import mega.privacy.android.app.constants.BroadcastConstants.ACTION_TYPE
 import mega.privacy.android.app.databinding.DialogTwoVerticalButtonsBinding
 import mega.privacy.android.app.fragments.settingsFragments.SettingsFileManagementFragment
 import mega.privacy.android.app.globalmanagement.MyAccountInfo
@@ -42,18 +41,6 @@ class FileManagementPreferencesActivity : PreferencesBaseActivity() {
             }
         }
     }
-    private val updateMyAccountReceiver: BroadcastReceiver = object : BroadcastReceiver() {
-        override fun onReceive(context: Context, intent: Intent) {
-            if (sttFileManagement != null && intent.action == Constants.BROADCAST_ACTION_INTENT_UPDATE_ACCOUNT_DETAILS) {
-                val actionType = intent.getIntExtra(ACTION_TYPE, Constants.INVALID_VALUE)
-                if (actionType == Constants.UPDATE_ACCOUNT_DETAILS) {
-                    if (!isFinishing) {
-                        sttFileManagement?.setRubbishInfo()
-                    }
-                }
-            }
-        }
-    }
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -65,10 +52,6 @@ class FileManagementPreferencesActivity : PreferencesBaseActivity() {
             sttFileManagement =
                 supportFragmentManager.findFragmentById(R.id.fragment_container) as? SettingsFileManagementFragment
         }
-        registerReceiver(
-            updateMyAccountReceiver,
-            IntentFilter(Constants.BROADCAST_ACTION_INTENT_UPDATE_ACCOUNT_DETAILS)
-        )
         val filterUpdateCUSettings =
             IntentFilter(Constants.BROADCAST_ACTION_INTENT_SETTINGS_UPDATED)
         filterUpdateCUSettings.addAction(ACTION_REFRESH_CLEAR_OFFLINE_SETTING)
@@ -89,7 +72,6 @@ class FileManagementPreferencesActivity : PreferencesBaseActivity() {
 
     override fun onDestroy() {
         super.onDestroy()
-        unregisterReceiver(updateMyAccountReceiver)
         unregisterReceiver(updateCUSettingsReceiver)
         dismissAlertDialogIfExists(clearOfflineDialog)
     }

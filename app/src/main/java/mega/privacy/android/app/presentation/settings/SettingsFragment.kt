@@ -2,18 +2,13 @@ package mega.privacy.android.app.presentation.settings
 
 import android.annotation.SuppressLint
 import android.app.Activity
-import android.content.BroadcastReceiver
-import android.content.Context
 import android.content.Intent
-import android.content.IntentFilter
 import android.net.Uri
-import android.os.Build
 import android.os.Bundle
 import android.view.View
 import android.widget.TextView
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.annotation.StringRes
-import androidx.core.content.ContextCompat
 import androidx.fragment.app.FragmentResultListener
 import androidx.fragment.app.viewModels
 import androidx.lifecycle.Lifecycle
@@ -105,12 +100,6 @@ class SettingsFragment :
         }
 
     private var cookiePolicyLink: String? = null
-
-    private val updateMyAccountReceiver: BroadcastReceiver = object : BroadcastReceiver() {
-        override fun onReceive(context: Context, intent: Intent) {
-            viewModel.refreshAccount()
-        }
-    }
 
     override fun onCreatePreferences(savedInstanceState: Bundle?, rootKey: String?) {
         preferenceManager.preferenceDataStore =
@@ -214,25 +203,9 @@ class SettingsFragment :
     }
 
     override fun onResume() {
-        registerAccountChangeReceiver()
         refreshSummaries()
         resetCounters(null)
         super.onResume()
-    }
-
-    @SuppressLint("WrongConstant")
-    private fun registerAccountChangeReceiver() {
-        val filter = IntentFilter(Constants.BROADCAST_ACTION_INTENT_UPDATE_ACCOUNT_DETAILS)
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
-            ContextCompat.registerReceiver(
-                requireContext(),
-                updateMyAccountReceiver,
-                filter,
-                ContextCompat.RECEIVER_NOT_EXPORTED
-            )
-        } else {
-            requireContext().registerReceiver(updateMyAccountReceiver, filter)
-        }
     }
 
     private fun refreshSummaries() {
@@ -241,11 +214,6 @@ class SettingsFragment :
 
     private fun updatePasscodeLockSummary(enabled: Boolean) {
         findPreference<Preference>(KEY_PASSCODE_LOCK)?.setSummary(if (enabled) R.string.mute_chat_notification_option_on else R.string.mute_chatroom_notification_option_off)
-    }
-
-    override fun onPause() {
-        requireContext().unregisterReceiver(updateMyAccountReceiver)
-        super.onPause()
     }
 
     /**

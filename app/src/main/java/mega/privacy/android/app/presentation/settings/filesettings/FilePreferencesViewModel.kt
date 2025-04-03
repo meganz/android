@@ -16,6 +16,7 @@ import mega.privacy.android.app.presentation.settings.filesettings.model.FilePre
 import mega.privacy.android.domain.entity.user.UserChanges
 import mega.privacy.android.domain.usecase.GetFolderVersionInfo
 import mega.privacy.android.domain.usecase.MonitorUserUpdates
+import mega.privacy.android.domain.usecase.account.MonitorMyAccountUpdateUseCase
 import mega.privacy.android.domain.usecase.cache.ClearCacheUseCase
 import mega.privacy.android.domain.usecase.cache.GetCacheSizeUseCase
 import mega.privacy.android.domain.usecase.file.GetFileVersionsOption
@@ -52,6 +53,7 @@ class FilePreferencesViewModel @Inject constructor(
     private val getRubbishBinAutopurgePeriodUseCase: GetRubbishBinAutopurgePeriodUseCase,
     private val setRubbishBinAutopurgePeriodUseCase: SetRubbishBinAutopurgePeriodUseCase,
     private val isRubbishBinAutopurgePeriodValidUseCase: IsRubbishBinAutopurgePeriodValidUseCase,
+    monitorMyAccountUpdateUseCase: MonitorMyAccountUpdateUseCase,
 ) : ViewModel() {
     private val _state = MutableStateFlow(FilePreferencesState())
 
@@ -64,6 +66,11 @@ class FilePreferencesViewModel @Inject constructor(
      * Monitor connectivity event
      */
     val monitorConnectivityEvent = monitorConnectivityUseCase()
+
+    /**
+     * Monitor my account update event
+     */
+    val monitorMyAccountUpdateEvent = monitorMyAccountUpdateUseCase()
 
     /**
      * Is connected
@@ -91,7 +98,10 @@ class FilePreferencesViewModel @Inject constructor(
         getRubbishBinAutopurgeInfo()
     }
 
-    private fun getRubbishBinAutopurgeInfo() {
+    /**
+     * Get rubbish bin autopurge info
+     */
+    fun getRubbishBinAutopurgeInfo() {
         viewModelScope.launch {
             runCatching {
                 val isEnabled = isRubbishBinAutopurgeEnabledUseCase()

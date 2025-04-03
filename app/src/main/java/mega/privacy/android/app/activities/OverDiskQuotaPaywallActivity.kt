@@ -1,9 +1,6 @@
 package mega.privacy.android.app.activities
 
-import android.content.BroadcastReceiver
-import android.content.Context
 import android.content.Intent
-import android.content.IntentFilter
 import android.os.Bundle
 import android.os.CountDownTimer
 import android.view.View
@@ -24,7 +21,6 @@ import mega.privacy.android.app.extensions.enableEdgeToEdgeAndConsumeInsets
 import mega.privacy.android.app.main.ManagerActivity
 import mega.privacy.android.app.presentation.overdisk.OverDiskQuotaPaywallViewModel
 import mega.privacy.android.app.utils.ColorUtils
-import mega.privacy.android.app.utils.Constants
 import mega.privacy.android.app.utils.TimeUtils.DATE_LONG_FORMAT
 import mega.privacy.android.app.utils.TimeUtils.formatDate
 import mega.privacy.android.app.utils.TimeUtils.getHumanizedTimeMs
@@ -62,11 +58,6 @@ class OverDiskQuotaPaywallActivity : PasscodeActivity(), View.OnClickListener {
         enableEdgeToEdgeAndConsumeInsets(WindowInsetsCompat.Type.navigationBars())
         super.onCreate(savedInstanceState)
 
-        registerReceiver(
-            updateAccountDetailsReceiver,
-            IntentFilter(Constants.BROADCAST_ACTION_INTENT_UPDATE_ACCOUNT_DETAILS)
-        )
-
         viewModel.requestStorageDetailIfNeeded()
 
         viewModel.getUserData()
@@ -95,11 +86,10 @@ class OverDiskQuotaPaywallActivity : PasscodeActivity(), View.OnClickListener {
         collectFlow(viewModel.monitorUpdateUserData) {
             updateStrings()
         }
-    }
 
-    override fun onDestroy() {
-        unregisterReceiver(updateAccountDetailsReceiver)
-        super.onDestroy()
+        collectFlow(viewModel.monitorMyAccountUpdate) {
+            updateStrings()
+        }
     }
 
     override fun onClick(v: View?) {
@@ -130,12 +120,6 @@ class OverDiskQuotaPaywallActivity : PasscodeActivity(), View.OnClickListener {
             val intent = Intent(applicationContext, ManagerActivity::class.java)
                 .putExtra(EXTRA_ASK_PERMISSIONS, askPermissions)
             startActivity(intent)
-        }
-    }
-
-    private val updateAccountDetailsReceiver: BroadcastReceiver = object : BroadcastReceiver() {
-        override fun onReceive(context: Context, intent: Intent) {
-            updateStrings()
         }
     }
 

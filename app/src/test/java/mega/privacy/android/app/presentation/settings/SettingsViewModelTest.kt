@@ -9,6 +9,7 @@ import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.distinctUntilChanged
 import kotlinx.coroutines.flow.emptyFlow
 import kotlinx.coroutines.flow.flow
+import kotlinx.coroutines.flow.flowOf
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.test.StandardTestDispatcher
 import kotlinx.coroutines.test.advanceUntilIdle
@@ -17,6 +18,7 @@ import mega.privacy.android.app.TEST_USER_ACCOUNT
 import mega.privacy.android.app.extensions.asHotFlow
 import mega.privacy.android.app.presentation.settings.SettingsFragment.Companion.COOKIES_URI
 import mega.privacy.android.core.test.extension.CoroutineMainDispatcherExtension
+import mega.privacy.android.domain.entity.MyAccountUpdate
 import mega.privacy.android.domain.entity.preference.StartScreen
 import mega.privacy.android.domain.exception.MegaException
 import mega.privacy.android.domain.exception.SettingNotFoundException
@@ -32,6 +34,7 @@ import mega.privacy.android.domain.usecase.SetMediaDiscoveryView
 import mega.privacy.android.domain.usecase.ToggleAutoAcceptQRLinks
 import mega.privacy.android.domain.usecase.account.IsMultiFactorAuthEnabledUseCase
 import mega.privacy.android.domain.usecase.account.MonitorAccountDetailUseCase
+import mega.privacy.android.domain.usecase.account.MonitorMyAccountUpdateUseCase
 import mega.privacy.android.domain.usecase.camerauploads.IsCameraUploadsEnabledUseCase
 import mega.privacy.android.domain.usecase.featureflag.GetFeatureFlagValueUseCase
 import mega.privacy.android.domain.usecase.login.GetSessionTransferURLUseCase
@@ -88,6 +91,7 @@ class SettingsViewModelTest {
     private val monitorAccountDetailUseCase = mock<MonitorAccountDetailUseCase>()
     private val setAudioBackgroundPlayEnabledUseCase = mock<SetAudioBackgroundPlayEnabledUseCase>()
     private val getBusinessStatusUseCase = mock<GetBusinessStatusUseCase>()
+    private val monitorMyAccountUpdateUseCase = mock<MonitorMyAccountUpdateUseCase>()
 
     @BeforeEach
     fun setUp() {
@@ -139,6 +143,7 @@ class SettingsViewModelTest {
         monitorShowHiddenItemsUseCase.stub { onBlocking { invoke() }.thenReturn(emptyFlow()) }
 
         monitorAccountDetailUseCase.stub { on { invoke() }.thenReturn(emptyFlow()) }
+        whenever(monitorMyAccountUpdateUseCase()).thenReturn(emptyFlow())
 
         initViewModel()
     }
@@ -172,6 +177,7 @@ class SettingsViewModelTest {
             monitorAccountDetailUseCase = monitorAccountDetailUseCase,
             setAudioBackgroundPlayEnabledUseCase = setAudioBackgroundPlayEnabledUseCase,
             getBusinessStatusUseCase = getBusinessStatusUseCase,
+            monitorMyAccountUpdateUseCase = monitorMyAccountUpdateUseCase,
         )
     }
 
@@ -184,7 +190,7 @@ class SettingsViewModelTest {
             getAccountDetailsUseCase,
             monitorSubFolderMediaDiscoverySettingsUseCase,
             getSessionTransferURLUseCase,
-            setAudioBackgroundPlayEnabledUseCase
+            setAudioBackgroundPlayEnabledUseCase,
         )
     }
 
@@ -514,6 +520,14 @@ class SettingsViewModelTest {
         underTest.toggleBackgroundPlay(expected)
         advanceUntilIdle()
         verify(setAudioBackgroundPlayEnabledUseCase).invoke(expected)
+    }
+
+    @Test
+    fun `test that my account update and account details are updated`() = runTest {
+        whenever(monitorMyAccountUpdateUseCase()).thenReturn(flowOf(MyAccountUpdate(MyAccountUpdate.Action.UPDATE_ACCOUNT_DETAILS)))
+        initViewModel()
+        advanceUntilIdle()
+        verify(getAccountDetailsUseCase).invoke(true)
     }
 
     companion object {

@@ -159,8 +159,6 @@ public class Constants {
     public static final String ACTION_SHOW_UPGRADE_ACCOUNT = "ACTION_SHOW_UPGRADE_ACCOUNT";
     public static final String ACTION_OPEN_CONTACTS_SECTION = "ACTION_OPEN_CONTACTS_SECTION";
 
-    public static final String ACTION_STORAGE_STATE_CHANGED = "ACTION_STORAGE_STATE_CHANGED";
-
     public static final String ACTION_SHOW_SNACKBAR_SENT_AS_MESSAGE = "ACTION_SHOW_SNACKBAR_SENT_AS_MESSAGE";
 
     public static final String ACTION_SHARE_MSG = "ACTION_SHARE_MSG";
@@ -168,7 +166,6 @@ public class Constants {
     public static final String ACTION_REMOVE_LINK = "ACTION_REMOVE_LINK";
 
     public static final String BROADCAST_ACTION_INTENT_FILTER_UPDATE_FULL_SCREEN = "INTENT_FILTER_UPDATE_FULL_SCREEN";
-    public static final String BROADCAST_ACTION_INTENT_UPDATE_ACCOUNT_DETAILS = "INTENT_UPDATE_ACCOUNT_DETAILS";
     public static final String BROADCAST_ACTION_INTENT_SETTINGS_UPDATED = "SETTINGS_UPDATED";
 
     public static final String INTENT_EXTRA_KEY_PLACEHOLDER = "placeholder";

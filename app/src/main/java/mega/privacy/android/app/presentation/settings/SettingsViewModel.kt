@@ -19,6 +19,7 @@ import mega.privacy.android.app.featuretoggle.ApiFeatures
 import mega.privacy.android.app.presentation.settings.SettingsFragment.Companion.COOKIES_URI
 import mega.privacy.android.app.presentation.settings.model.MediaDiscoveryViewSettings
 import mega.privacy.android.app.presentation.settings.model.SettingsState
+import mega.privacy.android.domain.entity.MyAccountUpdate
 import mega.privacy.android.domain.entity.UserAccount
 import mega.privacy.android.domain.usecase.CanDeleteAccount
 import mega.privacy.android.domain.usecase.GetAccountDetailsUseCase
@@ -35,6 +36,7 @@ import mega.privacy.android.domain.usecase.SetMediaDiscoveryView
 import mega.privacy.android.domain.usecase.ToggleAutoAcceptQRLinks
 import mega.privacy.android.domain.usecase.account.IsMultiFactorAuthEnabledUseCase
 import mega.privacy.android.domain.usecase.account.MonitorAccountDetailUseCase
+import mega.privacy.android.domain.usecase.account.MonitorMyAccountUpdateUseCase
 import mega.privacy.android.domain.usecase.camerauploads.IsCameraUploadsEnabledUseCase
 import mega.privacy.android.domain.usecase.featureflag.GetFeatureFlagValueUseCase
 import mega.privacy.android.domain.usecase.login.GetSessionTransferURLUseCase
@@ -77,6 +79,7 @@ class SettingsViewModel @Inject constructor(
     private val monitorAccountDetailUseCase: MonitorAccountDetailUseCase,
     private val setAudioBackgroundPlayEnabledUseCase: SetAudioBackgroundPlayEnabledUseCase,
     private val getBusinessStatusUseCase: GetBusinessStatusUseCase,
+    private val monitorMyAccountUpdateUseCase: MonitorMyAccountUpdateUseCase
 ) : ViewModel() {
     private val state = MutableStateFlow(initialiseState())
     val uiState: StateFlow<SettingsState> = state
@@ -199,6 +202,13 @@ class SettingsViewModel @Inject constructor(
                 Timber.e(it)
             }.collect {
                 state.update(it)
+            }
+        }
+        viewModelScope.launch {
+            monitorMyAccountUpdateUseCase().collect {
+                if (it.action == MyAccountUpdate.Action.UPDATE_ACCOUNT_DETAILS) {
+                    refreshAccount()
+                }
             }
         }
         getCookiePolicyLink()

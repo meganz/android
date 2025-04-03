@@ -6,15 +6,18 @@ import de.palm.composestateevents.StateEventWithContentTriggered
 import de.palm.composestateevents.consumed
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.flow.MutableSharedFlow
+import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.test.StandardTestDispatcher
 import kotlinx.coroutines.test.advanceUntilIdle
 import kotlinx.coroutines.test.runTest
 import mega.privacy.android.core.test.extension.CoroutineMainDispatcherExtension
+import mega.privacy.android.domain.entity.MyAccountUpdate
 import mega.privacy.android.domain.entity.user.UserChanges
 import mega.privacy.android.domain.exception.MegaException
 import mega.privacy.android.domain.usecase.GetFolderVersionInfo
 import mega.privacy.android.domain.usecase.MonitorUserUpdates
+import mega.privacy.android.domain.usecase.account.MonitorMyAccountUpdateUseCase
 import mega.privacy.android.domain.usecase.cache.ClearCacheUseCase
 import mega.privacy.android.domain.usecase.cache.GetCacheSizeUseCase
 import mega.privacy.android.domain.usecase.file.GetFileVersionsOption
@@ -66,6 +69,14 @@ internal class FilePreferencesViewModelTest {
     private val setRubbishBinAutopurgePeriodUseCase: SetRubbishBinAutopurgePeriodUseCase = mock()
     private val isRubbishBinAutopurgePeriodValidUseCase: IsRubbishBinAutopurgePeriodValidUseCase =
         mock()
+    private val myAccountUpdateFlow = MutableStateFlow(
+        MyAccountUpdate(
+            MyAccountUpdate.Action.STORAGE_STATE_CHANGED,
+        )
+    )
+    private val monitorMyAccountUpdateUseCase = mock<MonitorMyAccountUpdateUseCase>() {
+        on { invoke() }.thenReturn(myAccountUpdateFlow)
+    }
 
     @BeforeEach
     fun setUp() {
@@ -109,7 +120,8 @@ internal class FilePreferencesViewModelTest {
             isRubbishBinAutopurgeEnabledUseCase,
             getRubbishBinAutopurgePeriodUseCase,
             setRubbishBinAutopurgePeriodUseCase,
-            isRubbishBinAutopurgePeriodValidUseCase
+            isRubbishBinAutopurgePeriodValidUseCase,
+            monitorMyAccountUpdateUseCase
         )
     }
 
@@ -277,6 +289,17 @@ internal class FilePreferencesViewModelTest {
                 assertThat(state.rubbishBinAutopurgePeriod).isEqualTo(7)
             }
         }
+
+    @Test
+    fun `test that monitor my account update emits the correct value`() = runTest {
+        val myAccountUpdate = MyAccountUpdate(MyAccountUpdate.Action.UPDATE_ACCOUNT_DETAILS)
+
+        myAccountUpdateFlow.emit(myAccountUpdate)
+        advanceUntilIdle()
+        underTest.monitorMyAccountUpdateEvent.test {
+            assertThat(awaitItem()).isEqualTo(myAccountUpdate)
+        }
+    }
 
     companion object {
         @JvmField

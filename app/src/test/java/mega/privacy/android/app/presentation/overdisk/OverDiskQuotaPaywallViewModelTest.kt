@@ -3,14 +3,18 @@ package mega.privacy.android.app.presentation.overdisk
 import app.cash.turbine.test
 import com.google.common.truth.Truth.assertThat
 import kotlinx.coroutines.flow.MutableSharedFlow
+import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.test.advanceUntilIdle
 import kotlinx.coroutines.test.runTest
 import mega.privacy.android.core.test.extension.CoroutineMainDispatcherExtension
+import mega.privacy.android.domain.entity.MyAccountUpdate
 import mega.privacy.android.domain.entity.Product
 import mega.privacy.android.domain.entity.billing.Pricing
 import mega.privacy.android.domain.usecase.GetPricing
 import mega.privacy.android.domain.usecase.IsDatabaseEntryStale
 import mega.privacy.android.domain.usecase.account.GetSpecificAccountDetailUseCase
 import mega.privacy.android.domain.usecase.account.GetUserDataUseCase
+import mega.privacy.android.domain.usecase.account.MonitorMyAccountUpdateUseCase
 import mega.privacy.android.domain.usecase.account.MonitorUpdateUserDataUseCase
 import org.junit.jupiter.api.AfterEach
 import org.junit.jupiter.api.BeforeEach
@@ -35,6 +39,14 @@ class OverDiskQuotaPaywallViewModelTest {
     private val getPricing: GetPricing = mock()
     private val getUserDataUseCase: GetUserDataUseCase = mock()
     private val monitorUpdateUserDataUseCase: MonitorUpdateUserDataUseCase = mock()
+    private val myAccountUpdateFlow = MutableStateFlow(
+        MyAccountUpdate(
+            MyAccountUpdate.Action.STORAGE_STATE_CHANGED,
+        )
+    )
+    private val monitorMyAccountUpdateUseCase = mock<MonitorMyAccountUpdateUseCase>() {
+        on { invoke() }.thenReturn(myAccountUpdateFlow)
+    }
 
     @BeforeEach
     fun setup() {
@@ -150,6 +162,17 @@ class OverDiskQuotaPaywallViewModelTest {
             verify(getUserDataUseCase).invoke()
         }
 
+    @Test
+    fun `test that monitor my account update emits the correct value`() = runTest {
+        val myAccountUpdate = MyAccountUpdate(MyAccountUpdate.Action.UPDATE_ACCOUNT_DETAILS)
+
+        myAccountUpdateFlow.emit(myAccountUpdate)
+        advanceUntilIdle()
+        underTest.monitorMyAccountUpdate.test {
+            assertThat(awaitItem()).isEqualTo(myAccountUpdate)
+        }
+    }
+
     @AfterEach
     fun resetMocks() {
         reset(
@@ -167,7 +190,8 @@ class OverDiskQuotaPaywallViewModelTest {
             getSpecificAccountDetailUseCase,
             getPricing,
             getUserDataUseCase,
-            monitorUpdateUserDataUseCase
+            monitorUpdateUserDataUseCase,
+            monitorMyAccountUpdateUseCase
         )
     }
 }

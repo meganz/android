@@ -45,6 +45,7 @@ import mega.privacy.android.app.utils.AlertDialogUtil.dismissAlertDialogIfExists
 import mega.privacy.android.app.utils.AlertDialogUtil.isAlertDialogShown
 import mega.privacy.android.app.utils.ColorUtils.getThemeColor
 import mega.privacy.android.app.utils.Util
+import mega.privacy.android.domain.entity.MyAccountUpdate
 import mega.privacy.android.shared.resources.R as sharedR
 import nz.mega.sdk.MegaAccountDetails
 import timber.log.Timber
@@ -124,6 +125,12 @@ class SettingsFileManagementFragment : SettingsBaseFragment(),
             Lifecycle.State.STARTED
         ) { isConnected ->
             setOnlineOptions(isConnected)
+        }
+        viewLifecycleOwner.collectFlow(viewModel.monitorMyAccountUpdateEvent) {
+            if (it.action == MyAccountUpdate.Action.UPDATE_ACCOUNT_DETAILS) {
+                setRubbishInfo()
+                viewModel.getRubbishBinAutopurgeInfo()
+            }
         }
     }
 

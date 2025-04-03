@@ -11,6 +11,7 @@ import mega.privacy.android.domain.usecase.GetPricing
 import mega.privacy.android.domain.usecase.IsDatabaseEntryStale
 import mega.privacy.android.domain.usecase.account.GetSpecificAccountDetailUseCase
 import mega.privacy.android.domain.usecase.account.GetUserDataUseCase
+import mega.privacy.android.domain.usecase.account.MonitorMyAccountUpdateUseCase
 import mega.privacy.android.domain.usecase.account.MonitorUpdateUserDataUseCase
 import timber.log.Timber
 import javax.inject.Inject
@@ -26,6 +27,7 @@ class OverDiskQuotaPaywallViewModel @Inject constructor(
     private val getPricing: GetPricing,
     private val getUserDataUseCase: GetUserDataUseCase,
     monitorUpdateUserDataUseCase: MonitorUpdateUserDataUseCase,
+    monitorMyAccountUpdateUseCase: MonitorMyAccountUpdateUseCase,
 ) : ViewModel() {
     private val _pricing = MutableStateFlow(Pricing(emptyList()))
 
@@ -38,6 +40,11 @@ class OverDiskQuotaPaywallViewModel @Inject constructor(
      * Monitor update user data broadcast event
      */
     val monitorUpdateUserData = monitorUpdateUserDataUseCase()
+
+    /**
+     * Monitor my account update broadcast event
+     */
+    val monitorMyAccountUpdate = monitorMyAccountUpdateUseCase()
 
     init {
         viewModelScope.launch {
