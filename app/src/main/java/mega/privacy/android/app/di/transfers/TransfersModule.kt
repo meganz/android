@@ -25,6 +25,11 @@ import mega.privacy.android.data.mapper.transfer.TransfersFinishNotificationSumm
 import mega.privacy.android.data.mapper.transfer.TransfersFinishedNotificationMapper
 import mega.privacy.android.data.mapper.transfer.TransfersNotificationMapper
 import mega.privacy.android.data.mapper.transfer.TransfersProgressNotificationSummaryBuilder
+import mega.privacy.android.domain.usecase.transfers.active.HandleChatTransferEventsUseCase
+import mega.privacy.android.domain.usecase.transfers.active.HandleDownloadTransferEventsUseCase
+import mega.privacy.android.domain.usecase.transfers.active.HandleTransferEventUseCase
+import mega.privacy.android.domain.usecase.transfers.active.HandleUploadTransferEventsUseCase
+import mega.privacy.android.domain.usecase.transfers.active.IHandleTransferEventUseCase
 
 /**
  * Module for transfers
@@ -86,6 +91,34 @@ abstract class TransfersModule {
     @Binds
     abstract fun bindTransfersGroupProgressNotificationBuilder(builder: DefaultTransfersActionGroupProgressNotificationBuilder): TransfersActionGroupProgressNotificationBuilder
 
+
+    /**
+     * Binds [HandleTransferEventUseCase] to [IHandleTransferEventUseCase] set
+     */
+    @Binds
+    @IntoSet
+    abstract fun provideGeneralTransferHandle(useCase: HandleTransferEventUseCase): @JvmSuppressWildcards IHandleTransferEventUseCase
+
+    /**
+     * Binds [HandleUploadTransferEventsUseCase] to [IHandleTransferEventUseCase] set
+     */
+    @Binds
+    @IntoSet
+    abstract fun provideUploadTransferHandle(useCase: HandleUploadTransferEventsUseCase): @JvmSuppressWildcards IHandleTransferEventUseCase
+
+    /**
+     * Binds [HandleDownloadTransferEventsUseCase] to [IHandleTransferEventUseCase] set
+     */
+    @Binds
+    @IntoSet
+    abstract fun provideDownloadTransferHandle(useCase: HandleDownloadTransferEventsUseCase): @JvmSuppressWildcards IHandleTransferEventUseCase
+
+    /**
+     * Binds [HandleChatTransferEventsUseCase] to [IHandleTransferEventUseCase] set
+     */
+    @Binds
+    @IntoSet
+    abstract fun provideChatTransferHandle(useCase: HandleChatTransferEventsUseCase): @JvmSuppressWildcards IHandleTransferEventUseCase
 
     companion object {
 

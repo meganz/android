@@ -10,11 +10,11 @@ import javax.inject.Inject
  */
 class HandleDownloadTransferEventsUseCase @Inject constructor(
     private val scanMediaFileUseCase: ScanMediaFileUseCase,
-) {
+) : IHandleTransferEventUseCase {
     /**
      * Invoke
      */
-    suspend operator fun invoke(vararg events: TransferEvent) {
+    override suspend operator fun invoke(vararg events: TransferEvent) {
         events.filter { event ->
             event.transfer.transferType == TransferType.DOWNLOAD
                     && event is TransferEvent.TransferFinishEvent

@@ -27,13 +27,13 @@ class HandleTransferEventUseCase @Inject internal constructor(
     private val handleAvailableOfflineEventUseCase: HandleAvailableOfflineEventUseCase,
     private val handleSDCardEventUseCase: HandleSDCardEventUseCase,
     private val getTransferDestinationUriUseCase: GetTransferDestinationUriUseCase,
-) {
+) : IHandleTransferEventUseCase {
 
     /**
      * Invoke.
      * @param events the [TransferEvent] that has been received.
      */
-    suspend operator fun invoke(vararg events: TransferEvent) {
+    override suspend operator fun invoke(vararg events: TransferEvent) {
         val transferEvents = events.asList().takeIf { it.isNotEmpty() } ?: return
 
         val eventsWithDestinationMap = transferEvents.associateWith { event ->

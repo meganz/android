@@ -16,11 +16,11 @@ import javax.inject.Inject
 class HandleChatTransferEventsUseCase @Inject constructor(
     private val attachNodeWithPendingMessageUseCase: AttachNodeWithPendingMessageUseCase,
     private val updatePendingMessageUseCase: UpdatePendingMessageUseCase,
-) {
+) : IHandleTransferEventUseCase {
     /**
      * Invoke
      */
-    suspend operator fun invoke(vararg events: TransferEvent) {
+    override suspend operator fun invoke(vararg events: TransferEvent) {
         events
             .filter { it.transfer.transferType == TransferType.CHAT_UPLOAD }
             .filterIsInstance<TransferEvent.TransferFinishEvent>()

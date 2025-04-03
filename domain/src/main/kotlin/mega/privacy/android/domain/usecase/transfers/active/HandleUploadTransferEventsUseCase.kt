@@ -12,11 +12,11 @@ import javax.inject.Inject
  */
 class HandleUploadTransferEventsUseCase @Inject constructor(
     private val setNodeAttributesAfterUploadUseCase: SetNodeAttributesAfterUploadUseCase,
-) {
+) : IHandleTransferEventUseCase {
     /**
      * Invoke
      */
-    suspend operator fun invoke(vararg events: TransferEvent) {
+    override suspend operator fun invoke(vararg events: TransferEvent) {
         events
             .filter { event ->
                 event.transfer.transferType == TransferType.GENERAL_UPLOAD
