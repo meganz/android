@@ -1,7 +1,6 @@
 package mega.privacy.android.app.presentation.fileinfo
 
 import android.content.Intent
-import android.net.Uri
 import android.os.Build
 import android.os.Bundle
 import androidx.activity.OnBackPressedCallback
@@ -26,13 +25,13 @@ import kotlinx.coroutines.launch
 import mega.privacy.android.analytics.Analytics
 import mega.privacy.android.app.BaseActivity
 import mega.privacy.android.app.R
-import mega.privacy.android.app.activities.WebViewActivity
 import mega.privacy.android.app.activities.contract.DeleteVersionsHistoryActivityContract
 import mega.privacy.android.app.activities.contract.NameCollisionActivityContract
 import mega.privacy.android.app.activities.contract.SelectFolderToCopyActivityContract
 import mega.privacy.android.app.activities.contract.SelectFolderToMoveActivityContract
 import mega.privacy.android.app.activities.contract.SelectUsersToShareActivityContract
 import mega.privacy.android.app.featuretoggle.AppFeatures
+import mega.privacy.android.app.extensions.launchUrl
 import mega.privacy.android.app.interfaces.ActionBackupListener
 import mega.privacy.android.app.main.ManagerActivity
 import mega.privacy.android.app.main.controllers.NodeController
@@ -171,7 +170,9 @@ class FileInfoActivity : BaseActivity() {
                     viewState = uiState,
                     snackBarHostState = snackBarHostState,
                     onBackPressed = onBackPressedDispatcher::onBackPressed,
-                    onTakeDownLinkClick = this::navigateToLink,
+                    onTakeDownLinkClick = {
+                        this@FileInfoActivity.launchUrl(it)
+                    },
                     onLocationClick = { this.navigateToLocation(uiState.nodeLocationInfo) },
                     availableOfflineChanged = { availableOffline ->
                         viewModel.availableOfflineChanged(availableOffline)
@@ -386,7 +387,10 @@ class FileInfoActivity : BaseActivity() {
                 listOf(NodeId(viewModel.node.handle))
             )
 
-            FileInfoMenuAction.DisputeTakedown -> navigateToDisputeTakeDown()
+            FileInfoMenuAction.DisputeTakedown -> {
+                this@FileInfoActivity.launchUrl(Constants.DISPUTE_URL)
+            }
+
             FileInfoMenuAction.SelectionModeAction.ChangePermission -> {
                 viewModel.initiateChangePermission(null)
             }
@@ -398,14 +402,6 @@ class FileInfoActivity : BaseActivity() {
 
             FileInfoMenuAction.SelectionModeAction.SelectAll -> viewModel.selectAllVisibleContacts()
         }
-    }
-
-    private fun navigateToLink(link: String) {
-        val uriUrl = Uri.parse(link)
-        val launchBrowser = Intent(this, WebViewActivity::class.java)
-            .addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP)
-            .setData(uriUrl)
-        startActivity(launchBrowser)
     }
 
     private fun navigateToLocation(locationInfo: LocationInfo?) {
@@ -444,13 +440,6 @@ class FileInfoActivity : BaseActivity() {
 
     private fun navigateToCopy() = copyLauncher.launch(longArrayOf(viewModel.nodeId.longValue))
     private fun navigateToMove() = moveLauncher.launch(longArrayOf(viewModel.nodeId.longValue))
-
-    private fun navigateToDisputeTakeDown() =
-        startActivity(
-            Intent(this, WebViewActivity::class.java)
-                .addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP)
-                .setData(Uri.parse(Constants.DISPUTE_URL))
-        )
 
     private fun navigateToGetLink() {
         if (showTakenDownNodeActionNotAvailableDialog(viewModel.node, this)) {
