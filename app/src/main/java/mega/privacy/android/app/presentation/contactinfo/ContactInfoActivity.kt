@@ -220,7 +220,6 @@ class ContactInfoActivity : BaseActivity(), ActionNodeCallback, MegaRequestListe
     }
 
     override fun showLeaveFolderDialog(nodeIds: List<Long>) {
-        onFolderLeave()
         viewModel.setLeaveFolderNodeIds(nodeIds)
     }
 
@@ -561,6 +560,7 @@ class ContactInfoActivity : BaseActivity(), ActionNodeCallback, MegaRequestListe
                     DenyEntryToCallDialog()
                     state.leaveFolderNodeIds?.let {
                         LeaveShareDialog(handles = it, onDismiss = {
+                            onFolderLeave()
                             viewModel.clearLeaveFolderNodeIds()
                         })
                     }
