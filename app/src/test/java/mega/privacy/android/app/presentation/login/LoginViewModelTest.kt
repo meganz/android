@@ -27,6 +27,8 @@ import mega.privacy.android.core.test.extension.CoroutineMainDispatcherExtension
 import mega.privacy.android.domain.entity.Progress
 import mega.privacy.android.domain.entity.ThemeMode
 import mega.privacy.android.domain.entity.login.EphemeralCredentials
+import mega.privacy.android.domain.entity.user.UserCredentials
+import mega.privacy.android.domain.exception.LoginLoggedOutFromOtherLocation
 import mega.privacy.android.domain.exception.MegaException
 import mega.privacy.android.domain.usecase.GetThemeMode
 import mega.privacy.android.domain.usecase.RootNodeExistsUseCase
@@ -503,6 +505,31 @@ internal class LoginViewModelTest {
         advanceUntilIdle()
         verify(resumeCreateAccountUseCase).invoke("session")
     }
+
+    @Test
+    fun `test that loginFailed with LoginLoggedOutFromOtherLocation then fetchNodesUpdate is null`() =
+        runTest {
+            whenever(fastLoginUseCase(any(), any(), any())).thenThrow(
+                LoginLoggedOutFromOtherLocation()
+            )
+            whenever(getAccountCredentialsUseCase()).thenReturn(
+                UserCredentials(
+                    email = "email",
+                    session = "session",
+                    firstName = "firstName",
+                    lastName = "lastName",
+                    myHandle = "myHandle"
+                )
+            )
+            underTest.fastLogin(false)
+            advanceUntilIdle()
+            underTest.state.test {
+                val item = awaitItem()
+                assertThat(item.fetchNodesUpdate).isNull()
+                assertThat(item.isLoginInProgress).isFalse()
+                assertThat(item.loginException).isInstanceOf(LoginLoggedOutFromOtherLocation::class.java)
+            }
+        }
 
     companion object {
         private val scheduler = TestCoroutineScheduler()

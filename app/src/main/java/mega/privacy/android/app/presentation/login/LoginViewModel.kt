@@ -722,6 +722,7 @@ class LoginViewModel @Inject constructor(
                     isLoginRequired = true,
                     is2FAEnabled = is2FARequest,
                     is2FARequired = false,
+                    fetchNodesUpdate = null,
                     loginException = this,
                     snackbarMessage = snackbarMessage ?: consumed()
                 )
@@ -733,6 +734,7 @@ class LoginViewModel @Inject constructor(
                     isLoginRequired = true,
                     is2FAEnabled = is2FARequest,
                     is2FARequired = false,
+                    fetchNodesUpdate = null,
                     loginException = this.takeIf { exception -> exception is LoginLoggedOutFromOtherLocation },
                     snackbarMessage = error?.let { triggered(it) } ?: consumed()
                 )
