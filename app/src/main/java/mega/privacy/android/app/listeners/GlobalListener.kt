@@ -44,6 +44,7 @@ import mega.privacy.android.domain.usecase.GetPricing
 import mega.privacy.android.domain.usecase.account.BroadcastAccountBlockedUseCase
 import mega.privacy.android.domain.usecase.account.BroadcastMyAccountUpdateUseCase
 import mega.privacy.android.domain.usecase.account.GetNotificationCountUseCase
+import mega.privacy.android.domain.usecase.account.GetUserDataUseCase
 import mega.privacy.android.domain.usecase.account.SetSecurityUpgradeInAppUseCase
 import mega.privacy.android.domain.usecase.billing.GetPaymentMethodUseCase
 import mega.privacy.android.domain.usecase.chat.UpdatePushNotificationSettingsUseCase
@@ -90,6 +91,7 @@ class GlobalListener @Inject constructor(
     private val shouldShowRichLinkWarningUseCase: ShouldShowRichLinkWarningUseCase,
     private val isRichPreviewsEnabledUseCase: IsRichPreviewsEnabledUseCase,
     private val broadcastMiscLoadedUseCase: BroadcastMiscLoadedUseCase,
+    private val getUserDataUseCase: GetUserDataUseCase,
 ) : MegaGlobalListenerInterface {
 
     private val globalSyncUpdates = MutableSharedFlow<Unit>()
@@ -186,6 +188,7 @@ class GlobalListener @Inject constructor(
         Timber.d("onAccountUpdate")
 
         applicationScope.launch {
+            runCatching { getUserDataUseCase() }.onFailure { Timber.e(it) }
             runCatching { getPaymentMethodUseCase(true) }.onFailure { Timber.e(it) }
             runCatching { getPricing(true) }.onFailure { Timber.e(it) }
             runCatching {

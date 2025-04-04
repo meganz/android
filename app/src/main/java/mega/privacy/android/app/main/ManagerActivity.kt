@@ -7307,6 +7307,8 @@ class ManagerActivity : PasscodeActivity(), NavigationView.OnNavigationItemSelec
                 if (isBusinessAccount) {
                     invalidateOptionsMenu()
                 }
+                checkForInAppAdvertisement(forceAskConsent = true)
+                handleShowingAds()
             }
         }
     }
