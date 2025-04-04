@@ -179,8 +179,7 @@ internal class SyncFoldersViewModel @Inject constructor(
                                 }.onSuccess { folderTreeInfo ->
                                     with(folderTreeInfo) {
                                         numOfFiles = numberOfFiles
-                                        numOfFolders =
-                                            numberOfFolders - 1 //we don't want to count itself
+                                        numOfFolders = numberOfFolders
                                         totalSizeInBytes = totalCurrentSizeInBytes
                                     }
                                 }.onFailure {
@@ -257,8 +256,7 @@ internal class SyncFoldersViewModel @Inject constructor(
                     }.onSuccess { folderTreeInfo ->
                         with(folderTreeInfo) {
                             numOfFiles = numberOfFiles
-                            numOfFolders =
-                                numberOfFolders - 1 //we don't want to count itself
+                            numOfFolders = numberOfFolders
                             totalSizeInBytes = totalCurrentSizeInBytes
                         }
                     }.onFailure {
