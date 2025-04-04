@@ -3,6 +3,7 @@ package mega.privacy.android.app.mediaplayer.videoplayer.navigation
 import androidx.compose.material.ScaffoldState
 import androidx.media3.exoplayer.ExoPlayer
 import androidx.navigation.NavGraphBuilder
+import androidx.navigation.NavHostController
 import androidx.navigation.navigation
 import com.google.accompanist.navigation.material.BottomSheetNavigator
 import com.google.accompanist.navigation.material.ExperimentalMaterialNavigationApi
@@ -14,6 +15,7 @@ internal object VideoPlayerNavigationGraph
 
 @OptIn(ExperimentalMaterialNavigationApi::class)
 internal fun NavGraphBuilder.videoPlayerComposeNavigationGraph(
+    navHostController: NavHostController,
     bottomSheetNavigator: BottomSheetNavigator,
     scaffoldState: ScaffoldState,
     viewModel: VideoPlayerViewModel,
@@ -27,6 +29,10 @@ internal fun NavGraphBuilder.videoPlayerComposeNavigationGraph(
             scaffoldState = scaffoldState,
             viewModel = viewModel,
             player = player,
-        )
+        ) {
+            navHostController.navigate(VideoQueueScreen)
+        }
+
+        videoQueueScreen(videoPlayerViewModel = viewModel)
     }
 }

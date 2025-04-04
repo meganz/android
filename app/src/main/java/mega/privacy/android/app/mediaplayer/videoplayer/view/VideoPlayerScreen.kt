@@ -46,7 +46,6 @@ import androidx.lifecycle.compose.LocalLifecycleOwner
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.media3.common.Player
 import androidx.media3.common.Player.STATE_BUFFERING
-import androidx.media3.common.Player.STATE_IDLE
 import androidx.media3.common.util.UnstableApi
 import androidx.media3.exoplayer.ExoPlayer
 import androidx.media3.ui.PlayerView
@@ -75,6 +74,7 @@ internal fun VideoPlayerScreen(
     scaffoldState: ScaffoldState,
     viewModel: VideoPlayerViewModel,
     player: ExoPlayer?,
+    playQueueButtonClicked: () -> Unit,
 ) {
     val lifecycle = LocalLifecycleOwner.current.lifecycle
     val context = LocalContext.current
@@ -91,7 +91,7 @@ internal fun VideoPlayerScreen(
     val navigationBarHeightPx = with(density) { navigationBarHeight.toPx().toInt() }
 
     val uiState by viewModel.uiState.collectAsStateWithLifecycle()
-    var playbackState by rememberSaveable { mutableIntStateOf(STATE_IDLE) }
+    var playbackState by rememberSaveable { mutableIntStateOf(STATE_BUFFERING) }
     val playerEventListener = object : Player.Listener {
         override fun onPlaybackStateChanged(state: Int) {
             playbackState = state
@@ -157,8 +157,13 @@ internal fun VideoPlayerScreen(
                             .apply {
                                 VideoPlayerController(
                                     context = context,
+                                    coroutineScope = coroutineScope,
                                     viewModel = viewModel,
-                                    container = root
+                                    container = root,
+                                    playQueueButtonClicked = {
+                                        autoHideJob?.cancel()
+                                        playQueueButtonClicked()
+                                    },
                                 ) { bitmap ->
                                     val (width, height) =
                                         if (orientation == ORIENTATION_LANDSCAPE && bitmap.height > bitmap.width) {

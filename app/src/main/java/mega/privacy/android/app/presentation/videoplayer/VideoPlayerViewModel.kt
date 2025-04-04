@@ -48,6 +48,7 @@ import mega.privacy.android.app.mediaplayer.gateway.MediaPlayerGateway
 import mega.privacy.android.app.mediaplayer.model.MediaPlaySources
 import mega.privacy.android.app.mediaplayer.queue.model.MediaQueueItemType
 import mega.privacy.android.app.mediaplayer.service.Metadata
+import mega.privacy.android.app.presentation.time.mapper.DurationInSecondsTextMapper
 import mega.privacy.android.app.presentation.transfers.starttransfer.model.TransferTriggerEvent
 import mega.privacy.android.app.presentation.transfers.starttransfer.model.TransferTriggerEvent.DownloadTriggerEvent
 import mega.privacy.android.app.presentation.transfers.starttransfer.model.TransferTriggerEvent.StartDownloadForOffline
@@ -194,6 +195,8 @@ import java.text.SimpleDateFormat
 import java.time.Instant
 import java.util.Date
 import javax.inject.Inject
+import kotlin.collections.filter
+import kotlin.time.Duration.Companion.milliseconds
 import kotlin.time.Duration.Companion.seconds
 
 /**
@@ -262,6 +265,7 @@ class VideoPlayerViewModel @Inject constructor(
     private val deleteNodeAttachmentMessageByIdsUseCase: DeleteNodeAttachmentMessageByIdsUseCase,
     private val monitorNodeUpdatesUseCase: MonitorNodeUpdatesUseCase,
     private val launchSourceMapper: LaunchSourceMapper,
+    private val durationInSecondsTextMapper: DurationInSecondsTextMapper,
     savedStateHandle: SavedStateHandle,
 ) : ViewModel() {
     val uiState: StateFlow<VideoPlayerUiState>
@@ -982,8 +986,19 @@ class VideoPlayerViewModel @Inject constructor(
                 isPaidUser = uiState.value.accountType?.isPaid == true,
                 isExpiredBusinessUser = uiState.value.isBusinessAccountExpired
             )
+
+            val updatedItems = items.mapIndexed { index, item ->
+                val newType = when {
+                    index == playingIndex -> MediaQueueItemType.Playing
+                    index < playingIndex -> MediaQueueItemType.Previous
+                    else -> MediaQueueItemType.Next
+                }
+                item.takeIf { it.type == newType } ?: item.copy(type = newType)
+            }
+
             uiState.update {
                 it.copy(
+                    items = updatedItems,
                     currentPlayingHandle = handle,
                     currentPlayingIndex = playingIndex,
                     menuActions = actions
@@ -1497,6 +1512,26 @@ class VideoPlayerViewModel @Inject constructor(
     internal suspend fun deleteMessageFromChat() {
         deleteNodeAttachmentMessageByIdsUseCase(chatId, messageId)
     }
+
+    internal fun updatePlaybackStateWithReplay(value: Boolean) {
+        mediaPlayerGateway.setPlayWhenReady(value)
+        uiState.update {
+            it.copy(
+                mediaPlaybackState = if (value) {
+                    MediaPlaybackState.Playing
+                } else {
+                    MediaPlaybackState.Paused
+                },
+                isAutoReplay = !value
+            )
+        }
+    }
+
+    internal fun getCurrentPlayingPosition() =
+        mediaPlayerGateway.getCurrentPlayingPosition().formatToString(durationInSecondsTextMapper)
+
+    private fun Long.formatToString(durationInSecondsTextMapper: DurationInSecondsTextMapper) =
+        durationInSecondsTextMapper(this.milliseconds)
 
     companion object {
         private const val MAX_RETRY = 6

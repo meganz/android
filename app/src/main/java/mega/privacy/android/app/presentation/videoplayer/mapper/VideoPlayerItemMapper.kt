@@ -1,6 +1,7 @@
 package mega.privacy.android.app.presentation.videoplayer.mapper
 
 import mega.privacy.android.app.mediaplayer.queue.model.MediaQueueItemType
+import mega.privacy.android.app.presentation.time.mapper.DurationInSecondsTextMapper
 import mega.privacy.android.app.presentation.videoplayer.model.VideoPlayerItem
 import java.io.File
 import javax.inject.Inject
@@ -10,7 +11,9 @@ import kotlin.time.Duration.Companion.seconds
 /**
  * Mapper to convert VideoPlayerEntity
  */
-class VideoPlayerItemMapper @Inject constructor() {
+class VideoPlayerItemMapper @Inject constructor(
+    private val durationInSecondsTextMapper: DurationInSecondsTextMapper,
+) {
 
     /**
      * Convert to VideoPlayerEntity
@@ -28,6 +31,6 @@ class VideoPlayerItemMapper @Inject constructor() {
         thumbnail = thumbnail,
         type = type,
         size = size,
-        duration = duration,
+        duration = durationInSecondsTextMapper(duration),
     )
 }

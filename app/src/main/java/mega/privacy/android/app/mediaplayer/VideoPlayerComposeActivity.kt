@@ -26,6 +26,7 @@ import androidx.activity.viewModels
 import androidx.appcompat.app.AppCompatDelegate
 import androidx.compose.material.rememberScaffoldState
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -58,6 +59,8 @@ import mega.privacy.android.app.mediaplayer.gateway.MediaPlayerGateway
 import mega.privacy.android.app.mediaplayer.service.AudioPlayerService
 import mega.privacy.android.app.mediaplayer.service.MediaPlayerCallback
 import mega.privacy.android.app.mediaplayer.service.Metadata
+import mega.privacy.android.app.mediaplayer.videoplayer.navigation.VIDEO_PLAYER_SCREEN_ROUTE
+import mega.privacy.android.app.mediaplayer.videoplayer.navigation.VIDEO_QUEUE_SCREEN_ROUTE
 import mega.privacy.android.app.mediaplayer.videoplayer.navigation.VideoPlayerNavigationGraph
 import mega.privacy.android.app.mediaplayer.videoplayer.navigation.videoPlayerComposeNavigationGraph
 import mega.privacy.android.app.presentation.container.AppContainer
@@ -281,7 +284,6 @@ class VideoPlayerComposeActivity : PasscodeActivity() {
         setContent {
             val mode by getThemeMode().collectAsStateWithLifecycle(initialValue = ThemeMode.System)
             var passcodeEnabled by remember { mutableStateOf(true) }
-            val uiState by videoPlayerViewModel.uiState.collectAsStateWithLifecycle()
 
             val containers: List<@Composable (@Composable () -> Unit) -> Unit> = listOf(
                 { OriginalTheme(isDark = mode.isDarkMode(), content = it) },
@@ -301,13 +303,29 @@ class VideoPlayerComposeActivity : PasscodeActivity() {
                 val bottomSheetNavigator = rememberBottomSheetNavigator()
                 val navHostController =
                     rememberNavController(bottomSheetNavigator)
+                val uiState by videoPlayerViewModel.uiState.collectAsStateWithLifecycle()
                 val scaffoldState = rememberScaffoldState()
+
+                LaunchedEffect(navHostController) {
+                    navHostController.currentBackStackEntryFlow.collect { backStackEntry ->
+                        backStackEntry.destination.route?.let { currentRoute ->
+                            when {
+                                currentRoute.contains(VIDEO_PLAYER_SCREEN_ROUTE) ->
+                                    handleAutoReplayIfPaused()
+
+                                currentRoute.contains(VIDEO_QUEUE_SCREEN_ROUTE) ->
+                                    videoPlayerViewModel.updatePlaybackStateWithReplay(false)
+                            }
+                        }
+                    }
+                }
 
                 NavHost(
                     navController = navHostController,
                     startDestination = VideoPlayerNavigationGraph
                 ) {
                     videoPlayerComposeNavigationGraph(
+                        navHostController = navHostController,
                         bottomSheetNavigator = bottomSheetNavigator,
                         scaffoldState = scaffoldState,
                         viewModel = videoPlayerViewModel,
@@ -338,6 +356,14 @@ class VideoPlayerComposeActivity : PasscodeActivity() {
         registerReceiver(headsetPlugReceiver, IntentFilter(Intent.ACTION_HEADSET_PLUG))
         setupObserver()
         initMediaSession()
+    }
+
+    private fun handleAutoReplayIfPaused() {
+        with(videoPlayerViewModel.uiState.value) {
+            if (mediaPlaybackState == MediaPlaybackState.Paused && isAutoReplay) {
+                videoPlayerViewModel.updatePlaybackStateWithReplay(true)
+            }
+        }
     }
 
     private fun observeRotationSettingsChange() {
@@ -755,6 +781,16 @@ class VideoPlayerComposeActivity : PasscodeActivity() {
                 mediaSessionHelper.setupMediaSession()
             }
         }
+    }
+
+    override fun onStop() {
+        super.onStop()
+        videoPlayerViewModel.updatePlaybackStateWithReplay(false)
+    }
+
+    override fun onStart() {
+        super.onStart()
+        handleAutoReplayIfPaused()
     }
 
     override fun onDestroy() {

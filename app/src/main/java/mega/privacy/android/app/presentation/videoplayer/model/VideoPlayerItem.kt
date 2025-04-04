@@ -4,8 +4,6 @@ import mega.privacy.android.icon.pack.R as iconPackR
 import androidx.annotation.DrawableRes
 import mega.privacy.android.app.mediaplayer.queue.model.MediaQueueItemType
 import java.io.File
-import kotlin.time.Duration
-import kotlin.time.Duration.Companion.seconds
 
 
 /**
@@ -20,6 +18,7 @@ import kotlin.time.Duration.Companion.seconds
  * @property type item type
  * @property size size of the node
  * @property duration the duration of media item
+ * @property isSelected whether the item is selected
  */
 data class VideoPlayerItem(
     @DrawableRes val icon: Int = iconPackR.drawable.ic_video_medium_solid,
@@ -28,5 +27,6 @@ data class VideoPlayerItem(
     val thumbnail: File? = null,
     val type: MediaQueueItemType,
     val size: Long,
-    val duration: Duration = 0.seconds,
+    val duration: String,
+    val isSelected: Boolean = false,
 )

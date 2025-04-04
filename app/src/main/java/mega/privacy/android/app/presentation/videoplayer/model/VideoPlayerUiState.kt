@@ -8,6 +8,7 @@ import mega.privacy.android.app.presentation.transfers.starttransfer.model.Trans
 import mega.privacy.android.domain.entity.AccountType
 import mega.privacy.android.domain.entity.mediaplayer.RepeatToggleMode
 import mega.privacy.android.domain.exception.MegaException
+import mega.privacy.android.legacy.core.ui.model.SearchWidgetState
 
 /**
  * The UI state for the video player feature.
@@ -35,6 +36,11 @@ import mega.privacy.android.domain.exception.MegaException
  * @property clickedMenuAction the clicked menu action
  * @property downloadEvent the download event
  * @property menuOptionClickedContent menu option click content
+ * @property isAutoReplay whether is re-play the video automatically
+ * @property selectedItemHandles the selected item handles
+ * @property isActionMode whether the action mode is activated
+ * @property searchState SearchWidgetState
+ * @property query search query
  */
 data class VideoPlayerUiState(
     val items: List<VideoPlayerItem> = emptyList(),
@@ -59,5 +65,10 @@ data class VideoPlayerUiState(
     val showHiddenItems: Boolean? = null,
     val clickedMenuAction: VideoPlayerMenuAction? = null,
     val downloadEvent: StateEventWithContent<DownloadTriggerEvent> = consumed(),
-    val menuOptionClickedContent: MenuOptionClickedContent? = null
+    val menuOptionClickedContent: MenuOptionClickedContent? = null,
+    val isAutoReplay: Boolean = false,
+    val selectedItemHandles: List<Long> = emptyList(),
+    val isActionMode: Boolean = false,
+    val searchState: SearchWidgetState = SearchWidgetState.COLLAPSED,
+    val query: String? = null,
 )

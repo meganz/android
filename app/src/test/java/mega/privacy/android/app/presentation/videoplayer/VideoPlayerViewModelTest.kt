@@ -25,6 +25,7 @@ import mega.privacy.android.app.mediaplayer.gateway.MediaPlayerGateway
 import mega.privacy.android.app.mediaplayer.queue.model.MediaQueueItemType
 import mega.privacy.android.app.mediaplayer.service.Metadata
 import mega.privacy.android.app.presentation.myaccount.InstantTaskExecutorExtension
+import mega.privacy.android.app.presentation.time.mapper.DurationInSecondsTextMapper
 import mega.privacy.android.app.presentation.transfers.starttransfer.model.TransferTriggerEvent.DownloadTriggerEvent
 import mega.privacy.android.app.presentation.videoplayer.mapper.LaunchSourceMapper
 import mega.privacy.android.app.presentation.videoplayer.mapper.VideoPlayerItemMapper
@@ -192,7 +193,7 @@ import org.mockito.kotlin.wheneverBlocking
 import java.io.File
 import java.time.Instant
 import kotlin.Boolean
-import kotlin.time.Duration
+import kotlin.time.Duration.Companion.milliseconds
 import kotlin.time.Duration.Companion.seconds
 import kotlin.use
 
@@ -276,6 +277,7 @@ class VideoPlayerViewModelTest {
         mock<DeleteNodeAttachmentMessageByIdsUseCase>()
     private val fakeMonitorNodeUpdatesFlow = MutableSharedFlow<NodeUpdate>()
     private val monitorNodeUpdatesUseCase = mock<MonitorNodeUpdatesUseCase>()
+    private val durationInSecondsTextMapper = mock<DurationInSecondsTextMapper>()
     private val launchSourceMapper = mock<LaunchSourceMapper>()
     private val savedStateHandle = SavedStateHandle(mapOf())
 
@@ -283,6 +285,7 @@ class VideoPlayerViewModelTest {
     private val testFileName = "test.mp4"
     private val testSize = 100L
     private val testDuration = 200.seconds
+    private val testDurationString = "3:20"
     private val testAbsolutePath = "https://www.example.com"
     private val testTitle = "video queue title"
     private val expectedCollectionId = 123456L
@@ -353,7 +356,8 @@ class VideoPlayerViewModelTest {
             deleteNodeAttachmentMessageByIdsUseCase = deleteNodeAttachmentMessageByIdsUseCase,
             monitorNodeUpdatesUseCase = monitorNodeUpdatesUseCase,
             launchSourceMapper = launchSourceMapper,
-            savedStateHandle = savedStateHandle
+            savedStateHandle = savedStateHandle,
+            durationInSecondsTextMapper = durationInSecondsTextMapper
         )
         savedStateHandle[INTENT_EXTRA_KEY_VIDEO_COLLECTION_ID] = expectedCollectionId
         savedStateHandle[INTENT_EXTRA_KEY_VIDEO_COLLECTION_TITLE] = expectedCollectionTitle
@@ -441,6 +445,7 @@ class VideoPlayerViewModelTest {
             deleteNodeAttachmentMessageByIdsUseCase,
             monitorNodeUpdatesUseCase,
             launchSourceMapper,
+            durationInSecondsTextMapper
         )
     }
 
@@ -648,7 +653,7 @@ class VideoPlayerViewModelTest {
                 fileName = testFileName
             )
             val node = initTypedVideoNode()
-            val videoPlayerItem = initVideoPlayerItem(testHandle, testFileName, testDuration)
+            val videoPlayerItem = initVideoPlayerItem(testHandle, testFileName)
             whenever(
                 videoPlayerItemMapper(
                     nodeHandle = testHandle,
@@ -681,11 +686,12 @@ class VideoPlayerViewModelTest {
             on { this.duration }.thenReturn(testDuration)
         }
 
-    private fun initVideoPlayerItem(handle: Long, name: String, duration: Duration) =
+    private fun initVideoPlayerItem(handle: Long, name: String, type: MediaQueueItemType? = null) =
         mock<VideoPlayerItem> {
             on { nodeHandle }.thenReturn(handle)
             on { nodeName }.thenReturn(name)
-            on { this.duration }.thenReturn(duration)
+            on { this.duration }.thenReturn(testDurationString)
+            on { this.type }.thenReturn(type)
         }
 
     @Test
@@ -720,7 +726,7 @@ class VideoPlayerViewModelTest {
                 initOfflineFileInfo(it, it.toString())
             }
             val items = offlineFiles.map {
-                initVideoPlayerItem(it.handle.toLong(), it.name, 200.seconds)
+                initVideoPlayerItem(it.handle.toLong(), it.name)
             }
             whenever(getOfflineNodesByParentIdUseCase(testParentId)).thenReturn(offlineFiles)
             offlineFiles.forEachIndexed { index, file ->
@@ -827,7 +833,7 @@ class VideoPlayerViewModelTest {
             }
             whenever(getFileByPathUseCase(testZipPath)).thenReturn(testFile)
             val items = testFiles.map {
-                initVideoPlayerItem(it.name.hashCode().toLong(), it.name, 200.seconds)
+                initVideoPlayerItem(it.name.hashCode().toLong(), it.name)
             }
             testFiles.forEachIndexed { index, file ->
                 whenever(
@@ -972,7 +978,7 @@ class VideoPlayerViewModelTest {
         whenever(httpServerIsRunningUseCase(any())).thenReturn(1)
 
         val entities = testVideoNodes.map {
-            initVideoPlayerItem(it.id.longValue, it.name, it.duration)
+            initVideoPlayerItem(it.id.longValue, it.name)
         }
         testVideoNodes.forEachIndexed { index, node ->
             whenever(
@@ -1221,12 +1227,14 @@ class VideoPlayerViewModelTest {
             val testHandle = 2L
             val handleNotInItems = 4L
             val testItems = (1..3).map {
-                initVideoPlayerItem(it.toLong(), it.toString(), 200.seconds)
+                initVideoPlayerItem(it.toLong(), it.toString())
             }
             whenever(launchSourceMapper(any(), any(), any(), any(), any(), any())).thenReturn(
                 emptyList()
             )
+            val testItem = initVideoPlayerItem(2.toLong(), "2", MediaQueueItemType.Playing)
             whenever(getVideoNodeByHandleUseCase(any(), any())).thenReturn(mock())
+            whenever(testItems[1].copy(type = MediaQueueItemType.Playing)).thenReturn(testItem)
             initViewModel()
             underTest.updateCurrentPlayingHandle(testHandle, testItems)
             testScheduler.advanceUntilIdle()
@@ -1236,6 +1244,7 @@ class VideoPlayerViewModelTest {
                         testItems.indexOfFirst { it.nodeHandle == testHandle }
                     )
                     assertThat(it.currentPlayingHandle).isEqualTo(testHandle)
+                    assertThat(it.items[1].type).isEqualTo(MediaQueueItemType.Playing)
                 }
                 underTest.updateCurrentPlayingHandle(handleNotInItems, testItems)
                 awaitItem().let {
@@ -1382,8 +1391,8 @@ class VideoPlayerViewModelTest {
         runTest {
             val testHandle = 1L
             val testItems: List<VideoPlayerItem> = listOf(
-                initVideoPlayerItem(2L, "", 200.seconds),
-                initVideoPlayerItem(testHandle, testHandle.toString(), 200.seconds),
+                initVideoPlayerItem(2L, ""),
+                initVideoPlayerItem(testHandle, testHandle.toString()),
             )
             val testActions = listOf<VideoPlayerMenuAction>(
                 VideoPlayerDownloadAction,
@@ -1824,6 +1833,38 @@ class VideoPlayerViewModelTest {
         Arguments.of(FILE_BROWSER_ADAPTER, VideoPlayerRemoveLinkAction),
         Arguments.of(FILE_BROWSER_ADAPTER, VideoPlayerRenameAction),
     )
+
+    @ParameterizedTest(name = "when value is {0}")
+    @ValueSource(booleans = [true, false])
+    fun `test that state is updated correctly when updatePlaybackStateWithReplay is invoked`(
+        value: Boolean,
+    ) =
+        runTest {
+            initViewModel()
+            underTest.updatePlaybackStateWithReplay(value)
+            advanceUntilIdle()
+            verify(mediaPlayerGateway).setPlayWhenReady(value)
+            underTest.uiState.test {
+                val actual = awaitItem()
+                assertThat(actual.mediaPlaybackState).isEqualTo(
+                    if (value) {
+                        MediaPlaybackState.Playing
+                    } else {
+                        MediaPlaybackState.Paused
+                    }
+                )
+                assertThat(actual.isAutoReplay).isEqualTo(!value)
+            }
+        }
+
+    @Test
+    fun `test that getCurrentPlayingPosition returns as expected`() = runTest {
+        whenever(mediaPlayerGateway.getCurrentPlayingPosition()).thenReturn(100)
+        whenever(durationInSecondsTextMapper(100.milliseconds)).thenReturn(testDurationString)
+        initViewModel()
+        val actual = underTest.getCurrentPlayingPosition()
+        assertThat(actual).isEqualTo(testDurationString)
+    }
 
     companion object {
         @JvmField

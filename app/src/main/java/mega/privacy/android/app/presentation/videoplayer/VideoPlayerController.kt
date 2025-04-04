@@ -55,9 +55,11 @@ class VideoPlayerController(
     private val context: Context,
     private val viewModel: VideoPlayerViewModel,
     container: ViewGroup,
+    coroutineScope: CoroutineScope,
+    private val playQueueButtonClicked: () -> Unit,
     private val captureScreenShotFinished: (Bitmap) -> Unit,
 ) : LifecycleEventObserver {
-    private val playlist = container.findViewById<ImageButton>(R.id.playlist)
+    private val playQueueButton = container.findViewById<ImageButton>(R.id.playlist)
     private val trackName = container.findViewById<TextView>(R.id.track_name)
     private val repeatToggleButton = container.findViewById<ImageButton>(R.id.repeat_toggle)
     private val playerComposeView = container.findViewById<PlayerView>(R.id.player_compose_view)
@@ -68,11 +70,17 @@ class VideoPlayerController(
     private var sharingScope: CoroutineScope? = null
 
     init {
-        val state = viewModel.uiState.value
+        coroutineScope.launch {
+            viewModel.uiState.map { it.items }.distinctUntilChanged().collectLatest {
+                if (it.isNotEmpty()) {
+                    togglePlayQueueEnabled(it.size)
+                }
+            }
+        }
 
-        setupRepeatToggleButton(state.repeatToggleMode)
-        setupVideoPlayQueueButton(state.items.size)
+        setupRepeatToggleButton(viewModel.uiState.value.repeatToggleMode)
         setupMoreOptionButton()
+        setupVideoPlayQueueButton(viewModel.uiState.value.items.size)
         screenshotButton.setOnClickListener {
             screenshotButtonClicked()
         }
@@ -85,8 +93,8 @@ class VideoPlayerController(
      */
     private fun setupVideoPlayQueueButton(size: Int) {
         togglePlayQueueEnabled(size)
-
-        playlist.setOnClickListener {
+        playQueueButton.setOnClickListener {
+            playQueueButtonClicked()
         }
     }
 
@@ -138,7 +146,7 @@ class VideoPlayerController(
      * @param itemSize the item size
      */
     private fun togglePlayQueueEnabled(itemSize: Int) {
-        playlist.visibility =
+        playQueueButton.visibility =
             if (itemSize > SINGLE_PLAYLIST_SIZE)
                 View.VISIBLE
             else

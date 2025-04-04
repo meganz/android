@@ -13,19 +13,23 @@ import mega.privacy.android.app.presentation.videoplayer.VideoPlayerViewModel
 @Serializable
 internal object VideoPlayerScreen
 
+internal const val VIDEO_PLAYER_SCREEN_ROUTE = "VideoPlayerScreen"
+
 @OptIn(ExperimentalMaterialNavigationApi::class)
 internal fun NavGraphBuilder.videoPlayerScreen(
     bottomSheetNavigator: BottomSheetNavigator,
     scaffoldState: ScaffoldState,
     viewModel: VideoPlayerViewModel,
     player: ExoPlayer?,
+    playQueueButtonClicked: () -> Unit,
 ) {
     composable<VideoPlayerScreen> {
         VideoPlayerScreen(
             bottomSheetNavigator = bottomSheetNavigator,
             scaffoldState = scaffoldState,
             viewModel = viewModel,
-            player = player
+            player = player,
+            playQueueButtonClicked = playQueueButtonClicked
         )
     }
 }
