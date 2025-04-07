@@ -1,9 +1,10 @@
 package mega.privacy.android.app.presentation.bottomsheet
 
+import mega.privacy.android.icon.pack.R as RPack
+import mega.privacy.android.shared.resources.R as sharedR
 import android.app.Activity
 import android.content.DialogInterface
 import android.content.Intent
-import android.net.Uri
 import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
@@ -33,8 +34,8 @@ import kotlinx.coroutines.launch
 import mega.privacy.android.analytics.Analytics
 import mega.privacy.android.app.MimeTypeList.Companion.typeForName
 import mega.privacy.android.app.R
-import mega.privacy.android.app.activities.WebViewActivity
 import mega.privacy.android.app.arch.extensions.collectFlow
+import mega.privacy.android.app.extensions.launchUrl
 import mega.privacy.android.app.featuretoggle.ApiFeatures
 import mega.privacy.android.app.featuretoggle.AppFeatures
 import mega.privacy.android.app.main.DrawerItem
@@ -96,10 +97,8 @@ import mega.privacy.android.domain.entity.node.thumbnail.ThumbnailRequest
 import mega.privacy.android.domain.entity.sync.SyncType
 import mega.privacy.android.domain.usecase.GetFileTypeInfoByNameUseCase
 import mega.privacy.android.domain.usecase.featureflag.GetFeatureFlagValueUseCase
-import mega.privacy.android.icon.pack.R as RPack
 import mega.privacy.android.navigation.MegaNavigator
 import mega.privacy.android.shared.original.core.ui.controls.controlssliders.MegaSwitch
-import mega.privacy.android.shared.resources.R as sharedR
 import mega.privacy.mobile.analytics.event.CloudDriveHideNodeMenuItemEvent
 import mega.privacy.mobile.analytics.event.HideNodeMenuItemEvent
 import nz.mega.sdk.MegaNode
@@ -455,11 +454,7 @@ class NodeOptionsBottomSheetDialogFragment : BaseBottomSheetDialogFragment() {
                     contentView.findViewById<View>(R.id.dispute_option).visibility = View.VISIBLE
                     contentView.findViewById<View>(R.id.dispute_option).setOnClickListener {
                         onClick {
-                            startActivity(
-                                Intent(requireContext(), WebViewActivity::class.java)
-                                    .addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP)
-                                    .setData(Uri.parse(Constants.DISPUTE_URL))
-                            )
+                            context.launchUrl(Constants.DISPUTE_URL)
                             dismiss()
                         }
                     }
