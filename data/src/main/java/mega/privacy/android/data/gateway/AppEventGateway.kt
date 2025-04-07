@@ -408,4 +408,16 @@ internal interface AppEventGateway {
      * Monitor SSL verification failed
      */
     fun monitorSslVerificationFailed(): Flow<Unit>
+
+    /**
+     * Broadcast transfer tag to cancel. Null it no transfer to cancel.
+     */
+    suspend fun broadcastTransferTagToCancel(transferTag: Int?)
+
+    /**
+     * Monitor transfer tag to cancel
+     *
+     * @return Flow of Int. Null it no transfer to cancel.
+     */
+    fun monitorTransferTagToCancel(): Flow<Int?>
 }

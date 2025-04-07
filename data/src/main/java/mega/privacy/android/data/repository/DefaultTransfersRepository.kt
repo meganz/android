@@ -30,16 +30,12 @@ import kotlinx.coroutines.withContext
 import mega.privacy.android.data.extensions.failWithError
 import mega.privacy.android.data.extensions.getRequestListener
 import mega.privacy.android.data.gateway.AppEventGateway
-import mega.privacy.android.data.gateway.CacheGateway
-import mega.privacy.android.data.gateway.DeviceGateway
 import mega.privacy.android.data.gateway.MegaLocalRoomGateway
 import mega.privacy.android.data.gateway.MegaLocalStorageGateway
 import mega.privacy.android.data.gateway.SDCardGateway
 import mega.privacy.android.data.gateway.TransfersPreferencesGateway
 import mega.privacy.android.data.gateway.WorkManagerGateway
-import mega.privacy.android.data.gateway.api.MegaApiFolderGateway
 import mega.privacy.android.data.gateway.api.MegaApiGateway
-import mega.privacy.android.data.gateway.api.MegaChatApiGateway
 import mega.privacy.android.data.listener.OptionalMegaRequestListenerInterface
 import mega.privacy.android.data.listener.OptionalMegaTransferListenerInterface
 import mega.privacy.android.data.mapper.node.MegaNodeMapper
@@ -98,8 +94,6 @@ import kotlin.time.Duration.Companion.seconds
 @Singleton
 internal class DefaultTransfersRepository @Inject constructor(
     private val megaApiGateway: MegaApiGateway,
-    private val megaApiFolderGateway: MegaApiFolderGateway,
-    private val megaChatApiGateway: MegaChatApiGateway,
     @IoDispatcher private val ioDispatcher: CoroutineDispatcher,
     @ApplicationScope private val scope: CoroutineScope,
     private val transferEventMapper: TransferEventMapper,
@@ -116,11 +110,9 @@ internal class DefaultTransfersRepository @Inject constructor(
     private val cancelTokenProvider: CancelTokenProvider,
     private val megaNodeMapper: MegaNodeMapper,
     private val sdCardGateway: SDCardGateway,
-    private val deviceGateway: DeviceGateway,
     private val inProgressTransferMapper: InProgressTransferMapper,
     private val monitorFetchNodesFinishUseCase: MonitorFetchNodesFinishUseCase,
     private val transfersPreferencesGateway: Lazy<TransfersPreferencesGateway>,
-    private val cacheGateway: CacheGateway,
 ) : TransferRepository {
 
     private val monitorPausedTransfers = MutableStateFlow(false)
@@ -867,6 +859,15 @@ internal class DefaultTransfersRepository @Inject constructor(
         withContext(ioDispatcher) {
             megaLocalRoomGateway.getActiveTransferGroup(id)
         }
+
+    override suspend fun broadcastTransferTagToCancel(transferTag: Int?) {
+        withContext(ioDispatcher) {
+            appEventGateway.broadcastTransferTagToCancel(transferTag)
+        }
+    }
+
+    override fun monitorTransferTagToCancel(): Flow<Int?> =
+        appEventGateway.monitorTransferTagToCancel()
 }
 
 private fun MegaTransfer.isBackgroundTransfer() =

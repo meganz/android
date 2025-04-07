@@ -72,6 +72,7 @@ internal class AppEventFacade @Inject constructor(
     private val updateUserData = MutableSharedFlow<Unit>()
     private val miscLoaded = MutableSharedFlow<Unit>()
     private val sslVerificationFailed = MutableSharedFlow<Unit>()
+    private val transferTagToCancel = MutableSharedFlow<Int?>()
 
     override suspend fun broadcastCookieSettings(enabledCookieSettings: Set<CookieType>) {
         _cookieSettings.emit(enabledCookieSettings)
@@ -259,6 +260,13 @@ internal class AppEventFacade @Inject constructor(
     override fun monitorSslVerificationFailed(): Flow<Unit> {
         return sslVerificationFailed.asSharedFlow()
     }
+
+    override suspend fun broadcastTransferTagToCancel(transferTag: Int?) {
+        transferTagToCancel.emit(transferTag)
+    }
+
+    override fun monitorTransferTagToCancel(): Flow<Int?> =
+        transferTagToCancel.asSharedFlow()
 }
 
 private fun <T> Flow<T>.toSharedFlow(

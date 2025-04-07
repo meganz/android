@@ -13,16 +13,12 @@ import kotlinx.coroutines.flow.flowOf
 import kotlinx.coroutines.test.UnconfinedTestDispatcher
 import kotlinx.coroutines.test.runTest
 import mega.privacy.android.data.gateway.AppEventGateway
-import mega.privacy.android.data.gateway.CacheGateway
-import mega.privacy.android.data.gateway.DeviceGateway
 import mega.privacy.android.data.gateway.MegaLocalRoomGateway
 import mega.privacy.android.data.gateway.MegaLocalStorageGateway
 import mega.privacy.android.data.gateway.SDCardGateway
 import mega.privacy.android.data.gateway.TransfersPreferencesGateway
 import mega.privacy.android.data.gateway.WorkManagerGateway
-import mega.privacy.android.data.gateway.api.MegaApiFolderGateway
 import mega.privacy.android.data.gateway.api.MegaApiGateway
-import mega.privacy.android.data.gateway.api.MegaChatApiGateway
 import mega.privacy.android.data.listener.OptionalMegaRequestListenerInterface
 import mega.privacy.android.data.listener.OptionalMegaTransferListenerInterface
 import mega.privacy.android.data.mapper.node.MegaNodeMapper
@@ -73,6 +69,7 @@ import org.junit.jupiter.params.ParameterizedTest
 import org.junit.jupiter.params.provider.Arguments
 import org.junit.jupiter.params.provider.EnumSource
 import org.junit.jupiter.params.provider.MethodSource
+import org.junit.jupiter.params.provider.NullSource
 import org.junit.jupiter.params.provider.ValueSource
 import org.mockito.kotlin.any
 import org.mockito.kotlin.anyOrNull
@@ -110,13 +107,9 @@ class DefaultTransfersRepositoryTest {
     private val activeTransferTotalsMapper = mock<ActiveTransferTotalsMapper>()
     private val megaNodeMapper = mock<MegaNodeMapper>()
     private val sdCardGateway = mock<SDCardGateway>()
-    private val deviceGateway = mock<DeviceGateway>()
     private val inProgressTransferMapper = mock<InProgressTransferMapper>()
     private val monitorFetchNodesFinishUseCase = mock<MonitorFetchNodesFinishUseCase>()
     private val transfersPreferencesGateway = mock<TransfersPreferencesGateway>()
-    private val cacheGateway = mock<CacheGateway>()
-    private val megaApiFolderGateway = mock<MegaApiFolderGateway>()
-    private val megaChatApiGateway = mock<MegaChatApiGateway>()
 
     private val testScope = CoroutineScope(UnconfinedTestDispatcher())
 
@@ -132,8 +125,6 @@ class DefaultTransfersRepositoryTest {
         stubPauseTransfers(paused)
         return DefaultTransfersRepository(
             megaApiGateway = megaApiGateway,
-            megaChatApiGateway = megaChatApiGateway,
-            megaApiFolderGateway = megaApiFolderGateway,
             ioDispatcher = UnconfinedTestDispatcher(),
             transferEventMapper = transferEventMapper,
             appEventGateway = appEventGateway,
@@ -150,11 +141,9 @@ class DefaultTransfersRepositoryTest {
             scope = testScope,
             megaNodeMapper = megaNodeMapper,
             sdCardGateway = sdCardGateway,
-            deviceGateway = deviceGateway,
             inProgressTransferMapper = inProgressTransferMapper,
             monitorFetchNodesFinishUseCase = monitorFetchNodesFinishUseCase,
             transfersPreferencesGateway = { transfersPreferencesGateway },
-            cacheGateway = cacheGateway
         )
     }
 
@@ -162,8 +151,6 @@ class DefaultTransfersRepositoryTest {
     fun resetMocks() {
         reset(
             megaApiGateway,
-            megaChatApiGateway,
-            megaApiFolderGateway,
             transferEventMapper,
             appEventGateway,
             transferMapper,
@@ -176,9 +163,7 @@ class DefaultTransfersRepositoryTest {
             completedTransferPendingTransferMapper,
             megaNodeMapper,
             sdCardGateway,
-            deviceGateway,
             inProgressTransferMapper,
-            cacheGateway,
             transferAppDataStringMapper,
             activeTransferTotalsMapper,
             monitorFetchNodesFinishUseCase,
@@ -1798,6 +1783,35 @@ class DefaultTransfersRepositoryTest {
 
         assertThat(underTest.getActiveTransferGroupById(groupId)).isEqualTo(expected)
     }
+
+    @ParameterizedTest(name = " when tag is {0}")
+    @ValueSource(ints = [123])
+    @NullSource
+    fun `test that broadcastTransferUniqueIdToCancel invokes correct appEventGateway fun`(
+        transferTag: Int?,
+    ) = runTest {
+        whenever(appEventGateway.broadcastTransferTagToCancel(transferTag)) doReturn Unit
+
+        underTest.broadcastTransferTagToCancel(transferTag)
+
+        verify(appEventGateway).broadcastTransferTagToCancel(transferTag)
+    }
+
+    @Test
+    fun `test that monitorTransferUniqueIdToCancel invokes correct appEventGateway fun and emits value`() =
+        runTest {
+            val transferTag = 123
+            val nullValue: Int? = null
+
+            whenever(appEventGateway.monitorTransferTagToCancel()) doReturn
+                    flowOf(transferTag, nullValue)
+
+            underTest.monitorTransferTagToCancel().test {
+                assertThat(awaitItem()).isEqualTo(transferTag)
+                assertThat(awaitItem()).isNull()
+                cancelAndIgnoreRemainingEvents()
+            }
+        }
 
     private fun getCompletedTransfer(fileName: String) = CompletedTransfer(
         fileName = fileName,

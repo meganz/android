@@ -631,4 +631,16 @@ interface TransferRepository {
      * @return [ActiveTransferActionGroup] with this [id] or null if it's not found
      */
     suspend fun getActiveTransferGroupById(id: Int): ActiveTransferActionGroup?
+
+    /**
+     * Broadcast transfer tag to cancel. Null it no transfer to cancel.
+     */
+    suspend fun broadcastTransferTagToCancel(transferTag: Int?)
+
+    /**
+     * Monitor transfer tag to cancel
+     *
+     * @return Flow of Int. Null it no transfer to cancel.
+     */
+    fun monitorTransferTagToCancel(): Flow<Int?>
 }
