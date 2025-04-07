@@ -4,7 +4,7 @@ import android.content.Context
 import android.content.Intent
 import android.net.Uri
 import mega.privacy.android.analytics.Analytics
-import mega.privacy.android.app.activities.WebViewActivity
+import mega.privacy.android.app.extensions.launchUrl
 import mega.privacy.android.app.fragments.homepage.main.HomepageFragment
 import mega.privacy.android.app.main.ManagerActivity
 import mega.privacy.android.app.presentation.achievements.AchievementsFeatureActivity
@@ -52,10 +52,7 @@ class BannerClickHandler(private val fragment: HomepageFragment) :
             }
 
             else -> {
-                with(Intent(context, WebViewActivity::class.java)) {
-                    data = Uri.parse(link)
-                    context.startActivity(this)
-                }
+                context.launchUrl(link)
             }
         }
     }
