@@ -11,7 +11,6 @@ import android.view.View
 import androidx.activity.enableEdgeToEdge
 import androidx.activity.viewModels
 import androidx.constraintlayout.widget.ConstraintSet
-import androidx.core.net.toUri
 import androidx.core.view.isVisible
 import androidx.recyclerview.widget.RecyclerView
 import coil.load
@@ -21,10 +20,10 @@ import kotlinx.coroutines.flow.map
 import mega.privacy.android.app.MimeTypeList
 import mega.privacy.android.app.R
 import mega.privacy.android.app.activities.PasscodeActivity
-import mega.privacy.android.app.activities.WebViewActivity
 import mega.privacy.android.app.databinding.ActivityNameCollisionBinding
 import mega.privacy.android.app.databinding.ViewNameCollisionOptionBinding
 import mega.privacy.android.app.extensions.consumeInsetsWithToolbar
+import mega.privacy.android.app.extensions.launchUrl
 import mega.privacy.android.app.interfaces.showSnackbar
 import mega.privacy.android.app.namecollision.data.NameCollisionActionResult
 import mega.privacy.android.app.namecollision.data.NameCollisionType
@@ -70,7 +69,6 @@ class NameCollisionActivity : PasscodeActivity() {
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        Timber.e("hmt new NameCollisionActivity")
         if (savedInstanceState == null) {
             @Suppress("UNCHECKED_CAST")
             val collisionsList = with(intent) {
@@ -147,11 +145,7 @@ class NameCollisionActivity : PasscodeActivity() {
         }
 
         binding.learnMore.setOnClickListener {
-            startActivity(
-                Intent(
-                    this@NameCollisionActivity,
-                    WebViewActivity::class.java
-                ).apply { data = LEARN_MORE_URI.toUri() })
+            this.launchUrl(LEARN_MORE_URI)
         }
         binding.replaceUpdateMergeButton.setOnClickListener {
             viewModel.replaceUpdateOrMerge(binding.applyForAllCheck.isChecked)
