@@ -46,6 +46,7 @@ import androidx.lifecycle.compose.LocalLifecycleOwner
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.media3.common.Player
 import androidx.media3.common.Player.STATE_BUFFERING
+import androidx.media3.common.Player.STATE_IDLE
 import androidx.media3.common.util.UnstableApi
 import androidx.media3.exoplayer.ExoPlayer
 import androidx.media3.ui.PlayerView
@@ -91,7 +92,7 @@ internal fun VideoPlayerScreen(
     val navigationBarHeightPx = with(density) { navigationBarHeight.toPx().toInt() }
 
     val uiState by viewModel.uiState.collectAsStateWithLifecycle()
-    var playbackState by rememberSaveable { mutableIntStateOf(STATE_BUFFERING) }
+    var playbackState by rememberSaveable { mutableIntStateOf(STATE_IDLE) }
     val playerEventListener = object : Player.Listener {
         override fun onPlaybackStateChanged(state: Int) {
             playbackState = state
@@ -131,6 +132,7 @@ internal fun VideoPlayerScreen(
     }
 
     DisposableEffect(Unit) {
+        playbackState = player?.playbackState ?: STATE_IDLE
         player?.addListener(playerEventListener)
         onDispose {
             player?.removeListener(playerEventListener)

@@ -33,6 +33,9 @@ internal fun NavGraphBuilder.videoPlayerComposeNavigationGraph(
             navHostController.navigate(VideoQueueScreen)
         }
 
-        videoQueueScreen(videoPlayerViewModel = viewModel)
+        videoQueueScreen(
+            navHostController = navHostController,
+            videoPlayerViewModel = viewModel
+        )
     }
 }

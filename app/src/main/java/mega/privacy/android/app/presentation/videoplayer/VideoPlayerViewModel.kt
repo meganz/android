@@ -26,6 +26,7 @@ import de.palm.composestateevents.consumed
 import de.palm.composestateevents.triggered
 import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Job
 import kotlinx.coroutines.async
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
@@ -39,6 +40,8 @@ import kotlinx.coroutines.flow.launchIn
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
+import kotlinx.coroutines.sync.Mutex
+import kotlinx.coroutines.sync.withLock
 import kotlinx.coroutines.withContext
 import mega.privacy.android.analytics.Analytics
 import mega.privacy.android.app.R
@@ -142,6 +145,7 @@ import mega.privacy.android.domain.usecase.GetUserNameByEmailUseCase
 import mega.privacy.android.domain.usecase.IsHiddenNodesOnboardedUseCase
 import mega.privacy.android.domain.usecase.UpdateNodeSensitiveUseCase
 import mega.privacy.android.domain.usecase.account.MonitorAccountDetailUseCase
+import mega.privacy.android.domain.usecase.call.IsParticipatingInChatCallUseCase
 import mega.privacy.android.domain.usecase.chat.message.delete.DeleteNodeAttachmentMessageByIdsUseCase
 import mega.privacy.android.domain.usecase.favourites.IsAvailableOfflineUseCase
 import mega.privacy.android.domain.usecase.featureflag.GetFeatureFlagValueUseCase
@@ -183,6 +187,7 @@ import mega.privacy.android.domain.usecase.setting.MonitorSubFolderMediaDiscover
 import mega.privacy.android.domain.usecase.thumbnailpreview.GetThumbnailUseCase
 import mega.privacy.android.domain.usecase.transfers.MonitorTransferEventsUseCase
 import mega.privacy.android.domain.usecase.videosection.SaveVideoRecentlyWatchedUseCase
+import mega.privacy.android.legacy.core.ui.model.SearchWidgetState
 import mega.privacy.mobile.analytics.event.VideoPlayerGetLinkMenuToolbarEvent
 import mega.privacy.mobile.analytics.event.VideoPlayerRemoveLinkMenuToolbarEvent
 import mega.privacy.mobile.analytics.event.VideoPlayerSaveToDeviceMenuToolbarEvent
@@ -193,9 +198,11 @@ import timber.log.Timber
 import java.io.File
 import java.text.SimpleDateFormat
 import java.time.Instant
+import java.util.Collections
 import java.util.Date
 import javax.inject.Inject
 import kotlin.collections.filter
+import kotlin.collections.map
 import kotlin.time.Duration.Companion.milliseconds
 import kotlin.time.Duration.Companion.seconds
 
@@ -266,6 +273,7 @@ class VideoPlayerViewModel @Inject constructor(
     private val monitorNodeUpdatesUseCase: MonitorNodeUpdatesUseCase,
     private val launchSourceMapper: LaunchSourceMapper,
     private val durationInSecondsTextMapper: DurationInSecondsTextMapper,
+    private val isParticipatingInChatCallUseCase: IsParticipatingInChatCallUseCase,
     savedStateHandle: SavedStateHandle,
 ) : ViewModel() {
     val uiState: StateFlow<VideoPlayerUiState>
@@ -313,6 +321,10 @@ class VideoPlayerViewModel @Inject constructor(
     private val throwable = SingleLiveEvent<Throwable>()
     private val snackbarMessage = SingleLiveEvent<Int>()
     private val startChatFileOfflineDownload = SingleLiveEvent<ChatFile>()
+    private var searchQuery: String = ""
+    private val mediaItemsDuringChanged = mutableListOf<MediaItem>()
+    private var searchJob: Job? = null
+    private val mutex = Mutex()
 
     init {
         setupTransferListener()
@@ -961,6 +973,7 @@ class VideoPlayerViewModel @Inject constructor(
      * Clear the state and flying task of this class, should be called in onDestroy.
      */
     private fun clear() {
+        searchJob?.cancel()
         applicationScope.launch {
             if (needStopStreamingServer) {
                 httpServerStopUseCase()
@@ -1527,11 +1540,187 @@ class VideoPlayerViewModel @Inject constructor(
         }
     }
 
+    internal fun seekToByHandle(handle: Long, items: List<VideoPlayerItem> = uiState.value.items) {
+        val index = items.indexOfFirst { it.nodeHandle == handle }
+        if (index in items.indices) {
+            mediaPlayerGateway.playerSeekTo(index)
+        }
+    }
+
+    internal fun swapItems(
+        from: Int,
+        to: Int,
+        list: List<VideoPlayerItem> = uiState.value.items,
+        mediaItems: List<MediaItem>? = uiState.value.mediaPlaySources?.mediaItems,
+    ) {
+        if (list.isEmpty() || mediaItems.isNullOrEmpty() || list.size != mediaItems.size) return
+        val indicesOfItems = list.indices
+        val newItems = list.toMutableList()
+        if (mediaItemsDuringChanged.isEmpty()) {
+            mediaItemsDuringChanged.addAll(mediaItems)
+        }
+
+        viewModelScope.launch(ioDispatcher) {
+            mutex.withLock {
+                if (from in indicesOfItems && to in indicesOfItems) {
+                    Collections.swap(newItems, from, to)
+                    Collections.swap(mediaItemsDuringChanged, from, to)
+                }
+                withContext(mainDispatcher) {
+                    uiState.update { it.copy(items = newItems) }
+                }
+            }
+        }
+    }
+
+    internal fun updateItemsAfterReorder() {
+        if (mediaItemsDuringChanged.isNotEmpty()) {
+            val index = uiState.value.currentPlayingIndex ?: 0
+            val mediaPlaySources = MediaPlaySources(
+                mediaItems = mediaItemsDuringChanged.toList(),
+                newIndexForCurrentItem = index,
+                nameToDisplay = null
+            )
+
+            uiState.update { it.copy(mediaPlaySources = mediaPlaySources) }
+            mediaPlayerGateway.buildPlaySources(mediaPlaySources)
+            mediaItemsDuringChanged.clear()
+        }
+    }
+
     internal fun getCurrentPlayingPosition() =
         mediaPlayerGateway.getCurrentPlayingPosition().formatToString(durationInSecondsTextMapper)
 
     private fun Long.formatToString(durationInSecondsTextMapper: DurationInSecondsTextMapper) =
         durationInSecondsTextMapper(this.milliseconds)
+
+    internal suspend fun isParticipatingInChatCall() = runCatching {
+        isParticipatingInChatCallUseCase()
+    }.getOrDefault(false)
+
+    internal fun updateActionMode(actionMode: Boolean) =
+        uiState.update { it.copy(isActionMode = actionMode) }
+
+    internal fun searchWidgetStateUpdate() {
+        val searchState = when (uiState.value.searchState) {
+            SearchWidgetState.EXPANDED -> SearchWidgetState.COLLAPSED
+
+            SearchWidgetState.COLLAPSED -> SearchWidgetState.EXPANDED
+        }
+        uiState.update { it.copy(searchState = searchState) }
+        if (searchState == SearchWidgetState.EXPANDED) {
+            searchQuery("")
+        }
+    }
+
+    internal fun closeSearch() {
+        searchQuery = ""
+        uiState.update {
+            it.copy(
+                searchedItems = emptyList(),
+                query = null,
+                searchState = SearchWidgetState.COLLAPSED
+            )
+        }
+    }
+
+    internal fun searchQuery(queryString: String) {
+        searchJob?.cancel()
+        searchJob = viewModelScope.launch(ioDispatcher) {
+            searchQuery = queryString
+            val items = uiState.value.items.filter { item ->
+                item.nodeName.contains(searchQuery, true)
+            }
+            withContext(mainDispatcher) {
+                uiState.update { it.copy(searchedItems = items, query = queryString) }
+            }
+        }
+    }
+
+    internal fun updateItemInSelectionState(
+        index: Int,
+        item: VideoPlayerItem,
+        items: List<VideoPlayerItem> = uiState.value.items,
+    ) {
+        val isSelected = !item.isSelected
+        val selectedHandles = uiState.value.selectedItemHandles.updateSelectedHandles(
+            id = item.nodeHandle,
+            isSelected = isSelected
+        )
+        val updateItems = items.updateItemSelectedState(index, isSelected)
+        uiState.update {
+            it.copy(
+                items = updateItems,
+                selectedItemHandles = selectedHandles
+            )
+        }
+    }
+
+    private fun List<Long>.updateSelectedHandles(
+        id: Long,
+        isSelected: Boolean,
+    ) = toMutableList().also { handles ->
+        if (isSelected) {
+            handles.add(id)
+        } else {
+            handles.remove(id)
+        }
+    }
+
+    private fun List<VideoPlayerItem>.updateItemSelectedState(
+        index: Int,
+        isSelected: Boolean,
+    ) =
+        if (index in indices) {
+            toMutableList().also { list ->
+                list[index] = list[index].copy(isSelected = isSelected)
+            }
+        } else this
+
+    internal fun clearAllSelected(items: List<VideoPlayerItem> = uiState.value.items) {
+        val updateItems = clearSelected(items)
+        uiState.update {
+            it.copy(
+                items = updateItems,
+                selectedItemHandles = emptyList()
+            )
+        }
+    }
+
+    private fun clearSelected(items: List<VideoPlayerItem>) =
+        items.map { it.copy(isSelected = false) }
+
+    internal fun removeSelectedItems(
+        selectedHandles: List<Long> = uiState.value.selectedItemHandles,
+        items: List<VideoPlayerItem> = uiState.value.items,
+        mediaItems: List<MediaItem>? = uiState.value.mediaPlaySources?.mediaItems,
+    ) {
+        if (
+            selectedHandles.isEmpty() ||
+            items.isEmpty() ||
+            mediaItems.isNullOrEmpty() ||
+            items.size != mediaItems.size
+        ) return
+
+        val updatedItems = items.filterNot { it.nodeHandle in selectedHandles }
+        val updatedMediaItems = mediaItems.filterNot { it.mediaId.toLong() in selectedHandles }
+
+        val mediaPlaySources = MediaPlaySources(
+            mediaItems = updatedMediaItems,
+            newIndexForCurrentItem = uiState.value.currentPlayingIndex ?: 0,
+            nameToDisplay = null
+        )
+
+        uiState.update {
+            it.copy(
+                items = updatedItems,
+                mediaPlaySources = mediaPlaySources,
+                selectedItemHandles = emptyList(),
+            )
+        }
+
+        mediaPlayerGateway.buildPlaySources(mediaPlaySources)
+    }
 
     companion object {
         private const val MAX_RETRY = 6

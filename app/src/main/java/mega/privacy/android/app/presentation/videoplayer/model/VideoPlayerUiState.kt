@@ -41,6 +41,7 @@ import mega.privacy.android.legacy.core.ui.model.SearchWidgetState
  * @property isActionMode whether the action mode is activated
  * @property searchState SearchWidgetState
  * @property query search query
+ * @property searchedItems searched video player items
  */
 data class VideoPlayerUiState(
     val items: List<VideoPlayerItem> = emptyList(),
@@ -71,4 +72,5 @@ data class VideoPlayerUiState(
     val isActionMode: Boolean = false,
     val searchState: SearchWidgetState = SearchWidgetState.COLLAPSED,
     val query: String? = null,
+    val searchedItems: List<VideoPlayerItem> = emptyList()
 )

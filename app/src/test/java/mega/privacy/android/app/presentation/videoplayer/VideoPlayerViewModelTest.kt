@@ -126,6 +126,7 @@ import mega.privacy.android.domain.usecase.GetUserNameByEmailUseCase
 import mega.privacy.android.domain.usecase.IsHiddenNodesOnboardedUseCase
 import mega.privacy.android.domain.usecase.UpdateNodeSensitiveUseCase
 import mega.privacy.android.domain.usecase.account.MonitorAccountDetailUseCase
+import mega.privacy.android.domain.usecase.call.IsParticipatingInChatCallUseCase
 import mega.privacy.android.domain.usecase.chat.message.delete.DeleteNodeAttachmentMessageByIdsUseCase
 import mega.privacy.android.domain.usecase.favourites.IsAvailableOfflineUseCase
 import mega.privacy.android.domain.usecase.featureflag.GetFeatureFlagValueUseCase
@@ -167,6 +168,7 @@ import mega.privacy.android.domain.usecase.setting.MonitorSubFolderMediaDiscover
 import mega.privacy.android.domain.usecase.thumbnailpreview.GetThumbnailUseCase
 import mega.privacy.android.domain.usecase.transfers.MonitorTransferEventsUseCase
 import mega.privacy.android.domain.usecase.videosection.SaveVideoRecentlyWatchedUseCase
+import mega.privacy.android.legacy.core.ui.model.SearchWidgetState
 import mega.privacy.mobile.analytics.event.VideoPlayerGetLinkMenuToolbarEvent
 import mega.privacy.mobile.analytics.event.VideoPlayerRemoveLinkMenuToolbarEvent
 import mega.privacy.mobile.analytics.event.VideoPlayerSaveToDeviceMenuToolbarEvent
@@ -278,6 +280,7 @@ class VideoPlayerViewModelTest {
     private val fakeMonitorNodeUpdatesFlow = MutableSharedFlow<NodeUpdate>()
     private val monitorNodeUpdatesUseCase = mock<MonitorNodeUpdatesUseCase>()
     private val durationInSecondsTextMapper = mock<DurationInSecondsTextMapper>()
+    private val isParticipatingInChatCallUseCase = mock<IsParticipatingInChatCallUseCase>()
     private val launchSourceMapper = mock<LaunchSourceMapper>()
     private val savedStateHandle = SavedStateHandle(mapOf())
 
@@ -357,7 +360,8 @@ class VideoPlayerViewModelTest {
             monitorNodeUpdatesUseCase = monitorNodeUpdatesUseCase,
             launchSourceMapper = launchSourceMapper,
             savedStateHandle = savedStateHandle,
-            durationInSecondsTextMapper = durationInSecondsTextMapper
+            durationInSecondsTextMapper = durationInSecondsTextMapper,
+            isParticipatingInChatCallUseCase = isParticipatingInChatCallUseCase
         )
         savedStateHandle[INTENT_EXTRA_KEY_VIDEO_COLLECTION_ID] = expectedCollectionId
         savedStateHandle[INTENT_EXTRA_KEY_VIDEO_COLLECTION_TITLE] = expectedCollectionTitle
@@ -445,7 +449,8 @@ class VideoPlayerViewModelTest {
             deleteNodeAttachmentMessageByIdsUseCase,
             monitorNodeUpdatesUseCase,
             launchSourceMapper,
-            durationInSecondsTextMapper
+            durationInSecondsTextMapper,
+            isParticipatingInChatCallUseCase
         )
     }
 
@@ -686,12 +691,18 @@ class VideoPlayerViewModelTest {
             on { this.duration }.thenReturn(testDuration)
         }
 
-    private fun initVideoPlayerItem(handle: Long, name: String, type: MediaQueueItemType? = null) =
+    private fun initVideoPlayerItem(
+        handle: Long,
+        name: String,
+        type: MediaQueueItemType? = null,
+        isSelect: Boolean = false,
+    ) =
         mock<VideoPlayerItem> {
             on { nodeHandle }.thenReturn(handle)
             on { nodeName }.thenReturn(name)
             on { this.duration }.thenReturn(testDurationString)
             on { this.type }.thenReturn(type)
+            on { this.isSelected }.thenReturn(isSelect)
         }
 
     @Test
@@ -1865,6 +1876,173 @@ class VideoPlayerViewModelTest {
         val actual = underTest.getCurrentPlayingPosition()
         assertThat(actual).isEqualTo(testDurationString)
     }
+
+    @Test
+    fun `test that expected function is invoked when seekToByHandle is invoked`() = runTest {
+        val testItems = (0..2).map {
+            initVideoPlayerItem(it.toLong(), it.toString())
+        }
+        underTest.seekToByHandle(1, testItems)
+        verify(mediaPlayerGateway).playerSeekTo(1)
+    }
+
+    @Test
+    fun `test that items are updated correctly when swapItems function is invoked`() = runTest {
+        val testItems = (0..2).map {
+            initVideoPlayerItem(it.toLong(), it.toString())
+        }
+        val mediaItems = (0..2).map {
+            MediaItem.Builder().setMediaId(it.toString()).build()
+        }
+        initViewModel()
+        underTest.swapItems(1, 2, testItems, mediaItems)
+        underTest.uiState.test {
+            val actual = awaitItem()
+            assertThat(actual.items[1].nodeHandle).isEqualTo(2L)
+            assertThat(actual.items[2].nodeHandle).isEqualTo(1L)
+        }
+    }
+
+    @Test
+    fun `test that mediaPlaySources are updated correctly when updateItemsAfterReorder is invoked`() =
+        runTest {
+            val testItems = (0..2).map {
+                initVideoPlayerItem(it.toLong(), it.toString())
+            }
+            val mediaItems = (0..2).map {
+                MediaItem.Builder().setMediaId(it.toString()).build()
+            }
+            initViewModel()
+            underTest.swapItems(1, 2, testItems, mediaItems)
+            underTest.updateItemsAfterReorder()
+            verify(mediaPlayerGateway).buildPlaySources(any())
+            advanceUntilIdle()
+            underTest.uiState.test {
+                val actual = awaitItem()
+                assertThat(actual.mediaPlaySources?.mediaItems?.get(1)?.mediaId).isEqualTo("2")
+                assertThat(actual.mediaPlaySources?.mediaItems?.get(2)?.mediaId).isEqualTo("1")
+                cancelAndConsumeRemainingEvents()
+            }
+        }
+
+    @ParameterizedTest(name = "if isParticipatingInChatCallUseCase returns {0}")
+    @ValueSource(booleans = [true, false])
+    fun `test that isParticipatingInChatCall returns correctly`(value: Boolean) = runTest {
+        whenever(isParticipatingInChatCallUseCase()).thenReturn(value)
+        initViewModel()
+        val actual = underTest.isParticipatingInChatCall()
+        assertThat(actual).isEqualTo(value)
+    }
+
+    @Test
+    fun `test that action mode is updated as expected`() = runTest {
+        initViewModel()
+        underTest.uiState.test {
+            assertThat(awaitItem().isActionMode).isFalse()
+            underTest.updateActionMode(true)
+            assertThat(awaitItem().isActionMode).isTrue()
+            underTest.updateActionMode(false)
+            assertThat(awaitItem().isActionMode).isFalse()
+        }
+    }
+
+    @Test
+    fun `test that search state is updated as expected`() = runTest {
+        initViewModel()
+        underTest.uiState.test {
+            assertThat(awaitItem().searchState).isEqualTo(SearchWidgetState.COLLAPSED)
+            underTest.searchWidgetStateUpdate()
+            assertThat(awaitItem().searchState).isEqualTo(SearchWidgetState.EXPANDED)
+            skipItems(1)
+            underTest.searchWidgetStateUpdate()
+            assertThat(awaitItem().searchState).isEqualTo(SearchWidgetState.COLLAPSED)
+        }
+    }
+
+    @Test
+    fun `test that states of the search feature are updated as expected`() = runTest {
+        initViewModel()
+        underTest.searchWidgetStateUpdate()
+        underTest.searchQuery("")
+        underTest.uiState.test {
+            val initial = awaitItem()
+            assertThat(initial.searchState).isEqualTo(SearchWidgetState.EXPANDED)
+            assertThat(initial.query).isNotNull()
+            underTest.closeSearch()
+            val actual = awaitItem()
+            assertThat(actual.searchState).isEqualTo(SearchWidgetState.COLLAPSED)
+            assertThat(actual.query).isNull()
+            cancelAndIgnoreRemainingEvents()
+        }
+    }
+
+    @Test
+    fun `test that state is updated correctly when updateItemInSelectionState is invoked`() =
+        runTest {
+            val testItems = (0..2).map {
+                initVideoPlayerItem(it.toLong(), it.toString())
+            }
+            val testSelectItem = initVideoPlayerItem(handle = 1L, name = "1", isSelect = true)
+            whenever(testItems[1].copy(isSelected = true)).thenReturn(testSelectItem)
+            initViewModel()
+            underTest.updateItemInSelectionState(1, testItems[1], testItems)
+            underTest.uiState.test {
+                val actual = awaitItem()
+                assertThat(actual.items[1].isSelected).isTrue()
+                assertThat(actual.selectedItemHandles.size).isEqualTo(1)
+                assertThat(actual.selectedItemHandles.contains(1)).isTrue()
+            }
+        }
+
+    @Test
+    fun `test that state is updated correctly when clearAllSelected is invoked`() =
+        runTest {
+            val testItems = (0..2).map {
+                initVideoPlayerItem(it.toLong(), it.toString())
+            }
+            val testSelectItem = initVideoPlayerItem(handle = 1L, name = "1", isSelect = true)
+            whenever(testItems[1].copy(isSelected = true)).thenReturn(testSelectItem)
+            whenever(testSelectItem.copy(isSelected = false)).thenReturn(testItems[1])
+            initViewModel()
+            underTest.updateItemInSelectionState(1, testItems[1], testItems)
+            underTest.uiState.test {
+                awaitItem().let {
+                    assertThat(it.items[1].isSelected).isTrue()
+                    assertThat(it.selectedItemHandles.size).isEqualTo(1)
+                    assertThat(it.selectedItemHandles.contains(1)).isTrue()
+                }
+                underTest.clearAllSelected()
+                awaitItem().let {
+                    assertThat(it.items[1].isSelected).isFalse()
+                    assertThat(it.selectedItemHandles).isEmpty()
+                }
+            }
+        }
+
+    @Test
+    fun `test that state is updated correctly when removeSelectedItems is invoked`() =
+        runTest {
+            val testItems = (0..2).map {
+                initVideoPlayerItem(it.toLong(), it.toString())
+            }
+            val mediaItems = (0..2).map {
+                MediaItem.Builder().setMediaId(it.toString()).build()
+            }
+            val selectHandles = listOf(1L, 2L)
+            initViewModel()
+            underTest.removeSelectedItems(selectHandles, testItems, mediaItems)
+            verify(mediaPlayerGateway).buildPlaySources(any())
+            advanceUntilIdle()
+            underTest.uiState.test {
+                val actual = awaitItem()
+                assertThat(actual.items.size).isEqualTo(1)
+                assertThat(actual.items.first().nodeHandle).isEqualTo(0)
+                assertThat(actual.mediaPlaySources?.mediaItems?.size).isEqualTo(1)
+                assertThat(actual.mediaPlaySources?.mediaItems?.first()?.mediaId).isEqualTo("0")
+                assertThat(actual.selectedItemHandles).isEmpty()
+                cancelAndConsumeRemainingEvents()
+            }
+        }
 
     companion object {
         @JvmField

@@ -10,11 +10,15 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
+import androidx.navigation.NavHostController
 import com.google.accompanist.systemuicontroller.rememberSystemUiController
+import kotlinx.coroutines.launch
+import mega.privacy.android.app.mediaplayer.queue.model.MediaQueueItemType
 import mega.privacy.android.app.mediaplayer.queue.model.VideoQueueMenuAction
 import mega.privacy.android.app.mediaplayer.queue.view.VideoQueueTopBar
 import mega.privacy.android.app.presentation.videoplayer.VideoPlayerViewModel
@@ -23,10 +27,12 @@ import mega.privacy.android.shared.original.core.ui.controls.layouts.MegaScaffol
 
 @Composable
 internal fun VideoQueueScreen(
-    viewModel: VideoPlayerViewModel
+    navHostController: NavHostController,
+    viewModel: VideoPlayerViewModel,
 ) {
     val uiState = viewModel.uiState.collectAsStateWithLifecycle().value
     val lazyListState = rememberLazyListState()
+    val coroutineScope = rememberCoroutineScope()
     val onBackPressedDispatcher = LocalOnBackPressedDispatcherOwner.current?.onBackPressedDispatcher
     val systemUiController = rememberSystemUiController()
     var currentPlayingPosition by rememberSaveable { mutableStateOf<String>("") }
@@ -43,16 +49,20 @@ internal fun VideoQueueScreen(
     }
 
     val isBackHandlerEnabled =
-        uiState.isActionMode || uiState.searchState == SearchWidgetState.EXPANDED
+        (uiState.isActionMode || uiState.searchState == SearchWidgetState.EXPANDED)
 
     BackHandler(isBackHandlerEnabled) {
         when {
             uiState.isActionMode -> {
-                //Will complete in CC-8676
+                viewModel.updateActionMode(false)
+                viewModel.clearAllSelected()
             }
 
             uiState.searchState == SearchWidgetState.EXPANDED -> {
-                //Will complete in CC-8676
+                viewModel.closeSearch()
+                coroutineScope.launch {
+                    lazyListState.animateScrollToItem(uiState.currentPlayingIndex ?: 0)
+                }
             }
         }
     }
@@ -68,37 +78,28 @@ internal fun VideoQueueScreen(
                 onMenuActionClick = { action ->
                     action?.let {
                         when (it) {
-                            is VideoQueueMenuAction.VideoQueueSelectAction -> {
-                                //Will complete in CC-8676
-                            }
+                            is VideoQueueMenuAction.VideoQueueSelectAction ->
+                                viewModel.updateActionMode(true)
 
                             is VideoQueueMenuAction.VideoQueueRemoveAction -> {
-                                //Will complete in CC-8676
+                                viewModel.removeSelectedItems()
+                                viewModel.updateActionMode(false)
                             }
                         }
                     }
                 },
-                onSearchTextChange = {
-                    //Will complete in CC-8676
-                },
-                onCloseClicked = {
-                    //Will complete in CC-8676
-                },
-                onSearchClicked = {
-                    //Will complete in CC-8676
-                },
+                onSearchTextChange = viewModel::searchQuery,
+                onCloseClicked = viewModel::closeSearch,
+                onSearchClicked = viewModel::searchWidgetStateUpdate,
                 onBackPressed = {
                     when {
                         uiState.isActionMode -> {
-                            //Will complete in CC-8676
+                            viewModel.updateActionMode(false)
+                            viewModel.clearAllSelected()
                         }
 
-                        uiState.searchState == SearchWidgetState.EXPANDED -> {
-                            //Will complete in CC-8676
-                        }
-
-                        else ->
-                            onBackPressedDispatcher?.onBackPressed()
+                        uiState.searchState == SearchWidgetState.EXPANDED -> viewModel.closeSearch()
+                        else -> onBackPressedDispatcher?.onBackPressed()
                     }
                 }
             )
@@ -110,20 +111,31 @@ internal fun VideoQueueScreen(
                     .fillMaxHeight()
                     .weight(1f),
                 indexOfDisabledItem = uiState.currentPlayingIndex ?: 0,
-                items = uiState.items,
+                items = if (uiState.searchState == SearchWidgetState.COLLAPSED)
+                    uiState.items
+                else
+                    uiState.searchedItems,
                 currentPlayingPosition = currentPlayingPosition,
                 isPaused = true,
                 isSearchMode = uiState.searchState == SearchWidgetState.EXPANDED,
                 lazyListState = lazyListState,
                 onClick = { index, item ->
-                    //Will complete in CC-8676
+                    coroutineScope.launch {
+                        if (uiState.isActionMode) {
+                            if (item.type != MediaQueueItemType.Playing) {
+                                viewModel.updateItemInSelectionState(index, item)
+                            }
+                        } else if (!viewModel.isParticipatingInChatCall()) {
+                            if (uiState.searchState == SearchWidgetState.EXPANDED) {
+                                viewModel.closeSearch()
+                            }
+                            viewModel.seekToByHandle(item.nodeHandle)
+                            navHostController.popBackStack()
+                        }
+                    }
                 },
-                onDragFinished = {
-                    //Will complete in CC-8676
-                },
-                onMove = { from, to ->
-                    //Will complete in CC-8676
-                }
+                onDragFinished = viewModel::updateItemsAfterReorder,
+                onMove = viewModel::swapItems
             )
         }
     }

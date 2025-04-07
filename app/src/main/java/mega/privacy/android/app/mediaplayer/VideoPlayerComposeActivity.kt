@@ -439,6 +439,7 @@ class VideoPlayerComposeActivity : PasscodeActivity() {
                         state == MEDIA_PLAYER_STATE_READY -> {
                             if (playbackState == MediaPlaybackState.Paused
                                 && !mediaPlayerGateway.getPlayWhenReady()
+                                && !videoPlayerViewModel.uiState.value.isAutoReplay
                             ) {
                                 mediaPlayerGateway.setPlayWhenReady(true)
                             }
