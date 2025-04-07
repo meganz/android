@@ -1,0 +1,100 @@
+package mega.privacy.android.app.presentation.transfers.preview
+
+import android.os.Bundle
+import android.view.LayoutInflater
+import android.view.View
+import android.view.ViewGroup
+import androidx.compose.foundation.layout.navigationBarsPadding
+import androidx.compose.material.rememberScaffoldState
+import androidx.compose.runtime.getValue
+import androidx.compose.ui.Modifier
+import androidx.compose.ui.platform.ComposeView
+import androidx.compose.ui.platform.ViewCompositionStrategy
+import androidx.fragment.app.Fragment
+import androidx.lifecycle.compose.collectAsStateWithLifecycle
+import androidx.navigation.compose.NavHost
+import androidx.navigation.compose.composable
+import androidx.navigation.compose.rememberNavController
+import androidx.navigation.navOptions
+import com.google.accompanist.navigation.material.ExperimentalMaterialNavigationApi
+import dagger.hilt.android.AndroidEntryPoint
+import mega.privacy.android.app.components.chatsession.ChatSessionContainer
+import mega.privacy.android.app.components.session.SessionContainer
+import mega.privacy.android.app.presentation.extensions.isDarkMode
+import mega.privacy.android.app.presentation.passcode.model.PasscodeCryptObjectFactory
+import mega.privacy.android.app.presentation.psa.PsaContainer
+import mega.privacy.android.app.presentation.security.check.PasscodeContainer
+import mega.privacy.android.app.presentation.transfers.preview.view.navigation.fakePreviewViewNavigationGraph
+import mega.privacy.android.app.presentation.transfers.preview.view.navigation.navigateToFakePreviewViewGraph
+import mega.privacy.android.domain.entity.ThemeMode
+import mega.privacy.android.domain.usecase.GetThemeMode
+import mega.privacy.android.shared.original.core.ui.theme.OriginalTheme
+import javax.inject.Inject
+
+@AndroidEntryPoint
+class FakePreviewFragment : Fragment() {
+
+    @Inject
+    lateinit var getThemeMode: GetThemeMode
+
+    @Inject
+    lateinit var passcodeCryptObjectFactory: PasscodeCryptObjectFactory
+
+    @OptIn(ExperimentalMaterialNavigationApi::class)
+    override fun onCreateView(
+        inflater: LayoutInflater,
+        container: ViewGroup?,
+        savedInstanceState: Bundle?,
+    ): View = ComposeView(requireContext()).apply {
+        setViewCompositionStrategy(ViewCompositionStrategy.DisposeOnViewTreeLifecycleDestroyed)
+        setContent {
+            val mode by getThemeMode().collectAsStateWithLifecycle(initialValue = ThemeMode.System)
+            SessionContainer {
+                ChatSessionContainer {
+                    OriginalTheme(isDark = mode.isDarkMode()) {
+                        PasscodeContainer(
+                            passcodeCryptObjectFactory = passcodeCryptObjectFactory,
+                            content = {
+                                PsaContainer {
+                                    val navHostController = rememberNavController()
+                                    val scaffoldState = rememberScaffoldState()
+                                    val transferUniqueId =
+                                        arguments?.getLong(EXTRA_TRANSFER_UNIQUE_ID) ?: 0
+
+                                    NavHost(
+                                        navController = navHostController,
+                                        startDestination = "start",
+                                        modifier = Modifier.navigationBarsPadding(),
+                                    ) {
+                                        composable("start") {
+                                            navHostController.navigateToFakePreviewViewGraph(
+                                                navOptions = navOptions {
+                                                    popUpTo("start") {
+                                                        inclusive = true
+                                                    }
+                                                },
+                                                transferUniqueId = transferUniqueId,
+                                            )
+                                        }
+
+                                        fakePreviewViewNavigationGraph(
+                                            navHostController = navHostController,
+                                            scaffoldState = scaffoldState,
+                                            onBackPress = { requireActivity().supportFinishAfterTransition() }
+                                        )
+                                    }
+                                }
+                            }
+                        )
+                    }
+                }
+            }
+        }
+    }
+
+    companion object {
+        const val EXTRA_TRANSFER_UNIQUE_ID = "TRANSFER_UNIQUE_ID"
+        const val EXTRA_FILE_PATH = "FILE_PATH"
+        const val EXTRA_ERROR = "ERROR"
+    }
+}
