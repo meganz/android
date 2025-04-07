@@ -1038,4 +1038,6 @@
     <string name="sign_up_password_hint_number_or_special_character">최소 1개의 숫자 또는 특수문자</string>
     <!--Sign up page text to ask the user to login if they already have a MEGA account-->
     <string name="sign_up_already_have_account_login_link_text">이미 MEGA 계정이 있나요? [A]로그인[/A]</string>
+    <!-- Text shown in the fake preview screen -->
+    <string name="transfers_fake_preview_text">Loading file</string>
 </resources>

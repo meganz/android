@@ -1031,7 +1031,7 @@
     <!-- Message displayed when email address is successfully updated -->
     <string name="email_confirmation_email_address_update_message">E-mail adres bijgewerkt</string>
     <!-- Snackbar text to inform the user that download started -->
-    <string name="transfers_download_started_snackbar">Download started. See notification for details.</string>
+    <string name="transfers_download_started_snackbar">Het downloaden is gestart. Zie meldingen voor meer informatie.</string>
     <!--Sign Up page text field input first name error message when empty-->
     <string name="sign_up_first_name_text_field_error_message">Een voornaam invoeren</string>
     <!--Sign Up page text field input last name error message when empty-->
@@ -1056,4 +1056,6 @@
     <string name="sign_up_password_hint_number_or_special_character">Tenminste één nummer of speciaal teken</string>
     <!--Sign up page text to ask the user to login if they already have a MEGA account-->
     <string name="sign_up_already_have_account_login_link_text">Heeft u al een MEGA-account? [A]Log in[/A]</string>
+    <!-- Text shown in the fake preview screen -->
+    <string name="transfers_fake_preview_text">Loading file</string>
 </resources>

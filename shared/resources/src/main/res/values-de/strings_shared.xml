@@ -1056,4 +1056,6 @@
     <string name="sign_up_password_hint_number_or_special_character">Mindestens eine Ziffer oder ein Sonderzeichen</string>
     <!--Sign up page text to ask the user to login if they already have a MEGA account-->
     <string name="sign_up_already_have_account_login_link_text">Sie haben bereits einen MEGA-Account? [A]Einloggen[/A]</string>
+    <!-- Text shown in the fake preview screen -->
+    <string name="transfers_fake_preview_text">Loading file</string>
 </resources>
