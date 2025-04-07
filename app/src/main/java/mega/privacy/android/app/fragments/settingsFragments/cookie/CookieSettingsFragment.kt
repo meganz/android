@@ -1,11 +1,8 @@
 package mega.privacy.android.app.fragments.settingsFragments.cookie
 
-import android.content.Intent
-import android.net.Uri
 import android.os.Bundle
 import android.view.View
 import android.widget.Toast
-import androidx.core.net.toUri
 import androidx.fragment.app.viewModels
 import androidx.lifecycle.lifecycleScope
 import androidx.preference.Preference
@@ -15,7 +12,6 @@ import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.launch
 import mega.privacy.android.app.MegaApplication
 import mega.privacy.android.app.R
-import mega.privacy.android.app.activities.WebViewActivity
 import mega.privacy.android.app.arch.extensions.collectFlow
 import mega.privacy.android.app.components.TwoButtonsPreference
 import mega.privacy.android.app.constants.SettingsConstants.KEY_ADS_PERSONALIZATION
@@ -24,6 +20,7 @@ import mega.privacy.android.app.constants.SettingsConstants.KEY_COOKIE_ACCEPT
 import mega.privacy.android.app.constants.SettingsConstants.KEY_COOKIE_ANALYTICS
 import mega.privacy.android.app.constants.SettingsConstants.KEY_COOKIE_POLICIES
 import mega.privacy.android.app.constants.SettingsConstants.KEY_COOKIE_SETTINGS
+import mega.privacy.android.app.extensions.launchUrl
 import mega.privacy.android.app.fragments.settingsFragments.SettingsBaseFragment
 import mega.privacy.android.app.presentation.advertisements.GoogleAdsManager
 import mega.privacy.android.domain.entity.settings.cookie.CookieType
@@ -90,10 +87,10 @@ class CookieSettingsFragment : SettingsBaseFragment(),
         analyticsCookiesPreference?.onPreferenceChangeListener = this
         policiesPreference?.apply {
             setButton1(getString(R.string.settings_about_cookie_policy)) {
-                openBrowser(COOKIE_URL.toUri())
+                context.launchUrl(COOKIE_URL)
             }
             setButton2(getString(R.string.settings_about_privacy_policy)) {
-                openBrowser(PRIVACY_URL.toUri())
+                context.launchUrl(PRIVACY_URL)
             }
         }
         adsPersonalization?.onPreferenceClickListener = this
@@ -146,17 +143,6 @@ class CookieSettingsFragment : SettingsBaseFragment(),
         }
 
         return true
-    }
-
-    /**
-     * Open browser screen to show an Uri
-     *
-     * @param uri   Uri to be shown on the browser
-     */
-    private fun openBrowser(uri: Uri) {
-        startActivity(Intent(requireContext(), WebViewActivity::class.java).apply {
-            data = uri
-        })
     }
 
     companion object {
