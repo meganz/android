@@ -1067,7 +1067,7 @@
     <!-- Message displayed when email address is successfully updated -->
     <string name="email_confirmation_email_address_update_message">Адрес электронной почты изменён</string>
     <!-- Snackbar text to inform the user that download started -->
-    <string name="transfers_download_started_snackbar">Download started. See notification for details.</string>
+    <string name="transfers_download_started_snackbar">Скачивание началось. Подробности в уведомлении.</string>
     <!--Sign Up page text field input first name error message when empty-->
     <string name="sign_up_first_name_text_field_error_message">Введите имя</string>
     <!--Sign Up page text field input last name error message when empty-->
@@ -1092,4 +1092,6 @@
     <string name="sign_up_password_hint_number_or_special_character">Хотя бы одну цифру или специальный символ</string>
     <!--Sign up page text to ask the user to login if they already have a MEGA account-->
     <string name="sign_up_already_have_account_login_link_text">Уже есть аккаунт MEGA? [A]Войти[/A]</string>
+    <!-- Text shown in the fake preview screen -->
+    <string name="transfers_fake_preview_text">Loading file</string>
 </resources>

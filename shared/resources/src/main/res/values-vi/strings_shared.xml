@@ -313,7 +313,7 @@
     <!-- Title of the Warning Dialog shown when the new Local Primary or Secondary Folder is same as, a parent folder or sub-folder of the opposite Local Folder -->
     <string name="settings_camera_uploads_related_new_local_folder_warning_dialog_title">Xung&#160;đột thư&#160;mục tải lên</string>
     <!-- Body of the Warning Dialog shown when the new Local Primary or Secondary Folder is same as, a parent folder or sub-folder of the opposite Local Folder -->
-    <string name="settings_camera_uploads_related_new_local_folder_warning_dialog_body">Thư&#160;mục Đăng&#160;tải camêra và thư&#160;mục Đăng&#160;tải phương&#160;tiện phụ của bạn không thể liên&#160;kết với nhau. Hãy chọn một thư&#160;mục khác.</string>
+    <string name="settings_camera_uploads_related_new_local_folder_warning_dialog_body">Thư&#160;mục Đăng&#160;tải camêra và thư&#160;mục Đăng&#160;tải phương&#160;tiện bổ&#160;sung của bạn không được phép có liên&#160;quan với nhau. Hãy chọn một thư&#160;mục khác.</string>
     <!-- The confirmation Button text of the Warning Dialog shown when the new Local Primary or Secondary Folder is same as, a parent folder or sub-folder of the opposite Local Folder -->
     <string name="settings_camera_uploads_related_new_local_folder_warning_dialog_confirm_button">OK, hiểu rồi</string>
     <!-- Warning message shown when trying to select a local folder but there isn’t any app to do that. -->
@@ -1013,7 +1013,7 @@
     <!-- Message displayed when email address is successfully updated -->
     <string name="email_confirmation_email_address_update_message">Địa chỉ email đã được cập&#160;nhật</string>
     <!-- Snackbar text to inform the user that download started -->
-    <string name="transfers_download_started_snackbar">Download started. See notification for details.</string>
+    <string name="transfers_download_started_snackbar">Phiên tải xuống đã bắt đầu. Xem thông báo để biết thêm chi tiết.</string>
     <!--Sign Up page text field input first name error message when empty-->
     <string name="sign_up_first_name_text_field_error_message">Điền tên</string>
     <!--Sign Up page text field input last name error message when empty-->
@@ -1038,4 +1038,6 @@
     <string name="sign_up_password_hint_number_or_special_character">Ít nhất có một con số hoặc ký&#160;tự đặc&#160;biệt</string>
     <!--Sign up page text to ask the user to login if they already have a MEGA account-->
     <string name="sign_up_already_have_account_login_link_text">Bạn đã có tài&#160;khoản MEGA rồi? [A]Đăng&#160;nhập[/A]</string>
+    <!-- Text shown in the fake preview screen -->
+    <string name="transfers_fake_preview_text">Loading file</string>
 </resources>

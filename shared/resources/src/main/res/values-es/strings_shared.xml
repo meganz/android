@@ -1049,7 +1049,7 @@
     <!-- Message displayed when email address is successfully updated -->
     <string name="email_confirmation_email_address_update_message">Dirección de correo electrónico actualizada</string>
     <!-- Snackbar text to inform the user that download started -->
-    <string name="transfers_download_started_snackbar">Download started. See notification for details.</string>
+    <string name="transfers_download_started_snackbar">Descarga iniciada. Consulta la notificación para más detalles.</string>
     <!--Sign Up page text field input first name error message when empty-->
     <string name="sign_up_first_name_text_field_error_message">Introducir un nombre</string>
     <!--Sign Up page text field input last name error message when empty-->
@@ -1061,7 +1061,7 @@
     <!--Sign Up page message to be shown when confirm password is not same as password-->
     <string name="sign_up_confirm_password_not_match_error_message">Las contraseñas no coinciden. Compruébalas y vuelve a intentarlo.</string>
     <!--Sign Up page message to be shown when password is considered medium-->
-    <string name="sign_up_password_medium_password_warning_message">Tu contraseña es fácil de adivinar. Te sugerimos que pruebes con una combinación más segura de caracteres.</string>
+    <string name="sign_up_password_medium_password_warning_message">La contraseña es fácil de adivinar. Te sugerimos que pruebes con una combinación más segura de caracteres.</string>
     <!--Message to be shown when password is considered weak -->
     <string name="sign_up_password_weak_password_error_message">La contraseña es demasiado fácil de adivinar. Prueba con una combinación más segura de caracteres.</string>
     <!--Sign Up page terms and condition content text-->
@@ -1074,4 +1074,6 @@
     <string name="sign_up_password_hint_number_or_special_character">Al menos un número o un carácter especial</string>
     <!--Sign up page text to ask the user to login if they already have a MEGA account-->
     <string name="sign_up_already_have_account_login_link_text">¿Ya tienes una cuenta de MEGA? [A]Inicia sesión[/A]</string>
+    <!-- Text shown in the fake preview screen -->
+    <string name="transfers_fake_preview_text">Loading file</string>
 </resources>
