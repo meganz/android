@@ -22,7 +22,6 @@ import mega.privacy.android.data.mapper.transfer.TransfersFinishedNotificationMa
 import mega.privacy.android.data.mapper.transfer.TransfersNotificationMapper
 import mega.privacy.android.data.mapper.transfer.TransfersProgressNotificationSummaryBuilder
 import mega.privacy.android.domain.entity.transfer.ActiveTransferTotals
-import mega.privacy.android.domain.entity.transfer.TransferEvent
 import mega.privacy.android.domain.entity.transfer.TransferProgressResult
 import mega.privacy.android.domain.entity.transfer.TransferType
 import mega.privacy.android.domain.entity.transfer.isPreviewDownload
@@ -30,9 +29,7 @@ import mega.privacy.android.domain.monitoring.CrashReporter
 import mega.privacy.android.domain.qualifier.IoDispatcher
 import mega.privacy.android.domain.qualifier.LoginMutex
 import mega.privacy.android.domain.usecase.featureflag.GetFeatureFlagValueUseCase
-import mega.privacy.android.domain.usecase.qrcode.ScanMediaFileUseCase
 import mega.privacy.android.domain.usecase.transfers.MonitorActiveAndPendingTransfersUseCase
-import mega.privacy.android.domain.usecase.transfers.MonitorTransferEventsUseCase
 import mega.privacy.android.domain.usecase.transfers.active.ClearActiveTransfersIfFinishedUseCase
 import mega.privacy.android.domain.usecase.transfers.active.CorrectActiveTransfersUseCase
 import mega.privacy.android.domain.usecase.transfers.active.GetActiveTransferTotalsUseCase
@@ -49,7 +46,6 @@ class DownloadsWorker @AssistedInject constructor(
     @Assisted context: Context,
     @Assisted workerParams: WorkerParameters,
     @IoDispatcher private val ioDispatcher: CoroutineDispatcher,
-    monitorTransferEventsUseCase: MonitorTransferEventsUseCase,
     areTransfersPausedUseCase: AreTransfersPausedUseCase,
     getActiveTransferTotalsUseCase: GetActiveTransferTotalsUseCase,
     overQuotaNotificationBuilder: OverQuotaNotificationBuilder,
@@ -63,7 +59,6 @@ class DownloadsWorker @AssistedInject constructor(
     private val transfersActionGroupFinishNotificationBuilder: TransfersActionGroupFinishNotificationBuilder,
     private val transfersActionGroupProgressNotificationBuilder: TransfersActionGroupProgressNotificationBuilder,
     private val transfersProgressNotificationSummaryBuilder: TransfersProgressNotificationSummaryBuilder,
-    private val scanMediaFileUseCase: ScanMediaFileUseCase,
     crashReporter: CrashReporter,
     foregroundSetter: ForegroundSetter? = null,
     notificationSamplePeriod: Long? = null,
@@ -76,7 +71,6 @@ class DownloadsWorker @AssistedInject constructor(
     workerParams = workerParams,
     type = TransferType.DOWNLOAD,
     ioDispatcher = ioDispatcher,
-    monitorTransferEventsUseCase = monitorTransferEventsUseCase,
     areTransfersPausedUseCase = areTransfersPausedUseCase,
     getActiveTransferTotalsUseCase = getActiveTransferTotalsUseCase,
     overQuotaNotificationBuilder = overQuotaNotificationBuilder,
@@ -99,9 +93,6 @@ class DownloadsWorker @AssistedInject constructor(
 
     override suspend fun doWorkInternal(scope: CoroutineScope) {
         scope.launch {
-            super.doWorkInternal(this)
-        }
-        scope.launch {
             startAllPendingDownloadsUseCase()
                 .catch {
                     Timber.e(it, "Error on start downloading nodes")
@@ -118,16 +109,6 @@ class DownloadsWorker @AssistedInject constructor(
 
     override suspend fun createFinishNotification(activeTransferTotals: ActiveTransferTotals) =
         transfersFinishedNotificationMapper(activeTransferTotals)
-
-    override suspend fun onTransferEventReceived(event: TransferEvent) {
-        if (event is TransferEvent.TransferFinishEvent && event.transfer.transferredBytes == event.transfer.totalBytes && event.error == null) {
-            runCatching {
-                scanMediaFileUseCase(arrayOf(event.transfer.localPath), arrayOf(""))
-            }.onFailure {
-                Timber.w(it, "Exception scanning file.")
-            }
-        }
-    }
 
     override suspend fun showGroupedNotifications() =
         getFeatureFlagValueUseCase(DataFeatures.ShowGroupedDownloadNotifications)

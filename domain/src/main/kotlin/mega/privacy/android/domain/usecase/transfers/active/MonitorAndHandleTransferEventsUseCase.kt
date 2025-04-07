@@ -24,11 +24,11 @@ import kotlin.time.Duration.Companion.milliseconds
  * It starts the corresponding transfer Worker if needed
  *
  * @property monitorTransferEventsUseCase Use case for monitoring transfer events.
- * @property handleTransferEventUseCase Use case for handling transfer events.
+ * @property handleTransferEventsUseCases Use case for handling transfer events.
  */
 class MonitorAndHandleTransferEventsUseCase @Inject constructor(
     private val monitorTransferEventsUseCase: MonitorTransferEventsUseCase,
-    private val handleTransferEventUseCase: HandleTransferEventUseCase,
+    private val handleTransferEventsUseCases: Set<@JvmSuppressWildcards IHandleTransferEventUseCase>,
     private val transferRepository: TransferRepository,
 ) {
     /**
@@ -76,8 +76,11 @@ class MonitorAndHandleTransferEventsUseCase @Inject constructor(
                 .collectChunked(
                     chunkDuration = eventsChunkDuration,
                     flushOnIdleDuration = 200.milliseconds
-                ) { transferEvents ->
-                    handleTransferEventUseCase(events = transferEvents.toTypedArray())
+                ) {
+                    val transferEvents = it.toTypedArray()
+                    handleTransferEventsUseCases.forEach {
+                        it(events = transferEvents)
+                    }
                     send(transferEvents.size)
                 }
         }

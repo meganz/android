@@ -31,8 +31,6 @@ import mega.privacy.android.data.mapper.transfer.ChatUploadNotificationMapper
 import mega.privacy.android.data.mapper.transfer.OverQuotaNotificationBuilder
 import mega.privacy.android.domain.entity.Progress
 import mega.privacy.android.domain.entity.chat.PendingMessageState
-import mega.privacy.android.domain.entity.chat.messages.pending.UpdatePendingMessageStateRequest
-import mega.privacy.android.domain.entity.node.NodeId
 import mega.privacy.android.domain.entity.transfer.ActiveTransferTotals
 import mega.privacy.android.domain.entity.transfer.ChatCompressionProgress
 import mega.privacy.android.domain.entity.transfer.ChatCompressionState
@@ -43,12 +41,9 @@ import mega.privacy.android.domain.entity.transfer.TransferEvent
 import mega.privacy.android.domain.entity.transfer.TransferType
 import mega.privacy.android.domain.exception.MegaException
 import mega.privacy.android.domain.monitoring.CrashReporter
-import mega.privacy.android.domain.usecase.chat.message.AttachNodeWithPendingMessageUseCase
 import mega.privacy.android.domain.usecase.chat.message.CheckFinishedChatUploadsUseCase
 import mega.privacy.android.domain.usecase.chat.message.MonitorPendingMessagesByStateUseCase
-import mega.privacy.android.domain.usecase.chat.message.UpdatePendingMessageUseCase
 import mega.privacy.android.domain.usecase.chat.message.pendingmessages.CompressPendingMessagesUseCase
-import mega.privacy.android.domain.usecase.transfers.MonitorTransferEventsUseCase
 import mega.privacy.android.domain.usecase.transfers.active.ClearActiveTransfersIfFinishedUseCase
 import mega.privacy.android.domain.usecase.transfers.active.CorrectActiveTransfersUseCase
 import mega.privacy.android.domain.usecase.transfers.active.GetActiveTransferTotalsUseCase
@@ -63,7 +58,6 @@ import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.TestInstance
 import org.mockito.kotlin.any
 import org.mockito.kotlin.anyOrNull
-import org.mockito.kotlin.anyValueClass
 import org.mockito.kotlin.anyVararg
 import org.mockito.kotlin.doReturn
 import org.mockito.kotlin.eq
@@ -90,8 +84,6 @@ class ChatUploadsWorkerTest {
 
     private val workProgressUpdater = mock<ProgressUpdater>()
 
-    private val attachNodeWithPendingMessageUseCase = mock<AttachNodeWithPendingMessageUseCase>()
-    private val monitorTransferEventsUseCase = mock<MonitorTransferEventsUseCase>()
     private val monitorOngoingActiveTransfersUseCase = mock<MonitorOngoingActiveTransfersUseCase>()
     private val areTransfersPausedUseCase = mock<AreTransfersPausedUseCase>()
     private val getActiveTransferTotalsUseCase = mock<GetActiveTransferTotalsUseCase>()
@@ -102,7 +94,6 @@ class ChatUploadsWorkerTest {
     private val clearActiveTransfersIfFinishedUseCase =
         mock<ClearActiveTransfersIfFinishedUseCase>()
     private val chatUploadNotificationMapper = mock<ChatUploadNotificationMapper>()
-    private val updatePendingMessageUseCase = mock<UpdatePendingMessageUseCase>()
     private val checkFinishedChatUploadsUseCase = mock<CheckFinishedChatUploadsUseCase>()
     private val setForeground = mock<ForegroundSetter>()
     private val crashReporter = mock<CrashReporter>()
@@ -144,7 +135,6 @@ class ChatUploadsWorkerTest {
                 )
             ),
             ioDispatcher = ioDispatcher,
-            monitorTransferEventsUseCase = monitorTransferEventsUseCase,
             areTransfersPausedUseCase = areTransfersPausedUseCase,
             getActiveTransferTotalsUseCase = getActiveTransferTotalsUseCase,
             overQuotaNotificationBuilder = overQuotaNotificationBuilder,
@@ -153,8 +143,6 @@ class ChatUploadsWorkerTest {
             correctActiveTransfersUseCase = correctActiveTransfersUseCase,
             clearActiveTransfersIfFinishedUseCase = clearActiveTransfersIfFinishedUseCase,
             chatUploadNotificationMapper = chatUploadNotificationMapper,
-            attachNodeWithPendingMessageUseCase = attachNodeWithPendingMessageUseCase,
-            updatePendingMessageUseCase = updatePendingMessageUseCase,
             checkFinishedChatUploadsUseCase = checkFinishedChatUploadsUseCase,
             compressPendingMessagesUseCase = compressPendingMessagesUseCase,
             monitorOngoingActiveTransfersUseCase = monitorOngoingActiveTransfersUseCase,
@@ -183,11 +171,8 @@ class ChatUploadsWorkerTest {
             clearActiveTransfersIfFinishedUseCase,
             crashReporter,
             setForeground,
-            monitorTransferEventsUseCase,
-            attachNodeWithPendingMessageUseCase,
             monitorOngoingActiveTransfersUseCase,
             chatUploadNotificationMapper,
-            updatePendingMessageUseCase,
             checkFinishedChatUploadsUseCase,
             compressPendingMessagesUseCase,
             clearPendingMessagesCompressionProgressUseCase,
@@ -204,54 +189,6 @@ class ChatUploadsWorkerTest {
             underTest.doWork()
             verify(crashReporter, times(2)).log(any())
         }
-
-    @Test
-    fun `test that node is attached to chat once upload is finished`() = runTest {
-        val finishEvent = commonStub()
-
-        underTest.onTransferEventReceived(finishEvent)
-
-        verify(attachNodeWithPendingMessageUseCase).invoke(
-            PENDING_MSG_ID,
-            NodeId(NODE_ID),
-            listOf(ChatUpload(pendingMessageId = PENDING_MSG_ID))
-        )
-    }
-
-    @Test
-    fun `test that pending message is updated to error uploading if the upload fails`() = runTest {
-        val finishEvent = commonStub(true)
-
-        underTest.onTransferEventReceived(finishEvent)
-
-        verify(updatePendingMessageUseCase).invoke(
-            UpdatePendingMessageStateRequest(
-                PENDING_MSG_ID,
-                state = PendingMessageState.ERROR_UPLOADING
-            )
-        )
-    }
-
-    @Test
-    fun `test that pending message is updated to error attaching if the attach fails`() = runTest {
-        val finishEvent = commonStub()
-        whenever(
-            attachNodeWithPendingMessageUseCase(
-                any(),
-                anyValueClass(),
-                any()
-            )
-        ).thenThrow(RuntimeException::class.java)
-
-        underTest.onTransferEventReceived(finishEvent)
-
-        verify(updatePendingMessageUseCase).invoke(
-            UpdatePendingMessageStateRequest(
-                PENDING_MSG_ID,
-                state = PendingMessageState.ERROR_ATTACHING
-            )
-        )
-    }
 
     @Test
     fun `test that correctActiveTransfersUseCase is invoked when the worker starts doing work`() =
@@ -446,7 +383,6 @@ class ChatUploadsWorkerTest {
                 storageOverQuota = false
             )
         ))
-        whenever(monitorTransferEventsUseCase()) doReturn (emptyFlow())
         whenever(workProgressUpdater.updateProgress(any(), any(), any()))
             .thenReturn(SettableFuture.create<Void?>().also { it.set(null) })
         whenever(areNotificationsEnabledUseCase()).thenReturn(false)

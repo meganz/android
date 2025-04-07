@@ -74,7 +74,6 @@ class UploadsWorkerTest {
     private lateinit var workExecutor: WorkManagerTaskExecutor
     private lateinit var workDatabase: WorkDatabase
 
-    private val monitorTransferEventsUseCase = mock<MonitorTransferEventsUseCase>()
     private val monitorActiveAndPendingTransfersUseCase =
         mock<MonitorActiveAndPendingTransfersUseCase>()
     private val areTransfersPausedUseCase = mock<AreTransfersPausedUseCase>()
@@ -86,7 +85,6 @@ class UploadsWorkerTest {
     private val clearActiveTransfersIfFinishedUseCase =
         mock<ClearActiveTransfersIfFinishedUseCase>()
     private val transfersFinishedNotificationMapper = mock<TransfersFinishedNotificationMapper>()
-    private val setNodeAttributesAfterUploadUseCase = mock<SetNodeAttributesAfterUploadUseCase>()
     private val workProgressUpdater = mock<ProgressUpdater>()
     private val setForeground = mock<ForegroundSetter>()
     private val crashReporter = mock<CrashReporter>()
@@ -124,7 +122,6 @@ class UploadsWorkerTest {
                 )
             ),
             ioDispatcher = ioDispatcher,
-            monitorTransferEventsUseCase = monitorTransferEventsUseCase,
             areTransfersPausedUseCase = areTransfersPausedUseCase,
             monitorActiveAndPendingTransfersUseCase = monitorActiveAndPendingTransfersUseCase,
             getActiveTransferTotalsUseCase = getActiveTransferTotalsUseCase,
@@ -135,7 +132,6 @@ class UploadsWorkerTest {
             correctActiveTransfersUseCase = correctActiveTransfersUseCase,
             clearActiveTransfersIfFinishedUseCase = clearActiveTransfersIfFinishedUseCase,
             transfersFinishedNotificationMapper = transfersFinishedNotificationMapper,
-            setNodeAttributesAfterUploadUseCase = setNodeAttributesAfterUploadUseCase,
             crashReporter = crashReporter,
             foregroundSetter = setForeground,
             notificationSamplePeriod = 0L,
@@ -158,7 +154,6 @@ class UploadsWorkerTest {
             correctActiveTransfersUseCase,
             clearActiveTransfersIfFinishedUseCase,
             transfersFinishedNotificationMapper,
-            setNodeAttributesAfterUploadUseCase,
             crashReporter,
             setForeground,
             startAllPendingUploadsUseCase
@@ -169,14 +164,6 @@ class UploadsWorkerTest {
     fun tearDown() {
         Dispatchers.resetMain()
     }
-
-    @Test
-    fun `test that monitorTransferEventsUseCase is invoked when the worker starts doing work`() =
-        runTest {
-            commonStub()
-            underTest.doWork()
-            verify(monitorTransferEventsUseCase, atLeastOnce()).invoke()
-        }
 
     @Test
     fun `test that crashReporter is invoked when the worker starts doing work`() =
@@ -208,7 +195,6 @@ class UploadsWorkerTest {
             commonStub()
             val inOrder =
                 inOrder(
-                    monitorTransferEventsUseCase,
                     correctActiveTransfersUseCase,
                     monitorActiveAndPendingTransfersUseCase
                 )
@@ -342,31 +328,6 @@ class UploadsWorkerTest {
     }
 
     @Test
-    fun `test that node attributes are set once upload is finished`() = runTest {
-        val appData = listOf(TransferAppData.Geolocation(345.4, 45.34))
-        val finishEvent = commonStub(appData = appData)
-
-        underTest.onTransferEventReceived(finishEvent)
-
-        verify(setNodeAttributesAfterUploadUseCase).invoke(nodeId, UriPath(localPath), appData)
-    }
-
-    @Test
-    fun `test that node attributes are not set once upload is finished with error`() = runTest {
-        val transfer: Transfer = mock {
-            on { this.nodeHandle }.thenReturn(nodeId)
-            on { this.localPath }.thenReturn(localPath)
-            on { this.state }.thenReturn(TransferState.STATE_FAILED)
-        }
-        val transferEvent = TransferEvent.TransferFinishEvent(transfer, mock())
-        commonStub()
-
-        underTest.onTransferEventReceived(transferEvent)
-
-        verifyNoInteractions(setNodeAttributesAfterUploadUseCase)
-    }
-
-    @Test
     fun `test that startAllPendingDownloadsUseCase is invoked when work is started`() = runTest {
         commonStub()
         underTest.doWork()
@@ -387,8 +348,6 @@ class UploadsWorkerTest {
         val transferEvent = TransferEvent.TransferFinishEvent(transfer, null)
         whenever(areTransfersPausedUseCase())
             .thenReturn(false)
-        whenever(monitorTransferEventsUseCase())
-            .thenReturn(flowOf(transferEvent))
         whenever(monitorActiveAndPendingTransfersUseCase(TransferType.GENERAL_UPLOAD))
             .thenReturn(flow {
                 emit(

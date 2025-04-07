@@ -14,7 +14,7 @@ import mega.privacy.android.domain.usecase.chat.message.UpdatePendingMessageUseC
 import javax.inject.Inject
 
 /**
- * Monitors the pending messages that are added by the user to a chat and if it's not accessible by the sdk (it's a content Uri) copies the file to the cache folder and then:
+ * Monitors the pending messages that are added by the user to a chat and then:
  *  - if it needs compression: updates the pending message state to be compressed
  *  - if doesn't need compression: updates the pending message state to be ready to upload
  *  It returns a flow that emits the number of pending messages in preparing state

@@ -41,9 +41,7 @@ import mega.privacy.android.domain.entity.transfer.TransferProgressResult
 import mega.privacy.android.domain.entity.transfer.TransferType
 import mega.privacy.android.domain.monitoring.CrashReporter
 import mega.privacy.android.domain.usecase.featureflag.GetFeatureFlagValueUseCase
-import mega.privacy.android.domain.usecase.qrcode.ScanMediaFileUseCase
 import mega.privacy.android.domain.usecase.transfers.MonitorActiveAndPendingTransfersUseCase
-import mega.privacy.android.domain.usecase.transfers.MonitorTransferEventsUseCase
 import mega.privacy.android.domain.usecase.transfers.active.ClearActiveTransfersIfFinishedUseCase
 import mega.privacy.android.domain.usecase.transfers.active.CorrectActiveTransfersUseCase
 import mega.privacy.android.domain.usecase.transfers.active.GetActiveTransferTotalsUseCase
@@ -79,7 +77,6 @@ class DownloadsWorkerTest {
     private lateinit var workExecutor: WorkManagerTaskExecutor
     private lateinit var workDatabase: WorkDatabase
 
-    private val monitorTransferEventsUseCase = mock<MonitorTransferEventsUseCase>()
     private val areTransfersPausedUseCase = mock<AreTransfersPausedUseCase>()
     private val getActiveTransferTotalsUseCase = mock<GetActiveTransferTotalsUseCase>()
     private val transfersNotificationMapper = mock<TransfersNotificationMapper>()
@@ -90,7 +87,6 @@ class DownloadsWorkerTest {
         mock<ClearActiveTransfersIfFinishedUseCase>()
     private val transfersFinishedNotificationMapper = mock<TransfersFinishedNotificationMapper>()
     private val workProgressUpdater = mock<ProgressUpdater>()
-    private val scanMediaFileUseCase = mock<ScanMediaFileUseCase>()
     private val setForeground = mock<ForegroundSetter>()
     private val crashReporter = mock<CrashReporter>()
     private val notificationManager = mock<NotificationManagerCompat>()
@@ -135,7 +131,6 @@ class DownloadsWorkerTest {
                 )
             ),
             ioDispatcher = ioDispatcher,
-            monitorTransferEventsUseCase = monitorTransferEventsUseCase,
             areTransfersPausedUseCase = areTransfersPausedUseCase,
             getActiveTransferTotalsUseCase = getActiveTransferTotalsUseCase,
             transfersNotificationMapper = transfersNotificationMapper,
@@ -145,7 +140,6 @@ class DownloadsWorkerTest {
             correctActiveTransfersUseCase = correctActiveTransfersUseCase,
             clearActiveTransfersIfFinishedUseCase = clearActiveTransfersIfFinishedUseCase,
             transfersFinishedNotificationMapper = transfersFinishedNotificationMapper,
-            scanMediaFileUseCase = scanMediaFileUseCase,
             crashReporter = crashReporter,
             foregroundSetter = setForeground,
             notificationSamplePeriod = 0L,
@@ -177,7 +171,6 @@ class DownloadsWorkerTest {
             transfersFinishedNotificationMapper,
             crashReporter,
             setForeground,
-            monitorTransferEventsUseCase,
             monitorActiveAndPendingTransfersUseCase,
             startAllPendingDownloadsUseCase,
             transfersActionGroupFinishNotificationBuilder,
@@ -192,14 +185,6 @@ class DownloadsWorkerTest {
     fun tearDown() {
         Dispatchers.resetMain()
     }
-
-    @Test
-    fun `test that monitorTransferEventsUseCase is invoked when the worker starts doing work`() =
-        runTest {
-            commonStub()
-            underTest.doWork()
-            verify(monitorTransferEventsUseCase).invoke()
-        }
 
     @Test
     fun `test that crashReporter is invoked when the worker starts doing work`() =
@@ -231,7 +216,6 @@ class DownloadsWorkerTest {
             commonStub()
             val inOrder =
                 inOrder(
-                    monitorTransferEventsUseCase,
                     correctActiveTransfersUseCase,
                     monitorActiveAndPendingTransfersUseCase,
                 )
@@ -365,20 +349,6 @@ class DownloadsWorkerTest {
     }
 
     @Test
-    fun `test that file is scanned by scanMediaFileUseCase once download is finished`() = runTest {
-        val localPath = "localPath"
-        val transfer = mock<Transfer> {
-            on { this.localPath } doReturn localPath
-        }
-        val finishEvent = mock<TransferEvent.TransferFinishEvent> {
-            on { this.transfer } doReturn transfer
-        }
-
-        underTest.onTransferEventReceived(finishEvent)
-        verify(scanMediaFileUseCase).invoke(arrayOf(localPath), arrayOf(""))
-    }
-
-    @Test
     fun `test that startAllPendingDownloadsUseCase is invoked when work is started`() = runTest {
         commonStub()
         underTest.doWork()
@@ -446,8 +416,6 @@ class DownloadsWorkerTest {
         val transferEvent = TransferEvent.TransferFinishEvent(transfer, null)
         whenever(areTransfersPausedUseCase())
             .thenReturn(false)
-        whenever(monitorTransferEventsUseCase())
-            .thenReturn(flowOf(transferEvent))
         whenever(monitorActiveAndPendingTransfersUseCase(TransferType.DOWNLOAD))
             .thenReturn(flow {
                 emit(

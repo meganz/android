@@ -18,25 +18,18 @@ import mega.privacy.android.data.mapper.transfer.ChatUploadNotificationMapper
 import mega.privacy.android.data.mapper.transfer.OverQuotaNotificationBuilder
 import mega.privacy.android.domain.entity.Progress
 import mega.privacy.android.domain.entity.chat.PendingMessageState
-import mega.privacy.android.domain.entity.chat.messages.pending.UpdatePendingMessageStateRequest
-import mega.privacy.android.domain.entity.node.NodeId
 import mega.privacy.android.domain.entity.transfer.ActiveTransferTotals
 import mega.privacy.android.domain.entity.transfer.ChatCompressionFinished
 import mega.privacy.android.domain.entity.transfer.ChatCompressionProgress
 import mega.privacy.android.domain.entity.transfer.ChatCompressionState
-import mega.privacy.android.domain.entity.transfer.TransferEvent
 import mega.privacy.android.domain.entity.transfer.TransferProgressResult
 import mega.privacy.android.domain.entity.transfer.TransferType
-import mega.privacy.android.domain.entity.transfer.pendingMessageIds
 import mega.privacy.android.domain.monitoring.CrashReporter
 import mega.privacy.android.domain.qualifier.IoDispatcher
 import mega.privacy.android.domain.qualifier.LoginMutex
-import mega.privacy.android.domain.usecase.chat.message.AttachNodeWithPendingMessageUseCase
 import mega.privacy.android.domain.usecase.chat.message.CheckFinishedChatUploadsUseCase
 import mega.privacy.android.domain.usecase.chat.message.MonitorPendingMessagesByStateUseCase
-import mega.privacy.android.domain.usecase.chat.message.UpdatePendingMessageUseCase
 import mega.privacy.android.domain.usecase.chat.message.pendingmessages.CompressPendingMessagesUseCase
-import mega.privacy.android.domain.usecase.transfers.MonitorTransferEventsUseCase
 import mega.privacy.android.domain.usecase.transfers.active.ClearActiveTransfersIfFinishedUseCase
 import mega.privacy.android.domain.usecase.transfers.active.CorrectActiveTransfersUseCase
 import mega.privacy.android.domain.usecase.transfers.active.GetActiveTransferTotalsUseCase
@@ -56,7 +49,6 @@ class ChatUploadsWorker @AssistedInject constructor(
     @Assisted context: Context,
     @Assisted workerParams: WorkerParameters,
     @IoDispatcher private val ioDispatcher: CoroutineDispatcher,
-    monitorTransferEventsUseCase: MonitorTransferEventsUseCase,
     areTransfersPausedUseCase: AreTransfersPausedUseCase,
     getActiveTransferTotalsUseCase: GetActiveTransferTotalsUseCase,
     overQuotaNotificationBuilder: OverQuotaNotificationBuilder,
@@ -65,8 +57,6 @@ class ChatUploadsWorker @AssistedInject constructor(
     correctActiveTransfersUseCase: CorrectActiveTransfersUseCase,
     clearActiveTransfersIfFinishedUseCase: ClearActiveTransfersIfFinishedUseCase,
     private val chatUploadNotificationMapper: ChatUploadNotificationMapper,
-    private val attachNodeWithPendingMessageUseCase: AttachNodeWithPendingMessageUseCase,
-    private val updatePendingMessageUseCase: UpdatePendingMessageUseCase,
     private val checkFinishedChatUploadsUseCase: CheckFinishedChatUploadsUseCase,
     private val compressPendingMessagesUseCase: CompressPendingMessagesUseCase,
     private val monitorOngoingActiveTransfersUseCase: MonitorOngoingActiveTransfersUseCase,
@@ -83,7 +73,6 @@ class ChatUploadsWorker @AssistedInject constructor(
     workerParams = workerParams,
     type = TransferType.CHAT_UPLOAD,
     ioDispatcher = ioDispatcher,
-    monitorTransferEventsUseCase = monitorTransferEventsUseCase,
     areTransfersPausedUseCase = areTransfersPausedUseCase,
     getActiveTransferTotalsUseCase = getActiveTransferTotalsUseCase,
     overQuotaNotificationBuilder = overQuotaNotificationBuilder,
@@ -135,9 +124,6 @@ class ChatUploadsWorker @AssistedInject constructor(
 
     override suspend fun doWorkInternal(scope: CoroutineScope) {
         scope.launch {
-            super.doWorkInternal(this)
-        }
-        scope.launch {
             prepareAllPendingMessagesUseCase()
                 .catch { Timber.e(it) }
                 .collect { Timber.d("Chat Upload Preparing $it attachments") }
@@ -162,38 +148,6 @@ class ChatUploadsWorker @AssistedInject constructor(
 
     override suspend fun onStart() {
         checkFinishedChatUploadsUseCase()
-    }
-
-    override suspend fun onTransferEventReceived(event: TransferEvent) {
-        event.transfer.pendingMessageIds()?.let { pendingMessageIds ->
-            (event as? TransferEvent.TransferFinishEvent)?.let { finishEvent ->
-                pendingMessageIds.forEach { pendingMessageId ->
-                    if (finishEvent.error == null) {
-                        runCatching {
-                            Timber.d("Node will be attached")
-                            //once uploaded, it can be attached to the chat
-                            attachNodeWithPendingMessageUseCase(
-                                pendingMessageId,
-                                NodeId(event.transfer.nodeHandle),
-                                finishEvent.transfer.appData,
-                            )
-                        }.onFailure {
-                            updateState(pendingMessageId, PendingMessageState.ERROR_ATTACHING)
-                            Timber.e(it, "Node could not be attached")
-                        }
-                    } else {
-                        updateState(pendingMessageId, PendingMessageState.ERROR_UPLOADING)
-                    }
-                }
-            }
-        }
-    }
-
-    private suspend fun updateState(
-        pendingMessageId: Long,
-        state: PendingMessageState,
-    ) {
-        updatePendingMessageUseCase(UpdatePendingMessageStateRequest(pendingMessageId, state))
     }
 
     companion object {

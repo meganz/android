@@ -37,14 +37,15 @@ class MonitorAndHandleTransferEventsUseCaseTest {
     private lateinit var underTest: MonitorAndHandleTransferEventsUseCase
 
     private val monitorTransferEventsUseCase = mock<MonitorTransferEventsUseCase>()
-    private val handleTransferEventUseCase = mock<HandleTransferEventUseCase>()
+    private val handleTransferEventsUseCases =
+        setOf(mock<HandleTransferEventUseCase>(), mock<HandleTransferEventUseCase>())
     private val transferRepository = mock<TransferRepository>()
 
     @BeforeAll
     fun setup() {
         underTest = MonitorAndHandleTransferEventsUseCase(
             monitorTransferEventsUseCase,
-            handleTransferEventUseCase,
+            handleTransferEventsUseCases,
             transferRepository,
         )
     }
@@ -53,8 +54,8 @@ class MonitorAndHandleTransferEventsUseCaseTest {
     fun cleanUp() {
         reset(
             monitorTransferEventsUseCase,
-            handleTransferEventUseCase,
             transferRepository,
+            *handleTransferEventsUseCases.toTypedArray(),
         )
         whenever(transferRepository.monitorIsDownloadsWorkerFinished()) doReturn flowOf(false)
         whenever(transferRepository.monitorIsUploadsWorkerFinished()) doReturn flowOf(false)
@@ -84,9 +85,10 @@ class MonitorAndHandleTransferEventsUseCaseTest {
             assertThat(awaitItem()).isEqualTo(3)
             awaitComplete()
         }
-
-        verify(handleTransferEventUseCase).invoke(fileEvent1, fileEvent2)
-        verify(handleTransferEventUseCase).invoke(fileEvent3, fileEvent4, fileEvent5)
+        handleTransferEventsUseCases.forEach {
+            verify(it).invoke(fileEvent1, fileEvent2)
+            verify(it).invoke(fileEvent3, fileEvent4, fileEvent5)
+        }
     }
 
     @ParameterizedTest
@@ -106,8 +108,9 @@ class MonitorAndHandleTransferEventsUseCaseTest {
             assertThat(awaitItem()).isEqualTo(1)
             awaitComplete()
         }
-
-        verify(handleTransferEventUseCase).invoke(transferEvent)
+        handleTransferEventsUseCases.forEach {
+            verify(it).invoke(transferEvent)
+        }
     }
 
     @Nested

@@ -15,8 +15,6 @@ import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.catch
-import kotlinx.coroutines.flow.filter
-import kotlinx.coroutines.flow.filterNot
 import kotlinx.coroutines.flow.lastOrNull
 import kotlinx.coroutines.flow.onCompletion
 import kotlinx.coroutines.flow.transformWhile
@@ -26,18 +24,13 @@ import kotlinx.coroutines.withContext
 import mega.privacy.android.data.mapper.transfer.OverQuotaNotificationBuilder
 import mega.privacy.android.domain.entity.transfer.ActiveTransferTotals
 import mega.privacy.android.domain.entity.transfer.MonitorOngoingActiveTransfersResult
-import mega.privacy.android.domain.entity.transfer.TransferEvent
 import mega.privacy.android.domain.entity.transfer.TransferProgressResult
 import mega.privacy.android.domain.entity.transfer.TransferType
-import mega.privacy.android.domain.entity.transfer.isBackgroundTransfer
-import mega.privacy.android.domain.entity.transfer.isVoiceClip
-import mega.privacy.android.domain.extension.collectChunked
 import mega.privacy.android.domain.extension.onEachSampled
 import mega.privacy.android.domain.extension.onFirst
 import mega.privacy.android.domain.extension.skipUnstable
 import mega.privacy.android.domain.monitoring.CrashReporter
 import mega.privacy.android.domain.qualifier.LoginMutex
-import mega.privacy.android.domain.usecase.transfers.MonitorTransferEventsUseCase
 import mega.privacy.android.domain.usecase.transfers.active.ClearActiveTransfersIfFinishedUseCase
 import mega.privacy.android.domain.usecase.transfers.active.CorrectActiveTransfersUseCase
 import mega.privacy.android.domain.usecase.transfers.active.GetActiveTransferTotalsUseCase
@@ -56,7 +49,6 @@ abstract class AbstractTransfersWorker(
     workerParams: WorkerParameters,
     protected val type: TransferType,
     private val ioDispatcher: CoroutineDispatcher,
-    private val monitorTransferEventsUseCase: MonitorTransferEventsUseCase,
     private val areTransfersPausedUseCase: AreTransfersPausedUseCase,
     private val getActiveTransferTotalsUseCase: GetActiveTransferTotalsUseCase,
     private val overQuotaNotificationBuilder: OverQuotaNotificationBuilder,
@@ -100,11 +92,6 @@ abstract class AbstractTransfersWorker(
     open suspend fun onStart() {}
 
     /**
-     * Event to do extra work on each transfer event
-     */
-    open suspend fun onTransferEventReceived(event: TransferEvent) {}
-
-    /**
      * Event to do extra work on complete
      */
     open suspend fun onComplete() {}
@@ -113,6 +100,8 @@ abstract class AbstractTransfersWorker(
      * @return a flow with updates of MonitorOngoingActiveTransfersResult to track the progress of the ongoing work. It will be sampled to avoid too much updates.
      */
     internal abstract fun monitorProgress(): Flow<TransferProgressResult>
+
+    internal abstract suspend fun doWorkInternal(scope: CoroutineScope)
 
     internal fun consumeProgress() = monitorProgress()
         .skipUnstable(eventsChunkDuration) {
@@ -268,31 +257,6 @@ abstract class AbstractTransfersWorker(
                     ?: createUpdateNotification(activeTransferTotals, paused)
             }
         )
-
-    /**
-     * Monitors transfer events and update the related active transfers
-     */
-    internal open suspend fun doWorkInternal(scope: CoroutineScope) {
-        monitorTransferEventsUseCase()
-            .filterNot { event ->
-                event.transfer.isVoiceClip()
-                        || event.transfer.isBackgroundTransfer()
-                        || event.transfer.isStreamingTransfer
-                        || event.transfer.isBackupTransfer
-                        || event.transfer.isSyncTransfer
-            }
-            .filter { it.transfer.transferType == type }
-            .collectChunked(
-                chunkDuration = eventsChunkDuration,
-                flushOnIdleDuration = 200.milliseconds
-            ) { transferEvents ->
-                scope.launch {
-                    transferEvents.forEach {
-                        onTransferEventReceived(it)
-                    }
-                }
-            }
-    }
 
     private suspend fun stopWork(performWorkJob: Job) {
         Timber.d("${this@AbstractTransfersWorker::class.java.simpleName} Stop work")

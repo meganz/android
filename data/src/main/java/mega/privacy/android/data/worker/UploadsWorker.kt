@@ -16,21 +16,17 @@ import mega.privacy.android.data.mapper.transfer.OverQuotaNotificationBuilder
 import mega.privacy.android.data.mapper.transfer.TransfersFinishedNotificationMapper
 import mega.privacy.android.data.mapper.transfer.TransfersNotificationMapper
 import mega.privacy.android.domain.entity.transfer.ActiveTransferTotals
-import mega.privacy.android.domain.entity.transfer.TransferEvent
 import mega.privacy.android.domain.entity.transfer.TransferProgressResult
 import mega.privacy.android.domain.entity.transfer.TransferType
-import mega.privacy.android.domain.entity.uri.UriPath
 import mega.privacy.android.domain.monitoring.CrashReporter
 import mega.privacy.android.domain.qualifier.IoDispatcher
 import mega.privacy.android.domain.qualifier.LoginMutex
 import mega.privacy.android.domain.usecase.transfers.MonitorActiveAndPendingTransfersUseCase
-import mega.privacy.android.domain.usecase.transfers.MonitorTransferEventsUseCase
 import mega.privacy.android.domain.usecase.transfers.active.ClearActiveTransfersIfFinishedUseCase
 import mega.privacy.android.domain.usecase.transfers.active.CorrectActiveTransfersUseCase
 import mega.privacy.android.domain.usecase.transfers.active.GetActiveTransferTotalsUseCase
 import mega.privacy.android.domain.usecase.transfers.paused.AreTransfersPausedUseCase
 import mega.privacy.android.domain.usecase.transfers.pending.StartAllPendingUploadsUseCase
-import mega.privacy.android.domain.usecase.transfers.uploads.SetNodeAttributesAfterUploadUseCase
 import timber.log.Timber
 
 /**
@@ -42,7 +38,6 @@ class UploadsWorker @AssistedInject constructor(
     @Assisted context: Context,
     @Assisted workerParams: WorkerParameters,
     @IoDispatcher private val ioDispatcher: CoroutineDispatcher,
-    monitorTransferEventsUseCase: MonitorTransferEventsUseCase,
     private val monitorActiveAndPendingTransfersUseCase: MonitorActiveAndPendingTransfersUseCase,
     areTransfersPausedUseCase: AreTransfersPausedUseCase,
     getActiveTransferTotalsUseCase: GetActiveTransferTotalsUseCase,
@@ -53,7 +48,6 @@ class UploadsWorker @AssistedInject constructor(
     clearActiveTransfersIfFinishedUseCase: ClearActiveTransfersIfFinishedUseCase,
     private val transfersNotificationMapper: TransfersNotificationMapper,
     private val transfersFinishedNotificationMapper: TransfersFinishedNotificationMapper,
-    private val setNodeAttributesAfterUploadUseCase: SetNodeAttributesAfterUploadUseCase,
     crashReporter: CrashReporter,
     foregroundSetter: ForegroundSetter? = null,
     notificationSamplePeriod: Long? = null,
@@ -64,7 +58,6 @@ class UploadsWorker @AssistedInject constructor(
     workerParams = workerParams,
     type = TransferType.GENERAL_UPLOAD,
     ioDispatcher = ioDispatcher,
-    monitorTransferEventsUseCase = monitorTransferEventsUseCase,
     areTransfersPausedUseCase = areTransfersPausedUseCase,
     getActiveTransferTotalsUseCase = getActiveTransferTotalsUseCase,
     overQuotaNotificationBuilder = overQuotaNotificationBuilder,
@@ -85,9 +78,6 @@ class UploadsWorker @AssistedInject constructor(
 
     override suspend fun doWorkInternal(scope: CoroutineScope) {
         scope.launch {
-            super.doWorkInternal(this)
-        }
-        scope.launch {
             startAllPendingUploadsUseCase()
                 .catch {
                     Timber.e(it, "Error on start uploading files")
@@ -104,22 +94,6 @@ class UploadsWorker @AssistedInject constructor(
 
     override suspend fun createFinishNotification(activeTransferTotals: ActiveTransferTotals) =
         transfersFinishedNotificationMapper(activeTransferTotals)
-
-    override suspend fun onTransferEventReceived(event: TransferEvent) {
-        (event as? TransferEvent.TransferFinishEvent)?.let {
-            if (it.error == null) {
-                runCatching {
-                    setNodeAttributesAfterUploadUseCase(
-                        nodeHandle = it.transfer.nodeHandle,
-                        uriPath = UriPath(it.transfer.localPath),
-                        appData = it.transfer.appData
-                    )
-                }.onFailure { exception ->
-                    Timber.e(exception, "Node attributes not correctly set")
-                }
-            }
-        }
-    }
 
     companion object {
         /**
