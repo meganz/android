@@ -48,6 +48,7 @@ import mega.privacy.android.domain.usecase.setting.SetAskBeforeLargeDownloadsSet
 import mega.privacy.android.domain.usecase.transfers.CancelTransferByTagUseCase
 import mega.privacy.android.domain.usecase.transfers.DeleteCacheFilesUseCase
 import mega.privacy.android.domain.usecase.transfers.GetFileNameFromStringUriUseCase
+import mega.privacy.android.domain.usecase.transfers.GetTransferByTagUseCase
 import mega.privacy.android.domain.usecase.transfers.active.ClearActiveTransfersIfFinishedUseCase
 import mega.privacy.android.domain.usecase.transfers.active.MonitorOngoingActiveTransfersUseCase
 import mega.privacy.android.domain.usecase.transfers.chatuploads.SetAskedResumeTransfersUseCase
@@ -87,6 +88,7 @@ import org.mockito.kotlin.reset
 import org.mockito.kotlin.verify
 import org.mockito.kotlin.verifyNoInteractions
 import org.mockito.kotlin.whenever
+import java.io.File
 
 @ExtendWith(CoroutineMainDispatcherExtension::class)
 @TestInstance(TestInstance.Lifecycle.PER_CLASS)
@@ -148,6 +150,7 @@ class StartTransfersComponentViewModelTest {
     private val getFileNameFromStringUriUseCase = mock<GetFileNameFromStringUriUseCase>()
     private val cancelTransferByTagUseCase = mock<CancelTransferByTagUseCase>()
     private val deleteCacheFilesUseCase = mock<DeleteCacheFilesUseCase>()
+    private val getTransferByTagUseCase = mock<GetTransferByTagUseCase>()
 
     private val node: TypedFileNode = mock()
     private val nodes = listOf(node)
@@ -214,6 +217,7 @@ class StartTransfersComponentViewModelTest {
             getFileNameFromStringUriUseCase = getFileNameFromStringUriUseCase,
             cancelTransferByTagUseCase = cancelTransferByTagUseCase,
             deleteCacheFilesUseCase = deleteCacheFilesUseCase,
+            getTransferByTagUseCase = getTransferByTagUseCase,
         )
     }
 
@@ -259,6 +263,7 @@ class StartTransfersComponentViewModelTest {
             getFileNameFromStringUriUseCase,
             cancelTransferByTagUseCase,
             deleteCacheFilesUseCase,
+            getTransferByTagUseCase,
         )
         initialStub()
     }
@@ -1173,6 +1178,26 @@ class StartTransfersComponentViewModelTest {
             uiState.test {
                 assertThat(awaitItem().transferTagToCancel).isNull()
             }
+        }
+    }
+
+    @ParameterizedTest(name = " if resetTransferTagToCancel is {0}")
+    @ValueSource(booleans = [true, false])
+    fun `test that previewFile updates state correctly`(
+        resetTransferTagToCancel: Boolean,
+    ) = runTest {
+        val transferTagToCancel = 1
+        val event = TransferTriggerEvent.CancelPreviewDownload(transferTagToCancel)
+        val file = mock<File>()
+
+        underTest.startTransfer(event)
+        underTest.previewFile(file, resetTransferTagToCancel)
+
+        underTest.uiState.test {
+            val actual = awaitItem()
+            assertThat(actual.previewFileToOpen).isEqualTo(file)
+            assertThat(actual.transferTagToCancel)
+                .isEqualTo(if (resetTransferTagToCancel) null else transferTagToCancel)
         }
     }
 

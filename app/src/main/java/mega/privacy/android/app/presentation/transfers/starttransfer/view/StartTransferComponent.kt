@@ -7,6 +7,9 @@ import android.content.Intent
 import android.net.Uri
 import android.os.Build
 import android.view.View
+import androidx.activity.compose.rememberLauncherForActivityResult
+import androidx.activity.result.contract.ActivityResultContracts
+import androidx.appcompat.app.AppCompatActivity
 import androidx.compose.foundation.isSystemInDarkTheme
 import androidx.compose.material.SnackbarHostState
 import androidx.compose.material.SnackbarResult
@@ -45,6 +48,10 @@ import mega.privacy.android.app.myAccount.MyAccountActivity
 import mega.privacy.android.app.presentation.node.action.HandleFileAction
 import mega.privacy.android.app.presentation.permissions.NotificationsPermissionActivity
 import mega.privacy.android.app.presentation.snackbar.LegacySnackBarWrapper
+import mega.privacy.android.app.presentation.transfers.preview.FakePreviewActivity
+import mega.privacy.android.app.presentation.transfers.preview.FakePreviewFragment
+import mega.privacy.android.app.presentation.transfers.preview.FakePreviewFragment.Companion.EXTRA_ERROR
+import mega.privacy.android.app.presentation.transfers.preview.FakePreviewFragment.Companion.EXTRA_FILE_PATH
 import mega.privacy.android.app.presentation.transfers.starttransfer.StartTransfersComponentViewModel
 import mega.privacy.android.app.presentation.transfers.starttransfer.model.SaveDestinationInfo
 import mega.privacy.android.app.presentation.transfers.starttransfer.model.StartTransferEvent
@@ -142,7 +149,7 @@ internal fun StartTransferComponent(
                 }
             }
             when {
-                triggerEvent !is TransferTriggerEvent.StartUpload.TextFile
+                triggerEvent !is StartUpload.TextFile
                         && mediaReadPermission?.status?.isGranted == false -> {
                     viewModel.transferEventWaitingForPermissionRequest(triggerEvent)
                     mediaReadPermission.launchPermissionRequest()
@@ -258,6 +265,7 @@ private fun StartTransferComponent(
     val showQuotaExceededDialog = rememberSaveable(stateSaver = storageStateSaver) {
         mutableStateOf(null)
     }
+    var showErrorMessage: String? by rememberSaveable { mutableStateOf(null) }
     var launchFolderPickerForDownloadDestination by rememberSaveable(uiState.askDestinationForDownload != null) {
         mutableStateOf(uiState.askDestinationForDownload != null)
     }
@@ -271,39 +279,58 @@ private fun StartTransferComponent(
         },
     )
 
+    val fakePreviewLauncher = rememberLauncherForActivityResult(
+        contract = ActivityResultContracts.StartActivityForResult()
+    ) { result ->
+        if (result.resultCode == AppCompatActivity.RESULT_OK) {
+            Timber.d("Fake preview activity result OK")
+
+            result.data?.let {
+                it.getStringExtra(EXTRA_FILE_PATH)?.let { path ->
+                    onPreviewFile(File(path))
+                }
+                it.getStringExtra(EXTRA_ERROR)?.let { error ->
+                    if (error.isNotEmpty()) {
+                        showErrorMessage = error
+                        Timber.e("Error in fake preview activity")
+                    }
+                }
+            } ?: Timber.e("Fake preview activity result data is null")
+        }
+    }
+
     EventEffect(
         event = uiState.oneOffViewEvent,
         onConsumed = onOneOffEventConsumed,
-        action = {
-            when (it) {
+        action = { event ->
+            when (event) {
                 is StartTransferEvent.FinishDownloadProcessing -> {
                     onFinishProcessing(
-                        event = it,
+                        event = event,
                         snackBarHostState = snackBarHostState,
                         showQuotaExceededDialog = showQuotaExceededDialog,
                         context = context,
                     )
-                    onScanningFinished(it)
+                    onScanningFinished(event)
                 }
 
                 is StartTransferEvent.FinishUploadProcessing -> {
-                    val message = (it.triggerEvent as? Files)?.specificStartMessage
+                    val message = (event.triggerEvent as? Files)?.specificStartMessage
                         ?: context.resources.getQuantityString(
                             R.plurals.upload_began,
-                            it.totalFiles,
-                            it.totalFiles,
+                            event.totalFiles,
+                            event.totalFiles,
                         )
                     snackBarHostState.showAutoDurationSnackbar(message)
-                    onScanningFinished(it)
+                    onScanningFinished(event)
                 }
 
                 is StartTransferEvent.Message -> {
                     consumeMessage(
-                        it,
+                        event,
                         snackBarHostState,
                         context,
                         navigateToStorageSettings,
-                        onPreviewFile,
                     )
                 }
 
@@ -313,13 +340,13 @@ private fun StartTransferComponent(
 
                 is StartTransferEvent.PausedTransfers -> {
                     when {
-                        it.triggerEvent is TransferTriggerEvent.StartChatUpload -> {
+                        event.triggerEvent is TransferTriggerEvent.StartChatUpload -> {
                             showResumeChatUploadsAlertDialog = true
                         }
 
-                        it.triggerEvent is TransferTriggerEvent.StartDownloadForPreview -> {
+                        event.triggerEvent is TransferTriggerEvent.StartDownloadForPreview -> {
                             showResumePreviewDownloadsAlertDialog =
-                                it.triggerEvent.node?.name ?: run {
+                                event.triggerEvent.node?.name ?: run {
                                     Timber.w("Empty name for file preview")
                                     ""
                                 }
@@ -331,9 +358,20 @@ private fun StartTransferComponent(
                     snackBarHostState.showAutoDurationSnackbar(
                         context.resources.getQuantityString(
                             R.plurals.download_complete,
-                            it.totalFiles,
-                            it.totalFiles,
+                            event.totalFiles,
+                            event.totalFiles,
                         )
+                    )
+                }
+
+                is StartTransferEvent.SlowDownloadPreviewInProgress -> {
+                    fakePreviewLauncher.launch(
+                        Intent(context, FakePreviewActivity::class.java).also {
+                            it.putExtra(
+                                FakePreviewFragment.EXTRA_TRANSFER_UNIQUE_ID,
+                                event.transferUniqueId,
+                            )
+                        }
                     )
                 }
             }
@@ -491,6 +529,12 @@ private fun StartTransferComponent(
             )
         }
     )
+    LaunchedEffect(showErrorMessage) {
+        showErrorMessage?.let {
+            snackBarHostState.showAutoDurationSnackbar(it)
+            showErrorMessage = null
+        }
+    }
 }
 
 private val storageStateSaver = Saver<StorageState?, Int>(
@@ -534,7 +578,6 @@ private suspend fun consumeMessage(
     snackBarHostState: SnackbarHostState,
     context: Context,
     navigateToStorageSettings: () -> Unit,
-    previewFile: (File) -> Unit,
 ) {
     //show snack bar with an optional action
     val result = snackBarHostState.showAutoDurationSnackbar(
@@ -542,24 +585,15 @@ private suspend fun consumeMessage(
         event.action?.let { context.getString(it) }
     )
     if (result == SnackbarResult.ActionPerformed && event.actionEvent != null) {
-        consumeMessageAction(
-            event.actionEvent,
-            navigateToStorageSettings,
-            previewFile,
-        )
+        consumeMessageAction(event.actionEvent, navigateToStorageSettings)
     }
 }
 
 private fun consumeMessageAction(
     actionEvent: StartTransferEvent.Message.ActionEvent,
     navigateToStorageSettings: () -> Unit,
-    previewFile: (File) -> Unit,
 ) = when (actionEvent) {
     StartTransferEvent.Message.ActionEvent.GoToFileManagement -> {
         navigateToStorageSettings()
-    }
-
-    is StartTransferEvent.Message.ActionEvent.OpenPreview -> {
-        previewFile(actionEvent.file)
     }
 }

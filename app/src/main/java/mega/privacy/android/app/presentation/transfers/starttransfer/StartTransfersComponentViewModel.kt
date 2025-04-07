@@ -24,8 +24,7 @@ import mega.privacy.android.app.presentation.transfers.starttransfer.model.Cance
 import mega.privacy.android.app.presentation.transfers.starttransfer.model.ConfirmLargeDownloadInfo
 import mega.privacy.android.app.presentation.transfers.starttransfer.model.SaveDestinationInfo
 import mega.privacy.android.app.presentation.transfers.starttransfer.model.StartTransferEvent
-import mega.privacy.android.app.presentation.transfers.starttransfer.model.StartTransferEvent.Message.SlowDownloadPreviewFinished
-import mega.privacy.android.app.presentation.transfers.starttransfer.model.StartTransferEvent.Message.SlowDownloadPreviewInProgress
+import mega.privacy.android.app.presentation.transfers.starttransfer.model.StartTransferEvent.SlowDownloadPreviewInProgress
 import mega.privacy.android.app.presentation.transfers.starttransfer.model.StartTransferJobInProgress
 import mega.privacy.android.app.presentation.transfers.starttransfer.model.StartTransferViewState
 import mega.privacy.android.app.presentation.transfers.starttransfer.model.TransferTriggerEvent
@@ -53,6 +52,7 @@ import mega.privacy.android.domain.usecase.setting.SetAskBeforeLargeDownloadsSet
 import mega.privacy.android.domain.usecase.transfers.CancelTransferByTagUseCase
 import mega.privacy.android.domain.usecase.transfers.DeleteCacheFilesUseCase
 import mega.privacy.android.domain.usecase.transfers.GetFileNameFromStringUriUseCase
+import mega.privacy.android.domain.usecase.transfers.GetTransferByTagUseCase
 import mega.privacy.android.domain.usecase.transfers.active.ClearActiveTransfersIfFinishedUseCase
 import mega.privacy.android.domain.usecase.transfers.active.MonitorOngoingActiveTransfersUseCase
 import mega.privacy.android.domain.usecase.transfers.chatuploads.SetAskedResumeTransfersUseCase
@@ -125,6 +125,7 @@ internal class StartTransfersComponentViewModel @Inject constructor(
     private val getFileNameFromStringUriUseCase: GetFileNameFromStringUriUseCase,
     private val cancelTransferByTagUseCase: CancelTransferByTagUseCase,
     private val deleteCacheFilesUseCase: DeleteCacheFilesUseCase,
+    private val getTransferByTagUseCase: GetTransferByTagUseCase,
 ) : ViewModel(), DefaultLifecycleObserver {
 
     private val _uiState = MutableStateFlow(StartTransferViewState())
@@ -587,9 +588,16 @@ internal class StartTransfersComponentViewModel @Inject constructor(
         }
     }
 
-    fun previewFile(file: File) {
-        _uiState.update {
-            it.copy(previewFileToOpen = file)
+    fun previewFile(file: File, resetTransferTagToCancel: Boolean = false) {
+        _uiState.update { state ->
+            val transferTagToCancel = if (resetTransferTagToCancel) {
+                null
+            } else {
+                state.transferTagToCancel
+            }
+            state.copy(
+                previewFileToOpen = file, transferTagToCancel = transferTagToCancel
+            )
         }
     }
 
@@ -693,16 +701,11 @@ internal class StartTransfersComponentViewModel @Inject constructor(
                     if (group.completedFiles == 1) {
                         val file = File(group.destination + group.singleFileName)
                         val duration = group.durationFromStart(getCurrentTimeInMillisUseCase())
-                        if (duration < 6.seconds) {
-                            previewFile(file)
-                        } else {
-                            _uiState.updateEventAndClearProgress(
-                                SlowDownloadPreviewFinished(file)
-                            )
+                        if (duration < 1.5.seconds) {
+                            val resetTransferTagToCancel =
+                                group.singleTransferTag == uiState.value.transferTagToCancel
+                            previewFile(file, resetTransferTagToCancel)
                         }
-                    }
-                    if (group.singleTransferTag == uiState.value.transferTagToCancel) {
-                        setTransferTagToCancel(null)
                     }
                 }
             }
@@ -712,13 +715,21 @@ internal class StartTransfersComponentViewModel @Inject constructor(
         actionGroups.filter {
             !it.finished()
                     && !alreadySlowNotifiedGroups.contains(it.groupId)
-                    && it.durationFromStart(getCurrentTimeInMillisUseCase()) > 2.seconds
+                    && it.durationFromStart(getCurrentTimeInMillisUseCase()) > 1.5.seconds
         }
             .takeIf { it.isNotEmpty() }
             ?.let { notFinishedSlowGroups ->
                 //as this is responding an user action, usually only one group at a time, but
                 alreadySlowNotifiedGroups.addAll(notFinishedSlowGroups.map { it.groupId })
-                _uiState.updateEventAndClearProgress(SlowDownloadPreviewInProgress)
+                notFinishedSlowGroups.first().singleTransferTag?.let { tag ->
+                    viewModelScope.launch {
+                        getTransferByTagUseCase(tag)?.let { transfer ->
+                            _uiState.updateEventAndClearProgress(
+                                SlowDownloadPreviewInProgress(transfer.uniqueId)
+                            )
+                        }
+                    }
+                }
             }
     }
 

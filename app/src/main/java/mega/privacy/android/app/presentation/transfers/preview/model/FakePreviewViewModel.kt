@@ -18,6 +18,7 @@ import mega.privacy.android.domain.exception.QuotaExceededMegaException
 import mega.privacy.android.domain.exception.transfers.TransferNotFoundException
 import mega.privacy.android.domain.usecase.transfers.GetTransferByUniqueIdUseCase
 import mega.privacy.android.domain.usecase.transfers.MonitorTransferEventsUseCase
+import timber.log.Timber
 import javax.inject.Inject
 
 /**
@@ -58,6 +59,7 @@ class FakePreviewViewModel @Inject constructor(
                     )
                 }
             } ?: run {
+                Timber.e("Transfer not found")
                 _uiState.update { state -> state.copy(error = TransferNotFoundException()) }
             }
         }

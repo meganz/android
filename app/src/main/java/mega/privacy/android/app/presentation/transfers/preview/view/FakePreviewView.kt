@@ -35,6 +35,7 @@ import mega.privacy.android.app.presentation.transfers.preview.FakePreviewFragme
 import mega.privacy.android.app.presentation.transfers.preview.FakePreviewFragment.Companion.EXTRA_FILE_PATH
 import mega.privacy.android.app.presentation.transfers.preview.model.FakePreviewState
 import mega.privacy.android.domain.entity.Progress
+import mega.privacy.android.domain.exception.QuotaExceededMegaException
 import mega.privacy.android.icon.pack.R as iconPackR
 import mega.privacy.android.shared.original.core.ui.controls.appbar.AppBarType
 import mega.privacy.android.shared.original.core.ui.controls.appbar.MegaAppBar
@@ -113,8 +114,14 @@ internal fun FakePreviewView(
 
         error?.let {
             LocalContext.current.findActivity()?.apply {
-                val errorString = stringResource(R.string.error_temporary_unavaible)
-                setResult(RESULT_OK, Intent().apply { putExtra(EXTRA_ERROR, errorString) })
+                val intent = when (error) {
+                    is QuotaExceededMegaException -> Intent()
+                    else -> Intent().apply {
+                        putExtra(EXTRA_ERROR, stringResource(R.string.error_temporary_unavaible))
+                    }
+                }
+
+                setResult(RESULT_OK, intent)
                 finish()
             }
         }
