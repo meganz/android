@@ -45,8 +45,8 @@ class SortFavouritesUseCaseTest {
     }
 
     @Test
-    fun `test that file nodes are sorted by label ascending`() = runTest {
-        // FavouriteSortOrder.Label is always ascending.
+    fun `test that file nodes are sorted by label descending`() = runTest {
+        // FavouriteSortOrder.Label is always descending.
         val order = FavouriteSortOrder.Label
         val fileA = mock<FileNode> {
             on { name } doReturn "file1"
@@ -66,7 +66,7 @@ class SortFavouritesUseCaseTest {
 
         val result = underTest(nodes, order)
 
-        assertThat(result).containsExactly(fileA, fileB).inOrder()
+        assertThat(result).containsExactly(fileB, fileA).inOrder()
     }
 
     @Test

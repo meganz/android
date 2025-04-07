@@ -33,7 +33,7 @@ sealed interface FavouriteSortOrder {
     /**
      * Label
      */
-    object Label : FavouriteSortOrder {
-        override val sortDescending = false
+    data object Label : FavouriteSortOrder {
+        override val sortDescending = true
     }
 }
