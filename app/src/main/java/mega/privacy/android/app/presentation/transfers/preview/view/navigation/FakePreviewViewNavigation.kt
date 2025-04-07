@@ -18,6 +18,7 @@ internal fun NavGraphBuilder.fakePreviewScreen(
     navHostController: NavHostController,
     scaffoldState: ScaffoldState,
     onBackPress: () -> Unit,
+    navigateToStorageSettings: () -> Unit,
 ) {
     composable(route = fakePreviewRoute) { backStackEntry ->
         val viewModel =
@@ -28,6 +29,8 @@ internal fun NavGraphBuilder.fakePreviewScreen(
             scaffoldState = scaffoldState,
             onBackPress = onBackPress,
             uiState = uiState,
+            consumeTransferEvent = viewModel::consumeTransferEvent,
+            navigateToStorageSettings = navigateToStorageSettings,
         )
     }
 }

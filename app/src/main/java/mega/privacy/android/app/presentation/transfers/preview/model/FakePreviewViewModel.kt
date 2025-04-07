@@ -4,6 +4,7 @@ import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import dagger.hilt.android.lifecycle.HiltViewModel
+import de.palm.composestateevents.consumed
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.collectLatest
@@ -100,5 +101,12 @@ class FakePreviewViewModel @Inject constructor(
                     }
                 }
         }
+    }
+
+    /**
+     * Consume transfer event
+     */
+    fun consumeTransferEvent() {
+        _uiState.update { state -> state.copy(transferEvent = consumed()) }
     }
 }

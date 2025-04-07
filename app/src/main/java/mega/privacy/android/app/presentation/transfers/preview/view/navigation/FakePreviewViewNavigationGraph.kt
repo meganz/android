@@ -19,6 +19,7 @@ internal fun NavGraphBuilder.fakePreviewViewNavigationGraph(
     navHostController: NavHostController,
     scaffoldState: ScaffoldState,
     onBackPress: () -> Unit,
+    navigateToStorageSettings: () -> Unit,
 ) {
     navigation(
         startDestination = fakePreviewRoute,
@@ -28,6 +29,7 @@ internal fun NavGraphBuilder.fakePreviewViewNavigationGraph(
             navHostController = navHostController,
             scaffoldState = scaffoldState,
             onBackPress = onBackPress,
+            navigateToStorageSettings = navigateToStorageSettings,
         )
     }
 }

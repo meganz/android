@@ -34,6 +34,7 @@ import mega.privacy.android.app.presentation.qrcode.findActivity
 import mega.privacy.android.app.presentation.transfers.preview.FakePreviewFragment.Companion.EXTRA_ERROR
 import mega.privacy.android.app.presentation.transfers.preview.FakePreviewFragment.Companion.EXTRA_FILE_PATH
 import mega.privacy.android.app.presentation.transfers.preview.model.FakePreviewState
+import mega.privacy.android.app.presentation.transfers.starttransfer.view.StartTransferComponent
 import mega.privacy.android.domain.entity.Progress
 import mega.privacy.android.domain.exception.QuotaExceededMegaException
 import mega.privacy.android.icon.pack.R as iconPackR
@@ -52,6 +53,8 @@ internal fun FakePreviewView(
     scaffoldState: ScaffoldState,
     onBackPress: () -> Unit,
     uiState: FakePreviewState,
+    consumeTransferEvent: () -> Unit,
+    navigateToStorageSettings: () -> Unit,
 ) {
     with(uiState) {
         MegaScaffold(
@@ -125,6 +128,13 @@ internal fun FakePreviewView(
                 finish()
             }
         }
+
+        StartTransferComponent(
+            event = uiState.transferEvent,
+            onConsumeEvent = consumeTransferEvent,
+            snackBarHostState = scaffoldState.snackbarHostState,
+            navigateToStorageSettings = navigateToStorageSettings,
+        )
     }
 }
 
@@ -141,6 +151,8 @@ private fun FakePreviewViewPreview() {
                 fileTypeResId = iconPackR.drawable.ic_generic_medium_solid,
                 progress = Progress(0.3f),
             ),
+            consumeTransferEvent = {},
+            navigateToStorageSettings = {},
         )
     }
 }

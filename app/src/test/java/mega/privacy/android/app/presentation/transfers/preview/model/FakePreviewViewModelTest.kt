@@ -3,6 +3,7 @@ package mega.privacy.android.app.presentation.transfers.preview.model
 import androidx.lifecycle.SavedStateHandle
 import app.cash.turbine.test
 import com.google.common.truth.Truth.assertThat
+import de.palm.composestateevents.StateEventWithContentConsumed
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.emptyFlow
@@ -89,6 +90,7 @@ class FakePreviewViewModelTest {
             assertThat(actual.fileTypeResId).isNull()
             assertThat(actual.progress).isEqualTo(Progress(0f))
             assertThat(actual.previewFilePathToOpen).isNull()
+            assertThat(actual.transferEvent).isInstanceOf(StateEventWithContentConsumed::class.java)
         }
     }
 
@@ -244,6 +246,17 @@ class FakePreviewViewModelTest {
 
             underTest.uiState.test {
                 assertThat(awaitItem().error).isEqualTo(error)
+            }
+        }
+
+    @Test
+    fun `test that consumeTransferEvent updates state with null`() =
+        runTest {
+            underTest.consumeTransferEvent()
+
+            underTest.uiState.test {
+                assertThat(awaitItem().transferEvent)
+                    .isInstanceOf(StateEventWithContentConsumed::class.java)
             }
         }
 }

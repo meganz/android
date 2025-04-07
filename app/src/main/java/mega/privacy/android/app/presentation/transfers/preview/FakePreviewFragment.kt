@@ -24,10 +24,12 @@ import mega.privacy.android.app.presentation.extensions.isDarkMode
 import mega.privacy.android.app.presentation.passcode.model.PasscodeCryptObjectFactory
 import mega.privacy.android.app.presentation.psa.PsaContainer
 import mega.privacy.android.app.presentation.security.check.PasscodeContainer
+import mega.privacy.android.app.presentation.settings.model.StorageTargetPreference
 import mega.privacy.android.app.presentation.transfers.preview.view.navigation.fakePreviewViewNavigationGraph
 import mega.privacy.android.app.presentation.transfers.preview.view.navigation.navigateToFakePreviewViewGraph
 import mega.privacy.android.domain.entity.ThemeMode
 import mega.privacy.android.domain.usecase.GetThemeMode
+import mega.privacy.android.navigation.MegaNavigator
 import mega.privacy.android.shared.original.core.ui.theme.OriginalTheme
 import javax.inject.Inject
 
@@ -39,6 +41,12 @@ class FakePreviewFragment : Fragment() {
 
     @Inject
     lateinit var passcodeCryptObjectFactory: PasscodeCryptObjectFactory
+
+    /**
+     * The centralized navigator in the :app module
+     */
+    @Inject
+    lateinit var megaNavigator: MegaNavigator
 
     @OptIn(ExperimentalMaterialNavigationApi::class)
     override fun onCreateView(
@@ -80,7 +88,13 @@ class FakePreviewFragment : Fragment() {
                                         fakePreviewViewNavigationGraph(
                                             navHostController = navHostController,
                                             scaffoldState = scaffoldState,
-                                            onBackPress = { requireActivity().supportFinishAfterTransition() }
+                                            onBackPress = { requireActivity().supportFinishAfterTransition() },
+                                            navigateToStorageSettings = {
+                                                megaNavigator.openSettings(
+                                                    requireActivity(),
+                                                    StorageTargetPreference
+                                                )
+                                            },
                                         )
                                     }
                                 }

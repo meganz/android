@@ -1,5 +1,8 @@
 package mega.privacy.android.app.presentation.transfers.preview.model
 
+import de.palm.composestateevents.StateEventWithContent
+import de.palm.composestateevents.consumed
+import mega.privacy.android.app.presentation.transfers.starttransfer.model.TransferTriggerEvent
 import mega.privacy.android.domain.entity.Progress
 
 /**
@@ -10,6 +13,7 @@ import mega.privacy.android.domain.entity.Progress
  * @param progress The progress of the transfer.
  * @param previewFilePathToOpen The file path to preview.
  * @param error [Throwable].
+ * @param transferEvent [StateEventWithContent] of [TransferTriggerEvent].
  */
 data class FakePreviewState(
     val fileName: String? = null,
@@ -17,4 +21,5 @@ data class FakePreviewState(
     val progress: Progress = Progress(0f),
     val previewFilePathToOpen: String? = null,
     val error: Throwable? = null,
+    val transferEvent: StateEventWithContent<TransferTriggerEvent> = consumed(),
 )
