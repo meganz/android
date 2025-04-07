@@ -188,7 +188,9 @@ import mega.privacy.android.domain.usecase.thumbnailpreview.GetThumbnailUseCase
 import mega.privacy.android.domain.usecase.transfers.MonitorTransferEventsUseCase
 import mega.privacy.android.domain.usecase.videosection.SaveVideoRecentlyWatchedUseCase
 import mega.privacy.android.legacy.core.ui.model.SearchWidgetState
+import mega.privacy.mobile.analytics.event.VideoPlayerFullScreenPressedEvent
 import mega.privacy.mobile.analytics.event.VideoPlayerGetLinkMenuToolbarEvent
+import mega.privacy.mobile.analytics.event.VideoPlayerOriginalPressedEvent
 import mega.privacy.mobile.analytics.event.VideoPlayerRemoveLinkMenuToolbarEvent
 import mega.privacy.mobile.analytics.event.VideoPlayerSaveToDeviceMenuToolbarEvent
 import mega.privacy.mobile.analytics.event.VideoPlayerShareMenuToolbarEvent
@@ -1720,6 +1722,17 @@ class VideoPlayerViewModel @Inject constructor(
         }
 
         mediaPlayerGateway.buildPlaySources(mediaPlaySources)
+    }
+
+    internal fun updateFullscreen(value: Boolean) {
+        Analytics.tracker.trackEvent(
+            if (value) {
+                VideoPlayerFullScreenPressedEvent
+            } else {
+                VideoPlayerOriginalPressedEvent
+            }
+        )
+        uiState.update { it.copy(isFullscreen = value) }
     }
 
     companion object {

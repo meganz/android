@@ -169,7 +169,9 @@ import mega.privacy.android.domain.usecase.thumbnailpreview.GetThumbnailUseCase
 import mega.privacy.android.domain.usecase.transfers.MonitorTransferEventsUseCase
 import mega.privacy.android.domain.usecase.videosection.SaveVideoRecentlyWatchedUseCase
 import mega.privacy.android.legacy.core.ui.model.SearchWidgetState
+import mega.privacy.mobile.analytics.event.VideoPlayerFullScreenPressedEvent
 import mega.privacy.mobile.analytics.event.VideoPlayerGetLinkMenuToolbarEvent
+import mega.privacy.mobile.analytics.event.VideoPlayerOriginalPressedEvent
 import mega.privacy.mobile.analytics.event.VideoPlayerRemoveLinkMenuToolbarEvent
 import mega.privacy.mobile.analytics.event.VideoPlayerSaveToDeviceMenuToolbarEvent
 import mega.privacy.mobile.analytics.event.VideoPlayerShareMenuToolbarEvent
@@ -2043,6 +2045,27 @@ class VideoPlayerViewModelTest {
                 cancelAndConsumeRemainingEvents()
             }
         }
+
+    @ParameterizedTest(name = "and isFullscreen is {0}")
+    @ValueSource(booleans = [true, false])
+    fun `test that isFullscreen is updated correctly when updateFullscreen is invoked`(
+        isFullscreen: Boolean,
+    ) = runTest {
+        initViewModel()
+        underTest.updateFullscreen(isFullscreen)
+        testScheduler.advanceUntilIdle()
+        assertThat(analyticsExtension.events.first()).isInstanceOf(
+            if (isFullscreen) {
+                VideoPlayerFullScreenPressedEvent::class.java
+            } else {
+                VideoPlayerOriginalPressedEvent::class.java
+            }
+        )
+        underTest.uiState.test {
+            assertThat(awaitItem().isFullscreen).isEqualTo(isFullscreen)
+            cancelAndConsumeRemainingEvents()
+        }
+    }
 
     companion object {
         @JvmField

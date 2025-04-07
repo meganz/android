@@ -49,6 +49,8 @@ import androidx.media3.common.Player.STATE_BUFFERING
 import androidx.media3.common.Player.STATE_IDLE
 import androidx.media3.common.util.UnstableApi
 import androidx.media3.exoplayer.ExoPlayer
+import androidx.media3.ui.AspectRatioFrameLayout.RESIZE_MODE_FIT
+import androidx.media3.ui.AspectRatioFrameLayout.RESIZE_MODE_ZOOM
 import androidx.media3.ui.PlayerView
 import com.google.accompanist.navigation.material.BottomSheetNavigator
 import com.google.accompanist.navigation.material.ExperimentalMaterialNavigationApi
@@ -133,6 +135,7 @@ internal fun VideoPlayerScreen(
 
     DisposableEffect(Unit) {
         playbackState = player?.playbackState ?: STATE_IDLE
+
         player?.addListener(playerEventListener)
         onDispose {
             player?.removeListener(playerEventListener)
@@ -157,11 +160,24 @@ internal fun VideoPlayerScreen(
                     factory = { inflater, parent, attachToParent ->
                         VideoPlayerPlayerViewBinding.inflate(inflater, parent, attachToParent)
                             .apply {
+                                fun updateResizeMode(isFullscreen: Boolean) {
+                                    playerComposeView.resizeMode = if (isFullscreen) {
+                                        RESIZE_MODE_ZOOM
+                                    } else {
+                                        RESIZE_MODE_FIT
+                                    }
+                                }
+
                                 VideoPlayerController(
                                     context = context,
                                     coroutineScope = coroutineScope,
                                     viewModel = viewModel,
                                     container = root,
+                                    fullscreenClickedCallback = {
+                                        val isFullscreen = uiState.isFullscreen.not()
+                                        viewModel.updateFullscreen(isFullscreen)
+                                        updateResizeMode(isFullscreen)
+                                    },
                                     playQueueButtonClicked = {
                                         autoHideJob?.cancel()
                                         playQueueButtonClicked()
@@ -232,6 +248,7 @@ internal fun VideoPlayerScreen(
 
                                 playerComposeView.player = player
                                 playerComposeView.controllerShowTimeoutMs = 0
+                                updateResizeMode(uiState.isFullscreen)
                                 toggleControllerVisibility(true, true)
                             }
                     },

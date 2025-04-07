@@ -56,6 +56,7 @@ class VideoPlayerController(
     private val viewModel: VideoPlayerViewModel,
     container: ViewGroup,
     coroutineScope: CoroutineScope,
+    private val fullscreenClickedCallback: () -> Unit,
     private val playQueueButtonClicked: () -> Unit,
     private val captureScreenShotFinished: (Bitmap) -> Unit,
 ) : LifecycleEventObserver {
@@ -63,9 +64,10 @@ class VideoPlayerController(
     private val trackName = container.findViewById<TextView>(R.id.track_name)
     private val repeatToggleButton = container.findViewById<ImageButton>(R.id.repeat_toggle)
     private val playerComposeView = container.findViewById<PlayerView>(R.id.player_compose_view)
-    internal val moreOptionButton = container.findViewById<ImageButton>(R.id.more_option)
-    internal val videoOptionPopup = container.findViewById<ComposeView>(R.id.video_option_popup)
+    private val moreOptionButton = container.findViewById<ImageButton>(R.id.more_option)
+    private val videoOptionPopup = container.findViewById<ComposeView>(R.id.video_option_popup)
     private val screenshotButton = container.findViewById<ImageButton>(R.id.image_screenshot)
+    private val fullscreenButton = container.findViewById<ImageButton>(R.id.full_screen)
 
     private var sharingScope: CoroutineScope? = null
 
@@ -78,12 +80,19 @@ class VideoPlayerController(
             }
         }
 
+        coroutineScope.launch {
+            viewModel.uiState.map { it.isFullscreen }.distinctUntilChanged().collectLatest {
+                updateFullscreenButtonIcon(it)
+            }
+        }
+
         setupRepeatToggleButton(viewModel.uiState.value.repeatToggleMode)
         setupMoreOptionButton()
         setupVideoPlayQueueButton(viewModel.uiState.value.items.size)
         screenshotButton.setOnClickListener {
             screenshotButtonClicked()
         }
+        setupFullscreen(viewModel.uiState.value.isFullscreen)
     }
 
     /**
@@ -173,11 +182,11 @@ class VideoPlayerController(
     private fun initVideoOptionPopup(composeView: ComposeView) {
         composeView.setupComposeView(context) {
             val state by viewModel.uiState.collectAsStateWithLifecycle()
-            val videoOptions = remember(state.isFullScreen) {
+            val videoOptions = remember(state.isFullscreen) {
                 listOf(
                     VideoOptionItem.VIDEO_OPTION_SNAPSHOT,
                     VideoOptionItem.VIDEO_OPTION_LOCK,
-                    if (state.isFullScreen) {
+                    if (state.isFullscreen) {
                         VideoOptionItem.VIDEO_OPTION_ORIGINAL
                     } else {
                         VideoOptionItem.VIDEO_OPTION_ZOOM_TO_FILL
@@ -190,15 +199,9 @@ class VideoPlayerController(
                 onDismissRequest = { viewModel.updateIsVideoOptionPopupShown(false) }
             ) { videOption ->
                 when (videOption) {
-                    VideoOptionItem.VIDEO_OPTION_SNAPSHOT -> {
-                        screenshotButtonClicked()
-                    }
-
+                    VideoOptionItem.VIDEO_OPTION_SNAPSHOT -> screenshotButtonClicked()
                     VideoOptionItem.VIDEO_OPTION_LOCK -> {}
-
-                    VideoOptionItem.VIDEO_OPTION_ZOOM_TO_FILL -> {}
-
-                    else -> {}
+                    else -> fullscreenClickedCallback()
                 }
                 viewModel.updateIsVideoOptionPopupShown(false)
             }
@@ -237,6 +240,22 @@ class VideoPlayerController(
             captureScreenShot()
         }
     }
+
+    internal fun setupFullscreen(isFullScreen: Boolean) {
+        updateFullscreenButtonIcon(isFullScreen)
+        fullscreenButton.setOnClickListener {
+            fullscreenClickedCallback()
+        }
+    }
+
+    internal fun updateFullscreenButtonIcon(isFullScreen: Boolean) =
+        fullscreenButton.setImageResource(
+            if (isFullScreen) {
+                R.drawable.ic_original
+            } else {
+                R.drawable.ic_full_screen
+            }
+        )
 
     @OptIn(UnstableApi::class)
     private fun captureScreenShot() {

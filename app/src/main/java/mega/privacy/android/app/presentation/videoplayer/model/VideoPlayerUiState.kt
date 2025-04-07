@@ -25,7 +25,7 @@ import mega.privacy.android.legacy.core.ui.model.SearchWidgetState
  * @property currentPlayingVideoSize the current playing video size
  * @property mediaPlaybackState the playback state
  * @property snackBarMessage the snack bar message
- * @property isFullScreen whether it is full screen
+ * @property isFullscreen whether it is full screen
  * @property isVideoOptionPopupShown whether the video option popup is shown
  * @property menuActions the list of video player menu actions
  * @property accountType the account type
@@ -56,7 +56,7 @@ data class VideoPlayerUiState(
     val currentPlayingVideoSize: VideoSize? = null,
     val mediaPlaybackState: MediaPlaybackState = MediaPlaybackState.Playing,
     val snackBarMessage: String? = null,
-    val isFullScreen: Boolean = false,
+    val isFullscreen: Boolean = false,
     val isVideoOptionPopupShown: Boolean = false,
     val menuActions: List<VideoPlayerMenuAction> = emptyList(),
     val accountType: AccountType? = null,
