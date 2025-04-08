@@ -116,6 +116,8 @@ class ChatTabsFragment : Fragment() {
 
     private var actionMode: ActionMode? = null
     private var archivedMenuItem: MenuItem? = null
+    private var searchMenuItem: MenuItem? = null
+
     private var currentTab: ChatTab = ChatTab.CHATS
 
     private val viewModel by viewModels<ChatTabsViewModel>()
@@ -271,6 +273,18 @@ class ChatTabsFragment : Fragment() {
             }
         }
 
+        viewLifecycleOwner.collectFlow(noteToSelfChatViewModel.state.map { it.isNoteToSelfChatEmpty }
+            .distinctUntilChanged()) {
+            searchMenuItem?.isVisible = !it && !viewModel.getState().value.isEmptyChats
+
+        }
+
+        viewLifecycleOwner.collectFlow(viewModel.getState().map { it.isEmptyChats }
+            .distinctUntilChanged()) {
+            searchMenuItem?.isVisible =
+                !it && !noteToSelfChatViewModel.state.value.isNoteToSelfChatEmpty
+        }
+
         viewLifecycleOwner.collectFlow(viewModel.getState(), Lifecycle.State.RESUMED) { state ->
             if (state.selectedIds.isNotEmpty()) {
                 if (actionMode == null) {
@@ -372,7 +386,12 @@ class ChatTabsFragment : Fragment() {
         activity?.addMenuProvider(object : MenuProvider {
             override fun onCreateMenu(menu: Menu, menuInflater: MenuInflater) {
                 menuInflater.inflate(R.menu.fragment_chat_tabs, menu)
-                menu.findItem(R.id.menu_search)?.setupSearchView(viewModel::setSearchQuery)
+                searchMenuItem = menu.findItem(R.id.menu_search)?.also {
+                    it.setupSearchView(viewModel::setSearchQuery)
+                    it.isVisible =
+                        !viewModel.getState().value.isEmptyChats && !noteToSelfChatViewModel.state.value.isNoteToSelfChatEmpty
+                }
+
                 archivedMenuItem = menu.findItem(R.id.action_menu_archived)?.also {
                     it.isVisible = viewModel.getState().value.hasArchivedChats
                 }

@@ -106,16 +106,18 @@ fun ChatListView(
             .fillMaxSize()
             .background(MaterialTheme.colors.surface)
     ) {
-        val showEmptyStateAndNoteToSelfChat =
+        val showNoteToSelfChatWithEmptyState =
             !isMeetingView && (items.size == 1 && items.first() is ChatRoomItem.NoteToSelfChatRoomItem)
-        val isEmptyStateShowed =
-            !isLoading && (items.isEmpty() || showEmptyStateAndNoteToSelfChat) && !isSearchMode
+        val showEmptyState =
+            !isLoading && (items.isEmpty() || showNoteToSelfChatWithEmptyState) && !isSearchMode
+
+        val showNoResultState = !isLoading && isSearchMode && items.isEmpty()
 
         if (items.isNotEmpty()) {
             ListView(
                 items = items,
                 selectedIds = selectedIds,
-                isEmptyStateShowed = isEmptyStateShowed,
+                isEmptyStateShowed = showEmptyState,
                 scrollToTop = scrollToTop,
                 isNew = isNew,
                 tooltip = tooltip,
@@ -128,8 +130,9 @@ fun ChatListView(
             )
         }
 
-        if (isEmptyStateShowed) {
+        if (showEmptyState || showNoResultState) {
             EmptyView(
+                showNoResultState = showNoResultState,
                 isMeetingView = isMeetingView,
                 onEmptyButtonClick = onEmptyButtonClick,
                 hasAnyContact = hasAnyContact,
@@ -305,26 +308,36 @@ private fun OrientationSwapper(
 @Composable
 private fun EmptyView(
     isMeetingView: Boolean,
+    showNoResultState: Boolean,
     modifier: Modifier = Modifier,
     hasAnyContact: Boolean = false,
     onEmptyButtonClick: () -> Unit = {},
     onScheduleMeeting: () -> Unit = {},
 ) {
     val imageResource: Int
-    val titleResource: Int
-    val descriptionResource: Int
-    val buttonResource: Int
-    if (isMeetingView) {
-        imageResource = IconR.drawable.ic_video_glass
-        titleResource = sharedR.string.meeting_recent_list_empty_title
-        descriptionResource = sharedR.string.meeting_recent_list_empty_subtitle
-        buttonResource = R.string.action_start_meeting_now
-    } else {
-        imageResource = IconR.drawable.ic_message_call_glass
-        titleResource = sharedR.string.chat_recent_list_empty_title
-        descriptionResource = sharedR.string.chat_recent_list_empty_subtitle
-        buttonResource =
-            if (hasAnyContact) R.string.fab_label_new_chat else sharedR.string.chat_recent_invite_friend
+    var titleResource: Int? = null
+    var descriptionResource: Int
+    var buttonResource: Int? = null
+    when {
+        showNoResultState -> {
+            imageResource = IconR.drawable.ic_search_02
+            descriptionResource = R.string.search_empty_screen_no_results
+        }
+
+        isMeetingView -> {
+            imageResource = IconR.drawable.ic_video_glass
+            titleResource = sharedR.string.meeting_recent_list_empty_title
+            descriptionResource = sharedR.string.meeting_recent_list_empty_subtitle
+            buttonResource = R.string.action_start_meeting_now
+        }
+
+        else -> {
+            imageResource = IconR.drawable.ic_message_call_glass
+            titleResource = sharedR.string.chat_recent_list_empty_title
+            descriptionResource = sharedR.string.chat_recent_list_empty_subtitle
+            buttonResource =
+                if (hasAnyContact) R.string.fab_label_new_chat else sharedR.string.chat_recent_invite_friend
+        }
     }
 
     Column(
@@ -344,13 +357,16 @@ private fun EmptyView(
                 modifier = Modifier.size(120.dp),
             )
         }
-        MegaText(
-            text = stringResource(titleResource),
-            style = MaterialTheme.typography.subtitle1.copy(fontWeight = FontWeight.W500),
-            textColor = TextColor.Primary,
-            textAlign = TextAlign.Center,
-            modifier = Modifier.padding(top = 10.dp, start = 50.dp, end = 50.dp)
-        )
+
+        titleResource?.let {
+            MegaText(
+                text = stringResource(titleResource),
+                style = MaterialTheme.typography.subtitle1.copy(fontWeight = FontWeight.W500),
+                textColor = TextColor.Primary,
+                textAlign = TextAlign.Center,
+                modifier = Modifier.padding(top = 10.dp, start = 50.dp, end = 50.dp)
+            )
+        }
 
         val context = LocalContext.current
 
@@ -378,14 +394,18 @@ private fun EmptyView(
             ),
             modifier = Modifier.padding(top = 20.dp, start = 50.dp, end = 50.dp)
         )
+
         OrientationSwapper {
-            RaisedDefaultMegaButton(
-                textId = buttonResource,
-                onClick = onEmptyButtonClick,
-                modifier = Modifier
-                    .padding(vertical = 12.dp)
-                    .align(Alignment.CenterHorizontally)
-            )
+            buttonResource?.let {
+                RaisedDefaultMegaButton(
+                    textId = buttonResource,
+                    onClick = onEmptyButtonClick,
+                    modifier = Modifier
+                        .padding(vertical = 12.dp)
+                        .align(Alignment.CenterHorizontally)
+                )
+            }
+
             if (isMeetingView) {
                 OutlinedWithoutBackgroundMegaButton(
                     modifier = Modifier

@@ -23,6 +23,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.unit.dp
 import kotlinx.coroutines.launch
 import mega.privacy.android.app.R
 import mega.privacy.android.app.presentation.changepassword.view.Constants
@@ -33,6 +34,8 @@ import mega.privacy.android.app.presentation.meeting.model.NoteToSelfChatUIState
 import mega.privacy.android.domain.entity.chat.ChatRoomItem
 import mega.privacy.android.legacy.core.ui.controls.appbar.LegacySearchAppBar
 import mega.privacy.android.legacy.core.ui.model.SearchWidgetState
+import mega.privacy.android.shared.original.core.ui.controls.appbar.AppBarType
+import mega.privacy.android.shared.original.core.ui.controls.appbar.MegaAppBar
 import mega.privacy.android.shared.original.core.ui.preview.CombinedThemePreviews
 import mega.privacy.android.shared.original.core.ui.theme.extensions.black_white
 import mega.privacy.android.shared.original.core.ui.utils.showAutoDurationSnackbar
@@ -67,6 +70,8 @@ fun ArchivedChatsView(
     var showElevation by remember { mutableStateOf(false) }
     val hideSheet = { scope.launch { sheetState.hide() } }
 
+    val showSearchButton = !state.items.isEmpty() && !noteToSelfState.isNoteToSelfChatEmpty
+
     ModalBottomSheetLayout(
         modifier = Modifier.systemBarsPadding(),
         sheetState = sheetState,
@@ -97,17 +102,30 @@ fun ArchivedChatsView(
                 }
             },
             topBar = {
-                LegacySearchAppBar(
-                    searchWidgetState = searchState,
-                    typedSearch = searchQuery,
-                    onSearchTextChange = { searchQuery = it },
-                    onCloseClicked = { searchState = SearchWidgetState.COLLAPSED },
-                    onSearchClicked = { searchState = SearchWidgetState.EXPANDED },
-                    onBackPressed = onBackPressed,
-                    elevation = showElevation,
-                    title = stringResource(R.string.archived_chat),
-                    hintId = R.string.hint_action_search
-                )
+                if (showSearchButton) {
+                    LegacySearchAppBar(
+                        searchWidgetState = searchState,
+                        typedSearch = searchQuery,
+                        onSearchTextChange = { searchQuery = it },
+                        onCloseClicked = { searchState = SearchWidgetState.COLLAPSED },
+                        onSearchClicked = { searchState = SearchWidgetState.EXPANDED },
+                        onBackPressed = onBackPressed,
+                        elevation = showElevation,
+                        title = stringResource(R.string.archived_chat),
+                        hintId = R.string.hint_action_search
+                    )
+                } else {
+                    MegaAppBar(
+                        appBarType = AppBarType.BACK_NAVIGATION,
+                        title = stringResource(R.string.archived_chat),
+                        subtitle = null,
+                        modifier = Modifier,
+                        onNavigationPressed = onBackPressed,
+                        titleIcons = null,
+                        elevation = 0.dp,
+                    )
+                }
+
             }
         ) { padding ->
             val isSearchMode = filteredChats != null
