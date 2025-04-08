@@ -1,9 +1,16 @@
 package mega.privacy.android.app.presentation.achievements.info
 
+import androidx.lifecycle.SavedStateHandle
+import androidx.navigation.testing.invoke
+import androidx.test.ext.junit.runners.AndroidJUnit4
 import app.cash.turbine.test
 import com.google.common.truth.Truth.assertThat
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.ExperimentalCoroutinesApi
+import kotlinx.coroutines.test.UnconfinedTestDispatcher
+import kotlinx.coroutines.test.resetMain
 import kotlinx.coroutines.test.runTest
-import mega.privacy.android.core.test.extension.CoroutineMainDispatcherExtension
+import kotlinx.coroutines.test.setMain
 import mega.privacy.android.data.gateway.DeviceGateway
 import mega.privacy.android.data.mapper.NumberOfDaysMapper
 import mega.privacy.android.domain.entity.achievement.Achievement
@@ -11,10 +18,10 @@ import mega.privacy.android.domain.entity.achievement.AchievementType
 import mega.privacy.android.domain.entity.achievement.AchievementsOverview
 import mega.privacy.android.domain.entity.achievement.AwardedAchievement
 import mega.privacy.android.domain.usecase.achievements.GetAccountAchievementsOverviewUseCase
-import org.junit.jupiter.api.BeforeEach
-import org.junit.jupiter.api.Test
-import org.junit.jupiter.api.TestInstance
-import org.junit.jupiter.api.extension.ExtendWith
+import org.junit.After
+import org.junit.Before
+import org.junit.Test
+import org.junit.runner.RunWith
 import org.mockito.kotlin.mock
 import org.mockito.kotlin.reset
 import org.mockito.kotlin.stub
@@ -23,17 +30,25 @@ import java.util.Calendar
 import java.util.concurrent.TimeUnit
 import kotlin.random.Random
 
-@ExtendWith(CoroutineMainDispatcherExtension::class)
-@TestInstance(TestInstance.Lifecycle.PER_CLASS)
+@RunWith(AndroidJUnit4::class)
+@OptIn(ExperimentalCoroutinesApi::class)
 class AchievementsInfoViewModelTest {
     private lateinit var underTest: AchievementsInfoViewModel
+    private var savedStateHandle = SavedStateHandle()
     private val deviceGateway = mock<DeviceGateway>()
     private val getAccountAchievementsOverviewUseCase =
         mock<GetAccountAchievementsOverviewUseCase>()
 
-    @BeforeEach
+
+    @Before
     fun setup() {
+        Dispatchers.setMain(UnconfinedTestDispatcher())
         reset(deviceGateway, getAccountAchievementsOverviewUseCase)
+    }
+
+    @After
+    fun tearDown() {
+        Dispatchers.resetMain()
     }
 
     private fun initViewModel(
@@ -44,16 +59,15 @@ class AchievementsInfoViewModelTest {
             achievedStorageFromReferralsInBytes = 0,
             achievedTransferFromReferralsInBytes = 0,
         ),
-        achievementMain: AchievementMain,
     ) {
         getAccountAchievementsOverviewUseCase.stub {
             onBlocking { invoke() }.thenReturn(achievementsOverview)
         }
 
         underTest = AchievementsInfoViewModel(
+            savedStateHandle = savedStateHandle,
             getAccountAchievementsOverviewUseCase = getAccountAchievementsOverviewUseCase,
-            numberOfDaysMapper = NumberOfDaysMapper(deviceGateway),
-            achievementInfoArgs = achievementMain
+            numberOfDaysMapper = NumberOfDaysMapper(deviceGateway)
         )
     }
 
@@ -62,9 +76,11 @@ class AchievementsInfoViewModelTest {
         runTest {
             val expectedAchievement = AchievementType.MEGA_ACHIEVEMENT_WELCOME
 
-            initViewModel(
-                achievementMain = AchievementMain(expectedAchievement)
+            savedStateHandle = SavedStateHandle.Companion.invoke(
+                route = AchievementMain(achievementType = expectedAchievement)
             )
+
+            initViewModel()
 
             underTest.uiState.test {
                 assertThat(awaitItem().achievementType).isEqualTo(expectedAchievement)
@@ -83,6 +99,9 @@ class AchievementsInfoViewModelTest {
             val endTime =
                 startTime.timeInMillis + TimeUnit.DAYS.toMillis(expectedDaysLeft.toLong()) + 1000
 
+            savedStateHandle = SavedStateHandle.Companion.invoke(
+                route = AchievementMain(achievementType = expectedAchievementType)
+            )
 
             whenever(deviceGateway.now).thenReturn(startTime.timeInMillis)
             initViewModel(
@@ -103,8 +122,7 @@ class AchievementsInfoViewModelTest {
                         currentStorageInBytes = 0,
                         achievedStorageFromReferralsInBytes = 0,
                         achievedTransferFromReferralsInBytes = 0
-                    ),
-                achievementMain = AchievementMain(expectedAchievementType)
+                    )
             )
 
             underTest.uiState.test {
@@ -120,6 +138,9 @@ class AchievementsInfoViewModelTest {
             val expectedAchievementType = AchievementType.MEGA_ACHIEVEMENT_INVITE
             val expectedGrantedStorage = 126312783L
 
+            savedStateHandle = SavedStateHandle.Companion.invoke(
+                route = AchievementMain(achievementType = expectedAchievementType)
+            )
             initViewModel(
                 achievementsOverview =
                     AchievementsOverview(
@@ -143,8 +164,7 @@ class AchievementsInfoViewModelTest {
                         currentStorageInBytes = 0,
                         achievedStorageFromReferralsInBytes = 0,
                         achievedTransferFromReferralsInBytes = 0
-                    ),
-                achievementMain = AchievementMain(expectedAchievementType)
+                    )
             )
 
             underTest.uiState.test {
@@ -160,6 +180,10 @@ class AchievementsInfoViewModelTest {
             val expectedAchievementType = AchievementType.MEGA_ACHIEVEMENT_WELCOME
             val expectedGrantedStorage = 126312783L
 
+            savedStateHandle = SavedStateHandle.Companion.invoke(
+                route = AchievementMain(achievementType = expectedAchievementType)
+            )
+
             initViewModel(
                 achievementsOverview =
                     AchievementsOverview(
@@ -183,8 +207,7 @@ class AchievementsInfoViewModelTest {
                         currentStorageInBytes = 0,
                         achievedStorageFromReferralsInBytes = 0,
                         achievedTransferFromReferralsInBytes = 0
-                    ),
-                achievementMain = AchievementMain(expectedAchievementType)
+                    )
             )
 
             underTest.uiState.test {
@@ -200,6 +223,10 @@ class AchievementsInfoViewModelTest {
             val expectedAchievementType = AchievementType.MEGA_ACHIEVEMENT_MOBILE_INSTALL
             val expectedRewardedStorage = 126312783L
             val expectedAwardId = Random.nextInt(from = 1, until = 1000)
+
+            savedStateHandle = SavedStateHandle.Companion.invoke(
+                route = AchievementMain(achievementType = expectedAchievementType)
+            )
 
             initViewModel(
                 achievementsOverview =
@@ -217,8 +244,7 @@ class AchievementsInfoViewModelTest {
                         currentStorageInBytes = 0,
                         achievedStorageFromReferralsInBytes = 0,
                         achievedTransferFromReferralsInBytes = 0
-                    ),
-                achievementMain = AchievementMain(expectedAchievementType)
+                    )
             )
 
             underTest.uiState.test {
