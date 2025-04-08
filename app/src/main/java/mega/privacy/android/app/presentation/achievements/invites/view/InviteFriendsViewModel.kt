@@ -3,12 +3,13 @@ package mega.privacy.android.app.presentation.achievements.invites.view
 import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import androidx.navigation.toRoute
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
-import mega.privacy.android.app.presentation.achievements.invites.InviteFriendsArgs
+import mega.privacy.android.app.presentation.achievements.invites.InviteFriends
 import mega.privacy.android.app.presentation.achievements.invites.model.InviteFriendsUIState
 import mega.privacy.android.domain.entity.achievement.AchievementType
 import mega.privacy.android.domain.entity.achievement.AwardedAchievementInvite
@@ -21,11 +22,20 @@ import javax.inject.Inject
  * ViewModel for InviteFriendsScreen
  */
 @HiltViewModel
-class InviteFriendsViewModel @Inject constructor(
-    savedStateHandle: SavedStateHandle,
+class InviteFriendsViewModel(
     private val getAccountAchievementsOverviewUseCase: GetAccountAchievementsOverviewUseCase,
+    private val inviteFriendsArgs: InviteFriends,
 ) : ViewModel() {
-    private val inviteFriendsArgs = InviteFriendsArgs(savedStateHandle)
+
+    @Inject
+    constructor(
+        savedStateHandle: SavedStateHandle,
+        getAccountAchievementsOverviewUseCase: GetAccountAchievementsOverviewUseCase,
+    ) : this(
+        getAccountAchievementsOverviewUseCase,
+        savedStateHandle.toRoute<InviteFriends>(),
+    )
+
     private val _uiState = MutableStateFlow(InviteFriendsUIState())
 
     /**

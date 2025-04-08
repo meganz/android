@@ -83,7 +83,7 @@ internal fun AchievementsNavHostController(
     NavHost(
         modifier = modifier,
         navController = navHostController,
-        startDestination = achievementsRoute
+        startDestination = AchievementMain
     ) {
         achievementScreen(
             onNavigateToInfoAchievements = navHostController::navigateToAchievementsInfo,

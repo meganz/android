@@ -1,10 +1,8 @@
 package mega.privacy.android.app.presentation.achievements.invites
 
-import androidx.lifecycle.SavedStateHandle
 import app.cash.turbine.test
 import com.google.common.truth.Truth.assertThat
 import kotlinx.coroutines.test.runTest
-import mega.privacy.android.app.presentation.achievements.invites.storageBonusInBytesArg
 import mega.privacy.android.app.presentation.achievements.invites.view.InviteFriendsViewModel
 import mega.privacy.android.core.test.extension.CoroutineMainDispatcherExtension
 import mega.privacy.android.domain.entity.achievement.Achievement
@@ -26,7 +24,6 @@ import org.mockito.kotlin.whenever
 @TestInstance(TestInstance.Lifecycle.PER_CLASS)
 class InviteFriendsViewModelTest {
     private lateinit var underTest: InviteFriendsViewModel
-    private val savedStateHandle = SavedStateHandle()
     private val reward100Mb = 104857600L
     private val expirationInDays = 100
     private val achievementsMock = AchievementsOverview(
@@ -55,10 +52,10 @@ class InviteFriendsViewModelTest {
     @Test
     fun `test that on view model init should fetch use case and update ui state correctly`() =
         runTest {
-            savedStateHandle[storageBonusInBytesArg] = 0L
-
             initMocks()
-            initTestClass()
+            initTestClass(
+                inviteFriends = InviteFriends(0L)
+            )
 
             underTest.uiState.test {
                 assertThat(awaitItem().grantStorageInBytes).isEqualTo(reward100Mb)
@@ -68,9 +65,9 @@ class InviteFriendsViewModelTest {
     @Test
     fun `test that getAccountAchievementsOverviewUseCase should not be called when referral storage value from saved state exists`() =
         runTest {
-            savedStateHandle[storageBonusInBytesArg] = reward100Mb
-
-            initTestClass()
+            initTestClass(
+                inviteFriends = InviteFriends(reward100Mb)
+            )
 
             verify(getAccountAchievementsOverviewUseCase, never()).invoke()
             underTest.uiState.test {
@@ -78,10 +75,12 @@ class InviteFriendsViewModelTest {
             }
         }
 
-    private fun initTestClass() {
+    private fun initTestClass(
+        inviteFriends: InviteFriends
+    ) {
         underTest = InviteFriendsViewModel(
-            savedStateHandle = savedStateHandle,
-            getAccountAchievementsOverviewUseCase = getAccountAchievementsOverviewUseCase
+            getAccountAchievementsOverviewUseCase = getAccountAchievementsOverviewUseCase,
+            inviteFriendsArgs = inviteFriends
         )
     }
 

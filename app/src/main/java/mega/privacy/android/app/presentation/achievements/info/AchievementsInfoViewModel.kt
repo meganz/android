@@ -3,6 +3,7 @@ package mega.privacy.android.app.presentation.achievements.info
 import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import androidx.navigation.toRoute
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
@@ -21,18 +22,24 @@ import javax.inject.Inject
  * ViewModel for AchievementsInfoScreen
  */
 @HiltViewModel
-class AchievementsInfoViewModel @Inject constructor(
-    savedStateHandle: SavedStateHandle,
+class AchievementsInfoViewModel(
     private val getAccountAchievementsOverviewUseCase: GetAccountAchievementsOverviewUseCase,
     private val numberOfDaysMapper: NumberOfDaysMapper,
+    achievementInfoArgs: AchievementMain,
 ) : ViewModel() {
-    private val achievementInfoArgs = AchievementInfoArgs(savedStateHandle)
-    private val achievementType =
-        AchievementType.values()
-            .firstOrNull {
-                it.classValue == achievementInfoArgs.achievementTypeId
-            }
+    private val achievementType = achievementInfoArgs.achievementType
     private val _uiState = MutableStateFlow(AchievementsInfoUIState())
+
+    @Inject
+    constructor(
+        savedStateHandle: SavedStateHandle,
+        getAccountAchievementsOverviewUseCase: GetAccountAchievementsOverviewUseCase,
+        numberOfDaysMapper: NumberOfDaysMapper,
+    ) : this(
+        getAccountAchievementsOverviewUseCase,
+        numberOfDaysMapper,
+        savedStateHandle.toRoute<AchievementMain>(),
+    )
 
     /**
      * Flow of [AchievementsInfoUIState] UI State
@@ -48,7 +55,7 @@ class AchievementsInfoViewModel @Inject constructor(
     /**
      * Sets the achievements type from fragment arguments
      */
-    private fun setInitialAchievementsType() = viewModelScope.launch {
+    private fun setInitialAchievementsType() {
         _uiState.update {
             it.copy(achievementType = achievementType)
         }

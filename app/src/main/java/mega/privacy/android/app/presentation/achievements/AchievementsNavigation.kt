@@ -4,6 +4,7 @@ import androidx.navigation.NavController
 import androidx.navigation.NavGraphBuilder
 import androidx.navigation.NavOptions
 import androidx.navigation.compose.composable
+import kotlinx.serialization.Serializable
 import mega.privacy.android.app.presentation.achievements.info.view.AchievementsInfoRoute
 import mega.privacy.android.app.presentation.achievements.view.AchievementRoute
 import mega.privacy.android.domain.entity.achievement.AchievementType
@@ -11,7 +12,8 @@ import mega.privacy.android.domain.entity.achievement.AchievementType
 /**
  * Route for [AchievementsInfoRoute]
  */
-internal const val achievementsRoute = "achievements/main"
+@Serializable
+data object AchievementMain
 
 /**
  * Composable destination for [AchievementRoute]
@@ -21,7 +23,7 @@ fun NavGraphBuilder.achievementScreen(
     onNavigateToInfoAchievements: (achievementType: AchievementType) -> Unit,
     onNavigateToReferralBonuses: () -> Unit,
 ) {
-    composable(achievementsRoute) {
+    composable<AchievementMain> {
         AchievementRoute(
             onNavigateToInfoAchievements = onNavigateToInfoAchievements,
             onNavigateToInviteFriends = onNavigateToInviteFriends,
@@ -34,5 +36,5 @@ fun NavGraphBuilder.achievementScreen(
  * Navigation for [AchievementRoute]
  */
 fun NavController.navigateToAchievements(navOptions: NavOptions? = null) {
-    this.navigate(route = achievementsRoute, navOptions = navOptions)
+    this.navigate(route = AchievementMain, navOptions = navOptions)
 }

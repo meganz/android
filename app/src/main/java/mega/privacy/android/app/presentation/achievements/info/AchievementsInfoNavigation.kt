@@ -1,38 +1,25 @@
 package mega.privacy.android.app.presentation.achievements.info
 
-import androidx.lifecycle.SavedStateHandle
 import androidx.navigation.NavController
 import androidx.navigation.NavGraphBuilder
 import androidx.navigation.NavOptions
-import androidx.navigation.NavType
 import androidx.navigation.compose.composable
-import androidx.navigation.navArgument
+import kotlinx.serialization.Serializable
 import mega.privacy.android.app.presentation.achievements.info.view.AchievementsInfoRoute
 import mega.privacy.android.domain.entity.achievement.AchievementType
 
 /**
  * Route for [AchievementsInfoRoute]
+ * @param achievementType
  */
-internal const val achievementsInfoRoute = "achievements/info"
-internal const val achievementTypeIdArg = "achievement_type_id"
-
-internal class AchievementInfoArgs(val achievementTypeId: Int) {
-    constructor(savedStateHandle: SavedStateHandle) :
-            this(checkNotNull(savedStateHandle[achievementTypeIdArg]) as Int)
-}
+@Serializable
+data class AchievementMain(val achievementType: AchievementType)
 
 /**
  * Composable destination for [AchievementsInfoRoute]
  */
 fun NavGraphBuilder.achievementsInfoScreen() {
-    composable(
-        route = "$achievementsInfoRoute?achievement_type_id={$achievementTypeIdArg}",
-        arguments = listOf(
-            navArgument(name = achievementTypeIdArg) {
-                type = NavType.IntType
-            },
-        )
-    ) {
+    composable<AchievementMain> {
         AchievementsInfoRoute()
     }
 }
@@ -45,7 +32,7 @@ fun NavController.navigateToAchievementsInfo(
     navOptions: NavOptions? = null,
 ) {
     this.navigate(
-        route = "$achievementsInfoRoute?achievement_type_id=${type.classValue}",
+        route = AchievementMain(type),
         navOptions = navOptions
     )
 }
