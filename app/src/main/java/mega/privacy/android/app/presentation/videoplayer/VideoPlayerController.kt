@@ -37,7 +37,9 @@ import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.launch
 import mega.privacy.android.analytics.Analytics
 import mega.privacy.android.app.R
+import mega.privacy.android.app.mediaplayer.SpeedSelectedPopup
 import mega.privacy.android.app.mediaplayer.VideoOptionPopup
+import mega.privacy.android.app.mediaplayer.model.SpeedPlaybackItem
 import mega.privacy.android.app.mediaplayer.model.VideoOptionItem
 import mega.privacy.android.app.mediaplayer.queue.audio.AudioQueueFragment.Companion.SINGLE_PLAYLIST_SIZE
 import mega.privacy.android.app.mediaplayer.service.Metadata
@@ -73,6 +75,8 @@ class VideoPlayerController(
     private val controllerView = container.findViewById<View>(R.id.layout_player)
     private val unlockView = container.findViewById<View>(R.id.layout_unlock)
     private val unlockButton = container.findViewById<ImageButton>(R.id.image_button_unlock)
+    private val speedPlaybackButton = container.findViewById<ImageButton>(R.id.speed_playback)
+    private val speedPlaybackPopup = container.findViewById<ComposeView>(R.id.speed_playback_popup)
 
     private var sharingScope: CoroutineScope? = null
 
@@ -98,6 +102,12 @@ class VideoPlayerController(
             }
         }
 
+        coroutineScope.launch {
+            viewModel.uiState.map { it.currentSpeedPlayback }.distinctUntilChanged().collectLatest {
+                speedPlaybackButton.setImageResource(it.iconId)
+            }
+        }
+
         setupRepeatToggleButton(viewModel.uiState.value.repeatToggleMode)
         setupMoreOptionButton()
         setupVideoPlayQueueButton(viewModel.uiState.value.items.size)
@@ -113,6 +123,7 @@ class VideoPlayerController(
         unlockButton.setOnClickListener {
             updateLockState(false)
         }
+        setupSpeedPlaybackButton()
     }
 
     /**
@@ -282,6 +293,30 @@ class VideoPlayerController(
         unlockView.isVisible = isLock
         lockStateChanged(isLock)
         viewModel.updateLockStatus(isLock)
+    }
+
+    private fun setupSpeedPlaybackButton() {
+        initSpeedPlaybackPopup(speedPlaybackPopup)
+        speedPlaybackButton.setImageResource(viewModel.uiState.value.currentSpeedPlayback.iconId)
+        speedPlaybackButton.setOnClickListener {
+            viewModel.updateIsSpeedPopupShown(true)
+        }
+    }
+
+    private fun initSpeedPlaybackPopup(composeView: ComposeView) {
+        composeView.setupComposeView(context) {
+            val state by viewModel.uiState.collectAsStateWithLifecycle()
+
+            SpeedSelectedPopup(
+                items = SpeedPlaybackItem.entries,
+                isShown = state.isSpeedPopupShown,
+                currentPlaybackSpeed = state.currentSpeedPlayback,
+                onDismissRequest = { viewModel.updateIsSpeedPopupShown(false) }
+            ) { speedPlaybackItem ->
+                viewModel.updateCurrentSpeedPlaybackItem(speedPlaybackItem)
+                viewModel.updateIsSpeedPopupShown(false)
+            }
+        }
     }
 
     @OptIn(UnstableApi::class)

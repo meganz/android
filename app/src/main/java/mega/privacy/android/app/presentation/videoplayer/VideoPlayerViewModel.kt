@@ -49,6 +49,7 @@ import mega.privacy.android.app.di.mediaplayer.VideoPlayer
 import mega.privacy.android.app.featuretoggle.ApiFeatures
 import mega.privacy.android.app.mediaplayer.gateway.MediaPlayerGateway
 import mega.privacy.android.app.mediaplayer.model.MediaPlaySources
+import mega.privacy.android.app.mediaplayer.model.SpeedPlaybackItem
 import mega.privacy.android.app.mediaplayer.queue.model.MediaQueueItemType
 import mega.privacy.android.app.mediaplayer.service.Metadata
 import mega.privacy.android.app.presentation.time.mapper.DurationInSecondsTextMapper
@@ -1348,6 +1349,15 @@ class VideoPlayerViewModel @Inject constructor(
 
     internal fun updateIsVideoOptionPopupShown(value: Boolean) {
         uiState.update { it.copy(isVideoOptionPopupShown = value) }
+    }
+
+    internal fun updateIsSpeedPopupShown(value: Boolean) {
+        uiState.update { it.copy(isSpeedPopupShown = value) }
+    }
+
+    internal fun updateCurrentSpeedPlaybackItem(item: SpeedPlaybackItem) {
+        mediaPlayerGateway.updatePlaybackSpeed(item)
+        uiState.update { it.copy(currentSpeedPlayback = item) }
     }
 
     /**

@@ -22,6 +22,7 @@ import mega.privacy.android.app.TimberJUnit5Extension
 import mega.privacy.android.app.data.extensions.observeOnce
 import mega.privacy.android.app.featuretoggle.ApiFeatures
 import mega.privacy.android.app.mediaplayer.gateway.MediaPlayerGateway
+import mega.privacy.android.app.mediaplayer.model.SpeedPlaybackItem
 import mega.privacy.android.app.mediaplayer.queue.model.MediaQueueItemType
 import mega.privacy.android.app.mediaplayer.service.Metadata
 import mega.privacy.android.app.presentation.myaccount.InstantTaskExecutorExtension
@@ -1431,16 +1432,43 @@ class VideoPlayerViewModelTest {
             }
         }
 
-    fun `test that isVideoOptionPopupShown is updated correctly`() = runTest {
+    @ParameterizedTest(name = "when value is {0}")
+    @ValueSource(booleans = [true, false])
+    fun `test that isVideoOptionPopupShown is updated correctly`(value: Boolean) = runTest {
         initViewModel()
-        underTest.updateIsVideoOptionPopupShown(true)
+        underTest.updateIsVideoOptionPopupShown(value)
         testScheduler.advanceUntilIdle()
         underTest.uiState.test {
-            assertThat(awaitItem().isVideoOptionPopupShown).isTrue()
-            underTest.updateIsVideoOptionPopupShown(false)
-            assertThat(awaitItem().isVideoOptionPopupShown).isFalse()
+            assertThat(awaitItem().isVideoOptionPopupShown).isEqualTo(value)
         }
     }
+
+    @ParameterizedTest(name = "when value is {0}")
+    @ValueSource(booleans = [true, false])
+    fun `test that isSpeedPopupShown is updated correctly`(value: Boolean) = runTest {
+        initViewModel()
+        underTest.updateIsSpeedPopupShown(value)
+        testScheduler.advanceUntilIdle()
+        underTest.uiState.test {
+            assertThat(awaitItem().isSpeedPopupShown).isEqualTo(value)
+        }
+    }
+
+    @ParameterizedTest(name = "when item is {0}")
+    @MethodSource("provideSpeedPlaybackItem")
+    fun `test that currentSpeedPlayback is updated correctly`(item: SpeedPlaybackItem) = runTest {
+        initViewModel()
+        underTest.updateCurrentSpeedPlaybackItem(item)
+        testScheduler.advanceUntilIdle()
+        verify(mediaPlayerGateway).updatePlaybackSpeed(item)
+        underTest.uiState.test {
+            val actual = awaitItem()
+            assertThat(actual.currentSpeedPlayback.speed).isEqualTo(item.speed)
+            assertThat(actual.currentSpeedPlayback.iconId).isEqualTo(item.iconId)
+        }
+    }
+
+    private fun provideSpeedPlaybackItem() = SpeedPlaybackItem.entries
 
     @Test
     internal fun `test that copy complete snack bar message is shown when node is copied to different directory`() =

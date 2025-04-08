@@ -3,6 +3,7 @@ package mega.privacy.android.app.presentation.videoplayer.model
 import de.palm.composestateevents.StateEventWithContent
 import de.palm.composestateevents.consumed
 import mega.privacy.android.app.mediaplayer.model.MediaPlaySources
+import mega.privacy.android.app.mediaplayer.model.SpeedPlaybackItem
 import mega.privacy.android.app.mediaplayer.service.Metadata
 import mega.privacy.android.app.presentation.transfers.starttransfer.model.TransferTriggerEvent.DownloadTriggerEvent
 import mega.privacy.android.domain.entity.AccountType
@@ -43,6 +44,8 @@ import mega.privacy.android.legacy.core.ui.model.SearchWidgetState
  * @property query search query
  * @property searchedItems searched video player items
  * @property isLocked whether the video player is locked
+ * @property isSpeedPopupShown speed playback popup whether is shown, true is shown, otherwise is false
+ * @property currentSpeedPlayback current SpeedPlaybackItem
  */
 data class VideoPlayerUiState(
     val items: List<VideoPlayerItem> = emptyList(),
@@ -75,4 +78,6 @@ data class VideoPlayerUiState(
     val query: String? = null,
     val searchedItems: List<VideoPlayerItem> = emptyList(),
     val isLocked: Boolean = false,
+    val isSpeedPopupShown: Boolean = false,
+    val currentSpeedPlayback: SpeedPlaybackItem = SpeedPlaybackItem.PLAYBACK_SPEED_1_X,
 )
