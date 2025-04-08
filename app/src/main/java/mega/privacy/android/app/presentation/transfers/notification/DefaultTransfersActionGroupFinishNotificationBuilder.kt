@@ -1,7 +1,5 @@
 package mega.privacy.android.app.presentation.transfers.notification
 
-import mega.privacy.android.icon.pack.R as iconPackR
-import mega.privacy.android.shared.resources.R as sharedR
 import android.app.Notification
 import android.app.PendingIntent
 import android.content.Context
@@ -32,6 +30,9 @@ import mega.privacy.android.domain.entity.transfer.isPreviewDownload
 import mega.privacy.android.domain.usecase.featureflag.GetFeatureFlagValueUseCase
 import mega.privacy.android.domain.usecase.file.GetPathByDocumentContentUriUseCase
 import mega.privacy.android.domain.usecase.file.IsContentUriUseCase
+import mega.privacy.android.domain.usecase.login.GetSessionUseCase
+import mega.privacy.android.icon.pack.R as iconPackR
+import mega.privacy.android.shared.resources.R as sharedR
 import java.io.File
 import java.util.zip.ZipFile
 import javax.inject.Inject
@@ -44,6 +45,7 @@ class DefaultTransfersActionGroupFinishNotificationBuilder @Inject constructor(
     private val getFeatureFlagValueUseCase: GetFeatureFlagValueUseCase,
     private val isContentUriUseCase: IsContentUriUseCase,
     private val getPathByDocumentContentUriUseCase: GetPathByDocumentContentUriUseCase,
+    private val getSessionUseCase: GetSessionUseCase,
     private val fileSizeStringMapper: FileSizeStringMapper,
     private val fileTypeInfoMapper: FileTypeInfoMapper,
 ) : TransfersActionGroupFinishNotificationBuilder {
@@ -62,6 +64,7 @@ class DefaultTransfersActionGroupFinishNotificationBuilder @Inject constructor(
         }
         val isPreviewDownload = actionGroup.isPreviewDownload()
         val isOfflineDownload = actionGroup.isOfflineDownload()
+        val isLoggedIn = getSessionUseCase() != null
         val titleSuffix = when {
             errorCount > 0 && alreadyTransferredCount > 0 ->
                 "${alreadyMsg(alreadyTransferredCount)}, ${errorMsg(errorCount)}"
@@ -201,15 +204,29 @@ class DefaultTransfersActionGroupFinishNotificationBuilder @Inject constructor(
             PendingIntent.FLAG_UPDATE_CURRENT or PendingIntent.FLAG_IMMUTABLE
         )
 
-        val actionIntent = if (isPreviewDownload) {
-            previewIntent
-        } else {
-            Intent(context, ManagerActivity::class.java).apply {
-                action = Constants.ACTION_LOCATE_DOWNLOADED_FILE
-                putExtra(Constants.INTENT_EXTRA_IS_OFFLINE_PATH, isOfflineDownload)
-                putExtra(FileStorageActivity.EXTRA_PATH, actionGroup.destination)
-                actionGroup.singleFileName?.let {
-                    putExtra(FileStorageActivity.EXTRA_FILE_NAME, it)
+        val actionIntent = when {
+            isPreviewDownload -> {
+                previewIntent
+            }
+
+            isLoggedIn -> {
+                Intent(context, ManagerActivity::class.java).apply {
+                    action = Constants.ACTION_LOCATE_DOWNLOADED_FILE
+                    putExtra(Constants.INTENT_EXTRA_IS_OFFLINE_PATH, isOfflineDownload)
+                    putExtra(FileStorageActivity.EXTRA_PATH, actionGroup.destination)
+                    actionGroup.singleFileName?.let {
+                        putExtra(FileStorageActivity.EXTRA_FILE_NAME, it)
+                    }
+                }
+            }
+
+            else -> {
+                Intent(context, FileStorageActivity::class.java).apply {
+                    action = FileStorageActivity.Mode.BROWSE_FILES.action
+                    putExtra(FileStorageActivity.EXTRA_PATH, actionGroup.destination)
+                    intent.getStringExtra(FileStorageActivity.EXTRA_FILE_NAME)?.let {
+                        putExtra(FileStorageActivity.EXTRA_FILE_NAME, it)
+                    }
                 }
             }
         }
@@ -222,10 +239,18 @@ class DefaultTransfersActionGroupFinishNotificationBuilder @Inject constructor(
             PendingIntent.FLAG_UPDATE_CURRENT or PendingIntent.FLAG_IMMUTABLE
         )
 
-        val actionText = if (isPreviewDownload) {
-            resources.getString(sharedR.string.transfers_notification_preview_action)
-        } else {
-            resources.getString(sharedR.string.transfers_notification_location_action)
+        val actionText = when {
+            isPreviewDownload -> {
+                resources.getString(sharedR.string.transfers_notification_preview_action)
+            }
+
+            isLoggedIn || isOfflineDownload.not() -> {
+                resources.getString(sharedR.string.transfers_notification_location_action)
+            }
+
+            else -> {
+                null
+            }
         }
 
         return NotificationCompat.Builder(context, Constants.NOTIFICATION_CHANNEL_DOWNLOAD_ID)
@@ -241,12 +266,14 @@ class DefaultTransfersActionGroupFinishNotificationBuilder @Inject constructor(
                 contentText?.let {
                     setContentText(it)
                 }
-                if (actionGroup.completedFiles > 0 || actionGroup.alreadyTransferred > 0) {
-                    addAction(
-                        iconPackR.drawable.ic_stat_notify,
-                        actionText,
-                        actionPendingIntent
-                    )
+                actionText?.let {
+                    if (actionGroup.completedFiles > 0 || actionGroup.alreadyTransferred > 0) {
+                        addAction(
+                            iconPackR.drawable.ic_stat_notify,
+                            actionText,
+                            actionPendingIntent
+                        )
+                    }
                 }
             }
             .setGroup(FINAL_SUMMARY_GROUP + transferType.name)
