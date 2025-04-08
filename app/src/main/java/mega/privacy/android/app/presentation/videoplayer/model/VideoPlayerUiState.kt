@@ -42,6 +42,7 @@ import mega.privacy.android.legacy.core.ui.model.SearchWidgetState
  * @property searchState SearchWidgetState
  * @property query search query
  * @property searchedItems searched video player items
+ * @property isLocked whether the video player is locked
  */
 data class VideoPlayerUiState(
     val items: List<VideoPlayerItem> = emptyList(),
@@ -72,5 +73,6 @@ data class VideoPlayerUiState(
     val isActionMode: Boolean = false,
     val searchState: SearchWidgetState = SearchWidgetState.COLLAPSED,
     val query: String? = null,
-    val searchedItems: List<VideoPlayerItem> = emptyList()
+    val searchedItems: List<VideoPlayerItem> = emptyList(),
+    val isLocked: Boolean = false,
 )

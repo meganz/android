@@ -57,6 +57,7 @@ class VideoPlayerController(
     container: ViewGroup,
     coroutineScope: CoroutineScope,
     private val fullscreenClickedCallback: () -> Unit,
+    private val lockStateChanged: (lock: Boolean) -> Unit,
     private val playQueueButtonClicked: () -> Unit,
     private val captureScreenShotFinished: (Bitmap) -> Unit,
 ) : LifecycleEventObserver {
@@ -68,6 +69,10 @@ class VideoPlayerController(
     private val videoOptionPopup = container.findViewById<ComposeView>(R.id.video_option_popup)
     private val screenshotButton = container.findViewById<ImageButton>(R.id.image_screenshot)
     private val fullscreenButton = container.findViewById<ImageButton>(R.id.full_screen)
+    private val lockButton = container.findViewById<ImageButton>(R.id.image_button_lock)
+    private val controllerView = container.findViewById<View>(R.id.layout_player)
+    private val unlockView = container.findViewById<View>(R.id.layout_unlock)
+    private val unlockButton = container.findViewById<ImageButton>(R.id.image_button_unlock)
 
     private var sharingScope: CoroutineScope? = null
 
@@ -86,6 +91,13 @@ class VideoPlayerController(
             }
         }
 
+        coroutineScope.launch {
+            viewModel.uiState.map { it.isLocked }.distinctUntilChanged().collectLatest {
+                controllerView.isVisible = !it
+                unlockView.isVisible = it
+            }
+        }
+
         setupRepeatToggleButton(viewModel.uiState.value.repeatToggleMode)
         setupMoreOptionButton()
         setupVideoPlayQueueButton(viewModel.uiState.value.items.size)
@@ -93,6 +105,14 @@ class VideoPlayerController(
             screenshotButtonClicked()
         }
         setupFullscreen(viewModel.uiState.value.isFullscreen)
+
+        lockButton.setOnClickListener {
+            updateLockState(true)
+        }
+
+        unlockButton.setOnClickListener {
+            updateLockState(false)
+        }
     }
 
     /**
@@ -200,7 +220,7 @@ class VideoPlayerController(
             ) { videOption ->
                 when (videOption) {
                     VideoOptionItem.VIDEO_OPTION_SNAPSHOT -> screenshotButtonClicked()
-                    VideoOptionItem.VIDEO_OPTION_LOCK -> {}
+                    VideoOptionItem.VIDEO_OPTION_LOCK -> updateLockState(true)
                     else -> fullscreenClickedCallback()
                 }
                 viewModel.updateIsVideoOptionPopupShown(false)
@@ -256,6 +276,13 @@ class VideoPlayerController(
                 R.drawable.ic_full_screen
             }
         )
+
+    private fun updateLockState(isLock: Boolean) {
+        controllerView.isVisible = !isLock
+        unlockView.isVisible = isLock
+        lockStateChanged(isLock)
+        viewModel.updateLockStatus(isLock)
+    }
 
     @OptIn(UnstableApi::class)
     private fun captureScreenShot() {

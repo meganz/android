@@ -188,6 +188,8 @@ import mega.privacy.android.domain.usecase.thumbnailpreview.GetThumbnailUseCase
 import mega.privacy.android.domain.usecase.transfers.MonitorTransferEventsUseCase
 import mega.privacy.android.domain.usecase.videosection.SaveVideoRecentlyWatchedUseCase
 import mega.privacy.android.legacy.core.ui.model.SearchWidgetState
+import mega.privacy.mobile.analytics.event.LockButtonPressedEvent
+import mega.privacy.mobile.analytics.event.UnlockButtonPressedEvent
 import mega.privacy.mobile.analytics.event.VideoPlayerFullScreenPressedEvent
 import mega.privacy.mobile.analytics.event.VideoPlayerGetLinkMenuToolbarEvent
 import mega.privacy.mobile.analytics.event.VideoPlayerOriginalPressedEvent
@@ -1733,6 +1735,17 @@ class VideoPlayerViewModel @Inject constructor(
             }
         )
         uiState.update { it.copy(isFullscreen = value) }
+    }
+
+    internal fun updateLockStatus(value: Boolean) {
+        Analytics.tracker.trackEvent(
+            if (value) {
+                LockButtonPressedEvent
+            } else {
+                UnlockButtonPressedEvent
+            }
+        )
+        uiState.update { it.copy(isLocked = value) }
     }
 
     companion object {

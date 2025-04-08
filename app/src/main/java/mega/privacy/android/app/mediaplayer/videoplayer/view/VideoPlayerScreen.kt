@@ -178,6 +178,16 @@ internal fun VideoPlayerScreen(
                                         viewModel.updateFullscreen(isFullscreen)
                                         updateResizeMode(isFullscreen)
                                     },
+                                    lockStateChanged = {
+                                        autoHideJob?.cancel()
+                                        autoHideJob = coroutineScope.launch {
+                                            systemUiController.isSystemBarsVisible = true
+                                            playerComposeView.showController()
+                                            delay(AUDIO_PLAYER_TOOLBAR_INIT_HIDE_DELAY_MS)
+                                            systemUiController.isSystemBarsVisible = false
+                                            playerComposeView.hideController()
+                                        }
+                                    },
                                     playQueueButtonClicked = {
                                         autoHideJob?.cancel()
                                         playQueueButtonClicked()
@@ -271,7 +281,7 @@ internal fun VideoPlayerScreen(
                         orientation == ORIENTATION_PORTRAIT
                 }
 
-                if (isControllerViewVisible) {
+                if (isControllerViewVisible && !uiState.isLocked) {
                     VideoPlayerTopBar(
                         modifier = Modifier.padding(
                             end = if (orientation == ORIENTATION_PORTRAIT)

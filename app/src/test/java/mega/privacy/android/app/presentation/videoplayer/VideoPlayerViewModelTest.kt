@@ -169,6 +169,8 @@ import mega.privacy.android.domain.usecase.thumbnailpreview.GetThumbnailUseCase
 import mega.privacy.android.domain.usecase.transfers.MonitorTransferEventsUseCase
 import mega.privacy.android.domain.usecase.videosection.SaveVideoRecentlyWatchedUseCase
 import mega.privacy.android.legacy.core.ui.model.SearchWidgetState
+import mega.privacy.mobile.analytics.event.LockButtonPressedEvent
+import mega.privacy.mobile.analytics.event.UnlockButtonPressedEvent
 import mega.privacy.mobile.analytics.event.VideoPlayerFullScreenPressedEvent
 import mega.privacy.mobile.analytics.event.VideoPlayerGetLinkMenuToolbarEvent
 import mega.privacy.mobile.analytics.event.VideoPlayerOriginalPressedEvent
@@ -2063,6 +2065,27 @@ class VideoPlayerViewModelTest {
         )
         underTest.uiState.test {
             assertThat(awaitItem().isFullscreen).isEqualTo(isFullscreen)
+            cancelAndConsumeRemainingEvents()
+        }
+    }
+
+    @ParameterizedTest(name = "and lock state is {0}")
+    @ValueSource(booleans = [true, false])
+    fun `test that isLocked is updated correctly when updateLockStatus is invoked`(
+        isLocked: Boolean,
+    ) = runTest {
+        initViewModel()
+        underTest.updateLockStatus(isLocked)
+        testScheduler.advanceUntilIdle()
+        assertThat(analyticsExtension.events.first()).isInstanceOf(
+            if (isLocked) {
+                LockButtonPressedEvent::class.java
+            } else {
+                UnlockButtonPressedEvent::class.java
+            }
+        )
+        underTest.uiState.test {
+            assertThat(awaitItem().isLocked).isEqualTo(isLocked)
             cancelAndConsumeRemainingEvents()
         }
     }
