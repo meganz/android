@@ -70,12 +70,26 @@ fun Context?.launchUrl(url: String?) {
         return
     }
 
+    val uri = runCatching { Uri.parse(url) }.getOrElse {
+        Timber.e(it, "Failed to parse URL")
+        return
+    }
+
     fun Intent.applyNewTaskFlag() = apply {
         if (this@launchUrl is Application) addFlags(Intent.FLAG_ACTIVITY_NEW_TASK)
     }
 
-    val uri = Uri.parse(url)
     runCatching {
+        // Don't open URL in Custom Tabs if it's a deeplink
+        val deeplinkHosts = setOf(
+            "mega.co.nz",
+            "www.mega.co.nz",
+            "mega.nz",
+            "www.mega.nz"
+        )
+        if (deeplinkHosts.contains(uri.host) || uri.scheme == "mega") {
+            throw IllegalArgumentException("URL is a deeplink")
+        }
         CustomTabsIntent.Builder()
             .apply {
                 setTheme(R.style.Theme_Mega)
@@ -83,6 +97,7 @@ fun Context?.launchUrl(url: String?) {
                 setShareState(CustomTabsIntent.SHARE_STATE_OFF)
                 setDownloadButtonEnabled(false)
                 setBookmarksButtonEnabled(false)
+                setSendToExternalDefaultHandlerEnabled(false)
             }
             .build()
             .also {
@@ -93,7 +108,7 @@ fun Context?.launchUrl(url: String?) {
                 it.intent.applyNewTaskFlag()
             }.launchUrl(this, uri)
     }.recoverCatching { e ->
-        Timber.e(e, "Chrome Custom Tabs launch failed, falling back to WebViewActivity")
+        Timber.e(e, "Falling back to WebViewActivity")
         startActivity(
             Intent(this, WebViewActivity::class.java).apply {
                 addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP)
@@ -102,7 +117,7 @@ fun Context?.launchUrl(url: String?) {
             }
         )
     }.recoverCatching { e ->
-        Timber.e(e, "WebViewActivity launch failed, falling back to browser")
+        Timber.e(e, "Falling back to default browser")
         startActivity(Intent(Intent.ACTION_VIEW, uri).applyNewTaskFlag())
     }.onFailure {
         Timber.e(it, "Failed to launch URL")

@@ -1,5 +1,6 @@
 package mega.privacy.android.app.presentation.login
 
+import mega.privacy.android.shared.resources.R as sharedR
 import android.annotation.SuppressLint
 import android.app.Activity
 import android.content.Intent
@@ -37,8 +38,8 @@ import mega.privacy.android.app.MegaApplication.Companion.getChatManagement
 import mega.privacy.android.app.MegaApplication.Companion.isIsHeartBeatAlive
 import mega.privacy.android.app.MegaApplication.Companion.setHeartBeatAlive
 import mega.privacy.android.app.R
-import mega.privacy.android.app.activities.WebViewActivity
 import mega.privacy.android.app.constants.IntentConstants
+import mega.privacy.android.app.extensions.launchUrl
 import mega.privacy.android.app.featuretoggle.AppFeatures
 import mega.privacy.android.app.main.FileExplorerActivity
 import mega.privacy.android.app.main.ManagerActivity
@@ -76,7 +77,6 @@ import mega.privacy.android.domain.qualifier.LoginMutex
 import mega.privacy.android.domain.usecase.GetThemeMode
 import mega.privacy.android.domain.usecase.featureflag.GetFeatureFlagValueUseCase
 import mega.privacy.android.shared.original.core.ui.theme.OriginalTheme
-import mega.privacy.android.shared.resources.R as sharedR
 import nz.mega.sdk.MegaError
 import timber.log.Timber
 import javax.inject.Inject
@@ -212,10 +212,7 @@ class LoginFragment : Fragment() {
     }
 
     private fun openLoginIssueHelpdeskPage() {
-        Intent(Intent.ACTION_VIEW).apply {
-            data = Uri.parse(Companion.LOGIN_HELP_URL)
-            startActivity(this)
-        }
+        context.launchUrl(LOGIN_HELP_URL)
     }
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
@@ -982,24 +979,14 @@ class LoginFragment : Fragment() {
 
     private fun onForgotPassword(typedEmail: String?) {
         Timber.d("Click on button_forgot_pass")
-        try {
-            val openTermsIntent = Intent(requireContext(), WebViewActivity::class.java).apply {
-                flags = Intent.FLAG_ACTIVITY_CLEAR_TOP
-                data = if (typedEmail.isNullOrEmpty()) {
-                    Uri.parse(RECOVERY_URL)
-                } else {
-                    val encodedEmail =
-                        Base64.encodeToString(typedEmail.toByteArray(), Base64.DEFAULT)
-                            .replace("\n", "")
-
-                    Uri.parse(RECOVERY_URL_EMAIL + encodedEmail)
-                }
+        context.launchUrl(
+            if (typedEmail.isNullOrEmpty()) {
+                RECOVERY_URL
+            } else {
+                RECOVERY_URL_EMAIL + Base64.encodeToString(typedEmail.toByteArray(), Base64.DEFAULT)
+                    .replace("\n", "")
             }
-
-            startActivity(openTermsIntent)
-        } catch (e: Exception) {
-            startActivity(Intent(Intent.ACTION_VIEW).setData(Uri.parse(RECOVERY_URL)))
-        }
+        )
     }
 
     private fun onCreateAccount() {
@@ -1007,18 +994,7 @@ class LoginFragment : Fragment() {
     }
 
     private fun onLostAuthenticationDevice() {
-        try {
-            startActivity(Intent(requireContext(), WebViewActivity::class.java).apply {
-                flags = Intent.FLAG_ACTIVITY_CLEAR_TOP
-                data = Uri.parse(RECOVERY_URL)
-            })
-        } catch (e: Exception) {
-            try {
-                startActivity(Intent(Intent.ACTION_VIEW).setData(Uri.parse(RECOVERY_URL)))
-            } catch (e: Exception) {
-                Timber.w("Exception trying to open installed browser apps", e)
-            }
-        }
+        context.launchUrl(RECOVERY_URL)
     }
 
     private fun sendSupportEmail(ticket: SupportEmailTicket) {
