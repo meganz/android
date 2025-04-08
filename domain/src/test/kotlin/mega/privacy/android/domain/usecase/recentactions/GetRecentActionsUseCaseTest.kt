@@ -4,7 +4,6 @@ import com.google.common.truth.Truth.assertThat
 import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.test.UnconfinedTestDispatcher
-import kotlinx.coroutines.test.runBlockingTest
 import kotlinx.coroutines.test.runTest
 import mega.privacy.android.domain.entity.RecentActionBucketUnTyped
 import mega.privacy.android.domain.entity.RecentActionsSharesType
@@ -94,7 +93,7 @@ class GetRecentActionsUseCaseTest {
     }
 
     @Test
-    fun `test that recentActionsRepository getRecentActions is invoked`() = runBlockingTest {
+    fun `test that recentActionsRepository getRecentActions is invoked`() = runTest {
         whenever(recentActionsRepository.getRecentActions(any())).thenReturn(emptyList())
         underTest(false)
         verify(recentActionsRepository).getRecentActions(false)

@@ -82,9 +82,7 @@ class VideoSelectedActivity : PasscodeActivity() {
             OriginalTheme(isDark = themeMode.isDarkMode()) {
                 VideoSelectedScreen(
                     viewModel = viewModel,
-                    onBackPressed = {
-                        onBackPressedCallback.handleOnBackPressed()
-                    },
+                    onBackPressed = onBackPressedCallback::handleOnBackPressed,
                     onSortOrderClick = { showNewSortByPanel() },
                     onVideoSelected = { selectedItems ->
                         val items = ArrayList(selectedItems.map { it.toString() })

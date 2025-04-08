@@ -27,6 +27,7 @@ import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableIntStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.vector.ImageVector
@@ -42,6 +43,7 @@ import androidx.navigation.compose.rememberNavController
 import androidx.window.core.layout.WindowWidthSizeClass
 import kotlinx.collections.immutable.ImmutableList
 import kotlinx.collections.immutable.persistentListOf
+import kotlinx.coroutines.launch
 import mega.android.core.ui.components.MegaScaffold
 import mega.android.core.ui.components.MegaText
 import mega.android.core.ui.components.button.MegaOutlinedButton
@@ -70,18 +72,21 @@ internal fun SettingsHomeView(
     }
 
     val navigator = rememberListDetailPaneScaffoldNavigator<SettingEntryPoint.NavData>()
+    val coroutineScope = rememberCoroutineScope()
 
     LaunchedEffect(initialScreen) {
         initialScreen?.let {
             navigator.navigateTo(
                 pane = ListDetailPaneScaffoldRole.Detail,
-                content = it
+                contentKey = it
             )
         }
     }
 
     BackHandler(navigator.canNavigateBack()) {
-        navigator.navigateBack()
+        coroutineScope.launch {
+            navigator.navigateBack()
+        }
     }
 
     val detailNavigator = rememberNavController()
@@ -97,10 +102,12 @@ internal fun SettingsHomeView(
                     state = state,
                     onNavigateToItem = { settingEntryPoint ->
                         // Navigate to the detail pane with the passed item
-                        navigator.navigateTo(
-                            pane = ListDetailPaneScaffoldRole.Detail,
-                            content = settingEntryPoint.navData
-                        )
+                        coroutineScope.launch {
+                            navigator.navigateTo(
+                                pane = ListDetailPaneScaffoldRole.Detail,
+                                contentKey = settingEntryPoint.navData
+                            )
+                        }
                     },
                     onBackPressed = onBackPressed
                 )
@@ -116,7 +123,7 @@ internal fun SettingsHomeView(
                     else -> true
                 }
 
-                val settingEntryPoint = navigator.currentDestination?.content
+                val settingEntryPoint = navigator.currentDestination?.contentKey
                 val title = settingEntryPoint?.title?.let { stringResource(it) } ?: "Empty"
                 MegaScaffold(
                     modifier = Modifier.fillMaxSize(),
@@ -124,9 +131,11 @@ internal fun SettingsHomeView(
                         MegaTopAppBar(
                             modifier = Modifier.statusBarsPadding(),
                             navigationType = if (backVisible) AppBarNavigationType.Back {
-                                navigator.handleDetailBackAction(
-                                    detailNavigator
-                                )
+                                coroutineScope.launch {
+                                    navigator.handleDetailBackAction(
+                                        detailNavigator
+                                    )
+                                }
                             } else AppBarNavigationType.None,
                             title = title,
                         )
@@ -147,7 +156,7 @@ internal fun SettingsHomeView(
 }
 
 @OptIn(ExperimentalMaterial3AdaptiveApi::class)
-private fun ThreePaneScaffoldNavigator<*>.handleDetailBackAction(
+private suspend fun ThreePaneScaffoldNavigator<*>.handleDetailBackAction(
     detailNavigator: NavHostController,
 ) {
     if (detailNavigator.navigateUp().not()) {

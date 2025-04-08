@@ -1,7 +1,6 @@
 package mega.privacy.android.domain.usecase.chat
 
 import kotlinx.coroutines.ExperimentalCoroutinesApi
-import kotlinx.coroutines.test.runBlockingTest
 import kotlinx.coroutines.test.runTest
 import mega.privacy.android.domain.repository.AccountRepository
 import org.junit.jupiter.api.BeforeEach
