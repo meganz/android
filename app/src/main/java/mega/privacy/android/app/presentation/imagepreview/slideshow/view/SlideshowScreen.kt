@@ -1,5 +1,6 @@
 package mega.privacy.android.app.presentation.imagepreview.slideshow.view
 
+import androidx.compose.animation.core.tween
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -34,11 +35,13 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.graphicsLayer
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalLifecycleOwner
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.util.lerp
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.LifecycleEventObserver
@@ -72,6 +75,7 @@ import mega.privacy.android.shared.original.core.ui.controls.layouts.MegaScaffol
 import mega.privacy.android.shared.original.core.ui.theme.extensions.black_white
 import mega.privacy.android.shared.original.core.ui.theme.extensions.white_alpha_070_grey_alpha_070
 import mega.privacy.mobile.analytics.event.SlideShowScreenEvent
+import kotlin.math.absoluteValue
 
 @Composable
 fun SlideshowScreen(
@@ -108,6 +112,7 @@ fun SlideshowScreen(
     currentImageNode?.let { node ->
         val zoomableStateMap = remember { mutableMapOf<NodeId, ZoomableState?>() }
         val isNodeDownloaded = remember { mutableStateMapOf<NodeId, Boolean>() }
+        var nodeStatusDownload by remember { mutableStateOf("") }
 
         val scaffoldState = rememberScaffoldState()
         val coroutineScope = rememberCoroutineScope()
@@ -175,8 +180,10 @@ fun SlideshowScreen(
             viewState.imageNodes.getOrNull(page)?.let { node ->
                 viewModel.setCurrentImageNode(node)
                 viewModel.setCurrentImageNodeIndex(page)
-
-                repeat(2) { viewModel.preloadImageNode(page + 1 + it) }
+                viewModel.preloadImageNode(page + 1) { nodeId, isDownloaded ->
+                    isNodeDownloaded[nodeId] = isDownloaded
+                    nodeStatusDownload = "$nodeId-$isDownloaded"
+                }
             }
 
             for (candidatePage in page - 1..page + 1) {
@@ -195,15 +202,34 @@ fun SlideshowScreen(
             }
         }
 
-        LaunchedEffect(isPlaying, currentImageNodeIndex, speed, isNodeDownloaded[node.id]) {
+        LaunchedEffect(
+            isPlaying,
+            currentImageNodeIndex,
+            speed,
+            isNodeDownloaded[node.id],
+            nodeStatusDownload,
+        ) {
             if (viewState.imageNodes.getOrNull(currentImageNodeIndex) == node) {
-                if (isPlaying && isNodeDownloaded[node.id] == true) {
-                    delay(speed.duration.inWholeMilliseconds)
+                var nextIdx = if (pagerState.canScrollForward) currentImageNodeIndex + 1 else 0
+                if (nextIdx >= pagerState.pageCount) nextIdx = 0
 
-                    var nextIdx = if (pagerState.canScrollForward) currentImageNodeIndex + 1 else 0
-                    if (nextIdx >= pagerState.pageCount) nextIdx = 0
+                val nextNode = viewState.imageNodes.getOrNull(nextIdx)
+                if (nextNode != null) {
+                    if (isPlaying && isNodeDownloaded[node.id] == true && isNodeDownloaded[nextNode.id] == true) {
+                        delay(speed.duration.inWholeMilliseconds)
 
-                    pagerState.scrollToPage(nextIdx)
+                        coroutineScope.launch {
+                            if (nextIdx == 0) {
+                                pagerState.scrollToPage(
+                                    page = 0,
+                                )
+                            }
+                            pagerState.animateScrollToPage(
+                                page = nextIdx,
+                                animationSpec = tween(1500),
+                            )
+                        }
+                    }
                 }
             }
         }
@@ -316,6 +342,8 @@ private fun SlideShowContent(
             Box(modifier = Modifier.fillMaxSize()) {
                 ImageContent(
                     imageState = imageState,
+                    pagerState = pagerState,
+                    index = index,
                     onTapImage = onTapImage,
                     fullSizePath = if (imageNode.serializedData == "localFile") imageNode.fullSizePath else fullSizePath,
                     errorImagePath = if (imageNode.serializedData == "localFile") imageNode.fullSizePath else errorImagePath,
@@ -364,6 +392,8 @@ private fun SlideShowContent(
 @Composable
 private fun ImageContent(
     imageState: ZoomableImageState,
+    pagerState: PagerState,
+    index: Int,
     onTapImage: () -> Unit,
     fullSizePath: String?,
     errorImagePath: String?,
@@ -382,14 +412,30 @@ private fun ImageContent(
                     imagePath = errorImagePath
                 }
             )
-            .crossfade(1000)
             .build()
 
         ZoomableAsyncImage(
             model = request,
             state = imageState,
             contentDescription = "Image Preview",
-            modifier = Modifier.fillMaxSize(),
+            modifier = Modifier
+                .fillMaxSize()
+                .graphicsLayer {
+                    val pageOffset =
+                        pagerState.currentPage - index + pagerState.currentPageOffsetFraction
+
+                    alpha = lerp(
+                        start = 0f,
+                        stop = 1f,
+                        fraction = 1f - pageOffset.absoluteValue.coerceIn(0f, 1f),
+                    )
+
+                    translationX = lerp(
+                        start = size.width,
+                        stop = 0f,
+                        fraction = 1f - pageOffset,
+                    )
+                },
             onClick = { onTapImage() },
             onDoubleClick = DoubleClickToZoomListener.cycle(maxZoomFactor = 3f),
         )

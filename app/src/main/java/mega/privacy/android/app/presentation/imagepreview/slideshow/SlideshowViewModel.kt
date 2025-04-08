@@ -26,6 +26,7 @@ import mega.privacy.android.app.presentation.imagepreview.slideshow.model.Slides
 import mega.privacy.android.domain.entity.VideoFileTypeInfo
 import mega.privacy.android.domain.entity.imageviewer.ImageResult
 import mega.privacy.android.domain.entity.node.ImageNode
+import mega.privacy.android.domain.entity.node.NodeId
 import mega.privacy.android.domain.entity.slideshow.SlideshowOrder
 import mega.privacy.android.domain.entity.slideshow.SlideshowSpeed
 import mega.privacy.android.domain.qualifier.IoDispatcher
@@ -235,8 +236,10 @@ class SlideshowViewModel @Inject constructor(
     // the cross-fade effect which indicating a bug in Coil lib.
     //
     // This manual preloading is the alternative to simulate same behavior.
-    fun preloadImageNode(page: Int) = viewModelScope.launch {
+    fun preloadImageNode(page: Int, callback: (NodeId, Boolean) -> Unit) = viewModelScope.launch {
         val node = _state.value.imageNodes.getOrNull(page) ?: return@launch
-        monitorImageResult(node).collect {}
+        monitorImageResult(node).collect {
+            callback(node.id, it.isFullyLoaded)
+        }
     }
 }
