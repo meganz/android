@@ -17,7 +17,7 @@ import mega.privacy.android.domain.entity.uri.UriPath
  * @property nodeHandle
  * @property fingerprint
  * @property name
- * @property transferTag
+ * @property originalUriPath original location of the file to be attached, useful in case of media compression, where [uriPath] is changed to a temporary file that will be deleted once uploaded
  * @constructor Create empty Pending message
  */
 data class PendingMessage(
@@ -33,6 +33,7 @@ data class PendingMessage(
     var nodeHandle: Long = -1,
     var fingerprint: String? = null,
     var name: String? = null,
+    val originalUriPath: UriPath = UriPath("")
 ) {
     /**
      * True if it's a voice clip, false otherwise

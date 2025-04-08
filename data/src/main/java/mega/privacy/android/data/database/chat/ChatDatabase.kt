@@ -26,7 +26,7 @@ import mega.privacy.android.data.database.entity.chat.TypedMessageEntity
  */
 const val CHAT_DATABASE_NAME = "chat_database"
 
-private const val DATABASE_VERSION = 5
+private const val DATABASE_VERSION = 6
 
 /**
  * In memory chat database
@@ -49,6 +49,7 @@ private const val DATABASE_VERSION = 5
         AutoMigration(2, 3, spec = AutoMigrationSpecChat2to3::class),
         AutoMigration(3, 4),
         AutoMigration(4, 5, spec = AutoMigrationSpecChat4to5::class),
+        AutoMigration(5, 6),
     ],
 )
 abstract class ChatDatabase : RoomDatabase() {

@@ -30,6 +30,7 @@ class PendingMessageMapper @Inject constructor() {
                 nodeHandle = nodeHandle,
                 fingerprint = fingerprint,
                 name = name,
+                originalUriPath = UriPath(originalUriPath),
             )
         }
     }

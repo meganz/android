@@ -32,6 +32,7 @@ internal class PendingMessageMapperTest {
         nodeHandle = 6543L,
         fingerprint = "903456L",
         name = "sample pending message",
+        originalUriPath = "original/file/path"
     )
 
     @BeforeAll
@@ -57,6 +58,7 @@ internal class PendingMessageMapperTest {
             { assertThat(pendingMessage.nodeHandle).isEqualTo(pendingMessageEntity.nodeHandle) },
             { assertThat(pendingMessage.fingerprint).isEqualTo(pendingMessageEntity.fingerprint) },
             { assertThat(pendingMessage.name).isEqualTo(pendingMessageEntity.name) },
+            { assertThat(pendingMessage.originalUriPath).isEqualTo(UriPath(pendingMessageEntity.originalUriPath)) }
         )
     }
 

@@ -20,6 +20,7 @@ import mega.privacy.android.domain.entity.chat.PendingMessageState
  * @property nodeHandle
  * @property fingerprint
  * @property name
+ * @property originalUriPath
  */
 @Entity(tableName = "pending_messages")
 data class PendingMessageEntity(
@@ -36,4 +37,6 @@ data class PendingMessageEntity(
     val nodeHandle: Long,
     val fingerprint: String?,
     val name: String?,
+    @ColumnInfo(name = "original_uri_path", defaultValue = "")
+    val originalUriPath: String,
 )

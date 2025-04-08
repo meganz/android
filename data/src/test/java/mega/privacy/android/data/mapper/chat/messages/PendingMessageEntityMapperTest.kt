@@ -50,6 +50,7 @@ internal class PendingMessageEntityMapperTest {
                 nodeHandle = savePendingMessageRequest.nodeHandle,
                 fingerprint = savePendingMessageRequest.fingerprint,
                 name = savePendingMessageRequest.name,
+                originalUriPath = savePendingMessageRequest.uriPath.value
             )
 
             val actual = underTest(savePendingMessageRequest)
