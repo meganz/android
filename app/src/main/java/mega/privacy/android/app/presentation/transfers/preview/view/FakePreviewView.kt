@@ -37,6 +37,7 @@ import mega.privacy.android.app.presentation.transfers.preview.model.FakePreview
 import mega.privacy.android.app.presentation.transfers.starttransfer.view.StartTransferComponent
 import mega.privacy.android.domain.entity.Progress
 import mega.privacy.android.domain.exception.QuotaExceededMegaException
+import mega.privacy.android.domain.exception.transfers.NoTransferToShowException
 import mega.privacy.android.icon.pack.R as iconPackR
 import mega.privacy.android.shared.original.core.ui.controls.appbar.AppBarType
 import mega.privacy.android.shared.original.core.ui.controls.appbar.MegaAppBar
@@ -57,54 +58,56 @@ internal fun FakePreviewView(
     navigateToStorageSettings: () -> Unit,
 ) {
     with(uiState) {
-        MegaScaffold(
-            modifier = Modifier
-                .fillMaxSize()
-                .systemBarsPadding()
-                .imePadding()
-                .semantics { testTagsAsResourceId = true }
-                .testTag(TEST_TAG_FAKE_PREVIEW),
-            scaffoldState = scaffoldState,
-            topBar = {
-                Column {
-                    MegaAppBar(
-                        appBarType = AppBarType.BACK_NAVIGATION,
-                        title = fileName ?: "",
-                        onNavigationPressed = onBackPress,
-                    )
-                    MegaAnimatedLinearProgressIndicator(
-                        modifier = Modifier.testTag(TEST_TAG_PROGRESS_BAR),
-                        indicatorProgress = progress.floatValue,
-                        progressAnimDuration = if (progress.floatValue > 0.5f) 1000 else 3000,
-                        height = 4.dp,
-                        strokeCap = StrokeCap.Square,
-                    )
-                }
-            },
-        ) { paddingValues ->
-            Column(
+        fileName?.let {
+            MegaScaffold(
                 modifier = Modifier
-                    .padding(paddingValues)
-                    .fillMaxSize(),
-                horizontalAlignment = Alignment.CenterHorizontally,
-                verticalArrangement = Arrangement.Center,
-            ) {
-                fileTypeResId?.let { id ->
-                    Image(
-                        modifier = Modifier
-                            .size(96.dp)
-                            .testTag(TEST_TAG_FILE_TYPE_ICON),
-                        painter = painterResource(id = id),
-                        contentDescription = "StorageStatusImage"
+                    .fillMaxSize()
+                    .systemBarsPadding()
+                    .imePadding()
+                    .semantics { testTagsAsResourceId = true }
+                    .testTag(TEST_TAG_FAKE_PREVIEW),
+                scaffoldState = scaffoldState,
+                topBar = {
+                    Column {
+                        MegaAppBar(
+                            appBarType = AppBarType.BACK_NAVIGATION,
+                            title = fileName,
+                            onNavigationPressed = onBackPress,
+                        )
+                        MegaAnimatedLinearProgressIndicator(
+                            modifier = Modifier.testTag(TEST_TAG_PROGRESS_BAR),
+                            indicatorProgress = progress.floatValue,
+                            progressAnimDuration = if (progress.floatValue > 0.5f) 1000 else 3000,
+                            height = 4.dp,
+                            strokeCap = StrokeCap.Square,
+                        )
+                    }
+                },
+            ) { paddingValues ->
+                Column(
+                    modifier = Modifier
+                        .padding(paddingValues)
+                        .fillMaxSize(),
+                    horizontalAlignment = Alignment.CenterHorizontally,
+                    verticalArrangement = Arrangement.Center,
+                ) {
+                    fileTypeResId?.let { id ->
+                        Image(
+                            modifier = Modifier
+                                .size(96.dp)
+                                .testTag(TEST_TAG_FILE_TYPE_ICON),
+                            painter = painterResource(id = fileTypeResId),
+                            contentDescription = "StorageStatusImage"
+                        )
+                    }
+                    MegaText(
+                        text = stringResource(sharedResR.string.transfers_fake_preview_text),
+                        textColor = TextColor.Secondary,
+                        style = MaterialTheme.typography.caption,
+                        textAlign = TextAlign.Center,
+                        modifier = Modifier.testTag(TEST_TAG_LOADING_TEST)
                     )
                 }
-                MegaText(
-                    text = stringResource(sharedResR.string.transfers_fake_preview_text),
-                    textColor = TextColor.Secondary,
-                    style = MaterialTheme.typography.caption,
-                    textAlign = TextAlign.Center,
-                    modifier = Modifier.testTag(TEST_TAG_LOADING_TEST)
-                )
             }
         }
 
@@ -118,7 +121,7 @@ internal fun FakePreviewView(
         error?.let {
             LocalContext.current.findActivity()?.apply {
                 val intent = when (error) {
-                    is QuotaExceededMegaException -> Intent()
+                    is QuotaExceededMegaException, is NoTransferToShowException -> Intent()
                     else -> Intent().apply {
                         putExtra(EXTRA_ERROR, stringResource(R.string.error_temporary_unavaible))
                     }

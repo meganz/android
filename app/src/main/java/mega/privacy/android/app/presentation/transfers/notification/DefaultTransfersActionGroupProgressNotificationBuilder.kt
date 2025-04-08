@@ -1,7 +1,5 @@
 package mega.privacy.android.app.presentation.transfers.notification
 
-import mega.privacy.android.icon.pack.R as iconPackR
-import mega.privacy.android.shared.resources.R as sharedR
 import android.app.Notification
 import android.app.PendingIntent
 import android.content.BroadcastReceiver
@@ -18,6 +16,8 @@ import mega.privacy.android.app.main.ManagerActivity
 import mega.privacy.android.app.presentation.manager.model.TransfersTab
 import mega.privacy.android.app.presentation.transfers.EXTRA_TAB
 import mega.privacy.android.app.presentation.transfers.TransfersActivity
+import mega.privacy.android.app.presentation.transfers.preview.FakePreviewActivity
+import mega.privacy.android.app.presentation.transfers.preview.FakePreviewFragment.Companion.EXTRA_TRANSFER_TAG
 import mega.privacy.android.app.presentation.transfers.view.COMPLETED_TAB_INDEX
 import mega.privacy.android.app.utils.Constants
 import mega.privacy.android.app.utils.Util
@@ -32,6 +32,8 @@ import mega.privacy.android.domain.usecase.featureflag.GetFeatureFlagValueUseCas
 import mega.privacy.android.domain.usecase.file.GetPathByDocumentContentUriUseCase
 import mega.privacy.android.domain.usecase.file.IsContentUriUseCase
 import mega.privacy.android.domain.usecase.transfers.paused.PauseTransfersQueueUseCase
+import mega.privacy.android.icon.pack.R as iconPackR
+import mega.privacy.android.shared.resources.R as sharedR
 import timber.log.Timber
 import javax.inject.Inject
 
@@ -121,9 +123,8 @@ class DefaultTransfersActionGroupProgressNotificationBuilder @Inject constructor
                 it,
             )
         }
-        val cancelTransferIntent = Intent(context, ManagerActivity::class.java).apply {
-            action = Constants.ACTION_CANCEL_TRANSFER
-            putExtra(Constants.INTENT_EXTRA_TAG, actionGroup.singleTransferTag)
+        val cancelTransferIntent = Intent(context, FakePreviewActivity::class.java).apply {
+            putExtra(EXTRA_TRANSFER_TAG, actionGroup.singleTransferTag)
         }
         val openTransfersSectionIntent =
             if (getFeatureFlagValueUseCase(AppFeatures.TransfersSection)) {

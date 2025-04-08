@@ -12,8 +12,10 @@ import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.catch
 import kotlinx.coroutines.flow.collect
+import kotlinx.coroutines.flow.collectLatest
 import kotlinx.coroutines.flow.conflate
 import kotlinx.coroutines.flow.onEach
+import kotlinx.coroutines.flow.retry
 import kotlinx.coroutines.flow.takeWhile
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
@@ -74,6 +76,8 @@ import mega.privacy.android.domain.usecase.transfers.pending.DeleteAllPendingTra
 import mega.privacy.android.domain.usecase.transfers.pending.InsertPendingDownloadsForNodesUseCase
 import mega.privacy.android.domain.usecase.transfers.pending.InsertPendingUploadsForFilesUseCase
 import mega.privacy.android.domain.usecase.transfers.pending.MonitorPendingTransfersUntilResolvedUseCase
+import mega.privacy.android.domain.usecase.transfers.previews.BroadcastTransferTagToCancelUseCase
+import mega.privacy.android.domain.usecase.transfers.previews.MonitorTransferTagToCancelUseCase
 import mega.privacy.android.domain.usecase.transfers.uploads.GetCurrentUploadSpeedUseCase
 import mega.privacy.android.domain.usecase.transfers.uploads.StartUploadsWorkerAndWaitUntilIsStartedUseCase
 import timber.log.Timber
@@ -126,6 +130,8 @@ internal class StartTransfersComponentViewModel @Inject constructor(
     private val cancelTransferByTagUseCase: CancelTransferByTagUseCase,
     private val deleteCacheFilesUseCase: DeleteCacheFilesUseCase,
     private val getTransferByTagUseCase: GetTransferByTagUseCase,
+    private val monitorTransferTagToCancelUseCase: MonitorTransferTagToCancelUseCase,
+    private val broadcastTransferTagToCancelUseCase: BroadcastTransferTagToCancelUseCase,
 ) : ViewModel(), DefaultLifecycleObserver {
 
     private val _uiState = MutableStateFlow(StartTransferViewState())
@@ -141,6 +147,7 @@ internal class StartTransfersComponentViewModel @Inject constructor(
         monitorRequestFilesPermissionDenied()
         monitorStorageOverQuota()
         monitorPreviews()
+        monitorTransferToCancel()
     }
 
     /**
@@ -942,7 +949,7 @@ internal class StartTransfersComponentViewModel @Inject constructor(
                         setCancelTransferResult(false)
                     }
             }
-            setTransferTagToCancel(null)
+            broadcastTransferTagToCancelAsNull()
         }
     }
 
@@ -962,7 +969,26 @@ internal class StartTransfersComponentViewModel @Inject constructor(
      * Cancels the cancellation of a transfer.
      */
     fun cancelTransferCancelled() {
-        setTransferTagToCancel(null)
+        broadcastTransferTagToCancelAsNull()
+    }
+
+    private fun monitorTransferToCancel() {
+        viewModelScope.launch {
+            monitorTransferTagToCancelUseCase()
+                .retry {
+                    Timber.e(it)
+                    true
+                }
+                .collectLatest { transferTag ->
+                    setTransferTagToCancel(transferTag)
+                }
+        }
+    }
+
+    private fun broadcastTransferTagToCancelAsNull() {
+        viewModelScope.launch {
+            broadcastTransferTagToCancelUseCase(null)
+        }
     }
 
     companion object {

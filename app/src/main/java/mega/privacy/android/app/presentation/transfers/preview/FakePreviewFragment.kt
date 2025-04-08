@@ -67,7 +67,11 @@ class FakePreviewFragment : Fragment() {
                                     val navHostController = rememberNavController()
                                     val scaffoldState = rememberScaffoldState()
                                     val transferUniqueId =
-                                        arguments?.getLong(EXTRA_TRANSFER_UNIQUE_ID) ?: 0
+                                        arguments?.getLong(EXTRA_TRANSFER_UNIQUE_ID, -1)
+                                            .takeUnless { it == -1L }
+                                    val transferTagToCancel =
+                                        arguments?.getInt(EXTRA_TRANSFER_TAG, -1)
+                                            .takeUnless { it == -1 }
 
                                     NavHost(
                                         navController = navHostController,
@@ -76,12 +80,13 @@ class FakePreviewFragment : Fragment() {
                                     ) {
                                         composable("start") {
                                             navHostController.navigateToFakePreviewViewGraph(
+                                                transferUniqueId = transferUniqueId,
+                                                transferTagToCancel = transferTagToCancel,
                                                 navOptions = navOptions {
                                                     popUpTo("start") {
                                                         inclusive = true
                                                     }
                                                 },
-                                                transferUniqueId = transferUniqueId,
                                             )
                                         }
 
@@ -110,5 +115,6 @@ class FakePreviewFragment : Fragment() {
         const val EXTRA_TRANSFER_UNIQUE_ID = "TRANSFER_UNIQUE_ID"
         const val EXTRA_FILE_PATH = "FILE_PATH"
         const val EXTRA_ERROR = "ERROR"
+        const val EXTRA_TRANSFER_TAG = "TRANSFER_TAG"
     }
 }

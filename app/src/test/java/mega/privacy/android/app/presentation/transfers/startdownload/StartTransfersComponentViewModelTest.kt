@@ -70,6 +70,8 @@ import mega.privacy.android.domain.usecase.transfers.pending.DeleteAllPendingTra
 import mega.privacy.android.domain.usecase.transfers.pending.InsertPendingDownloadsForNodesUseCase
 import mega.privacy.android.domain.usecase.transfers.pending.InsertPendingUploadsForFilesUseCase
 import mega.privacy.android.domain.usecase.transfers.pending.MonitorPendingTransfersUntilResolvedUseCase
+import mega.privacy.android.domain.usecase.transfers.previews.BroadcastTransferTagToCancelUseCase
+import mega.privacy.android.domain.usecase.transfers.previews.MonitorTransferTagToCancelUseCase
 import mega.privacy.android.domain.usecase.transfers.uploads.GetCurrentUploadSpeedUseCase
 import mega.privacy.android.domain.usecase.transfers.uploads.StartUploadsWorkerAndWaitUntilIsStartedUseCase
 import org.junit.jupiter.api.BeforeAll
@@ -151,6 +153,10 @@ class StartTransfersComponentViewModelTest {
     private val cancelTransferByTagUseCase = mock<CancelTransferByTagUseCase>()
     private val deleteCacheFilesUseCase = mock<DeleteCacheFilesUseCase>()
     private val getTransferByTagUseCase = mock<GetTransferByTagUseCase>()
+    private val monitorTransferTagToCancelUseCase = mock<MonitorTransferTagToCancelUseCase> {
+        on { invoke() } doReturn emptyFlow()
+    }
+    private val broadcastTransferTagToCancelUseCase = mock<BroadcastTransferTagToCancelUseCase>()
 
     private val node: TypedFileNode = mock()
     private val nodes = listOf(node)
@@ -218,6 +224,8 @@ class StartTransfersComponentViewModelTest {
             cancelTransferByTagUseCase = cancelTransferByTagUseCase,
             deleteCacheFilesUseCase = deleteCacheFilesUseCase,
             getTransferByTagUseCase = getTransferByTagUseCase,
+            monitorTransferTagToCancelUseCase = monitorTransferTagToCancelUseCase,
+            broadcastTransferTagToCancelUseCase = broadcastTransferTagToCancelUseCase,
         )
     }
 
@@ -264,6 +272,7 @@ class StartTransfersComponentViewModelTest {
             cancelTransferByTagUseCase,
             deleteCacheFilesUseCase,
             getTransferByTagUseCase,
+            broadcastTransferTagToCancelUseCase,
         )
         initialStub()
     }
@@ -1092,32 +1101,33 @@ class StartTransfersComponentViewModelTest {
     }
 
     @Test
-    fun `test that startTransfer with CancelPreviewDownload updates state correctly`() = runTest {
-        val transferTagToCancel = 1
+    fun `test that monitorTransferTagToCancelUseCase updates state correctly`() = runTest {
+        val transferTag = 123
+
+        whenever(monitorTransferTagToCancelUseCase()) doReturn flowOf(transferTag)
+
+        initTest()
+
         underTest.uiState.test {
-            assertThat(awaitItem().transferTagToCancel).isNull()
-            underTest.startTransfer(TransferTriggerEvent.CancelPreviewDownload(transferTagToCancel))
-            assertThat(awaitItem().transferTagToCancel).isEqualTo(transferTagToCancel)
+            assertThat(awaitItem().transferTagToCancel).isEqualTo(transferTag)
         }
     }
 
     @Test
-    fun `test that cancelTransferConfirmed invokes correctly and reset the transfer to cancel`() =
+    fun `test that cancelTransferConfirmed invokes correctly`() =
         runTest {
             val transferTagToCancel = 1
 
+            whenever(monitorTransferTagToCancelUseCase()) doReturn flowOf(transferTagToCancel)
             whenever(cancelTransferByTagUseCase(transferTagToCancel)).thenReturn(Unit)
+            whenever(broadcastTransferTagToCancelUseCase(null)).thenReturn(Unit)
 
-            with(underTest) {
-                startTransfer(TransferTriggerEvent.CancelPreviewDownload(transferTagToCancel))
-                cancelTransferConfirmed()
+            initTest()
 
-                uiState.test {
-                    assertThat(awaitItem().transferTagToCancel).isNull()
-                }
-            }
+            underTest.cancelTransferConfirmed()
 
             verify(cancelTransferByTagUseCase).invoke(transferTagToCancel)
+            verify(broadcastTransferTagToCancelUseCase).invoke(null)
         }
 
     @ParameterizedTest(name = " when use case finishes with success: {0}")
@@ -1135,7 +1145,6 @@ class StartTransfersComponentViewModelTest {
             }
 
             with(underTest) {
-                startTransfer(TransferTriggerEvent.CancelPreviewDownload(transferTagToCancel))
                 cancelTransferConfirmed()
 
                 uiState.test {
@@ -1151,13 +1160,7 @@ class StartTransfersComponentViewModelTest {
     @Test
     fun `test that onConsumeCancelTransferResult updates the state correctly`() =
         runTest {
-            val transferTagToCancel = 1
-
-            whenever(cancelTransferByTagUseCase(transferTagToCancel)).thenReturn(Unit)
-
             with(underTest) {
-                startTransfer(TransferTriggerEvent.CancelPreviewDownload(transferTagToCancel))
-                cancelTransferConfirmed()
                 onConsumeCancelTransferResult()
 
                 uiState.test {
@@ -1168,17 +1171,10 @@ class StartTransfersComponentViewModelTest {
         }
 
     @Test
-    fun `test that cancelTransferCancelled resets the transfer to cancel `() = runTest {
-        val transferTagToCancel = 1
+    fun `test that cancelTransferCancelled invokes correctly`() = runTest {
+        underTest.cancelTransferCancelled()
 
-        with(underTest) {
-            startTransfer(TransferTriggerEvent.CancelPreviewDownload(transferTagToCancel))
-            cancelTransferCancelled()
-
-            uiState.test {
-                assertThat(awaitItem().transferTagToCancel).isNull()
-            }
-        }
+        verify(broadcastTransferTagToCancelUseCase).invoke(null)
     }
 
     @ParameterizedTest(name = " if resetTransferTagToCancel is {0}")
@@ -1187,10 +1183,12 @@ class StartTransfersComponentViewModelTest {
         resetTransferTagToCancel: Boolean,
     ) = runTest {
         val transferTagToCancel = 1
-        val event = TransferTriggerEvent.CancelPreviewDownload(transferTagToCancel)
         val file = mock<File>()
 
-        underTest.startTransfer(event)
+        whenever(monitorTransferTagToCancelUseCase()) doReturn flowOf(transferTagToCancel)
+
+        initTest()
+
         underTest.previewFile(file, resetTransferTagToCancel)
 
         underTest.uiState.test {

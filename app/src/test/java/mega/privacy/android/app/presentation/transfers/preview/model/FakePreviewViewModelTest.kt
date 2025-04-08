@@ -9,17 +9,21 @@ import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.emptyFlow
 import kotlinx.coroutines.flow.flowOf
 import kotlinx.coroutines.test.runTest
+import mega.privacy.android.app.presentation.transfers.preview.view.navigation.transferTagToCancelArg
 import mega.privacy.android.app.presentation.transfers.preview.view.navigation.transferUniqueIdArg
 import mega.privacy.android.core.test.extension.CoroutineMainDispatcherExtension
 import mega.privacy.android.core.ui.mapper.FileTypeIconMapper
 import mega.privacy.android.domain.entity.Progress
 import mega.privacy.android.domain.entity.transfer.Transfer
 import mega.privacy.android.domain.entity.transfer.TransferEvent
+import mega.privacy.android.domain.entity.transfer.TransferState
 import mega.privacy.android.domain.exception.MegaException
 import mega.privacy.android.domain.exception.QuotaExceededMegaException
+import mega.privacy.android.domain.exception.transfers.NoTransferToShowException
 import mega.privacy.android.domain.exception.transfers.TransferNotFoundException
 import mega.privacy.android.domain.usecase.transfers.GetTransferByUniqueIdUseCase
 import mega.privacy.android.domain.usecase.transfers.MonitorTransferEventsUseCase
+import mega.privacy.android.domain.usecase.transfers.previews.BroadcastTransferTagToCancelUseCase
 import org.junit.jupiter.api.BeforeAll
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
@@ -28,6 +32,7 @@ import org.junit.jupiter.api.extension.ExtendWith
 import org.mockito.kotlin.doReturn
 import org.mockito.kotlin.mock
 import org.mockito.kotlin.reset
+import org.mockito.kotlin.verify
 import org.mockito.kotlin.verifyNoInteractions
 import org.mockito.kotlin.whenever
 
@@ -43,23 +48,25 @@ class FakePreviewViewModelTest {
     private val monitorTransferEventsUseCase = mock<MonitorTransferEventsUseCase> {
         onBlocking { invoke() } doReturn emptyFlow()
     }
+    private val broadcastTransferTagToCancelUseCase = mock<BroadcastTransferTagToCancelUseCase>()
     private val fileTypeIconMapper = mock<FileTypeIconMapper>()
 
     private val transferUniqueId = 12L
     private val fileName = "test.txt"
+    private val savedStateHandle = SavedStateHandle(
+        mapOf(transferUniqueIdArg to transferUniqueId.toString())
+    )
 
     @BeforeAll
     fun setup() {
         initTest()
     }
 
-    private fun initTest() {
-        val savedStateHandle = SavedStateHandle(
-            mapOf(transferUniqueIdArg to transferUniqueId.toString())
-        )
+    private fun initTest(savedStateHandle: SavedStateHandle = this.savedStateHandle) {
         underTest = FakePreviewViewModel(
             getTransferByUniqueIdUseCase = getTransferByUniqueIdUseCase,
             monitorTransferEventsUseCase = monitorTransferEventsUseCase,
+            broadcastTransferTagToCancelUseCase = broadcastTransferTagToCancelUseCase,
             fileTypeIconMapper = fileTypeIconMapper,
             savedStateHandle = savedStateHandle,
         )
@@ -70,6 +77,7 @@ class FakePreviewViewModelTest {
         reset(
             getTransferByUniqueIdUseCase,
             monitorTransferEventsUseCase,
+            broadcastTransferTagToCancelUseCase,
             fileTypeIconMapper,
         )
     }
@@ -84,14 +92,22 @@ class FakePreviewViewModelTest {
 
     @Test
     fun `test initial state`() = runTest {
+        initTest(savedStateHandle = SavedStateHandle())
+
         underTest.uiState.test {
             val actual = awaitItem()
             assertThat(actual.fileName).isNull()
             assertThat(actual.fileTypeResId).isNull()
             assertThat(actual.progress).isEqualTo(Progress(0f))
             assertThat(actual.previewFilePathToOpen).isNull()
+            assertThat(actual.error).isInstanceOf(NoTransferToShowException::class.java)
             assertThat(actual.transferEvent).isInstanceOf(StateEventWithContentConsumed::class.java)
         }
+
+        verifyNoInteractions(getTransferByUniqueIdUseCase)
+        verifyNoInteractions(fileTypeIconMapper)
+        verifyNoInteractions(monitorTransferEventsUseCase)
+        verifyNoInteractions(broadcastTransferTagToCancelUseCase)
     }
 
     @Test
@@ -228,7 +244,7 @@ class FakePreviewViewModelTest {
         }
 
     @Test
-    fun `test that finish event, with any exception, updates state with error`() =
+    fun `test that finish event, with any exception, updates state with event error`() =
         runTest {
             val transfer = mock<Transfer> {
                 on { this.uniqueId } doReturn transferUniqueId
@@ -250,6 +266,30 @@ class FakePreviewViewModelTest {
         }
 
     @Test
+    fun `test that finish event, with cancelled transfer, updates state with NoTransferToShowException error`() =
+        runTest {
+            val transfer = mock<Transfer> {
+                on { this.uniqueId } doReturn transferUniqueId
+                on { this.fileName } doReturn fileName
+                on { this.state } doReturn TransferState.STATE_CANCELLED
+                on { this.isCancelled } doReturn true
+            }
+            val error = mock<MegaException>()
+            val event = mock<TransferEvent.TransferFinishEvent> {
+                on { this.transfer } doReturn transfer
+                on { this.error } doReturn error
+            }
+
+            commonStub(transfer = transfer, flow = flowOf(event))
+
+            initTest()
+
+            underTest.uiState.test {
+                assertThat(awaitItem().error).isInstanceOf(NoTransferToShowException::class.java)
+            }
+        }
+
+    @Test
     fun `test that consumeTransferEvent updates state with null`() =
         runTest {
             underTest.consumeTransferEvent()
@@ -258,5 +298,52 @@ class FakePreviewViewModelTest {
                 assertThat(awaitItem().transferEvent)
                     .isInstanceOf(StateEventWithContentConsumed::class.java)
             }
+        }
+
+    @Test
+    fun `test that BroadcastTransferTagToCancelUseCase is invoked if transfer tag to cancel is received and state is updated with error if not transfer unique id`() =
+        runTest {
+            val transferTagToCancel = 1234
+            val savedStateHandle = SavedStateHandle(
+                mapOf(transferTagToCancelArg to transferTagToCancel.toString())
+            )
+
+            whenever(broadcastTransferTagToCancelUseCase(transferTagToCancel)) doReturn Unit
+
+            initTest(savedStateHandle)
+
+            underTest.uiState.test {
+                assertThat(awaitItem().error)
+                    .isInstanceOf(NoTransferToShowException::class.java)
+            }
+
+            verify(broadcastTransferTagToCancelUseCase).invoke(transferTagToCancel)
+        }
+
+    @Test
+    fun `test that BroadcastTransferTagToCancelUseCase is invoked if transfer tag to cancel is received but state is NOT updated with error when there is transfer unique id`() =
+        runTest {
+            val transferTagToCancel = 1234
+            val savedStateHandle = SavedStateHandle(
+                mapOf(
+                    transferUniqueIdArg to transferUniqueId.toString(),
+                    transferTagToCancelArg to transferTagToCancel.toString()
+                )
+            )
+            val transfer = mock<Transfer> {
+                on { this.fileName } doReturn fileName
+            }
+
+            commonStub(transfer = transfer)
+
+            whenever(broadcastTransferTagToCancelUseCase(transferTagToCancel)) doReturn Unit
+
+            initTest(savedStateHandle)
+
+            underTest.uiState.test {
+                assertThat(awaitItem().error).isNull()
+            }
+
+            verify(broadcastTransferTagToCancelUseCase).invoke(transferTagToCancel)
         }
 }

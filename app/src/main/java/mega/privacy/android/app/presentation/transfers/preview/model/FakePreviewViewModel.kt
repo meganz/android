@@ -16,9 +16,11 @@ import mega.privacy.android.core.ui.mapper.FileTypeIconMapper
 import mega.privacy.android.domain.entity.Progress
 import mega.privacy.android.domain.entity.transfer.TransferEvent
 import mega.privacy.android.domain.exception.QuotaExceededMegaException
+import mega.privacy.android.domain.exception.transfers.NoTransferToShowException
 import mega.privacy.android.domain.exception.transfers.TransferNotFoundException
 import mega.privacy.android.domain.usecase.transfers.GetTransferByUniqueIdUseCase
 import mega.privacy.android.domain.usecase.transfers.MonitorTransferEventsUseCase
+import mega.privacy.android.domain.usecase.transfers.previews.BroadcastTransferTagToCancelUseCase
 import timber.log.Timber
 import javax.inject.Inject
 
@@ -31,6 +33,7 @@ import javax.inject.Inject
 class FakePreviewViewModel @Inject constructor(
     private val getTransferByUniqueIdUseCase: GetTransferByUniqueIdUseCase,
     private val monitorTransferEventsUseCase: MonitorTransferEventsUseCase,
+    private val broadcastTransferTagToCancelUseCase: BroadcastTransferTagToCancelUseCase,
     private val fileTypeIconMapper: FileTypeIconMapper,
     savedStateHandle: SavedStateHandle,
 ) : ViewModel() {
@@ -41,65 +44,83 @@ class FakePreviewViewModel @Inject constructor(
     private val fakePreviewArgs = FakePreviewArgs(savedStateHandle)
 
     init {
+        checkArgs()
         getTransfer()
         monitorTransferEvents()
+        checkTransferTagToCancel()
+    }
+
+    private fun checkArgs() {
+        if (fakePreviewArgs.transferUniqueId == null && fakePreviewArgs.transferTagToCancel == null) {
+            Timber.e("No transferUniqueId and no transferTagToCancel provided")
+            _uiState.update { state -> state.copy(error = NoTransferToShowException()) }
+        }
     }
 
     private fun getTransfer() {
-        viewModelScope.launch {
-            runCatching {
-                getTransferByUniqueIdUseCase(fakePreviewArgs.transferUniqueId)
-            }.getOrNull()?.let { transfer ->
-                val extension = transfer.fileName.substringAfterLast('.')
-                val fileTypeResId = fileTypeIconMapper(extension)
+        fakePreviewArgs.transferUniqueId?.let {
+            viewModelScope.launch {
+                runCatching {
+                    getTransferByUniqueIdUseCase(it)
+                }.getOrNull()?.let { transfer ->
+                    val extension = transfer.fileName.substringAfterLast('.')
+                    val fileTypeResId = fileTypeIconMapper(extension)
 
-                _uiState.update { state ->
-                    state.copy(
-                        fileName = transfer.fileName,
-                        fileTypeResId = fileTypeResId,
-                    )
+                    _uiState.update { state ->
+                        state.copy(
+                            fileName = transfer.fileName,
+                            fileTypeResId = fileTypeResId,
+                        )
+                    }
+                } ?: run {
+                    Timber.e("Transfer not found")
+                    _uiState.update { state -> state.copy(error = TransferNotFoundException()) }
                 }
-            } ?: run {
-                Timber.e("Transfer not found")
-                _uiState.update { state -> state.copy(error = TransferNotFoundException()) }
             }
         }
     }
 
     private fun monitorTransferEvents() {
-        viewModelScope.launch {
-            monitorTransferEventsUseCase()
-                .filter { event -> event.transfer.uniqueId == fakePreviewArgs.transferUniqueId }
-                .collectLatest { event ->
-                    when (event) {
-                        is TransferEvent.TransferUpdateEvent -> {
-                            _uiState.update { state -> state.copy(progress = event.transfer.progress) }
-                        }
-
-                        is TransferEvent.TransferTemporaryErrorEvent -> {
-                            if (event.error is QuotaExceededMegaException) {
-                                _uiState.update { state -> state.copy(error = event.error) }
+        fakePreviewArgs.transferUniqueId?.let {
+            viewModelScope.launch {
+                monitorTransferEventsUseCase()
+                    .filter { event -> event.transfer.uniqueId == it }
+                    .collectLatest { event ->
+                        when (event) {
+                            is TransferEvent.TransferUpdateEvent -> {
+                                _uiState.update { state -> state.copy(progress = event.transfer.progress) }
                             }
-                        }
 
-                        is TransferEvent.TransferFinishEvent -> {
-                            if (event.error == null) {
-                                _uiState.update { state ->
-                                    state.copy(
-                                        progress = Progress(1f),
-                                        previewFilePathToOpen = event.transfer.localPath,
-                                    )
+                            is TransferEvent.TransferTemporaryErrorEvent -> {
+                                if (event.error is QuotaExceededMegaException) {
+                                    _uiState.update { state -> state.copy(error = event.error) }
                                 }
-                            } else {
-                                _uiState.update { state -> state.copy(error = event.error) }
                             }
-                        }
 
-                        else -> {
-                            //No relevant events. Do nothing.
+                            is TransferEvent.TransferFinishEvent -> {
+                                if (event.error == null) {
+                                    _uiState.update { state ->
+                                        state.copy(
+                                            progress = Progress(1f),
+                                            previewFilePathToOpen = event.transfer.localPath,
+                                        )
+                                    }
+                                } else {
+                                    val error = if (event.transfer.isCancelled) {
+                                        NoTransferToShowException()
+                                    } else {
+                                        event.error
+                                    }
+                                    _uiState.update { state -> state.copy(error = error) }
+                                }
+                            }
+
+                            else -> {
+                                //No relevant events. Do nothing.
+                            }
                         }
                     }
-                }
+            }
         }
     }
 
@@ -108,5 +129,18 @@ class FakePreviewViewModel @Inject constructor(
      */
     fun consumeTransferEvent() {
         _uiState.update { state -> state.copy(transferEvent = consumed()) }
+    }
+
+    private fun checkTransferTagToCancel() {
+        fakePreviewArgs.transferTagToCancel?.let {
+            viewModelScope.launch {
+                broadcastTransferTagToCancelUseCase(it)
+            }
+            Timber.d("Broadcast sent to cancel transfer with tag: $it")
+
+            if (fakePreviewArgs.transferUniqueId == null) {
+                _uiState.update { state -> state.copy(error = NoTransferToShowException()) }
+            }
+        }
     }
 }
