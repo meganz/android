@@ -150,7 +150,6 @@ public class Constants {
     public static final String ACTION_OPEN_DEVICE_CENTER = "ACTION_OPEN_DEVICE_CENTER";
     public static final String ACTION_OPEN_SYNC_MEGA_FOLDER = "ACTION_OPEN_SYNC_MEGA_FOLDER";
     public static final String ACTION_SHOW_WARNING = "ACTION_SHOW_WARNING";
-    public static final String ACTION_CANCEL_TRANSFER = "CANCEL_TRANSFER";
     public static final String OPENED_FROM_CHAT = "OPENED_FROM_CHAT";
     public static final String ACTION_OPEN_CHAT_LINK = "OPEN_CHAT_LINK";
     public static final String ACTION_JOIN_OPEN_CHAT_LINK = "JOIN_OPEN_CHAT_LINK";
@@ -220,7 +219,6 @@ public class Constants {
     public static final String INTENT_EXTRA_COLLISION_RESULTS = "INTENT_EXTRA_COLLISION_RESULTS";
     public static final String INTENT_EXTRA_SINGLE_COLLISION_RESULT = "INTENT_EXTRA_SINGLE_COLLISION_RESULT";
     public static final String INTENT_EXTRA_KEY_CONTACTS_SELECTED = "INTENT_EXTRA_KEY_CONTACTS_SELECTED";
-    public static final String INTENT_EXTRA_TAG = "INTENT_EXTRA_TAG";
 
     public static final int FILE_BROWSER_ADAPTER = 2000;
     public static final int CONTACT_FILE_ADAPTER = 2001;

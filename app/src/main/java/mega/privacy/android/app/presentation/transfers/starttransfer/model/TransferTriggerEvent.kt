@@ -262,17 +262,6 @@ sealed interface TransferTriggerEvent {
     }
 
     /**
-     * Event to cancel a preview download.
-     *
-     * @param transferTag the tag of the transfer to be canceled.
-     */
-    data class CancelPreviewDownload(
-        val transferTag: Int,
-        override val type: TransferType = TransferType.DOWNLOAD,
-        override val waitNotificationPermissionResponseToStart: Boolean = false,
-    ) : TransferTriggerEvent
-
-    /**
      * Specify the need to check if transfers are paused when the [TransferTriggerEvent] is emitted
      */
     enum class CheckPausedTransfersType {

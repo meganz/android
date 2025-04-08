@@ -190,10 +190,6 @@ internal class StartTransfersComponentViewModel @Inject constructor(
                         transferTriggerEvent = transferTriggerEvent,
                     )
                 }
-
-                is TransferTriggerEvent.CancelPreviewDownload -> {
-                    setTransferTagToCancel(transferTriggerEvent.transferTag)
-                }
             }
             checkAndHandleTransfersPaused(transferTriggerEvent)
         }

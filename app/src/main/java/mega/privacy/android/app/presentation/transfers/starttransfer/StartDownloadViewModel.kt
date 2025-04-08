@@ -407,13 +407,4 @@ class StartDownloadViewModel @Inject constructor(
             triggered(event)
         }
     }
-
-    /**
-     * Triggers the event to cancel a preview download.
-     */
-    fun onCancelPreviewDownload(tag: Int) {
-        _state.update {
-            triggered(TransferTriggerEvent.CancelPreviewDownload(tag))
-        }
-    }
 }

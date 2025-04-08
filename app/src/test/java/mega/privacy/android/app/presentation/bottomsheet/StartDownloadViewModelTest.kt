@@ -238,22 +238,6 @@ class StartDownloadViewModelTest {
         }
     }
 
-    @Test
-    fun `test that onCancelPreviewDownload launches the correct event`() = runTest {
-        val tag = 1
-
-        underTest.onCancelPreviewDownload(tag)
-
-        underTest.state.test {
-            val event = awaitItem()
-            assertThat(event).isInstanceOf(StateEventWithContentTriggered::class.java)
-            val content = (event as StateEventWithContentTriggered).content
-            assertThat(content).isInstanceOf(TransferTriggerEvent.CancelPreviewDownload::class.java)
-            assertThat((content as TransferTriggerEvent.CancelPreviewDownload).transferTag)
-                .isEqualTo(tag)
-        }
-    }
-
     private suspend fun assertStartDownloadNode(vararg node: TypedNode, withStartMessage: Boolean) {
         underTest.state.test {
             val event = awaitItem()

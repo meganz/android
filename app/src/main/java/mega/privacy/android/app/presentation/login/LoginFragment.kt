@@ -321,10 +321,6 @@ class LoginFragment : Fragment() {
                                     intentExtras = extras
                                 }
 
-                                Constants.ACTION_CANCEL_TRANSFER -> {
-                                    intentExtras = extras
-                                }
-
                                 Constants.ACTION_OPEN_MEGA_FOLDER_LINK,
                                 Constants.ACTION_IMPORT_LINK_FETCH_NODES,
                                 Constants.ACTION_CHANGE_MAIL,
@@ -768,10 +764,6 @@ class LoginFragment : Fragment() {
                 }
 
                 Constants.ACTION_EXPLORE_ZIP -> {
-                    intentExtras?.let { intent.putExtras(it) }
-                }
-
-                Constants.ACTION_CANCEL_TRANSFER -> {
                     intentExtras?.let { intent.putExtras(it) }
                 }
 
