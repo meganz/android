@@ -8,10 +8,12 @@ import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import mega.privacy.android.app.R
+import mega.privacy.android.app.featuretoggle.AppFeatures
 import mega.privacy.android.app.presentation.login.onboarding.TourFragment
 import mega.privacy.android.app.presentation.login.onboarding.model.TourUiState
 import mega.privacy.android.app.utils.Constants
 import mega.privacy.android.domain.usecase.IsUrlMatchesRegexUseCase
+import mega.privacy.android.domain.usecase.featureflag.GetFeatureFlagValueUseCase
 import mega.privacy.android.domain.usecase.login.SetLogoutInProgressFlagUseCase
 import timber.log.Timber
 import javax.inject.Inject
@@ -25,16 +27,42 @@ import javax.inject.Inject
 class TourViewModel @Inject constructor(
     private val setLogoutInProgressFlagUseCase: SetLogoutInProgressFlagUseCase,
     private val isUrlMatchesRegexUseCase: IsUrlMatchesRegexUseCase,
+    private val getFeatureFlagValueUseCase: GetFeatureFlagValueUseCase,
 ) : ViewModel() {
 
     private val _uiState = MutableStateFlow(TourUiState())
     internal val uiState = _uiState.asStateFlow()
 
+    init {
+        setupInitialState()
+    }
+
+    private fun setupInitialState() {
+        viewModelScope.launch {
+            runCatching {
+                getFeatureFlagValueUseCase(AppFeatures.RegistrationRevamp).let { flag ->
+                    _uiState.update { state ->
+                        state.copy(
+                            isNewRegistrationUiEnabled = flag,
+                        )
+                    }
+                }
+            }.onFailure {
+                Timber.e(it)
+                _uiState.update { state ->
+                    state.copy(
+                        isNewRegistrationUiEnabled = false
+                    )
+                }
+            }
+        }
+    }
+
     internal fun clearLogoutProgressFlag() {
         viewModelScope.launch {
             Timber.d("Clearing the logout progress status")
             runCatching { setLogoutInProgressFlagUseCase(false) }
-                .onFailure { Timber.e("Failed to set the logout progress status", it) }
+                .onFailure { Timber.e("Failed to set the logout progress status $it") }
         }
     }
 
@@ -78,7 +106,7 @@ class TourViewModel @Inject constructor(
                     _uiState.update { it.copy(errorTextId = R.string.invalid_meeting_link_args) }
                 }
             }.onFailure {
-                Timber.e("Failed to match the meeting link regex", it)
+                Timber.e("Failed to match the meeting link regex  $it")
             }
         }
     }

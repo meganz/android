@@ -1,6 +1,5 @@
 package mega.privacy.android.app.presentation.login.onboarding.view
 
-import mega.privacy.android.shared.resources.R as SharedR
 import android.Manifest
 import android.content.pm.PackageManager
 import android.content.res.Configuration
@@ -52,13 +51,12 @@ import androidx.compose.ui.semantics.testTagsAsResourceId
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.core.content.ContextCompat
-import androidx.hilt.navigation.compose.hiltViewModel
-import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import coil.compose.rememberAsyncImagePainter
 import coil.decode.SvgDecoder
 import coil.imageLoader
 import kotlinx.collections.immutable.toImmutableList
 import kotlinx.coroutines.launch
+import mega.android.core.ui.theme.values.TextColor
 import mega.privacy.android.app.R
 import mega.privacy.android.app.extensions.isTablet
 import mega.privacy.android.app.extensions.navigateToAppSettings
@@ -73,34 +71,34 @@ import mega.privacy.android.shared.original.core.ui.controls.text.MegaText
 import mega.privacy.android.shared.original.core.ui.preview.CombinedTextAndThemePreviews
 import mega.privacy.android.shared.original.core.ui.theme.OriginalTheme
 import mega.privacy.android.shared.original.core.ui.theme.extensions.conditional
-import mega.android.core.ui.theme.values.TextColor
 import mega.privacy.android.shared.original.core.ui.utils.showAutoDurationSnackbar
-import timber.log.Timber
 import mega.privacy.android.shared.resources.R as sharedR
+import timber.log.Timber
 
 @OptIn(ExperimentalComposeUiApi::class)
 @Composable
 internal fun TourRoute(
+    uiState: TourUiState,
     onLoginClick: () -> Unit,
     onCreateAccountClick: () -> Unit,
     onOpenLink: (meetingLink: String) -> Unit,
+    onMeetingLinkChange: (meetingLink: String) -> Unit,
+    onConfirmMeetingLinkClick: () -> Unit,
+    onClearLogoutProgressFlag: () -> Unit,
     modifier: Modifier = Modifier,
-    viewModel: TourViewModel = hiltViewModel(),
 ) {
-    val uiState by viewModel.uiState.collectAsStateWithLifecycle()
 
     TourScreen(
         modifier = modifier.semantics { testTagsAsResourceId = true },
         uiState = uiState,
         onLoginClick = onLoginClick,
         onCreateAccountClick = onCreateAccountClick,
-        onMeetingLinkChange = viewModel::onMeetingLinkChange,
-        onConfirmMeetingLinkClick = viewModel::onConfirmMeetingLinkClick,
+        onMeetingLinkChange = onMeetingLinkChange,
+        onConfirmMeetingLinkClick = onConfirmMeetingLinkClick,
         onOpenLink = {
             onOpenLink(it)
-            viewModel.resetOpenLink()
         },
-        onClearLogoutProgressFlag = viewModel::clearLogoutProgressFlag
+        onClearLogoutProgressFlag = onClearLogoutProgressFlag
     )
 }
 
@@ -262,8 +260,8 @@ internal fun TourScreen(
 private fun getOnboardingUiItem() = listOf(
     OnboardingUiItem(
         imageDrawableId = R.drawable.tour1,
-        titleStringId = SharedR.string.cloud_drive_tour_first_title,
-        subtitleStringId = SharedR.string.cloud_drive_tour_first_subtitle,
+        titleStringId = sharedR.string.cloud_drive_tour_first_title,
+        subtitleStringId = sharedR.string.cloud_drive_tour_first_subtitle,
         gradientColors = listOf(
             Color(0xFFFF8989),
             Color(0xFFFF5252)
@@ -271,8 +269,8 @@ private fun getOnboardingUiItem() = listOf(
     ),
     OnboardingUiItem(
         imageDrawableId = R.drawable.tour2,
-        titleStringId = SharedR.string.cloud_drive_tour_second_title,
-        subtitleStringId = SharedR.string.cloud_drive_tour_second_subtitle,
+        titleStringId = sharedR.string.cloud_drive_tour_second_title,
+        subtitleStringId = sharedR.string.cloud_drive_tour_second_subtitle,
         gradientColors = listOf(
             Color(0xFF55D2F0),
             Color(0xFF2BA6DE)
@@ -280,8 +278,8 @@ private fun getOnboardingUiItem() = listOf(
     ),
     OnboardingUiItem(
         imageDrawableId = R.drawable.tour3,
-        titleStringId = SharedR.string.cloud_drive_tour_third_title,
-        subtitleStringId = SharedR.string.cloud_drive_tour_third_subtitle,
+        titleStringId = sharedR.string.cloud_drive_tour_third_title,
+        subtitleStringId = sharedR.string.cloud_drive_tour_third_subtitle,
         gradientColors = listOf(
             Color(0xFFFFA700),
             Color(0xFFFF6F00)
@@ -289,8 +287,8 @@ private fun getOnboardingUiItem() = listOf(
     ),
     OnboardingUiItem(
         imageDrawableId = R.drawable.tour4,
-        titleStringId = SharedR.string.cloud_drive_tour_fourth_title,
-        subtitleStringId = SharedR.string.cloud_drive_tour_fourth_subtitle,
+        titleStringId = sharedR.string.cloud_drive_tour_fourth_title,
+        subtitleStringId = sharedR.string.cloud_drive_tour_fourth_subtitle,
         gradientColors = listOf(
             Color(0xFF00BDB2),
             Color(0xFF00897B)
@@ -298,8 +296,8 @@ private fun getOnboardingUiItem() = listOf(
     ),
     OnboardingUiItem(
         imageDrawableId = R.drawable.tour5,
-        titleStringId = SharedR.string.cloud_drive_tour_fifth_title,
-        subtitleStringId = SharedR.string.cloud_drive_tour_fifth_subtitle,
+        titleStringId = sharedR.string.cloud_drive_tour_fifth_title,
+        subtitleStringId = sharedR.string.cloud_drive_tour_fifth_subtitle,
         gradientColors = listOf(
             Color(0xFFC86DD7),
             Color(0xFFA037F3)

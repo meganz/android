@@ -9,10 +9,12 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.ComposeView
 import androidx.compose.ui.platform.ViewCompositionStrategy
 import androidx.fragment.app.Fragment
+import androidx.fragment.app.viewModels
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import dagger.hilt.android.AndroidEntryPoint
 import mega.privacy.android.app.presentation.extensions.isDarkMode
 import mega.privacy.android.app.presentation.login.onboarding.view.TourRoute
+import mega.privacy.android.app.presentation.login.onboarding.view.TourViewModel
 import mega.privacy.android.domain.entity.ThemeMode
 import mega.privacy.android.domain.usecase.GetThemeMode
 import mega.privacy.android.shared.original.core.ui.theme.OriginalTheme
@@ -35,6 +37,8 @@ class TourFragment : Fragment() {
     internal var onCreateAccountClick: (() -> Unit)? = null
     internal var onOpenLink: ((meetingLink: String) -> Unit)? = null
 
+    private val viewModel: TourViewModel by viewModels()
+
     /**
      * Called to have the fragment instantiate its user interface view.
      */
@@ -46,8 +50,10 @@ class TourFragment : Fragment() {
         setViewCompositionStrategy(ViewCompositionStrategy.DisposeOnViewTreeLifecycleDestroyed)
         setContent {
             val themeMode by getThemeMode().collectAsStateWithLifecycle(initialValue = ThemeMode.System)
+            val uiState by viewModel.uiState.collectAsStateWithLifecycle()
             OriginalTheme(isDark = themeMode.isDarkMode()) {
                 TourRoute(
+                    uiState = uiState,
                     modifier = Modifier.fillMaxSize(),
                     onLoginClick = {
                         Timber.d("onLoginClick")
@@ -59,7 +65,11 @@ class TourFragment : Fragment() {
                     },
                     onOpenLink = {
                         onOpenLink?.invoke(it)
-                    }
+                        viewModel.resetOpenLink()
+                    },
+                    onMeetingLinkChange = viewModel::onMeetingLinkChange,
+                    onConfirmMeetingLinkClick = viewModel::onConfirmMeetingLinkClick,
+                    onClearLogoutProgressFlag = viewModel::clearLogoutProgressFlag
                 )
             }
         }

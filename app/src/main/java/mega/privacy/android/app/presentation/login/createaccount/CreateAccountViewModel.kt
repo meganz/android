@@ -83,6 +83,11 @@ class CreateAccountViewModel @Inject constructor(
                 }
             }.onFailure {
                 Timber.e(it)
+                _uiState.update { state ->
+                    state.copy(
+                        isNewRegistrationUiEnabled = false
+                    )
+                }
             }
         }
     }
