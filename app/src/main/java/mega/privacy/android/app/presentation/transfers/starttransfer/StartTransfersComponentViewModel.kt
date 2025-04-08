@@ -22,7 +22,6 @@ import kotlinx.coroutines.launch
 import mega.privacy.android.app.middlelayer.iar.OnCompleteListener
 import mega.privacy.android.app.presentation.mapper.file.FileSizeStringMapper
 import mega.privacy.android.app.presentation.transfers.TransfersConstants
-import mega.privacy.android.app.presentation.transfers.starttransfer.model.CancelTransferResult
 import mega.privacy.android.app.presentation.transfers.starttransfer.model.ConfirmLargeDownloadInfo
 import mega.privacy.android.app.presentation.transfers.starttransfer.model.SaveDestinationInfo
 import mega.privacy.android.app.presentation.transfers.starttransfer.model.StartTransferEvent
@@ -591,17 +590,8 @@ internal class StartTransfersComponentViewModel @Inject constructor(
         }
     }
 
-    fun previewFile(file: File, resetTransferTagToCancel: Boolean = false) {
-        _uiState.update { state ->
-            val transferTagToCancel = if (resetTransferTagToCancel) {
-                null
-            } else {
-                state.transferTagToCancel
-            }
-            state.copy(
-                previewFileToOpen = file, transferTagToCancel = transferTagToCancel
-            )
-        }
+    fun previewFile(file: File) {
+        _uiState.update { state -> state.copy(previewFileToOpen = file) }
     }
 
     /**
@@ -704,10 +694,13 @@ internal class StartTransfersComponentViewModel @Inject constructor(
                     if (group.completedFiles == 1) {
                         val file = File(group.destination + group.singleFileName)
                         val duration = group.durationFromStart(getCurrentTimeInMillisUseCase())
+
+                        if (group.singleTransferTag == uiState.value.transferTagToCancel) {
+                            broadcastTransferTagToCancelAsNull()
+                        }
+
                         if (duration < 1.5.seconds) {
-                            val resetTransferTagToCancel =
-                                group.singleTransferTag == uiState.value.transferTagToCancel
-                            previewFile(file, resetTransferTagToCancel)
+                            previewFile(file)
                         }
                     }
                 }
@@ -939,26 +932,17 @@ internal class StartTransfersComponentViewModel @Inject constructor(
         uiState.value.transferTagToCancel?.let {
             viewModelScope.launch {
                 runCatching { cancelTransferByTagUseCase(it) }
-                    .onSuccess { setCancelTransferResult(true) }
                     .onFailure {
                         Timber.e(it)
-                        setCancelTransferResult(false)
+                        _uiState.update { state -> state.copy(cancelTransferFailure = triggered) }
                     }
             }
             broadcastTransferTagToCancelAsNull()
         }
     }
 
-    private fun setCancelTransferResult(success: Boolean) {
-        _uiState.update { state ->
-            state.copy(
-                cancelTransferResult = triggered(CancelTransferResult(success))
-            )
-        }
-    }
-
-    fun onConsumeCancelTransferResult() {
-        _uiState.update { state -> state.copy(cancelTransferResult = consumed()) }
+    fun onConsumeCancelTransferFailure() {
+        _uiState.update { state -> state.copy(cancelTransferFailure = consumed) }
     }
 
     /**

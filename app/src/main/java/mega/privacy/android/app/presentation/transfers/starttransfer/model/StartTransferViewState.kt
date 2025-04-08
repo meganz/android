@@ -1,5 +1,6 @@
 package mega.privacy.android.app.presentation.transfers.starttransfer.model
 
+import de.palm.composestateevents.StateEvent
 import de.palm.composestateevents.StateEventWithContent
 import de.palm.composestateevents.consumed
 import java.io.File
@@ -18,7 +19,7 @@ import java.io.File
  * @property previewFileToOpen
  * @property isOpenWithAction True if the user is opening a file with another app.
  * @property transferTagToCancel A transfer tag if there is a user's request to cancel it, null otherwise.
- * @property cancelTransferResult Result of the cancel transfer request.
+ * @property cancelTransferFailure Error for the cancel transfer request.
  * @constructor Create empty Start transfer view state
  */
 data class StartTransferViewState(
@@ -33,7 +34,7 @@ data class StartTransferViewState(
     val previewFileToOpen: File? = null,
     val isOpenWithAction: Boolean = false,
     val transferTagToCancel: Int? = null,
-    val cancelTransferResult: StateEventWithContent<CancelTransferResult> = consumed(),
+    val cancelTransferFailure: StateEvent = consumed,
 )
 
 /**
@@ -43,5 +44,3 @@ data class StartTransferViewState(
  * @property destinationName The destination name.
  */
 data class SaveDestinationInfo(val destination: String, val destinationName: String)
-
-data class CancelTransferResult(val success: Boolean)

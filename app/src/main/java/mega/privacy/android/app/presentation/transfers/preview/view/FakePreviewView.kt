@@ -29,7 +29,6 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import com.google.accompanist.navigation.material.ExperimentalMaterialNavigationApi
 import mega.android.core.ui.theme.values.TextColor
-import mega.privacy.android.app.R
 import mega.privacy.android.app.presentation.qrcode.findActivity
 import mega.privacy.android.app.presentation.transfers.preview.FakePreviewFragment.Companion.EXTRA_ERROR
 import mega.privacy.android.app.presentation.transfers.preview.FakePreviewFragment.Companion.EXTRA_FILE_PATH
@@ -123,7 +122,10 @@ internal fun FakePreviewView(
                 val intent = when (error) {
                     is QuotaExceededMegaException, is NoTransferToShowException -> Intent()
                     else -> Intent().apply {
-                        putExtra(EXTRA_ERROR, stringResource(R.string.error_temporary_unavaible))
+                        putExtra(
+                            EXTRA_ERROR,
+                            stringResource(sharedResR.string.transfers_fake_preview_screen_general_error)
+                        )
                     }
                 }
 

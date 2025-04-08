@@ -3,6 +3,7 @@ package mega.privacy.android.app.presentation.transfers.startdownload
 import android.net.Uri
 import app.cash.turbine.test
 import com.google.common.truth.Truth.assertThat
+import de.palm.composestateevents.StateEvent
 import de.palm.composestateevents.StateEventWithContentConsumed
 import de.palm.composestateevents.StateEventWithContentTriggered
 import kotlinx.coroutines.awaitCancellation
@@ -18,7 +19,6 @@ import kotlinx.coroutines.yield
 import mega.privacy.android.app.presentation.mapper.file.FileSizeStringMapper
 import mega.privacy.android.app.presentation.transfers.TransfersConstants
 import mega.privacy.android.app.presentation.transfers.starttransfer.StartTransfersComponentViewModel
-import mega.privacy.android.app.presentation.transfers.starttransfer.model.CancelTransferResult
 import mega.privacy.android.app.presentation.transfers.starttransfer.model.ConfirmLargeDownloadInfo
 import mega.privacy.android.app.presentation.transfers.starttransfer.model.SaveDestinationInfo
 import mega.privacy.android.app.presentation.transfers.starttransfer.model.StartTransferEvent
@@ -1148,11 +1148,11 @@ class StartTransfersComponentViewModelTest {
                 cancelTransferConfirmed()
 
                 uiState.test {
-                    val result = awaitItem().cancelTransferResult
-                    assertThat(result).isInstanceOf(StateEventWithContentTriggered::class.java)
-                    val content = (result as StateEventWithContentTriggered).content
-                    assertThat(content).isInstanceOf(CancelTransferResult::class.java)
-                    assertThat(content.success).isEqualTo(success)
+                    val result = awaitItem().cancelTransferFailure
+                    assertThat(result).isEqualTo(
+                        if (success) StateEvent.Consumed
+                        else StateEvent.Triggered
+                    )
                 }
             }
         }
@@ -1161,11 +1161,11 @@ class StartTransfersComponentViewModelTest {
     fun `test that onConsumeCancelTransferResult updates the state correctly`() =
         runTest {
             with(underTest) {
-                onConsumeCancelTransferResult()
+                onConsumeCancelTransferFailure()
 
                 uiState.test {
-                    val result = awaitItem().cancelTransferResult
-                    assertThat(result).isInstanceOf(StateEventWithContentConsumed::class.java)
+                    val result = awaitItem().cancelTransferFailure
+                    assertThat(result).isEqualTo(StateEvent.Consumed)
                 }
             }
         }
@@ -1177,11 +1177,8 @@ class StartTransfersComponentViewModelTest {
         verify(broadcastTransferTagToCancelUseCase).invoke(null)
     }
 
-    @ParameterizedTest(name = " if resetTransferTagToCancel is {0}")
-    @ValueSource(booleans = [true, false])
-    fun `test that previewFile updates state correctly`(
-        resetTransferTagToCancel: Boolean,
-    ) = runTest {
+    @Test
+    fun `test that previewFile updates state correctly`() = runTest {
         val transferTagToCancel = 1
         val file = mock<File>()
 
@@ -1189,13 +1186,10 @@ class StartTransfersComponentViewModelTest {
 
         initTest()
 
-        underTest.previewFile(file, resetTransferTagToCancel)
+        underTest.previewFile(file)
 
         underTest.uiState.test {
-            val actual = awaitItem()
-            assertThat(actual.previewFileToOpen).isEqualTo(file)
-            assertThat(actual.transferTagToCancel)
-                .isEqualTo(if (resetTransferTagToCancel) null else transferTagToCancel)
+            assertThat(awaitItem().previewFileToOpen).isEqualTo(file)
         }
     }
 

@@ -62,7 +62,7 @@ import mega.privacy.android.app.presentation.transfers.starttransfer.model.Trans
 import mega.privacy.android.app.presentation.transfers.starttransfer.view.dialog.ResumeChatTransfersDialog
 import mega.privacy.android.app.presentation.transfers.starttransfer.view.dialog.ResumePreviewTransfersDialog
 import mega.privacy.android.app.presentation.transfers.starttransfer.view.filespermission.FilesPermissionDialog
-import mega.privacy.android.app.presentation.transfers.view.dialog.CancelTransferDialog
+import mega.privacy.android.app.presentation.transfers.view.dialog.CancelPreviewDownloadDialog
 import mega.privacy.android.app.presentation.transfers.view.dialog.NotEnoughSpaceForUploadDialog
 import mega.privacy.android.app.presentation.transfers.view.dialog.TransferInProgressDialog
 import mega.privacy.android.app.upgradeAccount.UpgradeAccountActivity
@@ -196,7 +196,7 @@ internal fun StartTransferComponent(
         onPreviewOpened = viewModel::consumePreviewFileOpened,
         onCancelTransferConfirmed = viewModel::cancelTransferConfirmed,
         onCancelTransferCancelled = viewModel::cancelTransferCancelled,
-        onConsumeCancelTransferResult = viewModel::onConsumeCancelTransferResult,
+        onConsumeCancelTransferResult = viewModel::onConsumeCancelTransferFailure,
     )
 }
 
@@ -508,24 +508,17 @@ private fun StartTransferComponent(
             })
     }
     uiState.transferTagToCancel?.let {
-        CancelTransferDialog(
-            title = stringResource(sharedR.string.transfers_cancel_download_warning_title),
+        CancelPreviewDownloadDialog(
             onCancelTransfer = onCancelTransferConfirmed,
             onDismiss = onCancelTransferCancelled
         )
     }
     EventEffect(
-        event = uiState.cancelTransferResult,
+        event = uiState.cancelTransferFailure,
         onConsumed = onConsumeCancelTransferResult,
         action = {
             snackBarHostState.showAutoDurationSnackbar(
-                context.getString(
-                    if (it.success) {
-                        sharedR.string.transfers_cancel_download_success_message
-                    } else {
-                        sharedR.string.transfers_error_cancelling_download
-                    }
-                )
+                context.getString(sharedR.string.transfers_error_cancelling_preview_download)
             )
         }
     )
