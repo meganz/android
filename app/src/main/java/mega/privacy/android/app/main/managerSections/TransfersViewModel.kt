@@ -552,7 +552,8 @@ class TransfersViewModel @Inject constructor(
 
                     if (isChatUpload) {
                         runCatching {
-                            retryChatUploadUseCase(appData.mapNotNull { it as? TransferAppData.ChatUpload })
+                            retryChatUploadUseCase(appData?.mapNotNull { it as? TransferAppData.ChatUpload }
+                                ?: emptyList())
                         }.onFailure {
                             //No uploads were retried, try general upload only.
                             _uiState.update { state ->
@@ -579,8 +580,8 @@ class TransfersViewModel @Inject constructor(
     }
 
     private fun List<TransferAppData>.getOriginalContentUri(): String? = this
-        .filterIsInstance<TransferAppData.OriginalContentUri>()
-        .firstOrNull()?.originalUri
+        .filterIsInstance<TransferAppData.OriginalUriPath>()
+        .firstOrNull()?.originalUriPath?.value
 
     private fun getUploadTriggerEvent(path: String, parentHandle: Long): TransferTriggerEvent {
         return TransferTriggerEvent.StartUpload.Files(
@@ -597,6 +598,9 @@ class TransfersViewModel @Inject constructor(
     }
 
     companion object {
+        /**
+         * Maximum number of transfers to be shown in the completed transfers list
+         */
         const val MAX_TRANSFERS = 100
     }
 }

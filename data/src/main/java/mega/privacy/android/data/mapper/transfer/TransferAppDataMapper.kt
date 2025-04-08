@@ -10,8 +10,10 @@ import mega.privacy.android.data.mapper.transfer.AppDataTypeConstants.PreviewDow
 import mega.privacy.android.data.mapper.transfer.AppDataTypeConstants.SDCardDownload
 import mega.privacy.android.data.mapper.transfer.AppDataTypeConstants.TransferGroup
 import mega.privacy.android.data.mapper.transfer.AppDataTypeConstants.VoiceClip
+import mega.privacy.android.data.mapper.transfer.AppDataTypeConstants.OfflineDownload
 import mega.privacy.android.domain.entity.transfer.TransferAppData
 import mega.privacy.android.domain.entity.transfer.TransferAppData.*
+import mega.privacy.android.domain.entity.uri.UriPath
 import timber.log.Timber
 import javax.inject.Inject
 
@@ -60,7 +62,7 @@ class TransferAppDataMapper @Inject constructor() {
                     BackgroundTransfer -> TransferAppData.BackgroundTransfer
 
                     OriginalContentUri -> values.firstIfNotBlank()?.let {
-                        OriginalContentUri(it)
+                        OriginalUriPath(UriPath(it))
                     }
 
                     ChatDownload -> {
@@ -85,7 +87,7 @@ class TransferAppDataMapper @Inject constructor() {
 
                     PreviewDownload -> TransferAppData.PreviewDownload
 
-                    AppDataTypeConstants.OfflineDownload -> TransferAppData.OfflineDownload
+                    OfflineDownload -> TransferAppData.OfflineDownload
 
                     null -> null
                 }

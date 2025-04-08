@@ -9,6 +9,7 @@ import mega.privacy.android.domain.entity.node.DefaultTypedFileNode
 import mega.privacy.android.domain.entity.node.chat.ChatDefaultFile
 import mega.privacy.android.domain.entity.transfer.TransferAppData
 import mega.privacy.android.domain.entity.transfer.TransferEvent
+import mega.privacy.android.domain.entity.uri.UriPath
 import mega.privacy.android.domain.repository.FileSystemRepository
 import mega.privacy.android.domain.repository.TransferRepository
 import org.junit.jupiter.api.BeforeAll
@@ -107,7 +108,7 @@ class DownloadNodeUseCaseTest {
             on { messageId } doReturn 974L
             on { messageIndex } doReturn 347
         }
-        val appData = listOf(TransferAppData.OriginalContentUri("content uri"))
+        val appData = listOf(TransferAppData.OriginalUriPath(UriPath("content uri")))
         val expected = TransferAppData.ChatDownload(
             node.chatId,
             node.messageId,
@@ -120,7 +121,7 @@ class DownloadNodeUseCaseTest {
 
         verify(transferRepository).startDownload(eq(node), eq(destinationPath), argThat {
             this.containsAll(appData)
-                    && this.any { it.equals(expected) }
+                    && this.any { it == expected }
         }, eq(false))
     }
 

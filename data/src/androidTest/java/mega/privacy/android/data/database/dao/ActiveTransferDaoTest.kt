@@ -11,6 +11,7 @@ import mega.privacy.android.data.database.MegaDatabase
 import mega.privacy.android.data.database.entity.ActiveTransferEntity
 import mega.privacy.android.domain.entity.transfer.TransferAppData
 import mega.privacy.android.domain.entity.transfer.TransferType
+import mega.privacy.android.domain.entity.uri.UriPath
 import org.junit.After
 import org.junit.Before
 import org.junit.Test
@@ -71,7 +72,8 @@ class ActiveTransferDaoTest {
             isAlreadyTransferred = false,
             isCancelled = true,
             appData = listOf(
-                TransferAppData.CameraUpload, TransferAppData.OriginalContentUri("content://uri"),
+                TransferAppData.CameraUpload,
+                TransferAppData.OriginalUriPath(UriPath("content://uri")),
             ),
             fileName = "fileName"
         )

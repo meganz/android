@@ -16,6 +16,7 @@ import mega.privacy.android.data.mapper.transfer.TransferAppDataMapper.Companion
 import mega.privacy.android.data.mapper.transfer.TransferAppDataMapper.Companion.APP_DATA_REPEATED_TRANSFER_SEPARATOR
 import mega.privacy.android.data.mapper.transfer.TransferAppDataMapper.Companion.APP_DATA_SEPARATOR
 import mega.privacy.android.domain.entity.transfer.TransferAppData
+import mega.privacy.android.domain.entity.uri.UriPath
 import org.junit.jupiter.api.BeforeAll
 import org.junit.jupiter.api.Nested
 import org.junit.jupiter.api.Test
@@ -120,7 +121,7 @@ class TransferAppDataMapperTest {
         fun `test that a OriginalContentUri is mapped correctly`() {
             val uri = "content://com.android.externalstorage.documents/tree/primary%3A"
             val raw = "ORIGINAL_URI>$uri"
-            val expected = TransferAppData.OriginalContentUri(uri)
+            val expected = TransferAppData.OriginalUriPath(UriPath(uri))
             Truth.assertThat(underTest(raw)).containsExactly(expected)
         }
 
@@ -209,7 +210,7 @@ class TransferAppDataMapperTest {
                 )
             ),
             generateAppDataString(OriginalContentUri, TARGET_URI)
-                    to listOf(TransferAppData.OriginalContentUri(TARGET_URI)),
+                    to listOf(TransferAppData.OriginalUriPath(UriPath(TARGET_URI))),
             generateAppDataString(
                 ChatDownload,
                 FAKE_ID.toString(),

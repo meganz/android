@@ -6,6 +6,7 @@ import mega.privacy.android.data.database.entity.ActiveTransferEntity
 import mega.privacy.android.domain.entity.transfer.ActiveTransfer
 import mega.privacy.android.domain.entity.transfer.TransferAppData
 import mega.privacy.android.domain.entity.transfer.TransferType
+import mega.privacy.android.domain.entity.uri.UriPath
 import org.junit.jupiter.api.BeforeAll
 import org.junit.jupiter.api.TestInstance
 import org.junit.jupiter.params.ParameterizedTest
@@ -51,7 +52,7 @@ class ActiveTransferEntityMapperTest {
                                         isCancelled = isCancelled,
                                         appData = listOf(
                                             TransferAppData.CameraUpload,
-                                            TransferAppData.OriginalContentUri("content://uri")
+                                            TransferAppData.OriginalUriPath(UriPath("content://uri"))
                                         ),
                                         fileName = FILE_NAME,
                                     ),
@@ -67,7 +68,7 @@ class ActiveTransferEntityMapperTest {
                                         isCancelled = isCancelled,
                                         appData = listOf(
                                             TransferAppData.CameraUpload,
-                                            TransferAppData.OriginalContentUri("content://uri")
+                                            TransferAppData.OriginalUriPath(UriPath("content://uri"))
                                         ),
                                         fileName = FILE_NAME,
                                     )

@@ -12,7 +12,7 @@ internal enum class AppDataTypeConstants(
     CameraUpload("CU_UPLOAD", TransferAppData.CameraUpload::class),
     SDCardDownload("SD_CARD_DOWNLOAD", TransferAppData.SdCardDownload::class),
     BackgroundTransfer("BACKGROUND_TRANSFER", TransferAppData.BackgroundTransfer::class),
-    OriginalContentUri("ORIGINAL_URI", TransferAppData.OriginalContentUri::class),
+    OriginalContentUri("ORIGINAL_URI", TransferAppData.OriginalUriPath::class),
     ChatDownload("CHAT_DOWNLOAD", TransferAppData.ChatDownload::class),
     GeoLocation("GEO_LOCATION", TransferAppData.Geolocation::class),
     TransferGroup("TRANSFER_GROUP", TransferAppData.TransferGroup::class),
@@ -24,9 +24,9 @@ internal enum class AppDataTypeConstants(
 
     companion object {
 
-        private val constantsDictionary by lazy { values().associateBy { it.sdkTypeValue } }
+        private val constantsDictionary by lazy { entries.associateBy { it.sdkTypeValue } }
 
-        private val classDictionary by lazy { values().associateBy { it.clazz } }
+        private val classDictionary by lazy { entries.associateBy { it.clazz } }
 
         fun getTypeFromSdkValue(sdkTypeConstant: String) =
             constantsDictionary[sdkTypeConstant]

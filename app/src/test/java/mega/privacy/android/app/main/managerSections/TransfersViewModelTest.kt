@@ -25,6 +25,7 @@ import mega.privacy.android.domain.entity.transfer.Transfer
 import mega.privacy.android.domain.entity.transfer.TransferAppData
 import mega.privacy.android.domain.entity.transfer.TransferEvent
 import mega.privacy.android.domain.entity.transfer.TransferState
+import mega.privacy.android.domain.entity.uri.UriPath
 import mega.privacy.android.domain.exception.chat.ChatUploadNotRetriedException
 import mega.privacy.android.domain.usecase.GetNodeByIdUseCase
 import mega.privacy.android.domain.usecase.chat.message.pendingmessages.RetryChatUploadUseCase
@@ -406,7 +407,7 @@ internal class TransfersViewModelTest {
                 )
             )
             whenever(transferAppDataMapper(appDataString)) doReturn listOf(
-                TransferAppData.OriginalContentUri(contentUri)
+                TransferAppData.OriginalUriPath(UriPath(contentUri))
             )
             whenever(canReadUriUseCase(contentUri)) doReturn true
 

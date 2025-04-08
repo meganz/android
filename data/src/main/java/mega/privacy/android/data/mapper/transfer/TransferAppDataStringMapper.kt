@@ -34,7 +34,7 @@ class TransferAppDataStringMapper @Inject constructor() {
                     parentPath
                 )
 
-                is TransferAppData.OriginalContentUri -> listOf(originalUri)
+                is TransferAppData.OriginalUriPath -> listOf(originalUriPath.value)
                 is TransferAppData.ChatDownload -> listOf(
                     chatId.toString(),
                     msgId.toString(),

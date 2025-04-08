@@ -1,5 +1,7 @@
 package mega.privacy.android.domain.entity.transfer
 
+import mega.privacy.android.domain.entity.uri.UriPath
+
 /**
  * Data to identify different types of transfers within the app
  */
@@ -52,10 +54,10 @@ sealed interface TransferAppData {
     ) : TransferAppData
 
     /**
-     * Identify the original content URI of an upload transfer that needs to be copied to the cache folder for retry purposes.
-     * @param originalUri
+     * Identify the original [UriPath] of an upload transfer that needs to be copied to the cache folder, to access the original file if needed once the temporary file is removed.
+     * @param originalUriPath
      */
-    data class OriginalContentUri(val originalUri: String) : TransferAppData
+    data class OriginalUriPath(val originalUriPath: UriPath) : TransferAppData
 
     /**
      * Identify a chat download transfer.
