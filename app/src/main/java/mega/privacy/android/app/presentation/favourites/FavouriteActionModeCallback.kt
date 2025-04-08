@@ -1,15 +1,14 @@
 package mega.privacy.android.app.presentation.favourites
 
+import mega.privacy.android.shared.resources.R as sharedR
 import android.content.Context
-import android.content.Intent
-import android.net.Uri
 import android.view.Menu
 import android.view.MenuItem
 import androidx.appcompat.view.ActionMode
 import androidx.lifecycle.lifecycleScope
 import kotlinx.coroutines.launch
 import mega.privacy.android.app.R
-import mega.privacy.android.app.activities.WebViewActivity
+import mega.privacy.android.app.extensions.launchUrl
 import mega.privacy.android.app.featuretoggle.ApiFeatures
 import mega.privacy.android.app.main.ManagerActivity
 import mega.privacy.android.app.main.controllers.NodeController
@@ -19,7 +18,6 @@ import mega.privacy.android.app.utils.LinksUtil
 import mega.privacy.android.app.utils.MegaNodeUtil
 import mega.privacy.android.app.utils.MenuUtils.toggleAllMenuItemsVisibility
 import mega.privacy.android.domain.entity.node.NodeId
-import mega.privacy.android.shared.resources.R as sharedR
 import timber.log.Timber
 
 /**
@@ -178,11 +176,7 @@ class FavouriteActionModeCallback(
                 }
 
                 R.id.cab_menu_dispute -> {
-                    context.startActivity(
-                        Intent(context, WebViewActivity::class.java)
-                            .addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP)
-                            .setData(Uri.parse(Constants.DISPUTE_URL))
-                    )
+                    context.launchUrl(Constants.DISPUTE_URL)
                 }
 
                 else -> {}
