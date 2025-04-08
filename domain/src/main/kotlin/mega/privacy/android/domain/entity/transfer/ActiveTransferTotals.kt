@@ -17,6 +17,7 @@ import kotlin.time.Duration.Companion.milliseconds
  * @param transferredBytes total bytes already transferred of active transfers of this type
  * @param totalAlreadyTransferredFiles files not downloaded because already downloaded
  * @param totalCancelled files canceled before transfer has completed
+ * @param actionGroups
  */
 data class ActiveTransferTotals(
     val transfersType: TransferType,
@@ -40,7 +41,7 @@ data class ActiveTransferTotals(
      * @param completedFiles the amount of files completed (finished without errors)
      * @param alreadyTransferred the amount of files not transferred because already transferred
      * @param destination the destination of the transfer
-     * @param singleFileName in case of a single file transfer, the name of the file, null otherwise
+     * @param fileNames the names of the involved files
      * @param singleTransferTag in case of a single file transfer, its, null otherwise
      * @param startTime the local time in milliseconds when this action was started, it should be used for UX only as precision is not guaranteed
      * @param pausedFiles the amount of files that are paused
@@ -55,7 +56,7 @@ data class ActiveTransferTotals(
         val completedFiles: Int,
         val alreadyTransferred: Int,
         val destination: String,
-        val singleFileName: String?,
+        val fileNames: List<String>,
         val singleTransferTag: Int?,
         val startTime: Long,
         val pausedFiles: Int,
@@ -74,6 +75,9 @@ data class ActiveTransferTotals(
          */
         val finishedFilesWithErrors = finishedFiles - completedFiles - alreadyTransferred
 
+        /**
+         * @return the duration of this action group from the start time to the current time
+         */
         fun durationFromStart(currentTimeInMillis: Long) =
             (currentTimeInMillis - startTime).milliseconds
 
@@ -86,6 +90,11 @@ data class ActiveTransferTotals(
          * The progress of the already transferred bytes
          */
         val progress = Progress(transferredBytes, totalBytes)
+
+        /**
+         * in case of a single file transfer, the name of the file, null otherwise
+         */
+        val singleFileName = fileNames.singleOrNull()
     }
 
     /**
