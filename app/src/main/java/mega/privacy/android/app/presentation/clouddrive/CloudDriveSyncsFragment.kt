@@ -1,9 +1,10 @@
 package mega.privacy.android.app.presentation.clouddrive
 
+import mega.privacy.android.icon.pack.R as iconPackR
+import mega.privacy.android.shared.resources.R as sharedR
 import android.app.Activity
 import android.content.Context
 import android.content.Intent
-import android.net.Uri
 import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.Menu
@@ -53,8 +54,8 @@ import kotlinx.coroutines.flow.sample
 import kotlinx.coroutines.launch
 import mega.privacy.android.analytics.Analytics
 import mega.privacy.android.app.R
-import mega.privacy.android.app.activities.WebViewActivity
 import mega.privacy.android.app.arch.extensions.collectFlow
+import mega.privacy.android.app.extensions.launchUrl
 import mega.privacy.android.app.featuretoggle.ApiFeatures
 import mega.privacy.android.app.fragments.homepage.SortByHeaderViewModel
 import mega.privacy.android.app.interfaces.ActionBackupListener
@@ -100,13 +101,11 @@ import mega.privacy.android.domain.usecase.GetThemeMode
 import mega.privacy.android.domain.usecase.featureflag.GetFeatureFlagValueUseCase
 import mega.privacy.android.feature.sync.ui.permissions.SyncPermissionsManager
 import mega.privacy.android.feature.sync.ui.synclist.SyncListRoute
-import mega.privacy.android.icon.pack.R as iconPackR
 import mega.privacy.android.navigation.MegaNavigator
 import mega.privacy.android.shared.original.core.ui.controls.layouts.MegaScaffold
 import mega.privacy.android.shared.original.core.ui.controls.tab.Tabs
 import mega.privacy.android.shared.original.core.ui.theme.OriginalTheme
 import mega.privacy.android.shared.original.core.ui.utils.showAutoDurationSnackbar
-import mega.privacy.android.shared.resources.R as sharedR
 import mega.privacy.mobile.analytics.event.AndroidSyncFABButtonEvent
 import mega.privacy.mobile.analytics.event.CloudDriveHideNodeMenuItemEvent
 import mega.privacy.mobile.analytics.event.CloudDriveScreenEvent
@@ -453,8 +452,8 @@ class CloudDriveSyncsFragment : Fragment() {
             ),
             onSortOrderClick = { showSortByPanel() },
             onChangeViewTypeClick = fileBrowserViewModel::onChangeViewTypeClicked,
-            onLinkClicked = ::navigateToLink,
-            onDisputeTakeDownClicked = ::navigateToLink,
+            onLinkClicked = context::launchUrl,
+            onDisputeTakeDownClicked = context::launchUrl,
             onDismissClicked = fileBrowserViewModel::onBannerDismissClicked,
             onStorageAlmostFullWarningDismiss = fileBrowserViewModel::setStorageCapacityAsDefault,
             onUpgradeClicked = {
@@ -872,11 +871,7 @@ class CloudDriveSyncsFragment : Fragment() {
                 }
 
                 OptionItems.DISPUTE_CLICKED -> {
-                    startActivity(
-                        Intent(requireContext(), WebViewActivity::class.java)
-                            .addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP)
-                            .setData(Uri.parse(Constants.DISPUTE_URL))
-                    )
+                    context.launchUrl(Constants.DISPUTE_URL)
                     disableSelectMode()
                 }
 
@@ -904,18 +899,6 @@ class CloudDriveSyncsFragment : Fragment() {
                 }
             }
         }
-    }
-
-    /**
-     * Clicked on link
-     * @param link
-     */
-    private fun navigateToLink(link: String) {
-        val uriUrl = Uri.parse(link)
-        val launchBrowser = Intent(requireContext(), WebViewActivity::class.java)
-            .addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP)
-            .setData(uriUrl)
-        startActivity(launchBrowser)
     }
 
     private fun disableSelectMode() {
