@@ -176,7 +176,6 @@ fun ChatInfoView(
                     if (state.isNoteToSelf && noteToSelfChatState.isNoteToYourselfFeatureFlagEnabled) {
                         NoteToSelfView(
                             isHint = noteToSelfChatState.isNoteToSelfChatEmpty,
-                            isNew = noteToSelfChatState.isNewFeature
                         )
                     } else {
                         ScheduledMeetingTitleView(state = state)

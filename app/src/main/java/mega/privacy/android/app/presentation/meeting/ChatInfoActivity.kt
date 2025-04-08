@@ -196,13 +196,6 @@ class ChatInfoActivity : PasscodeActivity(), SnackbarShower {
     }
 
     private fun collectFlows() {
-        collectFlow(noteToSelfChatViewModel.state.map { it.noteToSelfChatRoom }
-            .distinctUntilChanged()) {
-            it?.also {
-                noteToSelfChatViewModel.getNoteToSelfPreference()
-            }
-        }
-
         collectFlow(scheduledMeetingManagementViewModel.state.map { it.finish }
             .distinctUntilChanged()) {
             if (it) {
