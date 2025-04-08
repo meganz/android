@@ -59,9 +59,8 @@ class CompressPendingMessagesUseCase @Inject constructor(
                                 //if this was already compressed don't compress it again.
                                 if (uriPath !in pathsToSizeAndProgress) {
                                     semaphore.withPermit {
-                                        val original = uriPath
                                         val size =
-                                            (getFileSizeFromUriPathUseCase(original) as? FileResult)?.sizeInBytes
+                                            (getFileSizeFromUriPathUseCase(uriPath) as? FileResult)?.sizeInBytes
                                                 ?: 0
                                         pathsToSizeAndProgress[uriPath] = SizeAndProgress(
                                             size.coerceAtLeast(1L),
@@ -69,8 +68,9 @@ class CompressPendingMessagesUseCase @Inject constructor(
                                         )
                                         val totalSize =
                                             pathsToSizeAndProgress.values.sumOf { it.size }
-                                        val compressed = compressFileForChatUseCase(original)
+                                        val compressed = compressFileForChatUseCase(uriPath)
                                             .onEach { chatUploadCompressionState ->
+                                                println("TRAN-833 compression state $chatUploadCompressionState")
                                                 val newProgress =
                                                     when (chatUploadCompressionState) {
                                                         is ChatUploadCompressionState.Compressing -> {
@@ -110,7 +110,7 @@ class CompressPendingMessagesUseCase @Inject constructor(
                                                 UpdatePendingMessageStateAndPathRequest(
                                                     pendingMessage.id,
                                                     PendingMessageState.READY_TO_UPLOAD,
-                                                    (compressed?.absolutePath ?: original.value),
+                                                    (compressed?.absolutePath ?: uriPath.value),
                                                 )
                                             }.toTypedArray()
                                         )

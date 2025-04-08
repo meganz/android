@@ -4,7 +4,6 @@ import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.emitAll
 import kotlinx.coroutines.flow.emptyFlow
 import kotlinx.coroutines.flow.flow
-import kotlinx.coroutines.flow.onEach
 import mega.privacy.android.domain.entity.chat.PendingMessageState
 import mega.privacy.android.domain.entity.chat.messages.pending.UpdatePendingMessageStateRequest
 import mega.privacy.android.domain.entity.node.NodeId
@@ -32,7 +31,6 @@ class StartChatUploadsWithWorkerUseCase @Inject constructor(
     private val startChatUploadsWorkerAndWaitUntilIsStartedUseCase: StartChatUploadsWorkerAndWaitUntilIsStartedUseCase,
     private val chatAttachmentNeedsCompressionUseCase: ChatAttachmentNeedsCompressionUseCase,
     private val fileSystemRepository: FileSystemRepository,
-    private val handleChatUploadTransferEventUseCase: HandleChatUploadTransferEventUseCase,
     private val updatePendingMessageUseCase: UpdatePendingMessageUseCase,
     private val getPendingMessageUseCase: GetPendingMessageUseCase,
     cancelCancelTokenUseCase: CancelCancelTokenUseCase,
@@ -78,9 +76,7 @@ class StartChatUploadsWithWorkerUseCase @Inject constructor(
                         appData = appData,
                         parentFolderId = chatFilesFolderId,
                         isHighPriority = true,
-                    ).onEach { event ->
-                        handleChatUploadTransferEventUseCase(event, *pendingMessageIds)
-                    }
+                    )
                 }
             },
             startWorker = {

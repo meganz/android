@@ -2,6 +2,7 @@ package mega.privacy.android.domain.usecase.transfers.active
 
 import mega.privacy.android.domain.entity.chat.PendingMessageState
 import mega.privacy.android.domain.entity.chat.messages.pending.UpdatePendingMessageStateRequest
+import mega.privacy.android.domain.entity.chat.messages.pending.UpdatePendingMessageTransferTagRequest
 import mega.privacy.android.domain.entity.node.NodeId
 import mega.privacy.android.domain.entity.transfer.TransferEvent
 import mega.privacy.android.domain.entity.transfer.TransferType
@@ -21,15 +22,32 @@ class HandleChatTransferEventsUseCase @Inject constructor(
      * Invoke
      */
     override suspend operator fun invoke(vararg events: TransferEvent) {
-        events
-            .filter { it.transfer.transferType == TransferType.CHAT_UPLOAD }
+        val chatEvents = events.filter { it.transfer.transferType == TransferType.CHAT_UPLOAD }
+
+        //update transfer uniqueId on Start event
+        chatEvents
+            .filterIsInstance<TransferEvent.TransferStartEvent>()
+            .flatMap {
+                it.transfer.pendingMessageIds()?.map { pendingMessageId ->
+                    UpdatePendingMessageTransferTagRequest(
+                        pendingMessageId = pendingMessageId,
+                        transferUniqueId = it.transfer.uniqueId,
+                        state = PendingMessageState.UPLOADING
+                    )
+                } ?: emptyList()
+            }
+            .takeIf { it.isNotEmpty() }
+            ?.let {
+                updatePendingMessageUseCase(*it.toTypedArray())
+            }
+        //once uploaded, attach the node to the chat
+        chatEvents
             .filterIsInstance<TransferEvent.TransferFinishEvent>()
             .forEach { finishEvent ->
                 finishEvent.transfer.pendingMessageIds()?.let { pendingMessageIds ->
                     pendingMessageIds.forEach { pendingMessageId ->
                         if (finishEvent.error == null) {
                             runCatching {
-                                //once uploaded, it can be attached to the chat
                                 attachNodeWithPendingMessageUseCase(
                                     pendingMessageId,
                                     NodeId(finishEvent.transfer.nodeHandle),
@@ -46,6 +64,21 @@ class HandleChatTransferEventsUseCase @Inject constructor(
                         }
                     }
                 }
+            }
+        //mark as error if it's a temporary error (typically an over quota error)
+        chatEvents
+            .filterIsInstance<TransferEvent.TransferTemporaryErrorEvent>()
+            .flatMap {
+                it.transfer.pendingMessageIds()?.map { pendingMessageId ->
+                    UpdatePendingMessageStateRequest(
+                        pendingMessageId = pendingMessageId,
+                        state = PendingMessageState.ERROR_UPLOADING
+                    )
+                } ?: emptyList()
+            }
+            .takeIf { it.isNotEmpty() }
+            ?.let {
+                updatePendingMessageUseCase(*it.toTypedArray())
             }
     }
 

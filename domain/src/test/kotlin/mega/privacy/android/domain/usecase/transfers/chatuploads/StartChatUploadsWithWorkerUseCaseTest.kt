@@ -9,7 +9,6 @@ import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.collect
 import kotlinx.coroutines.flow.emptyFlow
 import kotlinx.coroutines.flow.flow
-import kotlinx.coroutines.flow.flowOf
 import kotlinx.coroutines.test.runTest
 import mega.privacy.android.domain.entity.chat.PendingMessage
 import mega.privacy.android.domain.entity.chat.PendingMessageState
@@ -50,7 +49,6 @@ class StartChatUploadsWithWorkerUseCaseTest {
     private val startChatUploadsWorkerAndWaitUntilIsStartedUseCase =
         mock<StartChatUploadsWorkerAndWaitUntilIsStartedUseCase>()
     private val fileSystemRepository = mock<FileSystemRepository>()
-    private val handleChatUploadTransferEventUseCase = mock<HandleChatUploadTransferEventUseCase>()
     private val chatAttachmentNeedsCompressionUseCase =
         mock<ChatAttachmentNeedsCompressionUseCase>()
     private val updatePendingMessageUseCase = mock<UpdatePendingMessageUseCase>()
@@ -63,7 +61,6 @@ class StartChatUploadsWithWorkerUseCaseTest {
             startChatUploadsWorkerAndWaitUntilIsStartedUseCase = startChatUploadsWorkerAndWaitUntilIsStartedUseCase,
             chatAttachmentNeedsCompressionUseCase = chatAttachmentNeedsCompressionUseCase,
             fileSystemRepository = fileSystemRepository,
-            handleChatUploadTransferEventUseCase = handleChatUploadTransferEventUseCase,
             updatePendingMessageUseCase = updatePendingMessageUseCase,
             getPendingMessageUseCase = getPendingMessageUseCase,
             cancelCancelTokenUseCase = cancelCancelTokenUseCase,
@@ -77,7 +74,6 @@ class StartChatUploadsWithWorkerUseCaseTest {
             startChatUploadsWorkerAndWaitUntilIsStartedUseCase,
             chatAttachmentNeedsCompressionUseCase,
             fileSystemRepository,
-            handleChatUploadTransferEventUseCase,
             updatePendingMessageUseCase,
             getPendingMessageUseCase,
             cancelCancelTokenUseCase,
@@ -274,32 +270,6 @@ class StartChatUploadsWithWorkerUseCaseTest {
             cancelAndIgnoreRemainingEvents()
         }
     }
-
-    @Test
-    fun `test that handle chat upload transfer event use case is called on each transfer event`() =
-        runTest {
-            val file = createFileUriPath()
-            val pendingMessageId = 15L
-            val transferTag = 12
-            val transfer = mock<Transfer> {
-                on { it.tag } doReturn transferTag
-            }
-            val event = TransferEvent.TransferStartEvent(transfer)
-            whenever(
-                uploadFileUseCase.invoke(
-                    uriPath = anyValueClass(),
-                    fileName = anyOrNull(),
-                    appData = any(),
-                    parentFolderId = anyValueClass(),
-                    isHighPriority = any()
-                )
-            ) doReturn flowOf(event)
-
-            underTest(file, NodeId(11L), pendingMessageId).test {
-                verify(handleChatUploadTransferEventUseCase).invoke(event, pendingMessageId)
-                cancelAndIgnoreRemainingEvents()
-            }
-        }
 
     private fun createFileUriPath() = UriPath("foo")
 

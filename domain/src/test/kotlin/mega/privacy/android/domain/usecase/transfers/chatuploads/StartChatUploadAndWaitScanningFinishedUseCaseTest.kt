@@ -32,14 +32,12 @@ class StartChatUploadAndWaitScanningFinishedUseCaseTest {
     private val uploadFileUseCase = mock<UploadFileUseCase>()
     private val getOrCreateMyChatsFilesFolderIdUseCase =
         mock<GetOrCreateMyChatsFilesFolderIdUseCase>()
-    private val handleChatUploadTransferEventUseCase = mock<HandleChatUploadTransferEventUseCase>()
 
     @BeforeAll
     fun setup() {
         underTest = StartChatUploadAndWaitScanningFinishedUseCase(
             uploadFileUseCase,
             getOrCreateMyChatsFilesFolderIdUseCase,
-            handleChatUploadTransferEventUseCase,
         )
     }
 
@@ -48,7 +46,6 @@ class StartChatUploadAndWaitScanningFinishedUseCaseTest {
         reset(
             uploadFileUseCase,
             getOrCreateMyChatsFilesFolderIdUseCase,
-            handleChatUploadTransferEventUseCase,
         )
         whenever(getOrCreateMyChatsFilesFolderIdUseCase()) doReturn myChatsFolderId
     }
@@ -88,37 +85,6 @@ class StartChatUploadAndWaitScanningFinishedUseCaseTest {
     }
 
     @Test
-    fun `test that handle chat upload transfer event use case is invoked when an event is received`() =
-        runTest {
-            val expected = mock<TransferEvent.TransferStartEvent> {
-                on { transfer } doReturn fileTransfer
-            }
-            val file = file
-            val fileName = "name"
-            val pendingMessageIds = listOf(1L, 2L, 3L)
-            whenever(
-                uploadFileUseCase(
-                    uriPath = anyValueClass(),
-                    fileName = any(),
-                    appData = any(),
-                    parentFolderId = anyValueClass(),
-                    isHighPriority = any(),
-                )
-            ) doReturn flowOf(expected)
-
-            underTest(
-                uriPath = UriPath(file.absolutePath),
-                fileName = fileName,
-                pendingMessageIds = pendingMessageIds
-            )
-
-            verify(handleChatUploadTransferEventUseCase).invoke(
-                expected,
-                pendingMessageIds = pendingMessageIds.toLongArray()
-            )
-        }
-
-    @Test
     fun `test that the scanning finished event is awaited when the use case is invoked`() {
         runTest {
             assertDoesNotThrow {
@@ -145,11 +111,6 @@ class StartChatUploadAndWaitScanningFinishedUseCaseTest {
                     uriPath = UriPath(file.absolutePath),
                     fileName = fileName,
                     pendingMessageIds = pendingMessageIds
-                )
-
-                verify(handleChatUploadTransferEventUseCase).invoke(
-                    finishEvent,
-                    pendingMessageIds = pendingMessageIds.toLongArray()
                 )
             }
         }
