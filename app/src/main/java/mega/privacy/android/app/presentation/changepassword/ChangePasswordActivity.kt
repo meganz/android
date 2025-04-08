@@ -1,7 +1,6 @@
 package mega.privacy.android.app.presentation.changepassword
 
 import android.content.Intent
-import android.net.Uri
 import android.os.Bundle
 import android.view.MenuItem
 import android.view.WindowManager
@@ -17,7 +16,7 @@ import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import dagger.hilt.android.AndroidEntryPoint
 import mega.privacy.android.app.R
 import mega.privacy.android.app.activities.PasscodeActivity
-import mega.privacy.android.app.activities.WebViewActivity
+import mega.privacy.android.app.extensions.launchUrl
 import mega.privacy.android.app.main.ManagerActivity
 import mega.privacy.android.app.presentation.changepassword.view.ChangePasswordView
 import mega.privacy.android.app.presentation.extensions.isDarkMode
@@ -115,7 +114,7 @@ class ChangePasswordActivity : PasscodeActivity() {
 
             ChangePasswordView(
                 uiState = uiState,
-                onTnCLinkClickListener = ::seeTermsAndConditions,
+                onTnCLinkClickListener = { this.launchUrl(Constants.URL_E2EE) },
                 onPasswordTextChanged = viewModel::checkPasswordStrength,
                 onConfirmPasswordTextChanged = viewModel::validateConfirmPasswordToDefault,
                 onSnackBarShown = viewModel::onSnackBarShown,
@@ -202,24 +201,6 @@ class ChangePasswordActivity : PasscodeActivity() {
             }
         }
         return super.onOptionsItemSelected(item)
-    }
-
-    /*
-    * Action when TNC checkbox link is clicked
-    */
-    private fun seeTermsAndConditions() {
-        try {
-            val intent = Intent(this, WebViewActivity::class.java).apply {
-                flags = Intent.FLAG_ACTIVITY_CLEAR_TOP
-                data = Uri.parse(Constants.URL_E2EE)
-            }
-            startActivity(intent)
-        } catch (e: Exception) {
-            val viewIntent = Intent(Intent.ACTION_VIEW).apply {
-                data = Uri.parse(Constants.URL_E2EE)
-            }
-            startActivity(viewIntent)
-        }
     }
 
     private fun showAlert() {
