@@ -31,11 +31,11 @@ import mega.privacy.android.app.MegaApplication
 import mega.privacy.android.app.MimeTypeList
 import mega.privacy.android.app.R
 import mega.privacy.android.app.activities.PasscodeActivity
-import mega.privacy.android.app.activities.WebViewActivity
 import mega.privacy.android.app.activities.contract.NameCollisionActivityContract
 import mega.privacy.android.app.arch.extensions.collectFlow
 import mega.privacy.android.app.constants.IntentConstants
 import mega.privacy.android.app.extensions.enableEdgeToEdgeAndConsumeInsets
+import mega.privacy.android.app.extensions.launchUrl
 import mega.privacy.android.app.featuretoggle.AppFeatures
 import mega.privacy.android.app.main.DecryptAlertDialog
 import mega.privacy.android.app.main.FileExplorerActivity
@@ -243,8 +243,8 @@ class FolderLinkComposeActivity : PasscodeActivity(),
                 onStorageDialogActionButtonClick = { viewModel.handleActionClick(this) },
                 onStorageDialogAchievementButtonClick = ::navigateToAchievements,
                 emptyViewString = getEmptyViewString(),
-                onDisputeTakeDownClicked = ::navigateToLink,
-                onLinkClicked = ::navigateToLink,
+                onDisputeTakeDownClicked = this::launchUrl,
+                onLinkClicked = this::launchUrl,
                 onEnterMediaDiscoveryClick = ::onEnterMediaDiscoveryClick,
                 onTransferWidgetClick = ::onTransfersWidgetClick,
                 fileTypeIconMapper = fileTypeIconMapper,
@@ -568,18 +568,6 @@ class FolderLinkComposeActivity : PasscodeActivity(),
         val accountIntent = Intent(this, MyAccountActivity::class.java)
             .setAction(IntentConstants.ACTION_OPEN_ACHIEVEMENTS)
         startActivity(accountIntent)
-    }
-
-    /**
-     * Clicked on link
-     * @param link
-     */
-    private fun navigateToLink(link: String) {
-        val uriUrl = Uri.parse(link)
-        val launchBrowser = Intent(this, WebViewActivity::class.java)
-            .addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP)
-            .setData(uriUrl)
-        startActivity(launchBrowser)
     }
 
     companion object {
