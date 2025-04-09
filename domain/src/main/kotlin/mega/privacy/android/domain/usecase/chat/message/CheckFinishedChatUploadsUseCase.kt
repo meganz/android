@@ -30,7 +30,6 @@ class CheckFinishedChatUploadsUseCase @Inject constructor(
                                 attachNodeWithPendingMessageUseCase(
                                     pendingMessage.id,
                                     NodeId(transfer.nodeHandle),
-                                    transfer.appData,
                                 )
                             } else {
                                 pendingMessage.updateToErrorUploading()

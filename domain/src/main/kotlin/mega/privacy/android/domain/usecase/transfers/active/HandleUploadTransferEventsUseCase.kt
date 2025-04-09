@@ -19,7 +19,7 @@ class HandleUploadTransferEventsUseCase @Inject constructor(
     override suspend operator fun invoke(vararg events: TransferEvent) {
         events
             .filter { event ->
-                event.transfer.transferType == TransferType.GENERAL_UPLOAD
+                (event.transfer.transferType == TransferType.GENERAL_UPLOAD || event.transfer.transferType == TransferType.CHAT_UPLOAD)
                         && event is TransferEvent.TransferFinishEvent
                         && event.error == null
             }.mapAsync(concurrencyLimit = 5) { event ->

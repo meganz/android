@@ -78,7 +78,6 @@ class CheckFinishedChatUploadsUseCaseTest {
         runTest {
             val pendingMessageIds = (1..10).map { it * 100L }
             val nodeHandles = pendingMessageIds.map { it * 2 }
-            val appData = listOf(TransferAppData.Geolocation(345.4, 45.34))
             val uploadingPendingMessage = pendingMessageIds.mapIndexed { index, id ->
                 mock<PendingMessage> {
                     on { it.transferUniqueId } doReturn index.toLong()
@@ -90,7 +89,6 @@ class CheckFinishedChatUploadsUseCaseTest {
                 val transfer = mock<Transfer> {
                     on { it.nodeHandle } doReturn nodeHandles[index]
                     on { it.isFinished } doReturn true
-                    on { it.appData } doReturn appData
                 }
                 whenever(transferRepository.getTransferByUniqueId(index.toLong())) doReturn transfer
             }
@@ -101,7 +99,6 @@ class CheckFinishedChatUploadsUseCaseTest {
                 verify(attachNodeWithPendingMessageUseCase).invoke(
                     pendingMessageId,
                     NodeId(nodeHandles[index]),
-                    appData,
                 )
             }
         }

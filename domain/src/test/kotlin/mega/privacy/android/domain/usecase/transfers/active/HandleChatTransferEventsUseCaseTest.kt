@@ -73,7 +73,6 @@ class HandleChatTransferEventsUseCaseTest {
             verify(attachNodeWithPendingMessageUseCase).invoke(
                 pendingMessageId,
                 NodeId(nodeHandle),
-                appData
             )
         }
     }
@@ -150,7 +149,6 @@ class HandleChatTransferEventsUseCaseTest {
                     attachNodeWithPendingMessageUseCase.invoke(
                         pendingMessageId,
                         NodeId(nodeHandle),
-                        appData
                     )
                 ).thenThrow(RuntimeException())
             },
@@ -253,7 +251,6 @@ class HandleChatTransferEventsUseCaseTest {
             verify(attachNodeWithPendingMessageUseCase).invoke(
                 pendingMessageId,
                 NodeId(nodeHandle),
-                appData,
             )
         }
     }

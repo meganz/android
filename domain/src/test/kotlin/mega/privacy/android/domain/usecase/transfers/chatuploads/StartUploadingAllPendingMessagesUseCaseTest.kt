@@ -94,7 +94,6 @@ class StartUploadingAllPendingMessagesUseCaseTest {
     fun `test that pending message starts uploading`() =
         runTest {
             val pendingMessage = stubPendingMessage()
-            val file = File("/video.mp4")
             val fileName = pendingMessage.name
             whenever(monitorPendingMessagesByStateUseCase(PendingMessageState.READY_TO_UPLOAD)) doReturn
                     flowOf(listOf(pendingMessage))
@@ -104,7 +103,7 @@ class StartUploadingAllPendingMessagesUseCaseTest {
             verify(startChatUploadAndWaitScanningFinishedUseCase).invoke(
                 pendingMessage.uriPath,
                 fileName,
-                listOf(pendingMessage.id)
+                pendingMessageIds = listOf(pendingMessage.id)
             )
         }
 
@@ -140,7 +139,7 @@ class StartUploadingAllPendingMessagesUseCaseTest {
                 verify(startChatUploadAndWaitScanningFinishedUseCase)(
                     it.uriPath,
                     it.name,
-                    listOf(it.id)
+                    pendingMessageIds = listOf(it.id)
                 )
             }
         }

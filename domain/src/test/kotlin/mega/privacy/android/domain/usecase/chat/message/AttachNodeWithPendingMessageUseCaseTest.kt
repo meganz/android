@@ -8,19 +8,16 @@ import mega.privacy.android.domain.entity.chat.messages.pending.UpdatePendingMes
 import mega.privacy.android.domain.entity.chat.messages.pending.UpdatePendingMessageStateRequest
 import mega.privacy.android.domain.entity.chat.messages.request.CreateTypedMessageRequest
 import mega.privacy.android.domain.entity.node.NodeId
-import mega.privacy.android.domain.entity.transfer.TransferAppData
 import mega.privacy.android.domain.entity.uri.UriPath
 import mega.privacy.android.domain.repository.ChatRepository
 import mega.privacy.android.domain.repository.chat.ChatMessageRepository
 import mega.privacy.android.domain.usecase.chat.GetChatMessageUseCase
 import mega.privacy.android.domain.usecase.chat.message.pendingmessages.GetPendingMessageUseCase
-import mega.privacy.android.domain.usecase.transfers.uploads.SetNodeAttributesAfterUploadUseCase
 import org.junit.jupiter.api.BeforeAll
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.TestInstance
 import org.mockito.kotlin.doReturn
-import org.mockito.kotlin.inOrder
 import org.mockito.kotlin.mock
 import org.mockito.kotlin.reset
 import org.mockito.kotlin.verify
@@ -34,7 +31,6 @@ class AttachNodeWithPendingMessageUseCaseTest {
     private val chatRepository = mock<ChatRepository>()
     private val getChatMessageUseCase = mock<GetChatMessageUseCase>()
     private val createSaveSentMessageRequestUseCase = mock<CreateSaveSentMessageRequestUseCase>()
-    private val setNodeAttributesAfterUploadUseCase = mock<SetNodeAttributesAfterUploadUseCase>()
     private val updatePendingMessageUseCase = mock<UpdatePendingMessageUseCase>()
     private val getPendingMessageUseCase = mock<GetPendingMessageUseCase>()
 
@@ -45,7 +41,6 @@ class AttachNodeWithPendingMessageUseCaseTest {
             chatRepository = chatRepository,
             getChatMessageUseCase = getChatMessageUseCase,
             createSaveSentMessageRequestUseCase = createSaveSentMessageRequestUseCase,
-            setNodeAttributesAfterUploadUseCase = setNodeAttributesAfterUploadUseCase,
             updatePendingMessageUseCase = updatePendingMessageUseCase,
             getPendingMessageUseCase = getPendingMessageUseCase,
         )
@@ -58,7 +53,6 @@ class AttachNodeWithPendingMessageUseCaseTest {
             chatRepository,
             getChatMessageUseCase,
             createSaveSentMessageRequestUseCase,
-            setNodeAttributesAfterUploadUseCase,
             updatePendingMessageUseCase,
             getPendingMessageUseCase,
         )
@@ -121,31 +115,6 @@ class AttachNodeWithPendingMessageUseCaseTest {
         }
 
     @Test
-    fun `test that setNodeAttributesAfterUploadUseCase is invoked before attaching the file`() =
-        runTest {
-            val pendingMessage = createPendingMessageMock()
-            whenever(getPendingMessageUseCase(pendingMsgId)).thenReturn(
-                pendingMessage
-            )
-            val appData = mock<List<TransferAppData>>()
-
-            val nodeId = NodeId(nodeHandle)
-            val inOrder = inOrder(
-                setNodeAttributesAfterUploadUseCase,
-                chatMessageRepository
-            )
-
-            underTest(pendingMsgId, nodeId, appData)
-            inOrder.verify(setNodeAttributesAfterUploadUseCase)
-                .invoke(
-                    nodeId.longValue,
-                    uriPath,
-                    appData,
-                )
-            inOrder.verify(chatMessageRepository).attachNode(chatId, nodeId)
-        }
-
-    @Test
     fun `test that file path is cached when original path from pending message does not exist`() =
         runTest {
             val pendingMessage = createPendingMessageMock()
@@ -198,6 +167,7 @@ class AttachNodeWithPendingMessageUseCaseTest {
         on { tempIdKarere } doReturn tempId
         on { videoDownSampled } doReturn null
         on { uriPath } doReturn uriPath
+        on { originalUriPath } doReturn uriPath
         on { nodeHandle } doReturn nodeHandle
         on { fingerprint } doReturn null
         on { name } doReturn null

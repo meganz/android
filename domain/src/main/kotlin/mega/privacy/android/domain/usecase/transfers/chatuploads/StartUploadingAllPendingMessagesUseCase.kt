@@ -5,7 +5,7 @@ import kotlinx.coroutines.flow.conflate
 import kotlinx.coroutines.flow.map
 import mega.privacy.android.domain.entity.chat.PendingMessageState
 import mega.privacy.android.domain.entity.chat.messages.pending.UpdatePendingMessageStateRequest
-import mega.privacy.android.domain.repository.FileSystemRepository
+import mega.privacy.android.domain.entity.transfer.TransferAppData
 import mega.privacy.android.domain.usecase.chat.message.MonitorPendingMessagesByStateUseCase
 import mega.privacy.android.domain.usecase.chat.message.UpdatePendingMessageUseCase
 import javax.inject.Inject
@@ -31,12 +31,17 @@ class StartUploadingAllPendingMessagesUseCase @Inject constructor(
                 pendingMessageList
                     .groupBy { it.uriPath to it.name }
                     .forEach { (filesAndNames, pendingMessages) ->
+                        val uriPath = filesAndNames.first
+                        val originalUriPath =
+                            pendingMessages.firstOrNull()?.originalUriPath?.takeIf { uriPath != it }
+                                ?.let { TransferAppData.OriginalUriPath(it) }
                         // Start the upload and wait until scanning has finished:
                         // - One by one because the pending messages are different
                         // - Wait until scanning finished as required by the sdk
                         startChatUploadAndWaitScanningFinishedUseCase(
-                            uriPath = filesAndNames.first,
+                            uriPath = uriPath,
                             fileName = filesAndNames.second,
+                            extraAppData = originalUriPath,
                             pendingMessageIds = pendingMessages.map { it.id }
                         )
                         updatePendingMessageUseCase(

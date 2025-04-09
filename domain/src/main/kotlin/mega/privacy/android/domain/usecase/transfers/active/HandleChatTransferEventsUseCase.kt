@@ -51,7 +51,6 @@ class HandleChatTransferEventsUseCase @Inject constructor(
                                 attachNodeWithPendingMessageUseCase(
                                     pendingMessageId,
                                     NodeId(finishEvent.transfer.nodeHandle),
-                                    finishEvent.transfer.appData,
                                 )
                             }.onFailure {
                                 updateState(

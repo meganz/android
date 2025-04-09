@@ -116,6 +116,42 @@ class StartChatUploadAndWaitScanningFinishedUseCaseTest {
         }
     }
 
+    @Test
+    fun `test that extra app data is added to upload files use case`() = runTest {
+        val file = file
+        val fileName = "name"
+        val pendingMessageIds = listOf(1L, 2L, 3L)
+        whenever(
+            uploadFileUseCase(
+                uriPath = anyValueClass(),
+                fileName = any(),
+                appData = any(),
+                parentFolderId = anyValueClass(),
+                isHighPriority = any(),
+            )
+        ) doReturn emptyFlow()
+        val originalUriPath = TransferAppData.OriginalUriPath(UriPath("original/path"))
+        val appData = pendingMessageIds.map {
+            TransferAppData.ChatUpload(it)
+        } + originalUriPath
+
+        underTest.invoke(
+            uriPath = UriPath(file.absolutePath),
+            fileName = fileName,
+            pendingMessageIds = pendingMessageIds,
+            extraAppData = originalUriPath
+        )
+
+        // Then
+        verify(uploadFileUseCase).invoke(
+            uriPath = UriPath(file.absolutePath),
+            fileName = fileName,
+            appData = appData,
+            parentFolderId = myChatsFolderId,
+            isHighPriority = false,
+        )
+    }
+
     private val myChatsFolderId = NodeId(45L)
     private val file = File("/root/file.txt")
     private val fileTransfer = mock<Transfer> {

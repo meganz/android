@@ -5,7 +5,6 @@ import mega.privacy.android.domain.entity.chat.messages.pending.UpdatePendingMes
 import mega.privacy.android.domain.entity.chat.messages.pending.UpdatePendingMessageStateRequest
 import mega.privacy.android.domain.entity.node.NodeId
 import mega.privacy.android.domain.entity.transfer.TransferAppData
-import mega.privacy.android.domain.entity.uri.UriPath
 import mega.privacy.android.domain.repository.ChatRepository
 import mega.privacy.android.domain.repository.chat.ChatMessageRepository
 import mega.privacy.android.domain.usecase.chat.GetChatMessageUseCase
@@ -22,7 +21,6 @@ class AttachNodeWithPendingMessageUseCase @Inject constructor(
     private val chatRepository: ChatRepository,
     private val getChatMessageUseCase: GetChatMessageUseCase,
     private val createSaveSentMessageRequestUseCase: CreateSaveSentMessageRequestUseCase,
-    private val setNodeAttributesAfterUploadUseCase: SetNodeAttributesAfterUploadUseCase,
     private val updatePendingMessageUseCase: UpdatePendingMessageUseCase,
     private val getPendingMessageUseCase: GetPendingMessageUseCase,
 ) {
@@ -31,13 +29,11 @@ class AttachNodeWithPendingMessageUseCase @Inject constructor(
      *
      * @param pendingMessageId
      * @param nodeId of the already uploaded file that will be attached to the chat
-     * @param appData [TransferAppData] list related to this transfer if known, to get some data like geolocation
      */
     suspend operator fun invoke(
         pendingMessageId: Long,
         nodeId: NodeId,
-        appData: List<TransferAppData>? = null,
-        ) {
+    ) {
 
         getPendingMessageUseCase(pendingMessageId)
             ?.let { pendingMessage ->
@@ -45,7 +41,7 @@ class AttachNodeWithPendingMessageUseCase @Inject constructor(
                     chatMessageRepository.getCachedOriginalPathForPendingMessage(pendingMessage.id)
                 chatMessageRepository.cacheOriginalPathForNode(
                     nodeId,
-                    originalPath ?: pendingMessage.uriPath
+                    originalPath ?: pendingMessage.originalUriPath
                 )
                 updatePendingMessageUseCase(
                     UpdatePendingMessageStateAndNodeHandleRequest(
@@ -54,13 +50,6 @@ class AttachNodeWithPendingMessageUseCase @Inject constructor(
                         nodeHandle = nodeId.longValue,
                     )
                 )
-                runCatching {
-                    setNodeAttributesAfterUploadUseCase(
-                        nodeId.longValue,
-                        pendingMessage.uriPath,
-                        appData,
-                    )
-                }
                 val chatId = pendingMessage.chatId
                 val attachedNode = if (pendingMessage.isVoiceClip) {
                     chatMessageRepository.attachVoiceMessage(chatId, nodeId.longValue)

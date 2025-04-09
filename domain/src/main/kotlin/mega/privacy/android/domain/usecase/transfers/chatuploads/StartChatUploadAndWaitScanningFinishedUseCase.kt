@@ -3,6 +3,7 @@ package mega.privacy.android.domain.usecase.transfers.chatuploads
 import kotlinx.coroutines.flow.firstOrNull
 import kotlinx.coroutines.flow.onEach
 import mega.privacy.android.domain.entity.transfer.TransferAppData
+import mega.privacy.android.domain.entity.transfer.TransferAppData.ChatUploadAppData
 import mega.privacy.android.domain.entity.transfer.isFinishScanningEvent
 import mega.privacy.android.domain.entity.uri.UriPath
 import mega.privacy.android.domain.usecase.transfers.uploads.UploadFileUseCase
@@ -23,11 +24,12 @@ class StartChatUploadAndWaitScanningFinishedUseCase @Inject constructor(
     suspend operator fun invoke(
         uriPath: UriPath,
         fileName: String?,
+        extraAppData: TransferAppData? = null,
         pendingMessageIds: List<Long>,
     ) {
-        val appData = pendingMessageIds.map {
+        val appData = (pendingMessageIds.map {
             TransferAppData.ChatUpload(it)
-        }
+        } + extraAppData).filterNotNull()
         uploadFileUseCase(
             uriPath = uriPath,
             fileName = fileName,
