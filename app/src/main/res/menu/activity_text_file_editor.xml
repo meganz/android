@@ -24,7 +24,7 @@
         android:id="@+id/action_get_link"
         android:icon="@drawable/ic_link01_medium_regular_outline"
         android:orderInCategory="100"
-        android:title="@{@plurals/label_share_links(one)}"
+        android:title="@string/context_get_link"
         android:visible="false"
         app:iconTint="?attr/colorControlNormal"
         app:showAsAction="always" />
