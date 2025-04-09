@@ -4,9 +4,19 @@ import mega.privacy.android.data.extensions.toUri
 import mega.privacy.android.domain.entity.document.DocumentEntity
 import mega.privacy.android.domain.entity.uri.UriPath
 
-/*
+/**
  * File system document representation
- */
+ * @param name
+ * @param uriPath
+ * @param isFolder
+ * @param size
+ * @param numFiles
+ * @param numFolders
+ * @param parent
+ * @param canRead
+ * @param isHighlighted
+ *
+ **/
 data class FileDocument(
     val name: String,
     val uriPath: UriPath,
@@ -34,9 +44,18 @@ data class FileDocument(
         isHighlighted = isHighlighted,
     )
 
+    /**
+     * total files and folders children
+     */
     val totalChildren = numFiles + numFolders
 
+    /**
+     * If file is hidden, checking if name starts with `.`
+     */
     val isHidden: Boolean get() = name.startsWith(".")
 
+    /**
+     * Gets the uri of this file (example `file:///path/filename.txt`)
+     */
     fun getUri() = uriPath.toUri()
 }

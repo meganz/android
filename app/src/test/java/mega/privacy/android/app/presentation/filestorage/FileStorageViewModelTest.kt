@@ -134,7 +134,7 @@ class FileStorageViewModelTest {
         commonStub(uriPath, children = documentEntities)
         underTest.setRootPath(
             uriPath,
-            highlightFileName = documentEntities.getOrNull(expected)?.name
+            highlightFileNames = listOfNotNull(documentEntities.getOrNull(expected)?.name)
         )
         underTest.uiState.test {
             val state = awaitItem() as? FileStorageUiState.Loaded

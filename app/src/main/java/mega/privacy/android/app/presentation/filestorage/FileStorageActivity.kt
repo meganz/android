@@ -199,7 +199,7 @@ class FileStorageActivity : PasscodeActivity(), Scrollable {
                     viewModel.setRootPath(
                         uriPath = UriPath(extraPath),
                         updateStorageType = mode == Mode.BROWSE_FILES,
-                        highlightFileName = it.getStringArrayList(EXTRA_FILE_NAMES)?.firstOrNull()
+                        highlightFileNames = it.getStringArrayList(EXTRA_FILE_NAMES)
                     )
                 }
             }

@@ -59,19 +59,19 @@ class FileStorageViewModel @Inject constructor(
      * Sets the root [UriPath] to browse and sets it to current folder
      * @param uriPath
      * @param updateStorageType if true, the storage type will be checked, storage type not changed otherwise
-     * @param highlightFileName if not null, the name of the file to be highlighted
+     * @param highlightFileNames the names of the files to be highlighted
      */
     fun setRootPath(
         uriPath: UriPath,
         updateStorageType: Boolean = false,
-        highlightFileName: String? = null,
+        highlightFileNames: List<String>? = null,
     ) {
         viewModelScope.launch {
             updateUiState(
                 uriPath,
                 storageType = if (updateStorageType) getStorageType(uriPath) else null,
                 isInCacheDirectory = isUriPathInCacheUseCase(uriPath),
-                highlightFileName = highlightFileName,
+                highlightFileNames = highlightFileNames,
             )
         }
     }
@@ -182,20 +182,20 @@ class FileStorageViewModel @Inject constructor(
      * @param parent the parent of the current folder, null if it's the root folder
      * @param storageType the new value for storage type, if null it is not changed
      * @param isInCacheDirectory the new value for isInCacheDirectory, if null, it is not changed
-     * @param highlightFileName if not null, the name of the file to be highlighted
+     * @param highlightFileNames the name of the files to be highlighted
      */
     private suspend fun updateUiState(
         uriPath: UriPath,
         parent: FileDocument? = null,
         storageType: FileStorageType? = null,
         isInCacheDirectory: Boolean? = null,
-        highlightFileName: String? = null,
+        highlightFileNames: List<String>? = null,
     ) {
         val currentDocument = FileDocument(
             documentEntity = getDocumentEntityUseCase(uriPath) ?: return,
             parent = parent,
         )
-        val children = getChildren(currentDocument, highlightFileName)
+        val children = getChildren(currentDocument, highlightFileNames)
         uiState.update { uiState ->
             val loaded = uiState.getOrCreateLoaded()
             loaded.getOrCreateLoaded().copy(
@@ -224,11 +224,11 @@ class FileStorageViewModel @Inject constructor(
      */
     private suspend fun getChildren(
         parent: FileDocument,
-        highlightFileName: String?,
+        highlightFileNames: List<String>? = null,
     ): List<FileDocument> =
         getFilesInDocumentFolderUseCase(parent.uriPath).files
             .mapNotNull { documentEntity ->
-                val isHighlighted = highlightFileName == documentEntity.name
+                val isHighlighted = highlightFileNames?.contains(documentEntity.name) == true
                 FileDocument(documentEntity, parent, isHighlighted).takeIf { !it.isHidden }
             }.sortedWith(compareByDescending<FileDocument> { it.isFolder }.thenBy { it.name })
 }
