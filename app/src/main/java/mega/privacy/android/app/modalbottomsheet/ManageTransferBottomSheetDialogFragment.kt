@@ -32,6 +32,7 @@ import mega.privacy.android.app.utils.Util.showSnackbar
 import mega.privacy.android.domain.entity.node.NodeId
 import mega.privacy.android.domain.entity.node.thumbnail.ThumbnailRequest
 import mega.privacy.android.domain.entity.transfer.CompletedTransfer
+import mega.privacy.android.shared.resources.R as sharedR
 import nz.mega.sdk.MegaChatApiJava
 import nz.mega.sdk.MegaTransfer
 import timber.log.Timber
@@ -89,6 +90,10 @@ internal class ManageTransferBottomSheetDialogFragment : BaseBottomSheetDialogFr
         }
 
         val getLinkOption = contentView.findViewById<TextView>(R.id.option_get_link)
+        getLinkOption.text = resources.getQuantityString(
+            sharedR.plurals.label_share_links,
+            1
+        )
         val getLinkOptionSeparator = contentView.findViewById<View>(R.id.separator_get_link)
         getLinkOption.setOnClickListener(this)
 

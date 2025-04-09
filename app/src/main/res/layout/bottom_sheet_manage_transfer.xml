@@ -130,7 +130,7 @@
             <TextView
                 android:id="@+id/option_get_link"
                 style="@style/BottomSheetOption"
-                android:text="@{@plurals/label_share_links(1)}"
+                tools:text="Share Link"
                 app:drawableStartCompat="@drawable/ic_link01_medium_regular_outline" />
 
             <View
