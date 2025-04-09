@@ -1,12 +1,18 @@
 package mega.privacy.android.app.presentation.videoplayer
 
 import android.Manifest
+import android.annotation.SuppressLint
 import android.app.Activity
 import android.content.Context
 import android.graphics.Bitmap
+import android.graphics.Matrix
 import android.os.Build
 import android.os.Environment
 import android.os.Environment.getExternalStoragePublicDirectory
+import android.view.GestureDetector
+import android.view.MotionEvent
+import android.view.ScaleGestureDetector
+import android.view.TextureView
 import android.view.View
 import android.view.ViewGroup
 import android.widget.ImageButton
@@ -61,6 +67,7 @@ class VideoPlayerController(
     private val fullscreenClickedCallback: () -> Unit,
     private val lockStateChanged: (lock: Boolean) -> Unit,
     private val playQueueButtonClicked: () -> Unit,
+    private val playerViewClicked: () -> Unit,
     private val captureScreenShotFinished: (Bitmap) -> Unit,
 ) : LifecycleEventObserver {
     private val playQueueButton = container.findViewById<ImageButton>(R.id.playlist)
@@ -79,6 +86,13 @@ class VideoPlayerController(
     private val speedPlaybackPopup = container.findViewById<ComposeView>(R.id.speed_playback_popup)
 
     private var sharingScope: CoroutineScope? = null
+
+    private var scaleGestureDetector: ScaleGestureDetector? = null
+    private var gestureDetector: GestureDetector? = null
+    private var zoomLevel = 1.0f
+    private val maxZoom = 5.0f
+    private var translationX = 0f
+    private var translationY = 0f
 
     init {
         coroutineScope.launch {
@@ -124,6 +138,7 @@ class VideoPlayerController(
             updateLockState(false)
         }
         setupSpeedPlaybackButton()
+        setupGestures()
     }
 
     /**
@@ -319,10 +334,79 @@ class VideoPlayerController(
         }
     }
 
+    @SuppressLint("ClickableViewAccessibility")
+    private fun setupGestures() {
+        scaleGestureDetector = ScaleGestureDetector(
+            context,
+            object : ScaleGestureDetector.SimpleOnScaleGestureListener() {
+                override fun onScale(detector: ScaleGestureDetector): Boolean {
+                    if (!viewModel.uiState.value.isLocked) {
+                        zoomLevel = (zoomLevel * detector.scaleFactor).coerceIn(1.0f, maxZoom)
+                        updateTransformations()
+                    }
+                    return true
+                }
+            })
+
+        gestureDetector =
+            GestureDetector(context, object : GestureDetector.SimpleOnGestureListener() {
+                override fun onScroll(
+                    e1: MotionEvent?,
+                    e2: MotionEvent,
+                    distanceX: Float,
+                    distanceY: Float,
+                ): Boolean {
+                    if (zoomLevel > 1 && !viewModel.uiState.value.isLocked) {
+                        translationX -= distanceX
+                        translationY -= distanceY
+                        enforceBoundaries()
+                        updateTransformations()
+                    }
+                    return true
+                }
+
+                @OptIn(UnstableApi::class)
+                override fun onSingleTapConfirmed(e: MotionEvent): Boolean {
+                    playerViewClicked()
+                    return true
+                }
+            })
+
+        playerComposeView.setOnTouchListener { _, event ->
+            scaleGestureDetector?.onTouchEvent(event)
+            gestureDetector?.onTouchEvent(event)
+            true
+        }
+    }
+
+    @OptIn(UnstableApi::class)
+    private fun updateTransformations() {
+        (playerComposeView?.videoSurfaceView as? TextureView)?.let { textureView ->
+            val matrix = Matrix()
+            matrix.postScale(zoomLevel, zoomLevel, textureView.width / 2f, textureView.height / 2f)
+            matrix.postTranslate(translationX, translationY)
+            textureView.setTransform(matrix)
+            if (!viewModel.isMediaPlayerPlaying()) {
+                textureView.invalidate()
+                textureView.requestLayout()
+            }
+        }
+    }
+
+    @OptIn(UnstableApi::class)
+    private fun enforceBoundaries() {
+        playerComposeView?.videoSurfaceView?.let { textureView ->
+            val maxTranslationX = (zoomLevel - 1) * textureView.width / 2
+            val maxTranslationY = (zoomLevel - 1) * textureView.height / 2
+
+            translationX = translationX.coerceIn(-maxTranslationX, maxTranslationX)
+            translationY = translationY.coerceIn(-maxTranslationY, maxTranslationY)
+        }
+    }
+
     @OptIn(UnstableApi::class)
     private fun captureScreenShot() {
-        val rootPath =
-            getExternalStoragePublicDirectory(Environment.DIRECTORY_DCIM).absolutePath
+        val rootPath = getExternalStoragePublicDirectory(Environment.DIRECTORY_DCIM).absolutePath
         playerComposeView.videoSurfaceView?.let { view ->
             viewModel.screenshotWhenVideoPlaying(rootPath, captureView = view) { bitmap ->
                 Analytics.tracker.trackEvent(SnapshotButtonPressedEvent)

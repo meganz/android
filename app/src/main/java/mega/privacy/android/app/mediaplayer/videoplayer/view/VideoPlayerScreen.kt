@@ -192,6 +192,17 @@ internal fun VideoPlayerScreen(
                                         autoHideJob?.cancel()
                                         playQueueButtonClicked()
                                     },
+                                    playerViewClicked = {
+                                        val visible = !isControllerViewVisible
+                                        autoHideJob?.cancel()
+                                        isControllerViewVisible = visible
+                                        systemUiController.isSystemBarsVisible = visible
+                                        if (visible) {
+                                            playerComposeView.showController()
+                                        } else {
+                                            playerComposeView.hideController()
+                                        }
+                                    }
                                 ) { bitmap ->
                                     val (width, height) =
                                         if (orientation == ORIENTATION_LANDSCAPE && bitmap.height > bitmap.width) {
@@ -212,36 +223,6 @@ internal fun VideoPlayerScreen(
                                     lifecycle.addObserver(it)
                                 }
 
-                                fun updateControllerView(isVisible: Boolean) {
-                                    systemUiController.isSystemBarsVisible = isVisible
-                                    if (isVisible) {
-                                        playerComposeView.showController()
-                                    } else {
-                                        playerComposeView.hideController()
-                                    }
-                                }
-
-                                fun toggleControllerVisibility(
-                                    visible: Boolean,
-                                    isAutoHidden: Boolean = false,
-                                ) {
-                                    autoHideJob?.cancel()
-                                    isControllerViewVisible = visible
-                                    updateControllerView(visible)
-
-                                    if (visible && isAutoHidden) {
-                                        autoHideJob = coroutineScope.launch {
-                                            delay(AUDIO_PLAYER_TOOLBAR_INIT_HIDE_DELAY_MS)
-                                            isControllerViewVisible = false
-                                            updateControllerView(false)
-                                        }
-                                    }
-                                }
-
-                                playerComposeView.setOnClickListener {
-                                    toggleControllerVisibility(!isControllerViewVisible)
-                                }
-
                                 playerComposeView.setControllerVisibilityListener(
                                     object : PlayerView.ControllerVisibilityListener {
                                         override fun onVisibilityChanged(visibility: Int) {
@@ -259,7 +240,18 @@ internal fun VideoPlayerScreen(
                                 playerComposeView.player = player
                                 playerComposeView.controllerShowTimeoutMs = 0
                                 updateResizeMode(uiState.isFullscreen)
-                                toggleControllerVisibility(true, true)
+
+                                autoHideJob?.cancel()
+                                isControllerViewVisible = true
+                                systemUiController.isSystemBarsVisible = true
+                                playerComposeView.showController()
+
+                                autoHideJob = coroutineScope.launch {
+                                    delay(AUDIO_PLAYER_TOOLBAR_INIT_HIDE_DELAY_MS)
+                                    isControllerViewVisible = false
+                                    systemUiController.isSystemBarsVisible = false
+                                    playerComposeView.hideController()
+                                }
                             }
                     },
                 ) {

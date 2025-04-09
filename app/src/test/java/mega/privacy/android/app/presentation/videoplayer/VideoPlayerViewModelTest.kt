@@ -2118,6 +2118,17 @@ class VideoPlayerViewModelTest {
         }
     }
 
+    @ParameterizedTest(name = "when mediaPlayerIsPlaying returns {0}")
+    @ValueSource(booleans = [true, false])
+    fun `test that isMediaPlayerPlaying returns correctly `(
+        value: Boolean,
+    ) = runTest {
+        initViewModel()
+        whenever(mediaPlayerGateway.mediaPlayerIsPlaying()).thenReturn(value)
+        val actual = underTest.isMediaPlayerPlaying()
+        assertThat(actual).isEqualTo(value)
+    }
+
     companion object {
         @JvmField
         @RegisterExtension

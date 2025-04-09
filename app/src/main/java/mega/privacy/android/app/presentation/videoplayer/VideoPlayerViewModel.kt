@@ -1360,6 +1360,9 @@ class VideoPlayerViewModel @Inject constructor(
         uiState.update { it.copy(currentSpeedPlayback = item) }
     }
 
+    internal fun isMediaPlayerPlaying() =
+        runCatching { mediaPlayerGateway.mediaPlayerIsPlaying() }.getOrDefault(false)
+
     /**
      * Capture the screenshot when video playing
      *
