@@ -1,5 +1,7 @@
 package mega.privacy.android.app.presentation.transfers.notification
 
+import mega.privacy.android.icon.pack.R as iconPackR
+import mega.privacy.android.shared.resources.R as sharedR
 import android.app.Notification
 import android.app.PendingIntent
 import android.content.Context
@@ -31,8 +33,6 @@ import mega.privacy.android.domain.usecase.featureflag.GetFeatureFlagValueUseCas
 import mega.privacy.android.domain.usecase.file.GetPathByDocumentContentUriUseCase
 import mega.privacy.android.domain.usecase.file.IsContentUriUseCase
 import mega.privacy.android.domain.usecase.login.GetSessionUseCase
-import mega.privacy.android.icon.pack.R as iconPackR
-import mega.privacy.android.shared.resources.R as sharedR
 import java.io.File
 import java.util.zip.ZipFile
 import javax.inject.Inject
@@ -214,9 +214,10 @@ class DefaultTransfersActionGroupFinishNotificationBuilder @Inject constructor(
                     action = Constants.ACTION_LOCATE_DOWNLOADED_FILE
                     putExtra(Constants.INTENT_EXTRA_IS_OFFLINE_PATH, isOfflineDownload)
                     putExtra(FileStorageActivity.EXTRA_PATH, actionGroup.destination)
-                    actionGroup.singleFileName?.let {
-                        putExtra(FileStorageActivity.EXTRA_FILE_NAME, it)
-                    }
+                    putStringArrayListExtra(
+                        FileStorageActivity.EXTRA_FILE_NAMES,
+                        ArrayList(actionGroup.fileNames)
+                    )
                 }
             }
 
@@ -224,8 +225,8 @@ class DefaultTransfersActionGroupFinishNotificationBuilder @Inject constructor(
                 Intent(context, FileStorageActivity::class.java).apply {
                     action = FileStorageActivity.Mode.BROWSE_FILES.action
                     putExtra(FileStorageActivity.EXTRA_PATH, actionGroup.destination)
-                    intent.getStringExtra(FileStorageActivity.EXTRA_FILE_NAME)?.let {
-                        putExtra(FileStorageActivity.EXTRA_FILE_NAME, it)
+                    intent.getStringArrayListExtra(FileStorageActivity.EXTRA_FILE_NAMES)?.let {
+                        putStringArrayListExtra(FileStorageActivity.EXTRA_FILE_NAMES, it)
                     }
                 }
             }

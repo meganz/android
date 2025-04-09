@@ -93,8 +93,8 @@ class ManagerRedirectIntentMapper @Inject constructor(private val activity: Acti
                     intent.getStringExtra(FileStorageActivity.EXTRA_PATH)?.let {
                         putExtra(FileStorageActivity.EXTRA_PATH, it)
                     }
-                    intent.getStringExtra(FileStorageActivity.EXTRA_FILE_NAME)?.let {
-                        putExtra(FileStorageActivity.EXTRA_FILE_NAME, it)
+                    intent.getStringArrayListExtra(FileStorageActivity.EXTRA_FILE_NAMES)?.let {
+                        putStringArrayListExtra(FileStorageActivity.EXTRA_FILE_NAMES, it)
                     }
                 }
 

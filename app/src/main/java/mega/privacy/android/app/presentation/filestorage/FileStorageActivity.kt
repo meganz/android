@@ -199,7 +199,7 @@ class FileStorageActivity : PasscodeActivity(), Scrollable {
                     viewModel.setRootPath(
                         uriPath = UriPath(extraPath),
                         updateStorageType = mode == Mode.BROWSE_FILES,
-                        highlightFileName = it.getString(EXTRA_FILE_NAME)
+                        highlightFileName = it.getStringArrayList(EXTRA_FILE_NAMES)?.firstOrNull()
                     )
                 }
             }
@@ -681,7 +681,7 @@ class FileStorageActivity : PasscodeActivity(), Scrollable {
         const val EXTRA_DOCUMENT_HASHES: String = "document_hash"
         const val EXTRA_SAVE_RECOVERY_KEY: String = "save_recovery_key"
         const val EXTRA_PATH: String = "filepath"
-        const val EXTRA_FILE_NAME: String = "filename"
+        const val EXTRA_FILE_NAMES: String = "filename"
         const val EXTRA_IS_FOLDER_IN_SD_CARD: String = "is_folder_in_sd_card"
         const val EXTRA_PROMPT: String = "prompt"
     }

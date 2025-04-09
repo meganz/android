@@ -2,6 +2,7 @@
 
 package mega.privacy.android.app.main
 
+import mega.privacy.android.shared.resources.R as sharedR
 import android.Manifest
 import android.annotation.SuppressLint
 import android.app.Activity
@@ -321,7 +322,6 @@ import mega.privacy.android.navigation.settings.arguments.TargetPreference
 import mega.privacy.android.shared.original.core.ui.controls.sheets.BottomSheet
 import mega.privacy.android.shared.original.core.ui.controls.widgets.setTransfersWidgetContent
 import mega.privacy.android.shared.original.core.ui.theme.OriginalTheme
-import mega.privacy.android.shared.resources.R as sharedR
 import mega.privacy.mobile.analytics.event.ArchivedChatsMenuItemEvent
 import mega.privacy.mobile.analytics.event.ChatRoomDNDMenuItemEvent
 import mega.privacy.mobile.analytics.event.ChatRoomsBottomNavigationItemEvent
@@ -5868,8 +5868,8 @@ class ManagerActivity : PasscodeActivity(), NavigationView.OnNavigationItemSelec
             Intent(this, FileStorageActivity::class.java).apply {
                 action = FileStorageActivity.Mode.BROWSE_FILES.action
                 putExtra(FileStorageActivity.EXTRA_PATH, path)
-                intent.getStringExtra(FileStorageActivity.EXTRA_FILE_NAME)?.let {
-                    putExtra(FileStorageActivity.EXTRA_FILE_NAME, it)
+                intent.getStringArrayListExtra(FileStorageActivity.EXTRA_FILE_NAMES)?.let {
+                    putStringArrayListExtra(FileStorageActivity.EXTRA_FILE_NAMES, it)
                 }
                 startActivity(this)
             }
@@ -6903,7 +6903,10 @@ class ManagerActivity : PasscodeActivity(), NavigationView.OnNavigationItemSelec
                         val intent = Intent(this, FileStorageActivity::class.java)
                         intent.action = FileStorageActivity.Mode.BROWSE_FILES.action
                         intent.putExtra(FileStorageActivity.EXTRA_PATH, file.path)
-                        intent.putExtra(FileStorageActivity.EXTRA_FILE_NAME, transfer.fileName)
+                        intent.putStringArrayListExtra(
+                            FileStorageActivity.EXTRA_FILE_NAMES,
+                            arrayListOf(transfer.fileName)
+                        )
                         startActivity(intent)
                     }
 
