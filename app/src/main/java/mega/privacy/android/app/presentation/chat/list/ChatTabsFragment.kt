@@ -118,8 +118,6 @@ class ChatTabsFragment : Fragment() {
     private var archivedMenuItem: MenuItem? = null
     private var searchMenuItem: MenuItem? = null
 
-    private var currentTab: ChatTab = ChatTab.CHATS
-
     private val viewModel by viewModels<ChatTabsViewModel>()
     private val scheduledMeetingManagementViewModel by viewModels<ScheduledMeetingManagementViewModel>()
     private val noteToSelfChatViewModel by viewModels<NoteToSelfChatViewModel>()
@@ -266,24 +264,17 @@ class ChatTabsFragment : Fragment() {
         }
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
-        viewLifecycleOwner.collectFlow(noteToSelfChatViewModel.state.map { it.noteToSelfChatRoom }
-            .distinctUntilChanged()) {
-            it?.also {
-                noteToSelfChatViewModel.getNoteToSelfPreference()
+        (activity as? NavigationDrawerManager)?.addDrawerListener(drawerListener)
+        view.post {
+            (activity as? ManagerActivity?)?.showHideBottomNavigationView(false)
+            (activity as? ManagerActivity?)?.invalidateOptionsMenu()
+            (activity as? ManagerActivity?)?.findViewById<View>(R.id.toolbar)?.setOnClickListener {
+                ChatStatusDialogFragment().show(childFragmentManager, ChatStatusDialogFragment.TAG)
             }
+            setupMenu()
         }
 
-        viewLifecycleOwner.collectFlow(noteToSelfChatViewModel.state.map { it.isNoteToSelfChatEmpty }
-            .distinctUntilChanged()) {
-            searchMenuItem?.isVisible = !it && !viewModel.getState().value.isEmptyChats
-
-        }
-
-        viewLifecycleOwner.collectFlow(viewModel.getState().map { it.isEmptyChats }
-            .distinctUntilChanged()) {
-            searchMenuItem?.isVisible =
-                !it && !noteToSelfChatViewModel.state.value.isNoteToSelfChatEmpty
-        }
+        collectFlows()
 
         viewLifecycleOwner.collectFlow(viewModel.getState(), Lifecycle.State.RESUMED) { state ->
             if (state.selectedIds.isNotEmpty()) {
@@ -336,14 +327,34 @@ class ChatTabsFragment : Fragment() {
             }
             archivedMenuItem?.isVisible = state.hasArchivedChats
         }
-        (activity as? NavigationDrawerManager)?.addDrawerListener(drawerListener)
-        view.post {
-            (activity as? ManagerActivity?)?.showHideBottomNavigationView(false)
-            (activity as? ManagerActivity?)?.invalidateOptionsMenu()
-            (activity as? ManagerActivity?)?.findViewById<View>(R.id.toolbar)?.setOnClickListener {
-                ChatStatusDialogFragment().show(childFragmentManager, ChatStatusDialogFragment.TAG)
+    }
+
+    private fun collectFlows() {
+        viewLifecycleOwner.collectFlow(noteToSelfChatViewModel.state.map { it.noteToSelfChatRoom }
+            .distinctUntilChanged()) {
+            it?.also {
+                noteToSelfChatViewModel.getNoteToSelfPreference()
             }
-            setupMenu()
+        }
+
+        viewLifecycleOwner.collectFlow(noteToSelfChatViewModel.state.map { it.isNoteToSelfChatEmpty }
+            .distinctUntilChanged()) {
+            checkSearchVisibility(isNoteToSelfChatEmpty = it)
+        }
+
+        viewLifecycleOwner.collectFlow(viewModel.getState().map { it.onlyNoteToSelfChat }
+            .distinctUntilChanged()) {
+            checkSearchVisibility(onlyNoteToSelfChat = it)
+        }
+
+        viewLifecycleOwner.collectFlow(viewModel.getState().map { it.isEmptyChatsOrMeetings }
+            .distinctUntilChanged()) {
+            checkSearchVisibility(isEmptyChatsOrMeetings = it)
+        }
+
+        viewLifecycleOwner.collectFlow(viewModel.getState().map { it.areChatsOrMeetingLoading }
+            .distinctUntilChanged()) {
+            checkSearchVisibility(areChatsOrMeetingLoading = it)
         }
     }
 
@@ -382,15 +393,28 @@ class ChatTabsFragment : Fragment() {
         super.onDestroyView()
     }
 
+    /**
+     * Check search menu item visibility
+     */
+    private fun checkSearchVisibility(
+        areChatsOrMeetingLoading: Boolean = viewModel.getState().value.areChatsOrMeetingLoading,
+        isEmptyChatsOrMeetings: Boolean = viewModel.getState().value.isEmptyChatsOrMeetings,
+        onlyNoteToSelfChat: Boolean = viewModel.getState().value.onlyNoteToSelfChat,
+        isNoteToSelfChatEmpty: Boolean = noteToSelfChatViewModel.state.value.isNoteToSelfChatEmpty,
+    ) {
+        searchMenuItem?.isVisible =
+            !areChatsOrMeetingLoading && !isEmptyChatsOrMeetings && (!onlyNoteToSelfChat || !isNoteToSelfChatEmpty)
+    }
+
     private fun setupMenu() {
         activity?.addMenuProvider(object : MenuProvider {
             override fun onCreateMenu(menu: Menu, menuInflater: MenuInflater) {
                 menuInflater.inflate(R.menu.fragment_chat_tabs, menu)
                 searchMenuItem = menu.findItem(R.id.menu_search)?.also {
                     it.setupSearchView(viewModel::setSearchQuery)
-                    it.isVisible =
-                        !viewModel.getState().value.isEmptyChats && !noteToSelfChatViewModel.state.value.isNoteToSelfChatEmpty
                 }
+
+                checkSearchVisibility()
 
                 archivedMenuItem = menu.findItem(R.id.action_menu_archived)?.also {
                     it.isVisible = viewModel.getState().value.hasArchivedChats
@@ -429,26 +453,19 @@ class ChatTabsFragment : Fragment() {
     }
 
     private fun onTabSelected(selectedTab: ChatTab) {
-        currentTab = selectedTab
-
+        viewModel.setTabSelected(selectedTab)
         viewModel.clearSelection()
         viewModel.clearSearchQuery()
         activity?.invalidateMenu()
         view?.hideKeyboard()
 
-        if (currentTab == ChatTab.CHATS) {
+        if (selectedTab == ChatTab.CHATS) {
             Analytics.tracker.trackEvent(ChatsTabEvent)
         } else {
             viewModel.requestMeetings()
             Analytics.tracker.trackEvent(MeetingsTabEvent)
         }
     }
-
-    /**
-     * Check if meeting tab is shown
-     */
-    private fun isMeetingTabShown(): Boolean =
-        currentTab == ChatTab.MEETINGS
 
     /**
      * On create meeting
@@ -523,7 +540,7 @@ class ChatTabsFragment : Fragment() {
     }
 
     private fun startChatAction(isFabClicked: Boolean) {
-        if (isMeetingTabShown()) {
+        if (viewModel.isMeetingTabShown()) {
             if (isFabClicked) {
                 Analytics.tracker.trackEvent(ChatTabFABPressedEvent)
                 MeetingBottomSheetDialogFragment.newInstance(true).apply {
@@ -562,7 +579,7 @@ class ChatTabsFragment : Fragment() {
 
             override fun onPrepareActionMode(mode: ActionMode, menu: Menu): Boolean {
                 val currentState = viewModel.getState().value
-                val currentItems = if (!isMeetingTabShown()) {
+                val currentItems = if (!viewModel.isMeetingTabShown()) {
                     currentState.chats
                 } else {
                     currentState.meetings
@@ -590,7 +607,7 @@ class ChatTabsFragment : Fragment() {
             override fun onActionItemClicked(mode: ActionMode, item: MenuItem): Boolean =
                 when (item.itemId) {
                     R.id.menu_chat_select_all -> {
-                        val allItems = if (!isMeetingTabShown()) {
+                        val allItems = if (!viewModel.isMeetingTabShown()) {
                             viewModel.getState().value.chats.map(ChatRoomItem::chatId)
                         } else {
                             viewModel.getState().value.meetings.map(ChatRoomItem::chatId)

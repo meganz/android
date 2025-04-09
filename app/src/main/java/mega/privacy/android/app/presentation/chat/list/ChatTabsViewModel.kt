@@ -63,6 +63,7 @@ import nz.mega.sdk.MegaChatError
 import timber.log.Timber
 import java.util.concurrent.TimeUnit
 import mega.privacy.android.shared.resources.R as sharedR
+import mega.privacy.android.app.presentation.chat.list.model.ChatTab
 import javax.inject.Inject
 
 /**
@@ -212,7 +213,10 @@ class ChatTabsViewModel @Inject constructor(
                     state.update {
                         it.copy(
                             areChatsLoading = false,
-                            chats = items
+                            chats = items,
+                            onlyNoteToSelfChat = items.size == 1 && items.first() is ChatRoomItem.NoteToSelfChatRoomItem,
+                            areChatsOrMeetingLoading = if (it.currentTab == ChatTab.CHATS) false else it.areChatsOrMeetingLoading,
+                            isEmptyChatsOrMeetings = if (it.currentTab == ChatTab.CHATS) it.noChats else it.isEmptyChatsOrMeetings
                         )
                     }
                 }
@@ -239,7 +243,9 @@ class ChatTabsViewModel @Inject constructor(
                         state.update {
                             it.copy(
                                 areMeetingsLoading = false,
-                                meetings = items
+                                meetings = items,
+                                areChatsOrMeetingLoading = if (it.currentTab == ChatTab.MEETINGS) false else it.areChatsOrMeetingLoading,
+                                isEmptyChatsOrMeetings = if (it.currentTab == ChatTab.MEETINGS) it.noMeetings else it.isEmptyChatsOrMeetings
                             )
                         }
                     }
@@ -601,6 +607,27 @@ class ChatTabsViewModel @Inject constructor(
     fun clearSelection() {
         state.update { it.copy(selectedIds = emptyList()) }
     }
+
+    /**
+     * Set tab selected
+     *
+     * @param selectedTab   [ChatTab]
+     */
+    fun setTabSelected(selectedTab: ChatTab) {
+        state.update {
+            it.copy(
+                currentTab = selectedTab,
+                areChatsOrMeetingLoading = if (it.currentTab == ChatTab.CHATS) it.areChatsLoading else it.areMeetingsLoading,
+                isEmptyChatsOrMeetings = if (it.currentTab == ChatTab.CHATS) it.noChats else it.noMeetings
+            )
+        }
+    }
+
+    /**
+     * Check if meeting tab is shown
+     */
+    fun isMeetingTabShown(): Boolean = state.value.currentTab == ChatTab.MEETINGS
+
 
     /**
      * Set chat search query

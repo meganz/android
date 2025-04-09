@@ -47,11 +47,22 @@ data class ChatsTabState(
     val showForceUpdateDialog: Boolean = false,
     val hasArchivedChats: Boolean = false,
     val hasAnyContact: Boolean = false,
+    val currentTab: ChatTab = ChatTab.CHATS,
+    val onlyNoteToSelfChat: Boolean = false,
+    val areChatsOrMeetingLoading: Boolean = true,
+    val isEmptyChatsOrMeetings: Boolean = false
+
 ) {
     /**
-     * Is empty chats
+     * Check if the chats list is empty
      */
-    val isEmptyChats
-        get() = chats.isEmpty() || areChatsLoading
+    val noChats
+        get() = chats.isEmpty()
+
+    /**
+     * Check if the meeting list is empty
+     */
+    val noMeetings
+        get() = meetings.isEmpty()
 }
 

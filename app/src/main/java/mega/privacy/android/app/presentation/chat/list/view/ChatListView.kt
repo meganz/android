@@ -395,29 +395,31 @@ private fun EmptyView(
             modifier = Modifier.padding(top = 20.dp, start = 50.dp, end = 50.dp)
         )
 
-        OrientationSwapper {
-            buttonResource?.let {
-                RaisedDefaultMegaButton(
-                    textId = buttonResource,
-                    onClick = onEmptyButtonClick,
-                    modifier = Modifier
-                        .padding(vertical = 12.dp)
-                        .align(Alignment.CenterHorizontally)
-                )
-            }
+        if (!showNoResultState) {
+            OrientationSwapper {
+                buttonResource?.let {
+                    RaisedDefaultMegaButton(
+                        textId = buttonResource,
+                        onClick = onEmptyButtonClick,
+                        modifier = Modifier
+                            .padding(vertical = 12.dp)
+                            .align(Alignment.CenterHorizontally)
+                    )
+                }
 
-            if (isMeetingView) {
-                OutlinedWithoutBackgroundMegaButton(
-                    modifier = Modifier
-                        .padding(start = 20.dp, end = 20.dp)
-                        .align(Alignment.CenterHorizontally),
-                    contentPadding = PaddingValues(horizontal = 16.dp, vertical = 8.dp),
-                    text = stringResource(id = R.string.chat_schedule_meeting),
-                    onClick = onScheduleMeeting,
-                    rounded = false,
-                    enabled = true,
-                    iconId = null
-                )
+                if (isMeetingView) {
+                    OutlinedWithoutBackgroundMegaButton(
+                        modifier = Modifier
+                            .padding(start = 20.dp, end = 20.dp)
+                            .align(Alignment.CenterHorizontally),
+                        contentPadding = PaddingValues(horizontal = 16.dp, vertical = 8.dp),
+                        text = stringResource(id = R.string.chat_schedule_meeting),
+                        onClick = onScheduleMeeting,
+                        rounded = false,
+                        enabled = true,
+                        iconId = null
+                    )
+                }
             }
         }
     }

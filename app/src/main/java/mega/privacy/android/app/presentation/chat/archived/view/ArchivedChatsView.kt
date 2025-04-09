@@ -70,7 +70,8 @@ fun ArchivedChatsView(
     var showElevation by remember { mutableStateOf(false) }
     val hideSheet = { scope.launch { sheetState.hide() } }
 
-    val showSearchButton = !state.items.isEmpty() && !noteToSelfState.isNoteToSelfChatEmpty
+    val showSearchButton =
+        !state.noChats && (!state.onlyNoteToSelfChat || !noteToSelfState.isNoteToSelfChatEmpty)
 
     ModalBottomSheetLayout(
         modifier = Modifier.systemBarsPadding(),
