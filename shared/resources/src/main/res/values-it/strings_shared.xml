@@ -942,7 +942,7 @@
     <!-- Generic settings label text -->
     <string name="general_settings">Impostazioni</string>
     <!-- Ad settings label in the cookie settings page -->
-    <string name="settings_cookie_settings_label_ad_settings">Ad settings</string>
+    <string name="settings_cookie_settings_label_ad_settings">Impostazioni degli annunci</string>
     <!-- Ads personalization label in the cookie settings page -->
     <string name="settings_cookie_settings_label_ads_personalization">Ads personalisation</string>
     <!-- Cookie settings title in the cookie settings page -->
@@ -1073,5 +1073,13 @@
     <!--Sign up page text to ask the user to login if they already have a MEGA account-->
     <string name="sign_up_already_have_account_login_link_text">Hai già un account MEGA? [A]Login[/A]</string>
     <!-- Text shown in the fake preview screen -->
-    <string name="transfers_fake_preview_text">Loading file</string>
+    <string name="transfers_fake_preview_text">Loading file&#8230;</string>
+    <!-- Title or a warning, related to cancel a preview download, asking for confirmation before proceeding. -->
+    <string name="transfers_cancel_preview_download_warning_title">Cancel preview?</string>
+    <!-- Text or a warning, related to cancel a preview download, asking for confirmation before proceeding. -->
+    <string name="transfers_cancel_preview_download_warning_text">You will no longer be able to preview this file</string>
+    <!-- Warning text informing that a file preview failed to load. -->
+    <string name="transfers_fake_preview_screen_general_error">Preview failed to load, try again.</string>
+    <!-- Warning shown after trying to cancel a download, but the request failed -->
+    <string name="transfers_error_cancelling_preview_download">Something went wrong. Preview was not cancelled. See notification for details.</string>
 </resources>

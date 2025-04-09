@@ -1057,7 +1057,7 @@
     <!--Sign up page text to ask the user to login if they already have a MEGA account-->
     <string name="sign_up_already_have_account_login_link_text">Already have a MEGA account? [A]Log in[/A]</string>
     <!-- Text shown in the fake preview screen -->
-    <string name="transfers_fake_preview_text">Loading file</string>
+    <string name="transfers_fake_preview_text">Loading file&#8230;</string>
     <!-- Title or a warning, related to cancel a preview download, asking for confirmation before proceeding. -->
     <string name="transfers_cancel_preview_download_warning_title">Cancel preview?</string>
     <!-- Text or a warning, related to cancel a preview download, asking for confirmation before proceeding. -->
