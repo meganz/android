@@ -905,7 +905,7 @@
     <!--Message to be shown to the user when they entered an incorrect verification code-->
     <string name="multi_factor_auth_login_verification_input_error_text">Неверный код подтверждения</string>
     <!-- Snackbar text to inform the user that preview may take some time because it needs to be downloaded -->
-    <string name="transfers_preview_slow_snackbar">Готовим файл для предварительного просмотра. Подробности см. в уведомлении.</string>
+    <string name="transfers_preview_slow_snackbar">Готовим файл для предварительного просмотра. Подробности в уведомлении.</string>
     <!-- Notification text for preview downloads.  Please do not modify the %s placeholder as it will be replaced by the name of the file to be donwloaded -->
     <string name="transfers_notification_downloading_preview">Подготовка %1$s для просмотра</string>
     <!-- Notification text for preview downloads, paused state.  Please do not modify the %s placeholder as it will be replaced by the name of the file to be donwloaded -->
@@ -1093,5 +1093,13 @@
     <!--Sign up page text to ask the user to login if they already have a MEGA account-->
     <string name="sign_up_already_have_account_login_link_text">Уже есть аккаунт MEGA? [A]Войти[/A]</string>
     <!-- Text shown in the fake preview screen -->
-    <string name="transfers_fake_preview_text">Loading file</string>
+    <string name="transfers_fake_preview_text">Загрузка файла&#8230;</string>
+    <!-- Title or a warning, related to cancel a preview download, asking for confirmation before proceeding. -->
+    <string name="transfers_cancel_preview_download_warning_title">Отменить предварительный просмотр?</string>
+    <!-- Text or a warning, related to cancel a preview download, asking for confirmation before proceeding. -->
+    <string name="transfers_cancel_preview_download_warning_text">Вы не сможете просмотреть этот файл</string>
+    <!-- Warning text informing that a file preview failed to load. -->
+    <string name="transfers_fake_preview_screen_general_error">Не удалось загрузить, попробуйте ещё раз.</string>
+    <!-- Warning shown after trying to cancel a download, but the request failed -->
+    <string name="transfers_error_cancelling_preview_download">Что-то пошло не так. Предварительный просмотр не был отменён. Подробности в уведомлении.</string>
 </resources>

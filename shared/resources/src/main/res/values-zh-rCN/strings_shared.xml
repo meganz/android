@@ -1039,5 +1039,13 @@
     <!--Sign up page text to ask the user to login if they already have a MEGA account-->
     <string name="sign_up_already_have_account_login_link_text">已经有MEGA帐户？[A]登入[/A]</string>
     <!-- Text shown in the fake preview screen -->
-    <string name="transfers_fake_preview_text">Loading file</string>
+    <string name="transfers_fake_preview_text">正在加载文件...</string>
+    <!-- Title or a warning, related to cancel a preview download, asking for confirmation before proceeding. -->
+    <string name="transfers_cancel_preview_download_warning_title">取消预览？</string>
+    <!-- Text or a warning, related to cancel a preview download, asking for confirmation before proceeding. -->
+    <string name="transfers_cancel_preview_download_warning_text">您将无法再预览此文件</string>
+    <!-- Warning text informing that a file preview failed to load. -->
+    <string name="transfers_fake_preview_screen_general_error">预览加载失败，请重试。</string>
+    <!-- Warning shown after trying to cancel a download, but the request failed -->
+    <string name="transfers_error_cancelling_preview_download">出了点问题。预览未取消。详情请参阅通知。</string>
 </resources>
