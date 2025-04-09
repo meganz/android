@@ -47,9 +47,9 @@ class PhotoBottomSheetDialogFragment : BaseBottomSheetDialogFragment() {
                     setStateBottomSheetBehaviorHidden()
                 }
 
-                binding.deleteSeparator.isVisible = true
+                binding.deleteSeparator.root.isVisible = true
             } else {
-                binding.deleteSeparator.isVisible = false
+                binding.deleteSeparator.root.isVisible = false
             }
         }
 
