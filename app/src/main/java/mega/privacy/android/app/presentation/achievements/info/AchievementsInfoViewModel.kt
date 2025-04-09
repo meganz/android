@@ -22,24 +22,14 @@ import javax.inject.Inject
  * ViewModel for AchievementsInfoScreen
  */
 @HiltViewModel
-class AchievementsInfoViewModel(
+class AchievementsInfoViewModel @Inject constructor(
+    savedStateHandle: SavedStateHandle,
     private val getAccountAchievementsOverviewUseCase: GetAccountAchievementsOverviewUseCase,
     private val numberOfDaysMapper: NumberOfDaysMapper,
-    achievementInfoArgs: AchievementMain,
 ) : ViewModel() {
+    private val achievementInfoArgs = savedStateHandle.toRoute<AchievementMain>()
     private val achievementType = achievementInfoArgs.achievementType
     private val _uiState = MutableStateFlow(AchievementsInfoUIState())
-
-    @Inject
-    constructor(
-        savedStateHandle: SavedStateHandle,
-        getAccountAchievementsOverviewUseCase: GetAccountAchievementsOverviewUseCase,
-        numberOfDaysMapper: NumberOfDaysMapper,
-    ) : this(
-        getAccountAchievementsOverviewUseCase,
-        numberOfDaysMapper,
-        savedStateHandle.toRoute<AchievementMain>(),
-    )
 
     /**
      * Flow of [AchievementsInfoUIState] UI State

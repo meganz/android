@@ -22,20 +22,11 @@ import javax.inject.Inject
  * ViewModel for InviteFriendsScreen
  */
 @HiltViewModel
-class InviteFriendsViewModel(
+class InviteFriendsViewModel @Inject constructor(
+    savedStateHandle: SavedStateHandle,
     private val getAccountAchievementsOverviewUseCase: GetAccountAchievementsOverviewUseCase,
-    private val inviteFriendsArgs: InviteFriends,
 ) : ViewModel() {
-
-    @Inject
-    constructor(
-        savedStateHandle: SavedStateHandle,
-        getAccountAchievementsOverviewUseCase: GetAccountAchievementsOverviewUseCase,
-    ) : this(
-        getAccountAchievementsOverviewUseCase,
-        savedStateHandle.toRoute<InviteFriends>(),
-    )
-
+    private val inviteFriendsArgs = savedStateHandle.toRoute<InviteFriends>()
     private val _uiState = MutableStateFlow(InviteFriendsUIState())
 
     /**
