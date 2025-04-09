@@ -6,7 +6,6 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.grid.GridCells
 import androidx.compose.foundation.lazy.grid.GridItemSpan
 import androidx.compose.foundation.lazy.grid.LazyGridState
-import androidx.compose.foundation.lazy.grid.LazyVerticalGrid
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.ExperimentalComposeUiApi
 import androidx.compose.ui.Modifier
@@ -26,6 +25,7 @@ import mega.privacy.android.domain.entity.node.TypedFolderNode
 import mega.privacy.android.domain.entity.node.TypedNode
 import mega.privacy.android.domain.entity.node.thumbnail.ThumbnailRequest
 import mega.privacy.android.legacy.core.ui.controls.lists.HeaderViewItem
+import mega.privacy.android.shared.original.core.ui.controls.layouts.FastScrollLazyVerticalGrid
 import mega.privacy.android.shared.original.core.ui.controls.lists.NodeGridViewItem
 
 /**
@@ -70,9 +70,10 @@ fun <T : TypedNode> NodeGridView(
     listContentPadding: PaddingValues = PaddingValues(0.dp),
     nodeSourceType: NodeSourceType = NodeSourceType.CLOUD_DRIVE,
 ) {
-    LazyVerticalGrid(
+    FastScrollLazyVerticalGrid(
         state = gridState,
         columns = GridCells.Fixed(spanCount),
+        totalItems = nodeUIItems.size,
         modifier = modifier
             .padding(horizontal = 4.dp)
             .semantics { testTagsAsResourceId = true },

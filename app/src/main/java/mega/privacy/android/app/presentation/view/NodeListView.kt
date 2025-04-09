@@ -3,7 +3,6 @@ package mega.privacy.android.app.presentation.view
 import androidx.compose.foundation.isSystemInDarkTheme
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.LazyListState
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.ExperimentalComposeUiApi
@@ -33,6 +32,7 @@ import mega.privacy.android.domain.entity.node.thumbnail.ThumbnailRequest
 import mega.privacy.android.legacy.core.ui.controls.lists.HeaderViewItem
 import mega.privacy.android.shared.original.core.ui.controls.dividers.DividerType
 import mega.privacy.android.shared.original.core.ui.controls.dividers.MegaDivider
+import mega.privacy.android.shared.original.core.ui.controls.layouts.FastScrollLazyColumn
 import mega.privacy.android.shared.original.core.ui.controls.lists.NodeListViewItem
 import mega.privacy.android.shared.original.core.ui.controls.text.LongTextBehaviour
 import mega.privacy.android.shared.original.core.ui.preview.CombinedThemePreviews
@@ -83,8 +83,9 @@ fun <T : TypedNode> NodeListView(
     inSelectionMode: Boolean = false,
     nodeSourceType: NodeSourceType = NodeSourceType.CLOUD_DRIVE,
 ) {
-    LazyColumn(
+    FastScrollLazyColumn(
         state = listState,
+        totalItems = nodeUIItemList.size,
         modifier = modifier.semantics { testTagsAsResourceId = true },
         contentPadding = listContentPadding
     ) {

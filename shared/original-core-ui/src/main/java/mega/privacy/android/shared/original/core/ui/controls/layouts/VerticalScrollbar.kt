@@ -51,8 +51,8 @@ internal fun VerticalScrollbar(
 ) = VerticalScrollbar(
     tooltipText = tooltipText,
     state = state,
-    firstVisibleItemIndex = remember { derivedStateOf { state.firstVisibleItemIndex } },
-    lastVisibleItemIndex = remember {
+    firstVisibleItemIndex = remember(state) { derivedStateOf { state.firstVisibleItemIndex } },
+    lastVisibleItemIndex = remember(state) {
         derivedStateOf {
             state.layoutInfo.visibleItemsInfo.lastOrNull()?.index ?: state.firstVisibleItemIndex
         }
@@ -74,8 +74,8 @@ internal fun VerticalScrollbar(
 ) = VerticalScrollbar(
     tooltipText = tooltipText,
     state = state,
-    firstVisibleItemIndex = remember { derivedStateOf { state.firstVisibleItemIndex } },
-    lastVisibleItemIndex = remember {
+    firstVisibleItemIndex = remember(state) { derivedStateOf { state.firstVisibleItemIndex } },
+    lastVisibleItemIndex = remember(state) {
         derivedStateOf {
             state.layoutInfo.visibleItemsInfo.lastOrNull()?.index ?: state.firstVisibleItemIndex
         }
@@ -114,6 +114,7 @@ private fun VerticalScrollbar(
     var thumbPressed by remember { mutableStateOf(false) }
     // scrollableItemsAmount is item count minus visible items, approximately the first visible item when fully scrolled
     val scrollableItemsAmount by remember(
+        state,
         itemCount,
         lastVisibleItemIndex.value,
         firstVisibleItemIndex.value
@@ -124,7 +125,7 @@ private fun VerticalScrollbar(
         }
     }
 
-    val thumbOffset by remember(itemCount) {
+    val thumbOffset by remember(itemCount, state) {
         derivedStateOf {
             val isScrollToEnd =
                 lastVisibleItemIndex.value == itemCount - 1 || scrollableItemsAmount == 0
@@ -137,7 +138,7 @@ private fun VerticalScrollbar(
         }
     }
 
-    val thumbVisible by remember(itemCount) {
+    val thumbVisible by remember(itemCount, state) {
         derivedStateOf {
             itemCount > 0 && state.isScrollInProgress || thumbPressed
         }

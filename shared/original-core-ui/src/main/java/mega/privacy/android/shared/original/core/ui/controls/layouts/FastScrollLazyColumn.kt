@@ -25,12 +25,12 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.unit.dp
+import mega.android.core.ui.theme.values.TextColor
 import mega.privacy.android.shared.original.core.ui.controls.buttons.OutlinedMegaButton
 import mega.privacy.android.shared.original.core.ui.controls.text.MegaText
 import mega.privacy.android.shared.original.core.ui.preview.CombinedThemePreviews
 import mega.privacy.android.shared.original.core.ui.theme.MegaOriginalTheme
 import mega.privacy.android.shared.original.core.ui.theme.OriginalThemeForPreviews
-import mega.android.core.ui.theme.values.TextColor
 
 /**
  * A LazyColumn that shows a vertical scrollbar with a thumb that allows fast scrolling of the list.
@@ -50,8 +50,8 @@ import mega.android.core.ui.theme.values.TextColor
 @Composable
 fun FastScrollLazyColumn(
     totalItems: Int,
-    tooltipText: (currentIndex: Int) -> String,
     modifier: Modifier = Modifier,
+    tooltipText: ((currentIndex: Int) -> String)? = null,
     state: LazyListState = rememberLazyListState(),
     contentPadding: PaddingValues = PaddingValues(0.dp),
     reverseLayout: Boolean = false,
