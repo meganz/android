@@ -10,8 +10,6 @@ import mega.privacy.android.domain.usecase.business.BroadcastBusinessAccountExpi
 import mega.privacy.android.domain.usecase.transfers.downloads.HandleAvailableOfflineEventUseCase
 import mega.privacy.android.domain.usecase.transfers.overquota.BroadcastStorageOverQuotaUseCase
 import mega.privacy.android.domain.usecase.transfers.overquota.BroadcastTransferOverQuotaUseCase
-import mega.privacy.android.domain.usecase.transfers.sd.GetTransferDestinationUriUseCase
-import mega.privacy.android.domain.usecase.transfers.sd.HandleSDCardEventUseCase
 import javax.inject.Inject
 
 /**
@@ -25,8 +23,6 @@ class HandleTransferEventUseCase @Inject internal constructor(
     private val broadcastTransferOverQuotaUseCase: BroadcastTransferOverQuotaUseCase,
     private val broadcastStorageOverQuotaUseCase: BroadcastStorageOverQuotaUseCase,
     private val handleAvailableOfflineEventUseCase: HandleAvailableOfflineEventUseCase,
-    private val handleSDCardEventUseCase: HandleSDCardEventUseCase,
-    private val getTransferDestinationUriUseCase: GetTransferDestinationUriUseCase,
 ) : IHandleTransferEventUseCase {
 
     /**
@@ -36,18 +32,11 @@ class HandleTransferEventUseCase @Inject internal constructor(
     override suspend operator fun invoke(vararg events: TransferEvent) {
         val transferEvents = events.asList().takeIf { it.isNotEmpty() } ?: return
 
-        val eventsWithDestinationMap = transferEvents.associateWith { event ->
-            if (event is TransferEvent.TransferStartEvent || event is TransferEvent.TransferFinishEvent) {
-                getTransferDestinationUriUseCase(event.transfer)
-            } else null
-        }
-
         checkOverQuota(transferEvents)
         checkBusinessAccountExpired(transferEvents)
 
         transferEvents.forEach { event ->
             handleAvailableOfflineEventUseCase(event)
-            handleSDCardEventUseCase(event, eventsWithDestinationMap[event])
         }
 
         updateInProgressTransfers(transferEvents)
@@ -57,7 +46,7 @@ class HandleTransferEventUseCase @Inject internal constructor(
         val completedEventsMap = transferEvents
             .filterNot { it.transfer.isFolderTransfer || it.transfer.isPreviewDownload() }
             .filterIsInstance<TransferEvent.TransferFinishEvent>()
-            .associateWith { eventsWithDestinationMap[it]?.toString() }
+
         if (completedEventsMap.isNotEmpty()) {
             transferRepository.addCompletedTransfers(completedEventsMap)
         }

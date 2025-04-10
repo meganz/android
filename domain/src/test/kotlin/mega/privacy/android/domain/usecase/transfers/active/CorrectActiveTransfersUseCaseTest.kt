@@ -13,7 +13,6 @@ import mega.privacy.android.domain.entity.transfer.pending.PendingTransferState
 import mega.privacy.android.domain.repository.TransferRepository
 import mega.privacy.android.domain.usecase.transfers.GetInProgressTransfersUseCase
 import mega.privacy.android.domain.usecase.transfers.pending.UpdatePendingTransferStateUseCase
-import mega.privacy.android.domain.usecase.transfers.sd.HandleNotInProgressSDCardActiveTransfersUseCase
 import org.junit.jupiter.api.BeforeAll
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
@@ -41,8 +40,6 @@ internal class CorrectActiveTransfersUseCaseTest {
     private val transferRepository = mock<TransferRepository>()
     private val getInProgressTransfersUseCase = mock<GetInProgressTransfersUseCase>()
     private val updatePendingTransferStateUseCase = mock<UpdatePendingTransferStateUseCase>()
-    private val handleNotInProgressSDCardActiveTransfersUseCase =
-        mock<HandleNotInProgressSDCardActiveTransfersUseCase>()
 
     private val mockedActiveTransfers = (0L..10L).map { mock<ActiveTransfer>() }
     private val mockedTransfers = (0L..10L).map { mock<Transfer>() }
@@ -53,7 +50,6 @@ internal class CorrectActiveTransfersUseCaseTest {
             getInProgressTransfersUseCase = getInProgressTransfersUseCase,
             transferRepository = transferRepository,
             updatePendingTransferStateUseCase = updatePendingTransferStateUseCase,
-            handleNotInProgressSDCardActiveTransfersUseCase = handleNotInProgressSDCardActiveTransfersUseCase,
         )
     }
 
@@ -82,24 +78,16 @@ internal class CorrectActiveTransfersUseCaseTest {
             .thenReturn(emptyList())
     }
 
-    private fun stubActiveTransfers(areFinished: Boolean, isSdCardDownload: Boolean = false) {
+    private fun stubActiveTransfers(areFinished: Boolean) {
         mockedActiveTransfers.forEachIndexed { index, activeTransfer ->
             whenever(activeTransfer.uniqueId).thenReturn(index.toLong())
             whenever(activeTransfer.isFinished).thenReturn(areFinished)
-            if (isSdCardDownload) {
-                val data = mock<TransferAppData.SdCardDownload>()
-                whenever(activeTransfer.appData).thenReturn(listOf(data))
-            }
         }
     }
 
-    private fun stubTransfers(isSdCardDownload: Boolean = false) {
+    private fun stubTransfers() {
         mockedTransfers.forEachIndexed { index, transfer ->
             whenever(transfer.uniqueId).thenReturn(index.toLong())
-            if (isSdCardDownload) {
-                val data = mock<TransferAppData.SdCardDownload>()
-                whenever(transfer.appData).thenReturn(listOf(data))
-            }
         }
     }
 
@@ -120,24 +108,6 @@ internal class CorrectActiveTransfersUseCaseTest {
             Truth.assertThat(expected).isNotEmpty()
             underTest(TransferType.GENERAL_UPLOAD)
             verify(transferRepository).setActiveTransferAsCancelledByUniqueId(expected)
-        }
-
-    @Test
-    fun `test that when there are active transfers not finished and not in progress which are SD card, HandleNotInProgressSDCardActiveTransfersUseCase is invoked`() =
-        runTest {
-            stubActiveTransfers(areFinished = false, isSdCardDownload = true)
-            stubTransfers(isSdCardDownload = true)
-            val inProgress = subSetTransfers()
-            val expected = mockedActiveTransfers
-                .filter { it.uniqueId !in inProgress.map { it.uniqueId } }
-
-            whenever(transferRepository.getCurrentActiveTransfersByType(any()))
-                .thenReturn(mockedActiveTransfers)
-            whenever(getInProgressTransfersUseCase()).thenReturn(inProgress)
-
-            underTest(TransferType.DOWNLOAD)
-
-            verify(handleNotInProgressSDCardActiveTransfersUseCase).invoke(expected.associate { it.uniqueId to it.appData })
         }
 
     @Test

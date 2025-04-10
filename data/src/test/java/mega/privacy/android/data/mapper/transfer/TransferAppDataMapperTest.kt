@@ -6,10 +6,9 @@ import mega.privacy.android.data.mapper.transfer.AppDataTypeConstants.CameraUplo
 import mega.privacy.android.data.mapper.transfer.AppDataTypeConstants.ChatDownload
 import mega.privacy.android.data.mapper.transfer.AppDataTypeConstants.ChatUpload
 import mega.privacy.android.data.mapper.transfer.AppDataTypeConstants.GeoLocation
+import mega.privacy.android.data.mapper.transfer.AppDataTypeConstants.OfflineDownload
 import mega.privacy.android.data.mapper.transfer.AppDataTypeConstants.OriginalContentUri
 import mega.privacy.android.data.mapper.transfer.AppDataTypeConstants.PreviewDownload
-import mega.privacy.android.data.mapper.transfer.AppDataTypeConstants.OfflineDownload
-import mega.privacy.android.data.mapper.transfer.AppDataTypeConstants.SDCardDownload
 import mega.privacy.android.data.mapper.transfer.AppDataTypeConstants.TransferGroup
 import mega.privacy.android.data.mapper.transfer.AppDataTypeConstants.VoiceClip
 import mega.privacy.android.data.mapper.transfer.TransferAppDataMapper.Companion.APP_DATA_INDICATOR
@@ -77,31 +76,6 @@ class TransferAppDataMapperTest {
 
     @Nested
     inner class RealParameters {
-
-        @Test
-        fun `test that the sd card paths are mapped correctly when there are - char in the path`() {
-            val raw =
-                "SD_CARD_DOWNLOAD>/storage/48F8-4FB7/Download mega>content://com.android.externalstorage.documents/tree/48F8-4FB7%3ADownload%20mega"
-            val expected = TransferAppData.SdCardDownload(
-                targetPathForSDK = "/storage/48F8-4FB7/Download mega",
-                finalTargetUri = "content://com.android.externalstorage.documents/tree/48F8-4FB7%3ADownload%20mega"
-            )
-            Truth.assertThat(underTest(raw)).containsExactly(expected)
-        }
-
-        @Test
-        fun `test that the sd card paths are mapped correctly when parentPath is received as param`() {
-            val raw =
-                "SD_CARD_DOWNLOAD>/storage/48F8-4FB7/Download mega>content://com.android.externalstorage.documents/tree/48F8-4FB7%3ADownload%20mega"
-            val parentPath = "path/parentPath"
-            val expected = TransferAppData.SdCardDownload(
-                targetPathForSDK = "/storage/48F8-4FB7/Download mega",
-                finalTargetUri = "content://com.android.externalstorage.documents/tree/48F8-4FB7%3ADownload%20mega",
-                parentPath = parentPath
-            )
-            Truth.assertThat(underTest(appDataRaw = raw, parentPath = parentPath))
-                .containsExactly(expected)
-        }
 
         @Test
         fun `test that a chat upload is mapped correctly if the message id is a number`() {
@@ -182,7 +156,6 @@ class TransferAppDataMapperTest {
             "",
             "something wrong",
             generateAppDataString(ChatUpload),
-            "$SDCardDownload$APP_DATA_INDICATOR", //missing fields
         )
 
         internal val correctParameters = listOf(
@@ -192,23 +165,8 @@ class TransferAppDataMapperTest {
                     to listOf(TransferAppData.VoiceClip),
             generateAppDataString(CameraUpload)
                     to listOf(TransferAppData.CameraUpload),
-            generateAppDataString(SDCardDownload, TARGET_PATH, TARGET_URI)
-                    to listOf(
-                TransferAppData.SdCardDownload(
-                    targetPathForSDK = TARGET_PATH,
-                    finalTargetUri = TARGET_URI
-                )
-            ),
             generateAppDataString(BackgroundTransfer)
                     to listOf(TransferAppData.BackgroundTransfer),
-            generateAppDataString(SDCardDownload, TARGET_PATH, TARGET_URI, PARENT_PATH)
-                    to listOf(
-                TransferAppData.SdCardDownload(
-                    targetPathForSDK = TARGET_PATH,
-                    finalTargetUri = TARGET_URI,
-                    parentPath = PARENT_PATH
-                )
-            ),
             generateAppDataString(OriginalContentUri, TARGET_URI)
                     to listOf(TransferAppData.OriginalUriPath(UriPath(TARGET_URI))),
             generateAppDataString(

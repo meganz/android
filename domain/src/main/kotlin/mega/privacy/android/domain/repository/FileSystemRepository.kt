@@ -112,15 +112,6 @@ interface FileSystemRepository {
     suspend fun doesFolderExists(folderPath: String): Boolean
 
     /**
-     * Checks for the Folder existence in the SD Card
-     *
-     * @param uriString The Folder path in the SD Card
-     *
-     * @return true if it exists, and false if otherwise
-     */
-    suspend fun isFolderInSDCardAvailable(uriString: String): Boolean
-
-    /**
      * Checks whether the External Storage Directory exists
      *
      * @return true if it exists, and false if otherwise
@@ -231,32 +222,6 @@ interface FileSystemRepository {
      * Check if file is exists
      */
     suspend fun checkFileExistsByUriPath(uriPath: String?): String?
-
-    /**
-     * @return true if the [localPath] points to a SD card
-     */
-    suspend fun isSDCardPathOrUri(localPath: String): Boolean
-
-    /**
-     * @return true if the [localPath] points to a SD card cache
-     */
-    suspend fun isSDCardCachePath(localPath: String): Boolean
-
-    /**
-     * Moves a [file] to a [destinationUri] on the sd. It first copies the file to the [destinationUri] and then deletes the original one
-     *
-     * @param file the file to be moved
-     * @param destinationUri the target uri where the file will be moved (excluding the name of the file itself)
-     */
-    suspend fun moveFileToSd(file: File, destinationUri: String, subFolders: List<String>): Boolean
-
-    /**
-     * Moves a [directory] to a [destinationUri] on the sd. It first copies the file to the [destinationUri] and then deletes the original one
-     *
-     * @param directory the directory to be moved
-     * @param destinationUri the target uri where the file will be moved (excluding the name of the file itself)
-     */
-    suspend fun moveDirectoryToSd(directory: File, destinationUri: String): Boolean
 
     /**
      * Create new image uri
@@ -495,16 +460,6 @@ interface FileSystemRepository {
         originalUriPath: UriPath,
         newFilename: String,
     ): File
-
-    /**
-     * Gets the length of the file given the content URI.
-     */
-    suspend fun getFileLengthFromSdCardContentUri(fileContentUri: String): Long
-
-    /**
-     * Deletes the file given the content URI.
-     */
-    suspend fun deleteFileFromSdCardContentUri(fileContentUri: String): Boolean
 
     /**
      * Checks if an uri can be read

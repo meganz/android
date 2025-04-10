@@ -4,13 +4,11 @@ import mega.privacy.android.domain.entity.transfer.ActiveTransferTotals
 import mega.privacy.android.domain.entity.transfer.TransferType
 import mega.privacy.android.domain.entity.transfer.isBackgroundTransfer
 import mega.privacy.android.domain.entity.transfer.isPreviewDownload
-import mega.privacy.android.domain.entity.transfer.isSDCardDownload
 import mega.privacy.android.domain.entity.transfer.isVoiceClip
 import mega.privacy.android.domain.entity.transfer.pending.PendingTransferState
 import mega.privacy.android.domain.repository.TransferRepository
 import mega.privacy.android.domain.usecase.transfers.GetInProgressTransfersUseCase
 import mega.privacy.android.domain.usecase.transfers.pending.UpdatePendingTransferStateUseCase
-import mega.privacy.android.domain.usecase.transfers.sd.HandleNotInProgressSDCardActiveTransfersUseCase
 import javax.inject.Inject
 
 /**
@@ -22,7 +20,6 @@ class CorrectActiveTransfersUseCase @Inject constructor(
     private val getInProgressTransfersUseCase: GetInProgressTransfersUseCase,
     private val transferRepository: TransferRepository,
     private val updatePendingTransferStateUseCase: UpdatePendingTransferStateUseCase,
-    private val handleNotInProgressSDCardActiveTransfersUseCase: HandleNotInProgressSDCardActiveTransfersUseCase,
 ) {
     /**
      * Invoke.
@@ -47,7 +44,7 @@ class CorrectActiveTransfersUseCase @Inject constructor(
         //set not-in-progress active transfers as finished, this can happen if we missed a finish event from SDK
         val notInProgressNoSDCardActiveTransfersUniqueIds = activeTransfers
             .filter { activeTransfer ->
-                !activeTransfer.isFinished && activeTransfer.isSDCardDownload().not()
+                !activeTransfer.isFinished
                         && activeTransfer.uniqueId !in inProgressTransfers.map { it.uniqueId }
             }
             .map {
@@ -59,16 +56,6 @@ class CorrectActiveTransfersUseCase @Inject constructor(
                 setActiveTransferAsCancelledByUniqueId(notInProgressNoSDCardActiveTransfersUniqueIds)
                 removeInProgressTransfers(notInProgressNoSDCardActiveTransfersUniqueIds.toSet())
             }
-        }
-
-        //Handle not-in-progress sd card active transfers
-        val notInProgressSdCardAppDataMap = activeTransfers.filter { activeTransfer ->
-            !activeTransfer.isFinished && activeTransfer.isSDCardDownload()
-                    && !inProgressTransfers.map { it.uniqueId }.contains(activeTransfer.uniqueId)
-        }.associate { activeTransfer -> activeTransfer.uniqueId to activeTransfer.appData }
-
-        if (notInProgressSdCardAppDataMap.isNotEmpty()) {
-            handleNotInProgressSDCardActiveTransfersUseCase(notInProgressSdCardAppDataMap)
         }
 
         //add in-progress active transfers if they are not added, this can happen if we missed a start event from SDK
