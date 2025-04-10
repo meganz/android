@@ -37,10 +37,10 @@ import dagger.hilt.android.AndroidEntryPoint
 import de.palm.composestateevents.EventEffect
 import kotlinx.coroutines.launch
 import mega.privacy.android.app.R
-import mega.privacy.android.app.activities.WebViewActivity
 import mega.privacy.android.app.activities.contract.NameCollisionActivityContract
 import mega.privacy.android.app.arch.extensions.collectFlow
 import mega.privacy.android.app.components.session.SessionContainer
+import mega.privacy.android.app.extensions.launchUrl
 import mega.privacy.android.app.featuretoggle.AppFeatures
 import mega.privacy.android.app.fragments.homepage.SortByHeaderViewModel
 import mega.privacy.android.app.main.ManagerActivity
@@ -278,7 +278,7 @@ class SearchActivity : AppCompatActivity(), MegaSnackbarShower {
                                     .fillMaxWidth(),
                                 viewModel = viewModel,
                                 nodeActionsViewModel = nodeActionsViewModel,
-                                navigateToLink = ::navigateToLink,
+                                navigateToLink = this@SearchActivity::launchUrl,
                                 showSortOrderBottomSheet = ::showSortOrderBottomSheet,
                                 nodeActionHandler = bottomSheetActionHandler,
                                 navHostController = navHostController,
@@ -389,18 +389,6 @@ class SearchActivity : AppCompatActivity(), MegaSnackbarShower {
         collectFlow(sortByHeaderViewModel.orderChangeState) {
             viewModel.onSortOrderChanged()
         }
-    }
-
-    /**
-     * Clicked on link
-     * @param link
-     */
-    private fun navigateToLink(link: String) {
-        val uriUrl = Uri.parse(link)
-        val launchBrowser = Intent(this, WebViewActivity::class.java)
-            .addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP)
-            .setData(uriUrl)
-        startActivity(launchBrowser)
     }
 
     /**
