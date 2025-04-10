@@ -1,8 +1,6 @@
 package mega.privacy.android.app.presentation.rubbishbin
 
 import mega.privacy.android.icon.pack.R as iconPackR
-import android.content.Intent
-import android.net.Uri
 import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.Menu
@@ -30,8 +28,8 @@ import kotlinx.coroutines.flow.distinctUntilChanged
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.sample
 import mega.privacy.android.app.R
-import mega.privacy.android.app.activities.WebViewActivity
 import mega.privacy.android.app.arch.extensions.collectFlow
+import mega.privacy.android.app.extensions.launchUrl
 import mega.privacy.android.app.fragments.homepage.SortByHeaderViewModel
 import mega.privacy.android.app.main.ManagerActivity
 import mega.privacy.android.app.main.controllers.NodeController
@@ -164,8 +162,8 @@ class RubbishBinComposeFragment : Fragment() {
                                     ?: R.string.sortby_name
                             ),
                             emptyState = getEmptyFolderDrawable(uiState.isRubbishBinEmpty),
-                            onLinkClicked = ::navigateToLink,
-                            onDisputeTakeDownClicked = ::navigateToLink,
+                            onLinkClicked = context::launchUrl,
+                            onDisputeTakeDownClicked = context::launchUrl,
                             fileTypeIconMapper = fileTypeIconMapper
                         )
                     }
@@ -395,17 +393,5 @@ class RubbishBinComposeFragment : Fragment() {
         viewLifecycleOwner.collectFlow(sortByHeaderViewModel.orderChangeState) {
             viewModel.onSortOrderChanged()
         }
-    }
-
-    /**
-     * Clicked on link
-     * @param link
-     */
-    private fun navigateToLink(link: String) {
-        val uriUrl = Uri.parse(link)
-        val launchBrowser = Intent(requireContext(), WebViewActivity::class.java)
-            .addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP)
-            .setData(uriUrl)
-        startActivity(launchBrowser)
     }
 }
