@@ -110,9 +110,17 @@ class ActiveTransferDaoTest {
         }
 
     @Test
-    fun test_that_getActiveTransferByTag_returns_the_correct_active_transfer() = runTest {
+    fun test_that_getActiveTransferByUniqueId_returns_the_correct_active_transfer() = runTest {
         entities.forEach { entity ->
             val actual = activeTransferDao.getActiveTransferByUniqueId(entity.uniqueId)
+            assertThat(actual).isEqualTo(entity)
+        }
+    }
+
+    @Test
+    fun test_that_getActiveTransferByTag_returns_the_correct_active_transfer() = runTest {
+        entities.forEach { entity ->
+            val actual = activeTransferDao.getActiveTransferByTag(entity.tag)
             assertThat(actual).isEqualTo(entity)
         }
     }

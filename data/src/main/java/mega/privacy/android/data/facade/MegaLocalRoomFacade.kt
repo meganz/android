@@ -251,6 +251,9 @@ internal class MegaLocalRoomFacade @Inject constructor(
     override suspend fun getActiveTransferByUniqueId(uniqueId: Long) =
         activeTransferDao.get().getActiveTransferByUniqueId(uniqueId)
 
+    override suspend fun getActiveTransferByTag(tag: Int) =
+        activeTransferDao.get().getActiveTransferByTag(tag)
+
     override fun getActiveTransfersByType(transferType: TransferType) =
         activeTransferDao.get().getActiveTransfersByType(transferType)
 

@@ -323,7 +323,15 @@ interface TransferRepository {
     /**
      * Get active transfer by uniqueId
      */
-    suspend fun getActiveTransferByTagUniqueId(uniqueId: Long): ActiveTransfer?
+    suspend fun getActiveTransferByUniqueId(uniqueId: Long): ActiveTransfer?
+
+    /**
+     * Get active transfer by tag
+     *
+     * Make you sure you use this only for getting the parent folder Transfer using
+     * Transfer.folderTransferTag, otherwise it may lead to unexpected results.
+     */
+    suspend fun getActiveTransferByTag(tag: Int): ActiveTransfer?
 
     /**
      * Get active transfers by type

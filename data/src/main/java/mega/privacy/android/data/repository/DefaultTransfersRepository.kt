@@ -544,10 +544,13 @@ internal class DefaultTransfersRepository @Inject constructor(
             workInfos.any { it.state.isFinished }
         }
 
-    override suspend fun getActiveTransferByTagUniqueId(uniqueId: Long) =
-        withContext(ioDispatcher) {
-            megaLocalRoomGateway.getActiveTransferByUniqueId(uniqueId)
-        }
+    override suspend fun getActiveTransferByUniqueId(uniqueId: Long) = withContext(ioDispatcher) {
+        megaLocalRoomGateway.getActiveTransferByUniqueId(uniqueId)
+    }
+
+    override suspend fun getActiveTransferByTag(tag: Int) = withContext(ioDispatcher) {
+        megaLocalRoomGateway.getActiveTransferByTag(tag)
+    }
 
     override fun getActiveTransfersByType(transferType: TransferType) =
         megaLocalRoomGateway
