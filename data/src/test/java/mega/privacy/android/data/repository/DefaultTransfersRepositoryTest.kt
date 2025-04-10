@@ -1147,11 +1147,20 @@ class DefaultTransfersRepositoryTest {
         }
 
         @Test
-        fun `test that getActiveTransferByTag gateway result is returned when getActiveTransferByTag is called`() =
+        fun `test that getActiveTransferByUniqueId gateway result is returned when getActiveTransferByUniqueId is called`() =
             runTest {
                 val expected = mock<ActiveTransfer>()
                 whenever(megaLocalRoomGateway.getActiveTransferByUniqueId(1)).thenReturn(expected)
-                val actual = underTest.getActiveTransferByTagUniqueId(1)
+                val actual = underTest.getActiveTransferByUniqueId(1)
+                assertThat(actual).isEqualTo(expected)
+            }
+
+        @Test
+        fun `test that getActiveTransferByTag gateway result is returned when getActiveTransferByTag is called`() =
+            runTest {
+                val expected = mock<ActiveTransfer>()
+                whenever(megaLocalRoomGateway.getActiveTransferByTag(1)).thenReturn(expected)
+                val actual = underTest.getActiveTransferByTag(1)
                 assertThat(actual).isEqualTo(expected)
             }
 

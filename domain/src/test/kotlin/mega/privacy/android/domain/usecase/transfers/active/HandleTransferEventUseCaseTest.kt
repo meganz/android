@@ -100,7 +100,49 @@ class HandleTransferEventUseCaseTest {
             val parentTransfer = mock<Transfer> {
                 on { it.appData } doReturn listOf(appData)
             }
-            whenever(transferRepository.getTransferByTag(parentTag)) doReturn parentTransfer
+            whenever(transferRepository.getActiveTransferByTag(parentTag)) doReturn parentTransfer
+            val expected = transferEvent.transfer.copy(appData = listOf(appData))
+            underTest.invoke(transferEvent)
+            verify(transferRepository).insertOrUpdateActiveTransfers(eq(listOf(expected)))
+        }
+
+    @ParameterizedTest
+    @MethodSource("provideRecursiveTransferAppData")
+    fun `test that parent group app data is added when child transfer paused event is received`(
+        appData: TransferAppData,
+    ) =
+        runTest {
+            val parentTag = 2
+            val transferEvent = mockTransferEvent<TransferEvent.TransferPaused>(
+                TransferType.DOWNLOAD,
+                1,
+                folderTransferTag = parentTag
+            )
+            val parentTransfer = mock<Transfer> {
+                on { it.appData } doReturn listOf(appData)
+            }
+            whenever(transferRepository.getActiveTransferByTag(parentTag)) doReturn parentTransfer
+            val expected = transferEvent.transfer.copy(appData = listOf(appData))
+            underTest.invoke(transferEvent)
+            verify(transferRepository).insertOrUpdateActiveTransfers(eq(listOf(expected)))
+        }
+
+    @ParameterizedTest
+    @MethodSource("provideRecursiveTransferAppData")
+    fun `test that parent group app data is added when child transfer finish event is received`(
+        appData: TransferAppData,
+    ) =
+        runTest {
+            val parentTag = 2
+            val transferEvent = mockTransferEvent<TransferEvent.TransferFinishEvent>(
+                TransferType.DOWNLOAD,
+                1,
+                folderTransferTag = parentTag
+            )
+            val parentTransfer = mock<Transfer> {
+                on { it.appData } doReturn listOf(appData)
+            }
+            whenever(transferRepository.getActiveTransferByTag(parentTag)) doReturn parentTransfer
             val expected = transferEvent.transfer.copy(appData = listOf(appData))
             underTest.invoke(transferEvent)
             verify(transferRepository).insertOrUpdateActiveTransfers(eq(listOf(expected)))

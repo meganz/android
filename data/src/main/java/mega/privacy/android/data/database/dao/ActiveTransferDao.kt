@@ -15,6 +15,9 @@ internal interface ActiveTransferDao {
     @Query("SELECT * FROM active_transfers WHERE uniqueId = :uniqueId")
     suspend fun getActiveTransferByUniqueId(uniqueId: Long): ActiveTransferEntity?
 
+    @Query("SELECT * FROM active_transfers WHERE tag = :tag")
+    suspend fun getActiveTransferByTag(tag: Int): ActiveTransferEntity?
+
     @Query("SELECT * FROM active_transfers WHERE transfer_type = :transferType")
     fun getActiveTransfersByType(transferType: TransferType): Flow<List<ActiveTransferEntity>>
 
