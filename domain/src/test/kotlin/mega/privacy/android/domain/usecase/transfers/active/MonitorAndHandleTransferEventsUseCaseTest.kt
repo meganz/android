@@ -39,14 +39,12 @@ class MonitorAndHandleTransferEventsUseCaseTest {
     private val monitorTransferEventsUseCase = mock<MonitorTransferEventsUseCase>()
     private val handleTransferEventsUseCases =
         setOf(mock<HandleTransferEventUseCase>(), mock<HandleTransferEventUseCase>())
-    private val transferRepository = mock<TransferRepository>()
 
     @BeforeAll
     fun setup() {
         underTest = MonitorAndHandleTransferEventsUseCase(
             monitorTransferEventsUseCase,
             handleTransferEventsUseCases,
-            transferRepository,
         )
     }
 
@@ -54,12 +52,8 @@ class MonitorAndHandleTransferEventsUseCaseTest {
     fun cleanUp() {
         reset(
             monitorTransferEventsUseCase,
-            transferRepository,
             *handleTransferEventsUseCases.toTypedArray(),
         )
-        whenever(transferRepository.monitorIsDownloadsWorkerFinished()) doReturn flowOf(false)
-        whenever(transferRepository.monitorIsUploadsWorkerFinished()) doReturn flowOf(false)
-        whenever(transferRepository.monitorIsChatUploadsWorkerFinished()) doReturn flowOf(false)
     }
 
     @Test
@@ -110,118 +104,6 @@ class MonitorAndHandleTransferEventsUseCaseTest {
         }
         handleTransferEventsUseCases.forEach {
             verify(it).invoke(transferEvent)
-        }
-    }
-
-    @Nested
-    inner class WorkerStartTests {
-        @ParameterizedTest
-        @EnumSource(TransferType::class, names = ["DOWNLOAD", "GENERAL_UPLOAD", "CHAT_UPLOAD"])
-        fun `test that worker is started when is not running and an event of related type is received`(
-            type: TransferType,
-        ) = runTest {
-            val transferEvent = TransferEvent.TransferUpdateEvent(
-                mock<Transfer> {
-                    on { transferType } doReturn type
-                }
-            )
-            whenever(monitorIsWorkerFinished(type)) doReturn flowOf(true)
-            whenever(monitorTransferEventsUseCase()).thenReturn(
-                flowOf(transferEvent)
-            )
-            underTest().test {
-                awaitItem()
-                awaitComplete()
-            }
-            verify(type)
-        }
-
-        @ParameterizedTest
-        @EnumSource(TransferType::class, names = ["DOWNLOAD", "GENERAL_UPLOAD", "CHAT_UPLOAD"])
-        fun `test that download worker is started only once when is not running and multiple download events are received`(
-            type: TransferType,
-        ) = runTest {
-            val transferEvents = (0..5).map {
-                TransferEvent.TransferUpdateEvent(
-                    mock<Transfer> {
-                        on { transferType } doReturn type
-                    }
-                )
-            }
-            whenever(monitorIsWorkerFinished(type)) doReturn flowOf(true)
-            whenever(monitorTransferEventsUseCase()).thenReturn(
-                transferEvents.asFlow()
-            )
-            underTest().test {
-                awaitItem()
-                awaitComplete()
-            }
-            verify(type)
-        }
-
-        @ParameterizedTest
-        @EnumSource(TransferType::class, names = ["DOWNLOAD", "GENERAL_UPLOAD", "CHAT_UPLOAD"])
-        fun `test that download worker is not restarted again when it finishes and last event was a download event`(
-            type: TransferType,
-        ) = runTest {
-            val transferEvent = TransferEvent.TransferUpdateEvent(
-                mock<Transfer> {
-                    on { transferType } doReturn type
-                }
-            )
-            val monitorIsDownloadsWorkerFinished = MutableStateFlow(true)
-            whenever(monitorIsWorkerFinished(type)) doReturn monitorIsDownloadsWorkerFinished
-            whenever(monitorTransferEventsUseCase()).thenReturn(
-                flowOf(transferEvent)
-            )
-            underTest().test {
-                awaitItem()
-                monitorIsDownloadsWorkerFinished.emit(false) //simulate worker has been started
-                monitorIsDownloadsWorkerFinished.emit(true) //simulate worker has finished
-                assertThat(cancelAndConsumeRemainingEvents()).isEmpty()
-            }
-            verify(type)
-        }
-
-        @ParameterizedTest
-        @EnumSource(TransferType::class, names = ["DOWNLOAD", "GENERAL_UPLOAD", "CHAT_UPLOAD"])
-        fun `test that download worker is not started when a download event is received but it is already running`(
-            type: TransferType,
-        ) = runTest {
-            val transferEvent = TransferEvent.TransferUpdateEvent(
-                mock<Transfer> {
-                    on { transferType } doReturn type
-                }
-            )
-            whenever(monitorIsWorkerFinished(type)) doReturn flowOf(false)
-            whenever(monitorTransferEventsUseCase()).thenReturn(
-                flowOf(transferEvent)
-            )
-            underTest().test {
-                awaitItem()
-                awaitComplete()
-            }
-            verify(type, 0)
-        }
-
-        private fun monitorIsWorkerFinished(transferType: TransferType) = when (transferType) {
-            TransferType.DOWNLOAD -> transferRepository.monitorIsDownloadsWorkerFinished()
-            TransferType.GENERAL_UPLOAD -> transferRepository.monitorIsUploadsWorkerFinished()
-            TransferType.CHAT_UPLOAD -> transferRepository.monitorIsChatUploadsWorkerFinished()
-            else -> throw IllegalArgumentException("Invalid transfer type")
-        }
-
-        private suspend fun verify(type: TransferType, times: Int = 1) = when (type) {
-            TransferType.DOWNLOAD ->
-                verify(transferRepository, times(times)).startDownloadWorker()
-
-            TransferType.GENERAL_UPLOAD ->
-                verify(transferRepository, times(times)).startUploadsWorker()
-
-            TransferType.CHAT_UPLOAD ->
-                verify(transferRepository, times(times)).startChatUploadsWorker()
-
-            else -> throw IllegalArgumentException("Invalid transfer type")
         }
     }
 
