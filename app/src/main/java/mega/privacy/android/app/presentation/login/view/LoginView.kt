@@ -146,7 +146,7 @@ fun LoginView(
             .semantics { testTagsAsResourceId = true },
         scaffoldState = scaffoldState,
         topBar = {
-            if (state.is2FARequired || state.multiFactorAuthState != null) {
+            if (state.is2FARequired && !showLoginInProgress) {
                 MegaAppBar(
                     appBarType = AppBarType.BACK_NAVIGATION,
                     title = stringResource(R.string.login_verification),

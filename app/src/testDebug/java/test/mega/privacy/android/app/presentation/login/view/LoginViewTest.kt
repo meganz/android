@@ -13,8 +13,9 @@ import mega.privacy.android.app.presentation.login.model.LoginState
 import mega.privacy.android.app.presentation.login.model.MultiFactorAuthState
 import mega.privacy.android.app.presentation.twofactorauthentication.view.TWO_FACTOR_AUTHENTICATION_TEST_TAG
 import mega.privacy.android.domain.entity.Progress
-import mega.privacy.android.domain.entity.login.TemporaryWaitingError
 import mega.privacy.android.domain.entity.login.FetchNodesUpdate
+import mega.privacy.android.domain.entity.login.TemporaryWaitingError
+import mega.privacy.android.shared.original.core.ui.controls.appbar.TEST_TAG_APP_BAR
 import org.junit.Rule
 import org.junit.Test
 import org.junit.runner.RunWith
@@ -48,6 +49,33 @@ class LoginViewTest {
     }
 
     @Test
+    fun `test that appbar is shown when login is not in progress`() {
+        setupRule(
+            state = LoginState(
+                is2FARequired = true,
+                isLoginInProgress = false,
+                requestStatusProgress = null,
+                fetchNodesUpdate = null,
+            )
+        )
+        composeRule.onNodeWithTag(TEST_TAG_APP_BAR).assertExists()
+    }
+
+    @Test
+    fun `test that appbar is not shown when login is in progress`() {
+        setupRule(
+            state = LoginState(
+                is2FARequired = true,
+                isLoginInProgress = true,
+                requestStatusProgress = null,
+                fetchNodesUpdate = null,
+            )
+        )
+        composeRule.onNodeWithTag(TEST_TAG_APP_BAR).assertDoesNotExist()
+    }
+
+
+    @Test
     fun `test that login title is shown if login is required`() {
         setupRule(stateWithLoginRequired)
         composeRule.onNodeWithText(fromId(R.string.login_to_mega)).assertExists()
@@ -56,7 +84,8 @@ class LoginViewTest {
     @Test
     fun `test that email field is shown if login is required`() {
         setupRule(stateWithLoginRequired)
-        composeRule.onNodeWithText(fromId(mega.privacy.android.shared.resources.R.string.email_text)).assertExists()
+        composeRule.onNodeWithText(fromId(mega.privacy.android.shared.resources.R.string.email_text))
+            .assertExists()
     }
 
     @Test
@@ -69,7 +98,8 @@ class LoginViewTest {
     @Test
     fun `test that password field is shown if login is required`() {
         setupRule(stateWithLoginRequired)
-        composeRule.onNodeWithText(fromId(mega.privacy.android.shared.resources.R.string.password_text)).assertExists()
+        composeRule.onNodeWithText(fromId(mega.privacy.android.shared.resources.R.string.password_text))
+            .assertExists()
     }
 
     @Test
@@ -82,7 +112,8 @@ class LoginViewTest {
     @Test
     fun `test that log in button is shown if login is required`() {
         setupRule(stateWithLoginRequired)
-        composeRule.onNodeWithText(fromId(mega.privacy.android.shared.resources.R.string.login_text)).assertExists()
+        composeRule.onNodeWithText(fromId(mega.privacy.android.shared.resources.R.string.login_text))
+            .assertExists()
     }
 
     @Test
