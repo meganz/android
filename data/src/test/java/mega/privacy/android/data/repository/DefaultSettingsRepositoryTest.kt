@@ -35,6 +35,7 @@ import org.junit.jupiter.params.ParameterizedTest
 import org.junit.jupiter.params.provider.NullSource
 import org.junit.jupiter.params.provider.ValueSource
 import org.mockito.kotlin.any
+import org.mockito.kotlin.eq
 import org.mockito.kotlin.mock
 import org.mockito.kotlin.reset
 import org.mockito.kotlin.times
@@ -445,5 +446,29 @@ internal class DefaultSettingsRepositoryTest {
     ) = runTest {
         whenever(megaApiGateway.serverSideRubbishBinAutopurgeEnabled()).thenReturn(expected)
         assertThat(underTest.isRubbishBinAutopurgeEnabled()).isEqualTo(expected)
+    }
+
+    @Test
+    fun `test that value passed to set auto accept is passed on to the gateway`() = runTest {
+        val expected = true
+        val megaError = mock<MegaError>{
+            on { errorCode }.thenReturn(MegaError.API_OK)
+        }
+        val request = mock<MegaRequest>{
+            on { flag }.thenReturn(expected)
+            on { type }.thenReturn(MegaRequest.TYPE_SET_ATTR_USER)
+            on { paramType }.thenReturn(MegaApiJava.USER_ATTR_CONTACT_LINK_VERIFICATION)
+        }
+        val api = mock<MegaApiJava>()
+        whenever(megaApiGateway.setAutoAcceptContactsFromLink(any(), any())).thenAnswer {
+            (it.arguments[1] as MegaRequestListenerInterface).onRequestFinish(
+                api,
+                request,
+                megaError
+            )
+        }
+
+        underTest.setAutoAcceptQR(expected)
+        verify(megaApiGateway).setAutoAcceptContactsFromLink(eq(expected), any())
     }
 }

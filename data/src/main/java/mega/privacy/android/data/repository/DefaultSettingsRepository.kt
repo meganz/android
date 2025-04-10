@@ -144,9 +144,9 @@ internal class DefaultSettingsRepository @Inject constructor(
     override suspend fun setAutoAcceptQR(accept: Boolean): Boolean = withContext(ioDispatcher) {
         suspendCoroutine { continuation ->
             megaApiGateway.setAutoAcceptContactsFromLink(
-                !accept, OptionalMegaRequestListenerInterface(
+                accept, OptionalMegaRequestListenerInterface(
                     onRequestFinish = onSetContactLinksOptionRequestFinished(
-                        continuation, accept
+                        continuation
                     )
                 )
             )
@@ -155,12 +155,11 @@ internal class DefaultSettingsRepository @Inject constructor(
 
     private fun onSetContactLinksOptionRequestFinished(
         continuation: Continuation<Boolean>,
-        accept: Boolean,
     ) = { request: MegaRequest, error: MegaError ->
         if (isSetAutoAcceptQRResponse(request)) {
             when (error.errorCode) {
                 MegaError.API_OK -> {
-                    continuation.resumeWith(Result.success(accept))
+                    continuation.resumeWith(Result.success(request.flag))
                 }
 
                 else -> continuation.failWithError(error, "onSetContactLinksOptionRequestFinished")
