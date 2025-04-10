@@ -210,7 +210,7 @@ internal class FileSystemRepositoryImpl @Inject constructor(
     override suspend fun checkFileExistsByUriPath(uriPath: String?): String? =
         withContext(ioDispatcher) {
             try {
-                if (File(URI.create(uriPath).path).exists()) {
+                if (uriPath != null && File(URI.create(uriPath).path).exists()) {
                     uriPath
                 } else {
                     null
