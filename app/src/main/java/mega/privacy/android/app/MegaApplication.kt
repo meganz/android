@@ -61,6 +61,7 @@ import mega.privacy.android.domain.usecase.login.IsUserLoggedInUseCase
 import mega.privacy.android.domain.usecase.setting.GetMiscFlagsUseCase
 import mega.privacy.android.domain.usecase.setting.UpdateCrashAndPerformanceReportersUseCase
 import mega.privacy.android.domain.usecase.transfers.active.MonitorAndHandleTransferEventsUseCase
+import mega.privacy.android.domain.usecase.transfers.active.MonitorTransferEventsToStartWorkersIfNeededUseCase
 import nz.mega.sdk.MegaApiAndroid
 import nz.mega.sdk.MegaChatApiAndroid
 import nz.mega.sdk.MegaChatApiJava
@@ -98,6 +99,8 @@ import kotlin.time.Duration.Companion.milliseconds
  * @property isEsid
  * @property globalNetworkStateHandler
  * @property monitorAndHandleTransferEventsUseCase
+ * @property monitorTransferEventsToStartWorkersIfNeededUseCase
+ * @property applicationScope
  */
 @HiltAndroidApp
 class MegaApplication : MultiDexApplication(), DefaultLifecycleObserver,
@@ -201,6 +204,10 @@ class MegaApplication : MultiDexApplication(), DefaultLifecycleObserver,
     @Inject
     lateinit var monitorAndHandleTransferEventsUseCase: MonitorAndHandleTransferEventsUseCase
 
+
+    @Inject
+    lateinit var monitorTransferEventsToStartWorkersIfNeededUseCase: MonitorTransferEventsToStartWorkersIfNeededUseCase
+
     var localIpAddress: String? = ""
 
     var isEsid = false
@@ -238,6 +245,7 @@ class MegaApplication : MultiDexApplication(), DefaultLifecycleObserver,
         isVerifySMSShowed = false
 
         monitorTransferEvents()
+        monitorTransferEventsToStartWorkersIfNeeded()
         setupMegaChatApi()
         getMiscFlagsIfNeeded()
         initialiseAdsIfNeeded()
@@ -389,6 +397,23 @@ class MegaApplication : MultiDexApplication(), DefaultLifecycleObserver,
                     // reset the delay on each successful collect
                     reconnectDelay = Duration.ZERO
                     Timber.v("$it transfer events processed")
+                }
+        }
+    }
+
+    private fun monitorTransferEventsToStartWorkersIfNeeded() {
+        applicationScope.launch(Dispatchers.IO) {
+            var reconnectDelay = Duration.ZERO
+            monitorTransferEventsToStartWorkersIfNeededUseCase()
+                .retry {
+                    Timber.e(it, "Error starting Workers, retrying in $reconnectDelay")
+                    delay(reconnectDelay)
+                    reconnectDelay = (reconnectDelay * 2).coerceAtLeast(100.milliseconds)
+                    true
+                }
+                .collect {
+                    reconnectDelay = Duration.ZERO
+                    Timber.v("Worker started for $it")
                 }
         }
     }
