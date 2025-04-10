@@ -897,7 +897,7 @@
     <!-- password label -->
     <string name="password_text">密碼</string>
     <!-- Login button -->
-    <string name="login_text">使用您的MEGA帳戶登入</string>
+    <string name="login_text">登入</string>
     <!--The text where user forgot their password and will navigate to reset it-->
     <string name="login_page_forgot_password_text">忘記密碼？</string>
     <!-- Sync state up to date -->
@@ -1048,4 +1048,16 @@
     <string name="transfers_fake_preview_screen_general_error">預覽載入失敗，請重試。</string>
     <!-- Warning shown after trying to cancel a download, but the request failed -->
     <string name="transfers_error_cancelling_preview_download">出了點問題。預覽未取消。詳情請檢視通知。</string>
+    <!-- Title of the Rename and Create Backup Dialog -->
+    <string name="sync_rename_and_create_backup_dialog_title">備份名稱已存在</string>
+    <!-- Text of the Rename and Create Backup Dialog -->
+    <string name="sync_rename_and_create_backup_dialog_text">您的備份中已存在相同名稱的資料夾。重新命名新資料夾以繼續備份。您裝置上的資料夾名稱不會改變。</string>
+    <!-- Rename and Create Backup Dialog hint text (input field description) -->
+    <string name="sync_rename_and_create_backup_dialog_hint_text">備份名稱</string>
+    <!-- Label for the Positive Button of the Rename and Create Backup Dialog -->
+    <string name="sync_rename_and_create_backup_dialog_positive_button">重新命名</string>
+    <!-- The Error Message shown in the Rename and Create Backup Dialog when the user submits an empty backup name -->
+    <string name="sync_rename_and_create_backup_dialog_error_message_empty_backup_name">輸入備份名稱。</string>
+    <!-- The Error Message shown in the Rename and Create Backup Dialog when the user submits a new backup name that already exists in Backups -->
+    <string name="sync_rename_and_create_backup_dialog_error_message_name_already_exists">已存在相同名稱的備份。輸入不同的名稱。</string>
 </resources>

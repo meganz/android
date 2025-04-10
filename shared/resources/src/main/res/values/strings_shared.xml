@@ -914,7 +914,7 @@
     <!-- password label -->
     <string name="password_text">Password</string>
     <!-- Login button -->
-    <string name="login_text">Log in with your MEGA account</string>
+    <string name="login_text">Log in</string>
     <!--The text where user forgot their password and will navigate to reset it-->
     <string name="login_page_forgot_password_text">Forgot password?</string>
     <!-- Sync state up to date -->

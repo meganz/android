@@ -914,7 +914,7 @@
     <!-- password label -->
     <string name="password_text">Wachtwoord</string>
     <!-- Login button -->
-    <string name="login_text">Meld je aan met uw MEGA-account</string>
+    <string name="login_text">Inloggen</string>
     <!--The text where user forgot their password and will navigate to reset it-->
     <string name="login_page_forgot_password_text">Wachtwoord vergeten?</string>
     <!-- Sync state up to date -->
@@ -1066,4 +1066,16 @@
     <string name="transfers_fake_preview_screen_general_error">Preview failed to load, try again.</string>
     <!-- Warning shown after trying to cancel a download, but the request failed -->
     <string name="transfers_error_cancelling_preview_download">Something went wrong. Preview was not cancelled. See notification for details.</string>
+    <!-- Title of the Rename and Create Backup Dialog -->
+    <string name="sync_rename_and_create_backup_dialog_title">Backup name already exists</string>
+    <!-- Text of the Rename and Create Backup Dialog -->
+    <string name="sync_rename_and_create_backup_dialog_text">A folder with the same name already exists in your Backups. Rename the new folder to continue with the backup. Folder name will not change on your device.</string>
+    <!-- Rename and Create Backup Dialog hint text (input field description) -->
+    <string name="sync_rename_and_create_backup_dialog_hint_text">Backup name</string>
+    <!-- Label for the Positive Button of the Rename and Create Backup Dialog -->
+    <string name="sync_rename_and_create_backup_dialog_positive_button">Hernoemen</string>
+    <!-- The Error Message shown in the Rename and Create Backup Dialog when the user submits an empty backup name -->
+    <string name="sync_rename_and_create_backup_dialog_error_message_empty_backup_name">Enter a backup name.</string>
+    <!-- The Error Message shown in the Rename and Create Backup Dialog when the user submits a new backup name that already exists in Backups -->
+    <string name="sync_rename_and_create_backup_dialog_error_message_name_already_exists">A backup with this name already exists. Enter a different name.</string>
 </resources>
