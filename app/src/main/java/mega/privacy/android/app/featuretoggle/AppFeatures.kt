@@ -165,6 +165,14 @@ enum class AppFeatures(override val description: String, private val defaultValu
         "Registration Revamp with new components",
         false,
     ),
+
+    /**
+     *  Onboarding Revamp with new components
+     */
+    OnboardingRevamp(
+        "Onboarding Revamp with new components",
+        false,
+    ),
     ;
 
     companion object : FeatureFlagValueProvider {
