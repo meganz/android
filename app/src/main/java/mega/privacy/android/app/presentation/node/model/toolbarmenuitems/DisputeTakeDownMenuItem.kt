@@ -1,15 +1,13 @@
 package mega.privacy.android.app.presentation.node.model.toolbarmenuitems
 
-import android.content.Intent
-import android.net.Uri
 import androidx.navigation.NavHostController
 import kotlinx.coroutines.CoroutineScope
-import mega.privacy.android.app.activities.WebViewActivity
+import mega.privacy.android.app.extensions.launchUrl
 import mega.privacy.android.app.presentation.node.model.menuaction.DisputeTakeDownMenuAction
 import mega.privacy.android.app.utils.Constants
+import mega.privacy.android.domain.entity.node.TypedNode
 import mega.privacy.android.shared.original.core.ui.model.MenuAction
 import mega.privacy.android.shared.original.core.ui.model.MenuActionWithIcon
-import mega.privacy.android.domain.entity.node.TypedNode
 import javax.inject.Inject
 
 /**
@@ -40,9 +38,6 @@ class DisputeTakeDownMenuItem @Inject constructor(
         parentScope: CoroutineScope,
     ): () -> Unit = {
         onDismiss()
-        val disputeTakeDownIntent = Intent(navController.context, WebViewActivity::class.java)
-            .addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP)
-            .setData(Uri.parse(Constants.DISPUTE_URL))
-        navController.context.startActivity(disputeTakeDownIntent)
+        navController.context.launchUrl(Constants.DISPUTE_URL)
     }
 }

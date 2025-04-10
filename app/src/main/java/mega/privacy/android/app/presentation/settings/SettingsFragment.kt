@@ -487,10 +487,10 @@ class SettingsFragment :
         internal const val INITIAL_PREFERENCE = "initial"
         internal const val NAVIGATE_TO_INITIAL_PREFERENCE = "navigateToInitial"
 
-        internal const val COOKIES_URI = "https://mega.nz/cookie"
+        internal const val COOKIES_URI = "https://mega.io/cookie"
         internal const val GITHUB_URL = "https://github.com/meganz/android"
-        internal const val TERMS_OF_SERVICE_URL = "https://mega.nz/terms"
-        internal const val PRIVACY_POLICY_URL = "https://mega.nz/privacy"
+        internal const val TERMS_OF_SERVICE_URL = "https://mega.io/terms"
+        internal const val PRIVACY_POLICY_URL = "https://mega.io/privacy"
         internal const val HELP_CENTRE_URL = "https://help.mega.io/installs-apps/mobile"
     }
 

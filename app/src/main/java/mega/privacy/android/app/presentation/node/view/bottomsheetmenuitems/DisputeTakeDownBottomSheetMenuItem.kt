@@ -1,16 +1,14 @@
 package mega.privacy.android.app.presentation.node.view.bottomsheetmenuitems
 
-import android.content.Intent
-import android.net.Uri
 import androidx.navigation.NavHostController
 import kotlinx.coroutines.CoroutineScope
-import mega.privacy.android.app.activities.WebViewActivity
+import mega.privacy.android.app.extensions.launchUrl
 import mega.privacy.android.app.presentation.node.model.menuaction.DisputeTakeDownMenuAction
 import mega.privacy.android.app.utils.Constants
-import mega.privacy.android.shared.original.core.ui.model.MenuAction
-import mega.privacy.android.shared.original.core.ui.model.MenuActionWithIcon
 import mega.privacy.android.domain.entity.node.TypedNode
 import mega.privacy.android.domain.entity.shares.AccessPermission
+import mega.privacy.android.shared.original.core.ui.model.MenuAction
+import mega.privacy.android.shared.original.core.ui.model.MenuActionWithIcon
 import javax.inject.Inject
 
 /**
@@ -38,11 +36,7 @@ class DisputeTakeDownBottomSheetMenuItem @Inject constructor(
         parentCoroutineScope: CoroutineScope,
     ): () -> Unit = {
         onDismiss()
-        navController.context.startActivity(
-            Intent(navController.context, WebViewActivity::class.java)
-                .addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP)
-                .setData(Uri.parse(Constants.DISPUTE_URL))
-        )
+        navController.context.launchUrl(Constants.DISPUTE_URL)
     }
 
     override val groupId = 4
