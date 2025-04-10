@@ -12,8 +12,12 @@ import mega.privacy.android.core.test.AnalyticsTestRule
 import mega.privacy.android.domain.entity.node.NodeId
 import mega.privacy.android.domain.entity.sync.SyncType
 import mega.privacy.android.feature.sync.domain.entity.SyncStatus
+import mega.privacy.android.feature.sync.R
 import mega.privacy.android.feature.sync.ui.model.SyncUiItem
 import mega.privacy.android.feature.sync.ui.permissions.SyncPermissionsManager
+import mega.privacy.android.feature.sync.ui.synclist.SOLVED_ISSUES_CHIP_TEST_TAG
+import mega.privacy.android.feature.sync.ui.synclist.STALLED_ISSUES_CHIP_TEST_TAG
+import mega.privacy.android.feature.sync.ui.synclist.SYNC_FOLDERS_CHIP_TEST_TAG
 import mega.privacy.android.feature.sync.ui.synclist.SyncListRoute
 import mega.privacy.android.feature.sync.ui.synclist.SyncListState
 import mega.privacy.android.feature.sync.ui.synclist.SyncListViewModel
@@ -25,9 +29,13 @@ import mega.privacy.android.feature.sync.ui.synclist.stalledissues.SyncStalledIs
 import mega.privacy.android.feature.sync.ui.synclist.stalledissues.SyncStalledIssuesViewModel
 import mega.privacy.android.shared.original.core.ui.controls.buttons.MULTI_FAB_MAIN_FAB_TEST_TAG
 import mega.privacy.android.shared.original.core.ui.controls.buttons.MULTI_FAB_OPTION_ROW_TEST_TAG
-import mega.privacy.android.shared.resources.R
+import mega.privacy.android.shared.resources.R as sharedR
 import mega.privacy.mobile.analytics.event.AndroidBackupFABButtonPressedEvent
+import mega.privacy.mobile.analytics.event.AndroidSyncFABButtonEvent
 import mega.privacy.mobile.analytics.event.AndroidSyncMultiFABButtonPressedEvent
+import mega.privacy.mobile.analytics.event.SyncListFoldersButtonPressedEvent
+import mega.privacy.mobile.analytics.event.SyncListIssuesButtonPressedEvent
+import mega.privacy.mobile.analytics.event.SyncListSolvedIssuesButtonPressedEvent
 import org.junit.Before
 import org.junit.Rule
 import org.junit.Test
@@ -82,7 +90,7 @@ class SyncListRouteTest {
         whenever(syncFoldersViewModel.uiState).thenReturn(syncFoldersUiState)
         whenever(syncStalledIssuesState.value).thenReturn(SyncStalledIssuesState(emptyList()))
         whenever(syncStalledIssuesViewModel.state).thenReturn(syncStalledIssuesState)
-        whenever(syncSolvedIssuesState.value).thenReturn(SyncSolvedIssuesState())
+        whenever(syncSolvedIssuesState.value).thenReturn(SyncSolvedIssuesState(mock()))
         whenever(syncSolvedIssuesViewModel.state).thenReturn(syncSolvedIssuesState)
     }
 
@@ -112,16 +120,51 @@ class SyncListRouteTest {
     }
 
     @Test
+    fun `test that tap on Sync FAB sends the right analytics tracker event`() {
+        setComposeContent()
+        composeTestRule.onNodeWithTag(MULTI_FAB_MAIN_FAB_TEST_TAG).performClick()
+        composeTestRule.onNodeWithTag(
+            "${MULTI_FAB_OPTION_ROW_TEST_TAG}_${
+                composeTestRule.activity.getString(
+                    R.string.sync_toolbar_title
+                )
+            }"
+        ).performClick()
+        assertThat(analyticsRule.events).contains(AndroidSyncFABButtonEvent)
+    }
+
+    @Test
     fun `test that tap on Backup FAB sends the right analytics tracker event`() {
         setComposeContent()
         composeTestRule.onNodeWithTag(MULTI_FAB_MAIN_FAB_TEST_TAG).performClick()
         composeTestRule.onNodeWithTag(
             "${MULTI_FAB_OPTION_ROW_TEST_TAG}_${
                 composeTestRule.activity.getString(
-                    R.string.sync_add_new_backup_toolbar_title
+                    sharedR.string.sync_add_new_backup_toolbar_title
                 )
             }"
         ).performClick()
         assertThat(analyticsRule.events).contains(AndroidBackupFABButtonPressedEvent)
+    }
+
+    @Test
+    fun `test that tap on Folders chip sends the right analytics tracker event`() {
+        setComposeContent()
+        composeTestRule.onNodeWithTag(SYNC_FOLDERS_CHIP_TEST_TAG).performClick()
+        assertThat(analyticsRule.events).contains(SyncListFoldersButtonPressedEvent)
+    }
+
+    @Test
+    fun `test that tap on Stalled Issues chip sends the right analytics tracker event`() {
+        setComposeContent()
+        composeTestRule.onNodeWithTag(STALLED_ISSUES_CHIP_TEST_TAG).performClick()
+        assertThat(analyticsRule.events).contains(SyncListIssuesButtonPressedEvent)
+    }
+
+    @Test
+    fun `test that tap on Solved Issues chip sends the right analytics tracker event`() {
+        setComposeContent()
+        composeTestRule.onNodeWithTag(SOLVED_ISSUES_CHIP_TEST_TAG).performClick()
+        assertThat(analyticsRule.events).contains(SyncListSolvedIssuesButtonPressedEvent)
     }
 }

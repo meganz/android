@@ -73,7 +73,11 @@ import mega.privacy.android.shared.original.core.ui.controls.sheets.BottomSheet
 import mega.privacy.android.shared.original.core.ui.model.MenuAction
 import mega.privacy.android.shared.original.core.ui.utils.ComposableLifecycle
 import mega.privacy.mobile.analytics.event.AndroidBackupFABButtonPressedEvent
+import mega.privacy.mobile.analytics.event.AndroidSyncFABButtonEvent
 import mega.privacy.mobile.analytics.event.AndroidSyncMultiFABButtonPressedEvent
+import mega.privacy.mobile.analytics.event.SyncListFoldersButtonPressedEvent
+import mega.privacy.mobile.analytics.event.SyncListIssuesButtonPressedEvent
+import mega.privacy.mobile.analytics.event.SyncListSolvedIssuesButtonPressedEvent
 
 @Composable
 internal fun SyncListScreen(
@@ -187,6 +191,7 @@ internal fun SyncListScreen(
                                 icon = painterResource(id = iconPackR.drawable.ic_sync_01),
                                 label = stringResource(id = R.string.sync_toolbar_title),
                                 onClicked = {
+                                    Analytics.tracker.trackEvent(AndroidSyncFABButtonEvent)
                                     onSyncFolderClicked()
                                     multiFabState.value = MultiFloatingActionButtonState.COLLAPSED
                                 },
@@ -195,9 +200,7 @@ internal fun SyncListScreen(
                                 icon = painterResource(id = iconPackR.drawable.ic_database),
                                 label = stringResource(id = sharedResR.string.sync_add_new_backup_toolbar_title),
                                 onClicked = {
-                                    Analytics.tracker.trackEvent(
-                                        AndroidBackupFABButtonPressedEvent
-                                    )
+                                    Analytics.tracker.trackEvent(AndroidBackupFABButtonPressedEvent)
                                     onBackupFolderClicked()
                                     multiFabState.value = MultiFloatingActionButtonState.COLLAPSED
                                 },
@@ -363,20 +366,32 @@ private fun HeaderChips(
     ChipBar(modifier = modifier.padding(vertical = 8.dp)) {
         MegaChip(
             selected = selectedChip == SYNC_FOLDERS,
-            text = stringResource(id = R.string.sync_folders)
-        ) { onChipSelected(SYNC_FOLDERS) }
+            text = stringResource(id = R.string.sync_folders),
+            modifier = modifier.testTag(SYNC_FOLDERS_CHIP_TEST_TAG),
+        ) {
+            Analytics.tracker.trackEvent(SyncListFoldersButtonPressedEvent)
+            onChipSelected(SYNC_FOLDERS)
+        }
         MegaChip(
             selected = selectedChip == STALLED_ISSUES,
             text = if (stalledIssuesCount > 0) {
                 stringResource(R.string.sync_stalled_issues, stalledIssuesCount)
             } else {
                 stringResource(id = R.string.sync_stalled_issue_zero)
-            }
-        ) { onChipSelected(STALLED_ISSUES) }
+            },
+            modifier = modifier.testTag(STALLED_ISSUES_CHIP_TEST_TAG),
+        ) {
+            Analytics.tracker.trackEvent(SyncListIssuesButtonPressedEvent)
+            onChipSelected(STALLED_ISSUES)
+        }
         MegaChip(
             selected = selectedChip == SOLVED_ISSUES,
-            text = stringResource(id = sharedR.string.device_center_sync_solved_issues_chip_text)
-        ) { onChipSelected(SOLVED_ISSUES) }
+            text = stringResource(id = sharedR.string.device_center_sync_solved_issues_chip_text),
+            modifier = modifier.testTag(SOLVED_ISSUES_CHIP_TEST_TAG),
+        ) {
+            Analytics.tracker.trackEvent(SyncListSolvedIssuesButtonPressedEvent)
+            onChipSelected(SOLVED_ISSUES)
+        }
     }
 }
 
@@ -427,3 +442,18 @@ private fun SelectedChipScreen(
         }
     }
 }
+
+/**
+ * Sync Folders Chip test tag
+ */
+internal const val SYNC_FOLDERS_CHIP_TEST_TAG = "sync_list:folders_chip"
+
+/**
+ * Stalled Issues Chip test tag
+ */
+internal const val STALLED_ISSUES_CHIP_TEST_TAG = "sync_list:stalled_issues_chip"
+
+/**
+ * Solved Issues Chip test tag
+ */
+internal const val SOLVED_ISSUES_CHIP_TEST_TAG = "sync_list:solved_issues_chip"

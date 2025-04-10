@@ -30,7 +30,6 @@ import mega.privacy.android.feature.sync.ui.synclist.SyncListRoute
 import mega.privacy.android.navigation.MegaNavigator
 import mega.privacy.android.shared.original.core.ui.utils.findFragmentActivity
 import mega.privacy.mobile.analytics.event.AddSyncScreenEvent
-import mega.privacy.mobile.analytics.event.AndroidSyncFABButtonEvent
 import mega.privacy.mobile.analytics.event.AndroidSyncGetStartedButtonEvent
 import timber.log.Timber
 
@@ -286,7 +285,6 @@ internal fun NavGraphBuilder.syncNavGraph(
                 viewModel = hiltViewModel(),
                 syncPermissionsManager = syncPermissionsManager,
                 onSyncFolderClicked = {
-                    Analytics.tracker.trackEvent(AndroidSyncFABButtonEvent)
                     navController.navigate(
                         getSyncNewFolderRoute(syncType = SyncType.TYPE_TWOWAY)
                     )

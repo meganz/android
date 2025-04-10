@@ -106,9 +106,9 @@ import mega.privacy.android.shared.original.core.ui.controls.layouts.MegaScaffol
 import mega.privacy.android.shared.original.core.ui.controls.tab.Tabs
 import mega.privacy.android.shared.original.core.ui.theme.OriginalTheme
 import mega.privacy.android.shared.original.core.ui.utils.showAutoDurationSnackbar
-import mega.privacy.mobile.analytics.event.AndroidSyncFABButtonEvent
 import mega.privacy.mobile.analytics.event.CloudDriveHideNodeMenuItemEvent
 import mega.privacy.mobile.analytics.event.CloudDriveScreenEvent
+import mega.privacy.mobile.analytics.event.SyncsTabEvent
 import timber.log.Timber
 import javax.inject.Inject
 
@@ -241,6 +241,9 @@ class CloudDriveSyncsFragment : Fragment() {
                     rememberPagerState(initialPage = uiState.selectedTab.position.takeIf { it != CloudDriveTab.NONE.position }
                         ?: 0) { 2 }
                 LaunchedEffect(pagerState.currentPage) {
+                    if (pagerState.currentPage == CloudDriveTab.SYNC.position) {
+                        Analytics.tracker.trackEvent(SyncsTabEvent)
+                    }
                     fileBrowserViewModel.onTabChanged(CloudDriveTab.entries.first { it.position == pagerState.currentPage })
                 }
                 LaunchedEffect(uiState.selectedTab) {
@@ -295,8 +298,6 @@ class CloudDriveSyncsFragment : Fragment() {
                                         isInCloudDrive = true,
                                         syncPermissionsManager = syncPermissionsManager,
                                         onSyncFolderClicked = {
-                                            Analytics.tracker.trackEvent(AndroidSyncFABButtonEvent)
-                                            // open sync fragment with specific folder
                                             megaNavigator.openNewSync(
                                                 activity,
                                                 SyncType.TYPE_TWOWAY,
