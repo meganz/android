@@ -108,9 +108,9 @@ public class Constants {
     public static final long SECONDS_TO_WAIT_FOR_OTHERS_TO_JOIN_THE_CALL = 5 * SECONDS_IN_MINUTE;
 
     public static final String SCANNED_CONTACT_BASE_URL = "https://mega.nz/";
-    public static final String DISPUTE_URL = "https://mega.nz/dispute";
-    public static final String TAKEDOWN_URL = "https://mega.nz/takedown";
-    public static final String TERMS_OF_SERVICE_URL = "https://mega.nz/terms";
+    public static final String DISPUTE_URL = "https://mega.io/dispute";
+    public static final String TAKEDOWN_URL = "https://mega.io/takedown";
+    public static final String TERMS_OF_SERVICE_URL = "https://mega.io/terms";
     public static final String PRICING_PAGE_URL = "https://mega.io/pricing";
     public static final String ACTION_OPEN_MEGA_LINK = "OPEN_MEGA_LINK";
     public static final String ACTION_OPEN_MEGA_FOLDER_LINK = "OPEN_MEGA_FOLDER_LINK";
@@ -328,7 +328,7 @@ public class Constants {
     public static final String MAIL_SUPPORT = "support@mega.nz";
 
     //link for introduction end to end encryption
-    public static final String URL_E2EE = "https://mega.nz/security";
+    public static final String URL_E2EE = "https://mega.io/security";
 
     public static final int MIN_ITEMS_SCROLLBAR = 30;
     public static final int MIN_ITEMS_SCROLLBAR_CONTACT = 20;
