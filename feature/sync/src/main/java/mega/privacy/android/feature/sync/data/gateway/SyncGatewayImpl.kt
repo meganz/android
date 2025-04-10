@@ -14,6 +14,7 @@ import mega.privacy.android.data.listener.OptionalMegaRequestListenerInterface
 import mega.privacy.android.data.qualifier.MegaApi
 import mega.privacy.android.domain.qualifier.ApplicationScope
 import mega.privacy.android.feature.sync.data.model.MegaSyncListenerEvent
+import mega.privacy.android.feature.sync.domain.exception.BackupAlreadyExistsException
 import nz.mega.sdk.MegaApiAndroid
 import nz.mega.sdk.MegaError
 import nz.mega.sdk.MegaNode
@@ -67,10 +68,18 @@ internal class SyncGatewayImpl @Inject constructor(
         suspendCancellableCoroutine { continuation ->
             val requestListener = OptionalMegaRequestListenerInterface(
                 onRequestFinish = { request: MegaRequest, error: MegaError ->
-                    if (error.errorCode == MegaError.API_OK) {
-                        continuation.resumeWith(Result.success(request.parentHandle))
-                    } else {
-                        continuation.resumeWith(Result.success(null))
+                    when (error.errorCode) {
+                        MegaError.API_OK -> {
+                            continuation.resumeWith(Result.success(request.parentHandle))
+                        }
+
+                        MegaError.API_EACCESS -> {
+                            continuation.resumeWith(Result.failure(BackupAlreadyExistsException()))
+                        }
+
+                        else -> {
+                            continuation.resumeWith(Result.success(null))
+                        }
                     }
                 }
             )

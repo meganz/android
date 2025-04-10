@@ -35,7 +35,7 @@ internal class SyncFolderPairUseCase @Inject constructor(
         name: String?,
         localPath: String,
         remotePath: RemoteFolder
-    ): Boolean? {
+    ): Boolean {
         val folderPairHandle = syncRepository.setupFolderPair(
             syncType = syncType,
             name = name,

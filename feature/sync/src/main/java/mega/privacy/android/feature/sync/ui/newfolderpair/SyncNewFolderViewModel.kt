@@ -23,6 +23,7 @@ import mega.privacy.android.domain.usecase.account.IsStorageOverQuotaUseCase
 import mega.privacy.android.domain.usecase.backup.GetDeviceIdUseCase
 import mega.privacy.android.domain.usecase.backup.GetDeviceNameUseCase
 import mega.privacy.android.feature.sync.domain.entity.RemoteFolder
+import mega.privacy.android.feature.sync.domain.exception.BackupAlreadyExistsException
 import mega.privacy.android.feature.sync.domain.usecase.GetLocalDCIMFolderPathUseCase
 import mega.privacy.android.feature.sync.domain.usecase.backup.MyBackupsFolderExistsUseCase
 import mega.privacy.android.feature.sync.domain.usecase.backup.SetMyBackupsFolderUseCase
@@ -31,6 +32,8 @@ import mega.privacy.android.feature.sync.domain.usecase.sync.SyncFolderPairUseCa
 import mega.privacy.android.feature.sync.domain.usecase.sync.option.ClearSelectedMegaFolderUseCase
 import mega.privacy.android.feature.sync.domain.usecase.sync.option.MonitorSelectedMegaFolderUseCase
 import timber.log.Timber
+import kotlin.io.path.Path
+import kotlin.io.path.name
 
 @HiltViewModel(assistedFactory = SyncNewFolderViewModel.SyncNewFolderViewModelFactory::class)
 internal class SyncNewFolderViewModel @AssistedInject constructor(
@@ -155,12 +158,12 @@ internal class SyncNewFolderViewModel @AssistedInject constructor(
                                         runCatching {
                                             setMyBackupsFolderUseCase(BACKUPS_FOLDER_DEFAULT_NAME)
                                         }.onSuccess {
-                                            createBackup()
+                                            if (createBackup().not()) return@launch
                                         }.onFailure {
                                             Timber.e(it)
                                         }
                                     } else {
-                                        createBackup()
+                                        if (createBackup().not()) return@launch
                                     }
                                 }
 
@@ -175,9 +178,7 @@ internal class SyncNewFolderViewModel @AssistedInject constructor(
                                     }
                                 }
                             }
-                            _state.update { state ->
-                                state.copy(openSyncListScreen = triggered)
-                            }
+                            openSyncListScreen()
                         }
                     }
                 }
@@ -197,13 +198,29 @@ internal class SyncNewFolderViewModel @AssistedInject constructor(
         }
     }
 
-    private suspend fun createBackup() {
-        syncFolderPairUseCase(
-            syncType = state.value.syncType,
-            name = null,
-            localPath = state.value.selectedLocalFolder,
-            remotePath = RemoteFolder(NodeId(-1L), ""),
-        )
+    private suspend fun createBackup(): Boolean {
+        runCatching {
+            syncFolderPairUseCase(
+                syncType = state.value.syncType,
+                name = null,
+                localPath = state.value.selectedLocalFolder,
+                remotePath = RemoteFolder(NodeId(-1L), ""),
+            )
+        }.onSuccess { result ->
+            onShowRenameAndCreateBackupDialogConsumed()
+            return result != false
+        }.onFailure { exception ->
+            if (exception is BackupAlreadyExistsException) {
+                _state.update { state ->
+                    state.copy(
+                        showRenameAndCreateBackupDialog = Path(_state.value.selectedLocalFolder).name
+                    )
+                }
+            } else {
+                Timber.e(exception)
+            }
+        }
+        return false
     }
 
     /**
@@ -211,5 +228,19 @@ internal class SyncNewFolderViewModel @AssistedInject constructor(
      */
     fun onShowSnackbarConsumed() {
         _state.update { state -> state.copy(showSnackbar = consumed()) }
+    }
+
+    /**
+     * Consumes the event of showing rename and create backup dialog.
+     */
+    fun onShowRenameAndCreateBackupDialogConsumed() {
+        _state.update { state -> state.copy(showRenameAndCreateBackupDialog = null) }
+    }
+
+    /**
+     * Triggers the event to open sync list screen
+     */
+    fun openSyncListScreen() {
+        _state.update { state -> state.copy(openSyncListScreen = triggered) }
     }
 }

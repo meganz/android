@@ -21,6 +21,7 @@ import mega.privacy.android.domain.usecase.backup.GetDeviceNameUseCase
 import mega.privacy.android.feature.sync.domain.entity.FolderPair
 import mega.privacy.android.feature.sync.domain.entity.RemoteFolder
 import mega.privacy.android.feature.sync.domain.entity.SyncStatus
+import mega.privacy.android.feature.sync.domain.exception.BackupAlreadyExistsException
 import mega.privacy.android.feature.sync.domain.usecase.GetLocalDCIMFolderPathUseCase
 import mega.privacy.android.feature.sync.domain.usecase.backup.MyBackupsFolderExistsUseCase
 import mega.privacy.android.feature.sync.domain.usecase.backup.SetMyBackupsFolderUseCase
@@ -400,6 +401,44 @@ internal class SyncNewFolderViewModelTest {
             }
         }
     }
+
+    @Test
+    fun `test that next click will display the rename and create backup dialog if backup name already exists`() =
+        runTest {
+            val remoteFolder = RemoteFolder(NodeId(-1L), "")
+            whenever(isStorageOverQuotaUseCase()).thenReturn(false)
+            whenever(monitorSelectedMegaFolderUseCase()).thenReturn(flow {
+                emit(remoteFolder)
+                awaitCancellation()
+            })
+            whenever(myBackupsFolderExistsUseCase()).thenReturn(false)
+            whenever(setMyBackupsFolderUseCase("Backups")).thenReturn(NodeId(9999L))
+            whenever(
+                syncFolderPairUseCase.invoke(
+                    syncType = SyncType.TYPE_BACKUP,
+                    name = null,
+                    localPath = "",
+                    remotePath = remoteFolder,
+                )
+            ).thenThrow(BackupAlreadyExistsException())
+            val state = SyncNewFolderState(
+                syncType = SyncType.TYPE_BACKUP,
+                deviceName = "Device Name",
+                selectedMegaFolder = remoteFolder,
+            )
+            initViewModel(syncType = SyncType.TYPE_BACKUP)
+
+            underTest.handleAction(SyncNewFolderAction.NextClicked)
+
+            verify(syncFolderPairUseCase).invoke(
+                syncType = SyncType.TYPE_BACKUP,
+                name = null,
+                localPath = state.selectedLocalFolder,
+                remotePath = remoteFolder,
+            )
+            assertThat(underTest.state.value.showRenameAndCreateBackupDialog).isNotEqualTo(null)
+            assertThat(underTest.state.value.openSyncListScreen).isEqualTo(consumed)
+        }
 
     private fun initViewModel(
         syncType: SyncType,

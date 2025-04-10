@@ -48,6 +48,7 @@ import mega.privacy.android.feature.sync.R
 import mega.privacy.android.feature.sync.domain.entity.RemoteFolder
 import mega.privacy.android.feature.sync.ui.megapicker.AllFilesAccessDialog
 import mega.privacy.android.feature.sync.ui.permissions.SyncPermissionsManager
+import mega.privacy.android.feature.sync.ui.renamebackup.model.RenameAndCreateBackupDialog
 import mega.privacy.android.feature.sync.ui.views.InputSyncInformationView
 import mega.privacy.android.feature.sync.ui.views.SyncTypePreviewProvider
 import mega.privacy.android.shared.original.core.ui.controls.appbar.AppBarType
@@ -96,6 +97,8 @@ internal fun SyncNewFolderScreen(
         onBackClicked = onBackClicked,
         showStorageOverQuota = showStorageOverQuota,
         onDismissStorageOverQuota = onDismissStorageOverQuota,
+        onDismissRenameAndCreateBackupDialog = { viewModel.onShowRenameAndCreateBackupDialogConsumed() },
+        onRenameAndCreateBackupSucceeded = { viewModel.openSyncListScreen() },
         onOpenUpgradeAccount = onOpenUpgradeAccount,
         onShowSnackbarConsumed = { viewModel.onShowSnackbarConsumed() },
     )
@@ -113,6 +116,8 @@ private fun SyncNewFolderScreenScaffold(
     onBackClicked: () -> Unit,
     showStorageOverQuota: Boolean,
     onDismissStorageOverQuota: () -> Unit,
+    onDismissRenameAndCreateBackupDialog: () -> Unit,
+    onRenameAndCreateBackupSucceeded: () -> Unit,
     onOpenUpgradeAccount: () -> Unit,
     onShowSnackbarConsumed: () -> Unit,
 ) {
@@ -154,6 +159,9 @@ private fun SyncNewFolderScreenScaffold(
                     syncPermissionsManager = syncPermissionsManager,
                     showStorageOverQuota = showStorageOverQuota,
                     onDismissStorageOverQuota = onDismissStorageOverQuota,
+                    showRenameAndCreateBackupDialog = state.showRenameAndCreateBackupDialog,
+                    onDismissRenameAndCreateBackupDialog = onDismissRenameAndCreateBackupDialog,
+                    onRenameAndCreateBackupSucceeded = onRenameAndCreateBackupSucceeded,
                     onOpenUpgradeAccount = onOpenUpgradeAccount,
                     onShowSyncPermissionBannerValueChanged = { value ->
                         isWarningBannerDisplayed = value
@@ -189,6 +197,9 @@ private fun SyncNewFolderScreenContent(
     syncPermissionsManager: SyncPermissionsManager,
     showStorageOverQuota: Boolean,
     onDismissStorageOverQuota: () -> Unit,
+    showRenameAndCreateBackupDialog: String?,
+    onDismissRenameAndCreateBackupDialog: () -> Unit,
+    onRenameAndCreateBackupSucceeded: () -> Unit,
     onOpenUpgradeAccount: () -> Unit,
     onShowSyncPermissionBannerValueChanged: (Boolean) -> Unit,
     snackBarHostState: SnackbarHostState,
@@ -203,6 +214,7 @@ private fun SyncNewFolderScreenContent(
     }
     val scrollState = rememberScrollState()
     val coroutineScope = rememberCoroutineScope()
+    var proceedButtonClicked by remember { mutableStateOf(false) }
 
     Column(
         modifier
@@ -296,6 +308,21 @@ private fun SyncNewFolderScreenContent(
             )
         }
 
+        showRenameAndCreateBackupDialog?.let { folderPairName ->
+            RenameAndCreateBackupDialog(
+                backupName = folderPairName,
+                localPath = selectedLocalFolder,
+                onSuccess = {
+                    onDismissRenameAndCreateBackupDialog()
+                    onRenameAndCreateBackupSucceeded()
+                },
+                onCancel = {
+                    proceedButtonClicked = false
+                    onDismissRenameAndCreateBackupDialog()
+                },
+            )
+        }
+
         val isLandscape =
             LocalConfiguration.current.orientation == Configuration.ORIENTATION_LANDSCAPE
         Column(modifier = Modifier.conditional(isLandscape) { fillMaxWidth(0.45f).align(Alignment.CenterHorizontally) }) {
@@ -356,7 +383,6 @@ private fun SyncNewFolderScreenContent(
                     .testTag(TAG_SYNC_NEW_FOLDER_SCREEN_SYNC_BUTTON),
                 contentAlignment = Alignment.Center
             ) {
-                var buttonClicked by remember { mutableStateOf(false) }
                 val buttonEnabled = when (syncType) {
                     SyncType.TYPE_BACKUP -> selectedLocalFolder.isNotBlank() && syncPermissionsManager.isManageExternalStoragePermissionGranted()
                     else -> selectedLocalFolder.isNotBlank() && selectedMegaFolder != null && syncPermissionsManager.isManageExternalStoragePermissionGranted()
@@ -368,7 +394,7 @@ private fun SyncNewFolderScreenContent(
                         .padding(bottom = 16.dp, start = 16.dp, end = 16.dp),
                     textId = when (syncType) {
                         SyncType.TYPE_BACKUP -> {
-                            if (buttonClicked) {
+                            if (proceedButtonClicked) {
                                 sharedResR.string.sync_list_sync_state_updating
                             } else {
                                 sharedResR.string.sync_add_new_backup_proceed_button_label
@@ -376,7 +402,7 @@ private fun SyncNewFolderScreenContent(
                         }
 
                         else -> {
-                            if (buttonClicked) {
+                            if (proceedButtonClicked) {
                                 R.string.sync_list_sync_state_syncing
                             } else {
                                 R.string.sync_button_label
@@ -384,10 +410,10 @@ private fun SyncNewFolderScreenContent(
                         }
                     },
                     onClick = {
-                        buttonClicked = true
+                        proceedButtonClicked = true
                         syncClicked()
                     },
-                    enabled = buttonEnabled && buttonClicked.not()
+                    enabled = buttonEnabled && proceedButtonClicked.not()
                 )
             }
         }
@@ -418,6 +444,8 @@ private fun SyncNewFolderScreenPreview(
             syncPermissionsManager = SyncPermissionsManager(LocalContext.current),
             showStorageOverQuota = false,
             onDismissStorageOverQuota = {},
+            onDismissRenameAndCreateBackupDialog = {},
+            onRenameAndCreateBackupSucceeded = {},
             onOpenUpgradeAccount = {},
             onBackClicked = {},
             onShowSnackbarConsumed = {},
@@ -442,6 +470,9 @@ private fun SyncNewFolderScreenContentPreview(
             syncPermissionsManager = SyncPermissionsManager(LocalContext.current),
             showStorageOverQuota = false,
             onDismissStorageOverQuota = {},
+            showRenameAndCreateBackupDialog = null,
+            onDismissRenameAndCreateBackupDialog = {},
+            onRenameAndCreateBackupSucceeded = {},
             onOpenUpgradeAccount = {},
             onShowSyncPermissionBannerValueChanged = {},
             snackBarHostState = rememberScaffoldState().snackbarHostState,

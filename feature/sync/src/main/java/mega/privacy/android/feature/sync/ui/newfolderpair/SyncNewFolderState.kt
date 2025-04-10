@@ -18,6 +18,7 @@ import mega.privacy.android.feature.sync.domain.entity.RemoteFolder
  * @param showStorageOverQuota True if have to show the storage over quota message, False otherwise
  * @param openSyncListScreen Event to open sync list screen
  * @param showSnackbar Event to show a snackbar message
+ * @param showRenameAndCreateBackupDialog Show the rename and create backup dialog with the current name
  */
 internal data class SyncNewFolderState(
     val syncType: SyncType,
@@ -30,4 +31,5 @@ internal data class SyncNewFolderState(
     val showStorageOverQuota: Boolean = false,
     val openSyncListScreen: StateEvent = consumed,
     val showSnackbar: StateEventWithContent<Int?> = consumed(),
+    val showRenameAndCreateBackupDialog: String? = null,
 )
