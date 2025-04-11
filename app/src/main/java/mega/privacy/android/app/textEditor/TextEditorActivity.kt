@@ -650,6 +650,7 @@ class TextEditorActivity : PasscodeActivity(), SnackbarShower, Scrollable {
                 }
             }
         } else {
+            binding.contentText.isVisible = false
             menu.toggleAllMenuItemsVisibility(false)
             menu.findItem(R.id.action_save).isVisible = true
             updateLineNumbersMenuOption(menu.findItem(R.id.action_line_numbers))
