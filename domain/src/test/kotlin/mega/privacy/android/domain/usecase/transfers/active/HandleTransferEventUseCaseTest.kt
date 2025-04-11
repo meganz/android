@@ -27,6 +27,7 @@ import org.mockito.kotlin.eq
 import org.mockito.kotlin.mock
 import org.mockito.kotlin.never
 import org.mockito.kotlin.reset
+import org.mockito.kotlin.times
 import org.mockito.kotlin.verify
 import org.mockito.kotlin.verifyNoInteractions
 import org.mockito.kotlin.verifyNoMoreInteractions
@@ -138,6 +139,32 @@ class HandleTransferEventUseCaseTest {
             underTest.invoke(transferEvent)
             verify(transferRepository).insertOrUpdateActiveTransfers(eq(listOf(expected)))
         }
+
+    @Test
+    fun `test that parent group app data is cached`() = runTest {
+        val parentTag = 46376
+        val appData = TransferAppData.TransferGroup(245)
+        val transferEvent1 = mockTransferEvent<TransferEvent.TransferStartEvent>(
+            TransferType.DOWNLOAD,
+            1,
+            folderTransferTag = parentTag
+        )
+        val transferEvent2 = mockTransferEvent<TransferEvent.TransferFinishEvent>(
+            TransferType.DOWNLOAD,
+            1,
+            folderTransferTag = parentTag
+        )
+        val parentTransfer = mock<Transfer> {
+            on { it.appData } doReturn listOf(appData)
+        }
+        whenever(transferRepository.getActiveTransferByTag(parentTag)) doReturn parentTransfer
+
+        underTest.invoke(transferEvent1)
+        underTest.invoke(transferEvent2)
+
+        verify(transferRepository, times(2)).insertOrUpdateActiveTransfers(any())
+        verify(transferRepository).getActiveTransferByTag(parentTag) //only once
+    }
 
     @Test
     fun `test that invoke call insertOrUpdateActiveTransfers with the last event of each transfer when multiple events are send`() =
