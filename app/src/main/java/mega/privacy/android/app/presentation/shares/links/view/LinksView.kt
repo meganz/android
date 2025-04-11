@@ -20,12 +20,12 @@ import mega.privacy.android.app.presentation.search.view.LoadingStateView
 import mega.privacy.android.app.presentation.shares.links.model.LinksUiState
 import mega.privacy.android.app.presentation.view.NODES_EMPTY_VIEW_VISIBLE
 import mega.privacy.android.app.presentation.view.NodesView
+import mega.privacy.android.core.ui.mapper.FileTypeIconMapper
+import mega.privacy.android.domain.entity.node.publiclink.PublicLinkNode
+import mega.privacy.android.legacy.core.ui.controls.LegacyMegaEmptyView
 import mega.privacy.android.shared.original.core.ui.utils.ListStateMap
 import mega.privacy.android.shared.original.core.ui.utils.getState
 import mega.privacy.android.shared.original.core.ui.utils.sync
-import mega.privacy.android.domain.entity.node.publiclink.PublicLinkNode
-import mega.privacy.android.core.ui.mapper.FileTypeIconMapper
-import mega.privacy.android.legacy.core.ui.controls.LegacyMegaEmptyView
 
 /**
  * Composable view for Links screen
@@ -46,6 +46,7 @@ fun LinksView(
     onItemClick: (NodeUIItem<PublicLinkNode>) -> Unit,
     onLongClick: (NodeUIItem<PublicLinkNode>) -> Unit,
     onMenuClick: (NodeUIItem<PublicLinkNode>) -> Unit,
+    onLinkClick: (String) -> Unit,
     sortOrder: String,
     onSortOrderClick: () -> Unit,
     fileTypeIconMapper: FileTypeIconMapper,
@@ -97,8 +98,8 @@ fun LinksView(
                 onChangeViewTypeClick = { },
                 listState = currentListState,
                 gridState = gridState,
-                onLinkClicked = { },
-                onDisputeTakeDownClicked = { },
+                onLinkClicked = onLinkClick,
+                onDisputeTakeDownClicked = onLinkClick,
                 showMediaDiscoveryButton = false,
                 onEnterMediaDiscoveryClick = { },
                 showPublicLinkCreationTime = uiState.isInRootLevel,

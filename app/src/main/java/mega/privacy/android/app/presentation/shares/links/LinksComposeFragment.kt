@@ -1,8 +1,8 @@
 package mega.privacy.android.app.presentation.shares.links
 
+import mega.privacy.android.icon.pack.R as iconPackR
+import mega.privacy.android.shared.resources.R as sharedR
 import android.content.Context
-import android.content.Intent
-import android.net.Uri
 import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.Menu
@@ -32,8 +32,8 @@ import kotlinx.coroutines.flow.distinctUntilChanged
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.launch
 import mega.privacy.android.app.R
-import mega.privacy.android.app.activities.WebViewActivity
 import mega.privacy.android.app.arch.extensions.collectFlow
+import mega.privacy.android.app.extensions.launchUrl
 import mega.privacy.android.app.fragments.homepage.SortByHeaderViewModel
 import mega.privacy.android.app.interfaces.ActionBackupListener
 import mega.privacy.android.app.main.ManagerActivity
@@ -70,11 +70,9 @@ import mega.privacy.android.domain.entity.node.publiclink.PublicLinkFile
 import mega.privacy.android.domain.entity.node.publiclink.PublicLinkNode
 import mega.privacy.android.domain.usecase.GetThemeMode
 import mega.privacy.android.domain.usecase.featureflag.GetFeatureFlagValueUseCase
-import mega.privacy.android.icon.pack.R as iconPackR
 import mega.privacy.android.navigation.MegaNavigator
 import mega.privacy.android.shared.original.core.ui.theme.OriginalTheme
 import mega.privacy.android.shared.original.core.ui.utils.showAutoDurationSnackbar
-import mega.privacy.android.shared.resources.R as sharedR
 import timber.log.Timber
 import javax.inject.Inject
 
@@ -196,6 +194,7 @@ class LinksComposeFragment : Fragment() {
                             SortByHeaderViewModel.orderNameMap[uiState.sortOrder]
                                 ?: R.string.sortby_name
                         ),
+                        onLinkClick = context::launchUrl,
                         onSortOrderClick = ::showSortByPanel,
                         onToggleAppBarElevation = toggleAppBarElevation,
                         fileTypeIconMapper = fileTypeIconMapper,
@@ -492,11 +491,7 @@ class LinksComposeFragment : Fragment() {
                 }
 
                 OptionItems.DISPUTE_CLICKED -> {
-                    startActivity(
-                        Intent(requireContext(), WebViewActivity::class.java)
-                            .addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP)
-                            .setData(Uri.parse(Constants.DISPUTE_URL))
-                    )
+                    context.launchUrl(Constants.DISPUTE_URL)
                     disableSelectMode()
                 }
 
