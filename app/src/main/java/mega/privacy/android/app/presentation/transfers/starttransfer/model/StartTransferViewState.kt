@@ -1,8 +1,10 @@
 package mega.privacy.android.app.presentation.transfers.starttransfer.model
 
+import android.os.Parcelable
 import de.palm.composestateevents.StateEvent
 import de.palm.composestateevents.StateEventWithContent
 import de.palm.composestateevents.consumed
+import kotlinx.parcelize.Parcelize
 import java.io.File
 
 /**
@@ -43,4 +45,5 @@ data class StartTransferViewState(
  * @property destination The destination path.
  * @property destinationName The destination name.
  */
-data class SaveDestinationInfo(val destination: String, val destinationName: String)
+@Parcelize
+data class SaveDestinationInfo(val destination: String, val destinationName: String) : Parcelable
