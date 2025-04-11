@@ -46,6 +46,9 @@ import mega.privacy.android.legacy.core.ui.model.SearchWidgetState
  * @property isLocked whether the video player is locked
  * @property isSpeedPopupShown speed playback popup whether is shown, true is shown, otherwise is false
  * @property currentSpeedPlayback current SpeedPlaybackItem
+ * @property showPlaybackDialog whether the playback dialog is shown
+ * @property playbackPosition the playback position
+ * @property currentPlayingItemName the current playing item name
  */
 data class VideoPlayerUiState(
     val items: List<VideoPlayerItem> = emptyList(),
@@ -80,4 +83,7 @@ data class VideoPlayerUiState(
     val isLocked: Boolean = false,
     val isSpeedPopupShown: Boolean = false,
     val currentSpeedPlayback: SpeedPlaybackItem = SpeedPlaybackItem.PLAYBACK_SPEED_1_X,
+    val showPlaybackDialog: Boolean = false,
+    val playbackPosition: Long? = null,
+    val currentPlayingItemName: String? = null,
 )

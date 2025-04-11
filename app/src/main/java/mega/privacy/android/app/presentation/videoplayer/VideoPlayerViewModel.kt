@@ -36,6 +36,7 @@ import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.flow.conflate
 import kotlinx.coroutines.flow.filter
 import kotlinx.coroutines.flow.first
+import kotlinx.coroutines.flow.firstOrNull
 import kotlinx.coroutines.flow.launchIn
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.update
@@ -60,6 +61,7 @@ import mega.privacy.android.app.presentation.videoplayer.mapper.LaunchSourceMapp
 import mega.privacy.android.app.presentation.videoplayer.mapper.VideoPlayerItemMapper
 import mega.privacy.android.app.presentation.videoplayer.model.MediaPlaybackState
 import mega.privacy.android.app.presentation.videoplayer.model.MenuOptionClickedContent
+import mega.privacy.android.app.presentation.videoplayer.model.PlaybackPositionStatus
 import mega.privacy.android.app.presentation.videoplayer.model.VideoPlayerItem
 import mega.privacy.android.app.presentation.videoplayer.model.VideoPlayerMenuAction
 import mega.privacy.android.app.presentation.videoplayer.model.VideoPlayerMenuAction.VideoPlayerDownloadAction
@@ -118,6 +120,7 @@ import mega.privacy.android.app.utils.livedata.SingleLiveEvent
 import mega.privacy.android.domain.entity.SortOrder
 import mega.privacy.android.domain.entity.VideoFileTypeInfo
 import mega.privacy.android.domain.entity.account.business.BusinessAccountStatus
+import mega.privacy.android.domain.entity.mediaplayer.PlaybackInformation
 import mega.privacy.android.domain.entity.mediaplayer.RepeatToggleMode
 import mega.privacy.android.domain.entity.node.FileNode
 import mega.privacy.android.domain.entity.node.NameCollision
@@ -144,6 +147,7 @@ import mega.privacy.android.domain.usecase.GetRootNodeUseCase
 import mega.privacy.android.domain.usecase.GetRubbishNodeUseCase
 import mega.privacy.android.domain.usecase.GetUserNameByEmailUseCase
 import mega.privacy.android.domain.usecase.IsHiddenNodesOnboardedUseCase
+import mega.privacy.android.domain.usecase.MonitorPlaybackTimesUseCase
 import mega.privacy.android.domain.usecase.UpdateNodeSensitiveUseCase
 import mega.privacy.android.domain.usecase.account.MonitorAccountDetailUseCase
 import mega.privacy.android.domain.usecase.call.IsParticipatingInChatCallUseCase
@@ -160,6 +164,7 @@ import mega.privacy.android.domain.usecase.mediaplayer.HttpServerIsRunningUseCas
 import mega.privacy.android.domain.usecase.mediaplayer.HttpServerStartUseCase
 import mega.privacy.android.domain.usecase.mediaplayer.HttpServerStopUseCase
 import mega.privacy.android.domain.usecase.mediaplayer.videoplayer.CanRemoveFromChatUseCase
+import mega.privacy.android.domain.usecase.mediaplayer.videoplayer.DeletePlaybackInformationUseCase
 import mega.privacy.android.domain.usecase.mediaplayer.videoplayer.GetVideoNodeByHandleUseCase
 import mega.privacy.android.domain.usecase.mediaplayer.videoplayer.GetVideoNodesByEmailUseCase
 import mega.privacy.android.domain.usecase.mediaplayer.videoplayer.GetVideoNodesByHandlesUseCase
@@ -171,7 +176,9 @@ import mega.privacy.android.domain.usecase.mediaplayer.videoplayer.GetVideoNodes
 import mega.privacy.android.domain.usecase.mediaplayer.videoplayer.GetVideosByParentHandleFromMegaApiFolderUseCase
 import mega.privacy.android.domain.usecase.mediaplayer.videoplayer.GetVideosBySearchTypeUseCase
 import mega.privacy.android.domain.usecase.mediaplayer.videoplayer.MonitorVideoRepeatModeUseCase
+import mega.privacy.android.domain.usecase.mediaplayer.videoplayer.SavePlaybackTimesUseCase
 import mega.privacy.android.domain.usecase.mediaplayer.videoplayer.SetVideoRepeatModeUseCase
+import mega.privacy.android.domain.usecase.mediaplayer.videoplayer.TrackPlaybackPositionUseCase
 import mega.privacy.android.domain.usecase.node.CheckChatNodesNameCollisionAndCopyUseCase
 import mega.privacy.android.domain.usecase.node.CheckNodesNameCollisionWithActionUseCase
 import mega.privacy.android.domain.usecase.node.DisableExportUseCase
@@ -193,6 +200,7 @@ import mega.privacy.mobile.analytics.event.LockButtonPressedEvent
 import mega.privacy.mobile.analytics.event.UnlockButtonPressedEvent
 import mega.privacy.mobile.analytics.event.VideoPlayerFullScreenPressedEvent
 import mega.privacy.mobile.analytics.event.VideoPlayerGetLinkMenuToolbarEvent
+import mega.privacy.mobile.analytics.event.VideoPlayerIsActivatedEvent
 import mega.privacy.mobile.analytics.event.VideoPlayerOriginalPressedEvent
 import mega.privacy.mobile.analytics.event.VideoPlayerRemoveLinkMenuToolbarEvent
 import mega.privacy.mobile.analytics.event.VideoPlayerSaveToDeviceMenuToolbarEvent
@@ -279,6 +287,10 @@ class VideoPlayerViewModel @Inject constructor(
     private val launchSourceMapper: LaunchSourceMapper,
     private val durationInSecondsTextMapper: DurationInSecondsTextMapper,
     private val isParticipatingInChatCallUseCase: IsParticipatingInChatCallUseCase,
+    private val trackPlaybackPositionUseCase: TrackPlaybackPositionUseCase,
+    private val monitorPlaybackTimesUseCase: MonitorPlaybackTimesUseCase,
+    private val savePlaybackTimesUseCase: SavePlaybackTimesUseCase,
+    private val deletePlaybackInformationUseCase: DeletePlaybackInformationUseCase,
     savedStateHandle: SavedStateHandle,
 ) : ViewModel() {
     val uiState: StateFlow<VideoPlayerUiState>
@@ -289,6 +301,14 @@ class VideoPlayerViewModel @Inject constructor(
 
     private val currentLaunchSources: Int by lazy {
         savedStateHandle[INTENT_EXTRA_KEY_ADAPTER_TYPE] ?: INVALID_VALUE
+    }
+
+    private val firstPlayingHandle: Long by lazy {
+        savedStateHandle[INTENT_EXTRA_KEY_HANDLE] ?: INVALID_HANDLE
+    }
+
+    private val firstPlayingItemName: String by lazy {
+        savedStateHandle[INTENT_EXTRA_KEY_FILE_NAME] ?: ""
     }
 
     private val shouldShowAddTo: Boolean by lazy {
@@ -330,6 +350,10 @@ class VideoPlayerViewModel @Inject constructor(
     private val mediaItemsDuringChanged = mutableListOf<MediaItem>()
     private var searchJob: Job? = null
     private val mutex = Mutex()
+    private var playbackPositionJob: Job? = null
+    private var hasCheckedPlaybackPosition = false
+    private var playbackPositionStatus = PlaybackPositionStatus.Initial
+    private var currentIntent: Intent? = null
 
     init {
         setupTransferListener()
@@ -438,9 +462,24 @@ class VideoPlayerViewModel @Inject constructor(
         }
     }
 
-    internal fun initVideoPlaybackSources(intent: Intent?) {
+    internal fun initVideoPlayerData(intent: Intent?) {
+        currentIntent = intent
+        checkPlaybackPositionBeforePlayback(firstPlayingHandle) {
+            initVideoPlaybackSources()
+        }
+        hasCheckedPlaybackPosition = true
+    }
+
+    private fun initVideoPlaybackSources() {
         viewModelScope.launch {
-            buildPlaybackSources(intent)
+            buildPlaybackSources(currentIntent)
+            trackPlaybackPositionUseCase {
+                PlaybackInformation(
+                    mediaPlayerGateway.getCurrentMediaItem()?.mediaId?.toLong(),
+                    mediaPlayerGateway.getCurrentItemDuration(),
+                    mediaPlayerGateway.getCurrentPlayingPosition()
+                )
+            }
         }
     }
 
@@ -983,11 +1022,27 @@ class VideoPlayerViewModel @Inject constructor(
             if (needStopStreamingServer) {
                 httpServerStopUseCase()
             }
+            savePlaybackTimesUseCase()
         }
     }
 
     internal fun updateMetadata(metadata: Metadata) =
         uiState.update { it.copy(metadata = metadata) }
+
+    internal fun onMediaItemTransition(handle: String?, isUpdateName: Boolean) {
+        updateCurrentPlayingVideoSize(null)
+        if (handle == null) return
+        if (uiState.value.currentPlayingHandle != handle.toLong())
+            Analytics.tracker.trackEvent(VideoPlayerIsActivatedEvent)
+        updateCurrentPlayingHandle(handle.toLong())
+        saveVideoWatchedTime()
+        if (isUpdateName) {
+            val nodeName = uiState.value.items.find {
+                it.nodeHandle == handle.toLong()
+            }?.nodeName ?: ""
+            updateMetadata(Metadata(null, null, null, nodeName))
+        }
+    }
 
     internal fun updateCurrentPlayingVideoSize(videoSize: VideoSize?) =
         uiState.update { it.copy(currentPlayingVideoSize = videoSize) }
@@ -997,7 +1052,12 @@ class VideoPlayerViewModel @Inject constructor(
         items: List<VideoPlayerItem> = uiState.value.items,
     ) {
         val playingIndex = items.indexOfFirst { it.nodeHandle == handle }.takeIf { it != -1 } ?: 0
+        val playingItemName = items.firstOrNull { it.nodeHandle == handle }?.nodeName
         viewModelScope.launch {
+            savePlaybackTimesUseCase()
+
+            handlePlaybackPositionAfterVideoTransition(handle)
+
             val actions = getMenuActionsForVideo(
                 launchSource = currentLaunchSources,
                 videoNodeHandle = handle,
@@ -1019,8 +1079,65 @@ class VideoPlayerViewModel @Inject constructor(
                     items = updatedItems,
                     currentPlayingHandle = handle,
                     currentPlayingIndex = playingIndex,
-                    menuActions = actions
+                    menuActions = actions,
+                    currentPlayingItemName = playingItemName
                 )
+            }
+        }
+    }
+
+    private fun handlePlaybackPositionAfterVideoTransition(handle: Long) {
+        // Pause the video before check playback position
+        mediaPlayerGateway.setPlayWhenReady(false)
+        //If hasCheckedPlaybackPosition is true, avoid checking playback position again
+        if (!hasCheckedPlaybackPosition) {
+            checkPlaybackPositionBeforePlayback(handle) {
+                mediaPlayerGateway.setPlayWhenReady(true)
+            }
+        } else {
+            checkPlaybackPositionStatus()
+        }
+
+        // Reset hasCheckedPlaybackPosition to re-check playback position on video transition
+        hasCheckedPlaybackPosition = false
+    }
+
+    private fun checkPlaybackPositionStatus(
+        playbackPosition: Long? = uiState.value.playbackPosition,
+    ) {
+        when (playbackPositionStatus) {
+            PlaybackPositionStatus.Restart -> viewModelScope.launch {
+                deletePlaybackInformationUseCase(uiState.value.currentPlayingHandle)
+            }
+
+            PlaybackPositionStatus.Resume -> playbackPosition?.let {
+                mediaPlayerGateway.playerSeekToPositionInMs(it)
+            }
+
+            else -> Unit
+        }
+        playbackPositionStatus = PlaybackPositionStatus.Initial
+
+        if (!mediaPlayerGateway.getPlayWhenReady()) {
+            mediaPlayerGateway.setPlayWhenReady(true)
+        }
+    }
+
+    internal fun onPlaybackStateChanged(state: Int) {
+        val playbackState = uiState.value.mediaPlaybackState
+        when {
+            state == MEDIA_PLAYER_STATE_ENDED &&
+                    playbackState == MediaPlaybackState.Playing ->
+                updatePlaybackState(MediaPlaybackState.Paused)
+
+            state == MEDIA_PLAYER_STATE_READY -> {
+                if (playbackState == MediaPlaybackState.Paused
+                    && !mediaPlayerGateway.getPlayWhenReady()
+                    && !uiState.value.isAutoReplay
+                    && playbackPositionStatus == PlaybackPositionStatus.Initial
+                ) {
+                    mediaPlayerGateway.setPlayWhenReady(true)
+                }
             }
         }
     }
@@ -1098,7 +1215,7 @@ class VideoPlayerViewModel @Inject constructor(
                 ZIP_ADAPTER -> {
                     val mediaItem = mediaPlayerGateway.getCurrentMediaItem()
                     val uri = mediaItem?.localConfiguration?.uri ?: return@launch
-                    val nodeName = getCurrentPlayingItem()?.nodeName ?: return@launch
+                    val nodeName = uiState.value.currentPlayingItemName ?: return@launch
                     TransferTriggerEvent.CopyUri(nodeName, uri)
                 }
 
@@ -1174,7 +1291,7 @@ class VideoPlayerViewModel @Inject constructor(
                 }
 
                 FILE_LINK_ADAPTER -> {
-                    val nodeName = getCurrentPlayingItem()?.nodeName ?: ""
+                    val nodeName = uiState.value.currentPlayingItemName ?: ""
                     val content = MenuOptionClickedContent.ShareLink(fileLink, nodeName)
                     uiState.update { it.copy(menuOptionClickedContent = content) }
                 }
@@ -1236,10 +1353,6 @@ class VideoPlayerViewModel @Inject constructor(
                     isNodeInCloudDriveUseCase(handle) &&
                     isNodeInBackupsNodeUseCase(handle)
         }.getOrDefault(false)
-    }
-
-    internal fun getCurrentPlayingItem() = uiState.value.items.firstOrNull {
-        it.nodeHandle == uiState.value.currentPlayingHandle
     }
 
     /**
@@ -1761,7 +1874,45 @@ class VideoPlayerViewModel @Inject constructor(
         uiState.update { it.copy(isLocked = value) }
     }
 
+    private fun checkPlaybackPositionBeforePlayback(handle: Long, noPlaybackPosition: () -> Unit) {
+        playbackPositionJob?.cancel()
+        playbackPositionJob = viewModelScope.launch {
+            val currentItemName = uiState.value.currentPlayingItemName ?: firstPlayingItemName
+            val playbackPosition =
+                monitorPlaybackTimesUseCase().firstOrNull()?.get(handle)?.currentPosition
+
+            if (playbackPosition != null && playbackPosition > 0) {
+                playbackPositionStatus = PlaybackPositionStatus.DialogShowing
+                uiState.update {
+                    it.copy(
+                        showPlaybackDialog = true,
+                        playbackPosition = playbackPosition,
+                        currentPlayingItemName = currentItemName
+                    )
+                }
+            } else {
+                noPlaybackPosition()
+            }
+        }
+    }
+
+    internal fun updatePlaybackPositionStatus(
+        value: PlaybackPositionStatus,
+        playbackPosition: Long? = uiState.value.playbackPosition,
+    ) {
+        playbackPositionStatus = value
+        if (hasCheckedPlaybackPosition) {
+            initVideoPlaybackSources()
+        } else {
+            checkPlaybackPositionStatus(playbackPosition)
+        }
+        uiState.update { it.copy(showPlaybackDialog = false) }
+    }
+
     companion object {
+        private const val MEDIA_PLAYER_STATE_ENDED = 4
+        private const val MEDIA_PLAYER_STATE_READY = 3
+
         private const val MAX_RETRY = 6
 
         private const val MEGA_SCREENSHOTS_FOLDER_NAME = "MEGA Screenshots/"

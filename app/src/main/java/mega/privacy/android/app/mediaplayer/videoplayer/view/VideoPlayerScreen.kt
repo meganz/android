@@ -1,5 +1,6 @@
 package mega.privacy.android.app.mediaplayer.videoplayer.view
 
+import android.annotation.SuppressLint
 import android.content.res.Configuration.ORIENTATION_LANDSCAPE
 import android.content.res.Configuration.ORIENTATION_PORTRAIT
 import android.graphics.Bitmap
@@ -35,6 +36,7 @@ import androidx.compose.ui.platform.LocalConfiguration
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.platform.LocalLayoutDirection
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.semantics.semantics
 import androidx.compose.ui.semantics.testTagsAsResourceId
 import androidx.compose.ui.unit.Density
@@ -63,11 +65,14 @@ import mega.privacy.android.app.databinding.VideoPlayerPlayerViewBinding
 import mega.privacy.android.app.presentation.videoplayer.VideoPlayerController
 import mega.privacy.android.app.presentation.videoplayer.VideoPlayerViewModel
 import mega.privacy.android.app.presentation.videoplayer.model.MediaPlaybackState
+import mega.privacy.android.app.presentation.videoplayer.model.PlaybackPositionStatus
 import mega.privacy.android.app.presentation.videoplayer.view.VideoPlayerTopBar
 import mega.privacy.android.app.utils.Constants.AUDIO_PLAYER_TOOLBAR_INIT_HIDE_DELAY_MS
+import mega.privacy.android.shared.original.core.ui.controls.dialogs.MegaAlertDialog
 import mega.privacy.android.shared.original.core.ui.controls.layouts.MegaScaffold
 import mega.privacy.android.shared.original.core.ui.controls.sheets.MegaBottomSheetLayout
 import mega.privacy.android.shared.original.core.ui.utils.showAutoDurationSnackbar
+import kotlin.math.roundToInt
 
 @androidx.annotation.OptIn(UnstableApi::class)
 @OptIn(ExperimentalComposeUiApi::class, ExperimentalMaterialNavigationApi::class)
@@ -112,6 +117,8 @@ internal fun VideoPlayerScreen(
     val screenWidth = with(density) { LocalConfiguration.current.screenWidthDp.dp.toPx() }
     val screenHeight = with(density) { LocalConfiguration.current.screenHeightDp.dp.toPx() }
 
+    var playerView by remember { mutableStateOf<PlayerView?>(null) }
+
     LaunchedEffect(isScreenshotVisible) {
         if (isScreenshotVisible) {
             scale.snapTo(1f)
@@ -130,6 +137,22 @@ internal fun VideoPlayerScreen(
         uiState.snackBarMessage?.let { message ->
             scaffoldState.snackbarHostState.showAutoDurationSnackbar(message)
             viewModel.updateSnackBarMessage(null)
+        }
+    }
+
+    LaunchedEffect(uiState.showPlaybackDialog) {
+        if (uiState.showPlaybackDialog) {
+            autoHideJob?.cancel()
+        } else {
+            if (isControllerViewVisible) {
+                autoHideJob?.cancel()
+                autoHideJob = coroutineScope.launch {
+                    delay(AUDIO_PLAYER_TOOLBAR_INIT_HIDE_DELAY_MS)
+                    isControllerViewVisible = false
+                    systemUiController.isSystemBarsVisible = false
+                    playerView?.hideController()
+                }
+            }
         }
     }
 
@@ -160,6 +183,7 @@ internal fun VideoPlayerScreen(
                     factory = { inflater, parent, attachToParent ->
                         VideoPlayerPlayerViewBinding.inflate(inflater, parent, attachToParent)
                             .apply {
+                                playerView = playerComposeView
                                 fun updateResizeMode(isFullscreen: Boolean) {
                                     playerComposeView.resizeMode = if (isFullscreen) {
                                         RESIZE_MODE_ZOOM
@@ -312,6 +336,28 @@ internal fun VideoPlayerScreen(
                         )
                     }
                 }
+
+                if (uiState.showPlaybackDialog) {
+                    MegaAlertDialog(
+                        title = stringResource(R.string.video_playback_position_dialog_title),
+                        body = stringResource(
+                            R.string.video_playback_position_dialog_message,
+                            uiState.currentPlayingItemName ?: "",
+                            formatSecondsToString(uiState.playbackPosition ?: 0)
+                        ),
+                        confirmButtonText = stringResource(R.string.video_playback_position_dialog_restart_button),
+                        cancelButtonText = stringResource(R.string.video_playback_position_dialog_resume_button),
+                        onConfirm = {
+                            viewModel.updatePlaybackPositionStatus(PlaybackPositionStatus.Restart)
+                        },
+                        onCancel = {
+                            viewModel.updatePlaybackPositionStatus(PlaybackPositionStatus.Resume)
+                        },
+                        onDismiss = {
+                            viewModel.updatePlaybackPositionStatus(PlaybackPositionStatus.Initial)
+                        },
+                    )
+                }
             }
         }
     }
@@ -326,4 +372,19 @@ private fun getNavigationBarHeight(
     with(density) { WindowInsets.navigationBars.getRight(density, layoutDirection).toDp() }
 } else {
     with(density) { WindowInsets.navigationBars.getBottom(density).toDp() }
+}
+
+@SuppressLint("DefaultLocale")
+private fun formatSecondsToString(milliseconds: Long): String {
+    val totalSeconds = (milliseconds / 1000.0).roundToInt()
+    val hours = totalSeconds / 3600
+    val remSeconds = totalSeconds % 3600
+    val minutes = remSeconds / 60
+    val seconds = remSeconds % 60
+
+    return if (hours >= 1) {
+        String.format("%2d:%02d:%02d", hours, minutes, seconds)
+    } else {
+        String.format("%02d:%02d", minutes, seconds)
+    }
 }

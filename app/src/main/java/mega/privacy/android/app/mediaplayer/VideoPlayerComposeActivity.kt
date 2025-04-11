@@ -131,7 +131,7 @@ import mega.privacy.android.navigation.MegaNavigator
 import mega.privacy.android.shared.original.core.ui.theme.OriginalTheme
 import mega.privacy.mobile.analytics.event.HideNodeMultiSelectMenuItemEvent
 import mega.privacy.mobile.analytics.event.VideoPlayerInfoMenuItemEvent
-import mega.privacy.mobile.analytics.event.VideoPlayerIsActivatedEvent
+import mega.privacy.mobile.analytics.event.VideoPlayerScreenEvent
 import mega.privacy.mobile.analytics.event.VideoPlayerSendToChatMenuToolbarEvent
 import nz.mega.sdk.MegaApiJava.INVALID_HANDLE
 import timber.log.Timber
@@ -277,6 +277,7 @@ class VideoPlayerComposeActivity : PasscodeActivity() {
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
+        Analytics.tracker.trackEvent(VideoPlayerScreenEvent)
         enableEdgeToEdge()
         currentOrientation = resources.configuration.orientation
         observeRotationSettingsChange()
@@ -351,8 +352,7 @@ class VideoPlayerComposeActivity : PasscodeActivity() {
                 )
             }
         }
-
-        videoPlayerViewModel.initVideoPlaybackSources(intent)
+        videoPlayerViewModel.initVideoPlayerData(intent)
         registerReceiver(headsetPlugReceiver, IntentFilter(Intent.ACTION_HEADSET_PLUG))
         setupObserver()
         initMediaSession()
@@ -394,24 +394,7 @@ class VideoPlayerComposeActivity : PasscodeActivity() {
             nameChangeCallback = nameChangeCallback,
             mediaPlayerCallback = object : MediaPlayerCallback {
                 override fun onMediaItemTransitionCallback(handle: String?, isUpdateName: Boolean) {
-                    with(videoPlayerViewModel) {
-                        updateCurrentPlayingVideoSize(null)
-                        if (handle == null) return
-                        if (uiState.value.currentPlayingHandle != handle.toLong())
-                            Analytics.tracker.trackEvent(VideoPlayerIsActivatedEvent)
-                        updateCurrentPlayingHandle(handle.toLong())
-                        saveVideoWatchedTime()
-                        if (isUpdateName) {
-                            val nodeName = uiState.value.items.find {
-                                it.nodeHandle == handle.toLong()
-                            }?.nodeName ?: ""
-                            updateMetadata(Metadata(null, null, null, nodeName))
-                        }
-
-                        if (!mediaPlayerGateway.getPlayWhenReady()) {
-                            mediaPlayerGateway.setPlayWhenReady(true)
-                        }
-                    }
+                    videoPlayerViewModel.onMediaItemTransition(handle, isUpdateName)
                 }
 
                 override fun onShuffleModeEnabledChangedCallback(shuffleModeEnabled: Boolean) {
@@ -430,21 +413,7 @@ class VideoPlayerComposeActivity : PasscodeActivity() {
                 }
 
                 override fun onPlaybackStateChangedCallback(state: Int) {
-                    val playbackState = videoPlayerViewModel.uiState.value.mediaPlaybackState
-                    when {
-                        state == MEDIA_PLAYER_STATE_ENDED &&
-                                playbackState == MediaPlaybackState.Playing ->
-                            videoPlayerViewModel.updatePlaybackState(MediaPlaybackState.Paused)
-
-                        state == MEDIA_PLAYER_STATE_READY -> {
-                            if (playbackState == MediaPlaybackState.Paused
-                                && !mediaPlayerGateway.getPlayWhenReady()
-                                && !videoPlayerViewModel.uiState.value.isAutoReplay
-                            ) {
-                                mediaPlayerGateway.setPlayWhenReady(true)
-                            }
-                        }
-                    }
+                    videoPlayerViewModel.onPlaybackStateChanged(state)
                 }
 
                 override fun onPlayerErrorCallback() = videoPlayerViewModel.onPlayerError()
@@ -611,7 +580,7 @@ class VideoPlayerComposeActivity : PasscodeActivity() {
                     }
 
                 else -> {
-                    val nodeName = videoPlayerViewModel.getCurrentPlayingItem()?.nodeName
+                    val nodeName = videoPlayerViewModel.uiState.value.currentPlayingItemName
                     Intent(this@VideoPlayerComposeActivity, FileInfoActivity::class.java).apply {
                         putExtra(HANDLE, playingHandle)
                         putExtra(NAME, nodeName)
@@ -808,9 +777,6 @@ class VideoPlayerComposeActivity : PasscodeActivity() {
     }
 
     companion object {
-        private const val MEDIA_PLAYER_STATE_ENDED = 4
-        private const val MEDIA_PLAYER_STATE_READY = 3
-
         private const val INTENT_KEY_STATE = "state"
         private const val STATE_HEADSET_UNPLUGGED = 0
     }

@@ -32,6 +32,7 @@ import mega.privacy.android.app.presentation.videoplayer.mapper.LaunchSourceMapp
 import mega.privacy.android.app.presentation.videoplayer.mapper.VideoPlayerItemMapper
 import mega.privacy.android.app.presentation.videoplayer.model.MediaPlaybackState
 import mega.privacy.android.app.presentation.videoplayer.model.MenuOptionClickedContent
+import mega.privacy.android.app.presentation.videoplayer.model.PlaybackPositionStatus
 import mega.privacy.android.app.presentation.videoplayer.model.VideoPlayerItem
 import mega.privacy.android.app.presentation.videoplayer.model.VideoPlayerMenuAction
 import mega.privacy.android.app.presentation.videoplayer.model.VideoPlayerMenuAction.VideoPlayerAddToAction
@@ -97,6 +98,7 @@ import mega.privacy.android.domain.entity.VideoFileTypeInfo
 import mega.privacy.android.domain.entity.account.AccountDetail
 import mega.privacy.android.domain.entity.account.AccountLevelDetail
 import mega.privacy.android.domain.entity.account.business.BusinessAccountStatus
+import mega.privacy.android.domain.entity.mediaplayer.PlaybackInformation
 import mega.privacy.android.domain.entity.mediaplayer.RepeatToggleMode
 import mega.privacy.android.domain.entity.node.FileNode
 import mega.privacy.android.domain.entity.node.MoveRequestResult
@@ -125,6 +127,7 @@ import mega.privacy.android.domain.usecase.GetRootNodeUseCase
 import mega.privacy.android.domain.usecase.GetRubbishNodeUseCase
 import mega.privacy.android.domain.usecase.GetUserNameByEmailUseCase
 import mega.privacy.android.domain.usecase.IsHiddenNodesOnboardedUseCase
+import mega.privacy.android.domain.usecase.MonitorPlaybackTimesUseCase
 import mega.privacy.android.domain.usecase.UpdateNodeSensitiveUseCase
 import mega.privacy.android.domain.usecase.account.MonitorAccountDetailUseCase
 import mega.privacy.android.domain.usecase.call.IsParticipatingInChatCallUseCase
@@ -141,6 +144,7 @@ import mega.privacy.android.domain.usecase.mediaplayer.HttpServerIsRunningUseCas
 import mega.privacy.android.domain.usecase.mediaplayer.HttpServerStartUseCase
 import mega.privacy.android.domain.usecase.mediaplayer.HttpServerStopUseCase
 import mega.privacy.android.domain.usecase.mediaplayer.videoplayer.CanRemoveFromChatUseCase
+import mega.privacy.android.domain.usecase.mediaplayer.videoplayer.DeletePlaybackInformationUseCase
 import mega.privacy.android.domain.usecase.mediaplayer.videoplayer.GetVideoNodeByHandleUseCase
 import mega.privacy.android.domain.usecase.mediaplayer.videoplayer.GetVideoNodesByEmailUseCase
 import mega.privacy.android.domain.usecase.mediaplayer.videoplayer.GetVideoNodesByHandlesUseCase
@@ -152,7 +156,9 @@ import mega.privacy.android.domain.usecase.mediaplayer.videoplayer.GetVideoNodes
 import mega.privacy.android.domain.usecase.mediaplayer.videoplayer.GetVideosByParentHandleFromMegaApiFolderUseCase
 import mega.privacy.android.domain.usecase.mediaplayer.videoplayer.GetVideosBySearchTypeUseCase
 import mega.privacy.android.domain.usecase.mediaplayer.videoplayer.MonitorVideoRepeatModeUseCase
+import mega.privacy.android.domain.usecase.mediaplayer.videoplayer.SavePlaybackTimesUseCase
 import mega.privacy.android.domain.usecase.mediaplayer.videoplayer.SetVideoRepeatModeUseCase
+import mega.privacy.android.domain.usecase.mediaplayer.videoplayer.TrackPlaybackPositionUseCase
 import mega.privacy.android.domain.usecase.node.CheckChatNodesNameCollisionAndCopyUseCase
 import mega.privacy.android.domain.usecase.node.CheckNodesNameCollisionWithActionUseCase
 import mega.privacy.android.domain.usecase.node.DisableExportUseCase
@@ -174,6 +180,7 @@ import mega.privacy.mobile.analytics.event.LockButtonPressedEvent
 import mega.privacy.mobile.analytics.event.UnlockButtonPressedEvent
 import mega.privacy.mobile.analytics.event.VideoPlayerFullScreenPressedEvent
 import mega.privacy.mobile.analytics.event.VideoPlayerGetLinkMenuToolbarEvent
+import mega.privacy.mobile.analytics.event.VideoPlayerIsActivatedEvent
 import mega.privacy.mobile.analytics.event.VideoPlayerOriginalPressedEvent
 import mega.privacy.mobile.analytics.event.VideoPlayerRemoveLinkMenuToolbarEvent
 import mega.privacy.mobile.analytics.event.VideoPlayerSaveToDeviceMenuToolbarEvent
@@ -288,6 +295,10 @@ class VideoPlayerViewModelTest {
     private val isParticipatingInChatCallUseCase = mock<IsParticipatingInChatCallUseCase>()
     private val launchSourceMapper = mock<LaunchSourceMapper>()
     private val savedStateHandle = SavedStateHandle(mapOf())
+    private val trackPlaybackPositionUseCase = mock<TrackPlaybackPositionUseCase>()
+    private val monitorPlaybackTimesUseCase = mock<MonitorPlaybackTimesUseCase>()
+    private val savePlaybackTimesUseCase = mock<SavePlaybackTimesUseCase>()
+    private val deletePlaybackInformationUseCase = mock<DeletePlaybackInformationUseCase>()
 
     private val testHandle: Long = 123456
     private val testFileName = "test.mp4"
@@ -366,12 +377,18 @@ class VideoPlayerViewModelTest {
             launchSourceMapper = launchSourceMapper,
             savedStateHandle = savedStateHandle,
             durationInSecondsTextMapper = durationInSecondsTextMapper,
-            isParticipatingInChatCallUseCase = isParticipatingInChatCallUseCase
+            isParticipatingInChatCallUseCase = isParticipatingInChatCallUseCase,
+            trackPlaybackPositionUseCase = trackPlaybackPositionUseCase,
+            monitorPlaybackTimesUseCase = monitorPlaybackTimesUseCase,
+            savePlaybackTimesUseCase = savePlaybackTimesUseCase,
+            deletePlaybackInformationUseCase = deletePlaybackInformationUseCase,
         )
         savedStateHandle[INTENT_EXTRA_KEY_VIDEO_COLLECTION_ID] = expectedCollectionId
         savedStateHandle[INTENT_EXTRA_KEY_VIDEO_COLLECTION_TITLE] = expectedCollectionTitle
         savedStateHandle[INTENT_EXTRA_KEY_CHAT_ID] = expectedChatId
         savedStateHandle[INTENT_EXTRA_KEY_MSG_ID] = expectedMessageId
+        savedStateHandle[INTENT_EXTRA_KEY_HANDLE] = testHandle
+        savedStateHandle[INTENT_EXTRA_KEY_FILE_NAME] = testFileName
     }
 
     @BeforeEach
@@ -388,6 +405,7 @@ class VideoPlayerViewModelTest {
         wheneverBlocking {
             getFeatureFlagValueUseCase(ApiFeatures.HiddenNodesInternalRelease)
         }.thenReturn(true)
+        whenever(monitorPlaybackTimesUseCase()).thenReturn(flowOf(null))
         initViewModel()
     }
 
@@ -455,7 +473,11 @@ class VideoPlayerViewModelTest {
             monitorNodeUpdatesUseCase,
             launchSourceMapper,
             durationInSecondsTextMapper,
-            isParticipatingInChatCallUseCase
+            isParticipatingInChatCallUseCase,
+            trackPlaybackPositionUseCase,
+            monitorPlaybackTimesUseCase,
+            savePlaybackTimesUseCase,
+            deletePlaybackInformationUseCase,
         )
     }
 
@@ -509,7 +531,7 @@ class VideoPlayerViewModelTest {
         runTest {
             val intent = mock<Intent>()
             initTestDataForTestingInvalidParams(intent = intent, rebuildPlaylist = false)
-            underTest.initVideoPlaybackSources(intent)
+            underTest.initVideoPlayerData(intent)
             underTest.uiState.test {
                 assertThat(awaitItem().isRetry).isFalse()
             }
@@ -545,7 +567,7 @@ class VideoPlayerViewModelTest {
                 rebuildPlaylist = true,
                 launchSource = INVALID_VALUE
             )
-            underTest.initVideoPlaybackSources(intent)
+            underTest.initVideoPlayerData(intent)
             underTest.uiState.test {
                 assertThat(awaitItem().isRetry).isFalse()
             }
@@ -560,7 +582,7 @@ class VideoPlayerViewModelTest {
                 rebuildPlaylist = true,
                 launchSource = FOLDER_LINK_ADAPTER,
             )
-            underTest.initVideoPlaybackSources(intent)
+            underTest.initVideoPlayerData(intent)
             underTest.uiState.test {
                 assertThat(awaitItem().isRetry).isFalse()
             }
@@ -577,7 +599,7 @@ class VideoPlayerViewModelTest {
                 data = mock(),
                 handle = INVALID_HANDLE
             )
-            underTest.initVideoPlaybackSources(intent)
+            underTest.initVideoPlayerData(intent)
             underTest.uiState.test {
                 assertThat(awaitItem().isRetry).isFalse()
             }
@@ -594,7 +616,7 @@ class VideoPlayerViewModelTest {
                 data = mock(),
                 handle = 123456
             )
-            underTest.initVideoPlaybackSources(intent)
+            underTest.initVideoPlayerData(intent)
             underTest.uiState.test {
                 assertThat(awaitItem().isRetry).isFalse()
             }
@@ -613,7 +635,7 @@ class VideoPlayerViewModelTest {
                 fileName = "test.mp4"
             )
             whenever(getLocalFolderLinkUseCase(any())).thenReturn(null)
-            underTest.initVideoPlaybackSources(intent)
+            underTest.initVideoPlayerData(intent)
             underTest.uiState.test {
                 assertThat(awaitItem().isRetry).isFalse()
             }
@@ -634,7 +656,7 @@ class VideoPlayerViewModelTest {
                 handle = testHandle,
                 fileName = testFileName
             )
-            underTest.initVideoPlaybackSources(intent)
+            underTest.initVideoPlayerData(intent)
             advanceUntilIdle()
             underTest.uiState.test {
                 val actual = awaitItem()
@@ -676,7 +698,7 @@ class VideoPlayerViewModelTest {
             ).thenReturn(videoPlayerItem)
             whenever(intent.getBooleanExtra(INTENT_EXTRA_KEY_IS_PLAYLIST, true)).thenReturn(false)
             whenever(getVideoNodeByHandleUseCase(testHandle)).thenReturn(node)
-            underTest.initVideoPlaybackSources(intent)
+            underTest.initVideoPlayerData(intent)
             underTest.uiState.test {
                 val actual = awaitItem()
                 actual.items.let { items ->
@@ -767,7 +789,7 @@ class VideoPlayerViewModelTest {
 
             mockStatic(Uri::class.java).use {
                 whenever(Uri.parse(testAbsolutePath)).thenReturn(mock())
-                underTest.initVideoPlaybackSources(intent)
+                underTest.initVideoPlayerData(intent)
                 underTest.uiState.test {
                     val actual = awaitItem()
                     actual.items.let { items ->
@@ -870,7 +892,7 @@ class VideoPlayerViewModelTest {
                 testFiles.forEach { file ->
                     whenever(FileUtil.getUriForFile(context, file)).thenReturn(mock())
                 }
-                underTest.initVideoPlaybackSources(intent)
+                underTest.initVideoPlayerData(intent)
                 underTest.uiState.test {
                     val actual = awaitItem()
                     actual.items.let { items ->
@@ -1017,7 +1039,7 @@ class VideoPlayerViewModelTest {
         ).thenReturn(true)
         mockStatic(Uri::class.java).use {
             whenever(Uri.parse(testAbsolutePath)).thenReturn(mock())
-            underTest.initVideoPlaybackSources(intent)
+            underTest.initVideoPlayerData(intent)
             underTest.uiState.test {
                 val actual = awaitItem()
                 actual.items.let { items ->
@@ -2129,9 +2151,110 @@ class VideoPlayerViewModelTest {
         assertThat(actual).isEqualTo(value)
     }
 
+    @ParameterizedTest(name = "when isUpdateName is {0}")
+    @ValueSource(booleans = [true, false])
+    fun `test that state is updated correctly after onMediaItemTransition is invoked`(
+        isUpdateName: Boolean,
+    ) = runTest {
+        val testMediaItem = MediaItem.Builder()
+            .setMediaId(testHandle.toString())
+            .build()
+        whenever(mediaPlayerGateway.getCurrentMediaItem()).thenReturn(testMediaItem)
+        whenever(getVideoNodeByHandleUseCase(any(), any())).thenReturn(mock())
+        whenever(launchSourceMapper(any(), any(), any(), any(), any(), any())).thenReturn(
+            emptyList()
+        )
+        initViewModel()
+        underTest.onMediaItemTransition(testHandle.toString(), isUpdateName)
+        assertThat(analyticsExtension.events.first()).isInstanceOf(VideoPlayerIsActivatedEvent::class.java)
+        verify(saveVideoRecentlyWatchedUseCase).invoke(any(), any(), any(), any())
+        if (isUpdateName) {
+            underTest.uiState.test {
+                val metadata = awaitItem().metadata
+                assertThat(metadata.title).isNull()
+                assertThat(metadata.artist).isNull()
+                assertThat(metadata.album).isNull()
+                assertThat(metadata.nodeName).isEmpty()
+            }
+        }
+    }
+
+    @Test
+    fun `test that state is updated correctly after checkPlaybackPositionBeforePlayback is invoked`() =
+        runTest {
+            val playbackInfo = mock<PlaybackInformation> {
+                on { currentPosition }.thenReturn(100)
+            }
+            val map = mapOf<Long, PlaybackInformation>(testHandle to playbackInfo)
+            whenever(monitorPlaybackTimesUseCase()).thenReturn(flowOf(map))
+            initViewModel()
+            underTest.initVideoPlayerData(null)
+            advanceUntilIdle()
+            underTest.uiState.test {
+                val actual = awaitItem()
+                assertThat(actual.showPlaybackDialog).isTrue()
+                assertThat(actual.playbackPosition).isEqualTo(100)
+                assertThat(actual.currentPlayingItemName).isEqualTo(testFileName)
+                cancelAndConsumeRemainingEvents()
+            }
+        }
+
+    @ParameterizedTest(name = "when PlaybackPositionStatus is {0}")
+    @MethodSource("providePlaybackPositionStatus")
+    fun `test that state is updated correctly after updatePlaybackStatus is invoked`(
+        status: PlaybackPositionStatus,
+    ) = runTest {
+        whenever(mediaPlayerGateway.getPlayWhenReady()).thenReturn(false)
+        initViewModel()
+        underTest.updatePlaybackPositionStatus(status, 100)
+        when (status) {
+            PlaybackPositionStatus.Restart -> verify(deletePlaybackInformationUseCase).invoke(any())
+            PlaybackPositionStatus.Resume -> verify(mediaPlayerGateway).playerSeekToPositionInMs(any())
+            else -> Unit
+        }
+        verify(mediaPlayerGateway).setPlayWhenReady(true)
+        underTest.uiState.test {
+            assertThat(awaitItem().showPlaybackDialog).isFalse()
+        }
+    }
+
+    private fun providePlaybackPositionStatus() = listOf(
+        PlaybackPositionStatus.Restart,
+        PlaybackPositionStatus.Resume,
+        PlaybackPositionStatus.DialogShowing,
+        PlaybackPositionStatus.Initial,
+    )
+
+    @ParameterizedTest(name = "when state is {0}")
+    @ValueSource(ints = [MEDIA_PLAYER_STATE_ENDED, MEDIA_PLAYER_STATE_READY])
+    fun `test that behaviour is as expected after onPlaybackStateChanged is invoked`(
+        state: Int,
+    ) = runTest {
+        whenever(mediaPlayerGateway.getPlayWhenReady()).thenReturn(false)
+        initViewModel()
+        underTest.updatePlaybackState(
+            if (state == MEDIA_PLAYER_STATE_ENDED) {
+                MediaPlaybackState.Playing
+            } else {
+                MediaPlaybackState.Paused
+            }
+        )
+        underTest.onPlaybackStateChanged(state)
+        if (state == MEDIA_PLAYER_STATE_READY) {
+            verify(mediaPlayerGateway).setPlayWhenReady(true)
+        } else {
+            underTest.uiState.test {
+                assertThat(awaitItem().mediaPlaybackState).isEqualTo(MediaPlaybackState.Paused)
+            }
+        }
+    }
+
     companion object {
         @JvmField
         @RegisterExtension
         val analyticsExtension = AnalyticsTestExtension()
+
+        private const val MEDIA_PLAYER_STATE_ENDED = 4
+        private const val MEDIA_PLAYER_STATE_READY = 3
     }
 }
