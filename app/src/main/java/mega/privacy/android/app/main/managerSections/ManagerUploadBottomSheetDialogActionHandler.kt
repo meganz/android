@@ -99,9 +99,13 @@ internal class ManagerUploadBottomSheetDialogActionHandler @Inject constructor(
         managerActivity.registerForActivityResult(OpenMultipleDocumentsPersistable()) {
             if (it.isNotEmpty()) {
                 it.forEach { uri ->
-                    managerActivity.contentResolver.takePersistableUriPermission(
-                        uri, Intent.FLAG_GRANT_READ_URI_PERMISSION
-                    )
+                    runCatching {
+                        managerActivity.contentResolver.takePersistableUriPermission(
+                            uri, Intent.FLAG_GRANT_READ_URI_PERMISSION
+                        )
+                    }.onFailure {
+                        Timber.e(it, "Failed to take persistable URI permission")
+                    }
                 }
                 managerActivity.handleFileUris(it)
             }
