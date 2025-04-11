@@ -323,17 +323,16 @@ class CloudDriveExplorerFragment : RotatableFragment(), CheckScrollInterface, Se
                 val latestMoveTargetPathTab = fileExplorerViewModel.latestMoveTargetPathTab
 
                 if (latestTargetPathTab == FileExplorerActivity.CLOUD_TAB || latestMoveTargetPathTab == FileExplorerActivity.CLOUD_TAB) {
-                    if (modeCloud == FileExplorerActivity.COPY) {
-                        targetPath = fileExplorerViewModel.latestCopyTargetPath?.let {
+                    targetPath = when (modeCloud) {
+                        FileExplorerActivity.COPY -> fileExplorerViewModel.latestCopyTargetPath
+                        FileExplorerActivity.MOVE -> fileExplorerViewModel.latestMoveTargetPath
+                        else -> null
+                    }?.also {
+                        // Don't hide tabs if the target path is root of cloud drive
+                        if (it != rootHandle) {
                             fileExplorerActivity.hideTabs(true, CLOUD_FRAGMENT)
-                            it
-                        } ?: rootHandle
-                    } else if (modeCloud == FileExplorerActivity.MOVE) {
-                        targetPath = fileExplorerViewModel.latestMoveTargetPath?.let {
-                            fileExplorerActivity.hideTabs(true, CLOUD_FRAGMENT)
-                            it
-                        } ?: rootHandle
-                    }
+                        }
+                    } ?: rootHandle
                 }
                 setParentHandle(targetPath)
             }
