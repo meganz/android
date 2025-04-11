@@ -4042,13 +4042,14 @@ class ManagerActivity : PasscodeActivity(), NavigationView.OnNavigationItemSelec
         megaNavigator.openSettings(this, targetPreference)
     }
 
-    private fun openFullscreenOfflineFragment(path: String?) {
+    private fun openFullscreenOfflineFragment(path: String?, fileNames: ArrayList<String>? = null) {
         drawerItem = DrawerItem.HOMEPAGE
         path?.let {
             navController?.navigate(
                 HomepageFragmentDirections.actionHomepageToFullscreenOfflineCompose(
                     path = it,
-                    rootFolderOnly = false
+                    rootFolderOnly = false,
+                    fileNames = fileNames?.toTypedArray()
                 ),
                 NavOptions.Builder().setLaunchSingleTop(true).build()
             )
@@ -5857,18 +5858,19 @@ class ManagerActivity : PasscodeActivity(), NavigationView.OnNavigationItemSelec
 
     private fun handleLocateFileNavigationFromIntent() {
         val path = intent.getStringExtra(FileStorageActivity.EXTRA_PATH) ?: return
+        val fileNames = intent.getStringArrayListExtra(FileStorageActivity.EXTRA_FILE_NAMES)
         if (intent.getBooleanExtra(Constants.INTENT_EXTRA_IS_OFFLINE_PATH, false)) {
             selectDrawerItem(DrawerItem.HOMEPAGE)
             val offlinePath = path.replace(
                 getString(R.string.section_saved_for_offline_new),
                 ""
             ) + Constants.SEPARATOR
-            openFullscreenOfflineFragment(offlinePath)
+            openFullscreenOfflineFragment(offlinePath, fileNames)
         } else {
             Intent(this, FileStorageActivity::class.java).apply {
                 action = FileStorageActivity.Mode.BROWSE_FILES.action
                 putExtra(FileStorageActivity.EXTRA_PATH, path)
-                intent.getStringArrayListExtra(FileStorageActivity.EXTRA_FILE_NAMES)?.let {
+                fileNames?.let {
                     putStringArrayListExtra(FileStorageActivity.EXTRA_FILE_NAMES, it)
                 }
                 startActivity(this)

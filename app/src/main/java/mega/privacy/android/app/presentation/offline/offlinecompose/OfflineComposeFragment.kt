@@ -127,7 +127,7 @@ class OfflineComposeFragment : Fragment(), ActionMode.Callback {
                         }
                     )
                     LaunchedEffect(args.path) {
-                        viewModel.navigateToPath(args.path, args.rootFolderOnly)
+                        viewModel.navigateToPath(args.path, args.rootFolderOnly, args.fileNames)
                     }
                     LaunchedEffect(defaultTitle) {
                         viewModel.updateDefaultTitle(defaultTitle)

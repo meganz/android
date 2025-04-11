@@ -65,15 +65,17 @@ class OfflineComposeViewModel @Inject constructor(
     /**
      * Navigates to the specified path, if exists
      */
-    fun navigateToPath(path: String, rootFolderOnly: Boolean) {
+    fun navigateToPath(path: String, rootFolderOnly: Boolean, fileNames: Array<String>? = null) {
         if (path.isBlank() || path == File.separator) return
         viewModelScope.launch {
             path.split(File.separator).filterNot { it.isBlank() }.forEach { child ->
                 loadOfflineNodes()
                 uiState.value.offlineNodes.find { it.offlineNode.name == child }?.let {
-                    onItemClicked(it, rootFolderOnly)
+                    openFolder(it, rootFolderOnly, false)
                 } ?: return@forEach
             }
+            loadOfflineNodes()
+            highlightFiles(fileNames)
         }
     }
 
@@ -153,6 +155,16 @@ class OfflineComposeViewModel @Inject constructor(
         }
     }
 
+    private fun highlightFiles(fileNamesToHighlight: Array<String>?) {
+        _uiState.update {
+            it.copy(
+                offlineNodes = it.offlineNodes.map { item ->
+                    item.copy(isHighlighted = fileNamesToHighlight?.contains(item.offlineNode.name) == true)
+                }
+            )
+        }
+    }
+
     /**
      * Set search query
      */
@@ -181,28 +193,7 @@ class OfflineComposeViewModel @Inject constructor(
     fun onItemClicked(offlineNodeUIItem: OfflineNodeUIItem, rootFolderOnly: Boolean) {
         if (uiState.value.selectedNodeHandles.isEmpty()) {
             if (offlineNodeUIItem.offlineNode.isFolder) {
-                if (rootFolderOnly) {
-                    _uiState.update {
-                        it.copy(
-                            openFolderInPageEvent = triggered(offlineNodeUIItem.offlineNode),
-                        )
-                    }
-                } else {
-                    parentStack.push(
-                        Pair(
-                            offlineNodeUIItem.offlineNode.parentId,
-                            uiState.value.title
-                        )
-                    )
-                    _uiState.update {
-                        it.copy(
-                            title = offlineNodeUIItem.offlineNode.name,
-                            parentId = offlineNodeUIItem.offlineNode.id,
-                            closeSearchViewEvent = triggered
-                        )
-                    }
-                    refreshOfflineNodes()
-                }
+                openFolder(offlineNodeUIItem, rootFolderOnly, true)
             } else {
                 _uiState.update {
                     it.copy(
@@ -212,6 +203,35 @@ class OfflineComposeViewModel @Inject constructor(
             }
         } else {
             onLongItemClicked(offlineNodeUIItem)
+        }
+    }
+
+    private fun openFolder(
+        offlineNodeUIItem: OfflineNodeUIItem,
+        rootFolderOnly: Boolean,
+        refreshNodesAsync: Boolean,
+    ) {
+        if (rootFolderOnly) {
+            _uiState.update {
+                it.copy(
+                    openFolderInPageEvent = triggered(offlineNodeUIItem.offlineNode),
+                )
+            }
+        } else {
+            parentStack.push(
+                Pair(
+                    offlineNodeUIItem.offlineNode.parentId,
+                    uiState.value.title
+                )
+            )
+            _uiState.update {
+                it.copy(
+                    title = offlineNodeUIItem.offlineNode.name,
+                    parentId = offlineNodeUIItem.offlineNode.id,
+                    closeSearchViewEvent = triggered
+                )
+            }
+            if (refreshNodesAsync) refreshOfflineNodes()
         }
     }
 

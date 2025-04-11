@@ -123,7 +123,8 @@ private fun OfflineListContent(
                 onLongClick = {
                     onItemLongClicked(it)
                 },
-                isSelected = it.isSelected
+                isSelected = it.isSelected,
+                isHighlighted = it.isHighlighted,
             )
             MegaDivider(dividerType = DividerType.BigStartPadding)
         }
@@ -153,6 +154,7 @@ private fun OfflineListContent(
                 isSelected = it.isSelected,
                 isTakenDown = false,
                 isInvisible = it.isInvisible,
+                isHighlighted = it.isHighlighted,
                 onClick = {
                     onOfflineItemClicked(it)
                 },

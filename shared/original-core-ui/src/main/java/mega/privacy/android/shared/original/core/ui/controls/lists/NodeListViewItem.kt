@@ -6,6 +6,7 @@ import androidx.compose.animation.AnimatedContent
 import androidx.compose.foundation.Canvas
 import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.Image
+import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.combinedClickable
 import androidx.compose.foundation.horizontalScroll
@@ -36,7 +37,7 @@ import mega.privacy.android.shared.original.core.ui.controls.images.ThumbnailVie
 import mega.privacy.android.shared.original.core.ui.controls.text.HighlightedText
 import mega.privacy.android.shared.original.core.ui.controls.text.LongTextBehaviour
 import mega.privacy.android.shared.original.core.ui.controls.text.MegaText
-import mega.privacy.android.shared.original.core.ui.preview.CombinedThemePreviews
+import mega.privacy.android.shared.original.core.ui.preview.CombinedThemeComponentPreviews
 import mega.privacy.android.shared.original.core.ui.theme.MegaOriginalTheme
 import mega.privacy.android.shared.original.core.ui.theme.OriginalTheme
 import mega.privacy.android.shared.original.core.ui.utils.normalize
@@ -65,6 +66,7 @@ import mega.privacy.android.shared.original.core.ui.utils.normalize
  * @param labelColor Label color
  * @param showLink Show link
  * @param showFavourite Show favourite
+ * @param isHighlighted if true, the background will be highlighted with a different color to make the item stand out above the others
  * @param onMoreClicked On more clicked
  */
 @OptIn(ExperimentalFoundationApi::class)
@@ -94,6 +96,7 @@ fun NodeListViewItem(
     showFavourite: Boolean = false,
     isSensitive: Boolean = false,
     showBlurEffect: Boolean = false,
+    isHighlighted: Boolean = false,
     onMoreClicked: (() -> Unit)? = null,
     onInfoClicked: (() -> Unit)? = null,
     onItemClicked: (() -> Unit)? = null,
@@ -107,6 +110,10 @@ fun NodeListViewItem(
                 onClick = {
                     onItemClicked?.invoke()
                 }
+            )
+            .then(
+                if (isHighlighted) Modifier.background(MegaOriginalTheme.colors.background.surface2)
+                else Modifier
             ),
         fillSubTitleText = showIsVerified.not(),
         icon = {
@@ -350,7 +357,7 @@ private fun Circle(color: Color, modifier: Modifier = Modifier) {
     )
 }
 
-@CombinedThemePreviews
+@CombinedThemeComponentPreviews
 @Composable
 private fun GenericNodeListViewItemSimplePreview() {
     OriginalTheme(isDark = isSystemInDarkTheme()) {
@@ -362,7 +369,7 @@ private fun GenericNodeListViewItemSimplePreview() {
     }
 }
 
-@CombinedThemePreviews
+@CombinedThemeComponentPreviews
 @Composable
 private fun GenericNodeListViewItemHighlightPreview() {
     OriginalTheme(isDark = isSystemInDarkTheme()) {
@@ -375,7 +382,7 @@ private fun GenericNodeListViewItemHighlightPreview() {
     }
 }
 
-@CombinedThemePreviews
+@CombinedThemeComponentPreviews
 @Composable
 private fun GenericNodeListItemWithLongTitlePreview() {
     OriginalTheme(isDark = isSystemInDarkTheme()) {
@@ -394,7 +401,7 @@ private fun GenericNodeListItemWithLongTitlePreview() {
     }
 }
 
-@CombinedThemePreviews
+@CombinedThemeComponentPreviews
 @Composable
 private fun GenericNodeListItemPreview() {
     OriginalTheme(isDark = isSystemInDarkTheme()) {
@@ -414,7 +421,7 @@ private fun GenericNodeListItemPreview() {
     }
 }
 
-@CombinedThemePreviews
+@CombinedThemeComponentPreviews
 @Composable
 private fun GenericNodeListItemWithoutMoreOptionPreview() {
     OriginalTheme(isDark = isSystemInDarkTheme()) {

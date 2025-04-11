@@ -337,6 +337,40 @@ class OfflineComposeViewModelTest {
         assertThat(underTest.uiState.value.parentId).isEqualTo(grandChildId)
     }
 
+    @Test
+    fun `test that navigateToPath set highlighted elements correctly`() = runTest {
+        val parentId = -1
+        val childId = 3453
+        val folder = mock<OfflineFileInformation> {
+            on { isFolder } doReturn true
+            on { name } doReturn "folder"
+            on { id } doReturn childId
+        }
+        val highlighted = mock<OfflineFileInformation> {
+            on { isFolder } doReturn false
+            on { name } doReturn "file1"
+            on { id } doReturn 564
+        }
+        val file2 = mock<OfflineFileInformation> {
+            on { isFolder } doReturn false
+            on { name } doReturn "file2"
+            on { id } doReturn 63456
+        }
+        val path = File.separator + folder.name + File.separator
+        whenever(getOfflineNodesByParentIdUseCase(parentId)).thenReturn(listOf(folder))
+        whenever(getOfflineNodesByParentIdUseCase(childId)).thenReturn(listOf(highlighted, file2))
+
+        underTest.navigateToPath(
+            path = path,
+            rootFolderOnly = false,
+            fileNames = arrayOf(highlighted.name)
+        )
+        assertThat(underTest.uiState.value.offlineNodes.find { it.isHighlighted }?.offlineNode)
+            .isEqualTo(highlighted)
+        assertThat(underTest.uiState.value.offlineNodes.find { !it.isHighlighted }?.offlineNode)
+            .isEqualTo(file2)
+    }
+
     private suspend fun stubCommon() {
         whenever(getOfflineNodesByParentIdUseCase(-1)).thenReturn(emptyList())
         whenever(setOfflineWarningMessageVisibilityUseCase(false)).thenReturn(Unit)

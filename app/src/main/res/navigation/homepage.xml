@@ -113,6 +113,11 @@
             android:name="title"
             android:defaultValue=""
             app:argType="string" />
+        <argument
+            android:name="fileNames"
+            app:argType="string[]"
+            app:nullable="true"
+            android:defaultValue="@null" />
         <action
             android:id="@+id/action_homepage_to_fullscreen_offline_compose"
             app:destination="@id/offlineFragmentCompose" />

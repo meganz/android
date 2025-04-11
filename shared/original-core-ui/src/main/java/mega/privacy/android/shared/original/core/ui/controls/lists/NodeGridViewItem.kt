@@ -1,5 +1,6 @@
 package mega.privacy.android.shared.original.core.ui.controls.lists
 
+import mega.privacy.android.icon.pack.R as IconPackR
 import androidx.annotation.DrawableRes
 import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.Image
@@ -41,18 +42,17 @@ import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.tooling.preview.PreviewParameter
 import androidx.compose.ui.tooling.preview.PreviewParameterProvider
 import androidx.compose.ui.unit.dp
+import mega.android.core.ui.theme.values.TextColor
 import mega.privacy.android.icon.pack.R
 import mega.privacy.android.shared.original.core.ui.controls.dividers.DividerType
 import mega.privacy.android.shared.original.core.ui.controls.dividers.MegaDivider
 import mega.privacy.android.shared.original.core.ui.controls.images.GridThumbnailView
 import mega.privacy.android.shared.original.core.ui.controls.text.LongTextBehaviour
 import mega.privacy.android.shared.original.core.ui.controls.text.MegaText
-import mega.privacy.android.shared.original.core.ui.preview.CombinedThemePreviews
+import mega.privacy.android.shared.original.core.ui.preview.CombinedThemeComponentPreviews
 import mega.privacy.android.shared.original.core.ui.theme.MegaOriginalTheme
 import mega.privacy.android.shared.original.core.ui.theme.OriginalTheme
 import mega.privacy.android.shared.original.core.ui.theme.extensions.color_button_brand
-import mega.android.core.ui.theme.values.TextColor
-import mega.privacy.android.icon.pack.R as IconPackR
 
 /**
  * Node grid view item
@@ -85,6 +85,7 @@ fun NodeGridViewItem(
     isInvisible: Boolean = false,
     isSensitive: Boolean = false,
     showBlurEffect: Boolean = false,
+    isHighlighted: Boolean = false,
 ) {
 
     if (isInvisible) {
@@ -104,7 +105,11 @@ fun NodeGridViewItem(
                     else MegaOriginalTheme.colors.border.subtle,
                     shape = RoundedCornerShape(5.dp),
                 )
-                .background(MegaOriginalTheme.colors.background.pageBackground)
+                .background(
+                    if (isHighlighted)
+                        MegaOriginalTheme.colors.background.surface2
+                    else MegaOriginalTheme.colors.background.pageBackground
+                )
                 .combinedClickable(
                     onClick = { onClick() },
                     onLongClick = { onLongClick() },
@@ -275,7 +280,7 @@ private fun Footer(
 }
 
 
-@CombinedThemePreviews
+@CombinedThemeComponentPreviews
 @Composable
 private fun NodeGridViewItemPreview(
     @PreviewParameter(NodeGridViewItemDataProvider::class) data: NodeGridViewItemData,
