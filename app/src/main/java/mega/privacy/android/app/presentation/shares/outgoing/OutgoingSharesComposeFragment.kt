@@ -1,9 +1,10 @@
 package mega.privacy.android.app.presentation.shares.outgoing
 
+import mega.privacy.android.icon.pack.R as iconPackR
+import mega.privacy.android.shared.resources.R as sharedR
 import android.app.Activity.RESULT_OK
 import android.content.Context
 import android.content.Intent
-import android.net.Uri
 import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.Menu
@@ -38,8 +39,8 @@ import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.sample
 import kotlinx.coroutines.launch
 import mega.privacy.android.app.R
-import mega.privacy.android.app.activities.WebViewActivity
 import mega.privacy.android.app.arch.extensions.collectFlow
+import mega.privacy.android.app.extensions.launchUrl
 import mega.privacy.android.app.fragments.homepage.SortByHeaderViewModel
 import mega.privacy.android.app.interfaces.ActionBackupListener
 import mega.privacy.android.app.main.ManagerActivity
@@ -79,11 +80,9 @@ import mega.privacy.android.domain.entity.node.TypedFolderNode
 import mega.privacy.android.domain.entity.node.shares.ShareNode
 import mega.privacy.android.domain.usecase.GetThemeMode
 import mega.privacy.android.domain.usecase.featureflag.GetFeatureFlagValueUseCase
-import mega.privacy.android.icon.pack.R as iconPackR
 import mega.privacy.android.navigation.MegaNavigator
 import mega.privacy.android.shared.original.core.ui.theme.OriginalTheme
 import mega.privacy.android.shared.original.core.ui.utils.showAutoDurationSnackbar
-import mega.privacy.android.shared.resources.R as sharedR
 import timber.log.Timber
 import javax.inject.Inject
 
@@ -241,7 +240,7 @@ class OutgoingSharesComposeFragment : Fragment() {
                         ),
                         onSortOrderClick = { showSortByPanel() },
                         onChangeViewTypeClick = viewModel::onChangeViewTypeClicked,
-                        onLinkClicked = ::navigateToLink,
+                        onLinkClicked = context::launchUrl,
                         onVerifyContactDialogDismissed = viewModel::dismissVerifyContactDialog,
                         onToggleAppBarElevation = toggleAppBarElevation,
                         fileTypeIconMapper = fileTypeIconMapper,
@@ -627,11 +626,7 @@ class OutgoingSharesComposeFragment : Fragment() {
                 }
 
                 OptionItems.DISPUTE_CLICKED -> {
-                    startActivity(
-                        Intent(requireContext(), WebViewActivity::class.java)
-                            .addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP)
-                            .setData(Uri.parse(Constants.DISPUTE_URL))
-                    )
+                    context.launchUrl(Constants.DISPUTE_URL)
                     disableSelectMode()
                 }
 
@@ -659,18 +654,6 @@ class OutgoingSharesComposeFragment : Fragment() {
                 }
             }
         }
-    }
-
-    /**
-     * Clicked on link
-     * @param link
-     */
-    private fun navigateToLink(link: String) {
-        val uriUrl = Uri.parse(link)
-        val launchBrowser = Intent(requireContext(), WebViewActivity::class.java)
-            .addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP)
-            .setData(uriUrl)
-        startActivity(launchBrowser)
     }
 
     /**
