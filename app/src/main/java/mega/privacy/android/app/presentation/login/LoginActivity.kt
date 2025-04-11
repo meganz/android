@@ -29,7 +29,6 @@ import mega.privacy.android.app.presentation.login.confirmemail.ConfirmEmailFrag
 import mega.privacy.android.app.presentation.login.createaccount.CreateAccountComposeFragment
 import mega.privacy.android.app.presentation.login.model.LoginFragmentType
 import mega.privacy.android.app.presentation.login.onboarding.TourFragment
-import mega.privacy.android.app.presentation.login.reportissue.ReportIssueViaEmailFragment
 import mega.privacy.android.app.presentation.meeting.view.dialog.ACTION_JOIN_AS_GUEST
 import mega.privacy.android.app.presentation.openlink.OpenLinkActivity
 import mega.privacy.android.app.utils.Constants
@@ -77,7 +76,6 @@ class LoginActivity : BaseActivity() {
 
             when (visibleFragment) {
                 Constants.CREATE_ACCOUNT_FRAGMENT -> showFragment(Constants.TOUR_FRAGMENT)
-                Constants.REPORT_ISSUE_VIA_EMAIL_FRAGMENT -> showFragment(Constants.LOGIN_FRAGMENT)
                 Constants.TOUR_FRAGMENT, Constants.CONFIRM_EMAIL_FRAGMENT -> finish()
             }
         }
@@ -301,15 +299,6 @@ class LoginActivity : BaseActivity() {
                         .replace(R.id.fragment_container_login, confirmEmailFragment)
                         .commitNowAllowingStateLoss()
                 }
-
-                window.clearFlags(WindowManager.LayoutParams.FLAG_LAYOUT_NO_LIMITS)
-            }
-
-
-            Constants.REPORT_ISSUE_VIA_EMAIL_FRAGMENT -> {
-                supportFragmentManager.beginTransaction()
-                    .replace(R.id.fragment_container_login, ReportIssueViaEmailFragment())
-                    .commitNowAllowingStateLoss()
 
                 window.clearFlags(WindowManager.LayoutParams.FLAG_LAYOUT_NO_LIMITS)
             }

@@ -72,7 +72,6 @@ public class Constants {
     public static final int LOGIN_FRAGMENT = 6001;
     public static final int CONFIRM_EMAIL_FRAGMENT = 6002;
     public static final int CREATE_ACCOUNT_FRAGMENT = 604;
-    public static final int REPORT_ISSUE_VIA_EMAIL_FRAGMENT = 605;
 
 
     public static final int UPDATE_ACCOUNT_DETAILS = 9003;
