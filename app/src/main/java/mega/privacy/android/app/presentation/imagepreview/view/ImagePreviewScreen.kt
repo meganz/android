@@ -4,8 +4,6 @@
 
 package mega.privacy.android.app.presentation.imagepreview.view
 
-import mega.privacy.android.icon.pack.R as iconPackR
-import mega.privacy.android.shared.resources.R as sharedR
 import android.content.res.Configuration
 import androidx.activity.compose.BackHandler
 import androidx.activity.compose.LocalOnBackPressedDispatcherOwner
@@ -53,6 +51,7 @@ import androidx.compose.material.rememberModalBottomSheetState
 import androidx.compose.material.rememberScaffoldState
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.SideEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableFloatStateOf
 import androidx.compose.runtime.mutableStateOf
@@ -94,7 +93,6 @@ import me.saket.telephoto.flick.rememberFlickToDismissState
 import me.saket.telephoto.zoomable.DoubleClickToZoomListener
 import me.saket.telephoto.zoomable.ZoomSpec
 import me.saket.telephoto.zoomable.ZoomableImageState
-import me.saket.telephoto.zoomable.ZoomableState
 import me.saket.telephoto.zoomable.coil.ZoomableAsyncImage
 import me.saket.telephoto.zoomable.rememberZoomableImageState
 import me.saket.telephoto.zoomable.rememberZoomableState
@@ -108,7 +106,7 @@ import mega.privacy.android.domain.entity.AccountType
 import mega.privacy.android.domain.entity.VideoFileTypeInfo
 import mega.privacy.android.domain.entity.imageviewer.ImageResult
 import mega.privacy.android.domain.entity.node.ImageNode
-import mega.privacy.android.domain.entity.node.NodeId
+import mega.privacy.android.icon.pack.R as iconPackR
 import mega.privacy.android.shared.original.core.ui.controls.dialogs.MegaAlertDialog
 import mega.privacy.android.shared.original.core.ui.controls.layouts.MegaScaffold
 import mega.privacy.android.shared.original.core.ui.controls.text.MiddleEllipsisText
@@ -117,8 +115,10 @@ import mega.privacy.android.shared.original.core.ui.theme.extensions.white_alpha
 import mega.privacy.android.shared.original.core.ui.theme.extensions.white_black
 import mega.privacy.android.shared.original.core.ui.theme.grey_100
 import mega.privacy.android.shared.original.core.ui.utils.showAutoDurationSnackbar
+import mega.privacy.android.shared.resources.R as sharedR
 import mega.privacy.mobile.analytics.event.ImagePreviewHideNodeMenuToolBarEvent
 import mega.privacy.mobile.analytics.event.MagnifierMenuItemEvent
+import timber.log.Timber
 
 @Composable
 internal fun ImagePreviewScreen(
@@ -189,29 +189,16 @@ internal fun ImagePreviewScreen(
             skipHalfExpanded = false,
         )
 
-        val zoomableStateMap = remember { mutableMapOf<NodeId, ZoomableState?>() }
         var flickOffsetFraction by remember { mutableFloatStateOf(0f) }
 
         LaunchedEffect(pagerState) {
             snapshotFlow { pagerState.currentPage }.distinctUntilChanged().collect { page ->
-                for (candidate in listOf(page - 1, page + 1)) {
-                    viewState.imageNodes.getOrNull(candidate)?.let {
-                        coroutineScope.launch {
-                            zoomableStateMap.getOrDefault(it.id, null)?.resetZoom()
-                        }
-                    }
-                }
-
                 viewState.imageNodes.getOrNull(page)?.let {
                     viewModel.setCurrentImageNodeIndex(page)
                     viewModel.setCurrentImageNode(it)
                     viewModel.setCurrentImageNodeAvailableOffline(it)
                 }
             }
-        }
-
-        LaunchedEffect(currentImageNode) {
-            zoomableStateMap.getOrDefault(currentImageNode.id, null)?.resetZoom()
         }
 
         if (viewState.resultMessage.isNotEmpty()) {
@@ -375,9 +362,6 @@ internal fun ImagePreviewScreen(
                                     .windowInsetsPadding(WindowInsets.navigationBars),
                             )
                         }
-                    },
-                    onCacheImageState = { node, zoomState ->
-                        zoomableStateMap[node.id] = zoomState
                     },
                 )
 
@@ -554,10 +538,10 @@ private fun ImagePreviewContent(
     getErrorImagePath: suspend (ImageResult?) -> String?,
     onClickVideoPlay: (ImageNode) -> Unit,
     onCloseMagnifier: () -> Unit,
-    onCacheImageState: (ImageNode, ZoomableState) -> Unit,
     modifier: Modifier = Modifier,
 ) {
     var isDraggingMagnifier by remember { mutableStateOf(false) }
+    val coroutineScope = rememberCoroutineScope()
 
     Box(modifier = modifier.fillMaxSize()) {
         if (!isMagnifierMode) {
@@ -587,8 +571,14 @@ private fun ImagePreviewContent(
                     val zoomableState = rememberZoomableState(
                         zoomSpec = ZoomSpec(maxZoomFactor = Int.MAX_VALUE.toFloat())
                     )
+                    SideEffect {
+                        if (index != pagerState.currentPage) {
+                            coroutineScope.launch {
+                                zoomableState.resetZoom()
+                            }
+                        }
+                    }
                     val imageState = rememberZoomableImageState(zoomableState)
-                    onCacheImageState(imageNode, imageState.zoomableState)
 
                     ImagePreviewContent(
                         imageNode = imageNode,
