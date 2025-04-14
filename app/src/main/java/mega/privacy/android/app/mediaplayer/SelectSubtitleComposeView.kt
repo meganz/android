@@ -69,6 +69,7 @@ import mega.privacy.android.domain.entity.AccountType
 import mega.privacy.android.domain.entity.mediaplayer.SubtitleFileInfo
 import mega.privacy.android.legacy.core.ui.controls.appbar.LegacySearchAppBar
 import mega.privacy.android.legacy.core.ui.model.SearchWidgetState
+import mega.privacy.android.shared.original.core.ui.controls.appbar.SelectModeAppBar
 import mega.privacy.android.shared.original.core.ui.controls.progressindicator.MegaCircularProgressIndicator
 import mega.privacy.android.shared.original.core.ui.theme.OriginalTheme
 import timber.log.Timber
@@ -452,27 +453,10 @@ internal fun SubtitleFileInfoListView(
 internal fun SelectedTopBar(
     onBackPressedCallback: () -> Unit,
 ) {
-    TopAppBar(
+    SelectModeAppBar(
         modifier = Modifier.testTag(SELECTED_TOP_BAR_TEST_TAG),
-        title = {
-            Text(
-                text = "1",
-                style = MaterialTheme.typography.subtitle1,
-                fontWeight = FontWeight.Medium,
-                color = colorResource(id = R.color.accent_900)
-            )
-        },
-        navigationIcon = {
-            IconButton(onClick = onBackPressedCallback) {
-                Icon(
-                    imageVector = Icons.Filled.ArrowBack,
-                    contentDescription = "Back button",
-                    tint = colorResource(id = R.color.accent_900)
-                )
-            }
-        },
-        backgroundColor = MaterialTheme.colors.surface,
-        elevation = 0.dp
+        title = "1",
+        onNavigationPressed = onBackPressedCallback
     )
 }
 
