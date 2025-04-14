@@ -221,7 +221,9 @@
                 app:layout_constraintEnd_toStartOf="@id/exo_duration"
                 app:layout_constraintStart_toEndOf="@id/exo_position"
                 app:layout_constraintTop_toTopOf="@id/speed_playback"
-                app:unplayed_color="@color/grey_600" />
+                app:unplayed_color="@color/grey_600"
+                app:played_color="@color/color_button_brand"
+                app:scrubber_color="@color/color_button_brand"/>
 
             <androidx.compose.ui.platform.ComposeView
                 android:id="@+id/speed_playback_popup"

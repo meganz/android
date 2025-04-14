@@ -93,7 +93,7 @@ fun SpeedSelectedPopup(
                                 .padding(25.dp, 10.dp),
                             colorFilter = ColorFilter.tint(
                                 if (item == currentPlaybackSpeed) {
-                                    colorResource(id = R.color.accent_900)
+                                    colorResource(id = R.color.color_button_brand)
                                 } else {
                                     Color.White
                                 }
