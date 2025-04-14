@@ -53,10 +53,10 @@ import kotlinx.coroutines.sync.Mutex
 import mega.privacy.android.app.BaseActivity.Companion.showSimpleSnackbar
 import mega.privacy.android.app.MegaApplication.Companion.getInstance
 import mega.privacy.android.app.R
-import mega.privacy.android.app.activities.WebViewActivity
 import mega.privacy.android.app.components.CustomViewPager
 import mega.privacy.android.app.components.EditTextPIN
 import mega.privacy.android.app.extensions.consumeInsetsWithToolbar
+import mega.privacy.android.app.extensions.launchUrl
 import mega.privacy.android.app.main.providers.CloudDriveProviderFragment
 import mega.privacy.android.app.main.providers.IncomingSharesProviderFragment
 import mega.privacy.android.app.main.providers.ProviderPageAdapter
@@ -586,17 +586,7 @@ class FileProviderActivity : AppCompatActivity(), MegaRequestListenerInterface,
         lostYourDeviceButton =
             findViewById<RelativeLayout?>(R.id.lost_authentication_device).apply {
                 setOnClickListener {
-                    try {
-                        val openTermsIntent =
-                            Intent(this@FileProviderActivity, WebViewActivity::class.java)
-                        openTermsIntent.flags = Intent.FLAG_ACTIVITY_CLEAR_TOP
-                        openTermsIntent.data = Uri.parse(RECOVERY_URL)
-                        startActivity(openTermsIntent)
-                    } catch (e: Exception) {
-                        val viewIntent = Intent(Intent.ACTION_VIEW)
-                        viewIntent.data = Uri.parse(RECOVERY_URL)
-                        startActivity(viewIntent)
-                    }
+                    this@FileProviderActivity.launchUrl(RECOVERY_URL)
                 }
             }
         pinError = findViewById<TextView?>(R.id.pin_2fa_error_login).apply {
