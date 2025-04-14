@@ -3,7 +3,6 @@ package mega.privacy.android.app.listeners
 import android.content.Context
 import android.content.Intent
 import mega.privacy.android.app.R
-import mega.privacy.android.app.constants.BroadcastConstants
 import mega.privacy.android.app.interfaces.ActivityLauncher
 import mega.privacy.android.app.interfaces.SnackbarShower
 import mega.privacy.android.app.interfaces.showSnackbar
@@ -149,26 +148,7 @@ class CopyListener(
                         }
                     }
                 }
-                MULTIPLE_FORWARD_MESSAGES -> {
-                    if (counter == 0) {
-                        if (error > 0) {
-                            Intent(BroadcastConstants.BROADCAST_ACTION_ERROR_COPYING_NODES).run {
-                                putExtra(
-                                    BroadcastConstants.ERROR_MESSAGE_TEXT,
-                                    context.resources.getQuantityString(
-                                        R.plurals.error_forwarding_messages,
-                                        error
-                                    )
-                                )
-                                setPackage(context.applicationContext.packageName)
-                                context.sendBroadcast(this)
-                            }
-                        } else {
-                            Timber.d("Forward message")
-                            chatController?.forwardMessages(messagesSelected, chatId)
-                        }
-                    }
-                }
+
                 MULTIPLE_IMPORT_CONTACT_MESSAGES -> {
                     if (counter == 0) {
                         if (error > 0) {
@@ -221,7 +201,6 @@ class CopyListener(
 
     companion object {
         const val COPY = 1
-        const val MULTIPLE_FORWARD_MESSAGES = 2
         const val MULTIPLE_IMPORT_CONTACT_MESSAGES = 3
     }
 }

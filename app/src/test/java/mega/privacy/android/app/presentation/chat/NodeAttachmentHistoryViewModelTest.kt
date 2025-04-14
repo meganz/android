@@ -24,6 +24,7 @@ import mega.privacy.android.domain.usecase.account.MonitorStorageStateEventUseCa
 import mega.privacy.android.domain.usecase.favourites.IsAvailableOfflineUseCase
 import mega.privacy.android.domain.usecase.network.IsConnectedToInternetUseCase
 import mega.privacy.android.domain.usecase.node.CheckChatNodesNameCollisionAndCopyUseCase
+import mega.privacy.android.domain.usecase.node.CopyChatNodesUseCase
 import mega.privacy.android.domain.usecase.node.GetNodeContentUriByHandleUseCase
 import mega.privacy.android.domain.usecase.node.chat.GetChatFileUseCase
 import mega.privacy.android.navigation.MegaNavigator
@@ -51,20 +52,22 @@ class NodeAttachmentHistoryViewModelTest {
     private val megaNavigator: MegaNavigator = mock()
     private val isAvailableOfflineUseCase = mock<IsAvailableOfflineUseCase>()
     private val getChatFileUseCase = mock<GetChatFileUseCase>()
+    private val copyChatNodesUseCase = mock<CopyChatNodesUseCase>()
 
     private lateinit var viewModel: NodeAttachmentHistoryViewModel
 
     @BeforeEach
     fun setup() {
         viewModel = NodeAttachmentHistoryViewModel(
-            checkChatNodesNameCollisionAndCopyUseCase,
-            monitorStorageStateEventUseCase,
-            isConnectedToInternetUseCase,
-            getNodeContentUriByHandleUseCase,
-            mock(),
-            getChatFileUseCase,
-            isAvailableOfflineUseCase,
-            megaNavigator
+            checkChatNodesNameCollisionAndCopyUseCase = checkChatNodesNameCollisionAndCopyUseCase,
+            monitorStorageStateEventUseCase = monitorStorageStateEventUseCase,
+            isConnectedToInternetUseCase = isConnectedToInternetUseCase,
+            getNodeContentUriByHandleUseCase = getNodeContentUriByHandleUseCase,
+            removeOfflineNodeUseCase = mock(),
+            getChatFileUseCase = getChatFileUseCase,
+            isAvailableOfflineUseCase = isAvailableOfflineUseCase,
+            copyChatNodesUseCase = copyChatNodesUseCase,
+            megaNavigator = megaNavigator
         )
     }
 
@@ -76,7 +79,8 @@ class NodeAttachmentHistoryViewModelTest {
         getNodeContentUriByHandleUseCase,
         megaNavigator,
         getChatFileUseCase,
-        isAvailableOfflineUseCase
+        isAvailableOfflineUseCase,
+        copyChatNodesUseCase,
     )
 
     @Test
@@ -267,4 +271,40 @@ class NodeAttachmentHistoryViewModelTest {
                 assertThat(result).isEqualTo(chatFile)
             }
         }
+
+    @Test
+    fun `test that _copyResultFlow is updated when copy attachments to forward is successful and a node is copied`() =
+        runTest {
+            val chatId = 123L
+            val messageIds = mutableListOf(456L, 789L)
+            val newNodeParent = 321L
+            val result = MoveRequestResult.Copy(2, 1)
+            val expectedState = CopyRequestState(result = result.toCopyRequestResult())
+
+            whenever(
+                copyChatNodesUseCase.invoke(
+                    any(),
+                    any(),
+                    NodeId(any())
+                )
+            ).thenReturn(result)
+
+            viewModel.copyAttachmentsToForward(chatId, messageIds, newNodeParent)
+
+            assertThat(expectedState).isEqualTo(viewModel.copyResultFlow.value)
+        }
+
+    @Test
+    fun `test that _copyResultFlow is updated when copy attachments to forward fails`() = runTest {
+        val chatId = 123L
+        val messageIds = mutableListOf(456L, 789L)
+        val newNodeParent = 321L
+
+        whenever(copyChatNodesUseCase.invoke(any(), any(), NodeId(any())))
+            .thenThrow(ForeignNodeException())
+
+        viewModel.copyAttachmentsToForward(chatId, messageIds, newNodeParent)
+
+        assertThat(viewModel.copyResultFlow.value?.error).isInstanceOf(ForeignNodeException::class.java)
+    }
 }

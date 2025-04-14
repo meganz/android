@@ -2,7 +2,6 @@ package mega.privacy.android.app.main.megachat
 
 import android.annotation.SuppressLint
 import android.content.BroadcastReceiver
-import android.content.Context
 import android.content.DialogInterface
 import android.content.Intent
 import android.content.IntentFilter
@@ -41,8 +40,6 @@ import mega.privacy.android.app.activities.PasscodeActivity
 import mega.privacy.android.app.activities.contract.NameCollisionActivityContract
 import mega.privacy.android.app.arch.extensions.collectFlow
 import mega.privacy.android.app.components.SimpleDividerItemDecoration
-import mega.privacy.android.app.constants.BroadcastConstants.BROADCAST_ACTION_ERROR_COPYING_NODES
-import mega.privacy.android.app.constants.BroadcastConstants.ERROR_MESSAGE_TEXT
 import mega.privacy.android.app.extensions.consumeInsetsWithToolbar
 import mega.privacy.android.app.interfaces.SnackbarShower
 import mega.privacy.android.app.interfaces.StoreDataBeforeForward
@@ -171,17 +168,6 @@ internal class NodeAttachmentHistoryActivity : PasscodeActivity(), MegaChatReque
         }
     }
 
-    private val errorCopyingNodesReceiver: BroadcastReceiver = object : BroadcastReceiver() {
-        override fun onReceive(context: Context, intent: Intent) {
-            if (BROADCAST_ACTION_ERROR_COPYING_NODES != intent.action) {
-                return
-            }
-
-            removeProgressDialog()
-            showSnackbar(Constants.SNACKBAR_TYPE, intent.getStringExtra(ERROR_MESSAGE_TEXT))
-        }
-    }
-
     override fun onCreate(savedInstanceState: Bundle?) {
         Timber.d("onCreate")
         super.onCreate(savedInstanceState)
@@ -197,10 +183,6 @@ internal class NodeAttachmentHistoryActivity : PasscodeActivity(), MegaChatReque
 
         handler = Handler()
 
-        registerSdkAppropriateReceiver(
-            IntentFilter(BROADCAST_ACTION_ERROR_COPYING_NODES),
-            errorCopyingNodesReceiver,
-        )
         this.enableEdgeToEdge()
         setContentView(R.layout.activity_node_history)
         materialToolBar = findViewById(R.id.toolbar_node_history)
@@ -363,20 +345,38 @@ internal class NodeAttachmentHistoryActivity : PasscodeActivity(), MegaChatReque
             Lifecycle.State.STARTED
         ) { copyResult: CopyRequestState? ->
             if (copyResult == null) return@collectFlow
+
             dismissAlertDialogIfExists(statusDialog)
 
-            val copyThrowable = copyResult.error
-            if (copyThrowable != null) {
-                manageCopyMoveException(copyThrowable)
+            copyResult.error?.let {
+                manageCopyMoveException(it)
             }
 
-            showSnackbar(
-                Constants.SNACKBAR_TYPE, if (copyResult.result != null)
-                    copyRequestMessageMapper.invoke(copyResult.result)
-                else
-                    getString(R.string.import_success_error),
-                MegaChatApiJava.MEGACHAT_INVALID_HANDLE
-            )
+            if (preservedMessagesSelected != null) {
+                copyResult.result?.let { result ->
+                    if (result.errorCount > 0) {
+                        val errorString = resources.getQuantityString(
+                            R.plurals.error_forwarding_messages,
+                            result.errorCount
+                        )
+                        showSnackbar(
+                            Constants.SNACKBAR_TYPE, errorString,
+                            MegaChatApiJava.MEGACHAT_INVALID_HANDLE
+                        )
+                    } else {
+                        forwardMessages(preservedMessagesSelected)
+                        preservedMessagesSelected = null
+                    }
+                }
+            } else {
+                showSnackbar(
+                    Constants.SNACKBAR_TYPE, if (copyResult.result != null)
+                        copyRequestMessageMapper.invoke(copyResult.result)
+                    else
+                        getString(R.string.import_success_error),
+                    MegaChatApiJava.MEGACHAT_INVALID_HANDLE
+                )
+            }
             viewModel.copyResultConsumed()
         }
 
@@ -443,7 +443,6 @@ internal class NodeAttachmentHistoryActivity : PasscodeActivity(), MegaChatReque
     override fun onDestroy() {
         Timber.d("onDestroy")
         super.onDestroy()
-        unregisterReceiver(errorCopyingNodesReceiver)
 
         megaChatApi.removeNodeHistoryListener(chatId, this)
         megaChatApi.closeNodeHistory(chatId, null)
@@ -747,11 +746,22 @@ internal class NodeAttachmentHistoryActivity : PasscodeActivity(), MegaChatReque
     }
 
     override fun handleStoredData() {
-        chatC?.proceedWithForwardOrShare(
-            this, myChatFilesFolder, preservedMessagesSelected,
-            preservedMessagesToImport, chatId, Constants.FORWARD_ONLY_OPTION
-        )
-        preservedMessagesSelected = null
+        if (preservedMessagesToImport.isNullOrEmpty()) {
+            forwardMessages(preservedMessagesSelected)
+            preservedMessagesSelected = null
+        } else {
+            preservedMessagesToImport?.let {
+                myChatFilesFolder?.let { newParentNode ->
+                    val messageIdsToCopy = it.map { it.msgId }
+                    viewModel.copyAttachmentsToForward(
+                        chatId = chatId,
+                        messageIdsToCopy = messageIdsToCopy,
+                        newParentHandle = newParentNode.handle,
+                    )
+                }
+            }
+        }
+
         preservedMessagesToImport = null
     }
 
@@ -786,7 +796,7 @@ internal class NodeAttachmentHistoryActivity : PasscodeActivity(), MegaChatReque
                 Timber.d("Forward message")
                 clearSelections()
                 hideMultipleSelect()
-                forwardMessages(messagesSelected)
+                chatC?.prepareMessagesToForward(messagesSelected, chatId)
             } else if (itemId == R.id.chat_cab_menu_delete) {
                 clearSelections()
                 hideMultipleSelect()
@@ -968,9 +978,9 @@ internal class NodeAttachmentHistoryActivity : PasscodeActivity(), MegaChatReque
             ).show()
     }
 
-    fun forwardMessages(messagesSelected: ArrayList<MegaChatMessage?>?) {
+    fun forwardMessages(messagesSelected: ArrayList<MegaChatMessage>?) {
         Timber.d("forwardMessages")
-        chatC?.prepareMessagesToForward(messagesSelected, chatId)
+        chatC?.forwardMessages(messagesSelected, chatId)
     }
 
     @Deprecated("Deprecated in Java")

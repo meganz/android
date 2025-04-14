@@ -23,6 +23,7 @@ import mega.privacy.android.domain.usecase.account.MonitorStorageStateEventUseCa
 import mega.privacy.android.domain.usecase.favourites.IsAvailableOfflineUseCase
 import mega.privacy.android.domain.usecase.network.IsConnectedToInternetUseCase
 import mega.privacy.android.domain.usecase.node.CheckChatNodesNameCollisionAndCopyUseCase
+import mega.privacy.android.domain.usecase.node.CopyChatNodesUseCase
 import mega.privacy.android.domain.usecase.node.GetNodeContentUriByHandleUseCase
 import mega.privacy.android.domain.usecase.node.chat.GetChatFileUseCase
 import mega.privacy.android.domain.usecase.offline.RemoveOfflineNodeUseCase
@@ -44,6 +45,7 @@ class NodeAttachmentHistoryViewModel @Inject constructor(
     private val removeOfflineNodeUseCase: RemoveOfflineNodeUseCase,
     private val getChatFileUseCase: GetChatFileUseCase,
     private val isAvailableOfflineUseCase: IsAvailableOfflineUseCase,
+    private val copyChatNodesUseCase: CopyChatNodesUseCase,
     private val megaNavigator: MegaNavigator,
 ) : ViewModel() {
 
@@ -250,5 +252,31 @@ class NodeAttachmentHistoryViewModel @Inject constructor(
         viewModelScope.launch {
             _startChatFileOfflineDownloadEvent.emit(null)
         }
+    }
+
+    fun copyAttachmentsToForward(
+        chatId: Long,
+        messageIdsToCopy: List<Long>,
+        newParentHandle: Long,
+    ) {
+        viewModelScope.launch {
+            runCatching {
+                copyChatNodesUseCase(
+                    chatId = chatId,
+                    messageIds = messageIdsToCopy,
+                    newNodeParent = NodeId(newParentHandle),
+                )
+            }.onSuccess { result ->
+                _copyResultFlow.update { _ ->
+                    CopyRequestState(result = result.toCopyRequestResult())
+                }
+            }.onFailure { throwable ->
+                Timber.e(throwable)
+                _copyResultFlow.update {
+                    CopyRequestState(error = throwable)
+                }
+            }
+        }
+
     }
 }

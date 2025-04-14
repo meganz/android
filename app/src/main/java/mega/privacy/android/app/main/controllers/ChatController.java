@@ -6,7 +6,6 @@ import static mega.privacy.android.app.utils.ChatUtil.getMutedPeriodString;
 import static mega.privacy.android.app.utils.Constants.ACTION_FORWARD_MESSAGES;
 import static mega.privacy.android.app.utils.Constants.ID_CHAT_FROM;
 import static mega.privacy.android.app.utils.Constants.ID_MESSAGES;
-import static mega.privacy.android.app.utils.Constants.IMPORT_TO_SHARE_OPTION;
 import static mega.privacy.android.app.utils.Constants.NOTIFICATIONS_DISABLED;
 import static mega.privacy.android.app.utils.Constants.NOTIFICATIONS_DISABLED_UNTIL_THIS_MORNING;
 import static mega.privacy.android.app.utils.Constants.NOTIFICATIONS_DISABLED_UNTIL_TOMORROW_MORNING;
@@ -37,8 +36,6 @@ import mega.privacy.android.app.MegaApplication;
 import mega.privacy.android.app.R;
 import mega.privacy.android.app.activities.settingsActivities.ChatNotificationsPreferencesActivity;
 import mega.privacy.android.app.di.DbHandlerModuleKt;
-import mega.privacy.android.app.interfaces.SnackbarShower;
-import mega.privacy.android.app.listeners.CopyListener;
 import mega.privacy.android.app.listeners.ExportListener;
 import mega.privacy.android.app.listeners.GetAttrUserListener;
 import mega.privacy.android.app.main.FileExplorerActivity;
@@ -56,7 +53,6 @@ import nz.mega.sdk.MegaChatContainsMeta;
 import nz.mega.sdk.MegaChatMessage;
 import nz.mega.sdk.MegaChatRoom;
 import nz.mega.sdk.MegaNode;
-import nz.mega.sdk.MegaNodeList;
 import timber.log.Timber;
 
 public class ChatController {
@@ -687,65 +683,6 @@ public class ChatController {
                 } else {
                     megaApi.getMyChatFilesFolder(new GetAttrUserListener(context));
                 }
-            }
-        }
-    }
-
-    /**
-     * Method for copying nodes to My Chat Files folder.
-     *
-     * @param snackbarShower    The interface to show snackbar.
-     * @param myChatFilesFolder The node myChatFilesFolder.
-     * @param messagesSelected  The list of selected msgs.
-     * @param messagesToImport  The list of messages to import.
-     * @param idChat            The chat ID.
-     * @param typeImport        IMPORT_TO_SHARE_OPTION, indicates that the node will be shared.
-     *                          FORWARD_ONLY_OPTION, indicates that the node will be forwarded.
-     */
-    public void proceedWithForwardOrShare(SnackbarShower snackbarShower, MegaNode myChatFilesFolder,
-                                          ArrayList<MegaChatMessage> messagesSelected,
-                                          ArrayList<MegaChatMessage> messagesToImport,
-                                          long idChat, int typeImport) {
-        CopyListener listener;
-        if (typeImport == IMPORT_TO_SHARE_OPTION) {
-            if (exportListener == null) {
-                listener = new CopyListener(CopyListener.MULTIPLE_IMPORT_CONTACT_MESSAGES,
-                        messagesSelected, messagesToImport.size(), context, snackbarShower, this, idChat);
-            } else {
-                listener = new CopyListener(CopyListener.MULTIPLE_IMPORT_CONTACT_MESSAGES,
-                        messagesSelected, messagesToImport.size(), context, snackbarShower, this,
-                        idChat, exportListener);
-            }
-
-        } else {
-            listener = new CopyListener(CopyListener.MULTIPLE_FORWARD_MESSAGES, messagesSelected,
-                    messagesToImport.size(), context, snackbarShower, this, idChat);
-        }
-
-        int errors = 0;
-
-        for (MegaChatMessage msgToImport : messagesToImport) {
-            if (msgToImport == null) {
-                Timber.w("MESSAGE is null");
-                errors++;
-            } else {
-                MegaNodeList nodeList = msgToImport.getMegaNodeList();
-                for (int i = 0; i < nodeList.size(); i++) {
-                    MegaNode document = nodeList.get(i);
-                    if (document != null) {
-                        Timber.d("DOCUMENT to copy: %s", document.getHandle());
-                        document = authorizeNodeIfPreview(document, megaChatApi.getChatRoom(idChat));
-                        megaApi.copyNode(document, myChatFilesFolder, listener);
-                    }
-                }
-            }
-        }
-
-        if (errors > 0) {
-            if (typeImport == IMPORT_TO_SHARE_OPTION) {
-                showSnackbar(context, context.getString(R.string.number_no_imported_from_chat, errors));
-            } else {
-                showSnackbar(context, context.getResources().getQuantityString(R.plurals.messages_forwarded_partial_error, errors, errors));
             }
         }
     }
