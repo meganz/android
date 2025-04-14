@@ -132,6 +132,8 @@ class ScheduledMeetingManagementViewModel @Inject constructor(
     val state: StateFlow<ScheduledMeetingManagementUiState> = _state
 
     private var isChatHistoryEmptyJob: Job? = null
+    private var monitorChatRoomUpdatesJob: Job? = null
+
 
     internal var chatScheduledMeeting: ChatScheduledMeeting? = null
 
@@ -175,8 +177,9 @@ class ScheduledMeetingManagementViewModel @Inject constructor(
      *
      * @param chatId Chat id.
      */
-    private fun getChatRoomUpdates(chatId: Long) =
-        viewModelScope.launch {
+    private fun getChatRoomUpdates(chatId: Long) {
+        monitorChatRoomUpdatesJob?.cancel()
+        monitorChatRoomUpdatesJob = viewModelScope.launch {
             monitorChatRoomUpdatesUseCase(chatId).collectLatest { chat ->
                 _state.update { state ->
                     state.copy(
@@ -185,6 +188,7 @@ class ScheduledMeetingManagementViewModel @Inject constructor(
                 }
             }
         }
+    }
 
     /**
      * Get my full name
@@ -287,6 +291,7 @@ class ScheduledMeetingManagementViewModel @Inject constructor(
      */
     fun stopMonitoringLoadMessages() {
         isChatHistoryEmptyJob?.cancel()
+        monitorChatRoomUpdatesJob?.cancel()
     }
 
     /**
