@@ -292,6 +292,11 @@ interface AppNavigator {
 
 
     /**
+     * Open Device Center
+     */
+    fun openDeviceCenter(context: Context)
+
+    /**
      * Open Stop Backup Destination in SyncHost Activity
      * //stop-backup-mega-picker
      */

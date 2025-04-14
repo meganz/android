@@ -2,12 +2,14 @@ package mega.privacy.android.app.nav
 
 import android.content.Context
 import android.content.Intent
+import android.content.Intent.FLAG_ACTIVITY_CLEAR_TOP
 import android.net.Uri
 import androidx.activity.result.ActivityResultLauncher
 import androidx.core.net.toUri
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.launch
 import mega.privacy.android.app.featuretoggle.AppFeatures
+import mega.privacy.android.app.main.ManagerActivity
 import mega.privacy.android.app.mediaplayer.AudioPlayerActivity
 import mega.privacy.android.app.mediaplayer.LegacyVideoPlayerActivity
 import mega.privacy.android.app.mediaplayer.VideoPlayerComposeActivity
@@ -18,7 +20,6 @@ import mega.privacy.android.app.presentation.meeting.chat.model.EXTRA_ACTION
 import mega.privacy.android.app.presentation.meeting.chat.model.EXTRA_LINK
 import mega.privacy.android.app.presentation.meeting.chat.view.message.attachment.NodeContentUriIntentMapper
 import mega.privacy.android.app.presentation.meeting.managechathistory.view.screen.ManageChatHistoryActivity
-import mega.privacy.android.app.presentation.openlink.OpenLinkActivity
 import mega.privacy.android.app.presentation.settings.camerauploads.SettingsCameraUploadsActivity
 import mega.privacy.android.app.presentation.settings.compose.navigation.SettingsNavigatorImpl
 import mega.privacy.android.app.presentation.transfers.EXTRA_TAB
@@ -28,6 +29,8 @@ import mega.privacy.android.app.upgradeAccount.UpgradeAccountActivity
 import mega.privacy.android.app.uploadFolder.UploadFolderActivity
 import mega.privacy.android.app.uploadFolder.UploadFolderType
 import mega.privacy.android.app.utils.Constants
+import mega.privacy.android.app.utils.Constants.ACTION_OPEN_DEVICE_CENTER
+import mega.privacy.android.app.utils.Constants.ACTION_OPEN_SYNC_MEGA_FOLDER
 import mega.privacy.android.app.utils.Constants.EXTRA_HANDLE_ZIP
 import mega.privacy.android.app.utils.Constants.EXTRA_PATH_ZIP
 import mega.privacy.android.app.utils.Constants.FROM_CHAT
@@ -467,9 +470,20 @@ internal class MegaNavigatorImpl @Inject constructor(
     }
 
     override fun openSyncMegaFolder(context: Context, handle: Long) {
-        context.startActivity(Intent(context, OpenLinkActivity::class.java).apply {
-            data = "https://mega.nz/opensync#${handle}".toUri()
-        })
+        context.startActivity(
+            Intent(context, ManagerActivity::class.java)
+                .setAction(ACTION_OPEN_SYNC_MEGA_FOLDER)
+                .setFlags(FLAG_ACTIVITY_CLEAR_TOP)
+                .setData("https://mega.nz/opensync#${handle}".toUri())
+        )
+    }
+
+    override fun openDeviceCenter(context: Context) {
+        context.startActivity(
+            Intent(context, ManagerActivity::class.java)
+                .setAction(ACTION_OPEN_DEVICE_CENTER)
+                .setFlags(FLAG_ACTIVITY_CLEAR_TOP)
+        )
     }
 
     override fun openSelectStopBackupDestinationFromSyncsTab(context: Context) {

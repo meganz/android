@@ -31,7 +31,6 @@ import mega.privacy.android.navigation.MegaNavigator
 import mega.privacy.android.shared.original.core.ui.utils.findFragmentActivity
 import mega.privacy.mobile.analytics.event.AddSyncScreenEvent
 import mega.privacy.mobile.analytics.event.AndroidSyncGetStartedButtonEvent
-import timber.log.Timber
 
 /**
  * Route ro the Sync feature
@@ -172,10 +171,6 @@ internal fun NavGraphBuilder.syncNavGraph(
             val remoteFolderHandle =
                 navBackStackEntry.arguments?.getString("remoteFolderHandle")?.toLongOrNull()
             val remoteFolderName = navBackStackEntry.arguments?.getString("remoteFolderName")
-
-            Timber.d(
-                "Sync Type = $syncType | Is From Manager Activity = $isFromManagerActivity | Remote Folder Handle = $remoteFolderHandle | Remote Folder Name = $remoteFolderName"
-            )
 
             val viewModel =
                 hiltViewModel<SyncNewFolderViewModel, SyncNewFolderViewModel.SyncNewFolderViewModelFactory> { factory ->

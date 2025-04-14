@@ -6,19 +6,23 @@ import android.view.ViewGroup
 import androidx.activity.OnBackPressedCallback
 import androidx.activity.enableEdgeToEdge
 import androidx.appcompat.app.AppCompatActivity
-import androidx.core.net.toUri
 import androidx.core.view.ViewCompat
 import androidx.core.view.WindowCompat
 import androidx.core.view.WindowInsetsCompat
 import androidx.core.view.updateLayoutParams
 import androidx.fragment.app.commit
 import dagger.hilt.android.AndroidEntryPoint
+import mega.privacy.android.navigation.MegaNavigator
+import javax.inject.Inject
 
 /**
  * Activity to show the Sync feature by hosting the [SyncFragment]
  */
 @AndroidEntryPoint
 class SyncHostActivity : AppCompatActivity() {
+
+    @Inject
+    lateinit var megaNavigator: MegaNavigator
 
     /**
      * Initializes the activity.
@@ -67,9 +71,7 @@ class SyncHostActivity : AppCompatActivity() {
     private val onBackPressedCallback = object : OnBackPressedCallback(true) {
         override fun handleOnBackPressed() {
             if (!intent.getBooleanExtra(EXTRA_IS_FROM_CLOUD_DRIVE, false)) {
-                startActivity(Intent(Intent.ACTION_VIEW).apply {
-                    data = "https://mega.nz/devicecenter".toUri()
-                })
+                megaNavigator.openDeviceCenter(this@SyncHostActivity)
             }
             finish()
         }
