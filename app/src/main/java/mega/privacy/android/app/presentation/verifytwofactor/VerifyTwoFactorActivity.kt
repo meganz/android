@@ -3,7 +3,6 @@ package mega.privacy.android.app.presentation.verifytwofactor
 import android.app.Activity
 import android.content.ClipboardManager
 import android.content.Intent
-import android.net.Uri
 import android.os.Bundle
 import android.view.WindowManager
 import android.view.inputmethod.InputMethodManager
@@ -15,10 +14,10 @@ import androidx.core.widget.doAfterTextChanged
 import dagger.hilt.android.AndroidEntryPoint
 import mega.privacy.android.app.R
 import mega.privacy.android.app.activities.PasscodeActivity
-import mega.privacy.android.app.activities.WebViewActivity
 import mega.privacy.android.app.components.EditTextPIN
 import mega.privacy.android.app.databinding.ActivityVerifyTwoFactorBinding
 import mega.privacy.android.app.extensions.enableEdgeToEdgeAndConsumeInsets
+import mega.privacy.android.app.extensions.launchUrl
 import mega.privacy.android.app.listeners.OptionalMegaRequestListenerInterface
 import mega.privacy.android.app.main.ManagerActivity
 import mega.privacy.android.app.presentation.changepassword.ChangePasswordActivity
@@ -147,19 +146,7 @@ class VerifyTwoFactorActivity : PasscodeActivity() {
         setSubTitle()
 
         binding.lostAuthenticationDevice.setOnClickListener {
-            try {
-                val openTermsIntent = Intent(this, WebViewActivity::class.java)
-                openTermsIntent.apply {
-                    flags = Intent.FLAG_ACTIVITY_CLEAR_TOP
-                    data = Uri.parse(RECOVERY_URL)
-                }
-
-                startActivity(openTermsIntent)
-            } catch (e: Exception) {
-                val viewIntent = Intent(Intent.ACTION_VIEW)
-                viewIntent.data = Uri.parse(RECOVERY_URL)
-                startActivity(viewIntent)
-            }
+            this.launchUrl(RECOVERY_URL)
         }
 
         setEditTextPINs()
