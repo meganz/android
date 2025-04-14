@@ -107,66 +107,84 @@ import javax.inject.Singleton
 internal abstract class GatewayModule {
 
     @Binds
+    @Singleton
     abstract fun bindRequestPhoneNumberPreferencesGateway(implementation: RequestPhoneNumberPreferencesDataStore): RequestPhoneNumberPreferencesGateway
 
     @Binds
+    @Singleton
     abstract fun bindSlideshowPreferencesGateway(implementation: SlideshowPreferencesDataStore): SlideshowPreferencesGateway
 
     @Binds
+    @Singleton
     abstract fun bindAssetsGateway(implementation: AssetsFacade): AssetsGateway
 
     @Binds
+    @Singleton
     abstract fun bindDeviceGateway(implementation: AndroidDeviceGateway): DeviceGateway
 
     @Binds
+    @Singleton
     abstract fun bindFileAttributeGateway(implementation: FileAttributeFacade): FileAttributeGateway
 
     @Binds
+    @Singleton
     abstract fun bindCameraUploadMediaGateway(implementation: CameraUploadsMediaFacade): CameraUploadsMediaGateway
 
     @Binds
+    @Singleton
     abstract fun bindFileCompressionGateway(implementation: ZipFileCompressionGateway): FileCompressionGateway
 
     /**
      * Provides CacheGateway implementation
      */
     @Binds
+    @Singleton
     abstract fun bindCacheGateway(implementation: CacheGatewayImpl): CacheGateway
 
     @Binds
+    @Singleton
     abstract fun bindChatPreferencesGateway(implementation: ChatPreferencesDataStore): ChatPreferencesGateway
 
     @Binds
+    @Singleton
     abstract fun bindCredentialsGateway(implementation: CredentialsPreferencesDataStore): CredentialsPreferencesGateway
 
     @Binds
+    @Singleton
     abstract fun bindCallsPreferencesGateway(implementation: CallsPreferencesDataStore): CallsPreferencesGateway
 
     @Binds
+    @Singleton
     abstract fun bindAppPreferencesGateway(implementation: AppPreferencesDatastore): AppPreferencesGateway
 
     @Binds
+    @Singleton
     abstract fun bindFeatureFlagPreferencesGateway(implementation: FeatureFlagPreferencesDataStore): FeatureFlagPreferencesGateway
 
     @Binds
+    @Singleton
     abstract fun bindStatisticsPreferencesGateway(implementation: StatisticsPreferencesDataStore): StatisticsPreferencesGateway
 
     /**
      * Provide ui preferences gateway implementation
      */
     @Binds
+    @Singleton
     abstract fun bindUIPreferencesGateway(implementation: UIPreferencesDatastore): UIPreferencesGateway
 
     @Binds
+    @Singleton
     abstract fun bindAccountPreferencesGateway(implementation: AccountPreferencesDataStore): AccountPreferencesGateway
 
     @Binds
+    @Singleton
     abstract fun MediaPlayerPreferencesGateway(implementation: MediaPlayerPreferencesDatastore): MediaPlayerPreferencesGateway
 
     @Binds
     abstract fun bindMegaApiWrapper(implementation: MegaApiFacade): MegaApiGateway
 
     @Binds
+    @Singleton
     abstract fun bindMegaChatApiGateway(implementation: MegaChatApiFacade): MegaChatApiGateway
 
     @Binds
@@ -174,9 +192,11 @@ internal abstract class GatewayModule {
     abstract fun bindMegaDBHandlerWrapper(implementation: MegaLocalStorageFacade): MegaLocalStorageGateway
 
     @Binds
+    @Singleton
     abstract fun bindFileGateway(implementation: FileFacade): FileGateway
 
     @Binds
+    @Singleton
     abstract fun bindMegaApiFolderGateway(implementation: MegaApiFolderFacade): MegaApiFolderGateway
 
     /**
@@ -185,12 +205,14 @@ internal abstract class GatewayModule {
      * @return CacheFolderGateway : @CacheFolderGateway
      */
     @Binds
+    @Singleton
     abstract fun bindCacheFolderGateway(implementation: CacheFolderFacade): CacheFolderGateway
 
     /**
      * Provide default implementation of [PermissionGateway]
      */
     @Binds
+    @Singleton
     abstract fun bindPermissionGateway(implementation: PermissionFacade): PermissionGateway
 
     /**
@@ -212,6 +234,7 @@ internal abstract class GatewayModule {
      * Provides [ClipboardGateway] implementation
      */
     @Binds
+    @Singleton
     abstract fun bindClipboardGateway(implementation: ClipboardFacade): ClipboardGateway
 
     @Binds
@@ -223,6 +246,7 @@ internal abstract class GatewayModule {
     abstract fun bindBillingFacade(implementation: BillingFacade): BillingGateway
 
     @Binds
+    @Singleton
     abstract fun bindStreamingGateway(implementation: DefaultStreamingGateway): StreamingGateway
 
     @Binds
@@ -240,6 +264,7 @@ internal abstract class GatewayModule {
      * @return [SDCardGateway]
      */
     @Binds
+    @Singleton
     abstract fun bindSDCardGateway(implementation: SDCardFacade): SDCardGateway
 
     @Binds
@@ -263,15 +288,19 @@ internal abstract class GatewayModule {
     abstract fun bindCameraUploadsSettingsPreferenceGateway(implementation: CameraUploadsSettingsPreferenceDataStore): CameraUploadsSettingsPreferenceGateway
 
     @Binds
+    @Singleton
     abstract fun bindInAppUpdatePreferencesGateway(implementation: InAppUpdatePreferencesDatastore): InAppUpdatePreferencesGateway
 
     @Binds
+    @Singleton
     abstract fun bindAdsGateway(implementation: AdsFacade): AdsGateway
 
     @Binds
+    @Singleton
     abstract fun bindPsaPreferenceGateway(implementation: PsaPreferenceDataStore): PsaPreferenceGateway
 
     @Binds
+    @Singleton
     abstract fun bindHttpConnectionGateway(implementation: HttpConnectionFacade): HttpConnectionGateway
 
     @Binds
@@ -291,6 +320,7 @@ internal abstract class GatewayModule {
     abstract fun bindWorkerClassGateway(implementation: WorkerClassGatewayImpl): WorkerClassGateway
 
     @Binds
+    @Singleton
     abstract fun bindContactGateway(implementation: ContactGatewayImpl): ContactGateway
 
     @Binds
