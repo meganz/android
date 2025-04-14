@@ -4,11 +4,13 @@ import android.annotation.SuppressLint
 import android.content.Intent
 import android.content.pm.ActivityInfo
 import android.net.Uri
+import android.os.Build
 import android.os.Bundle
 import android.view.WindowManager
 import androidx.activity.OnBackPressedCallback
 import androidx.activity.enableEdgeToEdge
 import androidx.activity.viewModels
+import androidx.core.splashscreen.SplashScreen
 import androidx.core.splashscreen.SplashScreen.Companion.installSplashScreen
 import androidx.core.view.WindowCompat
 import androidx.lifecycle.Lifecycle
@@ -114,6 +116,7 @@ class LoginActivity : BaseActivity() {
             && !viewModel.isConnected
         ) {
             // in case offline mode, go to ManagerActivity
+            stopShowingSplashScreen()
             startActivity(Intent(this, ManagerActivity::class.java))
             finish()
             return
@@ -123,13 +126,7 @@ class LoginActivity : BaseActivity() {
 
         binding = ActivityLoginBinding.inflate(layoutInflater)
         setContentView(binding.root)
-
-        // Turn off splash transition animation, and prevent the icon being jumped
-        splashScreen.setOnExitAnimationListener {
-            it.remove()
-            WindowCompat.setDecorFitsSystemWindows(window, false)
-        }
-
+        setupSplashExitAnimation(splashScreen)
         setupObservers()
         lifecycleScope.launch {
             if (savedInstanceState != null) {
@@ -171,6 +168,26 @@ class LoginActivity : BaseActivity() {
                 stopShowingSplashScreen()
                 Timber.w("Splash screen is being shown for too long")
             }
+        }
+    }
+
+    /**
+     * Disables the splash screen exit animation to prevent a visual "jump" of the app icon.
+     *
+     * Skipped on Android 13 (Tiramisu) for certain Chinese OEMs (e.g., OPPO, Realme, OnePlus),
+     * or specific models (e.g., Galaxy A03 Core), as it may cause crashes.
+     * See: https://issuetracker.google.com/issues/242118185
+     */
+    private fun setupSplashExitAnimation(splashScreen: SplashScreen) {
+        val isAndroid13 = Build.VERSION.SDK_INT == Build.VERSION_CODES.TIRAMISU
+        val isAffectedBrand = Build.BRAND.lowercase() in setOf("oppo", "realme", "oneplus")
+        val isAffectedModel = Build.MODEL.lowercase().contains("a03 core")
+
+        if (isAndroid13 && (isAffectedBrand || isAffectedModel)) return
+
+        splashScreen.setOnExitAnimationListener {
+            it.remove()
+            WindowCompat.setDecorFitsSystemWindows(window, false)
         }
     }
 
