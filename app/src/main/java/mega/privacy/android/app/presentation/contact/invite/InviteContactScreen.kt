@@ -65,6 +65,7 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.res.vectorResource
 import androidx.compose.ui.semantics.semantics
 import androidx.compose.ui.semantics.testTagsAsResourceId
+import androidx.compose.ui.text.SpanStyle
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.text.input.KeyboardType
@@ -80,6 +81,7 @@ import com.google.accompanist.permissions.isGranted
 import kotlinx.collections.immutable.ImmutableList
 import kotlinx.collections.immutable.toImmutableList
 import kotlinx.coroutines.delay
+import mega.android.core.ui.theme.values.TextColor
 import mega.privacy.android.analytics.Analytics
 import mega.privacy.android.app.R
 import mega.privacy.android.app.main.InvitationContactInfo
@@ -102,8 +104,10 @@ import mega.privacy.android.app.utils.AvatarUtil
 import mega.privacy.android.app.utils.Constants
 import mega.privacy.android.app.utils.Constants.EMAIL_ADDRESS
 import mega.privacy.android.app.utils.Constants.PHONE_NUMBER_REGEX
+import mega.privacy.android.icon.pack.R as iconPackR
 import mega.privacy.android.shared.original.core.ui.controls.appbar.AppBarType
 import mega.privacy.android.shared.original.core.ui.controls.appbar.MegaAppBar
+import mega.privacy.android.shared.original.core.ui.controls.buttons.LinkButton
 import mega.privacy.android.shared.original.core.ui.controls.buttons.MegaFloatingActionButton
 import mega.privacy.android.shared.original.core.ui.controls.buttons.RaisedDefaultMegaButton
 import mega.privacy.android.shared.original.core.ui.controls.chip.MegaChip
@@ -113,21 +117,17 @@ import mega.privacy.android.shared.original.core.ui.controls.progressindicator.M
 import mega.privacy.android.shared.original.core.ui.controls.text.LongTextBehaviour
 import mega.privacy.android.shared.original.core.ui.controls.text.MegaSpannedText
 import mega.privacy.android.shared.original.core.ui.controls.text.MegaText
-import mega.privacy.android.shared.original.core.ui.controls.buttons.LinkButton
 import mega.privacy.android.shared.original.core.ui.controls.textfields.GenericTextField
 import mega.privacy.android.shared.original.core.ui.model.MegaSpanStyle
 import mega.privacy.android.shared.original.core.ui.model.SpanIndicator
 import mega.privacy.android.shared.original.core.ui.preview.CombinedTextAndThemePreviews
 import mega.privacy.android.shared.original.core.ui.theme.OriginalTheme
-import mega.android.core.ui.theme.values.TextColor
 import mega.privacy.android.shared.original.core.ui.utils.rememberPermissionState
 import mega.privacy.android.shared.original.core.ui.utils.showAutoDurationSnackbar
+import mega.privacy.android.shared.resources.R as sharedR
 import mega.privacy.mobile.analytics.event.InviteContactsButtonPressedEvent
 import mega.privacy.mobile.analytics.event.ScanQRCodeButtonPressedEvent
 import timber.log.Timber
-import mega.privacy.android.icon.pack.R as iconPackR
-import mega.privacy.android.shared.resources.R as sharedR
-import androidx.compose.ui.text.SpanStyle
 
 @OptIn(ExperimentalComposeUiApi::class)
 @Composable
@@ -642,7 +642,7 @@ private fun ContactListBody(
     LazyColumn(modifier = modifier.testTag(CONTACT_LIST_BODY_TAG)) {
         items(
             items = contacts,
-            key = { item -> item.id },
+            key = { item -> "${item.type}_${item.id}" },
             contentType = { item -> item.type }
         ) { item ->
             when (item.type) {
