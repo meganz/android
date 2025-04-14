@@ -1,10 +1,13 @@
 package mega.privacy.android.domain.entity.achievement
 
+import kotlinx.serialization.Serializable
+
 /**
  * Achievement Type identifier
  *
  * @property classValue: Value defined in megaapi.h SDK class
  */
+@Serializable
 enum class AchievementType(val classValue: Int) {
 
     /**

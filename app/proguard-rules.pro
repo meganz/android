@@ -12,6 +12,8 @@
 -keepclassmembers enum * {
     *;
 }
+-if @kotlinx.serialization.Serializable class ** { *; }
+-keep enum * { *; }
 
 ##############
 # Parcelable #
