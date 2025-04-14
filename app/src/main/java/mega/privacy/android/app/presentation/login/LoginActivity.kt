@@ -370,7 +370,6 @@ class LoginActivity : BaseActivity() {
         if (intent?.action != null) {
             when (intent.action) {
                 Constants.ACTION_CANCEL_CAM_SYNC -> showCancelCUWarning()
-                Constants.ACTION_OVERQUOTA_TRANSFER -> showGeneralTransferOverQuotaWarning()
             }
         }
     }
