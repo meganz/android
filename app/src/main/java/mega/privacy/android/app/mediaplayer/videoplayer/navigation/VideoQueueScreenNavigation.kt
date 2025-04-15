@@ -11,8 +11,6 @@ import mega.privacy.android.app.presentation.videoplayer.view.VideoQueueScreen
 @Serializable
 internal object VideoQueueScreen
 
-internal const val VIDEO_QUEUE_SCREEN_ROUTE = "VideoQueueScreen"
-
 @OptIn(ExperimentalMaterialNavigationApi::class)
 internal fun NavGraphBuilder.videoQueueScreen(
     navHostController: NavHostController,

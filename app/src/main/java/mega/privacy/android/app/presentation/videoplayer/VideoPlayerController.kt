@@ -49,6 +49,7 @@ import mega.privacy.android.app.mediaplayer.model.SpeedPlaybackItem
 import mega.privacy.android.app.mediaplayer.model.VideoOptionItem
 import mega.privacy.android.app.mediaplayer.queue.audio.AudioQueueFragment.Companion.SINGLE_PLAYLIST_SIZE
 import mega.privacy.android.app.mediaplayer.service.Metadata
+import mega.privacy.android.app.presentation.videoplayer.model.SubtitleSelectedStatus
 import mega.privacy.android.app.utils.Constants.REQUEST_WRITE_STORAGE
 import mega.privacy.android.app.utils.permission.PermissionUtils.hasPermissions
 import mega.privacy.android.app.utils.permission.PermissionUtils.requestPermission
@@ -84,6 +85,7 @@ class VideoPlayerController(
     private val unlockButton = container.findViewById<ImageButton>(R.id.image_button_unlock)
     private val speedPlaybackButton = container.findViewById<ImageButton>(R.id.speed_playback)
     private val speedPlaybackPopup = container.findViewById<ComposeView>(R.id.speed_playback_popup)
+    private val subtitleButton = container.findViewById<ImageButton>(R.id.subtitle)
 
     private var sharingScope: CoroutineScope? = null
 
@@ -122,6 +124,13 @@ class VideoPlayerController(
             }
         }
 
+        coroutineScope.launch {
+            viewModel.uiState.map { it.subtitleSelectedStatus }.distinctUntilChanged()
+                .collectLatest {
+                    updateSubtitleButtonUI(it)
+                }
+        }
+
         setupRepeatToggleButton(viewModel.uiState.value.repeatToggleMode)
         setupMoreOptionButton()
         setupVideoPlayQueueButton(viewModel.uiState.value.items.size)
@@ -139,6 +148,7 @@ class VideoPlayerController(
         }
         setupSpeedPlaybackButton()
         setupGestures()
+        setupSubtitleButton()
     }
 
     /**
@@ -414,6 +424,23 @@ class VideoPlayerController(
             }
         }
     }
+
+    private fun setupSubtitleButton() {
+        subtitleButton.isVisible = viewModel.isShowSubtitleIcon()
+        updateSubtitleButtonUI(viewModel.uiState.value.subtitleSelectedStatus)
+        subtitleButton.setOnClickListener {
+            viewModel.updateShowSubtitleDialog(true)
+        }
+    }
+
+    private fun updateSubtitleButtonUI(status: SubtitleSelectedStatus) =
+        subtitleButton.setImageResource(
+            if (status == SubtitleSelectedStatus.Off) {
+                R.drawable.ic_subtitles_disable
+            } else {
+                R.drawable.ic_subtitles_enable
+            }
+        )
 
     override fun onStateChanged(source: LifecycleOwner, event: Lifecycle.Event) {
         when (event) {

@@ -62,6 +62,7 @@ import mega.privacy.android.app.presentation.videoplayer.mapper.VideoPlayerItemM
 import mega.privacy.android.app.presentation.videoplayer.model.MediaPlaybackState
 import mega.privacy.android.app.presentation.videoplayer.model.MenuOptionClickedContent
 import mega.privacy.android.app.presentation.videoplayer.model.PlaybackPositionStatus
+import mega.privacy.android.app.presentation.videoplayer.model.SubtitleSelectedStatus
 import mega.privacy.android.app.presentation.videoplayer.model.VideoPlayerItem
 import mega.privacy.android.app.presentation.videoplayer.model.VideoPlayerMenuAction
 import mega.privacy.android.app.presentation.videoplayer.model.VideoPlayerMenuAction.VideoPlayerDownloadAction
@@ -122,6 +123,7 @@ import mega.privacy.android.domain.entity.VideoFileTypeInfo
 import mega.privacy.android.domain.entity.account.business.BusinessAccountStatus
 import mega.privacy.android.domain.entity.mediaplayer.PlaybackInformation
 import mega.privacy.android.domain.entity.mediaplayer.RepeatToggleMode
+import mega.privacy.android.domain.entity.mediaplayer.SubtitleFileInfo
 import mega.privacy.android.domain.entity.node.FileNode
 import mega.privacy.android.domain.entity.node.NameCollision
 import mega.privacy.android.domain.entity.node.NodeId
@@ -165,6 +167,7 @@ import mega.privacy.android.domain.usecase.mediaplayer.HttpServerStartUseCase
 import mega.privacy.android.domain.usecase.mediaplayer.HttpServerStopUseCase
 import mega.privacy.android.domain.usecase.mediaplayer.videoplayer.CanRemoveFromChatUseCase
 import mega.privacy.android.domain.usecase.mediaplayer.videoplayer.DeletePlaybackInformationUseCase
+import mega.privacy.android.domain.usecase.mediaplayer.videoplayer.GetSRTSubtitleFileListUseCase
 import mega.privacy.android.domain.usecase.mediaplayer.videoplayer.GetVideoNodeByHandleUseCase
 import mega.privacy.android.domain.usecase.mediaplayer.videoplayer.GetVideoNodesByEmailUseCase
 import mega.privacy.android.domain.usecase.mediaplayer.videoplayer.GetVideoNodesByHandlesUseCase
@@ -197,6 +200,7 @@ import mega.privacy.android.domain.usecase.transfers.MonitorTransferEventsUseCas
 import mega.privacy.android.domain.usecase.videosection.SaveVideoRecentlyWatchedUseCase
 import mega.privacy.android.legacy.core.ui.model.SearchWidgetState
 import mega.privacy.mobile.analytics.event.LockButtonPressedEvent
+import mega.privacy.mobile.analytics.event.OffOptionForHideSubtitlePressedEvent
 import mega.privacy.mobile.analytics.event.UnlockButtonPressedEvent
 import mega.privacy.mobile.analytics.event.VideoPlayerFullScreenPressedEvent
 import mega.privacy.mobile.analytics.event.VideoPlayerGetLinkMenuToolbarEvent
@@ -215,6 +219,7 @@ import java.util.Collections
 import java.util.Date
 import javax.inject.Inject
 import kotlin.collections.filter
+import kotlin.collections.firstOrNull
 import kotlin.collections.map
 import kotlin.time.Duration.Companion.milliseconds
 import kotlin.time.Duration.Companion.seconds
@@ -291,6 +296,7 @@ class VideoPlayerViewModel @Inject constructor(
     private val monitorPlaybackTimesUseCase: MonitorPlaybackTimesUseCase,
     private val savePlaybackTimesUseCase: SavePlaybackTimesUseCase,
     private val deletePlaybackInformationUseCase: DeletePlaybackInformationUseCase,
+    private val getSRTSubtitleFileListUseCase: GetSRTSubtitleFileListUseCase,
     savedStateHandle: SavedStateHandle,
 ) : ViewModel() {
     val uiState: StateFlow<VideoPlayerUiState>
@@ -593,7 +599,11 @@ class VideoPlayerViewModel @Inject constructor(
             Timber.d("Playback sources: ${mediaPlaySources.mediaItems.size} items")
             with(mediaPlayerGateway) {
                 buildPlaySources(mediaPlaySources)
-                setPlayWhenReady(true && mediaPlaySources.isRestartPlaying)
+                setPlayWhenReady(
+                    mediaPlaySources.isRestartPlaying &&
+                            !uiState.value.showPlaybackDialog &&
+                            !uiState.value.showSubtitleDialog
+                )
                 playerPrepare()
             }
             mediaPlaySources.nameToDisplay?.let { name ->
@@ -1034,7 +1044,7 @@ class VideoPlayerViewModel @Inject constructor(
         if (handle == null) return
         if (uiState.value.currentPlayingHandle != handle.toLong())
             Analytics.tracker.trackEvent(VideoPlayerIsActivatedEvent)
-        updateCurrentPlayingHandle(handle.toLong())
+        updateCurrentPlayingHandle(handle.toLong(), isUpdateName)
         saveVideoWatchedTime()
         if (isUpdateName) {
             val nodeName = uiState.value.items.find {
@@ -1049,14 +1059,16 @@ class VideoPlayerViewModel @Inject constructor(
 
     internal fun updateCurrentPlayingHandle(
         handle: Long,
+        isCheckPlaybackPosition: Boolean,
         items: List<VideoPlayerItem> = uiState.value.items,
     ) {
         val playingIndex = items.indexOfFirst { it.nodeHandle == handle }.takeIf { it != -1 } ?: 0
-        val playingItemName = items.firstOrNull { it.nodeHandle == handle }?.nodeName
+        val playingItemName =
+            items.firstOrNull { it.nodeHandle == handle }?.nodeName ?: firstPlayingItemName
         viewModelScope.launch {
             savePlaybackTimesUseCase()
 
-            handlePlaybackPositionAfterVideoTransition(handle)
+            handlePlaybackPositionAfterVideoTransition(handle, isCheckPlaybackPosition)
 
             val actions = getMenuActionsForVideo(
                 launchSource = currentLaunchSources,
@@ -1086,11 +1098,14 @@ class VideoPlayerViewModel @Inject constructor(
         }
     }
 
-    private fun handlePlaybackPositionAfterVideoTransition(handle: Long) {
-        // Pause the video before check playback position
-        mediaPlayerGateway.setPlayWhenReady(false)
+    private fun handlePlaybackPositionAfterVideoTransition(
+        handle: Long,
+        isCheckPlaybackPosition: Boolean,
+    ) {
         //If hasCheckedPlaybackPosition is true, avoid checking playback position again
-        if (!hasCheckedPlaybackPosition) {
+        if (!hasCheckedPlaybackPosition && isCheckPlaybackPosition) {
+            // Pause the video before check playback position
+            mediaPlayerGateway.setPlayWhenReady(false)
             checkPlaybackPositionBeforePlayback(handle) {
                 mediaPlayerGateway.setPlayWhenReady(true)
             }
@@ -1107,7 +1122,13 @@ class VideoPlayerViewModel @Inject constructor(
     ) {
         when (playbackPositionStatus) {
             PlaybackPositionStatus.Restart -> viewModelScope.launch {
-                deletePlaybackInformationUseCase(uiState.value.currentPlayingHandle)
+                deletePlaybackInformationUseCase(
+                    if (uiState.value.currentPlayingHandle == INVALID_HANDLE) {
+                        firstPlayingHandle
+                    } else {
+                        uiState.value.currentPlayingHandle
+                    }
+                )
             }
 
             PlaybackPositionStatus.Resume -> playbackPosition?.let {
@@ -1135,6 +1156,8 @@ class VideoPlayerViewModel @Inject constructor(
                     && !mediaPlayerGateway.getPlayWhenReady()
                     && !uiState.value.isAutoReplay
                     && playbackPositionStatus == PlaybackPositionStatus.Initial
+                    && !uiState.value.showPlaybackDialog
+                    && !uiState.value.showSubtitleDialog
                 ) {
                     mediaPlayerGateway.setPlayWhenReady(true)
                 }
@@ -1908,6 +1931,131 @@ class VideoPlayerViewModel @Inject constructor(
         }
         uiState.update { it.copy(showPlaybackDialog = false) }
     }
+
+    internal suspend fun getMatchedSubtitleFileInfo(): SubtitleFileInfo? =
+        runCatching {
+            getSRTSubtitleFileListUseCase().firstOrNull { subtitleFileInfo ->
+                val subtitleName = subtitleFileInfo.name.substringBeforeLast(".")
+                val currentPlayingItemName =
+                    uiState.value.currentPlayingItemName ?: firstPlayingItemName
+                val mediaItemName = currentPlayingItemName.substringBeforeLast(".")
+                subtitleName == mediaItemName
+            }
+        }.onFailure {
+            Timber.e(it)
+        }.getOrNull()
+
+    internal fun updateSubtitleSelectedStatus(
+        status: SubtitleSelectedStatus,
+        info: SubtitleFileInfo? = null,
+    ) {
+        when (status) {
+            SubtitleSelectedStatus.Off -> onOffItemClicked()
+            SubtitleSelectedStatus.AddSubtitleItem -> if (info == null) {
+                onAddedSubtitleOptionClicked()
+            } else {
+                updateAddedSubtitleInfo(info)
+            }
+
+            SubtitleSelectedStatus.SelectMatchedItem -> onAutoMatchItemClicked(info)
+        }
+        if (!mediaPlayerGateway.getPlayWhenReady())
+            mediaPlayerGateway.setPlayWhenReady(true)
+    }
+
+    private fun onOffItemClicked() {
+        if (uiState.value.subtitleSelectedStatus != SubtitleSelectedStatus.Off) {
+            Analytics.tracker.trackEvent(OffOptionForHideSubtitlePressedEvent)
+            mediaPlayerGateway.hideSubtitle()
+        }
+
+        uiState.update {
+            it.copy(
+                showSubtitleDialog = false,
+                subtitleSelectedStatus = SubtitleSelectedStatus.Off
+            )
+        }
+    }
+
+    private fun onAddedSubtitleOptionClicked() {
+        mediaPlayerGateway.showSubtitle()
+        uiState.update {
+            it.copy(
+                showSubtitleDialog = false,
+                subtitleSelectedStatus = SubtitleSelectedStatus.AddSubtitleItem
+            )
+        }
+    }
+
+    private fun updateAddedSubtitleInfo(info: SubtitleFileInfo?) {
+        info?.url?.let {
+            addSubtitleAndUpdatePlaybackSources(it)
+        }
+
+        uiState.update {
+            it.copy(
+                showSubtitleDialog = false,
+                addedSubtitleInfo = info,
+                matchedSubtitleInfo = null,
+                subtitleSelectedStatus = if (info?.url == null)
+                    SubtitleSelectedStatus.Off
+                else
+                    SubtitleSelectedStatus.AddSubtitleItem,
+            )
+        }
+    }
+
+    private fun addSubtitleAndUpdatePlaybackSources(url: String) {
+        mediaPlayerGateway.addSubtitle(url)
+        uiState.value.mediaPlaySources?.let {
+            mediaPlayerGateway.buildPlaySources(it)
+        }
+    }
+
+    private fun onAutoMatchItemClicked(info: SubtitleFileInfo?) {
+        val matchedInfo = uiState.value.matchedSubtitleInfo
+        val addedInfo = uiState.value.addedSubtitleInfo
+
+        if (matchedInfo != null && addedInfo == null) {
+            mediaPlayerGateway.showSubtitle()
+        } else {
+            val url = matchedInfo?.url ?: info?.url
+            if (url != null) addSubtitleAndUpdatePlaybackSources(url)
+        }
+
+        uiState.update {
+            it.copy(
+                showSubtitleDialog = false,
+                matchedSubtitleInfo = info,
+                addedSubtitleInfo = null,
+                subtitleSelectedStatus =
+                if (info?.url == null)
+                    SubtitleSelectedStatus.Off
+                else
+                    SubtitleSelectedStatus.SelectMatchedItem
+            )
+        }
+    }
+
+    internal fun navigateToSelectSubtitle() {
+        uiState.update {
+            it.copy(
+                showSubtitleDialog = false,
+                navigateToSelectSubtitleScreen = true,
+            )
+        }
+    }
+
+    internal fun updateNavigateToSelectSubtitle(value: Boolean) {
+        uiState.update { it.copy(navigateToSelectSubtitleScreen = value) }
+    }
+
+    internal fun updateShowSubtitleDialog(value: Boolean) {
+        uiState.update { it.copy(showSubtitleDialog = value) }
+        mediaPlayerGateway.setPlayWhenReady(!value)
+    }
+
+    internal fun isShowSubtitleIcon() = currentLaunchSources != OFFLINE_ADAPTER
 
     companion object {
         private const val MEDIA_PLAYER_STATE_ENDED = 4

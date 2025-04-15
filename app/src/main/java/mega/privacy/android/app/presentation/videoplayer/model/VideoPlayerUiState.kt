@@ -8,6 +8,7 @@ import mega.privacy.android.app.mediaplayer.service.Metadata
 import mega.privacy.android.app.presentation.transfers.starttransfer.model.TransferTriggerEvent.DownloadTriggerEvent
 import mega.privacy.android.domain.entity.AccountType
 import mega.privacy.android.domain.entity.mediaplayer.RepeatToggleMode
+import mega.privacy.android.domain.entity.mediaplayer.SubtitleFileInfo
 import mega.privacy.android.domain.exception.MegaException
 import mega.privacy.android.legacy.core.ui.model.SearchWidgetState
 
@@ -49,6 +50,11 @@ import mega.privacy.android.legacy.core.ui.model.SearchWidgetState
  * @property showPlaybackDialog whether the playback dialog is shown
  * @property playbackPosition the playback position
  * @property currentPlayingItemName the current playing item name
+ * @property showSubtitleDialog whether the subtitle dialog is shown
+ * @property subtitleSelectedStatus the subtitle selected status
+ * @property matchedSubtitleInfo the matched subtitle info
+ * @property addedSubtitleInfo the added subtitle info
+ * @property navigateToSelectSubtitleScreen whether to navigate to select subtitle screen
  */
 data class VideoPlayerUiState(
     val items: List<VideoPlayerItem> = emptyList(),
@@ -86,4 +92,9 @@ data class VideoPlayerUiState(
     val showPlaybackDialog: Boolean = false,
     val playbackPosition: Long? = null,
     val currentPlayingItemName: String? = null,
+    val showSubtitleDialog: Boolean = false,
+    val subtitleSelectedStatus: SubtitleSelectedStatus = SubtitleSelectedStatus.Off,
+    val matchedSubtitleInfo: SubtitleFileInfo? = null,
+    val addedSubtitleInfo: SubtitleFileInfo? = null,
+    val navigateToSelectSubtitleScreen: Boolean = false,
 )

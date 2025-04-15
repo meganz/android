@@ -20,20 +20,28 @@ internal fun NavGraphBuilder.videoPlayerComposeNavigationGraph(
     scaffoldState: ScaffoldState,
     viewModel: VideoPlayerViewModel,
     player: ExoPlayer?,
+    handleAutoReplayIfPaused: () -> Unit,
 ) {
     navigation<VideoPlayerNavigationGraph>(
         startDestination = VideoPlayerScreen,
     ) {
         videoPlayerScreen(
+            navHostController = navHostController,
             bottomSheetNavigator = bottomSheetNavigator,
             scaffoldState = scaffoldState,
             viewModel = viewModel,
             player = player,
+            handleAutoReplayIfPaused = handleAutoReplayIfPaused,
         ) {
             navHostController.navigate(VideoQueueScreen)
         }
 
         videoQueueScreen(
+            navHostController = navHostController,
+            videoPlayerViewModel = viewModel
+        )
+
+        selectSubtitleScreen(
             navHostController = navHostController,
             videoPlayerViewModel = viewModel
         )

@@ -33,6 +33,7 @@ import mega.privacy.android.app.presentation.videoplayer.mapper.VideoPlayerItemM
 import mega.privacy.android.app.presentation.videoplayer.model.MediaPlaybackState
 import mega.privacy.android.app.presentation.videoplayer.model.MenuOptionClickedContent
 import mega.privacy.android.app.presentation.videoplayer.model.PlaybackPositionStatus
+import mega.privacy.android.app.presentation.videoplayer.model.SubtitleSelectedStatus
 import mega.privacy.android.app.presentation.videoplayer.model.VideoPlayerItem
 import mega.privacy.android.app.presentation.videoplayer.model.VideoPlayerMenuAction
 import mega.privacy.android.app.presentation.videoplayer.model.VideoPlayerMenuAction.VideoPlayerAddToAction
@@ -100,6 +101,7 @@ import mega.privacy.android.domain.entity.account.AccountLevelDetail
 import mega.privacy.android.domain.entity.account.business.BusinessAccountStatus
 import mega.privacy.android.domain.entity.mediaplayer.PlaybackInformation
 import mega.privacy.android.domain.entity.mediaplayer.RepeatToggleMode
+import mega.privacy.android.domain.entity.mediaplayer.SubtitleFileInfo
 import mega.privacy.android.domain.entity.node.FileNode
 import mega.privacy.android.domain.entity.node.MoveRequestResult
 import mega.privacy.android.domain.entity.node.Node
@@ -145,6 +147,7 @@ import mega.privacy.android.domain.usecase.mediaplayer.HttpServerStartUseCase
 import mega.privacy.android.domain.usecase.mediaplayer.HttpServerStopUseCase
 import mega.privacy.android.domain.usecase.mediaplayer.videoplayer.CanRemoveFromChatUseCase
 import mega.privacy.android.domain.usecase.mediaplayer.videoplayer.DeletePlaybackInformationUseCase
+import mega.privacy.android.domain.usecase.mediaplayer.videoplayer.GetSRTSubtitleFileListUseCase
 import mega.privacy.android.domain.usecase.mediaplayer.videoplayer.GetVideoNodeByHandleUseCase
 import mega.privacy.android.domain.usecase.mediaplayer.videoplayer.GetVideoNodesByEmailUseCase
 import mega.privacy.android.domain.usecase.mediaplayer.videoplayer.GetVideoNodesByHandlesUseCase
@@ -177,6 +180,7 @@ import mega.privacy.android.domain.usecase.transfers.MonitorTransferEventsUseCas
 import mega.privacy.android.domain.usecase.videosection.SaveVideoRecentlyWatchedUseCase
 import mega.privacy.android.legacy.core.ui.model.SearchWidgetState
 import mega.privacy.mobile.analytics.event.LockButtonPressedEvent
+import mega.privacy.mobile.analytics.event.OffOptionForHideSubtitlePressedEvent
 import mega.privacy.mobile.analytics.event.UnlockButtonPressedEvent
 import mega.privacy.mobile.analytics.event.VideoPlayerFullScreenPressedEvent
 import mega.privacy.mobile.analytics.event.VideoPlayerGetLinkMenuToolbarEvent
@@ -299,6 +303,7 @@ class VideoPlayerViewModelTest {
     private val monitorPlaybackTimesUseCase = mock<MonitorPlaybackTimesUseCase>()
     private val savePlaybackTimesUseCase = mock<SavePlaybackTimesUseCase>()
     private val deletePlaybackInformationUseCase = mock<DeletePlaybackInformationUseCase>()
+    private val getSRTSubtitleFileListUseCase = mock<GetSRTSubtitleFileListUseCase>()
 
     private val testHandle: Long = 123456
     private val testFileName = "test.mp4"
@@ -382,6 +387,7 @@ class VideoPlayerViewModelTest {
             monitorPlaybackTimesUseCase = monitorPlaybackTimesUseCase,
             savePlaybackTimesUseCase = savePlaybackTimesUseCase,
             deletePlaybackInformationUseCase = deletePlaybackInformationUseCase,
+            getSRTSubtitleFileListUseCase = getSRTSubtitleFileListUseCase
         )
         savedStateHandle[INTENT_EXTRA_KEY_VIDEO_COLLECTION_ID] = expectedCollectionId
         savedStateHandle[INTENT_EXTRA_KEY_VIDEO_COLLECTION_TITLE] = expectedCollectionTitle
@@ -478,6 +484,7 @@ class VideoPlayerViewModelTest {
             monitorPlaybackTimesUseCase,
             savePlaybackTimesUseCase,
             deletePlaybackInformationUseCase,
+            getSRTSubtitleFileListUseCase
         )
     }
 
@@ -1274,7 +1281,7 @@ class VideoPlayerViewModelTest {
             whenever(getVideoNodeByHandleUseCase(any(), any())).thenReturn(mock())
             whenever(testItems[1].copy(type = MediaQueueItemType.Playing)).thenReturn(testItem)
             initViewModel()
-            underTest.updateCurrentPlayingHandle(testHandle, testItems)
+            underTest.updateCurrentPlayingHandle(testHandle, false, testItems)
             testScheduler.advanceUntilIdle()
             underTest.uiState.test {
                 awaitItem().let {
@@ -1284,7 +1291,7 @@ class VideoPlayerViewModelTest {
                     assertThat(it.currentPlayingHandle).isEqualTo(testHandle)
                     assertThat(it.items[1].type).isEqualTo(MediaQueueItemType.Playing)
                 }
-                underTest.updateCurrentPlayingHandle(handleNotInItems, testItems)
+                underTest.updateCurrentPlayingHandle(handleNotInItems, false, testItems)
                 awaitItem().let {
                     assertThat(it.currentPlayingIndex).isEqualTo(0)
                     assertThat(it.currentPlayingHandle).isEqualTo(handleNotInItems)
@@ -1437,7 +1444,7 @@ class VideoPlayerViewModelTest {
                 VideoPlayerFileInfoAction,
             )
             initLaunchSourceMapperReturned(testActions)
-            underTest.updateCurrentPlayingHandle(testHandle, testItems)
+            underTest.updateCurrentPlayingHandle(testHandle, false, testItems)
             advanceUntilIdle()
             underTest.uiState.test {
                 val actual = awaitItem()
@@ -2248,6 +2255,210 @@ class VideoPlayerViewModelTest {
             }
         }
     }
+
+    @Test
+    fun `test that getMatchedSubtitleFileInfo function returns correctly`() = runTest {
+        val testInfoList = listOf(
+            mock<SubtitleFileInfo> {
+                on { name }.thenReturn(testFileName)
+            }
+        )
+        whenever(getSRTSubtitleFileListUseCase()).thenReturn(testInfoList)
+        initViewModel()
+        val actual = underTest.getMatchedSubtitleFileInfo()
+        assertThat(actual).isNotNull()
+        assertThat(actual?.name).isEqualTo(testFileName)
+    }
+
+    @ParameterizedTest(name = "when value is {0}")
+    @ValueSource(booleans = [true, false])
+    fun `test that showSubtitleDialog is update correctly after updateShowSubtitleDialog is invoked`(
+        value: Boolean,
+    ) = runTest {
+        initViewModel()
+        underTest.updateShowSubtitleDialog(value)
+        testScheduler.advanceUntilIdle()
+        verify(mediaPlayerGateway).setPlayWhenReady(!value)
+        underTest.uiState.test {
+            assertThat(awaitItem().showSubtitleDialog).isEqualTo(value)
+            cancelAndConsumeRemainingEvents()
+        }
+    }
+
+    @Test
+    fun `test that state is updated correctly after navigateToSelectSubtitle is invoked`() =
+        runTest {
+            initViewModel()
+            advanceUntilIdle()
+            underTest.uiState.drop(1).test {
+                underTest.updateShowSubtitleDialog(true)
+                assertThat(awaitItem().showSubtitleDialog).isTrue()
+                underTest.navigateToSelectSubtitle()
+                verify(mediaPlayerGateway).setPlayWhenReady(false)
+                assertThat(awaitItem().showSubtitleDialog).isFalse()
+            }
+        }
+
+    @ParameterizedTest(name = "when value is {0}")
+    @ValueSource(booleans = [true, false])
+    fun `test that navigateToSelectSubtitleScreen is update correctly after updateNavigateToSelectSubtitle is invoked`(
+        value: Boolean,
+    ) = runTest {
+        initViewModel()
+        underTest.updateNavigateToSelectSubtitle(value)
+        testScheduler.advanceUntilIdle()
+        underTest.uiState.test {
+            assertThat(awaitItem().navigateToSelectSubtitleScreen).isEqualTo(value)
+            cancelAndConsumeRemainingEvents()
+        }
+    }
+
+    @ParameterizedTest(name = "when LaunchSource is {0}")
+    @ValueSource(ints = [OFFLINE_ADAPTER, LINKS_ADAPTER])
+    fun `test that isShowSubtitleIcon returns correctly`(
+        launchSource: Int,
+    ) = runTest {
+        savedStateHandle[INTENT_EXTRA_KEY_ADAPTER_TYPE] = launchSource
+        initViewModel()
+        val actual = underTest.isShowSubtitleIcon()
+        assertThat(actual).isEqualTo(launchSource != OFFLINE_ADAPTER)
+    }
+
+    @Test
+    fun `test that state is updated correctly when SubtitleSelectedStatus is Off`() = runTest {
+        initViewModel()
+        underTest.updateSubtitleSelectedStatus(SubtitleSelectedStatus.AddSubtitleItem)
+        underTest.updateSubtitleSelectedStatus(SubtitleSelectedStatus.Off)
+        advanceUntilIdle()
+        assertThat(analyticsExtension.events.first()).isInstanceOf(
+            OffOptionForHideSubtitlePressedEvent::class.java
+        )
+        verify(mediaPlayerGateway).hideSubtitle()
+        underTest.uiState.test {
+            assertThat(awaitItem().subtitleSelectedStatus).isEqualTo(SubtitleSelectedStatus.Off)
+            cancelAndConsumeRemainingEvents()
+        }
+    }
+
+    @Test
+    fun `test that state is updated correctly when SubtitleSelectedStatus is AddSubtitleItem and info is null`() =
+        runTest {
+            initViewModel()
+            underTest.updateSubtitleSelectedStatus(SubtitleSelectedStatus.AddSubtitleItem)
+            advanceUntilIdle()
+            verify(mediaPlayerGateway).showSubtitle()
+            underTest.uiState.test {
+                assertThat(awaitItem().subtitleSelectedStatus).isEqualTo(SubtitleSelectedStatus.AddSubtitleItem)
+                cancelAndConsumeRemainingEvents()
+            }
+        }
+
+    @Test
+    fun `test that state is updated correctly when SubtitleSelectedStatus is AddSubtitleItem, subtitle url is not null`() =
+        runTest {
+            val testUrl = "testUrl"
+            val mockSubtitleInfo = mock<SubtitleFileInfo> {
+                on { url }.thenReturn(testUrl)
+            }
+            initViewModel()
+            underTest.updateSubtitleSelectedStatus(
+                SubtitleSelectedStatus.AddSubtitleItem,
+                mockSubtitleInfo
+            )
+            advanceUntilIdle()
+            verify(mediaPlayerGateway).addSubtitle(testUrl)
+            underTest.uiState.test {
+                val actual = awaitItem()
+                assertThat(actual.subtitleSelectedStatus).isEqualTo(SubtitleSelectedStatus.AddSubtitleItem)
+                assertThat(actual.showSubtitleDialog).isFalse()
+                assertThat(actual.addedSubtitleInfo).isEqualTo(mockSubtitleInfo)
+                assertThat(actual.matchedSubtitleInfo).isNull()
+                cancelAndConsumeRemainingEvents()
+            }
+        }
+
+    @Test
+    fun `test that state is updated correctly when SubtitleSelectedStatus is AddSubtitleItem, subtitle url is null`() =
+        runTest {
+            val mockSubtitleInfo = mock<SubtitleFileInfo>()
+            initViewModel()
+            underTest.updateSubtitleSelectedStatus(
+                SubtitleSelectedStatus.AddSubtitleItem,
+                mockSubtitleInfo
+            )
+            advanceUntilIdle()
+            underTest.uiState.test {
+                val actual = awaitItem()
+                assertThat(actual.subtitleSelectedStatus).isEqualTo(SubtitleSelectedStatus.Off)
+                assertThat(actual.showSubtitleDialog).isFalse()
+                assertThat(actual.addedSubtitleInfo).isEqualTo(mockSubtitleInfo)
+                assertThat(actual.matchedSubtitleInfo).isNull()
+                cancelAndConsumeRemainingEvents()
+            }
+        }
+
+    @Test
+    fun `test that state is updated correctly when SubtitleSelectedStatus is SelectMatchedItem`() =
+        runTest {
+            val testUrl = "testUrl"
+            val mockSubtitleInfo = mock<SubtitleFileInfo> {
+                on { url }.thenReturn(testUrl)
+            }
+            initViewModel()
+            underTest.updateSubtitleSelectedStatus(
+                SubtitleSelectedStatus.SelectMatchedItem,
+                mockSubtitleInfo
+            )
+            underTest.updateSubtitleSelectedStatus(SubtitleSelectedStatus.Off)
+            underTest.updateSubtitleSelectedStatus(
+                SubtitleSelectedStatus.SelectMatchedItem,
+                mockSubtitleInfo
+            )
+            underTest.uiState.test {
+                underTest.updateSubtitleSelectedStatus(
+                    SubtitleSelectedStatus.SelectMatchedItem,
+                    mockSubtitleInfo
+                )
+                awaitItem().let {
+                    assertThat(it.subtitleSelectedStatus).isEqualTo(SubtitleSelectedStatus.SelectMatchedItem)
+                    assertThat(it.showSubtitleDialog).isFalse()
+                    assertThat(it.matchedSubtitleInfo).isEqualTo(mockSubtitleInfo)
+                    assertThat(it.addedSubtitleInfo).isNull()
+                }
+                underTest.updateSubtitleSelectedStatus(SubtitleSelectedStatus.Off)
+                skipItems(1)
+                underTest.updateSubtitleSelectedStatus(
+                    SubtitleSelectedStatus.SelectMatchedItem,
+                    mockSubtitleInfo
+                )
+                awaitItem().let {
+                    assertThat(it.subtitleSelectedStatus).isEqualTo(SubtitleSelectedStatus.SelectMatchedItem)
+                    assertThat(it.showSubtitleDialog).isFalse()
+                    assertThat(it.matchedSubtitleInfo).isEqualTo(mockSubtitleInfo)
+                    assertThat(it.addedSubtitleInfo).isNull()
+                }
+                cancelAndConsumeRemainingEvents()
+            }
+        }
+
+    @Test
+    fun `test that state is updated correctly when SubtitleSelectedStatus is SelectMatchedItem and subtitle url is null`() =
+        runTest {
+            val mockSubtitleInfo = mock<SubtitleFileInfo>()
+            initViewModel()
+            underTest.updateSubtitleSelectedStatus(
+                SubtitleSelectedStatus.SelectMatchedItem,
+                mockSubtitleInfo
+            )
+            underTest.uiState.test {
+                val actual = awaitItem()
+                assertThat(actual.subtitleSelectedStatus).isEqualTo(SubtitleSelectedStatus.Off)
+                assertThat(actual.showSubtitleDialog).isFalse()
+                assertThat(actual.matchedSubtitleInfo).isEqualTo(mockSubtitleInfo)
+                assertThat(actual.addedSubtitleInfo).isNull()
+                cancelAndConsumeRemainingEvents()
+            }
+        }
 
     companion object {
         @JvmField

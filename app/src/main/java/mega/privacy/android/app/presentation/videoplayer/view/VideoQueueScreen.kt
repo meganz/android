@@ -40,6 +40,7 @@ internal fun VideoQueueScreen(
     LaunchedEffect(Unit) {
         systemUiController.isSystemBarsVisible = true
         currentPlayingPosition = viewModel.getCurrentPlayingPosition()
+        viewModel.updatePlaybackStateWithReplay(false)
     }
 
     LaunchedEffect(uiState.currentPlayingIndex) {

@@ -26,7 +26,6 @@ import androidx.activity.viewModels
 import androidx.appcompat.app.AppCompatDelegate
 import androidx.compose.material.rememberScaffoldState
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -59,8 +58,6 @@ import mega.privacy.android.app.mediaplayer.gateway.MediaPlayerGateway
 import mega.privacy.android.app.mediaplayer.service.AudioPlayerService
 import mega.privacy.android.app.mediaplayer.service.MediaPlayerCallback
 import mega.privacy.android.app.mediaplayer.service.Metadata
-import mega.privacy.android.app.mediaplayer.videoplayer.navigation.VIDEO_PLAYER_SCREEN_ROUTE
-import mega.privacy.android.app.mediaplayer.videoplayer.navigation.VIDEO_QUEUE_SCREEN_ROUTE
 import mega.privacy.android.app.mediaplayer.videoplayer.navigation.VideoPlayerNavigationGraph
 import mega.privacy.android.app.mediaplayer.videoplayer.navigation.videoPlayerComposeNavigationGraph
 import mega.privacy.android.app.presentation.container.AppContainer
@@ -307,20 +304,6 @@ class VideoPlayerComposeActivity : PasscodeActivity() {
                 val uiState by videoPlayerViewModel.uiState.collectAsStateWithLifecycle()
                 val scaffoldState = rememberScaffoldState()
 
-                LaunchedEffect(navHostController) {
-                    navHostController.currentBackStackEntryFlow.collect { backStackEntry ->
-                        backStackEntry.destination.route?.let { currentRoute ->
-                            when {
-                                currentRoute.contains(VIDEO_PLAYER_SCREEN_ROUTE) ->
-                                    handleAutoReplayIfPaused()
-
-                                currentRoute.contains(VIDEO_QUEUE_SCREEN_ROUTE) ->
-                                    videoPlayerViewModel.updatePlaybackStateWithReplay(false)
-                            }
-                        }
-                    }
-                }
-
                 NavHost(
                     navController = navHostController,
                     startDestination = VideoPlayerNavigationGraph
@@ -330,6 +313,7 @@ class VideoPlayerComposeActivity : PasscodeActivity() {
                         bottomSheetNavigator = bottomSheetNavigator,
                         scaffoldState = scaffoldState,
                         viewModel = videoPlayerViewModel,
+                        handleAutoReplayIfPaused = ::handleAutoReplayIfPaused,
                         player = player
                     )
                 }
@@ -378,13 +362,7 @@ class VideoPlayerComposeActivity : PasscodeActivity() {
         val nameChangeCallback: (title: String?, artist: String?, album: String?) -> Unit =
             { title, artist, album ->
                 with(videoPlayerViewModel) {
-                    val currentPlayingItemHandle =
-                        mediaPlayerGateway.getCurrentMediaItem()?.mediaId?.toLong()
-                    val playingItemTitle =
-                        uiState.value.items.find {
-                            it.nodeHandle == currentPlayingItemHandle
-                        }?.nodeName ?: ""
-
+                    val playingItemTitle = uiState.value.currentPlayingItemName ?: ""
                     updateMetadata(Metadata(title, artist, album, playingItemTitle))
                 }
             }

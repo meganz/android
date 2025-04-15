@@ -60,18 +60,23 @@ import com.google.accompanist.systemuicontroller.rememberSystemUiController
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
+import mega.privacy.android.analytics.Analytics
 import mega.privacy.android.app.R
 import mega.privacy.android.app.databinding.VideoPlayerPlayerViewBinding
+import mega.privacy.android.app.mediaplayer.AddSubtitleDialog
 import mega.privacy.android.app.presentation.videoplayer.VideoPlayerController
 import mega.privacy.android.app.presentation.videoplayer.VideoPlayerViewModel
 import mega.privacy.android.app.presentation.videoplayer.model.MediaPlaybackState
 import mega.privacy.android.app.presentation.videoplayer.model.PlaybackPositionStatus
+import mega.privacy.android.app.presentation.videoplayer.model.SubtitleSelectedStatus
 import mega.privacy.android.app.presentation.videoplayer.view.VideoPlayerTopBar
 import mega.privacy.android.app.utils.Constants.AUDIO_PLAYER_TOOLBAR_INIT_HIDE_DELAY_MS
 import mega.privacy.android.shared.original.core.ui.controls.dialogs.MegaAlertDialog
 import mega.privacy.android.shared.original.core.ui.controls.layouts.MegaScaffold
 import mega.privacy.android.shared.original.core.ui.controls.sheets.MegaBottomSheetLayout
 import mega.privacy.android.shared.original.core.ui.utils.showAutoDurationSnackbar
+import mega.privacy.mobile.analytics.event.AddSubtitlesOptionPressedEvent
+import mega.privacy.mobile.analytics.event.AutoMatchSubtitleOptionPressedEvent
 import kotlin.math.roundToInt
 
 @androidx.annotation.OptIn(UnstableApi::class)
@@ -140,8 +145,8 @@ internal fun VideoPlayerScreen(
         }
     }
 
-    LaunchedEffect(uiState.showPlaybackDialog) {
-        if (uiState.showPlaybackDialog) {
+    LaunchedEffect(uiState.showPlaybackDialog, uiState.showSubtitleDialog) {
+        if (uiState.showPlaybackDialog || uiState.showSubtitleDialog) {
             autoHideJob?.cancel()
         } else {
             if (isControllerViewVisible) {
@@ -357,6 +362,39 @@ internal fun VideoPlayerScreen(
                             viewModel.updatePlaybackPositionStatus(PlaybackPositionStatus.Initial)
                         },
                     )
+                }
+
+                AddSubtitleDialog(
+                    isShown = uiState.showSubtitleDialog,
+                    selectOptionState = uiState.subtitleSelectedStatus.id,
+                    matchedSubtitleFileUpdate = {
+                        viewModel.getMatchedSubtitleFileInfo()
+                    },
+                    subtitleFileName = uiState.addedSubtitleInfo?.name,
+                    onOffClicked = {
+                        viewModel.updateSubtitleSelectedStatus(SubtitleSelectedStatus.Off)
+                    },
+                    onAddedSubtitleClicked = {
+                        viewModel.updateSubtitleSelectedStatus(SubtitleSelectedStatus.AddSubtitleItem)
+                    },
+                    onAutoMatch = { info ->
+                        if (info.url == null) {
+                            viewModel.updateSnackBarMessage(
+                                context.getString(R.string.media_player_video_message_adding_subtitle_failed)
+                            )
+                            return@AddSubtitleDialog
+                        }
+                        Analytics.tracker.trackEvent(AutoMatchSubtitleOptionPressedEvent)
+                        viewModel.updateSubtitleSelectedStatus(
+                            SubtitleSelectedStatus.SelectMatchedItem,
+                            info
+                        )
+                    },
+                    onToSelectSubtitle = {
+                        Analytics.tracker.trackEvent(AddSubtitlesOptionPressedEvent)
+                        viewModel.navigateToSelectSubtitle()
+                    }) {
+                    viewModel.updateShowSubtitleDialog(false)
                 }
             }
         }
