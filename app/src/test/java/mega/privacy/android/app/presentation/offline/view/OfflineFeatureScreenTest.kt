@@ -19,7 +19,24 @@ class OfflineFeatureScreenTest {
 
     @Test
     fun `test that OfflineFeatureScreen displays OfflineLoadingView when loading`() {
-        val uiState = OfflineUiState(isLoading = true)
+        val uiState = OfflineUiState(isLoadingCurrentFolder = true)
+        composeRule.setContent {
+            OfflineFeatureScreen(
+                uiState = uiState,
+                fileTypeIconMapper = mock(),
+                onCloseWarningClick = {},
+                onOfflineItemClicked = {},
+                onItemLongClicked = { },
+                onOptionClicked = {}
+            )
+        }
+
+        composeRule.onNodeWithTag(OFFLINE_LOADING_VIEW_TEST_TAG, true).assertIsDisplayed()
+    }
+
+    @Test
+    fun `test that OfflineFeatureScreen displays OfflineLoadingView when loading child folders`() {
+        val uiState = OfflineUiState(isLoadingCurrentFolder = false, isLoadingChildFolders = true)
         composeRule.setContent {
             OfflineFeatureScreen(
                 uiState = uiState,
@@ -36,7 +53,7 @@ class OfflineFeatureScreenTest {
 
     @Test
     fun `test that OfflineFeatureScreen displays OfflineEmptyView when loaded and list is empty`() {
-        val uiState = OfflineUiState(isLoading = false, offlineNodes = emptyList())
+        val uiState = OfflineUiState(isLoadingCurrentFolder = false, offlineNodes = emptyList())
         composeRule.setContent {
             OfflineFeatureScreen(
                 uiState = uiState,
@@ -56,7 +73,7 @@ class OfflineFeatureScreenTest {
     fun `test that OfflineFeatureScreen displays warning banner when showOfflineWarning is true and isLoading is false`() {
         val uiState =
             OfflineUiState(
-                isLoading = false,
+                isLoadingCurrentFolder = false,
                 offlineNodes = emptyList(),
                 showOfflineWarning = true,
             )

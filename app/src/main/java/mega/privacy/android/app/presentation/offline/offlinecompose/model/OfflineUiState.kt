@@ -8,12 +8,14 @@ import mega.privacy.android.domain.entity.preference.ViewType
 
 /**
  * UI state for the OfflineComposeViewModel
- * @param isLoading UI state to show the loading state
+ * @param isLoadingCurrentFolder if true, current folder files are still loading
+ * @param isLoadingChildFolders if true, current folder is still not the final folder to show
  * @param showOfflineWarning UI state to show the offline warning
  * @param offlineNodes The offline nodes fetched from the database
  * @param selectedNodeHandles The selected nodes when the view is in the selecting mode
  * @param parentId Parent id of Node
  * @param title Title of screen
+ * @param defaultTitle default title
  * @param currentViewType ViewType [ViewType]
  * @param isOnline true if connected to network
  * @param searchQuery Search query
@@ -22,7 +24,8 @@ import mega.privacy.android.domain.entity.preference.ViewType
  * @param openOfflineNodeEvent Event to open offline node
  */
 data class OfflineUiState(
-    val isLoading: Boolean = true,
+    val isLoadingCurrentFolder: Boolean = true,
+    val isLoadingChildFolders: Boolean = false,
     val showOfflineWarning: Boolean = false,
     val offlineNodes: List<OfflineNodeUIItem> = emptyList(),
     val selectedNodeHandles: List<Long> = emptyList(),
@@ -36,6 +39,11 @@ data class OfflineUiState(
     val openFolderInPageEvent: StateEventWithContent<OfflineFileInformation> = consumed(),
     val openOfflineNodeEvent: StateEventWithContent<OfflineFileInformation> = consumed(),
 ) {
+
+    /**
+     * isLoading UI state to show the loading state
+     */
+    val isLoading = isLoadingCurrentFolder || isLoadingChildFolders
 
     /**
      * Actual title to show, it's [title] if it's not null or blank, [defaultTitle] otherwise

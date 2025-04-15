@@ -1886,32 +1886,6 @@ class DefaultTransfersRepositoryTest {
         assertThat(parentRecursiveAppDataCache).isEmpty()
     }
 
-    /*@Test
-    fun `test that parent group app data is cached`() = runTest {
-        val parentTag = 46376
-        val appData = TransferAppData.TransferGroup(245)
-        val transferEvent1 = mockTransferEvent<TransferEvent.TransferStartEvent>(
-            TransferType.DOWNLOAD,
-            1,
-            folderTransferTag = parentTag
-        )
-        val transferEvent2 = mockTransferEvent<TransferEvent.TransferFinishEvent>(
-            TransferType.DOWNLOAD,
-            1,
-            folderTransferTag = parentTag
-        )
-        val parentTransfer = mock<Transfer> {
-            on { it.appData } doReturn listOf(appData)
-        }
-        whenever(transferRepository.getActiveTransferByTag(parentTag)) doReturn parentTransfer
-
-        underTest.invoke(transferEvent1)
-        underTest.invoke(transferEvent2)
-
-        verify(transferRepository, times(2)).insertOrUpdateActiveTransfers(any())
-        verify(transferRepository).getActiveTransferByTag(parentTag) //only once
-    }*/
-
     private fun getCompletedTransfer(fileName: String) = CompletedTransfer(
         fileName = fileName,
         type = 0,

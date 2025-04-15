@@ -254,7 +254,7 @@ private fun OfflineFeatureScreenPreview() {
     OriginalTheme(isDark = isSystemInDarkTheme()) {
         OfflineFeatureScreen(
             uiState = OfflineUiState(
-                isLoading = false,
+                isLoadingCurrentFolder = false,
                 showOfflineWarning = true,
                 offlineNodes = listOf(
                     OfflineNodeUIItem(
@@ -303,7 +303,7 @@ private fun OfflineFeatureEmptyScreenPreview() {
     OriginalTheme(isDark = isSystemInDarkTheme()) {
         OfflineFeatureScreen(
             uiState = OfflineUiState(
-                isLoading = false,
+                isLoadingCurrentFolder = false,
                 showOfflineWarning = true,
                 offlineNodes = emptyList()
             ),
@@ -322,7 +322,7 @@ private fun OfflineFeatureLoadingScreenPreview() {
     OriginalTheme(isDark = isSystemInDarkTheme()) {
         OfflineFeatureScreen(
             uiState = OfflineUiState(
-                isLoading = true,
+                isLoadingCurrentFolder = true,
                 showOfflineWarning = true,
                 offlineNodes = emptyList()
             ),

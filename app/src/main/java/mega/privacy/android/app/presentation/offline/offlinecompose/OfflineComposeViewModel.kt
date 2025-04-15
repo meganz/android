@@ -67,6 +67,7 @@ class OfflineComposeViewModel @Inject constructor(
      */
     fun navigateToPath(path: String, rootFolderOnly: Boolean, fileNames: Array<String>? = null) {
         if (path.isBlank() || path == File.separator) return
+        isLoadingChildFolders(true)
         viewModelScope.launch {
             path.split(File.separator).filterNot { it.isBlank() }.forEach { child ->
                 loadOfflineNodes()
@@ -76,6 +77,7 @@ class OfflineComposeViewModel @Inject constructor(
             }
             loadOfflineNodes()
             highlightFiles(fileNames)
+            isLoadingChildFolders(false)
         }
     }
 
@@ -140,7 +142,7 @@ class OfflineComposeViewModel @Inject constructor(
         }.onSuccess { offlineNodeList ->
             _uiState.update {
                 it.copy(
-                    isLoading = false,
+                    isLoadingCurrentFolder = false,
                     offlineNodes = offlineNodeList.map { item -> OfflineNodeUIItem(item) }
                 )
             }
@@ -148,11 +150,15 @@ class OfflineComposeViewModel @Inject constructor(
             Timber.e(throwable)
             _uiState.update {
                 it.copy(
-                    isLoading = false,
+                    isLoadingCurrentFolder = false,
                     offlineNodes = emptyList()
                 )
             }
         }
+    }
+
+    private fun isLoadingChildFolders(isLoadingChildFolders: Boolean) = _uiState.update {
+        it.copy(isLoadingChildFolders = isLoadingChildFolders)
     }
 
     private fun highlightFiles(fileNamesToHighlight: Array<String>?) {

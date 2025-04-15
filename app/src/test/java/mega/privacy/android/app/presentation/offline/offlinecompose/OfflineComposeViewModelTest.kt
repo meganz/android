@@ -5,12 +5,15 @@ import app.cash.turbine.test
 import com.google.common.truth.Truth.assertThat
 import de.palm.composestateevents.StateEventWithContentTriggered
 import kotlinx.coroutines.ExperimentalCoroutinesApi
+import kotlinx.coroutines.flow.MutableSharedFlow
+import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.emptyFlow
 import kotlinx.coroutines.flow.flowOf
 import kotlinx.coroutines.runBlocking
 import kotlinx.coroutines.test.runTest
 import mega.privacy.android.app.presentation.offline.offlinecompose.model.OfflineNodeUIItem
 import mega.privacy.android.core.test.extension.CoroutineMainDispatcherExtension
+import mega.privacy.android.domain.entity.Offline
 import mega.privacy.android.domain.entity.offline.OfflineFileInformation
 import mega.privacy.android.domain.usecase.GetOfflineNodesByParentIdUseCase
 import mega.privacy.android.domain.usecase.network.MonitorConnectivityUseCase
@@ -80,6 +83,41 @@ class OfflineComposeViewModelTest {
             assertThat(expectMostRecentItem().isOnline).isEqualTo(isOnline)
         }
     }
+
+    @Test
+    fun `test that root offline content is shown by default when navigateToPath is not invoked`() =
+        runTest {
+            val rootNode = -1
+            val childId1 = 3453
+            val childId2 = 845
+            val file1 = mock<OfflineFileInformation> {
+                on { isFolder } doReturn false
+                on { name } doReturn "file1"
+                on { id } doReturn childId1
+            }
+            val file2 = mock<OfflineFileInformation> {
+                on { isFolder } doReturn false
+                on { name } doReturn "file2"
+                on { id } doReturn childId2
+            }
+
+            val offlineNodeUpdates = MutableSharedFlow<List<Offline>>()
+            whenever(monitorOfflineNodeUpdatesUseCase()).thenReturn(offlineNodeUpdates)
+            whenever(getOfflineNodesByParentIdUseCase(rootNode)).thenReturn(listOf(file1, file2))
+            initViewModel()
+            underTest.uiState.test {
+                assertThat(awaitItem().isLoading).isTrue() //initial
+                offlineNodeUpdates.emit(listOf(mock()))
+                val final = awaitItem()
+                assertThat(final.isLoading).isFalse()
+                assertThat(final.parentId).isEqualTo(rootNode)
+                assertThat(final.offlineNodes).containsExactly(
+                    OfflineNodeUIItem(file1),
+                    OfflineNodeUIItem(file2)
+                )
+            }
+
+        }
 
     @Test
     fun `test that dismissOfflineWarning calls setOfflineWarningMessageVisibilityUseCase`() =
@@ -310,7 +348,38 @@ class OfflineComposeViewModelTest {
     }
 
     @Test
-    fun `test that navigateToPath navigates to children if found`() = runTest {
+    fun `test that navigateToPath navigates to children if found`() {
+        runTest {
+            val parentId = -1
+            val childId = 3453
+            val grandChildId = 845
+            val child = mock<OfflineFileInformation> {
+                on { isFolder } doReturn true
+                on { name } doReturn "folder"
+                on { id } doReturn childId
+            }
+            val grandChild = mock<OfflineFileInformation> {
+                on { isFolder } doReturn true
+                on { name } doReturn "subFolder"
+                on { id } doReturn grandChildId
+            }
+            val path =
+                File.separator + child.name + File.separator + grandChild.name + File.separator
+
+            whenever(getOfflineNodesByParentIdUseCase(parentId)).thenReturn(listOf(child))
+            whenever(getOfflineNodesByParentIdUseCase(childId)).thenReturn(listOf(grandChild))
+            whenever(getOfflineNodesByParentIdUseCase(grandChildId)).thenReturn(listOf(mock()))
+
+            underTest.navigateToPath(
+                path = path,
+                rootFolderOnly = false
+            )
+            assertThat(underTest.uiState.value.parentId).isEqualTo(grandChildId)
+        }
+    }
+
+    @Test
+    fun `test that navigateToPath navigates directly to final child folder content`() = runTest {
         val parentId = -1
         val childId = 3453
         val grandChildId = 845
@@ -330,11 +399,18 @@ class OfflineComposeViewModelTest {
         whenever(getOfflineNodesByParentIdUseCase(childId)).thenReturn(listOf(grandChild))
         whenever(getOfflineNodesByParentIdUseCase(grandChildId)).thenReturn(listOf(mock()))
 
-        underTest.navigateToPath(
-            path = path,
-            rootFolderOnly = false
-        )
-        assertThat(underTest.uiState.value.parentId).isEqualTo(grandChildId)
+        underTest.uiState.test {
+            awaitItem() //initial
+            underTest.navigateToPath(
+                path = path,
+                rootFolderOnly = false
+            )
+            assertThat(awaitItem().isLoading).isTrue()
+            val final = awaitItem()
+            assertThat(final.isLoading).isFalse()
+            assertThat(final.parentId).isEqualTo(grandChildId)
+        }
+
     }
 
     @Test
