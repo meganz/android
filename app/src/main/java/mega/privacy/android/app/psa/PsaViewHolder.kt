@@ -1,6 +1,5 @@
 package mega.privacy.android.app.psa
 
-import android.content.Intent
 import android.graphics.Color
 import android.net.Uri
 import android.text.TextUtils
@@ -8,8 +7,8 @@ import android.view.View
 import androidx.core.view.isVisible
 import coil.load
 import mega.privacy.android.app.R
-import mega.privacy.android.app.activities.WebViewActivity
 import mega.privacy.android.app.databinding.PsaLayoutBinding
+import mega.privacy.android.app.extensions.launchUrl
 import mega.privacy.android.app.utils.ColorUtils.getColorForElevation
 import mega.privacy.android.app.utils.Util
 import mega.privacy.android.domain.entity.psa.Psa
@@ -52,10 +51,7 @@ class PsaViewHolder(
         if (!TextUtils.isEmpty(psa.positiveText) && !TextUtils.isEmpty(psa.positiveLink)) {
             binding.leftButton.text = psa.positiveText
             binding.leftButton.setOnClickListener {
-                val context = binding.root.context
-                val intent = Intent(context, WebViewActivity::class.java)
-                intent.data = Uri.parse(psa.positiveLink)
-                context.startActivity(intent)
+                binding.root.context.launchUrl(psa.positiveLink)
                 onDismiss(psa.id)
             }
 
