@@ -89,7 +89,7 @@ class GetDiskSpaceBytesUseCaseTest {
             whenever(fileSystemRepository.getDiskSpaceBytes(path)) doReturn expected
             whenever(fileSystemRepository.isFileUri(contentUri)) doReturn false
             whenever(fileSystemRepository.getAbsolutePathByContentUri(contentUri)) doReturn null
-            whenever(fileSystemRepository.getExternalPathByContentUri(contentUri)) doReturn path
+            whenever(fileSystemRepository.getExternalPathByUri(contentUri)) doReturn path
 
             val result = underTest(UriPath(contentUri))
             assertThat(result).isEqualTo(expected)

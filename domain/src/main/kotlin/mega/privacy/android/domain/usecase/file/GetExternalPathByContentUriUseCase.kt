@@ -8,6 +8,6 @@ class GetExternalPathByContentUriUseCase @Inject constructor(
 ) {
 
     suspend operator fun invoke(uri: String): String? {
-        return fileSystemRepository.getExternalPathByContentUri(uri)
+        return fileSystemRepository.getExternalPathByUri(uri)
     }
 }

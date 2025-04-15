@@ -26,7 +26,7 @@ class GetDiskSpaceBytesUseCase @Inject constructor(
             else -> {
                 // Try to get the path from a URI. It's not always possible to get the path of an URI
                 getAbsolutePathByContentUri(uriPath.value) // try to get the path using document file api
-                    ?: getExternalPathByContentUri(uriPath.value) // try to build the path from external content:// uri
+                    ?: getExternalPathByUri(uriPath.value) // try to build the path from external content:// uri
             }
         }?.let { path ->
             getDiskSpaceBytes(path)

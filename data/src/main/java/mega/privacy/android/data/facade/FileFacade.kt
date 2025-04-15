@@ -298,21 +298,36 @@ internal class FileFacade @Inject constructor(
         )
     }
 
-    override suspend fun getExternalPathByContentUri(contentUri: String) =
-        getExternalPathByContentUriSync(contentUri)
+    override suspend fun getExternalPathByUri(uriString: String) =
+        getExternalPathByUriSync(uriString)
 
-    override fun getExternalPathByContentUriSync(contentUri: String): String? = run {
-        if (contentUri.startsWith(File.separator)) return@run contentUri
+    override fun getExternalPathByUriSync(uriString: String): String? = with(uriString) {
+        if (startsWith(File.separator)) {
+            uriString
+        } else {
+            toUri().let { uri ->
+                when (uri.scheme) {
+                    "file" -> {
+                        uri.path
+                    }
 
-        val externalStorageDir = Environment.getExternalStorageDirectory().path
-        contentUri
-            .toUri()
-            .lastPathSegment
-            ?.split(":")
-            ?.lastOrNull()
-            ?.let {
-                if (it.contains(externalStorageDir)) it else "$externalStorageDir/$it"
+                    "content" -> {
+                        val externalStorageDir = Environment.getExternalStorageDirectory().path
+                        uri.lastPathSegment
+                            ?.split(":")
+                            ?.lastOrNull()
+                            ?.let {
+                                if (it.contains(externalStorageDir)) it
+                                else "$externalStorageDir/$it"
+                            }
+                    }
+
+                    else -> {
+                        null
+                    }
+                }
             }
+        }
     }
 
     override suspend fun deleteFilesInDirectory(directory: File) {
@@ -931,7 +946,7 @@ internal class FileFacade @Inject constructor(
     private fun updateFileMTime(uriPath: UriPath, newTime: Long): Boolean =
         runCatching {
             setLastModifiedForFile(uriPath.value, newTime)
-                ?: getExternalPathByContentUriSync(uriPath.value)?.let {
+                ?: getExternalPathByUriSync(uriPath.value)?.let {
                     setLastModifiedForFile(it, newTime)
                 }
         }.onFailure {

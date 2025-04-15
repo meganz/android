@@ -19,7 +19,6 @@ import org.mockito.kotlin.reset
 import org.mockito.kotlin.times
 import org.mockito.kotlin.verify
 import org.mockito.kotlin.whenever
-import kotlin.use
 
 @TestInstance(TestInstance.Lifecycle.PER_CLASS)
 class FileWrapperFactoryTest {
@@ -190,7 +189,7 @@ class FileWrapperFactoryTest {
         Mockito.mockStatic(Uri::class.java).useNoResult {
             val (uriPath, _) = commonStub()
             val expected = "/path"
-            whenever(fileGateway.getExternalPathByContentUriSync(uriPath.value)) doReturn expected
+            whenever(fileGateway.getExternalPathByUriSync(uriPath.value)) doReturn expected
             val actual = underTest(uriPath)?.getPath()
             assertThat(actual).isEqualTo(expected)
         }

@@ -196,28 +196,36 @@ interface FileGateway {
 
 
     /**
-     * Takes a content Uri and creates an external storage path from it
+     * Takes an Uri and creates an external storage path from it if possible.
      *
-     * e.g. the following Uri:
+     * E.g. the following content Uri:
      * "content://com.android.externalstorage.documents/tree/primary%3ASync%2FsomeFolder"
-     * will be converted to
-     * "/storage/emulated/0/Sync/someFolder"
+     * will be converted to * "/storage/emulated/0/Sync/someFolder".
+     * And the following file Uri:
+     * "file:///storage/emulated/0/xyzrutazyx/.megaignore" will be converted to
+     * "/storage/emulated/0/xyzrutazyx/.megaignore".
      *
-     * @param contentUri The content Uri to be converted
+     * Note that if a path is passed as uri, it will be returned as is.
+     *
+     * @param uriString The Uri to be converted
      */
-    suspend fun getExternalPathByContentUri(contentUri: String): String?
+    suspend fun getExternalPathByUri(uriString: String): String?
 
     /**
-     * Takes a content Uri and creates an external storage path from it
+     * Takes an Uri and creates an external storage path from it if possible.
      *
-     * e.g. the following Uri:
+     * E.g. the following content Uri:
      * "content://com.android.externalstorage.documents/tree/primary%3ASync%2FsomeFolder"
-     * will be converted to
-     * "/storage/emulated/0/Sync/someFolder"
+     * will be converted to * "/storage/emulated/0/Sync/someFolder".
+     * And the following file Uri:
+     * "file:///storage/emulated/0/xyzrutazyx/.megaignore" will be converted to
+     * "/storage/emulated/0/xyzrutazyx/.megaignore".
      *
-     * @param contentUri The content Uri to be converted
+     * Note that if a path is passed as uri, it will be returned as is.
+     *
+     * @param uriString The Uri to be converted
      */
-    fun getExternalPathByContentUriSync(contentUri: String): String?
+    fun getExternalPathByUriSync(uriString: String): String?
 
     /**
      * delete files in a directory

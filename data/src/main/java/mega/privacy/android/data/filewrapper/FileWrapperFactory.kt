@@ -33,7 +33,7 @@ internal class FileWrapperFactory(private val fileGateway: FileGateway) {
                         }
                     },
                     getPathFunction = {
-                        fileGateway.getExternalPathByContentUriSync(uriPath.value)
+                        fileGateway.getExternalPathByUriSync(uriPath.value)
                     },
                     getParentUriFunction = {
                         fileGateway.getParentSync(uriPath)?.let {

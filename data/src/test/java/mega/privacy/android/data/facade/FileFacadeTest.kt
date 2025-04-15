@@ -74,25 +74,52 @@ internal class FileFacadeTest {
     }
 
     @Test
-    fun `test that get external path by content uri returns the uri string`() = runTest {
-        val uriMock = mockStatic(Uri::class.java)
-        val contentUri =
-            "content://com.android.externalstorage.documents/tree/primary%3ASync%2FsomeFolder"
-        val expected = "/storage/emulated/0/Sync/someFolder"
-        val contentUriMock: Uri = mock()
-        whenever(contentUriMock.toString()).thenReturn(contentUri)
-        whenever(contentUriMock.lastPathSegment).thenReturn("primary:Sync/someFolder")
-        whenever(Uri.parse(contentUri)).thenReturn(contentUriMock)
-        whenever(Environment.getExternalStorageDirectory()).thenReturn(
-            File("/storage/emulated/0")
-        )
+    fun `test that get external path by uri returns the same as uriString param if it is already a path`() =
+        runTest {
+            val uriString = "/storage/emulated/0/folder/file.txt"
+            val expected = uriString
 
-        val actual = underTest.getExternalPathByContentUri(contentUri)
+            assertThat(underTest.getExternalPathByUri(uriString)).isEqualTo(expected)
+        }
 
-        assertThat(expected).isEqualTo(actual)
+    @Test
+    fun `test that get external path by uri returns the uri string if uriString is a file uri`() =
+        runTest {
+            mockStatic(Uri::class.java).use { uriMock ->
+                val uriString = "file:///storage/emulated/0/folder/file.txt"
+                val expected = "/storage/emulated/0/Sync/someFolder"
+                val contentUriMock: Uri = mock {
+                    on { scheme } doReturn "file"
+                    on { path } doReturn expected
+                }
 
-        uriMock.close()
-    }
+                whenever(contentUriMock.toString()).thenReturn(uriString)
+                whenever(Uri.parse(uriString)).thenReturn(contentUriMock)
+
+                assertThat(underTest.getExternalPathByUri(uriString)).isEqualTo(expected)
+            }
+        }
+
+    @Test
+    fun `test that get external path by uri returns the uri string if uriString is a content uri`() =
+        runTest {
+            mockStatic(Uri::class.java).use { uriMock ->
+                val uriString =
+                    "content://com.android.externalstorage.documents/tree/primary%3ASync%2FsomeFolder"
+                val expected = "/storage/emulated/0/Sync/someFolder"
+                val contentUriMock: Uri = mock {
+                    on { scheme } doReturn "content"
+                }
+
+                whenever(contentUriMock.toString()).thenReturn(uriString)
+                whenever(contentUriMock.lastPathSegment).thenReturn("primary:Sync/someFolder")
+                whenever(Uri.parse(uriString)).thenReturn(contentUriMock)
+                whenever(Environment.getExternalStorageDirectory())
+                    .thenReturn(File("/storage/emulated/0"))
+
+                assertThat(underTest.getExternalPathByUri(uriString)).isEqualTo(expected)
+            }
+        }
 
     @Test
     fun `test that buildExternalStorageFile returns correctly`() = runTest {

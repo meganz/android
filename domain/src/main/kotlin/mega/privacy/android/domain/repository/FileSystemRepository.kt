@@ -137,9 +137,20 @@ interface FileSystemRepository {
     fun scanMediaFile(paths: Array<String>, mimeTypes: Array<String>)
 
     /**
-     * Returns an external storage path based on content Uri
+     * Takes an Uri and creates an external storage path from it if possible.
+     *
+     * E.g. the following content Uri:
+     * "content://com.android.externalstorage.documents/tree/primary%3ASync%2FsomeFolder"
+     * will be converted to * "/storage/emulated/0/Sync/someFolder".
+     * And the following file Uri:
+     * "file:///storage/emulated/0/xyzrutazyx/.megaignore" will be converted to
+     * "/storage/emulated/0/xyzrutazyx/.megaignore".
+     *
+     * Note that if a path is passed as uri, it will be returned as is.
+     *
+     * @param uriString The Uri to be converted
      */
-    suspend fun getExternalPathByContentUri(uri: String): String?
+    suspend fun getExternalPathByUri(uriString: String): String?
 
     /**
      * Returns an absolute path based on document content Uri
