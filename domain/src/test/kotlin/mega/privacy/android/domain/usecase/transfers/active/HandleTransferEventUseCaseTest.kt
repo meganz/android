@@ -24,10 +24,10 @@ import org.mockito.kotlin.KStubbing
 import org.mockito.kotlin.any
 import org.mockito.kotlin.doReturn
 import org.mockito.kotlin.eq
+import org.mockito.kotlin.inOrder
 import org.mockito.kotlin.mock
 import org.mockito.kotlin.never
 import org.mockito.kotlin.reset
-import org.mockito.kotlin.times
 import org.mockito.kotlin.verify
 import org.mockito.kotlin.verifyNoInteractions
 import org.mockito.kotlin.verifyNoMoreInteractions
@@ -77,10 +77,25 @@ class HandleTransferEventUseCaseTest {
         verify(transferRepository).insertOrUpdateActiveTransfers(eq(listOf(transferEvent.transfer)))
     }
 
+    @Test
+    fun `test that invoke call clearRecursiveTransferAppDataFromCache after insertOrUpdateActiveTransfers with the related transfer when the event is a folder finish event`() =
+        runTest {
+            val transferEvent = mockTransferEvent<TransferEvent.TransferFinishEvent>(
+                TransferType.DOWNLOAD,
+                1,
+                isFolderTransfer = true
+            )
+            underTest.invoke(transferEvent)
+            inOrder(transferRepository) {
+                verify(transferRepository).insertOrUpdateActiveTransfers(eq(listOf(transferEvent.transfer)))
+                verify(transferRepository).clearRecursiveTransferAppDataFromCache(transferEvent.transfer.tag)
+            }
+        }
+
     @ParameterizedTest
     @MethodSource("provideRecursiveTransferAppData")
     fun `test that parent group app data is added when child transfer start event is received`(
-        appData: TransferAppData,
+        appData: TransferAppData.RecursiveTransferAppData,
     ) =
         runTest {
             val parentTag = 2
@@ -89,10 +104,8 @@ class HandleTransferEventUseCaseTest {
                 1,
                 folderTransferTag = parentTag
             )
-            val parentTransfer = mock<Transfer> {
-                on { it.appData } doReturn listOf(appData)
-            }
-            whenever(transferRepository.getActiveTransferByTag(parentTag)) doReturn parentTransfer
+            whenever(transferRepository.getRecursiveTransferAppDataFromParent(parentTag)) doReturn
+                    listOf(appData)
             val expected = transferEvent.transfer.copy(appData = listOf(appData))
             underTest.invoke(transferEvent)
             verify(transferRepository).insertOrUpdateActiveTransfers(eq(listOf(expected)))
@@ -101,7 +114,7 @@ class HandleTransferEventUseCaseTest {
     @ParameterizedTest
     @MethodSource("provideRecursiveTransferAppData")
     fun `test that parent group app data is added when child transfer paused event is received`(
-        appData: TransferAppData,
+        appData: TransferAppData.RecursiveTransferAppData,
     ) =
         runTest {
             val parentTag = 2
@@ -110,10 +123,8 @@ class HandleTransferEventUseCaseTest {
                 1,
                 folderTransferTag = parentTag
             )
-            val parentTransfer = mock<Transfer> {
-                on { it.appData } doReturn listOf(appData)
-            }
-            whenever(transferRepository.getActiveTransferByTag(parentTag)) doReturn parentTransfer
+            whenever(transferRepository.getRecursiveTransferAppDataFromParent(parentTag)) doReturn
+                    listOf(appData)
             val expected = transferEvent.transfer.copy(appData = listOf(appData))
             underTest.invoke(transferEvent)
             verify(transferRepository).insertOrUpdateActiveTransfers(eq(listOf(expected)))
@@ -122,7 +133,7 @@ class HandleTransferEventUseCaseTest {
     @ParameterizedTest
     @MethodSource("provideRecursiveTransferAppData")
     fun `test that parent group app data is added when child transfer finish event is received`(
-        appData: TransferAppData,
+        appData: TransferAppData.RecursiveTransferAppData,
     ) =
         runTest {
             val parentTag = 2
@@ -131,40 +142,12 @@ class HandleTransferEventUseCaseTest {
                 1,
                 folderTransferTag = parentTag
             )
-            val parentTransfer = mock<Transfer> {
-                on { it.appData } doReturn listOf(appData)
-            }
-            whenever(transferRepository.getActiveTransferByTag(parentTag)) doReturn parentTransfer
+            whenever(transferRepository.getRecursiveTransferAppDataFromParent(parentTag)) doReturn
+                    listOf(appData)
             val expected = transferEvent.transfer.copy(appData = listOf(appData))
             underTest.invoke(transferEvent)
             verify(transferRepository).insertOrUpdateActiveTransfers(eq(listOf(expected)))
         }
-
-    @Test
-    fun `test that parent group app data is cached`() = runTest {
-        val parentTag = 46376
-        val appData = TransferAppData.TransferGroup(245)
-        val transferEvent1 = mockTransferEvent<TransferEvent.TransferStartEvent>(
-            TransferType.DOWNLOAD,
-            1,
-            folderTransferTag = parentTag
-        )
-        val transferEvent2 = mockTransferEvent<TransferEvent.TransferFinishEvent>(
-            TransferType.DOWNLOAD,
-            1,
-            folderTransferTag = parentTag
-        )
-        val parentTransfer = mock<Transfer> {
-            on { it.appData } doReturn listOf(appData)
-        }
-        whenever(transferRepository.getActiveTransferByTag(parentTag)) doReturn parentTransfer
-
-        underTest.invoke(transferEvent1)
-        underTest.invoke(transferEvent2)
-
-        verify(transferRepository, times(2)).insertOrUpdateActiveTransfers(any())
-        verify(transferRepository).getActiveTransferByTag(parentTag) //only once
-    }
 
     @Test
     fun `test that invoke call insertOrUpdateActiveTransfers with the last event of each transfer when multiple events are send`() =
@@ -490,12 +473,14 @@ class HandleTransferEventUseCaseTest {
         transferType: TransferType,
         transferUniqueId: Long = 0,
         folderTransferTag: Int? = null,
+        isFolderTransfer: Boolean = false,
         stubbing: KStubbing<T>.(T) -> Unit = {},
     ): T {
         val transfer = mock<Transfer> {
             on { this.transferType }.thenReturn(transferType)
             on { this.uniqueId }.thenReturn(transferUniqueId)
             on { this.folderTransferTag }.thenReturn(folderTransferTag)
+            on { this.isFolderTransfer }.thenReturn(isFolderTransfer)
             on { this.appData }.thenReturn(emptyList())
         }
         return mock<T> {

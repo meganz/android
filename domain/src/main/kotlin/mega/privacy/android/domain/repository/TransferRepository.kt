@@ -12,6 +12,7 @@ import mega.privacy.android.domain.entity.transfer.CompletedTransferState
 import mega.privacy.android.domain.entity.transfer.InProgressTransfer
 import mega.privacy.android.domain.entity.transfer.Transfer
 import mega.privacy.android.domain.entity.transfer.TransferAppData
+import mega.privacy.android.domain.entity.transfer.TransferAppData.RecursiveTransferAppData
 import mega.privacy.android.domain.entity.transfer.TransferEvent
 import mega.privacy.android.domain.entity.transfer.TransferType
 import mega.privacy.android.domain.entity.transfer.pending.InsertPendingTransferRequest
@@ -640,4 +641,16 @@ interface TransferRepository {
      * @return Flow of Int. Null it no transfer to cancel.
      */
     fun monitorTransferTagToCancel(): Flow<Int?>
+
+    /**
+     * Get transfer app data from a folder transfer that needs to be used in children, this data is cached to be used in other calls
+     * @param parentTransferTag the tag of the folder transfer which RecursiveTransferAppData app data should be retrieved
+     */
+    suspend fun getRecursiveTransferAppDataFromParent(parentTransferTag: Int): List<RecursiveTransferAppData>
+
+    /**
+     * Clear cached transfer app data related to this parent transfer tag
+     * @param parentTransferTag the tag of the folder transfer that should be removed from cache because it's not needed anymore
+     */
+    suspend fun clearRecursiveTransferAppDataFromCache(parentTransferTag: Int)
 }

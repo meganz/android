@@ -107,7 +107,6 @@ class HandleTransferEventUseCase @Inject internal constructor(
         }
     }
 
-    private val cachedParentsAppData = HashMap<Int, List<RecursiveTransferAppData>>()
     private suspend fun updateActiveTransfers(events: List<TransferEvent>) {
         events.filterByType(
             start = true,
@@ -115,10 +114,7 @@ class HandleTransferEventUseCase @Inject internal constructor(
             finish = true
         )?.map { transferEvent ->
             val appDataToAdd = transferEvent.transfer.folderTransferTag?.let { folderTransferTag ->
-                cachedParentsAppData.getOrPut(folderTransferTag) {
-                    transferRepository.getActiveTransferByTag(folderTransferTag)?.appData?.filterIsInstance<RecursiveTransferAppData>()
-                        ?: emptyList()
-                }
+                transferRepository.getRecursiveTransferAppDataFromParent(folderTransferTag)
             }
 
             if (appDataToAdd.isNullOrEmpty()) {
@@ -130,6 +126,15 @@ class HandleTransferEventUseCase @Inject internal constructor(
             }
         }?.let {
             transferRepository.insertOrUpdateActiveTransfers(it)
+        }
+        clearParentsAppDataCache(events)
+    }
+
+    private suspend fun clearParentsAppDataCache(events: List<TransferEvent>) {
+        events.filterByType(finish = true)?.forEach { transferEvent ->
+            if (transferEvent.transfer.isFolderTransfer) {
+                transferRepository.clearRecursiveTransferAppDataFromCache(transferEvent.transfer.tag)
+            }
         }
     }
 

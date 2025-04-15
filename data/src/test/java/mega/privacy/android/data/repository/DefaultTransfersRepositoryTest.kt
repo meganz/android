@@ -75,6 +75,7 @@ import org.mockito.kotlin.argThat
 import org.mockito.kotlin.doReturn
 import org.mockito.kotlin.eq
 import org.mockito.kotlin.mock
+import org.mockito.kotlin.never
 import org.mockito.kotlin.reset
 import org.mockito.kotlin.verify
 import org.mockito.kotlin.whenever
@@ -106,6 +107,8 @@ class DefaultTransfersRepositoryTest {
     private val inProgressTransferMapper = mock<InProgressTransferMapper>()
     private val monitorFetchNodesFinishUseCase = mock<MonitorFetchNodesFinishUseCase>()
     private val transfersPreferencesGateway = mock<TransfersPreferencesGateway>()
+    private val parentRecursiveAppDataCache =
+        HashMap<Int, List<TransferAppData.RecursiveTransferAppData>>()
 
     private val testScope = CoroutineScope(UnconfinedTestDispatcher())
 
@@ -113,6 +116,7 @@ class DefaultTransfersRepositoryTest {
     fun setUp() = runTest {
         underTest = createDefaultTransfersRepository()
     }
+
 
     private suspend fun createDefaultTransfersRepository(paused: Boolean = false): DefaultTransfersRepository {
         //need to stub this method as it's called on init
@@ -139,6 +143,7 @@ class DefaultTransfersRepositoryTest {
             inProgressTransferMapper = inProgressTransferMapper,
             monitorFetchNodesFinishUseCase = monitorFetchNodesFinishUseCase,
             transfersPreferencesGateway = { transfersPreferencesGateway },
+            parentRecursiveAppDataCache = parentRecursiveAppDataCache,
         )
     }
 
@@ -163,6 +168,7 @@ class DefaultTransfersRepositoryTest {
             monitorFetchNodesFinishUseCase,
             transfersPreferencesGateway,
         )
+        parentRecursiveAppDataCache.clear()
     }
 
     @Nested
@@ -1612,7 +1618,9 @@ class DefaultTransfersRepositoryTest {
         runTest {
             val uniqueId = 15L
             val expected = mock<PendingTransfer>()
-            whenever(megaLocalRoomGateway.getPendingTransfersByUniqueId(uniqueId)).thenReturn(expected)
+            whenever(megaLocalRoomGateway.getPendingTransfersByUniqueId(uniqueId)).thenReturn(
+                expected
+            )
             val actual = underTest.getPendingTransfersByUniqueId(uniqueId)
             assertThat(actual).isEqualTo(expected)
         }
@@ -1804,6 +1812,105 @@ class DefaultTransfersRepositoryTest {
                 cancelAndIgnoreRemainingEvents()
             }
         }
+
+    @Test
+    fun `test that app data is get from gateway when is not in cache`() = runTest {
+        val parentTransferTag = 7643
+        val appData = listOf(
+            mock<TransferAppData.ChatUpload>(),
+            mock<TransferAppData.OfflineDownload>(),
+            mock<TransferAppData.TransferGroup>(),
+        )
+        val parentActiveTransfer = mock<ActiveTransfer> {
+            on { this.appData } doReturn appData
+        }
+        whenever(megaLocalRoomGateway.getActiveTransferByTag(parentTransferTag)).thenReturn(
+            parentActiveTransfer
+        )
+
+        val actual = underTest.getRecursiveTransferAppDataFromParent(parentTransferTag)
+
+        assertThat(actual).containsExactly(
+            *appData.filterIsInstance<TransferAppData.RecursiveTransferAppData>().toTypedArray()
+        )
+    }
+
+    @Test
+    fun `test that app data is get from cache when it is already added`() = runTest {
+        val parentTransferTag = 24356
+        val appData = listOf(
+            mock<TransferAppData.OfflineDownload>(),
+            mock<TransferAppData.TransferGroup>(),
+        )
+        parentRecursiveAppDataCache[parentTransferTag] = appData
+
+        val actual = underTest.getRecursiveTransferAppDataFromParent(parentTransferTag)
+
+        verify(megaLocalRoomGateway, never()).getActiveTransferByTag(parentTransferTag)
+        assertThat(actual).containsExactly(*appData.toTypedArray())
+    }
+
+    @Test
+    fun `test that app data is added to cache when fetched`() = runTest {
+        val parentTransferTag = 753455
+        val appData = listOf(
+            mock<TransferAppData.ChatUpload>(),
+            mock<TransferAppData.OfflineDownload>(),
+            mock<TransferAppData.TransferGroup>(),
+        )
+        val parentActiveTransfer = mock<ActiveTransfer> {
+            on { this.appData } doReturn appData
+        }
+        whenever(megaLocalRoomGateway.getActiveTransferByTag(parentTransferTag)).thenReturn(
+            parentActiveTransfer
+        )
+
+        underTest.getRecursiveTransferAppDataFromParent(parentTransferTag)
+
+        assertThat(parentRecursiveAppDataCache[parentTransferTag]).containsExactly(
+            *appData.filterIsInstance<TransferAppData.RecursiveTransferAppData>().toTypedArray()
+        )
+    }
+
+    @Test
+    fun `test that app data cache is cleared`() = runTest {
+        val parentTransferTag = 24356
+        val appData = listOf(
+            mock<TransferAppData.OfflineDownload>(),
+            mock<TransferAppData.TransferGroup>(),
+        )
+        parentRecursiveAppDataCache[parentTransferTag] = appData
+
+        underTest.clearRecursiveTransferAppDataFromCache(parentTransferTag)
+
+        assertThat(parentRecursiveAppDataCache).isEmpty()
+    }
+
+    /*@Test
+    fun `test that parent group app data is cached`() = runTest {
+        val parentTag = 46376
+        val appData = TransferAppData.TransferGroup(245)
+        val transferEvent1 = mockTransferEvent<TransferEvent.TransferStartEvent>(
+            TransferType.DOWNLOAD,
+            1,
+            folderTransferTag = parentTag
+        )
+        val transferEvent2 = mockTransferEvent<TransferEvent.TransferFinishEvent>(
+            TransferType.DOWNLOAD,
+            1,
+            folderTransferTag = parentTag
+        )
+        val parentTransfer = mock<Transfer> {
+            on { it.appData } doReturn listOf(appData)
+        }
+        whenever(transferRepository.getActiveTransferByTag(parentTag)) doReturn parentTransfer
+
+        underTest.invoke(transferEvent1)
+        underTest.invoke(transferEvent2)
+
+        verify(transferRepository, times(2)).insertOrUpdateActiveTransfers(any())
+        verify(transferRepository).getActiveTransferByTag(parentTag) //only once
+    }*/
 
     private fun getCompletedTransfer(fileName: String) = CompletedTransfer(
         fileName = fileName,
