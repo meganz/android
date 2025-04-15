@@ -19,7 +19,7 @@ internal class ChatImageNodeFetcher @Inject constructor(
     override fun monitorImageNodes(bundle: Bundle): Flow<List<ImageNode>> {
         return monitorChatImageNodesUseCase(
             chatRoomId = bundle.getLong(CHAT_ROOM_ID),
-            messageIds = bundle.getLongArray(MESSAGE_IDS)?.map { it }.orEmpty(),
+            messageIds = bundle.getLongArray(MESSAGE_IDS)?.distinct()?.map { it }.orEmpty(),
         ).mapLatest { imageNodes ->
             imageNodes.sortedWith(compareByDescending<ImageNode> { it.modificationTime }.thenByDescending { it.id.longValue })
         }.flowOn(defaultDispatcher)

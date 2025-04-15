@@ -306,7 +306,9 @@ private fun SlideShowContent(
             modifier = Modifier
                 .fillMaxSize(),
             state = pagerState,
-            key = { imageNodes.getOrNull(it)?.id?.longValue ?: -1L },
+            key = {
+                imageNodes.getOrNull(it)?.id?.longValue ?: "${System.currentTimeMillis()}_$it"
+            },
         ) { index ->
             val imageNode = imageNodes[index]
             val status by produceState(

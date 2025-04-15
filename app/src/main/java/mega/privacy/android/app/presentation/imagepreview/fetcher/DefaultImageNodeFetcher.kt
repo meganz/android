@@ -19,7 +19,7 @@ internal class DefaultImageNodeFetcher @Inject constructor(
 ) : ImageNodeFetcher {
     override fun monitorImageNodes(bundle: Bundle): Flow<List<ImageNode>> {
         return monitorImageNodesUseCase(
-            nodeIds = bundle.getLongArray(NODE_IDS)?.map { NodeId(it) }.orEmpty(),
+            nodeIds = bundle.getLongArray(NODE_IDS)?.distinct()?.map { NodeId(it) }.orEmpty(),
         ).mapLatest { imageNodes ->
             imageNodes.sortedWith(compareByDescending<ImageNode> { it.modificationTime }.thenByDescending { it.id.longValue })
         }.flowOn(defaultDispatcher)

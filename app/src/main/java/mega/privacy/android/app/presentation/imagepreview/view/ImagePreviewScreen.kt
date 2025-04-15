@@ -4,6 +4,8 @@
 
 package mega.privacy.android.app.presentation.imagepreview.view
 
+import mega.privacy.android.icon.pack.R as iconPackR
+import mega.privacy.android.shared.resources.R as sharedR
 import android.content.res.Configuration
 import androidx.activity.compose.BackHandler
 import androidx.activity.compose.LocalOnBackPressedDispatcherOwner
@@ -106,7 +108,6 @@ import mega.privacy.android.domain.entity.AccountType
 import mega.privacy.android.domain.entity.VideoFileTypeInfo
 import mega.privacy.android.domain.entity.imageviewer.ImageResult
 import mega.privacy.android.domain.entity.node.ImageNode
-import mega.privacy.android.icon.pack.R as iconPackR
 import mega.privacy.android.shared.original.core.ui.controls.dialogs.MegaAlertDialog
 import mega.privacy.android.shared.original.core.ui.controls.layouts.MegaScaffold
 import mega.privacy.android.shared.original.core.ui.controls.text.MiddleEllipsisText
@@ -115,10 +116,8 @@ import mega.privacy.android.shared.original.core.ui.theme.extensions.white_alpha
 import mega.privacy.android.shared.original.core.ui.theme.extensions.white_black
 import mega.privacy.android.shared.original.core.ui.theme.grey_100
 import mega.privacy.android.shared.original.core.ui.utils.showAutoDurationSnackbar
-import mega.privacy.android.shared.resources.R as sharedR
 import mega.privacy.mobile.analytics.event.ImagePreviewHideNodeMenuToolBarEvent
 import mega.privacy.mobile.analytics.event.MagnifierMenuItemEvent
-import timber.log.Timber
 
 @Composable
 internal fun ImagePreviewScreen(
@@ -549,7 +548,9 @@ private fun ImagePreviewContent(
                 modifier = Modifier.fillMaxSize(),
                 state = pagerState,
                 beyondViewportPageCount = 1,
-                key = { imageNodes.getOrNull(it)?.id?.longValue ?: -1L },
+                key = {
+                    imageNodes.getOrNull(it)?.id?.longValue ?: "${System.currentTimeMillis()}_$it"
+                },
             ) { index ->
                 val imageNode = imageNodes.getOrNull(index)
                 if (imageNode != null) {
