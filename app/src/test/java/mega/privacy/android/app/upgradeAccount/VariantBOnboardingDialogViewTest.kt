@@ -13,7 +13,10 @@ import androidx.compose.ui.test.printToString
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import dagger.hilt.android.testing.HiltAndroidTest
 import mega.privacy.android.app.R
+import mega.privacy.android.app.fromId
 import mega.privacy.android.app.presentation.account.model.AccountStorageUIState
+import mega.privacy.android.app.upgradeAccount.UpgradeAccountViewTest.Companion.expectedLocalisedSubscriptionsList
+import mega.privacy.android.app.upgradeAccount.VariantAOnboardingDialogViewTest.Companion.subscriptionProLite
 import mega.privacy.android.app.upgradeAccount.model.ChooseAccountState
 import mega.privacy.android.app.upgradeAccount.model.UIAccountType
 import mega.privacy.android.app.upgradeAccount.view.ADDITIONAL_FEATURES_DESCRIPTION_ROW
@@ -38,9 +41,6 @@ import org.junit.Rule
 import org.junit.Test
 import org.junit.runner.RunWith
 import org.robolectric.annotation.Config
-import mega.privacy.android.app.fromId
-import mega.privacy.android.app.upgradeAccount.UpgradeAccountViewTest.Companion.expectedLocalisedSubscriptionsList
-import mega.privacy.android.app.upgradeAccount.VariantAOnboardingDialogViewTest.Companion.subscriptionProLite
 
 @HiltAndroidTest
 @RunWith(AndroidJUnit4::class)
@@ -198,7 +198,7 @@ class VariantBOnboardingDialogViewTest {
             onContinueClicked = {},
             onChoosingMonthlyYearlyPlan = {},
             onChoosingPlanType = {},
-            onPlayStoreLinkClicked = {},
+            onLinkClicked = {},
             onProIIIVisible = {},
         )
     }
@@ -211,7 +211,7 @@ class VariantBOnboardingDialogViewTest {
             onContinueClicked = {},
             onChoosingMonthlyYearlyPlan = {},
             onChoosingPlanType = {},
-            onPlayStoreLinkClicked = {},
+            onLinkClicked = {},
             onProIIIVisible = {},
         )
     }

@@ -2,7 +2,6 @@ package mega.privacy.android.app.upgradeAccount
 
 import android.annotation.SuppressLint
 import android.content.Intent
-import android.net.Uri
 import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.ViewGroup
@@ -21,6 +20,7 @@ import dagger.hilt.android.AndroidEntryPoint
 import mega.privacy.android.analytics.Analytics
 import mega.privacy.android.app.arch.extensions.collectFlow
 import mega.privacy.android.app.constants.IntentConstants
+import mega.privacy.android.app.extensions.launchUrl
 import mega.privacy.android.app.globalmanagement.MyAccountInfo
 import mega.privacy.android.app.main.ManagerActivity
 import mega.privacy.android.app.presentation.account.AccountStorageViewModel
@@ -146,7 +146,7 @@ class ChooseAccountFragment : Fragment() {
                     },
                     onChoosingMonthlyYearlyPlan = chooseAccountViewModel::onSelectingMonthlyPlan,
                     onChoosingPlanType = chooseAccountViewModel::onSelectingPlanType,
-                    onPlayStoreLinkClicked = this::redirectToPlayStoreSubscription,
+                    onLinkClicked = context::launchUrl,
                     onProIIIVisible = {
                         Analytics.tracker.trackEvent(
                             OnboardingUpsellingDialogVariantBProPlanIIIDisplayedEvent
@@ -163,16 +163,6 @@ class ChooseAccountFragment : Fragment() {
                     modifier = modifier,
                 )
             }
-        }
-    }
-
-    private fun redirectToPlayStoreSubscription(link: String) {
-        val uriUrl = Uri.parse(link)
-        val launchBrowser = Intent(Intent.ACTION_VIEW, uriUrl)
-        runCatching {
-            startActivity(launchBrowser)
-        }.onFailure {
-            Timber.e("Failed to open play store subscription page with error: ${it.message}")
         }
     }
 

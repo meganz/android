@@ -56,6 +56,7 @@ import androidx.compose.ui.tooling.preview.PreviewParameterProvider
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import kotlinx.coroutines.launch
+import mega.android.core.ui.theme.values.TextColor
 import mega.privacy.android.app.R
 import mega.privacy.android.app.presentation.account.model.AccountStorageUIState
 import mega.privacy.android.app.upgradeAccount.model.LocalisedSubscription
@@ -76,6 +77,7 @@ import mega.privacy.android.domain.entity.Currency
 import mega.privacy.android.domain.entity.account.CurrencyAmount
 import mega.privacy.android.shared.original.core.ui.controls.appbar.AppBarType
 import mega.privacy.android.shared.original.core.ui.controls.appbar.MegaAppBar
+import mega.privacy.android.shared.original.core.ui.controls.layouts.MegaScaffold
 import mega.privacy.android.shared.original.core.ui.controls.text.MegaSpannedClickableText
 import mega.privacy.android.shared.original.core.ui.controls.text.MegaText
 import mega.privacy.android.shared.original.core.ui.model.MegaSpanStyle
@@ -84,16 +86,14 @@ import mega.privacy.android.shared.original.core.ui.model.SpanIndicator
 import mega.privacy.android.shared.original.core.ui.preview.CombinedThemePreviews
 import mega.privacy.android.shared.original.core.ui.theme.OriginalTheme
 import mega.privacy.android.shared.original.core.ui.theme.Typography
+import mega.privacy.android.shared.original.core.ui.theme.extensions.accent_900_accent_050
 import mega.privacy.android.shared.original.core.ui.theme.extensions.black_yellow_700
 import mega.privacy.android.shared.original.core.ui.theme.extensions.grey_020_grey_800
 import mega.privacy.android.shared.original.core.ui.theme.extensions.grey_100_alpha_060_dark_grey
 import mega.privacy.android.shared.original.core.ui.theme.extensions.grey_alpha_012_white_alpha_012
 import mega.privacy.android.shared.original.core.ui.theme.extensions.subtitle1medium
-import mega.privacy.android.shared.original.core.ui.theme.extensions.accent_900_accent_050
 import mega.privacy.android.shared.original.core.ui.theme.extensions.yellow_100_yellow_700_alpha_015
 import mega.privacy.android.shared.original.core.ui.theme.subtitle1
-import mega.android.core.ui.theme.values.TextColor
-import mega.privacy.android.shared.original.core.ui.controls.layouts.MegaScaffold
 import mega.privacy.android.shared.original.core.ui.utils.showAutoDurationSnackbar
 
 /**
@@ -106,8 +106,7 @@ fun UpgradeAccountView(
     accountStorageState: AccountStorageUIState,
     onBackPressed: () -> Unit,
     onBuyClicked: () -> Unit,
-    onPlayStoreLinkClicked: (String) -> Unit,
-    onPricingPageClicked: (String) -> Unit,
+    onLinkClicked: (String) -> Unit,
     onChoosingMonthlyYearlyPlan: (isMonthly: Boolean) -> Unit,
     onChoosingPlanType: (chosenPlan: AccountType) -> Unit,
     hideBillingWarning: () -> Unit,
@@ -270,7 +269,7 @@ fun UpgradeAccountView(
 
                 if (state.currentSubscriptionPlan == AccountType.PRO_III) {
                     PricingPageLinkText(
-                        onLinkClick = onPricingPageClicked
+                        onLinkClick = onLinkClicked
                     )
                 }
 
@@ -279,7 +278,7 @@ fun UpgradeAccountView(
                 )
                 if (state.localisedSubscriptionsList.isNotEmpty()) {
                     SubscriptionDetails(
-                        onLinkClick = onPlayStoreLinkClicked,
+                        onLinkClick = onLinkClicked,
                         chosenPlan = chosenPlan,
                         subscriptionList = state.localisedSubscriptionsList,
                         isMonthly = isMonthly,
@@ -637,8 +636,7 @@ fun PreviewUpgradeAccountView(
             accountStorageState = AccountStorageUIState(),
             onBackPressed = {},
             onBuyClicked = {},
-            onPlayStoreLinkClicked = {},
-            onPricingPageClicked = {},
+            onLinkClicked = {},
             onChoosingMonthlyYearlyPlan = {},
             onChoosingPlanType = {},
             hideBillingWarning = {},

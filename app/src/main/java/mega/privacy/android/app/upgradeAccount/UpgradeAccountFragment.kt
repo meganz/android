@@ -1,8 +1,6 @@
 package mega.privacy.android.app.upgradeAccount
 
 import android.content.Intent
-import android.content.Intent.ACTION_VIEW
-import android.net.Uri
 import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.ViewGroup
@@ -19,8 +17,8 @@ import androidx.fragment.app.activityViewModels
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import dagger.hilt.android.AndroidEntryPoint
 import mega.privacy.android.analytics.Analytics
-import mega.privacy.android.app.activities.WebViewActivity
 import mega.privacy.android.app.arch.extensions.collectFlow
+import mega.privacy.android.app.extensions.launchUrl
 import mega.privacy.android.app.globalmanagement.MyAccountInfo
 import mega.privacy.android.app.myAccount.MyAccountActivity
 import mega.privacy.android.app.presentation.account.AccountStorageViewModel
@@ -138,8 +136,7 @@ class UpgradeAccountFragment : Fragment() {
                     }
                     Analytics.tracker.trackEvent(UpgradeAccountBuyButtonPressedEvent)
                 },
-                onPlayStoreLinkClicked = this::redirectToPlayStoreSubscription,
-                onPricingPageClicked = this::redirectToPricingPage,
+                onLinkClicked = context::launchUrl,
                 onChoosingMonthlyYearlyPlan = upgradeAccountViewModel::onSelectingMonthlyPlan,
                 onChoosingPlanType = {
                     with(upgradeAccountViewModel) {
@@ -201,24 +198,6 @@ class UpgradeAccountFragment : Fragment() {
                 chosenPlan
             )
         )
-    }
-
-    private fun redirectToPlayStoreSubscription(link: String) {
-        val uriUrl = Uri.parse(link)
-        val launchBrowser = Intent(ACTION_VIEW, uriUrl)
-        runCatching {
-            startActivity(launchBrowser)
-        }.onFailure {
-            Timber.e("Failed to open play store subscription page with error: ${it.message}")
-        }
-    }
-
-    private fun redirectToPricingPage(link: String) {
-        val uriUrl = Uri.parse(link)
-        val launchBrowser = Intent(requireContext(), WebViewActivity::class.java)
-            .addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP)
-            .setData(uriUrl)
-        startActivity(launchBrowser)
     }
 
     private fun onPurchasesUpdated(

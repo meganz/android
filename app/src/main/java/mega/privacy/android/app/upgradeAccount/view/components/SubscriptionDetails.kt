@@ -179,7 +179,7 @@ internal fun SubscriptionDetails(
                         spanStyle = SpanStyle(textDecoration = TextDecoration.None),
                         linkColor = LinkColor.Primary,
                     ),
-                    annotation = "https://mega.nz/privacy"
+                    annotation = Constants.PRIVACY_POLICY_URL
                 ),
             ),
             onAnnotationClick = onLinkClick,

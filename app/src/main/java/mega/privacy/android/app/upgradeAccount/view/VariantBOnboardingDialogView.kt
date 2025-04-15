@@ -65,7 +65,7 @@ fun VariantBOnboardingDialogView(
     onContinueClicked: () -> Unit,
     onChoosingMonthlyYearlyPlan: (isMonthly: Boolean) -> Unit,
     onChoosingPlanType: (chosenPlan: AccountType) -> Unit,
-    onPlayStoreLinkClicked: (String) -> Unit,
+    onLinkClicked: (String) -> Unit,
     onProIIIVisible: () -> Unit,
     modifier: Modifier = Modifier,
 ) {
@@ -88,7 +88,7 @@ fun VariantBOnboardingDialogView(
                 onContinueClicked = onContinueClicked,
                 onChoosingMonthlyYearlyPlan = onChoosingMonthlyYearlyPlan,
                 onChoosingPlanType = onChoosingPlanType,
-                onPlayStoreLinkClicked = onPlayStoreLinkClicked,
+                onLinkClicked = onLinkClicked,
                 onProIIIVisible = onProIIIVisible,
                 modifier = modifier,
             )
@@ -104,7 +104,7 @@ internal fun VariantBOnboardingDialogColumn(
     onContinueClicked: () -> Unit,
     onChoosingMonthlyYearlyPlan: (isMonthly: Boolean) -> Unit,
     onChoosingPlanType: (chosenPlan: AccountType) -> Unit,
-    onPlayStoreLinkClicked: (String) -> Unit,
+    onLinkClicked: (String) -> Unit,
     onProIIIVisible: () -> Unit,
     modifier: Modifier = Modifier,
 ) {
@@ -295,7 +295,7 @@ internal fun VariantBOnboardingDialogColumn(
 
                     if (uiState.localisedSubscriptionsList.isNotEmpty()) {
                         SubscriptionDetails(
-                            onLinkClick = onPlayStoreLinkClicked,
+                            onLinkClick = onLinkClicked,
                             chosenPlan = chosenPlan,
                             subscriptionList = uiState.localisedSubscriptionsList,
                             isMonthly = isMonthly,
@@ -320,7 +320,7 @@ private fun PreviewVariantBOnboardingDialogView(
             onContinueClicked = {},
             onChoosingMonthlyYearlyPlan = {},
             onChoosingPlanType = {},
-            onPlayStoreLinkClicked = {},
+            onLinkClicked = {},
             onProIIIVisible = {},
         )
     }
