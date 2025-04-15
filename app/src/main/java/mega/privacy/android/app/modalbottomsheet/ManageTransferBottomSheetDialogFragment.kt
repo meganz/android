@@ -26,7 +26,6 @@ import mega.privacy.android.app.utils.ColorUtils
 import mega.privacy.android.app.utils.Constants
 import mega.privacy.android.app.utils.FileUtil
 import mega.privacy.android.app.utils.MegaApiUtils
-import mega.privacy.android.app.utils.MegaNodeUtil
 import mega.privacy.android.app.utils.Util
 import mega.privacy.android.app.utils.Util.showSnackbar
 import mega.privacy.android.domain.entity.node.NodeId
@@ -64,12 +63,12 @@ internal class ManageTransferBottomSheetDialogFragment : BaseBottomSheetDialogFr
         super.onViewCreated(view, savedInstanceState)
         viewLifecycleOwner.collectFlow(viewModel.uiState) {
             transfer = it.transfer
-            handleCompletedTransfer()
+            handleCompletedTransfer(it)
         }
     }
 
-    private fun handleCompletedTransfer() {
-        val transfer = transfer ?: return
+    private fun handleCompletedTransfer(uiState: ManageTransferSheetUiState) {
+        val transfer = uiState.transfer ?: return
         val thumbnail = contentView.findViewById<ImageView>(R.id.manage_transfer_thumbnail)
         val type = contentView.findViewById<ImageView>(R.id.manage_transfer_small_icon)
         val stateIcon = contentView.findViewById<ImageView>(R.id.manage_transfer_completed_image)
@@ -97,7 +96,7 @@ internal class ManageTransferBottomSheetDialogFragment : BaseBottomSheetDialogFr
         val getLinkOptionSeparator = contentView.findViewById<View>(R.id.separator_get_link)
         getLinkOption.setOnClickListener(this)
 
-        if (MegaNodeUtil.showShareOption(-1, false, transfer.handle)) {
+        if (uiState.iAmNodeOwner) {
             getLinkOption.visibility = View.VISIBLE
             getLinkOptionSeparator.visibility = View.VISIBLE
         } else {

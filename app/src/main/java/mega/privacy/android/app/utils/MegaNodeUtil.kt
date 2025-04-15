@@ -89,7 +89,7 @@ import java.util.concurrent.CopyOnWriteArrayList
 import kotlin.contracts.ExperimentalContracts
 import kotlin.contracts.contract
 
-
+@Deprecated("This class is deprecated. Use corresponding use cases instead.")
 object MegaNodeUtil {
 
     /**
