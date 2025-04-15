@@ -12,13 +12,14 @@ import androidx.fragment.app.Fragment
 import androidx.fragment.app.viewModels
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import dagger.hilt.android.AndroidEntryPoint
+import mega.android.core.ui.theme.AndroidTheme
 import mega.privacy.android.app.presentation.extensions.isDarkMode
+import mega.privacy.android.app.presentation.login.onboarding.view.NewTourRoute
 import mega.privacy.android.app.presentation.login.onboarding.view.TourRoute
 import mega.privacy.android.app.presentation.login.onboarding.view.TourViewModel
 import mega.privacy.android.domain.entity.ThemeMode
 import mega.privacy.android.domain.usecase.GetThemeMode
 import mega.privacy.android.shared.original.core.ui.theme.OriginalTheme
-import timber.log.Timber
 import javax.inject.Inject
 
 /**
@@ -51,26 +52,38 @@ class TourFragment : Fragment() {
         setContent {
             val themeMode by getThemeMode().collectAsStateWithLifecycle(initialValue = ThemeMode.System)
             val uiState by viewModel.uiState.collectAsStateWithLifecycle()
-            OriginalTheme(isDark = themeMode.isDarkMode()) {
-                TourRoute(
-                    uiState = uiState,
-                    modifier = Modifier.fillMaxSize(),
-                    onLoginClick = {
-                        Timber.d("onLoginClick")
-                        onLoginClick?.invoke()
-                    },
-                    onCreateAccountClick = {
-                        Timber.d("onRegisterClick")
-                        onCreateAccountClick?.invoke()
-                    },
-                    onOpenLink = {
-                        onOpenLink?.invoke(it)
-                        viewModel.resetOpenLink()
-                    },
-                    onMeetingLinkChange = viewModel::onMeetingLinkChange,
-                    onConfirmMeetingLinkClick = viewModel::onConfirmMeetingLinkClick,
-                    onClearLogoutProgressFlag = viewModel::clearLogoutProgressFlag
-                )
+            if (uiState.isNewRegistrationUiEnabled == true) {
+                AndroidTheme(isDark = themeMode.isDarkMode()) {
+                    NewTourRoute(
+                        modifier = Modifier.fillMaxSize(),
+                        onLoginClick = {
+                            onLoginClick?.invoke()
+                        },
+                        onCreateAccountClick = {
+                            onCreateAccountClick?.invoke()
+                        }
+                    )
+                }
+            } else if (uiState.isNewRegistrationUiEnabled == false) {
+                OriginalTheme(isDark = themeMode.isDarkMode()) {
+                    TourRoute(
+                        uiState = uiState,
+                        modifier = Modifier.fillMaxSize(),
+                        onLoginClick = {
+                            onLoginClick?.invoke()
+                        },
+                        onCreateAccountClick = {
+                            onCreateAccountClick?.invoke()
+                        },
+                        onOpenLink = {
+                            onOpenLink?.invoke(it)
+                            viewModel.resetOpenLink()
+                        },
+                        onMeetingLinkChange = viewModel::onMeetingLinkChange,
+                        onConfirmMeetingLinkClick = viewModel::onConfirmMeetingLinkClick,
+                        onClearLogoutProgressFlag = viewModel::clearLogoutProgressFlag
+                    )
+                }
             }
         }
     }
