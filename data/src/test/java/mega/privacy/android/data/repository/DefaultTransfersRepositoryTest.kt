@@ -84,11 +84,14 @@ import org.mockito.kotlin.verify
 import org.mockito.kotlin.whenever
 import java.io.File
 import kotlin.time.Duration.Companion.seconds
+import kotlin.time.ExperimentalTime
+import kotlin.time.Instant
 
 /**
  * Test class for [DefaultTransfersRepository]
  */
 @ExperimentalCoroutinesApi
+@OptIn(ExperimentalTime::class)
 @TestInstance(TestInstance.Lifecycle.PER_CLASS)
 class DefaultTransfersRepositoryTest {
     private lateinit var underTest: DefaultTransfersRepository
@@ -1926,6 +1929,21 @@ class DefaultTransfersRepositoryTest {
 
         assertThat(parentRecursiveAppDataCache).isEmpty()
     }
+
+    @Test
+    fun `test that monitorTransferOverQuotaErrorTimestamp emits value when setTransferOverQuotaErrorTimestamp is invoked`() =
+        runTest {
+            val currentTime = 12356L
+            val expected = Instant.fromEpochMilliseconds(currentTime)
+
+            whenever(deviceGateway.getCurrentTimeInMillis()).thenReturn(currentTime)
+
+            underTest.setTransferOverQuotaErrorTimestamp()
+            underTest.monitorTransferOverQuotaErrorTimestamp().test {
+                assertThat(awaitItem()).isEqualTo(expected)
+                cancelAndIgnoreRemainingEvents()
+            }
+        }
 
     private fun getCompletedTransfer(fileName: String) = CompletedTransfer(
         fileName = fileName,

@@ -21,6 +21,8 @@ import mega.privacy.android.domain.entity.transfer.pending.PendingTransferState
 import mega.privacy.android.domain.entity.transfer.pending.UpdatePendingTransferRequest
 import java.io.File
 import kotlin.time.Duration
+import kotlin.time.ExperimentalTime
+import kotlin.time.Instant
 
 /**
  * Transfer repository of Domain Module
@@ -669,4 +671,15 @@ interface TransferRepository {
      * @param parentTransferTag the tag of the folder transfer that should be removed from cache because it's not needed anymore
      */
     suspend fun clearRecursiveTransferAppDataFromCache(parentTransferTag: Int)
+
+    /**
+     * Monitor transfer over quota error timestamp.
+     */
+    @OptIn(ExperimentalTime::class)
+    fun monitorTransferOverQuotaErrorTimestamp(): Flow<Instant?>
+
+    /**
+     * Set transfer over quota error timestamp as current time.
+     */
+    suspend fun setTransferOverQuotaErrorTimestamp()
 }

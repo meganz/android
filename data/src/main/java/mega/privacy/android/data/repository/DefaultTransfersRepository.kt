@@ -83,6 +83,8 @@ import java.io.File
 import javax.inject.Inject
 import javax.inject.Singleton
 import kotlin.time.Duration.Companion.seconds
+import kotlin.time.ExperimentalTime
+import kotlin.time.Instant
 
 /**
  * Default [TransferRepository] implementation.
@@ -95,6 +97,7 @@ import kotlin.time.Duration.Companion.seconds
  * @param localStorageGateway [MegaLocalStorageGateway]
  * @param parentRecursiveAppDataCache cache to store transfer app data that needs to be used recursively in children
  */
+@OptIn(ExperimentalTime::class)
 @Singleton
 internal class DefaultTransfersRepository @Inject constructor(
     private val megaApiGateway: MegaApiGateway,
@@ -124,6 +127,8 @@ internal class DefaultTransfersRepository @Inject constructor(
     private val monitorPausedTransfers = MutableStateFlow(false)
 
     private val monitorAskedResumeTransfers = MutableStateFlow(false)
+
+    private val monitorTransferOverQuotaErrorTimestamp = MutableStateFlow<Instant?>(null)
 
     /**
      * To store in progress transfers in memory instead of in database
@@ -432,10 +437,12 @@ internal class DefaultTransfersRepository @Inject constructor(
     override suspend fun getInProgressTransfers(): List<Transfer> = withContext(ioDispatcher) {
         val transfers = mutableListOf<Transfer>()
         megaApiGateway.getTransferData()?.let { data ->
-            transfers.addAll((0 until data.numDownloads)
-                .mapNotNull { getTransferByTag(data.getDownloadTag(it)) })
-            transfers.addAll((0 until data.numUploads)
-                .mapNotNull { getTransferByTag(data.getUploadTag(it)) })
+            transfers.addAll(
+                (0 until data.numDownloads)
+                    .mapNotNull { getTransferByTag(data.getDownloadTag(it)) })
+            transfers.addAll(
+                (0 until data.numUploads)
+                    .mapNotNull { getTransferByTag(data.getUploadTag(it)) })
         }
         transfers.sortedBy { it.priority }
     }
@@ -735,10 +742,6 @@ internal class DefaultTransfersRepository @Inject constructor(
     private fun transferredBytesFlow(transferType: TransferType): MutableStateFlow<Map<Long, Long>> =
         transferredBytesFlows[transferType] ?: error("Unknown transfer type: $transferType")
 
-    companion object {
-        internal const val TRANSFERS_SD_TEMPORARY_FOLDER = "transfersSdTempMEGA"
-    }
-
     override fun monitorAskedResumeTransfers() = monitorAskedResumeTransfers.asStateFlow()
 
     override suspend fun setAskedResumeTransfers() {
@@ -893,10 +896,24 @@ internal class DefaultTransfersRepository @Inject constructor(
     override suspend fun clearRecursiveTransferAppDataFromCache(parentTransferTag: Int) {
         parentRecursiveAppDataCache.remove(parentTransferTag)
     }
+
+    override fun monitorTransferOverQuotaErrorTimestamp() =
+        monitorTransferOverQuotaErrorTimestamp.asStateFlow()
+
+    override suspend fun setTransferOverQuotaErrorTimestamp() {
+        monitorTransferOverQuotaErrorTimestamp.emit(
+            Instant.fromEpochMilliseconds(deviceGateway.getCurrentTimeInMillis())
+        )
+    }
+
+    private fun MegaTransfer.isBackgroundTransfer() =
+        appData?.contains(AppDataTypeConstants.BackgroundTransfer.sdkTypeValue) == true
+
+    private fun MegaTransfer.isCUUpload() =
+        appData?.contains(AppDataTypeConstants.CameraUpload.sdkTypeValue) == true
+
+    companion object {
+        internal const val TRANSFERS_SD_TEMPORARY_FOLDER = "transfersSdTempMEGA"
+    }
 }
 
-private fun MegaTransfer.isBackgroundTransfer() =
-    appData?.contains(AppDataTypeConstants.BackgroundTransfer.sdkTypeValue) == true
-
-private fun MegaTransfer.isCUUpload() =
-    appData?.contains(AppDataTypeConstants.CameraUpload.sdkTypeValue) == true
