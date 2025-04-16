@@ -461,7 +461,7 @@
     <!-- Step 4: instruction step no.4 Tap Cancel subscription on the account from the MEGA website from the mobile device-->
     <string name="account_cancellation_instructions_tap_cancel_subscription">4. Tap [A]Cancel subscription[/A].</string>
     <!-- Text to show in the Android Sync feature for a No Network State when there is no network connectivity -->
-    <string name="sync_no_network_state">No internet connection</string>
+    <string name="sync_no_network_state">İnternet bağlantısı yok</string>
     <!-- Menu option to create a new folder in the file manager -->
     <string name="general_menu_create_new_folder">Create new folder</string>
     <!-- Create new folder dialog title -->
@@ -1078,4 +1078,22 @@
     <string name="sync_rename_and_create_backup_dialog_error_message_empty_backup_name">Enter a backup name.</string>
     <!-- The Error Message shown in the Rename and Create Backup Dialog when the user submits a new backup name that already exists in Backups -->
     <string name="sync_rename_and_create_backup_dialog_error_message_name_already_exists">A backup with this name already exists. Enter a different name.</string>
+    <!-- USP Carousel page 1 title-->
+    <string name="carousel_page_title_slide_1">You hold the keys</string>
+    <!-- USP Carousel page 1 description-->
+    <string name="carousel_page_description_slide_1">User controlled, zero-knowledge encryption means no one can see your data unless you want them to - not even us!</string>
+    <!-- USP Carousel page 2 title-->
+    <string name="carousel_page_title_slide_2">Keep every moment safe</string>
+    <!-- USP Carousel page 2 description-->
+    <string name="carousel_page_description_slide_2">With automatic camera uploads to MEGA Cloud, and generous storage, you’ll never lose a precious memory</string>
+    <!-- USP Carousel page 3 title-->
+    <string name="carousel_page_title_slide_3">Your data. Your space.</string>
+    <!-- USP Carousel page 3 description-->
+    <string name="carousel_page_description_slide_3">Ample storage and easy ways to transfer, share, and organise your files means you can safely use MEGA for whatever you choose</string>
+    <!-- USP Carousel page 4 title-->
+    <string name="carousel_page_title_slide_4">Say it in private</string>
+    <!-- USP Carousel page 4 description-->
+    <string name="carousel_page_description_slide_4">Chat with friends and family, share photos or sensitive information, video call and schedule meetings. Safety and privacy guaranteed.</string>
+    <!-- Create account label-->
+    <string name="general_label_create_account">Sign up</string>
 </resources>

@@ -1060,4 +1060,22 @@
     <string name="sync_rename_and_create_backup_dialog_error_message_empty_backup_name">バックアップ名を入力してください。</string>
     <!-- The Error Message shown in the Rename and Create Backup Dialog when the user submits a new backup name that already exists in Backups -->
     <string name="sync_rename_and_create_backup_dialog_error_message_name_already_exists">この名前のバックアップはすでに存在します。別の名前を入力してください。</string>
+    <!-- USP Carousel page 1 title-->
+    <string name="carousel_page_title_slide_1">あなたがキーを持っています</string>
+    <!-- USP Carousel page 1 description-->
+    <string name="carousel_page_description_slide_1">ユーザー制御のゼロ知識暗号化は、あなたが望まない限り、誰もあなたのデータを見ることができないことを意味します。お客様のデータは、当社でさえも見ることができません！</string>
+    <!-- USP Carousel page 2 title-->
+    <string name="carousel_page_title_slide_2">一瞬一瞬を安全に</string>
+    <!-- USP Carousel page 2 description-->
+    <string name="carousel_page_description_slide_2">MEGAクラウドへのカメラの自動アップロードと豊富なストレージで、大切な思い出を絶対に逃しません。</string>
+    <!-- USP Carousel page 3 title-->
+    <string name="carousel_page_title_slide_3">あなたのデータ、あなたのスペース。</string>
+    <!-- USP Carousel page 3 description-->
+    <string name="carousel_page_description_slide_3">十分なストレージがあり、ファイルの転送、共有、整理が簡単にできるため、MEGAをどんな用途にも安心してお使いいただけます。</string>
+    <!-- USP Carousel page 4 title-->
+    <string name="carousel_page_title_slide_4">プライベートで話す</string>
+    <!-- USP Carousel page 4 description-->
+    <string name="carousel_page_description_slide_4">ご友人やご家族とチャットしたり、写真や機密情報を共有したり、ビデオ通話やミーティングの予定を立てたり、いろいろとお楽しみください。その際に、安全性とプライバシーが保証されています。</string>
+    <!-- Create account label-->
+    <string name="general_label_create_account">MEGAアカウントの作成</string>
 </resources>

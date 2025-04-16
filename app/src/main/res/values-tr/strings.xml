@@ -67,7 +67,7 @@
     <!-- Menu item -->
     <string name="action_settings">Ayarlar</string>
     <!-- Search button -->
-    <string name="action_search">Search</string>
+    <string name="action_search">Ara</string>
     <!-- Select country page title -->
     <string name="action_search_country">Choose your region</string>
     <!-- Alternative text or description text for the “Play” button -->

@@ -1057,25 +1057,43 @@
     <!--Sign up page text to ask the user to login if they already have a MEGA account-->
     <string name="sign_up_already_have_account_login_link_text">Heeft u al een MEGA-account? [A]Log in[/A]</string>
     <!-- Text shown in the fake preview screen -->
-    <string name="transfers_fake_preview_text">Loading file&#8230;</string>
+    <string name="transfers_fake_preview_text">Bestand wordt geladen...</string>
     <!-- Title or a warning, related to cancel a preview download, asking for confirmation before proceeding. -->
-    <string name="transfers_cancel_preview_download_warning_title">Cancel preview?</string>
+    <string name="transfers_cancel_preview_download_warning_title">Weergave annuleren?</string>
     <!-- Text or a warning, related to cancel a preview download, asking for confirmation before proceeding. -->
-    <string name="transfers_cancel_preview_download_warning_text">You will no longer be able to preview this file</string>
+    <string name="transfers_cancel_preview_download_warning_text">U kunt dit bestand niet langer bekijken</string>
     <!-- Warning text informing that a file preview failed to load. -->
-    <string name="transfers_fake_preview_screen_general_error">Preview failed to load, try again.</string>
+    <string name="transfers_fake_preview_screen_general_error">De weergave kon niet worden geladen, probeer het opnieuw.</string>
     <!-- Warning shown after trying to cancel a download, but the request failed -->
-    <string name="transfers_error_cancelling_preview_download">Something went wrong. Preview was not cancelled. See notification for details.</string>
+    <string name="transfers_error_cancelling_preview_download">Er is iets misgegaan. De weergave is niet geannuleerd. Zie meldingen voor meer informatie.</string>
     <!-- Title of the Rename and Create Backup Dialog -->
-    <string name="sync_rename_and_create_backup_dialog_title">Backup name already exists</string>
+    <string name="sync_rename_and_create_backup_dialog_title">De naam van de back-up bestaat al</string>
     <!-- Text of the Rename and Create Backup Dialog -->
-    <string name="sync_rename_and_create_backup_dialog_text">A folder with the same name already exists in your Backups. Rename the new folder to continue with the backup. Folder name will not change on your device.</string>
+    <string name="sync_rename_and_create_backup_dialog_text">Er bestaat al een map met dezelfde naam in uw back-ups. Hernoem de nieuwe map om door te gaan met de backup. De mapnaam verandert niet op uw apparaat.</string>
     <!-- Rename and Create Backup Dialog hint text (input field description) -->
-    <string name="sync_rename_and_create_backup_dialog_hint_text">Backup name</string>
+    <string name="sync_rename_and_create_backup_dialog_hint_text">Back-upnaam</string>
     <!-- Label for the Positive Button of the Rename and Create Backup Dialog -->
     <string name="sync_rename_and_create_backup_dialog_positive_button">Hernoemen</string>
     <!-- The Error Message shown in the Rename and Create Backup Dialog when the user submits an empty backup name -->
-    <string name="sync_rename_and_create_backup_dialog_error_message_empty_backup_name">Enter a backup name.</string>
+    <string name="sync_rename_and_create_backup_dialog_error_message_empty_backup_name">Een backupnaam invoeren.</string>
     <!-- The Error Message shown in the Rename and Create Backup Dialog when the user submits a new backup name that already exists in Backups -->
-    <string name="sync_rename_and_create_backup_dialog_error_message_name_already_exists">A backup with this name already exists. Enter a different name.</string>
+    <string name="sync_rename_and_create_backup_dialog_error_message_name_already_exists">Er bestaat al een backup met deze naam. Voer een andere naam in.</string>
+    <!-- USP Carousel page 1 title-->
+    <string name="carousel_page_title_slide_1">U heeft de sleutels</string>
+    <!-- USP Carousel page 1 description-->
+    <string name="carousel_page_description_slide_1">Door de gebruiker beheerde zero-knowledge codering kan niemand uw gegevens zien, tenzij u dat wilt, zelfs wij niet!</string>
+    <!-- USP Carousel page 2 title-->
+    <string name="carousel_page_title_slide_2">Houd elk moment veilig</string>
+    <!-- USP Carousel page 2 description-->
+    <string name="carousel_page_description_slide_2">Met automatische camera-uploads naar MEGA Cloud en royale opslagruimte verlies u nooit een kostbare herinnering</string>
+    <!-- USP Carousel page 3 title-->
+    <string name="carousel_page_title_slide_3">Uw gegevens. Uw opslag.</string>
+    <!-- USP Carousel page 3 description-->
+    <string name="carousel_page_description_slide_3">Dankzij de ruime opslagruimte en eenvoudige manieren om uw bestanden over te dragen, te delen en te ordenen, kunt u MEGA veilig gebruiken voor wat u maar wilt</string>
+    <!-- USP Carousel page 4 title-->
+    <string name="carousel_page_title_slide_4">Zeg het privé</string>
+    <!-- USP Carousel page 4 description-->
+    <string name="carousel_page_description_slide_4">Chat met vrienden en familie, deel foto\’s of gevoelige informatie, videogesprekken en plan vergaderingen. Veiligheid en privacy gegarandeerd.</string>
+    <!-- Create account label-->
+    <string name="general_label_create_account">MEGA-account aanmaken</string>
 </resources>

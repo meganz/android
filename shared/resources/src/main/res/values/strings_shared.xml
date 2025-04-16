@@ -1095,5 +1095,5 @@
     <!-- USP Carousel page 4 description-->
     <string name="carousel_page_description_slide_4">Chat with friends and family, share photos or sensitive information, video call and schedule meetings. Safety and privacy guaranteed.</string>
     <!-- Create account label-->
-    <string name="general_label_create_account">Create account</string>
+    <string name="general_label_create_account">Sign up</string>
 </resources>

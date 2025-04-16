@@ -63,7 +63,7 @@
     <!-- Label of the top app bar menu option of selected device in Device Center which takes the user to the device info screen -->
     <string name="device_center_device_top_menu_option_info">Info</string>
     <!-- Text to show in the Device Center for a No Network State when there is no network connectivity -->
-    <string name="device_center_no_network_state">No internet connection</string>
+    <string name="device_center_no_network_state">İnternet bağlantısı yok</string>
     <!-- Text to display in Device Center for an empty state when inspecting a device where no sync or backup has been configured -->
     <string name="device_center_nothing_setup_state">Nothing set up yet</string>
     <!-- The hint text for the search bar in the Device Center feature when the User is searching for Devices -->
