@@ -484,6 +484,10 @@ internal class DefaultSettingsRepository @Inject constructor(
         megaLocalStorageGateway.getFirstTime()
     }
 
+    override suspend fun getDownloadToSdCardUri() = withContext(ioDispatcher) {
+        databaseHandler.get().sdCardUri
+    }
+
     private suspend fun getShowHiddenNodesPreference() = withContext(ioDispatcher) {
         try {
             getCCPreferences().getValueFor(JSON_KEY_CONTENT_CONSUMPTION.value)

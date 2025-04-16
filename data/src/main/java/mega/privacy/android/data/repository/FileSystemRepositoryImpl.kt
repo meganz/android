@@ -2,6 +2,7 @@ package mega.privacy.android.data.repository
 
 import android.content.Context
 import android.net.Uri
+import android.webkit.MimeTypeMap
 import androidx.core.net.toFile
 import androidx.core.net.toUri
 import dagger.hilt.android.qualifiers.ApplicationContext
@@ -10,12 +11,14 @@ import kotlinx.coroutines.NonCancellable
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.flowOn
 import kotlinx.coroutines.sync.Mutex
+import kotlinx.coroutines.sync.withLock
 import kotlinx.coroutines.withContext
 import mega.privacy.android.data.extensions.toUri
 import mega.privacy.android.data.gateway.CacheGateway
 import mega.privacy.android.data.gateway.DeviceGateway
 import mega.privacy.android.data.gateway.FileAttributeGateway
 import mega.privacy.android.data.gateway.FileGateway
+import mega.privacy.android.data.gateway.SDCardGateway
 import mega.privacy.android.data.mapper.FileTypeInfoMapper
 import mega.privacy.android.data.wrapper.DocumentFileWrapper
 import mega.privacy.android.domain.entity.FileTypeInfo
@@ -28,6 +31,7 @@ import mega.privacy.android.domain.repository.FileSystemRepository
 import timber.log.Timber
 import java.io.File
 import java.io.FileNotFoundException
+import java.io.IOException
 import java.net.URI
 import java.net.URLConnection
 import javax.inject.Inject
@@ -52,6 +56,7 @@ internal class FileSystemRepositoryImpl @Inject constructor(
     private val fileTypeInfoMapper: FileTypeInfoMapper,
     private val fileGateway: FileGateway,
     private val deviceGateway: DeviceGateway,
+    private val sdCardGateway: SDCardGateway,
     private val fileAttributeGateway: FileAttributeGateway,
     private val documentFileWrapper: DocumentFileWrapper,
 ) : FileSystemRepository {
@@ -118,6 +123,11 @@ internal class FileSystemRepositoryImpl @Inject constructor(
 
     override suspend fun doesFolderExists(folderPath: String) = withContext(ioDispatcher) {
         fileGateway.isFileAvailable(folderPath)
+    }
+
+    override suspend fun isFolderInSDCardAvailable(uriString: String) = withContext(ioDispatcher) {
+        val directoryFile = sdCardGateway.getDirectoryFile(uriString)
+        fileGateway.isDocumentFileAvailable(directoryFile)
     }
 
     override suspend fun doesExternalStorageDirectoryExists() = withContext(ioDispatcher) {
@@ -221,6 +231,14 @@ internal class FileSystemRepositoryImpl @Inject constructor(
             }
         }
 
+    override suspend fun isSDCardPathOrUri(localPath: String) = withContext(ioDispatcher) {
+        sdCardGateway.doesFolderExists(localPath) || sdCardGateway.isSDCardUri(localPath)
+    }
+
+    override suspend fun isSDCardCachePath(localPath: String) = withContext(ioDispatcher) {
+        sdCardGateway.isSDCardCachePath(localPath)
+    }
+
     override suspend fun copyFilesToDocumentUri(
         source: File,
         destinationUri: UriPath,
@@ -238,6 +256,72 @@ internal class FileSystemRepositoryImpl @Inject constructor(
 
     override fun getFileTypeInfoByName(name: String, duration: Int): FileTypeInfo =
         fileTypeInfoMapper(name, duration)
+
+    override suspend fun moveFileToSd(
+        file: File,
+        destinationUri: String,
+        subFolders: List<String>,
+    ) = withContext(ioDispatcher) {
+        val sourceDocument = documentFileWrapper.fromFile(file)
+        val sdCardUri = Uri.parse(destinationUri)
+
+        val destDocument = moveSdDocumentMutex.withLock {
+            documentFileWrapper.getSdDocumentFile(
+                sdCardUri,
+                subFolders,
+                file.name,
+                MimeTypeMap.getSingleton().getMimeTypeFromExtension(file.extension)
+                    ?: "application/octet-stream"
+            )
+        }
+
+        try {
+            if (destDocument != null) {
+                val inputStream =
+                    context.contentResolver.openInputStream(sourceDocument.uri)
+                val outputStream =
+                    context.contentResolver.openOutputStream(destDocument.uri)
+
+                inputStream?.use { input ->
+                    outputStream?.use { output ->
+                        input.copyTo(output)
+                    }
+                }
+                file.delete()
+                return@withContext true
+            }
+        } catch (e: IOException) {
+            e.printStackTrace()
+        }
+        return@withContext false
+    }
+
+    override suspend fun moveDirectoryToSd(
+        directory: File,
+        destinationUri: String,
+    ): Boolean = withContext(ioDispatcher) {
+        val directorySdCardStringUri = Uri.parse(destinationUri)?.let { sdCardUri ->
+            moveSdDocumentMutex.withLock {
+                documentFileWrapper.fromUri(sdCardUri)?.let {
+                    it.findFile(directory.name) ?: it.createDirectory(directory.name)
+                }?.uri?.toString()
+            }
+        } ?: run {
+            Timber.w("Error getting SD card uri")
+            null
+        }
+
+        directory.listFiles()?.forEach { childFile ->
+            if (childFile.isDirectory) {
+                directorySdCardStringUri?.let { moveDirectoryToSd(childFile, it) }
+                    ?: Timber.w("Error moving directory to SD card")
+            } else {
+                moveFileToSd(childFile, destinationUri, listOf(directory.name))
+            }
+        }
+
+        return@withContext directory.delete()
+    }
 
     override suspend fun createNewImageUri(fileName: String): String? = withContext(ioDispatcher) {
         fileGateway.createNewImageUri(fileName)?.toString()
@@ -403,6 +487,17 @@ internal class FileSystemRepositoryImpl @Inject constructor(
 
         newFile
     }
+
+    override suspend fun getFileLengthFromSdCardContentUri(
+        fileContentUri: String,
+    ) = Uri.parse(fileContentUri)?.let { uri ->
+        documentFileWrapper.fromSingleUri(uri)?.length() ?: 0L
+    } ?: 0L
+
+    override suspend fun deleteFileFromSdCardContentUri(fileContentUri: String) =
+        Uri.parse(fileContentUri)?.let { uri ->
+            documentFileWrapper.fromSingleUri(uri)?.delete() ?: false
+        } ?: false
 
     override suspend fun canReadUri(stringUri: String) =
         fileGateway.canReadUri(stringUri)

@@ -38,6 +38,11 @@ interface SDCardGateway {
     suspend fun doesFolderExists(localPath: String): Boolean
 
     /**
+     * @return true if the [localPath] points to a SD card cache
+     */
+    suspend fun isSDCardCachePath(localPath: String): Boolean
+
+    /**
      * Retrieves the Root SD Card path
      *
      * @see mega.privacy.android.app.utils.SDCardUtils.getSDCardRoot

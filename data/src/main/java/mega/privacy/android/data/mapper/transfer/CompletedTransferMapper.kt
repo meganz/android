@@ -9,6 +9,7 @@ import mega.privacy.android.data.wrapper.StringWrapper
 import mega.privacy.android.domain.entity.transfer.CompletedTransfer
 import mega.privacy.android.domain.entity.transfer.Transfer
 import mega.privacy.android.domain.entity.transfer.TransferType
+import mega.privacy.android.domain.entity.transfer.getSDCardTransferPathForSDK
 import mega.privacy.android.domain.exception.MegaException
 import mega.privacy.android.domain.exception.QuotaExceededMegaException
 import mega.privacy.android.domain.qualifier.IoDispatcher
@@ -40,11 +41,13 @@ class CompletedTransferMapper @Inject constructor(
      *
      * @param transfer
      * @param error
+     * @param transferPath path if it's different from the one specified in [transfer], this happens when sdk downloads the file to the cache and then it's moved to its final destination. See GetTransferDestinationUriUseCase
      * @return a [CompletedTransfer]
      */
     suspend operator fun invoke(
         transfer: Transfer,
         error: MegaException?,
+        transferPath: String? = transfer.getSDCardTransferPathForSDK(),
     ) =
         withContext(ioDispatcher) {
             val isOffline = isOffline(transfer)
@@ -55,7 +58,7 @@ class CompletedTransferMapper @Inject constructor(
                 size = getSizeString(transfer.totalBytes),
                 handle = transfer.nodeHandle,
                 isOffline = isOffline,
-                path = formatTransferPath(transfer, isOffline),
+                path = transferPath ?: formatTransferPath(transfer, isOffline),
                 timestamp = deviceGateway.now,
                 error = error?.let { getErrorString(transfer, it) },
                 originalPath = transfer.localPath,

@@ -19,11 +19,13 @@ import kotlin.random.Random
 
 internal class TransferMapperTest {
 
+    private val parentPath = "parentPath"
+
     @Test
     fun `test that transfer mapper returns correctly`() {
         val appDataList = listOf(TransferAppData.CameraUpload)
         val transferAppDataMapper = mock<TransferAppDataMapper> {
-            on { invoke(APP_DATA_RAW) }.thenReturn(appDataList)
+            on { invoke(APP_DATA_RAW, parentPath) }.thenReturn(appDataList)
         }
         val transferTypeMapper = mock<TransferTypeMapper> {
             on { invoke(MegaTransfer.TYPE_DOWNLOAD, appDataList) }
@@ -79,7 +81,7 @@ internal class TransferMapperTest {
         folderTransferTag: Int,
     ) {
         val transferAppDataMapper = mock<TransferAppDataMapper> {
-            on { invoke(anyOrNull()) }.thenReturn(emptyList())
+            on { invoke(anyOrNull(), anyOrNull()) }.thenReturn(emptyList())
         }
         val transferTypeMapper = mock<TransferTypeMapper> {
             on { invoke(anyOrNull(), anyOrNull()) }
@@ -129,7 +131,7 @@ internal class TransferMapperTest {
             on { state }.thenReturn(MegaTransfer.STATE_COMPLETED)
             on { priority }.thenReturn(BigInteger.ONE)
             on { notificationNumber }.thenReturn(Random.nextLong())
-            on { parentPath }.thenReturn("parentPath")
+            on { parentPath }.thenReturn(parentPath)
         }
 
 

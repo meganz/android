@@ -12,6 +12,7 @@ import mega.privacy.android.domain.repository.FileSystemRepository
 import mega.privacy.android.domain.repository.TimeSystemRepository
 import mega.privacy.android.domain.repository.TransferRepository
 import mega.privacy.android.domain.usecase.file.DoesUriPathHaveSufficientSpaceForNodesUseCase
+import mega.privacy.android.domain.usecase.transfers.downloads.GetFileDestinationAndAppDataForDownloadUseCase
 import java.io.File
 import javax.inject.Inject
 
@@ -22,6 +23,7 @@ class InsertPendingDownloadsForNodesUseCase @Inject constructor(
     private val transferRepository: TransferRepository,
     private val getPendingTransferNodeIdentifierUseCase: GetPendingTransferNodeIdentifierUseCase,
     private val doesUriPathHaveSufficientSpaceForNodesUseCase: DoesUriPathHaveSufficientSpaceForNodesUseCase,
+    private val getFileDestinationAndAppDataForDownloadUseCase: GetFileDestinationAndAppDataForDownloadUseCase,
     private val fileSystemRepository: FileSystemRepository,
     private val timeSystemRepository: TimeSystemRepository,
 ) {
@@ -40,6 +42,9 @@ class InsertPendingDownloadsForNodesUseCase @Inject constructor(
         isHighPriority: Boolean,
         appData: TransferAppData?,
     ) {
+        val (folderDestination, destinationAppData) = getFileDestinationAndAppDataForDownloadUseCase(
+            destination
+        )
         val transferGroupId = transferRepository.insertActiveTransferGroup(
             ActiveTransferActionGroupImpl(
                 transferType = TransferType.DOWNLOAD,
@@ -49,10 +54,11 @@ class InsertPendingDownloadsForNodesUseCase @Inject constructor(
         )
         val appDataList = listOfNotNull(
             appData,
+            destinationAppData,
             TransferAppData.TransferGroup(transferGroupId),
         )
-        fileSystemRepository.createDirectory(destination.value)
-        if (!doesUriPathHaveSufficientSpaceForNodesUseCase(destination, nodes)) {
+        fileSystemRepository.createDirectory(folderDestination.value)
+        if (!doesUriPathHaveSufficientSpaceForNodesUseCase(folderDestination, nodes)) {
             throw NotEnoughStorageException()
         }
         transferRepository.insertPendingTransfers(
@@ -60,7 +66,7 @@ class InsertPendingDownloadsForNodesUseCase @Inject constructor(
                 InsertPendingTransferRequest(
                     transferType = TransferType.DOWNLOAD,
                     nodeIdentifier = getPendingTransferNodeIdentifierUseCase(node),
-                    uriPath = UriPath(destination.value.ensureEndsWithFileSeparator()),
+                    uriPath = UriPath(folderDestination.value.ensureEndsWithFileSeparator()),
                     appData = appDataList,
                     isHighPriority = isHighPriority,
                     fileName = node.name,

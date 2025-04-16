@@ -140,6 +140,19 @@ class SDCardFacadeTest {
 
     @ParameterizedTest
     @ValueSource(booleans = [true, false])
+    fun `test that is SD Card Cache Path returns true if corresponds`(
+        isSdPath: Boolean,
+    ) = runTest {
+        val cachePath = "cacheRoot"
+        val cache = File(cachePath)
+        whenever(context.externalCacheDir).thenReturn(cache)
+        val path =
+            if (isSdPath) "$cache${File.separator}somethingElse" else "noCacheRoot${File.separator}somethingElse"
+        assertThat(underTest.isSDCardCachePath(path)).isEqualTo(isSdPath)
+    }
+
+    @ParameterizedTest
+    @ValueSource(booleans = [true, false])
     fun `test that is SD Card Uri returns true if corresponds`(
         isSDCardUri: Boolean,
     ) = runTest {

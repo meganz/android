@@ -162,6 +162,46 @@ class CompletedTransferMapperTest {
             assertThat(actual.path).isEqualTo(directoryPath)
         }
 
+    @Test
+    fun `test that transferPath is assigned to completed transfer path when is set`() = runTest {
+        val expected = "content://com.android.providers.downloads.documents/tree/msd%·A109"
+        val directoryPath = "/storage/emulated/0/Download/Mega Downloads"
+        val offlineDirectoryPath = "/data/user/0/mega.privacy.android.app/files"
+        val offlineDirectory = "MEGA Offline"
+        val transfer = mockTransfer(
+            transferType = TransferType.DOWNLOAD,
+            parentPath = directoryPath
+        )
+        whenever(stringWrapper.getSizeString(any())).thenReturn("10MB")
+        whenever(fileGateway.getOfflineFilesRootPath()).thenReturn("$offlineDirectoryPath/$offlineDirectory")
+        val actual = underTest(transfer, null, expected)
+        assertThat(actual.path).isEqualTo(expected)
+    }
+
+    @Test
+    fun `test that getSDCardTransferPathForSDK is assigned to completed transfer path when transferPath is not set`() =
+        runTest {
+            val expected = "content://com.android.providers.downloads.documents/tree/msd%·A109"
+            val directoryPath = "/storage/emulated/0/Download/Mega Downloads"
+            val offlineDirectoryPath = "/data/user/0/mega.privacy.android.app/files"
+            val offlineDirectory = "MEGA Offline"
+            val transfer = mockTransfer(
+                transferType = TransferType.DOWNLOAD,
+                parentPath = directoryPath,
+                appData = listOf(
+                    TransferAppData.SdCardDownload(
+                        targetPathForSDK = expected,
+                        finalTargetUri = expected,
+                        parentPath = "parentPath"
+                    )
+                )
+            )
+            whenever(stringWrapper.getSizeString(any())).thenReturn("10MB")
+            whenever(fileGateway.getOfflineFilesRootPath()).thenReturn("$offlineDirectoryPath/$offlineDirectory")
+            val actual = underTest(transfer, null)
+            assertThat(actual.path).isEqualTo(expected)
+        }
+
     @ParameterizedTest(name = "invoked with path {0} and isInShare {1}")
     @MethodSource("provideUploadParams")
     fun `test that upload transfer is mapped correctly when invoked`(

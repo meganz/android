@@ -18,6 +18,13 @@ interface AppDataOwner {
 fun AppDataOwner.isVoiceClip(): Boolean = appData.contains(TransferAppData.VoiceClip)
 
 /**
+ * Is SD card download
+ *
+ * @return True if the transfer is an SD card download, false otherwise.
+ */
+fun AppDataOwner.isSDCardDownload(): Boolean = appData.any { it is TransferAppData.SdCardDownload }
+
+/**
  * Is background transfer
  *
  * @return True if the transfer is a background transfer, false otherwise.
@@ -46,6 +53,28 @@ fun AppDataOwner.pendingMessageIds() =
         .takeIf { it.any { it is TransferAppData.ChatUpload } }
         ?.filterIsInstance<TransferAppData.ChatUpload>()
         ?.map { it.pendingMessageId }
+
+/**
+ * Get the sdcard transfer path, if the transfer is a sdcard transfer
+ *
+ * @return a String representation of the transfer path, null if cannot be retrieved
+ */
+fun AppDataOwner.getSDCardTransferPathForSDK() = getSDCardDownloadAppData()?.targetPathForSDK
+
+/**
+ * Get the sdcard transfer target uri, if the transfer is a sdcard transfer
+ */
+fun AppDataOwner.getSDCardFinalTransferUri() = getSDCardDownloadAppData()?.finalTargetUri
+
+/**
+ * @return TransferAppData.SdCardDownload associated to this transfer if it's a SdCard download transfer, null otherwise.
+ */
+fun AppDataOwner.getSDCardDownloadAppData(): TransferAppData.SdCardDownload? =
+    if (isSDCardDownload()) {
+        appData
+            .filterIsInstance<TransferAppData.SdCardDownload>()
+            .firstOrNull()
+    } else null
 
 /**
  * @return [TransferAppData.ChatDownload] associated to this transfer if it's a ChatDownload transfer, null otherwise.

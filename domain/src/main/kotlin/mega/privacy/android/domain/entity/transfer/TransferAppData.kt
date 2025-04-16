@@ -40,6 +40,20 @@ sealed interface TransferAppData {
     data object BackgroundTransfer : TransferAppData
 
     /**
+     * Identify a download transfers that needs to be stored in the SD card.
+     *
+     * @param targetPathForSDK the path where the transfers will be stored by the SDK
+     * @param finalTargetUri the target uri in the sd card where the file will be moved once downloaded
+     * @param parentPath the path to the folder containing the destination file.
+     *                   It can be only set when the transfer already exists in SDK.
+     */
+    data class SdCardDownload(
+        val targetPathForSDK: String,
+        val finalTargetUri: String,
+        val parentPath: String? = null,
+    ) : TransferAppData
+
+    /**
      * Identify the original [UriPath] of an upload transfer that needs to be copied to the cache folder, to access the original file if needed once the temporary file is removed.
      * @param originalUriPath
      */

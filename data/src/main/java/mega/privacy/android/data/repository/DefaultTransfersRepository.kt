@@ -1,5 +1,6 @@
 package mega.privacy.android.data.repository
 
+import android.os.Build
 import androidx.work.WorkInfo
 import dagger.Lazy
 import kotlinx.coroutines.CoroutineDispatcher
@@ -30,8 +31,10 @@ import kotlinx.coroutines.withContext
 import mega.privacy.android.data.extensions.failWithError
 import mega.privacy.android.data.extensions.getRequestListener
 import mega.privacy.android.data.gateway.AppEventGateway
+import mega.privacy.android.data.gateway.DeviceGateway
 import mega.privacy.android.data.gateway.MegaLocalRoomGateway
 import mega.privacy.android.data.gateway.MegaLocalStorageGateway
+import mega.privacy.android.data.gateway.SDCardGateway
 import mega.privacy.android.data.gateway.TransfersPreferencesGateway
 import mega.privacy.android.data.gateway.WorkManagerGateway
 import mega.privacy.android.data.gateway.api.MegaApiGateway
@@ -110,6 +113,8 @@ internal class DefaultTransfersRepository @Inject constructor(
     private val completedTransferPendingTransferMapper: CompletedTransferPendingTransferMapper,
     private val cancelTokenProvider: CancelTokenProvider,
     private val megaNodeMapper: MegaNodeMapper,
+    private val sdCardGateway: SDCardGateway,
+    private val deviceGateway: DeviceGateway,
     private val inProgressTransferMapper: InProgressTransferMapper,
     private val monitorFetchNodesFinishUseCase: MonitorFetchNodesFinishUseCase,
     private val transfersPreferencesGateway: Lazy<TransfersPreferencesGateway>,
@@ -442,17 +447,20 @@ internal class DefaultTransfersRepository @Inject constructor(
         megaLocalRoomGateway.getCompletedTransfers(size)
             .flowOn(ioDispatcher)
 
-    override suspend fun addCompletedTransfers(finishEvents: List<TransferEvent.TransferFinishEvent>) {
+    override suspend fun addCompletedTransfers(
+        finishEventsAndPaths: Map<TransferEvent.TransferFinishEvent, String?>,
+    ) {
         withContext(ioDispatcher) {
             var completedTransferState = CompletedTransferState.Completed
-            val completedTransfers = finishEvents.map { event ->
+            val completedTransfers = finishEventsAndPaths.map { (event, transferPath) ->
                 if (event.transfer.state == TransferState.STATE_FAILED) {
                     completedTransferState = CompletedTransferState.Error
                 }
-                completedTransferMapper(event.transfer, event.error)
+                completedTransferMapper(event.transfer, event.error, transferPath)
             }
             megaLocalRoomGateway.addCompletedTransfers(completedTransfers)
-            removeInProgressTransfers(finishEvents.map { it.transfer.uniqueId }.toSet())
+            removeInProgressTransfers(finishEventsAndPaths.keys.map { it.transfer.uniqueId }
+                .toSet())
             appEventGateway.broadcastCompletedTransfer(completedTransferState)
         }
     }
@@ -531,6 +539,10 @@ internal class DefaultTransfersRepository @Inject constructor(
         workerManagerGateway.monitorDownloadsStatusInfo().map { workInfos ->
             workInfos.any { it.state.isFinished }
         }
+
+    override suspend fun allowUserToSetDownloadDestination(): Boolean = withContext(ioDispatcher) {
+        deviceGateway.getSdkVersionInt() < Build.VERSION_CODES.R
+    }
 
     override fun monitorIsChatUploadsWorkerEnqueued() =
         workerManagerGateway.monitorChatUploadsStatusInfo().map { workInfos ->
@@ -712,6 +724,13 @@ internal class DefaultTransfersRepository @Inject constructor(
     override suspend fun getCurrentDownloadSpeed() = withContext(ioDispatcher) {
         megaApiGateway.currentDownloadSpeed
     }
+
+    override suspend fun getOrCreateSDCardTransfersCacheFolder() =
+        withContext(ioDispatcher) {
+            sdCardGateway.getOrCreateCacheFolder(
+                TRANSFERS_SD_TEMPORARY_FOLDER
+            )
+        }
 
     private fun transferredBytesFlow(transferType: TransferType): MutableStateFlow<Map<Long, Long>> =
         transferredBytesFlows[transferType] ?: error("Unknown transfer type: $transferType")
