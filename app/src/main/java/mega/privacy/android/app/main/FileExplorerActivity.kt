@@ -331,6 +331,7 @@ class FileExplorerActivity : PasscodeActivity(), MegaRequestListenerInterface,
                 }
 
                 if (totalAttached + totalErrors == pendingToAttach) {
+                    finishFileExplorer()
                     if (totalErrors == 0 || totalAttached > 0) {
                         val intent = Intent(this, ManagerActivity::class.java)
                         intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP)
@@ -342,7 +343,6 @@ class FileExplorerActivity : PasscodeActivity(), MegaRequestListenerInterface,
                     } else {
                         showSnackbar(getString(R.string.files_send_to_chat_error))
                     }
-                    finishFileExplorer()
                 }
             }
         }
