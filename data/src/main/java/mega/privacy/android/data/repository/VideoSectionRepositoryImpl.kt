@@ -10,7 +10,6 @@ import kotlinx.coroutines.flow.merge
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.suspendCancellableCoroutine
 import kotlinx.coroutines.withContext
-import kotlinx.serialization.encodeToString
 import kotlinx.serialization.json.Json
 import mega.privacy.android.data.extensions.failWithError
 import mega.privacy.android.data.extensions.getRequestListener
@@ -401,9 +400,9 @@ internal class VideoSectionRepositoryImpl @Inject constructor(
     }
 
     override suspend fun monitorRecentlyWatchedVideoNodes(): Flow<List<TypedVideoNode>> =
-        withContext(ioDispatcher) {
-            val offlineItems = getAllOfflineNodeHandle()
-            getRecentlyWatchedData().map { list ->
+        getRecentlyWatchedData().map { list ->
+            withContext(ioDispatcher) {
+                val offlineItems = getAllOfflineNodeHandle()
                 list.mapNotNull { item ->
                     megaApiGateway.getMegaNodeByHandle(item.videoHandle)?.let { megaNode ->
                         val title =

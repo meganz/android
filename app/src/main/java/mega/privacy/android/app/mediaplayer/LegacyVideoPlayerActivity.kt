@@ -1,5 +1,6 @@
 package mega.privacy.android.app.mediaplayer
 
+import mega.privacy.android.shared.resources.R as sharedR
 import android.app.Activity
 import android.app.Dialog
 import android.content.BroadcastReceiver
@@ -50,6 +51,7 @@ import androidx.navigation.fragment.NavHostFragment
 import com.google.android.material.dialog.MaterialAlertDialogBuilder
 import com.google.android.material.snackbar.Snackbar
 import dagger.hilt.android.AndroidEntryPoint
+import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.FlowPreview
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.flow.debounce
@@ -58,6 +60,7 @@ import kotlinx.coroutines.flow.launchIn
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.onEach
 import kotlinx.coroutines.launch
+import kotlinx.coroutines.withContext
 import mega.privacy.android.analytics.Analytics
 import mega.privacy.android.app.R
 import mega.privacy.android.app.activities.OfflineFileInfoActivity
@@ -135,8 +138,9 @@ import mega.privacy.android.domain.entity.mediaplayer.RepeatToggleMode
 import mega.privacy.android.domain.entity.node.NodeId
 import mega.privacy.android.domain.exception.BlockedMegaException
 import mega.privacy.android.domain.exception.QuotaExceededMegaException
+import mega.privacy.android.domain.qualifier.IoDispatcher
+import mega.privacy.android.domain.qualifier.MainDispatcher
 import mega.privacy.android.domain.usecase.featureflag.GetFeatureFlagValueUseCase
-import mega.privacy.android.shared.resources.R as sharedR
 import mega.privacy.mobile.analytics.event.VideoPlayerGetLinkMenuToolbarEvent
 import mega.privacy.mobile.analytics.event.VideoPlayerHideNodeMenuItemEvent
 import mega.privacy.mobile.analytics.event.VideoPlayerInfoMenuItemEvent
@@ -171,6 +175,14 @@ class LegacyVideoPlayerActivity : MediaPlayerActivity() {
      */
     @Inject
     lateinit var getFeatureFlagValueUseCase: GetFeatureFlagValueUseCase
+
+    @Inject
+    @IoDispatcher
+    lateinit var ioDispatcher: CoroutineDispatcher
+
+    @Inject
+    @MainDispatcher
+    lateinit var mainDispatcher: CoroutineDispatcher
 
     private var isHiddenNodesEnabled: Boolean = false
 
@@ -1103,19 +1115,30 @@ class LegacyVideoPlayerActivity : MediaPlayerActivity() {
             R.id.add_to,
                 -> {
                 if (item.itemId == R.id.properties && adapterType != OFFLINE_ADAPTER) {
-                    val node = megaApi.getNodeByHandle(playingHandle)
-                    if (node == null) {
-                        Timber.e("onOptionsItemSelected properties non-offline null node")
-                        return false
+                    lifecycleScope.launch(ioDispatcher) {
+                        val node = megaApi.getNodeByHandle(playingHandle)
+                        if (node == null) {
+                            return@launch
+                        }
+                        withContext(mainDispatcher) {
+                            viewModel.updateMenuClickEventFlow(
+                                menuId = item.itemId,
+                                adapterType = adapterType,
+                                playingHandle = playingHandle,
+                                launchIntent = intent
+                            )
+                        }
                     }
+                    return true
+                } else {
+                    viewModel.updateMenuClickEventFlow(
+                        menuId = item.itemId,
+                        adapterType = adapterType,
+                        playingHandle = playingHandle,
+                        launchIntent = intent
+                    )
+                    return true
                 }
-                viewModel.updateMenuClickEventFlow(
-                    menuId = item.itemId,
-                    adapterType = adapterType,
-                    playingHandle = playingHandle,
-                    launchIntent = intent
-                )
-                return true
             }
         }
         return false
@@ -1137,7 +1160,11 @@ class LegacyVideoPlayerActivity : MediaPlayerActivity() {
         val adapterType = intent.getIntExtra(INTENT_EXTRA_KEY_ADAPTER_TYPE, INVALID_VALUE)
         refreshMenuOptionsJob?.cancel()
         refreshMenuOptionsJob = lifecycleScope.launch {
-            val node = videoViewModel.getCurrentPlayingNode()
+            val (node, isInRubbish) = withContext(ioDispatcher) {
+                val node = videoViewModel.getCurrentPlayingNode()
+                val isInRubbish = megaApi.isInRubbish(node)
+                node to isInRubbish
+            }
             when (currentFragmentId) {
                 R.id.video_main_player -> {
                     when {
@@ -1151,7 +1178,7 @@ class LegacyVideoPlayerActivity : MediaPlayerActivity() {
                                 currentFragmentId == R.id.video_main_player
                         }
 
-                        adapterType == RUBBISH_BIN_ADAPTER || megaApi.isInRubbish(node) -> {
+                        adapterType == RUBBISH_BIN_ADAPTER || isInRubbish -> {
                             menu.toggleAllMenuItemsVisibility(false)
 
                             menu.findItem(R.id.properties).isVisible =
