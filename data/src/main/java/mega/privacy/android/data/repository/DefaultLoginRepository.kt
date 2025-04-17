@@ -4,14 +4,12 @@ import dagger.Lazy
 import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Job
-import kotlinx.coroutines.async
 import kotlinx.coroutines.channels.awaitClose
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.callbackFlow
 import kotlinx.coroutines.flow.flowOn
 import kotlinx.coroutines.flow.onEach
-import kotlinx.coroutines.isActive
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.suspendCancellableCoroutine
 import kotlinx.coroutines.withContext
@@ -32,7 +30,6 @@ import mega.privacy.android.data.mapper.login.FetchNodesUpdateMapper
 import mega.privacy.android.data.mapper.login.TemporaryWaitingErrorMapper
 import mega.privacy.android.domain.entity.login.FetchNodesUpdate
 import mega.privacy.android.domain.entity.login.LoginStatus
-import mega.privacy.android.domain.entity.login.TemporaryWaitingError
 import mega.privacy.android.domain.exception.ChatLoggingOutException
 import mega.privacy.android.domain.exception.ChatNotInitializedErrorStatus
 import mega.privacy.android.domain.exception.ChatNotInitializedUnknownStatus
@@ -48,7 +45,6 @@ import mega.privacy.android.domain.exception.account.AccountExistedException
 import mega.privacy.android.domain.exception.login.FetchNodesBlockedAccount
 import mega.privacy.android.domain.exception.login.FetchNodesErrorAccess
 import mega.privacy.android.domain.exception.login.FetchNodesUnknownStatus
-import mega.privacy.android.domain.monitoring.CrashReporter
 import mega.privacy.android.domain.qualifier.ApplicationScope
 import mega.privacy.android.domain.qualifier.IoDispatcher
 import mega.privacy.android.domain.repository.security.LoginRepository
@@ -56,9 +52,6 @@ import nz.mega.sdk.MegaChatApi
 import nz.mega.sdk.MegaError
 import nz.mega.sdk.MegaRequest
 import timber.log.Timber
-import java.net.HttpURLConnection
-import java.net.InetAddress
-import java.net.URL
 import javax.inject.Inject
 import kotlin.coroutines.Continuation
 import kotlin.coroutines.suspendCoroutine
@@ -83,7 +76,6 @@ internal class DefaultLoginRepository @Inject constructor(
     @ApplicationScope private val applicationScope: CoroutineScope,
     private val setLogoutFlagWrapper: SetLogoutFlagWrapper,
     private val credentialsPreferencesGateway: Lazy<CredentialsPreferencesGateway>,
-    private val crashReporter: CrashReporter,
 ) : LoginRepository {
 
     override suspend fun initMegaChat(session: String) =
@@ -228,83 +220,6 @@ internal class DefaultLoginRepository @Inject constructor(
         }
     }
 
-    /**
-     * A temporary method get IP address using DNS resolver, and perform HTTP call to check internet connectivity
-     * @param address domain address to ping, eg mega.io
-     * @return Pair<Boolean, String> isHttpRequestSuccess, message with IP and response code
-     */
-    private suspend fun pingDomainAddress(address: String) = withContext(ioDispatcher) {
-        var isHttpRequestSuccess = true
-        val hostAddress = runCatching {
-            InetAddress.getByName(address).hostAddress
-        }.getOrElse {
-            "DNS lookup failed due to ${it.message}"
-        }
-
-        val httpStatusCode = runCatching {
-            val connection = URL("https://$address").openConnection() as HttpURLConnection
-            connection.apply {
-                setRequestProperty("User-Agent", "MegaAndroid")
-                setRequestProperty("Connection", "close")
-                connectTimeout = 2500
-                readTimeout = 2500
-                connect()
-            }
-            connection.responseCode
-        }.getOrElse {
-            isHttpRequestSuccess = false
-            "Failed due to ${it.message}"
-        }
-
-        isHttpRequestSuccess to "Ping: $address: $hostAddress, HTTP Status: $httpStatusCode"
-    }
-
-    /**
-     * A temporary method to report log to Crashlytics when connectivity issue occurred during login
-     * @param error MegaError
-     */
-    private fun reportLogToCrashlytics(error: MegaError, waitingReason: Int) {
-        applicationScope.launch(ioDispatcher) {
-            val publicIpDeferred = async {
-                getPublicIpAddress()
-            }
-            val googlePingDeferred = async {
-                pingDomainAddress("google.com")
-            }
-            val megaPingDeferred = async {
-                pingDomainAddress("g.api.mega.co.nz")
-            }
-            val publicIp = publicIpDeferred.await()
-            val googlePing = googlePingDeferred.await()
-            val megaPing = megaPingDeferred.await()
-
-            // So don't send log if user doesn't a valid internet connectivity
-            // even though Mobile Data or WiFi is enabled
-            if (!googlePing.first && !megaPing.first) {
-                Timber.w("Ping to mega and google has failed, user may not have valid internet connectivity")
-                return@launch
-            }
-
-            crashReporter.report(
-                Throwable(
-                    """Connection issue occurred during login. 
-                    Error code: ${error.errorCode},
-                    Error value: ${error.value.toInt()},
-                    Waiting reason: RETRY_CONNECTIVITY($waitingReason),
-                    Public IP: $publicIp,
-                    ${googlePing.second},
-                    ${megaPing.second}""".trimIndent()
-                )
-            )
-        }
-    }
-
-    private suspend fun getPublicIpAddress() = withContext(ioDispatcher) {
-        runCatching {
-            URL("https://api.ipify.org/").openStream().bufferedReader().use { it.readLine() }
-        }.getOrDefault("Failed to get public IP address")
-    }
-
     private fun loginRequest(
         loginRequest: (OptionalMegaRequestListenerInterface) -> Unit,
     ) = callbackFlow {
@@ -321,9 +236,6 @@ internal class DefaultLoginRepository @Inject constructor(
                             val temporaryError = waitingReason.let {
                                 Timber.w("Waiting, retry reason for ${request.requestString}: $it")
                                 temporaryWaitingErrorMapper(it)
-                            }
-                            if (this.isActive && temporaryError == TemporaryWaitingError.ConnectivityIssues) {
-                                reportLogToCrashlytics(error, waitingReason)
                             }
                             trySend(LoginStatus.LoginWaiting(temporaryError))
                         }
