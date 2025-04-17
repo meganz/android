@@ -38,7 +38,6 @@ import mega.privacy.android.domain.exception.account.AccountExistedException
 import mega.privacy.android.domain.exception.login.FetchNodesBlockedAccount
 import mega.privacy.android.domain.exception.login.FetchNodesErrorAccess
 import mega.privacy.android.domain.exception.login.FetchNodesUnknownStatus
-import mega.privacy.android.domain.monitoring.CrashReporter
 import nz.mega.sdk.MegaApiJava
 import nz.mega.sdk.MegaChatApi
 import nz.mega.sdk.MegaError
@@ -71,7 +70,6 @@ class DefaultLoginRepositoryTest {
     private val temporaryWaitingErrorMapper = mock<TemporaryWaitingErrorMapper>()
     private val setLogoutFlagWrapper = mock<SetLogoutFlagWrapper>()
     private val credentialsPreferencesGateway = mock<CredentialsPreferencesGateway>()
-    private val crashReporter = mock<CrashReporter>()
     private val testScope = CoroutineScope(UnconfinedTestDispatcher())
 
     private val email = "test@email.com"
@@ -93,7 +91,6 @@ class DefaultLoginRepositoryTest {
             applicationScope = testScope,
             setLogoutFlagWrapper = setLogoutFlagWrapper,
             credentialsPreferencesGateway = { credentialsPreferencesGateway },
-            crashReporter = crashReporter
         )
     }
 
