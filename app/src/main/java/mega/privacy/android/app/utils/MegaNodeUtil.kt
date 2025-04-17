@@ -1,11 +1,11 @@
 package mega.privacy.android.app.utils
 
+import mega.privacy.android.icon.pack.R as IconPackR
 import android.app.Activity
 import android.content.Context
 import android.content.Intent
 import android.content.res.Resources
 import android.graphics.drawable.Drawable
-import android.net.Uri
 import android.text.SpannableString
 import android.text.Spanned
 import android.text.method.LinkMovementMethod
@@ -23,8 +23,8 @@ import dagger.hilt.components.SingletonComponent
 import mega.privacy.android.app.MegaApplication
 import mega.privacy.android.app.MimeTypeList
 import mega.privacy.android.app.R
-import mega.privacy.android.app.activities.WebViewActivity
 import mega.privacy.android.app.di.getDbHandler
+import mega.privacy.android.app.extensions.launchUrl
 import mega.privacy.android.app.interfaces.ActivityLauncher
 import mega.privacy.android.app.interfaces.SnackbarShower
 import mega.privacy.android.app.interfaces.showSnackbar
@@ -74,7 +74,6 @@ import mega.privacy.android.app.utils.Util.getSizeString
 import mega.privacy.android.app.utils.Util.isOnline
 import mega.privacy.android.app.utils.Util.showSnackbar
 import mega.privacy.android.domain.entity.StorageState
-import mega.privacy.android.icon.pack.R as IconPackR
 import mega.privacy.android.navigation.MegaNavigator
 import nz.mega.sdk.MegaApiAndroid
 import nz.mega.sdk.MegaApiJava
@@ -996,10 +995,7 @@ object MegaNodeUtil {
 
         val clickableSpan = object : ClickableSpan() {
             override fun onClick(widget: View) {
-                val openTermsIntent = Intent(context, WebViewActivity::class.java)
-                openTermsIntent.flags = Intent.FLAG_ACTIVITY_CLEAR_TOP
-                openTermsIntent.data = Uri.parse(Constants.TAKEDOWN_URL)
-                context.startActivity(openTermsIntent)
+                context.launchUrl(Constants.TAKEDOWN_URL)
             }
         }
         urlSpan.setSpan(
@@ -1014,10 +1010,7 @@ object MegaNodeUtil {
             listener?.onCancelClicked()
         }
         builder.setNegativeButton(context.getString(R.string.dispute_takendown_file)) { dialog, _ ->
-            val openTermsIntent = Intent(context, WebViewActivity::class.java)
-            openTermsIntent.flags = Intent.FLAG_ACTIVITY_CLEAR_TOP
-            openTermsIntent.data = Uri.parse(Constants.DISPUTE_URL)
-            context.startActivity(openTermsIntent)
+            context.launchUrl(Constants.DISPUTE_URL)
             dialog.dismiss()
             listener?.onDisputeClicked()
         }
