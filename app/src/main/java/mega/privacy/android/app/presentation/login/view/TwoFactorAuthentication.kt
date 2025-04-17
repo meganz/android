@@ -1,7 +1,6 @@
 package mega.privacy.android.app.presentation.login.view
 
-import mega.android.core.ui.components.MegaText as MegaText3
-import mega.privacy.android.shared.resources.R as sharedR
+import android.content.res.Configuration
 import androidx.compose.foundation.isSystemInDarkTheme
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -32,6 +31,7 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import mega.android.core.ui.components.MegaClickableText
+import mega.android.core.ui.components.MegaText as MegaText3
 import mega.android.core.ui.components.indicators.LargeHUD
 import mega.android.core.ui.components.inputfields.DEFAULT_VERIFICATION_INPUT_LENGTH
 import mega.android.core.ui.components.inputfields.VerificationTextInputField
@@ -50,6 +50,7 @@ import mega.privacy.android.shared.original.core.ui.controls.buttons.TextMegaBut
 import mega.privacy.android.shared.original.core.ui.controls.progressindicator.MegaCircularProgressIndicator
 import mega.privacy.android.shared.original.core.ui.controls.text.MegaText
 import mega.privacy.android.shared.original.core.ui.preview.CombinedThemePreviews
+import mega.privacy.android.shared.resources.R as sharedR
 
 
 /**
@@ -141,7 +142,6 @@ fun NewTwoFactorAuthentication(
     onLostAuthenticatorDevice: () -> Unit,
     modifier: Modifier = Modifier,
 ) {
-    val scrollState = rememberScrollState()
     val request = remember { FocusRequester() }
     var code by rememberSaveable { mutableStateOf("") }
     val softKeyboard = LocalSoftwareKeyboardController.current
@@ -150,7 +150,10 @@ fun NewTwoFactorAuthentication(
         softKeyboard?.show()
     }
     val orientation = LocalConfiguration.current.orientation
-    val contentModifier = if (LocalDeviceType.current == DeviceType.Tablet) {
+    val isTablet = LocalDeviceType.current == DeviceType.Tablet
+    val isPhoneLandscape =
+        orientation == Configuration.ORIENTATION_LANDSCAPE && !isTablet
+    val contentModifier = if (isTablet || isPhoneLandscape) {
         Modifier
             .fillMaxHeight()
             .width(tabletScreenWidth(orientation))
@@ -164,10 +167,7 @@ fun NewTwoFactorAuthentication(
             modifier = Modifier.fillMaxSize(),
             horizontalAlignment = Alignment.CenterHorizontally
         ) {
-            Column(
-                modifier = contentModifier
-                    .verticalScroll(scrollState),
-            ) {
+            Column(modifier = contentModifier) {
                 MegaText3(
                     modifier = Modifier.padding(
                         vertical = LocalSpacing.current.x24

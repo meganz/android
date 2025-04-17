@@ -172,10 +172,9 @@
         <activity
             android:name=".presentation.login.LoginActivity"
             android:exported="true"
-            android:screenOrientation="portrait"
-            android:configChanges="orientation|screenSize"
+            android:configChanges="screenSize"
             android:theme="@style/Theme.Mega.Starting"
-            android:windowSoftInputMode="stateAlwaysHidden">
+            android:windowSoftInputMode="adjustResize|stateAlwaysHidden">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
                 <category android:name="android.intent.category.LAUNCHER" />

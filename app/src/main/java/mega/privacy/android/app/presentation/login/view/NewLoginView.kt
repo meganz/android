@@ -12,6 +12,8 @@ import androidx.compose.animation.core.rememberInfiniteTransition
 import androidx.compose.animation.core.tween
 import androidx.compose.animation.fadeIn
 import androidx.compose.animation.fadeOut
+import androidx.compose.animation.slideInVertically
+import androidx.compose.animation.slideOutVertically
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.gestures.detectTapGestures
@@ -24,6 +26,7 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.imePadding
+import androidx.compose.foundation.layout.navigationBarsPadding
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.statusBarsPadding
@@ -159,40 +162,60 @@ fun NewLoginView(
     var showChangeApiServerDialog by rememberSaveable { mutableStateOf(false) }
     val showLoginInProgress =
         state.isLoginInProgress || state.fetchNodesUpdate != null || state.isRequestStatusInProgress
+    val orientation = LocalConfiguration.current.orientation
+    val isTablet = LocalDeviceType.current == DeviceType.Tablet
+    val isPhoneLandscape =
+        orientation == Configuration.ORIENTATION_LANDSCAPE && !isTablet
+    val requiredLoginScrollState = rememberScrollState()
+    val twoFactorAuthScrollState = rememberScrollState()
     MegaScaffold(
         modifier = modifier
             .fillMaxSize()
+            .imePadding()
+            .navigationBarsPadding()
             .semantics { testTagsAsResourceId = true },
         snackbarHost = {
             MegaSnackbar(snackbarHostState)
         },
         topBar = {
             if (state.is2FARequired && !showLoginInProgress) {
-                MegaTopAppBar(
-                    modifier = Modifier.statusBarsPadding(),
-                    navigationType = AppBarNavigationType.Back(onBackPressed),
-                    title = stringResource(sharedR.string.settings_2fa),
-                )
+                AnimatedVisibility(
+                    visible = !isPhoneLandscape || !twoFactorAuthScrollState.canScrollBackward,
+                    enter = slideInVertically(initialOffsetY = { -it }),
+                    exit = slideOutVertically(targetOffsetY = { -it }),
+                ) {
+                    MegaTopAppBar(
+                        modifier = Modifier.statusBarsPadding(),
+                        navigationType = AppBarNavigationType.Back(onBackPressed),
+                        title = stringResource(sharedR.string.settings_2fa),
+                    )
+                }
             } else if (!showLoginInProgress) {
-                MegaTopAppBar(
-                    modifier = Modifier.statusBarsPadding(),
-                    title = "",
-                    navigationType = AppBarNavigationType.Back(onBackPressed),
-                    trailingIcons = {
-                        IconButton(
-                            onClick = {
-                                onReportIssue()
-                                Analytics.tracker.trackEvent(LoginHelpButtonPressedEvent)
-                            },
-                        ) {
-                            MegaIcon(
-                                painter = painterResource(id = mega.privacy.android.icon.pack.R.drawable.ic_help_circle_medium_regular_outline),
-                                tint = IconColor.Primary,
-                                contentDescription = "Report issue Icon"
-                            )
+                AnimatedVisibility(
+                    visible = !isPhoneLandscape || !requiredLoginScrollState.canScrollBackward,
+                    enter = slideInVertically(initialOffsetY = { -it }),
+                    exit = slideOutVertically(targetOffsetY = { -it }),
+                ) {
+                    MegaTopAppBar(
+                        modifier = Modifier.statusBarsPadding(),
+                        title = "",
+                        navigationType = AppBarNavigationType.Back(onBackPressed),
+                        trailingIcons = {
+                            IconButton(
+                                onClick = {
+                                    onReportIssue()
+                                    Analytics.tracker.trackEvent(LoginHelpButtonPressedEvent)
+                                },
+                            ) {
+                                MegaIcon(
+                                    painter = painterResource(id = mega.privacy.android.icon.pack.R.drawable.ic_help_circle_medium_regular_outline),
+                                    tint = IconColor.Primary,
+                                    contentDescription = "Report issue Icon"
+                                )
+                            }
                         }
-                    }
-                )
+                    )
+                }
             }
         },
     ) { paddingValues ->
@@ -212,19 +235,23 @@ fun NewLoginView(
                     onForgotPassword = onForgotPassword,
                     onCreateAccount = onCreateAccount,
                     onChangeApiServer = { showChangeApiServerDialog = true },
-                    modifier = Modifier.padding(paddingValues),
+                    modifier = Modifier
+                        .verticalScroll(requiredLoginScrollState)
+                        .padding(paddingValues),
                     onLoginExceptionConsumed = onLoginExceptionConsumed,
                     onResendVerificationEmail = onResendVerificationEmail,
                     onResetAccountBlockedEvent = onResetAccountBlockedEvent,
                     onResetResendVerificationEmailEvent = onResetResendVerificationEmailEvent,
-                    stopLogin = stopLogin
+                    stopLogin = stopLogin,
                 )
 
                 is2FARequired || multiFactorAuthState != null -> NewTwoFactorAuthentication(
                     state = this,
                     on2FAChanged = on2FAChanged,
                     onLostAuthenticatorDevice = onLostAuthenticatorDevice,
-                    modifier = Modifier.padding(paddingValues),
+                    modifier = Modifier
+                        .verticalScroll(twoFactorAuthScrollState)
+                        .padding(paddingValues),
                 )
             }
         }
@@ -266,9 +293,11 @@ private fun RequireLogin(
     modifier: Modifier = Modifier,
     onLoginExceptionConsumed: () -> Unit = {},
 ) {
-    val scrollState = rememberScrollState()
     val focusManager = LocalFocusManager.current
     val orientation = LocalConfiguration.current.orientation
+    val isTablet = LocalDeviceType.current == DeviceType.Tablet
+    val isPhoneLandscape =
+        orientation == Configuration.ORIENTATION_LANDSCAPE && !isTablet
     var wrongCredentials by remember { mutableStateOf(false) }
     var tooManyAttempts by remember { mutableStateOf(false) }
     var accountBlockedDetail by remember { mutableStateOf<AccountBlockedDetail?>(null) }
@@ -311,19 +340,17 @@ private fun RequireLogin(
     Box(
         modifier = modifier
             .fillMaxSize()
-            .verticalScroll(scrollState)
-            .imePadding()
             .pointerInput(Unit) {
                 detectTapGestures(onTap = {
                     focusManager.clearFocus(true)
                 })
             }, contentAlignment = Alignment.TopCenter
     ) {
-        val contentModifier = if (LocalDeviceType.current == DeviceType.Tablet) {
+        val contentModifier = if (isTablet || isPhoneLandscape) {
             Modifier
                 .fillMaxHeight()
                 .width(tabletScreenWidth(orientation))
-                .padding(top = 80.dp)
+                .padding(top = if (isTablet) 16.dp else 0.dp)
         } else {
             Modifier
                 .fillMaxSize()
@@ -335,7 +362,6 @@ private fun RequireLogin(
             Image(
                 modifier = Modifier
                     .size(120.dp)
-                    .padding(top = 32.dp)
                     .align(Alignment.CenterHorizontally),
                 painter = painterResource(id = R.drawable.ic_mega_round),
                 contentDescription = "Login Icon"

@@ -18,6 +18,7 @@ import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.launch
 import mega.android.core.ui.theme.AndroidTheme
 import mega.privacy.android.app.presentation.extensions.isDarkMode
+import mega.privacy.android.app.presentation.login.LoginActivity
 import mega.privacy.android.app.presentation.login.confirmemail.view.ConfirmEmailRoute
 import mega.privacy.android.app.presentation.login.model.LoginFragmentType
 import mega.privacy.android.domain.entity.ThemeMode
@@ -38,10 +39,6 @@ class ConfirmEmailFragment : Fragment() {
     lateinit var getThemeMode: GetThemeMode
 
     private val viewModel: ConfirmEmailViewModel by viewModels()
-
-    internal var onShowPendingFragment: ((fragmentType: LoginFragmentType) -> Unit)? = null
-    internal var onSetTemporalEmail: ((email: String) -> Unit)? = null
-    internal var onCancelConfirmationAccount: (() -> Unit)? = null
 
     private var emailTemp: String? = null
     private var firstNameTemp: String? = null
@@ -74,15 +71,9 @@ class ConfirmEmailFragment : Fragment() {
                         fullName = firstNameTemp.orEmpty(),
                         viewModel = viewModel,
                         uiState = uiState,
-                        onShowPendingFragment = {
-                            onShowPendingFragment?.invoke(it)
-                        },
-                        onSetTemporalEmail = {
-                            onSetTemporalEmail?.invoke(it)
-                        },
-                        onCancelConfirmationAccount = {
-                            onCancelConfirmationAccount?.invoke()
-                        },
+                        onShowPendingFragment = ::onShowPendingFragment,
+                        onSetTemporalEmail = ::onSetTemporalEmail,
+                        onCancelConfirmationAccount = ::onCancelConfirmationAccount,
                         sendFeedbackEmail = ::sendFeedbackEmail
                     )
                 }
@@ -94,20 +85,26 @@ class ConfirmEmailFragment : Fragment() {
                             .fillMaxSize(),
                         email = emailTemp.orEmpty(),
                         fullName = firstNameTemp,
-                        onShowPendingFragment = {
-                            onShowPendingFragment?.invoke(it)
-                        },
-                        onSetTemporalEmail = {
-                            onSetTemporalEmail?.invoke(it)
-                        },
-                        onCancelConfirmationAccount = {
-                            onCancelConfirmationAccount?.invoke()
-                        },
+                        onShowPendingFragment = ::onShowPendingFragment,
+                        onSetTemporalEmail = ::onSetTemporalEmail,
+                        onCancelConfirmationAccount = ::onCancelConfirmationAccount,
                         viewModel = viewModel
                     )
                 }
             }
         }
+    }
+
+    private fun onShowPendingFragment(fragmentType: LoginFragmentType) {
+        (activity as? LoginActivity)?.showFragment(fragmentType)
+    }
+
+    private fun onSetTemporalEmail(email: String) {
+        (activity as? LoginActivity)?.setTemporalEmail(email)
+    }
+
+    private fun onCancelConfirmationAccount() {
+        (activity as? LoginActivity)?.cancelConfirmationAccount()
     }
 
     private fun sendFeedbackEmail(email: String) {
@@ -122,16 +119,6 @@ class ConfirmEmailFragment : Fragment() {
             intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK)
             startActivity(intent)
         }
-    }
-
-    /**
-     * Called when the view previously created by onCreateView has been detached from the fragment.
-     */
-    override fun onDestroyView() {
-        super.onDestroyView()
-        onShowPendingFragment = null
-        onSetTemporalEmail = null
-        onCancelConfirmationAccount = null
     }
 
     companion object {
