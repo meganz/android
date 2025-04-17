@@ -125,7 +125,9 @@ class ImportFilesFragment : Fragment(), OnImportFilesAdapterFooterListener {
             adapter?.setImportNameFiles(nameFiles)
         }
 
-        binding.fileListView.adapter = adapter
+        if (binding.fileListView.adapter == null) {
+            binding.fileListView.adapter = adapter
+        }
         adapter?.setFooterListener(this)
     }
 

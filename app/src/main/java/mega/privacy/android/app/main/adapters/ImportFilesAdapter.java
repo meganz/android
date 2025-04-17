@@ -33,6 +33,7 @@ import org.jetbrains.annotations.NotNull;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
+import java.util.Objects;
 
 import coil.Coil;
 import coil.request.ImageRequest;
@@ -263,6 +264,7 @@ public class ImportFilesAdapter extends RecyclerView.Adapter<RecyclerView.ViewHo
                             names.put(fileName, newName);
                             ((FileExplorerActivity) context).setNameFiles(names);
                             updateNameLayout(((ViewHolderImportFiles) holder).nameLayout, ((ViewHolderImportFiles) holder).name);
+                            hideKeyboardView(context, v1, 0);
                         } else {
                             positionWithFocus = holder.getBindingAdapterPosition();
                         }
@@ -308,10 +310,11 @@ public class ImportFilesAdapter extends RecyclerView.Adapter<RecyclerView.ViewHo
     private void setDataList(boolean areItemsVisible) {
         if (areItemsVisible) {
             files = filesAll;
+            notifyItemRangeInserted(filesPartial.size(), files.size() - filesPartial.size());
         } else {
             files = filesPartial;
+            notifyItemRangeRemoved(filesPartial.size(), files.size() - filesPartial.size());
         }
-        notifyDataSetChanged();
     }
 
     /**
@@ -360,8 +363,10 @@ public class ImportFilesAdapter extends RecyclerView.Adapter<RecyclerView.ViewHo
     }
 
     public void setImportNameFiles(HashMap<String, String> names) {
-        this.names = names;
-        notifyDataSetChanged();
+        if (!Objects.equals(this.names, names)) {
+            this.names = names;
+            notifyDataSetChanged();
+        }
     }
 
     /**
