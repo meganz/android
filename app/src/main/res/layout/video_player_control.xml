@@ -96,6 +96,12 @@
             app:layout_constraintStart_toStartOf="parent"
             tools:text="Cashew Rhythm" />
 
+        <View
+            android:id="@+id/navigation_bar_bg"
+            android:layout_width="match_parent"
+            android:layout_height="0dp"
+            android:visibility="gone"/>
+
         <androidx.constraintlayout.widget.ConstraintLayout
             android:id="@+id/controls_view"
             android:layout_width="0dp"

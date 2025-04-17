@@ -287,13 +287,10 @@ internal fun VideoPlayerScreen(
                     val controllerView = root.findViewById<View>(R.id.controls_view)
                     playerComposeView.keepScreenOn =
                         uiState.mediaPlaybackState == MediaPlaybackState.Playing
-                    val layoutParams =
-                        controllerView.layoutParams as ViewGroup.MarginLayoutParams
-                    if (orientation == ORIENTATION_PORTRAIT)
-                        layoutParams.bottomMargin = navigationBarHeightPx
-                    else
-                        layoutParams.marginEnd = navigationBarHeightPx
-                    controllerView.layoutParams = layoutParams
+
+                    updateControllerViewPadding(controllerView, orientation, navigationBarHeightPx)
+                    root.findViewById<View>(R.id.navigation_bar_bg).isVisible =
+                        orientation != ORIENTATION_PORTRAIT
 
                     root.findViewById<ProgressBar>(R.id.loading_video_player_controller_view).isVisible =
                         playbackState <= STATE_BUFFERING
@@ -410,6 +407,19 @@ private fun getNavigationBarHeight(
     with(density) { WindowInsets.navigationBars.getRight(density, layoutDirection).toDp() }
 } else {
     with(density) { WindowInsets.navigationBars.getBottom(density).toDp() }
+}
+
+private fun updateControllerViewPadding(controllerView: View, orientation: Int, padding: Int) {
+    val layoutParams =
+        controllerView.layoutParams as ViewGroup.MarginLayoutParams
+    if (orientation == ORIENTATION_PORTRAIT) {
+        controllerView.setPadding(0, 0, 0, padding)
+        layoutParams.bottomMargin = 0
+    } else {
+        controllerView.setPadding(0, 0, 0, 0)
+        layoutParams.marginEnd = padding
+    }
+    controllerView.layoutParams = layoutParams
 }
 
 @SuppressLint("DefaultLocale")

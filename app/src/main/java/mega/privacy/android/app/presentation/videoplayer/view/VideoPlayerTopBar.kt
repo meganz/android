@@ -20,7 +20,7 @@ internal fun VideoPlayerTopBar(
         modifier = modifier.testTag(VIDEO_PLAYER_TOP_BAR_TEST_TAG),
         title = title,
         appBarType = AppBarType.BACK_NAVIGATION,
-        elevation = 0.dp,
+        elevation = 1.dp,
         onNavigationPressed = onBackPressed,
         actions = menuActions,
         onActionPressed = {

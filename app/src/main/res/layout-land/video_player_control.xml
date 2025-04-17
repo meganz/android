@@ -100,6 +100,15 @@
             app:layout_constraintTop_toBottomOf="@id/image_button_lock"
             app:tint="@color/white" />
 
+        <View
+            android:id="@+id/navigation_bar_bg"
+            android:layout_width="0dp"
+            android:layout_height="match_parent"
+            android:background="@color/grey_alpha_070"
+            app:layout_constraintStart_toEndOf="@id/controls_view"
+            app:layout_constraintEnd_toEndOf="parent"
+            android:visibility="gone"/>
+
         <ImageButton
             android:id="@+id/image_screenshot"
             style="@style/VideoPlayerButton"
