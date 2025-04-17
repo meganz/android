@@ -17,10 +17,10 @@ import mega.privacy.android.app.MegaApplication
 import mega.privacy.android.app.OpenPasswordLinkActivity
 import mega.privacy.android.app.R
 import mega.privacy.android.app.activities.PasscodeActivity
-import mega.privacy.android.app.activities.WebViewActivity
 import mega.privacy.android.app.arch.extensions.collectFlow
 import mega.privacy.android.app.databinding.ActivityOpenLinkBinding
 import mega.privacy.android.app.extensions.enableEdgeToEdgeAndConsumeInsets
+import mega.privacy.android.app.extensions.launchUrl
 import mega.privacy.android.app.globalmanagement.MegaChatRequestHandler
 import mega.privacy.android.app.listeners.LoadPreviewListener
 import mega.privacy.android.app.main.ManagerActivity
@@ -206,17 +206,17 @@ class OpenLinkActivity : PasscodeActivity(), MegaRequestListenerInterface,
             matchRegexs(url, EMAIL_VERIFY_LINK_REGEXS) -> {
                 Timber.d("Open email verification link")
                 MegaApplication.setIsWebOpenDueToEmailVerification(true)
-                openWebLink(url)
+                this.launchUrl(url)
             }
             // Web session link
             matchRegexs(url, WEB_SESSION_LINK_REGEXS) -> {
                 Timber.d("Open web session link")
-                openWebLink(url)
+                this.launchUrl(url)
             }
 
             matchRegexs(url, BUSINESS_INVITE_LINK_REGEXS) -> {
                 Timber.d("Open business invite link")
-                openWebLink(url)
+                this.launchUrl(url)
             }
             //MEGA DROP link
             matchRegexs(url, MEGA_DROP_LINK_REGEXS) -> {
@@ -449,7 +449,7 @@ class OpenLinkActivity : PasscodeActivity(), MegaRequestListenerInterface,
             matchRegexs(url, REVERT_CHANGE_PASSWORD_LINK_REGEXS)
                     || matchRegexs(url, MEGA_BLOG_LINK_REGEXS) -> {
                 Timber.d("Open revert password change link: $url")
-                openWebLink(url)
+                this.launchUrl(url)
             }
 
             // Open Sync folder link
@@ -658,23 +658,9 @@ class OpenLinkActivity : PasscodeActivity(), MegaRequestListenerInterface,
      */
     private fun checkIfRequiresTransferSession(url: String) {
         if (!requiresTransferSession(this, url)) {
-            openWebLink(url)
+            this.launchUrl(url)
         }
     }
-
-    /**
-     * Open web link
-     *
-     * @param url web link
-     */
-    fun openWebLink(url: String?) =
-        url?.let {
-            startActivity(
-                Intent(this, WebViewActivity::class.java)
-                    .setData(Uri.parse(it))
-            )
-            finish()
-        }
 
     private fun openWebLinkInBrowser(url: String?) = url?.let {
         val intent = Intent(ACTION_VIEW).apply { data = Uri.parse(url) }
