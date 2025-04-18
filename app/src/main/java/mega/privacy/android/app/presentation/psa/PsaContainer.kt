@@ -1,8 +1,6 @@
 package mega.privacy.android.app.presentation.psa
 
 import android.content.Context
-import android.content.Intent
-import android.net.Uri
 import androidx.compose.foundation.isSystemInDarkTheme
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.fillMaxSize
@@ -26,7 +24,7 @@ import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.launch
-import mega.privacy.android.app.activities.WebViewActivity
+import mega.privacy.android.app.extensions.launchUrl
 import mega.privacy.android.app.presentation.psa.model.PsaState
 import mega.privacy.android.app.presentation.psa.view.InfoPsaView
 import mega.privacy.android.app.presentation.psa.view.PsaView
@@ -181,9 +179,7 @@ private fun NestedPsaView(
 }
 
 private fun navigateToWebView(context: Context, psaUrl: String) {
-    val intent = Intent(context, WebViewActivity::class.java)
-    intent.data = Uri.parse(psaUrl)
-    context.startActivity(intent)
+    context.launchUrl(psaUrl)
 }
 
 @CombinedThemePreviews
