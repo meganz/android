@@ -71,4 +71,8 @@ internal class SyncNotificationRepositoryImpl @Inject constructor(
             syncNotificationGateway.getNotificationByType(type.name)
                 .mapNotNull { it.notificationId }
         }
+
+    override fun getSyncIssueNotificationByType(type: SyncNotificationType): SyncNotificationMessage {
+        return genericErrorToNotificationMessageMapper(type)
+    }
 }

@@ -63,4 +63,10 @@ interface SyncNotificationRepository {
      * @return all the IDs of the displayed notifications of a specific type
      */
     suspend fun getDisplayedNotificationsIdsByType(type: SyncNotificationType): List<Int>
+
+    /**
+     * Get Sync Issue Notification By Type
+     * @return the sync error notification message
+     */
+    fun getSyncIssueNotificationByType(type: SyncNotificationType): SyncNotificationMessage
 }
