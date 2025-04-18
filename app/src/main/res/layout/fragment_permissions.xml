@@ -1,106 +1,118 @@
 <?xml version="1.0" encoding="utf-8"?>
-<ScrollView xmlns:android="http://schemas.android.com/apk/res/android"
+<FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
     android:layout_width="match_parent"
-    android:layout_height="match_parent"
-    xmlns:app="http://schemas.android.com/apk/res-auto">
+    android:layout_height="match_parent">
 
-    <LinearLayout
+    <ScrollView
+        android:id="@+id/legacy_permissions_layout"
         android:layout_width="match_parent"
-        android:layout_height="match_parent"
-        android:orientation="vertical">
-
-        <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
-            android:orientation="vertical"
-            android:layout_width="match_parent"
-            android:layout_height="match_parent"
-            android:layout_marginLeft="36dp"
-            android:layout_marginRight="36dp"
-            android:id="@+id/setup_fragment_container" >
-
-            <ImageView
-                android:layout_width="90dp"
-                android:layout_height="90dp"
-                android:layout_marginTop="50dp"
-                app:tint="@color/red_600_white_087"
-                android:src="@drawable/logo_loading_ic"/>
-
-            <TextView
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_marginTop="50dp"
-                android:textAppearance="@style/TextAppearance.Mega.Headline6"
-                android:text="@string/general_setup_mega"/>
-
-            <TextView
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_marginTop="24dp"
-                android:textAppearance="@style/TextAppearance.Mega.Subtitle1.Secondary.Variant"
-                android:text="@string/setup_mega_explanation"/>
-
-            <LinearLayout
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:orientation="horizontal"
-                android:layout_marginTop="62dp"
-                android:paddingBottom="62dp">
-
-                <Button
-                    android:id="@+id/not_now_button"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:text="@string/permissions_not_now_button"
-                    style="?attr/borderlessButtonStyle"/>
-
-                <Button
-                    android:id="@+id/setup_button"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:text="@string/general_setup_mega"
-                    android:layout_marginLeft="16dp"
-                    style="?attr/materialButtonStyle"/>
-
-            </LinearLayout>
-
-        </LinearLayout>
+        android:layout_height="match_parent">
 
         <LinearLayout
-            android:id="@+id/allow_access_fragment_container"
             android:layout_width="match_parent"
             android:layout_height="match_parent"
             android:orientation="vertical">
 
-            <include
-                android:id="@+id/permissions_image_layout"
-                layout="@layout/permissions_image_layout"/>
+            <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+                android:id="@+id/setup_fragment_container"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:layout_marginLeft="36dp"
+                android:layout_marginRight="36dp"
+                android:orientation="vertical">
+
+                <ImageView
+                    android:layout_width="90dp"
+                    android:layout_height="90dp"
+                    android:layout_marginTop="50dp"
+                    android:src="@drawable/logo_loading_ic"
+                    app:tint="@color/red_600_white_087" />
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="50dp"
+                    android:text="@string/general_setup_mega"
+                    android:textAppearance="@style/TextAppearance.Mega.Headline6" />
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="24dp"
+                    android:text="@string/setup_mega_explanation"
+                    android:textAppearance="@style/TextAppearance.Mega.Subtitle1.Secondary.Variant" />
+
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="62dp"
+                    android:orientation="horizontal"
+                    android:paddingBottom="62dp">
+
+                    <Button
+                        android:id="@+id/not_now_button"
+                        style="?attr/borderlessButtonStyle"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="@string/permissions_not_now_button" />
+
+                    <Button
+                        android:id="@+id/setup_button"
+                        style="?attr/materialButtonStyle"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_marginLeft="16dp"
+                        android:text="@string/general_setup_mega" />
+
+                </LinearLayout>
+
+            </LinearLayout>
 
             <LinearLayout
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:orientation="horizontal"
-                android:layout_marginTop="22dp"
-                android:paddingBottom="62dp"
-                android:layout_gravity="center">
+                android:id="@+id/allow_access_fragment_container"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:orientation="vertical">
 
-                <Button
-                    android:id="@+id/not_now_button_2"
+                <include
+                    android:id="@+id/permissions_image_layout"
+                    layout="@layout/permissions_image_layout" />
+
+                <LinearLayout
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:text="@string/permissions_not_now_button"
-                    style="?attr/borderlessButtonStyle"/>
+                    android:layout_gravity="center"
+                    android:layout_marginTop="22dp"
+                    android:orientation="horizontal"
+                    android:paddingBottom="62dp">
 
-                <Button
-                    android:id="@+id/enable_button"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:text="@string/button_continue"
-                    android:layout_marginLeft="16dp"
-                    style="?attr/materialButtonStyle"/>
+                    <Button
+                        android:id="@+id/not_now_button_2"
+                        style="?attr/borderlessButtonStyle"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="@string/permissions_not_now_button" />
+
+                    <Button
+                        android:id="@+id/enable_button"
+                        style="?attr/materialButtonStyle"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_marginLeft="16dp"
+                        android:text="@string/button_continue" />
+
+                </LinearLayout>
 
             </LinearLayout>
 
         </LinearLayout>
 
-    </LinearLayout>
+    </ScrollView>
 
-</ScrollView>
+    <androidx.compose.ui.platform.ComposeView
+        android:id="@+id/new_permissions_layout"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:visibility="gone" />
+</FrameLayout>

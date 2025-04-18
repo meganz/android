@@ -19,6 +19,7 @@ import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 import mega.privacy.android.analytics.Analytics
+import mega.privacy.android.app.arch.extensions.collectFlow
 import mega.privacy.android.app.databinding.FragmentPermissionsBinding
 import mega.privacy.android.app.databinding.PermissionsImageLayoutBinding
 import mega.privacy.android.app.main.ManagerActivity
@@ -88,6 +89,18 @@ class PermissionsFragment : Fragment() {
 
         setupView()
         setupObservers()
+        monitorUiState()
+    }
+
+    private fun monitorUiState() {
+        collectFlow(viewModel.uiState) { state ->
+            updatePermissionsLayoutVisibility(state.isOnboardingRevampEnabled)
+        }
+    }
+
+    private fun updatePermissionsLayoutVisibility(isRevampEnabled: Boolean) {
+        binding.legacyPermissionsLayout.isVisible = !isRevampEnabled
+        binding.newPermissionsLayout.isVisible = isRevampEnabled
     }
 
     private fun setupView() {

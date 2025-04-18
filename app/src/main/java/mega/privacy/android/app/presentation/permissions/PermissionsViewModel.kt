@@ -6,16 +6,22 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.CoroutineDispatcher
+import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.StateFlow
+import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import mega.privacy.android.app.data.extensions.filterAllowedPermissions
 import mega.privacy.android.app.data.extensions.toPermissionScreen
 import mega.privacy.android.app.data.extensions.toPermissionType
+import mega.privacy.android.app.featuretoggle.AppFeatures
 import mega.privacy.android.app.presentation.permissions.model.Permission
 import mega.privacy.android.app.presentation.permissions.model.PermissionScreen
 import mega.privacy.android.app.presentation.permissions.model.PermissionType
 import mega.privacy.android.app.utils.livedata.SingleLiveEvent
 import mega.privacy.android.domain.qualifier.IoDispatcher
 import mega.privacy.android.domain.repository.AccountRepository
+import mega.privacy.android.domain.usecase.featureflag.GetFeatureFlagValueUseCase
+import timber.log.Timber
 import javax.inject.Inject
 
 /**
@@ -25,13 +31,34 @@ import javax.inject.Inject
 class PermissionsViewModel @Inject constructor(
     private val defaultAccountRepository: AccountRepository,
     @IoDispatcher private val ioDispatcher: CoroutineDispatcher,
+    private val getFeatureFlagValueUseCase: GetFeatureFlagValueUseCase,
 ) : ViewModel() {
+    internal val uiState: StateFlow<PermissionsUIState>
+        field = MutableStateFlow(PermissionsUIState())
 
     private lateinit var missingPermissions: List<Permission>
     private lateinit var permissionScreens: MutableList<PermissionScreen>
     private val showInitialSetupScreen: MutableLiveData<Boolean> = MutableLiveData()
     private val currentPermission: MutableLiveData<PermissionScreen?> = MutableLiveData()
     private val askPermissionType = SingleLiveEvent<PermissionType>()
+
+    init {
+        setOnboardingRevampFlag()
+    }
+
+    private fun setOnboardingRevampFlag() {
+        viewModelScope.launch {
+            runCatching {
+                getFeatureFlagValueUseCase(AppFeatures.OnboardingRevamp)
+            }.onSuccess { isEnabled ->
+                uiState.update {
+                    it.copy(isOnboardingRevampEnabled = isEnabled)
+                }
+            }.onFailure {
+                Timber.e(it)
+            }
+        }
+    }
 
     /**
      * Checks if should show "Allow access" screen.
