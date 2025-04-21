@@ -294,6 +294,7 @@ internal fun NavGraphBuilder.syncNavGraph(
                 syncFoldersViewModel = hiltViewModel(viewModelStoreOwner = viewModelStoreOwner),
                 syncStalledIssuesViewModel = hiltViewModel(viewModelStoreOwner = viewModelStoreOwner),
                 syncSolvedIssuesViewModel = hiltViewModel(viewModelStoreOwner = viewModelStoreOwner),
+                syncIssueNotificationViewModel = hiltViewModel(viewModelStoreOwner = viewModelStoreOwner),
                 selectedChip = selectedChip,
                 onOpenMegaFolderClicked = { handle ->
                     megaNavigator.openSyncMegaFolder(context, handle)

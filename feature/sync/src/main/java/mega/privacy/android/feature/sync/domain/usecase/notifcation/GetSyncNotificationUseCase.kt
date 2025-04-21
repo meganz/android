@@ -4,10 +4,10 @@ import mega.privacy.android.domain.entity.sync.SyncError
 import mega.privacy.android.feature.sync.domain.entity.FolderPair
 import mega.privacy.android.feature.sync.domain.entity.StalledIssue
 import mega.privacy.android.feature.sync.domain.entity.SyncNotificationMessage
-import mega.privacy.android.feature.sync.domain.entity.SyncNotificationType.ERROR
 import mega.privacy.android.feature.sync.domain.entity.SyncNotificationType.BATTERY_LOW
-import mega.privacy.android.feature.sync.domain.entity.SyncNotificationType.STALLED_ISSUE
+import mega.privacy.android.feature.sync.domain.entity.SyncNotificationType.ERROR
 import mega.privacy.android.feature.sync.domain.entity.SyncNotificationType.NOT_CONNECTED_TO_WIFI
+import mega.privacy.android.feature.sync.domain.entity.SyncNotificationType.STALLED_ISSUE
 import mega.privacy.android.feature.sync.domain.repository.SyncNotificationRepository
 import mega.privacy.android.feature.sync.ui.notification.SyncNotificationManager
 import javax.inject.Inject
@@ -32,7 +32,7 @@ class GetSyncNotificationUseCase @Inject constructor(
         syncs: List<FolderPair>,
         stalledIssues: List<StalledIssue>,
     ): SyncNotificationMessage? {
-        val isNetworkConstraintRespected = isSyncOnlyByWifi && isUserOnWifi || !isSyncOnlyByWifi
+        val isNetworkConstraintRespected = (isSyncOnlyByWifi && isUserOnWifi) || !isSyncOnlyByWifi
 
         return when {
             syncs.isEmpty() -> {
@@ -106,7 +106,6 @@ class GetSyncNotificationUseCase @Inject constructor(
                 syncNotificationManager.cancelNotification(notificationId = notificationId)
             }
         syncNotificationRepository.deleteDisplayedNotificationByType(STALLED_ISSUE)
-
     }
 
     private suspend fun getBatteryLowNotification(): SyncNotificationMessage? =

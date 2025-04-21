@@ -18,26 +18,28 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextDecoration
 import androidx.compose.ui.unit.dp
+import mega.android.core.ui.theme.values.TextColor
 import mega.privacy.android.core.R
 import mega.privacy.android.shared.original.core.ui.controls.text.MegaText
 import mega.privacy.android.shared.original.core.ui.preview.CombinedThemePreviews
 import mega.privacy.android.shared.original.core.ui.theme.MegaOriginalTheme
 import mega.privacy.android.shared.original.core.ui.theme.OriginalTheme
-import mega.privacy.android.shared.original.core.ui.theme.extensions.subtitle1medium
-import mega.android.core.ui.theme.values.TextColor
 
 
 @Composable
 private fun InlineBaseBanner(
     title: String,
     message: String,
-    actionButtonText: String,
-    onActionButtonClick: () -> Unit,
+    actionButtonText: String?,
     iconColor: Color,
     modifier: Modifier = Modifier,
+    titleStyle: TextStyle = MaterialTheme.typography.subtitle1,
+    messageStyle: TextStyle = MaterialTheme.typography.body2,
+    onActionButtonClick: (() -> Unit)? = null,
     onCloseClick: (() -> Unit)? = null,
     iconResId: Int = R.drawable.ic_info,
     backgroundColor: Color = MegaOriginalTheme.colors.notifications.notificationWarning,
@@ -46,7 +48,7 @@ private fun InlineBaseBanner(
         modifier = modifier
             .fillMaxWidth()
             .background(color = backgroundColor)
-            .padding(top = 24.dp, bottom = 16.dp, start = 16.dp, end = 16.dp),
+            .padding(16.dp),
     ) {
         Row {
             Icon(
@@ -70,7 +72,7 @@ private fun InlineBaseBanner(
                 MegaText(
                     text = title,
                     textColor = TextColor.Primary,
-                    style = MaterialTheme.typography.subtitle1medium
+                    style = titleStyle
                 )
 
                 Spacer(modifier = Modifier.size(8.dp))
@@ -78,27 +80,29 @@ private fun InlineBaseBanner(
                 MegaText(
                     text = message,
                     textColor = TextColor.Primary,
-                    style = MaterialTheme.typography.body2
+                    style = messageStyle
                 )
 
                 Spacer(modifier = Modifier.size(4.dp))
 
-                Box(
-                    modifier = Modifier.clickable { onActionButtonClick() }) {
-                    Text(
-                        modifier = Modifier.padding(
-                            top = 4.dp,
-                            bottom = 4.dp,
-                            start = 0.dp,
-                            end = 4.dp
-                        ),
-                        text = actionButtonText,
-                        textDecoration = TextDecoration.Underline,
-                        color = MegaOriginalTheme.colors.support.info,
-                        style = MaterialTheme.typography.button.copy(
-                            fontWeight = FontWeight.Medium
+                actionButtonText?.let {
+                    Box(
+                        modifier = Modifier.clickable { onActionButtonClick?.invoke() }) {
+                        Text(
+                            modifier = Modifier.padding(
+                                top = 4.dp,
+                                bottom = 4.dp,
+                                start = 0.dp,
+                                end = 4.dp
+                            ),
+                            text = actionButtonText,
+                            textDecoration = TextDecoration.Underline,
+                            color = MegaOriginalTheme.colors.support.info,
+                            style = MaterialTheme.typography.button.copy(
+                                fontWeight = FontWeight.Medium
+                            )
                         )
-                    )
+                    }
                 }
             }
 
@@ -125,10 +129,12 @@ private fun InlineBaseBanner(
 fun InlineWarningBanner(
     title: String,
     message: String,
-    actionButtonText: String,
-    onActionButtonClick: () -> Unit,
-    onCloseClick: (() -> Unit),
     modifier: Modifier = Modifier,
+    titleStyle: TextStyle = MaterialTheme.typography.subtitle1,
+    messageStyle: TextStyle = MaterialTheme.typography.body2,
+    actionButtonText: String? = null,
+    onActionButtonClick: (() -> Unit)? = null,
+    onCloseClick: (() -> Unit),
 ) {
     InlineBaseBanner(
         title = title,
@@ -137,6 +143,8 @@ fun InlineWarningBanner(
         onActionButtonClick = onActionButtonClick,
         onCloseClick = onCloseClick,
         modifier = modifier,
+        titleStyle = titleStyle,
+        messageStyle = messageStyle,
         iconResId = mega.privacy.android.icon.pack.R.drawable.ic_alert_circle_regular_medium_outline,
         iconColor = MegaOriginalTheme.colors.support.warning,
         backgroundColor = MegaOriginalTheme.colors.notifications.notificationWarning

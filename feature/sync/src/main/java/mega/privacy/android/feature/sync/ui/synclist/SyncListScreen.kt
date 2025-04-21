@@ -1,8 +1,5 @@
 package mega.privacy.android.feature.sync.ui.synclist
 
-import mega.privacy.android.icon.pack.R as iconPackR
-import mega.privacy.android.shared.resources.R as sharedR
-import mega.privacy.android.shared.resources.R as sharedResR
 import androidx.activity.compose.LocalOnBackPressedDispatcherOwner
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -39,6 +36,7 @@ import kotlinx.coroutines.launch
 import mega.privacy.android.analytics.Analytics
 import mega.privacy.android.feature.sync.R
 import mega.privacy.android.feature.sync.domain.entity.StalledIssueResolutionAction
+import mega.privacy.android.feature.sync.ui.SyncIssueNotificationViewModel
 import mega.privacy.android.feature.sync.ui.model.StalledIssueUiItem
 import mega.privacy.android.feature.sync.ui.model.SyncModalSheetContent
 import mega.privacy.android.feature.sync.ui.permissions.SyncPermissionsManager
@@ -55,7 +53,9 @@ import mega.privacy.android.feature.sync.ui.synclist.stalledissues.SyncStalledIs
 import mega.privacy.android.feature.sync.ui.synclist.stalledissues.SyncStalledIssuesViewModel
 import mega.privacy.android.feature.sync.ui.views.ConflictDetailsDialog
 import mega.privacy.android.feature.sync.ui.views.IssuesResolutionDialog
+import mega.privacy.android.feature.sync.ui.views.SyncNotificationWarningBanner
 import mega.privacy.android.feature.sync.ui.views.SyncPermissionWarningBanner
+import mega.privacy.android.icon.pack.R as iconPackR
 import mega.privacy.android.shared.original.core.ui.controls.appbar.AppBarType
 import mega.privacy.android.shared.original.core.ui.controls.appbar.MegaAppBar
 import mega.privacy.android.shared.original.core.ui.controls.banners.ActionBanner
@@ -72,6 +72,8 @@ import mega.privacy.android.shared.original.core.ui.controls.layouts.MegaScaffol
 import mega.privacy.android.shared.original.core.ui.controls.sheets.BottomSheet
 import mega.privacy.android.shared.original.core.ui.model.MenuAction
 import mega.privacy.android.shared.original.core.ui.utils.ComposableLifecycle
+import mega.privacy.android.shared.resources.R as sharedR
+import mega.privacy.android.shared.resources.R as sharedResR
 import mega.privacy.mobile.analytics.event.AndroidBackupFABButtonPressedEvent
 import mega.privacy.mobile.analytics.event.AndroidSyncFABButtonEvent
 import mega.privacy.mobile.analytics.event.AndroidSyncMultiFABButtonPressedEvent
@@ -96,6 +98,7 @@ internal fun SyncListScreen(
     syncFoldersViewModel: SyncFoldersViewModel,
     syncStalledIssuesViewModel: SyncStalledIssuesViewModel,
     syncSolvedIssuesViewModel: SyncSolvedIssuesViewModel,
+    syncIssueNotificationViewModel: SyncIssueNotificationViewModel,
     title: String,
     isInCloudDrive: Boolean = false,
     selectedChip: SyncChip = SYNC_FOLDERS,
@@ -252,6 +255,7 @@ internal fun SyncListScreen(
                     syncFoldersViewModel = syncFoldersViewModel,
                     syncStalledIssuesViewModel = syncStalledIssuesViewModel,
                     syncSolvedIssuesViewModel = syncSolvedIssuesViewModel,
+                    syncIssueNotificationViewModel = syncIssueNotificationViewModel,
                     deviceName = title,
                     selectedChip = selectedChip,
                     snackBarHostState = scaffoldState.snackbarHostState,
@@ -279,6 +283,7 @@ private fun SyncListScreenContent(
     syncFoldersViewModel: SyncFoldersViewModel,
     syncStalledIssuesViewModel: SyncStalledIssuesViewModel,
     syncSolvedIssuesViewModel: SyncSolvedIssuesViewModel,
+    syncIssueNotificationViewModel: SyncIssueNotificationViewModel,
     deviceName: String,
     selectedChip: SyncChip = SYNC_FOLDERS,
 ) {
@@ -287,6 +292,7 @@ private fun SyncListScreenContent(
     val syncFoldersUiState by syncFoldersViewModel.uiState.collectAsStateWithLifecycle()
     val syncStalledIssuesState by syncStalledIssuesViewModel.state.collectAsStateWithLifecycle()
     val syncSolvedIssuesState by syncSolvedIssuesViewModel.state.collectAsStateWithLifecycle()
+    val issueNotificationState by syncIssueNotificationViewModel.state.collectAsStateWithLifecycle()
 
     val pullToRefreshState = rememberPullRefreshState(
         refreshing = syncFoldersUiState.isRefreshing,
@@ -297,6 +303,11 @@ private fun SyncListScreenContent(
     Column(modifier) {
         SyncPermissionWarningBanner(
             syncPermissionsManager = syncPermissionsManager
+        )
+        SyncNotificationWarningBanner(
+            issueNotificationState,
+            onDismissNotification = syncIssueNotificationViewModel::dismissNotification,
+            modifier = Modifier.padding(bottom = 8.dp)
         )
         if (syncFoldersUiState.isStorageOverQuota) {
             ActionBanner(

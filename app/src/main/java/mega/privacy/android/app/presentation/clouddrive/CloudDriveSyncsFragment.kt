@@ -1,7 +1,5 @@
 package mega.privacy.android.app.presentation.clouddrive
 
-import mega.privacy.android.icon.pack.R as iconPackR
-import mega.privacy.android.shared.resources.R as sharedR
 import android.app.Activity
 import android.content.Context
 import android.content.Intent
@@ -17,9 +15,14 @@ import androidx.activity.result.contract.ActivityResultContracts
 import androidx.annotation.StringRes
 import androidx.appcompat.app.AppCompatActivity
 import androidx.appcompat.view.ActionMode
+import androidx.compose.foundation.background
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.offset
+import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.pager.HorizontalPager
 import androidx.compose.foundation.pager.rememberPagerState
+import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.material.SnackbarHostState
 import androidx.compose.material.rememberScaffoldState
 import androidx.compose.runtime.Composable
@@ -36,6 +39,7 @@ import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.ViewCompositionStrategy
 import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.unit.dp
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.activityViewModels
 import androidx.fragment.app.viewModels
@@ -99,13 +103,16 @@ import mega.privacy.android.domain.entity.node.TypedNode
 import mega.privacy.android.domain.entity.sync.SyncType
 import mega.privacy.android.domain.usecase.GetThemeMode
 import mega.privacy.android.domain.usecase.featureflag.GetFeatureFlagValueUseCase
+import mega.privacy.android.feature.sync.ui.SyncIssueNotificationViewModel
 import mega.privacy.android.feature.sync.ui.permissions.SyncPermissionsManager
 import mega.privacy.android.feature.sync.ui.synclist.SyncListRoute
+import mega.privacy.android.icon.pack.R as iconPackR
 import mega.privacy.android.navigation.MegaNavigator
 import mega.privacy.android.shared.original.core.ui.controls.layouts.MegaScaffold
 import mega.privacy.android.shared.original.core.ui.controls.tab.Tabs
 import mega.privacy.android.shared.original.core.ui.theme.OriginalTheme
 import mega.privacy.android.shared.original.core.ui.utils.showAutoDurationSnackbar
+import mega.privacy.android.shared.resources.R as sharedR
 import mega.privacy.mobile.analytics.event.CloudDriveHideNodeMenuItemEvent
 import mega.privacy.mobile.analytics.event.CloudDriveScreenEvent
 import mega.privacy.mobile.analytics.event.SyncsTabEvent
@@ -171,6 +178,7 @@ class CloudDriveSyncsFragment : Fragment() {
     private val fileBrowserViewModel: FileBrowserViewModel by activityViewModels()
     private val sortByHeaderViewModel: SortByHeaderViewModel by activityViewModels()
     private val transfersManagementViewModel: TransfersManagementViewModel by activityViewModels()
+    private val syncIssueNotificationViewModel: SyncIssueNotificationViewModel by activityViewModels()
 
     private var tempNodeIds: List<NodeId> = listOf()
 
@@ -231,6 +239,7 @@ class CloudDriveSyncsFragment : Fragment() {
                     .collectAsStateWithLifecycle(initialValue = ThemeMode.System)
                 val uiState by fileBrowserViewModel.state.collectAsStateWithLifecycle()
                 val nodeActionState by nodeActionsViewModel.state.collectAsStateWithLifecycle()
+                val syncNotificationState by syncIssueNotificationViewModel.state.collectAsStateWithLifecycle()
                 val scaffoldState = rememberScaffoldState()
                 val snackbarHostState = scaffoldState.snackbarHostState
                 val coroutineScope = rememberCoroutineScope()
@@ -268,6 +277,19 @@ class CloudDriveSyncsFragment : Fragment() {
                                         addTextTab(
                                             text = stringResource(tabResIds[page]),
                                             tag = item.name,
+                                            suffix = { activeColor, color ->
+                                                if (item == CloudDriveTab.SYNC && syncNotificationState.syncNotificationType != null) {
+                                                    Box(
+                                                        modifier = Modifier
+                                                            .offset(6.dp, 0.dp)
+                                                            .size(4.dp)
+                                                            .background(
+                                                                color = activeColor,
+                                                                shape = CircleShape
+                                                            )
+                                                    )
+                                                }
+                                            }
                                         )
                                     }
                             }

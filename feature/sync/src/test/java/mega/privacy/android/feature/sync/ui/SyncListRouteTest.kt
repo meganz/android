@@ -11,8 +11,8 @@ import kotlinx.coroutines.runBlocking
 import mega.privacy.android.core.test.AnalyticsTestRule
 import mega.privacy.android.domain.entity.node.NodeId
 import mega.privacy.android.domain.entity.sync.SyncType
-import mega.privacy.android.feature.sync.domain.entity.SyncStatus
 import mega.privacy.android.feature.sync.R
+import mega.privacy.android.feature.sync.domain.entity.SyncStatus
 import mega.privacy.android.feature.sync.ui.model.SyncUiItem
 import mega.privacy.android.feature.sync.ui.permissions.SyncPermissionsManager
 import mega.privacy.android.feature.sync.ui.synclist.SOLVED_ISSUES_CHIP_TEST_TAG
@@ -63,6 +63,8 @@ class SyncListRouteTest {
     private val syncStalledIssuesState: StateFlow<SyncStalledIssuesState> = mock()
     private val syncSolvedIssuesViewModel: SyncSolvedIssuesViewModel = mock()
     private val syncSolvedIssuesState: StateFlow<SyncSolvedIssuesState> = mock()
+    private val syncIssueNotificationViewModel: SyncIssueNotificationViewModel = mock()
+    private val syncMonitorState: StateFlow<SyncMonitorState> = mock()
 
     private val synUiItems = listOf(
         SyncUiItem(
@@ -82,6 +84,9 @@ class SyncListRouteTest {
     fun setupMock(): Unit = runBlocking {
         whenever(state.value).thenReturn(SyncListState())
         whenever(viewModel.state).thenReturn(state)
+        whenever(syncMonitorState.value).thenReturn(
+            SyncMonitorState()
+        )
         whenever(syncFoldersUiState.value).thenReturn(
             SyncFoldersUiState(
                 syncUiItems = synUiItems,
@@ -92,6 +97,7 @@ class SyncListRouteTest {
         whenever(syncStalledIssuesViewModel.state).thenReturn(syncStalledIssuesState)
         whenever(syncSolvedIssuesState.value).thenReturn(SyncSolvedIssuesState(mock()))
         whenever(syncSolvedIssuesViewModel.state).thenReturn(syncSolvedIssuesState)
+        whenever(syncIssueNotificationViewModel.state).thenReturn(syncMonitorState)
     }
 
     private fun setComposeContent() {
@@ -106,6 +112,7 @@ class SyncListRouteTest {
                 syncFoldersViewModel = syncFoldersViewModel,
                 syncStalledIssuesViewModel = syncStalledIssuesViewModel,
                 syncSolvedIssuesViewModel = syncSolvedIssuesViewModel,
+                syncIssueNotificationViewModel = syncIssueNotificationViewModel,
                 onOpenMegaFolderClicked = {},
                 onCameraUploadsSettingsClicked = {},
             )
