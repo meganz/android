@@ -1,11 +1,13 @@
 package mega.privacy.android.domain.usecase.transfers.pending
 
 import mega.privacy.android.domain.entity.node.NodeId
+import mega.privacy.android.domain.entity.transfer.ActiveTransferActionGroupImpl
 import mega.privacy.android.domain.entity.transfer.TransferAppData
 import mega.privacy.android.domain.entity.transfer.TransferType
 import mega.privacy.android.domain.entity.transfer.pending.InsertPendingTransferRequest
 import mega.privacy.android.domain.entity.transfer.pending.PendingTransferNodeIdentifier
 import mega.privacy.android.domain.entity.uri.UriPath
+import mega.privacy.android.domain.repository.TimeSystemRepository
 import mega.privacy.android.domain.repository.TransferRepository
 import javax.inject.Inject
 
@@ -14,6 +16,7 @@ import javax.inject.Inject
  */
 class InsertPendingUploadsForFilesUseCase @Inject constructor(
     private val transferRepository: TransferRepository,
+    private val timeSystemRepository: TimeSystemRepository,
 ) {
     /**
      * Invoke
@@ -26,8 +29,17 @@ class InsertPendingUploadsForFilesUseCase @Inject constructor(
         pathsAndNames: Map<String, String?>,
         parentFolderId: NodeId,
         isHighPriority: Boolean = false,
-        appData: List<TransferAppData> = emptyList(),
     ) {
+        val transferGroupId = transferRepository.insertActiveTransferGroup(
+            ActiveTransferActionGroupImpl(
+                transferType = TransferType.GENERAL_UPLOAD,
+                destination = "",
+                startTime = timeSystemRepository.getCurrentTimeInMillis(),
+            )
+        )
+        val appData = listOfNotNull(
+            TransferAppData.TransferGroup(transferGroupId),
+        )
         transferRepository.insertPendingTransfers(
             pathsAndNames.map { (path, name) ->
                 InsertPendingTransferRequest(

@@ -2,41 +2,66 @@ package mega.privacy.android.domain.usecase.transfers.pending
 
 import kotlinx.coroutines.test.runTest
 import mega.privacy.android.domain.entity.node.NodeId
+import mega.privacy.android.domain.entity.transfer.ActiveTransferActionGroupImpl
 import mega.privacy.android.domain.entity.transfer.TransferAppData
 import mega.privacy.android.domain.entity.transfer.TransferType
 import mega.privacy.android.domain.entity.transfer.pending.InsertPendingTransferRequest
 import mega.privacy.android.domain.entity.transfer.pending.PendingTransferNodeIdentifier
 import mega.privacy.android.domain.entity.uri.UriPath
+import mega.privacy.android.domain.repository.TimeSystemRepository
 import mega.privacy.android.domain.repository.TransferRepository
 import org.junit.jupiter.api.BeforeAll
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.TestInstance
+import org.mockito.kotlin.doReturn
 import org.mockito.kotlin.mock
 import org.mockito.kotlin.reset
 import org.mockito.kotlin.verify
+import org.mockito.kotlin.whenever
 
 @TestInstance(TestInstance.Lifecycle.PER_CLASS)
 class InsertPendingUploadsForFilesUseCaseTest {
     private lateinit var underTest: InsertPendingUploadsForFilesUseCase
 
     private val transferRepository = mock<TransferRepository>()
+    private val timeSystemRepository = mock<TimeSystemRepository>()
 
     @BeforeAll
     fun setUp() {
-        underTest = InsertPendingUploadsForFilesUseCase(transferRepository)
+        underTest = InsertPendingUploadsForFilesUseCase(
+            transferRepository,
+            timeSystemRepository,
+        )
     }
 
     @BeforeEach
     fun cleanUp() {
-        reset(transferRepository)
+        reset(
+            transferRepository,
+            timeSystemRepository,
+        )
     }
 
     @Test
     fun `test that pending transfers are inserted with correct parameters`() = runTest {
         val pathsAndNames = (0..10).associate { "content://file$it" to "newName$it" }
         val parentFolderId = NodeId(242L)
-        val appData = listOf(mock<TransferAppData.Geolocation>())
+        val currentTime = 398457L
+        whenever(timeSystemRepository.getCurrentTimeInMillis()) doReturn currentTime
+        val transferGroupId = 2437865L
+        whenever(
+            transferRepository.insertActiveTransferGroup(
+                ActiveTransferActionGroupImpl(
+                    transferType = TransferType.GENERAL_UPLOAD,
+                    destination = "",
+                    startTime = currentTime,
+                )
+            )
+        ) doReturn transferGroupId
+        val appData = listOfNotNull(
+            TransferAppData.TransferGroup(transferGroupId),
+        )
         val isHighPriority = false
         val expected = pathsAndNames.map { (path, name) ->
             InsertPendingTransferRequest(
@@ -53,7 +78,6 @@ class InsertPendingUploadsForFilesUseCaseTest {
             pathsAndNames,
             parentFolderId,
             isHighPriority,
-            appData,
         )
 
         verify(transferRepository).insertPendingTransfers(expected)
