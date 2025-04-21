@@ -1,5 +1,6 @@
 package mega.privacy.android.app.main
 
+import mega.privacy.android.icon.pack.R as iconPackR
 import mega.privacy.android.shared.resources.R as sharedR
 import android.os.Bundle
 import android.text.Spanned
@@ -16,7 +17,9 @@ import androidx.lifecycle.lifecycleScope
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import dagger.hilt.android.AndroidEntryPoint
+import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
+import kotlinx.coroutines.withContext
 import mega.privacy.android.app.R
 import mega.privacy.android.app.arch.extensions.collectFlow
 import mega.privacy.android.app.components.CustomizedGridLayoutManager
@@ -49,7 +52,6 @@ import nz.mega.sdk.MegaShare
 import timber.log.Timber
 import java.util.Stack
 import javax.inject.Inject
-import mega.privacy.android.icon.pack.R as iconPackR
 
 /**
  * The fragment for incoming shares explorer
@@ -142,11 +144,19 @@ class IncomingSharesExplorerFragment : RotatableFragment(), CheckScrollInterface
                 val unselect = menu?.findItem(R.id.cab_menu_unselect_all) ?: return@let
                 val selectAll = menu.findItem(R.id.cab_menu_select_all)
                 if (selectedNodes.isNotEmpty()) {
-                    selectAll.isVisible = selectedNodes.size != megaApi.getNumChildFiles(
-                        megaApi.getNodeByHandle(parentHandle)
-                    )
-                    unselect.title = getString(R.string.action_unselect_all)
-                    unselect.isVisible = true
+                    lifecycleScope.launch(Dispatchers.IO) {
+                        runCatching {
+                            selectedNodes.size != megaApi.getNumChildFiles(
+                                megaApi.getNodeByHandle(parentHandle)
+                            )
+                        }.onSuccess {
+                            withContext(Dispatchers.Main) {
+                                selectAll.isVisible = it
+                                unselect.title = getString(R.string.action_unselect_all)
+                                unselect.isVisible = true
+                            }
+                        }
+                    }
                 } else {
                     selectAll.isVisible = true
                     unselect.isVisible = false
@@ -173,7 +183,6 @@ class IncomingSharesExplorerFragment : RotatableFragment(), CheckScrollInterface
                 fileExplorerActivity.hideTabs(false, INCOMING_FRAGMENT)
                 fileExplorerActivity.clearQuerySearch()
                 updateOriginalData()
-                updateNodesByAdapter(originalData)
             }
             clearSelections()
             adapter.multipleSelected = false
@@ -422,12 +431,29 @@ class IncomingSharesExplorerFragment : RotatableFragment(), CheckScrollInterface
      * Original data is initialized
      */
     private fun updateOriginalData() {
+        lifecycleScope.launch {
+            fetchNodes()
+        }
+    }
+
+    private suspend fun fetchNodes() {
         if (parentHandle == INVALID_HANDLE) {
             getNodesFromInShares()
         } else {
-            megaApi.getNodeByHandle(parentHandle)?.let { parentNode ->
-                originalData.clear()
-                originalData.addAll(megaApi.getChildren(parentNode, order))
+            withContext(Dispatchers.IO) {
+                runCatching {
+                    megaApi.getNodeByHandle(parentHandle)?.let { parentNode ->
+                        megaApi.getChildren(parentNode, order)
+                    }
+                }.onSuccess { nodes ->
+                    if (nodes != null) {
+                        withContext(Dispatchers.Main) {
+                            originalData.clear()
+                            originalData.addAll(nodes)
+                            updateNodesByAdapter(originalData)
+                        }
+                    }
+                }
             }
         }
     }
@@ -472,28 +498,38 @@ class IncomingSharesExplorerFragment : RotatableFragment(), CheckScrollInterface
     /**
      * Find nodes
      */
-    private fun getNodesFromInShares() {
+    private suspend fun getNodesFromInShares() {
         Timber.d("getNodesFromInShares")
         fileExplorerActivity.deepBrowserTree = 0
-
         setOptionsBarVisibility()
-        originalData.clear()
-        originalData.addAll(
-            megaApi.getInShares(
-                if (orderParent == MegaApiAndroid.ORDER_DEFAULT_DESC)
-                    orderParent
-                else
-                    order
-            )
-        )
+        withContext(Dispatchers.IO) {
+            runCatching {
+                megaApi.getInShares(orderParent)
+            }.onSuccess {
+                withContext(Dispatchers.Main) {
+                    originalData.clear()
+                    originalData.addAll(it)
+                    updateNodesByAdapter(originalData)
+                }
+            }.onFailure { throwable ->
+                Timber.e(throwable)
+            }
+        }
     }
 
     private fun checkWritePermissions() {
-        hasWritePermissions = megaApi.getNodeByHandle(parentHandle)?.let { parentNode ->
-            megaApi.getAccess(parentNode) >= MegaShare.ACCESS_READWRITE
-        } ?: false
-
-        activateButton(hasWritePermissions)
+        lifecycleScope.launch(Dispatchers.IO) {
+            runCatching {
+                megaApi.getNodeByHandle(parentHandle)?.let { parentNode ->
+                    megaApi.getAccess(parentNode) >= MegaShare.ACCESS_READWRITE
+                } ?: false
+            }.onSuccess {
+                withContext(Dispatchers.Main) {
+                    hasWritePermissions = it
+                    activateButton(hasWritePermissions)
+                }
+            }
+        }
     }
 
     /**
@@ -553,40 +589,41 @@ class IncomingSharesExplorerFragment : RotatableFragment(), CheckScrollInterface
             fileExplorerActivity.collapseSearchView()
         }
 
-        adapter.getItem(position)?.let { node ->
+        adapter.getItem(position)?.also { node ->
             when {
                 node.isFolder -> {
-                    searchNodes.clear()
-                    fileExplorerActivity.hideTabs(true, INCOMING_FRAGMENT)
-                    fileExplorerActivity.shouldRestartSearch = false
+                    lifecycleScope.launch {
+                        searchNodes.clear()
+                        fileExplorerActivity.shouldRestartSearch = false
 
-                    if (selectFile && fileExplorerActivity.isMultiselect && adapter.multipleSelected)
-                        hideMultipleSelect()
+                        if (selectFile && fileExplorerActivity.isMultiselect && adapter.multipleSelected)
+                            hideMultipleSelect()
 
-                    fileExplorerActivity.increaseDeepBrowserTree()
-                    Timber.d("deepBrowserTree value: ${fileExplorerActivity.deepBrowserTree}")
-                    setOptionsBarVisibility()
+                        fileExplorerActivity.increaseDeepBrowserTree()
+                        Timber.d("deepBrowserTree value: ${fileExplorerActivity.deepBrowserTree}")
+                        setOptionsBarVisibility()
 
-                    val lastFirstVisiblePosition = if (fileExplorerActivity.isList) {
-                        listLayoutManager
-                    } else {
-                        gridLayoutManager
-                    }?.findFirstCompletelyVisibleItemPosition() ?: 0
+                        val lastFirstVisiblePosition = if (fileExplorerActivity.isList) {
+                            listLayoutManager
+                        } else {
+                            gridLayoutManager
+                        }?.findFirstCompletelyVisibleItemPosition() ?: 0
 
-                    Timber.d("Push to stack $lastFirstVisiblePosition position")
-                    lastPositionStack.push(lastFirstVisiblePosition)
+                        Timber.d("Push to stack $lastFirstVisiblePosition position")
+                        lastPositionStack.push(lastFirstVisiblePosition)
 
-                    setParentHandle(node.handle)
-                    fileExplorerActivity.invalidateOptionsMenu()
+                        setParentHandle(node.handle)
+                        fileExplorerActivity.invalidateOptionsMenu()
 
-                    updateOriginalData()
-                    updateNodesByAdapter(originalData)
-                    recyclerView.scrollToPosition(0)
+                        fetchNodes()
+                        recyclerView.scrollToPosition(0)
+                        fileExplorerActivity.hideTabs(true, INCOMING_FRAGMENT)
 
-                    if (modeCloud == COPY || modeCloud == MOVE) {
-                        when {
-                            adapter.itemCount == 0 -> activateButton(true)
-                            fileExplorerActivity.deepBrowserTree > 0 -> checkCopyMoveButton()
+                        if (modeCloud == COPY || modeCloud == MOVE) {
+                            when {
+                                adapter.itemCount == 0 -> activateButton(true)
+                                fileExplorerActivity.deepBrowserTree > 0 -> checkCopyMoveButton()
+                            }
                         }
                     }
                 }
@@ -623,65 +660,74 @@ class IncomingSharesExplorerFragment : RotatableFragment(), CheckScrollInterface
         fileExplorerActivity.decreaseDeepBrowserTree()
         when {
             fileExplorerActivity.deepBrowserTree == 0 -> {
-                setParentHandle(INVALID_HANDLE)
-                fileExplorerActivity.hideTabs(false, INCOMING_FRAGMENT)
-                getNodesFromInShares()
-                updateNodesByAdapter(originalData)
+                lifecycleScope.launch {
+                    setParentHandle(INVALID_HANDLE)
+                    getNodesFromInShares()
+                    fileExplorerActivity.hideTabs(false, INCOMING_FRAGMENT)
 
-                val lastVisiblePosition = if (lastPositionStack.isNotEmpty()) {
-                    lastPositionStack.pop().apply {
-                        Timber.d("Pop of the stack $this position")
-                    }
-                } else {
-                    0
-                }
-                Timber.d("Scroll to $lastVisiblePosition position")
-                if (lastVisiblePosition >= 0) {
-                    if (fileExplorerActivity.isList) {
-                        listLayoutManager
+                    val lastVisiblePosition = if (lastPositionStack.isNotEmpty()) {
+                        lastPositionStack.pop().apply {
+                            Timber.d("Pop of the stack $this position")
+                        }
                     } else {
-                        gridLayoutManager
-                    }?.scrollToPositionWithOffset(lastVisiblePosition, 0)
+                        0
+                    }
+                    Timber.d("Scroll to $lastVisiblePosition position")
+                    if (lastVisiblePosition >= 0) {
+                        if (fileExplorerActivity.isList) {
+                            listLayoutManager
+                        } else {
+                            gridLayoutManager
+                        }?.scrollToPositionWithOffset(lastVisiblePosition, 0)
+                    }
+                    setOptionsBarVisibility()
+                    fileExplorerActivity.invalidateOptionsMenu()
                 }
-                setOptionsBarVisibility()
-                fileExplorerActivity.invalidateOptionsMenu()
                 return 3
             }
 
             fileExplorerActivity.deepBrowserTree > 0 -> {
                 parentHandle = adapter.parentHandle
-                megaApi.getParentNode(megaApi.getNodeByHandle(parentHandle))
-                    ?.let { parentNode ->
-                        setParentHandle(parentNode.handle)
-                        originalData.clear()
-                        originalData.addAll(megaApi.getChildren(parentNode, order))
-                        updateNodesByAdapter(originalData)
-
-                        if (modeCloud == COPY || modeCloud == MOVE) {
-                            checkCopyMoveButton()
-                        }
-
-                        val lastVisiblePosition = if (lastPositionStack.isNotEmpty()) {
-                            lastPositionStack.pop().apply {
-                                Timber.d("Pop of the stack $this position")
+                lifecycleScope.launch(Dispatchers.IO) {
+                    runCatching {
+                        megaApi.getParentNode(megaApi.getNodeByHandle(parentHandle))
+                            ?.let { parentNode ->
+                                parentNode to megaApi.getChildren(parentNode, order)
                             }
-                        } else {
-                            0
+                    }.onSuccess { result ->
+                        if (result != null) {
+                            val (parentNode, nodes) = result
+                            withContext(Dispatchers.Main) {
+                                setParentHandle(parentNode.handle)
+                                originalData.clear()
+                                originalData.addAll(nodes)
+                                updateNodesByAdapter(originalData)
+
+                                if (modeCloud == COPY || modeCloud == MOVE) {
+                                    checkCopyMoveButton()
+                                }
+
+                                val lastVisiblePosition = if (lastPositionStack.isNotEmpty()) {
+                                    lastPositionStack.pop().apply {
+                                        Timber.d("Pop of the stack $this position")
+                                    }
+                                } else {
+                                    0
+                                }
+                                Timber.d("Scroll to $lastVisiblePosition position")
+                                if (lastVisiblePosition >= 0) {
+                                    if (fileExplorerActivity.isList) {
+                                        listLayoutManager
+                                    } else {
+                                        gridLayoutManager
+                                    }?.scrollToPositionWithOffset(lastVisiblePosition, 0)
+                                }
+                                fileExplorerActivity.invalidateOptionsMenu()
+                            }
                         }
-                        Timber.d("Scroll to $lastVisiblePosition position")
-                        if (lastVisiblePosition >= 0) {
-                            if (fileExplorerActivity.isList) {
-                                listLayoutManager
-                            } else {
-                                gridLayoutManager
-                            }?.scrollToPositionWithOffset(lastVisiblePosition, 0)
-                        }
-                        fileExplorerActivity.invalidateOptionsMenu()
-                        return 2
-                    } ?: let {
-                    setOptionsBarVisibility()
-                    return 2
+                    }
                 }
+                return 2
             }
 
             else -> {
@@ -698,11 +744,15 @@ class IncomingSharesExplorerFragment : RotatableFragment(), CheckScrollInterface
     }
 
     private fun setDeepBrowserTree(handle: Long) {
-        fileExplorerActivity.increaseDeepBrowserTree()
-        var parentNode = megaApi.getParentNode(megaApi.getNodeByHandle(handle))
-        while (parentNode != null) {
-            fileExplorerActivity.increaseDeepBrowserTree()
-            parentNode = megaApi.getParentNode(parentNode)
+        lifecycleScope.launch(Dispatchers.IO) {
+            runCatching {
+                fileExplorerActivity.increaseDeepBrowserTree()
+                var parentNode = megaApi.getParentNode(megaApi.getNodeByHandle(handle))
+                while (parentNode != null) {
+                    fileExplorerActivity.increaseDeepBrowserTree()
+                    parentNode = megaApi.getParentNode(parentNode)
+                }
+            }
         }
     }
 
@@ -782,13 +832,10 @@ class IncomingSharesExplorerFragment : RotatableFragment(), CheckScrollInterface
     fun updateNodesByOrder(order: Int) {
         if (parentHandle == INVALID_HANDLE) {
             orderParent = order
-            getNodesFromInShares()
         } else {
             this.order = order
-            originalData.clear()
-            originalData.addAll(megaApi.getChildren(megaApi.getNodeByHandle(parentHandle), order))
         }
-        updateNodesByAdapter(originalData)
+        updateOriginalData()
     }
 
     /**
@@ -877,7 +924,6 @@ class IncomingSharesExplorerFragment : RotatableFragment(), CheckScrollInterface
         }
         if (shouldResetNodes) {
             updateOriginalData()
-            updateNodesByAdapter(nodes)
         }
     }
 
