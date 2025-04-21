@@ -51,6 +51,15 @@ import mega.privacy.android.app.interfaces.SnackbarShower
 import mega.privacy.android.app.listeners.CreateChatListener
 import mega.privacy.android.app.listeners.CreateFolderListener
 import mega.privacy.android.app.listeners.GetAttrUserListener
+import mega.privacy.android.app.main.FileExplorerActivity.Companion.CAMERA
+import mega.privacy.android.app.main.FileExplorerActivity.Companion.COPY
+import mega.privacy.android.app.main.FileExplorerActivity.Companion.IMPORT
+import mega.privacy.android.app.main.FileExplorerActivity.Companion.MOVE
+import mega.privacy.android.app.main.FileExplorerActivity.Companion.SAVE
+import mega.privacy.android.app.main.FileExplorerActivity.Companion.SELECT
+import mega.privacy.android.app.main.FileExplorerActivity.Companion.SELECT_CAMERA_FOLDER
+import mega.privacy.android.app.main.FileExplorerActivity.Companion.SHARE_LINK
+import mega.privacy.android.app.main.FileExplorerActivity.Companion.UPLOAD
 import mega.privacy.android.app.main.adapters.FileExplorerPagerAdapter
 import mega.privacy.android.app.main.legacycontact.AddContactActivity
 import mega.privacy.android.app.main.legacycontact.AddContactActivity.Companion.ALLOW_ADD_PARTICIPANTS
@@ -2526,7 +2535,7 @@ class FileExplorerActivity : PasscodeActivity(), MegaRequestListenerInterface,
     /**
      * Sets the name files in the view model.
      */
-    fun setNameFiles(nameFiles: HashMap<String, String>) {
+    fun setNameFiles(nameFiles: Map<String, String>) {
         viewModel.setFileNames(nameFiles)
     }
 

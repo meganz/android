@@ -200,8 +200,8 @@ class ImportFilesFragment : Fragment(), OnImportFilesAdapterFooterListener {
         )
     }
 
-    private val nameFiles: HashMap<String, String>
-        get() = HashMap(viewModel.uiState.value.namesByOriginalName)
+    private val nameFiles: Map<String, String>
+        get() = viewModel.uiState.value.namesByOriginalName.toMap()
 
     /**
      * Handle clicking cloud drive option
