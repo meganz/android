@@ -32,6 +32,14 @@ enum class DataFeatures(
         "Show a single download finish notifications for each user action",
         true,
     ),
+
+    /**
+     * Show a single upload progress and finish notifications for each user action
+     */
+    ShowGroupedUploadNotifications(
+        "Show a single upload progress and finish notifications for each user action",
+        false,
+    ),
     ;
 
     companion object : FeatureFlagValueProvider {

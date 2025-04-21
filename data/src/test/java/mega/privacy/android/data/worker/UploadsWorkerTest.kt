@@ -17,11 +17,11 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.flow
-import kotlinx.coroutines.flow.flowOf
 import kotlinx.coroutines.test.UnconfinedTestDispatcher
 import kotlinx.coroutines.test.resetMain
 import kotlinx.coroutines.test.runTest
 import kotlinx.coroutines.test.setMain
+import mega.privacy.android.data.featuretoggle.DataFeatures
 import mega.privacy.android.data.mapper.transfer.OverQuotaNotificationBuilder
 import mega.privacy.android.data.mapper.transfer.TransfersFinishedNotificationMapper
 import mega.privacy.android.data.mapper.transfer.TransfersNotificationMapper
@@ -32,18 +32,15 @@ import mega.privacy.android.domain.entity.transfer.Transfer
 import mega.privacy.android.domain.entity.transfer.TransferAppData
 import mega.privacy.android.domain.entity.transfer.TransferEvent
 import mega.privacy.android.domain.entity.transfer.TransferProgressResult
-import mega.privacy.android.domain.entity.transfer.TransferState
 import mega.privacy.android.domain.entity.transfer.TransferType
-import mega.privacy.android.domain.entity.uri.UriPath
 import mega.privacy.android.domain.monitoring.CrashReporter
+import mega.privacy.android.domain.usecase.featureflag.GetFeatureFlagValueUseCase
 import mega.privacy.android.domain.usecase.transfers.MonitorActiveAndPendingTransfersUseCase
-import mega.privacy.android.domain.usecase.transfers.MonitorTransferEventsUseCase
 import mega.privacy.android.domain.usecase.transfers.active.ClearActiveTransfersIfFinishedUseCase
 import mega.privacy.android.domain.usecase.transfers.active.CorrectActiveTransfersUseCase
 import mega.privacy.android.domain.usecase.transfers.active.GetActiveTransferTotalsUseCase
 import mega.privacy.android.domain.usecase.transfers.paused.AreTransfersPausedUseCase
 import mega.privacy.android.domain.usecase.transfers.pending.StartAllPendingUploadsUseCase
-import mega.privacy.android.domain.usecase.transfers.uploads.SetNodeAttributesAfterUploadUseCase
 import org.junit.jupiter.api.AfterAll
 import org.junit.jupiter.api.BeforeAll
 import org.junit.jupiter.api.BeforeEach
@@ -90,6 +87,7 @@ class UploadsWorkerTest {
     private val crashReporter = mock<CrashReporter>()
     private val notificationManager = mock<NotificationManagerCompat>()
     private val startAllPendingUploadsUseCase = mock<StartAllPendingUploadsUseCase>()
+    private val getFeatureFlagValueUseCase = mock<GetFeatureFlagValueUseCase>()
 
     private val nodeId = 1L
     private val localPath = "localPath"
@@ -137,6 +135,7 @@ class UploadsWorkerTest {
             notificationSamplePeriod = 0L,
             startAllPendingUploadsUseCase = startAllPendingUploadsUseCase,
             loginMutex = mock(),
+            getFeatureFlagValueUseCase = getFeatureFlagValueUseCase
         )
     }
 
@@ -156,7 +155,8 @@ class UploadsWorkerTest {
             transfersFinishedNotificationMapper,
             crashReporter,
             setForeground,
-            startAllPendingUploadsUseCase
+            startAllPendingUploadsUseCase,
+            getFeatureFlagValueUseCase,
         )
     }
 
@@ -346,6 +346,8 @@ class UploadsWorkerTest {
             on { this.appData }.thenReturn(appData)
         }
         val transferEvent = TransferEvent.TransferFinishEvent(transfer, null)
+        whenever(getFeatureFlagValueUseCase(DataFeatures.ShowGroupedUploadNotifications))
+            .thenReturn(false)
         whenever(areTransfersPausedUseCase())
             .thenReturn(false)
         whenever(monitorActiveAndPendingTransfersUseCase(TransferType.GENERAL_UPLOAD))

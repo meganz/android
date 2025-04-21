@@ -12,6 +12,7 @@ import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.catch
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.sync.Mutex
+import mega.privacy.android.data.featuretoggle.DataFeatures
 import mega.privacy.android.data.mapper.transfer.OverQuotaNotificationBuilder
 import mega.privacy.android.data.mapper.transfer.TransfersFinishedNotificationMapper
 import mega.privacy.android.data.mapper.transfer.TransfersNotificationMapper
@@ -21,6 +22,7 @@ import mega.privacy.android.domain.entity.transfer.TransferType
 import mega.privacy.android.domain.monitoring.CrashReporter
 import mega.privacy.android.domain.qualifier.IoDispatcher
 import mega.privacy.android.domain.qualifier.LoginMutex
+import mega.privacy.android.domain.usecase.featureflag.GetFeatureFlagValueUseCase
 import mega.privacy.android.domain.usecase.transfers.MonitorActiveAndPendingTransfersUseCase
 import mega.privacy.android.domain.usecase.transfers.active.ClearActiveTransfersIfFinishedUseCase
 import mega.privacy.android.domain.usecase.transfers.active.CorrectActiveTransfersUseCase
@@ -53,6 +55,7 @@ class UploadsWorker @AssistedInject constructor(
     notificationSamplePeriod: Long? = null,
     private val startAllPendingUploadsUseCase: StartAllPendingUploadsUseCase,
     @LoginMutex private val loginMutex: Mutex,
+    private val getFeatureFlagValueUseCase: GetFeatureFlagValueUseCase,
 ) : AbstractTransfersWorker(
     context = context,
     workerParams = workerParams,
@@ -86,6 +89,9 @@ class UploadsWorker @AssistedInject constructor(
                 .collect { Timber.d("Start uploading $it files") }
         }
     }
+
+    override suspend fun showGroupedNotifications() =
+        getFeatureFlagValueUseCase(DataFeatures.ShowGroupedUploadNotifications)
 
     override suspend fun createUpdateNotification(
         activeTransferTotals: ActiveTransferTotals,
