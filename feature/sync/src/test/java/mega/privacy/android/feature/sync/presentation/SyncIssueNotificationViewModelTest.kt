@@ -12,10 +12,12 @@ import mega.privacy.android.feature.sync.domain.usecase.notifcation.MonitorSyncN
 import mega.privacy.android.feature.sync.ui.SyncIssueNotificationViewModel
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
+import org.junit.jupiter.api.TestInstance
 import org.mockito.kotlin.mock
 import org.mockito.kotlin.whenever
 
 @ExperimentalCoroutinesApi
+@TestInstance(TestInstance.Lifecycle.PER_CLASS)
 class SyncIssueNotificationViewModelTest {
 
     private val monitorSyncNotificationTypeUseCase: MonitorSyncNotificationTypeUseCase = mock()
