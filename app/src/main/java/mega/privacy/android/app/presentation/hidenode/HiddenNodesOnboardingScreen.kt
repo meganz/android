@@ -1,6 +1,7 @@
 package mega.privacy.android.app.presentation.hidenode
 
 import mega.privacy.android.icon.pack.R as RPack
+import mega.privacy.android.shared.resources.R as sharedR
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
@@ -189,7 +190,7 @@ private fun HiddenNodesOnboardingContent(
             Spacer(modifier = Modifier.height(24.dp))
 
             Text(
-                text = stringResource(id = R.string.hidden_nodes),
+                text = stringResource(id = sharedR.string.hidden_nodes_new_feature),
                 color = dark_grey.takeIf { isLight } ?: white,
                 fontSize = 16.sp,
                 fontWeight = FontWeight.W500,
@@ -200,24 +201,24 @@ private fun HiddenNodesOnboardingContent(
 
             HiddenNodesBenefit(
                 icon = painterResource(id = RPack.drawable.ic_eye_off_medium_regular_outline),
-                title = stringResource(id = R.string.hidden_nodes_benefit_title_hide_files_folders),
-                description = stringResource(id = R.string.hidden_nodes_benefit_description_hide_files_folders),
+                title = stringResource(id = sharedR.string.hidden_nodes_title_hide_files_folders_feature),
+                description = stringResource(id = sharedR.string.hidden_nodes_description_hide_files_folders_feature),
             )
 
             Spacer(modifier = Modifier.height(24.dp))
 
             HiddenNodesBenefit(
                 icon = painterResource(id = RPack.drawable.ic_images),
-                title = stringResource(id = R.string.hidden_nodes_benefit_title_exclude_timeline),
-                description = stringResource(id = R.string.hidden_nodes_benefit_description_exclude_timeline),
+                title = stringResource(id = sharedR.string.hidden_nodes_title_control_visibility),
+                description = stringResource(id = sharedR.string.hidden_nodes_description_control_visibility),
             )
 
             Spacer(modifier = Modifier.height(24.dp))
 
             HiddenNodesBenefit(
                 icon = painterResource(id = RPack.drawable.ic_eye_medium_regular_outline),
-                title = stringResource(id = R.string.hidden_nodes_benefit_title_out_of_sight),
-                description = stringResource(id = R.string.hidden_nodes_benefit_description_out_of_sight),
+                title = stringResource(id = sharedR.string.hidden_nodes_title_visible_shared_files),
+                description = stringResource(id = sharedR.string.hidden_nodes_description_visible_shared_files),
             )
         },
     )
