@@ -1,5 +1,6 @@
 package mega.privacy.android.app.presentation.login.confirmemail.changeemail
 
+import android.content.res.Configuration
 import androidx.activity.compose.LocalOnBackPressedDispatcherOwner
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxHeight
@@ -9,6 +10,8 @@ import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.systemBarsPadding
 import androidx.compose.foundation.layout.width
+import androidx.compose.foundation.rememberScrollState
+import androidx.compose.foundation.verticalScroll
 import androidx.compose.material3.SnackbarHostState
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
@@ -132,6 +135,9 @@ internal fun ChangeEmailAddressScreen(
     var accountExists by rememberSaveable { mutableStateOf(false) }
     val orientation = LocalConfiguration.current.orientation
     val context = LocalContext.current
+    val isTablet = LocalDeviceType.current == DeviceType.Tablet
+    val isPhoneLandscape =
+        orientation == Configuration.ORIENTATION_LANDSCAPE && !isTablet
 
     EventEffect(event = uiState.generalErrorEvent, onConsumed = onResetGeneralErrorEvent) {
         snackBarHostState.showSnackbar(context.getString(sharedR.string.general_request_failed_message))
@@ -157,11 +163,7 @@ internal fun ChangeEmailAddressScreen(
                 snackBarHostState = snackBarHostState,
             )
         },
-    ) { innerPadding ->
-        Column(
-            modifier = modifier.padding(innerPadding),
-            horizontalAlignment = Alignment.CenterHorizontally
-        ) {
+        topBar = {
             MegaTopAppBar(
                 modifier = Modifier
                     .padding(top = BannerPaddingProvider.current)
@@ -173,8 +175,16 @@ internal fun ChangeEmailAddressScreen(
                     },
                 ),
             )
-
-            val contentModifier = if (LocalDeviceType.current == DeviceType.Tablet) {
+        }
+    ) { innerPadding ->
+        Column(
+            modifier = modifier
+                .fillMaxWidth()
+                .verticalScroll(rememberScrollState())
+                .padding(innerPadding),
+            horizontalAlignment = Alignment.CenterHorizontally
+        ) {
+            val contentModifier = if (isTablet || isPhoneLandscape) {
                 Modifier
                     .fillMaxHeight()
                     .width(tabletScreenWidth(orientation))

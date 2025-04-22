@@ -15,6 +15,7 @@ import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.lifecycleScope
 import com.google.android.material.dialog.MaterialAlertDialogBuilder
 import dagger.hilt.android.AndroidEntryPoint
+import kotlinx.coroutines.CancellationException
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.mapNotNull
 import kotlinx.coroutines.launch
@@ -387,7 +388,9 @@ class LoginActivity : BaseActivity() {
                 viewModel.resumeCreateAccount(session)
             }.onFailure {
                 Timber.e(it)
-                cancelConfirmationAccount()
+                if (it !is CancellationException) {
+                    cancelConfirmationAccount()
+                }
             }
         }
     }

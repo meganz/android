@@ -438,6 +438,8 @@ class LoginViewModel @Inject constructor(
      * Checks a signup link.
      */
     fun checkSignupLink(link: String) {
+        // avoid rotating the screen calling this method again
+        if (_state.value.intentState != null) return
         _state.update { state ->
             state.copy(
                 isLoginRequired = false,

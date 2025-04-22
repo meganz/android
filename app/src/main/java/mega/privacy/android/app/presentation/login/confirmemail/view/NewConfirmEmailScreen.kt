@@ -1,10 +1,12 @@
 package mega.privacy.android.app.presentation.login.confirmemail.view
 
+import android.content.res.Configuration
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.isSystemInDarkTheme
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
@@ -13,6 +15,8 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.systemBarsPadding
 import androidx.compose.foundation.layout.width
+import androidx.compose.foundation.rememberScrollState
+import androidx.compose.foundation.verticalScroll
 import androidx.compose.material3.SnackbarHostState
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
@@ -179,6 +183,9 @@ internal fun NewConfirmEmailScreen(
     var cancelRegistration by remember { mutableStateOf(false) }
     val spacing = LocalSpacing.current
     val orientation = LocalConfiguration.current.orientation
+    val isTablet = LocalDeviceType.current == DeviceType.Tablet
+    val isPhoneLandscape =
+        orientation == Configuration.ORIENTATION_LANDSCAPE && !isTablet
     MegaScaffold(
         modifier = modifier.semantics { testTagsAsResourceId = true },
         snackbarHost = {
@@ -198,109 +205,108 @@ internal fun NewConfirmEmailScreen(
             )
         }
     ) { paddingValues ->
-        Box(modifier = modifier.padding(paddingValues)) {
-            Column(
-                modifier = Modifier.fillMaxWidth(),
-                horizontalAlignment = Alignment.CenterHorizontally
-            ) {
-                val contentModifier = if (LocalDeviceType.current == DeviceType.Tablet) {
-                    Modifier
-                        .fillMaxHeight()
-                        .width(tabletScreenWidth(orientation))
-                        .padding(top = spacing.x48, bottom = spacing.x24)
-                } else {
-                    Modifier
-                        .fillMaxWidth()
-                        .padding(horizontal = spacing.x16, vertical = spacing.x24)
-                }
-
-                Column(
-                    modifier = contentModifier,
-                    horizontalAlignment = Alignment.CenterHorizontally,
-                ) {
-                    Image(
-                        modifier = Modifier.size(120.dp),
-                        painter = painterResource(id = R.drawable.ic_sign_up_email_confirmation),
-                        contentDescription = "Email confirmation icon"
-                    )
-
-                    MegaText(
-                        modifier = Modifier
-                            .fillMaxWidth()
-                            .padding(top = spacing.x24),
-                        text = stringResource(sharedR.string.email_confirmation_title),
-                        style = AppTheme.typography.titleLarge,
-                        textColor = TextColor.Primary
-                    )
-
-                    if (email.isNotBlank()) {
-                        LinkSpannedText(
-                            modifier = Modifier.padding(top = spacing.x16),
-                            value = String.format(
-                                stringResource(sharedR.string.email_confirmation_content),
-                                email,
-                                MAIL_SUPPORT
-                            ),
-                            spanStyles = hashMapOf(
-                                SpanIndicator('A') to SpanStyleWithAnnotation(
-                                    MegaSpanStyle.LinkColorStyle(
-                                        SpanStyle(),
-                                        LinkColor.Primary
-                                    ), MAIL_SUPPORT
-                                ),
-                                SpanIndicator('P') to SpanStyleWithAnnotation(
-                                    MegaSpanStyle.TextColorStyle(
-                                        SpanStyle().copy(fontWeight = AppTheme.typography.titleMedium.fontWeight),
-                                        TextColor.Primary
-                                    ), email
-                                )
-                            ),
-                            baseStyle = AppTheme.typography.bodyLarge,
-                            baseTextColor = TextColor.Secondary,
-                            onAnnotationClick = {
-                                if (it == MAIL_SUPPORT) {
-                                    sendFeedbackEmail(it)
-                                }
-                            }
-                        )
-                    } else {
-                        ContentLoading()
-                    }
-                }
-            }
-
-            val contentModifier = if (LocalDeviceType.current == DeviceType.Tablet) {
+        Box(
+            modifier = modifier
+                .fillMaxWidth()
+                .padding(paddingValues)
+        ) {
+            val contentModifier = if (isTablet || isPhoneLandscape) {
                 Modifier
+                    .verticalScroll(rememberScrollState())
+                    .fillMaxHeight()
                     .width(tabletScreenWidth(orientation))
+                    .padding(
+                        top = if (isPhoneLandscape) spacing.x24 else spacing.x48,
+                        bottom = spacing.x24
+                    )
+                    .align(Alignment.TopCenter)
             } else {
                 Modifier
-                    .fillMaxWidth()
+                    .verticalScroll(rememberScrollState())
+                    .fillMaxSize()
                     .padding(horizontal = spacing.x16, vertical = spacing.x24)
             }
 
             Column(
-                modifier = contentModifier
-                    .align(Alignment.BottomCenter),
+                modifier = contentModifier,
+                horizontalAlignment = Alignment.CenterHorizontally,
             ) {
-                PrimaryFilledButton(
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .align(Alignment.CenterHorizontally),
-                    text = stringResource(sharedR.string.general_resend_button),
-                    onClick = {
-                        Analytics.tracker.trackEvent(ResendEmailConfirmationButtonPressedEvent)
-                        onResendSignUpLink(email)
-                    },
+                Image(
+                    modifier = Modifier.size(120.dp),
+                    painter = painterResource(id = R.drawable.ic_sign_up_email_confirmation),
+                    contentDescription = "Email confirmation icon"
                 )
 
-                TextOnlyButton(
+                MegaText(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .padding(top = spacing.x24),
+                    text = stringResource(sharedR.string.email_confirmation_title),
+                    style = AppTheme.typography.titleLarge,
+                    textColor = TextColor.Primary
+                )
+
+                if (email.isNotBlank()) {
+                    LinkSpannedText(
+                        modifier = Modifier.padding(top = spacing.x16),
+                        value = String.format(
+                            stringResource(sharedR.string.email_confirmation_content),
+                            email,
+                            MAIL_SUPPORT
+                        ),
+                        spanStyles = hashMapOf(
+                            SpanIndicator('A') to SpanStyleWithAnnotation(
+                                MegaSpanStyle.LinkColorStyle(
+                                    SpanStyle(),
+                                    LinkColor.Primary
+                                ), MAIL_SUPPORT
+                            ),
+                            SpanIndicator('P') to SpanStyleWithAnnotation(
+                                MegaSpanStyle.TextColorStyle(
+                                    SpanStyle().copy(fontWeight = AppTheme.typography.titleMedium.fontWeight),
+                                    TextColor.Primary
+                                ), email
+                            )
+                        ),
+                        baseStyle = AppTheme.typography.bodyLarge,
+                        baseTextColor = TextColor.Secondary,
+                        onAnnotationClick = {
+                            if (it == MAIL_SUPPORT) {
+                                sendFeedbackEmail(it)
+                            }
+                        }
+                    )
+                } else {
+                    ContentLoading()
+                }
+
+                Spacer(Modifier.weight(1f))
+
+                Column(
                     modifier = Modifier
                         .padding(top = spacing.x16)
-                        .height(height = spacing.x48)
-                        .align(Alignment.CenterHorizontally),
-                    text = stringResource(sharedR.string.general_change_email_address),
-                    onClick = onNavigateToChangeEmailAddress
-                )
+                        .fillMaxWidth()
+                ) {
+                    PrimaryFilledButton(
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .align(Alignment.CenterHorizontally),
+                        text = stringResource(sharedR.string.general_resend_button),
+                        onClick = {
+                            Analytics.tracker.trackEvent(ResendEmailConfirmationButtonPressedEvent)
+                            onResendSignUpLink(email)
+                        },
+                    )
+
+                    TextOnlyButton(
+                        modifier = Modifier
+                            .padding(top = spacing.x16)
+                            .height(height = spacing.x48)
+                            .align(Alignment.CenterHorizontally),
+                        text = stringResource(sharedR.string.general_change_email_address),
+                        onClick = onNavigateToChangeEmailAddress
+                    )
+                }
             }
 
             if (cancelRegistration) {

@@ -1,7 +1,10 @@
 package mega.privacy.android.app.presentation.login.createaccount.view
 
-import mega.privacy.android.shared.resources.R as sharedR
+import android.content.res.Configuration
 import androidx.activity.compose.BackHandler
+import androidx.compose.animation.AnimatedVisibility
+import androidx.compose.animation.slideInVertically
+import androidx.compose.animation.slideOutVertically
 import androidx.compose.foundation.gestures.detectTapGestures
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -36,6 +39,7 @@ import androidx.compose.ui.focus.focusProperties
 import androidx.compose.ui.focus.focusRequester
 import androidx.compose.ui.input.pointer.pointerInput
 import androidx.compose.ui.layout.onGloballyPositioned
+import androidx.compose.ui.layout.positionInParent
 import androidx.compose.ui.platform.LocalConfiguration
 import androidx.compose.ui.platform.LocalFocusManager
 import androidx.compose.ui.platform.LocalSoftwareKeyboardController
@@ -74,6 +78,11 @@ import mega.android.core.ui.theme.values.LinkColor
 import mega.privacy.android.app.R
 import mega.privacy.android.app.presentation.login.createaccount.CreateAccountViewModel
 import mega.privacy.android.app.presentation.login.createaccount.CreateAccountViewModel.Companion.EMAIL_CHAR_LIMIT
+import mega.privacy.android.app.presentation.login.createaccount.CreateAccountViewModel.Companion.KEY_CONFIRM_PASSWORD
+import mega.privacy.android.app.presentation.login.createaccount.CreateAccountViewModel.Companion.KEY_EMAIL
+import mega.privacy.android.app.presentation.login.createaccount.CreateAccountViewModel.Companion.KEY_FIRST_NAME
+import mega.privacy.android.app.presentation.login.createaccount.CreateAccountViewModel.Companion.KEY_LAST_NAME
+import mega.privacy.android.app.presentation.login.createaccount.CreateAccountViewModel.Companion.KEY_PASSWORD
 import mega.privacy.android.app.presentation.login.createaccount.model.CreateAccountStatus
 import mega.privacy.android.app.presentation.login.createaccount.model.CreateAccountUIState
 import mega.privacy.android.app.presentation.login.createaccount.view.CreateAccountTestTags.CONFIRM_PASSWORD
@@ -88,6 +97,8 @@ import mega.privacy.android.app.presentation.login.view.tabletScreenWidth
 import mega.privacy.android.app.utils.Constants.TERMS_OF_SERVICE_URL
 import mega.privacy.android.domain.entity.changepassword.PasswordStrength
 import mega.privacy.android.domain.entity.login.EphemeralCredentials
+import mega.privacy.android.shared.resources.R as sharedR
+import timber.log.Timber
 
 @OptIn(ExperimentalComposeUiApi::class)
 @Composable
@@ -154,20 +165,26 @@ internal fun NewCreateAccountScreen(
     val confirmPasswordFocusRequester = remember { FocusRequester() }
 
     val orientation = LocalConfiguration.current.orientation
-    var firstName by rememberSaveable { mutableStateOf<String>("") }
-    var lastName by rememberSaveable { mutableStateOf<String>("") }
-    var email by rememberSaveable { mutableStateOf<String>("") }
-    var password by rememberSaveable { mutableStateOf<String>("") }
+    var firstName by rememberSaveable { mutableStateOf("") }
+    var lastName by rememberSaveable { mutableStateOf("") }
+    var email by rememberSaveable { mutableStateOf("") }
+    var password by rememberSaveable { mutableStateOf("") }
     var isPasswordFocus by rememberSaveable { mutableStateOf(false) }
-    var confirmPassword by rememberSaveable { mutableStateOf<String>("") }
+    var confirmPassword by rememberSaveable { mutableStateOf("") }
     var termsCheckState by rememberSaveable { mutableStateOf(false) }
     var showAgreeToTerms by rememberSaveable { mutableStateOf(false) }
     var passwordHintHeight by rememberSaveable { mutableFloatStateOf(0F) }
+    var onSignUpButtonClicked by rememberSaveable { mutableStateOf(false) }
+    val fieldOffsets = remember { mutableMapOf<String, Int>() }
     val isMinimumCharacterError = uiState.isPasswordLengthSufficient == false
     val isWeakPassword =
         uiState.passwordStrength == PasswordStrength.WEAK || uiState.passwordStrength == PasswordStrength.VERY_WEAK
     var showAccountExistsMessage by rememberSaveable { mutableStateOf(false) }
     val softKeyboard = LocalSoftwareKeyboardController.current
+
+    val isTablet = LocalDeviceType.current == DeviceType.Tablet
+    val isPhoneLandscape =
+        orientation == Configuration.ORIENTATION_LANDSCAPE && !isTablet
 
     EventEffect(
         event = uiState.showAgreeToTermsEvent,
@@ -208,6 +225,28 @@ internal fun NewCreateAccountScreen(
         }
     }
 
+    if (isPhoneLandscape) {
+        LaunchedEffect(uiState, showAccountExistsMessage, onSignUpButtonClicked) {
+            val offset: Int? = when {
+                uiState.isFirstNameValid == false -> fieldOffsets[KEY_FIRST_NAME]
+                uiState.isLastNameValid == false -> fieldOffsets[KEY_LAST_NAME]
+                uiState.isEmailValid == false || uiState.isEmailLengthExceeded == true || showAccountExistsMessage
+                    -> fieldOffsets[KEY_EMAIL]
+
+                uiState.isPasswordValid == false -> fieldOffsets[KEY_PASSWORD]
+                uiState.isConfirmPasswordMatched == false -> fieldOffsets[KEY_CONFIRM_PASSWORD]
+                else -> null
+            }
+            offset?.let {
+                if (onSignUpButtonClicked) {
+                    Timber.d("Scroll to offset: $it")
+                    scrollState.animateScrollTo(offset)
+                    onSignUpButtonClicked = false
+                }
+            }
+        }
+    }
+
     BackHandler(enabled = true) {
         onBackIconPressed()
     }
@@ -215,6 +254,7 @@ internal fun NewCreateAccountScreen(
     MegaScaffold(
         modifier = modifier
             .fillMaxSize()
+            .imePadding()
             .semantics { testTagsAsResourceId = true },
         snackbarHost = {
             MegaSnackbar(
@@ -222,15 +262,21 @@ internal fun NewCreateAccountScreen(
             )
         },
         topBar = {
-            MegaTopAppBar(
-                modifier = Modifier
-                    .testTag(TOOLBAR)
-                    .statusBarsPadding(),
-                title = stringResource(id = R.string.create_account_title),
-                navigationType = AppBarNavigationType.Back(
-                    onNavigationIconClicked = onBackIconPressed,
+            AnimatedVisibility(
+                visible = !scrollState.canScrollBackward || !isPhoneLandscape,
+                enter = slideInVertically(initialOffsetY = { -it }),
+                exit = slideOutVertically(targetOffsetY = { -it }),
+            ) {
+                MegaTopAppBar(
+                    modifier = Modifier
+                        .testTag(TOOLBAR)
+                        .statusBarsPadding(),
+                    title = stringResource(id = R.string.create_account_title),
+                    navigationType = AppBarNavigationType.Back(
+                        onNavigationIconClicked = onBackIconPressed,
+                    )
                 )
-            )
+            }
         }
     ) { paddingValues ->
         Box(
@@ -238,14 +284,13 @@ internal fun NewCreateAccountScreen(
                 .fillMaxSize()
                 .padding(paddingValues)
                 .verticalScroll(scrollState)
-                .imePadding()
                 .pointerInput(Unit) {
                     detectTapGestures(onTap = {
                         focusManager.clearFocus(true)
                     })
                 }, contentAlignment = Alignment.TopCenter
         ) {
-            val contentModifier = if (LocalDeviceType.current == DeviceType.Tablet) {
+            val contentModifier = if (isTablet || isPhoneLandscape) {
                 Modifier
                     .fillMaxHeight()
                     .width(tabletScreenWidth(orientation))
@@ -258,6 +303,9 @@ internal fun NewCreateAccountScreen(
             ) {
                 TextInputField(
                     modifier = Modifier
+                        .onGloballyPositioned { coordinates ->
+                            fieldOffsets[KEY_FIRST_NAME] = coordinates.positionInParent().y.toInt()
+                        }
                         .testTag(FIRST_NAME)
                         .focusRequester(firstNameFocusRequester)
                         .focusProperties {
@@ -283,6 +331,9 @@ internal fun NewCreateAccountScreen(
 
                 TextInputField(
                     modifier = Modifier
+                        .onGloballyPositioned { coordinates ->
+                            fieldOffsets[KEY_LAST_NAME] = coordinates.positionInParent().y.toInt()
+                        }
                         .testTag(LAST_NAME)
                         .focusRequester(lastNameFocusRequester)
                         .focusProperties {
@@ -308,6 +359,9 @@ internal fun NewCreateAccountScreen(
 
                 TextInputField(
                     modifier = Modifier
+                        .onGloballyPositioned { coordinates ->
+                            fieldOffsets[KEY_EMAIL] = coordinates.positionInParent().y.toInt()
+                        }
                         .testTag(CreateAccountTestTags.EMAIL)
                         .focusRequester(emailFocusRequester)
                         .focusProperties {
@@ -340,6 +394,9 @@ internal fun NewCreateAccountScreen(
 
                 PasswordTextInputField(
                     modifier = Modifier
+                        .onGloballyPositioned { coordinates ->
+                            fieldOffsets[KEY_PASSWORD] = coordinates.positionInParent().y.toInt()
+                        }
                         .testTag(PASSWORD)
                         .focusRequester(passwordFocusRequester)
                         .focusProperties {
@@ -389,6 +446,10 @@ internal fun NewCreateAccountScreen(
 
                 PasswordTextInputField(
                     modifier = Modifier
+                        .onGloballyPositioned { coordinates ->
+                            fieldOffsets[KEY_CONFIRM_PASSWORD] =
+                                coordinates.positionInParent().y.toInt()
+                        }
                         .testTag(CONFIRM_PASSWORD)
                         .focusRequester(confirmPasswordFocusRequester)
                         .focusProperties {
@@ -489,6 +550,7 @@ internal fun NewCreateAccountScreen(
                     onClick = {
                         softKeyboard?.hide()
                         onCreateAccountClicked()
+                        onSignUpButtonClicked = true
                     },
                     text = stringResource(id = R.string.create_account),
                     isLoading = uiState.isLoading
