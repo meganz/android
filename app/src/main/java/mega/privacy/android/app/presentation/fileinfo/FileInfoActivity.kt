@@ -30,8 +30,8 @@ import mega.privacy.android.app.activities.contract.NameCollisionActivityContrac
 import mega.privacy.android.app.activities.contract.SelectFolderToCopyActivityContract
 import mega.privacy.android.app.activities.contract.SelectFolderToMoveActivityContract
 import mega.privacy.android.app.activities.contract.SelectUsersToShareActivityContract
-import mega.privacy.android.app.featuretoggle.AppFeatures
 import mega.privacy.android.app.extensions.launchUrl
+import mega.privacy.android.app.featuretoggle.AppFeatures
 import mega.privacy.android.app.interfaces.ActionBackupListener
 import mega.privacy.android.app.main.ManagerActivity
 import mega.privacy.android.app.main.controllers.NodeController
@@ -517,11 +517,6 @@ class FileInfoActivity : BaseActivity() {
                     event.successMessage(this)?.let {
                         snackBarHostState.showAutoDurationSnackbar(it)
                     }
-                    sendBroadcast(
-                        Intent(Constants.BROADCAST_ACTION_INTENT_FILTER_UPDATE_FULL_SCREEN).setPackage(
-                            applicationContext.packageName
-                        )
-                    )
                 } else {
                     Timber.e(event.exception)
                     if (!manageCopyMoveException(event.exception)) {

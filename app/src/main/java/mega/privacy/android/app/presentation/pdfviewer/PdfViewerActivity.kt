@@ -1,13 +1,12 @@
 package mega.privacy.android.app.presentation.pdfviewer
 
+import mega.privacy.android.shared.resources.R as sharedR
 import android.animation.ObjectAnimator
 import android.annotation.SuppressLint
 import android.app.Activity
-import android.content.BroadcastReceiver
 import android.content.Context
 import android.content.DialogInterface
 import android.content.Intent
-import android.content.IntentFilter
 import android.content.res.Configuration
 import android.graphics.Color
 import android.graphics.Rect
@@ -93,7 +92,6 @@ import mega.privacy.android.domain.entity.node.NodeId
 import mega.privacy.android.domain.qualifier.ApplicationScope
 import mega.privacy.android.domain.usecase.featureflag.GetFeatureFlagValueUseCase
 import mega.privacy.android.navigation.MegaNavigator
-import mega.privacy.android.shared.resources.R as sharedR
 import mega.privacy.mobile.analytics.event.DocumentPreviewHideNodeMenuItemEvent
 import nz.mega.sdk.MegaApiAndroid
 import nz.mega.sdk.MegaApiJava
@@ -189,13 +187,6 @@ class PdfViewerActivity : BaseActivity(), MegaGlobalListenerInterface, OnPageCha
     private var notChangePage = false
     private var inside = false
     private var node: MegaNode? = null
-    private val receiverToFinish: BroadcastReceiver = object : BroadcastReceiver() {
-        override fun onReceive(context: Context, intent: Intent?) {
-            if (intent != null) {
-                finish()
-            }
-        }
-    }
 
     private val viewModel by viewModels<PdfViewerViewModel>()
     private val startDownloadViewModel by viewModels<StartDownloadViewModel>()
@@ -257,11 +248,6 @@ class PdfViewerActivity : BaseActivity(), MegaGlobalListenerInterface, OnPageCha
         with(window) {
             addFlags(WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON)
         }
-
-        registerReceiver(
-            receiverToFinish,
-            IntentFilter(Constants.BROADCAST_ACTION_INTENT_FILTER_UPDATE_FULL_SCREEN)
-        )
 
         handler = Handler(Looper.getMainLooper())
 
@@ -1756,7 +1742,6 @@ class PdfViewerActivity : BaseActivity(), MegaGlobalListenerInterface, OnPageCha
             Timber.d("PdfViewerActivity::HttpServerStop")
         }
         handler?.removeCallbacksAndMessages(null)
-        unregisterReceiver(receiverToFinish)
         dismissAlertDialogIfExists(takenDownDialog)
         super.onDestroy()
     }
