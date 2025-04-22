@@ -1126,4 +1126,6 @@
     <string name="notification_permission_screen_description">Stay informed with real-time updates that matter to you. Get alerts for shared folder activity, security updates, and exclusive offers so you never miss anything important.\n\nYou can manage notification preferences at any time in your device settings.</string>
     <!--Button text to request Notification permission-->
     <string name="notification_permission_enable_button_text">Enable notifications</string>
+    <!-- Notification content for upload final notification in case of a single file upload. -->
+    <string name="transfers_notification_title_single_upload">Uploaded “%1$s”</string>
 </resources>

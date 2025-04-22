@@ -54,29 +54,35 @@ class DefaultTransfersActionGroupFinishNotificationBuilder @Inject constructor(
         actionGroup: ActiveTransferTotals.ActionGroup,
         transferType: TransferType,
     ): Notification {
+        if (transferType != TransferType.GENERAL_UPLOAD && transferType != TransferType.DOWNLOAD) {
+            throw NotImplementedError("Group notifications are not yet implemented for this type: $transferType")
+        }
         val totalCompleted = actionGroup.completedFiles
         val totalFinished = actionGroup.finishedFiles
         val errorCount = actionGroup.finishedFilesWithErrors
         val alreadyTransferredCount = actionGroup.alreadyTransferred
         val isDownload = transferType == TransferType.DOWNLOAD
-        if (!isDownload) {
-            throw NotImplementedError("Group notifications are not yet implemented for uploads")
-        }
-        val isPreviewDownload = actionGroup.isPreviewDownload()
-        val isOfflineDownload = actionGroup.isOfflineDownload()
+        val isPreviewDownload = isDownload && actionGroup.isPreviewDownload()
+        val isOfflineDownload = isDownload && actionGroup.isOfflineDownload()
         val isLoggedIn = getSessionUseCase() != null
         val titleSuffix = when {
-            errorCount > 0 && alreadyTransferredCount > 0 ->
-                "${alreadyMsg(alreadyTransferredCount)}, ${errorMsg(errorCount)}"
+            errorCount > 0 && alreadyTransferredCount > 0 -> {
+                "${alreadyMsg(alreadyTransferredCount, isDownload)}, " +
+                        errorMsg(errorCount, isDownload)
+            }
 
-            errorCount > 0 -> errorMsg(errorCount)
-            alreadyTransferredCount > 0 -> alreadyMsg(alreadyTransferredCount)
+            errorCount > 0 -> errorMsg(errorCount, isDownload)
+            alreadyTransferredCount > 0 -> alreadyMsg(alreadyTransferredCount, isDownload)
             else -> null
         }
         val notificationTitle = when {
             totalCompleted != totalFinished -> {
                 resources.getQuantityString(
-                    R.plurals.download_service_final_notification_with_details,
+                    if (isDownload) {
+                        R.plurals.download_service_final_notification_with_details
+                    } else {
+                        R.plurals.upload_service_final_notification
+                    },
                     totalFinished,
                     totalCompleted,
                     totalFinished,
@@ -85,7 +91,11 @@ class DefaultTransfersActionGroupFinishNotificationBuilder @Inject constructor(
 
             totalCompleted > 1 || actionGroup.singleFileName == null -> {
                 resources.getQuantityString(
-                    R.plurals.download_service_final_notification,
+                    if (isDownload) {
+                        R.plurals.download_service_final_notification
+                    } else {
+                        R.plurals.upload_service_final_notification
+                    },
                     totalCompleted,
                     totalCompleted
                 )
@@ -100,7 +110,11 @@ class DefaultTransfersActionGroupFinishNotificationBuilder @Inject constructor(
 
             else -> {
                 resources.getString(
-                    sharedR.string.transfers_notification_title_single_download,
+                    if (isDownload) {
+                        sharedR.string.transfers_notification_title_single_download
+                    } else {
+                        sharedR.string.transfers_notification_title_single_upload
+                    },
                     actionGroup.singleFileName
                 )
             }
@@ -281,15 +295,23 @@ class DefaultTransfersActionGroupFinishNotificationBuilder @Inject constructor(
             .build()
     }
 
-    private fun errorMsg(errorCount: Int) = resources.getQuantityString(
-        R.plurals.download_service_failed,
+    private fun errorMsg(errorCount: Int, isDownload: Boolean) = resources.getQuantityString(
+        if (isDownload) {
+            R.plurals.download_service_failed
+        } else {
+            R.plurals.upload_service_failed
+        },
         errorCount,
         errorCount
     )
 
-    private fun alreadyMsg(alreadyDownloadedCount: Int) =
+    private fun alreadyMsg(alreadyDownloadedCount: Int, isDownload: Boolean) =
         resources.getQuantityString(
-            R.plurals.already_downloaded_service,
+            if (isDownload) {
+                R.plurals.already_downloaded_service
+            } else {
+                R.plurals.upload_service_notification_already_uploaded
+            },
             alreadyDownloadedCount,
             alreadyDownloadedCount,
         )

@@ -20,7 +20,14 @@ class DefaultTransfersFinishNotificationSummaryBuilder @Inject constructor(
 ) : TransfersFinishNotificationSummaryBuilder {
 
     override suspend fun invoke(type: TransferType) =
-        NotificationCompat.Builder(context, Constants.NOTIFICATION_CHANNEL_DOWNLOAD_ID)
+        NotificationCompat.Builder(
+            context,
+            when (type) {
+                TransferType.DOWNLOAD -> Constants.NOTIFICATION_CHANNEL_DOWNLOAD_ID
+                TransferType.GENERAL_UPLOAD -> Constants.NOTIFICATION_CHANNEL_UPLOAD_ID
+                else -> throw IllegalArgumentException("Invalid transfer type: $type")
+            }
+        )
             .setSmallIcon(iconPackR.drawable.ic_stat_notify)
             .setColor(ContextCompat.getColor(context, R.color.red_600_red_300))
             .setGroup(FINAL_SUMMARY_GROUP + type.name)

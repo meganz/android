@@ -1,5 +1,7 @@
 package mega.privacy.android.app.presentation.transfers.notification
 
+import mega.privacy.android.icon.pack.R as iconPackR
+import mega.privacy.android.shared.resources.R as sharedR
 import android.app.Notification
 import android.app.PendingIntent
 import android.content.BroadcastReceiver
@@ -32,8 +34,6 @@ import mega.privacy.android.domain.usecase.featureflag.GetFeatureFlagValueUseCas
 import mega.privacy.android.domain.usecase.file.GetPathByDocumentContentUriUseCase
 import mega.privacy.android.domain.usecase.file.IsContentUriUseCase
 import mega.privacy.android.domain.usecase.transfers.paused.PauseTransfersQueueUseCase
-import mega.privacy.android.icon.pack.R as iconPackR
-import mega.privacy.android.shared.resources.R as sharedR
 import timber.log.Timber
 import javax.inject.Inject
 
@@ -52,13 +52,13 @@ class DefaultTransfersActionGroupProgressNotificationBuilder @Inject constructor
         transferType: TransferType,
         paused: Boolean,
     ): Notification {
-        val isDownload = transferType == TransferType.DOWNLOAD
-        if (!isDownload) {
-            throw NotImplementedError("Group notifications are not yet implemented for uploads")
+        if (transferType != TransferType.GENERAL_UPLOAD && transferType != TransferType.DOWNLOAD) {
+            throw NotImplementedError("Group notifications are not yet implemented for this type: $transferType")
         }
-        val isPreviewDownload = actionGroup.isPreviewDownload()
+        val isDownload = transferType == TransferType.DOWNLOAD
+        val isPreviewDownload = isDownload && actionGroup.isPreviewDownload()
         val isPreviewPaused = isPreviewDownload && paused
-        val isOfflineDownload = actionGroup.isOfflineDownload()
+        val isOfflineDownload = isDownload && actionGroup.isOfflineDownload()
         val notificationTitle = when {
             isPreviewPaused -> {
                 resources.getString(
@@ -84,9 +84,10 @@ class DefaultTransfersActionGroupProgressNotificationBuilder @Inject constructor
                 val areTransfersPaused = paused || actionGroup.allPaused()
 
                 val stringId = when {
-                    areTransfersPaused -> R.string.download_service_notification_paused
-
-                    else -> R.string.download_service_notification
+                    areTransfersPaused && isDownload -> R.string.download_service_notification_paused
+                    areTransfersPaused /*&& !isDownload*/ -> R.string.upload_service_notification_paused
+                    isDownload -> R.string.download_service_notification
+                    else /*!isDownload*/ -> R.string.upload_service_notification
                 }
 
                 context.getString(stringId, inProgress, totalTransfers)
@@ -98,7 +99,7 @@ class DefaultTransfersActionGroupProgressNotificationBuilder @Inject constructor
             actionGroup.totalBytes
         )
         val destination = runCatching {
-            if (isContentUriUseCase(actionGroup.destination)) {
+            if (isDownload && isContentUriUseCase(actionGroup.destination)) {
                 getPathByDocumentContentUriUseCase(actionGroup.destination)
             } else {
                 actionGroup.destination
@@ -123,39 +124,34 @@ class DefaultTransfersActionGroupProgressNotificationBuilder @Inject constructor
                 it,
             )
         }
-        val cancelTransferIntent = Intent(context, FakePreviewActivity::class.java).apply {
-            putExtra(EXTRA_TRANSFER_TAG, actionGroup.singleTransferTag)
-        }
-        val openTransfersSectionIntent =
-            if (getFeatureFlagValueUseCase(AppFeatures.TransfersSection)) {
-                Intent(context, TransfersActivity::class.java).apply {
-                    putExtra(EXTRA_TAB, COMPLETED_TAB_INDEX)
+        val (pendingIntent, actionIntent) = if (!isPreviewDownload) {
+            val openTransfersSectionIntent =
+                if (getFeatureFlagValueUseCase(AppFeatures.TransfersSection)) {
+                    Intent(context, TransfersActivity::class.java).apply {
+                        putExtra(EXTRA_TAB, COMPLETED_TAB_INDEX)
+                    }
+                } else {
+                    Intent(context, ManagerActivity::class.java).apply {
+                        action = Constants.ACTION_SHOW_TRANSFERS
+                        putExtra(ManagerActivity.TRANSFERS_TAB, TransfersTab.COMPLETED_TAB)
+                    }
                 }
-            } else {
-                Intent(context, ManagerActivity::class.java).apply {
-                    action = Constants.ACTION_SHOW_TRANSFERS
-                    putExtra(ManagerActivity.TRANSFERS_TAB, TransfersTab.COMPLETED_TAB)
-                }
-            }
-        val pendingIntent = if (!isPreviewDownload) {
             PendingIntent.getActivity(
                 context,
                 0,
                 openTransfersSectionIntent,
                 PendingIntent.FLAG_UPDATE_CURRENT or PendingIntent.FLAG_IMMUTABLE
-            )
+            ) to openTransfersSectionIntent
         } else {
-            null
+            null to Intent(context, FakePreviewActivity::class.java).apply {
+                putExtra(EXTRA_TRANSFER_TAG, actionGroup.singleTransferTag)
+            }
         }
         val actionPendingIntent = PendingIntent.getActivity(
             context,
             System.currentTimeMillis()
                 .toInt(), // Unique request code to make sure old intents are not reused
-            if (isPreviewDownload) {
-                cancelTransferIntent
-            } else {
-                openTransfersSectionIntent
-            },
+            actionIntent,
             PendingIntent.FLAG_UPDATE_CURRENT or PendingIntent.FLAG_IMMUTABLE
         )
         val actionText = when {

@@ -1,5 +1,6 @@
 package mega.privacy.android.data.worker
 
+import android.app.Notification
 import android.content.Context
 import androidx.core.app.NotificationManagerCompat
 import androidx.hilt.work.HiltWorker
@@ -14,8 +15,12 @@ import kotlinx.coroutines.launch
 import kotlinx.coroutines.sync.Mutex
 import mega.privacy.android.data.featuretoggle.DataFeatures
 import mega.privacy.android.data.mapper.transfer.OverQuotaNotificationBuilder
+import mega.privacy.android.data.mapper.transfer.TransfersActionGroupFinishNotificationBuilder
+import mega.privacy.android.data.mapper.transfer.TransfersActionGroupProgressNotificationBuilder
+import mega.privacy.android.data.mapper.transfer.TransfersFinishNotificationSummaryBuilder
 import mega.privacy.android.data.mapper.transfer.TransfersFinishedNotificationMapper
 import mega.privacy.android.data.mapper.transfer.TransfersNotificationMapper
+import mega.privacy.android.data.mapper.transfer.TransfersProgressNotificationSummaryBuilder
 import mega.privacy.android.domain.entity.transfer.ActiveTransferTotals
 import mega.privacy.android.domain.entity.transfer.TransferProgressResult
 import mega.privacy.android.domain.entity.transfer.TransferType
@@ -56,6 +61,10 @@ class UploadsWorker @AssistedInject constructor(
     private val startAllPendingUploadsUseCase: StartAllPendingUploadsUseCase,
     @LoginMutex private val loginMutex: Mutex,
     private val getFeatureFlagValueUseCase: GetFeatureFlagValueUseCase,
+    private val transfersProgressNotificationSummaryBuilder: TransfersProgressNotificationSummaryBuilder,
+    private val transfersActionGroupProgressNotificationBuilder: TransfersActionGroupProgressNotificationBuilder,
+    private val transfersFinishNotificationSummaryBuilder: TransfersFinishNotificationSummaryBuilder,
+    private val transfersActionGroupFinishNotificationBuilder: TransfersActionGroupFinishNotificationBuilder,
 ) : AbstractTransfersWorker(
     context = context,
     workerParams = workerParams,
@@ -93,6 +102,20 @@ class UploadsWorker @AssistedInject constructor(
     override suspend fun showGroupedNotifications() =
         getFeatureFlagValueUseCase(DataFeatures.ShowGroupedUploadNotifications)
 
+    override suspend fun createProgressSummaryNotification(): Notification =
+        transfersProgressNotificationSummaryBuilder(type)
+
+    override suspend fun createActionGroupProgressNotification(
+        actionGroup: ActiveTransferTotals.ActionGroup,
+        paused: Boolean,
+    ): Notification = transfersActionGroupProgressNotificationBuilder(actionGroup, type, paused)
+
+    override suspend fun createFinishSummaryNotification(): Notification =
+        transfersFinishNotificationSummaryBuilder(type)
+
+    override suspend fun createActionGroupFinishNotification(actionGroup: ActiveTransferTotals.ActionGroup): Notification =
+        transfersActionGroupFinishNotificationBuilder(actionGroup, type)
+
     override suspend fun createUpdateNotification(
         activeTransferTotals: ActiveTransferTotals,
         paused: Boolean,
@@ -106,7 +129,7 @@ class UploadsWorker @AssistedInject constructor(
          * Tag for enqueue the worker to work manager
          */
         const val SINGLE_UPLOAD_TAG = "MEGA_UPLOAD_TAG"
-        private const val UPLOAD_NOTIFICATION_ID = 1
-        private const val NOTIFICATION_UPLOAD_FINAL = 5
+        internal const val UPLOAD_NOTIFICATION_ID = 1
+        internal const val NOTIFICATION_UPLOAD_FINAL = 5
     }
 }

@@ -425,7 +425,10 @@ abstract class AbstractTransfersWorker(
 
         private const val NOTIFICATION_STORAGE_OVERQUOTA = 14
 
-        private const val NOTIFICATION_GROUP_MULTIPLAYER = 1_000_000
+        /**
+         * Multiplier for group notifications to be sure that group notifications don't collide
+         */
+        internal const val NOTIFICATION_GROUP_MULTIPLAYER = 1_000_000
 
         /**
          * Milliseconds to sample the transfer progress updates
