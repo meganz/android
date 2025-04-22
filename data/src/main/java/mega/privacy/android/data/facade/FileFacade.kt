@@ -447,15 +447,18 @@ internal class FileFacade @Inject constructor(
         }
     }
 
-    override suspend fun getFileSizeFromUri(uriString: String): Long? {
-        val cursor = context.contentResolver.query(uriString.toUri(), null, null, null, null)
-        return cursor?.use {
-            if (cursor.moveToFirst()) {
-                cursor.getColumnIndex(OpenableColumns.SIZE).takeIf { it >= 0 }
-                    ?.let { cursor.getLong(it) }
-            } else null
+    override suspend fun getFileSizeFromUri(uriString: String): Long? =
+        runCatching {
+            val cursor = context.contentResolver.query(uriString.toUri(), null, null, null, null)
+            cursor?.use {
+                if (cursor.moveToFirst()) {
+                    cursor.getColumnIndex(OpenableColumns.SIZE).takeIf { it >= 0 }
+                        ?.let { cursor.getLong(it) }
+                } else null
+            }
         }
-    }
+            .onFailure { Timber.e(it, "Error getting file size from Uri $uriString") }
+            .getOrNull()
 
     override suspend fun copyContentUriToFile(sourceUri: UriPath, targetFile: File) {
         val uri = sourceUri.value.toUri()

@@ -1,6 +1,7 @@
 package mega.privacy.android.app.camera
 
 import android.Manifest
+import android.content.Context
 import android.content.Intent
 import android.net.Uri
 import android.view.OrientationEventListener
@@ -103,7 +104,7 @@ internal fun CameraCaptureScreen(
 
     val galleryPicker =
         rememberLauncherForActivityResult(
-            contract = ActivityResultContracts.PickVisualMedia()
+            contract = persistablePickVisualMedia()
         ) {
             it?.let {
                 context.contentResolver.takePersistableUriPermission(
@@ -263,4 +264,12 @@ private fun rememberAnimationRotation(rotation: Float): Float {
         label = "rotation",
     )
     return targetRotation
+}
+
+private fun persistablePickVisualMedia() = object : ActivityResultContracts.PickVisualMedia() {
+    override fun createIntent(context: Context, input: PickVisualMediaRequest): Intent =
+        super.createIntent(context, input).also {
+            it.addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION)
+            it.addFlags(Intent.FLAG_GRANT_PERSISTABLE_URI_PERMISSION)
+        }
 }

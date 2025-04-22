@@ -23,7 +23,9 @@ fun Activity.uploadFolderManually() {
     this.startActivityForResult(
         Intent.createChooser(
             Intent(Intent.ACTION_OPEN_DOCUMENT_TREE)
-                .addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION), null
+                .addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION)
+                .addFlags(Intent.FLAG_GRANT_PERSISTABLE_URI_PERMISSION),
+             null
         ), Constants.REQUEST_CODE_GET_FOLDER
     )
 }

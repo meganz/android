@@ -350,7 +350,8 @@ class FileStorageActivity : PasscodeActivity(), Scrollable {
         try {
             startActivityForResult(
                 Intent(Intent.ACTION_OPEN_DOCUMENT_TREE)
-                    .addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION), REQUEST_PICK_CU_FOLDER
+                    .addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION or Intent.FLAG_GRANT_PERSISTABLE_URI_PERMISSION),
+                REQUEST_PICK_CU_FOLDER
             )
         } catch (e: ActivityNotFoundException) {
             showOpenDocumentWarningAndFinish(e)
@@ -364,7 +365,11 @@ class FileStorageActivity : PasscodeActivity(), Scrollable {
         try {
             startActivityForResult(
                 Intent(Intent.ACTION_OPEN_DOCUMENT_TREE)
-                    .addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION or Intent.FLAG_GRANT_WRITE_URI_PERMISSION),
+                    .addFlags(
+                        Intent.FLAG_GRANT_READ_URI_PERMISSION
+                                or Intent.FLAG_GRANT_WRITE_URI_PERMISSION
+                                or Intent.FLAG_GRANT_PERSISTABLE_URI_PERMISSION
+                    ),
                 REQUEST_PICK_DOWNLOAD_FOLDER
             )
         } catch (e: ActivityNotFoundException) {

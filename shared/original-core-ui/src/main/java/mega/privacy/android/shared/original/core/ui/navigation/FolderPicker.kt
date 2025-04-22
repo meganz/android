@@ -61,9 +61,7 @@ private fun persistableOpenDocumentTree(initialUri: Uri? = null) =
     object : ActivityResultContracts.OpenDocumentTree() {
         override fun createIntent(context: Context, input: Uri?): Intent =
             super.createIntent(context, initialUri).also {
-                it.addFlags(
-                    Intent.FLAG_GRANT_READ_URI_PERMISSION
-                            and Intent.FLAG_GRANT_PERSISTABLE_URI_PERMISSION
-                )
+                it.addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION)
+                it.addFlags(Intent.FLAG_GRANT_PERSISTABLE_URI_PERMISSION)
             }
     }
