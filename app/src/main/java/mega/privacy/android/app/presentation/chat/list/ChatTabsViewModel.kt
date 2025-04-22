@@ -216,7 +216,7 @@ class ChatTabsViewModel @Inject constructor(
                             chats = items,
                             onlyNoteToSelfChat = items.size == 1 && items.first() is ChatRoomItem.NoteToSelfChatRoomItem,
                             areChatsOrMeetingLoading = if (it.currentTab == ChatTab.CHATS) false else it.areChatsOrMeetingLoading,
-                            isEmptyChatsOrMeetings = if (it.currentTab == ChatTab.CHATS) it.noChats else it.isEmptyChatsOrMeetings
+                            isEmptyChatsOrMeetings = if (it.currentTab == ChatTab.CHATS) it.noChats else it.noMeetings
                         )
                     }
                 }
@@ -245,7 +245,7 @@ class ChatTabsViewModel @Inject constructor(
                                 areMeetingsLoading = false,
                                 meetings = items,
                                 areChatsOrMeetingLoading = if (it.currentTab == ChatTab.MEETINGS) false else it.areChatsOrMeetingLoading,
-                                isEmptyChatsOrMeetings = if (it.currentTab == ChatTab.MEETINGS) it.noMeetings else it.isEmptyChatsOrMeetings
+                                isEmptyChatsOrMeetings = if (it.currentTab == ChatTab.MEETINGS) it.noMeetings else it.noChats
                             )
                         }
                     }
@@ -617,8 +617,8 @@ class ChatTabsViewModel @Inject constructor(
         state.update {
             it.copy(
                 currentTab = selectedTab,
-                areChatsOrMeetingLoading = if (it.currentTab == ChatTab.CHATS) it.areChatsLoading else it.areMeetingsLoading,
-                isEmptyChatsOrMeetings = if (it.currentTab == ChatTab.CHATS) it.noChats else it.noMeetings
+                areChatsOrMeetingLoading = if (selectedTab == ChatTab.CHATS) it.areChatsLoading else it.areMeetingsLoading,
+                isEmptyChatsOrMeetings = if (selectedTab == ChatTab.CHATS) it.noChats else it.noMeetings
             )
         }
     }
