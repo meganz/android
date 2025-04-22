@@ -325,7 +325,7 @@ class NodeOptionsBottomSheetDialogFragment : BaseBottomSheetDialogFragment() {
                         )
                     }
                 }
-                optionHideHelp.setOnClickListener { showHiddenNodesOnboarding() }
+                optionHideHelp.setOnClickListener { showHiddenNodesOnboarding(false) }
                 optionDownload.setOnClickListener { onClick { onDownloadClicked(node) } }
                 optionOffline.setOnClickListener {
                     onClick {
@@ -1420,16 +1420,16 @@ class NodeOptionsBottomSheetDialogFragment : BaseBottomSheetDialogFragment() {
             setStateBottomSheetBehaviorHidden()
         } else {
             tempNodeId = nodeOptionsViewModel.state.value.node?.handle?.let { NodeId(it) }
-            showHiddenNodesOnboarding()
+            showHiddenNodesOnboarding(true)
         }
     }
 
-    private fun showHiddenNodesOnboarding() {
+    private fun showHiddenNodesOnboarding(isOnboarding: Boolean) {
         nodeOptionsViewModel.setHiddenNodesOnboarded()
 
         val intent = HiddenNodesOnboardingActivity.createScreen(
             context = requireContext(),
-            isOnboarding = true,
+            isOnboarding = isOnboarding,
         )
         hiddenNodesOnboardingLauncher.launch(intent)
         activity?.overridePendingTransition(0, 0)

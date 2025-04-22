@@ -28,6 +28,7 @@ import androidx.compose.material.Text
 import androidx.compose.material.TopAppBar
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.painter.Painter
@@ -36,8 +37,10 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import mega.privacy.android.analytics.Analytics
 import mega.privacy.android.app.R
+import mega.privacy.android.domain.entity.AccountType
 import mega.privacy.android.shared.original.core.ui.theme.accent_050
 import mega.privacy.android.shared.original.core.ui.theme.accent_900
 import mega.privacy.android.shared.original.core.ui.theme.black
@@ -53,10 +56,13 @@ import mega.privacy.mobile.analytics.event.HideNodeUpgradeScreenEvent
 
 @Composable
 internal fun HiddenNodesOnboardingScreen(
+    viewModel: HiddenNodesOnboardingViewModel,
     isOnboarding: Boolean,
     onClickBack: () -> Unit,
     onClickContinue: () -> Unit,
 ) {
+    val state by viewModel.state.collectAsStateWithLifecycle()
+
     LaunchedEffect(Unit) {
         Analytics.tracker.trackEvent(
             if (isOnboarding) HideNodeOnboardingScreenEvent else HideNodeUpgradeScreenEvent
@@ -70,11 +76,15 @@ internal fun HiddenNodesOnboardingScreen(
             )
         },
         bottomBar = {
-            HiddenNodesOnboardingBottomBar(
-                isOnboarding = isOnboarding,
-                onClickBack = onClickBack,
-                onClickContinue = onClickContinue,
-            )
+            if (state.isInitialized) {
+                HiddenNodesOnboardingBottomBar(
+                    accountType = state.accountType,
+                    isBusinessAccountExpired = state.isBusinessAccountExpired,
+                    isOnboarding = isOnboarding,
+                    onClickBack = onClickBack,
+                    onClickContinue = onClickContinue,
+                )
+            }
         },
         content = { paddingValues ->
             HiddenNodesOnboardingContent(
@@ -113,6 +123,8 @@ private fun HiddenNodesOnboardingAppBar(
 @Composable
 private fun HiddenNodesOnboardingBottomBar(
     modifier: Modifier = Modifier,
+    accountType: AccountType?,
+    isBusinessAccountExpired: Boolean,
     isOnboarding: Boolean,
     onClickBack: () -> Unit,
     onClickContinue: () -> Unit,
@@ -127,18 +139,16 @@ private fun HiddenNodesOnboardingBottomBar(
         horizontalArrangement = Arrangement.End,
         verticalAlignment = Alignment.CenterVertically,
     ) {
-        Text(
-            text = stringResource(id = R.string.button_not_now_rich_links),
-            modifier = Modifier.clickable { onClickBack() },
-            color = accent_900.takeIf { isLight } ?: accent_050,
-            fontWeight = FontWeight.W500,
-            style = MaterialTheme.typography.button,
-        )
-
-        Spacer(modifier = Modifier.size(28.dp))
+        val (strRes, action) = if (isOnboarding) {
+            R.string.button_continue to onClickContinue
+        } else if (accountType?.isPaid == false || isBusinessAccountExpired) {
+            R.string.plans_depleted_transfer_overquota to onClickContinue
+        } else {
+            R.string.general_close to onClickBack
+        }
 
         Button(
-            onClick = onClickContinue,
+            onClick = action,
             shape = RoundedCornerShape(4.dp),
             colors = ButtonDefaults.buttonColors(
                 backgroundColor = accent_900.takeIf { isLight } ?: accent_050,
@@ -147,9 +157,7 @@ private fun HiddenNodesOnboardingBottomBar(
             ),
         ) {
             Text(
-                text = stringResource(
-                    id = R.string.button_continue.takeIf { isOnboarding }
-                        ?: R.string.plans_depleted_transfer_overquota),
+                text = stringResource(strRes),
                 color = white.takeIf { isLight } ?: dark_grey,
                 fontWeight = FontWeight.W500,
                 style = MaterialTheme.typography.button,

@@ -42,6 +42,7 @@ class HiddenNodesOnboardingActivity : AppCompatActivity() {
             val themeMode by getThemeMode().collectAsState(initial = ThemeMode.System)
             OriginalTheme(isDark = themeMode.isDarkMode()) {
                 HiddenNodesOnboardingScreen(
+                    viewModel = viewModel,
                     isOnboarding = isOnboarding,
                     onClickBack = ::finish,
                     onClickContinue = ::handleContinue,
