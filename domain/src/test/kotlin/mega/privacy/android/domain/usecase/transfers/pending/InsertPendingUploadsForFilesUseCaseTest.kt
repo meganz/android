@@ -8,6 +8,7 @@ import mega.privacy.android.domain.entity.transfer.TransferType
 import mega.privacy.android.domain.entity.transfer.pending.InsertPendingTransferRequest
 import mega.privacy.android.domain.entity.transfer.pending.PendingTransferNodeIdentifier
 import mega.privacy.android.domain.entity.uri.UriPath
+import mega.privacy.android.domain.repository.NodeRepository
 import mega.privacy.android.domain.repository.TimeSystemRepository
 import mega.privacy.android.domain.repository.TransferRepository
 import org.junit.jupiter.api.BeforeAll
@@ -26,12 +27,14 @@ class InsertPendingUploadsForFilesUseCaseTest {
 
     private val transferRepository = mock<TransferRepository>()
     private val timeSystemRepository = mock<TimeSystemRepository>()
+    private val nodeRepository = mock<NodeRepository>()
 
     @BeforeAll
     fun setUp() {
         underTest = InsertPendingUploadsForFilesUseCase(
             transferRepository,
             timeSystemRepository,
+            nodeRepository,
         )
     }
 
@@ -40,6 +43,7 @@ class InsertPendingUploadsForFilesUseCaseTest {
         reset(
             transferRepository,
             timeSystemRepository,
+            nodeRepository,
         )
     }
 
@@ -48,13 +52,15 @@ class InsertPendingUploadsForFilesUseCaseTest {
         val pathsAndNames = (0..10).associate { "content://file$it" to "newName$it" }
         val parentFolderId = NodeId(242L)
         val currentTime = 398457L
+        val destination = "/folder/sub-folder"
         whenever(timeSystemRepository.getCurrentTimeInMillis()) doReturn currentTime
+        whenever(nodeRepository.getNodePathById(parentFolderId)) doReturn destination
         val transferGroupId = 2437865L
         whenever(
             transferRepository.insertActiveTransferGroup(
                 ActiveTransferActionGroupImpl(
                     transferType = TransferType.GENERAL_UPLOAD,
-                    destination = "",
+                    destination = destination,
                     startTime = currentTime,
                 )
             )

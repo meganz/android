@@ -7,6 +7,7 @@ import mega.privacy.android.domain.entity.transfer.TransferType
 import mega.privacy.android.domain.entity.transfer.pending.InsertPendingTransferRequest
 import mega.privacy.android.domain.entity.transfer.pending.PendingTransferNodeIdentifier
 import mega.privacy.android.domain.entity.uri.UriPath
+import mega.privacy.android.domain.repository.NodeRepository
 import mega.privacy.android.domain.repository.TimeSystemRepository
 import mega.privacy.android.domain.repository.TransferRepository
 import javax.inject.Inject
@@ -17,6 +18,7 @@ import javax.inject.Inject
 class InsertPendingUploadsForFilesUseCase @Inject constructor(
     private val transferRepository: TransferRepository,
     private val timeSystemRepository: TimeSystemRepository,
+    private val nodeRepository: NodeRepository,
 ) {
     /**
      * Invoke
@@ -33,7 +35,7 @@ class InsertPendingUploadsForFilesUseCase @Inject constructor(
         val transferGroupId = transferRepository.insertActiveTransferGroup(
             ActiveTransferActionGroupImpl(
                 transferType = TransferType.GENERAL_UPLOAD,
-                destination = "",
+                destination = nodeRepository.getNodePathById(parentFolderId),
                 startTime = timeSystemRepository.getCurrentTimeInMillis(),
             )
         )
