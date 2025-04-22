@@ -6,7 +6,6 @@ import kotlinx.coroutines.flow.flowOf
 import kotlinx.coroutines.runBlocking
 import kotlinx.coroutines.test.StandardTestDispatcher
 import kotlinx.coroutines.test.TestScope
-import mega.privacy.android.app.initializer.DependencyContainer
 import mega.privacy.android.domain.entity.user.UserCredentials
 import mega.privacy.android.domain.usecase.login.GetAccountCredentialsUseCase
 import mega.privacy.android.domain.usecase.login.MonitorLogoutUseCase
@@ -32,7 +31,7 @@ class OfflineDocumentProviderTest {
     private val mockedAccountCredentials = mock<UserCredentials>()
     private val testDispatcher = StandardTestDispatcher()
     private val testScope = TestScope(testDispatcher)
-    private val mockDependencyContainer: DependencyContainer = mock()
+    private val mockDependencyContainer: DocumentProviderEntryPoint = mock()
 
     @BeforeEach
     fun setUp() {
@@ -45,21 +44,21 @@ class OfflineDocumentProviderTest {
             mockDependencyContainer
         )
 
-        whenever(mockDependencyContainer.applicationScope).thenReturn(testScope)
-        whenever(mockDependencyContainer.getOfflineDocumentProviderRootFolderUseCase).thenReturn(
+        whenever(mockDependencyContainer.applicationScope()).thenReturn(testScope)
+        whenever(mockDependencyContainer.getOfflineDocumentProviderRootFolderUseCase()).thenReturn(
             getOfflineDocumentProviderRootFolderUseCase
         )
-        whenever(mockDependencyContainer.monitorLogoutUseCase).thenReturn(monitorLogoutUseCase)
-        whenever(mockDependencyContainer.getAccountCredentialsUseCase).thenReturn(
+        whenever(mockDependencyContainer.monitorLogoutUseCase()).thenReturn(monitorLogoutUseCase)
+        whenever(mockDependencyContainer.getAccountCredentialsUseCase()).thenReturn(
             getAccountCredentialsUseCase
         )
 
         underTest = OfflineDocumentProvider()
-        injectDependencyContainer(underTest, mockDependencyContainer)
+        injectDependencyContainer(underTest, lazy { mockDependencyContainer })
     }
 
     private fun injectDependencyContainer(instance: Any, value: Any) {
-        val field: Field = instance.javaClass.getDeclaredField("dependencyContainer")
+        val field: Field = instance.javaClass.getDeclaredField("dependencyContainer\$delegate")
         field.isAccessible = true
         field.set(instance, value)
     }

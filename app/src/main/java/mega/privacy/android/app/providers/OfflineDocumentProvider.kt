@@ -1,6 +1,5 @@
 package mega.privacy.android.app.providers
 
-import mega.privacy.android.shared.resources.R as SharedR
 import android.database.Cursor
 import android.database.MatrixCursor
 import android.net.Uri
@@ -12,15 +11,20 @@ import android.provider.DocumentsContract.Document
 import android.provider.DocumentsContract.Root
 import android.provider.DocumentsProvider
 import android.webkit.MimeTypeMap
+import dagger.hilt.EntryPoint
+import dagger.hilt.InstallIn
+import dagger.hilt.android.EntryPointAccessors
+import dagger.hilt.components.SingletonComponent
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.runBlocking
 import mega.privacy.android.app.BuildConfig
-import mega.privacy.android.app.initializer.DependencyContainer
+import mega.privacy.android.domain.qualifier.ApplicationScope
 import mega.privacy.android.domain.usecase.login.GetAccountCredentialsUseCase
 import mega.privacy.android.domain.usecase.login.MonitorLogoutUseCase
 import mega.privacy.android.domain.usecase.offline.GetOfflineDocumentProviderRootFolderUseCase
+import mega.privacy.android.shared.resources.R as SharedR
 import timber.log.Timber
 import java.io.File
 import java.io.FileNotFoundException
@@ -61,11 +65,16 @@ class OfflineDocumentProvider : DocumentsProvider() {
     }
 
     private var rootFolder: File? = null
-    private val dependencyContainer: DependencyContainer = DependencyContainer
-    private val applicationScope: CoroutineScope by lazy { dependencyContainer.applicationScope }
-    private val getOfflineDocumentProviderRootFolderUseCase: GetOfflineDocumentProviderRootFolderUseCase by lazy { dependencyContainer.getOfflineDocumentProviderRootFolderUseCase }
-    private val monitorLogoutUseCase: MonitorLogoutUseCase by lazy { dependencyContainer.monitorLogoutUseCase }
-    private val getAccountCredentialsUseCase: GetAccountCredentialsUseCase by lazy { dependencyContainer.getAccountCredentialsUseCase }
+    private val dependencyContainer: DocumentProviderEntryPoint by lazy {
+        EntryPointAccessors.fromApplication(
+            context!!.applicationContext,
+            DocumentProviderEntryPoint::class.java
+        )
+    }
+    private val applicationScope: CoroutineScope by lazy { dependencyContainer.applicationScope() }
+    private val getOfflineDocumentProviderRootFolderUseCase: GetOfflineDocumentProviderRootFolderUseCase by lazy { dependencyContainer.getOfflineDocumentProviderRootFolderUseCase() }
+    private val monitorLogoutUseCase: MonitorLogoutUseCase by lazy { dependencyContainer.monitorLogoutUseCase() }
+    private val getAccountCredentialsUseCase: GetAccountCredentialsUseCase by lazy { dependencyContainer.getAccountCredentialsUseCase() }
     private var logoutJob: Job? = null
 
     /**
@@ -341,3 +350,30 @@ class OfflineDocumentProvider : DocumentsProvider() {
     }
 }
 
+/**
+ * OfflineDocumentProvider Entry point
+ */
+@EntryPoint
+@InstallIn(SingletonComponent::class)
+interface DocumentProviderEntryPoint {
+    /**
+     * Provides [GetOfflineDocumentProviderRootFolderUseCase] to create Document provider Root Folder for the User.
+     */
+    fun getOfflineDocumentProviderRootFolderUseCase(): GetOfflineDocumentProviderRootFolderUseCase
+
+    /**
+     * Provides [MonitorLogoutUseCase] to monitor logout.
+     */
+    fun monitorLogoutUseCase(): MonitorLogoutUseCase
+
+    /**
+     * Provides [GetAccountCredentialsUseCase] to get logged in user's credentials
+     */
+    fun getAccountCredentialsUseCase(): GetAccountCredentialsUseCase
+
+    /**
+     * Provides [CoroutineScope] for application scope.
+     */
+    @ApplicationScope
+    fun applicationScope(): CoroutineScope
+}
