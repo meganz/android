@@ -165,7 +165,7 @@ class StartConversationViewModel @Inject constructor(
             val contactList = getVisibleContactsUseCase()
             _state.update {
                 it.copy(
-                    contactItemList = contactList,
+                    contactItemList = contactList.sortList(),
                     emptyViewVisible = contactList.isEmpty(),
                     searchAvailable = contactList.isNotEmpty(),
                     filteredContactList = getFilteredContactList(
@@ -196,7 +196,7 @@ class StartConversationViewModel @Inject constructor(
         viewModelScope.launch {
             monitorContactUpdates().collectLatest { userUpdates ->
                 val contactList = applyContactUpdates(_state.value.contactItemList, userUpdates)
-                _state.update { it.copy(contactItemList = contactList) }
+                _state.update { it.copy(contactItemList = contactList.sortList()) }
             }
         }
     }

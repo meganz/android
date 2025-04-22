@@ -241,7 +241,7 @@ internal class DefaultContactsRepository @Inject constructor(
 
             contactDataMapper(
                 fullName = fullName,
-                alias = alias,
+                alias = if (alias.isNullOrEmpty()) null else alias,
                 avatarUri = avatarUri,
                 userVisibility = contactItem.visibility
             )
