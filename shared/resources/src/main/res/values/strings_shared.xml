@@ -1120,4 +1120,10 @@
     <string name="camera_backup_permission_enable_button_text">Enable camera uploads</string>
     <!--Permission screen skip requesting permission button text-->
     <string name="permission_screen_skip_permission_request_button_text">Skip for now</string>
+    <!--Notification permission screen title-->
+    <string name="notification_permission_screen_title">Never miss an important update</string>
+    <!--Notification permission screen description-->
+    <string name="notification_permission_screen_description">Stay informed with real-time updates that matter to you. Get alerts for shared folder activity, security updates, and exclusive offers so you never miss anything important.\n\nYou can manage notification preferences at any time in your device settings.</string>
+    <!--Button text to request Notification permission-->
+    <string name="notification_permission_enable_button_text">Enable notifications</string>
 </resources>

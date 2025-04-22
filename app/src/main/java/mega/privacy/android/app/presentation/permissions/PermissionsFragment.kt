@@ -10,7 +10,6 @@ import android.provider.Settings.canDrawOverlays
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.pager.HorizontalPager
@@ -31,7 +30,6 @@ import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.launch
 import mega.android.core.ui.components.indicators.LargeHUD
 import mega.android.core.ui.theme.AndroidTheme
-import mega.android.core.ui.theme.values.TextColor
 import mega.privacy.android.analytics.Analytics
 import mega.privacy.android.app.arch.extensions.collectFlow
 import mega.privacy.android.app.databinding.FragmentPermissionsBinding
@@ -46,13 +44,13 @@ import mega.privacy.android.app.presentation.permissions.model.Permission
 import mega.privacy.android.app.presentation.permissions.model.PermissionScreen
 import mega.privacy.android.app.presentation.permissions.model.PermissionType
 import mega.privacy.android.app.presentation.permissions.view.CameraBackupPermissionsScreen
+import mega.privacy.android.app.presentation.permissions.view.NotificationPermissionScreen
 import mega.privacy.android.app.utils.permission.PermissionUtils.getAudioPermissionByVersion
 import mega.privacy.android.app.utils.permission.PermissionUtils.getImagePermissionByVersion
 import mega.privacy.android.app.utils.permission.PermissionUtils.getReadExternalStoragePermission
 import mega.privacy.android.app.utils.permission.PermissionUtils.getVideoPermissionByVersion
 import mega.privacy.android.app.utils.permission.PermissionUtils.hasPermissions
 import mega.privacy.android.app.utils.permission.PermissionUtils.requestPermission
-import mega.privacy.android.shared.original.core.ui.controls.text.MegaText
 import mega.privacy.mobile.analytics.event.OnboardingInitialPageNotNowButtonPressedEvent
 import mega.privacy.mobile.analytics.event.OnboardingInitialPageSetUpMegaButtonPressedEvent
 import timber.log.Timber
@@ -163,19 +161,15 @@ class PermissionsFragment : Fragment() {
                         }
 
                         PERMISSION_NOTIFICATION_PAGE -> {
-                            // Todo replace with notification permission screen
-                            Box(
-                                modifier = Modifier
-                                    .fillMaxSize()
-                                    .clickable {
-                                        setNextPermission()
-                                    }
-                            ) {
-                                MegaText(
-                                    text = "Empty Notification screen",
-                                    textColor = TextColor.Primary
-                                )
-                            }
+                            NotificationPermissionScreen(
+                                modifier = Modifier.fillMaxSize(),
+                                onEnablePermission = {
+                                    // TODO Handle request notification permission
+                                },
+                                onSkipPermission = {
+                                    // TODO Handle skip notification permission
+                                }
+                            )
                         }
 
                         PERMISSION_CAMERA_PAGE -> {

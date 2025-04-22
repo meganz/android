@@ -16,6 +16,25 @@ import mega.android.core.ui.theme.AndroidThemeForPreviews
 import mega.privacy.android.shared.resources.R
 
 @Composable
+fun NotificationPermissionScreen(
+    modifier: Modifier = Modifier,
+    onEnablePermission: () -> Unit,
+    onSkipPermission: () -> Unit,
+) {
+    NewPermissionsScreen(
+        attributes = PermissionAttributes(
+            title = stringResource(R.string.notification_permission_screen_title),
+            description = stringResource(R.string.notification_permission_screen_description),
+            bannerText = null,
+            image = painterResource(id = IconPackR.drawable.illustration_notification_permission),
+            primaryButton = stringResource(R.string.notification_permission_enable_button_text) to onEnablePermission,
+            secondaryButton = stringResource(R.string.permission_screen_skip_permission_request_button_text) to onSkipPermission,
+        ),
+        modifier = modifier,
+    )
+}
+
+@Composable
 fun CameraBackupPermissionsScreen(
     modifier: Modifier = Modifier,
     onEnablePermission: () -> Unit,
@@ -49,6 +68,18 @@ fun CameraBackupPermissionsScreen(
 private fun CameraBackupPermissionsScreenPreview() {
     AndroidThemeForPreviews {
         CameraBackupPermissionsScreen(
+            modifier = Modifier,
+            onEnablePermission = {},
+            onSkipPermission = {},
+        )
+    }
+}
+
+@CombinedThemePreviews
+@Composable
+private fun NotificationPermissionScreenPreview() {
+    AndroidThemeForPreviews {
+        NotificationPermissionScreen(
             modifier = Modifier,
             onEnablePermission = {},
             onSkipPermission = {},
