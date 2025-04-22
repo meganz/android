@@ -6,6 +6,7 @@ import androidx.compose.ui.test.junit4.createComposeRule
 import androidx.compose.ui.test.onNodeWithText
 import androidx.compose.ui.test.performClick
 import androidx.test.ext.junit.runners.AndroidJUnit4
+import mega.android.core.ui.components.text.SpannableText
 import mega.privacy.android.app.R
 import mega.privacy.android.app.presentation.permissions.view.NewPermissionsScreen
 import mega.privacy.android.app.presentation.permissions.view.PermissionAttributes
@@ -29,7 +30,7 @@ class PermissionScreenViewTest {
                 attributes = PermissionAttributes(
                     title = "Title",
                     description = "Description",
-                    bannerText = "Banner Text",
+                    bannerText = SpannableText("Banner Text"),
                     image = painterResource(id = R.drawable.ic_apps),
                     primaryButton = "Primary Button" to {},
                     secondaryButton = "Secondary Button" to {}
@@ -55,7 +56,7 @@ class PermissionScreenViewTest {
                 attributes = PermissionAttributes(
                     title = "Title",
                     description = "Description",
-                    bannerText = "Banner Text",
+                    bannerText = SpannableText("Banner Text"),
                     image = painterResource(id = R.drawable.ic_apps),
                     primaryButton = "Primary Button" to primaryButtonCallback,
                     secondaryButton = "Secondary Button" to secondaryButtonCallback

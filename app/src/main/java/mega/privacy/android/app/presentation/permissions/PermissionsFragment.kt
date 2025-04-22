@@ -10,14 +10,28 @@ import android.provider.Settings.canDrawOverlays
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import androidx.compose.foundation.clickable
+import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.pager.HorizontalPager
+import androidx.compose.foundation.pager.rememberPagerState
+import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.getValue
+import androidx.compose.ui.Modifier
 import androidx.core.content.ContextCompat
 import androidx.core.view.isVisible
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.viewModels
+import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.lifecycle.lifecycleScope
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.delay
+import kotlinx.coroutines.flow.distinctUntilChanged
+import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.launch
+import mega.android.core.ui.components.indicators.LargeHUD
+import mega.android.core.ui.theme.AndroidTheme
+import mega.android.core.ui.theme.values.TextColor
 import mega.privacy.android.analytics.Analytics
 import mega.privacy.android.app.arch.extensions.collectFlow
 import mega.privacy.android.app.databinding.FragmentPermissionsBinding
@@ -25,17 +39,20 @@ import mega.privacy.android.app.databinding.PermissionsImageLayoutBinding
 import mega.privacy.android.app.main.ManagerActivity
 import mega.privacy.android.app.presentation.extensions.description
 import mega.privacy.android.app.presentation.extensions.image
+import mega.privacy.android.app.presentation.extensions.isDarkMode
 import mega.privacy.android.app.presentation.extensions.positiveButton
 import mega.privacy.android.app.presentation.extensions.title
 import mega.privacy.android.app.presentation.permissions.model.Permission
 import mega.privacy.android.app.presentation.permissions.model.PermissionScreen
 import mega.privacy.android.app.presentation.permissions.model.PermissionType
+import mega.privacy.android.app.presentation.permissions.view.CameraBackupPermissionsScreen
 import mega.privacy.android.app.utils.permission.PermissionUtils.getAudioPermissionByVersion
 import mega.privacy.android.app.utils.permission.PermissionUtils.getImagePermissionByVersion
 import mega.privacy.android.app.utils.permission.PermissionUtils.getReadExternalStoragePermission
 import mega.privacy.android.app.utils.permission.PermissionUtils.getVideoPermissionByVersion
 import mega.privacy.android.app.utils.permission.PermissionUtils.hasPermissions
 import mega.privacy.android.app.utils.permission.PermissionUtils.requestPermission
+import mega.privacy.android.shared.original.core.ui.controls.text.MegaText
 import mega.privacy.mobile.analytics.event.OnboardingInitialPageNotNowButtonPressedEvent
 import mega.privacy.mobile.analytics.event.OnboardingInitialPageSetUpMegaButtonPressedEvent
 import timber.log.Timber
@@ -45,7 +62,6 @@ import timber.log.Timber
  */
 @AndroidEntryPoint
 class PermissionsFragment : Fragment() {
-
     private val viewModel: PermissionsViewModel by viewModels()
     private lateinit var binding: FragmentPermissionsBinding
     private lateinit var permissionBinding: PermissionsImageLayoutBinding
@@ -87,14 +103,27 @@ class PermissionsFragment : Fragment() {
             setupData()
         }
 
-        setupView()
-        setupObservers()
-        monitorUiState()
+        monitorOnboardingRevampState()
     }
 
-    private fun monitorUiState() {
-        collectFlow(viewModel.uiState) { state ->
-            updatePermissionsLayoutVisibility(state.isOnboardingRevampEnabled)
+    private fun monitorOnboardingRevampState() {
+        collectFlow(
+            viewModel
+                .uiState
+                .map { it.isOnboardingRevampEnabled }
+                .distinctUntilChanged()
+        ) { state ->
+            setupView(state)
+            updatePermissionsLayoutVisibility(state)
+        }
+    }
+
+    private fun setupView(isRevampEnabled: Boolean) {
+        if (isRevampEnabled) {
+            setupComposableView()
+        } else {
+            setupLegacyView()
+            setupLegacyObservers()
         }
     }
 
@@ -103,7 +132,66 @@ class PermissionsFragment : Fragment() {
         binding.newPermissionsLayout.isVisible = isRevampEnabled
     }
 
-    private fun setupView() {
+    private fun setupComposableView() {
+        binding.newPermissionsLayout.setContent {
+            val uiState by viewModel.uiState.collectAsStateWithLifecycle()
+            val isDarkTheme = uiState.themeMode.isDarkMode()
+            val pagerState = rememberPagerState(initialPage = PERMISSION_DEFAULT_PAGE) { 3 }
+
+            LaunchedEffect(uiState.visiblePermission) {
+                val page = when (uiState.visiblePermission) {
+                    PermissionScreen.Camera -> PERMISSION_CAMERA_PAGE
+                    PermissionScreen.Notifications -> PERMISSION_NOTIFICATION_PAGE
+                    else -> PERMISSION_DEFAULT_PAGE
+                }
+
+                pagerState.animateScrollToPage(page)
+            }
+
+            AndroidTheme(isDarkTheme) {
+                HorizontalPager(
+                    modifier = Modifier.fillMaxSize(),
+                    state = pagerState,
+                    userScrollEnabled = false,
+                ) { page ->
+                    when (page) {
+                        PERMISSION_DEFAULT_PAGE -> {
+                            // Show loading indicator when permissions is loading
+                            Box(modifier = Modifier.fillMaxSize()) {
+                                LargeHUD()
+                            }
+                        }
+
+                        PERMISSION_NOTIFICATION_PAGE -> {
+                            // Todo replace with notification permission screen
+                            Box(
+                                modifier = Modifier
+                                    .fillMaxSize()
+                                    .clickable {
+                                        setNextPermission()
+                                    }
+                            ) {
+                                MegaText(
+                                    text = "Empty Notification screen",
+                                    textColor = TextColor.Primary
+                                )
+                            }
+                        }
+
+                        PERMISSION_CAMERA_PAGE -> {
+                            CameraBackupPermissionsScreen(
+                                modifier = Modifier.fillMaxSize(),
+                                onEnablePermission = ::askForReadAndWritePermissions,
+                                onSkipPermission = ::setNextPermission
+                            )
+                        }
+                    }
+                }
+            }
+        }
+    }
+
+    private fun setupLegacyView() {
         binding.notNowButton.setOnClickListener {
             Analytics.tracker.trackEvent(OnboardingInitialPageNotNowButtonPressedEvent)
             (requireActivity() as ManagerActivity).destroyPermissionsFragment()
@@ -176,7 +264,7 @@ class PermissionsFragment : Fragment() {
         viewModel.setData(missingPermission)
     }
 
-    private fun setupObservers() {
+    private fun setupLegacyObservers() {
         viewModel.shouldShowInitialSetupScreen().observe(viewLifecycleOwner, ::showScreen)
         viewModel.getCurrentPermission().observe(viewLifecycleOwner, ::setCurrentPermissionScreen)
         viewModel.onAskPermission().observe(viewLifecycleOwner, ::askForPermission)
@@ -343,6 +431,10 @@ class PermissionsFragment : Fragment() {
          * Permissions fragment identifier.
          */
         const val PERMISSIONS_FRAGMENT = 666
+
+        private const val PERMISSION_DEFAULT_PAGE = 0
+        private const val PERMISSION_NOTIFICATION_PAGE = 1
+        private const val PERMISSION_CAMERA_PAGE = 2
 
         /**
          * Creates a new instance of [PermissionsFragment].

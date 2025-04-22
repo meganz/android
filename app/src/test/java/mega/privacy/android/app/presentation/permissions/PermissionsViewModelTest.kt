@@ -4,17 +4,24 @@ import app.cash.turbine.test
 import com.google.common.truth.Truth.assertThat
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.ExperimentalCoroutinesApi
+import kotlinx.coroutines.flow.flowOf
 import kotlinx.coroutines.test.UnconfinedTestDispatcher
 import kotlinx.coroutines.test.resetMain
 import kotlinx.coroutines.test.runTest
 import kotlinx.coroutines.test.setMain
 import mega.privacy.android.app.featuretoggle.AppFeatures
+import mega.privacy.android.app.presentation.permissions.model.Permission
+import mega.privacy.android.app.presentation.permissions.model.PermissionScreen
+import mega.privacy.android.domain.entity.ThemeMode
 import mega.privacy.android.domain.repository.AccountRepository
+import mega.privacy.android.domain.usecase.GetThemeMode
 import mega.privacy.android.domain.usecase.featureflag.GetFeatureFlagValueUseCase
 import org.junit.jupiter.api.AfterEach
 import org.junit.jupiter.api.BeforeEach
+import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.TestInstance
 import org.junit.jupiter.params.ParameterizedTest
+import org.junit.jupiter.params.provider.EnumSource
 import org.junit.jupiter.params.provider.ValueSource
 import org.mockito.kotlin.mock
 import org.mockito.kotlin.reset
@@ -27,6 +34,7 @@ class PermissionsViewModelTest {
 
     private val defaultAccountRepository: AccountRepository = mock()
     private val getFeatureFlagValueUseCase: GetFeatureFlagValueUseCase = mock()
+    private val getThemeModeUseCase: GetThemeMode = mock()
     private val testDispatcher = UnconfinedTestDispatcher()
 
     @BeforeEach
@@ -45,6 +53,7 @@ class PermissionsViewModelTest {
             defaultAccountRepository = defaultAccountRepository,
             ioDispatcher = testDispatcher,
             getFeatureFlagValueUseCase = getFeatureFlagValueUseCase,
+            getThemeModeUseCase = getThemeModeUseCase,
         )
     }
 
@@ -56,8 +65,85 @@ class PermissionsViewModelTest {
 
         init()
 
+        underTest.setData(emptyList())
+
         underTest.uiState.test {
             assertThat(awaitItem().isOnboardingRevampEnabled).isEqualTo(isEnabled)
         }
     }
+
+    @ParameterizedTest
+    @EnumSource(ThemeMode::class)
+    fun `test that theme mode is set correctly`(value: ThemeMode) = runTest {
+        whenever(getThemeModeUseCase()).thenReturn(flowOf(value))
+
+        init()
+
+        underTest.uiState.test {
+            assertThat(awaitItem().themeMode).isEqualTo(value)
+        }
+    }
+
+    @Test
+    fun `test that first visible permission should default to first missing permission`() =
+        runTest {
+            whenever(getFeatureFlagValueUseCase(AppFeatures.OnboardingRevamp))
+                .thenReturn(true)
+
+            init()
+
+            underTest.setData(
+                permissions = listOf(
+                    Permission.Read to false
+                )
+            )
+
+            underTest.uiState.test {
+                assertThat(awaitItem().visiblePermission).isEqualTo(PermissionScreen.Media)
+            }
+        }
+
+    @Test
+    fun `test that on next permission should update ui state`() =
+        runTest {
+            whenever(getFeatureFlagValueUseCase(AppFeatures.OnboardingRevamp))
+                .thenReturn(true)
+
+            init()
+
+            underTest.setData(
+                permissions = listOf(
+                    Permission.Read to false,
+                    Permission.Notifications to false
+                )
+            )
+
+            underTest.uiState.test {
+                assertThat(awaitItem().visiblePermission).isEqualTo(PermissionScreen.Media)
+                underTest.nextPermission()
+                assertThat(awaitItem().visiblePermission).isEqualTo(PermissionScreen.Notifications)
+            }
+        }
+
+    @Test
+    fun `test that on next permission should ignore next permission not included for revamp`() =
+        runTest {
+            whenever(getFeatureFlagValueUseCase(AppFeatures.OnboardingRevamp))
+                .thenReturn(true)
+
+            init()
+
+            underTest.setData(
+                permissions = listOf(
+                    Permission.Read to false,
+                    Permission.Bluetooth to false
+                )
+            )
+
+            underTest.uiState.test {
+                assertThat(awaitItem().visiblePermission).isEqualTo(PermissionScreen.Media)
+                underTest.nextPermission()
+                assertThat(awaitItem().visiblePermission).isNull()
+            }
+        }
 }

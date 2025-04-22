@@ -8,6 +8,8 @@ import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
+import kotlinx.coroutines.flow.catch
+import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import mega.privacy.android.app.data.extensions.filterAllowedPermissions
@@ -20,6 +22,7 @@ import mega.privacy.android.app.presentation.permissions.model.PermissionType
 import mega.privacy.android.app.utils.livedata.SingleLiveEvent
 import mega.privacy.android.domain.qualifier.IoDispatcher
 import mega.privacy.android.domain.repository.AccountRepository
+import mega.privacy.android.domain.usecase.GetThemeMode
 import mega.privacy.android.domain.usecase.featureflag.GetFeatureFlagValueUseCase
 import timber.log.Timber
 import javax.inject.Inject
@@ -32,6 +35,7 @@ class PermissionsViewModel @Inject constructor(
     private val defaultAccountRepository: AccountRepository,
     @IoDispatcher private val ioDispatcher: CoroutineDispatcher,
     private val getFeatureFlagValueUseCase: GetFeatureFlagValueUseCase,
+    private val getThemeModeUseCase: GetThemeMode,
 ) : ViewModel() {
     internal val uiState: StateFlow<PermissionsUIState>
         field = MutableStateFlow(PermissionsUIState())
@@ -41,9 +45,21 @@ class PermissionsViewModel @Inject constructor(
     private val showInitialSetupScreen: MutableLiveData<Boolean> = MutableLiveData()
     private val currentPermission: MutableLiveData<PermissionScreen?> = MutableLiveData()
     private val askPermissionType = SingleLiveEvent<PermissionType>()
+    private val isOnboardingRevampEnabled = MutableStateFlow<Boolean?>(null)
 
     init {
+        getThemeMode()
         setOnboardingRevampFlag()
+    }
+
+    private fun getThemeMode() {
+        viewModelScope.launch {
+            getThemeModeUseCase()
+                .catch { Timber.e(it) }
+                .collect { themeMode ->
+                    uiState.update { it.copy(themeMode = themeMode) }
+                }
+        }
     }
 
     private fun setOnboardingRevampFlag() {
@@ -51,6 +67,9 @@ class PermissionsViewModel @Inject constructor(
             runCatching {
                 getFeatureFlagValueUseCase(AppFeatures.OnboardingRevamp)
             }.onSuccess { isEnabled ->
+                // Update the feature flag value in the state flow
+                isOnboardingRevampEnabled.update { isEnabled }
+
                 uiState.update {
                     it.copy(isOnboardingRevampEnabled = isEnabled)
                 }
@@ -78,14 +97,28 @@ class PermissionsViewModel @Inject constructor(
     /**
      * Sets initial data for requesting missing permissions.
      */
-    fun setData(missingPermissions: List<Pair<Permission, Boolean>>) {
-        this.missingPermissions = missingPermissions.filterAllowedPermissions()
-            .apply {
-                permissionScreens = toPermissionScreen()
-            }
+    fun setData(permissions: List<Pair<Permission, Boolean>>) {
+        viewModelScope.launch {
+            missingPermissions = permissions.filterAllowedPermissions()
+            // Suspend until feature flag value is set
+            val isFlagEnabled = isOnboardingRevampEnabled.first { it != null } == true
 
-        if (permissionScreens.isNotEmpty()) {
-            showInitialSetupScreen.value = true
+            if (isFlagEnabled) {
+                missingPermissions
+                    // Filter out permissions that are not needed for the onboarding revamp. On the new
+                    // onboarding flow, we only need Media (Read and Write) and Notifications permissions.
+                    .filter { it == Permission.Read || it == Permission.Notifications }
+                    .apply { permissionScreens = toPermissionScreen() }
+                    .also { updateCurrentPermissionRevamp() }
+            } else {
+                missingPermissions.apply {
+                    permissionScreens = toPermissionScreen()
+                }
+
+                if (permissionScreens.isNotEmpty()) {
+                    showInitialSetupScreen.value = true
+                }
+            }
         }
     }
 
@@ -94,6 +127,12 @@ class PermissionsViewModel @Inject constructor(
             currentPermission.value = permissionScreens[0]
         } else {
             currentPermission.value = null
+        }
+    }
+
+    private fun updateCurrentPermissionRevamp() {
+        uiState.update {
+            it.copy(visiblePermission = permissionScreens.firstOrNull())
         }
     }
 
@@ -110,7 +149,12 @@ class PermissionsViewModel @Inject constructor(
      */
     fun nextPermission() {
         if (permissionScreens.isNotEmpty()) permissionScreens.removeAt(0)
-        updateCurrentPermission()
+
+        if (isOnboardingRevampEnabled.value == true) {
+            updateCurrentPermissionRevamp()
+        } else {
+            updateCurrentPermission()
+        }
     }
 
     /**

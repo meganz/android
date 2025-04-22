@@ -24,6 +24,7 @@ import mega.android.core.ui.components.MegaScaffold
 import mega.android.core.ui.components.MegaText
 import mega.android.core.ui.components.banner.InlineInfoBanner
 import mega.android.core.ui.components.button.AnchoredButtonGroup
+import mega.android.core.ui.components.text.SpannableText
 import mega.android.core.ui.model.Button
 import mega.android.core.ui.preview.CombinedThemePreviews
 import mega.android.core.ui.theme.AndroidThemeForPreviews
@@ -38,7 +39,7 @@ typealias ButtonAttributes = Pair<String, () -> Unit>
 internal data class PermissionAttributes(
     val title: String,
     val description: String,
-    val bannerText: String?,
+    val bannerText: SpannableText?,
     val image: Painter,
     val primaryButton: ButtonAttributes,
     val secondaryButton: ButtonAttributes,
@@ -123,12 +124,12 @@ internal fun NewPermissionsScreen(
                 textColor = TextColor.Secondary,
             )
 
-            attributes.bannerText?.let { text ->
+            attributes.bannerText?.let {
                 InlineInfoBanner(
                     modifier = Modifier
                         .fillMaxWidth()
                         .padding(top = spacing.x24),
-                    body = text,
+                    body = it,
                     showCancelButton = false,
                 )
             }
@@ -147,7 +148,7 @@ internal fun PermissionScreenPreview() {
                 image = painterResource(id = mega.privacy.android.icon.pack.R.drawable.ic_illustrator_thumbnail_outline),
                 primaryButton = "Allow" to {},
                 secondaryButton = "Not Now" to {},
-                bannerText = "This is a sample inline info banner",
+                bannerText = SpannableText("This is a sample inline info banner"),
             ),
             modifier = Modifier.fillMaxSize()
         )
