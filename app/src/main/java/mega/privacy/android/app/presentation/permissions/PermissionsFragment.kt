@@ -10,14 +10,7 @@ import android.provider.Settings.canDrawOverlays
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import androidx.compose.foundation.layout.Box
-import androidx.compose.foundation.layout.fillMaxSize
-import androidx.compose.foundation.pager.HorizontalPager
-import androidx.compose.foundation.pager.rememberPagerState
-import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
-import androidx.compose.ui.Alignment
-import androidx.compose.ui.Modifier
 import androidx.core.content.ContextCompat
 import androidx.core.view.isVisible
 import androidx.fragment.app.Fragment
@@ -25,12 +18,10 @@ import androidx.fragment.app.viewModels
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.lifecycle.lifecycleScope
 import dagger.hilt.android.AndroidEntryPoint
-import de.palm.composestateevents.EventEffect
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.distinctUntilChanged
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.launch
-import mega.android.core.ui.components.indicators.LargeHUD
 import mega.android.core.ui.theme.AndroidTheme
 import mega.privacy.android.analytics.Analytics
 import mega.privacy.android.app.arch.extensions.collectFlow
@@ -45,8 +36,6 @@ import mega.privacy.android.app.presentation.extensions.title
 import mega.privacy.android.app.presentation.permissions.model.Permission
 import mega.privacy.android.app.presentation.permissions.model.PermissionScreen
 import mega.privacy.android.app.presentation.permissions.model.PermissionType
-import mega.privacy.android.app.presentation.permissions.view.CameraBackupPermissionsScreen
-import mega.privacy.android.app.presentation.permissions.view.NotificationPermissionScreen
 import mega.privacy.android.app.utils.permission.PermissionUtils.getAudioPermissionByVersion
 import mega.privacy.android.app.utils.permission.PermissionUtils.getImagePermissionByVersion
 import mega.privacy.android.app.utils.permission.PermissionUtils.getReadExternalStoragePermission
@@ -138,58 +127,14 @@ class PermissionsFragment : Fragment() {
             val isDarkTheme = uiState.themeMode.isDarkMode()
 
             AndroidTheme(isDarkTheme) {
-                val pagerState = rememberPagerState(
-                    initialPage = uiState.visiblePermission.ordinal,
-                    pageCount = { NewPermissionScreen.entries.size }
+                NewPermissionsComposableScreen(
+                    uiState = uiState,
+                    askNotificationPermission = ::askForNotificationsPermission,
+                    askCameraBackupPermission = ::askForReadPermission,
+                    setNextPermission = ::setNextPermission,
+                    closePermissionScreen = ::closePermissionScreen,
+                    resetFinishEvent = viewModel::resetFinishEvent
                 )
-
-                LaunchedEffect(uiState.visiblePermission) {
-                    val targetPage = uiState.visiblePermission.ordinal
-                    if (targetPage != pagerState.currentPage) {
-                        pagerState.animateScrollToPage(targetPage)
-                    }
-                }
-
-                // This event will trigger when there are no more permissions to show
-                EventEffect(
-                    event = uiState.finishEvent,
-                    onConsumed = viewModel::resetFinishEvent
-                ) {
-                    closePermissionScreen()
-                }
-
-                HorizontalPager(
-                    modifier = Modifier.fillMaxSize(),
-                    state = pagerState,
-                    userScrollEnabled = false,
-                ) { page ->
-                    when (page) {
-                        NewPermissionScreen.Notification.ordinal -> {
-                            NotificationPermissionScreen(
-                                modifier = Modifier.fillMaxSize(),
-                                onEnablePermission = {
-                                    // TODO Handle request notification permission
-                                },
-                                onSkipPermission = ::setNextPermission
-                            )
-                        }
-
-                        NewPermissionScreen.CameraBackup.ordinal -> {
-                            CameraBackupPermissionsScreen(
-                                modifier = Modifier.fillMaxSize(),
-                                onEnablePermission = ::askForReadAndWritePermissions,
-                                onSkipPermission = ::setNextPermission
-                            )
-                        }
-
-                        NewPermissionScreen.Loading.ordinal -> {
-                            // Show loading indicator when permissions is loading
-                            Box(modifier = Modifier.fillMaxSize()) {
-                                LargeHUD(modifier = Modifier.align(Alignment.Center))
-                            }
-                        }
-                    }
-                }
             }
         }
     }
