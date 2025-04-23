@@ -26,8 +26,8 @@ internal class CreateSdkLogEntry @Inject constructor(
                 request.throwable
             )
 
-            isNotSdkLog(request.trace, request.sdkLoggers) -> LogEntry(
-                "[clientApp ${getAppVersion()}]",
+            request.tag != "[chat_sdk]" -> LogEntry(
+                request.tag ?: "[clientApp ${getAppVersion()}]",
                 request.message,
                 createTraceString(request.trace, request.loggingClasses),
                 request.priority.intValue,
@@ -38,10 +38,7 @@ internal class CreateSdkLogEntry @Inject constructor(
         }
     }
 
-    private fun isSdkLog(tag: String?) = tag != null
-
-    private fun isNotSdkLog(trace: List<StackTraceElement>, sdkLoggers: List<String>) =
-        trace.none { it.className in sdkLoggers }
+    private fun isSdkLog(tag: String?) = tag == "[sdk]"
 
     private suspend fun getAppVersion() =
         appVersion ?: environmentRepository.getAppInfo().appVersion.also {

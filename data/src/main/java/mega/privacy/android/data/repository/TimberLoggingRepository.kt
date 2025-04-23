@@ -77,13 +77,15 @@ internal class TimberLoggingRepository @Inject constructor(
         }
     }
 
-    override fun enableLogAllToConsole() {
+    override fun enableLogAllToConsole(isDebugBuild: Boolean) {
         MegaApiAndroid.addLoggerObject(megaSdkLogger)
         MegaApiAndroid.setLogLevel(MegaApiAndroid.LOG_LEVEL_MAX)
         MegaChatApiAndroid.setLoggerObject(megaChatLogger)
         MegaChatApiAndroid.setLogLevel(MegaChatApiAndroid.LOG_LEVEL_MAX)
         MegaChatApiAndroid.setInternalMaxLogLevel(MegaChatApiAndroid.LOG_LEVEL_DEBUG)
-        Timber.plant(LineNumberDebugTree())
+        if (isDebugBuild) {
+            Timber.plant(LineNumberDebugTree())
+        }
     }
 
     override fun resetSdkLogging() {

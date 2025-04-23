@@ -19,29 +19,28 @@ internal class CreateChatLogEntry @Inject constructor(
     private var appVersion: String? = null
 
     override suspend fun invoke(request: CreateLogEntryRequest): LogEntry? {
-        val entry = if (isChatLog(request.tag)) {
-            var megaTag: String? = null
-            var stackTrace: String? = null
-
-            if (isNotSdkLog(request.trace, request.sdkLoggers)) {
-                megaTag = createClientAppTag(request.priority)
-                stackTrace = createTraceString(request.trace, request.loggingClasses)
-            }
-            LogEntry(
-                megaTag,
+        return when {
+            isChatLog(request.tag) -> LogEntry(
+                null,
                 request.message,
-                stackTrace,
+                null,
                 request.priority.intValue,
                 request.throwable
             )
-        } else null
-        return entry
+
+            request.tag != "[sdk]" -> LogEntry(
+                request.tag ?: createClientAppTag(request.priority),
+                request.message,
+                createTraceString(request.trace, request.loggingClasses),
+                request.priority.intValue,
+                request.throwable
+            )
+
+            else -> null
+        }
     }
 
-    private fun isChatLog(tag: String?) = tag == null
-
-    private fun isNotSdkLog(trace: List<StackTraceElement>, sdkLoggers: List<String>) =
-        trace.none { it.className in sdkLoggers }
+    private fun isChatLog(tag: String?) = tag == "[chat_sdk]"
 
     private suspend fun createClientAppTag(priority: LogPriority): String =
         "[${getFormattedTime()}][${priority.name}][clientApp ${getAppVersion()}]"

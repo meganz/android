@@ -1,7 +1,6 @@
 package mega.privacy.android.domain.usecase
 
 import com.google.common.truth.Truth.assertThat
-import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.test.runTest
 import mega.privacy.android.domain.entity.AppInfo
 import mega.privacy.android.domain.entity.logging.CreateLogEntryRequest
@@ -14,7 +13,6 @@ import org.mockito.kotlin.mock
 import org.mockito.kotlin.verify
 import org.mockito.kotlin.verifyNoMoreInteractions
 
-@OptIn(ExperimentalCoroutinesApi::class)
 class CreateChatLogEntryTest {
     private lateinit var underTest: CreateLogEntry
 
@@ -49,7 +47,7 @@ class CreateChatLogEntryTest {
     }
 
     @Test
-    fun `test that logs with non null tags return null`() = runTest {
+    fun `test that logs with non null tags return not null`() = runTest {
         val request = CreateLogEntryRequest(
             tag = "Tag",
             message = "message",
@@ -60,14 +58,14 @@ class CreateChatLogEntryTest {
             sdkLoggers = emptyList()
         )
         val actual = underTest(request)
-        assertThat(actual).isNull()
+        assertThat(actual).isNotNull()
     }
 
     @Test
     fun `test that logs from sdk loggers has no tag added`() = runTest {
         val loggingClass = "loggingClass"
         val request = CreateLogEntryRequest(
-            tag = null,
+            tag = "[sdk]",
             message = "message",
             priority = LogPriority.DEBUG,
             throwable = null,
@@ -84,7 +82,7 @@ class CreateChatLogEntryTest {
     fun `test that sdk logs have no trace added`() = runTest {
         val loggingClass = "loggingClass"
         val request = CreateLogEntryRequest(
-            tag = null,
+            tag = "[sdk]",
             message = "message",
             priority = LogPriority.DEBUG,
             throwable = null,

@@ -18,7 +18,7 @@ import javax.inject.Inject
 internal class TimberMegaLogger @Inject constructor() : MegaLoggerInterface {
     @Synchronized
     override fun log(time: String, logLevel: Int, source: String, message: String) {
-        Timber.tag("[sdk]")
+        Timber.tag(TAG)
         Timber.log(
             priority = getPriority(logLevel),
             message = "$message ${getSource(source)}",
@@ -39,4 +39,8 @@ internal class TimberMegaLogger @Inject constructor() : MegaLoggerInterface {
 
     private fun getSource(source: String?) =
         source?.split("jni/mega")?.getOrNull(1) ?: source
+
+    companion object {
+        const val TAG = "[sdk]"
+    }
 }

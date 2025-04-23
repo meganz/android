@@ -8,6 +8,7 @@ import dagger.hilt.android.EntryPointAccessors
 import dagger.hilt.components.SingletonComponent
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.launch
+import mega.privacy.android.app.BuildConfig
 import mega.privacy.android.domain.qualifier.ApplicationScope
 import mega.privacy.android.domain.usecase.EnableLogAllToConsole
 import mega.privacy.android.domain.usecase.InitialiseLoggingUseCase
@@ -52,7 +53,7 @@ class LoggerInitializer : Initializer<Unit> {
         val entryPoint =
             EntryPointAccessors.fromApplication(context, LoggerInitializerEntryPoint::class.java)
 
-        entryPoint.enableLogAllToConsole().invoke()
+        entryPoint.enableLogAllToConsole().invoke(BuildConfig.DEBUG)
         entryPoint.appScope().launch {
             entryPoint.initialiseLogging().invoke()
         }

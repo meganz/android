@@ -76,23 +76,6 @@ class CreateSdkLogEntryTest {
     }
 
     @Test
-    fun `test that trace from loggers with no tag returns null`() = runTest {
-        val loggingClass = "loggingClass"
-        val request = CreateLogEntryRequest(
-            tag = null,
-            message = "message",
-            priority = LogPriority.DEBUG,
-            throwable = null,
-            trace = listOf(StackTraceElement(loggingClass, "", "", 1)),
-            loggingClasses = emptyList(),
-            sdkLoggers = listOf(loggingClass),
-        )
-        val actual = underTest(request)
-
-        assertThat(actual).isNull()
-    }
-
-    @Test
     fun `test that values match`() = runTest {
         val message = "message"
         val priority = LogPriority.DEBUG

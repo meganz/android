@@ -51,7 +51,11 @@ internal class LogFlowTree(
     )
 
     override fun log(priority: Int, tag: String?, message: String, t: Throwable?) {
-        val trace = Throwable().stackTrace
+        val trace = if (tag == TimberChatLogger.TAG || tag == TimberMegaLogger.TAG) {
+            emptyList()
+        } else {
+            Throwable().stackTrace.take(10)
+        }
         scope.launch {
             createLogEntry(
                 CreateLogEntryRequest(
@@ -59,9 +63,10 @@ internal class LogFlowTree(
                     message = message,
                     priority = LogPriority.fromInt(priority),
                     throwable = t,
-                    trace = trace.asList(),
+                    trace = trace,
                     loggingClasses = ignoredClasses,
-                    sdkLoggers = sdkLoggers)
+                    sdkLoggers = sdkLoggers
+                )
             )?.let { _logFlow.emit(it) }
         }
     }

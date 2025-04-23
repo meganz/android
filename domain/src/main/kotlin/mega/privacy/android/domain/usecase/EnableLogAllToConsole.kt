@@ -9,5 +9,5 @@ fun interface EnableLogAllToConsole {
      * Invoke
      *
      */
-    operator fun invoke()
+    operator fun invoke(isDebugBuild: Boolean)
 }

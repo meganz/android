@@ -15,6 +15,7 @@ import javax.inject.Inject
 internal class TimberChatLogger @Inject constructor() : MegaChatLoggerInterface {
     @Synchronized
     override fun log(loglevel: Int, message: String?) {
+        Timber.tag(TAG)
         when (loglevel) {
             MegaChatApi.LOG_LEVEL_MAX -> Timber.v(message)
             MegaChatApi.LOG_LEVEL_DEBUG -> Timber.d(message)
@@ -23,5 +24,9 @@ internal class TimberChatLogger @Inject constructor() : MegaChatLoggerInterface 
             MegaChatApi.LOG_LEVEL_ERROR -> Timber.e(message)
             else -> Timber.i(message)
         }
+    }
+
+    companion object {
+        const val TAG = "[chat_sdk]"
     }
 }
