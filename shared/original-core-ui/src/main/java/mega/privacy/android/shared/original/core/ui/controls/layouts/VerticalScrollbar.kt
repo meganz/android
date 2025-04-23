@@ -140,7 +140,7 @@ private fun VerticalScrollbar(
 
     val thumbVisible by remember(itemCount, state) {
         derivedStateOf {
-            itemCount > 0 && state.isScrollInProgress || thumbPressed
+            itemCount > 0 && state.isScrollInProgress && (state.canScrollForward || state.canScrollBackward) || thumbPressed
         }
     }
 
