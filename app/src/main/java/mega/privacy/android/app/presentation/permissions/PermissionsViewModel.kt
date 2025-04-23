@@ -5,6 +5,8 @@ import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import dagger.hilt.android.lifecycle.HiltViewModel
+import de.palm.composestateevents.consumed
+import de.palm.composestateevents.triggered
 import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
@@ -131,10 +133,27 @@ class PermissionsViewModel @Inject constructor(
     }
 
     private fun updateCurrentPermissionRevamp() {
+        val visiblePermission = permissionScreens
+            .firstOrNull()
+            ?.toNewPermissionScreen()
+            ?: run {
+                Timber.d("No more permissions to show")
+                uiState.update { it.copy(finishEvent = triggered) }
+                return
+            }
+
+        Timber.d("Showing permission: $visiblePermission")
         uiState.update {
-            it.copy(visiblePermission = permissionScreens.firstOrNull())
+            it.copy(visiblePermission = visiblePermission)
         }
     }
+
+    private fun PermissionScreen.toNewPermissionScreen() =
+        when (this) {
+            PermissionScreen.Notifications -> NewPermissionScreen.Notification
+            PermissionScreen.Media -> NewPermissionScreen.CameraBackup
+            else -> NewPermissionScreen.Loading
+        }
 
     /**
      * Sets the showInitialSetupScreen value to false and updates the current permission to show.
@@ -172,5 +191,9 @@ class PermissionsViewModel @Inject constructor(
         viewModelScope.launch(ioDispatcher) {
             defaultAccountRepository.setUserHasLoggedIn()
         }
+    }
+
+    internal fun resetFinishEvent() {
+        uiState.update { it.copy(finishEvent = consumed) }
     }
 }

@@ -2,6 +2,7 @@ package mega.privacy.android.app.presentation.permissions
 
 import app.cash.turbine.test
 import com.google.common.truth.Truth.assertThat
+import de.palm.composestateevents.triggered
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.flow.flowOf
@@ -11,7 +12,6 @@ import kotlinx.coroutines.test.runTest
 import kotlinx.coroutines.test.setMain
 import mega.privacy.android.app.featuretoggle.AppFeatures
 import mega.privacy.android.app.presentation.permissions.model.Permission
-import mega.privacy.android.app.presentation.permissions.model.PermissionScreen
 import mega.privacy.android.domain.entity.ThemeMode
 import mega.privacy.android.domain.repository.AccountRepository
 import mega.privacy.android.domain.usecase.GetThemeMode
@@ -99,7 +99,7 @@ class PermissionsViewModelTest {
             )
 
             underTest.uiState.test {
-                assertThat(awaitItem().visiblePermission).isEqualTo(PermissionScreen.Media)
+                assertThat(awaitItem().visiblePermission).isEqualTo(NewPermissionScreen.CameraBackup)
             }
         }
 
@@ -119,14 +119,14 @@ class PermissionsViewModelTest {
             )
 
             underTest.uiState.test {
-                assertThat(awaitItem().visiblePermission).isEqualTo(PermissionScreen.Media)
+                assertThat(awaitItem().visiblePermission).isEqualTo(NewPermissionScreen.CameraBackup)
                 underTest.nextPermission()
-                assertThat(awaitItem().visiblePermission).isEqualTo(PermissionScreen.Notifications)
+                assertThat(awaitItem().visiblePermission).isEqualTo(NewPermissionScreen.Notification)
             }
         }
 
     @Test
-    fun `test that on next permission should ignore next permission not included for revamp`() =
+    fun `test that on next permission should trigger finish event when null`() =
         runTest {
             whenever(getFeatureFlagValueUseCase(AppFeatures.OnboardingRevamp))
                 .thenReturn(true)
@@ -141,9 +141,9 @@ class PermissionsViewModelTest {
             )
 
             underTest.uiState.test {
-                assertThat(awaitItem().visiblePermission).isEqualTo(PermissionScreen.Media)
+                assertThat(awaitItem().visiblePermission).isEqualTo(NewPermissionScreen.CameraBackup)
                 underTest.nextPermission()
-                assertThat(awaitItem().visiblePermission).isNull()
+                assertThat(awaitItem().finishEvent).isEqualTo(triggered)
             }
         }
 }

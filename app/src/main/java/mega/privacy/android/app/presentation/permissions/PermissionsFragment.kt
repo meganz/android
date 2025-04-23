@@ -16,6 +16,7 @@ import androidx.compose.foundation.pager.HorizontalPager
 import androidx.compose.foundation.pager.rememberPagerState
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.core.content.ContextCompat
 import androidx.core.view.isVisible
@@ -24,6 +25,7 @@ import androidx.fragment.app.viewModels
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.lifecycle.lifecycleScope
 import dagger.hilt.android.AndroidEntryPoint
+import de.palm.composestateevents.EventEffect
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.distinctUntilChanged
 import kotlinx.coroutines.flow.map
@@ -134,50 +136,57 @@ class PermissionsFragment : Fragment() {
         binding.newPermissionsLayout.setContent {
             val uiState by viewModel.uiState.collectAsStateWithLifecycle()
             val isDarkTheme = uiState.themeMode.isDarkMode()
-            val pagerState = rememberPagerState(initialPage = PERMISSION_DEFAULT_PAGE) { 3 }
-
-            LaunchedEffect(uiState.visiblePermission) {
-                val page = when (uiState.visiblePermission) {
-                    PermissionScreen.Camera -> PERMISSION_CAMERA_PAGE
-                    PermissionScreen.Notifications -> PERMISSION_NOTIFICATION_PAGE
-                    else -> PERMISSION_DEFAULT_PAGE
-                }
-
-                pagerState.animateScrollToPage(page)
-            }
 
             AndroidTheme(isDarkTheme) {
+                val pagerState = rememberPagerState(
+                    initialPage = uiState.visiblePermission.ordinal,
+                    pageCount = { NewPermissionScreen.entries.size }
+                )
+
+                LaunchedEffect(uiState.visiblePermission) {
+                    val targetPage = uiState.visiblePermission.ordinal
+                    if (targetPage != pagerState.currentPage) {
+                        pagerState.animateScrollToPage(targetPage)
+                    }
+                }
+
+                // This event will trigger when there are no more permissions to show
+                EventEffect(
+                    event = uiState.finishEvent,
+                    onConsumed = viewModel::resetFinishEvent
+                ) {
+                    closePermissionScreen()
+                }
+
                 HorizontalPager(
                     modifier = Modifier.fillMaxSize(),
                     state = pagerState,
                     userScrollEnabled = false,
                 ) { page ->
                     when (page) {
-                        PERMISSION_DEFAULT_PAGE -> {
-                            // Show loading indicator when permissions is loading
-                            Box(modifier = Modifier.fillMaxSize()) {
-                                LargeHUD()
-                            }
-                        }
-
-                        PERMISSION_NOTIFICATION_PAGE -> {
+                        NewPermissionScreen.Notification.ordinal -> {
                             NotificationPermissionScreen(
                                 modifier = Modifier.fillMaxSize(),
                                 onEnablePermission = {
                                     // TODO Handle request notification permission
                                 },
-                                onSkipPermission = {
-                                    // TODO Handle skip notification permission
-                                }
+                                onSkipPermission = ::setNextPermission
                             )
                         }
 
-                        PERMISSION_CAMERA_PAGE -> {
+                        NewPermissionScreen.CameraBackup.ordinal -> {
                             CameraBackupPermissionsScreen(
                                 modifier = Modifier.fillMaxSize(),
                                 onEnablePermission = ::askForReadAndWritePermissions,
                                 onSkipPermission = ::setNextPermission
                             )
+                        }
+
+                        NewPermissionScreen.Loading.ordinal -> {
+                            // Show loading indicator when permissions is loading
+                            Box(modifier = Modifier.fillMaxSize()) {
+                                LargeHUD(modifier = Modifier.align(Alignment.Center))
+                            }
                         }
                     }
                 }
@@ -271,12 +280,16 @@ class PermissionsFragment : Fragment() {
         viewModel.nextPermission()
     }
 
+    private fun closePermissionScreen() {
+        (requireActivity() as ManagerActivity).destroyPermissionsFragment()
+    }
+
     /**
      * Sets current permission screen.
      */
     private fun setCurrentPermissionScreen(currentPermission: PermissionScreen?) {
         if (currentPermission == null) {
-            (requireActivity() as ManagerActivity).destroyPermissionsFragment()
+            closePermissionScreen()
             return
         }
 
@@ -425,10 +438,6 @@ class PermissionsFragment : Fragment() {
          * Permissions fragment identifier.
          */
         const val PERMISSIONS_FRAGMENT = 666
-
-        private const val PERMISSION_DEFAULT_PAGE = 0
-        private const val PERMISSION_NOTIFICATION_PAGE = 1
-        private const val PERMISSION_CAMERA_PAGE = 2
 
         /**
          * Creates a new instance of [PermissionsFragment].
