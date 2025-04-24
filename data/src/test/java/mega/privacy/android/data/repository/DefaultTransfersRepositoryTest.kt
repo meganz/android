@@ -81,6 +81,7 @@ import org.mockito.kotlin.mock
 import org.mockito.kotlin.never
 import org.mockito.kotlin.reset
 import org.mockito.kotlin.verify
+import org.mockito.kotlin.verifyNoInteractions
 import org.mockito.kotlin.whenever
 import java.io.File
 import kotlin.time.Duration.Companion.seconds
@@ -1872,7 +1873,7 @@ class DefaultTransfersRepositoryTest {
             parentActiveTransfer
         )
 
-        val actual = underTest.getRecursiveTransferAppDataFromParent(parentTransferTag)
+        val actual = underTest.getRecursiveTransferAppDataFromParent(parentTransferTag) { null }
 
         assertThat(actual).containsExactly(
             *appData.filterIsInstance<TransferAppData.RecursiveTransferAppData>().toTypedArray()
@@ -1888,7 +1889,7 @@ class DefaultTransfersRepositoryTest {
         )
         parentRecursiveAppDataCache[parentTransferTag] = appData
 
-        val actual = underTest.getRecursiveTransferAppDataFromParent(parentTransferTag)
+        val actual = underTest.getRecursiveTransferAppDataFromParent(parentTransferTag) { null }
 
         verify(megaLocalRoomGateway, never()).getActiveTransferByTag(parentTransferTag)
         assertThat(actual).containsExactly(*appData.toTypedArray())
@@ -1909,11 +1910,32 @@ class DefaultTransfersRepositoryTest {
             parentActiveTransfer
         )
 
-        underTest.getRecursiveTransferAppDataFromParent(parentTransferTag)
+        underTest.getRecursiveTransferAppDataFromParent(parentTransferTag) { null }
 
         assertThat(parentRecursiveAppDataCache[parentTransferTag]).containsExactly(
             *appData.filterIsInstance<TransferAppData.RecursiveTransferAppData>().toTypedArray()
         )
+    }
+
+    @Test
+    fun `test that app data is added from parent`() = runTest {
+        val parentTransferTag = 753455
+        val appData = listOf(
+            mock<TransferAppData.ChatUpload>(),
+            mock<TransferAppData.OfflineDownload>(),
+            mock<TransferAppData.TransferGroup>(),
+        )
+        val parentTransfer = mock<Transfer> {
+            on { this.appData } doReturn appData
+        }
+
+        underTest.getRecursiveTransferAppDataFromParent(parentTransferTag) { parentTransfer }
+
+        assertThat(parentRecursiveAppDataCache[parentTransferTag]).containsExactly(
+            *appData.filterIsInstance<TransferAppData.RecursiveTransferAppData>().toTypedArray()
+        )
+
+        verifyNoInteractions(megaLocalRoomGateway)
     }
 
     @Test

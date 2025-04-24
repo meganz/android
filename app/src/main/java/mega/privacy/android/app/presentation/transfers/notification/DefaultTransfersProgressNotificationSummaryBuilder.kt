@@ -25,5 +25,6 @@ class DefaultTransfersProgressNotificationSummaryBuilder @Inject constructor(
             .setColor(ContextCompat.getColor(context, R.color.red_600_red_300))
             .setGroup(PROGRESS_SUMMARY_GROUP + type.name)
             .setGroupSummary(true)
+            .setContentTitle(context.getString(R.string.download_preparing_files))
             .build()
 }

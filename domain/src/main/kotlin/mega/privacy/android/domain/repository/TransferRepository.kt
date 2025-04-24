@@ -663,8 +663,12 @@ interface TransferRepository {
     /**
      * Get transfer app data from a folder transfer that needs to be used in children, this data is cached to be used in other calls
      * @param parentTransferTag the tag of the folder transfer which RecursiveTransferAppData app data should be retrieved
+     * @param fetchInMemoryParent lambda to get the parent from memory if not already cached. For performance and race condition reasons. If null it will be get from database if needed.
      */
-    suspend fun getRecursiveTransferAppDataFromParent(parentTransferTag: Int): List<RecursiveTransferAppData>
+    suspend fun getRecursiveTransferAppDataFromParent(
+        parentTransferTag: Int,
+        fetchInMemoryParent: () -> Transfer?,
+    ): List<RecursiveTransferAppData>
 
     /**
      * Clear cached transfer app data related to this parent transfer tag
