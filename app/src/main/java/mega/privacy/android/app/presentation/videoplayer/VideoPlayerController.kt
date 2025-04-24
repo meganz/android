@@ -4,11 +4,9 @@ import android.Manifest
 import android.annotation.SuppressLint
 import android.app.Activity
 import android.content.Context
-import android.graphics.Bitmap
+import android.content.res.Configuration.ORIENTATION_PORTRAIT
 import android.graphics.Matrix
 import android.os.Build
-import android.os.Environment
-import android.os.Environment.getExternalStoragePublicDirectory
 import android.view.GestureDetector
 import android.view.MotionEvent
 import android.view.ScaleGestureDetector
@@ -17,31 +15,21 @@ import android.view.View
 import android.view.ViewGroup
 import android.widget.ImageButton
 import android.widget.TextView
+import androidx.annotation.DrawableRes
 import androidx.annotation.OptIn
 import androidx.appcompat.app.AppCompatActivity
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.ui.platform.ComposeView
+import androidx.compose.ui.platform.LocalConfiguration
 import androidx.compose.ui.platform.ViewCompositionStrategy
 import androidx.core.view.isVisible
-import androidx.lifecycle.Lifecycle
-import androidx.lifecycle.LifecycleEventObserver
-import androidx.lifecycle.LifecycleOwner
-import androidx.lifecycle.compose.collectAsStateWithLifecycle
-import androidx.lifecycle.lifecycleScope
 import androidx.lifecycle.setViewTreeLifecycleOwner
 import androidx.lifecycle.setViewTreeViewModelStoreOwner
 import androidx.media3.common.util.UnstableApi
 import androidx.media3.ui.PlayerView
 import androidx.savedstate.setViewTreeSavedStateRegistryOwner
-import kotlinx.coroutines.CoroutineScope
-import kotlinx.coroutines.cancel
-import kotlinx.coroutines.flow.collectLatest
-import kotlinx.coroutines.flow.distinctUntilChanged
-import kotlinx.coroutines.flow.map
-import kotlinx.coroutines.launch
-import mega.privacy.android.analytics.Analytics
 import mega.privacy.android.app.R
 import mega.privacy.android.app.mediaplayer.SpeedSelectedPopup
 import mega.privacy.android.app.mediaplayer.VideoOptionPopup
@@ -49,28 +37,34 @@ import mega.privacy.android.app.mediaplayer.model.SpeedPlaybackItem
 import mega.privacy.android.app.mediaplayer.model.VideoOptionItem
 import mega.privacy.android.app.mediaplayer.queue.audio.AudioQueueFragment.Companion.SINGLE_PLAYLIST_SIZE
 import mega.privacy.android.app.mediaplayer.service.Metadata
+import mega.privacy.android.app.presentation.videoplayer.model.MediaPlaybackState
 import mega.privacy.android.app.presentation.videoplayer.model.SubtitleSelectedStatus
+import mega.privacy.android.app.presentation.videoplayer.model.VideoPlayerUiState
 import mega.privacy.android.app.utils.Constants.REQUEST_WRITE_STORAGE
 import mega.privacy.android.app.utils.permission.PermissionUtils.hasPermissions
 import mega.privacy.android.app.utils.permission.PermissionUtils.requestPermission
 import mega.privacy.android.domain.entity.mediaplayer.RepeatToggleMode
-import mega.privacy.mobile.analytics.event.LoopButtonPressedEvent
-import mega.privacy.mobile.analytics.event.SnapshotButtonPressedEvent
 import timber.log.Timber
 import javax.inject.Singleton
 
 @Singleton
 class VideoPlayerController(
     private val context: Context,
-    private val viewModel: VideoPlayerViewModel,
+    private val uiState: VideoPlayerUiState,
     container: ViewGroup,
-    coroutineScope: CoroutineScope,
-    private val fullscreenClickedCallback: () -> Unit,
+    private val isShowSubtitleIcon: Boolean,
+    private val updateRepeatToggleMode: () -> Unit,
+    private val updateIsVideoOptionPopupShown: (Boolean) -> Unit,
+    private val updateIsSpeedPopupShown: (Boolean) -> Unit,
+    private val speedPlaybackItemSelected: (SpeedPlaybackItem) -> Unit,
+    private val updateLockStatus: (Boolean) -> Unit,
+    private val showSubtitleDialog: () -> Unit,
+    private val fullscreenClickedCallback: (Boolean) -> Unit,
     private val lockStateChanged: (lock: Boolean) -> Unit,
     private val playQueueButtonClicked: () -> Unit,
     private val playerViewClicked: () -> Unit,
-    private val captureScreenShotFinished: (Bitmap) -> Unit,
-) : LifecycleEventObserver {
+    private val captureScreenShot: () -> Unit,
+) {
     private val playQueueButton = container.findViewById<ImageButton>(R.id.playlist)
     private val trackName = container.findViewById<TextView>(R.id.track_name)
     private val repeatToggleButton = container.findViewById<ImageButton>(R.id.repeat_toggle)
@@ -87,8 +81,6 @@ class VideoPlayerController(
     private val speedPlaybackPopup = container.findViewById<ComposeView>(R.id.speed_playback_popup)
     private val subtitleButton = container.findViewById<ImageButton>(R.id.subtitle)
 
-    private var sharingScope: CoroutineScope? = null
-
     private var scaleGestureDetector: ScaleGestureDetector? = null
     private var gestureDetector: GestureDetector? = null
     private var zoomLevel = 1.0f
@@ -96,48 +88,19 @@ class VideoPlayerController(
     private var translationX = 0f
     private var translationY = 0f
 
+    private var isSpeedPopupShown = mutableStateOf(uiState.isSpeedPopupShown)
+    private var isVideoOptionPopupShown = mutableStateOf(uiState.isVideoOptionPopupShown)
+    private var currentSpeedPlayback = mutableStateOf(uiState.currentSpeedPlayback)
+    private var isFullscreen = mutableStateOf(uiState.isFullscreen)
+
     init {
-        coroutineScope.launch {
-            viewModel.uiState.map { it.items }.distinctUntilChanged().collectLatest {
-                if (it.isNotEmpty()) {
-                    togglePlayQueueEnabled(it.size)
-                }
-            }
-        }
-
-        coroutineScope.launch {
-            viewModel.uiState.map { it.isFullscreen }.distinctUntilChanged().collectLatest {
-                updateFullscreenButtonIcon(it)
-            }
-        }
-
-        coroutineScope.launch {
-            viewModel.uiState.map { it.isLocked }.distinctUntilChanged().collectLatest {
-                controllerView.isVisible = !it
-                unlockView.isVisible = it
-            }
-        }
-
-        coroutineScope.launch {
-            viewModel.uiState.map { it.currentSpeedPlayback }.distinctUntilChanged().collectLatest {
-                speedPlaybackButton.setImageResource(it.iconId)
-            }
-        }
-
-        coroutineScope.launch {
-            viewModel.uiState.map { it.subtitleSelectedStatus }.distinctUntilChanged()
-                .collectLatest {
-                    updateSubtitleButtonUI(it)
-                }
-        }
-
-        setupRepeatToggleButton(viewModel.uiState.value.repeatToggleMode)
+        setupRepeatToggleButton(uiState.repeatToggleMode)
         setupMoreOptionButton()
-        setupVideoPlayQueueButton(viewModel.uiState.value.items.size)
+        setupVideoPlayQueueButton(uiState.items.size)
         screenshotButton.setOnClickListener {
             screenshotButtonClicked()
         }
-        setupFullscreen(viewModel.uiState.value.isFullscreen)
+        setupFullscreen(uiState.isFullscreen)
 
         lockButton.setOnClickListener {
             updateLockState(true)
@@ -172,17 +135,7 @@ class VideoPlayerController(
         repeatToggleButton.isVisible = true
         updateRepeatToggleButtonUI(context, defaultRepeatToggleMode)
         repeatToggleButton.setOnClickListener {
-            val repeatToggleMode =
-                viewModel.uiState.value.repeatToggleMode.let { repeatToggleMode ->
-                    if (repeatToggleMode == RepeatToggleMode.REPEAT_NONE) {
-                        Analytics.tracker.trackEvent(LoopButtonPressedEvent)
-                        RepeatToggleMode.REPEAT_ONE
-
-                    } else {
-                        RepeatToggleMode.REPEAT_NONE
-                    }
-                }
-            viewModel.setRepeatToggleModeForPlayer(repeatToggleMode)
+            updateRepeatToggleMode()
         }
     }
 
@@ -192,7 +145,7 @@ class VideoPlayerController(
      * @param context Context
      * @param repeatToggleMode the current RepeatToggleMode
      */
-    private fun updateRepeatToggleButtonUI(
+    internal fun updateRepeatToggleButtonUI(
         context: Context,
         repeatToggleMode: RepeatToggleMode,
     ) {
@@ -210,19 +163,19 @@ class VideoPlayerController(
      *
      * @param itemSize the item size
      */
-    private fun togglePlayQueueEnabled(itemSize: Int) {
+    internal fun togglePlayQueueEnabled(itemSize: Int) {
         playQueueButton.visibility =
             if (itemSize > SINGLE_PLAYLIST_SIZE)
                 View.VISIBLE
             else
                 View.INVISIBLE
-
     }
 
     private fun setupMoreOptionButton() {
         initVideoOptionPopup(videoOptionPopup)
         moreOptionButton.setOnClickListener {
-            viewModel.updateIsVideoOptionPopupShown(true)
+            updateIsVideoOptionPopupShown(true)
+            isVideoOptionPopupShown.value = true
         }
     }
 
@@ -231,35 +184,43 @@ class VideoPlayerController(
      *
      * @param metadata metadata to display
      */
-    private fun displayMetadata(metadata: Metadata) {
+    internal fun displayMetadata(metadata: Metadata) {
         trackName.text = metadata.title ?: metadata.nodeName
     }
 
     private fun initVideoOptionPopup(composeView: ComposeView) {
         composeView.setupComposeView(context) {
-            val state by viewModel.uiState.collectAsStateWithLifecycle()
-            val videoOptions = remember(state.isFullscreen) {
+            val videoOptions = remember(isFullscreen.value) {
                 listOf(
                     VideoOptionItem.VIDEO_OPTION_SNAPSHOT,
                     VideoOptionItem.VIDEO_OPTION_LOCK,
-                    if (state.isFullscreen) {
+                    if (isFullscreen.value) {
                         VideoOptionItem.VIDEO_OPTION_ORIGINAL
                     } else {
                         VideoOptionItem.VIDEO_OPTION_ZOOM_TO_FILL
                     }
                 )
             }
+            val orientation = LocalConfiguration.current.orientation
+
             VideoOptionPopup(
                 items = videoOptions,
-                isShown = state.isVideoOptionPopupShown,
-                onDismissRequest = { viewModel.updateIsVideoOptionPopupShown(false) }
+                isShown = isVideoOptionPopupShown.value && orientation == ORIENTATION_PORTRAIT,
+                onDismissRequest = {
+                    updateIsVideoOptionPopupShown(false)
+                    isVideoOptionPopupShown.value = false
+                }
             ) { videOption ->
                 when (videOption) {
                     VideoOptionItem.VIDEO_OPTION_SNAPSHOT -> screenshotButtonClicked()
                     VideoOptionItem.VIDEO_OPTION_LOCK -> updateLockState(true)
-                    else -> fullscreenClickedCallback()
+                    else -> {
+                        isFullscreen.value = !isFullscreen.value
+                        fullscreenClickedCallback(isFullscreen.value)
+                    }
                 }
-                viewModel.updateIsVideoOptionPopupShown(false)
+                updateIsVideoOptionPopupShown(false)
+                isVideoOptionPopupShown.value = false
             }
         }
     }
@@ -300,7 +261,8 @@ class VideoPlayerController(
     internal fun setupFullscreen(isFullScreen: Boolean) {
         updateFullscreenButtonIcon(isFullScreen)
         fullscreenButton.setOnClickListener {
-            fullscreenClickedCallback()
+            isFullscreen.value = !isFullscreen.value
+            fullscreenClickedCallback(isFullscreen.value)
         }
     }
 
@@ -317,29 +279,42 @@ class VideoPlayerController(
         controllerView.isVisible = !isLock
         unlockView.isVisible = isLock
         lockStateChanged(isLock)
-        viewModel.updateLockStatus(isLock)
+        updateLockStatus(isLock)
+    }
+
+    internal fun updateLockView(isLock: Boolean) {
+        controllerView.isVisible = !isLock
+        unlockView.isVisible = isLock
+    }
+
+    internal fun updateSpeedPlaybackButtonIcon(@DrawableRes icon: Int) {
+        speedPlaybackButton.setImageResource(icon)
     }
 
     private fun setupSpeedPlaybackButton() {
         initSpeedPlaybackPopup(speedPlaybackPopup)
-        speedPlaybackButton.setImageResource(viewModel.uiState.value.currentSpeedPlayback.iconId)
+        speedPlaybackButton.setImageResource(uiState.currentSpeedPlayback.iconId)
         speedPlaybackButton.setOnClickListener {
-            viewModel.updateIsSpeedPopupShown(true)
+            updateIsSpeedPopupShown(true)
+            isSpeedPopupShown.value = true
         }
     }
 
     private fun initSpeedPlaybackPopup(composeView: ComposeView) {
         composeView.setupComposeView(context) {
-            val state by viewModel.uiState.collectAsStateWithLifecycle()
-
             SpeedSelectedPopup(
                 items = SpeedPlaybackItem.entries,
-                isShown = state.isSpeedPopupShown,
-                currentPlaybackSpeed = state.currentSpeedPlayback,
-                onDismissRequest = { viewModel.updateIsSpeedPopupShown(false) }
+                isShown = isSpeedPopupShown.value,
+                currentPlaybackSpeed = currentSpeedPlayback.value,
+                onDismissRequest = {
+                    updateIsSpeedPopupShown(false)
+                    isSpeedPopupShown.value = false
+                }
             ) { speedPlaybackItem ->
-                viewModel.updateCurrentSpeedPlaybackItem(speedPlaybackItem)
-                viewModel.updateIsSpeedPopupShown(false)
+                speedPlaybackItemSelected(speedPlaybackItem)
+                updateIsSpeedPopupShown(false)
+                currentSpeedPlayback.value = speedPlaybackItem
+                isSpeedPopupShown.value = false
             }
         }
     }
@@ -350,7 +325,7 @@ class VideoPlayerController(
             context,
             object : ScaleGestureDetector.SimpleOnScaleGestureListener() {
                 override fun onScale(detector: ScaleGestureDetector): Boolean {
-                    if (!viewModel.uiState.value.isLocked) {
+                    if (!uiState.isLocked) {
                         zoomLevel = (zoomLevel * detector.scaleFactor).coerceIn(1.0f, maxZoom)
                         updateTransformations()
                     }
@@ -366,7 +341,7 @@ class VideoPlayerController(
                     distanceX: Float,
                     distanceY: Float,
                 ): Boolean {
-                    if (zoomLevel > 1 && !viewModel.uiState.value.isLocked) {
+                    if (zoomLevel > 1 && !uiState.isLocked) {
                         translationX -= distanceX
                         translationY -= distanceY
                         enforceBoundaries()
@@ -396,7 +371,7 @@ class VideoPlayerController(
             matrix.postScale(zoomLevel, zoomLevel, textureView.width / 2f, textureView.height / 2f)
             matrix.postTranslate(translationX, translationY)
             textureView.setTransform(matrix)
-            if (!viewModel.isMediaPlayerPlaying()) {
+            if (uiState.mediaPlaybackState == MediaPlaybackState.Paused) {
                 textureView.invalidate()
                 textureView.requestLayout()
             }
@@ -414,26 +389,15 @@ class VideoPlayerController(
         }
     }
 
-    @OptIn(UnstableApi::class)
-    private fun captureScreenShot() {
-        val rootPath = getExternalStoragePublicDirectory(Environment.DIRECTORY_DCIM).absolutePath
-        playerComposeView.videoSurfaceView?.let { view ->
-            viewModel.screenshotWhenVideoPlaying(rootPath, captureView = view) { bitmap ->
-                Analytics.tracker.trackEvent(SnapshotButtonPressedEvent)
-                captureScreenShotFinished(bitmap)
-            }
-        }
-    }
-
     private fun setupSubtitleButton() {
-        subtitleButton.isVisible = viewModel.isShowSubtitleIcon()
-        updateSubtitleButtonUI(viewModel.uiState.value.subtitleSelectedStatus)
+        subtitleButton.isVisible = isShowSubtitleIcon
+        updateSubtitleButtonUI(uiState.subtitleSelectedStatus)
         subtitleButton.setOnClickListener {
-            viewModel.updateShowSubtitleDialog(true)
+            showSubtitleDialog()
         }
     }
 
-    private fun updateSubtitleButtonUI(status: SubtitleSelectedStatus) =
+    internal fun updateSubtitleButtonUI(status: SubtitleSelectedStatus) =
         subtitleButton.setImageResource(
             if (status == SubtitleSelectedStatus.Off) {
                 R.drawable.ic_subtitles_disable
@@ -441,63 +405,4 @@ class VideoPlayerController(
                 R.drawable.ic_subtitles_enable
             }
         )
-
-    override fun onStateChanged(source: LifecycleOwner, event: Lifecycle.Event) {
-        when (event) {
-            Lifecycle.Event.ON_CREATE -> onCreated(source)
-            Lifecycle.Event.ON_RESUME -> onResume()
-            Lifecycle.Event.ON_PAUSE -> onPause()
-            Lifecycle.Event.ON_DESTROY -> onDestroy()
-            else -> return
-        }
-    }
-
-    private fun onCreated(source: LifecycleOwner) {
-        if (sharingScope == null) {
-            sharingScope = source.lifecycleScope
-            sharingScope?.launch {
-                viewModel.uiState.map { it.metadata }.distinctUntilChanged()
-                    .collectLatest { metadata ->
-                        displayMetadata(metadata)
-                    }
-            }
-
-            sharingScope?.launch {
-                viewModel.uiState.map { it.items }.distinctUntilChanged()
-                    .collectLatest {
-                        togglePlayQueueEnabled(it.size)
-                    }
-            }
-
-            sharingScope?.launch {
-                viewModel.uiState.map { it.repeatToggleMode }.distinctUntilChanged()
-                    .collectLatest {
-                        updateRepeatToggleButtonUI(context, it)
-                    }
-            }
-        }
-    }
-
-    /**
-     * The onResume function is called when Lifecycle event ON_RESUME
-     *
-     */
-    fun onResume() {
-        playerComposeView.onResume()
-    }
-
-    /**
-     * The onPause function is called when Lifecycle event ON_PAUSE
-     */
-    fun onPause() {
-        playerComposeView.onPause()
-    }
-
-    /**
-     * The onDestroy function is called when Lifecycle event ON_DESTROY
-     */
-    fun onDestroy() {
-        sharingScope?.cancel()
-        sharingScope = null
-    }
 }

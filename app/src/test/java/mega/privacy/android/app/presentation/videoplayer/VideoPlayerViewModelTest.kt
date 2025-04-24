@@ -871,10 +871,10 @@ class VideoPlayerViewModelTest {
             }.toTypedArray()
             val testParentFile = mock<File> {
                 on { name }.thenReturn(testTitle)
-                on { listFiles() }.thenReturn(testFiles)
             }
             val testFile = mock<File> {
                 on { parentFile }.thenReturn(testParentFile)
+                on { listFiles() }.thenReturn(testFiles)
             }
             whenever(getFileByPathUseCase(testZipPath)).thenReturn(testFile)
             val items = testFiles.map {
@@ -1024,6 +1024,11 @@ class VideoPlayerViewModelTest {
 
         val entities = testVideoNodes.map {
             initVideoPlayerItem(it.id.longValue, it.name)
+        }
+        entities.onEach {
+            whenever(it.copy(type = MediaQueueItemType.Playing)).thenReturn(it)
+            whenever(it.copy(type = MediaQueueItemType.Previous)).thenReturn(it)
+            whenever(it.copy(type = MediaQueueItemType.Next)).thenReturn(it)
         }
         testVideoNodes.forEachIndexed { index, node ->
             whenever(

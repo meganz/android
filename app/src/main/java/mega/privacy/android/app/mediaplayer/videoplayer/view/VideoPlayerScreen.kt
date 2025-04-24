@@ -4,6 +4,8 @@ import android.annotation.SuppressLint
 import android.content.res.Configuration.ORIENTATION_LANDSCAPE
 import android.content.res.Configuration.ORIENTATION_PORTRAIT
 import android.graphics.Bitmap
+import android.os.Environment.DIRECTORY_DCIM
+import android.os.Environment.getExternalStoragePublicDirectory
 import android.view.View
 import android.view.ViewGroup
 import android.widget.ProgressBar
@@ -44,7 +46,6 @@ import androidx.compose.ui.unit.LayoutDirection
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.viewinterop.AndroidViewBinding
 import androidx.core.view.isVisible
-import androidx.lifecycle.compose.LocalLifecycleOwner
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.media3.common.Player
 import androidx.media3.common.Player.STATE_BUFFERING
@@ -71,12 +72,15 @@ import mega.privacy.android.app.presentation.videoplayer.model.PlaybackPositionS
 import mega.privacy.android.app.presentation.videoplayer.model.SubtitleSelectedStatus
 import mega.privacy.android.app.presentation.videoplayer.view.VideoPlayerTopBar
 import mega.privacy.android.app.utils.Constants.AUDIO_PLAYER_TOOLBAR_INIT_HIDE_DELAY_MS
+import mega.privacy.android.domain.entity.mediaplayer.RepeatToggleMode
 import mega.privacy.android.shared.original.core.ui.controls.dialogs.MegaAlertDialog
 import mega.privacy.android.shared.original.core.ui.controls.layouts.MegaScaffold
 import mega.privacy.android.shared.original.core.ui.controls.sheets.MegaBottomSheetLayout
 import mega.privacy.android.shared.original.core.ui.utils.showAutoDurationSnackbar
 import mega.privacy.mobile.analytics.event.AddSubtitlesOptionPressedEvent
 import mega.privacy.mobile.analytics.event.AutoMatchSubtitleOptionPressedEvent
+import mega.privacy.mobile.analytics.event.LoopButtonPressedEvent
+import mega.privacy.mobile.analytics.event.SnapshotButtonPressedEvent
 import kotlin.math.roundToInt
 
 @androidx.annotation.OptIn(UnstableApi::class)
@@ -89,12 +93,13 @@ internal fun VideoPlayerScreen(
     player: ExoPlayer?,
     playQueueButtonClicked: () -> Unit,
 ) {
-    val lifecycle = LocalLifecycleOwner.current.lifecycle
     val context = LocalContext.current
     val density = LocalDensity.current
 
     val configuration = LocalConfiguration.current
     val orientation = configuration.orientation
+
+    var videoPlayerController by remember { mutableStateOf<VideoPlayerController?>(null) }
 
     val systemUiController = rememberSystemUiController()
     var isControllerViewVisible by rememberSaveable { mutableStateOf(true) }
@@ -161,6 +166,36 @@ internal fun VideoPlayerScreen(
         }
     }
 
+    LaunchedEffect(uiState.items) {
+        if (uiState.items.isNotEmpty()) {
+            videoPlayerController?.togglePlayQueueEnabled(uiState.items.size)
+        }
+    }
+
+    LaunchedEffect(uiState.isFullscreen) {
+        videoPlayerController?.updateFullscreenButtonIcon(uiState.isFullscreen)
+    }
+
+    LaunchedEffect(uiState.isLocked) {
+        videoPlayerController?.updateLockView(uiState.isLocked)
+    }
+
+    LaunchedEffect(uiState.currentSpeedPlayback) {
+        videoPlayerController?.updateSpeedPlaybackButtonIcon(uiState.currentSpeedPlayback.iconId)
+    }
+
+    LaunchedEffect(uiState.subtitleSelectedStatus) {
+        videoPlayerController?.updateSubtitleButtonUI(uiState.subtitleSelectedStatus)
+    }
+
+    LaunchedEffect(uiState.metadata) {
+        videoPlayerController?.displayMetadata(uiState.metadata)
+    }
+
+    LaunchedEffect(uiState.repeatToggleMode) {
+        videoPlayerController?.updateRepeatToggleButtonUI(context, uiState.repeatToggleMode)
+    }
+
     DisposableEffect(Unit) {
         playbackState = player?.playbackState ?: STATE_IDLE
 
@@ -197,13 +232,42 @@ internal fun VideoPlayerScreen(
                                     }
                                 }
 
-                                VideoPlayerController(
+                                videoPlayerController = VideoPlayerController(
                                     context = context,
-                                    coroutineScope = coroutineScope,
-                                    viewModel = viewModel,
+                                    uiState = uiState,
                                     container = root,
-                                    fullscreenClickedCallback = {
-                                        val isFullscreen = uiState.isFullscreen.not()
+                                    isShowSubtitleIcon = viewModel.isShowSubtitleIcon(),
+                                    updateRepeatToggleMode = {
+                                        val repeatToggleMode =
+                                            uiState.repeatToggleMode.let { repeatToggleMode ->
+                                                if (repeatToggleMode == RepeatToggleMode.REPEAT_NONE) {
+                                                    Analytics.tracker.trackEvent(
+                                                        LoopButtonPressedEvent
+                                                    )
+                                                    RepeatToggleMode.REPEAT_ONE
+
+                                                } else {
+                                                    RepeatToggleMode.REPEAT_NONE
+                                                }
+                                            }
+                                        viewModel.setRepeatToggleModeForPlayer(repeatToggleMode)
+                                    },
+                                    updateIsVideoOptionPopupShown = { value ->
+                                        viewModel.updateIsVideoOptionPopupShown(value)
+                                    },
+                                    updateIsSpeedPopupShown = { value ->
+                                        viewModel.updateIsSpeedPopupShown(value)
+                                    },
+                                    speedPlaybackItemSelected = { item ->
+                                        viewModel.updateCurrentSpeedPlaybackItem(item)
+                                    },
+                                    updateLockStatus = { isLock ->
+                                        viewModel.updateLockStatus(isLock)
+                                    },
+                                    showSubtitleDialog = {
+                                        viewModel.updateShowSubtitleDialog(true)
+                                    },
+                                    fullscreenClickedCallback = { isFullscreen ->
                                         viewModel.updateFullscreen(isFullscreen)
                                         updateResizeMode(isFullscreen)
                                     },
@@ -232,24 +296,32 @@ internal fun VideoPlayerScreen(
                                             playerComposeView.hideController()
                                         }
                                     }
-                                ) { bitmap ->
-                                    val (width, height) =
-                                        if (orientation == ORIENTATION_LANDSCAPE && bitmap.height > bitmap.width) {
-                                            (screenHeight * bitmap.width / bitmap.height) to screenHeight
-                                        } else {
-                                            screenWidth to (screenWidth * bitmap.height / bitmap.width)
-                                        }
+                                ) {
+                                    val rootPath =
+                                        getExternalStoragePublicDirectory(DIRECTORY_DCIM).absolutePath
+                                    playerComposeView.videoSurfaceView?.let { view ->
+                                        viewModel.screenshotWhenVideoPlaying(
+                                            rootPath = rootPath,
+                                            captureView = view
+                                        ) { bitmap ->
+                                            Analytics.tracker.trackEvent(SnapshotButtonPressedEvent)
+                                            val (width, height) =
+                                                if (orientation == ORIENTATION_LANDSCAPE && bitmap.height > bitmap.width) {
+                                                    (screenHeight * bitmap.width / bitmap.height) to screenHeight
+                                                } else {
+                                                    screenWidth to (screenWidth * bitmap.height / bitmap.width)
+                                                }
 
-                                    resizedBitmap = Bitmap.createScaledBitmap(
-                                        bitmap,
-                                        width.toInt(),
-                                        height.toInt(),
-                                        false
-                                    )
-                                    isScreenshotVisible = true
-                                    bitmap.recycle()
-                                }.let {
-                                    lifecycle.addObserver(it)
+                                            resizedBitmap = Bitmap.createScaledBitmap(
+                                                bitmap,
+                                                width.toInt(),
+                                                height.toInt(),
+                                                false
+                                            )
+                                            isScreenshotVisible = true
+                                            bitmap.recycle()
+                                        }
+                                    }
                                 }
 
                                 playerComposeView.setControllerVisibilityListener(

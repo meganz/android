@@ -369,6 +369,7 @@ class VideoPlayerViewModel @Inject constructor(
                     Timber.e(it)
                 }.collectLatest { mode ->
                     uiState.update { it.copy(repeatToggleMode = mode) }
+                    mediaPlayerGateway.setRepeatToggleMode(mode)
                 }
         }
 
@@ -703,13 +704,15 @@ class VideoPlayerViewModel @Inject constructor(
                 )
             }
 
-            updatePlaybackSources(
-                videoPlayerItems = videoPlayerItems,
-                mediaItems = mediaItems,
-                title = title,
-                currentPlayingIndex = currentPlayingIndex,
-                firstPlayHandle = firstPlayHandle
-            )
+            if (videoPlayerItems.isNotEmpty() && mediaItems.isNotEmpty()) {
+                updatePlaybackSources(
+                    videoPlayerItems = videoPlayerItems,
+                    mediaItems = mediaItems,
+                    title = title,
+                    currentPlayingIndex = currentPlayingIndex,
+                    firstPlayHandle = firstPlayHandle
+                )
+            }
         }.onFailure {
             Timber.e(it)
         }
@@ -741,13 +744,23 @@ class VideoPlayerViewModel @Inject constructor(
             nameToDisplay = null
         )
 
+        val updatedItems = videoPlayerItems.mapIndexed { index, item ->
+            val newType = when {
+                index == currentPlayingIndex -> MediaQueueItemType.Playing
+                index < currentPlayingIndex -> MediaQueueItemType.Previous
+                else -> MediaQueueItemType.Next
+            }
+            item.takeIf { it.type == newType } ?: item.copy(type = newType)
+        }
+
         uiState.update {
             it.copy(
-                items = videoPlayerItems,
+                items = updatedItems,
                 mediaPlaySources = mediaPlaySources,
                 playQueueTitle = title,
                 currentPlayingIndex = currentPlayingIndex,
-                currentPlayingHandle = firstPlayHandle
+                currentPlayingHandle = firstPlayHandle,
+                currentPlayingItemName = firstPlayingItemName
             )
         }
         buildPlaybackSourcesForPlayer(mediaPlaySources)
@@ -755,8 +768,8 @@ class VideoPlayerViewModel @Inject constructor(
 
     private suspend fun buildPlaybackSourcesByFiles(zipPath: String, firstPlayHandle: Long) {
         runCatching {
-            val (title, files) = getFileByPathUseCase(zipPath)?.parentFile.let { parentFile ->
-                parentFile?.name.orEmpty() to parentFile?.listFiles().orEmpty()
+            val (title, files) = getFileByPathUseCase(zipPath).let { zipFile ->
+                zipFile?.parentFile?.name.orEmpty() to zipFile?.listFiles()?.toList().orEmpty()
             }
             val mediaItems = mutableListOf<MediaItem>()
             var currentPlayingIndex = -1
@@ -782,13 +795,15 @@ class VideoPlayerViewModel @Inject constructor(
                 )
             }
 
-            updatePlaybackSources(
-                videoPlayerItems = videoPlayerItems,
-                mediaItems = mediaItems,
-                title = title,
-                currentPlayingIndex = currentPlayingIndex,
-                firstPlayHandle = firstPlayHandle
-            )
+            if (videoPlayerItems.isNotEmpty() && mediaItems.isNotEmpty()) {
+                updatePlaybackSources(
+                    videoPlayerItems = videoPlayerItems,
+                    mediaItems = mediaItems,
+                    title = title,
+                    currentPlayingIndex = currentPlayingIndex,
+                    firstPlayHandle = firstPlayHandle
+                )
+            }
         }.onFailure {
             Timber.e(it)
         }
@@ -1062,39 +1077,11 @@ class VideoPlayerViewModel @Inject constructor(
         isCheckPlaybackPosition: Boolean,
         items: List<VideoPlayerItem> = uiState.value.items,
     ) {
-        val playingIndex = items.indexOfFirst { it.nodeHandle == handle }.takeIf { it != -1 } ?: 0
-        val playingItemName =
-            items.firstOrNull { it.nodeHandle == handle }?.nodeName ?: firstPlayingItemName
         viewModelScope.launch {
             savePlaybackTimesUseCase()
-
             handlePlaybackPositionAfterVideoTransition(handle, isCheckPlaybackPosition)
-
-            val actions = getMenuActionsForVideo(
-                launchSource = currentLaunchSources,
-                videoNodeHandle = handle,
-                isPaidUser = uiState.value.accountType?.isPaid == true,
-                isExpiredBusinessUser = uiState.value.isBusinessAccountExpired
-            )
-
-            val updatedItems = items.mapIndexed { index, item ->
-                val newType = when {
-                    index == playingIndex -> MediaQueueItemType.Playing
-                    index < playingIndex -> MediaQueueItemType.Previous
-                    else -> MediaQueueItemType.Next
-                }
-                item.takeIf { it.type == newType } ?: item.copy(type = newType)
-            }
-
-            uiState.update {
-                it.copy(
-                    items = updatedItems,
-                    currentPlayingHandle = handle,
-                    currentPlayingIndex = playingIndex,
-                    menuActions = actions,
-                    currentPlayingItemName = playingItemName
-                )
-            }
+            updatePlaybackStatus(handle, items)
+            updateMenuActions(handle)
         }
     }
 
@@ -1115,6 +1102,42 @@ class VideoPlayerViewModel @Inject constructor(
 
         // Reset hasCheckedPlaybackPosition to re-check playback position on video transition
         hasCheckedPlaybackPosition = false
+    }
+
+    private fun updatePlaybackStatus(handle: Long, items: List<VideoPlayerItem>) {
+        if (items.isEmpty()) return
+        val playingIndex = items.indexOfFirst { it.nodeHandle == handle }.takeIf { it != -1 } ?: 0
+        val playingItemName =
+            items.firstOrNull { it.nodeHandle == handle }?.nodeName ?: firstPlayingItemName
+
+        val updatedItems = items.mapIndexed { index, item ->
+            val newType = when {
+                index == playingIndex -> MediaQueueItemType.Playing
+                index < playingIndex -> MediaQueueItemType.Previous
+                else -> MediaQueueItemType.Next
+            }
+            item.takeIf { it.type == newType } ?: item.copy(type = newType)
+        }
+
+        uiState.update {
+            it.copy(
+                items = updatedItems,
+                currentPlayingHandle = handle,
+                currentPlayingIndex = playingIndex,
+                currentPlayingItemName = playingItemName
+            )
+        }
+    }
+
+    private suspend fun updateMenuActions(handle: Long) {
+        val actions = getMenuActionsForVideo(
+            launchSource = currentLaunchSources,
+            videoNodeHandle = handle,
+            isPaidUser = uiState.value.accountType?.isPaid == true,
+            isExpiredBusinessUser = uiState.value.isBusinessAccountExpired
+        )
+
+        uiState.update { it.copy(menuActions = actions) }
     }
 
     private fun checkPlaybackPositionStatus(

@@ -288,6 +288,10 @@ class VideoPlayerComposeActivity : PasscodeActivity() {
         setContent {
             val mode by getThemeMode().collectAsStateWithLifecycle(initialValue = ThemeMode.System)
             var passcodeEnabled by remember { mutableStateOf(true) }
+            val bottomSheetNavigator = rememberBottomSheetNavigator()
+            val navHostController = rememberNavController(bottomSheetNavigator)
+            val uiState by videoPlayerViewModel.uiState.collectAsStateWithLifecycle()
+            val scaffoldState = rememberScaffoldState()
 
             val containers: List<@Composable (@Composable () -> Unit) -> Unit> = listOf(
                 { OriginalTheme(isDark = mode.isDarkMode(), content = it) },
@@ -304,12 +308,6 @@ class VideoPlayerComposeActivity : PasscodeActivity() {
             AppContainer(
                 containers = containers
             ) {
-                val bottomSheetNavigator = rememberBottomSheetNavigator()
-                val navHostController =
-                    rememberNavController(bottomSheetNavigator)
-                val uiState by videoPlayerViewModel.uiState.collectAsStateWithLifecycle()
-                val scaffoldState = rememberScaffoldState()
-
                 NavHost(
                     navController = navHostController,
                     startDestination = VideoPlayerNavigationGraph
