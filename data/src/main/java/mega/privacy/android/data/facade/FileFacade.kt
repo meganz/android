@@ -115,6 +115,10 @@ internal class FileFacade @Inject constructor(
     override suspend fun doesExternalStorageDirectoryExists(): Boolean =
         Environment.getExternalStorageDirectory() != null
 
+    override suspend fun getExternalStorageDirectoryPath(): String {
+        return Environment.getExternalStorageDirectory().absolutePath
+    }
+
     override suspend fun buildDefaultDownloadDir(): File =
         Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_DOWNLOADS)
             ?.let { downloadsDir ->

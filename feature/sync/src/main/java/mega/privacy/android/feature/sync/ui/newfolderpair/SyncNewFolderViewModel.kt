@@ -1,6 +1,5 @@
 package mega.privacy.android.feature.sync.ui.newfolderpair
 
-import mega.privacy.android.shared.resources.R as sharedR
 import androidx.core.net.toFile
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
@@ -22,6 +21,7 @@ import mega.privacy.android.domain.repository.BackupRepository.Companion.BACKUPS
 import mega.privacy.android.domain.usecase.account.IsStorageOverQuotaUseCase
 import mega.privacy.android.domain.usecase.backup.GetDeviceIdUseCase
 import mega.privacy.android.domain.usecase.backup.GetDeviceNameUseCase
+import mega.privacy.android.domain.usecase.file.GetExternalStorageDirectoryPathUseCase
 import mega.privacy.android.feature.sync.domain.entity.RemoteFolder
 import mega.privacy.android.feature.sync.domain.exception.BackupAlreadyExistsException
 import mega.privacy.android.feature.sync.domain.usecase.GetLocalDCIMFolderPathUseCase
@@ -31,6 +31,7 @@ import mega.privacy.android.feature.sync.domain.usecase.sync.GetFolderPairsUseCa
 import mega.privacy.android.feature.sync.domain.usecase.sync.SyncFolderPairUseCase
 import mega.privacy.android.feature.sync.domain.usecase.sync.option.ClearSelectedMegaFolderUseCase
 import mega.privacy.android.feature.sync.domain.usecase.sync.option.MonitorSelectedMegaFolderUseCase
+import mega.privacy.android.shared.resources.R as sharedR
 import timber.log.Timber
 import kotlin.io.path.Path
 import kotlin.io.path.name
@@ -50,6 +51,7 @@ internal class SyncNewFolderViewModel @AssistedInject constructor(
     private val getFolderPairsUseCase: GetFolderPairsUseCase,
     private val myBackupsFolderExistsUseCase: MyBackupsFolderExistsUseCase,
     private val setMyBackupsFolderUseCase: SetMyBackupsFolderUseCase,
+    private val getExternalStorageDirectoryPathUseCase: GetExternalStorageDirectoryPathUseCase,
 ) : ViewModel() {
 
     @AssistedFactory
@@ -106,7 +108,11 @@ internal class SyncNewFolderViewModel @AssistedInject constructor(
         when (action) {
             is SyncNewFolderAction.LocalFolderSelected -> {
                 viewModelScope.launch {
+                    Timber.d("Local folder selected: ${action.path}")
                     action.path.toFile().absolutePath.let { path ->
+                        if (path == getExternalStorageDirectoryPathUseCase()) {
+                            return@let
+                        }
                         val localDCIMFolderPath = getLocalDCIMFolderPathUseCase()
                         val folderPairs = getFolderPairsUseCase()
                         when {

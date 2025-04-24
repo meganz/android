@@ -1,6 +1,5 @@
 package mega.privacy.android.feature.sync.presentation
 
-import mega.privacy.android.shared.resources.R as sharedR
 import android.net.Uri
 import app.cash.turbine.test
 import com.google.common.truth.Truth.assertThat
@@ -18,6 +17,7 @@ import mega.privacy.android.domain.entity.sync.SyncType
 import mega.privacy.android.domain.usecase.account.IsStorageOverQuotaUseCase
 import mega.privacy.android.domain.usecase.backup.GetDeviceIdUseCase
 import mega.privacy.android.domain.usecase.backup.GetDeviceNameUseCase
+import mega.privacy.android.domain.usecase.file.GetExternalStorageDirectoryPathUseCase
 import mega.privacy.android.feature.sync.domain.entity.FolderPair
 import mega.privacy.android.feature.sync.domain.entity.RemoteFolder
 import mega.privacy.android.feature.sync.domain.entity.SyncStatus
@@ -32,6 +32,7 @@ import mega.privacy.android.feature.sync.domain.usecase.sync.option.MonitorSelec
 import mega.privacy.android.feature.sync.ui.newfolderpair.SyncNewFolderAction
 import mega.privacy.android.feature.sync.ui.newfolderpair.SyncNewFolderState
 import mega.privacy.android.feature.sync.ui.newfolderpair.SyncNewFolderViewModel
+import mega.privacy.android.shared.resources.R as sharedR
 import org.junit.jupiter.api.AfterEach
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.TestInstance
@@ -42,6 +43,7 @@ import org.junit.jupiter.params.provider.MethodSource
 import org.mockito.Mockito.mock
 import org.mockito.Mockito.reset
 import org.mockito.kotlin.verify
+import org.mockito.kotlin.verifyNoInteractions
 import org.mockito.kotlin.whenever
 import java.util.stream.Stream
 
@@ -60,6 +62,8 @@ internal class SyncNewFolderViewModelTest {
     private val getFolderPairsUseCase: GetFolderPairsUseCase = mock()
     private val myBackupsFolderExistsUseCase: MyBackupsFolderExistsUseCase = mock()
     private val setMyBackupsFolderUseCase: SetMyBackupsFolderUseCase = mock()
+    private val getExternalStorageDirectoryPathUseCase: GetExternalStorageDirectoryPathUseCase =
+        mock()
     private lateinit var underTest: SyncNewFolderViewModel
 
     @AfterEach
@@ -75,6 +79,7 @@ internal class SyncNewFolderViewModelTest {
             getFolderPairsUseCase,
             myBackupsFolderExistsUseCase,
             setMyBackupsFolderUseCase,
+            getExternalStorageDirectoryPathUseCase
         )
     }
 
@@ -100,6 +105,29 @@ internal class SyncNewFolderViewModelTest {
             whenever(localFolderUri.scheme).thenReturn("file")
 
             underTest.handleAction(SyncNewFolderAction.LocalFolderSelected(localFolderUri))
+
+            assertThat(expectedState.selectedLocalFolder).isEqualTo(underTest.state.value.selectedLocalFolder)
+        }
+
+    @ParameterizedTest(name = "Sync type: {0}")
+    @MethodSource("syncTypeParameters")
+    fun `test that when root local folder is selected action not results in updated state`(syncType: SyncType) =
+        runTest {
+            whenever(monitorSelectedMegaFolderUseCase()).thenReturn(flowOf(mock()))
+            initViewModel(syncType = syncType)
+            val localFolderUri: Uri = mock()
+            val localFolderStoragePath = "/storage/emulated/0"
+            val expectedState = SyncNewFolderState(
+                syncType = syncType,
+                deviceName = "Device Name",
+                selectedLocalFolder = ""
+            )
+            whenever(getExternalStorageDirectoryPathUseCase()).thenReturn(localFolderStoragePath)
+            whenever(localFolderUri.path).thenReturn(localFolderStoragePath)
+            whenever(localFolderUri.scheme).thenReturn("file")
+
+            underTest.handleAction(SyncNewFolderAction.LocalFolderSelected(localFolderUri))
+            verifyNoInteractions(getLocalDCIMFolderPathUseCase, getFolderPairsUseCase)
 
             assertThat(expectedState.selectedLocalFolder).isEqualTo(underTest.state.value.selectedLocalFolder)
         }
@@ -459,6 +487,7 @@ internal class SyncNewFolderViewModelTest {
             getFolderPairsUseCase = getFolderPairsUseCase,
             myBackupsFolderExistsUseCase = myBackupsFolderExistsUseCase,
             setMyBackupsFolderUseCase = setMyBackupsFolderUseCase,
+            getExternalStorageDirectoryPathUseCase = getExternalStorageDirectoryPathUseCase
         )
     }
 

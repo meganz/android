@@ -62,6 +62,13 @@ interface FileGateway {
      */
     suspend fun doesExternalStorageDirectoryExists(): Boolean
 
+
+    /**
+     * Get External Storage Directory Path
+     *
+     */
+    suspend fun getExternalStorageDirectoryPath(): String
+
     /**
      * Checks whether the [File] is available or not from the given [String] path
      *

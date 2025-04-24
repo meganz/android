@@ -128,6 +128,13 @@ interface FileSystemRepository {
     suspend fun doesExternalStorageDirectoryExists(): Boolean
 
     /**
+     * Get External Storage Directory Path
+     *
+     */
+    suspend fun getExternalStorageDirectoryPath(): String
+
+
+    /**
      * Does file exist
      *
      * @param path
