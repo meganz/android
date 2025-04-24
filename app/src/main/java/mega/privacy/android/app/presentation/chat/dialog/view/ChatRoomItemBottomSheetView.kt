@@ -229,7 +229,7 @@ internal fun ChatRoomItemBottomSheetView(
                     }
                     ChatDivider()
 
-                    if (item.isRecurring()) {
+                    if (item.isRecurring() && !item.isCancelled) {
                         MenuItem(
                             modifier = Modifier.testTag("occurrences"),
                             res = R.drawable.occurrences_icon,

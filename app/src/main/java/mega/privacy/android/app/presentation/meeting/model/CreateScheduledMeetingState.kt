@@ -127,7 +127,8 @@ data class CreateScheduledMeetingState(
      */
     private fun isValidEdition(): Boolean {
         scheduledMeeting?.let { schedMeet ->
-            return (schedMeet.title != meetingTitle ||
+            return ((schedMeet.isCanceled && schedMeet.rules?.freq != OccurrenceFrequencyType.Invalid) ||
+                    schedMeet.title != meetingTitle ||
                     (schedMeet.description ?: "") != descriptionText ||
                     initialMeetingLinkOption != enabledMeetingLinkOption ||
                     initialAllowAddParticipantsOption != enabledAllowAddParticipantsOption ||

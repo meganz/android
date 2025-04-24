@@ -307,6 +307,14 @@ sealed class ChatRoomItem(
         this is MeetingChatRoomItem && this.isRecurring()
 
     /**
+     * Check if chat is a cancelled recurring meeting
+     *
+     * @return  True if is a cancelled recurring meeting, false otherwise.
+     */
+    fun isCancelledRecurringMeeting(): Boolean =
+        this is MeetingChatRoomItem && this.isCancelled
+
+    /**
      * Check if chat has ongoing call
      *
      * @return  True if has an ongoing call, false otherwise.

@@ -269,10 +269,11 @@ internal fun ChatRoomItemView(
                         start.linkTo(muteIcon.end, 2.dp, 4.dp)
                         top.linkTo(titleText.top)
                         bottom.linkTo(titleText.bottom)
-                        visibility = if (item.isRecurringMeeting() && !isNoteToSelfChat)
-                            Visibility.Visible
-                        else
-                            Visibility.Gone
+                        visibility =
+                            if (item.isRecurringMeeting() && !isNoteToSelfChat && !item.isCancelledRecurringMeeting())
+                                Visibility.Visible
+                            else
+                                Visibility.Gone
                     },
             )
 
