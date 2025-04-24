@@ -1042,7 +1042,7 @@ private fun Modifier.magnifierEffect(
             )
         }
         .then(
-            if (offsetMagnifier == Offset.Unspecified || !isDraggingMagnifier) {
+            if (offsetMagnifier == Offset.Unspecified) {
                 Modifier
             } else {
                 Modifier.magnifier(
