@@ -4,15 +4,6 @@
     xmlns:bind="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools">
 
-    <data>
-        <variable
-            name="createviewmodel"
-            type="mega.privacy.android.app.meeting.fragments.CreateMeetingViewModel" />
-        <variable
-            name="sharedviewmodel"
-            type="mega.privacy.android.app.meeting.activity.MeetingActivityViewModel" />
-    </data>
-
     <androidx.constraintlayout.widget.ConstraintLayout
         android:id="@+id/create_meeting"
         android:layout_width="match_parent"
@@ -78,7 +69,6 @@
                 android:minWidth="100dp"
                 android:singleLine="true"
                 android:textAppearance="@style/TextAppearance.Mega.Subtitle1.Variant"
-                android:text="@={createviewmodel.meetingName}"
                 android:textAlignment="center"
                 android:textColor="@color/white"
                 android:textColorHint="#9B9B9B"
@@ -117,8 +107,7 @@
             android:layout_marginBottom="24dp"
             app:layout_constraintBottom_toTopOf="@id/edit_first_name"
             app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintStart_toStartOf="parent"
-            bind:viewmodelFab="@{sharedviewmodel}" />
+            app:layout_constraintStart_toStartOf="parent" />
 
         <EditText
             android:id="@+id/edit_first_name"

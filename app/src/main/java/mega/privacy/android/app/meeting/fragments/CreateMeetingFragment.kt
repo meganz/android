@@ -10,6 +10,7 @@ import android.view.MotionEvent.ACTION_DOWN
 import android.view.View
 import android.view.ViewGroup
 import androidx.core.content.ContextCompat
+import androidx.core.widget.doAfterTextChanged
 import androidx.fragment.app.viewModels
 import androidx.navigation.fragment.findNavController
 import com.google.android.material.appbar.MaterialToolbar
@@ -123,13 +124,28 @@ class CreateMeetingFragment : AbstractMeetingOnBoardingFragment() {
             val maxAllowed = ChatUtil.getMaxAllowed(defaultName)
             it.filters = arrayOf<InputFilter>(InputFilter.LengthFilter(maxAllowed))
         }
+
+        binding.typeMeetingEditText.doAfterTextChanged { text ->
+            viewModel.updateMeetingName(text.toString())
+        }
+
+        binding.onOffFab.fabMic.setOnClickListener {
+            sharedModel.onMicrophoneClicked()
+        }
+
+        binding.onOffFab.fabCam.setOnClickListener {
+            sharedModel.onCameraClicked()
+        }
+
+        binding.onOffFab.fabSpeaker.setOnClickListener {
+            sharedModel.clickSpeaker()
+        }
     }
 
     /**
      * Initialize ViewModel
      */
     private fun initViewModel() {
-        binding.createviewmodel = viewModel
         // Set default meeting name
         viewModel.initMeetingName()
         initRTCAudioManager()

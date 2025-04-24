@@ -22,6 +22,13 @@ class CreateMeetingViewModel @Inject constructor(
     }
 
     /**
+     * Sets value of meetingName
+     */
+    fun updateMeetingName(newName: String) {
+        meetingName.value = newName
+    }
+
+    /**
      * Sets the default value of hint
      *
      * @return the string of default meetingName

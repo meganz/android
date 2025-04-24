@@ -1357,6 +1357,20 @@ class MeetingActivityViewModel @Inject constructor(
     }
 
     /**
+     * Microphone clicked
+     */
+    fun onMicrophoneClicked() {
+        clickMic(!state.value.micEnabled)
+    }
+
+    /**
+     * Camera clicked
+     */
+    fun onCameraClicked() {
+        clickCamera(!state.value.camEnabled)
+    }
+
+    /**
      * Response of clicking mic fab
      *
      * @param shouldAudioBeEnabled True, if audio should be enabled. False, otherwise
