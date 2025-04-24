@@ -3,8 +3,10 @@ package mega.privacy.android.data.mapper.transfer.active
 import com.google.common.truth.Truth.assertThat
 import kotlinx.coroutines.test.runTest
 import mega.privacy.android.data.database.entity.ActiveTransferActionGroupEntity
+import mega.privacy.android.domain.entity.node.NodeId
 import mega.privacy.android.domain.entity.transfer.ActiveTransferActionGroupImpl
 import mega.privacy.android.domain.entity.transfer.TransferType
+import mega.privacy.android.domain.entity.transfer.pending.PendingTransferNodeIdentifier
 import org.junit.jupiter.api.BeforeAll
 import org.junit.jupiter.api.TestInstance
 import org.junit.jupiter.params.ParameterizedTest
@@ -26,9 +28,21 @@ class ActiveTransferGroupEntityMapperTest {
         transferType: TransferType,
     ) = runTest {
         val activeTransferGroup =
-            ActiveTransferActionGroupImpl(GROUP_ID, transferType, DESTINATION, START_TIME)
+            ActiveTransferActionGroupImpl(
+                groupId = GROUP_ID,
+                transferType = transferType,
+                destination = DESTINATION,
+                startTime = START_TIME,
+                pendingTransferNodeId = PendingTransferNodeIdentifier.CloudDriveNode(NodeId(NODE_ID)),
+            )
         val expected =
-            ActiveTransferActionGroupEntity(GROUP_ID, transferType, DESTINATION, START_TIME)
+            ActiveTransferActionGroupEntity(
+                groupId = GROUP_ID,
+                transferType = transferType,
+                destination = DESTINATION,
+                startTime = START_TIME,
+                pendingTransferNodeId = PendingTransferNodeIdentifier.CloudDriveNode(NodeId(NODE_ID)),
+            )
         val actual = underTest(activeTransferGroup)
         assertThat(expected).isEqualTo(actual)
     }
@@ -37,5 +51,6 @@ class ActiveTransferGroupEntityMapperTest {
         const val GROUP_ID = 34
         const val DESTINATION = "destination"
         const val START_TIME = 94837594L
+        const val NODE_ID = 4895L
     }
 }

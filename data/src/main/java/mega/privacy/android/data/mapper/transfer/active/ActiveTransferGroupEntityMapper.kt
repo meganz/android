@@ -5,12 +5,14 @@ import mega.privacy.android.domain.entity.transfer.ActiveTransferActionGroup
 import javax.inject.Inject
 
 internal class ActiveTransferGroupEntityMapper @Inject constructor() {
-    operator fun invoke(activeTransferActionGroup: ActiveTransferActionGroup) = with(activeTransferActionGroup) {
-        ActiveTransferActionGroupEntity(
-            groupId = groupId,
-            transferType = transferType,
-            destination = destination,
-            startTime = startTime,
-        )
-    }
+    operator fun invoke(activeTransferActionGroup: ActiveTransferActionGroup) =
+        with(activeTransferActionGroup) {
+            ActiveTransferActionGroupEntity(
+                groupId = groupId,
+                transferType = transferType,
+                destination = destination,
+                startTime = startTime,
+                pendingTransferNodeId = pendingTransferNodeId,
+            )
+        }
 }

@@ -53,6 +53,7 @@ class InsertPendingUploadsForFilesUseCaseTest {
         val parentFolderId = NodeId(242L)
         val currentTime = 398457L
         val destination = "/folder/sub-folder"
+        val pendingTransferNodeIdentifier = PendingTransferNodeIdentifier.CloudDriveNode(parentFolderId)
         whenever(timeSystemRepository.getCurrentTimeInMillis()) doReturn currentTime
         whenever(nodeRepository.getNodePathById(parentFolderId)) doReturn destination
         val transferGroupId = 2437865L
@@ -62,6 +63,7 @@ class InsertPendingUploadsForFilesUseCaseTest {
                     transferType = TransferType.GENERAL_UPLOAD,
                     destination = destination,
                     startTime = currentTime,
+                    pendingTransferNodeId = pendingTransferNodeIdentifier,
                 )
             )
         ) doReturn transferGroupId
@@ -72,7 +74,7 @@ class InsertPendingUploadsForFilesUseCaseTest {
         val expected = pathsAndNames.map { (path, name) ->
             InsertPendingTransferRequest(
                 transferType = TransferType.GENERAL_UPLOAD,
-                nodeIdentifier = PendingTransferNodeIdentifier.CloudDriveNode(parentFolderId),
+                nodeIdentifier = pendingTransferNodeIdentifier,
                 uriPath = UriPath(path),
                 appData = appData,
                 isHighPriority = isHighPriority,

@@ -1,7 +1,6 @@
 package mega.privacy.android.data.database.converter
 
 import androidx.room.TypeConverter
-import kotlinx.serialization.encodeToString
 import kotlinx.serialization.json.Json
 import mega.privacy.android.domain.entity.transfer.pending.PendingTransferNodeIdentifier
 
@@ -11,10 +10,10 @@ import mega.privacy.android.domain.entity.transfer.pending.PendingTransferNodeId
 internal class PendingTransferNodeIdentifierConverter {
 
     @TypeConverter
-    fun fromNodeIdentifier(nodeIdentifier: PendingTransferNodeIdentifier): String =
-        Json.encodeToString(nodeIdentifier)
+    fun fromNodeIdentifier(nodeIdentifier: PendingTransferNodeIdentifier?): String? =
+        nodeIdentifier?.let { Json.encodeToString(it) }
 
     @TypeConverter
-    fun toNodeIdentifier(serializedData: String): PendingTransferNodeIdentifier =
-        Json.decodeFromString(serializedData)
+    fun toNodeIdentifier(serializedData: String?): PendingTransferNodeIdentifier? =
+        serializedData?.let { Json.decodeFromString(it) }
 }

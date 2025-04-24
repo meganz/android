@@ -8,7 +8,9 @@ import com.google.common.truth.Truth.assertThat
 import kotlinx.coroutines.test.runTest
 import mega.privacy.android.data.database.MegaDatabase
 import mega.privacy.android.data.database.entity.ActiveTransferActionGroupEntity
+import mega.privacy.android.domain.entity.node.NodeId
 import mega.privacy.android.domain.entity.transfer.TransferType
+import mega.privacy.android.domain.entity.transfer.pending.PendingTransferNodeIdentifier
 import org.junit.After
 import org.junit.Before
 import org.junit.Test
@@ -40,6 +42,7 @@ class ActiveTransferGroupDaoTest {
             groupId = 6434,
             transferType = TransferType.DOWNLOAD,
             destination = "destination",
+            pendingTransferNodeId = PendingTransferNodeIdentifier.CloudDriveNode(NodeId(54L)),
         )
         underTest.insertActiveTransferGroup(newEntity)
         val actual = underTest.getActiveTransferGroupById(newEntity.groupId ?: -1)
@@ -52,6 +55,7 @@ class ActiveTransferGroupDaoTest {
             groupId = 6434,
             transferType = TransferType.DOWNLOAD,
             destination = "destination",
+            pendingTransferNodeId = PendingTransferNodeIdentifier.CloudDriveNode(NodeId(54L)),
         )
         underTest.insertActiveTransferGroup(newEntity)
         underTest.deleteActiveTransfersGroupById(newEntity.groupId ?: -1)

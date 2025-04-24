@@ -32,11 +32,13 @@ class InsertPendingUploadsForFilesUseCase @Inject constructor(
         parentFolderId: NodeId,
         isHighPriority: Boolean = false,
     ) {
+        val pendingTransferNodeId = PendingTransferNodeIdentifier.CloudDriveNode(parentFolderId)
         val transferGroupId = transferRepository.insertActiveTransferGroup(
             ActiveTransferActionGroupImpl(
                 transferType = TransferType.GENERAL_UPLOAD,
                 destination = nodeRepository.getNodePathById(parentFolderId),
                 startTime = timeSystemRepository.getCurrentTimeInMillis(),
+                pendingTransferNodeId = pendingTransferNodeId
             )
         )
         val appData = listOfNotNull(
@@ -46,7 +48,7 @@ class InsertPendingUploadsForFilesUseCase @Inject constructor(
             pathsAndNames.map { (path, name) ->
                 InsertPendingTransferRequest(
                     transferType = TransferType.GENERAL_UPLOAD,
-                    nodeIdentifier = PendingTransferNodeIdentifier.CloudDriveNode(parentFolderId),
+                    nodeIdentifier = pendingTransferNodeId,
                     uriPath = UriPath(path),
                     appData = appData,
                     isHighPriority = isHighPriority,
