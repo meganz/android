@@ -125,7 +125,10 @@ class HandleTransferEventUseCase @Inject internal constructor(
             finish = true
         )?.map { transferEvent ->
             val appDataToAdd = transferEvent.transfer.folderTransferTag?.let { folderTransferTag ->
-                transferRepository.getRecursiveTransferAppDataFromParent(folderTransferTag)
+                transferRepository.getRecursiveTransferAppDataFromParent(
+                    folderTransferTag,
+                    fetchInMemoryParent = { events.firstOrNull { it.transfer.tag == folderTransferTag }?.transfer }
+                )
             }
 
             if (appDataToAdd.isNullOrEmpty()) {

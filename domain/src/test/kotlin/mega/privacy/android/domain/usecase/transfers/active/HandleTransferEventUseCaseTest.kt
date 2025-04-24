@@ -113,8 +113,12 @@ class HandleTransferEventUseCaseTest {
                 1,
                 folderTransferTag = parentTag
             )
-            whenever(transferRepository.getRecursiveTransferAppDataFromParent(parentTag)) doReturn
-                    listOf(appData)
+            whenever(
+                transferRepository.getRecursiveTransferAppDataFromParent(
+                    eq(parentTag),
+                    any()
+                )
+            ) doReturn listOf(appData)
             val expected = transferEvent.transfer.copy(appData = listOf(appData))
             underTest.invoke(transferEvent)
             verify(transferRepository).insertOrUpdateActiveTransfers(eq(listOf(expected)))
@@ -132,8 +136,12 @@ class HandleTransferEventUseCaseTest {
                 1,
                 folderTransferTag = parentTag
             )
-            whenever(transferRepository.getRecursiveTransferAppDataFromParent(parentTag)) doReturn
-                    listOf(appData)
+            whenever(
+                transferRepository.getRecursiveTransferAppDataFromParent(
+                    eq(parentTag),
+                    any()
+                )
+            ) doReturn listOf(appData)
             val expected = transferEvent.transfer.copy(appData = listOf(appData))
             underTest.invoke(transferEvent)
             verify(transferRepository).insertOrUpdateActiveTransfers(eq(listOf(expected)))
@@ -151,8 +159,12 @@ class HandleTransferEventUseCaseTest {
                 1,
                 folderTransferTag = parentTag
             )
-            whenever(transferRepository.getRecursiveTransferAppDataFromParent(parentTag)) doReturn
-                    listOf(appData)
+            whenever(
+                transferRepository.getRecursiveTransferAppDataFromParent(
+                    eq(parentTag),
+                    any()
+                )
+            ) doReturn listOf(appData)
             val expected = transferEvent.transfer.copy(appData = listOf(appData))
             underTest.invoke(transferEvent)
             verify(transferRepository).insertOrUpdateActiveTransfers(eq(listOf(expected)))

@@ -885,13 +885,16 @@ internal class DefaultTransfersRepository @Inject constructor(
     override fun monitorTransferTagToCancel(): Flow<Int?> =
         appEventGateway.monitorTransferTagToCancel()
 
-    override suspend fun getRecursiveTransferAppDataFromParent(parentTransferTag: Int): List<RecursiveTransferAppData> =
-        withContext(ioDispatcher) {
-            parentRecursiveAppDataCache.getOrPut(parentTransferTag) {
-                getActiveTransferByTag(parentTransferTag)?.appData?.filterIsInstance<RecursiveTransferAppData>()
-                    ?: emptyList()
-            }
+
+    override suspend fun getRecursiveTransferAppDataFromParent(
+        parentTransferTag: Int,
+        fetchInMemoryParent: () -> Transfer?,
+    ): List<RecursiveTransferAppData> = withContext(ioDispatcher) {
+        parentRecursiveAppDataCache.getOrPut(parentTransferTag) {
+            (fetchInMemoryParent()?.appData ?: getActiveTransferByTag(parentTransferTag)?.appData)
+                ?.filterIsInstance<RecursiveTransferAppData>() ?: emptyList()
         }
+    }
 
     override suspend fun clearRecursiveTransferAppDataFromCache(parentTransferTag: Int) {
         parentRecursiveAppDataCache.remove(parentTransferTag)
