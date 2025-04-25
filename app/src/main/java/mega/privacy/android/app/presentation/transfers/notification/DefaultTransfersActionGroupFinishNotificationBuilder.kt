@@ -239,9 +239,10 @@ class DefaultTransfersActionGroupFinishNotificationBuilder @Inject constructor(
                 Intent(context, FileStorageActivity::class.java).apply {
                     action = FileStorageActivity.Mode.BROWSE_FILES.action
                     putExtra(FileStorageActivity.EXTRA_PATH, actionGroup.destination)
-                    intent.getStringArrayListExtra(FileStorageActivity.EXTRA_FILE_NAMES)?.let {
-                        putStringArrayListExtra(FileStorageActivity.EXTRA_FILE_NAMES, it)
-                    }
+                    putStringArrayListExtra(
+                        FileStorageActivity.EXTRA_FILE_NAMES,
+                        ArrayList(actionGroup.fileNames)
+                    )
                 }
             }
         }
