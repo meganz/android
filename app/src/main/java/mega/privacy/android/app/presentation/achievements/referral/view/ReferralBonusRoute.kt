@@ -109,7 +109,7 @@ internal fun ReferralBonusView(
             ) { idx ->
                 ReferralListItem(
                     modifier = Modifier
-                        .animateItemPlacement(),
+                        .animateItem(),
                     data = uiState.awardedInviteAchievements[idx],
                     index = idx
                 )
