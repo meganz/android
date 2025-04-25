@@ -39,6 +39,8 @@ internal class ActiveTransferTotalsMapper @Inject constructor(
                     } else null
                     val destination = previousGroup?.destination ?: transferGroup?.destination
                     val startTime = previousGroup?.startTime ?: transferGroup?.startTime ?: 0
+                    val pendingTransferNodeIdentifier =
+                        previousGroup?.pendingTransferNodeId ?: transferGroup?.pendingTransferNodeId
                     destination?.let { dest ->
                         ActiveTransferTotals.ActionGroup(
                             groupId = groupId,
@@ -57,6 +59,7 @@ internal class ActiveTransferTotalsMapper @Inject constructor(
                                 if (it.isFinished) it.totalBytes else transferredBytes[it.uniqueId]
                                     ?: 0L
                             },
+                            pendingTransferNodeId = pendingTransferNodeIdentifier,
                             appData = activeTransfersFiles
                                 .flatMap { it.appData }
                                 .filterNot { it is TransferAppData.TransferGroup } //group would be redundant

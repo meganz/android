@@ -1,6 +1,7 @@
 package mega.privacy.android.domain.entity.transfer
 
 import mega.privacy.android.domain.entity.Progress
+import mega.privacy.android.domain.entity.transfer.pending.PendingTransferNodeIdentifier
 import kotlin.time.Duration.Companion.milliseconds
 
 /**
@@ -47,6 +48,7 @@ data class ActiveTransferTotals(
      * @param pausedFiles the amount of files that are paused
      * @param totalBytes the total bytes of all files in this group
      * @param transferredBytes the total bytes already transferred of all files in this group
+     * @param pendingTransferNodeId the destination of this transfer in case of folder node destination, null otherwise
      * @param appData the list of app data of the transfers in this group. Group app data itself is filtered out. Only one instance of each app data type is added to represent this group.
      */
     data class ActionGroup(
@@ -62,6 +64,7 @@ data class ActiveTransferTotals(
         val pausedFiles: Int,
         val totalBytes: Long,
         val transferredBytes: Long,
+        val pendingTransferNodeId: PendingTransferNodeIdentifier?,
         override val appData: List<TransferAppData> = emptyList(),
     ) : AppDataOwner {
 

@@ -8,6 +8,7 @@ import mega.privacy.android.domain.entity.transfer.ActiveTransferTotals
 import mega.privacy.android.domain.entity.transfer.TransferAppData
 import mega.privacy.android.domain.entity.transfer.TransferType
 import mega.privacy.android.domain.entity.transfer.getTransferGroup
+import mega.privacy.android.domain.entity.transfer.pending.PendingTransferNodeIdentifier
 import mega.privacy.android.domain.repository.TransferRepository
 import org.junit.jupiter.api.BeforeAll
 import org.junit.jupiter.api.BeforeEach
@@ -21,7 +22,6 @@ import org.mockito.kotlin.verifyNoInteractions
 import org.mockito.kotlin.whenever
 import kotlin.collections.component1
 import kotlin.collections.component2
-import kotlin.collections.singleOrNull
 
 @TestInstance(TestInstance.Lifecycle.PER_CLASS)
 class ActiveTransferTotalsMapperTest {
@@ -190,6 +190,7 @@ class ActiveTransferTotalsMapperTest {
                             startTime = groupId.toLong(),
                             pausedFiles = fileTransfers.count { it.isPaused },
                             totalBytes = fileTransfers.sumOf { it.totalBytes },
+                            pendingTransferNodeId = null,
                             transferredBytes = fileTransfers.sumOf {
                                 if (it.isFinished) it.totalBytes else 0L
                             },
@@ -240,6 +241,7 @@ class ActiveTransferTotalsMapperTest {
                             startTime = groupId.toLong(),
                             pausedFiles = fileTransfers.count { it.isPaused },
                             totalBytes = fileTransfers.sumOf { it.totalBytes },
+                            pendingTransferNodeId = null,
                             transferredBytes = fileTransfers.sumOf { it.totalBytes },
                         )
                     }
@@ -252,13 +254,18 @@ class ActiveTransferTotalsMapperTest {
     @EnumSource(TransferType::class)
     fun `test that mapper correctly maps completed transfers in groups `(transferType: TransferType) =
         runTest {
+            val pendingTransferNodeIds = mutableMapOf<Int, PendingTransferNodeIdentifier>()
             val entities = createEntities(transferType).mapIndexed { index, entity ->
                 val groupId = index.mod(5)
+                val pendingTransferNodeId = pendingTransferNodeIds.getOrPut(groupId) {
+                    mock<PendingTransferNodeIdentifier.CloudDriveNode>()
+                }
                 whenever(transferRepository.getActiveTransferGroupById(groupId)) doReturn ActiveTransferActionGroupImpl(
                     groupId = groupId,
                     transferType = transferType,
                     destination = "destination$groupId",
                     startTime = groupId.toLong(),
+                    pendingTransferNodeId = pendingTransferNodeId,
                 )
                 entity.copy(appData = listOf(TransferAppData.TransferGroup(groupId.toLong())))
             }
@@ -283,6 +290,7 @@ class ActiveTransferTotalsMapperTest {
                             startTime = groupId.toLong(),
                             pausedFiles = fileTransfers.count { it.isPaused },
                             totalBytes = fileTransfers.sumOf { it.totalBytes },
+                            pendingTransferNodeId = pendingTransferNodeIds[groupId],
                             transferredBytes = fileTransfers.sumOf {
                                 if (it.isFinished) it.totalBytes else transferredBytes[it.uniqueId]
                                     ?: 0L
@@ -329,6 +337,7 @@ class ActiveTransferTotalsMapperTest {
                     startTime = 0,
                     pausedFiles = 0,
                     totalBytes = 0,
+                    pendingTransferNodeId = null,
                     transferredBytes = 0,
                 )
             )
@@ -356,6 +365,7 @@ class ActiveTransferTotalsMapperTest {
                         startTime = groupId.toLong(),
                         pausedFiles = 0,
                         totalBytes = 0,
+                        pendingTransferNodeId = null,
                         transferredBytes = 0,
                     )
                 )
@@ -378,6 +388,7 @@ class ActiveTransferTotalsMapperTest {
                             startTime = groupId.toLong(),
                             pausedFiles = fileTransfers.count { it.isPaused },
                             totalBytes = fileTransfers.sumOf { it.totalBytes },
+                            pendingTransferNodeId = null,
                             transferredBytes = fileTransfers.sumOf {
                                 //if it's finished always totalBytes as it can be cancelled or failed
                                 if (it.isFinished) it.totalBytes else 0L
@@ -402,14 +413,13 @@ class ActiveTransferTotalsMapperTest {
         transferType: TransferType,
     ) = runTest {
         val entities = createEntities(transferType).mapIndexed { index, entity ->
-            val groupId = index
-            whenever(transferRepository.getActiveTransferGroupById(groupId)) doReturn ActiveTransferActionGroupImpl(
-                groupId = groupId,
+            whenever(transferRepository.getActiveTransferGroupById(index)) doReturn ActiveTransferActionGroupImpl(
+                groupId = index,
                 transferType = transferType,
-                destination = "destination$groupId",
-                startTime = groupId.toLong(),
+                destination = "destination$index",
+                startTime = index.toLong(),
             )
-            entity.copy(appData = listOf(TransferAppData.TransferGroup(groupId.toLong())))
+            entity.copy(appData = listOf(TransferAppData.TransferGroup(index.toLong())))
         }.filterNot { it.isFolderTransfer }
         val transferredBytes = emptyMap<Long, Long>()
         val expected = entities
@@ -428,6 +438,7 @@ class ActiveTransferTotalsMapperTest {
                         startTime = groupId.toLong(),
                         pausedFiles = activeTransfer.count { it.isPaused },
                         totalBytes = activeTransfer.sumOf { it.totalBytes },
+                        pendingTransferNodeId = null,
                         transferredBytes = activeTransfer.sumOf {
                             if (it.isFinished) it.totalBytes else 0L
                         },

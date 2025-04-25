@@ -223,10 +223,17 @@ class DefaultTransfersActionGroupFinishNotificationBuilder @Inject constructor(
                 previewIntent
             }
 
-            isLoggedIn -> {
-                Intent(context, ManagerActivity::class.java).apply {
-                    action = Constants.ACTION_LOCATE_DOWNLOADED_FILE
-                    putExtra(Constants.INTENT_EXTRA_IS_OFFLINE_PATH, isOfflineDownload)
+            isDownload -> {
+                Intent(
+                    context,
+                    if (isLoggedIn) ManagerActivity::class.java else FileStorageActivity::class.java
+                ).apply {
+                    if (isLoggedIn) {
+                        action = Constants.ACTION_LOCATE_DOWNLOADED_FILE
+                        putExtra(Constants.INTENT_EXTRA_IS_OFFLINE_PATH, isOfflineDownload)
+                    } else {
+                        action = FileStorageActivity.Mode.BROWSE_FILES.action
+                    }
                     putExtra(FileStorageActivity.EXTRA_PATH, actionGroup.destination)
                     putStringArrayListExtra(
                         FileStorageActivity.EXTRA_FILE_NAMES,
@@ -235,13 +242,12 @@ class DefaultTransfersActionGroupFinishNotificationBuilder @Inject constructor(
                 }
             }
 
-            else -> {
-                Intent(context, FileStorageActivity::class.java).apply {
-                    action = FileStorageActivity.Mode.BROWSE_FILES.action
-                    putExtra(FileStorageActivity.EXTRA_PATH, actionGroup.destination)
-                    putStringArrayListExtra(
-                        FileStorageActivity.EXTRA_FILE_NAMES,
-                        ArrayList(actionGroup.fileNames)
+            else /* && !isDownload*/ -> {
+                Intent(context, ManagerActivity::class.java).apply {
+                    action = Constants.ACTION_OPEN_FOLDER
+                    putExtra(
+                        Constants.INTENT_EXTRA_KEY_PARENT_HANDLE,
+                        actionGroup.pendingTransferNodeId?.nodeId?.longValue
                     )
                 }
             }
