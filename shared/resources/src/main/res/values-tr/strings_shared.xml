@@ -105,7 +105,7 @@
     <!-- Search drop down chips filter type last modified -->
     <string name="search_dropdown_chip_filter_type_last_modified">Last modified</string>
     <!-- Search drop down chips filter type date modified today -->
-    <string name="search_dropdown_chip_filter_type_date_today">Today</string>
+    <string name="search_dropdown_chip_filter_type_date_today">Bugün</string>
     <!-- Search drop down chips filter type date modified last 7 days -->
     <string name="search_dropdown_chip_filter_type_date_last_seven_days">Last 7 days</string>
     <!-- Search drop down chips filter type date modified last 30 days -->
@@ -123,7 +123,7 @@
     <!-- Location filter title of the video section  -->
     <string name="video_section_videos_location_filter_title">Location</string>
     <!-- All locations option of the video section location filter  -->
-    <string name="video_section_videos_location_option_all_locations">All locations</string>
+    <string name="video_section_videos_location_option_all_locations">Tüm lokasyonlar</string>
     <!-- Cloud drive option of the video section location filter  -->
     <string name="video_section_videos_location_option_cloud_drive">Cloud drive</string>
     <!-- Camera uploads option of the video section location filter  -->
@@ -153,7 +153,7 @@
     <!-- Delete playlist dialog title of the video section playlists tab -->
     <string name="video_section_playlists_delete_playlist_dialog_title">Delete playlist?</string>
     <!-- Delete button title of the video section playlists tab delete playlist dialog -->
-    <string name="video_section_playlists_delete_playlist_dialog_delete_button">Delete</string>
+    <string name="video_section_playlists_delete_playlist_dialog_delete_button">Sil</string>
     <!-- Text that indicates that there’s no playlist to show. -->
     <string name="video_section_playlists_empty_hint_playlist">No playlists found</string>
     <!-- Delete option title of the video section playlist bottom sheet -->
@@ -161,7 +161,7 @@
     <!-- Remove videos dialog title of the video section playlist detail -->
     <string name="video_section_playlist_detail_remove_videos_dialog_title">Remove from playlist?</string>
     <!-- Remove button title of the video section playlist detail remove videos dialog -->
-    <string name="video_section_playlist_detail_remove_videos_dialog_remove_button">Remove</string>
+    <string name="video_section_playlist_detail_remove_videos_dialog_remove_button">Kaldır</string>
     <!-- Play all button title of the video section playlist detail -->
     <string name="video_section_playlist_detail_play_all_button">Play all</string>
     <!-- Text that indicates that there’s no videos in the video playlist detail to show. -->
@@ -199,13 +199,13 @@
     <!-- Size in gigabytes. It can be used for file/folder size or storage/transfer quota. The placeholder %1$s is for the size value, please adjust the position based on linguistics. -->
     <string name="general_size_giga_byte">%1$s</string>
     <!-- Name for Free account. DO NOT TRANSLATE! It'll only be used for Free account name. -->
-    <string name="general_free_plan_name">Free</string>
+    <string name="general_free_plan_name">Ücretsiz</string>
     <!-- Description of Transfer quota for Free users. The string will be part of another string "[B]Transfer:[/B] [A]%1$s[/A]" (key: account_upgrade_account_pro_plan_info_transfer). Combined string will look like this "[B]Transfer:[/B] [A]Limited[/A]". -->
     <string name="dialog_onboarding_transfer_quota_free_limited">Limited</string>
     <!-- Description of the price for Free account. The meaning: this type of account is for free. This string won't be used for name of Free account. -->
-    <string name="dialog_onboarding_free_account_price">Free</string>
+    <string name="dialog_onboarding_free_account_price">Ücretsiz</string>
     <!-- Continue button on Onboarding dialog, the user will proceed with payment for chosen account. -->
-    <string name="dialog_onboarding_button_continue">Continue</string>
+    <string name="dialog_onboarding_button_continue">Devamı</string>
     <!-- Title of navigation bar on Onboarding dialog. -->
     <string name="dialog_onboarding_app_bar_title">Choose your MEGA plan</string>
     <!-- Header of the Info view field for what is the content of a device/folder -->
@@ -253,7 +253,7 @@
     <!-- Confirm button text of the insufficient storage error dialog -->
     <string name="sync_error_dialog_insufficient_storage_confirm_button">See plans</string>
     <!-- Cancel button text of the insufficient storage error dialog -->
-    <string name="sync_error_dialog_insufficient_storage_cancel_button">Not now</string>
+    <string name="sync_error_dialog_insufficient_storage_cancel_button">Şimdi değil</string>
     <!-- Hint text explaining that you can change the email and resend the create account link to the new email address. This appears on the confirmation email screen under the email address text input field. -->
     <string name="account_confirm_email_misspelled_email_description">If you have misspelt your email address, correct it and tap [A]Resend[/A].</string>
     <!-- Title of the insufficient storage error banner -->
@@ -263,7 +263,7 @@
     <!-- Label of the Device Status informing the user that Nothing is set up for the Current Device -->
     <string name="device_center_list_view_item_status_nothing_setup">No syncs set up</string>
     <!-- The title of the warning dialog shown to a suspended Pro Flexi Account User -->
-    <string name="account_pro_flexi_account_deactivated_dialog_title">Account deactivated</string>
+    <string name="account_pro_flexi_account_deactivated_dialog_title">Hesap devre dışı bırakıldı</string>
     <!-- The body of the warning dialog shown to a suspended Pro Flexi Account User -->
     <string name="account_pro_flexi_account_deactivated_dialog_body">Your Pro&#160;Flexi account has been deactivated due to payment failure or you’ve cancelled your subscription. You won’t be able to access the data stored in your account. \nTo make a payment and reactivate your subscription, log in to MEGA through a browser.</string>
     <!-- Label for new low-tier plan Starter. Do not translate. Can be shown on My account screen to indicate current user's plan. -->
@@ -363,7 +363,7 @@
     <!-- Column header in the feature comparison table -->
     <string name="account_cancel_account_screen_plan_feature">Feature</string>
     <!-- Column header indicating features available with the free plan -->
-    <string name="account_cancel_account_screen_plan_free_plan">Free</string>
+    <string name="account_cancel_account_screen_plan_free_plan">Ücretsiz</string>
     <!-- Row label for storage feature in the comparison table -->
     <string name="account_cancel_account_screen_plan_storage">Storage</string>
     <!-- Row label for transfer feature in the comparison table -->
@@ -371,7 +371,7 @@
     <!-- Transfer limit in the free plan -->
     <string name="account_cancel_account_screen_plan_free_limited_transfer">Limited</string>
     <!-- Feature indicating password protection for links, available in the pro plan -->
-    <string name="account_cancel_account_screen_plan_password_protected_links">Password-protected links</string>
+    <string name="account_cancel_account_screen_plan_password_protected_links">Parola korumalı bağlantılar</string>
     <!-- Feature indicating expiry dates for links, available in the pro plan -->
     <string name="account_cancel_account_screen_plan_links_with_expiry_dates">Links with expiry dates</string>
     <!-- Feature indicating transfer sharing, available in the pro plan -->
@@ -409,7 +409,7 @@
     <!-- Share hidden item links description -->
     <string name="share_hidden_item_links_description">One or more of these items is set to hidden. Once you share the hidden items, anyone with the link will be able to see them. The items will still be hidden in your Cloud drive.</string>
     <!-- Title shown when cancelling the subscription -->
-    <string name="account_cancellation_instructions_cancel_subscription_title">Cancel subscription</string>
+    <string name="account_cancellation_instructions_cancel_subscription_title">Aboneliği iptal et</string>
     <!-- Title shown when reactivating the subscription -->
     <string name="account_cancellation_instructions_reactivate_subscription_title">Reactivate subscription</string>
     <!-- Title shown when cancelling the current plan in the instructions screen, informing the user about the account is not managed by google -->
@@ -469,9 +469,9 @@
     <!-- Create new folder dialog hint text (input field description) -->
     <string name="create_new_folder_dialog_hint_text">Folder name</string>
     <!-- Create new folder dialog confirm button -->
-    <string name="create_new_folder_dialog_confirm_button">Create</string>
+    <string name="create_new_folder_dialog_confirm_button">Oluştur</string>
     <!-- Dialog cancel option -->
-    <string name="general_dialog_cancel_button">Cancel</string>
+    <string name="general_dialog_cancel_button">İptal</string>
     <!-- Create new folder dialog error message shown when the user tries to an empty folder name -->
     <string name="create_new_folder_dialog_error_message_empty_folder_name">Enter a folder name</string>
     <!-- Create new folder dialog error message shown when folder cannot be created because there is already one with the same name -->
@@ -503,7 +503,7 @@
     <!-- Body of the dialog shown when user clicks to clear debris from settings menu -->
     <string name="settings_sync_clear_debris_dialog_body">Backups of the previous versions of your synced files will be permanently deleted from your device. \n\nCheck the .debris folder in your local device to see if you need to restore anything.</string>
     <!-- Continue button of the dialog shown when user clicks to clear debris from settings menu -->
-    <string name="settings_sync_clear_debris_dialog_continue">Continue</string>
+    <string name="settings_sync_clear_debris_dialog_continue">Devamı</string>
     <!-- Snackbar message shown when user clears debris from settings menu -->
     <string name="settings_sync_debris_cleared_message">.debris folder successfully cleared</string>
     <!-- Transfers scanning folders dialog sub-title when the app is scanning multiple folders. This message will inform how many files and folders were found. Example: "Found 134 folders and 5689 files." As it has double pluralization, folders will be pluralized in another string resource: transfers_scanning_folders_dialog_scanning_folders_subtitle -->
@@ -562,9 +562,9 @@
     <!-- Checkbox allowing MEGA to contact the user for further discussion -->
     <string name="account_cancel_subscription_survey_allow_contact">I allow MEGA to contact me to talk about this topic further</string>
     <!-- Button label to cancel the subscription -->
-    <string name="account_cancel_subscription_survey_cancel_button">Cancel subscription</string>
+    <string name="account_cancel_subscription_survey_cancel_button">Aboneliği iptal et</string>
     <!-- Button label to not cancel the subscription -->
-    <string name="account_cancel_subscription_survey_do_not_cancel_button">Don’t cancel</string>
+    <string name="account_cancel_subscription_survey_do_not_cancel_button">Vazgeçtim</string>
     <!-- Video recently watched title of the video section  -->
     <string name="video_section_title_video_recently_watched">Recently watched</string>
     <!-- Text that there is no recent activity of the video recently watched page  -->
@@ -582,7 +582,7 @@
     <!-- The Document Scanning Error Type for generic errors during Document Scanning -->
     <string name="document_scanning_error_type_generic_error">We’re having trouble opening the document scanner. Close and re-open the app, and try again.</string>
     <!-- The confirmation Button text of the Document Scanning Error Dialog -->
-    <string name="document_scanning_error_dialog_confirm_button">OK, got it</string>
+    <string name="document_scanning_error_dialog_confirm_button">Tamam, anladım.</string>
     <!--Title text to start a meeting from Meeting screen empty view-->
     <string name="meeting_recent_list_empty_title">Protect your calls</string>
     <!--Subtitle text from Meeting screen empty view-->
@@ -594,7 +594,7 @@
     <!-- the bonus title of join without account on left meeting page-->
     <string name="meeting_guest_left_meeting_bonus_title">Get free cloud storage</string>
     <!-- Label "What’s new" of the bottom sheet to promote Sync feature -->
-    <string name="sync_promotion_bottom_sheet_whats_new_label">What’s new</string>
+    <string name="sync_promotion_bottom_sheet_whats_new_label">Yenilikler</string>
     <!-- Title of the bottom sheet to promote Sync feature -->
     <string name="sync_promotion_bottom_sheet_title">Easy, automated sync</string>
     <!-- Text of the primary button of the bottom sheet to promote Sync feature for Pro users ("Sync folders") -->
@@ -660,7 +660,7 @@
     <!-- Context message in the files permission screen -->
     <string name="files_permission_screen_message">By allowing MEGA access to your files, you can upload to MEGA without creating temporary copies, saving space on your device and enabling faster uploads.</string>
     <!-- Title in the files permission screen -->
-    <string name="files_permission_screen_do_not_show_again_button">Don’t show this again</string>
+    <string name="files_permission_screen_do_not_show_again_button">Bir daha gösterme</string>
     <!-- Title of the dialog to confirm stop a sync -->
     <string name="sync_stop_sync_confirm_dialog_title">Stop syncing?</string>
     <!-- Message of the dialog to confirm stop a sync -->
@@ -706,7 +706,7 @@
     <!-- Photos search welcome description -->
     <string name="photos_search_welcome_description">Search for photos, videos, and albums</string>
     <!-- Photos search empty state title -->
-    <string name="photos_search_empty_state_title">No matching results</string>
+    <string name="photos_search_empty_state_title">Eşleşen sonuç yok</string>
     <!-- Photos search empty state description -->
     <string name="photos_search_empty_state_description">Try a different search term</string>
     <!-- Photos search recent search -->
@@ -735,20 +735,20 @@
     <!-- Explanatory text for the delete option of the dialog to confirm stop a backup -->
     <string name="sync_stop_backup_confirm_dialog_delete_option_text">Folder will be deleted from MEGA. It won’t be deleted from your device.</string>
     <!-- Name for a general button which action is "Confirm" something -->
-    <string name="general_confirm_button">Confirm</string>
+    <string name="general_confirm_button">Onayla</string>
     <!-- The failed Message when adding the video to the playlists from the video section. -->
-    <string name="video_section_playlists_add_to_playlists_failed_message">Unable to add item</string>
+    <string name="video_section_playlists_add_to_playlists_failed_message">Öğe eklenemiyor</string>
     <!-- Text of the add button in the page that adds the video to the video playlist -->
-    <string name="video_to_playlist_add_button">Add</string>
+    <string name="video_to_playlist_add_button">Ekle</string>
     <!-- The success Message when adding the video to the playlists from the video section. -->
     <plurals name="video_section_playlists_add_to_playlists_successfully_message">
         <item quantity="one">Added 1 item to “%1$s”</item>
         <item quantity="other">Added 1 item to %1$d playlists</item>
     </plurals>
     <!-- Name for a general label which action is "Select" something -->
-    <string name="general_select">Select</string>
+    <string name="general_select">Seçiniz</string>
     <!-- Name for a general label which action is "Select folder" -->
-    <string name="general_select_folder">Select folder</string>
+    <string name="general_select_folder">Klasör seç</string>
     <!-- Clickable label text to select the destination for the move option of the dialog to confirm stop a backup. Keep the placeholders because "[B][/B]" are in order to make the text clickable and "%1s" in order to display the selected folder name. -->
     <string name="sync_stop_backup_confirm_dialog_move_option_select_destination">Move to: [B]%1s[/B]</string>
     <!-- Message shown to user when app is connected to the MEGA server -->
@@ -912,13 +912,13 @@
     <!-- email label -->
     <string name="email_text">Email address</string>
     <!-- password label -->
-    <string name="password_text">Password</string>
+    <string name="password_text">Şifre</string>
     <!-- Login button -->
     <string name="login_text">Log in</string>
     <!--The text where user forgot their password and will navigate to reset it-->
-    <string name="login_page_forgot_password_text">Forgot password?</string>
+    <string name="login_page_forgot_password_text">Şifremi unuttunuz?</string>
     <!-- Sync state up to date -->
-    <string name="sync_list_sync_state_disabled">Disabled</string>
+    <string name="sync_list_sync_state_disabled">Engelli</string>
     <!-- Name of the Camera uploads feature -->
     <string name="general_camera_uploads">Camera uploads</string>
     <!-- Name of the Camera uploads feature -->
@@ -997,7 +997,7 @@
     <!-- Text for the "Yes, cancel" button in the cancel registration dialog -->
     <string name="email_confirmation_dialog_cancel_registration_cancel_button">Yes, cancel</string>
     <!-- Text for the "Don’t cancel" button in the cancel registration dialog -->
-    <string name="email_confirmation_dialog_cancel_registration_dismiss_button">Don’t cancel</string>
+    <string name="email_confirmation_dialog_cancel_registration_dismiss_button">Vazgeçtim</string>
     <!-- First message header paragraph in note to self chat -->
     <string name="chat_note_to_self_chat_first_message_header_paragraph">A private space for pictures, important information, or big ideas. Always synced, and protected with zero-knowledge encryption.</string>
     <!-- Title of the notification displayed when Syncs are paused due to low battery conditions -->
@@ -1033,27 +1033,27 @@
     <!-- Snackbar text to inform the user that download started -->
     <string name="transfers_download_started_snackbar">Download started. See notification for details.</string>
     <!--Sign Up page text field input first name error message when empty-->
-    <string name="sign_up_first_name_text_field_error_message">Enter a first name</string>
+    <string name="sign_up_first_name_text_field_error_message">Bir ad girin</string>
     <!--Sign Up page text field input last name error message when empty-->
-    <string name="sign_up_last_name_text_field_error_message">Enter a last name</string>
+    <string name="sign_up_last_name_text_field_error_message">Bir soyadı girin</string>
     <!--Sign Up page text field input email error message when more than 190 characters-->
     <string name="sign_up_email_text_field_char_limit_exceed_error">Must have 190 characters or less</string>
     <!--Sign Up page message to be shown when password is less than 8 characters-->
-    <string name="sign_up_password_min_character_error_message">Must have at least 8 characters</string>
+    <string name="sign_up_password_min_character_error_message">En az 8 karakter olmalı</string>
     <!--Sign Up page message to be shown when confirm password is not same as password-->
-    <string name="sign_up_confirm_password_not_match_error_message">Passwords don’t match. Check and try again.</string>
+    <string name="sign_up_confirm_password_not_match_error_message">Şifreler eşleşmiyor. Kontrol edin ve tekrar deneyin.</string>
     <!--Sign Up page message to be shown when password is considered medium-->
     <string name="sign_up_password_medium_password_warning_message">Your password is easy to guess. We suggest trying a stronger combination of characters.</string>
     <!--Message to be shown when password is considered weak -->
-    <string name="sign_up_password_weak_password_error_message">Your password is too easy to guess. Try a stronger combination of characters.</string>
+    <string name="sign_up_password_weak_password_error_message">Şifrenizi tahmin etmek çok kolay. Daha güçlü bir karakter kombinasyonu deneyin.</string>
     <!--Sign Up page terms and condition content text-->
     <string name="sign_up_terms_condition_content">I have read and agree to [A]MEGA’s Terms of Service.[/A]</string>
     <!--Sign Up page password hint and suggestion title-->
     <string name="sign_up_password_hint_title_text">It’s better to have:</string>
     <!--Sign Up page password hint to suggest a password with upper case and lower case letter-->
-    <string name="sign_up_password_hint_upper_lower_case">Upper and lower case letters</string>
+    <string name="sign_up_password_hint_upper_lower_case">Büyük ve küçük harfler</string>
     <!--Sign Up page password hint to suggest a password with at least one number or special character-->
-    <string name="sign_up_password_hint_number_or_special_character">At least one number or special character</string>
+    <string name="sign_up_password_hint_number_or_special_character">En az bir rakam veya özel karakter</string>
     <!--Sign up page text to ask the user to login if they already have a MEGA account-->
     <string name="sign_up_already_have_account_login_link_text">Already have a MEGA account? [A]Log in[/A]</string>
     <!-- Text shown in the fake preview screen -->
@@ -1095,5 +1095,37 @@
     <!-- USP Carousel page 4 description-->
     <string name="carousel_page_description_slide_4">Chat with friends and family, share photos or sensitive information, video call and schedule meetings. Safety and privacy guaranteed.</string>
     <!-- Create account label-->
-    <string name="general_label_create_account">Sign up</string>
+    <string name="general_label_create_account">Üye ol</string>
+    <!-- The new feature hidden nodes feature -->
+    <string name="hidden_nodes_new_feature">New feature: Hidden files and folders</string>
+    <!-- Hidden nodes: hide files and folders feature -->
+    <string name="hidden_nodes_title_hide_files_folders_feature">Hide files and folders</string>
+    <!-- Hidden nodes description: hide files and folders feature -->
+    <string name="hidden_nodes_description_hide_files_folders_feature">Easily keep sensitive files in your Cloud drive private and out of sight. By default, hidden files do not appear in your Cloud drive, Photos, and Recents section.</string>
+    <!-- Hidden nodes: control visibility feature -->
+    <string name="hidden_nodes_title_control_visibility">Control visibility easily</string>
+    <!-- Hidden nodes description: control visibility feature -->
+    <string name="hidden_nodes_description_control_visibility">To show hidden files, turn on the “Show hidden items” setting under “File Management --&gt; User interface” in your app settings</string>
+    <!-- Hidden nodes: shared files stay visible feature -->
+    <string name="hidden_nodes_title_visible_shared_files">Shared files stay visible</string>
+    <!-- Hidden nodes description: shared files stay visible feature -->
+    <string name="hidden_nodes_description_visible_shared_files">Files and folders shared with contacts or with public links are still accessible and visible, even if hidden</string>
+    <!--Camera backup permission screen title-->
+    <string name="camera_backup_permission_screen_title">Keep your photos safe, always</string>
+    <!--Camera backup permission screen description-->
+    <string name="camera_backup_permission_screen_description">Your memories matter.\n\nCamera uploads automatically backs up your photos and videos to your MEGA Cloud drive, so you never have to worry about losing them.</string>
+    <!--Camera backup permission banner text to explain why the camera backup permission is needed-->
+    <string name="camera_backup_permission_banner_info_description">Camera uploads requires [A]full access[/A] to your device’s photo library</string>
+    <!--Button text to request camera backup permission-->
+    <string name="camera_backup_permission_enable_button_text">Enable Camera uploads</string>
+    <!--Permission screen skip requesting permission button text-->
+    <string name="permission_screen_skip_permission_request_button_text">Skip for now</string>
+    <!--Notification permission screen title-->
+    <string name="notification_permission_screen_title">Never miss an important update</string>
+    <!--Notification permission screen description-->
+    <string name="notification_permission_screen_description">Stay informed with real-time updates that matter to you. Get alerts for shared folder activity, security updates, and exclusive offers, so you never miss anything important.\n\nYou can manage notification preferences at any time in your device’s settings.</string>
+    <!--Button text to request Notification permission-->
+    <string name="notification_permission_enable_button_text">Enable notifications</string>
+    <!-- Notification content for upload final notification in case of a single file upload. -->
+    <string name="transfers_notification_title_single_upload">Uploaded “%1$s”</string>
 </resources>

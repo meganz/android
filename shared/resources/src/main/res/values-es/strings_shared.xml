@@ -1099,19 +1099,51 @@
     <!-- USP Carousel page 1 title-->
     <string name="carousel_page_title_slide_1">Tú tienes las claves</string>
     <!-- USP Carousel page 1 description-->
-    <string name="carousel_page_description_slide_1">User controlled, zero-knowledge encryption means no one can see your data unless you want them to - not even us!</string>
+    <string name="carousel_page_description_slide_1">El cifrado de conocimiento cero controlado por el usuario sirve para que nadie pueda ver tus datos a menos que tú lo permitas, ¡ni siquiera nosotros!</string>
     <!-- USP Carousel page 2 title-->
-    <string name="carousel_page_title_slide_2">Keep every moment safe</string>
+    <string name="carousel_page_title_slide_2">Mantén cada momento seguro</string>
     <!-- USP Carousel page 2 description-->
-    <string name="carousel_page_description_slide_2">With automatic camera uploads to MEGA Cloud, and generous storage, you’ll never lose a precious memory</string>
+    <string name="carousel_page_description_slide_2">Con las subidas de la cámara automáticas a la nube de MEGA y un almacenamiento generoso, nunca perderás un valioso recuerdo</string>
     <!-- USP Carousel page 3 title-->
-    <string name="carousel_page_title_slide_3">Your data. Your space.</string>
+    <string name="carousel_page_title_slide_3">Tus datos. Tu espacio.</string>
     <!-- USP Carousel page 3 description-->
-    <string name="carousel_page_description_slide_3">Ample storage and easy ways to transfer, share, and organise your files means you can safely use MEGA for whatever you choose</string>
+    <string name="carousel_page_description_slide_3">El amplio almacenamiento y las formas sencillas de transferir, compartir y organizar tus archivos hacen que puedas usar MEGA de forma segura para lo que quieras</string>
     <!-- USP Carousel page 4 title-->
     <string name="carousel_page_title_slide_4">Dilo en privado</string>
     <!-- USP Carousel page 4 description-->
-    <string name="carousel_page_description_slide_4">Chat with friends and family, share photos or sensitive information, video call and schedule meetings. Safety and privacy guaranteed.</string>
+    <string name="carousel_page_description_slide_4">Chatea con amigos y familiares, comparte fotos o información confidencial, haz videollamadas y programa reuniones. Seguridad y privacidad garantizadas.</string>
     <!-- Create account label-->
     <string name="general_label_create_account">Crea una cuenta de MEGA</string>
+    <!-- The new feature hidden nodes feature -->
+    <string name="hidden_nodes_new_feature">Nueva característica: archivos y carpetas ocultos</string>
+    <!-- Hidden nodes: hide files and folders feature -->
+    <string name="hidden_nodes_title_hide_files_folders_feature">Oculta archivos y carpetas</string>
+    <!-- Hidden nodes description: hide files and folders feature -->
+    <string name="hidden_nodes_description_hide_files_folders_feature">Mantén privados y lejos de miradas indiscretas tus archivos sensibles en la nube. Por defecto, los archivos ocultos no aparecerán en tu nube, en la sección de Fotos ni en Recientes.</string>
+    <!-- Hidden nodes: control visibility feature -->
+    <string name="hidden_nodes_title_control_visibility">Controla la visibilidad fácilmente</string>
+    <!-- Hidden nodes description: control visibility feature -->
+    <string name="hidden_nodes_description_control_visibility">To show hidden files, turn on the “Show hidden items” setting under “File Management --&gt; User interface” in your app settings</string>
+    <!-- Hidden nodes: shared files stay visible feature -->
+    <string name="hidden_nodes_title_visible_shared_files">Los archivos compartidos permanecen visibles</string>
+    <!-- Hidden nodes description: shared files stay visible feature -->
+    <string name="hidden_nodes_description_visible_shared_files">Files and folders shared with contacts or with public links are still accessible and visible, even if hidden</string>
+    <!--Camera backup permission screen title-->
+    <string name="camera_backup_permission_screen_title">Keep your photos safe, always</string>
+    <!--Camera backup permission screen description-->
+    <string name="camera_backup_permission_screen_description">Your memories matter.\n\nCamera uploads automatically backs up your photos and videos to your MEGA Cloud drive, so you never have to worry about losing them.</string>
+    <!--Camera backup permission banner text to explain why the camera backup permission is needed-->
+    <string name="camera_backup_permission_banner_info_description">Camera uploads requires [A]full access[/A] to your device’s photo library</string>
+    <!--Button text to request camera backup permission-->
+    <string name="camera_backup_permission_enable_button_text">Activar las Subidas de la cámara</string>
+    <!--Permission screen skip requesting permission button text-->
+    <string name="permission_screen_skip_permission_request_button_text">Skip for now</string>
+    <!--Notification permission screen title-->
+    <string name="notification_permission_screen_title">Never miss an important update</string>
+    <!--Notification permission screen description-->
+    <string name="notification_permission_screen_description">Stay informed with real-time updates that matter to you. Get alerts for shared folder activity, security updates, and exclusive offers, so you never miss anything important.\n\nYou can manage notification preferences at any time in your device’s settings.</string>
+    <!--Button text to request Notification permission-->
+    <string name="notification_permission_enable_button_text">Activar Notificaciones</string>
+    <!-- Notification content for upload final notification in case of a single file upload. -->
+    <string name="transfers_notification_title_single_upload">Uploaded “%1$s”</string>
 </resources>

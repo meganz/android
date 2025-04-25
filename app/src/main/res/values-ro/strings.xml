@@ -1796,8 +1796,6 @@
     <string name="play_store_label">Google Play</string>
     <!-- Text shown in an alert explaining how to continue to enable Two-Factor Authentication -->
     <string name="text_2fa_help">Ai nevoie de o aplicație de autentificare pentru a activa A2F pe MEGA. Poți descărca și instala aplicația Google Authenticator, Duo Mobile, Authy sau Microsoft Authenticator pentru telefon sau tabletă.</string>
-    <!-- error message when importing multiple files from chat -->
-    <string name="number_no_imported_from_chat">%d fișiere nu au fost partajate</string>
     <!-- button’s text to open a full screen image -->
     <string name="preview_content">Deschide</string>
     <!-- message shown when the user clicks on media file chat message, there is no network connection and the file is not been downloaded -->

@@ -1796,8 +1796,6 @@
     <string name="play_store_label">Google Play Store</string>
     <!-- Text shown in an alert explaining how to continue to enable Two-Factor Authentication -->
     <string name="text_2fa_help">Hai bisogno di un’applicazione di autenticazione per attivare l’autenticazione a 2 fattori su MEGA. Puoi scaricare ed installare le app di Google Authenticator, Duo Mobile, Authy o Microsoft Authenticator per il tuo telefono o tablet.</string>
-    <!-- error message when importing multiple files from chat -->
-    <string name="number_no_imported_from_chat">%d file non sono stati condivisi</string>
     <!-- button’s text to open a full screen image -->
     <string name="preview_content">Apri</string>
     <!-- message shown when the user clicks on media file chat message, there is no network connection and the file is not been downloaded -->
