@@ -3,7 +3,7 @@
     <!-- Screen title for cropping current scan (Document scanner) -->
     <string name="scan_title_crop">Cắt hình</string>
     <!-- Screen title for saving current scan (Document scanner) -->
-    <string name="scan_title_save_scan">Lưu hình quét</string>
+    <string name="scan_title_save_scan">Lưu bản quét</string>
     <!-- Label of the button to add a new page to the current document scan -->
     <string name="scan_action_add">Thêm</string>
     <!-- Action of a button to save something -->
@@ -25,17 +25,17 @@
     <!-- Document scanner low quality option -->
     <string name="scan_quality_low">Thấp</string>
     <!-- Title text shown on document scanner dialog to discard scan -->
-    <string name="scan_dialog_discard_title">Bỏ hình quét?</string>
+    <string name="scan_dialog_discard_title">Bỏ bản quét?</string>
     <!-- Body text shown on document scanner dialog to discard scan -->
-    <string name="scan_dialog_discard_body">Hình quét này sẽ bị mất</string>
+    <string name="scan_dialog_discard_body">Bản quét này sẽ bị mất</string>
     <!-- Title text shown on document scanner dialog to discard scan all scans -->
-    <string name="scan_dialog_discard_all_title">Bỏ tất cả hình quét?</string>
+    <string name="scan_dialog_discard_all_title">Bỏ tất cả bản quét?</string>
     <!-- Body text shown on document scanner dialog to discard all scans -->
     <string name="scan_dialog_discard_all_body">Tài&#160;liệu này sẽ bị mất</string>
     <!-- Action text shown on document scanner dialog to discard scans -->
     <string name="scan_dialog_discard_action">Hủy bỏ</string>
     <!-- Body text shown on document scanner dialog to delete current scan -->
-    <string name="scan_dialog_delete_body">Xóa hình quét hiện tại?</string>
+    <string name="scan_dialog_delete_body">Xóa bản quét hiện tại?</string>
     <!-- Message shown when users deny camera permissions to scan documents -->
     <string name="scan_requires_permission">Cần quyền hạn sử&#160;dụng Camêra để quét tài&#160;liệu</string>
     <!-- Error text for incorrect name -->

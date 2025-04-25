@@ -1096,4 +1096,36 @@
     <string name="carousel_page_description_slide_4">Chat met vrienden en familie, deel foto\’s of gevoelige informatie, videogesprekken en plan vergaderingen. Veiligheid en privacy gegarandeerd.</string>
     <!-- Create account label-->
     <string name="general_label_create_account">MEGA-account aanmaken</string>
+    <!-- The new feature hidden nodes feature -->
+    <string name="hidden_nodes_new_feature">Nieuw kenmerk: Verborgen bestanden en mappen</string>
+    <!-- Hidden nodes: hide files and folders feature -->
+    <string name="hidden_nodes_title_hide_files_folders_feature">Verberg bestanden en mappen</string>
+    <!-- Hidden nodes description: hide files and folders feature -->
+    <string name="hidden_nodes_description_hide_files_folders_feature">Gevoelige bestanden op uw Cloud-schijf eenvoudig privé en uit het zicht houden. Verborgen bestanden worden standaard niet weergegeven in de sectie Cloudschijf, Foto\’s en Recente bestanden.</string>
+    <!-- Hidden nodes: control visibility feature -->
+    <string name="hidden_nodes_title_control_visibility">Controleer de zichtbaarheid eenvoudig</string>
+    <!-- Hidden nodes description: control visibility feature -->
+    <string name="hidden_nodes_description_control_visibility">Om verborgen bestanden weer te geven, zet u de instelling  “Verborgen items weergeven” aan onder  “Bestandsbeheer -&gt; Gebruikersinterface” in uw applicatie-instellingen</string>
+    <!-- Hidden nodes: shared files stay visible feature -->
+    <string name="hidden_nodes_title_visible_shared_files">Gedeelde bestanden blijven zichtbaar</string>
+    <!-- Hidden nodes description: shared files stay visible feature -->
+    <string name="hidden_nodes_description_visible_shared_files">Bestanden en mappen die worden gedeeld met contactpersonen of met openbare links zijn nog steeds toegankelijk en zichtbaar, zelfs als ze verborgen zijn</string>
+    <!--Camera backup permission screen title-->
+    <string name="camera_backup_permission_screen_title">Bewaar uw foto\’s altijd veilig</string>
+    <!--Camera backup permission screen description-->
+    <string name="camera_backup_permission_screen_description">Uw herinneringen zijn belangrijk.\n\nBij het uploaden van de camera wordt automatisch een back-up gemaakt van uw foto\’s en video\’s naar uw MEGA Cloud-schijf, zodat u zich nooit zorgen hoeft te maken dat u ze kwijtraakt.</string>
+    <!--Camera backup permission banner text to explain why the camera backup permission is needed-->
+    <string name="camera_backup_permission_banner_info_description">Voor het uploaden van de camera is [A]Volledige toegang[/A] naar de fotobibliotheek van uw apparaat vereist</string>
+    <!--Button text to request camera backup permission-->
+    <string name="camera_backup_permission_enable_button_text">Camera uploads Inschakelen</string>
+    <!--Permission screen skip requesting permission button text-->
+    <string name="permission_screen_skip_permission_request_button_text">Voor nu overslaan</string>
+    <!--Notification permission screen title-->
+    <string name="notification_permission_screen_title">Mis nooit meer een belangrijke update</string>
+    <!--Notification permission screen description-->
+    <string name="notification_permission_screen_description">Blijf op de hoogte met realtime updates die belangrijk voor u zijn. Ontvang meldingen voor activiteiten in gedeelde mappen, beveiligingsupdates en exclusieve aanbiedingen, zodat u nooit iets belangrijks mist.\n\nU kunt de meldingsvoorkeuren op elk moment beheren in de instellingen van uw apparaat.</string>
+    <!--Button text to request Notification permission-->
+    <string name="notification_permission_enable_button_text">Notificaties Inschakelen</string>
+    <!-- Notification content for upload final notification in case of a single file upload. -->
+    <string name="transfers_notification_title_single_upload">“%1$s” Geüpload</string>
 </resources>

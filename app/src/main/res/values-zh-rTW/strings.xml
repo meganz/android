@@ -1716,8 +1716,6 @@
     <string name="play_store_label">Google Play</string>
     <!-- Text shown in an alert explaining how to continue to enable Two-Factor Authentication -->
     <string name="text_2fa_help">您需要身份驗證應用程式才能在MEGA上啟用雙重驗證。您可以在手機或平板電腦裡下載並安裝Google Authenticator、Duo Mobile，Authy或Microsoft Authenticator應用程式。</string>
-    <!-- error message when importing multiple files from chat -->
-    <string name="number_no_imported_from_chat">未能共享%d個檔案</string>
     <!-- button’s text to open a full screen image -->
     <string name="preview_content">開啟</string>
     <!-- message shown when the user clicks on media file chat message, there is no network connection and the file is not been downloaded -->

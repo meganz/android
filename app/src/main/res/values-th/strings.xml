@@ -1716,8 +1716,6 @@
     <string name="play_store_label">Google Play</string>
     <!-- Text shown in an alert explaining how to continue to enable Two-Factor Authentication -->
     <string name="text_2fa_help">คุณต้องมีแอปตัวรับรองความถูกต้องเพื่อเปิดใช้งาน 2FA บน MEGA คุณสามารถดาวน์โหลดและติดตั้งแอปพลิเคชัน Google Authenticator, Duo Mobile, Authy หรือ Microsoft Authenticator สำหรับโทรศัพท์หรือแท็บเล็ตของคุณได้</string>
-    <!-- error message when importing multiple files from chat -->
-    <string name="number_no_imported_from_chat">ไม่ได้แชร์ไฟล์ %d ไฟล์</string>
     <!-- button’s text to open a full screen image -->
     <string name="preview_content">เปิด</string>
     <!-- message shown when the user clicks on media file chat message, there is no network connection and the file is not been downloaded -->

@@ -1063,19 +1063,51 @@
     <!-- USP Carousel page 1 title-->
     <string name="carousel_page_title_slide_1">您握有鑰匙</string>
     <!-- USP Carousel page 1 description-->
-    <string name="carousel_page_description_slide_1">User controlled, zero-knowledge encryption means no one can see your data unless you want them to - not even us!</string>
+    <string name="carousel_page_description_slide_1">使用者控制的零知識加密意味著沒有人可以看到您的資料，除非您想讓他們看到，否則連我們也無法看到您的資料。</string>
     <!-- USP Carousel page 2 title-->
-    <string name="carousel_page_title_slide_2">Keep every moment safe</string>
+    <string name="carousel_page_title_slide_2">時時刻刻保持安全</string>
     <!-- USP Carousel page 2 description-->
-    <string name="carousel_page_description_slide_2">With automatic camera uploads to MEGA Cloud, and generous storage, you’ll never lose a precious memory</string>
+    <string name="carousel_page_description_slide_2">透過自動相機上傳到MEGA雲端和充足的儲存空間，您永遠不會失去寶貴的回憶</string>
     <!-- USP Carousel page 3 title-->
-    <string name="carousel_page_title_slide_3">Your data. Your space.</string>
+    <string name="carousel_page_title_slide_3">您的資料與空間。</string>
     <!-- USP Carousel page 3 description-->
-    <string name="carousel_page_description_slide_3">Ample storage and easy ways to transfer, share, and organise your files means you can safely use MEGA for whatever you choose</string>
+    <string name="carousel_page_description_slide_3">充足的儲存空間和簡單易用的傳輸、共享和檔案整理方式意味著您可以安全地使用MEGA進行任何選擇操作</string>
     <!-- USP Carousel page 4 title-->
     <string name="carousel_page_title_slide_4">具隱私的對談</string>
     <!-- USP Carousel page 4 description-->
-    <string name="carousel_page_description_slide_4">Chat with friends and family, share photos or sensitive information, video call and schedule meetings. Safety and privacy guaranteed.</string>
+    <string name="carousel_page_description_slide_4">與朋友和家人聊天、共享照片或敏感信息、視訊通話和安排會議。保證安全和隱私。</string>
     <!-- Create account label-->
     <string name="general_label_create_account">註冊</string>
+    <!-- The new feature hidden nodes feature -->
+    <string name="hidden_nodes_new_feature">新功能：隱藏檔案和資料夾</string>
+    <!-- Hidden nodes: hide files and folders feature -->
+    <string name="hidden_nodes_title_hide_files_folders_feature">隱藏檔案和資料夾</string>
+    <!-- Hidden nodes description: hide files and folders feature -->
+    <string name="hidden_nodes_description_hide_files_folders_feature">輕鬆將雲端硬碟中的敏感檔案設成私密，不讓任何人看到。預設情況下，隱藏的檔案不會在您的雲端硬碟、照片和近期活動顯示。</string>
+    <!-- Hidden nodes: control visibility feature -->
+    <string name="hidden_nodes_title_control_visibility">輕鬆控制可見性</string>
+    <!-- Hidden nodes description: control visibility feature -->
+    <string name="hidden_nodes_description_control_visibility">To show hidden files, turn on the “Show hidden items” setting under “File Management --&gt; User interface” in your app settings</string>
+    <!-- Hidden nodes: shared files stay visible feature -->
+    <string name="hidden_nodes_title_visible_shared_files">共享檔案保持可見狀態</string>
+    <!-- Hidden nodes description: shared files stay visible feature -->
+    <string name="hidden_nodes_description_visible_shared_files">Files and folders shared with contacts or with public links are still accessible and visible, even if hidden</string>
+    <!--Camera backup permission screen title-->
+    <string name="camera_backup_permission_screen_title">Keep your photos safe, always</string>
+    <!--Camera backup permission screen description-->
+    <string name="camera_backup_permission_screen_description">Your memories matter.\n\nCamera uploads automatically backs up your photos and videos to your MEGA Cloud drive, so you never have to worry about losing them.</string>
+    <!--Camera backup permission banner text to explain why the camera backup permission is needed-->
+    <string name="camera_backup_permission_banner_info_description">Camera uploads requires [A]full access[/A] to your device’s photo library</string>
+    <!--Button text to request camera backup permission-->
+    <string name="camera_backup_permission_enable_button_text">啟用相機上傳</string>
+    <!--Permission screen skip requesting permission button text-->
+    <string name="permission_screen_skip_permission_request_button_text">Skip for now</string>
+    <!--Notification permission screen title-->
+    <string name="notification_permission_screen_title">Never miss an important update</string>
+    <!--Notification permission screen description-->
+    <string name="notification_permission_screen_description">Stay informed with real-time updates that matter to you. Get alerts for shared folder activity, security updates, and exclusive offers, so you never miss anything important.\n\nYou can manage notification preferences at any time in your device’s settings.</string>
+    <!--Button text to request Notification permission-->
+    <string name="notification_permission_enable_button_text">啟用通知</string>
+    <!-- Notification content for upload final notification in case of a single file upload. -->
+    <string name="transfers_notification_title_single_upload">Uploaded “%1$s”</string>
 </resources>

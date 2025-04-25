@@ -47,9 +47,9 @@
     <!-- Sync message when conflict resolved -->
     <string name="sync_stalled_issue_conflict_resolved">Conflict resolved</string>
     <!-- Sync dialog continue button -->
-    <string name="sync_dialog_file_permission_positive_button">Continue</string>
+    <string name="sync_dialog_file_permission_positive_button">Devamı</string>
     <!-- Sync dialog not now button -->
-    <string name="sync_dialog_file_permission_negative_button">Not now</string>
+    <string name="sync_dialog_file_permission_negative_button">Şimdi değil</string>
     <!-- Sync dialog title for battery optimization -->
     <string name="sync_dialog_battery_optimization_title">Battery optimisation</string>
     <!-- Sync dialog cancel button text -->
@@ -63,7 +63,7 @@
     <!-- Sync option to choose Mega folder -->
     <string name="sync_folders_choose_mega_folder_title">MEGA folder</string>
     <!-- Sync state Paused -->
-    <string name="sync_list_sync_state_paused">Paused</string>
+    <string name="sync_list_sync_state_paused">Duraklatıldı</string>
     <!-- Sync state syncing -->
     <string name="sync_list_sync_state_syncing">Syncing&#8230;</string>
     <!-- Sync permission title for device storage -->
@@ -73,9 +73,9 @@
     <!-- Sync while syncing title for Issues info -->
     <string name="sync_card_sync_issues_info">Issues info</string>
     <!-- Sync Pause -->
-    <string name="sync_card_pause_sync">Pause</string>
+    <string name="sync_card_pause_sync">Duraklat</string>
     <!-- Sync Run -->
-    <string name="sync_card_run_sync">Resume</string>
+    <string name="sync_card_run_sync">Devamını</string>
     <!-- Sync dialog for sync over Wi-Fi or mobile data -->
     <string name="sync_dialog_message_wifi_or_mobile_data">Wi-Fi or mobile data</string>
     <!-- Sync dialog for sync only over Wi-Fi -->
@@ -119,7 +119,7 @@
     <!-- Text that indicates that a folder is currently empty -->
     <string name="sync_file_browser_empty_folder">Empty folder</string>
     <!-- Selecting a specific location in MEGA. This is the text of the button -->
-    <string name="sync_general_select">Select</string>
+    <string name="sync_general_select">Seçiniz</string>
     <!-- Sync stalled issue reason is no file issue detailed description-->
     <string name="sync_stalled_issue_file_issue_detail">An item has an issue that needs your decision to resolve it</string>
     <!-- Sync stalled issue reason is delete or move detailed description-->

@@ -1078,4 +1078,36 @@
     <string name="carousel_page_description_slide_4">ご友人やご家族とチャットしたり、写真や機密情報を共有したり、ビデオ通話やミーティングの予定を立てたり、いろいろとお楽しみください。その際に、安全性とプライバシーが保証されています。</string>
     <!-- Create account label-->
     <string name="general_label_create_account">MEGAアカウントの作成</string>
+    <!-- The new feature hidden nodes feature -->
+    <string name="hidden_nodes_new_feature">新機能：非表示ファイルと非表示フォルダ</string>
+    <!-- Hidden nodes: hide files and folders feature -->
+    <string name="hidden_nodes_title_hide_files_folders_feature">ファイルとフォルダを隠す</string>
+    <!-- Hidden nodes description: hide files and folders feature -->
+    <string name="hidden_nodes_description_hide_files_folders_feature">クラウドドライブ内の機密ファイルを、簡単に非公開にできます。デフォルトでは、隠しファイルはクラウドドライブ、写真、および「最近使用（Recents）」セクションに表示されません。</string>
+    <!-- Hidden nodes: control visibility feature -->
+    <string name="hidden_nodes_title_control_visibility">表示/非表示を簡単に制御</string>
+    <!-- Hidden nodes description: control visibility feature -->
+    <string name="hidden_nodes_description_control_visibility">非表示ファイルを表示するには、アプリの設定で「ファイル管理（File Management） --&gt; ユーザーインターフェース（User interface）」の「非表示項目を表示（Show hidden items）」をオンにします</string>
+    <!-- Hidden nodes: shared files stay visible feature -->
+    <string name="hidden_nodes_title_visible_shared_files">共有ファイルは表示されたまま</string>
+    <!-- Hidden nodes description: shared files stay visible feature -->
+    <string name="hidden_nodes_description_visible_shared_files">連絡先や公開リンクで共有されたファイルやフォルダは、たとえ非表示であってもアクセス可能で、表示されます</string>
+    <!--Camera backup permission screen title-->
+    <string name="camera_backup_permission_screen_title">写真を常に安全に</string>
+    <!--Camera backup permission screen description-->
+    <string name="camera_backup_permission_screen_description">思い出を大切に。\n\nカメラアップロードは、写真や動画をMEGAクラウドドライブに自動的にバックアップするので、紛失の心配がありません。</string>
+    <!--Camera backup permission banner text to explain why the camera backup permission is needed-->
+    <string name="camera_backup_permission_banner_info_description">カメラのアップロードには、お使いのデバイスのフォトライブラリへの[A]フルアクセス[/A]が必要です。</string>
+    <!--Button text to request camera backup permission-->
+    <string name="camera_backup_permission_enable_button_text">カメラアップロードを有効にする</string>
+    <!--Permission screen skip requesting permission button text-->
+    <string name="permission_screen_skip_permission_request_button_text">今はやめておく</string>
+    <!--Notification permission screen title-->
+    <string name="notification_permission_screen_title">重要なアップデートを見逃さない</string>
+    <!--Notification permission screen description-->
+    <string name="notification_permission_screen_description">あなたにとって重要な最新情報をリアルタイムでお届けします。共有フォルダのアクティビティ、セキュリティアップデート、限定キャンペーンのアラートを受け取ることで、重要な情報を見逃すことはありません。通知の設定は、お使いのデバイスの設定でいつでも管理できます。</string>
+    <!--Button text to request Notification permission-->
+    <string name="notification_permission_enable_button_text">通知設定</string>
+    <!-- Notification content for upload final notification in case of a single file upload. -->
+    <string name="transfers_notification_title_single_upload">「%1$s」がアップロードされました</string>
 </resources>

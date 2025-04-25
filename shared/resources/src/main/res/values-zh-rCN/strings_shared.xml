@@ -1078,4 +1078,36 @@
     <string name="carousel_page_description_slide_4">Chat with friends and family, share photos or sensitive information, video call and schedule meetings. Safety and privacy guaranteed.</string>
     <!-- Create account label-->
     <string name="general_label_create_account">创建MEGA帐户</string>
+    <!-- The new feature hidden nodes feature -->
+    <string name="hidden_nodes_new_feature">新功能：隐藏的文件和文件夹</string>
+    <!-- Hidden nodes: hide files and folders feature -->
+    <string name="hidden_nodes_title_hide_files_folders_feature">隐藏文件和文件夹</string>
+    <!-- Hidden nodes description: hide files and folders feature -->
+    <string name="hidden_nodes_description_hide_files_folders_feature">轻松将云盘中的敏感文件设置为私密不可见。默认情况下，隐藏的文件不会在您的云盘、照片和近期中显示。</string>
+    <!-- Hidden nodes: control visibility feature -->
+    <string name="hidden_nodes_title_control_visibility">轻松控制可见性</string>
+    <!-- Hidden nodes description: control visibility feature -->
+    <string name="hidden_nodes_description_control_visibility">To show hidden files, turn on the “Show hidden items” setting under “File Management --&gt; User interface” in your app settings</string>
+    <!-- Hidden nodes: shared files stay visible feature -->
+    <string name="hidden_nodes_title_visible_shared_files">共享文件保持可见状态</string>
+    <!-- Hidden nodes description: shared files stay visible feature -->
+    <string name="hidden_nodes_description_visible_shared_files">Files and folders shared with contacts or with public links are still accessible and visible, even if hidden</string>
+    <!--Camera backup permission screen title-->
+    <string name="camera_backup_permission_screen_title">Keep your photos safe, always</string>
+    <!--Camera backup permission screen description-->
+    <string name="camera_backup_permission_screen_description">Your memories matter.\n\nCamera uploads automatically backs up your photos and videos to your MEGA Cloud drive, so you never have to worry about losing them.</string>
+    <!--Camera backup permission banner text to explain why the camera backup permission is needed-->
+    <string name="camera_backup_permission_banner_info_description">Camera uploads requires [A]full access[/A] to your device’s photo library</string>
+    <!--Button text to request camera backup permission-->
+    <string name="camera_backup_permission_enable_button_text">启用相机上传</string>
+    <!--Permission screen skip requesting permission button text-->
+    <string name="permission_screen_skip_permission_request_button_text">Skip for now</string>
+    <!--Notification permission screen title-->
+    <string name="notification_permission_screen_title">Never miss an important update</string>
+    <!--Notification permission screen description-->
+    <string name="notification_permission_screen_description">Stay informed with real-time updates that matter to you. Get alerts for shared folder activity, security updates, and exclusive offers, so you never miss anything important.\n\nYou can manage notification preferences at any time in your device’s settings.</string>
+    <!--Button text to request Notification permission-->
+    <string name="notification_permission_enable_button_text">启用提醒通知</string>
+    <!-- Notification content for upload final notification in case of a single file upload. -->
+    <string name="transfers_notification_title_single_upload">Uploaded “%1$s”</string>
 </resources>

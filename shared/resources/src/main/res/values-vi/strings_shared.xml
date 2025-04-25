@@ -207,7 +207,7 @@
     <!-- Header of the Info view field for what is the content of a device/folder -->
     <string name="info_content">Chứa đựng</string>
     <!-- Header of the Info view field for what is the total size of the content of a device/folder -->
-    <string name="info_total_size">Tổng kích thước</string>
+    <string name="info_total_size">Tổng kích cỡ</string>
     <!-- Header of the Info view field for the date and time a folder was added -->
     <string name="info_added">Đã thêm</string>
     <!-- String which indicates the number of files contained into a device/folder -->
@@ -291,11 +291,11 @@
     <!-- Title of first tour screen -->
     <string name="cloud_drive_tour_first_title">Chính bạn là người giữ chìa khóa</string>
     <!-- Title of second tour screen -->
-    <string name="cloud_drive_tour_second_title">Cuộc chát được mã hóa</string>
+    <string name="cloud_drive_tour_second_title">Chat được mã hóa</string>
     <!-- Title of third tour screen -->
     <string name="cloud_drive_tour_third_title">Tạo kết nối</string>
     <!-- Title of fourth tour screen -->
-    <string name="cloud_drive_tour_fourth_title">Hình Ảnh được gửi lên mây</string>
+    <string name="cloud_drive_tour_fourth_title">Hình ảnh của bạn ở trên mây</string>
     <!-- Title of fifth tour screen -->
     <string name="cloud_drive_tour_fifth_title">MEGA họp mặt</string>
     <!-- First subtitle of the tour screen -->
@@ -1065,11 +1065,11 @@
     <!-- USP Carousel page 1 description-->
     <string name="carousel_page_description_slide_1">User controlled, zero-knowledge encryption means no one can see your data unless you want them to - not even us!</string>
     <!-- USP Carousel page 2 title-->
-    <string name="carousel_page_title_slide_2">Keep every moment safe</string>
+    <string name="carousel_page_title_slide_2">Giữ mọi khoảnh&#160;khắc được an&#160;toàn</string>
     <!-- USP Carousel page 2 description-->
-    <string name="carousel_page_description_slide_2">With automatic camera uploads to MEGA Cloud, and generous storage, you’ll never lose a precious memory</string>
+    <string name="carousel_page_description_slide_2">Với tính năng tự&#160;động đăng&#160;tải camêra lên Ổ&#160;Mây MEGA và không&#160;gian lưu&#160;trữ rộng&#160;rãi, bạn sẽ không bao giờ mất một kỷ&#160;niệm quý&#160;giá nào hết</string>
     <!-- USP Carousel page 3 title-->
-    <string name="carousel_page_title_slide_3">Your data. Your space.</string>
+    <string name="carousel_page_title_slide_3">Dữ&#160;liệu chính&#160;chủ. Không&#160;gian riêng&#160;tư.</string>
     <!-- USP Carousel page 3 description-->
     <string name="carousel_page_description_slide_3">Ample storage and easy ways to transfer, share, and organise your files means you can safely use MEGA for whatever you choose</string>
     <!-- USP Carousel page 4 title-->
@@ -1078,4 +1078,36 @@
     <string name="carousel_page_description_slide_4">Chat with friends and family, share photos or sensitive information, video call and schedule meetings. Safety and privacy guaranteed.</string>
     <!-- Create account label-->
     <string name="general_label_create_account">Tạo tài&#160;khoản MEGA</string>
+    <!-- The new feature hidden nodes feature -->
+    <string name="hidden_nodes_new_feature">Tính năng mới: Tệp&#160;tin và thư&#160;mục ẩn</string>
+    <!-- Hidden nodes: hide files and folders feature -->
+    <string name="hidden_nodes_title_hide_files_folders_feature">Ẩn đi tệp&#160;tin và thư&#160;mục</string>
+    <!-- Hidden nodes description: hide files and folders feature -->
+    <string name="hidden_nodes_description_hide_files_folders_feature">Dễ&#160;dàng giữ các tệp&#160;tin nhạy cảm trong Ổ&#160;Mây của bạn ở chế&#160;độ riêng&#160;tư và ngoài tầm nhìn. Theo mặc&#160;định, các tệp&#160;tin ẩn đi không có xuất&#160;hiện trong phần Ổ&#160;Mây, Ảnh và Sử dụng gần đây của bạn.</string>
+    <!-- Hidden nodes: control visibility feature -->
+    <string name="hidden_nodes_title_control_visibility">Kiểm soát chế&#160;độ hiển&#160;thị dễ dàng</string>
+    <!-- Hidden nodes description: control visibility feature -->
+    <string name="hidden_nodes_description_control_visibility">To show hidden files, turn on the “Show hidden items” setting under “File Management --&gt; User interface” in your app settings</string>
+    <!-- Hidden nodes: shared files stay visible feature -->
+    <string name="hidden_nodes_title_visible_shared_files">Các tệp&#160;tin đã chia sẻ vẫn được hiển&#160;thị</string>
+    <!-- Hidden nodes description: shared files stay visible feature -->
+    <string name="hidden_nodes_description_visible_shared_files">Files and folders shared with contacts or with public links are still accessible and visible, even if hidden</string>
+    <!--Camera backup permission screen title-->
+    <string name="camera_backup_permission_screen_title">Keep your photos safe, always</string>
+    <!--Camera backup permission screen description-->
+    <string name="camera_backup_permission_screen_description">Your memories matter.\n\nCamera uploads automatically backs up your photos and videos to your MEGA Cloud drive, so you never have to worry about losing them.</string>
+    <!--Camera backup permission banner text to explain why the camera backup permission is needed-->
+    <string name="camera_backup_permission_banner_info_description">Camera uploads requires [A]full access[/A] to your device’s photo library</string>
+    <!--Button text to request camera backup permission-->
+    <string name="camera_backup_permission_enable_button_text">Bật Đăng Tải Camêra</string>
+    <!--Permission screen skip requesting permission button text-->
+    <string name="permission_screen_skip_permission_request_button_text">Skip for now</string>
+    <!--Notification permission screen title-->
+    <string name="notification_permission_screen_title">Never miss an important update</string>
+    <!--Notification permission screen description-->
+    <string name="notification_permission_screen_description">Stay informed with real-time updates that matter to you. Get alerts for shared folder activity, security updates, and exclusive offers, so you never miss anything important.\n\nYou can manage notification preferences at any time in your device’s settings.</string>
+    <!--Button text to request Notification permission-->
+    <string name="notification_permission_enable_button_text">Bật thông&#160;báo</string>
+    <!-- Notification content for upload final notification in case of a single file upload. -->
+    <string name="transfers_notification_title_single_upload">Uploaded “%1$s”</string>
 </resources>

@@ -1114,4 +1114,36 @@
     <string name="carousel_page_description_slide_4">Converse com amigos e familiares, compartilhe fotos ou informação confidencial, faça chamadas de vídeo e agende reuniões: segurança e privacidade garantidas.</string>
     <!-- Create account label-->
     <string name="general_label_create_account">Criar uma conta no MEGA</string>
+    <!-- The new feature hidden nodes feature -->
+    <string name="hidden_nodes_new_feature">Novo recurso: arquivos e pastas ocultos</string>
+    <!-- Hidden nodes: hide files and folders feature -->
+    <string name="hidden_nodes_title_hide_files_folders_feature">Oculte arquivos e pastas</string>
+    <!-- Hidden nodes description: hide files and folders feature -->
+    <string name="hidden_nodes_description_hide_files_folders_feature">Mantenha facilmente arquivos confidenciais na sua Nuvem de arquivos privados e longe da vista. Os arquivos ocultos não aparecem na Nuvem de arquivos, Fotos e Atividades recentes de forma predeterminada.</string>
+    <!-- Hidden nodes: control visibility feature -->
+    <string name="hidden_nodes_title_control_visibility">Controle a visibilidade facilmente</string>
+    <!-- Hidden nodes description: control visibility feature -->
+    <string name="hidden_nodes_description_control_visibility">Para mostrar arquivos ocultos, ative a opção “Mostrar itens ocultos” em “Gerenciamento de arquivos - Interface do usuário” nas configurações do seu aplicativo</string>
+    <!-- Hidden nodes: shared files stay visible feature -->
+    <string name="hidden_nodes_title_visible_shared_files">Os arquivos compartilhados permanecem visíveis</string>
+    <!-- Hidden nodes description: shared files stay visible feature -->
+    <string name="hidden_nodes_description_visible_shared_files">Os arquivos e as pastas compartilhados com contatos ou por meio de links públicos permanecem acessíveis e visíveis, mesmo se estiverem ocultos</string>
+    <!--Camera backup permission screen title-->
+    <string name="camera_backup_permission_screen_title">Mantenha as suas fotos seguras, sempre</string>
+    <!--Camera backup permission screen description-->
+    <string name="camera_backup_permission_screen_description">As suas lembranças importam.\n\nOs uploads da câmera fazem o backup automático das suas fotos e dos seus vídeos na sua nuvem do MEGA, para que você nunca corra o risco de perdê-los.</string>
+    <!--Camera backup permission banner text to explain why the camera backup permission is needed-->
+    <string name="camera_backup_permission_banner_info_description">Os uploads da câmera requerem [A]Acesso total[/A] à biblioteca de fotos do seu dispositivo</string>
+    <!--Button text to request camera backup permission-->
+    <string name="camera_backup_permission_enable_button_text">Ativar Uploads da câmera</string>
+    <!--Permission screen skip requesting permission button text-->
+    <string name="permission_screen_skip_permission_request_button_text">Agora não</string>
+    <!--Notification permission screen title-->
+    <string name="notification_permission_screen_title">Nunca perca uma atualização importante</string>
+    <!--Notification permission screen description-->
+    <string name="notification_permission_screen_description">Mantenha-se informado em tempo real com as atualizações que importam. Receba alertas sobre atividades em pastas compartilhadas, atualizações de segurança e ofertas exclusivas, para que você nunca perca nada importante.\n\nVocê pode gerenciar as preferências de notificação a qualquer momento nas configurações do seu dispositivo.</string>
+    <!--Button text to request Notification permission-->
+    <string name="notification_permission_enable_button_text">Notificações</string>
+    <!-- Notification content for upload final notification in case of a single file upload. -->
+    <string name="transfers_notification_title_single_upload">Foi feito o upload de “%1$s”</string>
 </resources>

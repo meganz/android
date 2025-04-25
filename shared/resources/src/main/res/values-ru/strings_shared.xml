@@ -1117,19 +1117,51 @@
     <!-- USP Carousel page 1 title-->
     <string name="carousel_page_title_slide_1">Ключи хранятся у вас</string>
     <!-- USP Carousel page 1 description-->
-    <string name="carousel_page_description_slide_1">User controlled, zero-knowledge encryption means no one can see your data unless you want them to - not even us!</string>
+    <string name="carousel_page_description_slide_1">Управляемое пользователем шифрование с нулевым разглашением означает, что никто не сможет увидеть ваши данные, если вы этого не захотите, — даже мы!</string>
     <!-- USP Carousel page 2 title-->
-    <string name="carousel_page_title_slide_2">Keep every moment safe</string>
+    <string name="carousel_page_title_slide_2">Сохраняйте каждое мгновение</string>
     <!-- USP Carousel page 2 description-->
-    <string name="carousel_page_description_slide_2">With automatic camera uploads to MEGA Cloud, and generous storage, you’ll never lose a precious memory</string>
+    <string name="carousel_page_description_slide_2">Благодаря автозагрузкам из камеры в MEGA Cloud и щедрому объёму хранения ни одно драгоценное воспоминание не потеряется.</string>
     <!-- USP Carousel page 3 title-->
-    <string name="carousel_page_title_slide_3">Your data. Your space.</string>
+    <string name="carousel_page_title_slide_3">Ваши данные. Ваше пространство.</string>
     <!-- USP Carousel page 3 description-->
-    <string name="carousel_page_description_slide_3">Ample storage and easy ways to transfer, share, and organise your files means you can safely use MEGA for whatever you choose</string>
+    <string name="carousel_page_description_slide_3">Благодаря удобным способам передачи, обмена и организации файлов, а также щедрому объёму хранения вы можете с уверенностью использовать MEGA для любых задач.</string>
     <!-- USP Carousel page 4 title-->
     <string name="carousel_page_title_slide_4">Разговоры тет-а-тет</string>
     <!-- USP Carousel page 4 description-->
-    <string name="carousel_page_description_slide_4">Chat with friends and family, share photos or sensitive information, video call and schedule meetings. Safety and privacy guaranteed.</string>
+    <string name="carousel_page_description_slide_4">Общайтесь в чате с друзьями и семьёй, делитесь фотографиями или личной информацией, проводите видеозвонки и назначайте встречи. Безопасность и конфиденциальность гарантированы.</string>
     <!-- Create account label-->
     <string name="general_label_create_account">Зарегистрироваться в MEGA</string>
+    <!-- The new feature hidden nodes feature -->
+    <string name="hidden_nodes_new_feature">Новая функция: скрытые файлы и папки</string>
+    <!-- Hidden nodes: hide files and folders feature -->
+    <string name="hidden_nodes_title_hide_files_folders_feature">Скрывайте файлы и папки</string>
+    <!-- Hidden nodes description: hide files and folders feature -->
+    <string name="hidden_nodes_description_hide_files_folders_feature">С лёгкостью сохраняйте конфиденциальные файлы на своем Облачном диске в тайне и вне поля зрения. По умолчанию скрытые файлы не отображаются в разделах «Облачный диск», «Фотографии» и «Недавние».</string>
+    <!-- Hidden nodes: control visibility feature -->
+    <string name="hidden_nodes_title_control_visibility">Простое управление видимостью</string>
+    <!-- Hidden nodes description: control visibility feature -->
+    <string name="hidden_nodes_description_control_visibility">Чтобы показать скрытые файлы, включите настройку «Показывать скрытые элементы» в разделе «Управление файлами» -&gt; «Пользовательский интерфейс» в настройках приложения</string>
+    <!-- Hidden nodes: shared files stay visible feature -->
+    <string name="hidden_nodes_title_visible_shared_files">Общие файлы остаются видимыми</string>
+    <!-- Hidden nodes description: shared files stay visible feature -->
+    <string name="hidden_nodes_description_visible_shared_files">Файлы и папки, которыми вы поделились с контактами или для которых созданы публичные ссылки, по-прежнему доступны и видны, даже если они скрыты</string>
+    <!--Camera backup permission screen title-->
+    <string name="camera_backup_permission_screen_title">Ваши фото всегда в безопасности</string>
+    <!--Camera backup permission screen description-->
+    <string name="camera_backup_permission_screen_description">Ваши воспоминания важны.\n\nЗагрузки из камеры автоматически создают резервные копии фото и видео на Облачном диске MEGA, поэтому вы их никогда не потеряете.</string>
+    <!--Camera backup permission banner text to explain why the camera backup permission is needed-->
+    <string name="camera_backup_permission_banner_info_description">Для загрузок из камеры требуется [A]полный доступ[/A] к галерее устройства</string>
+    <!--Button text to request camera backup permission-->
+    <string name="camera_backup_permission_enable_button_text">Включить Загрузки из камеры</string>
+    <!--Permission screen skip requesting permission button text-->
+    <string name="permission_screen_skip_permission_request_button_text">Пока пропустить</string>
+    <!--Notification permission screen title-->
+    <string name="notification_permission_screen_title">Никогда не пропустите важное сообщение</string>
+    <!--Notification permission screen description-->
+    <string name="notification_permission_screen_description">Будьте в курсе в режиме реального времени. Получайте оповещения об активности в общих папках, обновлениях безопасности и эксклюзивных предложениях, чтобы никогда не пропустить ничего важного.\n\nПараметры уведомлений можно изменить в любой момент в настройках устройства.</string>
+    <!--Button text to request Notification permission-->
+    <string name="notification_permission_enable_button_text">Включить уведомления</string>
+    <!-- Notification content for upload final notification in case of a single file upload. -->
+    <string name="transfers_notification_title_single_upload">«%1$s» обновлён</string>
 </resources>

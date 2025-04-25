@@ -1916,8 +1916,6 @@
     <string name="play_store_label">متجر غوغل Google Play</string>
     <!-- Text shown in an alert explaining how to continue to enable Two-Factor Authentication -->
     <string name="text_2fa_help">تحتاج الى تطبيق مصادقة لتفعيل المصادقة المزدوجة 2FA على ميغا MEGA. يمكنك تنزيل وتثبيت أحد التطبيقات Google Authenticator، Duo Mobile أو Microsoft Authenticator app على موبايلك أو جهازك اللوحي.</string>
-    <!-- error message when importing multiple files from chat -->
-    <string name="number_no_imported_from_chat">لم تنجح مشاركة %d ملف</string>
     <!-- button’s text to open a full screen image -->
     <string name="preview_content">فتح</string>
     <!-- message shown when the user clicks on media file chat message, there is no network connection and the file is not been downloaded -->

@@ -125,7 +125,7 @@
     <!-- This question applies to users that do not have an account on MEGA yet -->
     <string name="new_to_mega">Mới đến MEGA?</string>
     <!-- button that allows the user to create an account -->
-    <string name="create_account">Tạo tài&#160;khoản MEGA</string>
+    <string name="create_account">Đăng ký tài khoản</string>
     <!-- when the user tries to log in MEGA without typing the email -->
     <string name="error_enter_email">Nhập địa chỉ email</string>
     <!-- Title of the alert dialog when the user tries to recover the pass of a non existing account -->
@@ -797,7 +797,7 @@
     <!-- Error message shown after login into a folder link with an invalid decryption key -->
     <string name="general_error_invalid_decryption_key">Chìa&#160;khóa giải&#160;mã vừa cung&#160;cấp không&#160;đúng để dùng cho đường liên&#160;kết thư&#160;mục này.</string>
     <!-- Item of the navigation title for the chat section -->
-    <string name="section_chat">Chát</string>
+    <string name="section_chat">Chat</string>
     <!-- Confirmation button of the dialog to archive a chat -->
     <string name="tab_archive_chat">Bảo lưu</string>
     <!-- Title shown when multiselection is enable in chat tabs -->
@@ -853,7 +853,7 @@
     <!-- Message when select the option Do not disturb but the notifications are already muted -->
     <string name="notifications_are_already_muted">Âm báo chát đã tắt tiếng</string>
     <!-- Message when a chat has been unmuted successfully. -->
-    <string name="success_unmuting_a_chat">Âm báo chát được bật</string>
+    <string name="success_unmuting_a_chat">Thông báo chat đã được bật</string>
     <!-- String to indicate the time in 24h format until which a specific chat is muted. Plural, used for any format different to 1:XX, e.g. 14:15 -->
     <plurals name="chat_notifications_muted_until_specific_time">
         <item quantity="other">Tắt tiếng cho đến %1$s</item>
@@ -875,7 +875,7 @@
     <!-- Menu item to add participants to a chat -->
     <string name="add_participants_menu_item">Thêm thành viên</string>
     <!-- Menu item to remove a participants from a chat -->
-    <string name="remove_participant_menu_item">Loại&#160;khỏi cuộc chát</string>
+    <string name="remove_participant_menu_item">Loại bỏ người tham&#160;gia</string>
     <!-- Message about MEGA when there are no message in the chat screen -->
     <string name="mega_confidentiality_empty_screen">Chỉ có tác giả và người được cấp phép nhận tin mới có thể giải mã và đọc nội dung.</string>
     <!-- Message about MEGA when there are no message in the chat screen -->
@@ -905,11 +905,11 @@
     <!-- Confirmation before deleting one message -->
     <string name="confirmation_delete_one_message">Xóa tin nhắn?</string>
     <!-- Label for the sliding panel of a group chat -->
-    <string name="group_chat_label">Nhóm chát</string>
+    <string name="group_chat_label">Nhóm chat</string>
     <!-- Label for the option of the sliding panel to show the info of a chat group -->
     <string name="group_chat_info_label">Thông tin nhóm</string>
     <!-- Label for the option of the sliding panel to start a one to one chat -->
-    <string name="group_chat_start_conversation_label">Bắt đầu cuộc chát</string>
+    <string name="group_chat_start_conversation_label">Bắt đầu trò chuyện</string>
     <!-- Label for the option of the sliding panel to edit the profile -->
     <string name="group_chat_edit_profile_label">Sửa hồ&#160;sơ cá&#160;nhân</string>
     <!-- Title of the section to leave a group content in the Contact Properties screen -->
@@ -931,9 +931,9 @@
     <!-- confirmation message before leaving a group chat -->
     <string name="confirmation_leave_group_chat">Nếu rời khỏi cuộc chat, bạn sẽ không còn quyền truy cập vào nhóm để xem và gửi tin nhắn.</string>
     <!-- title confirmation message before leaving a group chat -->
-    <string name="title_confirmation_leave_group_chat">Rời khỏi nhóm chát?</string>
+    <string name="title_confirmation_leave_group_chat">Rời khỏi nhóm chat?</string>
     <!-- Message show when a participant hasn’t been successfully invited to a group chat -->
-    <string name="add_participant_error_already_exists">Thành viên này đã có mặt trong nhóm chát này rồi</string>
+    <string name="add_participant_error_already_exists">Người này đã có mặt trong nhóm chat này rồi</string>
     <!-- success message when inviting multiple contacts to a group chat -->
     <string name="number_correctly_add_participant">%d thành&#160;viên đã được mời</string>
     <!-- error message when inviting multiple contacts to a group chat -->
@@ -965,7 +965,7 @@
     <!-- Text shown when the chat history was cleared by someone -->
     <string name="non_format_history_cleared_by">Lịch sử nội dung chat đã bị xóa bởi %1$s</string>
     <!-- chat message when a participant was added to a group chat -->
-    <string name="non_format_message_add_participant">%1$s đã  được thêm vào nhóm chát từ lời mời của %2$s</string>
+    <string name="non_format_message_add_participant">%1$s đã  được thêm vào nhóm chat từ lời mời của %2$s</string>
     <!-- chat message when a participant was removed from a group chat -->
     <string name="non_format_message_remove_participant">%2$s đã loại&#160;bỏ %1$s khỏi nhóm chát</string>
     <!-- Message shown when a participant change the title of a group chat. -->
@@ -975,7 +975,7 @@
     <!-- Success alert when the user copies one message to the clipboard -->
     <string name="messages_copied_clipboard">Đã được ghi vào bảng&#160;nhớ&#160;tạm</string>
     <!-- Title of the error dialog when opening a chat -->
-    <string name="chat_error_open_title">Chát lỗi</string>
+    <string name="chat_error_open_title">Chat bị lỗi</string>
     <!-- Title of the contact list -->
     <plurals name="general_selection_num_contacts">
         <item quantity="other">%1$d tên liên lạc</item>
@@ -1122,7 +1122,7 @@
     <!-- Menu option -->
     <string name="general_view_contacts">Xem sổ liên&#160;lạc</string>
     <!-- Menu option -->
-    <string name="import_success_error">Lỗi. Chưa thêm vào Ổ Mây được</string>
+    <string name="import_success_error">Lỗi. Đã không thêm vào Ổ&#160;Mây được</string>
     <!-- Label in login screen to inform about the chat initialization proccess -->
     <string name="chat_connecting">Đang kết nối&#8230;</string>
     <!-- message when trying to invite a contact with a pending request -->
@@ -1176,13 +1176,13 @@
     <!-- Message when an user attribute has been changed successfully -->
     <string name="success_changing_user_attributes">Tên của bạn đã được cập&#160;nhật</string>
     <!-- Message show when a participant has been successfully invited to a group chat -->
-    <string name="add_participant_success">Đã thêm thành viên</string>
+    <string name="add_participant_success">Đã thêm người tham&#160;gia</string>
     <!-- Message show when a participant hasn’t been successfully invited to a group chat -->
-    <string name="add_participant_error">Lỗi. Không thêm được thành viên</string>
+    <string name="add_participant_error">Lỗi. Không thêm người tham gia được</string>
     <!-- Message show when a participant has been successfully removed from a group chat -->
-    <string name="remove_participant_success">Đã loại&#160;bỏ thành&#160;viên</string>
+    <string name="remove_participant_success">Đã loại&#160;bỏ người tham&#160;gia</string>
     <!-- Message show when a participant hasn’t been successfully removed from a group chat -->
-    <string name="remove_participant_error">Lỗi. Không loại bỏ được thành viên</string>
+    <string name="remove_participant_error">Lỗi. Không loại bỏ được người tham&#160;gia</string>
     <!--  -->
     <string name="no_files_selected_warning">Chưa có tệp tin nào được chọn</string>
     <!--  -->
@@ -1208,7 +1208,7 @@
     <!-- Label to explain the read only participant permission in the options panel of the group info screen -->
     <string name="file_properties_shared_folder_read_only">Chỉ-được-xem</string>
     <!-- Refers to access rights for a file folder. (with the & needed. Don’t use the symbol itself. Use &) -->
-    <string name="file_properties_shared_folder_read_write">Xem và sửa</string>
+    <string name="file_properties_shared_folder_read_write">Xem và ghi</string>
     <!-- State of an attachment message when the upload is in progress but the queue of transfers is paused. -->
     <string name="attachment_uploading_state_paused">Phiên truyền tải bị dừng</string>
     <!--  -->
@@ -1228,9 +1228,9 @@
     <!-- Title of the section to remove contact in the Contact Properties screen -->
     <string name="title_properties_remove_contact">Xóa tên liên lạc</string>
     <!-- Title of the section to enable notifications in the Contact Properties screen -->
-    <string name="title_properties_chat_notifications_contact">Âm báo chát</string>
+    <string name="title_properties_chat_notifications_contact">Âm báo chat</string>
     <!-- Text shown when the chat history was cleared by someone -->
-    <string name="history_cleared_by">[A]%1$s[/A][B] đã xóa lịch sử nội dung chát[/B]</string>
+    <string name="history_cleared_by">[A]%1$s[/A][B] đã xóa lịch sử nội dung chat[/B]</string>
     <!-- Item menu option upon clicking on one or multiple files. -->
     <string name="context_permissions_changing_folder">Đang thay&#160;đổi quyền&#160;hạn</string>
     <!-- Item menu option upon clicking on one or multiple files. -->
@@ -1246,7 +1246,7 @@
     <!-- confirmation message before removing a file -->
     <string name="confirmation_delete_from_mega">Xóa khỏi MEGA?</string>
     <!-- Title of the section to enable notifications in the Contact Properties screen -->
-    <string name="title_properties_contact_notifications_for_chat">Âm báo chát</string>
+    <string name="title_properties_contact_notifications_for_chat">Thông báo chat</string>
     <!-- title of the section for achievements -->
     <string name="achievements_title">Thành&#160;Tích</string>
     <!-- subtitle of the section for achievements -->
@@ -1520,7 +1520,7 @@
     <!-- Content of the dialog to confirm that several versions are going to be deleted -->
     <string name="content_dialog_delete_multiple_version">%d phiên bản này sẽ bị xoá bỏ hoàn toàn.</string>
     <!-- Title of the notification shown when a file is uploading to a chat -->
-    <string name="chat_upload_title_notification">Đăng tải lên chát</string>
+    <string name="chat_upload_title_notification">Đang tải lên vào cuộc chat</string>
     <!-- Label for the option on setting to set up the quality of multimedia files uploaded to the chat -->
     <string name="settings_chat_upload_quality">Chất lượng video</string>
     <!-- Label for the option on setting to set up the quality of video files to be uploaded -->
@@ -1573,7 +1573,7 @@
     <!-- Error message after sending to chat one or several messages to several chats -->
     <string name="files_send_to_chat_error">Lỗi. Gửi đi không thành&#160;công</string>
     <!-- menu option to send a file to a chat -->
-    <string name="context_send_file_to_chat">Gửi đến cuộc chát</string>
+    <string name="context_send_file_to_chat">Gửi đến cuộc chat</string>
     <!-- Title of the dialog ‘Do you remember your password?’ -->
     <string name="remember_pwd_dialog_title">Bạn có còn nhớ mật khẩu của mình không?</string>
     <!-- Text of the dialog ‘Recovery Key exported’ when the user wants logout -->
@@ -1716,8 +1716,6 @@
     <string name="play_store_label">Google Play</string>
     <!-- Text shown in an alert explaining how to continue to enable Two-Factor Authentication -->
     <string name="text_2fa_help">Cần phải có một app lập xác thực để bật tính năng 2FA với MEGA. Bạn có thể tải và cài đặt Google Authenticator, Duo Mobile, Authy hoặc Microsoft Authenticator app về thiết bị của mình.</string>
-    <!-- error message when importing multiple files from chat -->
-    <string name="number_no_imported_from_chat">Chia sẻ %d tệp tin chưa được hoàn tất</string>
     <!-- button’s text to open a full screen image -->
     <string name="preview_content">Mở</string>
     <!-- message shown when the user clicks on media file chat message, there is no network connection and the file is not been downloaded -->
@@ -1829,7 +1827,7 @@
     <!-- Text of the confirm dialog shown when it wants to add a contact from a QR scaned -->
     <string name="confirmation_share_contact">Chia sẻ với %s?</string>
     <!-- Text button for init a group chat -->
-    <string name="new_group_chat_label">Nhóm chát mới</string>
+    <string name="new_group_chat_label">Nhóm chat mới</string>
     <!-- Label shown when the user wants to add contacts into a chat conversation -->
     <string name="send_contacts">Gửi tên liên lạc</string>
     <!-- Title of the alert when the account have been logged out from another client -->
@@ -1845,23 +1843,23 @@
     <!-- Text of the dialog shown when the storage of a PRO I or II account is almost full -->
     <string name="text_almost_full_warning_pro_account">Ổ Mây sắp hết chỗ trống. Nâng cấp ngay và nhận lên đến %1$s không gian lưu trữ và %2$s băng thông truyền tải.</string>
     <!-- Text of the dialog shown when the storage of a PRO III account is almost full -->
-    <string name="text_almost_full_warning_pro3_account">Ổ Mây sắp hết chỗ trống. Nếu quý khách cần thêm không gian lưu trữ, xin liên hệ với MEGA để mua gói cước theo nhu cầu.</string>
+    <string name="text_almost_full_warning_pro3_account">Ổ&#160;Mây sắp bị đầy. Nếu bạn cần thêm không&#160;gian, xin vui lòng liên hệ với MEGA để mua gói theo nhu&#160;cầu.</string>
     <!-- Text of the dialog shown when the storage of a FREE account is full -->
     <string name="text_storage_full_warning">Ổ Mây bị đầy. Nâng cấp lên Pro và nhận lên đến %1$s không gian lưu trữ và %2$s băng thông truyền tải.</string>
     <!-- Text of the dialog shown when the storage of a PRO I or II account is full -->
-    <string name="text_storage_full_warning_pro_account">Ổ Mây bị đầy. Nâng cấp tài khoản và nhận lên đến %1$s không gian lưu trữ và %2$s băng thông truyền tải.</string>
+    <string name="text_storage_full_warning_pro_account">Ổ&#160;Mây bị đầy. Nâng cấp tài khoản và nhận lên đến %1$s không gian lưu trữ và %2$s băng thông truyền tải.</string>
     <!-- Text of the dialog shown when the storage of a PRO III account is full -->
-    <string name="text_storage_full_warning_pro3_account">Ổ Mây bị đầy. Nếu quý khách cần thêm không gian, xin vui lòng liên hệ với MEGA để mua gói cước theo nhu cầu.</string>
+    <string name="text_storage_full_warning_pro3_account">Ổ&#160;Mây bị đầy. Nếu bạn cần thêm không&#160;gian, xin vui lòng liên hệ với MEGA để mua gói theo nhu&#160;cầu.</string>
     <!-- Button of the dialog shown when the storage is almost full to see the available PRO plans -->
-    <string name="button_plans_almost_full_warning">Xem các gói thuê bao</string>
+    <string name="button_plans_almost_full_warning">Xem các gói đăng ký</string>
     <!-- Button of the dialog shown when the storage is almost full to custom a plan -->
-    <string name="button_custom_almost_full_warning">Gói cước theo nhu cầu</string>
+    <string name="button_custom_almost_full_warning">Gói theo nhu cầu</string>
     <!-- Button of the dialog shown when the storage is almost full to get bonus -->
     <string name="button_bonus_almost_full_warning">Nhận thêm Thưởng</string>
     <!-- Mail title to upgrade to a custom plan -->
-    <string name="title_mail_upgrade_plan">Nâng cấp thành gói cước theo nhu cầu</string>
+    <string name="title_mail_upgrade_plan">Nâng cấp thành gói theo nhu cầu</string>
     <!-- Mail subject to upgrade to a custom plan -->
-    <string name="subject_mail_upgrade_plan">Hỏi chúng tôi về cách mua gói cước theo nhu cầu sử dụng:</string>
+    <string name="subject_mail_upgrade_plan">Hỏi chúng tôi về cách mua gói theo nhu cầu:</string>
     <!-- Title of the button in the contact info screen to start an audio call -->
     <string name="call_button">Gọi</string>
     <!-- Title of the button in the contact info screen to send a message -->
@@ -1927,13 +1925,13 @@
     <!-- Warning show to the user when tries to make private a public chat and the chat has more than 100 participants -->
     <string name="warning_make_chat_private">Không thể chuyển&#160;đổi cuộc chát thành riêng&#160;tư vì số&#160;lượng người tham&#160;gia vượt&#160;quá giới&#160;hạn cho phép cho cuộc chát riêng&#160;tư.</string>
     <!-- Text shown when a moderator of a chat create a chat link. Please keep the placeholder because is to show the moderator’s name in runtime. -->
-    <string name="message_created_chat_link">[A]%1$s[/A][B] vừa tạo đường liên kết tới cuộc chát.[/B]</string>
+    <string name="message_created_chat_link">[A]%1$s[/A][B] vừa tạo đường liên kết tới cuộc chat.[/B]</string>
     <!-- Text shown when a moderator of a chat delete a chat link. Please keep the placeholder because is to show the moderator’s name in runtime. -->
     <string name="message_deleted_chat_link">[A]%1$s[/A][B] đã xóa đường liên kết tới cuộc chát.[/B]</string>
     <!-- Title of the option to delete a chat link -->
     <string name="action_delete_link">Xóa đường liên kết</string>
     <!-- Title of the alert when a chat link is invalid -->
-    <string name="title_alert_chat_link_error">Liên kết vào chát</string>
+    <string name="title_alert_chat_link_error">Đường liên&#160;kết chat</string>
     <!-- Text of the dialog to confirm after closing all other sessions -->
     <string name="confirmation_close_sessions_text">Việc này sẽ đăng xuất tài khoản ra khỏi tất cả các thiết bị ngoại trừ phiên hiện hành này.</string>
     <!-- Title of the dialog to confirm after closing all other sessions -->
@@ -2088,7 +2086,7 @@
     </plurals>
     <!-- Subtitle chat screen for groups with permissions and not archived, Plural of participant. 2 participants -->
     <plurals name="subtitle_of_group_chat">
-        <item quantity="other">%d thành viên</item>
+        <item quantity="other">%d người tham&#160;gia</item>
     </plurals>
     <!--  -->
     <string name="custom_subtitle_of_group_chat">%1$s và %2$d mục nữa</string>
@@ -2305,7 +2303,7 @@
     <!-- Label to reference a recents section -->
     <string name="recents_label">Gần Đây</string>
     <!-- Label to reference a chats section -->
-    <string name="chats_label">Cuộc chát</string>
+    <string name="chats_label">Cuộc chat</string>
     <!-- Text of the empty screen when there are not elements in Recents -->
     <string name="context_empty_recents">[B]Không có tệp tin nào trong [/B][A]Hoạt Động Gần Đây[/A]</string>
     <!-- Title of a recents bucket -->
@@ -2509,7 +2507,7 @@
     <!-- The label under the button of opening all-documents screen -->
     <string name="section_documents">Tệp Tài Liệu</string>
     <!-- Label of the floating action button of opening the new chat conversation -->
-    <string name="fab_label_new_chat">Cuộc chát mới</string>
+    <string name="fab_label_new_chat">Cuộc chat mới</string>
     <!-- Text that indicates that there’s no document to show. The format placeholders are to showing it in different colors. -->
     <string name="homepage_empty_hint_documents">[B]Không có[/B] [A]văn bản[/A] [B]nào[/B]</string>
     <!-- Text that indicates that there’s no audio to show. The format placeholders are to showing it in different colors. -->
@@ -2535,9 +2533,9 @@
     <!-- Indicator of the progress in a download/upload. Please, don’t remove the place holders: the first one is to set the percentage, the second one is to set the size of the file. Example 33% of 33.3 MB -->
     <string name="progress_size_indicator">%1$d%% trong tổng %2$s</string>
     <!-- Message showing when enable the mode for showing the special information in the chat messages. This action is performed from the settings section, clicking 5 times on the App version option -->
-    <string name="show_info_chat_msg_enabled">Bản ghi thông tin gỡ lỗi cho tin nhắn chát đã được bật</string>
+    <string name="show_info_chat_msg_enabled">Bản ghi thông tin gỡ lỗi cho tin nhắn chat đã được bật</string>
     <!-- Message showing when disable the mode for showing the special information in the chat messages.. This action is performed from the settings section, clicking 5 times on the App version option -->
-    <string name="show_info_chat_msg_disabled">Bản ghi thông tin gỡ lỗi cho tin nhắn chát đã bị tắt</string>
+    <string name="show_info_chat_msg_disabled">Bản ghi thông tin gỡ lỗi cho tin nhắn chat đã bị tắt</string>
     <!-- System message displayed to all chat participants when one of them enables retention history -->
     <string name="retention_history_changed_by">[A]%1$s[/A][B] đã thay đổi thời gian tự động xóa tin nhắn đã có lâu là [/B][A]%2$s[/A][B].[/B]</string>
     <!-- Title of the section to clear the chat content in the Manage chat history screen -->
@@ -2561,7 +2559,7 @@
     <!-- Label for the dialog box option to configure history retention. This option will indicate that messages older than a custom date will be deleted -->
     <string name="history_retention_option_custom">Tùy chỉnh</string>
     <!-- Title of the Manage chat history screen -->
-    <string name="title_properties_manage_chat">Quản lý lịch sử chát</string>
+    <string name="title_properties_manage_chat">Quản lý lịch sử chat</string>
     <!-- Subtitle of the dialogue to select a retention time -->
     <string name="subtitle_properties_manage_chat">Tự&#160;động xóa các tin&#160;nhắn đã có lâu hơn:</string>
     <!-- Text of the confirmation dialog to clear the chat history from Manage chat history section -->
@@ -2677,7 +2675,7 @@
     <!-- Preferences screen item title for Cookie Policy -->
     <string name="settings_about_cookie_policy">Chính Sách Cookie</string>
     <!-- Preferences screen item title for cookie settings -->
-    <string name="settings_about_cookie_settings">Thiết đặt cookie</string>
+    <string name="settings_about_cookie_settings">Cài đặt cookie</string>
     <!-- Title for Cookie dialog, visible for new users. -->
     <string name="dialog_cookie_alert_title">Quản&#160;lý cookies</string>
     <!-- Body for Cookie dialog, visible for new users. Please, keep the placeholders to format the string. -->
@@ -2739,7 +2737,7 @@
     <!-- Settings hint that indicates the audio will still be played in background if the app is backgrounded -->
     <string name="settings_background_play_hint">Cho phép phát trong nền</string>
     <!-- Text to show as subtitle of Enable camera uploads screen -->
-    <string name="enable_cu_subtitle">Tự động sao lưu dự phòng hình ảnh và videos của bạn lên Ổ Mây.</string>
+    <string name="enable_cu_subtitle">Tự động sao lưu dự phòng hình ảnh và videos của bạn lên Ổ&#160;Mây.</string>
     <!-- Text of a button on Camera Uploads section to show all the content of the section-->
     <string name="all_view_button">Tất cả</string>
     <!-- Text of a button on Camera Uploads section to show the content of the section organized by days-->
@@ -3007,7 +3005,7 @@
     <!-- Menu option to open a chat link. -->
     <string name="action_open_chat_link">Mở đường liên kết vào cuộc chát</string>
     <!-- Hint shown in the open chat link alert dialog. -->
-    <string name="hint_enter_chat_link">Nhập liên kết vào chát</string>
+    <string name="hint_enter_chat_link">Nhập đường liên kết chat</string>
     <!-- Hint shown in the open link alert dialog. -->
     <string name="hint_paste_link">Dán đường liên kết</string>
     <!-- Error shown when it tries to open an invalid file or folder link .-->
@@ -3322,18 +3320,18 @@
     </plurals>
     <!-- Number of participants in the call in the meeting info bottom panel -->
     <plurals name="meeting_call_screen_meeting_info_bottom_panel_num_of_participants">
-        <item quantity="other">Thành viên: %s</item>
+        <item quantity="other">Người tham&#160;gia: %s</item>
     </plurals>
     <!-- Chat log message when the permissions for a user has been changed to read-onl -->
     <string name="chat_chat_room_message_permissions_changed_to_read_only">[A]%1$s[/A][B] đã được đổi quyền hạn là chỉ-được-xem bởi [/B][A]%2$s[/A]</string>
     <!-- Chat log message when the permissions for a user has been changed to standard -->
-    <string name="chat_chat_room_message_permissions_changed_to_standard">[A]%1$s[/A][B] đã được đổi quyền&#160;hạn là thành&#160;viên thông&#160;thường bởi [/B][A]%2$s[/A]</string>
+    <string name="chat_chat_room_message_permissions_changed_to_standard">[A]%1$s[/A][B] đã được đổi quyền&#160;hạn là người tham&#160;gia thông&#160;thường bởi [/B][A]%2$s[/A]</string>
     <!-- Chat log message when the permissions for a user has been changed to host -->
     <string name="chat_chat_room_message_permissions_changed_to_host">[A]%1$s[/A][B] đã được đổi quyền hạn là người chủ trì bởi [/B][A]%2$s[/A]</string>
     <!-- Last chat log message in chats list when the permissions for a user has been changed to read-only -->
     <string name="chat_chats_list_last_message_permissions_changed_to_read_only">%2$s đã đổi quyền hạn của %1$s thành chỉ-được-xem</string>
     <!-- Last chat log message in chats list when the permissions for a user has been changed to standard -->
-    <string name="chat_chats_list_last_message_permissions_changed_to_standard">%2$s đã đổi quyền&#160;hạn của %1$s là thành&#160;viên thông&#160;thường</string>
+    <string name="chat_chats_list_last_message_permissions_changed_to_standard">%2$s đã đổi quyền&#160;hạn của %1$s là người tham&#160;gia thông&#160;thường</string>
     <!-- Last chat log message in chats list when the permissions for a user has been changed to host -->
     <string name="chat_chats_list_last_message_permissions_changed_to_host">%2$s đã đổi quyền hạn của %1$s thành người chủ trì</string>
     <!-- Label to indicate you have started a meeting or a group call and are waiting for others to join in -->
@@ -4046,7 +4044,7 @@
     <string name="meetings_schedule_meeting_discard_meeting_dialog_discard_option">Hủy bỏ</string>
     <!-- Success message when participants was added to the meeting in Schedule meeting screen -->
     <plurals name="meetings_schedule_meeting_snackbar_adding_participants_success">
-        <item quantity="other">Đã thêm %1$d thành&#160;viên</item>
+        <item quantity="other">Đã thêm %1$d người tham&#160;gia</item>
     </plurals>
     <!-- error message when sharing a folder(s) fails to be completed-->
     <plurals name="shared_items_cloud_drive_snackbar_sharing_folder_failed">
@@ -4440,7 +4438,7 @@
     <string name="contact_share_file_to_unverified_contact_warning_message">Một số tên liên&#160;lạc mà bạn đang chia&#160;sẻ thông&#160;tin chưa được bạn đã xác&#160;thực. Để đảm&#160;bảo an&#160;toàn hơn, chúng&#160;tôi khuyên bạn nên xác&#160;thực chứng&#160;chỉ đăng&#160;nhập của họ trong Sổ Liên&#160;Lạc. Nhấn vào ba dấu chấm bên cạnh tên liên&#160;lạc bạn muốn xác&#160;thực và nhấn vào Thông&#160;tin.</string>
     <!-- Success message when participants was removed to the meeting in Schedule meeting screen -->
     <plurals name="meetings_schedule_meeting_snackbar_removing_participants_success">
-        <item quantity="other">Đã loại bỏ %1$d thành&#160;viên</item>
+        <item quantity="other">Đã loại bỏ %1$d người tham&#160;gia</item>
     </plurals>
     <!-- Message to user when app update is downloaded -->
     <string name="general_app_update_message_download_success">Ứng&#160;dụng đã được cập&#160;nhật</string>
@@ -4499,7 +4497,7 @@
     <!-- Title of video option of snapshot-->
     <string name="media_player_video_option_snapshot_title">Chụp màn&#160;hình</string>
     <!-- Title of video option of lock-->
-    <string name="media_player_video_option_lock_title">Khóa chạm</string>
+    <string name="media_player_video_option_lock_title">Khóa cảm ứng</string>
     <!-- Title of video option of zoom to fill-->
     <string name="media_player_video_option_zoom_to_fill_title">Phóng vừa màn&#160;hình</string>
     <!-- Title of video option of original-->
@@ -4549,7 +4547,7 @@
         <item quantity="other">%d người được mời</item>
     </plurals>
     <!-- Title of button to share the chat link in bottom panel in the group call screen -->
-    <string name="meetings_group_call_bottom_panel_share_chat_link_button">Chia&#160;sẻ liên&#160;kết chát</string>
+    <string name="meetings_group_call_bottom_panel_share_chat_link_button">Chia&#160;sẻ liên&#160;kết chat</string>
     <!-- Title to display Current plan for user on My account screen. -->
     <string name="account_my_account_home_view_current_plan_title">Gói hiện tại</string>
     <!-- Button title on Storage/Transfer usage screen related to My account screen. When user taps on button he will be redirected to Upgrade account screen. -->
