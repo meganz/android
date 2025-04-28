@@ -9,6 +9,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.test.assertIsDisplayed
+import androidx.compose.ui.test.assertIsNotDisplayed
 import androidx.compose.ui.test.junit4.createComposeRule
 import androidx.compose.ui.test.onNodeWithTag
 import androidx.compose.ui.test.onNodeWithText
@@ -66,6 +67,58 @@ class FastScrollLazyVerticalGridTest {
                 moveBy(Offset(0f, -200f)) // Simulate a scroll
             }
             onNodeWithTag(THUMB_TAG).assertIsDisplayed()
+        }
+    }
+
+
+    @Test
+    fun `test that thumb icon is not shown when the 2 column grid with less than 50 items is scrolled`() {
+        with(composeRule) {
+            val items = (0..45).map { it }
+            setContent {
+                FastScrollLazyVerticalGrid(
+                    totalItems = items.size,
+                    columns = GridCells.Fixed(2),
+                    tooltipText = { "$it" },
+                    modifier = Modifier.size(700.dp)
+                ) {
+                    itemsIndexed(items) { index, _ ->
+                        Text("$index", modifier = Modifier.testTag("$index"))
+                    }
+                }
+            }
+            onNodeWithTag(THUMB_TAG).assertDoesNotExist()
+            onNodeWithTag(LAZY_GRID_TAG).performTouchInput {
+                down(center)
+                moveBy(Offset(0f, -200f)) // Simulate a scroll
+            }
+            onNodeWithTag(THUMB_TAG).assertIsNotDisplayed()
+        }
+    }
+
+
+    @Test
+    fun `test that thumb icon is not shown when the 3 column grid with less than 100 items is scrolled`() {
+        with(composeRule) {
+            val items = (0..85).map { it }
+            setContent {
+                FastScrollLazyVerticalGrid(
+                    totalItems = items.size,
+                    columns = GridCells.Fixed(3),
+                    tooltipText = { "$it" },
+                    modifier = Modifier.size(700.dp)
+                ) {
+                    itemsIndexed(items) { index, _ ->
+                        Text("$index", modifier = Modifier.testTag("$index"))
+                    }
+                }
+            }
+            onNodeWithTag(THUMB_TAG).assertDoesNotExist()
+            onNodeWithTag(LAZY_GRID_TAG).performTouchInput {
+                down(center)
+                moveBy(Offset(0f, -200f)) // Simulate a scroll
+            }
+            onNodeWithTag(THUMB_TAG).assertIsNotDisplayed()
         }
     }
 }
