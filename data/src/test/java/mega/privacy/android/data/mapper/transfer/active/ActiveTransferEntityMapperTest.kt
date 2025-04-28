@@ -55,6 +55,7 @@ class ActiveTransferEntityMapperTest {
                                             TransferAppData.OriginalUriPath(UriPath("content://uri"))
                                         ),
                                         fileName = FILE_NAME,
+                                        localPath = LOCAL_PATH
                                     ),
                                     ActiveTransferEntity(
                                         uniqueId = ID,
@@ -71,6 +72,7 @@ class ActiveTransferEntityMapperTest {
                                             TransferAppData.OriginalUriPath(UriPath("content://uri"))
                                         ),
                                         fileName = FILE_NAME,
+                                        localPath = LOCAL_PATH
                                     )
                                 )
                             }
@@ -85,6 +87,7 @@ class ActiveTransferEntityMapperTest {
         private const val TAG = 2
         private const val TOTAL = 1024L
         private const val FILE_NAME = "foo.txt"
+        private const val LOCAL_PATH = "file:///storage/emulated/0/Download/foo.txt"
     }
 
 
@@ -105,5 +108,6 @@ class ActiveTransferEntityMapperTest {
         override val isCancelled: Boolean,
         override val appData: List<TransferAppData>,
         override val fileName: String,
+        override val localPath: String,
     ) : ActiveTransfer
 }

@@ -18,6 +18,7 @@ internal class ActiveTransferEntityMapper @Inject constructor() {
             isCancelled = isCancelled,
             appData = appData,
             fileName = fileName,
+            localPath = localPath
         )
     }
 }

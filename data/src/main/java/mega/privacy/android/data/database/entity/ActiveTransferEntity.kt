@@ -56,4 +56,6 @@ internal data class ActiveTransferEntity(
     override val isCancelled: Boolean,
     @ColumnInfo(name = "transferappdata", defaultValue = "")
     override val appData: List<TransferAppData>,
+    @ColumnInfo(name = "local_path", defaultValue = "")
+    override val localPath: String,
 ) : ActiveTransfer

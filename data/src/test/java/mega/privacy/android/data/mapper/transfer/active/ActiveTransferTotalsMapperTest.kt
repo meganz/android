@@ -462,7 +462,8 @@ class ActiveTransferTotalsMapperTest {
             isAlreadyTransferred = tag.rem(9) == 0,
             isCancelled = tag.rem(7) == 0,
             appData = emptyList(),
-            fileName = "File$tag.txt"
+            fileName = "File$tag.txt",
+            localPath = "path/File$tag.txt"
         )
     }
 }

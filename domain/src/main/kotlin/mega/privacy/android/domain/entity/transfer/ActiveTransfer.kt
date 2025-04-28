@@ -34,4 +34,11 @@ interface ActiveTransfer : TypedTransfer, AppDataOwner {
      * Name of the file that is being transferred.
      */
     val fileName: String
+
+    /**
+     * Local path related to this transfer.
+     * For uploads, this property is the path to the source file.
+     * For downloads, it is the path of the destination file.
+     */
+    val localPath: String
 }
