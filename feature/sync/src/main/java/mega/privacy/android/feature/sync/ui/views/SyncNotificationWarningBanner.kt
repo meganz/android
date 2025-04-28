@@ -9,6 +9,7 @@ import mega.privacy.android.feature.sync.domain.entity.SyncNotificationType
 import mega.privacy.android.feature.sync.ui.SyncMonitorState
 import mega.privacy.android.shared.original.core.ui.controls.banners.InlineWarningBanner
 import mega.privacy.android.shared.original.core.ui.theme.extensions.body3
+import mega.privacy.android.shared.resources.R as sharedResR
 
 
 /**
@@ -25,8 +26,8 @@ fun SyncNotificationWarningBanner(
         if (it.syncNotificationType == SyncNotificationType.NOT_CONNECTED_TO_WIFI) {
             InlineWarningBanner(
                 modifier = modifier,
-                title = stringResource(it.title),
-                message = stringResource(it.text),
+                title = stringResource(sharedResR.string.general_sync_warning_lost_wifi_title),
+                message = stringResource(sharedResR.string.general_sync_warning_lost_wifi_text),
                 titleStyle = MaterialTheme.typography.body3,
                 messageStyle = MaterialTheme.typography.body3,
                 onCloseClick = {

@@ -463,7 +463,7 @@
     <!-- Text to show in the Android Sync feature for a No Network State when there is no network connectivity -->
     <string name="sync_no_network_state">No internet connection</string>
     <!-- Menu option to create a new folder in the file manager -->
-    <string name="general_menu_create_new_folder">Create new folder</string>
+    <string name="general_menu_create_new_folder">New folder</string>
     <!-- Create new folder dialog title -->
     <string name="create_new_folder_dialog_title">New folder</string>
     <!-- Create new folder dialog hint text (input field description) -->
@@ -821,8 +821,6 @@
     <string name="general_drive">Drive</string>
     <!-- Tab bar title of Syncs tab -->
     <string name="general_syncs">Syncs</string>
-    <!-- Text under the syncs list -->
-    <string name="syncs_tab_view_other_devices">View other devices in Device centre</string>
     <!-- The snackbar message of you and others raised your hands -->
     <plurals name="transfers_completed_read_error_retrying">
         <item quantity="one">Your upload can’t be completed or retried, because MEGA can no longer access the file</item>
@@ -1128,4 +1126,8 @@
     <string name="notification_permission_enable_button_text">Enable notifications</string>
     <!-- Notification content for upload final notification in case of a single file upload. -->
     <string name="transfers_notification_title_single_upload">Uploaded “%1$s”</string>
+    <!-- Title of the warning banner displayed when Syncs are paused due to lost Wi-Fi conditions -->
+    <string name="general_sync_warning_lost_wifi_title">Syncing paused due to lost connection.</string>
+    <!-- Text of the warning banner displayed when Syncs are paused due to lost Wi-Fi conditions -->
+    <string name="general_sync_warning_lost_wifi_text">Reconnect to Wi-Fi to resume.</string>
 </resources>
