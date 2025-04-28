@@ -66,6 +66,30 @@ class FastScrollLazyColumnTest {
     }
 
     @Test
+    fun `test that thumb icon is not shown when the list with less than 50 items is scrolled`() {
+        with(composeRule) {
+            val items = (0..45).map { it }
+            setContent {
+                FastScrollLazyColumn(
+                    totalItems = items.size,
+                    tooltipText = { "$it" },
+                    modifier = Modifier.size(700.dp)
+                ) {
+                    itemsIndexed(items = items) { index, _ ->
+                        Text("$index", modifier = Modifier.testTag("$index"))
+                    }
+                }
+            }
+            onNodeWithTag(THUMB_TAG).assertDoesNotExist()
+            onNodeWithTag(LAZY_COLUMN_TAG).performTouchInput {
+                down(center)
+                moveBy(Offset(0f, -200f)) //simulate swipe but without touch up event
+            }
+            onNodeWithTag(THUMB_TAG).assertIsNotDisplayed()
+        }
+    }
+
+    @Test
     fun `test that tooltip icon is shown when the thumb is pressed`() {
         with(composeRule) {
             val items = (0..1000).map { it }

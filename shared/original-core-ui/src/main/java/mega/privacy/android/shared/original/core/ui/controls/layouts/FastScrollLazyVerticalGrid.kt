@@ -1,5 +1,6 @@
 package mega.privacy.android.shared.original.core.ui.controls.layouts
 
+import MinimumItemThreshold
 import VerticalScrollbar
 import androidx.compose.foundation.background
 import androidx.compose.foundation.gestures.FlingBehavior
@@ -18,18 +19,20 @@ import androidx.compose.foundation.lazy.grid.LazyVerticalGrid
 import androidx.compose.foundation.lazy.grid.itemsIndexed
 import androidx.compose.foundation.lazy.grid.rememberLazyGridState
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.unit.dp
+import mega.android.core.ui.theme.values.TextColor
 import mega.privacy.android.shared.original.core.ui.controls.text.MegaText
 import mega.privacy.android.shared.original.core.ui.preview.CombinedThemePreviews
 import mega.privacy.android.shared.original.core.ui.theme.MegaOriginalTheme
 import mega.privacy.android.shared.original.core.ui.theme.OriginalThemeForPreviews
-import mega.android.core.ui.theme.values.TextColor
 
 /**
- * A LazyVerticalGrid that shows a vertical scrollbar with a thumb that allows fast scrolling of the list.
+ * A LazyVerticalGrid that shows a vertical scrollbar with a thumb that
+ * allows fast scrolling of the list when it has more than item threshold (50 for two column, else 100).
  *
  * @param modifier The modifier to be applied to the layout.
  * @param totalItems Total items in the list.
@@ -73,15 +76,26 @@ fun FastScrollLazyVerticalGrid(
             userScrollEnabled = userScrollEnabled,
             content = content
         )
-        VerticalScrollbar(
-            tooltipText = tooltipText,
-            state = state,
-            itemCount = totalItems,
-            reverseLayout = reverseLayout,
-            modifier = Modifier
-                .fillMaxHeight()
-                .align(Alignment.TopEnd),
-        )
+
+        val minimumItemThreshold = remember(columns) {
+            when (columns) {
+                GridCells.Fixed(1) -> MinimumItemThreshold.SINGLE_COLUMN
+                GridCells.Fixed(2) -> MinimumItemThreshold.TWO_COLUMN_GRID
+                else -> MinimumItemThreshold.MULTI_COLUMN_GRID
+            }
+        }
+
+        if (totalItems > minimumItemThreshold) {
+            VerticalScrollbar(
+                tooltipText = tooltipText,
+                state = state,
+                itemCount = totalItems,
+                reverseLayout = reverseLayout,
+                modifier = Modifier
+                    .fillMaxHeight()
+                    .align(Alignment.TopEnd),
+            )
+        }
     }
 }
 

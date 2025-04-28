@@ -89,6 +89,17 @@ internal fun VerticalScrollbar(
 
 private val thumbHeight = 40.dp
 private const val HIDE_DELAY_MILLIS = 900
+
+/**
+ * Specifies the minimum item count needed to enable the fast scrollbar thumb.
+ * Ensures the scrollbar is hidden when the list contains too few items.
+ */
+internal object MinimumItemThreshold {
+    const val SINGLE_COLUMN = 50
+    const val TWO_COLUMN_GRID = 50
+    const val MULTI_COLUMN_GRID = 100
+}
+
 internal const val THUMB_TAG = "fast_scroll_lazy_column:icon_thumb"
 
 @Composable

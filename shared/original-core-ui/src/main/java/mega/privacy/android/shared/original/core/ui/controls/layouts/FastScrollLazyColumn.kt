@@ -1,5 +1,6 @@
 package mega.privacy.android.shared.original.core.ui.controls.layouts
 
+import MinimumItemThreshold
 import VerticalScrollbar
 import androidx.compose.foundation.background
 import androidx.compose.foundation.gestures.FlingBehavior
@@ -33,7 +34,8 @@ import mega.privacy.android.shared.original.core.ui.theme.MegaOriginalTheme
 import mega.privacy.android.shared.original.core.ui.theme.OriginalThemeForPreviews
 
 /**
- * A LazyColumn that shows a vertical scrollbar with a thumb that allows fast scrolling of the list.
+ * A LazyColumn that shows a vertical scrollbar with a thumb that
+ * allows fast scrolling of the list when it has more than 50 items.
  *
  * @param totalItems Total items in the list.
  * @param tooltipText Function to provide the tooltip text for a given index.
@@ -74,15 +76,17 @@ fun FastScrollLazyColumn(
             userScrollEnabled = userScrollEnabled,
             content = content
         )
-        VerticalScrollbar(
-            tooltipText = tooltipText,
-            state = state,
-            itemCount = totalItems,
-            reverseLayout = reverseLayout,
-            modifier = Modifier
-                .fillMaxHeight()
-                .align(Alignment.TopEnd),
-        )
+        if (totalItems > MinimumItemThreshold.SINGLE_COLUMN) {
+            VerticalScrollbar(
+                tooltipText = tooltipText,
+                state = state,
+                itemCount = totalItems,
+                reverseLayout = reverseLayout,
+                modifier = Modifier
+                    .fillMaxHeight()
+                    .align(Alignment.TopEnd),
+            )
+        }
     }
 }
 
