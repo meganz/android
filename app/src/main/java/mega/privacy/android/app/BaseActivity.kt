@@ -255,25 +255,6 @@ abstract class BaseActivity : AppCompatActivity(), ActivityLauncher, PermissionR
     protected val isActivityInForeground: Boolean
         get() = !isActivityInBackground
 
-    /**
-     * Broadcast to show taken down files info
-     */
-    private val takenDownFilesReceiver: BroadcastReceiver = object : BroadcastReceiver() {
-        override fun onReceive(context: Context?, intent: Intent?) {
-            if (intent == null) return
-            Timber.d("BROADCAST INFORM THERE ARE TAKEN DOWN FILES IMPLIED IN ACTION")
-            val numberFiles = intent.getIntExtra(BroadcastConstants.NUMBER_FILES, 1)
-            Util.showSnackbar(
-                this@BaseActivity,
-                resources.getQuantityString(
-                    R.plurals.alert_taken_down_files,
-                    numberFiles,
-                    numberFiles
-                )
-            )
-        }
-    }
-
     private val onBackPressedCallback = object : OnBackPressedCallback(true) {
         override fun handleOnBackPressed() {
             handleGoBack()
@@ -312,11 +293,6 @@ abstract class BaseActivity : AppCompatActivity(), ActivityLauncher, PermissionR
                 retryConnectionsAndSignalPresence()
             }
         }
-
-        registerReceiver(
-            takenDownFilesReceiver,
-            IntentFilter(BroadcastConstants.BROADCAST_ACTION_INTENT_TAKEN_DOWN_FILES)
-        )
 
         collectFlow(monitorCookieSettingsSavedUseCase()) {
             val view = window.decorView.findViewById<View>(android.R.id.content)
@@ -422,7 +398,6 @@ abstract class BaseActivity : AppCompatActivity(), ActivityLauncher, PermissionR
 
 
     override fun onDestroy() {
-        unregisterReceiver(takenDownFilesReceiver)
         dismissAlertDialogIfExists(transferGeneralOverQuotaWarning)
         dismissAlertDialogIfExists(transferGeneralOverQuotaWarning)
         dismissAlertDialogIfExists(setDownloadLocationDialog)
