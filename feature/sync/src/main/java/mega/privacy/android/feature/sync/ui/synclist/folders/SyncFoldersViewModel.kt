@@ -20,6 +20,7 @@ import mega.privacy.android.data.mapper.backup.BackupInfoTypeIntMapper
 import mega.privacy.android.domain.entity.backup.Backup
 import mega.privacy.android.domain.entity.backup.BackupInfoType
 import mega.privacy.android.domain.entity.camerauploads.CameraUploadsStatusInfo
+import mega.privacy.android.domain.entity.node.NodeId
 import mega.privacy.android.domain.entity.node.TypedFolderNode
 import mega.privacy.android.domain.usecase.GetFolderTreeInfo
 import mega.privacy.android.domain.usecase.GetNodeByIdUseCase
@@ -230,6 +231,7 @@ internal class SyncFoldersViewModel @Inject constructor(
     ): SyncUiItem? {
         var localPath = ""
         var megaStoragePath = ""
+        var megaStorageNodeId = NodeId(-1L)
         var numOfFiles = 0
         var numOfFolders = 0
         var totalSizeInBytes = 0L
@@ -249,6 +251,7 @@ internal class SyncFoldersViewModel @Inject constructor(
                         BackupInfoType.MEDIA_UPLOADS -> getSecondaryFolderPathUseCase()
                         else -> backup.localFolder
                     }
+                    megaStorageNodeId = folder.id
                     megaStoragePath = getNodePathByIdUseCase(folder.id)
                     creationTime = folder.creationTime
                     runCatching {
@@ -276,6 +279,7 @@ internal class SyncFoldersViewModel @Inject constructor(
                 creationTime = creationTime,
                 deviceStoragePath = localPath,
                 megaStoragePath = megaStoragePath,
+                megaStorageNodeId = megaStorageNodeId
             )
         }
         return null
