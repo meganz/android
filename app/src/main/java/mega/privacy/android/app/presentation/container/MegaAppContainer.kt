@@ -1,9 +1,11 @@
 package mega.privacy.android.app.presentation.container
 
 import androidx.compose.runtime.Composable
+import mega.android.core.ui.theme.AndroidTheme
 import mega.privacy.android.app.components.session.SessionContainer
 import mega.privacy.android.app.presentation.extensions.isDarkMode
 import mega.privacy.android.app.presentation.passcode.model.PasscodeCryptObjectFactory
+import mega.privacy.android.app.presentation.psa.MegaPsaContainer
 import mega.privacy.android.app.presentation.psa.PsaContainer
 import mega.privacy.android.app.presentation.security.check.PasscodeContainer
 import mega.privacy.android.domain.entity.ThemeMode
@@ -35,6 +37,39 @@ internal fun MegaAppContainer(
             )
         },
         { OriginalTheme(isDark = themeMode.isDarkMode(), content = it) },
+        { SessionContainer(content = it) },
+    )
+
+    AppContainer(
+        containers = containers,
+        content = content
+    )
+}
+
+/**
+ * Shared app container
+ * Implements the same functionality as [MegaAppContainer] using the updated ui components and theme
+ *
+ * @param themeMode
+ * @param passcodeCryptObjectFactory
+ * @param content
+ *
+ */
+@Composable
+internal fun SharedAppContainer(
+    themeMode: ThemeMode,
+    passcodeCryptObjectFactory: PasscodeCryptObjectFactory,
+    content: @Composable () -> Unit,
+) {
+    val containers: List<@Composable (@Composable () -> Unit) -> Unit> = listOf(
+        { MegaPsaContainer(content = it) },
+        {
+            PasscodeContainer(
+                passcodeCryptObjectFactory = passcodeCryptObjectFactory,
+                content = it
+            )
+        },
+        { AndroidTheme(isDark = themeMode.isDarkMode(), content = it) },
         { SessionContainer(content = it) },
     )
 
