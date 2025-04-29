@@ -1072,6 +1072,9 @@ internal class FileFacade @Inject constructor(
         return FileStorageType.Unknown
     }
 
+    override suspend fun doesUriPathExist(uriPath: UriPath): Boolean =
+        getDocumentFileFromUri(uriPath.toUri())?.exists() == true
+
     private companion object {
         const val DOWNLOAD_DIR = "MEGA Downloads"
         const val PHOTO_DIR = "MEGA Photos"

@@ -799,6 +799,23 @@ internal class FileFacadeTest {
             assertThat(result).isEqualTo(FileStorageType.Unknown)
         }
 
+    @ParameterizedTest
+    @ValueSource(booleans = [true, false])
+    fun `test that doesUriPathExist returns value from document file`(expected: Boolean) = runTest {
+        mockStatic(Uri::class.java).use {
+            val documentFile = mock<DocumentFile> {
+                on { this.exists() } doReturn expected
+            }
+            val uri = stubGetDocumentFileFromUri(documentFile)
+            val uriPath = UriPath("content://foo")
+            whenever(Uri.parse(uriPath.value)) doReturn uri
+
+            val actual = underTest.doesUriPathExist(uriPath)
+
+            assertThat(actual).isEqualTo(expected)
+        }
+    }
+
 
     private fun stubGetDocumentFileFromUri(documentFile: DocumentFile): Uri {
         val uri = mock<Uri> {

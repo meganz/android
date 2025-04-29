@@ -560,4 +560,12 @@ interface FileGateway {
      * Returns device model or SD Card based on file location
      */
     suspend fun getFileStorageTypeName(path: String?): FileStorageType
+
+    /**
+     * Checks if an uri path exists
+     *
+     * @param uriPath the [UriPath] to check
+     * @return true if the UriPath exists, false otherwise
+     */
+    suspend fun doesUriPathExist(uriPath: UriPath): Boolean
 }

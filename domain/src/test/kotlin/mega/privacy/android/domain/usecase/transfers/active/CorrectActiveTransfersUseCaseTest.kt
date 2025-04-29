@@ -10,6 +10,8 @@ import mega.privacy.android.domain.entity.transfer.TransferAppData
 import mega.privacy.android.domain.entity.transfer.TransferType
 import mega.privacy.android.domain.entity.transfer.pending.PendingTransfer
 import mega.privacy.android.domain.entity.transfer.pending.PendingTransferState
+import mega.privacy.android.domain.entity.uri.UriPath
+import mega.privacy.android.domain.repository.FileSystemRepository
 import mega.privacy.android.domain.repository.TransferRepository
 import mega.privacy.android.domain.usecase.transfers.GetInProgressTransfersUseCase
 import mega.privacy.android.domain.usecase.transfers.pending.UpdatePendingTransferStateUseCase
@@ -31,6 +33,7 @@ import org.mockito.kotlin.never
 import org.mockito.kotlin.reset
 import org.mockito.kotlin.verify
 import org.mockito.kotlin.verifyNoInteractions
+import org.mockito.kotlin.verifyNoMoreInteractions
 import org.mockito.kotlin.whenever
 
 @ExperimentalCoroutinesApi
@@ -43,6 +46,7 @@ internal class CorrectActiveTransfersUseCaseTest {
     private val updatePendingTransferStateUseCase = mock<UpdatePendingTransferStateUseCase>()
     private val handleNotInProgressSDCardActiveTransfersUseCase =
         mock<HandleNotInProgressSDCardActiveTransfersUseCase>()
+    private val fileSystemRepository = mock<FileSystemRepository>()
 
     private val mockedActiveTransfers = (0L..10L).map { mock<ActiveTransfer>() }
     private val mockedTransfers = (0L..10L).map { mock<Transfer>() }
@@ -54,6 +58,7 @@ internal class CorrectActiveTransfersUseCaseTest {
             transferRepository = transferRepository,
             updatePendingTransferStateUseCase = updatePendingTransferStateUseCase,
             handleNotInProgressSDCardActiveTransfersUseCase = handleNotInProgressSDCardActiveTransfersUseCase,
+            fileSystemRepository = fileSystemRepository,
         )
     }
 
@@ -63,6 +68,7 @@ internal class CorrectActiveTransfersUseCaseTest {
             transferRepository,
             getInProgressTransfersUseCase,
             updatePendingTransferStateUseCase,
+            fileSystemRepository,
             *mockedActiveTransfers.toTypedArray(),
             *mockedTransfers.toTypedArray(),
         )
@@ -86,6 +92,7 @@ internal class CorrectActiveTransfersUseCaseTest {
         mockedActiveTransfers.forEachIndexed { index, activeTransfer ->
             whenever(activeTransfer.uniqueId).thenReturn(index.toLong())
             whenever(activeTransfer.isFinished).thenReturn(areFinished)
+            whenever(activeTransfer.localPath).thenReturn("path$index")
             if (isSdCardDownload) {
                 val data = mock<TransferAppData.SdCardDownload>()
                 whenever(activeTransfer.appData).thenReturn(listOf(data))
@@ -107,7 +114,7 @@ internal class CorrectActiveTransfersUseCaseTest {
     private fun subSetActiveTransfers() = mockedActiveTransfers.filter { it.uniqueId.mod(3) == 0 }
 
     @Test
-    fun `test that active transfers not finished and not in progress are set as cancelled`() =
+    fun `test that active transfers not finished and not in progress are set as finished when uri path does exist`() =
         runTest {
             stubActiveTransfers(false)
             stubTransfers()
@@ -115,11 +122,41 @@ internal class CorrectActiveTransfersUseCaseTest {
                 .thenReturn(mockedActiveTransfers)
             val inProgress = subSetTransfers()
             whenever(getInProgressTransfersUseCase()).thenReturn(inProgress)
-            val expected =
-                mockedActiveTransfers.map { it.uniqueId } - inProgress.map { it.uniqueId }.toSet()
+            val expected = mockedActiveTransfers.filter { activeTransfer ->
+                inProgress.map { it.uniqueId }.contains(activeTransfer.uniqueId).not()
+            }
+            expected.forEach {
+                whenever(fileSystemRepository.doesUriPathExist(UriPath(it.localPath))) doReturn true
+            }
             Truth.assertThat(expected).isNotEmpty()
             underTest(TransferType.GENERAL_UPLOAD)
-            verify(transferRepository).setActiveTransfersAsFinishedByUniqueId(expected, true)
+            verify(transferRepository).setActiveTransfersAsFinishedByUniqueId(
+                expected.map { it.uniqueId },
+                false
+            )
+        }
+
+    @Test
+    fun `test that active transfers not finished and not in progress are set as cancelled when uri path does not exist`() =
+        runTest {
+            stubActiveTransfers(false)
+            stubTransfers()
+            whenever(transferRepository.getCurrentActiveTransfersByType(any()))
+                .thenReturn(mockedActiveTransfers)
+            val inProgress = subSetTransfers()
+            whenever(getInProgressTransfersUseCase()).thenReturn(inProgress)
+            val expected = mockedActiveTransfers.filter { activeTransfer ->
+                inProgress.map { it.uniqueId }.contains(activeTransfer.uniqueId).not()
+            }
+            expected.forEach {
+                whenever(fileSystemRepository.doesUriPathExist(UriPath(it.localPath))) doReturn false
+            }
+            Truth.assertThat(expected).isNotEmpty()
+            underTest(TransferType.GENERAL_UPLOAD)
+            verify(transferRepository).setActiveTransfersAsFinishedByUniqueId(
+                expected.map { it.uniqueId },
+                true
+            )
         }
 
     @Test
@@ -183,6 +220,9 @@ internal class CorrectActiveTransfersUseCaseTest {
             whenever(getInProgressTransfersUseCase()).thenReturn(inProgress)
             val expected = mockedActiveTransfers.filter { transfer ->
                 !inProgress.map { it.uniqueId }.contains(transfer.uniqueId)
+            }
+            expected.forEach {
+                whenever(fileSystemRepository.doesUriPathExist(UriPath(it.localPath))) doReturn true
             }
             Truth.assertThat(expected).isNotEmpty()
             underTest(TransferType.GENERAL_UPLOAD)

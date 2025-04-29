@@ -193,7 +193,7 @@ interface FileSystemRepository {
     /**
      * Get GPS coordinates from video file
      *
-     * @param filePath
+     * @param uriPath
      *
      * @return a pair with latitude and longitude coordinates
      */
@@ -202,7 +202,7 @@ interface FileSystemRepository {
     /**
      * Get GPS coordinates from photo file
      *
-     * @param filePath
+     * @param uriPath
      *
      * @return a pair with latitude and longitude coordinates
      */
@@ -308,7 +308,7 @@ interface FileSystemRepository {
     suspend fun isFolderPath(path: String): Boolean
 
     /**
-     * @return true if the [uriString] represents a folder content uri (`content://com.android.externalstorage.documents/tree/...`)
+     * @return true if the [uri] represents a folder content uri (`content://com.android.externalstorage.documents/tree/...`)
      */
     suspend fun isFolderContentUri(uri: String): Boolean
 
@@ -541,4 +541,12 @@ interface FileSystemRepository {
      * Returns device model or SD Card based on file location
      */
     suspend fun getFileStorageTypeName(path: String?): FileStorageType
+
+    /**
+     * Checks if an uri path exists
+     *
+     * @param uriPath the [UriPath] to check
+     * @return true if the UriPath exists, false otherwise
+     */
+    suspend fun doesUriPathExist(uriPath: UriPath): Boolean
 }

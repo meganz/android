@@ -512,4 +512,8 @@ internal class FileSystemRepositoryImpl @Inject constructor(
     override suspend fun getFileStorageTypeName(path: String?) = withContext(ioDispatcher) {
         fileGateway.getFileStorageTypeName(path)
     }
+
+    override suspend fun doesUriPathExist(uriPath: UriPath) = withContext(ioDispatcher) {
+        fileGateway.doesUriPathExist(uriPath)
+    }
 }

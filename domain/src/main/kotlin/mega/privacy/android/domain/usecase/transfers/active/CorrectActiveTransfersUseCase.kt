@@ -7,6 +7,8 @@ import mega.privacy.android.domain.entity.transfer.isPreviewDownload
 import mega.privacy.android.domain.entity.transfer.isSDCardDownload
 import mega.privacy.android.domain.entity.transfer.isVoiceClip
 import mega.privacy.android.domain.entity.transfer.pending.PendingTransferState
+import mega.privacy.android.domain.entity.uri.UriPath
+import mega.privacy.android.domain.repository.FileSystemRepository
 import mega.privacy.android.domain.repository.TransferRepository
 import mega.privacy.android.domain.usecase.transfers.GetInProgressTransfersUseCase
 import mega.privacy.android.domain.usecase.transfers.pending.UpdatePendingTransferStateUseCase
@@ -23,6 +25,7 @@ class CorrectActiveTransfersUseCase @Inject constructor(
     private val transferRepository: TransferRepository,
     private val updatePendingTransferStateUseCase: UpdatePendingTransferStateUseCase,
     private val handleNotInProgressSDCardActiveTransfersUseCase: HandleNotInProgressSDCardActiveTransfersUseCase,
+    private val fileSystemRepository: FileSystemRepository,
 ) {
     /**
      * Invoke.
@@ -50,17 +53,22 @@ class CorrectActiveTransfersUseCase @Inject constructor(
                 !activeTransfer.isFinished && activeTransfer.isSDCardDownload().not()
                         && activeTransfer.uniqueId !in inProgressTransfers.map { it.uniqueId }
             }
-            .map {
-                it.uniqueId
-            }
+
         if (notInProgressNoSDCardActiveTransfersUniqueIds.isNotEmpty()) {
-            //we are not sure if they have been cancelled or not, but at this point it has more sense to don't show the completed status in transfer widget, so it's better to just finish it as cancelled
+            //Set not in progress as finished. We are not sure if they have been cancelled or failed, we check the existence of the file to set it as cancelled as best effort approach
             transferRepository.apply {
-                setActiveTransfersAsFinishedByUniqueId(
-                    uniqueIds = notInProgressNoSDCardActiveTransfersUniqueIds,
-                    cancelled = true
+                val (fileExists, fileNotExists) = notInProgressNoSDCardActiveTransfersUniqueIds.partition {
+                    fileSystemRepository.doesUriPathExist(UriPath(it.localPath))
+                }
+                fileExists.map { it.uniqueId }.takeIf { it.isNotEmpty() }?.let {
+                    setActiveTransfersAsFinishedByUniqueId(it, cancelled = false)
+                }
+                fileNotExists.map { it.uniqueId }.takeIf { it.isNotEmpty() }?.let {
+                    setActiveTransfersAsFinishedByUniqueId(it, cancelled = true)
+                }
+                removeInProgressTransfers(
+                    notInProgressNoSDCardActiveTransfersUniqueIds.map { it.uniqueId }.toSet()
                 )
-                removeInProgressTransfers(notInProgressNoSDCardActiveTransfersUniqueIds.toSet())
             }
         }
 

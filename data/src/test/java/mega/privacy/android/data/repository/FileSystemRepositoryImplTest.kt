@@ -608,4 +608,15 @@ internal class FileSystemRepositoryImplTest {
 
         assertThat(underTest.isFolderPath(path)).isEqualTo(expected)
     }
+
+    @ParameterizedTest
+    @ValueSource(booleans = [true, false])
+    fun `test that uriPathExists`(
+        expected: Boolean,
+    ) = runTest {
+        val uriPath = UriPath("foo")
+        whenever(fileGateway.doesUriPathExist(uriPath)) doReturn expected
+
+        assertThat(underTest.doesUriPathExist(uriPath)).isEqualTo(expected)
+    }
 }
