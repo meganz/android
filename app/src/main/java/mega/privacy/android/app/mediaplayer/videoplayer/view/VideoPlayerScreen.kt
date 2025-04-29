@@ -322,6 +322,8 @@ internal fun VideoPlayerScreen(
                                             bitmap.recycle()
                                         }
                                     }
+                                }.also {
+                                    playerComposeView.tag = it
                                 }
 
                                 playerComposeView.setControllerVisibilityListener(
@@ -355,6 +357,12 @@ internal fun VideoPlayerScreen(
                                 }
                             }
                     },
+                    onRelease = {
+                        (playerComposeView.tag as? VideoPlayerController)?.release()
+                        if (uiState.isVideoOptionPopupShown) {
+                            viewModel.updateIsVideoOptionPopupShown(false)
+                        }
+                    }
                 ) {
                     val controllerView = root.findViewById<View>(R.id.controls_view)
                     playerComposeView.keepScreenOn =

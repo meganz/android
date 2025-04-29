@@ -89,7 +89,7 @@ class VideoPlayerController(
     private var translationY = 0f
 
     private var isSpeedPopupShown = mutableStateOf(uiState.isSpeedPopupShown)
-    private var isVideoOptionPopupShown = mutableStateOf(uiState.isVideoOptionPopupShown)
+    private var isVideoOptionPopupShown = mutableStateOf(false)
     private var currentSpeedPlayback = mutableStateOf(uiState.currentSpeedPlayback)
     private var isFullscreen = mutableStateOf(uiState.isFullscreen)
 
@@ -366,7 +366,7 @@ class VideoPlayerController(
 
     @OptIn(UnstableApi::class)
     private fun updateTransformations() {
-        (playerComposeView?.videoSurfaceView as? TextureView)?.let { textureView ->
+        (playerComposeView.videoSurfaceView as? TextureView)?.let { textureView ->
             val matrix = Matrix()
             matrix.postScale(zoomLevel, zoomLevel, textureView.width / 2f, textureView.height / 2f)
             matrix.postTranslate(translationX, translationY)
@@ -380,7 +380,7 @@ class VideoPlayerController(
 
     @OptIn(UnstableApi::class)
     private fun enforceBoundaries() {
-        playerComposeView?.videoSurfaceView?.let { textureView ->
+        playerComposeView.videoSurfaceView?.let { textureView ->
             val maxTranslationX = (zoomLevel - 1) * textureView.width / 2
             val maxTranslationY = (zoomLevel - 1) * textureView.height / 2
 
@@ -405,4 +405,27 @@ class VideoPlayerController(
                 R.drawable.ic_subtitles_enable
             }
         )
+
+    internal fun release() {
+        screenshotButton?.setOnClickListener(null)
+        repeatToggleButton?.setOnClickListener(null)
+        moreOptionButton?.setOnClickListener(null)
+        fullscreenButton?.setOnClickListener(null)
+        lockButton?.setOnClickListener(null)
+        unlockButton?.setOnClickListener(null)
+        playQueueButton?.setOnClickListener(null)
+        subtitleButton?.setOnClickListener(null)
+        speedPlaybackButton?.setOnClickListener(null)
+
+        playerComposeView?.setOnTouchListener(null)
+
+        videoOptionPopup.disposeComposition()
+        speedPlaybackPopup.disposeComposition()
+
+        scaleGestureDetector = null
+        gestureDetector = null
+
+        isSpeedPopupShown.value = false
+        isVideoOptionPopupShown.value = false
+    }
 }
