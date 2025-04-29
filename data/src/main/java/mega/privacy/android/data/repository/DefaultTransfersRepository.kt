@@ -621,10 +621,12 @@ internal class DefaultTransfersRepository @Inject constructor(
             }
         }
 
-    override suspend fun setActiveTransferAsCancelledByUniqueId(uniqueIds: List<Long>) =
-        withContext(ioDispatcher) {
-            megaLocalRoomGateway.setActiveTransferAsCancelledByTag(uniqueIds)
-        }
+    override suspend fun setActiveTransfersAsFinishedByUniqueId(
+        uniqueIds: List<Long>,
+        cancelled: Boolean,
+    ) = withContext(ioDispatcher) {
+        megaLocalRoomGateway.setActiveTransfersAsFinishedByUniqueId(uniqueIds, cancelled)
+    }
 
     override fun getActiveTransferTotalsByType(transferType: TransferType): Flow<ActiveTransferTotals> =
         flow {

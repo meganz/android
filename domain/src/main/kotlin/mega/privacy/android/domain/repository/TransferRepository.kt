@@ -380,9 +380,11 @@ interface TransferRepository {
     suspend fun deleteAllActiveTransfers()
 
     /**
-     * Set an active transfer as finished cancelled by its uniqueId
+     * Set an active transfer as finished by its uniqueId
+     * @param uniqueIds the unique ids of the active transfers to be set as finished
+     * @param cancelled whether the transfer was cancelled or not
      */
-    suspend fun setActiveTransferAsCancelledByUniqueId(uniqueIds: List<Long>)
+    suspend fun setActiveTransfersAsFinishedByUniqueId(uniqueIds: List<Long>, cancelled: Boolean)
 
     /**
      * Get active transfer totals by type

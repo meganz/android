@@ -279,8 +279,10 @@ internal class MegaLocalRoomFacade @Inject constructor(
     override suspend fun deleteAllActiveTransfers() =
         activeTransferDao.get().deleteAllActiveTransfers()
 
-    override suspend fun setActiveTransferAsCancelledByTag(uniqueIds: List<Long>) =
-        activeTransferDao.get().setActiveTransferAsCancelledByUniqueId(uniqueIds)
+    override suspend fun setActiveTransfersAsFinishedByUniqueId(
+        uniqueIds: List<Long>,
+        cancelled: Boolean,
+    ) = activeTransferDao.get().setActiveTransfersAsFinishedByUniqueId(uniqueIds, cancelled)
 
     override suspend fun insertActiveTransferGroup(activeTransferActionGroup: ActiveTransferActionGroup) =
         activeTransferGroupDao.get()

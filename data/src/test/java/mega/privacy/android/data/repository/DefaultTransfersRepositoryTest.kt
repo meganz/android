@@ -1232,12 +1232,15 @@ class DefaultTransfersRepositoryTest {
                 verify(megaLocalRoomGateway).deleteAllActiveTransfers()
             }
 
-        @Test
+        @ParameterizedTest
+        @ValueSource(booleans = [true, false])
         fun `test that setActiveTransferAsFinishedByTag gateway is called when setActiveTransferAsFinishedByTag is called`(
+            cancelled: Boolean,
         ) = runTest {
             val uniqueIds = mock<List<Long>>()
-            underTest.setActiveTransferAsCancelledByUniqueId(uniqueIds)
-            verify(megaLocalRoomGateway).setActiveTransferAsCancelledByTag(uniqueIds)
+            underTest.setActiveTransfersAsFinishedByUniqueId(uniqueIds, cancelled)
+            verify(megaLocalRoomGateway)
+                .setActiveTransfersAsFinishedByUniqueId(uniqueIds, cancelled)
         }
 
         @ParameterizedTest

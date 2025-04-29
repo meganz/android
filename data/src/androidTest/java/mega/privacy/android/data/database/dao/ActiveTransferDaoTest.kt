@@ -171,14 +171,37 @@ class ActiveTransferDaoTest {
     }
 
     @Test
-    fun test_that_setActiveTransferAsCancelledByTag_set_as_finished_and_cancelled_all_transfers_with_given_tags() =
+    fun test_that_setActiveTransfersAsFinishedByUniqueId_set_as_finished_transfers_with_given_tags() =
         runTest {
             TransferType.entries.forEach { type ->
                 val initial = activeTransferDao.getCurrentActiveTransfersByType(type)
                 val toFinish = initial.take(initial.size / 2).filter { !it.isFinished }
                 assertThat(initial).isNotEmpty()
                 assertThat(toFinish).isNotEmpty()
-                activeTransferDao.setActiveTransferAsCancelledByUniqueId(toFinish.map { it.uniqueId })
+                activeTransferDao.setActiveTransfersAsFinishedByUniqueId(
+                    uniqueIds = toFinish.map { it.uniqueId },
+                    cancelled = false
+                )
+                val actual = activeTransferDao.getCurrentActiveTransfersByType(type)
+                toFinish.forEach { finished ->
+                    assertThat(actual.first { it.tag == finished.tag }.isFinished).isTrue()
+                    assertThat(actual.first { it.tag == finished.tag }.isCancelled).isFalse()
+                }
+            }
+        }
+
+    @Test
+    fun test_that_setActiveTransfersAsFinishedByUniqueId_set_as_finished_and_cancelled_all_transfers_with_given_tags() =
+        runTest {
+            TransferType.entries.forEach { type ->
+                val initial = activeTransferDao.getCurrentActiveTransfersByType(type)
+                val toFinish = initial.take(initial.size / 2).filter { !it.isFinished }
+                assertThat(initial).isNotEmpty()
+                assertThat(toFinish).isNotEmpty()
+                activeTransferDao.setActiveTransfersAsFinishedByUniqueId(
+                    uniqueIds = toFinish.map { it.uniqueId },
+                    cancelled = true
+                )
                 val actual = activeTransferDao.getCurrentActiveTransfersByType(type)
                 toFinish.forEach { finished ->
                     assertThat(actual.first { it.tag == finished.tag }.isFinished).isTrue()

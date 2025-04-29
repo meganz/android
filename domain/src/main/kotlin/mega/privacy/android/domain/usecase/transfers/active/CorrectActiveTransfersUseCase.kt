@@ -56,7 +56,10 @@ class CorrectActiveTransfersUseCase @Inject constructor(
         if (notInProgressNoSDCardActiveTransfersUniqueIds.isNotEmpty()) {
             //we are not sure if they have been cancelled or not, but at this point it has more sense to don't show the completed status in transfer widget, so it's better to just finish it as cancelled
             transferRepository.apply {
-                setActiveTransferAsCancelledByUniqueId(notInProgressNoSDCardActiveTransfersUniqueIds)
+                setActiveTransfersAsFinishedByUniqueId(
+                    uniqueIds = notInProgressNoSDCardActiveTransfersUniqueIds,
+                    cancelled = true
+                )
                 removeInProgressTransfers(notInProgressNoSDCardActiveTransfersUniqueIds.toSet())
             }
         }

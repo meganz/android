@@ -119,7 +119,7 @@ internal class CorrectActiveTransfersUseCaseTest {
                 mockedActiveTransfers.map { it.uniqueId } - inProgress.map { it.uniqueId }.toSet()
             Truth.assertThat(expected).isNotEmpty()
             underTest(TransferType.GENERAL_UPLOAD)
-            verify(transferRepository).setActiveTransferAsCancelledByUniqueId(expected)
+            verify(transferRepository).setActiveTransfersAsFinishedByUniqueId(expected, true)
         }
 
     @Test
@@ -150,7 +150,10 @@ internal class CorrectActiveTransfersUseCaseTest {
                 .thenReturn(mockedActiveTransfers)
             whenever(getInProgressTransfersUseCase()).thenReturn(inProgress)
             underTest(TransferType.GENERAL_UPLOAD)
-            verify(transferRepository, never()).setActiveTransferAsCancelledByUniqueId(anyOrNull())
+            verify(transferRepository, never()).setActiveTransfersAsFinishedByUniqueId(
+                uniqueIds = anyOrNull(),
+                cancelled = eq(true)
+            )
         }
 
     @Test

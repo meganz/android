@@ -245,9 +245,11 @@ interface MegaLocalRoomGateway {
     suspend fun deleteAllActiveTransfers()
 
     /**
-     * Set an active transfer as finished cancelled by its uniqueId
+     * Set an active transfer as finished by its uniqueId
+     * @param uniqueIds the unique ids of the active transfers to be set as finished
+     * @param cancelled whether the transfer was cancelled or not
      */
-    suspend fun setActiveTransferAsCancelledByTag(uniqueIds: List<Long>)
+    suspend fun setActiveTransfersAsFinishedByUniqueId(uniqueIds: List<Long>, cancelled: Boolean)
 
     /**
      * Insert a new active transfer group and returns it's id

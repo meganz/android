@@ -80,6 +80,6 @@ internal interface ActiveTransferDao {
     @Query("DELETE FROM active_transfers")
     suspend fun deleteAllActiveTransfers()
 
-    @Query("UPDATE active_transfers SET is_finished = 1, is_cancelled = 1 WHERE uniqueId IN (:uniqueIds)")
-    suspend fun setActiveTransferAsCancelledByUniqueId(uniqueIds: List<Long>)
+    @Query("UPDATE active_transfers SET is_finished = 1, is_cancelled = :cancelled WHERE uniqueId IN (:uniqueIds)")
+    suspend fun setActiveTransfersAsFinishedByUniqueId(uniqueIds: List<Long>, cancelled: Boolean)
 }
