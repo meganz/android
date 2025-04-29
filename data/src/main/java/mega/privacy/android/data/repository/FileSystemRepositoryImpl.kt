@@ -267,7 +267,7 @@ internal class FileSystemRepositoryImpl @Inject constructor(
         subFolders: List<String>,
     ) = withContext(ioDispatcher) {
         val sourceDocument = documentFileWrapper.fromFile(file)
-        val sdCardUri = Uri.parse(destinationUri)
+        val sdCardUri = destinationUri.toUri()
 
         val destDocument = moveSdDocumentMutex.withLock {
             documentFileWrapper.getSdDocumentFile(
@@ -304,7 +304,7 @@ internal class FileSystemRepositoryImpl @Inject constructor(
         directory: File,
         destinationUri: String,
     ): Boolean = withContext(ioDispatcher) {
-        val directorySdCardStringUri = Uri.parse(destinationUri)?.let { sdCardUri ->
+        val directorySdCardStringUri = destinationUri.toUri().let { sdCardUri ->
             moveSdDocumentMutex.withLock {
                 documentFileWrapper.fromUri(sdCardUri)?.let {
                     it.findFile(directory.name) ?: it.createDirectory(directory.name)
@@ -414,7 +414,7 @@ internal class FileSystemRepositoryImpl @Inject constructor(
         }
 
     override suspend fun deleteFileByUri(uri: String): Boolean = withContext(ioDispatcher) {
-        fileGateway.deleteFileByUri(Uri.parse(uri))
+        fileGateway.deleteFileByUri(uri.toUri())
     }
 
     override suspend fun getFilesInDocumentFolder(uri: UriPath): DocumentFolder =
@@ -466,14 +466,14 @@ internal class FileSystemRepositoryImpl @Inject constructor(
 
     override suspend fun getDocumentEntities(uris: List<UriPath>): List<DocumentEntity> =
         withContext(ioDispatcher) {
-            fileGateway.getDocumentEntities(uris.map { Uri.parse(it.value) })
+            fileGateway.getDocumentEntities(uris.map { it.value.toUri() })
         }
 
     override suspend fun getDocumentEntity(uri: UriPath): DocumentEntity? =
         getDocumentEntities(listOf(uri)).firstOrNull()
 
     override suspend fun getFileFromUri(uri: UriPath): File? = withContext(ioDispatcher) {
-        fileGateway.getFileFromUri(Uri.parse(uri.value))?.also {
+        fileGateway.getFileFromUri(uri.value.toUri())?.also {
             Timber.d("getFileFromUri uri: $uri, file path: $it")
         }
     }
@@ -494,12 +494,12 @@ internal class FileSystemRepositoryImpl @Inject constructor(
 
     override suspend fun getFileLengthFromSdCardContentUri(
         fileContentUri: String,
-    ) = Uri.parse(fileContentUri)?.let { uri ->
+    ) = fileContentUri.toUri()?.let { uri ->
         documentFileWrapper.fromSingleUri(uri)?.length() ?: 0L
     } ?: 0L
 
     override suspend fun deleteFileFromSdCardContentUri(fileContentUri: String) =
-        Uri.parse(fileContentUri)?.let { uri ->
+        fileContentUri.toUri()?.let { uri ->
             documentFileWrapper.fromSingleUri(uri)?.delete() ?: false
         } ?: false
 

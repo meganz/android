@@ -6,7 +6,6 @@ import android.content.ContentValues
 import android.content.Context
 import android.content.Intent
 import android.database.Cursor
-import android.graphics.Bitmap
 import android.graphics.Bitmap.CompressFormat
 import android.media.MediaScannerConnection
 import android.net.Uri
@@ -30,6 +29,7 @@ import android.webkit.MimeTypeMap
 import androidx.annotation.RequiresApi
 import androidx.annotation.RequiresPermission
 import androidx.core.content.FileProvider
+import androidx.core.graphics.scale
 import androidx.core.net.toFile
 import androidx.core.net.toUri
 import androidx.documentfile.provider.DocumentFile
@@ -583,7 +583,7 @@ internal class FileFacade @Inject constructor(
                         "Math.sqrt(DOWNSCALE_IMAGES_PX/totalPixels): ${sqrt(division)}"
             )
             val scaleBitmap =
-                Bitmap.createScaledBitmap(fileBitmap, width, height, true)
+                fileBitmap.scale(width, height)
 
             val fOut: FileOutputStream
             try {

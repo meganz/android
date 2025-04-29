@@ -2,6 +2,8 @@ package mega.privacy.android.data.repository.files
 
 import android.content.Context
 import android.graphics.Bitmap
+import androidx.core.graphics.createBitmap
+import androidx.core.graphics.scale
 import com.shockwave.pdfium.PdfiumCore
 import dagger.hilt.android.qualifiers.ApplicationContext
 import kotlinx.coroutines.CoroutineDispatcher
@@ -61,15 +63,15 @@ class PdfRepositoryImpl @Inject constructor(
             pdfiumCore.openPage(pdfDocument, pageNumber)
             val width = pdfiumCore.getPageWidthPoint(pdfDocument, pageNumber)
             val height = pdfiumCore.getPageHeightPoint(pdfDocument, pageNumber)
-            val bitmap = Bitmap.createBitmap(width, height, Bitmap.Config.ARGB_8888)
+            val bitmap = createBitmap(width, height)
             pdfiumCore.renderPageBitmap(pdfDocument, bitmap, pageNumber, 0, 0, width, height)
             val resizedBitmap = if (isPreview) {
                 val resize = if (width > height) 1000f / width else 1000f / height
                 val resizeWidth = (width * resize).toInt()
                 val resizeHeight = (height * resize).toInt()
-                Bitmap.createScaledBitmap(bitmap, resizeWidth, resizeHeight, false)
+                bitmap.scale(resizeWidth, resizeHeight, false)
             } else {
-                Bitmap.createScaledBitmap(bitmap, 200, 200, false)
+                bitmap.scale(200, 200, false)
             }
             val result = resizedBitmap.compress(Bitmap.CompressFormat.JPEG, 100, out)
 

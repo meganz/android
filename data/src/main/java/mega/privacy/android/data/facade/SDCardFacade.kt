@@ -7,6 +7,7 @@ import mega.privacy.android.data.gateway.SDCardGateway
 import mega.privacy.android.data.wrapper.DocumentFileWrapper
 import java.io.File
 import javax.inject.Inject
+import androidx.core.net.toUri
 
 /**
  * Default implementation of [SDCardGateway]
@@ -18,10 +19,10 @@ class SDCardFacade @Inject constructor(
     private val documentFileWrapper: DocumentFileWrapper,
 ) : SDCardGateway {
     override suspend fun getDirectoryFile(uriString: String) =
-        documentFileWrapper.fromTreeUri(Uri.parse(uriString))
+        documentFileWrapper.fromTreeUri(uriString.toUri())
 
     override suspend fun getDirectoryName(localPath: String): String {
-        val uri = Uri.parse(localPath)
+        val uri = localPath.toUri()
         val documentFile = documentFileWrapper.fromTreeUri(uri)
         return documentFile?.let {
             if (it.canWrite()) it.name else ""
@@ -56,7 +57,7 @@ class SDCardFacade @Inject constructor(
     }
 
     override suspend fun isSDCardUri(uriString: String) =
-        Uri.parse(uriString).let { uri ->
+        uriString.toUri().let { uri ->
             runCatching {
                 documentFileWrapper.fromTreeUri(uri)
             }.getOrNull()?.let { documentFile ->

@@ -1,6 +1,7 @@
 package mega.privacy.android.data.repository
 
 import android.content.Context
+import androidx.core.content.edit
 import dagger.hilt.android.qualifiers.ApplicationContext
 import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.suspendCancellableCoroutine
@@ -68,9 +69,9 @@ internal class DefaultPushesRepository @Inject constructor(
 
     override fun setPushToken(newToken: String) {
         context.getSharedPreferences(PUSH_TOKEN, Context.MODE_PRIVATE)
-            .edit()
-            .putString(NEW_TOKEN, newToken)
-            .apply()
+            .edit {
+                putString(NEW_TOKEN, newToken)
+            }
     }
 
     override suspend fun pushReceived(beep: Boolean) =
@@ -91,8 +92,9 @@ internal class DefaultPushesRepository @Inject constructor(
         }
 
     override suspend fun clearPushToken() = withContext(ioDispatcher) {
-        context.getSharedPreferences(PUSH_TOKEN, Context.MODE_PRIVATE).edit()
-            .clear().apply()
+        context.getSharedPreferences(PUSH_TOKEN, Context.MODE_PRIVATE).edit {
+            clear()
+        }
     }
 
     override suspend fun broadcastPushNotificationSettings() = withContext(ioDispatcher) {

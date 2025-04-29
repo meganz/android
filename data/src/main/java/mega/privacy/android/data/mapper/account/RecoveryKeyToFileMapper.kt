@@ -5,6 +5,7 @@ import android.graphics.Bitmap
 import android.graphics.Canvas
 import android.graphics.Color
 import android.graphics.Paint
+import androidx.core.graphics.createBitmap
 import dagger.hilt.android.qualifiers.ApplicationContext
 import java.io.File
 import java.io.FileOutputStream
@@ -21,7 +22,7 @@ internal class RecoveryKeyToFileMapper @Inject constructor(
      * Invoke
      */
     operator fun invoke(key: String): File {
-        val rKBitmap = Bitmap.createBitmap(1000, 1000, Bitmap.Config.ARGB_8888)
+        val rKBitmap = createBitmap(1000, 1000)
 
         val canvas = Canvas(rKBitmap)
         val paint = Paint()

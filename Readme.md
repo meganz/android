@@ -13,6 +13,8 @@ This document will guide you to build the application on a Linux/MacOS machine w
 
 * [Android NDK](https://developer.android.com/ndk/downloads)
 
+* JDK 21
+
 ### 2. Build & Run the application
 
 1. Get the source code.

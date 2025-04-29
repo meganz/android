@@ -1,6 +1,7 @@
 package mega.privacy.android.data.repository.apiserver
 
 import android.content.Context
+import androidx.core.content.edit
 import dagger.hilt.android.qualifiers.ApplicationContext
 import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.withContext
@@ -40,7 +41,7 @@ internal class ApiServerRepositoryImpl @Inject constructor(
 
     override suspend fun setNewApi(apiServer: ApiServer) = withContext(ioDispatcher) {
         context.getSharedPreferences(API_SERVER_PREFERENCES, Context.MODE_PRIVATE)
-            .edit().putInt(API_SERVER, apiServer.value).apply()
+            .edit { putInt(API_SERVER, apiServer.value) }
     }
 
     companion object {
