@@ -85,6 +85,7 @@ import mega.privacy.android.app.utils.Util.matchRegexs
 import mega.privacy.android.app.utils.isURLSanitized
 import mega.privacy.android.domain.entity.RegexPatternType
 import mega.privacy.android.domain.entity.photos.AlbumLink
+import mega.privacy.android.domain.exception.ResetPasswordLinkException
 import mega.privacy.android.domain.usecase.GetUrlRegexPatternTypeUseCase
 import mega.privacy.android.domain.usecase.contact.GetCurrentUserEmail
 import mega.privacy.android.navigation.DeeplinkHandler
@@ -175,6 +176,27 @@ class OpenLinkActivity : PasscodeActivity(), MegaRequestListenerInterface,
                     handleLoggedOutState()
                     handleAccountInvitationEmailState(accountInvitationEmail)
                     viewModel.onLogoutCompletedEventConsumed()
+                }
+
+                if (resetPasswordLinkResult != null) {
+                    if (resetPasswordLinkResult.isSuccess) {
+                        val emailForLink = resetPasswordLinkResult.getOrThrow()
+                        if (emailForLink != userEmail) {
+                            setError(getString(R.string.error_not_logged_with_correct_account))
+                        } else {
+                            navigateToResetPassword(isLoggedIn == true, needsRefreshSession)
+                            finish()
+                        }
+                    } else {
+                        val errorMessage = when (resetPasswordLinkResult.exceptionOrNull()) {
+                            ResetPasswordLinkException.LinkInvalid -> getString(R.string.invalid_link)
+                            ResetPasswordLinkException.LinkExpired -> getString(R.string.recovery_link_expired)
+                            ResetPasswordLinkException.LinkAccessDenied -> getString(R.string.error_not_logged_with_correct_account)
+                            else -> getString(R.string.general_text_error)
+                        }
+                        setError(errorMessage)
+                    }
+                    viewModel.onResetPasswordLinkResultConsumed()
                 }
             }
         }
@@ -398,27 +420,11 @@ class OpenLinkActivity : PasscodeActivity(), MegaRequestListenerInterface,
             matchRegexs(url, RESET_PASSWORD_LINK_REGEXS) -> {
                 Timber.d("Reset pass url")
                 if (isLoggedIn) {
-                    if (needsRefreshSession) {
-                        Timber.d("Go to Login to fetch nodes")
-                        startActivity(
-                            Intent(this, LoginActivity::class.java)
-                                .putExtra(VISIBLE_FRAGMENT, LOGIN_FRAGMENT)
-                                .setAction(ACTION_RESET_PASS)
-                                .setData(Uri.parse(url))
-                        )
-                    } else {
-                        Timber.d("Logged IN")
-                        startActivity(
-                            Intent(this, ManagerActivity::class.java)
-                                .setAction(ACTION_RESET_PASS)
-                                .setData(Uri.parse(url))
-                        )
-                    }
-                    finish()
+                    viewModel.queryResetPasswordLink(url.orEmpty())
                 } else {
-                    Timber.d("Not logged")
-                    // Users can reset their passwords in the browser even when not logged in.
-                    openWebLinkInBrowser(url)
+                    Timber.d("Go to Login to fetch nodes")
+                    navigateToResetPassword(false, false)
+                    finish()
                 }
             }
             // Pending contacts
@@ -568,6 +574,26 @@ class OpenLinkActivity : PasscodeActivity(), MegaRequestListenerInterface,
                     checkIfRequiresTransferSession(it)
                 }
             }
+        }
+    }
+
+    private fun navigateToResetPassword(isLoggedIn: Boolean, needsRefreshSession: Boolean) {
+        if (isLoggedIn && !needsRefreshSession) {
+            Timber.d("Logged IN")
+            startActivity(
+                Intent(this, ManagerActivity::class.java)
+                    .setAction(ACTION_RESET_PASS)
+                    .setData(Uri.parse(url))
+            )
+        } else {
+            Timber.d("Go to Login to fetch nodes")
+            startActivity(
+                Intent(this, LoginActivity::class.java)
+                    .putExtra(VISIBLE_FRAGMENT, LOGIN_FRAGMENT)
+                    .setAction(ACTION_RESET_PASS)
+                    .putExtra(LoginActivity.EXTRA_IS_LOGGED_IN, isLoggedIn)
+                    .setData(Uri.parse(url))
+            )
         }
     }
 

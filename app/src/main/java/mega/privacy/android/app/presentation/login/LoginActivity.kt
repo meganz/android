@@ -448,5 +448,10 @@ class LoginActivity : BaseActivity() {
          */
         @JvmField
         var isBackFromLoginPage = false
+
+        /**
+         * Intent extra for knowing if the user is logged in.
+         */
+        const val EXTRA_IS_LOGGED_IN = "isLoggedIn"
     }
 }

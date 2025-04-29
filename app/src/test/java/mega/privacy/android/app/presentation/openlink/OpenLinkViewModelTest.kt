@@ -8,6 +8,7 @@ import mega.privacy.android.app.MegaApplication
 import mega.privacy.android.core.test.extension.CoroutineMainDispatcherExtension
 import mega.privacy.android.domain.entity.user.UserCredentials
 import mega.privacy.android.domain.usecase.GetRootNodeUseCase
+import mega.privacy.android.domain.usecase.QueryResetPasswordLinkUseCase
 import mega.privacy.android.domain.usecase.link.DecodeLinkUseCase
 import mega.privacy.android.domain.usecase.login.ClearEphemeralCredentialsUseCase
 import mega.privacy.android.domain.usecase.login.GetAccountCredentialsUseCase
@@ -41,6 +42,7 @@ class OpenLinkViewModelTest {
     private val getAccountCredentialsUseCase: GetAccountCredentialsUseCase = mock()
     private val getRootNodeUseCase: GetRootNodeUseCase = mock()
     private val decodeLinkUseCase: DecodeLinkUseCase = mock()
+    private val queryResetPasswordLinkUseCase: QueryResetPasswordLinkUseCase = mock()
     private val applicationScope = CoroutineScope(extension.testDispatcher)
 
     @BeforeEach
@@ -53,6 +55,7 @@ class OpenLinkViewModelTest {
             getAccountCredentials = getAccountCredentialsUseCase,
             getRootNodeUseCase = getRootNodeUseCase,
             decodeLinkUseCase = decodeLinkUseCase,
+            queryResetPasswordLinkUseCase = queryResetPasswordLinkUseCase,
             applicationScope = applicationScope
         )
     }
@@ -246,6 +249,34 @@ class OpenLinkViewModelTest {
             assertThat(expectMostRecentItem().logoutCompletedEvent).isFalse()
         }
     }
+
+    @Test
+    fun `test that reset password link result is updated when successfully querying reset password link`() =
+        runTest {
+            val link = randomLink()
+            val result = Result.success("lh@mega.co.nz")
+
+            whenever(queryResetPasswordLinkUseCase(link)).thenReturn("lh@mega.co.nz")
+            underTest.queryResetPasswordLink(link)
+            underTest.uiState.test {
+                assertThat(expectMostRecentItem().resetPasswordLinkResult).isEqualTo(result)
+            }
+        }
+
+    @Test
+    fun `test that reset password link result is null when querying reset password link fails`() =
+        runTest {
+            // Given
+            val link = randomLink()
+            val exception = RuntimeException()
+
+            whenever(queryResetPasswordLinkUseCase(link)).thenThrow(exception)
+            underTest.queryResetPasswordLink(link)
+            underTest.uiState.test {
+                assertThat(expectMostRecentItem().resetPasswordLinkResult)
+                    .isEqualTo(Result.failure<Unit>(exception))
+            }
+        }
 
     @AfterEach
     fun resetMocks() {

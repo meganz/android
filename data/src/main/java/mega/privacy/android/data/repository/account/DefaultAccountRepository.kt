@@ -734,11 +734,11 @@ internal class DefaultAccountRepository @Inject constructor(
         withContext(ioDispatcher) {
             suspendCancellableCoroutine { continuation ->
                 val listener = OptionalMegaRequestListenerInterface(
-                    onRequestFinish = { _, error ->
+                    onRequestFinish = { request, error ->
                         when (error.errorCode) {
                             MegaError.API_OK -> {
                                 Timber.d("MegaRequest.TYPE_QUERY_RECOVERY_LINK MegaError API_OK")
-                                continuation.resumeWith(Result.success(link))
+                                continuation.resumeWith(Result.success(request.email.orEmpty()))
                             }
 
                             MegaError.API_EEXPIRED -> {
@@ -751,7 +751,7 @@ internal class DefaultAccountRepository @Inject constructor(
                             MegaError.API_EACCESS -> {
                                 Timber.w("MegaRequest.TYPE_QUERY_RECOVERY_LINK unrelated link $error")
                                 continuation.resumeWith(
-                                    Result.failure(ResetPasswordLinkException.LinkInvalid)
+                                    Result.failure(ResetPasswordLinkException.LinkAccessDenied)
                                 )
                             }
 
@@ -759,8 +759,7 @@ internal class DefaultAccountRepository @Inject constructor(
                                 Timber.w("MegaRequest.TYPE_QUERY_RECOVERY_LINK error $error")
                                 continuation.resumeWith(
                                     Result.failure(
-                                        ResetPasswordLinkException.Unknown(error.toException("queryResetPasswordLink"))
-                                    )
+                                        ResetPasswordLinkException.LinkInvalid)
                                 )
                             }
                         }

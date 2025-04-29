@@ -131,7 +131,6 @@ public class Constants {
     public static final String ACTION_RESET_PASS = "RESET_PASS";
     public static final String ACTION_RESET_PASS_FROM_LINK = "RESET_PASS_FROM_LINK";
     public static final String ACTION_PASS_CHANGED = "PASS_CHANGED";
-    public static final String ACTION_PARK_ACCOUNT = "PARK_ACCOUNT";
     public static final String ACTION_RESET_PASS_FROM_PARK_ACCOUNT = "RESET_PASS_FROM_PARK_ACCOUNT";
     public static final String ACTION_CHANGE_MAIL = "CHANGE_MAIL";
     public static final String ACTION_IPC = "IPC";

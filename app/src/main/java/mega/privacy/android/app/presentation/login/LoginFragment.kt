@@ -1,6 +1,5 @@
 package mega.privacy.android.app.presentation.login
 
-import mega.privacy.android.shared.resources.R as sharedR
 import android.annotation.SuppressLint
 import android.app.Activity
 import android.content.Intent
@@ -77,6 +76,7 @@ import mega.privacy.android.domain.qualifier.LoginMutex
 import mega.privacy.android.domain.usecase.GetThemeMode
 import mega.privacy.android.domain.usecase.featureflag.GetFeatureFlagValueUseCase
 import mega.privacy.android.shared.original.core.ui.theme.OriginalTheme
+import mega.privacy.android.shared.resources.R as sharedR
 import nz.mega.sdk.MegaError
 import timber.log.Timber
 import javax.inject.Inject
@@ -237,12 +237,13 @@ class LoginFragment : Fragment() {
 
                 Constants.ACTION_RESET_PASS -> {
                     val link = intent.dataString
-                    if (link != null) {
+                    val isLoggedIn = intent.getBooleanExtra(LoginActivity.EXTRA_IS_LOGGED_IN, false)
+                    if (link != null && !isLoggedIn) {
                         Timber.d("Link to resetPass: %s", link)
                         showDialogInsertMKToChangePass(link)
                         viewModel.intentSet()
-                        return
                     }
+                    return
                 }
 
                 Constants.ACTION_PASS_CHANGED -> {
@@ -328,6 +329,7 @@ class LoginFragment : Fragment() {
                                 Constants.ACTION_OPEN_HANDLE_NODE,
                                 Constants.ACTION_OPEN_CHAT_LINK,
                                 Constants.ACTION_JOIN_OPEN_CHAT_LINK,
+                                Constants.ACTION_RESET_PASS,
                                     -> {
                                     intentDataString = dataString
                                 }

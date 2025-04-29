@@ -12,6 +12,7 @@ import mega.privacy.android.app.MegaApplication
 import mega.privacy.android.app.globalmanagement.MegaChatRequestHandler
 import mega.privacy.android.domain.qualifier.ApplicationScope
 import mega.privacy.android.domain.usecase.GetRootNodeUseCase
+import mega.privacy.android.domain.usecase.QueryResetPasswordLinkUseCase
 import mega.privacy.android.domain.usecase.link.DecodeLinkUseCase
 import mega.privacy.android.domain.usecase.login.ClearEphemeralCredentialsUseCase
 import mega.privacy.android.domain.usecase.login.GetAccountCredentialsUseCase
@@ -33,6 +34,7 @@ class OpenLinkViewModel @Inject constructor(
     private val getAccountCredentials: GetAccountCredentialsUseCase,
     private val getRootNodeUseCase: GetRootNodeUseCase,
     private val decodeLinkUseCase: DecodeLinkUseCase,
+    private val queryResetPasswordLinkUseCase: QueryResetPasswordLinkUseCase,
     @ApplicationScope private val applicationScope: CoroutineScope,
 ) : ViewModel() {
 
@@ -57,6 +59,7 @@ class OpenLinkViewModel @Inject constructor(
                 _uiState.update {
                     it.copy(
                         decodedUrl = decodedUrl,
+                        userEmail = accountCredentials?.email,
                         isLoggedIn = accountCredentials != null,
                         needsRefreshSession = needToRefresh,
                         urlRedirectionEvent = true
@@ -137,6 +140,27 @@ class OpenLinkViewModel @Inject constructor(
     fun onLogoutCompletedEventConsumed() {
         _uiState.update {
             it.copy(logoutCompletedEvent = false)
+        }
+    }
+
+    /**
+     * Get reset password link
+     */
+    fun queryResetPasswordLink(link: String) = viewModelScope.launch {
+        val result = runCatching {
+            queryResetPasswordLinkUseCase(link)
+        }
+        _uiState.update {
+            it.copy(resetPasswordLinkResult = result)
+        }
+    }
+
+    /**
+     * Reset reset password link result when consumed
+     */
+    fun onResetPasswordLinkResultConsumed() {
+        _uiState.update {
+            it.copy(resetPasswordLinkResult = null)
         }
     }
 }

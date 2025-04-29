@@ -44,12 +44,13 @@ class QueryResetPasswordLinkUseCaseTest {
     internal fun `test that use case should return correct url value when invoked and url type is RESET_PASSWORD_LINK`() =
         runTest {
             val link = "qhwuehqwuhajsdhsjakdhasjhd"
+            val email = "lh@mega.co.nz"
             whenever(getUrlRegexPatternTypeUseCase(link)).thenReturn(RegexPatternType.RESET_PASSWORD_LINK)
-            whenever(accountRepository.queryResetPasswordLink(link)).thenReturn(link)
+            whenever(accountRepository.queryResetPasswordLink(link)).thenReturn(email)
 
             initTestClass()
 
-            assertThat(underTest(link)).isEqualTo(link)
+            assertThat(underTest(link)).isEqualTo(email)
             verify(accountRepository).queryResetPasswordLink(link)
         }
 

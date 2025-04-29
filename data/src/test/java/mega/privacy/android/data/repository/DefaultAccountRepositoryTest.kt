@@ -62,6 +62,7 @@ import mega.privacy.android.domain.entity.user.UserUpdate
 import mega.privacy.android.domain.exception.ChangeEmailException
 import mega.privacy.android.domain.exception.ChatNotInitializedException
 import mega.privacy.android.domain.exception.MegaException
+import mega.privacy.android.domain.exception.ResetPasswordLinkException
 import mega.privacy.android.domain.exception.account.ConfirmCancelAccountException
 import mega.privacy.android.domain.exception.account.ConfirmChangeEmailException
 import mega.privacy.android.domain.exception.account.CreateAccountException
@@ -74,6 +75,9 @@ import nz.mega.sdk.MegaChatError
 import nz.mega.sdk.MegaChatRequest
 import nz.mega.sdk.MegaCurrency
 import nz.mega.sdk.MegaError
+import nz.mega.sdk.MegaError.API_EACCESS
+import nz.mega.sdk.MegaError.API_EEXPIRED
+import nz.mega.sdk.MegaError.API_EINTERNAL
 import nz.mega.sdk.MegaPricing
 import nz.mega.sdk.MegaRequest
 import nz.mega.sdk.MegaRequestListenerInterface
@@ -1553,7 +1557,7 @@ class DefaultAccountRepositoryTest {
     fun `test that confirm change email throws an unknown mega exception when the sdk returns a different error`() =
         runTest {
             val megaError = mock<MegaError> {
-                on { errorCode }.thenReturn(MegaError.API_EEXPIRED)
+                on { errorCode }.thenReturn(API_EEXPIRED)
             }
             whenever(
                 megaApiGateway.confirmChangeEmail(
@@ -1635,7 +1639,7 @@ class DefaultAccountRepositoryTest {
         Arguments.of(MegaError.API_EFAILED),
         Arguments.of(MegaError.API_ETOOMANY),
         Arguments.of(MegaError.API_ERANGE),
-        Arguments.of(MegaError.API_EEXPIRED),
+        Arguments.of(API_EEXPIRED),
         Arguments.of(MegaError.API_ENOENT),
         Arguments.of(MegaError.API_ECIRCULAR),
         Arguments.of(MegaError.API_EACCESS),
@@ -1770,7 +1774,7 @@ class DefaultAccountRepositoryTest {
     fun `test that query cancel link throws an expired account cancellation link mega exception`() =
         runTest {
             val megaError = mock<MegaError> {
-                on { errorCode }.thenReturn(MegaError.API_EEXPIRED)
+                on { errorCode }.thenReturn(API_EEXPIRED)
             }
             whenever(
                 megaApiGateway.queryCancelLink(
@@ -2205,4 +2209,83 @@ class DefaultAccountRepositoryTest {
             underTest.resumeCreateAccount(session)
         }
     }
+
+    @Test
+    fun `test that queryResetPasswordLink returns email when link is valid`() = runTest {
+        val link = "validLink"
+        val email = "test@example.com"
+        val request = mock<MegaRequest> { on { this.email }.thenReturn(email) }
+
+        whenever(megaApiGateway.queryResetPasswordLink(eq(link), any())).thenAnswer {
+            (it.arguments[1] as OptionalMegaRequestListenerInterface).onRequestFinish(
+                mock(),
+                request,
+                mock { on { errorCode }.thenReturn(MegaError.API_OK) }
+            )
+        }
+
+        val result = underTest.queryResetPasswordLink(link)
+
+        assertThat(result).isEqualTo(email)
+    }
+
+    @Test
+    fun `test that queryResetPasswordLink throws LinkExpired exception when link is expired`() =
+        runTest {
+            val link = "expiredLink"
+
+            whenever(megaApiGateway.queryResetPasswordLink(eq(link), any())).thenAnswer {
+                (it.arguments[1] as OptionalMegaRequestListenerInterface).onRequestFinish(
+                    mock(),
+                    mock(),
+                    mock { on { errorCode }.thenReturn(API_EEXPIRED) }
+                )
+            }
+
+            val exception = assertThrows<ResetPasswordLinkException.LinkExpired> {
+                underTest.queryResetPasswordLink(link)
+            }
+
+            assertThat(exception).isInstanceOf(ResetPasswordLinkException.LinkExpired::class.java)
+        }
+
+    @Test
+    fun `test that queryResetPasswordLink throws LinkAccessDenied exception when link is unrelated`() =
+        runTest {
+            val link = "unrelatedLink"
+
+            whenever(megaApiGateway.queryResetPasswordLink(eq(link), any())).thenAnswer {
+                (it.arguments[1] as OptionalMegaRequestListenerInterface).onRequestFinish(
+                    mock(),
+                    mock(),
+                    mock { on { errorCode }.thenReturn(API_EACCESS) }
+                )
+            }
+
+            val exception = assertThrows<ResetPasswordLinkException.LinkAccessDenied> {
+                underTest.queryResetPasswordLink(link)
+            }
+
+            assertThat(exception).isInstanceOf(ResetPasswordLinkException.LinkAccessDenied::class.java)
+        }
+
+    @Test
+    fun `test that queryResetPasswordLink throws LinkInvalid exception for other errors`() =
+        runTest {
+            val link = "invalidLink"
+
+            whenever(megaApiGateway.queryResetPasswordLink(eq(link), any())).thenAnswer {
+                (it.arguments[1] as OptionalMegaRequestListenerInterface).onRequestFinish(
+                    mock(),
+                    mock(),
+                    mock { on { errorCode }.thenReturn(API_EINTERNAL) }
+                )
+            }
+
+            val exception = assertThrows<ResetPasswordLinkException.LinkInvalid> {
+                underTest.queryResetPasswordLink(link)
+            }
+
+            assertThat(exception).isInstanceOf(ResetPasswordLinkException.LinkInvalid::class.java)
+        }
 }

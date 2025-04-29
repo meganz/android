@@ -10,11 +10,13 @@ import javax.inject.Inject
  */
 class QueryResetPasswordLinkUseCase @Inject constructor(
     private val accountRepository: AccountRepository,
-    private val getUrlRegexPatternTypeUseCase: GetUrlRegexPatternTypeUseCase
+    private val getUrlRegexPatternTypeUseCase: GetUrlRegexPatternTypeUseCase,
 ) {
     /**
      * Invoke
      * @param link as the reset password link
+     *
+     * @return email associated with the reset password link
      */
     suspend operator fun invoke(link: String): String {
         return if (getUrlRegexPatternTypeUseCase(link) == RegexPatternType.RESET_PASSWORD_LINK) {

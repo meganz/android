@@ -256,7 +256,7 @@ interface AccountRepository {
      * Queries a reset password link.
      *
      * @param link Reset password link
-     * @return This: The link to reset password.
+     * @return Email associated with the link
      */
     suspend fun queryResetPasswordLink(link: String): String
 
