@@ -416,7 +416,12 @@ abstract class AbstractTransfersWorker(
         /**
          * Final summary group
          */
-        const val FINAL_SUMMARY_GROUP = "FinalSummary"
+        private const val FINAL_SUMMARY_GROUP = "FinalSummary"
+
+        /**
+         * Final summary group
+         */
+        fun finalSummaryGroup(transferType: TransferType) = FINAL_SUMMARY_GROUP + transferType.name
 
         /**
          * Progress summary group

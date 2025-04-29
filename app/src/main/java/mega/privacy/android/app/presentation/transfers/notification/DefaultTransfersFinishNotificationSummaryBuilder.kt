@@ -8,7 +8,7 @@ import dagger.hilt.android.qualifiers.ApplicationContext
 import mega.privacy.android.app.R
 import mega.privacy.android.app.utils.Constants
 import mega.privacy.android.data.mapper.transfer.TransfersFinishNotificationSummaryBuilder
-import mega.privacy.android.data.worker.AbstractTransfersWorker.Companion.FINAL_SUMMARY_GROUP
+import mega.privacy.android.data.worker.AbstractTransfersWorker.Companion.finalSummaryGroup
 import mega.privacy.android.domain.entity.transfer.TransferType
 import javax.inject.Inject
 
@@ -30,7 +30,7 @@ class DefaultTransfersFinishNotificationSummaryBuilder @Inject constructor(
         )
             .setSmallIcon(iconPackR.drawable.ic_stat_notify)
             .setColor(ContextCompat.getColor(context, R.color.red_600_red_300))
-            .setGroup(FINAL_SUMMARY_GROUP + type.name)
+            .setGroup(finalSummaryGroup(type))
             .setGroupSummary(true)
             .build()
 }
