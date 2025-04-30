@@ -1,7 +1,5 @@
 package mega.privacy.android.app.presentation.transfers.notification
 
-import mega.privacy.android.icon.pack.R as iconPackR
-import mega.privacy.android.shared.resources.R as sharedR
 import android.app.Notification
 import android.app.PendingIntent
 import android.content.BroadcastReceiver
@@ -13,14 +11,9 @@ import dagger.hilt.android.qualifiers.ApplicationContext
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.launch
 import mega.privacy.android.app.R
-import mega.privacy.android.app.featuretoggle.AppFeatures
-import mega.privacy.android.app.main.ManagerActivity
 import mega.privacy.android.app.presentation.manager.model.TransfersTab
-import mega.privacy.android.app.presentation.transfers.EXTRA_TAB
-import mega.privacy.android.app.presentation.transfers.TransfersActivity
 import mega.privacy.android.app.presentation.transfers.preview.FakePreviewActivity
 import mega.privacy.android.app.presentation.transfers.preview.FakePreviewFragment.Companion.EXTRA_TRANSFER_TAG
-import mega.privacy.android.app.presentation.transfers.view.COMPLETED_TAB_INDEX
 import mega.privacy.android.app.utils.Constants
 import mega.privacy.android.app.utils.Util
 import mega.privacy.android.data.mapper.transfer.TransfersActionGroupProgressNotificationBuilder
@@ -30,10 +23,11 @@ import mega.privacy.android.domain.entity.transfer.TransferType
 import mega.privacy.android.domain.entity.transfer.isOfflineDownload
 import mega.privacy.android.domain.entity.transfer.isPreviewDownload
 import mega.privacy.android.domain.qualifier.ApplicationScope
-import mega.privacy.android.domain.usecase.featureflag.GetFeatureFlagValueUseCase
 import mega.privacy.android.domain.usecase.file.GetPathByDocumentContentUriUseCase
 import mega.privacy.android.domain.usecase.file.IsContentUriUseCase
 import mega.privacy.android.domain.usecase.transfers.paused.PauseTransfersQueueUseCase
+import mega.privacy.android.icon.pack.R as iconPackR
+import mega.privacy.android.shared.resources.R as sharedR
 import timber.log.Timber
 import javax.inject.Inject
 
@@ -42,9 +36,9 @@ import javax.inject.Inject
  */
 class DefaultTransfersActionGroupProgressNotificationBuilder @Inject constructor(
     @ApplicationContext private val context: Context,
-    private val getFeatureFlagValueUseCase: GetFeatureFlagValueUseCase,
     private val isContentUriUseCase: IsContentUriUseCase,
     private val getPathByDocumentContentUriUseCase: GetPathByDocumentContentUriUseCase,
+    private val openTransfersSectionIntentMapper: OpenTransfersSectionIntentMapper,
 ) : TransfersActionGroupProgressNotificationBuilder {
     private val resources get() = context.resources
     override suspend fun invoke(
@@ -124,18 +118,9 @@ class DefaultTransfersActionGroupProgressNotificationBuilder @Inject constructor
                 it,
             )
         }
-        val (pendingIntent, actionIntent) = if (!isPreviewDownload) {
+        val (contentPendingIntent, actionIntent) = if (!isPreviewDownload) {
             val openTransfersSectionIntent =
-                if (getFeatureFlagValueUseCase(AppFeatures.TransfersSection)) {
-                    Intent(context, TransfersActivity::class.java).apply {
-                        putExtra(EXTRA_TAB, COMPLETED_TAB_INDEX)
-                    }
-                } else {
-                    Intent(context, ManagerActivity::class.java).apply {
-                        action = Constants.ACTION_SHOW_TRANSFERS
-                        putExtra(ManagerActivity.TRANSFERS_TAB, TransfersTab.COMPLETED_TAB)
-                    }
-                }
+                openTransfersSectionIntentMapper(TransfersTab.PENDING_TAB)
             PendingIntent.getActivity(
                 context,
                 0,
@@ -174,7 +159,7 @@ class DefaultTransfersActionGroupProgressNotificationBuilder @Inject constructor
             .setAutoCancel(false)
             .setSubText(subText)
             .setProgress(100, actionGroup.progress.intValue, false)
-            .setContentIntent(pendingIntent)
+            .setContentIntent(contentPendingIntent)
             .apply {
                 contentText?.let {
                     setContentText(it)
