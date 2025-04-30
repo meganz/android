@@ -1880,16 +1880,20 @@ class VideoPlayerViewModel @Inject constructor(
 
         val updatedItems = items.filterNot { it.nodeHandle in selectedHandles }
         val updatedMediaItems = mediaItems.filterNot { it.mediaId.toLong() in selectedHandles }
+        val newPlayingIndex =
+            updatedItems.indexOfFirst { it.nodeHandle == uiState.value.currentPlayingHandle }
+                .takeIf { it != -1 } ?: 0
 
         val mediaPlaySources = MediaPlaySources(
             mediaItems = updatedMediaItems,
-            newIndexForCurrentItem = uiState.value.currentPlayingIndex ?: 0,
+            newIndexForCurrentItem = newPlayingIndex,
             nameToDisplay = null
         )
 
         uiState.update {
             it.copy(
                 items = updatedItems,
+                currentPlayingIndex = newPlayingIndex,
                 mediaPlaySources = mediaPlaySources,
                 selectedItemHandles = emptyList(),
             )

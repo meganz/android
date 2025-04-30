@@ -2106,6 +2106,7 @@ class VideoPlayerViewModelTest {
                 assertThat(actual.mediaPlaySources?.mediaItems?.size).isEqualTo(1)
                 assertThat(actual.mediaPlaySources?.mediaItems?.first()?.mediaId).isEqualTo("0")
                 assertThat(actual.selectedItemHandles).isEmpty()
+                assertThat(actual.currentPlayingIndex).isEqualTo(0)
                 cancelAndConsumeRemainingEvents()
             }
         }
