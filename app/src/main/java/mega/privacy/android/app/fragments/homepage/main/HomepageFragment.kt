@@ -65,6 +65,7 @@ import mega.privacy.mobile.analytics.event.OfflineTabEvent
 import mega.privacy.mobile.analytics.event.RecentsTabEvent
 import mega.privacy.mobile.analytics.event.SmartBannerSwipeEvent
 import nz.mega.sdk.MegaChatApiJava.MEGACHAT_INVALID_HANDLE
+import timber.log.Timber
 import javax.inject.Inject
 
 
@@ -116,6 +117,8 @@ class HomepageFragment : Fragment() {
     private val tabsChildren = ArrayList<View>()
 
     private var startScreenDialog: AlertDialog? = null
+
+    private var isPageScrolled: Boolean = false
 
     private val openNewChatLauncher =
         registerForActivityResult(ActivityResultContracts.StartActivityForResult()) {
@@ -438,7 +441,17 @@ class HomepageFragment : Fragment() {
                 object : ViewPager2.OnPageChangeCallback() {
                     override fun onPageSelected(position: Int) {
                         super.onPageSelected(position)
-                        Analytics.tracker.trackEvent(SmartBannerSwipeEvent)
+                        if (isPageScrolled) {
+                            Timber.d("onPageSelected: $position")
+                            Analytics.tracker.trackEvent(SmartBannerSwipeEvent)
+                            isPageScrolled = false
+                        }
+                    }
+
+                    override fun onPageScrollStateChanged(state: Int) {
+                        super.onPageScrollStateChanged(state)
+                        Timber.d("onPageScrollStateChanged: $state")
+                        isPageScrolled = state == ViewPager2.SCROLL_STATE_SETTLING
                     }
                 }
             )
