@@ -61,9 +61,9 @@
     <!-- Item menu option upon right click on one or multiple files. -->
     <string name="action_add">Tải lên</string>
     <!-- Menu item -->
-    <string name="action_create_folder">Tạo thư mục mới</string>
+    <string name="action_create_folder">Thư mục mới</string>
     <!-- Option which allows create a new text file -->
-    <string name="action_create_txt">Tạo tệp văn bản mới</string>
+    <string name="action_create_txt">Tệp văn bản mới</string>
     <!-- Menu item -->
     <string name="action_settings">Thiết Đặt</string>
     <!-- Search button -->
@@ -4746,20 +4746,6 @@
     <string name="meetings_schedule_meeting_free_plan_100_participants_limit_dialog_description">Cuộc gọi này chỉ hỗ&#160;trợ được 100 người tham&#160;gia. Hãy yêu&#160;cầu bên tổ&#160;chức để loại bỏ hạn&#160;chế này.</string>
     <!-- Free plan limitation dialogue button for scheduled meeting calls with more than 100 participants -->
     <string name="meetings_schedule_meeting_free_plan_100_participants_limit_dialog_button">OK, hiểu rồi</string>
-    <!-- The title of the hidden nodes feature -->
-    <string name="hidden_nodes">Tệp&#160;tin và thư&#160;mục ẩn</string>
-    <!-- Hidden nodes benefit: hide files and folders -->
-    <string name="hidden_nodes_benefit_title_hide_files_folders">Ẩn đi các tệp&#160;tin và thư&#160;mục quan&#160;trọng</string>
-    <!-- Hidden nodes benefit description: hide files and folders -->
-    <string name="hidden_nodes_benefit_description_hide_files_folders">Bạn có thể giấu đi các tệp&#160;tin và thư&#160;mục riêng&#160;tư của mình. Chỉ có bạn mới có thể hiện những mục đó lại, bằng cách thực&#160;hiện từng cái riêng&#160;lẻ hoặc bật hiển&#160;thị các mục đã ẩn đi trong phần thiết&#160;đặt.</string>
-    <!-- Hidden nodes benefit: exclude from timeline -->
-    <string name="hidden_nodes_benefit_title_exclude_timeline">Loại&#160;trừ khỏi Dòng thời&#160;gian</string>
-    <!-- Hidden nodes benefit description: exclude from timeline -->
-    <string name="hidden_nodes_benefit_description_exclude_timeline">Các mục đã ẩn đi chỉ có thể truy&#160;cập thông qua Ổ&#160;Mây và sẽ không xuất&#160;hiện trong Ảnh, Album hoặc Sử&#160;dụng gần&#160;đây của bạn.</string>
-    <!-- Hidden nodes benefit: out of sight -->
-    <string name="hidden_nodes_benefit_title_out_of_sight">Ra khỏi tầm nhìn</string>
-    <!-- Hidden nodes benefit description: out of sight -->
-    <string name="hidden_nodes_benefit_description_out_of_sight">Bạn tự quyết&#160;định khi bạn muốn các tệp&#160;tin ẩn đi được hiển&#160;thị. Có một mục lựa&#160;chọn mới trong thiết&#160;đặt để hiển&#160;thị các mục ẩn tạm&#160;thời.</string>
     <!-- The snackbar message of hidden nodes operation -->
     <plurals name="hidden_nodes_result_message">
         <item quantity="other">%1$d mục ẩn</item>

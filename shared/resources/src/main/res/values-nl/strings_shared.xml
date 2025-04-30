@@ -463,7 +463,7 @@
     <!-- Text to show in the Android Sync feature for a No Network State when there is no network connectivity -->
     <string name="sync_no_network_state">Geen internet verbinding</string>
     <!-- Menu option to create a new folder in the file manager -->
-    <string name="general_menu_create_new_folder">Nieuwe map creëren</string>
+    <string name="general_menu_create_new_folder">Nieuwe map</string>
     <!-- Create new folder dialog title -->
     <string name="create_new_folder_dialog_title">Nieuwe map</string>
     <!-- Create new folder dialog hint text (input field description) -->
@@ -821,13 +821,6 @@
     <string name="general_drive">Schijf</string>
     <!-- Tab bar title of Syncs tab -->
     <string name="general_syncs">Synchronisaties</string>
-    <!-- Text under the syncs list -->
-    <string name="syncs_tab_view_other_devices">Bekijk andere apparaten in het Apparaatcentrum</string>
-    <!-- The snackbar message of you and others raised your hands -->
-    <plurals name="transfers_completed_read_error_retrying">
-        <item quantity="one"></item>
-        <item quantity="other"></item>
-    </plurals>
     <!-- Warning shown to the user when tries to retry a cancelled or failed transfer but it cannot be retried because app does not have read permission over the file anymore -->
     <string name="transfers_completed_one_read_error_retrying">Uw upload kan niet worden voltooid of opnieuw worden geprobeerd, omdat MEGA geen toegang meer heeft tot het bestand</string>
     <!-- Warning shown to the user when tries to retry some or all of cancelled or failed transfer but they cannot be retried because app does not have read permission over the files anymore -->
@@ -1105,7 +1098,7 @@
     <!-- Hidden nodes: control visibility feature -->
     <string name="hidden_nodes_title_control_visibility">Controleer de zichtbaarheid eenvoudig</string>
     <!-- Hidden nodes description: control visibility feature -->
-    <string name="hidden_nodes_description_control_visibility">Om verborgen bestanden weer te geven, zet u de instelling  “Verborgen items weergeven” aan onder  “Bestandsbeheer -&gt; Gebruikersinterface” in uw applicatie-instellingen</string>
+    <string name="hidden_nodes_description_control_visibility">To show hidden files, turn on the “Show hidden items” setting under “File Management” -&gt; “User interface” in your app settings.</string>
     <!-- Hidden nodes: shared files stay visible feature -->
     <string name="hidden_nodes_title_visible_shared_files">Gedeelde bestanden blijven zichtbaar</string>
     <!-- Hidden nodes description: shared files stay visible feature -->
@@ -1128,4 +1121,8 @@
     <string name="notification_permission_enable_button_text">Notificaties Inschakelen</string>
     <!-- Notification content for upload final notification in case of a single file upload. -->
     <string name="transfers_notification_title_single_upload">“%1$s” Geüpload</string>
+    <!-- Title of the warning banner displayed when Syncs are paused due to lost Wi-Fi conditions -->
+    <string name="general_sync_warning_lost_wifi_title">Syncing paused due to lost connection.</string>
+    <!-- Text of the warning banner displayed when Syncs are paused due to lost Wi-Fi conditions -->
+    <string name="general_sync_warning_lost_wifi_text">Reconnect to Wi-Fi to resume.</string>
 </resources>

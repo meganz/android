@@ -63,7 +63,7 @@
     <!-- Menu item -->
     <string name="action_create_folder">Nueva carpeta</string>
     <!-- Option which allows create a new text file -->
-    <string name="action_create_txt">Crear nuevo archivo de texto</string>
+    <string name="action_create_txt">Nuevo archivo de texto</string>
     <!-- Menu item -->
     <string name="action_settings">Ajustes</string>
     <!-- Search button -->
@@ -1111,9 +1111,9 @@
     <string name="upload_service_notification_paused">Subiendo archivos: %1$d de %2$d (en pausa)</string>
     <!-- Text of the notification shown when the upload service has finished, Plural -->
     <plurals name="upload_service_final_notification">
-        <item quantity="one">%1$d archivo subido</item>
-        <item quantity="many">%1$d de archivos subidos</item>
-        <item quantity="other">%1$d archivos subidos</item>
+        <item quantity="one">Se ha subido %1$d archivo</item>
+        <item quantity="many">Se han subido %1$d de archivos</item>
+        <item quantity="other">Se han subido %1$d archivos</item>
     </plurals>
     <!-- Text of the notification shown when the upload service has finished, Plural -->
     <plurals name="upload_service_notification_already_uploaded">
@@ -5196,20 +5196,6 @@
     <string name="meetings_schedule_meeting_free_plan_100_participants_limit_dialog_description">Esta llamada solo admite a 100 participantes. Pide al organizador que elimine esta restricción.</string>
     <!-- Free plan limitation dialogue button for scheduled meeting calls with more than 100 participants -->
     <string name="meetings_schedule_meeting_free_plan_100_participants_limit_dialog_button">Entendido</string>
-    <!-- The title of the hidden nodes feature -->
-    <string name="hidden_nodes">Archivos y carpetas ocultos</string>
-    <!-- Hidden nodes benefit: hide files and folders -->
-    <string name="hidden_nodes_benefit_title_hide_files_folders">Oculta archivos y carpetas importantes</string>
-    <!-- Hidden nodes benefit description: hide files and folders -->
-    <string name="hidden_nodes_benefit_description_hide_files_folders">Puedes ocultar archivos y carpetas confidenciales por motivos de privacidad. Solo tú podrás verlos, ya sea de forma individual o mostrando temporalmente los elementos ocultos desde los ajustes.</string>
-    <!-- Hidden nodes benefit: exclude from timeline -->
-    <string name="hidden_nodes_benefit_title_exclude_timeline">Excluye de la cronología</string>
-    <!-- Hidden nodes benefit description: exclude from timeline -->
-    <string name="hidden_nodes_benefit_description_exclude_timeline">Los elementos ocultos solo son accesibles a través de la Nube y no aparecerán en tus Fotos, Álbumes o Recientes.</string>
-    <!-- Hidden nodes benefit: out of sight -->
-    <string name="hidden_nodes_benefit_title_out_of_sight">Elementos ocultos</string>
-    <!-- Hidden nodes benefit description: out of sight -->
-    <string name="hidden_nodes_benefit_description_out_of_sight">Tú decides cuándo hacer visibles los archivos ocultos. Hay un nuevo ajuste para mostrar temporalmente los elementos ocultos.</string>
     <!-- The snackbar message of hidden nodes operation -->
     <plurals name="hidden_nodes_result_message">
         <item quantity="one">%1$d elemento oculto</item>

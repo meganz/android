@@ -455,7 +455,7 @@
     <!-- Text to show in the Android Sync feature for a No Network State when there is no network connectivity -->
     <string name="sync_no_network_state">ไม่มีการเชื่อมต่ออินเทอร์เน็ต</string>
     <!-- Menu option to create a new folder in the file manager -->
-    <string name="general_menu_create_new_folder">สร้างโฟลเดอร์ใหม่</string>
+    <string name="general_menu_create_new_folder">โฟลเดอร์ใหม่</string>
     <!-- Create new folder dialog title -->
     <string name="create_new_folder_dialog_title">โฟลเดอร์ใหม่</string>
     <!-- Create new folder dialog hint text (input field description) -->
@@ -808,12 +808,6 @@
     <string name="general_drive">ไดร์ฟ</string>
     <!-- Tab bar title of Syncs tab -->
     <string name="general_syncs">ซิงค์</string>
-    <!-- Text under the syncs list -->
-    <string name="syncs_tab_view_other_devices">ดูอุปกรณ์อื่น ๆ ในศูนย์อุปกรณ์</string>
-    <!-- The snackbar message of you and others raised your hands -->
-    <plurals name="transfers_completed_read_error_retrying">
-        <item quantity="other"></item>
-    </plurals>
     <!-- Warning shown to the user when tries to retry a cancelled or failed transfer but it cannot be retried because app does not have read permission over the file anymore -->
     <string name="transfers_completed_one_read_error_retrying">การอัปโหลดของคุณไม่สามารถดำเนินการต่อหรือลองใหม่อีกครั้งได้ เนื่องจาก MEGA ไม่สามารถเข้าถึงไฟล์ได้อีกต่อไป</string>
     <!-- Warning shown to the user when tries to retry some or all of cancelled or failed transfer but they cannot be retried because app does not have read permission over the files anymore -->
@@ -1013,7 +1007,7 @@
     <!-- Message displayed when email address is successfully updated -->
     <string name="email_confirmation_email_address_update_message">อัปเดตที่อยู่อีเมลแล้ว</string>
     <!-- Snackbar text to inform the user that download started -->
-    <string name="transfers_download_started_snackbar">Download started. See notification for details.</string>
+    <string name="transfers_download_started_snackbar">เริ่มดาวน์โหลดแล้ว ดูรายละเอียดที่การแจ้งเตือน</string>
     <!--Sign Up page text field input first name error message when empty-->
     <string name="sign_up_first_name_text_field_error_message">กรอกชื่อ</string>
     <!--Sign Up page text field input last name error message when empty-->
@@ -1039,43 +1033,43 @@
     <!--Sign up page text to ask the user to login if they already have a MEGA account-->
     <string name="sign_up_already_have_account_login_link_text">มีบัญชี MEGA แล้วหรือยัง [A]เข้าสู่ระบบ[/A]ได้เลย</string>
     <!-- Text shown in the fake preview screen -->
-    <string name="transfers_fake_preview_text">Loading file&#8230;</string>
+    <string name="transfers_fake_preview_text">กำลังโหลดไฟล์&#8230;</string>
     <!-- Title or a warning, related to cancel a preview download, asking for confirmation before proceeding. -->
-    <string name="transfers_cancel_preview_download_warning_title">Cancel preview?</string>
+    <string name="transfers_cancel_preview_download_warning_title">ยกเลิกแสดงตัวอย่างหรือไม่</string>
     <!-- Text or a warning, related to cancel a preview download, asking for confirmation before proceeding. -->
-    <string name="transfers_cancel_preview_download_warning_text">You will no longer be able to preview this file</string>
+    <string name="transfers_cancel_preview_download_warning_text">คุณจะไม่สามารถแสดงตัวอย่างไฟล์นี้ได้อีกต่อไป</string>
     <!-- Warning text informing that a file preview failed to load. -->
-    <string name="transfers_fake_preview_screen_general_error">Preview failed to load, try again.</string>
+    <string name="transfers_fake_preview_screen_general_error">การแสดงตัวอย่างโหลดไม่สำเร็จ ลองใหม่อีกครั้ง</string>
     <!-- Warning shown after trying to cancel a download, but the request failed -->
-    <string name="transfers_error_cancelling_preview_download">Something went wrong. Preview was not cancelled. See notification for details.</string>
+    <string name="transfers_error_cancelling_preview_download">เกิดข้อผิดพลาด ไม่สามารถยกเลิกแสดงตัวอย่างได้ ดูรายละเอียดที่การแจ้งเตือน</string>
     <!-- Title of the Rename and Create Backup Dialog -->
-    <string name="sync_rename_and_create_backup_dialog_title">Backup name already exists</string>
+    <string name="sync_rename_and_create_backup_dialog_title">มีชื่อสำรองข้อมูลนี้อยู่แล้ว</string>
     <!-- Text of the Rename and Create Backup Dialog -->
-    <string name="sync_rename_and_create_backup_dialog_text">A folder with the same name already exists in your Backups. Rename the new folder to continue with the backup. Folder name will not change on your device.</string>
+    <string name="sync_rename_and_create_backup_dialog_text">มีโฟลเดอร์ชื่อเดียวกันอยู่ในการสำรองข้อมูลของคุณ กรุณาเปลี่ยนชื่อโฟลเดอร์ใหม่เพื่อดำเนินการสำรองข้อมูลต่อ ชื่อโฟลเดอร์จะไม่เปลี่ยนแปลงบนอุปกรณ์ของคุณ</string>
     <!-- Rename and Create Backup Dialog hint text (input field description) -->
-    <string name="sync_rename_and_create_backup_dialog_hint_text">Backup name</string>
+    <string name="sync_rename_and_create_backup_dialog_hint_text">ชื่อสำรองข้อมูล</string>
     <!-- Label for the Positive Button of the Rename and Create Backup Dialog -->
     <string name="sync_rename_and_create_backup_dialog_positive_button">เปลี่ยนชื่อ</string>
     <!-- The Error Message shown in the Rename and Create Backup Dialog when the user submits an empty backup name -->
-    <string name="sync_rename_and_create_backup_dialog_error_message_empty_backup_name">Enter a backup name.</string>
+    <string name="sync_rename_and_create_backup_dialog_error_message_empty_backup_name">กรอกชื่อสำรองข้อมูล</string>
     <!-- The Error Message shown in the Rename and Create Backup Dialog when the user submits a new backup name that already exists in Backups -->
-    <string name="sync_rename_and_create_backup_dialog_error_message_name_already_exists">A backup with this name already exists. Enter a different name.</string>
+    <string name="sync_rename_and_create_backup_dialog_error_message_name_already_exists">มีสำรองข้อมูลชื่อนี้อยู่แล้ว กรุณากรอกชื่ออื่น</string>
     <!-- USP Carousel page 1 title-->
     <string name="carousel_page_title_slide_1">คุณคือผู้ถือกุญแจ</string>
     <!-- USP Carousel page 1 description-->
-    <string name="carousel_page_description_slide_1">User controlled, zero-knowledge encryption means no one can see your data unless you want them to - not even us!</string>
+    <string name="carousel_page_description_slide_1">การเข้ารหัสด้วยวิธีซีโร่-นอว์เลจที่คุณควบคุมเอง หมายความว่าไม่มีใครเห็นข้อมูลของคุณได้ หากคุณไม่ต้องการให้เห็น ไม่เว้นแม้แต่เรา!</string>
     <!-- USP Carousel page 2 title-->
-    <string name="carousel_page_title_slide_2">Keep every moment safe</string>
+    <string name="carousel_page_title_slide_2">เก็บทุกช่วงเวลาให้ปลอดภัย</string>
     <!-- USP Carousel page 2 description-->
-    <string name="carousel_page_description_slide_2">With automatic camera uploads to MEGA Cloud, and generous storage, you’ll never lose a precious memory</string>
+    <string name="carousel_page_description_slide_2">ด้วยการอัปโหลดรูปภาพจากกล้องไปยัง MEGA คลาวด์โดยอัตโนมัติ พร้อมพื้นที่จัดเก็บข้อมูลมากมาย คุณจะไม่สูญเสียความทรงจำอันมีค่าไป</string>
     <!-- USP Carousel page 3 title-->
-    <string name="carousel_page_title_slide_3">Your data. Your space.</string>
+    <string name="carousel_page_title_slide_3">ข้อมูลของคุณ พื้นที่ของคุณ</string>
     <!-- USP Carousel page 3 description-->
-    <string name="carousel_page_description_slide_3">Ample storage and easy ways to transfer, share, and organise your files means you can safely use MEGA for whatever you choose</string>
+    <string name="carousel_page_description_slide_3">พื้นที่จัดเก็บข้อมูลที่เพียงพอ และวิธีที่ง่ายดายในการถ่ายโอน แชร์ และจัดระเบียบไฟล์ ทำให้คุณสามารถใช้ MEGA ได้อย่างปลอดภัยสำหรับทุกสิ่งที่คุณต้องการ</string>
     <!-- USP Carousel page 4 title-->
     <string name="carousel_page_title_slide_4">พูดคุยเป็นการส่วนตัว</string>
     <!-- USP Carousel page 4 description-->
-    <string name="carousel_page_description_slide_4">Chat with friends and family, share photos or sensitive information, video call and schedule meetings. Safety and privacy guaranteed.</string>
+    <string name="carousel_page_description_slide_4">แชทกับเพื่อนและครอบครัว แชร์รูปภาพหรือข้อมูลสำคัญ โทรวิดีโอ และนัดหมายได้อย่างปลอดภัยและเป็นส่วนตัว</string>
     <!-- Create account label-->
     <string name="general_label_create_account">ลงทะเบียน</string>
     <!-- The new feature hidden nodes feature -->
@@ -1087,27 +1081,31 @@
     <!-- Hidden nodes: control visibility feature -->
     <string name="hidden_nodes_title_control_visibility">ควบคุมการมองเห็นได้ง่าย</string>
     <!-- Hidden nodes description: control visibility feature -->
-    <string name="hidden_nodes_description_control_visibility">To show hidden files, turn on the “Show hidden items” setting under “File Management --&gt; User interface” in your app settings</string>
+    <string name="hidden_nodes_description_control_visibility">To show hidden files, turn on the “Show hidden items” setting under “File Management” -&gt; “User interface” in your app settings.</string>
     <!-- Hidden nodes: shared files stay visible feature -->
     <string name="hidden_nodes_title_visible_shared_files">ไฟล์ที่แชร์ยังคงมองเห็นได้</string>
     <!-- Hidden nodes description: shared files stay visible feature -->
-    <string name="hidden_nodes_description_visible_shared_files">Files and folders shared with contacts or with public links are still accessible and visible, even if hidden</string>
+    <string name="hidden_nodes_description_visible_shared_files">ไฟล์และโฟลเดอร์ที่แชร์กับรายชื่อติดต่อหรือด้วยลิงก์สาธารณะยังคงเข้าถึงได้และมองเห็นได้ แม้ว่าจะซ่อนอยู่ก็ตาม</string>
     <!--Camera backup permission screen title-->
-    <string name="camera_backup_permission_screen_title">Keep your photos safe, always</string>
+    <string name="camera_backup_permission_screen_title">เก็บภาพถ่ายของคุณให้ปลอดภัยเสมอ</string>
     <!--Camera backup permission screen description-->
-    <string name="camera_backup_permission_screen_description">Your memories matter.\n\nCamera uploads automatically backs up your photos and videos to your MEGA Cloud drive, so you never have to worry about losing them.</string>
+    <string name="camera_backup_permission_screen_description">ความทรงจำของคุณมีค่า\n\nการอัปโหลดรูปภาพจะสำรองรูปภาพและวิดีโอของคุณไปยัง MEGA คลาวด์โดยอัตโนมัติ คุณจึงไม่ต้องกังวลว่าจะสูญหาย</string>
     <!--Camera backup permission banner text to explain why the camera backup permission is needed-->
-    <string name="camera_backup_permission_banner_info_description">Camera uploads requires [A]full access[/A] to your device’s photo library</string>
+    <string name="camera_backup_permission_banner_info_description">การอัปโหลดรูปภาพต้อง[A]เข้าถึงคลังรูปภาพทั้งหมด[/A]ในอุปกรณ์ของคุณ</string>
     <!--Button text to request camera backup permission-->
     <string name="camera_backup_permission_enable_button_text">เปิดใช้งานอัปโหลดกล้อง</string>
     <!--Permission screen skip requesting permission button text-->
-    <string name="permission_screen_skip_permission_request_button_text">Skip for now</string>
+    <string name="permission_screen_skip_permission_request_button_text">ข้ามไปก่อน</string>
     <!--Notification permission screen title-->
-    <string name="notification_permission_screen_title">Never miss an important update</string>
+    <string name="notification_permission_screen_title">ไม่พลาดทุกการอัปเดตที่สำคัญ</string>
     <!--Notification permission screen description-->
-    <string name="notification_permission_screen_description">Stay informed with real-time updates that matter to you. Get alerts for shared folder activity, security updates, and exclusive offers, so you never miss anything important.\n\nYou can manage notification preferences at any time in your device’s settings.</string>
+    <string name="notification_permission_screen_description">รับทราบข้อมูลด้วยการอัปเดตแบบเรียลไทม์ที่สำคัญสำหรับคุณ รับการแจ้งเตือนกิจกรรมในโฟลเดอร์ที่แชร์ การอัปเดตความปลอดภัย และข้อเสนอพิเศษ เพื่อให้คุณไม่พลาดทุกสิ่งสำคัญ คุณสามารถจัดการการตั้งค่าการแจ้งเตือนได้ตลอดเวลาในการตั้งค่าอุปกรณ์ของคุณ</string>
     <!--Button text to request Notification permission-->
     <string name="notification_permission_enable_button_text">เปิดใช้การแจ้งเตือน</string>
     <!-- Notification content for upload final notification in case of a single file upload. -->
-    <string name="transfers_notification_title_single_upload">Uploaded “%1$s”</string>
+    <string name="transfers_notification_title_single_upload">อัปโหลด “%1$s” แล้ว</string>
+    <!-- Title of the warning banner displayed when Syncs are paused due to lost Wi-Fi conditions -->
+    <string name="general_sync_warning_lost_wifi_title">การซิงค์หยุดชั่วคราวเนื่องจากการเชื่อมต่อขาดหายไป</string>
+    <!-- Text of the warning banner displayed when Syncs are paused due to lost Wi-Fi conditions -->
+    <string name="general_sync_warning_lost_wifi_text">เชื่อมต่อ Wi-Fi อีกครั้งเพื่อดำเนินการต่อ</string>
 </resources>

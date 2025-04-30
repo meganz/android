@@ -847,15 +847,6 @@
     <string name="general_drive">Диск</string>
     <!-- Tab bar title of Syncs tab -->
     <string name="general_syncs">Синхронизация</string>
-    <!-- Text under the syncs list -->
-    <string name="syncs_tab_view_other_devices">Посмотреть другие устройства в Центре устройств</string>
-    <!-- The snackbar message of you and others raised your hands -->
-    <plurals name="transfers_completed_read_error_retrying">
-        <item quantity="one"></item>
-        <item quantity="few"></item>
-        <item quantity="many"></item>
-        <item quantity="other"></item>
-    </plurals>
     <!-- Warning shown to the user when tries to retry a cancelled or failed transfer but it cannot be retried because app does not have read permission over the file anymore -->
     <string name="transfers_completed_one_read_error_retrying">Невозможно завершить загрузку или повторить попытку, поскольку у MEGA больше нет доступа к файлу</string>
     <!-- Warning shown to the user when tries to retry some or all of cancelled or failed transfer but they cannot be retried because app does not have read permission over the files anymore -->
@@ -1141,7 +1132,7 @@
     <!-- Hidden nodes: control visibility feature -->
     <string name="hidden_nodes_title_control_visibility">Простое управление видимостью</string>
     <!-- Hidden nodes description: control visibility feature -->
-    <string name="hidden_nodes_description_control_visibility">Чтобы показать скрытые файлы, включите настройку «Показывать скрытые элементы» в разделе «Управление файлами» -&gt; «Пользовательский интерфейс» в настройках приложения</string>
+    <string name="hidden_nodes_description_control_visibility">To show hidden files, turn on the “Show hidden items” setting under “File Management” -&gt; “User interface” in your app settings.</string>
     <!-- Hidden nodes: shared files stay visible feature -->
     <string name="hidden_nodes_title_visible_shared_files">Общие файлы остаются видимыми</string>
     <!-- Hidden nodes description: shared files stay visible feature -->
@@ -1164,4 +1155,8 @@
     <string name="notification_permission_enable_button_text">Включить уведомления</string>
     <!-- Notification content for upload final notification in case of a single file upload. -->
     <string name="transfers_notification_title_single_upload">«%1$s» обновлён</string>
+    <!-- Title of the warning banner displayed when Syncs are paused due to lost Wi-Fi conditions -->
+    <string name="general_sync_warning_lost_wifi_title">Синхронизация приостановлена из-за потери соединения.</string>
+    <!-- Text of the warning banner displayed when Syncs are paused due to lost Wi-Fi conditions -->
+    <string name="general_sync_warning_lost_wifi_text">Переподключитесь к Wi-Fi, чтобы возобновить.</string>
 </resources>

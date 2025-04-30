@@ -61,9 +61,9 @@
     <!-- Item menu option upon right click on one or multiple files. -->
     <string name="action_add">อัปโหลด</string>
     <!-- Menu item -->
-    <string name="action_create_folder">สร้างโฟลเดอร์ใหม่</string>
+    <string name="action_create_folder">โฟลเดอร์ใหม่</string>
     <!-- Option which allows create a new text file -->
-    <string name="action_create_txt">สร้างไฟล์ข้อความใหม่</string>
+    <string name="action_create_txt">ไฟล์ข้อความใหม่</string>
     <!-- Menu item -->
     <string name="action_settings">ตั้งค่า</string>
     <!-- Search button -->
@@ -4746,20 +4746,6 @@
     <string name="meetings_schedule_meeting_free_plan_100_participants_limit_dialog_description">การโทรนี้รองรับผู้เข้าร่วมได้สูงสุด 100&#160;คน หากต้องการเพิ่มจำนวนผู้เข้าร่วม กรุณาขอให้ผู้จัดการประชุมยกเลิกข้อจำกัดนี้ก่อน</string>
     <!-- Free plan limitation dialogue button for scheduled meeting calls with more than 100 participants -->
     <string name="meetings_schedule_meeting_free_plan_100_participants_limit_dialog_button">โอเค เข้าใจแล้ว</string>
-    <!-- The title of the hidden nodes feature -->
-    <string name="hidden_nodes">ซ่อนไฟล์และโฟลเดอร์</string>
-    <!-- Hidden nodes benefit: hide files and folders -->
-    <string name="hidden_nodes_benefit_title_hide_files_folders">ซ่อนไฟล์และโฟลเดอร์สำคัญ</string>
-    <!-- Hidden nodes benefit description: hide files and folders -->
-    <string name="hidden_nodes_benefit_description_hide_files_folders">เก็บไฟล์และโฟลเดอร์ลับไว้ส่วนตัว เฉพาะคุณเท่านั้นที่สามารถดูได้ โดยสามารถเลือกดูทีละรายการ หรือแสดงไฟล์ที่ซ่อนไว้ชั่วคราวจากการตั้งค่า</string>
-    <!-- Hidden nodes benefit: exclude from timeline -->
-    <string name="hidden_nodes_benefit_title_exclude_timeline">ไม่แสดงในไทม์ไลน์</string>
-    <!-- Hidden nodes benefit description: exclude from timeline -->
-    <string name="hidden_nodes_benefit_description_exclude_timeline">รายการที่ซ่อนจะมองเห็นได้เฉพาะในคลาวด์ไดร์ฟเท่านั้น และจะไม่ปรากฏในรูปภาพ อัลบั้ม หรือรายการล่าสุด</string>
-    <!-- Hidden nodes benefit: out of sight -->
-    <string name="hidden_nodes_benefit_title_out_of_sight">แสดงไฟล์ที่ซ่อนอยู่</string>
-    <!-- Hidden nodes benefit description: out of sight -->
-    <string name="hidden_nodes_benefit_description_out_of_sight">คุณสามารถเลือกได้ว่าต้องการให้ไฟล์ที่ซ่อนอยู่ปรากฏหรือไม่ มีการตั้งค่าใหม่ที่ช่วยให้คุณแสดงไฟล์ที่ซ่อนอยู่ชั่วคราวได้</string>
     <!-- The snackbar message of hidden nodes operation -->
     <plurals name="hidden_nodes_result_message">
         <item quantity="other">%1$d รายการถูกซ่อน</item>

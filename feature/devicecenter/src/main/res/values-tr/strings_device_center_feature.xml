@@ -31,7 +31,7 @@
     <!-- The name of one of the Device Center Bottom Sheet items which takes the User to the Camera uploads feature when clicked -->
     <string name="device_center_bottom_sheet_item_camera_uploads">Camera uploads</string>
     <!-- The enabled Camera uploads status that is shown alongside the "Camera uploads" Device Center Bottom Sheet item -->
-    <string name="device_center_bottom_sheet_item_camera_uploads_enabled_status">Enabled</string>
+    <string name="device_center_bottom_sheet_item_camera_uploads_enabled_status">Etkin</string>
     <!-- The disabled Camera uploads status that is shown alongside the "Camera uploads" Device Center Bottom Sheet item -->
     <string name="device_center_bottom_sheet_item_camera_uploads_disabled_status">Engelli</string>
     <!-- The name of one of the Device Center Bottom Sheet items that when clicked, opens the "Rename device" Dialog to let the User rename the selected Device -->

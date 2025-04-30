@@ -4746,20 +4746,6 @@
     <string name="meetings_schedule_meeting_free_plan_100_participants_limit_dialog_description">此通话只能支持100位参与者。请求组织者移除此限制。</string>
     <!-- Free plan limitation dialogue button for scheduled meeting calls with more than 100 participants -->
     <string name="meetings_schedule_meeting_free_plan_100_participants_limit_dialog_button">好的，明白了</string>
-    <!-- The title of the hidden nodes feature -->
-    <string name="hidden_nodes">隐藏的文件和文件夹</string>
-    <!-- Hidden nodes benefit: hide files and folders -->
-    <string name="hidden_nodes_benefit_title_hide_files_folders">隐藏重要的文件和文件夹</string>
-    <!-- Hidden nodes benefit description: hide files and folders -->
-    <string name="hidden_nodes_benefit_description_hide_files_folders">您可以隐藏敏感的文件和文件夹以保护隐私。只有您可以单独或通过设置中的暂时显示隐藏项目来显示它们。</string>
-    <!-- Hidden nodes benefit: exclude from timeline -->
-    <string name="hidden_nodes_benefit_title_exclude_timeline">从时间线中排除</string>
-    <!-- Hidden nodes benefit description: exclude from timeline -->
-    <string name="hidden_nodes_benefit_description_exclude_timeline">隐藏的项目只能通过云盘访问，不会出现在您的照片、相册或近期照片中。</string>
-    <!-- Hidden nodes benefit: out of sight -->
-    <string name="hidden_nodes_benefit_title_out_of_sight">隐藏</string>
-    <!-- Hidden nodes benefit description: out of sight -->
-    <string name="hidden_nodes_benefit_description_out_of_sight">您可以决定何时显示隐藏的文件。有一个新的设置可以暂时显示隐藏的项目。</string>
     <!-- The snackbar message of hidden nodes operation -->
     <plurals name="hidden_nodes_result_message">
         <item quantity="other">已隐藏%1$d个项目</item>

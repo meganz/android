@@ -5421,20 +5421,6 @@
     <string name="meetings_schedule_meeting_free_plan_100_participants_limit_dialog_description">Этот звонок может включать до 100&#160;участников. Попросите организатора снять это ограничение.</string>
     <!-- Free plan limitation dialogue button for scheduled meeting calls with more than 100 participants -->
     <string name="meetings_schedule_meeting_free_plan_100_participants_limit_dialog_button">Понятно</string>
-    <!-- The title of the hidden nodes feature -->
-    <string name="hidden_nodes">Скрытые файлы и папки</string>
-    <!-- Hidden nodes benefit: hide files and folders -->
-    <string name="hidden_nodes_benefit_title_hide_files_folders">Скрывайте важные файлы и папки</string>
-    <!-- Hidden nodes benefit description: hide files and folders -->
-    <string name="hidden_nodes_benefit_description_hide_files_folders">Вы можете скрывать важные файлы и папки в целях конфиденциальности. Отобразить их можете только вы: либо по отдельности, либо временно временно включить отображение скрытых элементов в настройках.</string>
-    <!-- Hidden nodes benefit: exclude from timeline -->
-    <string name="hidden_nodes_benefit_title_exclude_timeline">Исключайте из «Временной шкалы»</string>
-    <!-- Hidden nodes benefit description: exclude from timeline -->
-    <string name="hidden_nodes_benefit_description_exclude_timeline">Скрытые элементы доступны только через Облачный диск и не отображаются в «Фотографиях», «Альбомах» или «Недавних».</string>
-    <!-- Hidden nodes benefit: out of sight -->
-    <string name="hidden_nodes_benefit_title_out_of_sight">С глаз долой</string>
-    <!-- Hidden nodes benefit description: out of sight -->
-    <string name="hidden_nodes_benefit_description_out_of_sight">Вы сами решаете, когда будут видны скрытые файлы. Появилась новая настройка для временного отображения скрытых элементов.</string>
     <!-- The snackbar message of hidden nodes operation -->
     <plurals name="hidden_nodes_result_message">
         <item quantity="one">%1$d элемент скрыт</item>

@@ -61,9 +61,9 @@
     <!-- Item menu option upon right click on one or multiple files. -->
     <string name="action_add">رفع</string>
     <!-- Menu item -->
-    <string name="action_create_folder">إنشاء مجلد جديد</string>
+    <string name="action_create_folder">مجلد جديد</string>
     <!-- Option which allows create a new text file -->
-    <string name="action_create_txt">إنشاء ملف نصي جديد</string>
+    <string name="action_create_txt">ملف نصي جديد</string>
     <!-- Menu item -->
     <string name="action_settings">الإعدادات</string>
     <!-- Search button -->
@@ -5871,20 +5871,6 @@
     <string name="meetings_schedule_meeting_free_plan_100_participants_limit_dialog_description">يمكن لهذه المكالمة دعم 100 مشارك فقط. اطلب من المنظم إزالة هذا التقييد.</string>
     <!-- Free plan limitation dialogue button for scheduled meeting calls with more than 100 participants -->
     <string name="meetings_schedule_meeting_free_plan_100_participants_limit_dialog_button">حسنًا، فهمت ذلك</string>
-    <!-- The title of the hidden nodes feature -->
-    <string name="hidden_nodes">الملفات والمجلدات المخفية</string>
-    <!-- Hidden nodes benefit: hide files and folders -->
-    <string name="hidden_nodes_benefit_title_hide_files_folders">إخفاء الملفات والمجلدات المهمة</string>
-    <!-- Hidden nodes benefit description: hide files and folders -->
-    <string name="hidden_nodes_benefit_description_hide_files_folders">يمكنك إخفاء الملفات والمجلدات الحساسة للخصوصية. يمكنك فقط الكشف عنها إما بشكل فردي أو عن طريق عرض العناصر المخفية مؤقتًا من الإعدادات.</string>
-    <!-- Hidden nodes benefit: exclude from timeline -->
-    <string name="hidden_nodes_benefit_title_exclude_timeline">الاستبعاد من المخطط الزمني</string>
-    <!-- Hidden nodes benefit description: exclude from timeline -->
-    <string name="hidden_nodes_benefit_description_exclude_timeline">لا يمكن الوصول إلى العناصر المخفية إلا من خلال السواقة السحابية ولن تظهر في الصور أو الألبومات أو الأحداث الأخيرة.</string>
-    <!-- Hidden nodes benefit: out of sight -->
-    <string name="hidden_nodes_benefit_title_out_of_sight">بعيدًا عن الأنظار</string>
-    <!-- Hidden nodes benefit description: out of sight -->
-    <string name="hidden_nodes_benefit_description_out_of_sight">عليك أن تقرر متى تكون الملفات المخفية مرئية. هناك إعداد جديد لإظهار العناصر المخفية مؤقتًا.</string>
     <!-- The snackbar message of hidden nodes operation -->
     <plurals name="hidden_nodes_result_message">
         <item quantity="zero">%1$d عنصر مخفي</item>

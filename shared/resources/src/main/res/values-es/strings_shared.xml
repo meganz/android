@@ -834,14 +834,6 @@
     <string name="general_drive">Unidad</string>
     <!-- Tab bar title of Syncs tab -->
     <string name="general_syncs">Sincronizar</string>
-    <!-- Text under the syncs list -->
-    <string name="syncs_tab_view_other_devices">Ver otros dispositivos en el Centro de dispositivos</string>
-    <!-- The snackbar message of you and others raised your hands -->
-    <plurals name="transfers_completed_read_error_retrying">
-        <item quantity="one"></item>
-        <item quantity="many"></item>
-        <item quantity="other"></item>
-    </plurals>
     <!-- Warning shown to the user when tries to retry a cancelled or failed transfer but it cannot be retried because app does not have read permission over the file anymore -->
     <string name="transfers_completed_one_read_error_retrying">La subida no se puede completar ni reiniciar porque MEGA ya no puede acceder al archivo</string>
     <!-- Warning shown to the user when tries to retry some or all of cancelled or failed transfer but they cannot be retried because app does not have read permission over the files anymore -->
@@ -1119,31 +1111,35 @@
     <!-- Hidden nodes: hide files and folders feature -->
     <string name="hidden_nodes_title_hide_files_folders_feature">Oculta archivos y carpetas</string>
     <!-- Hidden nodes description: hide files and folders feature -->
-    <string name="hidden_nodes_description_hide_files_folders_feature">Mantén privados y lejos de miradas indiscretas tus archivos sensibles en la nube. Por defecto, los archivos ocultos no aparecerán en tu nube, en la sección de Fotos ni en Recientes.</string>
+    <string name="hidden_nodes_description_hide_files_folders_feature">Mantén tus archivos sensibles en la nube de forma privada y lejos de miradas indiscretas. Por defecto, los archivos ocultos no aparecen en tu Nube, ni en las secciones de Fotos y Recientes.</string>
     <!-- Hidden nodes: control visibility feature -->
     <string name="hidden_nodes_title_control_visibility">Controla la visibilidad fácilmente</string>
     <!-- Hidden nodes description: control visibility feature -->
-    <string name="hidden_nodes_description_control_visibility">To show hidden files, turn on the “Show hidden items” setting under “File Management --&gt; User interface” in your app settings</string>
+    <string name="hidden_nodes_description_control_visibility">To show hidden files, turn on the “Show hidden items” setting under “File Management” -&gt; “User interface” in your app settings.</string>
     <!-- Hidden nodes: shared files stay visible feature -->
     <string name="hidden_nodes_title_visible_shared_files">Los archivos compartidos permanecen visibles</string>
     <!-- Hidden nodes description: shared files stay visible feature -->
-    <string name="hidden_nodes_description_visible_shared_files">Files and folders shared with contacts or with public links are still accessible and visible, even if hidden</string>
+    <string name="hidden_nodes_description_visible_shared_files">Archivos y carpetas compartidos con contactos o con enlaces públicos siguen siendo accesibles y visibles, aunque estén ocultos</string>
     <!--Camera backup permission screen title-->
-    <string name="camera_backup_permission_screen_title">Keep your photos safe, always</string>
+    <string name="camera_backup_permission_screen_title">Mantén tus fotos seguras, siempre</string>
     <!--Camera backup permission screen description-->
-    <string name="camera_backup_permission_screen_description">Your memories matter.\n\nCamera uploads automatically backs up your photos and videos to your MEGA Cloud drive, so you never have to worry about losing them.</string>
+    <string name="camera_backup_permission_screen_description">Tus recuerdos importan.\n\nLas Subidas de la cámara hacen copias de seguridad automáticas de tus fotos y vídeos en la Nube, para que no tengas que preocuparte por perderlos.</string>
     <!--Camera backup permission banner text to explain why the camera backup permission is needed-->
-    <string name="camera_backup_permission_banner_info_description">Camera uploads requires [A]full access[/A] to your device’s photo library</string>
+    <string name="camera_backup_permission_banner_info_description">Las Subidas de la cámara requieren [A]acceso completo[/A] a la biblioteca de fotos de tu dispositivo</string>
     <!--Button text to request camera backup permission-->
     <string name="camera_backup_permission_enable_button_text">Activar las Subidas de la cámara</string>
     <!--Permission screen skip requesting permission button text-->
-    <string name="permission_screen_skip_permission_request_button_text">Skip for now</string>
+    <string name="permission_screen_skip_permission_request_button_text">Omitir por ahora</string>
     <!--Notification permission screen title-->
-    <string name="notification_permission_screen_title">Never miss an important update</string>
+    <string name="notification_permission_screen_title">No te pierdas ninguna actualización importante</string>
     <!--Notification permission screen description-->
-    <string name="notification_permission_screen_description">Stay informed with real-time updates that matter to you. Get alerts for shared folder activity, security updates, and exclusive offers, so you never miss anything important.\n\nYou can manage notification preferences at any time in your device’s settings.</string>
+    <string name="notification_permission_screen_description">Mantente informado con actualizaciones en tiempo real que son relevantes para ti. Recibe alertas sobre la actividad en carpetas compartidas, actualizaciones de seguridad y ofertas exclusivas, para que no te pierdas nada importante.\n\nPuedes gestionar tus preferencias de notificación en cualquier momento desde los ajustes de tu dispositivo.</string>
     <!--Button text to request Notification permission-->
     <string name="notification_permission_enable_button_text">Activar Notificaciones</string>
     <!-- Notification content for upload final notification in case of a single file upload. -->
-    <string name="transfers_notification_title_single_upload">Uploaded “%1$s”</string>
+    <string name="transfers_notification_title_single_upload">Se ha subido “%1$s”</string>
+    <!-- Title of the warning banner displayed when Syncs are paused due to lost Wi-Fi conditions -->
+    <string name="general_sync_warning_lost_wifi_title">La sincronización se ha detenido debido a la pérdida de la conexión.</string>
+    <!-- Text of the warning banner displayed when Syncs are paused due to lost Wi-Fi conditions -->
+    <string name="general_sync_warning_lost_wifi_text">Vuelve a conectarte al Wi-Fi para reanudar.</string>
 </resources>

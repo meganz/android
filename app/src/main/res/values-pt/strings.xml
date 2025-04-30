@@ -61,9 +61,9 @@
     <!-- Item menu option upon right click on one or multiple files. -->
     <string name="action_add">Upload</string>
     <!-- Menu item -->
-    <string name="action_create_folder">Criar nova pasta</string>
+    <string name="action_create_folder">Nova pasta</string>
     <!-- Option which allows create a new text file -->
-    <string name="action_create_txt">Criar um arquivo de texto novo</string>
+    <string name="action_create_txt">Novo arquivo de texto</string>
     <!-- Menu item -->
     <string name="action_settings">Configurações</string>
     <!-- Search button -->
@@ -5196,20 +5196,6 @@
     <string name="meetings_schedule_meeting_free_plan_100_participants_limit_dialog_description">Esta chamada permite um máximo de 100 participantes. Solicite ao organizador que elimine essa restrição.</string>
     <!-- Free plan limitation dialogue button for scheduled meeting calls with more than 100 participants -->
     <string name="meetings_schedule_meeting_free_plan_100_participants_limit_dialog_button">Entendi</string>
-    <!-- The title of the hidden nodes feature -->
-    <string name="hidden_nodes">Arquivos e pastas ocultos</string>
-    <!-- Hidden nodes benefit: hide files and folders -->
-    <string name="hidden_nodes_benefit_title_hide_files_folders">Oculte arquivos e pastas importantes</string>
-    <!-- Hidden nodes benefit description: hide files and folders -->
-    <string name="hidden_nodes_benefit_description_hide_files_folders">Você pode ocultar arquivos e pastas confidenciais para ter privacidade. Somente você poderá mostrá-los, de forma individual ou exibindo temporariamente itens ocultos nas configurações.</string>
-    <!-- Hidden nodes benefit: exclude from timeline -->
-    <string name="hidden_nodes_benefit_title_exclude_timeline">Exclua da Linha do tempo</string>
-    <!-- Hidden nodes benefit description: exclude from timeline -->
-    <string name="hidden_nodes_benefit_description_exclude_timeline">Somente é possível acessar itens ocultos por meio da Nuvem de arquivos: eles não aparecerão nas suas Fotos, nos Álbuns ou nas Atividades recentes.</string>
-    <!-- Hidden nodes benefit: out of sight -->
-    <string name="hidden_nodes_benefit_title_out_of_sight">Fora do alcance</string>
-    <!-- Hidden nodes benefit description: out of sight -->
-    <string name="hidden_nodes_benefit_description_out_of_sight">Você decide quando os arquivos ocultos ficam visíveis. Há uma nova configuração para mostrar itens ocultos temporariamente.</string>
     <!-- The snackbar message of hidden nodes operation -->
     <plurals name="hidden_nodes_result_message">
         <item quantity="one">%1$d item oculto</item>

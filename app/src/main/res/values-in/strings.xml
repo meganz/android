@@ -61,9 +61,9 @@
     <!-- Item menu option upon right click on one or multiple files. -->
     <string name="action_add">Unggah</string>
     <!-- Menu item -->
-    <string name="action_create_folder">Buat folder baru</string>
+    <string name="action_create_folder">Folder baru</string>
     <!-- Option which allows create a new text file -->
-    <string name="action_create_txt">Buat file teks baru</string>
+    <string name="action_create_txt">File teks baru</string>
     <!-- Menu item -->
     <string name="action_settings">Pengaturan</string>
     <!-- Search button -->
@@ -4746,20 +4746,6 @@
     <string name="meetings_schedule_meeting_free_plan_100_participants_limit_dialog_description">Panggilan ini hanya dapat mendukung 100 peserta. Minta penyelenggara untuk menghapus batasan ini.</string>
     <!-- Free plan limitation dialogue button for scheduled meeting calls with more than 100 participants -->
     <string name="meetings_schedule_meeting_free_plan_100_participants_limit_dialog_button">OK, mengerti</string>
-    <!-- The title of the hidden nodes feature -->
-    <string name="hidden_nodes">File dan folder tersembunyi</string>
-    <!-- Hidden nodes benefit: hide files and folders -->
-    <string name="hidden_nodes_benefit_title_hide_files_folders">Sembunyikan file dan folder penting</string>
-    <!-- Hidden nodes benefit description: hide files and folders -->
-    <string name="hidden_nodes_benefit_description_hide_files_folders">Anda dapat menyembunyikan file dan folder sensitif untuk privasi. Hanya anda yang dapat mengungkapkannya, baik secara individual atau dengan menampilkan item tersembunyi sementara dari pengaturan.</string>
-    <!-- Hidden nodes benefit: exclude from timeline -->
-    <string name="hidden_nodes_benefit_title_exclude_timeline">Kecualikan dari Timeline</string>
-    <!-- Hidden nodes benefit description: exclude from timeline -->
-    <string name="hidden_nodes_benefit_description_exclude_timeline">Item tersembunyi hanya dapat diakses melalui drive Cloud dan tidak akan muncul di Foto, Album, atau Terbaru anda.</string>
-    <!-- Hidden nodes benefit: out of sight -->
-    <string name="hidden_nodes_benefit_title_out_of_sight">Tidak terlihat</string>
-    <!-- Hidden nodes benefit description: out of sight -->
-    <string name="hidden_nodes_benefit_description_out_of_sight">Anda memutuskan kapan file tersembunyi terlihat. Ada pengaturan baru untuk menampilkan item tersembunyi sementara.</string>
     <!-- The snackbar message of hidden nodes operation -->
     <plurals name="hidden_nodes_result_message">
         <item quantity="other">%1$d item tersembunyi</item>

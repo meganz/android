@@ -455,7 +455,7 @@
     <!-- Text to show in the Android Sync feature for a No Network State when there is no network connectivity -->
     <string name="sync_no_network_state">無網路連線</string>
     <!-- Menu option to create a new folder in the file manager -->
-    <string name="general_menu_create_new_folder">建立新資料夾</string>
+    <string name="general_menu_create_new_folder">新資料夾</string>
     <!-- Create new folder dialog title -->
     <string name="create_new_folder_dialog_title">新資料夾</string>
     <!-- Create new folder dialog hint text (input field description) -->
@@ -808,12 +808,6 @@
     <string name="general_drive">硬碟</string>
     <!-- Tab bar title of Syncs tab -->
     <string name="general_syncs">同步</string>
-    <!-- Text under the syncs list -->
-    <string name="syncs_tab_view_other_devices">在裝置中心查看其它裝置</string>
-    <!-- The snackbar message of you and others raised your hands -->
-    <plurals name="transfers_completed_read_error_retrying">
-        <item quantity="other"></item>
-    </plurals>
     <!-- Warning shown to the user when tries to retry a cancelled or failed transfer but it cannot be retried because app does not have read permission over the file anymore -->
     <string name="transfers_completed_one_read_error_retrying">由於MEGA無法再存取該檔案，您的上傳無法完成或重試。</string>
     <!-- Warning shown to the user when tries to retry some or all of cancelled or failed transfer but they cannot be retried because app does not have read permission over the files anymore -->
@@ -989,7 +983,7 @@
     <!-- Title of the notification displayed when Syncs are paused due to lost Wi-Fi conditions -->
     <string name="general_sync_notification_lost_wifi_title">由於失去連線，同步已暫停</string>
     <!-- Text of the notification displayed when Syncs are paused due to lost Wi-Fi conditions -->
-    <string name="general_sync_notification_lost_wifi_text">重新連線Wi-Fi以繼續</string>
+    <string name="general_sync_notification_lost_wifi_text">重新連線到Wi-Fi以繼續</string>
     <!-- Title of the notification displayed when Syncs are stopped due to some sync error -->
     <string name="general_sync_notification_generic_error_title">同步已停止</string>
     <!-- Text of the notification displayed when Syncs are stopped due to some sync error -->
@@ -1087,27 +1081,31 @@
     <!-- Hidden nodes: control visibility feature -->
     <string name="hidden_nodes_title_control_visibility">輕鬆控制可見性</string>
     <!-- Hidden nodes description: control visibility feature -->
-    <string name="hidden_nodes_description_control_visibility">To show hidden files, turn on the “Show hidden items” setting under “File Management --&gt; User interface” in your app settings</string>
+    <string name="hidden_nodes_description_control_visibility">To show hidden files, turn on the “Show hidden items” setting under “File Management” -&gt; “User interface” in your app settings.</string>
     <!-- Hidden nodes: shared files stay visible feature -->
     <string name="hidden_nodes_title_visible_shared_files">共享檔案保持可見狀態</string>
     <!-- Hidden nodes description: shared files stay visible feature -->
-    <string name="hidden_nodes_description_visible_shared_files">Files and folders shared with contacts or with public links are still accessible and visible, even if hidden</string>
+    <string name="hidden_nodes_description_visible_shared_files">共享給聯絡人，或透過公開連結共享的檔案及資料夾，即使設定隱藏，仍然可以存取和被看到</string>
     <!--Camera backup permission screen title-->
-    <string name="camera_backup_permission_screen_title">Keep your photos safe, always</string>
+    <string name="camera_backup_permission_screen_title">始終確保照片的安全</string>
     <!--Camera backup permission screen description-->
-    <string name="camera_backup_permission_screen_description">Your memories matter.\n\nCamera uploads automatically backs up your photos and videos to your MEGA Cloud drive, so you never have to worry about losing them.</string>
+    <string name="camera_backup_permission_screen_description">您的回憶很重要。\n\n相機上傳功能會自動將您的照片和影片備份到您的MEGA雲端硬碟，因此您永遠不必擔心遺失它們。</string>
     <!--Camera backup permission banner text to explain why the camera backup permission is needed-->
-    <string name="camera_backup_permission_banner_info_description">Camera uploads requires [A]full access[/A] to your device’s photo library</string>
+    <string name="camera_backup_permission_banner_info_description">相機上傳需您裝置相簿的[A]完全存取[/A]權限</string>
     <!--Button text to request camera backup permission-->
     <string name="camera_backup_permission_enable_button_text">啟用相機上傳</string>
     <!--Permission screen skip requesting permission button text-->
-    <string name="permission_screen_skip_permission_request_button_text">Skip for now</string>
+    <string name="permission_screen_skip_permission_request_button_text">暫時跳過</string>
     <!--Notification permission screen title-->
-    <string name="notification_permission_screen_title">Never miss an important update</string>
+    <string name="notification_permission_screen_title">不要錯過重要更新</string>
     <!--Notification permission screen description-->
-    <string name="notification_permission_screen_description">Stay informed with real-time updates that matter to you. Get alerts for shared folder activity, security updates, and exclusive offers, so you never miss anything important.\n\nYou can manage notification preferences at any time in your device’s settings.</string>
+    <string name="notification_permission_screen_description">隨時瞭解對您重要的即時更新資訊。取得共享資料夾活動、安全性更新和獨家優惠的通知，您就不會錯過任何重要的事情。\n\n您可以隨時在裝置設定中管理通知偏好選項。</string>
     <!--Button text to request Notification permission-->
     <string name="notification_permission_enable_button_text">啟用通知</string>
     <!-- Notification content for upload final notification in case of a single file upload. -->
-    <string name="transfers_notification_title_single_upload">Uploaded “%1$s”</string>
+    <string name="transfers_notification_title_single_upload">已上傳「%1$s」</string>
+    <!-- Title of the warning banner displayed when Syncs are paused due to lost Wi-Fi conditions -->
+    <string name="general_sync_warning_lost_wifi_title">由於失去連線，同步已暫停。</string>
+    <!-- Text of the warning banner displayed when Syncs are paused due to lost Wi-Fi conditions -->
+    <string name="general_sync_warning_lost_wifi_text">重新連線到Wi-Fi以繼續。</string>
 </resources>

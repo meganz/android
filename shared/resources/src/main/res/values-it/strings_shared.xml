@@ -834,14 +834,6 @@
     <string name="general_drive">Drive</string>
     <!-- Tab bar title of Syncs tab -->
     <string name="general_syncs">Sincronizzazioni</string>
-    <!-- Text under the syncs list -->
-    <string name="syncs_tab_view_other_devices">Visualizza altri dispositivi nel Centro dispositivi</string>
-    <!-- The snackbar message of you and others raised your hands -->
-    <plurals name="transfers_completed_read_error_retrying">
-        <item quantity="one"></item>
-        <item quantity="many"></item>
-        <item quantity="other"></item>
-    </plurals>
     <!-- Warning shown to the user when tries to retry a cancelled or failed transfer but it cannot be retried because app does not have read permission over the file anymore -->
     <string name="transfers_completed_one_read_error_retrying">Il caricamento non può essere completato o ritentato, perché MEGA non può più accedere al file</string>
     <!-- Warning shown to the user when tries to retry some or all of cancelled or failed transfer but they cannot be retried because app does not have read permission over the files anymore -->
@@ -1121,7 +1113,7 @@
     <!-- Hidden nodes: control visibility feature -->
     <string name="hidden_nodes_title_control_visibility">Control visibility easily</string>
     <!-- Hidden nodes description: control visibility feature -->
-    <string name="hidden_nodes_description_control_visibility">To show hidden files, turn on the “Show hidden items” setting under “File Management --&gt; User interface” in your app settings</string>
+    <string name="hidden_nodes_description_control_visibility">To show hidden files, turn on the “Show hidden items” setting under “File Management” -&gt; “User interface” in your app settings.</string>
     <!-- Hidden nodes: shared files stay visible feature -->
     <string name="hidden_nodes_title_visible_shared_files">Shared files stay visible</string>
     <!-- Hidden nodes description: shared files stay visible feature -->
@@ -1144,4 +1136,8 @@
     <string name="notification_permission_enable_button_text">Attiva le notifiche</string>
     <!-- Notification content for upload final notification in case of a single file upload. -->
     <string name="transfers_notification_title_single_upload">Uploaded “%1$s”</string>
+    <!-- Title of the warning banner displayed when Syncs are paused due to lost Wi-Fi conditions -->
+    <string name="general_sync_warning_lost_wifi_title">Syncing paused due to lost connection.</string>
+    <!-- Text of the warning banner displayed when Syncs are paused due to lost Wi-Fi conditions -->
+    <string name="general_sync_warning_lost_wifi_text">Reconnect to Wi-Fi to resume.</string>
 </resources>

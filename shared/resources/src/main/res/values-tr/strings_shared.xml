@@ -463,7 +463,7 @@
     <!-- Text to show in the Android Sync feature for a No Network State when there is no network connectivity -->
     <string name="sync_no_network_state">İnternet bağlantısı yok</string>
     <!-- Menu option to create a new folder in the file manager -->
-    <string name="general_menu_create_new_folder">Create new folder</string>
+    <string name="general_menu_create_new_folder">New folder</string>
     <!-- Create new folder dialog title -->
     <string name="create_new_folder_dialog_title">New folder</string>
     <!-- Create new folder dialog hint text (input field description) -->
@@ -821,13 +821,6 @@
     <string name="general_drive">Drive</string>
     <!-- Tab bar title of Syncs tab -->
     <string name="general_syncs">Syncs</string>
-    <!-- Text under the syncs list -->
-    <string name="syncs_tab_view_other_devices">View other devices in Device centre</string>
-    <!-- The snackbar message of you and others raised your hands -->
-    <plurals name="transfers_completed_read_error_retrying">
-        <item quantity="one"></item>
-        <item quantity="other"></item>
-    </plurals>
     <!-- Warning shown to the user when tries to retry a cancelled or failed transfer but it cannot be retried because app does not have read permission over the file anymore -->
     <string name="transfers_completed_one_read_error_retrying">Your upload can’t be completed or retried, because MEGA can no longer access the file</string>
     <!-- Warning shown to the user when tries to retry some or all of cancelled or failed transfer but they cannot be retried because app does not have read permission over the files anymore -->
@@ -871,7 +864,7 @@
     <!--Content on the Multi-Factor Authentication Login page -->
     <string name="multi_factor_auth_login_verification_content">Enter the 6-digit code from your authenticator app.</string>
     <!--Message to be shown to the user when they entered an incorrect verification code-->
-    <string name="multi_factor_auth_login_verification_input_error_text">Incorrect verification code</string>
+    <string name="multi_factor_auth_login_verification_input_error_text">Yanlış doğrulama kodu</string>
     <!-- Snackbar text to inform the user that preview may take some time because it needs to be downloaded -->
     <string name="transfers_preview_slow_snackbar">Preparing file for preview. See notification for details.</string>
     <!-- Notification text for preview downloads.  Please do not modify the %s placeholder as it will be replaced by the name of the file to be donwloaded -->
@@ -894,13 +887,13 @@
     <!--SD Card text shown as title in FileStorage screen -->
     <string name="general_sd_card">SD card</string>
     <!--The title of the Login page-->
-    <string name="login_page_title">Log in to your MEGA account</string>
+    <string name="login_page_title">MEGA hesabınıza giriş yapın</string>
     <!--Message to be shown to the user when they entered an invalid email-->
-    <string name="login_invalid_email_error_message">Enter a valid email address</string>
+    <string name="login_invalid_email_error_message">Geçerli bir e-posta adresi girin</string>
     <!--Message to be shown to the user when they entered an invalid format password-->
-    <string name="login_invalid_password_error_message">Enter your password</string>
+    <string name="login_invalid_password_error_message">Şifrenizi girin</string>
     <!--Message to be shown to the user when they entered the wrong credential-->
-    <string name="login_wrong_credential_error_message">Invalid email address or password</string>
+    <string name="login_wrong_credential_error_message">Geçersiz e-posta adresi veya şifre</string>
     <!--Message to be shown to he user when the account is not validated -->
     <string name="login_account_not_validated">Your account signup is incomplete or has been cancelled. Check your email inbox.</string>
     <!--Message to be shown to the user when login fails due to multiple failed attempts-->
@@ -914,7 +907,7 @@
     <!-- password label -->
     <string name="password_text">Şifre</string>
     <!-- Login button -->
-    <string name="login_text">Log in</string>
+    <string name="login_text">Giriş yap</string>
     <!--The text where user forgot their password and will navigate to reset it-->
     <string name="login_page_forgot_password_text">Şifremi unuttunuz?</string>
     <!-- Sync state up to date -->
@@ -963,15 +956,15 @@
     <!-- The name of the Device or Folder Status which signifies that some action is needed -->
     <string name="device_center_list_view_item_status_attention_needed">Attention needed</string>
     <!--General Unable to log in-->
-    <string name="general_unable_to_login">Unable to log in</string>
+    <string name="general_unable_to_login">Giriş yapılamıyor</string>
     <!--General check inbox-->
-    <string name="general_check_inbox">Check your inbox</string>
+    <string name="general_check_inbox">Gelen kutunuzu kontrol edin</string>
     <!--Message to be shown to user when account is temporarily suspended and requires email verification -->
     <string name="login_account_suspension_email_verification_message">Your account has been locked for your protection after detecting a malicious login, so we require you to reset your password. Check your email inbox for instructions on unlocking your account and tips on how to prevent this from happening again.</string>
     <!--General Resend email-->
-    <string name="general_resend_email">Resend email</string>
+    <string name="general_resend_email">E-postayı yeniden gönder</string>
     <!-- Message displayed when email is successfully resent -->
-    <string name="general_email_resend_success_message">Email sent</string>
+    <string name="general_email_resend_success_message">E-posta gönderildi</string>
     <!--General Request Network Failed text-->
     <string name="general_request_failed_message">An error occurred, try again</string>
     <!-- Message error shown when trying to log in on an account that has been suspended due to breaches of copyright -->
@@ -979,7 +972,7 @@
     <!-- Message error shown when trying to log in on an account that has been terminated due to breaches of all reasons of breaching Terms of Service, except copyright. -->
     <string name="dialog_account_suspended_ToS_non_copyright_message">Your account was terminated due to a breach of MEGA’s Terms of Service.\nYou will not be able to regain access to your stored data or be authorised to sign up for a new MEGA account.</string>
     <!-- Error message appears to sub-users of a business account when they try to login and they are disabled. -->
-    <string name="error_business_disabled">Your account has been deactivated by your administrator. Please contact your Business account administrator for further details.</string>
+    <string name="error_business_disabled">Hesabınız, yöneticiniz tarafından devre dışı bırakıldı. Daha fazla bilgi için İşletme hesabı yöneticinizle iletişime geçin.</string>
     <!-- An error message which appears to sub-users of a business account when they try to login and they are deleted. -->
     <string name="error_business_removed">Your account has been removed by your administrator. Please contact your Business account administrator for further details.</string>
     <!--The title of the Email Confirmation page-->
@@ -1027,7 +1020,7 @@
     <!--Error message to be shown when account already existed-->
     <string name="sign_up_account_existed_error_message">This email address has already signed up for an account with MEGA</string>
     <!--General update text-->
-    <string name="general_update">Update</string>
+    <string name="general_update">Güncelle</string>
     <!-- Message displayed when email address is successfully updated -->
     <string name="email_confirmation_email_address_update_message">Email address updated</string>
     <!-- Snackbar text to inform the user that download started -->
@@ -1043,7 +1036,7 @@
     <!--Sign Up page message to be shown when confirm password is not same as password-->
     <string name="sign_up_confirm_password_not_match_error_message">Şifreler eşleşmiyor. Kontrol edin ve tekrar deneyin.</string>
     <!--Sign Up page message to be shown when password is considered medium-->
-    <string name="sign_up_password_medium_password_warning_message">Your password is easy to guess. We suggest trying a stronger combination of characters.</string>
+    <string name="sign_up_password_medium_password_warning_message">Şifrenizin tahmin edilmesi kolay. Daha güçlü bir karakter kombinasyonu denemenizi öneririz.</string>
     <!--Message to be shown when password is considered weak -->
     <string name="sign_up_password_weak_password_error_message">Şifrenizi tahmin etmek çok kolay. Daha güçlü bir karakter kombinasyonu deneyin.</string>
     <!--Sign Up page terms and condition content text-->
@@ -1105,7 +1098,7 @@
     <!-- Hidden nodes: control visibility feature -->
     <string name="hidden_nodes_title_control_visibility">Control visibility easily</string>
     <!-- Hidden nodes description: control visibility feature -->
-    <string name="hidden_nodes_description_control_visibility">To show hidden files, turn on the “Show hidden items” setting under “File Management --&gt; User interface” in your app settings</string>
+    <string name="hidden_nodes_description_control_visibility">To show hidden files, turn on the “Show hidden items” setting under “File Management” -&gt; “User interface” in your app settings.</string>
     <!-- Hidden nodes: shared files stay visible feature -->
     <string name="hidden_nodes_title_visible_shared_files">Shared files stay visible</string>
     <!-- Hidden nodes description: shared files stay visible feature -->
@@ -1128,4 +1121,8 @@
     <string name="notification_permission_enable_button_text">Enable notifications</string>
     <!-- Notification content for upload final notification in case of a single file upload. -->
     <string name="transfers_notification_title_single_upload">Uploaded “%1$s”</string>
+    <!-- Title of the warning banner displayed when Syncs are paused due to lost Wi-Fi conditions -->
+    <string name="general_sync_warning_lost_wifi_title">Syncing paused due to lost connection.</string>
+    <!-- Text of the warning banner displayed when Syncs are paused due to lost Wi-Fi conditions -->
+    <string name="general_sync_warning_lost_wifi_text">Reconnect to Wi-Fi to resume.</string>
 </resources>

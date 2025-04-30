@@ -63,7 +63,7 @@
     <!-- Menu item -->
     <string name="action_create_folder">Nuova cartella</string>
     <!-- Option which allows create a new text file -->
-    <string name="action_create_txt">Crea un nuovo file di testo</string>
+    <string name="action_create_txt">Nuovo file di testo</string>
     <!-- Menu item -->
     <string name="action_settings">Impostazioni</string>
     <!-- Search button -->
@@ -5196,20 +5196,6 @@
     <string name="meetings_schedule_meeting_free_plan_100_participants_limit_dialog_description">Questa chiamata può supportare solo 100 partecipanti. Chiedi all\’organizzatore di rimuovere questa restrizione.</string>
     <!-- Free plan limitation dialogue button for scheduled meeting calls with more than 100 participants -->
     <string name="meetings_schedule_meeting_free_plan_100_participants_limit_dialog_button">OK, capito</string>
-    <!-- The title of the hidden nodes feature -->
-    <string name="hidden_nodes">File e cartelle nascoste</string>
-    <!-- Hidden nodes benefit: hide files and folders -->
-    <string name="hidden_nodes_benefit_title_hide_files_folders">Nascondi file e cartelle importanti</string>
-    <!-- Hidden nodes benefit description: hide files and folders -->
-    <string name="hidden_nodes_benefit_description_hide_files_folders">Puoi nascondere file e cartelle sensibili per motivi di privacy. Solo tu puoi rivelarli, singolarmente o visualizzando temporaneamente gli oggetti nascosti dalle impostazioni.</string>
-    <!-- Hidden nodes benefit: exclude from timeline -->
-    <string name="hidden_nodes_benefit_title_exclude_timeline">Escludi dalla Cronologia</string>
-    <!-- Hidden nodes benefit description: exclude from timeline -->
-    <string name="hidden_nodes_benefit_description_exclude_timeline">Gli oggetti nascosti sono accessibili solo tramite il Cloud drive e non verranno visualizzati nelle tue Foto, nei tuoi Album o in Recenti.</string>
-    <!-- Hidden nodes benefit: out of sight -->
-    <string name="hidden_nodes_benefit_title_out_of_sight">Fuori dalla vista</string>
-    <!-- Hidden nodes benefit description: out of sight -->
-    <string name="hidden_nodes_benefit_description_out_of_sight">Sei tu a decidere quando i file nascosti sono visibili. C\’è una nuova impostazione per mostrare temporaneamente gli oggetti nascosti.</string>
     <!-- The snackbar message of hidden nodes operation -->
     <plurals name="hidden_nodes_result_message">
         <item quantity="one">%1$d oggetto nascosto</item>

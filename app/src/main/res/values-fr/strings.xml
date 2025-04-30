@@ -61,9 +61,9 @@
     <!-- Item menu option upon right click on one or multiple files. -->
     <string name="action_add">Téléverser</string>
     <!-- Menu item -->
-    <string name="action_create_folder">Créer un nouveau dossier</string>
+    <string name="action_create_folder">Nouveau dossier</string>
     <!-- Option which allows create a new text file -->
-    <string name="action_create_txt">Créer un nouveau fichier texte</string>
+    <string name="action_create_txt">Nouveau fichier texte</string>
     <!-- Menu item -->
     <string name="action_settings">Paramètres</string>
     <!-- Search button -->
@@ -5196,20 +5196,6 @@
     <string name="meetings_schedule_meeting_free_plan_100_participants_limit_dialog_description">Un maximum de 100&#160;personnes peut participer à cet appel. Demandez à la personne qui l’a organisé de lever cette limite.</string>
     <!-- Free plan limitation dialogue button for scheduled meeting calls with more than 100 participants -->
     <string name="meetings_schedule_meeting_free_plan_100_participants_limit_dialog_button">D’accord, j’ai compris</string>
-    <!-- The title of the hidden nodes feature -->
-    <string name="hidden_nodes">Fichiers et dossiers cachés</string>
-    <!-- Hidden nodes benefit: hide files and folders -->
-    <string name="hidden_nodes_benefit_title_hide_files_folders">Cacher les fichiers et dossiers importants</string>
-    <!-- Hidden nodes benefit description: hide files and folders -->
-    <string name="hidden_nodes_benefit_description_hide_files_folders">À des fins de confidentialité, vous pouvez dissimuler des fichiers et dossiers sensibles. Le choix de les faire apparaître vous appartient, soit individuellement, soit en activant temporairement dans les paramètres l’affichage des éléments cachés.</string>
-    <!-- Hidden nodes benefit: exclude from timeline -->
-    <string name="hidden_nodes_benefit_title_exclude_timeline">Exclure de la Vue chronologique</string>
-    <!-- Hidden nodes benefit description: exclude from timeline -->
-    <string name="hidden_nodes_benefit_description_exclude_timeline">Les éléments cachés ne sont accessibles que dans le Disque nuagique et n’apparaissent pas dans vos Photos, Albums ou Récents.</string>
-    <!-- Hidden nodes benefit: out of sight -->
-    <string name="hidden_nodes_benefit_title_out_of_sight">À l’abri des regards</string>
-    <!-- Hidden nodes benefit description: out of sight -->
-    <string name="hidden_nodes_benefit_description_out_of_sight">Vous décidez si les fichiers cachés sont visibles. Un nouveau paramètre permet d’afficher temporairement les éléments cachés.</string>
     <!-- The snackbar message of hidden nodes operation -->
     <plurals name="hidden_nodes_result_message">
         <item quantity="one">%1$d&#160;élément caché</item>
