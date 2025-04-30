@@ -7,8 +7,11 @@ import androidx.compose.foundation.lazy.LazyListState
 import androidx.compose.foundation.lazy.grid.LazyGridState
 import androidx.compose.material.MaterialTheme
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.saveable.rememberSaveable
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalConfiguration
 import androidx.compose.ui.unit.dp
@@ -74,7 +77,7 @@ fun <T : TypedNode> NodesView(
     listContentPadding: PaddingValues = PaddingValues(0.dp),
     nodeSourceType: NodeSourceType = NodeSourceType.CLOUD_DRIVE,
 ) {
-    val takenDownDialog = remember { mutableStateOf(Pair(false, false)) }
+    var showTakenDownDialog by rememberSaveable { mutableStateOf(false) }
     val orientation = LocalConfiguration.current.orientation
     val span = if (orientation == Configuration.ORIENTATION_PORTRAIT) spanCount else 4
     if (isListView) {
@@ -84,8 +87,8 @@ fun <T : TypedNode> NodesView(
             nodeUIItemList = nodeUIItems,
             onMenuClick = onMenuClick,
             onItemClicked = {
-                if (it.isTakenDown) {
-                    takenDownDialog.value = Pair(true, it.node is FolderNode)
+                if (it.isTakenDown && it.node !is FolderNode) {
+                    showTakenDownDialog = true
                 } else {
                     onItemClicked(it)
                 }
@@ -116,8 +119,8 @@ fun <T : TypedNode> NodesView(
             nodeUIItems = newList,
             onMenuClick = onMenuClick,
             onItemClicked = {
-                if (it.isTakenDown) {
-                    takenDownDialog.value = Pair(true, it.node is FolderNode)
+                if (it.isTakenDown && it.node !is FolderNode) {
+                    showTakenDownDialog = true
                 } else {
                     onItemClicked(it)
                 }
@@ -139,14 +142,17 @@ fun <T : TypedNode> NodesView(
             nodeSourceType = nodeSourceType,
         )
     }
-    if (takenDownDialog.value.first) {
+    if (showTakenDownDialog) {
         TakeDownDialog(
-            isFolder = takenDownDialog.value.second, onConfirm = {
-                takenDownDialog.value = Pair(false, false)
-            }, onDeny = {
-                takenDownDialog.value = Pair(false, false)
+            isFolder = false,
+            onConfirm = {
+                showTakenDownDialog = false
+            },
+            onDeny = {
+                showTakenDownDialog = false
                 onDisputeTakeDownClicked.invoke(Constants.DISPUTE_URL)
-            }, onLinkClick = {
+            },
+            onLinkClick = {
                 onLinkClicked(it)
             }
         )
