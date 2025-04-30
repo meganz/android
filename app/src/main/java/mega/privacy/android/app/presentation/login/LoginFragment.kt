@@ -22,12 +22,14 @@ import androidx.compose.runtime.getValue
 import androidx.compose.ui.platform.ComposeView
 import androidx.compose.ui.platform.ViewCompositionStrategy
 import androidx.core.content.FileProvider
+import androidx.core.net.toUri
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.activityViewModels
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.lifecycle.lifecycleScope
 import com.google.android.material.dialog.MaterialAlertDialogBuilder
 import dagger.hilt.android.AndroidEntryPoint
+import de.palm.composestateevents.EventEffect
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.sync.Mutex
@@ -72,6 +74,7 @@ import mega.privacy.android.domain.entity.StorageState
 import mega.privacy.android.domain.entity.account.AccountBlockedDetail
 import mega.privacy.android.domain.entity.account.AccountBlockedType
 import mega.privacy.android.domain.entity.support.SupportEmailTicket
+import mega.privacy.android.domain.exception.MegaException
 import mega.privacy.android.domain.qualifier.LoginMutex
 import mega.privacy.android.domain.usecase.GetThemeMode
 import mega.privacy.android.domain.usecase.featureflag.GetFeatureFlagValueUseCase
@@ -127,6 +130,18 @@ class LoginFragment : Fragment() {
     @Composable
     private fun LoginScreen() {
         val uiState by viewModel.state.collectAsStateWithLifecycle()
+
+        EventEffect(uiState.checkRecoveryKeyEvent, viewModel::onCheckRecoveryKeyEventConsumed) {
+            if (it.isSuccess) {
+                val data = it.getOrThrow()
+                navigateToChangePassword(link = data.link, value = data.recoveryKey)
+            } else {
+                val e = it.exceptionOrNull()
+                Timber.e(e)
+                val code = (e as? MegaException)?.errorCode ?: Int.MIN_VALUE
+                handleRkError(code)
+            }
+        }
 
         with(uiState) {
             intentState?.apply {
@@ -247,11 +262,9 @@ class LoginFragment : Fragment() {
                 }
 
                 Constants.ACTION_PASS_CHANGED -> {
-                    when (intent.getIntExtra(Constants.RESULT, MegaError.API_OK)) {
+                    when (val code = intent.getIntExtra(Constants.RESULT, MegaError.API_OK)) {
                         MegaError.API_OK -> viewModel.setSnackbarMessageId(R.string.pass_changed_alert)
-                        MegaError.API_EKEY -> showAlertIncorrectRK()
-                        MegaError.API_EBLOCKED -> viewModel.setSnackbarMessageId(R.string.error_reset_account_blocked)
-                        else -> viewModel.setSnackbarMessageId(R.string.general_text_error)
+                        else -> handleRkError(code)
                     }
                     viewModel.intentSet()
                     return
@@ -812,7 +825,7 @@ class LoginFragment : Fragment() {
      *
      * @param link Reset password link.
      */
-    private fun showDialogInsertMKToChangePass(link: String?) {
+    private fun showDialogInsertMKToChangePass(link: String) {
         Timber.d("link: %s", link)
         val layout = LinearLayout(requireContext())
         layout.orientation = LinearLayout.VERTICAL
@@ -836,21 +849,7 @@ class LoginFragment : Fragment() {
         input.inputType = InputType.TYPE_TEXT_VARIATION_EMAIL_ADDRESS
         input.setOnEditorActionListener { _, actionId, _ ->
             if (actionId == EditorInfo.IME_ACTION_DONE) {
-                Timber.d("IME OK BUTTON PASSWORD")
-                val value = input.text.toString().trim { it <= ' ' }
-                if (value == "" || value.isEmpty()) {
-                    Timber.w("Input is empty")
-                    input.error = getString(R.string.invalid_string)
-                    input.requestFocus()
-                } else {
-                    Timber.d("Positive button pressed - reset pass")
-                    val intent = Intent(requireContext(), ChangePasswordActivity::class.java)
-                    intent.action = Constants.ACTION_RESET_PASS_FROM_LINK
-                    intent.data = Uri.parse(link)
-                    intent.putExtra(IntentConstants.EXTRA_MASTER_KEY, value)
-                    startActivity(intent)
-                    insertMKDialog!!.dismiss()
-                }
+                onSubmitRK(input, link)
             } else {
                 Timber.d("Other IME%s", actionId)
             }
@@ -871,22 +870,38 @@ class LoginFragment : Fragment() {
         insertMKDialog = builder.create().apply {
             show()
             getButton(AlertDialog.BUTTON_POSITIVE).setOnClickListener {
-                Timber.d("OK BUTTON PASSWORD")
-                val value = input.text.toString().trim { it <= ' ' }
-                if (value == "" || value.isEmpty()) {
-                    Timber.w("Input is empty")
-                    input.error = getString(R.string.invalid_string)
-                    input.requestFocus()
-                } else {
-                    Timber.d("Positive button pressed - reset pass")
-                    val intent = Intent(requireContext(), ChangePasswordActivity::class.java)
-                    intent.action = Constants.ACTION_RESET_PASS_FROM_LINK
-                    intent.data = Uri.parse(link)
-                    intent.putExtra(IntentConstants.EXTRA_MASTER_KEY, value)
-                    startActivity(intent)
-                    dismiss()
-                }
+                onSubmitRK(input, link)
             }
+        }
+    }
+
+    private fun onSubmitRK(input: EditText, link: String) {
+        Timber.d("OK BUTTON PASSWORD")
+        val value = input.text.toString().trim { it <= ' ' }
+        if (value == "" || value.isEmpty()) {
+            Timber.w("Input is empty")
+            input.error = getString(R.string.invalid_string)
+            input.requestFocus()
+        } else {
+            Timber.d("Positive button pressed - reset pass")
+            viewModel.checkRecoveryKey(link, value)
+            insertMKDialog?.dismiss()
+        }
+    }
+
+    private fun navigateToChangePassword(link: String, value: String) {
+        val intent = Intent(requireContext(), ChangePasswordActivity::class.java)
+        intent.action = Constants.ACTION_RESET_PASS_FROM_LINK
+        intent.data = link.toUri()
+        intent.putExtra(IntentConstants.EXTRA_MASTER_KEY, value)
+        startActivity(intent)
+    }
+
+    private fun handleRkError(code: Int) {
+        when (code) {
+            MegaError.API_EKEY -> showAlertIncorrectRK()
+            MegaError.API_EBLOCKED -> viewModel.setSnackbarMessageId(R.string.error_reset_account_blocked)
+            else -> viewModel.setSnackbarMessageId(R.string.general_text_error)
         }
     }
 

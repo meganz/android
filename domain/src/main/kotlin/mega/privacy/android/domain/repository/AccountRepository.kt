@@ -753,4 +753,12 @@ interface AccountRepository {
      * Resume create account
      */
     suspend fun resumeCreateAccount(session: String)
+
+    /**
+     * Check if the recovery key is valid
+     *
+     * @param link The recovery key link
+     * @param recoveryKey The recovery key
+     */
+    suspend fun checkRecoveryKey(link: String, recoveryKey: String)
 }

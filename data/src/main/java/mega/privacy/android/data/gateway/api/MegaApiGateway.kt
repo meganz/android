@@ -3774,4 +3774,16 @@ interface MegaApiGateway {
      * @return True if this feature is enabled. Otherwise false.
      */
     suspend fun serverSideRubbishBinAutopurgeEnabled(): Boolean
+
+    /**
+     * @brief Check that the provided recovery key (master key) is correct
+     *
+     * The associated request type with this request is MegaRequest::TYPE_CHECK_RECOVERY_KEY
+     * No data in the MegaRequest object received on all callbacks
+     *
+     * @param link The recovery link sent to the user's email address.
+     * @param recoveryKey Base64-encoded string containing the recoveryKey (masterKey).
+     * @param listener MegaRequestListener to track this request
+     */
+    fun checkRecoveryKey(link: String, recoveryKey: String, listener: MegaRequestListenerInterface)
 }

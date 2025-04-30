@@ -181,7 +181,7 @@ class OpenLinkActivity : PasscodeActivity(), MegaRequestListenerInterface,
                 if (resetPasswordLinkResult != null) {
                     if (resetPasswordLinkResult.isSuccess) {
                         val emailForLink = resetPasswordLinkResult.getOrThrow()
-                        if (emailForLink != userEmail) {
+                        if (emailForLink != userEmail && isLoggedIn == true) {
                             setError(getString(R.string.error_not_logged_with_correct_account))
                         } else {
                             navigateToResetPassword(isLoggedIn == true, needsRefreshSession)
@@ -419,13 +419,7 @@ class OpenLinkActivity : PasscodeActivity(), MegaRequestListenerInterface,
             // Reset password - two options: logged IN or OUT
             matchRegexs(url, RESET_PASSWORD_LINK_REGEXS) -> {
                 Timber.d("Reset pass url")
-                if (isLoggedIn) {
-                    viewModel.queryResetPasswordLink(url.orEmpty())
-                } else {
-                    Timber.d("Go to Login to fetch nodes")
-                    navigateToResetPassword(false, false)
-                    finish()
-                }
+                viewModel.queryResetPasswordLink(url.orEmpty())
             }
             // Pending contacts
             matchRegexs(url, PENDING_CONTACTS_LINK_REGEXS) -> {

@@ -23,6 +23,7 @@ import mega.privacy.android.app.R
 import mega.privacy.android.app.middlelayer.installreferrer.InstallReferrerDetails
 import mega.privacy.android.app.middlelayer.installreferrer.InstallReferrerHandler
 import mega.privacy.android.app.presentation.login.model.LoginError
+import mega.privacy.android.app.presentation.login.model.RkLink
 import mega.privacy.android.core.test.extension.CoroutineMainDispatcherExtension
 import mega.privacy.android.domain.entity.Progress
 import mega.privacy.android.domain.entity.ThemeMode
@@ -32,6 +33,7 @@ import mega.privacy.android.domain.exception.LoginLoggedOutFromOtherLocation
 import mega.privacy.android.domain.exception.MegaException
 import mega.privacy.android.domain.usecase.GetThemeMode
 import mega.privacy.android.domain.usecase.RootNodeExistsUseCase
+import mega.privacy.android.domain.usecase.account.CheckRecoveryKeyUseCase
 import mega.privacy.android.domain.usecase.account.ClearUserCredentialsUseCase
 import mega.privacy.android.domain.usecase.account.MonitorAccountBlockedUseCase
 import mega.privacy.android.domain.usecase.account.MonitorStorageStateEventUseCase
@@ -65,10 +67,7 @@ import mega.privacy.android.domain.usecase.requeststatus.MonitorRequestStatusPro
 import mega.privacy.android.domain.usecase.setting.ResetChatSettingsUseCase
 import mega.privacy.android.domain.usecase.transfers.CancelTransfersUseCase
 import mega.privacy.android.domain.usecase.transfers.OngoingTransfersExistUseCase
-import mega.privacy.android.domain.usecase.transfers.chatuploads.StartChatUploadsWorkerUseCase
-import mega.privacy.android.domain.usecase.transfers.downloads.StartDownloadWorkerUseCase
 import mega.privacy.android.domain.usecase.transfers.paused.CheckIfTransfersShouldBePausedUseCase
-import mega.privacy.android.domain.usecase.transfers.uploads.StartUploadsWorkerUseCase
 import mega.privacy.android.domain.usecase.workers.StopCameraUploadsUseCase
 import org.junit.jupiter.api.AfterEach
 import org.junit.jupiter.api.BeforeEach
@@ -134,6 +133,7 @@ internal class LoginViewModelTest {
     private val getThemeMode = mock<GetThemeMode>()
     private val resendVerificationEmailUseCase = mock<ResendVerificationEmailUseCase>()
     private val resumeCreateAccountUseCase = mock<ResumeCreateAccountUseCase>()
+    private val checkRecoveryKeyUseCase = mock<CheckRecoveryKeyUseCase>()
 
     @BeforeEach
     fun setUp() {
@@ -179,7 +179,8 @@ internal class LoginViewModelTest {
             isFirstLaunchUseCase = isFirstLaunchUseCase,
             getThemeMode = getThemeMode,
             resendVerificationEmailUseCase = resendVerificationEmailUseCase,
-            resumeCreateAccountUseCase = resumeCreateAccountUseCase
+            resumeCreateAccountUseCase = resumeCreateAccountUseCase,
+            checkRecoveryKeyUseCase = checkRecoveryKeyUseCase
         )
     }
 
@@ -207,7 +208,8 @@ internal class LoginViewModelTest {
             monitorRequestStatusProgressEventUseCase,
             checkIfTransfersShouldBePausedUseCase,
             isFirstLaunchUseCase,
-            resendVerificationEmailUseCase
+            resendVerificationEmailUseCase,
+            checkRecoveryKeyUseCase
         )
     }
 
@@ -477,7 +479,7 @@ internal class LoginViewModelTest {
                     StateEventWithContentTriggered::class.java
                 )
                 if (item.resendVerificationEmailEvent is StateEventWithContentTriggered) {
-                    assertThat(item.resendVerificationEmailEvent.content).isTrue()
+                    assertThat((item.resendVerificationEmailEvent as StateEventWithContentTriggered<Boolean>).content).isTrue()
                 }
             }
         }
@@ -494,7 +496,7 @@ internal class LoginViewModelTest {
                     StateEventWithContentTriggered::class.java
                 )
                 if (item.resendVerificationEmailEvent is StateEventWithContentTriggered) {
-                    assertThat(item.resendVerificationEmailEvent.content).isFalse()
+                    assertThat((item.resendVerificationEmailEvent as StateEventWithContentTriggered<Boolean>).content).isFalse()
                 }
             }
         }
@@ -530,6 +532,60 @@ internal class LoginViewModelTest {
                 assertThat(item.loginException).isInstanceOf(LoginLoggedOutFromOtherLocation::class.java)
             }
         }
+
+    @Test
+    fun `test that checkRecoveryKey triggers success event when use case succeeds`() = runTest {
+        val link = "https://example.com/recovery"
+        val recoveryKey = "validRecoveryKey"
+        whenever(checkRecoveryKeyUseCase(link, recoveryKey)).thenReturn(Unit)
+
+        underTest.checkRecoveryKey(link, recoveryKey)
+        advanceUntilIdle()
+
+        underTest.state.test {
+            val item = awaitItem()
+            assertThat(item.checkRecoveryKeyEvent).isInstanceOf(StateEventWithContentTriggered::class.java)
+            if (item.checkRecoveryKeyEvent is StateEventWithContentTriggered) {
+                val result =
+                    (item.checkRecoveryKeyEvent as StateEventWithContentTriggered<Result<RkLink>>).content
+                assertThat(result.isSuccess).isTrue()
+                assertThat(result.getOrNull()).isEqualTo(RkLink(link, recoveryKey))
+            }
+        }
+    }
+
+    @Test
+    fun `test that checkRecoveryKey triggers failure event when use case throws error`() = runTest {
+        val link = "https://example.com/recovery"
+        val recoveryKey = "invalidRecoveryKey"
+        val exception = RuntimeException("Invalid recovery key")
+        whenever(checkRecoveryKeyUseCase(link, recoveryKey)).thenThrow(exception)
+
+        underTest.checkRecoveryKey(link, recoveryKey)
+        advanceUntilIdle()
+
+        underTest.state.test {
+            val item = awaitItem()
+            assertThat(item.checkRecoveryKeyEvent).isInstanceOf(StateEventWithContentTriggered::class.java)
+            if (item.checkRecoveryKeyEvent is StateEventWithContentTriggered) {
+                val result =
+                    (item.checkRecoveryKeyEvent as StateEventWithContentTriggered<Result<RkLink>>).content
+                assertThat(result.isFailure).isTrue()
+                assertThat(result.exceptionOrNull()).isEqualTo(exception)
+            }
+        }
+    }
+
+    @Test
+    fun `test that onCheckRecoveryKeyEventConsumed resets checkRecoveryKeyEvent`() = runTest {
+        underTest.onCheckRecoveryKeyEventConsumed()
+        advanceUntilIdle()
+
+        underTest.state.test {
+            val item = awaitItem()
+            assertThat(item.checkRecoveryKeyEvent).isInstanceOf(consumed().javaClass)
+        }
+    }
 
     companion object {
         private val scheduler = TestCoroutineScheduler()

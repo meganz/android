@@ -96,6 +96,7 @@ data class LoginState(
     val isLoginNewDesignEnabled: Boolean? = null,
     val accountBlockedEvent: StateEventWithContent<AccountBlockedDetail> = consumed(),
     val resendVerificationEmailEvent: StateEventWithContent<Boolean> = consumed(),
+    val checkRecoveryKeyEvent: StateEventWithContent<Result<RkLink>> = consumed(),
 ) {
 
     /**

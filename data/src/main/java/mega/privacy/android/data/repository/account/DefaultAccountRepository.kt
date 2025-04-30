@@ -759,7 +759,8 @@ internal class DefaultAccountRepository @Inject constructor(
                                 Timber.w("MegaRequest.TYPE_QUERY_RECOVERY_LINK error $error")
                                 continuation.resumeWith(
                                     Result.failure(
-                                        ResetPasswordLinkException.LinkInvalid)
+                                        ResetPasswordLinkException.LinkInvalid
+                                    )
                                 )
                             }
                         }
@@ -1433,6 +1434,14 @@ internal class DefaultAccountRepository @Inject constructor(
             megaApiGateway.resumeCreateAccount(session, listener)
         }
     }
+
+    override suspend fun checkRecoveryKey(link: String, recoveryKey: String) =
+        withContext(ioDispatcher) {
+            suspendCancellableCoroutine { continuation ->
+                val listener = continuation.getRequestListener("checkRecoveryKey") { }
+                megaApiGateway.checkRecoveryKey(link, recoveryKey, listener)
+            }
+        }
 
     companion object {
         private const val LAST_SYNC_TIMESTAMP_FILE = "last_sync_timestamp"

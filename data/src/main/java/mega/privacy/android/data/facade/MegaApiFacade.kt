@@ -1579,4 +1579,8 @@ internal class MegaApiFacade @Inject constructor(
     }
 
     override suspend fun serverSideRubbishBinAutopurgeEnabled(): Boolean = megaApi.serverSideRubbishBinAutopurgeEnabled()
+
+    override fun checkRecoveryKey(link: String, recoveryKey: String, listener: MegaRequestListenerInterface) {
+        megaApi.checkRecoveryKey(link, recoveryKey, listener)
+    }
 }

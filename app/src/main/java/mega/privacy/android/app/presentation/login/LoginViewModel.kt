@@ -34,6 +34,7 @@ import mega.privacy.android.app.presentation.login.model.LoginFragmentType
 import mega.privacy.android.app.presentation.login.model.LoginIntentState
 import mega.privacy.android.app.presentation.login.model.LoginState
 import mega.privacy.android.app.presentation.login.model.MultiFactorAuthState
+import mega.privacy.android.app.presentation.login.model.RkLink
 import mega.privacy.android.app.presentation.twofactorauthentication.extensions.getTwoFactorAuthentication
 import mega.privacy.android.app.presentation.twofactorauthentication.extensions.getUpdatedTwoFactorAuthentication
 import mega.privacy.android.app.utils.Constants
@@ -58,6 +59,7 @@ import mega.privacy.android.domain.exception.login.FetchNodesException
 import mega.privacy.android.domain.qualifier.LoginMutex
 import mega.privacy.android.domain.usecase.GetThemeMode
 import mega.privacy.android.domain.usecase.RootNodeExistsUseCase
+import mega.privacy.android.domain.usecase.account.CheckRecoveryKeyUseCase
 import mega.privacy.android.domain.usecase.account.ClearUserCredentialsUseCase
 import mega.privacy.android.domain.usecase.account.MonitorAccountBlockedUseCase
 import mega.privacy.android.domain.usecase.account.MonitorStorageStateEventUseCase
@@ -146,6 +148,7 @@ class LoginViewModel @Inject constructor(
     private val getThemeMode: GetThemeMode,
     private val resendVerificationEmailUseCase: ResendVerificationEmailUseCase,
     private val resumeCreateAccountUseCase: ResumeCreateAccountUseCase,
+    private val checkRecoveryKeyUseCase: CheckRecoveryKeyUseCase,
 ) : ViewModel() {
 
     private val _state = MutableStateFlow(LoginState())
@@ -1097,6 +1100,38 @@ class LoginViewModel @Inject constructor(
                 )
             }
         }
+    }
+
+    /**
+     * Check recovery key
+     *
+     * @param link the recovery key link
+     * @param recoveryKey the recovery key
+     */
+    fun checkRecoveryKey(link: String, recoveryKey: String) = viewModelScope.launch {
+        runCatching {
+            checkRecoveryKeyUseCase(link, recoveryKey)
+        }.onSuccess {
+            _state.update {
+                it.copy(
+                    checkRecoveryKeyEvent = triggered(Result.success(RkLink(link, recoveryKey)))
+                )
+            }
+        }.onFailure { throwable ->
+            Timber.e(throwable)
+            _state.update {
+                it.copy(
+                    checkRecoveryKeyEvent = triggered(Result.failure(throwable))
+                )
+            }
+        }
+    }
+
+    /**
+     * Check if the account is blocked
+     */
+    fun onCheckRecoveryKeyEventConsumed() {
+        _state.update { it.copy(checkRecoveryKeyEvent = consumed()) }
     }
 
     /**
