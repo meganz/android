@@ -27,7 +27,6 @@ import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.ButtonDefaults
-import androidx.compose.material.ExperimentalMaterialApi
 import androidx.compose.material.Icon
 import androidx.compose.material.MaterialTheme
 import androidx.compose.material.ModalBottomSheetValue
@@ -92,9 +91,9 @@ import mega.privacy.android.shared.original.core.ui.controls.dialogs.Confirmatio
 import mega.privacy.android.shared.original.core.ui.controls.snackbars.MegaSnackbar
 import mega.privacy.android.shared.original.core.ui.preview.CombinedThemePreviews
 import mega.privacy.android.shared.original.core.ui.theme.OriginalTheme
+import mega.privacy.android.shared.original.core.ui.theme.extensions.accent_900_accent_050
 import mega.privacy.android.shared.original.core.ui.theme.extensions.grey_alpha_038_white_alpha_038
 import mega.privacy.android.shared.original.core.ui.theme.extensions.grey_alpha_087_white_alpha_087
-import mega.privacy.android.shared.original.core.ui.theme.extensions.accent_900_accent_050
 import mega.privacy.android.shared.original.core.ui.utils.showAutoDurationSnackbar
 import timber.log.Timber
 import java.io.File
@@ -106,7 +105,6 @@ import kotlin.coroutines.resumeWithException
 /**
  * View to render the QR code Screen, including toolbar, content, etc.
  */
-@OptIn(ExperimentalMaterialApi::class)
 @SuppressLint("UnusedMaterialScaffoldPaddingParameter")
 @Composable
 internal fun QRCodeView(
@@ -155,7 +153,9 @@ internal fun QRCodeView(
         event = viewState.resultMessage,
         onConsumed = onResultMessageConsumed
     ) {
-        snackBarHostState.showAutoDurationSnackbar(context.resources.getString(it.first, *it.second))
+        snackBarHostState.showAutoDurationSnackbar(
+            context.resources.getString(it.first, *it.second)
+        )
     }
 
     EventEffect(
@@ -204,7 +204,9 @@ internal fun QRCodeView(
     )
 
     Scaffold(
-        modifier = Modifier.systemBarsPadding().fillMaxSize(),
+        modifier = Modifier
+            .systemBarsPadding()
+            .fillMaxSize(),
         scaffoldState = scaffoldState,
         snackbarHost = {
             SnackbarHost(hostState = snackBarHostState) { data ->
@@ -547,10 +549,9 @@ private fun handleSave(
         (myQRCodeState as? MyCodeUIState.QRCodeAvailable)?.qrCodeFilePath?.let { qrFilePath ->
             runCatching {
                 val bitmap = captureViewToBitmap(view, activity.window, viewBounds)
-                bitmap?.let {
-                    saveBitmap(bitmap, qrFilePath)
-                    onSaveQRCode()
-                } ?: snackBarHostState.showAutoDurationSnackbar(activity.getString(R.string.general_text_error))
+                requireNotNull(bitmap)
+                saveBitmap(bitmap, qrFilePath)
+                onSaveQRCode()
             }.onFailure { snackBarHostState.showAutoDurationSnackbar(activity.getString(R.string.general_text_error)) }
         }
     }
@@ -562,7 +563,7 @@ private fun handleShare(
     viewBounds: Rect,
     myQRCodeState: MyCodeUIState,
     coroutineScope: CoroutineScope,
-    snackBarHostState: SnackbarHostState
+    snackBarHostState: SnackbarHostState,
 ) {
     coroutineScope.launch {
         (myQRCodeState as? MyCodeUIState.QRCodeAvailable)?.qrCodeFilePath?.let { qrFilePath ->
@@ -572,7 +573,8 @@ private fun handleShare(
                     val file = saveBitmap(bitmap, qrFilePath)
                     val uri = getFileUri(activity, file)
                     shareImage(activity, uri)
-                } ?: snackBarHostState.showAutoDurationSnackbar(activity.getString(R.string.error_share_qr))
+                }
+                    ?: snackBarHostState.showAutoDurationSnackbar(activity.getString(R.string.error_share_qr))
             }.onFailure { snackBarHostState.showAutoDurationSnackbar(activity.getString(R.string.error_share_qr)) }
         }
     }
@@ -657,7 +659,7 @@ private fun shareImage(activity: Activity, uri: Uri?) {
 
 private fun finishActivityAndSetResult(
     activity: Activity?,
-    scannedContactLinkResult: ScannedContactLinkResult
+    scannedContactLinkResult: ScannedContactLinkResult,
 ) {
     val intent = Intent()
     intent.putExtra(Constants.INTENT_EXTRA_KEY_MAIL, scannedContactLinkResult.email)

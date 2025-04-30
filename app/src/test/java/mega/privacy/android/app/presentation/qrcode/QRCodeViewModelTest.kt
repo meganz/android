@@ -3,6 +3,7 @@ package mega.privacy.android.app.presentation.qrcode
 import android.content.Context
 import android.graphics.Bitmap
 import androidx.compose.ui.unit.sp
+import androidx.core.app.NotificationManagerCompat
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import app.cash.turbine.test
 import com.google.common.truth.Truth.assertThat
@@ -22,6 +23,8 @@ import mega.privacy.android.app.presentation.qrcode.mapper.MyQRCodeTextErrorMapp
 import mega.privacy.android.app.presentation.qrcode.model.BarcodeScanResult
 import mega.privacy.android.app.presentation.qrcode.mycode.model.MyCodeUIState
 import mega.privacy.android.app.presentation.transfers.starttransfer.model.TransferTriggerEvent
+import mega.privacy.android.data.mapper.transfer.TransfersActionGroupFinishNotificationBuilder
+import mega.privacy.android.data.worker.AreNotificationsEnabledUseCase
 import mega.privacy.android.domain.entity.contacts.InviteContactRequest
 import mega.privacy.android.domain.entity.node.NodeId
 import mega.privacy.android.domain.entity.qrcode.QRCodeQueryResults
@@ -80,12 +83,17 @@ class QRCodeViewModelTest {
     private val myQRCodeTextErrorMapper = mock<MyQRCodeTextErrorMapper>()
     private val scannerHandler = mock<ScannerHandler>()
     private val getCurrentUserEmail = mock<GetCurrentUserEmail>()
-    private val doesUriPathHaveSufficientSpaceUseCase = mock<DoesUriPathHaveSufficientSpaceUseCase>()
+    private val doesUriPathHaveSufficientSpaceUseCase =
+        mock<DoesUriPathHaveSufficientSpaceUseCase>()
     private val scanMediaFileUseCase = mock<ScanMediaFileUseCase>()
     private val getRootNodeUseCase = mock<GetRootNodeUseCase>()
     private val monitorStorageStateEventUseCase = mock<MonitorStorageStateEventUseCase>()
     private val checkFileNameCollisionsUseCase = mock<CheckFileNameCollisionsUseCase>()
     private val context = mock<Context>()
+    private val areNotificationsEnabledUseCase: AreNotificationsEnabledUseCase = mock()
+    private val notificationManager: NotificationManagerCompat = mock()
+    private val transfersActionGroupFinishNotificationBuilder: TransfersActionGroupFinishNotificationBuilder =
+        mock()
 
     private val initialContactLink = "https://contact_link1"
 
@@ -113,6 +121,9 @@ class QRCodeViewModelTest {
             getRootNodeUseCase = getRootNodeUseCase,
             monitorStorageStateEventUseCase = monitorStorageStateEventUseCase,
             checkFileNameCollisionsUseCase = checkFileNameCollisionsUseCase,
+            areNotificationsEnabledUseCase = areNotificationsEnabledUseCase,
+            notificationManager = notificationManager,
+            transfersActionGroupFinishNotificationBuilder = transfersActionGroupFinishNotificationBuilder,
             context = context,
         )
     }

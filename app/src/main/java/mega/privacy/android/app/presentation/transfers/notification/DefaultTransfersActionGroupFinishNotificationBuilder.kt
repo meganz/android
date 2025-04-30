@@ -83,13 +83,19 @@ class DefaultTransfersActionGroupFinishNotificationBuilder @Inject constructor(
             actionGroup = actionGroup,
         )
 
-        val (contentIntent, actionIntent) = contentAndActionIntents(
+        val actionIntent = actionIntent(
             isLoggedIn = isLoggedIn,
             isDownload = isDownload,
             isPreviewDownload = isPreviewDownload,
             isOfflineDownload = isOfflineDownload,
             actionGroup = actionGroup,
         )
+        val contentIntent =
+            if (isPreviewDownload || actionGroup.groupId < 0) { //not a real transfer, will not appear on transfer section -> content intent same as action intent
+                actionIntent
+            } else {
+                openTransfersSectionIntentMapper(TransfersTab.COMPLETED_TAB)
+            }
         val pendingIntent = PendingIntent.getActivity(
             context,
             0,
@@ -187,35 +193,29 @@ class DefaultTransfersActionGroupFinishNotificationBuilder @Inject constructor(
         return contentText
     }
 
-    private suspend fun contentAndActionIntents(
+    private fun actionIntent(
         isLoggedIn: Boolean,
         isDownload: Boolean,
         isPreviewDownload: Boolean,
         isOfflineDownload: Boolean,
         actionGroup: ActiveTransferTotals.ActionGroup,
-    ): Pair<Intent, Intent> = when {
-        isPreviewDownload -> {
-            val previewFile = actionGroup.singleFileName?.let {
-                File(actionGroup.destination + actionGroup.singleFileName)
-            }
-            val previewIntent: Intent = previewIntent(previewFile, actionGroup)
-            previewIntent to previewIntent
-        }
-
-        else -> {
-            openTransfersSectionIntentMapper(TransfersTab.COMPLETED_TAB) to actionIntent(
-                isLoggedIn = isLoggedIn,
-                isDownload = isDownload,
-                isOfflineDownload = isOfflineDownload,
-                actionGroup = actionGroup
-            )
-        }
+    ) = if (isPreviewDownload) {
+        previewIntent(actionGroup)
+    } else {
+        actionIntent(
+            isLoggedIn = isLoggedIn,
+            isDownload = isDownload,
+            isOfflineDownload = isOfflineDownload,
+            actionGroup = actionGroup
+        )
     }
 
     private fun previewIntent(
-        previewFile: File?,
         actionGroup: ActiveTransferTotals.ActionGroup,
     ): Intent {
+        val previewFile = actionGroup.singleFileName?.let {
+            File(actionGroup.destination + actionGroup.singleFileName)
+        }
         val previewIntent: Intent = Intent(Intent.ACTION_VIEW).apply {
             flags = Intent.FLAG_GRANT_READ_URI_PERMISSION
         }

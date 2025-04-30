@@ -1,8 +1,9 @@
 package mega.privacy.android.app.presentation.qrcode
 
-import mega.privacy.android.shared.resources.R as sharedR
+import android.annotation.SuppressLint
 import android.content.Context
 import androidx.compose.ui.unit.sp
+import androidx.core.app.NotificationManagerCompat
 import androidx.core.net.toUri
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
@@ -29,10 +30,14 @@ import mega.privacy.android.app.service.scanner.BarcodeScannerModuleIsNotInstall
 import mega.privacy.android.app.utils.AlertsAndWarnings
 import mega.privacy.android.app.utils.Constants
 import mega.privacy.android.app.utils.Util
+import mega.privacy.android.data.mapper.transfer.TransfersActionGroupFinishNotificationBuilder
+import mega.privacy.android.data.worker.AreNotificationsEnabledUseCase
 import mega.privacy.android.domain.entity.StorageState
 import mega.privacy.android.domain.entity.contacts.InviteContactRequest
 import mega.privacy.android.domain.entity.document.DocumentEntity
 import mega.privacy.android.domain.entity.node.NodeId
+import mega.privacy.android.domain.entity.transfer.ActiveTransferTotals
+import mega.privacy.android.domain.entity.transfer.TransferType
 import mega.privacy.android.domain.entity.uri.UriPath
 import mega.privacy.android.domain.usecase.CopyToClipBoard
 import mega.privacy.android.domain.usecase.GetMyAvatarColorUseCase
@@ -50,6 +55,7 @@ import mega.privacy.android.domain.usecase.qrcode.DeleteQRCodeUseCase
 import mega.privacy.android.domain.usecase.qrcode.QueryScannedContactLinkUseCase
 import mega.privacy.android.domain.usecase.qrcode.ResetContactLinkUseCase
 import mega.privacy.android.domain.usecase.qrcode.ScanMediaFileUseCase
+import mega.privacy.android.shared.resources.R as sharedR
 import timber.log.Timber
 import java.io.File
 import java.io.FileInputStream
@@ -82,6 +88,9 @@ class QRCodeViewModel @Inject constructor(
     private val monitorStorageStateEventUseCase: MonitorStorageStateEventUseCase,
     private val checkFileNameCollisionsUseCase: CheckFileNameCollisionsUseCase,
     @ApplicationContext private val context: Context,
+    private val areNotificationsEnabledUseCase: AreNotificationsEnabledUseCase,
+    private val notificationManager: NotificationManagerCompat,
+    private val transfersActionGroupFinishNotificationBuilder: TransfersActionGroupFinishNotificationBuilder,
 ) : ViewModel() {
 
     private val _uiState = MutableStateFlow(QRCodeUIState())
@@ -363,7 +372,8 @@ class QRCodeViewModel @Inject constructor(
                 return@launch
             }
 
-            val newQrFile = File(parentPath, "$myEmail$QR_IMAGE_FILE_NAME")
+            val fileName = "$myEmail$QR_IMAGE_FILE_NAME"
+            val newQrFile = File(parentPath, fileName)
 
             // For Android 11+ device, force to refresh MediaStore. Otherwise it is possible
             // that target file cannot be written.
@@ -380,6 +390,11 @@ class QRCodeViewModel @Inject constructor(
                     src.close()
                     dst.close()
                     setResultMessage(R.string.success_download_qr, arrayOf(parentPath))
+                    showQrCodeSavedSuccessfullyNotification(
+                        destination = parentPath,
+                        fileName = fileName,
+                        bytes = newQrFile.length()
+                    )
                 }
             } catch (e: IOException) {
                 Timber.e(e)
@@ -387,6 +402,48 @@ class QRCodeViewModel @Inject constructor(
             }
         }
     }
+
+    @SuppressLint("MissingPermission")
+    private fun showQrCodeSavedSuccessfullyNotification(
+        destination: String,
+        fileName: String,
+        bytes: Long,
+    ) {
+        viewModelScope.launch {
+            if (areNotificationsEnabledUseCase()) {
+                notificationManager.notify(
+                    QR_CODE_SAVED_SUCCESSFULLY_NOTIFICATION_ID,
+                    transfersActionGroupFinishNotificationBuilder(
+                        createSimulatedGroup(destination, fileName, bytes),
+                        TransferType.DOWNLOAD
+                    ),
+                )
+            }
+        }
+    }
+
+    /**
+     * Creates a simulated transfer group for QR file, is not a real transfer because is generated locally, but from user perspective should be the same
+     */
+    private fun createSimulatedGroup(
+        destination: String,
+        fileName: String,
+        bytes: Long,
+    ) = ActiveTransferTotals.ActionGroup(
+        groupId = -1,
+        totalFiles = 1,
+        finishedFiles = 1,
+        completedFiles = 1,
+        alreadyTransferred = 0,
+        destination = destination,
+        fileNames = listOf(fileName),
+        singleTransferTag = null,
+        startTime = 0,
+        pausedFiles = 0,
+        totalBytes = bytes,
+        transferredBytes = bytes,
+        pendingTransferNodeId = null,
+    )
 
     /**
      * Set finish activity on scan complete
@@ -400,7 +457,7 @@ class QRCodeViewModel @Inject constructor(
      *
      * @param messageId String ID of the message
      */
-    fun setResultMessage(messageId: Int, formatArgs: Array<Any> = emptyArray()) =
+    private fun setResultMessage(messageId: Int, formatArgs: Array<Any> = emptyArray()) =
         _uiState.update { it.copy(resultMessage = triggered(Pair(messageId, formatArgs))) }
 
     /**
@@ -475,5 +532,6 @@ class QRCodeViewModel @Inject constructor(
     companion object {
         private const val QR_IMAGE_FILE_NAME = "QR_code_image.jpg"
         private const val MIME_TYPE_IMAGE = "image/jpeg"
+        private const val QR_CODE_SAVED_SUCCESSFULLY_NOTIFICATION_ID = 6
     }
 }
