@@ -54,7 +54,7 @@ shimmerlayout = 'io.supercharge:shimmerlayout:2.1.0'
 simplestorage = { module = "com.anggrayudi:storage", version.ref = "simplestorage" }
 vdurmont-emoji = 'com.vdurmont:emoji-java:4.0.0'
 compose-state-events = { module = "com.github.leonard-palm:compose-state-events", version.ref = "compose-state-events" }
-mega-analytics = "mega.privacy.mobile:analytics-events-android:+"
+mega-analytics = "mega.privacy.mobile:analytics-events-android:20250424.083546"
 kotlinpoet = { module = "com.squareup:kotlinpoet", version.ref = "kotlinpoet" }
 balloon = "com.github.skydoves:balloon-compose:1.6.4"
 xray = { module = "mega.privacy.android.xray:xray", version.ref = "xray" }
