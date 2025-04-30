@@ -153,6 +153,10 @@ class SelectSubtitleFileViewModel @Inject constructor(
         }
     }
 
+    internal fun clearSelectedItem() {
+        selected.update { null }
+    }
+
     /**
      * Filter the items that matches the query
      * @param queryString search query

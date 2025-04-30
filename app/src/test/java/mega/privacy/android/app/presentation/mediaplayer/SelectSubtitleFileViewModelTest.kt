@@ -6,10 +6,12 @@ import com.google.common.truth.Truth.assertThat
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.flowOf
+import kotlinx.coroutines.test.advanceUntilIdle
 import kotlinx.coroutines.test.runTest
 import mega.privacy.android.app.TimberJUnit5Extension
 import mega.privacy.android.app.mediaplayer.SelectSubtitleFileViewModel
 import mega.privacy.android.app.mediaplayer.mapper.SubtitleFileInfoItemMapper
+import mega.privacy.android.app.mediaplayer.model.SubtitleFileInfoItem
 import mega.privacy.android.app.mediaplayer.model.SubtitleLoadState
 import mega.privacy.android.core.test.extension.CoroutineMainDispatcherExtension
 import mega.privacy.android.domain.entity.AccountSubscriptionCycle
@@ -116,4 +118,58 @@ internal class SelectSubtitleFileViewModelTest {
             assertThat((actual as SubtitleLoadState.Success).items.size).isEqualTo(3)
         }
     }
+
+    @Test
+    fun `test that state is updated correctly after itemClickedUpdate and clearSelectedItem are invoked`() =
+        runTest {
+            val accountDetail = AccountDetail(
+                levelDetail = AccountLevelDetail(
+                    accountType = AccountType.BUSINESS,
+                    subscriptionStatus = null,
+                    subscriptionRenewTime = 0L,
+                    accountSubscriptionCycle = AccountSubscriptionCycle.UNKNOWN,
+                    proExpirationTime = 0L,
+                    accountPlanDetail = null,
+                    accountSubscriptionDetailList = listOf(),
+                )
+            )
+            accountDetailFakeFlow.emit(accountDetail)
+            val testInfos = (1..3).map { id ->
+                mock<SubtitleFileInfo> {
+                    on { this.id }.thenReturn(id.toLong())
+                }
+            }
+            val testInfoItems = testInfos.map { info ->
+                mock<SubtitleFileInfoItem> {
+                    on { selected }.thenReturn(false)
+                    on { subtitleFileInfo }.thenReturn(info)
+                }
+            }
+            val expectedSubtitleFileInfoList: List<SubtitleFileInfo> = testInfos
+
+            whenever(getSRTSubtitleFileListUseCase()).thenReturn(expectedSubtitleFileInfoList)
+            testInfos.mapIndexed { index, it ->
+                whenever(subtitleFileInfoItemMapper(false, it)).thenReturn(testInfoItems[index])
+            }
+            val testSelectedItem = mock<SubtitleFileInfoItem> {
+                on { selected }.thenReturn(true)
+                on { subtitleFileInfo }.thenReturn(testInfos[0])
+            }
+            whenever(subtitleFileInfoItemMapper(true, testInfos[0])).thenReturn(testSelectedItem)
+            underTest.getSubtitleFileInfoList()
+            underTest.itemClickedUpdate(testInfos[0])
+            advanceUntilIdle()
+            underTest.state.test {
+                val actual = awaitItem()
+                assertThat(actual is SubtitleLoadState.Success).isTrue()
+                assertThat((actual as SubtitleLoadState.Success).items.size).isEqualTo(3)
+                assertThat(actual.items[0].selected).isTrue()
+                underTest.clearSelectedItem()
+                awaitItem().let {
+                    assertThat(it is SubtitleLoadState.Success).isTrue()
+                    assertThat((it as SubtitleLoadState.Success).items.size).isEqualTo(3)
+                    assertThat(it.items[0].selected).isFalse()
+                }
+            }
+        }
 }

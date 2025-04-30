@@ -39,9 +39,7 @@ internal fun NavGraphBuilder.selectSubtitleScreen(
                     SubtitleSelectedStatus.AddSubtitleItem,
                     info
                 )
-                info?.let {
-                    selectSubtitleViewModel.itemClickedUpdate(it)
-                }
+                selectSubtitleViewModel.clearSelectedItem()
                 navHostController.popBackStack()
             },
             onBackPressed = {

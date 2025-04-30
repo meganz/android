@@ -1,7 +1,6 @@
 package mega.privacy.android.app.mediaplayer
 
-import mega.privacy.android.icon.pack.R as IconPackR
-import mega.privacy.android.shared.resources.R as sharedR
+import androidx.activity.compose.BackHandler
 import androidx.compose.animation.core.Animatable
 import androidx.compose.animation.core.LinearEasing
 import androidx.compose.animation.core.tween
@@ -67,11 +66,13 @@ import mega.privacy.android.app.mediaplayer.model.SubtitleFileInfoItem
 import mega.privacy.android.app.mediaplayer.model.SubtitleLoadState
 import mega.privacy.android.domain.entity.AccountType
 import mega.privacy.android.domain.entity.mediaplayer.SubtitleFileInfo
+import mega.privacy.android.icon.pack.R as IconPackR
 import mega.privacy.android.legacy.core.ui.controls.appbar.LegacySearchAppBar
 import mega.privacy.android.legacy.core.ui.model.SearchWidgetState
 import mega.privacy.android.shared.original.core.ui.controls.appbar.SelectModeAppBar
 import mega.privacy.android.shared.original.core.ui.controls.progressindicator.MegaCircularProgressIndicator
 import mega.privacy.android.shared.original.core.ui.theme.OriginalTheme
+import mega.privacy.android.shared.resources.R as sharedR
 import timber.log.Timber
 
 internal object Constants {
@@ -120,6 +121,14 @@ internal fun SelectSubtitleComposeView(
 
     LaunchedEffect(Unit) {
         viewModel.getSubtitleFileInfoList()
+    }
+
+    BackHandler {
+        when {
+            viewModel.searchState == SearchWidgetState.EXPANDED -> viewModel.closeSearch()
+            selectedSubtitleFileInfo != null -> viewModel.clearSelectedItem()
+            else -> onBackPressed()
+        }
     }
 
     SelectSubtitleView(
@@ -323,8 +332,7 @@ internal fun SubtitleFileInfoListItem(
         Row {
             Image(
                 painter = painterResource(
-                    id =
-                    if (subtitleFileInfoItem.selected) {
+                    id = if (subtitleFileInfoItem.selected) {
                         R.drawable.ic_select_thumbnail
                     } else {
                         IconPackR.drawable.ic_text_medium_solid
