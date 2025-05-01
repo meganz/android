@@ -26,12 +26,10 @@ import androidx.core.net.toUri
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.activityViewModels
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
-import androidx.lifecycle.lifecycleScope
 import com.google.android.material.dialog.MaterialAlertDialogBuilder
 import dagger.hilt.android.AndroidEntryPoint
 import de.palm.composestateevents.EventEffect
 import kotlinx.coroutines.delay
-import kotlinx.coroutines.launch
 import kotlinx.coroutines.sync.Mutex
 import mega.android.core.ui.theme.AndroidTheme
 import mega.privacy.android.app.MegaApplication
@@ -41,7 +39,6 @@ import mega.privacy.android.app.MegaApplication.Companion.setHeartBeatAlive
 import mega.privacy.android.app.R
 import mega.privacy.android.app.constants.IntentConstants
 import mega.privacy.android.app.extensions.launchUrl
-import mega.privacy.android.app.featuretoggle.AppFeatures
 import mega.privacy.android.app.main.FileExplorerActivity
 import mega.privacy.android.app.main.ManagerActivity
 import mega.privacy.android.app.presentation.billing.BillingViewModel
@@ -195,6 +192,12 @@ class LoginFragment : Fragment() {
                 )
             }
         } else if (uiState.isLoginNewDesignEnabled == false) {
+            EventEffect(
+                event = uiState.accountBlockedEvent,
+                onConsumed = viewModel::resetAccountBlockedEvent
+            ) {
+                showBlockedDialogLegacy(it)
+            }
             OriginalTheme(isDark = uiState.themeMode.isDarkMode()) {
                 LoginView(
                     state = uiState,
@@ -280,7 +283,7 @@ class LoginFragment : Fragment() {
                             accountBlockedString
                         )
                     ) {
-                        showAccountBlockedDialog(
+                        viewModel.triggerAccountBlockedEvent(
                             AccountBlockedDetail(
                                 accountBlockedType,
                                 accountBlockedString
@@ -506,24 +509,18 @@ class LoginFragment : Fragment() {
         viewModel.intentSet()
     }
 
-    fun showAccountBlockedDialog(accountBlockedDetail: AccountBlockedDetail) {
-        viewLifecycleOwner.lifecycleScope.launch {
-            if (getFeatureFlagValueUseCase(AppFeatures.LoginRevamp) && (accountBlockedDetail.type == AccountBlockedType.TOS_COPYRIGHT || accountBlockedDetail.type == AccountBlockedType.TOS_NON_COPYRIGHT || accountBlockedDetail.type == AccountBlockedType.SUBUSER_DISABLED || accountBlockedDetail.type == AccountBlockedType.VERIFICATION_EMAIL)) {
-                viewModel.triggerAccountBlockedEvent(accountBlockedDetail)
-            } else {
-                if (accountBlockedDetail.type == AccountBlockedType.VERIFICATION_EMAIL) {
-                    if (!MegaApplication.isBlockedDueToWeakAccount && !MegaApplication.isWebOpenDueToEmailVerification) {
-                        startActivity(
-                            Intent(
-                                activity,
-                                WeakAccountProtectionAlertActivity::class.java
-                            )
-                        )
-                    }
-                } else if (!TextUtil.isTextEmpty(accountBlockedDetail.text)) {
-                    Util.showErrorAlertDialog(accountBlockedDetail.text, false, activity)
-                }
+    private fun showBlockedDialogLegacy(accountBlockedDetail: AccountBlockedDetail) {
+        if (accountBlockedDetail.type == AccountBlockedType.VERIFICATION_EMAIL) {
+            if (!MegaApplication.isBlockedDueToWeakAccount && !MegaApplication.isWebOpenDueToEmailVerification) {
+                startActivity(
+                    Intent(
+                        activity,
+                        WeakAccountProtectionAlertActivity::class.java
+                    )
+                )
             }
+        } else if (!TextUtil.isTextEmpty(accountBlockedDetail.text)) {
+            Util.showErrorAlertDialog(accountBlockedDetail.text, false, activity)
         }
     }
 

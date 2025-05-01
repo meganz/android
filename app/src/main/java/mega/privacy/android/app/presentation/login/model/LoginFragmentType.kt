@@ -1,26 +1,30 @@
 package mega.privacy.android.app.presentation.login.model
 
+import mega.privacy.android.app.utils.Constants
+
 /**
  * Enum class for defining login activity fragments.
+ *
+ * @property value The value of the fragment type.
  */
-enum class LoginFragmentType {
+enum class LoginFragmentType(val value: Int) {
     /**
      * Login screen.
      */
-    Login,
+    Login(Constants.LOGIN_FRAGMENT),
 
     /**
      * Create account screen.
      */
-    CreateAccount,
+    CreateAccount(Constants.CREATE_ACCOUNT_FRAGMENT),
 
     /**
      * Confirm email screen.
      */
-    ConfirmEmail,
+    ConfirmEmail(Constants.CONFIRM_EMAIL_FRAGMENT),
 
     /**
      * Tour screen.
      */
-    Tour,
+    Tour(Constants.TOUR_FRAGMENT),
 }

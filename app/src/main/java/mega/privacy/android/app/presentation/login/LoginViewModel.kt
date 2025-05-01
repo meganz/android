@@ -1,6 +1,7 @@
 package mega.privacy.android.app.presentation.login
 
 import androidx.annotation.StringRes
+import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import dagger.hilt.android.lifecycle.HiltViewModel
@@ -153,6 +154,7 @@ class LoginViewModel @Inject constructor(
     private val checkRecoveryKeyUseCase: CheckRecoveryKeyUseCase,
     monitorLoggedOutFromAnotherLocationUseCase: MonitorLoggedOutFromAnotherLocationUseCase,
     private val setLoggedOutFromAnotherLocationUseCase: SetLoggedOutFromAnotherLocationUseCase,
+    private val savedStateHandle: SavedStateHandle,
 ) : ViewModel() {
 
     private val _state = MutableStateFlow(LoginState())
@@ -188,6 +190,27 @@ class LoginViewModel @Inject constructor(
             }
         }
         setupInitialState()
+        getStartScreen()
+    }
+
+    private fun getStartScreen() = viewModelScope.launch {
+        runCatching { monitorEphemeralCredentialsUseCase().firstOrNull() }
+            .onSuccess { ephemeral ->
+                if (ephemeral != null && !ephemeral.session.isNullOrEmpty()) {
+                    setPendingFragmentToShow(LoginFragmentType.ConfirmEmail)
+                    resumeCreateAccount(ephemeral.session.orEmpty())
+                    return@launch
+                }
+            }
+
+        val session = getSession()
+        val visibleFragment =
+            savedStateHandle.get<Int>(Constants.VISIBLE_FRAGMENT) ?: run {
+                if (session.isNullOrEmpty()) Constants.TOUR_FRAGMENT else Constants.LOGIN_FRAGMENT
+            }
+
+        setPendingFragmentToShow(LoginFragmentType.entries.find { it.value == visibleFragment }
+            ?: LoginFragmentType.Login)
     }
 
     private fun enableAndMonitorRequestStatusProgressEvent() {
@@ -320,7 +343,7 @@ class LoginViewModel @Inject constructor(
     /**
      * Sets tour as pending fragment in state.
      */
-    fun setTourAsPendingFragment() =
+    private fun setTourAsPendingFragment() =
         _state.update { state -> state.copy(isPendingToShowFragment = LoginFragmentType.Tour) }
 
     /**
@@ -986,16 +1009,9 @@ class LoginViewModel @Inject constructor(
         _state.update { state -> state.copy(isFirstTime2FA = consumed) }
 
     /**
-     * Get ephemeral
-     *
-     */
-    suspend fun getEphemeral() =
-        runCatching { monitorEphemeralCredentialsUseCase().firstOrNull() }.getOrNull()
-
-    /**
      * Get session
      */
-    suspend fun getSession() =
+    private suspend fun getSession() =
         runCatching { getSessionUseCase() }.getOrNull()
 
     /**
@@ -1146,7 +1162,19 @@ class LoginViewModel @Inject constructor(
     /**
      * Resume create account
      */
-    suspend fun resumeCreateAccount(session: String) = resumeCreateAccountUseCase(session)
+    suspend fun resumeCreateAccount(session: String) {
+        runCatching {
+            resumeCreateAccountUseCase(session)
+        }.onFailure {
+            cancelCreateAccount()
+        }
+    }
+
+    fun cancelCreateAccount() {
+        clearEphemeral()
+        clearUserCredentials()
+        setTourAsPendingFragment()
+    }
 
     /**
      * Set handled logged out from another location

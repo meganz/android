@@ -5,31 +5,40 @@ import android.content.Intent
 import android.content.pm.ActivityInfo
 import android.os.Build
 import android.os.Bundle
-import androidx.activity.OnBackPressedCallback
+import androidx.activity.compose.setContent
 import androidx.activity.enableEdgeToEdge
 import androidx.activity.viewModels
+import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.getValue
 import androidx.core.splashscreen.SplashScreen
 import androidx.core.splashscreen.SplashScreen.Companion.installSplashScreen
 import androidx.core.view.WindowCompat
 import androidx.lifecycle.Lifecycle
+import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.lifecycle.lifecycleScope
+import androidx.navigation.NavDestination.Companion.hierarchy
+import androidx.navigation.compose.NavHost
+import androidx.navigation.compose.composable
+import androidx.navigation.compose.currentBackStackEntryAsState
+import androidx.navigation.compose.rememberNavController
 import com.google.android.material.dialog.MaterialAlertDialogBuilder
 import dagger.hilt.android.AndroidEntryPoint
-import kotlinx.coroutines.CancellationException
 import kotlinx.coroutines.delay
-import kotlinx.coroutines.flow.mapNotNull
 import kotlinx.coroutines.launch
 import mega.privacy.android.app.BaseActivity
 import mega.privacy.android.app.R
 import mega.privacy.android.app.arch.extensions.collectFlow
-import mega.privacy.android.app.databinding.ActivityLoginBinding
 import mega.privacy.android.app.globalmanagement.MegaChatRequestHandler
 import mega.privacy.android.app.main.ManagerActivity
-import mega.privacy.android.app.presentation.extensions.toConstant
-import mega.privacy.android.app.presentation.login.confirmemail.ConfirmEmailFragment
-import mega.privacy.android.app.presentation.login.createaccount.CreateAccountComposeFragment
+import mega.privacy.android.app.presentation.login.confirmemail.confirmationEmailScreen
+import mega.privacy.android.app.presentation.login.confirmemail.openConfirmationEmailScreen
+import mega.privacy.android.app.presentation.login.createaccount.CreateAccountScreen
+import mega.privacy.android.app.presentation.login.createaccount.createAccountScreen
+import mega.privacy.android.app.presentation.login.createaccount.openCreateAccountScreen
 import mega.privacy.android.app.presentation.login.model.LoginFragmentType
-import mega.privacy.android.app.presentation.login.onboarding.TourFragment
+import mega.privacy.android.app.presentation.login.onboarding.TourScreen
+import mega.privacy.android.app.presentation.login.onboarding.openTourScreen
+import mega.privacy.android.app.presentation.login.onboarding.tourScreen
 import mega.privacy.android.app.utils.Constants
 import mega.privacy.android.app.utils.Util
 import mega.privacy.android.domain.entity.account.AccountBlockedDetail
@@ -50,47 +59,21 @@ class LoginActivity : BaseActivity() {
 
     private val viewModel by viewModels<LoginViewModel>()
 
-    private lateinit var binding: ActivityLoginBinding
-
-    private var cancelledConfirmationProcess = false
-
-    //Fragments
-    private var loginFragment: LoginFragment? = null
-
-    private var visibleFragment = 0
-    private var emailTemp: String? = null
-    private var passwdTemp: String? = null
-    private var firstNameTemp: String? = null
-    private var lastNameTemp: String? = null
-
     /**
      * Flag to delay showing the splash screen.
      */
     private var keepShowingSplashScreen = true
 
-    private val onBackPressedCallback = object : OnBackPressedCallback(true) {
-        override fun handleOnBackPressed() {
-            Timber.d("onBackPressed")
-            retryConnectionsAndSignalPresence()
-
-            when (visibleFragment) {
-                Constants.CREATE_ACCOUNT_FRAGMENT -> showFragment(Constants.TOUR_FRAGMENT)
-                Constants.TOUR_FRAGMENT, Constants.CONFIRM_EMAIL_FRAGMENT -> finish()
-            }
-        }
-    }
-
     override fun onNewIntent(intent: Intent) {
         super.onNewIntent(intent)
         setIntent(intent)
 
-        visibleFragment = intent.getIntExtra(Constants.VISIBLE_FRAGMENT, Constants.LOGIN_FRAGMENT)
+        val visibleFragment =
+            intent.getIntExtra(Constants.VISIBLE_FRAGMENT, Constants.LOGIN_FRAGMENT)
 
-        if (visibleFragment == Constants.LOGIN_FRAGMENT) {
-            loginFragment = LoginFragment()
+        LoginFragmentType.entries.find { it.value == visibleFragment }?.let {
+            viewModel.setPendingFragmentToShow(it)
         }
-
-        showFragment(visibleFragment)
     }
 
     override fun onDestroy() {
@@ -117,55 +100,68 @@ class LoginActivity : BaseActivity() {
             finish()
             return
         }
-        onBackPressedDispatcher.addCallback(onBackPressedCallback)
         chatRequestHandler.setIsLoggingRunning(true)
 
-        binding = ActivityLoginBinding.inflate(layoutInflater)
         enableEdgeToEdge()
-        setContentView(binding.root)
-        setupSplashExitAnimation(splashScreen)
-        setupObservers()
-        lifecycleScope.launch {
-            if (savedInstanceState != null) {
-                Timber.d("Bundle is NOT NULL")
-                visibleFragment =
-                    savedInstanceState.getInt(Constants.VISIBLE_FRAGMENT, Constants.LOGIN_FRAGMENT)
-            } else {
-                visibleFragment =
-                    intent?.getIntExtra(Constants.VISIBLE_FRAGMENT, Constants.LOGIN_FRAGMENT)
-                        ?: Constants.LOGIN_FRAGMENT
-                Timber.d("There is an intent! VisibleFragment: %s", visibleFragment)
+        setContent {
+            val uiState by viewModel.state.collectAsStateWithLifecycle()
+            val navController = rememberNavController()
+            val navBackStackEntry by navController.currentBackStackEntryAsState()
+            val currentDestination = navBackStackEntry?.destination
+
+            val visibleFragment = when {
+                currentDestination?.hierarchy?.any {
+                    it.route == LoginScreen::class.qualifiedName
+                } == true -> Constants.LOGIN_FRAGMENT
+
+                currentDestination?.hierarchy?.any {
+                    it.route == CreateAccountScreen::class.qualifiedName
+                } == true -> Constants.CREATE_ACCOUNT_FRAGMENT
+
+                currentDestination?.hierarchy?.any {
+                    it.route == TourScreen::class.qualifiedName
+                } == true -> Constants.TOUR_FRAGMENT
+
+                else -> Constants.CONFIRM_EMAIL_FRAGMENT
             }
 
-            viewModel.getEphemeral()?.let {
-                visibleFragment = Constants.CONFIRM_EMAIL_FRAGMENT
-                emailTemp = it.email
-                passwdTemp = it.password
-                firstNameTemp = it.firstName
-                lastNameTemp = it.lastName
-                resumeCreateAccount(it.session.orEmpty())
-            } ?: run {
-                if (!intent.hasExtra(Constants.VISIBLE_FRAGMENT) && savedInstanceState == null) {
-                    val session = viewModel.getSession()
-                    if (session.isNullOrEmpty()) {
-                        visibleFragment = Constants.TOUR_FRAGMENT
+            LaunchedEffect(uiState.isLoginNewDesignEnabled, visibleFragment) {
+                restrictOrientation(uiState.isLoginNewDesignEnabled == true, visibleFragment)
+            }
+
+            LaunchedEffect(uiState.isPendingToShowFragment) {
+                val fragmentType = uiState.isPendingToShowFragment
+                if (fragmentType != null) {
+                    if (fragmentType != LoginFragmentType.Login) {
+                        stopShowingSplashScreen()
                     }
+
+                    when (fragmentType) {
+                        LoginFragmentType.Login -> navController.openLoginScreen()
+                        LoginFragmentType.CreateAccount -> navController.openCreateAccountScreen()
+                        LoginFragmentType.Tour -> navController.openTourScreen()
+                        LoginFragmentType.ConfirmEmail -> navController.openConfirmationEmailScreen()
+                    }
+                    viewModel.isPendingToShowFragmentConsumed()
                 }
             }
 
-            if (visibleFragment != Constants.LOGIN_FRAGMENT) {
-                stopShowingSplashScreen()
+            NavHost(
+                navController = navController,
+                startDestination = "start"
+            ) {
+                composable("start") {
+                    // no-op, we checking start destination in the view model
+                }
+                loginScreen()
+                createAccountScreen()
+                tourScreen()
+                confirmationEmailScreen()
             }
-            val currentFragment =
-                supportFragmentManager.findFragmentById(R.id.fragment_container_login)
-            if (savedInstanceState == null || currentFragment == null) {
-                // when savedInstanceState is different from null, the activity system automatically restores the last fragment
-                // so we need to show the fragment again
-                showFragment(visibleFragment)
-            } else {
-                loginFragment = currentFragment as? LoginFragment
-            }
-
+        }
+        setupSplashExitAnimation(splashScreen)
+        setupObservers()
+        lifecycleScope.launch {
             // A fail-safe to avoid the splash screen to be shown forever
             // in case not called by expected fragments
             delay(1500)
@@ -208,10 +204,6 @@ class LoginActivity : BaseActivity() {
             with(uiState) {
                 when {
                     isPendingToFinishActivity -> finish()
-                    isPendingToShowFragment != null -> {
-                        showFragment(isPendingToShowFragment.toConstant())
-                        viewModel.isPendingToShowFragmentConsumed()
-                    }
 
                     loginException != null -> {
                         if (loginException is LoginLoggedOutFromOtherLocation) {
@@ -220,12 +212,6 @@ class LoginActivity : BaseActivity() {
                         }
                     }
                 }
-            }
-        }
-
-        collectFlow(viewModel.state.mapNotNull { it.isLoginNewDesignEnabled }) { isLoginNewDesignEnabled ->
-            if (isLoginNewDesignEnabled) {
-                restrictOrientation()
             }
         }
 
@@ -239,13 +225,6 @@ class LoginActivity : BaseActivity() {
     }
 
     /**
-     * Shows a snackbar.
-     *
-     * @param message Message to show.
-     */
-    fun showSnackbar(message: String) = showSnackbar(binding.relativeContainerLogin, message)
-
-    /**
      * Show fragment
      *
      * @param fragmentType
@@ -255,69 +234,11 @@ class LoginActivity : BaseActivity() {
     }
 
     /**
-     * Shows a fragment.
-     *
-     * @param visibleFragment The fragment to show.
-     */
-    private fun showFragment(visibleFragment: Int) {
-        Timber.d("visibleFragment: %s", visibleFragment)
-        this.visibleFragment = visibleFragment
-        restrictOrientation()
-
-        when (visibleFragment) {
-            Constants.LOGIN_FRAGMENT -> {
-                Timber.d("Show LOGIN_FRAGMENT")
-                if (loginFragment == null) {
-                    loginFragment = LoginFragment()
-                }
-
-                if (passwdTemp != null && emailTemp != null) {
-                    viewModel.setTemporalCredentials(email = emailTemp, password = passwdTemp)
-                }
-
-                supportFragmentManager.beginTransaction()
-                    .replace(R.id.fragment_container_login, loginFragment ?: return)
-                    .commitNowAllowingStateLoss()
-            }
-
-            Constants.CREATE_ACCOUNT_FRAGMENT -> {
-                Timber.d("Show CREATE_ACCOUNT_FRAGMENT")
-                val createActFragment =
-                    CreateAccountComposeFragment()
-
-                if (cancelledConfirmationProcess) {
-                    cancelledConfirmationProcess = false
-                }
-
-                supportFragmentManager.beginTransaction()
-                    .replace(R.id.fragment_container_login, createActFragment)
-                    .commitNowAllowingStateLoss()
-            }
-
-            Constants.TOUR_FRAGMENT -> {
-                Timber.d("Show TOUR_FRAGMENT")
-                supportFragmentManager.beginTransaction()
-                    .replace(R.id.fragment_container_login, TourFragment())
-                    .commitNowAllowingStateLoss()
-            }
-
-            Constants.CONFIRM_EMAIL_FRAGMENT -> {
-                with(supportFragmentManager) {
-                    beginTransaction()
-                        .replace(R.id.fragment_container_login, ConfirmEmailFragment())
-                        .commitNowAllowingStateLoss()
-                }
-            }
-        }
-    }
-
-    /**
      * Restrict to portrait mode always for mobile devices and tablets (already restricted via Manifest).
      * Allow the landscape mode only for tablets and only for TOUR_FRAGMENT.
      */
     @SuppressLint("SourceLockedOrientationActivity")
-    private fun restrictOrientation() {
-        val isLoginNewDesignEnabled = viewModel.state.value.isLoginNewDesignEnabled == true
+    private fun restrictOrientation(isLoginNewDesignEnabled: Boolean, visibleFragment: Int) {
         requestedOrientation =
             if (isLoginNewDesignEnabled || visibleFragment == Constants.TOUR_FRAGMENT || visibleFragment == Constants.CREATE_ACCOUNT_FRAGMENT) {
                 Timber.d("Tour/create account screen landscape mode allowed")
@@ -345,9 +266,6 @@ class LoginActivity : BaseActivity() {
     public override fun onResume() {
         Timber.d("onResume")
         super.onResume()
-        Util.setAppFontSize(this)
-
-        if (intent == null) return
 
         if (intent?.action != null) {
             when (intent.action) {
@@ -374,22 +292,7 @@ class LoginActivity : BaseActivity() {
      * @param emailTemp The temporal email.
      */
     fun setTemporalEmail(emailTemp: String) {
-        this.emailTemp = emailTemp
         viewModel.setTemporalEmail(emailTemp)
-    }
-
-    private fun resumeCreateAccount(session: String) {
-        lifecycleScope.launch {
-            runCatching {
-                Timber.d("resume create account")
-                viewModel.resumeCreateAccount(session)
-            }.onFailure {
-                Timber.e(it)
-                if (it !is CancellationException) {
-                    cancelConfirmationAccount()
-                }
-            }
-        }
     }
 
     /**
@@ -397,45 +300,23 @@ class LoginActivity : BaseActivity() {
      */
     fun cancelConfirmationAccount() {
         Timber.d("cancelConfirmationAccount")
-        viewModel.clearEphemeral()
-        viewModel.clearUserCredentials()
-        cancelledConfirmationProcess = true
-        passwdTemp = null
-        emailTemp = null
-        viewModel.setTourAsPendingFragment()
-    }
-
-    public override fun onSaveInstanceState(outState: Bundle) {
-        Timber.d("onSaveInstanceState")
-        super.onSaveInstanceState(outState)
-        outState.putInt(Constants.VISIBLE_FRAGMENT, visibleFragment)
+        viewModel.cancelCreateAccount()
     }
 
     /**
      * Sets temporal data for account creation.
      *
      * @param email    Email.
-     * @param name     First name.
-     * @param lastName Last name.
-     * @param password Password.
      */
     fun setTemporalDataForAccountCreation(
         email: String,
-        name: String,
-        lastName: String,
-        password: String,
     ) {
         setTemporalEmail(email)
-        firstNameTemp = name
-        lastNameTemp = lastName
-        passwdTemp = password
         viewModel.setIsWaitingForConfirmAccount()
     }
 
     fun showAccountBlockedDialog(accountBlockedDetail: AccountBlockedDetail) {
-        if (visibleFragment == Constants.LOGIN_FRAGMENT) {
-            loginFragment?.showAccountBlockedDialog(accountBlockedDetail)
-        }
+        viewModel.triggerAccountBlockedEvent(accountBlockedDetail)
     }
 
     companion object {

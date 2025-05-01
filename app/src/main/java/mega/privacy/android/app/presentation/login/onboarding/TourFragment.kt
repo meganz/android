@@ -4,6 +4,7 @@ import android.content.Intent
 import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.ViewGroup
+import androidx.activity.compose.BackHandler
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Modifier
@@ -17,9 +18,9 @@ import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import dagger.hilt.android.AndroidEntryPoint
 import mega.android.core.ui.theme.AndroidTheme
 import mega.privacy.android.app.presentation.extensions.isDarkMode
-import mega.privacy.android.app.presentation.login.onboarding.view.NewTourRoute
 import mega.privacy.android.app.presentation.login.LoginViewModel
 import mega.privacy.android.app.presentation.login.model.LoginFragmentType
+import mega.privacy.android.app.presentation.login.onboarding.view.NewTourRoute
 import mega.privacy.android.app.presentation.login.onboarding.view.TourRoute
 import mega.privacy.android.app.presentation.login.onboarding.view.TourViewModel
 import mega.privacy.android.app.presentation.meeting.view.dialog.ACTION_JOIN_AS_GUEST
@@ -57,6 +58,11 @@ class TourFragment : Fragment() {
         setContent {
             val themeMode by getThemeMode().collectAsStateWithLifecycle(initialValue = ThemeMode.System)
             val uiState by viewModel.uiState.collectAsStateWithLifecycle()
+
+            BackHandler {
+                activity?.finish()
+            }
+
             if (uiState.isNewRegistrationUiEnabled == true) {
                 AndroidTheme(isDark = themeMode.isDarkMode()) {
                     NewTourRoute(

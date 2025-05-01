@@ -1,5 +1,6 @@
 package mega.privacy.android.app.presentation.login
 
+import androidx.lifecycle.SavedStateHandle
 import app.cash.turbine.test
 import com.google.common.truth.Truth.assertThat
 import de.palm.composestateevents.StateEventWithContentTriggered
@@ -23,6 +24,7 @@ import mega.privacy.android.app.R
 import mega.privacy.android.app.middlelayer.installreferrer.InstallReferrerDetails
 import mega.privacy.android.app.middlelayer.installreferrer.InstallReferrerHandler
 import mega.privacy.android.app.presentation.login.model.LoginError
+import mega.privacy.android.app.presentation.login.model.LoginFragmentType
 import mega.privacy.android.app.presentation.login.model.RkLink
 import mega.privacy.android.core.test.extension.CoroutineMainDispatcherExtension
 import mega.privacy.android.domain.entity.Progress
@@ -142,6 +144,7 @@ internal class LoginViewModelTest {
         }
     private val setLoggedOutFromAnotherLocationUseCase: SetLoggedOutFromAnotherLocationUseCase =
         mock()
+    private val savedStateHandle = mock<SavedStateHandle>()
 
     @BeforeEach
     fun setUp() {
@@ -191,6 +194,7 @@ internal class LoginViewModelTest {
             checkRecoveryKeyUseCase = checkRecoveryKeyUseCase,
             monitorLoggedOutFromAnotherLocationUseCase = monitorLoggedOutFromAnotherLocationUseCase,
             setLoggedOutFromAnotherLocationUseCase = setLoggedOutFromAnotherLocationUseCase,
+            savedStateHandle = savedStateHandle
         )
     }
 
@@ -220,7 +224,8 @@ internal class LoginViewModelTest {
             isFirstLaunchUseCase,
             resendVerificationEmailUseCase,
             checkRecoveryKeyUseCase,
-            setLoggedOutFromAnotherLocationUseCase
+            setLoggedOutFromAnotherLocationUseCase,
+            savedStateHandle
         )
     }
 
@@ -254,7 +259,7 @@ internal class LoginViewModelTest {
                 assertThat(loginException).isNull()
                 assertThat(ongoingTransfersExist).isNull()
                 assertThat(isPendingToFinishActivity).isFalse()
-                assertThat(isPendingToShowFragment).isNull()
+                assertThat(isPendingToShowFragment).isEqualTo(LoginFragmentType.Tour)
                 assertThat(isCheckingSignupLink).isFalse()
                 assertThat(snackbarMessage).isInstanceOf(consumed().javaClass)
                 assertThat(isFirstTimeLaunch).isFalse()
