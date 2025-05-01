@@ -191,8 +191,6 @@ HEADERS += \
     sdk/include/mega/common/activity_monitor_forward.h \
     sdk/include/mega/common/badge.h \
     sdk/include/mega/common/badge_forward.h \
-    sdk/include/mega/common/bind_handle.h \
-    sdk/include/mega/common/bind_handle_forward.h \
     sdk/include/mega/common/client.h \
     sdk/include/mega/common/client_adapter.h \
     sdk/include/mega/common/client_callbacks.h \
@@ -254,7 +252,6 @@ HEADERS += \
 # Common sources
 CPP_SOURCES += \
     sdk/src/common/activity_monitor.cpp \
-    sdk/src/common/bind_handle.cpp \
     sdk/src/common/client.cpp \
     sdk/src/common/client_adapter.cpp \
     sdk/src/common/database.cpp \

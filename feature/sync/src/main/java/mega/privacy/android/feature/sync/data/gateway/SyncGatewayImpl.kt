@@ -22,7 +22,7 @@ import nz.mega.sdk.MegaRequest
 import nz.mega.sdk.MegaSync
 import nz.mega.sdk.MegaSync.SyncType
 import nz.mega.sdk.MegaSyncList
-import nz.mega.sdk.MegaSyncStallList
+import nz.mega.sdk.MegaSyncStall
 import nz.mega.sdk.MegaSyncStats
 import nz.mega.sdk.StalledIssuesReceiver
 import javax.inject.Inject
@@ -123,7 +123,7 @@ internal class SyncGatewayImpl @Inject constructor(
         megaApi.pauseSync(folderPairId)
     }
 
-    override suspend fun getSyncStalledIssues(): MegaSyncStallList? {
+    override suspend fun getSyncStalledIssues(): List<MegaSyncStall>? {
         return if (megaApi.isSyncStalled) {
             suspendCancellableCoroutine { continuation ->
                 stalledIssuesListener = StalledIssuesReceiver { megaSyncStallList ->

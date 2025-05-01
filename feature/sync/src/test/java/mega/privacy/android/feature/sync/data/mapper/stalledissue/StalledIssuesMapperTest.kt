@@ -9,7 +9,6 @@ import mega.privacy.android.feature.sync.domain.entity.StallIssueType
 import mega.privacy.android.feature.sync.domain.entity.StalledIssue
 import mega.privacy.android.feature.sync.domain.entity.SyncStatus
 import nz.mega.sdk.MegaSyncStall
-import nz.mega.sdk.MegaSyncStallList
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.TestInstance
 import org.mockito.Mockito.mock
@@ -38,12 +37,8 @@ internal class StalledIssuesMapperTest {
                     syncStatus = SyncStatus.SYNCED
                 )
             )
-        val stalledIssuesSDKList: MegaSyncStallList = mock()
-        val issuesCount = 1L
         val stalledIssueNodeId = 20L
         val stalledIssueSDKObject: MegaSyncStall = mock()
-        whenever(stalledIssuesSDKList.size()).thenReturn(issuesCount)
-        whenever(stalledIssuesSDKList.get(0)).thenReturn(stalledIssueSDKObject)
         whenever(stalledIssueSDKObject.pathCount(true)).thenReturn(1)
         whenever(stalledIssueSDKObject.cloudNodeHandle(0)).thenReturn(stalledIssueNodeId)
         whenever(stalledIssueSDKObject.path(true, 0)).thenReturn(stalledIssueNodeName)
@@ -56,6 +51,7 @@ internal class StalledIssuesMapperTest {
         ).thenReturn("$syncLocalFolderPath/somefile.txt")
         whenever(stalledIssueSDKObject.reasonDebugString()).thenReturn(stalledIssueDebugString)
         whenever(stalledIssueSDKObject.reason()).thenReturn(MegaSyncStall.SyncStallReason.LocalAndRemoteChangedSinceLastSyncedState_userMustChoose)
+        val stalledIssuesSDKList = listOf(stalledIssueSDKObject)
         whenever(stalledIssueTypeMapper(MegaSyncStall.SyncStallReason.LocalAndRemoteChangedSinceLastSyncedState_userMustChoose)).thenReturn(
             StallIssueType.LocalAndRemoteChangedSinceLastSyncedStateUserMustChoose
         )

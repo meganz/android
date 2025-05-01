@@ -7,7 +7,7 @@ import nz.mega.sdk.MegaNode
 import nz.mega.sdk.MegaSync
 import nz.mega.sdk.MegaSync.SyncType
 import nz.mega.sdk.MegaSyncList
-import nz.mega.sdk.MegaSyncStallList
+import nz.mega.sdk.MegaSyncStall
 import nz.mega.sdk.MegaSyncStats
 
 /**
@@ -72,7 +72,10 @@ internal interface SyncGateway {
      */
     fun pauseSync(folderPairId: Long)
 
-    suspend fun getSyncStalledIssues(): MegaSyncStallList?
+    /**
+     * Get sync stalled issues
+     */
+    suspend fun getSyncStalledIssues(): List<MegaSyncStall>?
 
     suspend fun isNodeSyncableWithError(megaNode: MegaNode): MegaError
 }

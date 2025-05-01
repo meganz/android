@@ -4,7 +4,6 @@ import mega.privacy.android.domain.entity.node.NodeId
 import mega.privacy.android.feature.sync.domain.entity.FolderPair
 import mega.privacy.android.feature.sync.domain.entity.StalledIssue
 import nz.mega.sdk.MegaSyncStall
-import nz.mega.sdk.MegaSyncStallList
 import javax.inject.Inject
 
 internal class StalledIssuesMapper @Inject constructor(
@@ -13,22 +12,18 @@ internal class StalledIssuesMapper @Inject constructor(
 
     operator fun invoke(
         syncs: List<FolderPair>,
-        stalledIssues: MegaSyncStallList,
-    ): List<StalledIssue> {
-        val issuesCount = stalledIssues.size()
-        return (0 until issuesCount).map { index ->
-            val stalledIssueSdkObject = stalledIssues.get(index)
-            val nodes = getNodes(stalledIssueSdkObject)
-            val localPaths: List<String> = getLocalPaths(stalledIssueSdkObject)
-            StalledIssue(
-                syncId = getSyncId(syncs, nodes, localPaths) ?: -1,
-                nodeIds = nodes.map { it.nodeId },
-                localPaths = localPaths,
-                issueType = stalledIssueTypeMapper(stalledIssueSdkObject.reason()),
-                conflictName = stalledIssueSdkObject.reasonDebugString(),
-                nodeNames = nodes.map { it.nodeName },
-            )
-        }
+        stalledIssues: List<MegaSyncStall>,
+    ) = stalledIssues.map { stalledIssueSdkObject ->
+        val nodes = getNodes(stalledIssueSdkObject)
+        val localPaths: List<String> = getLocalPaths(stalledIssueSdkObject)
+        StalledIssue(
+            syncId = getSyncId(syncs, nodes, localPaths) ?: -1,
+            nodeIds = nodes.map { it.nodeId },
+            localPaths = localPaths,
+            issueType = stalledIssueTypeMapper(stalledIssueSdkObject.reason()),
+            conflictName = stalledIssueSdkObject.reasonDebugString(),
+            nodeNames = nodes.map { it.nodeName },
+        )
     }
 
     private fun getSyncId(

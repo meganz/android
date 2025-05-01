@@ -14,7 +14,6 @@ import nz.mega.sdk.MegaNode
 import nz.mega.sdk.MegaRequest
 import nz.mega.sdk.MegaSync
 import nz.mega.sdk.MegaSyncList
-import nz.mega.sdk.MegaSyncStallList
 import nz.mega.sdk.MegaSyncStats
 import nz.mega.sdk.StalledIssuesReceiver
 import org.junit.jupiter.api.AfterEach
@@ -130,22 +129,27 @@ internal class SyncGatewayImplTest {
     }
 
     @Test
-    fun `test that getSyncStalledIssues returns stalled issues list when sync is stalled`() =
+    fun `test that getSyncStalledIssues returns empty list when stall list is null`() =
         runTest {
-            val expectedStallList = mock<MegaSyncStallList>()
-            val request: MegaRequest = mock()
-            val error: MegaError = mock()
-            whenever(request.type).thenReturn(MegaRequest.TYPE_GET_SYNC_STALL_LIST)
-            whenever(request.megaSyncStallList).thenReturn(expectedStallList)
+            val mockRequest = mock<MegaRequest>().apply {
+                whenever(type).thenReturn(MegaRequest.TYPE_GET_SYNC_STALL_LIST)
+                whenever(megaSyncStallList).thenReturn(null)
+            }
+
             whenever(megaApi.isSyncStalled).thenReturn(true)
-            val stalledIssuesReceiverCaptor = argumentCaptor<StalledIssuesReceiver>()
-            whenever(megaApi.requestMegaSyncStallList(stalledIssuesReceiverCaptor.capture())).thenAnswer {
-                stalledIssuesReceiverCaptor.firstValue.onRequestFinish(megaApi, request, error)
+
+            val receiverCaptor = argumentCaptor<StalledIssuesReceiver>()
+            whenever(megaApi.requestMegaSyncStallList(receiverCaptor.capture())).thenAnswer {
+                receiverCaptor.firstValue.onRequestFinish(
+                    megaApi,
+                    mockRequest,
+                    mock<MegaError>().apply { whenever(errorCode).thenReturn(MegaError.API_OK) }
+                )
             }
 
             val result = underTest.getSyncStalledIssues()
 
-            assertThat(result).isEqualTo(expectedStallList)
+            assertThat(result).isEmpty()
         }
 
     @Test
