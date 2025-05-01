@@ -1,6 +1,5 @@
 package mega.privacy.android.app.mediaplayer
 
-import mega.privacy.android.shared.resources.R as sharedR
 import android.content.BroadcastReceiver
 import android.content.Context
 import android.content.Intent
@@ -131,6 +130,7 @@ import mega.privacy.android.domain.entity.node.NodeId
 import mega.privacy.android.domain.usecase.GetThemeMode
 import mega.privacy.android.navigation.MegaNavigator
 import mega.privacy.android.shared.original.core.ui.theme.OriginalTheme
+import mega.privacy.android.shared.resources.R as sharedR
 import mega.privacy.mobile.analytics.event.HideNodeMultiSelectMenuItemEvent
 import mega.privacy.mobile.analytics.event.VideoPlayerInfoMenuItemEvent
 import mega.privacy.mobile.analytics.event.VideoPlayerScreenEvent
@@ -359,10 +359,15 @@ class VideoPlayerComposeActivity : PasscodeActivity() {
     }
 
     private fun handleAutoReplayIfPaused() {
-        with(videoPlayerViewModel.uiState.value) {
-            if (mediaPlaybackState == MediaPlaybackState.Paused && isAutoReplay) {
-                videoPlayerViewModel.updatePlaybackStateWithReplay(true)
-            }
+        val uiState = videoPlayerViewModel.uiState.value
+
+        val shouldAutoReplay = uiState.mediaPlaybackState == MediaPlaybackState.Paused &&
+                uiState.isAutoReplay &&
+                !uiState.showSubtitleDialog &&
+                !uiState.showPlaybackDialog
+
+        if (shouldAutoReplay) {
+            videoPlayerViewModel.updatePlaybackStateWithReplay(true)
         }
     }
 

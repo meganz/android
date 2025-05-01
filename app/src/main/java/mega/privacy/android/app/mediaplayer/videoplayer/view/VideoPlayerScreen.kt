@@ -45,6 +45,7 @@ import androidx.compose.ui.unit.Density
 import androidx.compose.ui.unit.LayoutDirection
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.viewinterop.AndroidViewBinding
+import androidx.core.graphics.scale
 import androidx.core.view.isVisible
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.media3.common.Player
@@ -312,12 +313,8 @@ internal fun VideoPlayerScreen(
                                                     screenWidth to (screenWidth * bitmap.height / bitmap.width)
                                                 }
 
-                                            resizedBitmap = Bitmap.createScaledBitmap(
-                                                bitmap,
-                                                width.toInt(),
-                                                height.toInt(),
-                                                false
-                                            )
+                                            resizedBitmap =
+                                                bitmap.scale(width.toInt(), height.toInt(), false)
                                             isScreenshotVisible = true
                                             bitmap.recycle()
                                         }
@@ -409,11 +406,11 @@ internal fun VideoPlayerScreen(
                                     scaleX = scale.value,
                                     scaleY = scale.value,
                                     transformOrigin =
-                                    if (orientation == ORIENTATION_LANDSCAPE)
-                                        TransformOrigin(0.9f, 0.9f)
-                                    else {
-                                        TransformOrigin(0.9f, 0.8f)
-                                    }
+                                        if (orientation == ORIENTATION_LANDSCAPE)
+                                            TransformOrigin(0.9f, 0.9f)
+                                        else {
+                                            TransformOrigin(0.9f, 0.8f)
+                                        }
                                 )
                         )
                     }
