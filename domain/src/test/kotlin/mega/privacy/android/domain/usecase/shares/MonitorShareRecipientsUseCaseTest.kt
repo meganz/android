@@ -11,7 +11,10 @@ import mega.privacy.android.domain.entity.Contact
 import mega.privacy.android.domain.entity.ShareData
 import mega.privacy.android.domain.entity.contacts.ContactData
 import mega.privacy.android.domain.entity.contacts.UserChatStatus
+import mega.privacy.android.domain.entity.node.Node
+import mega.privacy.android.domain.entity.node.NodeChanges
 import mega.privacy.android.domain.entity.node.NodeId
+import mega.privacy.android.domain.entity.node.NodeUpdate
 import mega.privacy.android.domain.entity.shares.AccessPermission
 import mega.privacy.android.domain.entity.shares.ShareRecipient
 import mega.privacy.android.domain.entity.user.UserVisibility
@@ -80,6 +83,7 @@ class MonitorShareRecipientsUseCaseTest {
                     )
                 )
             )
+            on { monitorNodeUpdates() }.thenReturn(flow { awaitCancellation() })
         }
         contactsRepository.stub {
             on { monitorContactByEmail(nonContactEmail) }.thenReturn(flow {
@@ -125,6 +129,7 @@ class MonitorShareRecipientsUseCaseTest {
                     )
                 )
             )
+            on { monitorNodeUpdates() }.thenReturn(flow { awaitCancellation() })
         }
         contactsRepository.stub {
             on { monitorContactByEmail(contactEmail) }.thenReturn(flow {
@@ -192,6 +197,7 @@ class MonitorShareRecipientsUseCaseTest {
                     )
                 )
             )
+            on { monitorNodeUpdates() }.thenReturn(flow { awaitCancellation() })
         }
         val contactFlow = MutableStateFlow(getContact(userId, contactEmail, nickname))
         contactsRepository.stub {
@@ -248,7 +254,7 @@ class MonitorShareRecipientsUseCaseTest {
     }
 
     @Test
-    fun `test that updates to user online status is emitted`() = runTest {
+    fun `test that updates to user online status are emitted`() = runTest {
         val contactEmail = "contactEmail@test.com"
         val isPending = true
         val access = AccessPermission.UNKNOWN
@@ -271,6 +277,7 @@ class MonitorShareRecipientsUseCaseTest {
                     )
                 )
             )
+            on { monitorNodeUpdates() }.thenReturn(flow { awaitCancellation() })
         }
         val firstStatus = UserChatStatus.Away
         val secondStatus = UserChatStatus.Online
@@ -328,6 +335,7 @@ class MonitorShareRecipientsUseCaseTest {
                     )
                 }
             )
+            on { monitorNodeUpdates() }.thenReturn(flow { awaitCancellation() })
         }
         contactsRepository.stub {
             on { monitorContactByEmail(any()) }.thenAnswer { invocation ->
@@ -385,6 +393,120 @@ class MonitorShareRecipientsUseCaseTest {
                         )
                     }
                 }
+            )
+            cancelAndIgnoreRemainingEvents()
+        }
+    }
+
+    @Test
+    fun `test that contacts are updated if permission changes`() = runTest {
+        val contactEmail = "contactEmail@test.com"
+        val isPending = true
+        val access = AccessPermission.UNKNOWN
+        val newAccess = AccessPermission.READWRITE
+        val nickname = "nickname"
+        val userId = 1L
+        val avatarColour = 42
+        val sharedNodeId = NodeId(123)
+
+        val nodeUpdateFlow = MutableStateFlow<NodeUpdate>(NodeUpdate(emptyMap()))
+        nodeRepository.stub {
+            onBlocking { getNodeOutgoingShares(any()) }.thenReturn(
+                listOf(
+                    ShareData(
+                        user = contactEmail,
+                        userFullName = null,
+                        nodeHandle = 1,
+                        access = access,
+                        timeStamp = 0,
+                        isVerified = false,
+                        isPending = isPending,
+                        isContactCredentialsVerified = false,
+                        count = 1
+                    )
+                ),
+                listOf(
+                    ShareData(
+                        user = contactEmail,
+                        userFullName = null,
+                        nodeHandle = 1,
+                        access = newAccess,
+                        timeStamp = 0,
+                        isVerified = false,
+                        isPending = isPending,
+                        isContactCredentialsVerified = false,
+                        count = 1
+                    )
+                )
+            )
+            on { monitorNodeUpdates() }.thenReturn(
+                nodeUpdateFlow
+            )
+        }
+        contactsRepository.stub {
+            on { monitorContactByEmail(contactEmail) }.thenReturn(flow {
+                emit(
+                    getContact(userId, contactEmail, nickname)
+                )
+                awaitCancellation()
+            })
+            onBlocking { getAvatarUri(contactEmail) }.thenReturn(null)
+            on { monitorOnlineStatusByHandle(userId) }.thenReturn(flow {
+                emit(UserChatStatus.Invalid)
+                awaitCancellation()
+            })
+            onBlocking { areCredentialsVerified(contactEmail) }.thenReturn(false)
+        }
+        avatarRepository.stub {
+            onBlocking { getAvatarColor(userId) }.thenReturn(avatarColour)
+        }
+
+        underTest(sharedNodeId).test {
+            assertThat(awaitItem()).containsExactly(
+                ShareRecipient.Contact(
+                    handle = userId,
+                    email = contactEmail,
+                    contactData = ContactData(
+                        fullName = nickname,
+                        alias = nickname,
+                        avatarUri = null,
+                        userVisibility = UserVisibility.Visible
+                    ),
+                    isVerified = false,
+                    permission = access,
+                    isPending = isPending,
+                    status = UserChatStatus.Invalid,
+                    defaultAvatarColor = avatarColour,
+                )
+            )
+            val mockNode = mock<Node>{
+                on { id }.thenReturn(sharedNodeId)
+            }
+            nodeUpdateFlow.emit(
+                NodeUpdate(
+                    mapOf(
+                        mockNode to listOf(
+                            NodeChanges.Outshare
+                        )
+                    )
+                )
+            )
+            assertThat(awaitItem()).containsExactly(
+                ShareRecipient.Contact(
+                    handle = userId,
+                    email = contactEmail,
+                    contactData = ContactData(
+                        fullName = nickname,
+                        alias = nickname,
+                        avatarUri = null,
+                        userVisibility = UserVisibility.Visible
+                    ),
+                    isVerified = false,
+                    permission = newAccess,
+                    isPending = isPending,
+                    status = UserChatStatus.Invalid,
+                    defaultAvatarColor = avatarColour,
+                )
             )
             cancelAndIgnoreRemainingEvents()
         }

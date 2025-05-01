@@ -5,12 +5,15 @@ import kotlinx.coroutines.awaitCancellation
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.flow.emitAll
+import kotlinx.coroutines.flow.filter
+import kotlinx.coroutines.flow.filterNotNull
 import kotlinx.coroutines.flow.flatMapLatest
 import kotlinx.coroutines.flow.flow
 import kotlinx.coroutines.flow.map
 import mega.privacy.android.domain.entity.Contact
 import mega.privacy.android.domain.entity.ShareData
 import mega.privacy.android.domain.entity.contacts.ContactData
+import mega.privacy.android.domain.entity.node.NodeChanges
 import mega.privacy.android.domain.entity.node.NodeId
 import mega.privacy.android.domain.entity.shares.ShareRecipient
 import mega.privacy.android.domain.entity.user.UserVisibility
@@ -25,18 +28,32 @@ class MonitorShareRecipientsUseCase @Inject constructor(
     private val avatarRepository: AvatarRepository,
 ) {
 
+    @OptIn(ExperimentalCoroutinesApi::class)
     operator fun invoke(nodeId: NodeId): Flow<List<ShareRecipient>> =
         flow {
             val shareDataList = nodeRepository.getNodeOutgoingShares(nodeId)
-            if (shareDataList.isEmpty()) {
-                emit(emptyList())
-            } else {
-                emitAll(
-                    getContactListFlow(shareDataList)
-                )
-            }
+            emit(shareDataList)
+            emitAll(
+                nodeRepository.monitorNodeUpdates()
+                    .map {
+                        it.changes.mapKeys { it.key.id }[nodeId]
+                    }
+                    .filterNotNull()
+                    .filter { list: List<NodeChanges> -> list.any { it == NodeChanges.Outshare || it == NodeChanges.Pendingshare } }
+                    .map { nodeRepository.getNodeOutgoingShares(nodeId) }
+            )
             awaitCancellation()
+        }.flatMapLatest { shareDataList ->
+            if (shareDataList.isEmpty()) {
+                flow {
+                    emit(emptyList())
+                    awaitCancellation()
+                }
+            } else {
+                getContactListFlow(shareDataList)
+            }
         }
+
 
     private fun getContactListFlow(shareDataList: List<ShareData>): Flow<List<ShareRecipient>> =
         combine(
