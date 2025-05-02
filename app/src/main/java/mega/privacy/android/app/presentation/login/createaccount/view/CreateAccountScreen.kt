@@ -153,6 +153,7 @@ internal fun CreateAccountScreen(
                     modifier = Modifier.testTag(CREATE_ACCOUNT_TOOLBAR_TAG),
                     appBarType = AppBarType.NONE,
                     title = stringResource(R.string.create_account_title),
+                    isStatusBarColorEnabled = false
                 )
             }
         },

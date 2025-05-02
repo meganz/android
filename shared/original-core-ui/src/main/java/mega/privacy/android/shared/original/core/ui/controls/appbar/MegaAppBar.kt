@@ -90,6 +90,7 @@ fun MegaAppBar(
     enabled: Boolean = true,
     elevation: Dp = LocalMegaAppBarElevation.current,
     windowInsets: WindowInsets = WindowInsets.statusBars,
+    isStatusBarColorEnabled: Boolean = true
 ) = CompositionLocalProvider(
     LocalMegaAppBarColors provides MegaAppBarColors(
         iconsTintColor = MegaOriginalTheme.colors.icon.primary,
@@ -108,7 +109,8 @@ fun MegaAppBar(
         maxActionsToShow = maxActionsToShow,
         enabled = enabled,
         elevation = elevation,
-        windowInsets = windowInsets
+        windowInsets = windowInsets,
+        isStatusBarColorEnabled = isStatusBarColorEnabled
     )
 }
 
@@ -143,6 +145,7 @@ fun MegaAppBar(
     enabled: Boolean = true,
     elevation: Dp = LocalMegaAppBarElevation.current,
     windowInsets: WindowInsets = WindowInsets.statusBars,
+    isStatusBarColorEnabled: Boolean = true
 ) = CompositionLocalProvider(
     LocalMegaAppBarColors provides MegaAppBarColors(
         iconsTintColor = MegaOriginalTheme.colors.icon.primary,
@@ -161,7 +164,8 @@ fun MegaAppBar(
         maxActionsToShow = maxActionsToShow,
         enabled = enabled,
         elevation = elevation,
-        windowInsets = windowInsets
+        windowInsets = windowInsets,
+        isStatusBarColorEnabled = isStatusBarColorEnabled
     )
 }
 
@@ -279,6 +283,7 @@ internal fun BaseMegaAppBar(
     enabled: Boolean = true,
     elevation: Dp = LocalMegaAppBarElevation.current,
     windowInsets: WindowInsets = WindowInsets.statusBars,
+    isStatusBarColorEnabled: Boolean = true
 ) = BaseMegaAppBar(
     appBarType = appBarType,
     titleAndSubtitle = {
@@ -296,7 +301,8 @@ internal fun BaseMegaAppBar(
     maxActionsToShow = maxActionsToShow,
     enabled = enabled,
     elevation = elevation,
-    windowInsets = windowInsets
+    windowInsets = windowInsets,
+    isStatusBarColorEnabled = isStatusBarColorEnabled
 )
 
 @Composable
@@ -311,6 +317,7 @@ internal fun BaseMegaAppBar(
     enabled: Boolean = true,
     elevation: Dp = LocalMegaAppBarElevation.current,
     windowInsets: WindowInsets = WindowInsets.statusBars,
+    isStatusBarColorEnabled: Boolean = true,
 ) {
     val backgroundColor by animateColorAsState(
         targetValue = (if (elevation == 0.dp) MegaOriginalTheme.colors.background.pageBackground else MegaOriginalTheme.colors.background.surface1)
@@ -318,7 +325,7 @@ internal fun BaseMegaAppBar(
         label = "elevation animation",
     )
     // set the status bar color to match toolbar color, it has no effect on android 15
-    if (!LocalView.current.isInEditMode) {
+    if (!LocalView.current.isInEditMode && isStatusBarColorEnabled) {
         val systemUiController = rememberSystemUiController()
         DisposableEffect(systemUiController, backgroundColor) {
             systemUiController.setStatusBarColor(
