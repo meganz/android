@@ -228,17 +228,17 @@ class OpenLinkActivity : PasscodeActivity(), MegaRequestListenerInterface,
             matchRegexs(url, EMAIL_VERIFY_LINK_REGEXS) -> {
                 Timber.d("Open email verification link")
                 MegaApplication.setIsWebOpenDueToEmailVerification(true)
-                this.launchUrl(url)
+                openWebLink(url)
             }
             // Web session link
             matchRegexs(url, WEB_SESSION_LINK_REGEXS) -> {
                 Timber.d("Open web session link")
-                this.launchUrl(url)
+                openWebLink(url)
             }
 
             matchRegexs(url, BUSINESS_INVITE_LINK_REGEXS) -> {
                 Timber.d("Open business invite link")
-                this.launchUrl(url)
+                openWebLink(url)
             }
             //MEGA DROP link
             matchRegexs(url, MEGA_DROP_LINK_REGEXS) -> {
@@ -449,7 +449,7 @@ class OpenLinkActivity : PasscodeActivity(), MegaRequestListenerInterface,
             matchRegexs(url, REVERT_CHANGE_PASSWORD_LINK_REGEXS)
                     || matchRegexs(url, MEGA_BLOG_LINK_REGEXS) -> {
                 Timber.d("Open revert password change link: $url")
-                this.launchUrl(url)
+                openWebLink(url)
             }
 
             // Open Sync folder link
@@ -678,8 +678,18 @@ class OpenLinkActivity : PasscodeActivity(), MegaRequestListenerInterface,
      */
     private fun checkIfRequiresTransferSession(url: String) {
         if (!requiresTransferSession(this, url)) {
-            this.launchUrl(url)
+            openWebLink(url)
         }
+    }
+
+    /**
+     * Open web link and finish current activity
+     *
+     * @param url web link
+     */
+    fun openWebLink(url: String?) = url?.let {
+        launchUrl(it)
+        finish()
     }
 
     private fun openWebLinkInBrowser(url: String?) = url?.let {
