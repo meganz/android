@@ -2002,10 +2002,6 @@
     <string name="dispute_takendown_file">争议删除</string>
     <!-- Error shown when download a file that has violated ToS/AUP. -->
     <string name="error_download_takendown_node">因违反我们的服务条款而无法访问</string>
-    <!-- Alert shown when some files were not downloaded due to ToS/AUP violation, Plural of taken down files. 2 files -->
-    <plurals name="alert_taken_down_files">
-        <item quantity="other">%d个文件因违反我们的服务条款而无法下载。</item>
-    </plurals>
     <!-- Subtitle of a file takedown reinstated historic notification -->
     <string name="subtitle_file_takedown_reinstated_notification">[A]您公开的共享文件[/A][B]%s[/B]已被恢复。</string>
     <!-- Subtitle of a folder takedown reinstated historic notification -->
@@ -3455,11 +3451,11 @@
     <!-- Label for scheduled weekly meetings -->
     <string name="meetings_list_scheduled_meeting_weekly_label">每周%s</string>
     <!-- In Settings view the title of setting, which allows to use media discovery view automatically. -->
-    <string name="settings_media_discovery_view_title">媒体发现视图</string>
+    <string name="settings_media_discovery_view_title">图库视图</string>
     <!-- In Settings view the explanation of a setting, which allows to use media discovery view automatically. -->
-    <string name="settings_media_discovery_view_context">在媒体发现视图中自动打开只包含图片和视频的文件夹。这让您可以在图库模式下看到媒体内容并按日期筛选。</string>
+    <string name="settings_media_discovery_view_context">Open folders with only images or videos in a visual grid. Browse media by thumbnails and filter by date.</string>
     <!-- Context of banner for media discovery view. When user opens a folder, which can be viewed in Media discovery view, the banner will be shown with this text to let user know, where the setting can be changed. -->
-    <string name="cloud_drive_media_discovery_banner_context">由于此文件夹仅包含图像和视频，我们已自动在媒体发现视图中将其打开。您可以通过更身临其境的布局欣赏您的视觉内容。您可以在设置中禁用此功能。</string>
+    <string name="cloud_drive_media_discovery_banner_context">As this folder contains only images and videos, we’ve automatically opened it in gallery view. You can enjoy your visual content with a more immersive layout. You can disable this in Settings.</string>
     <!-- Banner option for user to open settings, where he can disable the media discovery view setting. -->
     <string name="cloud_drive_media_discovery_banner_settings">设置</string>
     <!-- Banner option for user that he understood the explanation and agrees with media discovery view setting being enabled. -->
@@ -4503,9 +4499,9 @@
     <!-- Title of video option of original-->
     <string name="media_player_video_option_original_title">原画</string>
     <!-- In Settings view the title of setting, which allows to show subfolder media discovery. -->
-    <string name="settings_media_discovery_sub_folder_title">子文件夹中的媒体发现</string>
+    <string name="settings_media_discovery_sub_folder_title">Gallery view in subfolders</string>
     <!-- In Settings view the explanation of a setting, which allows to show subfolder media discovery. -->
-    <string name="settings_media_discovery_sub_folder_context">子文件夹中的图像和视频也将包含在媒体发现视图中。</string>
+    <string name="settings_media_discovery_sub_folder_context">Images and videos from subfolders will also be included in gallery view</string>
     <!-- Description text in empty search screen when no search results found -->
     <string name="search_empty_screen_no_results">没有符合搜索的项目</string>
     <!-- Description text in empty search screen when images filter selected -->

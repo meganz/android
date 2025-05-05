@@ -895,7 +895,7 @@
     <!--Message to be shown to the user when they entered the wrong credential-->
     <string name="login_wrong_credential_error_message">Geçersiz e-posta adresi veya şifre</string>
     <!--Message to be shown to he user when the account is not validated -->
-    <string name="login_account_not_validated">Your account signup is incomplete or has been cancelled. Check your email inbox.</string>
+    <string name="login_account_not_validated">Hesap kaydınız tamamlanmamış ya da iptal edilmiş. Lütfen e-posta kutunuzu kontrol edin.</string>
     <!--Message to be shown to the user when login fails due to multiple failed attempts-->
     <string name="login_too_many_attempts_error_message">You have attempted to log in too many times. Wait and try again.</string>
     <!--The footer text to be shown where a user can sign up if they do not have a MEGA account-->
@@ -903,7 +903,7 @@
     <!-- Title of setting Two-Factor Authentication -->
     <string name="settings_2fa">Two-factor authentication</string>
     <!-- email label -->
-    <string name="email_text">Email address</string>
+    <string name="email_text">E-posta adresi</string>
     <!-- password label -->
     <string name="password_text">Şifre</string>
     <!-- Login button -->

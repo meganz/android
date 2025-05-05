@@ -2088,12 +2088,6 @@
     <string name="dispute_takendown_file">Contester le retrait</string>
     <!-- Error shown when download a file that has violated ToS/AUP. -->
     <string name="error_download_takendown_node">Non accessible pour non-respect des Conditions générales d’utilisation</string>
-    <!-- Alert shown when some files were not downloaded due to ToS/AUP violation, Plural of taken down files. 2 files -->
-    <plurals name="alert_taken_down_files">
-        <item quantity="one">%d fichier n’a pas été téléchargé pour non-respect des Conditions générales d’utilisation.</item>
-        <item quantity="many">%d fichiers n’ont pas été téléchargés pour non-respect des Conditions générales d’utilisation.</item>
-        <item quantity="other">%d fichiers n’ont pas été téléchargés pour non-respect des Conditions générales d’utilisation.</item>
-    </plurals>
     <!-- Subtitle of a file takedown reinstated historic notification -->
     <string name="subtitle_file_takedown_reinstated_notification">[A]Votre fichier [B]%s[/B] partagé publiquement[/A] a été rétabli.</string>
     <!-- Subtitle of a folder takedown reinstated historic notification -->
@@ -3633,11 +3627,11 @@
     <!-- Label for scheduled weekly meetings -->
     <string name="meetings_list_scheduled_meeting_weekly_label">%s toutes les semaines</string>
     <!-- In Settings view the title of setting, which allows to use media discovery view automatically. -->
-    <string name="settings_media_discovery_view_title">Mode de découverte des médias</string>
+    <string name="settings_media_discovery_view_title">Vue de la galerie</string>
     <!-- In Settings view the explanation of a setting, which allows to use media discovery view automatically. -->
-    <string name="settings_media_discovery_view_context">Ouvrir automatiquement les dossiers qui ne comprennent qu’images et vidéos en mode de découverte des médias. Cela vous permet de visualiser les médias en mode galerie et de les filtrer par date.</string>
+    <string name="settings_media_discovery_view_context">Open folders with only images or videos in a visual grid. Browse media by thumbnails and filter by date.</string>
     <!-- Context of banner for media discovery view. When user opens a folder, which can be viewed in Media discovery view, the banner will be shown with this text to let user know, where the setting can be changed. -->
-    <string name="cloud_drive_media_discovery_banner_context">Comme ce dossier ne comprend que des images et des vidéos, nous l’avons automatiquement ouvert en mode de découverte des médias. Vous pouvez profiter de votre contenu visuel avec une mise en page plus immersive. Vous pouvez désactiver cette option dans Paramètres.</string>
+    <string name="cloud_drive_media_discovery_banner_context">As this folder contains only images and videos, we’ve automatically opened it in gallery view. You can enjoy your visual content with a more immersive layout. You can disable this in Settings.</string>
     <!-- Banner option for user to open settings, where he can disable the media discovery view setting. -->
     <string name="cloud_drive_media_discovery_banner_settings">Paramètres</string>
     <!-- Banner option for user that he understood the explanation and agrees with media discovery view setting being enabled. -->
@@ -4939,9 +4933,9 @@
     <!-- Title of video option of original-->
     <string name="media_player_video_option_original_title">Originale</string>
     <!-- In Settings view the title of setting, which allows to show subfolder media discovery. -->
-    <string name="settings_media_discovery_sub_folder_title">Découverte des médias dans les sous-dossiers</string>
+    <string name="settings_media_discovery_sub_folder_title">Gallery view in subfolders</string>
     <!-- In Settings view the explanation of a setting, which allows to show subfolder media discovery. -->
-    <string name="settings_media_discovery_sub_folder_context">Les images et vidéos des sous-dossiers seront aussi comprises en mode de découverte des médias.</string>
+    <string name="settings_media_discovery_sub_folder_context">Images and videos from subfolders will also be included in gallery view</string>
     <!-- Description text in empty search screen when no search results found -->
     <string name="search_empty_screen_no_results">Aucun résultat</string>
     <!-- Description text in empty search screen when images filter selected -->

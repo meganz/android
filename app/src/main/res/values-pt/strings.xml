@@ -2088,12 +2088,6 @@
     <string name="dispute_takendown_file">Disputar remoção</string>
     <!-- Error shown when download a file that has violated ToS/AUP. -->
     <string name="error_download_takendown_node">Não acessível por infringir os nossos Termos de serviço</string>
-    <!-- Alert shown when some files were not downloaded due to ToS/AUP violation, Plural of taken down files. 2 files -->
-    <plurals name="alert_taken_down_files">
-        <item quantity="one">Não foi feito o download de %d arquivo porque ele infringia os nossos Termos de serviço.</item>
-        <item quantity="many">Não foi feito o download de %d de arquivos porque eles infringiam os nossos Termos de serviço.</item>
-        <item quantity="other">Não foi feito o download de %d arquivos porque eles infringiam os nossos Termos de serviço.</item>
-    </plurals>
     <!-- Subtitle of a file takedown reinstated historic notification -->
     <string name="subtitle_file_takedown_reinstated_notification">[A]O seu arquivo compartilhado publicamente [/A] [B]%s[/B] foi restaurado.</string>
     <!-- Subtitle of a folder takedown reinstated historic notification -->
@@ -3633,11 +3627,11 @@
     <!-- Label for scheduled weekly meetings -->
     <string name="meetings_list_scheduled_meeting_weekly_label">%s semanal</string>
     <!-- In Settings view the title of setting, which allows to use media discovery view automatically. -->
-    <string name="settings_media_discovery_view_title">Visualização do explorador multimídia</string>
+    <string name="settings_media_discovery_view_title">Visualização na galeria</string>
     <!-- In Settings view the explanation of a setting, which allows to use media discovery view automatically. -->
-    <string name="settings_media_discovery_view_context">Abrir automaticamente pastas somente com imagens e vídeos na visualização do explorador multimídia. Isso permite que você veja os arquivos na galeria e filtre por data.</string>
+    <string name="settings_media_discovery_view_context">Abre em uma grade visual pastas que só contem imagens e/ou vídeos, para que você possa navegar pelas miniaturas e filtrar por data.</string>
     <!-- Context of banner for media discovery view. When user opens a folder, which can be viewed in Media discovery view, the banner will be shown with this text to let user know, where the setting can be changed. -->
-    <string name="cloud_drive_media_discovery_banner_context">Como essa pasta contém apenas imagens e vídeos, nós a abrimos automaticamente na visualização do explorador multimídia. Você pode aproveitar o seu conteúdo visual com um layout mais envolvente. Para desativar essa função, acesse as Configurações.</string>
+    <string name="cloud_drive_media_discovery_banner_context">Como essa pasta contém apenas imagens e vídeos, nós a abrimos automaticamente com a visualização na galeria. Você pode aproveitar o seu conteúdo visual com um layout mais envolvente. Para desativar esta função, acesse as Configurações.</string>
     <!-- Banner option for user to open settings, where he can disable the media discovery view setting. -->
     <string name="cloud_drive_media_discovery_banner_settings">Configurações</string>
     <!-- Banner option for user that he understood the explanation and agrees with media discovery view setting being enabled. -->
@@ -4939,9 +4933,9 @@
     <!-- Title of video option of original-->
     <string name="media_player_video_option_original_title">Original</string>
     <!-- In Settings view the title of setting, which allows to show subfolder media discovery. -->
-    <string name="settings_media_discovery_sub_folder_title">Explorador multimídia nas subpastas</string>
+    <string name="settings_media_discovery_sub_folder_title">Visualização de subpastas na galeria</string>
     <!-- In Settings view the explanation of a setting, which allows to show subfolder media discovery. -->
-    <string name="settings_media_discovery_sub_folder_context">Imagens e vídeos de subpastas também serão incluídos na visualização do explorador multimídia.</string>
+    <string name="settings_media_discovery_sub_folder_context">Imagens e vídeos de subpastas também serão incluídos na visualização na galeria</string>
     <!-- Description text in empty search screen when no search results found -->
     <string name="search_empty_screen_no_results">Não há resultados</string>
     <!-- Description text in empty search screen when images filter selected -->
@@ -4999,7 +4993,7 @@
     <!-- Title about Pro plans on Onboarding dialog (for user to choose account - Free or Pro).  -->
     <string name="dialog_onboarding_get_pro_title">Obtenha mais com um plano Pro</string>
     <!-- Short description about Pro plans on Onboarding dialog (for user to choose account - Free or Pro). %1$s placeholder will be replaced with correct localised price (e.g. $4.99). -->
-    <string name="dialog_onboarding_get_pro_description">Faça o upgrade a um plano Pro para obter mais armazenamento e acessar recursos exclusivos. O nossos planos são a partir de %1$s por mês.</string>
+    <string name="dialog_onboarding_get_pro_description">Faça o upgrade a um plano Pro para obter mais armazenamento e acessar recursos exclusivos. Os nossos planos são a partir de %1$s por mês.</string>
     <!-- Title for Storage feature on Onboarding dialog (for user to choose account - Free or Pro).  -->
     <string name="dialog_onboarding_feature_title_storage">Flexibilidade de armazenamento máxima</string>
     <!-- Title for Button to view Pro plans on Onboarding dialog (for user to choose account - Free or Pro). After clicking on the button user will redirecting to Upgrade Account screen.  -->

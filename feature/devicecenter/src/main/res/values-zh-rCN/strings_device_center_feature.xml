@@ -20,8 +20,6 @@
     <string name="device_center_list_view_item_status_updating_with_progress">%1$d%%更新中&#8230;</string>
     <!-- The name of the Device or Folder Status which signifies that it is disabled -->
     <string name="device_center_list_view_item_status_disabled">已禁用</string>
-    <!-- The name of the Device or Folder Status which signifies that it is offline -->
-    <string name="device_center_list_view_item_status_offline">非活跃</string>
     <!-- The name of the Device or Folder Status which signifies that the backup procedure has been paused -->
     <string name="device_center_list_view_item_status_paused">已暂停</string>
     <!-- The name of the Device or Folder Status which signifies that an error has occurred -->

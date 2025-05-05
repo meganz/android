@@ -1081,7 +1081,7 @@
     <!-- Hidden nodes: control visibility feature -->
     <string name="hidden_nodes_title_control_visibility">表示/非表示を簡単に制御</string>
     <!-- Hidden nodes description: control visibility feature -->
-    <string name="hidden_nodes_description_control_visibility">To show hidden files, turn on the “Show hidden items” setting under “File Management” -&gt; “User interface” in your app settings.</string>
+    <string name="hidden_nodes_description_control_visibility">非表示ファイルを表示するには、アプリの設定で「ファイル管理（File Management） -&gt; ユーザーインターフェース（User interface）」の「非表示項目を表示（Show hidden items）」をオンにします。</string>
     <!-- Hidden nodes: shared files stay visible feature -->
     <string name="hidden_nodes_title_visible_shared_files">共有ファイルは表示されたまま</string>
     <!-- Hidden nodes description: shared files stay visible feature -->

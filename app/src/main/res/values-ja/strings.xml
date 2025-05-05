@@ -2002,10 +2002,6 @@
     <string name="dispute_takendown_file">異議申立による削除</string>
     <!-- Error shown when download a file that has violated ToS/AUP. -->
     <string name="error_download_takendown_node">ご利用規約に違反するため、アクセスできません。</string>
-    <!-- Alert shown when some files were not downloaded due to ToS/AUP violation, Plural of taken down files. 2 files -->
-    <plurals name="alert_taken_down_files">
-        <item quantity="other">%d個のファイルは当社のご利用規約に違反するため、ダウンロードされませんでした。</item>
-    </plurals>
     <!-- Subtitle of a file takedown reinstated historic notification -->
     <string name="subtitle_file_takedown_reinstated_notification">[A]あなたの公開共有されたファイル[/A][B]%s[/B]は復活しました。</string>
     <!-- Subtitle of a folder takedown reinstated historic notification -->
@@ -3455,11 +3451,11 @@
     <!-- Label for scheduled weekly meetings -->
     <string name="meetings_list_scheduled_meeting_weekly_label">%s毎週</string>
     <!-- In Settings view the title of setting, which allows to use media discovery view automatically. -->
-    <string name="settings_media_discovery_view_title">メディア検出ビュー</string>
+    <string name="settings_media_discovery_view_title">ギャラリービュー</string>
     <!-- In Settings view the explanation of a setting, which allows to use media discovery view automatically. -->
-    <string name="settings_media_discovery_view_context">メディア検出ビューで画像と動画のみを含むフォルダを自動的に開きます。これにより、ギャラリーモードでメディアを表示し、日付でフィルター処理できます。</string>
+    <string name="settings_media_discovery_view_context">画像や動画だけのフォルダをビジュアルグリッドで開きます。サムネイルでメディアをブラウズし、日付でフィルタリングできます。</string>
     <!-- Context of banner for media discovery view. When user opens a folder, which can be viewed in Media discovery view, the banner will be shown with this text to let user know, where the setting can be changed. -->
-    <string name="cloud_drive_media_discovery_banner_context">このフォルダには画像と動画のみが含まれているため、自動的にメディア検出ビューで開きます。また、より没入感のあるレイアウトでビジュアルコンテンツを楽しむことができます。これは「設定」で無効にできます。</string>
+    <string name="cloud_drive_media_discovery_banner_context">このフォルダには画像と動画のみが含まれているため、自動的にギャラリービューで開きます。また、より没入感のあるレイアウトでビジュアルコンテンツを楽しむことができます。これは「設定」で無効にできます。</string>
     <!-- Banner option for user to open settings, where he can disable the media discovery view setting. -->
     <string name="cloud_drive_media_discovery_banner_settings">設定</string>
     <!-- Banner option for user that he understood the explanation and agrees with media discovery view setting being enabled. -->
@@ -4503,9 +4499,9 @@
     <!-- Title of video option of original-->
     <string name="media_player_video_option_original_title">オリジナル</string>
     <!-- In Settings view the title of setting, which allows to show subfolder media discovery. -->
-    <string name="settings_media_discovery_sub_folder_title">サブフォルダ内のメディアディスカバリー</string>
+    <string name="settings_media_discovery_sub_folder_title">サブフォルダ内のギャラリービュー</string>
     <!-- In Settings view the explanation of a setting, which allows to show subfolder media discovery. -->
-    <string name="settings_media_discovery_sub_folder_context">サブフォルダの画像と動画もメディア検出ビューに含まれます。</string>
+    <string name="settings_media_discovery_sub_folder_context">サブフォルダの画像と動画もギャラリービューに含まれます。</string>
     <!-- Description text in empty search screen when no search results found -->
     <string name="search_empty_screen_no_results">結果なし</string>
     <!-- Description text in empty search screen when images filter selected -->

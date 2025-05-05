@@ -1095,7 +1095,7 @@
     <!--Button text to request camera backup permission-->
     <string name="camera_backup_permission_enable_button_text">Bật Đăng Tải Camêra</string>
     <!--Permission screen skip requesting permission button text-->
-    <string name="permission_screen_skip_permission_request_button_text">Skip for now</string>
+    <string name="permission_screen_skip_permission_request_button_text">Để lúc khác</string>
     <!--Notification permission screen title-->
     <string name="notification_permission_screen_title">Never miss an important update</string>
     <!--Notification permission screen description-->

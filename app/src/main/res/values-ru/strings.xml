@@ -2131,13 +2131,6 @@
     <string name="dispute_takendown_file">Оспорить изъятие</string>
     <!-- Error shown when download a file that has violated ToS/AUP. -->
     <string name="error_download_takendown_node">Недоступно из-за нарушения наших условий использования</string>
-    <!-- Alert shown when some files were not downloaded due to ToS/AUP violation, Plural of taken down files. 2 files -->
-    <plurals name="alert_taken_down_files">
-        <item quantity="one">%d файл не был скачан из-за нарушения наших условий использования.</item>
-        <item quantity="few">%d файла не было скачано из-за нарушения наших условий использования.</item>
-        <item quantity="many">%d файлов не было скачано из-за нарушения наших условий использования.</item>
-        <item quantity="other">%d файла не было скачано из-за нарушения наших условий использования.</item>
-    </plurals>
     <!-- Subtitle of a file takedown reinstated historic notification -->
     <string name="subtitle_file_takedown_reinstated_notification">[A]Ваш общедоступный файл [/A][B]%s[/B] был восстановлен.</string>
     <!-- Subtitle of a folder takedown reinstated historic notification -->
@@ -3722,11 +3715,11 @@
     <!-- Label for scheduled weekly meetings -->
     <string name="meetings_list_scheduled_meeting_weekly_label">%s еженедельно</string>
     <!-- In Settings view the title of setting, which allows to use media discovery view automatically. -->
-    <string name="settings_media_discovery_view_title">Режим обнаружения медиа</string>
+    <string name="settings_media_discovery_view_title">Галерея</string>
     <!-- In Settings view the explanation of a setting, which allows to use media discovery view automatically. -->
-    <string name="settings_media_discovery_view_context">Автоматически открывать папки, содержащие только изображения и видео, в режиме обнаружения медиа. Это позволяет просматривать медиафайлы в виде галереи и фильтровать по дате.</string>
+    <string name="settings_media_discovery_view_context">Открывать папки только с изображениями или видео в режиме сетки. Просматривайте эскизы медиафайлов и фильтруйте их по дате.</string>
     <!-- Context of banner for media discovery view. When user opens a folder, which can be viewed in Media discovery view, the banner will be shown with this text to let user know, where the setting can be changed. -->
-    <string name="cloud_drive_media_discovery_banner_context">Поскольку эта папка содержит только изображения и видео, мы автоматически открыли её в режиме обнаружения медиа. Наслаждайтесь более наглядным представлением содержимого. Это можно отключить в «Настройках».</string>
+    <string name="cloud_drive_media_discovery_banner_context">Поскольку эта папка содержит только изображения и видео, мы автоматически открыли её в режиме галереи. Наслаждайтесь более наглядным представлением содержимого. Это можно отключить в «Настройках».</string>
     <!-- Banner option for user to open settings, where he can disable the media discovery view setting. -->
     <string name="cloud_drive_media_discovery_banner_settings">Настройки</string>
     <!-- Banner option for user that he understood the explanation and agrees with media discovery view setting being enabled. -->
@@ -5157,9 +5150,9 @@
     <!-- Title of video option of original-->
     <string name="media_player_video_option_original_title">Исходное</string>
     <!-- In Settings view the title of setting, which allows to show subfolder media discovery. -->
-    <string name="settings_media_discovery_sub_folder_title">Обнаружение медиа в подпапках</string>
+    <string name="settings_media_discovery_sub_folder_title">Режим галереи в подпапках</string>
     <!-- In Settings view the explanation of a setting, which allows to show subfolder media discovery. -->
-    <string name="settings_media_discovery_sub_folder_context">Изображения и видео из подпапок также будут включены в режим обнаружения медиа.</string>
+    <string name="settings_media_discovery_sub_folder_context">Изображения и видео из подпапок также будут отображаться в галерее</string>
     <!-- Description text in empty search screen when no search results found -->
     <string name="search_empty_screen_no_results">Нет результатов</string>
     <!-- Description text in empty search screen when images filter selected -->

@@ -2131,13 +2131,6 @@
     <string name="dispute_takendown_file">Roztrzyganie sporów</string>
     <!-- Error shown when download a file that has violated ToS/AUP. -->
     <string name="error_download_takendown_node">Brak dostępu, ponieważ narusza to nasze warunki korzystania z usługi</string>
-    <!-- Alert shown when some files were not downloaded due to ToS/AUP violation, Plural of taken down files. 2 files -->
-    <plurals name="alert_taken_down_files">
-        <item quantity="one">%d plik nie został pobrany, ponieważ naruszał nasze Warunki korzystania z usługi.</item>
-        <item quantity="few">%d pliki nie zostały pobrane, ponieważ naruszały nasze Warunki korzystania z usługi.</item>
-        <item quantity="many">%d pliki nie zostały pobrane, ponieważ naruszały nasze Warunki korzystania z usługi.</item>
-        <item quantity="other">%d pliki nie zostały pobrane, ponieważ naruszały nasze Warunki korzystania z usługi.</item>
-    </plurals>
     <!-- Subtitle of a file takedown reinstated historic notification -->
     <string name="subtitle_file_takedown_reinstated_notification">[A]Twój publiczny plik [/A][B]%s[/B] został przywrócony.</string>
     <!-- Subtitle of a folder takedown reinstated historic notification -->
@@ -3722,11 +3715,11 @@
     <!-- Label for scheduled weekly meetings -->
     <string name="meetings_list_scheduled_meeting_weekly_label">%s tygodniowo</string>
     <!-- In Settings view the title of setting, which allows to use media discovery view automatically. -->
-    <string name="settings_media_discovery_view_title">Widok mediów</string>
+    <string name="settings_media_discovery_view_title">Widok galerii</string>
     <!-- In Settings view the explanation of a setting, which allows to use media discovery view automatically. -->
-    <string name="settings_media_discovery_view_context">Automatyczne otwieranie katalogów zawierających tylko obrazy i filmy w widoku Media Discovery. Umożliwia to oglądanie multimediów w trybie galerii i filtrowanie według daty.</string>
+    <string name="settings_media_discovery_view_context">Otwieraj katalogi zawierające tylko obrazy lub filmy w formie wizualnej siatki. Przeglądaj multimedia według miniatur i filtruj według daty.</string>
     <!-- Context of banner for media discovery view. When user opens a folder, which can be viewed in Media discovery view, the banner will be shown with this text to let user know, where the setting can be changed. -->
-    <string name="cloud_drive_media_discovery_banner_context">Ponieważ katalog ten zawiera tylko obrazy i filmy, automatycznie otworzyliśmy go w widoku odkrywania multimediów. Możesz cieszyć się treściami wizualnymi w bardziej wciągającym układzie. Możesz to wyłączyć w Ustawieniach.</string>
+    <string name="cloud_drive_media_discovery_banner_context">Ponieważ ten katalog zawiera tylko obrazy i filmy, automatycznie otworzyliśmy go w widoku galerii. Możesz cieszyć się swoją wizualną zawartością w bardziej immersyjnym układzie. Możesz to wyłączyć w Ustawieniach.</string>
     <!-- Banner option for user to open settings, where he can disable the media discovery view setting. -->
     <string name="cloud_drive_media_discovery_banner_settings">Ustawienia</string>
     <!-- Banner option for user that he understood the explanation and agrees with media discovery view setting being enabled. -->
@@ -5157,9 +5150,9 @@
     <!-- Title of video option of original-->
     <string name="media_player_video_option_original_title">Oryginalny</string>
     <!-- In Settings view the title of setting, which allows to show subfolder media discovery. -->
-    <string name="settings_media_discovery_sub_folder_title">Wykrywanie multimediów w podfolderach</string>
+    <string name="settings_media_discovery_sub_folder_title">Widok galerii w podfolderach</string>
     <!-- In Settings view the explanation of a setting, which allows to show subfolder media discovery. -->
-    <string name="settings_media_discovery_sub_folder_context">Obrazy i filmy z podfolderów będą również uwzględniane w widoku wykrywania multimediów.</string>
+    <string name="settings_media_discovery_sub_folder_context">Obrazy i filmy z podfolderów będą również uwzględnione w widoku galerii</string>
     <!-- Description text in empty search screen when no search results found -->
     <string name="search_empty_screen_no_results">Brak wyników</string>
     <!-- Description text in empty search screen when images filter selected -->

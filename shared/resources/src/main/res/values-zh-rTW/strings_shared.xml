@@ -1081,7 +1081,7 @@
     <!-- Hidden nodes: control visibility feature -->
     <string name="hidden_nodes_title_control_visibility">輕鬆控制可見性</string>
     <!-- Hidden nodes description: control visibility feature -->
-    <string name="hidden_nodes_description_control_visibility">To show hidden files, turn on the “Show hidden items” setting under “File Management” -&gt; “User interface” in your app settings.</string>
+    <string name="hidden_nodes_description_control_visibility">若要顯示隱藏檔案，請在應用程式設定中的「檔案管理」-&gt;「使用者介面」下開啟「顯示隱藏項目」設定。</string>
     <!-- Hidden nodes: shared files stay visible feature -->
     <string name="hidden_nodes_title_visible_shared_files">共享檔案保持可見狀態</string>
     <!-- Hidden nodes description: shared files stay visible feature -->
