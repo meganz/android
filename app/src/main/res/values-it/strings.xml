@@ -2088,12 +2088,6 @@
     <string name="dispute_takendown_file">Contesta chiusura</string>
     <!-- Error shown when download a file that has violated ToS/AUP. -->
     <string name="error_download_takendown_node">Non accessibile in quanto violava i nostri Termini di servizio</string>
-    <!-- Alert shown when some files were not downloaded due to ToS/AUP violation, Plural of taken down files. 2 files -->
-    <plurals name="alert_taken_down_files">
-        <item quantity="one">%d file non è stato scaricato in quanto violava i nostri Termini di servizio.</item>
-        <item quantity="many">%d file non sono stati scaricati in quanto violavano i nostri Termini di servizio.</item>
-        <item quantity="other">%d file non sono stati scaricati in quanto violavano i nostri Termini di servizio.</item>
-    </plurals>
     <!-- Subtitle of a file takedown reinstated historic notification -->
     <string name="subtitle_file_takedown_reinstated_notification">[A]Il tuo file pubblicamente condiviso[/A] [B]%s[/B] è stato reintegrato.</string>
     <!-- Subtitle of a folder takedown reinstated historic notification -->
@@ -3633,11 +3627,11 @@
     <!-- Label for scheduled weekly meetings -->
     <string name="meetings_list_scheduled_meeting_weekly_label">%s settimanale</string>
     <!-- In Settings view the title of setting, which allows to use media discovery view automatically. -->
-    <string name="settings_media_discovery_view_title">Esplorazione dei media</string>
+    <string name="settings_media_discovery_view_title">Gallery view</string>
     <!-- In Settings view the explanation of a setting, which allows to use media discovery view automatically. -->
-    <string name="settings_media_discovery_view_context">Apri automaticamente le cartelle che contengono solamente immagini e video nell\’esplorazione dei media. Questo ti permette di vedere i media in modalità galleria e di filtrare per data.</string>
+    <string name="settings_media_discovery_view_context">Open folders with only images or videos in a visual grid. Browse media by thumbnails and filter by date.</string>
     <!-- Context of banner for media discovery view. When user opens a folder, which can be viewed in Media discovery view, the banner will be shown with this text to let user know, where the setting can be changed. -->
-    <string name="cloud_drive_media_discovery_banner_context">Dato che questa cartella contiene solamente immagini e video, la abbiamo aperta automaticamente nella modalità di esplorazione dei media. Questo ti permette di vedere i media in modalità galleria e di filtrare per data. Puoi disabilitarlo nelle Impostazioni.</string>
+    <string name="cloud_drive_media_discovery_banner_context">As this folder contains only images and videos, we’ve automatically opened it in gallery view. You can enjoy your visual content with a more immersive layout. You can disable this in Settings.</string>
     <!-- Banner option for user to open settings, where he can disable the media discovery view setting. -->
     <string name="cloud_drive_media_discovery_banner_settings">Impostazioni</string>
     <!-- Banner option for user that he understood the explanation and agrees with media discovery view setting being enabled. -->
@@ -4939,9 +4933,9 @@
     <!-- Title of video option of original-->
     <string name="media_player_video_option_original_title">Originale</string>
     <!-- In Settings view the title of setting, which allows to show subfolder media discovery. -->
-    <string name="settings_media_discovery_sub_folder_title">Esplora i media nelle sottocartelle</string>
+    <string name="settings_media_discovery_sub_folder_title">Gallery view in subfolders</string>
     <!-- In Settings view the explanation of a setting, which allows to show subfolder media discovery. -->
-    <string name="settings_media_discovery_sub_folder_context">Immagini e video dalle sottocartelle saranno inclusi nell\’esplorazione dei media.</string>
+    <string name="settings_media_discovery_sub_folder_context">Images and videos from subfolders will also be included in gallery view</string>
     <!-- Description text in empty search screen when no search results found -->
     <string name="search_empty_screen_no_results">Nessun risultato</string>
     <!-- Description text in empty search screen when images filter selected -->

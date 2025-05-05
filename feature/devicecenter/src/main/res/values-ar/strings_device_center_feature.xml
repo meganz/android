@@ -20,8 +20,6 @@
     <string name="device_center_list_view_item_status_updating_with_progress">%1$d%% جارٍ التحديث&#8230;</string>
     <!-- The name of the Device or Folder Status which signifies that it is disabled -->
     <string name="device_center_list_view_item_status_disabled">تعطيل</string>
-    <!-- The name of the Device or Folder Status which signifies that it is offline -->
-    <string name="device_center_list_view_item_status_offline">غير نشط</string>
     <!-- The name of the Device or Folder Status which signifies that the backup procedure has been paused -->
     <string name="device_center_list_view_item_status_paused">متوقف مؤقتاً</string>
     <!-- The name of the Device or Folder Status which signifies that an error has occurred -->

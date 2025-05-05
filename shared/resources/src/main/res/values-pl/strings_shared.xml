@@ -1132,7 +1132,7 @@
     <!-- Hidden nodes: control visibility feature -->
     <string name="hidden_nodes_title_control_visibility">Łatwe sterowanie widocznością</string>
     <!-- Hidden nodes description: control visibility feature -->
-    <string name="hidden_nodes_description_control_visibility">To show hidden files, turn on the “Show hidden items” setting under “File Management” -&gt; “User interface” in your app settings.</string>
+    <string name="hidden_nodes_description_control_visibility">Aby wyświetlić ukryte pliki, włącz ustawienie „Pokaż ukryte elementy” w sekcji „Zarządzanie plikami” -&gt; „Interfejs użytkownika” w ustawieniach aplikacji.</string>
     <!-- Hidden nodes: shared files stay visible feature -->
     <string name="hidden_nodes_title_visible_shared_files">Pliki udostępnione pozostają widoczne</string>
     <!-- Hidden nodes description: shared files stay visible feature -->

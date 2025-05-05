@@ -2088,12 +2088,6 @@
     <string name="dispute_takendown_file">Disputar la retirada</string>
     <!-- Error shown when download a file that has violated ToS/AUP. -->
     <string name="error_download_takendown_node">Eliminado por infringir nuestros Términos de servicio</string>
-    <!-- Alert shown when some files were not downloaded due to ToS/AUP violation, Plural of taken down files. 2 files -->
-    <plurals name="alert_taken_down_files">
-        <item quantity="one">No se ha podido descargar %d archivo porque infringen nuestros Términos de servicio.&#160;</item>
-        <item quantity="many">No se han podido descargar %d de archivos porque infringen nuestros Términos de servicio.</item>
-        <item quantity="other">No se han podido descargar %d archivos porque infringen nuestros Términos de servicio.</item>
-    </plurals>
     <!-- Subtitle of a file takedown reinstated historic notification -->
     <string name="subtitle_file_takedown_reinstated_notification">[A]El archivo que has compartido públicamente [/A][B]%s[/B] ha sido restaurado.</string>
     <!-- Subtitle of a folder takedown reinstated historic notification -->
@@ -3633,11 +3627,11 @@
     <!-- Label for scheduled weekly meetings -->
     <string name="meetings_list_scheduled_meeting_weekly_label">%s semanalmente</string>
     <!-- In Settings view the title of setting, which allows to use media discovery view automatically. -->
-    <string name="settings_media_discovery_view_title">Vista de explorador multimedia</string>
+    <string name="settings_media_discovery_view_title">Vista de galería</string>
     <!-- In Settings view the explanation of a setting, which allows to use media discovery view automatically. -->
-    <string name="settings_media_discovery_view_context">Abre automáticamente carpetas que contengan solo imágenes y vídeos en la vista de explorador multimedia. Podrás ver fotos y vídeos en modo galería y filtrar por fecha.</string>
+    <string name="settings_media_discovery_view_context">Abre carpetas que contengan solo imágenes o videos en una cuadrícula visual. Navega por el contenido mediante miniaturas y filtra por fecha.</string>
     <!-- Context of banner for media discovery view. When user opens a folder, which can be viewed in Media discovery view, the banner will be shown with this text to let user know, where the setting can be changed. -->
-    <string name="cloud_drive_media_discovery_banner_context">Como esta carpeta solo contiene imágenes y vídeos, la abrimos automáticamente en la vista de explorador multimedia. Puedes disfrutar de tu contenido visual con un diseño más envolvente. Puedes desactivar esta opción en Ajustes.</string>
+    <string name="cloud_drive_media_discovery_banner_context">Como esta carpeta solo contiene imágenes y vídeos, la hemos abierto automáticamente en la vista de galería. Puedes disfrutar de tu contenido visual con un diseño más envolvente. Puedes desactivar esta opción en Ajustes.</string>
     <!-- Banner option for user to open settings, where he can disable the media discovery view setting. -->
     <string name="cloud_drive_media_discovery_banner_settings">Ajustes</string>
     <!-- Banner option for user that he understood the explanation and agrees with media discovery view setting being enabled. -->
@@ -4939,9 +4933,9 @@
     <!-- Title of video option of original-->
     <string name="media_player_video_option_original_title">Original</string>
     <!-- In Settings view the title of setting, which allows to show subfolder media discovery. -->
-    <string name="settings_media_discovery_sub_folder_title">Explorador multimedia en subcarpetas</string>
+    <string name="settings_media_discovery_sub_folder_title">Vista de galería en subcarpetas</string>
     <!-- In Settings view the explanation of a setting, which allows to show subfolder media discovery. -->
-    <string name="settings_media_discovery_sub_folder_context">Las imágenes y los vídeos de las subcarpetas también se incluirán en la vista de explorador multimedia.</string>
+    <string name="settings_media_discovery_sub_folder_context">Las imágenes y los vídeos de las subcarpetas también se incluirán en la vista de galería</string>
     <!-- Description text in empty search screen when no search results found -->
     <string name="search_empty_screen_no_results">No hay resultados</string>
     <!-- Description text in empty search screen when images filter selected -->

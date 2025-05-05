@@ -2002,10 +2002,6 @@
     <string name="dispute_takendown_file">게시중단 이의제기</string>
     <!-- Error shown when download a file that has violated ToS/AUP. -->
     <string name="error_download_takendown_node">이용 약관 위반으로 인하여 접근할 수 없습니다</string>
-    <!-- Alert shown when some files were not downloaded due to ToS/AUP violation, Plural of taken down files. 2 files -->
-    <plurals name="alert_taken_down_files">
-        <item quantity="other">%d개의 파일이 이용 약관 위반으로 인해 다운로드되지 않았습니다.</item>
-    </plurals>
     <!-- Subtitle of a file takedown reinstated historic notification -->
     <string name="subtitle_file_takedown_reinstated_notification">[A]공개적으로 공유한 파일 [/A][B]%s[/B] 이/가 복구되었습니다.</string>
     <!-- Subtitle of a folder takedown reinstated historic notification -->
@@ -3455,11 +3451,11 @@
     <!-- Label for scheduled weekly meetings -->
     <string name="meetings_list_scheduled_meeting_weekly_label">매주 %s</string>
     <!-- In Settings view the title of setting, which allows to use media discovery view automatically. -->
-    <string name="settings_media_discovery_view_title">미디어 발견 보기</string>
+    <string name="settings_media_discovery_view_title">갤러리 보기</string>
     <!-- In Settings view the explanation of a setting, which allows to use media discovery view automatically. -->
-    <string name="settings_media_discovery_view_context">미디어 발견 보기에서 자동으로 이미지와 동영상만 담긴 폴더를 엽니다. 이것은 갤러리 모드에서 미디어를 보고 날짜에 따라 필터하게 해줍니다.</string>
+    <string name="settings_media_discovery_view_context">Open folders with only images or videos in a visual grid. Browse media by thumbnails and filter by date.</string>
     <!-- Context of banner for media discovery view. When user opens a folder, which can be viewed in Media discovery view, the banner will be shown with this text to let user know, where the setting can be changed. -->
-    <string name="cloud_drive_media_discovery_banner_context">이 폴더가 이미지와 동영상만 담고 있으므로, 자동으로 미디어 발견 보기에서 열었습니다. 시각 콘텐츠를 더욱 몰입되는 레이아웃에서 즐길 수 있습니다. 이것을 설정에서 비활성화 할 수 있습니다.</string>
+    <string name="cloud_drive_media_discovery_banner_context">As this folder contains only images and videos, we’ve automatically opened it in gallery view. You can enjoy your visual content with a more immersive layout. You can disable this in Settings.</string>
     <!-- Banner option for user to open settings, where he can disable the media discovery view setting. -->
     <string name="cloud_drive_media_discovery_banner_settings">설정</string>
     <!-- Banner option for user that he understood the explanation and agrees with media discovery view setting being enabled. -->
@@ -4503,9 +4499,9 @@
     <!-- Title of video option of original-->
     <string name="media_player_video_option_original_title">원본</string>
     <!-- In Settings view the title of setting, which allows to show subfolder media discovery. -->
-    <string name="settings_media_discovery_sub_folder_title">하위 폴더에서 미디어 찾기</string>
+    <string name="settings_media_discovery_sub_folder_title">Gallery view in subfolders</string>
     <!-- In Settings view the explanation of a setting, which allows to show subfolder media discovery. -->
-    <string name="settings_media_discovery_sub_folder_context">하위 폴더의 이미지와 동영상도 미디어 발견 보기에 포함합니다.</string>
+    <string name="settings_media_discovery_sub_folder_context">Images and videos from subfolders will also be included in gallery view</string>
     <!-- Description text in empty search screen when no search results found -->
     <string name="search_empty_screen_no_results">결과 없음</string>
     <!-- Description text in empty search screen when images filter selected -->

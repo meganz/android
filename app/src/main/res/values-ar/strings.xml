@@ -2217,15 +2217,6 @@
     <string name="dispute_takendown_file">الاعتراض على الإزالة</string>
     <!-- Error shown when download a file that has violated ToS/AUP. -->
     <string name="error_download_takendown_node">لا يمكن الوصول إليه لأنه ينتهك شروط الخدمة الخاصة بنا</string>
-    <!-- Alert shown when some files were not downloaded due to ToS/AUP violation, Plural of taken down files. 2 files -->
-    <plurals name="alert_taken_down_files">
-        <item quantity="zero">%d  ملف لم يتم تنزيله لانتهاك شروط الخدمة الخاصة بنا.</item>
-        <item quantity="one">%d  ملف لم يتم تنزيله لانتهاك شروط الخدمة الخاصة بنا.</item>
-        <item quantity="two">%d  ملفين لم يتم تنزيلهما لانتهاك شروط الخدمة الخاصة بنا.</item>
-        <item quantity="few">%d  ملفات لم يتم تنزيلها لانتهاك شروط الخدمة الخاصة بنا.</item>
-        <item quantity="many">%d  ملفاً لم يتم تنزيلها لانتهاك شروط الخدمة الخاصة بنا.</item>
-        <item quantity="other">%d ملف لم يتم تنزيلها لانتهاك شروط الخدمة الخاصة بنا.</item>
-    </plurals>
     <!-- Subtitle of a file takedown reinstated historic notification -->
     <string name="subtitle_file_takedown_reinstated_notification">[A]ملفك المشارك للعموم [/A][B]%s[/B] قد تم إعادته.</string>
     <!-- Subtitle of a folder takedown reinstated historic notification -->
@@ -3900,11 +3891,11 @@
     <!-- Label for scheduled weekly meetings -->
     <string name="meetings_list_scheduled_meeting_weekly_label">%s أسبوعياً</string>
     <!-- In Settings view the title of setting, which allows to use media discovery view automatically. -->
-    <string name="settings_media_discovery_view_title">عرض اكتشاف الوسائط</string>
+    <string name="settings_media_discovery_view_title">عرض المعرض</string>
     <!-- In Settings view the explanation of a setting, which allows to use media discovery view automatically. -->
-    <string name="settings_media_discovery_view_context">افتح تلقائيًا المجلدات التي تحتوي فقط على الصور ومقاطع الفيديو في طريقة عرض اكتشاف الوسائط. يتيح لك ذلك رؤية الوسائط في وضع المعرض والفلترة حسب التاريخ.</string>
+    <string name="settings_media_discovery_view_context">Open folders with only images or videos in a visual grid. Browse media by thumbnails and filter by date.</string>
     <!-- Context of banner for media discovery view. When user opens a folder, which can be viewed in Media discovery view, the banner will be shown with this text to let user know, where the setting can be changed. -->
-    <string name="cloud_drive_media_discovery_banner_context">نظرًا لأن هذا المجلد يحتوي فقط على الصور ومقاطع الفيديو، فقد قمنا بفتحه تلقائيًا في عرض اكتشاف الوسائط. يمكنك الاستمتاع بالمحتوى المرئي الخاص بك بتصميم أكثر غامرة. يمكنك تعطيل هذا في الإعدادات.</string>
+    <string name="cloud_drive_media_discovery_banner_context">As this folder contains only images and videos, we’ve automatically opened it in gallery view. You can enjoy your visual content with a more immersive layout. You can disable this in Settings.</string>
     <!-- Banner option for user to open settings, where he can disable the media discovery view setting. -->
     <string name="cloud_drive_media_discovery_banner_settings">الإعدادات</string>
     <!-- Banner option for user that he understood the explanation and agrees with media discovery view setting being enabled. -->
@@ -5593,9 +5584,9 @@
     <!-- Title of video option of original-->
     <string name="media_player_video_option_original_title">الأصلي</string>
     <!-- In Settings view the title of setting, which allows to show subfolder media discovery. -->
-    <string name="settings_media_discovery_sub_folder_title">اكتشاف الوسائط في المجلدات الفرعية</string>
+    <string name="settings_media_discovery_sub_folder_title">Gallery view in subfolders</string>
     <!-- In Settings view the explanation of a setting, which allows to show subfolder media discovery. -->
-    <string name="settings_media_discovery_sub_folder_context">سيتم أيضًا تضمين الصور ومقاطع الفيديو من المجلدات الفرعية في عرض اكتشاف الوسائط.</string>
+    <string name="settings_media_discovery_sub_folder_context">Images and videos from subfolders will also be included in gallery view</string>
     <!-- Description text in empty search screen when no search results found -->
     <string name="search_empty_screen_no_results">لا يوجد نتائج</string>
     <!-- Description text in empty search screen when images filter selected -->
