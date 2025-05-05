@@ -1443,6 +1443,14 @@ internal class DefaultAccountRepository @Inject constructor(
             }
         }
 
+    override suspend fun setLoggedOutFromAnotherLocation(isLoggedOut: Boolean) {
+        appEventGateway.setLoggedOutFromAnotherLocation(isLoggedOut)
+    }
+
+    override fun monitorLoggedOutFromAnotherLocation(): Flow<Boolean> {
+        return appEventGateway.monitorLoggedOutFromAnotherLocation()
+    }
+
     companion object {
         private const val LAST_SYNC_TIMESTAMP_FILE = "last_sync_timestamp"
         private const val USER_INTERFACE_PREFERENCES = "USER_INTERFACE_PREFERENCES"

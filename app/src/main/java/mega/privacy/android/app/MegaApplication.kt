@@ -96,7 +96,6 @@ import kotlin.time.Duration.Companion.milliseconds
  * @property callChangesObserver
  * @property globalChatListener
  * @property localIpAddress
- * @property isEsid
  * @property globalNetworkStateHandler
  * @property monitorAndHandleTransferEventsUseCase
  * @property monitorTransferEventsToStartWorkersIfNeededUseCase
@@ -209,8 +208,6 @@ class MegaApplication : MultiDexApplication(), DefaultLifecycleObserver,
     lateinit var monitorTransferEventsToStartWorkersIfNeededUseCase: MonitorTransferEventsToStartWorkersIfNeededUseCase
 
     var localIpAddress: String? = ""
-
-    var isEsid = false
 
     private val meetingListener = MeetingListener()
     private val soundsController = CallSoundsController()

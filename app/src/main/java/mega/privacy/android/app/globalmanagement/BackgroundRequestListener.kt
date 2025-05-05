@@ -16,6 +16,7 @@ import mega.privacy.android.domain.usecase.IsUseHttpsEnabledUseCase
 import mega.privacy.android.domain.usecase.SetUseHttpsUseCase
 import mega.privacy.android.domain.usecase.account.GetFullAccountInfoUseCase
 import mega.privacy.android.domain.usecase.account.ResetAccountDetailsTimeStampUseCase
+import mega.privacy.android.domain.usecase.account.SetLoggedOutFromAnotherLocationUseCase
 import mega.privacy.android.domain.usecase.backup.SetupDeviceNameUseCase
 import mega.privacy.android.domain.usecase.business.BroadcastBusinessAccountExpiredUseCase
 import mega.privacy.android.domain.usecase.chat.UpdatePushNotificationSettingsUseCase
@@ -76,7 +77,8 @@ class BackgroundRequestListener @Inject constructor(
     private val isUseHttpsEnabledUseCase: IsUseHttpsEnabledUseCase,
     private val setUseHttpsUseCase: SetUseHttpsUseCase,
     private val resetAccountDetailsTimeStampUseCase: ResetAccountDetailsTimeStampUseCase,
-    private val broadcastSslVerificationFailedUseCase: BroadcastSslVerificationFailedUseCase
+    private val broadcastSslVerificationFailedUseCase: BroadcastSslVerificationFailedUseCase,
+    private val setLoggedOutFromAnotherLocationUseCase: SetLoggedOutFromAnotherLocationUseCase
 ) : MegaRequestListenerInterface {
     /**
      * On request start
@@ -225,8 +227,8 @@ class BackgroundRequestListener @Inject constructor(
         } else if (e.errorCode == MegaError.API_ESID) {
             Timber.w("TYPE_LOGOUT:API_ESID")
             myAccountInfo.resetDefaults()
-            (application as MegaApplication).isEsid = true
             applicationScope.launch {
+                setLoggedOutFromAnotherLocationUseCase(true)
                 runCatching { localLogoutAppUseCase() }
                     .onFailure { Timber.d(it) }
             }

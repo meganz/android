@@ -20,7 +20,6 @@ import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.mapNotNull
 import kotlinx.coroutines.launch
 import mega.privacy.android.app.BaseActivity
-import mega.privacy.android.app.MegaApplication
 import mega.privacy.android.app.R
 import mega.privacy.android.app.arch.extensions.collectFlow
 import mega.privacy.android.app.databinding.ActivityLoginBinding
@@ -229,6 +228,14 @@ class LoginActivity : BaseActivity() {
                 restrictOrientation()
             }
         }
+
+        collectFlow(viewModel.monitorLoggedOutFromAnotherLocation) { loggedOut ->
+            if (loggedOut) {
+                Timber.d("logged out from another location")
+                showAlertLoggedOut()
+                viewModel.setHandledLoggedOutFromAnotherLocation()
+            }
+        }
     }
 
     /**
@@ -305,9 +312,6 @@ class LoginActivity : BaseActivity() {
                 }
             }
         }
-        if ((application as MegaApplication).isEsid) {
-            showAlertLoggedOut()
-        }
     }
 
     /**
@@ -334,15 +338,11 @@ class LoginActivity : BaseActivity() {
      */
     private fun showAlertLoggedOut() {
         Timber.d("showAlertLoggedOut")
-        (application as MegaApplication).isEsid = false
-
-        if (!isFinishing) {
-            MaterialAlertDialogBuilder(this)
-                .setTitle(getString(R.string.title_alert_logged_out))
-                .setMessage(getString(R.string.error_server_expired_session))
-                .setPositiveButton(getString(R.string.general_ok), null)
-                .show()
-        }
+        MaterialAlertDialogBuilder(this)
+            .setTitle(getString(R.string.title_alert_logged_out))
+            .setMessage(getString(R.string.error_server_expired_session))
+            .setPositiveButton(getString(R.string.general_ok), null)
+            .show()
     }
 
     public override fun onResume() {

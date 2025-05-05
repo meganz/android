@@ -58,7 +58,7 @@ internal class AppEventFacade @Inject constructor(
     private val _monitorCameraUploadsSettingsActions =
         MutableSharedFlow<CameraUploadsSettingsAction>()
     private val _businessAccountExpired = MutableSharedFlow<Unit>()
-
+    private val _sessionLoggedOutFromAnotherLocation = MutableStateFlow(false)
 
     override val monitorCookieSettings: Flow<Set<CookieType>> = _cookieSettings.asSharedFlow()
 
@@ -267,6 +267,14 @@ internal class AppEventFacade @Inject constructor(
 
     override fun monitorTransferTagToCancel(): Flow<Int?> =
         transferTagToCancel.asSharedFlow()
+
+    override suspend fun setLoggedOutFromAnotherLocation(isLoggedOut: Boolean) {
+        _sessionLoggedOutFromAnotherLocation.emit(isLoggedOut)
+    }
+
+    override fun monitorLoggedOutFromAnotherLocation(): Flow<Boolean> {
+        return _sessionLoggedOutFromAnotherLocation.asStateFlow()
+    }
 }
 
 private fun <T> Flow<T>.toSharedFlow(

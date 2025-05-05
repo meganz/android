@@ -36,9 +36,11 @@ import mega.privacy.android.domain.usecase.RootNodeExistsUseCase
 import mega.privacy.android.domain.usecase.account.CheckRecoveryKeyUseCase
 import mega.privacy.android.domain.usecase.account.ClearUserCredentialsUseCase
 import mega.privacy.android.domain.usecase.account.MonitorAccountBlockedUseCase
+import mega.privacy.android.domain.usecase.account.MonitorLoggedOutFromAnotherLocationUseCase
 import mega.privacy.android.domain.usecase.account.MonitorStorageStateEventUseCase
 import mega.privacy.android.domain.usecase.account.ResendVerificationEmailUseCase
 import mega.privacy.android.domain.usecase.account.ResumeCreateAccountUseCase
+import mega.privacy.android.domain.usecase.account.SetLoggedOutFromAnotherLocationUseCase
 import mega.privacy.android.domain.usecase.camerauploads.EstablishCameraUploadsSyncHandlesUseCase
 import mega.privacy.android.domain.usecase.camerauploads.HasCameraSyncEnabledUseCase
 import mega.privacy.android.domain.usecase.camerauploads.HasPreferencesUseCase
@@ -134,6 +136,12 @@ internal class LoginViewModelTest {
     private val resendVerificationEmailUseCase = mock<ResendVerificationEmailUseCase>()
     private val resumeCreateAccountUseCase = mock<ResumeCreateAccountUseCase>()
     private val checkRecoveryKeyUseCase = mock<CheckRecoveryKeyUseCase>()
+    private val monitorLoggedOutFromAnotherLocationUseCase: MonitorLoggedOutFromAnotherLocationUseCase =
+        mock {
+            onBlocking { invoke() }.thenReturn(flowOf(false))
+        }
+    private val setLoggedOutFromAnotherLocationUseCase: SetLoggedOutFromAnotherLocationUseCase =
+        mock()
 
     @BeforeEach
     fun setUp() {
@@ -180,7 +188,9 @@ internal class LoginViewModelTest {
             getThemeMode = getThemeMode,
             resendVerificationEmailUseCase = resendVerificationEmailUseCase,
             resumeCreateAccountUseCase = resumeCreateAccountUseCase,
-            checkRecoveryKeyUseCase = checkRecoveryKeyUseCase
+            checkRecoveryKeyUseCase = checkRecoveryKeyUseCase,
+            monitorLoggedOutFromAnotherLocationUseCase = monitorLoggedOutFromAnotherLocationUseCase,
+            setLoggedOutFromAnotherLocationUseCase = setLoggedOutFromAnotherLocationUseCase,
         )
     }
 
@@ -209,7 +219,8 @@ internal class LoginViewModelTest {
             checkIfTransfersShouldBePausedUseCase,
             isFirstLaunchUseCase,
             resendVerificationEmailUseCase,
-            checkRecoveryKeyUseCase
+            checkRecoveryKeyUseCase,
+            setLoggedOutFromAnotherLocationUseCase
         )
     }
 
@@ -585,6 +596,13 @@ internal class LoginViewModelTest {
             val item = awaitItem()
             assertThat(item.checkRecoveryKeyEvent).isInstanceOf(consumed().javaClass)
         }
+    }
+
+    @Test
+    fun `test that set handled logged out from another location invokes correctly`() = runTest {
+        underTest.setHandledLoggedOutFromAnotherLocation()
+        advanceUntilIdle()
+        verify(setLoggedOutFromAnotherLocationUseCase).invoke(false)
     }
 
     companion object {

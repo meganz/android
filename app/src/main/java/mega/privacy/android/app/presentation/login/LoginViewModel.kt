@@ -62,9 +62,11 @@ import mega.privacy.android.domain.usecase.RootNodeExistsUseCase
 import mega.privacy.android.domain.usecase.account.CheckRecoveryKeyUseCase
 import mega.privacy.android.domain.usecase.account.ClearUserCredentialsUseCase
 import mega.privacy.android.domain.usecase.account.MonitorAccountBlockedUseCase
+import mega.privacy.android.domain.usecase.account.MonitorLoggedOutFromAnotherLocationUseCase
 import mega.privacy.android.domain.usecase.account.MonitorStorageStateEventUseCase
 import mega.privacy.android.domain.usecase.account.ResendVerificationEmailUseCase
 import mega.privacy.android.domain.usecase.account.ResumeCreateAccountUseCase
+import mega.privacy.android.domain.usecase.account.SetLoggedOutFromAnotherLocationUseCase
 import mega.privacy.android.domain.usecase.camerauploads.EstablishCameraUploadsSyncHandlesUseCase
 import mega.privacy.android.domain.usecase.camerauploads.HasCameraSyncEnabledUseCase
 import mega.privacy.android.domain.usecase.camerauploads.HasPreferencesUseCase
@@ -149,6 +151,8 @@ class LoginViewModel @Inject constructor(
     private val resendVerificationEmailUseCase: ResendVerificationEmailUseCase,
     private val resumeCreateAccountUseCase: ResumeCreateAccountUseCase,
     private val checkRecoveryKeyUseCase: CheckRecoveryKeyUseCase,
+    monitorLoggedOutFromAnotherLocationUseCase: MonitorLoggedOutFromAnotherLocationUseCase,
+    private val setLoggedOutFromAnotherLocationUseCase: SetLoggedOutFromAnotherLocationUseCase,
 ) : ViewModel() {
 
     private val _state = MutableStateFlow(LoginState())
@@ -164,6 +168,11 @@ class LoginViewModel @Inject constructor(
      */
     val isConnected: Boolean
         get() = isConnectedToInternetUseCase()
+
+    /**
+     * Monitor if the user is logged out from another location.
+     */
+    val monitorLoggedOutFromAnotherLocation = monitorLoggedOutFromAnotherLocationUseCase()
 
     private var pendingAction: String? = null
 
@@ -1138,6 +1147,15 @@ class LoginViewModel @Inject constructor(
      * Resume create account
      */
     suspend fun resumeCreateAccount(session: String) = resumeCreateAccountUseCase(session)
+
+    /**
+     * Set handled logged out from another location
+     */
+    fun setHandledLoggedOutFromAnotherLocation() {
+        viewModelScope.launch {
+            setLoggedOutFromAnotherLocationUseCase(false)
+        }
+    }
 
     companion object {
         /**

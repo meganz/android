@@ -420,4 +420,16 @@ internal interface AppEventGateway {
      * @return Flow of Int. Null it no transfer to cancel.
      */
     fun monitorTransferTagToCancel(): Flow<Int?>
+
+    /**
+     * Set the state indicating if the user session has been logged out from another location.
+     */
+    suspend fun setLoggedOutFromAnotherLocation(isLoggedOut: Boolean)
+
+    /**
+     * Monitor the state indicating if the user session has been logged out from another location.
+     *
+     * @return Flow of Boolean
+     */
+    fun monitorLoggedOutFromAnotherLocation(): Flow<Boolean>
 }

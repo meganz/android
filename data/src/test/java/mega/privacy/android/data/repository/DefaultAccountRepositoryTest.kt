@@ -2288,4 +2288,24 @@ class DefaultAccountRepositoryTest {
 
             assertThat(exception).isInstanceOf(ResetPasswordLinkException.LinkInvalid::class.java)
         }
+
+    // generate unit test for 2 new functions setLoggedOutFromAnotherLocation and monitorLoggedOutFromAnotherLocation
+
+    @Test
+    fun `test that setLoggedOutFromAnotherLocation is invoked when setLoggedOutFromAnotherLocation called`() =
+        runTest {
+            val isLoggedOut = true
+            underTest.setLoggedOutFromAnotherLocation(isLoggedOut)
+            verify(appEventGateway).setLoggedOutFromAnotherLocation(isLoggedOut)
+        }
+
+    @Test
+    fun `test that monitorLoggedOutFromAnotherLocation is invoked when monitorLoggedOutFromAnotherLocation called`() =
+        runTest {
+            whenever(appEventGateway.monitorLoggedOutFromAnotherLocation()).thenReturn(flowOf(true))
+            underTest.monitorLoggedOutFromAnotherLocation().test {
+                assertThat(awaitItem()).isEqualTo(true)
+                cancelAndIgnoreRemainingEvents()
+            }
+        }
 }

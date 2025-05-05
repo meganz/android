@@ -761,4 +761,16 @@ interface AccountRepository {
      * @param recoveryKey The recovery key
      */
     suspend fun checkRecoveryKey(link: String, recoveryKey: String)
+
+    /**
+     * Set the state indicating if the user session has been logged out from another location.
+     */
+    suspend fun setLoggedOutFromAnotherLocation(isLoggedOut: Boolean)
+
+    /**
+     * Monitor the state indicating if the user session has been logged out from another location.
+     *
+     * @return Flow of Boolean
+     */
+    fun monitorLoggedOutFromAnotherLocation(): Flow<Boolean>
 }
