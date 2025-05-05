@@ -38,7 +38,7 @@ enum class DataFeatures(
      */
     ShowGroupedUploadNotifications(
         "Show a single upload progress and finish notifications for each user action",
-        false,
+        true,
     ),
     ;
 
