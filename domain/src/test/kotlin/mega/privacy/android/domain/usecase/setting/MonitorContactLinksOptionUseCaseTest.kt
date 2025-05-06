@@ -1,4 +1,4 @@
-package mega.privacy.android.domain.usecase
+package mega.privacy.android.domain.usecase.setting
 
 import app.cash.turbine.test
 import com.google.common.truth.Truth.assertThat
@@ -9,28 +9,32 @@ import kotlinx.coroutines.flow.flowOf
 import kotlinx.coroutines.test.runTest
 import mega.privacy.android.domain.entity.user.UserChanges
 import mega.privacy.android.domain.entity.user.UserVisibility
+import mega.privacy.android.domain.repository.SettingsRepository
+import mega.privacy.android.domain.usecase.MonitorUserUpdates
 import org.junit.Before
 import org.junit.Test
 import org.mockito.kotlin.mock
 import org.mockito.kotlin.whenever
 
 @OptIn(ExperimentalCoroutinesApi::class)
-class DefaultMonitorAutoAcceptQRLinksTest {
-    private lateinit var underTest: MonitorAutoAcceptQRLinks
-    private val fetchAutoAcceptQRLinks = mock<FetchAutoAcceptQRLinks>()
-    private val monitorUserUpdates = mock<MonitorUserUpdates>{ on { invoke() }.thenReturn(emptyFlow())}
+class MonitorContactLinksOptionUseCaseTest {
+
+    private lateinit var underTest: MonitorContactLinksOptionUseCase
+    private val settingsRepository = mock<SettingsRepository>()
+    private val monitorUserUpdates =
+        mock<MonitorUserUpdates> { on { invoke() }.thenReturn(emptyFlow()) }
 
     @Before
     fun setUp() {
-        underTest = DefaultMonitorAutoAcceptQRLinks(
-            fetchAutoAcceptQRLinks = fetchAutoAcceptQRLinks,
+        underTest = MonitorContactLinksOptionUseCase(
+            settingsRepository = settingsRepository,
             monitorUserUpdates = monitorUserUpdates
         )
     }
 
     @Test
     fun `test that value from fetch use case is returned`() = runTest {
-        whenever(fetchAutoAcceptQRLinks()).thenReturn(true)
+        whenever(settingsRepository.getContactLinksOption()).thenReturn(true)
 
         underTest().test {
             assertThat(awaitItem()).isTrue()
@@ -41,7 +45,7 @@ class DefaultMonitorAutoAcceptQRLinksTest {
     @Test
     fun `test that contact link verification updates causes a new value to be returned`() =
         runTest {
-            whenever(fetchAutoAcceptQRLinks()).thenReturn(true, false)
+            whenever(settingsRepository.getContactLinksOption()).thenReturn(true, false)
             whenever(monitorUserUpdates()).thenReturn(flowOf(UserChanges.ContactLinkVerification))
 
             underTest().test {
@@ -55,7 +59,7 @@ class DefaultMonitorAutoAcceptQRLinksTest {
     @Test
     fun `test that non contact link verification updates do not cause a new value to be returned`() =
         runTest {
-            whenever(fetchAutoAcceptQRLinks()).thenReturn(true, false)
+            whenever(settingsRepository.getContactLinksOption()).thenReturn(true, false)
             whenever(monitorUserUpdates()).thenReturn(
                 listOf(
                     UserChanges.AuthenticationInformation,

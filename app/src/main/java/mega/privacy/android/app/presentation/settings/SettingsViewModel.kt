@@ -26,14 +26,12 @@ import mega.privacy.android.domain.usecase.GetAccountDetailsUseCase
 import mega.privacy.android.domain.usecase.GetBusinessStatusUseCase
 import mega.privacy.android.domain.usecase.IsChatLoggedIn
 import mega.privacy.android.domain.usecase.IsMultiFactorAuthAvailable
-import mega.privacy.android.domain.usecase.MonitorAutoAcceptQRLinks
 import mega.privacy.android.domain.usecase.MonitorMediaDiscoveryView
 import mega.privacy.android.domain.usecase.MonitorPasscodeLockPreferenceUseCase
 import mega.privacy.android.domain.usecase.MonitorStartScreenPreference
 import mega.privacy.android.domain.usecase.RequestAccountDeletion
 import mega.privacy.android.domain.usecase.RootNodeExistsUseCase
 import mega.privacy.android.domain.usecase.SetMediaDiscoveryView
-import mega.privacy.android.domain.usecase.ToggleAutoAcceptQRLinks
 import mega.privacy.android.domain.usecase.account.IsMultiFactorAuthEnabledUseCase
 import mega.privacy.android.domain.usecase.account.MonitorAccountDetailUseCase
 import mega.privacy.android.domain.usecase.account.MonitorMyAccountUpdateUseCase
@@ -42,12 +40,14 @@ import mega.privacy.android.domain.usecase.featureflag.GetFeatureFlagValueUseCas
 import mega.privacy.android.domain.usecase.login.GetSessionTransferURLUseCase
 import mega.privacy.android.domain.usecase.mediaplayer.audioplayer.SetAudioBackgroundPlayEnabledUseCase
 import mega.privacy.android.domain.usecase.network.MonitorConnectivityUseCase
+import mega.privacy.android.domain.usecase.setting.MonitorContactLinksOptionUseCase
 import mega.privacy.android.domain.usecase.setting.MonitorHideRecentActivityUseCase
 import mega.privacy.android.domain.usecase.setting.MonitorShowHiddenItemsUseCase
 import mega.privacy.android.domain.usecase.setting.MonitorSubFolderMediaDiscoverySettingsUseCase
 import mega.privacy.android.domain.usecase.setting.SetHideRecentActivityUseCase
 import mega.privacy.android.domain.usecase.setting.SetShowHiddenItemsUseCase
 import mega.privacy.android.domain.usecase.setting.SetSubFolderMediaDiscoveryEnabledUseCase
+import mega.privacy.android.domain.usecase.setting.ToggleContactLinksOptionUseCase
 import timber.log.Timber
 import javax.inject.Inject
 
@@ -58,13 +58,13 @@ class SettingsViewModel @Inject constructor(
     private val isCameraUploadsEnabledUseCase: IsCameraUploadsEnabledUseCase,
     private val rootNodeExistsUseCase: RootNodeExistsUseCase,
     private val isMultiFactorAuthAvailable: IsMultiFactorAuthAvailable,
-    private val monitorAutoAcceptQRLinks: MonitorAutoAcceptQRLinks,
+    private val monitorContactLinksOptionUseCase: MonitorContactLinksOptionUseCase,
     private val startScreen: MonitorStartScreenPreference,
     private val monitorHideRecentActivityUseCase: MonitorHideRecentActivityUseCase,
     private val setHideRecentActivityUseCase: SetHideRecentActivityUseCase,
     private val monitorMediaDiscoveryView: MonitorMediaDiscoveryView,
     private val setMediaDiscoveryView: SetMediaDiscoveryView,
-    private val toggleAutoAcceptQRLinks: ToggleAutoAcceptQRLinks,
+    private val toggleContactLinksOptionUseCase: ToggleContactLinksOptionUseCase,
     private val isMultiFactorAuthEnabledUseCase: IsMultiFactorAuthEnabledUseCase,
     monitorConnectivityUseCase: MonitorConnectivityUseCase,
     private val requestAccountDeletion: RequestAccountDeletion,
@@ -129,7 +129,7 @@ class SettingsViewModel @Inject constructor(
                     .map { available ->
                         { state: SettingsState -> state.copy(multiFactorVisible = available) }
                     },
-                monitorAutoAcceptQRLinks().catch { e ->
+                monitorContactLinksOptionUseCase().catch { e ->
                     Timber.e(e, "Error when monitoring Auto accept QR settings")
                     emit(false)
                 }.map { enabled ->
@@ -286,7 +286,7 @@ class SettingsViewModel @Inject constructor(
 
     fun toggleAutoAcceptPreference() = viewModelScope.launch {
         runCatching {
-            toggleAutoAcceptQRLinks()
+            toggleContactLinksOptionUseCase()
         }
     }
 

@@ -26,12 +26,10 @@ import mega.privacy.android.domain.usecase.GetAccountDetailsUseCase
 import mega.privacy.android.domain.usecase.GetBusinessStatusUseCase
 import mega.privacy.android.domain.usecase.IsChatLoggedIn
 import mega.privacy.android.domain.usecase.IsMultiFactorAuthAvailable
-import mega.privacy.android.domain.usecase.MonitorAutoAcceptQRLinks
 import mega.privacy.android.domain.usecase.MonitorMediaDiscoveryView
 import mega.privacy.android.domain.usecase.MonitorPasscodeLockPreferenceUseCase
 import mega.privacy.android.domain.usecase.MonitorStartScreenPreference
 import mega.privacy.android.domain.usecase.SetMediaDiscoveryView
-import mega.privacy.android.domain.usecase.ToggleAutoAcceptQRLinks
 import mega.privacy.android.domain.usecase.account.IsMultiFactorAuthEnabledUseCase
 import mega.privacy.android.domain.usecase.account.MonitorAccountDetailUseCase
 import mega.privacy.android.domain.usecase.account.MonitorMyAccountUpdateUseCase
@@ -40,11 +38,13 @@ import mega.privacy.android.domain.usecase.featureflag.GetFeatureFlagValueUseCas
 import mega.privacy.android.domain.usecase.login.GetSessionTransferURLUseCase
 import mega.privacy.android.domain.usecase.mediaplayer.audioplayer.SetAudioBackgroundPlayEnabledUseCase
 import mega.privacy.android.domain.usecase.network.MonitorConnectivityUseCase
+import mega.privacy.android.domain.usecase.setting.MonitorContactLinksOptionUseCase
 import mega.privacy.android.domain.usecase.setting.MonitorHideRecentActivityUseCase
 import mega.privacy.android.domain.usecase.setting.MonitorShowHiddenItemsUseCase
 import mega.privacy.android.domain.usecase.setting.MonitorSubFolderMediaDiscoverySettingsUseCase
 import mega.privacy.android.domain.usecase.setting.SetHideRecentActivityUseCase
 import mega.privacy.android.domain.usecase.setting.SetSubFolderMediaDiscoveryEnabledUseCase
+import mega.privacy.android.domain.usecase.setting.ToggleContactLinksOptionUseCase
 import org.junit.jupiter.api.AfterEach
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
@@ -66,14 +66,14 @@ import java.util.stream.Stream
 class SettingsViewModelTest {
     private lateinit var underTest: SettingsViewModel
 
-    private val toggleAutoAcceptQRLinks = mock<ToggleAutoAcceptQRLinks>()
+    private val toggleContactLinksOptionUseCase = mock<ToggleContactLinksOptionUseCase>()
     private val isMultiFactorAuthEnabledUseCase = mock<IsMultiFactorAuthEnabledUseCase>()
     private val isChatLoggedInValue = MutableStateFlow(true)
     private val setHideRecentActivityUseCase = mock<SetHideRecentActivityUseCase>()
     private val setMediaDiscoveryView = mock<SetMediaDiscoveryView>()
     private val getFeatureFlagValueUseCase = mock<GetFeatureFlagValueUseCase>()
     private val monitorPasscodeLockPreferenceUseCase = mock<MonitorPasscodeLockPreferenceUseCase>()
-    private val monitorAutoAcceptQRLinks = mock<MonitorAutoAcceptQRLinks>()
+    private val monitorContactLinksOptionUseCase = mock<MonitorContactLinksOptionUseCase>()
     private val isChatLoggedIn = mock<IsChatLoggedIn>()
     private val monitorHideRecentActivityUseCase = mock<MonitorHideRecentActivityUseCase>()
     private val monitorMediaDiscoveryView = mock<MonitorMediaDiscoveryView>()
@@ -95,7 +95,7 @@ class SettingsViewModelTest {
 
     @BeforeEach
     fun setUp() {
-        monitorAutoAcceptQRLinks.stub {
+        monitorContactLinksOptionUseCase.stub {
             on { invoke() }.thenReturn(true.asHotFlow())
         }
 
@@ -103,7 +103,7 @@ class SettingsViewModelTest {
             onBlocking { invoke(any()) }.thenReturn(false)
         }
 
-        monitorAutoAcceptQRLinks.stub {
+        monitorContactLinksOptionUseCase.stub {
             on { invoke() }.thenReturn(
                 emptyFlow()
             )
@@ -156,14 +156,14 @@ class SettingsViewModelTest {
             isCameraUploadsEnabledUseCase = isCameraUploadsEnabledUseCase,
             rootNodeExistsUseCase = mock { onBlocking { invoke() }.thenReturn(true) },
             isMultiFactorAuthAvailable = isMultiFactorAuthAvailable,
-            monitorAutoAcceptQRLinks = monitorAutoAcceptQRLinks,
+            monitorContactLinksOptionUseCase = monitorContactLinksOptionUseCase,
             isMultiFactorAuthEnabledUseCase = isMultiFactorAuthEnabledUseCase,
             startScreen = monitorStartScreenPreference,
             monitorHideRecentActivityUseCase = monitorHideRecentActivityUseCase,
             setHideRecentActivityUseCase = setHideRecentActivityUseCase,
             monitorMediaDiscoveryView = monitorMediaDiscoveryView,
             setMediaDiscoveryView = setMediaDiscoveryView,
-            toggleAutoAcceptQRLinks = toggleAutoAcceptQRLinks,
+            toggleContactLinksOptionUseCase = toggleContactLinksOptionUseCase,
             monitorConnectivityUseCase = monitorConnectivityUseCase,
             requestAccountDeletion = mock(),
             isChatLoggedIn = isChatLoggedIn,
@@ -184,7 +184,7 @@ class SettingsViewModelTest {
     @AfterEach
     internal fun cleanUp() {
         Mockito.reset(
-            monitorAutoAcceptQRLinks,
+            monitorContactLinksOptionUseCase,
             getFeatureFlagValueUseCase,
             monitorHideRecentActivityUseCase,
             getAccountDetailsUseCase,
@@ -207,7 +207,7 @@ class SettingsViewModelTest {
         whenever(monitorPasscodeLockPreferenceUseCase()).thenReturn(emptyFlow())
         isMultiFactorAuthEnabledUseCase.stub {
             onBlocking { invoke() }.thenReturn(false)
-            monitorAutoAcceptQRLinks.stub {
+            monitorContactLinksOptionUseCase.stub {
                 on { invoke() }.thenReturn(
                     flow {
                         emit(true)
@@ -269,7 +269,7 @@ class SettingsViewModelTest {
     @Test
     fun `test that an error on fetching QR setting returns false instead`() =
         runTest {
-            monitorAutoAcceptQRLinks.stub {
+            monitorContactLinksOptionUseCase.stub {
                 on { invoke() }.thenAnswer {
                     throw SettingNotFoundException(
                         -1

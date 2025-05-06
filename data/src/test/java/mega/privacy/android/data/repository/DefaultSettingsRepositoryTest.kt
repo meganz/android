@@ -470,7 +470,7 @@ internal class DefaultSettingsRepositoryTest {
             on { paramType }.thenReturn(MegaApiJava.USER_ATTR_CONTACT_LINK_VERIFICATION)
         }
         val api = mock<MegaApiJava>()
-        whenever(megaApiGateway.setAutoAcceptContactsFromLink(any(), any())).thenAnswer {
+        whenever(megaApiGateway.setContactLinksOption(any(), any())).thenAnswer {
             (it.arguments[1] as MegaRequestListenerInterface).onRequestFinish(
                 api,
                 request,
@@ -478,7 +478,7 @@ internal class DefaultSettingsRepositoryTest {
             )
         }
 
-        underTest.setAutoAcceptQR(expected)
-        verify(megaApiGateway).setAutoAcceptContactsFromLink(eq(expected), any())
+        underTest.setContactLinksOption(expected)
+        verify(megaApiGateway).setContactLinksOption(eq(expected), any())
     }
 }

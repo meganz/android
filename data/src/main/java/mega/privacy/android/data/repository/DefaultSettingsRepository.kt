@@ -105,9 +105,9 @@ internal class DefaultSettingsRepository @Inject constructor(
     @Volatile
     private var isShowHiddenNodesPopulated: Boolean = false
 
-    override suspend fun fetchContactLinksOption(): Boolean = withContext(ioDispatcher) {
+    override suspend fun getContactLinksOption(): Boolean = withContext(ioDispatcher) {
         suspendCoroutine { continuation ->
-            megaApiGateway.isAutoAcceptContactsFromLinkEnabled(
+            megaApiGateway.getContactLinksOption(
                 OptionalMegaRequestListenerInterface(
                     onRequestFinish = onGetContactLinksOptionRequestFinished(continuation)
                 )
@@ -119,11 +119,11 @@ internal class DefaultSettingsRepository @Inject constructor(
         { request: MegaRequest, error: MegaError ->
             if (isFetchAutoAcceptQRResponse(request)) {
                 when (error.errorCode) {
-                    MegaError.API_OK -> {
+                    API_OK -> {
                         continuation.resumeWith(Result.success(request.flag))
                     }
 
-                    MegaError.API_ENOENT -> continuation.failWithException(
+                    API_ENOENT -> continuation.failWithException(
                         SettingNotFoundException(
                             error.errorCode, error.errorString
                         )
@@ -141,24 +141,25 @@ internal class DefaultSettingsRepository @Inject constructor(
         TYPE_GET_ATTR_USER, MegaApiJava.USER_ATTR_CONTACT_LINK_VERIFICATION
     )
 
-    override suspend fun setAutoAcceptQR(accept: Boolean): Boolean = withContext(ioDispatcher) {
-        suspendCoroutine { continuation ->
-            megaApiGateway.setAutoAcceptContactsFromLink(
-                accept, OptionalMegaRequestListenerInterface(
-                    onRequestFinish = onSetContactLinksOptionRequestFinished(
-                        continuation
+    override suspend fun setContactLinksOption(enable: Boolean): Boolean =
+        withContext(ioDispatcher) {
+            suspendCoroutine { continuation ->
+                megaApiGateway.setContactLinksOption(
+                    enable, OptionalMegaRequestListenerInterface(
+                        onRequestFinish = onSetContactLinksOptionRequestFinished(
+                            continuation
+                        )
                     )
                 )
-            )
+            }
         }
-    }
 
     private fun onSetContactLinksOptionRequestFinished(
         continuation: Continuation<Boolean>,
     ) = { request: MegaRequest, error: MegaError ->
         if (isSetAutoAcceptQRResponse(request)) {
             when (error.errorCode) {
-                MegaError.API_OK -> {
+                API_OK -> {
                     continuation.resumeWith(Result.success(request.flag))
                 }
 

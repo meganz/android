@@ -12,20 +12,17 @@ import mega.privacy.android.app.di.settings.SettingsUseCases
 import mega.privacy.android.app.di.settings.startscreen.TempStartScreenUseCaseStaticModule
 import mega.privacy.android.app.presentation.settings.model.PreferenceResource
 import mega.privacy.android.domain.usecase.CanDeleteAccount
-import mega.privacy.android.domain.usecase.FetchAutoAcceptQRLinks
 import mega.privacy.android.domain.usecase.GetChatImageQuality
 import mega.privacy.android.domain.usecase.GetPreference
 import mega.privacy.android.domain.usecase.GetSupportEmailUseCase
 import mega.privacy.android.domain.usecase.IsChatLoggedIn
 import mega.privacy.android.domain.usecase.IsMultiFactorAuthAvailable
-import mega.privacy.android.domain.usecase.MonitorAutoAcceptQRLinks
 import mega.privacy.android.domain.usecase.MonitorMediaDiscoveryView
 import mega.privacy.android.domain.usecase.MonitorStartScreenPreference
 import mega.privacy.android.domain.usecase.PutPreference
 import mega.privacy.android.domain.usecase.RequestAccountDeletion
 import mega.privacy.android.domain.usecase.SetChatImageQuality
 import mega.privacy.android.domain.usecase.SetMediaDiscoveryView
-import mega.privacy.android.domain.usecase.ToggleAutoAcceptQRLinks
 import mega.privacy.android.domain.usecase.call.MonitorCallSoundEnabledUseCase
 import mega.privacy.android.domain.usecase.call.SetCallsSoundEnabledStateUseCase
 import mega.privacy.android.domain.usecase.setting.EnableFileVersionsOption
@@ -52,8 +49,6 @@ object TestSettingsModule {
         mock<MonitorStartScreenPreference> { on { invoke() }.thenReturn(emptyFlow()) }
     val isMultiFactorAuthAvailable =
         mock<IsMultiFactorAuthAvailable> { on { invoke() }.thenReturn(true) }
-    val fetchAutoAcceptQRLinks =
-        mock<FetchAutoAcceptQRLinks> { onBlocking { invoke() }.thenReturn(false) }
     val monitorMediaDiscoveryView =
         mock<MonitorMediaDiscoveryView> { on { invoke() }.thenReturn(emptyFlow()) }
     val getChatImageQuality = mock<GetChatImageQuality> { on { invoke() }.thenReturn(emptyFlow()) }
@@ -69,12 +64,6 @@ object TestSettingsModule {
     fun provideIsMultiFactorAuthAvailable(): IsMultiFactorAuthAvailable =
         isMultiFactorAuthAvailable
 
-
-    @Provides
-    fun provideFetchContactLinksOption(): FetchAutoAcceptQRLinks =
-        fetchAutoAcceptQRLinks
-
-
     @Provides
     fun provideGetStartScreen(): MonitorStartScreenPreference = monitorStartScreenPreference
 
@@ -85,22 +74,11 @@ object TestSettingsModule {
     fun provideSetMediaDiscoveryView(): SetMediaDiscoveryView = mock()
 
     @Provides
-    fun provideToggleAutoAcceptQRLinks(): ToggleAutoAcceptQRLinks =
-        mock()
-
-    @Provides
     fun provideRequestAccountDeletion(): RequestAccountDeletion = mock()
 
 
     @Provides
     fun provideIsChatLoggedIn(): IsChatLoggedIn = mock { on { invoke() }.thenReturn(flowOf(true)) }
-
-    @Provides
-    fun provide(): MonitorAutoAcceptQRLinks = mock {
-        on { invoke() }.thenReturn(
-            flowOf(true)
-        )
-    }
 
     @Provides
     fun provideGetChatImageQuality(): GetChatImageQuality = getChatImageQuality

@@ -465,24 +465,43 @@ interface MegaApiGateway {
      */
     suspend fun getNumChildFiles(node: MegaNode): Int
 
+    /**
+     * Enable or disable the automatic approval of incoming contact requests using a
+     * contact link
+     *
+     * The associated request type with this request is MegaRequest::TYPE_SET_ATTR_USER
+     *
+     * Valid data in the MegaRequest object received on callbacks:
+     * - MegaRequest::getParamType - Returns the value
+     * MegaApi::USER_ATTR_CONTACT_LINK_VERIFICATION
+     *
+     * Valid data in the MegaRequest object received in onRequestFinish:
+     * - MegaRequest::getText - "0" for disable, "1" for enable
+     *
+     * @param enable   True to enable the automatic approval of incoming contact requests using a
+     *                 contact link
+     * @param listener MegaRequestListener to track this request
+     */
+    fun setContactLinksOption(enable: Boolean, listener: MegaRequestListenerInterface)
 
     /**
-     * Set auto accept contacts from link
+     * Check if the automatic approval of incoming contact requests using contact links is enabled or disabled
      *
-     * @param disableAutoAccept pass true to stop auto accepting contacts
-     * @param listener
-     */
-    fun setAutoAcceptContactsFromLink(
-        disableAutoAccept: Boolean,
-        listener: MegaRequestListenerInterface,
-    )
-
-    /**
-     * Is auto accept contacts from link enabled
+     * If the option has never been set, the error code will be MegaError::API_ENOENT.
      *
-     * @param listener
+     * The associated request type with this request is MegaRequest::TYPE_GET_ATTR_USER
+     *
+     * Valid data in the MegaRequest object received on callbacks:
+     * - MegaRequest::getParamType - Returns the value MegaApi::USER_ATTR_CONTACT_LINK_VERIFICATION
+     *
+     * Valid data in the MegaRequest object received in onRequestFinish when the error code
+     * is MegaError::API_OK:
+     * - MegaRequest::getText - "0" for disable, "1" for enable
+     * - MegaRequest::getFlag - false if disabled, true if enabled
+     *
+     * @param listener MegaRequestListener to track this request
      */
-    fun isAutoAcceptContactsFromLinkEnabled(listener: MegaRequestListenerInterface)
+    fun getContactLinksOption(listener: MegaRequestListenerInterface)
 
 
     /**

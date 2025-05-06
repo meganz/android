@@ -16,20 +16,45 @@ import java.io.File
  *
  */
 interface SettingsRepository {
-    /**
-     * Fetch contact links option
-     *
-     * @return true if option is enabled, else false
-     */
-    suspend fun fetchContactLinksOption(): Boolean
 
     /**
-     * Set auto accept qr requests
+     * Check if the automatic approval of incoming contact requests using contact links is enabled or disabled
      *
-     * @param accept
-     * @return true if option is enabled, else false
+     * If the option has never been set, the error code will be MegaError::API_ENOENT.
+     *
+     * The associated request type with this request is MegaRequest::TYPE_GET_ATTR_USER
+     *
+     * Valid data in the MegaRequest object received on callbacks:
+     * - MegaRequest::getParamType - Returns the value MegaApi::USER_ATTR_CONTACT_LINK_VERIFICATION
+     *
+     * Valid data in the MegaRequest object received in onRequestFinish when the error code
+     * is MegaError::API_OK:
+     * - MegaRequest::getText - "0" for disable, "1" for enable
+     * - MegaRequest::getFlag - false if disabled, true if enabled
+     *
+     * @return true if auto-accept is enabled, false otherwise
      */
-    suspend fun setAutoAcceptQR(accept: Boolean): Boolean
+    suspend fun getContactLinksOption(): Boolean
+
+    /**
+     * Enable or disable the automatic approval of incoming contact requests using a
+     * contact link
+     *
+     * The associated request type with this request is MegaRequest::TYPE_SET_ATTR_USER
+     *
+     * Valid data in the MegaRequest object received on callbacks:
+     * - MegaRequest::getParamType - Returns the value
+     * MegaApi::USER_ATTR_CONTACT_LINK_VERIFICATION
+     *
+     * Valid data in the MegaRequest object received in onRequestFinish:
+     * - MegaRequest::getText - "0" for disable, "1" for enable
+     *
+     * @param enable   True to enable the automatic approval of incoming contact requests using a
+     *                 contact link
+     *
+     * @return true if auto-accept is enabled, false otherwise
+     */
+    suspend fun setContactLinksOption(enable: Boolean): Boolean
 
     /**
      * Monitor hide recent activity setting

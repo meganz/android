@@ -1,4 +1,4 @@
-package mega.privacy.android.domain.usecase
+package mega.privacy.android.domain.usecase.setting
 
 import com.google.common.truth.Truth.assertThat
 import kotlinx.coroutines.ExperimentalCoroutinesApi
@@ -12,21 +12,18 @@ import org.junit.Test
 import org.mockito.kotlin.any
 import org.mockito.kotlin.mock
 import org.mockito.kotlin.verify
-import org.mockito.kotlin.verifyNoInteractions
 import org.mockito.kotlin.whenever
 
 @ExperimentalCoroutinesApi
-class DefaultToggleAutoAcceptQRLinksTest {
-    private lateinit var underTest: ToggleAutoAcceptQRLinks
+class ToggleContactLinksOptionUseCaseTest {
+    private lateinit var underTest: ToggleContactLinksOptionUseCase
 
-    private val fetchAutoAcceptQRLinks = mock<FetchAutoAcceptQRLinks>()
     private val settingsRepository = mock<SettingsRepository>()
 
     @Before
     fun setUp() {
-        runBlocking { whenever(settingsRepository.setAutoAcceptQR(any())).thenAnswer { it.arguments[0] } }
-        underTest = DefaultToggleAutoAcceptQRLinks(
-            fetchAutoAcceptQRLinks = fetchAutoAcceptQRLinks,
+        runBlocking { whenever(settingsRepository.setContactLinksOption(any())).thenAnswer { it.arguments[0] } }
+        underTest = ToggleContactLinksOptionUseCase(
             settingsRepository = settingsRepository,
         )
     }
@@ -34,37 +31,37 @@ class DefaultToggleAutoAcceptQRLinksTest {
 
     @Test
     fun `test that if current value is true, it is set to false`() = runTest {
-        whenever(fetchAutoAcceptQRLinks()).thenReturn(true)
+        whenever(settingsRepository.getContactLinksOption()).thenReturn(true)
         assertThat(underTest()).isFalse()
 
-        verify(settingsRepository).setAutoAcceptQR(false)
+        verify(settingsRepository).setContactLinksOption(false)
     }
 
     @Test
     fun `test that if current value is false, it is set to true`() = runTest {
-        whenever(fetchAutoAcceptQRLinks()).thenReturn(false)
+        whenever(settingsRepository.getContactLinksOption()).thenReturn(false)
         assertThat(underTest()).isTrue()
 
-        verify(settingsRepository).setAutoAcceptQR(true)
+        verify(settingsRepository).setContactLinksOption(true)
     }
 
     @Test
     fun `test that if current value throws a SettingNotFoundException, it is set to true`() =
         runTest {
-            whenever(fetchAutoAcceptQRLinks()).thenAnswer { throw SettingNotFoundException(-1) }
+            whenever(settingsRepository.getContactLinksOption()).thenAnswer {
+                throw SettingNotFoundException(-1)
+            }
             assertThat(underTest()).isTrue()
 
-            verify(settingsRepository).setAutoAcceptQR(true)
+            verify(settingsRepository).setContactLinksOption(true)
         }
 
     @Test
     fun `test that if current value throws an unknownException, it is rethrown`() = runTest {
-        whenever(fetchAutoAcceptQRLinks()).thenAnswer { throw Exception() }
+        whenever(settingsRepository.getContactLinksOption()).thenAnswer { throw Exception() }
         assertThrows(Exception::class.java) {
             runBlocking { underTest() }
         }
-
-        verifyNoInteractions(settingsRepository)
     }
 
 }

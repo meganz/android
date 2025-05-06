@@ -421,12 +421,10 @@ internal class MegaApiFacade @Inject constructor(
 
     override suspend fun getNumChildFiles(node: MegaNode): Int = megaApi.getNumChildFiles(node)
 
-    override fun setAutoAcceptContactsFromLink(
-        disableAutoAccept: Boolean,
-        listener: MegaRequestListenerInterface,
-    ) = megaApi.setContactLinksOption(disableAutoAccept, listener)
+    override fun setContactLinksOption(enable: Boolean, listener: MegaRequestListenerInterface) =
+        megaApi.setContactLinksOption(enable, listener)
 
-    override fun isAutoAcceptContactsFromLinkEnabled(listener: MegaRequestListenerInterface) =
+    override fun getContactLinksOption(listener: MegaRequestListenerInterface) =
         megaApi.getContactLinksOption(listener)
 
     override fun getFolderInfo(node: MegaNode?, listener: MegaRequestListenerInterface) =
