@@ -6,12 +6,30 @@ import kotlinx.collections.immutable.ImmutableList
 import mega.privacy.android.domain.entity.node.NodeId
 import mega.privacy.android.domain.entity.shares.ShareRecipient
 
-@Immutable
-data class FileContactListState(
-    val folderName: String,
-    val folderId: NodeId,
-    val recipients: ImmutableList<ShareRecipient>,
-    val shareRemovedEvent: StateEventWithContent<String>,
-    val sharingInProgress: Boolean,
-    val sharingCompletedEvent: StateEventWithContent<String>,
-)
+internal sealed interface FileContactListState {
+
+    val folderName: String
+    val folderId: NodeId
+
+    /**
+     * Loading state
+     */
+    @Immutable
+    data class Loading(
+        override val folderName: String,
+        override val folderId: NodeId,
+    ) : FileContactListState
+
+    /**
+     * Loading state
+     */
+    @Immutable
+    data class Data(
+        override val folderName: String,
+        override val folderId: NodeId,
+        val recipients: ImmutableList<ShareRecipient>,
+        val shareRemovedEvent: StateEventWithContent<String>,
+        val sharingInProgress: Boolean,
+        val sharingCompletedEvent: StateEventWithContent<String>,
+    ) : FileContactListState
+}

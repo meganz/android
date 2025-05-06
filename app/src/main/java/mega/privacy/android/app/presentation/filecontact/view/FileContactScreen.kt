@@ -15,6 +15,7 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.painterResource
 import de.palm.composestateevents.EventEffect
+import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.launch
 import mega.android.core.ui.components.MegaScaffold
 import mega.android.core.ui.components.MegaSnackbar
@@ -31,8 +32,8 @@ import mega.privacy.android.domain.entity.shares.ShareRecipient
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun FileContactScreen(
-    state: FileContactListState,
+internal fun FileContactScreen(
+    state: FileContactListState.Data,
     onBackPressed: () -> Unit,
     removeContacts: (List<ShareRecipient>) -> Unit,
     shareFolder: (NodeId, List<String>, AccessPermission) -> Unit,
@@ -41,7 +42,32 @@ fun FileContactScreen(
     shareCompletedEventHandled: () -> Unit,
     navigateToInfo: (ShareRecipient) -> Unit,
     modifier: Modifier = Modifier,
-) {
+    addContactsContract: AddContactsContract = AddContactsContract(),
+    coroutineScope: CoroutineScope = rememberCoroutineScope(),
+    snackbarHostState: SnackbarHostState = remember { SnackbarHostState() },
+    ) {
+    var newShareRecipients: List<String>? by remember { mutableStateOf(null) }
+    val launcher = rememberLauncherForActivityResult(
+        contract = addContactsContract
+    ) { result ->
+        coroutineScope.launch {
+            result?.let {
+                if (result.emails.isNotEmpty()) {
+                    newShareRecipients = result.emails
+                }
+            }
+        }
+    }
+
+    val onShareFolder = {
+        launcher.launch(
+            AddContactsContract.Input(
+                contactType = AddContactsContract.ContactType.All,
+                nodeHandle = listOf(state.folderId.longValue),
+            )
+        )
+    }
+
     var selectedItems by remember { mutableStateOf(emptyList<ShareRecipient>()) }
     val selectionState = SelectionState(
         selectedCount = selectedItems.size,
@@ -71,9 +97,7 @@ fun FileContactScreen(
         }
     }
 
-
     var verifyRemoval: List<ShareRecipient>? by remember { mutableStateOf(null) }
-    val coroutineScope = rememberCoroutineScope()
 
     val selectAll = {
         selectedItems = state.recipients
@@ -85,30 +109,7 @@ fun FileContactScreen(
     val changePermissions = {
         updatePermissions = selectedItems
     }
-    val snackbarHostState = remember { SnackbarHostState() }
 
-    var newShareRecipients: List<String>? by remember { mutableStateOf(null) }
-
-    val launcher = rememberLauncherForActivityResult(
-        contract = AddContactsContract()
-    ) { result ->
-        coroutineScope.launch {
-            result?.let {
-                if (result.emails.isNotEmpty()) {
-                    newShareRecipients = result.emails
-                }
-            }
-        }
-    }
-
-    val onShareFolder = {
-        launcher.launch(
-            AddContactsContract.Input(
-                contactType = AddContactsContract.ContactType.All,
-                nodeHandle = listOf(state.folderId.longValue),
-            )
-        )
-    }
     val removeShare = {
         verifyRemoval = selectedItems
     }
