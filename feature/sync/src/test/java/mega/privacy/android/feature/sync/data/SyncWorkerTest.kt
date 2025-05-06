@@ -21,11 +21,13 @@ import kotlinx.coroutines.test.StandardTestDispatcher
 import kotlinx.coroutines.test.TestScope
 import kotlinx.coroutines.test.advanceTimeBy
 import kotlinx.coroutines.test.runTest
+import mega.privacy.android.data.wrapper.CookieEnabledCheckWrapper
 import mega.privacy.android.domain.entity.BatteryInfo
 import mega.privacy.android.domain.entity.node.NodeId
 import mega.privacy.android.domain.entity.sync.SyncError
 import mega.privacy.android.domain.entity.sync.SyncType
 import mega.privacy.android.domain.usecase.IsOnWifiNetworkUseCase
+import mega.privacy.android.domain.usecase.RootNodeExistsUseCase
 import mega.privacy.android.domain.usecase.environment.MonitorBatteryInfoUseCase
 import mega.privacy.android.domain.usecase.login.BackgroundFastLoginUseCase
 import mega.privacy.android.domain.usecase.network.MonitorConnectivityUseCase
@@ -38,10 +40,10 @@ import mega.privacy.android.feature.sync.domain.usecase.notifcation.GetSyncNotif
 import mega.privacy.android.feature.sync.domain.usecase.notifcation.SetSyncNotificationShownUseCase
 import mega.privacy.android.feature.sync.domain.usecase.sync.MonitorSyncStalledIssuesUseCase
 import mega.privacy.android.feature.sync.domain.usecase.sync.MonitorSyncsUseCase
+import mega.privacy.android.feature.sync.domain.usecase.sync.PauseResumeSyncsBasedOnBatteryAndWiFiUseCase
 import mega.privacy.android.feature.sync.domain.usecase.sync.option.MonitorSyncByWiFiUseCase
 import mega.privacy.android.feature.sync.ui.notification.SyncNotificationManager
 import mega.privacy.android.feature.sync.ui.permissions.SyncPermissionsManager
-import org.junit.Assert.assertEquals
 import org.junit.Before
 import org.junit.Test
 import org.junit.runner.RunWith
@@ -73,8 +75,11 @@ class SyncWorkerTest {
     private val isOnWifiNetworkUseCase: IsOnWifiNetworkUseCase = mock()
     private val syncNotificationManager: SyncNotificationManager = mock()
     private val setSyncNotificationShownUseCase: SetSyncNotificationShownUseCase = mock()
+    private val isRootNodeExistsUseCase: RootNodeExistsUseCase = mock()
+    private val pauseResumeSyncsBasedOnBatteryAndWiFiUseCase: PauseResumeSyncsBasedOnBatteryAndWiFiUseCase =
+        mock()
     private val syncPermissionsManager: SyncPermissionsManager = mock()
-
+    private val cookieEnabledCheckWrapper: CookieEnabledCheckWrapper = mock()
     private val monitorSyncsUseCase: MonitorSyncsUseCase = mock()
 
     @Before
@@ -101,7 +106,7 @@ class SyncWorkerTest {
                 workDatabase, { _, _ -> }, workExecutor
             )
         )
-        whenever(loginMutex.isLocked).thenReturn(true)
+        whenever(loginMutex.isLocked).thenReturn(false)
         whenever(monitorSyncStalledIssuesUseCase()).thenReturn(flowOf(emptyList()))
         whenever(monitorBatteryInfoUseCase()).thenReturn(flowOf(mock()))
         whenever(monitorSyncByWiFiUseCase()).thenReturn(flowOf(false))
@@ -120,7 +125,10 @@ class SyncWorkerTest {
             isOnWifiNetworkUseCase,
             syncNotificationManager,
             setSyncNotificationShownUseCase,
-            syncPermissionsManager
+            pauseResumeSyncsBasedOnBatteryAndWiFiUseCase,
+            isRootNodeExistsUseCase,
+            syncPermissionsManager,
+            cookieEnabledCheckWrapper,
         )
     }
 
@@ -193,7 +201,7 @@ class SyncWorkerTest {
 
         val result = deferredResult.await()
 
-        assertEquals(Result.success(), result)
+        assertThat(result).isEqualTo(Result.success())
     }
 
     @Test
@@ -229,6 +237,7 @@ class SyncWorkerTest {
             )
         ).thenReturn(notification)
         whenever(syncPermissionsManager.isNotificationsPermissionGranted()).thenReturn(true)
+        whenever(syncNotificationManager.isSyncNotificationDisplayed()).thenReturn(false)
 
         underTest.doWork()
 

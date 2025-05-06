@@ -1,5 +1,6 @@
 package mega.privacy.android.feature.sync.data.gateway
 
+import androidx.work.BackoffPolicy
 import androidx.work.Constraints
 import androidx.work.ExistingPeriodicWorkPolicy
 import androidx.work.NetworkType
@@ -36,6 +37,11 @@ internal class SyncWorkManagerGatewayImpl @Inject constructor(
                             .setRequiresBatteryNotLow(true)
                             .build()
                     )
+                    .setBackoffCriteria(
+                        BackoffPolicy.LINEAR,
+                        SYNC_LINEAR_BACKOFF_TIME,
+                        TimeUnit.SECONDS
+                    )
                     .addTag(SyncWorker.SYNC_WORKER_TAG)
                     .build()
             workManager.enqueueUniquePeriodicWork(
@@ -61,5 +67,9 @@ internal class SyncWorkManagerGatewayImpl @Inject constructor(
             ?.map { workInfo -> workInfo.state == WorkInfo.State.ENQUEUED || workInfo.state == WorkInfo.State.RUNNING }
             ?.contains(true)
             ?: false
+    }
+
+    private companion object {
+        const val SYNC_LINEAR_BACKOFF_TIME = 10L
     }
 }
