@@ -1,6 +1,7 @@
 package mega.privacy.android.app.presentation.meeting.chat.view.navigation
 
 import android.content.Context
+import android.content.Intent
 import android.os.Bundle
 import androidx.fragment.app.commit
 import mega.privacy.android.app.presentation.meeting.chat.ChatFragment
@@ -24,15 +25,18 @@ internal fun openChatFragment(
     chatLink: String? = null,
 ) {
     context.findChatHostActivity()?.apply {
-        supportFragmentManager.commit {
-            val extras = Bundle().apply {
-                putString(EXTRA_ACTION, ACTION_CHAT_SHOW_MESSAGES)
-                putLong(Constants.CHAT_ID, chatId)
-                chatLink?.let {
-                    putString(EXTRA_LINK, it)
-                }
+        Bundle().apply {
+            putString(EXTRA_ACTION, ACTION_CHAT_SHOW_MESSAGES)
+            putLong(Constants.CHAT_ID, chatId)
+            chatLink?.let {
+                putString(EXTRA_LINK, it)
             }
-            replace(android.R.id.content, ChatFragment::class.java, extras)
+        }.let { extras ->
+            intent = Intent().apply { putExtras(extras) }
+
+            supportFragmentManager.commit {
+                replace(android.R.id.content, ChatFragment::class.java, extras)
+            }
         }
     } ?: run {
         Timber.e("This navigation needs to be used from ChatHostActivity only")
